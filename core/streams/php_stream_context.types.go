@@ -1,0 +1,44 @@
+// <<generate>>
+
+package streams
+
+/**
+ * PhpStreamNotifier
+ */
+type PhpStreamNotifier struct {
+	func_        PhpStreamNotificationFunc
+	dtor         func(notifier *PhpStreamNotifier)
+	ptr          zend.Zval
+	mask         int
+	progress     int
+	progress_max int
+}
+
+func (this PhpStreamNotifier) GetFunc() PhpStreamNotificationFunc               { return this.func_ }
+func (this *PhpStreamNotifier) SetFunc(value PhpStreamNotificationFunc)         { this.func_ = value }
+func (this PhpStreamNotifier) GetDtor() func(notifier *PhpStreamNotifier)       { return this.dtor }
+func (this *PhpStreamNotifier) SetDtor(value func(notifier *PhpStreamNotifier)) { this.dtor = value }
+func (this PhpStreamNotifier) GetPtr() zend.Zval                                { return this.ptr }
+func (this *PhpStreamNotifier) SetPtr(value zend.Zval)                          { this.ptr = value }
+func (this PhpStreamNotifier) GetMask() int                                     { return this.mask }
+func (this *PhpStreamNotifier) SetMask(value int)                               { this.mask = value }
+func (this PhpStreamNotifier) GetProgress() int                                 { return this.progress }
+func (this *PhpStreamNotifier) SetProgress(value int)                           { this.progress = value }
+func (this PhpStreamNotifier) GetProgressMax() int                              { return this.progress_max }
+func (this *PhpStreamNotifier) SetProgressMax(value int)                        { this.progress_max = value }
+
+/**
+ * PhpStreamContext
+ */
+type PhpStreamContext struct {
+	notifier *PhpStreamNotifier
+	options  zend.Zval
+	res      *zend.ZendResource
+}
+
+func (this PhpStreamContext) GetNotifier() *PhpStreamNotifier       { return this.notifier }
+func (this *PhpStreamContext) SetNotifier(value *PhpStreamNotifier) { this.notifier = value }
+func (this PhpStreamContext) GetOptions() zend.Zval                 { return this.options }
+func (this *PhpStreamContext) SetOptions(value zend.Zval)           { this.options = value }
+func (this PhpStreamContext) GetRes() *zend.ZendResource            { return this.res }
+func (this *PhpStreamContext) SetRes(value *zend.ZendResource)      { this.res = value }
