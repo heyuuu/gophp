@@ -2,7 +2,9 @@
 
 package zend
 
-import g "sik/runtime/grammar"
+import (
+	g "sik/runtime/grammar"
+)
 
 // Source: <Zend/zend_strtod.h>
 

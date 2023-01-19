@@ -2,6 +2,11 @@
 
 package standard
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 /**
  * PhpStreamInputT
  */

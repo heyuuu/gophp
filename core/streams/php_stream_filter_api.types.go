@@ -2,6 +2,11 @@
 
 package streams
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 /**
  * PhpStreamBucket
  */

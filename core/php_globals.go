@@ -2,8 +2,6 @@
 
 package core
 
-import "sik/zend"
-
 // Source: <main/php_globals.h>
 
 /*

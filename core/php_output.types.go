@@ -2,6 +2,10 @@
 
 package core
 
+import (
+	"sik/zend"
+)
+
 /**
  * PhpOutputBuffer
  */

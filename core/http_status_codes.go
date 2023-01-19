@@ -2,7 +2,9 @@
 
 package core
 
-import g "sik/runtime/grammar"
+import (
+	g "sik/runtime/grammar"
+)
 
 // Source: <main/http_status_codes.h>
 

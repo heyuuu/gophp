@@ -2,7 +2,9 @@
 
 package cli
 
-import g "sik/runtime/grammar"
+import (
+	g "sik/runtime/grammar"
+)
 
 // Source: <sapi/cli/php_http_parser.h>
 

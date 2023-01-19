@@ -2,6 +2,10 @@
 
 package standard
 
+import (
+	"sik/core"
+)
+
 /**
  * PhpFtpDirstreamData
  */

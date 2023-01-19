@@ -2,7 +2,9 @@
 
 package zend
 
-import g "sik/runtime/grammar"
+import (
+	g "sik/runtime/grammar"
+)
 
 func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = execute_data.GetOpline()

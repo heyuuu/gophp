@@ -2,7 +2,9 @@
 
 package standard
 
-import g "sik/runtime/grammar"
+import (
+	g "sik/runtime/grammar"
+)
 
 // Source: <ext/standard/crypt_freesec.h>
 

@@ -2,7 +2,9 @@
 
 package standard
 
-import "sik/zend"
+import (
+	"sik/zend"
+)
 
 // Source: <ext/standard/php_password.h>
 

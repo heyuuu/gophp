@@ -2,6 +2,10 @@
 
 package spl
 
+import (
+	"sik/zend"
+)
+
 /**
  * _spl_cbfilter_it_intern
  */

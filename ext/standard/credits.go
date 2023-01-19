@@ -2,7 +2,9 @@
 
 package standard
 
-import "sik/core"
+import (
+	"sik/core"
+)
 
 // Source: <ext/standard/credits.h>
 

@@ -2,7 +2,9 @@
 
 package standard
 
-import "sik/core"
+import (
+	"sik/core"
+)
 
 // Source: <ext/standard/php_fopen_wrappers.h>
 

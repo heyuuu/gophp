@@ -2,6 +2,11 @@
 
 package cli
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 /**
  * ZendCliServerGlobals
  */

@@ -2,7 +2,9 @@
 
 package spl
 
-import "sik/zend"
+import (
+	"sik/zend"
+)
 
 // Source: <ext/spl/spl_exceptions.h>
 

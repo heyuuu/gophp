@@ -2,7 +2,9 @@
 
 package core
 
-import "sik/zend"
+import (
+	"sik/zend"
+)
 
 // Source: <main/php_open_temporary_file.h>
 

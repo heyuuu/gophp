@@ -2,8 +2,6 @@
 
 package standard
 
-import "sik/zend"
-
 // Source: <ext/standard/php_array.h>
 
 /*

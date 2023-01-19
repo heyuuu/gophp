@@ -2,6 +2,11 @@
 
 package core
 
+import (
+	"sik/core/streams"
+	"sik/zend"
+)
+
 /**
  * PhpStreamStatbuf
  */

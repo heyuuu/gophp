@@ -2,11 +2,6 @@
 
 package streams
 
-import (
-	"sik/core"
-	"sik/zend"
-)
-
 // Source: <main/streams/php_stream_filter_api.h>
 
 /*

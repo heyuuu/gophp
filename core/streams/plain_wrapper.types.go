@@ -2,6 +2,10 @@
 
 package streams
 
+import (
+	"sik/zend"
+)
+
 /**
  * PhpStdioStreamData
  */

@@ -2,6 +2,10 @@
 
 package cgi
 
+import (
+	"sik/zend"
+)
+
 /**
  * php_cgi_globals_struct
  */

@@ -2,6 +2,10 @@
 
 package spl
 
+import (
+	"sik/zend"
+)
+
 /**
  * SplPtrHeap
  */
