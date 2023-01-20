@@ -1227,10 +1227,242 @@ var ArginfoHeapCompare []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{
 var ArginfoPqueueInsert []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"value", 0, 0, 0}, {"priority", 0, 0, 0}}
 var ArginfoPqueueSetflags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"flags", 0, 0, 0}}
 var ArginfoSplheapVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var spl_funcs_SplMinHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"compare", zim_spl_SplMinHeap_compare, ArginfoHeapCompare, uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 1}, {nil, nil, nil, 0, 0}}
-var spl_funcs_SplMaxHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"compare", zim_spl_SplMaxHeap_compare, ArginfoHeapCompare, uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 1}, {nil, nil, nil, 0, 0}}
-var spl_funcs_SplPriorityQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"compare", zim_spl_SplPriorityQueue_compare, ArginfoHeapCompare, uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"insert", zim_spl_SplPriorityQueue_insert, ArginfoPqueueInsert, uint32(g.SizeOf("arginfo_pqueue_insert")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setExtractFlags", zim_spl_SplPriorityQueue_setExtractFlags, ArginfoPqueueSetflags, uint32(g.SizeOf("arginfo_pqueue_setflags")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getExtractFlags", zim_spl_SplPriorityQueue_getExtractFlags, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"top", zim_spl_SplPriorityQueue_top, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"extract", zim_spl_SplPriorityQueue_extract, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"count", zim_spl_SplHeap_count, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"isEmpty", zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_SplHeap_rewind, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_SplPriorityQueue_current, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_SplHeap_key, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_SplHeap_next, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_SplHeap_valid, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"recoverFromCorruption", zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"isCorrupted", zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"__debugInfo", zim_spl_SplPriorityQueue___debugInfo, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var spl_funcs_SplHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"extract", zim_spl_SplHeap_extract, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"insert", zim_spl_SplHeap_insert, ArginfoHeapInsert, uint32(g.SizeOf("arginfo_heap_insert")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"top", zim_spl_SplHeap_top, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"count", zim_spl_SplHeap_count, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"isEmpty", zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_SplHeap_rewind, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_SplHeap_current, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_SplHeap_key, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_SplHeap_next, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_SplHeap_valid, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"recoverFromCorruption", zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"isCorrupted", zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"__debugInfo", zim_spl_SplHeap___debugInfo, ArginfoSplheapVoid, uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"compare", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<1 | 1<<6}, {nil, nil, nil, 0, 0}}
+var spl_funcs_SplMinHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"compare",
+		zim_spl_SplMinHeap_compare,
+		ArginfoHeapCompare,
+		uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 1,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var spl_funcs_SplMaxHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"compare",
+		zim_spl_SplMaxHeap_compare,
+		ArginfoHeapCompare,
+		uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 1,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var spl_funcs_SplPriorityQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"compare",
+		zim_spl_SplPriorityQueue_compare,
+		ArginfoHeapCompare,
+		uint32(g.SizeOf("arginfo_heap_compare")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"insert",
+		zim_spl_SplPriorityQueue_insert,
+		ArginfoPqueueInsert,
+		uint32(g.SizeOf("arginfo_pqueue_insert")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setExtractFlags",
+		zim_spl_SplPriorityQueue_setExtractFlags,
+		ArginfoPqueueSetflags,
+		uint32(g.SizeOf("arginfo_pqueue_setflags")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getExtractFlags",
+		zim_spl_SplPriorityQueue_getExtractFlags,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"top",
+		zim_spl_SplPriorityQueue_top,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"extract",
+		zim_spl_SplPriorityQueue_extract,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"count",
+		zim_spl_SplHeap_count,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"isEmpty",
+		zim_spl_SplHeap_isEmpty,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_SplHeap_rewind,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_SplPriorityQueue_current,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_SplHeap_key,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_SplHeap_next,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_SplHeap_valid,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"recoverFromCorruption",
+		zim_spl_SplHeap_recoverFromCorruption,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"isCorrupted",
+		zim_spl_SplHeap_isCorrupted,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"__debugInfo",
+		zim_spl_SplPriorityQueue___debugInfo,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var spl_funcs_SplHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"extract",
+		zim_spl_SplHeap_extract,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"insert",
+		zim_spl_SplHeap_insert,
+		ArginfoHeapInsert,
+		uint32(g.SizeOf("arginfo_heap_insert")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"top",
+		zim_spl_SplHeap_top,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"count",
+		zim_spl_SplHeap_count,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"isEmpty",
+		zim_spl_SplHeap_isEmpty,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_SplHeap_rewind,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_SplHeap_current,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_SplHeap_key,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_SplHeap_next,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_SplHeap_valid,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"recoverFromCorruption",
+		zim_spl_SplHeap_recoverFromCorruption,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"isCorrupted",
+		zim_spl_SplHeap_isCorrupted,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"__debugInfo",
+		zim_spl_SplHeap___debugInfo,
+		ArginfoSplheapVoid,
+		uint32(g.SizeOf("arginfo_splheap_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"compare",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<1 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 

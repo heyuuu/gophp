@@ -145,7 +145,7 @@ import (
  * Do format conversion placing the output in buffer
  */
 
-func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap va_list) {
+func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) {
 	var s *byte = nil
 	var s_len int
 	var free_zcopy int
@@ -765,13 +765,13 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap va_list)
 
 /* }}} */
 
-func PhpPrintfToSmartString(buf *zend.SmartString, format *byte, ap va_list) {
+func PhpPrintfToSmartString(buf *zend.SmartString, format *byte, ap ...any) {
 	XbufFormatConverter(buf, 1, format, ap)
 }
 
 /* }}} */
 
-func PhpPrintfToSmartStr(buf *zend.SmartStr, format *byte, ap va_list) {
+func PhpPrintfToSmartStr(buf *zend.SmartStr, format *byte, ap ...any) {
 	XbufFormatConverter(buf, 0, format, ap)
 }
 

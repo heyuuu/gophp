@@ -283,7 +283,7 @@ func (this *ZendClassEntry) SetModule(value *ZendModuleEntry) { this.info.intern
  * ZendUtilityFunctions
  */
 type ZendUtilityFunctions struct {
-	error_function                  func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args va_list)
+	error_function                  func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 	printf_function                 func(format *byte, _ ...any) int
 	write_function                  func(str *byte, str_length int) int
 	fopen_function                  func(filename *byte, opened_path **ZendString) *FILE
@@ -292,16 +292,16 @@ type ZendUtilityFunctions struct {
 	ticks_function                  func(ticks int)
 	on_timeout                      func(seconds int)
 	stream_open_function            func(filename *byte, handle *ZendFileHandle) int
-	printf_to_smart_string_function func(buf *SmartString, format *byte, ap va_list)
-	printf_to_smart_str_function    func(buf *SmartStr, format *byte, ap va_list)
+	printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any)
+	printf_to_smart_str_function    func(buf *SmartStr, format *byte, ap ...any)
 	getenv_function                 func(name *byte, name_len int) *byte
 	resolve_path_function           func(filename *byte, filename_len int) *ZendString
 }
 
-func (this ZendUtilityFunctions) GetErrorFunction() func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args va_list) {
+func (this ZendUtilityFunctions) GetErrorFunction() func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
 	return this.error_function
 }
-func (this *ZendUtilityFunctions) SetErrorFunction(value func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args va_list)) {
+func (this *ZendUtilityFunctions) SetErrorFunction(value func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)) {
 	this.error_function = value
 }
 func (this ZendUtilityFunctions) GetPrintfFunction() func(format *byte, _ ...any) int {
@@ -346,16 +346,16 @@ func (this ZendUtilityFunctions) GetStreamOpenFunction() func(filename *byte, ha
 func (this *ZendUtilityFunctions) SetStreamOpenFunction(value func(filename *byte, handle *ZendFileHandle) int) {
 	this.stream_open_function = value
 }
-func (this ZendUtilityFunctions) GetPrintfToSmartStringFunction() func(buf *SmartString, format *byte, ap va_list) {
+func (this ZendUtilityFunctions) GetPrintfToSmartStringFunction() func(buf *SmartString, format *byte, ap ...any) {
 	return this.printf_to_smart_string_function
 }
-func (this *ZendUtilityFunctions) SetPrintfToSmartStringFunction(value func(buf *SmartString, format *byte, ap va_list)) {
+func (this *ZendUtilityFunctions) SetPrintfToSmartStringFunction(value func(buf *SmartString, format *byte, ap ...any)) {
 	this.printf_to_smart_string_function = value
 }
-func (this ZendUtilityFunctions) GetPrintfToSmartStrFunction() func(buf *SmartStr, format *byte, ap va_list) {
+func (this ZendUtilityFunctions) GetPrintfToSmartStrFunction() func(buf *SmartStr, format *byte, ap ...any) {
 	return this.printf_to_smart_str_function
 }
-func (this *ZendUtilityFunctions) SetPrintfToSmartStrFunction(value func(buf *SmartStr, format *byte, ap va_list)) {
+func (this *ZendUtilityFunctions) SetPrintfToSmartStrFunction(value func(buf *SmartStr, format *byte, ap ...any)) {
 	this.printf_to_smart_str_function = value
 }
 func (this ZendUtilityFunctions) GetGetenvFunction() func(name *byte, name_len int) *byte {

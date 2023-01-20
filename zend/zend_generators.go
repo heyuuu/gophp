@@ -1608,7 +1608,65 @@ func ZendGeneratorGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 var ArginfoGeneratorVoid []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
 var ArginfoGeneratorSend []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"value", 0, 0, 0}}
 var ArginfoGeneratorThrow []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"exception", 0, 0, 0}}
-var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{{"rewind", zim_Generator_rewind, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_Generator_valid, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_Generator_current, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_Generator_key, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_Generator_next, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"send", zim_Generator_send, ArginfoGeneratorSend, uint32(g.SizeOf("arginfo_generator_send")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"throw", zim_Generator_throw, ArginfoGeneratorThrow, uint32(g.SizeOf("arginfo_generator_throw")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getReturn", zim_Generator_getReturn, ArginfoGeneratorVoid, uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"rewind",
+		zim_Generator_rewind,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_Generator_valid,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_Generator_current,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_Generator_key,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_Generator_next,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"send",
+		zim_Generator_send,
+		ArginfoGeneratorSend,
+		uint32(g.SizeOf("arginfo_generator_send")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"throw",
+		zim_Generator_throw,
+		ArginfoGeneratorThrow,
+		uint32(g.SizeOf("arginfo_generator_throw")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getReturn",
+		zim_Generator_getReturn,
+		ArginfoGeneratorVoid,
+		uint32(g.SizeOf("arginfo_generator_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func ZendRegisterGeneratorCe() {
 	var ce ZendClassEntry

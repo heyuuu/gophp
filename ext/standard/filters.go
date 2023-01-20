@@ -1827,7 +1827,16 @@ var StandardFilters []struct {
 } = []struct {
 	ops     *streams.PhpStreamFilterOps
 	factory *streams.PhpStreamFilterFactory
-}{{&StrfilterRot13Ops, &StrfilterRot13Factory}, {&StrfilterToupperOps, &StrfilterToupperFactory}, {&StrfilterTolowerOps, &StrfilterTolowerFactory}, {&StrfilterStripTagsOps, &StrfilterStripTagsFactory}, {&StrfilterConvertOps, &StrfilterConvertFactory}, {&ConsumedFilterOps, &ConsumedFilterFactory}, {&ChunkedFilterOps, &ChunkedFilterFactory}, {nil, nil}}
+}{
+	{&StrfilterRot13Ops, &StrfilterRot13Factory},
+	{&StrfilterToupperOps, &StrfilterToupperFactory},
+	{&StrfilterTolowerOps, &StrfilterTolowerFactory},
+	{&StrfilterStripTagsOps, &StrfilterStripTagsFactory},
+	{&StrfilterConvertOps, &StrfilterConvertFactory},
+	{&ConsumedFilterOps, &ConsumedFilterFactory},
+	{&ChunkedFilterOps, &ChunkedFilterFactory},
+	{nil, nil},
+}
 
 /* {{{ filter MINIT and MSHUTDOWN */
 

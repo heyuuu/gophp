@@ -62,7 +62,30 @@ var DirClassEntryPtr *zend.ZendClassEntry
 
 /* }}} */
 
-var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"close", ZifClosedir, ArginfoDir, uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"rewind", ZifRewinddir, ArginfoDir, uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"read", PhpIfReaddir, ArginfoDir, uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"close",
+		ZifClosedir,
+		ArginfoDir,
+		uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"rewind",
+		ZifRewinddir,
+		ArginfoDir,
+		uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"read",
+		PhpIfReaddir,
+		ArginfoDir,
+		uint32(g.SizeOf("arginfo_dir")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func PhpSetDefaultDir(res *zend.ZendResource) {
 	if DirGlobals.GetDefaultDir() != nil {

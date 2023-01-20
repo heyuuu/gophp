@@ -992,14 +992,167 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 
 /* }}} */
 
-var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{{"getMessage", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getCode", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getFile", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getLine", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getTrace", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getPrevious", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getTraceAsString", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"__toString", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"getMessage",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getCode",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getFile",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getLine",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getTrace",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getPrevious",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getTraceAsString",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"__toString",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 
 var ArginfoExceptionConstruct []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"message", 0, 0, 0}, {"code", 0, 0, 0}, {"previous", 0, 0, 0}}
-var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{{"__clone", ZimExceptionClone, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<2 | 1<<5}, {"__construct", ZimExceptionConstruct, ArginfoExceptionConstruct, uint32(g.SizeOf("arginfo_exception___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"__wakeup", ZimExceptionWakeup, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getMessage", zim_exception_getMessage, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getCode", zim_exception_getCode, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getFile", zim_exception_getFile, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getLine", zim_exception_getLine, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getTrace", zim_exception_getTrace, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getPrevious", zim_exception_getPrevious, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"getTraceAsString", zim_exception_getTraceAsString, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {"__toString", zim_exception___toString, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"__clone",
+		ZimExceptionClone,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<2 | 1<<5,
+	},
+	{
+		"__construct",
+		ZimExceptionConstruct,
+		ArginfoExceptionConstruct,
+		uint32(g.SizeOf("arginfo_exception___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"__wakeup",
+		ZimExceptionWakeup,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getMessage",
+		zim_exception_getMessage,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getCode",
+		zim_exception_getCode,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getFile",
+		zim_exception_getFile,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getLine",
+		zim_exception_getLine,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getTrace",
+		zim_exception_getTrace,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getPrevious",
+		zim_exception_getPrevious,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"getTraceAsString",
+		zim_exception_getTraceAsString,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{
+		"__toString",
+		zim_exception___toString,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var ArginfoErrorExceptionConstruct []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"message", 0, 0, 0}, {"code", 0, 0, 0}, {"severity", 0, 0, 0}, {"filename", 0, 0, 0}, {"lineno", 0, 0, 0}, {"previous", 0, 0, 0}}
-var ErrorExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{{"__construct", ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct, uint32(g.SizeOf("arginfo_error_exception___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getSeverity", zim_error_exception_getSeverity, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<5}, {nil, nil, nil, 0, 0}}
+var ErrorExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"__construct",
+		ZimErrorExceptionConstruct,
+		ArginfoErrorExceptionConstruct,
+		uint32(g.SizeOf("arginfo_error_exception___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getSeverity",
+		zim_error_exception_getSeverity,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<5,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 

@@ -185,7 +185,23 @@ type SplIteratorApplyFuncT func(iter *zend.ZendObjectIterator, puser any) int
 // # include "zend_smart_str.h"
 
 var ArginfoRecursiveItVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var spl_funcs_RecursiveIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"hasChildren", nil, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"getChildren", nil, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var spl_funcs_RecursiveIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"hasChildren",
+		nil,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"getChildren",
+		nil,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 type RecursiveIteratorMode = int
 
@@ -1135,10 +1151,143 @@ func spl_RecursiveTreeIterator_new(class_type *zend.ZendClassEntry) *zend.ZendOb
 
 /* }}} */
 
-var ArginfoRecursiveItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}, {"mode", 0, 0, 0}, {"flags", 0, 0, 0}}
+var ArginfoRecursiveItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+	{"mode", 0, 0, 0},
+	{"flags", 0, 0, 0},
+}
 var arginfo_recursive_it_getSubIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"level", 0, 0, 0}}
 var arginfo_recursive_it_setMaxDepth []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"max_depth", 0, 0, 0}}
-var spl_funcs_RecursiveIteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveIteratorIterator___construct, ArginfoRecursiveItConstruct, uint32(g.SizeOf("arginfo_recursive_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_RecursiveIteratorIterator_key, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_RecursiveIteratorIterator_current, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getDepth", zim_spl_RecursiveIteratorIterator_getDepth, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getSubIterator", zim_spl_RecursiveIteratorIterator_getSubIterator, arginfo_recursive_it_getSubIterator, uint32(g.SizeOf("arginfo_recursive_it_getSubIterator")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_RecursiveIteratorIterator_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"beginIteration", zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"endIteration", zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"callHasChildren", zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"callGetChildren", zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"beginChildren", zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"endChildren", zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"nextElement", zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setMaxDepth", zim_spl_RecursiveIteratorIterator_setMaxDepth, arginfo_recursive_it_setMaxDepth, uint32(g.SizeOf("arginfo_recursive_it_setMaxDepth")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getMaxDepth", zim_spl_RecursiveIteratorIterator_getMaxDepth, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_RecursiveIteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveIteratorIterator___construct,
+		ArginfoRecursiveItConstruct,
+		uint32(g.SizeOf("arginfo_recursive_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_RecursiveIteratorIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_RecursiveIteratorIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_RecursiveIteratorIterator_key,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_RecursiveIteratorIterator_current,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_RecursiveIteratorIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getDepth",
+		zim_spl_RecursiveIteratorIterator_getDepth,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getSubIterator",
+		zim_spl_RecursiveIteratorIterator_getSubIterator,
+		arginfo_recursive_it_getSubIterator,
+		uint32(g.SizeOf("arginfo_recursive_it_getSubIterator")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_RecursiveIteratorIterator_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"beginIteration",
+		zim_spl_RecursiveIteratorIterator_beginIteration,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"endIteration",
+		zim_spl_RecursiveIteratorIterator_endIteration,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"callHasChildren",
+		zim_spl_RecursiveIteratorIterator_callHasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"callGetChildren",
+		zim_spl_RecursiveIteratorIterator_callGetChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"beginChildren",
+		zim_spl_RecursiveIteratorIterator_beginChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"endChildren",
+		zim_spl_RecursiveIteratorIterator_endChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"nextElement",
+		zim_spl_RecursiveIteratorIterator_nextElement,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setMaxDepth",
+		zim_spl_RecursiveIteratorIterator_setMaxDepth,
+		arginfo_recursive_it_setMaxDepth,
+		uint32(g.SizeOf("arginfo_recursive_it_setMaxDepth")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getMaxDepth",
+		zim_spl_RecursiveIteratorIterator_getMaxDepth,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_value *zend.Zval) {
 	var str zend.SmartStr = zend.SmartStr{0}
@@ -1475,10 +1624,144 @@ func zim_spl_RecursiveTreeIterator_key(execute_data *zend.ZendExecuteData, retur
 	return
 }
 
-var ArginfoRecursiveTreeItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}, {"flags", 0, 0, 0}, {"caching_it_flags", 0, 0, 0}, {"mode", 0, 0, 0}}
+var ArginfoRecursiveTreeItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+	{"flags", 0, 0, 0},
+	{"caching_it_flags", 0, 0, 0},
+	{"mode", 0, 0, 0},
+}
 var arginfo_recursive_tree_it_setPrefixPart []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"part", 0, 0, 0}, {"value", 0, 0, 0}}
 var arginfo_recursive_tree_it_setPostfix []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"postfix", 0, 0, 0}}
-var spl_funcs_RecursiveTreeIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveTreeIterator___construct, ArginfoRecursiveTreeItConstruct, uint32(g.SizeOf("arginfo_recursive_tree_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_RecursiveIteratorIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_RecursiveIteratorIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_RecursiveTreeIterator_key, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_RecursiveTreeIterator_current, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_RecursiveIteratorIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"beginIteration", zim_spl_RecursiveIteratorIterator_beginIteration, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"endIteration", zim_spl_RecursiveIteratorIterator_endIteration, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"callHasChildren", zim_spl_RecursiveIteratorIterator_callHasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"callGetChildren", zim_spl_RecursiveIteratorIterator_callGetChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"beginChildren", zim_spl_RecursiveIteratorIterator_beginChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"endChildren", zim_spl_RecursiveIteratorIterator_endChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"nextElement", zim_spl_RecursiveIteratorIterator_nextElement, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getPrefix", zim_spl_RecursiveTreeIterator_getPrefix, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setPrefixPart", zim_spl_RecursiveTreeIterator_setPrefixPart, arginfo_recursive_tree_it_setPrefixPart, uint32(g.SizeOf("arginfo_recursive_tree_it_setPrefixPart")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getEntry", zim_spl_RecursiveTreeIterator_getEntry, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setPostfix", zim_spl_RecursiveTreeIterator_setPostfix, arginfo_recursive_tree_it_setPostfix, uint32(g.SizeOf("arginfo_recursive_tree_it_setPostfix")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getPostfix", zim_spl_RecursiveTreeIterator_getPostfix, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_RecursiveTreeIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveTreeIterator___construct,
+		ArginfoRecursiveTreeItConstruct,
+		uint32(g.SizeOf("arginfo_recursive_tree_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_RecursiveIteratorIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_RecursiveIteratorIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_RecursiveTreeIterator_key,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_RecursiveTreeIterator_current,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_RecursiveIteratorIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"beginIteration",
+		zim_spl_RecursiveIteratorIterator_beginIteration,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"endIteration",
+		zim_spl_RecursiveIteratorIterator_endIteration,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"callHasChildren",
+		zim_spl_RecursiveIteratorIterator_callHasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"callGetChildren",
+		zim_spl_RecursiveIteratorIterator_callGetChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"beginChildren",
+		zim_spl_RecursiveIteratorIterator_beginChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"endChildren",
+		zim_spl_RecursiveIteratorIterator_endChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"nextElement",
+		zim_spl_RecursiveIteratorIterator_nextElement,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getPrefix",
+		zim_spl_RecursiveTreeIterator_getPrefix,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setPrefixPart",
+		zim_spl_RecursiveTreeIterator_setPrefixPart,
+		arginfo_recursive_tree_it_setPrefixPart,
+		uint32(g.SizeOf("arginfo_recursive_tree_it_setPrefixPart")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getEntry",
+		zim_spl_RecursiveTreeIterator_getEntry,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setPostfix",
+		zim_spl_RecursiveTreeIterator_setPostfix,
+		arginfo_recursive_tree_it_setPostfix,
+		uint32(g.SizeOf("arginfo_recursive_tree_it_setPostfix")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getPostfix",
+		zim_spl_RecursiveTreeIterator_getPostfix,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplDualItGetMethod(object **zend.ZendObject, method *zend.ZendString, key *zend.Zval) *zend.ZendFunction {
 	var function_handler *zend.ZendFunction
@@ -2704,22 +2987,281 @@ func SplDualItNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 
 /* }}} */
 
-var ArginfoFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}}
-var spl_funcs_FilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_FilterIterator___construct, ArginfoFilterItConstruct, uint32(g.SizeOf("arginfo_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_FilterIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", ZimSplDualItValid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", ZimSplDualItKey, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", ZimSplDualItCurrent, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_FilterIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"accept", nil, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
-var ArginfoCallbackFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}, {"callback", 0, 0, 0}}
-var spl_funcs_CallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_CallbackFilterIterator___construct, ArginfoCallbackFilterItConstruct, uint32(g.SizeOf("arginfo_callback_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"accept", zim_spl_CallbackFilterIterator_accept, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var ArginfoRecursiveCallbackFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("RecursiveIterator"), 0, 0}, {"callback", 0, 0, 0}}
-var spl_funcs_RecursiveCallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveCallbackFilterIterator___construct, ArginfoRecursiveCallbackFilterItConstruct, uint32(g.SizeOf("arginfo_recursive_callback_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"hasChildren", zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getChildren", zim_spl_RecursiveCallbackFilterIterator_getChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var ArginfoParentItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("RecursiveIterator"), 0, 0}}
-var spl_funcs_RecursiveFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveFilterIterator___construct, ArginfoParentItConstruct, uint32(g.SizeOf("arginfo_parent_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"hasChildren", zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getChildren", zim_spl_RecursiveFilterIterator_getChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var spl_funcs_ParentIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_ParentIterator___construct, ArginfoParentItConstruct, uint32(g.SizeOf("arginfo_parent_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"accept", zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var ArginfoRegexItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}, {"regex", 0, 0, 0}, {"mode", 0, 0, 0}, {"flags", 0, 0, 0}, {"preg_flags", 0, 0, 0}}
+var ArginfoFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+}
+var spl_funcs_FilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_FilterIterator___construct,
+		ArginfoFilterItConstruct,
+		uint32(g.SizeOf("arginfo_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_FilterIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		ZimSplDualItValid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		ZimSplDualItKey,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		ZimSplDualItCurrent,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_FilterIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"accept",
+		nil,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoCallbackFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+	{"callback", 0, 0, 0},
+}
+var spl_funcs_CallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_CallbackFilterIterator___construct,
+		ArginfoCallbackFilterItConstruct,
+		uint32(g.SizeOf("arginfo_callback_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"accept",
+		zim_spl_CallbackFilterIterator_accept,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoRecursiveCallbackFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("RecursiveIterator"), 0, 0},
+	{"callback", 0, 0, 0},
+}
+var spl_funcs_RecursiveCallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveCallbackFilterIterator___construct,
+		ArginfoRecursiveCallbackFilterItConstruct,
+		uint32(g.SizeOf("arginfo_recursive_callback_filter_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"hasChildren",
+		zim_spl_RecursiveFilterIterator_hasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getChildren",
+		zim_spl_RecursiveCallbackFilterIterator_getChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoParentItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("RecursiveIterator"), 0, 0},
+}
+var spl_funcs_RecursiveFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveFilterIterator___construct,
+		ArginfoParentItConstruct,
+		uint32(g.SizeOf("arginfo_parent_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"hasChildren",
+		zim_spl_RecursiveFilterIterator_hasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getChildren",
+		zim_spl_RecursiveFilterIterator_getChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var spl_funcs_ParentIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_ParentIterator___construct,
+		ArginfoParentItConstruct,
+		uint32(g.SizeOf("arginfo_parent_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"accept",
+		zim_spl_RecursiveFilterIterator_hasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoRegexItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(2)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+	{"regex", 0, 0, 0},
+	{"mode", 0, 0, 0},
+	{"flags", 0, 0, 0},
+	{"preg_flags", 0, 0, 0},
+}
 var ArginfoRegexItSetMode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"mode", 0, 0, 0}}
 var ArginfoRegexItSetFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"flags", 0, 0, 0}}
 var ArginfoRegexItSetPregFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"preg_flags", 0, 0, 0}}
-var spl_funcs_RegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RegexIterator___construct, ArginfoRegexItConstruct, uint32(g.SizeOf("arginfo_regex_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"accept", zim_spl_RegexIterator_accept, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getMode", zim_spl_RegexIterator_getMode, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setMode", zim_spl_RegexIterator_setMode, ArginfoRegexItSetMode, uint32(g.SizeOf("arginfo_regex_it_set_mode")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getFlags", zim_spl_RegexIterator_getFlags, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setFlags", zim_spl_RegexIterator_setFlags, ArginfoRegexItSetFlags, uint32(g.SizeOf("arginfo_regex_it_set_flags")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getPregFlags", zim_spl_RegexIterator_getPregFlags, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setPregFlags", zim_spl_RegexIterator_setPregFlags, ArginfoRegexItSetPregFlags, uint32(g.SizeOf("arginfo_regex_it_set_preg_flags")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getRegex", zim_spl_RegexIterator_getRegex, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
-var ArginfoRecRegexItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"iterator", zend.ZendType("RecursiveIterator"), 0, 0}, {"regex", 0, 0, 0}, {"mode", 0, 0, 0}, {"flags", 0, 0, 0}, {"preg_flags", 0, 0, 0}}
-var spl_funcs_RecursiveRegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveRegexIterator___construct, ArginfoRecRegexItConstruct, uint32(g.SizeOf("arginfo_rec_regex_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"accept", zim_spl_RecursiveRegexIterator_accept, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"hasChildren", zim_spl_RecursiveFilterIterator_hasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getChildren", zim_spl_RecursiveRegexIterator_getChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_RegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RegexIterator___construct,
+		ArginfoRegexItConstruct,
+		uint32(g.SizeOf("arginfo_regex_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"accept",
+		zim_spl_RegexIterator_accept,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getMode",
+		zim_spl_RegexIterator_getMode,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setMode",
+		zim_spl_RegexIterator_setMode,
+		ArginfoRegexItSetMode,
+		uint32(g.SizeOf("arginfo_regex_it_set_mode")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getFlags",
+		zim_spl_RegexIterator_getFlags,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setFlags",
+		zim_spl_RegexIterator_setFlags,
+		ArginfoRegexItSetFlags,
+		uint32(g.SizeOf("arginfo_regex_it_set_flags")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getPregFlags",
+		zim_spl_RegexIterator_getPregFlags,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setPregFlags",
+		zim_spl_RegexIterator_setPregFlags,
+		ArginfoRegexItSetPregFlags,
+		uint32(g.SizeOf("arginfo_regex_it_set_preg_flags")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getRegex",
+		zim_spl_RegexIterator_getRegex,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoRecRegexItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(2)), 0, 0, 0},
+	{"iterator", zend.ZendType("RecursiveIterator"), 0, 0},
+	{"regex", 0, 0, 0},
+	{"mode", 0, 0, 0},
+	{"flags", 0, 0, 0},
+	{"preg_flags", 0, 0, 0},
+}
+var spl_funcs_RecursiveRegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveRegexIterator___construct,
+		ArginfoRecRegexItConstruct,
+		uint32(g.SizeOf("arginfo_rec_regex_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"accept",
+		zim_spl_RecursiveRegexIterator_accept,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"hasChildren",
+		zim_spl_RecursiveFilterIterator_hasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getChildren",
+		zim_spl_RecursiveRegexIterator_getChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplLimitItValid(intern *SplDualItObject) int {
 	/* FAILURE / SUCCESS */
@@ -2871,11 +3413,93 @@ func zim_spl_LimitIterator_getPosition(execute_data *zend.ZendExecuteData, retur
 	return
 }
 
-var ArginfoSeekableItSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"position", 4<<2 | g.Cond(false, 0x1, 0x0), 0, 0}}
-var spl_funcs_SeekableIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"seek", nil, ArginfoSeekableItSeek, uint32(g.SizeOf("arginfo_seekable_it_seek")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
-var ArginfoLimitItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}, {"offset", 0, 0, 0}, {"count", 0, 0, 0}}
+var ArginfoSeekableItSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"position", 4<<2 | g.Cond(false, 0x1, 0x0), 0, 0},
+}
+var spl_funcs_SeekableIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"seek",
+		nil,
+		ArginfoSeekableItSeek,
+		uint32(g.SizeOf("arginfo_seekable_it_seek")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ArginfoLimitItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+	{"offset", 0, 0, 0},
+	{"count", 0, 0, 0},
+}
 var ArginfoLimitItSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"position", 0, 0, 0}}
-var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_LimitIterator___construct, ArginfoLimitItConstruct, uint32(g.SizeOf("arginfo_limit_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_LimitIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_LimitIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", ZimSplDualItKey, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", ZimSplDualItCurrent, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_LimitIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"seek", zim_spl_LimitIterator_seek, ArginfoLimitItSeek, uint32(g.SizeOf("arginfo_limit_it_seek")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getPosition", zim_spl_LimitIterator_getPosition, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_LimitIterator___construct,
+		ArginfoLimitItConstruct,
+		uint32(g.SizeOf("arginfo_limit_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_LimitIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_LimitIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		ZimSplDualItKey,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		ZimSplDualItCurrent,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_LimitIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"seek",
+		zim_spl_LimitIterator_seek,
+		ArginfoLimitItSeek,
+		uint32(g.SizeOf("arginfo_limit_it_seek")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getPosition",
+		zim_spl_LimitIterator_getPosition,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplCachingItValid(intern *SplDualItObject) int {
 	if (intern.GetUCachingFlags() & CIT_VALID) != 0 {
@@ -3385,11 +4009,136 @@ func zim_spl_CachingIterator_count(execute_data *zend.ZendExecuteData, return_va
 
 /* }}} */
 
-var ArginfoCachingItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}, {"flags", 0, 0, 0}}
+var ArginfoCachingItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+	{"flags", 0, 0, 0},
+}
 var arginfo_caching_it_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"flags", 0, 0, 0}}
 var arginfo_caching_it_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"index", 0, 0, 0}}
 var arginfo_caching_it_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"index", 0, 0, 0}, {"newval", 0, 0, 0}}
-var spl_funcs_CachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_CachingIterator___construct, ArginfoCachingItConstruct, uint32(g.SizeOf("arginfo_caching_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_CachingIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_CachingIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", ZimSplDualItKey, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", ZimSplDualItCurrent, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_CachingIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"hasNext", zim_spl_CachingIterator_hasNext, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"__toString", zim_spl_CachingIterator___toString, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getFlags", zim_spl_CachingIterator_getFlags, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setFlags", zim_spl_CachingIterator_setFlags, arginfo_caching_it_setFlags, uint32(g.SizeOf("arginfo_caching_it_setFlags")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetGet", zim_spl_CachingIterator_offsetGet, arginfo_caching_it_offsetGet, uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetSet", zim_spl_CachingIterator_offsetSet, arginfo_caching_it_offsetSet, uint32(g.SizeOf("arginfo_caching_it_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetUnset", zim_spl_CachingIterator_offsetUnset, arginfo_caching_it_offsetGet, uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetExists", zim_spl_CachingIterator_offsetExists, arginfo_caching_it_offsetGet, uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getCache", zim_spl_CachingIterator_getCache, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"count", zim_spl_CachingIterator_count, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_CachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_CachingIterator___construct,
+		ArginfoCachingItConstruct,
+		uint32(g.SizeOf("arginfo_caching_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_CachingIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_CachingIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		ZimSplDualItKey,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		ZimSplDualItCurrent,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_CachingIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"hasNext",
+		zim_spl_CachingIterator_hasNext,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"__toString",
+		zim_spl_CachingIterator___toString,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getFlags",
+		zim_spl_CachingIterator_getFlags,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setFlags",
+		zim_spl_CachingIterator_setFlags,
+		arginfo_caching_it_setFlags,
+		uint32(g.SizeOf("arginfo_caching_it_setFlags")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetGet",
+		zim_spl_CachingIterator_offsetGet,
+		arginfo_caching_it_offsetGet,
+		uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetSet",
+		zim_spl_CachingIterator_offsetSet,
+		arginfo_caching_it_offsetSet,
+		uint32(g.SizeOf("arginfo_caching_it_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetUnset",
+		zim_spl_CachingIterator_offsetUnset,
+		arginfo_caching_it_offsetGet,
+		uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetExists",
+		zim_spl_CachingIterator_offsetExists,
+		arginfo_caching_it_offsetGet,
+		uint32(g.SizeOf("arginfo_caching_it_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getCache",
+		zim_spl_CachingIterator_getCache,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"count",
+		zim_spl_CachingIterator_count,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ proto RecursiveCachingIterator::__construct(RecursiveIterator it [, flags = CIT_CALL_TOSTRING])
    Create an iterator from a RecursiveIterator */
@@ -3465,8 +4214,35 @@ func zim_spl_RecursiveCachingIterator_getChildren(execute_data *zend.ZendExecute
 	}
 }
 
-var ArginfoCachingRecItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}, {"flags", 0, 0, 0}}
-var spl_funcs_RecursiveCachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_RecursiveCachingIterator___construct, ArginfoCachingRecItConstruct, uint32(g.SizeOf("arginfo_caching_rec_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"hasChildren", zim_spl_RecursiveCachingIterator_hasChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getChildren", zim_spl_RecursiveCachingIterator_getChildren, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var ArginfoCachingRecItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+	{"flags", 0, 0, 0},
+}
+var spl_funcs_RecursiveCachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_RecursiveCachingIterator___construct,
+		ArginfoCachingRecItConstruct,
+		uint32(g.SizeOf("arginfo_caching_rec_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"hasChildren",
+		zim_spl_RecursiveCachingIterator_hasChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getChildren",
+		zim_spl_RecursiveCachingIterator_getChildren,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ proto IteratorIterator::__construct(Traversable it)
    Create an iterator from anything that is traversable */
@@ -3475,8 +4251,62 @@ func zim_spl_IteratorIterator___construct(execute_data *zend.ZendExecuteData, re
 	SplDualItConstruct(execute_data, return_value, spl_ce_IteratorIterator, zend.ZendCeTraversable, DIT_IteratorIterator)
 }
 
-var ArginfoIteratorItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}}
-var spl_funcs_IteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_IteratorIterator___construct, ArginfoIteratorItConstruct, uint32(g.SizeOf("arginfo_iterator_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", ZimSplDualItRewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", ZimSplDualItValid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", ZimSplDualItKey, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", ZimSplDualItCurrent, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", ZimSplDualItNext, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var ArginfoIteratorItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+}
+var spl_funcs_IteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_IteratorIterator___construct,
+		ArginfoIteratorItConstruct,
+		uint32(g.SizeOf("arginfo_iterator_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		ZimSplDualItRewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		ZimSplDualItValid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		ZimSplDualItKey,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		ZimSplDualItCurrent,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		ZimSplDualItNext,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ proto NoRewindIterator::__construct(Iterator it)
    Create an iterator from another iterator */
@@ -3607,8 +4437,62 @@ func zim_spl_NoRewindIterator_next(execute_data *zend.ZendExecuteData, return_va
 	intern.GetInnerIterator().funcs.move_forward(intern.GetInnerIterator())
 }
 
-var ArginfoNorewindItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}}
-var spl_funcs_NoRewindIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_NoRewindIterator___construct, ArginfoNorewindItConstruct, uint32(g.SizeOf("arginfo_norewind_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_NoRewindIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_NoRewindIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_NoRewindIterator_key, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_NoRewindIterator_current, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_NoRewindIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var ArginfoNorewindItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+}
+var spl_funcs_NoRewindIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_NoRewindIterator___construct,
+		ArginfoNorewindItConstruct,
+		uint32(g.SizeOf("arginfo_norewind_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_NoRewindIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_NoRewindIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_NoRewindIterator_key,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_NoRewindIterator_current,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_NoRewindIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ proto InfiniteIterator::__construct(Iterator it)
    Create an iterator from another iterator */
@@ -3645,7 +4529,23 @@ func zim_spl_InfiniteIterator_next(execute_data *zend.ZendExecuteData, return_va
 	}
 }
 
-var spl_funcs_InfiniteIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_InfiniteIterator___construct, ArginfoNorewindItConstruct, uint32(g.SizeOf("arginfo_norewind_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_InfiniteIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_InfiniteIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_InfiniteIterator___construct,
+		ArginfoNorewindItConstruct,
+		uint32(g.SizeOf("arginfo_norewind_it___construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_InfiniteIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ proto void EmptyIterator::rewind()
    Does nothing  */
@@ -3711,7 +4611,44 @@ func zim_spl_EmptyIterator_next(execute_data *zend.ZendExecuteData, return_value
 	}
 }
 
-var spl_funcs_EmptyIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"rewind", zim_spl_EmptyIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_EmptyIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_EmptyIterator_key, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_EmptyIterator_current, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_EmptyIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_EmptyIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"rewind",
+		zim_spl_EmptyIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_EmptyIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_EmptyIterator_key,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_EmptyIterator_current,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_EmptyIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplAppendItNextIterator(intern *SplDualItObject) int {
 	SplDualItFree(intern)
@@ -3975,8 +4912,83 @@ func zim_spl_AppendIterator_getArrayIterator(execute_data *zend.ZendExecuteData,
 	_z1.u1.type_info = _t
 }
 
-var ArginfoAppendItAppend []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Iterator"), 0, 0}}
-var spl_funcs_AppendIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_AppendIterator___construct, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"append", zim_spl_AppendIterator_append, ArginfoAppendItAppend, uint32(g.SizeOf("arginfo_append_it_append")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_AppendIterator_rewind, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_AppendIterator_valid, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", ZimSplDualItKey, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_AppendIterator_current, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_AppendIterator_next, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getInnerIterator", zim_spl_dual_it_getInnerIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getIteratorIndex", zim_spl_AppendIterator_getIteratorIndex, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"getArrayIterator", zim_spl_AppendIterator_getArrayIterator, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var ArginfoAppendItAppend []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Iterator"), 0, 0},
+}
+var spl_funcs_AppendIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_AppendIterator___construct,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"append",
+		zim_spl_AppendIterator_append,
+		ArginfoAppendItAppend,
+		uint32(g.SizeOf("arginfo_append_it_append")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_AppendIterator_rewind,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_AppendIterator_valid,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		ZimSplDualItKey,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_AppendIterator_current,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_AppendIterator_next,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getInnerIterator",
+		zim_spl_dual_it_getInnerIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getIteratorIndex",
+		zim_spl_AppendIterator_getIteratorIndex,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"getArrayIterator",
+		zim_spl_AppendIterator_getArrayIterator,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SplIteratorApply(obj *zend.Zval, apply_func SplIteratorApplyFuncT, puser any) int {
 	var iter *zend.ZendObjectIterator
@@ -4143,7 +5155,16 @@ func ZifIteratorApply(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 
 /* }}} */
 
-var spl_funcs_OuterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"getInnerIterator", nil, ArginfoRecursiveItVoid, uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var spl_funcs_OuterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"getInnerIterator",
+		nil,
+		ArginfoRecursiveItVoid,
+		uint32(g.SizeOf("arginfo_recursive_it_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ PHP_MINIT_FUNCTION(spl_iterators)
  */

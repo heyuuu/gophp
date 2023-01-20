@@ -390,7 +390,30 @@ var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(z
 
 /* }}} */
 
-var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"dl", standard.ZifDl, ArginfoDl, uint32(g.SizeOf("arginfo_dl")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"cli_set_process_title", ZifCliSetProcessTitle, ArginfoCliSetProcessTitle, uint32(g.SizeOf("arginfo_cli_set_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"cli_get_process_title", ZifCliGetProcessTitle, ArginfoCliGetProcessTitle, uint32(g.SizeOf("arginfo_cli_get_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"dl",
+		standard.ZifDl,
+		ArginfoDl,
+		uint32(g.SizeOf("arginfo_dl")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"cli_set_process_title",
+		ZifCliSetProcessTitle,
+		ArginfoCliSetProcessTitle,
+		uint32(g.SizeOf("arginfo_cli_set_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"cli_get_process_title",
+		ZifCliGetProcessTitle,
+		ArginfoCliGetProcessTitle,
+		uint32(g.SizeOf("arginfo_cli_get_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ php_cli_usage
  */

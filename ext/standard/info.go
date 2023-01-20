@@ -788,7 +788,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 
 /* }}} */
 
-func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements va_list) {
+func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements ...any) {
 	var i int
 	var row_element *byte
 	if core.sapi_module.phpinfo_as_text == 0 {

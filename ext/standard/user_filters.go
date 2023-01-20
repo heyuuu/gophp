@@ -60,7 +60,30 @@ func ZifUserFilterNop(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 var ArginfoPhpUserFilterFilter []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"in", 0, 0, 0}, {"out", 0, 0, 0}, {"consumed", 0, 1, 0}, {"closing", 0, 0, 0}}
 var arginfo_php_user_filter_onCreate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
 var arginfo_php_user_filter_onClose []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"filter", ZifUserFilterNop, ArginfoPhpUserFilterFilter, uint32(g.SizeOf("arginfo_php_user_filter_filter")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"onCreate", ZifUserFilterNop, arginfo_php_user_filter_onCreate, uint32(g.SizeOf("arginfo_php_user_filter_onCreate")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"onClose", ZifUserFilterNop, arginfo_php_user_filter_onClose, uint32(g.SizeOf("arginfo_php_user_filter_onClose")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"filter",
+		ZifUserFilterNop,
+		ArginfoPhpUserFilterFilter,
+		uint32(g.SizeOf("arginfo_php_user_filter_filter")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"onCreate",
+		ZifUserFilterNop,
+		arginfo_php_user_filter_onCreate,
+		uint32(g.SizeOf("arginfo_php_user_filter_onCreate")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"onClose",
+		ZifUserFilterNop,
+		arginfo_php_user_filter_onClose,
+		uint32(g.SizeOf("arginfo_php_user_filter_onClose")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var UserFilterClassEntry zend.ZendClassEntry
 
 func PhpBucketDtor(res *zend.ZendResource) {

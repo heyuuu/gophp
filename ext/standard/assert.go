@@ -90,7 +90,70 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 
 /* }}} */
 
-var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{{"assert.active", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetActive())) - (*byte)(nil))), any(&AssertGlobals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"assert.active\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"assert.bail", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetBail())) - (*byte)(nil))), any(&AssertGlobals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"assert.bail\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"assert.warning", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetWarning())) - (*byte)(nil))), any(&AssertGlobals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"assert.warning\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"assert.callback", OnChangeCallback, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"assert.callback\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"assert.quiet_eval", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetQuietEval())) - (*byte)(nil))), any(&AssertGlobals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"assert.quiet_eval\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"assert.exception", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetException())) - (*byte)(nil))), any(&AssertGlobals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"assert.exception\"") - 1, 1<<0 | 1<<1 | 1<<2}, {nil, nil, nil, nil, nil, nil, nil, 0, 0, 0}}
+var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
+	{
+		"assert.active",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetActive())) - (*byte)(nil))),
+		any(&AssertGlobals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"assert.active\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"assert.bail",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetBail())) - (*byte)(nil))),
+		any(&AssertGlobals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"assert.bail\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"assert.warning",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetWarning())) - (*byte)(nil))),
+		any(&AssertGlobals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"assert.warning\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{"assert.callback", OnChangeCallback, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"assert.callback\"") - 1, 1<<0 | 1<<1 | 1<<2},
+	{
+		"assert.quiet_eval",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetQuietEval())) - (*byte)(nil))),
+		any(&AssertGlobals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"assert.quiet_eval\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"assert.exception",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetException())) - (*byte)(nil))),
+		any(&AssertGlobals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"assert.exception\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+}
 
 func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
 	&assert_globals_p.callback.u1.type_info = 0

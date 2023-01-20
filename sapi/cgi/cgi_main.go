@@ -749,7 +749,16 @@ var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(z
 
 /* }}} */
 
-var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"dl", standard.ZifDl, ArginfoDl, uint32(g.SizeOf("arginfo_dl")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"dl",
+		standard.ZifDl,
+		ArginfoDl,
+		uint32(g.SizeOf("arginfo_dl")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* {{{ php_cgi_usage
  */
@@ -1357,7 +1366,105 @@ func FastcgiCleanup(signal int) {
 	}
 }
 
-var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{{"cgi.rfc2616_headers", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRfc2616Headers())) - (*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"cgi.rfc2616_headers\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"cgi.nph", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetNph())) - (*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"cgi.nph\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"cgi.check_shebang_line", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetCheckShebangLine())) - (*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"cgi.check_shebang_line\"") - 1, 1 << 2}, {"cgi.force_redirect", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetForceRedirect())) - (*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"cgi.force_redirect\"") - 1, 1 << 2}, {"cgi.redirect_status_env", zend.OnUpdateString, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRedirectStatusEnv())) - (*byte)(nil))), any(&php_cgi_globals), nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"cgi.redirect_status_env\"") - 1, 1 << 2}, {"cgi.fix_pathinfo", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFixPathinfo())) - (*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"cgi.fix_pathinfo\"") - 1, 1 << 2}, {"cgi.discard_path", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetDiscardPath())) - (*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, g.SizeOf("\"0\"") - 1, g.SizeOf("\"cgi.discard_path\"") - 1, 1 << 2}, {"fastcgi.logging", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFcgiLogging())) - (*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"fastcgi.logging\"") - 1, 1 << 2}, {nil, nil, nil, nil, nil, nil, nil, 0, 0, 0}}
+var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
+	{
+		"cgi.rfc2616_headers",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRfc2616Headers())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"cgi.rfc2616_headers\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"cgi.nph",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetNph())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"cgi.nph\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"cgi.check_shebang_line",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetCheckShebangLine())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"cgi.check_shebang_line\"") - 1,
+		1 << 2,
+	},
+	{
+		"cgi.force_redirect",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetForceRedirect())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"cgi.force_redirect\"") - 1,
+		1 << 2,
+	},
+	{
+		"cgi.redirect_status_env",
+		zend.OnUpdateString,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRedirectStatusEnv())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		nil,
+		nil,
+		g.SizeOf("NULL") - 1,
+		g.SizeOf("\"cgi.redirect_status_env\"") - 1,
+		1 << 2,
+	},
+	{
+		"cgi.fix_pathinfo",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFixPathinfo())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"cgi.fix_pathinfo\"") - 1,
+		1 << 2,
+	},
+	{
+		"cgi.discard_path",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetDiscardPath())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"0",
+		nil,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"cgi.discard_path\"") - 1,
+		1 << 2,
+	},
+	{
+		"fastcgi.logging",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFcgiLogging())) - (*byte)(nil))),
+		any(&php_cgi_globals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"fastcgi.logging\"") - 1,
+		1 << 2,
+	},
+	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+}
 
 /* {{{ php_cgi_globals_ctor
  */
@@ -1568,7 +1675,37 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 /* }}} */
 
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var CgiFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"apache_child_terminate", ZifApacheChildTerminate, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var CgiFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"apache_child_terminate",
+		ZifApacheChildTerminate,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"apache_request_headers",
+		ZifApacheRequestHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"apache_response_headers",
+		ZifApacheResponseHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"getallheaders",
+		ZifApacheRequestHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var CgiModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{g.SizeOf("zend_module_entry"), 20190902, 0, 0, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, "7.4.33", 0, nil, nil, nil, nil, 0, 0, nil, 0, "API" + "20190902" + ",NTS"}
 
 /* {{{ main

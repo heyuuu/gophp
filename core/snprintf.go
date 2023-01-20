@@ -624,7 +624,7 @@ type Buffy = BufArea
  * Do format conversion placing the output in buffer
  */
 
-func FormatConverter(odp *Buffy, fmt *byte, ap va_list) int {
+func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 	var sp *byte
 	var bep *byte
 	var cc int = 0
@@ -1225,7 +1225,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap va_list) int {
 
 /* }}} */
 
-func StrxPrintv(ccp *int, buf *byte, len_ int, format *byte, ap va_list) {
+func StrxPrintv(ccp *int, buf *byte, len_ int, format *byte, ap ...any) {
 	var od Buffy
 	var cc int
 
@@ -1273,7 +1273,7 @@ func ApPhpSlprintf(buf *byte, len_ int, format string, _ ...any) int {
 
 /* }}} */
 
-func ApPhpVslprintf(buf *byte, len_ int, format *byte, ap va_list) int {
+func ApPhpVslprintf(buf *byte, len_ int, format *byte, ap ...any) int {
 	var cc int
 	StrxPrintv(&cc, buf, len_, format, ap)
 	if int(cc >= len_) != 0 {
@@ -1296,7 +1296,7 @@ func ApPhpSnprintf(buf *byte, len_ int, format string, _ ...any) int {
 
 /* }}} */
 
-func ApPhpVsnprintf(buf *byte, len_ int, format *byte, ap va_list) int {
+func ApPhpVsnprintf(buf *byte, len_ int, format *byte, ap ...any) int {
 	var cc int
 	StrxPrintv(&cc, buf, len_, format, ap)
 	return cc
@@ -1304,7 +1304,7 @@ func ApPhpVsnprintf(buf *byte, len_ int, format *byte, ap va_list) int {
 
 /* }}} */
 
-func ApPhpVasprintf(buf **byte, format *byte, ap va_list) int {
+func ApPhpVasprintf(buf **byte, format *byte, ap ...any) int {
 	var ap2 va_list
 	var cc int
 	memcpy(&ap2, &ap, g.SizeOf("va_list"))

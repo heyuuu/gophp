@@ -605,17 +605,118 @@ func ZendImplementCountable(interface_ *ZendClassEntry, class_type *ZendClassEnt
 
 /* }}}*/
 
-var ZendFuncsAggregate []ZendFunctionEntry = []ZendFunctionEntry{{"getIterator", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
-var ZendFuncsIterator []ZendFunctionEntry = []ZendFunctionEntry{{"current", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"next", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"key", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"valid", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"rewind", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var ZendFuncsAggregate []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"getIterator",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var ZendFuncsIterator []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"current",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"next",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"key",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"valid",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"rewind",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var ZendFuncsTraversable *ZendFunctionEntry = nil
 var ArginfoArrayaccessOffset []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"offset", 0, 0, 0}}
 var ArginfoArrayaccessOffsetGet []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"offset", 0, 0, 0}}
 var ArginfoArrayaccessOffsetValue []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"offset", 0, 0, 0}, {"value", 0, 0, 0}}
-var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{{"offsetExists", nil, ArginfoArrayaccessOffset, uint32(g.SizeOf("arginfo_arrayaccess_offset")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"offsetGet", nil, ArginfoArrayaccessOffsetGet, uint32(g.SizeOf("arginfo_arrayaccess_offset_get")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"offsetSet", nil, ArginfoArrayaccessOffsetValue, uint32(g.SizeOf("arginfo_arrayaccess_offset_value")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"offsetUnset", nil, ArginfoArrayaccessOffset, uint32(g.SizeOf("arginfo_arrayaccess_offset")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"offsetExists",
+		nil,
+		ArginfoArrayaccessOffset,
+		uint32(g.SizeOf("arginfo_arrayaccess_offset")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"offsetGet",
+		nil,
+		ArginfoArrayaccessOffsetGet,
+		uint32(g.SizeOf("arginfo_arrayaccess_offset_get")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"offsetSet",
+		nil,
+		ArginfoArrayaccessOffsetValue,
+		uint32(g.SizeOf("arginfo_arrayaccess_offset_value")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"offsetUnset",
+		nil,
+		ArginfoArrayaccessOffset,
+		uint32(g.SizeOf("arginfo_arrayaccess_offset")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var ArginfoSerializableSerialize []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"serialized", 0, 0, 0}}
-var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{{"serialize", nil, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {"unserialize", nil, ArginfoSerializableSerialize, uint32(g.SizeOf("arginfo_serializable_serialize")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"serialize",
+		nil,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{
+		"unserialize",
+		nil,
+		ArginfoSerializableSerialize,
+		uint32(g.SizeOf("arginfo_serializable_serialize")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 var ArginfoCountableCount []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{{"count", nil, ArginfoCountableCount, uint32(g.SizeOf("arginfo_countable_count")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<6}, {nil, nil, nil, 0, 0}}
+var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"count",
+		nil,
+		ArginfoCountableCount,
+		uint32(g.SizeOf("arginfo_countable_count")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<6,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 

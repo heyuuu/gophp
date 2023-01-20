@@ -168,7 +168,24 @@ var PhpCliServerWorkersMax zend.ZendLong
 
 // @type PhpCliServerHttpResponseStatusCodePair struct
 
-var TemplateMap []PhpCliServerHttpResponseStatusCodePair = []PhpCliServerHttpResponseStatusCodePair{{400, "<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>"}, {404, "<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>"}, {500, "<h1>%s</h1><p>The server is temporarily unavailable.</p>"}, {501, "<h1>%s</h1><p>Request method not supported.</p>"}}
+var TemplateMap []PhpCliServerHttpResponseStatusCodePair = []PhpCliServerHttpResponseStatusCodePair{
+	{
+		400,
+		"<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>",
+	},
+	{
+		404,
+		"<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>",
+	},
+	{
+		500,
+		"<h1>%s</h1><p>The server is temporarily unavailable.</p>",
+	},
+	{
+		501,
+		"<h1>%s</h1><p>Request method not supported.</p>",
+	},
+}
 
 // #define PHP_CLI_SERVER_LOG_PROCESS       1
 
@@ -381,7 +398,21 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 
 func CliServerInitGlobals(cg *ZendCliServerGlobals) { cg.SetColor(0) }
 
-var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{{"cli_server.color", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendCliServerGlobals)(nil).GetColor())) - (*byte)(nil))), any(&CliServerGlobals), nil, "0", zend.ZendIniBooleanDisplayerCb, g.SizeOf("\"0\"") - 1, g.SizeOf("\"cli_server.color\"") - 1, 1<<0 | 1<<1 | 1<<2}, {nil, nil, nil, nil, nil, nil, nil, 0, 0, 0}}
+var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
+	{
+		"cli_server.color",
+		zend.OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendCliServerGlobals)(nil).GetColor())) - (*byte)(nil))),
+		any(&CliServerGlobals),
+		nil,
+		"0",
+		zend.ZendIniBooleanDisplayerCb,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"cli_server.color\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+}
 
 func ZmStartupCliServer(type_ int, module_number int) int {
 	CliServerInitGlobals(&CliServerGlobals)
@@ -399,7 +430,44 @@ var CliServerModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{g.SizeOf("z
 /* }}} */
 
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var ServerAdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"cli_set_process_title", ZifCliSetProcessTitle, ArginfoCliSetProcessTitle, uint32(g.SizeOf("arginfo_cli_set_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"cli_get_process_title", ZifCliGetProcessTitle, ArginfoCliGetProcessTitle, uint32(g.SizeOf("arginfo_cli_get_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var ServerAdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"cli_set_process_title",
+		ZifCliSetProcessTitle,
+		ArginfoCliSetProcessTitle,
+		uint32(g.SizeOf("arginfo_cli_set_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"cli_get_process_title",
+		ZifCliGetProcessTitle,
+		ArginfoCliGetProcessTitle,
+		uint32(g.SizeOf("arginfo_cli_get_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"apache_request_headers",
+		ZifApacheRequestHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"apache_response_headers",
+		ZifApacheResponseHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"getallheaders",
+		ZifApacheRequestHeaders,
+		ArginfoNoArgs,
+		uint32(g.SizeOf("arginfo_no_args")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func SapiCliServerStartup(sapi_module *core.sapi_module_struct) int {
 	var workers *byte
@@ -496,7 +564,7 @@ func SapiCliServerRegisterVariable(track_vars_array *zend.Zval, key *byte, val *
 		core.PhpRegisterVariableSafe((*byte)(key), new_val, new_val_len, track_vars_array)
 	}
 }
-func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args va_list, hash_key *zend.ZendHashKey) int {
+func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args ...any, hash_key *zend.ZendHashKey) int {
 	var track_vars_array *zend.Zval = __va_arg(args, (*zend.Zval)(_))
 	if hash_key.key != nil {
 		var real_key *byte
@@ -1430,7 +1498,18 @@ func PhpCliServerClientReadRequestOnMessageComplete(parser *PhpHttpParser) int {
 }
 func PhpCliServerClientReadRequest(client *PhpCliServerClient, errstr **byte) int {
 	var buf []byte
-	var settings PhpHttpParserSettings = PhpHttpParserSettings{PhpCliServerClientReadRequestOnMessageBegin, PhpCliServerClientReadRequestOnPath, PhpCliServerClientReadRequestOnQueryString, PhpCliServerClientReadRequestOnUrl, PhpCliServerClientReadRequestOnFragment, PhpCliServerClientReadRequestOnHeaderField, PhpCliServerClientReadRequestOnHeaderValue, PhpCliServerClientReadRequestOnHeadersComplete, PhpCliServerClientReadRequestOnBody, PhpCliServerClientReadRequestOnMessageComplete}
+	var settings PhpHttpParserSettings = PhpHttpParserSettings{
+		PhpCliServerClientReadRequestOnMessageBegin,
+		PhpCliServerClientReadRequestOnPath,
+		PhpCliServerClientReadRequestOnQueryString,
+		PhpCliServerClientReadRequestOnUrl,
+		PhpCliServerClientReadRequestOnFragment,
+		PhpCliServerClientReadRequestOnHeaderField,
+		PhpCliServerClientReadRequestOnHeaderValue,
+		PhpCliServerClientReadRequestOnHeadersComplete,
+		PhpCliServerClientReadRequestOnBody,
+		PhpCliServerClientReadRequestOnMessageComplete,
+	}
 	var nbytes_consumed int
 	var nbytes_read int
 	if client.GetRequestRead() != 0 {

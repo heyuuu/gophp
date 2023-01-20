@@ -146,8 +146,13 @@ func ZendWeakrefNoUnset(object *Zval, member *Zval, rtc *any) {
 	ZendThrowError(nil, "WeakReference objects do not support "+"properties")
 }
 
-var ZendWeakrefCreateArginfo []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), ZendType("WeakReference"), 0, 0}, {"referent", 8<<2 | g.Cond(false, 0x1, 0x0), 0, 0}}
-var ZendWeakrefGetArginfo []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 8<<2 | g.Cond(true, 0x1, 0x0), 0, 0}}
+var ZendWeakrefCreateArginfo []ZendInternalArgInfo = []ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), ZendType("WeakReference"), 0, 0},
+	{"referent", 8<<2 | g.Cond(false, 0x1, 0x0), 0, 0},
+}
+var ZendWeakrefGetArginfo []ZendInternalArgInfo = []ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(0)), 8<<2 | g.Cond(true, 0x1, 0x0), 0, 0},
+}
 
 func zim_WeakReference___construct(execute_data *ZendExecuteData, return_value *Zval) {
 	ZendThrowError(nil, "Direct instantiation of 'WeakReference' is not allowed, "+"use WeakReference::create instead")
@@ -301,7 +306,30 @@ func zim_WeakReference_get(execute_data *ZendExecuteData, return_value *Zval) {
 	ZendWeakrefGet(g.CondF1(&(execute_data.GetThis()).GetType() == 8, func() *Zval { return &(execute_data.GetThis()) }, nil), return_value)
 }
 
-var ZendWeakrefMethods []ZendFunctionEntry = []ZendFunctionEntry{{"__construct", zim_WeakReference___construct, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"create", zim_WeakReference_create, ZendWeakrefCreateArginfo, uint32(g.SizeOf("zend_weakref_create_arginfo")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<4}, {"get", zim_WeakReference_get, ZendWeakrefGetArginfo, uint32(g.SizeOf("zend_weakref_get_arginfo")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var ZendWeakrefMethods []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"__construct",
+		zim_WeakReference___construct,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"create",
+		zim_WeakReference_create,
+		ZendWeakrefCreateArginfo,
+		uint32(g.SizeOf("zend_weakref_create_arginfo")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<4,
+	},
+	{
+		"get",
+		zim_WeakReference_get,
+		ZendWeakrefGetArginfo,
+		uint32(g.SizeOf("zend_weakref_get_arginfo")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func ZendRegisterWeakrefCe() {
 	var ce ZendClassEntry

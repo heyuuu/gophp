@@ -710,7 +710,44 @@ var ArginfoClosureBindto []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(
 var ArginfoClosureBind []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"closure", 0, 0, 0}, {"newthis", 0, 0, 0}, {"newscope", 0, 0, 0}}
 var ArginfoClosureCall []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"newthis", 0, 0, 0}, {"parameters", 0, 0, 1}}
 var ArginfoClosureFromcallable []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"callable", 0, 0, 0}}
-var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{{"__construct", zim_Closure___construct, nil, uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 2}, {"bind", zim_Closure_bind, ArginfoClosureBind, uint32(g.SizeOf("arginfo_closure_bind")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<4}, {"bindTo", zim_Closure_bind, ArginfoClosureBindto, uint32(g.SizeOf("arginfo_closure_bindto")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"call", zim_Closure_call, ArginfoClosureCall, uint32(g.SizeOf("arginfo_closure_call")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"fromCallable", zim_Closure_fromCallable, ArginfoClosureFromcallable, uint32(g.SizeOf("arginfo_closure_fromcallable")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<4}, {nil, nil, nil, 0, 0}}
+var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{
+	{
+		"__construct",
+		zim_Closure___construct,
+		nil,
+		uint32(g.SizeOf("NULL")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 2,
+	},
+	{
+		"bind",
+		zim_Closure_bind,
+		ArginfoClosureBind,
+		uint32(g.SizeOf("arginfo_closure_bind")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<4,
+	},
+	{
+		"bindTo",
+		zim_Closure_bind,
+		ArginfoClosureBindto,
+		uint32(g.SizeOf("arginfo_closure_bindto")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"call",
+		zim_Closure_call,
+		ArginfoClosureCall,
+		uint32(g.SizeOf("arginfo_closure_call")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"fromCallable",
+		zim_Closure_fromCallable,
+		ArginfoClosureFromcallable,
+		uint32(g.SizeOf("arginfo_closure_fromcallable")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<4,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 func ZendRegisterClosureCe() {
 	var ce ZendClassEntry

@@ -1225,9 +1225,21 @@ func ZmInfoSpl(zend_module *zend.ZendModuleEntry) {
 
 /* }}} */
 
-var ArginfoIteratorToArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}, {"use_keys", 0, 0, 0}}
-var ArginfoIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}}
-var ArginfoIteratorApply []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"iterator", zend.ZendType("Traversable"), 0, 0}, {"function", 0, 0, 0}, {"args", 7<<2 | g.Cond(true, 0x1, 0x0), 0, 0}}
+var ArginfoIteratorToArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+	{"use_keys", 0, 0, 0},
+}
+var ArginfoIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+}
+var ArginfoIteratorApply []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(2)), 0, 0, 0},
+	{"iterator", zend.ZendType("Traversable"), 0, 0},
+	{"function", 0, 0, 0},
+	{"args", 7<<2 | g.Cond(true, 0x1, 0x0), 0, 0},
+}
 var ArginfoClassParents []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"instance", 0, 0, 0}, {"autoload", 0, 0, 0}}
 var ArginfoClassImplements []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"what", 0, 0, 0}, {"autoload", 0, 0, 0}}
 var ArginfoClassUses []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"what", 0, 0, 0}, {"autoload", 0, 0, 0}}
@@ -1243,7 +1255,114 @@ var ArginfoSplObjectId []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{
 
 /* }}} */
 
-var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"spl_classes", ZifSplClasses, ArginfoSplClasses, uint32(g.SizeOf("arginfo_spl_classes")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload", ZifSplAutoload, ArginfoSplAutoload, uint32(g.SizeOf("arginfo_spl_autoload")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload_extensions", ZifSplAutoloadExtensions, ArginfoSplAutoloadExtensions, uint32(g.SizeOf("arginfo_spl_autoload_extensions")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload_register", ZifSplAutoloadRegister, ArginfoSplAutoloadRegister, uint32(g.SizeOf("arginfo_spl_autoload_register")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload_unregister", ZifSplAutoloadUnregister, ArginfoSplAutoloadUnregister, uint32(g.SizeOf("arginfo_spl_autoload_unregister")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload_functions", ZifSplAutoloadFunctions, ArginfoSplAutoloadFunctions, uint32(g.SizeOf("arginfo_spl_autoload_functions")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_autoload_call", ZifSplAutoloadCall, ArginfoSplAutoloadCall, uint32(g.SizeOf("arginfo_spl_autoload_call")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"class_parents", ZifClassParents, ArginfoClassParents, uint32(g.SizeOf("arginfo_class_parents")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"class_implements", ZifClassImplements, ArginfoClassImplements, uint32(g.SizeOf("arginfo_class_implements")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"class_uses", ZifClassUses, ArginfoClassUses, uint32(g.SizeOf("arginfo_class_uses")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_object_hash", ZifSplObjectHash, ArginfoSplObjectHash, uint32(g.SizeOf("arginfo_spl_object_hash")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"spl_object_id", ZifSplObjectId, ArginfoSplObjectId, uint32(g.SizeOf("arginfo_spl_object_id")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"iterator_to_array", ZifIteratorToArray, ArginfoIteratorToArray, uint32(g.SizeOf("arginfo_iterator_to_array")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"iterator_count", ZifIteratorCount, ArginfoIterator, uint32(g.SizeOf("arginfo_iterator")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {"iterator_apply", ZifIteratorApply, ArginfoIteratorApply, uint32(g.SizeOf("arginfo_iterator_apply")/g.SizeOf("struct _zend_internal_arg_info") - 1), 0}, {nil, nil, nil, 0, 0}}
+var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"spl_classes",
+		ZifSplClasses,
+		ArginfoSplClasses,
+		uint32(g.SizeOf("arginfo_spl_classes")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload",
+		ZifSplAutoload,
+		ArginfoSplAutoload,
+		uint32(g.SizeOf("arginfo_spl_autoload")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_extensions",
+		ZifSplAutoloadExtensions,
+		ArginfoSplAutoloadExtensions,
+		uint32(g.SizeOf("arginfo_spl_autoload_extensions")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_register",
+		ZifSplAutoloadRegister,
+		ArginfoSplAutoloadRegister,
+		uint32(g.SizeOf("arginfo_spl_autoload_register")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_unregister",
+		ZifSplAutoloadUnregister,
+		ArginfoSplAutoloadUnregister,
+		uint32(g.SizeOf("arginfo_spl_autoload_unregister")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_functions",
+		ZifSplAutoloadFunctions,
+		ArginfoSplAutoloadFunctions,
+		uint32(g.SizeOf("arginfo_spl_autoload_functions")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_call",
+		ZifSplAutoloadCall,
+		ArginfoSplAutoloadCall,
+		uint32(g.SizeOf("arginfo_spl_autoload_call")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_parents",
+		ZifClassParents,
+		ArginfoClassParents,
+		uint32(g.SizeOf("arginfo_class_parents")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_implements",
+		ZifClassImplements,
+		ArginfoClassImplements,
+		uint32(g.SizeOf("arginfo_class_implements")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_uses",
+		ZifClassUses,
+		ArginfoClassUses,
+		uint32(g.SizeOf("arginfo_class_uses")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_object_hash",
+		ZifSplObjectHash,
+		ArginfoSplObjectHash,
+		uint32(g.SizeOf("arginfo_spl_object_hash")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_object_id",
+		ZifSplObjectId,
+		ArginfoSplObjectId,
+		uint32(g.SizeOf("arginfo_spl_object_id")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_to_array",
+		ZifIteratorToArray,
+		ArginfoIteratorToArray,
+		uint32(g.SizeOf("arginfo_iterator_to_array")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_count",
+		ZifIteratorCount,
+		ArginfoIterator,
+		uint32(g.SizeOf("arginfo_iterator")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_apply",
+		ZifIteratorApply,
+		ArginfoIteratorApply,
+		uint32(g.SizeOf("arginfo_iterator_apply")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 

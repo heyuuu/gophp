@@ -1154,7 +1154,121 @@ var arginfo_fixedarray_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInterna
 var arginfo_fixedarray_setSize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"value", 0, 0, 0}}
 var arginfo_fixedarray_fromArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"array", 0, 0, 0}, {"save_indexes", 0, 0, 0}}
 var ArginfoSplfixedarrayVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{{"__construct", zim_spl_SplFixedArray___construct, ArginfoSplfixedarrayConstruct, uint32(g.SizeOf("arginfo_splfixedarray_construct")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"__wakeup", zim_spl_SplFixedArray___wakeup, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"count", zim_spl_SplFixedArray_count, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"toArray", zim_spl_SplFixedArray_toArray, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"fromArray", zim_spl_SplFixedArray_fromArray, arginfo_fixedarray_fromArray, uint32(g.SizeOf("arginfo_fixedarray_fromArray")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1<<0 | 1<<4}, {"getSize", zim_spl_SplFixedArray_getSize, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"setSize", zim_spl_SplFixedArray_setSize, arginfo_fixedarray_setSize, uint32(g.SizeOf("arginfo_fixedarray_setSize")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetExists", zim_spl_SplFixedArray_offsetExists, arginfo_fixedarray_offsetGet, uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetGet", zim_spl_SplFixedArray_offsetGet, arginfo_fixedarray_offsetGet, uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetSet", zim_spl_SplFixedArray_offsetSet, arginfo_fixedarray_offsetSet, uint32(g.SizeOf("arginfo_fixedarray_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"offsetUnset", zim_spl_SplFixedArray_offsetUnset, arginfo_fixedarray_offsetGet, uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"rewind", zim_spl_SplFixedArray_rewind, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"current", zim_spl_SplFixedArray_current, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"key", zim_spl_SplFixedArray_key, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"next", zim_spl_SplFixedArray_next, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {"valid", zim_spl_SplFixedArray_valid, ArginfoSplfixedarrayVoid, uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1), 1 << 0}, {nil, nil, nil, 0, 0}}
+var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"__construct",
+		zim_spl_SplFixedArray___construct,
+		ArginfoSplfixedarrayConstruct,
+		uint32(g.SizeOf("arginfo_splfixedarray_construct")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"__wakeup",
+		zim_spl_SplFixedArray___wakeup,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"count",
+		zim_spl_SplFixedArray_count,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"toArray",
+		zim_spl_SplFixedArray_toArray,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"fromArray",
+		zim_spl_SplFixedArray_fromArray,
+		arginfo_fixedarray_fromArray,
+		uint32(g.SizeOf("arginfo_fixedarray_fromArray")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1<<0 | 1<<4,
+	},
+	{
+		"getSize",
+		zim_spl_SplFixedArray_getSize,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"setSize",
+		zim_spl_SplFixedArray_setSize,
+		arginfo_fixedarray_setSize,
+		uint32(g.SizeOf("arginfo_fixedarray_setSize")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetExists",
+		zim_spl_SplFixedArray_offsetExists,
+		arginfo_fixedarray_offsetGet,
+		uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetGet",
+		zim_spl_SplFixedArray_offsetGet,
+		arginfo_fixedarray_offsetGet,
+		uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetSet",
+		zim_spl_SplFixedArray_offsetSet,
+		arginfo_fixedarray_offsetSet,
+		uint32(g.SizeOf("arginfo_fixedarray_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"offsetUnset",
+		zim_spl_SplFixedArray_offsetUnset,
+		arginfo_fixedarray_offsetGet,
+		uint32(g.SizeOf("arginfo_fixedarray_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"rewind",
+		zim_spl_SplFixedArray_rewind,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"current",
+		zim_spl_SplFixedArray_current,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"key",
+		zim_spl_SplFixedArray_key,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"next",
+		zim_spl_SplFixedArray_next,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{
+		"valid",
+		zim_spl_SplFixedArray_valid,
+		ArginfoSplfixedarrayVoid,
+		uint32(g.SizeOf("arginfo_splfixedarray_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		1 << 0,
+	},
+	{nil, nil, nil, 0, 0},
+}
 
 /* }}} */
 

@@ -137,11 +137,11 @@ var ZendWrite ZendWriteFuncT
 var ZendFopen func(filename *byte, opened_path **ZendString) *FILE
 var ZendTicksFunction func(ticks int)
 var ZendInterruptFunction func(execute_data *ZendExecuteData)
-var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args va_list)
+var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 var ZendOnTimeout func(seconds int)
 var ZendStreamOpenFunction func(filename *byte, handle *ZendFileHandle) int
-var ZendPrintfToSmartString func(buf *SmartString, format *byte, ap va_list)
-var ZendPrintfToSmartStr func(buf *SmartStr, format *byte, ap va_list)
+var ZendPrintfToSmartString func(buf *SmartString, format *byte, ap ...any)
+var ZendPrintfToSmartStr func(buf *SmartStr, format *byte, ap ...any)
 var ZendGetenv func(name *byte, name_len int) *byte
 var ZendResolvePath func(filename *byte, filename_len int) *ZendString
 
@@ -335,9 +335,74 @@ func OnUpdateAssertions(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any,
 
 // #define SIGNAL_CHECK_DEFAULT       "0"
 
-var IniEntries []ZendIniEntryDef = []ZendIniEntryDef{{"error_reporting", OnUpdateErrorReporting, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"error_reporting\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"zend.assertions", OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions())) - (*byte)(nil))), any(&ExecutorGlobals), nil, "1", nil, g.SizeOf("\"1\"") - 1, g.SizeOf("\"zend.assertions\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"zend.enable_gc", OnUpdateGCEnabled, nil, nil, nil, "1", ZendGcEnabledDisplayerCb, g.SizeOf("\"1\"") - 1, g.SizeOf("\"zend.enable_gc\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"zend.multibyte", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte())) - (*byte)(nil))), any(&CompilerGlobals), nil, "0", ZendIniBooleanDisplayerCb, g.SizeOf("\"0\"") - 1, g.SizeOf("\"zend.multibyte\"") - 1, 1 << 1}, {"zend.script_encoding", OnUpdateScriptEncoding, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"zend.script_encoding\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"zend.detect_unicode", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode())) - (*byte)(nil))), any(&CompilerGlobals), nil, "1", ZendIniBooleanDisplayerCb, g.SizeOf("\"1\"") - 1, g.SizeOf("\"zend.detect_unicode\"") - 1, 1<<0 | 1<<1 | 1<<2}, {"zend.signal_check", OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck())) - (*byte)(nil))), any(&ZendSignalGlobals), nil, "0", ZendIniBooleanDisplayerCb, g.SizeOf("\"0\"") - 1, g.SizeOf("\"zend.signal_check\"") - 1, 1 << 2}, {"zend.exception_ignore_args", OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs())) - (*byte)(nil))), any(&ExecutorGlobals), nil, "0", ZendIniBooleanDisplayerCb, g.SizeOf("\"0\"") - 1, g.SizeOf("\"zend.exception_ignore_args\"") - 1, 1<<0 | 1<<1 | 1<<2}, {nil, nil, nil, nil, nil, nil, nil, 0, 0, 0}}
+var IniEntries []ZendIniEntryDef = []ZendIniEntryDef{
+	{"error_reporting", OnUpdateErrorReporting, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"error_reporting\"") - 1, 1<<0 | 1<<1 | 1<<2},
+	{
+		"zend.assertions",
+		OnUpdateAssertions,
+		any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions())) - (*byte)(nil))),
+		any(&ExecutorGlobals),
+		nil,
+		"1",
+		nil,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"zend.assertions\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{"zend.enable_gc", OnUpdateGCEnabled, nil, nil, nil, "1", ZendGcEnabledDisplayerCb, g.SizeOf("\"1\"") - 1, g.SizeOf("\"zend.enable_gc\"") - 1, 1<<0 | 1<<1 | 1<<2},
+	{
+		"zend.multibyte",
+		OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte())) - (*byte)(nil))),
+		any(&CompilerGlobals),
+		nil,
+		"0",
+		ZendIniBooleanDisplayerCb,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"zend.multibyte\"") - 1,
+		1 << 1,
+	},
+	{"zend.script_encoding", OnUpdateScriptEncoding, nil, nil, nil, nil, nil, g.SizeOf("NULL") - 1, g.SizeOf("\"zend.script_encoding\"") - 1, 1<<0 | 1<<1 | 1<<2},
+	{
+		"zend.detect_unicode",
+		OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode())) - (*byte)(nil))),
+		any(&CompilerGlobals),
+		nil,
+		"1",
+		ZendIniBooleanDisplayerCb,
+		g.SizeOf("\"1\"") - 1,
+		g.SizeOf("\"zend.detect_unicode\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{
+		"zend.signal_check",
+		OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck())) - (*byte)(nil))),
+		any(&ZendSignalGlobals),
+		nil,
+		"0",
+		ZendIniBooleanDisplayerCb,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"zend.signal_check\"") - 1,
+		1 << 2,
+	},
+	{
+		"zend.exception_ignore_args",
+		OnUpdateBool,
+		any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs())) - (*byte)(nil))),
+		any(&ExecutorGlobals),
+		nil,
+		"0",
+		ZendIniBooleanDisplayerCb,
+		g.SizeOf("\"0\"") - 1,
+		g.SizeOf("\"zend.exception_ignore_args\"") - 1,
+		1<<0 | 1<<1 | 1<<2,
+	},
+	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+}
 
-func ZendVspprintf(pbuf **byte, max_len int, format string, ap va_list) int {
+func ZendVspprintf(pbuf **byte, max_len int, format string, ap ...any) int {
 	var buf SmartString = SmartString{0}
 
 	/* since there are places where (v)spprintf called without checking for null,
@@ -384,7 +449,7 @@ func ZendSpprintfUnchecked(message **byte, max_len int, format *byte, _ ...any) 
 
 /* }}} */
 
-func ZendVstrpprintf(max_len int, format *byte, ap va_list) *ZendString {
+func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
 	var buf SmartStr = SmartStr{0}
 	ZendPrintfToSmartStr(&buf, format, ap)
 	if buf.GetS() == nil {
@@ -1081,7 +1146,7 @@ func ZendGetConfigurationDirective(name *ZendString) *Zval {
 
 // #define RESTORE_STACK(stack) do { if ( stack . top ) { zend_stack_destroy ( & CG ( stack ) ) ; memcpy ( & CG ( stack ) , & stack , sizeof ( zend_stack ) ) ; } } while ( 0 )
 
-func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format *byte, args va_list) {
+func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
 	var usr_copy va_list
 	var params []Zval
 	var retval Zval

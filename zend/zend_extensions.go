@@ -252,7 +252,7 @@ func ZendExtensionDtor(extension *ZendExtension) {
 		dlclose(extension.GetHandle())
 	}
 }
-func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args va_list) {
+func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args ...any) {
 	var message int
 	var arg any
 	if extension.GetMessageHandler() == nil || num_args != 2 {

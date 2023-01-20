@@ -62,7 +62,16 @@ import (
 /* {{{ php_post_entries[]
  */
 
-var PhpPostEntries []SapiPostEntry = []SapiPostEntry{{"application/x-www-form-urlencoded", g.SizeOf("DEFAULT_POST_CONTENT_TYPE") - 1, SapiReadStandardFormData, PhpStdPostHandler}, {"multipart/form-data", g.SizeOf("MULTIPART_CONTENT_TYPE") - 1, nil, Rfc1867PostHandler}, {nil, 0, nil, nil}}
+var PhpPostEntries []SapiPostEntry = []SapiPostEntry{
+	{
+		"application/x-www-form-urlencoded",
+		g.SizeOf("DEFAULT_POST_CONTENT_TYPE") - 1,
+		SapiReadStandardFormData,
+		PhpStdPostHandler,
+	},
+	{"multipart/form-data", g.SizeOf("MULTIPART_CONTENT_TYPE") - 1, nil, Rfc1867PostHandler},
+	{nil, 0, nil, nil},
+}
 
 /* }}} */
 

@@ -968,7 +968,22 @@ func ZendGetUnqualifiedName(name *ZendString, result **byte, result_len *int) Ze
 /* }}} */
 
 // @type ReservedClassName struct
-var ReservedClassNames []ReservedClassName = []ReservedClassName{{"bool", g.SizeOf("\"bool\"") - 1}, {"false", g.SizeOf("\"false\"") - 1}, {"float", g.SizeOf("\"float\"") - 1}, {"int", g.SizeOf("\"int\"") - 1}, {"null", g.SizeOf("\"null\"") - 1}, {"parent", g.SizeOf("\"parent\"") - 1}, {"self", g.SizeOf("\"self\"") - 1}, {"static", g.SizeOf("\"static\"") - 1}, {"string", g.SizeOf("\"string\"") - 1}, {"true", g.SizeOf("\"true\"") - 1}, {"void", g.SizeOf("\"void\"") - 1}, {"iterable", g.SizeOf("\"iterable\"") - 1}, {"object", g.SizeOf("\"object\"") - 1}, {nil, 0}}
+var ReservedClassNames []ReservedClassName = []ReservedClassName{
+	{"bool", g.SizeOf("\"bool\"") - 1},
+	{"false", g.SizeOf("\"false\"") - 1},
+	{"float", g.SizeOf("\"float\"") - 1},
+	{"int", g.SizeOf("\"int\"") - 1},
+	{"null", g.SizeOf("\"null\"") - 1},
+	{"parent", g.SizeOf("\"parent\"") - 1},
+	{"self", g.SizeOf("\"self\"") - 1},
+	{"static", g.SizeOf("\"static\"") - 1},
+	{"string", g.SizeOf("\"string\"") - 1},
+	{"true", g.SizeOf("\"true\"") - 1},
+	{"void", g.SizeOf("\"void\"") - 1},
+	{"iterable", g.SizeOf("\"iterable\"") - 1},
+	{"object", g.SizeOf("\"object\"") - 1},
+	{nil, 0},
+}
 
 func ZendIsReservedClassName(name *ZendString) ZendBool {
 	var reserved *ReservedClassName = ReservedClassNames
@@ -995,7 +1010,16 @@ func ZendAssertValidClassName(name *ZendString) {
 
 // @type BuiltinTypeInfo struct
 
-var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{{"int", g.SizeOf("\"int\"") - 1, 4}, {"float", g.SizeOf("\"float\"") - 1, 5}, {"string", g.SizeOf("\"string\"") - 1, 6}, {"bool", g.SizeOf("\"bool\"") - 1, 16}, {"void", g.SizeOf("\"void\"") - 1, 19}, {"iterable", g.SizeOf("\"iterable\"") - 1, 18}, {"object", g.SizeOf("\"object\"") - 1, 8}, {nil, 0, 0}}
+var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
+	{"int", g.SizeOf("\"int\"") - 1, 4},
+	{"float", g.SizeOf("\"float\"") - 1, 5},
+	{"string", g.SizeOf("\"string\"") - 1, 6},
+	{"bool", g.SizeOf("\"bool\"") - 1, 16},
+	{"void", g.SizeOf("\"void\"") - 1, 19},
+	{"iterable", g.SizeOf("\"iterable\"") - 1, 18},
+	{"object", g.SizeOf("\"object\"") - 1, 8},
+	{nil, 0, 0},
+}
 
 func ZendLookupBuiltinTypeByName(name *ZendString) ZendUchar {
 	var info *BuiltinTypeInfo = &BuiltinTypes[0]
