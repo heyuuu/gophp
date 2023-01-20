@@ -47,7 +47,7 @@ func Goto(label any) {
 	// todo
 }
 
-func SizeOf() int {
+func SizeOf(typ any) int {
 	// todo
 	return 0
 }
