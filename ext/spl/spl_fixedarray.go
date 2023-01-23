@@ -76,15 +76,9 @@ var spl_ce_SplFixedArray *zend.ZendClassEntry
 
 var spl_handler_SplFixedArray zend.ZendObjectHandlers
 
-// @type SplFixedarray struct
-
 /* }}} */
 
-// @type SplFixedarrayObject struct
-
 /* }}} */
-
-// @type SplFixedarrayIt struct
 
 /* }}} */
 

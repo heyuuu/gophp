@@ -10561,7 +10561,6 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 
 /* }}} */
 
-// @type Bucketindex struct
 func ArrayBucketindexSwap(p any, q any) {
 	var f *Bucketindex = (*Bucketindex)(p)
 	var g *Bucketindex = (*Bucketindex)(q)

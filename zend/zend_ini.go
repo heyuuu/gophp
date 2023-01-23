@@ -40,9 +40,6 @@ import (
 
 // #define ZEND_INI_DISP(name) ZEND_COLD void name ( zend_ini_entry * ini_entry , int type )
 
-// @type ZendIniEntryDef struct
-
-// @type ZendIniEntry struct
 var ZendCopyIniDirectives func() int
 var ZendIniRefreshCaches func(stage int)
 var DisplayIniEntries func(module *ZendModuleEntry)
@@ -130,8 +127,6 @@ type ZendIniParserCbT func(arg1 *Zval, arg2 *Zval, arg3 *Zval, callback_type int
 // #define ZEND_INI_PARSER_SECTION       2
 
 // #define ZEND_INI_PARSER_POP_ENTRY       3
-
-// @type ZendIniParserParam struct
 
 // Source: <Zend/zend_ini.c>
 

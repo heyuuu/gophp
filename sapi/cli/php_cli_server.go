@@ -34,8 +34,6 @@ import (
 
 // # include "SAPI.h"
 
-// @type ZendCliServerGlobals struct
-
 // #define CLI_SERVER_G(v) ( cli_server_globals . v )
 
 // Source: <sapi/cli/php_cli_server.c>
@@ -152,22 +150,6 @@ import (
 var PhpCliServerMaster pid_t
 var PhpCliServerWorkers *pid_t
 var PhpCliServerWorkersMax zend.ZendLong
-
-// @type PhpCliServerPoller struct
-
-// @type PhpCliServerRequest struct
-
-// @type PhpCliServerChunk struct
-
-// @type PhpCliServerBuffer struct
-
-// @type PhpCliServerContentSender struct
-
-// @type PhpCliServerClient struct
-
-// @type PhpCliServer struct
-
-// @type PhpCliServerHttpResponseStatusCodePair struct
 
 var TemplateMap []PhpCliServerHttpResponseStatusCodePair = []PhpCliServerHttpResponseStatusCodePair{
 	{
@@ -2151,8 +2133,6 @@ func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int
 }
 
 /* }}} */
-
-// @type PhpCliServerDoEventForEachFdCallbackParams struct
 
 func PhpCliServerDoEventForEachFdCallback(_params any, fd core.PhpSocketT, event int) int {
 	var params *PhpCliServerDoEventForEachFdCallbackParams = _params

@@ -26,6 +26,4 @@ package standard
 
 // # include "ext/standard/basic_functions.h"
 
-// @type PhpLcgGlobals struct
-
 // #define LCG(v) ( lcg_globals . v )

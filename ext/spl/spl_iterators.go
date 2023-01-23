@@ -125,10 +125,7 @@ const (
 	REGIT_MODE_MAX
 )
 
-// @type _spl_cbfilter_it_intern struct
 type __struct___spl_cbfilter_it_intern = _spl_cbfilter_it_intern
-
-// @type SplDualItObject struct
 
 func SplDualItFromObj(obj *zend.ZendObject) *SplDualItObject {
 	return (*SplDualItObject)((*byte)(obj - zend_long((*byte)(&((*SplDualItObject)(nil).GetStd()))-(*byte)(nil))))
@@ -229,12 +226,6 @@ const (
 	RS_CHILD = 3
 	RS_START = 4
 )
-
-// @type SplSubIterator struct
-
-// @type SplRecursiveItObject struct
-
-// @type SplRecursiveItIterator struct
 
 var SplHandlersRecItIt zend.ZendObjectHandlers
 var SplHandlersDualIt zend.ZendObjectHandlers
@@ -5116,7 +5107,6 @@ func ZifIteratorCount(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 
 /* }}} */
 
-// @type SplIteratorApplyInfo struct
 func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 	var retval zend.Zval
 	var apply_info *SplIteratorApplyInfo = (*SplIteratorApplyInfo)(puser)

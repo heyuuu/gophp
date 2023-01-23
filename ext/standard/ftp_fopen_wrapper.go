@@ -72,8 +72,6 @@ import (
 
 // #define GET_FTP_RESULT(stream) get_ftp_result ( ( stream ) , tmp_line , sizeof ( tmp_line ) )
 
-// @type PhpFtpDirstreamData struct
-
 /* {{{ get_ftp_result
  */
 

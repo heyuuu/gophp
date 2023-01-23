@@ -56,12 +56,8 @@ const (
 type SplForeignDtorT func(object *SplFilesystemObject)
 type SplForeignCloneT func(src *SplFilesystemObject, dst *SplFilesystemObject)
 
-// @type SplOtherHandler struct
-
 /* define an __special__  overloaded iterator structure */
 
-// @type SplFilesystemIterator struct
-// @type SplFilesystemObject struct
 func SplFilesystemFromObj(obj *zend.ZendObject) *SplFilesystemObject {
 	return (*SplFilesystemObject)((*byte)(obj - zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd()))-(*byte)(nil))))
 }

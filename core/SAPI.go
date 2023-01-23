@@ -47,9 +47,6 @@ import (
 
 // #define SAPI_API
 
-// @type SapiHeader struct
-// @type SapiHeaders struct
-
 type sapi_module_struct = _sapiModule
 
 var sapi_module sapi_module_struct
@@ -60,8 +57,6 @@ var sapi_module sapi_module_struct
  * and that you free them after sapi_deactivate().
  */
 
-// @type SapiRequestInfo struct
-// @type sapi_globals_struct struct
 type _sapiGlobals = sapi_globals_struct
 
 // #define SG(v) ( sapi_globals . v )
@@ -73,7 +68,6 @@ var sapi_globals sapi_globals_struct
  * operating on HTTP headers.
  */
 
-// @type SapiHeaderLine struct
 type SapiHeaderOpEnum = int
 
 const (
@@ -87,9 +81,6 @@ const (
 /* Deprecated functions. Use sapi_header_op instead. */
 
 // #define sapi_add_header(a,b,c) sapi_add_header_ex ( ( a ) , ( b ) , ( c ) , 1 )
-
-// @type _sapiModule struct
-// @type SapiPostEntry struct
 
 /* header_handler() constants */
 

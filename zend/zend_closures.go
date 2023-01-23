@@ -78,8 +78,6 @@ var ZendCeClosure *ZendClassEntry
 
 // #define ZEND_CLOSURE_PROPERTY_ERROR() zend_throw_error ( NULL , "Closure object cannot have properties" )
 
-// @type ZendClosure struct
-
 /* non-static since it needs to be referenced */
 
 var ClosureHandlers ZendObjectHandlers

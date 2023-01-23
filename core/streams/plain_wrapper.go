@@ -110,8 +110,6 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 
 /* {{{ ------- STDIO stream implementation -------*/
 
-// @type PhpStdioStreamData struct
-
 // #define PHP_STDIOP_GET_FD(anfd,data) anfd = ( data ) -> file ? fileno ( ( data ) -> file ) : ( data ) -> fd
 
 func DoFstat(d *PhpStdioStreamData, force int) int {

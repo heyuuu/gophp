@@ -89,17 +89,7 @@ var PhpFileLeStreamFilter func() int
 
 // # include "streams/php_stream_filter_api.h"
 
-// @type PhpStreamStatbuf struct
-
-// @type PhpStreamDirent struct
-
 /* operations on streams that are file-handles */
-
-// @type PhpStreamOps struct
-
-// @type PhpStreamWrapperOps struct
-
-// @type PhpStreamWrapper struct
 
 // #define PHP_STREAM_FLAG_NO_SEEK       0x1
 
@@ -125,8 +115,6 @@ var PhpFileLeStreamFilter func() int
 // #define PHP_STREAM_FLAG_NO_FCLOSE       0x80
 
 // #define PHP_STREAM_FLAG_WAS_WRITTEN       0x80000000
-
-// @type PhpStream struct
 
 // #define PHP_STREAM_CONTEXT(stream) ( ( php_stream_context * ) ( ( stream ) -> ctx ? ( ( stream ) -> ctx -> ptr ) : NULL ) )
 

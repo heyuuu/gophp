@@ -39,10 +39,7 @@ type PhpProcessIdT = pid_t
  * Under unix, it is an argv style array.
  * */
 
-// @type PhpProcessEnvT struct
 type _phpProcessEnv = PhpProcessEnvT
-
-// @type PhpProcessHandle struct
 
 // Source: <ext/standard/proc_open.c>
 
@@ -604,8 +601,6 @@ func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 // #define DESC_REDIRECT       3
 
 // #define DESC_PARENT_MODE_WRITE       8
-
-// @type PhpProcOpenDescriptorItem struct
 
 /* }}} */
 

@@ -54,10 +54,6 @@ const (
 	ZEND_HANDLE_STREAM
 )
 
-// @type ZendStream struct
-
-// @type ZendFileHandle struct
-
 type ZendStatT = __struct__stat
 
 // #define zend_fseek       fseek

@@ -129,18 +129,7 @@ type ZendType = uintPtr
 
 // #define ZEND_TYPE_ENCODE_CLASS_CONST(class_name,allow_null) ZEND_TYPE_ENCODE_CLASS_CONST_Q1 ( allow_null , class_name )
 
-// @type ZendValue struct
-
-// @type Zval struct
-// @type ZendRefcountedH struct
-
-// @type ZendRefcounted struct
-// @type ZendString struct
-// @type Bucket struct
-
 type HashTable = ZendArray
-
-// @type ZendArray struct
 
 /*
  * HashTable Data Layout
@@ -199,21 +188,11 @@ type HashTable = ZendArray
 
 type HashPosition = uint32
 
-// @type HashTableIterator struct
-
-// @type ZendObject struct
-// @type ZendResource struct
-// @type ZendPropertyInfoList struct
-// @type ZendPropertyInfoSourceList struct
-
 // #define ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(list) ( 0x1 | ( uintptr_t ) ( list ) )
 
 // #define ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list) ( ( zend_property_info_list * ) ( ( list ) & ~ 0x1 ) )
 
 // #define ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list) ( ( list ) & 0x1 )
-
-// @type ZendReference struct
-// @type ZendAstRef struct
 
 /* regular data types */
 

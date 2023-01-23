@@ -116,8 +116,6 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 
 /* dedicated Zend executor functions - do not use! */
 
-// @type _zendVmStack struct
-
 // #define ZEND_VM_STACK_HEADER_SLOTS       ( ( ZEND_MM_ALIGNED_SIZE ( sizeof ( struct _zend_vm_stack ) ) + ZEND_MM_ALIGNED_SIZE ( sizeof ( zval ) ) - 1 ) / ZEND_MM_ALIGNED_SIZE ( sizeof ( zval ) ) )
 
 // #define ZEND_VM_STACK_ELEMENTS(stack) ( ( ( zval * ) ( stack ) ) + ZEND_VM_STACK_HEADER_SLOTS )

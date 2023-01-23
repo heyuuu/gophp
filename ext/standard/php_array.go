@@ -51,6 +51,4 @@ package standard
 
 // #define ARRAY_FILTER_USE_KEY       2
 
-// @type ZendArrayGlobals struct
-
 // #define ARRAYG(v) ZEND_MODULE_GLOBALS_ACCESSOR ( array , v )

@@ -37,8 +37,6 @@ type RsrcDtorFuncT func(res *ZendResource)
 
 // #define ZEND_RSRC_DTOR_FUNC(name) void name ( zend_resource * res )
 
-// @type ZendRsrcListDtorsEntry struct
-
 var LeIndexPtr int
 
 // Source: <Zend/zend_list.c>

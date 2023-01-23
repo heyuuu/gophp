@@ -91,19 +91,6 @@ import (
 type ZendSerializeData = __struct___zend_serialize_data
 type ZendUnserializeData = __struct___zend_unserialize_data
 
-// @type ZendClassName struct
-
-// @type ZendTraitMethodReference struct
-
-// @type ZendTraitPrecedence struct
-
-// @type ZendTraitAlias struct
-
-// @type ZendClassEntry struct
-// @type ZendUtilityFunctions struct
-
-// @type ZendUtilityValues struct
-
 type ZendWriteFuncT func(str *byte, str_length int) int
 
 // #define zend_bailout() _zend_bailout ( __FILE__ , __LINE__ )
@@ -186,8 +173,6 @@ const (
 	EH_NORMAL = 0
 	EH_THROW
 )
-
-// @type ZendErrorHandling struct
 
 // #define DEBUG_BACKTRACE_PROVIDE_OBJECT       ( 1 << 0 )
 

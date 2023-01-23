@@ -147,8 +147,6 @@ import (
 
 // #define TRANSLATE_SLASHES_LOWER(path)
 
-// @type PhpExtensionLists struct
-
 /* True globals */
 
 var IsSpecialSection int = 0

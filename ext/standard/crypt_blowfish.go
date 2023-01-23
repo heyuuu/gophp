@@ -96,8 +96,6 @@ type BF_word_signed = signed__int
 
 type BF_key []BF_word
 
-// @type BF_ctx struct
-
 /*
  * Magic IV for 64 Blowfish encryptions that we do at the end.
  * The string is "OrpheanBeholderScryDoubt" on big-endian.

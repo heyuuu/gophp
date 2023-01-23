@@ -50,8 +50,6 @@ import (
 
 // # include < glob . h >
 
-// @type PhpDirGlobals struct
-
 // #define DIRG(v) ( dir_globals . v )
 
 var DirGlobals PhpDirGlobals

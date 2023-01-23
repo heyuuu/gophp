@@ -48,8 +48,6 @@ import (
 
 // #define OBJ_RELEASE(obj) zend_object_release ( obj )
 
-// @type ZendObjectsStore struct
-
 /* Global store handling functions */
 
 /* Store API functions */

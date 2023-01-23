@@ -61,9 +61,6 @@ package zend
 
 type ZendVmStack *_zendVmStack
 
-// @type ZendCompilerGlobals struct
-// @type ZendExecutorGlobals struct
-
 // #define EG_FLAGS_INITIAL       ( 0 )
 
 // #define EG_FLAGS_IN_SHUTDOWN       ( 1 << 0 )
@@ -72,7 +69,6 @@ type ZendVmStack *_zendVmStack
 
 // #define EG_FLAGS_IN_RESOURCE_SHUTDOWN       ( 1 << 2 )
 
-// @type ZendIniScannerGlobals struct
 type ZendPhpScannerEvent = int
 
 const (
@@ -80,5 +76,3 @@ const (
 	ON_FEEDBACK
 	ON_STOP
 )
-
-// @type ZendPhpScannerGlobals struct

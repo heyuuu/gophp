@@ -31,7 +31,6 @@ import (
 
 // # include "zend.h"
 
-// @type ZendArena struct
 func ZendArenaCreate(size int) *ZendArena {
 	var arena *ZendArena = (*ZendArena)(_emalloc(size))
 	arena.SetPtr((*byte)(arena + (g.SizeOf("zend_arena") + 8 - 1 & ^(8-1))))

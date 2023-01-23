@@ -32,8 +32,6 @@ import (
 
 // #define URL_H
 
-// @type PhpUrl struct
-
 // #define PHP_URL_SCHEME       0
 
 // #define PHP_URL_HOST       1

@@ -39,8 +39,6 @@ import (
 
 // #define HL_KEYWORD_COLOR       "#007700"
 
-// @type ZendSyntaxHighlighterIni struct
-
 var SyntaxHighlighterIni ZendSyntaxHighlighterIni
 
 // Source: <Zend/zend_highlight.c>

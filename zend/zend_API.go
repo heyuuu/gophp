@@ -42,12 +42,6 @@ import (
 
 // # include "zend_execute.h"
 
-// @type ZendFunctionEntry struct
-
-// @type ZendFcallInfo struct
-
-// @type ZendFcallInfoCache struct
-
 // #define ZEND_NS_NAME(ns,name) ns "\\" name
 
 // #define ZEND_FN(name) zif_ ## name

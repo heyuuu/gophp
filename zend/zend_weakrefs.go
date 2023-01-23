@@ -59,8 +59,6 @@ var ZendCeWeakref *ZendClassEntry
 
 // # include "zend_weakrefs.h"
 
-// @type ZendWeakref struct
-
 var ZendWeakrefHandlers ZendObjectHandlers
 
 // #define zend_weakref_from(o) ( ( zend_weakref * ) ( ( ( char * ) o ) - XtOffsetOf ( zend_weakref , std ) ) )

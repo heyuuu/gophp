@@ -123,8 +123,6 @@ var StrfilterTolowerFactory streams.PhpStreamFilterFactory = streams.PhpStreamFi
 
 /* }}} */
 
-// @type PhpStripTagsFilter struct
-
 func PhpStripTagsFilterCtor(inst *PhpStripTagsFilter, allowed_tags *zend.ZendString, persistent int) int {
 	if allowed_tags != nil {
 		if nil == g.Assign(&(inst.GetAllowedTags()), g.CondF(persistent != 0, func() any { return zend.__zendMalloc(allowed_tags.len_ + 1) }, func() any { return zend._emalloc(allowed_tags.len_ + 1) })) {
@@ -253,15 +251,11 @@ const (
 type PhpConvConvertFunc func(*PhpConv, **byte, *int, **byte, *int) PhpConvErrT
 type PhpConvDtorFunc func(*PhpConv)
 
-// @type PhpConv struct
-
 // #define php_conv_convert(a,b,c,d,e) ( ( php_conv * ) ( a ) ) -> convert_op ( ( php_conv * ) ( a ) , ( b ) , ( c ) , ( d ) , ( e ) )
 
 // #define php_conv_dtor(a) ( ( php_conv * ) a ) -> dtor ( ( a ) )
 
 /* {{{ php_conv_base64_encode */
-
-// @type PhpConvBase64Encode struct
 
 var B64TblEnc []uint8 = []uint8{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'}
 
@@ -476,8 +470,6 @@ out:
 
 /* }}} */
 
-// @type PhpConvBase64Decode struct
-
 var B64TblDec []uint = []uint{64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 128, 64, 64, 64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64, 64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64}
 
 func PhpConvBase64DecodeCtor(inst *PhpConvBase64Decode) int {
@@ -592,8 +584,6 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 }
 
 /* }}} */
-
-// @type PhpConvQprintEncode struct
 
 // #define PHP_CONV_QPRINT_OPT_BINARY       0x00000001
 
@@ -853,8 +843,6 @@ func PhpConvQprintEncodeCtor(inst *PhpConvQprintEncode, line_len uint, lbchars *
 
 /* }}} */
 
-// @type PhpConvQprintDecode struct
-
 func PhpConvQprintDecodeDtor(inst *PhpConvQprintDecode) {
 	r.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
@@ -1068,8 +1056,6 @@ func PhpConvQprintDecodeCtor(inst *PhpConvQprintDecode, lbchars *byte, lbchars_l
 }
 
 /* }}} */
-
-// @type PhpConvertFilter struct
 
 // #define PHP_CONV_BASE64_ENCODE       1
 
@@ -1582,8 +1568,6 @@ var StrfilterConvertFactory streams.PhpStreamFilterFactory = streams.PhpStreamFi
 
 /* }}} */
 
-// @type PhpConsumedFilterData struct
-
 func ConsumedFilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(thisfilter.abstract.value.ptr)
 	var bucket *streams.PhpStreamBucket
@@ -1653,8 +1637,6 @@ const (
 	CHUNK_TRAILER
 	CHUNK_ERROR
 )
-
-// @type PhpChunkedFilterData struct
 
 func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 	var p *byte = buf

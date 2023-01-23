@@ -25,5 +25,3 @@ package cli
 // #define CLI_H
 
 // #define PHP_CLI_API
-
-// @type CliShellCallbacksT struct

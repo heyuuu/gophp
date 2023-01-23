@@ -46,8 +46,6 @@ import (
 
 // #define ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK       0x1000
 
-// @type ZendConstant struct
-
 // #define ZEND_CONSTANT_FLAGS(c) ( Z_CONSTANT_FLAGS ( ( c ) -> value ) & 0xff )
 
 // #define ZEND_CONSTANT_MODULE_NUMBER(c) ( Z_CONSTANT_FLAGS ( ( c ) -> value ) >> 8 )

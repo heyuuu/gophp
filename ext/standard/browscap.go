@@ -45,18 +45,12 @@ import (
 
 // #define BROWSCAP_NUM_CONTAINS       5
 
-// @type BrowscapKv struct
-// @type BrowscapEntry struct
-// @type BrowserData struct
-
 /* browser data defined in startup phase, eagerly loaded in MINIT */
 
 var GlobalBdata BrowserData = BrowserData{0}
 
 /* browser data defined in activation phase, lazily loaded in get_browser.
  * Per request and per thread, if applicable */
-
-// @type ZendBrowscapGlobals struct
 
 var BrowscapGlobals ZendBrowscapGlobals
 
@@ -215,8 +209,6 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 }
 
 /* }}} */
-
-// @type BrowscapParserCtx struct
 
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent zend.ZendBool) *zend.ZendString {
 	var interned *zend.ZendString = zend.ZendHashFindPtr(&ctx.str_interned, str)

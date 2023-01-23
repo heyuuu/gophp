@@ -67,10 +67,6 @@ const (
 	TOK_OTHER
 )
 
-// @type PhpMetaTagsData struct
-
-// @type PhpFileGlobals struct
-
 // #define FG(v) ( file_globals . v )
 
 var FileGlobals PhpFileGlobals

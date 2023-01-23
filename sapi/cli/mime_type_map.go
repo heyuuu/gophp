@@ -24,8 +24,6 @@ package cli
 
 // #define PHP_CLI_SERVER_MIME_TYPE_MAP_H
 
-// @type PhpCliServerExtMimeTypePair struct
-
 var MimeTypeMap []PhpCliServerExtMimeTypePair = []PhpCliServerExtMimeTypePair{
 	{"ez", "application/andrew-inset"},
 	{"aw", "application/applixware"},

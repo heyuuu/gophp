@@ -144,11 +144,7 @@ var spl_funcs_SplSubject []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 }
 var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 
-// @type spl_SplObjectStorage struct
-
 /* {{{ storage is an assoc array of [zend_object*]=>[zval *obj, zval *inf] */
-
-// @type spl_SplObjectStorageElement struct
 
 func SplObjectStorageFromObj(obj *zend.ZendObject) *spl_SplObjectStorage {
 	return (*spl_SplObjectStorage)((*byte)(obj - zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd()))-(*byte)(nil))))

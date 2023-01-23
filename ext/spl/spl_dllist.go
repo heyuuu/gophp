@@ -101,18 +101,11 @@ var spl_handler_SplDoublyLinkedList zend.ZendObjectHandlers
 
 // #define SPL_DLLIST_IT_FIX       0x00000004
 
-// @type SplPtrLlistElement struct
-
 type SplPtrLlistDtorFunc func(*SplPtrLlistElement)
 type SplPtrLlistCtorFunc func(*SplPtrLlistElement)
 
-// @type SplPtrLlist struct
-
-// @type SplDllistObject struct
-
 /* define an __special__  overloaded iterator structure */
 
-// @type SplDllistIt struct
 func SplDllistFromObj(obj *zend.ZendObject) *SplDllistObject {
 	return (*SplDllistObject)((*byte)(obj - zend_long((*byte)(&((*SplDllistObject)(nil).GetStd()))-(*byte)(nil))))
 }

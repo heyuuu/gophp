@@ -44,8 +44,6 @@ func __phpMempcpy(dst any, src any, len_ int) any {
 
 /* Structure to save state of computation between the single steps.  */
 
-// @type Sha256Ctx struct
-
 // #define SWAP(n) ( ( ( n ) << 24 ) | ( ( ( n ) & 0xff00 ) << 8 ) | ( ( ( n ) >> 8 ) & 0xff00 ) | ( ( n ) >> 24 ) )
 
 /* This array contains the bytes used to pad the buffer to the next

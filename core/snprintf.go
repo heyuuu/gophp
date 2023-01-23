@@ -576,7 +576,6 @@ func ApPhpConvP2(num UWideInt, nbits int, format byte, buf_end *byte, len_ *int)
  * Descriptor for buffer area
  */
 
-// @type BufArea struct
 type Buffy = BufArea
 
 /*

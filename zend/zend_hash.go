@@ -95,8 +95,6 @@ var ZendEmptyArray HashTable
 
 // #define ZVAL_EMPTY_ARRAY(z) do { zval * __z = ( z ) ; Z_ARR_P ( __z ) = ( zend_array * ) & zend_empty_array ; Z_TYPE_INFO_P ( __z ) = IS_ARRAY ; } while ( 0 )
 
-// @type ZendHashKey struct
-
 type MergeCheckerFuncT func(target_ht *HashTable, source_data *Zval, hash_key *ZendHashKey, pParam any) ZendBool
 
 /* startup/shutdown */

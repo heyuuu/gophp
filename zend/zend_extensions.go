@@ -55,8 +55,6 @@ You can use the following macro to check the extension API version for compatibi
 
 // #define ZEND_EXTENSION_API_NO       320190902
 
-// @type ZendExtensionVersionInfo struct
-
 // #define ZEND_EXTENSION_BUILD_ID       "API" ZEND_TOSTR ( ZEND_EXTENSION_API_NO ) ZEND_BUILD_TS ZEND_BUILD_DEBUG ZEND_BUILD_SYSTEM ZEND_BUILD_EXTRA
 
 /* Typedef's for zend_extension function pointers */
@@ -74,8 +72,6 @@ type OpArrayCtorFuncT func(op_array *ZendOpArray)
 type OpArrayDtorFuncT func(op_array *ZendOpArray)
 type OpArrayPersistCalcFuncT func(op_array *ZendOpArray) int
 type OpArrayPersistFuncT func(op_array *ZendOpArray, mem any) int
-
-// @type ZendExtension struct
 
 // #define ZEND_EXTMSG_NEW_EXTENSION       1
 
@@ -289,8 +285,6 @@ func ZendGetExtension(extension_name *byte) *ZendExtension {
 	}
 	return nil
 }
-
-// @type ZendExtensionPersistData struct
 
 func ZendExtensionOpArrayPersistCalcHandler(extension *ZendExtension, data *ZendExtensionPersistData) {
 	if extension.GetOpArrayPersistCalc() != nil {

@@ -38,15 +38,7 @@ import (
 
 /* Signal structs */
 
-// @type ZendSignalEntryT struct
-
-// @type ZendSignalT struct
-
-// @type ZendSignalQueueT struct
-
 /* Signal Globals */
-
-// @type ZendSignalGlobalsT struct
 
 // #define SIGG(v) ( zend_signal_globals . v )
 

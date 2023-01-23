@@ -28,11 +28,6 @@ import (
    +----------------------------------------------------------------------+
 */
 
-// @type ZendObjectIteratorFuncs struct
-
-// @type ZendObjectIterator struct
-// @type ZendClassIteratorFuncs struct
-
 /* given a zval, returns stuff that can be used to iterate it. */
 
 /* given an iterator, wrap it up as a zval for use by the engine opcodes */

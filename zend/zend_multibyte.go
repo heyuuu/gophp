@@ -40,8 +40,6 @@ type ZendEncodingListParser func(encoding_list *byte, encoding_list_len int, ret
 type ZendEncodingInternalEncodingGetter func() *ZendEncoding
 type ZendEncodingInternalEncodingSetter func(encoding *ZendEncoding) int
 
-// @type ZendMultibyteFunctions struct
-
 /*
  * zend multibyte APIs
  */

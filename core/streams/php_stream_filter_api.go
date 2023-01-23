@@ -31,8 +31,6 @@ package streams
 
 // #define PHP_STREAM_FILTER_ALL       ( PHP_STREAM_FILTER_READ | PHP_STREAM_FILTER_WRITE )
 
-// @type PhpStreamBucket struct
-// @type PhpStreamBucketBrigade struct
 type PhpStreamFilterStatusT = int
 
 const (
@@ -51,12 +49,6 @@ const (
 
 // #define PSFS_FLAG_FLUSH_CLOSE       2
 
-// @type PhpStreamFilterOps struct
-
-// @type PhpStreamFilterChain struct
-
-// @type PhpStreamFilter struct
-
 /* stack filter onto a stream */
 
 // #define php_stream_filter_alloc(fops,thisptr,persistent) _php_stream_filter_alloc ( ( fops ) , ( thisptr ) , ( persistent ) STREAMS_CC )
@@ -70,5 +62,3 @@ const (
 // #define php_stream_filter_flush(filter,finish) _php_stream_filter_flush ( ( filter ) , ( finish ) )
 
 // #define php_stream_is_filtered(stream) ( ( stream ) -> readfilters . head || ( stream ) -> writefilters . head )
-
-// @type PhpStreamFilterFactory struct

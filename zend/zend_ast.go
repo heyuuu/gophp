@@ -152,19 +152,11 @@ const (
 type ZendAstKind = uint16
 type ZendAstAttr = uint16
 
-// @type ZendAst struct
-
 /* Same as zend_ast, but with children count, which is updated dynamically */
-
-// @type ZendAstList struct
 
 /* Lineno is stored in val.u2.lineno */
 
-// @type ZendAstZval struct
-
 /* Separate structure for function and class declaration, as they need extra information. */
-
-// @type ZendAstDecl struct
 
 type ZendAstProcessT func(ast *ZendAst)
 

@@ -53,7 +53,6 @@ import (
 
 // # include "php_ticks.h"
 
-// @type StTickFunction struct
 func PhpStartupTicks() int {
 	zend.ZendLlistInit(&(CoreGlobals.GetTickFunctions()), g.SizeOf("struct st_tick_function"), nil, 1)
 	return zend.SUCCESS

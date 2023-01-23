@@ -39,8 +39,6 @@ const (
 	PHP_STREAM_MAP_MODE_SHARED_READWRITE
 )
 
-// @type PhpStreamMmapRange struct
-
 // #define PHP_STREAM_MMAP_ALL       0
 
 // #define PHP_STREAM_MMAP_MAX       ( 512 * 1024 * 1024 )

@@ -95,14 +95,7 @@ type SplPtrHeapDtorFunc func(any)
 type SplPtrHeapCtorFunc func(any)
 type SplPtrHeapCmpFunc func(any, any, *zend.Zval) int
 
-// @type SplPtrHeap struct
-
-// @type SplHeapObject struct
-
 /* define an __special__  overloaded iterator structure */
-
-// @type SplHeapIt struct
-// @type SplPqueueElem struct
 
 func SplHeapFromObj(obj *zend.ZendObject) *SplHeapObject {
 	return (*SplHeapObject)((*byte)(obj - zend_long((*byte)(&((*SplHeapObject)(nil).GetStd()))-(*byte)(nil))))

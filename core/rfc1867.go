@@ -46,18 +46,6 @@ import (
 
 // #define MULTIPART_EVENT_END       5
 
-// @type MultipartEventStart struct
-
-// @type MultipartEventFormdata struct
-
-// @type MultipartEventFileStart struct
-
-// @type MultipartEventFileData struct
-
-// @type MultipartEventFileEnd struct
-
-// @type MultipartEventEnd struct
-
 type PhpRfc1867EncodingTranslationT func() int
 type PhpRfc1867GetDetectOrderT func(list ***zend.ZendEncoding, list_size *int)
 type PhpRfc1867SetInputEncodingT func(encoding *zend.ZendEncoding)
@@ -293,9 +281,6 @@ func DestroyUploadedFilesHash() {
 /* }}} */
 
 // #define FILLUNIT       ( 1024 * 5 )
-
-// @type MultipartBuffer struct
-// @type MimeHeaderEntry struct
 
 /*
  * Fill up the buffer with client data.

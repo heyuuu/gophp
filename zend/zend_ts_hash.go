@@ -26,7 +26,6 @@ package zend
 
 // # include "zend.h"
 
-// @type TsHashTable struct
 type _zendTsHashtable = TsHashTable
 
 // #define TS_HASH(table) ( & ( table -> hash ) )

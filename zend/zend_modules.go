@@ -69,8 +69,6 @@ package zend
 
 // #define MODULE_TEMPORARY       2
 
-// @type ZendModuleEntry struct
-
 // #define MODULE_DEP_REQUIRED       1
 
 // #define MODULE_DEP_CONFLICTS       2
@@ -91,6 +89,5 @@ package zend
 
 // #define ZEND_MOD_END       { NULL , NULL , NULL , 0 }
 
-// @type ZendModuleDep struct
 var ModuleRegistryRequestStartup func(module *ZendModuleEntry) int
 var ModuleRegistryUnloadTemp func(module *ZendModuleEntry) int

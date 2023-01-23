@@ -38,9 +38,6 @@ type PhpStreamNotificationFunc func(context *core.PhpStreamContext, notifycode i
 
 // #define php_stream_context_to_zval(context,zval) { ZVAL_RES ( zval , ( context ) -> res ) ; GC_ADDREF ( ( context ) -> res ) ; }
 
-// @type PhpStreamNotifier struct
-// @type PhpStreamContext struct
-
 /* not all notification codes are implemented */
 
 // #define PHP_STREAM_NOTIFY_RESOLVE       1

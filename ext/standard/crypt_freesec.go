@@ -14,8 +14,6 @@ import (
 
 // #define MD5_HASH_MAX_LEN       120
 
-// @type PhpCryptExtendedData struct
-
 /*
  * _crypt_extended_init() must be called explicitly before first use of
  * _crypt_extended_r().

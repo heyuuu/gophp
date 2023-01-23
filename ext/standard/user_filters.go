@@ -46,8 +46,6 @@ import (
 
 // #define PHP_STREAM_FILTER_RES_NAME       "userfilter.filter"
 
-// @type PhpUserFilterData struct
-
 /* to provide context for calling into the next filter from user-space */
 
 var LeUserfilters int

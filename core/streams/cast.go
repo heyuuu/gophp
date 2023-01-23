@@ -53,7 +53,6 @@ import (
 
 // #define PHP_FPOS_T       fpos_t
 
-// @type COOKIE_IO_FUNCTIONS_T struct
 func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.FILE {
 	return funopen(cookie, funcs.GetReader(), funcs.GetWriter(), funcs.GetSeeker(), funcs.GetCloser())
 }

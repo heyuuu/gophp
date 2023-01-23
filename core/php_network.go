@@ -140,8 +140,6 @@ type PhpSockaddrStorage = __struct__sockaddr_storage
 
 // #define php_connect_nonb(sock,addr,addrlen,timeout) php_network_connect_socket ( ( sock ) , ( addr ) , ( addrlen ) , 0 , ( timeout ) , NULL , NULL )
 
-// @type PhpNetstreamDataT struct
-
 var PhpStreamSocketOps PhpStreamOps
 var PhpStreamGenericSocketOps PhpStreamOps
 

@@ -40,8 +40,6 @@ var ZendCeArrayaccess *ZendClassEntry
 var ZendCeSerializable *ZendClassEntry
 var ZendCeCountable *ZendClassEntry
 
-// @type ZendUserIterator struct
-
 // #define zend_call_method_with_0_params(obj,obj_ce,fn_proxy,function_name,retval) zend_call_method ( obj , obj_ce , fn_proxy , function_name , sizeof ( function_name ) - 1 , retval , 0 , NULL , NULL )
 
 // #define zend_call_method_with_1_params(obj,obj_ce,fn_proxy,function_name,retval,arg1) zend_call_method ( obj , obj_ce , fn_proxy , function_name , sizeof ( function_name ) - 1 , retval , 1 , arg1 , NULL )

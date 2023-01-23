@@ -163,32 +163,9 @@ type FcgiLogger func(type_ int, fmt *byte, _ ...any)
 
 // # include "fastcgi.h"
 
-// @type FcgiHeader struct
-
-// @type FcgiBeginRequest struct
-
-// @type FcgiBeginRequestRec struct
-
-// @type FcgiEndRequest struct
-
-// @type FcgiEndRequestRec struct
-
-// @type FcgiHashBucket struct
-
-// @type FcgiHashBuckets struct
-
-// @type FcgiDataSeg struct
-
-// @type FcgiHash struct
-
-// @type FcgiReqHook struct
-// @type FcgiRequest struct
-
 /* maybe it's better to use weak name instead */
 
 var FcgiLog FcgiLogger
-
-// @type SaT struct
 
 var FcgiMgmtVars zend.HashTable
 var IsInitialized int = 0

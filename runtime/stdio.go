@@ -4,7 +4,6 @@ package runtime
 
 // Source: <runtime/stdio.h>
 
-// @type FILE struct
 type __sFILE = FILE
 
 // #define BUFSIZ       1024

@@ -154,8 +154,6 @@ type ZendObjectGetClosureT func(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **Z
 type ZendObjectGetGcT func(object *Zval, table **Zval, n *int) *HashTable
 type ZendObjectDoOperationT func(opcode ZendUchar, result *Zval, op1 *Zval, op2 *Zval) int
 
-// @type ZendObjectHandlers struct
-
 // #define zend_get_std_object_handlers() ( & std_object_handlers )
 
 // #define zend_get_function_root_class(fbc) ( ( fbc ) -> common . prototype ? ( fbc ) -> common . prototype -> common . scope : ( fbc ) -> common . scope )

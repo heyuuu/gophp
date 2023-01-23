@@ -379,7 +379,6 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	zend._efree(var_orig)
 }
 
-// @type PostVarDataT struct
 type PostVarData = PostVarDataT
 
 func AddPostVar(arr *zend.Zval, var_ *PostVarDataT, eof zend.ZendBool) zend.ZendBool {

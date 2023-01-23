@@ -33,8 +33,6 @@ import (
 
 // #define PHP_PASSWORD_BCRYPT_COST       10
 
-// @type PhpPasswordAlgo struct
-
 func PhpPasswordAlgoIdentify(hash *zend.ZendString) *PhpPasswordAlgo {
 	return PhpPasswordAlgoIdentifyEx(hash, PhpPasswordAlgoDefault())
 }

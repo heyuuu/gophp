@@ -125,10 +125,6 @@ const (
 
 // #define PHP_OUTPUT_HANDLER_DEFAULT_SIZE       0x4000
 
-// @type PhpOutputBuffer struct
-
-// @type PhpOutputContext struct
-
 /* old-style, stateless callback */
 
 type PhpOutputHandlerFuncT func(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int)
@@ -148,12 +144,6 @@ type PhpOutputHandlerConflictCheckT func(handler_name *byte, handler_name_len in
 /* ctor for aliases */
 
 type PhpOutputHandlerAliasCtorT func(handler_name *byte, handler_name_len int, chunk_size int, flags int) *PhpOutputHandler
-
-// @type PhpOutputHandlerUserFuncT struct
-
-// @type PhpOutputHandler struct
-
-// @type ZendOutputGlobals struct
 
 /* there should not be a need to use OG() from outside of output.c */
 

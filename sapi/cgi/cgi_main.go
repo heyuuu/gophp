@@ -133,7 +133,6 @@ var PhpOptarg *byte = nil
 var PhpOptind int = 1
 var OPTIONS []core.Opt = []core.Opt{{'a', 0, "interactive"}, {'b', 1, "bindpath"}, {'C', 0, "no-chdir"}, {'c', 1, "php-ini"}, {'d', 1, "define"}, {'e', 0, "profile-info"}, {'f', 1, "file"}, {'h', 0, "help"}, {'i', 0, "info"}, {'l', 0, "syntax-check"}, {'m', 0, "modules"}, {'n', 0, "no-php-ini"}, {'q', 0, "no-header"}, {'s', 0, "syntax-highlight"}, {'s', 0, "syntax-highlighting"}, {'w', 0, "strip"}, {'?', 0, "usage"}, {'v', 0, "version"}, {'z', 1, "zend-extension"}, {'T', 1, "timing"}, {'-', 0, nil}}
 
-// @type php_cgi_globals_struct struct
 type _phpCgiGlobals = php_cgi_globals_struct
 
 /* {{{ user_config_cache
@@ -145,8 +144,6 @@ type _phpCgiGlobals = php_cgi_globals_struct
  *       storing per-file entries as it would not be possible to detect added / deleted entries
  *       between separate files.
  */
-
-// @type UserConfigCacheEntry struct
 
 func UserConfigCacheEntryDtor(el *zend.Zval) {
 	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.value.ptr)

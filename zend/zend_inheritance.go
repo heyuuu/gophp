@@ -2500,8 +2500,6 @@ func ZendCheckDeprecatedConstructor(ce *ZendClassEntry) {
 
 // #define DISPLAY_ABSTRACT_FN(idx) ai . afn [ idx ] ? ZEND_FN_SCOPE_NAME ( ai . afn [ idx ] ) : "" , ai . afn [ idx ] ? "::" : "" , ai . afn [ idx ] ? ZSTR_VAL ( ai . afn [ idx ] -> common . function_name ) : "" , ai . afn [ idx ] && ai . afn [ idx + 1 ] ? ", " : ( ai . afn [ idx ] && ai . cnt > MAX_ABSTRACT_INFO_CNT ? ", ..." : "" )
 
-// @type ZendAbstractInfo struct
-
 func ZendVerifyAbstractClassFunction(fn *ZendFunction, ai *ZendAbstractInfo) {
 	if (fn.GetFnFlags() & 1 << 6) != 0 {
 		if ai.GetCnt() < 3 {
@@ -2601,7 +2599,6 @@ const (
 	OBLIGATION_PROPERTY_COMPATIBILITY
 )
 
-// @type VarianceObligation struct
 func VarianceObligationDtor(zv *Zval) { _efree(zv.GetValue().GetPtr()) }
 func VarianceObligationHtDtor(zv *Zval) {
 	ZendHashDestroy(zv.GetValue().GetPtr())

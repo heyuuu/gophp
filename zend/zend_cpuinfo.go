@@ -143,8 +143,6 @@ func ZendCpuSupportsAvx2() int {
 
 // # include "zend_cpuinfo.h"
 
-// @type ZendCpuInfo struct
-
 var Cpuinfo ZendCpuInfo = ZendCpuInfo{0}
 
 func __zendCpuid(func_ uint32, subfunc uint32, cpuinfo *ZendCpuInfo) { cpuinfo.SetEax(0) }

@@ -121,8 +121,6 @@ var spl_handler_ArrayIterator zend.ZendObjectHandlers
 
 // #define SPL_ARRAY_METHOD_MAY_USER_ARG       2
 
-// @type SplArrayObject struct
-
 func SplArrayFromObj(obj *zend.ZendObject) *SplArrayObject {
 	return (*SplArrayObject)((*byte)(obj - zend_long((*byte)(&((*SplArrayObject)(nil).GetStd()))-(*byte)(nil))))
 }

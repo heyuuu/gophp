@@ -43,8 +43,6 @@ var PhpUrlDecode func(str *byte, len_ int) int
  * from an existing memory buffer.
  */
 
-// @type PhpStreamMemoryData struct
-
 /* {{{ */
 
 func PhpStreamMemoryWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
@@ -329,8 +327,6 @@ func _phpStreamMemoryGetBuffer(stream *core.PhpStream, length *int) *byte {
 }
 
 /* }}} */
-
-// @type PhpStreamTempData struct
 
 /* {{{ */
 

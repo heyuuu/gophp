@@ -46,8 +46,6 @@ import (
 // # include < utime . h >
 
 var LeProtocols int
-
-// @type PhpUserStreamWrapper struct
 var UserStreamWops core.PhpStreamWrapperOps = core.PhpStreamWrapperOps{UserWrapperOpener, nil, nil, UserWrapperStatUrl, UserWrapperOpendir, "user-space", UserWrapperUnlink, UserWrapperRename, UserWrapperMkdir, UserWrapperRmdir, UserWrapperMetadata}
 
 func StreamWrapperDtor(rsrc *zend.ZendResource) {
@@ -87,7 +85,6 @@ func ZmStartupUserStreams(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 
-// @type _phpUserstreamData struct
 type PhpUserstreamDataT = _phpUserstreamData
 
 /* names of methods */

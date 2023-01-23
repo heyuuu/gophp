@@ -52,32 +52,13 @@ import (
 
 // #define ZEND_USE_ABS_CONST_ADDR       0
 
-// @type ZnodeOp struct
-
-// @type Znode struct
-
 /* Temporarily defined here, to avoid header ordering issues */
-
-// @type ZendAstZnode struct
 
 func ZendAstGetZnode(ast *ZendAst) *Znode { return &((*ZendAstZnode)(ast)).node }
 
-// @type ZendDeclarables struct
-
 /* Compilation context that is different for each file, but shared between op arrays. */
 
-// @type ZendFileContext struct
-
-// @type ZendParserStackElem struct
-
 type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
-
-// @type ZendOp struct
-// @type ZendBrkContElement struct
-
-// @type ZendLabel struct
-
-// @type ZendTryCatchElement struct
 
 // #define ZEND_LIVE_TMPVAR       0
 
@@ -91,11 +72,7 @@ type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
 
 // #define ZEND_LIVE_MASK       7
 
-// @type ZendLiveRange struct
-
 /* Compilation context that is different for each op array. */
-
-// @type ZendOparrayContext struct
 
 /* Class, property and method flags                  class|meth.|prop.|const*/
 
@@ -295,8 +272,6 @@ type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
 
 // #define ZEND_ACC_CALL_VIA_HANDLER       ZEND_ACC_CALL_VIA_TRAMPOLINE
 
-// @type ZendPropertyInfo struct
-
 // #define OBJ_PROP(obj,offset) ( ( zval * ) ( ( char * ) ( obj ) + offset ) )
 
 // #define OBJ_PROP_NUM(obj,num) ( & ( obj ) -> properties_table [ ( num ) ] )
@@ -305,25 +280,15 @@ type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
 
 // #define OBJ_PROP_TO_NUM(offset) ( ( offset - OBJ_PROP_TO_OFFSET ( 0 ) ) / sizeof ( zval ) )
 
-// @type ZendClassConstant struct
-
 /* arg_info for internal functions */
 
-// @type ZendInternalArgInfo struct
-
 /* arg_info for user functions */
-
-// @type ZendArgInfo struct
 
 /* the following structure repeats the layout of zend_internal_arg_info,
  * but its fields have different meaning. It's used as the first element of
  * arg_info array to define properties __special__  of internal functions.
  * It's also used for the return type.
  */
-
-// @type ZendInternalFunctionInfo struct
-
-// @type ZendOpArray struct
 
 // #define ZEND_RETURN_VALUE       0
 
@@ -333,12 +298,7 @@ type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
 
 type ZifHandler func(execute_data *ZendExecuteData, return_value *Zval)
 
-// @type ZendInternalFunction struct
-
 // #define ZEND_FN_SCOPE_NAME(function) ( ( function ) && ( function ) -> common . scope ? ZSTR_VAL ( ( function ) -> common . scope -> name ) : "" )
-
-// @type ZendFunction struct
-// @type ZendExecuteData struct
 
 // #define ZEND_CALL_HAS_THIS       IS_OBJECT_EX
 
@@ -517,8 +477,6 @@ func ZendGetUnmangledPropertyName(mangled_prop *ZendString) *byte {
 
 type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) ZendBool
 type ZendAutoGlobalCallback func(name *ZendString) ZendBool
-
-// @type ZendAutoGlobal struct
 
 /* BEGIN: OPCODES */
 
@@ -898,8 +856,6 @@ func ZendCheckArgSendType(zf *ZendFunction, arg_num uint32, mask uint32) int {
 
 // #define FC(member) ( CG ( file_context ) . member )
 
-// @type ZendLoopVar struct
-
 func ZendAllocCacheSlots(count unsigned) uint32 {
 	var op_array *ZendOpArray = CG.GetActiveOpArray()
 	var ret uint32 = op_array.GetCacheSize()
@@ -968,7 +924,6 @@ func ZendGetUnqualifiedName(name *ZendString, result **byte, result_len *int) Ze
 
 /* }}} */
 
-// @type ReservedClassName struct
 var ReservedClassNames []ReservedClassName = []ReservedClassName{
 	{"bool", g.SizeOf("\"bool\"") - 1},
 	{"false", g.SizeOf("\"false\"") - 1},
@@ -1008,8 +963,6 @@ func ZendAssertValidClassName(name *ZendString) {
 }
 
 /* }}} */
-
-// @type BuiltinTypeInfo struct
 
 var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
 	{"int", g.SizeOf("\"int\"") - 1, 4},
@@ -6260,7 +6213,6 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 
 /* }}} */
 
-// @type ClosureInfo struct
 func FindImplicitBindsRecursively(info *ClosureInfo, ast *ZendAst) {
 	if ast == nil {
 		return

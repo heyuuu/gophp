@@ -62,14 +62,9 @@ var ZifHeaderRegisterCallback func(execute_data *zend.ZendExecuteData, return_va
 type PhpUint32 = uint32
 type PhpInt32 = int32
 
-// @type PhpBasicGlobals struct
-
 // #define BG(v) ( basic_globals . v )
 
 var BasicGlobals PhpBasicGlobals
-
-// @type PutenvEntry struct
-// @type PhpShutdownFunctionEntry struct
 
 // Source: <ext/standard/basic_functions.c>
 
@@ -179,8 +174,6 @@ type YY_BUFFER_STATE *__struct__yy_buffer_state
 // # include "streamsfuncs.h"
 
 var IncompleteClassEntry *zend.ZendClassEntry = nil
-
-// @type UserTickFunctionEntry struct
 
 /* some prototypes for local functions */
 

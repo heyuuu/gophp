@@ -84,8 +84,6 @@ const (
 
 /* Structure definition for the set_option interface that the above functions wrap */
 
-// @type PhpStreamXportParam struct
-
 /* Because both client and server streams use the same mechanisms
    for encryption we use the LSB to denote clients.
 */
@@ -116,5 +114,3 @@ const (
 )
 
 /* These functions provide crypto support on the underlying transport */
-
-// @type PhpStreamXportCryptoParam struct

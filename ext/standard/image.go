@@ -65,8 +65,6 @@ var PhpSigWebp []byte = []byte{'W', 'E', 'B', 'P'}
 
 /* REMEMBER TO ADD MIME-TYPE TO FUNCTION php_image_type_to_mime_type */
 
-// @type Gfxinfo struct
-
 /* {{{ PHP_MINIT_FUNCTION(imagetypes)
  * Register IMAGETYPE_<xxx> constants used by GetImageSize(), image_type_to_mime_type, ext/exif */
 

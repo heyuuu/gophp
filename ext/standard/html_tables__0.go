@@ -113,9 +113,6 @@ var CharsetMap []struct {
  * The origin charset must have at most 256 code points.
  * The multi-byte encodings are not supported */
 
-// @type EncToUniStage2 struct
-// @type EncToUni struct
-
 /* bits 7-8 bits (only single bytes encodings supported )*/
 
 // #define ENT_ENC_TO_UNI_STAGE1(k) ( ( k & 0xC0 ) >> 6 )
@@ -256,8 +253,6 @@ var EncToUniIndex []*EncToUni = []*EncToUni{nil, &EncToUniIso88591, &EncToUniWin
 
 /* }}} */
 
-// @type UniToEnc struct
-
 /* {{{ Mappings *from* Unicode for ISO-8859-15 */
 
 var UnimapIso885915 []UniToEnc = []UniToEnc{{0xa5, 0xa5}, {0xa7, 0xa7}, {0xa9, 0xa9}, {0xaa, 0xaa}, {0xab, 0xab}, {0xac, 0xac}, {0xad, 0xad}, {0xae, 0xae}, {0xaf, 0xaf}, {0xb0, 0xb0}, {0xb1, 0xb1}, {0xb2, 0xb2}, {0xb3, 0xb3}, {0xb5, 0xb5}, {0xb6, 0xb6}, {0xb7, 0xb7}, {0xb9, 0xb9}, {0xba, 0xba}, {0xbb, 0xbb}, {0x152, 0xbc}, {0x153, 0xbd}, {0x160, 0xa6}, {0x161, 0xa8}, {0x178, 0xbe}, {0x17d, 0xb4}, {0x17e, 0xb8}, {0x20ac, 0xa4}}
@@ -295,11 +290,7 @@ var UnimapMacroman []UniToEnc = []UniToEnc{{0xa0, 0xca}, {0xa1, 0xc1}, {0xa2, 0x
 /* The default entity may be NULL. Binary search is still possible while
    is senseless as there are just two rows (see also find_entity_for_char()). */
 
-// @type EntityMulticodepointRow struct
-
 /* blocks of these should start at code points k where k % 0xFC0 == 0 */
-
-// @type EntityStage3Row struct
 
 /* Calculate k & 0x3F Use as offset */
 
@@ -311,8 +302,6 @@ type EntityStage1Row **EntityStage3Row
 
 /* For stage 1, Calculate k & 0xFFF000 >> 3*4.
  * If larger than 1D, we have no mapping. Otherwise lookup that index */
-
-// @type EntityTableOpt struct
 
 /* Replaced "GT" > "gt" and "QUOT" > "quot" for consistency's sake. */
 
@@ -453,10 +442,8 @@ var EntityMsTableHtml5 []EntityStage1Row = []EntityStage1Row{Stage2TableHtml5000
 
 /* end of HTML5 multi-stage table for codepoint -> entity }}} */
 
-// @type EntityCpMap struct
 type EntityHtBucket *EntityCpMap
 
-// @type EntityHt struct
 var HtBucketEmpty []EntityCpMap = []EntityCpMap{{nil, 0, 0, 0}}
 var HtBucketHtml5000 []EntityCpMap = []EntityCpMap{{"realpart", 8, 0x211c, 0}, {"varr", 4, 0x2195, 0}, {nil, 0, 0, 0}}
 var HtBucketHtml5001 []EntityCpMap = []EntityCpMap{{"angrt", 5, 0x221f, 0}, {"iogon", 5, 0x12f, 0}, {nil, 0, 0, 0}}

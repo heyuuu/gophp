@@ -49,7 +49,3 @@ package core
 // #define TRACK_VARS_FILES       5
 
 // #define TRACK_VARS_REQUEST       6
-
-// @type ArgSeparators struct
-
-// @type PhpCoreGlobals struct

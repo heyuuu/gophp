@@ -527,8 +527,6 @@ func PhpGethostbyname(name *byte) *zend.ZendString {
 
 // #define MAXRESOURCERECORDS       64
 
-// @type Querybuf struct
-
 /* just a hack to free resources allocated by glibc in __res_nsend()
  * See also:
  *   res_thread_freeres() in glibc/resolv/res_init.c

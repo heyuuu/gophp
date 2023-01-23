@@ -43,8 +43,6 @@ import (
 
 // #define ZEND_MM_ALIGNED_SIZE_EX(size,alignment) ( ( ( size ) + ( ( alignment ) - 1 ) ) & ~ ( ( alignment ) - 1 ) )
 
-// @type ZendLeakInfo struct
-
 // #define ZEND_MM_OVERHEAD       0
 
 // # include "zend_alloc_sizes.h"
@@ -207,10 +205,6 @@ type ZendMmChunkAllocT func(storage *ZendMmStorage, size int, alignment int) any
 type ZendMmChunkFreeT func(storage *ZendMmStorage, chunk any, size int)
 type ZendMmChunkTruncateT func(storage *ZendMmStorage, chunk any, old_size int, new_size int) int
 type ZendMmChunkExtendT func(storage *ZendMmStorage, chunk any, old_size int, new_size int) int
-
-// @type ZendMmHandlers struct
-
-// @type ZendMmStorage struct
 
 /*
 
@@ -469,18 +463,10 @@ var ZendMmUseHugePages int = 0
  *               2 for 5-8, 3 for 9-16 etc) see zend_alloc_sizes.h
  */
 
-// @type ZendMmHeap struct
-// @type ZendMmChunk struct
-// @type ZendMmPage struct
-
 /*
  * bin - is one or few continuous pages (up to 8) used for allocation of
  * a particular "small size".
  */
-
-// @type ZendMmBin struct
-// @type ZendMmFreeSlot struct
-// @type ZendMmHugeList struct
 
 // #define ZEND_MM_PAGE_ADDR(chunk,page_num) ( ( void * ) ( ( ( zend_mm_page * ) ( chunk ) ) + ( page_num ) ) )
 
@@ -1815,8 +1801,6 @@ func _zendMmRealloc2(heap *ZendMmHeap, ptr any, size int, copy_size int) any {
 func _zendMmBlockSize(heap *ZendMmHeap, ptr any) int { return ZendMmSize(heap, ptr) }
 
 /**********************/
-
-// @type ZendAllocGlobals struct
 
 // #define AG(v) ( alloc_globals . v )
 

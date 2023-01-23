@@ -166,9 +166,6 @@ const (
 	SBodyIdentityEof
 )
 
-// @type PhpHttpParser struct
-// @type PhpHttpParserSettings struct
-
 /* If php_http_should_keep_alive() in the on_headers_complete or
  * on_message_complete callback returns true, then this will be should be
  * the last message on the connection.

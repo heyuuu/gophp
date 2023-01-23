@@ -467,8 +467,6 @@ var Free func(any)
 
 /* A type that is properly aligned for any stack member.  */
 
-// @type IniUnionYyalloc struct
-
 /* The size of the maximum gap between one aligned stack and the next.  */
 
 // #define YYSTACK_GAP_MAXIMUM       ( sizeof ( union yyalloc ) - 1 )

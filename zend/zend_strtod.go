@@ -77,8 +77,6 @@ import (
 
 // #define CONST       const
 
-// @type U struct
-
 // #define word0(x) ( x ) -> L [ 1 ]
 
 // #define word1(x) ( x ) -> L [ 0 ]
@@ -166,8 +164,6 @@ import (
 
 // #define Pack_32
 
-// @type BCinfo struct
-
 // #define FFFFFFFF       0xffffffffUL
 
 // #define Llong       long long
@@ -179,8 +175,6 @@ import (
 // #define FREE_DTOA_LOCK(n)
 
 // #define Kmax       7
-
-// @type Bigint struct
 
 var Freelist []*Bigint
 

@@ -38,7 +38,6 @@ import (
 
 // #define GLOB_FLAGMASK       ( ~ GLOB_ONLYDIR )
 
-// @type GlobST struct
 func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
 	var pglob *GlobST = (*GlobST)(stream.abstract)
 	if pglob != nil && pglob.GetPath() != nil {

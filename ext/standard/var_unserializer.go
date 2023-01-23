@@ -36,9 +36,6 @@ import (
 
 // #define VAR_UNSERIALIZE_FLAG       2
 
-// @type VarEntries struct
-// @type VarDtorEntries struct
-// @type PhpUnserializeData struct
 func PhpVarUnserializeInit() PhpUnserializeDataT {
 	var d PhpUnserializeDataT
 

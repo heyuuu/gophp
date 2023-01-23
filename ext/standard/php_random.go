@@ -24,8 +24,6 @@ package standard
 
 // #define PHP_RANDOM_H
 
-// @type PhpRandomGlobals struct
-
 // #define php_random_bytes_throw(b,s) php_random_bytes ( ( b ) , ( s ) , 1 )
 
 // #define php_random_bytes_silent(b,s) php_random_bytes ( ( b ) , ( s ) , 0 )

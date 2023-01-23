@@ -51,8 +51,6 @@ import (
 
 /* }}} */
 
-// @type PhpSerializeData struct
-
 // #define COMMON       ( is_ref ? "&" : "" )
 
 func PhpArrayElementDump(zv *zend.Zval, index zend.ZendUlong, key *zend.ZendString, level int) {

@@ -129,8 +129,6 @@ import (
  * a character set.
  */
 
-// @type CharSet struct
-
 /*
  * Declarations for functions used only in this file.
  */

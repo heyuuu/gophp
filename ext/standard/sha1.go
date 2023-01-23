@@ -36,8 +36,6 @@ import (
 
 /* SHA1 context. */
 
-// @type PHP_SHA1_CTX struct
-
 // Source: <ext/standard/sha1.c>
 
 /*

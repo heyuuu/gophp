@@ -44,8 +44,6 @@ import (
 
 var ZmShutdownSpl func(type_ int, module_number int) int
 
-// @type ZendSplGlobals struct
-
 var SplGlobals ZendSplGlobals
 
 // #define SPL_G(v) ZEND_MODULE_GLOBALS_ACCESSOR ( spl , v )
@@ -436,8 +434,6 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 }
-
-// @type AutoloadFuncInfo struct
 func AutoloadFuncInfoDtor(element *zend.Zval) {
 	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.value.ptr)
 	if alfi.obj.u1.v.type_ != 0 {

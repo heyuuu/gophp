@@ -68,7 +68,6 @@ func PhpStreamOutputClose(stream *core.PhpStream, close_handle int) int { return
 
 var PhpStreamOutputOps core.PhpStreamOps = core.PhpStreamOps{PhpStreamOutputWrite, PhpStreamOutputRead, PhpStreamOutputClose, nil, "Output", nil, nil, nil, nil}
 
-// @type PhpStreamInputT struct
 type PhpStreamInput = PhpStreamInputT
 
 /* }}} */

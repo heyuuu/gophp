@@ -45,8 +45,6 @@ import (
  * See md5.c for more information.
  */
 
-// @type PHP_MD5_CTX struct
-
 // Source: <ext/standard/md5.c>
 
 /*

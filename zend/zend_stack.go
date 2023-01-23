@@ -25,8 +25,6 @@ package zend
 
 // #define ZEND_STACK_H
 
-// @type ZendStack struct
-
 // #define STACK_BLOCK_SIZE       16
 
 // #define ZEND_STACK_APPLY_TOPDOWN       1

@@ -79,8 +79,6 @@ import (
 
 // #define php_sys_link       link
 
-// @type CwdState struct
-
 type VerifyPathFunc func(*CwdState) int
 
 /* One of the following constants must be used as the last argument
@@ -95,10 +93,6 @@ type VerifyPathFunc func(*CwdState) int
 // #define REALPATH_CACHE_TTL       ( 2 * 60 )
 
 // #define REALPATH_CACHE_SIZE       0
-
-// @type RealpathCacheBucket struct
-
-// @type VirtualCwdGlobals struct
 
 var CwdGlobals VirtualCwdGlobals
 

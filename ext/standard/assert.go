@@ -39,8 +39,6 @@ import (
 
 /* }}} */
 
-// @type ZendAssertGlobals struct
-
 var AssertGlobals ZendAssertGlobals
 var AssertionErrorCe *zend.ZendClassEntry
 

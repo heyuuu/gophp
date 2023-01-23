@@ -99,7 +99,6 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 
 /* }}} */
 
-// @type SpecialFormsT struct
 func CompareSpecialVersionForms(form1 *byte, form2 *byte) int {
 	var found1 int = -1
 	var found2 int = -1

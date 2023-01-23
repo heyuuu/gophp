@@ -30,8 +30,6 @@ import (
 
 // #define ZEND_GC_H
 
-// @type ZendGcStatus struct
-
 var GcCollectCycles func() int
 
 /* enable/disable automatic start of GC collection */
@@ -200,10 +198,6 @@ func GcCheckPossibleRoot(ref *ZendRefcounted) {
 
 // #define GC_FETCH_NEXT_UNUSED() gc_fetch_next_unused ( )
 
-// @type GcRootBuffer struct
-
-// @type ZendGcGlobals struct
-
 // #define GC_G(v) ( gc_globals . v )
 
 var GcGlobals ZendGcGlobals
@@ -215,8 +209,6 @@ var GcGlobals ZendGcGlobals
 // #define GC_BENCH_PEAK(peak,counter)
 
 // #define GC_STACK_SEGMENT_SIZE       ( ( ( 4096 - ZEND_MM_OVERHEAD ) / sizeof ( void * ) ) - 2 )
-
-// @type GcStack struct
 
 // #define GC_STACK_DCL(init) gc_stack * _stack = init ; size_t _top = 0 ;
 
