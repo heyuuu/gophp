@@ -5,6 +5,7 @@ package spl
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -237,7 +238,7 @@ func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clone
 				__z.value.arr = __arr
 				__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
 			} else {
-				assert(orig.value.obj.handlers == &spl_handler_ArrayIterator)
+				r.Assert(orig.value.obj.handlers == &spl_handler_ArrayIterator)
 				var _z1 *zend.Zval = &intern.array
 				var _z2 *zend.Zval = orig
 				var _gc *zend.ZendRefcounted = _z2.value.counted
@@ -1320,8 +1321,8 @@ func zim_spl_Array_setIteratorClass(execute_data *zend.ZendExecuteData, return_v
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

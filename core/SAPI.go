@@ -366,7 +366,7 @@ func SapiReadStandardFormData() {
 
 			}
 		}
-		_phpStreamSeek(sapi_globals.GetRequestInfo().GetRequestBody(), 0, SEEK_SET)
+		_phpStreamSeek(sapi_globals.GetRequestInfo().GetRequestBody(), 0, 0)
 	}
 }
 func GetDefaultContentType(prefix_len uint32, len_ *uint32) *byte {

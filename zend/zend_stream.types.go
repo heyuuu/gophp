@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	r "sik/runtime"
+)
+
 /**
  * ZendStream
  */
@@ -29,7 +33,7 @@ func (this *ZendStream) SetCloser(value ZendStreamCloserT) { this.closer = value
  */
 type ZendFileHandle struct {
 	handle struct /* union */ {
-		fp     *FILE
+		fp     *r.FILE
 		stream ZendStream
 	}
 	filename      *byte
@@ -40,8 +44,8 @@ type ZendFileHandle struct {
 	len_          int
 }
 
-func (this ZendFileHandle) GetFp() *FILE                     { return this.handle.fp }
-func (this *ZendFileHandle) SetFp(value *FILE)               { this.handle.fp = value }
+func (this ZendFileHandle) GetFp() *r.FILE                   { return this.handle.fp }
+func (this *ZendFileHandle) SetFp(value *r.FILE)             { this.handle.fp = value }
 func (this ZendFileHandle) GetStream() ZendStream            { return this.handle.stream }
 func (this *ZendFileHandle) SetStream(value ZendStream)      { this.handle.stream = value }
 func (this ZendFileHandle) GetFilename() *byte               { return this.filename }

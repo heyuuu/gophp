@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -100,7 +101,7 @@ func ZmStartupExec(type_ int, module_number int) int {
 /* }}} */
 
 func PhpExec(type_ int, cmd *byte, array *zend.Zval, return_value *zend.Zval) int {
-	var fp *FILE
+	var fp *r.FILE
 	var buf *byte
 	var l int = 0
 	var pclose_return int
@@ -259,8 +260,8 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -277,8 +278,8 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 			_optional = 1
 			if mode == 0 {
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -290,8 +291,8 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 				zend.ZendParseArgZvalDeref(_arg, &ret_array, 0)
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -368,7 +369,7 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 	}
 	if ret_code != nil {
 		for {
-			assert(ret_code.u1.v.type_ == 10)
+			r.Assert(ret_code.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = ret_code
 				var ref *zend.ZendReference = _zv.value.ref
@@ -618,8 +619,8 @@ func ZifEscapeshellcmd(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -721,8 +722,8 @@ func ZifEscapeshellarg(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -783,7 +784,7 @@ func ZifEscapeshellarg(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 /* }}} */
 
 func ZifShellExec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var in *FILE
+	var in *r.FILE
 	var command *byte
 	var command_len int
 	var ret *zend.ZendString
@@ -822,8 +823,8 @@ func ZifShellExec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -936,8 +937,8 @@ func ZifProcNice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

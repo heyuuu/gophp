@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -92,7 +93,7 @@ func ZendIteratorDtor(iter *ZendObjectIterator) {
 	ZendObjectsStoreDel(&iter.std)
 }
 func ZendIteratorUnwrap(array_ptr *Zval) *ZendObjectIterator {
-	assert(array_ptr.GetType() == 8)
+	r.Assert(array_ptr.GetType() == 8)
 	if array_ptr.GetValue().GetObj().GetHandlers() == &IteratorObjectHandlers {
 		return (*ZendObjectIterator)(array_ptr.GetValue().GetObj())
 	}

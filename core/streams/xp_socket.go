@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -354,7 +355,7 @@ func PhpSockopCast(stream *core.PhpStream, castas int, ret *any) int {
 	switch castas {
 	case 0:
 		if ret != nil {
-			*((**FILE)(ret)) = fdopen(sock.socket, stream.mode)
+			*((**r.FILE)(ret)) = fdopen(sock.socket, stream.mode)
 			if *ret {
 				return zend.SUCCESS
 			}

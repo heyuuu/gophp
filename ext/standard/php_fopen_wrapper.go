@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -85,7 +86,7 @@ func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 
 		var read_bytes int = core.SapiReadPostBlock(buf, count)
 		if read_bytes > 0 {
-			streams._phpStreamSeek(input.GetBody(), 0, SEEK_END)
+			streams._phpStreamSeek(input.GetBody(), 0, 2)
 			streams._phpStreamWrite(input.GetBody(), buf, read_bytes)
 		}
 	}
@@ -94,7 +95,7 @@ func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		/* If the input stream contains filters, it's not really seekable. The
 		   input->position is likely to be wrong for unfiltered data. */
 
-		streams._phpStreamSeek(input.GetBody(), input.GetPosition(), SEEK_SET)
+		streams._phpStreamSeek(input.GetBody(), input.GetPosition(), 0)
 
 		/* If the input stream contains filters, it's not really seekable. The
 		   input->position is likely to be wrong for unfiltered data. */
@@ -173,7 +174,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	var token *byte = nil
 	var pathdup *byte
 	var max_memory zend.ZendLong
-	var file *FILE = nil
+	var file *r.FILE = nil
 	if !(strncasecmp(path, "php://", 6)) {
 		path += 6
 	}
@@ -208,7 +209,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		}
 		input = zend._ecalloc(1, g.SizeOf("* input"))
 		if g.Assign(&(input.GetBody()), core.sapi_globals.request_info.request_body) {
-			streams._phpStreamSeek(input.GetBody(), 0, SEEK_SET)
+			streams._phpStreamSeek(input.GetBody(), 0, 0)
 		} else {
 			input.SetBody(streams._phpStreamTempCreateEx(0x0, 0x4000, core.CoreGlobals.upload_tmp_dir))
 			core.sapi_globals.request_info.request_body = input.GetBody()

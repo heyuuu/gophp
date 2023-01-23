@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -761,7 +762,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				} else if numVars != 0 {
 					current = args + g.PostInc(&objIndex)
 					for {
-						assert(current.u1.v.type_ == 10)
+						r.Assert(current.u1.v.type_ == 10)
 						for {
 							var _zv *zend.Zval = current
 							var ref *zend.ZendReference = _zv.value.ref
@@ -907,7 +908,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				} else if numVars != 0 {
 					current = args + g.PostInc(&objIndex)
 					for {
-						assert(current.u1.v.type_ == 10)
+						r.Assert(current.u1.v.type_ == 10)
 						for {
 							var _zv *zend.Zval = current
 							var ref *zend.ZendReference = _zv.value.ref
@@ -968,7 +969,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				} else if numVars != 0 {
 					current = args + g.PostInc(&objIndex)
 					for {
-						assert(current.u1.v.type_ == 10)
+						r.Assert(current.u1.v.type_ == 10)
 						for {
 							var _zv *zend.Zval = current
 							var ref *zend.ZendReference = _zv.value.ref
@@ -1156,7 +1157,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 						current = args + g.PostInc(&objIndex)
 						for {
-							assert(current.u1.v.type_ == 10)
+							r.Assert(current.u1.v.type_ == 10)
 							for {
 								var _zv *zend.Zval = current
 								var ref *zend.ZendReference = _zv.value.ref
@@ -1184,7 +1185,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					} else if numVars != 0 {
 						current = args + g.PostInc(&objIndex)
 						for {
-							assert(current.u1.v.type_ == 10)
+							r.Assert(current.u1.v.type_ == 10)
 							for {
 								var _zv *zend.Zval = current
 								var ref *zend.ZendReference = _zv.value.ref
@@ -1333,7 +1334,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				} else if numVars != 0 {
 					current = args + g.PostInc(&objIndex)
 					for {
-						assert(current.u1.v.type_ == 10)
+						r.Assert(current.u1.v.type_ == 10)
 						for {
 							var _zv *zend.Zval = current
 							var ref *zend.ZendReference = _zv.value.ref

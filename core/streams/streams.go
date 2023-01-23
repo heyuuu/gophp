@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -445,7 +446,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 			*/
 
 			stream.in_free = 0
-			return fclose(stream.stdiocast)
+			return r.Fclose(stream.stdiocast)
 		}
 		ret = stream.ops.close(stream, g.Cond(preserve_handle != 0, 0, 1))
 		stream.abstract = nil
@@ -453,7 +454,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 		/* tidy up any FILE* that might have been fdopened */
 
 		if release_cast != 0 && stream.fclose_stdiocast == 1 && stream.stdiocast != nil {
-			fclose(stream.stdiocast)
+			r.Fclose(stream.stdiocast)
 			stream.stdiocast = nil
 			stream.fclose_stdiocast = 0
 		}
@@ -792,14 +793,14 @@ func _phpStreamPutc(stream *core.PhpStream, c int) int {
 	if _phpStreamWrite(stream, (*byte)(&buf), 1) > 0 {
 		return 1
 	}
-	return EOF
+	return -1
 }
 func _phpStreamGetc(stream *core.PhpStream) int {
 	var buf byte
 	if _phpStreamRead(stream, &buf, 1) > 0 {
 		return buf & 0xff
 	}
-	return EOF
+	return -1
 }
 func _phpStreamPuts(stream *core.PhpStream, buf *byte) int {
 	var len_ int
@@ -971,7 +972,7 @@ func _phpStreamGetLine(stream *core.PhpStream, buf *byte, maxlen int, returned_l
 	}
 	if total_copied == 0 {
 		if grow_mode != 0 {
-			assert(bufstart == nil)
+			r.Assert(bufstart == nil)
 		}
 		return nil
 	}
@@ -1116,7 +1117,7 @@ func _phpStreamWriteBuffer(stream *core.PhpStream, buf *byte, count int) ssize_t
 	if stream.ops.seek != nil && (stream.flags&0x1) == 0 && stream.readpos != stream.writepos {
 		stream.writepos = 0
 		stream.readpos = stream.writepos
-		stream.ops.seek(stream, stream.position, SEEK_SET, &stream.position)
+		stream.ops.seek(stream, stream.position, 0, &stream.position)
 	}
 	for count > 0 {
 		var towrite int = count
@@ -1232,7 +1233,7 @@ func _phpStreamWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if count == 0 {
 		return 0
 	}
-	assert(buf != nil)
+	r.Assert(buf != nil)
 	if stream.ops.write == nil {
 		core.PhpErrorDocref(nil, 1<<3, "Stream is not writable")
 		return ssize_t - 1
@@ -1267,7 +1268,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 
 		/* flush to commit data written to the fopencookie FILE* */
 
-		fflush(stream.stdiocast)
+		r.Fflush(stream.stdiocast)
 
 		/* flush to commit data written to the fopencookie FILE* */
 
@@ -1277,7 +1278,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 
 	if (stream.flags & 0x2) == 0 {
 		switch whence {
-		case SEEK_CUR:
+		case 1:
 			if offset > 0 && offset <= stream.writepos-stream.readpos {
 				stream.readpos += offset
 				stream.position += offset
@@ -1285,7 +1286,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 				return 0
 			}
 			break
-		case SEEK_SET:
+		case 0:
 			if offset > stream.position && offset <= stream.position+stream.writepos-stream.readpos {
 				stream.readpos += offset - stream.position
 				stream.position = offset
@@ -1301,9 +1302,9 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 			_phpStreamFlush(stream, 0)
 		}
 		switch whence {
-		case SEEK_CUR:
+		case 1:
 			offset = stream.position + offset
-			whence = SEEK_SET
+			whence = 0
 			break
 		}
 		ret = stream.ops.seek(stream, offset, whence, &stream.position)
@@ -1322,7 +1323,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 
 	/* emulate forward moving seeks with reads */
 
-	if whence == SEEK_CUR && offset >= 0 {
+	if whence == 1 && offset >= 0 {
 		var tmp []byte
 		var didread ssize_t
 		for offset > 0 {
@@ -1531,7 +1532,7 @@ func _phpStreamCopyToStreamEx(src *core.PhpStream, dest *core.PhpStream, maxlen 
 			p = _phpStreamMmapRange(src, _phpStreamTell(src), chunk_size, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped)
 			if p != nil {
 				var didwrite ssize_t
-				if _phpStreamSeek(src, mapped, SEEK_CUR) != 0 {
+				if _phpStreamSeek(src, mapped, 1) != 0 {
 					_phpStreamMmapUnmap(src)
 					break
 				}
@@ -2091,7 +2092,7 @@ func _phpStreamOpenWrapperEx(path string, mode string, options int, opened_path 
 
 		/* if opened for append, we need to revise our idea of the initial file position */
 
-		if 0 == stream.ops.seek(stream, 0, SEEK_CUR, &newpos) {
+		if 0 == stream.ops.seek(stream, 0, 1, &newpos) {
 			stream.position = newpos
 		}
 

@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -134,7 +135,7 @@ type ZendWriteFuncT func(str *byte, str_length int) int
 
 var ZendPrintf func(format *byte, _ ...any) int
 var ZendWrite ZendWriteFuncT
-var ZendFopen func(filename *byte, opened_path **ZendString) *FILE
+var ZendFopen func(filename *byte, opened_path **ZendString) *r.FILE
 var ZendTicksFunction func(ticks int)
 var ZendInterruptFunction func(execute_data *ZendExecuteData)
 var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
@@ -738,11 +739,11 @@ func ZendPrintZvalR(expr *Zval, indent int) {
 
 /* }}} */
 
-func ZendFopenWrapper(filename *byte, opened_path **ZendString) *FILE {
+func ZendFopenWrapper(filename *byte, opened_path **ZendString) *r.FILE {
 	if opened_path != nil {
 		*opened_path = ZendStringInit(filename, strlen(filename), 0)
 	}
-	return fopen(filename, "rb")
+	return r.Fopen(filename, "rb")
 }
 
 /* }}} */
@@ -949,7 +950,7 @@ func ZendResolvePropertyTypes() {
 							var type_name *ZendString = (*ZendString)(prop_info.GetType() & ^0x3)
 							var lc_type_name *ZendString = ZendStringTolowerEx(type_name, 0)
 							var prop_ce *ZendClassEntry = ZendHashFindPtr(CG.GetClassTable(), lc_type_name)
-							assert(prop_ce != nil && prop_ce.GetType() == 1)
+							r.Assert(prop_ce != nil && prop_ce.GetType() == 1)
 							prop_info.SetType(uintptr_t(prop_ce) | g.Cond((prop_info.GetType()&0x1) != 0, 0x3, 0x2))
 							ZendStringRelease(lc_type_name)
 							ZendStringRelease(type_name)

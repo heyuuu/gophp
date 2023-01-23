@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -107,7 +108,7 @@ import (
 /* {{{ php_iptc_put1
  */
 
-func PhpIptcPut1(fp *FILE, spool int, c uint8, spoolbuf **uint8) int {
+func PhpIptcPut1(fp *r.FILE, spool int, c uint8, spoolbuf **uint8) int {
 	if spool > 0 {
 		core.PhpOutputWrite((*byte)(&c), 1)
 	}
@@ -119,12 +120,12 @@ func PhpIptcPut1(fp *FILE, spool int, c uint8, spoolbuf **uint8) int {
 
 /* }}} */
 
-func PhpIptcGet1(fp *FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcGet1(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	var c int
 	var cc byte
-	c = getc(fp)
-	if c == EOF {
-		return EOF
+	c = r.Getc(fp)
+	if c == -1 {
+		return -1
 	}
 	if spool > 0 {
 		cc = c
@@ -138,8 +139,8 @@ func PhpIptcGet1(fp *FILE, spool int, spoolbuf **uint8) int {
 
 /* }}} */
 
-func PhpIptcReadRemaining(fp *FILE, spool int, spoolbuf **uint8) int {
-	for PhpIptcGet1(fp, spool, spoolbuf) != EOF {
+func PhpIptcReadRemaining(fp *r.FILE, spool int, spoolbuf **uint8) int {
+	for PhpIptcGet1(fp, spool, spoolbuf) != -1 {
 		continue
 	}
 	return 0xd9
@@ -147,20 +148,20 @@ func PhpIptcReadRemaining(fp *FILE, spool int, spoolbuf **uint8) int {
 
 /* }}} */
 
-func PhpIptcSkipVariable(fp *FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcSkipVariable(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	var length uint
 	var c1 int
 	var c2 int
-	if g.Assign(&c1, PhpIptcGet1(fp, spool, spoolbuf)) == EOF {
+	if g.Assign(&c1, PhpIptcGet1(fp, spool, spoolbuf)) == -1 {
 		return 0xd9
 	}
-	if g.Assign(&c2, PhpIptcGet1(fp, spool, spoolbuf)) == EOF {
+	if g.Assign(&c2, PhpIptcGet1(fp, spool, spoolbuf)) == -1 {
 		return 0xd9
 	}
 	length = (uint8(c1) << 8) + uint8(c2)
 	length -= 2
 	for g.PostDec(&length) {
-		if PhpIptcGet1(fp, spool, spoolbuf) == EOF {
+		if PhpIptcGet1(fp, spool, spoolbuf) == -1 {
 			return 0xd9
 		}
 	}
@@ -169,17 +170,17 @@ func PhpIptcSkipVariable(fp *FILE, spool int, spoolbuf **uint8) int {
 
 /* }}} */
 
-func PhpIptcNextMarker(fp *FILE, spool int, spoolbuf **uint8) int {
+func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	var c int
 
 	/* skip unimportant stuff */
 
 	c = PhpIptcGet1(fp, spool, spoolbuf)
-	if c == EOF {
+	if c == -1 {
 		return 0xd9
 	}
 	for c != 0xff {
-		if g.Assign(&c, PhpIptcGet1(fp, spool, spoolbuf)) == EOF {
+		if g.Assign(&c, PhpIptcGet1(fp, spool, spoolbuf)) == -1 {
 			return 0xd9
 		}
 	}
@@ -188,7 +189,7 @@ func PhpIptcNextMarker(fp *FILE, spool int, spoolbuf **uint8) int {
 
 	for {
 		c = PhpIptcGet1(fp, 0, 0)
-		if c == EOF {
+		if c == -1 {
 			return 0xd9
 		} else if c == 0xff {
 			PhpIptcPut1(fp, spool, uint8(c), spoolbuf)
@@ -213,7 +214,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var iptcdata_len int
 	var jpeg_file_len int
 	var spool zend.ZendLong = 0
-	var fp *FILE
+	var fp *r.FILE
 	var marker uint
 	var done uint = 0
 	var inx int
@@ -255,8 +256,8 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -271,8 +272,8 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -288,8 +289,8 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -340,7 +341,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.u1.type_info = 2
 		return
 	}
-	if g.Assign(&fp, fopen(jpeg_file, "rb")) == 0 {
+	if g.Assign(&fp, r.Fopen(jpeg_file, "rb")) == 0 {
 		core.PhpErrorDocref(nil, 1<<1, "Unable to open %s", jpeg_file)
 		return_value.u1.type_info = 2
 		return
@@ -355,7 +356,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		memset(poi, 0, iptcdata_len+g.SizeOf("psheader")+sb.st_size+1024+1)
 	}
 	if PhpIptcGet1(fp, spool, g.Cond(poi != nil, &poi, 0)) != 0xff {
-		fclose(fp)
+		r.Fclose(fp)
 		if spoolbuf != nil {
 			zend.ZendStringEfree(spoolbuf)
 		}
@@ -363,7 +364,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	if PhpIptcGet1(fp, spool, g.Cond(poi != nil, &poi, 0)) != 0xd8 {
-		fclose(fp)
+		r.Fclose(fp)
 		if spoolbuf != nil {
 			zend.ZendStringEfree(spoolbuf)
 		}
@@ -383,7 +384,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			/* we are going to write a new APP13 marker, so don't output the old one */
 
 			PhpIptcSkipVariable(fp, 0, 0)
-			fgetc(fp)
+			r.Fgetc(fp)
 			PhpIptcReadRemaining(fp, spool, g.Cond(poi != nil, &poi, 0))
 			done = 1
 			break
@@ -427,7 +428,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			break
 		}
 	}
-	fclose(fp)
+	r.Fclose(fp)
 	if spool < 2 {
 		spoolbuf = zend.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.val), 0)
 		var __z *zend.Zval = return_value
@@ -489,8 +490,8 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

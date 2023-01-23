@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -66,11 +67,11 @@ func PhpOutputInitGlobals(G *ZendOutputGlobals) { memset(G, 0, g.SizeOf("* G")) 
 /* }}} */
 
 func PhpOutputStdout(str *byte, str_len int) int {
-	fwrite(str, 1, str_len, stdout)
+	r.Fwrite(str, 1, str_len, stdout)
 	return str_len
 }
 func PhpOutputStderr(str *byte, str_len int) int {
-	fwrite(str, 1, str_len, stderr)
+	r.Fwrite(str, 1, str_len, stderr)
 
 	/* See http://support.microsoft.com/kb/190351 */
 
@@ -1081,7 +1082,7 @@ func PhpOutputStackApplyStatus(h any, z any) int {
  * Returns an array with the status of the output handler */
 
 func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *zend.Zval) *zend.Zval {
-	assert(entry != nil)
+	r.Assert(entry != nil)
 	var __arr *zend.ZendArray = zend._zendNewArray(0)
 	var __z *zend.Zval = entry
 	__z.value.arr = __arr

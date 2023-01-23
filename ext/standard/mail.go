@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -107,8 +108,8 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -252,7 +253,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var key *zend.ZendString
 	var val *zend.Zval
 	var s zend.SmartStr = zend.SmartStr{0}
-	assert(headers.u1.v.type_ == 7)
+	r.Assert(headers.u1.v.type_ == 7)
 	for {
 		var __ht *zend.HashTable = headers.value.arr
 		var _p *zend.Bucket = __ht.arData
@@ -593,8 +594,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -609,8 +610,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -625,8 +626,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -642,8 +643,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -654,8 +655,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			zend.ZendParseArgZvalDeref(_arg, &headers, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -897,7 +898,7 @@ func PhpMailDetectMultipleCrlf(hdr *byte) int {
  */
 
 func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *byte) int {
-	var sendmail *FILE
+	var sendmail *r.FILE
 	var ret int
 	var sendmail_path *byte = zend.ZendIniStringEx("sendmail_path", g.SizeOf("\"sendmail_path\"")-1, 0, nil)
 	var sendmail_cmd *byte = nil
@@ -979,12 +980,12 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			}
 			return 0
 		}
-		fprintf(sendmail, "To: %s\n", to)
-		fprintf(sendmail, "Subject: %s\n", subject)
+		r.Fprintf(sendmail, "To: %s\n", to)
+		r.Fprintf(sendmail, "Subject: %s\n", subject)
 		if hdr != nil {
-			fprintf(sendmail, "%s\n", hdr)
+			r.Fprintf(sendmail, "%s\n", hdr)
 		}
-		fprintf(sendmail, "\n%s\n", message)
+		r.Fprintf(sendmail, "\n%s\n", message)
 		ret = pclose(sendmail)
 		if ret != 0 {
 			if hdr != headers {

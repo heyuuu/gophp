@@ -4,6 +4,7 @@ package spl
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -115,7 +116,7 @@ func SplHeapElem(heap *SplPtrHeap, i int) any {
 	return any((*byte)(heap.GetElements() + heap.GetElemSize()*i))
 }
 func SplHeapElemCopy(heap *SplPtrHeap, to any, from any) {
-	assert(to != from)
+	r.Assert(to != from)
 	memcpy(to, from, heap.GetElemSize())
 }
 func SplPtrHeapZvalDtor(elem any) { zend.ZvalPtrDtor((*zend.Zval)(elem)) }
@@ -203,7 +204,7 @@ func SplPqueueExtractHelper(result *zend.Zval, elem *SplPqueueElem, flags int) {
 		}
 		return
 	}
-	assert(false)
+	r.Assert(false)
 }
 
 /* }}} */

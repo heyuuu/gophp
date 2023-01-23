@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -631,7 +632,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
 	var args []zend.Zval
 	var didwrite ssize_t
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("stream_write", g.SizeOf("USERSTREAM_WRITE")-1, 0)
 	__z.value.str = __s
@@ -674,7 +675,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var call_result int
 	var didread int = 0
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("stream_read", g.SizeOf("USERSTREAM_READ")-1, 0)
 	__z.value.str = __s
@@ -734,7 +735,7 @@ func PhpUserstreamopClose(stream *core.PhpStream, close_handle int) int {
 	var func_name zend.Zval
 	var retval zend.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("stream_close", g.SizeOf("USERSTREAM_CLOSE")-1, 0)
 	__z.value.str = __s
@@ -752,7 +753,7 @@ func PhpUserstreamopFlush(stream *core.PhpStream) int {
 	var retval zend.Zval
 	var call_result int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("stream_flush", g.SizeOf("USERSTREAM_FLUSH")-1, 0)
 	__z.value.str = __s
@@ -774,7 +775,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	var ret int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
 	var args []zend.Zval
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("stream_seek", g.SizeOf("USERSTREAM_SEEK")-1, 0)
 	__z.value.str = __s
@@ -1051,7 +1052,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 				__z.u1.type_info = 4
 			} else {
 				var __z *zend.Zval = &args[2]
-				__z.value.lval = BUFSIZ
+				__z.value.lval = 1024
 				__z.u1.type_info = 4
 			}
 			break
@@ -1463,7 +1464,7 @@ func PhpUserstreamopClosedir(stream *core.PhpStream, close_handle int) int {
 	var func_name zend.Zval
 	var retval zend.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.abstract)
-	assert(us != nil)
+	r.Assert(us != nil)
 	var __z *zend.Zval = &func_name
 	var __s *zend.ZendString = zend.ZendStringInit("dir_closedir", g.SizeOf("USERSTREAM_DIR_CLOSE")-1, 0)
 	__z.value.str = __s

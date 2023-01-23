@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -129,7 +130,7 @@ func ZendLoadExtension(path *byte) int {
 	var handle any
 	handle = dlopen(path, 1|0)
 	if !handle {
-		fprintf(stderr, "Failed loading %s:  %s\n", path, dlerror())
+		r.Fprintf(stderr, "Failed loading %s:  %s\n", path, dlerror())
 		return FAILURE
 	}
 	return ZendLoadExtensionHandle(handle, path)
@@ -146,7 +147,7 @@ func ZendLoadExtensionHandle(handle any, path *byte) int {
 		new_extension = (*ZendExtension)(dlsym(handle, "_zend_extension_entry"))
 	}
 	if extension_version_info == nil || new_extension == nil {
-		fprintf(stderr, "%s doesn't appear to be a valid Zend extension\n", path)
+		r.Fprintf(stderr, "%s doesn't appear to be a valid Zend extension\n", path)
 
 		/* See http://support.microsoft.com/kb/190351 */
 
@@ -158,14 +159,14 @@ func ZendLoadExtensionHandle(handle any, path *byte) int {
 
 	if extension_version_info.GetZendExtensionApiNo() != 320190902 && (new_extension.GetApiNoCheck() == nil || new_extension.GetApiNoCheck()(320190902) != SUCCESS) {
 		if extension_version_info.GetZendExtensionApiNo() > 320190902 {
-			fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is outdated.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902)
+			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is outdated.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902)
 
 			/* See http://support.microsoft.com/kb/190351 */
 
 			dlclose(handle)
 			return FAILURE
 		} else if extension_version_info.GetZendExtensionApiNo() < 320190902 {
-			fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is newer.\n"+"Contact %s at %s for a later version of %s.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902, new_extension.GetAuthor(), new_extension.GetURL(), new_extension.GetName())
+			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is newer.\n"+"Contact %s at %s for a later version of %s.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902, new_extension.GetAuthor(), new_extension.GetURL(), new_extension.GetName())
 
 			/* See http://support.microsoft.com/kb/190351 */
 
@@ -173,14 +174,14 @@ func ZendLoadExtensionHandle(handle any, path *byte) int {
 			return FAILURE
 		}
 	} else if strcmp("API"+"320190902"+",NTS", extension_version_info.GetBuildId()) && (new_extension.GetBuildIdCheck() == nil || new_extension.GetBuildIdCheck()("API"+"320190902"+",NTS") != SUCCESS) {
-		fprintf(stderr, "Cannot load %s - it was built with configuration %s, whereas running engine is %s\n", new_extension.GetName(), extension_version_info.GetBuildId(), "API"+"320190902"+",NTS")
+		r.Fprintf(stderr, "Cannot load %s - it was built with configuration %s, whereas running engine is %s\n", new_extension.GetName(), extension_version_info.GetBuildId(), "API"+"320190902"+",NTS")
 
 		/* See http://support.microsoft.com/kb/190351 */
 
 		dlclose(handle)
 		return FAILURE
 	} else if ZendGetExtension(new_extension.GetName()) != nil {
-		fprintf(stderr, "Cannot load %s - it was already loaded\n", new_extension.GetName())
+		r.Fprintf(stderr, "Cannot load %s - it was already loaded\n", new_extension.GetName())
 
 		/* See http://support.microsoft.com/kb/190351 */
 

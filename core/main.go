@@ -5,6 +5,7 @@ package core
 import (
 	"sik/core/streams"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -1926,7 +1927,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
 
 					if (!(strcmp(sapi_module.GetName(), "cli")) || !(strcmp(sapi_module.GetName(), "cgi")) || !(strcmp(sapi_module.GetName(), "phpdbg"))) && CoreGlobals.GetDisplayErrors() == 2 {
-						fprintf(stderr, "%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
+						r.Fprintf(stderr, "%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
 					} else {
 						PhpPrintf("%s\n%s: %s in %s on line %"+"u"+"\n%s", g.Cond(prepend_string != nil, prepend_string, ""), error_type_str, buffer, error_filename, error_lineno, g.Cond(append_string != nil, append_string, ""))
 					}
@@ -2060,7 +2061,7 @@ func ZifSetTimeLimit(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 /* }}} */
 
-func PhpFopenWrapperForZend(filename *byte, opened_path **zend.ZendString) *FILE {
+func PhpFopenWrapperForZend(filename *byte, opened_path **zend.ZendString) *r.FILE {
 	return streams._phpStreamOpenWrapperAsFile((*byte)(filename), "rb", 0x1|0|0x8|0x80, opened_path)
 }
 
@@ -2186,7 +2187,7 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 		} else {
 			ApPhpSnprintf(memory_leak_buf, g.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", g.CondF1(sapi_globals.GetRequestInfo().GetPathTranslated() != nil, func() *byte { return sapi_globals.GetRequestInfo().GetPathTranslated() }, "-"))
 		}
-		fprintf(stderr, "%s", memory_leak_buf)
+		r.Fprintf(stderr, "%s", memory_leak_buf)
 		break
 	}
 }

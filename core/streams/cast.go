@@ -4,6 +4,7 @@ package streams
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -53,7 +54,7 @@ import (
 // #define PHP_FPOS_T       fpos_t
 
 // @type COOKIE_IO_FUNCTIONS_T struct
-func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *FILE {
+func Fopencookie(cookie any, mode *byte, funcs *COOKIE_IO_FUNCTIONS_T) *r.FILE {
 	return funopen(cookie, funcs.GetReader(), funcs.GetWriter(), funcs.GetSeeker(), funcs.GetCloser())
 }
 
@@ -144,7 +145,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		_phpStreamFlush(stream, 0)
 		if stream.ops.seek != nil && (stream.flags&0x1) == 0 {
 			var dummy zend.ZendOffT
-			stream.ops.seek(stream, stream.position, SEEK_SET, &dummy)
+			stream.ops.seek(stream, stream.position, 0, &dummy)
 			stream.writepos = 0
 			stream.readpos = stream.writepos
 		}
@@ -155,7 +156,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 	if castas == 0 {
 		if stream.stdiocast != nil {
 			if ret != nil {
-				*((**FILE)(ret)) = stream.stdiocast
+				*((**r.FILE)(ret)) = stream.stdiocast
 			}
 			goto exit_success
 		}
@@ -174,7 +175,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		}
 		var fixed_mode []byte
 		PhpStreamModeSanitizeFdopenFopencookie(stream, fixed_mode)
-		*((**FILE)(ret)) = Fopencookie(stream, fixed_mode, &StreamCookieFunctions)
+		*((**r.FILE)(ret)) = Fopencookie(stream, fixed_mode, &StreamCookieFunctions)
 		if (*ret) != nil {
 			var pos zend.ZendOffT
 			stream.fclose_stdiocast = 2
@@ -184,7 +185,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 
 			pos = _phpStreamTell(stream)
 			if pos > 0 {
-				fseek(*ret, pos, SEEK_SET)
+				r.Fseek(*ret, pos, 0)
 			}
 			goto exit_success
 		}
@@ -212,7 +213,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 				} else {
 					var retcast int = _phpStreamCast(newstream, castas|flags, (*any)(ret), show_err)
 					if retcast == zend.SUCCESS {
-						rewind(*((**FILE)(ret)))
+						r.Rewind(*((**r.FILE)(ret)))
 					}
 
 					/* do some specialized cleanup */
@@ -264,7 +265,7 @@ exit_success:
 
 	}
 	if castas == 0 && ret != nil {
-		stream.stdiocast = *((**FILE)(ret))
+		stream.stdiocast = *((**r.FILE)(ret))
 	}
 	if (flags & 0x40000000) != 0 {
 		_phpStreamFree(stream, 1|2|4)
@@ -274,8 +275,8 @@ exit_success:
 
 /* }}} */
 
-func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **zend.ZendString) *FILE {
-	var fp *FILE = nil
+func _phpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **zend.ZendString) *r.FILE {
+	var fp *r.FILE = nil
 	var stream *core.PhpStream = nil
 	stream = _phpStreamOpenWrapperEx(path, mode, options|0x20, opened_path, nil)
 	if stream == nil {
@@ -319,7 +320,7 @@ func _phpStreamMakeSeekable(origstream *core.PhpStream, newstream **core.PhpStre
 		return 3
 	}
 	_phpStreamFree(origstream, 1|2)
-	_phpStreamSeek(*newstream, 0, SEEK_SET)
+	_phpStreamSeek(*newstream, 0, 0)
 	return 1
 }
 

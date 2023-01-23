@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/core/streams"
+	r "sik/runtime"
 	"sik/zend"
 )
 
@@ -203,7 +204,7 @@ type PhpStream struct {
 	mode             []byte
 	flags            uint32
 	res              *zend.ZendResource
-	stdiocast        *FILE
+	stdiocast        *r.FILE
 	orig_path        *byte
 	ctx              *zend.ZendResource
 	position         zend.ZendOffT
@@ -247,8 +248,8 @@ func (this PhpStream) GetFlags() uint32                                    { ret
 func (this *PhpStream) SetFlags(value uint32)                              { this.flags = value }
 func (this PhpStream) GetRes() *zend.ZendResource                          { return this.res }
 func (this *PhpStream) SetRes(value *zend.ZendResource)                    { this.res = value }
-func (this PhpStream) GetStdiocast() *FILE                                 { return this.stdiocast }
-func (this *PhpStream) SetStdiocast(value *FILE)                           { this.stdiocast = value }
+func (this PhpStream) GetStdiocast() *r.FILE                               { return this.stdiocast }
+func (this *PhpStream) SetStdiocast(value *r.FILE)                         { this.stdiocast = value }
 func (this PhpStream) GetOrigPath() *byte                                  { return this.orig_path }
 func (this *PhpStream) SetOrigPath(value *byte)                            { this.orig_path = value }
 func (this PhpStream) GetCtx() *zend.ZendResource                          { return this.ctx }

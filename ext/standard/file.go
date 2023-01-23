@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -200,9 +201,9 @@ func ZmStartupFile(type_ int, module_number int) int {
 	LeStreamContext = zend.ZendRegisterListDestructorsEx(FileContextDtor, nil, "stream-context", module_number)
 	FileGlobalsCtor(&FileGlobals)
 	zend.ZendRegisterIniEntries(IniEntries, module_number)
-	zend.ZendRegisterLongConstant("SEEK_SET", g.SizeOf("\"SEEK_SET\"")-1, SEEK_SET, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("SEEK_CUR", g.SizeOf("\"SEEK_CUR\"")-1, SEEK_CUR, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("SEEK_END", g.SizeOf("\"SEEK_END\"")-1, SEEK_END, 1<<0|1<<1, module_number)
+	zend.ZendRegisterLongConstant("SEEK_SET", g.SizeOf("\"SEEK_SET\"")-1, 0, 1<<0|1<<1, module_number)
+	zend.ZendRegisterLongConstant("SEEK_CUR", g.SizeOf("\"SEEK_CUR\"")-1, 1, 1<<0|1<<1, module_number)
+	zend.ZendRegisterLongConstant("SEEK_END", g.SizeOf("\"SEEK_END\"")-1, 2, 1<<0|1<<1, module_number)
 	zend.ZendRegisterLongConstant("LOCK_SH", g.SizeOf("\"LOCK_SH\"")-1, 1, 1<<0|1<<1, module_number)
 	zend.ZendRegisterLongConstant("LOCK_EX", g.SizeOf("\"LOCK_EX\"")-1, 2, 1<<0|1<<1, module_number)
 	zend.ZendRegisterLongConstant("LOCK_UN", g.SizeOf("\"LOCK_UN\"")-1, 3, 1<<0|1<<1, module_number)
@@ -325,8 +326,8 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -341,8 +342,8 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -358,8 +359,8 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -397,7 +398,7 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -410,7 +411,7 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if wouldblock != nil {
 		for {
-			assert(wouldblock.u1.v.type_ == 10)
+			r.Assert(wouldblock.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = wouldblock
 				var ref *zend.ZendReference = _zv.value.ref
@@ -435,7 +436,7 @@ func ZifFlock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if streams._phpStreamSetOption(stream, 6, act, any(nil)) != 0 {
 		if operation != 0 && errno == EAGAIN && wouldblock != nil {
 			for {
-				assert(wouldblock.u1.v.type_ == 10)
+				r.Assert(wouldblock.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = wouldblock
 					var ref *zend.ZendReference = _zv.value.ref
@@ -525,8 +526,8 @@ func ZifGetMetaTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -542,8 +543,8 @@ func ZifGetMetaTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -776,8 +777,8 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -793,8 +794,8 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -809,8 +810,8 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -825,8 +826,8 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -841,8 +842,8 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -900,7 +901,7 @@ func ZifFileGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		return_value.u1.type_info = 2
 		return
 	}
-	if offset != 0 && streams._phpStreamSeek(stream, offset, g.Cond(offset > 0, SEEK_SET, SEEK_END)) < 0 {
+	if offset != 0 && streams._phpStreamSeek(stream, offset, g.Cond(offset > 0, 0, 2)) < 0 {
 		core.PhpErrorDocref(nil, 1<<1, "Failed to seek to position "+"%"+"lld"+" in the stream", offset)
 		streams._phpStreamFree(stream, 1|2)
 		return_value.u1.type_info = 2
@@ -971,8 +972,8 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -987,8 +988,8 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1000,8 +1001,8 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			zend.ZendParseArgZvalDeref(_arg, &data, 0)
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1016,8 +1017,8 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1258,8 +1259,8 @@ func ZifFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1275,8 +1276,8 @@ func ZifFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1291,8 +1292,8 @@ func ZifFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1464,8 +1465,8 @@ func ZifTempnam(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1480,8 +1481,8 @@ func ZifTempnam(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1609,8 +1610,8 @@ func PhpIfFopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1625,8 +1626,8 @@ func PhpIfFopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1642,8 +1643,8 @@ func PhpIfFopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1658,8 +1659,8 @@ func PhpIfFopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1758,8 +1759,8 @@ func ZifFclose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1802,7 +1803,7 @@ func ZifFclose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -1824,7 +1825,7 @@ func ZifPopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var mode *byte
 	var command_len int
 	var mode_len int
-	var fp *FILE
+	var fp *r.FILE
 	var stream *core.PhpStream
 	var posix_mode *byte
 	for {
@@ -1861,8 +1862,8 @@ func ZifPopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1877,8 +1878,8 @@ func ZifPopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1984,8 +1985,8 @@ func ZifPclose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2028,7 +2029,7 @@ func ZifPclose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2081,8 +2082,8 @@ func ZifFeof(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2125,7 +2126,7 @@ func ZifFeof(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2183,8 +2184,8 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2200,8 +2201,8 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2244,7 +2245,7 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2336,8 +2337,8 @@ func ZifFgetc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2380,13 +2381,13 @@ func ZifFgetc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
 	}
 	result = streams._phpStreamGetc(stream)
-	if result == EOF {
+	if result == -1 {
 		return_value.u1.type_info = 2
 	} else {
 		buf[0] = result
@@ -2446,8 +2447,8 @@ func ZifFgetss(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2463,8 +2464,8 @@ func ZifFgetss(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2479,8 +2480,8 @@ func ZifFgetss(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2523,7 +2524,7 @@ func ZifFgetss(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(fd.u1.v.type_ == 9)
+	r.Assert(fd.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(fd.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2608,8 +2609,8 @@ func ZifFscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2624,8 +2625,8 @@ func ZifFscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2744,8 +2745,8 @@ func ZifFwrite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2760,8 +2761,8 @@ func ZifFwrite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2777,8 +2778,8 @@ func ZifFwrite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2838,7 +2839,7 @@ func ZifFwrite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		__z.u1.type_info = 4
 		return
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2894,8 +2895,8 @@ func ZifFflush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2938,7 +2939,7 @@ func ZifFflush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -2991,8 +2992,8 @@ func ZifRewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3035,12 +3036,12 @@ func ZifRewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
 	}
-	if -1 == streams._phpStreamSeek(stream, 0, SEEK_SET) {
+	if -1 == streams._phpStreamSeek(stream, 0, 0) {
 		return_value.u1.type_info = 2
 		return
 	}
@@ -3088,8 +3089,8 @@ func ZifFtell(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3132,7 +3133,7 @@ func ZifFtell(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -3153,7 +3154,7 @@ func ZifFtell(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 func ZifFseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var res *zend.Zval
 	var offset zend.ZendLong
-	var whence zend.ZendLong = SEEK_SET
+	var whence zend.ZendLong = 0
 	var stream *core.PhpStream
 	for {
 		var _flags int = 0
@@ -3189,8 +3190,8 @@ func ZifFseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3205,8 +3206,8 @@ func ZifFseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3222,8 +3223,8 @@ func ZifFseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3266,7 +3267,7 @@ func ZifFseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -3334,8 +3335,8 @@ func ZifMkdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3351,8 +3352,8 @@ func ZifMkdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3367,8 +3368,8 @@ func ZifMkdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3383,8 +3384,8 @@ func ZifMkdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3482,8 +3483,8 @@ func ZifRmdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3499,8 +3500,8 @@ func ZifRmdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3601,8 +3602,8 @@ func ZifReadfile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3618,8 +3619,8 @@ func ZifReadfile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3634,8 +3635,8 @@ func ZifReadfile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3741,8 +3742,8 @@ func ZifUmask(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3836,8 +3837,8 @@ func ZifFpassthru(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3880,7 +3881,7 @@ func ZifFpassthru(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -3936,8 +3937,8 @@ func ZifRename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3952,8 +3953,8 @@ func ZifRename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3969,8 +3970,8 @@ func ZifRename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4085,8 +4086,8 @@ func ZifUnlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4102,8 +4103,8 @@ func ZifUnlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4211,8 +4212,8 @@ func PhpIfFtruncate(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4227,8 +4228,8 @@ func PhpIfFtruncate(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4276,7 +4277,7 @@ func PhpIfFtruncate(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return_value.u1.type_info = 2
 		return
 	}
-	assert(fp.u1.v.type_ == 9)
+	r.Assert(fp.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(fp.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -4348,8 +4349,8 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4392,7 +4393,7 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(fp.u1.v.type_ == 9)
+	r.Assert(fp.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(fp.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -4521,8 +4522,8 @@ func ZifCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4537,8 +4538,8 @@ func ZifCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4554,8 +4555,8 @@ func ZifCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4750,8 +4751,8 @@ func ZifFread(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4766,8 +4767,8 @@ func ZifFread(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4810,7 +4811,7 @@ func ZifFread(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	assert(res.u1.v.type_ == 9)
+	r.Assert(res.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(res.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -4934,8 +4935,8 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4950,8 +4951,8 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4967,8 +4968,8 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4983,8 +4984,8 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4999,8 +5000,8 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5082,7 +5083,7 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			core.PhpErrorDocref(nil, 1<<3, "escape must be empty or a single character")
 		}
 		if escape_str_len < 1 {
-			escape_char = EOF
+			escape_char = -1
 		} else {
 
 			/* use first character from string */
@@ -5093,7 +5094,7 @@ func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		}
 	}
-	assert(fp.u1.v.type_ == 9)
+	r.Assert(fp.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(fp.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -5117,7 +5118,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var ret int
 	var field_tmp *zend.Zval
 	var csvline zend.SmartStr = zend.SmartStr{0}
-	assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == EOF)
+	r.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == -1)
 	count = fields.value.arr.nNumOfElements
 	for {
 		var __ht *zend.HashTable = fields.value.arr
@@ -5135,13 +5136,13 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 
 			/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
-			if memchr(field_str.val, delimiter, field_str.len_) || memchr(field_str.val, enclosure, field_str.len_) || escape_char != EOF && memchr(field_str.val, escape_char, field_str.len_) || memchr(field_str.val, '\n', field_str.len_) || memchr(field_str.val, '\r', field_str.len_) || memchr(field_str.val, '\t', field_str.len_) || memchr(field_str.val, ' ', field_str.len_) {
+			if memchr(field_str.val, delimiter, field_str.len_) || memchr(field_str.val, enclosure, field_str.len_) || escape_char != -1 && memchr(field_str.val, escape_char, field_str.len_) || memchr(field_str.val, '\n', field_str.len_) || memchr(field_str.val, '\r', field_str.len_) || memchr(field_str.val, '\t', field_str.len_) || memchr(field_str.val, ' ', field_str.len_) {
 				var ch *byte = field_str.val
 				var end *byte = ch + field_str.len_
 				var escaped int = 0
 				zend.SmartStrAppendcEx(&csvline, enclosure, 0)
 				for ch < end {
-					if escape_char != EOF && (*ch) == escape_char {
+					if escape_char != -1 && (*ch) == escape_char {
 						escaped = 1
 					} else if escaped == 0 && (*ch) == enclosure {
 						zend.SmartStrAppendcEx(&csvline, enclosure, 0)
@@ -5224,8 +5225,8 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5241,8 +5242,8 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5253,8 +5254,8 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			zend.ZendParseArgZvalDeref(_arg, &len_zv, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5269,8 +5270,8 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5285,8 +5286,8 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5368,7 +5369,7 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			core.PhpErrorDocref(nil, 1<<3, "escape must be empty or a single character")
 		}
 		if escape_str_len < 1 {
-			escape = EOF
+			escape = -1
 		} else {
 			escape = uint8(escape_str[0])
 		}
@@ -5385,7 +5386,7 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else {
 		len_ = -1
 	}
-	assert(fd.u1.v.type_ == 9)
+	r.Assert(fd.u1.v.type_ == 9)
 	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2(fd.value.res, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
 		return_value.u1.type_info = 2
 		return
@@ -5418,7 +5419,7 @@ func PhpFgetcsv(stream *core.PhpStream, delimiter byte, enclosure byte, escape_c
 	var line_end_len int
 	var inc_len int
 	var first_field zend.ZendBool = 1
-	assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == EOF)
+	r.Assert(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == -1)
 
 	/* initialize internal state */
 
@@ -5575,7 +5576,7 @@ func PhpFgetcsv(stream *core.PhpStream, delimiter byte, enclosure byte, escape_c
 					default:
 						if (*bptr) == enclosure {
 							state = 2
-						} else if escape_char != EOF && (*bptr) == escape_char {
+						} else if escape_char != -1 && (*bptr) == escape_char {
 							state = 1
 						}
 						bptr++
@@ -5752,8 +5753,8 @@ func ZifRealpath(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5957,8 +5958,8 @@ func ZifFnmatch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5973,8 +5974,8 @@ func ZifFnmatch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5990,8 +5991,8 @@ func ZifFnmatch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

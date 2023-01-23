@@ -3,6 +3,7 @@
 package streams
 
 import (
+	r "sik/runtime"
 	"sik/zend"
 )
 
@@ -10,7 +11,7 @@ import (
  * PhpStdioStreamData
  */
 type PhpStdioStreamData struct {
-	file             *FILE
+	file             *r.FILE
 	fd               int
 	is_process_pipe  unsigned
 	is_pipe          unsigned
@@ -27,8 +28,8 @@ type PhpStdioStreamData struct {
 	sb               zend.ZendStatT
 }
 
-func (this PhpStdioStreamData) GetFile() *FILE                      { return this.file }
-func (this *PhpStdioStreamData) SetFile(value *FILE)                { this.file = value }
+func (this PhpStdioStreamData) GetFile() *r.FILE                    { return this.file }
+func (this *PhpStdioStreamData) SetFile(value *r.FILE)              { this.file = value }
 func (this PhpStdioStreamData) GetFd() int                          { return this.fd }
 func (this *PhpStdioStreamData) SetFd(value int)                    { this.fd = value }
 func (this PhpStdioStreamData) GetIsProcessPipe() unsigned          { return this.is_process_pipe }

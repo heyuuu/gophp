@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -115,11 +116,11 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 func ZendFunctionDtor(zv *Zval) {
 	var function *ZendFunction = zv.GetValue().GetPtr()
 	if function.GetType() == 2 {
-		assert(function.GetFunctionName() != nil)
+		r.Assert(function.GetFunctionName() != nil)
 		DestroyOpArray(&function.op_array)
 	} else {
-		assert(function.GetType() == 1)
-		assert(function.GetFunctionName() != nil)
+		r.Assert(function.GetType() == 1)
+		r.Assert(function.GetFunctionName() != nil)
 		ZendStringReleaseEx(function.GetFunctionName(), 1)
 
 		/* For methods this will be called explicitly. */
@@ -646,7 +647,7 @@ func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start 
 	var range_ *ZendLiveRange
 	op_array.GetLastLiveRange()++
 	op_array.SetLiveRange(_erealloc(op_array.GetLiveRange(), g.SizeOf("zend_live_range")*op_array.GetLastLiveRange()))
-	assert(start < end)
+	r.Assert(start < end)
 	range_ = &op_array.live_range[op_array.GetLastLiveRange()-1]
 	range_.SetVar(uint32(intptr_t)((*Zval)(nil) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(op_array.GetLastVar()+var_num))))
 	range_.SetVar(range_.GetVar() | kind)
@@ -664,7 +665,7 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 	case 147:
 
 	case 55:
-		assert(false)
+		r.Assert(false)
 		return
 	case 46:
 
@@ -804,7 +805,7 @@ func KeepsOp1Alive(opline *ZendOp) ZendBool {
 	if opline.GetOpcode() == 48 || opline.GetOpcode() == 187 || opline.GetOpcode() == 98 || opline.GetOpcode() == 167 {
 		return 1
 	}
-	assert(opline.GetOpcode() != 188 && opline.GetOpcode() != 78 && opline.GetOpcode() != 126 && opline.GetOpcode() != 155 && opline.GetOpcode() != 124 && opline.GetOpcode() != 182 && opline.GetOpcode() != 55)
+	r.Assert(opline.GetOpcode() != 188 && opline.GetOpcode() != 78 && opline.GetOpcode() != 126 && opline.GetOpcode() != 155 && opline.GetOpcode() != 124 && opline.GetOpcode() != 182 && opline.GetOpcode() != 55)
 	return 0
 }
 
@@ -829,7 +830,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 	var var_offset uint32 = op_array.GetLastVar()
 	var last_use *uint32 = _emalloc(g.SizeOf("uint32_t") * op_array.GetT())
 	memset(last_use, -1, g.SizeOf("uint32_t")*op_array.GetT())
-	assert(op_array.GetLiveRange() == nil)
+	r.Assert(op_array.GetLiveRange() == nil)
 	for opnum > 0 {
 		opnum--
 		opline--
@@ -851,7 +852,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 
 					/* OP_DATA uses only op1 operand */
 
-					assert(opline.GetOpcode() != 137)
+					r.Assert(opline.GetOpcode() != 137)
 					num = opnum
 					EmitLiveRange(op_array, var_num, num, last_use[var_num], needs_live_range)
 				}
@@ -898,7 +899,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 
 				/* OP_DATA uses only op1 operand */
 
-				assert(opline.GetOpcode() != 137)
+				r.Assert(opline.GetOpcode() != 137)
 				last_use[var_num] = opnum
 			}
 		}
@@ -929,7 +930,7 @@ func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRan
 func ZendRecalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	/* We assume that we never create live-ranges where there were none before. */
 
-	assert(op_array.GetLiveRange() != nil)
+	r.Assert(op_array.GetLiveRange() != nil)
 	_efree(op_array.GetLiveRange())
 	op_array.SetLiveRange(nil)
 	op_array.SetLastLiveRange(0)
@@ -1161,7 +1162,7 @@ func GetBinaryOp(opcode int) BinaryOpType {
 	case 15:
 		return BinaryOpType(BooleanXorFunction)
 	default:
-		assert(false)
+		r.Assert(false)
 		return BinaryOpType(nil)
 	}
 }

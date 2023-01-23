@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -86,7 +87,7 @@ func ZendArenaRelease(arena_ptr **ZendArena, checkpoint any) {
 		arena = prev
 		*arena_ptr = arena
 	}
-	assert((*byte)(checkpoint > (*byte)(arena != nil && (*byte)(checkpoint <= arena.GetEnd()) != nil)) != nil)
+	r.Assert((*byte)(checkpoint > (*byte)(arena != nil && (*byte)(checkpoint <= arena.GetEnd()) != nil)) != nil)
 	arena.SetPtr((*byte)(checkpoint))
 }
 func ZendArenaContains(arena *ZendArena, ptr any) ZendBool {

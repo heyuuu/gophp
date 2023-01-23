@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -358,7 +359,7 @@ func AddNextIndexZval(arg *Zval, value *Zval) int {
 
 func ZendForbidDynamicCall(func_name string) int {
 	var ex *ZendExecuteData = EG.GetCurrentExecuteData()
-	assert(ex != nil && ex.GetFunc() != nil)
+	r.Assert(ex != nil && ex.GetFunc() != nil)
 	if (ex.GetThis().GetTypeInfo() & 1 << 25) != 0 {
 		ZendError(1<<1, "Cannot call %s dynamically", func_name)
 		return FAILURE
@@ -1576,7 +1577,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 	for true {
 		if (*spec_walk) == '/' {
 			var _zv *Zval = arg
-			assert(_zv.GetType() != 10)
+			r.Assert(_zv.GetType() != 10)
 			var __zv *Zval = _zv
 			if __zv.GetType() == 7 {
 				if ZvalRefcountP(__zv) > 1 {
@@ -1762,7 +1763,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
 
-		assert(c != 'Z')
+		r.Assert(c != 'Z')
 	default:
 		return "unknown"
 	}
@@ -4925,7 +4926,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 /* }}} */
 
 func ZvalMakeInternedString(zv *Zval) *ZendString {
-	assert(zv.GetType() == 6)
+	r.Assert(zv.GetType() == 6)
 	zv.GetValue().SetStr(ZendNewInternedString(zv.GetValue().GetStr()))
 	if (ZvalGcFlags(zv.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) != 0 {
 		zv.SetTypeFlags(0)
@@ -4976,7 +4977,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		_z1.GetValue().SetCounted(_gc)
 		_z1.SetTypeInfo(_t)
 		if ce.GetStaticMembersTablePtr() == nil {
-			assert(ce.GetType() == 1)
+			r.Assert(ce.GetType() == 1)
 			if EG.GetCurrentExecuteData() == nil {
 				ce.SetStaticMembersTablePtr(ZendMapPtrNew())
 			} else {
@@ -4995,8 +4996,8 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(&ce.default_properties_table[(property_info.GetOffset()-uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0))/g.SizeOf("zval")])
 			ZendHashDel(&ce.properties_info, name)
-			assert(ce.GetType() == 1)
-			assert(ce.GetPropertiesInfoTable() != nil)
+			r.Assert(ce.GetType() == 1)
+			r.Assert(ce.GetPropertiesInfoTable() != nil)
 			ce.GetPropertiesInfoTable()[(property_info.GetOffset()-uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0))/g.SizeOf("zval")] = property_info
 		} else {
 			property_info.SetOffset(uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil)) + g.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
@@ -5057,7 +5058,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 	} else if (access_type & 1 << 2) != 0 {
 		property_info.SetName(ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
 	} else {
-		assert((access_type & 1 << 1) != 0)
+		r.Assert((access_type & 1 << 1) != 0)
 		property_info.SetName(ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
 	}
 	property_info.SetName(ZendNewInternedString(property_info.GetName()))
@@ -5562,7 +5563,7 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *
 	if property == nil {
 		return FAILURE
 	}
-	assert(value.GetType() != 10)
+	r.Assert(value.GetType() != 10)
 	if value.GetTypeFlags() != 0 {
 		ZvalAddrefP(value)
 	}
@@ -5724,7 +5725,7 @@ func ZendReplaceErrorHandling(error_handling ZendErrorHandlingT, exception_class
 	if current != nil {
 		ZendSaveErrorHandling(current)
 	}
-	assert(error_handling == EH_THROW || exception_class == nil)
+	r.Assert(error_handling == EH_THROW || exception_class == nil)
 	EG.SetErrorHandling(error_handling)
 	EG.SetExceptionClass(exception_class)
 }

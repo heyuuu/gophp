@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -378,7 +379,7 @@ func ZendImplementTraversable(interface_ *ZendClassEntry, class_type *ZendClassE
 		return SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
-		assert((class_type.GetCeFlags() & 1 << 20) != 0)
+		r.Assert((class_type.GetCeFlags() & 1 << 20) != 0)
 		for i = 0; i < class_type.GetNumInterfaces(); i++ {
 			if class_type.interfaces[i] == ZendCeAggregate || class_type.interfaces[i] == ZendCeIterator {
 				return SUCCESS
@@ -409,7 +410,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			/* c-level get_iterator cannot be changed (exception being only Traversable is implemented) */
 
 			if class_type.GetNumInterfaces() != 0 {
-				assert((class_type.GetCeFlags() & 1 << 20) != 0)
+				r.Assert((class_type.GetCeFlags() & 1 << 20) != 0)
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.interfaces[i] == ZendCeIterator {
 						ZendErrorNoreturn(1<<0, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())

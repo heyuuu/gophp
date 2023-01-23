@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -145,7 +146,7 @@ func _phpStreamFopenFromFdInt(fd int, mode *byte, persistent_id *byte) *core.Php
 	self.SetFd(fd)
 	return _phpStreamAlloc(&PhpStreamStdioOps, self, persistent_id, mode)
 }
-func _phpStreamFopenFromFileInt(file *FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromFileInt(file *r.FILE, mode *byte) *core.PhpStream {
 	var self *PhpStdioStreamData
 	self = zend._emalloc(g.SizeOf("* self"))
 	memset(self, 0, g.SizeOf("* self"))
@@ -195,12 +196,12 @@ func _phpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStr
 			stream.flags |= 0x1
 			stream.position = -1
 		} else {
-			stream.position = lseek(self.GetFd(), 0, SEEK_CUR)
+			stream.position = lseek(self.GetFd(), 0, 1)
 		}
 	}
 	return stream
 }
-func _phpStreamFopenFromFile(file *FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
 	var stream *core.PhpStream = _phpStreamFopenFromFileInt(file, mode)
 	if stream != nil {
 		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
@@ -209,12 +210,12 @@ func _phpStreamFopenFromFile(file *FILE, mode *byte) *core.PhpStream {
 			stream.flags |= 0x1
 			stream.position = -1
 		} else {
-			stream.position = ftell(file)
+			stream.position = r.Ftell(file)
 		}
 	}
 	return stream
 }
-func _phpStreamFopenFromPipe(file *FILE, mode *byte) *core.PhpStream {
+func _phpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
 	var self *PhpStdioStreamData
 	var stream *core.PhpStream
 	self = zend._emalloc(g.SizeOf("* self"))
@@ -232,7 +233,7 @@ func _phpStreamFopenFromPipe(file *FILE, mode *byte) *core.PhpStream {
 }
 func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-	assert(data != nil)
+	r.Assert(data != nil)
 	if data.GetFd() >= 0 {
 		var bytes_written ssize_t = write(data.GetFd(), buf, count)
 		if bytes_written < 0 {
@@ -253,16 +254,16 @@ func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		return bytes_written
 	} else {
 		if data.GetIsSeekable() && data.GetLastOp() == 'r' {
-			fseek(data.GetFile(), 0, SEEK_CUR)
+			r.Fseek(data.GetFile(), 0, 1)
 		}
 		data.SetLastOp('w')
-		return ssize_t(fwrite(buf, 1, count, data.GetFile()))
+		return ssize_t(r.Fwrite(buf, 1, count, data.GetFile()))
 	}
 }
 func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
 	var ret ssize_t
-	assert(data != nil)
+	r.Assert(data != nil)
 	if data.GetFd() >= 0 {
 		ret = read(data.GetFd(), buf, count)
 		if ret == size_t-1 && errno == EINTR {
@@ -306,18 +307,18 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		}
 	} else {
 		if data.GetIsSeekable() && data.GetLastOp() == 'w' {
-			fseek(data.GetFile(), 0, SEEK_CUR)
+			r.Fseek(data.GetFile(), 0, 1)
 		}
 		data.SetLastOp('r')
-		ret = fread(buf, 1, count, data.GetFile())
-		stream.eof = feof(data.GetFile())
+		ret = r.Fread(buf, 1, count, data.GetFile())
+		stream.eof = r.Feof(data.GetFile())
 	}
 	return ret
 }
 func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 	var ret int
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-	assert(data != nil)
+	r.Assert(data != nil)
 	if data.GetLastMappedAddr() != nil {
 		munmap(data.GetLastMappedAddr(), data.GetLastMappedLen())
 		data.SetLastMappedAddr(nil)
@@ -331,7 +332,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 					ret = WEXITSTATUS(ret)
 				}
 			} else {
-				ret = fclose(data.GetFile())
+				ret = r.Fclose(data.GetFile())
 				data.SetFile(nil)
 			}
 		} else if data.GetFd() != -1 {
@@ -358,7 +359,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 }
 func PhpStdiopFlush(stream *core.PhpStream) int {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-	assert(data != nil)
+	r.Assert(data != nil)
 
 	/*
 	 * stdio buffers data in user land. By calling fflush(3), this
@@ -367,14 +368,14 @@ func PhpStdiopFlush(stream *core.PhpStream) int {
 	 */
 
 	if data.GetFile() != nil {
-		return fflush(data.GetFile())
+		return r.Fflush(data.GetFile())
 	}
 	return 0
 }
 func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
 	var ret int
-	assert(data != nil)
+	r.Assert(data != nil)
 	if !(data.GetIsSeekable()) {
 		core.PhpErrorDocref(nil, 1<<1, "cannot seek on this stream")
 		return -1
@@ -388,15 +389,15 @@ func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, new
 		*newoffset = result
 		return 0
 	} else {
-		ret = fseek(data.GetFile(), offset, whence)
-		*newoffset = ftell(data.GetFile())
+		ret = r.Fseek(data.GetFile(), offset, whence)
+		*newoffset = r.Ftell(data.GetFile())
 		return ret
 	}
 }
 func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 	var fd core.PhpSocketT
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-	assert(data != nil)
+	r.Assert(data != nil)
 
 	/* as soon as someone touches the stdio layer, buffering may ensue,
 	 * so we need to stop using the fd directly in that case */
@@ -416,7 +417,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 					return zend.FAILURE
 				}
 			}
-			*((**FILE)(ret)) = data.GetFile()
+			*((**r.FILE)(ret)) = data.GetFile()
 			data.SetFd(-1)
 		}
 		return zend.SUCCESS
@@ -443,7 +444,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 			return zend.FAILURE
 		}
 		if data.GetFile() != nil {
-			fflush(data.GetFile())
+			r.Fflush(data.GetFile())
 		}
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = fd
@@ -459,7 +460,7 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 func PhpStdiopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var ret int
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-	assert(data != nil)
+	r.Assert(data != nil)
 	if g.Assign(&ret, DoFstat(data, 1)) == 0 {
 		memcpy(&ssb.sb, &data.sb, g.SizeOf("ssb -> sb"))
 	}
@@ -487,15 +488,15 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		if ptrparam {
 			size = *((*int)(ptrparam))
 		} else {
-			size = BUFSIZ
+			size = 1024
 		}
 		switch value {
 		case 0:
-			return setvbuf(data.GetFile(), nil, _IONBF, 0)
+			return r.Setvbuf(data.GetFile(), nil, _IONBF, 0)
 		case 1:
-			return setvbuf(data.GetFile(), nil, _IOLBF, size)
+			return r.Setvbuf(data.GetFile(), nil, _IOLBF, size)
 		case 2:
-			return setvbuf(data.GetFile(), nil, _IOFBF, size)
+			return r.Setvbuf(data.GetFile(), nil, _IOFBF, size)
 		default:
 			return -1
 		}
@@ -814,7 +815,7 @@ func PhpPlainFilesRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to 
 	if core.PhpCheckOpenBasedir(url_from) != 0 || core.PhpCheckOpenBasedir(url_to) != 0 {
 		return 0
 	}
-	ret = rename(url_from, url_to)
+	ret = r.Rename(url_from, url_to)
 	if ret == -1 {
 		core.PhpErrorDocref2(nil, url_from, url_to, 1<<1, "%s", strerror(errno))
 		return 0
@@ -957,12 +958,12 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 	case 1:
 		newtime = (*__struct__utimbuf)(value)
 		if access(url, F_OK) != 0 {
-			var file *FILE = fopen(url, "w")
+			var file *r.FILE = r.Fopen(url, "w")
 			if file == nil {
 				core.PhpErrorDocref1(nil, url, 1<<1, "Unable to create file %s because %s", url, strerror(errno))
 				return 0
 			}
-			fclose(file)
+			r.Fclose(file)
 		}
 		ret = utime(url, newtime)
 		break

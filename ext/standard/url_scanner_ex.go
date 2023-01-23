@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -359,7 +360,7 @@ func CheckHttpHost(target *byte) int {
 func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
 	var allowed_hosts *zend.HashTable = g.CondF(ctx.GetType() != 0, func() *zend.HashTable { return &(BasicGlobals.GetUrlAdaptSessionHostsHt()) }, func() *zend.HashTable { return &(BasicGlobals.GetUrlAdaptOutputHostsHt()) })
-	assert(ctx.GetTagType() == TAG_FORM)
+	r.Assert(ctx.GetTagType() == TAG_FORM)
 	if ctx.attr_val.s != nil && ctx.attr_val.s.len_ != 0 {
 		url_parts = PhpUrlParseEx(ctx.attr_val.s.val, ctx.attr_val.s.len_)
 	} else {

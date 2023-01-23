@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -374,12 +375,12 @@ func PhpCheckOpenBasedirEx(path *byte, warn int) int {
 
 /* }}} */
 
-func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **zend.ZendString) *FILE {
-	var fp *FILE
+func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **zend.ZendString) *r.FILE {
+	var fp *r.FILE
 	if PhpCheckOpenBasedir((*byte)(path)) != 0 {
 		return nil
 	}
-	fp = fopen(path, mode)
+	fp = r.Fopen(path, mode)
 	if fp != nil && opened_path != nil {
 
 		//TODO :avoid reallocation
@@ -627,12 +628,12 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 
 /* }}} */
 
-func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **zend.ZendString) *FILE {
+func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **zend.ZendString) *r.FILE {
 	var pathbuf *byte
 	var ptr *byte
 	var end *byte
 	var trypath []byte
-	var fp *FILE
+	var fp *r.FILE
 	var filename_length int
 	var exec_filename *zend.ZendString
 	if opened_path != nil {

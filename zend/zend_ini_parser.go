@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -315,7 +316,7 @@ func IniError(msg *byte) {
 		error_buf = _estrdup("Invalid configuration directive\n")
 	}
 	if CG.GetIniParserUnbufferedErrors() != 0 {
-		fprintf(stderr, "PHP:  %s", error_buf)
+		r.Fprintf(stderr, "PHP:  %s", error_buf)
 	} else {
 		ZendError(1<<1, "%s", error_buf)
 	}

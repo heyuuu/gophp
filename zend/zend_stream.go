@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -101,28 +102,28 @@ type ZendStatT = __struct__stat
 var Isatty func(fd int) int
 
 func ZendStreamStdioReader(handle any, buf *byte, len_ int) ssize_t {
-	return fread(buf, 1, len_, (*FILE)(handle))
+	return r.Fread(buf, 1, len_, (*r.FILE)(handle))
 }
 func ZendStreamStdioCloser(handle any) {
-	if handle && (*FILE)(handle != stdin) != nil {
-		fclose((*FILE)(handle))
+	if handle && (*r.FILE)(handle != stdin) != nil {
+		r.Fclose((*r.FILE)(handle))
 	}
 }
 func ZendStreamStdioFsizer(handle any) int {
 	var buf ZendStatT
-	if handle && fstat(fileno((*FILE)(handle)), &buf) == 0 {
+	if handle && fstat(fileno((*r.FILE)(handle)), &buf) == 0 {
 		return buf.st_size
 	}
 	return -1
 }
 func ZendStreamFsize(file_handle *ZendFileHandle) int {
-	assert(file_handle.GetType() == ZEND_HANDLE_STREAM)
+	r.Assert(file_handle.GetType() == ZEND_HANDLE_STREAM)
 	if file_handle.GetStream().GetIsatty() != 0 {
 		return 0
 	}
 	return file_handle.GetStream().GetFsizer()(file_handle.GetStream().GetHandle())
 }
-func ZendStreamInitFp(handle *ZendFileHandle, fp *FILE, filename string) {
+func ZendStreamInitFp(handle *ZendFileHandle, fp *r.FILE, filename string) {
 	memset(handle, 0, g.SizeOf("zend_file_handle"))
 	handle.SetType(ZEND_HANDLE_FP)
 	handle.SetFp(fp)
@@ -151,13 +152,13 @@ func ZendStreamGetc(file_handle *ZendFileHandle) int {
 	if file_handle.GetStream().GetReader()(file_handle.GetStream().GetHandle(), &buf, g.SizeOf("buf")) {
 		return int(buf)
 	}
-	return EOF
+	return -1
 }
 func ZendStreamRead(file_handle *ZendFileHandle, buf *byte, len_ int) ssize_t {
 	if file_handle.GetStream().GetIsatty() != 0 {
 		var c int = '*'
 		var n int
-		for n = 0; n < len_ && g.Assign(&c, ZendStreamGetc(file_handle)) != EOF && c != '\n'; n++ {
+		for n = 0; n < len_ && g.Assign(&c, ZendStreamGetc(file_handle)) != -1 && c != '\n'; n++ {
 			buf[n] = byte(c)
 		}
 		if c == '\n' {
@@ -185,7 +186,7 @@ func ZendStreamFixup(file_handle *ZendFileHandle, buf **byte, len_ *int) int {
 		}
 		file_handle.SetType(ZEND_HANDLE_STREAM)
 		file_handle.GetStream().SetHandle(file_handle.GetFp())
-		file_handle.GetStream().SetIsatty(Isatty(fileno((*FILE)(file_handle.GetStream().GetHandle()))))
+		file_handle.GetStream().SetIsatty(Isatty(fileno((*r.FILE)(file_handle.GetStream().GetHandle()))))
 		file_handle.GetStream().SetReader(ZendStreamReaderT(ZendStreamStdioReader))
 		file_handle.GetStream().SetCloser(ZendStreamCloserT(ZendStreamStdioCloser))
 		file_handle.GetStream().SetFsizer(ZendStreamFsizerT(ZendStreamStdioFsizer))
@@ -242,7 +243,7 @@ func ZendStreamFixup(file_handle *ZendFileHandle, buf **byte, len_ *int) int {
 func ZendFileHandleDtor(fh *ZendFileHandle) {
 	switch fh.GetType() {
 	case ZEND_HANDLE_FP:
-		fclose(fh.GetFp())
+		r.Fclose(fh.GetFp())
 		break
 	case ZEND_HANDLE_STREAM:
 		if fh.GetStream().GetCloser() != nil && fh.GetStream().GetHandle() {

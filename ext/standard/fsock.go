@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -123,8 +124,8 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -140,8 +141,8 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -156,8 +157,8 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -168,8 +169,8 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -180,8 +181,8 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -252,7 +253,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if stream == nil {
 		if zerrno != nil {
 			for {
-				assert(zerrno.u1.v.type_ == 10)
+				r.Assert(zerrno.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zerrno
 					var ref *zend.ZendReference = _zv.value.ref
@@ -273,7 +274,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		if errstr != nil {
 			if zerrstr != nil {
 				for {
-					assert(zerrstr.u1.v.type_ == 10)
+					r.Assert(zerrstr.u1.v.type_ == 10)
 					for {
 						var _zv *zend.Zval = zerrstr
 						var ref *zend.ZendReference = _zv.value.ref
@@ -304,7 +305,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	}
 	if zerrno != nil {
 		for {
-			assert(zerrno.u1.v.type_ == 10)
+			r.Assert(zerrno.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrno
 				var ref *zend.ZendReference = _zv.value.ref
@@ -324,7 +325,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	}
 	if zerrstr != nil {
 		for {
-			assert(zerrstr.u1.v.type_ == 10)
+			r.Assert(zerrstr.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrstr
 				var ref *zend.ZendReference = _zv.value.ref

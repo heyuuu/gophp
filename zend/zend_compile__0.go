@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -1187,7 +1188,7 @@ func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
 	var p *Zval
 	var rv Zval
 	if g.Assign(&p, ZendHashFind(&CG.filenames_table, new_compiled_filename)) {
-		assert(p.GetType() == 6)
+		r.Assert(p.GetType() == 6)
 		CG.SetCompiledFilename(p.GetValue().GetStr())
 		return p.GetValue().GetStr()
 	}
@@ -1761,7 +1762,7 @@ func FunctionAddRef(function *ZendFunction) {
 			}
 		}
 		if (CG.GetCompilerOptions() & 1 << 15) != 0 {
-			assert((op_array.GetFnFlags() & 1 << 10) != 0)
+			r.Assert((op_array.GetFnFlags() & 1 << 10) != 0)
 			op_array.SetRunTimeCachePtr(ZendMapPtrNew())
 			op_array.SetStaticVariablesPtrPtr(ZendMapPtrNew())
 		} else {
@@ -1786,7 +1787,7 @@ func DoBindFunctionError(lcname *ZendString, op_array *ZendOpArray, compile_time
 	var zv *Zval = ZendHashFindEx(g.CondF(compile_time != 0, func() *HashTable { return CG.GetFunctionTable() }, func() *HashTable { return EG.GetFunctionTable() }), lcname, 1)
 	var error_level int = g.Cond(compile_time != 0, 1<<6, 1<<0)
 	var old_function *ZendFunction
-	assert(zv != nil)
+	r.Assert(zv != nil)
 	old_function = (*ZendFunction)(zv.GetValue().GetPtr())
 	if old_function.GetType() == 2 && old_function.GetOpArray().GetLast() > 0 {
 		ZendErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", g.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
@@ -1832,7 +1833,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 			return FAILURE
 		} else {
 			for {
-				assert((EG.GetCurrentExecuteData().GetFunc().GetOpArray().GetFnFlags() & 1 << 10) != 0)
+				r.Assert((EG.GetCurrentExecuteData().GetFunc().GetOpArray().GetFnFlags() & 1 << 10) != 0)
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(EG.GetCurrentExecuteData().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
 					zv = ZendHashFindEx(EG.GetClassTable(), rtd_key.GetValue().GetStr(), 1)
 					if zv != nil {
@@ -1916,7 +1917,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 		var run_time_cache *any
 		if op_array.GetRunTimeCachePtr() == nil {
 			var ptr any
-			assert((op_array.GetFnFlags() & 1 << 22) != 0)
+			r.Assert((op_array.GetFnFlags() & 1 << 22) != 0)
 			ptr = _emalloc(op_array.GetCacheSize() + g.SizeOf("void *"))
 			op_array.SetRunTimeCachePtr(ptr)
 			ptr = (*byte)(ptr + g.SizeOf("void *"))
@@ -2432,7 +2433,7 @@ func Zendlex(elem *ZendParserStackElem) int {
 		CG.SetIncrementLineno(0)
 	}
 	ret = LexScan(&zv, elem)
-	assert(EG.GetException() == nil || ret == T_ERROR)
+	r.Assert(EG.GetException() == nil || ret == T_ERROR)
 	return ret
 }
 
@@ -2536,7 +2537,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 			__z.GetValue().SetStr(__s)
 			__z.SetTypeInfo(6 | 1<<0<<8)
 		} else {
-			assert(zv.GetValue().GetLval() > 0)
+			r.Assert(zv.GetValue().GetLval() > 0)
 			zv.GetValue().SetLval(zv.GetValue().GetLval() * -1)
 		}
 	} else if zv.GetType() == 6 {
@@ -2545,7 +2546,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 		memmove(zv.GetValue().GetStr().GetVal()+1, zv.GetValue().GetStr().GetVal(), orig_len+1)
 		zv.GetValue().GetStr().GetVal()[0] = '-'
 	} else {
-		assert(false)
+		r.Assert(false)
 	}
 	return ast
 }
@@ -2898,7 +2899,7 @@ func ZendDelayedCompileEnd(offset uint32) *ZendOp {
 	var oplines *ZendOp = ZendStackBase(&CG.delayed_oplines_stack)
 	var i uint32
 	var count uint32 = ZendStackCount(&CG.delayed_oplines_stack)
-	assert(count >= offset)
+	r.Assert(count >= offset)
 	for i = offset; i < count; i++ {
 		opline = GetNextOp()
 		memcpy(opline, &oplines[i], g.SizeOf("zend_op"))
@@ -2947,7 +2948,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 			}
 		}
 	} else {
-		assert(false)
+		r.Assert(false)
 	}
 }
 
@@ -3098,7 +3099,7 @@ func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 			 */
 
 			var c int = ZendAddLiteral(&dim_node.u.constant)
-			assert(opline.GetOp2().GetConstant()+1 == c)
+			r.Assert(opline.GetOp2().GetConstant()+1 == c)
 			var __z *Zval = CG.GetActiveOpArray().GetLiterals() + opline.GetOp2().GetConstant()
 			__z.GetValue().SetLval(index)
 			__z.SetTypeInfo(4)
@@ -5001,7 +5002,7 @@ func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 
 		} else {
 			var opline *ZendOp
-			assert((loop_var.GetVarType() & (1<<2 | 1<<1)) != 0)
+			r.Assert((loop_var.GetVarType() & (1<<2 | 1<<1)) != 0)
 			opline = GetNextOp()
 			opline.SetOpcode(loop_var.GetOpcode())
 			opline.SetOp1Type(loop_var.GetVarType())
@@ -5137,7 +5138,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 	var depth_ast *ZendAst = ast.GetChild()[0]
 	var opline *ZendOp
 	var depth ZendLong
-	assert(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
+	r.Assert(ast.GetKind() == ZEND_AST_BREAK || ast.GetKind() == ZEND_AST_CONTINUE)
 	if depth_ast != nil {
 		var depth_zv *Zval
 		if depth_ast.GetKind() != ZEND_AST_ZVAL {
@@ -5163,7 +5164,7 @@ func ZendCompileBreakContinue(ast *ZendAst) {
 		var cur int = CG.GetContext().GetCurrentBrkCont()
 		for d = depth - 1; d > 0; d-- {
 			cur = CG.GetContext().GetBrkContArray()[cur].GetParent()
-			assert(cur != -1)
+			r.Assert(cur != -1)
 		}
 		if CG.GetContext().GetBrkContArray()[cur].GetIsSwitch() != 0 {
 			if depth == 1 {
@@ -5222,7 +5223,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 	opline.SetOp1Type(0)
 	opline.SetOp2Type(0)
 	opline.SetResultType(0)
-	assert(remove_oplines >= 0)
+	r.Assert(remove_oplines >= 0)
 	for g.PostDec(&remove_oplines) {
 		opline--
 		opline.GetOp1().SetNum(0)
@@ -5473,7 +5474,7 @@ func ZendCompileIf(ast *ZendAst) {
 
 			/* "else" can only occur as last element. */
 
-			assert(i == list.GetChildren()-1)
+			r.Assert(i == list.GetChildren()-1)
 			ZendCompileStmt(stmt_ast)
 		}
 	}
@@ -5557,7 +5558,7 @@ func ShouldUseJumptable(cases *ZendAstList, jumptable_type ZendUchar) ZendBool {
 	if jumptable_type == 4 {
 		return cases.GetChildren() >= 5
 	} else {
-		assert(jumptable_type == 6)
+		r.Assert(jumptable_type == 6)
 		return cases.GetChildren() >= 2
 	}
 
@@ -5646,18 +5647,18 @@ func ZendCompileSwitch(ast *ZendAst) {
 				var __z *Zval = &jmp_target
 				__z.GetValue().SetLval(GetNextOpNumber())
 				__z.SetTypeInfo(4)
-				assert(cond_zv.GetType() == jumptable_type)
+				r.Assert(cond_zv.GetType() == jumptable_type)
 				if cond_zv.GetType() == 4 {
 					ZendHashIndexAdd(jumptable, cond_zv.GetValue().GetLval(), &jmp_target)
 				} else {
-					assert(cond_zv.GetType() == 6)
+					r.Assert(cond_zv.GetType() == 6)
 					ZendHashAdd(jumptable, cond_zv.GetValue().GetStr(), &jmp_target)
 				}
 			}
 		} else {
 			ZendUpdateJumpTargetToNext(opnum_default_jmp)
 			if jumptable != nil {
-				assert(opnum_switch != uint32-1)
+				r.Assert(opnum_switch != uint32-1)
 				opline = &CG.active_op_array.GetOpcodes()[opnum_switch]
 				opline.SetExtendedValue(GetNextOpNumber())
 			}
@@ -5791,7 +5792,7 @@ func ZendCompileTry(ast *ZendAst) {
 		if is_last_catch == 0 {
 			jmp_opnums[i+1] = ZendEmitJump(0)
 		}
-		assert(opnum_catch != uint32-1 && "Should have at least one class")
+		r.Assert(opnum_catch != uint32-1 && "Should have at least one class")
 		opline = &CG.active_op_array.GetOpcodes()[opnum_catch]
 		if is_last_catch == 0 {
 			opline.GetOp2().SetOplineNum(GetNextOpNumber())
@@ -7982,7 +7983,7 @@ func ZendCompileGreater(result *Znode, ast *ZendAst) {
 	var right_ast *ZendAst = ast.GetChild()[1]
 	var left_node Znode
 	var right_node Znode
-	assert(ast.GetKind() == ZEND_AST_GREATER || ast.GetKind() == ZEND_AST_GREATER_EQUAL)
+	r.Assert(ast.GetKind() == ZEND_AST_GREATER || ast.GetKind() == ZEND_AST_GREATER_EQUAL)
 	ZendCompileExpr(&left_node, left_ast)
 	ZendCompileExpr(&right_node, right_ast)
 	if left_node.GetOpType() == 1<<0 && right_node.GetOpType() == 1<<0 {
@@ -8017,7 +8018,7 @@ func ZendCompileUnaryPm(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
 	var expr_node Znode
 	var lefthand_node Znode
-	assert(ast.GetKind() == ZEND_AST_UNARY_PLUS || ast.GetKind() == ZEND_AST_UNARY_MINUS)
+	r.Assert(ast.GetKind() == ZEND_AST_UNARY_PLUS || ast.GetKind() == ZEND_AST_UNARY_MINUS)
 	ZendCompileExpr(&expr_node, expr_ast)
 	if expr_node.GetOpType() == 1<<0 {
 		if ZendTryCtEvalUnaryPm(&result.u.constant, ast.GetKind(), &expr_node.u.constant) != 0 {
@@ -8047,7 +8048,7 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 	var opline_jmpz *ZendOp
 	var opline_bool *ZendOp
 	var opnum_jmpz uint32
-	assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
+	r.Assert(ast.GetKind() == ZEND_AST_AND || ast.GetKind() == ZEND_AST_OR)
 	ZendCompileExpr(&left_node, left_ast)
 	if left_node.GetOpType() == 1<<0 {
 		if ast.GetKind() == ZEND_AST_AND && ZendIsTrue(&left_node.u.constant) == 0 || ast.GetKind() == ZEND_AST_OR && ZendIsTrue(&left_node.u.constant) != 0 {
@@ -8113,7 +8114,7 @@ func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
 
 func ZendCompilePostIncdec(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
-	assert(ast.GetKind() == ZEND_AST_POST_INC || ast.GetKind() == ZEND_AST_POST_DEC)
+	r.Assert(ast.GetKind() == ZEND_AST_POST_INC || ast.GetKind() == ZEND_AST_POST_DEC)
 	ZendEnsureWritableVariable(var_ast)
 	if var_ast.GetKind() == ZEND_AST_PROP {
 		var opline *ZendOp = ZendCompileProp(nil, var_ast, 2, 0)
@@ -8142,7 +8143,7 @@ func ZendCompilePostIncdec(result *Znode, ast *ZendAst) {
 
 func ZendCompilePreIncdec(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
-	assert(ast.GetKind() == ZEND_AST_PRE_INC || ast.GetKind() == ZEND_AST_PRE_DEC)
+	r.Assert(ast.GetKind() == ZEND_AST_PRE_INC || ast.GetKind() == ZEND_AST_PRE_DEC)
 	ZendEnsureWritableVariable(var_ast)
 	if var_ast.GetKind() == ZEND_AST_PROP {
 		var opline *ZendOp = ZendCompileProp(result, var_ast, 2, 0)
@@ -8188,7 +8189,7 @@ func ZendCompileShorthandConditional(result *Znode, ast *ZendAst) {
 	var false_node Znode
 	var opline_qm_assign *ZendOp
 	var opnum_jmp_set uint32
-	assert(ast.GetChild()[1] == nil)
+	r.Assert(ast.GetChild()[1] == nil)
 	ZendCompileExpr(&cond_node, cond_ast)
 	opnum_jmp_set = GetNextOpNumber()
 	ZendEmitOpTmp(result, 152, &cond_node, nil)
@@ -8520,7 +8521,7 @@ func ZendCompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 	var var_ast *ZendAst = ast.GetChild()[0]
 	var var_node Znode
 	var opline *ZendOp = nil
-	assert(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
+	r.Assert(ast.GetKind() == ZEND_AST_ISSET || ast.GetKind() == ZEND_AST_EMPTY)
 	if ZendIsVariable(var_ast) == 0 {
 		if ast.GetKind() == ZEND_AST_EMPTY {
 
@@ -8624,7 +8625,7 @@ func ZendCompileArray(result *Znode, ast *ZendAst) {
 
 	/* Empty arrays are handled at compile-time */
 
-	assert(list.GetChildren() > 0)
+	r.Assert(list.GetChildren() > 0)
 	for i = 0; i < list.GetChildren(); i++ {
 		var elem_ast *ZendAst = list.GetChild()[i]
 		var value_ast *ZendAst
@@ -8687,7 +8688,7 @@ func ZendCompileArray(result *Znode, ast *ZendAst) {
 	/* Add a flag to INIT_ARRAY if we know this array cannot be packed */
 
 	if packed == 0 {
-		assert(opnum_init != uint32-1)
+		r.Assert(opnum_init != uint32-1)
 		opline = &CG.active_op_array.GetOpcodes()[opnum_init]
 		opline.SetExtendedValue(opline.GetExtendedValue() | 1<<1)
 	}
@@ -8861,7 +8862,7 @@ func ZendCompileEncapsList(result *Znode, ast *ZendAst) {
 	var last_const_node Znode
 	var list *ZendAstList = ZendAstGetList(ast)
 	var reserved_op_number uint32 = -1
-	assert(list.GetChildren() > 0)
+	r.Assert(list.GetChildren() > 0)
 	j = 0
 	last_const_node.SetOpType(0)
 	for i = 0; i < list.GetChildren(); i++ {
@@ -9046,7 +9047,7 @@ func ZendCompileMagicConst(result *Znode, ast *ZendAst) {
 		result.SetOpType(1 << 0)
 		return
 	}
-	assert(ast.GetAttr() == T_CLASS_C && CG.GetActiveClassEntry() != nil && (CG.GetActiveClassEntry().GetCeFlags()&1<<1) != 0)
+	r.Assert(ast.GetAttr() == T_CLASS_C && CG.GetActiveClassEntry() != nil && (CG.GetActiveClassEntry().GetCeFlags()&1<<1) != 0)
 	opline = ZendEmitOpTmp(result, 157, nil, nil)
 	opline.GetOp1().SetNum(1)
 }
@@ -9136,7 +9137,7 @@ func ZendCompileConstExprMagicConst(ast_ptr **ZendAst) {
 
 	/* Other cases already resolved by constant folding */
 
-	assert(ast.GetAttr() == T_CLASS_C)
+	r.Assert(ast.GetAttr() == T_CLASS_C)
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreate0(ZEND_AST_CONSTANT_CLASS)
 }
@@ -9498,7 +9499,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileFuncDecl(result, ast, 0)
 		return
 	default:
-		assert(false)
+		r.Assert(false)
 	}
 }
 

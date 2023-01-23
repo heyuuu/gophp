@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -663,7 +664,7 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 					return 0
 				}
 			} else {
-				assert((flags & 1 << 1) != 0)
+				r.Assert((flags & 1 << 1) != 0)
 				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 					goto wrong
 				}
@@ -753,7 +754,7 @@ func ZendGetPropertyInfo(ce *ZendClassEntry, member *ZendString, silent int) *Ze
 					return (*ZendPropertyInfo)(intptr_t - 1)
 				}
 			} else {
-				assert((flags & 1 << 1) != 0)
+				r.Assert((flags & 1 << 1) != 0)
 				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
 					goto wrong
 				}
@@ -807,13 +808,13 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 
 			}
 		} else {
-			assert((property_info.GetFlags() & 1 << 1) != 0)
+			r.Assert((property_info.GetFlags() & 1 << 1) != 0)
 		}
 		return SUCCESS
 	} else {
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), prop_info_name, 1)
 		if property_info == nil {
-			assert(is_dynamic != 0)
+			r.Assert(is_dynamic != 0)
 			return SUCCESS
 		} else if property_info == (*ZendPropertyInfo)(intptr_t-1) {
 			return FAILURE
@@ -841,7 +842,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	var guards *HashTable
 	var zv *Zval
 	var ptr *uint32
-	assert((zobj.GetCe().GetCeFlags() & 1 << 11) != 0)
+	r.Assert((zobj.GetCe().GetCeFlags() & 1 << 11) != 0)
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if zv.GetType() == 6 {
 		var str *ZendString = zv.GetValue().GetStr()
@@ -874,13 +875,13 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 		}
 	} else if zv.GetType() == 7 {
 		guards = zv.GetValue().GetArr()
-		assert(guards != nil)
+		r.Assert(guards != nil)
 		zv = ZendHashFind(guards, member)
 		if zv != nil {
 			return (*uint32)(zend_uintptr_t(*zv).value.ptr & ^1)
 		}
 	} else {
-		assert(zv.GetType() == 0)
+		r.Assert(zv.GetType() == 0)
 		var __z *Zval = zv
 		var __s *ZendString = member
 		__z.GetValue().SetStr(__s)
@@ -1024,7 +1025,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 			/* Trigger the correct error */
 
 			ZendGetPropertyOffset(zobj.GetCe(), name, 0, nil, &prop_info)
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			retval = &EG.uninitialized_zval
 			goto exit
 		}
@@ -1057,7 +1058,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	var tmp Zval
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	assert(value.GetType() != 10)
+	r.Assert(value.GetType() != 10)
 	zobj = object.GetValue().GetObj()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
@@ -1135,12 +1136,12 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			variable_ptr = &EG.error_zval
 			goto exit
 		}
 	} else {
-		assert(intptr_t(property_offset) != 0)
+		r.Assert(intptr_t(property_offset) != 0)
 	write_std_property:
 		if value.GetTypeFlags() != 0 {
 			ZvalAddrefP(value)
@@ -1489,7 +1490,7 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			goto exit
 		}
 	}
@@ -1591,7 +1592,7 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_s
 	 */
 
 	var dummy any = any(intPtr(2))
-	assert(fbc != nil)
+	r.Assert(fbc != nil)
 	if EG.GetTrampoline().GetFunctionName() == nil {
 		func_ = &EG.trampoline.GetOpArray()
 	} else {
@@ -2072,13 +2073,13 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 				if has_set_exists == 1<<0 {
 					result = ZendIsTrue(value)
 				} else if has_set_exists < 1<<0 {
-					assert(has_set_exists == 0x0)
+					r.Assert(has_set_exists == 0x0)
 					if value.GetType() == 10 {
 						value = &(*value).value.GetRef().GetVal()
 					}
 					result = value.GetType() != 1
 				} else {
-					assert(has_set_exists == 0x2)
+					r.Assert(has_set_exists == 0x2)
 					result = 1
 				}
 				goto exit
@@ -2240,7 +2241,7 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 		}
 		return ht
 	default:
-		assert(false)
+		r.Assert(false)
 		return nil
 	}
 }

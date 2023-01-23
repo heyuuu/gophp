@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -183,7 +184,7 @@ func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
-	assert(len_ >= s.GetLen())
+	r.Assert(len_ >= s.GetLen())
 	if (ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0 {
 		if ZendGcRefcount(&s.gc) == 1 {
 			ret = (*ZendString)(g.CondF(persistent != 0, func() any {
@@ -205,7 +206,7 @@ func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
-	assert(len_ <= s.GetLen())
+	r.Assert(len_ <= s.GetLen())
 	if (ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0 {
 		if ZendGcRefcount(&s.gc) == 1 {
 			ret = (*ZendString)(g.CondF(persistent != 0, func() any {
@@ -248,14 +249,14 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 }
 func ZendStringFree(s *ZendString) {
 	if (ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0 {
-		assert(ZendGcRefcount(&s.gc) <= 1)
+		r.Assert(ZendGcRefcount(&s.gc) <= 1)
 		g.CondF((ZvalGcFlags(s.GetGc().GetTypeInfo())&1<<7) != 0, func() { return Free(s) }, func() { return _efree(s) })
 	}
 }
 func ZendStringEfree(s *ZendString) {
-	assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0)
-	assert(ZendGcRefcount(&s.gc) <= 1)
-	assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) == 0)
+	r.Assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0)
+	r.Assert(ZendGcRefcount(&s.gc) <= 1)
+	r.Assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) == 0)
 	_efree(s)
 }
 func ZendStringRelease(s *ZendString) {
@@ -269,10 +270,10 @@ func ZendStringReleaseEx(s *ZendString, persistent int) {
 	if (ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 6) == 0 {
 		if ZendGcDelref(&s.gc) == 0 {
 			if persistent != 0 {
-				assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) != 0)
+				r.Assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) != 0)
 				Free(s)
 			} else {
-				assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) == 0)
+				r.Assert((ZvalGcFlags(s.GetGc().GetTypeInfo()) & 1 << 7) == 0)
 				_efree(s)
 			}
 		}
@@ -579,7 +580,7 @@ func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 		ZendStringRelease(str)
 		return ret
 	}
-	assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 7) != 0)
+	r.Assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 7) != 0)
 	if ZendGcRefcount(&str.gc) > 1 {
 		var h ZendUlong = str.GetH()
 		ZendStringDelref(str)
@@ -626,7 +627,7 @@ func ZendStringInitInternedPermanent(str *byte, size int, permanent int) *ZendSt
 	if ret != nil {
 		return ret
 	}
-	assert(permanent != 0)
+	r.Assert(permanent != 0)
 	ret = ZendStringInit(str, size, permanent)
 	ret.SetH(h)
 	return ZendAddInternedString(ret, &InternedStringsPermanent, 1<<8)

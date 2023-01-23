@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -113,7 +114,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 		} else if p.GetType() == 7 {
 			var guards *HashTable
 			guards = p.GetValue().GetArr()
-			assert(guards != nil)
+			r.Assert(guards != nil)
 			ZendHashDestroy(guards)
 			_efree(guards)
 		}

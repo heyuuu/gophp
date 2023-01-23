@@ -3,6 +3,7 @@
 package core
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -47,19 +48,19 @@ import (
 
 func PhpOptError(argc int, argv **byte, oint int, optchr int, err int, show_err int) int {
 	if show_err != 0 {
-		fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1)
+		r.Fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1)
 		switch err {
 		case 1:
-			fprintf(stderr, ": in flags\n")
+			r.Fprintf(stderr, ": in flags\n")
 			break
 		case 2:
-			fprintf(stderr, "option not found %c\n", argv[oint][optchr])
+			r.Fprintf(stderr, "option not found %c\n", argv[oint][optchr])
 			break
 		case 3:
-			fprintf(stderr, "no argument for option %c\n", argv[oint][optchr])
+			r.Fprintf(stderr, "no argument for option %c\n", argv[oint][optchr])
 			break
 		default:
-			fprintf(stderr, "unknown\n")
+			r.Fprintf(stderr, "unknown\n")
 			break
 		}
 	}
@@ -84,11 +85,11 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 	}
 	prev_optarg = optarg
 	if (*optind) >= argc {
-		return EOF
+		return -1
 	}
 	if dash == 0 {
 		if argv[*optind][0] != '-' {
-			return EOF
+			return -1
 		} else {
 			if !(argv[*optind][1]) {
 
@@ -97,7 +98,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 				 * the following args
 				 */
 
-				return EOF
+				return -1
 
 				/*
 				 * use to specify stdin. Need to let pgm process this and
@@ -115,7 +116,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 
 		if argv[*optind][2] == '0' {
 			*optind++
-			return EOF
+			return -1
 		}
 		arg_start = 2
 
@@ -219,7 +220,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 		}
 		return opts[PhpOptidx].GetOptChar()
 	}
-	assert(false)
+	r.Assert(false)
 	return 0
 }
 

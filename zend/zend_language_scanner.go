@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -169,7 +170,7 @@ func StripUnderscores(str *byte, len_ *int) {
 }
 func EncodingFilterScriptToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	assert(internal_encoding != nil)
+	r.Assert(internal_encoding != nil)
 	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LANG_SCNG.GetScriptEncoding())
 }
 func EncodingFilterScriptToIntermediate(to **uint8, to_length *int, from *uint8, from_length int) int {
@@ -180,7 +181,7 @@ func EncodingFilterIntermediateToScript(to **uint8, to_length *int, from *uint8,
 }
 func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	assert(internal_encoding != nil)
+	r.Assert(internal_encoding != nil)
 	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
 }
 
@@ -308,7 +309,7 @@ func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncodin
 	/* utf-16 or utf-32? */
 
 	p = script
-	assert(p >= script)
+	r.Assert(p >= script)
 	for size_t(p-script) < script_size {
 		p = memchr(p, 0, script_size-(p-script)-2)
 		if p == nil {
@@ -330,7 +331,7 @@ func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncodin
 	/* BE or LE? */
 
 	p = script
-	assert(p >= script)
+	r.Assert(p >= script)
 	for size_t(p-script) < script_size {
 		if (*p) == '0' && (*(p + wchar_size - 1)) != '0' {
 
@@ -525,7 +526,7 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 		ZendLlistAddElement(&CG.open_files, file_handle)
 		return FAILURE
 	}
-	assert(EG.GetException() == nil && "stream_fixup() should have failed")
+	r.Assert(EG.GetException() == nil && "stream_fixup() should have failed")
 	ZendLlistAddElement(&CG.open_files, file_handle)
 	if file_handle.GetStream().GetHandle() >= any(file_handle != nil && file_handle.GetStream().GetHandle() <= any(file_handle+1)) {
 		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLastEx(&CG.open_files, nil))
@@ -1985,7 +1986,7 @@ yy19:
 		var __z *Zval = zendlval
 		__z.GetValue().SetLval(strtoll(lnum, &end, g.Cond(is_octal != 0, 8, 10)))
 		__z.SetTypeInfo(4)
-		assert(end == lnum+len_)
+		r.Assert(end == lnum+len_)
 	} else {
 		errno = 0
 		var __z *Zval = zendlval
@@ -2002,16 +2003,16 @@ yy19:
 				__z.GetValue().SetDval(ZendStrtod(lnum, (**byte)(&end)))
 				__z.SetTypeInfo(5)
 			}
-			assert(end == lnum+len_)
+			r.Assert(end == lnum+len_)
 			if contains_underscores != 0 {
 				_efree(lnum)
 			}
 			token = T_DNUMBER
 			goto emit_token_with_val
 		}
-		assert(end == lnum+len_)
+		r.Assert(end == lnum+len_)
 	}
-	assert(!errno)
+	r.Assert(!errno)
 	if contains_underscores != 0 {
 		_efree(lnum)
 	}
@@ -2954,7 +2955,7 @@ yy86:
 
 	/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-	assert(end == dnum+len_)
+	r.Assert(end == dnum+len_)
 	if contains_underscores != 0 {
 		_efree(dnum)
 	}
@@ -3926,7 +3927,7 @@ yy173:
 			var __z *Zval = zendlval
 			__z.GetValue().SetLval(strtoll(bin, &end, 2))
 			__z.SetTypeInfo(4)
-			assert(!errno && end == bin+len_)
+			r.Assert(!errno && end == bin+len_)
 		}
 		if contains_underscores != 0 {
 			_efree(bin)
@@ -3940,7 +3941,7 @@ yy173:
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-		assert(end == bin+len_)
+		r.Assert(end == bin+len_)
 		if contains_underscores != 0 {
 			_efree(bin)
 		}
@@ -4022,7 +4023,7 @@ yy177:
 			var __z *Zval = zendlval
 			__z.GetValue().SetLval(strtoll(hex, &end, 16))
 			__z.SetTypeInfo(4)
-			assert(!errno && end == hex+len_)
+			r.Assert(!errno && end == hex+len_)
 		}
 		if contains_underscores != 0 {
 			_efree(hex)
@@ -4036,7 +4037,7 @@ yy177:
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-		assert(end == hex+len_)
+		r.Assert(end == hex+len_)
 		if contains_underscores != 0 {
 			_efree(hex)
 		}
@@ -8862,7 +8863,7 @@ yy617:
 		if errno == ERANGE {
 			goto string
 		}
-		assert(end == (*byte)(LANG_SCNG.GetYyText())+LANG_SCNG.GetYyLeng())
+		r.Assert(end == (*byte)(LANG_SCNG.GetYyText())+LANG_SCNG.GetYyLeng())
 	} else {
 	string:
 		var __z *Zval = zendlval
@@ -9426,7 +9427,7 @@ emit_token_with_str:
 	}
 emit_token_with_val:
 	if elem != nil {
-		assert(zendlval.GetType() != 0)
+		r.Assert(zendlval.GetType() != 0)
 		elem.SetAst(ZendAstCreateZvalWithLineno(zendlval, start_line))
 	}
 emit_token:

@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -89,7 +90,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, inde
 		zend.ZendWrite("]=>\n", strlen("]=>\n"))
 	}
 	if zv.u1.v.type_ == 0 {
-		assert(prop_info.type_ != 0)
+		r.Assert(prop_info.type_ != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', g.Cond((prop_info.type_&0x1) != 0, "?", ""), g.CondF(prop_info.type_ > 0x3ff, func() __auto__ {
 			return g.CondF((prop_info.type_&0x2) != 0, func() *zend.ZendString { return (*zend.ZendClassEntry)(prop_info.type_ & ^0x3).name }, func() *zend.ZendString { return (*zend.ZendString)(prop_info.type_ & ^0x3) }).val
 		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.type_ >> 2) }))
@@ -369,7 +370,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, ind
 		zend.ZendWrite("]=>\n", strlen("]=>\n"))
 	}
 	if prop_info != nil && zv.u1.v.type_ == 0 {
-		assert(prop_info.type_ != 0)
+		r.Assert(prop_info.type_ != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', g.Cond((prop_info.type_&0x1) != 0, "?", ""), g.CondF(prop_info.type_ > 0x3ff, func() __auto__ {
 			return g.CondF((prop_info.type_&0x2) != 0, func() *zend.ZendString { return (*zend.ZendClassEntry)(prop_info.type_ & ^0x3).name }, func() *zend.ZendString { return (*zend.ZendString)(prop_info.type_ & ^0x3) }).val
 		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.type_ >> 2) }))
@@ -917,8 +918,8 @@ func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -930,8 +931,8 @@ func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1598,8 +1599,8 @@ func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1704,8 +1705,8 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1721,8 +1722,8 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1939,8 +1940,8 @@ func ZifMemoryGetUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2028,8 +2029,8 @@ func ZifMemoryGetPeakUsage(execute_data *zend.ZendExecuteData, return_value *zen
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -159,7 +160,7 @@ func StrfilterStripTagsFilter(stream *core.PhpStream, thisfilter *core.PhpStream
 	return streams.PSFS_PASS_ON
 }
 func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
-	assert(thisfilter.abstract.value.ptr != nil)
+	r.Assert(thisfilter.abstract.value.ptr != nil)
 	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(thisfilter.abstract.value.ptr))
 	g.CondF((*PhpStripTagsFilter)(thisfilter.abstract.value.ptr).GetPersistent() != 0, func() { return zend.Free(thisfilter.abstract.value.ptr) }, func() { return zend._efree(thisfilter.abstract.value.ptr) })
 }
@@ -289,7 +290,7 @@ func PhpConvBase64EncodeCtor(inst *PhpConvBase64Encode, line_len uint, lbchars *
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvBase64EncodeDtor(inst *PhpConvBase64Encode) {
-	assert(inst != nil)
+	r.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		g.CondF(inst.GetPersistent() != 0, func() { return zend.Free(any(inst.GetLbchars())) }, func() { return zend._efree(any(inst.GetLbchars())) })
 	}
@@ -599,7 +600,7 @@ func PhpConvBase64DecodeConvert(inst *PhpConvBase64Decode, in_pp **byte, in_left
 // #define PHP_CONV_QPRINT_OPT_FORCE_ENCODE_FIRST       0x00000002
 
 func PhpConvQprintEncodeDtor(inst *PhpConvQprintEncode) {
-	assert(inst != nil)
+	r.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		g.CondF(inst.GetPersistent() != 0, func() { return zend.Free(any(inst.GetLbchars())) }, func() { return zend._efree(any(inst.GetLbchars())) })
 	}
@@ -855,7 +856,7 @@ func PhpConvQprintEncodeCtor(inst *PhpConvQprintEncode, line_len uint, lbchars *
 // @type PhpConvQprintDecode struct
 
 func PhpConvQprintDecodeDtor(inst *PhpConvQprintDecode) {
-	assert(inst != nil)
+	r.Assert(inst != nil)
 	if inst.GetLbcharsDup() != 0 && inst.GetLbchars() != nil {
 		g.CondF(inst.GetPersistent() != 0, func() { return zend.Free(any(inst.GetLbchars())) }, func() { return zend._efree(any(inst.GetLbchars())) })
 	}
@@ -1532,7 +1533,7 @@ out_failure:
 	return streams.PSFS_ERR_FATAL
 }
 func StrfilterConvertDtor(thisfilter *core.PhpStreamFilter) {
-	assert(thisfilter.abstract.value.ptr != nil)
+	r.Assert(thisfilter.abstract.value.ptr != nil)
 	PhpConvertFilterDtor((*PhpConvertFilter)(thisfilter.abstract.value.ptr))
 	g.CondF((*PhpConvertFilter)(thisfilter.abstract.value.ptr).GetPersistent() != 0, func() { return zend.Free(thisfilter.abstract.value.ptr) }, func() { return zend._efree(thisfilter.abstract.value.ptr) })
 }
@@ -1599,7 +1600,7 @@ func ConsumedFilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilt
 		*bytes_consumed = consumed
 	}
 	if (flags & 2) != 0 {
-		streams._phpStreamSeek(stream, data.GetOffset()+data.GetConsumed(), SEEK_SET)
+		streams._phpStreamSeek(stream, data.GetOffset()+data.GetConsumed(), 0)
 	}
 	data.SetConsumed(data.GetConsumed() + consumed)
 	return streams.PSFS_PASS_ON

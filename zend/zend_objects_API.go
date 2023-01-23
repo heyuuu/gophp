@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -84,7 +85,7 @@ func ZendObjectAlloc(obj_size int, ce *ZendClassEntry) any {
 func ZendGetPropertyInfoForSlot(obj *ZendObject, slot *Zval) *ZendPropertyInfo {
 	var table **ZendPropertyInfo = obj.GetCe().GetPropertiesInfoTable()
 	var prop_num intPtr = slot - obj.GetPropertiesTable()
-	assert(prop_num >= 0 && prop_num < obj.GetCe().GetDefaultPropertiesCount())
+	r.Assert(prop_num >= 0 && prop_num < obj.GetCe().GetDefaultPropertiesCount())
 	return table[prop_num]
 }
 
@@ -260,7 +261,7 @@ func ZendObjectsStorePut(object *ZendObject) {
 	EG.GetObjectsStore().GetObjectBuckets()[handle] = object
 }
 func ZendObjectsStoreDel(object *ZendObject) {
-	assert(ZendGcRefcount(&object.gc) == 0)
+	r.Assert(ZendGcRefcount(&object.gc) == 0)
 
 	/* GC might have released this object already. */
 
@@ -284,8 +285,8 @@ func ZendObjectsStoreDel(object *ZendObject) {
 	if ZendGcRefcount(&object.gc) == 0 {
 		var handle uint32 = object.GetHandle()
 		var ptr any
-		assert(EG.GetObjectsStore().GetObjectBuckets() != nil)
-		assert((zend_uintptr_t(EG.GetObjectsStore().GetObjectBuckets()[handle]) & 1 << 0) == 0)
+		r.Assert(EG.GetObjectsStore().GetObjectBuckets() != nil)
+		r.Assert((zend_uintptr_t(EG.GetObjectsStore().GetObjectBuckets()[handle]) & 1 << 0) == 0)
 		EG.GetObjectsStore().GetObjectBuckets()[handle] = (*ZendObject)(zend_uintptr_t(object) | 1<<0)
 		if (ZvalGcFlags(object.GetGc().GetTypeInfo()) & 1 << 9) == 0 {
 			object.GetGc().SetTypeInfo(object.GetGc().GetTypeInfo() | 1<<9<<0)

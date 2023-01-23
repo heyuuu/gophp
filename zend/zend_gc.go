@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -273,7 +274,7 @@ func GcDecompress(ref *ZendRefcounted, idx uint32) *GcRootBuffer {
 	}
 	for true {
 		idx += 512 * 1024
-		assert(idx < GC_G.GetFirstUnused())
+		r.Assert(idx < GC_G.GetFirstUnused())
 		root = GC_G.GetBuf() + idx
 		if any(uintptr_t(root.GetRef()) & ^0x3) == ref {
 			return root
@@ -283,10 +284,10 @@ func GcDecompress(ref *ZendRefcounted, idx uint32) *GcRootBuffer {
 func GcFetchUnused() uint32 {
 	var idx uint32
 	var root *GcRootBuffer
-	assert(GC_G.GetUnused() != 0)
+	r.Assert(GC_G.GetUnused() != 0)
 	idx = GC_G.GetUnused()
 	root = GC_G.GetBuf() + idx
-	assert((uintptr_t(root.GetRef()) & 0x3) == 0x1)
+	r.Assert((uintptr_t(root.GetRef()) & 0x3) == 0x1)
 	GC_G.SetUnused(uint32(uintptr_t)(root.GetRef()) / g.SizeOf("void *"))
 	return idx
 }
@@ -296,7 +297,7 @@ func GcLinkUnused(root *GcRootBuffer) {
 }
 func GcFetchNextUnused() uint32 {
 	var idx uint32
-	assert(GC_G.GetFirstUnused() != GC_G.GetBufSize())
+	r.Assert(GC_G.GetFirstUnused() != GC_G.GetBufSize())
 	idx = GC_G.GetFirstUnused()
 	GC_G.SetFirstUnused(GC_G.GetFirstUnused() + 1)
 	return idx
@@ -421,8 +422,8 @@ func GcAdjustThreshold(count int) {
 func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 	var idx uint32
 	var newRoot *GcRootBuffer
-	assert(ZvalGcType(ref.GetGc().GetTypeInfo()) == 7 || ZvalGcType(ref.GetGc().GetTypeInfo()) == 8)
-	assert(ZvalGcInfo(ref.GetGc().GetTypeInfo()) == 0)
+	r.Assert(ZvalGcType(ref.GetGc().GetTypeInfo()) == 7 || ZvalGcType(ref.GetGc().GetTypeInfo()) == 8)
+	r.Assert(ZvalGcInfo(ref.GetGc().GetTypeInfo()) == 0)
 	if GC_G.GetGcEnabled() != 0 && GC_G.GetGcActive() == 0 {
 		ZendGcAddref(&ref.gc)
 		GcAdjustThreshold(GcCollectCycles())
@@ -464,8 +465,8 @@ func GcPossibleRoot(ref *ZendRefcounted) {
 		GcPossibleRootWhenFull(ref)
 		return
 	}
-	assert(ZvalGcType(ref.GetGc().GetTypeInfo()) == 7 || ZvalGcType(ref.GetGc().GetTypeInfo()) == 8)
-	assert(ZvalGcInfo(ref.GetGc().GetTypeInfo()) == 0)
+	r.Assert(ZvalGcType(ref.GetGc().GetTypeInfo()) == 7 || ZvalGcType(ref.GetGc().GetTypeInfo()) == 8)
+	r.Assert(ZvalGcInfo(ref.GetGc().GetTypeInfo()) == 0)
 	newRoot = GC_G.GetBuf() + idx
 	newRoot.SetRef(ref)
 	idx = GcCompress(idx)
@@ -490,7 +491,7 @@ func GcRemoveFromBuffer(ref *ZendRefcounted) {
 		GcRemoveCompressed(ref, idx)
 		return
 	}
-	assert(idx != 0)
+	r.Assert(idx != 0)
 	root = GC_G.GetBuf() + idx
 	GcRemoveFromRoots(root)
 }
@@ -1139,7 +1140,7 @@ func GcCollectRoots(flags *uint32, stack *GcStack) int {
 	for idx != end {
 		current = GC_G.GetBuf() + idx
 		ref = current.GetRef()
-		assert((uintptr_t(ref) & 0x3) == 0x0)
+		r.Assert((uintptr_t(ref) & 0x3) == 0x0)
 		current.SetRef(any(uintptr_t(ref) | 0x2))
 		if (ref.GetGc().GetTypeInfo() & 0x300000 << 10) == 0x100000<<10 {
 			ref.GetGc().SetTypeInfo(ref.GetGc().GetTypeInfo() &^ (0x300000 << 10))

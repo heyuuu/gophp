@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -543,7 +544,7 @@ func ZendUnwrapReference(op *Zval) {
 	if ZvalRefcountP(op) == 1 {
 		var _z *Zval = op
 		var ref *ZendReference
-		assert(_z.GetType() == 10)
+		r.Assert(_z.GetType() == 10)
 		ref = _z.GetValue().GetRef()
 		var _z1 *Zval = _z
 		var _z2 *Zval = &ref.val
@@ -1273,7 +1274,7 @@ try_again:
 
 func _tryConvertToString(op *Zval) ZendBool {
 	var str *ZendString
-	assert(op.GetType() != 6)
+	r.Assert(op.GetType() != 6)
 	str = ZvalTryGetStringFunc(op)
 	if str == nil {
 		return 0
@@ -3409,7 +3410,7 @@ func NumericCompareFunction(op1 *Zval, op2 *Zval) int {
 /* }}} */
 
 func ZendFreeObjGetResult(op *Zval) {
-	assert(op.GetTypeFlags() == 0 || ZvalRefcountP(op) != 0)
+	r.Assert(op.GetTypeFlags() == 0 || ZvalRefcountP(op) != 0)
 	ZvalPtrDtor(op)
 }
 
@@ -3734,7 +3735,7 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				__z.SetTypeInfo(4)
 				return SUCCESS
 			} else {
-				assert(false)
+				r.Assert(false)
 				ZendThrowError(nil, "Unsupported operand types")
 				if result != op1 {
 					result.SetTypeInfo(0)
@@ -3891,7 +3892,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 	var i uint32
 	if instance_ce.GetNumInterfaces() != 0 {
-		assert((instance_ce.GetCeFlags() & 1 << 20) != 0)
+		r.Assert((instance_ce.GetCeFlags() & 1 << 20) != 0)
 		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
 			if instance_ce.interfaces[i] == ce {
 				return 1
@@ -3905,10 +3906,10 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBo
 
 func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_interface ZendBool) ZendBool {
 	if is_interface != 0 {
-		assert((ce.GetCeFlags() & 1 << 0) != 0)
+		r.Assert((ce.GetCeFlags() & 1 << 0) != 0)
 		return InstanceofInterface(instance_ce, ce)
 	} else {
-		assert((ce.GetCeFlags() & 1 << 0) == 0)
+		r.Assert((ce.GetCeFlags() & 1 << 0) == 0)
 		return InstanceofClass(instance_ce, ce)
 	}
 }

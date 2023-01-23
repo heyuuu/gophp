@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -261,7 +262,7 @@ func zend_is_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecute
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -276,7 +277,7 @@ func zend_is_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecute
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -311,7 +312,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExe
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -326,7 +327,7 @@ func zend_is_not_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExe
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -361,7 +362,7 @@ func zend_is_smaller_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecu
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -376,7 +377,7 @@ func zend_is_smaller_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecu
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -411,7 +412,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -426,7 +427,7 @@ func zend_is_smaller_or_equal_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -518,7 +519,7 @@ func ZEND_ASSIGN_STATIC_PROP_OP_SPEC_HANDLER(execute_data *ZendExecuteData) int 
 	var prop_info *ZendPropertyInfo
 	var ref *ZendReference
 	if ZendFetchStaticPropertyAddress(&prop, &prop_info, (opline+1).GetExtendedValue(), 2, 0, opline, execute_data) != SUCCESS {
-		assert(EG.GetException() != nil)
+		r.Assert(EG.GetException() != nil)
 		if (opline.GetResultType() & (1<<2 | 1<<1)) != 0 {
 			(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(0)
 		}
@@ -608,7 +609,7 @@ func zend_fetch_static_prop_helper_SPEC(type_ int, execute_data *ZendExecuteData
 	var opline *ZendOp = execute_data.GetOpline()
 	var prop *Zval
 	if ZendFetchStaticPropertyAddress(&prop, nil, opline.GetExtendedValue() & ^3, type_, opline.GetExtendedValue()&3, opline, execute_data) != SUCCESS {
-		assert(EG.GetException() != nil || type_ == 3)
+		r.Assert(EG.GetException() != nil || type_ == 3)
 		prop = &EG.uninitialized_zval
 	}
 	if type_ == 0 || type_ == 3 {
@@ -1076,7 +1077,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteD
 		return 1
 	} else {
 		var retval Zval
-		assert(fbc.GetType() == 1)
+		r.Assert(fbc.GetType() == 1)
 		if (fbc.GetFnFlags() & 1 << 11) != 0 {
 			ZendDeprecatedFunction(fbc)
 			if EG.GetException() != nil {
@@ -1132,7 +1133,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(execute_data *ZendExecuteDat
 		return 1
 	} else {
 		var retval Zval
-		assert(fbc.GetType() == 1)
+		r.Assert(fbc.GetType() == 1)
 		if (fbc.GetFnFlags() & 1 << 11) != 0 {
 			ZendDeprecatedFunction(fbc)
 			if EG.GetException() != nil {
@@ -1862,7 +1863,7 @@ func zend_case_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecuteData
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -1877,7 +1878,7 @@ func zend_case_helper_SPEC(op_1 *Zval, op_2 *Zval, execute_data *ZendExecuteData
 			return 0
 		}
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -2004,7 +2005,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		if ce == nil {
 			ce = ZendFetchClassByName((*Zval)((*byte)(opline)+int32(opline.GetOp2()).constant).GetValue().GetStr(), ((*Zval)((*byte)(opline)+int32(opline.GetOp2()).constant) + 1).GetValue().GetStr(), 0|0x200)
 			if ce == nil {
-				assert(EG.GetException() != nil)
+				r.Assert(EG.GetException() != nil)
 				if (opline.GetOp1Type() & (1<<1 | 1<<2)) != 0 {
 					ZvalPtrDtorNogc((*Zval)((*byte)(execute_data) + int(opline.GetOp1().GetVar())))
 				}
@@ -2014,7 +2015,7 @@ func ZEND_UNSET_STATIC_PROP_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	} else if opline.GetOp2Type() == 0 {
 		ce = ZendFetchClass(nil, opline.GetOp2().GetNum())
 		if ce == nil {
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			if (opline.GetOp1Type() & (1<<1 | 1<<2)) != 0 {
 				ZvalPtrDtorNogc((*Zval)((*byte)(execute_data) + int(opline.GetOp1().GetVar())))
 			}
@@ -2113,7 +2114,7 @@ func ZEND_EXIT_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	}
 	_zendBailout(__FILE__, __LINE__)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2147,7 +2148,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 			break
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2158,7 +2159,7 @@ func ZEND_EXT_STMT_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		execute_data.SetOpline(execute_data.GetOpline() + 1)
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2169,7 +2170,7 @@ func ZEND_EXT_FCALL_BEGIN_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		execute_data.SetOpline(execute_data.GetOpline() + 1)
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2180,7 +2181,7 @@ func ZEND_EXT_FCALL_END_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		execute_data.SetOpline(execute_data.GetOpline() + 1)
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2194,7 +2195,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		zv = ZendHashFindEx(EG.GetClassTable(), rtd_key, 1)
 		if zv == nil {
 			for {
-				assert((execute_data.GetFunc().GetOpArray().GetFnFlags() & 1 << 10) != 0)
+				r.Assert((execute_data.GetFunc().GetOpArray().GetFnFlags() & 1 << 10) != 0)
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(execute_data.GetFunc().GetOpArray().GetFilename()) == SUCCESS {
 					zv = ZendHashFindEx(EG.GetClassTable(), rtd_key, 1)
 					if zv != nil {
@@ -2205,7 +2206,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 				break
 			}
 		}
-		assert(zv != nil)
+		r.Assert(zv != nil)
 		ce = zv.GetValue().GetCe()
 		if (ce.GetCeFlags() & 1 << 3) == 0 {
 			if ZendDoLinkClass(ce, g.CondF1(opline.GetOp2Type() == 1<<0, func() *ZendString {
@@ -2217,7 +2218,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		(*any)((*byte)(execute_data.GetRunTimeCache() + opline.GetExtendedValue()))[0] = ce
 	}
 	(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).GetValue().SetCe(ce)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2237,19 +2238,19 @@ func ZEND_TICKS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 			return 0
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
 func ZEND_EXT_NOP_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = execute_data.GetOpline()
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
 func ZEND_NOP_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = execute_data.GetOpline()
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2501,7 +2502,7 @@ func ZEND_ASSERT_CHECK_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		return 0
 	} else {
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -2522,7 +2523,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 			var __fill_ht *HashTable = args
 			var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			assert((__fill_ht.GetUFlags() & 1 << 2) != 0)
+			r.Assert((__fill_ht.GetUFlags() & 1 << 2) != 0)
 			for {
 				var _z1 *Zval = &__fill_bkt.val
 				var _z2 *Zval = p
@@ -2554,7 +2555,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	} else {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCall())
 	}
-	assert(ZendVmCalcUsedStack(2, call.GetFunc()) <= size_t((*byte)(EG.GetVmStackEnd())-(*byte)(call)))
+	r.Assert(ZendVmCalcUsedStack(2, call.GetFunc()) <= size_t((*byte)(EG.GetVmStackEnd())-(*byte)(call)))
 	call.GetThis().SetNumArgs(2)
 	var __z *Zval = (*Zval)(call) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(1)-1))
 	var __s *ZendString = fbc.GetFunctionName()
@@ -2597,7 +2598,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	} else {
 		var retval Zval
-		assert(fbc.GetType() == 1)
+		r.Assert(fbc.GetType() == 1)
 		EG.SetCurrentExecuteData(call)
 		if (fbc.GetFnFlags()&1<<8) != 0 && ZendVerifyInternalArgTypes(fbc, call) == 0 {
 			ZendVmStackFreeCallFrame(call)
@@ -2683,7 +2684,7 @@ func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) i
 	call = ZendVmStackPushCallFrame(0<<16|0<<17, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2763,7 +2764,7 @@ func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(execute_data *ZendExecuteData
 	call = ZendVmStackPushCallFrame(0<<16|0<<17, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2791,7 +2792,7 @@ func ZEND_INIT_FCALL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	call = ZendVmStackPushCallFrameEx(opline.GetOp1().GetNum(), 0<<16|0<<17, fbc, opline.GetExtendedValue(), nil)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2867,7 +2868,7 @@ func ZEND_RECV_INIT_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	}
 	execute_data.SetOpline(opline)
 	return 0
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2934,7 +2935,7 @@ func ZEND_RECV_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			return 0
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -2955,7 +2956,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			var __fill_ht *HashTable = params.GetValue().GetArr()
 			var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			assert((__fill_ht.GetUFlags() & 1 << 2) != 0)
+			r.Assert((__fill_ht.GetUFlags() & 1 << 2) != 0)
 			param = (*Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(execute_data.GetFunc().GetOpArray().GetLastVar()+execute_data.GetFunc().GetOpArray().GetT()))
 			if (execute_data.GetFunc().GetOpArray().GetFnFlags() & 1 << 8) != 0 {
 				execute_data.GetThis().SetTypeInfo(execute_data.GetThis().GetTypeInfo() | 1<<19)
@@ -3071,7 +3072,7 @@ func ZEND_BW_NOT_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(^(op1.GetValue().GetLval()))
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -3108,7 +3109,7 @@ func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		execute_data.SetOpline(execute_data.GetOpline() + 1)
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -3138,7 +3139,7 @@ func ZEND_JMPZ_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var val *Zval
 	val = (*Zval)((*byte)(opline) + int32(opline.GetOp1()).constant)
 	if val.GetTypeInfo() == 3 {
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else if val.GetTypeInfo() <= 3 {
@@ -3187,7 +3188,7 @@ func ZEND_JMPNZ_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				return 0
 			}
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -3250,7 +3251,7 @@ func ZEND_JMPZ_EX_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	val = (*Zval)((*byte)(opline) + int32(opline.GetOp1()).constant)
 	if val.GetTypeInfo() == 3 {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else if val.GetTypeInfo() <= 3 {
@@ -3305,7 +3306,7 @@ func ZEND_JMPNZ_EX_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			execute_data.SetOpline(execute_data.GetOpline() + 1)
 			return 0
 		} else {
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -3464,7 +3465,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		retval_ptr = nil
 		if 1<<0 == 1<<2 {
-			assert(retval_ptr != &EG.uninitialized_zval)
+			r.Assert(retval_ptr != &EG.uninitialized_zval)
 			if opline.GetExtendedValue() == 1<<0 && retval_ptr.GetType() != 10 {
 				ZendError(1<<3, "Only variable references should be returned by reference")
 				if execute_data.GetReturnValue() != nil {
@@ -3687,7 +3688,7 @@ func ZEND_SEND_VAL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZvalAddrefP(arg)
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -3713,7 +3714,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZvalAddrefP(arg)
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -3738,7 +3739,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER(execute_data *ZendExecuteData) in
 			ZvalAddrefP(arg)
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -3789,7 +3790,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		execute_data.SetOpline(execute_data.GetOpline() + 1)
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4042,7 +4043,7 @@ func ZEND_INCLUDE_OR_EVAL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int 
 	} else if opline.GetResultType() != 0 {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4063,7 +4064,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZvalAddrefP(array_ptr)
 		}
 		result.SetFePos(0)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else if 1<<0 != 1<<0 && array_ptr.GetType() == 8 {
@@ -4112,7 +4113,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				}
 				return 0
 			} else {
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -4207,7 +4208,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		if 1<<0 == 1<<2 {
 
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else if 1<<0 != 1<<0 && array_ptr.GetType() == 8 {
@@ -4281,7 +4282,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				}
 				return 0
 			} else {
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -4351,7 +4352,7 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4397,7 +4398,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		return 0
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4464,7 +4465,7 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4536,7 +4537,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						ZendGcAddref(&_gc.gc)
 					}
 				}
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -4603,7 +4604,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(value.GetValue().GetStr().GetLen())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -4614,7 +4615,7 @@ func ZEND_STRLEN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 				__z.GetValue().SetLval(value.GetValue().GetStr().GetLen())
 				__z.SetTypeInfo(4)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -4746,7 +4747,7 @@ func ZEND_TYPE_CHECK_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		} else {
 			(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -4769,7 +4770,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				return 0
 			}
 			(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if EG.GetZendConstants().GetNNumOfElements() == uintptr_t(c)>>1 {
@@ -4785,7 +4786,7 @@ func ZEND_DEFINED_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				return 0
 			}
 			(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -4804,7 +4805,7 @@ func ZEND_QM_ASSIGN_LONG_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 	__z.GetValue().SetLval(value.GetValue().GetLval())
 	__z.SetTypeInfo(4)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4815,7 +4816,7 @@ func ZEND_QM_ASSIGN_DOUBLE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int
 	var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 	__z.GetValue().SetDval(value.GetValue().GetDval())
 	__z.SetTypeInfo(5)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4829,7 +4830,7 @@ func ZEND_QM_ASSIGN_NOREF_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int 
 	var _t uint32 = _z2.GetTypeInfo()
 	_z1.GetValue().SetCounted(_gc)
 	_z1.SetTypeInfo(_t)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4845,7 +4846,7 @@ func ZEND_SEND_VAL_SIMPLE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int 
 	var _t uint32 = _z2.GetTypeInfo()
 	_z1.GetValue().SetCounted(_gc)
 	_z1.SetTypeInfo(_t)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4865,7 +4866,7 @@ func ZEND_SEND_VAL_EX_SIMPLE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) i
 	var _t uint32 = _z2.GetTypeInfo()
 	_z1.GetValue().SetCounted(_gc)
 	_z1.SetTypeInfo(_t)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -4884,7 +4885,7 @@ func ZEND_ADD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		if op2.GetTypeInfo() == 4 {
 			result = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 			FastLongAddFunction(result, op1, op2)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 5 {
@@ -4901,7 +4902,7 @@ func ZEND_ADD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			var __z *Zval = result
 			__z.GetValue().SetDval(d1 + d2)
 			__z.SetTypeInfo(5)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 4 {
@@ -4927,7 +4928,7 @@ func ZEND_SUB_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		if op2.GetTypeInfo() == 4 {
 			result = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 			FastLongSubFunction(result, op1, op2)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 5 {
@@ -4944,7 +4945,7 @@ func ZEND_SUB_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			var __z *Zval = result
 			__z.GetValue().SetDval(d1 - d2)
 			__z.SetTypeInfo(5)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 4 {
@@ -4983,7 +4984,7 @@ func ZEND_MUL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			} else {
 				result.SetTypeInfo(4)
 			}
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 5 {
@@ -5000,7 +5001,7 @@ func ZEND_MUL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			var __z *Zval = result
 			__z.GetValue().SetDval(d1 * d2)
 			__z.SetTypeInfo(5)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 4 {
@@ -5047,7 +5048,7 @@ func ZEND_MOD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				__z.GetValue().SetLval(op1.GetValue().GetLval() % op2.GetValue().GetLval())
 				__z.SetTypeInfo(4)
 			}
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -5069,7 +5070,7 @@ func ZEND_SL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(zend_long(zend_ulong(*op1).value.lval << op2.GetValue().GetLval()))
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -5087,7 +5088,7 @@ func ZEND_SR_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(op1.GetValue().GetLval() >> op2.GetValue().GetLval())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -5216,7 +5217,7 @@ func ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -5232,7 +5233,7 @@ func ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -5299,7 +5300,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) i
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -5315,7 +5316,7 @@ func ZEND_IS_NOT_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) i
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -5382,7 +5383,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -5398,7 +5399,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -5450,7 +5451,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecute
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -5466,7 +5467,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecute
 					return 0
 				}
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -5515,7 +5516,7 @@ func ZEND_BW_OR_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(op1.GetValue().GetLval() | op2.GetValue().GetLval())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -5533,7 +5534,7 @@ func ZEND_BW_AND_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(op1.GetValue().GetLval() & op2.GetValue().GetLval())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -5551,7 +5552,7 @@ func ZEND_BW_XOR_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(op1.GetValue().GetLval() ^ op2.GetValue().GetLval())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -5699,7 +5700,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 						var _t uint32 = _z2.GetTypeInfo()
 						_z1.GetValue().SetCounted(_gc)
 						_z1.SetTypeInfo(_t)
-						assert(EG.GetException() == nil)
+						r.Assert(EG.GetException() == nil)
 						execute_data.SetOpline(opline + 1)
 						return 0
 					}
@@ -5818,7 +5819,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) i
 						var _t uint32 = _z2.GetTypeInfo()
 						_z1.GetValue().SetCounted(_gc)
 						_z1.SetTypeInfo(_t)
-						assert(EG.GetException() == nil)
+						r.Assert(EG.GetException() == nil)
 						execute_data.SetOpline(opline + 1)
 						return 0
 					}
@@ -5987,7 +5988,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 				ZendStringReleaseEx(op2_str, 0)
 			}
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -6199,7 +6200,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDat
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), obj)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -6218,7 +6219,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExe
 		if ce == nil {
 			ce = ZendFetchClassByName((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant).GetValue().GetStr(), ((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant) + 1).GetValue().GetStr(), 0|0x200)
 			if ce == nil {
-				assert(EG.GetException() != nil)
+				r.Assert(EG.GetException() != nil)
 				return 0
 			}
 			if 1<<0 != 1<<0 {
@@ -6228,7 +6229,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExe
 	} else if 1<<0 == 0 {
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			return 0
 		}
 	} else {
@@ -6328,7 +6329,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExe
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), ce)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -6398,7 +6399,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData)
 	call = ZendVmStackPushCallFrame(call_info, func_, opline.GetExtendedValue(), object_or_called_scope)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -6419,7 +6420,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecut
 			} else {
 				ce = ZendFetchClassByName((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant).GetValue().GetStr(), ((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant) + 1).GetValue().GetStr(), 0|0x200)
 				if ce == nil {
-					assert(EG.GetException() != nil)
+					r.Assert(EG.GetException() != nil)
 					(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(0)
 					return 0
 				}
@@ -6428,7 +6429,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecut
 			if 1<<0 == 0 {
 				ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 				if ce == nil {
-					assert(EG.GetException() != nil)
+					r.Assert(EG.GetException() != nil)
 					(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(0)
 					return 0
 				}
@@ -6480,7 +6481,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecut
 			ZvalCopyCtorFunc(_z1)
 		}
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -6618,7 +6619,7 @@ func ZEND_INIT_ARRAY_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int
 		var __z *Zval = array
 		__z.GetValue().SetArr(__arr)
 		__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -6700,7 +6701,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 				} else {
 					(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 				}
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -6904,7 +6905,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 		}
 		(*any)((*byte)(execute_data.GetRunTimeCache() + opline.GetExtendedValue()))[0] = ce
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -6987,7 +6988,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 
 				for {
 					if 1<<0 == 1<<2 {
-						assert(value_ptr != &EG.uninitialized_zval)
+						r.Assert(value_ptr != &EG.uninitialized_zval)
 						if opline.GetExtendedValue() == 1<<0 && value_ptr.GetType() != 10 {
 							ZendError(1<<3, "Only variable references should be yielded by reference")
 							var _z1 *Zval = &generator.value
@@ -7187,7 +7188,7 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 
 			/* Wrong type, fall back to ZEND_CASE chain */
 
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -7222,7 +7223,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) 
 
 			/* Wrong type, fall back to ZEND_CASE chain */
 
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else {
@@ -7233,7 +7234,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) 
 
 				/* Wrong type, fall back to ZEND_CASE chain */
 
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7359,7 +7360,7 @@ func ZEND_ADD_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 		if op2.GetTypeInfo() == 4 {
 			result = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 			FastLongAddFunction(result, op1, op2)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 5 {
@@ -7376,7 +7377,7 @@ func ZEND_ADD_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 			var __z *Zval = result
 			__z.GetValue().SetDval(d1 + d2)
 			__z.SetTypeInfo(5)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 4 {
@@ -7402,7 +7403,7 @@ func ZEND_SUB_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 		if op2.GetTypeInfo() == 4 {
 			result = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 			FastLongSubFunction(result, op1, op2)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 5 {
@@ -7419,7 +7420,7 @@ func ZEND_SUB_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 			var __z *Zval = result
 			__z.GetValue().SetDval(d1 - d2)
 			__z.SetTypeInfo(5)
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		} else if op2.GetTypeInfo() == 4 {
@@ -7456,7 +7457,7 @@ func ZEND_MOD_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 				__z.GetValue().SetLval(op1.GetValue().GetLval() % op2.GetValue().GetLval())
 				__z.SetTypeInfo(4)
 			}
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -7478,7 +7479,7 @@ func ZEND_SL_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(zend_long(zend_ulong(*op1).value.lval << op2.GetValue().GetLval()))
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -7496,7 +7497,7 @@ func ZEND_SR_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
 		var __z *Zval = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 		__z.GetValue().SetLval(op1.GetValue().GetLval() >> op2.GetValue().GetLval())
 		__z.SetTypeInfo(4)
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -7517,13 +7518,13 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) 
 			if op1.GetValue().GetLval() < op2.GetValue().GetLval() {
 			is_smaller_true:
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
 			is_smaller_false:
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7567,7 +7568,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteD
 				execute_data.SetOpline(opline + 2)
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -7578,7 +7579,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteD
 				}
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7625,7 +7626,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecute
 				}
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -7633,7 +7634,7 @@ func ZEND_IS_SMALLER_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecute
 				execute_data.SetOpline(opline + 2)
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7675,13 +7676,13 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExec
 			if op1.GetValue().GetLval() <= op2.GetValue().GetLval() {
 			is_smaller_or_equal_true:
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
 			is_smaller_or_equal_false:
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7725,7 +7726,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *Zen
 				execute_data.SetOpline(opline + 2)
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -7736,7 +7737,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *Zen
 				}
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7783,7 +7784,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *Ze
 				}
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(3)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			} else {
@@ -7791,7 +7792,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *Ze
 				execute_data.SetOpline(opline + 2)
 				return 0
 				(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
-				assert(EG.GetException() == nil)
+				r.Assert(EG.GetException() == nil)
 				execute_data.SetOpline(opline + 1)
 				return 0
 			}
@@ -7829,7 +7830,7 @@ func ZEND_SUB_LONG_NO_OVERFLOW_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExe
 	var __z *Zval = result
 	__z.GetValue().SetLval(op1.GetValue().GetLval() - op2.GetValue().GetLval())
 	__z.SetTypeInfo(4)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7842,7 +7843,7 @@ func ZEND_SUB_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) in
 	op2 = (*Zval)((*byte)(execute_data) + int(opline.GetOp2().GetVar()))
 	result = (*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar()))
 	FastLongSubFunction(result, op1, op2)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7857,7 +7858,7 @@ func ZEND_SUB_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) 
 	var __z *Zval = result
 	__z.GetValue().SetDval(op1.GetValue().GetDval() - op2.GetValue().GetDval())
 	__z.SetTypeInfo(5)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7874,7 +7875,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteD
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7901,7 +7902,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExe
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7928,7 +7929,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendEx
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7945,7 +7946,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecut
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7972,7 +7973,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendE
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -7999,7 +8000,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *Zend
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8016,7 +8017,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *Zen
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8043,7 +8044,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8070,7 +8071,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_dat
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8087,7 +8088,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *Z
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8114,7 +8115,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_da
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8141,7 +8142,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_d
 	} else {
 		(*Zval)((*byte)(execute_data) + int(opline.GetResult().GetVar())).SetTypeInfo(2)
 	}
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -8198,7 +8199,7 @@ func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecut
 			execute_data.SetOpline(execute_data.GetOpline() + 1)
 			return 0
 		} else {
-			assert(EG.GetException() == nil)
+			r.Assert(EG.GetException() == nil)
 			execute_data.SetOpline(opline + 1)
 			return 0
 		}
@@ -8333,7 +8334,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZendStringReleaseEx(op2_str, 0)
 			}
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	} else {
@@ -8498,7 +8499,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 						var _t uint32 = _z2.GetTypeInfo()
 						_z1.GetValue().SetCounted(_gc)
 						_z1.SetTypeInfo(_t)
-						assert(EG.GetException() == nil)
+						r.Assert(EG.GetException() == nil)
 						execute_data.SetOpline(opline + 1)
 						return 0
 					}
@@ -8619,7 +8620,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 						var _t uint32 = _z2.GetTypeInfo()
 						_z1.GetValue().SetCounted(_gc)
 						_z1.SetTypeInfo(_t)
-						assert(EG.GetException() == nil)
+						r.Assert(EG.GetException() == nil)
 						execute_data.SetOpline(opline + 1)
 						return 0
 					}
@@ -8795,7 +8796,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 				ZendStringReleaseEx(op2_str, 0)
 			}
 		}
-		assert(EG.GetException() == nil)
+		r.Assert(EG.GetException() == nil)
 		execute_data.SetOpline(opline + 1)
 		return 0
 	}
@@ -9012,7 +9013,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteDa
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), obj)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -9031,7 +9032,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendEx
 		if ce == nil {
 			ce = ZendFetchClassByName((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant).GetValue().GetStr(), ((*Zval)((*byte)(opline)+int32(opline.GetOp1()).constant) + 1).GetValue().GetStr(), 0|0x200)
 			if ce == nil {
-				assert(EG.GetException() != nil)
+				r.Assert(EG.GetException() != nil)
 				ZvalPtrDtorNogc((*Zval)((*byte)(execute_data) + int(opline.GetOp2().GetVar())))
 				return 0
 			}
@@ -9042,7 +9043,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendEx
 	} else if 1<<0 == 0 {
 		ce = ZendFetchClass(nil, opline.GetOp1().GetNum())
 		if ce == nil {
-			assert(EG.GetException() != nil)
+			r.Assert(EG.GetException() != nil)
 			ZvalPtrDtorNogc((*Zval)((*byte)(execute_data) + int(opline.GetOp2().GetVar())))
 			return 0
 		}
@@ -9146,7 +9147,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendEx
 	call = ZendVmStackPushCallFrame(call_info, fbc, opline.GetExtendedValue(), ce)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }
@@ -9220,7 +9221,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData
 	call = ZendVmStackPushCallFrame(call_info, func_, opline.GetExtendedValue(), object_or_called_scope)
 	call.SetPrevExecuteData(execute_data.GetCall())
 	execute_data.SetCall(call)
-	assert(EG.GetException() == nil)
+	r.Assert(EG.GetException() == nil)
 	execute_data.SetOpline(opline + 1)
 	return 0
 }

@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -954,7 +955,7 @@ func ZendHashRealInitMixedEx(ht *HashTable) {
 	memset(&(*uint32)(ht.GetArData())[int32(ht.GetNTableMask())], uint32-1, (size_t(uint32)-int32(ht.GetNTableMask()))*g.SizeOf("uint32_t"))
 }
 func ZendHashRealInitEx(ht *HashTable, packed int) {
-	assert((ht.GetUFlags() & 1 << 3) != 0)
+	r.Assert((ht.GetUFlags() & 1 << 3) != 0)
 	if packed != 0 {
 		ZendHashRealInitPackedEx(ht)
 	} else {
@@ -1079,7 +1080,7 @@ func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 		ZendHashRealInit(ht, packed)
 	} else {
 		if packed != 0 {
-			assert((ht.GetUFlags() & 1 << 2) != 0)
+			r.Assert((ht.GetUFlags() & 1 << 2) != 0)
 			if nSize > ht.GetNTableSize() {
 				ht.SetNTableSize(ZendHashCheckSize(nSize))
 				ht.SetArData((*Bucket)((*byte)(g.CondF((ZvalGcFlags(ht.GetGc().GetTypeInfo())&1<<7) != 0, func() any {
@@ -1089,7 +1090,7 @@ func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 				})) + (size_t(uint32)-int32(ht.GetNTableMask()))*g.SizeOf("uint32_t")))
 			}
 		} else {
-			assert((ht.GetUFlags() & 1 << 2) == 0)
+			r.Assert((ht.GetUFlags() & 1 << 2) == 0)
 			if nSize > ht.GetNTableSize() {
 				var new_data any
 				var old_data any = (*byte)(ht.GetArData() - (size_t(uint32)-int32(ht.GetNTableMask()))*g.SizeOf("uint32_t"))
@@ -1222,7 +1223,7 @@ func ZendHashIteratorAdd(ht *HashTable, pos HashPosition) uint32 {
 }
 func ZendHashIteratorPos(idx uint32, ht *HashTable) HashPosition {
 	var iter *HashTableIterator = EG.GetHtIterators() + idx
-	assert(idx != uint32-1)
+	r.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != (*HashTable)(intptr_t-1) && iter.GetHt().GetNIteratorsCount() != 0xff {
 			iter.GetHt().SetNIteratorsCount(iter.GetHt().GetNIteratorsCount() - 1)
@@ -1238,7 +1239,7 @@ func ZendHashIteratorPos(idx uint32, ht *HashTable) HashPosition {
 func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 	var ht *HashTable = array.GetValue().GetArr()
 	var iter *HashTableIterator = EG.GetHtIterators() + idx
-	assert(idx != uint32-1)
+	r.Assert(idx != uint32-1)
 	if iter.GetHt() != ht {
 		if iter.GetHt() != nil && iter.GetHt() != (*HashTable)(intptr_t-1) && ht.GetNIteratorsCount() != 0xff {
 			iter.GetHt().SetNIteratorsCount(iter.GetHt().GetNIteratorsCount() - 1)
@@ -1265,9 +1266,9 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 }
 func ZendHashIteratorDel(idx uint32) {
 	var iter *HashTableIterator = EG.GetHtIterators() + idx
-	assert(idx != uint32-1)
+	r.Assert(idx != uint32-1)
 	if iter.GetHt() != nil && iter.GetHt() != (*HashTable)(intptr_t-1) && iter.GetHt().GetNIteratorsCount() != 0xff {
-		assert(iter.GetHt().GetNIteratorsCount() != 0)
+		r.Assert(iter.GetHt().GetNIteratorsCount() != 0)
 		iter.GetHt().SetNIteratorsCount(iter.GetHt().GetNIteratorsCount() - 1)
 	}
 	iter.SetHt(nil)
@@ -1371,7 +1372,7 @@ func ZendHashStrFindBucket(ht *HashTable, str *byte, len_ int, h ZendUlong) *Buc
 	nIndex = h | ht.GetNTableMask()
 	idx = (*uint32)(arData)[int32(nIndex)]
 	for idx != uint32-1 {
-		assert(idx < ht.GetNTableSize())
+		r.Assert(idx < ht.GetNTableSize())
 		p = arData + idx
 		if p.GetH() == h && p.GetKey() != nil && p.GetKey().GetLen() == len_ && !(memcmp(p.GetKey().GetVal(), str, len_)) {
 			return p
@@ -1389,7 +1390,7 @@ func ZendHashIndexFindBucket(ht *HashTable, h ZendUlong) *Bucket {
 	nIndex = h | ht.GetNTableMask()
 	idx = (*uint32)(arData)[int32(nIndex)]
 	for idx != uint32-1 {
-		assert(idx < ht.GetNTableSize())
+		r.Assert(idx < ht.GetNTableSize())
 		p = arData + idx
 		if p.GetH() == h && p.GetKey() == nil {
 			return p
@@ -1425,12 +1426,12 @@ func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uin
 		p = ZendHashFindBucket(ht, key, 0)
 		if p != nil {
 			var data *Zval
-			assert((flag & 1 << 3) == 0)
+			r.Assert((flag & 1 << 3) == 0)
 			if (flag & 1 << 1) != 0 {
 				if (flag & 1 << 2) == 0 {
 					return nil
 				}
-				assert(&p.val != pData)
+				r.Assert(&p.val != pData)
 				data = &p.val
 				if data.GetType() == 13 {
 					data = data.GetValue().GetZv()
@@ -1441,7 +1442,7 @@ func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uin
 					return nil
 				}
 			} else {
-				assert(&p.val != pData)
+				r.Assert(&p.val != pData)
 				data = &p.val
 				if (flag&1<<2) != 0 && data.GetType() == 13 {
 					data = data.GetValue().GetZv()
@@ -1510,7 +1511,7 @@ func _zendHashStrAddOrUpdateI(ht *HashTable, str *byte, len_ int, h ZendUlong, p
 				if (flag & 1 << 2) == 0 {
 					return nil
 				}
-				assert(&p.val != pData)
+				r.Assert(&p.val != pData)
 				data = &p.val
 				if data.GetType() == 13 {
 					data = data.GetValue().GetZv()
@@ -1521,7 +1522,7 @@ func _zendHashStrAddOrUpdateI(ht *HashTable, str *byte, len_ int, h ZendUlong, p
 					return nil
 				}
 			} else {
-				assert(&p.val != pData)
+				r.Assert(&p.val != pData)
 				data = &p.val
 				if (flag&1<<2) != 0 && data.GetType() == 13 {
 					data = data.GetValue().GetZv()
@@ -1571,7 +1572,7 @@ func ZendHashAddOrUpdate(ht *HashTable, key *ZendString, pData *Zval, flag uint3
 	} else if flag == 1<<0 {
 		return ZendHashUpdate(ht, key, pData)
 	} else {
-		assert(flag == (1<<0 | 1<<2))
+		r.Assert(flag == (1<<0 | 1<<2))
 		return ZendHashUpdateInd(ht, key, pData)
 	}
 }
@@ -1595,7 +1596,7 @@ func ZendHashStrAddOrUpdate(ht *HashTable, str *byte, len_ int, pData *Zval, fla
 	} else if flag == 1<<0 {
 		return ZendHashStrUpdate(ht, str, len_, pData)
 	} else {
-		assert(flag == (1<<0 | 1<<2))
+		r.Assert(flag == (1<<0 | 1<<2))
 		return ZendHashStrUpdateInd(ht, str, len_, pData)
 	}
 }
@@ -1693,7 +1694,7 @@ func _zendHashIndexAddOrUpdateI(ht *HashTable, h ZendUlong, pData *Zval, flag ui
 		if (flag & 1 << 3) == 0 {
 			p = ZendHashIndexFindBucket(ht, h)
 			if p != nil {
-				assert((flag & 1 << 3) == 0)
+				r.Assert((flag & 1 << 3) == 0)
 				goto replace
 			}
 		}
@@ -1732,13 +1733,13 @@ func ZendHashIndexAddOrUpdate(ht *HashTable, h ZendUlong, pData *Zval, flag uint
 	} else if flag == (1<<1 | 1<<3) {
 		return ZendHashIndexAddNew(ht, h, pData)
 	} else if flag == (1<<1 | 1<<4) {
-		assert(h == ht.GetNNextFreeElement())
+		r.Assert(h == ht.GetNNextFreeElement())
 		return ZendHashNextIndexInsert(ht, pData)
 	} else if flag == (1<<1 | 1<<3 | 1<<4) {
-		assert(h == ht.GetNNextFreeElement())
+		r.Assert(h == ht.GetNNextFreeElement())
 		return ZendHashNextIndexInsertNew(ht, pData)
 	} else {
-		assert(flag == 1<<0)
+		r.Assert(flag == 1<<0)
 		return ZendHashIndexUpdate(ht, h, pData)
 	}
 }
@@ -1763,7 +1764,7 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var i uint32
 	var p *Bucket
 	var arData *Bucket
-	assert((ht.GetUFlags() & 1 << 2) == 0)
+	r.Assert((ht.GetUFlags() & 1 << 2) == 0)
 	p = ZendHashFindBucket(ht, key, 0)
 	if p != nil {
 		if p == b {
@@ -3191,7 +3192,7 @@ func ZendHashCompareImpl(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, or
 		}
 		if ordered != 0 {
 			for true {
-				assert(idx2 != ht2.GetNNumUsed())
+				r.Assert(idx2 != ht2.GetNNumUsed())
 				p2 = ht2.GetArData() + idx2
 				if p2.GetVal().GetType() != 0 {
 					break

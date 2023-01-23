@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -746,7 +747,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	if EG.GetException() != nil {
 		return FAILURE
 	}
-	assert(fci.GetSize() == g.SizeOf("zend_fcall_info"))
+	r.Assert(fci.GetSize() == g.SizeOf("zend_fcall_info"))
 
 	/* Initialize execute_data */
 

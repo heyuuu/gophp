@@ -50,7 +50,7 @@ func _phpStreamMmapUnmap(stream *core.PhpStream) int {
 }
 func _phpStreamMmapUnmapEx(stream *core.PhpStream, readden zend.ZendOffT) int {
 	var ret int = 1
-	if _phpStreamSeek(stream, readden, SEEK_CUR) != 0 {
+	if _phpStreamSeek(stream, readden, 1) != 0 {
 		ret = 0
 	}
 	if _phpStreamMmapUnmap(stream) == 0 {

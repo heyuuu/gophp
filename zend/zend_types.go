@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	r "sik/runtime"
+)
+
 // Source: <Zend/zend_types.h>
 
 /*
@@ -753,7 +757,7 @@ func ZendGcAddref(p *ZendRefcountedH) uint32 {
 	return p.GetRefcount()
 }
 func ZendGcDelref(p *ZendRefcountedH) uint32 {
-	assert(p.GetRefcount() > 0)
+	r.Assert(p.GetRefcount() > 0)
 
 	p.GetRefcount()--
 	return p.GetRefcount()
@@ -770,15 +774,15 @@ func ZvalRefcountP(pz *Zval) uint32 {
 	return ZendGcRefcount(&(pz.GetValue().GetCounted()).gc)
 }
 func ZvalSetRefcountP(pz *Zval, rc uint32) uint32 {
-	assert(pz.GetTypeFlags() != 0)
+	r.Assert(pz.GetTypeFlags() != 0)
 	return ZendGcSetRefcount(&(pz.GetValue().GetCounted()).gc, rc)
 }
 func ZvalAddrefP(pz *Zval) uint32 {
-	assert(pz.GetTypeFlags() != 0)
+	r.Assert(pz.GetTypeFlags() != 0)
 	return ZendGcAddref(&(pz.GetValue().GetCounted()).gc)
 }
 func ZvalDelrefP(pz *Zval) uint32 {
-	assert(pz.GetTypeFlags() != 0)
+	r.Assert(pz.GetTypeFlags() != 0)
 	return ZendGcDelref(&(pz.GetValue().GetCounted()).gc)
 }
 

@@ -3,6 +3,7 @@
 package core
 
 import (
+	r "sik/runtime"
 	"sik/zend"
 )
 
@@ -223,8 +224,8 @@ func PhpOpenTemporaryFdEx(dir *byte, pfx *byte, opened_path_p **zend.ZendString,
 func PhpOpenTemporaryFd(dir *byte, pfx string, opened_path_p **zend.ZendString) int {
 	return PhpOpenTemporaryFdEx(dir, pfx, opened_path_p, 0)
 }
-func PhpOpenTemporaryFile(dir *byte, pfx *byte, opened_path_p **zend.ZendString) *FILE {
-	var fp *FILE
+func PhpOpenTemporaryFile(dir *byte, pfx *byte, opened_path_p **zend.ZendString) *r.FILE {
+	var fp *r.FILE
 	var fd int = PhpOpenTemporaryFd(dir, pfx, opened_path_p)
 	if fd == -1 {
 		return nil

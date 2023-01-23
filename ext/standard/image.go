@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -98,7 +99,7 @@ func ZmStartupImagetypes(type_ int, module_number int) int {
 func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
-	if streams._phpStreamSeek(stream, 3, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 3, 1) != 0 {
 		return nil
 	}
 	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
@@ -121,7 +122,7 @@ func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 func PhpHandlePsd(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
-	if streams._phpStreamSeek(stream, 11, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 11, 1) != 0 {
 		return nil
 	}
 	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
@@ -139,7 +140,7 @@ func PhpHandleBmp(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
 	var size int
-	if streams._phpStreamSeek(stream, 11, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 11, 1) != 0 {
 		return nil
 	}
 	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
@@ -183,7 +184,7 @@ func PhpHandleSwf(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var bits long
 	var a []uint8
-	if streams._phpStreamSeek(stream, 5, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 5, 1) != 0 {
 		return nil
 	}
 	if streams._phpStreamRead(stream, (*byte)(a), g.SizeOf("a")) != g.SizeOf("a") {
@@ -213,7 +214,7 @@ func PhpHandlePng(stream *core.PhpStream) *Gfxinfo {
 	 * Interlace method:   1 byte
 	 */
 
-	if streams._phpStreamSeek(stream, 8, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 8, 1) != 0 {
 		return nil
 	}
 	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) < g.SizeOf("dim") {
@@ -321,7 +322,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 	if ff_read == 0 {
 		var extraneous int = 0
 		for g.Assign(&marker, streams._phpStreamGetc(stream)) != 0xff {
-			if marker == EOF {
+			if marker == -1 {
 				return 0xd9
 			}
 			extraneous++
@@ -332,7 +333,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 	}
 	a = 1
 	for {
-		if g.Assign(&marker, streams._phpStreamGetc(stream)) == EOF {
+		if g.Assign(&marker, streams._phpStreamGetc(stream)) == -1 {
 			return 0xd9
 		}
 		a++
@@ -354,7 +355,7 @@ func PhpSkipVariable(stream *core.PhpStream) int {
 		return 0
 	}
 	length = length - 2
-	streams._phpStreamSeek(stream, zend.ZendLong(length), SEEK_CUR)
+	streams._phpStreamSeek(stream, zend.ZendLong(length), 1)
 	return 1
 }
 
@@ -438,7 +439,7 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 				if info == nil || length < 8 {
 					return result
 				}
-				if streams._phpStreamSeek(stream, length-8, SEEK_CUR) != 0 {
+				if streams._phpStreamSeek(stream, length-8, 1) != 0 {
 					return result
 				}
 			} else {
@@ -588,7 +589,7 @@ func PhpHandleJpc(stream *core.PhpStream) *Gfxinfo {
 	PhpRead2(stream)
 	result.SetWidth(PhpRead4(stream))
 	result.SetHeight(PhpRead4(stream))
-	if streams._phpStreamSeek(stream, 24, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, 24, 1) != 0 {
 		zend._efree(result)
 		return nil
 	}
@@ -658,7 +659,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 			/* Skip the first 3 bytes to emulate the file type examination */
 
-			streams._phpStreamSeek(stream, 3, SEEK_CUR)
+			streams._phpStreamSeek(stream, 3, 1)
 			result = PhpHandleJpc(stream)
 			break
 		}
@@ -671,7 +672,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 		/* Skip over LBox (Which includes both TBox and LBox itself */
 
-		if streams._phpStreamSeek(stream, box_length-8, SEEK_CUR) != 0 {
+		if streams._phpStreamSeek(stream, box_length-8, 1) != 0 {
 			break
 		}
 
@@ -777,7 +778,7 @@ func PhpHandleTiff(stream *core.PhpStream, info *zend.Zval, motorola_intel int) 
 		return nil
 	}
 	ifd_addr = PhpIfdGet32u(ifd_ptr, motorola_intel)
-	if streams._phpStreamSeek(stream, ifd_addr-8, SEEK_CUR) != 0 {
+	if streams._phpStreamSeek(stream, ifd_addr-8, 1) != 0 {
 		return nil
 	}
 	ifd_size = 2
@@ -898,7 +899,7 @@ func PhpHandleIff(stream *core.PhpStream) *Gfxinfo {
 				return result
 			}
 		} else {
-			if streams._phpStreamSeek(stream, size, SEEK_CUR) != 0 {
+			if streams._phpStreamSeek(stream, size, 1) != 0 {
 				return nil
 			}
 		}
@@ -914,7 +915,7 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 	var i int
 	var width int = 0
 	var height int = 0
-	if streams._phpStreamSeek(stream, 0, SEEK_SET) != 0 {
+	if streams._phpStreamSeek(stream, 0, 0) != 0 {
 		return 0
 	}
 
@@ -1012,7 +1013,7 @@ func PhpGetXbm(stream *core.PhpStream, result **Gfxinfo) int {
 	if result != nil {
 		*result = nil
 	}
-	if streams._phpStreamSeek(stream, 0, SEEK_SET) != 0 {
+	if streams._phpStreamSeek(stream, 0, 0) != 0 {
 		return 0
 	}
 	for g.Assign(&fline, streams._phpStreamGetLine(stream, nil, 0, nil)) != nil {
@@ -1221,8 +1222,8 @@ func ZifImageTypeToMimeType(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1311,8 +1312,8 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1328,8 +1329,8 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1669,8 +1670,8 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1686,8 +1687,8 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

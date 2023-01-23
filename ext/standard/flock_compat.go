@@ -80,7 +80,7 @@ func PhpFlock(fd int, operation int) int {
 	var ret int
 	flck.l_len = 0
 	flck.l_start = flck.l_len
-	flck.l_whence = SEEK_SET
+	flck.l_whence = 0
 	if (operation & LOCK_SH) != 0 {
 		flck.l_type = F_RDLCK
 	} else if (operation & LOCK_EX) != 0 {

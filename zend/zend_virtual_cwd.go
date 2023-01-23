@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -530,7 +531,7 @@ func TsrmRealpathR(path *byte, start int, len_ int, ll *int, t *int64, use_realp
 		for i > start && path[i-1] != '/' {
 			i--
 		}
-		assert(i < 256)
+		r.Assert(i < 256)
 		if i == len_ || i+1 == len_ && path[i] == '.' {
 
 			/* remove double slashes and '.' */
@@ -560,11 +561,11 @@ func TsrmRealpathR(path *byte, start int, len_ int, ll *int, t *int64, use_realp
 			j = TsrmRealpathR(path, start, i-1, ll, t, use_realpath, 1, nil)
 			if j > start && j != size_t-1 {
 				j--
-				assert(i < 256)
+				r.Assert(i < 256)
 				for j > start && path[j] != '/' {
 					j--
 				}
-				assert(i < 256)
+				r.Assert(i < 256)
 				if start == 0 {
 
 					/* leading '..' must not be removed in case of relative path */
@@ -915,9 +916,9 @@ func VirtualFilepath(path *byte, filepath **byte) int {
 
 /* }}} */
 
-func VirtualFopen(path *byte, mode *byte) *FILE {
+func VirtualFopen(path *byte, mode *byte) *r.FILE {
 	var new_state CwdState
-	var f *FILE
+	var f *r.FILE
 	if path[0] == '0' {
 		return nil
 	}
@@ -929,7 +930,7 @@ func VirtualFopen(path *byte, mode *byte) *FILE {
 		&new_state.SetCwdLength(0)
 		return nil
 	}
-	f = fopen(new_state.GetCwd(), mode)
+	f = r.Fopen(new_state.GetCwd(), mode)
 	_efree(&new_state.GetCwd())
 	&new_state.SetCwdLength(0)
 	return f
@@ -1092,7 +1093,7 @@ func VirtualRename(oldname *byte, newname *byte) int {
 	/* rename on windows will fail if newname already exists.
 	   MoveFileEx has to be used */
 
-	retval = rename(oldname, newname)
+	retval = r.Rename(oldname, newname)
 	_efree(&old_state.GetCwd())
 	&old_state.SetCwdLength(0)
 	_efree(&new_state.GetCwd())
@@ -1216,14 +1217,14 @@ func VirtualOpendir(pathname *byte) *DIR {
 
 /* }}} */
 
-func VirtualPopen(command *byte, type_ *byte) *FILE {
+func VirtualPopen(command *byte, type_ *byte) *r.FILE {
 	var command_length int
 	var dir_length int
 	var extra int = 0
 	var command_line *byte
 	var ptr *byte
 	var dir *byte
-	var retval *FILE
+	var retval *r.FILE
 	command_length = strlen(command)
 	dir_length = CwdGlobals.GetCwd().GetCwdLength()
 	dir = CwdGlobals.GetCwd().GetCwd()

@@ -4,6 +4,7 @@ package core
 
 import (
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -499,7 +500,7 @@ func PhpInitConfig() int {
 	var open_basedir *byte
 	var free_ini_search_path int = 0
 	var opened_path *zend.ZendString = nil
-	var fp *FILE
+	var fp *r.FILE
 	var filename *byte
 	zend._zendHashInit(&ConfigurationHash, 8, ConfigZvalDtor, 1)
 	if sapi_module.GetIniDefaults() != nil {
@@ -593,7 +594,7 @@ func PhpInitConfig() int {
 			var statbuf zend.ZendStatT
 			if !(stat(php_ini_file_name, &statbuf)) {
 				if (statbuf.st_mode & S_IFMT) != S_IFDIR {
-					fp = fopen(php_ini_file_name, "r")
+					fp = r.Fopen(php_ini_file_name, "r")
 					if fp != nil {
 						filename = ExpandFilepath(php_ini_file_name, nil)
 					}
@@ -722,7 +723,7 @@ func PhpInitConfig() int {
 					if stat(ini_file, &sb) == 0 {
 						if (sb.st_mode & S_IFMT) == S_IFREG {
 							var fh zend.ZendFileHandle
-							zend.ZendStreamInitFp(&fh, fopen(ini_file, "r"), ini_file)
+							zend.ZendStreamInitFp(&fh, r.Fopen(ini_file, "r"), ini_file)
 							if fh.handle.fp != nil {
 								if zend.ZendParseIniFile(&fh, 1, 0, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash) == zend.SUCCESS {
 
@@ -811,7 +812,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.Ha
 	if stat(ini_file, &sb) == 0 {
 		if (sb.st_mode & S_IFMT) == S_IFREG {
 			var fh zend.ZendFileHandle
-			zend.ZendStreamInitFp(&fh, fopen(ini_file, "r"), ini_file)
+			zend.ZendStreamInitFp(&fh, r.Fopen(ini_file, "r"), ini_file)
 			if fh.handle.fp != nil {
 
 				/* Reset active ini section */

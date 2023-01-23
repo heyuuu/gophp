@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -441,7 +442,7 @@ func PhpArrayDataCompare(a any, b any) int {
 	if zend.CompareFunction(&result, first, second) == zend.FAILURE {
 		return 0
 	}
-	assert(result.u1.v.type_ == 4)
+	r.Assert(result.u1.v.type_ == 4)
 	if result.value.lval != 0 {
 		if result.value.lval < 0 {
 			return -1
@@ -758,8 +759,8 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -771,7 +772,7 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -791,8 +792,8 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -884,8 +885,8 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -897,7 +898,7 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -917,8 +918,8 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1049,8 +1050,8 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1062,8 +1063,8 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1210,8 +1211,8 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1223,7 +1224,7 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -1334,8 +1335,8 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1347,7 +1348,7 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -1367,8 +1368,8 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1460,8 +1461,8 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1473,7 +1474,7 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -1493,8 +1494,8 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1586,8 +1587,8 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1599,7 +1600,7 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -1619,8 +1620,8 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1712,8 +1713,8 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1725,7 +1726,7 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -1745,8 +1746,8 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1910,8 +1911,8 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1929,8 +1930,8 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2138,8 +2139,8 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2151,7 +2152,7 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -2265,8 +2266,8 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2278,7 +2279,7 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -2392,8 +2393,8 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2405,7 +2406,7 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -2519,8 +2520,8 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2532,7 +2533,7 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -2646,8 +2647,8 @@ func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2753,8 +2754,8 @@ func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3341,8 +3342,8 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3354,7 +3355,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -3373,8 +3374,8 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3397,8 +3398,8 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3489,8 +3490,8 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3502,7 +3503,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -3521,8 +3522,8 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3545,8 +3546,8 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3637,8 +3638,8 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3649,8 +3650,8 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 
 			zend.ZendParseArgZvalDeref(_arg, &value, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3666,8 +3667,8 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5355,8 +5356,8 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5375,8 +5376,8 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5391,8 +5392,8 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5741,8 +5742,8 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5757,8 +5758,8 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5773,8 +5774,8 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5926,8 +5927,8 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5942,8 +5943,8 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6069,8 +6070,8 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6081,8 +6082,8 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			zend.ZendParseArgZvalDeref(_arg, &zlow, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6094,8 +6095,8 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &zhigh, 0)
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6197,7 +6198,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				var __fill_ht *zend.HashTable = return_value.value.arr
 				var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 				var __fill_idx uint32 = __fill_ht.nNumUsed
-				assert((__fill_ht.u.flags & 1 << 2) != 0)
+				r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 				for ; low >= high; low -= uint(lstep) {
 					var __z *zend.Zval = &__fill_bkt.val
 					var __s *zend.ZendString = zend.ZendOneCharString[low]
@@ -6231,7 +6232,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				var __fill_ht *zend.HashTable = return_value.value.arr
 				var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 				var __fill_idx uint32 = __fill_ht.nNumUsed
-				assert((__fill_ht.u.flags & 1 << 2) != 0)
+				r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 				for ; low <= high; low += uint(lstep) {
 					var __z *zend.Zval = &__fill_bkt.val
 					var __s *zend.ZendString = zend.ZendOneCharString[low]
@@ -6296,7 +6297,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			i = 0
 			element = low
 			for i < size && element >= high {
@@ -6334,7 +6335,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			i = 0
 			element = low
 			for i < size && element <= high {
@@ -6403,7 +6404,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for i = 0; i < size; i++ {
 				var __z *zend.Zval = &__fill_bkt.val
 				__z.value.lval = low - i*lstep
@@ -6437,7 +6438,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for i = 0; i < size; i++ {
 				var __z *zend.Zval = &__fill_bkt.val
 				__z.value.lval = low + i*lstep
@@ -6594,8 +6595,8 @@ func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6607,7 +6608,7 @@ func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -6873,8 +6874,8 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -6886,7 +6887,7 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -7013,8 +7014,8 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7026,7 +7027,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -7165,8 +7166,8 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7178,7 +7179,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -7393,8 +7394,8 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7406,7 +7407,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -7559,8 +7560,8 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7572,7 +7573,7 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_arg = &(*_arg).value.ref.val
 			}
 			var _zv *zend.Zval = _arg
-			assert(_zv.u1.v.type_ != 10)
+			r.Assert(_zv.u1.v.type_ != 10)
 			var __zv *zend.Zval = _zv
 			if __zv.u1.v.type_ == 7 {
 				if zend.ZvalRefcountP(__zv) > 1 {
@@ -7591,8 +7592,8 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7608,8 +7609,8 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7624,8 +7625,8 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7761,8 +7762,8 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7777,8 +7778,8 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7794,8 +7795,8 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7806,8 +7807,8 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 			zend.ZendParseArgZvalDeref(_arg, &z_length, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -7903,7 +7904,7 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = input.value.arr
 				var _p *zend.Bucket = __ht.arData
@@ -8024,7 +8025,7 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 						core.PhpErrorDocref(nil, 1<<1, "recursion detected")
 						return 0
 					}
-					assert(dest_entry.u1.v.type_ != 10 || zend.ZvalRefcountP(dest_entry) > 1)
+					r.Assert(dest_entry.u1.v.type_ != 10 || zend.ZvalRefcountP(dest_entry) > 1)
 					for {
 						var _zv *zend.Zval = dest_entry
 						if _zv.u1.v.type_ == 10 {
@@ -8130,7 +8131,7 @@ func PhpArrayMerge(dest *zend.HashTable, src *zend.HashTable) int {
 			var __fill_ht *zend.HashTable = dest
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = src
 				var _p *zend.Bucket = __ht.arData
@@ -8246,7 +8247,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				core.PhpErrorDocref(nil, 1<<1, "recursion detected")
 				return 0
 			}
-			assert(dest_entry.u1.v.type_ != 10 || zend.ZvalRefcountP(dest_entry) > 1)
+			r.Assert(dest_entry.u1.v.type_ != 10 || zend.ZvalRefcountP(dest_entry) > 1)
 			for {
 				var _zv *zend.Zval = dest_entry
 				if _zv.u1.v.type_ == 10 {
@@ -8586,7 +8587,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 			var __fill_ht *zend.HashTable = dest
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = src
 				var _p *zend.Bucket = __ht.arData
@@ -8736,8 +8737,8 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -8753,8 +8754,8 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -8765,8 +8766,8 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			zend.ZendParseArgZvalDeref(_arg, &search_value, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -8936,7 +8937,7 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			if (arrval.u.flags&1<<2) != 0 && arrval.nNumUsed == arrval.nNumOfElements {
 
 				/* Optimistic case: range(0..n-1) for vector-like packed array */
@@ -9045,8 +9046,8 @@ func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9132,8 +9133,8 @@ func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9221,8 +9222,8 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9320,7 +9321,7 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		var __fill_ht *zend.HashTable = return_value.value.arr
 		var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 		var __fill_idx uint32 = __fill_ht.nNumUsed
-		assert((__fill_ht.u.flags & 1 << 2) != 0)
+		r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 		for {
 			var __ht *zend.HashTable = arrval
 			var _p *zend.Bucket = __ht.arData
@@ -9402,8 +9403,8 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9609,8 +9610,8 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9625,8 +9626,8 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9638,8 +9639,8 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZendParseArgZvalDeref(_arg, &column, 1)
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9691,7 +9692,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = input
 				var _p *zend.Bucket = __ht.arData
@@ -9857,8 +9858,8 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9874,8 +9875,8 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -9930,7 +9931,7 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = input.value.arr
 				var _idx uint32 = __ht.nNumUsed
@@ -10047,8 +10048,8 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10063,8 +10064,8 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10079,8 +10080,8 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10157,7 +10158,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for i = 0; i < num_pads; i++ {
 				var _z1 *zend.Zval = &__fill_bkt.val
 				var _z2 *zend.Zval = pad_value
@@ -10179,7 +10180,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for {
 				var __ht *zend.HashTable = input.value.arr
 				var _p *zend.Bucket = __ht.arData
@@ -10217,7 +10218,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_ht *zend.HashTable = return_value.value.arr
 			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
 			var __fill_idx uint32 = __fill_ht.nNumUsed
-			assert((__fill_ht.u.flags & 1 << 2) != 0)
+			r.Assert((__fill_ht.u.flags & 1 << 2) != 0)
 			for i = 0; i < num_pads; i++ {
 				var _z1 *zend.Zval = &__fill_bkt.val
 				var _z2 *zend.Zval = pad_value
@@ -10316,8 +10317,8 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10464,8 +10465,8 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10481,8 +10482,8 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10616,8 +10617,8 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -10633,8 +10634,8 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -496,7 +497,7 @@ var BinElements []uint32 = []uint32{512, 256, 170, 128, 102, 85, 73, 64, 51, 42,
 var BinPages []uint32 = []uint32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 3, 1, 1, 5, 3, 2, 2, 5, 3, 7, 4, 5, 3}
 
 func ZendMmPanic(message string) {
-	fprintf(stderr, "%s\n", message)
+	r.Fprintf(stderr, "%s\n", message)
 
 	/* See http://support.microsoft.com/kb/190351 */
 
@@ -529,11 +530,11 @@ func ZendMmMmapFixed(addr any, size int) any {
 
 	var ptr any = mmap(addr, size, PROT_READ|PROT_WRITE, flags, -1, 0)
 	if ptr == any(-1) {
-		fprintf(stderr, "\nmmap() failed: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nmmap() failed: [%d] %s\n", errno, strerror(errno))
 		return nil
 	} else if ptr != addr {
 		if munmap(ptr, size) != 0 {
-			fprintf(stderr, "\nmunmap() failed: [%d] %s\n", errno, strerror(errno))
+			r.Fprintf(stderr, "\nmunmap() failed: [%d] %s\n", errno, strerror(errno))
 		}
 		return nil
 	}
@@ -543,14 +544,14 @@ func ZendMmMmap(size int) any {
 	var ptr any
 	ptr = mmap(nil, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0)
 	if ptr == any(-1) {
-		fprintf(stderr, "\nmmap() failed: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nmmap() failed: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
 	return ptr
 }
 func ZendMmMunmap(addr any, size int) {
 	if munmap(addr, size) != 0 {
-		fprintf(stderr, "\nmunmap() failed: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nmunmap() failed: [%d] %s\n", errno, strerror(errno))
 	}
 }
 
@@ -751,7 +752,7 @@ func ZendMmChunkAllocInt(size int, alignment int) any {
 func ZendMmChunkAlloc(heap *ZendMmHeap, size int, alignment int) any {
 	if heap.GetStorage() != nil {
 		var ptr any = heap.GetStorage().GetHandlers().GetChunkAlloc()(heap.GetStorage(), size, alignment)
-		assert((zend_uintptr_t((*byte)(ptr+(alignment-1)))&alignment - 1) == ZendUintptrT(ptr))
+		r.Assert((zend_uintptr_t((*byte)(ptr+(alignment-1)))&alignment - 1) == ZendUintptrT(ptr))
 		return ptr
 	}
 	return ZendMmChunkAllocInt(size, alignment)
@@ -1540,7 +1541,7 @@ func ZendMmInit() *ZendMmHeap {
 	var chunk *ZendMmChunk = (*ZendMmChunk)(ZendMmChunkAllocInt(2*1024*1024, 2*1024*1024))
 	var heap *ZendMmHeap
 	if chunk == nil {
-		fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
 	heap = &chunk.heap_slot
@@ -1594,17 +1595,17 @@ func ZendMmGc(heap *ZendMmHeap) int {
 				ZendMmPanic("zend_mm_heap corrupted")
 			}
 			page_offset = size_t(p)&2*1024*1024 - 1
-			assert(page_offset != 0)
+			r.Assert(page_offset != 0)
 			page_num = int(page_offset / (4 * 1024))
 			info = chunk.GetMap()[page_num]
-			assert((info & 0x80000000) != 0)
+			r.Assert((info & 0x80000000) != 0)
 			if (info & 0x40000000) != 0 {
 				page_num -= (info & 0x1ff0000) >> 16
 				info = chunk.GetMap()[page_num]
-				assert((info & 0x80000000) != 0)
-				assert((info & 0x40000000) == 0)
+				r.Assert((info & 0x80000000) != 0)
+				r.Assert((info & 0x40000000) == 0)
 			}
-			assert((info&0x1f)>>0 == i)
+			r.Assert((info&0x1f)>>0 == i)
 			free_counter = ((info & 0x1ff0000) >> 16) + 1
 			if free_counter == BinElements[i] {
 				has_free_pages = 1
@@ -1623,17 +1624,17 @@ func ZendMmGc(heap *ZendMmHeap) int {
 				ZendMmPanic("zend_mm_heap corrupted")
 			}
 			page_offset = size_t(p)&2*1024*1024 - 1
-			assert(page_offset != 0)
+			r.Assert(page_offset != 0)
 			page_num = int(page_offset / (4 * 1024))
 			info = chunk.GetMap()[page_num]
-			assert((info & 0x80000000) != 0)
+			r.Assert((info & 0x80000000) != 0)
 			if (info & 0x40000000) != 0 {
 				page_num -= (info & 0x1ff0000) >> 16
 				info = chunk.GetMap()[page_num]
-				assert((info & 0x80000000) != 0)
-				assert((info & 0x40000000) == 0)
+				r.Assert((info & 0x80000000) != 0)
+				r.Assert((info & 0x40000000) == 0)
 			}
-			assert((info&0x1f)>>0 == i)
+			r.Assert((info&0x1f)>>0 == i)
 			if (info&0x1ff0000)>>16 == BinElements[i] {
 
 				/* remove from cache */
@@ -1982,7 +1983,7 @@ func ShutdownMemoryManager(silent int, full_shutdown int) {
 func TrackedMalloc(size int) any {
 	var ptr any = __zendMalloc(size)
 	var h ZendUlong = uintPtr(ptr) >> 3
-	assert(any(uintptr_t(h<<3) == ptr))
+	r.Assert(any(uintptr_t(h<<3) == ptr))
 	ZendHashIndexAddEmptyElement(AllocGlobals.GetMmHeap().GetTrackedAllocs(), h)
 	return ptr
 }
@@ -1996,7 +1997,7 @@ func TrackedRealloc(ptr any, new_size int) any {
 	ZendHashIndexDel(AllocGlobals.GetMmHeap().GetTrackedAllocs(), h)
 	ptr = __zendRealloc(ptr, new_size)
 	h = uintPtr(ptr) >> 3
-	assert(any(uintptr_t(h<<3) == ptr))
+	r.Assert(any(uintptr_t(h<<3) == ptr))
 	ZendHashIndexAddEmptyElement(AllocGlobals.GetMmHeap().GetTrackedAllocs(), h)
 	return ptr
 }
@@ -2098,7 +2099,7 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	tmp_storage.SetData(data)
 	chunk = (*ZendMmChunk)(handlers.GetChunkAlloc()(&tmp_storage, 2*1024*1024, 2*1024*1024))
 	if chunk == nil {
-		fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
 	heap = &chunk.heap_slot
@@ -2131,7 +2132,7 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	storage = _zendMmAlloc(heap, g.SizeOf("zend_mm_storage")+data_size)
 	if storage == nil {
 		handlers.GetChunkFree()(&tmp_storage, chunk, 2*1024*1024)
-		fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
+		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
 	memcpy(storage, &tmp_storage, g.SizeOf("zend_mm_storage"))
@@ -2143,7 +2144,7 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	return heap
 }
 func ZendOutOfMemory() {
-	fprintf(stderr, "Out of memory\n")
+	r.Fprintf(stderr, "Out of memory\n")
 	exit(1)
 }
 func __zendMalloc(len_ int) any {

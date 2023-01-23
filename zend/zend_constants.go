@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -285,7 +286,7 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *ZendClassEntry) int {
 	} else if (c.GetValue().GetAccessFlags() & 1 << 2) != 0 {
 		return c.GetCe() == scope
 	} else {
-		assert((c.GetValue().GetAccessFlags() & 1 << 1) != 0)
+		r.Assert((c.GetValue().GetAccessFlags() & 1 << 1) != 0)
 		return ZendCheckProtected(c.GetCe(), scope)
 	}
 }

@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -209,7 +210,7 @@ func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & 1 << 18) != 0 {
 		var p ZendVmStack = EG.GetVmStack()
 		var prev ZendVmStack = p.GetPrev()
-		assert(call == (*ZendExecuteData)((*Zval)(EG.GetVmStack())+((g.SizeOf("struct _zend_vm_stack")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))))
+		r.Assert(call == (*ZendExecuteData)((*Zval)(EG.GetVmStack())+((g.SizeOf("struct _zend_vm_stack")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))))
 		EG.SetVmStackTop(prev.GetTop())
 		EG.SetVmStackEnd(prev.GetEnd())
 		EG.SetVmStack(prev)
@@ -434,7 +435,7 @@ func ZendVmStackInit() {
 func ZendVmStackInitEx(page_size int) {
 	/* page_size must be a power of 2 */
 
-	assert(page_size > 0 && (page_size&page_size-1) == 0)
+	r.Assert(page_size > 0 && (page_size&page_size-1) == 0)
 	EG.SetVmStackPageSize(page_size)
 	EG.SetVmStack(ZendVmStackNewPage(page_size, nil))
 	EG.SetVmStackTop(EG.GetVmStack().GetTop())
@@ -468,7 +469,7 @@ func ZendGetCompiledVariableValue(execute_data *ZendExecuteData, var_ uint32) *Z
 func _getZvalPtrTmp(var_ uint32, should_free *ZendFreeOp, execute_data *ZendExecuteData) *Zval {
 	var ret *Zval = (*Zval)((*byte)(execute_data) + int(var_))
 	*should_free = ret
-	assert(ret.GetType() != 10)
+	r.Assert(ret.GetType() != 10)
 	return ret
 }
 func _getZvalPtrVar(var_ uint32, should_free *ZendFreeOp, execute_data *ZendExecuteData) *Zval {
@@ -616,7 +617,7 @@ func _getZvalPtrDeref(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ 
 		if op_type == 1<<1 {
 			return _getZvalPtrTmp(node.GetVar(), should_free, execute_data)
 		} else {
-			assert(op_type == 1<<2)
+			r.Assert(op_type == 1<<2)
 			return _getZvalPtrVarDeref(node.GetVar(), should_free, execute_data)
 		}
 	} else {
@@ -635,7 +636,7 @@ func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp,
 		if op_type == 1<<1 {
 			return _getZvalPtrTmp(node.GetVar(), should_free, execute_data)
 		} else {
-			assert(op_type == 1<<2)
+			r.Assert(op_type == 1<<2)
 			return _getZvalPtrVarDeref(node.GetVar(), should_free, execute_data)
 		}
 	} else {
@@ -678,7 +679,7 @@ func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ in
 		*should_free = nil
 		return _getZvalPtrCv(node.GetVar(), type_, execute_data)
 	} else {
-		assert(op_type == 1<<2)
+		r.Assert(op_type == 1<<2)
 		return _getZvalPtrPtrVar(node.GetVar(), should_free, execute_data)
 	}
 }
@@ -1093,7 +1094,7 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 	return 1
 }
 func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendBool) ZendBool {
-	assert(property.GetType() != 10)
+	r.Assert(property.GetType() != 10)
 	if info.GetType() > 0x3ff {
 		if property.GetType() != 8 {
 			return property.GetType() == 1 && (info.GetType()&0x1) != 0
@@ -1103,7 +1104,7 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendB
 		}
 		return InstanceofFunction(property.GetValue().GetObj().GetCe(), (*ZendClassEntry)(info.GetType() & ^0x3))
 	}
-	assert(info.GetType()>>2 != 17)
+	r.Assert(info.GetType()>>2 != 17)
 	if info.GetType()>>2 == property.GetType() {
 		return 1
 	} else if property.GetType() == 1 {
@@ -1215,7 +1216,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_valu
 func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_value *Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo = &zf.common.arg_info[arg_num-1]
 	var ce *ZendClassEntry
-	assert(arg_num <= zf.GetNumArgs())
+	r.Assert(arg_num <= zf.GetNumArgs())
 	cur_arg_info = &zf.common.arg_info[arg_num-1]
 	ce = nil
 	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
@@ -1227,8 +1228,8 @@ func ZendVerifyRecvArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_
 func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_value *Zval, cache_slot *any) int {
 	var cur_arg_info *ZendArgInfo
 	var ce *ZendClassEntry
-	assert(arg_num > zf.GetNumArgs())
-	assert((zf.GetFnFlags() & 1 << 14) != 0)
+	r.Assert(arg_num > zf.GetNumArgs())
+	r.Assert((zf.GetFnFlags() & 1 << 14) != 0)
 	cur_arg_info = &zf.common.arg_info[zf.GetNumArgs()]
 	ce = nil
 	if ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0 {
@@ -1381,7 +1382,7 @@ func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp,
 
 	if opline.GetExtendedValue() == 8 && ref.GetVal().GetType() == 6 {
 		ConcatFunction(&ref.val, &ref.val, value)
-		assert(ref.GetVal().GetType() == 6 && "Concat should return string")
+		r.Assert(ref.GetVal().GetType() == 6 && "Concat should return string")
 		return
 	}
 	ZendBinaryOp(&z_copy, &ref.val, value, opline)
@@ -1404,7 +1405,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value 
 
 	if opline.GetExtendedValue() == 8 && zptr.GetType() == 6 {
 		ConcatFunction(zptr, zptr, value)
-		assert(zptr.GetType() == 6 && "Concat should return string")
+		r.Assert(zptr.GetType() == 6 && "Concat should return string")
 		return
 	}
 	ZendBinaryOp(&z_copy, zptr, value, opline)
@@ -1583,7 +1584,7 @@ func ZendWrongStringOffset(execute_data *ZendExecuteData) {
 				break
 			}
 			if opline.GetOp2Type() == 1<<2 && opline.GetOp2().GetVar() == var_ {
-				assert(opline.GetOpcode() == 30)
+				r.Assert(opline.GetOpcode() == 30)
 				msg = "Cannot create references to/from string offsets"
 				break
 			}
@@ -1593,7 +1594,7 @@ func ZendWrongStringOffset(execute_data *ZendExecuteData) {
 	default:
 		break
 	}
-	assert(msg != nil)
+	r.Assert(msg != nil)
 	ZendThrowError(nil, "%s", msg)
 }
 func ZendWrongPropertyRead(property *Zval) {
@@ -1729,7 +1730,7 @@ func ZendThrowIncdecRefError(ref *ZendReference, opline *ZendOp) ZendLong {
 	/* Currently there should be no way for a typed reference to accept both int and double.
 	 * Generalize this and the related property code once this becomes possible. */
 
-	assert(error_prop != nil)
+	r.Assert(error_prop != nil)
 	if (opline.GetOpcode() & 1) == 0 {
 		ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), g.Cond((error_prop.GetType()&0x1) != 0, "?", ""))
 		return INT64_MAX
@@ -2118,7 +2119,7 @@ func ZendGetTargetSymbolTable(fetch_type int, execute_data *ZendExecuteData) *Ha
 	if (fetch_type & (1<<3 | 1<<1)) != 0 {
 		ht = &EG.symbol_table
 	} else {
-		assert((fetch_type & 1 << 2) != 0)
+		r.Assert((fetch_type & 1 << 2) != 0)
 		if (execute_data.GetThis().GetTypeInfo() & 1 << 20) == 0 {
 			ZendRebuildSymbolTable()
 		}
@@ -2478,7 +2479,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			} else if ZvalRefcountP(retval) == 1 {
 				var _z *Zval = retval
 				var ref *ZendReference
-				assert(_z.GetType() == 10)
+				r.Assert(_z.GetType() == 10)
 				ref = _z.GetValue().GetRef()
 				var _z1 *Zval = _z
 				var _z2 *Zval = &ref.val
@@ -2643,7 +2644,7 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 			dim++
 		}
 		retval = container.GetValue().GetObj().GetHandlers().GetReadDimension()(container, dim, type_, result)
-		assert(result != nil)
+		r.Assert(result != nil)
 		if retval != nil {
 			if result != retval {
 				var _z3 *Zval = retval
@@ -2897,7 +2898,7 @@ func check_type_stdClass_assignable(type_ ZendType) ZendBool {
 
 func ZendVerifyRefArrayAssignable(ref *ZendReference) ZendBool {
 	var prop *ZendPropertyInfo
-	assert(ref.GetSources().GetPtr() != nil)
+	r.Assert(ref.GetSources().GetPtr() != nil)
 	var _source_list *ZendPropertyInfoSourceList = &ref.sources
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
@@ -2927,7 +2928,7 @@ func ZendVerifyRefArrayAssignable(ref *ZendReference) ZendBool {
 
 func zend_verify_ref_stdClass_assignable(ref *ZendReference) ZendBool {
 	var prop *ZendPropertyInfo
-	assert(ref.GetSources().GetPtr() != nil)
+	r.Assert(ref.GetSources().GetPtr() != nil)
 	var _source_list *ZendPropertyInfoSourceList = &ref.sources
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
@@ -3101,7 +3102,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			if ptr.GetType() == 10 && ZvalRefcountP(ptr) == 1 {
 				var _z *Zval = ptr
 				var ref *ZendReference
-				assert(_z.GetType() == 10)
+				r.Assert(_z.GetType() == 10)
 				ref = _z.GetValue().GetRef()
 				var _z1 *Zval = _z
 				var _z2 *Zval = &ref.val
@@ -3212,7 +3213,7 @@ func ZendFetchStaticPropertyAddressEx(retval **Zval, prop_info **ZendPropertyInf
 	var op2_type ZendUchar = opline.GetOp2Type()
 	if op2_type == 1<<0 {
 		var class_name *Zval = (*Zval)((*byte)(opline) + int32(opline.GetOp2()).constant)
-		assert(op1_type != 1<<0 || (*any)((*byte)(execute_data.GetRunTimeCache() + cache_slot))[0] == nil)
+		r.Assert(op1_type != 1<<0 || (*any)((*byte)(execute_data.GetRunTimeCache() + cache_slot))[0] == nil)
 		if g.Assign(&ce, (*any)((*byte)(execute_data.GetRunTimeCache() + cache_slot))[0]) == nil {
 			ce = ZendFetchClassByName(class_name.GetValue().GetStr(), (class_name + 1).GetValue().GetStr(), 0|0x200)
 			if ce == nil {
@@ -3389,7 +3390,7 @@ func ZendVerifyRefAssignableZval(ref *ZendReference, zv *Zval, strict ZendBool) 
 	var seen_prop *ZendPropertyInfo = nil
 	var seen_type ZendUchar
 	var needs_coercion ZendBool = 0
-	assert(zv.GetType() != 10)
+	r.Assert(zv.GetType() != 10)
 	var _source_list *ZendPropertyInfoSourceList = &ref.sources
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
@@ -3435,7 +3436,7 @@ func ZendVerifyRefAssignableZval(ref *ZendReference, zv *Zval, strict ZendBool) 
 func IZvalPtrDtorNoref(zval_ptr *Zval) {
 	if zval_ptr.GetTypeFlags() != 0 {
 		var ref *ZendRefcounted = zval_ptr.GetValue().GetCounted()
-		assert(zval_ptr.GetType() != 10)
+		r.Assert(zval_ptr.GetType() != 10)
 		if ZendGcDelref(&ref.gc) == 0 {
 			RcDtorFunc(ref)
 		} else if (ref.GetGc().GetTypeInfo() & (0xfffffc00 | 1<<4<<0)) == 1<<4<<0 {
@@ -3539,12 +3540,12 @@ func ZendRefDelTypeSource(source_list *ZendPropertyInfoSourceList, prop *ZendPro
 	var ptr **ZendPropertyInfo
 	var end ***ZendPropertyInfo
 	if (source_list.GetList() & 0x1) == 0 {
-		assert(source_list.GetPtr() == prop)
+		r.Assert(source_list.GetPtr() == prop)
 		source_list.SetPtr(nil)
 		return
 	}
 	if list.GetNum() == 1 {
-		assert((*list).ptr == prop)
+		r.Assert((*list).ptr == prop)
 		_efree(list)
 		source_list.SetPtr(nil)
 		return
@@ -3558,7 +3559,7 @@ func ZendRefDelTypeSource(source_list *ZendPropertyInfoSourceList, prop *ZendPro
 	for ptr < end && (*ptr) != prop {
 		ptr++
 	}
-	assert((*ptr) == prop)
+	r.Assert((*ptr) == prop)
 
 	/* Copy the last list element into the deleted slot. */
 
@@ -3749,7 +3750,7 @@ func ZendInitCvs(first uint32, last uint32, execute_data *ZendExecuteData) {
 func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_trampoline ZendBool, execute_data *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
-	assert(execute_data.GetFunc() == (*ZendFunction)(op_array))
+	r.Assert(execute_data.GetFunc() == (*ZendFunction)(op_array))
 	execute_data.SetOpline(op_array.GetOpcodes())
 	execute_data.SetCall(nil)
 	execute_data.SetReturnValue(return_value)
@@ -3787,7 +3788,7 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 
 func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	var run_time_cache *any
-	assert(g.CondF((uintptr_t(op_array).run_time_cache__ptr&1) != 0, func() any {
+	r.Assert(g.CondF((uintptr_t(op_array).run_time_cache__ptr&1) != 0, func() any {
 		return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(op_array).run_time_cache__ptr - 1)))
 	}, func() any { return any(*(op_array.GetRunTimeCachePtr())) }) == nil)
 	run_time_cache = ZendArenaAlloc(&CG.arena, op_array.GetCacheSize())
@@ -3839,14 +3840,14 @@ func ZendInitFuncRunTimeCache(op_array *ZendOpArray) {
 	}
 }
 func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
-	assert(execute_data.GetFunc() == (*ZendFunction)(op_array))
+	r.Assert(execute_data.GetFunc() == (*ZendFunction)(op_array))
 	execute_data.SetOpline(op_array.GetOpcodes())
 	execute_data.SetCall(nil)
 	execute_data.SetReturnValue(return_value)
 	ZendAttachSymbolTable(execute_data)
 	if op_array.GetRunTimeCachePtr() == nil {
 		var ptr any
-		assert((op_array.GetFnFlags() & 1 << 22) != 0)
+		r.Assert((op_array.GetFnFlags() & 1 << 22) != 0)
 		ptr = _emalloc(op_array.GetCacheSize() + g.SizeOf("void *"))
 		op_array.SetRunTimeCachePtr(ptr)
 		ptr = (*byte)(ptr + g.SizeOf("void *"))
@@ -3974,7 +3975,7 @@ func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
 		var level int
 		var do_exit int
 		if opline.GetOpcode() == 61 || opline.GetOpcode() == 59 || opline.GetOpcode() == 69 || opline.GetOpcode() == 128 || opline.GetOpcode() == 118 || opline.GetOpcode() == 112 || opline.GetOpcode() == 113 || opline.GetOpcode() == 68 {
-			assert(op_num != 0)
+			r.Assert(op_num != 0)
 			opline--
 		}
 		for {
@@ -4157,7 +4158,7 @@ func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num 
 					ZvalPtrDtorNogc(var_)
 				} else if kind == 4 {
 					var obj *ZendObject
-					assert(var_.GetType() == 8)
+					r.Assert(var_.GetType() == 8)
 					obj = var_.GetValue().GetObj()
 					ZendObjectStoreCtorFailed(obj)
 					ZendObjectRelease(obj)
@@ -4170,7 +4171,7 @@ func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num 
 					var rope **ZendString = (**ZendString)(var_)
 					var last *ZendOp = execute_data.GetFunc().GetOpArray().GetOpcodes() + op_num
 					for last.GetOpcode() != 55 && last.GetOpcode() != 54 || last.GetResult().GetVar() != var_num {
-						assert(last >= execute_data.GetFunc().GetOpArray().GetOpcodes())
+						r.Assert(last >= execute_data.GetFunc().GetOpArray().GetOpcodes())
 						last--
 					}
 					if last.GetOpcode() == 54 {

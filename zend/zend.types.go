@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	r "sik/runtime"
+)
+
 /**
  * ZendClassName
  */
@@ -286,7 +290,7 @@ type ZendUtilityFunctions struct {
 	error_function                  func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 	printf_function                 func(format *byte, _ ...any) int
 	write_function                  func(str *byte, str_length int) int
-	fopen_function                  func(filename *byte, opened_path **ZendString) *FILE
+	fopen_function                  func(filename *byte, opened_path **ZendString) *r.FILE
 	message_handler                 func(message ZendLong, data any)
 	get_configuration_directive     func(name *ZendString) *Zval
 	ticks_function                  func(ticks int)
@@ -316,10 +320,10 @@ func (this ZendUtilityFunctions) GetWriteFunction() func(str *byte, str_length i
 func (this *ZendUtilityFunctions) SetWriteFunction(value func(str *byte, str_length int) int) {
 	this.write_function = value
 }
-func (this ZendUtilityFunctions) GetFopenFunction() func(filename *byte, opened_path **ZendString) *FILE {
+func (this ZendUtilityFunctions) GetFopenFunction() func(filename *byte, opened_path **ZendString) *r.FILE {
 	return this.fopen_function
 }
-func (this *ZendUtilityFunctions) SetFopenFunction(value func(filename *byte, opened_path **ZendString) *FILE) {
+func (this *ZendUtilityFunctions) SetFopenFunction(value func(filename *byte, opened_path **ZendString) *r.FILE) {
 	this.fopen_function = value
 }
 func (this ZendUtilityFunctions) GetMessageHandler() func(message ZendLong, data any) {

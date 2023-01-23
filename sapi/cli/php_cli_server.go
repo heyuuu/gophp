@@ -5,6 +5,7 @@ package cli
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -475,7 +476,7 @@ func SapiCliServerStartup(sapi_module *core.sapi_module_struct) int {
 		return zend.FAILURE
 	}
 	if g.Assign(&workers, getenv("PHP_CLI_SERVER_WORKERS")) {
-		fprintf(stderr, "platform does not support SO_REUSEPORT, cannot create workers\n")
+		r.Fprintf(stderr, "platform does not support SO_REUSEPORT, cannot create workers\n")
 	}
 	return zend.SUCCESS
 }
@@ -668,9 +669,9 @@ func SapiCliServerLogWrite(type_ int, msg *byte) {
 		}
 	}
 	if PhpCliServerWorkersMax > 1 {
-		fprintf(stderr, "[%ld] [%s] %s\n", long(getpid()), buf, msg)
+		r.Fprintf(stderr, "[%ld] [%s] %s\n", long(getpid()), buf, msg)
 	} else {
-		fprintf(stderr, "[%s] %s\n", buf, msg)
+		r.Fprintf(stderr, "[%s] %s\n", buf, msg)
 	}
 }
 func SapiCliServerLogMessage(msg *byte, syslog_type_int int) { SapiCliServerLogWrite(3, msg) }
@@ -1346,7 +1347,7 @@ func PhpCliServerClientReadRequestOnQueryString(parser *PhpHttpParser, at *byte,
 		client.GetRequest().SetQueryString(zend.ZendStrndup(at, length))
 		client.GetRequest().SetQueryStringLen(length)
 	} else {
-		assert(length <= 80*1024 && 80*1024-length >= client.GetRequest().GetQueryStringLen())
+		r.Assert(length <= 80*1024 && 80*1024-length >= client.GetRequest().GetQueryStringLen())
 		client.GetRequest().SetQueryString(zend.__zendRealloc(client.GetRequest().GetQueryString(), client.GetRequest().GetQueryStringLen()+length+1))
 		memcpy(client.GetRequest().GetQueryString()+client.GetRequest().GetQueryStringLen(), at, length)
 		client.GetRequest().SetQueryStringLen(client.GetRequest().GetQueryStringLen() + length)
@@ -1361,8 +1362,8 @@ func PhpCliServerClientReadRequestOnUrl(parser *PhpHttpParser, at *byte, length 
 		client.GetRequest().SetRequestUri(zend.ZendStrndup(at, length))
 		client.GetRequest().SetRequestUriLen(length)
 	} else {
-		assert(client.GetRequest().GetRequestMethod() == parser.GetMethod())
-		assert(length <= 80*1024 && 80*1024-length >= client.GetRequest().GetQueryStringLen())
+		r.Assert(client.GetRequest().GetRequestMethod() == parser.GetMethod())
+		r.Assert(length <= 80*1024 && 80*1024-length >= client.GetRequest().GetQueryStringLen())
 		client.GetRequest().SetRequestUri(zend.__zendRealloc(client.GetRequest().GetRequestUri(), client.GetRequest().GetRequestUriLen()+length+1))
 		memcpy(client.GetRequest().GetRequestUri()+client.GetRequest().GetRequestUriLen(), at, length)
 		client.GetRequest().SetRequestUriLen(client.GetRequest().GetRequestUriLen() + length)
@@ -1442,7 +1443,7 @@ func PhpCliServerClientReadRequestOnHeaderValue(parser *PhpHttpParser, at *byte,
 
 		// can't happen
 
-		assert(false)
+		r.Assert(false)
 		break
 	}
 	client.SetLastHeaderElement(HEADER_VALUE)
@@ -1658,7 +1659,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	var status_string *byte = GetStatusString(status)
 	var content_template *byte = GetTemplateString(status)
 	var errstr *byte = GetLastError()
-	assert(status_string != nil && content_template != nil)
+	r.Assert(status_string != nil && content_template != nil)
 	PhpCliServerContentSenderCtor(&client.content_sender)
 	client.SetContentSenderInitialized(1)
 	escaped_request_uri = standard.PhpEscapeHtmlEntitiesEx((*uint8)(client.GetRequest().GetRequestUri()), client.GetRequest().GetRequestUriLen(), 0, 2|1, nil, 0)
@@ -2034,7 +2035,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, rou
 		}
 	}
 	if p == nil {
-		fprintf(stderr, "Invalid address: %s\n", addr)
+		r.Fprintf(stderr, "Invalid address: %s\n", addr)
 		retval = zend.FAILURE
 		goto out
 	}
@@ -2262,11 +2263,11 @@ func DoCliServer(argc int, argv **byte) int {
 	if document_root != nil {
 		var sb zend.ZendStatT
 		if stat(document_root, &sb) {
-			fprintf(stderr, "Directory %s does not exist.\n", document_root)
+			r.Fprintf(stderr, "Directory %s does not exist.\n", document_root)
 			return 1
 		}
 		if (sb.st_mode & S_IFMT) != S_IFDIR {
-			fprintf(stderr, "%s is not a directory.\n", document_root)
+			r.Fprintf(stderr, "%s is not a directory.\n", document_root)
 			return 1
 		}
 		if zend.TsrmRealpath(document_root, document_root_buf) != nil {

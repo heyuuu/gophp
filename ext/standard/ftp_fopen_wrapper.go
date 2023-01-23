@@ -112,7 +112,7 @@ func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStr
 			result = GetFtpResult(controlstream, tmp_line, g.SizeOf("tmp_line"))
 			if result != 226 && result != 250 {
 				core.PhpErrorDocref(nil, 1<<1, "FTP server error %d:%s", result, tmp_line)
-				ret = EOF
+				ret = -1
 			}
 		}
 		streams._phpStreamWrite(controlstream, "QUIT\r\n", strlen("QUIT\r\n"))

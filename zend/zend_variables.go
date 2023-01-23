@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	r "sik/runtime"
+)
+
 // Source: <Zend/zend_variables.h>
 
 /*
@@ -67,9 +71,9 @@ func ZvalOptCopyCtor(zvalue *Zval) {
 }
 func ZvalPtrDtorStr(zval_ptr *Zval) {
 	if zval_ptr.GetTypeFlags() != 0 && ZvalDelrefP(zval_ptr) == 0 {
-		assert(zval_ptr.GetType() == 6)
-		assert((ZvalGcFlags(zval_ptr.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) == 0)
-		assert((ZvalGcFlags(zval_ptr.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 7) == 0)
+		r.Assert(zval_ptr.GetType() == 6)
+		r.Assert((ZvalGcFlags(zval_ptr.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) == 0)
+		r.Assert((ZvalGcFlags(zval_ptr.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 7) == 0)
 		_efree(zval_ptr.GetValue().GetStr())
 	}
 }
@@ -133,11 +137,11 @@ type ZendRcDtorFuncT func(p *ZendRefcounted)
 var ZendRcDtorFunc []ZendRcDtorFuncT = []ZendRcDtorFuncT{ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(_efree), ZendRcDtorFuncT(ZendArrayDestroy), ZendRcDtorFuncT(ZendObjectsStoreDel), ZendRcDtorFuncT(ZendListFree), ZendRcDtorFuncT(ZendReferenceDestroy), ZendRcDtorFuncT(ZendAstRefDestroy)}
 
 func RcDtorFunc(p *ZendRefcounted) {
-	assert(ZvalGcType(p.GetGc().GetTypeInfo()) <= 11)
+	r.Assert(ZvalGcType(p.GetGc().GetTypeInfo()) <= 11)
 	ZendRcDtorFunc[ZvalGcType(p.GetGc().GetTypeInfo())](p)
 }
 func ZendReferenceDestroy(ref *ZendReference) {
-	assert(ref.GetSources().GetPtr() == nil)
+	r.Assert(ref.GetSources().GetPtr() == nil)
 	IZvalPtrDtor(&ref.val)
 	_efree(ref)
 }
@@ -152,8 +156,8 @@ func ZvalInternalPtrDtor(zval_ptr *Zval) {
 		if ZendGcDelref(&ref.gc) == 0 {
 			if zval_ptr.GetType() == 6 {
 				var str *ZendString = (*ZendString)(ref)
-				assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 6) == 0)
-				assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 7) != 0)
+				r.Assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 6) == 0)
+				r.Assert((ZvalGcFlags(str.GetGc().GetTypeInfo()) & 1 << 7) != 0)
 				Free(str)
 			} else {
 				ZendErrorNoreturn(1<<4, "Internal zval's can't be arrays, objects, resources or reference")
@@ -188,7 +192,7 @@ func ZvalCopyCtorFunc(zvalue *Zval) {
 		__z.GetValue().SetArr(__arr)
 		__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
 	} else if zvalue.GetType() == 6 {
-		assert((ZvalGcFlags(zvalue.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) == 0)
+		r.Assert((ZvalGcFlags(zvalue.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) == 0)
 		var __z *Zval = zvalue
 		var __s *ZendString = ZendStringDup(zvalue.GetValue().GetStr(), 0)
 		__z.GetValue().SetStr(__s)

@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -471,7 +472,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 							}
 							zend.ZendStringReleaseEx(unmangled, 0)
 						} else {
-							assert((existing_propinfo.flags & 1 << 0) != 0)
+							r.Assert((existing_propinfo.flags & 1 << 0) != 0)
 							new_key = unmangled
 						}
 						zend.ZvalPtrDtorStr(&key)

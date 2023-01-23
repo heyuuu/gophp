@@ -5,6 +5,7 @@ package core
 import (
 	"sik/core/streams"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -107,7 +108,7 @@ func PhpRegisterVariable(var_ string, strval *byte, track_vars_array *zend.Zval)
 
 func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_array *zend.Zval) {
 	var new_entry zend.Zval
-	assert(strval != nil)
+	r.Assert(strval != nil)
 
 	/* Prepare value */
 
@@ -146,7 +147,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	var gpc_element_p *zend.Zval
 	var is_array zend.ZendBool = 0
 	var symtable1 *zend.HashTable = nil
-	assert(var_name != nil)
+	r.Assert(var_name != nil)
 	if track_vars_array != nil && track_vars_array.u1.v.type_ == 7 {
 		symtable1 = track_vars_array.value.arr
 	}
@@ -453,11 +454,11 @@ func PhpStdPostHandler(content_type_dup *byte, arg any) {
 	var arr *zend.Zval = (*zend.Zval)(arg)
 	var s *PhpStream = sapi_globals.GetRequestInfo().GetRequestBody()
 	var post_data PostVarDataT
-	if s != nil && zend.SUCCESS == _phpStreamSeek(s, 0, SEEK_SET) {
+	if s != nil && zend.SUCCESS == _phpStreamSeek(s, 0, 0) {
 		memset(&post_data, 0, g.SizeOf("post_data"))
 		for _phpStreamEof(s) == 0 {
 			var buf []byte = []byte{0}
-			var len_ ssize_t = _phpStreamRead(s, buf, BUFSIZ)
+			var len_ ssize_t = _phpStreamRead(s, buf, 1024)
 			if len_ > 0 {
 				zend.SmartStrAppendlEx(&post_data.str, buf, len_, 0)
 				if zend.SUCCESS != AddPostVars(arr, &post_data, 0) {
@@ -465,7 +466,7 @@ func PhpStdPostHandler(content_type_dup *byte, arg any) {
 					return
 				}
 			}
-			if len_ != BUFSIZ {
+			if len_ != 1024 {
 				break
 			}
 		}

@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -172,7 +173,7 @@ func ZendGeneratorFreezeCallStack(execute_data *ZendExecuteData) *ZendExecuteDat
 		}
 	}
 	execute_data.SetCall(nil)
-	assert(prev_call == (*ZendExecuteData)(stack))
+	r.Assert(prev_call == (*ZendExecuteData)(stack))
 	return prev_call
 }
 
@@ -685,7 +686,7 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 }
 func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNode, child *ZendGenerator) {
 	var leaf ZendUlong
-	assert(src.GetChildren() > 1)
+	r.Assert(src.GetChildren() > 1)
 	for {
 		var __ht *HashTable = src.GetHt()
 		var _p *Bucket = __ht.GetArData()
@@ -1260,8 +1261,8 @@ func zim_Generator_send(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 			_real_arg = (*Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1385,8 +1386,8 @@ func zim_Generator_throw(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 			_real_arg = (*Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

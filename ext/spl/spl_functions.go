@@ -3,6 +3,7 @@
 package spl
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -173,7 +174,7 @@ func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_fl
 func SplAddInterfaces(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.num_interfaces != 0 {
-		assert((pce.ce_flags & 1 << 3) != 0)
+		r.Assert((pce.ce_flags & 1 << 3) != 0)
 		for num_interfaces = 0; num_interfaces < pce.num_interfaces; num_interfaces++ {
 			SplAddClassName(list, pce.interfaces[num_interfaces], allow, ce_flags)
 		}
@@ -187,7 +188,7 @@ func SplAddTraits(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags
 	var trait *zend.ZendClassEntry
 	for num_traits = 0; num_traits < pce.num_traits; num_traits++ {
 		trait = zend.ZendFetchClassByName(pce.trait_names[num_traits].name, pce.trait_names[num_traits].lc_name, 6)
-		assert(trait != nil)
+		r.Assert(trait != nil)
 		SplAddClassName(list, trait, allow, ce_flags)
 	}
 }

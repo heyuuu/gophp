@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -405,7 +406,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	if filename == nil || filename[0] == '0' {
 		return zend.FAILURE
 	}
-	zend.ZendStreamInitFp(&fh, fopen(filename, "r"), filename)
+	zend.ZendStreamInitFp(&fh, r.Fopen(filename, "r"), filename)
 	if fh.handle.fp == nil {
 		zend.ZendError(1<<5, "Cannot open '%s' for reading", filename)
 		return zend.FAILURE
@@ -661,7 +662,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 func BrowscapZvalCopyCtor(p *zend.Zval) {
 	if p.u1.v.type_flags != 0 {
 		var str *zend.ZendString
-		assert(p.u1.v.type_ == 6)
+		r.Assert(p.u1.v.type_ == 6)
 		str = p.value.str
 		if (zend.ZvalGcFlags(str.gc.u.type_info) & 1 << 7) == 0 {
 			zend.ZendGcAddref(&str.gc)
@@ -734,8 +735,8 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -750,8 +751,8 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

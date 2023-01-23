@@ -6,6 +6,7 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -485,7 +486,7 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 		intern.SetIndex(index)
 		break
 	case SPL_FS_FILE:
-		assert(false)
+		r.Assert(false)
 	}
 	intern.SetFileClass(source.GetFileClass())
 	intern.SetInfoClass(source.GetInfoClass())
@@ -881,7 +882,7 @@ func zim_spl_DirectoryIterator_rewind(execute_data *zend.ZendExecuteData, return
 	}
 	intern.SetIndex(0)
 	if intern.GetDirp() != nil {
-		streams._phpStreamSeek(intern.GetDirp(), 0, SEEK_SET)
+		streams._phpStreamSeek(intern.GetDirp(), 0, 0)
 	}
 	SplFilesystemDirRead(intern)
 }
@@ -1762,7 +1763,7 @@ func zim_spl_FilesystemIterator_rewind(execute_data *zend.ZendExecuteData, retur
 	}
 	intern.SetIndex(0)
 	if intern.GetDirp() != nil {
-		streams._phpStreamSeek(intern.GetDirp(), 0, SEEK_SET)
+		streams._phpStreamSeek(intern.GetDirp(), 0, 0)
 	}
 	for {
 		SplFilesystemDirRead(intern)
@@ -2041,7 +2042,7 @@ func SplFilesystemDirItRewind(iter *zend.ZendObjectIterator) {
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject((*SplFilesystemIterator)(iter))
 	object.SetIndex(0)
 	if object.GetDirp() != nil {
-		streams._phpStreamSeek(object.GetDirp(), 0, SEEK_SET)
+		streams._phpStreamSeek(object.GetDirp(), 0, 0)
 	}
 	SplFilesystemDirRead(object)
 }
@@ -2127,7 +2128,7 @@ func SplFilesystemTreeItRewind(iter *zend.ZendObjectIterator) {
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject(iterator)
 	object.SetIndex(0)
 	if object.GetDirp() != nil {
-		streams._phpStreamSeek(object.GetDirp(), 0, SEEK_SET)
+		streams._phpStreamSeek(object.GetDirp(), 0, 0)
 	}
 	for {
 		SplFilesystemDirRead(object)
@@ -2891,7 +2892,7 @@ func SplFilesystemFileRewind(this_ptr *zend.Zval, intern *SplFilesystemObject) {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	if -1 == streams._phpStreamSeek(intern.GetStream(), 0, SEEK_SET) {
+	if -1 == streams._phpStreamSeek(intern.GetStream(), 0, 0) {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot rewind file %s", intern.GetFileName())
 	} else {
 		SplFilesystemFileFreeLine(intern)
@@ -3275,7 +3276,7 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 				return
 			}
 			if esc_len == 0 {
-				escape = EOF
+				escape = -1
 			} else {
 				escape = uint8(esc[0])
 			}
@@ -3320,7 +3321,7 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 		case 4:
 			switch esc_len {
 			case 0:
-				escape = EOF
+				escape = -1
 				break
 			case 1:
 				escape = uint8(esc[0])
@@ -3379,7 +3380,7 @@ func zim_spl_SplFileObject_setCsvControl(execute_data *zend.ZendExecuteData, ret
 		case 3:
 			switch esc_len {
 			case 0:
-				escape = EOF
+				escape = -1
 				break
 			case 1:
 				escape = uint8(esc[0])
@@ -3427,7 +3428,7 @@ func zim_spl_SplFileObject_getCsvControl(execute_data *zend.ZendExecuteData, ret
 	delimiter[1] = '0'
 	enclosure[0] = intern.GetEnclosure()
 	enclosure[1] = '0'
-	if intern.GetEscape() == EOF {
+	if intern.GetEscape() == -1 {
 		escape[0] = '0'
 	} else {
 		escape[0] = uint8(intern.GetEscape())
@@ -3495,7 +3496,7 @@ func zim_spl_SplFileObject_ftell(execute_data *zend.ZendExecuteData, return_valu
 func zim_spl_SplFileObject_fseek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = SplFilesystemFromObj(&(execute_data.This).value.obj)
 	var pos zend.ZendLong
-	var whence zend.ZendLong = SEEK_SET
+	var whence zend.ZendLong = 0
 	if zend.ZendParseParameters(execute_data.This.u2.num_args, "l|l", &pos, &whence) == zend.FAILURE {
 		return
 	}
@@ -3523,7 +3524,7 @@ func zim_spl_SplFileObject_fgetc(execute_data *zend.ZendExecuteData, return_valu
 	}
 	SplFilesystemFileFreeLine(intern)
 	result = streams._phpStreamGetc(intern.GetStream())
-	if result == EOF {
+	if result == -1 {
 		return_value.u1.type_info = 2
 	} else {
 		if result == '\n' {

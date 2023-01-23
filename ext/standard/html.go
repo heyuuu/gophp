@@ -4,6 +4,7 @@ package standard
 
 import (
 	"sik/core"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -160,7 +161,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 	var pos int = *cursor
 	var this_char uint = 0
 	*status = zend.SUCCESS
-	assert(pos <= str_len)
+	r.Assert(pos <= str_len)
 	if str_len-pos < 1 {
 		*cursor = pos + 1
 		*status = zend.FAILURE
@@ -983,7 +984,7 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 		*buf = code
 		return 1
 	default:
-		assert(false)
+		r.Assert(false)
 		return 0
 	}
 
@@ -1004,7 +1005,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 	var q *byte
 	var doctype int = flags & (16 | 32)
 	lim = old + oldlen
-	assert((*lim) == '0')
+	r.Assert((*lim) == '0')
 	p = old
 	q = ret.val
 	for p < lim {
@@ -1075,7 +1076,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 				}
 			}
 		}
-		assert((*next) == ';')
+		r.Assert((*next) == ';')
 		if code == '\'' && (flags&1) == 0 || code == '"' && (flags&2) == 0 {
 			goto invalid_code
 		}
@@ -1141,7 +1142,7 @@ func UnescapeInverseMap(all int, flags int) *EntityHt {
 
 func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	var retval EntityTableOpt = EntityTableOpt{nil}
-	assert(!(doctype == 16 && all != 0))
+	r.Assert(!(doctype == 16 && all != 0))
 	if all != 0 {
 		if doctype == (16 | 32) {
 			retval.SetMsTable(EntityMsTableHtml5)
@@ -1563,8 +1564,8 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1580,8 +1581,8 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1596,8 +1597,8 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1612,8 +1613,8 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1739,8 +1740,8 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1756,8 +1757,8 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1857,8 +1858,8 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1874,8 +1875,8 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1890,8 +1891,8 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2054,8 +2055,8 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2070,8 +2071,8 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2086,8 +2087,8 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

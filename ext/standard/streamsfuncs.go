@@ -5,6 +5,7 @@ package standard
 import (
 	"sik/core"
 	"sik/core/streams"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -136,8 +137,8 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -152,8 +153,8 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -168,8 +169,8 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -288,8 +289,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -305,8 +306,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -317,8 +318,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -329,8 +330,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -345,8 +346,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -361,8 +362,8 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -422,7 +423,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	tv.tv_usec = conv % 1000000
 	if zerrno != nil {
 		for {
-			assert(zerrno.u1.v.type_ == 10)
+			r.Assert(zerrno.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrno
 				var ref *zend.ZendReference = _zv.value.ref
@@ -442,7 +443,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	if zerrstr != nil {
 		for {
-			assert(zerrstr.u1.v.type_ == 10)
+			r.Assert(zerrstr.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrstr
 				var ref *zend.ZendReference = _zv.value.ref
@@ -476,7 +477,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	if stream == nil {
 		if zerrno != nil {
 			for {
-				assert(zerrno.u1.v.type_ == 10)
+				r.Assert(zerrno.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zerrno
 					var ref *zend.ZendReference = _zv.value.ref
@@ -496,7 +497,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 		}
 		if zerrstr != nil && errstr != nil {
 			for {
-				assert(zerrstr.u1.v.type_ == 10)
+				r.Assert(zerrstr.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zerrstr
 					var ref *zend.ZendReference = _zv.value.ref
@@ -581,8 +582,8 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -598,8 +599,8 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -610,8 +611,8 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -622,8 +623,8 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 
 			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -638,8 +639,8 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -693,7 +694,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	if zerrno != nil {
 		for {
-			assert(zerrno.u1.v.type_ == 10)
+			r.Assert(zerrno.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrno
 				var ref *zend.ZendReference = _zv.value.ref
@@ -713,7 +714,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	if zerrstr != nil {
 		for {
-			assert(zerrstr.u1.v.type_ == 10)
+			r.Assert(zerrstr.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zerrstr
 				var ref *zend.ZendReference = _zv.value.ref
@@ -739,7 +740,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	if stream == nil {
 		if zerrno != nil {
 			for {
-				assert(zerrno.u1.v.type_ == 10)
+				r.Assert(zerrno.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zerrno
 					var ref *zend.ZendReference = _zv.value.ref
@@ -759,7 +760,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 		}
 		if zerrstr != nil && errstr != nil {
 			for {
-				assert(zerrstr.u1.v.type_ == 10)
+				r.Assert(zerrstr.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zerrstr
 					var ref *zend.ZendReference = _zv.value.ref
@@ -842,8 +843,8 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -859,8 +860,8 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -875,8 +876,8 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -928,7 +929,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 	if 0 == streams.PhpStreamXportAccept(stream, &clistream, g.Cond(zpeername != nil, &peername, nil), nil, nil, &tv, &errstr) && clistream != nil {
 		if peername != nil {
 			for {
-				assert(zpeername.u1.v.type_ == 10)
+				r.Assert(zpeername.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zpeername
 					var ref *zend.ZendReference = _zv.value.ref
@@ -1008,8 +1009,8 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1024,8 +1025,8 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1137,8 +1138,8 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1153,8 +1154,8 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1170,8 +1171,8 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1186,8 +1187,8 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1298,8 +1299,8 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1314,8 +1315,8 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1331,8 +1332,8 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1347,8 +1348,8 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1393,7 +1394,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	if zremote != nil {
 		for {
-			assert(zremote.u1.v.type_ == 10)
+			r.Assert(zremote.u1.v.type_ == 10)
 			for {
 				var _zv *zend.Zval = zremote
 				var ref *zend.ZendReference = _zv.value.ref
@@ -1419,7 +1420,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 	if recvd >= 0 {
 		if zremote != nil && remote_addr != nil {
 			for {
-				assert(zremote.u1.v.type_ == 10)
+				r.Assert(zremote.u1.v.type_ == 10)
 				for {
 					var _zv *zend.Zval = zremote
 					var ref *zend.ZendReference = _zv.value.ref
@@ -1497,8 +1498,8 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1514,8 +1515,8 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1530,8 +1531,8 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1591,7 +1592,7 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 
 			/* use SEEK_CUR to allow emulation in streams that don't support seeking */
 
-			seek_res = streams._phpStreamSeek(stream, desiredpos-position, SEEK_CUR)
+			seek_res = streams._phpStreamSeek(stream, desiredpos-position, 1)
 
 			/* use SEEK_CUR to allow emulation in streams that don't support seeking */
 
@@ -1599,7 +1600,7 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 
 			/* desired position before position or error on tell */
 
-			seek_res = streams._phpStreamSeek(stream, desiredpos, SEEK_SET)
+			seek_res = streams._phpStreamSeek(stream, desiredpos, 0)
 
 			/* desired position before position or error on tell */
 
@@ -1674,8 +1675,8 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1690,8 +1691,8 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1707,8 +1708,8 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1723,8 +1724,8 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -1775,7 +1776,7 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 		return_value.u1.type_info = 2
 		return
 	}
-	if pos > 0 && streams._phpStreamSeek(src, pos, SEEK_SET) < 0 {
+	if pos > 0 && streams._phpStreamSeek(src, pos, 0) < 0 {
 		core.PhpErrorDocref(nil, 1<<1, "Failed to seek to position "+"%"+"lld"+" in the stream", pos)
 		return_value.u1.type_info = 2
 		return
@@ -1830,8 +1831,8 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2236,8 +2237,8 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2255,8 +2256,8 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2274,8 +2275,8 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2293,8 +2294,8 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2310,8 +2311,8 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2643,8 +2644,8 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -2745,8 +2746,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 				}
 				_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -2761,8 +2762,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					break
 				}
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -2859,8 +2860,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 				}
 				_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -2875,8 +2876,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					break
 				}
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -2891,8 +2892,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					break
 				}
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -2907,8 +2908,8 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					break
 				}
 				_i++
-				assert(_i <= _min_num_args || _optional == 1)
-				assert(_i > _min_num_args || _optional == 0)
+				r.Assert(_i <= _min_num_args || _optional == 1)
+				r.Assert(_i > _min_num_args || _optional == 0)
 				if _optional != 0 {
 					if _i > _num_args {
 						break
@@ -3004,8 +3005,8 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3020,8 +3021,8 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3116,8 +3117,8 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3222,8 +3223,8 @@ func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3318,8 +3319,8 @@ func ZifStreamContextSetDefault(execute_data *zend.ZendExecuteData, return_value
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3413,8 +3414,8 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3429,8 +3430,8 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3531,8 +3532,8 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3547,8 +3548,8 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3564,8 +3565,8 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3580,8 +3581,8 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3737,8 +3738,8 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3846,8 +3847,8 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3862,8 +3863,8 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3879,8 +3880,8 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -3991,8 +3992,8 @@ func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4007,8 +4008,8 @@ func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4105,8 +4106,8 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4121,8 +4122,8 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4138,8 +4139,8 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4242,8 +4243,8 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4258,8 +4259,8 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4319,7 +4320,7 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 	if ret == 0 {
 		__z.value.lval = 0
 	} else {
-		__z.value.lval = EOF
+		__z.value.lval = -1
 	}
 	__z.u1.type_info = 4
 	return
@@ -4366,8 +4367,8 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4382,8 +4383,8 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4451,7 +4452,7 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 	if ret > 0 {
 		__z.value.lval = zend.ZendLong(ret)
 	} else {
-		__z.value.lval = zend.ZendLong(EOF)
+		__z.value.lval = zend_long(-1)
 	}
 	__z.u1.type_info = 4
 	return
@@ -4499,8 +4500,8 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4515,8 +4516,8 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4576,7 +4577,7 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 	if ret == 0 {
 		__z.value.lval = 0
 	} else {
-		__z.value.lval = EOF
+		__z.value.lval = -1
 	}
 	__z.u1.type_info = 4
 	return
@@ -4627,8 +4628,8 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4643,8 +4644,8 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4660,8 +4661,8 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 			}
 			_optional = 1
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4676,8 +4677,8 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4801,8 +4802,8 @@ func ZifStreamResolveIncludePath(execute_data *zend.ZendExecuteData, return_valu
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -4900,8 +4901,8 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5007,8 +5008,8 @@ func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5105,8 +5106,8 @@ func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5218,8 +5219,8 @@ func ZifStreamSocketShutdown(execute_data *zend.ZendExecuteData, return_value *z
 			}
 			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break
@@ -5234,8 +5235,8 @@ func ZifStreamSocketShutdown(execute_data *zend.ZendExecuteData, return_value *z
 				break
 			}
 			_i++
-			assert(_i <= _min_num_args || _optional == 1)
-			assert(_i > _min_num_args || _optional == 0)
+			r.Assert(_i <= _min_num_args || _optional == 1)
+			r.Assert(_i > _min_num_args || _optional == 0)
 			if _optional != 0 {
 				if _i > _num_args {
 					break

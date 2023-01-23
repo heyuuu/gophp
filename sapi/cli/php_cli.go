@@ -6,6 +6,7 @@ import (
 	"sik/core"
 	"sik/core/streams"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -260,7 +261,7 @@ func SapiCliFlush(server_context any) {
 	 * are/could be closed before fflush() is called.
 	 */
 
-	if fflush(stdout) == EOF && errno != EBADF {
+	if r.Fflush(stdout) == -1 && errno != EBADF {
 		core.PhpHandleAbortedConnection()
 	}
 
@@ -314,12 +315,12 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 
 /* }}} */
 
-func SapiCliLogMessage(message *byte, syslog_type_int int) { fprintf(stderr, "%s\n", message) }
+func SapiCliLogMessage(message *byte, syslog_type_int int) { r.Fprintf(stderr, "%s\n", message) }
 
 /* }}} */
 
 func SapiCliDeactivate() int {
-	fflush(stdout)
+	r.Fflush(stdout)
 	if core.sapi_globals.request_info.argv0 != nil {
 		zend.Free(core.sapi_globals.request_info.argv0)
 		core.sapi_globals.request_info.argv0 = nil
@@ -426,7 +427,7 @@ func PhpCliUsage(argv0 *byte) {
 	} else {
 		prog = "php"
 	}
-	printf("Usage: %s [options] [-f] <file> [--] [args...]\n"+"   %s [options] -r <code> [--] [args...]\n"+"   %s [options] [-B <begin_code>] -R <code> [-E <end_code>] [--] [args...]\n"+"   %s [options] [-B <begin_code>] -F <file> [-E <end_code>] [--] [args...]\n"+"   %s [options] -S <addr>:<port> [-t docroot] [router]\n"+"   %s [options] -- [args...]\n"+"   %s [options] -a\n"+"\n"+"  -a               Run interactively\n"+"  -c <path>|<file> Look for php.ini file in this directory\n"+"  -n               No configuration (ini) files will be used\n"+"  -d foo[=bar]     Define INI entry foo with value 'bar'\n"+"  -e               Generate extended information for debugger/profiler\n"+"  -f <file>        Parse and execute <file>.\n"+"  -h               This help\n"+"  -i               PHP information\n"+"  -l               Syntax check only (lint)\n"+"  -m               Show compiled in modules\n"+"  -r <code>        Run PHP <code> without using script tags <?..?>\n"+"  -B <begin_code>  Run PHP <begin_code> before processing input lines\n"+"  -R <code>        Run PHP <code> for every input line\n"+"  -F <file>        Parse and execute <file> for every input line\n"+"  -E <end_code>    Run PHP <end_code> after processing all input lines\n"+"  -H               Hide any passed arguments from external tools.\n"+"  -S <addr>:<port> Run with built-in web server.\n"+"  -t <docroot>     Specify document root <docroot> for built-in web server.\n"+"  -s               Output HTML syntax highlighted source.\n"+"  -v               Version number\n"+"  -w               Output source with stripped comments and whitespace.\n"+"  -z <file>        Load Zend extension <file>.\n"+"\n"+"  args...          Arguments passed to script. Use -- args when first argument\n"+"                   starts with - or script is read from stdin\n"+"\n"+"  --ini            Show configuration file names\n"+"\n"+"  --rf <name>      Show information about function <name>.\n"+"  --rc <name>      Show information about class <name>.\n"+"  --re <name>      Show information about extension <name>.\n"+"  --rz <name>      Show information about Zend extension <name>.\n"+"  --ri <name>      Show configuration for extension <name>.\n"+"\n", prog, prog, prog, prog, prog, prog, prog)
+	r.Printf("Usage: %s [options] [-f] <file> [--] [args...]\n"+"   %s [options] -r <code> [--] [args...]\n"+"   %s [options] [-B <begin_code>] -R <code> [-E <end_code>] [--] [args...]\n"+"   %s [options] [-B <begin_code>] -F <file> [-E <end_code>] [--] [args...]\n"+"   %s [options] -S <addr>:<port> [-t docroot] [router]\n"+"   %s [options] -- [args...]\n"+"   %s [options] -a\n"+"\n"+"  -a               Run interactively\n"+"  -c <path>|<file> Look for php.ini file in this directory\n"+"  -n               No configuration (ini) files will be used\n"+"  -d foo[=bar]     Define INI entry foo with value 'bar'\n"+"  -e               Generate extended information for debugger/profiler\n"+"  -f <file>        Parse and execute <file>.\n"+"  -h               This help\n"+"  -i               PHP information\n"+"  -l               Syntax check only (lint)\n"+"  -m               Show compiled in modules\n"+"  -r <code>        Run PHP <code> without using script tags <?..?>\n"+"  -B <begin_code>  Run PHP <begin_code> before processing input lines\n"+"  -R <code>        Run PHP <code> for every input line\n"+"  -F <file>        Parse and execute <file> for every input line\n"+"  -E <end_code>    Run PHP <end_code> after processing all input lines\n"+"  -H               Hide any passed arguments from external tools.\n"+"  -S <addr>:<port> Run with built-in web server.\n"+"  -t <docroot>     Specify document root <docroot> for built-in web server.\n"+"  -s               Output HTML syntax highlighted source.\n"+"  -v               Version number\n"+"  -w               Output source with stripped comments and whitespace.\n"+"  -z <file>        Load Zend extension <file>.\n"+"\n"+"  args...          Arguments passed to script. Use -- args when first argument\n"+"                   starts with - or script is read from stdin\n"+"\n"+"  --ini            Show configuration file names\n"+"\n"+"  --rf <name>      Show information about function <name>.\n"+"  --rc <name>      Show information about class <name>.\n"+"  --re <name>      Show information about extension <name>.\n"+"  --rz <name>      Show information about Zend extension <name>.\n"+"  --ri <name>      Show configuration for extension <name>.\n"+"\n", prog, prog, prog, prog, prog, prog, prog)
 }
 
 /* }}} */
@@ -490,7 +491,7 @@ var ParamModeConflict *byte = "Either execute direct code, process stdin or use 
  */
 
 func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {
-	var fp *FILE = fopen(script_file, "rb")
+	var fp *r.FILE = r.Fopen(script_file, "rb")
 	if fp == nil {
 		core.PhpPrintf("Could not open input file: %s\n", script_file)
 		return zend.FAILURE
@@ -724,8 +725,8 @@ func DoCli(argc int, argv **byte) int {
 			goto err
 		}
 		if interactive != 0 {
-			printf("Interactive mode enabled\n\n")
-			fflush(stdout)
+			r.Printf("Interactive mode enabled\n\n")
+			r.Fflush(stdout)
 		}
 
 		/* only set script_file if not set already and not in direct mode and not at end of parameter list */
@@ -769,7 +770,7 @@ func DoCli(argc int, argv **byte) int {
 		core.sapi_globals.request_info.argv = argv + php_optind - 1
 		if core.PhpRequestStartup() == zend.FAILURE {
 			*arg_excp = arg_free
-			fclose(file_handle.handle.fp)
+			r.Fclose(file_handle.handle.fp)
 			var __str *byte = "Could not startup.\n"
 			core.PhpOutputWrite(__str, strlen(__str))
 			goto err

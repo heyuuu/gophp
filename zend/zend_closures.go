@@ -3,6 +3,7 @@
 package zend
 
 import (
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 )
 
@@ -866,7 +867,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 			/* avoid infinity recursion, by taking handler from nested closure */
 
 			var nested *ZendClosure = (*ZendClosure)((*byte)(func_ - zend_long((*byte)(&((*ZendClosure)(nil).GetFunc()))-(*byte)(nil))))
-			assert(nested.GetStd().GetCe() == ZendCeClosure)
+			r.Assert(nested.GetStd().GetCe() == ZendCeClosure)
 			closure.SetOrigInternalHandler(nested.GetOrigInternalHandler())
 		} else {
 			closure.SetOrigInternalHandler(closure.GetFunc().GetInternalFunction().GetHandler())

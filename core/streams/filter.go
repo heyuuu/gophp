@@ -5,6 +5,7 @@ package streams
 import (
 	"sik/core"
 	"sik/ext/standard"
+	r "sik/runtime"
 	g "sik/runtime/grammar"
 	"sik/zend"
 )
@@ -247,7 +248,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent
 		memcpy(wildname, filtername, n+1)
 		period = wildname + (period - filtername)
 		for period != nil && filter == nil {
-			assert(period[0] == '.')
+			r.Assert(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
 			if nil != g.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {
