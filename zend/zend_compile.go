@@ -9777,3 +9777,5 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 	ZendAstDestroy(ast)
 	*ast_ptr = ZendAstCreateZval(&result)
 }
+
+/* }}} */

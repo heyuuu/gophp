@@ -1,5 +1,0 @@
-// <<generate>>
-
-package zend
-
-/* }}} */
