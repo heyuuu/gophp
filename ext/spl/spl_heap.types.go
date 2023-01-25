@@ -37,6 +37,18 @@ func (this *SplPtrHeap) SetMaxSize(value int)             { this.max_size = valu
 func (this SplPtrHeap) GetElemSize() int                  { return this.elem_size }
 func (this *SplPtrHeap) SetElemSize(value int)            { this.elem_size = value }
 
+/* SplPtrHeap.flags */
+func (this *SplPtrHeap) AddFlags(value int)     { this.flags |= value }
+func (this *SplPtrHeap) SubFlags(value int)     { this.flags &^= value }
+func (this SplPtrHeap) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplPtrHeap) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * SplHeapObject
  */
@@ -62,6 +74,18 @@ func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)       { this.f
 func (this SplHeapObject) GetStd() zend.ZendObject                      { return this.std }
 func (this *SplHeapObject) SetStd(value zend.ZendObject)                { this.std = value }
 
+/* SplHeapObject.flags */
+func (this *SplHeapObject) AddFlags(value int)     { this.flags |= value }
+func (this *SplHeapObject) SubFlags(value int)     { this.flags &^= value }
+func (this SplHeapObject) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplHeapObject) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * SplHeapIt
  */
@@ -74,6 +98,18 @@ func (this SplHeapIt) GetIntern() zend.ZendUserIterator       { return this.inte
 func (this *SplHeapIt) SetIntern(value zend.ZendUserIterator) { this.intern = value }
 func (this SplHeapIt) GetFlags() int                          { return this.flags }
 func (this *SplHeapIt) SetFlags(value int)                    { this.flags = value }
+
+/* SplHeapIt.flags */
+func (this *SplHeapIt) AddFlags(value int)     { this.flags |= value }
+func (this *SplHeapIt) SubFlags(value int)     { this.flags &^= value }
+func (this SplHeapIt) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplHeapIt) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
 
 /**
  * SplPqueueElem

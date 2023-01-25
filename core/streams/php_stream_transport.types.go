@@ -83,6 +83,18 @@ func (this *PhpStreamXportParam) SetReturncode(value int) { this.outputs.returnc
 func (this PhpStreamXportParam) GetErrorCode() int        { return this.outputs.error_code }
 func (this *PhpStreamXportParam) SetErrorCode(value int)  { this.outputs.error_code = value }
 
+/* PhpStreamXportParam.inputs.flags */
+func (this *PhpStreamXportParam) AddFlags(value int)     { this.inputs.flags |= value }
+func (this *PhpStreamXportParam) SubFlags(value int)     { this.inputs.flags &^= value }
+func (this PhpStreamXportParam) HasFlags(value int) bool { return this.inputs.flags&value != 0 }
+func (this *PhpStreamXportParam) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * PhpStreamXportCryptoParam
  */

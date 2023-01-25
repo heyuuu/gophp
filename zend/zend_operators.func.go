@@ -226,7 +226,7 @@ again:
 		}
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			result = 1
 		}
 		break
@@ -690,7 +690,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -743,7 +743,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -804,7 +804,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -921,7 +921,7 @@ func _tryConvertToString(op *Zval) ZendBool {
 }
 func ConvertScalarToArray(op *Zval) {
 	var ht *HashTable = ZendNewArray(1)
-	ZendHashIndexAddNew(ht, 0, op)
+	ht.IndexAddNew(0, op)
 	ZVAL_ARR(op, ht)
 }
 func ConvertToArray(op *Zval) {
@@ -1000,7 +1000,7 @@ try_again:
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, op)
 		ObjectInit(op)
-		ZendHashAddNew(Z_OBJPROP_P(op), ZSTR_KNOWN(ZEND_STR_SCALAR), &tmp)
+		Z_OBJPROP_P(op).AddNew(ZSTR_KNOWN(ZEND_STR_SCALAR), &tmp)
 		break
 	}
 }
@@ -1084,7 +1084,7 @@ try_again:
 
 		}
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			return 1
 		} else {
 			return 0
@@ -1125,7 +1125,7 @@ try_again:
 	case IS_STRING:
 		return ZendStrtod(Z_STRVAL_P(op), nil)
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).NumElements() {
 			return 1.0
 		} else {
 			return 0.0
@@ -1220,7 +1220,7 @@ func AddFunctionArray(result *Zval, op1 *Zval, op2 *Zval) {
 	} else {
 		SEPARATE_ARRAY(result)
 	}
-	ZendHashMerge(Z_ARRVAL_P(result), Z_ARRVAL_P(op2), ZvalAddRef, 0)
+	Z_ARRVAL_P(result).Merge(Z_ARRVAL_P(op2), ZvalAddRef, 0)
 }
 func AddFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
 	var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
@@ -2739,7 +2739,7 @@ func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {
 	case IS_STRING:
 		return ZendStringEquals(Z_STR_P(op1), Z_STR_P(op2))
 	case IS_ARRAY:
-		return Z_ARRVAL_P(op1) == Z_ARRVAL_P(op2) || ZendHashCompare(Z_ARRVAL_P(op1), Z_ARRVAL_P(op2), CompareFuncT(HashZvalIdenticalFunction), 1) == 0
+		return Z_ARRVAL_P(op1) == Z_ARRVAL_P(op2) || Z_ARRVAL_P(op1).Compare(Z_ARRVAL_P(op2), CompareFuncT(HashZvalIdenticalFunction), 1) == 0
 	case IS_OBJECT:
 		return Z_OBJ_P(op1) == Z_OBJ_P(op2)
 	default:
@@ -2797,7 +2797,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 	var i uint32
 	if instance_ce.GetNumInterfaces() != 0 {
-		ZEND_ASSERT((instance_ce.GetCeFlags() & ZEND_ACC_RESOLVED_INTERFACES) != 0)
+		ZEND_ASSERT(instance_ce.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
 		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
 			if instance_ce.interfaces[i] == ce {
 				return 1
@@ -2808,15 +2808,15 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBo
 }
 func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_interface ZendBool) ZendBool {
 	if is_interface != 0 {
-		ZEND_ASSERT((ce.GetCeFlags() & ZEND_ACC_INTERFACE) != 0)
+		ZEND_ASSERT(ce.isInterface())
 		return InstanceofInterface(instance_ce, ce)
 	} else {
-		ZEND_ASSERT((ce.GetCeFlags() & ZEND_ACC_INTERFACE) == 0)
+		ZEND_ASSERT(!ce.isInterface())
 		return InstanceofClass(instance_ce, ce)
 	}
 }
 func InstanceofFunction(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
-	if (ce.GetCeFlags() & ZEND_ACC_INTERFACE) != 0 {
+	if ce.isInterface() {
 		return InstanceofInterface(instance_ce, ce)
 	} else {
 		return InstanceofClass(instance_ce, ce)
@@ -3364,7 +3364,7 @@ func ZendCompareSymbolTables(ht1 *HashTable, ht2 *HashTable) int {
 	if ht1 == ht2 {
 		return 0
 	} else {
-		return ZendHashCompare(ht1, ht2, CompareFuncT(HashZvalCompareFunction), 0)
+		return ht1.Compare(ht2, CompareFuncT(HashZvalCompareFunction), 0)
 	}
 }
 func ZendCompareArrays(a1 *Zval, a2 *Zval) int {

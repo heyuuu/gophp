@@ -296,6 +296,30 @@ func (this *ZendPropertyInfo) SetCe(value *ZendClassEntry)     { this.ce = value
 func (this ZendPropertyInfo) GetType() ZendType                { return this.type_ }
 func (this *ZendPropertyInfo) SetType(value ZendType)          { this.type_ = value }
 
+/* ZendPropertyInfo.flags */
+func (this *ZendPropertyInfo) AddFlags(value uint32)     { this.flags |= value }
+func (this *ZendPropertyInfo) SubFlags(value uint32)     { this.flags &^= value }
+func (this ZendPropertyInfo) HasFlags(value uint32) bool { return this.flags&value != 0 }
+func (this *ZendPropertyInfo) SwitchFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+func (this ZendPropertyInfo) isStatic() bool            { return this.HasFlags(ZEND_ACC_STATIC) }
+func (this ZendPropertyInfo) isShadow() bool            { return this.HasFlags(ZEND_ACC_SHADOW) }
+func (this ZendPropertyInfo) isProtected() bool         { return this.HasFlags(ZEND_ACC_PROTECTED) }
+func (this ZendPropertyInfo) isPrivate() bool           { return this.HasFlags(ZEND_ACC_PRIVATE) }
+func (this ZendPropertyInfo) isChanged() bool           { return this.HasFlags(ZEND_ACC_CHANGED) }
+func (this ZendPropertyInfo) isPublic() bool            { return this.HasFlags(ZEND_ACC_PUBLIC) }
+func (this *ZendPropertyInfo) setIsStatic(cond bool)    { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
+func (this *ZendPropertyInfo) setIsShadow(cond bool)    { this.SwitchFlags(ZEND_ACC_SHADOW, cond) }
+func (this *ZendPropertyInfo) setIsProtected(cond bool) { this.SwitchFlags(ZEND_ACC_PROTECTED, cond) }
+func (this *ZendPropertyInfo) setIsPrivate(cond bool)   { this.SwitchFlags(ZEND_ACC_PRIVATE, cond) }
+func (this *ZendPropertyInfo) setIsChanged(cond bool)   { this.SwitchFlags(ZEND_ACC_CHANGED, cond) }
+func (this *ZendPropertyInfo) setIsPublic(cond bool)    { this.SwitchFlags(ZEND_ACC_PUBLIC, cond) }
+
 /**
  * ZendClassConstant
  */
@@ -472,6 +496,62 @@ func (this *ZendOpArray) SetLiterals(value *Zval)                     { this.lit
 func (this ZendOpArray) GetReserved() []any                           { return this.reserved }
 func (this *ZendOpArray) SetReserved(value []any)                     { this.reserved = value }
 
+/* ZendOpArray.fn_flags */
+func (this *ZendOpArray) AddFnFlags(value uint32)     { this.fn_flags |= value }
+func (this *ZendOpArray) SubFnFlags(value uint32)     { this.fn_flags &^= value }
+func (this ZendOpArray) HasFnFlags(value uint32) bool { return this.fn_flags&value != 0 }
+func (this *ZendOpArray) SwitchFnFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFnFlags(value)
+	} else {
+		this.SubFnFlags(value)
+	}
+}
+func (this ZendOpArray) isChanged() bool         { return this.HasFnFlags(ZEND_ACC_CHANGED) }
+func (this ZendOpArray) isPrivate() bool         { return this.HasFnFlags(ZEND_ACC_PRIVATE) }
+func (this ZendOpArray) isNoRtArena() bool       { return this.HasFnFlags(ZEND_ACC_NO_RT_ARENA) }
+func (this ZendOpArray) isHasReturnType() bool   { return this.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE) }
+func (this ZendOpArray) isClosure() bool         { return this.HasFnFlags(ZEND_ACC_CLOSURE) }
+func (this ZendOpArray) isReturnReference() bool { return this.HasFnFlags(ZEND_ACC_RETURN_REFERENCE) }
+func (this ZendOpArray) isGenerator() bool       { return this.HasFnFlags(ZEND_ACC_GENERATOR) }
+func (this ZendOpArray) isHasFinallyBlock() bool { return this.HasFnFlags(ZEND_ACC_HAS_FINALLY_BLOCK) }
+func (this ZendOpArray) isVariadic() bool        { return this.HasFnFlags(ZEND_ACC_VARIADIC) }
+func (this ZendOpArray) isPublic() bool          { return this.HasFnFlags(ZEND_ACC_PUBLIC) }
+func (this ZendOpArray) isStatic() bool          { return this.HasFnFlags(ZEND_ACC_STATIC) }
+func (this ZendOpArray) isAbstract() bool        { return this.HasFnFlags(ZEND_ACC_ABSTRACT) }
+func (this ZendOpArray) isCallViaTrampoline() bool {
+	return this.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE)
+}
+func (this ZendOpArray) isHasTypeHints() bool      { return this.HasFnFlags(ZEND_ACC_HAS_TYPE_HINTS) }
+func (this ZendOpArray) isDonePassTwo() bool       { return this.HasFnFlags(ZEND_ACC_DONE_PASS_TWO) }
+func (this *ZendOpArray) setIsChanged(cond bool)   { this.SwitchFnFlags(ZEND_ACC_CHANGED, cond) }
+func (this *ZendOpArray) setIsPrivate(cond bool)   { this.SwitchFnFlags(ZEND_ACC_PRIVATE, cond) }
+func (this *ZendOpArray) setIsNoRtArena(cond bool) { this.SwitchFnFlags(ZEND_ACC_NO_RT_ARENA, cond) }
+func (this *ZendOpArray) setIsHasReturnType(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_HAS_RETURN_TYPE, cond)
+}
+func (this *ZendOpArray) setIsClosure(cond bool) { this.SwitchFnFlags(ZEND_ACC_CLOSURE, cond) }
+func (this *ZendOpArray) setIsReturnReference(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_RETURN_REFERENCE, cond)
+}
+func (this *ZendOpArray) setIsGenerator(cond bool) { this.SwitchFnFlags(ZEND_ACC_GENERATOR, cond) }
+func (this *ZendOpArray) setIsHasFinallyBlock(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_HAS_FINALLY_BLOCK, cond)
+}
+func (this *ZendOpArray) setIsVariadic(cond bool) { this.SwitchFnFlags(ZEND_ACC_VARIADIC, cond) }
+func (this *ZendOpArray) setIsPublic(cond bool)   { this.SwitchFnFlags(ZEND_ACC_PUBLIC, cond) }
+func (this *ZendOpArray) setIsStatic(cond bool)   { this.SwitchFnFlags(ZEND_ACC_STATIC, cond) }
+func (this *ZendOpArray) setIsAbstract(cond bool) { this.SwitchFnFlags(ZEND_ACC_ABSTRACT, cond) }
+func (this *ZendOpArray) setIsCallViaTrampoline(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE, cond)
+}
+func (this *ZendOpArray) setIsHasTypeHints(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_HAS_TYPE_HINTS, cond)
+}
+func (this *ZendOpArray) setIsDonePassTwo(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_DONE_PASS_TWO, cond)
+}
+
 /**
  * ZendInternalFunction
  */
@@ -514,6 +594,18 @@ func (this ZendInternalFunction) GetModule() *ZendModuleEntry            { retur
 func (this *ZendInternalFunction) SetModule(value *ZendModuleEntry)      { this.module = value }
 func (this ZendInternalFunction) GetReserved() []any                     { return this.reserved }
 func (this *ZendInternalFunction) SetReserved(value []any)               { this.reserved = value }
+
+/* ZendInternalFunction.fn_flags */
+func (this *ZendInternalFunction) AddFnFlags(value uint32)     { this.fn_flags |= value }
+func (this *ZendInternalFunction) SubFnFlags(value uint32)     { this.fn_flags &^= value }
+func (this ZendInternalFunction) HasFnFlags(value uint32) bool { return this.fn_flags&value != 0 }
+func (this *ZendInternalFunction) SwitchFnFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFnFlags(value)
+	} else {
+		this.SubFnFlags(value)
+	}
+}
 
 /**
  * ZendFunction
@@ -563,6 +655,94 @@ func (this *ZendFunction) SetOpArray(value ZendOpArray)             { this.op_ar
 func (this ZendFunction) GetInternalFunction() ZendInternalFunction { return this.internal_function }
 func (this *ZendFunction) SetInternalFunction(value ZendInternalFunction) {
 	this.internal_function = value
+}
+
+/* ZendFunction.quick_arg_flags */
+func (this *ZendFunction) AddQuickArgFlags(value uint32)     { this.quick_arg_flags |= value }
+func (this *ZendFunction) SubQuickArgFlags(value uint32)     { this.quick_arg_flags &^= value }
+func (this ZendFunction) HasQuickArgFlags(value uint32) bool { return this.quick_arg_flags&value != 0 }
+func (this *ZendFunction) SwitchQuickArgFlags(value uint32, cond bool) {
+	if cond {
+		this.AddQuickArgFlags(value)
+	} else {
+		this.SubQuickArgFlags(value)
+	}
+}
+
+/* ZendFunction.common.fn_flags */
+func (this *ZendFunction) AddFnFlags(value uint32)     { this.common.fn_flags |= value }
+func (this *ZendFunction) SubFnFlags(value uint32)     { this.common.fn_flags &^= value }
+func (this ZendFunction) HasFnFlags(value uint32) bool { return this.common.fn_flags&value != 0 }
+func (this *ZendFunction) SwitchFnFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFnFlags(value)
+	} else {
+		this.SubFnFlags(value)
+	}
+}
+func (this ZendFunction) isVariadic() bool      { return this.HasFnFlags(ZEND_ACC_VARIADIC) }
+func (this ZendFunction) isStatic() bool        { return this.HasFnFlags(ZEND_ACC_STATIC) }
+func (this ZendFunction) isHasReturnType() bool { return this.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE) }
+func (this ZendFunction) isCtor() bool          { return this.HasFnFlags(ZEND_ACC_CTOR) }
+func (this ZendFunction) isDtor() bool          { return this.HasFnFlags(ZEND_ACC_DTOR) }
+func (this ZendFunction) isPrivate() bool       { return this.HasFnFlags(ZEND_ACC_PRIVATE) }
+func (this ZendFunction) isProtected() bool     { return this.HasFnFlags(ZEND_ACC_PROTECTED) }
+func (this ZendFunction) isCallViaTrampoline() bool {
+	return this.HasFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE)
+}
+func (this ZendFunction) isAbstract() bool         { return this.HasFnFlags(ZEND_ACC_ABSTRACT) }
+func (this ZendFunction) isAllowStatic() bool      { return this.HasFnFlags(ZEND_ACC_ALLOW_STATIC) }
+func (this ZendFunction) isPublic() bool           { return this.HasFnFlags(ZEND_ACC_PUBLIC) }
+func (this ZendFunction) isFakeClosure() bool      { return this.HasFnFlags(ZEND_ACC_FAKE_CLOSURE) }
+func (this ZendFunction) isGenerator() bool        { return this.HasFnFlags(ZEND_ACC_GENERATOR) }
+func (this ZendFunction) isUserArgInfo() bool      { return this.HasFnFlags(ZEND_ACC_USER_ARG_INFO) }
+func (this ZendFunction) isNoRtArena() bool        { return this.HasFnFlags(ZEND_ACC_NO_RT_ARENA) }
+func (this ZendFunction) isClosure() bool          { return this.HasFnFlags(ZEND_ACC_CLOSURE) }
+func (this ZendFunction) isStrictTypes() bool      { return this.HasFnFlags(ZEND_ACC_STRICT_TYPES) }
+func (this ZendFunction) isDeprecated() bool       { return this.HasFnFlags(ZEND_ACC_DEPRECATED) }
+func (this ZendFunction) isFinal() bool            { return this.HasFnFlags(ZEND_ACC_FINAL) }
+func (this ZendFunction) isReturnReference() bool  { return this.HasFnFlags(ZEND_ACC_RETURN_REFERENCE) }
+func (this ZendFunction) isArenaAllocated() bool   { return this.HasFnFlags(ZEND_ACC_ARENA_ALLOCATED) }
+func (this ZendFunction) isHasTypeHints() bool     { return this.HasFnFlags(ZEND_ACC_HAS_TYPE_HINTS) }
+func (this *ZendFunction) setIsVariadic(cond bool) { this.SwitchFnFlags(ZEND_ACC_VARIADIC, cond) }
+func (this *ZendFunction) setIsStatic(cond bool)   { this.SwitchFnFlags(ZEND_ACC_STATIC, cond) }
+func (this *ZendFunction) setIsHasReturnType(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_HAS_RETURN_TYPE, cond)
+}
+func (this *ZendFunction) setIsCtor(cond bool)      { this.SwitchFnFlags(ZEND_ACC_CTOR, cond) }
+func (this *ZendFunction) setIsDtor(cond bool)      { this.SwitchFnFlags(ZEND_ACC_DTOR, cond) }
+func (this *ZendFunction) setIsPrivate(cond bool)   { this.SwitchFnFlags(ZEND_ACC_PRIVATE, cond) }
+func (this *ZendFunction) setIsProtected(cond bool) { this.SwitchFnFlags(ZEND_ACC_PROTECTED, cond) }
+func (this *ZendFunction) setIsCallViaTrampoline(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE, cond)
+}
+func (this *ZendFunction) setIsAbstract(cond bool) { this.SwitchFnFlags(ZEND_ACC_ABSTRACT, cond) }
+func (this *ZendFunction) setIsAllowStatic(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_ALLOW_STATIC, cond)
+}
+func (this *ZendFunction) setIsPublic(cond bool) { this.SwitchFnFlags(ZEND_ACC_PUBLIC, cond) }
+func (this *ZendFunction) setIsFakeClosure(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_FAKE_CLOSURE, cond)
+}
+func (this *ZendFunction) setIsGenerator(cond bool) { this.SwitchFnFlags(ZEND_ACC_GENERATOR, cond) }
+func (this *ZendFunction) setIsUserArgInfo(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_USER_ARG_INFO, cond)
+}
+func (this *ZendFunction) setIsNoRtArena(cond bool) { this.SwitchFnFlags(ZEND_ACC_NO_RT_ARENA, cond) }
+func (this *ZendFunction) setIsClosure(cond bool)   { this.SwitchFnFlags(ZEND_ACC_CLOSURE, cond) }
+func (this *ZendFunction) setIsStrictTypes(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_STRICT_TYPES, cond)
+}
+func (this *ZendFunction) setIsDeprecated(cond bool) { this.SwitchFnFlags(ZEND_ACC_DEPRECATED, cond) }
+func (this *ZendFunction) setIsFinal(cond bool)      { this.SwitchFnFlags(ZEND_ACC_FINAL, cond) }
+func (this *ZendFunction) setIsReturnReference(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_RETURN_REFERENCE, cond)
+}
+func (this *ZendFunction) setIsArenaAllocated(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_ARENA_ALLOCATED, cond)
+}
+func (this *ZendFunction) setIsHasTypeHints(cond bool) {
+	this.SwitchFnFlags(ZEND_ACC_HAS_TYPE_HINTS, cond)
 }
 
 /**

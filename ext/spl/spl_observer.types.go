@@ -39,6 +39,18 @@ func (this *spl_SplObjectStorage) SetGcdataNum(value int)       { this.gcdata_nu
 func (this spl_SplObjectStorage) GetStd() zend.ZendObject       { return this.std }
 func (this *spl_SplObjectStorage) SetStd(value zend.ZendObject) { this.std = value }
 
+/* spl_SplObjectStorage.flags */
+func (this *spl_SplObjectStorage) AddFlags(value zend.ZendLong)     { this.flags |= value }
+func (this *spl_SplObjectStorage) SubFlags(value zend.ZendLong)     { this.flags &^= value }
+func (this spl_SplObjectStorage) HasFlags(value zend.ZendLong) bool { return this.flags&value != 0 }
+func (this *spl_SplObjectStorage) SwitchFlags(value zend.ZendLong, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * spl_SplObjectStorageElement
  */

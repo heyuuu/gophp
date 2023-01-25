@@ -95,7 +95,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 		case RS_NEXT:
 			iterator.funcs.move_forward(iterator)
 			if zend.ExecutorGlobals.exception != nil {
-				if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+				if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 					return
 				} else {
 					zend.ZendClearException()
@@ -115,7 +115,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 				zend.ZendCallMethodWith0Params(zobject, ce, nil, "haschildren", &retval)
 			}
 			if zend.ExecutorGlobals.exception != nil {
-				if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+				if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 					object.GetIterators()[object.GetLevel()].SetState(RS_NEXT)
 					return
 				} else {
@@ -159,7 +159,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			}
 			object.GetIterators()[object.GetLevel()].SetState(RS_NEXT)
 			if zend.ExecutorGlobals.exception != nil {
-				if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+				if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 					return
 				} else {
 					zend.ZendClearException()
@@ -185,7 +185,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 				zend.ZendCallMethodWith0Params(zobject, ce, nil, "getchildren", &child)
 			}
 			if zend.ExecutorGlobals.exception != nil {
-				if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+				if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 					return
 				} else {
 					zend.ZendClearException()
@@ -216,7 +216,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			if object.GetBeginChildren() != nil {
 				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.beginChildren, "beginchildren", nil)
 				if zend.ExecutorGlobals.exception != nil {
-					if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+					if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 						return
 					} else {
 						zend.ZendClearException()
@@ -232,7 +232,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			if object.GetEndChildren() != nil {
 				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.endChildren, "endchildren", nil)
 				if zend.ExecutorGlobals.exception != nil {
-					if (object.GetFlags() & RIT_CATCH_GET_CHILD) == 0 {
+					if !object.HasFlags(RIT_CATCH_GET_CHILD) {
 						return
 					} else {
 						zend.ZendClearException()
@@ -816,7 +816,7 @@ func zim_spl_RecursiveTreeIterator_current(execute_data *zend.ZendExecuteData, r
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
 		return
 	}
-	if (object.GetFlags() & RTIT_BYPASS_CURRENT) != 0 {
+	if object.HasFlags(RTIT_BYPASS_CURRENT) {
 		var iterator *zend.ZendObjectIterator = object.GetIterators()[object.GetLevel()].GetIterator()
 		var data *zend.Zval
 		SPL_FETCH_SUB_ITERATOR(iterator, object)
@@ -873,7 +873,7 @@ func zim_spl_RecursiveTreeIterator_key(execute_data *zend.ZendExecuteData, retur
 	} else {
 		zend.ZVAL_NULL(&key)
 	}
-	if (object.GetFlags() & RTIT_BYPASS_KEY) != 0 {
+	if object.HasFlags(RTIT_BYPASS_KEY) {
 		zend.RETVAL_ZVAL(&key, 1, 1)
 		return
 	}
@@ -990,7 +990,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			zend.ZendThrowException(spl_ce_InvalidArgumentException, "Flags must contain only one of CALL_TOSTRING, TOSTRING_USE_KEY, TOSTRING_USE_CURRENT, TOSTRING_USE_INNER", 0)
 			return nil
 		}
-		intern.SetUCachingFlags(intern.GetUCachingFlags() | flags&CIT_PUBLIC)
+		intern.AddUCachingFlags(flags & CIT_PUBLIC)
 		zend.ArrayInit(&intern.u.caching.zcache)
 		break
 	case DIT_IteratorIterator:
@@ -1455,7 +1455,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		zend.RETVAL_FALSE
 		return
 	}
-	if (intern.GetURegexFlags() & REGIT_USE_KEY) != 0 {
+	if intern.HasURegexFlags(REGIT_USE_KEY) {
 		subject = zend.ZvalGetString(&intern.current.key)
 	} else {
 		if zend.Z_TYPE(intern.GetData()) == zend.IS_ARRAY {
@@ -1506,7 +1506,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 			return
 		}
 		result = php_pcre_replace_impl(intern.GetPce(), subject, zend.ZSTR_VAL(subject), zend.ZSTR_LEN(subject), replacement_str, -1, &count)
-		if (intern.GetURegexFlags() & REGIT_USE_KEY) != 0 {
+		if intern.HasURegexFlags(REGIT_USE_KEY) {
 			zend.ZvalPtrDtor(&intern.current.key)
 			zend.ZVAL_STR(&intern.current.key, result)
 		} else {
@@ -1516,7 +1516,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		zend.ZendStringRelease(replacement_str)
 		zend.RETVAL_BOOL(count > 0)
 	}
-	if (intern.GetURegexFlags() & REGIT_INVERTED) != 0 {
+	if intern.HasURegexFlags(REGIT_INVERTED) {
 		zend.RETVAL_BOOL(zend.Z_TYPE_P(return_value) != zend.IS_TRUE)
 	}
 	zend.ZendStringReleaseEx(subject, 0)
@@ -1849,7 +1849,7 @@ func zim_spl_LimitIterator_getPosition(execute_data *zend.ZendExecuteData, retur
 	return
 }
 func SplCachingItValid(intern *SplDualItObject) int {
-	if (intern.GetUCachingFlags() & CIT_VALID) != 0 {
+	if intern.HasUCachingFlags(CIT_VALID) {
 		return zend.SUCCESS
 	} else {
 		return zend.FAILURE
@@ -1858,11 +1858,11 @@ func SplCachingItValid(intern *SplDualItObject) int {
 func SplCachingItHasNext(intern *SplDualItObject) int { return SplDualItValid(intern) }
 func SplCachingItNext(intern *SplDualItObject) {
 	if SplDualItFetch(intern, 1) == zend.SUCCESS {
-		intern.SetUCachingFlags(intern.GetUCachingFlags() | CIT_VALID)
+		intern.AddUCachingFlags(CIT_VALID)
 
 		/* Full cache ? */
 
-		if (intern.GetUCachingFlags() & CIT_FULL_CACHE) != 0 {
+		if intern.HasUCachingFlags(CIT_FULL_CACHE) {
 			var key *zend.Zval = &intern.current.key
 			var data *zend.Zval = &intern.current.data
 			zend.ZVAL_DEREF(data)
@@ -1880,7 +1880,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			zend.ZendCallMethodWith0Params(&intern.inner.zobject, intern.GetCe(), nil, "haschildren", &retval)
 			if zend.ExecutorGlobals.exception != nil {
 				zend.ZvalPtrDtor(&retval)
-				if (intern.GetUCachingFlags() & CIT_CATCH_GET_CHILD) != 0 {
+				if intern.HasUCachingFlags(CIT_CATCH_GET_CHILD) {
 					zend.ZendClearException()
 				} else {
 					return
@@ -1890,7 +1890,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 					zend.ZendCallMethodWith0Params(&intern.inner.zobject, intern.GetCe(), nil, "getchildren", &zchildren)
 					if zend.ExecutorGlobals.exception != nil {
 						zend.ZvalPtrDtor(&zchildren)
-						if (intern.GetUCachingFlags() & CIT_CATCH_GET_CHILD) != 0 {
+						if intern.HasUCachingFlags(CIT_CATCH_GET_CHILD) {
 							zend.ZendClearException()
 						} else {
 							zend.ZvalPtrDtor(&retval)
@@ -1904,7 +1904,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 				}
 				zend.ZvalPtrDtor(&retval)
 				if zend.ExecutorGlobals.exception != nil {
-					if (intern.GetUCachingFlags() & CIT_CATCH_GET_CHILD) != 0 {
+					if intern.HasUCachingFlags(CIT_CATCH_GET_CHILD) {
 						zend.ZendClearException()
 					} else {
 						return
@@ -1912,10 +1912,10 @@ func SplCachingItNext(intern *SplDualItObject) {
 				}
 			}
 		}
-		if (intern.GetUCachingFlags() & (CIT_TOSTRING_USE_INNER | CIT_CALL_TOSTRING)) != 0 {
+		if intern.HasUCachingFlags(CIT_TOSTRING_USE_INNER | CIT_CALL_TOSTRING) {
 			var use_copy int
 			var expr_copy zend.Zval
-			if (intern.GetUCachingFlags() & CIT_TOSTRING_USE_INNER) != 0 {
+			if intern.HasUCachingFlags(CIT_TOSTRING_USE_INNER) {
 				zend.ZVAL_COPY_VALUE(&intern.u.caching.zstr, &intern.inner.zobject)
 			} else {
 				zend.ZVAL_COPY_VALUE(&intern.u.caching.zstr, &intern.current.data)
@@ -1929,7 +1929,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 		}
 		SplDualItNext(intern, 0)
 	} else {
-		intern.SetUCachingFlags(intern.GetUCachingFlags() &^ CIT_VALID)
+		intern.SubUCachingFlags(CIT_VALID)
 	}
 }
 func SplCachingItRewind(intern *SplDualItObject) {
@@ -2002,15 +2002,15 @@ func zim_spl_CachingIterator___toString(execute_data *zend.ZendExecuteData, retu
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & (CIT_CALL_TOSTRING | CIT_TOSTRING_USE_KEY | CIT_TOSTRING_USE_CURRENT | CIT_TOSTRING_USE_INNER)) == 0 {
+	if !intern.HasUCachingFlags(CIT_CALL_TOSTRING | CIT_TOSTRING_USE_KEY | CIT_TOSTRING_USE_CURRENT | CIT_TOSTRING_USE_INNER) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
-	if (intern.GetUCachingFlags() & CIT_TOSTRING_USE_KEY) != 0 {
+	if intern.HasUCachingFlags(CIT_TOSTRING_USE_KEY) {
 		zend.ZVAL_COPY(return_value, &intern.current.key)
 		zend.ConvertToString(return_value)
 		return
-	} else if (intern.GetUCachingFlags() & CIT_TOSTRING_USE_CURRENT) != 0 {
+	} else if intern.HasUCachingFlags(CIT_TOSTRING_USE_CURRENT) {
 		zend.ZVAL_COPY(return_value, &intern.current.data)
 		zend.ConvertToString(return_value)
 		return
@@ -2033,7 +2033,7 @@ func zim_spl_CachingIterator_offsetSet(execute_data *zend.ZendExecuteData, retur
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
@@ -2053,7 +2053,7 @@ func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, retur
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
@@ -2075,7 +2075,7 @@ func zim_spl_CachingIterator_offsetUnset(execute_data *zend.ZendExecuteData, ret
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
@@ -2093,7 +2093,7 @@ func zim_spl_CachingIterator_offsetExists(execute_data *zend.ZendExecuteData, re
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
@@ -2114,7 +2114,7 @@ func zim_spl_CachingIterator_getCache(execute_data *zend.ZendExecuteData, return
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}
@@ -2150,15 +2150,15 @@ func zim_spl_CachingIterator_setFlags(execute_data *zend.ZendExecuteData, return
 		zend.ZendThrowException(spl_ce_InvalidArgumentException, "Flags must contain only one of CALL_TOSTRING, TOSTRING_USE_KEY, TOSTRING_USE_CURRENT, TOSTRING_USE_INNER", 0)
 		return
 	}
-	if (intern.GetUCachingFlags()&CIT_CALL_TOSTRING) != 0 && (flags&CIT_CALL_TOSTRING) == 0 {
+	if intern.HasUCachingFlags(CIT_CALL_TOSTRING) && (flags&CIT_CALL_TOSTRING) == 0 {
 		zend.ZendThrowException(spl_ce_InvalidArgumentException, "Unsetting flag CALL_TO_STRING is not possible", 0)
 		return
 	}
-	if (intern.GetUCachingFlags()&CIT_TOSTRING_USE_INNER) != 0 && (flags&CIT_TOSTRING_USE_INNER) == 0 {
+	if intern.HasUCachingFlags(CIT_TOSTRING_USE_INNER) && (flags&CIT_TOSTRING_USE_INNER) == 0 {
 		zend.ZendThrowException(spl_ce_InvalidArgumentException, "Unsetting flag TOSTRING_USE_INNER is not possible", 0)
 		return
 	}
-	if (flags&CIT_FULL_CACHE) != 0 && (intern.GetUCachingFlags()&CIT_FULL_CACHE) == 0 {
+	if (flags&CIT_FULL_CACHE) != 0 && !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 
 		/* clear on (re)enable */
 
@@ -2180,7 +2180,7 @@ func zim_spl_CachingIterator_count(execute_data *zend.ZendExecuteData, return_va
 		return
 	}
 	intern = it
-	if (intern.GetUCachingFlags() & CIT_FULL_CACHE) == 0 {
+	if !intern.HasUCachingFlags(CIT_FULL_CACHE) {
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).name))
 		return
 	}

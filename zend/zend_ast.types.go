@@ -92,3 +92,43 @@ func (this ZendAstDecl) GetName() *ZendString             { return this.name }
 func (this *ZendAstDecl) SetName(value *ZendString)       { this.name = value }
 func (this ZendAstDecl) GetChild() []*ZendAst             { return this.child }
 func (this *ZendAstDecl) SetChild(value []*ZendAst)       { this.child = value }
+
+/* ZendAstDecl.flags */
+func (this *ZendAstDecl) AddFlags(value uint32)     { this.flags |= value }
+func (this *ZendAstDecl) SubFlags(value uint32)     { this.flags &^= value }
+func (this ZendAstDecl) HasFlags(value uint32) bool { return this.flags&value != 0 }
+func (this *ZendAstDecl) SwitchFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+func (this ZendAstDecl) isPublic() bool          { return this.HasFlags(ZEND_ACC_PUBLIC) }
+func (this ZendAstDecl) isProtected() bool       { return this.HasFlags(ZEND_ACC_PROTECTED) }
+func (this ZendAstDecl) isPrivate() bool         { return this.HasFlags(ZEND_ACC_PRIVATE) }
+func (this ZendAstDecl) isStatic() bool          { return this.HasFlags(ZEND_ACC_STATIC) }
+func (this ZendAstDecl) isAbstract() bool        { return this.HasFlags(ZEND_ACC_ABSTRACT) }
+func (this ZendAstDecl) isFinal() bool           { return this.HasFlags(ZEND_ACC_FINAL) }
+func (this ZendAstDecl) isReturnReference() bool { return this.HasFlags(ZEND_ACC_RETURN_REFERENCE) }
+func (this ZendAstDecl) isInterface() bool       { return this.HasFlags(ZEND_ACC_INTERFACE) }
+func (this ZendAstDecl) isTrait() bool           { return this.HasFlags(ZEND_ACC_TRAIT) }
+func (this ZendAstDecl) isExplicitAbstractClass() bool {
+	return this.HasFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)
+}
+func (this ZendAstDecl) isAnonClass() bool         { return this.HasFlags(ZEND_ACC_ANON_CLASS) }
+func (this *ZendAstDecl) setIsPublic(cond bool)    { this.SwitchFlags(ZEND_ACC_PUBLIC, cond) }
+func (this *ZendAstDecl) setIsProtected(cond bool) { this.SwitchFlags(ZEND_ACC_PROTECTED, cond) }
+func (this *ZendAstDecl) setIsPrivate(cond bool)   { this.SwitchFlags(ZEND_ACC_PRIVATE, cond) }
+func (this *ZendAstDecl) setIsStatic(cond bool)    { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
+func (this *ZendAstDecl) setIsAbstract(cond bool)  { this.SwitchFlags(ZEND_ACC_ABSTRACT, cond) }
+func (this *ZendAstDecl) setIsFinal(cond bool)     { this.SwitchFlags(ZEND_ACC_FINAL, cond) }
+func (this *ZendAstDecl) setIsReturnReference(cond bool) {
+	this.SwitchFlags(ZEND_ACC_RETURN_REFERENCE, cond)
+}
+func (this *ZendAstDecl) setIsInterface(cond bool) { this.SwitchFlags(ZEND_ACC_INTERFACE, cond) }
+func (this *ZendAstDecl) setIsTrait(cond bool)     { this.SwitchFlags(ZEND_ACC_TRAIT, cond) }
+func (this *ZendAstDecl) setIsExplicitAbstractClass(cond bool) {
+	this.SwitchFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS, cond)
+}
+func (this *ZendAstDecl) setIsAnonClass(cond bool) { this.SwitchFlags(ZEND_ACC_ANON_CLASS, cond) }

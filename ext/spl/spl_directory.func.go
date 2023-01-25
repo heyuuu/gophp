@@ -1216,8 +1216,8 @@ func zim_spl_FilesystemIterator_setFlags(execute_data *zend.ZendExecuteData, ret
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &flags) == zend.FAILURE {
 		return
 	}
-	intern.SetFlags(intern.GetFlags() &^ (SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK))
-	intern.SetFlags(intern.GetFlags() | (SPL_FILE_DIR_KEY_MODE_MASK|SPL_FILE_DIR_CURRENT_MODE_MASK|SPL_FILE_DIR_OTHERS_MASK)&flags)
+	intern.SubFlags(SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK)
+	intern.AddFlags((SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK) & flags)
 }
 func zim_spl_RecursiveDirectoryIterator_hasChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var allow_links zend.ZendBool = 0
@@ -1230,7 +1230,7 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(execute_data *zend.ZendExecu
 		return
 	} else {
 		SplFilesystemObjectGetFileName(intern)
-		if allow_links == 0 && (intern.GetFlags()&SPL_FILE_DIR_FOLLOW_SYMLINKS) == 0 {
+		if allow_links == 0 && !intern.HasFlags(SPL_FILE_DIR_FOLLOW_SYMLINKS) {
 			standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_LINK, return_value)
 			if zend.ZendIsTrue(return_value) != 0 {
 				zend.RETVAL_FALSE

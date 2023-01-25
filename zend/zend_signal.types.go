@@ -15,6 +15,18 @@ func (this *ZendSignalEntryT) SetFlags(value int)   { this.flags = value }
 func (this ZendSignalEntryT) GetHandler() any       { return this.handler }
 func (this *ZendSignalEntryT) SetHandler(value any) { this.handler = value }
 
+/* ZendSignalEntryT.flags */
+func (this *ZendSignalEntryT) AddFlags(value int)     { this.flags |= value }
+func (this *ZendSignalEntryT) SubFlags(value int)     { this.flags &^= value }
+func (this ZendSignalEntryT) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *ZendSignalEntryT) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * ZendSignalT
  */

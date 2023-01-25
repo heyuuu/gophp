@@ -367,11 +367,11 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.ZvalPtrDtor(&retval)
 	}
 }
-func HT_MOVE_TAIL_TO_HEAD(ht *zend.HashTable) {
-	var tmp zend.Bucket = ht.arData[ht.nNumUsed-1]
-	memmove(ht.arData+1, ht.arData, b.SizeOf("Bucket")*(ht.nNumUsed-1))
-	ht.arData[0] = tmp
-	zend.ZendHashRehash(ht)
+func (this *zend.HashTable) MoveTailToHead() {
+	var tmp zend.Bucket = this.arData[this.nNumUsed-1]
+	memmove(this.arData+1, this.arData, b.SizeOf("Bucket")*(this.nNumUsed-1))
+	this.arData[0] = tmp
+	zend.ZendHashRehash(this)
 }
 func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var func_name *zend.ZendString
@@ -506,7 +506,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 
 				/* Move the newly created element to the head of the hashtable */
 
-				HT_MOVE_TAIL_TO_HEAD(SPL_G(autoload_functions))
+				SPL_G(autoload_functions).MoveTailToHead()
 
 				/* Move the newly created element to the head of the hashtable */
 
@@ -534,7 +534,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 
 			/* Move the newly created element to the head of the hashtable */
 
-			HT_MOVE_TAIL_TO_HEAD(SPL_G(autoload_functions))
+			SPL_G(autoload_functions).MoveTailToHead()
 
 			/* Move the newly created element to the head of the hashtable */
 

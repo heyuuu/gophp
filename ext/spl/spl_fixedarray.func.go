@@ -154,19 +154,19 @@ func SplFixedarrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, 
 	}
 	if inherited != 0 {
 		if funcs_ptr.zf_rewind.common.scope != parent {
-			intern.SetFlags(intern.GetFlags() | SPL_FIXEDARRAY_OVERLOADED_REWIND)
+			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND)
 		}
 		if funcs_ptr.zf_valid.common.scope != parent {
-			intern.SetFlags(intern.GetFlags() | SPL_FIXEDARRAY_OVERLOADED_VALID)
+			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_VALID)
 		}
 		if funcs_ptr.zf_key.common.scope != parent {
-			intern.SetFlags(intern.GetFlags() | SPL_FIXEDARRAY_OVERLOADED_KEY)
+			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_KEY)
 		}
 		if funcs_ptr.zf_current.common.scope != parent {
-			intern.SetFlags(intern.GetFlags() | SPL_FIXEDARRAY_OVERLOADED_CURRENT)
+			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT)
 		}
 		if funcs_ptr.zf_next.common.scope != parent {
-			intern.SetFlags(intern.GetFlags() | SPL_FIXEDARRAY_OVERLOADED_NEXT)
+			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT)
 		}
 		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetget", b.SizeOf("\"offsetget\"")-1))
 		if intern.GetFptrOffsetGet().common.scope == parent {
@@ -638,7 +638,7 @@ func SplFixedarrayItDtor(iter *zend.ZendObjectIterator) {
 }
 func SplFixedarrayItRewind(iter *zend.ZendObjectIterator) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if (object.GetFlags() & SPL_FIXEDARRAY_OVERLOADED_REWIND) != 0 {
+	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND) {
 		zend.ZendUserItRewind(iter)
 	} else {
 		object.SetCurrent(0)
@@ -646,7 +646,7 @@ func SplFixedarrayItRewind(iter *zend.ZendObjectIterator) {
 }
 func SplFixedarrayItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if (object.GetFlags() & SPL_FIXEDARRAY_OVERLOADED_VALID) != 0 {
+	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_VALID) {
 		return zend.ZendUserItValid(iter)
 	}
 	if object.GetCurrent() >= 0 && object.GetCurrent() < object.GetArray().GetSize() {
@@ -657,7 +657,7 @@ func SplFixedarrayItValid(iter *zend.ZendObjectIterator) int {
 func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var zindex zend.Zval
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if (object.GetFlags() & SPL_FIXEDARRAY_OVERLOADED_CURRENT) != 0 {
+	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT) {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
 		var data *zend.Zval
@@ -671,7 +671,7 @@ func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 }
 func SplFixedarrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if (object.GetFlags() & SPL_FIXEDARRAY_OVERLOADED_KEY) != 0 {
+	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_KEY) {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
 		zend.ZVAL_LONG(key, object.GetCurrent())
@@ -679,7 +679,7 @@ func SplFixedarrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval)
 }
 func SplFixedarrayItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if (object.GetFlags() & SPL_FIXEDARRAY_OVERLOADED_NEXT) != 0 {
+	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT) {
 		zend.ZendUserItMoveForward(iter)
 	} else {
 		zend.ZendUserItInvalidateCurrent(iter)

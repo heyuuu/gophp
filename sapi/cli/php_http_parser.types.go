@@ -48,6 +48,18 @@ func (this *PhpHttpParser) SetUpgrade(value byte)          { this.upgrade = valu
 func (this PhpHttpParser) GetData() any                    { return this.data }
 func (this *PhpHttpParser) SetData(value any)              { this.data = value }
 
+/* PhpHttpParser.flags */
+func (this *PhpHttpParser) AddFlags(value uint8)     { this.flags |= value }
+func (this *PhpHttpParser) SubFlags(value uint8)     { this.flags &^= value }
+func (this PhpHttpParser) HasFlags(value uint8) bool { return this.flags&value != 0 }
+func (this *PhpHttpParser) SwitchFlags(value uint8, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * PhpHttpParserSettings
  */

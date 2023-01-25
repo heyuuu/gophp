@@ -348,7 +348,7 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 	switch Z_TYPE_P(offset) {
 	case IS_UNDEF:
-		if ZendHashNextIndexInsert(Z_ARRVAL_P(result), expr) == nil {
+		if Z_ARRVAL_P(result).NextIndexInsert(expr) == nil {
 			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
@@ -361,20 +361,20 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 		ZendSymtableUpdate(Z_ARRVAL_P(result), ZSTR_EMPTY_ALLOC(), expr)
 		break
 	case IS_LONG:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), Z_LVAL_P(offset), expr)
+		Z_ARRVAL_P(result).IndexUpdate(Z_LVAL_P(offset), expr)
 		break
 	case IS_FALSE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), 0, expr)
+		Z_ARRVAL_P(result).IndexUpdate(0, expr)
 		break
 	case IS_TRUE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), 1, expr)
+		Z_ARRVAL_P(result).IndexUpdate(1, expr)
 		break
 	case IS_DOUBLE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), ZendDvalToLval(Z_DVAL_P(offset)), expr)
+		Z_ARRVAL_P(result).IndexUpdate(ZendDvalToLval(Z_DVAL_P(offset)), expr)
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), Z_RES_HANDLE_P(offset), expr)
+		Z_ARRVAL_P(result).IndexUpdate(Z_RES_HANDLE_P(offset), expr)
 		break
 	default:
 		ZendThrowError(nil, "Illegal offset type")
@@ -403,7 +403,7 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 					ZendThrowError(nil, "Cannot unpack array with string keys")
 					return FAILURE
 				} else {
-					if ZendHashNextIndexInsert(Z_ARRVAL_P(result), val) == nil {
+					if Z_ARRVAL_P(result).NextIndexInsert(val) == nil {
 						ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 						break
 					}
@@ -1228,20 +1228,20 @@ tail_call:
 
 	case ZEND_AST_METHOD:
 		decl = (*ZendAstDecl)(ast)
-		if (decl.GetFlags() & ZEND_ACC_PUBLIC) != 0 {
+		if decl.isPublic() {
 			SmartStrAppends(str, "public ")
-		} else if (decl.GetFlags() & ZEND_ACC_PROTECTED) != 0 {
+		} else if decl.isProtected() {
 			SmartStrAppends(str, "protected ")
-		} else if (decl.GetFlags() & ZEND_ACC_PRIVATE) != 0 {
+		} else if decl.isPrivate() {
 			SmartStrAppends(str, "private ")
 		}
-		if (decl.GetFlags() & ZEND_ACC_STATIC) != 0 {
+		if decl.isStatic() {
 			SmartStrAppends(str, "static ")
 		}
-		if (decl.GetFlags() & ZEND_ACC_ABSTRACT) != 0 {
+		if decl.isAbstract() {
 			SmartStrAppends(str, "abstract ")
 		}
-		if (decl.GetFlags() & ZEND_ACC_FINAL) != 0 {
+		if decl.isFinal() {
 			SmartStrAppends(str, "final ")
 		}
 		if decl.GetKind() == ZEND_AST_ARROW_FUNC {
@@ -1249,7 +1249,7 @@ tail_call:
 		} else {
 			SmartStrAppends(str, "function ")
 		}
-		if (decl.GetFlags() & ZEND_ACC_RETURN_REFERENCE) != 0 {
+		if decl.isReturnReference() {
 			SmartStrAppendc(str, '&')
 		}
 		if ast.GetKind() != ZEND_AST_CLOSURE && ast.GetKind() != ZEND_AST_ARROW_FUNC {
@@ -1286,15 +1286,15 @@ tail_call:
 		break
 	case ZEND_AST_CLASS:
 		decl = (*ZendAstDecl)(ast)
-		if (decl.GetFlags() & ZEND_ACC_INTERFACE) != 0 {
+		if decl.isInterface() {
 			SmartStrAppends(str, "interface ")
-		} else if (decl.GetFlags() & ZEND_ACC_TRAIT) != 0 {
+		} else if decl.isTrait() {
 			SmartStrAppends(str, "trait ")
 		} else {
-			if (decl.GetFlags() & ZEND_ACC_EXPLICIT_ABSTRACT_CLASS) != 0 {
+			if decl.isExplicitAbstractClass() {
 				SmartStrAppends(str, "abstract ")
 			}
-			if (decl.GetFlags() & ZEND_ACC_FINAL) != 0 {
+			if decl.isFinal() {
 				SmartStrAppends(str, "final ")
 			}
 			SmartStrAppends(str, "class ")

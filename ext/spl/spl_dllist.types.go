@@ -97,6 +97,18 @@ func (this *SplDllistObject) SetGcDataCount(value int)     { this.gc_data_count 
 func (this SplDllistObject) GetStd() zend.ZendObject       { return this.std }
 func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
 
+/* SplDllistObject.flags */
+func (this *SplDllistObject) AddFlags(value int)     { this.flags |= value }
+func (this *SplDllistObject) SubFlags(value int)     { this.flags &^= value }
+func (this SplDllistObject) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplDllistObject) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * SplDllistIt
  */
@@ -115,3 +127,15 @@ func (this SplDllistIt) GetTraversePosition() int                      { return 
 func (this *SplDllistIt) SetTraversePosition(value int)                { this.traverse_position = value }
 func (this SplDllistIt) GetFlags() int                                 { return this.flags }
 func (this *SplDllistIt) SetFlags(value int)                           { this.flags = value }
+
+/* SplDllistIt.flags */
+func (this *SplDllistIt) AddFlags(value int)     { this.flags |= value }
+func (this *SplDllistIt) SubFlags(value int)     { this.flags &^= value }
+func (this SplDllistIt) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplDllistIt) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}

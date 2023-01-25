@@ -437,7 +437,7 @@ func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 	if handler.GetBuffer().GetData() != nil {
 		zend.Efree(handler.GetBuffer().GetData())
 	}
-	if (handler.GetFlags() & PHP_OUTPUT_HANDLER_USER) != 0 {
+	if handler.HasFlags(PHP_OUTPUT_HANDLER_USER) {
 		zend.ZvalPtrDtor(&handler.func_.user.GetZoh())
 		zend.Efree(handler.GetUser())
 	}
@@ -596,11 +596,11 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 		/* need to start? */
 
-		if (handler.GetFlags() & PHP_OUTPUT_HANDLER_STARTED) == 0 {
+		if !handler.HasFlags(PHP_OUTPUT_HANDLER_STARTED) {
 			context.SetOp(context.GetOp() | PHP_OUTPUT_HANDLER_START)
 		}
 		OG(running) = handler
-		if (handler.GetFlags() & PHP_OUTPUT_HANDLER_USER) != 0 {
+		if handler.HasFlags(PHP_OUTPUT_HANDLER_USER) {
 			var retval zend.Zval
 			var ob_data zend.Zval
 			var ob_mode zend.Zval
@@ -648,7 +648,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				status = PHP_OUTPUT_HANDLER_FAILURE
 			}
 		}
-		handler.SetFlags(handler.GetFlags() | PHP_OUTPUT_HANDLER_STARTED)
+		handler.AddFlags(PHP_OUTPUT_HANDLER_STARTED)
 		OG(running) = nil
 	}
 	switch status {
@@ -656,7 +656,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 		/* disable this handler */
 
-		handler.SetFlags(handler.GetFlags() | PHP_OUTPUT_HANDLER_DISABLED)
+		handler.AddFlags(PHP_OUTPUT_HANDLER_DISABLED)
 
 		/* discard any output */
 
@@ -683,7 +683,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		/* no more buffered data */
 
 		handler.GetBuffer().SetUsed(0)
-		handler.SetFlags(handler.GetFlags() | PHP_OUTPUT_HANDLER_PROCESSED)
+		handler.AddFlags(PHP_OUTPUT_HANDLER_PROCESSED)
 		break
 	}
 	context.SetOp(original_op)
@@ -709,7 +709,7 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 		context.GetIn().SetUsed(len_)
 		if obh_cnt > 1 {
 			zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
-		} else if b.Assign(&active, zend.ZendStackTop(&OG(handlers))) && ((*active).GetFlags()&PHP_OUTPUT_HANDLER_DISABLED) == 0 {
+		} else if b.Assign(&active, zend.ZendStackTop(&OG(handlers))) && !(*active).HasFlags(PHP_OUTPUT_HANDLER_DISABLED) {
 			PhpOutputHandlerOp(*active, &context)
 		} else {
 			PhpOutputContextPass(&context)

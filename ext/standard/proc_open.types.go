@@ -65,3 +65,15 @@ func (this PhpProcOpenDescriptorItem) GetMode() int                           { 
 func (this *PhpProcOpenDescriptorItem) SetMode(value int)                     { this.mode = value }
 func (this PhpProcOpenDescriptorItem) GetModeFlags() int                      { return this.mode_flags }
 func (this *PhpProcOpenDescriptorItem) SetModeFlags(value int)                { this.mode_flags = value }
+
+/* PhpProcOpenDescriptorItem.mode_flags */
+func (this *PhpProcOpenDescriptorItem) AddModeFlags(value int)     { this.mode_flags |= value }
+func (this *PhpProcOpenDescriptorItem) SubModeFlags(value int)     { this.mode_flags &^= value }
+func (this PhpProcOpenDescriptorItem) HasModeFlags(value int) bool { return this.mode_flags&value != 0 }
+func (this *PhpProcOpenDescriptorItem) SwitchModeFlags(value int, cond bool) {
+	if cond {
+		this.AddModeFlags(value)
+	} else {
+		this.SubModeFlags(value)
+	}
+}

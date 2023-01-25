@@ -58,11 +58,11 @@ func DestroyZendFunction(function *ZendFunction) {
 	ZendFunctionDtor(&tmp)
 }
 func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
-	if (function.GetFnFlags()&(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS)) != 0 && function.GetArgInfo() != nil {
+	if function.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && function.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32 = function.GetNumArgs() + 1
 		var arg_info *ZendInternalArgInfo = function.GetArgInfo() - 1
-		if (function.GetFnFlags() & ZEND_ACC_VARIADIC) != 0 {
+		if function.HasFnFlags(ZEND_ACC_VARIADIC) {
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
@@ -88,7 +88,7 @@ func ZendFunctionDtor(zv *Zval) {
 		if function.GetScope() == nil {
 			ZendFreeInternalArgInfo(&function.internal_function)
 		}
-		if (function.GetFnFlags() & ZEND_ACC_ARENA_ALLOCATED) == 0 {
+		if !function.isArenaAllocated() {
 			Pefree(function, 1)
 		}
 	}
@@ -223,12 +223,12 @@ func DestroyZendClass(zv *Zval) {
 	var prop_info *ZendPropertyInfo
 	var ce *ZendClassEntry = Z_PTR_P(zv)
 	var fn *ZendFunction
-	if (ce.GetCeFlags() & (ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED)) != 0 {
+	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
 		var op_array *ZendOpArray
 		if ce.GetDefaultStaticMembersCount() != 0 {
 			ZendCleanupInternalClassData(ce)
 		}
-		if (ce.GetCeFlags() & ZEND_HAS_STATIC_IN_METHODS) != 0 {
+		if ce.HasCeFlags(ZEND_HAS_STATIC_IN_METHODS) {
 			for {
 				var __ht *HashTable = &ce.function_table
 				var _p *Bucket = __ht.GetArData()
@@ -253,7 +253,7 @@ func DestroyZendClass(zv *Zval) {
 	}
 	switch ce.GetType() {
 	case ZEND_USER_CLASS:
-		if ce.parent_name && (ce.GetCeFlags()&ZEND_ACC_RESOLVED_PARENT) == 0 {
+		if ce.parent_name && !ce.HasCeFlags(ZEND_ACC_RESOLVED_PARENT) {
 			ZendStringReleaseEx(ce.parent_name, 0)
 		}
 		if ce.GetDefaultPropertiesTable() != nil {
@@ -324,10 +324,10 @@ func DestroyZendClass(zv *Zval) {
 			}
 			break
 		}
-		ZendHashDestroy(&ce.properties_info)
+		&ce.properties_info.Destroy()
 		ZendStringReleaseEx(ce.GetName(), 0)
-		ZendHashDestroy(&ce.function_table)
-		if ZendHashNumElements(&ce.constants_table) {
+		&ce.function_table.Destroy()
+		if &ce.constants_table.NumElements() {
 			var c *ZendClassConstant
 			for {
 				var __ht *HashTable = &ce.constants_table
@@ -350,9 +350,9 @@ func DestroyZendClass(zv *Zval) {
 				break
 			}
 		}
-		ZendHashDestroy(&ce.constants_table)
+		&ce.constants_table.Destroy()
 		if ce.GetNumInterfaces() > 0 {
-			if (ce.GetCeFlags() & ZEND_ACC_RESOLVED_INTERFACES) == 0 {
+			if !ce.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES) {
 				var i uint32
 				for i = 0; i < ce.GetNumInterfaces(); i++ {
 					ZendStringReleaseEx(ce.interface_names[i].name, 0)
@@ -390,7 +390,7 @@ func DestroyZendClass(zv *Zval) {
 				ZendCleanupInternalClassData(ce)
 			}
 		}
-		ZendHashDestroy(&ce.properties_info)
+		&ce.properties_info.Destroy()
 		ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
@@ -406,14 +406,14 @@ func DestroyZendClass(zv *Zval) {
 					continue
 				}
 				fn = Z_PTR_P(_z)
-				if (fn.GetFnFlags()&(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS)) != 0 && fn.GetScope() == ce {
+				if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
 					ZendFreeInternalArgInfo(&fn.internal_function)
 				}
 			}
 			break
 		}
-		ZendHashDestroy(&ce.function_table)
-		if ZendHashNumElements(&ce.constants_table) {
+		&ce.function_table.Destroy()
+		if &ce.constants_table.NumElements() {
 			var c *ZendClassConstant
 			for {
 				var __ht *HashTable = &ce.constants_table
@@ -436,7 +436,7 @@ func DestroyZendClass(zv *Zval) {
 				}
 				break
 			}
-			ZendHashDestroy(&ce.constants_table)
+			&ce.constants_table.Destroy()
 		}
 		if ce.GetIteratorFuncsPtr() != nil {
 			Free(ce.GetIteratorFuncsPtr())
@@ -453,7 +453,7 @@ func DestroyZendClass(zv *Zval) {
 }
 func ZendClassAddRef(zv *Zval) {
 	var ce *ZendClassEntry = Z_PTR_P(zv)
-	if (ce.GetCeFlags() & ZEND_ACC_IMMUTABLE) == 0 {
+	if !ce.HasCeFlags(ZEND_ACC_IMMUTABLE) {
 		ce.GetRefcount()++
 	}
 }
@@ -467,7 +467,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 			}
 		}
 	}
-	if (op_array.GetFnFlags()&ZEND_ACC_HEAP_RT_CACHE) != 0 && op_array.GetRunTimeCachePtr() != nil {
+	if op_array.HasFnFlags(ZEND_ACC_HEAP_RT_CACHE) && op_array.GetRunTimeCachePtr() != nil {
 		Efree(op_array.GetRunTimeCachePtr())
 	}
 	if op_array.GetRefcount() == nil || b.PreDec(&((*op_array).refcount)) > 0 {
@@ -489,7 +489,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 			ZvalPtrDtorNogc(literal)
 			literal++
 		}
-		if ZEND_USE_ABS_CONST_ADDR || (op_array.GetFnFlags()&ZEND_ACC_DONE_PASS_TWO) == 0 {
+		if ZEND_USE_ABS_CONST_ADDR || !op_array.isDonePassTwo() {
 			Efree(op_array.GetLiterals())
 		}
 	}
@@ -507,18 +507,18 @@ func DestroyOpArray(op_array *ZendOpArray) {
 		Efree(op_array.GetTryCatchArray())
 	}
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR) != 0 {
-		if (op_array.GetFnFlags() & ZEND_ACC_DONE_PASS_TWO) != 0 {
+		if op_array.isDonePassTwo() {
 			ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayDtorHandler), op_array)
 		}
 	}
 	if op_array.GetArgInfo() != nil {
 		var num_args uint32 = op_array.GetNumArgs()
 		var arg_info *ZendArgInfo = op_array.GetArgInfo()
-		if (op_array.GetFnFlags() & ZEND_ACC_HAS_RETURN_TYPE) != 0 {
+		if op_array.isHasReturnType() {
 			arg_info--
 			num_args++
 		}
-		if (op_array.GetFnFlags() & ZEND_ACC_VARIADIC) != 0 {
+		if op_array.isVariadic() {
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
@@ -913,7 +913,7 @@ func PassTwo(op_array *ZendOpArray) int {
 	/* Needs to be set directly after the opcode/literal reallocation, to ensure destruction
 	 * happens correctly if any of the following fixups generate a fatal error. */
 
-	op_array.SetFnFlags(op_array.GetFnFlags() | ZEND_ACC_DONE_PASS_TWO)
+	op_array.setIsDonePassTwo(true)
 	opline = op_array.GetOpcodes()
 	end = opline + op_array.GetLast()
 	for opline < end {
@@ -934,7 +934,7 @@ func PassTwo(op_array *ZendOpArray) int {
 
 		case ZEND_CONT:
 			var jmp_target uint32 = ZendGetBrkContTarget(op_array, opline)
-			if (op_array.GetFnFlags() & ZEND_ACC_HAS_FINALLY_BLOCK) != 0 {
+			if op_array.isHasFinallyBlock() {
 				ZendCheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), jmp_target)
 			}
 			opline.SetOpcode(ZEND_JMP)
@@ -944,7 +944,7 @@ func PassTwo(op_array *ZendOpArray) int {
 			break
 		case ZEND_GOTO:
 			ZendResolveGotoLabel(op_array, opline)
-			if (op_array.GetFnFlags() & ZEND_ACC_HAS_FINALLY_BLOCK) != 0 {
+			if op_array.isHasFinallyBlock() {
 				ZendCheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), opline.GetOp1().GetOplineNum())
 			}
 		case ZEND_JMP:
@@ -1001,7 +1001,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		case ZEND_RETURN:
 
 		case ZEND_RETURN_BY_REF:
-			if (op_array.GetFnFlags() & ZEND_ACC_GENERATOR) != 0 {
+			if op_array.isGenerator() {
 				opline.SetOpcode(ZEND_GENERATOR_RETURN)
 			}
 			break

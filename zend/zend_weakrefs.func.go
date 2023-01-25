@@ -16,13 +16,13 @@ func ZendWeakrefUnref(zv *Zval) {
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
-	ZendHashInit(&(ExecutorGlobals.GetWeakrefs()), 8, nil, ZendWeakrefUnref, 0)
+	&(ExecutorGlobals.GetWeakrefs()).Init(8, nil, ZendWeakrefUnref, 0)
 }
 func ZendWeakrefsNotify(object *ZendObject) {
-	ZendHashIndexDel(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(object))
+	&(ExecutorGlobals.GetWeakrefs()).IndexDel(ZendUlong(object))
 }
 func ZendWeakrefsShutdown() {
-	ZendHashDestroy(&(ExecutorGlobals.GetWeakrefs()))
+	&(ExecutorGlobals.GetWeakrefs()).Destroy()
 }
 func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
@@ -31,7 +31,7 @@ func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	return &wr.std
 }
 func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
-	var wr *ZendWeakref = ZendHashIndexFindPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(Z_OBJ_P(referent)))
+	var wr *ZendWeakref = &(ExecutorGlobals.GetWeakrefs()).IndexFindPtr(ZendUlong(Z_OBJ_P(referent)))
 	if wr == nil {
 		return 0
 	}
@@ -44,7 +44,7 @@ func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
 	ObjectInitEx(return_value, ZendCeWeakref)
 	wr = ZendWeakrefFetch(return_value)
 	wr.SetReferent(Z_OBJ_P(referent))
-	ZendHashIndexAddPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(wr.GetReferent()), wr)
+	&(ExecutorGlobals.GetWeakrefs()).IndexAddPtr(ZendUlong(wr.GetReferent()), wr)
 	GC_ADD_FLAGS(wr.GetReferent(), IS_OBJ_WEAKLY_REFERENCED)
 }
 func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
@@ -57,7 +57,7 @@ func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 func ZendWeakrefFree(zo *ZendObject) {
 	var wr *ZendWeakref = ZendWeakrefFrom(zo)
 	if wr.GetReferent() != nil {
-		ZendHashIndexDel(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(wr.GetReferent()))
+		&(ExecutorGlobals.GetWeakrefs()).IndexDel(ZendUlong(wr.GetReferent()))
 	}
 	ZendObjectStdDtor(&wr.std)
 }
@@ -232,7 +232,7 @@ func ZendRegisterWeakrefCe() {
 	ce.SetName(ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)
 	ZendCeWeakref = ZendRegisterInternalClass(&ce)
-	ZendCeWeakref.SetCeFlags(ZendCeWeakref.GetCeFlags() | ZEND_ACC_FINAL)
+	ZendCeWeakref.setIsFinal(true)
 	ZendCeWeakref.create_object = ZendWeakrefNew
 	ZendCeWeakref.SetSerialize(ZendClassSerializeDeny)
 	ZendCeWeakref.SetUnserialize(ZendClassUnserializeDeny)

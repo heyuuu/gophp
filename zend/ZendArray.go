@@ -57,8 +57,8 @@ type ZendArray struct {
 
 func (this ZendArray) GetGc() ZendRefcountedH              { return this.gc }
 func (this *ZendArray) SetGc(value ZendRefcountedH)        { this.gc = value }
-func (this ZendArray) GetUVFlags() ZendUchar               { return this.u.v.flags }
-func (this *ZendArray) SetUVFlags(value ZendUchar)         { this.u.v.flags = value }
+func (this ZendArray) GetFlags() ZendUchar                 { return this.u.v.flags }
+func (this *ZendArray) SetFlags(value ZendUchar)           { this.u.v.flags = value }
 func (this ZendArray) GetUnused() ZendUchar                { return this.u.v._unused }
 func (this *ZendArray) SetUnused(value ZendUchar)          { this.u.v._unused = value }
 func (this ZendArray) GetNIteratorsCount() ZendUchar       { return this.u.v.nIteratorsCount }
@@ -83,3 +83,37 @@ func (this ZendArray) GetNNextFreeElement() ZendLong       { return this.nNextFr
 func (this *ZendArray) SetNNextFreeElement(value ZendLong) { this.nNextFreeElement = value }
 func (this ZendArray) GetPDestructor() DtorFuncT           { return this.pDestructor }
 func (this *ZendArray) SetPDestructor(value DtorFuncT)     { this.pDestructor = value }
+
+/* ZendArray.u.v.flags */
+func (this *ZendArray) AddFlags(value ZendUchar)     { this.u.v.flags |= value }
+func (this *ZendArray) SubFlags(value ZendUchar)     { this.u.v.flags &^= value }
+func (this ZendArray) HasFlags(value ZendUchar) bool { return this.u.v.flags&value != 0 }
+func (this *ZendArray) SwitchFlags(value ZendUchar, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+func (this ZendArray) isHasEmptyInd() bool         { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
+func (this *ZendArray) setIsHasEmptyInd(cond bool) { this.SwitchFlags(HASH_FLAG_HAS_EMPTY_IND, cond) }
+
+/* ZendArray.u.flags */
+func (this *ZendArray) AddUFlags(value uint32)     { this.u.flags |= value }
+func (this *ZendArray) SubUFlags(value uint32)     { this.u.flags &^= value }
+func (this ZendArray) HasUFlags(value uint32) bool { return this.u.flags&value != 0 }
+func (this *ZendArray) SwitchUFlags(value uint32, cond bool) {
+	if cond {
+		this.AddUFlags(value)
+	} else {
+		this.SubUFlags(value)
+	}
+}
+func (this ZendArray) isApplyProtection() bool { return this.HasUFlags(HASH_FLAG_APPLY_PROTECTION) }
+func (this ZendArray) isPacked() bool          { return this.HasUFlags(HASH_FLAG_PACKED) }
+func (this ZendArray) isInitialized() bool     { return this.HasUFlags(HASH_FLAG_INITIALIZED) }
+func (this *ZendArray) setIsApplyProtection(cond bool) {
+	this.SwitchUFlags(HASH_FLAG_APPLY_PROTECTION, cond)
+}
+func (this *ZendArray) setIsPacked(cond bool)      { this.SwitchUFlags(HASH_FLAG_PACKED, cond) }
+func (this *ZendArray) setIsInitialized(cond bool) { this.SwitchUFlags(HASH_FLAG_INITIALIZED, cond) }

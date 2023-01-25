@@ -60,7 +60,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 		}
 		if fn_proxy == nil || (*fn_proxy) == nil {
 			if EXPECTED(obj_ce != nil) {
-				fcic.SetFunctionHandler(ZendHashStrFindPtr(&obj_ce.function_table, function_name, function_name_len))
+				fcic.SetFunctionHandler(&obj_ce.function_table.StrFindPtr(function_name, function_name_len))
 				if UNEXPECTED(fcic.GetFunctionHandler() == nil) {
 
 					/* error at c-level */
@@ -237,7 +237,7 @@ func ZendImplementTraversable(interface_ *ZendClassEntry, class_type *ZendClassE
 		return SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
-		ZEND_ASSERT((class_type.GetCeFlags() & ZEND_ACC_RESOLVED_INTERFACES) != 0)
+		ZEND_ASSERT(class_type.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
 		for i = 0; i < class_type.GetNumInterfaces(); i++ {
 			if class_type.interfaces[i] == ZendCeAggregate || class_type.interfaces[i] == ZendCeIterator {
 				return SUCCESS
@@ -265,7 +265,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			/* c-level get_iterator cannot be changed (exception being only Traversable is implemented) */
 
 			if class_type.GetNumInterfaces() != 0 {
-				ZEND_ASSERT((class_type.GetCeFlags() & ZEND_ACC_RESOLVED_INTERFACES) != 0)
+				ZEND_ASSERT(class_type.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.interfaces[i] == ZendCeIterator {
 						ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", ZSTR_VAL(class_type.GetName()), ZSTR_VAL(interface_.GetName()), ZSTR_VAL(ZendCeIterator.GetName()))
@@ -283,7 +283,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 	}
 	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
 		class_type.SetGetIterator(class_type.parent.get_iterator)
-		class_type.SetCeFlags(class_type.GetCeFlags() | ZEND_ACC_REUSE_GET_ITERATOR)
+		class_type.AddCeFlags(ZEND_ACC_REUSE_GET_ITERATOR)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetNewIterator)
 	}
@@ -293,7 +293,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		}
-		funcs_ptr.SetZfNewIterator(ZendHashStrFindPtr(&class_type.function_table, "getiterator", b.SizeOf("\"getiterator\"")-1))
+		funcs_ptr.SetZfNewIterator(&class_type.function_table.StrFindPtr("getiterator", b.SizeOf("\"getiterator\"")-1))
 	} else {
 		if funcs_ptr == nil {
 			funcs_ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_iterator_funcs"))
@@ -328,7 +328,7 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 	}
 	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
 		class_type.SetGetIterator(class_type.parent.get_iterator)
-		class_type.SetCeFlags(class_type.GetCeFlags() | ZEND_ACC_REUSE_GET_ITERATOR)
+		class_type.AddCeFlags(ZEND_ACC_REUSE_GET_ITERATOR)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetIterator)
 	}
@@ -338,11 +338,11 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		} else {
-			funcs_ptr.SetZfRewind(ZendHashStrFindPtr(&class_type.function_table, "rewind", b.SizeOf("\"rewind\"")-1))
-			funcs_ptr.SetZfValid(ZendHashStrFindPtr(&class_type.function_table, "valid", b.SizeOf("\"valid\"")-1))
-			funcs_ptr.SetZfKey(ZendHashStrFindPtr(&class_type.function_table, "key", b.SizeOf("\"key\"")-1))
-			funcs_ptr.SetZfCurrent(ZendHashStrFindPtr(&class_type.function_table, "current", b.SizeOf("\"current\"")-1))
-			funcs_ptr.SetZfNext(ZendHashStrFindPtr(&class_type.function_table, "next", b.SizeOf("\"next\"")-1))
+			funcs_ptr.SetZfRewind(&class_type.function_table.StrFindPtr("rewind", b.SizeOf("\"rewind\"")-1))
+			funcs_ptr.SetZfValid(&class_type.function_table.StrFindPtr("valid", b.SizeOf("\"valid\"")-1))
+			funcs_ptr.SetZfKey(&class_type.function_table.StrFindPtr("key", b.SizeOf("\"key\"")-1))
+			funcs_ptr.SetZfCurrent(&class_type.function_table.StrFindPtr("current", b.SizeOf("\"current\"")-1))
+			funcs_ptr.SetZfNext(&class_type.function_table.StrFindPtr("next", b.SizeOf("\"next\"")-1))
 		}
 	} else {
 		if funcs_ptr == nil {

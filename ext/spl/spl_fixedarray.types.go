@@ -66,6 +66,18 @@ func (this *SplFixedarrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 func (this SplFixedarrayObject) GetStd() zend.ZendObject       { return this.std }
 func (this *SplFixedarrayObject) SetStd(value zend.ZendObject) { this.std = value }
 
+/* SplFixedarrayObject.flags */
+func (this *SplFixedarrayObject) AddFlags(value int)     { this.flags |= value }
+func (this *SplFixedarrayObject) SubFlags(value int)     { this.flags &^= value }
+func (this SplFixedarrayObject) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplFixedarrayObject) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * SplFixedarrayIt
  */

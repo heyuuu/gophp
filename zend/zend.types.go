@@ -283,6 +283,40 @@ func (this *ZendClassEntry) SetBuiltinFunctions(value *ZendFunctionEntry) {
 func (this ZendClassEntry) GetModule() *ZendModuleEntry       { return this.info.internal.module }
 func (this *ZendClassEntry) SetModule(value *ZendModuleEntry) { this.info.internal.module = value }
 
+/* ZendClassEntry.ce_flags */
+func (this *ZendClassEntry) AddCeFlags(value uint32)     { this.ce_flags |= value }
+func (this *ZendClassEntry) SubCeFlags(value uint32)     { this.ce_flags &^= value }
+func (this ZendClassEntry) HasCeFlags(value uint32) bool { return this.ce_flags&value != 0 }
+func (this *ZendClassEntry) SwitchCeFlags(value uint32, cond bool) {
+	if cond {
+		this.AddCeFlags(value)
+	} else {
+		this.SubCeFlags(value)
+	}
+}
+func (this ZendClassEntry) isConstantsUpdated() bool {
+	return this.HasCeFlags(ZEND_ACC_CONSTANTS_UPDATED)
+}
+func (this ZendClassEntry) isInterface() bool { return this.HasCeFlags(ZEND_ACC_INTERFACE) }
+func (this ZendClassEntry) isTrait() bool     { return this.HasCeFlags(ZEND_ACC_TRAIT) }
+func (this ZendClassEntry) isImplicitAbstractClass() bool {
+	return this.HasCeFlags(ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
+}
+func (this ZendClassEntry) isFinal() bool     { return this.HasCeFlags(ZEND_ACC_FINAL) }
+func (this ZendClassEntry) isUseGuards() bool { return this.HasCeFlags(ZEND_ACC_USE_GUARDS) }
+func (this ZendClassEntry) isAnonBound() bool { return this.HasCeFlags(ZEND_ACC_ANON_BOUND) }
+func (this *ZendClassEntry) setIsConstantsUpdated(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_CONSTANTS_UPDATED, cond)
+}
+func (this *ZendClassEntry) setIsInterface(cond bool) { this.SwitchCeFlags(ZEND_ACC_INTERFACE, cond) }
+func (this *ZendClassEntry) setIsTrait(cond bool)     { this.SwitchCeFlags(ZEND_ACC_TRAIT, cond) }
+func (this *ZendClassEntry) setIsImplicitAbstractClass(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_IMPLICIT_ABSTRACT_CLASS, cond)
+}
+func (this *ZendClassEntry) setIsFinal(cond bool)     { this.SwitchCeFlags(ZEND_ACC_FINAL, cond) }
+func (this *ZendClassEntry) setIsUseGuards(cond bool) { this.SwitchCeFlags(ZEND_ACC_USE_GUARDS, cond) }
+func (this *ZendClassEntry) setIsAnonBound(cond bool) { this.SwitchCeFlags(ZEND_ACC_ANON_BOUND, cond) }
+
 /**
  * ZendUtilityFunctions
  */

@@ -1384,9 +1384,9 @@ func ZendMmShutdown(heap *ZendMmHeap, full int, silent int) {
 			if silent != 0 {
 				TrackedFreeAll()
 			}
-			ZendHashClean(heap.GetTrackedAllocs())
+			heap.GetTrackedAllocs().Clean()
 			if full != 0 {
-				ZendHashDestroy(heap.GetTrackedAllocs())
+				heap.GetTrackedAllocs().Destroy()
 				Free(heap.GetTrackedAllocs())
 
 				/* Make sure the heap free below does not use tracked_free(). */
@@ -1671,21 +1671,21 @@ func TrackedMalloc(size int) any {
 	var ptr any = __zendMalloc(size)
 	var h ZendUlong = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
 	ZEND_ASSERT(any(uintptr_t(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
-	ZendHashIndexAddEmptyElement(AG(mm_heap).tracked_allocs, h)
+	AG(mm_heap).tracked_allocs.IndexAddEmptyElement(h)
 	return ptr
 }
 func TrackedFree(ptr any) {
 	var h ZendUlong = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
-	ZendHashIndexDel(AG(mm_heap).tracked_allocs, h)
+	AG(mm_heap).tracked_allocs.IndexDel(h)
 	Free(ptr)
 }
 func TrackedRealloc(ptr any, new_size int) any {
 	var h ZendUlong = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
-	ZendHashIndexDel(AG(mm_heap).tracked_allocs, h)
+	AG(mm_heap).tracked_allocs.IndexDel(h)
 	ptr = __zendRealloc(ptr, new_size)
 	h = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
 	ZEND_ASSERT(any(uintptr_t(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
-	ZendHashIndexAddEmptyElement(AG(mm_heap).tracked_allocs, h)
+	AG(mm_heap).tracked_allocs.IndexAddEmptyElement(h)
 	return ptr
 }
 func TrackedFreeAll() {
@@ -1731,7 +1731,7 @@ func AllocGlobalsCtor(alloc_globals *ZendAllocGlobals) {
 			mm_heap.SetCustomHeapStdFree(TrackedFree)
 			mm_heap.SetCustomHeapStdRealloc(TrackedRealloc)
 			mm_heap.SetTrackedAllocs(Malloc(b.SizeOf("HashTable")))
-			ZendHashInit(mm_heap.GetTrackedAllocs(), 1024, nil, nil, 1)
+			mm_heap.GetTrackedAllocs().Init(1024, nil, nil, 1)
 		}
 		return
 	}

@@ -32,7 +32,7 @@ func ZendObjectRelease(obj *ZendObject) {
 	}
 }
 func ZendObjectPropertiesSize(ce *ZendClassEntry) int {
-	return b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() - b.Cond((ce.GetCeFlags()&ZEND_ACC_USE_GUARDS) != 0, 0, 1))
+	return b.SizeOf("zval") * (ce.GetDefaultPropertiesCount() - b.Cond(ce.isUseGuards(), 0, 1))
 }
 func ZendObjectAlloc(obj_size int, ce *ZendClassEntry) any {
 	var obj any = Emalloc(obj_size + ZendObjectPropertiesSize(ce))
@@ -68,7 +68,7 @@ func ZendObjectsStoreDestroy(objects *ZendObjectsStore) {
 	objects.SetObjectBuckets(nil)
 }
 func ZendObjectsStoreCallDestructors(objects *ZendObjectsStore) {
-	ExecutorGlobals.SetFlags(ExecutorGlobals.GetFlags() | EG_FLAGS_OBJECT_STORE_NO_REUSE)
+	ExecutorGlobals.AddFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE)
 	if objects.GetTop() > 1 {
 		var i uint32
 		for i = 1; i < objects.GetTop(); i++ {
@@ -169,7 +169,7 @@ func ZendObjectsStorePut(object *ZendObject) {
 	 * the dtors for newly created objects are called in zend_objects_store_call_destructors() loop
 	 */
 
-	if ExecutorGlobals.GetObjectsStore().GetFreeListHead() != -1 && EXPECTED((ExecutorGlobals.GetFlags()&EG_FLAGS_OBJECT_STORE_NO_REUSE) == 0) {
+	if ExecutorGlobals.GetObjectsStore().GetFreeListHead() != -1 && EXPECTED(!ExecutorGlobals.HasFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE)) {
 		handle = ExecutorGlobals.GetObjectsStore().GetFreeListHead()
 		ExecutorGlobals.GetObjectsStore().SetFreeListHead(GET_OBJ_BUCKET_NUMBER(ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[handle]))
 	} else if UNEXPECTED(ExecutorGlobals.GetObjectsStore().GetTop() == ExecutorGlobals.GetObjectsStore().GetSize()) {

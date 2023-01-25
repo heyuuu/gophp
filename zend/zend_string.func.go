@@ -274,9 +274,9 @@ func _strDtor(zv *Zval) {
 	Pefree(str, GC_FLAGS(str)&IS_STR_PERSISTENT)
 }
 func ZendInitInternedStringsHt(interned_strings *HashTable, permanent int) {
-	ZendHashInit(interned_strings, 1024, nil, _strDtor, permanent)
+	interned_strings.Init(1024, nil, _strDtor, permanent)
 	if permanent != 0 {
-		ZendHashRealInitMixed(interned_strings)
+		interned_strings.RealInitMixed()
 	}
 }
 func ZendInternedStringsInit() {
@@ -311,7 +311,7 @@ func ZendInternedStringsInit() {
 	}
 }
 func ZendInternedStringsDtor() {
-	ZendHashDestroy(&InternedStringsPermanent)
+	&InternedStringsPermanent.Destroy()
 	Free(ZendKnownStrings)
 	ZendKnownStrings = nil
 }
@@ -320,9 +320,9 @@ func ZendInternedStringHtLookupEx(h ZendUlong, str *byte, size int, interned_str
 	var idx uint32
 	var p *Bucket
 	nIndex = h | interned_strings.GetNTableMask()
-	idx = HT_HASH(interned_strings, nIndex)
+	idx = interned_strings.Hash(nIndex)
 	for idx != HT_INVALID_IDX {
-		p = HT_HASH_TO_BUCKET(interned_strings, idx)
+		p = interned_strings.HashToBucket(idx)
 		if p.GetH() == h && ZSTR_LEN(p.GetKey()) == size {
 			if !(memcmp(ZSTR_VAL(p.GetKey()), str, size)) {
 				return p.GetKey()
@@ -338,9 +338,9 @@ func ZendInternedStringHtLookup(str *ZendString, interned_strings *HashTable) *Z
 	var idx uint32
 	var p *Bucket
 	nIndex = h | interned_strings.GetNTableMask()
-	idx = HT_HASH(interned_strings, nIndex)
+	idx = interned_strings.Hash(nIndex)
 	for idx != HT_INVALID_IDX {
-		p = HT_HASH_TO_BUCKET(interned_strings, idx)
+		p = interned_strings.HashToBucket(idx)
 		if p.GetH() == h && ZendStringEqualContent(p.GetKey(), str) != 0 {
 			return p.GetKey()
 		}
@@ -353,7 +353,7 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 	GC_SET_REFCOUNT(str, 1)
 	GC_ADD_FLAGS(str, IS_STR_INTERNED|flags)
 	ZVAL_INTERNED_STR(&val, str)
-	ZendHashAddNew(interned_strings, str, &val)
+	interned_strings.AddNew(str, &val)
 	return str
 }
 func ZendInternedStringFindPermanent(str *ZendString) *ZendString {
@@ -450,7 +450,7 @@ func ZendInternedStringsActivate() {
 	ZendInitInternedStringsHt(&(CompilerGlobals.GetInternedStrings()), 0)
 }
 func ZendInternedStringsDeactivate() {
-	ZendHashDestroy(&(CompilerGlobals.GetInternedStrings()))
+	&(CompilerGlobals.GetInternedStrings()).Destroy()
 }
 func ZendInternedStringsSetRequestStorageHandlers(handler ZendNewInternedStringFuncT, init_handler ZendStringInitInternedFuncT) {
 	InternedStringRequestHandler = handler

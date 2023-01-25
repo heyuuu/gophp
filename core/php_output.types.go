@@ -98,6 +98,18 @@ func (this *PhpOutputHandler) SetInternal(value PhpOutputHandlerContextFuncT) {
 	this.func_.internal = value
 }
 
+/* PhpOutputHandler.flags */
+func (this *PhpOutputHandler) AddFlags(value int)     { this.flags |= value }
+func (this *PhpOutputHandler) SubFlags(value int)     { this.flags &^= value }
+func (this PhpOutputHandler) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *PhpOutputHandler) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * ZendOutputGlobals
  */
@@ -124,3 +136,15 @@ func (this ZendOutputGlobals) GetOutputStartLineno() int       { return this.out
 func (this *ZendOutputGlobals) SetOutputStartLineno(value int) { this.output_start_lineno = value }
 func (this ZendOutputGlobals) GetFlags() int                   { return this.flags }
 func (this *ZendOutputGlobals) SetFlags(value int)             { this.flags = value }
+
+/* ZendOutputGlobals.flags */
+func (this *ZendOutputGlobals) AddFlags(value int)     { this.flags |= value }
+func (this *ZendOutputGlobals) SubFlags(value int)     { this.flags &^= value }
+func (this ZendOutputGlobals) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *ZendOutputGlobals) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}

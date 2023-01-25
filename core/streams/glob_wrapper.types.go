@@ -29,3 +29,15 @@ func (this GlobST) GetPattern() *byte        { return this.pattern }
 func (this *GlobST) SetPattern(value *byte)  { this.pattern = value }
 func (this GlobST) GetPatternLen() int       { return this.pattern_len }
 func (this *GlobST) SetPatternLen(value int) { this.pattern_len = value }
+
+/* GlobST.flags */
+func (this *GlobST) AddFlags(value int)     { this.flags |= value }
+func (this *GlobST) SubFlags(value int)     { this.flags &^= value }
+func (this GlobST) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *GlobST) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}

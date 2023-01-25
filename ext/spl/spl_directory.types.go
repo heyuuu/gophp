@@ -168,3 +168,15 @@ func (this SplFilesystemObject) GetEscape() int                { return this.u.f
 func (this *SplFilesystemObject) SetEscape(value int)          { this.u.file.escape = value }
 func (this SplFilesystemObject) GetStd() zend.ZendObject       { return this.std }
 func (this *SplFilesystemObject) SetStd(value zend.ZendObject) { this.std = value }
+
+/* SplFilesystemObject.flags */
+func (this *SplFilesystemObject) AddFlags(value zend.ZendLong)     { this.flags |= value }
+func (this *SplFilesystemObject) SubFlags(value zend.ZendLong)     { this.flags &^= value }
+func (this SplFilesystemObject) HasFlags(value zend.ZendLong) bool { return this.flags&value != 0 }
+func (this *SplFilesystemObject) SwitchFlags(value zend.ZendLong, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}

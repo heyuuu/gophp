@@ -722,7 +722,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 	}
 	if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
 		if ce != nil {
-			if (ce.GetCeFlags() & ZEND_ACC_INTERFACE) != 0 {
+			if ce.isInterface() {
 				*need_msg = "implement interface "
 				is_interface = 1
 			} else {
@@ -917,7 +917,7 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
 
-		if UNEXPECTED((self_ce.GetCeFlags() & ZEND_ACC_TRAIT) != 0) {
+		if UNEXPECTED(self_ce.isTrait()) {
 			ZendThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(ZEND_TYPE_ALLOW_NULL(*type_), " non-null", ""))
 			return 0
 		}
@@ -1034,7 +1034,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_valu
 	var ce *ZendClassEntry
 	if EXPECTED(arg_num <= zf.GetNumArgs()) {
 		cur_arg_info = &zf.common.arg_info[arg_num-1]
-	} else if UNEXPECTED((zf.GetFnFlags() & ZEND_ACC_VARIADIC) != 0) {
+	} else if UNEXPECTED(zf.isVariadic()) {
 		cur_arg_info = &zf.common.arg_info[zf.GetNumArgs()]
 	} else {
 		return 1
@@ -1062,7 +1062,7 @@ func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *Zval, defa
 	var cur_arg_info *ZendArgInfo
 	var ce *ZendClassEntry
 	ZEND_ASSERT(arg_num > zf.GetNumArgs())
-	ZEND_ASSERT((zf.GetFnFlags() & ZEND_ACC_VARIADIC) != 0)
+	ZEND_ASSERT(zf.isVariadic())
 	cur_arg_info = &zf.common.arg_info[zf.GetNumArgs()]
 	ce = nil
 	if UNEXPECTED(ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0) {
@@ -1832,7 +1832,7 @@ func ZendInvalidMethodCall(object *Zval, function_name *Zval) {
 	ZendThrowError(nil, "Call to a member function %s() on %s", Z_STRVAL_P(function_name), ZendGetTypeByConst(Z_TYPE_P(object)))
 }
 func ZendNonStaticMethodCall(fbc *ZendFunction) {
-	if (fbc.GetFnFlags() & ZEND_ACC_ALLOW_STATIC) != 0 {
+	if fbc.isAllowStatic() {
 		ZendError(E_DEPRECATED, "Non-static method %s::%s() should not be called statically", ZSTR_VAL(fbc.GetScope().GetName()), ZSTR_VAL(fbc.GetFunctionName()))
 	} else {
 		ZendThrowError(ZendCeError, "Non-static method %s::%s() cannot be called statically", ZSTR_VAL(fbc.GetScope().GetName()), ZSTR_VAL(fbc.GetFunctionName()))
@@ -1928,7 +1928,7 @@ try_again:
 				return nil
 			}
 		case BP_VAR_W:
-			retval = ZendHashIndexAddNew(ht, hval, &(ExecutorGlobals.GetUninitializedZval()))
+			retval = ht.IndexAddNew(hval, &(ExecutorGlobals.GetUninitializedZval()))
 			break
 		}
 	} else if EXPECTED(Z_TYPE_P(dim) == IS_STRING) {
@@ -1939,7 +1939,7 @@ try_again:
 			}
 		}
 	str_index:
-		retval = ZendHashFindEx(ht, offset_key, ZEND_CONST_COND(dim_type == IS_CONST, 0))
+		retval = ht.FindEx(offset_key, ZEND_CONST_COND(dim_type == IS_CONST, 0))
 		if retval != nil {
 
 			/* support for $GLOBALS[...] */
@@ -1986,11 +1986,11 @@ try_again:
 					ZendStringRelease(offset_key)
 					return nil
 				}
-				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ht.AddNew(offset_key, &(ExecutorGlobals.GetUninitializedZval()))
 				ZendStringRelease(offset_key)
 				break
 			case BP_VAR_W:
-				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ht.AddNew(offset_key, &(ExecutorGlobals.GetUninitializedZval()))
 				break
 			}
 		}
@@ -2035,7 +2035,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = ZendHashNextIndexInsert(Z_ARRVAL_P(container), &(ExecutorGlobals.GetUninitializedZval()))
+			retval = Z_ARRVAL_P(container).NextIndexInsert(&(ExecutorGlobals.GetUninitializedZval()))
 			if UNEXPECTED(retval == nil) {
 				ZendCannotAddElement()
 				ZVAL_ERROR(result)
@@ -2279,10 +2279,10 @@ func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 	if Z_TYPE_P(offset) == IS_DOUBLE {
 		hval = ZendDvalToLval(Z_DVAL_P(offset))
 	num_idx:
-		return ZendHashIndexFind(ht, hval)
+		return ht.IndexFind(hval)
 	} else if Z_TYPE_P(offset) == IS_NULL {
 	str_idx:
-		return ZendHashFindExInd(ht, ZSTR_EMPTY_ALLOC(), 1)
+		return ht.FindExInd(ZSTR_EMPTY_ALLOC(), 1)
 	} else if Z_TYPE_P(offset) == IS_FALSE {
 		hval = 0
 		goto num_idx
@@ -2384,7 +2384,7 @@ try_again:
 			goto num_key
 		}
 	str_key:
-		if ZendHashFindInd(ht, str) != nil {
+		if ht.FindInd(str) != nil {
 			return IS_TRUE
 		} else {
 			return IS_FALSE
@@ -2392,7 +2392,7 @@ try_again:
 	} else if EXPECTED(Z_TYPE_P(key) == IS_LONG) {
 		hval = Z_LVAL_P(key)
 	num_key:
-		if ZendHashIndexFind(ht, hval) != nil {
+		if ht.IndexFind(hval) != nil {
 			return IS_TRUE
 		} else {
 			return IS_FALSE
@@ -2631,7 +2631,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			ptr = ZendHashFindEx(zobj.GetProperties(), Z_STR_P(prop_ptr), 1)
+			ptr = zobj.GetProperties().FindEx(Z_STR_P(prop_ptr), 1)
 			if EXPECTED(ptr != nil) {
 				ZVAL_INDIRECT(result, ptr)
 				return
@@ -3151,7 +3151,7 @@ func ZendCopyExtraArgs(EXECUTE_DATA_D) {
 	var delta int
 	var count uint32
 	var type_flags uint32 = 0
-	if EXPECTED((op_array.GetFnFlags() & ZEND_ACC_HAS_TYPE_HINTS) == 0) {
+	if EXPECTED(!op_array.isHasTypeHints()) {
 
 		/* Skip useless ZEND_RECV and ZEND_RECV_INIT opcodes */
 
@@ -3219,10 +3219,10 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 	first_extra_arg = op_array.GetNumArgs()
 	num_args = EX_NUM_ARGS()
 	if UNEXPECTED(num_args > first_extra_arg) {
-		if may_be_trampoline == 0 || EXPECTED((op_array.GetFnFlags()&ZEND_ACC_CALL_VIA_TRAMPOLINE) == 0) {
+		if may_be_trampoline == 0 || EXPECTED(!op_array.isCallViaTrampoline()) {
 			ZendCopyExtraArgs(EXECUTE_DATA_C)
 		}
-	} else if EXPECTED((op_array.GetFnFlags() & ZEND_ACC_HAS_TYPE_HINTS) == 0) {
+	} else if EXPECTED(!op_array.isHasTypeHints()) {
 
 		/* Skip useless ZEND_RECV and ZEND_RECV_INIT opcodes */
 
@@ -3247,7 +3247,7 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *ZendString) *ZendFunction {
-	var zv *Zval = ZendHashFind(ExecutorGlobals.GetFunctionTable(), name)
+	var zv *Zval = ExecutorGlobals.GetFunctionTable().Find(name)
 	if EXPECTED(zv != nil) {
 		var fbc *ZendFunction = Z_FUNC_P(zv)
 		if EXPECTED(fbc.GetType() == ZEND_USER_FUNCTION) && UNEXPECTED(!(RUN_TIME_CACHE(&fbc.op_array))) {
@@ -3258,7 +3258,7 @@ func ZendFetchFunction(name *ZendString) *ZendFunction {
 	return nil
 }
 func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
-	var zv *Zval = ZendHashStrFind(ExecutorGlobals.GetFunctionTable(), name, len_)
+	var zv *Zval = ExecutorGlobals.GetFunctionTable().StrFind(name, len_)
 	if EXPECTED(zv != nil) {
 		var fbc *ZendFunction = Z_FUNC_P(zv)
 		if EXPECTED(fbc.GetType() == ZEND_USER_FUNCTION) && UNEXPECTED(!(RUN_TIME_CACHE(&fbc.op_array))) {
@@ -3281,7 +3281,7 @@ func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, 
 	ZendAttachSymbolTable(execute_data)
 	if op_array.GetRunTimeCachePtr() == nil {
 		var ptr any
-		ZEND_ASSERT((op_array.GetFnFlags() & ZEND_ACC_HEAP_RT_CACHE) != 0)
+		ZEND_ASSERT(op_array.HasFnFlags(ZEND_ACC_HEAP_RT_CACHE))
 		ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
 		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
 		ptr = (*byte)(ptr + b.SizeOf("void *"))
@@ -3500,9 +3500,9 @@ func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
 				OBJ_RELEASE(Z_OBJ(call.GetThis()))
 			}
-			if (call.GetFunc().GetFnFlags() & ZEND_ACC_CLOSURE) != 0 {
+			if call.GetFunc().isClosure() {
 				ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
-			} else if (call.GetFunc().GetFnFlags() & ZEND_ACC_CALL_VIA_TRAMPOLINE) != 0 {
+			} else if call.GetFunc().isCallViaTrampoline() {
 				ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
 			}
@@ -3634,7 +3634,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		}
 		ZendStringReleaseEx(lcname, 0)
 		ZendStringReleaseEx(mname, 0)
-		if UNEXPECTED((fbc.GetFnFlags() & ZEND_ACC_STATIC) == 0) {
+		if UNEXPECTED(!fbc.isStatic()) {
 			ZendNonStaticMethodCall(fbc)
 			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 				return nil
@@ -3650,7 +3650,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if UNEXPECTED(b.Assign(&func_, ZendHashFind(ExecutorGlobals.GetFunctionTable(), lcname)) == nil) {
+		if UNEXPECTED(b.Assign(&func_, ExecutorGlobals.GetFunctionTable().Find(lcname)) == nil) {
 			ZendThrowError(nil, "Call to undefined function %s()", ZSTR_VAL(function))
 			ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -3672,13 +3672,13 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if EXPECTED(Z_OBJ_HANDLER_P(function, get_closure)) && EXPECTED(Z_OBJ_HANDLER_P(function, get_closure)(function, &called_scope, &fbc, &object) == SUCCESS) {
 		object_or_called_scope = called_scope
-		if (fbc.GetFnFlags() & ZEND_ACC_CLOSURE) != 0 {
+		if fbc.isClosure() {
 
 			/* Delay closure destruction until its invocation */
 
 			GC_ADDREF(ZEND_CLOSURE_OBJECT(fbc))
 			call_info |= ZEND_CALL_CLOSURE
-			if (fbc.GetFnFlags() & ZEND_ACC_FAKE_CLOSURE) != 0 {
+			if fbc.isFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
 			}
 			if object != nil {
@@ -3703,11 +3703,11 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 	var fbc *ZendFunction
 	var object_or_called_scope any
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	if ZendHashNumElements(function) == 2 {
+	if function.NumElements() == 2 {
 		var obj *Zval
 		var method *Zval
-		obj = ZendHashIndexFind(function, 0)
-		method = ZendHashIndexFind(function, 1)
+		obj = function.IndexFind(0)
+		method = function.IndexFind(1)
 		if UNEXPECTED(obj == nil) || UNEXPECTED(method == nil) {
 			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil
@@ -3738,7 +3738,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				}
 				return nil
 			}
-			if (fbc.GetFnFlags() & ZEND_ACC_STATIC) == 0 {
+			if !fbc.isStatic() {
 				ZendNonStaticMethodCall(fbc)
 				if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 					return nil
@@ -3754,7 +3754,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				}
 				return nil
 			}
-			if (fbc.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+			if fbc.isStatic() {
 				object_or_called_scope = object.GetCe()
 			} else {
 				call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
@@ -3791,7 +3791,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		var resolved_path *ZendString
 		resolved_path = ZendResolvePath(Z_STRVAL_P(inc_filename), Z_STRLEN_P(inc_filename))
 		if EXPECTED(resolved_path != nil) {
-			if ZendHashExists(&(ExecutorGlobals.GetIncludedFiles()), resolved_path) != 0 {
+			if &(ExecutorGlobals.GetIncludedFiles()).Exists(resolved_path) != 0 {
 				goto already_compiled
 			}
 		} else if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
@@ -3806,7 +3806,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(ZendStringCopy(resolved_path))
 			}
-			if ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath()) != nil {
+			if &(ExecutorGlobals.GetIncludedFiles()).AddEmptyElement(file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				ZendStringReleaseEx(resolved_path, 0)
@@ -3912,23 +3912,23 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
-	zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), Z_STR_P(key), 1)
+	zv = ExecutorGlobals.GetZendConstants().FindEx(Z_STR_P(key), 1)
 	if zv != nil {
 		c = (*ZendConstant)(Z_PTR_P(zv))
 	} else {
 		key++
-		zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), Z_STR_P(key), 1)
+		zv = ExecutorGlobals.GetZendConstants().FindEx(Z_STR_P(key), 1)
 		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(Z_PTR_P(zv)))&CONST_CS) == 0 {
 			c = (*ZendConstant)(Z_PTR_P(zv))
 		} else {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), Z_STR_P(key), 1)
+				zv = ExecutorGlobals.GetZendConstants().FindEx(Z_STR_P(key), 1)
 				if zv != nil {
 					c = (*ZendConstant)(Z_PTR_P(zv))
 				} else {
 					key++
-					zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), Z_STR_P(key), 1)
+					zv = ExecutorGlobals.GetZendConstants().FindEx(Z_STR_P(key), 1)
 					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(Z_PTR_P(zv)))&CONST_CS) == 0 {
 						c = (*ZendConstant)(Z_PTR_P(zv))
 					}

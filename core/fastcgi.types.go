@@ -52,6 +52,18 @@ func (this *FcgiBeginRequest) SetFlags(value uint8)      { this.flags = value }
 func (this FcgiBeginRequest) GetReserved() []uint8       { return this.reserved }
 func (this *FcgiBeginRequest) SetReserved(value []uint8) { this.reserved = value }
 
+/* FcgiBeginRequest.flags */
+func (this *FcgiBeginRequest) AddFlags(value uint8)     { this.flags |= value }
+func (this *FcgiBeginRequest) SubFlags(value uint8)     { this.flags &^= value }
+func (this FcgiBeginRequest) HasFlags(value uint8) bool { return this.flags&value != 0 }
+func (this *FcgiBeginRequest) SwitchFlags(value uint8, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+
 /**
  * FcgiBeginRequestRec
  */

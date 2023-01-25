@@ -107,11 +107,11 @@ func CleanModuleConstant(el *Zval, arg any) int {
 	}
 }
 func CleanModuleConstants(module_number int) {
-	ZendHashApplyWithArgument(ExecutorGlobals.GetZendConstants(), CleanModuleConstant, any(&module_number))
+	ExecutorGlobals.GetZendConstants().ApplyWithArgument(CleanModuleConstant, any(&module_number))
 }
 func ZendStartupConstants() int {
 	ExecutorGlobals.SetZendConstants((*HashTable)(Malloc(b.SizeOf("HashTable"))))
-	ZendHashInit(ExecutorGlobals.GetZendConstants(), 128, nil, ZEND_CONSTANT_DTOR, 1)
+	ExecutorGlobals.GetZendConstants().Init(128, nil, ZEND_CONSTANT_DTOR, 1)
 	return SUCCESS
 }
 func ZendRegisterStandardConstants() {
@@ -143,7 +143,7 @@ func ZendRegisterStandardConstants() {
 	REGISTER_MAIN_NULL_CONSTANT("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
 }
 func ZendShutdownConstants() int {
-	ZendHashDestroy(ExecutorGlobals.GetZendConstants())
+	ExecutorGlobals.GetZendConstants().Destroy()
 	Free(ExecutorGlobals.GetZendConstants())
 	return SUCCESS
 }
@@ -200,7 +200,7 @@ func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 		/* check for __COMPILER_HALT_OFFSET__ */
 
 		haltname = ZendManglePropertyName(haltoff, b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1, cfilename, clen, 0)
-		c = ZendHashFindPtr(ExecutorGlobals.GetZendConstants(), haltname)
+		c = ExecutorGlobals.GetZendConstants().FindPtr(haltname)
 		ZendStringEfree(haltname)
 		return c
 	} else {
@@ -219,10 +219,10 @@ func ZendVerifyConstAccess(c *ZendClassConstant, scope *ZendClassEntry) int {
 }
 func ZendGetConstantStrImpl(name *byte, name_len int) *ZendConstant {
 	var c *ZendConstant
-	if b.Assign(&c, ZendHashStrFindPtr(ExecutorGlobals.GetZendConstants(), name, name_len)) == nil {
+	if b.Assign(&c, ExecutorGlobals.GetZendConstants().StrFindPtr(name, name_len)) == nil {
 		var lcname *byte = DoAlloca(name_len+1, use_heap)
 		ZendStrTolowerCopy(lcname, name, name_len)
-		if b.Assign(&c, ZendHashStrFindPtr(ExecutorGlobals.GetZendConstants(), lcname, name_len)) != nil {
+		if b.Assign(&c, ExecutorGlobals.GetZendConstants().StrFindPtr(lcname, name_len)) != nil {
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 				c = nil
 			}
@@ -244,11 +244,11 @@ func ZendGetConstantStr(name *byte, name_len int) *Zval {
 func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 	var zv *Zval
 	var c *ZendConstant
-	zv = ZendHashFind(ExecutorGlobals.GetZendConstants(), name)
+	zv = ExecutorGlobals.GetZendConstants().Find(name)
 	if zv == nil {
 		var lcname *byte = DoAlloca(ZSTR_LEN(name)+1, use_heap)
 		ZendStrTolowerCopy(lcname, ZSTR_VAL(name), ZSTR_LEN(name))
-		zv = ZendHashStrFind(ExecutorGlobals.GetZendConstants(), lcname, ZSTR_LEN(name))
+		zv = ExecutorGlobals.GetZendConstants().StrFind(lcname, ZSTR_LEN(name))
 		if zv != nil {
 			c = Z_PTR_P(zv)
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
@@ -337,7 +337,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			ce = ZendFetchClass(class_name, flags)
 		}
 		if ce != nil {
-			c = ZendHashFindPtr(&ce.constants_table, constant_name)
+			c = &ce.constants_table.FindPtr(constant_name)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
 					ZendThrowError(nil, "Undefined class constant '%s::%s'", ZSTR_VAL(class_name), ZSTR_VAL(constant_name))
@@ -394,12 +394,12 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 
 		lcname[prefix_len] = '\\'
 		memcpy(lcname+prefix_len+1, constant_name, const_name_len+1)
-		if b.Assign(&c, ZendHashStrFindPtr(ExecutorGlobals.GetZendConstants(), lcname, lcname_len)) == nil {
+		if b.Assign(&c, ExecutorGlobals.GetZendConstants().StrFindPtr(lcname, lcname_len)) == nil {
 
 			/* try lowercase */
 
 			ZendStrTolower(lcname+prefix_len+1, const_name_len)
-			if b.Assign(&c, ZendHashStrFindPtr(ExecutorGlobals.GetZendConstants(), lcname, lcname_len)) != nil {
+			if b.Assign(&c, ExecutorGlobals.GetZendConstants().StrFindPtr(lcname, lcname_len)) != nil {
 				if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 					c = nil
 				}
@@ -433,11 +433,11 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 	}
 	return &c.value
 }
-func ZendHashAddConstant(ht *HashTable, key *ZendString, c *ZendConstant) any {
+func (this *HashTable) AddConstant(key *ZendString, c *ZendConstant) any {
 	var ret any
 	var copy *ZendConstant = Pemalloc(b.SizeOf("zend_constant"), ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	memcpy(copy, c, b.SizeOf("zend_constant"))
-	ret = ZendHashAddPtr(ht, key, copy)
+	ret = this.AddPtr(key, copy)
 	if !ret {
 		Pefree(copy, ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT)
 	}
@@ -465,7 +465,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 
 	/* Check if the user is trying to define the __special__  internal pseudo constant name __COMPILER_HALT_OFFSET__ */
 
-	if ZendStringEqualsLiteral(name, "__COMPILER_HALT_OFFSET__") || ZendHashAddConstant(ExecutorGlobals.GetZendConstants(), name, c) == nil {
+	if ZendStringEqualsLiteral(name, "__COMPILER_HALT_OFFSET__") || ExecutorGlobals.GetZendConstants().AddConstant(name, c) == nil {
 
 		/* The internal __COMPILER_HALT_OFFSET__ is prefixed by NULL byte */
 

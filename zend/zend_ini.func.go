@@ -100,7 +100,7 @@ func ZendIniStartup() int {
 	ExecutorGlobals.SetIniDirectives(RegisteredZendIniDirectives)
 	ExecutorGlobals.SetModifiedIniDirectives(nil)
 	ExecutorGlobals.SetErrorReportingIniEntry(nil)
-	ZendHashInitEx(RegisteredZendIniDirectives, 128, nil, FreeIniEntry, 1, 0)
+	RegisteredZendIniDirectives.InitEx(128, nil, FreeIniEntry, 1, 0)
 	return SUCCESS
 }
 func ZendIniShutdown() int {
@@ -108,11 +108,11 @@ func ZendIniShutdown() int {
 	return SUCCESS
 }
 func ZendIniDtor(ini_directives *HashTable) {
-	ZendHashDestroy(ini_directives)
+	ini_directives.Destroy()
 	Free(ini_directives)
 }
 func ZendIniGlobalShutdown() int {
-	ZendHashDestroy(RegisteredZendIniDirectives)
+	RegisteredZendIniDirectives.Destroy()
 	Free(RegisteredZendIniDirectives)
 	return SUCCESS
 }
@@ -134,7 +134,7 @@ func ZendIniDeactivate() int {
 			}
 			break
 		}
-		ZendHashDestroy(ExecutorGlobals.GetModifiedIniDirectives())
+		ExecutorGlobals.GetModifiedIniDirectives().Destroy()
 		FREE_HASHTABLE(ExecutorGlobals.GetModifiedIniDirectives())
 		ExecutorGlobals.SetModifiedIniDirectives(nil)
 	}
@@ -161,7 +161,7 @@ func IniKeyCompare(a any, b any) int {
 	}
 }
 func ZendIniSortEntries() {
-	ZendHashSort(ExecutorGlobals.GetIniDirectives(), IniKeyCompare, 0)
+	ExecutorGlobals.GetIniDirectives().Sort(IniKeyCompare, 0)
 }
 func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 	var p *ZendIniEntry
@@ -181,7 +181,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 		p.SetOrigModifiable(0)
 		p.SetModified(0)
 		p.SetModuleNumber(module_number)
-		if ZendHashAddPtr(directives, p.GetName(), any(p)) == nil {
+		if directives.AddPtr(p.GetName(), any(p)) == nil {
 			if p.GetName() != nil {
 				ZendStringReleaseEx(p.GetName(), 1)
 			}
@@ -205,7 +205,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 	return SUCCESS
 }
 func ZendUnregisterIniEntries(module_number int) {
-	ZendHashApplyWithArgument(RegisteredZendIniDirectives, ZendRemoveIniEntries, any(&module_number))
+	RegisteredZendIniDirectives.ApplyWithArgument(ZendRemoveIniEntries, any(&module_number))
 }
 func ZendAlterIniEntry(name *ZendString, new_value *ZendString, modify_type int, stage int) int {
 	return ZendAlterIniEntryEx(name, new_value, modify_type, stage, 0)
@@ -231,7 +231,7 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 	var duplicate *ZendString
 	var modifiable uint8
 	var modified ZendBool
-	if b.Assign(&ini_entry, ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)) == nil {
+	if b.Assign(&ini_entry, ExecutorGlobals.GetIniDirectives().FindPtr(name)) == nil {
 		return FAILURE
 	}
 	modifiable = ini_entry.GetModifiable()
@@ -246,13 +246,13 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 	}
 	if ExecutorGlobals.GetModifiedIniDirectives() == nil {
 		ALLOC_HASHTABLE(ExecutorGlobals.GetModifiedIniDirectives())
-		ZendHashInit(ExecutorGlobals.GetModifiedIniDirectives(), 8, nil, nil, 0)
+		ExecutorGlobals.GetModifiedIniDirectives().Init(8, nil, nil, 0)
 	}
 	if modified == 0 {
 		ini_entry.SetOrigValue(ini_entry.GetValue())
 		ini_entry.SetOrigModifiable(modifiable)
 		ini_entry.SetModified(1)
-		ZendHashAddPtr(ExecutorGlobals.GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
+		ExecutorGlobals.GetModifiedIniDirectives().AddPtr(ini_entry.GetName(), ini_entry)
 	}
 	duplicate = ZendStringCopy(new_value)
 	if ini_entry.GetOnModify() == nil || ini_entry.GetOnModify()(ini_entry, duplicate, ini_entry.GetMhArg1(), ini_entry.GetMhArg2(), ini_entry.GetMhArg3(), stage) == SUCCESS {
@@ -268,12 +268,12 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 }
 func ZendRestoreIniEntry(name *ZendString, stage int) int {
 	var ini_entry *ZendIniEntry
-	if b.Assign(&ini_entry, ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
+	if b.Assign(&ini_entry, ExecutorGlobals.GetIniDirectives().FindPtr(name)) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
 		return FAILURE
 	}
 	if ExecutorGlobals.GetModifiedIniDirectives() != nil {
 		if ZendRestoreIniEntryCb(ini_entry, stage) == 0 {
-			ZendHashDel(ExecutorGlobals.GetModifiedIniDirectives(), name)
+			ExecutorGlobals.GetModifiedIniDirectives().Del(name)
 		} else {
 			return FAILURE
 		}
@@ -282,7 +282,7 @@ func ZendRestoreIniEntry(name *ZendString, stage int) int {
 }
 func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(RegisteredZendIniDirectives, name, name_length)
+	ini_entry = RegisteredZendIniDirectives.StrFindPtr(name, name_length)
 	if ini_entry == nil {
 		return FAILURE
 	}
@@ -291,7 +291,7 @@ func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini
 }
 func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
+	ini_entry = ExecutorGlobals.GetIniDirectives().StrFindPtr(name, name_length)
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
@@ -311,7 +311,7 @@ func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 }
 func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
+	ini_entry = ExecutorGlobals.GetIniDirectives().StrFindPtr(name, name_length)
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			return float64(b.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ZSTR_VAL(ini_entry.GetOrigValue()), nil) }, 0.0))
@@ -323,7 +323,7 @@ func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 }
 func ZendIniStringEx(name *byte, name_length int, orig int, exists *ZendBool) *byte {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
+	ini_entry = ExecutorGlobals.GetIniDirectives().StrFindPtr(name, name_length)
 	if ini_entry != nil {
 		if exists != nil {
 			*exists = 1
@@ -361,7 +361,7 @@ func ZendIniString(name string, name_length int, orig int) *byte {
 }
 func ZendIniGetValue(name *ZendString) *ZendString {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)
+	ini_entry = ExecutorGlobals.GetIniDirectives().FindPtr(name)
 	if ini_entry != nil {
 		if ini_entry.GetValue() != nil {
 			return ini_entry.GetValue()

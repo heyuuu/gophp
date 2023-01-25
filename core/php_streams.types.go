@@ -268,3 +268,15 @@ func (this PhpStream) GetChunkSize() int                                   { ret
 func (this *PhpStream) SetChunkSize(value int)                             { this.chunk_size = value }
 func (this PhpStream) GetEnclosingStream() *PhpStream                      { return this.enclosing_stream }
 func (this *PhpStream) SetEnclosingStream(value *PhpStream)                { this.enclosing_stream = value }
+
+/* PhpStream.flags */
+func (this *PhpStream) AddFlags(value uint32)     { this.flags |= value }
+func (this *PhpStream) SubFlags(value uint32)     { this.flags &^= value }
+func (this PhpStream) HasFlags(value uint32) bool { return this.flags&value != 0 }
+func (this *PhpStream) SwitchFlags(value uint32, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}

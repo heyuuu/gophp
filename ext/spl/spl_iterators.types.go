@@ -121,6 +121,60 @@ func (this *SplDualItObject) SetCbfilter(value *_spl_cbfilter_it_intern) { this.
 func (this SplDualItObject) GetStd() zend.ZendObject                     { return this.std }
 func (this *SplDualItObject) SetStd(value zend.ZendObject)               { this.std = value }
 
+/* SplDualItObject.u.caching.flags */
+func (this *SplDualItObject) AddUCachingFlags(value zend.ZendLong) { this.u.caching.flags |= value }
+func (this *SplDualItObject) SubUCachingFlags(value zend.ZendLong) { this.u.caching.flags &^= value }
+func (this SplDualItObject) HasUCachingFlags(value zend.ZendLong) bool {
+	return this.u.caching.flags&value != 0
+}
+func (this *SplDualItObject) SwitchUCachingFlags(value zend.ZendLong, cond bool) {
+	if cond {
+		this.AddUCachingFlags(value)
+	} else {
+		this.SubUCachingFlags(value)
+	}
+}
+
+/* SplDualItObject.u.regex.flags */
+func (this *SplDualItObject) AddURegexFlags(value zend.ZendLong) { this.u.regex.flags |= value }
+func (this *SplDualItObject) SubURegexFlags(value zend.ZendLong) { this.u.regex.flags &^= value }
+func (this SplDualItObject) HasURegexFlags(value zend.ZendLong) bool {
+	return this.u.regex.flags&value != 0
+}
+func (this *SplDualItObject) SwitchURegexFlags(value zend.ZendLong, cond bool) {
+	if cond {
+		this.AddURegexFlags(value)
+	} else {
+		this.SubURegexFlags(value)
+	}
+}
+
+/* SplDualItObject.u.regex.preg_flags */
+func (this *SplDualItObject) AddPregFlags(value zend.ZendLong) { this.u.regex.preg_flags |= value }
+func (this *SplDualItObject) SubPregFlags(value zend.ZendLong) { this.u.regex.preg_flags &^= value }
+func (this SplDualItObject) HasPregFlags(value zend.ZendLong) bool {
+	return this.u.regex.preg_flags&value != 0
+}
+func (this *SplDualItObject) SwitchPregFlags(value zend.ZendLong, cond bool) {
+	if cond {
+		this.AddPregFlags(value)
+	} else {
+		this.SubPregFlags(value)
+	}
+}
+
+/* SplDualItObject.u.regex.use_flags */
+func (this *SplDualItObject) AddUseFlags(value int)     { this.u.regex.use_flags |= value }
+func (this *SplDualItObject) SubUseFlags(value int)     { this.u.regex.use_flags &^= value }
+func (this SplDualItObject) HasUseFlags(value int) bool { return this.u.regex.use_flags&value != 0 }
+func (this *SplDualItObject) SwitchUseFlags(value int, cond bool) {
+	if cond {
+		this.AddUseFlags(value)
+	} else {
+		this.SubUseFlags(value)
+	}
+}
+
 /**
  * SplSubIterator
  */
@@ -207,6 +261,18 @@ func (this SplRecursiveItObject) GetPostfix() []zend.SmartStr              { ret
 func (this *SplRecursiveItObject) SetPostfix(value []zend.SmartStr)        { this.postfix = value }
 func (this SplRecursiveItObject) GetStd() zend.ZendObject                  { return this.std }
 func (this *SplRecursiveItObject) SetStd(value zend.ZendObject)            { this.std = value }
+
+/* SplRecursiveItObject.flags */
+func (this *SplRecursiveItObject) AddFlags(value int)     { this.flags |= value }
+func (this *SplRecursiveItObject) SubFlags(value int)     { this.flags &^= value }
+func (this SplRecursiveItObject) HasFlags(value int) bool { return this.flags&value != 0 }
+func (this *SplRecursiveItObject) SwitchFlags(value int, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
 
 /**
  * SplRecursiveItIterator

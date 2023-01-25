@@ -158,6 +158,20 @@ func (this *ZendCompilerGlobals) SetDelayedAutoloads(value *HashTable) {
 func (this ZendCompilerGlobals) GetRtdKeyCounter() uint32       { return this.rtd_key_counter }
 func (this *ZendCompilerGlobals) SetRtdKeyCounter(value uint32) { this.rtd_key_counter = value }
 
+/* ZendCompilerGlobals.extra_fn_flags */
+func (this *ZendCompilerGlobals) AddExtraFnFlags(value uint32) { this.extra_fn_flags |= value }
+func (this *ZendCompilerGlobals) SubExtraFnFlags(value uint32) { this.extra_fn_flags &^= value }
+func (this ZendCompilerGlobals) HasExtraFnFlags(value uint32) bool {
+	return this.extra_fn_flags&value != 0
+}
+func (this *ZendCompilerGlobals) SwitchExtraFnFlags(value uint32, cond bool) {
+	if cond {
+		this.AddExtraFnFlags(value)
+	} else {
+		this.SubExtraFnFlags(value)
+	}
+}
+
 /**
  * ZendExecutorGlobals
  */
@@ -428,6 +442,22 @@ func (this *ZendExecutorGlobals) SetExceptionIgnoreArgs(value ZendBool) {
 }
 func (this ZendExecutorGlobals) GetReserved() []any       { return this.reserved }
 func (this *ZendExecutorGlobals) SetReserved(value []any) { this.reserved = value }
+
+/* ZendExecutorGlobals.flags */
+func (this *ZendExecutorGlobals) AddFlags(value ZendUchar)     { this.flags |= value }
+func (this *ZendExecutorGlobals) SubFlags(value ZendUchar)     { this.flags &^= value }
+func (this ZendExecutorGlobals) HasFlags(value ZendUchar) bool { return this.flags&value != 0 }
+func (this *ZendExecutorGlobals) SwitchFlags(value ZendUchar, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+func (this ZendExecutorGlobals) isInShutdown() bool { return this.HasFlags(EG_FLAGS_IN_SHUTDOWN) }
+func (this *ZendExecutorGlobals) setIsInShutdown(cond bool) {
+	this.SwitchFlags(EG_FLAGS_IN_SHUTDOWN, cond)
+}
 
 /**
  * ZendIniScannerGlobals

@@ -454,7 +454,7 @@ func ZendCompile(type_ int) *ZendOpArray {
 
 		/* Use heap to not waste arena memory */
 
-		op_array.SetFnFlags(op_array.GetFnFlags() | ZEND_ACC_HEAP_RT_CACHE)
+		op_array.AddFnFlags(ZEND_ACC_HEAP_RT_CACHE)
 		if ZendAstProcess != nil {
 			ZendAstProcess(CompilerGlobals.GetAst())
 		}
@@ -510,7 +510,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 			opened_path = ZendStringCopy(Z_STR_P(filename))
 			file_handle.SetOpenedPath(opened_path)
 		}
-		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
+		&(ExecutorGlobals.GetIncludedFiles()).AddEmptyElement(file_handle.GetOpenedPath())
 		if opened_path != nil {
 			ZendStringReleaseEx(opened_path, 0)
 		}

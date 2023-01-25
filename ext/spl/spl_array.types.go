@@ -47,3 +47,15 @@ func (this *SplArrayObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 }
 func (this SplArrayObject) GetStd() zend.ZendObject       { return this.std }
 func (this *SplArrayObject) SetStd(value zend.ZendObject) { this.std = value }
+
+/* SplArrayObject.ar_flags */
+func (this *SplArrayObject) AddArFlags(value int)     { this.ar_flags |= value }
+func (this *SplArrayObject) SubArFlags(value int)     { this.ar_flags &^= value }
+func (this SplArrayObject) HasArFlags(value int) bool { return this.ar_flags&value != 0 }
+func (this *SplArrayObject) SwitchArFlags(value int, cond bool) {
+	if cond {
+		this.AddArFlags(value)
+	} else {
+		this.SubArFlags(value)
+	}
+}

@@ -13,7 +13,7 @@ func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
 	object.SetCe(ce)
 	object.SetProperties(nil)
 	ZendObjectsStorePut(object)
-	if UNEXPECTED((ce.GetCeFlags() & ZEND_ACC_USE_GUARDS) != 0) {
+	if UNEXPECTED(ce.isUseGuards()) {
 		ZVAL_UNDEF(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount())
 	}
 }
@@ -47,14 +47,14 @@ func ZendObjectStdDtor(object *ZendObject) {
 			}
 		}
 	}
-	if UNEXPECTED((object.GetCe().GetCeFlags() & ZEND_ACC_USE_GUARDS) != 0) {
+	if UNEXPECTED(object.GetCe().isUseGuards()) {
 		if EXPECTED(Z_TYPE_P(p) == IS_STRING) {
 			ZvalPtrDtorStr(p)
 		} else if Z_TYPE_P(p) == IS_ARRAY {
 			var guards *HashTable
 			guards = Z_ARRVAL_P(p)
 			ZEND_ASSERT(guards != nil)
-			ZendHashDestroy(guards)
+			guards.Destroy()
 			FREE_HASHTABLE(guards)
 		}
 	}
@@ -70,8 +70,8 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		var fci ZendFcallInfo
 		var fcic ZendFcallInfoCache
 		var ret Zval
-		if (destructor.GetOpArray().GetFnFlags() & (ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED)) != 0 {
-			if (destructor.GetOpArray().GetFnFlags() & ZEND_ACC_PRIVATE) != 0 {
+		if destructor.GetOpArray().HasFnFlags(ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED) {
+			if destructor.GetOpArray().isPrivate() {
 
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
@@ -195,18 +195,18 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		/* fast copy */
 
 	}
-	if old_object.GetProperties() != nil && EXPECTED(ZendHashNumElements(old_object.GetProperties())) {
+	if old_object.GetProperties() != nil && EXPECTED(old_object.GetProperties().NumElements()) {
 		var prop *Zval
 		var new_prop Zval
 		var num_key ZendUlong
 		var key *ZendString
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(ZendNewArray(ZendHashNumElements(old_object.GetProperties())))
-			ZendHashRealInitMixed(new_object.GetProperties())
+			new_object.SetProperties(ZendNewArray(old_object.GetProperties().NumElements()))
+			new_object.GetProperties().RealInitMixed()
 		} else {
-			ZendHashExtend(new_object.GetProperties(), new_object.GetProperties().GetNNumUsed()+ZendHashNumElements(old_object.GetProperties()), 0)
+			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().NumElements(), 0)
 		}
-		HT_FLAGS(new_object.GetProperties()) |= HT_FLAGS(old_object.GetProperties()) & HASH_FLAG_HAS_EMPTY_IND
+		new_object.GetProperties().Flags() |= old_object.GetProperties().Flags() & HASH_FLAG_HAS_EMPTY_IND
 		for {
 			var __ht *HashTable = old_object.GetProperties()
 			var _p *Bucket = __ht.GetArData()
@@ -227,9 +227,9 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 					ZvalAddRef(&new_prop)
 				}
 				if EXPECTED(key != nil) {
-					_zendHashAppend(new_object.GetProperties(), key, &new_prop)
+					new_object.GetProperties()._append(key, &new_prop)
 				} else {
-					ZendHashIndexAddNew(new_object.GetProperties(), num_key, &new_prop)
+					new_object.GetProperties().IndexAddNew(num_key, &new_prop)
 				}
 			}
 			break

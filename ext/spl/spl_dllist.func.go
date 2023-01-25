@@ -244,10 +244,10 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clon
 	}
 	for parent != nil {
 		if parent == spl_ce_SplStack {
-			intern.SetFlags(intern.GetFlags() | SPL_DLLIST_IT_FIX | SPL_DLLIST_IT_LIFO)
+			intern.AddFlags(SPL_DLLIST_IT_FIX | SPL_DLLIST_IT_LIFO)
 			intern.std.handlers = &spl_handler_SplDoublyLinkedList
 		} else if parent == spl_ce_SplQueue {
-			intern.SetFlags(intern.GetFlags() | SPL_DLLIST_IT_FIX)
+			intern.AddFlags(SPL_DLLIST_IT_FIX)
 			intern.std.handlers = &spl_handler_SplDoublyLinkedList
 		}
 		if parent == spl_ce_SplDoublyLinkedList {
@@ -462,7 +462,7 @@ func zim_spl_SplDoublyLinkedList_setIteratorMode(execute_data *zend.ZendExecuteD
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
-	if (intern.GetFlags()&SPL_DLLIST_IT_FIX) != 0 && (intern.GetFlags()&SPL_DLLIST_IT_LIFO) != (value&SPL_DLLIST_IT_LIFO) {
+	if intern.HasFlags(SPL_DLLIST_IT_FIX) && (intern.GetFlags()&SPL_DLLIST_IT_LIFO) != (value&SPL_DLLIST_IT_LIFO) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Iterators' LIFO/FIFO modes for SplStack/SplQueue objects are frozen", 0)
 		return
 	}

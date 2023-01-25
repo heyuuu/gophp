@@ -403,7 +403,7 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 	ZVAL_ARR(&globals, &(ExecutorGlobals.GetSymbolTable()))
 	Z_TYPE_FLAGS_P(&globals) = 0
 	ZVAL_NEW_REF(&globals, &globals)
-	ZendHashUpdate(&(ExecutorGlobals.GetSymbolTable()), name, &globals)
+	&(ExecutorGlobals.GetSymbolTable()).Update(name, &globals)
 	return 0
 }
 func ZendStartup(utility_functions *ZendUtilityFunctions) int {
@@ -453,11 +453,11 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	GLOBAL_CLASS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
 	GLOBAL_AUTO_GLOBALS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
 	GLOBAL_CONSTANTS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
-	ZendHashInitEx(GLOBAL_FUNCTION_TABLE, 1024, nil, ZEND_FUNCTION_DTOR, 1, 0)
-	ZendHashInitEx(GLOBAL_CLASS_TABLE, 64, nil, ZEND_CLASS_DTOR, 1, 0)
-	ZendHashInitEx(GLOBAL_AUTO_GLOBALS_TABLE, 8, nil, AutoGlobalDtor, 1, 0)
-	ZendHashInitEx(GLOBAL_CONSTANTS_TABLE, 128, nil, ZEND_CONSTANT_DTOR, 1, 0)
-	ZendHashInitEx(&ModuleRegistry, 32, nil, ModuleDestructorZval, 1, 0)
+	GLOBAL_FUNCTION_TABLE.InitEx(1024, nil, ZEND_FUNCTION_DTOR, 1, 0)
+	GLOBAL_CLASS_TABLE.InitEx(64, nil, ZEND_CLASS_DTOR, 1, 0)
+	GLOBAL_AUTO_GLOBALS_TABLE.InitEx(8, nil, AutoGlobalDtor, 1, 0)
+	GLOBAL_CONSTANTS_TABLE.InitEx(128, nil, ZEND_CONSTANT_DTOR, 1, 0)
+	&ModuleRegistry.InitEx(32, nil, ModuleDestructorZval, 1, 0)
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)
 	PhpScannerGlobalsCtor(&language_scanner_globals)
@@ -515,7 +515,7 @@ func ZendResolvePropertyTypes() {
 						if ZEND_TYPE_IS_NAME(prop_info.GetType()) {
 							var type_name *ZendString = ZEND_TYPE_NAME(prop_info.GetType())
 							var lc_type_name *ZendString = ZendStringTolower(type_name)
-							var prop_ce *ZendClassEntry = ZendHashFindPtr(CompilerGlobals.GetClassTable(), lc_type_name)
+							var prop_ce *ZendClassEntry = CompilerGlobals.GetClassTable().FindPtr(lc_type_name)
 							ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 							prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, ZEND_TYPE_ALLOW_NULL(prop_info.GetType())))
 							ZendStringRelease(lc_type_name)
@@ -525,7 +525,7 @@ func ZendResolvePropertyTypes() {
 					break
 				}
 			}
-			ce.SetCeFlags(ce.GetCeFlags() | ZEND_ACC_PROPERTY_TYPES_RESOLVED)
+			ce.AddCeFlags(ZEND_ACC_PROPERTY_TYPES_RESOLVED)
 		}
 		break
 	}
@@ -548,15 +548,15 @@ func ZendShutdown() {
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
-	ZendHashDestroy(GLOBAL_FUNCTION_TABLE)
-	ZendHashDestroy(GLOBAL_CLASS_TABLE)
-	ZendHashDestroy(GLOBAL_AUTO_GLOBALS_TABLE)
+	GLOBAL_FUNCTION_TABLE.Destroy()
+	GLOBAL_CLASS_TABLE.Destroy()
+	GLOBAL_AUTO_GLOBALS_TABLE.Destroy()
 	Free(GLOBAL_AUTO_GLOBALS_TABLE)
 	ZendShutdownExtensions()
 	Free(ZendVersionInfo)
 	Free(GLOBAL_FUNCTION_TABLE)
 	Free(GLOBAL_CLASS_TABLE)
-	ZendHashDestroy(GLOBAL_CONSTANTS_TABLE)
+	GLOBAL_CONSTANTS_TABLE.Destroy()
 	Free(GLOBAL_CONSTANTS_TABLE)
 	ZendShutdownStrtod()
 	if CompilerGlobals.GetMapPtrBase() {
@@ -1052,7 +1052,7 @@ func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
 		}
 		op_array = ZendCompileFile(file_handle, type_)
 		if file_handle.GetOpenedPath() != nil {
-			ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
+			&(ExecutorGlobals.GetIncludedFiles()).AddEmptyElement(file_handle.GetOpenedPath())
 		}
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {

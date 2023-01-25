@@ -93,3 +93,31 @@ func (this ZendGenerator) GetGcBuffer() *Zval                    { return this.g
 func (this *ZendGenerator) SetGcBuffer(value *Zval)              { this.gc_buffer = value }
 func (this ZendGenerator) GetGcBufferSize() uint32               { return this.gc_buffer_size }
 func (this *ZendGenerator) SetGcBufferSize(value uint32)         { this.gc_buffer_size = value }
+
+/* ZendGenerator.flags */
+func (this *ZendGenerator) AddFlags(value ZendUchar)     { this.flags |= value }
+func (this *ZendGenerator) SubFlags(value ZendUchar)     { this.flags &^= value }
+func (this ZendGenerator) HasFlags(value ZendUchar) bool { return this.flags&value != 0 }
+func (this *ZendGenerator) SwitchFlags(value ZendUchar, cond bool) {
+	if cond {
+		this.AddFlags(value)
+	} else {
+		this.SubFlags(value)
+	}
+}
+func (this ZendGenerator) isCurrentlyRunning() bool {
+	return this.HasFlags(ZEND_GENERATOR_CURRENTLY_RUNNING)
+}
+func (this ZendGenerator) isDoInit() bool       { return this.HasFlags(ZEND_GENERATOR_DO_INIT) }
+func (this ZendGenerator) isAtFirstYield() bool { return this.HasFlags(ZEND_GENERATOR_AT_FIRST_YIELD) }
+func (this ZendGenerator) isForcedClose() bool  { return this.HasFlags(ZEND_GENERATOR_FORCED_CLOSE) }
+func (this *ZendGenerator) setIsCurrentlyRunning(cond bool) {
+	this.SwitchFlags(ZEND_GENERATOR_CURRENTLY_RUNNING, cond)
+}
+func (this *ZendGenerator) setIsDoInit(cond bool) { this.SwitchFlags(ZEND_GENERATOR_DO_INIT, cond) }
+func (this *ZendGenerator) setIsAtFirstYield(cond bool) {
+	this.SwitchFlags(ZEND_GENERATOR_AT_FIRST_YIELD, cond)
+}
+func (this *ZendGenerator) setIsForcedClose(cond bool) {
+	this.SwitchFlags(ZEND_GENERATOR_FORCED_CLOSE, cond)
+}
