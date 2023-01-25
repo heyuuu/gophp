@@ -512,12 +512,12 @@ func ZendResolvePropertyTypes() {
 							continue
 						}
 						prop_info = Z_PTR_P(_z)
-						if ZEND_TYPE_IS_NAME(prop_info.GetType()) {
-							var type_name *ZendString = ZEND_TYPE_NAME(prop_info.GetType())
+						if prop_info.GetType().IsName() {
+							var type_name *ZendString = prop_info.GetType().Name()
 							var lc_type_name *ZendString = ZendStringTolower(type_name)
 							var prop_ce *ZendClassEntry = CompilerGlobals.GetClassTable().FindPtr(lc_type_name)
 							ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
-							prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, ZEND_TYPE_ALLOW_NULL(prop_info.GetType())))
+							prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 							ZendStringRelease(lc_type_name)
 							ZendStringRelease(type_name)
 						}

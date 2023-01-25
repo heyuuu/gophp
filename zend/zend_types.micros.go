@@ -8,11 +8,17 @@ package zend
 
 // # include "zend_long.h"
 
+// #define ZEND_ENDIAN_LOHI(lo,hi) lo ; hi ;
+
 // #define ZEND_ENDIAN_LOHI_3(lo,mi,hi) lo ; mi ; hi ;
 
 // #define ZEND_ENDIAN_LOHI_4(a,b,c,d) a ; b ; c ; d ;
 
+// #define ZEND_ENDIAN_LOHI_C(lo,hi) lo , hi
+
 // #define ZEND_ENDIAN_LOHI_C_3(lo,mi,hi) lo , mi , hi ,
+
+// #define ZEND_ENDIAN_LOHI_C_4(a,b,c,d) a , b , c , d
 
 // #define ZEND_TLS       static
 

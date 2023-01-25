@@ -6,35 +6,21 @@ import (
 	b "sik/builtin"
 )
 
-func ZEND_ENDIAN_LOHI(lo __auto__, hi __auto__) {
-	lo
-	hi
+func (this ZendType) IsSet() bool { return this > int64(0x3) }
+func (this ZendType) IsCode() bool {
+	return this > int64(0x3) && this <= int64(0x3ff)
 }
-func ZEND_ENDIAN_LOHI_C(lo __auto__, hi __auto__) {
-	lo
-	hi
+func (this ZendType) IsClass() bool { return this > int64(0x3ff) }
+func (this ZendType) IsCe() bool    { return (this & int64(0x2)) != 0 }
+func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
+func (this ZendType) Name() *ZendString {
+	return (*ZendString)(this & ^(int64(0x3)))
 }
-func ZEND_ENDIAN_LOHI_C_4(a __auto__, b __auto__, c __auto__, d __auto__) {
-	a
-	b
-	c
-	d
+func (this ZendType) Ce() *ZendClassEntry {
+	return (*ZendClassEntry)(this & ^(int64(0x3)))
 }
-func ZEND_TYPE_IS_SET(t ZendType) bool { return t > int64(0x3) }
-func ZEND_TYPE_IS_CODE(t ZendType) bool {
-	return t > int64(0x3) && t <= int64(0x3ff)
-}
-func ZEND_TYPE_IS_CLASS(t ZendType) bool { return t > int64(0x3ff) }
-func ZEND_TYPE_IS_CE(t ZendType) bool    { return (t & int64(0x2)) != 0 }
-func ZEND_TYPE_IS_NAME(t ZendType) bool {
-	return ZEND_TYPE_IS_CLASS(t) && !(ZEND_TYPE_IS_CE(t))
-}
-func ZEND_TYPE_NAME(t ZendType) *ZendString { return (*ZendString)(t & ^(int64(0x3))) }
-func ZEND_TYPE_CE(t ZendType) *ZendClassEntry {
-	return (*ZendClassEntry)(t & ^(int64(0x3)))
-}
-func ZEND_TYPE_CODE(t ZendType) int         { return t >> int64(2) }
-func ZEND_TYPE_ALLOW_NULL(t ZendType) bool  { return (t & int64(0x1)) != 0 }
+func (this ZendType) Code() int             { return this >> int64(2) }
+func (this ZendType) AllowNull() bool       { return (this & int64(0x1)) != 0 }
 func ZEND_TYPE_WITHOUT_NULL(t __auto__) int { return t & ^(int64(0x1)) }
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) int {
 	return code<<int64(2) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })

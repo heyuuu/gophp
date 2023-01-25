@@ -953,13 +953,13 @@ func ZendMarkFunctionAsGenerator() {
 	}
 	if CompilerGlobals.GetActiveOpArray().IsHasReturnType() {
 		var return_info ZendArgInfo = CompilerGlobals.GetActiveOpArray().GetArgInfo()[-1]
-		if ZEND_TYPE_CODE(return_info.GetType()) != IS_ITERABLE {
+		if return_info.GetType().Code() != IS_ITERABLE {
 			var msg *byte = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
-			if !(ZEND_TYPE_IS_CLASS(return_info.GetType())) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZendGetTypeByConst(ZEND_TYPE_CODE(return_info.GetType())))
+			if !(return_info.GetType().IsClass()) {
+				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZendGetTypeByConst(return_info.GetType().Code()))
 			}
-			if !(ZendStringEqualsLiteralCi(ZEND_TYPE_NAME(return_info.GetType()), "Traversable")) && !(ZendStringEqualsLiteralCi(ZEND_TYPE_NAME(return_info.GetType()), "Iterator")) && !(ZendStringEqualsLiteralCi(ZEND_TYPE_NAME(return_info.GetType()), "Generator")) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZSTR_VAL(ZEND_TYPE_NAME(return_info.GetType())))
+			if !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Traversable")) && !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Iterator")) && !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Generator")) {
+				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZSTR_VAL(return_info.GetType().Name()))
 			}
 		}
 	}
@@ -1801,12 +1801,12 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 	}
 }
 func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit ZendBool) {
-	if ZEND_TYPE_IS_SET(return_info.GetType()) {
+	if return_info.GetType().IsSet() {
 		var opline *ZendOp
 
 		/* `return ...;` is illegal in a void function (but `return;` isn't) */
 
-		if ZEND_TYPE_CODE(return_info.GetType()) == IS_VOID {
+		if return_info.GetType().Code() == IS_VOID {
 			if expr != nil {
 				if expr.GetOpType() == IS_CONST && Z_TYPE(expr.GetConstant()) == IS_NULL {
 					ZendErrorNoreturn(E_COMPILE_ERROR, "A void function must not return a value "+"(did you mean \"return;\" instead of \"return null;\"?)")
@@ -1823,14 +1823,14 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit Zen
 
 		}
 		if expr == nil && implicit == 0 {
-			if ZEND_TYPE_ALLOW_NULL(return_info.GetType()) {
+			if return_info.GetType().AllowNull() {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "A function with return type must return a value "+"(did you mean \"return null;\" instead of \"return;\"?)")
 			} else {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "A function with return type must return a value")
 			}
 		}
 		if expr != nil && expr.GetOpType() == IS_CONST {
-			if ZEND_TYPE_CODE(return_info.GetType()) == Z_TYPE(expr.GetConstant()) || ZEND_TYPE_CODE(return_info.GetType()) == _IS_BOOL && (Z_TYPE(expr.GetConstant()) == IS_FALSE || Z_TYPE(expr.GetConstant()) == IS_TRUE) || ZEND_TYPE_ALLOW_NULL(return_info.GetType()) && Z_TYPE(expr.GetConstant()) == IS_NULL {
+			if return_info.GetType().Code() == Z_TYPE(expr.GetConstant()) || return_info.GetType().Code() == _IS_BOOL && (Z_TYPE(expr.GetConstant()) == IS_FALSE || Z_TYPE(expr.GetConstant()) == IS_TRUE) || return_info.GetType().AllowNull() && Z_TYPE(expr.GetConstant()) == IS_NULL {
 
 				/* we don't need run-time check */
 
@@ -1847,7 +1847,7 @@ func ZendEmitReturnTypeCheck(expr *Znode, return_info *ZendArgInfo, implicit Zen
 			expr.GetOp().SetVar(GetTemporaryVariable())
 			opline.GetResult().SetVar(expr.GetOp().GetVar())
 		}
-		if ZEND_TYPE_IS_CLASS(return_info.GetType()) {
+		if return_info.GetType().IsClass() {
 			opline.GetOp2().SetNum(CompilerGlobals.GetActiveOpArray().GetCacheSize())
 			CompilerGlobals.GetActiveOpArray().SetCacheSize(CompilerGlobals.GetActiveOpArray().GetCacheSize() + b.SizeOf("void *"))
 		} else {
@@ -4501,7 +4501,7 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		arg_infos.SetPassByReference(op_array.IsReturnReference())
 		arg_infos.SetIsVariadic(0)
 		arg_infos.SetType(ZendCompileTypename(return_type_ast, 0))
-		if ZEND_TYPE_CODE(arg_infos.GetType()) == IS_VOID && ZEND_TYPE_ALLOW_NULL(arg_infos.GetType()) {
+		if arg_infos.GetType().Code() == IS_VOID && arg_infos.GetType().AllowNull() {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Void type cannot be nullable")
 		}
 		arg_infos++
@@ -4572,25 +4572,25 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			var has_null_default ZendBool = default_ast != nil && (Z_TYPE(default_node.GetConstant()) == IS_NULL || Z_TYPE(default_node.GetConstant()) == IS_CONSTANT_AST && Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZSTR_VAL(ZendAstGetConstantName(Z_ASTVAL(default_node.GetConstant()))), "NULL") == 0)
 			op_array.SetIsHasTypeHints(true)
 			arg_info.SetType(ZendCompileTypename(type_ast, has_null_default))
-			if ZEND_TYPE_CODE(arg_info.GetType()) == IS_VOID {
+			if arg_info.GetType().Code() == IS_VOID {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "void cannot be used as a parameter type")
 			}
 			if type_ast.GetKind() == ZEND_AST_TYPE {
-				if ZEND_TYPE_CODE(arg_info.GetType()) == IS_ARRAY {
+				if arg_info.GetType().Code() == IS_ARRAY {
 					if default_ast != nil && has_null_default == 0 && Z_TYPE(default_node.GetConstant()) != IS_ARRAY && Z_TYPE(default_node.GetConstant()) != IS_CONSTANT_AST {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with array type can only be an array or NULL")
 					}
-				} else if ZEND_TYPE_CODE(arg_info.GetType()) == IS_CALLABLE && default_ast != nil {
+				} else if arg_info.GetType().Code() == IS_CALLABLE && default_ast != nil {
 					if has_null_default == 0 && Z_TYPE(default_node.GetConstant()) != IS_CONSTANT_AST {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with callable type can only be NULL")
 					}
 				}
 			} else {
 				if default_ast != nil && has_null_default == 0 && Z_TYPE(default_node.GetConstant()) != IS_CONSTANT_AST {
-					if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
+					if arg_info.GetType().IsClass() {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a class type can only be NULL")
 					} else {
-						switch ZEND_TYPE_CODE(arg_info.GetType()) {
+						switch arg_info.GetType().Code() {
 						case IS_DOUBLE:
 							if Z_TYPE(default_node.GetConstant()) != IS_DOUBLE && Z_TYPE(default_node.GetConstant()) != IS_LONG {
 								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
@@ -4606,8 +4606,8 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 							ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
 							break
 						default:
-							if !(ZEND_SAME_FAKE_TYPE(ZEND_TYPE_CODE(arg_info.GetType()), Z_TYPE(default_node.GetConstant()))) {
-								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(ZEND_TYPE_CODE(arg_info.GetType())), ZendGetTypeByConst(ZEND_TYPE_CODE(arg_info.GetType())))
+							if !(ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), Z_TYPE(default_node.GetConstant()))) {
+								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(arg_info.GetType().Code()), ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
 							break
 						}
@@ -4628,11 +4628,11 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			/* Allocate cache slot to speed-up run-time class resolution */
 
 			if opline.GetOpcode() == ZEND_RECV_INIT {
-				if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
+				if arg_info.GetType().IsClass() {
 					opline.SetExtendedValue(ZendAllocCacheSlot())
 				}
 			} else {
-				if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
+				if arg_info.GetType().IsClass() {
 					opline.GetOp2().SetNum(op_array.GetCacheSize())
 					op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("void *"))
 				} else {
@@ -5178,8 +5178,8 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		var type_ ZendType = 0
 		if type_ast != nil {
 			type_ = ZendCompileTypename(type_ast, 0)
-			if ZEND_TYPE_CODE(type_) == IS_VOID || ZEND_TYPE_CODE(type_) == IS_CALLABLE {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ZSTR_VAL(ce.GetName()), ZSTR_VAL(name), ZendGetTypeByConst(ZEND_TYPE_CODE(type_)))
+			if type_.Code() == IS_VOID || type_.Code() == IS_CALLABLE {
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Property %s::$%s cannot have type %s", ZSTR_VAL(ce.GetName()), ZSTR_VAL(name), ZendGetTypeByConst(type_.Code()))
 			}
 		}
 
@@ -5196,28 +5196,28 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		}
 		if value_ast != nil {
 			ZendConstExprToZval(&value_zv, value_ast)
-			if ZEND_TYPE_IS_SET(type_) && !(Z_CONSTANT(value_zv)) {
+			if type_.IsSet() && !(Z_CONSTANT(value_zv)) {
 				if Z_TYPE(value_zv) == IS_NULL {
-					if !(ZEND_TYPE_ALLOW_NULL(type_)) {
-						var name *byte = b.CondF(ZEND_TYPE_IS_CLASS(type_), func() []byte { return ZSTR_VAL(ZEND_TYPE_NAME(type_)) }, func() *byte { return ZendGetTypeByConst(ZEND_TYPE_CODE(type_)) })
+					if !(type_.AllowNull()) {
+						var name *byte = b.CondF(type_.IsClass(), func() []byte { return ZSTR_VAL(type_.Name()) }, func() *byte { return ZendGetTypeByConst(type_.Code()) })
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type %s may not be null. "+"Use the nullable type ?%s to allow null default value", name, name)
 					}
-				} else if ZEND_TYPE_IS_CLASS(type_) {
-					ZendErrorNoreturn(E_COMPILE_ERROR, "Property of type %s may not have default value", ZSTR_VAL(ZEND_TYPE_NAME(type_)))
-				} else if ZEND_TYPE_CODE(type_) == IS_ARRAY || ZEND_TYPE_CODE(type_) == IS_ITERABLE {
+				} else if type_.IsClass() {
+					ZendErrorNoreturn(E_COMPILE_ERROR, "Property of type %s may not have default value", ZSTR_VAL(type_.Name()))
+				} else if type_.Code() == IS_ARRAY || type_.Code() == IS_ITERABLE {
 					if Z_TYPE(value_zv) != IS_ARRAY {
-						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type %s can only be an array", ZendGetTypeByConst(ZEND_TYPE_CODE(type_)))
+						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type %s can only be an array", ZendGetTypeByConst(type_.Code()))
 					}
-				} else if ZEND_TYPE_CODE(type_) == IS_DOUBLE {
+				} else if type_.Code() == IS_DOUBLE {
 					if Z_TYPE(value_zv) != IS_DOUBLE && Z_TYPE(value_zv) != IS_LONG {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type float can only be float or int")
 					}
 					ConvertToDouble(&value_zv)
-				} else if !(ZEND_SAME_FAKE_TYPE(ZEND_TYPE_CODE(type_), Z_TYPE(value_zv))) {
-					ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type %s can only be %s", ZendGetTypeByConst(ZEND_TYPE_CODE(type_)), ZendGetTypeByConst(ZEND_TYPE_CODE(type_)))
+				} else if !(ZEND_SAME_FAKE_TYPE(type_.Code(), Z_TYPE(value_zv))) {
+					ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for property of type %s can only be %s", ZendGetTypeByConst(type_.Code()), ZendGetTypeByConst(type_.Code()))
 				}
 			}
-		} else if !(ZEND_TYPE_IS_SET(type_)) {
+		} else if !(type_.IsSet()) {
 			ZVAL_NULL(&value_zv)
 		} else {
 			ZVAL_UNDEF(&value_zv)

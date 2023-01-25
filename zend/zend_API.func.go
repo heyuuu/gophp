@@ -2667,8 +2667,8 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 				/* Don't count the variadic argument */
 
 			}
-			if ZEND_TYPE_IS_SET(info.GetType()) {
-				if ZEND_TYPE_IS_CLASS(info.GetType()) {
+			if info.GetType().IsSet() {
+				if info.GetType().IsClass() {
 					var type_name *byte = (*byte)(info.GetType())
 					if type_name[0] == '?' {
 						type_name++
@@ -2735,7 +2735,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		if reg_function.GetArgInfo() != nil && reg_function.GetNumArgs() != 0 {
 			var i uint32
 			for i = 0; i < reg_function.GetNumArgs(); i++ {
-				if ZEND_TYPE_IS_SET(reg_function.GetArgInfo()[i].GetType()) {
+				if reg_function.GetArgInfo()[i].GetType().IsSet() {
 					reg_function.SetIsHasTypeHints(true)
 					break
 				}
@@ -2756,7 +2756,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			memcpy(new_arg_info, arg_info, b.SizeOf("zend_arg_info")*num_args)
 			reg_function.SetArgInfo(new_arg_info + 1)
 			for i = 0; i < num_args; i++ {
-				if ZEND_TYPE_IS_CLASS(new_arg_info[i].GetType()) {
+				if new_arg_info[i].GetType().IsClass() {
 					var class_name *byte = (*byte)(new_arg_info[i].GetType())
 					var allow_null ZendBool = 0
 					var str *ZendString
@@ -4007,7 +4007,7 @@ func IsPersistentClass(ce *ZendClassEntry) ZendBool {
 func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zval, access_type int, doc_comment *ZendString, type_ ZendType) int {
 	var property_info *ZendPropertyInfo
 	var property_info_ptr *ZendPropertyInfo
-	if ZEND_TYPE_IS_SET(type_) {
+	if type_.IsSet() {
 		ce.SetIsHasTypeHints(true)
 	}
 	if ce.GetType() == ZEND_INTERNAL_CLASS {

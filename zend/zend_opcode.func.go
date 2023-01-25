@@ -66,8 +66,8 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
-			if ZEND_TYPE_IS_CLASS(arg_info[i].GetType()) {
-				ZendStringReleaseEx(ZEND_TYPE_NAME(arg_info[i].GetType()), 1)
+			if arg_info[i].GetType().IsClass() {
+				ZendStringReleaseEx(arg_info[i].GetType().Name(), 1)
 			}
 		}
 		Free(arg_info)
@@ -317,8 +317,8 @@ func DestroyZendClass(zv *Zval) {
 					if prop_info.GetDocComment() != nil {
 						ZendStringReleaseEx(prop_info.GetDocComment(), 0)
 					}
-					if ZEND_TYPE_IS_NAME(prop_info.GetType()) {
-						ZendStringRelease(ZEND_TYPE_NAME(prop_info.GetType()))
+					if prop_info.GetType().IsName() {
+						ZendStringRelease(prop_info.GetType().Name())
 					}
 				}
 			}
@@ -525,8 +525,8 @@ func DestroyOpArray(op_array *ZendOpArray) {
 			if arg_info[i].GetName() != nil {
 				ZendStringReleaseEx(arg_info[i].GetName(), 0)
 			}
-			if ZEND_TYPE_IS_CLASS(arg_info[i].GetType()) {
-				ZendStringReleaseEx(ZEND_TYPE_NAME(arg_info[i].GetType()), 0)
+			if arg_info[i].GetType().IsClass() {
+				ZendStringReleaseEx(arg_info[i].GetType().Name(), 0)
 			}
 		}
 		Efree(arg_info)
