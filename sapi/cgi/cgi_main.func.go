@@ -28,7 +28,7 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 func ModuleNameCmp(a any, b any) int {
 	var f *zend.Bucket = (*zend.Bucket)(a)
 	var s *zend.Bucket = (*zend.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.val)).name, (*zend.ZendModuleEntry)(zend.Z_PTR(s.val)).name)
+	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.GetVal())).GetName(), (*zend.ZendModuleEntry)(zend.Z_PTR(s.GetVal())).GetName())
 }
 func PrintModules() {
 	var sorted_registry zend.HashTable
@@ -38,34 +38,34 @@ func PrintModules() {
 	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			module = zend.Z_PTR_P(_z)
-			core.PhpPrintf("%s\n", module.name)
+			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break
 	}
 	zend.ZendHashDestroy(&sorted_registry)
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
-	core.PhpPrintf("%s\n", ext.name)
+	core.PhpPrintf("%s\n", ext.GetName())
 	return 0
 }
 func ExtensionNameCmp(f **zend.ZendLlistElement, s **zend.ZendLlistElement) int {
-	var fe *zend.ZendExtension = (*zend.ZendExtension)((*f).data)
-	var se *zend.ZendExtension = (*zend.ZendExtension)((*s).data)
-	return strcmp(fe.name, se.name)
+	var fe *zend.ZendExtension = (*zend.ZendExtension)((*f).GetData())
+	var se *zend.ZendExtension = (*zend.ZendExtension)((*s).GetData())
+	return strcmp(fe.GetName(), se.GetName())
 }
 func PrintExtensions() {
 	var sorted_exts zend.ZendLlist
 	zend.ZendLlistCopy(&sorted_exts, &zend.ZendExtensions)
-	sorted_exts.dtor = nil
+	sorted_exts.SetDtor(nil)
 	zend.ZendLlistSort(&sorted_exts, ExtensionNameCmp)
 	zend.ZendLlistApplyWithArgument(&sorted_exts, zend.LlistApplyWithArgFuncT(PrintExtensionInfo), nil)
 	zend.ZendLlistDestroy(&sorted_exts)
@@ -147,24 +147,24 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
-				h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.headers, &pos))
+				h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.GetHeaders(), &pos))
 				for h != nil {
-					if h.header_len > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.header, "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
+					if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
 						has_status = 1
 						break
 					}
-					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.headers, &pos))
+					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
 				}
 				if has_status == 0 {
 					var err *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(core.HttpStatusMap)
-					for err.code != 0 {
-						if err.code == core.SG(sapi_headers).http_response_code {
+					for err.GetCode() != 0 {
+						if err.GetCode() == core.SG(sapi_headers).http_response_code {
 							break
 						}
 						err++
 					}
-					if err.str != nil {
-						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", core.SG(sapi_headers).http_response_code, err.str)
+					if err.GetStr() != nil {
+						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", core.SG(sapi_headers).http_response_code, err.GetStr())
 					} else {
 						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d", core.SG(sapi_headers).http_response_code)
 					}
@@ -177,27 +177,27 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			ignore_status = 1
 		}
 	}
-	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.headers, &pos))
+	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.GetHeaders(), &pos))
 	for h != nil {
 
 		/* prevent CRLFCRLF */
 
-		if h.header_len != 0 {
-			if h.header_len > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.header, "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
+		if h.GetHeaderLen() != 0 {
+			if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
 				if ignore_status == 0 {
 					ignore_status = 1
-					core.PHPWRITE_H(h.header, h.header_len)
+					core.PHPWRITE_H(h.GetHeader(), h.GetHeaderLen())
 					core.PHPWRITE_H("\r\n", 2)
 				}
-			} else if response_status == 304 && h.header_len > b.SizeOf("\"Content-Type:\"")-1 && strncasecmp(h.header, "Content-Type:", b.SizeOf("\"Content-Type:\"")-1) == 0 {
-				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.headers, &pos))
+			} else if response_status == 304 && h.GetHeaderLen() > b.SizeOf("\"Content-Type:\"")-1 && strncasecmp(h.GetHeader(), "Content-Type:", b.SizeOf("\"Content-Type:\"")-1) == 0 {
+				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
 				continue
 			} else {
-				core.PHPWRITE_H(h.header, h.header_len)
+				core.PHPWRITE_H(h.GetHeader(), h.GetHeaderLen())
 				core.PHPWRITE_H("\r\n", 2)
 			}
 		}
-		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.headers, &pos))
+		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
 	}
 	core.PHPWRITE_H("\r\n", 2)
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
@@ -276,16 +276,16 @@ func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any
 	var array_ptr *zend.Zval = (*zend.Zval)(arg)
 	var filter_arg int = b.Cond(zend.Z_ARR_P(array_ptr) == zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
-	if core.sapi_module.input_filter(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
+	if core.sapi_module.GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
 	}
 }
 func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 	if core.PG(variables_order) && (strchr(core.PG(variables_order), 'E') || strchr(core.PG(variables_order), 'e')) {
-		if zend.Z_TYPE(core.PG(http_globals)[core.TRACK_VARS_ENV]) != zend.IS_ARRAY {
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != zend.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if zend.Z_TYPE(core.PG(http_globals)[core.TRACK_VARS_ENV]) == zend.IS_ARRAY && zend.Z_ARR_P(array_ptr) != zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]) {
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && zend.Z_ARR_P(array_ptr) != zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]) {
 			zend.ZendArrayDestroy(zend.Z_ARR_P(array_ptr))
 			zend.Z_ARR_P(array_ptr) = zend.ZendArrayDup(zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]))
 			return
@@ -345,7 +345,7 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 
 		/* Build the special-case PHP_SELF variable for the CGI version */
 
-		if core.sapi_module.input_filter(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
+		if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
 			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
 		}
 		if free_php_self != 0 {
@@ -358,7 +358,7 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 			php_self = ""
 		}
 		php_self_len = strlen(php_self)
-		if core.sapi_module.input_filter(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
+		if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
 			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
 		}
 	}
@@ -578,20 +578,20 @@ func PhpCgiUsage(argv0 *byte) {
 }
 func IsValidPath(path *byte) int {
 	var p *byte = path
-	if zend.UNEXPECTED(p == nil) {
+	if p == nil {
 		return 0
 	}
-	if zend.UNEXPECTED((*p) == '.') && (*(p + 1)) == '.' && (!(*(p + 2)) || zend.IS_SLASH(*(p + 2))) {
+	if (*p) == '.' && (*(p + 1)) == '.' && (!(*(p + 2)) || zend.IS_SLASH(*(p + 2))) {
 		return 0
 	}
 	for *p {
 		if zend.IS_SLASH(*p) {
 			p++
-			if zend.UNEXPECTED((*p) == '.') {
+			if (*p) == '.' {
 				p++
-				if zend.UNEXPECTED((*p) == '.') {
+				if (*p) == '.' {
 					p++
-					if zend.UNEXPECTED(!(*p)) || zend.UNEXPECTED(zend.IS_SLASH(*p)) {
+					if !(*p) || zend.IS_SLASH(*p) {
 						return 0
 					}
 				}
@@ -923,7 +923,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	zend.ZendHashInit(&php_cgi_globals.user_config_cache, 8, nil, UserConfigCacheEntryDtor, 1)
+	zend.ZendHashInit(&php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES()
@@ -1046,20 +1046,20 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 	}
 }
 func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
-	if h.header_len > 0 {
+	if h.GetHeaderLen() > 0 {
 		var s *byte
 		var len_ int = 0
-		var p *byte = strchr(h.header, ':')
+		var p *byte = strchr(h.GetHeader(), ':')
 		if nil != p {
-			len_ = p - h.header
+			len_ = p - h.GetHeader()
 		}
 		if len_ > 0 {
-			for len_ != 0 && (h.header[len_-1] == ' ' || h.header[len_-1] == '\t') {
+			for len_ != 0 && (h.GetHeader()[len_-1] == ' ' || h.GetHeader()[len_-1] == '\t') {
 				len_--
 			}
 			if len_ != 0 {
 				s = zend.DoAlloca(len_+1, use_heap)
-				memcpy(s, h.header, len_)
+				memcpy(s, h.GetHeader(), len_)
 				s[len_] = 0
 				for {
 					p++
@@ -1067,7 +1067,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 						break
 					}
 				}
-				zend.AddAssocStringlEx(return_value, s, len_, p, h.header_len-(p-h.header))
+				zend.AddAssocStringlEx(return_value, s, len_, p, h.GetHeaderLen()-(p-h.GetHeader()))
 				zend.FreeAlloca(s, use_heap)
 			}
 		}
@@ -1120,7 +1120,7 @@ func Main(argc int, argv []*byte) int {
 	PhpCgiGlobalsCtor(&php_cgi_globals)
 	core.SapiStartup(&CgiSapiModule)
 	fastcgi = core.FcgiIsFastcgi()
-	CgiSapiModule.php_ini_path_override = nil
+	CgiSapiModule.SetPhpIniPathOverride(nil)
 	if fastcgi == 0 {
 
 		/* Make sure we detect we are a cgi - a bit redundancy here,
@@ -1152,13 +1152,13 @@ func Main(argc int, argv []*byte) int {
 	for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
 		switch c {
 		case 'c':
-			if CgiSapiModule.php_ini_path_override != nil {
-				zend.Free(CgiSapiModule.php_ini_path_override)
+			if CgiSapiModule.GetPhpIniPathOverride() != nil {
+				zend.Free(CgiSapiModule.GetPhpIniPathOverride())
 			}
-			CgiSapiModule.php_ini_path_override = strdup(PhpOptarg)
+			CgiSapiModule.SetPhpIniPathOverride(strdup(PhpOptarg))
 			break
 		case 'n':
-			CgiSapiModule.php_ini_ignore = 1
+			CgiSapiModule.SetPhpIniIgnore(1)
 			break
 		case 'd':
 
@@ -1169,25 +1169,25 @@ func Main(argc int, argv []*byte) int {
 			if b.Assign(&val, strchr(PhpOptarg, '=')) {
 				val++
 				if !(isalnum(*val)) && (*val) != '"' && (*val) != '\'' && (*val) != '0' {
-					CgiSapiModule.ini_entries = realloc(CgiSapiModule.ini_entries, ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\""))
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len, PhpOptarg, val-PhpOptarg)
+					CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\"")))
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, val-PhpOptarg)
 					ini_entries_len += val - PhpOptarg
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len, "\"", 1)
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, "\"", 1)
 					ini_entries_len++
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len, val, len_-(val-PhpOptarg))
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, val, len_-(val-PhpOptarg))
 					ini_entries_len += len_ - (val - PhpOptarg)
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
 					ini_entries_len += b.SizeOf("\"\\n\\0\\\"\"") - 2
 				} else {
-					CgiSapiModule.ini_entries = realloc(CgiSapiModule.ini_entries, ini_entries_len+len_+b.SizeOf("\"\\n\\0\""))
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len, PhpOptarg, len_)
-					memcpy(CgiSapiModule.ini_entries+ini_entries_len+len_, "\n0", b.SizeOf("\"\\n\\0\""))
+					CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\n\\0\"")))
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
+					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len+len_, "\n0", b.SizeOf("\"\\n\\0\""))
 					ini_entries_len += len_ + b.SizeOf("\"\\n\\0\"") - 2
 				}
 			} else {
-				CgiSapiModule.ini_entries = realloc(CgiSapiModule.ini_entries, ini_entries_len+len_+b.SizeOf("\"=1\\n\\0\""))
-				memcpy(CgiSapiModule.ini_entries+ini_entries_len, PhpOptarg, len_)
-				memcpy(CgiSapiModule.ini_entries+ini_entries_len+len_, "=1\n0", b.SizeOf("\"=1\\n\\0\""))
+				CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"=1\\n\\0\"")))
+				memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
+				memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len+len_, "=1\n0", b.SizeOf("\"=1\\n\\0\""))
 				ini_entries_len += len_ + b.SizeOf("\"=1\\n\\0\"") - 2
 			}
 			break
@@ -1207,20 +1207,20 @@ func Main(argc int, argv []*byte) int {
 
 		/* Override SAPI callbacks */
 
-		CgiSapiModule.ub_write = SapiFcgiUbWrite
-		CgiSapiModule.flush = SapiFcgiFlush
-		CgiSapiModule.read_post = SapiFcgiReadPost
-		CgiSapiModule.getenv = SapiFcgiGetenv
-		CgiSapiModule.read_cookies = SapiFcgiReadCookies
+		CgiSapiModule.SetUbWrite(SapiFcgiUbWrite)
+		CgiSapiModule.SetFlush(SapiFcgiFlush)
+		CgiSapiModule.SetReadPost(SapiFcgiReadPost)
+		CgiSapiModule.SetGetenv(SapiFcgiGetenv)
+		CgiSapiModule.SetReadCookies(SapiFcgiReadCookies)
 	}
-	CgiSapiModule.executable_location = argv[0]
+	CgiSapiModule.SetExecutableLocation(argv[0])
 	if cgi == 0 && fastcgi == 0 && bindpath == nil {
-		CgiSapiModule.additional_functions = AdditionalFunctions
+		CgiSapiModule.SetAdditionalFunctions(AdditionalFunctions)
 	}
 
 	/* startup after we get the above ini override se we get things right */
 
-	if CgiSapiModule.startup(&CgiSapiModule) == zend.FAILURE {
+	if CgiSapiModule.GetStartup()(&CgiSapiModule) == zend.FAILURE {
 		zend.Free(bindpath)
 		return zend.FAILURE
 	}
@@ -1237,16 +1237,16 @@ func Main(argc int, argv []*byte) int {
 		 */
 
 		if !(getenv("REDIRECT_STATUS")) && !(getenv("HTTP_REDIRECT_STATUS")) && (!(CGIG(redirect_status_env)) || !(getenv(CGIG(redirect_status_env)))) {
-			var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.bailout
+			var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.GetBailout()
 			var __bailout JMP_BUF
-			zend.ExecutorGlobals.bailout = &__bailout
+			zend.ExecutorGlobals.SetBailout(&__bailout)
 			if zend.SETJMP(__bailout) == 0 {
 				core.SG(sapi_headers).http_response_code = 400
 				core.PUTS("<b>Security Alert!</b> The PHP CGI cannot be accessed directly.\n\n\n<p>This PHP CGI binary was compiled with force-cgi-redirect enabled.  This\n\nmeans that a page will only be served up if the REDIRECT_STATUS CGI variable is\n\nset, e.g. via an Apache Action directive.</p>\n\n<p>For more information as to <i>why</i> this behaviour exists, see the <a href=\"http://php.net/security.cgi-bin\">\nmanual page for CGI security</a>.</p>\n\n<p>For more information about changing this behaviour or re-enabling this webserver,\n\nconsult the installation file that came with this distribution, or visit \n\n<a href=\"http://php.net/install.windows\">the manual page</a>.</p>\n")
 			} else {
-				zend.ExecutorGlobals.bailout = __orig_bailout
+				zend.ExecutorGlobals.SetBailout(__orig_bailout)
 			}
-			zend.ExecutorGlobals.bailout = __orig_bailout
+			zend.ExecutorGlobals.SetBailout(__orig_bailout)
 			zend.Free(bindpath)
 			return zend.FAILURE
 		}
@@ -1389,10 +1389,10 @@ func Main(argc int, argv []*byte) int {
 			zend.ZendSignalInit()
 		}
 	}
-	zend.ExecutorGlobals.bailout = nil
-	var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.bailout
+	zend.ExecutorGlobals.SetBailout(nil)
+	var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.GetBailout()
 	var __bailout JMP_BUF
-	zend.ExecutorGlobals.bailout = &__bailout
+	zend.ExecutorGlobals.SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 1, 2)) != -1 {
 			switch c {
@@ -1449,7 +1449,7 @@ func Main(argc int, argv []*byte) int {
 						core.SG(options) |= core.SAPI_OPTION_NO_CHDIR
 						break
 					case 'e':
-						zend.CompilerGlobals.compiler_options |= zend.ZEND_COMPILE_EXTENDED_INFO
+						zend.CompilerGlobals.SetCompilerOptions(zend.CompilerGlobals.GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
 						break
 					case 'f':
 						if script_file != nil {
@@ -1511,7 +1511,7 @@ func Main(argc int, argv []*byte) int {
 						}
 						core.SG(headers_sent) = 1
 						core.SG(request_info).no_headers = 1
-						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.sapi_module.name, __DATE__, __TIME__, zend.GetZendVersion())
+						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.sapi_module.GetName(), __DATE__, __TIME__, zend.GetZendVersion())
 						core.PhpRequestShutdown(any(0))
 						core.FcgiShutdown()
 						exit_status = 0
@@ -1640,9 +1640,9 @@ func Main(argc int, argv []*byte) int {
 
 			if cgi != 0 || fastcgi != 0 || core.SG(request_info).path_translated {
 				if core.PhpFopenPrimaryScript(&file_handle) == zend.FAILURE {
-					var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.bailout
+					var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.GetBailout()
 					var __bailout JMP_BUF
-					zend.ExecutorGlobals.bailout = &__bailout
+					zend.ExecutorGlobals.SetBailout(&__bailout)
 					if zend.SETJMP(__bailout) == 0 {
 						if errno == EACCES {
 							core.SG(sapi_headers).http_response_code = 403
@@ -1652,9 +1652,9 @@ func Main(argc int, argv []*byte) int {
 							core.PUTS("No input file specified.\n")
 						}
 					} else {
-						zend.ExecutorGlobals.bailout = __orig_bailout
+						zend.ExecutorGlobals.SetBailout(__orig_bailout)
 					}
-					zend.ExecutorGlobals.bailout = __orig_bailout
+					zend.ExecutorGlobals.SetBailout(__orig_bailout)
 
 					/* we want to serve more requests if this is fastcgi
 					 * so cleanup and continue, request shutdown is
@@ -1680,7 +1680,7 @@ func Main(argc int, argv []*byte) int {
 				}
 			}
 			if CGIG(check_shebang_line) {
-				zend.CompilerGlobals.skip_shebang = 1
+				zend.CompilerGlobals.SetSkipShebang(1)
 			}
 			switch behavior {
 			case PHP_MODE_STANDARD:
@@ -1690,9 +1690,9 @@ func Main(argc int, argv []*byte) int {
 				core.PG(during_request_startup) = 0
 				exit_status = core.PhpLintScript(&file_handle)
 				if exit_status == zend.SUCCESS {
-					zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.filename)
+					zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.GetFilename())
 				} else {
-					zend.ZendPrintf("Errors parsing %s\n", file_handle.filename)
+					zend.ZendPrintf("Errors parsing %s\n", file_handle.GetFilename())
 				}
 				break
 			case PHP_MODE_STRIP:
@@ -1724,7 +1724,7 @@ func Main(argc int, argv []*byte) int {
 			}
 			core.PhpRequestShutdown(any(0))
 			if exit_status == 0 {
-				exit_status = zend.ExecutorGlobals.exit_status
+				exit_status = zend.ExecutorGlobals.GetExitStatus()
 			}
 			if free_query_string != 0 && core.SG(request_info).query_string {
 				zend.Free(core.SG(request_info).query_string)
@@ -1773,17 +1773,17 @@ func Main(argc int, argv []*byte) int {
 			core.FcgiDestroyRequest(request)
 		}
 		core.FcgiShutdown()
-		if CgiSapiModule.php_ini_path_override != nil {
-			zend.Free(CgiSapiModule.php_ini_path_override)
+		if CgiSapiModule.GetPhpIniPathOverride() != nil {
+			zend.Free(CgiSapiModule.GetPhpIniPathOverride())
 		}
-		if CgiSapiModule.ini_entries != nil {
-			zend.Free(CgiSapiModule.ini_entries)
+		if CgiSapiModule.GetIniEntries() != nil {
+			zend.Free(CgiSapiModule.GetIniEntries())
 		}
 	} else {
-		zend.ExecutorGlobals.bailout = __orig_bailout
+		zend.ExecutorGlobals.SetBailout(__orig_bailout)
 		exit_status = 255
 	}
-	zend.ExecutorGlobals.bailout = __orig_bailout
+	zend.ExecutorGlobals.SetBailout(__orig_bailout)
 out:
 	if benchmark != 0 {
 		var sec int

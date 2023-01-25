@@ -51,7 +51,7 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -64,14 +64,14 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -110,15 +110,15 @@ func PhpMailBuildHeadersCheckFieldValue(val *zend.Zval) zend.ZendBool {
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 
-	for len_ < value.len_ {
-		if (*(value.val + len_)) == '\r' {
-			if value.len_-len_ >= 3 && (*(value.val + len_ + 1)) == '\n' && ((*(value.val + len_ + 2)) == ' ' || (*(value.val + len_ + 2)) == '\t') {
+	for len_ < value.GetLen() {
+		if (*(value.GetVal() + len_)) == '\r' {
+			if value.GetLen()-len_ >= 3 && (*(value.GetVal() + len_ + 1)) == '\n' && ((*(value.GetVal() + len_ + 2)) == ' ' || (*(value.GetVal() + len_ + 2)) == '\t') {
 				len_ += 3
 				continue
 			}
 			return zend.FAILURE
 		}
-		if (*(value.val + len_)) == '0' {
+		if (*(value.GetVal() + len_)) == '0' {
 			return zend.FAILURE
 		}
 		len_++
@@ -130,8 +130,8 @@ func PhpMailBuildHeadersCheckFieldName(key *zend.ZendString) zend.ZendBool {
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2 */
 
-	for len_ < key.len_ {
-		if (*(key.val + len_)) < 33 || (*(key.val + len_)) > 126 || (*(key.val + len_)) == ':' {
+	for len_ < key.GetLen() {
+		if (*(key.GetVal() + len_)) < 33 || (*(key.GetVal() + len_)) > 126 || (*(key.GetVal() + len_)) == ':' {
 			return zend.FAILURE
 		}
 		len_++
@@ -166,15 +166,15 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *zend.ZendString, val *zend.
 	var tmp_val *zend.Zval
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(val)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			tmp_key = _p.key
+			tmp_key = _p.GetKey()
 			tmp_val = _z
 			if tmp_key != nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", zend.ZSTR_VAL(tmp_key))
@@ -197,16 +197,16 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	zend.ZEND_ASSERT(zend.Z_TYPE_P(headers) == zend.IS_ARRAY)
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(headers)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			idx = _p.h
-			key = _p.key
+			idx = _p.GetH()
+			key = _p.GetKey()
 			val = _z
 			if key == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
@@ -297,11 +297,11 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 
 	/* Remove the last \r\n */
 
-	if s.s != nil {
-		s.s.len_ -= 2
+	if s.GetS() != nil {
+		s.GetS().SetLen(s.GetS().GetLen() - 2)
 	}
 	zend.SmartStr0(&s)
-	return s.s
+	return s.GetS()
 }
 func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var to *byte = nil
@@ -341,7 +341,7 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -354,19 +354,19 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &to, &to_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &to, &to_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &subject, &subject_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &subject, &subject_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &message, &message_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &message, &message_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -375,14 +375,14 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &headers, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &extra_cmd, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &extra_cmd, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -596,7 +596,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 			var len_ int
 			time(&curtime)
 			date_str = php_format_date("d-M-Y H:i:s e", 13, curtime, 1)
-			len_ = core.Spprintf(&tmp, 0, "[%s] %s%s", date_str.val, logline, core.PHP_EOL)
+			len_ = core.Spprintf(&tmp, 0, "[%s] %s%s", date_str.GetVal(), logline, core.PHP_EOL)
 			PhpMailLogToFile(mail_log, tmp, len_)
 			zend.ZendStringFree(date_str)
 			zend.Efree(tmp)

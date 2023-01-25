@@ -26,17 +26,17 @@ func ZendWeakrefsShutdown() {
 }
 func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
-	ZendObjectStdInit(&wr.std, ZendCeWeakref)
+	ZendObjectStdInit(&wr.GetStd(), ZendCeWeakref)
 	wr.GetStd().SetHandlers(&ZendWeakrefHandlers)
-	return &wr.std
+	return &wr.GetStd()
 }
 func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
 	var wr *ZendWeakref = &(ExecutorGlobals.GetWeakrefs()).IndexFindPtr(ZendUlong(Z_OBJ_P(referent)))
 	if wr == nil {
 		return 0
 	}
-	GC_ADDREF(&wr.std)
-	ZVAL_OBJ(return_value, &wr.std)
+	GC_ADDREF(&wr.GetStd())
+	ZVAL_OBJ(return_value, &wr.GetStd())
 	return 1
 }
 func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
@@ -59,7 +59,7 @@ func ZendWeakrefFree(zo *ZendObject) {
 	if wr.GetReferent() != nil {
 		&(ExecutorGlobals.GetWeakrefs()).IndexDel(ZendUlong(wr.GetReferent()))
 	}
-	ZendObjectStdDtor(&wr.std)
+	ZendObjectStdDtor(&wr.GetStd())
 }
 func ZendWeakrefUnsupported(thing string) {
 	ZendThrowError(nil, "WeakReference objects do not support "+thing)
@@ -111,7 +111,7 @@ func zim_WeakReference_create(execute_data *ZendExecuteData, return_value *Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if UNEXPECTED(_num_args < _min_num_args) || UNEXPECTED(_num_args > _max_num_args) && EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -124,14 +124,14 @@ func zim_WeakReference_create(execute_data *ZendExecuteData, return_value *Zval)
 			}
 			_real_arg = ZEND_CALL_ARG(execute_data, 0)
 			Z_PARAM_PROLOGUE(0, 0)
-			if UNEXPECTED(ZendParseArgObject(_arg, &referent, nil, 0) == 0) {
+			if ZendParseArgObject(_arg, &referent, nil, 0) == 0 {
 				_expected_type = Z_EXPECTED_OBJECT
 				_error_code = ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if UNEXPECTED(_error_code != ZPP_ERROR_OK) {
+		if _error_code != ZPP_ERROR_OK {
 			if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -184,7 +184,7 @@ func zim_WeakReference_get(execute_data *ZendExecuteData, return_value *Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if UNEXPECTED(_num_args < _min_num_args) || UNEXPECTED(_num_args > _max_num_args) && EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
 						ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -198,7 +198,7 @@ func zim_WeakReference_get(execute_data *ZendExecuteData, return_value *Zval) {
 			_real_arg = ZEND_CALL_ARG(execute_data, 0)
 			break
 		}
-		if UNEXPECTED(_error_code != ZPP_ERROR_OK) {
+		if _error_code != ZPP_ERROR_OK {
 			if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {

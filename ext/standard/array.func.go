@@ -45,12 +45,12 @@ func PhpArrayKeyCompare(a any, b any) int {
 	var l1 zend.ZendLong
 	var l2 zend.ZendLong
 	var d float64
-	if f.key == nil {
-		if s.key == nil {
-			return zend.ZendLong(f.h > zend.ZendLong(b.Cond(s.h != 0, 1, -1)))
+	if f.GetKey() == nil {
+		if s.GetKey() == nil {
+			return zend.ZendLong(f.GetH() > zend.ZendLong(b.Cond(s.GetH() != 0, 1, -1)))
 		} else {
-			l1 = zend.ZendLong(f.h)
-			t = zend.IsNumericString(s.key.val, s.key.len_, &l2, &d, 1)
+			l1 = zend.ZendLong(f.GetH())
+			t = zend.IsNumericString(s.GetKey().GetVal(), s.GetKey().GetLen(), &l2, &d, 1)
 			if t == zend.IS_LONG {
 
 			} else if t == zend.IS_DOUBLE {
@@ -60,11 +60,11 @@ func PhpArrayKeyCompare(a any, b any) int {
 			}
 		}
 	} else {
-		if s.key != nil {
-			return zend.ZendiSmartStrcmp(f.key, s.key)
+		if s.GetKey() != nil {
+			return zend.ZendiSmartStrcmp(f.GetKey(), s.GetKey())
 		} else {
-			l2 = zend.ZendLong(s.h)
-			t = zend.IsNumericString(f.key.val, f.key.len_, &l1, &d, 1)
+			l2 = zend.ZendLong(s.GetH())
+			t = zend.IsNumericString(f.GetKey().GetVal(), f.GetKey().GetLen(), &l1, &d, 1)
 			if t == zend.IS_LONG {
 
 			} else if t == zend.IS_DOUBLE {
@@ -80,20 +80,20 @@ func PhpArrayReverseKeyCompare(a any, b any) int { return PhpArrayKeyCompare(b, 
 func PhpArrayKeyCompareNumeric(a any, b any) int {
 	var f *zend.Bucket = (*zend.Bucket)(a)
 	var s *zend.Bucket = (*zend.Bucket)(b)
-	if f.key == nil && s.key == nil {
-		return zend.ZendLong(f.h > zend.ZendLong(b.Cond(s.h != 0, 1, -1)))
+	if f.GetKey() == nil && s.GetKey() == nil {
+		return zend.ZendLong(f.GetH() > zend.ZendLong(b.Cond(s.GetH() != 0, 1, -1)))
 	} else {
 		var d1 float64
 		var d2 float64
-		if f.key != nil {
-			d1 = zend.ZendStrtod(f.key.val, nil)
+		if f.GetKey() != nil {
+			d1 = zend.ZendStrtod(f.GetKey().GetVal(), nil)
 		} else {
-			d1 = float64(zend.ZendLong(f.h))
+			d1 = float64(zend.ZendLong(f.GetH()))
 		}
-		if s.key != nil {
-			d2 = zend.ZendStrtod(s.key.val, nil)
+		if s.GetKey() != nil {
+			d2 = zend.ZendStrtod(s.GetKey().GetVal(), nil)
 		} else {
-			d2 = float64(zend.ZendLong(s.h))
+			d2 = float64(zend.ZendLong(s.GetH()))
 		}
 		return zend.ZEND_NORMALIZE_BOOL(d1 - d2)
 	}
@@ -108,18 +108,18 @@ func PhpArrayKeyCompareStringCase(a any, b any) int {
 	var l2 int
 	var buf1 []byte
 	var buf2 []byte
-	if f.key != nil {
-		s1 = f.key.val
-		l1 = f.key.len_
+	if f.GetKey() != nil {
+		s1 = f.GetKey().GetVal()
+		l1 = f.GetKey().GetLen()
 	} else {
-		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.h)
+		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.GetH())
 		l1 = buf1 + b.SizeOf("buf1") - 1 - s1
 	}
-	if s.key != nil {
-		s2 = s.key.val
-		l2 = s.key.len_
+	if s.GetKey() != nil {
+		s2 = s.GetKey().GetVal()
+		l2 = s.GetKey().GetLen()
 	} else {
-		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.h)
+		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.GetH())
 		l2 = buf2 + b.SizeOf("buf2") - 1 - s1
 	}
 	return zend.ZendBinaryStrcasecmpL(s1, l1, s2, l2)
@@ -136,18 +136,18 @@ func PhpArrayKeyCompareString(a any, b any) int {
 	var l2 int
 	var buf1 []byte
 	var buf2 []byte
-	if f.key != nil {
-		s1 = f.key.val
-		l1 = f.key.len_
+	if f.GetKey() != nil {
+		s1 = f.GetKey().GetVal()
+		l1 = f.GetKey().GetLen()
 	} else {
-		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.h)
+		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.GetH())
 		l1 = buf1 + b.SizeOf("buf1") - 1 - s1
 	}
-	if s.key != nil {
-		s2 = s.key.val
-		l2 = s.key.len_
+	if s.GetKey() != nil {
+		s2 = s.GetKey().GetVal()
+		l2 = s.GetKey().GetLen()
 	} else {
-		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.h)
+		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.GetH())
 		l2 = buf2 + b.SizeOf("buf2") - 1 - s2
 	}
 	return zend.ZendBinaryStrcmp(s1, l1, s2, l2)
@@ -162,18 +162,18 @@ func PhpArrayKeyCompareStringNaturalGeneral(a any, b any, fold_case int) int {
 	var l2 int
 	var buf1 []byte
 	var buf2 []byte
-	if f.key != nil {
-		s1 = f.key.val
-		l1 = f.key.len_
+	if f.GetKey() != nil {
+		s1 = f.GetKey().GetVal()
+		l1 = f.GetKey().GetLen()
 	} else {
-		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.h)
+		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.GetH())
 		l1 = buf1 + b.SizeOf("buf1") - 1 - s1
 	}
-	if s.key != nil {
-		s2 = s.key.val
-		l2 = s.key.len_
+	if s.GetKey() != nil {
+		s2 = s.GetKey().GetVal()
+		l2 = s.GetKey().GetLen()
 	} else {
-		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.h)
+		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.GetH())
 		l2 = buf2 + b.SizeOf("buf2") - 1 - s1
 	}
 	return StrnatcmpEx(s1, l1, s2, l2, fold_case)
@@ -197,15 +197,15 @@ func PhpArrayKeyCompareStringLocale(a any, b any) int {
 	var s2 *byte
 	var buf1 []byte
 	var buf2 []byte
-	if f.key != nil {
-		s1 = f.key.val
+	if f.GetKey() != nil {
+		s1 = f.GetKey().GetVal()
 	} else {
-		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.h)
+		s1 = zend.ZendPrintLongToBuf(buf1+b.SizeOf("buf1")-1, f.GetH())
 	}
-	if s.key != nil {
-		s2 = s.key.val
+	if s.GetKey() != nil {
+		s2 = s.GetKey().GetVal()
 	} else {
-		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.h)
+		s2 = zend.ZendPrintLongToBuf(buf2+b.SizeOf("buf2")-1, s.GetH())
 	}
 	return strcoll(s1, s2)
 }
@@ -220,18 +220,18 @@ func PhpArrayDataCompare(a any, b any) int {
 	var second *zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	first = &f.val
-	second = &s.val
-	if zend.UNEXPECTED(zend.Z_TYPE_P(first) == zend.IS_INDIRECT) {
+	first = &f.GetVal()
+	second = &s.GetVal()
+	if zend.Z_TYPE_P(first) == zend.IS_INDIRECT {
 		first = zend.Z_INDIRECT_P(first)
 	}
-	if zend.UNEXPECTED(zend.Z_TYPE_P(second) == zend.IS_INDIRECT) {
+	if zend.Z_TYPE_P(second) == zend.IS_INDIRECT {
 		second = zend.Z_INDIRECT_P(second)
 	}
 	if zend.CompareFunction(&result, first, second) == zend.FAILURE {
 		return 0
 	}
-	zend.ZEND_ASSERT(zend.Z_TYPE(result) == zend.IS_LONG)
+	zend.ZEND_ASSERT(result.IsType(zend.IS_LONG))
 	return zend.ZEND_NORMALIZE_BOOL(zend.Z_LVAL(result))
 }
 func PhpArrayReverseDataCompare(a any, b any) int { return PhpArrayDataCompare(a, b) * -1 }
@@ -242,12 +242,12 @@ func PhpArrayDataCompareNumeric(a any, b any) int {
 	var second *zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	first = &f.val
-	second = &s.val
-	if zend.UNEXPECTED(zend.Z_TYPE_P(first) == zend.IS_INDIRECT) {
+	first = &f.GetVal()
+	second = &s.GetVal()
+	if zend.Z_TYPE_P(first) == zend.IS_INDIRECT {
 		first = zend.Z_INDIRECT_P(first)
 	}
-	if zend.UNEXPECTED(zend.Z_TYPE_P(second) == zend.IS_INDIRECT) {
+	if zend.Z_TYPE_P(second) == zend.IS_INDIRECT {
 		second = zend.Z_INDIRECT_P(second)
 	}
 	return zend.NumericCompareFunction(first, second)
@@ -260,12 +260,12 @@ func PhpArrayDataCompareStringCase(a any, b any) int {
 	var second *zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	first = &f.val
-	second = &s.val
-	if zend.UNEXPECTED(zend.Z_TYPE_P(first) == zend.IS_INDIRECT) {
+	first = &f.GetVal()
+	second = &s.GetVal()
+	if zend.Z_TYPE_P(first) == zend.IS_INDIRECT {
 		first = zend.Z_INDIRECT_P(first)
 	}
-	if zend.UNEXPECTED(zend.Z_TYPE_P(second) == zend.IS_INDIRECT) {
+	if zend.Z_TYPE_P(second) == zend.IS_INDIRECT {
 		second = zend.Z_INDIRECT_P(second)
 	}
 	return zend.StringCaseCompareFunction(first, second)
@@ -280,12 +280,12 @@ func PhpArrayDataCompareString(a any, b any) int {
 	var second *zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	first = &f.val
-	second = &s.val
-	if zend.UNEXPECTED(zend.Z_TYPE_P(first) == zend.IS_INDIRECT) {
+	first = &f.GetVal()
+	second = &s.GetVal()
+	if zend.Z_TYPE_P(first) == zend.IS_INDIRECT {
 		first = zend.Z_INDIRECT_P(first)
 	}
-	if zend.UNEXPECTED(zend.Z_TYPE_P(second) == zend.IS_INDIRECT) {
+	if zend.Z_TYPE_P(second) == zend.IS_INDIRECT {
 		second = zend.Z_INDIRECT_P(second)
 	}
 	return zend.StringCompareFunction(first, second)
@@ -296,8 +296,8 @@ func PhpArrayNaturalGeneralCompare(a any, b any, fold_case int) int {
 	var s *zend.Bucket = (*zend.Bucket)(b)
 	var tmp_str1 *zend.ZendString
 	var tmp_str2 *zend.ZendString
-	var str1 *zend.ZendString = zend.ZvalGetTmpString(&f.val, &tmp_str1)
-	var str2 *zend.ZendString = zend.ZvalGetTmpString(&s.val, &tmp_str2)
+	var str1 *zend.ZendString = zend.ZvalGetTmpString(&f.GetVal(), &tmp_str1)
+	var str2 *zend.ZendString = zend.ZvalGetTmpString(&s.GetVal(), &tmp_str2)
 	var result int = StrnatcmpEx(zend.ZSTR_VAL(str1), zend.ZSTR_LEN(str1), zend.ZSTR_VAL(str2), zend.ZSTR_LEN(str2), fold_case)
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
@@ -322,12 +322,12 @@ func PhpArrayDataCompareStringLocale(a any, b any) int {
 	var second *zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	first = &f.val
-	second = &s.val
-	if zend.UNEXPECTED(zend.Z_TYPE_P(first) == zend.IS_INDIRECT) {
+	first = &f.GetVal()
+	second = &s.GetVal()
+	if zend.Z_TYPE_P(first) == zend.IS_INDIRECT {
 		first = zend.Z_INDIRECT_P(first)
 	}
-	if zend.UNEXPECTED(zend.Z_TYPE_P(second) == zend.IS_INDIRECT) {
+	if zend.Z_TYPE_P(second) == zend.IS_INDIRECT {
 		second = zend.Z_INDIRECT_P(second)
 	}
 	return zend.StringLocaleCompareFunction(first, second)
@@ -476,7 +476,7 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -489,21 +489,21 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -563,7 +563,7 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -576,21 +576,21 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -638,12 +638,12 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 	cnt = zend.ZendArrayCount(ht)
 	for {
 		var __ht *zend.HashTable = ht
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			element = _z
@@ -684,7 +684,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -700,14 +700,14 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -753,12 +753,12 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* first, we check if the handler is defined */
 
-		if zend.Z_OBJ_HT_P(array).count_elements != nil {
+		if zend.Z_OBJ_HT_P(array).GetCountElements() != nil {
 			zend.RETVAL_LONG(1)
-			if zend.SUCCESS == zend.Z_OBJ_HT(*array).count_elements(array, &zend.Z_LVAL_P(return_value)) {
+			if zend.SUCCESS == zend.Z_OBJ_HT(*array).GetCountElements()(array, &zend.Z_LVAL_P(return_value)) {
 				return
 			}
-			if zend.ExecutorGlobals.exception != nil {
+			if zend.ExecutorGlobals.GetException() != nil {
 				return
 			}
 		}
@@ -767,7 +767,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		if zend.InstanceofFunction(zend.Z_OBJCE_P(array), zend.ZendCeCountable) != 0 {
 			zend.ZendCallMethodWith0Params(array, nil, nil, "count", &retval)
-			if zend.Z_TYPE(retval) != zend.IS_UNDEF {
+			if retval.GetType() != zend.IS_UNDEF {
 				zend.RETVAL_LONG(zend.ZvalGetLong(&retval))
 				zend.ZvalPtrDtor(&retval)
 			}
@@ -810,7 +810,7 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -823,14 +823,14 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -899,7 +899,7 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -912,21 +912,21 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -986,7 +986,7 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -999,21 +999,21 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1073,7 +1073,7 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1086,21 +1086,21 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1160,7 +1160,7 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1173,21 +1173,21 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1229,13 +1229,13 @@ func PhpArrayUserCompare(a any, b any) int {
 	var retval zend.Zval
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	zend.ZVAL_COPY(&args[0], &f.val)
-	zend.ZVAL_COPY(&args[1], &s.val)
+	zend.ZVAL_COPY(&args[0], &f.GetVal())
+	zend.ZVAL_COPY(&args[1], &s.GetVal())
 	BG(user_compare_fci).param_count = 2
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && zend.Z_TYPE(retval) != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		zend.ZvalPtrDtor(&args[1])
@@ -1294,7 +1294,7 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1307,13 +1307,13 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &BG(user_compare_fci), &BG(user_compare_fci_cache), 0, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &BG(user_compare_fci), &BG(user_compare_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -1322,12 +1322,12 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1387,21 +1387,21 @@ func PhpArrayUserKeyCompare(a any, b any) int {
 	var result zend.ZendLong
 	f = (*zend.Bucket)(a)
 	s = (*zend.Bucket)(b)
-	if f.key == nil {
-		zend.ZVAL_LONG(&args[0], f.h)
+	if f.GetKey() == nil {
+		zend.ZVAL_LONG(&args[0], f.GetH())
 	} else {
-		zend.ZVAL_STR_COPY(&args[0], f.key)
+		zend.ZVAL_STR_COPY(&args[0], f.GetKey())
 	}
-	if s.key == nil {
-		zend.ZVAL_LONG(&args[1], s.h)
+	if s.GetKey() == nil {
+		zend.ZVAL_LONG(&args[1], s.GetH())
 	} else {
-		zend.ZVAL_STR_COPY(&args[1], s.key)
+		zend.ZVAL_STR_COPY(&args[1], s.GetKey())
 	}
 	BG(user_compare_fci).param_count = 2
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && zend.Z_TYPE(retval) != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		result = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 	} else {
@@ -1438,7 +1438,7 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1451,14 +1451,14 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1520,7 +1520,7 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1533,14 +1533,14 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1602,7 +1602,7 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1615,14 +1615,14 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1684,7 +1684,7 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1697,14 +1697,14 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1766,7 +1766,7 @@ func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1779,14 +1779,14 @@ func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1844,7 +1844,7 @@ func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1857,14 +1857,14 @@ func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1916,7 +1916,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -1929,7 +1929,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -1940,7 +1940,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -1971,7 +1971,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if argc == 1 {
 		var result *zend.Zval
-		if zend.Z_TYPE(args[0]) != zend.IS_ARRAY {
+		if args[0].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "When only one parameter is given, it must be an array")
 			zend.RETVAL_NULL()
 		} else {
@@ -1992,7 +1992,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		min = &args[0]
 		for i = 1; i < argc; i++ {
 			zend.IsSmallerFunction(&result, &args[i], min)
-			if zend.Z_TYPE(result) == zend.IS_TRUE {
+			if result.IsType(zend.IS_TRUE) {
 				min = &args[i]
 			}
 		}
@@ -2025,7 +2025,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -2038,7 +2038,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -2049,7 +2049,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -2080,7 +2080,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if argc == 1 {
 		var result *zend.Zval
-		if zend.Z_TYPE(args[0]) != zend.IS_ARRAY {
+		if args[0].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "When only one parameter is given, it must be an array")
 			zend.RETVAL_NULL()
 		} else {
@@ -2101,7 +2101,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		max = &args[0]
 		for i = 1; i < argc; i++ {
 			zend.IsSmallerOrEqualFunction(&result, &args[i], max)
-			if zend.Z_TYPE(result) == zend.IS_FALSE {
+			if result.IsType(zend.IS_FALSE) {
 				max = &args[i]
 			}
 		}
@@ -2185,7 +2185,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Back up hash position, as it may change */
 
-		zend.ExecutorGlobals.ht_iterators[ht_iter].pos = pos
+		zend.ExecutorGlobals.GetHtIterators()[ht_iter].SetPos(pos)
 		if recursive != 0 && zend.Z_TYPE_P(zend.Z_REFVAL_P(zv)) == zend.IS_ARRAY {
 			var thash *zend.HashTable
 			var orig_array_walk_fci zend.ZendFcallInfo
@@ -2236,7 +2236,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 			}
 			zend.ZvalPtrDtor(&args[0])
 		}
-		if zend.Z_TYPE(args[1]) != zend.IS_UNDEF {
+		if args[1].GetType() != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&args[1])
 			zend.ZVAL_UNDEF(&args[1])
 		}
@@ -2260,7 +2260,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Reload array and position -- both may have changed */
 
-		if zend.ExecutorGlobals.exception != nil {
+		if zend.ExecutorGlobals.GetException() != nil {
 			break
 		}
 	}
@@ -2298,7 +2298,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -2311,13 +2311,13 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 1) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -2326,7 +2326,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			_optional = 1
@@ -2334,7 +2334,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &userdata, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -2397,7 +2397,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -2410,13 +2410,13 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 1) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -2425,7 +2425,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			_optional = 1
@@ -2433,7 +2433,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 			zend.ZendParseArgZvalDeref(_arg, &userdata, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -2496,7 +2496,7 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -2511,21 +2511,21 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &value, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -2555,18 +2555,18 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		if zend.Z_TYPE_P(value) == zend.IS_LONG {
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					zend.ZVAL_DEREF(entry)
 					if zend.Z_TYPE_P(entry) == zend.IS_LONG && zend.Z_LVAL_P(entry) == zend.Z_LVAL_P(value) {
@@ -2588,18 +2588,18 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		} else {
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					zend.ZVAL_DEREF(entry)
 					if zend.FastIsIdenticalFunction(value, entry) != 0 {
@@ -2623,18 +2623,18 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		if zend.Z_TYPE_P(value) == zend.IS_LONG {
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					if zend.FastEqualCheckLong(value, entry) != 0 {
 						if behavior == 0 {
@@ -2655,18 +2655,18 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		} else if zend.Z_TYPE_P(value) == zend.IS_STRING {
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					if zend.FastEqualCheckString(value, entry) != 0 {
 						if behavior == 0 {
@@ -2687,18 +2687,18 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		} else {
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					if zend.FastEqualCheckFunction(value, entry) != 0 {
 						if behavior == 0 {
@@ -2734,14 +2734,14 @@ func PhpValidVarName(var_name *byte, var_name_len int) int {
 	var charset2 []uint32 = []uint32{0x0, 0x3ff0000, 0x87fffffe, 0x7fffffe, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff}
 	var i int
 	var ch uint32
-	if zend.UNEXPECTED(var_name_len == 0) {
+	if var_name_len == 0 {
 		return 0
 	}
 
 	/* These are allowed as first char: [a-zA-Z_\x7f-\xff] */
 
-	ch = uint32_t((*uint8)(var_name))[0]
-	if zend.UNEXPECTED(zend.ZEND_BIT_TEST(charset, ch) == 0) {
+	ch = uint32((*uint8)(var_name))[0]
+	if zend.ZEND_BIT_TEST(charset, ch) == 0 {
 		return 0
 	}
 
@@ -2750,8 +2750,8 @@ func PhpValidVarName(var_name *byte, var_name_len int) int {
 	if var_name_len > 1 {
 		i = 1
 		for {
-			ch = uint32_t((*uint8)(var_name))[i]
-			if zend.UNEXPECTED(zend.ZEND_BIT_TEST(charset2, ch) == 0) {
+			ch = uint32((*uint8)(var_name))[i]
+			if zend.ZEND_BIT_TEST(charset2, ch) == 0 {
 				return 0
 			}
 			if b.PreInc(&i) >= var_name_len {
@@ -2777,17 +2777,17 @@ func PhpExtractRefIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) ze
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -2831,17 +2831,17 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -2866,7 +2866,7 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 				}
 				zend.ZVAL_DEREF(entry)
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-				if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+				if zend.ExecutorGlobals.GetException() != nil {
 					return -1
 				}
 				count++
@@ -2883,17 +2883,17 @@ func PhpExtractRefOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) z
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -2941,17 +2941,17 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -2973,7 +2973,7 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 				}
 				zend.ZVAL_DEREF(entry)
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-				if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+				if zend.ExecutorGlobals.GetException() != nil {
 					return -1
 				}
 			} else {
@@ -2995,17 +2995,17 @@ func PhpExtractRefPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArr
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3063,17 +3063,17 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3100,7 +3100,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 								orig_var = zend.Z_INDIRECT_P(orig_var)
 							}
 							zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-							if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+							if zend.ExecutorGlobals.GetException() != nil {
 								zend.ZendStringReleaseEx(zend.Z_STR(final_name), 0)
 								return -1
 							}
@@ -3126,17 +3126,17 @@ func PhpExtractRefPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3212,17 +3212,17 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3253,7 +3253,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 								orig_var = zend.Z_INDIRECT_P(orig_var)
 							}
 							zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-							if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+							if zend.ExecutorGlobals.GetException() != nil {
 								zend.ZendStringReleaseEx(zend.Z_STR(final_name), 0)
 								return -1
 							}
@@ -3291,18 +3291,18 @@ func PhpExtractRefPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, p
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			var_name = _p.key
+			num_key = _p.GetH()
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name != nil {
 				if zend.ZSTR_LEN(var_name) == 0 {
@@ -3351,18 +3351,18 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			var_name = _p.key
+			num_key = _p.GetH()
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name != nil {
 				if zend.ZSTR_LEN(var_name) == 0 {
@@ -3385,7 +3385,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 							orig_var = zend.Z_INDIRECT_P(orig_var)
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-						if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+						if zend.ExecutorGlobals.GetException() != nil {
 							zend.ZendStringReleaseEx(zend.Z_STR(final_name), 0)
 							return -1
 						}
@@ -3411,18 +3411,18 @@ func PhpExtractRefPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArra
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			var_name = _p.key
+			num_key = _p.GetH()
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name != nil {
 				if PhpValidVarName(zend.ZSTR_VAL(var_name), zend.ZSTR_LEN(var_name)) == 0 || zend.ZendStringEqualsLiteral(var_name, "this") {
@@ -3478,18 +3478,18 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 	var final_name zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			var_name = _p.key
+			num_key = _p.GetH()
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name != nil {
 				if PhpValidVarName(zend.ZSTR_VAL(var_name), zend.ZSTR_LEN(var_name)) == 0 || zend.ZendStringEqualsLiteral(var_name, "this") {
@@ -3520,7 +3520,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 						orig_var = zend.Z_INDIRECT_P(orig_var)
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-					if zend.UNEXPECTED(zend.ExecutorGlobals.exception != nil) {
+					if zend.ExecutorGlobals.GetException() != nil {
 						zend.ZendStringReleaseEx(zend.Z_STR(final_name), 0)
 						return -1
 					}
@@ -3543,17 +3543,17 @@ func PhpExtractRefSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Z
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3599,17 +3599,17 @@ func PhpExtractSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Zend
 	var orig_var *zend.Zval
 	for {
 		var __ht *zend.HashTable = arr
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			var_name = _p.key
+			var_name = _p.GetKey()
 			entry = _z
 			if var_name == nil {
 				continue
@@ -3668,7 +3668,7 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -3681,14 +3681,14 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &var_array_param, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &var_array_param, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &extract_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &extract_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -3697,7 +3697,7 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &prefix, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -3817,7 +3817,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			zend.Z_TRY_ADDREF_P(value_ptr)
 			zend.ZendHashUpdate(zend.Z_ARRVAL_P(return_value), zend.Z_STR_P(entry), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(zend.Z_STR_P(entry), "this") {
-			var object *zend.ZendObject = zend.ZendGetThisObject(zend.ExecutorGlobals.current_execute_data)
+			var object *zend.ZendObject = zend.ZendGetThisObject(zend.ExecutorGlobals.GetCurrentExecuteData())
 			if object != nil {
 				zend.GC_ADDREF(object)
 				zend.ZVAL_OBJ(&data, object)
@@ -3836,14 +3836,14 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 		}
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(entry)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				value_ptr = _z
@@ -3882,7 +3882,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -3895,7 +3895,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				num_args = _num_varargs
 				_i += _num_varargs
@@ -3906,7 +3906,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -3936,7 +3936,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	symbol_table = zend.ZendRebuildSymbolTable()
-	if zend.UNEXPECTED(symbol_table == nil) {
+	if symbol_table == nil {
 		return
 	}
 
@@ -3944,7 +3944,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	   or multiple string names, rather than a combination of both.
 	   So quickly guess a minimum result size based on that */
 
-	if num_args != 0 && zend.Z_TYPE(args[0]) == zend.IS_ARRAY {
+	if num_args != 0 && args[0].IsType(zend.IS_ARRAY) {
 		zend.ArrayInitSize(return_value, zend.ZendHashNumElements(zend.Z_ARRVAL(args[0])))
 	} else {
 		zend.ArrayInitSize(return_value, num_args)
@@ -3978,7 +3978,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -3991,13 +3991,13 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &start_key, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &start_key, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &num, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &num, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -4006,7 +4006,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &val, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -4032,40 +4032,40 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.EXPECTED(num > 0) {
-		if b.SizeOf("num") > 4 && zend.UNEXPECTED(zend.EXPECTED(num > 0x7fffffff)) {
+	if num > 0 {
+		if b.SizeOf("num") > 4 && num > 0x7fffffff {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Too many elements")
 			zend.RETVAL_FALSE
 			return
-		} else if zend.UNEXPECTED(start_key > zend.ZEND_LONG_MAX-num+1) {
+		} else if start_key > zend.ZEND_LONG_MAX-num+1 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			zend.RETVAL_FALSE
 			return
-		} else if zend.EXPECTED(start_key >= 0) && zend.EXPECTED(start_key < num) {
+		} else if start_key >= 0 && start_key < num {
 
 			/* create packed array */
 
 			var p *zend.Bucket
 			var n zend.ZendLong
-			zend.ArrayInitSize(return_value, uint32_t(start_key+num))
+			zend.ArrayInitSize(return_value, uint32(start_key+num))
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
-			zend.Z_ARRVAL_P(return_value).nNumUsed = uint32_t(start_key + num)
-			zend.Z_ARRVAL_P(return_value).nNumOfElements = uint32(num)
-			zend.Z_ARRVAL_P(return_value).nNextFreeElement = zend_long(start_key + num)
+			zend.Z_ARRVAL_P(return_value).SetNNumUsed(uint32(start_key + num))
+			zend.Z_ARRVAL_P(return_value).SetNNumOfElements(uint32(num))
+			zend.Z_ARRVAL_P(return_value).SetNNextFreeElement(zend_long(start_key + num))
 			if zend.Z_REFCOUNTED_P(val) {
 				zend.GC_ADDREF_EX(zend.Z_COUNTED_P(val), uint32(num))
 			}
-			p = zend.Z_ARRVAL_P(return_value).arData
+			p = zend.Z_ARRVAL_P(return_value).GetArData()
 			n = start_key
 			for b.PostDec(&start_key) {
-				zend.ZVAL_UNDEF(&p.val)
+				zend.ZVAL_UNDEF(&p.GetVal())
 				p++
 			}
 			for b.PostDec(&num) {
-				zend.ZVAL_COPY_VALUE(&p.val, val)
+				zend.ZVAL_COPY_VALUE(&p.GetVal(), val)
 				n++
-				p.h = n - 1
-				p.key = nil
+				p.SetH(n - 1)
+				p.SetKey(nil)
 				p++
 			}
 		} else {
@@ -4083,7 +4083,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				start_key++
 			}
 		}
-	} else if zend.EXPECTED(num == 0) {
+	} else if num == 0 {
 		zend.RETVAL_EMPTY_ARRAY()
 		return
 	} else {
@@ -4117,7 +4117,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -4130,7 +4130,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &keys, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &keys, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -4139,7 +4139,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendParseArgZvalDeref(_arg, &val, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -4171,12 +4171,12 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	zend.ArrayInitSize(return_value, zend.ZendHashNumElements(zend.Z_ARRVAL_P(keys)))
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(keys)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			entry = _z
@@ -4223,7 +4223,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -4244,7 +4244,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &zstep, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -4325,12 +4325,12 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			/* Initialize the return_value as an array. */
 
-			zend.ArrayInitSize(return_value, uint32_t((low-high)/lstep+1))
+			zend.ArrayInitSize(return_value, uint32((low-high)/lstep+1))
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			for {
 				var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-				var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-				var __fill_idx uint32 = __fill_ht.nNumUsed
+				var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 				zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 				for ; low >= high; low -= uint(lstep) {
 					zend.ZEND_HASH_FILL_SET_INTERNED_STR(zend.ZSTR_CHAR(low))
@@ -4339,10 +4339,10 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						break
 					}
 				}
-				__fill_ht.nNumUsed = __fill_idx
-				__fill_ht.nNumOfElements = __fill_idx
-				__fill_ht.nNextFreeElement = __fill_idx
-				__fill_ht.nInternalPointer = 0
+				__fill_ht.SetNNumUsed(__fill_idx)
+				__fill_ht.SetNNumOfElements(__fill_idx)
+				__fill_ht.SetNNextFreeElement(__fill_idx)
+				__fill_ht.SetNInternalPointer(0)
 				break
 			}
 		} else if high > low {
@@ -4350,12 +4350,12 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				err = 1
 				goto err
 			}
-			zend.ArrayInitSize(return_value, uint32_t((high-low)/lstep+1))
+			zend.ArrayInitSize(return_value, uint32((high-low)/lstep+1))
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			for {
 				var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-				var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-				var __fill_idx uint32 = __fill_ht.nNumUsed
+				var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+				var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 				zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 				for ; low <= high; low += uint(lstep) {
 					zend.ZEND_HASH_FILL_SET_INTERNED_STR(zend.ZSTR_CHAR(low))
@@ -4364,10 +4364,10 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						break
 					}
 				}
-				__fill_ht.nNumUsed = __fill_idx
-				__fill_ht.nNumOfElements = __fill_idx
-				__fill_ht.nNextFreeElement = __fill_idx
-				__fill_ht.nInternalPointer = 0
+				__fill_ht.SetNNumUsed(__fill_idx)
+				__fill_ht.SetNNumOfElements(__fill_idx)
+				__fill_ht.SetNNextFreeElement(__fill_idx)
+				__fill_ht.SetNInternalPointer(0)
 				break
 			}
 		} else {
@@ -4404,8 +4404,8 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ArrayInitSize(return_value, size)
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			i = 0
 			element = low
@@ -4415,10 +4415,10 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				i++
 				element = low - i*step
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		} else if high > low {
 			if high-low < step || step <= 0 {
 				err = 1
@@ -4434,8 +4434,8 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ArrayInitSize(return_value, size)
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			i = 0
 			element = low
@@ -4445,10 +4445,10 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				i++
 				element = low + i*step
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		} else {
 			zend.ArrayInit(return_value)
 			zend.ZVAL_DOUBLE(&tmp, low)
@@ -4486,21 +4486,21 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				zend.RETVAL_FALSE
 				return
 			}
-			size = uint32_t(__calc_size + 1)
+			size = uint32(__calc_size + 1)
 			zend.ArrayInitSize(return_value, size)
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for i = 0; i < size; i++ {
 				zend.ZEND_HASH_FILL_SET_LONG(low - i*lstep)
 				zend.ZEND_HASH_FILL_NEXT()
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		} else if high > low {
 			if zend.ZendUlong(high-low < lstep) != 0 {
 				err = 1
@@ -4512,21 +4512,21 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				zend.RETVAL_FALSE
 				return
 			}
-			size = uint32_t(__calc_size + 1)
+			size = uint32(__calc_size + 1)
 			zend.ArrayInitSize(return_value, size)
 			zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for i = 0; i < size; i++ {
 				zend.ZEND_HASH_FILL_SET_LONG(low + i*lstep)
 				zend.ZEND_HASH_FILL_NEXT()
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		} else {
 			zend.ArrayInit(return_value)
 			zend.ZVAL_LONG(&tmp, low)
@@ -4555,17 +4555,17 @@ func PhpArrayDataShuffle(array *zend.Zval) {
 	}
 	hash = zend.Z_ARRVAL_P(array)
 	n_left = n_elems
-	if zend.EXPECTED(!(zend.HT_HAS_ITERATORS(hash))) {
-		if hash.nNumUsed != hash.nNumOfElements {
+	if !(zend.HT_HAS_ITERATORS(hash)) {
+		if hash.GetNNumUsed() != hash.GetNNumOfElements() {
 			j = 0
 			idx = 0
-			for ; idx < hash.nNumUsed; idx++ {
-				p = hash.arData + idx
-				if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+			for ; idx < hash.GetNNumUsed(); idx++ {
+				p = hash.GetArData() + idx
+				if p.GetVal().IsType(zend.IS_UNDEF) {
 					continue
 				}
 				if j != idx {
-					hash.arData[j] = *p
+					hash.GetArData()[j] = *p
 				}
 				j++
 			}
@@ -4573,23 +4573,23 @@ func PhpArrayDataShuffle(array *zend.Zval) {
 		for b.PreDec(&n_left) {
 			rnd_idx = PhpMtRandRange(0, n_left)
 			if rnd_idx != n_left {
-				temp = hash.arData[n_left]
-				hash.arData[n_left] = hash.arData[rnd_idx]
-				hash.arData[rnd_idx] = temp
+				temp = hash.GetArData()[n_left]
+				hash.GetArData()[n_left] = hash.GetArData()[rnd_idx]
+				hash.GetArData()[rnd_idx] = temp
 			}
 		}
 	} else {
 		var iter_pos uint32 = zend.ZendHashIteratorsLowerPos(hash, 0)
-		if hash.nNumUsed != hash.nNumOfElements {
+		if hash.GetNNumUsed() != hash.GetNNumOfElements() {
 			j = 0
 			idx = 0
-			for ; idx < hash.nNumUsed; idx++ {
-				p = hash.arData + idx
-				if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+			for ; idx < hash.GetNNumUsed(); idx++ {
+				p = hash.GetArData() + idx
+				if p.GetVal().IsType(zend.IS_UNDEF) {
 					continue
 				}
 				if j != idx {
-					hash.arData[j] = *p
+					hash.GetArData()[j] = *p
 					if idx == iter_pos {
 						zend.ZendHashIteratorsUpdate(hash, idx, j)
 						iter_pos = zend.ZendHashIteratorsLowerPos(hash, iter_pos+1)
@@ -4601,24 +4601,24 @@ func PhpArrayDataShuffle(array *zend.Zval) {
 		for b.PreDec(&n_left) {
 			rnd_idx = PhpMtRandRange(0, n_left)
 			if rnd_idx != n_left {
-				temp = hash.arData[n_left]
-				hash.arData[n_left] = hash.arData[rnd_idx]
-				hash.arData[rnd_idx] = temp
+				temp = hash.GetArData()[n_left]
+				hash.GetArData()[n_left] = hash.GetArData()[rnd_idx]
+				hash.GetArData()[rnd_idx] = temp
 				zend.ZendHashIteratorsUpdate(hash, uint32(rnd_idx), n_left)
 			}
 		}
 	}
-	hash.nNumUsed = n_elems
-	hash.nInternalPointer = 0
+	hash.SetNNumUsed(n_elems)
+	hash.SetNInternalPointer(0)
 	for j = 0; j < n_elems; j++ {
-		p = hash.arData + j
-		if p.key != nil {
-			zend.ZendStringReleaseEx(p.key, 0)
+		p = hash.GetArData() + j
+		if p.GetKey() != nil {
+			zend.ZendStringReleaseEx(p.GetKey(), 0)
 		}
-		p.h = j
-		p.key = nil
+		p.SetH(j)
+		p.SetKey(nil)
 	}
-	hash.nNextFreeElement = n_elems
+	hash.SetNNextFreeElement(n_elems)
 	if (zend.HT_FLAGS(hash) & zend.HASH_FLAG_PACKED) == 0 {
 		zend.ZendHashToPacked(hash)
 	}
@@ -4646,7 +4646,7 @@ func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -4659,14 +4659,14 @@ func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -4734,22 +4734,22 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 
 	pos = 0
 	idx = 0
-	for ; pos < offset && idx < in_hash.nNumUsed; idx++ {
-		p = in_hash.arData + idx
-		if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+	for ; pos < offset && idx < in_hash.GetNNumUsed(); idx++ {
+		p = in_hash.GetArData() + idx
+		if p.GetVal().IsType(zend.IS_UNDEF) {
 			continue
 		}
 
 		/* Get entry and increase reference count */
 
-		entry = &p.val
+		entry = &p.GetVal()
 
 		/* Update output hash depending on key type */
 
-		if p.key == nil {
+		if p.GetKey() == nil {
 			zend.ZendHashNextIndexInsertNew(&out_hash, entry)
 		} else {
-			zend.ZendHashAddNew(&out_hash, p.key, entry)
+			zend.ZendHashAddNew(&out_hash, p.GetKey(), entry)
 		}
 		if idx == iter_pos {
 			if zend.ZendLong(idx != pos) != 0 {
@@ -4763,21 +4763,21 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 	/* If hash for removed entries exists, go until offset+length and copy the entries to it */
 
 	if removed != nil {
-		for ; pos < offset+length && idx < in_hash.nNumUsed; idx++ {
-			p = in_hash.arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for ; pos < offset+length && idx < in_hash.GetNNumUsed(); idx++ {
+			p = in_hash.GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
 			pos++
-			entry = &p.val
+			entry = &p.GetVal()
 			zend.Z_TRY_ADDREF_P(entry)
-			if p.key == nil {
+			if p.GetKey() == nil {
 				zend.ZendHashNextIndexInsertNew(removed, entry)
 				zend.ZendHashDelBucket(in_hash, p)
 			} else {
-				zend.ZendHashAddNew(removed, p.key, entry)
-				if in_hash == &(zend.ExecutorGlobals.symbol_table) {
-					zend.ZendDeleteGlobalVariable(p.key)
+				zend.ZendHashAddNew(removed, p.GetKey(), entry)
+				if in_hash == &(zend.ExecutorGlobals.GetSymbolTable()) {
+					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
 					zend.ZendHashDelBucket(in_hash, p)
 				}
@@ -4785,14 +4785,14 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 		}
 	} else {
 		var pos2 int = pos
-		for ; pos2 < offset+length && idx < in_hash.nNumUsed; idx++ {
-			p = in_hash.arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for ; pos2 < offset+length && idx < in_hash.GetNNumUsed(); idx++ {
+			p = in_hash.GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
 			pos2++
-			if p.key != nil && in_hash == &(zend.ExecutorGlobals.symbol_table) {
-				zend.ZendDeleteGlobalVariable(p.key)
+			if p.GetKey() != nil && in_hash == &(zend.ExecutorGlobals.GetSymbolTable()) {
+				zend.ZendDeleteGlobalVariable(p.GetKey())
 			} else {
 				zend.ZendHashDelBucket(in_hash, p)
 			}
@@ -4805,14 +4805,14 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 	if replace != nil {
 		for {
 			var __ht *zend.HashTable = replace
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				entry = _z
@@ -4826,16 +4826,16 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 
 	/* Copy the remaining input hash entries to the output hash */
 
-	for ; idx < in_hash.nNumUsed; idx++ {
-		p = in_hash.arData + idx
-		if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+	for ; idx < in_hash.GetNNumUsed(); idx++ {
+		p = in_hash.GetArData() + idx
+		if p.GetVal().IsType(zend.IS_UNDEF) {
 			continue
 		}
-		entry = &p.val
-		if p.key == nil {
+		entry = &p.GetVal()
+		if p.GetKey() == nil {
 			zend.ZendHashNextIndexInsertNew(&out_hash, entry)
 		} else {
-			zend.ZendHashAddNew(&out_hash, p.key, entry)
+			zend.ZendHashAddNew(&out_hash, p.GetKey(), entry)
 		}
 		if idx == iter_pos {
 			if zend.ZendLong(idx != pos) != 0 {
@@ -4850,16 +4850,16 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 
 	zend.HT_SET_ITERATORS_COUNT(&out_hash, zend.HT_ITERATORS_COUNT(in_hash))
 	zend.HT_SET_ITERATORS_COUNT(in_hash, 0)
-	in_hash.pDestructor = nil
+	in_hash.SetPDestructor(nil)
 	zend.ZendHashDestroy(in_hash)
 	zend.HT_FLAGS(in_hash) = zend.HT_FLAGS(&out_hash)
-	in_hash.nTableSize = out_hash.nTableSize
-	in_hash.nTableMask = out_hash.nTableMask
-	in_hash.nNumUsed = out_hash.nNumUsed
-	in_hash.nNumOfElements = out_hash.nNumOfElements
-	in_hash.nNextFreeElement = out_hash.nNextFreeElement
-	in_hash.arData = out_hash.arData
-	in_hash.pDestructor = out_hash.pDestructor
+	in_hash.SetNTableSize(out_hash.GetNTableSize())
+	in_hash.SetNTableMask(out_hash.GetNTableMask())
+	in_hash.SetNNumUsed(out_hash.GetNNumUsed())
+	in_hash.SetNNumOfElements(out_hash.GetNNumOfElements())
+	in_hash.SetNNextFreeElement(out_hash.GetNNextFreeElement())
+	in_hash.SetArData(out_hash.GetArData())
+	in_hash.SetPDestructor(out_hash.GetPDestructor())
 	zend.ZendHashInternalPointerReset(in_hash)
 }
 func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -4889,7 +4889,7 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -4902,13 +4902,13 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -4919,7 +4919,7 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -4990,7 +4990,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5003,14 +5003,14 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -5042,14 +5042,14 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Get the last value and copy it into the return value */
 
-	idx = zend.Z_ARRVAL_P(stack).nNumUsed
+	idx = zend.Z_ARRVAL_P(stack).GetNNumUsed()
 	for true {
 		if idx == 0 {
 			return
 		}
 		idx--
-		p = zend.Z_ARRVAL_P(stack).arData + idx
-		val = &p.val
+		p = zend.Z_ARRVAL_P(stack).GetArData() + idx
+		val = &p.GetVal()
 		if zend.Z_TYPE_P(val) == zend.IS_INDIRECT {
 			val = zend.Z_INDIRECT_P(val)
 		}
@@ -5058,14 +5058,14 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	zend.ZVAL_COPY_DEREF(return_value, val)
-	if p.key == nil && zend.Z_ARRVAL_P(stack).nNextFreeElement > 0 && p.h >= zend_ulong(zend.Z_ARRVAL_P(stack).nNextFreeElement-1) {
-		zend.Z_ARRVAL_P(stack).nNextFreeElement = zend.Z_ARRVAL_P(stack).nNextFreeElement - 1
+	if p.GetKey() == nil && zend.Z_ARRVAL_P(stack).GetNNextFreeElement() > 0 && p.GetH() >= zend_ulong(zend.Z_ARRVAL_P(stack).GetNNextFreeElement()-1) {
+		zend.Z_ARRVAL_P(stack).SetNNextFreeElement(zend.Z_ARRVAL_P(stack).GetNNextFreeElement() - 1)
 	}
 
 	/* Delete the last value */
 
-	if p.key != nil && zend.Z_ARRVAL_P(stack) == &(zend.ExecutorGlobals.symbol_table) {
-		zend.ZendDeleteGlobalVariable(p.key)
+	if p.GetKey() != nil && zend.Z_ARRVAL_P(stack) == &(zend.ExecutorGlobals.GetSymbolTable()) {
+		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(zend.Z_ARRVAL_P(stack), p)
 	}
@@ -5097,7 +5097,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5110,14 +5110,14 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -5151,11 +5151,11 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	idx = 0
 	for true {
-		if idx == zend.Z_ARRVAL_P(stack).nNumUsed {
+		if idx == zend.Z_ARRVAL_P(stack).GetNNumUsed() {
 			return
 		}
-		p = zend.Z_ARRVAL_P(stack).arData + idx
-		val = &p.val
+		p = zend.Z_ARRVAL_P(stack).GetArData() + idx
+		val = &p.GetVal()
 		if zend.Z_TYPE_P(val) == zend.IS_INDIRECT {
 			val = zend.Z_INDIRECT_P(val)
 		}
@@ -5168,8 +5168,8 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	/* Delete the first value */
 
-	if p.key != nil && zend.Z_ARRVAL_P(stack) == &(zend.ExecutorGlobals.symbol_table) {
-		zend.ZendDeleteGlobalVariable(p.key)
+	if p.GetKey() != nil && zend.Z_ARRVAL_P(stack) == &(zend.ExecutorGlobals.GetSymbolTable()) {
+		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(zend.Z_ARRVAL_P(stack), p)
 	}
@@ -5178,34 +5178,34 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	if (zend.HT_FLAGS(zend.Z_ARRVAL_P(stack)) & zend.HASH_FLAG_PACKED) != 0 {
 		var k uint32 = 0
-		if zend.EXPECTED(!(zend.HT_HAS_ITERATORS(zend.Z_ARRVAL_P(stack)))) {
-			for idx = 0; idx < zend.Z_ARRVAL_P(stack).nNumUsed; idx++ {
-				p = zend.Z_ARRVAL_P(stack).arData + idx
-				if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		if !(zend.HT_HAS_ITERATORS(zend.Z_ARRVAL_P(stack))) {
+			for idx = 0; idx < zend.Z_ARRVAL_P(stack).GetNNumUsed(); idx++ {
+				p = zend.Z_ARRVAL_P(stack).GetArData() + idx
+				if p.GetVal().IsType(zend.IS_UNDEF) {
 					continue
 				}
 				if idx != k {
-					var q *zend.Bucket = zend.Z_ARRVAL_P(stack).arData + k
-					q.h = k
-					q.key = nil
-					zend.ZVAL_COPY_VALUE(&q.val, &p.val)
-					zend.ZVAL_UNDEF(&p.val)
+					var q *zend.Bucket = zend.Z_ARRVAL_P(stack).GetArData() + k
+					q.SetH(k)
+					q.SetKey(nil)
+					zend.ZVAL_COPY_VALUE(&q.GetVal(), &p.GetVal())
+					zend.ZVAL_UNDEF(&p.GetVal())
 				}
 				k++
 			}
 		} else {
 			var iter_pos uint32 = zend.ZendHashIteratorsLowerPos(zend.Z_ARRVAL_P(stack), 0)
-			for idx = 0; idx < zend.Z_ARRVAL_P(stack).nNumUsed; idx++ {
-				p = zend.Z_ARRVAL_P(stack).arData + idx
-				if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+			for idx = 0; idx < zend.Z_ARRVAL_P(stack).GetNNumUsed(); idx++ {
+				p = zend.Z_ARRVAL_P(stack).GetArData() + idx
+				if p.GetVal().IsType(zend.IS_UNDEF) {
 					continue
 				}
 				if idx != k {
-					var q *zend.Bucket = zend.Z_ARRVAL_P(stack).arData + k
-					q.h = k
-					q.key = nil
-					zend.ZVAL_COPY_VALUE(&q.val, &p.val)
-					zend.ZVAL_UNDEF(&p.val)
+					var q *zend.Bucket = zend.Z_ARRVAL_P(stack).GetArData() + k
+					q.SetH(k)
+					q.SetKey(nil)
+					zend.ZVAL_COPY_VALUE(&q.GetVal(), &p.GetVal())
+					zend.ZVAL_UNDEF(&p.GetVal())
 					if idx == iter_pos {
 						zend.ZendHashIteratorsUpdate(zend.Z_ARRVAL_P(stack), idx, k)
 						iter_pos = zend.ZendHashIteratorsLowerPos(zend.Z_ARRVAL_P(stack), iter_pos+1)
@@ -5214,27 +5214,27 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				k++
 			}
 		}
-		zend.Z_ARRVAL_P(stack).nNumUsed = k
-		zend.Z_ARRVAL_P(stack).nNextFreeElement = k
+		zend.Z_ARRVAL_P(stack).SetNNumUsed(k)
+		zend.Z_ARRVAL_P(stack).SetNNextFreeElement(k)
 	} else {
 		var k uint32 = 0
 		var should_rehash int = 0
-		for idx = 0; idx < zend.Z_ARRVAL_P(stack).nNumUsed; idx++ {
-			p = zend.Z_ARRVAL_P(stack).arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for idx = 0; idx < zend.Z_ARRVAL_P(stack).GetNNumUsed(); idx++ {
+			p = zend.Z_ARRVAL_P(stack).GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
-			if p.key == nil {
-				if p.h != k {
+			if p.GetKey() == nil {
+				if p.GetH() != k {
 					k++
-					p.h = k - 1
+					p.SetH(k - 1)
 					should_rehash = 1
 				} else {
 					k++
 				}
 			}
 		}
-		zend.Z_ARRVAL_P(stack).nNextFreeElement = k
+		zend.Z_ARRVAL_P(stack).SetNNextFreeElement(k)
 		if should_rehash != 0 {
 			zend.ZendHashRehash(zend.Z_ARRVAL_P(stack))
 		}
@@ -5270,7 +5270,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5283,13 +5283,13 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -5300,7 +5300,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -5333,15 +5333,15 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stack)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			key = _p.key
+			key = _p.GetKey()
 			value = _z
 			if key != nil {
 				zend.ZendHashAddNew(&new_hash, key, value)
@@ -5351,7 +5351,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	if zend.UNEXPECTED(zend.HT_HAS_ITERATORS(zend.Z_ARRVAL_P(stack))) {
+	if zend.HT_HAS_ITERATORS(zend.Z_ARRVAL_P(stack)) {
 		zend.ZendHashIteratorsAdvance(zend.Z_ARRVAL_P(stack), argc)
 		zend.HT_SET_ITERATORS_COUNT(&new_hash, zend.HT_ITERATORS_COUNT(zend.Z_ARRVAL_P(stack)))
 		zend.HT_SET_ITERATORS_COUNT(zend.Z_ARRVAL_P(stack), 0)
@@ -5359,16 +5359,16 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 	/* replace HashTable data */
 
-	zend.Z_ARRVAL_P(stack).pDestructor = nil
+	zend.Z_ARRVAL_P(stack).SetPDestructor(nil)
 	zend.ZendHashDestroy(zend.Z_ARRVAL_P(stack))
 	zend.HT_FLAGS(zend.Z_ARRVAL_P(stack)) = zend.HT_FLAGS(&new_hash)
-	zend.Z_ARRVAL_P(stack).nTableSize = new_hash.nTableSize
-	zend.Z_ARRVAL_P(stack).nTableMask = new_hash.nTableMask
-	zend.Z_ARRVAL_P(stack).nNumUsed = new_hash.nNumUsed
-	zend.Z_ARRVAL_P(stack).nNumOfElements = new_hash.nNumOfElements
-	zend.Z_ARRVAL_P(stack).nNextFreeElement = new_hash.nNextFreeElement
-	zend.Z_ARRVAL_P(stack).arData = new_hash.arData
-	zend.Z_ARRVAL_P(stack).pDestructor = new_hash.pDestructor
+	zend.Z_ARRVAL_P(stack).SetNTableSize(new_hash.GetNTableSize())
+	zend.Z_ARRVAL_P(stack).SetNTableMask(new_hash.GetNTableMask())
+	zend.Z_ARRVAL_P(stack).SetNNumUsed(new_hash.GetNNumUsed())
+	zend.Z_ARRVAL_P(stack).SetNNumOfElements(new_hash.GetNNumOfElements())
+	zend.Z_ARRVAL_P(stack).SetNNextFreeElement(new_hash.GetNNextFreeElement())
+	zend.Z_ARRVAL_P(stack).SetArData(new_hash.GetArData())
+	zend.Z_ARRVAL_P(stack).SetPDestructor(new_hash.GetPDestructor())
 	zend.ZendHashInternalPointerReset(zend.Z_ARRVAL_P(stack))
 
 	/* Clean up and return the number of elements in the stack */
@@ -5405,7 +5405,7 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5418,20 +5418,20 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &length, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &length, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -5440,7 +5440,7 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZendParseArgZvalDeref(_arg, &repl_array, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -5546,7 +5546,7 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5559,13 +5559,13 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &offset, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -5574,14 +5574,14 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &z_length, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -5652,17 +5652,17 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 		for {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					entry = _z
@@ -5673,7 +5673,7 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 					if pos > offset+length {
 						break
 					}
-					if zend.UNEXPECTED(zend.Z_ISREF_P(entry)) && zend.UNEXPECTED(zend.Z_REFCOUNT_P(entry) == 1) {
+					if zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1 {
 						entry = zend.Z_REFVAL_P(entry)
 					}
 					zend.Z_TRY_ADDREF_P(entry)
@@ -5681,25 +5681,25 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	} else {
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				string_key = _p.key
+				num_key = _p.GetH()
+				string_key = _p.GetKey()
 				entry = _z
 				pos++
 				if pos <= offset {
@@ -5729,15 +5729,15 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 	var string_key *zend.ZendString
 	for {
 		var __ht *zend.HashTable = src
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			string_key = _p.key
+			string_key = _p.GetKey()
 			src_entry = _z
 			if string_key != nil {
 				if b.Assign(&dest_entry, zend.ZendHashFindEx(dest, string_key, 1)) != nil {
@@ -5808,21 +5808,21 @@ func PhpArrayMerge(dest *zend.HashTable, src *zend.HashTable) int {
 		zend.ZendHashExtend(dest, zend.ZendHashNumElements(dest)+zend.ZendHashNumElements(src), 1)
 		for {
 			var __fill_ht *zend.HashTable = dest
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = src
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					src_entry = _z
-					if zend.UNEXPECTED(zend.Z_ISREF_P(src_entry)) && zend.UNEXPECTED(zend.Z_REFCOUNT_P(src_entry) == 1) {
+					if zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1 {
 						src_entry = zend.Z_REFVAL_P(src_entry)
 					}
 					zend.Z_TRY_ADDREF_P(src_entry)
@@ -5830,26 +5830,26 @@ func PhpArrayMerge(dest *zend.HashTable, src *zend.HashTable) int {
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	} else {
 		for {
 			var __ht *zend.HashTable = src
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				string_key = _p.key
+				string_key = _p.GetKey()
 				src_entry = _z
-				if zend.UNEXPECTED(zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1) {
+				if zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1 {
 					src_entry = zend.Z_REFVAL_P(src_entry)
 				}
 				zend.Z_TRY_ADDREF_P(src_entry)
@@ -5874,16 +5874,16 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 	var ret int
 	for {
 		var __ht *zend.HashTable = src
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			string_key = _p.key
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
 			src_entry = _z
 			src_zval = src_entry
 			zend.ZVAL_DEREF(src_zval)
@@ -5957,7 +5957,7 @@ func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *ze
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -5970,7 +5970,7 @@ func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -5981,7 +5981,7 @@ func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *ze
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6063,7 +6063,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6076,7 +6076,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -6087,7 +6087,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6144,15 +6144,15 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 				var string_key *zend.ZendString
 				for {
 					var __ht *zend.HashTable = zend.Z_ARRVAL_P(ret)
-					var _p *zend.Bucket = __ht.arData
-					var _end *zend.Bucket = _p + __ht.nNumUsed
+					var _p *zend.Bucket = __ht.GetArData()
+					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.val
+						var _z *zend.Zval = &_p.GetVal()
 
-						if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 							continue
 						}
-						string_key = _p.key
+						string_key = _p.GetKey()
 						if string_key == nil {
 							copy = 0
 							break
@@ -6178,21 +6178,21 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.ZendHashRealInitPacked(dest)
 		for {
 			var __fill_ht *zend.HashTable = dest
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = src
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					src_entry = _z
-					if zend.UNEXPECTED(zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1) {
+					if zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1 {
 						src_entry = zend.Z_REFVAL_P(src_entry)
 					}
 					zend.Z_TRY_ADDREF_P(src_entry)
@@ -6200,10 +6200,10 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	} else {
@@ -6211,21 +6211,21 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.ZendHashRealInitMixed(dest)
 		for {
 			var __ht *zend.HashTable = src
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				string_key = _p.key
+				string_key = _p.GetKey()
 				src_entry = _z
-				if zend.UNEXPECTED(zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1) {
+				if zend.Z_ISREF_P(src_entry) && zend.Z_REFCOUNT_P(src_entry) == 1 {
 					src_entry = zend.Z_REFVAL_P(src_entry)
 				}
 				zend.Z_TRY_ADDREF_P(src_entry)
-				if zend.EXPECTED(string_key != nil) {
+				if string_key != nil {
 					zend._zendHashAppend(dest, string_key, src_entry)
 				} else {
 					zend.ZendHashNextIndexInsertNew(dest, src_entry)
@@ -6289,7 +6289,7 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6302,7 +6302,7 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -6311,14 +6311,14 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &search_value, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6361,18 +6361,18 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if strict != 0 {
 			for {
 				var __ht *zend.HashTable = arrval
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					zend.ZVAL_DEREF(entry)
 					if zend.FastIsIdenticalFunction(search_value, entry) != 0 {
@@ -6389,18 +6389,18 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else {
 			for {
 				var __ht *zend.HashTable = arrval
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 					if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 						_z = zend.Z_INDIRECT_P(_z)
 					}
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_idx = _p.h
-					str_idx = _p.key
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
 					entry = _z
 					if zend.FastEqualCheckFunction(search_value, entry) != 0 {
 						if str_idx != nil {
@@ -6419,8 +6419,8 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 		for {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			if zend.HT_IS_PACKED(arrval) && zend.HT_IS_WITHOUT_HOLES(arrval) {
 
@@ -6437,18 +6437,18 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 				for {
 					var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-					var _p *zend.Bucket = __ht.arData
-					var _end *zend.Bucket = _p + __ht.nNumUsed
+					var _p *zend.Bucket = __ht.GetArData()
+					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.val
+						var _z *zend.Zval = &_p.GetVal()
 						if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 							_z = zend.Z_INDIRECT_P(_z)
 						}
-						if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 							continue
 						}
-						num_idx = _p.h
-						str_idx = _p.key
+						num_idx = _p.GetH()
+						str_idx = _p.GetKey()
 						entry = _z
 						if str_idx != nil {
 							zend.ZEND_HASH_FILL_SET_STR_COPY(str_idx)
@@ -6463,10 +6463,10 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				/* Go through input array and add keys to the return array */
 
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	}
@@ -6496,7 +6496,7 @@ func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6509,14 +6509,14 @@ func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6570,7 +6570,7 @@ func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6583,14 +6583,14 @@ func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6646,7 +6646,7 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6659,14 +6659,14 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6704,7 +6704,7 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 	/* Return vector-like packed arrays as-is */
 
-	if zend.HT_IS_PACKED(arrval) && zend.HT_IS_WITHOUT_HOLES(arrval) && arrval.nNextFreeElement == arrlen {
+	if zend.HT_IS_PACKED(arrval) && zend.HT_IS_WITHOUT_HOLES(arrval) && arrval.GetNNextFreeElement() == arrlen {
 		zend.RETVAL_ZVAL(input, 1, 0)
 		return
 	}
@@ -6718,21 +6718,21 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 	for {
 		var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-		var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-		var __fill_idx uint32 = __fill_ht.nNumUsed
+		var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 		for {
 			var __ht *zend.HashTable = arrval
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				entry = _z
-				if zend.UNEXPECTED(zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1) {
+				if zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1 {
 					entry = zend.Z_REFVAL_P(entry)
 				}
 				zend.Z_TRY_ADDREF_P(entry)
@@ -6740,10 +6740,10 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			break
 		}
-		__fill_ht.nNumUsed = __fill_idx
-		__fill_ht.nNumOfElements = __fill_idx
-		__fill_ht.nNextFreeElement = __fill_idx
-		__fill_ht.nInternalPointer = 0
+		__fill_ht.SetNNumUsed(__fill_idx)
+		__fill_ht.SetNNumOfElements(__fill_idx)
+		__fill_ht.SetNNextFreeElement(__fill_idx)
+		__fill_ht.SetNInternalPointer(0)
 		break
 	}
 
@@ -6775,7 +6775,7 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6788,14 +6788,14 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -6831,12 +6831,12 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 	myht = zend.Z_ARRVAL_P(input)
 	for {
 		var __ht *zend.HashTable = myht
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			entry = _z
@@ -6946,7 +6946,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -6959,7 +6959,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &input, 0, 0, 0) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &input, 0, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -6971,7 +6971,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZendParseArgZvalDeref(_arg, &index, 1)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7006,17 +7006,17 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 		for {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = input
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					data = _z
@@ -7031,21 +7031,21 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	} else {
 		for {
 			var __ht *zend.HashTable = input
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				data = _z
@@ -7141,7 +7141,7 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -7154,21 +7154,21 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7202,23 +7202,23 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 		for {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-				var _idx uint32 = __ht.nNumUsed
-				var _p *zend.Bucket = __ht.arData + _idx
+				var _idx uint32 = __ht.GetNNumUsed()
+				var _p *zend.Bucket = __ht.GetArData() + _idx
 				var _z *zend.Zval
-				for _idx = __ht.nNumUsed; _idx > 0; _idx-- {
+				for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
 					_p--
-					_z = &_p.val
+					_z = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					entry = _z
-					if zend.UNEXPECTED(zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1) {
+					if zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1 {
 						entry = zend.Z_REFVAL_P(entry)
 					}
 					zend.Z_TRY_ADDREF_P(entry)
@@ -7226,27 +7226,27 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 	} else {
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-			var _idx uint32 = __ht.nNumUsed
-			var _p *zend.Bucket = __ht.arData + _idx
+			var _idx uint32 = __ht.GetNNumUsed()
+			var _p *zend.Bucket = __ht.GetArData() + _idx
 			var _z *zend.Zval
-			for _idx = __ht.nNumUsed; _idx > 0; _idx-- {
+			for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
 				_p--
-				_z = &_p.val
+				_z = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				string_key = _p.key
+				num_key = _p.GetH()
+				string_key = _p.GetKey()
 				entry = _z
 				if string_key != nil {
 					entry = zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), string_key, entry)
@@ -7294,7 +7294,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -7307,13 +7307,13 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &pad_size, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &pad_size, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -7322,7 +7322,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &pad_value, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7374,30 +7374,30 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 		if pad_size < 0 {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for i = 0; i < num_pads; i++ {
 				zend.ZEND_HASH_FILL_ADD(pad_value)
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		}
 		for {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					value = _z
@@ -7406,24 +7406,24 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				}
 				break
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 			break
 		}
 		if pad_size > 0 {
 			var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-			var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-			var __fill_idx uint32 = __fill_ht.nNumUsed
+			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 			for i = 0; i < num_pads; i++ {
 				zend.ZEND_HASH_FILL_ADD(pad_value)
 			}
-			__fill_ht.nNumUsed = __fill_idx
-			__fill_ht.nNumOfElements = __fill_idx
-			__fill_ht.nNextFreeElement = __fill_idx
-			__fill_ht.nInternalPointer = 0
+			__fill_ht.SetNNumUsed(__fill_idx)
+			__fill_ht.SetNNumOfElements(__fill_idx)
+			__fill_ht.SetNNextFreeElement(__fill_idx)
+			__fill_ht.SetNInternalPointer(0)
 		}
 	} else {
 		if pad_size < 0 {
@@ -7433,17 +7433,17 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				key = _p.key
+				key = _p.GetKey()
 				value = _z
 				zend.Z_TRY_ADDREF_P(value)
 				if key != nil {
@@ -7488,7 +7488,7 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -7501,14 +7501,14 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7537,16 +7537,16 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ArrayInitSize(return_value, zend.ZendHashNumElements(zend.Z_ARRVAL_P(array)))
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_idx = _p.h
-			str_idx = _p.key
+			num_idx = _p.GetH()
+			str_idx = _p.GetKey()
 			entry = _z
 			zend.ZVAL_DEREF(entry)
 			if zend.Z_TYPE_P(entry) == zend.IS_LONG {
@@ -7598,7 +7598,7 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -7611,21 +7611,21 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &change_to_upper, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &change_to_upper, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7654,16 +7654,16 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 	zend.ArrayInitSize(return_value, zend.ZendHashNumElements(zend.Z_ARRVAL_P(array)))
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			string_key = _p.key
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
 			entry = _z
 			if string_key == nil {
 				entry = zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), num_key, entry)
@@ -7720,7 +7720,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -7733,21 +7733,21 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &sort_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -7773,7 +7773,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	if zend.Z_ARRVAL_P(array).nNumOfElements <= 1 {
+	if zend.Z_ARRVAL_P(array).GetNNumOfElements() <= 1 {
 		zend.ZVAL_COPY(return_value, array)
 		return
 	}
@@ -7786,18 +7786,18 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		zend.ArrayInit(return_value)
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				str_key = _p.key
+				num_key = _p.GetH()
+				str_key = _p.GetKey()
 				val = _z
 				var retval *zend.Zval
 				if zend.Z_TYPE_P(val) == zend.IS_STRING {
@@ -7812,7 +7812,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 					/* First occurrence of the value */
 
-					if zend.UNEXPECTED(zend.Z_ISREF_P(val) && zend.Z_REFCOUNT_P(val) == 1) {
+					if zend.Z_ISREF_P(val) && zend.Z_REFCOUNT_P(val) == 1 {
 						zend.ZVAL_DEREF(val)
 					}
 					zend.Z_TRY_ADDREF_P(val)
@@ -7833,44 +7833,44 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 	/* create and sort array with pointers to the target_hash buckets */
 
-	arTmp = (*Bucketindex)(zend.Pemalloc((zend.Z_ARRVAL_P(array).nNumOfElements+1)*b.SizeOf("struct bucketindex"), zend.GC_FLAGS(zend.Z_ARRVAL_P(array))&zend.IS_ARRAY_PERSISTENT))
+	arTmp = (*Bucketindex)(zend.Pemalloc((zend.Z_ARRVAL_P(array).GetNNumOfElements()+1)*b.SizeOf("struct bucketindex"), zend.GC_FLAGS(zend.Z_ARRVAL_P(array))&zend.IS_ARRAY_PERSISTENT))
 	i = 0
 	idx = 0
-	for ; idx < zend.Z_ARRVAL_P(array).nNumUsed; idx++ {
-		p = zend.Z_ARRVAL_P(array).arData + idx
-		if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+	for ; idx < zend.Z_ARRVAL_P(array).GetNNumUsed(); idx++ {
+		p = zend.Z_ARRVAL_P(array).GetArData() + idx
+		if p.GetVal().IsType(zend.IS_UNDEF) {
 			continue
 		}
-		if zend.Z_TYPE(p.val) == zend.IS_INDIRECT && zend.Z_TYPE_P(zend.Z_INDIRECT(p.val)) == zend.IS_UNDEF {
+		if p.GetVal().IsType(zend.IS_INDIRECT) && zend.Z_TYPE_P(zend.Z_INDIRECT(p.GetVal())) == zend.IS_UNDEF {
 			continue
 		}
 		arTmp[i].SetB(*p)
 		arTmp[i].SetI(i)
 		i++
 	}
-	zend.ZVAL_UNDEF(&arTmp[i].b.val)
+	zend.ZVAL_UNDEF(&arTmp[i].GetB().GetVal())
 	zend.ZendSort(any(arTmp), i, b.SizeOf("struct bucketindex"), cmp, zend.SwapFuncT(ArrayBucketindexSwap))
 
 	/* go through the sorted array and delete duplicates from the copy */
 
 	lastkept = arTmp
-	for cmpdata = arTmp + 1; zend.Z_TYPE(cmpdata.b.val) != zend.IS_UNDEF; cmpdata++ {
+	for cmpdata = arTmp + 1; cmpdata.GetB().GetVal().GetType() != zend.IS_UNDEF; cmpdata++ {
 		if cmp(lastkept, cmpdata) != 0 {
 			lastkept = cmpdata
 		} else {
 			if lastkept.GetI() > cmpdata.GetI() {
-				p = &lastkept.b
+				p = &lastkept.GetB()
 				lastkept = cmpdata
 			} else {
-				p = &cmpdata.b
+				p = &cmpdata.GetB()
 			}
-			if p.key == nil {
-				zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.h)
+			if p.GetKey() == nil {
+				zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.GetH())
 			} else {
-				if zend.Z_ARRVAL_P(return_value) == &(zend.ExecutorGlobals.symbol_table) {
-					zend.ZendDeleteGlobalVariable(p.key)
+				if zend.Z_ARRVAL_P(return_value) == &(zend.ExecutorGlobals.GetSymbolTable()) {
+					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
-					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.key)
+					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.GetKey())
 				}
 			}
 		}
@@ -7889,7 +7889,7 @@ func ZvalUserCompare(a *zend.Zval, b *zend.Zval) int {
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && zend.Z_TYPE(retval) != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		return zend.ZEND_NORMALIZE_BOOL(ret)
@@ -7939,20 +7939,20 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 		return
 	}
 	for i = 0; i < argc; i++ {
-		if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+		if args[i].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			zend.RETVAL_NULL()
 			return
 		}
 	}
 	zend.ArrayInit(return_value)
-	for idx = 0; idx < zend.Z_ARRVAL(args[0]).nNumUsed; idx++ {
-		p = zend.Z_ARRVAL(args[0]).arData + idx
-		val = &p.val
+	for idx = 0; idx < zend.Z_ARRVAL(args[0]).GetNNumUsed(); idx++ {
+		p = zend.Z_ARRVAL(args[0]).GetArData() + idx
+		val = &p.GetVal()
 		if zend.Z_TYPE_P(val) == zend.IS_UNDEF {
 			continue
 		}
-		if zend.UNEXPECTED(zend.Z_TYPE_P(val) == zend.IS_INDIRECT) {
+		if zend.Z_TYPE_P(val) == zend.IS_INDIRECT {
 			val = zend.Z_INDIRECT_P(val)
 			if zend.Z_TYPE_P(val) == zend.IS_UNDEF {
 				continue
@@ -7961,29 +7961,29 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 		if zend.Z_ISREF_P(val) && zend.Z_REFCOUNT_P(val) == 1 {
 			val = zend.Z_REFVAL_P(val)
 		}
-		if p.key == nil {
+		if p.GetKey() == nil {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashIndexFind(zend.Z_ARRVAL(args[i]), p.h)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
+				if b.Assign(&data, zend.ZendHashIndexFind(zend.Z_ARRVAL(args[i]), p.GetH())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
 					ok = 0
 					break
 				}
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), p.h, val)
+				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), p.GetH(), val)
 			}
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashFindExInd(zend.Z_ARRVAL(args[i]), p.key, 1)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
+				if b.Assign(&data, zend.ZendHashFindExInd(zend.Z_ARRVAL(args[i]), p.GetKey(), 1)) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
 					ok = 0
 					break
 				}
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashUpdate(zend.Z_ARRVAL_P(return_value), p.key, val)
+				zend.ZendHashUpdate(zend.Z_ARRVAL_P(return_value), p.GetKey(), val)
 			}
 		}
 	}
@@ -8116,28 +8116,28 @@ func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		BG(user_compare_fci_cache) = *fci_key_cache
 	}
 	for i = 0; i < arr_argc; i++ {
-		if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+		if args[i].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			arr_argc = i
 			goto out
 		}
 		hash = zend.Z_ARRVAL(args[i])
-		list = (*zend.Bucket)(zend.Pemalloc((hash.nNumOfElements+1)*b.SizeOf("Bucket"), zend.GC_FLAGS(hash)&zend.IS_ARRAY_PERSISTENT))
+		list = (*zend.Bucket)(zend.Pemalloc((hash.GetNNumOfElements()+1)*b.SizeOf("Bucket"), zend.GC_FLAGS(hash)&zend.IS_ARRAY_PERSISTENT))
 		lists[i] = list
 		ptrs[i] = list
-		for idx = 0; idx < hash.nNumUsed; idx++ {
-			p = hash.arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for idx = 0; idx < hash.GetNNumUsed(); idx++ {
+			p = hash.GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
 			b.PostInc(&(*list)) = *p
 		}
-		zend.ZVAL_UNDEF(&list.val)
-		if hash.nNumOfElements > 1 {
+		zend.ZVAL_UNDEF(&list.GetVal())
+		if hash.GetNNumOfElements() > 1 {
 			if behavior == INTERSECT_NORMAL {
-				zend.ZendSort(any(lists[i]), hash.nNumOfElements, b.SizeOf("Bucket"), intersect_data_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
+				zend.ZendSort(any(lists[i]), hash.GetNNumOfElements(), b.SizeOf("Bucket"), intersect_data_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
 			} else if (behavior & INTERSECT_ASSOC) != 0 {
-				zend.ZendSort(any(lists[i]), hash.nNumOfElements, b.SizeOf("Bucket"), intersect_key_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
+				zend.ZendSort(any(lists[i]), hash.GetNNumOfElements(), b.SizeOf("Bucket"), intersect_key_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
 			}
 		}
 	}
@@ -8148,21 +8148,21 @@ func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 
 	/* go through the lists and look for common values */
 
-	for zend.Z_TYPE(ptrs[0].val) != zend.IS_UNDEF {
+	for ptrs[0].GetVal().GetType() != zend.IS_UNDEF {
 		if (behavior&INTERSECT_ASSOC) != 0 && key_compare_type == INTERSECT_COMP_KEY_USER {
 			BG(user_compare_fci) = *fci_key
 			BG(user_compare_fci_cache) = *fci_key_cache
 		}
 		for i = 1; i < arr_argc; i++ {
 			if (behavior & INTERSECT_NORMAL) != 0 {
-				for zend.Z_TYPE(ptrs[i].val) != zend.IS_UNDEF && 0 < b.Assign(&c, intersect_data_compare_func(ptrs[0], ptrs[i])) {
+				for ptrs[i].GetVal().GetType() != zend.IS_UNDEF && 0 < b.Assign(&c, intersect_data_compare_func(ptrs[0], ptrs[i])) {
 					ptrs[i]++
 				}
 			} else if (behavior & INTERSECT_ASSOC) != 0 {
-				for zend.Z_TYPE(ptrs[i].val) != zend.IS_UNDEF && 0 < b.Assign(&c, intersect_key_compare_func(ptrs[0], ptrs[i])) {
+				for ptrs[i].GetVal().GetType() != zend.IS_UNDEF && 0 < b.Assign(&c, intersect_key_compare_func(ptrs[0], ptrs[i])) {
 					ptrs[i]++
 				}
-				if c == 0 && zend.Z_TYPE(ptrs[i].val) != zend.IS_UNDEF && behavior == INTERSECT_ASSOC {
+				if c == 0 && ptrs[i].GetVal().GetType() != zend.IS_UNDEF && behavior == INTERSECT_ASSOC {
 
 					/* this means that ptrs[i] is not NULL so we can compare
 					 * and "c==0" is from last operation
@@ -8182,20 +8182,20 @@ func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					}
 				}
 			}
-			if zend.Z_TYPE(ptrs[i].val) == zend.IS_UNDEF {
+			if ptrs[i].GetVal().IsType(zend.IS_UNDEF) {
 
 				/* delete any values corresponding to remains of ptrs[0] */
 
 				for {
 					ptrs[0]++
 					p = ptrs[0] - 1
-					if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+					if p.GetVal().IsType(zend.IS_UNDEF) {
 						goto out
 					}
-					if p.key == nil {
-						zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.h)
+					if p.GetKey() == nil {
+						zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.GetH())
 					} else {
-						zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.key)
+						zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.GetKey())
 					}
 				}
 
@@ -8213,12 +8213,12 @@ func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 
 			for {
 				p = ptrs[0]
-				if p.key == nil {
-					zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.h)
+				if p.GetKey() == nil {
+					zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.GetH())
 				} else {
-					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.key)
+					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.GetKey())
 				}
-				if zend.Z_TYPE(b.PreInc(&ptrs[0]).val) == zend.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.u1.v.type_ == zend.IS_UNDEF {
 					goto out
 				}
 				if behavior == INTERSECT_NORMAL {
@@ -8243,7 +8243,7 @@ func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			/* ptrs[0] is present in all the arguments */
 
 			for {
-				if zend.Z_TYPE(b.PreInc(&ptrs[0]).val) == zend.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.u1.v.type_ == zend.IS_UNDEF {
 					goto out
 				}
 				if behavior == INTERSECT_NORMAL {
@@ -8334,20 +8334,20 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 	}
 	for i = 0; i < argc; i++ {
-		if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+		if args[i].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			zend.RETVAL_NULL()
 			return
 		}
 	}
 	zend.ArrayInit(return_value)
-	for idx = 0; idx < zend.Z_ARRVAL(args[0]).nNumUsed; idx++ {
-		p = zend.Z_ARRVAL(args[0]).arData + idx
-		val = &p.val
+	for idx = 0; idx < zend.Z_ARRVAL(args[0]).GetNNumUsed(); idx++ {
+		p = zend.Z_ARRVAL(args[0]).GetArData() + idx
+		val = &p.GetVal()
 		if zend.Z_TYPE_P(val) == zend.IS_UNDEF {
 			continue
 		}
-		if zend.UNEXPECTED(zend.Z_TYPE_P(val) == zend.IS_INDIRECT) {
+		if zend.Z_TYPE_P(val) == zend.IS_INDIRECT {
 			val = zend.Z_INDIRECT_P(val)
 			if zend.Z_TYPE_P(val) == zend.IS_UNDEF {
 				continue
@@ -8356,29 +8356,29 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		if zend.Z_ISREF_P(val) && zend.Z_REFCOUNT_P(val) == 1 {
 			val = zend.Z_REFVAL_P(val)
 		}
-		if p.key == nil {
+		if p.GetKey() == nil {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashIndexFind(zend.Z_ARRVAL(args[i]), p.h)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
+				if b.Assign(&data, zend.ZendHashIndexFind(zend.Z_ARRVAL(args[i]), p.GetH())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
 					ok = 0
 					break
 				}
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), p.h, val)
+				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), p.GetH(), val)
 			}
 		} else {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashFindExInd(zend.Z_ARRVAL(args[i]), p.key, 1)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
+				if b.Assign(&data, zend.ZendHashFindExInd(zend.Z_ARRVAL(args[i]), p.GetKey(), 1)) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
 					ok = 0
 					break
 				}
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashUpdate(zend.Z_ARRVAL_P(return_value), p.key, val)
+				zend.ZendHashUpdate(zend.Z_ARRVAL_P(return_value), p.GetKey(), val)
 			}
 		}
 	}
@@ -8511,28 +8511,28 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 		BG(user_compare_fci_cache) = *fci_key_cache
 	}
 	for i = 0; i < arr_argc; i++ {
-		if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+		if args[i].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			arr_argc = i
 			goto out
 		}
 		hash = zend.Z_ARRVAL(args[i])
-		list = (*zend.Bucket)(zend.Pemalloc((hash.nNumOfElements+1)*b.SizeOf("Bucket"), zend.GC_FLAGS(hash)&zend.IS_ARRAY_PERSISTENT))
+		list = (*zend.Bucket)(zend.Pemalloc((hash.GetNNumOfElements()+1)*b.SizeOf("Bucket"), zend.GC_FLAGS(hash)&zend.IS_ARRAY_PERSISTENT))
 		lists[i] = list
 		ptrs[i] = list
-		for idx = 0; idx < hash.nNumUsed; idx++ {
-			p = hash.arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for idx = 0; idx < hash.GetNNumUsed(); idx++ {
+			p = hash.GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
 			b.PostInc(&(*list)) = *p
 		}
-		zend.ZVAL_UNDEF(&list.val)
-		if hash.nNumOfElements > 1 {
+		zend.ZVAL_UNDEF(&list.GetVal())
+		if hash.GetNNumOfElements() > 1 {
 			if behavior == DIFF_NORMAL {
-				zend.ZendSort(any(lists[i]), hash.nNumOfElements, b.SizeOf("Bucket"), diff_data_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
+				zend.ZendSort(any(lists[i]), hash.GetNNumOfElements(), b.SizeOf("Bucket"), diff_data_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
 			} else if (behavior & DIFF_ASSOC) != 0 {
-				zend.ZendSort(any(lists[i]), hash.nNumOfElements, b.SizeOf("Bucket"), diff_key_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
+				zend.ZendSort(any(lists[i]), hash.GetNNumOfElements(), b.SizeOf("Bucket"), diff_key_compare_func, zend.SwapFuncT(zend.ZendHashBucketSwap))
 			}
 		}
 	}
@@ -8543,7 +8543,7 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 
 	/* go through the lists and look for values of ptr[0] that are not in the others */
 
-	for zend.Z_TYPE(ptrs[0].val) != zend.IS_UNDEF {
+	for ptrs[0].GetVal().GetType() != zend.IS_UNDEF {
 		if (behavior&DIFF_ASSOC) != 0 && key_compare_type == DIFF_COMP_KEY_USER {
 			BG(user_compare_fci) = *fci_key
 			BG(user_compare_fci_cache) = *fci_key_cache
@@ -8552,17 +8552,17 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 		for i = 1; i < arr_argc; i++ {
 			var ptr *zend.Bucket = ptrs[i]
 			if behavior == DIFF_NORMAL {
-				for zend.Z_TYPE(ptrs[i].val) != zend.IS_UNDEF && 0 < b.Assign(&c, diff_data_compare_func(ptrs[0], ptrs[i])) {
+				for ptrs[i].GetVal().GetType() != zend.IS_UNDEF && 0 < b.Assign(&c, diff_data_compare_func(ptrs[0], ptrs[i])) {
 					ptrs[i]++
 				}
 			} else if (behavior & DIFF_ASSOC) != 0 {
-				for zend.Z_TYPE(ptr.val) != zend.IS_UNDEF && 0 != b.Assign(&c, diff_key_compare_func(ptrs[0], ptr)) {
+				for ptr.GetVal().GetType() != zend.IS_UNDEF && 0 != b.Assign(&c, diff_key_compare_func(ptrs[0], ptr)) {
 					ptr++
 				}
 			}
 			if c == 0 {
 				if behavior == DIFF_NORMAL {
-					if zend.Z_TYPE(ptrs[i].val) != zend.IS_UNDEF {
+					if ptrs[i].GetVal().GetType() != zend.IS_UNDEF {
 						ptrs[i]++
 					}
 					break
@@ -8571,7 +8571,7 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 					/* In this branch is execute only when DIFF_ASSOC. If behavior == DIFF_KEY
 					 * data comparison is not needed - skipped. */
 
-					if zend.Z_TYPE(ptr.val) != zend.IS_UNDEF {
+					if ptr.GetVal().GetType() != zend.IS_UNDEF {
 						if data_compare_type == DIFF_COMP_DATA_USER {
 							BG(user_compare_fci) = *fci_data
 							BG(user_compare_fci_cache) = *fci_data_cache
@@ -8616,12 +8616,12 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 
 			for {
 				p = ptrs[0]
-				if p.key == nil {
-					zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.h)
+				if p.GetKey() == nil {
+					zend.ZendHashIndexDel(zend.Z_ARRVAL_P(return_value), p.GetH())
 				} else {
-					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.key)
+					zend.ZendHashDel(zend.Z_ARRVAL_P(return_value), p.GetKey())
 				}
-				if zend.Z_TYPE(b.PreInc(&ptrs[0]).val) == zend.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.u1.v.type_ == zend.IS_UNDEF {
 					goto out
 				}
 				if behavior == DIFF_NORMAL {
@@ -8646,7 +8646,7 @@ func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, b
 			/* ptrs[0] in none of the other arguments */
 
 			for {
-				if zend.Z_TYPE(b.PreInc(&ptrs[0]).val) == zend.IS_UNDEF {
+				if b.PreInc(&ptrs[0]).val.u1.v.type_ == zend.IS_UNDEF {
 					goto out
 				}
 				if behavior == DIFF_NORMAL {
@@ -8720,7 +8720,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -8733,7 +8733,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -8744,7 +8744,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -8770,7 +8770,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE(args[0]) != zend.IS_ARRAY {
+	if args[0].GetType() != zend.IS_ARRAY {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter 1 to be an array, %s given", zend.ZendZvalTypeName(&args[0]))
 		zend.RETVAL_NULL()
 		return
@@ -8778,7 +8778,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	num = zend.ZendHashNumElements(zend.Z_ARRVAL(args[0]))
 	if num == 0 {
 		for i = 1; i < argc; i++ {
-			if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+			if args[i].GetType() != zend.IS_ARRAY {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 				zend.RETVAL_NULL()
 				return
@@ -8793,14 +8793,14 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		value = nil
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL(args[0])
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				value = _z
@@ -8810,7 +8810,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		if value == nil {
 			for i = 1; i < argc; i++ {
-				if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+				if args[i].GetType() != zend.IS_ARRAY {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 					zend.RETVAL_NULL()
 					return
@@ -8821,7 +8821,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		search_str = zend.ZvalGetTmpString(value, &tmp_search_str)
 		for i = 1; i < argc; i++ {
-			if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+			if args[i].GetType() != zend.IS_ARRAY {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 				zend.RETVAL_NULL()
 				return
@@ -8829,14 +8829,14 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if found == 0 {
 				for {
 					var __ht *zend.HashTable = zend.Z_ARRVAL(args[i])
-					var _p *zend.Bucket = __ht.arData
-					var _end *zend.Bucket = _p + __ht.nNumUsed
+					var _p *zend.Bucket = __ht.GetArData()
+					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.val
+						var _z *zend.Zval = &_p.GetVal()
 						if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 							_z = zend.Z_INDIRECT_P(_z)
 						}
-						if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 							continue
 						}
 						value = _z
@@ -8865,7 +8865,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	num = 0
 	for i = 1; i < argc; i++ {
-		if zend.Z_TYPE(args[i]) != zend.IS_ARRAY {
+		if args[i].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+1, zend.ZendZvalTypeName(&args[i]))
 			zend.RETVAL_NULL()
 			return
@@ -8884,14 +8884,14 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	for i = 1; i < argc; i++ {
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL(args[i])
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				value = _z
@@ -8908,18 +8908,18 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ArrayInitSize(return_value, zend.ZendHashNumElements(zend.Z_ARRVAL(args[0])))
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL(args[0])
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			idx = _p.h
-			key = _p.key
+			idx = _p.GetH()
+			key = _p.GetKey()
 			value = _z
 			str = zend.ZvalGetTmpString(value, &tmp_str)
 			if zend.ZendHashExists(&exclude, str) == 0 {
@@ -8967,7 +8967,7 @@ func PhpMultisortCompare(a any, b any) int {
 			}
 		}
 		r++
-		if zend.Z_TYPE(ab[r].val) == zend.IS_UNDEF {
+		if ab[r].GetVal().IsType(zend.IS_UNDEF) {
 			break
 		}
 	}
@@ -9019,7 +9019,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9032,7 +9032,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -9043,7 +9043,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9215,9 +9215,9 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	for i = 0; i < num_arrays; i++ {
 		k = 0
-		for idx = 0; idx < zend.Z_ARRVAL_P(arrays[i]).nNumUsed; idx++ {
-			p = zend.Z_ARRVAL_P(arrays[i]).arData + idx
-			if zend.Z_TYPE(p.val) == zend.IS_UNDEF {
+		for idx = 0; idx < zend.Z_ARRVAL_P(arrays[i]).GetNNumUsed(); idx++ {
+			p = zend.Z_ARRVAL_P(arrays[i]).GetArData() + idx
+			if p.GetVal().IsType(zend.IS_UNDEF) {
 				continue
 			}
 			indirect[k][i] = *p
@@ -9225,7 +9225,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		}
 	}
 	for k = 0; k < array_size; k++ {
-		zend.ZVAL_UNDEF(&indirect[k][num_arrays].val)
+		zend.ZVAL_UNDEF(&indirect[k][num_arrays].GetVal())
 	}
 
 	/* Do the actual sort magic - bada-bim, bada-boom. */
@@ -9237,21 +9237,21 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	for i = 0; i < num_arrays; i++ {
 		var repack int
 		hash = zend.Z_ARRVAL_P(arrays[i])
-		hash.nNumUsed = array_size
-		hash.nInternalPointer = 0
+		hash.SetNNumUsed(array_size)
+		hash.SetNInternalPointer(0)
 		repack = !(zend.HT_FLAGS(hash) & zend.HASH_FLAG_PACKED)
 		n = 0
 		k = 0
 		for ; k < array_size; k++ {
-			hash.arData[k] = indirect[k][i]
-			if hash.arData[k].key == nil {
+			hash.GetArData()[k] = indirect[k][i]
+			if hash.GetArData()[k].GetKey() == nil {
 				n++
-				hash.arData[k].h = n - 1
+				hash.GetArData()[k].SetH(n - 1)
 			} else {
 				repack = 0
 			}
 		}
-		hash.nNextFreeElement = array_size
+		hash.SetNNextFreeElement(array_size)
 		if repack != 0 {
 			zend.ZendHashToPacked(hash)
 		} else if (zend.HT_FLAGS(hash) & zend.HASH_FLAG_PACKED) == 0 {
@@ -9301,7 +9301,7 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9314,21 +9314,21 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &num_req, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &num_req, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9361,7 +9361,7 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if num_req == 1 {
 		var ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-		if uint32(num_avail < ht.nNumUsed-(ht.nNumUsed>>1)) != 0 {
+		if uint32(num_avail < ht.GetNNumUsed()-(ht.GetNNumUsed()>>1)) != 0 {
 
 			/* If less than 1/2 of elements are used, don't sample. Instead search for a
 			 * specific offset using linear scan. */
@@ -9370,16 +9370,16 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var randval zend.ZendLong = PhpMtRandRange(0, num_avail-1)
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					num_key = _p.h
-					string_key = _p.key
+					num_key = _p.GetH()
+					string_key = _p.GetKey()
 					if i == randval {
 						if string_key != nil {
 							zend.RETVAL_STR_COPY(string_key)
@@ -9401,14 +9401,14 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		 * For N=10 this becomes smaller than 0.1%. */
 
 		for {
-			var randval zend.ZendLong = PhpMtRandRange(0, ht.nNumUsed-1)
-			var bucket *zend.Bucket = &ht.arData[randval]
-			if !(zend.Z_ISUNDEF(bucket.val)) {
-				if bucket.key != nil {
-					zend.RETVAL_STR_COPY(bucket.key)
+			var randval zend.ZendLong = PhpMtRandRange(0, ht.GetNNumUsed()-1)
+			var bucket *zend.Bucket = &ht.GetArData()[randval]
+			if !(zend.Z_ISUNDEF(bucket.GetVal())) {
+				if bucket.GetKey() != nil {
+					zend.RETVAL_STR_COPY(bucket.GetKey())
 					return
 				} else {
-					zend.RETVAL_LONG(bucket.h)
+					zend.RETVAL_LONG(bucket.GetH())
 					return
 				}
 			}
@@ -9450,8 +9450,8 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZendHashRealInitPacked(zend.Z_ARRVAL_P(return_value))
 	for {
 		var __fill_ht *zend.HashTable = zend.Z_ARRVAL_P(return_value)
-		var __fill_bkt *zend.Bucket = __fill_ht.arData + __fill_ht.nNumUsed
-		var __fill_idx uint32 = __fill_ht.nNumUsed
+		var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
+		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		zend.ZEND_ASSERT((zend.HT_FLAGS(__fill_ht) & zend.HASH_FLAG_PACKED) != 0)
 
 		/* We can't use zend_hash_index_find()
@@ -9459,16 +9459,16 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				string_key = _p.key
+				num_key = _p.GetH()
+				string_key = _p.GetKey()
 				if (zend.ZendBitsetIn(bitset, i) ^ negative_bitset) != 0 {
 					if string_key != nil {
 						zend.ZEND_HASH_FILL_SET_STR_COPY(string_key)
@@ -9485,10 +9485,10 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* We can't use zend_hash_index_find()
 		 * because the array may have string keys or gaps. */
 
-		__fill_ht.nNumUsed = __fill_idx
-		__fill_ht.nNumOfElements = __fill_idx
-		__fill_ht.nNextFreeElement = __fill_idx
-		__fill_ht.nInternalPointer = 0
+		__fill_ht.SetNNumUsed(__fill_idx)
+		__fill_ht.SetNNumOfElements(__fill_idx)
+		__fill_ht.SetNNextFreeElement(__fill_idx)
+		__fill_ht.SetNInternalPointer(0)
 		break
 	}
 	zend.FreeAlloca(bitset, use_heap)
@@ -9518,7 +9518,7 @@ func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9531,14 +9531,14 @@ func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9567,12 +9567,12 @@ func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZVAL_LONG(return_value, 0)
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			entry = _z
@@ -9612,7 +9612,7 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9625,14 +9625,14 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9664,12 +9664,12 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			entry = _z
@@ -9678,7 +9678,7 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			zend.ZVAL_COPY(&entry_n, entry)
 			zend.ConvertScalarToNumber(&entry_n)
-			if zend.Z_TYPE(entry_n) == zend.IS_LONG && zend.Z_TYPE_P(return_value) == zend.IS_LONG {
+			if entry_n.IsType(zend.IS_LONG) && zend.Z_TYPE_P(return_value) == zend.IS_LONG {
 				dval = float64(zend.Z_LVAL_P(return_value) * float64(zend.Z_LVAL(entry_n)))
 				if float64(zend.ZEND_LONG_MIN <= dval && dval <= float64(zend.ZEND_LONG_MAX)) {
 					zend.Z_LVAL_P(return_value) *= zend.Z_LVAL(entry_n)
@@ -9723,7 +9723,7 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9736,13 +9736,13 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -9751,7 +9751,7 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			_optional = 1
@@ -9759,7 +9759,7 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZendParseArgZvalDeref(_arg, &initial, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9801,24 +9801,24 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		zend.ZendReleaseFcallInfoCache(&fci_cache)
 		return
 	}
-	fci.retval = &retval
-	fci.param_count = 2
-	fci.no_separation = 0
+	fci.SetRetval(&retval)
+	fci.SetParamCount(2)
+	fci.SetNoSeparation(0)
 	for {
 		var __ht *zend.HashTable = htbl
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			operand = _z
 			zend.ZVAL_COPY_VALUE(&args[0], &result)
 			zend.ZVAL_COPY(&args[1], operand)
-			fci.params = args
-			if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && zend.Z_TYPE(retval) != zend.IS_UNDEF {
+			fci.SetParams(args)
+			if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 				zend.ZvalPtrDtor(&args[1])
 				zend.ZvalPtrDtor(&args[0])
 				zend.ZVAL_COPY_VALUE(&result, &retval)
@@ -9866,7 +9866,7 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -9879,14 +9879,14 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -9895,18 +9895,18 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &use_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &use_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -9939,30 +9939,30 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if zend.ZEND_NUM_ARGS() > 1 {
 		have_callback = 1
-		fci.no_separation = 0
-		fci.retval = &retval
+		fci.SetNoSeparation(0)
+		fci.SetRetval(&retval)
 		if use_type == ARRAY_FILTER_USE_BOTH {
-			fci.param_count = 2
+			fci.SetParamCount(2)
 			key = &args[1]
 		} else {
-			fci.param_count = 1
+			fci.SetParamCount(1)
 			key = &args[0]
 		}
 	}
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 			if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 				_z = zend.Z_INDIRECT_P(_z)
 			}
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			string_key = _p.key
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
 			operand = _z
 			if have_callback != 0 {
 				if use_type != 0 {
@@ -9981,7 +9981,7 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				if use_type != ARRAY_FILTER_USE_KEY {
 					zend.ZVAL_COPY(&args[0], operand)
 				}
-				fci.params = args
+				fci.SetParams(args)
 				if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS {
 					var retval_true int
 					zend.ZvalPtrDtor(&args[0])
@@ -10044,7 +10044,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -10057,7 +10057,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 1, &_error) == 0) {
+			if zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 1, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -10066,11 +10066,11 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					_error_code = zend.ZPP_ERROR_WRONG_CALLBACK
 					break
 				}
-			} else if zend.UNEXPECTED(_error != nil) {
+			} else if _error != nil {
 				zend.ZendWrongCallbackDeprecated(_i, _error)
 			}
 			var _num_varargs int = _num_args - _i - 0
-			if zend.EXPECTED(_num_varargs > 0) {
+			if _num_varargs > 0 {
 				arrays = _real_arg + 1
 				n_arrays = _num_varargs
 				_i += _num_varargs
@@ -10081,7 +10081,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -10114,7 +10114,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var zv *zend.Zval
 		var arg zend.Zval
 		var ret int
-		if zend.Z_TYPE(arrays[0]) != zend.IS_ARRAY {
+		if arrays[0].GetType() != zend.IS_ARRAY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter 2 to be an array, %s given", zend.ZendZvalTypeName(&arrays[0]))
 			return
 		}
@@ -10131,27 +10131,27 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendHashRealInit(zend.Z_ARRVAL_P(return_value), zend.HT_FLAGS(zend.Z_ARRVAL(arrays[0]))&zend.HASH_FLAG_PACKED)
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL(arrays[0])
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 				if zend.Z_TYPE_P(_z) == zend.IS_INDIRECT {
 					_z = zend.Z_INDIRECT_P(_z)
 				}
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				str_key = _p.key
+				num_key = _p.GetH()
+				str_key = _p.GetKey()
 				zv = _z
-				fci.retval = &result
-				fci.param_count = 1
-				fci.params = &arg
-				fci.no_separation = 0
+				fci.SetRetval(&result)
+				fci.SetParamCount(1)
+				fci.SetParams(&arg)
+				fci.SetNoSeparation(0)
 				zend.ZVAL_COPY(&arg, zv)
 				ret = zend.ZendCallFunction(&fci, &fci_cache)
 				zend.IZvalPtrDtor(&arg)
-				if ret != zend.SUCCESS || zend.Z_TYPE(result) == zend.IS_UNDEF {
+				if ret != zend.SUCCESS || result.IsType(zend.IS_UNDEF) {
 					zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
 					zend.RETVAL_NULL()
 					return
@@ -10168,7 +10168,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else {
 		var array_pos *uint32 = (*zend.HashPosition)(zend.Ecalloc(n_arrays, b.SizeOf("HashPosition")))
 		for i = 0; i < n_arrays; i++ {
-			if zend.Z_TYPE(arrays[i]) != zend.IS_ARRAY {
+			if arrays[i].GetType() != zend.IS_ARRAY {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Expected parameter %d to be an array, %s given", i+2, zend.ZendZvalTypeName(&arrays[i]))
 				zend.Efree(array_pos)
 				return
@@ -10196,11 +10196,11 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 					var pos uint32 = array_pos[i]
 					for true {
-						if pos >= zend.Z_ARRVAL(arrays[i]).nNumUsed {
+						if pos >= zend.Z_ARRVAL(arrays[i]).GetNNumUsed() {
 							zend.ZVAL_NULL(&zv)
 							break
-						} else if zend.Z_TYPE(zend.Z_ARRVAL(arrays[i]).arData[pos].val) != zend.IS_UNDEF {
-							zend.ZVAL_COPY(&zv, &zend.Z_ARRVAL(arrays[i]).arData[pos].val)
+						} else if zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal().GetType() != zend.IS_UNDEF {
+							zend.ZVAL_COPY(&zv, &zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
 							array_pos[i] = pos + 1
 							break
 						}
@@ -10226,22 +10226,22 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 					var pos uint32 = array_pos[i]
 					for true {
-						if pos >= zend.Z_ARRVAL(arrays[i]).nNumUsed {
+						if pos >= zend.Z_ARRVAL(arrays[i]).GetNNumUsed() {
 							zend.ZVAL_NULL(&params[i])
 							break
-						} else if zend.Z_TYPE(zend.Z_ARRVAL(arrays[i]).arData[pos].val) != zend.IS_UNDEF {
-							zend.ZVAL_COPY(&params[i], &zend.Z_ARRVAL(arrays[i]).arData[pos].val)
+						} else if zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal().GetType() != zend.IS_UNDEF {
+							zend.ZVAL_COPY(&params[i], &zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
 							array_pos[i] = pos + 1
 							break
 						}
 						pos++
 					}
 				}
-				fci.retval = &result
-				fci.param_count = n_arrays
-				fci.params = params
-				fci.no_separation = 0
-				if zend.ZendCallFunction(&fci, &fci_cache) != zend.SUCCESS || zend.Z_TYPE(result) == zend.IS_UNDEF {
+				fci.SetRetval(&result)
+				fci.SetParamCount(n_arrays)
+				fci.SetParams(params)
+				fci.SetNoSeparation(0)
+				if zend.ZendCallFunction(&fci, &fci_cache) != zend.SUCCESS || result.IsType(zend.IS_UNDEF) {
 					zend.Efree(array_pos)
 					zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
 					for i = 0; i < n_arrays; i++ {
@@ -10288,7 +10288,7 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -10303,14 +10303,14 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &key, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &array, 0, 1) == 0) {
+			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -10336,7 +10336,7 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		}
 		break
 	}
-	if zend.EXPECTED(zend.Z_TYPE_P(array) == zend.IS_ARRAY) {
+	if zend.Z_TYPE_P(array) == zend.IS_ARRAY {
 		ht = zend.Z_ARRVAL_P(array)
 	} else {
 		ht = zend.ZendGetPropertiesFor(array, zend.ZEND_PROP_PURPOSE_ARRAY_CAST)
@@ -10391,7 +10391,7 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -10404,27 +10404,27 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &input, 0, 0) == 0) {
+			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &preserve_keys, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -10465,25 +10465,25 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			size = 1
 		}
 	}
-	zend.ArrayInitSize(return_value, uint32_t((num_in-1)/size+1))
+	zend.ArrayInitSize(return_value, uint32((num_in-1)/size+1))
 	zend.ZVAL_UNDEF(&chunk)
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(input)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			num_key = _p.h
-			str_key = _p.key
+			num_key = _p.GetH()
+			str_key = _p.GetKey()
 			entry = _z
 
 			/* If new chunk, create and initialize it. */
 
-			if zend.Z_TYPE(chunk) == zend.IS_UNDEF {
+			if chunk.IsType(zend.IS_UNDEF) {
 				zend.ArrayInitSize(&chunk, uint32(size))
 			}
 
@@ -10517,7 +10517,7 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	/* Add the final chunk if there is one. */
 
-	if zend.Z_TYPE(chunk) != zend.IS_UNDEF {
+	if chunk.GetType() != zend.IS_UNDEF {
 		zend.AddNextIndexZval(return_value, &chunk)
 	}
 
@@ -10552,7 +10552,7 @@ func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -10565,20 +10565,20 @@ func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &keys, 0, 0, 0) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &keys, 0, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &values, 0, 0, 0) == 0) {
+			if zend.ZendParseArgArrayHt(_arg, &values, 0, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -10618,20 +10618,20 @@ func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ArrayInitSize(return_value, num_keys)
 	for {
 		var __ht *zend.HashTable = keys
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			entry_keys = _z
 			for true {
-				if pos_values >= values.nNumUsed {
+				if pos_values >= values.GetNNumUsed() {
 					break
-				} else if zend.Z_TYPE(values.arData[pos_values].val) != zend.IS_UNDEF {
-					entry_values = &values.arData[pos_values].val
+				} else if values.GetArData()[pos_values].GetVal().GetType() != zend.IS_UNDEF {
+					entry_values = &values.GetArData()[pos_values].GetVal()
 					if zend.Z_TYPE_P(entry_keys) == zend.IS_LONG {
 						entry_values = zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), zend.Z_LVAL_P(entry_keys), entry_values)
 					} else {

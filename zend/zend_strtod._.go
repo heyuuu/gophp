@@ -43,8 +43,8 @@ package zend
  *
  ***************************************************************/
 
-const Long = int32_t
-const ULong = uint32_t
+const Long = int32
+const ULong = uint32
 const MALLOC = Malloc
 const STRTOD_DIGLIM = 40
 const StrtodDiglim = STRTOD_DIGLIM

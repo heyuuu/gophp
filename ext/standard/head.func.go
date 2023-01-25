@@ -33,7 +33,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -46,27 +46,27 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &ctr.line, &len_, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &rep, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &rep, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &ctr.response_code, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &ctr.GetResponseCode(), &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -92,7 +92,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	ctr.line_len = uint32(len_)
+	ctr.SetLineLen(uint32(len_))
 	core.SapiHeaderOp(b.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
 }
 func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -119,7 +119,7 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -133,14 +133,14 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &ctr.line, &len_, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -166,7 +166,7 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	ctr.line_len = uint32(len_)
+	ctr.SetLineLen(uint32(len_))
 	core.SapiHeaderOp(b.Cond(zend.ZEND_NUM_ARGS() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
 }
 func PhpHeader() int {
@@ -269,10 +269,10 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 		zend.SmartStrAppends(&buf, COOKIE_SAMESITE)
 		zend.SmartStrAppend(&buf, samesite)
 	}
-	ctr.line = zend.ZSTR_VAL(buf.s)
-	ctr.line_len = uint32(zend.ZSTR_LEN(buf.s))
+	ctr.SetLine(zend.ZSTR_VAL(buf.GetS()))
+	ctr.SetLineLen(uint32(zend.ZSTR_LEN(buf.GetS())))
 	result = core.SapiHeaderOp(core.SAPI_HEADER_ADD, &ctr)
-	zend.ZendStringRelease(buf.s)
+	zend.ZendStringRelease(buf.GetS())
 	return result
 }
 func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, path **zend.ZendString, domain **zend.ZendString, secure *zend.ZendBool, httponly *zend.ZendBool, samesite **zend.ZendString) {
@@ -281,15 +281,15 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 	var value *zend.Zval
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(options)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			key = _p.key
+			key = _p.GetKey()
 			value = _z
 			if key != nil {
 				if zend.ZendStringEqualsLiteralCi(key, "expires") {
@@ -359,7 +359,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -372,14 +372,14 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &name, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &value, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &value, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -387,32 +387,32 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &path, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &path, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &domain, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &domain, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -440,7 +440,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if expires_or_options != nil {
 		if zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
-			if zend.UNEXPECTED(zend.ZEND_NUM_ARGS() > 3) {
+			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
 				return
@@ -450,7 +450,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			expires = zend.ZvalGetLong(expires_or_options)
 		}
 	}
-	if zend.ExecutorGlobals.exception == nil {
+	if zend.ExecutorGlobals.GetException() == nil {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 1) == zend.SUCCESS {
 			zend.RETVAL_TRUE
 		} else {
@@ -500,7 +500,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -513,14 +513,14 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &name, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &value, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &value, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -528,32 +528,32 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &expires_or_options, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &path, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &path, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &domain, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &domain, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &secure, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &httponly, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -581,7 +581,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	if expires_or_options != nil {
 		if zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
-			if zend.UNEXPECTED(zend.ZEND_NUM_ARGS() > 3) {
+			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
 				return
@@ -591,7 +591,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			expires = zend.ZvalGetLong(expires_or_options)
 		}
 	}
-	if zend.ExecutorGlobals.exception == nil {
+	if zend.ExecutorGlobals.GetException() == nil {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 0) == zend.SUCCESS {
 			zend.RETVAL_TRUE
 		} else {
@@ -636,7 +636,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -655,7 +655,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZendParseArgZvalDeref(_arg, &arg2, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -707,7 +707,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 func PhpHeadApplyHeaderListToHash(data any, arg any) {
 	var sapi_header *core.SapiHeader = (*core.SapiHeader)(data)
 	if arg && sapi_header != nil {
-		zend.AddNextIndexString((*zend.Zval)(arg), (*byte)(sapi_header.header))
+		zend.AddNextIndexString((*zend.Zval)(arg), (*byte)(sapi_header.GetHeader()))
 	}
 }
 func ZifHeadersList(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -740,7 +740,7 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -754,14 +754,14 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &response_code, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &response_code, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {

@@ -330,7 +330,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
 		"short_open_tag",
 		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*zend.ZendCompilerGlobals)(nil).short_tags)) - (*byte)(nil))),
+		any(zend_long((*byte)(&((*zend.ZendCompilerGlobals)(nil).GetShortTags())) - (*byte)(nil))),
 		any(&zend.CompilerGlobals),
 		nil,
 		DEFAULT_SHORT_OPEN_TAG,
@@ -773,7 +773,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
 		"realpath_cache_size",
 		zend.OnUpdateLong,
-		any(zend_long((*byte)(&((*zend.VirtualCwdGlobals)(nil).realpath_cache_size_limit)) - (*byte)(nil))),
+		any(zend_long((*byte)(&((*zend.VirtualCwdGlobals)(nil).GetRealpathCacheSizeLimit())) - (*byte)(nil))),
 		any(&zend.CwdGlobals),
 		nil,
 		"4096K",
@@ -785,7 +785,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
 		"realpath_cache_ttl",
 		zend.OnUpdateLong,
-		any(zend_long((*byte)(&((*zend.VirtualCwdGlobals)(nil).realpath_cache_ttl)) - (*byte)(nil))),
+		any(zend_long((*byte)(&((*zend.VirtualCwdGlobals)(nil).GetRealpathCacheTtl())) - (*byte)(nil))),
 		any(&zend.CwdGlobals),
 		nil,
 		"120",
@@ -821,7 +821,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
 		"hard_timeout",
 		zend.OnUpdateLong,
-		any(zend_long((*byte)(&((*zend.ZendExecutorGlobals)(nil).hard_timeout)) - (*byte)(nil))),
+		any(zend_long((*byte)(&((*zend.ZendExecutorGlobals)(nil).GetHardTimeout())) - (*byte)(nil))),
 		any(&zend.ExecutorGlobals),
 		nil,
 		"2",

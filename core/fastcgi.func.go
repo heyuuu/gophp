@@ -8,7 +8,7 @@ import (
 )
 
 func FCGI_HASH_FUNC(var_ __auto__, var_len int) __auto__ {
-	if zend.UNEXPECTED(var_len < 3) {
+	if var_len < 3 {
 		return uint(var_len)
 	} else {
 		return (uint(var_[3]) << 2) + (uint(var_[var_len-2]) << 4) + (uint(var_[var_len-1]) << 2) + var_len
@@ -71,7 +71,7 @@ func FcgiHashClean(h *FcgiHash) {
 }
 func FcgiHashStrndup(h *FcgiHash, str *byte, str_len uint) *byte {
 	var ret *byte
-	if zend.UNEXPECTED(h.GetData().GetPos()+str_len+1 >= h.GetData().GetEnd()) {
+	if h.GetData().GetPos()+str_len+1 >= h.GetData().GetEnd() {
 		var seg_size uint = b.Cond(str_len+1 > FCGI_HASH_SEG_SIZE, str_len+1, FCGI_HASH_SEG_SIZE)
 		var p *FcgiDataSeg = (*FcgiDataSeg)(zend.Malloc(b.SizeOf("fcgi_data_seg") - 1 + seg_size))
 		p.SetPos(p.GetData())
@@ -88,15 +88,15 @@ func FcgiHashStrndup(h *FcgiHash, str *byte, str_len uint) *byte {
 func FcgiHashSet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val *byte, val_len uint) *byte {
 	var idx uint = hash_value & FCGI_HASH_TABLE_MASK
 	var p *FcgiHashBucket = h.GetHashTable()[idx]
-	for zend.UNEXPECTED(p != nil) {
-		if zend.UNEXPECTED(p.GetHashValue() == hash_value) && p.GetVarLen() == var_len && memcmp(p.GetVar(), var_, var_len) == 0 {
+	for p != nil {
+		if p.GetHashValue() == hash_value && p.GetVarLen() == var_len && memcmp(p.GetVar(), var_, var_len) == 0 {
 			p.SetValLen(val_len)
 			p.SetVal(FcgiHashStrndup(h, val, val_len))
 			return p.GetVal()
 		}
 		p = p.GetNext()
 	}
-	if zend.UNEXPECTED(h.GetBuckets().GetIdx() >= FCGI_HASH_TABLE_SIZE) {
+	if h.GetBuckets().GetIdx() >= FCGI_HASH_TABLE_SIZE {
 		var b *FcgiHashBuckets = (*FcgiHashBuckets)(zend.Malloc(b.SizeOf("fcgi_hash_buckets")))
 		b.SetIdx(0)
 		b.SetNext(h.GetBuckets())
@@ -117,7 +117,7 @@ func FcgiHashSet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val *by
 }
 func FcgiHashDel(h *FcgiHash, hash_value uint, var_ *byte, var_len uint) {
 	var idx uint = hash_value & FCGI_HASH_TABLE_MASK
-	var p **FcgiHashBucket = &h.hash_table[idx]
+	var p **FcgiHashBucket = &h.GetHashTable()[idx]
 	for (*p) != nil {
 		if (*p).GetHashValue() == hash_value && (*p).GetVarLen() == var_len && memcmp((*p).GetVar(), var_, var_len) == 0 {
 			(*p).SetVal(nil)
@@ -125,7 +125,7 @@ func FcgiHashDel(h *FcgiHash, hash_value uint, var_ *byte, var_len uint) {
 			*p = (*p).GetNext()
 			return
 		}
-		p = &(*p).next
+		p = &(*p).GetNext()
 	}
 }
 func FcgiHashGet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val_len *uint) *byte {
@@ -143,7 +143,7 @@ func FcgiHashGet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val_len
 func FcgiHashApply(h *FcgiHash, func_ FcgiApplyFunc, arg any) {
 	var p *FcgiHashBucket = h.GetList()
 	for p != nil {
-		if zend.EXPECTED(p.GetVal() != nil) {
+		if p.GetVal() != nil {
 			func_(p.GetVar(), p.GetVarLen(), p.GetVal(), p.GetValLen(), arg)
 		}
 		p = p.GetListNext()
@@ -242,7 +242,7 @@ func FcgiListen(path *byte, backlog int) int {
 	/* Prepare socket address */
 
 	if tcp != 0 {
-		memset(&sa.sa_inet, 0, b.SizeOf("sa . sa_inet"))
+		memset(&sa.GetSaInet(), 0, b.SizeOf("sa . sa_inet"))
 		sa.sa_inet.sin_family = AF_INET
 		sa.sa_inet.sin_port = htons(port)
 		sock_len = b.SizeOf("sa . sa_inet")
@@ -273,7 +273,7 @@ func FcgiListen(path *byte, backlog int) int {
 			FcgiLog(FCGI_ERROR, "Listening socket's path name is too long.\n")
 			return -1
 		}
-		memset(&sa.sa_unix, 0, b.SizeOf("sa . sa_unix"))
+		memset(&sa.GetSaUnix(), 0, b.SizeOf("sa . sa_unix"))
 		sa.sa_unix.sun_family = AF_UNIX
 		memcpy(sa.sa_unix.sun_path, path, path_len+1)
 		sock_len = size_t((*__struct__sockaddr_un)(0).sun_path) + path_len
@@ -421,11 +421,11 @@ func FcgiInitRequest(listen_socket int, on_accept func(), on_read func(), on_clo
 	} else {
 		req.GetHook().SetOnClose(FcgiHookDummy)
 	}
-	FcgiHashInit(&req.env)
+	FcgiHashInit(&req.GetEnv())
 	return req
 }
 func FcgiDestroyRequest(req *FcgiRequest) {
-	FcgiHashDestroy(&req.env)
+	FcgiHashDestroy(&req.GetEnv())
 	zend.Free(req)
 }
 func SafeWrite(req *FcgiRequest, buf any, count int) ssize_t {
@@ -485,8 +485,8 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 	for p < end {
 		*p++
 		name_len = (*p) - 1
-		if zend.UNEXPECTED(name_len >= 128) {
-			if zend.UNEXPECTED(p+3 >= end) {
+		if name_len >= 128 {
+			if p+3 >= end {
 				return 0
 			}
 			name_len = (name_len & 0x7f) << 24
@@ -495,13 +495,13 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 			*p++
 			name_len |= (*p) - 1
 		}
-		if zend.UNEXPECTED(p >= end) {
+		if p >= end {
 			return 0
 		}
 		*p++
 		val_len = (*p) - 1
-		if zend.UNEXPECTED(val_len >= 128) {
-			if zend.UNEXPECTED(p+3 >= end) {
+		if val_len >= 128 {
+			if p+3 >= end {
 				return 0
 			}
 			val_len = (val_len & 0x7f) << 24
@@ -510,7 +510,7 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 			*p++
 			val_len |= (*p) - 1
 		}
-		if zend.UNEXPECTED(name_len+val_len > uint(end-p)) {
+		if name_len+val_len > uint(end-p) {
 
 			/* Malformated request */
 
@@ -519,7 +519,7 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 			/* Malformated request */
 
 		}
-		FcgiHashSet(&req.env, FCGI_HASH_FUNC(p, name_len), (*byte)(p), name_len, (*byte)(p+name_len), val_len)
+		FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC(p, name_len), (*byte)(p), name_len, (*byte)(p+name_len), val_len)
 		p += name_len + val_len
 	}
 	return 1
@@ -535,7 +535,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 	req.SetOutHdr(nil)
 	req.SetOutPos(req.GetOutBuf())
 	if req.GetHasEnv() != 0 {
-		FcgiHashClean(&req.env)
+		FcgiHashClean(&req.GetEnv())
 	} else {
 		req.SetHasEnv(1)
 	}
@@ -564,13 +564,13 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		req.SetKeep(b.GetFlags() & FCGI_KEEP_CONN)
 		switch (b.GetRoleB1() << 8) + b.GetRoleB0() {
 		case FCGI_RESPONDER:
-			FcgiHashSet(&req.env, FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
+			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
 			break
 		case FCGI_AUTHORIZER:
-			FcgiHashSet(&req.env, FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
+			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
 			break
 		case FCGI_FILTER:
-			FcgiHashSet(&req.env, FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
+			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
 			break
 		default:
 			return 0
@@ -707,7 +707,7 @@ func FcgiRead(req *FcgiRequest, str *byte, len_ int) int {
 }
 func FcgiClose(req *FcgiRequest, force int, destroy int) {
 	if destroy != 0 && req.GetHasEnv() != 0 {
-		FcgiHashClean(&req.env)
+		FcgiHashClean(&req.GetEnv())
 		req.SetHasEnv(0)
 	}
 	if (force != 0 || req.GetKeep() == 0) && req.GetFd() >= 0 {
@@ -825,7 +825,7 @@ func FcgiFlush(req *FcgiRequest, end int) int {
 	len_ = int(req.GetOutPos() - req.GetOutBuf())
 	if end != 0 {
 		var rec *FcgiEndRequestRec = (*FcgiEndRequestRec)(req.GetOutPos())
-		FcgiMakeHeader(&rec.hdr, FCGI_END_REQUEST, req.GetId(), b.SizeOf("fcgi_end_request"))
+		FcgiMakeHeader(&rec.GetHdr(), FCGI_END_REQUEST, req.GetId(), b.SizeOf("fcgi_end_request"))
 		rec.GetBody().SetAppStatusB3(0)
 		rec.GetBody().SetAppStatusB2(0)
 		rec.GetBody().SetAppStatusB1(0)
@@ -947,33 +947,33 @@ func FcgiGetenv(req *FcgiRequest, var_ *byte, var_len int) *byte {
 	if req == nil {
 		return nil
 	}
-	return FcgiHashGet(&req.env, FCGI_HASH_FUNC(var_, var_len), (*byte)(var_), var_len, &val_len)
+	return FcgiHashGet(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), (*byte)(var_), var_len, &val_len)
 }
 func FcgiQuickGetenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint) *byte {
 	var val_len uint
-	return FcgiHashGet(&req.env, hash_value, (*byte)(var_), var_len, &val_len)
+	return FcgiHashGet(&req.GetEnv(), hash_value, (*byte)(var_), var_len, &val_len)
 }
 func FcgiPutenv(req *FcgiRequest, var_ *byte, var_len int, val *byte) *byte {
 	if req == nil {
 		return nil
 	}
 	if val == nil {
-		FcgiHashDel(&req.env, FCGI_HASH_FUNC(var_, var_len), var_, var_len)
+		FcgiHashDel(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len)
 		return nil
 	} else {
-		return FcgiHashSet(&req.env, FCGI_HASH_FUNC(var_, var_len), var_, var_len, val, uint(strlen(val)))
+		return FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len, val, uint(strlen(val)))
 	}
 }
 func FcgiQuickPutenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint, val *byte) *byte {
 	if val == nil {
-		FcgiHashDel(&req.env, hash_value, var_, var_len)
+		FcgiHashDel(&req.GetEnv(), hash_value, var_, var_len)
 		return nil
 	} else {
-		return FcgiHashSet(&req.env, hash_value, var_, var_len, val, uint(strlen(val)))
+		return FcgiHashSet(&req.GetEnv(), hash_value, var_, var_len, val, uint(strlen(val)))
 	}
 }
 func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *zend.Zval) {
-	FcgiHashApply(&req.env, func_, array)
+	FcgiHashApply(&req.GetEnv(), func_, array)
 }
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue zend.Zval

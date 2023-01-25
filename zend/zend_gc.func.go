@@ -16,14 +16,14 @@ func GC_MAY_LEAK(ref *ZendRefcounted) bool {
 	return (GC_TYPE_INFO(ref) & (GC_INFO_MASK | GC_COLLECTABLE<<GC_FLAGS_SHIFT)) == GC_COLLECTABLE<<GC_FLAGS_SHIFT
 }
 func GcCheckPossibleRoot(ref *ZendRefcounted) {
-	if EXPECTED(GC_TYPE_INFO(ref) == IS_REFERENCE) {
-		var zv *Zval = &((*ZendReference)(ref)).val
+	if GC_TYPE_INFO(ref) == IS_REFERENCE {
+		var zv *Zval = &((*ZendReference)(ref)).GetVal()
 		if !(Z_COLLECTABLE_P(zv)) {
 			return
 		}
 		ref = Z_COUNTED_P(zv)
 	}
-	if UNEXPECTED(GC_MAY_LEAK(ref)) {
+	if GC_MAY_LEAK(ref) {
 		GcPossibleRoot(ref)
 	}
 }
@@ -48,30 +48,30 @@ func GC_REF_SET_BLACK(ref __auto__) {
 func GC_REF_SET_PURPLE(ref __auto__) {
 	GC_TYPE_INFO(ref) |= GC_COLOR << GC_INFO_SHIFT
 }
-func GC_GET_PTR(ptr *ZendRefcounted) any { return any(uintptr_t(ptr) & ^GC_BITS) }
+func GC_GET_PTR(ptr *ZendRefcounted) any { return any(uintPtr(ptr) & ^GC_BITS) }
 func GC_IS_ROOT(ptr *ZendRefcounted) bool {
-	return (uintptr_t(ptr) & GC_BITS) == GC_ROOT
+	return (uintPtr(ptr) & GC_BITS) == GC_ROOT
 }
 func GC_IS_UNUSED(ptr *ZendRefcounted) bool {
-	return (uintptr_t(ptr) & GC_BITS) == GC_UNUSED
+	return (uintPtr(ptr) & GC_BITS) == GC_UNUSED
 }
 func GC_IS_GARBAGE(ptr *ZendRefcounted) bool {
-	return (uintptr_t(ptr) & GC_BITS) == GC_GARBAGE
+	return (uintPtr(ptr) & GC_BITS) == GC_GARBAGE
 }
 func GC_IS_DTOR_GARBAGE(ptr *ZendRefcounted) bool {
-	return (uintptr_t(ptr) & GC_BITS) == GC_DTOR_GARBAGE
+	return (uintPtr(ptr) & GC_BITS) == GC_DTOR_GARBAGE
 }
-func GC_MAKE_GARBAGE(ptr __auto__) any { return any(uintptr_t(ptr) | GC_GARBAGE) }
+func GC_MAKE_GARBAGE(ptr __auto__) any { return any(uintPtr(ptr) | GC_GARBAGE) }
 func GC_MAKE_DTOR_GARBAGE(ptr *ZendObject) any {
-	return any(uintptr_t(ptr) | GC_DTOR_GARBAGE)
+	return any(uintPtr(ptr) | GC_DTOR_GARBAGE)
 }
 func GC_IDX2PTR(idx __auto__) __auto__ { return GC_G(buf) + idx }
 func GC_PTR2IDX(ptr *GcRootBuffer) int { return ptr - GC_G(buf) }
 func GC_IDX2LIST(idx uint32) any {
-	return any(uintptr_t(idx*b.SizeOf("void *") | GC_UNUSED))
+	return any(uintPtr(idx*b.SizeOf("void *") | GC_UNUSED))
 }
 func GC_LIST2IDX(list *ZendRefcounted) int {
-	return uint32_t(uintptr_t)(list) / b.SizeOf("void *")
+	return uint32(uintPtr)(list) / b.SizeOf("void *")
 }
 func GC_HAS_UNUSED() bool               { return GC_G(unused) != GC_INVALID }
 func GC_FETCH_UNUSED() uint32           { return GcFetchUnused() }
@@ -90,7 +90,7 @@ func GC_STACK_DCL(init *GcStack) {
 func GC_STACK_PUSH(ref *ZendRefcounted) { GcStackPush(&_stack, &_top, ref) }
 func GC_STACK_POP() *ZendRefcounted     { return GcStackPop(&_stack, &_top) }
 func GcStackNext(stack *GcStack) *GcStack {
-	if UNEXPECTED(stack.GetNext() == nil) {
+	if stack.GetNext() == nil {
 		var segment *GcStack = Emalloc(b.SizeOf("gc_stack"))
 		segment.SetPrev(stack)
 		segment.SetNext(nil)
@@ -99,14 +99,14 @@ func GcStackNext(stack *GcStack) *GcStack {
 	return stack.GetNext()
 }
 func GcStackPush(stack **GcStack, top *int, ref *ZendRefcounted) {
-	if UNEXPECTED((*top) == GC_STACK_SEGMENT_SIZE) {
+	if (*top) == GC_STACK_SEGMENT_SIZE {
 		*stack = GcStackNext(*stack)
 		*top = 0
 	}
 	(*stack).GetData()[b.PostInc(&(*top))] = ref
 }
 func GcStackPop(stack **GcStack, top *int) *ZendRefcounted {
-	if UNEXPECTED((*top) == 0) {
+	if (*top) == 0 {
 		if (*stack).GetPrev() == nil {
 			return nil
 		} else {
@@ -127,14 +127,14 @@ func GcStackFree(stack *GcStack) {
 	}
 }
 func GcCompress(idx uint32) uint32 {
-	if EXPECTED(idx < GC_MAX_UNCOMPRESSED) {
+	if idx < GC_MAX_UNCOMPRESSED {
 		return idx
 	}
 	return idx%GC_MAX_UNCOMPRESSED | GC_MAX_UNCOMPRESSED
 }
 func GcDecompress(ref *ZendRefcounted, idx uint32) *GcRootBuffer {
 	var root *GcRootBuffer = GC_IDX2PTR(idx)
-	if EXPECTED(GC_GET_PTR(root.GetRef()) == ref) {
+	if GC_GET_PTR(root.GetRef()) == ref {
 		return root
 	}
 	for true {
@@ -292,20 +292,20 @@ func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 	if GcGlobals.GetGcEnabled() != 0 && GcGlobals.GetGcActive() == 0 {
 		GC_ADDREF(ref)
 		GcAdjustThreshold(GcCollectCycles())
-		if UNEXPECTED(GC_DELREF(ref) != 0) == 0 {
+		if GC_DELREF(ref) == 0 {
 			RcDtorFunc(ref)
 			return
-		} else if UNEXPECTED(GC_INFO(ref) != 0) {
+		} else if GC_INFO(ref) != 0 {
 			return
 		}
 	}
 	if GC_HAS_UNUSED() {
 		idx = GC_FETCH_UNUSED()
-	} else if EXPECTED(GC_HAS_NEXT_UNUSED()) {
+	} else if GC_HAS_NEXT_UNUSED() {
 		idx = GC_FETCH_NEXT_UNUSED()
 	} else {
 		GcGrowRootBuffer()
-		if UNEXPECTED(!(GC_HAS_NEXT_UNUSED())) {
+		if !(GC_HAS_NEXT_UNUSED()) {
 			return
 		}
 		idx = GC_FETCH_NEXT_UNUSED()
@@ -319,12 +319,12 @@ func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 func GcPossibleRoot(ref *ZendRefcounted) {
 	var idx uint32
 	var newRoot *GcRootBuffer
-	if UNEXPECTED(GcGlobals.GetGcProtected() != 0) {
+	if GcGlobals.GetGcProtected() != 0 {
 		return
 	}
-	if EXPECTED(GC_HAS_UNUSED()) {
+	if GC_HAS_UNUSED() {
 		idx = GC_FETCH_UNUSED()
-	} else if EXPECTED(GC_HAS_NEXT_UNUSED_UNDER_THRESHOLD()) {
+	} else if GC_HAS_NEXT_UNUSED_UNDER_THRESHOLD() {
 		idx = GC_FETCH_NEXT_UNUSED()
 	} else {
 		GcPossibleRootWhenFull(ref)
@@ -352,7 +352,7 @@ func GcRemoveFromBuffer(ref *ZendRefcounted) {
 
 	/* Perform decompression only in case of large buffers */
 
-	if UNEXPECTED(GcGlobals.GetFirstUnused() >= GC_MAX_UNCOMPRESSED) {
+	if GcGlobals.GetFirstUnused() >= GC_MAX_UNCOMPRESSED {
 		GcRemoveCompressed(ref, idx)
 		return
 	}
@@ -369,7 +369,7 @@ func GcScanBlack(ref *ZendRefcounted, stack *GcStack) {
 tail_call:
 	if GC_TYPE(ref) == IS_OBJECT {
 		var obj *ZendObject = (*ZendObject)(ref)
-		if EXPECTED((OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0) {
+		if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
 			var n int
 			var zv *Zval
 			var end *Zval
@@ -377,7 +377,7 @@ tail_call:
 			ZVAL_OBJ(&tmp, obj)
 			ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 			end = zv + n
-			if EXPECTED(ht == nil) || UNEXPECTED(GC_REF_CHECK_COLOR(ht, GC_BLACK)) {
+			if ht == nil || GC_REF_CHECK_COLOR(ht, GC_BLACK) {
 				ht = nil
 				if n == 0 {
 					goto next
@@ -401,7 +401,7 @@ tail_call:
 				}
 				zv++
 			}
-			if EXPECTED(ht == nil) {
+			if ht == nil {
 				ref = Z_COUNTED_P(zv)
 				GC_ADDREF(ref)
 				if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
@@ -439,7 +439,7 @@ tail_call:
 	end = p + ht.GetNNumUsed()
 	for true {
 		end--
-		zv = &end.val
+		zv = &end.GetVal()
 		if Z_TYPE_P(zv) == IS_INDIRECT {
 			zv = Z_INDIRECT_P(zv)
 		}
@@ -451,7 +451,7 @@ tail_call:
 		}
 	}
 	for p != end {
-		zv = &p.val
+		zv = &p.GetVal()
 		if Z_TYPE_P(zv) == IS_INDIRECT {
 			zv = Z_INDIRECT_P(zv)
 		}
@@ -465,7 +465,7 @@ tail_call:
 		}
 		p++
 	}
-	zv = &p.val
+	zv = &p.GetVal()
 	if Z_TYPE_P(zv) == IS_INDIRECT {
 		zv = Z_INDIRECT_P(zv)
 	}
@@ -490,7 +490,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 	for {
 		if GC_TYPE(ref) == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if EXPECTED((OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0) {
+			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -498,7 +498,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				ZVAL_OBJ(&tmp, obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
-				if EXPECTED(ht == nil) || UNEXPECTED(GC_REF_CHECK_COLOR(ht, GC_GREY)) {
+				if ht == nil || GC_REF_CHECK_COLOR(ht, GC_GREY) {
 					ht = nil
 					if n == 0 {
 						goto next
@@ -522,7 +522,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 					}
 					zv++
 				}
-				if EXPECTED(ht == nil) {
+				if ht == nil {
 					ref = Z_COUNTED_P(zv)
 					GC_DELREF(ref)
 					if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
@@ -561,7 +561,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 		end = p + ht.GetNNumUsed()
 		for true {
 			end--
-			zv = &end.val
+			zv = &end.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -573,7 +573,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			}
 		}
 		for p != end {
-			zv = &p.val
+			zv = &p.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -587,7 +587,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			}
 			p++
 		}
-		zv = &p.val
+		zv = &p.GetVal()
 		if Z_TYPE_P(zv) == IS_INDIRECT {
 			zv = Z_INDIRECT_P(zv)
 		}
@@ -664,7 +664,7 @@ tail_call:
 		if GC_REFCOUNT(ref) > 0 {
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 				GC_REF_SET_BLACK(ref)
-				if UNEXPECTED(!(_stack.next)) {
+				if !(_stack.next) {
 					GcStackNext(_stack)
 				}
 
@@ -677,7 +677,7 @@ tail_call:
 		} else {
 			if GC_TYPE(ref) == IS_OBJECT {
 				var obj *ZendObject = (*ZendObject)(ref)
-				if EXPECTED((OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0) {
+				if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
 					var n int
 					var zv *Zval
 					var end *Zval
@@ -685,7 +685,7 @@ tail_call:
 					ZVAL_OBJ(&tmp, obj)
 					ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 					end = zv + n
-					if EXPECTED(ht == nil) || UNEXPECTED(!(GC_REF_CHECK_COLOR(ht, GC_GREY))) {
+					if ht == nil || !(GC_REF_CHECK_COLOR(ht, GC_GREY)) {
 						ht = nil
 						if n == 0 {
 							goto next
@@ -708,7 +708,7 @@ tail_call:
 						}
 						zv++
 					}
-					if EXPECTED(ht == nil) {
+					if ht == nil {
 						ref = Z_COUNTED_P(zv)
 						if GC_REF_CHECK_COLOR(ref, GC_GREY) {
 							GC_REF_SET_COLOR(ref, GC_WHITE)
@@ -745,7 +745,7 @@ tail_call:
 			end = p + ht.GetNNumUsed()
 			for true {
 				end--
-				zv = &end.val
+				zv = &end.GetVal()
 				if Z_TYPE_P(zv) == IS_INDIRECT {
 					zv = Z_INDIRECT_P(zv)
 				}
@@ -757,7 +757,7 @@ tail_call:
 				}
 			}
 			for p != end {
-				zv = &p.val
+				zv = &p.GetVal()
 				if Z_TYPE_P(zv) == IS_INDIRECT {
 					zv = Z_INDIRECT_P(zv)
 				}
@@ -770,7 +770,7 @@ tail_call:
 				}
 				p++
 			}
-			zv = &p.val
+			zv = &p.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -809,7 +809,7 @@ func GcAddGarbage(ref *ZendRefcounted) {
 		idx = GC_FETCH_NEXT_UNUSED()
 	} else {
 		GcGrowRootBuffer()
-		if UNEXPECTED(!(GC_HAS_NEXT_UNUSED())) {
+		if !(GC_HAS_NEXT_UNUSED()) {
 			return
 		}
 		idx = GC_FETCH_NEXT_UNUSED()
@@ -836,7 +836,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 		}
 		if GC_TYPE(ref) == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if EXPECTED((OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0) {
+			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -853,7 +853,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 				ZVAL_OBJ(&tmp, obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
-				if EXPECTED(ht == nil) || UNEXPECTED(GC_REF_CHECK_COLOR(ht, GC_BLACK)) {
+				if ht == nil || GC_REF_CHECK_COLOR(ht, GC_BLACK) {
 					ht = nil
 					if n == 0 {
 						goto next
@@ -877,7 +877,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 					}
 					zv++
 				}
-				if EXPECTED(ht == nil) {
+				if ht == nil {
 					ref = Z_COUNTED_P(zv)
 					GC_ADDREF(ref)
 					if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
@@ -917,7 +917,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 		end = p + ht.GetNNumUsed()
 		for true {
 			end--
-			zv = &end.val
+			zv = &end.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -929,7 +929,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			}
 		}
 		for p != end {
-			zv = &p.val
+			zv = &p.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -943,7 +943,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			}
 			p++
 		}
-		zv = &p.val
+		zv = &p.GetVal()
 		if Z_TYPE_P(zv) == IS_INDIRECT {
 			zv = Z_INDIRECT_P(zv)
 		}
@@ -1025,7 +1025,7 @@ tail_call:
 		}
 		if GC_TYPE(ref) == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if EXPECTED((OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0) {
+			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -1033,7 +1033,7 @@ tail_call:
 				ZVAL_OBJ(&tmp, obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
-				if EXPECTED(ht == nil) {
+				if ht == nil {
 					if n == 0 {
 						return count
 					}
@@ -1050,7 +1050,7 @@ tail_call:
 					}
 					zv++
 				}
-				if EXPECTED(ht == nil) {
+				if ht == nil {
 					ref = Z_COUNTED_P(zv)
 					goto tail_call
 				}
@@ -1072,7 +1072,7 @@ tail_call:
 		end = p + ht.GetNNumUsed()
 		for true {
 			end--
-			zv = &end.val
+			zv = &end.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -1084,7 +1084,7 @@ tail_call:
 			}
 		}
 		for p != end {
-			zv = &p.val
+			zv = &p.GetVal()
 			if Z_TYPE_P(zv) == IS_INDIRECT {
 				zv = Z_INDIRECT_P(zv)
 			}
@@ -1094,7 +1094,7 @@ tail_call:
 			}
 			p++
 		}
-		zv = &p.val
+		zv = &p.GetVal()
 		if Z_TYPE_P(zv) == IS_INDIRECT {
 			zv = Z_INDIRECT_P(zv)
 		}

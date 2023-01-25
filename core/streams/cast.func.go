@@ -28,14 +28,14 @@ func StreamCookieCloser(cookie any) int {
 
 	/* prevent recursion */
 
-	stream.fclose_stdiocast = core.PHP_STREAM_FCLOSE_NONE
+	stream.SetFcloseStdiocast(core.PHP_STREAM_FCLOSE_NONE)
 	return core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE|core.PHP_STREAM_FREE_KEEP_RSRC|core.PHP_STREAM_FREE_RSRC_DTOR)
 }
 func PhpStreamModeSanitizeFdopenFopencookie(stream *core.PhpStream, result *byte) {
 	/* replace modes not supported by fdopen and fopencookie, but supported
 	 * by PHP's fread(), so that their calls won't fail */
 
-	var cur_mode *byte = stream.mode
+	var cur_mode *byte = stream.GetMode()
 	var has_plus int = 0
 	var has_bin int = 0
 	var i int
@@ -79,20 +79,20 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 
 	if ret != nil && castas != core.PHP_STREAM_AS_FD_FOR_SELECT {
 		core.PhpStreamFlush(stream)
-		if stream.ops.seek != nil && (stream.flags&core.PHP_STREAM_FLAG_NO_SEEK) == 0 {
+		if stream.GetOps().GetSeek() != nil && !stream.HasFlags(core.PHP_STREAM_FLAG_NO_SEEK) {
 			var dummy zend.ZendOffT
-			stream.ops.seek(stream, stream.position, r.SEEK_SET, &dummy)
-			stream.writepos = 0
-			stream.readpos = stream.writepos
+			stream.GetOps().GetSeek()(stream, stream.GetPosition(), r.SEEK_SET, &dummy)
+			stream.SetWritepos(0)
+			stream.SetReadpos(stream.GetWritepos())
 		}
 	}
 
 	/* filtered streams can only be cast as stdio, and only when fopencookie is present */
 
 	if castas == core.PHP_STREAM_AS_STDIO {
-		if stream.stdiocast != nil {
+		if stream.GetStdiocast() != nil {
 			if ret != nil {
-				*((**r.FILE)(ret)) = stream.stdiocast
+				*((**r.FILE)(ret)) = stream.GetStdiocast()
 			}
 			goto exit_success
 		}
@@ -100,7 +100,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		/* if the stream is a stdio stream let's give it a chance to respond
 		 * first, to avoid doubling up the layers of stdio with an fopencookie */
 
-		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.ops.cast != nil && !(PhpStreamIsFiltered(stream)) && stream.ops.cast(stream, castas, ret) == zend.SUCCESS {
+		if core.PhpStreamIs(stream, core.PHP_STREAM_IS_STDIO) && stream.GetOps().GetCast() != nil && !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast()(stream, castas, ret) == zend.SUCCESS {
 			goto exit_success
 		}
 
@@ -114,7 +114,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		*((**r.FILE)(ret)) = Fopencookie(stream, fixed_mode, PHP_STREAM_COOKIE_FUNCTIONS)
 		if (*ret) != nil {
 			var pos zend.ZendOffT
-			stream.fclose_stdiocast = core.PHP_STREAM_FCLOSE_FOPENCOOKIE
+			stream.SetFcloseStdiocast(core.PHP_STREAM_FCLOSE_FOPENCOOKIE)
 
 			/* If the stream position is not at the start, we need to force
 			 * the stdio layer to believe it's real location. */
@@ -134,8 +134,8 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 
 		core.PhpErrorDocref(nil, zend.E_ERROR, "fopencookie failed")
 		return zend.FAILURE
-		if !(PhpStreamIsFiltered(stream)) && stream.ops.cast != nil && stream.ops.cast(stream, castas, nil) == zend.SUCCESS {
-			if zend.FAILURE == stream.ops.cast(stream, castas, ret) {
+		if !(PhpStreamIsFiltered(stream)) && stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, nil) == zend.SUCCESS {
+			if zend.FAILURE == stream.GetOps().GetCast()(stream, castas, ret) {
 				return zend.FAILURE
 			}
 			goto exit_success
@@ -175,7 +175,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 			core.PhpErrorDocref(nil, zend.E_WARNING, "cannot cast a filtered stream on this system")
 		}
 		return zend.FAILURE
-	} else if stream.ops.cast != nil && stream.ops.cast(stream, castas, ret) == zend.SUCCESS {
+	} else if stream.GetOps().GetCast() != nil && stream.GetOps().GetCast()(stream, castas, ret) == zend.SUCCESS {
 		goto exit_success
 	}
 	if show_err != 0 {
@@ -183,17 +183,17 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 		/* these names depend on the values of the PHP_STREAM_AS_XXX defines in php_streams.h */
 
 		var cast_names []*byte = []*byte{"STDIO FILE*", "File Descriptor", "Socket Descriptor", "select()able descriptor"}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot represent a stream of type %s as a %s", stream.ops.label, cast_names[castas])
+		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot represent a stream of type %s as a %s", stream.GetOps().GetLabel(), cast_names[castas])
 	}
 	return zend.FAILURE
 exit_success:
-	if stream.writepos-stream.readpos > 0 && stream.fclose_stdiocast != core.PHP_STREAM_FCLOSE_FOPENCOOKIE && (flags&core.PHP_STREAM_CAST_INTERNAL) == 0 {
+	if stream.GetWritepos()-stream.GetReadpos() > 0 && stream.GetFcloseStdiocast() != core.PHP_STREAM_FCLOSE_FOPENCOOKIE && (flags&core.PHP_STREAM_CAST_INTERNAL) == 0 {
 
 		/* the data we have buffered will be lost to the third party library that
 		 * will be accessing the stream.  Emit a warning so that the end-user will
 		 * know that they should try something else */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, zend.ZEND_LONG_FMT+" bytes of buffered data lost during stream conversion!", zend_long(stream.writepos-stream.readpos))
+		core.PhpErrorDocref(nil, zend.E_WARNING, zend.ZEND_LONG_FMT+" bytes of buffered data lost during stream conversion!", zend_long(stream.GetWritepos()-stream.GetReadpos()))
 
 		/* the data we have buffered will be lost to the third party library that
 		 * will be accessing the stream.  Emit a warning so that the end-user will
@@ -201,7 +201,7 @@ exit_success:
 
 	}
 	if castas == core.PHP_STREAM_AS_STDIO && ret != nil {
-		stream.stdiocast = *((**r.FILE)(ret))
+		stream.SetStdiocast(*((**r.FILE)(ret)))
 	}
 	if (flags & core.PHP_STREAM_CAST_RELEASE) != 0 {
 		core.PhpStreamFree(stream, core.PHP_STREAM_FREE_CLOSE_CASTED)
@@ -229,7 +229,7 @@ func _phpStreamMakeSeekable(origstream *core.PhpStream, newstream **core.PhpStre
 		return core.PHP_STREAM_FAILED
 	}
 	*newstream = nil
-	if (flags&core.PHP_STREAM_FORCE_CONVERSION) == 0 && origstream.ops.seek != nil {
+	if (flags&core.PHP_STREAM_FORCE_CONVERSION) == 0 && origstream.GetOps().GetSeek() != nil {
 		*newstream = origstream
 		return core.PHP_STREAM_UNCHANGED
 	}

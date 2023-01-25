@@ -17,12 +17,12 @@ func SAFE_STRING(s *byte) string {
 	}
 }
 func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if zend.ExecutorGlobals.current_execute_data != nil {
-		if zend.Z_TYPE(ASSERTG(callback)) != zend.IS_UNDEF {
+	if zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
+		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&ASSERTG(callback))
 			zend.ZVAL_UNDEF(&ASSERTG(callback))
 		}
-		if new_value != nil && (zend.Z_TYPE(ASSERTG(callback)) != zend.IS_UNDEF || zend.ZSTR_LEN(new_value) != 0) {
+		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || zend.ZSTR_LEN(new_value) != 0) {
 			zend.ZVAL_STR_COPY(&ASSERTG(callback), new_value)
 		}
 	} else {
@@ -40,7 +40,7 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 	return zend.SUCCESS
 }
 func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
-	zend.ZVAL_UNDEF(&assert_globals_p.callback)
+	zend.ZVAL_UNDEF(&assert_globals_p.GetCallback())
 	assert_globals_p.SetCb(nil)
 }
 func ZmStartupAssert(type_ int, module_number int) int {
@@ -54,8 +54,8 @@ func ZmStartupAssert(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("ASSERT_QUIET_EVAL", ASSERT_QUIET_EVAL, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("ASSERT_EXCEPTION", ASSERT_EXCEPTION, zend.CONST_CS|zend.CONST_PERSISTENT)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
-	ce.name = zend.ZendStringInitInterned("AssertionError", b.SizeOf("\"AssertionError\"")-1, 1)
-	ce.info.internal.builtin_functions = nil
+	ce.SetName(zend.ZendStringInitInterned("AssertionError", b.SizeOf("\"AssertionError\"")-1, 1))
+	ce.SetBuiltinFunctions(nil)
 	AssertionErrorCe = zend.ZendRegisterInternalClassEx(&ce, zend.ZendCeError)
 	return zend.SUCCESS
 }
@@ -67,7 +67,7 @@ func ZmShutdownAssert(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmDeactivateAssert(type_ int, module_number int) int {
-	if zend.Z_TYPE(ASSERTG(callback)) != zend.IS_UNDEF {
+	if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(&ASSERTG(callback))
 		zend.ZVAL_UNDEF(&ASSERTG(callback))
 	}
@@ -105,7 +105,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -124,7 +124,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZendParseArgZvalDeref(_arg, &description, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -160,8 +160,8 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
 		myeval = zend.Z_STRVAL_P(assertion)
 		if ASSERTG(quiet_eval) {
-			old_error_reporting = zend.ExecutorGlobals.error_reporting
-			zend.ExecutorGlobals.error_reporting = 0
+			old_error_reporting = zend.ExecutorGlobals.GetErrorReporting()
+			zend.ExecutorGlobals.SetErrorReporting(0)
 		}
 		compiled_string_description = zend.ZendMakeCompiledStringDescription("assert code")
 		if zend.ZendEvalStringl(myeval, zend.Z_STRLEN_P(assertion), &retval, compiled_string_description) == zend.FAILURE {
@@ -181,10 +181,10 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		zend.Efree(compiled_string_description)
 		if ASSERTG(quiet_eval) {
-			zend.ExecutorGlobals.error_reporting = old_error_reporting
+			zend.ExecutorGlobals.SetErrorReporting(old_error_reporting)
 		}
 		zend.ConvertToBoolean(&retval)
-		val = zend.Z_TYPE(retval) == zend.IS_TRUE
+		val = retval.IsType(zend.IS_TRUE)
 	} else {
 		val = zend.ZendIsTrue(assertion)
 	}
@@ -192,10 +192,10 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_TRUE
 		return
 	}
-	if zend.Z_TYPE(ASSERTG(callback)) == zend.IS_UNDEF && ASSERTG(cb) {
+	if ASSERTG(callback).u1.v.type_ == zend.IS_UNDEF && ASSERTG(cb) {
 		zend.ZVAL_STRING(&ASSERTG(callback), ASSERTG(cb))
 	}
-	if zend.Z_TYPE(ASSERTG(callback)) != zend.IS_UNDEF {
+	if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 		var args []zend.Zval
 		var retval zend.Zval
 		var lineno uint32 = zend.ZendGetExecutedLineno()
@@ -281,7 +281,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -294,7 +294,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &what, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &what, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -304,7 +304,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendParseArgZvalDeref(_arg, &value, 0)
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -335,7 +335,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		oldint = ASSERTG(active)
 		if ac == 2 {
 			var value_str *zend.ZendString = zend.ZvalTryGetString(value)
-			if zend.UNEXPECTED(value_str == nil) {
+			if value_str == nil {
 				return
 			}
 			key = zend.ZendStringInit("assert.active", b.SizeOf("\"assert.active\"")-1, 0)
@@ -350,7 +350,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		oldint = ASSERTG(bail)
 		if ac == 2 {
 			var value_str *zend.ZendString = zend.ZvalTryGetString(value)
-			if zend.UNEXPECTED(value_str == nil) {
+			if value_str == nil {
 				return
 			}
 			key = zend.ZendStringInit("assert.bail", b.SizeOf("\"assert.bail\"")-1, 0)
@@ -365,7 +365,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		oldint = ASSERTG(quiet_eval)
 		if ac == 2 {
 			var value_str *zend.ZendString = zend.ZvalTryGetString(value)
-			if zend.UNEXPECTED(value_str == nil) {
+			if value_str == nil {
 				return
 			}
 			key = zend.ZendStringInit("assert.quiet_eval", b.SizeOf("\"assert.quiet_eval\"")-1, 0)
@@ -380,7 +380,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		oldint = ASSERTG(warning)
 		if ac == 2 {
 			var value_str *zend.ZendString = zend.ZvalTryGetString(value)
-			if zend.UNEXPECTED(value_str == nil) {
+			if value_str == nil {
 				return
 			}
 			key = zend.ZendStringInit("assert.warning", b.SizeOf("\"assert.warning\"")-1, 0)
@@ -392,7 +392,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 		break
 	case ASSERT_CALLBACK:
-		if zend.Z_TYPE(ASSERTG(callback)) != zend.IS_UNDEF {
+		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZVAL_COPY(return_value, &ASSERTG(callback))
 		} else if ASSERTG(cb) {
 			zend.RETVAL_STRING(ASSERTG(cb))
@@ -408,7 +408,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		oldint = ASSERTG(exception)
 		if ac == 2 {
 			var val *zend.ZendString = zend.ZvalTryGetString(value)
-			if zend.UNEXPECTED(val == nil) {
+			if val == nil {
 				return
 			}
 			key = zend.ZendStringInit("assert.exception", b.SizeOf("\"assert.exception\"")-1, 0)

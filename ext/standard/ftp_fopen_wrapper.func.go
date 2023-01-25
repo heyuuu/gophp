@@ -31,10 +31,10 @@ func PhpStreamFtpStreamStat(wrapper *core.PhpStreamWrapper, stream *core.PhpStre
 	 * file's details from being used instead. */
 }
 func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStream) int {
-	var controlstream *core.PhpStream = stream.wrapperthis
+	var controlstream *core.PhpStream = stream.GetWrapperthis()
 	var ret int = 0
 	if controlstream != nil {
-		if strpbrk(stream.mode, "wa+") {
+		if strpbrk(stream.GetMode(), "wa+") {
 			var tmp_line []byte
 			var result int
 
@@ -48,7 +48,7 @@ func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStr
 		}
 		core.PhpStreamWriteString(controlstream, "QUIT\r\n")
 		core.PhpStreamClose(controlstream)
-		stream.wrapperthis = nil
+		stream.SetWrapperthis(nil)
 	}
 	return ret
 }
@@ -572,7 +572,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* remember control stream */
 
-	datastream.wrapperthis = stream
+	datastream.SetWrapperthis(stream)
 	PhpUrlFree(resource)
 	return datastream
 errexit:
@@ -597,31 +597,31 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var innerstream *core.PhpStream
 	var tmp_len int
 	var basename *zend.ZendString
-	innerstream = (*PhpFtpDirstreamData)(stream.abstract).GetDatastream()
+	innerstream = (*PhpFtpDirstreamData)(stream.GetAbstract()).GetDatastream()
 	if count != b.SizeOf("php_stream_dirent") {
 		return -1
 	}
 	if core.PhpStreamEof(innerstream) != 0 {
 		return 0
 	}
-	if core.PhpStreamGetLine(innerstream, ent.d_name, b.SizeOf("ent -> d_name"), &tmp_len) == nil {
+	if core.PhpStreamGetLine(innerstream, ent.GetDName(), b.SizeOf("ent -> d_name"), &tmp_len) == nil {
 		return -1
 	}
-	basename = PhpBasename(ent.d_name, tmp_len, nil, 0)
+	basename = PhpBasename(ent.GetDName(), tmp_len, nil, 0)
 	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), zend.ZSTR_LEN(basename)-1)
-	memcpy(ent.d_name, zend.ZSTR_VAL(basename), tmp_len)
-	ent.d_name[tmp_len-1] = '0'
+	memcpy(ent.GetDName(), zend.ZSTR_VAL(basename), tmp_len)
+	ent.GetDName()[tmp_len-1] = '0'
 	zend.ZendStringReleaseEx(basename, 0)
 
 	/* Trim off trailing whitespace characters */
 
-	for tmp_len > 0 && (ent.d_name[tmp_len-1] == '\n' || ent.d_name[tmp_len-1] == '\r' || ent.d_name[tmp_len-1] == '\t' || ent.d_name[tmp_len-1] == ' ') {
-		ent.d_name[b.PreDec(&tmp_len)] = '0'
+	for tmp_len > 0 && (ent.GetDName()[tmp_len-1] == '\n' || ent.GetDName()[tmp_len-1] == '\r' || ent.GetDName()[tmp_len-1] == '\t' || ent.GetDName()[tmp_len-1] == ' ') {
+		ent.GetDName()[b.PreDec(&tmp_len)] = '0'
 	}
 	return b.SizeOf("php_stream_dirent")
 }
 func PhpFtpDirstreamClose(stream *core.PhpStream, close_handle int) int {
-	var data *PhpFtpDirstreamData = stream.abstract
+	var data *PhpFtpDirstreamData = stream.GetAbstract()
 
 	/* close control connection */
 
@@ -635,7 +635,7 @@ func PhpFtpDirstreamClose(stream *core.PhpStream, close_handle int) int {
 	core.PhpStreamClose(data.GetDatastream())
 	data.SetDatastream(nil)
 	zend.Efree(data)
-	stream.abstract = nil
+	stream.SetAbstract(nil)
 	return 0
 }
 func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {

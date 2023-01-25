@@ -13,10 +13,10 @@ func loBit(u uint32) int             { return u & 0x1 }
 func loBits(u uint32) int            { return u & 0x7fffffff }
 func mixBits(u uint32, v uint32) int { return hiBit(u) | loBits(v) }
 func Twist(m uint32, u uint32, v uint32) int {
-	return m ^ mixBits(u, v)>>1 ^ uint32_t(-(int32_t(loBit(v))))&0x9908b0df
+	return m ^ mixBits(u, v)>>1 ^ uint32(-(int32(loBit(v))))&0x9908b0df
 }
 func TwistPhp(m uint32, u uint32, v uint32) int {
-	return m ^ mixBits(u, v)>>1 ^ uint32_t(-(int32_t(loBit(u))))&0x9908b0df
+	return m ^ mixBits(u, v)>>1 ^ uint32(-(int32(loBit(u))))&0x9908b0df
 }
 func PhpMtInitialize(seed uint32, state *uint32) {
 	/* Initialize generator state with seed
@@ -77,7 +77,7 @@ func PhpMtRand() uint32 {
 	   Every other access function simply transforms the numbers extracted here */
 
 	var s1 uint32
-	if zend.UNEXPECTED(!(BG(mt_rand_is_seeded))) {
+	if !(BG(mt_rand_is_seeded)) {
 		PhpMtSrand(GENERATE_SEED())
 	}
 	if BG(left) == 0 {
@@ -115,7 +115,7 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -129,20 +129,20 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &seed, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &seed, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -187,7 +187,7 @@ func RandRange32(umax uint32) uint32 {
 
 	/* Special case where no modulus is required */
 
-	if zend.UNEXPECTED(umax == UINT32_MAX) {
+	if umax == UINT32_MAX {
 		return result
 	}
 
@@ -207,7 +207,7 @@ func RandRange32(umax uint32) uint32 {
 
 	/* Discard numbers over the limit to avoid modulo bias */
 
-	for zend.UNEXPECTED(result > limit) {
+	for result > limit {
 		result = PhpMtRand()
 	}
 	return result % umax
@@ -261,7 +261,7 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -274,20 +274,20 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -313,7 +313,7 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.UNEXPECTED(max < min) {
+	if max < min {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
 		zend.RETVAL_FALSE
 		return

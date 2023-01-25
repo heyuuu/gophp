@@ -84,13 +84,13 @@ func RESET_CONSTANT_VISITED(zv *Zval) uint32 {
 func FreeZendConstant(zv *Zval) {
 	var c *ZendConstant = Z_PTR_P(zv)
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
-		ZvalPtrDtorNogc(&c.value)
+		ZvalPtrDtorNogc(&c.GetValue())
 		if c.GetName() != nil {
 			ZendStringReleaseEx(c.GetName(), 0)
 		}
 		Efree(c)
 	} else {
-		ZvalInternalPtrDtor(&c.value)
+		ZvalInternalPtrDtor(&c.GetValue())
 		if c.GetName() != nil {
 			ZendStringReleaseEx(c.GetName(), 1)
 		}
@@ -149,35 +149,35 @@ func ZendShutdownConstants() int {
 }
 func ZendRegisterNullConstant(name *byte, name_len int, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_NULL(&c.value)
+	ZVAL_NULL(&c.GetValue())
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterBoolConstant(name *byte, name_len int, bval ZendBool, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_BOOL(&c.value, bval)
+	ZVAL_BOOL(&c.GetValue(), bval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterLongConstant(name *byte, name_len int, lval ZendLong, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_LONG(&c.value, lval)
+	ZVAL_LONG(&c.GetValue(), lval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterDoubleConstant(name *byte, name_len int, dval float64, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_DOUBLE(&c.value, dval)
+	ZVAL_DOUBLE(&c.GetValue(), dval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterStringlConstant(name *byte, name_len int, strval *byte, strlen int, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_STR(&c.value, ZendStringInitInterned(strval, strlen, flags&CONST_PERSISTENT))
+	ZVAL_STR(&c.GetValue(), ZendStringInitInterned(strval, strlen, flags&CONST_PERSISTENT))
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
@@ -236,7 +236,7 @@ func ZendGetConstantStrImpl(name *byte, name_len int) *ZendConstant {
 func ZendGetConstantStr(name *byte, name_len int) *Zval {
 	var c *ZendConstant = ZendGetConstantStrImpl(name, name_len)
 	if c != nil {
-		return &c.value
+		return &c.GetValue()
 	} else {
 		return nil
 	}
@@ -266,7 +266,7 @@ func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 func ZendGetConstant(name *ZendString) *Zval {
 	var c *ZendConstant = ZendGetConstantImpl(name)
 	if c != nil {
-		return &c.value
+		return &c.GetValue()
 	} else {
 		return nil
 	}
@@ -312,16 +312,16 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 		var c *ZendClassConstant = nil
 		var ret_constant *Zval = nil
 		if ZendStringEqualsLiteralCi(class_name, "self") {
-			if UNEXPECTED(scope == nil) {
+			if scope == nil {
 				ZendThrowError(nil, "Cannot access self:: when no class scope is active")
 				goto failure
 			}
 			ce = scope
 		} else if ZendStringEqualsLiteralCi(class_name, "parent") {
-			if UNEXPECTED(scope == nil) {
+			if scope == nil {
 				ZendThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
-			} else if UNEXPECTED(!(scope.parent)) {
+			} else if !(scope.parent) {
 				ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 				goto failure
 			} else {
@@ -329,7 +329,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			}
 		} else if ZendStringEqualsLiteralCi(class_name, "static") {
 			ce = ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData())
-			if UNEXPECTED(ce == nil) {
+			if ce == nil {
 				ZendThrowError(nil, "Cannot access static:: when no class scope is active")
 				goto failure
 			}
@@ -337,7 +337,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			ce = ZendFetchClass(class_name, flags)
 		}
 		if ce != nil {
-			c = &ce.constants_table.FindPtr(constant_name)
+			c = &ce.GetConstantsTable().FindPtr(constant_name)
 			if c == nil {
 				if (flags & ZEND_FETCH_CLASS_SILENT) == 0 {
 					ZendThrowError(nil, "Undefined class constant '%s::%s'", ZSTR_VAL(class_name), ZSTR_VAL(constant_name))
@@ -351,7 +351,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 					}
 					goto failure
 				}
-				ret_constant = &c.value
+				ret_constant = &c.GetValue()
 			}
 		}
 		if ret_constant != nil && Z_TYPE_P(ret_constant) == IS_CONSTANT_AST {
@@ -364,7 +364,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			MARK_CONSTANT_VISITED(ret_constant)
 			ret = ZvalUpdateConstantEx(ret_constant, c.GetCe())
 			RESET_CONSTANT_VISITED(ret_constant)
-			if UNEXPECTED(ret != SUCCESS) {
+			if ret != SUCCESS {
 				ret_constant = nil
 				goto failure
 			}
@@ -431,7 +431,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			ZendError(E_DEPRECATED, "Case-insensitive constants are deprecated. "+"The correct casing for this constant is \"%s\"", ZSTR_VAL(c.GetName()))
 		}
 	}
-	return &c.value
+	return &c.GetValue()
 }
 func (this *HashTable) AddConstant(key *ZendString, c *ZendConstant) any {
 	var ret any
@@ -475,7 +475,7 @@ func ZendRegisterConstant(c *ZendConstant) int {
 		ZendError(E_NOTICE, "Constant %s already defined", ZSTR_VAL(name))
 		ZendStringRelease(c.GetName())
 		if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
-			ZvalPtrDtorNogc(&c.value)
+			ZvalPtrDtorNogc(&c.GetValue())
 		}
 		ret = FAILURE
 	}

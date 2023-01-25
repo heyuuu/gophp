@@ -39,16 +39,16 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 	arg_sep_len = strlen(arg_sep)
 	for {
 		var __ht *zend.HashTable = ht
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			idx = _p.h
-			key = _p.key
+			idx = _p.GetH()
+			key = _p.GetKey()
 			zdata = _z
 			var is_dynamic zend.ZendBool = 1
 			if zend.Z_TYPE_P(zdata) == zend.IS_INDIRECT {
@@ -158,7 +158,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				/* Skip these types */
 
 			} else {
-				if formstr.s != nil {
+				if formstr.GetS() != nil {
 					zend.SmartStrAppendl(formstr, arg_sep, arg_sep_len)
 				}
 
@@ -257,7 +257,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -270,33 +270,33 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &formdata, 0, 1) == 0) {
+			if zend.ZendParseArgArray(_arg, &formdata, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &arg_sep, &arg_sep_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &arg_sep, &arg_sep_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &enc_type, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &enc_type, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -324,17 +324,17 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		break
 	}
 	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(zend.Z_TYPE_P(formdata) == zend.IS_OBJECT, formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
-		if formstr.s != nil {
+		if formstr.GetS() != nil {
 			zend.SmartStrFree(&formstr)
 		}
 		zend.RETVAL_FALSE
 		return
 	}
-	if formstr.s == nil {
+	if formstr.GetS() == nil {
 		zend.RETVAL_EMPTY_STRING()
 		return
 	}
 	zend.SmartStr0(&formstr)
-	zend.RETVAL_NEW_STR(formstr.s)
+	zend.RETVAL_NEW_STR(formstr.GetS())
 	return
 }

@@ -125,7 +125,7 @@ func PhpStreamBucketAppend(brigade *PhpStreamBucketBrigade, bucket *PhpStreamBuc
 	bucket.SetPrev(brigade.GetTail())
 	bucket.SetNext(nil)
 	if brigade.GetTail() != nil {
-		brigade.GetTail().next = bucket
+		brigade.GetTail().SetNext(bucket)
 	} else {
 		brigade.SetHead(bucket)
 	}
@@ -134,7 +134,7 @@ func PhpStreamBucketAppend(brigade *PhpStreamBucketBrigade, bucket *PhpStreamBuc
 }
 func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
 	if bucket.GetPrev() != nil {
-		bucket.GetPrev().next = bucket.GetNext()
+		bucket.GetPrev().SetNext(bucket.GetNext())
 	} else if bucket.GetBrigade() != nil {
 		bucket.GetBrigade().SetHead(bucket.GetNext())
 	}
@@ -226,13 +226,13 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 	filter.SetPrev(chain.GetTail())
 	filter.SetNext(nil)
 	if chain.GetTail() != nil {
-		chain.GetTail().next = filter
+		chain.GetTail().SetNext(filter)
 	} else {
 		chain.SetHead(filter)
 	}
 	chain.SetTail(filter)
 	filter.SetChain(chain)
-	if &(stream.readfilters) == chain && stream.writepos-stream.readpos > 0 {
+	if &(stream.GetReadfilters()) == chain && stream.GetWritepos()-stream.GetReadpos() > 0 {
 
 		/* Let's going ahead and wind anything in the buffer through this filter */
 
@@ -243,10 +243,10 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 		var status PhpStreamFilterStatusT
 		var bucket *PhpStreamBucket
 		var consumed int = 0
-		bucket = PhpStreamBucketNew(stream, (*byte)(stream.readbuf+stream.readpos), stream.writepos-stream.readpos, 0, 0)
+		bucket = PhpStreamBucketNew(stream, (*byte)(stream.GetReadbuf()+stream.GetReadpos()), stream.GetWritepos()-stream.GetReadpos(), 0, 0)
 		PhpStreamBucketAppend(brig_inp, bucket)
 		status = filter.GetFops().GetFilter()(stream, filter, brig_inp, brig_outp, &consumed, PSFS_FLAG_NORMAL)
-		if stream.readpos+consumed > uint32(stream.writepos) {
+		if stream.GetReadpos()+consumed > uint32(stream.GetWritepos()) {
 
 			/* No behaving filter should cause this. */
 
@@ -275,28 +275,28 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 			   leave this filter in a feed me state until data is needed.
 			   Reset stream's internal read buffer since the filter is "holding" it. */
 
-			stream.readpos = 0
-			stream.writepos = 0
+			stream.SetReadpos(0)
+			stream.SetWritepos(0)
 			break
 		case PSFS_PASS_ON:
 
 			/* If any data is consumed, we cannot rely upon the existing read buffer,
 			   as the filtered data must replace the existing data, so invalidate the cache */
 
-			stream.writepos = 0
-			stream.readpos = 0
+			stream.SetWritepos(0)
+			stream.SetReadpos(0)
 			for brig_outp.GetHead() != nil {
 				bucket = brig_outp.GetHead()
 
 				/* Grow buffer to hold this bucket if need be.
 				   TODO: See warning in main/stream/streams.c::php_stream_fill_read_buffer */
 
-				if stream.readbuflen-stream.writepos < bucket.GetBuflen() {
-					stream.readbuflen += bucket.GetBuflen()
-					stream.readbuf = zend.Perealloc(stream.readbuf, stream.readbuflen, stream.is_persistent)
+				if stream.GetReadbuflen()-stream.GetWritepos() < bucket.GetBuflen() {
+					stream.SetReadbuflen(stream.GetReadbuflen() + bucket.GetBuflen())
+					stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetReadbuflen(), stream.GetIsPersistent()))
 				}
-				memcpy(stream.readbuf+stream.writepos, bucket.GetBuf(), bucket.GetBuflen())
-				stream.writepos += bucket.GetBuflen()
+				memcpy(stream.GetReadbuf()+stream.GetWritepos(), bucket.GetBuf(), bucket.GetBuflen())
+				stream.SetWritepos(stream.GetWritepos() + bucket.GetBuflen())
 				PhpStreamBucketUnlink(bucket)
 				PhpStreamBucketDelref(bucket)
 			}
@@ -381,41 +381,41 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 		/* Unlikely, but possible */
 
 	}
-	if chain == &(stream.readfilters) {
+	if chain == &(stream.GetReadfilters()) {
 
 		/* Dump any newly flushed data to the read buffer */
 
-		if stream.readpos > 0 {
+		if stream.GetReadpos() > 0 {
 
 			/* Back the buffer up */
 
-			memcpy(stream.readbuf, stream.readbuf+stream.readpos, stream.writepos-stream.readpos)
-			stream.readpos = 0
-			stream.writepos -= stream.readpos
+			memcpy(stream.GetReadbuf(), stream.GetReadbuf()+stream.GetReadpos(), stream.GetWritepos()-stream.GetReadpos())
+			stream.SetReadpos(0)
+			stream.SetWritepos(stream.GetWritepos() - stream.GetReadpos())
 		}
-		if flushed_size > stream.readbuflen-stream.writepos {
+		if flushed_size > stream.GetReadbuflen()-stream.GetWritepos() {
 
 			/* Grow the buffer */
 
-			stream.readbuf = zend.Perealloc(stream.readbuf, stream.writepos+flushed_size+stream.chunk_size, stream.is_persistent)
+			stream.SetReadbuf(zend.Perealloc(stream.GetReadbuf(), stream.GetWritepos()+flushed_size+stream.GetChunkSize(), stream.GetIsPersistent()))
 
 			/* Grow the buffer */
 
 		}
 		for b.Assign(&bucket, inp.GetHead()) {
-			memcpy(stream.readbuf+stream.writepos, bucket.GetBuf(), bucket.GetBuflen())
-			stream.writepos += bucket.GetBuflen()
+			memcpy(stream.GetReadbuf()+stream.GetWritepos(), bucket.GetBuf(), bucket.GetBuflen())
+			stream.SetWritepos(stream.GetWritepos() + bucket.GetBuflen())
 			PhpStreamBucketUnlink(bucket)
 			PhpStreamBucketDelref(bucket)
 		}
-	} else if chain == &(stream.writefilters) {
+	} else if chain == &(stream.GetWritefilters()) {
 
 		/* Send flushed data to the stream */
 
 		for b.Assign(&bucket, inp.GetHead()) {
-			var count ssize_t = stream.ops.write(stream, bucket.GetBuf(), bucket.GetBuflen())
+			var count ssize_t = stream.GetOps().GetWrite()(stream, bucket.GetBuf(), bucket.GetBuflen())
 			if count > 0 {
-				stream.position += count
+				stream.SetPosition(stream.GetPosition() + count)
 			}
 			PhpStreamBucketUnlink(bucket)
 			PhpStreamBucketDelref(bucket)

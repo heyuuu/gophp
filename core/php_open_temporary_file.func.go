@@ -19,26 +19,26 @@ func PhpDoOpenTemporaryFile(path *byte, pfx *byte, opened_path_p **zend.ZendStri
 	if !(zend.VCWD_GETCWD(cwd, MAXPATHLEN)) {
 		cwd[0] = '0'
 	}
-	new_state.cwd = zend.Estrdup(cwd)
-	new_state.cwd_length = strlen(cwd)
+	new_state.SetCwd(zend.Estrdup(cwd))
+	new_state.SetCwdLength(strlen(cwd))
 	if zend.VirtualFileEx(&new_state, path, nil, zend.CWD_REALPATH) != 0 {
-		zend.Efree(new_state.cwd)
+		zend.Efree(new_state.GetCwd())
 		return -1
 	}
-	if zend.IS_SLASH(new_state.cwd[new_state.cwd_length-1]) {
+	if zend.IS_SLASH(new_state.GetCwd()[new_state.GetCwdLength()-1]) {
 		trailing_slash = ""
 	} else {
 		trailing_slash = "/"
 	}
-	if Snprintf(opened_path, MAXPATHLEN, "%s%s%sXXXXXX", new_state.cwd, trailing_slash, pfx) >= MAXPATHLEN {
-		zend.Efree(new_state.cwd)
+	if Snprintf(opened_path, MAXPATHLEN, "%s%s%sXXXXXX", new_state.GetCwd(), trailing_slash, pfx) >= MAXPATHLEN {
+		zend.Efree(new_state.GetCwd())
 		return -1
 	}
 	fd = mkstemp(opened_path)
 	if fd != -1 && opened_path_p != nil {
 		*opened_path_p = zend.ZendStringInit(opened_path, strlen(opened_path), 0)
 	}
-	zend.Efree(new_state.cwd)
+	zend.Efree(new_state.GetCwd())
 	return fd
 }
 func PhpGetTemporaryDirectory() *byte {

@@ -98,7 +98,7 @@ func OnUpdateOutputHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.SmartStr, separator *byte) {
 	var url_parts *PhpUrl
 	zend.SmartStr0(url)
-	url_parts = PhpUrlParseEx(zend.ZSTR_VAL(url.s), zend.ZSTR_LEN(url.s))
+	url_parts = PhpUrlParseEx(zend.ZSTR_VAL(url.GetS()), zend.ZSTR_LEN(url.GetS()))
 
 	/* Ignore malformed URLs */
 
@@ -109,7 +109,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	/* Don't modify URLs of the format "#mark" */
 
-	if url_parts.GetFragment() != nil && '#' == zend.ZSTR_VAL(url.s)[0] {
+	if url_parts.GetFragment() != nil && '#' == zend.ZSTR_VAL(url.GetS())[0] {
 		zend.SmartStrAppendSmartStr(dest, url)
 		PhpUrlFree(url_parts)
 		return
@@ -155,7 +155,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	if url_parts.GetScheme() != nil {
 		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetScheme()))
 		zend.SmartStrAppends(dest, "://")
-	} else if (*(zend.ZSTR_VAL(url.s))) == '/' && (*(zend.ZSTR_VAL(url.s) + 1)) == '/' {
+	} else if (*(zend.ZSTR_VAL(url.GetS()))) == '/' && (*(zend.ZSTR_VAL(url.GetS()) + 1)) == '/' {
 		zend.SmartStrAppends(dest, "//")
 	}
 	if url_parts.GetUser() != nil {
@@ -196,31 +196,31 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	/* arg.s is string WITHOUT NUL.
 	   To avoid partial match, NUL is added here */
 
-	zend.ZSTR_VAL(ctx.arg.s)[zend.ZSTR_LEN(ctx.arg.s)] = '0'
-	if !(strcasecmp(zend.ZSTR_VAL(ctx.arg.s), ctx.GetLookupData())) {
+	zend.ZSTR_VAL(ctx.GetArg().GetS())[zend.ZSTR_LEN(ctx.GetArg().GetS())] = '0'
+	if !(strcasecmp(zend.ZSTR_VAL(ctx.GetArg().GetS()), ctx.GetLookupData())) {
 		f = 1
 	}
 	if quotes {
-		zend.SmartStrAppendc(&ctx.result, type_)
+		zend.SmartStrAppendc(&ctx.GetResult(), type_)
 	}
 	if f {
-		AppendModifiedUrl(&ctx.val, &ctx.result, &ctx.url_app, core.PG(arg_separator).output)
+		AppendModifiedUrl(&ctx.GetVal(), &ctx.GetResult(), &ctx.GetUrlApp(), core.PG(arg_separator).output)
 	} else {
-		zend.SmartStrAppendSmartStr(&ctx.result, &ctx.val)
+		zend.SmartStrAppendSmartStr(&ctx.GetResult(), &ctx.GetVal())
 	}
 	if quotes {
-		zend.SmartStrAppendc(&ctx.result, type_)
+		zend.SmartStrAppendc(&ctx.GetResult(), type_)
 	}
 }
 func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
-	zend.SmartStrAppendl(&ctx.result, start, YYCURSOR-start)
+	zend.SmartStrAppendl(&ctx.GetResult(), start, YYCURSOR-start)
 }
 func CheckHttpHost(target *byte) int {
 	var host *zend.Zval
 	var tmp *zend.Zval
 	var host_tmp *zend.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), zend.ZEND_STRL("_SERVER"))) && zend.Z_TYPE_P(tmp) == zend.IS_ARRAY && b.Assign(&host, zend.ZendHashStrFind(zend.Z_ARRVAL_P(tmp), zend.ZEND_STRL("HTTP_HOST"))) && zend.Z_TYPE_P(host) == zend.IS_STRING {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZEND_STRL("_SERVER"))) && zend.Z_TYPE_P(tmp) == zend.IS_ARRAY && b.Assign(&host, zend.ZendHashStrFind(zend.Z_ARRVAL_P(tmp), zend.ZEND_STRL("HTTP_HOST"))) && zend.Z_TYPE_P(host) == zend.IS_STRING {
 		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */
@@ -242,8 +242,8 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 	var url_parts *PhpUrl = nil
 	var allowed_hosts *zend.HashTable = b.CondF(ctx.GetType() != 0, func() __auto__ { return &BG(url_adapt_session_hosts_ht) }, func() __auto__ { return &BG(url_adapt_output_hosts_ht) })
 	zend.ZEND_ASSERT(ctx.GetTagType() == TAG_FORM)
-	if ctx.attr_val.s != nil && zend.ZSTR_LEN(ctx.attr_val.s) != 0 {
-		url_parts = PhpUrlParseEx(zend.ZSTR_VAL(ctx.attr_val.s), zend.ZSTR_LEN(ctx.attr_val.s))
+	if ctx.GetAttrVal().GetS() != nil && zend.ZSTR_LEN(ctx.GetAttrVal().GetS()) != 0 {
+		url_parts = PhpUrlParseEx(zend.ZSTR_VAL(ctx.GetAttrVal().GetS()), zend.ZSTR_LEN(ctx.GetAttrVal().GetS()))
 	} else {
 		return zend.SUCCESS
 	}
@@ -281,35 +281,35 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 }
 func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	var doit int = 0
-	if zend.ZSTR_LEN(ctx.form_app.s) > 0 {
-		switch zend.ZSTR_LEN(ctx.tag.s) {
+	if zend.ZSTR_LEN(ctx.GetFormApp().GetS()) > 0 {
+		switch zend.ZSTR_LEN(ctx.GetTag().GetS()) {
 		case b.SizeOf("\"form\"") - 1:
-			if !(strncasecmp(zend.ZSTR_VAL(ctx.tag.s), "form", zend.ZSTR_LEN(ctx.tag.s))) && CheckHostWhitelist(ctx) == zend.SUCCESS {
+			if !(strncasecmp(zend.ZSTR_VAL(ctx.GetTag().GetS()), "form", zend.ZSTR_LEN(ctx.GetTag().GetS()))) && CheckHostWhitelist(ctx) == zend.SUCCESS {
 				doit = 1
 			}
 			break
 		}
 	}
 	if doit != 0 {
-		zend.SmartStrAppendSmartStr(&ctx.result, &ctx.form_app)
+		zend.SmartStrAppendSmartStr(&ctx.GetResult(), &ctx.GetFormApp())
 	}
 }
 func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	var ok int = 0
 	var i uint
-	if ctx.tag.s != nil {
-		zend.ZSTR_LEN(ctx.tag.s) = 0
+	if ctx.GetTag().GetS() != nil {
+		zend.ZSTR_LEN(ctx.GetTag().GetS()) = 0
 	}
-	zend.SmartStrAppendl(&ctx.tag, start, YYCURSOR-start)
-	for i = 0; i < zend.ZSTR_LEN(ctx.tag.s); i++ {
-		zend.ZSTR_VAL(ctx.tag.s)[i] = tolower(int(uint8(zend.ZSTR_VAL(ctx.tag.s)[i])))
+	zend.SmartStrAppendl(&ctx.GetTag(), start, YYCURSOR-start)
+	for i = 0; i < zend.ZSTR_LEN(ctx.GetTag().GetS()); i++ {
+		zend.ZSTR_VAL(ctx.GetTag().GetS())[i] = tolower(int(uint8(zend.ZSTR_VAL(ctx.GetTag().GetS())[i])))
 	}
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
 
-	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), zend.ZSTR_VAL(ctx.tag.s), zend.ZSTR_LEN(ctx.tag.s))) != nil {
+	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), zend.ZSTR_VAL(ctx.GetTag().GetS()), zend.ZSTR_LEN(ctx.GetTag().GetS()))) != nil {
 		ok = 1
-		if zend.ZSTR_LEN(ctx.tag.s) == b.SizeOf("\"form\"")-1 && !(strncasecmp(zend.ZSTR_VAL(ctx.tag.s), "form", zend.ZSTR_LEN(ctx.tag.s))) {
+		if zend.ZSTR_LEN(ctx.GetTag().GetS()) == b.SizeOf("\"form\"")-1 && !(strncasecmp(zend.ZSTR_VAL(ctx.GetTag().GetS()), "form", zend.ZSTR_LEN(ctx.GetTag().GetS()))) {
 			ctx.SetTagType(TAG_FORM)
 		} else {
 			ctx.SetTagType(TAG_NORMAL)
@@ -322,20 +322,20 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 	}
 }
 func HandleArg(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
-	if ctx.arg.s != nil {
-		zend.ZSTR_LEN(ctx.arg.s) = 0
+	if ctx.GetArg().GetS() != nil {
+		zend.ZSTR_LEN(ctx.GetArg().GetS()) = 0
 	}
-	zend.SmartStrAppendl(&ctx.arg, start, YYCURSOR-start)
-	if ctx.GetTagType() == TAG_FORM && strncasecmp(zend.ZSTR_VAL(ctx.arg.s), "action", zend.ZSTR_LEN(ctx.arg.s)) == 0 {
+	zend.SmartStrAppendl(&ctx.GetArg(), start, YYCURSOR-start)
+	if ctx.GetTagType() == TAG_FORM && strncasecmp(zend.ZSTR_VAL(ctx.GetArg().GetS()), "action", zend.ZSTR_LEN(ctx.GetArg().GetS())) == 0 {
 		ctx.SetAttrType(ATTR_ACTION)
 	} else {
 		ctx.SetAttrType(ATTR_NORMAL)
 	}
 }
 func HandleVal(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte, quotes byte, type_ byte) {
-	zend.SmartStrSetl(&ctx.val, start+quotes, YYCURSOR-start-quotes*2)
+	zend.SmartStrSetl(&ctx.GetVal(), start+quotes, YYCURSOR-start-quotes*2)
 	if ctx.GetTagType() == TAG_FORM && ctx.GetAttrType() == ATTR_ACTION {
-		zend.SmartStrSetl(&ctx.attr_val, start+quotes, YYCURSOR-start-quotes*2)
+		zend.SmartStrSetl(&ctx.GetAttrVal(), start+quotes, YYCURSOR-start-quotes*2)
 	}
 	TagArg(ctx, quotes, type_)
 }
@@ -345,9 +345,9 @@ func XxMainloop(ctx *UrlAdaptStateExT, newdata *byte, newlen int) {
 	var xp *byte
 	var start *byte
 	var rest int
-	zend.SmartStrAppendl(&ctx.buf, newdata, newlen)
-	YYCURSOR = zend.ZSTR_VAL(ctx.buf.s)
-	YYLIMIT = zend.ZSTR_VAL(ctx.buf.s) + zend.ZSTR_LEN(ctx.buf.s)
+	zend.SmartStrAppendl(&ctx.GetBuf(), newdata, newlen)
+	YYCURSOR = zend.ZSTR_VAL(ctx.GetBuf().GetS())
+	YYLIMIT = zend.ZSTR_VAL(ctx.GetBuf().GetS()) + zend.ZSTR_LEN(ctx.GetBuf().GetS())
 	switch ctx.GetState() {
 	case STATE_PLAIN:
 		goto state_plain
@@ -765,9 +765,9 @@ stop:
 		rest = YYLIMIT - start
 	}
 	if rest != 0 {
-		memmove(zend.ZSTR_VAL(ctx.buf.s), start, rest)
+		memmove(zend.ZSTR_VAL(ctx.GetBuf().GetS()), start, rest)
 	}
-	zend.ZSTR_LEN(ctx.buf.s) = rest
+	zend.ZSTR_LEN(ctx.GetBuf().GetS()) = rest
 }
 func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte, newlen *int, encode int) *byte {
 	var result *byte
@@ -794,9 +794,9 @@ func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte,
 	AppendModifiedUrl(&surl, &buf, &url_app, core.PG(arg_separator).output)
 	zend.SmartStr0(&buf)
 	if newlen != nil {
-		*newlen = zend.ZSTR_LEN(buf.s)
+		*newlen = zend.ZSTR_LEN(buf.GetS())
 	}
-	result = zend.Estrndup(zend.ZSTR_VAL(buf.s), zend.ZSTR_LEN(buf.s))
+	result = zend.Estrndup(zend.ZSTR_VAL(buf.GetS()), zend.ZSTR_LEN(buf.GetS()))
 	zend.SmartStrFree(&url_app)
 	zend.SmartStrFree(&buf)
 	return result
@@ -804,22 +804,22 @@ func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte,
 func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush zend.ZendBool, ctx *UrlAdaptStateExT) *byte {
 	var retval *byte
 	XxMainloop(ctx, src, srclen)
-	if ctx.result.s == nil {
-		zend.SmartStrAppendl(&ctx.result, "", 0)
+	if ctx.GetResult().GetS() == nil {
+		zend.SmartStrAppendl(&ctx.GetResult(), "", 0)
 		*newlen = 0
 	} else {
-		*newlen = zend.ZSTR_LEN(ctx.result.s)
+		*newlen = zend.ZSTR_LEN(ctx.GetResult().GetS())
 	}
-	zend.SmartStr0(&ctx.result)
+	zend.SmartStr0(&ctx.GetResult())
 	if do_flush != 0 {
-		zend.SmartStrAppend(&ctx.result, ctx.buf.s)
-		*newlen += zend.ZSTR_LEN(ctx.buf.s)
-		zend.SmartStrFree(&ctx.buf)
-		zend.SmartStrFree(&ctx.val)
-		zend.SmartStrFree(&ctx.attr_val)
+		zend.SmartStrAppend(&ctx.GetResult(), ctx.GetBuf().GetS())
+		*newlen += zend.ZSTR_LEN(ctx.GetBuf().GetS())
+		zend.SmartStrFree(&ctx.GetBuf())
+		zend.SmartStrFree(&ctx.GetVal())
+		zend.SmartStrFree(&ctx.GetAttrVal())
 	}
-	retval = zend.Estrndup(zend.ZSTR_VAL(ctx.result.s), zend.ZSTR_LEN(ctx.result.s))
-	zend.SmartStrFree(&ctx.result)
+	retval = zend.Estrndup(zend.ZSTR_VAL(ctx.GetResult().GetS()), zend.ZSTR_LEN(ctx.GetResult().GetS()))
+	zend.SmartStrFree(&ctx.GetResult())
 	return retval
 }
 func PhpUrlScannerExActivate(type_ int) int {
@@ -839,11 +839,11 @@ func PhpUrlScannerExDeactivate(type_ int) int {
 	} else {
 		ctx = &BG(url_adapt_output_ex)
 	}
-	zend.SmartStrFree(&ctx.result)
-	zend.SmartStrFree(&ctx.buf)
-	zend.SmartStrFree(&ctx.tag)
-	zend.SmartStrFree(&ctx.arg)
-	zend.SmartStrFree(&ctx.attr_val)
+	zend.SmartStrFree(&ctx.GetResult())
+	zend.SmartStrFree(&ctx.GetBuf())
+	zend.SmartStrFree(&ctx.GetTag())
+	zend.SmartStrFree(&ctx.GetArg())
+	zend.SmartStrFree(&ctx.GetAttrVal())
 	return zend.SUCCESS
 }
 func PhpUrlScannerSessionHandlerImpl(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int, type_ int) {
@@ -854,7 +854,7 @@ func PhpUrlScannerSessionHandlerImpl(output *byte, output_len int, handled_outpu
 	} else {
 		url_state = &BG(url_adapt_output_ex)
 	}
-	if zend.ZSTR_LEN(url_state.url_app.s) != 0 {
+	if zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) != 0 {
 		*handled_output = UrlAdaptExt(output, output_len, &len_, zend_bool(b.Cond((mode&(core.PHP_OUTPUT_HANDLER_END|core.PHP_OUTPUT_HANDLER_CONT|core.PHP_OUTPUT_HANDLER_FLUSH|core.PHP_OUTPUT_HANDLER_FINAL)) != 0, 1, 0)), url_state)
 		if b.SizeOf("unsigned int") < b.SizeOf("size_t") {
 			if len_ > UINT_MAX {
@@ -862,15 +862,15 @@ func PhpUrlScannerSessionHandlerImpl(output *byte, output_len int, handled_outpu
 			}
 		}
 		*handled_output_len = len_
-	} else if zend.ZSTR_LEN(url_state.url_app.s) == 0 {
+	} else if zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) == 0 {
 		var ctx *UrlAdaptStateExT = url_state
-		if ctx.buf.s != nil && zend.ZSTR_LEN(ctx.buf.s) != 0 {
-			zend.SmartStrAppend(&ctx.result, ctx.buf.s)
-			zend.SmartStrAppendl(&ctx.result, output, output_len)
-			*handled_output = zend.Estrndup(zend.ZSTR_VAL(ctx.result.s), zend.ZSTR_LEN(ctx.result.s))
-			*handled_output_len = zend.ZSTR_LEN(ctx.buf.s) + output_len
-			zend.SmartStrFree(&ctx.buf)
-			zend.SmartStrFree(&ctx.result)
+		if ctx.GetBuf().GetS() != nil && zend.ZSTR_LEN(ctx.GetBuf().GetS()) != 0 {
+			zend.SmartStrAppend(&ctx.GetResult(), ctx.GetBuf().GetS())
+			zend.SmartStrAppendl(&ctx.GetResult(), output, output_len)
+			*handled_output = zend.Estrndup(zend.ZSTR_VAL(ctx.GetResult().GetS()), zend.ZSTR_LEN(ctx.GetResult().GetS()))
+			*handled_output_len = zend.ZSTR_LEN(ctx.GetBuf().GetS()) + output_len
+			zend.SmartStrFree(&ctx.GetBuf())
+			zend.SmartStrFree(&ctx.GetResult())
 		} else {
 			*handled_output = zend.Estrndup(output, b.Assign(&(*handled_output_len), output_len))
 		}
@@ -904,8 +904,8 @@ func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len in
 		core.PhpOutputStartInternal(zend.ZEND_STRL("URL-Rewriter"), handler, 0, core.PHP_OUTPUT_HANDLER_STDFLAGS)
 		url_state.SetActive(1)
 	}
-	if url_state.url_app.s != nil && zend.ZSTR_LEN(url_state.url_app.s) != 0 {
-		zend.SmartStrAppends(&url_state.url_app, core.PG(arg_separator).output)
+	if url_state.GetUrlApp().GetS() != nil && zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) != 0 {
+		zend.SmartStrAppends(&url_state.GetUrlApp(), core.PG(arg_separator).output)
 	}
 	if encode != 0 {
 		encoded = PhpRawUrlEncode(name, name_len)
@@ -926,14 +926,14 @@ func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len in
 		zend.SmartStrAppendl(&hname, name, name_len)
 		zend.SmartStrAppendl(&hvalue, value, value_len)
 	}
-	zend.SmartStrAppendSmartStr(&url_state.url_app, &sname)
-	zend.SmartStrAppendc(&url_state.url_app, '=')
-	zend.SmartStrAppendSmartStr(&url_state.url_app, &svalue)
-	zend.SmartStrAppends(&url_state.form_app, "<input type=\"hidden\" name=\"")
-	zend.SmartStrAppendSmartStr(&url_state.form_app, &hname)
-	zend.SmartStrAppends(&url_state.form_app, "\" value=\"")
-	zend.SmartStrAppendSmartStr(&url_state.form_app, &hvalue)
-	zend.SmartStrAppends(&url_state.form_app, "\" />")
+	zend.SmartStrAppendSmartStr(&url_state.GetUrlApp(), &sname)
+	zend.SmartStrAppendc(&url_state.GetUrlApp(), '=')
+	zend.SmartStrAppendSmartStr(&url_state.GetUrlApp(), &svalue)
+	zend.SmartStrAppends(&url_state.GetFormApp(), "<input type=\"hidden\" name=\"")
+	zend.SmartStrAppendSmartStr(&url_state.GetFormApp(), &hname)
+	zend.SmartStrAppends(&url_state.GetFormApp(), "\" value=\"")
+	zend.SmartStrAppendSmartStr(&url_state.GetFormApp(), &hvalue)
+	zend.SmartStrAppends(&url_state.GetFormApp(), "\" />")
 	zend.SmartStrFree(&sname)
 	zend.SmartStrFree(&svalue)
 	zend.SmartStrFree(&hname)
@@ -953,11 +953,11 @@ func PhpUrlScannerResetVarsImpl(type_ int) {
 	} else {
 		url_state = &BG(url_adapt_output_ex)
 	}
-	if url_state.form_app.s != nil {
-		zend.ZSTR_LEN(url_state.form_app.s) = 0
+	if url_state.GetFormApp().GetS() != nil {
+		zend.ZSTR_LEN(url_state.GetFormApp().GetS()) = 0
 	}
-	if url_state.url_app.s != nil {
-		zend.ZSTR_LEN(url_state.url_app.s) = 0
+	if url_state.GetUrlApp().GetS() != nil {
+		zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) = 0
 	}
 }
 func PhpUrlScannerResetSessionVars() int {
@@ -989,7 +989,7 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Short circuit check. Only check url_app. */
 
-	if url_state.url_app.s == nil || zend.ZSTR_LEN(url_state.url_app.s) == 0 {
+	if url_state.GetUrlApp().GetS() == nil || zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) == 0 {
 		return zend.SUCCESS
 	}
 	if encode != 0 {
@@ -1015,7 +1015,7 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Short circuit check. Only check url_app. */
 
-	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.url_app.s), zend.ZSTR_VAL(url_app.s), zend.ZSTR_LEN(url_app.s), zend.ZSTR_VAL(url_state.url_app.s)+zend.ZSTR_LEN(url_state.url_app.s)))
+	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.GetUrlApp().GetS()), zend.ZSTR_VAL(url_app.GetS()), zend.ZSTR_LEN(url_app.GetS()), zend.ZSTR_VAL(url_state.GetUrlApp().GetS())+zend.ZSTR_LEN(url_state.GetUrlApp().GetS())))
 	if start == nil {
 		ret = zend.FAILURE
 		goto finish
@@ -1023,8 +1023,8 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Get end of url var */
 
-	limit = zend.ZSTR_VAL(url_state.url_app.s) + zend.ZSTR_LEN(url_state.url_app.s)
-	end = start + zend.ZSTR_LEN(url_app.s)
+	limit = zend.ZSTR_VAL(url_state.GetUrlApp().GetS()) + zend.ZSTR_LEN(url_state.GetUrlApp().GetS())
+	end = start + zend.ZSTR_LEN(url_app.GetS())
 	separator_len = strlen(core.PG(arg_separator).output)
 	for end < limit {
 		if !(memcmp(end, core.PG(arg_separator).output, separator_len)) {
@@ -1037,7 +1037,7 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Remove all when this is the only rewrite var */
 
-	if zend.ZSTR_LEN(url_state.url_app.s) == end-start {
+	if zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) == end-start {
 		PhpUrlScannerResetVarsImpl(type_)
 		goto finish
 	}
@@ -1050,13 +1050,13 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Remove partially */
 
-	memmove(start, end, zend.ZSTR_LEN(url_state.url_app.s)-(end-zend.ZSTR_VAL(url_state.url_app.s)))
-	zend.ZSTR_LEN(url_state.url_app.s) -= end - start
-	zend.ZSTR_VAL(url_state.url_app.s)[zend.ZSTR_LEN(url_state.url_app.s)] = '0'
+	memmove(start, end, zend.ZSTR_LEN(url_state.GetUrlApp().GetS())-(end-zend.ZSTR_VAL(url_state.GetUrlApp().GetS())))
+	zend.ZSTR_LEN(url_state.GetUrlApp().GetS()) -= end - start
+	zend.ZSTR_VAL(url_state.GetUrlApp().GetS())[zend.ZSTR_LEN(url_state.GetUrlApp().GetS())] = '0'
 
 	/* Remove form var */
 
-	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.form_app.s), zend.ZSTR_VAL(form_app.s), zend.ZSTR_LEN(form_app.s), zend.ZSTR_VAL(url_state.form_app.s)+zend.ZSTR_LEN(url_state.form_app.s)))
+	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.GetFormApp().GetS()), zend.ZSTR_VAL(form_app.GetS()), zend.ZSTR_LEN(form_app.GetS()), zend.ZSTR_VAL(url_state.GetFormApp().GetS())+zend.ZSTR_LEN(url_state.GetFormApp().GetS())))
 	if start == nil {
 
 		/* Should not happen */
@@ -1068,8 +1068,8 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Get end of form var */
 
-	limit = zend.ZSTR_VAL(url_state.form_app.s) + zend.ZSTR_LEN(url_state.form_app.s)
-	end = start + zend.ZSTR_LEN(form_app.s)
+	limit = zend.ZSTR_VAL(url_state.GetFormApp().GetS()) + zend.ZSTR_LEN(url_state.GetFormApp().GetS())
+	end = start + zend.ZSTR_LEN(form_app.GetS())
 	for end < limit {
 		if (*end) == '>' {
 			end += 1
@@ -1080,9 +1080,9 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 
 	/* Remove partially */
 
-	memmove(start, end, zend.ZSTR_LEN(url_state.form_app.s)-(end-zend.ZSTR_VAL(url_state.form_app.s)))
-	zend.ZSTR_LEN(url_state.form_app.s) -= end - start
-	zend.ZSTR_VAL(url_state.form_app.s)[zend.ZSTR_LEN(url_state.form_app.s)] = '0'
+	memmove(start, end, zend.ZSTR_LEN(url_state.GetFormApp().GetS())-(end-zend.ZSTR_VAL(url_state.GetFormApp().GetS())))
+	zend.ZSTR_LEN(url_state.GetFormApp().GetS()) -= end - start
+	zend.ZSTR_VAL(url_state.GetFormApp().GetS())[zend.ZSTR_LEN(url_state.GetFormApp().GetS())] = '0'
 finish:
 	zend.SmartStrFree(&url_app)
 	zend.SmartStrFree(&form_app)

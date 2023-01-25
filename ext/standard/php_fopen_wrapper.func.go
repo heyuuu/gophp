@@ -17,15 +17,15 @@ func PhpStreamOutputWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	return count
 }
 func PhpStreamOutputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	stream.eof = 1
+	stream.SetEof(1)
 	return -1
 }
 func PhpStreamOutputClose(stream *core.PhpStream, close_handle int) int        { return 0 }
 func PhpStreamInputWrite(stream *core.PhpStream, buf *byte, count int) ssize_t { return -1 }
 func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	var input *PhpStreamInputT = stream.abstract
+	var input *PhpStreamInputT = stream.GetAbstract()
 	var read ssize_t
-	if !(core.SG(post_read)) && core.SG(read_post_bytes) < int64_t(input.GetPosition()+count) {
+	if !(core.SG(post_read)) && core.SG(read_post_bytes) < int64(input.GetPosition()+count) {
 
 		/* read requested data from SAPI */
 
@@ -35,7 +35,7 @@ func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			core.PhpStreamWrite(input.GetBody(), buf, read_bytes)
 		}
 	}
-	if input.GetBody().readfilters.head == nil {
+	if input.GetBody().GetReadfilters().GetHead() == nil {
 
 		/* If the input stream contains filters, it's not really seekable. The
 		   input->position is likely to be wrong for unfiltered data. */
@@ -48,23 +48,23 @@ func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	}
 	read = core.PhpStreamRead(input.GetBody(), buf, count)
 	if !read || read == size_t-1 {
-		stream.eof = 1
+		stream.SetEof(1)
 	} else {
 		input.SetPosition(input.GetPosition() + read)
 	}
 	return read
 }
 func PhpStreamInputClose(stream *core.PhpStream, close_handle int) int {
-	zend.Efree(stream.abstract)
-	stream.abstract = nil
+	zend.Efree(stream.GetAbstract())
+	stream.SetAbstract(nil)
 	return 0
 }
 func PhpStreamInputFlush(stream *core.PhpStream) int { return -1 }
 func PhpStreamInputSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int {
-	var input *PhpStreamInputT = stream.abstract
+	var input *PhpStreamInputT = stream.GetAbstract()
 	if input.GetBody() != nil {
 		var sought int = core.PhpStreamSeek(input.GetBody(), offset, whence)
-		input.SetPosition(input.GetBody().position)
+		input.SetPosition(input.GetBody().GetPosition())
 		*newoffset = input.GetPosition()
 		return sought
 	}
@@ -79,14 +79,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 		PhpUrlDecode(p, strlen(p))
 		if read_chain != 0 {
 			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, core.PhpStreamIsPersistent(stream))) {
-				streams.PhpStreamFilterAppend(&stream.readfilters, temp_filter)
+				streams.PhpStreamFilterAppend(&stream.GetReadfilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create filter (%s)", p)
 			}
 		}
 		if write_chain != 0 {
 			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, core.PhpStreamIsPersistent(stream))) {
-				streams.PhpStreamFilterAppend(&stream.writefilters, temp_filter)
+				streams.PhpStreamFilterAppend(&stream.GetWritefilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create filter (%s)", p)
 			}
@@ -151,7 +151,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 			}
 			return nil
 		}
-		if !(strcmp(core.sapi_module.name, "cli")) {
+		if !(strcmp(core.sapi_module.GetName(), "cli")) {
 			var cli_in int = 0
 			fd = cgi.STDIN_FILENO
 			if cli_in != 0 {
@@ -164,7 +164,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 			fd = dup(cgi.STDIN_FILENO)
 		}
 	} else if !(strcasecmp(path, "stdout")) {
-		if !(strcmp(core.sapi_module.name, "cli")) {
+		if !(strcmp(core.sapi_module.GetName(), "cli")) {
 			var cli_out int = 0
 			fd = cli.STDOUT_FILENO
 			if b.PostInc(&cli_out) {
@@ -177,7 +177,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 			fd = dup(cli.STDOUT_FILENO)
 		}
 	} else if !(strcasecmp(path, "stderr")) {
-		if !(strcmp(core.sapi_module.name, "cli")) {
+		if !(strcmp(core.sapi_module.GetName(), "cli")) {
 			var cli_err int = 0
 			fd = cli.STDERR_FILENO
 			if b.PostInc(&cli_err) {
@@ -194,7 +194,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		var end *byte
 		var fildes_ori zend.ZendLong
 		var dtablesize int
-		if strcmp(core.sapi_module.name, "cli") {
+		if strcmp(core.sapi_module.GetName(), "cli") {
 			if (options & core.REPORT_ERRORS) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Direct access to file descriptors is only available from command-line PHP")
 			}
@@ -256,7 +256,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 			p = core.PhpStrtokR(nil, "/", &token)
 		}
 		zend.Efree(pathdup)
-		if zend.ExecutorGlobals.exception != nil {
+		if zend.ExecutorGlobals.GetException() != nil {
 			core.PhpStreamClose(stream)
 			return nil
 		}

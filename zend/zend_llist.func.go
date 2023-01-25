@@ -180,7 +180,7 @@ func ZendLlistApplyWithArguments(l *ZendLlist, func_ LlistApplyWithArgsFuncT, nu
 }
 func ZendLlistCount(l *ZendLlist) int { return l.GetCount() }
 func ZendLlistGetFirstEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
 	*current = l.GetHead()
 	if (*current) != nil {
 		return (*current).GetData()
@@ -189,7 +189,7 @@ func ZendLlistGetFirstEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	}
 }
 func ZendLlistGetLastEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
 	*current = l.GetTail()
 	if (*current) != nil {
 		return (*current).GetData()
@@ -198,7 +198,7 @@ func ZendLlistGetLastEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	}
 }
 func ZendLlistGetNextEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
 	if (*current) != nil {
 		*current = (*current).GetNext()
 		if (*current) != nil {
@@ -208,7 +208,7 @@ func ZendLlistGetNextEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	return nil
 }
 func ZendLlistGetPrevEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
 	if (*current) != nil {
 		*current = (*current).GetPrev()
 		if (*current) != nil {

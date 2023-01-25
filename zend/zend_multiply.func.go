@@ -20,7 +20,7 @@ func ZendSafeAddress(nmemb int, size int, offset int, overflow *int) int {
 	var res int = nmemb*size + offset
 	var _d float64 = float64(nmemb * float64(size+float64(offset)))
 	var _delta float64 = float64(res - _d)
-	if UNEXPECTED(_d+_delta != _d) {
+	if _d+_delta != _d {
 		*overflow = 1
 		return 0
 	}
@@ -30,7 +30,7 @@ func ZendSafeAddress(nmemb int, size int, offset int, overflow *int) int {
 func ZendSafeAddressGuarded(nmemb int, size int, offset int) int {
 	var overflow int
 	var ret int = ZendSafeAddress(nmemb, size, offset, &overflow)
-	if UNEXPECTED(overflow != 0) {
+	if overflow != 0 {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%zu * %zu + %zu)", nmemb, size, offset)
 		return 0
 	}
@@ -39,7 +39,7 @@ func ZendSafeAddressGuarded(nmemb int, size int, offset int) int {
 func ZendSafeAddmult(nmemb int, size int, offset int, message string) int {
 	var overflow int
 	var ret int = ZendSafeAddress(nmemb, size, offset, &overflow)
-	if UNEXPECTED(overflow != 0) {
+	if overflow != 0 {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in %s (%zu * %zu + %zu)", message, nmemb, size, offset)
 		return 0
 	}

@@ -516,7 +516,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 		}
 	}
 	ZendDestroyFileHandle(&file_handle)
-	if UNEXPECTED(filename == &tmp) {
+	if filename == &tmp {
 		ZvalPtrDtor(&tmp)
 	}
 	return retval
@@ -586,7 +586,7 @@ func CompileString(source_string *Zval, filename *byte) *ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *ZendOpArray = nil
 	var tmp Zval
-	if UNEXPECTED(Z_TYPE_P(source_string) != IS_STRING) {
+	if Z_TYPE_P(source_string) != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(source_string))
 	} else {
 		ZVAL_COPY(&tmp, source_string)
@@ -626,14 +626,14 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *ZendSyntaxHighlighter
 func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni, str_name *byte) int {
 	var original_lex_state ZendLexState
 	var tmp Zval
-	if UNEXPECTED(Z_TYPE_P(str) != IS_STRING) {
+	if Z_TYPE_P(str) != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(str))
 		str = &tmp
 	}
 	ZendSaveLexicalState(&original_lex_state)
 	if ZendPrepareStringForScanning(str, str_name) == FAILURE {
 		ZendRestoreLexicalState(&original_lex_state)
-		if UNEXPECTED(str == &tmp) {
+		if str == &tmp {
 			ZvalPtrDtor(&tmp)
 		}
 		return FAILURE
@@ -645,7 +645,7 @@ func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni
 		SCNG(script_filtered) = nil
 	}
 	ZendRestoreLexicalState(&original_lex_state)
-	if UNEXPECTED(str == &tmp) {
+	if str == &tmp {
 		ZvalPtrDtor(&tmp)
 	}
 	return SUCCESS
@@ -716,7 +716,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 	s = Z_STRVAL_P(zendlval)
 	end = s + Z_STRLEN_P(zendlval)
 	for true {
-		if UNEXPECTED((*s) == '\\') {
+		if (*s) == '\\' {
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
@@ -1013,7 +1013,7 @@ func CopyHeredocLabelStack(void_heredoc_label any) {
 	new_heredoc_label.SetLabel(Estrndup(heredoc_label.GetLabel(), heredoc_label.GetLength()))
 	ZendPtrStackPush(&SCNG(heredoc_label_stack), any(new_heredoc_label))
 }
-func PARSER_MODE() __auto__ { return EXPECTED(elem != nil) }
+func PARSER_MODE() bool { return elem != nil }
 func RETURN_TOKEN_WITH_VAL(_token Yytokentype) {
 	token = _token
 	goto emit_token_with_val
@@ -1372,7 +1372,7 @@ yy5:
 		switch b.PostInc(&(*YYCURSOR)) {
 		case '"':
 			Yyleng = YYCURSOR - SCNG(yy_text)
-			if EXPECTED(ZendScanEscapeString(zendlval, Yytext+bprefix+1, Yyleng-bprefix-2, '"') == SUCCESS) || !(PARSER_MODE()) {
+			if ZendScanEscapeString(zendlval, Yytext+bprefix+1, Yyleng-bprefix-2, '"') == SUCCESS || !(PARSER_MODE()) {
 				RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
 			} else {
 				token = T_ERROR
@@ -1516,7 +1516,7 @@ yy10:
 	s = Z_STRVAL_P(zendlval)
 	end = s + Z_STRLEN_P(zendlval)
 	for true {
-		if UNEXPECTED((*s) == '\\') {
+		if (*s) == '\\' {
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
@@ -5488,7 +5488,7 @@ yy334:
 		SCNG(heredoc_indentation_uses_spaces) = 0
 		LanguageScannerGlobals.SetOnEvent(nil)
 		CompilerGlobals.SetDocComment(nil)
-		ZendPtrStackReverseApply(&current_state.heredoc_label_stack, CopyHeredocLabelStack)
+		ZendPtrStackReverseApply(&current_state.GetHeredocLabelStack(), CopyHeredocLabelStack)
 		ZendExceptionSave()
 		for heredoc_nesting_level != 0 {
 			var zv Zval
@@ -7698,7 +7698,7 @@ yy562:
 		break
 	}
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	if EXPECTED(ZendScanEscapeString(zendlval, Yytext, Yyleng, '`') == SUCCESS) || !(PARSER_MODE()) {
+	if ZendScanEscapeString(zendlval, Yytext, Yyleng, '`') == SUCCESS || !(PARSER_MODE()) {
 		RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		token = T_ERROR
@@ -7885,7 +7885,7 @@ yy576:
 	}
 double_quotes_scan_done:
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	if EXPECTED(ZendScanEscapeString(zendlval, Yytext, Yyleng, '"') == SUCCESS) || !(PARSER_MODE()) {
+	if ZendScanEscapeString(zendlval, Yytext, Yyleng, '"') == SUCCESS || !(PARSER_MODE()) {
 		RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		token = T_ERROR
@@ -8125,7 +8125,7 @@ heredoc_scan_done:
 			token = T_ERROR
 			goto emit_token
 		}
-		if UNEXPECTED(ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS) {
+		if ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS {
 			ZendStringEfree(copy)
 			token = T_ERROR
 			goto emit_token

@@ -13,10 +13,10 @@ import (
 func StrfilterRot13Filter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
-	for buckets_in.head != nil {
-		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.head)
-		PhpStrtr(bucket.buf, bucket.buflen, Rot13From, Rot13To, 52)
-		consumed += bucket.buflen
+	for buckets_in.GetHead() != nil {
+		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Rot13From, Rot13To, 52)
+		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -30,10 +30,10 @@ func StrfilterRot13Create(filtername *byte, filterparams *zend.Zval, persistent 
 func StrfilterToupperFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
-	for buckets_in.head != nil {
-		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.head)
-		PhpStrtr(bucket.buf, bucket.buflen, Lowercase, Uppercase, 26)
-		consumed += bucket.buflen
+	for buckets_in.GetHead() != nil {
+		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Lowercase, Uppercase, 26)
+		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -44,10 +44,10 @@ func StrfilterToupperFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFi
 func StrfilterTolowerFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
-	for buckets_in.head != nil {
-		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.head)
-		PhpStrtr(bucket.buf, bucket.buflen, Uppercase, Lowercase, 26)
-		consumed += bucket.buflen
+	for buckets_in.GetHead() != nil {
+		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
+		PhpStrtr(bucket.GetBuf(), bucket.GetBuflen(), Uppercase, Lowercase, 26)
+		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -83,11 +83,11 @@ func PhpStripTagsFilterDtor(inst *PhpStripTagsFilter) {
 func StrfilterStripTagsFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
-	var inst *PhpStripTagsFilter = (*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.abstract))
-	for buckets_in.head != nil {
-		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.head)
-		consumed = bucket.buflen
-		bucket.buflen = PhpStripTags(bucket.buf, bucket.buflen, &(inst.GetState()), inst.GetAllowedTags(), inst.GetAllowedTagsLen())
+	var inst *PhpStripTagsFilter = (*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.GetAbstract()))
+	for buckets_in.GetHead() != nil {
+		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
+		consumed = bucket.GetBuflen()
+		bucket.SetBuflen(PhpStripTags(bucket.GetBuf(), bucket.GetBuflen(), &(inst.GetState()), inst.GetAllowedTags(), inst.GetAllowedTagsLen()))
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -96,9 +96,9 @@ func StrfilterStripTagsFilter(stream *core.PhpStream, thisfilter *core.PhpStream
 	return streams.PSFS_PASS_ON
 }
 func StrfilterStripTagsDtor(thisfilter *core.PhpStreamFilter) {
-	r.Assert(zend.Z_PTR(thisfilter.abstract) != nil)
-	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.abstract)))
-	zend.Pefree(zend.Z_PTR(thisfilter.abstract), (*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.abstract)).GetPersistent())
+	r.Assert(zend.Z_PTR(thisfilter.GetAbstract()) != nil)
+	PhpStripTagsFilterDtor((*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.GetAbstract())))
+	zend.Pefree(zend.Z_PTR(thisfilter.GetAbstract()), (*PhpStripTagsFilter)(zend.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }
 func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpStripTagsFilter
@@ -111,12 +111,12 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 			var tmp *zend.Zval
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(filterparams)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					tmp = _z
@@ -128,14 +128,14 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 				break
 			}
 			zend.SmartStr0(&tags_ss)
-			allowed_tags = tags_ss.s
+			allowed_tags = tags_ss.GetS()
 		} else {
 			allowed_tags = zend.ZvalGetString(filterparams)
 		}
 
 		/* Exception during string conversion. */
 
-		if zend.ExecutorGlobals.exception != nil {
+		if zend.ExecutorGlobals.GetException() != nil {
 			if allowed_tags != nil {
 				zend.ZendStringRelease(allowed_tags)
 			}
@@ -1287,11 +1287,11 @@ out_failure:
 func StrfilterConvertFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket = nil
 	var consumed int = 0
-	var inst *PhpConvertFilter = (*PhpConvertFilter)(zend.Z_PTR(thisfilter.abstract))
-	for buckets_in.head != nil {
-		bucket = buckets_in.head
+	var inst *PhpConvertFilter = (*PhpConvertFilter)(zend.Z_PTR(thisfilter.GetAbstract()))
+	for buckets_in.GetHead() != nil {
+		bucket = buckets_in.GetHead()
 		streams.PhpStreamBucketUnlink(bucket)
-		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, bucket.buf, bucket.buflen, &consumed, core.PhpStreamIsPersistent(stream)) != zend.SUCCESS {
+		if StrfilterConvertAppendBucket(inst, stream, thisfilter, buckets_out, bucket.GetBuf(), bucket.GetBuflen(), &consumed, core.PhpStreamIsPersistent(stream)) != zend.SUCCESS {
 			goto out_failure
 		}
 		streams.PhpStreamBucketDelref(bucket)
@@ -1312,9 +1312,9 @@ out_failure:
 	return streams.PSFS_ERR_FATAL
 }
 func StrfilterConvertDtor(thisfilter *core.PhpStreamFilter) {
-	r.Assert(zend.Z_PTR(thisfilter.abstract) != nil)
-	PhpConvertFilterDtor((*PhpConvertFilter)(zend.Z_PTR(thisfilter.abstract)))
-	zend.Pefree(zend.Z_PTR(thisfilter.abstract), (*PhpConvertFilter)(zend.Z_PTR(thisfilter.abstract)).GetPersistent())
+	r.Assert(zend.Z_PTR(thisfilter.GetAbstract()) != nil)
+	PhpConvertFilterDtor((*PhpConvertFilter)(zend.Z_PTR(thisfilter.GetAbstract())))
+	zend.Pefree(zend.Z_PTR(thisfilter.GetAbstract()), (*PhpConvertFilter)(zend.Z_PTR(thisfilter.GetAbstract())).GetPersistent())
 }
 func StrfilterConvertCreate(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
 	var inst *PhpConvertFilter
@@ -1350,15 +1350,15 @@ out:
 	return retval
 }
 func ConsumedFilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
-	var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(zend.Z_PTR(thisfilter.abstract))
+	var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(zend.Z_PTR(thisfilter.GetAbstract()))
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	if data.GetOffset() == ^0 {
 		data.SetOffset(core.PhpStreamTell(stream))
 	}
-	for b.Assign(&bucket, buckets_in.head) != nil {
+	for b.Assign(&bucket, buckets_in.GetHead()) != nil {
 		streams.PhpStreamBucketUnlink(bucket)
-		consumed += bucket.buflen
+		consumed += bucket.GetBuflen()
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -1371,8 +1371,8 @@ func ConsumedFilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilt
 	return streams.PSFS_PASS_ON
 }
 func ConsumedFilterDtor(thisfilter *core.PhpStreamFilter) {
-	if thisfilter != nil && zend.Z_PTR(thisfilter.abstract) {
-		var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(zend.Z_PTR(thisfilter.abstract))
+	if thisfilter != nil && zend.Z_PTR(thisfilter.GetAbstract()) {
+		var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(zend.Z_PTR(thisfilter.GetAbstract()))
 		zend.Pefree(data, data.GetPersistent())
 	}
 }
@@ -1516,11 +1516,11 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 func PhpChunkedFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
-	var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(zend.Z_PTR(thisfilter.abstract))
-	for buckets_in.head != nil {
-		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.head)
-		consumed += bucket.buflen
-		bucket.buflen = PhpDechunk(bucket.buf, bucket.buflen, data)
+	var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(zend.Z_PTR(thisfilter.GetAbstract()))
+	for buckets_in.GetHead() != nil {
+		bucket = streams.PhpStreamBucketMakeWriteable(buckets_in.GetHead())
+		consumed += bucket.GetBuflen()
+		bucket.SetBuflen(PhpDechunk(bucket.GetBuf(), bucket.GetBuflen(), data))
 		streams.PhpStreamBucketAppend(buckets_out, bucket)
 	}
 	if bytes_consumed != nil {
@@ -1529,8 +1529,8 @@ func PhpChunkedFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 	return streams.PSFS_PASS_ON
 }
 func PhpChunkedDtor(thisfilter *core.PhpStreamFilter) {
-	if thisfilter != nil && zend.Z_PTR(thisfilter.abstract) {
-		var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(zend.Z_PTR(thisfilter.abstract))
+	if thisfilter != nil && zend.Z_PTR(thisfilter.GetAbstract()) {
+		var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(zend.Z_PTR(thisfilter.GetAbstract()))
 		zend.Pefree(data, data.GetPersistent())
 	}
 }
@@ -1553,7 +1553,7 @@ func ChunkedFilterCreate(filtername *byte, filterparams *zend.Zval, persistent u
 func ZmStartupStandardFilters(type_ int, module_number int) int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
-		if zend.FAILURE == streams.PhpStreamFilterRegisterFactory(StandardFilters[i].ops.label, StandardFilters[i].factory) {
+		if zend.FAILURE == streams.PhpStreamFilterRegisterFactory(StandardFilters[i].ops.GetLabel(), StandardFilters[i].factory) {
 			return zend.FAILURE
 		}
 	}
@@ -1562,7 +1562,7 @@ func ZmStartupStandardFilters(type_ int, module_number int) int {
 func ZmShutdownStandardFilters(type_ int, module_number int) int {
 	var i int
 	for i = 0; StandardFilters[i].ops != nil; i++ {
-		streams.PhpStreamFilterUnregisterFactory(StandardFilters[i].ops.label)
+		streams.PhpStreamFilterUnregisterFactory(StandardFilters[i].ops.GetLabel())
 	}
 	return zend.SUCCESS
 }

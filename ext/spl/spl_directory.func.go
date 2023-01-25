@@ -22,7 +22,7 @@ func SplFilesystemObjectToIterator(obj *SplFilesystemObject) *SplFilesystemItera
 	var it *SplFilesystemIterator
 	it = zend.Ecalloc(1, b.SizeOf("spl_filesystem_iterator"))
 	it.SetObject(any(obj))
-	zend.ZendIteratorInit(&it.intern)
+	zend.ZendIteratorInit(&it.GetIntern())
 	return it
 }
 func SplFilesystemIteratorToObject(it *SplFilesystemIterator) *SplFilesystemObject {
@@ -47,8 +47,8 @@ func SplFilesystemFileFreeLine(intern *SplFilesystemObject) {
 		intern.SetCurrentLine(nil)
 	}
 	if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
-		zend.ZvalPtrDtor(&intern.u.file.current_zval)
-		zend.ZVAL_UNDEF(&intern.u.file.current_zval)
+		zend.ZvalPtrDtor(&intern.GetCurrentZval())
+		zend.ZVAL_UNDEF(&intern.GetCurrentZval())
 	}
 }
 func SplFilesystemObjectDestroyObject(object *zend.ZendObject) {
@@ -70,13 +70,13 @@ func SplFilesystemObjectDestroyObject(object *zend.ZendObject) {
 			   }
 			*/
 
-			if intern.GetStream().is_persistent == 0 {
+			if intern.GetStream().GetIsPersistent() == 0 {
 				core.PhpStreamClose(intern.GetStream())
 			} else {
 				core.PhpStreamPclose(intern.GetStream())
 			}
 			intern.SetStream(nil)
-			zend.ZVAL_UNDEF(&intern.u.file.zresource)
+			zend.ZVAL_UNDEF(&intern.GetZresource())
 		}
 		break
 	default:
@@ -88,7 +88,7 @@ func SplFilesystemObjectFreeStorage(object *zend.ZendObject) {
 	if intern.GetOthHandler() != nil && intern.GetOthHandler().GetDtor() != nil {
 		intern.GetOthHandler().GetDtor()(intern)
 	}
-	zend.ZendObjectStdDtor(&intern.std)
+	zend.ZendObjectStdDtor(&intern.GetStd())
 	if intern.GetPath() != nil {
 		zend.Efree(intern.GetPath())
 	}
@@ -122,18 +122,18 @@ func SplFilesystemObjectNewEx(class_type *zend.ZendClassEntry) *zend.ZendObject 
 
 	intern.SetFileClass(spl_ce_SplFileObject)
 	intern.SetInfoClass(spl_ce_SplFileInfo)
-	zend.ZendObjectStdInit(&intern.std, class_type)
-	zend.ObjectPropertiesInit(&intern.std, class_type)
-	intern.std.handlers = &SplFilesystemObjectHandlers
-	return &intern.std
+	zend.ZendObjectStdInit(&intern.GetStd(), class_type)
+	zend.ObjectPropertiesInit(&intern.GetStd(), class_type)
+	intern.GetStd().SetHandlers(&SplFilesystemObjectHandlers)
+	return &intern.GetStd()
 }
 func SplFilesystemObjectNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 	return SplFilesystemObjectNewEx(class_type)
 }
 func SplFilesystemObjectNewCheck(class_type *zend.ZendClassEntry) *zend.ZendObject {
 	var ret *SplFilesystemObject = SplFilesystemFromObj(SplFilesystemObjectNewEx(class_type))
-	ret.std.handlers = &SplFilesystemObjectCheckHandlers
-	return &ret.std
+	ret.GetStd().SetHandlers(&SplFilesystemObjectCheckHandlers)
+	return &ret.GetStd()
 }
 func SplFilesystemObjectGetPath(intern *SplFilesystemObject, len_ *int) *byte {
 	if intern.GetType() == SPL_FS_DIR {
@@ -166,9 +166,9 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 		/* if there is parent path, ammend it, otherwise just use the given path as is */
 
 		if path_len == 0 {
-			intern.SetFileNameLen(core.Spprintf(&intern.file_name, 0, "%s", intern.u.dir.entry.d_name))
+			intern.SetFileNameLen(core.Spprintf(&intern.GetFileName(), 0, "%s", intern.GetEntry().GetDName()))
 		} else {
-			intern.SetFileNameLen(core.Spprintf(&intern.file_name, 0, "%s%c%s", path, slash, intern.u.dir.entry.d_name))
+			intern.SetFileNameLen(core.Spprintf(&intern.GetFileName(), 0, "%s%c%s", path, slash, intern.GetEntry().GetDName()))
 		}
 
 		/* if there is parent path, ammend it, otherwise just use the given path as is */
@@ -177,8 +177,8 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 	}
 }
 func SplFilesystemDirRead(intern *SplFilesystemObject) int {
-	if intern.GetDirp() == nil || core.PhpStreamReaddir(intern.GetDirp(), &intern.u.dir.entry) == nil {
-		intern.u.dir.entry.d_name[0] = '0'
+	if intern.GetDirp() == nil || core.PhpStreamReaddir(intern.GetDirp(), &intern.GetEntry()) == nil {
+		intern.GetEntry().GetDName()[0] = '0'
 		return 0
 	} else {
 		return 1
@@ -199,9 +199,9 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 		intern.SetPath(zend.Estrndup(path, intern.GetPathLen()))
 	}
 	intern.SetIndex(0)
-	if zend.ExecutorGlobals.exception != nil || intern.GetDirp() == nil {
-		intern.u.dir.entry.d_name[0] = '0'
-		if zend.ExecutorGlobals.exception == nil {
+	if zend.ExecutorGlobals.GetException() != nil || intern.GetDirp() == nil {
+		intern.GetEntry().GetDName()[0] = '0'
+		if zend.ExecutorGlobals.GetException() == nil {
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
@@ -213,7 +213,7 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 	} else {
 		for {
 			SplFilesystemDirRead(intern)
-			if !(skip_dots != 0 && SplFilesystemIsDot(intern.u.dir.entry.d_name) != 0) {
+			if !(skip_dots != 0 && SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0) {
 				break
 			}
 		}
@@ -223,7 +223,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	var tmp zend.Zval
 	intern.SetType(SPL_FS_FILE)
 	standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_DIR, &tmp)
-	if zend.Z_TYPE(tmp) == zend.IS_TRUE {
+	if tmp.IsType(zend.IS_TRUE) {
 		intern.SetOpenMode(nil)
 		intern.SetFileName(nil)
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Cannot use SplFileObject with directories")
@@ -232,7 +232,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetContext(streams.PhpStreamContextFromZval(intern.GetZcontext(), 0))
 	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
 	if intern.GetFileNameLen() == 0 || intern.GetStream() == nil {
-		if zend.ExecutorGlobals.exception == nil {
+		if zend.ExecutorGlobals.GetException() == nil {
 			zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", b.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
 		}
 		intern.SetFileName(nil)
@@ -250,13 +250,13 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	if intern.GetFileNameLen() > 1 && IS_SLASH_AT(intern.GetFileName(), intern.GetFileNameLen()-1) {
 		intern.GetFileNameLen()--
 	}
-	intern.SetOrigPath(zend.Estrndup(intern.GetStream().orig_path, strlen(intern.GetStream().orig_path)))
+	intern.SetOrigPath(zend.Estrndup(intern.GetStream().GetOrigPath(), strlen(intern.GetStream().GetOrigPath())))
 	intern.SetFileName(zend.Estrndup(intern.GetFileName(), intern.GetFileNameLen()))
 	intern.SetOpenMode(zend.Estrndup(intern.GetOpenMode(), intern.GetOpenModeLen()))
 
 	/* avoid reference counting in debug mode, thus do it manually */
 
-	zend.ZVAL_RES(&intern.u.file.zresource, intern.GetStream().res)
+	zend.ZVAL_RES(&intern.GetZresource(), intern.GetStream().GetRes())
 
 	/*!!! TODO: maybe bug?
 	  Z_SET_REFCOUNT(intern->u.file.zresource, 1);
@@ -265,7 +265,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetDelimiter(',')
 	intern.SetEnclosure('"')
 	intern.SetEscape(uint8('\\'))
-	intern.SetFuncGetCurr(zend.ZendHashStrFindPtr(&intern.std.ce.function_table, "getcurrentline", b.SizeOf("\"getcurrentline\"")-1))
+	intern.SetFuncGetCurr(zend.ZendHashStrFindPtr(&intern.GetStd().GetCe().GetFunctionTable(), "getcurrentline", b.SizeOf("\"getcurrentline\"")-1))
 	return zend.SUCCESS
 }
 func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
@@ -277,7 +277,7 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var skip_dots int
 	old_object = zend.Z_OBJ_P(zobject)
 	source = SplFilesystemFromObj(old_object)
-	new_object = SplFilesystemObjectNewEx(old_object.ce)
+	new_object = SplFilesystemObjectNewEx(old_object.GetCe())
 	intern = SplFilesystemFromObj(new_object)
 	intern.SetFlags(source.GetFlags())
 	switch source.GetType() {
@@ -296,7 +296,7 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 		for index = 0; index < source.GetIndex(); index++ {
 			for {
 				SplFilesystemDirRead(intern)
-				if !(skip_dots != 0 && SplFilesystemIsDot(intern.u.dir.entry.d_name) != 0) {
+				if !(skip_dots != 0 && SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0) {
 					break
 				}
 			}
@@ -364,10 +364,10 @@ func SplFilesystemObjectCreateInfo(source *SplFilesystemObject, file_path *byte,
 	}
 	zend.ZendUpdateClassConstants(ce)
 	intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-	zend.ZVAL_OBJ(return_value, &intern.std)
-	if ce.constructor.common.scope != spl_ce_SplFileInfo {
+	zend.ZVAL_OBJ(return_value, &intern.GetStd())
+	if ce.GetConstructor().GetScope() != spl_ce_SplFileInfo {
 		zend.ZVAL_STRINGL(&arg1, file_path, file_path_len)
-		zend.ZendCallMethodWith1Params(return_value, ce, &ce.constructor, "__construct", nil, &arg1)
+		zend.ZendCallMethodWith1Params(return_value, ce, &ce.GetConstructor(), "__construct", nil, &arg1)
 		zend.ZvalPtrDtor(&arg1)
 	} else {
 		SplFilesystemInfoSetFilename(intern, file_path, file_path_len, use_copy)
@@ -388,7 +388,7 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 	case SPL_FS_FILE:
 		break
 	case SPL_FS_DIR:
-		if !(source.u.dir.entry.d_name[0]) {
+		if !(source.GetEntry().GetDName()[0]) {
 			zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Could not open file")
 			zend.ZendRestoreErrorHandling(&error_handling)
 			return nil
@@ -401,20 +401,20 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 		} else {
 			ce = source.GetInfoClass()
 		}
-		if zend.UNEXPECTED(zend.ZendUpdateClassConstants(ce) != zend.SUCCESS) {
+		if zend.ZendUpdateClassConstants(ce) != zend.SUCCESS {
 			break
 		}
 		intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-		zend.ZVAL_OBJ(return_value, &intern.std)
+		zend.ZVAL_OBJ(return_value, &intern.GetStd())
 		SplFilesystemObjectGetFileName(source)
-		if ce.constructor.common.scope != spl_ce_SplFileInfo {
+		if ce.GetConstructor().GetScope() != spl_ce_SplFileInfo {
 			zend.ZVAL_STRINGL(&arg1, source.GetFileName(), source.GetFileNameLen())
-			zend.ZendCallMethodWith1Params(return_value, ce, &ce.constructor, "__construct", nil, &arg1)
+			zend.ZendCallMethodWith1Params(return_value, ce, &ce.GetConstructor(), "__construct", nil, &arg1)
 			zend.ZvalPtrDtor(&arg1)
 		} else {
 			intern.SetFileName(zend.Estrndup(source.GetFileName(), source.GetFileNameLen()))
 			intern.SetFileNameLen(source.GetFileNameLen())
-			intern.SetPath(SplFilesystemObjectGetPath(source, &intern._path_len))
+			intern.SetPath(SplFilesystemObjectGetPath(source, &intern.GetPathLen()))
 			intern.SetPath(zend.Estrndup(intern.GetPath(), intern.GetPathLen()))
 		}
 		break
@@ -424,26 +424,26 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 		} else {
 			ce = source.GetFileClass()
 		}
-		if zend.UNEXPECTED(zend.ZendUpdateClassConstants(ce) != zend.SUCCESS) {
+		if zend.ZendUpdateClassConstants(ce) != zend.SUCCESS {
 			break
 		}
 		intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-		zend.ZVAL_OBJ(return_value, &intern.std)
+		zend.ZVAL_OBJ(return_value, &intern.GetStd())
 		SplFilesystemObjectGetFileName(source)
-		if ce.constructor.common.scope != spl_ce_SplFileObject {
+		if ce.GetConstructor().GetScope() != spl_ce_SplFileObject {
 			zend.ZVAL_STRINGL(&arg1, source.GetFileName(), source.GetFileNameLen())
 			zend.ZVAL_STRINGL(&arg2, "r", 1)
-			zend.ZendCallMethodWith2Params(return_value, ce, &ce.constructor, "__construct", nil, &arg1, &arg2)
+			zend.ZendCallMethodWith2Params(return_value, ce, &ce.GetConstructor(), "__construct", nil, &arg1, &arg2)
 			zend.ZvalPtrDtor(&arg1)
 			zend.ZvalPtrDtor(&arg2)
 		} else {
 			intern.SetFileName(source.GetFileName())
 			intern.SetFileNameLen(source.GetFileNameLen())
-			intern.SetPath(SplFilesystemObjectGetPath(source, &intern._path_len))
+			intern.SetPath(SplFilesystemObjectGetPath(source, &intern.GetPathLen()))
 			intern.SetPath(zend.Estrndup(intern.GetPath(), intern.GetPathLen()))
 			intern.SetOpenMode("r")
 			intern.SetOpenModeLen(1)
-			if ht != 0 && zend.ZendParseParameters(ht, "|sbr", &intern.u.file.open_mode, &intern.u.file.open_mode_len, &use_include_path, &intern.u.file.zcontext) == zend.FAILURE {
+			if ht != 0 && zend.ZendParseParameters(ht, "|sbr", &intern.GetOpenMode(), &intern.GetOpenModeLen(), &use_include_path, &intern.GetZcontext()) == zend.FAILURE {
 				zend.ZendRestoreErrorHandling(&error_handling)
 				intern.SetOpenMode(nil)
 				intern.SetFileName(nil)
@@ -478,7 +478,7 @@ func SplFilesystemObjectGetPathname(intern *SplFilesystemObject, len_ *int) *byt
 		*len_ = intern.GetFileNameLen()
 		return intern.GetFileName()
 	case SPL_FS_DIR:
-		if intern.u.dir.entry.d_name[0] {
+		if intern.GetEntry().GetDName()[0] {
 			SplFilesystemObjectGetFileName(intern)
 			*len_ = intern.GetFileNameLen()
 			return intern.GetFileName()
@@ -495,10 +495,10 @@ func SplFilesystemObjectGetDebugInfo(object *zend.Zval) *zend.HashTable {
 	var path *byte
 	var path_len int
 	var stmp []byte
-	if intern.std.properties == nil {
-		zend.RebuildObjectProperties(&intern.std)
+	if intern.GetStd().GetProperties() == nil {
+		zend.RebuildObjectProperties(&intern.GetStd())
 	}
-	rv = zend.ZendArrayDup(intern.std.properties)
+	rv = zend.ZendArrayDup(intern.GetStd().GetProperties())
 	pnstr = SplGenPrivatePropName(spl_ce_SplFileInfo, "pathName", b.SizeOf("\"pathName\"")-1)
 	path = SplFilesystemObjectGetPathname(intern, &path_len)
 	zend.ZVAL_STRINGL(&tmp, b.Cond(path != nil, path, ""), path_len)
@@ -610,7 +610,7 @@ func SplFilesystemObjectConstruct(execute_data *zend.ZendExecuteData, return_val
 	} else {
 		SplFilesystemDirOpen(intern, path)
 	}
-	if zend.InstanceofFunction(intern.std.ce, spl_ce_RecursiveDirectoryIterator) != 0 {
+	if zend.InstanceofFunction(intern.GetStd().GetCe(), spl_ce_RecursiveDirectoryIterator) != 0 {
 		intern.SetIsRecursive(1)
 	} else {
 		intern.SetIsRecursive(0)
@@ -660,7 +660,7 @@ func zim_spl_DirectoryIterator_next(execute_data *zend.ZendExecuteData, return_v
 	intern.GetIndex()++
 	for {
 		SplFilesystemDirRead(intern)
-		if !(skip_dots != 0 && SplFilesystemIsDot(intern.u.dir.entry.d_name) != 0) {
+		if !(skip_dots != 0 && SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0) {
 			break
 		}
 	}
@@ -680,21 +680,21 @@ func zim_spl_DirectoryIterator_seek(execute_data *zend.ZendExecuteData, return_v
 
 		/* we first rewind */
 
-		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.u.dir.func_rewind, "rewind", nil)
+		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.GetFuncRewind(), "rewind", nil)
 
 		/* we first rewind */
 
 	}
 	for intern.GetIndex() < pos {
 		var valid int = 0
-		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.u.dir.func_valid, "valid", &retval)
+		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.GetFuncValid(), "valid", &retval)
 		valid = zend.ZendIsTrue(&retval)
 		zend.ZvalPtrDtor(&retval)
 		if valid == 0 {
 			zend.ZendThrowExceptionEx(spl_ce_OutOfBoundsException, 0, "Seek position "+zend.ZEND_LONG_FMT+" is out of range", pos)
 			return
 		}
-		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.u.dir.func_next, "next", nil)
+		zend.ZendCallMethodWith0Params(zend.ZEND_THIS, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.GetFuncNext(), "next", nil)
 	}
 }
 func zim_spl_DirectoryIterator_valid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -702,7 +702,7 @@ func zim_spl_DirectoryIterator_valid(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.u.dir.entry.d_name[0] != '0')
+	zend.RETVAL_BOOL(intern.GetEntry().GetDName()[0] != '0')
 	return
 }
 func zim_spl_SplFileInfo_getPath(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -741,7 +741,7 @@ func zim_spl_DirectoryIterator_getFilename(execute_data *zend.ZendExecuteData, r
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_STRING(intern.u.dir.entry.d_name)
+	zend.RETVAL_STRING(intern.GetEntry().GetDName())
 	return
 }
 func zim_spl_SplFileInfo_getExtension(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -784,7 +784,7 @@ func zim_spl_DirectoryIterator_getExtension(execute_data *zend.ZendExecuteData, 
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	fname = standard.PhpBasename(intern.u.dir.entry.d_name, strlen(intern.u.dir.entry.d_name), nil, 0)
+	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), nil, 0)
 	p = zend.ZendMemrchr(zend.ZSTR_VAL(fname), '.', zend.ZSTR_LEN(fname))
 	if p != nil {
 		idx = p - zend.ZSTR_VAL(fname)
@@ -825,7 +825,7 @@ func zim_spl_DirectoryIterator_getBasename(execute_data *zend.ZendExecuteData, r
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|s", &suffix, &slen) == zend.FAILURE {
 		return
 	}
-	fname = standard.PhpBasename(intern.u.dir.entry.d_name, strlen(intern.u.dir.entry.d_name), suffix, slen)
+	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), suffix, slen)
 	zend.RETVAL_STR(fname)
 }
 func zim_spl_SplFileInfo_getPathname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -850,7 +850,7 @@ func zim_spl_FilesystemIterator_key(execute_data *zend.ZendExecuteData, return_v
 		return
 	}
 	if SPL_FILE_DIR_KEY(intern, SPL_FILE_DIR_KEY_AS_FILENAME) {
-		zend.RETVAL_STRING(intern.u.dir.entry.d_name)
+		zend.RETVAL_STRING(intern.GetEntry().GetDName())
 		return
 	} else {
 		SplFilesystemObjectGetFileName(intern)
@@ -880,7 +880,7 @@ func zim_spl_DirectoryIterator_isDot(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(SplFilesystemIsDot(intern.u.dir.entry.d_name) != 0)
+	zend.RETVAL_BOOL(SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0)
 	return
 }
 func zim_spl_SplFileInfo___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1106,7 +1106,7 @@ func zim_spl_SplFileInfo_getRealPath(execute_data *zend.ZendExecuteData, return_
 		return
 	}
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_RuntimeException, &error_handling)
-	if intern.GetType() == SPL_FS_DIR && intern.GetFileName() == nil && intern.u.dir.entry.d_name[0] {
+	if intern.GetType() == SPL_FS_DIR && intern.GetFileName() == nil && intern.GetEntry().GetDName()[0] {
 		SplFilesystemObjectGetFileName(intern)
 	}
 	if intern.GetOrigPath() != nil {
@@ -1197,7 +1197,7 @@ func zim_spl_FilesystemIterator_rewind(execute_data *zend.ZendExecuteData, retur
 	}
 	for {
 		SplFilesystemDirRead(intern)
-		if !(skip_dots != 0 && SplFilesystemIsDot(intern.u.dir.entry.d_name) != 0) {
+		if !(skip_dots != 0 && SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0) {
 			break
 		}
 	}
@@ -1225,7 +1225,7 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(execute_data *zend.ZendExecu
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|b", &allow_links) == zend.FAILURE {
 		return
 	}
-	if SplFilesystemIsInvalidOrDot(intern.u.dir.entry.d_name) != 0 {
+	if SplFilesystemIsInvalidOrDot(intern.GetEntry().GetDName()) != 0 {
 		zend.RETVAL_FALSE
 		return
 	} else {
@@ -1257,10 +1257,10 @@ func zim_spl_RecursiveDirectoryIterator_getChildren(execute_data *zend.ZendExecu
 	subdir = Z_SPLFILESYSTEM_P(return_value)
 	if subdir != nil {
 		if intern.GetSubPath() != nil && intern.GetSubPath()[0] {
-			subdir.SetSubPathLen(core.Spprintf(&subdir.u.dir.sub_path, 0, "%s%c%s", intern.GetSubPath(), slash, intern.u.dir.entry.d_name))
+			subdir.SetSubPathLen(core.Spprintf(&subdir.GetSubPath(), 0, "%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
 		} else {
-			subdir.SetSubPathLen(strlen(intern.u.dir.entry.d_name))
-			subdir.SetSubPath(zend.Estrndup(intern.u.dir.entry.d_name, subdir.GetSubPathLen()))
+			subdir.SetSubPathLen(strlen(intern.GetEntry().GetDName()))
+			subdir.SetSubPath(zend.Estrndup(intern.GetEntry().GetDName(), subdir.GetSubPathLen()))
 		}
 		subdir.SetInfoClass(intern.GetInfoClass())
 		subdir.SetFileClass(intern.GetFileClass())
@@ -1287,10 +1287,10 @@ func zim_spl_RecursiveDirectoryIterator_getSubPathname(execute_data *zend.ZendEx
 		return
 	}
 	if intern.GetSubPath() != nil {
-		zend.RETVAL_NEW_STR(core.Strpprintf(0, "%s%c%s", intern.GetSubPath(), slash, intern.u.dir.entry.d_name))
+		zend.RETVAL_NEW_STR(core.Strpprintf(0, "%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
 		return
 	} else {
-		zend.RETVAL_STRING(intern.u.dir.entry.d_name)
+		zend.RETVAL_STRING(intern.GetEntry().GetDName())
 		return
 	}
 }
@@ -1328,22 +1328,22 @@ func SplFilesystemDirGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(&iterator.intern.data, zend.Z_OBJ_P(object))
-	iterator.intern.funcs = &SplFilesystemDirItFuncs
+	zend.ZVAL_OBJ(&iterator.GetIntern().GetData(), zend.Z_OBJ_P(object))
+	iterator.GetIntern().SetFuncs(&SplFilesystemDirItFuncs)
 
 	/* ->current must be initialized; rewind doesn't set it and valid
 	 * doesn't check whether it's set */
 
 	iterator.SetCurrent(*object)
-	return &iterator.intern
+	return &iterator.GetIntern()
 }
 func SplFilesystemDirItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplFilesystemIterator = (*SplFilesystemIterator)(iter)
-	zend.ZvalPtrDtor(&iterator.intern.data)
+	zend.ZvalPtrDtor(&iterator.GetIntern().GetData())
 }
 func SplFilesystemDirItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject((*SplFilesystemIterator)(iter))
-	if object.u.dir.entry.d_name[0] != '0' {
+	if object.GetEntry().GetDName()[0] != '0' {
 		return zend.SUCCESS
 	} else {
 		return zend.FAILURE
@@ -1351,7 +1351,7 @@ func SplFilesystemDirItValid(iter *zend.ZendObjectIterator) int {
 }
 func SplFilesystemDirItCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var iterator *SplFilesystemIterator = (*SplFilesystemIterator)(iter)
-	return &iterator.current
+	return &iterator.GetCurrent()
 }
 func SplFilesystemDirItCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject((*SplFilesystemIterator)(iter))
@@ -1376,8 +1376,8 @@ func SplFilesystemDirItRewind(iter *zend.ZendObjectIterator) {
 }
 func SplFilesystemTreeItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplFilesystemIterator = (*SplFilesystemIterator)(iter)
-	zend.ZvalPtrDtor(&iterator.intern.data)
-	zend.ZvalPtrDtor(&iterator.current)
+	zend.ZvalPtrDtor(&iterator.GetIntern().GetData())
+	zend.ZvalPtrDtor(&iterator.GetCurrent())
 }
 func SplFilesystemTreeItCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var iterator *SplFilesystemIterator = (*SplFilesystemIterator)(iter)
@@ -1385,23 +1385,23 @@ func SplFilesystemTreeItCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	if SPL_FILE_DIR_CURRENT(object, SPL_FILE_DIR_CURRENT_AS_PATHNAME) {
 		if zend.Z_ISUNDEF(iterator.GetCurrent()) {
 			SplFilesystemObjectGetFileName(object)
-			zend.ZVAL_STRINGL(&iterator.current, object.GetFileName(), object.GetFileNameLen())
+			zend.ZVAL_STRINGL(&iterator.GetCurrent(), object.GetFileName(), object.GetFileNameLen())
 		}
-		return &iterator.current
+		return &iterator.GetCurrent()
 	} else if SPL_FILE_DIR_CURRENT(object, SPL_FILE_DIR_CURRENT_AS_FILEINFO) {
 		if zend.Z_ISUNDEF(iterator.GetCurrent()) {
 			SplFilesystemObjectGetFileName(object)
-			SplFilesystemObjectCreateType(0, object, SPL_FS_INFO, nil, &iterator.current)
+			SplFilesystemObjectCreateType(0, object, SPL_FS_INFO, nil, &iterator.GetCurrent())
 		}
-		return &iterator.current
+		return &iterator.GetCurrent()
 	} else {
-		return &iterator.intern.data
+		return &iterator.GetIntern().GetData()
 	}
 }
 func SplFilesystemTreeItCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject((*SplFilesystemIterator)(iter))
 	if SPL_FILE_DIR_KEY(object, SPL_FILE_DIR_KEY_AS_FILENAME) {
-		zend.ZVAL_STRING(key, object.u.dir.entry.d_name)
+		zend.ZVAL_STRING(key, object.GetEntry().GetDName())
 	} else {
 		SplFilesystemObjectGetFileName(object)
 		zend.ZVAL_STRINGL(key, object.GetFileName(), object.GetFileNameLen())
@@ -1413,7 +1413,7 @@ func SplFilesystemTreeItMoveForward(iter *zend.ZendObjectIterator) {
 	object.GetIndex()++
 	for {
 		SplFilesystemDirRead(object)
-		if SplFilesystemIsDot(object.u.dir.entry.d_name) == 0 {
+		if SplFilesystemIsDot(object.GetEntry().GetDName()) == 0 {
 			break
 		}
 	}
@@ -1422,8 +1422,8 @@ func SplFilesystemTreeItMoveForward(iter *zend.ZendObjectIterator) {
 		object.SetFileName(nil)
 	}
 	if !(zend.Z_ISUNDEF(iterator.GetCurrent())) {
-		zend.ZvalPtrDtor(&iterator.current)
-		zend.ZVAL_UNDEF(&iterator.current)
+		zend.ZvalPtrDtor(&iterator.GetCurrent())
+		zend.ZVAL_UNDEF(&iterator.GetCurrent())
 	}
 }
 func SplFilesystemTreeItRewind(iter *zend.ZendObjectIterator) {
@@ -1435,13 +1435,13 @@ func SplFilesystemTreeItRewind(iter *zend.ZendObjectIterator) {
 	}
 	for {
 		SplFilesystemDirRead(object)
-		if SplFilesystemIsDot(object.u.dir.entry.d_name) == 0 {
+		if SplFilesystemIsDot(object.GetEntry().GetDName()) == 0 {
 			break
 		}
 	}
 	if !(zend.Z_ISUNDEF(iterator.GetCurrent())) {
-		zend.ZvalPtrDtor(&iterator.current)
-		zend.ZVAL_UNDEF(&iterator.current)
+		zend.ZvalPtrDtor(&iterator.GetCurrent())
+		zend.ZVAL_UNDEF(&iterator.GetCurrent())
 	}
 }
 func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) *zend.ZendObjectIterator {
@@ -1454,14 +1454,14 @@ func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(&iterator.intern.data, zend.Z_OBJ_P(object))
-	iterator.intern.funcs = &SplFilesystemTreeItFuncs
-	return &iterator.intern
+	zend.ZVAL_OBJ(&iterator.GetIntern().GetData(), zend.Z_OBJ_P(object))
+	iterator.GetIntern().SetFuncs(&SplFilesystemTreeItFuncs)
+	return &iterator.GetIntern()
 }
 func SplFilesystemObjectCast(readobj *zend.Zval, writeobj *zend.Zval, type_ int) int {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(readobj)
 	if type_ == zend.IS_STRING {
-		if zend.Z_OBJCE_P(readobj).__tostring != nil {
+		if zend.Z_OBJCE_P(readobj).GetTostring() != nil {
 			return zend.ZendStdCastObjectTostring(readobj, writeobj, type_)
 		}
 		switch intern.GetType() {
@@ -1471,7 +1471,7 @@ func SplFilesystemObjectCast(readobj *zend.Zval, writeobj *zend.Zval, type_ int)
 			zend.ZVAL_STRINGL(writeobj, intern.GetFileName(), intern.GetFileNameLen())
 			return zend.SUCCESS
 		case SPL_FS_DIR:
-			zend.ZVAL_STRING(writeobj, intern.u.dir.entry.d_name)
+			zend.ZVAL_STRING(writeobj, intern.GetEntry().GetDName())
 			return zend.SUCCESS
 		}
 	} else if type_ == zend._IS_BOOL {
@@ -1525,7 +1525,7 @@ func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunction, pass_num_args int, return_value *zend.Zval, arg2 *zend.Zval) int {
 	var fci zend.ZendFcallInfo
 	var fcic zend.ZendFcallInfoCache
-	var zresource_ptr *zend.Zval = &intern.u.file.zresource
+	var zresource_ptr *zend.Zval = &intern.GetZresource()
 	var params *zend.Zval
 	var retval zend.Zval
 	var result int
@@ -1544,16 +1544,16 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 		zend.WRONG_PARAM_COUNT_WITH_RETVAL(zend.FAILURE)
 	}
 	zend.ZVAL_UNDEF(&retval)
-	fci.size = b.SizeOf("fci")
-	fci.object = nil
-	fci.retval = &retval
-	fci.param_count = num_args
-	fci.params = params
-	fci.no_separation = 1
-	zend.ZVAL_STR(&fci.function_name, func_ptr.common.function_name)
-	fcic.function_handler = func_ptr
-	fcic.called_scope = nil
-	fcic.object = nil
+	fci.SetSize(b.SizeOf("fci"))
+	fci.SetObject(nil)
+	fci.SetRetval(&retval)
+	fci.SetParamCount(num_args)
+	fci.SetParams(params)
+	fci.SetNoSeparation(1)
+	zend.ZVAL_STR(&fci.GetFunctionName(), func_ptr.GetFunctionName())
+	fcic.SetFunctionHandler(func_ptr)
+	fcic.SetCalledScope(nil)
+	fcic.SetObject(nil)
 	result = zend.ZendCallFunction(&fci, &fcic)
 	if result == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 		zend.RETVAL_FALSE
@@ -1576,12 +1576,12 @@ func SplFilesystemFileReadCsv(intern *SplFilesystemObject, delimiter byte, enclo
 		var buf_len int = intern.GetCurrentLineLen()
 		var buf *byte = zend.Estrndup(intern.GetCurrentLine(), buf_len)
 		if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
-			zend.ZvalPtrDtor(&intern.u.file.current_zval)
-			zend.ZVAL_UNDEF(&intern.u.file.current_zval)
+			zend.ZvalPtrDtor(&intern.GetCurrentZval())
+			zend.ZVAL_UNDEF(&intern.GetCurrentZval())
 		}
-		standard.PhpFgetcsv(intern.GetStream(), delimiter, enclosure, escape, buf_len, buf, &intern.u.file.current_zval)
+		standard.PhpFgetcsv(intern.GetStream(), delimiter, enclosure, escape, buf_len, buf, &intern.GetCurrentZval())
 		if return_value != nil {
-			value = &intern.u.file.current_zval
+			value = &intern.GetCurrentZval()
 			zend.ZVAL_COPY_DEREF(return_value, value)
 		}
 	}
@@ -1592,7 +1592,7 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 
 	/* 1) use fgetcsv? 2) overloaded call the function, 3) do it directly */
 
-	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 || intern.GetFuncGetCurr().common.scope != spl_ce_SplFileObject {
+	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 || intern.GetFuncGetCurr().GetScope() != spl_ce_SplFileObject {
 		if core.PhpStreamEof(intern.GetStream()) != 0 {
 			if silent == 0 {
 				zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot read from file %s", intern.GetFileName())
@@ -1602,20 +1602,20 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 		if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 {
 			return SplFilesystemFileReadCsv(intern, intern.GetDelimiter(), intern.GetEnclosure(), intern.GetEscape(), nil)
 		} else {
-			var execute_data *zend.ZendExecuteData = zend.ExecutorGlobals.current_execute_data
-			zend.ZendCallMethodWith0Params(this_ptr, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.u.file.func_getCurr, "getCurrentLine", &retval)
+			var execute_data *zend.ZendExecuteData = zend.ExecutorGlobals.GetCurrentExecuteData()
+			zend.ZendCallMethodWith0Params(this_ptr, zend.Z_OBJCE_P(zend.ZEND_THIS), &intern.GetFuncGetCurr(), "getCurrentLine", &retval)
 		}
 		if !(zend.Z_ISUNDEF(retval)) {
 			if intern.GetCurrentLine() != nil || !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
 				intern.GetCurrentLineNum()++
 			}
 			SplFilesystemFileFreeLine(intern)
-			if zend.Z_TYPE(retval) == zend.IS_STRING {
+			if retval.IsType(zend.IS_STRING) {
 				intern.SetCurrentLine(zend.Estrndup(zend.Z_STRVAL(retval), zend.Z_STRLEN(retval)))
 				intern.SetCurrentLineLen(zend.Z_STRLEN(retval))
 			} else {
 				var value *zend.Zval = &retval
-				zend.ZVAL_COPY_DEREF(&intern.u.file.current_zval, value)
+				zend.ZVAL_COPY_DEREF(&intern.GetCurrentZval(), value)
 			}
 			zend.ZvalPtrDtor(&retval)
 			return zend.SUCCESS
@@ -1632,17 +1632,17 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 	if intern.GetCurrentLine() != nil {
 		return intern.GetCurrentLineLen() == 0
 	} else if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
-		switch zend.Z_TYPE(intern.GetCurrentZval()) {
+		switch intern.GetCurrentZval().GetType() {
 		case zend.IS_STRING:
 			return zend.Z_STRLEN(intern.GetCurrentZval()) == 0
 		case zend.IS_ARRAY:
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetCurrentZval())) == 1 {
 				var idx uint32 = 0
 				var first *zend.Zval
-				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).arData[idx].val) {
+				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()) {
 					idx++
 				}
-				first = &zend.Z_ARRVAL(intern.GetCurrentZval()).arData[idx].val
+				first = &zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
 				return zend.Z_TYPE_P(first) == zend.IS_STRING && zend.Z_STRLEN_P(first) == 0
 			}
 			return zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetCurrentZval())) == 0
@@ -1688,7 +1688,7 @@ func zim_spl_SplFileObject___construct(execute_data *zend.ZendExecuteData, retur
 	var error_handling zend.ZendErrorHandling
 	intern.SetOpenMode(nil)
 	intern.SetOpenModeLen(0)
-	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "p|sbr!", &intern.file_name, &intern.file_name_len, &intern.u.file.open_mode, &intern.u.file.open_mode_len, &use_include_path, &intern.u.file.zcontext) == zend.FAILURE {
+	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "p|sbr!", &intern.GetFileName(), &intern.GetFileNameLen(), &intern.GetOpenMode(), &intern.GetOpenModeLen(), &use_include_path, &intern.GetZcontext()) == zend.FAILURE {
 		intern.SetOpenMode(nil)
 		intern.SetFileName(nil)
 		return
@@ -1699,11 +1699,11 @@ func zim_spl_SplFileObject___construct(execute_data *zend.ZendExecuteData, retur
 	}
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_RuntimeException, &error_handling)
 	if SplFilesystemFileOpen(intern, use_include_path, 0) == zend.SUCCESS {
-		tmp_path_len = strlen(intern.GetStream().orig_path)
-		if tmp_path_len > 1 && IS_SLASH_AT(intern.GetStream().orig_path, tmp_path_len-1) {
+		tmp_path_len = strlen(intern.GetStream().GetOrigPath())
+		if tmp_path_len > 1 && IS_SLASH_AT(intern.GetStream().GetOrigPath(), tmp_path_len-1) {
 			tmp_path_len--
 		}
-		tmp_path = zend.Estrndup(intern.GetStream().orig_path, tmp_path_len)
+		tmp_path = zend.Estrndup(intern.GetStream().GetOrigPath(), tmp_path_len)
 		p1 = strrchr(tmp_path, '/')
 		p2 = 0
 		if p1 != nil || p2 != nil {
@@ -1712,7 +1712,7 @@ func zim_spl_SplFileObject___construct(execute_data *zend.ZendExecuteData, retur
 			intern.SetPathLen(0)
 		}
 		zend.Efree(tmp_path)
-		intern.SetPath(zend.Estrndup(intern.GetStream().orig_path, intern.GetPathLen()))
+		intern.SetPath(zend.Estrndup(intern.GetStream().GetOrigPath(), intern.GetPathLen()))
 	}
 	zend.ZendRestoreErrorHandling(&error_handling)
 }
@@ -1810,7 +1810,7 @@ func zim_spl_SplFileObject_current(execute_data *zend.ZendExecuteData, return_va
 		zend.RETVAL_STRINGL(intern.GetCurrentLine(), intern.GetCurrentLineLen())
 		return
 	} else if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
-		var value *zend.Zval = &intern.u.file.current_zval
+		var value *zend.Zval = &intern.GetCurrentZval()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 		return
 	}
@@ -1844,7 +1844,7 @@ func zim_spl_SplFileObject_next(execute_data *zend.ZendExecuteData, return_value
 }
 func zim_spl_SplFileObject_setFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &intern.flags) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &intern.GetFlags()) == zend.FAILURE {
 		return
 	}
 }
@@ -2063,7 +2063,7 @@ func zim_spl_SplFileObject_getCsvControl(execute_data *zend.ZendExecuteData, ret
 func zim_spl_SplFileObject_flock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.function_table, "flock", b.SizeOf("\"flock\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.GetFunctionTable(), "flock", b.SizeOf("\"flock\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
 		return
@@ -2147,7 +2147,7 @@ func zim_spl_SplFileObject_fgetss(execute_data *zend.ZendExecuteData, return_val
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.function_table, "fgetss", b.SizeOf("\"fgetss\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.GetFunctionTable(), "fgetss", b.SizeOf("\"fgetss\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
 		return
@@ -2172,7 +2172,7 @@ func zim_spl_SplFileObject_fscanf(execute_data *zend.ZendExecuteData, return_val
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.function_table, "fscanf", b.SizeOf("\"fscanf\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.GetFunctionTable(), "fscanf", b.SizeOf("\"fscanf\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
 		return
@@ -2244,7 +2244,7 @@ func zim_spl_SplFileObject_fread(execute_data *zend.ZendExecuteData, return_valu
 func zim_spl_SplFileObject_fstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.function_table, "fstat", b.SizeOf("\"fstat\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.ExecutorGlobals.GetFunctionTable(), "fstat", b.SizeOf("\"fstat\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
 		return
@@ -2294,17 +2294,17 @@ func zim_spl_SplFileObject_seek(execute_data *zend.ZendExecuteData, return_value
 func ZmStartupSplDirectory(type_ int, module_number int) int {
 	SplRegisterStdClass(&spl_ce_SplFileInfo, "SplFileInfo", SplFilesystemObjectNew, spl_SplFileInfo_functions)
 	memcpy(&SplFilesystemObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
-	SplFilesystemObjectHandlers.offset = zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd())) - (*byte)(nil))
-	SplFilesystemObjectHandlers.clone_obj = SplFilesystemObjectClone
-	SplFilesystemObjectHandlers.cast_object = SplFilesystemObjectCast
-	SplFilesystemObjectHandlers.dtor_obj = SplFilesystemObjectDestroyObject
-	SplFilesystemObjectHandlers.free_obj = SplFilesystemObjectFreeStorage
-	spl_ce_SplFileInfo.serialize = zend.ZendClassSerializeDeny
-	spl_ce_SplFileInfo.unserialize = zend.ZendClassUnserializeDeny
+	SplFilesystemObjectHandlers.SetOffset(zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd())) - (*byte)(nil)))
+	SplFilesystemObjectHandlers.SetCloneObj(SplFilesystemObjectClone)
+	SplFilesystemObjectHandlers.SetCastObject(SplFilesystemObjectCast)
+	SplFilesystemObjectHandlers.SetDtorObj(SplFilesystemObjectDestroyObject)
+	SplFilesystemObjectHandlers.SetFreeObj(SplFilesystemObjectFreeStorage)
+	spl_ce_SplFileInfo.SetSerialize(zend.ZendClassSerializeDeny)
+	spl_ce_SplFileInfo.SetUnserialize(zend.ZendClassUnserializeDeny)
 	SplRegisterSubClass(&spl_ce_DirectoryIterator, spl_ce_SplFileInfo, "DirectoryIterator", SplFilesystemObjectNew, spl_DirectoryIterator_functions)
 	zend.ZendClassImplements(spl_ce_DirectoryIterator, 1, zend.ZendCeIterator)
 	zend.ZendClassImplements(spl_ce_DirectoryIterator, 1, spl_ce_SeekableIterator)
-	spl_ce_DirectoryIterator.get_iterator = SplFilesystemDirGetIterator
+	spl_ce_DirectoryIterator.SetGetIterator(SplFilesystemDirGetIterator)
 	SplRegisterSubClass(&spl_ce_FilesystemIterator, spl_ce_DirectoryIterator, "FilesystemIterator", SplFilesystemObjectNew, spl_FilesystemIterator_functions)
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "CURRENT_MODE_MASK", b.SizeOf("\"CURRENT_MODE_MASK\"")-1, zend.ZendLong(SPL_FILE_DIR_CURRENT_MODE_MASK))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "CURRENT_AS_PATHNAME", b.SizeOf("\"CURRENT_AS_PATHNAME\"")-1, zend.ZendLong(SPL_FILE_DIR_CURRENT_AS_PATHNAME))
@@ -2318,12 +2318,12 @@ func ZmStartupSplDirectory(type_ int, module_number int) int {
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "OTHER_MODE_MASK", b.SizeOf("\"OTHER_MODE_MASK\"")-1, zend.ZendLong(SPL_FILE_DIR_OTHERS_MASK))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "SKIP_DOTS", b.SizeOf("\"SKIP_DOTS\"")-1, zend.ZendLong(SPL_FILE_DIR_SKIPDOTS))
 	zend.ZendDeclareClassConstantLong(spl_ce_FilesystemIterator, "UNIX_PATHS", b.SizeOf("\"UNIX_PATHS\"")-1, zend.ZendLong(SPL_FILE_DIR_UNIXPATHS))
-	spl_ce_FilesystemIterator.get_iterator = SplFilesystemTreeGetIterator
+	spl_ce_FilesystemIterator.SetGetIterator(SplFilesystemTreeGetIterator)
 	SplRegisterSubClass(&spl_ce_RecursiveDirectoryIterator, spl_ce_FilesystemIterator, "RecursiveDirectoryIterator", SplFilesystemObjectNew, spl_RecursiveDirectoryIterator_functions)
 	zend.ZendClassImplements(spl_ce_RecursiveDirectoryIterator, 1, spl_ce_RecursiveIterator)
 	memcpy(&SplFilesystemObjectCheckHandlers, &SplFilesystemObjectHandlers, b.SizeOf("zend_object_handlers"))
-	SplFilesystemObjectCheckHandlers.clone_obj = nil
-	SplFilesystemObjectCheckHandlers.get_method = SplFilesystemObjectGetMethodCheck
+	SplFilesystemObjectCheckHandlers.SetCloneObj(nil)
+	SplFilesystemObjectCheckHandlers.SetGetMethod(SplFilesystemObjectGetMethodCheck)
 	SplRegisterSubClass(&spl_ce_GlobIterator, spl_ce_FilesystemIterator, "GlobIterator", SplFilesystemObjectNewCheck, spl_GlobIterator_functions)
 	zend.ZendClassImplements(spl_ce_GlobIterator, 1, spl_ce_Countable)
 	SplRegisterSubClass(&spl_ce_SplFileObject, spl_ce_SplFileInfo, "SplFileObject", SplFilesystemObjectNewCheck, spl_SplFileObject_functions)

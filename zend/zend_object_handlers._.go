@@ -24,7 +24,7 @@ package zend
 */
 
 const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
-const ZEND_DYNAMIC_PROPERTY_OFFSET = uintptr_t(intptr_t)(-1)
+const ZEND_DYNAMIC_PROPERTY_OFFSET = uintPtr(intptr_t)(-1)
 
 /* The following rule applies to read_property() and read_dimension() implementations:
    If you return a zval which is not otherwise referenced by the extension or the engine's

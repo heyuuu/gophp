@@ -212,23 +212,23 @@ func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
 			for true {
 				for cmp(pivot, i) > 0 {
 					i += siz
-					if UNEXPECTED(i == j) {
+					if i == j {
 						goto done
 					}
 				}
 				j -= siz
-				if UNEXPECTED(j == i) {
+				if j == i {
 					goto done
 				}
 				for cmp(j, pivot) > 0 {
 					j -= siz
-					if UNEXPECTED(j == i) {
+					if j == i {
 						goto done
 					}
 				}
 				swp(i, j)
 				i += siz
-				if UNEXPECTED(i == j) {
+				if i == j {
 					goto done
 				}
 			}

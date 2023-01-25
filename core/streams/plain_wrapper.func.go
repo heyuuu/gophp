@@ -70,7 +70,7 @@ func DoFstat(d *PhpStdioStreamData, force int) int {
 		var fd int
 		var r int
 		PHP_STDIOP_GET_FD(fd, d)
-		r = zend.ZendFstat(fd, &d.sb)
+		r = zend.ZendFstat(fd, &d.GetSb())
 		d.SetCachedFstat(r == 0)
 		return r
 	}
@@ -113,9 +113,9 @@ func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **zend.
 		}
 		stream = PhpStreamFopenFromFdIntRel(fd, "r+b", nil)
 		if stream != nil {
-			var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
-			stream.wrapper = (*core.PhpStreamWrapper)(&PhpPlainFilesWrapper)
-			stream.orig_path = zend.Estrndup(zend.ZSTR_VAL(opened_path), zend.ZSTR_LEN(opened_path))
+			var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
+			stream.SetWrapper((*core.PhpStreamWrapper)(&PhpPlainFilesWrapper))
+			stream.SetOrigPath(zend.Estrndup(zend.ZSTR_VAL(opened_path), zend.ZSTR_LEN(opened_path)))
 			self.SetTempName(opened_path)
 			self.SetLockFlag(LOCK_UN)
 			return stream
@@ -133,13 +133,13 @@ func DetectIsSeekable(self *PhpStdioStreamData) {}
 func _phpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
 	var stream *core.PhpStream = PhpStreamFopenFromFdIntRel(fd, mode, persistent_id)
 	if stream != nil {
-		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 		DetectIsSeekable(self)
 		if !(self.GetIsSeekable()) {
-			stream.flags |= core.PHP_STREAM_FLAG_NO_SEEK
-			stream.position = -1
+			stream.AddFlags(core.PHP_STREAM_FLAG_NO_SEEK)
+			stream.SetPosition(-1)
 		} else {
-			stream.position = zend.ZendLseek(self.GetFd(), 0, r.SEEK_CUR)
+			stream.SetPosition(zend.ZendLseek(self.GetFd(), 0, r.SEEK_CUR))
 		}
 	}
 	return stream
@@ -147,13 +147,13 @@ func _phpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStr
 func _phpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
 	var stream *core.PhpStream = PhpStreamFopenFromFileIntRel(file, mode)
 	if stream != nil {
-		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+		var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 		DetectIsSeekable(self)
 		if !(self.GetIsSeekable()) {
-			stream.flags |= core.PHP_STREAM_FLAG_NO_SEEK
-			stream.position = -1
+			stream.AddFlags(core.PHP_STREAM_FLAG_NO_SEEK)
+			stream.SetPosition(-1)
 		} else {
-			stream.position = zend.ZendFtell(file)
+			stream.SetPosition(zend.ZendFtell(file))
 		}
 	}
 	return stream
@@ -171,11 +171,11 @@ func _phpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
 	self.SetFd(fileno(file))
 	self.SetTempName(nil)
 	stream = core.PhpStreamAllocRel(&PhpStreamStdioOps, self, 0, mode)
-	stream.flags |= core.PHP_STREAM_FLAG_NO_SEEK
+	stream.AddFlags(core.PHP_STREAM_FLAG_NO_SEEK)
 	return stream
 }
 func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 	if data.GetFd() >= 0 {
 		var bytes_written ssize_t = write(data.GetFd(), buf, count)
@@ -204,7 +204,7 @@ func PhpStdiopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	}
 }
 func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	var ret ssize_t
 	r.Assert(data != nil)
 	if data.GetFd() >= 0 {
@@ -239,14 +239,14 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 				/* TODO: Remove this special-case? */
 
 				if errno != EBADF {
-					stream.eof = 1
+					stream.SetEof(1)
 				}
 
 				/* TODO: Remove this special-case? */
 
 			}
 		} else if ret == 0 {
-			stream.eof = 1
+			stream.SetEof(1)
 		}
 	} else {
 		if data.GetIsSeekable() && data.GetLastOp() == 'w' {
@@ -254,13 +254,13 @@ func PhpStdiopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		}
 		data.SetLastOp('r')
 		ret = r.Fread(buf, 1, count, data.GetFile())
-		stream.eof = r.Feof(data.GetFile())
+		stream.SetEof(r.Feof(data.GetFile()))
 	}
 	return ret
 }
 func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 	var ret int
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 	if data.GetLastMappedAddr() != nil {
 		munmap(data.GetLastMappedAddr(), data.GetLastMappedLen())
@@ -297,11 +297,11 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 		data.SetFile(nil)
 		data.SetFd(-1)
 	}
-	zend.Pefree(data, stream.is_persistent)
+	zend.Pefree(data, stream.GetIsPersistent())
 	return ret
 }
 func PhpStdiopFlush(stream *core.PhpStream) int {
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 
 	/*
@@ -316,7 +316,7 @@ func PhpStdiopFlush(stream *core.PhpStream) int {
 	return 0
 }
 func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int {
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	var ret int
 	r.Assert(data != nil)
 	if !(data.GetIsSeekable()) {
@@ -339,7 +339,7 @@ func PhpStdiopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int, new
 }
 func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 	var fd core.PhpSocketT
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 
 	/* as soon as someone touches the stdio layer, buffering may ensue,
@@ -394,15 +394,15 @@ func PhpStdiopCast(stream *core.PhpStream, castas int, ret *any) int {
 }
 func PhpStdiopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var ret int
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 	if b.Assign(&ret, DoFstat(data, 1)) == 0 {
-		memcpy(&ssb.sb, &data.sb, b.SizeOf("ssb -> sb"))
+		memcpy(&ssb.GetSb(), &data.GetSb(), b.SizeOf("ssb -> sb"))
 	}
 	return ret
 }
 func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam any) int {
-	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.abstract)
+	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	var size int
 	var fd int
 	PHP_STDIOP_GET_FD(fd, data)
@@ -536,7 +536,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 	}
 }
 func PhpPlainFilesDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	var dir *DIR = (*DIR)(stream.abstract)
+	var dir *DIR = (*DIR)(stream.GetAbstract())
 	var result *__struct__dirent
 	var ent *core.PhpStreamDirent = (*core.PhpStreamDirent)(buf)
 
@@ -547,23 +547,23 @@ func PhpPlainFilesDirstreamRead(stream *core.PhpStream, buf *byte, count int) ss
 	}
 	result = readdir(dir)
 	if result != nil {
-		core.PHP_STRLCPY(ent.d_name, result.d_name, b.SizeOf("ent -> d_name"), strlen(result.d_name))
+		core.PHP_STRLCPY(ent.GetDName(), result.d_name, b.SizeOf("ent -> d_name"), strlen(result.d_name))
 		return b.SizeOf("php_stream_dirent")
 	}
 	return 0
 }
 func PhpPlainFilesDirstreamClose(stream *core.PhpStream, close_handle int) int {
-	return closedir((*DIR)(stream.abstract))
+	return closedir((*DIR)(stream.GetAbstract()))
 }
 func PhpPlainFilesDirstreamRewind(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffs *zend.ZendOffT) int {
-	rewinddir((*DIR)(stream.abstract))
+	rewinddir((*DIR)(stream.GetAbstract()))
 	return 0
 }
 func PhpPlainFilesDirOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
 	var dir *DIR = nil
 	var stream *core.PhpStream = nil
 	if (options & core.STREAM_USE_GLOB_DIR_OPEN) != 0 {
-		return PhpGlobStreamWrapper.wops.dir_opener((*core.PhpStreamWrapper)(&PhpGlobStreamWrapper), path, mode, options, opened_path, context)
+		return PhpGlobStreamWrapper.GetWops().GetDirOpener()((*core.PhpStreamWrapper)(&PhpGlobStreamWrapper), path, mode, options, opened_path, context)
 	}
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
 		return nil
@@ -635,7 +635,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 			 * on fstat() syscalls */
 
 			if (options & core.STREAM_OPEN_FOR_INCLUDE) != 0 {
-				var self *PhpStdioStreamData = (*PhpStdioStreamData)(ret.abstract)
+				var self *PhpStdioStreamData = (*PhpStdioStreamData)(ret.GetAbstract())
 				var r int
 				r = DoFstat(self, 0)
 				if r == 0 && !(zend.S_ISREG(self.sb.st_mode)) {
@@ -657,7 +657,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 
 			}
 			if (options & core.STREAM_USE_BLOCKING_PIPE) != 0 {
-				var self *PhpStdioStreamData = (*PhpStdioStreamData)(ret.abstract)
+				var self *PhpStdioStreamData = (*PhpStdioStreamData)(ret.GetAbstract())
 				self.SetIsPipeBlocking(1)
 			}
 			return ret
@@ -683,9 +683,9 @@ func PhpPlainFilesUrlStater(wrapper *core.PhpStreamWrapper, url *byte, flags int
 		return -1
 	}
 	if (flags & core.PHP_STREAM_URL_STAT_LINK) != 0 {
-		return zend.VCWD_LSTAT(url, &ssb.sb)
+		return zend.VCWD_LSTAT(url, &ssb.GetSb())
 	} else {
-		return zend.VCWD_STAT(url, &ssb.sb)
+		return zend.VCWD_STAT(url, &ssb.GetSb())
 	}
 }
 func PhpPlainFilesUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, context *core.PhpStreamContext) int {

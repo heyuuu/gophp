@@ -11,7 +11,7 @@ import (
 )
 
 func SECTION(name string) {
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<h2>" + name + "</h2>\n")
 	} else {
 		PhpInfoPrintTableStart()
@@ -47,29 +47,29 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 	if ht != nil {
 		if zend.ZendHashNumElements(ht) {
 			var first int = 1
-			if core.sapi_module.phpinfo_as_text == 0 {
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
 			for {
 				var __ht *zend.HashTable = ht
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
-					key = _p.key
+					key = _p.GetKey()
 					if key != nil {
 						if first != 0 {
 							first = 0
 						} else {
 							PhpInfoPrint(", ")
 						}
-						if core.sapi_module.phpinfo_as_text == 0 {
+						if core.sapi_module.GetPhpinfoAsText() == 0 {
 							PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))
 						} else {
 							PhpInfoPrint(zend.ZSTR_VAL(key))
@@ -78,7 +78,7 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 				}
 				break
 			}
-			if core.sapi_module.phpinfo_as_text == 0 {
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")
 			}
 		} else {
@@ -91,30 +91,30 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 	}
 }
 func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
-	if zend_module.info_func != nil || zend_module.version != nil {
-		if core.sapi_module.phpinfo_as_text == 0 {
-			var url_name *zend.ZendString = PhpUrlEncode(zend_module.name, strlen(zend_module.name))
+	if zend_module.GetInfoFunc() != nil || zend_module.GetVersion() != nil {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
+			var url_name *zend.ZendString = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
 			PhpStrtolower(zend.ZSTR_VAL(url_name), zend.ZSTR_LEN(url_name))
-			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", zend.ZSTR_VAL(url_name), zend_module.name)
+			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", zend.ZSTR_VAL(url_name), zend_module.GetName())
 			zend.Efree(url_name)
 		} else {
 			PhpInfoPrintTableStart()
-			PhpInfoPrintTableHeader(1, zend_module.name)
+			PhpInfoPrintTableHeader(1, zend_module.GetName())
 			PhpInfoPrintTableEnd()
 		}
-		if zend_module.info_func != nil {
-			zend_module.info_func(zend_module)
+		if zend_module.GetInfoFunc() != nil {
+			zend_module.GetInfoFunc()(zend_module)
 		} else {
 			PhpInfoPrintTableStart()
-			PhpInfoPrintTableRow(2, "Version", zend_module.version)
+			PhpInfoPrintTableRow(2, "Version", zend_module.GetVersion())
 			PhpInfoPrintTableEnd()
 			zend.DISPLAY_INI_ENTRIES()
 		}
 	} else {
-		if core.sapi_module.phpinfo_as_text == 0 {
-			PhpInfoPrintf("<tr><td class=\"v\">%s</td></tr>\n", zend_module.name)
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
+			PhpInfoPrintf("<tr><td class=\"v\">%s</td></tr>\n", zend_module.GetName())
 		} else {
-			PhpInfoPrintf("%s\n", zend_module.name)
+			PhpInfoPrintf("%s\n", zend_module.GetName())
 		}
 	}
 }
@@ -126,21 +126,21 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var key *zend.ZendString
 	key = zend.ZendStringInit(name, name_length, 0)
 	zend.ZendIsAutoGlobal(key)
-	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.symbol_table), key)) != nil && zend.Z_TYPE_P(data) == zend.IS_ARRAY {
+	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.GetSymbolTable()), key)) != nil && zend.Z_TYPE_P(data) == zend.IS_ARRAY {
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				num_key = _p.h
-				string_key = _p.key
+				num_key = _p.GetH()
+				string_key = _p.GetKey()
 				tmp = _z
-				if core.sapi_module.phpinfo_as_text == 0 {
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
 					PhpInfoPrint("<tr>")
 					PhpInfoPrint("<td class=\"e\">")
 				}
@@ -148,7 +148,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 				PhpInfoPrint(name)
 				PhpInfoPrint("['")
 				if string_key != nil {
-					if core.sapi_module.phpinfo_as_text == 0 {
+					if core.sapi_module.GetPhpinfoAsText() == 0 {
 						PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(string_key), zend.ZSTR_LEN(string_key))
 					} else {
 						PhpInfoPrint(zend.ZSTR_VAL(string_key))
@@ -157,14 +157,14 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 					PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
 				}
 				PhpInfoPrint("']")
-				if core.sapi_module.phpinfo_as_text == 0 {
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
 					PhpInfoPrint("</td><td class=\"v\">")
 				} else {
 					PhpInfoPrint(" => ")
 				}
 				zend.ZVAL_DEREF(tmp)
 				if zend.Z_TYPE_P(tmp) == zend.IS_ARRAY {
-					if core.sapi_module.phpinfo_as_text == 0 {
+					if core.sapi_module.GetPhpinfoAsText() == 0 {
 						var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
 						PhpInfoPrint("<pre>")
 						PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
@@ -176,7 +176,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 				} else {
 					var tmp2 *zend.ZendString
 					var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
-					if core.sapi_module.phpinfo_as_text == 0 {
+					if core.sapi_module.GetPhpinfoAsText() == 0 {
 						if zend.ZSTR_LEN(str) == 0 {
 							PhpInfoPrint("<i>no value</i>")
 						} else {
@@ -187,7 +187,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 					}
 					zend.ZendTmpStringRelease(tmp2)
 				}
-				if core.sapi_module.phpinfo_as_text == 0 {
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
 					PhpInfoPrint("</td></tr>\n")
 				} else {
 					PhpInfoPrint("\n")
@@ -243,14 +243,14 @@ func PhpPrintInfoHtmlhead() {
 func ModuleNameCmp(a any, b any) int {
 	var f *zend.Bucket = (*zend.Bucket)(a)
 	var s *zend.Bucket = (*zend.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.val)).name, (*zend.ZendModuleEntry)(zend.Z_PTR(s.val)).name)
+	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.GetVal())).GetName(), (*zend.ZendModuleEntry)(zend.Z_PTR(s.GetVal())).GetName())
 }
 func PhpPrintInfo(flag int) {
 	var env **byte
 	var tmp1 **byte
 	var tmp2 **byte
 	var php_uname *zend.ZendString
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpPrintInfoHtmlhead()
 	} else {
 		PhpInfoPrint("phpinfo()\n")
@@ -259,10 +259,10 @@ func PhpPrintInfo(flag int) {
 		var zend_version *byte = zend.GetZendVersion()
 		var temp_api []byte
 		php_uname = PhpGetUname('a')
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrintBoxStart(1)
 		}
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			var the_time int64
 			var ta *__struct__tm
 			var tmbuf __struct__tm
@@ -275,7 +275,7 @@ func PhpPrintInfo(flag int) {
 				PhpInfoPrint(PHP_LOGO_DATA_URI + "\" alt=\"PHP logo\" /></a>")
 			}
 		}
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrintf("<h1 class=\"p\">PHP Version %s</h1>\n", core.PHP_VERSION)
 		} else {
 			PhpInfoPrintTableRow(2, "PHP Version", core.PHP_VERSION)
@@ -285,8 +285,8 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableRow(2, "System", zend.ZSTR_VAL(php_uname))
 		PhpInfoPrintTableRow(2, "Build Date", __DATE__+" "+__TIME__)
 		PhpInfoPrintTableRow(2, "Configure Command", core.CONFIGURE_COMMAND)
-		if core.sapi_module.pretty_name != nil {
-			PhpInfoPrintTableRow(2, "Server API", core.sapi_module.pretty_name)
+		if core.sapi_module.GetPrettyName() != nil {
+			PhpInfoPrintTableRow(2, "Server API", core.sapi_module.GetPrettyName())
 		}
 		PhpInfoPrintTableRow(2, "Virtual Directory Support", "disabled")
 		PhpInfoPrintTableRow(2, "Configuration File (php.ini) Path", core.PHP_CONFIG_FILE_PATH)
@@ -308,7 +308,7 @@ func PhpPrintInfo(flag int) {
 		var functions *zend.ZendMultibyteFunctions = zend.ZendMultibyteGetFunctions()
 		var descr *byte
 		if functions != nil {
-			core.Spprintf(&descr, 0, "provided by %s", functions.provider_name)
+			core.Spprintf(&descr, 0, "provided by %s", functions.GetProviderName())
 		} else {
 			descr = zend.Estrdup("disabled")
 		}
@@ -324,13 +324,13 @@ func PhpPrintInfo(flag int) {
 		/* Zend Engine */
 
 		PhpInfoPrintBoxStart(0)
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<a href=\"http://www.zend.com/\"><img border=\"0\" src=\"")
 			PhpInfoPrint(ZEND_LOGO_DATA_URI + "\" alt=\"Zend logo\" /></a>\n")
 		}
 		PhpInfoPrint("This program makes use of the Zend Scripting Language Engine:")
-		PhpInfoPrint(b.Cond(core.sapi_module.phpinfo_as_text == 0, "<br />", "\n"))
-		if core.sapi_module.phpinfo_as_text != 0 {
+		PhpInfoPrint(b.Cond(core.sapi_module.GetPhpinfoAsText() == 0, "<br />", "\n"))
+		if core.sapi_module.GetPhpinfoAsText() != 0 {
 			PhpInfoPrint(zend_version)
 		} else {
 			zend.ZendHtmlPuts(zend_version, strlen(zend_version))
@@ -341,7 +341,7 @@ func PhpPrintInfo(flag int) {
 	zend.ZendIniSortEntries()
 	if (flag & PHP_INFO_CONFIGURATION) != 0 {
 		PhpInfoPrintHr()
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<h1>Configuration</h1>\n")
 		} else {
 			SECTION("Configuration")
@@ -359,16 +359,16 @@ func PhpPrintInfo(flag int) {
 		zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 		for {
 			var __ht *zend.HashTable = &sorted_registry
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				module = zend.Z_PTR_P(_z)
-				if module.info_func != nil || module.version != nil {
+				if module.GetInfoFunc() != nil || module.GetVersion() != nil {
 					PhpInfoPrintModule(module)
 				}
 			}
@@ -379,16 +379,16 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableHeader(1, "Module Name")
 		for {
 			var __ht *zend.HashTable = &sorted_registry
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				module = zend.Z_PTR_P(_z)
-				if module.info_func == nil && module.version == nil {
+				if module.GetInfoFunc() == nil && module.GetVersion() == nil {
 					PhpInfoPrintModule(module)
 				}
 			}
@@ -421,16 +421,16 @@ func PhpPrintInfo(flag int) {
 		SECTION("PHP Variables")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(2, "Variable", "Value")
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), "PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_SELF", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), "PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), "PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), "PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", zend.Z_STRVAL_P(data))
 		}
 		PhpPrintGpcseArray(zend.ZEND_STRL("_REQUEST"))
@@ -447,7 +447,7 @@ func PhpPrintInfo(flag int) {
 		PhpPrintCredits(PHP_CREDITS_ALL & ^PHP_CREDITS_FULLPAGE)
 	}
 	if (flag & PHP_INFO_LICENSE) != 0 {
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			SECTION("PHP License")
 			PhpInfoPrintBoxStart(0)
 			PhpInfoPrint("<p>\n")
@@ -479,30 +479,30 @@ func PhpPrintInfo(flag int) {
 			PhpInfoPrint("questions about PHP licensing, please contact license@php.net.\n")
 		}
 	}
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</div></body></html>")
 	}
 }
 func PhpInfoPrintTableStart() {
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<table>\n")
 	} else {
 		PhpInfoPrint("\n")
 	}
 }
 func PhpInfoPrintTableEnd() {
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</table>\n")
 	}
 }
 func PhpInfoPrintBoxStart(flag int) {
 	PhpInfoPrintTableStart()
 	if flag != 0 {
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<tr class=\"h\"><td>\n")
 		}
 	} else {
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<tr class=\"v\"><td>\n")
 		} else {
 			PhpInfoPrint("\n")
@@ -510,13 +510,13 @@ func PhpInfoPrintBoxStart(flag int) {
 	}
 }
 func PhpInfoPrintBoxEnd() {
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</td></tr>\n")
 	}
 	PhpInfoPrintTableEnd()
 }
 func PhpInfoPrintHr() {
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<hr />\n")
 	} else {
 		PhpInfoPrint("\n\n _______________________________________________________________________\n\n")
@@ -524,7 +524,7 @@ func PhpInfoPrintHr() {
 }
 func PhpInfoPrintTableColspanHeader(num_cols int, header string) {
 	var spaces int
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrintf("<tr class=\"h\"><th colspan=\"%d\">%s</th></tr>\n", num_cols, header)
 	} else {
 		spaces = int(74 - strlen(header))
@@ -536,7 +536,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 	var row_elements va_list
 	var row_element *byte
 	va_start(row_elements, num_cols)
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<tr class=\"h\">")
 	}
 	for i = 0; i < num_cols; i++ {
@@ -544,7 +544,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 		if row_element == nil || !(*row_element) {
 			row_element = " "
 		}
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<th>")
 			PhpInfoPrint(row_element)
 			PhpInfoPrint("</th>")
@@ -557,7 +557,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 			}
 		}
 	}
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</tr>\n")
 	}
 	va_end(row_elements)
@@ -565,22 +565,22 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements ...any) {
 	var i int
 	var row_element *byte
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<tr>")
 	}
 	for i = 0; i < num_cols; i++ {
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrintf("<td class=\"%s\">", b.Cond(i == 0, "e", value_class))
 		}
 		row_element = __va_arg(row_elements, (*byte)(_))
 		if row_element == nil || !(*row_element) {
-			if core.sapi_module.phpinfo_as_text == 0 {
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("<i>no value</i>")
 			} else {
 				PhpInfoPrint(" ")
 			}
 		} else {
-			if core.sapi_module.phpinfo_as_text == 0 {
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrintHtmlEsc(row_element, strlen(row_element))
 			} else {
 				PhpInfoPrint(row_element)
@@ -589,13 +589,13 @@ func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements 
 				}
 			}
 		}
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrint(" </td>")
 		} else if i == num_cols-1 {
 			PhpInfoPrint("\n")
 		}
 	}
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</tr>\n")
 	}
 }
@@ -652,7 +652,7 @@ func ZifPhpinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -666,14 +666,14 @@ func ZifPhpinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flag, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &flag, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -732,7 +732,7 @@ func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -746,14 +746,14 @@ func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &ext_name, &ext_name_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &ext_name, &ext_name_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -816,7 +816,7 @@ func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -830,14 +830,14 @@ func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flag, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &flag, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -871,8 +871,8 @@ func ZifPhpSapiName(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	if core.sapi_module.name != nil {
-		zend.RETVAL_STRING(core.sapi_module.name)
+	if core.sapi_module.GetName() != nil {
+		zend.RETVAL_STRING(core.sapi_module.GetName())
 		return
 	} else {
 		zend.RETVAL_FALSE
@@ -903,7 +903,7 @@ func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -917,14 +917,14 @@ func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &mode, &modelen, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &mode, &modelen, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {

@@ -104,7 +104,7 @@ func ZendStringDup(s *ZendString, persistent int) *ZendString {
 func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	if ZSTR_IS_INTERNED(s) == 0 {
-		if EXPECTED(GC_REFCOUNT(s) == 1) {
+		if GC_REFCOUNT(s) == 1 {
 			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 			ZSTR_LEN(ret) = len_
 			ZendStringForgetHashVal(ret)
@@ -122,7 +122,7 @@ func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	ZEND_ASSERT(len_ >= ZSTR_LEN(s))
 	if ZSTR_IS_INTERNED(s) == 0 {
-		if EXPECTED(GC_REFCOUNT(s) == 1) {
+		if GC_REFCOUNT(s) == 1 {
 			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 			ZSTR_LEN(ret) = len_
 			ZendStringForgetHashVal(ret)
@@ -140,7 +140,7 @@ func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	ZEND_ASSERT(len_ <= ZSTR_LEN(s))
 	if ZSTR_IS_INTERNED(s) == 0 {
-		if EXPECTED(GC_REFCOUNT(s) == 1) {
+		if GC_REFCOUNT(s) == 1 {
 			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 			ZSTR_LEN(ret) = len_
 			ZendStringForgetHashVal(ret)

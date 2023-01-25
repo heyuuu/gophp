@@ -370,7 +370,7 @@ func PhpStreamXportSendto(stream *core.PhpStream, buf *byte, buflen int, flags i
 	var ret int = 0
 	var oob int
 	oob = (flags & STREAM_OOB) == STREAM_OOB
-	if (oob != 0 || addr) && stream.writefilters.GetHead() != nil {
+	if (oob != 0 || addr) && stream.GetWritefilters().GetHead() != nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
 		return -1
 	}

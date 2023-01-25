@@ -7,18 +7,15 @@ import (
 	"sik/core"
 )
 
-func __hasAttribute(x __auto__) int { return 0 }
-func __hasBuiltin(x __auto__) int   { return 0 }
-func __hasFeature(x __auto__) int   { return 0 }
-func ZEND_ASSERT(c bool)            {}
-func ZEND_IGNORE_VALUE(x __auto__)  { void(x) }
-func ZendQuietWrite()               { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
+func ZEND_ASSERT(c bool)           {}
+func ZEND_IGNORE_VALUE(x __auto__) { void(x) }
+func ZendQuietWrite()              { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
 func DL_LOAD(libname *byte) __auto__ {
 	return dlopen(libname, PHP_RTLD_MODE|RTLD_GLOBAL)
 }
 func ZEND_CONST_COND(_condition __auto__, _default __auto__) __auto__ { return _default }
-func EXPECTED(condition bool) __auto__                                { return __builtin_expect(!!condition, 1) }
-func UNEXPECTED(condition bool) __auto__                              { return __builtin_expect(!!condition, 0) }
+func EXPECTED(condition __auto__) __auto__                            { return __builtin_expect(!!condition, 1) }
+func UNEXPECTED(condition __auto__) __auto__                          { return __builtin_expect(!!condition, 0) }
 func DoAlloca(p int, use_heap __auto__) any                           { return Emalloc(p) }
 func FreeAlloca(p any, use_heap __auto__)                             { Efree(p) }
 func SETJMP(a JMP_BUF) __auto__                                       { return sigsetjmp(a, 0) }

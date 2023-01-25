@@ -43,13 +43,13 @@ func PhpStreamMakeSeekableRel(origstream *PhpStream, newstream **PhpStream, flag
 	return _phpStreamMakeSeekable(origstream, newstream, flags)
 }
 func PHP_STREAM_CONTEXT(stream *PhpStream) *PhpStreamContext {
-	return (*PhpStreamContext)(b.CondF1(stream.GetCtx() != nil, func() any { return stream.GetCtx().ptr }, nil))
+	return (*PhpStreamContext)(b.CondF1(stream.GetCtx() != nil, func() any { return stream.GetCtx().GetPtr() }, nil))
 }
 func PhpStreamAlloc(ops *PhpStreamOps, thisptr any, persistent_id int, mode *byte) *PhpStream {
 	return _phpStreamAlloc(ops, thisptr, persistent_id, mode)
 }
 func PhpStreamGetResourceId(stream __auto__) int {
-	return (*PhpStream)(stream).GetRes().handle
+	return (*PhpStream)(stream).GetRes().GetHandle()
 }
 func PhpStreamAutoCleanup(stream *PhpStream) { stream.SetExposed(1) }
 func PhpStreamToZval(stream *PhpStream, zval *zend.Zval) {

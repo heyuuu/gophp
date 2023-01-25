@@ -8,10 +8,10 @@ import (
 
 func CREDIT_LINE(module string, authors string) { PhpInfoPrintTableRow(2, module, authors) }
 func PhpPrintCredits(flag int) {
-	if core.sapi_module.phpinfo_as_text == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
 		PhpPrintInfoHtmlhead()
 	}
-	if core.sapi_module.phpinfo_as_text == 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 {
 		core.PUTS("<h1>PHP Credits</h1>\n")
 	} else {
 		core.PUTS("PHP Credits\n")
@@ -30,7 +30,7 @@ func PhpPrintCredits(flag int) {
 		/* Design & Concept */
 
 		PhpInfoPrintTableStart()
-		if core.sapi_module.phpinfo_as_text == 0 {
+		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			PhpInfoPrintTableHeader(1, "Language Design &amp; Concept")
 		} else {
 			PhpInfoPrintTableHeader(1, "Language Design & Concept")
@@ -120,7 +120,7 @@ func PhpPrintCredits(flag int) {
 		CREDIT_LINE("Windows Infrastructure", "Alex Schoenmaker")
 		PhpInfoPrintTableEnd()
 	}
-	if core.sapi_module.phpinfo_as_text == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
+	if core.sapi_module.GetPhpinfoAsText() == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
 		core.PUTS("</div></body></html>\n")
 	}
 }

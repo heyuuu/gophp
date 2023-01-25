@@ -21,12 +21,12 @@ func ZendSignalHandlerDefer(signo int, siginfo *siginfo_t, context any) {
 	var errno_save int = errno
 	var queue *ZendSignalQueueT
 	var qtmp *ZendSignalQueueT
-	if EXPECTED(SIGG(active)) {
-		if UNEXPECTED(SIGG(depth) == 0) {
-			if UNEXPECTED(SIGG(blocked)) {
+	if SIGG(active) {
+		if SIGG(depth) == 0 {
+			if SIGG(blocked) {
 				SIGG(blocked) = 0
 			}
-			if EXPECTED(SIGG(running) == 0) {
+			if SIGG(running) == 0 {
 				SIGG(running) = 1
 				ZendSignalHandler(signo, siginfo, context)
 				queue = SIGG(phead)
@@ -71,7 +71,7 @@ func ZendSignalHandlerDefer(signo int, siginfo *siginfo_t, context any) {
 func ZendSignalHandlerUnblock() {
 	var queue *ZendSignalQueueT
 	var zend_signal ZendSignalT
-	if EXPECTED(SIGG(active)) {
+	if SIGG(active) {
 		SIGNAL_BEGIN_CRITICAL()
 		queue = SIGG(phead)
 		SIGG(phead) = queue.GetNext()
@@ -237,7 +237,7 @@ func ZendSignalGlobalsCtor(zend_signal_globals *ZendSignalGlobalsT) {
 	memset(zend_signal_globals, 0, b.SizeOf("* zend_signal_globals"))
 	zend_signal_globals.SetReset(1)
 	for x = 0; x < b.SizeOf("zend_signal_globals -> pstorage")/b.SizeOf("* zend_signal_globals -> pstorage"); x++ {
-		var queue *ZendSignalQueueT = &zend_signal_globals.pstorage[x]
+		var queue *ZendSignalQueueT = &zend_signal_globals.GetPstorage()[x]
 		queue.GetZendSignal().SetSigno(0)
 		queue.SetNext(zend_signal_globals.GetPavail())
 		zend_signal_globals.SetPavail(queue)

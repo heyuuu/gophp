@@ -8,33 +8,33 @@ import (
 )
 
 func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval) int {
-	var func_ *zend.ZendFunction = pce.constructor
+	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.common.function_name), zend.ZSTR_LEN(func_.common.function_name), nil, 1, arg1, nil)
+	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.GetFunctionName()), zend.ZSTR_LEN(func_.GetFunctionName()), nil, 1, arg1, nil)
 	return 0
 }
 func SplInstantiateArgEx2(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval, arg2 *zend.Zval) int {
-	var func_ *zend.ZendFunction = pce.constructor
+	var func_ *zend.ZendFunction = pce.GetConstructor()
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.common.function_name), zend.ZSTR_LEN(func_.common.function_name), nil, 2, arg1, arg2)
+	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.GetFunctionName()), zend.ZSTR_LEN(func_.GetFunctionName()), nil, 2, arg1, arg2)
 	return 0
 }
 func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *zend.Zval, argc int, argv *zend.Zval) {
-	var func_ *zend.ZendFunction = pce.constructor
+	var func_ *zend.ZendFunction = pce.GetConstructor()
 	var fci zend.ZendFcallInfo
 	var fcc zend.ZendFcallInfoCache
 	var dummy zend.Zval
 	SplInstantiate(pce, retval)
-	fci.size = b.SizeOf("zend_fcall_info")
-	zend.ZVAL_STR(&fci.function_name, func_.common.function_name)
-	fci.object = zend.Z_OBJ_P(retval)
-	fci.retval = &dummy
-	fci.param_count = argc
-	fci.params = argv
-	fci.no_separation = 1
-	fcc.function_handler = func_
-	fcc.called_scope = pce
-	fcc.object = zend.Z_OBJ_P(retval)
+	fci.SetSize(b.SizeOf("zend_fcall_info"))
+	zend.ZVAL_STR(&fci.GetFunctionName(), func_.GetFunctionName())
+	fci.SetObject(zend.Z_OBJ_P(retval))
+	fci.SetRetval(&dummy)
+	fci.SetParamCount(argc)
+	fci.SetParams(argv)
+	fci.SetNoSeparation(1)
+	fcc.SetFunctionHandler(func_)
+	fcc.SetCalledScope(pce)
+	fcc.SetObject(zend.Z_OBJ_P(retval))
 	zend.ZendCallFunction(&fci, &fcc)
 }
 func SplInstantiate(pce *zend.ZendClassEntry, object *zend.Zval) { zend.ObjectInitEx(object, pce) }

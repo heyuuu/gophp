@@ -457,7 +457,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 					if zend.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
 						return zend.ZendStringInit(trypath, strlen(trypath), 0)
 					}
-					if zend.ExecutorGlobals.exception != nil {
+					if zend.ExecutorGlobals.GetException() != nil {
 						return nil
 					}
 				}
@@ -498,7 +498,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 						if zend.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
 							return zend.ZendStringInit(trypath, strlen(trypath), 0)
 						}
-						if zend.ExecutorGlobals.exception != nil {
+						if zend.ExecutorGlobals.GetException() != nil {
 							return nil
 						}
 					}
@@ -676,23 +676,23 @@ func ExpandFilepathWithMode(filepath *byte, real_path *byte, relative_to *byte, 
 			cwd[0] = '0'
 		}
 	}
-	new_state.cwd = zend.Estrdup(cwd)
-	new_state.cwd_length = strlen(cwd)
+	new_state.SetCwd(zend.Estrdup(cwd))
+	new_state.SetCwdLength(strlen(cwd))
 	if zend.VirtualFileEx(&new_state, filepath, nil, realpath_mode) != 0 {
-		zend.Efree(new_state.cwd)
+		zend.Efree(new_state.GetCwd())
 		return nil
 	}
 	if real_path != nil {
-		if new_state.cwd_length > MAXPATHLEN-1 {
+		if new_state.GetCwdLength() > MAXPATHLEN-1 {
 			copy_len = MAXPATHLEN - 1
 		} else {
-			copy_len = new_state.cwd_length
+			copy_len = new_state.GetCwdLength()
 		}
-		memcpy(real_path, new_state.cwd, copy_len)
+		memcpy(real_path, new_state.GetCwd(), copy_len)
 		real_path[copy_len] = '0'
 	} else {
-		real_path = zend.Estrndup(new_state.cwd, new_state.cwd_length)
+		real_path = zend.Estrndup(new_state.GetCwd(), new_state.GetCwdLength())
 	}
-	zend.Efree(new_state.cwd)
+	zend.Efree(new_state.GetCwd())
 	return real_path
 }

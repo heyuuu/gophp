@@ -28,8 +28,8 @@ func ZmStartupDir(type_ int, module_number int) int {
 	var pathsep_str []byte
 	var dir_class_entry zend.ZendClassEntry
 	memset(&dir_class_entry, 0, b.SizeOf("zend_class_entry"))
-	dir_class_entry.name = zend.ZendStringInitInterned("Directory", b.SizeOf("\"Directory\"")-1, 1)
-	dir_class_entry.info.internal.builtin_functions = PhpDirClassFunctions
+	dir_class_entry.SetName(zend.ZendStringInitInterned("Directory", b.SizeOf("\"Directory\"")-1, 1))
+	dir_class_entry.SetBuiltinFunctions(PhpDirClassFunctions)
 	DirClassEntryPtr = zend.ZendRegisterInternalClass(&dir_class_entry)
 	dirsep_str[0] = zend.DEFAULT_SLASH
 	dirsep_str[1] = '0'
@@ -86,7 +86,7 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -99,21 +99,21 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &dirname, &dir_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &dirname, &dir_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &zcontext, 0) == 0) {
+			if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -145,12 +145,12 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 		zend.RETVAL_FALSE
 		return
 	}
-	dirp.flags |= core.PHP_STREAM_FLAG_NO_FCLOSE
-	PhpSetDefaultDir(dirp.res)
+	dirp.AddFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
+	PhpSetDefaultDir(dirp.GetRes())
 	if createobject != 0 {
 		zend.ObjectInitEx(return_value, DirClassEntryPtr)
 		zend.AddPropertyStringl(return_value, "path", dirname, dir_len)
-		zend.AddPropertyResource(return_value, "handle", dirp.res)
+		zend.AddPropertyResource(return_value, "handle", dirp.GetRes())
 		core.PhpStreamAutoCleanup(dirp)
 	} else {
 		core.PhpStreamToZval(dirp, return_value)
@@ -189,7 +189,7 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -203,14 +203,14 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &id, 0) == 0) {
+			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -260,13 +260,13 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 	}
-	if (dirp.flags & core.PHP_STREAM_FLAG_IS_DIR) == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.res.handle)
+	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		zend.RETVAL_FALSE
 		return
 	}
-	res = dirp.res
-	zend.ZendListClose(dirp.res)
+	res = dirp.GetRes()
+	zend.ZendListClose(dirp.GetRes())
 	if res == DIRG(default_dir) {
 		PhpSetDefaultDir(nil)
 	}
@@ -296,7 +296,7 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -309,14 +309,14 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -384,7 +384,7 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -397,14 +397,14 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -493,7 +493,7 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -507,14 +507,14 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &id, 0) == 0) {
+			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -564,8 +564,8 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 	}
-	if (dirp.flags & core.PHP_STREAM_FLAG_IS_DIR) == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.res.handle)
+	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		zend.RETVAL_FALSE
 		return
 	}
@@ -598,7 +598,7 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -612,14 +612,14 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &id, 0) == 0) {
+			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -669,13 +669,13 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 	}
-	if (dirp.flags & core.PHP_STREAM_FLAG_IS_DIR) == 0 {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.res.handle)
+	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
 		zend.RETVAL_FALSE
 		return
 	}
 	if core.PhpStreamReaddir(dirp, &entry) != nil {
-		zend.RETVAL_STRINGL(entry.d_name, strlen(entry.d_name))
+		zend.RETVAL_STRINGL(entry.GetDName(), strlen(entry.GetDName()))
 		return
 	}
 	zend.RETVAL_FALSE
@@ -711,7 +711,7 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -724,21 +724,21 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &pattern, &pattern_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &pattern, &pattern_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -866,7 +866,7 @@ func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -879,27 +879,27 @@ func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &dirn, &dirn_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &dirn, &dirn_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0) {
+			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &zcontext, 0) == 0) {
+			if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {

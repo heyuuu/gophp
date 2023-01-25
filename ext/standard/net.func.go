@@ -73,7 +73,7 @@ func IfaceAppendUnicast(unicast *zend.Zval, flags zend.ZendLong, addr *__struct_
 func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
-	if zend.UNEXPECTED(zend.ZEND_NUM_ARGS() != 0) {
+	if zend.ZEND_NUM_ARGS() != 0 {
 		zend.ZendWrongParametersNoneError()
 		return
 	}

@@ -152,7 +152,7 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 	return res
 }
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent zend.ZendBool) *zend.ZendString {
-	var interned *zend.ZendString = zend.ZendHashFindPtr(&ctx.str_interned, str)
+	var interned *zend.ZendString = zend.ZendHashFindPtr(&ctx.GetStrInterned(), str)
 	if interned != nil {
 		zend.ZendStringAddref(interned)
 	} else {
@@ -160,7 +160,7 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent 
 		if persistent != 0 {
 			interned = zend.ZendNewInternedString(str)
 		}
-		zend.ZendHashAddNewPtr(&ctx.str_interned, interned, interned)
+		zend.ZendHashAddNewPtr(&ctx.GetStrInterned(), interned, interned)
 	}
 	return interned
 }
@@ -169,7 +169,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persisten
 	var interned *zend.ZendString
 	zend.ZSTR_ALLOCA_ALLOC(lcname, zend.ZSTR_LEN(str), use_heap)
 	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lcname), zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
-	interned = zend.ZendHashFindPtr(&ctx.str_interned, lcname)
+	interned = zend.ZendHashFindPtr(&ctx.GetStrInterned(), lcname)
 	if interned != nil {
 		zend.ZendStringAddref(interned)
 	} else {
@@ -177,7 +177,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persisten
 		if persistent != 0 {
 			interned = zend.ZendNewInternedString(interned)
 		}
-		zend.ZendHashAddNewPtr(&ctx.str_interned, interned, interned)
+		zend.ZendHashAddNewPtr(&ctx.GetStrInterned(), interned, interned)
 	}
 	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
 	return interned
@@ -281,7 +281,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern))
 		pos = entry.GetPrefixLen()
 		for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
-			pos = BrowscapComputeContains(pattern, pos, &entry.contains_start[i], &entry.contains_len[i])
+			pos = BrowscapComputeContains(pattern, pos, &entry.GetContainsStart()[i], &entry.GetContainsLen()[i])
 		}
 		break
 	}
@@ -294,7 +294,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 		return zend.FAILURE
 	}
 	zend.ZendStreamInitFp(&fh, zend.VCWD_FOPEN(filename, "r"), filename)
-	if fh.handle.fp == nil {
+	if fh.GetFp() == nil {
 		zend.ZendError(zend.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return zend.FAILURE
 	}
@@ -309,7 +309,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	ctx.SetBdata(browdata)
 	ctx.SetCurrentEntry(nil)
 	ctx.SetCurrentSectionName(nil)
-	zend.ZendHashInit(&ctx.str_interned, 8, nil, StrInternedDtor, persistent)
+	zend.ZendHashInit(&ctx.GetStrInterned(), 8, nil, StrInternedDtor, persistent)
 	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
 
 	/* Destroy parser context */
@@ -317,7 +317,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	if ctx.GetCurrentSectionName() != nil {
 		zend.ZendStringRelease(ctx.GetCurrentSectionName())
 	}
-	zend.ZendHashDestroy(&ctx.str_interned)
+	zend.ZendHashDestroy(&ctx.GetStrInterned())
 	return zend.SUCCESS
 }
 func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
@@ -569,7 +569,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -583,20 +583,20 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &agent_name, 1) == 0) {
+			if zend.ZendParseArgStr(_arg, &agent_name, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &return_array, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &return_array, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -624,7 +624,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	if agent_name == nil {
 		var http_user_agent *zend.Zval = nil
-		if zend.Z_TYPE(core.PG(http_globals)[core.TRACK_VARS_SERVER]) == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
+		if core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
 			http_user_agent = zend.ZendHashStrFind(zend.Z_ARRVAL_P(&core.PG(http_globals)[core.TRACK_VARS_SERVER]), "HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
 		}
 		if http_user_agent == nil {
@@ -640,12 +640,12 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var entry *BrowscapEntry
 		for {
 			var __ht *zend.HashTable = bdata.GetHtab()
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				entry = zend.Z_PTR_P(_z)

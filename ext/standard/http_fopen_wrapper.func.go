@@ -77,7 +77,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		return nil
 	}
 	if !(zend.ZendStringEqualsLiteralCi(resource.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(resource.GetScheme(), "https")) {
-		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.wops.label, "proxy")) == nil || zend.Z_TYPE_P(tmpzval) != zend.IS_STRING || zend.Z_STRLEN_P(tmpzval) == 0 {
+		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || zend.Z_TYPE_P(tmpzval) != zend.IS_STRING || zend.Z_STRLEN_P(tmpzval) == 0 {
 			PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
 		}
@@ -107,7 +107,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		} else if resource.GetPort() == 0 {
 			resource.SetPort(80)
 		}
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.wops.label, "proxy")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
 			use_proxy = 1
 			transport_len = zend.Z_STRLEN_P(tmpzval)
 			transport_string = zend.Estrndup(zend.Z_STRVAL_P(tmpzval), zend.Z_STRLEN_P(tmpzval))
@@ -115,7 +115,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", b.Cond(use_ssl != 0, "ssl", "tcp"), zend.ZSTR_VAL(resource.GetHost()), resource.GetPort())
 		}
 	}
-	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.wops.label, "timeout")) != nil {
+	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
 		var d float64 = zend.ZvalGetDouble(tmpzval)
 		timeout.tv_sec = int64(d)
 		timeout.tv_usec = size_t((d - timeout.tv_sec) * 1000000)
@@ -158,12 +158,12 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 				var tmpheader *zend.Zval = nil
 				for {
 					var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
-					var _p *zend.Bucket = __ht.arData
-					var _end *zend.Bucket = _p + __ht.nNumUsed
+					var _p *zend.Bucket = __ht.GetArData()
+					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.val
+						var _z *zend.Zval = &_p.GetVal()
 
-						if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 							continue
 						}
 						tmpheader = _z
@@ -241,7 +241,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		}
 	finish:
 		zend.SmartStrAppendl(&header, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
-		if core.PhpStreamWrite(stream, zend.ZSTR_VAL(header.s), zend.ZSTR_LEN(header.s)) != zend.ZSTR_LEN(header.s) {
+		if core.PhpStreamWrite(stream, zend.ZSTR_VAL(header.GetS()), zend.ZSTR_LEN(header.GetS())) != zend.ZSTR_LEN(header.GetS()) {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Cannot connect to HTTPS server through proxy")
 			core.PhpStreamClose(stream)
 			stream = nil
@@ -288,8 +288,8 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	/* avoid problems with auto-detecting when reading the headers -> the headers
 	 * are always in canonical \r\n format */
 
-	eol_detect = stream.flags & (core.PHP_STREAM_FLAG_DETECT_EOL | core.PHP_STREAM_FLAG_EOL_MAC)
-	stream.flags &= ^(core.PHP_STREAM_FLAG_DETECT_EOL | core.PHP_STREAM_FLAG_EOL_MAC)
+	eol_detect = stream.GetFlags() & (core.PHP_STREAM_FLAG_DETECT_EOL | core.PHP_STREAM_FLAG_EOL_MAC)
+	stream.SubFlags(core.PHP_STREAM_FLAG_DETECT_EOL | core.PHP_STREAM_FLAG_EOL_MAC)
 	streams.PhpStreamContextSet(stream, context)
 	streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_CONNECT, nil, 0)
 	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "max_redirects")) != nil {
@@ -370,12 +370,12 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			var tmpstr zend.SmartStr = zend.SmartStr{0}
 			for {
 				var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
-				var _p *zend.Bucket = __ht.arData
-				var _end *zend.Bucket = _p + __ht.nNumUsed
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *zend.Zval = &_p.val
+					var _z *zend.Zval = &_p.GetVal()
 
-					if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					tmpheader = _z
@@ -390,8 +390,8 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 
-			if tmpstr.s != nil {
-				tmp = PhpTrim(tmpstr.s, nil, 0, 3)
+			if tmpstr.GetS() != nil {
+				tmp = PhpTrim(tmpstr.GetS(), nil, 0, 3)
 				zend.SmartStrFree(&tmpstr)
 			}
 
@@ -611,7 +611,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 	/* send it */
 
-	core.PhpStreamWrite(stream, zend.ZSTR_VAL(req_buf.s), zend.ZSTR_LEN(req_buf.s))
+	core.PhpStreamWrite(stream, zend.ZSTR_VAL(req_buf.GetS()), zend.ZSTR_LEN(req_buf.GetS()))
 	location[0] = '0'
 	if zend.Z_ISUNDEF_P(response_header) {
 		zend.ArrayInit(response_header)
@@ -893,7 +893,7 @@ out:
 	}
 	if stream != nil {
 		if header_init != 0 {
-			zend.ZVAL_COPY(&stream.wrapperdata, response_header)
+			zend.ZVAL_COPY(&stream.GetWrapperdata(), response_header)
 		}
 		streams.PhpStreamNotifyProgressInit(context, 0, file_size)
 
@@ -905,18 +905,18 @@ out:
 
 		/* restore the users auto-detect-line-endings setting */
 
-		stream.flags |= eol_detect
+		stream.AddFlags(eol_detect)
 
 		/* as far as streams are concerned, we are now at the start of
 		 * the stream */
 
-		stream.position = 0
+		stream.SetPosition(0)
 
 		/* restore mode */
 
-		strlcpy(stream.mode, mode, b.SizeOf("stream -> mode"))
+		strlcpy(stream.GetMode(), mode, b.SizeOf("stream -> mode"))
 		if transfer_encoding != nil {
-			streams.PhpStreamFilterAppend(&stream.readfilters, transfer_encoding)
+			streams.PhpStreamFilterAppend(&stream.GetReadfilters(), transfer_encoding)
 		}
 	} else {
 		if transfer_encoding != nil {

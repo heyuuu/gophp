@@ -9,7 +9,7 @@ import (
 )
 
 func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil && pglob.GetPath() != nil {
 		if plen != nil {
 			*plen = pglob.GetPathLen()
@@ -23,7 +23,7 @@ func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
 	}
 }
 func _phpGlobStreamGetPattern(stream *core.PhpStream, plen *int) *byte {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil && pglob.GetPattern() != nil {
 		if plen != nil {
 			*plen = pglob.GetPatternLen()
@@ -37,7 +37,7 @@ func _phpGlobStreamGetPattern(stream *core.PhpStream, plen *int) *byte {
 	}
 }
 func _phpGlobStreamGetCount(stream *core.PhpStream, pflags *int) int {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil {
 		if pflags != nil {
 			*pflags = pglob.GetFlags()
@@ -69,7 +69,7 @@ func PhpGlobStreamPathSplit(pglob *GlobST, path *byte, get_path int, p_file **by
 	}
 }
 func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	var ent *core.PhpStreamDirent = (*core.PhpStreamDirent)(buf)
 	var path *byte
 
@@ -78,7 +78,7 @@ func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if count == b.SizeOf("php_stream_dirent") && pglob != nil {
 		if pglob.GetIndex() < int(pglob.glob.gl_pathc) {
 			PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[b.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
-			core.PHP_STRLCPY(ent.d_name, path, b.SizeOf("ent -> d_name"), strlen(path))
+			core.PHP_STRLCPY(ent.GetDName(), path, b.SizeOf("ent -> d_name"), strlen(path))
 			return b.SizeOf("php_stream_dirent")
 		}
 		pglob.SetIndex(pglob.glob.gl_pathc)
@@ -90,10 +90,10 @@ func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	return -1
 }
 func PhpGlobStreamClose(stream *core.PhpStream, close_handle int) int {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil {
 		pglob.SetIndex(0)
-		globfree(&pglob.glob)
+		globfree(&pglob.GetGlob())
 		if pglob.GetPath() != nil {
 			zend.Efree(pglob.GetPath())
 		}
@@ -101,11 +101,11 @@ func PhpGlobStreamClose(stream *core.PhpStream, close_handle int) int {
 			zend.Efree(pglob.GetPattern())
 		}
 	}
-	zend.Efree(stream.abstract)
+	zend.Efree(stream.GetAbstract())
 	return 0
 }
 func PhpGlobStreamRewind(stream *core.PhpStream, offset zend.ZendOffT, whence int, newoffs *zend.ZendOffT) int {
-	var pglob *GlobST = (*GlobST)(stream.abstract)
+	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil {
 		pglob.SetIndex(0)
 		if pglob.GetPath() != nil {
@@ -130,7 +130,7 @@ func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		return nil
 	}
 	pglob = zend.Ecalloc(b.SizeOf("* pglob"), 1)
-	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, &pglob.glob)) {
+	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, &pglob.GetGlob())) {
 		zend.Efree(pglob)
 		return nil
 	}

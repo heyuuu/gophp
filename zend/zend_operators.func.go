@@ -12,7 +12,7 @@ func ZEND_DOUBLE_FITS_LONG(d float64) bool {
 	return !(d >= float64(ZEND_LONG_MAX != 0 || d < float64(ZEND_LONG_MIN)))
 }
 func ZendDvalToLval(d float64) ZendLong {
-	if UNEXPECTED(!(core.ZendFinite(d))) || UNEXPECTED(core.ZendIsnan(d)) {
+	if !(core.ZendFinite(d)) || core.ZendIsnan(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		return ZendDvalToLvalSlow(d)
@@ -20,7 +20,7 @@ func ZendDvalToLval(d float64) ZendLong {
 	return ZendLong(d)
 }
 func ZendDvalToLvalCap(d float64) ZendLong {
-	if UNEXPECTED(!(core.ZendFinite(d))) || UNEXPECTED(core.ZendIsnan(d)) {
+	if !(core.ZendFinite(d)) || core.ZendIsnan(d) {
 		return 0
 	} else if !(ZEND_DOUBLE_FITS_LONG(d)) {
 		if d > 0 {
@@ -61,7 +61,7 @@ func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte
 	if needle_len > off_s {
 		return nil
 	}
-	if EXPECTED(off_s < 1024 || needle_len < 9) {
+	if off_s < 1024 || needle_len < 9 {
 		end -= needle_len
 		for p <= end {
 			if b.Assign(&p, (*byte)(memchr(p, *needle, end-p+1))) && ne == p[needle_len-1] {
@@ -108,7 +108,7 @@ func ZendMemnrstr(haystack *byte, needle *byte, needle_len int, end *byte) *byte
 	if needle_len > off_s {
 		return nil
 	}
-	if EXPECTED(off_s < 1024 || needle_len < 3) {
+	if off_s < 1024 || needle_len < 3 {
 		p -= needle_len
 		for {
 			p = (*byte)(ZendMemrchr(haystack, *needle, p-haystack+1))
@@ -128,28 +128,28 @@ func ZendMemnrstr(haystack *byte, needle *byte, needle_len int, end *byte) *byte
 	}
 }
 func ZvalGetLong(op *Zval) ZendLong {
-	if EXPECTED(Z_TYPE_P(op) == IS_LONG) {
+	if Z_TYPE_P(op) == IS_LONG {
 		return Z_LVAL_P(op)
 	} else {
 		return ZvalGetLongFunc(op)
 	}
 }
 func ZvalGetDouble(op *Zval) float64 {
-	if EXPECTED(Z_TYPE_P(op) == IS_DOUBLE) {
+	if Z_TYPE_P(op) == IS_DOUBLE {
 		return Z_DVAL_P(op)
 	} else {
 		return ZvalGetDoubleFunc(op)
 	}
 }
 func ZvalGetString(op *Zval) *ZendString {
-	if EXPECTED(Z_TYPE_P(op) == IS_STRING) {
+	if Z_TYPE_P(op) == IS_STRING {
 		return ZendStringCopy(Z_STR_P(op))
 	} else {
 		return ZvalGetStringFunc(op)
 	}
 }
 func ZvalGetTmpString(op *Zval, tmp **ZendString) *ZendString {
-	if EXPECTED(Z_TYPE_P(op) == IS_STRING) {
+	if Z_TYPE_P(op) == IS_STRING {
 		*tmp = nil
 		return Z_STR_P(op)
 	} else {
@@ -158,12 +158,12 @@ func ZvalGetTmpString(op *Zval, tmp **ZendString) *ZendString {
 	}
 }
 func ZendTmpStringRelease(tmp *ZendString) {
-	if UNEXPECTED(tmp != nil) {
+	if tmp != nil {
 		ZendStringReleaseEx(tmp, 0)
 	}
 }
 func ZvalTryGetString(op *Zval) *ZendString {
-	if EXPECTED(Z_TYPE_P(op) == IS_STRING) {
+	if Z_TYPE_P(op) == IS_STRING {
 		var ret *ZendString = ZendStringCopy(Z_STR_P(op))
 		return ret
 	} else {
@@ -171,7 +171,7 @@ func ZvalTryGetString(op *Zval) *ZendString {
 	}
 }
 func ZvalTryGetTmpString(op *Zval, tmp **ZendString) *ZendString {
-	if EXPECTED(Z_TYPE_P(op) == IS_STRING) {
+	if Z_TYPE_P(op) == IS_STRING {
 		var ret *ZendString = Z_STR_P(op)
 		*tmp = nil
 		return ret
@@ -231,14 +231,14 @@ again:
 		}
 		break
 	case IS_OBJECT:
-		if EXPECTED(Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring) {
+		if Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
 			result = 1
 		} else {
 			result = ZendObjectIsTrue(op)
 		}
 		break
 	case IS_RESOURCE:
-		if EXPECTED(Z_RES_HANDLE_P(op) != 0) {
+		if Z_RES_HANDLE_P(op) != 0 {
 			result = 1
 		}
 		break
@@ -321,7 +321,7 @@ func ConvertScalarToNumberEx(pzv *Zval) {
 	}
 }
 func FastLongIncrementFunction(op1 *Zval) {
-	if UNEXPECTED(Z_LVAL_P(op1) == ZEND_LONG_MAX) {
+	if Z_LVAL_P(op1) == ZEND_LONG_MAX {
 
 		/* switch to double */
 
@@ -334,7 +334,7 @@ func FastLongIncrementFunction(op1 *Zval) {
 	}
 }
 func FastLongDecrementFunction(op1 *Zval) {
-	if UNEXPECTED(Z_LVAL_P(op1) == ZEND_LONG_MIN) {
+	if Z_LVAL_P(op1) == ZEND_LONG_MIN {
 
 		/* switch to double */
 
@@ -353,7 +353,7 @@ func FastLongAddFunction(result *Zval, op1 *Zval, op2 *Zval) {
 	 * have read the values of op1 and op2.
 	 */
 
-	if UNEXPECTED((Z_LVAL_P(op1)&LONG_SIGN_MASK) == (Z_LVAL_P(op2)&LONG_SIGN_MASK) && (Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(op1)+Z_LVAL_P(op2)&LONG_SIGN_MASK)) {
+	if (Z_LVAL_P(op1)&LONG_SIGN_MASK) == (Z_LVAL_P(op2)&LONG_SIGN_MASK) && (Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(op1)+Z_LVAL_P(op2)&LONG_SIGN_MASK) {
 		ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1)+float64(Z_LVAL_P(op2))))
 	} else {
 		ZVAL_LONG(result, Z_LVAL_P(op1)+Z_LVAL_P(op2))
@@ -366,19 +366,19 @@ func FastLongAddFunction(result *Zval, op1 *Zval, op2 *Zval) {
 	 */
 }
 func FastAddFunction(result *Zval, op1 *Zval, op2 *Zval) int {
-	if EXPECTED(Z_TYPE_P(op1) == IS_LONG) {
-		if EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op1) == IS_LONG {
+		if Z_TYPE_P(op2) == IS_LONG {
 			FastLongAddFunction(result, op1, op2)
 			return SUCCESS
-		} else if EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE) {
+		} else if Z_TYPE_P(op2) == IS_DOUBLE {
 			ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))+Z_DVAL_P(op2))
 			return SUCCESS
 		}
-	} else if EXPECTED(Z_TYPE_P(op1) == IS_DOUBLE) {
-		if EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE) {
+	} else if Z_TYPE_P(op1) == IS_DOUBLE {
+		if Z_TYPE_P(op2) == IS_DOUBLE {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)+Z_DVAL_P(op2))
 			return SUCCESS
-		} else if EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+		} else if Z_TYPE_P(op2) == IS_LONG {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)+float64(Z_LVAL_P(op2)))
 			return SUCCESS
 		}
@@ -387,7 +387,7 @@ func FastAddFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 }
 func FastLongSubFunction(result *Zval, op1 *Zval, op2 *Zval) {
 	ZVAL_LONG(result, Z_LVAL_P(op1)-Z_LVAL_P(op2))
-	if UNEXPECTED((Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(op2)&LONG_SIGN_MASK) && (Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(result)&LONG_SIGN_MASK)) {
+	if (Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(op2)&LONG_SIGN_MASK) && (Z_LVAL_P(op1)&LONG_SIGN_MASK) != (Z_LVAL_P(result)&LONG_SIGN_MASK) {
 		ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1)-float64(Z_LVAL_P(op2))))
 	}
 }
@@ -403,20 +403,20 @@ func ZendFastEqualStrings(s1 *ZendString, s2 *ZendString) int {
 }
 func FastEqualCheckFunction(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if EXPECTED(Z_TYPE_P(op1) == IS_LONG) {
-		if EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op1) == IS_LONG {
+		if Z_TYPE_P(op2) == IS_LONG {
 			return Z_LVAL_P(op1) == Z_LVAL_P(op2)
-		} else if EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE) {
+		} else if Z_TYPE_P(op2) == IS_DOUBLE {
 			return float64(Z_LVAL_P(op1)) == Z_DVAL_P(op2)
 		}
-	} else if EXPECTED(Z_TYPE_P(op1) == IS_DOUBLE) {
-		if EXPECTED(Z_TYPE_P(op2) == IS_DOUBLE) {
+	} else if Z_TYPE_P(op1) == IS_DOUBLE {
+		if Z_TYPE_P(op2) == IS_DOUBLE {
 			return Z_DVAL_P(op1) == Z_DVAL_P(op2)
-		} else if EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+		} else if Z_TYPE_P(op2) == IS_LONG {
 			return Z_DVAL_P(op1) == float64(Z_LVAL_P(op2))
 		}
-	} else if EXPECTED(Z_TYPE_P(op1) == IS_STRING) {
-		if EXPECTED(Z_TYPE_P(op2) == IS_STRING) {
+	} else if Z_TYPE_P(op1) == IS_STRING {
+		if Z_TYPE_P(op2) == IS_STRING {
 			return ZendFastEqualStrings(Z_STR_P(op1), Z_STR_P(op2))
 		}
 	}
@@ -425,7 +425,7 @@ func FastEqualCheckFunction(op1 *Zval, op2 *Zval) int {
 }
 func FastEqualCheckLong(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op2) == IS_LONG {
 		return Z_LVAL_P(op1) == Z_LVAL_P(op2)
 	}
 	CompareFunction(&result, op1, op2)
@@ -433,7 +433,7 @@ func FastEqualCheckLong(op1 *Zval, op2 *Zval) int {
 }
 func FastEqualCheckString(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if EXPECTED(Z_TYPE_P(op2) == IS_STRING) {
+	if Z_TYPE_P(op2) == IS_STRING {
 		return ZendFastEqualStrings(Z_STR_P(op1), Z_STR_P(op2))
 	}
 	CompareFunction(&result, op1, op2)
@@ -583,11 +583,11 @@ try_again:
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, _IS_NUMBER, ConvertScalarToNumber)
-		if check != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if check != 0 && ExecutorGlobals.GetException() != nil {
 			return
 		}
 		ZvalPtrDtor(op)
-		if Z_TYPE(dst) == IS_LONG || Z_TYPE(dst) == IS_DOUBLE {
+		if dst.IsType(IS_LONG) || dst.IsType(IS_DOUBLE) {
 			ZVAL_COPY_VALUE(op, &dst)
 		} else {
 			ZVAL_LONG(op, 1)
@@ -619,7 +619,7 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		return holder
 	case IS_OBJECT:
 		ConvertObjectToType(op, holder, _IS_NUMBER, ConvertScalarToNumber)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) || UNEXPECTED(Z_TYPE_P(holder) != IS_LONG && Z_TYPE_P(holder) != IS_DOUBLE) {
+		if ExecutorGlobals.GetException() != nil || Z_TYPE_P(holder) != IS_LONG && Z_TYPE_P(holder) != IS_DOUBLE {
 			ZVAL_LONG(holder, 1)
 		}
 		return holder
@@ -702,7 +702,7 @@ try_again:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
 		ZvalPtrDtor(op)
-		if Z_TYPE(dst) == IS_LONG {
+		if dst.IsType(IS_LONG) {
 			ZVAL_LONG(op, Z_LVAL(dst))
 		} else {
 			ZVAL_LONG(op, 1)
@@ -755,7 +755,7 @@ try_again:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
 		ZvalPtrDtor(op)
-		if Z_TYPE(dst) == IS_DOUBLE {
+		if dst.IsType(IS_DOUBLE) {
 			ZVAL_DOUBLE(op, Z_DVAL(dst))
 		} else {
 			ZVAL_DOUBLE(op, 1.0)
@@ -912,7 +912,7 @@ func _tryConvertToString(op *Zval) ZendBool {
 	var str *ZendString
 	ZEND_ASSERT(Z_TYPE_P(op) != IS_STRING)
 	str = ZvalTryGetStringFunc(op)
-	if UNEXPECTED(str == nil) {
+	if str == nil {
 		return 0
 	}
 	ZvalPtrDtor(op)
@@ -1064,7 +1064,7 @@ try_again:
 				ZendError(E_WARNING, "A non-numeric value encountered")
 			}
 			return 0
-		} else if EXPECTED(type_ == IS_LONG) {
+		} else if type_ == IS_LONG {
 			return lval
 		} else {
 
@@ -1092,7 +1092,7 @@ try_again:
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
-		if Z_TYPE(dst) == IS_LONG {
+		if dst.IsType(IS_LONG) {
 			return Z_LVAL(dst)
 		} else {
 			return 1
@@ -1133,7 +1133,7 @@ try_again:
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
-		if Z_TYPE(dst) == IS_DOUBLE {
+		if dst.IsType(IS_DOUBLE) {
 			return Z_DVAL(dst)
 		} else {
 			return 1.0
@@ -1165,7 +1165,7 @@ try_again:
 		return ZendStrpprintf(0, "%.*G", int(ExecutorGlobals.GetPrecision()), Z_DVAL_P(op))
 	case IS_ARRAY:
 		ZendError(E_NOTICE, "Array to string conversion")
-		if try != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if try != 0 && ExecutorGlobals.GetException() != nil {
 			return nil
 		} else {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
@@ -1224,19 +1224,19 @@ func AddFunctionArray(result *Zval, op1 *Zval, op2 *Zval) {
 }
 func AddFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
 	var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
-	if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) {
+	if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 		FastLongAddFunction(result, op1, op2)
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE)) {
+	} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1)+Z_DVAL_P(op2))
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) {
+	} else if type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE) {
 		ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))+Z_DVAL_P(op2))
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) {
+	} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1)+float64(Z_LVAL_P(op2)))
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_ARRAY, IS_ARRAY)) {
+	} else if type_pair == TYPE_PAIR(IS_ARRAY, IS_ARRAY) {
 		AddFunctionArray(result, op1, op2)
 		return SUCCESS
 	} else {
@@ -1253,7 +1253,7 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if Z_ISREF_P(op2) {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1262,14 +1262,14 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_ADD, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_ADD, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_ADD, result, op1, op2)) {
+			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_ADD, result, op1, op2) {
 				return SUCCESS
 			}
-			if EXPECTED(op1 != op2) {
+			if op1 != op2 {
 				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 				op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
 			} else {
@@ -1304,16 +1304,16 @@ func AddFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 }
 func SubFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
 	var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
-	if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) {
+	if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 		FastLongSubFunction(result, op1, op2)
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE)) {
+	} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1)-Z_DVAL_P(op2))
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) {
+	} else if type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE) {
 		ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))-Z_DVAL_P(op2))
 		return SUCCESS
-	} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) {
+	} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1)-float64(Z_LVAL_P(op2)))
 		return SUCCESS
 	} else {
@@ -1330,7 +1330,7 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if Z_ISREF_P(op2) {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1339,14 +1339,14 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SUB, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SUB, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SUB, result, op1, op2)) {
+			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SUB, result, op1, op2) {
 				return SUCCESS
 			}
-			if EXPECTED(op1 != op2) {
+			if op1 != op2 {
 				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 				op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
 			} else {
@@ -1385,7 +1385,7 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
-		if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) {
+		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			var overflow ZendLong
 			ZEND_SIGNED_MULTIPLY_LONG(Z_LVAL_P(op1), Z_LVAL_P(op2), Z_LVAL_P(result), Z_DVAL_P(result), overflow)
 			if overflow != 0 {
@@ -1394,13 +1394,13 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_TYPE_INFO_P(result) = IS_LONG
 			}
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE) {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)*Z_DVAL_P(op2))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE) {
 			ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))*Z_DVAL_P(op2))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG) {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)*float64(Z_LVAL_P(op2)))
 			return SUCCESS
 		} else {
@@ -1409,7 +1409,7 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1418,14 +1418,14 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-					if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_MUL, result, op1, op2)) {
+				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+					if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_MUL, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_MUL, result, op1, op2)) {
+				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_MUL, result, op1, op2) {
 					return SUCCESS
 				}
-				if EXPECTED(op1 != op2) {
+				if op1 != op2 {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
 				} else {
@@ -1455,7 +1455,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
-		if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) {
+		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			if Z_LVAL_P(op2) >= 0 {
 				var l1 ZendLong = 1
 				var l2 ZendLong = Z_LVAL_P(op1)
@@ -1497,13 +1497,13 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				ZVAL_DOUBLE(result, pow(float64(Z_LVAL_P(op1)), float64(Z_LVAL_P(op2))))
 			}
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE) {
 			ZVAL_DOUBLE(result, pow(Z_DVAL_P(op1), Z_DVAL_P(op2)))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE) {
 			ZVAL_DOUBLE(result, pow(float64(Z_LVAL_P(op1)), Z_DVAL_P(op2)))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG) {
 			ZVAL_DOUBLE(result, pow(Z_DVAL_P(op1), float64(Z_LVAL_P(op2))))
 			return SUCCESS
 		} else {
@@ -1512,7 +1512,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1521,14 +1521,14 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-					if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_POW, result, op1, op2)) {
+				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+					if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_POW, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_POW, result, op1, op2)) {
+				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_POW, result, op1, op2) {
 					return SUCCESS
 				}
-				if EXPECTED(op1 != op2) {
+				if op1 != op2 {
 					if Z_TYPE_P(op1) == IS_ARRAY {
 						if op1 == result {
 							ZvalPtrDtor(result)
@@ -1582,7 +1582,7 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var converted int = 0
 	for true {
 		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
-		if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) {
+		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			if Z_LVAL_P(op2) == 0 {
 				ZendError(E_WARNING, "Division by zero")
 				ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1)/float64(Z_LVAL_P(op2))))
@@ -1600,19 +1600,19 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))/Z_LVAL_P(op2))
 			}
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE) {
 			if Z_DVAL_P(op2) == 0 {
 				ZendError(E_WARNING, "Division by zero")
 			}
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)/Z_DVAL_P(op2))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) {
+		} else if type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG) {
 			if Z_LVAL_P(op2) == 0 {
 				ZendError(E_WARNING, "Division by zero")
 			}
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)/float64(Z_LVAL_P(op2)))
 			return SUCCESS
-		} else if EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) {
+		} else if type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE) {
 			if Z_DVAL_P(op2) == 0 {
 				ZendError(E_WARNING, "Division by zero")
 			}
@@ -1624,7 +1624,7 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1633,14 +1633,14 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-					if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_DIV, result, op1, op2)) {
+				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+					if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_DIV, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_DIV, result, op1, op2)) {
+				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_DIV, result, op1, op2) {
 					return SUCCESS
 				}
-				if EXPECTED(op1 != op2) {
+				if op1 != op2 {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
 				} else {
@@ -1668,7 +1668,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
+		if Z_TYPE_P(op1) != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
 				if Z_TYPE_P(op1) == IS_LONG {
@@ -1676,7 +1676,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1685,13 +1685,13 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_MOD, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_MOD, result, op1, op2) {
 					return SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1703,7 +1703,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
+		if Z_TYPE_P(op2) != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 				if Z_TYPE_P(op2) == IS_LONG {
@@ -1711,11 +1711,11 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_MOD, result, op1, op2)) {
+			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_MOD, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1759,7 +1759,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	for {
 		if Z_TYPE_P(op1) == IS_FALSE {
 			op1_val = 0
-		} else if EXPECTED(Z_TYPE_P(op1) == IS_TRUE) {
+		} else if Z_TYPE_P(op1) == IS_TRUE {
 			op1_val = 1
 		} else {
 			if Z_ISREF_P(op1) {
@@ -1767,12 +1767,12 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				if Z_TYPE_P(op1) == IS_FALSE {
 					op1_val = 0
 					break
-				} else if EXPECTED(Z_TYPE_P(op1) == IS_TRUE) {
+				} else if Z_TYPE_P(op1) == IS_TRUE {
 					op1_val = 1
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1781,8 +1781,8 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BOOL_XOR, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BOOL_XOR, result, op1, op2) {
 					return SUCCESS
 				}
 			}
@@ -1793,7 +1793,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	for {
 		if Z_TYPE_P(op2) == IS_FALSE {
 			op2_val = 0
-		} else if EXPECTED(Z_TYPE_P(op2) == IS_TRUE) {
+		} else if Z_TYPE_P(op2) == IS_TRUE {
 			op2_val = 1
 		} else {
 			if Z_ISREF_P(op2) {
@@ -1801,12 +1801,12 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				if Z_TYPE_P(op2) == IS_FALSE {
 					op2_val = 0
 					break
-				} else if EXPECTED(Z_TYPE_P(op2) == IS_TRUE) {
+				} else if Z_TYPE_P(op2) == IS_TRUE {
 					op2_val = 1
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BOOL_XOR, result, op1, op2)) {
+			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BOOL_XOR, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_val = ZvalIsTrue(op2)
@@ -1819,7 +1819,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 func BooleanNotFunction(result *Zval, op1 *Zval) int {
 	if Z_TYPE_P(op1) < IS_TRUE {
 		ZVAL_TRUE(result)
-	} else if EXPECTED(Z_TYPE_P(op1) == IS_TRUE) {
+	} else if Z_TYPE_P(op1) == IS_TRUE {
 		ZVAL_FALSE(result)
 	} else {
 		if Z_ISREF_P(op1) {
@@ -1827,12 +1827,12 @@ func BooleanNotFunction(result *Zval, op1 *Zval) int {
 			if Z_TYPE_P(op1) < IS_TRUE {
 				ZVAL_TRUE(result)
 				return SUCCESS
-			} else if EXPECTED(Z_TYPE_P(op1) == IS_TRUE) {
+			} else if Z_TYPE_P(op1) == IS_TRUE {
 				ZVAL_FALSE(result)
 				return SUCCESS
 			}
 		}
-		if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BOOL_NOT, result, op1, nil)) {
+		if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BOOL_NOT, result, op1, nil) {
 			return SUCCESS
 		}
 		ZVAL_BOOL(result, !(ZvalIsTrue(op1)))
@@ -1865,7 +1865,7 @@ try_again:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
 	default:
-		if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_NOT, result, op1, nil)) {
+		if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_NOT, result, op1, nil) {
 			return SUCCESS
 		}
 		if result != op1 {
@@ -1878,19 +1878,19 @@ try_again:
 func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)|Z_LVAL_P(op2))
 		return SUCCESS
 	}
 	ZVAL_DEREF(op1)
 	ZVAL_DEREF(op2)
-	if Z_TYPE_P(op1) == IS_STRING && EXPECTED(Z_TYPE_P(op2) == IS_STRING) {
+	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
 		var longer *Zval
 		var shorter *Zval
 		var str *ZendString
 		var i int
-		if EXPECTED(Z_STRLEN_P(op1) >= Z_STRLEN_P(op2)) {
-			if EXPECTED(Z_STRLEN_P(op1) == Z_STRLEN_P(op2)) && Z_STRLEN_P(op1) == 1 {
+		if Z_STRLEN_P(op1) >= Z_STRLEN_P(op2) {
+			if Z_STRLEN_P(op1) == Z_STRLEN_P(op2) && Z_STRLEN_P(op1) == 1 {
 				var or ZendUchar = zend_uchar((*Z_STRVAL_P)(op1) | (*Z_STRVAL_P)(op2))
 				if result == op1 {
 					ZvalPtrDtorStr(result)
@@ -1915,8 +1915,8 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+	if Z_TYPE_P(op1) != IS_LONG {
+		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -1925,13 +1925,13 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-			if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_OR, result, op1, op2)) {
+		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+			if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_OR, result, op1, op2) {
 				return SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -1940,12 +1940,12 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_OR, result, op1, op2)) {
+	if Z_TYPE_P(op2) != IS_LONG {
+		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_OR, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -1963,7 +1963,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)&Z_LVAL_P(op2))
 		return SUCCESS
 	}
@@ -1974,8 +1974,8 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		var shorter *Zval
 		var str *ZendString
 		var i int
-		if EXPECTED(Z_STRLEN_P(op1) >= Z_STRLEN_P(op2)) {
-			if EXPECTED(Z_STRLEN_P(op1) == Z_STRLEN_P(op2)) && Z_STRLEN_P(op1) == 1 {
+		if Z_STRLEN_P(op1) >= Z_STRLEN_P(op2) {
+			if Z_STRLEN_P(op1) == Z_STRLEN_P(op2) && Z_STRLEN_P(op1) == 1 {
 				var and ZendUchar = zend_uchar((*Z_STRVAL_P)(op1) & (*Z_STRVAL_P)(op2))
 				if result == op1 {
 					ZvalPtrDtorStr(result)
@@ -2000,8 +2000,8 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+	if Z_TYPE_P(op1) != IS_LONG {
+		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -2010,13 +2010,13 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-			if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_AND, result, op1, op2)) {
+		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+			if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_AND, result, op1, op2) {
 				return SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2025,12 +2025,12 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_AND, result, op1, op2)) {
+	if Z_TYPE_P(op2) != IS_LONG {
+		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_AND, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2048,7 +2048,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG) {
+	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)^Z_LVAL_P(op2))
 		return SUCCESS
 	}
@@ -2059,8 +2059,8 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		var shorter *Zval
 		var str *ZendString
 		var i int
-		if EXPECTED(Z_STRLEN_P(op1) >= Z_STRLEN_P(op2)) {
-			if EXPECTED(Z_STRLEN_P(op1) == Z_STRLEN_P(op2)) && Z_STRLEN_P(op1) == 1 {
+		if Z_STRLEN_P(op1) >= Z_STRLEN_P(op2) {
+			if Z_STRLEN_P(op1) == Z_STRLEN_P(op2) && Z_STRLEN_P(op1) == 1 {
 				var xor ZendUchar = zend_uchar((*Z_STRVAL_P)(op1) ^ (*Z_STRVAL_P)(op2))
 				if result == op1 {
 					ZvalPtrDtorStr(result)
@@ -2085,8 +2085,8 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+	if Z_TYPE_P(op1) != IS_LONG {
+		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -2095,13 +2095,13 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-			if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_XOR, result, op1, op2)) {
+		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+			if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_BW_XOR, result, op1, op2) {
 				return SUCCESS
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2110,12 +2110,12 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
-		if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_XOR, result, op1, op2)) {
+	if Z_TYPE_P(op2) != IS_LONG {
+		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_BW_XOR, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		if ExecutorGlobals.GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2134,7 +2134,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
+		if Z_TYPE_P(op1) != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
 				if Z_TYPE_P(op1) == IS_LONG {
@@ -2142,7 +2142,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -2151,13 +2151,13 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SL, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SL, result, op1, op2) {
 					return SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2169,7 +2169,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
+		if Z_TYPE_P(op2) != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 				if Z_TYPE_P(op2) == IS_LONG {
@@ -2177,11 +2177,11 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SL, result, op1, op2)) {
+			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SL, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2195,8 +2195,8 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 
 	/* prevent wrapping quirkiness on some processors where << 64 + x == << x */
 
-	if UNEXPECTED(ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0) {
-		if EXPECTED(op2_lval > 0) {
+	if ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0 {
+		if op2_lval > 0 {
 			if op1 == result {
 				ZvalPtrDtor(result)
 			}
@@ -2227,7 +2227,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if UNEXPECTED(Z_TYPE_P(op1) != IS_LONG) {
+		if Z_TYPE_P(op1) != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
 				if Z_TYPE_P(op1) == IS_LONG {
@@ -2235,7 +2235,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -2244,13 +2244,13 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SR, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_SR, result, op1, op2) {
 					return SUCCESS
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2262,7 +2262,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if UNEXPECTED(Z_TYPE_P(op2) != IS_LONG) {
+		if Z_TYPE_P(op2) != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 				if Z_TYPE_P(op2) == IS_LONG {
@@ -2270,11 +2270,11 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SR, result, op1, op2)) {
+			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_SR, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2288,8 +2288,8 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 
 	/* prevent wrapping quirkiness on some processors where >> 64 + x == >> x */
 
-	if UNEXPECTED(ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0) {
-		if EXPECTED(op2_lval > 0) {
+	if ZendUlong(op2_lval >= SIZEOF_ZEND_LONG*8) != 0 {
+		if op2_lval > 0 {
 			if op1 == result {
 				ZvalPtrDtor(result)
 			}
@@ -2320,14 +2320,14 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	ZVAL_UNDEF(&op1_copy)
 	ZVAL_UNDEF(&op2_copy)
 	for {
-		if UNEXPECTED(Z_TYPE_P(op1) != IS_STRING) {
+		if Z_TYPE_P(op1) != IS_STRING {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
 				if Z_TYPE_P(op1) == IS_STRING {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && op1 == result && UNEXPECTED(Z_OBJ_HANDLER_P(op1, get)) && EXPECTED(Z_OBJ_HANDLER_P(op1, set)) {
+			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HANDLER_P(op1, get) && Z_OBJ_HANDLER_P(op1, set) {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HANDLER_P(op1, get)(op1, &rv)
@@ -2336,15 +2336,15 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HANDLER_P(op1, set)(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if UNEXPECTED(Z_TYPE_P(op1) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op1, do_operation)) {
-				if EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_CONCAT, result, op1, op2)) {
+			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, do_operation) {
+				if SUCCESS == Z_OBJ_HANDLER_P(op1, do_operation)(ZEND_CONCAT, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_CONCAT, result, op1, op2)) {
+			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
 			ZVAL_STR(&op1_copy, ZvalGetStringFunc(op1))
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				if orig_op1 != result {
 					ZVAL_UNDEF(result)
@@ -2352,7 +2352,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return FAILURE
 			}
 			if result == op1 {
-				if UNEXPECTED(op1 == op2) {
+				if op1 == op2 {
 					op2 = &op1_copy
 				}
 			}
@@ -2361,18 +2361,18 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if UNEXPECTED(Z_TYPE_P(op2) != IS_STRING) {
+		if Z_TYPE_P(op2) != IS_STRING {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 				if Z_TYPE_P(op2) == IS_STRING {
 					break
 				}
 			}
-			if UNEXPECTED(Z_TYPE_P(op2) == IS_OBJECT) && UNEXPECTED(Z_OBJ_HANDLER_P(op2, do_operation)) && EXPECTED(SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_CONCAT, result, op1, op2)) {
+			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, do_operation) && SUCCESS == Z_OBJ_HANDLER_P(op2, do_operation)(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
 			ZVAL_STR(&op2_copy, ZvalGetStringFunc(op2))
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+			if ExecutorGlobals.GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				ZvalPtrDtorStr(&op2_copy)
 				if orig_op1 != result {
@@ -2384,15 +2384,15 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		}
 		break
 	}
-	if UNEXPECTED(Z_STRLEN_P(op1) == 0) {
-		if EXPECTED(result != op2) {
+	if Z_STRLEN_P(op1) == 0 {
+		if result != op2 {
 			if result == orig_op1 {
 				IZvalPtrDtor(result)
 			}
 			ZVAL_COPY(result, op2)
 		}
-	} else if UNEXPECTED(Z_STRLEN_P(op2) == 0) {
-		if EXPECTED(result != op1) {
+	} else if Z_STRLEN_P(op2) == 0 {
+		if result != op1 {
 			if result == orig_op1 {
 				IZvalPtrDtor(result)
 			}
@@ -2403,7 +2403,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		var op2_len int = Z_STRLEN_P(op2)
 		var result_len int = op1_len + op2_len
 		var result_str *ZendString
-		if UNEXPECTED(op1_len > ZSTR_MAX_LEN-op2_len) {
+		if op1_len > ZSTR_MAX_LEN-op2_len {
 			ZendThrowError(nil, "String size overflow")
 			ZvalPtrDtorStr(&op1_copy)
 			ZvalPtrDtorStr(&op2_copy)
@@ -2456,7 +2456,7 @@ func StringCompareFunctionEx(op1 *Zval, op2 *Zval, case_insensitive ZendBool) in
 	return ret
 }
 func StringCompareFunction(op1 *Zval, op2 *Zval) int {
-	if EXPECTED(Z_TYPE_P(op1) == IS_STRING) && EXPECTED(Z_TYPE_P(op2) == IS_STRING) {
+	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
 		if Z_STR_P(op1) == Z_STR_P(op2) {
 			return 0
 		} else {
@@ -2474,7 +2474,7 @@ func StringCompareFunction(op1 *Zval, op2 *Zval) int {
 	}
 }
 func StringCaseCompareFunction(op1 *Zval, op2 *Zval) int {
-	if EXPECTED(Z_TYPE_P(op1) == IS_STRING) && EXPECTED(Z_TYPE_P(op2) == IS_STRING) {
+	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
 		if Z_STR_P(op1) == Z_STR_P(op2) {
 			return 0
 		} else {
@@ -2602,13 +2602,13 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			}
 			if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HANDLER_P(op1, compare) {
 				ret = Z_OBJ_HANDLER_P(op1, compare)(result, op1, op2)
-				if UNEXPECTED(Z_TYPE_P(result) != IS_LONG) {
+				if Z_TYPE_P(result) != IS_LONG {
 					ConvertCompareResultToLong(result)
 				}
 				return ret
 			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HANDLER_P(op2, compare) {
 				ret = Z_OBJ_HANDLER_P(op2, compare)(result, op1, op2)
-				if UNEXPECTED(Z_TYPE_P(result) != IS_LONG) {
+				if Z_TYPE_P(result) != IS_LONG {
 					ConvertCompareResultToLong(result)
 				}
 				return ret
@@ -3037,7 +3037,7 @@ func ZendObjectIsTrue(op *Zval) int {
 	if Z_OBJ_HT_P(op).GetCastObject() != nil {
 		var tmp Zval
 		if Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, _IS_BOOL) == SUCCESS {
-			return Z_TYPE(tmp) == IS_TRUE
+			return tmp.IsType(IS_TRUE)
 		}
 		ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", ZSTR_VAL(Z_OBJ_P(op).GetCe().GetName()))
 	} else if Z_OBJ_HT_P(op).GetGet() != nil {
@@ -3571,7 +3571,7 @@ func ZendMemnstrEx(haystack *byte, needle string, needle_len int, end *byte) *by
 		if i == needle_len {
 			return p
 		}
-		if UNEXPECTED(p == end) {
+		if p == end {
 			return nil
 		}
 		p += td[uint8(p[needle_len])]
@@ -3597,7 +3597,7 @@ func ZendMemnrstrEx(haystack *byte, needle *byte, needle_len int, end *byte) *by
 		if i == needle_len {
 			return (*byte)(p)
 		}
-		if UNEXPECTED(p == haystack) {
+		if p == haystack {
 			return nil
 		}
 		p -= td[uint8(p[-1])]

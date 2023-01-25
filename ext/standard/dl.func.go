@@ -33,7 +33,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -46,14 +46,14 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &filename, &filename_len, 0) == 0) {
+			if zend.ZendParseArgString(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -91,7 +91,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpDl(filename, zend.MODULE_TEMPORARY, return_value, 0)
 	if zend.Z_TYPE_P(return_value) == zend.IS_TRUE {
-		zend.ExecutorGlobals.full_tables_cleanup = 1
+		zend.ExecutorGlobals.SetFullTablesCleanup(1)
 	}
 }
 func PhpLoadShlib(path *byte, errp **byte) any {
@@ -197,19 +197,19 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		return zend.FAILURE
 	}
 	module_entry = get_module()
-	if module_entry.zend_api != zend.ZEND_MODULE_API_NO {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.name, module_entry.zend_api, zend.ZEND_MODULE_API_NO)
+	if module_entry.GetZendApi() != zend.ZEND_MODULE_API_NO {
+		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetZendApi(), zend.ZEND_MODULE_API_NO)
 		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	if strcmp(module_entry.build_id, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS) {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.name, module_entry.build_id, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+	if strcmp(module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS) {
+		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.GetName(), module_entry.GetBuildId(), "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	module_entry.type_ = type_
-	module_entry.module_number = zend.ZendNextFreeModule()
-	module_entry.handle = handle
+	module_entry.SetType(type_)
+	module_entry.SetModuleNumber(zend.ZendNextFreeModule())
+	module_entry.SetHandle(handle)
 	if b.Assign(&module_entry, zend.ZendRegisterModuleEx(module_entry)) == nil {
 		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
@@ -218,9 +218,9 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && module_entry.request_startup_func != nil {
-		if module_entry.request_startup_func(type_, module_entry.module_number) == zend.FAILURE {
-			core.PhpErrorDocref(nil, error_type, "Unable to initialize module '%s'", module_entry.name)
+	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && module_entry.GetRequestStartupFunc() != nil {
+		if module_entry.GetRequestStartupFunc()(type_, module_entry.GetModuleNumber()) == zend.FAILURE {
+			core.PhpErrorDocref(nil, error_type, "Unable to initialize module '%s'", module_entry.GetName())
 			zend.DL_UNLOAD(handle)
 			return zend.FAILURE
 		}

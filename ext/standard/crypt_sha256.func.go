@@ -167,12 +167,12 @@ func Sha256FinishCtx(ctx *Sha256Ctx, resbuf any) any {
 	} else {
 		pad = 56 - bytes
 	}
-	memcpy(&ctx.buffer[bytes], Fillbuf, pad)
+	memcpy(&ctx.GetBuffer()[bytes], Fillbuf, pad)
 
 	/* Put the 64-bit file length in *bits* at the end of the buffer.  */
 
-	*((*uint32)(&ctx.buffer[bytes+pad+4])) = SWAP(ctx.GetTotal()[0] << 3)
-	*((*uint32)(&ctx.buffer[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>29)
+	*((*uint32)(&ctx.GetBuffer()[bytes+pad+4])) = SWAP(ctx.GetTotal()[0] << 3)
+	*((*uint32)(&ctx.GetBuffer()[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>29)
 
 	/* Process last bytes.  */
 
@@ -192,7 +192,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 	if ctx.GetBuflen() != 0 {
 		var left_over int = ctx.GetBuflen()
 		var add int = b.Cond(128-left_over > len_, len_, 128-left_over)
-		memcpy(&ctx.buffer[left_over], buffer, add)
+		memcpy(&ctx.GetBuffer()[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + uint32(add))
 		if ctx.GetBuflen() > 64 {
 			Sha256ProcessBlock(ctx.GetBuffer(), ctx.GetBuflen() & ^63, ctx)
@@ -200,7 +200,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 			/* The regions in the following copy operation cannot overlap.  */
 
-			memcpy(ctx.GetBuffer(), &ctx.buffer[left_over + add & ^63], ctx.GetBuflen())
+			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[left_over + add & ^63], ctx.GetBuflen())
 
 			/* The regions in the following copy operation cannot overlap.  */
 
@@ -236,12 +236,12 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 	if len_ > 0 {
 		var left_over int = ctx.GetBuflen()
-		memcpy(&ctx.buffer[left_over], buffer, len_)
+		memcpy(&ctx.GetBuffer()[left_over], buffer, len_)
 		left_over += len_
 		if left_over >= 64 {
 			Sha256ProcessBlock(ctx.GetBuffer(), 64, ctx)
 			left_over -= 64
-			memcpy(ctx.GetBuffer(), &ctx.buffer[64], left_over)
+			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[64], left_over)
 		}
 		ctx.SetBuflen(uint32(left_over))
 	}
@@ -291,14 +291,14 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	}
 	salt_len = cli.MIN(strcspn(salt, "$"), SALT_LEN_MAX)
 	key_len = strlen(key)
-	if (key-(*byte)(0))%__alignof__(uint32_t) != 0 {
-		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint32_t)))
-		copied_key = memcpy(tmp+__alignof__(uint32_t)-(tmp-(*byte)(0))%__alignof__(uint32_t), key, key_len)
+	if (key-(*byte)(0))%__alignof__(uint32) != 0 {
+		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint32)))
+		copied_key = memcpy(tmp+__alignof__(uint32)-(tmp-(*byte)(0))%__alignof__(uint32), key, key_len)
 		key = copied_key
 	}
-	if (salt-(*byte)(0))%__alignof__(uint32_t) != 0 {
-		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint32_t)))
-		copied_salt = memcpy(tmp+__alignof__(uint32_t)-(tmp-(*byte)(0))%__alignof__(uint32_t), salt, salt_len)
+	if (salt-(*byte)(0))%__alignof__(uint32) != 0 {
+		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint32)))
+		copied_salt = memcpy(tmp+__alignof__(uint32)-(tmp-(*byte)(0))%__alignof__(uint32), salt, salt_len)
 		salt = copied_salt
 		copied_salt[salt_len] = 0
 	}

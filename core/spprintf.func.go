@@ -17,12 +17,12 @@ func INS_STRING(xbuf any, str *byte, len_ int, is_char zend.ZendBool) {
 func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {
 	if is_char != 0 {
 		zend.SmartStringAlloc((*zend.SmartString)(xbuf), count, 0)
-		memset((*zend.SmartString)(xbuf).c+(*zend.SmartString)(xbuf).len_, ch, count)
-		(*zend.SmartString)(xbuf).len_ += count
+		memset((*zend.SmartString)(xbuf).GetC()+(*zend.SmartString)(xbuf).GetLen(), ch, count)
+		(*zend.SmartString)(xbuf).SetLen((*zend.SmartString)(xbuf).GetLen() + count)
 	} else {
 		zend.SmartStrAlloc((*zend.SmartStr)(xbuf), count, 0)
-		memset(zend.ZSTR_VAL((*zend.SmartStr)(xbuf).s)+zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s), ch, count)
-		zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s) += count
+		memset(zend.ZSTR_VAL((*zend.SmartStr)(xbuf).GetS())+zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()), ch, count)
+		zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()) += count
 	}
 }
 func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) {
@@ -508,9 +508,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				break
 			case 'n':
 				if is_char != 0 {
-					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartString)(xbuf).len_)
+					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartString)(xbuf).GetLen())
 				} else {
-					*(__va_arg(ap, (*int)(_))) = int(zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s))
+					*(__va_arg(ap, (*int)(_))) = int(zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()))
 				}
 				goto skip_output
 			case 'p':

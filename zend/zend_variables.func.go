@@ -51,7 +51,7 @@ func RcDtorFunc(p *ZendRefcounted) {
 }
 func ZendReferenceDestroy(ref *ZendReference) {
 	ZEND_ASSERT(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
-	IZvalPtrDtor(&ref.val)
+	IZvalPtrDtor(&ref.GetVal())
 	EfreeSize(ref, b.SizeOf("zend_reference"))
 }
 func ZendEmptyDestroy(ref *ZendReference) {}
@@ -81,9 +81,9 @@ func ZvalAddRef(p *Zval) {
 	}
 }
 func ZvalCopyCtorFunc(zvalue *Zval) {
-	if EXPECTED(Z_TYPE_P(zvalue) == IS_ARRAY) {
+	if Z_TYPE_P(zvalue) == IS_ARRAY {
 		ZVAL_ARR(zvalue, ZendArrayDup(Z_ARRVAL_P(zvalue)))
-	} else if EXPECTED(Z_TYPE_P(zvalue) == IS_STRING) {
+	} else if Z_TYPE_P(zvalue) == IS_STRING {
 		ZEND_ASSERT(ZSTR_IS_INTERNED(Z_STR_P(zvalue)) == 0)
 		ZVAL_NEW_STR(zvalue, ZendStringDup(Z_STR_P(zvalue), 0))
 	}

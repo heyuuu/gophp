@@ -115,12 +115,12 @@ func DestroyUploadedFilesHash() {
 	var el *zend.Zval
 	for {
 		var __ht *zend.HashTable = SG(rfc1867_uploaded_files)
-		var _p *zend.Bucket = __ht.arData
-		var _end *zend.Bucket = _p + __ht.nNumUsed
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.val
+			var _z *zend.Zval = &_p.GetVal()
 
-			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			el = _z
@@ -181,12 +181,12 @@ func MultipartBufferNew(boundary *byte, boundary_len int) *MultipartBuffer {
 	}
 	self.SetBuffer((*byte)(zend.Ecalloc(1, minsize+1)))
 	self.SetBufsize(minsize)
-	Spprintf(&self.boundary, 0, "--%s", boundary)
-	self.SetBoundaryNextLen(int(Spprintf(&self.boundary_next, 0, "\n--%s", boundary)))
+	Spprintf(&self.GetBoundary(), 0, "--%s", boundary)
+	self.SetBoundaryNextLen(int(Spprintf(&self.GetBoundaryNext(), 0, "\n--%s", boundary)))
 	self.SetBufBegin(self.GetBuffer())
 	self.SetBytesInBuffer(0)
 	if PhpRfc1867EncodingTranslation() != 0 {
-		PhpRfc1867GetDetectOrder(&self.detect_order, &self.detect_order_size)
+		PhpRfc1867GetDetectOrder(&self.GetDetectOrder(), &self.GetDetectOrderSize())
 	} else {
 		self.SetDetectOrder(nil)
 		self.SetDetectOrderSize(0)
@@ -297,15 +297,15 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 			value = strchr(line, ':')
 		}
 		if value != nil {
-			if buf_value.c != nil && key != nil {
+			if buf_value.GetC() != nil && key != nil {
 
 				/* new entry, add the old one to the list */
 
 				zend.SmartString0(&buf_value)
 				entry.SetKey(key)
-				entry.SetValue(buf_value.c)
+				entry.SetValue(buf_value.GetC())
 				zend.ZendLlistAddElement(header, &entry)
-				buf_value.c = nil
+				buf_value.SetC(nil)
 				key = nil
 			}
 			*value = '0'
@@ -317,19 +317,19 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 			}
 			key = zend.Estrdup(line)
 			zend.SmartStringAppends(&buf_value, value)
-		} else if buf_value.c != nil {
+		} else if buf_value.GetC() != nil {
 			zend.SmartStringAppends(&buf_value, line)
 		} else {
 			continue
 		}
 	}
-	if buf_value.c != nil && key != nil {
+	if buf_value.GetC() != nil && key != nil {
 
 		/* add the last one to the list */
 
 		zend.SmartString0(&buf_value)
 		entry.SetKey(key)
-		entry.SetValue(buf_value.c)
+		entry.SetValue(buf_value.GetC())
 		zend.ZendLlistAddElement(header, &entry)
 	}
 	return 1
@@ -622,7 +622,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	zend.ALLOC_HASHTABLE(uploaded_files)
 	zend.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
 	SG(rfc1867_uploaded_files) = uploaded_files
-	if zend.Z_TYPE(PG(http_globals)[TRACK_VARS_FILES]) != zend.IS_ARRAY {
+	if PG(http_globals)[TRACK_VARS_FILES].u1.v.type_ != zend.IS_ARRAY {
 
 		/* php_auto_globals_create_files() might have already done that */
 

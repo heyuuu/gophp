@@ -27,10 +27,10 @@ func ZendArenaAlloc(arena_ptr **ZendArena, size int) any {
 	var arena *ZendArena = *arena_ptr
 	var ptr *byte = arena.GetPtr()
 	size = ZEND_MM_ALIGNED_SIZE(size)
-	if EXPECTED(size <= size_t(arena.GetEnd()-ptr)) {
+	if size <= size_t(arena.GetEnd()-ptr) {
 		arena.SetPtr(ptr + size)
 	} else {
-		var arena_size int = b.CondF(UNEXPECTED(size+ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")) > size_t(arena.GetEnd()-(*byte)(arena))), func() int { return size + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")) }, func() __auto__ { return size_t(arena.GetEnd() - (*byte)(arena)) })
+		var arena_size int = b.CondF(size+ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")) > size_t(arena.GetEnd()-(*byte)(arena)), func() int { return size + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")) }, func() __auto__ { return size_t(arena.GetEnd() - (*byte)(arena)) })
 		var new_arena *ZendArena = (*ZendArena)(Emalloc(arena_size))
 		ptr = (*byte)(new_arena + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")))
 		new_arena.SetPtr((*byte)(new_arena + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_arena")) + size))
@@ -45,7 +45,7 @@ func ZendArenaCalloc(arena_ptr **ZendArena, count int, unit_size int) any {
 	var size int
 	var ret any
 	size = ZendSafeAddress(unit_size, count, 0, &overflow)
-	if UNEXPECTED(overflow != 0) {
+	if overflow != 0 {
 		ZendError(E_ERROR, "Possible integer overflow in zend_arena_calloc() (%zu * %zu)", unit_size, count)
 	}
 	ret = ZendArenaAlloc(arena_ptr, size)
@@ -55,7 +55,7 @@ func ZendArenaCalloc(arena_ptr **ZendArena, count int, unit_size int) any {
 func ZendArenaCheckpoint(arena *ZendArena) any { return arena.GetPtr() }
 func ZendArenaRelease(arena_ptr **ZendArena, checkpoint any) {
 	var arena *ZendArena = *arena_ptr
-	for UNEXPECTED((*byte)(checkpoint > arena.GetEnd()) != nil) || UNEXPECTED((*byte)(checkpoint <= (*byte)(arena)) != nil) {
+	for (*byte)(checkpoint > arena.GetEnd() || (*byte)(checkpoint <= (*byte)(arena)) != nil) != nil {
 		var prev *ZendArena = arena.GetPrev()
 		Efree(arena)
 		arena = prev

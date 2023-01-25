@@ -69,7 +69,7 @@ func PhpIsFileOk(state *CwdState) int {
 	return 1
 }
 func CwdGlobalsCtor(cwd_g *VirtualCwdGlobals) {
-	CWD_STATE_COPY(&cwd_g.cwd, &MainCwdState)
+	CWD_STATE_COPY(&cwd_g.GetCwd(), &MainCwdState)
 	cwd_g.SetRealpathCacheSize(0)
 	cwd_g.SetRealpathCacheSizeLimit(REALPATH_CACHE_SIZE)
 	cwd_g.SetRealpathCacheTtl(REALPATH_CACHE_TTL)
@@ -89,7 +89,7 @@ func RealpathCacheCleanHelper(max_entries uint32, cache **RealpathCacheBucket, c
 	*cache_size = 0
 }
 func CwdGlobalsDtor(cwd_g *VirtualCwdGlobals) {
-	RealpathCacheCleanHelper(b.SizeOf("cwd_g -> realpath_cache")/b.SizeOf("cwd_g -> realpath_cache [ 0 ]"), cwd_g.GetRealpathCache(), &cwd_g.realpath_cache_size)
+	RealpathCacheCleanHelper(b.SizeOf("cwd_g -> realpath_cache")/b.SizeOf("cwd_g -> realpath_cache [ 0 ]"), cwd_g.GetRealpathCache(), &cwd_g.GetRealpathCacheSize())
 }
 func VirtualCwdMainCwdInit(reinit uint8) {
 	var cwd []byte
@@ -194,7 +194,7 @@ func RealpathCacheDel(path *byte, path_len int) {
 			Free(r)
 			return
 		} else {
-			bucket = &(*bucket).next
+			bucket = &(*bucket).GetNext()
 		}
 	}
 }
@@ -250,7 +250,7 @@ func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 		} else if key == (*bucket).GetKey() && path_len == (*bucket).GetPathLen() && memcmp(path, (*bucket).GetPath(), path_len) == 0 {
 			return *bucket
 		} else {
-			bucket = &(*bucket).next
+			bucket = &(*bucket).GetNext()
 		}
 	}
 	return nil
@@ -287,7 +287,7 @@ func TsrmRealpathR(path *byte, start int, len_ int, ll *int, t *int64, use_realp
 
 			/* remove double slashes and '.' */
 
-			if EXPECTED(i > 0) {
+			if i > 0 {
 				len_ = i - 1
 			} else {
 				len_ = 0

@@ -28,6 +28,12 @@ package zend
 
 // # include "zend_range_check.h"
 
+// #define __has_attribute(x) 0
+
+// #define __has_builtin(x) 0
+
+// #define __has_feature(x) 0
+
 // #define ZEND_ASSUME(c)
 
 // #define EMPTY_SWITCH_DEFAULT_CASE() default : ZEND_ASSUME ( 0 ) ; break ;

@@ -82,8 +82,8 @@ type HashTable = ZendArray
  *                 +=============================+
  */
 
-const HT_INVALID_IDX uint32 = uint32_t - 1
-const HT_MIN_MASK uint32 = uint32_t - 2
+const HT_INVALID_IDX uint32 = uint32 - 1
+const HT_MIN_MASK uint32 = uint32 - 2
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 

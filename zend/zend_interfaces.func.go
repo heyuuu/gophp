@@ -45,12 +45,12 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 		/* no interest in caching and no information already present that is
 		 * needed later inside zend_call_function. */
 
-		ZVAL_STRINGL(&fci.function_name, function_name, function_name_len)
+		ZVAL_STRINGL(&fci.GetFunctionName(), function_name, function_name_len)
 		result = ZendCallFunction(&fci, nil)
-		ZvalPtrDtor(&fci.function_name)
+		ZvalPtrDtor(&fci.GetFunctionName())
 	} else {
 		var fcic ZendFcallInfoCache
-		ZVAL_UNDEF(&fci.function_name)
+		ZVAL_UNDEF(&fci.GetFunctionName())
 		if obj_ce == nil {
 			if object != nil {
 				obj_ce = Z_OBJCE_P(object)
@@ -59,9 +59,9 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 			}
 		}
 		if fn_proxy == nil || (*fn_proxy) == nil {
-			if EXPECTED(obj_ce != nil) {
-				fcic.SetFunctionHandler(&obj_ce.function_table.StrFindPtr(function_name, function_name_len))
-				if UNEXPECTED(fcic.GetFunctionHandler() == nil) {
+			if obj_ce != nil {
+				fcic.SetFunctionHandler(&obj_ce.GetFunctionTable().StrFindPtr(function_name, function_name_len))
+				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */
 
@@ -72,7 +72,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 				}
 			} else {
 				fcic.SetFunctionHandler(ZendFetchFunctionStr(function_name, function_name_len))
-				if UNEXPECTED(fcic.GetFunctionHandler() == nil) {
+				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */
 
@@ -127,28 +127,28 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 	return retval_ptr
 }
 func ZendUserItNewIterator(ce *ZendClassEntry, object *Zval, retval *Zval) {
-	ZendCallMethodWith0Params(object, ce, &ce.iterator_funcs_ptr.GetZfNewIterator(), "getiterator", retval)
+	ZendCallMethodWith0Params(object, ce, &ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", retval)
 }
 func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
 	if !(Z_ISUNDEF(iter.GetValue())) {
-		ZvalPtrDtor(&iter.value)
-		ZVAL_UNDEF(&iter.value)
+		ZvalPtrDtor(&iter.GetValue())
+		ZVAL_UNDEF(&iter.GetValue())
 	}
 }
 func ZendUserItDtor(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = &iter.it.GetData()
+	var object *Zval = &iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
 	ZvalPtrDtor(object)
 }
 func ZendUserItValid(_iter *ZendObjectIterator) int {
 	if _iter != nil {
 		var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-		var object *Zval = &iter.it.GetData()
+		var object *Zval = &iter.GetIt().GetData()
 		var more Zval
 		var result int
-		ZendCallMethodWith0Params(object, iter.GetCe(), &iter.ce.GetIteratorFuncsPtr().GetZfValid(), "valid", &more)
+		ZendCallMethodWith0Params(object, iter.GetCe(), &iter.GetCe().GetIteratorFuncsPtr().GetZfValid(), "valid", &more)
 		result = IZendIsTrue(&more)
 		ZvalPtrDtor(&more)
 		if result != 0 {
@@ -161,18 +161,18 @@ func ZendUserItValid(_iter *ZendObjectIterator) int {
 }
 func ZendUserItGetCurrentData(_iter *ZendObjectIterator) *Zval {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = &iter.it.GetData()
+	var object *Zval = &iter.GetIt().GetData()
 	if Z_ISUNDEF(iter.GetValue()) {
-		ZendCallMethodWith0Params(object, iter.GetCe(), &iter.ce.GetIteratorFuncsPtr().GetZfCurrent(), "current", &iter.value)
+		ZendCallMethodWith0Params(object, iter.GetCe(), &iter.GetCe().GetIteratorFuncsPtr().GetZfCurrent(), "current", &iter.GetValue())
 	}
-	return &iter.value
+	return &iter.GetValue()
 }
 func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = &iter.it.GetData()
+	var object *Zval = &iter.GetIt().GetData()
 	var retval Zval
-	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.ce.GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
-	if Z_TYPE(retval) != IS_UNDEF {
+	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.GetCe().GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
+	if retval.GetType() != IS_UNDEF {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
 		if ExecutorGlobals.GetException() == nil {
@@ -183,15 +183,15 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
 }
 func ZendUserItMoveForward(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = &iter.it.GetData()
+	var object *Zval = &iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
-	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.ce.GetIteratorFuncsPtr().GetZfNext(), "next", nil)
+	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.GetCe().GetIteratorFuncsPtr().GetZfNext(), "next", nil)
 }
 func ZendUserItRewind(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	var object *Zval = &iter.it.GetData()
+	var object *Zval = &iter.GetIt().GetData()
 	ZendUserItInvalidateCurrent(_iter)
-	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.ce.GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
+	ZendCallMethodWith0Params(object, iter.GetCe(), &iter.GetCe().GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
 }
 func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {
 	var iterator *ZendUserIterator
@@ -202,10 +202,10 @@ func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendOb
 	iterator = Emalloc(b.SizeOf("zend_user_iterator"))
 	ZendIteratorInit((*ZendObjectIterator)(iterator))
 	Z_ADDREF_P(object)
-	ZVAL_OBJ(&iterator.it.GetData(), Z_OBJ_P(object))
+	ZVAL_OBJ(&iterator.GetIt().GetData(), Z_OBJ_P(object))
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
 	iterator.SetCe(Z_OBJCE_P(object))
-	ZVAL_UNDEF(&iterator.value)
+	ZVAL_UNDEF(&iterator.GetValue())
 	return (*ZendObjectIterator)(iterator)
 }
 func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {
@@ -213,7 +213,7 @@ func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 	var new_iterator *ZendObjectIterator
 	var ce_it *ZendClassEntry
 	ZendUserItNewIterator(ce, object, &iterator)
-	if Z_TYPE(iterator) == IS_OBJECT {
+	if iterator.IsType(IS_OBJECT) {
 		ce_it = Z_OBJCE(iterator)
 	} else {
 		ce_it = nil
@@ -293,7 +293,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		}
-		funcs_ptr.SetZfNewIterator(&class_type.function_table.StrFindPtr("getiterator", b.SizeOf("\"getiterator\"")-1))
+		funcs_ptr.SetZfNewIterator(&class_type.GetFunctionTable().StrFindPtr("getiterator", b.SizeOf("\"getiterator\"")-1))
 	} else {
 		if funcs_ptr == nil {
 			funcs_ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_iterator_funcs"))
@@ -338,11 +338,11 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		} else {
-			funcs_ptr.SetZfRewind(&class_type.function_table.StrFindPtr("rewind", b.SizeOf("\"rewind\"")-1))
-			funcs_ptr.SetZfValid(&class_type.function_table.StrFindPtr("valid", b.SizeOf("\"valid\"")-1))
-			funcs_ptr.SetZfKey(&class_type.function_table.StrFindPtr("key", b.SizeOf("\"key\"")-1))
-			funcs_ptr.SetZfCurrent(&class_type.function_table.StrFindPtr("current", b.SizeOf("\"current\"")-1))
-			funcs_ptr.SetZfNext(&class_type.function_table.StrFindPtr("next", b.SizeOf("\"next\"")-1))
+			funcs_ptr.SetZfRewind(&class_type.GetFunctionTable().StrFindPtr("rewind", b.SizeOf("\"rewind\"")-1))
+			funcs_ptr.SetZfValid(&class_type.GetFunctionTable().StrFindPtr("valid", b.SizeOf("\"valid\"")-1))
+			funcs_ptr.SetZfKey(&class_type.GetFunctionTable().StrFindPtr("key", b.SizeOf("\"key\"")-1))
+			funcs_ptr.SetZfCurrent(&class_type.GetFunctionTable().StrFindPtr("current", b.SizeOf("\"current\"")-1))
+			funcs_ptr.SetZfNext(&class_type.GetFunctionTable().StrFindPtr("next", b.SizeOf("\"next\"")-1))
 		}
 	} else {
 		if funcs_ptr == nil {
@@ -366,11 +366,11 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var retval Zval
 	var result int
-	ZendCallMethodWith0Params(object, ce, &ce.serialize_func, "serialize", &retval)
-	if Z_TYPE(retval) == IS_UNDEF || ExecutorGlobals.GetException() != nil {
+	ZendCallMethodWith0Params(object, ce, &ce.GetSerializeFunc(), "serialize", &retval)
+	if retval.IsType(IS_UNDEF) || ExecutorGlobals.GetException() != nil {
 		result = FAILURE
 	} else {
-		switch Z_TYPE(retval) {
+		switch retval.GetType() {
 		case IS_NULL:
 
 			/* we could also make this '*buf_len = 0' but this allows to skip variables */
@@ -395,11 +395,11 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 }
 func ZendUserUnserialize(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len int, data *ZendUnserializeData) int {
 	var zdata Zval
-	if UNEXPECTED(ObjectInitEx(object, ce) != SUCCESS) {
+	if ObjectInitEx(object, ce) != SUCCESS {
 		return FAILURE
 	}
 	ZVAL_STRINGL(&zdata, (*byte)(buf), buf_len)
-	ZendCallMethodWith1Params(object, ce, &ce.unserialize_func, "unserialize", nil, &zdata)
+	ZendCallMethodWith1Params(object, ce, &ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	ZvalPtrDtor(&zdata)
 	if ExecutorGlobals.GetException() != nil {
 		return FAILURE

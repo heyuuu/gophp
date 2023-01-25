@@ -27,7 +27,7 @@ func SmartStringAppendUnsigned(str *SmartString, val ZendUlong) {
 	SmartStringAppendUnsignedEx(str, val, 0)
 }
 func SmartStringAlloc(str *SmartString, len_ int, persistent ZendBool) int {
-	if UNEXPECTED(str.GetC() == nil) || UNEXPECTED(len_ >= str.GetA()-str.GetLen()) {
+	if str.GetC() == nil || len_ >= str.GetA()-str.GetLen() {
 		if persistent != 0 {
 			_smartStringAllocPersistent(str, len_)
 		} else {

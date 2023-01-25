@@ -30,14 +30,14 @@ func PhpSyslog(priority int, format string, _ ...any) {
 
 		/* Just send it directly to the syslog */
 
-		syslog(priority, "%.*s", int(fbuf.len_), fbuf.c)
+		syslog(priority, "%.*s", int(fbuf.GetLen()), fbuf.GetC())
 		zend.SmartStringFree(&fbuf)
 		return
 	}
-	for ptr = fbuf.c; ; ptr++ {
+	for ptr = fbuf.GetC(); ; ptr++ {
 		c = *ptr
 		if c == '0' {
-			syslog(priority, "%.*s", int(sbuf.len_), sbuf.c)
+			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
 			break
 		}
 
@@ -48,7 +48,7 @@ func PhpSyslog(priority int, format string, _ ...any) {
 		} else if c >= 0x80 && PG(syslog_filter) != PHP_SYSLOG_FILTER_ASCII {
 			zend.SmartStringAppendc(&sbuf, c)
 		} else if c == '\n' {
-			syslog(priority, "%.*s", int(sbuf.len_), sbuf.c)
+			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
 			zend.SmartStringReset(&sbuf)
 		} else if c < 0x20 && PG(syslog_filter) == PHP_SYSLOG_FILTER_ALL {
 			zend.SmartStringAppendc(&sbuf, c)

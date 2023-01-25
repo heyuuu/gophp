@@ -12,11 +12,11 @@ func SapiAddHeader(a *byte, b int, c zend.ZendBool) int { return SapiAddHeaderEx
 func _typeDtor(zv *zend.Zval)                           { zend.Free(zend.Z_PTR_P(zv)) }
 func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
 	memset(sapi_globals, 0, b.SizeOf("* sapi_globals"))
-	zend.ZendHashInitEx(&sapi_globals.known_post_content_types, 8, nil, _typeDtor, 1, 0)
+	zend.ZendHashInitEx(&sapi_globals.GetKnownPostContentTypes(), 8, nil, _typeDtor, 1, 0)
 	PhpSetupSapiContentTypes()
 }
 func SapiGlobalsDtor(sapi_globals *sapi_globals_struct) {
-	zend.ZendHashDestroy(&sapi_globals.known_post_content_types)
+	zend.ZendHashDestroy(&sapi_globals.GetKnownPostContentTypes())
 }
 func SapiStartup(sf *sapi_module_struct) {
 	sf.SetIniEntries(nil)
@@ -34,7 +34,7 @@ func ZifHeaderRegisterCallback(execute_data *zend.ZendExecuteData, return_value 
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE(SG(callback_func)) != zend.IS_UNDEF {
+	if SG(callback_func).u1.v.type_ != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(&SG(callback_func))
 		SG(fci_cache) = zend.EmptyFcallInfoCache
 	}
@@ -48,7 +48,7 @@ func SapiRunHeaderCallback(callback *zend.Zval) {
 	var callback_error *byte = nil
 	var retval zend.Zval
 	if zend.ZendFcallInfoInit(callback, 0, &fci, &SG(fci_cache), nil, &callback_error) == zend.SUCCESS {
-		fci.retval = &retval
+		fci.SetRetval(&retval)
 		error = zend.ZendCallFunction(&fci, &SG(fci_cache))
 		if error == zend.FAILURE {
 			goto callback_failed
@@ -460,24 +460,24 @@ func SapiUpdateResponseCode(ncode int) {
 func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 	var header *SapiHeader
 	var next *zend.ZendLlistElement
-	var current *zend.ZendLlistElement = l.head
+	var current *zend.ZendLlistElement = l.GetHead()
 	for current != nil {
-		header = (*SapiHeader)(current.data)
-		next = current.next
+		header = (*SapiHeader)(current.GetData())
+		next = current.GetNext()
 		if header.GetHeaderLen() > len_ && header.GetHeader()[len_] == ':' && !(strncasecmp(header.GetHeader(), name, len_)) {
-			if current.prev != nil {
-				current.prev.next = next
+			if current.GetPrev() != nil {
+				current.GetPrev().SetNext(next)
 			} else {
-				l.head = next
+				l.SetHead(next)
 			}
 			if next != nil {
-				next.prev = current.prev
+				next.SetPrev(current.GetPrev())
 			} else {
-				l.tail = current.prev
+				l.SetTail(current.GetPrev())
 			}
 			SapiFreeHeader(header)
 			zend.Efree(current)
-			l.count--
+			l.GetCount()--
 		}
 		current = next
 	}
@@ -650,7 +650,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 					PHP_STRLCPY(newheader, "Content-type: ", newlen, b.SizeOf("\"Content-type: \"")-1)
 					strlcat(newheader, mimetype, newlen)
 					sapi_header.SetHeader(newheader)
-					sapi_header.SetHeaderLen(uint32_t(newlen - 1))
+					sapi_header.SetHeaderLen(uint32(newlen - 1))
 					zend.Efree(header_line)
 				}
 				zend.Efree(mimetype)
@@ -723,7 +723,7 @@ func SapiSendHeaders() int {
 		}
 		SG(sapi_headers).send_default_content_type = 0
 	}
-	if zend.Z_TYPE(SG(callback_func)) != zend.IS_UNDEF {
+	if SG(callback_func).u1.v.type_ != zend.IS_UNDEF {
 		var cb zend.Zval
 		zend.ZVAL_COPY_VALUE(&cb, &SG(callback_func))
 		zend.ZVAL_UNDEF(&SG(callback_func))
@@ -782,7 +782,7 @@ func SapiRegisterPostEntries(post_entries *SapiPostEntry) int {
 func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	var ret int
 	var key *zend.ZendString
-	if SG(sapi_started) && zend.ExecutorGlobals.current_execute_data != nil {
+	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	key = zend.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
@@ -796,27 +796,27 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	return ret
 }
 func SapiUnregisterPostEntry(post_entry *SapiPostEntry) {
-	if SG(sapi_started) && zend.ExecutorGlobals.current_execute_data != nil {
+	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return
 	}
 	zend.ZendHashStrDel(&SG(known_post_content_types), post_entry.GetContentType(), post_entry.GetContentTypeLen())
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
-	if SG(sapi_started) && zend.ExecutorGlobals.current_execute_data != nil {
+	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetDefaultPostReader(default_post_reader)
 	return zend.SUCCESS
 }
 func SapiRegisterTreatData(treat_data func(arg int, str *byte, destArray *zend.Zval)) int {
-	if SG(sapi_started) && zend.ExecutorGlobals.current_execute_data != nil {
+	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetTreatData(treat_data)
 	return zend.SUCCESS
 }
 func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, input_filter_init func() uint) int {
-	if SG(sapi_started) && zend.ExecutorGlobals.current_execute_data != nil {
+	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetInputFilter(input_filter)

@@ -152,11 +152,11 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.val
+			var _z *Zval = &_p.GetVal()
 			if Z_TYPE_P(_z) == IS_INDIRECT {
 				_z = Z_INDIRECT_P(_z)
 			}
-			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+			if Z_TYPE_P(_z) == IS_UNDEF {
 				continue
 			}
 			num_key = _p.GetH()
@@ -210,11 +210,11 @@ func PrintFlatHash(ht *HashTable) {
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.val
+			var _z *Zval = &_p.GetVal()
 			if Z_TYPE_P(_z) == IS_INDIRECT {
 				_z = Z_INDIRECT_P(_z)
 			}
-			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+			if Z_TYPE_P(_z) == IS_UNDEF {
 				continue
 			}
 			num_key = _p.GetH()
@@ -491,24 +491,24 @@ func ZendResolvePropertyTypes() {
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.val
+			var _z *Zval = &_p.GetVal()
 
-			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+			if Z_TYPE_P(_z) == IS_UNDEF {
 				continue
 			}
 			ce = Z_PTR_P(_z)
 			if ce.GetType() != ZEND_INTERNAL_CLASS {
 				continue
 			}
-			if UNEXPECTED(ZEND_CLASS_HAS_TYPE_HINTS(ce)) {
+			if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
 				for {
-					var __ht *HashTable = &ce.properties_info
+					var __ht *HashTable = &ce.GetPropertiesInfo()
 					var _p *Bucket = __ht.GetArData()
 					var _end *Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *Zval = &_p.val
+						var _z *Zval = &_p.GetVal()
 
-						if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+						if Z_TYPE_P(_z) == IS_UNDEF {
 							continue
 						}
 						prop_info = Z_PTR_P(_z)
@@ -600,7 +600,7 @@ func _zendBailout(filename *byte, lineno uint32) {
 func ZendAppendVersionInfo(extension *ZendExtension) {
 	var new_info *byte
 	var new_info_length uint32
-	new_info_length = uint32_t(b.SizeOf("\"    with  v, , by \\n\"") + strlen(extension.GetName()) + strlen(extension.GetVersion()) + strlen(extension.GetCopyright()) + strlen(extension.GetAuthor()))
+	new_info_length = uint32(b.SizeOf("\"    with  v, , by \\n\"") + strlen(extension.GetName()) + strlen(extension.GetVersion()) + strlen(extension.GetCopyright()) + strlen(extension.GetAuthor()))
 	new_info = (*byte)(Malloc(new_info_length + 1))
 	core.Snprintf(new_info, new_info_length, "    with %s v%s, %s, by %s\n", extension.GetName(), extension.GetVersion(), extension.GetCopyright(), extension.GetAuthor())
 	ZendVersionInfo = (*byte)(realloc(ZendVersionInfo, ZendVersionInfoLength+new_info_length+1))
@@ -736,7 +736,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 	/* if we don't have a user defined error handler */
 
-	if Z_TYPE(ExecutorGlobals.GetUserErrorHandler()) == IS_UNDEF || (ExecutorGlobals.GetUserErrorHandlerErrorReporting()&type_) == 0 || ExecutorGlobals.GetErrorHandling() != EH_NORMAL {
+	if ExecutorGlobals.GetUserErrorHandler().IsType(IS_UNDEF) || (ExecutorGlobals.GetUserErrorHandlerErrorReporting()&type_) == 0 || ExecutorGlobals.GetErrorHandling() != EH_NORMAL {
 		ZendErrorCb(type_, error_filename, error_lineno, format, args)
 	} else {
 		switch type_ {
@@ -798,8 +798,8 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			orig_fake_scope = ExecutorGlobals.GetFakeScope()
 			ExecutorGlobals.SetFakeScope(nil)
 			if CallUserFunction(CompilerGlobals.GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == SUCCESS {
-				if Z_TYPE(retval) != IS_UNDEF {
-					if Z_TYPE(retval) == IS_FALSE {
+				if retval.GetType() != IS_UNDEF {
+					if retval.IsType(IS_FALSE) {
 						ZendErrorCb(type_, error_filename, error_lineno, format, args)
 					}
 					ZvalPtrDtor(&retval)
@@ -823,7 +823,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			ZvalPtrDtor(&params[4])
 			ZvalPtrDtor(&params[2])
 			ZvalPtrDtor(&params[1])
-			if Z_TYPE(ExecutorGlobals.GetUserErrorHandler()) == IS_UNDEF {
+			if ExecutorGlobals.GetUserErrorHandler().IsType(IS_UNDEF) {
 				ZVAL_COPY_VALUE(&(ExecutorGlobals.GetUserErrorHandler()), &orig_user_error_handler)
 			} else {
 				ZvalPtrDtor(&orig_user_error_handler)
@@ -967,7 +967,7 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
 
 	/* Marker used to disable exception generation during preloading. */
 
-	if ExecutorGlobals.GetException() == any(uintptr_t-1) {
+	if ExecutorGlobals.GetException() == any(uintPtr-1) {
 		return
 	}
 	va_start(va, format)
@@ -1058,8 +1058,8 @@ func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
 		if op_array != nil {
 			ZendExecute(op_array, retval)
 			ZendExceptionRestore()
-			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
-				if Z_TYPE(ExecutorGlobals.GetUserExceptionHandler()) != IS_UNDEF {
+			if ExecutorGlobals.GetException() != nil {
+				if ExecutorGlobals.GetUserExceptionHandler().GetType() != IS_UNDEF {
 					ZendUserExceptionHandler()
 				}
 				if ExecutorGlobals.GetException() != nil {

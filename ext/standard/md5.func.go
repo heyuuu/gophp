@@ -44,7 +44,7 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -57,21 +57,21 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &arg, 0) == 0) {
+			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -138,7 +138,7 @@ func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
@@ -151,21 +151,21 @@ func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0) {
+			if zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0) {
+			if zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_BOOL
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+		if _error_code != zend.ZPP_ERROR_OK {
 			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
@@ -488,10 +488,10 @@ func PHP_MD5Update(ctx *PHP_MD5_CTX, data any, size int) {
 	if used != 0 {
 		free = 64 - used
 		if size < free {
-			memcpy(&ctx.buffer[used], data, size)
+			memcpy(&ctx.GetBuffer()[used], data, size)
 			return
 		}
-		memcpy(&ctx.buffer[used], data, free)
+		memcpy(&ctx.GetBuffer()[used], data, free)
 		data = (*uint8)(data + free)
 		size -= free
 		Body(ctx, ctx.GetBuffer(), 64)
@@ -509,12 +509,12 @@ func PHP_MD5Final(result *uint8, ctx *PHP_MD5_CTX) {
 	ctx.GetBuffer()[b.PostInc(&used)] = 0x80
 	free = 64 - used
 	if free < 8 {
-		memset(&ctx.buffer[used], 0, free)
+		memset(&ctx.GetBuffer()[used], 0, free)
 		Body(ctx, ctx.GetBuffer(), 64)
 		used = 0
 		free = 64
 	}
-	memset(&ctx.buffer[used], 0, free-8)
+	memset(&ctx.GetBuffer()[used], 0, free-8)
 	ctx.SetLo(ctx.GetLo() << 3)
 	ctx.GetBuffer()[56] = ctx.GetLo()
 	ctx.GetBuffer()[57] = ctx.GetLo() >> 8

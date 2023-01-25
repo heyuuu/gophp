@@ -24,7 +24,7 @@ func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int,
 		zend.ZVAL_ERROR(rv)
 		return rv
 	} else {
-		return &(zend.ExecutorGlobals.uninitialized_zval)
+		return &(zend.ExecutorGlobals.GetUninitializedZval())
 	}
 }
 func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *zend.Zval, cache_slot *any) *zend.Zval {
@@ -33,7 +33,7 @@ func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *z
 }
 func IncompleteClassGetPropertyPtrPtr(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any) *zend.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
-	return &(zend.ExecutorGlobals.error_zval)
+	return &(zend.ExecutorGlobals.GetErrorZval())
 }
 func IncompleteClassUnsetProperty(object *zend.Zval, member *zend.Zval, cache_slot *any) {
 	IncompleteClassMessage(object, zend.E_NOTICE)
@@ -51,23 +51,23 @@ func IncompleteClassGetMethod(object **zend.ZendObject, method *zend.ZendString,
 func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *zend.ZendObject {
 	var object *zend.ZendObject
 	object = zend.ZendObjectsNew(class_type)
-	object.handlers = &PhpIncompleteObjectHandlers
+	object.SetHandlers(&PhpIncompleteObjectHandlers)
 	zend.ObjectPropertiesInit(object, class_type)
 	return object
 }
 func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 	var incomplete_class zend.ZendClassEntry
 	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
-	incomplete_class.name = zend.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1)
-	incomplete_class.info.internal.builtin_functions = nil
+	incomplete_class.SetName(zend.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1))
+	incomplete_class.SetBuiltinFunctions(nil)
 	incomplete_class.create_object = PhpCreateIncompleteObject
 	memcpy(&PhpIncompleteObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
-	PhpIncompleteObjectHandlers.read_property = IncompleteClassGetProperty
-	PhpIncompleteObjectHandlers.has_property = IncompleteClassHasProperty
-	PhpIncompleteObjectHandlers.unset_property = IncompleteClassUnsetProperty
-	PhpIncompleteObjectHandlers.write_property = IncompleteClassWriteProperty
-	PhpIncompleteObjectHandlers.get_property_ptr_ptr = IncompleteClassGetPropertyPtrPtr
-	PhpIncompleteObjectHandlers.get_method = IncompleteClassGetMethod
+	PhpIncompleteObjectHandlers.SetReadProperty(IncompleteClassGetProperty)
+	PhpIncompleteObjectHandlers.SetHasProperty(IncompleteClassHasProperty)
+	PhpIncompleteObjectHandlers.SetUnsetProperty(IncompleteClassUnsetProperty)
+	PhpIncompleteObjectHandlers.SetWriteProperty(IncompleteClassWriteProperty)
+	PhpIncompleteObjectHandlers.SetGetPropertyPtrPtr(IncompleteClassGetPropertyPtrPtr)
+	PhpIncompleteObjectHandlers.SetGetMethod(IncompleteClassGetMethod)
 	return zend.ZendRegisterInternalClass(&incomplete_class)
 }
 func PhpLookupClassName(object *zend.Zval) *zend.ZendString {

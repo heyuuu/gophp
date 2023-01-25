@@ -217,7 +217,7 @@ func ZendMmRealloc2Rel(heap *ZendMmHeap, p any, size int, copy_size int) any {
 }
 func ZendMmBlockSizeRel(heap *ZendMmHeap, p any) int { return _zendMmBlockSize(heap, p) }
 func ZEND_MM_CHECK(condition __auto__, message string) {
-	if UNEXPECTED(!condition) {
+	if !condition {
 		ZendMmPanic(message)
 	}
 }
@@ -497,7 +497,7 @@ func ZendMmChunkAllocInt(size int, alignment int) any {
 	}
 }
 func ZendMmChunkAlloc(heap *ZendMmHeap, size int, alignment int) any {
-	if UNEXPECTED(heap.GetStorage() != nil) {
+	if heap.GetStorage() != nil {
 		var ptr any = heap.GetStorage().GetHandlers().GetChunkAlloc()(heap.GetStorage(), size, alignment)
 		ZEND_ASSERT((zend_uintptr_t((*byte)(ptr+(alignment-1)))&alignment - 1) == ZendUintptrT(ptr))
 		return ptr
@@ -505,14 +505,14 @@ func ZendMmChunkAlloc(heap *ZendMmHeap, size int, alignment int) any {
 	return ZendMmChunkAllocInt(size, alignment)
 }
 func ZendMmChunkFree(heap *ZendMmHeap, addr any, size int) {
-	if UNEXPECTED(heap.GetStorage() != nil) {
+	if heap.GetStorage() != nil {
 		heap.GetStorage().GetHandlers().GetChunkFree()(heap.GetStorage(), addr, size)
 		return
 	}
 	ZendMmMunmap(addr, size)
 }
 func ZendMmChunkTruncate(heap *ZendMmHeap, addr any, old_size int, new_size int) int {
-	if UNEXPECTED(heap.GetStorage() != nil) {
+	if heap.GetStorage() != nil {
 		if heap.GetStorage().GetHandlers().GetChunkTruncate() != nil {
 			return heap.GetStorage().GetHandlers().GetChunkTruncate()(heap.GetStorage(), addr, old_size, new_size)
 		} else {
@@ -523,7 +523,7 @@ func ZendMmChunkTruncate(heap *ZendMmHeap, addr any, old_size int, new_size int)
 	return 1
 }
 func ZendMmChunkExtend(heap *ZendMmHeap, addr any, old_size int, new_size int) int {
-	if UNEXPECTED(heap.GetStorage() != nil) {
+	if heap.GetStorage() != nil {
 		if heap.GetStorage().GetHandlers().GetChunkExtend() != nil {
 			return heap.GetStorage().GetHandlers().GetChunkExtend()(heap.GetStorage(), addr, old_size, new_size)
 		} else {
@@ -559,7 +559,7 @@ func ZendMmAllocPages(heap *ZendMmHeap, pages_count uint32) any {
 	var len_ uint32
 	var steps int = 0
 	for true {
-		if UNEXPECTED(chunk.GetFreePages() < pages_count) {
+		if chunk.GetFreePages() < pages_count {
 			goto not_found
 		} else {
 
@@ -649,7 +649,7 @@ func ZendMmAllocPages(heap *ZendMmHeap, pages_count uint32) any {
 				chunk = heap.GetCachedChunks()
 				heap.SetCachedChunks(chunk.GetNext())
 			} else {
-				if UNEXPECTED(ZEND_MM_CHUNK_SIZE > heap.GetLimit()-heap.GetRealSize()) {
+				if ZEND_MM_CHUNK_SIZE > heap.GetLimit()-heap.GetRealSize() {
 					if ZendMmGc(heap) != 0 {
 						goto get_chunk
 					} else if heap.GetOverflow() == 0 {
@@ -658,7 +658,7 @@ func ZendMmAllocPages(heap *ZendMmHeap, pages_count uint32) any {
 					}
 				}
 				chunk = (*ZendMmChunk)(ZendMmChunkAlloc(heap, ZEND_MM_CHUNK_SIZE, ZEND_MM_CHUNK_SIZE))
-				if UNEXPECTED(chunk == nil) {
+				if chunk == nil {
 
 					/* insufficient memory */
 
@@ -827,7 +827,7 @@ func ZendMmAllocSmallSlow(heap *ZendMmHeap, bin_num uint32) any {
 	var p *ZendMmFreeSlot
 	var end *ZendMmFreeSlot
 	bin = (*ZendMmBin)(ZendMmAllocPages(heap, BinPages[bin_num]))
-	if UNEXPECTED(bin == nil) {
+	if bin == nil {
 
 		/* insufficient memory */
 
@@ -878,7 +878,7 @@ func ZendMmAllocSmall(heap *ZendMmHeap, bin_num int) any {
 	var peak int = MAX(heap.GetPeak(), size)
 	heap.SetSize(size)
 	heap.SetPeak(peak)
-	if EXPECTED(heap.GetFreeSlot()[bin_num] != nil) {
+	if heap.GetFreeSlot()[bin_num] != nil {
 		var p *ZendMmFreeSlot = heap.GetFreeSlot()[bin_num]
 		heap.GetFreeSlot()[bin_num] = p.GetNextFreeSlot()
 		return any(p)
@@ -895,10 +895,10 @@ func ZendMmFreeSmall(heap *ZendMmHeap, ptr any, bin_num int) {
 }
 func ZendMmAllocHeap(heap *ZendMmHeap, size int) any {
 	var ptr any
-	if EXPECTED(size <= ZEND_MM_MAX_SMALL_SIZE) {
+	if size <= ZEND_MM_MAX_SMALL_SIZE {
 		ptr = ZendMmAllocSmall(heap, ZEND_MM_SMALL_SIZE_TO_BIN(size))
 		return ptr
-	} else if EXPECTED(size <= ZEND_MM_MAX_LARGE_SIZE) {
+	} else if size <= ZEND_MM_MAX_LARGE_SIZE {
 		ptr = ZendMmAllocLarge(heap, size)
 		return ptr
 	} else {
@@ -907,7 +907,7 @@ func ZendMmAllocHeap(heap *ZendMmHeap, size int) any {
 }
 func ZendMmFreeHeap(heap *ZendMmHeap, ptr any) {
 	var page_offset int = ZEND_MM_ALIGNED_OFFSET(ptr, ZEND_MM_CHUNK_SIZE)
-	if UNEXPECTED(page_offset == 0) {
+	if page_offset == 0 {
 		if ptr != nil {
 			ZendMmFreeHuge(heap, ptr)
 		}
@@ -916,7 +916,7 @@ func ZendMmFreeHeap(heap *ZendMmHeap, ptr any) {
 		var page_num int = int(page_offset / ZEND_MM_PAGE_SIZE)
 		var info ZendMmPageInfo = chunk.GetMap()[page_num]
 		ZEND_MM_CHECK(chunk.GetHeap() == heap, "zend_mm_heap corrupted")
-		if EXPECTED((info & ZEND_MM_IS_SRUN) != 0) {
+		if (info & ZEND_MM_IS_SRUN) != 0 {
 			ZendMmFreeSmall(heap, ptr, ZEND_MM_SRUN_BIN_NUM(info))
 		} else {
 			var pages_count int = ZEND_MM_LRUN_PAGES(info)
@@ -927,7 +927,7 @@ func ZendMmFreeHeap(heap *ZendMmHeap, ptr any) {
 }
 func ZendMmSize(heap *ZendMmHeap, ptr any) int {
 	var page_offset int = ZEND_MM_ALIGNED_OFFSET(ptr, ZEND_MM_CHUNK_SIZE)
-	if UNEXPECTED(page_offset == 0) {
+	if page_offset == 0 {
 		return ZendMmGetHugeBlockSize(heap, ptr)
 	} else {
 		var chunk *ZendMmChunk
@@ -937,7 +937,7 @@ func ZendMmSize(heap *ZendMmHeap, ptr any) int {
 		page_num = int(page_offset / ZEND_MM_PAGE_SIZE)
 		info = chunk.GetMap()[page_num]
 		ZEND_MM_CHECK(chunk.GetHeap() == heap, "zend_mm_heap corrupted")
-		if EXPECTED((info & ZEND_MM_IS_SRUN) != 0) {
+		if (info & ZEND_MM_IS_SRUN) != 0 {
 			return BinDataSize[ZEND_MM_SRUN_BIN_NUM(info)]
 		} else {
 			return ZEND_MM_LRUN_PAGES(info) * ZEND_MM_PAGE_SIZE
@@ -976,7 +976,7 @@ func ZendMmReallocHuge(heap *ZendMmHeap, ptr any, size int, copy_size int) any {
 			/* unmup tail */
 
 		} else {
-			if UNEXPECTED(new_size-old_size > heap.GetLimit()-heap.GetRealSize()) {
+			if new_size-old_size > heap.GetLimit()-heap.GetRealSize() {
 				if ZendMmGc(heap) != 0 && new_size-old_size <= heap.GetLimit()-heap.GetRealSize() {
 
 				} else if heap.GetOverflow() == 0 {
@@ -1008,8 +1008,8 @@ func ZendMmReallocHeap(heap *ZendMmHeap, ptr any, size int, use_copy_size ZendBo
 	var new_size int
 	var ret any
 	page_offset = ZEND_MM_ALIGNED_OFFSET(ptr, ZEND_MM_CHUNK_SIZE)
-	if UNEXPECTED(page_offset == 0) {
-		if EXPECTED(ptr == nil) {
+	if page_offset == 0 {
+		if ptr == nil {
 			return _zendMmAlloc(heap, size)
 		} else {
 			return ZendMmReallocHuge(heap, ptr, size, copy_size)
@@ -1180,10 +1180,10 @@ func ZendMmAllocHuge(heap *ZendMmHeap, size int) any {
 	var alignment int = REAL_PAGE_SIZE
 	var new_size int = ZEND_MM_ALIGNED_SIZE_EX(size, alignment)
 	var ptr any
-	if UNEXPECTED(new_size < size) {
+	if new_size < size {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%zu + %zu)", size, alignment)
 	}
-	if UNEXPECTED(new_size > heap.GetLimit()-heap.GetRealSize()) {
+	if new_size > heap.GetLimit()-heap.GetRealSize() {
 		if ZendMmGc(heap) != 0 && new_size <= heap.GetLimit()-heap.GetRealSize() {
 
 		} else if heap.GetOverflow() == 0 {
@@ -1192,7 +1192,7 @@ func ZendMmAllocHuge(heap *ZendMmHeap, size int) any {
 		}
 	}
 	ptr = ZendMmChunkAlloc(heap, new_size, ZEND_MM_CHUNK_SIZE)
-	if UNEXPECTED(ptr == nil) {
+	if ptr == nil {
 
 		/* insufficient memory */
 
@@ -1228,11 +1228,11 @@ func ZendMmFreeHuge(heap *ZendMmHeap, ptr any) {
 func ZendMmInit() *ZendMmHeap {
 	var chunk *ZendMmChunk = (*ZendMmChunk)(ZendMmChunkAllocInt(ZEND_MM_CHUNK_SIZE, ZEND_MM_CHUNK_SIZE))
 	var heap *ZendMmHeap
-	if UNEXPECTED(chunk == nil) {
+	if chunk == nil {
 		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
-	heap = &chunk.heap_slot
+	heap = &chunk.GetHeapSlot()
 	chunk.SetHeap(heap)
 	chunk.SetNext(chunk)
 	chunk.SetPrev(chunk)
@@ -1302,7 +1302,7 @@ func ZendMmGc(heap *ZendMmHeap) int {
 		if has_free_pages == 0 {
 			continue
 		}
-		q = &heap.free_slot[i]
+		q = &heap.GetFreeSlot()[i]
 		p = *q
 		for p != nil {
 			chunk = (*ZendMmChunk)(ZEND_MM_ALIGNED_BASE(p, ZEND_MM_CHUNK_SIZE))
@@ -1326,7 +1326,7 @@ func ZendMmGc(heap *ZendMmHeap) int {
 				p = p.GetNextFreeSlot()
 				*q = p
 			} else {
-				q = &p.next_free_slot
+				q = &p.GetNextFreeSlot()
 				p = *q
 			}
 		}
@@ -1469,7 +1469,7 @@ func ZendMmShutdown(heap *ZendMmHeap, full int, silent int) {
 		/* reinitialize the first chunk and heap */
 
 		p = heap.GetMainChunk()
-		p.SetHeap(&p.heap_slot)
+		p.SetHeap(&p.GetHeapSlot())
 		p.SetNext(p)
 		p.SetPrev(p)
 		p.SetFreePages(ZEND_MM_PAGES - ZEND_MM_FIRST_PAGE)
@@ -1552,32 +1552,32 @@ func _reallocCustom(ptr any, size int) any {
 	}
 }
 func _emalloc(size int) any {
-	if UNEXPECTED(AG(mm_heap).use_custom_heap) {
+	if AG(mm_heap).use_custom_heap {
 		return _mallocCustom(size)
 	}
 	return ZendMmAllocHeap(AG(mm_heap), size)
 }
 func _efree(ptr any) {
-	if UNEXPECTED(AG(mm_heap).use_custom_heap) {
+	if AG(mm_heap).use_custom_heap {
 		_efreeCustom(ptr)
 		return
 	}
 	ZendMmFreeHeap(AG(mm_heap), ptr)
 }
 func _erealloc(ptr any, size int) any {
-	if UNEXPECTED(AG(mm_heap).use_custom_heap) {
+	if AG(mm_heap).use_custom_heap {
 		return _reallocCustom(ptr, size)
 	}
 	return ZendMmReallocHeap(AG(mm_heap), ptr, size, 0, size)
 }
 func _erealloc2(ptr any, size int, copy_size int) any {
-	if UNEXPECTED(AG(mm_heap).use_custom_heap) {
+	if AG(mm_heap).use_custom_heap {
 		return _reallocCustom(ptr, size)
 	}
 	return ZendMmReallocHeap(AG(mm_heap), ptr, size, 1, copy_size)
 }
 func _zendMemBlockSize(ptr any) int {
-	if UNEXPECTED(AG(mm_heap).use_custom_heap) {
+	if AG(mm_heap).use_custom_heap {
 		return 0
 	}
 	return ZendMmSize(AG(mm_heap), ptr)
@@ -1605,7 +1605,7 @@ func _estrdup(s *byte) *byte {
 	var length int
 	var p *byte
 	length = strlen(s)
-	if UNEXPECTED(length+1 == 0) {
+	if length+1 == 0 {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
 	}
 	p = (*byte)(_emalloc(length + 1))
@@ -1614,7 +1614,7 @@ func _estrdup(s *byte) *byte {
 }
 func _estrndup(s *byte, length int) *byte {
 	var p *byte
-	if UNEXPECTED(length+1 == 0) {
+	if length+1 == 0 {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
 	}
 	p = (*byte)(_emalloc(length + 1))
@@ -1624,14 +1624,14 @@ func _estrndup(s *byte, length int) *byte {
 }
 func ZendStrndup(s *byte, length int) *byte {
 	var p *byte
-	if UNEXPECTED(length+1 == 0) {
+	if length+1 == 0 {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (1 * %zu + 1)", length)
 	}
 	p = (*byte)(Malloc(length + 1))
-	if UNEXPECTED(p == nil) {
+	if p == nil {
 		return p
 	}
-	if EXPECTED(length != 0) {
+	if length != 0 {
 		memcpy(p, s, length)
 	}
 	p[length] = 0
@@ -1641,7 +1641,7 @@ func ZendSetMemoryLimit(memory_limit int) int {
 	if memory_limit < ZEND_MM_CHUNK_SIZE {
 		memory_limit = ZEND_MM_CHUNK_SIZE
 	}
-	if UNEXPECTED(memory_limit < AG(mm_heap).real_size) {
+	if memory_limit < AG(mm_heap).real_size {
 		return FAILURE
 	}
 	AG(mm_heap).limit = memory_limit
@@ -1670,7 +1670,7 @@ func ShutdownMemoryManager(silent int, full_shutdown int) {
 func TrackedMalloc(size int) any {
 	var ptr any = __zendMalloc(size)
 	var h ZendUlong = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
-	ZEND_ASSERT(any(uintptr_t(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
+	ZEND_ASSERT(any(uintPtr(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
 	AG(mm_heap).tracked_allocs.IndexAddEmptyElement(h)
 	return ptr
 }
@@ -1684,7 +1684,7 @@ func TrackedRealloc(ptr any, new_size int) any {
 	AG(mm_heap).tracked_allocs.IndexDel(h)
 	ptr = __zendRealloc(ptr, new_size)
 	h = uintPtr(ptr) >> core.ZEND_MM_ALIGNMENT_LOG2
-	ZEND_ASSERT(any(uintptr_t(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
+	ZEND_ASSERT(any(uintPtr(h<<core.ZEND_MM_ALIGNMENT_LOG2) == ptr))
 	AG(mm_heap).tracked_allocs.IndexAddEmptyElement(h)
 	return ptr
 }
@@ -1696,13 +1696,13 @@ func TrackedFreeAll() {
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.val
+			var _z *Zval = &_p.GetVal()
 
-			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+			if Z_TYPE_P(_z) == IS_UNDEF {
 				continue
 			}
 			h = _p.GetH()
-			var ptr any = any(uintptr_t(h << core.ZEND_MM_ALIGNMENT_LOG2))
+			var ptr any = any(uintPtr(h << core.ZEND_MM_ALIGNMENT_LOG2))
 			Free(ptr)
 		}
 		break
@@ -1780,14 +1780,14 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	var storage *ZendMmStorage
 	var chunk *ZendMmChunk
 	var heap *ZendMmHeap
-	memcpy((*ZendMmHandlers)(&tmp_storage.handlers), handlers, b.SizeOf("zend_mm_handlers"))
+	memcpy((*ZendMmHandlers)(&tmp_storage.GetHandlers()), handlers, b.SizeOf("zend_mm_handlers"))
 	tmp_storage.SetData(data)
 	chunk = (*ZendMmChunk)(handlers.GetChunkAlloc()(&tmp_storage, ZEND_MM_CHUNK_SIZE, ZEND_MM_CHUNK_SIZE))
-	if UNEXPECTED(chunk == nil) {
+	if chunk == nil {
 		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
-	heap = &chunk.heap_slot
+	heap = &chunk.GetHeapSlot()
 	chunk.SetHeap(heap)
 	chunk.SetNext(chunk)
 	chunk.SetPrev(chunk)
@@ -1834,7 +1834,7 @@ func ZendOutOfMemory() {
 }
 func __zendMalloc(len_ int) any {
 	var tmp any = Malloc(len_)
-	if EXPECTED(tmp || len_ == 0) {
+	if tmp || len_ == 0 {
 		return tmp
 	}
 	ZendOutOfMemory()
@@ -1848,7 +1848,7 @@ func __zendCalloc(nmemb int, len_ int) any {
 }
 func __zendRealloc(p any, len_ int) any {
 	p = realloc(p, len_)
-	if EXPECTED(p || len_ == 0) {
+	if p || len_ == 0 {
 		return p
 	}
 	ZendOutOfMemory()

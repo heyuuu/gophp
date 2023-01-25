@@ -160,7 +160,7 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	}
 	Z_SET_REFCOUNT(trace, 0)
 	base_ce = IGetExceptionBase(&obj)
-	if EXPECTED(class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, ZendGetCompiledFilename()))) {
+	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, ZendGetCompiledFilename())) {
 		ZVAL_STRING(&tmp, ZendGetExecutedFilename())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
 		ZvalPtrDtor(&tmp)
@@ -200,7 +200,7 @@ func ZimExceptionConstruct(execute_data *ZendExecuteData, return_value *Zval) {
 	base_ce = IGetExceptionBase(object)
 	if ZendParseParametersEx(ZEND_PARSE_PARAMS_QUIET, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == FAILURE {
 		var ce *ZendClassEntry
-		if Z_TYPE(EX(This)) == IS_OBJECT {
+		if EX(This).u1.v.type_ == IS_OBJECT {
 			ce = Z_OBJCE(EX(This))
 		} else if Z_CE(EX(This)) != nil {
 			ce = Z_CE(EX(This))
@@ -255,7 +255,7 @@ func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zva
 	var argc int = ZEND_NUM_ARGS()
 	if ZendParseParametersEx(ZEND_PARSE_PARAMS_QUIET, argc, "|SllSlO!", &message, &code, &severity, &filename, &lineno, &previous, ZendCeThrowable) == FAILURE {
 		var ce *ZendClassEntry
-		if Z_TYPE(EX(This)) == IS_OBJECT {
+		if EX(This).u1.v.type_ == IS_OBJECT {
 			ce = Z_OBJCE(EX(This))
 		} else if Z_CE(EX(This)) != nil {
 			ce = Z_CE(EX(This))
@@ -466,9 +466,9 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *Zval = &_p.val
+					var _z *Zval = &_p.GetVal()
 
-					if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+					if Z_TYPE_P(_z) == IS_UNDEF {
 						continue
 					}
 					arg = _z
@@ -509,9 +509,9 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.val
+			var _z *Zval = &_p.GetVal()
 
-			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
+			if Z_TYPE_P(_z) == IS_UNDEF {
 				continue
 			}
 			index = _p.GetH()
@@ -559,14 +559,14 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		var file *ZendString = ZvalGetString(GET_PROPERTY(exception, ZEND_STR_FILE))
 		var line ZendLong = ZvalGetLong(GET_PROPERTY(exception, ZEND_STR_LINE))
 		fci.SetSize(b.SizeOf("fci"))
-		ZVAL_STR(&fci.function_name, fname)
+		ZVAL_STR(&fci.GetFunctionName(), fname)
 		fci.SetObject(Z_OBJ_P(exception))
 		fci.SetRetval(&trace)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
 		ZendCallFunction(&fci, nil)
-		if Z_TYPE(trace) != IS_STRING {
+		if trace.GetType() != IS_STRING {
 			ZvalPtrDtor(&trace)
 			ZVAL_UNDEF(&trace)
 		}
@@ -576,9 +576,9 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 			message = real_message
 		}
 		if ZSTR_LEN(message) > 0 {
-			str = ZendStrpprintf(0, "%s: %s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", ZSTR_VAL(Z_OBJCE_P(exception).GetName()), ZSTR_VAL(message), ZSTR_VAL(file), line, b.CondF1(Z_TYPE(trace) == IS_STRING && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(ZSTR_LEN(prev_str) != 0, "\n\nNext ", ""), ZSTR_VAL(prev_str))
+			str = ZendStrpprintf(0, "%s: %s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", ZSTR_VAL(Z_OBJCE_P(exception).GetName()), ZSTR_VAL(message), ZSTR_VAL(file), line, b.CondF1(trace.IsType(IS_STRING) && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(ZSTR_LEN(prev_str) != 0, "\n\nNext ", ""), ZSTR_VAL(prev_str))
 		} else {
-			str = ZendStrpprintf(0, "%s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", ZSTR_VAL(Z_OBJCE_P(exception).GetName()), ZSTR_VAL(file), line, b.CondF1(Z_TYPE(trace) == IS_STRING && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(ZSTR_LEN(prev_str) != 0, "\n\nNext ", ""), ZSTR_VAL(prev_str))
+			str = ZendStrpprintf(0, "%s in %s:"+ZEND_LONG_FMT+"\nStack trace:\n%s%s%s", ZSTR_VAL(Z_OBJCE_P(exception).GetName()), ZSTR_VAL(file), line, b.CondF1(trace.IsType(IS_STRING) && Z_STRLEN(trace) != 0, func() []byte { return Z_STRVAL(trace) }, "#0 {main}\n"), b.Cond(ZSTR_LEN(prev_str) != 0, "\n\nNext ", ""), ZSTR_VAL(prev_str))
 		}
 		ZendStringReleaseEx(prev_str, 0)
 		ZendStringReleaseEx(message, 0)
@@ -764,9 +764,9 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 		var str *ZendString
 		var file *ZendString = nil
 		var line ZendLong = 0
-		ZendCallMethodWith0Params(&exception, ce_exception, &ex.ce.GetTostring(), "__tostring", &tmp)
+		ZendCallMethodWith0Params(&exception, ce_exception, &ex.GetCe().GetTostring(), "__tostring", &tmp)
 		if ExecutorGlobals.GetException() == nil {
-			if Z_TYPE(tmp) != IS_STRING {
+			if tmp.GetType() != IS_STRING {
 				ZendError(E_WARNING, "%s::__toString() must return a string", ZSTR_VAL(ce_exception.GetName()))
 			} else {
 				ZendUpdatePropertyEx(IGetExceptionBase(&exception), &exception, ZSTR_KNOWN(ZEND_STR_STRING), &tmp)

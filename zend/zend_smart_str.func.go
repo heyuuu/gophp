@@ -20,11 +20,11 @@ func SmartStrAppendLong(dest *SmartStr, val ZendLong)      { SmartStrAppendLongE
 func SmartStrAppendUnsigned(dest *SmartStr, val ZendUlong) { SmartStrAppendUnsignedEx(dest, val, 0) }
 func SmartStrFree(dest *SmartStr)                          { SmartStrFreeEx(dest, 0) }
 func SmartStrAlloc(str *SmartStr, len_ int, persistent ZendBool) int {
-	if UNEXPECTED(str.GetS() == nil) {
+	if str.GetS() == nil {
 		goto do_smart_str_realloc
 	} else {
 		len_ += ZSTR_LEN(str.GetS())
-		if UNEXPECTED(len_ >= str.GetA()) {
+		if len_ >= str.GetA() {
 		do_smart_str_realloc:
 			if persistent != 0 {
 				SmartStrRealloc(str, len_)
@@ -107,7 +107,7 @@ func SMART_STR_NEW_LEN(len_ int) int {
 	return ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STR_OVERHEAD, SMART_STR_PAGE) - SMART_STR_OVERHEAD
 }
 func SmartStrErealloc(str *SmartStr, len_ int) {
-	if UNEXPECTED(str.GetS() == nil) {
+	if str.GetS() == nil {
 		if len_ <= SMART_STR_START_LEN {
 			str.SetA(SMART_STR_START_LEN)
 		} else {
@@ -121,7 +121,7 @@ func SmartStrErealloc(str *SmartStr, len_ int) {
 	}
 }
 func SmartStrRealloc(str *SmartStr, len_ int) {
-	if UNEXPECTED(str.GetS() == nil) {
+	if str.GetS() == nil {
 		if len_ <= SMART_STR_START_LEN {
 			str.SetA(SMART_STR_START_LEN)
 		} else {
@@ -214,7 +214,7 @@ func _smartStringAllocPersistent(str *SmartString, len_ int) {
 		}
 		str.SetC(Pemalloc(str.GetA()+1, 1))
 	} else {
-		if UNEXPECTED(int(len_ > SIZE_MAX-str.GetLen()) != 0) {
+		if int(len_ > SIZE_MAX-str.GetLen()) != 0 {
 			ZendError(E_ERROR, "String size overflow")
 		}
 		len_ += str.GetLen()
@@ -230,7 +230,7 @@ func _smartStringAlloc(str *SmartString, len_ int) {
 			str.SetC(Emalloc(SMART_STRING_START_LEN + 1))
 		} else {
 			str.SetA(ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STRING_OVERHEAD, SMART_STRING_PAGE) - SMART_STRING_OVERHEAD)
-			if EXPECTED(str.GetA() < ZEND_MM_CHUNK_SIZE-SMART_STRING_OVERHEAD) {
+			if str.GetA() < ZEND_MM_CHUNK_SIZE-SMART_STRING_OVERHEAD {
 				str.SetC(EmallocLarge(str.GetA() + 1))
 			} else {
 
@@ -243,7 +243,7 @@ func _smartStringAlloc(str *SmartString, len_ int) {
 			}
 		}
 	} else {
-		if UNEXPECTED(int(len_ > SIZE_MAX-str.GetLen()) != 0) {
+		if int(len_ > SIZE_MAX-str.GetLen()) != 0 {
 			ZendError(E_ERROR, "String size overflow")
 		}
 		len_ += str.GetLen()

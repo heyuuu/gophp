@@ -61,7 +61,7 @@ func Bfree(v *Bigint) {
 	}
 }
 func Bcopy(x *Bigint, y *Bigint) __auto__ {
-	return memcpy((*byte)(&x.sign), (*byte)(&y.sign), y.GetWds()*b.SizeOf("Long")+2*b.SizeOf("int"))
+	return memcpy((*byte)(&x.GetSign()), (*byte)(&y.GetSign()), y.GetWds()*b.SizeOf("Long")+2*b.SizeOf("int"))
 }
 func Multadd(b *Bigint, m int, a int) *Bigint {
 	var i int
@@ -2328,7 +2328,7 @@ func FreeP5s() {
 	var tmp **Bigint
 	listp = &P5s
 	for b.Assign(&tmp, *listp) != nil {
-		*listp = tmp.next
+		*listp = tmp.GetNext()
 		Free(tmp)
 	}
 }

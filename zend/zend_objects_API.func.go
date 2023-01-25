@@ -27,7 +27,7 @@ func ZendObjectStoreCtorFailed(obj *ZendObject) {
 func ZendObjectRelease(obj *ZendObject) {
 	if GC_DELREF(obj) == 0 {
 		ZendObjectsStoreDel(obj)
-	} else if UNEXPECTED(GC_MAY_LEAK((*ZendRefcounted)(obj))) {
+	} else if GC_MAY_LEAK((*ZendRefcounted)(obj)) {
 		GcPossibleRoot((*ZendRefcounted)(obj))
 	}
 }
@@ -61,7 +61,7 @@ func ZendObjectsStoreInit(objects *ZendObjectsStore, init_size uint32) {
 	objects.SetTop(1)
 	objects.SetSize(init_size)
 	objects.SetFreeListHead(-1)
-	memset(&objects.object_buckets[0], 0, b.SizeOf("zend_object *"))
+	memset(&objects.GetObjectBuckets()[0], 0, b.SizeOf("zend_object *"))
 }
 func ZendObjectsStoreDestroy(objects *ZendObjectsStore) {
 	Efree(objects.GetObjectBuckets())
@@ -122,9 +122,9 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 			if IS_OBJ_VALID(obj) {
 				if (OBJ_FLAGS(obj) & IS_OBJ_FREE_CALLED) == 0 {
 					GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
-					if obj.handlers.GetFreeObj() != ZendObjectStdDtor {
+					if obj.GetHandlers().GetFreeObj() != ZendObjectStdDtor {
 						GC_ADDREF(obj)
-						obj.handlers.GetFreeObj()(obj)
+						obj.GetHandlers().GetFreeObj()(obj)
 					}
 				}
 			}
@@ -140,7 +140,7 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 				if (OBJ_FLAGS(obj) & IS_OBJ_FREE_CALLED) == 0 {
 					GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
 					GC_ADDREF(obj)
-					obj.handlers.GetFreeObj()(obj)
+					obj.GetHandlers().GetFreeObj()(obj)
 				}
 			}
 			if obj_ptr == end {
@@ -169,10 +169,10 @@ func ZendObjectsStorePut(object *ZendObject) {
 	 * the dtors for newly created objects are called in zend_objects_store_call_destructors() loop
 	 */
 
-	if ExecutorGlobals.GetObjectsStore().GetFreeListHead() != -1 && EXPECTED(!ExecutorGlobals.IsObjectStoreNoReuse()) {
+	if ExecutorGlobals.GetObjectsStore().GetFreeListHead() != -1 && !ExecutorGlobals.IsObjectStoreNoReuse() {
 		handle = ExecutorGlobals.GetObjectsStore().GetFreeListHead()
 		ExecutorGlobals.GetObjectsStore().SetFreeListHead(GET_OBJ_BUCKET_NUMBER(ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[handle]))
-	} else if UNEXPECTED(ExecutorGlobals.GetObjectsStore().GetTop() == ExecutorGlobals.GetObjectsStore().GetSize()) {
+	} else if ExecutorGlobals.GetObjectsStore().GetTop() == ExecutorGlobals.GetObjectsStore().GetSize() {
 		ZendObjectsStorePutCold(object)
 		return
 	} else {
@@ -187,7 +187,7 @@ func ZendObjectsStoreDel(object *ZendObject) {
 
 	/* GC might have released this object already. */
 
-	if UNEXPECTED(GC_TYPE(object) == IS_NULL) {
+	if GC_TYPE(object) == IS_NULL {
 		return
 	}
 

@@ -26,5 +26,5 @@ func PhpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 	return _phpStreamFilterFlush(filter, finish)
 }
 func PhpStreamIsFiltered(stream *core.PhpStream) bool {
-	return stream.readfilters.GetHead() != nil || stream.writefilters.GetHead() != nil
+	return stream.GetReadfilters().GetHead() != nil || stream.GetWritefilters().GetHead() != nil
 }

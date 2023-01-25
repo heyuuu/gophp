@@ -261,9 +261,9 @@ func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags
 		}
 	default:
 		user = zend.Ecalloc(1, b.SizeOf("php_output_handler_user_func_t"))
-		if zend.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, &user.fci, &user.fcc, &handler_name, &error) {
+		if zend.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, &user.GetFci(), &user.GetFcc(), &handler_name, &error) {
 			handler = PhpOutputHandlerInit(handler_name, chunk_size, flags & ^0xf | PHP_OUTPUT_HANDLER_USER)
-			zend.ZVAL_COPY(&user.zoh, output_handler)
+			zend.ZVAL_COPY(&user.GetZoh(), output_handler)
 			handler.SetUser(user)
 		} else {
 			zend.Efree(user)
@@ -307,12 +307,12 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 	if nil != b.Assign(&rconflicts, zend.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
 		for {
 			var __ht *zend.HashTable = rconflicts
-			var _p *zend.Bucket = __ht.arData
-			var _end *zend.Bucket = _p + __ht.nNumUsed
+			var _p *zend.Bucket = __ht.GetArData()
+			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.val
+				var _z *zend.Zval = &_p.GetVal()
 
-				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				conflict = zend.Z_PTR_P(_z)
@@ -357,7 +357,7 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 }
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var str *zend.ZendString
-	if zend.ExecutorGlobals.current_module == nil {
+	if zend.ExecutorGlobals.GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
 		return zend.FAILURE
 	}
@@ -369,7 +369,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var rev zend.HashTable
 	var rev_ptr *zend.HashTable = nil
-	if zend.ExecutorGlobals.current_module == nil {
+	if zend.ExecutorGlobals.GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return zend.FAILURE
 	}
@@ -397,7 +397,7 @@ func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT 
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *zend.ZendString
-	if zend.ExecutorGlobals.current_module == nil {
+	if zend.ExecutorGlobals.GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler alias outside of MINIT")
 		return zend.FAILURE
 	}
@@ -438,7 +438,7 @@ func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 		zend.Efree(handler.GetBuffer().GetData())
 	}
 	if handler.IsUser() {
-		zend.ZvalPtrDtor(&handler.func_.user.GetZoh())
+		zend.ZvalPtrDtor(&handler.GetUser().GetZoh())
 		zend.Efree(handler.GetUser())
 	}
 	if handler.GetDtor() != nil && handler.GetOpaq() {
@@ -589,7 +589,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 	/* storable? */
 
-	if PhpOutputHandlerAppend(handler, &context.in) != 0 && context.GetOp() == 0 {
+	if PhpOutputHandlerAppend(handler, &context.GetIn()) != 0 && context.GetOp() == 0 {
 		context.SetOp(original_op)
 		return PHP_OUTPUT_HANDLER_NO_DATA
 	} else {
@@ -606,17 +606,17 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			var ob_mode zend.Zval
 			zend.ZVAL_STRINGL(&ob_data, handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed())
 			zend.ZVAL_LONG(&ob_mode, zend.ZendLong(context.GetOp()))
-			zend.ZendFcallInfoArgn(&handler.func_.user.GetFci(), 2, &ob_data, &ob_mode)
+			zend.ZendFcallInfoArgn(&handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			zend.ZvalPtrDtor(&ob_data)
 			var PHP_OUTPUT_USER_SUCCESS func(retval zend.Zval) bool = func(retval zend.Zval) bool {
-				return zend.Z_TYPE(retval) != zend.IS_UNDEF && zend.Z_TYPE(retval) != zend.IS_FALSE
+				return retval.GetType() != zend.IS_UNDEF && retval.GetType() != zend.IS_FALSE
 			}
-			if zend.SUCCESS == zend.ZendFcallInfoCall(&handler.func_.user.GetFci(), &handler.func_.user.GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
+			if zend.SUCCESS == zend.ZendFcallInfoCall(&handler.GetUser().GetFci(), &handler.GetUser().GetFcc(), &retval, nil) && PHP_OUTPUT_USER_SUCCESS(retval) {
 
 				/* user handler may have returned TRUE */
 
 				status = PHP_OUTPUT_HANDLER_NO_DATA
-				if zend.Z_TYPE(retval) != zend.IS_FALSE && zend.Z_TYPE(retval) != zend.IS_TRUE {
+				if retval.GetType() != zend.IS_FALSE && retval.GetType() != zend.IS_TRUE {
 					zend.ConvertToStringEx(&retval)
 					if zend.Z_STRLEN(retval) != 0 {
 						context.GetOut().SetData(zend.Estrndup(zend.Z_STRVAL(retval), zend.Z_STRLEN(retval)))
@@ -634,11 +634,11 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				/* call failed, pass internal buffer along */
 
 			}
-			zend.ZendFcallInfoArgn(&handler.func_.user.GetFci(), 0)
+			zend.ZendFcallInfoArgn(&handler.GetUser().GetFci(), 0)
 			zend.ZvalPtrDtor(&retval)
 		} else {
 			PhpOutputContextFeed(context, handler.GetBuffer().GetData(), handler.GetBuffer().GetSize(), handler.GetBuffer().GetUsed(), 0)
-			if zend.SUCCESS == handler.GetInternal()(&handler.opaq, context) {
+			if zend.SUCCESS == handler.GetInternal()(&handler.GetOpaq(), context) {
 				if context.GetOut().GetUsed() != 0 {
 					status = PHP_OUTPUT_HANDLER_SUCCESS
 				} else {
@@ -831,9 +831,9 @@ func PhpOutputStackPop(flags int) int {
 			PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to %s buffer. No buffer to %s", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"))
 		}
 		return 0
-	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && (orphan.flags&PHP_OUTPUT_HANDLER_REMOVABLE) == 0 {
+	} else if (flags&PHP_OUTPUT_POP_FORCE) == 0 && !orphan.HasFlags(PHP_OUTPUT_HANDLER_REMOVABLE) {
 		if (flags & PHP_OUTPUT_POP_SILENT) == 0 {
-			PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), zend.ZSTR_VAL(orphan.name), orphan.level)
+			PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to %s buffer of %s (%d)", b.Cond((flags&PHP_OUTPUT_POP_DISCARD) != 0, "discard", "send"), zend.ZSTR_VAL(orphan.GetName()), orphan.GetLevel())
 		}
 		return 0
 	} else {
@@ -841,11 +841,11 @@ func PhpOutputStackPop(flags int) int {
 
 		/* don't run the output handler if it's disabled */
 
-		if (orphan.flags & PHP_OUTPUT_HANDLER_DISABLED) == 0 {
+		if !orphan.IsDisabled() {
 
 			/* didn't it start yet? */
 
-			if (orphan.flags & PHP_OUTPUT_HANDLER_STARTED) == 0 {
+			if !orphan.IsStarted() {
 				context.SetOp(context.GetOp() | PHP_OUTPUT_HANDLER_START)
 			}
 
