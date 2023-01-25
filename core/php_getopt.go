@@ -35,4 +35,4 @@ type _opt = Opt
 
 /* php_getopt will return this value if there is an error in arguments */
 
-// #define PHP_GETOPT_INVALID_ARG       ( - 2 )
+const PHP_GETOPT_INVALID_ARG = -2

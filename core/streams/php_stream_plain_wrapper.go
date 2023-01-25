@@ -2,6 +2,12 @@
 
 package streams
 
+import (
+	"sik/core"
+	r "sik/runtime"
+	"sik/zend"
+)
+
 // Source: <main/streams/php_stream_plain_wrapper.h>
 
 /*
@@ -28,20 +34,28 @@ package streams
 
 // #define php_stream_fopen_with_path(filename,mode,path,opened) _php_stream_fopen_with_path ( ( filename ) , ( mode ) , ( path ) , ( opened ) , 0 STREAMS_CC )
 
-// #define php_stream_fopen_from_file(file,mode) _php_stream_fopen_from_file ( ( file ) , ( mode ) STREAMS_CC )
-
-// #define php_stream_fopen_from_fd(fd,mode,persistent_id) _php_stream_fopen_from_fd ( ( fd ) , ( mode ) , ( persistent_id ) STREAMS_CC )
-
-// #define php_stream_fopen_from_pipe(file,mode) _php_stream_fopen_from_pipe ( ( file ) , ( mode ) STREAMS_CC )
+func PhpStreamFopenFromFile(file *r.FILE, mode *byte) *core.PhpStream {
+	return _phpStreamFopenFromFile(file, mode)
+}
+func PhpStreamFopenFromFd(fd int, mode *byte, persistent_id *byte) *core.PhpStream {
+	return _phpStreamFopenFromFd(fd, mode, persistent_id)
+}
+func PhpStreamFopenFromPipe(file *r.FILE, mode *byte) *core.PhpStream {
+	return _phpStreamFopenFromPipe(file, mode)
+}
 
 // #define php_stream_fopen_tmpfile() _php_stream_fopen_tmpfile ( 0 STREAMS_CC )
 
-// #define php_stream_fopen_temporary_file(dir,pfx,opened_path) _php_stream_fopen_temporary_file ( ( dir ) , ( pfx ) , ( opened_path ) STREAMS_CC )
+func PhpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path **zend.ZendString) *core.PhpStream {
+	return _phpStreamFopenTemporaryFile(dir, pfx, opened_path)
+}
 
 /* This is a utility API for extensions that are opening a stream, converting it
  * to a FILE* and then closing it again.  Be warned that fileno() on the result
  * will most likely fail on systems with fopencookie. */
 
-// #define php_stream_open_wrapper_as_file(path,mode,options,opened_path) _php_stream_open_wrapper_as_file ( ( path ) , ( mode ) , ( options ) , ( opened_path ) STREAMS_CC )
+func PhpStreamOpenWrapperAsFile(path *byte, mode string, options int, opened_path **zend.ZendString) *r.FILE {
+	return _phpStreamOpenWrapperAsFile(path, mode, options, opened_path)
+}
 
 /* parse standard "fopen" modes into open() flags */

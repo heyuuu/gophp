@@ -4,7 +4,6 @@ package cli
 
 import (
 	"sik/core"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -30,8 +29,13 @@ import (
 
 // #define PHP_PS_TITLE_HEADER
 
-var ArginfoCliSetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"title", 0, 0, 0}}
-var ArginfoCliGetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
+var ArginfoCliSetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{"title", 0, 0, 0},
+}
+var ArginfoCliGetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+}
 
 // Source: <sapi/cli/php_cli_process_title.c>
 
@@ -66,16 +70,16 @@ func ZifCliSetProcessTitle(execute_data *zend.ZendExecuteData, return_value *zen
 	var title *byte = nil
 	var title_len int
 	var rc int
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "s", &title, &title_len) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "s", &title, &title_len) == zend.FAILURE {
 		return
 	}
 	rc = SetPsTitle(title)
-	if rc == 0 {
-		return_value.u1.type_info = 3
+	if rc == PS_TITLE_SUCCESS {
+		zend.RETVAL_TRUE
 		return
 	}
-	core.PhpErrorDocref(nil, 1<<1, "cli_set_process_title had an error: %s", PsTitleErrno(rc))
-	return_value.u1.type_info = 2
+	core.PhpErrorDocref(nil, zend.E_WARNING, "cli_set_process_title had an error: %s", PsTitleErrno(rc))
+	zend.RETVAL_FALSE
 	return
 }
 
@@ -85,22 +89,16 @@ func ZifCliGetProcessTitle(execute_data *zend.ZendExecuteData, return_value *zen
 	var length int = 0
 	var title *byte = nil
 	var rc int
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	rc = GetPsTitle(&length, &title)
-	if rc != 0 {
-		core.PhpErrorDocref(nil, 1<<1, "cli_get_process_title had an error: %s", PsTitleErrno(rc))
-		return_value.u1.type_info = 1
+	if rc != PS_TITLE_SUCCESS {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "cli_get_process_title had an error: %s", PsTitleErrno(rc))
+		zend.RETVAL_NULL()
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = zend.ZendStringInit(title, length, 0)
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	zend.RETVAL_STRINGL(title, length)
 	return
 }
 

@@ -2,6 +2,10 @@
 
 package streams
 
+import (
+	"sik/core"
+)
+
 // Source: <main/streams/php_stream_glob_wrapper.h>
 
 /*
@@ -22,8 +26,12 @@ package streams
    +----------------------------------------------------------------------+
 */
 
-// #define php_glob_stream_get_path(stream,plen) _php_glob_stream_get_path ( ( stream ) , ( plen ) STREAMS_CC )
-
-// #define php_glob_stream_get_pattern(stream,plen) _php_glob_stream_get_pattern ( ( stream ) , ( plen ) STREAMS_CC )
-
-// #define php_glob_stream_get_count(stream,pflags) _php_glob_stream_get_count ( ( stream ) , ( pflags ) STREAMS_CC )
+func PhpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
+	return _phpGlobStreamGetPath(stream, plen)
+}
+func PhpGlobStreamGetPattern(stream *core.PhpStream, plen *int) *byte {
+	return _phpGlobStreamGetPattern(stream, plen)
+}
+func PhpGlobStreamGetCount(stream *core.PhpStream, pflags *int) int {
+	return _phpGlobStreamGetCount(stream, pflags)
+}

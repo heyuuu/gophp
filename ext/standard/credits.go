@@ -56,20 +56,17 @@ import (
 
 // # include "SAPI.h"
 
-// #define CREDIT_LINE(module,authors) php_info_print_table_row ( 2 , module , authors )
-
+func CREDIT_LINE(module string, authors string) { PhpInfoPrintTableRow(2, module, authors) }
 func PhpPrintCredits(flag int) {
-	if core.sapi_module.phpinfo_as_text == 0 && (flag&1<<5) != 0 {
+	if core.sapi_module.phpinfo_as_text == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
 		PhpPrintInfoHtmlhead()
 	}
 	if core.sapi_module.phpinfo_as_text == 0 {
-		var __str *byte = "<h1>PHP Credits</h1>\n"
-		core.PhpOutputWrite(__str, strlen(__str))
+		core.PUTS("<h1>PHP Credits</h1>\n")
 	} else {
-		var __str *byte = "PHP Credits\n"
-		core.PhpOutputWrite(__str, strlen(__str))
+		core.PUTS("PHP Credits\n")
 	}
-	if (flag & 1 << 0) != 0 {
+	if (flag & PHP_CREDITS_GROUP) != 0 {
 
 		/* Group */
 
@@ -78,7 +75,7 @@ func PhpPrintCredits(flag int) {
 		PhpInfoPrintTableRow(1, "Thies C. Arntzen, Stig Bakken, Shane Caraveo, Andi Gutmans, Rasmus Lerdorf, Sam Ruby, Sascha Schumann, Zeev Suraski, Jim Winstead, Andrei Zmievski")
 		PhpInfoPrintTableEnd()
 	}
-	if (flag & 1 << 1) != 0 {
+	if (flag & PHP_CREDITS_GENERAL) != 0 {
 
 		/* Design & Concept */
 
@@ -96,18 +93,18 @@ func PhpPrintCredits(flag int) {
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableColspanHeader(2, "PHP Authors")
 		PhpInfoPrintTableHeader(2, "Contribution", "Authors")
-		PhpInfoPrintTableRow(2, "Zend Scripting Language Engine", "Andi Gutmans, Zeev Suraski, Stanislav Malyshev, Marcus Boerger, Dmitry Stogov, Xinchen Hui, Nikita Popov")
-		PhpInfoPrintTableRow(2, "Extension Module API", "Andi Gutmans, Zeev Suraski, Andrei Zmievski")
-		PhpInfoPrintTableRow(2, "UNIX Build and Modularization", "Stig Bakken, Sascha Schumann, Jani Taskinen, Peter Kokot")
-		PhpInfoPrintTableRow(2, "Windows Support", "Shane Caraveo, Zeev Suraski, Wez Furlong, Pierre-Alain Joye, Anatol Belski, Kalle Sommer Nielsen")
-		PhpInfoPrintTableRow(2, "Server API (SAPI) Abstraction Layer", "Andi Gutmans, Shane Caraveo, Zeev Suraski")
-		PhpInfoPrintTableRow(2, "Streams Abstraction Layer", "Wez Furlong, Sara Golemon")
-		PhpInfoPrintTableRow(2, "PHP Data Objects Layer", "Wez Furlong, Marcus Boerger, Sterling Hughes, George Schlossnagle, Ilia Alshanetsky")
-		PhpInfoPrintTableRow(2, "Output Handler", "Zeev Suraski, Thies C. Arntzen, Marcus Boerger, Michael Wallner")
-		PhpInfoPrintTableRow(2, "Consistent 64 bit support", "Anthony Ferrara, Anatol Belski")
+		CREDIT_LINE("Zend Scripting Language Engine", "Andi Gutmans, Zeev Suraski, Stanislav Malyshev, Marcus Boerger, Dmitry Stogov, Xinchen Hui, Nikita Popov")
+		CREDIT_LINE("Extension Module API", "Andi Gutmans, Zeev Suraski, Andrei Zmievski")
+		CREDIT_LINE("UNIX Build and Modularization", "Stig Bakken, Sascha Schumann, Jani Taskinen, Peter Kokot")
+		CREDIT_LINE("Windows Support", "Shane Caraveo, Zeev Suraski, Wez Furlong, Pierre-Alain Joye, Anatol Belski, Kalle Sommer Nielsen")
+		CREDIT_LINE("Server API (SAPI) Abstraction Layer", "Andi Gutmans, Shane Caraveo, Zeev Suraski")
+		CREDIT_LINE("Streams Abstraction Layer", "Wez Furlong, Sara Golemon")
+		CREDIT_LINE("PHP Data Objects Layer", "Wez Furlong, Marcus Boerger, Sterling Hughes, George Schlossnagle, Ilia Alshanetsky")
+		CREDIT_LINE("Output Handler", "Zeev Suraski, Thies C. Arntzen, Marcus Boerger, Michael Wallner")
+		CREDIT_LINE("Consistent 64 bit support", "Anthony Ferrara, Anatol Belski")
 		PhpInfoPrintTableEnd()
 	}
-	if (flag & 1 << 2) != 0 {
+	if (flag & PHP_CREDITS_SAPI) != 0 {
 
 		/* SAPI Modules */
 
@@ -122,7 +119,7 @@ func PhpPrintCredits(flag int) {
 		// # include "credits_sapi.h"
 
 	}
-	if (flag & 1 << 3) != 0 {
+	if (flag & PHP_CREDITS_MODULES) != 0 {
 
 		/* Modules */
 
@@ -137,22 +134,22 @@ func PhpPrintCredits(flag int) {
 		// # include "credits_ext.h"
 
 	}
-	if (flag & 1 << 4) != 0 {
+	if (flag & PHP_CREDITS_DOCS) != 0 {
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableColspanHeader(2, "PHP Documentation")
-		PhpInfoPrintTableRow(2, "Authors", "Mehdi Achour, Friedhelm Betz, Antony Dovgal, Nuno Lopes, Hannes Magnusson, Philip Olson, Georg Richter, Damien Seguy, Jakub Vrana, Adam Harvey")
-		PhpInfoPrintTableRow(2, "Editor", "Peter Cowburn")
-		PhpInfoPrintTableRow(2, "User Note Maintainers", "Daniel P. Brown, Thiago Henrique Pojda")
-		PhpInfoPrintTableRow(2, "Other Contributors", "Previously active authors, editors and other contributors are listed in the manual.")
+		CREDIT_LINE("Authors", "Mehdi Achour, Friedhelm Betz, Antony Dovgal, Nuno Lopes, Hannes Magnusson, Philip Olson, Georg Richter, Damien Seguy, Jakub Vrana, Adam Harvey")
+		CREDIT_LINE("Editor", "Peter Cowburn")
+		CREDIT_LINE("User Note Maintainers", "Daniel P. Brown, Thiago Henrique Pojda")
+		CREDIT_LINE("Other Contributors", "Previously active authors, editors and other contributors are listed in the manual.")
 		PhpInfoPrintTableEnd()
 	}
-	if (flag & 1 << 6) != 0 {
+	if (flag & PHP_CREDITS_QA) != 0 {
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(1, "PHP Quality Assurance Team")
 		PhpInfoPrintTableRow(1, "Ilia Alshanetsky, Joerg Behrens, Antony Dovgal, Stefan Esser, Moriyoshi Koizumi, Magnus Maatta, Sebastian Nohn, Derick Rethans, Melvyn Sopacua, Pierre-Alain Joye, Dmitry Stogov, Felipe Pena, David Soria Parra, Stanislav Malyshev, Julien Pauli, Stephen Zarkos, Anatol Belski, Remi Collet, Ferenc Kovacs")
 		PhpInfoPrintTableEnd()
 	}
-	if (flag & 1 << 7) != 0 {
+	if (flag & PHP_CREDITS_WEB) != 0 {
 
 		/* Websites and infrastructure */
 
@@ -161,21 +158,20 @@ func PhpPrintCredits(flag int) {
 
 		/* www., wiki., windows., master., and others, I guess pecl. too? */
 
-		PhpInfoPrintTableRow(2, "PHP Websites Team", "Rasmus Lerdorf, Hannes Magnusson, Philip Olson, Lukas Kahwe Smith, Pierre-Alain Joye, Kalle Sommer Nielsen, Peter Cowburn, Adam Harvey, Ferenc Kovacs, Levi Morrison")
-		PhpInfoPrintTableRow(2, "Event Maintainers", "Damien Seguy, Daniel P. Brown")
+		CREDIT_LINE("PHP Websites Team", "Rasmus Lerdorf, Hannes Magnusson, Philip Olson, Lukas Kahwe Smith, Pierre-Alain Joye, Kalle Sommer Nielsen, Peter Cowburn, Adam Harvey, Ferenc Kovacs, Levi Morrison")
+		CREDIT_LINE("Event Maintainers", "Damien Seguy, Daniel P. Brown")
 
 		/* Mirroring */
 
-		PhpInfoPrintTableRow(2, "Network Infrastructure", "Daniel P. Brown")
+		CREDIT_LINE("Network Infrastructure", "Daniel P. Brown")
 
 		/* Windows build boxes and such things */
 
-		PhpInfoPrintTableRow(2, "Windows Infrastructure", "Alex Schoenmaker")
+		CREDIT_LINE("Windows Infrastructure", "Alex Schoenmaker")
 		PhpInfoPrintTableEnd()
 	}
-	if core.sapi_module.phpinfo_as_text == 0 && (flag&1<<5) != 0 {
-		var __str *byte = "</div></body></html>\n"
-		core.PhpOutputWrite(__str, strlen(__str))
+	if core.sapi_module.phpinfo_as_text == 0 && (flag&PHP_CREDITS_FULLPAGE) != 0 {
+		core.PUTS("</div></body></html>\n")
 	}
 }
 

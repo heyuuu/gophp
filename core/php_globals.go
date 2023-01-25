@@ -26,26 +26,19 @@ package core
 
 // # include "zend_globals.h"
 
-// #define PG(v) ( core_globals . v )
+func PG(v *byte) __auto__ { return CoreGlobals.v }
 
 /* Error display modes */
 
-// #define PHP_DISPLAY_ERRORS_STDOUT       1
-
-// #define PHP_DISPLAY_ERRORS_STDERR       2
+const PHP_DISPLAY_ERRORS_STDOUT = 1
+const PHP_DISPLAY_ERRORS_STDERR = 2
 
 /* Track vars */
 
-// #define TRACK_VARS_POST       0
-
-// #define TRACK_VARS_GET       1
-
-// #define TRACK_VARS_COOKIE       2
-
-// #define TRACK_VARS_SERVER       3
-
-// #define TRACK_VARS_ENV       4
-
-// #define TRACK_VARS_FILES       5
-
-// #define TRACK_VARS_REQUEST       6
+const TRACK_VARS_POST = 0
+const TRACK_VARS_GET = 1
+const TRACK_VARS_COOKIE = 2
+const TRACK_VARS_SERVER = 3
+const TRACK_VARS_ENV = 4
+const TRACK_VARS_FILES = 5
+const TRACK_VARS_REQUEST = 6

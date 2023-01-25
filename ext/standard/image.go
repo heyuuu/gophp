@@ -3,10 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	"sik/core/streams"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -69,26 +68,26 @@ var PhpSigWebp []byte = []byte{'W', 'E', 'B', 'P'}
  * Register IMAGETYPE_<xxx> constants used by GetImageSize(), image_type_to_mime_type, ext/exif */
 
 func ZmStartupImagetypes(type_ int, module_number int) int {
-	zend.ZendRegisterLongConstant("IMAGETYPE_GIF", g.SizeOf("\"IMAGETYPE_GIF\"")-1, IMAGE_FILETYPE_GIF, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JPEG", g.SizeOf("\"IMAGETYPE_JPEG\"")-1, IMAGE_FILETYPE_JPEG, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_PNG", g.SizeOf("\"IMAGETYPE_PNG\"")-1, IMAGE_FILETYPE_PNG, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_SWF", g.SizeOf("\"IMAGETYPE_SWF\"")-1, IMAGE_FILETYPE_SWF, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_PSD", g.SizeOf("\"IMAGETYPE_PSD\"")-1, IMAGE_FILETYPE_PSD, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_BMP", g.SizeOf("\"IMAGETYPE_BMP\"")-1, IMAGE_FILETYPE_BMP, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_TIFF_II", g.SizeOf("\"IMAGETYPE_TIFF_II\"")-1, IMAGE_FILETYPE_TIFF_II, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_TIFF_MM", g.SizeOf("\"IMAGETYPE_TIFF_MM\"")-1, IMAGE_FILETYPE_TIFF_MM, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JPC", g.SizeOf("\"IMAGETYPE_JPC\"")-1, IMAGE_FILETYPE_JPC, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JP2", g.SizeOf("\"IMAGETYPE_JP2\"")-1, IMAGE_FILETYPE_JP2, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JPX", g.SizeOf("\"IMAGETYPE_JPX\"")-1, IMAGE_FILETYPE_JPX, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JB2", g.SizeOf("\"IMAGETYPE_JB2\"")-1, IMAGE_FILETYPE_JB2, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_IFF", g.SizeOf("\"IMAGETYPE_IFF\"")-1, IMAGE_FILETYPE_IFF, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_WBMP", g.SizeOf("\"IMAGETYPE_WBMP\"")-1, IMAGE_FILETYPE_WBMP, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_JPEG2000", g.SizeOf("\"IMAGETYPE_JPEG2000\"")-1, IMAGE_FILETYPE_JPC, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_XBM", g.SizeOf("\"IMAGETYPE_XBM\"")-1, IMAGE_FILETYPE_XBM, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_ICO", g.SizeOf("\"IMAGETYPE_ICO\"")-1, IMAGE_FILETYPE_ICO, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_WEBP", g.SizeOf("\"IMAGETYPE_WEBP\"")-1, IMAGE_FILETYPE_WEBP, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_UNKNOWN", g.SizeOf("\"IMAGETYPE_UNKNOWN\"")-1, IMAGE_FILETYPE_UNKNOWN, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("IMAGETYPE_COUNT", g.SizeOf("\"IMAGETYPE_COUNT\"")-1, IMAGE_FILETYPE_COUNT, 1<<0|1<<1, module_number)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_GIF", IMAGE_FILETYPE_GIF, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JPEG", IMAGE_FILETYPE_JPEG, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_PNG", IMAGE_FILETYPE_PNG, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_SWF", IMAGE_FILETYPE_SWF, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_PSD", IMAGE_FILETYPE_PSD, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_BMP", IMAGE_FILETYPE_BMP, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_TIFF_II", IMAGE_FILETYPE_TIFF_II, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_TIFF_MM", IMAGE_FILETYPE_TIFF_MM, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JPC", IMAGE_FILETYPE_JPC, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JP2", IMAGE_FILETYPE_JP2, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JPX", IMAGE_FILETYPE_JPX, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JB2", IMAGE_FILETYPE_JB2, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_IFF", IMAGE_FILETYPE_IFF, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_WBMP", IMAGE_FILETYPE_WBMP, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_JPEG2000", IMAGE_FILETYPE_JPC, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_XBM", IMAGE_FILETYPE_XBM, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_ICO", IMAGE_FILETYPE_ICO, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_WEBP", IMAGE_FILETYPE_WEBP, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_UNKNOWN", IMAGE_FILETYPE_UNKNOWN, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("IMAGETYPE_COUNT", IMAGE_FILETYPE_COUNT, zend.CONST_CS|zend.CONST_PERSISTENT)
 	return zend.SUCCESS
 }
 
@@ -97,13 +96,13 @@ func ZmStartupImagetypes(type_ int, module_number int) int {
 func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
-	if streams._phpStreamSeek(stream, 3, 1) != 0 {
+	if core.PhpStreamSeek(stream, 3, r.SEEK_CUR) != 0 {
 		return nil
 	}
-	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
+	if core.PhpStreamRead(stream, (*byte)(dim), b.SizeOf("dim")) != b.SizeOf("dim") {
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	result.SetWidth(uint(dim[0] | uint(dim[1])<<8))
 	result.SetHeight(uint(dim[2] | uint(dim[3])<<8))
 	if (dim[4] & 0x80) != 0 {
@@ -120,13 +119,13 @@ func PhpHandleGif(stream *core.PhpStream) *Gfxinfo {
 func PhpHandlePsd(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
-	if streams._phpStreamSeek(stream, 11, 1) != 0 {
+	if core.PhpStreamSeek(stream, 11, r.SEEK_CUR) != 0 {
 		return nil
 	}
-	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
+	if core.PhpStreamRead(stream, (*byte)(dim), b.SizeOf("dim")) != b.SizeOf("dim") {
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	result.SetHeight((uint(dim[0]) << 24) + (uint(dim[1]) << 16) + (uint(dim[2]) << 8) + uint(dim[3]))
 	result.SetWidth((uint(dim[4]) << 24) + (uint(dim[5]) << 16) + (uint(dim[6]) << 8) + uint(dim[7]))
 	return result
@@ -138,20 +137,20 @@ func PhpHandleBmp(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
 	var size int
-	if streams._phpStreamSeek(stream, 11, 1) != 0 {
+	if core.PhpStreamSeek(stream, 11, r.SEEK_CUR) != 0 {
 		return nil
 	}
-	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
+	if core.PhpStreamRead(stream, (*byte)(dim), b.SizeOf("dim")) != b.SizeOf("dim") {
 		return nil
 	}
 	size = (uint(dim[3]) << 24) + (uint(dim[2]) << 16) + (uint(dim[1]) << 8) + uint(dim[0])
 	if size == 12 {
-		result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+		result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 		result.SetWidth((uint(dim[5]) << 8) + uint(dim[4]))
 		result.SetHeight((uint(dim[7]) << 8) + uint(dim[6]))
 		result.SetBits(uint(dim[11]))
 	} else if size > 12 && (size <= 64 || size == 108 || size == 124) {
-		result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+		result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 		result.SetWidth((uint(dim[7]) << 24) + (uint(dim[6]) << 16) + (uint(dim[5]) << 8) + uint(dim[4]))
 		result.SetHeight((uint(dim[11]) << 24) + (uint(dim[10]) << 16) + (uint(dim[9]) << 8) + uint(dim[8]))
 		result.SetHeight(abs(int32(result.GetHeight())))
@@ -182,13 +181,13 @@ func PhpHandleSwf(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var bits long
 	var a []uint8
-	if streams._phpStreamSeek(stream, 5, 1) != 0 {
+	if core.PhpStreamSeek(stream, 5, r.SEEK_CUR) != 0 {
 		return nil
 	}
-	if streams._phpStreamRead(stream, (*byte)(a), g.SizeOf("a")) != g.SizeOf("a") {
+	if core.PhpStreamRead(stream, (*byte)(a), b.SizeOf("a")) != b.SizeOf("a") {
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	bits = PhpSwfGetBits(a, 0, 5)
 	result.SetWidth((PhpSwfGetBits(a, 5+bits, bits) - PhpSwfGetBits(a, 5, bits)) / 20)
 	result.SetHeight((PhpSwfGetBits(a, 5+3*bits, bits) - PhpSwfGetBits(a, 5+2*bits, bits)) / 20)
@@ -212,13 +211,13 @@ func PhpHandlePng(stream *core.PhpStream) *Gfxinfo {
 	 * Interlace method:   1 byte
 	 */
 
-	if streams._phpStreamSeek(stream, 8, 1) != 0 {
+	if core.PhpStreamSeek(stream, 8, r.SEEK_CUR) != 0 {
 		return nil
 	}
-	if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) < g.SizeOf("dim") {
+	if core.PhpStreamRead(stream, (*byte)(dim), b.SizeOf("dim")) < b.SizeOf("dim") {
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	result.SetWidth((uint(dim[0]) << 24) + (uint(dim[1]) << 16) + (uint(dim[2]) << 8) + uint(dim[3]))
 	result.SetHeight((uint(dim[4]) << 24) + (uint(dim[5]) << 16) + (uint(dim[6]) << 8) + uint(dim[7]))
 	result.SetBits(uint(dim[8]))
@@ -227,73 +226,40 @@ func PhpHandlePng(stream *core.PhpStream) *Gfxinfo {
 
 /* }}} */
 
-// #define M_SOF0       0xC0
-
-// #define M_SOF1       0xC1
-
-// #define M_SOF2       0xC2
-
-// #define M_SOF3       0xC3
-
-// #define M_SOF5       0xC5
-
-// #define M_SOF6       0xC6
-
-// #define M_SOF7       0xC7
-
-// #define M_SOF9       0xC9
-
-// #define M_SOF10       0xCA
-
-// #define M_SOF11       0xCB
-
-// #define M_SOF13       0xCD
-
-// #define M_SOF14       0xCE
-
-// #define M_SOF15       0xCF
-
-// #define M_SOI       0xD8
-
-// #define M_EOI       0xD9
-
-// #define M_SOS       0xDA
-
-// #define M_APP0       0xe0
-
-// #define M_APP1       0xe1
-
-// #define M_APP2       0xe2
-
-// #define M_APP3       0xe3
-
-// #define M_APP4       0xe4
-
-// #define M_APP5       0xe5
-
-// #define M_APP6       0xe6
-
-// #define M_APP7       0xe7
-
-// #define M_APP8       0xe8
-
-// #define M_APP9       0xe9
-
-// #define M_APP10       0xea
-
-// #define M_APP11       0xeb
-
-// #define M_APP12       0xec
-
-// #define M_APP13       0xed
-
-// #define M_APP14       0xee
-
-// #define M_APP15       0xef
-
-// #define M_COM       0xFE
-
-// #define M_PSEUDO       0xFFD8
+const M_SOF0 = 0xc0
+const M_SOF1 = 0xc1
+const M_SOF2 = 0xc2
+const M_SOF3 = 0xc3
+const M_SOF5 = 0xc5
+const M_SOF6 = 0xc6
+const M_SOF7 = 0xc7
+const M_SOF9 = 0xc9
+const M_SOF10 = 0xca
+const M_SOF11 = 0xcb
+const M_SOF13 = 0xcd
+const M_SOF14 = 0xce
+const M_SOF15 = 0xcf
+const M_SOI = 0xd8
+const M_EOI = 0xd9
+const M_SOS = 0xda
+const M_APP0 = 0xe0
+const M_APP1 = 0xe1
+const M_APP2 = 0xe2
+const M_APP3 = 0xe3
+const M_APP4 = 0xe4
+const M_APP5 = 0xe5
+const M_APP6 = 0xe6
+const M_APP7 = 0xe7
+const M_APP8 = 0xe8
+const M_APP9 = 0xe9
+const M_APP10 = 0xea
+const M_APP11 = 0xeb
+const M_APP12 = 0xec
+const M_APP13 = 0xed
+const M_APP14 = 0xee
+const M_APP15 = 0xef
+const M_COM = 0xfe
+const M_PSEUDO = 0xffd8
 
 /* {{{ php_read2
  */
@@ -303,7 +269,7 @@ func PhpRead2(stream *core.PhpStream) uint16 {
 
 	/* return 0 if we couldn't read enough data */
 
-	if streams._phpStreamRead(stream, (*byte)(a), g.SizeOf("a")) < g.SizeOf("a") {
+	if core.PhpStreamRead(stream, (*byte)(a), b.SizeOf("a")) < b.SizeOf("a") {
 		return 0
 	}
 	return (uint16(a[0]) << 8) + uint16(a[1])
@@ -319,20 +285,20 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 
 	if ff_read == 0 {
 		var extraneous int = 0
-		for g.Assign(&marker, streams._phpStreamGetc(stream)) != 0xff {
-			if marker == -1 {
-				return 0xd9
+		for b.Assign(&marker, core.PhpStreamGetc(stream)) != 0xff {
+			if marker == r.EOF {
+				return M_EOI
 			}
 			extraneous++
 		}
 		if extraneous != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "corrupt JPEG data: %zu extraneous bytes before marker", extraneous)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "corrupt JPEG data: %zu extraneous bytes before marker", extraneous)
 		}
 	}
 	a = 1
 	for {
-		if g.Assign(&marker, streams._phpStreamGetc(stream)) == -1 {
-			return 0xd9
+		if b.Assign(&marker, core.PhpStreamGetc(stream)) == r.EOF {
+			return M_EOI
 		}
 		a++
 		if marker != 0xff {
@@ -340,7 +306,7 @@ func PhpNextMarker(stream *core.PhpStream, last_marker int, ff_read int) uint {
 		}
 	}
 	if a < 2 {
-		return 0xd9
+		return M_EOI
 	}
 	return uint(marker)
 }
@@ -353,7 +319,7 @@ func PhpSkipVariable(stream *core.PhpStream) int {
 		return 0
 	}
 	length = length - 2
-	streams._phpStreamSeek(stream, zend.ZendLong(length), 1)
+	core.PhpStreamSeek(stream, zend.ZendLong(length), r.SEEK_CUR)
 	return 1
 }
 
@@ -369,22 +335,22 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
 		return 0
 	}
 	length -= 2
-	buffer = zend._emalloc(int(length))
-	if streams._phpStreamRead(stream, buffer, int(length)) != length {
-		zend._efree(buffer)
+	buffer = zend.Emalloc(int(length))
+	if core.PhpStreamRead(stream, buffer, int(length)) != length {
+		zend.Efree(buffer)
 		return 0
 	}
-	core.ApPhpSnprintf(markername, g.SizeOf("markername"), "APP%d", marker-0xe0)
-	if g.Assign(&tmp, zend.ZendHashStrFind(info.value.arr, markername, strlen(markername))) == nil {
+	core.Snprintf(markername, b.SizeOf("markername"), "APP%d", marker-M_APP0)
+	if b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_ARRVAL_P(info), markername, strlen(markername))) == nil {
 
 		/* XXX we only catch the 1st tag of it's kind! */
 
-		zend.AddAssocStringlEx(info, markername, strlen(markername), buffer, length)
+		zend.AddAssocStringl(info, markername, buffer, length)
 
 		/* XXX we only catch the 1st tag of it's kind! */
 
 	}
-	zend._efree(buffer)
+	zend.Efree(buffer)
 	return 1
 }
 
@@ -392,52 +358,52 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
 
 func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 	var result *Gfxinfo = nil
-	var marker uint = 0xffd8
+	var marker uint = M_PSEUDO
 	var length uint16
 	var ff_read uint16 = 1
 	for {
 		marker = PhpNextMarker(stream, marker, ff_read)
 		ff_read = 0
 		switch marker {
-		case 0xc0:
+		case M_SOF0:
 
-		case 0xc1:
+		case M_SOF1:
 
-		case 0xc2:
+		case M_SOF2:
 
-		case 0xc3:
+		case M_SOF3:
 
-		case 0xc5:
+		case M_SOF5:
 
-		case 0xc6:
+		case M_SOF6:
 
-		case 0xc7:
+		case M_SOF7:
 
-		case 0xc9:
+		case M_SOF9:
 
-		case 0xca:
+		case M_SOF10:
 
-		case 0xcb:
+		case M_SOF11:
 
-		case 0xcd:
+		case M_SOF13:
 
-		case 0xce:
+		case M_SOF14:
 
-		case 0xcf:
+		case M_SOF15:
 			if result == nil {
 
 				/* handle SOFn block */
 
-				result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+				result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 				length = PhpRead2(stream)
-				result.SetBits(streams._phpStreamGetc(stream))
+				result.SetBits(core.PhpStreamGetc(stream))
 				result.SetHeight(PhpRead2(stream))
 				result.SetWidth(PhpRead2(stream))
-				result.SetChannels(streams._phpStreamGetc(stream))
+				result.SetChannels(core.PhpStreamGetc(stream))
 				if info == nil || length < 8 {
 					return result
 				}
-				if streams._phpStreamSeek(stream, length-8, 1) != 0 {
+				if core.PhpStreamSeek(stream, length-8, r.SEEK_CUR) != 0 {
 					return result
 				}
 			} else {
@@ -446,37 +412,37 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 				}
 			}
 			break
-		case 0xe0:
+		case M_APP0:
 
-		case 0xe1:
+		case M_APP1:
 
-		case 0xe2:
+		case M_APP2:
 
-		case 0xe3:
+		case M_APP3:
 
-		case 0xe4:
+		case M_APP4:
 
-		case 0xe5:
+		case M_APP5:
 
-		case 0xe6:
+		case M_APP6:
 
-		case 0xe7:
+		case M_APP7:
 
-		case 0xe8:
+		case M_APP8:
 
-		case 0xe9:
+		case M_APP9:
 
-		case 0xea:
+		case M_APP10:
 
-		case 0xeb:
+		case M_APP11:
 
-		case 0xec:
+		case M_APP12:
 
-		case 0xed:
+		case M_APP13:
 
-		case 0xee:
+		case M_APP14:
 
-		case 0xef:
+		case M_APP15:
 			if info != nil {
 				if php_read_APP(stream, marker, info) == 0 {
 					return result
@@ -487,9 +453,9 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 				}
 			}
 			break
-		case 0xda:
+		case M_SOS:
 
-		case 0xd9:
+		case M_EOI:
 			return result
 		default:
 			if PhpSkipVariable(stream) == 0 {
@@ -508,7 +474,7 @@ func PhpRead4(stream *core.PhpStream) uint {
 
 	/* just return 0 if we hit the end-of-file */
 
-	if streams._phpStreamRead(stream, (*byte)(a), g.SizeOf("a")) != g.SizeOf("a") {
+	if core.PhpStreamRead(stream, (*byte)(a), b.SizeOf("a")) != b.SizeOf("a") {
 		return 0
 	}
 	return (uint(a[0]) << 24) + (uint(a[1]) << 16) + (uint(a[2]) << 8) + uint(a[3])
@@ -516,47 +482,27 @@ func PhpRead4(stream *core.PhpStream) uint {
 
 /* }}} */
 
-// #define JPEG2000_MARKER_PREFIX       0xFF
-
-// #define JPEG2000_MARKER_SOC       0x4F
-
-// #define JPEG2000_MARKER_SOT       0x90
-
-// #define JPEG2000_MARKER_SOD       0x93
-
-// #define JPEG2000_MARKER_EOC       0xD9
-
-// #define JPEG2000_MARKER_SIZ       0x51
-
-// #define JPEG2000_MARKER_COD       0x52
-
-// #define JPEG2000_MARKER_COC       0x53
-
-// #define JPEG2000_MARKER_RGN       0x5E
-
-// #define JPEG2000_MARKER_QCD       0x5C
-
-// #define JPEG2000_MARKER_QCC       0x5D
-
-// #define JPEG2000_MARKER_POC       0x5F
-
-// #define JPEG2000_MARKER_TLM       0x55
-
-// #define JPEG2000_MARKER_PLM       0x57
-
-// #define JPEG2000_MARKER_PLT       0x58
-
-// #define JPEG2000_MARKER_PPM       0x60
-
-// #define JPEG2000_MARKER_PPT       0x61
-
-// #define JPEG2000_MARKER_SOP       0x91
-
-// #define JPEG2000_MARKER_EPH       0x92
-
-// #define JPEG2000_MARKER_CRG       0x63
-
-// #define JPEG2000_MARKER_COM       0x64
+const JPEG2000_MARKER_PREFIX = 0xff
+const JPEG2000_MARKER_SOC = 0x4f
+const JPEG2000_MARKER_SOT = 0x90
+const JPEG2000_MARKER_SOD = 0x93
+const JPEG2000_MARKER_EOC = 0xd9
+const JPEG2000_MARKER_SIZ = 0x51
+const JPEG2000_MARKER_COD = 0x52
+const JPEG2000_MARKER_COC = 0x53
+const JPEG2000_MARKER_RGN = 0x5e
+const JPEG2000_MARKER_QCD = 0x5c
+const JPEG2000_MARKER_QCC = 0x5d
+const JPEG2000_MARKER_POC = 0x5f
+const JPEG2000_MARKER_TLM = 0x55
+const JPEG2000_MARKER_PLM = 0x57
+const JPEG2000_MARKER_PLT = 0x58
+const JPEG2000_MARKER_PPM = 0x60
+const JPEG2000_MARKER_PPT = 0x61
+const JPEG2000_MARKER_SOP = 0x91
+const JPEG2000_MARKER_EPH = 0x92
+const JPEG2000_MARKER_CRG = 0x63
+const JPEG2000_MARKER_COM = 0x64
 
 /* }}} */
 
@@ -574,26 +520,26 @@ func PhpHandleJpc(stream *core.PhpStream) *Gfxinfo {
 	   "bit depth" answer somewhat problematic. For this implementation
 	   we'll use the highest depth encountered. */
 
-	first_marker_id = streams._phpStreamGetc(stream)
+	first_marker_id = core.PhpStreamGetc(stream)
 
 	/* Ensure that this marker is SIZ (as is mandated by the standard) */
 
-	if first_marker_id != 0x51 {
-		core.PhpErrorDocref(nil, 1<<1, "JPEG2000 codestream corrupt(Expected SIZ marker not found after SOC)")
+	if first_marker_id != JPEG2000_MARKER_SIZ {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "JPEG2000 codestream corrupt(Expected SIZ marker not found after SOC)")
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	PhpRead2(stream)
 	PhpRead2(stream)
 	result.SetWidth(PhpRead4(stream))
 	result.SetHeight(PhpRead4(stream))
-	if streams._phpStreamSeek(stream, 24, 1) != 0 {
-		zend._efree(result)
+	if core.PhpStreamSeek(stream, 24, r.SEEK_CUR) != 0 {
+		zend.Efree(result)
 		return nil
 	}
 	result.SetChannels(PhpRead2(stream))
-	if result.GetChannels() == 0 && streams._phpStreamEof(stream) != 0 || result.GetChannels() > 256 {
-		zend._efree(result)
+	if result.GetChannels() == 0 && core.PhpStreamEof(stream) != 0 || result.GetChannels() > 256 {
+		zend.Efree(result)
 		return nil
 	}
 
@@ -601,13 +547,13 @@ func PhpHandleJpc(stream *core.PhpStream) *Gfxinfo {
 
 	highest_bit_depth = 0
 	for i = 0; i < result.GetChannels(); i++ {
-		bit_depth = streams._phpStreamGetc(stream)
+		bit_depth = core.PhpStreamGetc(stream)
 		bit_depth++
 		if bit_depth > highest_bit_depth {
 			highest_bit_depth = bit_depth
 		}
-		streams._phpStreamGetc(stream)
-		streams._phpStreamGetc(stream)
+		core.PhpStreamGetc(stream)
+		core.PhpStreamGetc(stream)
 	}
 	result.SetBits(highest_bit_depth)
 	return result
@@ -635,7 +581,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 		/* TBox */
 
-		if streams._phpStreamRead(stream, any(&box_type), g.SizeOf("box_type")) != g.SizeOf("box_type") {
+		if core.PhpStreamRead(stream, any(&box_type), b.SizeOf("box_type")) != b.SizeOf("box_type") {
 
 			/* Use this as a general "out of stream" error */
 
@@ -657,7 +603,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 			/* Skip the first 3 bytes to emulate the file type examination */
 
-			streams._phpStreamSeek(stream, 3, 1)
+			core.PhpStreamSeek(stream, 3, r.SEEK_CUR)
 			result = PhpHandleJpc(stream)
 			break
 		}
@@ -670,7 +616,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 		/* Skip over LBox (Which includes both TBox and LBox itself */
 
-		if streams._phpStreamSeek(stream, box_length-8, 1) != 0 {
+		if core.PhpStreamSeek(stream, box_length-8, r.SEEK_CUR) != 0 {
 			break
 		}
 
@@ -678,7 +624,7 @@ func PhpHandleJp2(stream *core.PhpStream) *Gfxinfo {
 
 	}
 	if result == nil {
-		core.PhpErrorDocref(nil, 1<<1, "JP2 file has no codestreams at root level")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "JP2 file has no codestreams at root level")
 	}
 	return result
 }
@@ -689,39 +635,25 @@ var PhpTiffBytesPerFormat []int = []int{0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8}
 
 /* uncompressed only */
 
-// #define TAG_IMAGEWIDTH       0x0100
-
-// #define TAG_IMAGEHEIGHT       0x0101
+const TAG_IMAGEWIDTH = 0x100
+const TAG_IMAGEHEIGHT = 0x101
 
 /* compressed images only */
 
-// #define TAG_COMP_IMAGEWIDTH       0xA002
-
-// #define TAG_COMP_IMAGEHEIGHT       0xA003
-
-// #define TAG_FMT_BYTE       1
-
-// #define TAG_FMT_STRING       2
-
-// #define TAG_FMT_USHORT       3
-
-// #define TAG_FMT_ULONG       4
-
-// #define TAG_FMT_URATIONAL       5
-
-// #define TAG_FMT_SBYTE       6
-
-// #define TAG_FMT_UNDEFINED       7
-
-// #define TAG_FMT_SSHORT       8
-
-// #define TAG_FMT_SLONG       9
-
-// #define TAG_FMT_SRATIONAL       10
-
-// #define TAG_FMT_SINGLE       11
-
-// #define TAG_FMT_DOUBLE       12
+const TAG_COMP_IMAGEWIDTH = 0xa002
+const TAG_COMP_IMAGEHEIGHT = 0xa003
+const TAG_FMT_BYTE = 1
+const TAG_FMT_STRING = 2
+const TAG_FMT_USHORT = 3
+const TAG_FMT_ULONG = 4
+const TAG_FMT_URATIONAL = 5
+const TAG_FMT_SBYTE = 6
+const TAG_FMT_UNDEFINED = 7
+const TAG_FMT_SSHORT = 8
+const TAG_FMT_SLONG = 9
+const TAG_FMT_SRATIONAL = 10
+const TAG_FMT_SINGLE = 11
+const TAG_FMT_DOUBLE = 12
 
 /* }}} */
 
@@ -772,25 +704,25 @@ func PhpHandleTiff(stream *core.PhpStream, info *zend.Zval, motorola_intel int) 
 	var entry_type int
 	var ifd_data *byte
 	var ifd_ptr []*byte
-	if streams._phpStreamRead(stream, ifd_ptr, 4) != 4 {
+	if core.PhpStreamRead(stream, ifd_ptr, 4) != 4 {
 		return nil
 	}
 	ifd_addr = PhpIfdGet32u(ifd_ptr, motorola_intel)
-	if streams._phpStreamSeek(stream, ifd_addr-8, 1) != 0 {
+	if core.PhpStreamSeek(stream, ifd_addr-8, r.SEEK_CUR) != 0 {
 		return nil
 	}
 	ifd_size = 2
-	ifd_data = zend._emalloc(ifd_size)
-	if streams._phpStreamRead(stream, ifd_data, 2) != 2 {
-		zend._efree(ifd_data)
+	ifd_data = zend.Emalloc(ifd_size)
+	if core.PhpStreamRead(stream, ifd_data, 2) != 2 {
+		zend.Efree(ifd_data)
 		return nil
 	}
 	num_entries = PhpIfdGet16u(ifd_data, motorola_intel)
 	dir_size = 2 + 12*num_entries + 4
 	ifd_size = dir_size
-	ifd_data = zend._erealloc(ifd_data, ifd_size)
-	if streams._phpStreamRead(stream, ifd_data+2, dir_size-2) != dir_size-2 {
-		zend._efree(ifd_data)
+	ifd_data = zend.Erealloc(ifd_data, ifd_size)
+	if core.PhpStreamRead(stream, ifd_data+2, dir_size-2) != dir_size-2 {
+		zend.Efree(ifd_data)
 		return nil
 	}
 
@@ -802,45 +734,45 @@ func PhpHandleTiff(stream *core.PhpStream, info *zend.Zval, motorola_intel int) 
 		entry_tag = PhpIfdGet16u(dir_entry+0, motorola_intel)
 		entry_type = PhpIfdGet16u(dir_entry+2, motorola_intel)
 		switch entry_type {
-		case 1:
+		case TAG_FMT_BYTE:
 
-		case 6:
+		case TAG_FMT_SBYTE:
 			entry_value = size_t(dir_entry[8])
 			break
-		case 3:
+		case TAG_FMT_USHORT:
 			entry_value = PhpIfdGet16u(dir_entry+8, motorola_intel)
 			break
-		case 8:
+		case TAG_FMT_SSHORT:
 			entry_value = PhpIfdGet16s(dir_entry+8, motorola_intel)
 			break
-		case 4:
+		case TAG_FMT_ULONG:
 			entry_value = PhpIfdGet32u(dir_entry+8, motorola_intel)
 			break
-		case 9:
+		case TAG_FMT_SLONG:
 			entry_value = PhpIfdGet32s(dir_entry+8, motorola_intel)
 			break
 		default:
 			continue
 		}
 		switch entry_tag {
-		case 0x100:
+		case TAG_IMAGEWIDTH:
 
-		case 0xa002:
+		case TAG_COMP_IMAGEWIDTH:
 			width = entry_value
 			break
-		case 0x101:
+		case TAG_IMAGEHEIGHT:
 
-		case 0xa003:
+		case TAG_COMP_IMAGEHEIGHT:
 			height = entry_value
 			break
 		}
 	}
-	zend._efree(ifd_data)
+	zend.Efree(ifd_data)
 	if width != 0 && height != 0 {
 
 		/* not the same when in for-loop */
 
-		result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+		result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 		result.SetHeight(height)
 		result.SetWidth(width)
 		result.SetBits(0)
@@ -860,7 +792,7 @@ func PhpHandleIff(stream *core.PhpStream) *Gfxinfo {
 	var width short
 	var height short
 	var bits short
-	if streams._phpStreamRead(stream, (*byte)(a), 8) != 8 {
+	if core.PhpStreamRead(stream, (*byte)(a), 8) != 8 {
 		return nil
 	}
 	if strncmp((*byte)(a+4), "ILBM", 4) && strncmp((*byte)(a+4), "PBM ", 4) {
@@ -870,7 +802,7 @@ func PhpHandleIff(stream *core.PhpStream) *Gfxinfo {
 	/* loop chunks to find BMHD chunk */
 
 	for {
-		if streams._phpStreamRead(stream, (*byte)(a), 8) != 8 {
+		if core.PhpStreamRead(stream, (*byte)(a), 8) != 8 {
 			return nil
 		}
 		chunkId = PhpIfdGet32s(a+0, 1)
@@ -882,14 +814,14 @@ func PhpHandleIff(stream *core.PhpStream) *Gfxinfo {
 			size++
 		}
 		if chunkId == 0x424d4844 {
-			if size < 9 || streams._phpStreamRead(stream, (*byte)(a), 9) != 9 {
+			if size < 9 || core.PhpStreamRead(stream, (*byte)(a), 9) != 9 {
 				return nil
 			}
 			width = PhpIfdGet16s(a+0, 1)
 			height = PhpIfdGet16s(a+2, 1)
 			bits = a[8] & 0xff
 			if width > 0 && height > 0 && bits > 0 && bits < 33 {
-				result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+				result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 				result.SetWidth(width)
 				result.SetHeight(height)
 				result.SetBits(bits)
@@ -897,7 +829,7 @@ func PhpHandleIff(stream *core.PhpStream) *Gfxinfo {
 				return result
 			}
 		} else {
-			if streams._phpStreamSeek(stream, size, 1) != 0 {
+			if core.PhpStreamSeek(stream, size, r.SEEK_CUR) != 0 {
 				return nil
 			}
 		}
@@ -913,20 +845,20 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 	var i int
 	var width int = 0
 	var height int = 0
-	if streams._phpStreamSeek(stream, 0, 0) != 0 {
+	if core.PhpStreamRewind(stream) != 0 {
 		return 0
 	}
 
 	/* get type */
 
-	if streams._phpStreamGetc(stream) != 0 {
+	if core.PhpStreamGetc(stream) != 0 {
 		return 0
 	}
 
 	/* skip header */
 
 	for {
-		i = streams._phpStreamGetc(stream)
+		i = core.PhpStreamGetc(stream)
 		if i < 0 {
 			return 0
 		}
@@ -938,7 +870,7 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 	/* get width */
 
 	for {
-		i = streams._phpStreamGetc(stream)
+		i = core.PhpStreamGetc(stream)
 		if i < 0 {
 			return 0
 		}
@@ -960,7 +892,7 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 	/* get height */
 
 	for {
-		i = streams._phpStreamGetc(stream)
+		i = core.PhpStreamGetc(stream)
 		if i < 0 {
 			return 0
 		}
@@ -991,9 +923,9 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 /* }}} */
 
 func PhpHandleWbmp(stream *core.PhpStream) *Gfxinfo {
-	var result *Gfxinfo = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	var result *Gfxinfo = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	if PhpGetWbmp(stream, &result, 0) == 0 {
-		zend._efree(result)
+		zend.Efree(result)
 		return nil
 	}
 	return result
@@ -1011,13 +943,13 @@ func PhpGetXbm(stream *core.PhpStream, result **Gfxinfo) int {
 	if result != nil {
 		*result = nil
 	}
-	if streams._phpStreamSeek(stream, 0, 0) != 0 {
+	if core.PhpStreamRewind(stream) != 0 {
 		return 0
 	}
-	for g.Assign(&fline, streams._phpStreamGetLine(stream, nil, 0, nil)) != nil {
-		iname = zend._estrdup(fline)
+	for b.Assign(&fline, core.PhpStreamGets(stream, nil, 0)) != nil {
+		iname = zend.Estrdup(fline)
 		if sscanf(fline, "#define %s %d", iname, &value) == 2 {
-			if !(g.Assign(&type_, strrchr(iname, '_'))) {
+			if !(b.Assign(&type_, strrchr(iname, '_'))) {
 				type_ = iname
 			} else {
 				type_++
@@ -1025,27 +957,27 @@ func PhpGetXbm(stream *core.PhpStream, result **Gfxinfo) int {
 			if !(strcmp("width", type_)) {
 				width = uint(value)
 				if height != 0 {
-					zend._efree(iname)
+					zend.Efree(iname)
 					break
 				}
 			}
 			if !(strcmp("height", type_)) {
 				height = uint(value)
 				if width != 0 {
-					zend._efree(iname)
+					zend.Efree(iname)
 					break
 				}
 			}
 		}
-		zend._efree(fline)
-		zend._efree(iname)
+		zend.Efree(fline)
+		zend.Efree(iname)
 	}
 	if fline != nil {
-		zend._efree(fline)
+		zend.Efree(fline)
 	}
 	if width != 0 && height != 0 {
 		if result != nil {
-			*result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+			*result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 			(*result).SetWidth(width)
 			(*result).SetHeight(height)
 		}
@@ -1068,16 +1000,16 @@ func PhpHandleIco(stream *core.PhpStream) *Gfxinfo {
 	var result *Gfxinfo = nil
 	var dim []uint8
 	var num_icons int = 0
-	if streams._phpStreamRead(stream, (*byte)(dim), 2) != 2 {
+	if core.PhpStreamRead(stream, (*byte)(dim), 2) != 2 {
 		return nil
 	}
 	num_icons = (uint(dim[1]) << 8) + uint(dim[0])
 	if num_icons < 1 || num_icons > 255 {
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	for num_icons > 0 {
-		if streams._phpStreamRead(stream, (*byte)(dim), g.SizeOf("dim")) != g.SizeOf("dim") {
+		if core.PhpStreamRead(stream, (*byte)(dim), b.SizeOf("dim")) != b.SizeOf("dim") {
 			break
 		}
 		if (uint(dim[7])<<8)+uint(dim[6]) >= result.GetBits() {
@@ -1103,7 +1035,7 @@ func PhpHandleWebp(stream *core.PhpStream) *Gfxinfo {
 	var sig []byte = []byte{'V', 'P', '8'}
 	var buf []uint8
 	var format byte
-	if streams._phpStreamRead(stream, (*byte)(buf), 18) != 18 {
+	if core.PhpStreamRead(stream, (*byte)(buf), 18) != 18 {
 		return nil
 	}
 	if memcmp(buf, sig, 3) {
@@ -1120,7 +1052,7 @@ func PhpHandleWebp(stream *core.PhpStream) *Gfxinfo {
 	default:
 		return nil
 	}
-	result = (*Gfxinfo)(zend._ecalloc(1, g.SizeOf("struct gfxinfo")))
+	result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
 	switch format {
 	case ' ':
 		result.SetWidth(buf[14] + ((buf[15] & 0x3f) << 8))
@@ -1190,7 +1122,7 @@ func ZifImageTypeToMimeType(execute_data *zend.ZendExecuteData, return_value *ze
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1198,7 +1130,7 @@ func ZifImageTypeToMimeType(execute_data *zend.ZendExecuteData, return_value *ze
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1207,52 +1139,42 @@ func ZifImageTypeToMimeType(execute_data *zend.ZendExecuteData, return_value *ze
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &p_image_type, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &p_image_type, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1263,11 +1185,7 @@ func ZifImageTypeToMimeType(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 		break
 	}
-	var _s *byte = (*byte)(PhpImageTypeToMimeType(p_image_type))
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = zend.ZendStringInit(_s, strlen(_s), 0)
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	zend.ZVAL_STRING(return_value, (*byte)(PhpImageTypeToMimeType(p_image_type)))
 }
 
 /* }}} */
@@ -1280,7 +1198,7 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1288,7 +1206,7 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1297,76 +1215,56 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &image_type, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &image_type, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &inc_dot, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &inc_dot, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
@@ -1425,14 +1323,10 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 		break
 	}
 	if imgext != nil {
-		var _s *byte = &imgext[!inc_dot]
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendStringInit(_s, strlen(_s), 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
+		zend.RETVAL_STRING(&imgext[!inc_dot])
 		return
 	}
-	return_value.u1.type_info = 2
+	zend.RETVAL_FALSE
 	return
 }
 
@@ -1444,8 +1338,8 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 	if filetype == nil {
 		filetype = tmp
 	}
-	if streams._phpStreamRead(stream, filetype, 3) != 3 {
-		core.PhpErrorDocref(nil, 1<<3, "Read error!")
+	if core.PhpStreamRead(stream, filetype, 3) != 3 {
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 
@@ -1456,14 +1350,14 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 	} else if !(memcmp(filetype, PhpSigJpg, 3)) {
 		return IMAGE_FILETYPE_JPEG
 	} else if !(memcmp(filetype, PhpSigPng, 3)) {
-		if streams._phpStreamRead(stream, filetype+3, 5) != 5 {
-			core.PhpErrorDocref(nil, 1<<3, "Read error!")
+		if core.PhpStreamRead(stream, filetype+3, 5) != 5 {
+			core.PhpErrorDocref(nil, zend.E_NOTICE, "Read error!")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 		if !(memcmp(filetype, PhpSigPng, 8)) {
 			return IMAGE_FILETYPE_PNG
 		} else {
-			core.PhpErrorDocref(nil, 1<<1, "PNG file corrupted by ASCII conversion")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "PNG file corrupted by ASCII conversion")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 	} else if !(memcmp(filetype, PhpSigSwf, 3)) {
@@ -1477,8 +1371,8 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 	} else if !(memcmp(filetype, PhpSigJpc, 3)) {
 		return IMAGE_FILETYPE_JPC
 	} else if !(memcmp(filetype, PhpSigRiff, 3)) {
-		if streams._phpStreamRead(stream, filetype+3, 9) != 9 {
-			core.PhpErrorDocref(nil, 1<<3, "Read error!")
+		if core.PhpStreamRead(stream, filetype+3, 9) != 9 {
+			core.PhpErrorDocref(nil, zend.E_NOTICE, "Read error!")
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 		if !(memcmp(filetype+8, PhpSigWebp, 4)) {
@@ -1487,8 +1381,8 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 			return IMAGE_FILETYPE_UNKNOWN
 		}
 	}
-	if streams._phpStreamRead(stream, filetype+3, 1) != 1 {
-		core.PhpErrorDocref(nil, 1<<3, "Read error!")
+	if core.PhpStreamRead(stream, filetype+3, 1) != 1 {
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 
@@ -1506,7 +1400,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 
 	/* WBMP may be smaller than 12 bytes, so delay error */
 
-	twelve_bytes_read = streams._phpStreamRead(stream, filetype+4, 8) == 8
+	twelve_bytes_read = core.PhpStreamRead(stream, filetype+4, 8) == 8
 
 	/* BYTES READ: 12 */
 
@@ -1520,7 +1414,7 @@ func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
 		return IMAGE_FILETYPE_WBMP
 	}
 	if twelve_bytes_read == 0 {
-		core.PhpErrorDocref(nil, 1<<3, "Read error!")
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "Read error!")
 		return IMAGE_FILETYPE_UNKNOWN
 	}
 	if PhpGetXbm(stream, nil) != 0 {
@@ -1535,7 +1429,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 	var itype int = 0
 	var result *Gfxinfo = nil
 	if stream == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	itype = PhpGetimagetype(stream, nil)
@@ -1557,7 +1451,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 		result = PhpHandleSwf(stream)
 		break
 	case IMAGE_FILETYPE_SWC:
-		core.PhpErrorDocref(nil, 1<<3, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled")
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled")
 		break
 	case IMAGE_FILETYPE_PSD:
 		result = PhpHandlePsd(stream)
@@ -1599,46 +1493,42 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 	}
 	if result != nil {
 		var temp []byte
-		var __arr *zend.ZendArray = zend._zendNewArray(0)
-		var __z *zend.Zval = return_value
-		__z.value.arr = __arr
-		__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+		zend.ArrayInit(return_value)
 		zend.AddIndexLong(return_value, 0, result.GetWidth())
 		zend.AddIndexLong(return_value, 1, result.GetHeight())
 		zend.AddIndexLong(return_value, 2, itype)
-		core.ApPhpSnprintf(temp, g.SizeOf("temp"), "width=\"%d\" height=\"%d\"", result.GetWidth(), result.GetHeight())
+		core.Snprintf(temp, b.SizeOf("temp"), "width=\"%d\" height=\"%d\"", result.GetWidth(), result.GetHeight())
 		zend.AddIndexString(return_value, 3, temp)
 		if result.GetBits() != 0 {
-			zend.AddAssocLongEx(return_value, "bits", strlen("bits"), result.GetBits())
+			zend.AddAssocLong(return_value, "bits", result.GetBits())
 		}
 		if result.GetChannels() != 0 {
-			zend.AddAssocLongEx(return_value, "channels", strlen("channels"), result.GetChannels())
+			zend.AddAssocLong(return_value, "channels", result.GetChannels())
 		}
-		zend.AddAssocStringEx(return_value, "mime", strlen("mime"), (*byte)(PhpImageTypeToMimeType(itype)))
-		zend._efree(result)
+		zend.AddAssocString(return_value, "mime", (*byte)(PhpImageTypeToMimeType(itype)))
+		zend.Efree(result)
 	} else {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 }
 
 /* }}} */
 
-// #define FROM_DATA       0
-
-// #define FROM_PATH       1
+const FROM_DATA = 0
+const FROM_PATH = 1
 
 func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
 	var info *zend.Zval = nil
 	var stream *core.PhpStream = nil
 	var input *byte
 	var input_len int
-	var argc int = execute_data.This.u2.num_args
+	var argc int = zend.ZEND_NUM_ARGS()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1646,7 +1536,7 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1655,65 +1545,45 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &input, &input_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &input, &input_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &info, 0)
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1724,8 +1594,8 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 		break
 	}
-	if mode == 1 && strlen(input) != size_t(input_len) {
-		core.PhpErrorDocref(nil, 1<<1, "Invalid path")
+	if mode == FROM_PATH && zend.CHECK_NULL_PATH(input, input_len) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path")
 		return
 	}
 	if argc == 2 {
@@ -1734,29 +1604,29 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 			return
 		}
 	}
-	if mode == 1 {
-		stream = streams._phpStreamOpenWrapperEx(input, "rb", 0x10|0x8|0x0, nil, nil)
+	if mode == FROM_PATH {
+		stream = core.PhpStreamOpenWrapper(input, "rb", core.STREAM_MUST_SEEK|core.REPORT_ERRORS|core.IGNORE_PATH, nil)
 	} else {
-		stream = streams._phpStreamMemoryOpen(0x1, input, input_len)
+		stream = core.PhpStreamMemoryOpen(core.TEMP_STREAM_READONLY, input, input_len)
 	}
 	if stream == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	PhpGetimagesizeFromStream(stream, info, execute_data, return_value)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 }
 
 /* }}} */
 
 func ZifGetimagesize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpGetimagesizeFromAny(execute_data, return_value, 1)
+	PhpGetimagesizeFromAny(execute_data, return_value, FROM_PATH)
 }
 
 /* }}} */
 
 func ZifGetimagesizefromstring(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpGetimagesizeFromAny(execute_data, return_value, 0)
+	PhpGetimagesizeFromAny(execute_data, return_value, FROM_DATA)
 }
 
 /* }}} */

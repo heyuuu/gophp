@@ -4,8 +4,6 @@ package standard
 
 import (
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -55,59 +53,59 @@ import (
 func ZmStartupSyslog(type_ int, module_number int) int {
 	/* error levels */
 
-	zend.ZendRegisterLongConstant("LOG_EMERG", g.SizeOf("\"LOG_EMERG\"")-1, LOG_EMERG, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_ALERT", g.SizeOf("\"LOG_ALERT\"")-1, LOG_ALERT, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_CRIT", g.SizeOf("\"LOG_CRIT\"")-1, LOG_CRIT, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_ERR", g.SizeOf("\"LOG_ERR\"")-1, LOG_ERR, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_WARNING", g.SizeOf("\"LOG_WARNING\"")-1, LOG_WARNING, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_NOTICE", g.SizeOf("\"LOG_NOTICE\"")-1, LOG_NOTICE, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_INFO", g.SizeOf("\"LOG_INFO\"")-1, LOG_INFO, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_DEBUG", g.SizeOf("\"LOG_DEBUG\"")-1, LOG_DEBUG, 1<<0|1<<1, module_number)
+	zend.REGISTER_LONG_CONSTANT("LOG_EMERG", LOG_EMERG, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_ALERT", LOG_ALERT, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_CRIT", LOG_CRIT, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_ERR", LOG_ERR, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_WARNING", LOG_WARNING, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_NOTICE", LOG_NOTICE, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_INFO", LOG_INFO, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_DEBUG", LOG_DEBUG, zend.CONST_CS|zend.CONST_PERSISTENT)
 
 	/* facility: type of program logging the message */
 
-	zend.ZendRegisterLongConstant("LOG_KERN", g.SizeOf("\"LOG_KERN\"")-1, LOG_KERN, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_USER", g.SizeOf("\"LOG_USER\"")-1, LOG_USER, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_MAIL", g.SizeOf("\"LOG_MAIL\"")-1, LOG_MAIL, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_DAEMON", g.SizeOf("\"LOG_DAEMON\"")-1, LOG_DAEMON, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_AUTH", g.SizeOf("\"LOG_AUTH\"")-1, LOG_AUTH, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_SYSLOG", g.SizeOf("\"LOG_SYSLOG\"")-1, LOG_SYSLOG, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LPR", g.SizeOf("\"LOG_LPR\"")-1, LOG_LPR, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL0", g.SizeOf("\"LOG_LOCAL0\"")-1, LOG_LOCAL0, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL1", g.SizeOf("\"LOG_LOCAL1\"")-1, LOG_LOCAL1, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL2", g.SizeOf("\"LOG_LOCAL2\"")-1, LOG_LOCAL2, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL3", g.SizeOf("\"LOG_LOCAL3\"")-1, LOG_LOCAL3, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL4", g.SizeOf("\"LOG_LOCAL4\"")-1, LOG_LOCAL4, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL5", g.SizeOf("\"LOG_LOCAL5\"")-1, LOG_LOCAL5, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL6", g.SizeOf("\"LOG_LOCAL6\"")-1, LOG_LOCAL6, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_LOCAL7", g.SizeOf("\"LOG_LOCAL7\"")-1, LOG_LOCAL7, 1<<0|1<<1, module_number)
+	zend.REGISTER_LONG_CONSTANT("LOG_KERN", LOG_KERN, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_USER", LOG_USER, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_MAIL", LOG_MAIL, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_DAEMON", LOG_DAEMON, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_AUTH", LOG_AUTH, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_SYSLOG", LOG_SYSLOG, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LPR", LOG_LPR, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL0", LOG_LOCAL0, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL1", LOG_LOCAL1, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL2", LOG_LOCAL2, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL3", LOG_LOCAL3, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL4", LOG_LOCAL4, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL5", LOG_LOCAL5, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL6", LOG_LOCAL6, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_LOCAL7", LOG_LOCAL7, zend.CONST_CS|zend.CONST_PERSISTENT)
 
 	/* options */
 
-	zend.ZendRegisterLongConstant("LOG_PID", g.SizeOf("\"LOG_PID\"")-1, LOG_PID, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_CONS", g.SizeOf("\"LOG_CONS\"")-1, LOG_CONS, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_ODELAY", g.SizeOf("\"LOG_ODELAY\"")-1, LOG_ODELAY, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("LOG_NDELAY", g.SizeOf("\"LOG_NDELAY\"")-1, LOG_NDELAY, 1<<0|1<<1, module_number)
-	BasicGlobals.SetSyslogDevice(nil)
+	zend.REGISTER_LONG_CONSTANT("LOG_PID", LOG_PID, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_CONS", LOG_CONS, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_ODELAY", LOG_ODELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("LOG_NDELAY", LOG_NDELAY, zend.CONST_CS|zend.CONST_PERSISTENT)
+	BG(syslog_device) = nil
 	return zend.SUCCESS
 }
 
 /* }}} */
 
 func ZmActivateSyslog(type_ int, module_number int) int {
-	BasicGlobals.SetSyslogDevice(nil)
+	BG(syslog_device) = nil
 	return zend.SUCCESS
 }
 func ZmShutdownSyslog(type_ int, module_number int) int {
-	if BasicGlobals.GetSyslogDevice() != nil {
-		zend.Free(BasicGlobals.GetSyslogDevice())
-		BasicGlobals.SetSyslogDevice(nil)
+	if BG(syslog_device) {
+		zend.Free(BG(syslog_device))
+		BG(syslog_device) = nil
 	}
 	return zend.SUCCESS
 }
 func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
-	core.CoreGlobals.have_called_openlog = 1
+	core.PG(have_called_openlog) = 1
 }
 
 /* {{{ proto bool openlog(string ident, int option, int facility)
@@ -122,7 +120,7 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -130,7 +128,7 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -139,84 +137,54 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &ident, &ident_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &ident, &ident_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &option, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &option, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &facility, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &facility, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -227,34 +195,31 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if BasicGlobals.GetSyslogDevice() != nil {
-		zend.Free(BasicGlobals.GetSyslogDevice())
+	if BG(syslog_device) {
+		zend.Free(BG(syslog_device))
 	}
-	BasicGlobals.SetSyslogDevice(zend.ZendStrndup(ident, ident_len))
-	if BasicGlobals.GetSyslogDevice() == nil {
-		return_value.u1.type_info = 2
+	BG(syslog_device) = zend.ZendStrndup(ident, ident_len)
+	if BG(syslog_device) == nil {
+		zend.RETVAL_FALSE
 		return
 	}
-	PhpOpenlog(BasicGlobals.GetSyslogDevice(), option, facility)
-	return_value.u1.type_info = 3
+	PhpOpenlog(BG(syslog_device), option, facility)
+	zend.RETVAL_TRUE
 	return
 }
 
 /* }}} */
 
 func ZifCloselog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	closelog()
-	if BasicGlobals.GetSyslogDevice() != nil {
-		zend.Free(BasicGlobals.GetSyslogDevice())
-		BasicGlobals.SetSyslogDevice(nil)
+	if BG(syslog_device) {
+		zend.Free(BG(syslog_device))
+		BG(syslog_device) = nil
 	}
-	return_value.u1.type_info = 3
+	zend.RETVAL_TRUE
 	return
 }
 
@@ -268,7 +233,7 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -276,7 +241,7 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -285,68 +250,48 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &priority, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &priority, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &message, &message_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &message, &message_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -358,7 +303,7 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	core.PhpSyslog(priority, "%s", message)
-	return_value.u1.type_info = 3
+	zend.RETVAL_TRUE
 	return
 }
 

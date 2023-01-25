@@ -38,10 +38,13 @@ type PhpUnserializeDataT *PhpUnserializeData
 var PhpVarUnserializeRef func(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int
 var PhpVarUnserializeIntern func(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int
 
-// #define PHP_VAR_SERIALIZE_INIT(d) ( d ) = php_var_serialize_init ( )
-
-// #define PHP_VAR_SERIALIZE_DESTROY(d) php_var_serialize_destroy ( d )
-
-// #define PHP_VAR_UNSERIALIZE_INIT(d) ( d ) = php_var_unserialize_init ( )
-
-// #define PHP_VAR_UNSERIALIZE_DESTROY(d) php_var_unserialize_destroy ( d )
+func PHP_VAR_SERIALIZE_INIT(d PhpSerializeDataT) PhpSerializeDataT {
+	d = PhpVarSerializeInit()
+	return d
+}
+func PHP_VAR_SERIALIZE_DESTROY(d PhpSerializeDataT) { PhpVarSerializeDestroy(d) }
+func PHP_VAR_UNSERIALIZE_INIT(d PhpUnserializeDataT) PhpUnserializeDataT {
+	d = PhpVarUnserializeInit()
+	return d
+}
+func PHP_VAR_UNSERIALIZE_DESTROY(d PhpUnserializeDataT) { PhpVarUnserializeDestroy(d) }

@@ -3,8 +3,8 @@
 package zend
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 )
 
 // Source: <Zend/zend_stream.h>
@@ -44,7 +44,7 @@ type ZendStreamFsizerT func(handle any) int
 type ZendStreamReaderT func(handle any, buf *byte, len_ int) ssize_t
 type ZendStreamCloserT func(handle any)
 
-// #define ZEND_MMAP_AHEAD       32
+const ZEND_MMAP_AHEAD = 32
 
 type ZendStreamType = int
 
@@ -56,15 +56,11 @@ const (
 
 type ZendStatT = __struct__stat
 
-// #define zend_fseek       fseek
-
-// #define zend_ftell       ftell
-
-// #define zend_lseek       lseek
-
-// #define zend_fstat       fstat
-
-// #define zend_stat       stat
+const ZendFseek = r.Fseek
+const ZendFtell = r.Ftell
+const ZendLseek = lseek
+const ZendFstat = fstat
+const ZendStat = stat
 
 // Source: <Zend/zend_stream.c>
 
@@ -107,26 +103,26 @@ func ZendStreamStdioCloser(handle any) {
 }
 func ZendStreamStdioFsizer(handle any) int {
 	var buf ZendStatT
-	if handle && fstat(fileno((*r.FILE)(handle)), &buf) == 0 {
+	if handle && ZendFstat(fileno((*r.FILE)(handle)), &buf) == 0 {
 		return buf.st_size
 	}
 	return -1
 }
 func ZendStreamFsize(file_handle *ZendFileHandle) int {
-	r.Assert(file_handle.GetType() == ZEND_HANDLE_STREAM)
+	ZEND_ASSERT(file_handle.GetType() == ZEND_HANDLE_STREAM)
 	if file_handle.GetStream().GetIsatty() != 0 {
 		return 0
 	}
 	return file_handle.GetStream().GetFsizer()(file_handle.GetStream().GetHandle())
 }
 func ZendStreamInitFp(handle *ZendFileHandle, fp *r.FILE, filename string) {
-	memset(handle, 0, g.SizeOf("zend_file_handle"))
+	memset(handle, 0, b.SizeOf("zend_file_handle"))
 	handle.SetType(ZEND_HANDLE_FP)
 	handle.SetFp(fp)
 	handle.SetFilename(filename)
 }
 func ZendStreamInitFilename(handle *ZendFileHandle, filename *byte) {
-	memset(handle, 0, g.SizeOf("zend_file_handle"))
+	memset(handle, 0, b.SizeOf("zend_file_handle"))
 	handle.SetType(ZEND_HANDLE_FILENAME)
 	handle.SetFilename(filename)
 }
@@ -145,20 +141,20 @@ func ZendStreamOpen(filename *byte, handle *ZendFileHandle) int {
 }
 func ZendStreamGetc(file_handle *ZendFileHandle) int {
 	var buf byte
-	if file_handle.GetStream().GetReader()(file_handle.GetStream().GetHandle(), &buf, g.SizeOf("buf")) {
+	if file_handle.GetStream().GetReader()(file_handle.GetStream().GetHandle(), &buf, b.SizeOf("buf")) {
 		return int(buf)
 	}
-	return -1
+	return r.EOF
 }
 func ZendStreamRead(file_handle *ZendFileHandle, buf *byte, len_ int) ssize_t {
 	if file_handle.GetStream().GetIsatty() != 0 {
 		var c int = '*'
 		var n int
-		for n = 0; n < len_ && g.Assign(&c, ZendStreamGetc(file_handle)) != -1 && c != '\n'; n++ {
+		for n = 0; n < len_ && b.Assign(&c, ZendStreamGetc(file_handle)) != r.EOF && c != '\n'; n++ {
 			buf[n] = byte(c)
 		}
 		if c == '\n' {
-			buf[g.PostInc(&n)] = byte(c)
+			buf[b.PostInc(&n)] = byte(c)
 		}
 		return n
 	}
@@ -194,12 +190,12 @@ func ZendStreamFixup(file_handle *ZendFileHandle, buf **byte, len_ *int) int {
 	if file_size != 0 {
 		var read ssize_t
 		var size int = 0
-		*buf = _safeEmalloc(1, file_size, 32)
-		for g.Assign(&read, ZendStreamRead(file_handle, (*buf)+size, file_size-size)) > 0 {
+		*buf = SafeEmalloc(1, file_size, ZEND_MMAP_AHEAD)
+		for b.Assign(&read, ZendStreamRead(file_handle, (*buf)+size, file_size-size)) > 0 {
 			size += read
 		}
 		if read < 0 {
-			_efree(*buf)
+			Efree(*buf)
 			return FAILURE
 		}
 		file_handle.SetBuf(*buf)
@@ -208,30 +204,30 @@ func ZendStreamFixup(file_handle *ZendFileHandle, buf **byte, len_ *int) int {
 		var size int = 0
 		var remain int = 4 * 1024
 		var read ssize_t
-		*buf = _emalloc(remain)
-		for g.Assign(&read, ZendStreamRead(file_handle, (*buf)+size, remain)) > 0 {
+		*buf = Emalloc(remain)
+		for b.Assign(&read, ZendStreamRead(file_handle, (*buf)+size, remain)) > 0 {
 			size += read
 			remain -= read
 			if remain == 0 {
-				*buf = _safeErealloc(*buf, size, 2, 0)
+				*buf = SafeErealloc(*buf, size, 2, 0)
 				remain = size
 			}
 		}
 		if read < 0 {
-			_efree(*buf)
+			Efree(*buf)
 			return FAILURE
 		}
 		file_handle.SetLen(size)
-		if size != 0 && remain < 32 {
-			*buf = _safeErealloc(*buf, size, 1, 32)
+		if size != 0 && remain < ZEND_MMAP_AHEAD {
+			*buf = SafeErealloc(*buf, size, 1, ZEND_MMAP_AHEAD)
 		}
 		file_handle.SetBuf(*buf)
 	}
 	if file_handle.GetLen() == 0 {
-		*buf = _erealloc(*buf, 32)
+		*buf = Erealloc(*buf, ZEND_MMAP_AHEAD)
 		file_handle.SetBuf(*buf)
 	}
-	memset(file_handle.GetBuf()+file_handle.GetLen(), 0, 32)
+	memset(file_handle.GetBuf()+file_handle.GetLen(), 0, ZEND_MMAP_AHEAD)
 	*buf = file_handle.GetBuf()
 	*len_ = file_handle.GetLen()
 	return SUCCESS
@@ -260,11 +256,11 @@ func ZendFileHandleDtor(fh *ZendFileHandle) {
 		fh.SetOpenedPath(nil)
 	}
 	if fh.GetBuf() != nil {
-		_efree(fh.GetBuf())
+		Efree(fh.GetBuf())
 		fh.SetBuf(nil)
 	}
 	if fh.GetFreeFilename() != 0 && fh.GetFilename() != nil {
-		_efree((*byte)(fh.GetFilename()))
+		Efree((*byte)(fh.GetFilename()))
 		fh.SetFilename(nil)
 	}
 }

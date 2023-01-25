@@ -3,9 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -31,49 +31,30 @@ import (
 
 // #define HTML_H
 
-// #define ENT_HTML_QUOTE_NONE       0
-
-// #define ENT_HTML_QUOTE_SINGLE       1
-
-// #define ENT_HTML_QUOTE_DOUBLE       2
-
-// #define ENT_HTML_IGNORE_ERRORS       4
-
-// #define ENT_HTML_SUBSTITUTE_ERRORS       8
-
-// #define ENT_HTML_DOC_TYPE_MASK       ( 16 | 32 )
-
-// #define ENT_HTML_DOC_HTML401       0
-
-// #define ENT_HTML_DOC_XML1       16
-
-// #define ENT_HTML_DOC_XHTML       32
-
-// #define ENT_HTML_DOC_HTML5       ( 16 | 32 )
+const ENT_HTML_QUOTE_NONE = 0
+const ENT_HTML_QUOTE_SINGLE = 1
+const ENT_HTML_QUOTE_DOUBLE = 2
+const ENT_HTML_IGNORE_ERRORS = 4
+const ENT_HTML_SUBSTITUTE_ERRORS = 8
+const ENT_HTML_DOC_TYPE_MASK = 16 | 32
+const ENT_HTML_DOC_HTML401 = 0
+const ENT_HTML_DOC_XML1 = 16
+const ENT_HTML_DOC_XHTML = 32
+const ENT_HTML_DOC_HTML5 = 16 | 32
 
 /* reserve bit 6 */
 
-// #define ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS       128
-
-// #define ENT_COMPAT       ENT_HTML_QUOTE_DOUBLE
-
-// #define ENT_QUOTES       ( ENT_HTML_QUOTE_DOUBLE | ENT_HTML_QUOTE_SINGLE )
-
-// #define ENT_NOQUOTES       ENT_HTML_QUOTE_NONE
-
-// #define ENT_IGNORE       ENT_HTML_IGNORE_ERRORS
-
-// #define ENT_SUBSTITUTE       ENT_HTML_SUBSTITUTE_ERRORS
-
-// #define ENT_HTML401       0
-
-// #define ENT_XML1       16
-
-// #define ENT_XHTML       32
-
-// #define ENT_HTML5       ( 16 | 32 )
-
-// #define ENT_DISALLOWED       128
+const ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS = 128
+const ENT_COMPAT zend.ZendLong = ENT_HTML_QUOTE_DOUBLE
+const ENT_QUOTES zend.ZendLong = ENT_HTML_QUOTE_DOUBLE | ENT_HTML_QUOTE_SINGLE
+const ENT_NOQUOTES zend.ZendLong = ENT_HTML_QUOTE_NONE
+const ENT_IGNORE zend.ZendLong = ENT_HTML_IGNORE_ERRORS
+const ENT_SUBSTITUTE zend.ZendLong = ENT_HTML_SUBSTITUTE_ERRORS
+const ENT_HTML401 = 0
+const ENT_XML1 = 16
+const ENT_XHTML = 32
+const ENT_HTML5 zend.ZendLong = 16 | 32
+const ENT_DISALLOWED = 128
 
 // Source: <ext/standard/html.c>
 
@@ -119,38 +100,44 @@ import (
 /* Macro for disabling flag of translation of non-basic entities where this isn't supported.
  * Not appropriate for html_entity_decode/htmlspecialchars_decode */
 
-// #define LIMIT_ALL(all,doctype,charset) do { ( all ) = ( all ) && ! CHARSET_PARTIAL_SUPPORT ( ( charset ) ) && ( ( doctype ) != ENT_HTML_DOC_XML1 ) ; } while ( 0 )
+func LIMIT_ALL(all __auto__, doctype int, charset EntityCharset) {
+	all = all && !(CHARSET_PARTIAL_SUPPORT(charset)) && doctype != ENT_HTML_DOC_XML1
+}
 
 // #define MB_FAILURE(pos,advance) do { * cursor = pos + ( advance ) ; * status = FAILURE ; return 0 ; } while ( 0 )
 
-// #define CHECK_LEN(pos,chars_need) ( ( str_len - ( pos ) ) >= ( chars_need ) )
+func CHECK_LEN(pos int, chars_need int) bool { return str_len-pos >= chars_need }
 
 /* valid as single byte character or leading byte */
 
-// #define utf8_lead(c) ( ( c ) < 0x80 || ( ( c ) >= 0xC2 && ( c ) <= 0xF4 ) )
+func Utf8Lead(c uint8) bool {
+	return c < 0x80 || c >= 0xc2 && c <= 0xf4
+}
 
 /* whether it's actually valid depends on other stuff;
  * this macro cannot check for non-shortest forms, surrogates or
  * code points above 0x10FFFF */
 
-// #define utf8_trail(c) ( ( c ) >= 0x80 && ( c ) <= 0xBF )
-
-// #define gb2312_lead(c) ( ( c ) != 0x8E && ( c ) != 0x8F && ( c ) != 0xA0 && ( c ) != 0xFF )
-
-// #define gb2312_trail(c) ( ( c ) >= 0xA1 && ( c ) <= 0xFE )
-
-// #define sjis_lead(c) ( ( c ) != 0x80 && ( c ) != 0xA0 && ( c ) < 0xFD )
-
-// #define sjis_trail(c) ( ( c ) >= 0x40 && ( c ) != 0x7F && ( c ) < 0xFD )
+func Utf8Trail(c uint8) bool { return c >= 0x80 && c <= 0xbf }
+func Gb2312Lead(c uint8) bool {
+	return c != 0x8e && c != 0x8f && c != 0xa0 && c != 0xff
+}
+func Gb2312Trail(c uint8) bool { return c >= 0xa1 && c <= 0xfe }
+func SjisLead(c uint8) bool {
+	return c != 0x80 && c != 0xa0 && c < 0xfd
+}
+func SjisTrail(c uint8) bool {
+	return c >= 0x40 && c != 0x7f && c < 0xfd
+}
 
 /* {{{ get_default_charset
  */
 
 func GetDefaultCharset() *byte {
-	if core.CoreGlobals.internal_encoding != nil && core.CoreGlobals.internal_encoding[0] {
-		return core.CoreGlobals.internal_encoding
-	} else if core.sapi_globals.default_charset != nil && core.sapi_globals.default_charset[0] {
-		return core.sapi_globals.default_charset
+	if core.PG(internal_encoding) && core.PG(internal_encoding)[0] {
+		return core.PG(internal_encoding)
+	} else if core.SG(default_charset) && core.SG(default_charset)[0] {
+		return core.SG(default_charset)
 	}
 	return nil
 }
@@ -162,7 +149,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 	var this_char uint = 0
 	*status = zend.SUCCESS
 	r.Assert(pos <= str_len)
-	if str_len-pos < 1 {
+	if !(CHECK_LEN(pos, 1)) {
 		*cursor = pos + 1
 		*status = zend.FAILURE
 		return 0
@@ -185,13 +172,13 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			*status = zend.FAILURE
 			return 0
 		} else if c < 0xe0 {
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
 			}
-			if !(str[pos+1] >= 0x80 && str[pos+1] <= 0xbf) {
-				*cursor = pos + g.Cond(str[pos+1] < 0x80 || str[pos+1] >= 0xc2 && str[pos+1] <= 0xf4, 1, 2)
+			if !(Utf8Trail(str[pos+1])) {
+				*cursor = pos + b.Cond(Utf8Lead(str[pos+1]), 1, 2)
 				*status = zend.FAILURE
 				return 0
 			}
@@ -204,12 +191,12 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos += 2
 		} else if c < 0xf0 {
 			var avail int = str_len - pos
-			if avail < 3 || !(str[pos+1] >= 0x80 && str[pos+1] <= 0xbf) || !(str[pos+2] >= 0x80 && str[pos+2] <= 0xbf) {
-				if avail < 2 || (str[pos+1] < 0x80 || str[pos+1] >= 0xc2 && str[pos+1] <= 0xf4) {
+			if avail < 3 || !(Utf8Trail(str[pos+1])) || !(Utf8Trail(str[pos+2])) {
+				if avail < 2 || Utf8Lead(str[pos+1]) {
 					*cursor = pos + 1
 					*status = zend.FAILURE
 					return 0
-				} else if avail < 3 || (str[pos+2] < 0x80 || str[pos+2] >= 0xc2 && str[pos+2] <= 0xf4) {
+				} else if avail < 3 || Utf8Lead(str[pos+2]) {
 					*cursor = pos + 2
 					*status = zend.FAILURE
 					return 0
@@ -232,16 +219,16 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			pos += 3
 		} else if c < 0xf5 {
 			var avail int = str_len - pos
-			if avail < 4 || !(str[pos+1] >= 0x80 && str[pos+1] <= 0xbf) || !(str[pos+2] >= 0x80 && str[pos+2] <= 0xbf) || !(str[pos+3] >= 0x80 && str[pos+3] <= 0xbf) {
-				if avail < 2 || (str[pos+1] < 0x80 || str[pos+1] >= 0xc2 && str[pos+1] <= 0xf4) {
+			if avail < 4 || !(Utf8Trail(str[pos+1])) || !(Utf8Trail(str[pos+2])) || !(Utf8Trail(str[pos+3])) {
+				if avail < 2 || Utf8Lead(str[pos+1]) {
 					*cursor = pos + 1
 					*status = zend.FAILURE
 					return 0
-				} else if avail < 3 || (str[pos+2] < 0x80 || str[pos+2] >= 0xc2 && str[pos+2] <= 0xf4) {
+				} else if avail < 3 || Utf8Lead(str[pos+2]) {
 					*cursor = pos + 2
 					*status = zend.FAILURE
 					return 0
-				} else if avail < 4 || (str[pos+3] < 0x80 || str[pos+3] >= 0xc2 && str[pos+3] <= 0xf4) {
+				} else if avail < 4 || Utf8Lead(str[pos+3]) {
 					*cursor = pos + 3
 					*status = zend.FAILURE
 					return 0
@@ -271,7 +258,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 		var c uint8 = str[pos]
 		if c >= 0x81 && c <= 0xfe {
 			var next uint8
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -294,7 +281,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 		var c uint8 = str[pos]
 		if c >= 0x81 && c <= 0xfe {
 			var next uint8
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -321,15 +308,15 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 		var c uint8 = str[pos]
 		if c >= 0xa1 && c <= 0xfe {
 			var next uint8
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
 			}
 			next = str[pos+1]
-			if next >= 0xa1 && next <= 0xfe {
+			if Gb2312Trail(next) {
 				this_char = c<<8 | next
-			} else if next != 0x8e && next != 0x8f && next != 0xa0 && next != 0xff {
+			} else if Gb2312Lead(next) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -339,7 +326,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				return 0
 			}
 			pos += 2
-		} else if c != 0x8e && c != 0x8f && c != 0xa0 && c != 0xff {
+		} else if Gb2312Lead(c) {
 			this_char = c
 			pos += 1
 		} else {
@@ -352,15 +339,15 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 		var c uint8 = str[pos]
 		if c >= 0x81 && c <= 0x9f || c >= 0xe0 && c <= 0xfc {
 			var next uint8
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
 			}
 			next = str[pos+1]
-			if next >= 0x40 && next != 0x7f && next < 0xfd {
+			if SjisTrail(next) {
 				this_char = c<<8 | next
-			} else if next != 0x80 && next != 0xa0 && next < 0xfd {
+			} else if SjisLead(next) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -383,7 +370,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 		var c uint8 = str[pos]
 		if c >= 0xa1 && c <= 0xfe {
 			var next unsigned
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -398,14 +385,14 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				/* this a jis kanji char */
 
 			} else {
-				*cursor = pos + g.Cond(next != 0xa0 && next != 0xff, 1, 2)
+				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
 				*status = zend.FAILURE
 				return 0
 			}
 			pos += 2
 		} else if c == 0x8e {
 			var next unsigned
-			if str_len-pos < 2 {
+			if !(CHECK_LEN(pos, 2)) {
 				*cursor = pos + 1
 				*status = zend.FAILURE
 				return 0
@@ -420,7 +407,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 				/* JIS X 0201 kana */
 
 			} else {
-				*cursor = pos + g.Cond(next != 0xa0 && next != 0xff, 1, 2)
+				*cursor = pos + b.Cond(next != 0xa0 && next != 0xff, 1, 2)
 				*status = zend.FAILURE
 				return 0
 			}
@@ -467,7 +454,7 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 
 		/* single-byte charsets */
 
-		this_char = str[g.PostInc(&pos)]
+		this_char = str[b.PostInc(&pos)]
 		break
 	}
 	*cursor = pos
@@ -493,13 +480,13 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 	if charset_hint == nil {
 		return CsUtf8
 	}
-	if g.Assign(&len_, strlen(charset_hint)) != 0 {
+	if b.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
 	}
 	zenc = zend.ZendMultibyteGetInternalEncoding()
 	if zenc != nil {
 		charset_hint = (*byte)(zend.ZendMultibyteGetEncodingName(zenc))
-		if charset_hint != nil && g.Assign(&len_, strlen(charset_hint)) != 0 {
+		if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {
 			if len_ == 4 && (!(memcmp("pass", charset_hint, 4)) || !(memcmp("auto", charset_hint, 4))) {
 				charset_hint = nil
 				len_ = 0
@@ -508,8 +495,8 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 			}
 		}
 	}
-	charset_hint = core.sapi_globals.default_charset
-	if charset_hint != nil && g.Assign(&len_, strlen(charset_hint)) != 0 {
+	charset_hint = core.SG(default_charset)
+	if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
 	}
 
@@ -551,7 +538,7 @@ det_charset:
 
 		/* now walk the charset map and look for the codeset */
 
-		for i = 0; i < g.SizeOf("charset_map")/g.SizeOf("charset_map [ 0 ]"); i++ {
+		for i = 0; i < b.SizeOf("charset_map")/b.SizeOf("charset_map [ 0 ]"); i++ {
 			if len_ == CharsetMap[i].codeset_len && zend.ZendBinaryStrcasecmp(charset_hint, len_, CharsetMap[i].codeset, len_) == 0 {
 				charset = CharsetMap[i].charset
 				found = 1
@@ -559,7 +546,7 @@ det_charset:
 			}
 		}
 		if found == 0 {
-			core.PhpErrorDocref(nil, 1<<1, "charset `%s' not supported, assuming utf-8", charset_hint)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "charset `%s' not supported, assuming utf-8", charset_hint)
 		}
 	}
 	return charset
@@ -662,7 +649,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		if code < 0xa4 || code > 0xbe && code <= 0xff {
 			*res = code
 		} else {
-			found = UnimapBsearch(UnimapIso885915, code, g.SizeOf("unimap_iso885915")/g.SizeOf("* unimap_iso885915"))
+			found = UnimapBsearch(UnimapIso885915, code, b.SizeOf("unimap_iso885915")/b.SizeOf("* unimap_iso885915"))
 			if found != 0 {
 				*res = found
 			} else {
@@ -674,7 +661,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		if code <= 0x7f || code >= 0xa0 && code <= 0xff {
 			*res = code
 		} else {
-			found = UnimapBsearch(UnimapWin1252, code, g.SizeOf("unimap_win1252")/g.SizeOf("* unimap_win1252"))
+			found = UnimapBsearch(UnimapWin1252, code, b.SizeOf("unimap_win1252")/b.SizeOf("* unimap_win1252"))
 			if found != 0 {
 				*res = found
 			} else {
@@ -687,19 +674,19 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			return zend.FAILURE
 		}
 		table = UnimapMacroman
-		table_size = g.SizeOf("unimap_macroman") / g.SizeOf("* unimap_macroman")
+		table_size = b.SizeOf("unimap_macroman") / b.SizeOf("* unimap_macroman")
 		goto table_over_7F
 	case CsCp1251:
 		table = UnimapWin1251
-		table_size = g.SizeOf("unimap_win1251") / g.SizeOf("* unimap_win1251")
+		table_size = b.SizeOf("unimap_win1251") / b.SizeOf("* unimap_win1251")
 		goto table_over_7F
 	case CsKoi8r:
 		table = UnimapKoi8r
-		table_size = g.SizeOf("unimap_koi8r") / g.SizeOf("* unimap_koi8r")
+		table_size = b.SizeOf("unimap_koi8r") / b.SizeOf("* unimap_koi8r")
 		goto table_over_7F
 	case CsCp866:
 		table = UnimapCp866
-		table_size = g.SizeOf("unimap_cp866") / g.SizeOf("* unimap_cp866")
+		table_size = b.SizeOf("unimap_cp866") / b.SizeOf("* unimap_cp866")
 	table_over_7F:
 		if code <= 0x7f {
 			*res = code
@@ -750,7 +737,7 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 func MapToUnicode(code unsigned, table *EncToUni, res *unsigned) {
 	/* only single byte encodings are currently supported; assumed code <= 0xFF */
 
-	*res = table.GetInner()[(code&0xc0)>>6].GetUniCp()[code&0x3f]
+	*res = table.GetInner()[ENT_ENC_TO_UNI_STAGE1(code)].GetUniCp()[ENT_ENC_TO_UNI_STAGE2(code)]
 
 	/* only single byte encodings are currently supported; assumed code <= 0xFF */
 }
@@ -783,13 +770,13 @@ func UnicodeCpIsAllowed(uni_cp unsigned, document_type int) int {
 	 */
 
 	switch document_type {
-	case 0:
+	case ENT_HTML_DOC_HTML401:
 		return uni_cp >= 0x20 && uni_cp <= 0x7e || (uni_cp == 0xa || uni_cp == 0x9 || uni_cp == 0xd) || uni_cp >= 0xa0 && uni_cp <= 0xd7ff || uni_cp >= 0xe000 && uni_cp <= 0x10ffff
-	case 16 | 32:
+	case ENT_HTML_DOC_HTML5:
 		return uni_cp >= 0x20 && uni_cp <= 0x7e || uni_cp >= 0x9 && uni_cp <= 0xd && uni_cp != 0xb || uni_cp >= 0xa0 && uni_cp <= 0xd7ff || uni_cp >= 0xe000 && uni_cp <= 0x10ffff && (uni_cp&0xffff) < 0xfffe && (uni_cp < 0xfdd0 || uni_cp > 0xfdef)
-	case 32:
+	case ENT_HTML_DOC_XHTML:
 
-	case 16:
+	case ENT_HTML_DOC_XML1:
 		return uni_cp >= 0x20 && uni_cp <= 0xd7ff || (uni_cp == 0xa || uni_cp == 0x9 || uni_cp == 0xd) || uni_cp >= 0xe000 && uni_cp <= 0x10ffff && uni_cp != 0xfffe && uni_cp != 0xffff
 	default:
 		return 1
@@ -826,13 +813,13 @@ func NumericEntityIsAllowed(uni_cp unsigned, document_type int) int {
 	/* less restrictive than unicode_cp_is_allowed */
 
 	switch document_type {
-	case 0:
+	case ENT_HTML_DOC_HTML401:
 
 		/* all non-SGML characters (those marked with UNUSED in DESCSET) should be
 		 * representable with numeric entities */
 
 		return uni_cp <= 0x10ffff
-	case 16 | 32:
+	case ENT_HTML_DOC_HTML5:
 
 		/* 8.1.4. The numeric character reference forms described above are allowed to
 		 * reference any Unicode code point other than U+0000, U+000D, permanently
@@ -840,9 +827,9 @@ func NumericEntityIsAllowed(uni_cp unsigned, document_type int) int {
 		 * than space characters (U+0009, U+000A, U+000C and U+000D) */
 
 		return uni_cp >= 0x20 && uni_cp <= 0x7e || uni_cp >= 0x9 && uni_cp <= 0xc && uni_cp != 0xb || uni_cp >= 0xa0 && uni_cp <= 0x10ffff && (uni_cp&0xffff) < 0xfffe && (uni_cp < 0xfdd0 || uni_cp > 0xfdef)
-	case 32:
+	case ENT_HTML_DOC_XHTML:
 
-	case 16:
+	case ENT_HTML_DOC_XML1:
 
 		/* OTOH, XML 1.0 requires "character references to match the production for Char
 		 * See <http://www.w3.org/TR/REC-xml/#NT-CharRef> */
@@ -871,7 +858,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 	if hexadecimal != 0 && !(isxdigit(*(*buf))) || hexadecimal == 0 && !(isdigit(*(*buf))) {
 		return zend.FAILURE
 	}
-	code_l = strtoll(*buf, &endptr, g.Cond(hexadecimal != 0, 16, 10))
+	code_l = zend.ZEND_STRTOL(*buf, &endptr, b.Cond(hexadecimal != 0, 16, 10))
 
 	/* we're guaranteed there were valid digits, so *endptr > buf */
 
@@ -883,7 +870,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 	/* many more are invalid, but that depends on whether it's HTML
 	 * (and which version) or XML. */
 
-	if code_l > 0x10ffff {
+	if code_l > zend.Z_L(0x10ffff) {
 		return zend.FAILURE
 	}
 	if code_point != nil {
@@ -997,17 +984,16 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
  *   that correspond to quotes (depending on quote_style).
  */
 
-// #define TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen) ( ( oldlen ) + ( oldlen ) / 5 + 2 )
-
+func TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen int) int { return oldlen + oldlen/5 + 2 }
 func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, flags int, inv_map *EntityHt, charset EntityCharset) {
 	var p *byte
 	var lim *byte
 	var q *byte
-	var doctype int = flags & (16 | 32)
+	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	lim = old + oldlen
 	r.Assert((*lim) == '0')
 	p = old
-	q = ret.val
+	q = zend.ZSTR_VAL(ret)
 	for p < lim {
 		var code unsigned
 		var code2 unsigned = 0
@@ -1019,7 +1005,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 		 * we're sure it represents the '&' character. */
 
 		if p[0] != '&' || p+3 >= lim {
-			*(g.PostInc(&q)) = *(g.PostInc(&p))
+			*(b.PostInc(&q)) = *(b.PostInc(&p))
 			continue
 		}
 
@@ -1043,7 +1029,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 			 * a numeric entity but is allowed literally (U+000D). The
 			 * unoptimized version would be ... || !numeric_entity_is_allowed(code) */
 
-			if UnicodeCpIsAllowed(code, doctype) == 0 || doctype == (16|32) && code == 0xd {
+			if UnicodeCpIsAllowed(code, doctype) == 0 || doctype == ENT_HTML_DOC_HTML5 && code == 0xd {
 				goto invalid_code
 			}
 
@@ -1061,7 +1047,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 				goto invalid_code
 			}
 			if ResolveNamedEntityHtml(start, ent_len, inv_map, &code, &code2) == zend.FAILURE {
-				if doctype == 32 && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's' {
+				if doctype == ENT_HTML_DOC_XHTML && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's' {
 
 					/* uses html4 inv_map, which doesn't include apos;. This is a
 					 * hack to support it */
@@ -1077,7 +1063,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 			}
 		}
 		r.Assert((*next) == ';')
-		if code == '\'' && (flags&1) == 0 || code == '"' && (flags&2) == 0 {
+		if code == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || code == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 			goto invalid_code
 		}
 
@@ -1106,31 +1092,31 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 		continue
 	invalid_code:
 		for ; p < next; p++ {
-			*(g.PostInc(&q)) = *p
+			*(b.PostInc(&q)) = *p
 		}
 	}
 	*q = '0'
-	ret.len_ = size_t(q - ret.val)
+	zend.ZSTR_LEN(ret) = size_t(q - zend.ZSTR_VAL(ret))
 }
 
 /* }}} */
 
 func UnescapeInverseMap(all int, flags int) *EntityHt {
-	var document_type int = flags & (16 | 32)
+	var document_type int = flags & ENT_HTML_DOC_TYPE_MASK
 	if all != 0 {
 		switch document_type {
-		case 0:
+		case ENT_HTML_DOC_HTML401:
 
-		case 32:
+		case ENT_HTML_DOC_XHTML:
 			return &EntHtHtml4
-		case 16 | 32:
+		case ENT_HTML_DOC_HTML5:
 			return &EntHtHtml5
 		default:
 			return &EntHtBeApos
 		}
 	} else {
 		switch document_type {
-		case 0:
+		case ENT_HTML_DOC_HTML401:
 			return &EntHtBeNoapos
 		default:
 			return &EntHtBeApos
@@ -1142,15 +1128,15 @@ func UnescapeInverseMap(all int, flags int) *EntityHt {
 
 func DetermineEntityTable(all int, doctype int) EntityTableOpt {
 	var retval EntityTableOpt = EntityTableOpt{nil}
-	r.Assert(!(doctype == 16 && all != 0))
+	r.Assert(!(doctype == ENT_HTML_DOC_XML1 && all != 0))
 	if all != 0 {
-		if doctype == (16 | 32) {
+		if doctype == ENT_HTML_DOC_HTML5 {
 			retval.SetMsTable(EntityMsTableHtml5)
 		} else {
 			retval.SetMsTable(EntityMsTableHtml4)
 		}
 	} else {
-		if doctype == 0 {
+		if doctype == ENT_HTML_DOC_HTML401 {
 			retval.SetTable(Stage3TableBeNoapos00000)
 		} else {
 			retval.SetTable(Stage3TableBeApos00000)
@@ -1166,7 +1152,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 	var charset EntityCharset
 	var inverse_map *EntityHt
 	var new_size int
-	if !(memchr(str.val, '&', str.len_)) {
+	if !(memchr(zend.ZSTR_VAL(str), '&', zend.ZSTR_LEN(str))) {
 		return zend.ZendStringCopy(str)
 	}
 	if all != 0 {
@@ -1177,8 +1163,8 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 
 	/* don't use LIMIT_ALL! */
 
-	new_size = str.len_ + str.len_/5 + 2
-	if str.len_ > new_size {
+	new_size = TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(zend.ZSTR_LEN(str))
+	if zend.ZSTR_LEN(str) > new_size {
 
 		/* overflow, refuse to do anything */
 
@@ -1192,7 +1178,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 
 	/* replace numeric entities */
 
-	TraverseForEntities(str.val, str.len_, ret, all, flags, inverse_map, charset)
+	TraverseForEntities(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str), ret, all, flags, inverse_map, charset)
 	return ret
 }
 
@@ -1205,14 +1191,14 @@ func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_char
 /* {{{ find_entity_for_char */
 
 func FindEntityForChar(k uint, charset EntityCharset, table *EntityStage1Row, entity **uint8, entity_len *int, old *uint8, oldlen int, cursor *int) {
-	var stage1_idx unsigned = (k & 0xfff000) >> 12
+	var stage1_idx unsigned = ENT_STAGE1_INDEX(k)
 	var c *EntityStage3Row
 	if stage1_idx > 0x1d {
 		*entity = nil
 		*entity_len = 0
 		return
 	}
-	c = &table[stage1_idx][(k&0xfc0)>>6][k&0x3f]
+	c = &table[stage1_idx][ENT_STAGE2_INDEX(k)][ENT_STAGE3_INDEX(k)]
 	if !(c.GetAmbiguous()) {
 		*entity = (*uint8)(c.GetEntity())
 		*entity_len = c.GetEntityLen()
@@ -1270,13 +1256,13 @@ func FindEntityForCharBasic(k uint, table *EntityStage3Row, entity **uint8, enti
 
 /* }}} */
 
-func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_charset *byte, double_encode zend.ZendBool) *zend.ZendString {
+func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_charset string, double_encode zend.ZendBool) *zend.ZendString {
 	var cursor int
 	var maxlen int
 	var len_ int
 	var replaced *zend.ZendString
 	var charset EntityCharset = DetermineCharset(hint_charset)
-	var doctype int = flags & (16 | 32)
+	var doctype int = flags & ENT_HTML_DOC_TYPE_MASK
 	var entity_table EntityTableOpt
 	var to_uni_table *EncToUni = nil
 	var inv_map *EntityHt = nil
@@ -1286,13 +1272,13 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 	var replacement *uint8 = nil
 	var replacement_len int = 0
 	if all != 0 {
-		if charset >= CsBig5 {
-			core.PhpErrorDocref(nil, 1<<3, "Only basic entities "+"substitution is supported for multi-byte encodings other than UTF-8; "+"functionality is equivalent to htmlspecialchars")
+		if CHARSET_PARTIAL_SUPPORT(charset) {
+			core.PhpErrorDocref(nil, zend.E_NOTICE, "Only basic entities "+"substitution is supported for multi-byte encodings other than UTF-8; "+"functionality is equivalent to htmlspecialchars")
 		}
-		all = all != 0 && charset < CsBig5 && doctype != 16
+		LIMIT_ALL(all, doctype, charset)
 	}
 	entity_table = DetermineEntityTable(all, doctype)
-	if all != 0 && charset > Cs88591 {
+	if all != 0 && !(CHARSET_UNICODE_COMPAT(charset)) {
 		to_uni_table = EncToUniIndex[charset]
 	}
 	if double_encode == 0 {
@@ -1306,13 +1292,13 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 		 * even if we are only encoding the basic ones */
 
 	}
-	if (flags & (8 | 128)) != 0 {
+	if (flags & (ENT_HTML_SUBSTITUTE_ERRORS | ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS)) != 0 {
 		if charset == CsUtf8 {
 			replacement = (*uint8)("xEFxBFxBD")
-			replacement_len = g.SizeOf("\"\\xEF\\xBF\\xBD\"") - 1
+			replacement_len = b.SizeOf("\"\\xEF\\xBF\\xBD\"") - 1
 		} else {
 			replacement = (*uint8)("&#xFFFD;")
-			replacement_len = g.SizeOf("\"&#xFFFD;\"") - 1
+			replacement_len = b.SizeOf("\"&#xFFFD;\"") - 1
 		}
 	}
 
@@ -1344,15 +1330,15 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 
 			/* invalid MB sequence */
 
-			if (flags & 4) != 0 {
+			if (flags & ENT_HTML_IGNORE_ERRORS) != 0 {
 				continue
-			} else if (flags & 8) != 0 {
-				memcpy(&replaced.val[len_], replacement, replacement_len)
+			} else if (flags & ENT_HTML_SUBSTITUTE_ERRORS) != 0 {
+				memcpy(&zend.ZSTR_VAL(replaced)[len_], replacement, replacement_len)
 				len_ += replacement_len
 				continue
 			} else {
 				zend.ZendStringEfree(replaced)
-				return zend.ZendEmptyString
+				return zend.ZSTR_EMPTY_ALLOC()
 			}
 
 			/* invalid MB sequence */
@@ -1364,7 +1350,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 		if this_char != '&' {
 			var rep *uint8 = nil
 			var rep_len int = 0
-			if this_char == '\'' && (flags&1) == 0 || this_char == '"' && (flags&2) == 0 {
+			if this_char == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || this_char == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 				goto pass_char_through
 			}
 			if all != 0 {
@@ -1390,17 +1376,17 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 				FindEntityForCharBasic(this_char, entity_table.GetTable(), &rep, &rep_len)
 			}
 			if rep != nil {
-				replaced.val[g.PostInc(&len_)] = '&'
-				memcpy(&replaced.val[len_], rep, rep_len)
+				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = '&'
+				memcpy(&zend.ZSTR_VAL(replaced)[len_], rep, rep_len)
 				len_ += rep_len
-				replaced.val[g.PostInc(&len_)] = ';'
+				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = ';'
 			} else {
 
 				/* we did not find an entity for this char.
 				 * check for its validity, if its valid pass it unchanged */
 
-				if (flags & 128) != 0 {
-					if charset <= Cs88591 {
+				if (flags & ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS) != 0 {
+					if CHARSET_UNICODE_COMPAT(charset) {
 						if UnicodeCpIsAllowed(this_char, doctype) == 0 {
 							mbsequence = replacement
 							mbseqlen = replacement_len
@@ -1440,17 +1426,17 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 				}
 			pass_char_through:
 				if mbseqlen > 1 {
-					memcpy(replaced.val+len_, mbsequence, mbseqlen)
+					memcpy(zend.ZSTR_VAL(replaced)+len_, mbsequence, mbseqlen)
 					len_ += mbseqlen
 				} else {
-					replaced.val[g.PostInc(&len_)] = mbsequence[0]
+					zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = mbsequence[0]
 				}
 			}
 		} else {
 			if double_encode != 0 {
 			encode_amp:
-				memcpy(&replaced.val[len_], "&amp;", g.SizeOf("\"&amp;\"")-1)
-				len_ += g.SizeOf("\"&amp;\"") - 1
+				memcpy(&zend.ZSTR_VAL(replaced)[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
+				len_ += b.SizeOf("\"&amp;\"") - 1
 			} else {
 
 				/* check if entity is valid */
@@ -1467,7 +1453,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 					if valid == zend.FAILURE {
 						goto encode_amp
 					}
-					if (flags & 128) != 0 {
+					if (flags & ENT_HTML_SUBSTITUTE_DISALLOWED_CHARS) != 0 {
 						if NumericEntityIsAllowed(code_point, doctype) == 0 {
 							goto encode_amp
 						}
@@ -1485,7 +1471,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 						goto encode_amp
 					}
 					if ResolveNamedEntityHtml(start, ent_len, inv_map, &dummy1, &dummy2) == zend.FAILURE {
-						if !(doctype == 32 && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's') {
+						if !(doctype == ENT_HTML_DOC_XHTML && ent_len == 4 && start[0] == 'a' && start[1] == 'p' && start[2] == 'o' && start[3] == 's') {
 
 							/* uses html4 inv_map, which doesn't include apos;. This is a
 							 * hack to support it */
@@ -1508,16 +1494,16 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 					replaced = zend.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
 					maxlen += ent_len + 128
 				}
-				replaced.val[g.PostInc(&len_)] = '&'
-				memcpy(&replaced.val[len_], &old[cursor], ent_len)
+				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = '&'
+				memcpy(&zend.ZSTR_VAL(replaced)[len_], &old[cursor], ent_len)
 				len_ += ent_len
-				replaced.val[g.PostInc(&len_)] = ';'
+				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
 			}
 		}
 	}
-	replaced.val[len_] = '0'
-	replaced.len_ = len_
+	zend.ZSTR_VAL(replaced)[len_] = '0'
+	zend.ZSTR_LEN(replaced) = len_
 	return replaced
 }
 
@@ -1527,14 +1513,14 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	var str *zend.ZendString
 	var hint_charset *zend.ZendString = nil
 	var default_charset *byte
-	var flags zend.ZendLong = 2
+	var flags zend.ZendLong = ENT_COMPAT
 	var replaced *zend.ZendString
 	var double_encode zend.ZendBool = 1
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 4
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1542,7 +1528,7 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1551,101 +1537,61 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &hint_charset, 1) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &hint_charset, 1) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &double_encode, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &double_encode, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1659,39 +1605,31 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.val), str.len_, all, int(flags), g.CondF1(hint_charset != nil, func() []byte { return hint_charset.val }, default_charset), double_encode)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = replaced
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), all, int(flags), b.CondF1(hint_charset != nil, func() []byte { return zend.ZSTR_VAL(hint_charset) }, default_charset), double_encode)
+	zend.RETVAL_STR(replaced)
 }
 
 /* }}} */
 
-// #define HTML_SPECIALCHARS       0
-
-// #define HTML_ENTITIES       1
+const HTML_SPECIALCHARS = 0
+const HTML_ENTITIES = 1
 
 /* {{{ register_html_constants
  */
 
 func RegisterHtmlConstants(type_ int, module_number int) {
-	zend.ZendRegisterLongConstant("HTML_SPECIALCHARS", g.SizeOf("\"HTML_SPECIALCHARS\"")-1, 0, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("HTML_ENTITIES", g.SizeOf("\"HTML_ENTITIES\"")-1, 1, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_COMPAT", g.SizeOf("\"ENT_COMPAT\"")-1, 2, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_QUOTES", g.SizeOf("\"ENT_QUOTES\"")-1, 2|1, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_NOQUOTES", g.SizeOf("\"ENT_NOQUOTES\"")-1, 0, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_IGNORE", g.SizeOf("\"ENT_IGNORE\"")-1, 4, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_SUBSTITUTE", g.SizeOf("\"ENT_SUBSTITUTE\"")-1, 8, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_DISALLOWED", g.SizeOf("\"ENT_DISALLOWED\"")-1, 128, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_HTML401", g.SizeOf("\"ENT_HTML401\"")-1, 0, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_XML1", g.SizeOf("\"ENT_XML1\"")-1, 16, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_XHTML", g.SizeOf("\"ENT_XHTML\"")-1, 32, 1<<1|1<<0, module_number)
-	zend.ZendRegisterLongConstant("ENT_HTML5", g.SizeOf("\"ENT_HTML5\"")-1, 16|32, 1<<1|1<<0, module_number)
+	zend.REGISTER_LONG_CONSTANT("HTML_SPECIALCHARS", HTML_SPECIALCHARS, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("HTML_ENTITIES", HTML_ENTITIES, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_COMPAT", ENT_COMPAT, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_QUOTES", ENT_QUOTES, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_NOQUOTES", ENT_NOQUOTES, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_IGNORE", ENT_IGNORE, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_SUBSTITUTE", ENT_SUBSTITUTE, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_DISALLOWED", ENT_DISALLOWED, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_HTML401", ENT_HTML401, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_XML1", ENT_XML1, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS)
+	zend.REGISTER_LONG_CONSTANT("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS)
 }
 
 /* }}} */
@@ -1704,13 +1642,13 @@ func ZifHtmlspecialchars(execute_data *zend.ZendExecuteData, return_value *zend.
 
 func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
-	var quote_style zend.ZendLong = 2
+	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *zend.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1718,7 +1656,7 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1727,69 +1665,49 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1802,17 +1720,10 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 	}
 	replaced = PhpUnescapeHtmlEntities(str, 0, int(quote_style), nil)
 	if replaced != nil {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = replaced
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+		zend.RETVAL_STR(replaced)
 		return
 	}
-	return_value.u1.type_info = 2
+	zend.RETVAL_FALSE
 	return
 }
 
@@ -1822,13 +1733,13 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 	var str *zend.ZendString
 	var hint_charset *zend.ZendString = nil
 	var default_charset *byte
-	var quote_style zend.ZendLong = 2
+	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *zend.ZendString
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1836,7 +1747,7 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1845,85 +1756,55 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &quote_style, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &hint_charset, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &hint_charset, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1937,19 +1818,12 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), g.CondF1(hint_charset != nil, func() []byte { return hint_charset.val }, default_charset))
+	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), b.CondF1(hint_charset != nil, func() []byte { return zend.ZSTR_VAL(hint_charset) }, default_charset))
 	if replaced != nil {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = replaced
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+		zend.RETVAL_STR(replaced)
 		return
 	}
-	return_value.u1.type_info = 2
+	zend.RETVAL_FALSE
 	return
 }
 
@@ -1989,7 +1863,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 			var spe_cp unsigned
 			uni_cp = mcpr[i].GetSecondCp()
 			l = mcpr[i].GetEntityLen()
-			if charset > Cs88591 {
+			if !(CHARSET_UNICODE_COMPAT(charset)) {
 				if MapFromUnicode(uni_cp, charset, &spe_cp) == zend.FAILURE {
 					continue
 				}
@@ -2007,8 +1881,8 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 /* }}} */
 
 func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var all zend.ZendLong = 0
-	var flags zend.ZendLong = 2
+	var all zend.ZendLong = HTML_SPECIALCHARS
+	var flags zend.ZendLong = ENT_COMPAT
 	var doctype int
 	var entity_table EntityTableOpt
 	var to_uni_table *EncToUni = nil
@@ -2024,7 +1898,7 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -2032,7 +1906,7 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -2041,85 +1915,55 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &all, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &all, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &flags, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &charset_hint, &charset_hint_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &charset_hint, &charset_hint_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -2131,19 +1975,16 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		break
 	}
 	charset = DetermineCharset(charset_hint)
-	doctype = flags & (16 | 32)
-	all = all != 0 && charset < CsBig5 && doctype != 16
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	doctype = flags & ENT_HTML_DOC_TYPE_MASK
+	LIMIT_ALL(all, doctype, charset)
+	zend.ArrayInit(return_value)
 	entity_table = DetermineEntityTable(int(all), doctype)
-	if all != 0 && charset > Cs88591 {
+	if all != 0 && !(CHARSET_UNICODE_COMPAT(charset)) {
 		to_uni_table = EncToUniIndex[charset]
 	}
 	if all != 0 {
 		var ms_table *EntityStage1Row = entity_table.GetMsTable()
-		if charset <= Cs88591 {
+		if CHARSET_UNICODE_COMPAT(charset) {
 			var i unsigned
 			var j unsigned
 			var k unsigned
@@ -2153,7 +1994,7 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 
 			/* no mapping to unicode required */
 
-			if charset > CsUtf8 && charset < CsBig5 {
+			if CHARSET_SINGLE_BYTE(charset) {
 				max_i = 1
 				max_j = 4
 				max_k = 64
@@ -2176,8 +2017,8 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 						if r.GetEntity() == nil {
 							continue
 						}
-						code = i<<12 | j<<6 | k
-						if code == '\'' && (flags&1) == 0 || code == '"' && (flags&2) == 0 {
+						code = ENT_CODE_POINT_FROM_STAGES(i, j, k)
+						if code == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || code == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 							continue
 						}
 						WriteS3rowData(r, code, charset, return_value)
@@ -2196,11 +2037,11 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 
 				/* can be done before mapping, they're invariant */
 
-				if i == '\'' && (flags&1) == 0 || i == '"' && (flags&2) == 0 {
+				if i == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || i == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 					continue
 				}
 				MapToUnicode(i, to_uni_table, &uni_cp)
-				r = &ms_table[(uni_cp&0xfff000)>>12][(uni_cp&0xfc0)>>6][uni_cp&0x3f]
+				r = &ms_table[ENT_STAGE1_INDEX(uni_cp)][ENT_STAGE2_INDEX(uni_cp)][ENT_STAGE3_INDEX(uni_cp)]
 				if r.GetEntity() == nil {
 					continue
 				}
@@ -2212,13 +2053,13 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		/* we could use sizeof(stage3_table_be_apos_00000) as well */
 
 		var j unsigned
-		var numelems unsigned = g.SizeOf("stage3_table_be_noapos_00000") / g.SizeOf("* stage3_table_be_noapos_00000")
+		var numelems unsigned = b.SizeOf("stage3_table_be_noapos_00000") / b.SizeOf("* stage3_table_be_noapos_00000")
 		for j = 0; j < numelems; j++ {
 			var r *EntityStage3Row = &entity_table.table[j]
 			if r.GetEntity() == nil {
 				continue
 			}
-			if j == '\'' && (flags&1) == 0 || j == '"' && (flags&2) == 0 {
+			if j == '\'' && (flags&ENT_HTML_QUOTE_SINGLE) == 0 || j == '"' && (flags&ENT_HTML_QUOTE_DOUBLE) == 0 {
 				continue
 			}
 

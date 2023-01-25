@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -28,7 +27,10 @@ import (
    +----------------------------------------------------------------------+
 */
 
-// #define CRC32(crc,ch) ( crc = ( crc >> 8 ) ^ crc32tab [ ( crc ^ ( ch ) ) & 0xff ] )
+func CRC32(crc int, ch __auto__) int {
+	crc = crc>>8 ^ Crc32tab[(crc^ch)&0xff]
+	return crc
+}
 
 /* generated using the AUTODIN II polynomial
  *    x^32 + x^26 + x^23 + x^22 + x^16 +
@@ -76,20 +78,20 @@ func HasCrc32Insn() int {
 	return res
 }
 func Crc32Aarch64(crc uint32, p *byte, nr int) uint32 {
-	for nr >= g.SizeOf("uint64_t") {
+	for nr >= b.SizeOf("uint64_t") {
 		crc = __crc32d(crc, *((*uint64)(p)))
-		p += g.SizeOf("uint64_t")
-		nr -= g.SizeOf("uint64_t")
+		p += b.SizeOf("uint64_t")
+		nr -= b.SizeOf("uint64_t")
 	}
-	if nr >= g.SizeOf("int32_t") {
+	if nr >= b.SizeOf("int32_t") {
 		crc = __crc32w(crc, *((*uint32)(p)))
-		p += g.SizeOf("uint32_t")
-		nr -= g.SizeOf("uint32_t")
+		p += b.SizeOf("uint32_t")
+		nr -= b.SizeOf("uint32_t")
 	}
-	if nr >= g.SizeOf("int16_t") {
+	if nr >= b.SizeOf("int16_t") {
 		crc = __crc32h(crc, *((*uint16)(p)))
-		p += g.SizeOf("uint16_t")
-		nr -= g.SizeOf("uint16_t")
+		p += b.SizeOf("uint16_t")
+		nr -= b.SizeOf("uint16_t")
 	}
 	if nr != 0 {
 		crc = __crc32b(crc, *p)
@@ -109,7 +111,7 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -117,7 +119,7 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -126,52 +128,42 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &p, &nr, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &p, &nr, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -185,17 +177,13 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	crc = crcinit ^ 0xffffffff
 	if HasCrc32Insn() != 0 {
 		crc = Crc32Aarch64(crc, p, nr)
-		var __z *zend.Zval = return_value
-		__z.value.lval = crc ^ 0xffffffff
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(crc ^ 0xffffffff)
 		return
 	}
-	for ; g.PostDec(&nr); p++ {
+	for ; b.PostDec(&nr); p++ {
 		crc = crc>>8&0xffffff ^ Crc32tab[(crc^(*p))&0xff]
 	}
-	var __z *zend.Zval = return_value
-	__z.value.lval = crc ^ 0xffffffff
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(crc ^ 0xffffffff)
 	return
 }
 

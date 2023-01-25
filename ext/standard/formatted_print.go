@@ -3,10 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	"sik/core/streams"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	"sik/sapi/cli"
 	"sik/zend"
 )
 
@@ -44,21 +43,14 @@ import (
 
 // # include < locale . h >
 
-// #define LCONV_DECIMAL_POINT       ( * lconv -> decimal_point )
-
-// #define ALIGN_LEFT       0
-
-// #define ALIGN_RIGHT       1
-
-// #define ADJ_WIDTH       1
-
-// #define ADJ_PRECISION       2
-
-// #define NUM_BUF_SIZE       500
-
-// #define FLOAT_PRECISION       6
-
-// #define MAX_FLOAT_PRECISION       53
+const LCONV_DECIMAL_POINT byte = (*lconv).decimal_point
+const ALIGN_LEFT = 0
+const ALIGN_RIGHT = 1
+const ADJ_WIDTH = 1
+const ADJ_PRECISION = 2
+const NUM_BUF_SIZE = 500
+const FLOAT_PRECISION = 6
+const MAX_FLOAT_PRECISION = 53
 
 // #define PRINTF_DEBUG(arg)
 
@@ -68,17 +60,17 @@ var HEXCHARS []byte = "0123456789ABCDEF"
 /* php_spintf_appendchar() {{{ */
 
 func PhpSprintfAppendchar(buffer **zend.ZendString, pos *int, add byte) {
-	if (*pos)+1 >= (*buffer).len_ {
-		*buffer = zend.ZendStringExtend(*buffer, (*buffer).len_<<1, 0)
+	if (*pos)+1 >= zend.ZSTR_LEN(*buffer) {
+		*buffer = zend.ZendStringExtend(*buffer, zend.ZSTR_LEN(*buffer)<<1, 0)
 	}
-	(*buffer).val[g.PostInc(&(*pos))] = add
+	zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = add
 }
 
 /* }}} */
 
 func PhpSprintfAppendchars(buffer **zend.ZendString, pos *int, add *byte, len_ int) {
-	if (*pos)+len_ >= (*buffer).len_ {
-		var nlen int = (*buffer).len_
+	if (*pos)+len_ >= zend.ZSTR_LEN(*buffer) {
+		var nlen int = zend.ZSTR_LEN(*buffer)
 		for {
 			nlen = nlen << 1
 			if (*pos)+len_ < nlen {
@@ -87,7 +79,7 @@ func PhpSprintfAppendchars(buffer **zend.ZendString, pos *int, add *byte, len_ i
 		}
 		*buffer = zend.ZendStringExtend(*buffer, nlen, 0)
 	}
-	memcpy((*buffer).val+(*pos), add, len_)
+	memcpy(zend.ZSTR_VAL(*buffer)+(*pos), add, len_)
 	*pos += len_
 }
 
@@ -99,11 +91,7 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 	var copy_len int
 	var m_width int
 	if expprec != 0 {
-		if max_width < len_ {
-			copy_len = max_width
-		} else {
-			copy_len = len_
-		}
+		copy_len = cli.MIN(max_width, len_)
 	} else {
 		copy_len = len_
 	}
@@ -112,45 +100,41 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 	} else {
 		npad = min_width - copy_len
 	}
-	if min_width > copy_len {
-		m_width = min_width
-	} else {
-		m_width = copy_len
-	}
-	if m_width > 2147483647-(*pos)-1 {
-		zend.ZendErrorNoreturn(1<<0, "Field width %zd is too long", m_width)
+	m_width = zend.MAX(min_width, copy_len)
+	if m_width > core.INT_MAX-(*pos)-1 {
+		zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", m_width)
 	}
 	req_size = (*pos) + m_width + 1
-	if req_size > (*buffer).len_ {
-		var size int = (*buffer).len_
+	if req_size > zend.ZSTR_LEN(*buffer) {
+		var size int = zend.ZSTR_LEN(*buffer)
 		for req_size > size {
-			if size > SIZE_MAX/2 {
-				zend.ZendErrorNoreturn(1<<0, "Field width %zd is too long", req_size)
+			if size > zend.ZEND_SIZE_MAX/2 {
+				zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", req_size)
 			}
 			size <<= 1
 		}
 		*buffer = zend.ZendStringExtend(*buffer, size, 0)
 	}
-	if alignment == 1 {
+	if alignment == ALIGN_RIGHT {
 		if (neg != 0 || always_sign != 0) && padding == '0' {
 			if neg != 0 {
-				(*buffer).val[g.PostInc(&(*pos))] = '-'
+				zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = '-'
 			} else {
-				(*buffer).val[g.PostInc(&(*pos))] = '+'
+				zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = '+'
 			}
 			add++
 			len_--
 			copy_len--
 		}
-		for g.PostDec(&npad) > 0 {
-			(*buffer).val[g.PostInc(&(*pos))] = padding
+		for b.PostDec(&npad) > 0 {
+			zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = padding
 		}
 	}
-	memcpy(&(*buffer).val[*pos], add, copy_len+1)
+	memcpy(&zend.ZSTR_VAL(*buffer)[*pos], add, copy_len+1)
 	*pos += copy_len
-	if alignment == 0 {
-		for g.PostDec(&npad) {
-			(*buffer).val[g.PostInc(&(*pos))] = padding
+	if alignment == ALIGN_LEFT {
+		for b.PostDec(&npad) {
+			zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = padding
 		}
 	}
 }
@@ -161,7 +145,7 @@ func PhpSprintfAppendint(buffer **zend.ZendString, pos *int, number zend.ZendLon
 	var numbuf []byte
 	var magn zend.ZendUlong
 	var nmagn zend.ZendUlong
-	var i uint = 500 - 1
+	var i uint = NUM_BUF_SIZE - 1
 	var neg uint = 0
 	if number < 0 {
 		neg = 1
@@ -178,18 +162,18 @@ func PhpSprintfAppendint(buffer **zend.ZendString, pos *int, number zend.ZendLon
 	numbuf[i] = '0'
 	for {
 		nmagn = magn / 10
-		numbuf[g.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
+		numbuf[b.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
 		magn = nmagn
 		if !(magn > 0 && i > 1) {
 			break
 		}
 	}
 	if neg != 0 {
-		numbuf[g.PreDec(&i)] = '-'
+		numbuf[b.PreDec(&i)] = '-'
 	} else if always_sign != 0 {
-		numbuf[g.PreDec(&i)] = '+'
+		numbuf[b.PreDec(&i)] = '+'
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, 500-1-i, neg, 0, always_sign)
+	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, neg, 0, always_sign)
 }
 
 /* }}} */
@@ -198,7 +182,7 @@ func PhpSprintfAppenduint(buffer **zend.ZendString, pos *int, number zend.ZendUl
 	var numbuf []byte
 	var magn zend.ZendUlong
 	var nmagn zend.ZendUlong
-	var i uint = 500 - 1
+	var i uint = NUM_BUF_SIZE - 1
 	magn = zend.ZendUlong(number)
 
 	/* Can't right-pad 0's on integers */
@@ -209,13 +193,13 @@ func PhpSprintfAppenduint(buffer **zend.ZendString, pos *int, number zend.ZendUl
 	numbuf[i] = '0'
 	for {
 		nmagn = magn / 10
-		numbuf[g.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
+		numbuf[b.PreDec(&i)] = uint8(magn - nmagn*10 + '0')
 		magn = nmagn
 		if !(magn > 0 && i > 0) {
 			break
 		}
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, 500-1-i, 0, 0, 0)
+	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, 0, 0)
 }
 
 /* }}} */
@@ -226,18 +210,18 @@ func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, 
 	var s_len int = 0
 	var is_negative int = 0
 	var lconv *__struct__lconv
-	if (adjust & 2) == 0 {
-		precision = 6
-	} else if precision > 53 {
-		core.PhpErrorDocref(nil, 1<<3, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, 53)
-		precision = 53
+	if (adjust & ADJ_PRECISION) == 0 {
+		precision = FLOAT_PRECISION
+	} else if precision > MAX_FLOAT_PRECISION {
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "Requested precision of %d digits was truncated to PHP maximum of %d digits", precision, MAX_FLOAT_PRECISION)
+		precision = MAX_FLOAT_PRECISION
 	}
-	if isnan(number) {
+	if core.ZendIsnan(number) {
 		is_negative = number < 0
 		PhpSprintfAppendstring(buffer, pos, "NaN", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return
 	}
-	if isinf(number) {
+	if core.ZendIsinf(number) {
 		is_negative = number < 0
 		PhpSprintfAppendstring(buffer, pos, "INF", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return
@@ -251,7 +235,7 @@ func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, 
 
 	case 'F':
 		lconv = localeconv()
-		s = core.PhpConvFp(g.Cond(fmt == 'f', 'F', fmt), number, 0, precision, g.CondF1(fmt == 'f', func() __auto__ { return (*lconv).decimal_point }, '.'), &is_negative, &num_buf[1], &s_len)
+		s = core.PhpConvFp(b.Cond(fmt == 'f', 'F', fmt), number, 0, precision, b.Cond(fmt == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
 		if is_negative != 0 {
 			num_buf[0] = '-'
 			s = num_buf
@@ -274,7 +258,7 @@ func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, 
 		 */
 
 		lconv = localeconv()
-		s = core.PhpGcvt(number, precision, (*lconv).decimal_point, g.Cond(fmt == 'G', 'E', 'e'), &num_buf[1])
+		s = core.PhpGcvt(number, precision, LCONV_DECIMAL_POINT, b.Cond(fmt == 'G', 'E', 'e'), &num_buf[1])
 		is_negative = 0
 		if (*s) == '-' {
 			is_negative = 1
@@ -294,32 +278,32 @@ func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, 
 func PhpSprintfAppend2n(buffer **zend.ZendString, pos *int, number zend.ZendLong, width int, padding byte, alignment int, n int, chartable *byte, expprec int) {
 	var numbuf []byte
 	var num zend.ZendUlong
-	var i zend.ZendUlong = 500 - 1
+	var i zend.ZendUlong = NUM_BUF_SIZE - 1
 	var andbits int = (1 << n) - 1
 	num = zend.ZendUlong(number)
 	numbuf[i] = '0'
 	for {
-		numbuf[g.PreDec(&i)] = chartable[num&andbits]
+		numbuf[b.PreDec(&i)] = chartable[num&andbits]
 		num >>= n
 		if num <= 0 {
 			break
 		}
 	}
-	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, 500-1-i, 0, expprec, 0)
+	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, expprec, 0)
 }
 
 /* }}} */
 
 func PhpSprintfGetnumber(buffer **byte, len_ *int) int {
 	var endptr *byte
-	var num zend.ZendLong = strtoll(*buffer, &endptr, 10)
+	var num zend.ZendLong = zend.ZEND_STRTOL(*buffer, &endptr, 10)
 	var i int
 	if endptr != nil {
 		i = endptr - (*buffer)
 		*len_ -= i
 		*buffer = endptr
 	}
-	if num >= 2147483647 || num < 0 {
+	if num >= core.INT_MAX || num < 0 {
 		return -1
 	} else {
 		return int(num)
@@ -346,8 +330,8 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 	if zend.TryConvertToString(z_format) == 0 {
 		return nil
 	}
-	format = z_format.value.str.val
-	format_len = z_format.value.str.len_
+	format = zend.Z_STRVAL_P(z_format)
+	format_len = zend.Z_STRLEN_P(z_format)
 	result = zend.ZendStringAlloc(size, 0)
 	currarg = 0
 	for format_len != 0 {
@@ -372,7 +356,7 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 
 			/* starting a new format specifier, reset variables */
 
-			alignment = 1
+			alignment = ALIGN_RIGHT
 			adjusting = 0
 			padding = ' '
 			always_sign = 0
@@ -394,7 +378,7 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 					argnum = PhpSprintfGetnumber(&format, &format_len)
 					if argnum <= 0 {
 						zend.ZendStringEfree(result)
-						core.PhpErrorDocref(nil, 1<<1, "Argument number must be greater than zero")
+						core.PhpErrorDocref(nil, zend.E_WARNING, "Argument number must be greater than zero")
 						return nil
 					}
 					argnum--
@@ -411,7 +395,7 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 					if (*format) == ' ' || (*format) == '0' {
 						padding = *format
 					} else if (*format) == '-' {
-						alignment = 0
+						alignment = ALIGN_LEFT
 					} else if (*format) == '+' {
 						always_sign = 1
 					} else if (*format) == '\'' && format_len > 1 {
@@ -428,12 +412,12 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 				/* after modifiers comes width */
 
 				if isdigit(int(*format)) {
-					if g.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-						zend._efree(result)
-						core.PhpErrorDocref(nil, 1<<1, "Width must be greater than zero and less than %d", 2147483647)
+					if b.Assign(&width, PhpSprintfGetnumber(&format, &format_len)) < 0 {
+						zend.Efree(result)
+						core.PhpErrorDocref(nil, zend.E_WARNING, "Width must be greater than zero and less than %d", core.INT_MAX)
 						return nil
 					}
-					adjusting |= 1
+					adjusting |= ADJ_WIDTH
 				} else {
 					width = 0
 				}
@@ -444,12 +428,12 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 					format++
 					format_len--
 					if isdigit(int(*format)) {
-						if g.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
-							zend._efree(result)
-							core.PhpErrorDocref(nil, 1<<1, "Precision must be greater than zero and less than %d", 2147483647)
+						if b.Assign(&precision, PhpSprintfGetnumber(&format, &format_len)) < 0 {
+							zend.Efree(result)
+							core.PhpErrorDocref(nil, zend.E_WARNING, "Precision must be greater than zero and less than %d", core.INT_MAX)
 							return nil
 						}
-						adjusting |= 2
+						adjusting |= ADJ_PRECISION
 						expprec = 1
 					} else {
 						precision = 0
@@ -459,8 +443,8 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 				}
 			}
 			if argnum >= argc {
-				zend._efree(result)
-				core.PhpErrorDocref(nil, 1<<1, "Too few arguments")
+				zend.Efree(result)
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Too few arguments")
 				return nil
 			}
 			if (*format) == 'l' {
@@ -475,7 +459,7 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 			case 's':
 				var t *zend.ZendString
 				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
-				PhpSprintfAppendstring(&result, &outpos, str.val, width, precision, padding, alignment, str.len_, 0, expprec, 0)
+				PhpSprintfAppendstring(&result, &outpos, zend.ZSTR_VAL(str), width, precision, padding, alignment, zend.ZSTR_LEN(str), 0, expprec, 0)
 				zend.ZendTmpStringRelease(t)
 				break
 			case 'd':
@@ -531,8 +515,8 @@ exit:
 
 	/* possibly, we have to make sure we have room for the terminating null? */
 
-	result.val[outpos] = 0
-	result.len_ = outpos
+	zend.ZSTR_VAL(result)[outpos] = 0
+	zend.ZSTR_LEN(result) = outpos
 	return result
 }
 
@@ -542,29 +526,24 @@ func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 	var args *zend.Zval
 	var zv *zend.Zval
 	var n int
-	if array.u1.v.type_ != 7 {
+	if zend.Z_TYPE_P(array) != zend.IS_ARRAY {
 		zend.ConvertToArray(array)
 	}
-	n = array.value.arr.nNumOfElements
-	args = (*zend.Zval)(zend._safeEmalloc(n, g.SizeOf("zval"), 0))
+	n = zend.ZendHashNumElements(zend.Z_ARRVAL_P(array))
+	args = (*zend.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
 	for {
-		var __ht *zend.HashTable = array.value.arr
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
 		var _p *zend.Bucket = __ht.arData
 		var _end *zend.Bucket = _p + __ht.nNumUsed
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
 			zv = _z
-			var _z1 *zend.Zval = &args[n]
-			var _z2 *zend.Zval = zv
-			var _gc *zend.ZendRefcounted = _z2.value.counted
-			var _t uint32 = _z2.u1.type_info
-			_z1.value.counted = _gc
-			_z1.u1.type_info = _t
+			zend.ZVAL_COPY_VALUE(&args[n], zv)
 			n++
 		}
 		break
@@ -584,7 +563,7 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -592,7 +571,7 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -601,32 +580,22 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
+			if zend.EXPECTED(_num_varargs > 0) {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -637,46 +606,39 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = result
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(result)
 }
 
 /* }}} */
@@ -691,7 +653,7 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -699,7 +661,7 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -708,86 +670,59 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	args = PhpFormattedPrintGetArray(array, &argc)
 	result = PhpFormattedPrint(format, args, argc)
-	zend._efree(args)
+	zend.Efree(args)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = result
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(result)
 }
 
 /* }}} */
@@ -802,7 +737,7 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = -1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -810,7 +745,7 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -819,32 +754,22 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
+			if zend.EXPECTED(_num_varargs > 0) {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -855,43 +780,41 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	rlen = core.PhpOutputWrite(result.val, result.len_)
+	rlen = core.PHPWRITE(zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
 	zend.ZendStringEfree(result)
-	var __z *zend.Zval = return_value
-	__z.value.lval = rlen
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(rlen)
 	return
 }
 
@@ -908,7 +831,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -916,7 +839,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -925,83 +848,61 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	args = PhpFormattedPrintGetArray(array, &argc)
 	result = PhpFormattedPrint(format, args, argc)
-	zend._efree(args)
+	zend.Efree(args)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	rlen = core.PhpOutputWrite(result.val, result.len_)
+	rlen = core.PHPWRITE(zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
 	zend.ZendStringEfree(result)
-	var __z *zend.Zval = return_value
-	__z.value.lval = rlen
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(rlen)
 	return
 }
 
@@ -1014,15 +915,14 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var result *zend.ZendString
-	if execute_data.This.u2.num_args < 2 {
-		zend.ZendWrongParamCount()
-		return
+	if zend.ZEND_NUM_ARGS() < 2 {
+		zend.WRONG_PARAM_COUNT
 	}
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = -1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1030,7 +930,7 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1039,48 +939,28 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &arg1, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			var _num_varargs int = _num_args - _i - 0
-			if _num_varargs > 0 {
+			if zend.EXPECTED(_num_varargs > 0) {
 				args = _real_arg + 1
 				argc = _num_varargs
 				_i += _num_varargs
@@ -1091,46 +971,41 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
-	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2Ex(arg1, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
-		return_value.u1.type_info = 2
-		return
-	}
+	core.PhpStreamFromZval(stream, arg1)
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	streams._phpStreamWrite(stream, result.val, result.len_)
-	var __z *zend.Zval = return_value
-	__z.value.lval = result.len_
-	__z.u1.type_info = 4
+	core.PhpStreamWrite(stream, zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
+	zend.RETVAL_LONG(zend.ZSTR_LEN(result))
 	zend.ZendStringEfree(result)
 }
 
@@ -1144,15 +1019,14 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var result *zend.ZendString
-	if execute_data.This.u2.num_args != 3 {
-		zend.ZendWrongParamCount()
-		return
+	if zend.ZEND_NUM_ARGS() != 3 {
+		zend.WRONG_PARAM_COUNT
 	}
 	for {
 		var _flags int = 0
 		var _min_num_args int = 3
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1160,7 +1034,7 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1169,102 +1043,67 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &arg1, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
-	if g.Assign(&stream, (*core.PhpStream)(zend.ZendFetchResource2Ex(arg1, "stream", streams.PhpFileLeStream(), streams.PhpFileLePstream()))) == nil {
-		return_value.u1.type_info = 2
-		return
-	}
+	core.PhpStreamFromZval(stream, arg1)
 	args = PhpFormattedPrintGetArray(array, &argc)
 	result = PhpFormattedPrint(format, args, argc)
-	zend._efree(args)
+	zend.Efree(args)
 	if result == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
-	streams._phpStreamWrite(stream, result.val, result.len_)
-	var __z *zend.Zval = return_value
-	__z.value.lval = result.len_
-	__z.u1.type_info = 4
+	core.PhpStreamWrite(stream, zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
+	zend.RETVAL_LONG(zend.ZSTR_LEN(result))
 	zend.ZendStringEfree(result)
 }
 

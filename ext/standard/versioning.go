@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -46,7 +45,7 @@ import (
 
 func PhpCanonicalizeVersion(version *byte) *byte {
 	var len_ int = strlen(version)
-	var buf *byte = zend._safeEmalloc(len_, 2, 1)
+	var buf *byte = zend.SafeEmalloc(len_, 2, 1)
 	var q *byte
 	var lp byte
 	var lq byte
@@ -59,7 +58,7 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 	q = buf
 	*p++
 	lp = (*p) - 1
-	g.PostInc(&(*q)) = lp
+	b.PostInc(&(*q)) = lp
 	for *p {
 
 		/*  s/[-_+]/./g;
@@ -67,33 +66,30 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 		 *  s/([^\D\.])([^\d\.])/$1.$2/g;
 		 */
 
-		// #define isdig(x) ( isdigit ( x ) && ( x ) != '.' )
-
-		// #define isndig(x) ( ! isdigit ( x ) && ( x ) != '.' )
-
-		// #define isspecialver(x) ( ( x ) == '-' || ( x ) == '_' || ( x ) == '+' )
-
+		var isdig func(x byte) bool = func(x byte) bool { return isdigit(x) && x != '.' }
+		var isndig func(x byte) bool = func(x byte) bool { return !(isdigit(x)) && x != '.' }
+		var isspecialver func(x byte) bool = func(x byte) bool { return x == '-' || x == '_' || x == '+' }
 		lq = *(q - 1)
-		if (*p) == '-' || (*p) == '_' || (*p) == '+' {
+		if isspecialver(*p) {
 			if lq != '.' {
-				g.PostInc(&(*q)) = '.'
+				b.PostInc(&(*q)) = '.'
 			}
-		} else if !(isdigit(lp)) && lp != '.' && (isdigit(*p) && (*p) != '.') || isdigit(lp) && lp != '.' && (!(isdigit(*p)) && (*p) != '.') {
+		} else if isndig(lp) && isdig(*p) || isdig(lp) && isndig(*p) {
 			if lq != '.' {
-				g.PostInc(&(*q)) = '.'
+				b.PostInc(&(*q)) = '.'
 			}
-			g.PostInc(&(*q)) = *p
+			b.PostInc(&(*q)) = *p
 		} else if !(isalnum(*p)) {
 			if lq != '.' {
-				g.PostInc(&(*q)) = '.'
+				b.PostInc(&(*q)) = '.'
 			}
 		} else {
-			g.PostInc(&(*q)) = *p
+			b.PostInc(&(*q)) = *p
 		}
 		*p++
 		lp = (*p) - 1
 	}
-	g.PostInc(&(*q)) = '0'
+	b.PostInc(&(*q)) = '0'
 	return buf
 }
 
@@ -116,15 +112,7 @@ func CompareSpecialVersionForms(form1 *byte, form2 *byte) int {
 			break
 		}
 	}
-	if found1-found2 != 0 {
-		if found1-found2 < 0 {
-			return -1
-		} else {
-			return 1
-		}
-	} else {
-		return 0
-	}
+	return zend.ZEND_NORMALIZE_BOOL(found1 - found2)
 }
 
 /* }}} */
@@ -151,12 +139,12 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 		}
 	}
 	if orig_ver1[0] == '#' {
-		ver1 = zend._estrdup(orig_ver1)
+		ver1 = zend.Estrdup(orig_ver1)
 	} else {
 		ver1 = PhpCanonicalizeVersion(orig_ver1)
 	}
 	if orig_ver2[0] == '#' {
-		ver2 = zend._estrdup(orig_ver2)
+		ver2 = zend.Estrdup(orig_ver2)
 	} else {
 		ver2 = PhpCanonicalizeVersion(orig_ver2)
 	}
@@ -165,10 +153,10 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	n2 = ver2
 	p2 = n2
 	for (*p1) && (*p2) && n1 != nil && n2 != nil {
-		if g.Assign(&n1, strchr(p1, '.')) != nil {
+		if b.Assign(&n1, strchr(p1, '.')) != nil {
 			*n1 = '0'
 		}
-		if g.Assign(&n2, strchr(p2, '.')) != nil {
+		if b.Assign(&n2, strchr(p2, '.')) != nil {
 			*n2 = '0'
 		}
 		if isdigit(*p1) && isdigit(*p2) {
@@ -177,15 +165,7 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 
 			l1 = strtol(p1, nil, 10)
 			l2 = strtol(p2, nil, 10)
-			if l1-l2 != 0 {
-				if l1-l2 < 0 {
-					compare = -1
-				} else {
-					compare = 1
-				}
-			} else {
-				compare = 0
-			}
+			compare = zend.ZEND_NORMALIZE_BOOL(l1 - l2)
 		} else if !(isdigit(*p1)) && !(isdigit(*p2)) {
 
 			/* compare element names */
@@ -232,8 +212,8 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 			}
 		}
 	}
-	zend._efree(ver1)
-	zend._efree(ver2)
+	zend.Efree(ver1)
+	zend.Efree(ver2)
 	return compare
 }
 
@@ -251,7 +231,7 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -259,7 +239,7 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -268,85 +248,55 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &v1, &v1_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &v1, &v1_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &v2, &v2_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &v2, &v2_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &op, &op_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &op, &op_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -359,60 +309,34 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	compare = PhpVersionCompare(v1, v2)
 	if op == nil {
-		var __z *zend.Zval = return_value
-		__z.value.lval = compare
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(compare)
 		return
 	}
 	if !(strncmp(op, "<", op_len)) || !(strncmp(op, "lt", op_len)) {
-		if compare == -1 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare == -1)
 		return
 	}
 	if !(strncmp(op, "<=", op_len)) || !(strncmp(op, "le", op_len)) {
-		if compare != 1 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare != 1)
 		return
 	}
 	if !(strncmp(op, ">", op_len)) || !(strncmp(op, "gt", op_len)) {
-		if compare == 1 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare == 1)
 		return
 	}
 	if !(strncmp(op, ">=", op_len)) || !(strncmp(op, "ge", op_len)) {
-		if compare != -1 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare != -1)
 		return
 	}
 	if !(strncmp(op, "==", op_len)) || !(strncmp(op, "=", op_len)) || !(strncmp(op, "eq", op_len)) {
-		if compare == 0 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare == 0)
 		return
 	}
 	if !(strncmp(op, "!=", op_len)) || !(strncmp(op, "<>", op_len)) || !(strncmp(op, "ne", op_len)) {
-		if compare != 0 {
-			return_value.u1.type_info = 3
-		} else {
-			return_value.u1.type_info = 2
-		}
+		zend.RETVAL_BOOL(compare != 0)
 		return
 	}
-	return_value.u1.type_info = 1
+	zend.RETVAL_NULL()
 	return
 }
 

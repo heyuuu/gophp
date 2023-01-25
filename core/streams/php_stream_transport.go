@@ -4,6 +4,7 @@ package streams
 
 import (
 	"sik/core"
+	"sik/zend"
 )
 
 // Source: <main/streams/php_stream_transport.h>
@@ -31,21 +32,18 @@ import (
 type PhpStreamTransportFactoryFunc func(proto *byte, protolen int, resourcename *byte, resourcenamelen int, persistent_id *byte, options int, flags int, timeout *__struct__timeval, context *core.PhpStreamContext) *core.PhpStream
 type PhpStreamTransportFactory *PhpStreamTransportFactoryFunc
 
-// #define STREAM_XPORT_CLIENT       0
-
-// #define STREAM_XPORT_SERVER       1
-
-// #define STREAM_XPORT_CONNECT       2
-
-// #define STREAM_XPORT_BIND       4
-
-// #define STREAM_XPORT_LISTEN       8
-
-// #define STREAM_XPORT_CONNECT_ASYNC       16
+const STREAM_XPORT_CLIENT = 0
+const STREAM_XPORT_SERVER = 1
+const STREAM_XPORT_CONNECT = 2
+const STREAM_XPORT_BIND = 4
+const STREAM_XPORT_LISTEN = 8
+const STREAM_XPORT_CONNECT_ASYNC = 16
 
 /* Open a client or server socket connection */
 
-// #define php_stream_xport_create(name,namelen,options,flags,persistent_id,timeout,context,estr,ecode) _php_stream_xport_create ( name , namelen , options , flags , persistent_id , timeout , context , estr , ecode STREAMS_CC )
+func PhpStreamXportCreate(name *byte, namelen int, options int, flags int, persistent_id *byte, timeout *__struct__timeval, context *core.PhpStreamContext, estr **zend.ZendString, ecode *int) *core.PhpStream {
+	return _phpStreamXportCreate(name, namelen, options, flags, persistent_id, timeout, context, estr, ecode)
+}
 
 /* Bind the stream to a local address */
 

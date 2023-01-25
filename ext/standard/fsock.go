@@ -3,10 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -80,7 +79,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var port zend.ZendLong = -1
 	var zerrno *zend.Zval = nil
 	var zerrstr *zend.Zval = nil
-	var timeout float64 = float64(FileGlobals.GetDefaultSocketTimeout())
+	var timeout float64 = float64(FG(default_socket_timeout))
 	var conv int64
 	var tv __struct__timeval
 	var hashkey *byte = nil
@@ -89,12 +88,12 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var hostname *byte = nil
 	var hostname_len int
 	var errstr *zend.ZendString = nil
-	return_value.u1.type_info = 2
+	zend.RETVAL_FALSE
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 5
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -102,7 +101,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -111,125 +110,75 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &port, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &port, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_DOUBLE
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	if persistent != 0 {
-		zend.ZendSpprintf(&hashkey, 0, "pfsockopen__%s:"+"%"+"lld", host, port)
+		core.Spprintf(&hashkey, 0, "pfsockopen__%s:"+zend.ZEND_LONG_FMT, host, port)
 	}
 	if port > 0 {
-		hostname_len = zend.ZendSpprintf(&hostname, 0, "%s:"+"%"+"lld", host, port)
+		hostname_len = core.Spprintf(&hostname, 0, "%s:"+zend.ZEND_LONG_FMT, host, port)
 	} else {
 		hostname_len = host_len
 		hostname = host
@@ -240,117 +189,40 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	conv = time_t(timeout * 1000000.0)
 	tv.tv_sec = conv / 1000000
 	tv.tv_usec = conv % 1000000
-	stream = streams._phpStreamXportCreate(hostname, hostname_len, 0x8, 0|2, hashkey, &tv, nil, &errstr, &err)
+	stream = streams.PhpStreamXportCreate(hostname, hostname_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, hashkey, &tv, nil, &errstr, &err)
 	if port > 0 {
-		zend._efree(hostname)
+		zend.Efree(hostname)
 	}
 	if stream == nil {
-		core.PhpErrorDocref(nil, 1<<1, "unable to connect to %s:"+"%"+"lld"+" (%s)", host, port, g.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.val }))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s:"+zend.ZEND_LONG_FMT+" (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return zend.ZSTR_VAL(errstr) }))
 	}
 	if hashkey != nil {
-		zend._efree(hashkey)
+		zend.Efree(hashkey)
 	}
 	if stream == nil {
 		if zerrno != nil {
-			for {
-				r.Assert(zerrno.u1.v.type_ == 10)
-				for {
-					var _zv *zend.Zval = zerrno
-					var ref *zend.ZendReference = _zv.value.ref
-					if ref.sources.ptr != nil {
-						zend.ZendTryAssignTypedRefLong(ref, err)
-						break
-					}
-					_zv = &ref.val
-					zend.ZvalPtrDtor(_zv)
-					var __z *zend.Zval = _zv
-					__z.value.lval = err
-					__z.u1.type_info = 4
-					break
-				}
-				break
-			}
+			zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, err)
 		}
 		if errstr != nil {
 			if zerrstr != nil {
-				for {
-					r.Assert(zerrstr.u1.v.type_ == 10)
-					for {
-						var _zv *zend.Zval = zerrstr
-						var ref *zend.ZendReference = _zv.value.ref
-						if ref.sources.ptr != nil {
-							zend.ZendTryAssignTypedRefStr(ref, errstr)
-							break
-						}
-						_zv = &ref.val
-						zend.ZvalPtrDtor(_zv)
-						var __z *zend.Zval = _zv
-						var __s *zend.ZendString = errstr
-						__z.value.str = __s
-						if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-							__z.u1.type_info = 6
-						} else {
-							__z.u1.type_info = 6 | 1<<0<<8
-						}
-						break
-					}
-					break
-				}
+				zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
 			} else {
 				zend.ZendStringRelease(errstr)
 			}
 		}
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	if zerrno != nil {
-		for {
-			r.Assert(zerrno.u1.v.type_ == 10)
-			for {
-				var _zv *zend.Zval = zerrno
-				var ref *zend.ZendReference = _zv.value.ref
-				if ref.sources.ptr != nil {
-					zend.ZendTryAssignTypedRefLong(ref, 0)
-					break
-				}
-				_zv = &ref.val
-				zend.ZvalPtrDtor(_zv)
-				var __z *zend.Zval = _zv
-				__z.value.lval = 0
-				__z.u1.type_info = 4
-				break
-			}
-			break
-		}
+		zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, 0)
 	}
 	if zerrstr != nil {
-		for {
-			r.Assert(zerrstr.u1.v.type_ == 10)
-			for {
-				var _zv *zend.Zval = zerrstr
-				var ref *zend.ZendReference = _zv.value.ref
-				if ref.sources.ptr != nil {
-					zend.ZendTryAssignTypedRefEmptyString(ref)
-					break
-				}
-				_zv = &ref.val
-				zend.ZvalPtrDtor(_zv)
-				var __z *zend.Zval = _zv
-				var __s *zend.ZendString = zend.ZendEmptyString
-				__z.value.str = __s
-				__z.u1.type_info = 6
-				break
-			}
-			break
-		}
+		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
 	if errstr != nil {
 		zend.ZendStringReleaseEx(errstr, 0)
 	}
-	var __z *zend.Zval = return_value
-	__z.value.res = stream.res
-	__z.u1.type_info = 9 | 1<<0<<8
-	stream.__exposed = 1
+	core.PhpStreamToZval(stream, return_value)
 }
 
 /* }}} */

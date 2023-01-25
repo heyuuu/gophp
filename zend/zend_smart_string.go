@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_smart_string.h>
@@ -37,28 +37,28 @@ import (
 
 /* wrapper */
 
-// #define smart_string_appends_ex(str,src,what) smart_string_appendl_ex ( ( str ) , ( src ) , strlen ( src ) , ( what ) )
-
-// #define smart_string_appends(str,src) smart_string_appendl ( ( str ) , ( src ) , strlen ( src ) )
-
-// #define smart_string_append_ex(str,src,what) smart_string_appendl_ex ( ( str ) , ( ( smart_string * ) ( src ) ) -> c , ( ( smart_string * ) ( src ) ) -> len , ( what ) ) ;
-
-// #define smart_string_sets(str,src) smart_string_setl ( ( str ) , ( src ) , strlen ( src ) ) ;
-
-// #define smart_string_appendc(str,c) smart_string_appendc_ex ( ( str ) , ( c ) , 0 )
-
-// #define smart_string_free(s) smart_string_free_ex ( ( s ) , 0 )
-
-// #define smart_string_appendl(str,src,len) smart_string_appendl_ex ( ( str ) , ( src ) , ( len ) , 0 )
-
-// #define smart_string_append(str,src) smart_string_append_ex ( ( str ) , ( src ) , 0 )
-
-// #define smart_string_append_long(str,val) smart_string_append_long_ex ( ( str ) , ( val ) , 0 )
-
-// #define smart_string_append_unsigned(str,val) smart_string_append_unsigned_ex ( ( str ) , ( val ) , 0 )
-
+func SmartStringAppendsEx(str *SmartString, src *byte, what ZendBool) {
+	SmartStringAppendlEx(str, src, strlen(src), what)
+}
+func SmartStringAppends(str *SmartString, src *byte) {
+	SmartStringAppendl(str, src, strlen(src))
+}
+func SmartStringAppendEx(str *SmartString, src __auto__, what ZendBool) {
+	SmartStringAppendlEx(str, (*SmartString)(src).GetC(), (*SmartString)(src).GetLen(), what)
+}
+func SmartStringSets(str *SmartString, src *byte) { SmartStringSetl(str, src, strlen(src)) }
+func SmartStringAppendc(str *SmartString, c byte) { SmartStringAppendcEx(str, c, 0) }
+func SmartStringFree(s *SmartString)              { SmartStringFreeEx(s, 0) }
+func SmartStringAppendl(str *SmartString, src string, len_ int) {
+	SmartStringAppendlEx(str, src, len_, 0)
+}
+func SmartStringAppend(str *SmartString, src __auto__)     { SmartStringAppendEx(str, src, 0) }
+func SmartStringAppendLong(str *SmartString, val ZendLong) { SmartStringAppendLongEx(str, val, 0) }
+func SmartStringAppendUnsigned(str *SmartString, val ZendUlong) {
+	SmartStringAppendUnsignedEx(str, val, 0)
+}
 func SmartStringAlloc(str *SmartString, len_ int, persistent ZendBool) int {
-	if str.GetC() == nil || len_ >= str.GetA()-str.GetLen() {
+	if UNEXPECTED(str.GetC() == nil) || UNEXPECTED(len_ >= str.GetA()-str.GetLen()) {
 		if persistent != 0 {
 			_smartStringAllocPersistent(str, len_)
 		} else {
@@ -69,7 +69,7 @@ func SmartStringAlloc(str *SmartString, len_ int, persistent ZendBool) int {
 }
 func SmartStringFreeEx(str *SmartString, persistent ZendBool) {
 	if str.GetC() != nil {
-		g.CondF(persistent != 0, func() { return Free(str.GetC()) }, func() { return _efree(str.GetC()) })
+		Pefree(str.GetC(), persistent)
 		str.SetC(nil)
 	}
 	str.SetLen(0)
@@ -91,13 +91,13 @@ func SmartStringAppendlEx(dest *SmartString, str *byte, len_ int, persistent Zen
 }
 func SmartStringAppendLongEx(dest *SmartString, num ZendLong, persistent ZendBool) {
 	var buf []byte
-	var result *byte = ZendPrintLongToBuf(buf+g.SizeOf("buf")-1, num)
-	SmartStringAppendlEx(dest, result, buf+g.SizeOf("buf")-1-result, persistent)
+	var result *byte = ZendPrintLongToBuf(buf+b.SizeOf("buf")-1, num)
+	SmartStringAppendlEx(dest, result, buf+b.SizeOf("buf")-1-result, persistent)
 }
 func SmartStringAppendUnsignedEx(dest *SmartString, num ZendUlong, persistent ZendBool) {
 	var buf []byte
-	var result *byte = ZendPrintUlongToBuf(buf+g.SizeOf("buf")-1, num)
-	SmartStringAppendlEx(dest, result, buf+g.SizeOf("buf")-1-result, persistent)
+	var result *byte = ZendPrintUlongToBuf(buf+b.SizeOf("buf")-1, num)
+	SmartStringAppendlEx(dest, result, buf+b.SizeOf("buf")-1-result, persistent)
 }
 func SmartStringSetl(dest *SmartString, src *byte, len_ int) {
 	dest.SetLen(len_)

@@ -7,13 +7,13 @@ package zend
  */
 type U struct /* union */ {
 	d float64
-	L []uint32
+	L []ULong
 }
 
-func (this U) GetD() float64        { return this.d }
-func (this *U) SetD(value float64)  { this.d = value }
-func (this U) GetL() []uint32       { return this.L }
-func (this *U) SetL(value []uint32) { this.L = value }
+func (this U) GetD() float64       { return this.d }
+func (this *U) SetD(value float64) { this.d = value }
+func (this U) GetL() []ULong       { return this.L }
+func (this *U) SetL(value []ULong) { this.L = value }
 
 /**
  * BCinfo
@@ -64,7 +64,7 @@ type Bigint struct {
 	maxwds int
 	sign   int
 	wds    int
-	x      []uint32
+	x      []ULong
 }
 
 func (this Bigint) GetNext() *Bigint       { return this.next }
@@ -77,5 +77,5 @@ func (this Bigint) GetSign() int           { return this.sign }
 func (this *Bigint) SetSign(value int)     { this.sign = value }
 func (this Bigint) GetWds() int            { return this.wds }
 func (this *Bigint) SetWds(value int)      { this.wds = value }
-func (this Bigint) GetX() []uint32         { return this.x }
-func (this *Bigint) SetX(value []uint32)   { this.x = value }
+func (this Bigint) GetX() []ULong          { return this.x }
+func (this *Bigint) SetX(value []ULong)    { this.x = value }

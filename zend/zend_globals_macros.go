@@ -29,6 +29,8 @@ package zend
 
 // #define CG(v) ( compiler_globals . v )
 
+var Zendparse func() int
+
 /* Executor */
 
 // #define EG(v) ( executor_globals . v )

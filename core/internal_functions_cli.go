@@ -84,5 +84,3 @@ package core
 // failed # include "ext/xmlreader/php_xmlreader.h"
 
 // failed # include "ext/xmlwriter/php_xmlwriter.h"
-
-// #define EXTCOUNT       ( sizeof ( php_builtin_extensions ) / sizeof ( zend_module_entry * ) )

@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -108,7 +107,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 	retval = zend.ZendStringAlloc(buf_size, 0)
 	i = length
 	p1 = str
-	p2 = (*uint8)(retval.val)
+	p2 = (*uint8)(zend.ZSTR_VAL(retval))
 	decoded_len = 0
 	for i > 0 && (*p1) != '0' {
 		if (*p1) == '=' {
@@ -122,11 +121,11 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 
 				/* next char should be a hexadecimal digit */
 
-				if g.PreDec(&i) == 0 || g.Assign(&l_nbl, hexval_tbl[*(g.PreInc(&p1))]) >= 16 {
-					zend._efree(retval)
+				if b.PreDec(&i) == 0 || b.Assign(&l_nbl, hexval_tbl[*(b.PreInc(&p1))]) >= 16 {
+					zend.Efree(retval)
 					return nil
 				}
-				*(g.PostInc(&p2)) = h_nbl<<4 | l_nbl
+				*(b.PostInc(&p2)) = h_nbl<<4 | l_nbl
 				decoded_len++
 				i--
 				p1++
@@ -135,8 +134,8 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 				/* soft line break */
 
 				for h_nbl == 32 {
-					if g.PreDec(&i) == 0 || g.Assign(&h_nbl, hexval_tbl[*(g.PreInc(&p1))]) == 64 {
-						zend._efree(retval)
+					if b.PreDec(&i) == 0 || b.Assign(&h_nbl, hexval_tbl[*(b.PreInc(&p1))]) == 64 {
+						zend.Efree(retval)
 						return nil
 					}
 				}
@@ -147,14 +146,14 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 				i--
 				p1++
 			} else {
-				zend._efree(retval)
+				zend.Efree(retval)
 				return nil
 			}
 		} else {
 			if replace_us_by_ws == (*p1) {
-				*(g.PostInc(&p2)) = 'x'
+				*(b.PostInc(&p2)) = 'x'
 			} else {
-				*(g.PostInc(&p2)) = *p1
+				*(b.PostInc(&p2)) = *p1
 			}
 			i--
 			p1++
@@ -162,13 +161,13 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 		}
 	}
 	*p2 = '0'
-	retval.len_ = decoded_len
+	zend.ZSTR_LEN(retval) = decoded_len
 	return retval
 }
 
 /* }}} */
 
-// #define PHP_QPRINT_MAXL       75
+const PHP_QPRINT_MAXL = 75
 
 func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 	var lp zend.ZendUlong = 0
@@ -176,39 +175,39 @@ func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 	var d *uint8
 	var hex *byte = "0123456789ABCDEF"
 	var ret *zend.ZendString
-	ret = zend.ZendStringSafeAlloc(3, length+(3*length/(75-9)+1), 0, 0)
-	d = (*uint8)(ret.val)
-	for g.PostDec(&length) {
-		if g.Assign(&c, g.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
-			g.PostInc(&(*d)) = '0'
+	ret = zend.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
+	d = (*uint8)(zend.ZSTR_VAL(ret))
+	for b.PostDec(&length) {
+		if b.Assign(&c, b.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
+			b.PostInc(&(*d)) = '0'
 			*str++
-			g.PostInc(&(*d)) = (*str) - 1
+			b.PostInc(&(*d)) = (*str) - 1
 			length--
 			lp = 0
 		} else {
 			if iscntrl(c) || c == 0x7f || (c&0x80) != 0 || c == '=' || c == ' ' && (*str) == '0' {
-				if g.AssignOp(&lp, "+=", 3) > 75 && c <= 0x7f || c > 0x7f && c <= 0xdf && lp+3 > 75 || c > 0xdf && c <= 0xef && lp+6 > 75 || c > 0xef && c <= 0xf4 && lp+9 > 75 {
-					g.PostInc(&(*d)) = '='
-					g.PostInc(&(*d)) = '0'
-					g.PostInc(&(*d)) = '0'
+				if b.AssignOp(&lp, "+=", 3) > PHP_QPRINT_MAXL && c <= 0x7f || c > 0x7f && c <= 0xdf && lp+3 > PHP_QPRINT_MAXL || c > 0xdf && c <= 0xef && lp+6 > PHP_QPRINT_MAXL || c > 0xef && c <= 0xf4 && lp+9 > PHP_QPRINT_MAXL {
+					b.PostInc(&(*d)) = '='
+					b.PostInc(&(*d)) = '0'
+					b.PostInc(&(*d)) = '0'
 					lp = 3
 				}
-				g.PostInc(&(*d)) = '='
-				g.PostInc(&(*d)) = hex[c>>4]
-				g.PostInc(&(*d)) = hex[c&0xf]
+				b.PostInc(&(*d)) = '='
+				b.PostInc(&(*d)) = hex[c>>4]
+				b.PostInc(&(*d)) = hex[c&0xf]
 			} else {
-				if g.PreInc(&lp) > 75 {
-					g.PostInc(&(*d)) = '='
-					g.PostInc(&(*d)) = '0'
-					g.PostInc(&(*d)) = '0'
+				if b.PreInc(&lp) > PHP_QPRINT_MAXL {
+					b.PostInc(&(*d)) = '='
+					b.PostInc(&(*d)) = '0'
+					b.PostInc(&(*d)) = '0'
 					lp = 1
 				}
-				g.PostInc(&(*d)) = c
+				b.PostInc(&(*d)) = c
 			}
 		}
 	}
 	*d = '0'
-	ret = zend.ZendStringTruncate(ret, d-(*uint8)(ret.val), 0)
+	ret = zend.ZendStringTruncate(ret, d-(*uint8)(zend.ZSTR_VAL(ret)), 0)
 	return ret
 }
 
@@ -225,7 +224,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -233,7 +232,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -242,52 +241,42 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &arg1, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &arg1, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -298,23 +287,20 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		}
 		break
 	}
-	if arg1.len_ == 0 {
+	if zend.ZSTR_LEN(arg1) == 0 {
 
 		/* shortcut */
 
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendEmptyString
-		__z.value.str = __s
-		__z.u1.type_info = 6
+		zend.RETVAL_EMPTY_STRING()
 		return
 	}
-	str_in = arg1.val
-	str_out = zend.ZendStringAlloc(arg1.len_, 0)
+	str_in = zend.ZSTR_VAL(arg1)
+	str_out = zend.ZendStringAlloc(zend.ZSTR_LEN(arg1), 0)
 	for str_in[i] {
 		switch str_in[i] {
 		case '=':
 			if str_in[i+1] && str_in[i+2] && isxdigit(int(str_in[i+1])) && isxdigit(int(str_in[i+2])) {
-				str_out.val[g.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
+				zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
 				i += 3
 			} else {
 				k = 1
@@ -352,20 +338,17 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 					/* CR or LF */
 
 				} else {
-					str_out.val[g.PostInc(&j)] = str_in[g.PostInc(&i)]
+					zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 				}
 			}
 			break
 		default:
-			str_out.val[g.PostInc(&j)] = str_in[g.PostInc(&i)]
+			zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 		}
 	}
-	str_out.val[j] = '0'
-	str_out.len_ = j
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = str_out
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	zend.ZSTR_VAL(str_out)[j] = '0'
+	zend.ZSTR_LEN(str_out) = j
+	zend.RETVAL_NEW_STR(str_out)
 }
 
 /* }}} */
@@ -377,7 +360,7 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -385,7 +368,7 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -394,52 +377,42 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -450,22 +423,12 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		}
 		break
 	}
-	if str.len_ == 0 {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendEmptyString
-		__z.value.str = __s
-		__z.u1.type_info = 6
+	if zend.ZSTR_LEN(str) == 0 {
+		zend.RETVAL_EMPTY_STRING()
 		return
 	}
-	new_str = PhpQuotPrintEncode((*uint8)(str.val), str.len_)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = new_str
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	new_str = PhpQuotPrintEncode((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str))
+	zend.RETVAL_STR(new_str)
 	return
 }
 

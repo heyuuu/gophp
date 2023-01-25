@@ -1,2 +1,2 @@
 clear:
-	ls | grep -v runtime | grep -v builtin | grep -v go.mod | grep -v Makefile | xargs rm -rf
+	ls | grep -v builtin | grep -v go.mod | grep -v Makefile | xargs rm -rf

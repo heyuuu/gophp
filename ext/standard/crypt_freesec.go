@@ -3,7 +3,7 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <ext/standard/crypt_freesec.h>
@@ -12,7 +12,7 @@ import (
 
 // # include "php_stdint.h"
 
-// #define MD5_HASH_MAX_LEN       120
+const MD5_HASH_MAX_LEN = 120
 
 /*
  * _crypt_extended_init() must be called explicitly before first use of
@@ -36,7 +36,7 @@ import (
 
 // # include "crypt_freesec.h"
 
-// #define _PASSWORD_EFMT1       '_'
+const _PASSWORD_EFMT1 = '_'
 
 var IP []u_char = []u_char{58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6, 64, 56, 48, 40, 32, 24, 16, 8, 57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3, 61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7}
 var KeyPerm []u_char = []u_char{57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36, 63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4}
@@ -115,7 +115,7 @@ func _cryptExtendedInit() {
 	var final_perm []u_char
 	var u_sbox [][]u_char
 	var un_pbox []u_char
-	bits24 = g.Assign(&bits28, Bits32+4) + 4
+	bits24 = b.Assign(&bits28, Bits32+4) + 4
 
 	/*
 	 * Invert the S-boxes, reordering the input bits.
@@ -147,7 +147,7 @@ func _cryptExtendedInit() {
 	 */
 
 	for i = 0; i < 64; i++ {
-		init_perm[g.Assign(&final_perm[i], IP[i]-1)] = i
+		init_perm[b.Assign(&final_perm[i], IP[i]-1)] = i
 		inv_key_perm[i] = 255
 	}
 
@@ -176,19 +176,19 @@ func _cryptExtendedInit() {
 
 	for k = 0; k < 8; k++ {
 		for i = 0; i < 256; i++ {
-			*(g.Assign(&il, &IpMaskl[k][i])) = 0
-			*(g.Assign(&ir, &IpMaskr[k][i])) = 0
-			*(g.Assign(&fl, &FpMaskl[k][i])) = 0
-			*(g.Assign(&fr, &FpMaskr[k][i])) = 0
+			*(b.Assign(&il, &IpMaskl[k][i])) = 0
+			*(b.Assign(&ir, &IpMaskr[k][i])) = 0
+			*(b.Assign(&fl, &FpMaskl[k][i])) = 0
+			*(b.Assign(&fr, &FpMaskr[k][i])) = 0
 			for j = 0; j < 8; j++ {
 				inbit = 8*k + j
 				if (i & Bits8[j]) != 0 {
-					if g.Assign(&obit, init_perm[inbit]) < 32 {
+					if b.Assign(&obit, init_perm[inbit]) < 32 {
 						*il |= Bits32[obit]
 					} else {
 						*ir |= Bits32[obit-32]
 					}
-					if g.Assign(&obit, final_perm[inbit]) < 32 {
+					if b.Assign(&obit, final_perm[inbit]) < 32 {
 						*fl |= Bits32[obit]
 					} else {
 						*fr |= Bits32[obit-32]
@@ -197,12 +197,12 @@ func _cryptExtendedInit() {
 			}
 		}
 		for i = 0; i < 128; i++ {
-			*(g.Assign(&il, &KeyPermMaskl[k][i])) = 0
-			*(g.Assign(&ir, &KeyPermMaskr[k][i])) = 0
+			*(b.Assign(&il, &KeyPermMaskl[k][i])) = 0
+			*(b.Assign(&ir, &KeyPermMaskr[k][i])) = 0
 			for j = 0; j < 7; j++ {
 				inbit = 8*k + j
 				if (i & Bits8[j+1]) != 0 {
-					if g.Assign(&obit, inv_key_perm[inbit]) == 255 {
+					if b.Assign(&obit, inv_key_perm[inbit]) == 255 {
 						continue
 					}
 					if obit < 28 {
@@ -212,12 +212,12 @@ func _cryptExtendedInit() {
 					}
 				}
 			}
-			*(g.Assign(&il, &CompMaskl[k][i])) = 0
-			*(g.Assign(&ir, &CompMaskr[k][i])) = 0
+			*(b.Assign(&il, &CompMaskl[k][i])) = 0
+			*(b.Assign(&ir, &CompMaskr[k][i])) = 0
 			for j = 0; j < 7; j++ {
 				inbit = 7*k + j
 				if (i & Bits8[j+1]) != 0 {
-					if g.Assign(&obit, inv_comp_perm[inbit]) == 255 {
+					if b.Assign(&obit, inv_comp_perm[inbit]) == 255 {
 						continue
 					}
 					if obit < 24 {
@@ -240,7 +240,7 @@ func _cryptExtendedInit() {
 	}
 	for b = 0; b < 4; b++ {
 		for i = 0; i < 256; i++ {
-			*(g.Assign(&p, &Psbox[b][i])) = 0
+			*(b.Assign(&p, &Psbox[b][i])) = 0
 			for j = 0; j < 8; j++ {
 				if (i & Bits8[j]) != 0 {
 					*p |= Bits32[un_pbox[8*b+j]]
@@ -377,7 +377,7 @@ func DoDes(l_in uint32, r_in uint32, l_out *uint32, r_out *uint32, count int, da
 	l = IpMaskl[0][l_in>>24] | IpMaskl[1][l_in>>16&0xff] | IpMaskl[2][l_in>>8&0xff] | IpMaskl[3][l_in&0xff] | IpMaskl[4][r_in>>24] | IpMaskl[5][r_in>>16&0xff] | IpMaskl[6][r_in>>8&0xff] | IpMaskl[7][r_in&0xff]
 	r = IpMaskr[0][l_in>>24] | IpMaskr[1][l_in>>16&0xff] | IpMaskr[2][l_in>>8&0xff] | IpMaskr[3][l_in&0xff] | IpMaskr[4][r_in>>24] | IpMaskr[5][r_in>>16&0xff] | IpMaskr[6][r_in>>8&0xff] | IpMaskr[7][r_in&0xff]
 	saltbits = data.GetSaltbits()
-	for g.PostDec(&count) {
+	for b.PostDec(&count) {
 
 		/*
 		 * Do each round.
@@ -386,7 +386,7 @@ func DoDes(l_in uint32, r_in uint32, l_out *uint32, r_out *uint32, count int, da
 		kl = kl1
 		kr = kr1
 		round = 16
-		for g.PostDec(&round) {
+		for b.PostDec(&round) {
 
 			/*
 			 * Expand R to 48 bits (simulate the E-box).
@@ -401,8 +401,8 @@ func DoDes(l_in uint32, r_in uint32, l_out *uint32, r_out *uint32, count int, da
 			 */
 
 			f = (r48l ^ r48r) & saltbits
-			r48l ^= f ^ g.PostInc(&(*kl))
-			r48r ^= f ^ g.PostInc(&(*kr))
+			r48l ^= f ^ b.PostInc(&(*kl))
+			r48r ^= f ^ b.PostInc(&(*kr))
 
 			/*
 			 * Do sbox lookups (which shrink it back to 32 bits)
@@ -471,8 +471,8 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 	 */
 
 	q = (*u_char)(keybuf)
-	for size_t(q-(*u_char)(keybuf)) < g.SizeOf("keybuf") {
-		g.PostInc(&(*q)) = (*key) << 1
+	for size_t(q-(*u_char)(keybuf)) < b.SizeOf("keybuf") {
+		b.PostInc(&(*q)) = (*key) << 1
 		if (*key) != 0 {
 			key++
 		}
@@ -480,7 +480,7 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 	if DesSetkey((*byte)(keybuf), data) != 0 {
 		return nil
 	}
-	if (*setting) == '_' {
+	if (*setting) == _PASSWORD_EFMT1 {
 
 		/*
 		 * "new"-style:
@@ -524,8 +524,8 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 			 */
 
 			q = (*u_char)(keybuf)
-			for size_t(q-(*u_char)(keybuf)) < g.SizeOf("keybuf") && (*key) != 0 {
-				g.PostInc(&(*q)) ^= g.PostInc(&(*key)) << 1
+			for size_t(q-(*u_char)(keybuf)) < b.SizeOf("keybuf") && (*key) != 0 {
+				b.PostInc(&(*q)) ^= b.PostInc(&(*key)) << 1
 			}
 			if DesSetkey((*byte)(keybuf), data) != 0 {
 				return nil
@@ -566,19 +566,19 @@ func _cryptExtendedR(key *uint8, setting *byte, data *PhpCryptExtendedData) *byt
 	 */
 
 	l = r0 >> 8
-	g.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l&0x3f]
 	l = r0<<16 | r1>>16&0xffff
-	g.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>18&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l&0x3f]
 	l = r1 << 2
-	g.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
-	g.PostInc(&(*p)) = Ascii64[l&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>12&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l>>6&0x3f]
+	b.PostInc(&(*p)) = Ascii64[l&0x3f]
 	*p = 0
 	return data.GetOutput()
 }

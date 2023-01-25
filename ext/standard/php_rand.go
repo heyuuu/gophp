@@ -2,6 +2,10 @@
 
 package standard
 
+import (
+	"sik/zend"
+)
+
 // Source: <ext/standard/php_rand.h>
 
 /*
@@ -35,9 +39,8 @@ package standard
 
 /* System Rand functions */
 
-// #define RAND_MAX       PHP_MT_RAND_MAX
-
-// #define PHP_RAND_MAX       PHP_MT_RAND_MAX
+const RAND_MAX = PHP_MT_RAND_MAX
+const PHP_RAND_MAX = PHP_MT_RAND_MAX
 
 /*
  * A bit of tricky math here.  We want to avoid using a modulus because
@@ -65,6 +68,10 @@ package standard
  * -RL
 */
 
-// #define RAND_RANGE_BADSCALING(__n,__min,__max,__tmax) ( __n ) = ( __min ) + ( zend_long ) ( ( double ) ( ( double ) ( __max ) - ( __min ) + 1.0 ) * ( ( __n ) / ( ( __tmax ) + 1.0 ) ) )
-
-// #define GENERATE_SEED() ( ( ( zend_long ) ( time ( 0 ) * getpid ( ) ) ) ^ ( ( zend_long ) ( 1000000.0 * php_combined_lcg ( ) ) ) )
+func RAND_RANGE_BADSCALING(__n int64, __min zend.ZendLong, __max zend.ZendLong, __tmax float) int64 {
+	__n = __min + zend_long(float64(float64(__max-__min+1.0)*(__n/(__tmax+1.0))))
+	return __n
+}
+func GENERATE_SEED() int {
+	return zend_long(time(0)*getpid()) ^ zend_long(1000000.0*PhpCombinedLcg())
+}

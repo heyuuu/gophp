@@ -3,7 +3,7 @@
 package core
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -54,7 +54,7 @@ import (
 
 // #define NATURAL
 
-// #define THRESHOLD       16
+const THRESHOLD = 16
 
 /* #define NATURAL __special__  to get hybrid natural merge.
  * (The default is pairwise merging.)
@@ -70,17 +70,47 @@ import (
 
 // # include "php.h"
 
-// #define ISIZE       sizeof ( int )
+const ISIZE = b.SizeOf("int")
+const PSIZE = b.SizeOf("u_char *")
 
-// #define PSIZE       sizeof ( u_char * )
-
-// #define ICOPY_LIST(src,dst,last) do * ( int * ) dst = * ( int * ) src , src += ISIZE , dst += ISIZE ; while ( src < last )
-
-// #define ICOPY_ELT(src,dst,i) do * ( int * ) dst = * ( int * ) src , src += ISIZE , dst += ISIZE ; while ( i -= ISIZE )
-
-// #define CCOPY_LIST(src,dst,last) do * dst ++ = * src ++ ; while ( src < last )
-
-// #define CCOPY_ELT(src,dst,i) do * dst ++ = * src ++ ; while ( i -= 1 )
+func ICOPY_LIST(src *u_char, dst *u_char, last *u_char) {
+	for {
+		*((*int)(dst)) = *((*int)(src))
+		src += ISIZE
+		dst += ISIZE
+		if src >= last {
+			break
+		}
+	}
+}
+func ICOPY_ELT(src *u_char, dst *u_char, i int) {
+	for {
+		*((*int)(dst)) = *((*int)(src))
+		src += ISIZE
+		dst += ISIZE
+		if !(b.AssignOp(&i, "-=", ISIZE)) {
+			break
+		}
+	}
+}
+func CCOPY_LIST(src *int, dst *u_char, last *u_char) {
+	for {
+		*src++
+		b.PostInc(&(*dst)) = (*src) - 1
+		if src >= last {
+			break
+		}
+	}
+}
+func CCOPY_ELT(src *int, dst *u_char, i int) {
+	for {
+		*src++
+		b.PostInc(&(*dst)) = (*src) - 1
+		if !(b.AssignOp(&i, "-=", 1)) {
+			break
+		}
+	}
+}
 
 /*
  * Find the next possible pointer head.  (Trickery for forcing an array
@@ -88,7 +118,9 @@ import (
  * boundaries.
  */
 
-// #define EVAL(p) ( u_char * * ) ( ( u_char * ) 0 + ( ( ( u_char * ) p + PSIZE - 1 - ( u_char * ) 0 ) & ~ ( PSIZE - 1 ) ) )
+func EVAL(p *u_char) **u_char {
+	return (**u_char)((*u_char)(0 + ((*u_char)(p+PSIZE-1-(*u_char)(0)) & ^(PSIZE - 1))))
+}
 
 /* {{{ php_mergesort
  * Arguments are as for qsort.
@@ -113,7 +145,7 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 	var p *u_char
 	var last *u_char
 	var p1 **u_char
-	if size < g.SizeOf("u_char *")/2 {
+	if size < PSIZE/2 {
 		errno = EINVAL
 		return -1
 	}
@@ -127,10 +159,10 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 	 */
 
 	iflag = 0
-	if size%g.SizeOf("int") == 0 && (*byte)(base-(*byte)(0))%g.SizeOf("int") == 0 {
+	if size%ISIZE == 0 && (*byte)(base-(*byte)(0))%ISIZE == 0 {
 		iflag = 1
 	}
-	if g.Assign(&list2, zend.Malloc(nmemb*size+g.SizeOf("u_char *"))) == nil {
+	if b.Assign(&list2, zend.Malloc(nmemb*size+PSIZE)) == nil {
 		return -1
 	}
 	list1 = base
@@ -138,18 +170,18 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 	last = list2 + nmemb*size
 	big = 0
 	i = big
-	for (*((**u_char)((*u_char)(0+((*u_char)(list2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *")-1))) != last))) != nil {
+	for (*EVAL)(list2) != last {
 		l2 = list1
-		p1 = (**u_char)((*u_char)(0 + ((*u_char)(list1+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))
+		p1 = EVAL(list1)
 		p2 = list2
 		tp2 = p2
-		for ; p2 != last; p1 = (**u_char)((*u_char)(0 + ((*u_char)(l2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))) {
-			p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+		for ; p2 != last; p1 = EVAL(l2) {
+			p2 = (*EVAL)(p2)
 			f1 = l2
 			l1 = list1 + (p2 - list2)
 			f2 = l1
 			if p2 != last {
-				p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+				p2 = (*EVAL)(p2)
 			}
 			l2 = list1 + (p2 - list2)
 			for f1 < l1 && f2 < l2 {
@@ -165,8 +197,8 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 					sense = 0
 				}
 				if big == 0 {
-					for g.AssignOp(&b, "+=", size) < t && cmp(q, b) > sense {
-						if g.PreInc(&i) == 6 {
+					for b.AssignOp(&b, "+=", size) < t && cmp(q, b) > sense {
+						if b.PreInc(&i) == 6 {
 							big = 1
 							goto EXPONENTIAL
 						}
@@ -174,8 +206,8 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 				} else {
 				EXPONENTIAL:
 					for i = size; ; i <<= 1 {
-						if g.Assign(&p, b+i) >= t {
-							if g.Assign(&p, t-size) > b && (*cmp)(q, p) <= sense {
+						if b.Assign(&p, b+i) >= t {
+							if b.Assign(&p, t-size) > b && (*cmp)(q, p) <= sense {
 								t = p
 							} else {
 								b = p
@@ -193,7 +225,7 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 					}
 					for t > b+size {
 						i = ((t - b) / size >> 1) * size
-						if (*cmp)(q, g.Assign(&p, b+i)) <= sense {
+						if (*cmp)(q, b.Assign(&p, b+i)) <= sense {
 							t = p
 						} else {
 							b = p
@@ -202,7 +234,7 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 					goto COPY
 				FASTCASE:
 					for i > size {
-						if (*cmp)(q, g.Assign(&p, b+g.AssignOp(&i, ">>=", 1))) <= sense {
+						if (*cmp)(q, b.Assign(&p, b+b.AssignOp(&i, ">>=", 1))) <= sense {
 							t = p
 						} else {
 							b = p
@@ -214,111 +246,33 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 				i = size
 				if q == f1 {
 					if iflag != 0 {
-						for {
-							*((*int)(tp2)) = *((*int)(f2))
-							f2 += g.SizeOf("int")
-							tp2 += g.SizeOf("int")
-							if f2 >= b {
-								break
-							}
-						}
-						for {
-							*((*int)(tp2)) = *((*int)(f1))
-							f1 += g.SizeOf("int")
-							tp2 += g.SizeOf("int")
-							if !(g.AssignOp(&i, "-=", g.SizeOf("int"))) {
-								break
-							}
-						}
+						ICOPY_LIST(f2, tp2, b)
+						ICOPY_ELT(f1, tp2, i)
 					} else {
-						for {
-							*f2++
-							g.PostInc(&(*tp2)) = (*f2) - 1
-							if f2 >= b {
-								break
-							}
-						}
-						for {
-							*f1++
-							g.PostInc(&(*tp2)) = (*f1) - 1
-							if !(g.AssignOp(&i, "-=", 1)) {
-								break
-							}
-						}
+						CCOPY_LIST(f2, tp2, b)
+						CCOPY_ELT(f1, tp2, i)
 					}
 				} else {
 					if iflag != 0 {
-						for {
-							*((*int)(tp2)) = *((*int)(f1))
-							f1 += g.SizeOf("int")
-							tp2 += g.SizeOf("int")
-							if f1 >= b {
-								break
-							}
-						}
-						for {
-							*((*int)(tp2)) = *((*int)(f2))
-							f2 += g.SizeOf("int")
-							tp2 += g.SizeOf("int")
-							if !(g.AssignOp(&i, "-=", g.SizeOf("int"))) {
-								break
-							}
-						}
+						ICOPY_LIST(f1, tp2, b)
+						ICOPY_ELT(f2, tp2, i)
 					} else {
-						for {
-							*f1++
-							g.PostInc(&(*tp2)) = (*f1) - 1
-							if f1 >= b {
-								break
-							}
-						}
-						for {
-							*f2++
-							g.PostInc(&(*tp2)) = (*f2) - 1
-							if !(g.AssignOp(&i, "-=", 1)) {
-								break
-							}
-						}
+						CCOPY_LIST(f1, tp2, b)
+						CCOPY_ELT(f2, tp2, i)
 					}
 				}
 			}
 			if f2 < l2 {
 				if iflag != 0 {
-					for {
-						*((*int)(tp2)) = *((*int)(f2))
-						f2 += g.SizeOf("int")
-						tp2 += g.SizeOf("int")
-						if f2 >= l2 {
-							break
-						}
-					}
+					ICOPY_LIST(f2, tp2, l2)
 				} else {
-					for {
-						*f2++
-						g.PostInc(&(*tp2)) = (*f2) - 1
-						if f2 >= l2 {
-							break
-						}
-					}
+					CCOPY_LIST(f2, tp2, l2)
 				}
 			} else if f1 < l1 {
 				if iflag != 0 {
-					for {
-						*((*int)(tp2)) = *((*int)(f1))
-						f1 += g.SizeOf("int")
-						tp2 += g.SizeOf("int")
-						if f1 >= l1 {
-							break
-						}
-					}
+					ICOPY_LIST(f1, tp2, l1)
 				} else {
-					for {
-						*f1++
-						g.PostInc(&(*tp2)) = (*f1) - 1
-						if f1 >= l1 {
-							break
-						}
-					}
+					CCOPY_LIST(f1, tp2, l1)
 				}
 			}
 			*p1 = l2
@@ -338,9 +292,37 @@ func PhpMergesort(base any, nmemb int, size int, cmp func(any, any) int) int {
 
 /* }}} */
 
-// #define swap(a,b) { s = b ; i = size ; do { tmp = * a ; * a ++ = * s ; * s ++ = tmp ; } while ( -- i ) ; a -= size ; }
-
-// #define reverse(bot,top) { s = top ; do { i = size ; do { tmp = * bot ; * bot ++ = * s ; * s ++ = tmp ; } while ( -- i ) ; s -= size2 ; } while ( bot < s ) ; }
+func Swap(a *u_char, b *u_char) {
+	s = b
+	i = size
+	for {
+		tmp = *a
+		b.PostInc(&(*a)) = *s
+		b.PostInc(&(*s)) = tmp
+		if !(b.PreDec(&i)) {
+			break
+		}
+	}
+	a -= size
+}
+func Reverse(bot *u_char, top int) {
+	s = top
+	for {
+		i = size
+		for {
+			tmp = *bot
+			b.PostInc(&(*bot)) = *s
+			b.PostInc(&(*s)) = tmp
+			if !(b.PreDec(&i)) {
+				break
+			}
+		}
+		s -= size2
+		if bot >= s {
+			break
+		}
+	}
+}
 
 /* {{{ setup
  * Optional hybrid natural/pairwise first pass.  Eats up list1 in runs of
@@ -364,7 +346,7 @@ func Setup(list1 *u_char, list2 *u_char, n int, size int, cmp func(any, any) int
 	size2 = size * 2
 	if n <= 5 {
 		Insertionsort(list1, n, size, cmp)
-		*((**u_char)((*u_char)(0 + ((*u_char)(list2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = (*u_char)(list2 + n*size)
+		(*EVAL)(list2) = (*u_char)(list2 + n*size)
 		return
 	}
 
@@ -376,7 +358,7 @@ func Setup(list1 *u_char, list2 *u_char, n int, size int, cmp func(any, any) int
 	i = 4 + (n & 1)
 	Insertionsort(list1+(n-i)*size, i, size, cmp)
 	last = list1 + size*(n-i)
-	*((**u_char)((*u_char)(0 + ((*u_char)(list2+(last-list1)+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = list2 + n*size
+	(*EVAL)(list2 + (last - list1)) = list2 + n*size
 	p2 = list2
 	f1 = list1
 	sense = cmp(f1, f1+size) > 0
@@ -391,24 +373,14 @@ func Setup(list1 *u_char, list2 *u_char, n int, size int, cmp func(any, any) int
 			}
 			length += 2
 		}
-		if length < 16 {
+		if length < THRESHOLD {
 			for {
-				*((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = f1 + size2 - list1 + list2
-				p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+				(*EVAL)(p2) = f1 + size2 - list1 + list2
+				p2 = (*EVAL)(p2)
 				if sense > 0 {
-					s = f1 + size
-					i = size
-					for {
-						tmp = *f1
-						g.PostInc(&(*f1)) = *s
-						g.PostInc(&(*s)) = tmp
-						if !(g.PreDec(&i)) {
-							break
-						}
-					}
-					f1 -= size
+					Swap(f1, f1+size)
 				}
-				if g.AssignOp(&f1, "+=", size2) >= f2 {
+				if b.AssignOp(&f1, "+=", size2) >= f2 {
 					break
 				}
 			}
@@ -416,54 +388,24 @@ func Setup(list1 *u_char, list2 *u_char, n int, size int, cmp func(any, any) int
 			l2 = f2
 			for f2 = f1 + size2; f2 < l2; f2 += size2 {
 				if cmp(f2-size, f2) > 0 != sense {
-					*((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = f2 - list1 + list2
-					p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+					(*EVAL)(p2) = f2 - list1 + list2
+					p2 = (*EVAL)(p2)
 					if sense > 0 {
-						s = f2 - size
-						for {
-							i = size
-							for {
-								tmp = *f1
-								g.PostInc(&(*f1)) = *s
-								g.PostInc(&(*s)) = tmp
-								if !(g.PreDec(&i)) {
-									break
-								}
-							}
-							s -= size2
-							if f1 >= s {
-								break
-							}
-						}
+						Reverse(f1, f2-size)
 					}
 					f1 = f2
 				}
 			}
 			if sense > 0 {
-				s = f2 - size
-				for {
-					i = size
-					for {
-						tmp = *f1
-						g.PostInc(&(*f1)) = *s
-						g.PostInc(&(*s)) = tmp
-						if !(g.PreDec(&i)) {
-							break
-						}
-					}
-					s -= size2
-					if f1 >= s {
-						break
-					}
-				}
+				Reverse(f1, f2-size)
 			}
 			f1 = f2
 			if f2 < last || cmp(f2-size, f2) > 0 {
-				*((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = f2 - list1 + list2
-				p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+				(*EVAL)(p2) = f2 - list1 + list2
+				p2 = (*EVAL)(p2)
 			} else {
-				*((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1))))) = list2 + n*size
-				p2 = *((**u_char)((*u_char)(0 + ((*u_char)(p2+g.SizeOf("u_char *")-1-(*u_char)(0)) & ^(g.SizeOf("u_char *") - 1)))))
+				(*EVAL)(p2) = list2 + n*size
+				p2 = (*EVAL)(p2)
 			}
 		}
 	}
@@ -478,23 +420,13 @@ func Insertionsort(a *u_char, n int, size int, cmp func(any, any) int) {
 	var u *u_char
 	var tmp u_char
 	var i int
-	for ai = a + size; g.PreDec(&n) >= 1; ai += size {
+	for ai = a + size; b.PreDec(&n) >= 1; ai += size {
 		for t = ai; t > a; t -= size {
 			u = t - size
 			if cmp(u, t) <= 0 {
 				break
 			}
-			s = t
-			i = size
-			for {
-				tmp = *u
-				g.PostInc(&(*u)) = *s
-				g.PostInc(&(*s)) = tmp
-				if !(g.PreDec(&i)) {
-					break
-				}
-			}
-			u -= size
+			Swap(u, t)
 		}
 	}
 }

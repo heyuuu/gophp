@@ -3,7 +3,7 @@
 package cli
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -29,15 +29,11 @@ import (
 
 // #define PS_TITLE_HEADER
 
-// #define PS_TITLE_SUCCESS       0
-
-// #define PS_TITLE_NOT_AVAILABLE       1
-
-// #define PS_TITLE_NOT_INITIALIZED       2
-
-// #define PS_TITLE_BUFFER_NOT_AVAILABLE       3
-
-// #define PS_TITLE_WINDOWS_ERROR       4
+const PS_TITLE_SUCCESS = 0
+const PS_TITLE_NOT_AVAILABLE = 1
+const PS_TITLE_NOT_INITIALIZED = 2
+const PS_TITLE_BUFFER_NOT_AVAILABLE = 3
+const PS_TITLE_WINDOWS_ERROR = 4
 
 // Source: <sapi/cli/ps_title.c>
 
@@ -118,7 +114,7 @@ var Environ **byte
 
 /* Different systems want the buffer padded differently */
 
-// #define PS_PADDING       '\0'
+const PS_PADDING = '0'
 
 var PsBuffer *byte
 var PsBufferSize int
@@ -190,8 +186,8 @@ func SavePsArgs(argc int, argv **byte) **byte {
 	 * move the environment out of the way
 	 */
 
-	NewEnviron = (**byte)(zend.Malloc((i + 1) * g.SizeOf("char *")))
-	FrozenEnviron = (**byte)(zend.Malloc((i + 1) * g.SizeOf("char *")))
+	NewEnviron = (**byte)(zend.Malloc((i + 1) * b.SizeOf("char *")))
+	FrozenEnviron = (**byte)(zend.Malloc((i + 1) * b.SizeOf("char *")))
 	if NewEnviron == nil || FrozenEnviron == nil {
 		goto clobber_error
 	}
@@ -203,7 +199,7 @@ func SavePsArgs(argc int, argv **byte) **byte {
 	}
 	NewEnviron[i] = nil
 	Environ = NewEnviron
-	memcpy((*byte)(FrozenEnviron), (*byte)(NewEnviron), g.SizeOf("char *")*(i+1))
+	memcpy((*byte)(FrozenEnviron), (*byte)(NewEnviron), b.SizeOf("char *")*(i+1))
 
 	/*
 	 * If we're going to change the original argv[] then make a copy for
@@ -218,7 +214,7 @@ func SavePsArgs(argc int, argv **byte) **byte {
 
 	var new_argv **byte
 	var i int
-	new_argv = (**byte)(zend.Malloc((argc + 1) * g.SizeOf("char *")))
+	new_argv = (**byte)(zend.Malloc((argc + 1) * b.SizeOf("char *")))
 	if new_argv == nil {
 		goto clobber_error
 	}
@@ -268,12 +264,12 @@ clobber_error:
 
 func IsPsTitleAvailable() int {
 	if SaveArgv == nil {
-		return 2
+		return PS_TITLE_NOT_INITIALIZED
 	}
 	if PsBuffer == nil {
-		return 3
+		return PS_TITLE_BUFFER_NOT_AVAILABLE
 	}
-	return 0
+	return PS_TITLE_SUCCESS
 }
 
 /*
@@ -282,13 +278,13 @@ func IsPsTitleAvailable() int {
 
 func PsTitleErrno(rc int) *byte {
 	switch rc {
-	case 0:
+	case PS_TITLE_SUCCESS:
 		return "Success"
-	case 1:
+	case PS_TITLE_NOT_AVAILABLE:
 		return "Not available on this OS"
-	case 2:
+	case PS_TITLE_NOT_INITIALIZED:
 		return "Not initialized correctly"
-	case 3:
+	case PS_TITLE_BUFFER_NOT_AVAILABLE:
 		return "Buffer not contiguous"
 	}
 	return "Unknown error code"
@@ -304,7 +300,7 @@ func PsTitleErrno(rc int) *byte {
 
 func SetPsTitle(title *byte) int {
 	var rc int = IsPsTitleAvailable()
-	if rc != 0 {
+	if rc != PS_TITLE_SUCCESS {
 		return rc
 	}
 	strncpy(PsBuffer, title, PsBufferSize)
@@ -314,9 +310,9 @@ func SetPsTitle(title *byte) int {
 	/* pad unused memory */
 
 	if PsBufferCurLen < PsBufferSize {
-		memset(PsBuffer+PsBufferCurLen, '0', PsBufferSize-PsBufferCurLen)
+		memset(PsBuffer+PsBufferCurLen, PS_PADDING, PsBufferSize-PsBufferCurLen)
 	}
-	return 0
+	return PS_TITLE_SUCCESS
 }
 
 /*
@@ -328,12 +324,12 @@ func SetPsTitle(title *byte) int {
 
 func GetPsTitle(displen *int, string **byte) int {
 	var rc int = IsPsTitleAvailable()
-	if rc != 0 {
+	if rc != PS_TITLE_SUCCESS {
 		return rc
 	}
 	*displen = int(PsBufferCurLen)
 	*string = PsBuffer
-	return 0
+	return PS_TITLE_SUCCESS
 }
 
 /*

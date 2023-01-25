@@ -29,9 +29,8 @@ import (
 
 // #define PHP_PASSWORD_H
 
-// #define PHP_PASSWORD_DEFAULT       PHP_PASSWORD_BCRYPT
-
-// #define PHP_PASSWORD_BCRYPT_COST       10
+const PHP_PASSWORD_DEFAULT = PHP_PASSWORD_BCRYPT
+const PHP_PASSWORD_BCRYPT_COST = 10
 
 func PhpPasswordAlgoIdentify(hash *zend.ZendString) *PhpPasswordAlgo {
 	return PhpPasswordAlgoIdentifyEx(hash, PhpPasswordAlgoDefault())

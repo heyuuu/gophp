@@ -3,8 +3,7 @@
 package zend
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_iterators.h>
@@ -61,8 +60,8 @@ var ZendIteratorClassEntry ZendClassEntry
 var IteratorObjectHandlers ZendObjectHandlers = ZendObjectHandlers{0, IterWrapperFree, IterWrapperDtor, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, IterWrapperGetGc, nil, nil}
 
 func ZendRegisterIteratorWrapper() {
-	memset(&ZendIteratorClassEntry, 0, g.SizeOf("zend_class_entry"))
-	ZendIteratorClassEntry.SetName(ZendStringInitInterned("__iterator_wrapper", g.SizeOf("\"__iterator_wrapper\"")-1, 1))
+	memset(&ZendIteratorClassEntry, 0, b.SizeOf("zend_class_entry"))
+	ZendIteratorClassEntry.SetName(ZendStringInitInterned("__iterator_wrapper", b.SizeOf("\"__iterator_wrapper\"")-1, 1))
 	ZendIteratorClassEntry.SetBuiltinFunctions(nil)
 }
 func IterWrapperFree(object *ZendObject) {
@@ -82,15 +81,15 @@ func ZendIteratorInit(iter *ZendObjectIterator) {
 	iter.GetStd().SetHandlers(&IteratorObjectHandlers)
 }
 func ZendIteratorDtor(iter *ZendObjectIterator) {
-	if ZendGcDelref(&(&iter.std).GetGc()) > 0 {
+	if GC_DELREF(&iter.std) > 0 {
 		return
 	}
 	ZendObjectsStoreDel(&iter.std)
 }
 func ZendIteratorUnwrap(array_ptr *Zval) *ZendObjectIterator {
-	r.Assert(array_ptr.GetType() == 8)
-	if array_ptr.GetValue().GetObj().GetHandlers() == &IteratorObjectHandlers {
-		return (*ZendObjectIterator)(array_ptr.GetValue().GetObj())
+	ZEND_ASSERT(Z_TYPE_P(array_ptr) == IS_OBJECT)
+	if Z_OBJ_HT_P(array_ptr) == &IteratorObjectHandlers {
+		return (*ZendObjectIterator)(Z_OBJ_P(array_ptr))
 	}
 	return nil
 }

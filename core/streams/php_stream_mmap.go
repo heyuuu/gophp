@@ -2,6 +2,11 @@
 
 package streams
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 // Source: <main/streams/php_stream_mmap.h>
 
 /*
@@ -38,22 +43,29 @@ const (
 	PHP_STREAM_MAP_MODE_SHARED_READONLY
 	PHP_STREAM_MAP_MODE_SHARED_READWRITE
 )
+const PHP_STREAM_MMAP_ALL = 0
+const PHP_STREAM_MMAP_MAX = 512 * 1024 * 1024
 
-// #define PHP_STREAM_MMAP_ALL       0
-
-// #define PHP_STREAM_MMAP_MAX       ( 512 * 1024 * 1024 )
-
-// #define php_stream_mmap_supported(stream) ( _php_stream_set_option ( ( stream ) , PHP_STREAM_OPTION_MMAP_API , PHP_STREAM_MMAP_SUPPORTED , NULL ) == 0 ? 1 : 0 )
+func PhpStreamMmapSupported(stream *core.PhpStream) int {
+	if _phpStreamSetOption(stream, core.PHP_STREAM_OPTION_MMAP_API, PHP_STREAM_MMAP_SUPPORTED, nil) == 0 {
+		return 1
+	} else {
+		return 0
+	}
+}
 
 /* Returns 1 if the stream in its current state can be memory mapped,
  * 0 otherwise */
 
-// #define php_stream_mmap_possible(stream) ( ! php_stream_is_filtered ( ( stream ) ) && php_stream_mmap_supported ( ( stream ) ) )
+func PhpStreamMmapPossible(stream *core.PhpStream) bool {
+	return !(PhpStreamIsFiltered(stream)) && PhpStreamMmapSupported(stream) != 0
+}
 
 // #define php_stream_mmap_range(stream,offset,length,mode,mapped_len) _php_stream_mmap_range ( ( stream ) , ( offset ) , ( length ) , ( mode ) , ( mapped_len ) )
 
 /* un-maps the last mapped range */
 
-// #define php_stream_mmap_unmap(stream) _php_stream_mmap_unmap ( ( stream ) )
-
-// #define php_stream_mmap_unmap_ex(stream,readden) _php_stream_mmap_unmap_ex ( ( stream ) , ( readden ) )
+func PhpStreamMmapUnmap(stream *core.PhpStream) int { return _phpStreamMmapUnmap(stream) }
+func PhpStreamMmapUnmapEx(stream *core.PhpStream, readden zend.ZendOffT) int {
+	return _phpStreamMmapUnmapEx(stream, readden)
+}

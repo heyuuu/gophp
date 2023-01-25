@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_highlight.h>
@@ -29,15 +29,11 @@ import (
 
 // #define ZEND_HIGHLIGHT_H
 
-// #define HL_COMMENT_COLOR       "#FF8000"
-
-// #define HL_DEFAULT_COLOR       "#0000BB"
-
-// #define HL_HTML_COLOR       "#000000"
-
-// #define HL_STRING_COLOR       "#DD0000"
-
-// #define HL_KEYWORD_COLOR       "#007700"
+const HL_COMMENT_COLOR = "#FF8000"
+const HL_DEFAULT_COLOR = "#0000BB"
+const HL_HTML_COLOR = "#000000"
+const HL_STRING_COLOR = "#DD0000"
+const HL_KEYWORD_COLOR = "#007700"
 
 var SyntaxHighlighterIni ZendSyntaxHighlighterIni
 
@@ -79,25 +75,25 @@ var SyntaxHighlighterIni ZendSyntaxHighlighterIni
 func ZendHtmlPutc(c byte) {
 	switch c {
 	case '\n':
-		ZendWrite("<br />", strlen("<br />"))
+		ZEND_PUTS("<br />")
 		break
 	case '<':
-		ZendWrite("&lt;", strlen("&lt;"))
+		ZEND_PUTS("&lt;")
 		break
 	case '>':
-		ZendWrite("&gt;", strlen("&gt;"))
+		ZEND_PUTS("&gt;")
 		break
 	case '&':
-		ZendWrite("&amp;", strlen("&amp;"))
+		ZEND_PUTS("&amp;")
 		break
 	case ' ':
-		ZendWrite("&nbsp;", strlen("&nbsp;"))
+		ZEND_PUTS("&nbsp;")
 		break
 	case '\t':
-		ZendWrite("&nbsp;&nbsp;&nbsp;&nbsp;", strlen("&nbsp;&nbsp;&nbsp;&nbsp;"))
+		ZEND_PUTS("&nbsp;&nbsp;&nbsp;&nbsp;")
 		break
 	default:
-		ZendWrite(&c, 1)
+		ZEND_PUTC(c)
 		break
 	}
 }
@@ -106,8 +102,8 @@ func ZendHtmlPuts(s *byte, len_ int) {
 	var end *uint8 = ptr + len_
 	var filtered *uint8 = nil
 	var filtered_len int
-	if LANG_SCNG.GetOutputFilter() != nil {
-		LANG_SCNG.GetOutputFilter()(&filtered, &filtered_len, ptr, len_)
+	if LanguageScannerGlobals.GetOutputFilter() != nil {
+		LanguageScannerGlobals.GetOutputFilter()(&filtered, &filtered_len, ptr, len_)
 		ptr = filtered
 		end = filtered + filtered_len
 	}
@@ -115,16 +111,16 @@ func ZendHtmlPuts(s *byte, len_ int) {
 		if (*ptr) == ' ' {
 			for {
 				ZendHtmlPutc(*ptr)
-				if !(g.PreInc(&ptr) < end && (*ptr) == ' ') {
+				if !(b.PreInc(&ptr) < end && (*ptr) == ' ') {
 					break
 				}
 			}
 		} else {
-			ZendHtmlPutc(g.PostInc(&(*ptr)))
+			ZendHtmlPutc(b.PostInc(&(*ptr)))
 		}
 	}
-	if LANG_SCNG.GetOutputFilter() != nil {
-		_efree(filtered)
+	if LanguageScannerGlobals.GetOutputFilter() != nil {
+		Efree(filtered)
 	}
 }
 func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
@@ -137,7 +133,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 
 	/* highlight stuff coming back from zendlex() */
 
-	for g.Assign(&token_type, LexScan(&token, nil)) {
+	for b.Assign(&token_type, LexScan(&token, nil)) {
 		switch token_type {
 		case T_INLINE_HTML:
 			next_color = syntax_highlighter_ini.GetHighlightHtml()
@@ -178,12 +174,12 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			next_color = syntax_highlighter_ini.GetHighlightString()
 			break
 		case T_WHITESPACE:
-			ZendHtmlPuts((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng())
-			&token.SetTypeInfo(0)
+			ZendHtmlPuts((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+			ZVAL_UNDEF(&token)
 			continue
 			break
 		default:
-			if token.GetType() == 0 {
+			if Z_TYPE(token) == IS_UNDEF {
 				next_color = syntax_highlighter_ini.GetHighlightKeyword()
 			} else {
 				next_color = syntax_highlighter_ini.GetHighlightDefault()
@@ -199,8 +195,8 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 				ZendPrintf("<span style=\"color: %s\">", last_color)
 			}
 		}
-		ZendHtmlPuts((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng())
-		if token.GetType() == 6 {
+		ZendHtmlPuts((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+		if Z_TYPE(token) == IS_STRING {
 			switch token_type {
 			case T_OPEN_TAG:
 
@@ -219,7 +215,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 				break
 			}
 		}
-		&token.SetTypeInfo(0)
+		ZVAL_UNDEF(&token)
 	}
 	if last_color != syntax_highlighter_ini.GetHighlightHtml() {
 		ZendPrintf("</span>\n")
@@ -237,35 +233,35 @@ func ZendStrip() {
 	var token Zval
 	var token_type int
 	var prev_space int = 0
-	for g.Assign(&token_type, LexScan(&token, nil)) {
+	for b.Assign(&token_type, LexScan(&token, nil)) {
 		switch token_type {
 		case T_WHITESPACE:
 			if prev_space == 0 {
-				ZendWrite(" ", g.SizeOf("\" \"")-1)
+				ZendWrite(" ", b.SizeOf("\" \"")-1)
 				prev_space = 1
 			}
 		case T_COMMENT:
 
 		case T_DOC_COMMENT:
-			&token.SetTypeInfo(0)
+			ZVAL_UNDEF(&token)
 			continue
 		case T_END_HEREDOC:
-			ZendWrite((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng())
+			ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
 
 			/* read the following character, either newline or ; */
 
 			if LexScan(&token, nil) != T_WHITESPACE {
-				ZendWrite((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng())
+				ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
 			}
-			ZendWrite("\n", g.SizeOf("\"\\n\"")-1)
+			ZendWrite("\n", b.SizeOf("\"\\n\"")-1)
 			prev_space = 1
-			&token.SetTypeInfo(0)
+			ZVAL_UNDEF(&token)
 			continue
 		default:
-			ZendWrite((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng())
+			ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
 			break
 		}
-		if token.GetType() == 6 {
+		if Z_TYPE(token) == IS_STRING {
 			switch token_type {
 			case T_OPEN_TAG:
 
@@ -285,7 +281,7 @@ func ZendStrip() {
 			}
 		}
 		prev_space = 0
-		&token.SetTypeInfo(0)
+		ZVAL_UNDEF(&token)
 	}
 
 	/* Discard parse errors thrown during tokenization */

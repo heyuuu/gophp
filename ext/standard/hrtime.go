@@ -30,17 +30,12 @@ import (
 
 // #define HRTIME_H
 
-// #define PHP_HRTIME_PLATFORM_POSIX       0
-
-// #define PHP_HRTIME_PLATFORM_WINDOWS       0
-
-// #define PHP_HRTIME_PLATFORM_APPLE       0
-
-// #define PHP_HRTIME_PLATFORM_HPUX       0
-
-// #define PHP_HRTIME_PLATFORM_AIX       0
-
-// #define HRTIME_AVAILABLE       ( PHP_HRTIME_PLATFORM_POSIX || PHP_HRTIME_PLATFORM_WINDOWS || PHP_HRTIME_PLATFORM_APPLE || PHP_HRTIME_PLATFORM_HPUX || PHP_HRTIME_PLATFORM_AIX )
+const PHP_HRTIME_PLATFORM_POSIX = 0
+const PHP_HRTIME_PLATFORM_WINDOWS = 0
+const PHP_HRTIME_PLATFORM_APPLE = 0
+const PHP_HRTIME_PLATFORM_HPUX = 0
+const PHP_HRTIME_PLATFORM_AIX = 0
+const HRTIME_AVAILABLE = PHP_HRTIME_PLATFORM_POSIX || PHP_HRTIME_PLATFORM_WINDOWS || PHP_HRTIME_PLATFORM_APPLE || PHP_HRTIME_PLATFORM_HPUX || PHP_HRTIME_PLATFORM_AIX
 
 type PhpHrtimeT = uint64
 
@@ -71,7 +66,7 @@ type PhpHrtimeT = uint64
 
 /* {{{ */
 
-// #define NANO_IN_SEC       1000000000
+const NANO_IN_SEC = 1000000000
 
 /* }}} */
 
@@ -86,7 +81,7 @@ func _timerInit() int {
 
 func ZmStartupHrtime(type_ int, module_number int) int {
 	if 0 > _timerInit() {
-		core.PhpErrorDocref(nil, 1<<1, "Failed to initialize high-resolution timer")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to initialize high-resolution timer")
 		return zend.FAILURE
 	}
 	return zend.SUCCESS
@@ -95,8 +90,10 @@ func ZmStartupHrtime(type_ int, module_number int) int {
 /* }}} */
 
 func _timerCurrent() PhpHrtimeT { return 0 }
-
-// #define PHP_RETURN_HRTIME(t) RETURN_LONG ( ( zend_long ) t )
+func PHP_RETURN_HRTIME(t __auto__) {
+	zend.RETVAL_LONG(zend.ZendLong(t))
+	return
+}
 
 /* {{{ proto mixed hrtime([bool get_as_number = false])
    Returns an array of integers in form [seconds, nanoseconds] counted
@@ -106,7 +103,7 @@ func _timerCurrent() PhpHrtimeT { return 0 }
    delivered timestamp is monotonic and can not be adjusted. */
 
 func ZifHrtime(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	return_value.u1.type_info = 2
+	zend.RETVAL_FALSE
 	return
 }
 

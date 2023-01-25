@@ -39,13 +39,10 @@ package zend
 
 // #define SHUTDOWN_FUNC_ARGS_PASSTHRU       type , module_number
 
-// #define ZEND_MODULE_INFO_FUNC_ARGS       zend_module_entry * zend_module
-
-// #define ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU       zend_module
-
-// #define ZEND_MODULE_API_NO       20190902
-
-// #define USING_ZTS       0
+const ZEND_MODULE_INFO_FUNC_ARGS = zend_module_entry * zend_module
+const ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU ZEND_MODULE_INFO_FUNC_ARGS = zend_module
+const ZEND_MODULE_API_NO = 20190902
+const USING_ZTS = 0
 
 // #define STANDARD_MODULE_HEADER_EX       sizeof ( zend_module_entry ) , ZEND_MODULE_API_NO , ZEND_DEBUG , USING_ZTS
 
@@ -63,17 +60,13 @@ package zend
 
 // #define STANDARD_MODULE_PROPERTIES       NO_MODULE_GLOBALS , NULL , STANDARD_MODULE_PROPERTIES_EX
 
-// #define NO_VERSION_YET       NULL
+const NO_VERSION_YET = nil
+const MODULE_PERSISTENT = 1
+const MODULE_TEMPORARY = 2
 
-// #define MODULE_PERSISTENT       1
-
-// #define MODULE_TEMPORARY       2
-
-// #define MODULE_DEP_REQUIRED       1
-
-// #define MODULE_DEP_CONFLICTS       2
-
-// #define MODULE_DEP_OPTIONAL       3
+const MODULE_DEP_REQUIRED = 1
+const MODULE_DEP_CONFLICTS = 2
+const MODULE_DEP_OPTIONAL = 3
 
 // #define ZEND_MOD_REQUIRED_EX(name,rel,ver) { name , rel , ver , MODULE_DEP_REQUIRED } ,
 

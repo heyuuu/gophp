@@ -24,4 +24,4 @@ package zend
 
 // #define ZEND_VM_H
 
-// #define ZEND_VM_SET_OPCODE_HANDLER(opline) zend_vm_set_opcode_handler ( opline )
+func ZEND_VM_SET_OPCODE_HANDLER(opline *ZendOp) { ZendVmSetOpcodeHandler(opline) }

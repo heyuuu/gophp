@@ -3,8 +3,8 @@
 package streams
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -34,9 +34,8 @@ import (
 
 // # include < glob . h >
 
-// #define GLOB_ONLYDIR       ( 1 << 30 )
-
-// #define GLOB_FLAGMASK       ( ~ GLOB_ONLYDIR )
+const GLOB_ONLYDIR = 1 << 30
+const GLOB_FLAGMASK = ^GLOB_ONLYDIR
 
 func _phpGlobStreamGetPath(stream *core.PhpStream, plen *int) *byte {
 	var pglob *GlobST = (*GlobST)(stream.abstract)
@@ -92,19 +91,19 @@ func _phpGlobStreamGetCount(stream *core.PhpStream, pflags *int) int {
 func PhpGlobStreamPathSplit(pglob *GlobST, path *byte, get_path int, p_file **byte) {
 	var pos *byte
 	var gpath *byte = path
-	if g.Assign(&pos, strrchr(path, '/')) != nil {
+	if b.Assign(&pos, strrchr(path, '/')) != nil {
 		path = pos + 1
 	}
 	*p_file = path
 	if get_path != 0 {
 		if pglob.GetPath() != nil {
-			zend._efree(pglob.GetPath())
+			zend.Efree(pglob.GetPath())
 		}
 		if path-gpath > 1 {
 			path--
 		}
 		pglob.SetPathLen(path - gpath)
-		pglob.SetPath(zend._estrndup(gpath, pglob.GetPathLen()))
+		pglob.SetPath(zend.Estrndup(gpath, pglob.GetPathLen()))
 	}
 }
 
@@ -117,22 +116,15 @@ func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 
 	/* avoid problems if someone mis-uses the stream */
 
-	if count == g.SizeOf("php_stream_dirent") && pglob != nil {
+	if count == b.SizeOf("php_stream_dirent") && pglob != nil {
 		if pglob.GetIndex() < int(pglob.glob.gl_pathc) {
-			PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[g.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
-			var php_str_len int
-			if strlen(path) >= g.SizeOf("ent -> d_name") {
-				php_str_len = g.SizeOf("ent -> d_name") - 1
-			} else {
-				php_str_len = strlen(path)
-			}
-			memcpy(ent.d_name, path, php_str_len)
-			ent.d_name[php_str_len] = '0'
-			return g.SizeOf("php_stream_dirent")
+			PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[b.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
+			core.PHP_STRLCPY(ent.d_name, path, b.SizeOf("ent -> d_name"), strlen(path))
+			return b.SizeOf("php_stream_dirent")
 		}
 		pglob.SetIndex(pglob.glob.gl_pathc)
 		if pglob.GetPath() != nil {
-			zend._efree(pglob.GetPath())
+			zend.Efree(pglob.GetPath())
 			pglob.SetPath(nil)
 		}
 	}
@@ -147,13 +139,13 @@ func PhpGlobStreamClose(stream *core.PhpStream, close_handle int) int {
 		pglob.SetIndex(0)
 		globfree(&pglob.glob)
 		if pglob.GetPath() != nil {
-			zend._efree(pglob.GetPath())
+			zend.Efree(pglob.GetPath())
 		}
 		if pglob.GetPattern() != nil {
-			zend._efree(pglob.GetPattern())
+			zend.Efree(pglob.GetPattern())
 		}
 	}
-	zend._efree(stream.abstract)
+	zend.Efree(stream.abstract)
 	return 0
 }
 
@@ -164,7 +156,7 @@ func PhpGlobStreamRewind(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	if pglob != nil {
 		pglob.SetIndex(0)
 		if pglob.GetPath() != nil {
-			zend._efree(pglob.GetPath())
+			zend.Efree(pglob.GetPath())
 			pglob.SetPath(nil)
 		}
 	}
@@ -182,33 +174,33 @@ func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	var ret int
 	var tmp *byte
 	var pos *byte
-	if !(strncmp(path, "glob://", g.SizeOf("\"glob://\"")-1)) {
-		path += g.SizeOf("\"glob://\"") - 1
+	if !(strncmp(path, "glob://", b.SizeOf("\"glob://\"")-1)) {
+		path += b.SizeOf("\"glob://\"") - 1
 		if opened_path != nil {
 			*opened_path = zend.ZendStringInit(path, strlen(path), 0)
 		}
 	}
-	if (options&0x400) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
+	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
 		return nil
 	}
-	pglob = zend._ecalloc(g.SizeOf("* pglob"), 1)
-	if 0 != g.Assign(&ret, glob(path, pglob.GetFlags() & ^(1<<30), nil, &pglob.glob)) {
-		zend._efree(pglob)
+	pglob = zend.Ecalloc(b.SizeOf("* pglob"), 1)
+	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, &pglob.glob)) {
+		zend.Efree(pglob)
 		return nil
 	}
 	pos = path
-	if g.Assign(&tmp, strrchr(pos, '/')) != nil {
+	if b.Assign(&tmp, strrchr(pos, '/')) != nil {
 		pos = tmp + 1
 	}
 	pglob.SetPatternLen(strlen(pos))
-	pglob.SetPattern(zend._estrndup(pos, pglob.GetPatternLen()))
+	pglob.SetPattern(zend.Estrndup(pos, pglob.GetPatternLen()))
 	pglob.SetFlags(pglob.GetFlags() | GLOB_APPEND)
 	if pglob.glob.gl_pathc {
 		PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[0], 1, &tmp)
 	} else {
 		PhpGlobStreamPathSplit(pglob, path, 1, &tmp)
 	}
-	return _phpStreamAlloc(&PhpGlobStreamOps, pglob, 0, mode)
+	return core.PhpStreamAlloc(&PhpGlobStreamOps, pglob, 0, mode)
 }
 
 /* }}} */

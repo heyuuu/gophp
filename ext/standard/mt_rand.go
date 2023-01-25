@@ -3,9 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -45,21 +44,19 @@ import (
 
 /* MT RAND FUNCTIONS */
 
-// #define N       MT_N
+const N = MT_N
+const M = 397
 
-// #define M       ( 397 )
-
-// #define hiBit(u) ( ( u ) & 0x80000000U )
-
-// #define loBit(u) ( ( u ) & 0x00000001U )
-
-// #define loBits(u) ( ( u ) & 0x7FFFFFFFU )
-
-// #define mixBits(u,v) ( hiBit ( u ) | loBits ( v ) )
-
-// #define twist(m,u,v) ( m ^ ( mixBits ( u , v ) >> 1 ) ^ ( ( uint32_t ) ( - ( int32_t ) ( loBit ( v ) ) ) & 0x9908b0dfU ) )
-
-// #define twist_php(m,u,v) ( m ^ ( mixBits ( u , v ) >> 1 ) ^ ( ( uint32_t ) ( - ( int32_t ) ( loBit ( u ) ) ) & 0x9908b0dfU ) )
+func hiBit(u uint32) int             { return u & 0x80000000 }
+func loBit(u uint32) int             { return u & 0x1 }
+func loBits(u uint32) int            { return u & 0x7fffffff }
+func mixBits(u uint32, v uint32) int { return hiBit(u) | loBits(v) }
+func Twist(m uint32, u uint32, v uint32) int {
+	return m ^ mixBits(u, v)>>1 ^ uint32_t(-(int32_t(loBit(v))))&0x9908b0df
+}
+func TwistPhp(m uint32, u uint32, v uint32) int {
+	return m ^ mixBits(u, v)>>1 ^ uint32_t(-(int32_t(loBit(u))))&0x9908b0df
+}
 
 /* {{{ php_mt_initialize
  */
@@ -73,9 +70,9 @@ func PhpMtInitialize(seed uint32, state *uint32) {
 	var s *uint32 = state
 	var r *uint32 = state
 	var i int = 1
-	g.PostInc(&(*s)) = seed & 0xffffffff
-	for ; i < 624; i++ {
-		g.PostInc(&(*s)) = 1812433253*((*r)^(*r)>>30) + i&0xffffffff
+	b.PostInc(&(*s)) = seed & 0xffffffff
+	for ; i < N; i++ {
+		b.PostInc(&(*s)) = 1812433253*((*r)^(*r)>>30) + i&0xffffffff
 		r++
 	}
 }
@@ -86,28 +83,28 @@ func PhpMtReload() {
 	/* Generate N new values in state
 	   Made clearer and faster by Matthew Bellew (matthew.bellew@home.com) */
 
-	var state *uint32 = BasicGlobals.GetState()
+	var state *uint32 = BG(state)
 	var p *uint32 = state
 	var i int
-	if BasicGlobals.GetMtRandMode() == 0 {
-		for i = 624 - 397; g.PostDec(&i); p++ {
-			*p = p[397] ^ (p[0]&0x80000000|p[1]&0x7fffffff)>>1 ^ uint32(-(int32(p[1]&0x1)))&0x9908b0df
+	if BG(mt_rand_mode) == MT_RAND_MT19937 {
+		for i = N - M; b.PostDec(&i); p++ {
+			*p = Twist(p[M], p[0], p[1])
 		}
-		for i = 397; g.PreDec(&i); p++ {
-			*p = p[397-624] ^ (p[0]&0x80000000|p[1]&0x7fffffff)>>1 ^ uint32(-(int32(p[1]&0x1)))&0x9908b0df
+		for i = M; b.PreDec(&i); p++ {
+			*p = Twist(p[M-N], p[0], p[1])
 		}
-		*p = p[397-624] ^ (p[0]&0x80000000|state[0]&0x7fffffff)>>1 ^ uint32(-(int32(state[0]&0x1)))&0x9908b0df
+		*p = Twist(p[M-N], p[0], state[0])
 	} else {
-		for i = 624 - 397; g.PostDec(&i); p++ {
-			*p = p[397] ^ (p[0]&0x80000000|p[1]&0x7fffffff)>>1 ^ uint32(-(int32(p[0]&0x1)))&0x9908b0df
+		for i = N - M; b.PostDec(&i); p++ {
+			*p = TwistPhp(p[M], p[0], p[1])
 		}
-		for i = 397; g.PreDec(&i); p++ {
-			*p = p[397-624] ^ (p[0]&0x80000000|p[1]&0x7fffffff)>>1 ^ uint32(-(int32(p[0]&0x1)))&0x9908b0df
+		for i = M; b.PreDec(&i); p++ {
+			*p = TwistPhp(p[M-N], p[0], p[1])
 		}
-		*p = p[397-624] ^ (p[0]&0x80000000|state[0]&0x7fffffff)>>1 ^ uint32(-(int32(p[0]&0x1)))&0x9908b0df
+		*p = TwistPhp(p[M-N], p[0], state[0])
 	}
-	BasicGlobals.SetLeft(624)
-	BasicGlobals.SetNext(state)
+	BG(left) = N
+	BG(next) = state
 }
 
 /* }}} */
@@ -115,12 +112,12 @@ func PhpMtReload() {
 func PhpMtSrand(seed uint32) {
 	/* Seed the generator with a simple uint32 */
 
-	PhpMtInitialize(seed, BasicGlobals.GetState())
+	PhpMtInitialize(seed, BG(state))
 	PhpMtReload()
 
 	/* Seed only once */
 
-	BasicGlobals.SetMtRandIsSeeded(1)
+	BG(mt_rand_is_seeded) = 1
 
 	/* Seed only once */
 }
@@ -132,15 +129,15 @@ func PhpMtRand() uint32 {
 	   Every other access function simply transforms the numbers extracted here */
 
 	var s1 uint32
-	if BasicGlobals.GetMtRandIsSeeded() == 0 {
-		PhpMtSrand(zend_long(time(0)*getpid()) ^ zend_long(1000000.0*PhpCombinedLcg()))
+	if zend.UNEXPECTED(!(BG(mt_rand_is_seeded))) {
+		PhpMtSrand(GENERATE_SEED())
 	}
-	if BasicGlobals.GetLeft() == 0 {
+	if BG(left) == 0 {
 		PhpMtReload()
 	}
-	BasicGlobals.GetLeft()--
-	*(BasicGlobals.GetNext())++
-	s1 = (*(BasicGlobals.GetNext())) - 1
+	BG(left)--
+	(*BG)(next)++
+	s1 = (*BG)(next) - 1
 	s1 ^= s1 >> 11
 	s1 ^= s1 << 7 & 0x9d2c5680
 	s1 ^= s1 << 15 & 0xefc60000
@@ -151,12 +148,12 @@ func PhpMtRand() uint32 {
 
 func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var seed zend.ZendLong = 0
-	var mode zend.ZendLong = 0
+	var mode zend.ZendLong = MT_RAND_MT19937
 	for {
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -164,7 +161,7 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -173,69 +170,49 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &seed, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &seed, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &mode, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -246,15 +223,15 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if execute_data.This.u2.num_args == 0 {
-		seed = zend_long(time(0)*getpid()) ^ zend_long(1000000.0*PhpCombinedLcg())
+	if zend.ZEND_NUM_ARGS() == 0 {
+		seed = GENERATE_SEED()
 	}
 	switch mode {
-	case 1:
-		BasicGlobals.SetMtRandMode(1)
+	case MT_RAND_PHP:
+		BG(mt_rand_mode) = MT_RAND_PHP
 		break
 	default:
-		BasicGlobals.SetMtRandMode(0)
+		BG(mt_rand_mode) = MT_RAND_MT19937
 	}
 	PhpMtSrand(seed)
 }
@@ -268,7 +245,7 @@ func RandRange32(umax uint32) uint32 {
 
 	/* Special case where no modulus is required */
 
-	if umax == UINT32_MAX {
+	if zend.UNEXPECTED(umax == UINT32_MAX) {
 		return result
 	}
 
@@ -288,7 +265,7 @@ func RandRange32(umax uint32) uint32 {
 
 	/* Discard numbers over the limit to avoid modulo bias */
 
-	for result > limit {
+	for zend.UNEXPECTED(result > limit) {
 		result = PhpMtRand()
 	}
 	return result % umax
@@ -306,7 +283,7 @@ func PhpMtRandRange(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 
 func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	var n int64
-	if BasicGlobals.GetMtRandMode() == 0 {
+	if BG(mt_rand_mode) == MT_RAND_MT19937 {
 		return PhpMtRandRange(min, max)
 	}
 
@@ -314,7 +291,7 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 	 * to prevent other functions being affected */
 
 	n = int64(PhpMtRand() >> 1)
-	n = min + zend_long(float64(float64(max-min+1.0)*(n/(zend_long(0x7fffffff)+1.0))))
+	RAND_RANGE_BADSCALING(n, min, max, PHP_MT_RAND_MAX)
 	return n
 }
 
@@ -323,21 +300,19 @@ func PhpMtRandCommon(min zend.ZendLong, max zend.ZendLong) zend.ZendLong {
 func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
-	var argc int = execute_data.This.u2.num_args
+	var argc int = zend.ZEND_NUM_ARGS()
 	if argc == 0 {
 
 		// genrand_int31 in mt19937ar.c performs a right shift
 
-		var __z *zend.Zval = return_value
-		__z.value.lval = PhpMtRand() >> 1
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(PhpMtRand() >> 1)
 		return
 	}
 	for {
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -345,7 +320,7 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -354,68 +329,48 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -426,24 +381,19 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if max < min {
-		core.PhpErrorDocref(nil, 1<<1, "max("+"%"+"lld"+") is smaller than min("+"%"+"lld"+")", max, min)
-		return_value.u1.type_info = 2
+	if zend.UNEXPECTED(max < min) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
+		zend.RETVAL_FALSE
 		return
 	}
-	var __z *zend.Zval = return_value
-	__z.value.lval = PhpMtRandCommon(min, max)
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(PhpMtRandCommon(min, max))
 	return
 }
 
 /* }}} */
 
 func ZifMtGetrandmax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 
@@ -452,16 +402,14 @@ func ZifMtGetrandmax(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	 * compatibility with the previous php_rand
 	 */
 
-	var __z *zend.Zval = return_value
-	__z.value.lval = zend_long(0x7fffffff)
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(PHP_MT_RAND_MAX)
 	return
 }
 
 /* }}} */
 
 func ZmStartupMtRand(type_ int, module_number int) int {
-	zend.ZendRegisterLongConstant("MT_RAND_MT19937", g.SizeOf("\"MT_RAND_MT19937\"")-1, 0, 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("MT_RAND_PHP", g.SizeOf("\"MT_RAND_PHP\"")-1, 1, 1<<0|1<<1, module_number)
+	zend.REGISTER_LONG_CONSTANT("MT_RAND_MT19937", MT_RAND_MT19937, zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("MT_RAND_PHP", MT_RAND_PHP, zend.CONST_CS|zend.CONST_PERSISTENT)
 	return zend.SUCCESS
 }

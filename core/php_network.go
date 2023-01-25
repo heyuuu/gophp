@@ -26,13 +26,13 @@ package core
 
 // # include < php . h >
 
-// #define closesocket       close
+const Closesocket = close
 
 // # include < netinet / tcp . h >
 
-// #define EWOULDBLOCK       EAGAIN
+const EWOULDBLOCK = EAGAIN
 
-// #define php_socket_errno() errno
+func PhpSocketErrno() __auto__ { return errno }
 
 /* like strerror, but caller must efree the returned string,
  * unless buf is not NULL.
@@ -45,11 +45,9 @@ package core
 /* These are here, rather than with the win32 counterparts above,
  * since <sys/socket.h> defines them. */
 
-// #define SHUT_RD       0
-
-// #define SHUT_WR       1
-
-// #define SHUT_RDWR       2
+const SHUT_RD = 0
+const SHUT_WR = 1
+const SHUT_RDWR = 2
 
 // # include < sys / time . h >
 
@@ -57,23 +55,13 @@ package core
 
 type PhpSocketT = int
 
-// #define SOCK_ERR       - 1
-
-// #define SOCK_CONN_ERR       - 1
-
-// #define SOCK_RECV_ERR       - 1
-
-// #define STREAM_SOCKOP_NONE       ( 1 << 0 )
-
-// #define STREAM_SOCKOP_SO_REUSEPORT       ( 1 << 1 )
-
-// #define STREAM_SOCKOP_SO_BROADCAST       ( 1 << 2 )
-
-// #define STREAM_SOCKOP_IPV6_V6ONLY       ( 1 << 3 )
-
-// #define STREAM_SOCKOP_IPV6_V6ONLY_ENABLED       ( 1 << 4 )
-
-// #define STREAM_SOCKOP_TCP_NODELAY       ( 1 << 5 )
+const SOCK_RECV_ERR = -1
+const STREAM_SOCKOP_NONE long = 1 << 0
+const STREAM_SOCKOP_SO_REUSEPORT = 1 << 1
+const STREAM_SOCKOP_SO_BROADCAST = 1 << 2
+const STREAM_SOCKOP_IPV6_V6ONLY = 1 << 3
+const STREAM_SOCKOP_IPV6_V6ONLY_ENABLED = 1 << 4
+const STREAM_SOCKOP_TCP_NODELAY = 1 << 5
 
 /* uncomment this to debug poll(2) emulation on systems that have poll(2) */
 
@@ -81,9 +69,9 @@ type PhpSocketT = int
 
 type PhpPollfd = __struct__pollfd
 
-// #define PHP_POLLREADABLE       ( POLLIN | POLLERR | POLLHUP )
+const PHP_POLLREADABLE = POLLIN | POLLERR | POLLHUP
 
-// #define php_poll2(ufds,nfds,timeout) poll ( ufds , nfds , timeout )
+func PhpPoll2(ufds *PhpPollfd, nfds int, timeout int) __auto__ { return poll(ufds, nfds, timeout) }
 
 /* timeval-to-timeout (for poll(2)) */
 
@@ -105,7 +93,7 @@ func PhpPollfdFor(fd PhpSocketT, events int, timeouttv *__struct__timeval) int {
 	p.fd = fd
 	p.events = events
 	p.revents = 0
-	n = poll(&p, 1, PhpTvtoto(timeouttv))
+	n = PhpPoll2(&p, 1, PhpTvtoto(timeouttv))
 	if n > 0 {
 		return p.revents
 	}
@@ -117,7 +105,7 @@ func PhpPollfdForMs(fd PhpSocketT, events int, timeout int) int {
 	p.fd = fd
 	p.events = events
 	p.revents = 0
-	n = poll(&p, 1, timeout)
+	n = PhpPoll2(&p, 1, timeout)
 	if n > 0 {
 		return p.revents
 	}
@@ -126,39 +114,60 @@ func PhpPollfdForMs(fd PhpSocketT, events int, timeout int) int {
 
 /* emit warning and suggestion for unsafe select(2) usage */
 
-// #define PHP_SAFE_FD_SET(fd,set) do { if ( fd < FD_SETSIZE ) FD_SET ( fd , set ) ; } while ( 0 )
+func PHP_SAFE_FD_SET(fd PhpSocketT, set *fd_set) {
+	if fd < FD_SETSIZE {
+		FD_SET(fd, set)
+	}
+}
+func PHP_SAFE_FD_CLR(fd PhpSocketT, set fd_set) {
+	if fd < FD_SETSIZE {
+		FD_CLR(fd, set)
+	}
+}
+func PHP_SAFE_FD_ISSET(fd PhpSocketT, set *fd_set) bool {
+	return fd < FD_SETSIZE && FD_ISSET(fd, set)
+}
+func PHP_SAFE_MAX_FD(m PhpSocketT, n int) {
+	if m >= FD_SETSIZE {
+		_phpEmitFdSetsizeWarning(m)
+		m = FD_SETSIZE - 1
+	}
+}
 
-// #define PHP_SAFE_FD_CLR(fd,set) do { if ( fd < FD_SETSIZE ) FD_CLR ( fd , set ) ; } while ( 0 )
-
-// #define PHP_SAFE_FD_ISSET(fd,set) ( ( fd < FD_SETSIZE ) && FD_ISSET ( fd , set ) )
-
-// #define PHP_SAFE_MAX_FD(m,n) do { if ( m >= FD_SETSIZE ) { _php_emit_fd_setsize_warning ( m ) ; m = FD_SETSIZE - 1 ; } } while ( 0 )
-
-// #define PHP_SOCK_CHUNK_SIZE       8192
+const PHP_SOCK_CHUNK_SIZE = 8192
 
 type PhpSockaddrStorage = __struct__sockaddr_storage
 
-// #define php_connect_nonb(sock,addr,addrlen,timeout) php_network_connect_socket ( ( sock ) , ( addr ) , ( addrlen ) , 0 , ( timeout ) , NULL , NULL )
+func PhpConnectNonb(sock PhpSocketT, addr *__struct__sockaddr, addrlen socklen_t, timeout *__struct__timeval) int {
+	return PhpNetworkConnectSocket(sock, addr, addrlen, 0, timeout, nil, nil)
+}
 
 var PhpStreamSocketOps PhpStreamOps
 var PhpStreamGenericSocketOps PhpStreamOps
 
-// #define PHP_STREAM_IS_SOCKET       ( & php_stream_socket_ops )
+const PHP_STREAM_IS_SOCKET = &PhpStreamSocketOps
 
 /* open a connection to a host using php_hostconnect and return a stream */
 
-// #define php_stream_sock_open_from_socket(socket,persistent) _php_stream_sock_open_from_socket ( ( socket ) , ( persistent ) STREAMS_CC )
-
-// #define php_stream_sock_open_host(host,port,socktype,timeout,persistent) _php_stream_sock_open_host ( ( host ) , ( port ) , ( socktype ) , ( timeout ) , ( persistent ) STREAMS_CC )
+func PhpStreamSockOpenFromSocket(socket PhpSocketT, persistent int) *PhpStream {
+	return _phpStreamSockOpenFromSocket(socket, persistent)
+}
+func PhpStreamSockOpenHost(host *byte, port uint16, socktype int, timeout int, persistent int) *PhpStream {
+	return _phpStreamSockOpenHost(host, port, socktype, timeout, persistent)
+}
 
 /* {{{ memory debug */
 
-// #define php_stream_sock_open_from_socket_rel(socket,persistent) _php_stream_sock_open_from_socket ( ( socket ) , ( persistent ) STREAMS_REL_CC )
-
-// #define php_stream_sock_open_host_rel(host,port,socktype,timeout,persistent) _php_stream_sock_open_host ( ( host ) , ( port ) , ( socktype ) , ( timeout ) , ( persistent ) STREAMS_REL_CC )
-
-// #define php_stream_sock_open_unix_rel(path,pathlen,persistent,timeval) _php_stream_sock_open_unix ( ( path ) , ( pathlen ) , ( persistent ) , ( timeval ) STREAMS_REL_CC )
+func PhpStreamSockOpenFromSocketRel(socket PhpSocketT, persistent *byte) *PhpStream {
+	return _phpStreamSockOpenFromSocket(socket, persistent)
+}
+func PhpStreamSockOpenHostRel(host *byte, port uint16, socktype int, timeout *__struct__timeval, persistent *byte) *PhpStream {
+	return _phpStreamSockOpenHost(host, port, socktype, timeout, persistent)
+}
+func PhpStreamSockOpenUnixRel(path __auto__, pathlen __auto__, persistent __auto__, timeval __auto__) __auto__ {
+	return _php_stream_sock_open_unix(path, pathlen, persistent, timeval)
+}
 
 /* }}} */
 
-// #define MAXFQDNLEN       255
+const MAXFQDNLEN = 255

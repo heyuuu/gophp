@@ -3,9 +3,9 @@
 package streams
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -47,11 +47,24 @@ func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) 
 func PhpStreamXportUnregister(protocol *byte) int {
 	return zend.ZendHashStrDel(&XportHash, protocol, strlen(protocol))
 }
-
-// #define ERR_REPORT(out_err,fmt,arg) if ( out_err ) { * out_err = strpprintf ( 0 , fmt , arg ) ; } else { php_error_docref ( NULL , E_WARNING , fmt , arg ) ; }
-
-// #define ERR_RETURN(out_err,local_err,fmt) if ( out_err ) { * out_err = local_err ; } else { php_error_docref ( NULL , E_WARNING , fmt , local_err ? ZSTR_VAL ( local_err ) : "Unspecified error" ) ; if ( local_err ) { zend_string_release_ex ( local_err , 0 ) ; local_err = NULL ; } }
-
+func ERR_REPORT(out_err **zend.ZendString, fmt string, arg []byte) {
+	if out_err != nil {
+		*out_err = core.Strpprintf(0, fmt, arg)
+	} else {
+		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, arg)
+	}
+}
+func ERR_RETURN(out_err **zend.ZendString, local_err *zend.ZendString, fmt string) {
+	if out_err != nil {
+		*out_err = local_err
+	} else {
+		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return zend.ZSTR_VAL(local_err) }, "Unspecified error"))
+		if local_err != nil {
+			zend.ZendStringReleaseEx(local_err, 0)
+			local_err = nil
+		}
+	}
+}
 func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, persistent_id *byte, timeout *__struct__timeval, context *core.PhpStreamContext, error_string **zend.ZendString, error_code *int) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var factory PhpStreamTransportFactory = nil
@@ -61,7 +74,7 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 	var failed int = 0
 	var error_text *zend.ZendString = nil
 	var default_timeout __struct__timeval = __struct__timeval{0, 0}
-	default_timeout.tv_sec = standard.FileGlobals.default_socket_timeout
+	default_timeout.tv_sec = standard.FG(default_socket_timeout)
 	if timeout == nil {
 		timeout = &default_timeout
 	}
@@ -70,20 +83,20 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 
 	if persistent_id != nil {
 		switch PhpStreamFromPersistentId(persistent_id, &stream) {
-		case 0:
+		case core.PHP_STREAM_PERSISTENT_SUCCESS:
 
 			/* use a 0 second timeout when checking if the socket
 			 * has already died */
 
-			if 0 == _phpStreamSetOption(stream, 12, 0, nil) {
+			if core.PHP_STREAM_OPTION_RETURN_OK == core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_CHECK_LIVENESS, 0, nil) {
 				return stream
 			}
 
 			/* dead - kill it */
 
-			_phpStreamFree(stream, 1|2|16)
+			core.PhpStreamPclose(stream)
 			stream = nil
-		case 1:
+		case core.PHP_STREAM_PERSISTENT_FAILURE:
 
 		default:
 
@@ -103,24 +116,13 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 		n = 3
 	}
 	if protocol != nil {
-		if nil == g.Assign(&factory, zend.ZendHashStrFindPtr(&XportHash, protocol, n)) {
+		if nil == b.Assign(&factory, zend.ZendHashStrFindPtr(&XportHash, protocol, n)) {
 			var wrapper_name []byte
-			if n >= g.SizeOf("wrapper_name") {
-				n = g.SizeOf("wrapper_name") - 1
+			if n >= b.SizeOf("wrapper_name") {
+				n = b.SizeOf("wrapper_name") - 1
 			}
-			var php_str_len int
-			if n >= g.SizeOf("wrapper_name") {
-				php_str_len = g.SizeOf("wrapper_name") - 1
-			} else {
-				php_str_len = n
-			}
-			memcpy(wrapper_name, protocol, php_str_len)
-			wrapper_name[php_str_len] = '0'
-			if error_string != nil {
-				*error_string = zend.ZendStrpprintf(0, "Unable to find the socket transport \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
-			} else {
-				core.PhpErrorDocref(nil, 1<<1, "Unable to find the socket transport \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
-			}
+			core.PHP_STRLCPY(wrapper_name, protocol, b.SizeOf("wrapper_name"), n)
+			ERR_REPORT(error_string, "Unable to find the socket transport \"%s\" - did you forget to enable it when you configured PHP?", wrapper_name)
 			return nil
 		}
 	}
@@ -128,27 +130,19 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 
 		/* should never happen */
 
-		core.PhpErrorDocref(nil, 1<<1, "Could not find a factory !?")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not find a factory !?")
 		return nil
 	}
 	stream = factory(protocol, n, (*byte)(name), namelen, persistent_id, options, flags, timeout, context)
 	if stream != nil {
 		PhpStreamContextSet(stream, context)
-		if (flags & 1) == 0 {
+		if (flags & STREAM_XPORT_SERVER) == 0 {
 
 			/* client */
 
-			if (flags & (2 | 16)) != 0 {
-				if -1 == PhpStreamXportConnect(stream, name, namelen, g.Cond((flags&16) != 0, 1, 0), timeout, &error_text, error_code) {
-					if error_string != nil {
-						*error_string = error_text
-					} else {
-						core.PhpErrorDocref(nil, 1<<1, "connect() failed: %s", g.CondF1(error_text != nil, func() []byte { return error_text.val }, "Unspecified error"))
-						if error_text != nil {
-							zend.ZendStringReleaseEx(error_text, 0)
-							error_text = nil
-						}
-					}
+			if (flags & (STREAM_XPORT_CONNECT | STREAM_XPORT_CONNECT_ASYNC)) != 0 {
+				if -1 == PhpStreamXportConnect(stream, name, namelen, b.Cond((flags&STREAM_XPORT_CONNECT_ASYNC) != 0, 1, 0), timeout, &error_text, error_code) {
+					ERR_RETURN(error_string, error_text, "connect() failed: %s")
 					failed = 1
 				}
 			}
@@ -159,34 +153,18 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 
 			/* server */
 
-			if (flags & 4) != 0 {
+			if (flags & STREAM_XPORT_BIND) != 0 {
 				if 0 != PhpStreamXportBind(stream, name, namelen, &error_text) {
-					if error_string != nil {
-						*error_string = error_text
-					} else {
-						core.PhpErrorDocref(nil, 1<<1, "bind() failed: %s", g.CondF1(error_text != nil, func() []byte { return error_text.val }, "Unspecified error"))
-						if error_text != nil {
-							zend.ZendStringReleaseEx(error_text, 0)
-							error_text = nil
-						}
-					}
+					ERR_RETURN(error_string, error_text, "bind() failed: %s")
 					failed = 1
-				} else if (flags & 8) != 0 {
+				} else if (flags & STREAM_XPORT_LISTEN) != 0 {
 					var zbacklog *zend.Zval = nil
 					var backlog int = 32
-					if (*core.PhpStreamContext)(g.CondF1(stream.ctx != nil, func() any { return stream.ctx.ptr }, nil)) != nil && g.Assign(&zbacklog, PhpStreamContextGetOption((*core.PhpStreamContext)(g.CondF1(stream.ctx != nil, func() any { return stream.ctx.ptr }, nil)), "socket", "backlog")) != nil {
+					if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&zbacklog, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "backlog")) != nil {
 						backlog = zend.ZvalGetLong(zbacklog)
 					}
 					if 0 != PhpStreamXportListen(stream, backlog, &error_text) {
-						if error_string != nil {
-							*error_string = error_text
-						} else {
-							core.PhpErrorDocref(nil, 1<<1, "listen() failed: %s", g.CondF1(error_text != nil, func() []byte { return error_text.val }, "Unspecified error"))
-							if error_text != nil {
-								zend.ZendStringReleaseEx(error_text, 0)
-								error_text = nil
-							}
-						}
+						ERR_RETURN(error_string, error_text, "listen() failed: %s")
 						failed = 1
 					}
 				}
@@ -201,9 +179,9 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 		/* failure means that they don't get a stream to play with */
 
 		if persistent_id != nil {
-			_phpStreamFree(stream, 1|2|16)
+			core.PhpStreamPclose(stream)
 		} else {
-			_phpStreamFree(stream, 1|2)
+			core.PhpStreamClose(stream)
 		}
 		stream = nil
 	}
@@ -215,7 +193,7 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_text **zend.ZendString) int {
 	var param PhpStreamXportParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_BIND)
 	param.SetName((*byte)(name))
 	param.SetNamelen(namelen)
@@ -224,8 +202,8 @@ func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_t
 	} else {
 		param.SetWantErrortext(0)
 	}
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		if error_text != nil {
 			*error_text = param.GetErrorText()
 		}
@@ -239,7 +217,7 @@ func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_t
 func PhpStreamXportConnect(stream *core.PhpStream, name *byte, namelen int, asynchronous int, timeout *__struct__timeval, error_text **zend.ZendString, error_code *int) int {
 	var param PhpStreamXportParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	if asynchronous != 0 {
 		param.SetOp(STREAM_XPORT_OP_CONNECT_ASYNC)
 	} else {
@@ -253,8 +231,8 @@ func PhpStreamXportConnect(stream *core.PhpStream, name *byte, namelen int, asyn
 	} else {
 		param.SetWantErrortext(0)
 	}
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		if error_text != nil {
 			*error_text = param.GetErrorText()
 		}
@@ -271,7 +249,7 @@ func PhpStreamXportConnect(stream *core.PhpStream, name *byte, namelen int, asyn
 func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **zend.ZendString) int {
 	var param PhpStreamXportParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_LISTEN)
 	param.SetBacklog(backlog)
 	if error_text != nil {
@@ -279,8 +257,8 @@ func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **zend
 	} else {
 		param.SetWantErrortext(0)
 	}
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		if error_text != nil {
 			*error_text = param.GetErrorText()
 		}
@@ -294,7 +272,7 @@ func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **zend
 func PhpStreamXportAccept(stream *core.PhpStream, client **core.PhpStream, textaddr **zend.ZendString, addr *any, addrlen *socklen_t, timeout *__struct__timeval, error_text **zend.ZendString) int {
 	var param PhpStreamXportParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_ACCEPT)
 	param.SetTimeout(timeout)
 	if addr != nil {
@@ -312,8 +290,8 @@ func PhpStreamXportAccept(stream *core.PhpStream, client **core.PhpStream, texta
 	} else {
 		param.SetWantErrortext(0)
 	}
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		*client = param.GetClient()
 		if addr != nil {
 			*addr = param.GetOutputsAddr()
@@ -332,7 +310,7 @@ func PhpStreamXportAccept(stream *core.PhpStream, client **core.PhpStream, texta
 func PhpStreamXportGetName(stream *core.PhpStream, want_peer int, textaddr **zend.ZendString, addr *any, addrlen *socklen_t) int {
 	var param PhpStreamXportParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	if want_peer != 0 {
 		param.SetOp(STREAM_XPORT_OP_GET_PEER_NAME)
 	} else {
@@ -348,8 +326,8 @@ func PhpStreamXportGetName(stream *core.PhpStream, want_peer int, textaddr **zen
 	} else {
 		param.SetWantTextaddr(0)
 	}
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		if addr != nil {
 			*addr = param.GetOutputsAddr()
 			*addrlen = param.GetOutputsAddrlen()
@@ -364,28 +342,28 @@ func PhpStreamXportGetName(stream *core.PhpStream, want_peer int, textaddr **zen
 func PhpStreamXportCryptoSetup(stream *core.PhpStream, crypto_method PhpStreamXportCryptMethodT, session_stream *core.PhpStream) int {
 	var param PhpStreamXportCryptoParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_CRYPTO_OP_SETUP)
 	param.SetMethod(crypto_method)
 	param.SetSession(session_stream)
-	ret = _phpStreamSetOption(stream, 8, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_CRYPTO_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
-	core.PhpErrorDocref("streams.crypto", 1<<1, "this stream does not support SSL/crypto")
+	core.PhpErrorDocref("streams.crypto", zend.E_WARNING, "this stream does not support SSL/crypto")
 	return ret
 }
 func PhpStreamXportCryptoEnable(stream *core.PhpStream, activate int) int {
 	var param PhpStreamXportCryptoParam
 	var ret int
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_CRYPTO_OP_ENABLE)
 	param.SetActivate(activate)
-	ret = _phpStreamSetOption(stream, 8, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_CRYPTO_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
-	core.PhpErrorDocref("streams.crypto", 1<<1, "this stream does not support SSL/crypto")
+	core.PhpErrorDocref("streams.crypto", zend.E_WARNING, "this stream does not support SSL/crypto")
 	return ret
 }
 
@@ -399,7 +377,7 @@ func PhpStreamXportRecvfrom(stream *core.PhpStream, buf *byte, buflen int, flags
 
 	/* otherwise, we are going to bypass the buffer */
 
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_RECV)
 	if addr != nil {
 		param.SetWantAddr(1)
@@ -414,8 +392,8 @@ func PhpStreamXportRecvfrom(stream *core.PhpStream, buf *byte, buflen int, flags
 	param.SetBuf(buf)
 	param.SetBuflen(buflen)
 	param.SetFlags(flags)
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		if addr != nil {
 			*addr = param.GetOutputsAddr()
 			*addrlen = param.GetOutputsAddrlen()
@@ -441,10 +419,10 @@ func PhpStreamXportSendto(stream *core.PhpStream, buf *byte, buflen int, flags i
 	var oob int
 	oob = (flags & STREAM_OOB) == STREAM_OOB
 	if (oob != 0 || addr) && stream.writefilters.GetHead() != nil {
-		core.PhpErrorDocref(nil, 1<<1, "cannot write OOB data, or data to a targeted address on a filtered stream")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "cannot write OOB data, or data to a targeted address on a filtered stream")
 		return -1
 	}
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_SEND)
 	if addr {
 		param.SetWantAddr(1)
@@ -456,8 +434,8 @@ func PhpStreamXportSendto(stream *core.PhpStream, buf *byte, buflen int, flags i
 	param.SetFlags(flags)
 	param.SetInputsAddr(addr)
 	param.SetInputsAddrlen(addrlen)
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
 	return -1
@@ -469,11 +447,11 @@ func PhpStreamXportSendto(stream *core.PhpStream, buf *byte, buflen int, flags i
 func PhpStreamXportShutdown(stream *core.PhpStream, how StreamShutdownT) int {
 	var param PhpStreamXportParam
 	var ret int = 0
-	memset(&param, 0, g.SizeOf("param"))
+	memset(&param, 0, b.SizeOf("param"))
 	param.SetOp(STREAM_XPORT_OP_SHUTDOWN)
 	param.SetHow(how)
-	ret = _phpStreamSetOption(stream, 7, 0, &param)
-	if ret == 0 {
+	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_XPORT_API, 0, &param)
+	if ret == core.PHP_STREAM_OPTION_RETURN_OK {
 		return param.GetReturncode()
 	}
 	return -1

@@ -18,7 +18,7 @@ type ZendModuleEntry struct {
 	module_shutdown_func  func(type_ int, module_number int) int
 	request_startup_func  func(type_ int, module_number int) int
 	request_shutdown_func func(type_ int, module_number int) int
-	info_func             func(zend_module *ZendModuleEntry)
+	info_func             func(ZEND_MODULE_INFO_FUNC_ARGS)
 	version               *byte
 	globals_size          int
 	globals_ptr           any
@@ -72,8 +72,8 @@ func (this ZendModuleEntry) GetRequestShutdownFunc() func(type_ int, module_numb
 func (this *ZendModuleEntry) SetRequestShutdownFunc(value func(type_ int, module_number int) int) {
 	this.request_shutdown_func = value
 }
-func (this ZendModuleEntry) GetInfoFunc() func(zend_module *ZendModuleEntry) { return this.info_func }
-func (this *ZendModuleEntry) SetInfoFunc(value func(zend_module *ZendModuleEntry)) {
+func (this ZendModuleEntry) GetInfoFunc() func(ZEND_MODULE_INFO_FUNC_ARGS) { return this.info_func }
+func (this *ZendModuleEntry) SetInfoFunc(value func(ZEND_MODULE_INFO_FUNC_ARGS)) {
 	this.info_func = value
 }
 func (this ZendModuleEntry) GetVersion() *byte                      { return this.version }

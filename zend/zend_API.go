@@ -3,8 +3,8 @@
 package zend
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/core"
 )
 
 // Source: <Zend/zend_API.h>
@@ -42,7 +42,7 @@ import (
 
 // # include "zend_execute.h"
 
-// #define ZEND_NS_NAME(ns,name) ns "\\" name
+func ZEND_NS_NAME(ns string, name string) string { return ns + "\\" + name }
 
 // #define ZEND_FN(name) zif_ ## name
 
@@ -160,7 +160,9 @@ import (
 
 // #define ZEND_MODULE_DEACTIVATE_D(module) int ZEND_MODULE_DEACTIVATE_N ( module ) ( SHUTDOWN_FUNC_ARGS )
 
-// #define ZEND_MODULE_POST_ZEND_DEACTIVATE_D(module) int ZEND_MODULE_POST_ZEND_DEACTIVATE_N ( module ) ( void )
+func ZEND_MODULE_POST_ZEND_DEACTIVATE_D(module __auto__) {
+	var zm_post_zend_deactivate_module func() int
+}
 
 // #define ZEND_MODULE_INFO_D(module) ZEND_COLD void ZEND_MODULE_INFO_N ( module ) ( ZEND_MODULE_INFO_FUNC_ARGS )
 
@@ -188,59 +190,108 @@ import (
 
 // #define INIT_CLASS_ENTRY_EX(class_container,class_name,class_name_len,functions) { memset ( & class_container , 0 , sizeof ( zend_class_entry ) ) ; class_container . name = zend_string_init_interned ( class_name , class_name_len , 1 ) ; class_container . info . internal . builtin_functions = functions ; }
 
-// #define INIT_CLASS_ENTRY_INIT_METHODS(class_container,functions) { class_container . constructor = NULL ; class_container . destructor = NULL ; class_container . clone = NULL ; class_container . serialize = NULL ; class_container . unserialize = NULL ; class_container . create_object = NULL ; class_container . get_static_method = NULL ; class_container . __call = NULL ; class_container . __callstatic = NULL ; class_container . __tostring = NULL ; class_container . __get = NULL ; class_container . __set = NULL ; class_container . __unset = NULL ; class_container . __isset = NULL ; class_container . __debugInfo = NULL ; class_container . serialize_func = NULL ; class_container . unserialize_func = NULL ; class_container . parent = NULL ; class_container . num_interfaces = 0 ; class_container . trait_names = NULL ; class_container . num_traits = 0 ; class_container . trait_aliases = NULL ; class_container . trait_precedences = NULL ; class_container . interfaces = NULL ; class_container . get_iterator = NULL ; class_container . iterator_funcs_ptr = NULL ; class_container . info . internal . module = NULL ; class_container . info . internal . builtin_functions = functions ; }
-
-// #define INIT_NS_CLASS_ENTRY(class_container,ns,class_name,functions) INIT_CLASS_ENTRY ( class_container , ZEND_NS_NAME ( ns , class_name ) , functions )
-
-// #define CE_STATIC_MEMBERS(ce) ( ( zval * ) ZEND_MAP_PTR_GET ( ( ce ) -> static_members_table ) )
-
-// #define ZEND_FCI_INITIALIZED(fci) ( ( fci ) . size != 0 )
+func INIT_CLASS_ENTRY_INIT_METHODS(class_container ZendClassEntry, functions []ZendFunctionEntry) {
+	class_container.SetConstructor(nil)
+	class_container.SetDestructor(nil)
+	class_container.SetClone(nil)
+	class_container.SetSerialize(nil)
+	class_container.SetUnserialize(nil)
+	class_container.create_object = nil
+	class_container.SetGetStaticMethod(nil)
+	class_container.SetCall(nil)
+	class_container.SetCallstatic(nil)
+	class_container.SetTostring(nil)
+	class_container.SetGet(nil)
+	class_container.SetSet(nil)
+	class_container.SetUnset(nil)
+	class_container.SetIsset(nil)
+	class_container.SetDebugInfo(nil)
+	class_container.SetSerializeFunc(nil)
+	class_container.SetUnserializeFunc(nil)
+	class_container.parent = nil
+	class_container.SetNumInterfaces(0)
+	class_container.SetTraitNames(nil)
+	class_container.SetNumTraits(0)
+	class_container.SetTraitAliases(nil)
+	class_container.SetTraitPrecedences(nil)
+	class_container.interfaces = nil
+	class_container.SetGetIterator(nil)
+	class_container.SetIteratorFuncsPtr(nil)
+	class_container.SetModule(nil)
+	class_container.SetBuiltinFunctions(functions)
+}
+func INIT_NS_CLASS_ENTRY(class_container __auto__, ns string, class_name string, functions __auto__) {
+	memset(&class_container, 0, b.SizeOf("zend_class_entry"))
+	class_container.name = ZendStringInitInterned(ZEND_NS_NAME(ns, class_name), b.SizeOf("ZEND_NS_NAME ( ns , class_name )")-1, 1)
+	class_container.info.internal.builtin_functions = functions
+}
+func CE_STATIC_MEMBERS(ce *ZendClassEntry) *Zval {
+	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table))
+}
+func ZEND_FCI_INITIALIZED(fci ZendFcallInfo) bool { return fci.GetSize() != 0 }
 
 /* internal function to efficiently copy parameters when executing __call() */
 
-// #define zend_get_parameters_array(ht,param_count,argument_array) _zend_get_parameters_array_ex ( param_count , argument_array )
-
-// #define zend_get_parameters_array_ex(param_count,argument_array) _zend_get_parameters_array_ex ( param_count , argument_array )
-
-// #define zend_parse_parameters_none() ( EXPECTED ( ZEND_NUM_ARGS ( ) == 0 ) ? SUCCESS : ( zend_wrong_parameters_none_error ( ) , FAILURE ) )
-
-// #define zend_parse_parameters_none_throw() ( EXPECTED ( ZEND_NUM_ARGS ( ) == 0 ) ? SUCCESS : ( zend_wrong_parameters_none_exception ( ) , FAILURE ) )
+func ZendGetParametersArray(ht uint32, param_count int, argument_array *Zval) int {
+	return _zendGetParametersArrayEx(param_count, argument_array)
+}
+func ZendGetParametersArrayEx(param_count int, argument_array *Zval) int {
+	return _zendGetParametersArrayEx(param_count, argument_array)
+}
+func ZendParseParametersNone() ZEND_RESULT_CODE {
+	if EXPECTED(ZEND_NUM_ARGS() == 0) {
+		return SUCCESS
+	} else {
+		ZendWrongParametersNoneError()
+		return FAILURE
+	}
+}
+func ZendParseParametersNoneThrow() ZEND_RESULT_CODE {
+	if EXPECTED(ZEND_NUM_ARGS() == 0) {
+		return SUCCESS
+	} else {
+		ZendWrongParametersNoneException()
+		return FAILURE
+	}
+}
 
 /* Parameter parsing API -- andrei */
 
-// #define ZEND_PARSE_PARAMS_QUIET       ( 1 << 1 )
-
-// #define ZEND_PARSE_PARAMS_THROW       ( 1 << 2 )
+const ZEND_PARSE_PARAMS_QUIET = 1 << 1
+const ZEND_PARSE_PARAMS_THROW = 1 << 2
 
 /* End of parameter parsing API -- andrei */
 
-// #define zend_register_class_alias(name,ce) zend_register_class_alias_ex ( name , sizeof ( name ) - 1 , ce , 1 )
+func ZendRegisterClassAlias(name *byte, ce *ZendClassEntry) int {
+	return ZendRegisterClassAliasEx(name, b.SizeOf("name")-1, ce, 1)
+}
+func ZendRegisterNsClassAlias(ns string, name string, ce *ZendClassEntry) int {
+	return ZendRegisterClassAliasEx(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, ce, 1)
+}
 
-// #define zend_register_ns_class_alias(ns,name,ce) zend_register_class_alias_ex ( ZEND_NS_NAME ( ns , name ) , sizeof ( ZEND_NS_NAME ( ns , name ) ) - 1 , ce , 1 )
+const IS_CALLABLE_CHECK_SYNTAX_ONLY uint32 = 1 << 0
+const IS_CALLABLE_CHECK_NO_ACCESS = 1 << 1
+const IS_CALLABLE_CHECK_IS_STATIC = 1 << 2
+const IS_CALLABLE_CHECK_SILENT uint32 = 1 << 3
+const IS_CALLABLE_STRICT uint32 = IS_CALLABLE_CHECK_IS_STATIC
+const ZEND_THIS *Zval = &EX(This)
 
-// #define IS_CALLABLE_CHECK_SYNTAX_ONLY       ( 1 << 0 )
+func getThis() *Zval {
+	if Z_TYPE_P(ZEND_THIS) == IS_OBJECT {
+		return ZEND_THIS
+	} else {
+		return nil
+	}
+}
+func ZEND_IS_METHOD_CALL() bool { return EX(func_).common.scope != nil }
 
-// #define IS_CALLABLE_CHECK_NO_ACCESS       ( 1 << 1 )
+const WRONG_PARAM_COUNT = ZEND_WRONG_PARAM_COUNT()
 
-// #define IS_CALLABLE_CHECK_IS_STATIC       ( 1 << 2 )
-
-// #define IS_CALLABLE_CHECK_SILENT       ( 1 << 3 )
-
-// #define IS_CALLABLE_STRICT       ( IS_CALLABLE_CHECK_IS_STATIC )
-
-// #define ZEND_THIS       ( & EX ( This ) )
-
-// #define getThis() ( ( Z_TYPE_P ( ZEND_THIS ) == IS_OBJECT ) ? ZEND_THIS : NULL )
-
-// #define ZEND_IS_METHOD_CALL() ( EX ( func ) -> common . scope != NULL )
-
-// #define WRONG_PARAM_COUNT       ZEND_WRONG_PARAM_COUNT ( )
-
-// #define WRONG_PARAM_COUNT_WITH_RETVAL(ret) ZEND_WRONG_PARAM_COUNT_WITH_RETVAL ( ret )
-
-// #define ARG_COUNT(dummy) EX_NUM_ARGS ( )
-
-// #define ZEND_NUM_ARGS() EX_NUM_ARGS ( )
+func WRONG_PARAM_COUNT_WITH_RETVAL(ret ZEND_RESULT_CODE) __auto__ {
+	return ZEND_WRONG_PARAM_COUNT_WITH_RETVAL(ret)
+}
+func ARG_COUNT(dummy __auto__) uint32 { return EX_NUM_ARGS() }
+func ZEND_NUM_ARGS() uint32           { return EX_NUM_ARGS() }
 
 // #define ZEND_WRONG_PARAM_COUNT() { zend_wrong_param_count ( ) ; return ; }
 
@@ -248,64 +299,82 @@ import (
 
 // #define DLEXPORT
 
-// #define array_init(arg) ZVAL_ARR ( ( arg ) , zend_new_array ( 0 ) )
-
-// #define array_init_size(arg,size) ZVAL_ARR ( ( arg ) , zend_new_array ( size ) )
-
-// #define add_assoc_long(__arg,__key,__n) add_assoc_long_ex ( __arg , __key , strlen ( __key ) , __n )
-
-// #define add_assoc_null(__arg,__key) add_assoc_null_ex ( __arg , __key , strlen ( __key ) )
-
-// #define add_assoc_bool(__arg,__key,__b) add_assoc_bool_ex ( __arg , __key , strlen ( __key ) , __b )
-
-// #define add_assoc_resource(__arg,__key,__r) add_assoc_resource_ex ( __arg , __key , strlen ( __key ) , __r )
-
-// #define add_assoc_double(__arg,__key,__d) add_assoc_double_ex ( __arg , __key , strlen ( __key ) , __d )
-
-// #define add_assoc_str(__arg,__key,__str) add_assoc_str_ex ( __arg , __key , strlen ( __key ) , __str )
-
-// #define add_assoc_string(__arg,__key,__str) add_assoc_string_ex ( __arg , __key , strlen ( __key ) , __str )
-
-// #define add_assoc_stringl(__arg,__key,__str,__length) add_assoc_stringl_ex ( __arg , __key , strlen ( __key ) , __str , __length )
-
-// #define add_assoc_zval(__arg,__key,__value) add_assoc_zval_ex ( __arg , __key , strlen ( __key ) , __value )
-
+func ArrayInit(arg *Zval)                  { ZVAL_ARR(arg, ZendNewArray(0)) }
+func ArrayInitSize(arg *Zval, size uint32) { ZVAL_ARR(arg, ZendNewArray(size)) }
+func AddAssocLong(__arg *Zval, __key string, __n ZendLong) int {
+	return AddAssocLongEx(__arg, __key, strlen(__key), __n)
+}
+func AddAssocNull(__arg *Zval, __key string) int {
+	return AddAssocNullEx(__arg, __key, strlen(__key))
+}
+func AddAssocBool(__arg *Zval, __key string, __b int) int {
+	return AddAssocBoolEx(__arg, __key, strlen(__key), __b)
+}
+func AddAssocResource(__arg *Zval, __key *byte, __r *ZendResource) int {
+	return AddAssocResourceEx(__arg, __key, strlen(__key), __r)
+}
+func AddAssocDouble(__arg *Zval, __key *byte, __d float64) int {
+	return AddAssocDoubleEx(__arg, __key, strlen(__key), __d)
+}
+func AddAssocStr(__arg *Zval, __key string, __str *ZendString) int {
+	return AddAssocStrEx(__arg, __key, strlen(__key), __str)
+}
+func AddAssocString(__arg *Zval, __key *byte, __str *byte) int {
+	return AddAssocStringEx(__arg, __key, strlen(__key), __str)
+}
+func AddAssocStringl(__arg *Zval, __key string, __str *byte, __length int) int {
+	return AddAssocStringlEx(__arg, __key, strlen(__key), __str, __length)
+}
+func AddAssocZval(__arg *Zval, __key string, __value *Zval) int {
+	return AddAssocZvalEx(__arg, __key, strlen(__key), __value)
+}
 func AddIndexZval(arg *Zval, index ZendUlong, value *Zval) int {
-	if ZendHashIndexUpdate(arg.GetValue().GetArr(), index, value) != nil {
+	if ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
 	}
 }
 func AddNextIndexZval(arg *Zval, value *Zval) int {
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), value) != nil {
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
 	}
 }
-
-// #define add_property_long(__arg,__key,__n) add_property_long_ex ( __arg , __key , strlen ( __key ) , __n )
-
-// #define add_property_null(__arg,__key) add_property_null_ex ( __arg , __key , strlen ( __key ) )
-
-// #define add_property_bool(__arg,__key,__b) add_property_bool_ex ( __arg , __key , strlen ( __key ) , __b )
-
-// #define add_property_resource(__arg,__key,__r) add_property_resource_ex ( __arg , __key , strlen ( __key ) , __r )
-
-// #define add_property_double(__arg,__key,__d) add_property_double_ex ( __arg , __key , strlen ( __key ) , __d )
-
-// #define add_property_str(__arg,__key,__str) add_property_str_ex ( __arg , __key , strlen ( __key ) , __str )
-
-// #define add_property_string(__arg,__key,__str) add_property_string_ex ( __arg , __key , strlen ( __key ) , __str )
-
-// #define add_property_stringl(__arg,__key,__str,__length) add_property_stringl_ex ( __arg , __key , strlen ( __key ) , __str , __length )
-
-// #define add_property_zval(__arg,__key,__value) add_property_zval_ex ( __arg , __key , strlen ( __key ) , __value )
-
-// #define call_user_function(function_table,object,function_name,retval_ptr,param_count,params) _call_user_function_ex ( object , function_name , retval_ptr , param_count , params , 1 )
-
-// #define call_user_function_ex(function_table,object,function_name,retval_ptr,param_count,params,no_separation,symbol_table) _call_user_function_ex ( object , function_name , retval_ptr , param_count , params , no_separation )
+func AddPropertyLong(__arg *Zval, __key string, __n ZendLong) int {
+	return AddPropertyLongEx(__arg, __key, strlen(__key), __n)
+}
+func AddPropertyNull(__arg *Zval, __key string) int {
+	return AddPropertyNullEx(__arg, __key, strlen(__key))
+}
+func AddPropertyBool(__arg *Zval, __key *byte, __b ZendLong) int {
+	return AddPropertyBoolEx(__arg, __key, strlen(__key), __b)
+}
+func AddPropertyResource(__arg *Zval, __key string, __r *ZendResource) int {
+	return AddPropertyResourceEx(__arg, __key, strlen(__key), __r)
+}
+func AddPropertyDouble(__arg *Zval, __key *byte, __d float64) int {
+	return AddPropertyDoubleEx(__arg, __key, strlen(__key), __d)
+}
+func AddPropertyStr(__arg *Zval, __key *byte, __str *ZendString) int {
+	return AddPropertyStrEx(__arg, __key, strlen(__key), __str)
+}
+func AddPropertyString(__arg *Zval, __key string, __str *byte) int {
+	return AddPropertyStringEx(__arg, __key, strlen(__key), __str)
+}
+func AddPropertyStringl(__arg *Zval, __key string, __str *byte, __length int) int {
+	return AddPropertyStringlEx(__arg, __key, strlen(__key), __str, __length)
+}
+func AddPropertyZval(__arg *Zval, __key string, __value *Zval) int {
+	return AddPropertyZvalEx(__arg, __key, strlen(__key), __value)
+}
+func CallUserFunction(function_table *HashTable, object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval) int {
+	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
+}
+func CallUserFunctionEx(function_table __auto__, object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval, no_separation int, symbol_table __auto__) int {
+	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
+}
 
 /** Build zend_call_info/cache from a zval*
  *
@@ -352,10 +421,10 @@ func AddNextIndexZval(arg *Zval, value *Zval) int {
  */
 
 func ZendForbidDynamicCall(func_name string) int {
-	var ex *ZendExecuteData = EG.GetCurrentExecuteData()
-	r.Assert(ex != nil && ex.GetFunc() != nil)
-	if (ex.GetThis().GetTypeInfo() & 1 << 25) != 0 {
-		ZendError(1<<1, "Cannot call %s dynamically", func_name)
+	var ex *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
+	ZEND_ASSERT(ex != nil && ex.GetFunc() != nil)
+	if (ZEND_CALL_INFO(ex) & ZEND_CALL_DYNAMIC) != 0 {
+		ZendError(E_WARNING, "Cannot call %s dynamically", func_name)
 		return FAILURE
 	}
 	return SUCCESS
@@ -365,59 +434,57 @@ func ZendForbidDynamicCall(func_name string) int {
 
 // #define CHECK_ZVAL_STRING_REL(z)
 
-// #define CHECK_ZVAL_NULL_PATH(p) ( Z_STRLEN_P ( p ) != strlen ( Z_STRVAL_P ( p ) ) )
+func CHECK_ZVAL_NULL_PATH(p *Zval) bool {
+	return Z_STRLEN_P(p) != strlen(Z_STRVAL_P(p))
+}
+func CHECK_NULL_PATH(p []byte, l int) bool { return strlen(p) != size_t(l) }
+func ZVAL_STRINGL(z *Zval, s *byte, l int) { ZVAL_NEW_STR(z, ZendStringInit(s, l, 0)) }
+func ZVAL_STRING(z *Zval, s *byte) {
+	var _s *byte = s
+	ZVAL_STRINGL(z, _s, strlen(_s))
+}
+func ZVAL_EMPTY_STRING(z *Zval)             { ZVAL_INTERNED_STR(z, ZSTR_EMPTY_ALLOC()) }
+func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { ZVAL_NEW_STR(z, ZendStringInit(s, l, 1)) }
+func ZVAL_PSTRING(z *Zval, s *byte) {
+	var _s *byte = s
+	ZVAL_PSTRINGL(z, _s, strlen(_s))
+}
+func ZVAL_EMPTY_PSTRING(z *Zval) { ZVAL_PSTRINGL(z, "", 0) }
+func ZVAL_ZVAL(z *Zval, zv *Zval, copy int, dtor int) {
+	var __z *Zval = z
+	var __zv *Zval = zv
+	if EXPECTED(!(Z_ISREF_P(__zv))) {
+		if copy != 0 && dtor == 0 {
+			ZVAL_COPY(__z, __zv)
+		} else {
+			ZVAL_COPY_VALUE(__z, __zv)
+		}
+	} else {
+		ZVAL_COPY(__z, Z_REFVAL_P(__zv))
+		if dtor != 0 || copy == 0 {
+			ZvalPtrDtor(__zv)
+		}
+	}
+}
+func RETVAL_BOOL(b bool)                       { ZVAL_BOOL(return_value, b) }
+func RETVAL_NULL()                             { ZVAL_NULL(return_value) }
+func RETVAL_LONG(l int)                        { ZVAL_LONG(return_value, l) }
+func RETVAL_DOUBLE(d float64)                  { ZVAL_DOUBLE(return_value, d) }
+func RETVAL_STR(s *ZendString)                 { ZVAL_STR(return_value, s) }
+func RETVAL_INTERNED_STR(s *ZendString)        { ZVAL_INTERNED_STR(return_value, s) }
+func RETVAL_NEW_STR(s *ZendString)             { ZVAL_NEW_STR(return_value, s) }
+func RETVAL_STR_COPY(s *ZendString)            { ZVAL_STR_COPY(return_value, s) }
+func RETVAL_STRING(s *byte)                    { ZVAL_STRING(return_value, s) }
+func RETVAL_STRINGL(s string, l int)           { ZVAL_STRINGL(return_value, s, l) }
+func RETVAL_EMPTY_STRING()                     { ZVAL_EMPTY_STRING(return_value) }
+func RETVAL_RES(r *ZendResource)               { ZVAL_RES(return_value, r) }
+func RETVAL_ARR(r *HashTable)                  { ZVAL_ARR(return_value, r) }
+func RETVAL_EMPTY_ARRAY()                      { ZVAL_EMPTY_ARRAY(return_value) }
+func RETVAL_OBJ(r *ZendObject)                 { ZVAL_OBJ(return_value, r) }
+func RETVAL_ZVAL(zv *Zval, copy int, dtor int) { ZVAL_ZVAL(return_value, zv, copy, dtor) }
 
-// #define CHECK_NULL_PATH(p,l) ( strlen ( p ) != ( size_t ) ( l ) )
-
-// #define ZVAL_STRINGL(z,s,l) do { ZVAL_NEW_STR ( z , zend_string_init ( s , l , 0 ) ) ; } while ( 0 )
-
-// #define ZVAL_STRING(z,s) do { const char * _s = ( s ) ; ZVAL_STRINGL ( z , _s , strlen ( _s ) ) ; } while ( 0 )
-
-// #define ZVAL_EMPTY_STRING(z) do { ZVAL_INTERNED_STR ( z , ZSTR_EMPTY_ALLOC ( ) ) ; } while ( 0 )
-
-// #define ZVAL_PSTRINGL(z,s,l) do { ZVAL_NEW_STR ( z , zend_string_init ( s , l , 1 ) ) ; } while ( 0 )
-
-// #define ZVAL_PSTRING(z,s) do { const char * _s = ( s ) ; ZVAL_PSTRINGL ( z , _s , strlen ( _s ) ) ; } while ( 0 )
-
-// #define ZVAL_EMPTY_PSTRING(z) do { ZVAL_PSTRINGL ( z , "" , 0 ) ; } while ( 0 )
-
-// #define ZVAL_ZVAL(z,zv,copy,dtor) do { zval * __z = ( z ) ; zval * __zv = ( zv ) ; if ( EXPECTED ( ! Z_ISREF_P ( __zv ) ) ) { if ( copy && ! dtor ) { ZVAL_COPY ( __z , __zv ) ; } else { ZVAL_COPY_VALUE ( __z , __zv ) ; } } else { ZVAL_COPY ( __z , Z_REFVAL_P ( __zv ) ) ; if ( dtor || ! copy ) { zval_ptr_dtor ( __zv ) ; } } } while ( 0 )
-
-// #define RETVAL_BOOL(b) ZVAL_BOOL ( return_value , b )
-
-// #define RETVAL_NULL() ZVAL_NULL ( return_value )
-
-// #define RETVAL_LONG(l) ZVAL_LONG ( return_value , l )
-
-// #define RETVAL_DOUBLE(d) ZVAL_DOUBLE ( return_value , d )
-
-// #define RETVAL_STR(s) ZVAL_STR ( return_value , s )
-
-// #define RETVAL_INTERNED_STR(s) ZVAL_INTERNED_STR ( return_value , s )
-
-// #define RETVAL_NEW_STR(s) ZVAL_NEW_STR ( return_value , s )
-
-// #define RETVAL_STR_COPY(s) ZVAL_STR_COPY ( return_value , s )
-
-// #define RETVAL_STRING(s) ZVAL_STRING ( return_value , s )
-
-// #define RETVAL_STRINGL(s,l) ZVAL_STRINGL ( return_value , s , l )
-
-// #define RETVAL_EMPTY_STRING() ZVAL_EMPTY_STRING ( return_value )
-
-// #define RETVAL_RES(r) ZVAL_RES ( return_value , r )
-
-// #define RETVAL_ARR(r) ZVAL_ARR ( return_value , r )
-
-// #define RETVAL_EMPTY_ARRAY() ZVAL_EMPTY_ARRAY ( return_value )
-
-// #define RETVAL_OBJ(r) ZVAL_OBJ ( return_value , r )
-
-// #define RETVAL_ZVAL(zv,copy,dtor) ZVAL_ZVAL ( return_value , zv , copy , dtor )
-
-// #define RETVAL_FALSE       ZVAL_FALSE ( return_value )
-
-// #define RETVAL_TRUE       ZVAL_TRUE ( return_value )
+const RETVAL_FALSE = ZVAL_FALSE(return_value)
+const RETVAL_TRUE = ZVAL_TRUE(return_value)
 
 // #define RETURN_BOOL(b) { RETVAL_BOOL ( b ) ; return ; }
 
@@ -455,155 +522,413 @@ func ZendForbidDynamicCall(func_name string) int {
 
 // #define RETURN_TRUE       { RETVAL_TRUE ; return ; }
 
-// #define HASH_OF(p) ( Z_TYPE_P ( p ) == IS_ARRAY ? Z_ARRVAL_P ( p ) : ( ( Z_TYPE_P ( p ) == IS_OBJECT ? Z_OBJ_HT_P ( p ) -> get_properties ( ( p ) ) : NULL ) ) )
-
-// #define ZVAL_IS_NULL(z) ( Z_TYPE_P ( z ) == IS_NULL )
+func HASH_OF(p *Zval) __auto__ {
+	if Z_TYPE_P(p) == IS_ARRAY {
+		return Z_ARRVAL_P(p)
+	} else {
+		if Z_TYPE_P(p) == IS_OBJECT {
+			return Z_OBJ_HT_P(p).GetGetProperties()(p)
+		} else {
+			return nil
+		}
+	}
+}
+func ZVAL_IS_NULL(z *Zval) bool { return Z_TYPE_P(z) == IS_NULL }
 
 /* For compatibility */
 
-// #define ZEND_MINIT       ZEND_MODULE_STARTUP_N
+const ZEND_MINIT = ZEND_MODULE_STARTUP_N
+const ZEND_MSHUTDOWN = ZEND_MODULE_SHUTDOWN_N
+const ZEND_RINIT = ZEND_MODULE_ACTIVATE_N
+const ZEND_RSHUTDOWN = ZEND_MODULE_DEACTIVATE_N
+const ZEND_MINFO = ZEND_MODULE_INFO_N
 
-// #define ZEND_MSHUTDOWN       ZEND_MODULE_SHUTDOWN_N
-
-// #define ZEND_RINIT       ZEND_MODULE_ACTIVATE_N
-
-// #define ZEND_RSHUTDOWN       ZEND_MODULE_DEACTIVATE_N
-
-// #define ZEND_MINFO       ZEND_MODULE_INFO_N
-
-// #define ZEND_GINIT(module) ( ( void ( * ) ( void * ) ) ( ZEND_MODULE_GLOBALS_CTOR_N ( module ) ) )
-
-// #define ZEND_GSHUTDOWN(module) ( ( void ( * ) ( void * ) ) ( ZEND_MODULE_GLOBALS_DTOR_N ( module ) ) )
+func ZEND_GINIT(module __auto__) func(any) {
+	return (func(any))(zm_globals_ctor_module)
+}
+func ZEND_GSHUTDOWN(module __auto__) func(any) {
+	return (func(any))(zm_globals_dtor_module)
+}
 
 // #define ZEND_MINIT_FUNCTION       ZEND_MODULE_STARTUP_D
 
-// #define ZEND_MSHUTDOWN_FUNCTION       ZEND_MODULE_SHUTDOWN_D
-
-// #define ZEND_RINIT_FUNCTION       ZEND_MODULE_ACTIVATE_D
-
-// #define ZEND_RSHUTDOWN_FUNCTION       ZEND_MODULE_DEACTIVATE_D
-
-// #define ZEND_MINFO_FUNCTION       ZEND_MODULE_INFO_D
+const ZEND_MSHUTDOWN_FUNCTION = ZEND_MODULE_SHUTDOWN_D
+const ZEND_RINIT_FUNCTION = ZEND_MODULE_ACTIVATE_D
+const ZEND_RSHUTDOWN_FUNCTION = ZEND_MODULE_DEACTIVATE_D
+const ZEND_MINFO_FUNCTION = ZEND_MODULE_INFO_D
 
 // #define ZEND_GINIT_FUNCTION       ZEND_MODULE_GLOBALS_CTOR_D
 
-// #define ZEND_GSHUTDOWN_FUNCTION       ZEND_MODULE_GLOBALS_DTOR_D
+const ZEND_GSHUTDOWN_FUNCTION = ZEND_MODULE_GLOBALS_DTOR_D
 
 /* May modify arg in-place. Will free arg in failure case (and take ownership in success case).
  * Prefer using the ZEND_TRY_ASSIGN_* macros over these APIs. */
 
-// #define _ZEND_TRY_ASSIGN_NULL(zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_null ( ref ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_NULL ( _zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_NULL(zv) _ZEND_TRY_ASSIGN_NULL ( zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_NULL(zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_NULL ( zv , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_FALSE(zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_bool ( ref , 0 ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_FALSE ( _zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_FALSE(zv) _ZEND_TRY_ASSIGN_FALSE ( zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_FALSE(zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_FALSE ( zv , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_TRUE(zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_bool ( ref , 1 ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_TRUE ( _zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_TRUE(zv) _ZEND_TRY_ASSIGN_TRUE ( zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_TRUE(zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_TRUE ( zv , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_BOOL(zv,bval,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_bool ( ref , 1 ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_BOOL ( _zv , bval ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_BOOL(zv,bval) _ZEND_TRY_ASSIGN_BOOL ( zv , bval , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_BOOL(zv,bval) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_BOOL ( zv , bval , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_LONG(zv,lval,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_long ( ref , lval ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_LONG ( _zv , lval ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_LONG(zv,lval) _ZEND_TRY_ASSIGN_LONG ( zv , lval , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_LONG(zv,lval) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_LONG ( zv , lval , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_DOUBLE(zv,dval,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_double ( ref , dval ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_DOUBLE ( _zv , dval ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_DOUBLE(zv,dval) _ZEND_TRY_ASSIGN_DOUBLE ( zv , dval , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_DOUBLE(zv,dval) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_DOUBLE ( zv , dval , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_EMPTY_STRING(zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_empty_string ( ref ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_EMPTY_STRING ( _zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_EMPTY_STRING(zv) _ZEND_TRY_ASSIGN_EMPTY_STRING ( zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_EMPTY_STRING ( zv , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_STR(zv,str,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_str ( ref , str ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_STR ( _zv , str ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_STR(zv,str) _ZEND_TRY_ASSIGN_STR ( zv , str , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_STR(zv,str) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_STR ( zv , str , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_NEW_STR(zv,str,is_str) do { zval * _zv = zv ; if ( is_str || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_str ( ref , str ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_NEW_STR ( _zv , str ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_NEW_STR(zv,str) _ZEND_TRY_ASSIGN_NEW_STR ( zv , str , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_NEW_STR(zv,str) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_NEW_STR ( zv , str , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_STRING(zv,string,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_string ( ref , string ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_STRING ( _zv , string ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_STRING(zv,string) _ZEND_TRY_ASSIGN_STRING ( zv , string , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_STRING(zv,string) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_STRING ( zv , string , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_STRINGL(zv,string,len,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_stringl ( ref , string , len ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_STRINGL ( _zv , string , len ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_STRINGL(zv,string,len) _ZEND_TRY_ASSIGN_STRINGL ( zv , string , len , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_STRINGL(zv,string,len) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_STRINGL ( zv , string , len , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_ARR(zv,arr,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_arr ( ref , arr ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_ARR ( _zv , arr ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_ARR(zv,arr) _ZEND_TRY_ASSIGN_ARR ( zv , arr , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_ARR(zv,arr) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_ARR ( zv , arr , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_RES(zv,res,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_res ( ref , res ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_RES ( _zv , res ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_RES(zv,res) _ZEND_TRY_ASSIGN_RES ( zv , res , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_RES(zv,res) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_RES ( zv , res , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_TMP(zv,other_zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref ( ref , other_zv ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_COPY_VALUE ( _zv , other_zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_TMP(zv,other_zv) _ZEND_TRY_ASSIGN_TMP ( zv , other_zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_TMP(zv,other_zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_TMP ( zv , other_zv , 1 ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_VALUE(zv,other_zv,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_zval ( ref , other_zv ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_COPY_VALUE ( _zv , other_zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_VALUE(zv,other_zv) _ZEND_TRY_ASSIGN_VALUE ( zv , other_zv , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_VALUE(zv,other_zv) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_VALUE ( zv , other_zv , 1 ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_COPY(zv,other_zv) do { Z_TRY_ADDREF_P ( other_zv ) ; ZEND_TRY_ASSIGN_VALUE ( zv , other_zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_COPY(zv,other_zv) do { Z_TRY_ADDREF_P ( other_zv ) ; ZEND_TRY_ASSIGN_REF_VALUE ( zv , other_zv ) ; } while ( 0 )
-
-// #define _ZEND_TRY_ASSIGN_VALUE_EX(zv,other_zv,strict,is_ref) do { zval * _zv = zv ; if ( is_ref || UNEXPECTED ( Z_ISREF_P ( _zv ) ) ) { zend_reference * ref = Z_REF_P ( _zv ) ; if ( UNEXPECTED ( ZEND_REF_HAS_TYPE_SOURCES ( ref ) ) ) { zend_try_assign_typed_ref_zval_ex ( ref , other_zv , strict ) ; break ; } _zv = & ref -> val ; } zval_ptr_dtor ( _zv ) ; ZVAL_COPY_VALUE ( _zv , other_zv ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_VALUE_EX(zv,other_zv,strict) _ZEND_TRY_ASSIGN_VALUE_EX ( zv , other_zv , strict , 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_VALUE_EX(zv,other_zv,strict) do { ZEND_ASSERT ( Z_ISREF_P ( zv ) ) ; _ZEND_TRY_ASSIGN_VALUE_EX ( zv , other_zv , strict , 1 ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_COPY_EX(zv,other_zv,strict) do { Z_TRY_ADDREF_P ( other_zv ) ; ZEND_TRY_ASSIGN_VALUE_EX ( zv , other_zv , strict ) ; } while ( 0 )
-
-// #define ZEND_TRY_ASSIGN_REF_COPY_EX(zv,other_zv,strict) do { Z_TRY_ADDREF_P ( other_zv ) ; ZEND_TRY_ASSIGN_REF_VALUE_EX ( zv , other_zv , strict ) ; } while ( 0 )
+func _ZEND_TRY_ASSIGN_NULL(zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefNull(ref)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_NULL(_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_NULL(zv *Zval) { _ZEND_TRY_ASSIGN_NULL(zv, 0) }
+func ZEND_TRY_ASSIGN_REF_NULL(zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_NULL(zv, 1)
+}
+func _ZEND_TRY_ASSIGN_FALSE(zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefBool(ref, 0)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_FALSE(_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_FALSE(zv *Zval) { _ZEND_TRY_ASSIGN_FALSE(zv, 0) }
+func ZEND_TRY_ASSIGN_REF_FALSE(zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_FALSE(zv, 1)
+}
+func _ZEND_TRY_ASSIGN_TRUE(zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefBool(ref, 1)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_TRUE(_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_TRUE(zv *Zval) { _ZEND_TRY_ASSIGN_TRUE(zv, 0) }
+func ZEND_TRY_ASSIGN_REF_TRUE(zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_TRUE(zv, 1)
+}
+func _ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefBool(ref, 1)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_BOOL(_zv, bval)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__) { _ZEND_TRY_ASSIGN_BOOL(zv, bval, 0) }
+func ZEND_TRY_ASSIGN_REF_BOOL(zv *Zval, bval __auto__) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_BOOL(zv, bval, 1)
+}
+func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefLong(ref, lval)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_LONG(_zv, lval)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong) { _ZEND_TRY_ASSIGN_LONG(zv, lval, 0) }
+func ZEND_TRY_ASSIGN_REF_LONG(zv *Zval, lval ZendLong) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_LONG(zv, lval, 1)
+}
+func _ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefDouble(ref, dval)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_DOUBLE(_zv, dval)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64) { _ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 0) }
+func ZEND_TRY_ASSIGN_REF_DOUBLE(zv *Zval, dval float64) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 1)
+}
+func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefEmptyString(ref)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_EMPTY_STRING(_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval) { _ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 0) }
+func ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 1)
+}
+func _ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefStr(ref, str)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_STR(_zv, str)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_STR(zv, str, 0) }
+func ZEND_TRY_ASSIGN_REF_STR(zv *Zval, str *ZendString) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_STR(zv, str, 1)
+}
+func _ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString, is_str int) {
+	for {
+		var _zv *Zval = zv
+		if is_str != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefStr(ref, str)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_NEW_STR(_zv, str)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_NEW_STR(zv, str, 0) }
+func ZEND_TRY_ASSIGN_REF_NEW_STR(zv *Zval, str *ZendString) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_NEW_STR(zv, str, 1)
+}
+func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefString(ref, string)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_STRING(_zv, string)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte) { _ZEND_TRY_ASSIGN_STRING(zv, string, 0) }
+func ZEND_TRY_ASSIGN_REF_STRING(zv *Zval, string *byte) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_STRING(zv, string, 1)
+}
+func _ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefStringl(ref, string, len_)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_STRINGL(_zv, string, len_)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int) {
+	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 0)
+}
+func ZEND_TRY_ASSIGN_REF_STRINGL(zv *Zval, string *byte, len_ int) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 1)
+}
+func _ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefArr(ref, arr)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_ARR(_zv, arr)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray) { _ZEND_TRY_ASSIGN_ARR(zv, arr, 0) }
+func ZEND_TRY_ASSIGN_REF_ARR(zv *Zval, arr *ZendArray) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_ARR(zv, arr, 1)
+}
+func _ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefRes(ref, res)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_RES(_zv, res)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource) { _ZEND_TRY_ASSIGN_RES(zv, res, 0) }
+func ZEND_TRY_ASSIGN_REF_RES(zv *Zval, res *ZendResource) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_RES(zv, res, 1)
+}
+func _ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRef(ref, other_zv)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_COPY_VALUE(_zv, other_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_TMP(zv, other_zv, 0) }
+func ZEND_TRY_ASSIGN_REF_TMP(zv *Zval, other_zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_TMP(zv, other_zv, 1)
+}
+func _ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefZval(ref, other_zv)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_COPY_VALUE(_zv, other_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 0) }
+func ZEND_TRY_ASSIGN_REF_VALUE(zv *Zval, other_zv *Zval) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 1)
+}
+func ZEND_TRY_ASSIGN_COPY(zv *Zval, other_zv *Zval) {
+	Z_TRY_ADDREF_P(other_zv)
+	ZEND_TRY_ASSIGN_VALUE(zv, other_zv)
+}
+func ZEND_TRY_ASSIGN_REF_COPY(zv *Zval, other_zv *Zval) {
+	Z_TRY_ADDREF_P(other_zv)
+	ZEND_TRY_ASSIGN_REF_VALUE(zv, other_zv)
+}
+func _ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool, is_ref int) {
+	for {
+		var _zv *Zval = zv
+		if is_ref != 0 || UNEXPECTED(Z_ISREF_P(_zv)) {
+			var ref *ZendReference = Z_REF_P(_zv)
+			if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
+				ZendTryAssignTypedRefZvalEx(ref, other_zv, strict)
+				break
+			}
+			_zv = &ref.val
+		}
+		ZvalPtrDtor(_zv)
+		ZVAL_COPY_VALUE(_zv, other_zv)
+		break
+	}
+}
+func ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
+	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 0)
+}
+func ZEND_TRY_ASSIGN_REF_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
+	ZEND_ASSERT(Z_ISREF_P(zv))
+	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 1)
+}
+func ZEND_TRY_ASSIGN_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
+	Z_TRY_ADDREF_P(other_zv)
+	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
+}
+func ZEND_TRY_ASSIGN_REF_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
+	Z_TRY_ADDREF_P(other_zv)
+	ZEND_TRY_ASSIGN_REF_VALUE_EX(zv, other_zv, strict)
+}
 
 /* Initializes a reference to an empty array and returns dereferenced zval,
  * or NULL if the initialization failed. */
 
 func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
-	var arr *ZendArray = _zendNewArray(size)
-	if zv.GetType() == 10 {
-		var ref *ZendReference = zv.GetValue().GetRef()
-		if ref.GetSources().GetPtr() != nil {
+	var arr *ZendArray = ZendNewArray(size)
+	if EXPECTED(Z_ISREF_P(zv)) {
+		var ref *ZendReference = Z_REF_P(zv)
+		if UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(ref)) {
 			if ZendTryAssignTypedRefArr(ref, arr) != SUCCESS {
 				return nil
 			}
@@ -612,17 +937,14 @@ func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
 		zv = &ref.val
 	}
 	ZvalPtrDtor(zv)
-	var __arr *ZendArray = arr
-	var __z *Zval = zv
-	__z.GetValue().SetArr(__arr)
-	__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
+	ZVAL_ARR(zv, arr)
 	return zv
 }
 func ZendTryArrayInit(zv *Zval) *Zval { return ZendTryArrayInitSize(zv, 0) }
 
 /* Fast parameter parsing API */
 
-// #define FAST_ZPP       1
+const FAST_ZPP = 1
 
 // #define Z_EXPECTED_TYPES(_) _ ( Z_EXPECTED_LONG , "int" ) _ ( Z_EXPECTED_BOOL , "bool" ) _ ( Z_EXPECTED_STRING , "string" ) _ ( Z_EXPECTED_ARRAY , "array" ) _ ( Z_EXPECTED_FUNC , "valid callback" ) _ ( Z_EXPECTED_RESOURCE , "resource" ) _ ( Z_EXPECTED_PATH , "a valid path" ) _ ( Z_EXPECTED_OBJECT , "object" ) _ ( Z_EXPECTED_DOUBLE , "float" )
 
@@ -644,18 +966,12 @@ const (
 	Z_EXPECTED_DOUBLE
 	Z_EXPECTED_LAST
 )
-
-// #define ZPP_ERROR_OK       0
-
-// #define ZPP_ERROR_FAILURE       1
-
-// #define ZPP_ERROR_WRONG_CALLBACK       2
-
-// #define ZPP_ERROR_WRONG_CLASS       3
-
-// #define ZPP_ERROR_WRONG_ARG       4
-
-// #define ZPP_ERROR_WRONG_COUNT       5
+const ZPP_ERROR_OK = 0
+const ZPP_ERROR_FAILURE = 1
+const ZPP_ERROR_WRONG_CALLBACK = 2
+const ZPP_ERROR_WRONG_CLASS = 3
+const ZPP_ERROR_WRONG_ARG = 4
+const ZPP_ERROR_WRONG_COUNT = 5
 
 // #define ZEND_PARSE_PARAMETERS_START_EX(flags,min_num_args,max_num_args) do { const int _flags = ( flags ) ; int _min_num_args = ( min_num_args ) ; int _max_num_args = ( max_num_args ) ; int _num_args = EX_NUM_ARGS ( ) ; int _i = 0 ; zval * _real_arg , * _arg = NULL ; zend_expected_type _expected_type = Z_EXPECTED_LONG ; char * _error = NULL ; zend_bool _dummy ; zend_bool _optional = 0 ; int _error_code = ZPP_ERROR_OK ; ( ( void ) _i ) ; ( ( void ) _real_arg ) ; ( ( void ) _arg ) ; ( ( void ) _expected_type ) ; ( ( void ) _error ) ; ( ( void ) _dummy ) ; ( ( void ) _optional ) ; do { if ( UNEXPECTED ( _num_args < _min_num_args ) || ( UNEXPECTED ( _num_args > _max_num_args ) && EXPECTED ( _max_num_args >= 0 ) ) ) { if ( ! ( _flags & ZEND_PARSE_PARAMS_QUIET ) ) { if ( _flags & ZEND_PARSE_PARAMS_THROW ) { zend_wrong_parameters_count_exception ( _min_num_args , _max_num_args ) ; } else { zend_wrong_parameters_count_error ( _min_num_args , _max_num_args ) ; } } _error_code = ZPP_ERROR_FAILURE ; break ; } _real_arg = ZEND_CALL_ARG ( execute_data , 0 ) ;
 
@@ -667,7 +983,26 @@ const (
 
 // #define ZEND_PARSE_PARAMETERS_END() ZEND_PARSE_PARAMETERS_END_EX ( return )
 
-// #define Z_PARAM_PROLOGUE(deref,separate) ++ _i ; ZEND_ASSERT ( _i <= _min_num_args || _optional == 1 ) ; ZEND_ASSERT ( _i > _min_num_args || _optional == 0 ) ; if ( _optional ) { if ( UNEXPECTED ( _i > _num_args ) ) break ; } _real_arg ++ ; _arg = _real_arg ; if ( deref ) { if ( EXPECTED ( Z_ISREF_P ( _arg ) ) ) { _arg = Z_REFVAL_P ( _arg ) ; } } if ( separate ) { SEPARATE_ZVAL_NOREF ( _arg ) ; }
+func Z_PARAM_PROLOGUE(deref int, separate int) {
+	_i++
+	ZEND_ASSERT(_i <= _min_num_args || _optional == 1)
+	ZEND_ASSERT(_i > _min_num_args || _optional == 0)
+	if _optional {
+		if UNEXPECTED(_i > _num_args) {
+			break
+		}
+	}
+	_real_arg++
+	_arg = _real_arg
+	if deref != 0 {
+		if EXPECTED(Z_ISREF_P(_arg)) {
+			_arg = Z_REFVAL_P(_arg)
+		}
+	}
+	if separate != 0 {
+		SEPARATE_ZVAL_NOREF(_arg)
+	}
+}
 
 /* old "|" */
 
@@ -747,11 +1082,20 @@ const (
 
 /* old "L" */
 
-// #define Z_PARAM_STRICT_LONG_EX2(dest,is_null,check_null,deref,separate) Z_PARAM_PROLOGUE ( deref , separate ) ; if ( UNEXPECTED ( ! zend_parse_arg_long ( _arg , & dest , & is_null , check_null , 1 ) ) ) { _expected_type = Z_EXPECTED_LONG ; _error_code = ZPP_ERROR_WRONG_ARG ; break ; }
-
-// #define Z_PARAM_STRICT_LONG_EX(dest,is_null,check_null,separate) Z_PARAM_STRICT_LONG_EX2 ( dest , is_null , check_null , separate , separate )
-
-// #define Z_PARAM_STRICT_LONG(dest) Z_PARAM_STRICT_LONG_EX ( dest , _dummy , 0 , 0 )
+func Z_PARAM_STRICT_LONG_EX2(dest ZendLong, is_null ZendBool, check_null int, deref int, separate int) {
+	Z_PARAM_PROLOGUE(deref, separate)
+	if UNEXPECTED(ZendParseArgLong(_arg, &dest, &is_null, check_null, 1) == 0) {
+		_expected_type = Z_EXPECTED_LONG
+		_error_code = ZPP_ERROR_WRONG_ARG
+		break
+	}
+}
+func Z_PARAM_STRICT_LONG_EX(dest ZendLong, is_null ZendBool, check_null int, separate int) {
+	Z_PARAM_STRICT_LONG_EX2(dest, is_null, check_null, separate, separate)
+}
+func Z_PARAM_STRICT_LONG(dest ZendLong) {
+	Z_PARAM_STRICT_LONG_EX(dest, _dummy, 0, 0)
+}
 
 /* old "o" */
 
@@ -763,11 +1107,26 @@ const (
 
 /* old "O" */
 
-// #define Z_PARAM_OBJECT_OF_CLASS_EX2(dest,_ce,check_null,deref,separate) Z_PARAM_PROLOGUE ( deref , separate ) ; if ( UNEXPECTED ( ! zend_parse_arg_object ( _arg , & dest , _ce , check_null ) ) ) { if ( _ce ) { _error = ZSTR_VAL ( ( _ce ) -> name ) ; _error_code = ZPP_ERROR_WRONG_CLASS ; break ; } else { _expected_type = Z_EXPECTED_OBJECT ; _error_code = ZPP_ERROR_WRONG_ARG ; break ; } }
-
-// #define Z_PARAM_OBJECT_OF_CLASS_EX(dest,_ce,check_null,separate) Z_PARAM_OBJECT_OF_CLASS_EX2 ( dest , _ce , check_null , separate , separate )
-
-// #define Z_PARAM_OBJECT_OF_CLASS(dest,_ce) Z_PARAM_OBJECT_OF_CLASS_EX ( dest , _ce , 0 , 0 )
+func Z_PARAM_OBJECT_OF_CLASS_EX2(dest *Zval, _ce *ZendClassEntry, check_null int, deref int, separate int) {
+	Z_PARAM_PROLOGUE(deref, separate)
+	if UNEXPECTED(ZendParseArgObject(_arg, &dest, _ce, check_null) == 0) {
+		if _ce != nil {
+			_error = ZSTR_VAL(_ce.GetName())
+			_error_code = ZPP_ERROR_WRONG_CLASS
+			break
+		} else {
+			_expected_type = Z_EXPECTED_OBJECT
+			_error_code = ZPP_ERROR_WRONG_ARG
+			break
+		}
+	}
+}
+func Z_PARAM_OBJECT_OF_CLASS_EX(dest *Zval, _ce *ZendClassEntry, check_null int, separate int) {
+	Z_PARAM_OBJECT_OF_CLASS_EX2(dest, _ce, check_null, separate, separate)
+}
+func Z_PARAM_OBJECT_OF_CLASS(dest *Zval, _ce *ZendClassEntry) {
+	Z_PARAM_OBJECT_OF_CLASS_EX(dest, _ce, 0, 0)
+}
 
 /* old "p" */
 
@@ -819,9 +1178,11 @@ const (
 
 /* old "z" (with dereference) */
 
-// #define Z_PARAM_ZVAL_DEREF_EX(dest,check_null,separate) Z_PARAM_PROLOGUE ( 1 , separate ) ; zend_parse_arg_zval_deref ( _arg , & dest , check_null ) ;
-
-// #define Z_PARAM_ZVAL_DEREF(dest) Z_PARAM_ZVAL_DEREF_EX ( dest , 0 , 0 )
+func Z_PARAM_ZVAL_DEREF_EX(dest *Zval, check_null int, separate int) {
+	Z_PARAM_PROLOGUE(1, separate)
+	ZendParseArgZvalDeref(_arg, &dest, check_null)
+}
+func Z_PARAM_ZVAL_DEREF(dest *Zval) { Z_PARAM_ZVAL_DEREF_EX(dest, 0, 0) }
 
 /* old "+" and "*" */
 
@@ -835,11 +1196,11 @@ func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null i
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.GetType() == 3 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_TRUE) {
 		*dest = 1
-	} else if arg.GetType() == 2 {
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_FALSE) {
 		*dest = 0
-	} else if check_null != 0 && arg.GetType() == 1 {
+	} else if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 		*is_null = 1
 		*dest = 0
 	} else {
@@ -851,9 +1212,9 @@ func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null i
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.GetType() == 4 {
-		*dest = arg.GetValue().GetLval()
-	} else if check_null != 0 && arg.GetType() == 1 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_LONG) {
+		*dest = Z_LVAL_P(arg)
+	} else if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 		*is_null = 1
 		*dest = 0
 	} else if cap != 0 {
@@ -867,9 +1228,9 @@ func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null 
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.GetType() == 5 {
-		*dest = arg.GetValue().GetDval()
-	} else if check_null != 0 && arg.GetType() == 1 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_DOUBLE) {
+		*dest = Z_DVAL_P(arg)
+	} else if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 		*is_null = 1
 		*dest = 0.0
 	} else {
@@ -878,9 +1239,9 @@ func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null 
 	return 1
 }
 func ZendParseArgStr(arg *Zval, dest **ZendString, check_null int) int {
-	if arg.GetType() == 6 {
-		*dest = arg.GetValue().GetStr()
-	} else if check_null != 0 && arg.GetType() == 1 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_STRING) {
+		*dest = Z_STR_P(arg)
+	} else if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 		*dest = nil
 	} else {
 		return ZendParseArgStrSlow(arg, dest)
@@ -892,17 +1253,17 @@ func ZendParseArgString(arg *Zval, dest **byte, dest_len *int, check_null int) i
 	if ZendParseArgStr(arg, &str, check_null) == 0 {
 		return 0
 	}
-	if check_null != 0 && str == nil {
+	if check_null != 0 && UNEXPECTED(str == nil) {
 		*dest = nil
 		*dest_len = 0
 	} else {
-		*dest = str.GetVal()
-		*dest_len = str.GetLen()
+		*dest = ZSTR_VAL(str)
+		*dest_len = ZSTR_LEN(str)
 	}
 	return 1
 }
 func ZendParseArgPathStr(arg *Zval, dest **ZendString, check_null int) int {
-	if ZendParseArgStr(arg, dest, check_null) == 0 || (*dest) != nil && strlen((*dest).GetVal()) != size_t((*dest).GetLen()) {
+	if ZendParseArgStr(arg, dest, check_null) == 0 || (*dest) != nil && UNEXPECTED(CHECK_NULL_PATH(ZSTR_VAL(*dest), ZSTR_LEN(*dest))) {
 		return 0
 	}
 	return 1
@@ -912,19 +1273,19 @@ func ZendParseArgPath(arg *Zval, dest **byte, dest_len *int, check_null int) int
 	if ZendParseArgPathStr(arg, &str, check_null) == 0 {
 		return 0
 	}
-	if check_null != 0 && str == nil {
+	if check_null != 0 && UNEXPECTED(str == nil) {
 		*dest = nil
 		*dest_len = 0
 	} else {
-		*dest = str.GetVal()
-		*dest_len = str.GetLen()
+		*dest = ZSTR_VAL(str)
+		*dest_len = ZSTR_LEN(str)
 	}
 	return 1
 }
 func ZendParseArgArray(arg *Zval, dest **Zval, check_null int, or_object int) int {
-	if arg.GetType() == 7 || or_object != 0 && arg.GetType() == 8 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_ARRAY) || or_object != 0 && EXPECTED(Z_TYPE_P(arg) == IS_OBJECT) {
 		*dest = arg
-	} else if check_null != 0 && arg.GetType() == 1 {
+	} else if check_null != 0 && EXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		*dest = nil
 	} else {
 		return 0
@@ -932,17 +1293,17 @@ func ZendParseArgArray(arg *Zval, dest **Zval, check_null int, or_object int) in
 	return 1
 }
 func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object int, separate int) int {
-	if arg.GetType() == 7 {
-		*dest = arg.GetValue().GetArr()
-	} else if or_object != 0 && arg.GetType() == 8 {
-		if separate != 0 && arg.GetValue().GetObj().GetProperties() != nil && ZendGcRefcount(&(arg.GetValue().GetObj().GetProperties()).gc) > 1 {
-			if (ZvalGcFlags(arg.GetValue().GetObj().GetProperties().GetGc().GetTypeInfo()) & 1 << 6) == 0 {
-				ZendGcDelref(&(arg.GetValue().GetObj().GetProperties()).gc)
+	if EXPECTED(Z_TYPE_P(arg) == IS_ARRAY) {
+		*dest = Z_ARRVAL_P(arg)
+	} else if or_object != 0 && EXPECTED(Z_TYPE_P(arg) == IS_OBJECT) {
+		if separate != 0 && Z_OBJ_P(arg).GetProperties() != nil && UNEXPECTED(GC_REFCOUNT(Z_OBJ_P(arg).GetProperties()) > 1) {
+			if EXPECTED((GC_FLAGS(Z_OBJ_P(arg).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0) {
+				GC_DELREF(Z_OBJ_P(arg).GetProperties())
 			}
-			arg.GetValue().GetObj().SetProperties(ZendArrayDup(arg.GetValue().GetObj().GetProperties()))
+			Z_OBJ_P(arg).SetProperties(ZendArrayDup(Z_OBJ_P(arg).GetProperties()))
 		}
-		*dest = arg.GetValue().GetObj().GetHandlers().GetGetProperties()(arg)
-	} else if check_null != 0 && arg.GetType() == 1 {
+		*dest = Z_OBJ_HT_P(arg).GetGetProperties()(arg)
+	} else if check_null != 0 && EXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		*dest = nil
 	} else {
 		return 0
@@ -950,9 +1311,9 @@ func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object 
 	return 1
 }
 func ZendParseArgObject(arg *Zval, dest **Zval, ce *ZendClassEntry, check_null int) int {
-	if arg.GetType() == 8 && (ce == nil || InstanceofFunction(arg.GetValue().GetObj().GetCe(), ce) != 0) {
+	if EXPECTED(Z_TYPE_P(arg) == IS_OBJECT) && (ce == nil || EXPECTED(InstanceofFunction(Z_OBJCE_P(arg), ce) != 0)) {
 		*dest = arg
-	} else if check_null != 0 && arg.GetType() == 1 {
+	} else if check_null != 0 && EXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		*dest = nil
 	} else {
 		return 0
@@ -960,9 +1321,9 @@ func ZendParseArgObject(arg *Zval, dest **Zval, ce *ZendClassEntry, check_null i
 	return 1
 }
 func ZendParseArgResource(arg *Zval, dest **Zval, check_null int) int {
-	if arg.GetType() == 9 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_RESOURCE) {
 		*dest = arg
-	} else if check_null != 0 && arg.GetType() == 1 {
+	} else if check_null != 0 && EXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		*dest = nil
 	} else {
 		return 0
@@ -970,24 +1331,24 @@ func ZendParseArgResource(arg *Zval, dest **Zval, check_null int) int {
 	return 1
 }
 func ZendParseArgFunc(arg *Zval, dest_fci *ZendFcallInfo, dest_fcc *ZendFcallInfoCache, check_null int, error **byte) int {
-	if check_null != 0 && arg.GetType() == 1 {
+	if check_null != 0 && UNEXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		dest_fci.SetSize(0)
 		dest_fcc.SetFunctionHandler(nil)
 		*error = nil
-	} else if ZendFcallInfoInit(arg, 0, dest_fci, dest_fcc, nil, error) != SUCCESS {
+	} else if UNEXPECTED(ZendFcallInfoInit(arg, 0, dest_fci, dest_fcc, nil, error) != SUCCESS) {
 		return 0
 	}
 	return 1
 }
 func ZendParseArgZval(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && (arg.GetType() == 1 || arg.GetType() == 10 && &(*arg).value.GetRef().GetVal().u1.v.type_ == 1) {
+	if check_null != 0 && (UNEXPECTED(Z_TYPE_P(arg) == IS_NULL) || UNEXPECTED(Z_ISREF_P(arg)) && UNEXPECTED(Z_TYPE_P(Z_REFVAL_P(arg)) == IS_NULL)) {
 		*dest = nil
 	} else {
 		*dest = arg
 	}
 }
 func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && arg.GetType() == 1 {
+	if check_null != 0 && UNEXPECTED(Z_TYPE_P(arg) == IS_NULL) {
 		*dest = nil
 	} else {
 		*dest = arg
@@ -1052,18 +1413,13 @@ var ClassCleanupHandlers **ZendClassEntry
 func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = (*Zval)(EG.GetCurrentExecuteData()) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(1)-1))
-	arg_count = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
+	param_ptr = ZEND_CALL_ARG(ExecutorGlobals.GetCurrentExecuteData(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
 	if param_count > arg_count {
 		return FAILURE
 	}
-	for g.PostDec(&param_count) > 0 {
-		var _z1 *Zval = argument_array
-		var _z2 *Zval = param_ptr
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
+	for b.PostDec(&param_count) > 0 {
+		ZVAL_COPY_VALUE(argument_array, param_ptr)
 		argument_array++
 		param_ptr++
 	}
@@ -1075,16 +1431,14 @@ func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = (*Zval)(EG.GetCurrentExecuteData()) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(1)-1))
-	arg_count = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
+	param_ptr = ZEND_CALL_ARG(ExecutorGlobals.GetCurrentExecuteData(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
 	if param_count > arg_count {
 		return FAILURE
 	}
-	for g.PostDec(&param_count) > 0 {
-		if param_ptr.GetTypeFlags() != 0 {
-			ZvalAddrefP(param_ptr)
-		}
-		ZendHashNextIndexInsertNew(argument_array.GetValue().GetArr(), param_ptr)
+	for b.PostDec(&param_count) > 0 {
+		Z_TRY_ADDREF_P(param_ptr)
+		ZendHashNextIndexInsertNew(Z_ARRVAL_P(argument_array), param_ptr)
 		param_ptr++
 	}
 	return SUCCESS
@@ -1095,40 +1449,40 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 func ZendWrongParamCount() {
 	var space *byte
 	var class_name *byte = GetActiveClassName(&space)
-	ZendInternalArgumentCountError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "Wrong parameter count for %s%s%s()", class_name, space, GetActiveFunctionName())
+	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "Wrong parameter count for %s%s%s()", class_name, space, GetActiveFunctionName())
 }
 
 /* }}} */
 
 func ZendGetTypeByConst(type_ int) *byte {
 	switch type_ {
-	case 2:
+	case IS_FALSE:
 
-	case 3:
+	case IS_TRUE:
 
-	case 16:
+	case _IS_BOOL:
 		return "bool"
-	case 4:
+	case IS_LONG:
 		return "int"
-	case 5:
+	case IS_DOUBLE:
 		return "float"
-	case 6:
+	case IS_STRING:
 		return "string"
-	case 8:
+	case IS_OBJECT:
 		return "object"
-	case 9:
+	case IS_RESOURCE:
 		return "resource"
-	case 1:
+	case IS_NULL:
 		return "null"
-	case 17:
+	case IS_CALLABLE:
 		return "callable"
-	case 18:
+	case IS_ITERABLE:
 		return "iterable"
-	case 7:
+	case IS_ARRAY:
 		return "array"
-	case 19:
+	case IS_VOID:
 		return "void"
-	case 20:
+	case _IS_NUMBER:
 		return "number"
 	default:
 		return "unknown"
@@ -1138,37 +1492,35 @@ func ZendGetTypeByConst(type_ int) *byte {
 /* }}} */
 
 func ZendZvalTypeName(arg *Zval) *byte {
-	if arg.GetType() == 10 {
-		arg = &(*arg).value.GetRef().GetVal()
-	}
-	return ZendGetTypeByConst(arg.GetType())
+	ZVAL_DEREF(arg)
+	return ZendGetTypeByConst(Z_TYPE_P(arg))
 }
 
 /* }}} */
 
 func ZendZvalGetType(arg *Zval) *ZendString {
-	switch arg.GetType() {
-	case 1:
-		return ZendKnownStrings[ZEND_STR_NULL]
-	case 2:
+	switch Z_TYPE_P(arg) {
+	case IS_NULL:
+		return ZSTR_KNOWN(ZEND_STR_NULL)
+	case IS_FALSE:
 
-	case 3:
-		return ZendKnownStrings[ZEND_STR_BOOLEAN]
-	case 4:
-		return ZendKnownStrings[ZEND_STR_INTEGER]
-	case 5:
-		return ZendKnownStrings[ZEND_STR_DOUBLE]
-	case 6:
-		return ZendKnownStrings[ZEND_STR_STRING]
-	case 7:
-		return ZendKnownStrings[ZEND_STR_ARRAY]
-	case 8:
-		return ZendKnownStrings[ZEND_STR_OBJECT]
-	case 9:
-		if ZendRsrcListGetRsrcType(arg.GetValue().GetRes()) != nil {
-			return ZendKnownStrings[ZEND_STR_RESOURCE]
+	case IS_TRUE:
+		return ZSTR_KNOWN(ZEND_STR_BOOLEAN)
+	case IS_LONG:
+		return ZSTR_KNOWN(ZEND_STR_INTEGER)
+	case IS_DOUBLE:
+		return ZSTR_KNOWN(ZEND_STR_DOUBLE)
+	case IS_STRING:
+		return ZSTR_KNOWN(ZEND_STR_STRING)
+	case IS_ARRAY:
+		return ZSTR_KNOWN(ZEND_STR_ARRAY)
+	case IS_OBJECT:
+		return ZSTR_KNOWN(ZEND_STR_OBJECT)
+	case IS_RESOURCE:
+		if ZendRsrcListGetRsrcType(Z_RES_P(arg)) != nil {
+			return ZSTR_KNOWN(ZEND_STR_RESOURCE)
 		} else {
-			return ZendKnownStrings[ZEND_STR_CLOSED_RESOURCE]
+			return ZSTR_KNOWN(ZEND_STR_CLOSED_RESOURCE)
 		}
 	default:
 		return nil
@@ -1178,39 +1530,39 @@ func ZendZvalGetType(arg *Zval) *ZendString {
 /* }}} */
 
 func ZendWrongParametersNoneError() int {
-	var num_args int = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
-	var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-	var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects %s %d parameter%s, %d given", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
+	var num_args int = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
+	var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), "exactly", 0, "s", num_args)
 	return FAILURE
 }
 
 /* }}} */
 
 func ZendWrongParametersNoneException() int {
-	var num_args int = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
-	var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-	var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
+	var num_args int = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
+	var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), "exactly", 0, "s", num_args)
 	return FAILURE
 }
 
 /* }}} */
 
 func ZendWrongParametersCountError(min_num_args int, max_num_args int) {
-	var num_args int = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
-	var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-	var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects %s %d parameter%s, %d given", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), g.Cond(g.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), g.Cond(num_args < min_num_args, min_num_args, max_num_args), g.Cond(g.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+	var num_args int = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
+	var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 }
 
 /* }}} */
 
 func ZendWrongParametersCountException(min_num_args int, max_num_args int) {
-	var num_args int = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
-	var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-	var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), g.Cond(g.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), g.Cond(num_args < min_num_args, min_num_args, max_num_args), g.Cond(g.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+	var num_args int = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
+	var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 }
 
 /* }}} */
@@ -1219,11 +1571,11 @@ func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Z
 	var space *byte
 	var class_name *byte
 	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
-	ZendInternalTypeError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
+	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
 }
 
 /* }}} */
@@ -1232,7 +1584,7 @@ func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, ar
 	var space *byte
 	var class_name *byte
 	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -1244,11 +1596,11 @@ func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, ar
 func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
-	ZendInternalTypeError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
+	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
 }
 
 /* }}} */
@@ -1256,7 +1608,7 @@ func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
 func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -1268,12 +1620,12 @@ func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
 func ZendWrongCallbackError(num int, error *byte) {
 	var space *byte
 	var class_name *byte
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
-	ZendInternalTypeError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	_efree(error)
+	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
+	Efree(error)
 }
 
 /* }}} */
@@ -1281,12 +1633,12 @@ func ZendWrongCallbackError(num int, error *byte) {
 func ZendWrongCallbackException(num int, error *byte) {
 	var space *byte
 	var class_name *byte
-	if EG.GetException() != nil {
+	if ExecutorGlobals.GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
 	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	_efree(error)
+	Efree(error)
 }
 
 /* }}} */
@@ -1294,15 +1646,15 @@ func ZendWrongCallbackException(num int, error *byte) {
 func ZendWrongCallbackDeprecated(num int, error *byte) {
 	var space *byte
 	var class_name *byte = GetActiveClassName(&space)
-	ZendError(1<<13, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	_efree(error)
+	ZendError(E_DEPRECATED, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
+	Efree(error)
 }
 
 /* }}} */
 
 func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int) int {
 	var ce_base *ZendClassEntry = *pce
-	if check_null != 0 && arg.GetType() == 1 {
+	if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 		*pce = nil
 		return 1
 	}
@@ -1310,12 +1662,12 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 		*pce = nil
 		return 0
 	}
-	*pce = ZendLookupClass(arg.GetValue().GetStr())
+	*pce = ZendLookupClass(Z_STR_P(arg))
 	if ce_base != nil {
 		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
 			var space *byte
 			var class_name *byte = GetActiveClassName(&space)
-			ZendInternalTypeError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects parameter %d to be a class name derived from %s, '%s' given", class_name, space, GetActiveFunctionName(), num, ce_base.GetName().GetVal(), arg.GetValue().GetStr().GetVal())
+			ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a class name derived from %s, '%s' given", class_name, space, GetActiveFunctionName(), num, ZSTR_VAL(ce_base.GetName()), Z_STRVAL_P(arg))
 			*pce = nil
 			return 0
 		}
@@ -1323,7 +1675,7 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	if (*pce) == nil {
 		var space *byte
 		var class_name *byte = GetActiveClassName(&space)
-		ZendInternalTypeError(EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0, "%s%s%s() expects parameter %d to be a valid class name, '%s' given", class_name, space, GetActiveFunctionName(), num, arg.GetValue().GetStr().GetVal())
+		ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid class name, '%s' given", class_name, space, GetActiveFunctionName(), num, Z_STRVAL_P(arg))
 		return 0
 	}
 	return 1
@@ -1332,7 +1684,7 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 /* }}} */
 
 func ZendParseArgBoolWeak(arg *Zval, dest *ZendBool) int {
-	if arg.GetType() <= 6 {
+	if EXPECTED(Z_TYPE_P(arg) <= IS_STRING) {
 		*dest = ZendIsTrue(arg)
 	} else {
 		return 0
@@ -1343,7 +1695,7 @@ func ZendParseArgBoolWeak(arg *Zval, dest *ZendBool) int {
 /* }}} */
 
 func ZendParseArgBoolSlow(arg *Zval, dest *ZendBool) int {
-	if EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 {
+	if UNEXPECTED(ZEND_ARG_USES_STRICT_TYPES()) {
 		return 0
 	}
 	return ZendParseArgBoolWeak(arg, dest)
@@ -1352,24 +1704,24 @@ func ZendParseArgBoolSlow(arg *Zval, dest *ZendBool) int {
 /* }}} */
 
 func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
-	if arg.GetType() == 5 {
-		if isnan(arg.GetValue().GetDval()) {
+	if EXPECTED(Z_TYPE_P(arg) == IS_DOUBLE) {
+		if UNEXPECTED(core.ZendIsnan(Z_DVAL_P(arg))) {
 			return 0
 		}
-		if arg.GetValue().GetDval() >= float64(INT64_MAX || arg.GetValue().GetDval() < float64(INT64_MIN)) {
+		if UNEXPECTED(!(ZEND_DOUBLE_FITS_LONG(Z_DVAL_P(arg)))) {
 			return 0
 		} else {
-			*dest = ZendDvalToLval(arg.GetValue().GetDval())
+			*dest = ZendDvalToLval(Z_DVAL_P(arg))
 		}
-	} else if arg.GetType() == 6 {
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_STRING) {
 		var d float64
 		var type_ int
-		if g.Assign(&type_, IsNumericStrFunction(arg.GetValue().GetStr(), dest, &d)) != 4 {
-			if type_ != 0 {
-				if isnan(d) {
+		if UNEXPECTED(b.Assign(&type_, IsNumericStrFunction(Z_STR_P(arg), dest, &d)) != IS_LONG) {
+			if EXPECTED(type_ != 0) {
+				if UNEXPECTED(core.ZendIsnan(d)) {
 					return 0
 				}
-				if d >= float64(INT64_MAX || d < float64(INT64_MIN)) {
+				if UNEXPECTED(!(ZEND_DOUBLE_FITS_LONG(d))) {
 					return 0
 				} else {
 					*dest = ZendDvalToLval(d)
@@ -1378,12 +1730,12 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 				return 0
 			}
 		}
-		if EG.GetException() != nil {
+		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			return 0
 		}
-	} else if arg.GetType() < 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) < IS_TRUE) {
 		*dest = 0
-	} else if arg.GetType() == 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_TRUE) {
 		*dest = 1
 	} else {
 		return 0
@@ -1394,7 +1746,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 /* }}} */
 
 func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
-	if EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 {
+	if UNEXPECTED(ZEND_ARG_USES_STRICT_TYPES()) {
 		return 0
 	}
 	return ZendParseArgLongWeak(arg, dest)
@@ -1403,17 +1755,17 @@ func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
 /* }}} */
 
 func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
-	if arg.GetType() == 5 {
-		if isnan(arg.GetValue().GetDval()) {
+	if EXPECTED(Z_TYPE_P(arg) == IS_DOUBLE) {
+		if UNEXPECTED(core.ZendIsnan(Z_DVAL_P(arg))) {
 			return 0
 		}
-		*dest = ZendDvalToLvalCap(arg.GetValue().GetDval())
-	} else if arg.GetType() == 6 {
+		*dest = ZendDvalToLvalCap(Z_DVAL_P(arg))
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_STRING) {
 		var d float64
 		var type_ int
-		if g.Assign(&type_, IsNumericStrFunction(arg.GetValue().GetStr(), dest, &d)) != 4 {
-			if type_ != 0 {
-				if isnan(d) {
+		if UNEXPECTED(b.Assign(&type_, IsNumericStrFunction(Z_STR_P(arg), dest, &d)) != IS_LONG) {
+			if EXPECTED(type_ != 0) {
+				if UNEXPECTED(core.ZendIsnan(d)) {
 					return 0
 				}
 				*dest = ZendDvalToLvalCap(d)
@@ -1421,12 +1773,12 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 				return 0
 			}
 		}
-		if EG.GetException() != nil {
+		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			return 0
 		}
-	} else if arg.GetType() < 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) < IS_TRUE) {
 		*dest = 0
-	} else if arg.GetType() == 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_TRUE) {
 		*dest = 1
 	} else {
 		return 0
@@ -1437,7 +1789,7 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 /* }}} */
 
 func ZendParseArgLongCapSlow(arg *Zval, dest *ZendLong) int {
-	if EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 {
+	if UNEXPECTED(ZEND_ARG_USES_STRICT_TYPES()) {
 		return 0
 	}
 	return ZendParseArgLongCapWeak(arg, dest)
@@ -1446,24 +1798,24 @@ func ZendParseArgLongCapSlow(arg *Zval, dest *ZendLong) int {
 /* }}} */
 
 func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
-	if arg.GetType() == 4 {
-		*dest = float64(arg.GetValue().GetLval())
-	} else if arg.GetType() == 6 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_LONG) {
+		*dest = float64(Z_LVAL_P(arg))
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_STRING) {
 		var l ZendLong
 		var type_ int
-		if g.Assign(&type_, IsNumericStrFunction(arg.GetValue().GetStr(), &l, dest)) != 5 {
-			if type_ != 0 {
+		if UNEXPECTED(b.Assign(&type_, IsNumericStrFunction(Z_STR_P(arg), &l, dest)) != IS_DOUBLE) {
+			if EXPECTED(type_ != 0) {
 				*dest = float64(l)
 			} else {
 				return 0
 			}
 		}
-		if EG.GetException() != nil {
+		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			return 0
 		}
-	} else if arg.GetType() < 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) < IS_TRUE) {
 		*dest = 0.0
-	} else if arg.GetType() == 3 {
+	} else if EXPECTED(Z_TYPE_P(arg) == IS_TRUE) {
 		*dest = 1.0
 	} else {
 		return 0
@@ -1474,15 +1826,15 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 /* }}} */
 
 func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
-	if arg.GetType() == 4 {
+	if EXPECTED(Z_TYPE_P(arg) == IS_LONG) {
 
 		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
 
-		*dest = float64(arg.GetValue().GetLval())
+		*dest = float64(Z_LVAL_P(arg))
 
 		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
 
-	} else if EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 {
+	} else if UNEXPECTED(ZEND_ARG_USES_STRICT_TYPES()) {
 		return 0
 	}
 	return ZendParseArgDoubleWeak(arg, dest)
@@ -1491,49 +1843,30 @@ func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
 /* }}} */
 
 func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
-	if arg.GetType() < 6 {
-		if arg.GetType() != 6 {
-			_convertToString(arg)
-		}
-		*dest = arg.GetValue().GetStr()
-	} else if arg.GetType() == 8 {
-		if arg.GetValue().GetObj().GetHandlers().GetCastObject() != nil {
+	if EXPECTED(Z_TYPE_P(arg) < IS_STRING) {
+		ConvertToString(arg)
+		*dest = Z_STR_P(arg)
+	} else if UNEXPECTED(Z_TYPE_P(arg) == IS_OBJECT) {
+		if Z_OBJ_HANDLER_P(arg, cast_object) {
 			var obj Zval
-			if arg.GetValue().GetObj().GetHandlers().GetCastObject()(arg, &obj, 6) == SUCCESS {
+			if Z_OBJ_HANDLER_P(arg, cast_object)(arg, &obj, IS_STRING) == SUCCESS {
 				ZvalPtrDtor(arg)
-				var _z1 *Zval = arg
-				var _z2 *Zval = &obj
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				*dest = arg.GetValue().GetStr()
+				ZVAL_COPY_VALUE(arg, &obj)
+				*dest = Z_STR_P(arg)
 				return 1
 			}
-		} else if arg.GetValue().GetObj().GetHandlers().GetGet() != nil {
+		} else if Z_OBJ_HANDLER_P(arg, get) {
 			var rv Zval
-			var z *Zval = arg.GetValue().GetObj().GetHandlers().GetGet()(arg, &rv)
-			if z.GetType() != 8 {
+			var z *Zval = Z_OBJ_HANDLER_P(arg, get)(arg, &rv)
+			if Z_TYPE_P(z) != IS_OBJECT {
 				ZvalPtrDtor(arg)
-				if z.GetType() == 6 {
-					var _z1 *Zval = arg
-					var _z2 *Zval = z
-					var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-					var _t uint32 = _z2.GetTypeInfo()
-					_z1.GetValue().SetCounted(_gc)
-					_z1.SetTypeInfo(_t)
+				if Z_TYPE_P(z) == IS_STRING {
+					ZVAL_COPY_VALUE(arg, z)
 				} else {
-					var __z *Zval = arg
-					var __s *ZendString = ZvalGetStringFunc(z)
-					__z.GetValue().SetStr(__s)
-					if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-						__z.SetTypeInfo(6)
-					} else {
-						__z.SetTypeInfo(6 | 1<<0<<8)
-					}
+					ZVAL_STR(arg, ZvalGetStringFunc(z))
 					ZvalPtrDtor(z)
 				}
-				*dest = arg.GetValue().GetStr()
+				*dest = Z_STR_P(arg)
 				return 1
 			}
 			ZvalPtrDtor(z)
@@ -1548,7 +1881,7 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 /* }}} */
 
 func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
-	if EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 {
+	if UNEXPECTED(ZEND_ARG_USES_STRICT_TYPES()) {
 		return 0
 	}
 	return ZendParseArgStrWeak(arg, dest)
@@ -1558,32 +1891,17 @@ func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
 
 func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **byte, severity *int) *byte {
 	var spec_walk *byte = *spec
-	var c byte = g.PostInc(&(*spec_walk))
+	var c byte = b.PostInc(&(*spec_walk))
 	var check_null int = 0
 	var separate int = 0
 	var real_arg *Zval = arg
 
 	/* scan through modifiers */
 
-	if arg.GetType() == 10 {
-		arg = &(*arg).value.GetRef().GetVal()
-	}
+	ZVAL_DEREF(arg)
 	for true {
 		if (*spec_walk) == '/' {
-			var _zv *Zval = arg
-			r.Assert(_zv.GetType() != 10)
-			var __zv *Zval = _zv
-			if __zv.GetType() == 7 {
-				if ZvalRefcountP(__zv) > 1 {
-					if __zv.GetTypeFlags() != 0 {
-						ZvalDelrefP(__zv)
-					}
-					var __arr *ZendArray = ZendArrayDup(__zv.GetValue().GetArr())
-					var __z *Zval = __zv
-					__z.GetValue().SetArr(__arr)
-					__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
-				}
-			}
+			SEPARATE_ZVAL_NOREF(arg)
 			real_arg = arg
 			separate = 1
 		} else if (*spec_walk) == '!' {
@@ -1685,7 +2003,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 		var ce *ZendClassEntry = __va_arg(*va, (*ZendClassEntry)(_))
 		if ZendParseArgObject(arg, p, ce, check_null) == 0 {
 			if ce != nil {
-				return ce.GetName().GetVal()
+				return ZSTR_VAL(ce.GetName())
 			} else {
 				return "object"
 			}
@@ -1695,7 +2013,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 		var lookup *ZendClassEntry
 		var pce **ZendClassEntry = __va_arg(*va, (**ZendClassEntry)(_))
 		var ce_base *ZendClassEntry = *pce
-		if check_null != 0 && arg.GetType() == 1 {
+		if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 			*pce = nil
 			break
 		}
@@ -1703,20 +2021,20 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 			*pce = nil
 			return "valid class name"
 		}
-		if g.Assign(&lookup, ZendLookupClass(arg.GetValue().GetStr())) == nil {
+		if b.Assign(&lookup, ZendLookupClass(Z_STR_P(arg))) == nil {
 			*pce = nil
 		} else {
 			*pce = lookup
 		}
 		if ce_base != nil {
 			if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-				ZendSpprintf(error, 0, "to be a class name derived from %s, '%s' given", ce_base.GetName().GetVal(), arg.GetValue().GetStr().GetVal())
+				ZendSpprintf(error, 0, "to be a class name derived from %s, '%s' given", ZSTR_VAL(ce_base.GetName()), Z_STRVAL_P(arg))
 				*pce = nil
 				return ""
 			}
 		}
 		if (*pce) == nil {
-			ZendSpprintf(error, 0, "to be a valid class name, '%s' given", arg.GetValue().GetStr().GetVal())
+			ZendSpprintf(error, 0, "to be a valid class name, '%s' given", Z_STRVAL_P(arg))
 			return ""
 		}
 		break
@@ -1725,25 +2043,25 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 		var fci *ZendFcallInfo = __va_arg(*va, (*ZendFcallInfo)(_))
 		var fcc *ZendFcallInfoCache = __va_arg(*va, (*ZendFcallInfoCache)(_))
 		var is_callable_error *byte = nil
-		if check_null != 0 && arg.GetType() == 1 {
+		if check_null != 0 && Z_TYPE_P(arg) == IS_NULL {
 			fci.SetSize(0)
 			fcc.SetFunctionHandler(0)
 			break
 		}
 		if ZendFcallInfoInit(arg, 0, fci, fcc, nil, &is_callable_error) == SUCCESS {
 			if is_callable_error != nil {
-				*severity = 1 << 13
+				*severity = E_DEPRECATED
 				ZendSpprintf(error, 0, "to be a valid callback, %s", is_callable_error)
-				_efree(is_callable_error)
+				Efree(is_callable_error)
 				*spec = spec_walk
 				return ""
 			}
 			break
 		} else {
 			if is_callable_error != nil {
-				*severity = 1 << 0
+				*severity = E_ERROR
 				ZendSpprintf(error, 0, "to be a valid callback, %s", is_callable_error)
-				_efree(is_callable_error)
+				Efree(is_callable_error)
 				return ""
 			} else {
 				return "valid callback"
@@ -1757,7 +2075,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 
 		/* 'Z' iz not supported anymore and should be replaced with 'z' */
 
-		r.Assert(c != 'Z')
+		ZEND_ASSERT(c != 'Z')
 	default:
 		return "unknown"
 	}
@@ -1773,21 +2091,21 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 	var severity int = 0
 	expected_type = ZendParseArgImpl(arg_num, arg, va, spec, &error, &severity)
 	if expected_type != nil {
-		if EG.GetException() != nil {
+		if ExecutorGlobals.GetException() != nil {
 			return FAILURE
 		}
-		if (flags&1<<1) == 0 && ((*expected_type) || error != nil) {
+		if (flags&ZEND_PARSE_PARAMS_QUIET) == 0 && ((*expected_type) || error != nil) {
 			var space *byte
 			var class_name *byte = GetActiveClassName(&space)
-			var throw_exception ZendBool = EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 || (flags&1<<2) != 0
+			var throw_exception ZendBool = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			if error != nil {
 				ZendInternalTypeError(throw_exception, "%s%s%s() expects parameter %d %s", class_name, space, GetActiveFunctionName(), arg_num, error)
-				_efree(error)
+				Efree(error)
 			} else {
 				ZendInternalTypeError(throw_exception, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), arg_num, expected_type, ZendZvalTypeName(arg))
 			}
 		}
-		if severity != 1<<13 {
+		if severity != E_DEPRECATED {
 			return FAILURE
 		}
 	}
@@ -1805,9 +2123,9 @@ func ZendParseParameter(flags int, arg_num int, arg *Zval, spec *byte, _ ...any)
 	return ret
 }
 func ZendParseParametersDebugError(msg string) {
-	var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-	var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendErrorNoreturn(1<<4, "%s%s%s(): %s", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
+	var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+	ZendErrorNoreturn(E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), msg)
 }
 func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int {
 	var spec_walk *byte
@@ -1908,21 +2226,21 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 		max_num_args = -1
 	}
 	if num_args < min_num_args || num_args > max_num_args && max_num_args >= 0 {
-		if (flags & 1 << 1) == 0 {
-			var active_function *ZendFunction = EG.GetCurrentExecuteData().GetFunc()
-			var class_name *byte = g.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-			var throw_exception ZendBool = EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0 || (flags&1<<2) != 0
-			ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, g.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), g.Cond(g.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), g.Cond(num_args < min_num_args, min_num_args, max_num_args), g.Cond(g.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+			var active_function *ZendFunction = ExecutorGlobals.GetCurrentExecuteData().GetFunc()
+			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return ZSTR_VAL(active_function.GetScope().GetName()) }, "")
+			var throw_exception ZendBool = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
+			ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), ZSTR_VAL(active_function.GetFunctionName()), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 		}
 		return FAILURE
 	}
-	arg_count = EG.GetCurrentExecuteData().GetThis().GetNumArgs()
+	arg_count = ZEND_CALL_NUM_ARGS(ExecutorGlobals.GetCurrentExecuteData())
 	if num_args > arg_count {
 		ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return FAILURE
 	}
 	i = 0
-	for g.PostDec(&num_args) > 0 {
+	for b.PostDec(&num_args) > 0 {
 		if (*type_spec) == '|' {
 			type_spec++
 		}
@@ -1936,7 +2254,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			type_spec++
 			if num_varargs > 0 {
 				*n_varargs = num_varargs
-				*varargs = (*Zval)(EG.GetCurrentExecuteData()) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(i+1)-1))
+				*varargs = ZEND_CALL_ARG(ExecutorGlobals.GetCurrentExecuteData(), i+1)
 
 				/* adjust how many args we have left and restart loop */
 
@@ -1948,7 +2266,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 				*n_varargs = 0
 			}
 		}
-		arg = (*Zval)(EG.GetCurrentExecuteData()) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(i+1)-1))
+		arg = ZEND_CALL_ARG(ExecutorGlobals.GetCurrentExecuteData(), i+1)
 		if ZendParseArg(i+1, arg, va, &type_spec, flags) == FAILURE {
 
 			/* clean up varargs array if it was used */
@@ -1991,7 +2309,7 @@ func ZendParseParameters(num_args int, type_spec string, _ ...any) int {
 func ZendParseParametersThrow(num_args int, type_spec string, _ ...any) int {
 	var va va_list
 	var retval int
-	var flags int = 1 << 2
+	var flags int = ZEND_PARSE_PARAMS_THROW
 	va_start(va, type_spec)
 	retval = ZendParseVaArgs(num_args, type_spec, &va, flags)
 	va_end(va)
@@ -2013,8 +2331,8 @@ func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _
 	 * In that case EG(This) would still be the $this from the calling code and we'd take the
 	 * wrong branch here. */
 
-	var is_method ZendBool = EG.GetCurrentExecuteData().GetFunc().GetScope() != nil
-	if is_method == 0 || this_ptr == nil || this_ptr.GetType() != 8 {
+	var is_method ZendBool = ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetScope() != nil
+	if is_method == 0 || this_ptr == nil || Z_TYPE_P(this_ptr) != IS_OBJECT {
 		va_start(va, type_spec)
 		retval = ZendParseVaArgs(num_args, type_spec, &va, flags)
 		va_end(va)
@@ -2024,8 +2342,8 @@ func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _
 		object = __va_arg(va, (**Zval)(_))
 		ce = __va_arg(va, (*ZendClassEntry)(_))
 		*object = this_ptr
-		if ce != nil && InstanceofFunction(this_ptr.GetValue().GetObj().GetCe(), ce) == 0 {
-			ZendErrorNoreturn(1<<4, "%s::%s() must be derived from %s::%s", this_ptr.GetValue().GetObj().GetCe().GetName().GetVal(), GetActiveFunctionName(), ce.GetName().GetVal(), GetActiveFunctionName())
+		if ce != nil && InstanceofFunction(Z_OBJCE_P(this_ptr), ce) == 0 {
+			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ZSTR_VAL(Z_OBJCE_P(this_ptr).GetName()), GetActiveFunctionName(), ZSTR_VAL(ce.GetName()), GetActiveFunctionName())
 		}
 		retval = ZendParseVaArgs(num_args, p, &va, flags)
 		va_end(va)
@@ -2051,9 +2369,9 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *Zval, type_s
 		object = __va_arg(va, (**Zval)(_))
 		ce = __va_arg(va, (*ZendClassEntry)(_))
 		*object = this_ptr
-		if ce != nil && InstanceofFunction(this_ptr.GetValue().GetObj().GetCe(), ce) == 0 {
-			if (flags & 1 << 1) == 0 {
-				ZendErrorNoreturn(1<<4, "%s::%s() must be derived from %s::%s", ce.GetName().GetVal(), GetActiveFunctionName(), this_ptr.GetValue().GetObj().GetCe().GetName().GetVal(), GetActiveFunctionName())
+		if ce != nil && InstanceofFunction(Z_OBJCE_P(this_ptr), ce) == 0 {
+			if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+				ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() must be derived from %s::%s", ZSTR_VAL(ce.GetName()), GetActiveFunctionName(), ZSTR_VAL(Z_OBJCE_P(this_ptr).GetName()), GetActiveFunctionName())
 			}
 			va_end(va)
 			return FAILURE
@@ -2067,11 +2385,11 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *Zval, type_s
 /* }}} */
 
 func ZendMergeProperties(obj *Zval, properties *HashTable) {
-	var obj_ht *ZendObjectHandlers = obj.GetValue().GetObj().GetHandlers()
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
+	var obj_ht *ZendObjectHandlers = Z_OBJ_HT_P(obj)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 	var key *ZendString
 	var value *Zval
-	EG.SetFakeScope(obj.GetValue().GetObj().GetCe())
+	ExecutorGlobals.SetFakeScope(Z_OBJCE_P(obj))
 	for {
 		var __ht *HashTable = properties
 		var _p *Bucket = __ht.GetArData()
@@ -2079,39 +2397,32 @@ func ZendMergeProperties(obj *Zval, properties *HashTable) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
 			value = _z
 			if key != nil {
 				var member Zval
-				var __z *Zval = &member
-				var __s *ZendString = key
-				__z.GetValue().SetStr(__s)
-				if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-					__z.SetTypeInfo(6)
-				} else {
-					__z.SetTypeInfo(6 | 1<<0<<8)
-				}
+				ZVAL_STR(&member, key)
 				obj_ht.GetWriteProperty()(obj, &member, value, nil)
 			}
 		}
 		break
 	}
-	EG.SetFakeScope(old_scope)
+	ExecutorGlobals.SetFakeScope(old_scope)
 }
 
 /* }}} */
 
 func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
-	if (class_type.GetCeFlags() & 1 << 12) == 0 {
+	if (class_type.GetCeFlags() & ZEND_ACC_CONSTANTS_UPDATED) == 0 {
 		var ce *ZendClassEntry
 		var c *ZendClassConstant
 		var val *Zval
 		var prop_info *ZendPropertyInfo
 		if class_type.parent {
-			if ZendUpdateClassConstants(class_type.parent) != SUCCESS {
+			if UNEXPECTED(ZendUpdateClassConstants(class_type.parent) != SUCCESS) {
 				return FAILURE
 			}
 		}
@@ -2122,23 +2433,21 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
-				c = _z.GetValue().GetPtr()
+				c = Z_PTR_P(_z)
 				val = &c.value
-				if val.GetType() == 11 {
-					if ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS {
+				if Z_TYPE_P(val) == IS_CONSTANT_AST {
+					if UNEXPECTED(ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS) {
 						return FAILURE
 					}
 				}
 			}
 			break
 		}
-		if class_type.GetDefaultStaticMembersCount() != 0 && (*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-			return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-		}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) })) == nil {
-			if class_type.GetType() == 1 || (class_type.GetCeFlags()&(1<<7|1<<10)) != 0 {
+		if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
+			if class_type.GetType() == ZEND_INTERNAL_CLASS || (class_type.GetCeFlags()&(ZEND_ACC_IMMUTABLE|ZEND_ACC_PRELOADED)) != 0 {
 				ZendClassInitStatics(class_type)
 			}
 		}
@@ -2151,46 +2460,31 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 				for ; _p != _end; _p++ {
 					var _z *Zval = &_p.val
 
-					if _z.GetType() == 0 {
+					if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 						continue
 					}
-					prop_info = _z.GetValue().GetPtr()
+					prop_info = Z_PTR_P(_z)
 					if prop_info.GetCe() == ce {
-						if (prop_info.GetFlags() & 1 << 4) != 0 {
-							val = (*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-								return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-							}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) })) + prop_info.GetOffset()
+						if (prop_info.GetFlags() & ZEND_ACC_STATIC) != 0 {
+							val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()
 						} else {
-							val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0)))
+							val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
 						}
-						if val.GetType() == 11 {
+						if Z_TYPE_P(val) == IS_CONSTANT_AST {
 							if prop_info.GetType() != 0 {
 								var tmp Zval
-								var _z1 *Zval = &tmp
-								var _z2 *Zval = val
-								var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-								var _t uint32 = _z2.GetTypeInfo()
-								_z1.GetValue().SetCounted(_gc)
-								_z1.SetTypeInfo(_t)
-								if (_t & 0xff00) != 0 {
-									ZendGcAddref(&_gc.gc)
-								}
-								if ZvalUpdateConstantEx(&tmp, ce) != SUCCESS {
+								ZVAL_COPY(&tmp, val)
+								if UNEXPECTED(ZvalUpdateConstantEx(&tmp, ce) != SUCCESS) {
 									ZvalPtrDtor(&tmp)
 									return FAILURE
 								}
-								if ZendVerifyPropertyType(prop_info, &tmp, 1) == 0 {
+								if UNEXPECTED(ZendVerifyPropertyType(prop_info, &tmp, 1) == 0) {
 									ZvalPtrDtor(&tmp)
 									return FAILURE
 								}
 								ZvalPtrDtor(val)
-								var _z1 *Zval = val
-								var _z2 *Zval = &tmp
-								var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-								var _t uint32 = _z2.GetTypeInfo()
-								_z1.GetValue().SetCounted(_gc)
-								_z1.SetTypeInfo(_t)
-							} else if ZvalUpdateConstantEx(val, ce) != SUCCESS {
+								ZVAL_COPY_VALUE(val, &tmp)
+							} else if UNEXPECTED(ZvalUpdateConstantEx(val, ce) != SUCCESS) {
 								return FAILURE
 							}
 						}
@@ -2200,7 +2494,7 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 			}
 			ce = ce.parent
 		}
-		class_type.SetCeFlags(class_type.GetCeFlags() | 1<<12)
+		class_type.SetCeFlags(class_type.GetCeFlags() | ZEND_ACC_CONSTANTS_UPDATED)
 	}
 	return SUCCESS
 }
@@ -2212,22 +2506,9 @@ func _objectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
 		var src *Zval = class_type.GetDefaultPropertiesTable()
 		var dst *Zval = object.GetPropertiesTable()
 		var end *Zval = src + class_type.GetDefaultPropertiesCount()
-		if class_type.GetType() == 1 {
+		if UNEXPECTED(class_type.GetType() == ZEND_INTERNAL_CLASS) {
 			for {
-				var _z1 *Zval = dst
-				var _z2 *Zval = src
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if (_t & 0xff00) != 0 {
-					if (ZvalGcFlags(_gc.GetGc().GetTypeInfo()) & 1 << 7) == 0 {
-						ZendGcAddref(&_gc.gc)
-					} else {
-						ZvalCopyCtorFunc(_z1)
-					}
-				}
-				dst.SetU2Extra(src.GetU2Extra())
+				ZVAL_COPY_OR_DUP_PROP(dst, src)
 				src++
 				dst++
 				if src == end {
@@ -2236,16 +2517,7 @@ func _objectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
 			}
 		} else {
 			for {
-				var _z1 *Zval = dst
-				var _z2 *Zval = src
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if (_t & 0xff00) != 0 {
-					ZendGcAddref(&_gc.gc)
-				}
-				dst.SetU2Extra(src.GetU2Extra())
+				ZVAL_COPY_PROP(dst, src)
 				src++
 				dst++
 				if src == end {
@@ -2278,41 +2550,25 @@ func ObjectPropertiesInitEx(object *ZendObject, properties *HashTable) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
 				key = _p.GetKey()
 				prop = _z
 				property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
-				if property_info != (*ZendPropertyInfo)(intptr_t-1) && property_info != nil && (property_info.GetFlags()&1<<4) == 0 {
-					var slot *Zval = (*Zval)((*byte)(object + property_info.GetOffset()))
-					if property_info.GetType() != 0 {
+				if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && (property_info.GetFlags()&ZEND_ACC_STATIC) == 0 {
+					var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
+					if UNEXPECTED(property_info.GetType() != 0) {
 						var tmp Zval
-						var _z1 *Zval = &tmp
-						var _z2 *Zval = prop
-						var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-						var _t uint32 = _z2.GetTypeInfo()
-						_z1.GetValue().SetCounted(_gc)
-						_z1.SetTypeInfo(_t)
-						if ZendVerifyPropertyType(property_info, &tmp, 0) == 0 {
+						ZVAL_COPY_VALUE(&tmp, prop)
+						if UNEXPECTED(ZendVerifyPropertyType(property_info, &tmp, 0) == 0) {
 							continue
 						}
-						var _z1 *Zval = slot
-						var _z2 *Zval = &tmp
-						var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-						var _t uint32 = _z2.GetTypeInfo()
-						_z1.GetValue().SetCounted(_gc)
-						_z1.SetTypeInfo(_t)
+						ZVAL_COPY_VALUE(slot, &tmp)
 					} else {
-						var _z1 *Zval = slot
-						var _z2 *Zval = prop
-						var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-						var _t uint32 = _z2.GetTypeInfo()
-						_z1.GetValue().SetCounted(_gc)
-						_z1.SetTypeInfo(_t)
+						ZVAL_COPY_VALUE(slot, prop)
 					}
-					prop.GetValue().SetZv(slot)
-					prop.SetTypeInfo(13)
+					ZVAL_INDIRECT(prop, slot)
 				}
 			}
 			break
@@ -2335,47 +2591,41 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
 			h = _p.GetH()
 			key = _p.GetKey()
 			prop = _z
 			if key != nil {
-				if key.GetVal()[0] == '0' {
+				if ZSTR_VAL(key)[0] == '0' {
 					var class_name *byte
 					var prop_name *byte
 					var prop_name_len int
 					if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == SUCCESS {
 						var pname *ZendString = ZendStringInit(prop_name, prop_name_len, 0)
-						var prev_scope *ZendClassEntry = EG.GetFakeScope()
+						var prev_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 						if class_name != nil && class_name[0] != '*' {
 							var cname *ZendString = ZendStringInit(class_name, strlen(class_name), 0)
-							EG.SetFakeScope(ZendLookupClass(cname))
+							ExecutorGlobals.SetFakeScope(ZendLookupClass(cname))
 							ZendStringReleaseEx(cname, 0)
 						}
 						property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
 						ZendStringReleaseEx(pname, 0)
-						EG.SetFakeScope(prev_scope)
+						ExecutorGlobals.SetFakeScope(prev_scope)
 					} else {
-						property_info = (*ZendPropertyInfo)(intptr_t - 1)
+						property_info = ZEND_WRONG_PROPERTY_INFO
 					}
 				} else {
 					property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
 				}
-				if property_info != (*ZendPropertyInfo)(intptr_t-1) && property_info != nil && (property_info.GetFlags()&1<<4) == 0 {
-					var slot *Zval = (*Zval)((*byte)(object + property_info.GetOffset()))
+				if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && (property_info.GetFlags()&ZEND_ACC_STATIC) == 0 {
+					var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
 					ZvalPtrDtor(slot)
-					var _z1 *Zval = slot
-					var _z2 *Zval = prop
-					var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-					var _t uint32 = _z2.GetTypeInfo()
-					_z1.GetValue().SetCounted(_gc)
-					_z1.SetTypeInfo(_t)
+					ZVAL_COPY_VALUE(slot, prop)
 					ZvalAddRef(slot)
 					if object.GetProperties() != nil {
-						&tmp.GetValue().SetZv(slot)
-						&tmp.SetTypeInfo(13)
+						ZVAL_INDIRECT(&tmp, slot)
 						ZendHashUpdate(object.GetProperties(), key, &tmp)
 					}
 				} else {
@@ -2400,39 +2650,35 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 /* }}} */
 
 func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties *HashTable) int {
-	if (class_type.GetCeFlags() & (1<<0 | 1<<1 | 1<<4 | 1<<6)) != 0 {
-		if (class_type.GetCeFlags() & 1 << 0) != 0 {
-			ZendThrowError(nil, "Cannot instantiate interface %s", class_type.GetName().GetVal())
-		} else if (class_type.GetCeFlags() & 1 << 1) != 0 {
-			ZendThrowError(nil, "Cannot instantiate trait %s", class_type.GetName().GetVal())
+	if UNEXPECTED((class_type.GetCeFlags() & (ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)) != 0) {
+		if (class_type.GetCeFlags() & ZEND_ACC_INTERFACE) != 0 {
+			ZendThrowError(nil, "Cannot instantiate interface %s", ZSTR_VAL(class_type.GetName()))
+		} else if (class_type.GetCeFlags() & ZEND_ACC_TRAIT) != 0 {
+			ZendThrowError(nil, "Cannot instantiate trait %s", ZSTR_VAL(class_type.GetName()))
 		} else {
-			ZendThrowError(nil, "Cannot instantiate abstract class %s", class_type.GetName().GetVal())
+			ZendThrowError(nil, "Cannot instantiate abstract class %s", ZSTR_VAL(class_type.GetName()))
 		}
-		arg.SetTypeInfo(1)
-		arg.GetValue().SetObj(nil)
+		ZVAL_NULL(arg)
+		Z_OBJ_P(arg) = nil
 		return FAILURE
 	}
-	if (class_type.GetCeFlags() & 1 << 12) == 0 {
-		if ZendUpdateClassConstants(class_type) != SUCCESS {
-			arg.SetTypeInfo(1)
-			arg.GetValue().SetObj(nil)
+	if UNEXPECTED((class_type.GetCeFlags() & ZEND_ACC_CONSTANTS_UPDATED) == 0) {
+		if UNEXPECTED(ZendUpdateClassConstants(class_type) != SUCCESS) {
+			ZVAL_NULL(arg)
+			Z_OBJ_P(arg) = nil
 			return FAILURE
 		}
 	}
 	if class_type.create_object == nil {
 		var obj *ZendObject = ZendObjectsNew(class_type)
-		var __z *Zval = arg
-		__z.GetValue().SetObj(obj)
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
+		ZVAL_OBJ(arg, obj)
 		if properties != nil {
 			ObjectPropertiesInitEx(obj, properties)
 		} else {
 			_objectPropertiesInit(obj, class_type)
 		}
 	} else {
-		var __z *Zval = arg
-		__z.GetValue().SetObj(class_type.create_object(class_type))
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
+		ZVAL_OBJ(arg, class_type.create_object(class_type))
 	}
 	return SUCCESS
 }
@@ -2452,9 +2698,7 @@ func ObjectInitEx(arg *Zval, class_type *ZendClassEntry) int {
 /* }}} */
 
 func ObjectInit(arg *Zval) int {
-	var __z *Zval = arg
-	__z.GetValue().SetObj(ZendObjectsNew(ZendStandardClassDef))
-	__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
+	ZVAL_OBJ(arg, ZendObjectsNew(ZendStandardClassDef))
 	return SUCCESS
 }
 
@@ -2462,19 +2706,17 @@ func ObjectInit(arg *Zval) int {
 
 func AddAssocLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(n)
-	__z.SetTypeInfo(4)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_LONG(&tmp, n)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
 /* }}} */
 
-func AddAssocNullEx(arg *Zval, key string, key_len int) int {
+func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_NULL(&tmp)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
@@ -2482,12 +2724,8 @@ func AddAssocNullEx(arg *Zval, key string, key_len int) int {
 
 func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
 	var tmp Zval
-	if b != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_BOOL(&tmp, b)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
@@ -2495,50 +2733,35 @@ func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
 
 func AddAssocResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetRes(r)
-	__z.SetTypeInfo(9 | 1<<0<<8)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_RES(&tmp, r)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
 /* }}} */
 
-func AddAssocDoubleEx(arg *Zval, key *byte, key_len int, d float64) int {
+func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(d)
-	__z.SetTypeInfo(5)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_DOUBLE(&tmp, d)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
 /* }}} */
 
-func AddAssocStrEx(arg *Zval, key string, key_len int, str *ZendString) int {
+func AddAssocStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = str
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_STR(&tmp, str)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
 /* }}} */
 
-func AddAssocStringEx(arg *Zval, key *byte, key_len int, str *byte) int {
+func AddAssocStringEx(arg *Zval, key string, key_len int, str *byte) int {
 	var tmp Zval
-	var _s *byte = str
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_STRING(&tmp, str)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
@@ -2546,18 +2769,15 @@ func AddAssocStringEx(arg *Zval, key *byte, key_len int, str *byte) int {
 
 func AddAssocStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(str, length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, &tmp)
+	ZVAL_STRINGL(&tmp, str, length)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
 	return SUCCESS
 }
 
 /* }}} */
 
 func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
-	ZendSymtableStrUpdate(arg.GetValue().GetArr(), key, key_len, value)
+	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, value)
 	return SUCCESS
 }
 
@@ -2565,10 +2785,8 @@ func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
 
 func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(n)
-	__z.SetTypeInfo(4)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_LONG(&tmp, n)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2576,8 +2794,8 @@ func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
 
 func AddIndexNull(arg *Zval, index ZendUlong) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_NULL(&tmp)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2585,12 +2803,8 @@ func AddIndexNull(arg *Zval, index ZendUlong) int {
 
 func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 	var tmp Zval
-	if b != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_BOOL(&tmp, b)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2598,10 +2812,8 @@ func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 
 func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetRes(r)
-	__z.SetTypeInfo(9 | 1<<0<<8)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_RES(&tmp, r)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2609,10 +2821,8 @@ func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
 
 func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(d)
-	__z.SetTypeInfo(5)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_DOUBLE(&tmp, d)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2620,15 +2830,8 @@ func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 
 func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = str
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_STR(&tmp, str)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2636,12 +2839,8 @@ func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
 
 func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
 	var tmp Zval
-	var _s *byte = str
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_STRING(&tmp, str)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2649,11 +2848,8 @@ func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
 
 func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(str, length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZendHashIndexUpdate(arg.GetValue().GetArr(), index, &tmp)
+	ZVAL_STRINGL(&tmp, str, length)
+	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
 	return SUCCESS
 }
 
@@ -2661,10 +2857,8 @@ func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
 
 func AddNextIndexLong(arg *Zval, n ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(n)
-	__z.SetTypeInfo(4)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_LONG(&tmp, n)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2675,8 +2869,8 @@ func AddNextIndexLong(arg *Zval, n ZendLong) int {
 
 func AddNextIndexNull(arg *Zval) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_NULL(&tmp)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2687,12 +2881,8 @@ func AddNextIndexNull(arg *Zval) int {
 
 func AddNextIndexBool(arg *Zval, b int) int {
 	var tmp Zval
-	if b != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_BOOL(&tmp, b)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2703,10 +2893,8 @@ func AddNextIndexBool(arg *Zval, b int) int {
 
 func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetRes(r)
-	__z.SetTypeInfo(9 | 1<<0<<8)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_RES(&tmp, r)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2717,10 +2905,8 @@ func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 
 func AddNextIndexDouble(arg *Zval, d float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(d)
-	__z.SetTypeInfo(5)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_DOUBLE(&tmp, d)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2731,15 +2917,8 @@ func AddNextIndexDouble(arg *Zval, d float64) int {
 
 func AddNextIndexStr(arg *Zval, str *ZendString) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = str
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_STR(&tmp, str)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2750,12 +2929,8 @@ func AddNextIndexStr(arg *Zval, str *ZendString) int {
 
 func AddNextIndexString(arg *Zval, str *byte) int {
 	var tmp Zval
-	var _s *byte = str
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_STRING(&tmp, str)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2766,11 +2941,8 @@ func AddNextIndexString(arg *Zval, str *byte) int {
 
 func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(str, length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	if ZendHashNextIndexInsert(arg.GetValue().GetArr(), &tmp) != nil {
+	ZVAL_STRINGL(&tmp, str, length)
+	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2781,37 +2953,35 @@ func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
 
 func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 	var result *Zval
-	switch key.GetType() {
-	case 6:
-		result = ZendSymtableUpdate(ht, key.GetValue().GetStr(), value)
+	switch Z_TYPE_P(key) {
+	case IS_STRING:
+		result = ZendSymtableUpdate(ht, Z_STR_P(key), value)
 		break
-	case 1:
-		result = ZendSymtableUpdate(ht, ZendEmptyString, value)
+	case IS_NULL:
+		result = ZendSymtableUpdate(ht, ZSTR_EMPTY_ALLOC(), value)
 		break
-	case 9:
-		ZendError(1<<3, "Resource ID#%d used as offset, casting to integer (%d)", key.GetValue().GetRes().GetHandle(), key.GetValue().GetRes().GetHandle())
-		result = ZendHashIndexUpdate(ht, key.GetValue().GetRes().GetHandle(), value)
+	case IS_RESOURCE:
+		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(key), Z_RES_HANDLE_P(key))
+		result = ZendHashIndexUpdate(ht, Z_RES_HANDLE_P(key), value)
 		break
-	case 2:
+	case IS_FALSE:
 		result = ZendHashIndexUpdate(ht, 0, value)
 		break
-	case 3:
+	case IS_TRUE:
 		result = ZendHashIndexUpdate(ht, 1, value)
 		break
-	case 4:
-		result = ZendHashIndexUpdate(ht, key.GetValue().GetLval(), value)
+	case IS_LONG:
+		result = ZendHashIndexUpdate(ht, Z_LVAL_P(key), value)
 		break
-	case 5:
-		result = ZendHashIndexUpdate(ht, ZendDvalToLval(key.GetValue().GetDval()), value)
+	case IS_DOUBLE:
+		result = ZendHashIndexUpdate(ht, ZendDvalToLval(Z_DVAL_P(key)), value)
 		break
 	default:
-		ZendError(1<<1, "Illegal offset type")
+		ZendError(E_WARNING, "Illegal offset type")
 		result = nil
 	}
 	if result != nil {
-		if result.GetTypeFlags() != 0 {
-			ZvalAddrefP(result)
-		}
+		Z_TRY_ADDREF_P(result)
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2820,11 +2990,9 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 
 /* }}} */
 
-func AddPropertyLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
+func AddPropertyLongEx(arg *Zval, key *byte, key_len int, n ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(n)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&tmp, n)
 	return AddPropertyZvalEx(arg, key, key_len, &tmp)
 }
 
@@ -2832,29 +3000,23 @@ func AddPropertyLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
 
 func AddPropertyBoolEx(arg *Zval, key *byte, key_len int, b ZendLong) int {
 	var tmp Zval
-	if b != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&tmp, b)
 	return AddPropertyZvalEx(arg, key, key_len, &tmp)
 }
 
 /* }}} */
 
-func AddPropertyNullEx(arg *Zval, key string, key_len int) int {
+func AddPropertyNullEx(arg *Zval, key *byte, key_len int) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
+	ZVAL_NULL(&tmp)
 	return AddPropertyZvalEx(arg, key, key_len, &tmp)
 }
 
 /* }}} */
 
-func AddPropertyResourceEx(arg *Zval, key string, key_len int, r *ZendResource) int {
+func AddPropertyResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetRes(r)
-	__z.SetTypeInfo(9 | 1<<0<<8)
+	ZVAL_RES(&tmp, r)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -2864,9 +3026,7 @@ func AddPropertyResourceEx(arg *Zval, key string, key_len int, r *ZendResource) 
 
 func AddPropertyDoubleEx(arg *Zval, key *byte, key_len int, d float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(d)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&tmp, d)
 	return AddPropertyZvalEx(arg, key, key_len, &tmp)
 }
 
@@ -2874,14 +3034,7 @@ func AddPropertyDoubleEx(arg *Zval, key *byte, key_len int, d float64) int {
 
 func AddPropertyStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = str
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
+	ZVAL_STR(&tmp, str)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -2889,13 +3042,9 @@ func AddPropertyStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 
 /* }}} */
 
-func AddPropertyStringEx(arg *Zval, key string, key_len int, str *byte) int {
+func AddPropertyStringEx(arg *Zval, key *byte, key_len int, str *byte) int {
 	var tmp Zval
-	var _s *byte = str
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRING(&tmp, str)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -2903,12 +3052,9 @@ func AddPropertyStringEx(arg *Zval, key string, key_len int, str *byte) int {
 
 /* }}} */
 
-func AddPropertyStringlEx(arg *Zval, key string, key_len int, str *byte, length int) int {
+func AddPropertyStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(str, length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRINGL(&tmp, str, length)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -2916,13 +3062,10 @@ func AddPropertyStringlEx(arg *Zval, key string, key_len int, str *byte, length 
 
 /* }}} */
 
-func AddPropertyZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
+func AddPropertyZvalEx(arg *Zval, key *byte, key_len int, value *Zval) int {
 	var z_key Zval
-	var __z *Zval = &z_key
-	var __s *ZendString = ZendStringInit(key, key_len, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	arg.GetValue().GetObj().GetHandlers().GetWriteProperty()(arg, &z_key, value, nil)
+	ZVAL_STRINGL(&z_key, key, key_len)
+	Z_OBJ_HANDLER_P(arg, write_property)(arg, &z_key, value, nil)
 	ZvalPtrDtor(&z_key)
 	return SUCCESS
 }
@@ -2942,17 +3085,17 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 	if module.GetDeps() != nil {
 		var dep *ZendModuleDep = module.GetDeps()
 		for dep.GetName() != nil {
-			if dep.GetType() == 1 {
+			if dep.GetType() == MODULE_DEP_REQUIRED {
 				var req_mod *ZendModuleEntry
 				name_len = strlen(dep.GetName())
 				lcname = ZendStringAlloc(name_len, 0)
-				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
-				if g.Assign(&req_mod, ZendHashFindPtr(&ModuleRegistry, lcname)) == nil || req_mod.GetModuleStarted() == 0 {
+				ZendStrTolowerCopy(ZSTR_VAL(lcname), dep.GetName(), name_len)
+				if b.Assign(&req_mod, ZendHashFindPtr(&ModuleRegistry, lcname)) == nil || req_mod.GetModuleStarted() == 0 {
 					ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
 
-					ZendError(1<<5, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
+					ZendError(E_CORE_WARNING, "Cannot load module '%s' because required module '%s' is not loaded", module.GetName(), dep.GetName())
 					module.SetModuleStarted(0)
 					return FAILURE
 				}
@@ -2970,13 +3113,13 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 		}
 	}
 	if module.GetModuleStartupFunc() != nil {
-		EG.SetCurrentModule(module)
+		ExecutorGlobals.SetCurrentModule(module)
 		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == FAILURE {
-			ZendErrorNoreturn(1<<4, "Unable to start %s module", module.GetName())
-			EG.SetCurrentModule(nil)
+			ZendErrorNoreturn(E_CORE_ERROR, "Unable to start %s module", module.GetName())
+			ExecutorGlobals.SetCurrentModule(nil)
 			return FAILURE
 		}
-		EG.SetCurrentModule(nil)
+		ExecutorGlobals.SetCurrentModule(nil)
 	}
 	return SUCCESS
 }
@@ -2984,11 +3127,11 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 /* }}} */
 
 func ZendStartupModuleZval(zv *Zval) int {
-	var module *ZendModuleEntry = zv.GetValue().GetPtr()
+	var module *ZendModuleEntry = Z_PTR_P(zv)
 	if ZendStartupModuleEx(module) == SUCCESS {
-		return 0
+		return ZEND_HASH_APPLY_KEEP
 	} else {
-		return 1 << 0
+		return ZEND_HASH_APPLY_REMOVE
 	}
 }
 
@@ -3003,14 +3146,14 @@ func ZendSortModules(base any, count int, siz int, compare CompareFuncT, swp Swa
 	var r *ZendModuleEntry
 	for b1 < end {
 	try_again:
-		m = (*ZendModuleEntry)(b1.GetVal().GetValue().GetPtr())
+		m = (*ZendModuleEntry)(Z_PTR(b1.GetVal()))
 		if m.GetModuleStarted() == 0 && m.GetDeps() != nil {
 			var dep *ZendModuleDep = m.GetDeps()
 			for dep.GetName() != nil {
-				if dep.GetType() == 1 || dep.GetType() == 3 {
+				if dep.GetType() == MODULE_DEP_REQUIRED || dep.GetType() == MODULE_DEP_OPTIONAL {
 					b2 = b1 + 1
 					for b2 < end {
-						r = (*ZendModuleEntry)(b2.GetVal().GetValue().GetPtr())
+						r = (*ZendModuleEntry)(Z_PTR(b2.GetVal()))
 						if strcasecmp(dep.GetName(), r.GetName()) == 0 {
 							tmp = *b1
 							*b1 = *b2
@@ -3046,10 +3189,10 @@ func ZendCollectModuleHandlers() {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
-			module = _z.GetValue().GetPtr()
+			module = Z_PTR_P(_z)
 			if module.GetRequestStartupFunc() != nil {
 				startup_count++
 			}
@@ -3062,7 +3205,7 @@ func ZendCollectModuleHandlers() {
 		}
 		break
 	}
-	ModuleRequestStartupHandlers = (**ZendModuleEntry)(Malloc(g.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
+	ModuleRequestStartupHandlers = (**ZendModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
 	ModuleRequestStartupHandlers[startup_count] = nil
 	ModuleRequestShutdownHandlers = ModuleRequestStartupHandlers + startup_count + 1
 	ModuleRequestShutdownHandlers[shutdown_count] = nil
@@ -3076,18 +3219,18 @@ func ZendCollectModuleHandlers() {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
-			module = _z.GetValue().GetPtr()
+			module = Z_PTR_P(_z)
 			if module.GetRequestStartupFunc() != nil {
-				ModuleRequestStartupHandlers[g.PostInc(&startup_count)] = module
+				ModuleRequestStartupHandlers[b.PostInc(&startup_count)] = module
 			}
 			if module.GetRequestShutdownFunc() != nil {
-				ModuleRequestShutdownHandlers[g.PreDec(&shutdown_count)] = module
+				ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
 			}
 			if module.GetPostDeactivateFunc() != nil {
-				ModulePostDeactivateHandlers[g.PreDec(&post_deactivate_count)] = module
+				ModulePostDeactivateHandlers[b.PreDec(&post_deactivate_count)] = module
 			}
 		}
 		break
@@ -3096,38 +3239,38 @@ func ZendCollectModuleHandlers() {
 	/* Collect internal classes with static members */
 
 	for {
-		var __ht *HashTable = CG.GetClassTable()
+		var __ht *HashTable = CompilerGlobals.GetClassTable()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
-			ce = _z.GetValue().GetPtr()
-			if ce.GetType() == 1 && ce.GetDefaultStaticMembersCount() > 0 {
+			ce = Z_PTR_P(_z)
+			if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
 				class_count++
 			}
 		}
 		break
 	}
-	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(g.SizeOf("zend_class_entry *") * (class_count + 1)))
+	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
 		for {
-			var __ht *HashTable = CG.GetClassTable()
+			var __ht *HashTable = CompilerGlobals.GetClassTable()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
-				ce = _z.GetValue().GetPtr()
-				if ce.GetType() == 1 && ce.GetDefaultStaticMembersCount() > 0 {
-					ClassCleanupHandlers[g.PreDec(&class_count)] = ce
+				ce = Z_PTR_P(_z)
+				if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+					ClassCleanupHandlers[b.PreDec(&class_count)] = ce
 				}
 			}
 			break
@@ -3166,16 +3309,16 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	if module.GetDeps() != nil {
 		var dep *ZendModuleDep = module.GetDeps()
 		for dep.GetName() != nil {
-			if dep.GetType() == 2 {
+			if dep.GetType() == MODULE_DEP_CONFLICTS {
 				name_len = strlen(dep.GetName())
 				lcname = ZendStringAlloc(name_len, 0)
-				ZendStrTolowerCopy(lcname.GetVal(), dep.GetName(), name_len)
+				ZendStrTolowerCopy(ZSTR_VAL(lcname), dep.GetName(), name_len)
 				if ZendHashExists(&ModuleRegistry, lcname) != 0 || ZendGetExtension(dep.GetName()) != nil {
 					ZendStringEfree(lcname)
 
 					/* TODO: Check version relationship */
 
-					ZendError(1<<5, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
+					ZendError(E_CORE_WARNING, "Cannot load module '%s' because conflicting module '%s' is already loaded", module.GetName(), dep.GetName())
 					return nil
 				}
 				ZendStringEfree(lcname)
@@ -3184,24 +3327,24 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 		}
 	}
 	name_len = strlen(module.GetName())
-	lcname = ZendStringAlloc(name_len, module.GetType() == 1)
-	ZendStrTolowerCopy(lcname.GetVal(), module.GetName(), name_len)
+	lcname = ZendStringAlloc(name_len, module.GetType() == MODULE_PERSISTENT)
+	ZendStrTolowerCopy(ZSTR_VAL(lcname), module.GetName(), name_len)
 	lcname = ZendNewInternedString(lcname)
-	if g.Assign(&module_ptr, ZendHashAddMem(&ModuleRegistry, lcname, module, g.SizeOf("zend_module_entry"))) == nil {
-		ZendError(1<<5, "Module '%s' already loaded", module.GetName())
+	if b.Assign(&module_ptr, ZendHashAddMem(&ModuleRegistry, lcname, module, b.SizeOf("zend_module_entry"))) == nil {
+		ZendError(E_CORE_WARNING, "Module '%s' already loaded", module.GetName())
 		ZendStringRelease(lcname)
 		return nil
 	}
 	module = module_ptr
-	EG.SetCurrentModule(module)
+	ExecutorGlobals.SetCurrentModule(module)
 	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == FAILURE {
 		ZendHashDel(&ModuleRegistry, lcname)
 		ZendStringRelease(lcname)
-		EG.SetCurrentModule(nil)
-		ZendError(1<<5, "%s: Unable to register functions, unable to load", module.GetName())
+		ExecutorGlobals.SetCurrentModule(nil)
+		ZendError(E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
 		return nil
 	}
-	EG.SetCurrentModule(nil)
+	ExecutorGlobals.SetCurrentModule(nil)
 	ZendStringRelease(lcname)
 	return module
 }
@@ -3210,7 +3353,7 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 
 func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
 	module.SetModuleNumber(ZendNextFreeModule())
-	module.SetType(1)
+	module.SetType(MODULE_PERSISTENT)
 	return ZendRegisterModuleEx(module)
 }
 
@@ -3219,60 +3362,60 @@ func ZendRegisterInternalModule(module *ZendModuleEntry) *ZendModuleEntry {
 func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, error_type int) {
 	var lcname []byte
 	var name_len int
-	if fptr.GetFunctionName().GetVal()[0] != '_' || fptr.GetFunctionName().GetVal()[1] != '_' {
+	if ZSTR_VAL(fptr.GetFunctionName())[0] != '_' || ZSTR_VAL(fptr.GetFunctionName())[1] != '_' {
 		return
 	}
 
 	/* we don't care if the function name is longer, in fact lowercasing only
 	 * the beginning of the name speeds up the check process */
 
-	name_len = fptr.GetFunctionName().GetLen()
-	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), g.CondF2(name_len < g.SizeOf("lcname")-1, name_len, func() int { return g.SizeOf("lcname") - 1 }))
-	lcname[g.SizeOf("lcname")-1] = '0'
-	if name_len == g.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, "__destruct", g.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), "__destruct")
-	} else if name_len == g.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lcname, "__clone", g.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot accept any arguments", ce.GetName().GetVal(), "__clone")
-	} else if name_len == g.SizeOf("ZEND_GET_FUNC_NAME")-1 && !(memcmp(lcname, "__get", g.SizeOf("ZEND_GET_FUNC_NAME")-1)) {
+	name_len = ZSTR_LEN(fptr.GetFunctionName())
+	ZendStrTolowerCopy(lcname, ZSTR_VAL(fptr.GetFunctionName()), MIN(name_len, b.SizeOf("lcname")-1))
+	lcname[b.SizeOf("lcname")-1] = '0'
+	if name_len == b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DESTRUCTOR_FUNC_NAME, b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+		ZendError(error_type, "Destructor %s::%s() cannot take arguments", ZSTR_VAL(ce.GetName()), ZEND_DESTRUCTOR_FUNC_NAME)
+	} else if name_len == b.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CLONE_FUNC_NAME, b.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+		ZendError(error_type, "Method %s::%s() cannot accept any arguments", ZSTR_VAL(ce.GetName()), ZEND_CLONE_FUNC_NAME)
+	} else if name_len == b.SizeOf("ZEND_GET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_GET_FUNC_NAME, b.SizeOf("ZEND_GET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), "__get")
-		} else if (fptr.GetQuickArgFlags() >> (1 + 3) * 2 & (1 | 2)) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), "__get")
+			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ZSTR_VAL(ce.GetName()), ZEND_GET_FUNC_NAME)
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
+			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ZSTR_VAL(ce.GetName()), ZEND_GET_FUNC_NAME)
 		}
-	} else if name_len == g.SizeOf("ZEND_SET_FUNC_NAME")-1 && !(memcmp(lcname, "__set", g.SizeOf("ZEND_SET_FUNC_NAME")-1)) {
+	} else if name_len == b.SizeOf("ZEND_SET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_SET_FUNC_NAME, b.SizeOf("ZEND_SET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), "__set")
-		} else if (fptr.GetQuickArgFlags()>>(1+3)*2&(1|2)) != 0 || (fptr.GetQuickArgFlags()>>(2+3)*2&(1|2)) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), "__set")
+			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ZSTR_VAL(ce.GetName()), ZEND_SET_FUNC_NAME)
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
+			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ZSTR_VAL(ce.GetName()), ZEND_SET_FUNC_NAME)
 		}
-	} else if name_len == g.SizeOf("ZEND_UNSET_FUNC_NAME")-1 && !(memcmp(lcname, "__unset", g.SizeOf("ZEND_UNSET_FUNC_NAME")-1)) {
+	} else if name_len == b.SizeOf("ZEND_UNSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_UNSET_FUNC_NAME, b.SizeOf("ZEND_UNSET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), "__unset")
-		} else if (fptr.GetQuickArgFlags() >> (1 + 3) * 2 & (1 | 2)) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), "__unset")
+			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ZSTR_VAL(ce.GetName()), ZEND_UNSET_FUNC_NAME)
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
+			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ZSTR_VAL(ce.GetName()), ZEND_UNSET_FUNC_NAME)
 		}
-	} else if name_len == g.SizeOf("ZEND_ISSET_FUNC_NAME")-1 && !(memcmp(lcname, "__isset", g.SizeOf("ZEND_ISSET_FUNC_NAME")-1)) {
+	} else if name_len == b.SizeOf("ZEND_ISSET_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_ISSET_FUNC_NAME, b.SizeOf("ZEND_ISSET_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 1 {
-			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ce.GetName().GetVal(), "__isset")
-		} else if (fptr.GetQuickArgFlags() >> (1 + 3) * 2 & (1 | 2)) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), "__isset")
+			ZendError(error_type, "Method %s::%s() must take exactly 1 argument", ZSTR_VAL(ce.GetName()), ZEND_ISSET_FUNC_NAME)
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 {
+			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ZSTR_VAL(ce.GetName()), ZEND_ISSET_FUNC_NAME)
 		}
-	} else if name_len == g.SizeOf("ZEND_CALL_FUNC_NAME")-1 && !(memcmp(lcname, "__call", g.SizeOf("ZEND_CALL_FUNC_NAME")-1)) {
+	} else if name_len == b.SizeOf("ZEND_CALL_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALL_FUNC_NAME, b.SizeOf("ZEND_CALL_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ce.GetName().GetVal(), "__call")
-		} else if (fptr.GetQuickArgFlags()>>(1+3)*2&(1|2)) != 0 || (fptr.GetQuickArgFlags()>>(2+3)*2&(1|2)) != 0 {
-			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ce.GetName().GetVal(), "__call")
+			ZendError(error_type, "Method %s::%s() must take exactly 2 arguments", ZSTR_VAL(ce.GetName()), ZEND_CALL_FUNC_NAME)
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
+			ZendError(error_type, "Method %s::%s() cannot take arguments by reference", ZSTR_VAL(ce.GetName()), ZEND_CALL_FUNC_NAME)
 		}
-	} else if name_len == g.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1 && !(memcmp(lcname, "__callstatic", g.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1)) {
+	} else if name_len == b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_CALLSTATIC_FUNC_NAME, b.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1)) {
 		if fptr.GetNumArgs() != 2 {
-			ZendError(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ce.GetName().GetVal())
-		} else if (fptr.GetQuickArgFlags()>>(1+3)*2&(1|2)) != 0 || (fptr.GetQuickArgFlags()>>(2+3)*2&(1|2)) != 0 {
-			ZendError(error_type, "Method %s::__callStatic() cannot take arguments by reference", ce.GetName().GetVal())
+			ZendError(error_type, "Method %s::__callStatic() must take exactly 2 arguments", ZSTR_VAL(ce.GetName()))
+		} else if QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 1) != 0 || QUICK_ARG_SHOULD_BE_SENT_BY_REF(fptr, 2) != 0 {
+			ZendError(error_type, "Method %s::__callStatic() cannot take arguments by reference", ZSTR_VAL(ce.GetName()))
 		}
-	} else if name_len == g.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1 && !(memcmp(lcname, "__tostring", g.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), "__tostring")
-	} else if name_len == g.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1 && !(memcmp(lcname, "__debuginfo", g.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
-		ZendError(error_type, "Method %s::%s() cannot take arguments", ce.GetName().GetVal(), "__debuginfo")
+	} else if name_len == b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_TOSTRING_FUNC_NAME, b.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+		ZendError(error_type, "Method %s::%s() cannot take arguments", ZSTR_VAL(ce.GetName()), ZEND_TOSTRING_FUNC_NAME)
+	} else if name_len == b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DEBUGINFO_FUNC_NAME, b.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
+		ZendError(error_type, "Method %s::%s() cannot take arguments", ZSTR_VAL(ce.GetName()), ZEND_DEBUGINFO_FUNC_NAME)
 	}
 }
 
@@ -3304,25 +3447,25 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	var fname_len int
 	var lc_class_name *byte = nil
 	var class_name_len int = 0
-	if type_ == 1 {
-		error_type = 1 << 5
+	if type_ == MODULE_PERSISTENT {
+		error_type = E_CORE_WARNING
 	} else {
-		error_type = 1 << 1
+		error_type = E_WARNING
 	}
 	if target_function_table == nil {
-		target_function_table = CG.GetFunctionTable()
+		target_function_table = CompilerGlobals.GetFunctionTable()
 	}
-	internal_function.SetType(1)
-	internal_function.SetModule(EG.GetCurrentModule())
-	memset(internal_function.GetReserved(), 0, 6*g.SizeOf("void *"))
+	internal_function.SetType(ZEND_INTERNAL_FUNCTION)
+	internal_function.SetModule(ExecutorGlobals.GetCurrentModule())
+	memset(internal_function.GetReserved(), 0, ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 	if scope != nil {
-		class_name_len = scope.GetName().GetLen()
-		if g.Assign(&lc_class_name, ZendMemrchr(scope.GetName().GetVal(), '\\', class_name_len)) {
+		class_name_len = ZSTR_LEN(scope.GetName())
+		if b.Assign(&lc_class_name, ZendMemrchr(ZSTR_VAL(scope.GetName()), '\\', class_name_len)) {
 			lc_class_name++
-			class_name_len -= lc_class_name - scope.GetName().GetVal()
+			class_name_len -= lc_class_name - ZSTR_VAL(scope.GetName())
 			lc_class_name = ZendStrTolowerDup(lc_class_name, class_name_len)
 		} else {
-			lc_class_name = ZendStrTolowerDup(scope.GetName().GetVal(), class_name_len)
+			lc_class_name = ZendStrTolowerDup(ZSTR_VAL(scope.GetName()), class_name_len)
 		}
 	}
 	for ptr.GetFname() != nil {
@@ -3332,16 +3475,16 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		internal_function.SetScope(scope)
 		internal_function.SetPrototype(nil)
 		if ptr.GetFlags() != 0 {
-			if (ptr.GetFlags() & (1<<0 | 1<<1 | 1<<2)) == 0 {
-				if ptr.GetFlags() != 1<<11 && scope != nil {
-					ZendError(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", g.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), g.Cond(scope != nil, "::", ""), ptr.GetFname())
+			if (ptr.GetFlags() & ZEND_ACC_PPP_MASK) == 0 {
+				if ptr.GetFlags() != ZEND_ACC_DEPRECATED && scope != nil {
+					ZendError(error_type, "Invalid access level for %s%s%s() - access must be exactly one of public, protected or private", b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				}
-				internal_function.SetFnFlags(1<<0 | ptr.GetFlags())
+				internal_function.SetFnFlags(ZEND_ACC_PUBLIC | ptr.GetFlags())
 			} else {
 				internal_function.SetFnFlags(ptr.GetFlags())
 			}
 		} else {
-			internal_function.SetFnFlags(1 << 0)
+			internal_function.SetFnFlags(ZEND_ACC_PUBLIC)
 		}
 		if ptr.GetArgInfo() != nil {
 			var info *ZendInternalFunctionInfo = (*ZendInternalFunctionInfo)(ptr.GetArgInfo())
@@ -3356,10 +3499,10 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 				internal_function.SetRequiredNumArgs(info.GetRequiredNumArgs())
 			}
 			if info.GetReturnReference() != 0 {
-				internal_function.SetFnFlags(internal_function.GetFnFlags() | 1<<12)
+				internal_function.SetFnFlags(internal_function.GetFnFlags() | ZEND_ACC_RETURN_REFERENCE)
 			}
 			if ptr.GetArgInfo()[ptr.GetNumArgs()].GetIsVariadic() != 0 {
-				internal_function.SetFnFlags(internal_function.GetFnFlags() | 1<<14)
+				internal_function.SetFnFlags(internal_function.GetFnFlags() | ZEND_ACC_VARIADIC)
 
 				/* Don't count the variadic argument */
 
@@ -3368,17 +3511,17 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 				/* Don't count the variadic argument */
 
 			}
-			if info.GetType() > 0x3 {
-				if info.GetType() > 0x3ff {
+			if ZEND_TYPE_IS_SET(info.GetType()) {
+				if ZEND_TYPE_IS_CLASS(info.GetType()) {
 					var type_name *byte = (*byte)(info.GetType())
 					if type_name[0] == '?' {
 						type_name++
 					}
 					if scope == nil && (!(strcasecmp(type_name, "self")) || !(strcasecmp(type_name, "parent"))) {
-						ZendErrorNoreturn(1<<4, "Cannot declare a return type of %s outside of a class scope", type_name)
+						ZendErrorNoreturn(E_CORE_ERROR, "Cannot declare a return type of %s outside of a class scope", type_name)
 					}
 				}
-				internal_function.SetFnFlags(internal_function.GetFnFlags() | 1<<13)
+				internal_function.SetFnFlags(internal_function.GetFnFlags() | ZEND_ACC_HAS_RETURN_TYPE)
 			}
 		} else {
 			internal_function.SetArgInfo(nil)
@@ -3386,44 +3529,44 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			internal_function.SetRequiredNumArgs(0)
 		}
 		ZendSetFunctionArgFlags((*ZendFunction)(internal_function))
-		if (ptr.GetFlags() & 1 << 6) != 0 {
+		if (ptr.GetFlags() & ZEND_ACC_ABSTRACT) != 0 {
 			if scope != nil {
 
 				/* This is a class that must be abstract itself. Here we set the check info. */
 
-				scope.SetCeFlags(scope.GetCeFlags() | 1<<4)
-				if (scope.GetCeFlags() & 1 << 0) == 0 {
+				scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
+				if (scope.GetCeFlags() & ZEND_ACC_INTERFACE) == 0 {
 
 					/* Since the class is not an interface it needs to be declared as a abstract class. */
 
-					scope.SetCeFlags(scope.GetCeFlags() | 1<<6)
+					scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)
 
 					/* Since the class is not an interface it needs to be declared as a abstract class. */
 
 				}
 			}
-			if (ptr.GetFlags()&1<<4) != 0 && (scope == nil || (scope.GetCeFlags()&1<<0) == 0) {
-				ZendError(error_type, "Static function %s%s%s() cannot be abstract", g.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), g.Cond(scope != nil, "::", ""), ptr.GetFname())
+			if (ptr.GetFlags()&ZEND_ACC_STATIC) != 0 && (scope == nil || (scope.GetCeFlags()&ZEND_ACC_INTERFACE) == 0) {
+				ZendError(error_type, "Static function %s%s%s() cannot be abstract", b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 		} else {
-			if scope != nil && (scope.GetCeFlags()&1<<0) != 0 {
-				_efree((*byte)(lc_class_name))
-				ZendError(error_type, "Interface %s cannot contain non abstract method %s()", scope.GetName().GetVal(), ptr.GetFname())
+			if scope != nil && (scope.GetCeFlags()&ZEND_ACC_INTERFACE) != 0 {
+				Efree((*byte)(lc_class_name))
+				ZendError(error_type, "Interface %s cannot contain non abstract method %s()", ZSTR_VAL(scope.GetName()), ptr.GetFname())
 				return FAILURE
 			}
 			if internal_function.GetHandler() == nil {
 				if scope != nil {
-					_efree((*byte)(lc_class_name))
+					Efree((*byte)(lc_class_name))
 				}
-				ZendError(error_type, "Method %s%s%s() cannot be a NULL function", g.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), g.Cond(scope != nil, "::", ""), ptr.GetFname())
+				ZendError(error_type, "Method %s%s%s() cannot be a NULL function", b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 				ZendUnregisterFunctions(functions, count, target_function_table)
 				return FAILURE
 			}
 		}
-		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName(), type_ == 1)
+		lowercase_name = ZendStringTolowerEx(internal_function.GetFunctionName(), type_ == MODULE_PERSISTENT)
 		lowercase_name = ZendNewInternedString(lowercase_name)
-		reg_function = Malloc(g.SizeOf("zend_internal_function"))
-		memcpy(reg_function, &function, g.SizeOf("zend_internal_function"))
+		reg_function = Malloc(b.SizeOf("zend_internal_function"))
+		memcpy(reg_function, &function, b.SizeOf("zend_internal_function"))
 		if ZendHashAddPtr(target_function_table, lowercase_name, reg_function) == nil {
 			unload = 1
 			Free(reg_function)
@@ -3436,13 +3579,13 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		if reg_function.GetArgInfo() != nil && reg_function.GetNumArgs() != 0 {
 			var i uint32
 			for i = 0; i < reg_function.GetNumArgs(); i++ {
-				if reg_function.GetArgInfo()[i].GetType() > 0x3 {
-					reg_function.SetFnFlags(reg_function.GetFnFlags() | 1<<8)
+				if ZEND_TYPE_IS_SET(reg_function.GetArgInfo()[i].GetType()) {
+					reg_function.SetFnFlags(reg_function.GetFnFlags() | ZEND_ACC_HAS_TYPE_HINTS)
 					break
 				}
 			}
 		}
-		if reg_function.GetArgInfo() != nil && (reg_function.GetFnFlags()&(1<<13|1<<8)) != 0 {
+		if reg_function.GetArgInfo() != nil && (reg_function.GetFnFlags()&(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS)) != 0 {
 
 			/* convert "const char*" class type names into "zend_string*" */
 
@@ -3450,14 +3593,14 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			var num_args uint32 = reg_function.GetNumArgs() + 1
 			var arg_info *ZendArgInfo = reg_function.GetArgInfo() - 1
 			var new_arg_info *ZendArgInfo
-			if (reg_function.GetFnFlags() & 1 << 14) != 0 {
+			if (reg_function.GetFnFlags() & ZEND_ACC_VARIADIC) != 0 {
 				num_args++
 			}
-			new_arg_info = Malloc(g.SizeOf("zend_arg_info") * num_args)
-			memcpy(new_arg_info, arg_info, g.SizeOf("zend_arg_info")*num_args)
+			new_arg_info = Malloc(b.SizeOf("zend_arg_info") * num_args)
+			memcpy(new_arg_info, arg_info, b.SizeOf("zend_arg_info")*num_args)
 			reg_function.SetArgInfo(new_arg_info + 1)
 			for i = 0; i < num_args; i++ {
-				if new_arg_info[i].GetType() > 0x3ff {
+				if ZEND_TYPE_IS_CLASS(new_arg_info[i].GetType()) {
 					var class_name *byte = (*byte)(new_arg_info[i].GetType())
 					var allow_null ZendBool = 0
 					var str *ZendString
@@ -3466,7 +3609,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 						allow_null = 1
 					}
 					str = ZendStringInitInterned(class_name, strlen(class_name), 1)
-					new_arg_info[i].SetType(uintptr_t(str) | g.Cond(allow_null != 0, 0x1, 0x0))
+					new_arg_info[i].SetType(ZEND_TYPE_ENCODE_CLASS(str, allow_null))
 				}
 			}
 		}
@@ -3477,42 +3620,42 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			 * a constructor already.
 			 */
 
-			if fname_len == class_name_len && ctor == nil && !(memcmp(lowercase_name.GetVal(), lc_class_name, class_name_len+1)) {
+			if fname_len == class_name_len && ctor == nil && !(memcmp(ZSTR_VAL(lowercase_name), lc_class_name, class_name_len+1)) {
 				ctor = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("\"serialize\"")-1 && !(memcmp(lowercase_name.GetVal(), "serialize", g.SizeOf("\"serialize\"")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, "serialize") {
 				serialize_func = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("\"unserialize\"")-1 && !(memcmp(lowercase_name.GetVal(), "unserialize", g.SizeOf("\"unserialize\"")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, "unserialize") {
 				unserialize_func = reg_function
-			} else if lowercase_name.GetVal()[0] != '_' || lowercase_name.GetVal()[1] != '_' {
+			} else if ZSTR_VAL(lowercase_name)[0] != '_' || ZSTR_VAL(lowercase_name)[1] != '_' {
 				reg_function = nil
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_CONSTRUCTOR_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__construct", g.SizeOf("ZEND_CONSTRUCTOR_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CONSTRUCTOR_FUNC_NAME) {
 				ctor = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__destruct", g.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_DESTRUCTOR_FUNC_NAME) {
 				dtor = reg_function
 				if internal_function.GetNumArgs() != 0 {
-					ZendError(error_type, "Destructor %s::%s() cannot take arguments", scope.GetName().GetVal(), ptr.GetFname())
+					ZendError(error_type, "Destructor %s::%s() cannot take arguments", ZSTR_VAL(scope.GetName()), ptr.GetFname())
 				}
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_CLONE_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__clone", g.SizeOf("ZEND_CLONE_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CLONE_FUNC_NAME) {
 				clone = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_CALL_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__call", g.SizeOf("ZEND_CALL_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CALL_FUNC_NAME) {
 				__call = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__callstatic", g.SizeOf("ZEND_CALLSTATIC_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_CALLSTATIC_FUNC_NAME) {
 				__callstatic = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__tostring", g.SizeOf("ZEND_TOSTRING_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_TOSTRING_FUNC_NAME) {
 				__tostring = reg_function
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_GET_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__get", g.SizeOf("ZEND_GET_FUNC_NAME")-1)) {
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_GET_FUNC_NAME) {
 				__get = reg_function
-				scope.SetCeFlags(scope.GetCeFlags() | 1<<11)
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_SET_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__set", g.SizeOf("ZEND_SET_FUNC_NAME")-1)) {
+				scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_USE_GUARDS)
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_SET_FUNC_NAME) {
 				__set = reg_function
-				scope.SetCeFlags(scope.GetCeFlags() | 1<<11)
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_UNSET_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__unset", g.SizeOf("ZEND_UNSET_FUNC_NAME")-1)) {
+				scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_USE_GUARDS)
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_UNSET_FUNC_NAME) {
 				__unset = reg_function
-				scope.SetCeFlags(scope.GetCeFlags() | 1<<11)
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_ISSET_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__isset", g.SizeOf("ZEND_ISSET_FUNC_NAME")-1)) {
+				scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_USE_GUARDS)
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_ISSET_FUNC_NAME) {
 				__isset = reg_function
-				scope.SetCeFlags(scope.GetCeFlags() | 1<<11)
-			} else if lowercase_name.GetLen() == g.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1 && !(memcmp(lowercase_name.GetVal(), "__debuginfo", g.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1)) {
+				scope.SetCeFlags(scope.GetCeFlags() | ZEND_ACC_USE_GUARDS)
+			} else if ZendStringEqualsLiteral(lowercase_name, ZEND_DEBUGINFO_FUNC_NAME) {
 				__debugInfo = reg_function
 			} else {
 				reg_function = nil
@@ -3527,14 +3670,14 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	}
 	if unload != 0 {
 		if scope != nil {
-			_efree((*byte)(lc_class_name))
+			Efree((*byte)(lc_class_name))
 		}
 		for ptr.GetFname() != nil {
 			fname_len = strlen(ptr.GetFname())
 			lowercase_name = ZendStringAlloc(fname_len, 0)
-			ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
+			ZendStrTolowerCopy(ZSTR_VAL(lowercase_name), ptr.GetFname(), fname_len)
 			if ZendHashExists(target_function_table, lowercase_name) != 0 {
-				ZendError(error_type, "Function registration failed - duplicate name - %s%s%s", g.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""), g.Cond(scope != nil, "::", ""), ptr.GetFname())
+				ZendError(error_type, "Function registration failed - duplicate name - %s%s%s", b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""), b.Cond(scope != nil, "::", ""), ptr.GetFname())
 			}
 			ZendStringEfree(lowercase_name)
 			ptr++
@@ -3557,82 +3700,82 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		scope.SetSerializeFunc(serialize_func)
 		scope.SetUnserializeFunc(unserialize_func)
 		if ctor != nil {
-			ctor.SetFnFlags(ctor.GetFnFlags() | 1<<28)
-			if (ctor.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Constructor %s::%s() cannot be static", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
+			ctor.SetFnFlags(ctor.GetFnFlags() | ZEND_ACC_CTOR)
+			if (ctor.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Constructor %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(ctor.GetFunctionName()))
 			}
-			ctor.SetFnFlags(ctor.GetFnFlags() &^ (1 << 17))
+			ctor.SetFnFlags(ctor.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if dtor != nil {
-			dtor.SetFnFlags(dtor.GetFnFlags() | 1<<29)
-			if (dtor.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Destructor %s::%s() cannot be static", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
+			dtor.SetFnFlags(dtor.GetFnFlags() | ZEND_ACC_DTOR)
+			if (dtor.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Destructor %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(dtor.GetFunctionName()))
 			}
-			dtor.SetFnFlags(dtor.GetFnFlags() &^ (1 << 17))
+			dtor.SetFnFlags(dtor.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if clone != nil {
-			if (clone.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "%s::%s() cannot be static", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
+			if (clone.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "%s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(clone.GetFunctionName()))
 			}
-			clone.SetFnFlags(clone.GetFnFlags() &^ (1 << 17))
+			clone.SetFnFlags(clone.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __call != nil {
-			if (__call.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __call.GetFunctionName().GetVal())
+			if (__call.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__call.GetFunctionName()))
 			}
-			__call.SetFnFlags(__call.GetFnFlags() &^ (1 << 17))
+			__call.SetFnFlags(__call.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __callstatic != nil {
-			if (__callstatic.GetFnFlags() & 1 << 4) == 0 {
-				ZendError(error_type, "Method %s::%s() must be static", scope.GetName().GetVal(), __callstatic.GetFunctionName().GetVal())
+			if (__callstatic.GetFnFlags() & ZEND_ACC_STATIC) == 0 {
+				ZendError(error_type, "Method %s::%s() must be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__callstatic.GetFunctionName()))
 			}
-			__callstatic.SetFnFlags(__callstatic.GetFnFlags() | 1<<4)
+			__callstatic.SetFnFlags(__callstatic.GetFnFlags() | ZEND_ACC_STATIC)
 		}
 		if __tostring != nil {
-			if (__tostring.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __tostring.GetFunctionName().GetVal())
+			if (__tostring.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__tostring.GetFunctionName()))
 			}
-			__tostring.SetFnFlags(__tostring.GetFnFlags() &^ (1 << 17))
+			__tostring.SetFnFlags(__tostring.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __get != nil {
-			if (__get.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __get.GetFunctionName().GetVal())
+			if (__get.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__get.GetFunctionName()))
 			}
-			__get.SetFnFlags(__get.GetFnFlags() &^ (1 << 17))
+			__get.SetFnFlags(__get.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __set != nil {
-			if (__set.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __set.GetFunctionName().GetVal())
+			if (__set.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__set.GetFunctionName()))
 			}
-			__set.SetFnFlags(__set.GetFnFlags() &^ (1 << 17))
+			__set.SetFnFlags(__set.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __unset != nil {
-			if (__unset.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __unset.GetFunctionName().GetVal())
+			if (__unset.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__unset.GetFunctionName()))
 			}
-			__unset.SetFnFlags(__unset.GetFnFlags() &^ (1 << 17))
+			__unset.SetFnFlags(__unset.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __isset != nil {
-			if (__isset.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __isset.GetFunctionName().GetVal())
+			if (__isset.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__isset.GetFunctionName()))
 			}
-			__isset.SetFnFlags(__isset.GetFnFlags() &^ (1 << 17))
+			__isset.SetFnFlags(__isset.GetFnFlags() &^ ZEND_ACC_ALLOW_STATIC)
 		}
 		if __debugInfo != nil {
-			if (__debugInfo.GetFnFlags() & 1 << 4) != 0 {
-				ZendError(error_type, "Method %s::%s() cannot be static", scope.GetName().GetVal(), __debugInfo.GetFunctionName().GetVal())
+			if (__debugInfo.GetFnFlags() & ZEND_ACC_STATIC) != 0 {
+				ZendError(error_type, "Method %s::%s() cannot be static", ZSTR_VAL(scope.GetName()), ZSTR_VAL(__debugInfo.GetFunctionName()))
 			}
 		}
-		if ctor != nil && (ctor.GetFnFlags()&1<<13) != 0 {
-			ZendErrorNoreturn(1<<4, "Constructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), ctor.GetFunctionName().GetVal())
+		if ctor != nil && (ctor.GetFnFlags()&ZEND_ACC_HAS_RETURN_TYPE) != 0 {
+			ZendErrorNoreturn(E_CORE_ERROR, "Constructor %s::%s() cannot declare a return type", ZSTR_VAL(scope.GetName()), ZSTR_VAL(ctor.GetFunctionName()))
 		}
-		if dtor != nil && (dtor.GetFnFlags()&1<<13) != 0 {
-			ZendErrorNoreturn(1<<4, "Destructor %s::%s() cannot declare a return type", scope.GetName().GetVal(), dtor.GetFunctionName().GetVal())
+		if dtor != nil && (dtor.GetFnFlags()&ZEND_ACC_HAS_RETURN_TYPE) != 0 {
+			ZendErrorNoreturn(E_CORE_ERROR, "Destructor %s::%s() cannot declare a return type", ZSTR_VAL(scope.GetName()), ZSTR_VAL(dtor.GetFunctionName()))
 		}
-		if clone != nil && (clone.GetFnFlags()&1<<13) != 0 {
-			ZendErrorNoreturn(1<<4, "%s::%s() cannot declare a return type", scope.GetName().GetVal(), clone.GetFunctionName().GetVal())
+		if clone != nil && (clone.GetFnFlags()&ZEND_ACC_HAS_RETURN_TYPE) != 0 {
+			ZendErrorNoreturn(E_CORE_ERROR, "%s::%s() cannot declare a return type", ZSTR_VAL(scope.GetName()), ZSTR_VAL(clone.GetFunctionName()))
 		}
-		_efree((*byte)(lc_class_name))
+		Efree((*byte)(lc_class_name))
 	}
 	return SUCCESS
 }
@@ -3646,7 +3789,7 @@ func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_t
 	var lowercase_name *ZendString
 	var fname_len int
 	if target_function_table == nil {
-		target_function_table = CG.GetFunctionTable()
+		target_function_table = CompilerGlobals.GetFunctionTable()
 	}
 	for ptr.GetFname() != nil {
 		if count != -1 && i >= count {
@@ -3654,7 +3797,7 @@ func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_t
 		}
 		fname_len = strlen(ptr.GetFname())
 		lowercase_name = ZendStringAlloc(fname_len, 0)
-		ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
+		ZendStrTolowerCopy(ZSTR_VAL(lowercase_name), ptr.GetFname(), fname_len)
 		ZendHashDel(target_function_table, lowercase_name)
 		ZendStringEfree(lowercase_name)
 		ptr++
@@ -3665,7 +3808,7 @@ func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_t
 /* }}} */
 
 func ZendStartupModule(module *ZendModuleEntry) int {
-	if g.Assign(&module, ZendRegisterInternalModule(module)) != nil && ZendStartupModuleEx(module) == SUCCESS {
+	if b.Assign(&module, ZendRegisterInternalModule(module)) != nil && ZendStartupModuleEx(module) == SUCCESS {
 		return SUCCESS
 	}
 	return FAILURE
@@ -3686,25 +3829,25 @@ func ZendGetModuleStarted(module_name *byte) int {
 /* }}} */
 
 func CleanModuleClass(el *Zval, arg any) int {
-	var ce *ZendClassEntry = (*ZendClassEntry)(el.GetValue().GetPtr())
+	var ce *ZendClassEntry = (*ZendClassEntry)(Z_PTR_P(el))
 	var module_number int = *((*int)(arg))
-	if ce.GetType() == 1 && ce.GetModule().GetModuleNumber() == module_number {
-		return 1 << 0
+	if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetModule().GetModuleNumber() == module_number {
+		return ZEND_HASH_APPLY_REMOVE
 	} else {
-		return 0
+		return ZEND_HASH_APPLY_KEEP
 	}
 }
 
 /* }}} */
 
 func CleanModuleClasses(module_number int) {
-	ZendHashApplyWithArgument(EG.GetClassTable(), CleanModuleClass, any(&module_number))
+	ZendHashApplyWithArgument(ExecutorGlobals.GetClassTable(), CleanModuleClass, any(&module_number))
 }
 
 /* }}} */
 
 func ModuleDestructor(module *ZendModuleEntry) {
-	if module.GetType() == 2 {
+	if module.GetType() == MODULE_TEMPORARY {
 		ZendCleanModuleRsrcDtors(module.GetModuleNumber())
 		CleanModuleConstants(module.GetModuleNumber())
 		CleanModuleClasses(module.GetModuleNumber())
@@ -3712,7 +3855,7 @@ func ModuleDestructor(module *ZendModuleEntry) {
 	if module.GetModuleStarted() != 0 && module.GetModuleShutdownFunc() != nil {
 		module.GetModuleShutdownFunc()(module.GetType(), module.GetModuleNumber())
 	}
-	if module.GetModuleStarted() != 0 && module.GetModuleShutdownFunc() == nil && module.GetType() == 2 {
+	if module.GetModuleStarted() != 0 && module.GetModuleShutdownFunc() == nil && module.GetType() == MODULE_TEMPORARY {
 		ZendUnregisterIniEntries(module.GetModuleNumber())
 	}
 
@@ -3724,11 +3867,11 @@ func ModuleDestructor(module *ZendModuleEntry) {
 		}
 	}
 	module.SetModuleStarted(0)
-	if module.GetType() == 2 && module.GetFunctions() != nil {
+	if module.GetType() == MODULE_TEMPORARY && module.GetFunctions() != nil {
 		ZendUnregisterFunctions(module.GetFunctions(), -1, nil)
 	}
 	if module.GetHandle() && !(getenv("ZEND_DONT_UNLOAD_MODULES")) {
-		dlclose(module.GetHandle())
+		DL_UNLOAD(module.GetHandle())
 	}
 }
 
@@ -3739,7 +3882,7 @@ func ZendActivateModules() {
 	for (*p) != nil {
 		var module *ZendModuleEntry = *p
 		if module.GetRequestStartupFunc()(module.GetType(), module.GetModuleNumber()) == FAILURE {
-			ZendError(1<<1, "request_startup() for %s module failed", module.GetName())
+			ZendError(E_WARNING, "request_startup() for %s module failed", module.GetName())
 			exit(1)
 		}
 		p++
@@ -3749,12 +3892,12 @@ func ZendActivateModules() {
 /* }}} */
 
 func ZendDeactivateModules() {
-	EG.SetCurrentExecuteData(nil)
-	var __orig_bailout *sigjmp_buf = EG.GetBailout()
-	var __bailout sigjmp_buf
-	EG.SetBailout(&__bailout)
-	if sigsetjmp(__bailout, 0) == 0 {
-		if EG.GetFullTablesCleanup() != 0 {
+	ExecutorGlobals.SetCurrentExecuteData(nil)
+	var __orig_bailout *JMP_BUF = ExecutorGlobals.GetBailout()
+	var __bailout JMP_BUF
+	ExecutorGlobals.SetBailout(&__bailout)
+	if SETJMP(__bailout) == 0 {
+		if ExecutorGlobals.GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
 			for {
 				var __ht *HashTable = &ModuleRegistry
@@ -3765,10 +3908,10 @@ func ZendDeactivateModules() {
 					_p--
 					_z = &_p.val
 
-					if _z.GetType() == 0 {
+					if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 						continue
 					}
-					module = _z.GetValue().GetPtr()
+					module = Z_PTR_P(_z)
 					if module.GetRequestShutdownFunc() != nil {
 						module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
 					}
@@ -3784,7 +3927,7 @@ func ZendDeactivateModules() {
 			}
 		}
 	}
-	EG.SetBailout(__orig_bailout)
+	ExecutorGlobals.SetBailout(__orig_bailout)
 }
 
 /* }}} */
@@ -3800,7 +3943,7 @@ func ZendCleanupInternalClasses() {
 /* }}} */
 
 func ZendPostDeactivateModules() {
-	if EG.GetFullTablesCleanup() != 0 {
+	if ExecutorGlobals.GetFullTablesCleanup() != 0 {
 		var module *ZendModuleEntry
 		var zv *Zval
 		var key *ZendString
@@ -3811,10 +3954,10 @@ func ZendPostDeactivateModules() {
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
-				module = _z.GetValue().GetPtr()
+				module = Z_PTR_P(_z)
 				if module.GetPostDeactivateFunc() != nil {
 					module.GetPostDeactivateFunc()()
 				}
@@ -3830,19 +3973,32 @@ func ZendPostDeactivateModules() {
 				_p--
 				_z = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
 				key = _p.GetKey()
 				zv = _z
-				module = zv.GetValue().GetPtr()
-				if module.GetType() != 2 {
+				module = Z_PTR_P(zv)
+				if module.GetType() != MODULE_TEMPORARY {
 					break
 				}
 				ModuleDestructor(module)
 				Free(module)
 				ZendStringReleaseEx(key, 0)
-				ZEND_HASH_FOREACH_END_DEL_ITEM(__ht, _idx, _p)
+				__ht.GetNNumOfElements()--
+				var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
+				var i uint32 = HT_HASH(__ht, nIndex)
+				if UNEXPECTED(j != i) {
+					var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
+					for Z_NEXT(prev.GetVal()) != j {
+						i = Z_NEXT(prev.GetVal())
+						prev = HT_HASH_TO_BUCKET(__ht, i)
+					}
+					Z_NEXT(prev.GetVal()) = Z_NEXT(_p.GetVal())
+				} else {
+					HT_HASH(__ht, nIndex) = Z_NEXT(_p.GetVal())
+				}
 			}
 			__ht.SetNNumUsed(_idx)
 			break
@@ -3860,25 +4016,25 @@ func ZendPostDeactivateModules() {
 /* }}} */
 
 func ZendNextFreeModule() int {
-	return &ModuleRegistry.GetNNumOfElements() + 1
+	return ZendHashNumElements(&ModuleRegistry) + 1
 }
 
 /* }}} */
 
 func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) *ZendClassEntry {
-	var class_entry *ZendClassEntry = Malloc(g.SizeOf("zend_class_entry"))
+	var class_entry *ZendClassEntry = Malloc(b.SizeOf("zend_class_entry"))
 	var lowercase_name *ZendString
 	*class_entry = *orig_class_entry
-	class_entry.SetType(1)
+	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
-	class_entry.SetCeFlags(ce_flags | 1<<12 | 1<<3 | 1<<19 | 1<<20)
-	class_entry.SetModule(EG.GetCurrentModule())
+	class_entry.SetCeFlags(ce_flags | ZEND_ACC_CONSTANTS_UPDATED | ZEND_ACC_LINKED | ZEND_ACC_RESOLVED_PARENT | ZEND_ACC_RESOLVED_INTERFACES)
+	class_entry.SetModule(ExecutorGlobals.GetCurrentModule())
 	if class_entry.GetBuiltinFunctions() != nil {
-		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), &class_entry.function_table, EG.GetCurrentModule().GetType())
+		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), &class_entry.function_table, ExecutorGlobals.GetCurrentModule().GetType())
 	}
-	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG.GetCurrentModule().GetType() == 1)
+	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), ExecutorGlobals.GetCurrentModule().GetType() == MODULE_PERSISTENT)
 	lowercase_name = ZendNewInternedString(lowercase_name)
-	ZendHashUpdatePtr(CG.GetClassTable(), lowercase_name, class_entry)
+	ZendHashUpdatePtr(CompilerGlobals.GetClassTable(), lowercase_name, class_entry)
 	ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
@@ -3889,7 +4045,7 @@ func ZendRegisterInternalClassEx(class_entry *ZendClassEntry, parent_ce *ZendCla
 	var register_class *ZendClassEntry
 	register_class = ZendRegisterInternalClass(class_entry)
 	if parent_ce != nil {
-		ZendDoInheritanceEx(register_class, parent_ce, 0)
+		ZendDoInheritance(register_class, parent_ce)
 		ZendBuildPropertiesInfoTable(register_class)
 	}
 	return register_class
@@ -3901,7 +4057,7 @@ func ZendClassImplements(class_entry *ZendClassEntry, num_interfaces int, _ ...a
 	var interface_entry *ZendClassEntry
 	var interface_list va_list
 	va_start(interface_list, num_interfaces)
-	for g.PostDec(&num_interfaces) {
+	for b.PostDec(&num_interfaces) {
 		interface_entry = __va_arg(interface_list, (*ZendClassEntry)(_))
 		ZendDoImplementInterface(class_entry, interface_entry)
 	}
@@ -3917,7 +4073,7 @@ func ZendRegisterInternalClass(orig_class_entry *ZendClassEntry) *ZendClassEntry
 /* }}} */
 
 func ZendRegisterInternalInterface(orig_class_entry *ZendClassEntry) *ZendClassEntry {
-	return DoRegisterInternalClass(orig_class_entry, 1<<0)
+	return DoRegisterInternalClass(orig_class_entry, ZEND_ACC_INTERFACE)
 }
 
 /* }}} */
@@ -3929,24 +4085,23 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 
 	/* TODO: Move this out of here in 7.4. */
 
-	if persistent != 0 && EG.GetCurrentModule() != nil && EG.GetCurrentModule().GetType() == 2 {
+	if persistent != 0 && ExecutorGlobals.GetCurrentModule() != nil && ExecutorGlobals.GetCurrentModule().GetType() == MODULE_TEMPORARY {
 		persistent = 0
 	}
 	if name[0] == '\\' {
 		lcname = ZendStringAlloc(name_len-1, persistent)
-		ZendStrTolowerCopy(lcname.GetVal(), name+1, name_len-1)
+		ZendStrTolowerCopy(ZSTR_VAL(lcname), name+1, name_len-1)
 	} else {
 		lcname = ZendStringAlloc(name_len, persistent)
-		ZendStrTolowerCopy(lcname.GetVal(), name, name_len)
+		ZendStrTolowerCopy(ZSTR_VAL(lcname), name, name_len)
 	}
 	ZendAssertValidClassName(lcname)
 	lcname = ZendNewInternedString(lcname)
-	&zv.GetValue().SetPtr(ce)
-	&zv.SetTypeInfo(15)
-	ret = ZendHashAdd(CG.GetClassTable(), lcname, &zv)
+	ZVAL_ALIAS_PTR(&zv, ce)
+	ret = ZendHashAdd(CompilerGlobals.GetClassTable(), lcname, &zv)
 	ZendStringReleaseEx(lcname, 0)
 	if ret != nil {
-		if (ce.GetCeFlags() & 1 << 7) == 0 {
+		if (ce.GetCeFlags() & ZEND_ACC_IMMUTABLE) == 0 {
 			ce.GetRefcount()++
 		}
 		return SUCCESS
@@ -3963,29 +4118,13 @@ func ZendSetHashSymbol(symbol *Zval, name *byte, name_length int, is_ref ZendBoo
 		return FAILURE
 	}
 	if is_ref != 0 {
-		var __zv *Zval = symbol
-		if __zv.GetType() != 10 {
-			var _ref *ZendReference = (*ZendReference)(_emalloc(g.SizeOf("zend_reference")))
-			ZendGcSetRefcount(&_ref.gc, 1)
-			_ref.GetGc().SetTypeInfo(10)
-			var _z1 *Zval = &_ref.val
-			var _z2 *Zval = __zv
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
-			_ref.GetSources().SetPtr(nil)
-			__zv.GetValue().SetRef(_ref)
-			__zv.SetTypeInfo(10 | 1<<0<<8)
-		}
+		ZVAL_MAKE_REF(symbol)
 	}
 	va_start(symbol_table_list, num_symbol_tables)
-	for g.PostDec(&num_symbol_tables) > 0 {
+	for b.PostDec(&num_symbol_tables) > 0 {
 		symbol_table = __va_arg(symbol_table_list, (*HashTable)(_))
 		ZendHashStrUpdate(symbol_table, name, name_length, symbol)
-		if symbol.GetTypeFlags() != 0 {
-			ZvalAddrefP(symbol)
-		}
+		Z_TRY_ADDREF_P(symbol)
 	}
 	va_end(symbol_table_list)
 	return SUCCESS
@@ -3994,16 +4133,16 @@ func ZendSetHashSymbol(symbol *Zval, name *byte, name_length int, is_ref ZendBoo
 /* }}} */
 
 func ZifDisplayDisabledFunction(execute_data *ZendExecuteData, return_value *Zval) {
-	ZendError(1<<1, "%s() has been disabled for security reasons", GetActiveFunctionName())
+	ZendError(E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 
 /* }}} */
 
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *ZendInternalFunction
-	if g.Assign(&func_, ZendHashStrFindPtr(CG.GetFunctionTable(), function_name, function_name_length)) {
+	if b.Assign(&func_, ZendHashStrFindPtr(CompilerGlobals.GetFunctionTable(), function_name, function_name_length)) {
 		ZendFreeInternalArgInfo(func_)
-		func_.SetFnFlags(func_.GetFnFlags() &^ (1<<14 | 1<<8 | 1<<13))
+		func_.SetFnFlags(func_.GetFnFlags() &^ (ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE))
 		func_.SetNumArgs(0)
 		func_.SetArgInfo(nil)
 		func_.SetHandler(ZifDisplayDisabledFunction)
@@ -4020,18 +4159,18 @@ func DisplayDisabledClass(class_type *ZendClassEntry) *ZendObject {
 
 	/* Initialize default properties */
 
-	if class_type.GetDefaultPropertiesCount() != 0 {
+	if EXPECTED(class_type.GetDefaultPropertiesCount() != 0) {
 		var p *Zval = intern.GetPropertiesTable()
 		var end *Zval = p + class_type.GetDefaultPropertiesCount()
 		for {
-			p.SetTypeInfo(0)
+			ZVAL_UNDEF(p)
 			p++
 			if p == end {
 				break
 			}
 		}
 	}
-	ZendError(1<<1, "%s() has been disabled for security reasons", class_type.GetName().GetVal())
+	ZendError(E_WARNING, "%s() has been disabled for security reasons", ZSTR_VAL(class_type.GetName()))
 	return intern
 }
 
@@ -4044,40 +4183,13 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	var key *ZendString
 	var fn *ZendFunction
 	key = ZendStringAlloc(class_name_length, 0)
-	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
-	disabled_class = ZendHashFindPtr(CG.GetClassTable(), key)
+	ZendStrTolowerCopy(ZSTR_VAL(key), class_name, class_name_length)
+	disabled_class = ZendHashFindPtr(CompilerGlobals.GetClassTable(), key)
 	ZendStringReleaseEx(key, 0)
 	if disabled_class == nil {
 		return FAILURE
 	}
-	disabled_class.SetConstructor(nil)
-	disabled_class.SetDestructor(nil)
-	disabled_class.SetClone(nil)
-	disabled_class.SetSerialize(nil)
-	disabled_class.SetUnserialize(nil)
-	disabled_class.create_object = nil
-	disabled_class.SetGetStaticMethod(nil)
-	disabled_class.SetCall(nil)
-	disabled_class.SetCallstatic(nil)
-	disabled_class.SetTostring(nil)
-	disabled_class.SetGet(nil)
-	disabled_class.SetSet(nil)
-	disabled_class.SetUnset(nil)
-	disabled_class.SetIsset(nil)
-	disabled_class.SetDebugInfo(nil)
-	disabled_class.SetSerializeFunc(nil)
-	disabled_class.SetUnserializeFunc(nil)
-	disabled_class.parent = nil
-	disabled_class.SetNumInterfaces(0)
-	disabled_class.SetTraitNames(nil)
-	disabled_class.SetNumTraits(0)
-	disabled_class.SetTraitAliases(nil)
-	disabled_class.SetTraitPrecedences(nil)
-	disabled_class.interfaces = nil
-	disabled_class.SetGetIterator(nil)
-	disabled_class.SetIteratorFuncsPtr(nil)
-	disabled_class.SetModule(nil)
-	disabled_class.SetBuiltinFunctions(DisabledClassNew)
+	INIT_CLASS_ENTRY_INIT_METHODS(*disabled_class, DisabledClassNew)
 	disabled_class.create_object = DisplayDisabledClass
 	for {
 		var __ht *HashTable = &disabled_class.function_table
@@ -4086,11 +4198,11 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
-			fn = _z.GetValue().GetPtr()
-			if (fn.GetFnFlags()&(1<<13|1<<8)) != 0 && fn.GetScope() == disabled_class {
+			fn = Z_PTR_P(_z)
+			if (fn.GetFnFlags()&(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS)) != 0 && fn.GetScope() == disabled_class {
 				ZendFreeInternalArgInfo(&fn.internal_function)
 			}
 		}
@@ -4105,71 +4217,67 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *ZendFcallInfoCache, strict_class *int, error **byte) int {
 	var ret int = 0
 	var ce *ZendClassEntry
-	var name_len int = name.GetLen()
+	var name_len int = ZSTR_LEN(name)
 	var lcname *ZendString
-	lcname = (*ZendString)(_emalloc(zend_long((*byte)(&((*ZendString)(nil).GetVal()))-(*byte)(nil)) + name_len + 1 + (8-1) & ^(8-1)))
-	ZendGcSetRefcount(&lcname.gc, 1)
-	lcname.GetGc().SetTypeInfo(6)
-	lcname.SetH(0)
-	lcname.SetLen(name_len)
-	ZendStrTolowerCopy(lcname.GetVal(), name.GetVal(), name_len)
+	ZSTR_ALLOCA_ALLOC(lcname, name_len, use_heap)
+	ZendStrTolowerCopy(ZSTR_VAL(lcname), ZSTR_VAL(name), name_len)
 	*strict_class = 0
-	if lcname.GetLen() == g.SizeOf("\"self\"")-1 && !(memcmp(lcname.GetVal(), "self", g.SizeOf("\"self\"")-1)) {
+	if ZendStringEqualsLiteral(lcname, "self") {
 		if scope == nil {
 			if error != nil {
-				*error = _estrdup("cannot access self:: when no class scope is active")
+				*error = Estrdup("cannot access self:: when no class scope is active")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(EG.GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
 				fcc.SetCalledScope(scope)
 			}
 			fcc.SetCallingScope(scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG.GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData()))
 			}
 			ret = 1
 		}
-	} else if lcname.GetLen() == g.SizeOf("\"parent\"")-1 && !(memcmp(lcname.GetVal(), "parent", g.SizeOf("\"parent\"")-1)) {
+	} else if ZendStringEqualsLiteral(lcname, "parent") {
 		if scope == nil {
 			if error != nil {
-				*error = _estrdup("cannot access parent:: when no class scope is active")
+				*error = Estrdup("cannot access parent:: when no class scope is active")
 			}
 		} else if !(scope.parent) {
 			if error != nil {
-				*error = _estrdup("cannot access parent:: when current class scope has no parent")
+				*error = Estrdup("cannot access parent:: when current class scope has no parent")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(EG.GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.parent) == 0 {
 				fcc.SetCalledScope(scope.parent)
 			}
 			fcc.SetCallingScope(scope.parent)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG.GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
-	} else if lcname.GetLen() == g.SizeOf("\"static\"")-1 && !(memcmp(lcname.GetVal(), "static", g.SizeOf("\"static\"")-1)) {
-		var called_scope *ZendClassEntry = ZendGetCalledScope(EG.GetCurrentExecuteData())
+	} else if ZendStringEqualsLiteral(lcname, "static") {
+		var called_scope *ZendClassEntry = ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData())
 		if called_scope == nil {
 			if error != nil {
-				*error = _estrdup("cannot access static:: when no class scope is active")
+				*error = Estrdup("cannot access static:: when no class scope is active")
 			}
 		} else {
 			fcc.SetCalledScope(called_scope)
 			fcc.SetCallingScope(called_scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG.GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
-	} else if g.Assign(&ce, ZendLookupClass(name)) != nil {
+	} else if b.Assign(&ce, ZendLookupClass(name)) != nil {
 		var scope *ZendClassEntry
-		var ex *ZendExecuteData = EG.GetCurrentExecuteData()
-		for ex != nil && (ex.GetFunc() == nil || (ex.GetFunc().GetType()&1) != 0) {
+		var ex *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
+		for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 			ex = ex.GetPrevExecuteData()
 		}
 		if ex != nil {
@@ -4179,7 +4287,7 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 		}
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
-			var object *ZendObject = ZendGetThisObject(EG.GetCurrentExecuteData())
+			var object *ZendObject = ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData())
 			if object != nil && InstanceofFunction(object.GetCe(), scope) != 0 && InstanceofFunction(scope, ce) != 0 {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
@@ -4197,25 +4305,21 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 		ret = 1
 	} else {
 		if error != nil {
-			ZendSpprintf(error, 0, "class '%.*s' not found", int(name_len), name.GetVal())
+			ZendSpprintf(error, 0, "class '%.*s' not found", int(name_len), ZSTR_VAL(name))
 		}
 	}
-	_efree(lcname)
+	ZSTR_ALLOCA_FREE(lcname, use_heap)
 	return ret
 }
 
 /* }}} */
 
 func ZendReleaseFcallInfoCache(fcc *ZendFcallInfoCache) {
-	if fcc.GetFunctionHandler() != nil && ((fcc.GetFunctionHandler().GetFnFlags()&1<<18) != 0 || fcc.GetFunctionHandler().GetType() == 5 || fcc.GetFunctionHandler().GetType() == 3) {
-		if fcc.GetFunctionHandler().GetType() != 3 && fcc.GetFunctionHandler().GetFunctionName() != nil {
+	if fcc.GetFunctionHandler() != nil && ((fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_CALL_VIA_TRAMPOLINE) != 0 || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY || fcc.GetFunctionHandler().GetType() == ZEND_OVERLOADED_FUNCTION) {
+		if fcc.GetFunctionHandler().GetType() != ZEND_OVERLOADED_FUNCTION && fcc.GetFunctionHandler().GetFunctionName() != nil {
 			ZendStringReleaseEx(fcc.GetFunctionHandler().GetFunctionName(), 0)
 		}
-		if fcc.GetFunctionHandler() == &EG.trampoline {
-			EG.GetTrampoline().SetFunctionName(nil)
-		} else {
-			_efree(fcc.GetFunctionHandler())
-		}
+		ZendFreeTrampoline(fcc.GetFunctionHandler())
 	}
 	fcc.SetFunctionHandler(nil)
 }
@@ -4239,33 +4343,25 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
 
-		if callable.GetValue().GetStr().GetVal()[0] == '\\' {
+		if UNEXPECTED(Z_STRVAL_P(callable)[0] == '\\') {
 
 			/* Skip leading \ */
 
-			lmname = (*ZendString)(_emalloc(zend_long((*byte)(&((*ZendString)(nil).GetVal()))-(*byte)(nil)) + callable.GetValue().GetStr().GetLen() - 1 + 1 + (8-1) & ^(8-1)))
-			ZendGcSetRefcount(&lmname.gc, 1)
-			lmname.GetGc().SetTypeInfo(6)
-			lmname.SetH(0)
-			lmname.SetLen(callable.GetValue().GetStr().GetLen() - 1)
-			ZendStrTolowerCopy(lmname.GetVal(), callable.GetValue().GetStr().GetVal()+1, callable.GetValue().GetStr().GetLen()-1)
+			ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable)-1, use_heap)
+			ZendStrTolowerCopy(ZSTR_VAL(lmname), Z_STRVAL_P(callable)+1, Z_STRLEN_P(callable)-1)
 			func_ = ZendFetchFunction(lmname)
-			_efree(lmname)
+			ZSTR_ALLOCA_FREE(lmname, use_heap)
 		} else {
-			lmname = callable.GetValue().GetStr()
+			lmname = Z_STR_P(callable)
 			func_ = ZendFetchFunction(lmname)
 			if func_ == nil {
-				lmname = (*ZendString)(_emalloc(zend_long((*byte)(&((*ZendString)(nil).GetVal()))-(*byte)(nil)) + callable.GetValue().GetStr().GetLen() + 1 + (8-1) & ^(8-1)))
-				ZendGcSetRefcount(&lmname.gc, 1)
-				lmname.GetGc().SetTypeInfo(6)
-				lmname.SetH(0)
-				lmname.SetLen(callable.GetValue().GetStr().GetLen())
-				ZendStrTolowerCopy(lmname.GetVal(), callable.GetValue().GetStr().GetVal(), callable.GetValue().GetStr().GetLen())
+				ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable), use_heap)
+				ZendStrTolowerCopy(ZSTR_VAL(lmname), Z_STRVAL_P(callable), Z_STRLEN_P(callable))
 				func_ = ZendFetchFunction(lmname)
-				_efree(lmname)
+				ZSTR_ALLOCA_FREE(lmname, use_heap)
 			}
 		}
-		if func_ != nil {
+		if EXPECTED(func_ != nil) {
 			fcc.SetFunctionHandler(func_)
 			return 1
 		}
@@ -4273,14 +4369,14 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 
 	/* Split name into class/namespace and method/function names */
 
-	if g.Assign(&colon, ZendMemrchr(callable.GetValue().GetStr().GetVal(), ':', callable.GetValue().GetStr().GetLen())) != nil && colon > callable.GetValue().GetStr().GetVal() && (*(colon - 1)) == ':' {
+	if b.Assign(&colon, ZendMemrchr(Z_STRVAL_P(callable), ':', Z_STRLEN_P(callable))) != nil && colon > Z_STRVAL_P(callable) && (*(colon - 1)) == ':' {
 		var mlen int
 		colon--
-		clen = colon - callable.GetValue().GetStr().GetVal()
-		mlen = callable.GetValue().GetStr().GetLen() - clen - 2
-		if colon == callable.GetValue().GetStr().GetVal() {
+		clen = colon - Z_STRVAL_P(callable)
+		mlen = Z_STRLEN_P(callable) - clen - 2
+		if colon == Z_STRVAL_P(callable) {
 			if error != nil {
-				*error = _estrdup("invalid function name")
+				*error = Estrdup("invalid function name")
 			}
 			return 0
 		}
@@ -4293,7 +4389,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		} else {
 			scope = ZendGetExecutedScope()
 		}
-		cname = ZendStringInit(callable.GetValue().GetStr().GetVal(), clen, 0)
+		cname = ZendStringInit(Z_STRVAL_P(callable), clen, 0)
 		if ZendIsCallableCheckClass(cname, scope, fcc, &strict_class, error) == 0 {
 			ZendStringReleaseEx(cname, 0)
 			return 0
@@ -4302,16 +4398,16 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		ftable = &fcc.calling_scope.GetFunctionTable()
 		if ce_org != nil && InstanceofFunction(ce_org, fcc.GetCallingScope()) == 0 {
 			if error != nil {
-				ZendSpprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org.GetName().GetVal(), fcc.GetCallingScope().GetName().GetVal())
+				ZendSpprintf(error, 0, "class '%s' is not a subclass of '%s'", ZSTR_VAL(ce_org.GetName()), ZSTR_VAL(fcc.GetCallingScope().GetName()))
 			}
 			return 0
 		}
-		mname = ZendStringInit(callable.GetValue().GetStr().GetVal()+clen+2, mlen, 0)
+		mname = ZendStringInit(Z_STRVAL_P(callable)+clen+2, mlen, 0)
 	} else if ce_org != nil {
 
 		/* Try to fetch find static method of given class. */
 
-		mname = callable.GetValue().GetStr()
+		mname = Z_STR_P(callable)
 		ZendStringAddref(mname)
 		ftable = &ce_org.function_table
 		fcc.SetCallingScope(ce_org)
@@ -4319,36 +4415,36 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 
 		/* We already checked for plain function before. */
 
-		if error != nil && (check_flags&1<<3) == 0 {
-			ZendSpprintf(error, 0, "function '%s' not found or invalid function name", callable.GetValue().GetStr().GetVal())
+		if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
+			ZendSpprintf(error, 0, "function '%s' not found or invalid function name", Z_STRVAL_P(callable))
 		}
 		return 0
 	}
-	lmname = ZendStringTolowerEx(mname, 0)
-	if strict_class != 0 && fcc.GetCallingScope() != nil && (lmname.GetLen() == g.SizeOf("ZEND_CONSTRUCTOR_FUNC_NAME")-1 && !(memcmp(lmname.GetVal(), "__construct", g.SizeOf("ZEND_CONSTRUCTOR_FUNC_NAME")-1))) {
+	lmname = ZendStringTolower(mname)
+	if strict_class != 0 && fcc.GetCallingScope() != nil && ZendStringEqualsLiteral(lmname, ZEND_CONSTRUCTOR_FUNC_NAME) {
 		fcc.SetFunctionHandler(fcc.GetCallingScope().GetConstructor())
 		if fcc.GetFunctionHandler() != nil {
 			retval = 1
 		}
-	} else if g.Assign(&zv, ZendHashFind(ftable, lmname)) != nil {
-		fcc.SetFunctionHandler(zv.GetValue().GetPtr())
+	} else if b.Assign(&zv, ZendHashFind(ftable, lmname)) != nil {
+		fcc.SetFunctionHandler(Z_PTR_P(zv))
 		retval = 1
-		if (fcc.GetFunctionHandler().GetOpArray().GetFnFlags()&1<<3) != 0 && strict_class == 0 {
+		if (fcc.GetFunctionHandler().GetOpArray().GetFnFlags()&ZEND_ACC_CHANGED) != 0 && strict_class == 0 {
 			scope = ZendGetExecutedScope()
 			if scope != nil && InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
 				zv = ZendHashFind(&scope.function_table, lmname)
 				if zv != nil {
-					var priv_fbc *ZendFunction = zv.GetValue().GetPtr()
-					if (priv_fbc.GetFnFlags()&1<<2) != 0 && priv_fbc.GetScope() == scope {
+					var priv_fbc *ZendFunction = Z_PTR_P(zv)
+					if (priv_fbc.GetFnFlags()&ZEND_ACC_PRIVATE) != 0 && priv_fbc.GetScope() == scope {
 						fcc.SetFunctionHandler(priv_fbc)
 					}
 				}
 			}
 		}
-		if (fcc.GetFunctionHandler().GetFnFlags()&1<<0) == 0 && (check_flags&1<<1) == 0 && (fcc.GetCallingScope() != nil && (fcc.GetObject() != nil && fcc.GetCallingScope().GetCall() != nil || fcc.GetObject() == nil && fcc.GetCallingScope().GetCallstatic() != nil)) {
+		if (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_PUBLIC) == 0 && (check_flags&IS_CALLABLE_CHECK_NO_ACCESS) == 0 && (fcc.GetCallingScope() != nil && (fcc.GetObject() != nil && fcc.GetCallingScope().GetCall() != nil || fcc.GetObject() == nil && fcc.GetCallingScope().GetCallstatic() != nil)) {
 			scope = ZendGetExecutedScope()
 			if fcc.GetFunctionHandler().GetScope() != scope {
-				if (fcc.GetFunctionHandler().GetFnFlags()&1<<2) != 0 || ZendCheckProtected(g.CondF(fcc.GetFunctionHandler().GetPrototype() != nil, func() *ZendClassEntry { return fcc.GetFunctionHandler().GetPrototype().GetScope() }, func() *ZendClassEntry { return fcc.GetFunctionHandler().GetScope() }), scope) == 0 {
+				if (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_PRIVATE) != 0 || ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) == 0 {
 					retval = 0
 					fcc.SetFunctionHandler(nil)
 					goto get_function_via_handler
@@ -4369,7 +4465,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 						ZendReleaseFcallInfoCache(fcc)
 					} else {
 						retval = 1
-						call_via_handler = (fcc.GetFunctionHandler().GetFnFlags() & 1 << 18) != 0
+						call_via_handler = (fcc.GetFunctionHandler().GetFnFlags() & ZEND_ACC_CALL_VIA_TRAMPOLINE) != 0
 					}
 				}
 			}
@@ -4381,9 +4477,9 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 			}
 			if fcc.GetFunctionHandler() != nil {
 				retval = 1
-				call_via_handler = (fcc.GetFunctionHandler().GetFnFlags() & 1 << 18) != 0
+				call_via_handler = (fcc.GetFunctionHandler().GetFnFlags() & ZEND_ACC_CALL_VIA_TRAMPOLINE) != 0
 				if call_via_handler != 0 && fcc.GetObject() == nil {
-					var object *ZendObject = ZendGetThisObject(EG.GetCurrentExecuteData())
+					var object *ZendObject = ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData())
 					if object != nil && InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
 						fcc.SetObject(object)
 					}
@@ -4393,63 +4489,63 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 	}
 	if retval != 0 {
 		if fcc.GetCallingScope() != nil && call_via_handler == 0 {
-			if (fcc.GetFunctionHandler().GetFnFlags() & 1 << 6) != 0 {
+			if (fcc.GetFunctionHandler().GetFnFlags() & ZEND_ACC_ABSTRACT) != 0 {
 				retval = 0
 				if error != nil {
-					ZendSpprintf(error, 0, "cannot call abstract method %s::%s()", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+					ZendSpprintf(error, 0, "cannot call abstract method %s::%s()", ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(fcc.GetFunctionHandler().GetFunctionName()))
 				}
-			} else if fcc.GetObject() == nil && (fcc.GetFunctionHandler().GetFnFlags()&1<<4) == 0 {
+			} else if fcc.GetObject() == nil && (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_STATIC) == 0 {
 				var severity int
 				var verb *byte
-				if (fcc.GetFunctionHandler().GetFnFlags() & 1 << 17) != 0 {
-					severity = 1 << 13
+				if (fcc.GetFunctionHandler().GetFnFlags() & ZEND_ACC_ALLOW_STATIC) != 0 {
+					severity = E_DEPRECATED
 					verb = "should not"
 				} else {
 
 					/* An internal function assumes $this is present and won't check that. So PHP would crash by allowing the call. */
 
-					severity = 1 << 0
+					severity = E_ERROR
 					verb = "cannot"
 				}
-				if (check_flags & 1 << 2) != 0 {
+				if (check_flags & IS_CALLABLE_CHECK_IS_STATIC) != 0 {
 					retval = 0
 				}
 				if error != nil {
-					ZendSpprintf(error, 0, "non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
-					if severity != 1<<13 {
+					ZendSpprintf(error, 0, "non-static method %s::%s() %s be called statically", ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(fcc.GetFunctionHandler().GetFunctionName()), verb)
+					if severity != E_DEPRECATED {
 						retval = 0
 					}
 				} else if retval != 0 {
-					if severity == 1<<0 {
-						ZendThrowError(nil, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+					if severity == E_ERROR {
+						ZendThrowError(nil, "Non-static method %s::%s() %s be called statically", ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(fcc.GetFunctionHandler().GetFunctionName()), verb)
 					} else {
-						ZendError(severity, "Non-static method %s::%s() %s be called statically", fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal(), verb)
+						ZendError(severity, "Non-static method %s::%s() %s be called statically", ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(fcc.GetFunctionHandler().GetFunctionName()), verb)
 					}
 				}
 			}
-			if retval != 0 && (fcc.GetFunctionHandler().GetFnFlags()&1<<0) == 0 && (check_flags&1<<1) == 0 {
+			if retval != 0 && (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_PUBLIC) == 0 && (check_flags&IS_CALLABLE_CHECK_NO_ACCESS) == 0 {
 				scope = ZendGetExecutedScope()
 				if fcc.GetFunctionHandler().GetScope() != scope {
-					if (fcc.GetFunctionHandler().GetFnFlags()&1<<2) != 0 || ZendCheckProtected(g.CondF(fcc.GetFunctionHandler().GetPrototype() != nil, func() *ZendClassEntry { return fcc.GetFunctionHandler().GetPrototype().GetScope() }, func() *ZendClassEntry { return fcc.GetFunctionHandler().GetScope() }), scope) == 0 {
+					if (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_PRIVATE) != 0 || ZendCheckProtected(ZendGetFunctionRootClass(fcc.GetFunctionHandler()), scope) == 0 {
 						if error != nil {
 							if (*error) != nil {
-								_efree(*error)
+								Efree(*error)
 							}
-							ZendSpprintf(error, 0, "cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), fcc.GetCallingScope().GetName().GetVal(), fcc.GetFunctionHandler().GetFunctionName().GetVal())
+							ZendSpprintf(error, 0, "cannot access %s method %s::%s()", ZendVisibilityString(fcc.GetFunctionHandler().GetFnFlags()), ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(fcc.GetFunctionHandler().GetFunctionName()))
 						}
 						retval = 0
 					}
 				}
 			}
 		}
-	} else if error != nil && (check_flags&1<<3) == 0 {
+	} else if error != nil && (check_flags&IS_CALLABLE_CHECK_SILENT) == 0 {
 		if fcc.GetCallingScope() != nil {
 			if error != nil {
-				ZendSpprintf(error, 0, "class '%s' does not have a method '%s'", fcc.GetCallingScope().GetName().GetVal(), mname.GetVal())
+				ZendSpprintf(error, 0, "class '%s' does not have a method '%s'", ZSTR_VAL(fcc.GetCallingScope().GetName()), ZSTR_VAL(mname))
 			}
 		} else {
 			if error != nil {
-				ZendSpprintf(error, 0, "function '%s' does not exist", mname.GetVal())
+				ZendSpprintf(error, 0, "function '%s' does not exist", ZSTR_VAL(mname))
 			}
 		}
 	}
@@ -4457,7 +4553,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 	ZendStringReleaseEx(mname, 0)
 	if fcc.GetObject() != nil {
 		fcc.SetCalledScope(fcc.GetObject().GetCe())
-		if fcc.GetFunctionHandler() != nil && (fcc.GetFunctionHandler().GetFnFlags()&1<<4) != 0 {
+		if fcc.GetFunctionHandler() != nil && (fcc.GetFunctionHandler().GetFnFlags()&ZEND_ACC_STATIC) != 0 {
 			fcc.SetObject(nil)
 		}
 	}
@@ -4467,54 +4563,54 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 /* }}} */
 
 func ZendCreateMethodString(class_name *ZendString, method_name *ZendString) *ZendString {
-	var callable_name *ZendString = ZendStringAlloc(class_name.GetLen()+method_name.GetLen()+g.SizeOf("\"::\"")-1, 0)
-	var ptr *byte = callable_name.GetVal()
-	memcpy(ptr, class_name.GetVal(), class_name.GetLen())
-	ptr += class_name.GetLen()
-	memcpy(ptr, "::", g.SizeOf("\"::\"")-1)
-	ptr += g.SizeOf("\"::\"") - 1
-	memcpy(ptr, method_name.GetVal(), method_name.GetLen()+1)
+	var callable_name *ZendString = ZendStringAlloc(ZSTR_LEN(class_name)+ZSTR_LEN(method_name)+b.SizeOf("\"::\"")-1, 0)
+	var ptr *byte = ZSTR_VAL(callable_name)
+	memcpy(ptr, ZSTR_VAL(class_name), ZSTR_LEN(class_name))
+	ptr += ZSTR_LEN(class_name)
+	memcpy(ptr, "::", b.SizeOf("\"::\"")-1)
+	ptr += b.SizeOf("\"::\"") - 1
+	memcpy(ptr, ZSTR_VAL(method_name), ZSTR_LEN(method_name)+1)
 	return callable_name
 }
 func ZendGetCallableNameEx(callable *Zval, object *ZendObject) *ZendString {
 try_again:
-	switch callable.GetType() {
-	case 6:
+	switch Z_TYPE_P(callable) {
+	case IS_STRING:
 		if object != nil {
-			return ZendCreateMethodString(object.GetCe().GetName(), callable.GetValue().GetStr())
+			return ZendCreateMethodString(object.GetCe().GetName(), Z_STR_P(callable))
 		}
-		return ZendStringCopy(callable.GetValue().GetStr())
-	case 7:
+		return ZendStringCopy(Z_STR_P(callable))
+	case IS_ARRAY:
 		var method *Zval = nil
 		var obj *Zval = nil
-		if callable.GetValue().GetArr().GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFindDeref(callable.GetValue().GetArr(), 0)
-			method = ZendHashIndexFindDeref(callable.GetValue().GetArr(), 1)
+		if ZendHashNumElements(Z_ARRVAL_P(callable)) == 2 {
+			obj = ZendHashIndexFindDeref(Z_ARRVAL_P(callable), 0)
+			method = ZendHashIndexFindDeref(Z_ARRVAL_P(callable), 1)
 		}
-		if obj == nil || method == nil || method.GetType() != 6 {
-			return ZendKnownStrings[ZEND_STR_ARRAY_CAPITALIZED]
+		if obj == nil || method == nil || Z_TYPE_P(method) != IS_STRING {
+			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
 		}
-		if obj.GetType() == 6 {
-			return ZendCreateMethodString(obj.GetValue().GetStr(), method.GetValue().GetStr())
-		} else if obj.GetType() == 8 {
-			return ZendCreateMethodString(obj.GetValue().GetObj().GetCe().GetName(), method.GetValue().GetStr())
+		if Z_TYPE_P(obj) == IS_STRING {
+			return ZendCreateMethodString(Z_STR_P(obj), Z_STR_P(method))
+		} else if Z_TYPE_P(obj) == IS_OBJECT {
+			return ZendCreateMethodString(Z_OBJCE_P(obj).GetName(), Z_STR_P(method))
 		} else {
-			return ZendKnownStrings[ZEND_STR_ARRAY_CAPITALIZED]
+			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
 		}
-	case 8:
+	case IS_OBJECT:
 		var calling_scope *ZendClassEntry
 		var fptr *ZendFunction
 		var object *ZendObject
-		if callable.GetValue().GetObj().GetHandlers().GetGetClosure() != nil && callable.GetValue().GetObj().GetHandlers().GetGetClosure()(callable, &calling_scope, &fptr, &object) == SUCCESS {
-			var ce *ZendClassEntry = callable.GetValue().GetObj().GetCe()
-			var callable_name *ZendString = ZendStringAlloc(ce.GetName().GetLen()+g.SizeOf("\"::__invoke\"")-1, 0)
-			memcpy(callable_name.GetVal(), ce.GetName().GetVal(), ce.GetName().GetLen())
-			memcpy(callable_name.GetVal()+ce.GetName().GetLen(), "::__invoke", g.SizeOf("\"::__invoke\""))
+		if Z_OBJ_HANDLER_P(callable, get_closure) && Z_OBJ_HANDLER_P(callable, get_closure)(callable, &calling_scope, &fptr, &object) == SUCCESS {
+			var ce *ZendClassEntry = Z_OBJCE_P(callable)
+			var callable_name *ZendString = ZendStringAlloc(ZSTR_LEN(ce.GetName())+b.SizeOf("\"::__invoke\"")-1, 0)
+			memcpy(ZSTR_VAL(callable_name), ZSTR_VAL(ce.GetName()), ZSTR_LEN(ce.GetName()))
+			memcpy(ZSTR_VAL(callable_name)+ZSTR_LEN(ce.GetName()), "::__invoke", b.SizeOf("\"::__invoke\""))
 			return callable_name
 		}
 		return ZvalGetString(callable)
-	case 10:
-		callable = &(*callable).value.GetRef().GetVal()
+	case IS_REFERENCE:
+		callable = Z_REFVAL_P(callable)
 		goto try_again
 	default:
 		return ZvalGetStringFunc(callable)
@@ -4544,13 +4640,13 @@ func ZendIsCallableImpl(callable *Zval, object *ZendObject, check_flags uint32, 
 	fcc.SetFunctionHandler(nil)
 	fcc.SetObject(nil)
 again:
-	switch callable.GetType() {
-	case 6:
+	switch Z_TYPE_P(callable) {
+	case IS_STRING:
 		if object != nil {
 			fcc.SetObject(object)
 			fcc.SetCallingScope(object.GetCe())
 		}
-		if (check_flags & 1 << 0) != 0 {
+		if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 			fcc.SetCalledScope(fcc.GetCallingScope())
 			return 1
 		}
@@ -4560,37 +4656,33 @@ again:
 			ZendReleaseFcallInfoCache(fcc)
 		}
 		return ret
-	case 7:
+	case IS_ARRAY:
 		var method *Zval = nil
 		var obj *Zval = nil
-		if callable.GetValue().GetArr().GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFind(callable.GetValue().GetArr(), 0)
-			method = ZendHashIndexFind(callable.GetValue().GetArr(), 1)
+		if ZendHashNumElements(Z_ARRVAL_P(callable)) == 2 {
+			obj = ZendHashIndexFind(Z_ARRVAL_P(callable), 0)
+			method = ZendHashIndexFind(Z_ARRVAL_P(callable), 1)
 		}
 		for {
 			if obj == nil || method == nil {
 				break
 			}
-			if method.GetType() == 10 {
-				method = &(*method).value.GetRef().GetVal()
-			}
-			if method.GetType() != 6 {
+			ZVAL_DEREF(method)
+			if Z_TYPE_P(method) != IS_STRING {
 				break
 			}
-			if obj.GetType() == 10 {
-				obj = &(*obj).value.GetRef().GetVal()
-			}
-			if obj.GetType() == 6 {
-				if (check_flags & 1 << 0) != 0 {
+			ZVAL_DEREF(obj)
+			if Z_TYPE_P(obj) == IS_STRING {
+				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1
 				}
-				if ZendIsCallableCheckClass(obj.GetValue().GetStr(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
+				if ZendIsCallableCheckClass(Z_STR_P(obj), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
 					return 0
 				}
-			} else if obj.GetType() == 8 {
-				fcc.SetCallingScope(obj.GetValue().GetObj().GetCe())
-				fcc.SetObject(obj.GetValue().GetObj())
-				if (check_flags & 1 << 0) != 0 {
+			} else if Z_TYPE_P(obj) == IS_OBJECT {
+				fcc.SetCallingScope(Z_OBJCE_P(obj))
+				fcc.SetObject(Z_OBJ_P(obj))
+				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					fcc.SetCalledScope(fcc.GetCallingScope())
 					return 1
 				}
@@ -4601,27 +4693,25 @@ again:
 			goto check_func
 			break
 		}
-		if callable.GetValue().GetArr().GetNNumOfElements() == 2 {
-			if obj == nil || g.CondF(obj.GetType() != 10, func() bool { return obj.GetType() != 6 && obj.GetType() != 8 }, func() bool {
-				return &(*obj).value.GetRef().GetVal().u1.v.type_ != 6 && &(*obj).value.GetRef().GetVal().u1.v.type_ != 8
-			}) {
+		if ZendHashNumElements(Z_ARRVAL_P(callable)) == 2 {
+			if obj == nil || b.CondF(!(Z_ISREF_P(obj)), func() bool { return Z_TYPE_P(obj) != IS_STRING && Z_TYPE_P(obj) != IS_OBJECT }, func() bool { return Z_TYPE_P(Z_REFVAL_P(obj)) != IS_STRING && Z_TYPE_P(Z_REFVAL_P(obj)) != IS_OBJECT }) {
 				if error != nil {
-					*error = _estrdup("first array member is not a valid class name or object")
+					*error = Estrdup("first array member is not a valid class name or object")
 				}
 			} else {
 				if error != nil {
-					*error = _estrdup("second array member is not a valid method")
+					*error = Estrdup("second array member is not a valid method")
 				}
 			}
 		} else {
 			if error != nil {
-				*error = _estrdup("array must have exactly two members")
+				*error = Estrdup("array must have exactly two members")
 			}
 		}
 		return 0
-	case 8:
-		if callable.GetValue().GetObj().GetHandlers().GetGetClosure() != nil {
-			if callable.GetValue().GetObj().GetHandlers().GetGetClosure()(callable, &fcc.calling_scope, &fcc.function_handler, &fcc.object) == SUCCESS {
+	case IS_OBJECT:
+		if Z_OBJ_HANDLER_P(callable, get_closure) {
+			if Z_OBJ_HANDLER_P(callable, get_closure)(callable, &fcc.calling_scope, &fcc.function_handler, &fcc.object) == SUCCESS {
 				fcc.SetCalledScope(fcc.GetCallingScope())
 				if fcc == &fcc_local {
 					ZendReleaseFcallInfoCache(fcc)
@@ -4638,15 +4728,15 @@ again:
 			}
 		}
 		if error != nil {
-			*error = _estrdup("no array or string given")
+			*error = Estrdup("no array or string given")
 		}
 		return 0
-	case 10:
-		callable = &(*callable).value.GetRef().GetVal()
+	case IS_REFERENCE:
+		callable = Z_REFVAL_P(callable)
 		goto again
 	default:
 		if error != nil {
-			*error = _estrdup("no array or string given")
+			*error = Estrdup("no array or string given")
 		}
 		return 0
 	}
@@ -4669,13 +4759,10 @@ func ZendIsCallable(callable *Zval, check_flags uint32, callable_name **ZendStri
 
 func ZendMakeCallable(callable *Zval, callable_name **ZendString) ZendBool {
 	var fcc ZendFcallInfoCache
-	if ZendIsCallableEx(callable, nil, 1<<2, callable_name, &fcc, nil) != 0 {
-		if callable.GetType() == 6 && fcc.GetCallingScope() != nil {
+	if ZendIsCallableEx(callable, nil, IS_CALLABLE_STRICT, callable_name, &fcc, nil) != 0 {
+		if Z_TYPE_P(callable) == IS_STRING && fcc.GetCallingScope() != nil {
 			ZvalPtrDtorStr(callable)
-			var __arr *ZendArray = _zendNewArray(0)
-			var __z *Zval = callable
-			__z.GetValue().SetArr(__arr)
-			__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
+			ArrayInit(callable)
 			AddNextIndexStr(callable, ZendStringCopy(fcc.GetCallingScope().GetName()))
 			AddNextIndexStr(callable, ZendStringCopy(fcc.GetFunctionHandler().GetFunctionName()))
 		}
@@ -4691,14 +4778,9 @@ func ZendFcallInfoInit(callable *Zval, check_flags uint32, fci *ZendFcallInfo, f
 	if ZendIsCallableEx(callable, nil, check_flags, callable_name, fcc, error) == 0 {
 		return FAILURE
 	}
-	fci.SetSize(g.SizeOf("* fci"))
+	fci.SetSize(b.SizeOf("* fci"))
 	fci.SetObject(fcc.GetObject())
-	var _z1 *Zval = &fci.function_name
-	var _z2 *Zval = callable
-	var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	_z1.GetValue().SetCounted(_gc)
-	_z1.SetTypeInfo(_t)
+	ZVAL_COPY_VALUE(&fci.function_name, callable)
 	fci.SetRetval(nil)
 	fci.SetParamCount(0)
 	fci.SetParams(nil)
@@ -4717,7 +4799,7 @@ func ZendFcallInfoArgsClear(fci *ZendFcallInfo, free_mem int) {
 			p++
 		}
 		if free_mem != 0 {
-			_efree(fci.GetParams())
+			Efree(fci.GetParams())
 			fci.SetParams(nil)
 		}
 	}
@@ -4751,49 +4833,28 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 	if args == nil {
 		return SUCCESS
 	}
-	if args.GetType() != 7 {
+	if Z_TYPE_P(args) != IS_ARRAY {
 		return FAILURE
 	}
-	fci.SetParamCount(args.GetValue().GetArr().GetNNumOfElements())
-	params = (*Zval)(_erealloc(fci.GetParams(), fci.GetParamCount()*g.SizeOf("zval")))
+	fci.SetParamCount(ZendHashNumElements(Z_ARRVAL_P(args)))
+	params = (*Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
 	for {
-		var __ht *HashTable = args.GetValue().GetArr()
+		var __ht *HashTable = Z_ARRVAL_P(args)
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
 			arg = _z
-			if func_ != nil && arg.GetType() != 10 && ZendCheckArgSendType(func_, n, 1|2) != 0 {
-				var _ref *ZendReference = (*ZendReference)(_emalloc(g.SizeOf("zend_reference")))
-				ZendGcSetRefcount(&_ref.gc, 1)
-				_ref.GetGc().SetTypeInfo(10)
-				var _z1 *Zval = &_ref.val
-				var _z2 *Zval = arg
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				_ref.GetSources().SetPtr(nil)
-				params.GetValue().SetRef(_ref)
-				params.SetTypeInfo(10 | 1<<0<<8)
-				if arg.GetTypeFlags() != 0 {
-					ZvalAddrefP(arg)
-				}
+			if func_ != nil && !(Z_ISREF_P(arg)) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
+				ZVAL_NEW_REF(params, arg)
+				Z_TRY_ADDREF_P(arg)
 			} else {
-				var _z1 *Zval = params
-				var _z2 *Zval = arg
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if (_t & 0xff00) != 0 {
-					ZendGcAddref(&_gc.gc)
-				}
+				ZVAL_COPY(params, arg)
 			}
 			params++
 			n++
@@ -4819,17 +4880,9 @@ func ZendFcallInfoArgp(fci *ZendFcallInfo, argc int, argv *Zval) int {
 	ZendFcallInfoArgsClear(fci, !argc)
 	if argc != 0 {
 		fci.SetParamCount(argc)
-		fci.SetParams((*Zval)(_erealloc(fci.GetParams(), fci.GetParamCount()*g.SizeOf("zval"))))
+		fci.SetParams((*Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval"))))
 		for i = 0; i < argc; i++ {
-			var _z1 *Zval = &fci.params[i]
-			var _z2 *Zval = &argv[i]
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
-			if (_t & 0xff00) != 0 {
-				ZendGcAddref(&_gc.gc)
-			}
+			ZVAL_COPY(&fci.params[i], &argv[i])
 		}
 	}
 	return SUCCESS
@@ -4846,18 +4899,10 @@ func ZendFcallInfoArgv(fci *ZendFcallInfo, argc int, argv *va_list) int {
 	ZendFcallInfoArgsClear(fci, !argc)
 	if argc != 0 {
 		fci.SetParamCount(argc)
-		fci.SetParams((*Zval)(_erealloc(fci.GetParams(), fci.GetParamCount()*g.SizeOf("zval"))))
+		fci.SetParams((*Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval"))))
 		for i = 0; i < argc; i++ {
 			arg = __va_arg(*argv, (*Zval)(_))
-			var _z1 *Zval = &fci.params[i]
-			var _z2 *Zval = arg
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
-			if (_t & 0xff00) != 0 {
-				ZendGcAddref(&_gc.gc)
-			}
+			ZVAL_COPY(&fci.params[i], arg)
 		}
 	}
 	return SUCCESS
@@ -4891,7 +4936,7 @@ func ZendFcallInfoCall(fci *ZendFcallInfo, fcc *ZendFcallInfoCache, retval_ptr *
 		ZendFcallInfoArgs(fci, args)
 	}
 	result = ZendCallFunction(fci, fcc)
-	if retval_ptr == nil && retval.GetType() != 0 {
+	if retval_ptr == nil && Z_TYPE(retval) != IS_UNDEF {
 		ZvalPtrDtor(&retval)
 	}
 	if args != nil {
@@ -4907,7 +4952,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	var name_len int = strlen(module_name)
 	var module *ZendModuleEntry
 	lname = ZendStringAlloc(name_len, 0)
-	ZendStrTolowerCopy(lname.GetVal(), module_name, name_len)
+	ZendStrTolowerCopy(ZSTR_VAL(lname), module_name, name_len)
 	module = ZendHashFindPtr(&ModuleRegistry, lname)
 	ZendStringEfree(lname)
 	if module != nil {
@@ -4920,65 +4965,56 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 /* }}} */
 
 func ZvalMakeInternedString(zv *Zval) *ZendString {
-	r.Assert(zv.GetType() == 6)
-	zv.GetValue().SetStr(ZendNewInternedString(zv.GetValue().GetStr()))
-	if (ZvalGcFlags(zv.GetValue().GetStr().GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		zv.SetTypeFlags(0)
+	ZEND_ASSERT(Z_TYPE_P(zv) == IS_STRING)
+	Z_STR_P(zv) = ZendNewInternedString(Z_STR_P(zv))
+	if ZSTR_IS_INTERNED(Z_STR_P(zv)) != 0 {
+		Z_TYPE_FLAGS_P(zv) = 0
 	}
-	return zv.GetValue().GetStr()
+	return Z_STR_P(zv)
 }
 func IsPersistentClass(ce *ZendClassEntry) ZendBool {
-	return (ce.GetType()&1) != 0 && ce.GetModule().GetType() == 1
+	return (ce.GetType()&ZEND_INTERNAL_CLASS) != 0 && ce.GetModule().GetType() == MODULE_PERSISTENT
 }
 func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zval, access_type int, doc_comment *ZendString, type_ ZendType) int {
 	var property_info *ZendPropertyInfo
 	var property_info_ptr *ZendPropertyInfo
-	if type_ > 0x3 {
-		ce.SetCeFlags(ce.GetCeFlags() | 1<<8)
+	if ZEND_TYPE_IS_SET(type_) {
+		ce.SetCeFlags(ce.GetCeFlags() | ZEND_ACC_HAS_TYPE_HINTS)
 	}
-	if ce.GetType() == 1 {
-		property_info = __zendMalloc(g.SizeOf("zend_property_info"))
+	if ce.GetType() == ZEND_INTERNAL_CLASS {
+		property_info = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	} else {
-		property_info = ZendArenaAlloc(&CG.arena, g.SizeOf("zend_property_info"))
-		if property.GetType() == 11 {
-			ce.SetCeFlags(ce.GetCeFlags() &^ (1 << 12))
+		property_info = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_property_info"))
+		if Z_TYPE_P(property) == IS_CONSTANT_AST {
+			ce.SetCeFlags(ce.GetCeFlags() &^ ZEND_ACC_CONSTANTS_UPDATED)
 		}
 	}
-	if property.GetType() == 6 && (ZvalGcFlags(property.GetValue().GetStr().GetGc().GetTypeInfo())&1<<6) == 0 {
+	if Z_TYPE_P(property) == IS_STRING && ZSTR_IS_INTERNED(Z_STR_P(property)) == 0 {
 		ZvalMakeInternedString(property)
 	}
-	if (access_type & (1<<0 | 1<<1 | 1<<2)) == 0 {
-		access_type |= 1 << 0
+	if (access_type & ZEND_ACC_PPP_MASK) == 0 {
+		access_type |= ZEND_ACC_PUBLIC
 	}
-	if (access_type & 1 << 4) != 0 {
-		if g.Assign(&property_info_ptr, ZendHashFindPtr(&ce.properties_info, name)) != nil && (property_info_ptr.GetFlags()&1<<4) != 0 {
+	if (access_type & ZEND_ACC_STATIC) != 0 {
+		if b.Assign(&property_info_ptr, ZendHashFindPtr(&ce.properties_info, name)) != nil && (property_info_ptr.GetFlags()&ZEND_ACC_STATIC) != 0 {
 			property_info.SetOffset(property_info_ptr.GetOffset())
 			ZvalPtrDtor(&ce.default_static_members_table[property_info.GetOffset()])
 			ZendHashDel(&ce.properties_info, name)
 		} else {
 			ce.GetDefaultStaticMembersCount()++
 			property_info.SetOffset(ce.GetDefaultStaticMembersCount() - 1)
-			if ce.GetType() == 1 {
-				ce.SetDefaultStaticMembersTable(__zendRealloc(ce.GetDefaultStaticMembersTable(), g.SizeOf("zval")*ce.GetDefaultStaticMembersCount()))
-			} else {
-				ce.SetDefaultStaticMembersTable(_erealloc(ce.GetDefaultStaticMembersTable(), g.SizeOf("zval")*ce.GetDefaultStaticMembersCount()))
-			}
+			ce.SetDefaultStaticMembersTable(Perealloc(ce.GetDefaultStaticMembersTable(), b.SizeOf("zval")*ce.GetDefaultStaticMembersCount(), ce.GetType() == ZEND_INTERNAL_CLASS))
 		}
-		var _z1 *Zval = &ce.default_static_members_table[property_info.GetOffset()]
-		var _z2 *Zval = property
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
+		ZVAL_COPY_VALUE(&ce.default_static_members_table[property_info.GetOffset()], property)
 		if ce.GetStaticMembersTablePtr() == nil {
-			r.Assert(ce.GetType() == 1)
-			if EG.GetCurrentExecuteData() == nil {
-				ce.SetStaticMembersTablePtr(ZendMapPtrNew())
+			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
+			if ExecutorGlobals.GetCurrentExecuteData() == nil {
+				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
 
 				/* internal class loaded by dl() */
 
-				ce.SetStaticMembersTablePtr(&ce.default_static_members_table)
+				ZEND_MAP_PTR_INIT(ce.static_members_table, &ce.default_static_members_table)
 
 				/* internal class loaded by dl() */
 
@@ -4986,53 +5022,44 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		}
 	} else {
 		var property_default_ptr *Zval
-		if g.Assign(&property_info_ptr, ZendHashFindPtr(&ce.properties_info, name)) != nil && (property_info_ptr.GetFlags()&1<<4) == 0 {
+		if b.Assign(&property_info_ptr, ZendHashFindPtr(&ce.properties_info, name)) != nil && (property_info_ptr.GetFlags()&ZEND_ACC_STATIC) == 0 {
 			property_info.SetOffset(property_info_ptr.GetOffset())
-			ZvalPtrDtor(&ce.default_properties_table[(property_info.GetOffset()-uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0))/g.SizeOf("zval")])
+			ZvalPtrDtor(&ce.default_properties_table[OBJ_PROP_TO_NUM(property_info.GetOffset())])
 			ZendHashDel(&ce.properties_info, name)
-			r.Assert(ce.GetType() == 1)
-			r.Assert(ce.GetPropertiesInfoTable() != nil)
-			ce.GetPropertiesInfoTable()[(property_info.GetOffset()-uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0))/g.SizeOf("zval")] = property_info
+			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
+			ZEND_ASSERT(ce.GetPropertiesInfoTable() != nil)
+			ce.GetPropertiesInfoTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())] = property_info
 		} else {
-			property_info.SetOffset(uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil)) + g.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
+			property_info.SetOffset(OBJ_PROP_TO_OFFSET(ce.GetDefaultPropertiesCount()))
 			ce.GetDefaultPropertiesCount()++
-			if ce.GetType() == 1 {
-				ce.SetDefaultPropertiesTable(__zendRealloc(ce.GetDefaultPropertiesTable(), g.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
-			} else {
-				ce.SetDefaultPropertiesTable(_erealloc(ce.GetDefaultPropertiesTable(), g.SizeOf("zval")*ce.GetDefaultPropertiesCount()))
-			}
+			ce.SetDefaultPropertiesTable(Perealloc(ce.GetDefaultPropertiesTable(), b.SizeOf("zval")*ce.GetDefaultPropertiesCount(), ce.GetType() == ZEND_INTERNAL_CLASS))
 
 			/* For user classes this is handled during linking */
 
-			if ce.GetType() == 1 {
-				ce.SetPropertiesInfoTable(__zendRealloc(ce.GetPropertiesInfoTable(), g.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount()))
+			if ce.GetType() == ZEND_INTERNAL_CLASS {
+				ce.SetPropertiesInfoTable(Perealloc(ce.GetPropertiesInfoTable(), b.SizeOf("zend_property_info *")*ce.GetDefaultPropertiesCount(), 1))
 				ce.GetPropertiesInfoTable()[ce.GetDefaultPropertiesCount()-1] = property_info
 			}
 
 			/* For user classes this is handled during linking */
 
 		}
-		property_default_ptr = &ce.default_properties_table[(property_info.GetOffset()-uint32(zend_long((*byte)(&((*ZendObject)(nil).GetPropertiesTable()))-(*byte)(nil))+g.SizeOf("zval")*0))/g.SizeOf("zval")]
-		var _z1 *Zval = property_default_ptr
-		var _z2 *Zval = property
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
-		if property.GetType() == 0 {
-			property_default_ptr.SetU2Extra(1)
+		property_default_ptr = &ce.default_properties_table[OBJ_PROP_TO_NUM(property_info.GetOffset())]
+		ZVAL_COPY_VALUE(property_default_ptr, property)
+		if Z_ISUNDEF_P(property) {
+			Z_PROP_FLAG_P(property_default_ptr) = IS_PROP_UNINIT
 		} else {
-			property_default_ptr.SetU2Extra(0)
+			Z_PROP_FLAG_P(property_default_ptr) = 0
 		}
 	}
-	if (ce.GetType() & 1) != 0 {
-		switch property.GetType() {
-		case 7:
+	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
+		switch Z_TYPE_P(property) {
+		case IS_ARRAY:
 
-		case 8:
+		case IS_OBJECT:
 
-		case 9:
-			ZendErrorNoreturn(1<<4, "Internal zval's can't be arrays, objects or resources")
+		case IS_RESOURCE:
+			ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects or resources")
 			break
 		default:
 			break
@@ -5047,13 +5074,13 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		/* Must be interned to avoid ZTS data races */
 
 	}
-	if (access_type & 1 << 0) != 0 {
+	if (access_type & ZEND_ACC_PUBLIC) != 0 {
 		property_info.SetName(ZendStringCopy(name))
-	} else if (access_type & 1 << 2) != 0 {
-		property_info.SetName(ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
+	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
+		property_info.SetName(ZendManglePropertyName(ZSTR_VAL(ce.GetName()), ZSTR_LEN(ce.GetName()), ZSTR_VAL(name), ZSTR_LEN(name), IsPersistentClass(ce)))
 	} else {
-		r.Assert((access_type & 1 << 1) != 0)
-		property_info.SetName(ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
+		ZEND_ASSERT((access_type & ZEND_ACC_PROTECTED) != 0)
+		property_info.SetName(ZendManglePropertyName("*", 1, ZSTR_VAL(name), ZSTR_LEN(name), IsPersistentClass(ce)))
 	}
 	property_info.SetName(ZendNewInternedString(property_info.GetName()))
 	property_info.SetFlags(access_type)
@@ -5067,17 +5094,12 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 /* }}} */
 
 func ZendTryAssignTypedRefEx(ref *ZendReference, val *Zval, strict ZendBool) int {
-	if ZendVerifyRefAssignableZval(ref, val, strict) == 0 {
+	if UNEXPECTED(ZendVerifyRefAssignableZval(ref, val, strict) == 0) {
 		ZvalPtrDtor(val)
 		return FAILURE
 	} else {
 		ZvalPtrDtor(&ref.val)
-		var _z1 *Zval = &ref.val
-		var _z2 *Zval = val
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
+		ZVAL_COPY_VALUE(&ref.val, val)
 		return SUCCESS
 	}
 }
@@ -5085,14 +5107,14 @@ func ZendTryAssignTypedRefEx(ref *ZendReference, val *Zval, strict ZendBool) int
 /* }}} */
 
 func ZendTryAssignTypedRef(ref *ZendReference, val *Zval) int {
-	return ZendTryAssignTypedRefEx(ref, val, EG.GetCurrentExecuteData().GetPrevExecuteData() != nil && EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && (EG.GetCurrentExecuteData().GetPrevExecuteData().GetFunc().GetFnFlags()&1<<31) != 0)
+	return ZendTryAssignTypedRefEx(ref, val, ZEND_ARG_USES_STRICT_TYPES())
 }
 
 /* }}} */
 
 func ZendTryAssignTypedRefNull(ref *ZendReference) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
+	ZVAL_NULL(&tmp)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5100,11 +5122,7 @@ func ZendTryAssignTypedRefNull(ref *ZendReference) int {
 
 func ZendTryAssignTypedRefBool(ref *ZendReference, val ZendBool) int {
 	var tmp Zval
-	if val != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&tmp, val)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5112,9 +5130,7 @@ func ZendTryAssignTypedRefBool(ref *ZendReference, val ZendBool) int {
 
 func ZendTryAssignTypedRefLong(ref *ZendReference, lval ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(lval)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&tmp, lval)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5122,9 +5138,7 @@ func ZendTryAssignTypedRefLong(ref *ZendReference, lval ZendLong) int {
 
 func ZendTryAssignTypedRefDouble(ref *ZendReference, dval float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(dval)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&tmp, dval)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5132,10 +5146,7 @@ func ZendTryAssignTypedRefDouble(ref *ZendReference, dval float64) int {
 
 func ZendTryAssignTypedRefEmptyString(ref *ZendReference) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendEmptyString
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6)
+	ZVAL_EMPTY_STRING(&tmp)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5143,14 +5154,7 @@ func ZendTryAssignTypedRefEmptyString(ref *ZendReference) int {
 
 func ZendTryAssignTypedRefStr(ref *ZendReference, str *ZendString) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = str
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
+	ZVAL_STR(&tmp, str)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5158,11 +5162,7 @@ func ZendTryAssignTypedRefStr(ref *ZendReference, str *ZendString) int {
 
 func ZendTryAssignTypedRefString(ref *ZendReference, string *byte) int {
 	var tmp Zval
-	var _s *byte = string
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRING(&tmp, string)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5170,10 +5170,7 @@ func ZendTryAssignTypedRefString(ref *ZendReference, string *byte) int {
 
 func ZendTryAssignTypedRefStringl(ref *ZendReference, string *byte, len_ int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(string, len_, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRINGL(&tmp, string, len_)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5181,10 +5178,7 @@ func ZendTryAssignTypedRefStringl(ref *ZendReference, string *byte, len_ int) in
 
 func ZendTryAssignTypedRefArr(ref *ZendReference, arr *ZendArray) int {
 	var tmp Zval
-	var __arr *ZendArray = arr
-	var __z *Zval = &tmp
-	__z.GetValue().SetArr(__arr)
-	__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
+	ZVAL_ARR(&tmp, arr)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5192,9 +5186,7 @@ func ZendTryAssignTypedRefArr(ref *ZendReference, arr *ZendArray) int {
 
 func ZendTryAssignTypedRefRes(ref *ZendReference, res *ZendResource) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetRes(res)
-	__z.SetTypeInfo(9 | 1<<0<<8)
+	ZVAL_RES(&tmp, res)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5202,12 +5194,7 @@ func ZendTryAssignTypedRefRes(ref *ZendReference, res *ZendResource) int {
 
 func ZendTryAssignTypedRefZval(ref *ZendReference, zv *Zval) int {
 	var tmp Zval
-	var _z1 *Zval = &tmp
-	var _z2 *Zval = zv
-	var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	_z1.GetValue().SetCounted(_gc)
-	_z1.SetTypeInfo(_t)
+	ZVAL_COPY_VALUE(&tmp, zv)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 
@@ -5215,12 +5202,7 @@ func ZendTryAssignTypedRefZval(ref *ZendReference, zv *Zval) int {
 
 func ZendTryAssignTypedRefZvalEx(ref *ZendReference, zv *Zval, strict ZendBool) int {
 	var tmp Zval
-	var _z1 *Zval = &tmp
-	var _z2 *Zval = zv
-	var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	_z1.GetValue().SetCounted(_gc)
-	_z1.SetTypeInfo(_t)
+	ZVAL_COPY_VALUE(&tmp, zv)
 	return ZendTryAssignTypedRefEx(ref, &tmp, strict)
 }
 
@@ -5243,7 +5225,7 @@ func ZendDeclareProperty(ce *ZendClassEntry, name *byte, name_length int, proper
 
 func ZendDeclarePropertyNull(ce *ZendClassEntry, name string, name_length int, access_type int) int {
 	var property Zval
-	&property.SetTypeInfo(1)
+	ZVAL_NULL(&property)
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5251,11 +5233,7 @@ func ZendDeclarePropertyNull(ce *ZendClassEntry, name string, name_length int, a
 
 func ZendDeclarePropertyBool(ce *ZendClassEntry, name *byte, name_length int, value ZendLong, access_type int) int {
 	var property Zval
-	if value != 0 {
-		&property.SetTypeInfo(3)
-	} else {
-		&property.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&property, value)
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5263,9 +5241,7 @@ func ZendDeclarePropertyBool(ce *ZendClassEntry, name *byte, name_length int, va
 
 func ZendDeclarePropertyLong(ce *ZendClassEntry, name string, name_length int, value ZendLong, access_type int) int {
 	var property Zval
-	var __z *Zval = &property
-	__z.GetValue().SetLval(value)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&property, value)
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5273,9 +5249,7 @@ func ZendDeclarePropertyLong(ce *ZendClassEntry, name string, name_length int, v
 
 func ZendDeclarePropertyDouble(ce *ZendClassEntry, name *byte, name_length int, value float64, access_type int) int {
 	var property Zval
-	var __z *Zval = &property
-	__z.GetValue().SetDval(value)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&property, value)
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5283,10 +5257,7 @@ func ZendDeclarePropertyDouble(ce *ZendClassEntry, name *byte, name_length int, 
 
 func ZendDeclarePropertyString(ce *ZendClassEntry, name string, name_length int, value string, access_type int) int {
 	var property Zval
-	var __z *Zval = &property
-	var __s *ZendString = ZendStringInit(value, strlen(value), ce.GetType()&1)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_NEW_STR(&property, ZendStringInit(value, strlen(value), ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5294,10 +5265,7 @@ func ZendDeclarePropertyString(ce *ZendClassEntry, name string, name_length int,
 
 func ZendDeclarePropertyStringl(ce *ZendClassEntry, name *byte, name_length int, value *byte, value_len int, access_type int) int {
 	var property Zval
-	var __z *Zval = &property
-	var __s *ZendString = ZendStringInit(value, value_len, ce.GetType()&1)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_NEW_STR(&property, ZendStringInit(value, value_len, ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 
@@ -5305,36 +5273,31 @@ func ZendDeclarePropertyStringl(ce *ZendClassEntry, name *byte, name_length int,
 
 func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zval, access_type int, doc_comment *ZendString) int {
 	var c *ZendClassConstant
-	if (ce.GetCeFlags() & 1 << 0) != 0 {
-		if access_type != 1<<0 {
-			ZendErrorNoreturn(1<<6, "Access type for interface constant %s::%s must be public", ce.GetName().GetVal(), name.GetVal())
+	if (ce.GetCeFlags() & ZEND_ACC_INTERFACE) != 0 {
+		if access_type != ZEND_ACC_PUBLIC {
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Access type for interface constant %s::%s must be public", ZSTR_VAL(ce.GetName()), ZSTR_VAL(name))
 		}
 	}
-	if name.GetLen() == g.SizeOf("\"class\"")-1 && ZendBinaryStrcasecmp(name.GetVal(), name.GetLen(), "class", g.SizeOf("\"class\"")-1) == 0 {
-		ZendErrorNoreturn(g.Cond(ce.GetType() == 1, 1<<4, 1<<6), "A class constant must not be called 'class'; it is reserved for class name fetching")
+	if ZendStringEqualsLiteralCi(name, "class") {
+		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
-	if value.GetType() == 6 && (ZvalGcFlags(value.GetValue().GetStr().GetGc().GetTypeInfo())&1<<6) == 0 {
+	if Z_TYPE_P(value) == IS_STRING && ZSTR_IS_INTERNED(Z_STR_P(value)) == 0 {
 		ZvalMakeInternedString(value)
 	}
-	if ce.GetType() == 1 {
-		c = __zendMalloc(g.SizeOf("zend_class_constant"))
+	if ce.GetType() == ZEND_INTERNAL_CLASS {
+		c = Pemalloc(b.SizeOf("zend_class_constant"), 1)
 	} else {
-		c = ZendArenaAlloc(&CG.arena, g.SizeOf("zend_class_constant"))
+		c = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_constant"))
 	}
-	var _z1 *Zval = &c.value
-	var _z2 *Zval = value
-	var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	_z1.GetValue().SetCounted(_gc)
-	_z1.SetTypeInfo(_t)
-	c.GetValue().SetAccessFlags(access_type)
+	ZVAL_COPY_VALUE(&c.value, value)
+	Z_ACCESS_FLAGS(c.GetValue()) = access_type
 	c.SetDocComment(doc_comment)
 	c.SetCe(ce)
-	if value.GetType() == 11 {
-		ce.SetCeFlags(ce.GetCeFlags() &^ (1 << 12))
+	if Z_TYPE_P(value) == IS_CONSTANT_AST {
+		ce.SetCeFlags(ce.GetCeFlags() &^ ZEND_ACC_CONSTANTS_UPDATED)
 	}
 	if !(ZendHashAddPtr(&ce.constants_table, name, c)) {
-		ZendErrorNoreturn(g.Cond(ce.GetType() == 1, 1<<4, 1<<6), "Cannot redefine class __special__  constant %s::%s", ce.GetName().GetVal(), name.GetVal())
+		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "Cannot redefine class __special__  constant %s::%s", ZSTR_VAL(ce.GetName()), ZSTR_VAL(name))
 	}
 	return SUCCESS
 }
@@ -5344,12 +5307,12 @@ func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zva
 func ZendDeclareClassConstant(ce *ZendClassEntry, name *byte, name_length int, value *Zval) int {
 	var ret int
 	var key *ZendString
-	if ce.GetType() == 1 {
+	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		key = ZendStringInitInterned(name, name_length, 1)
 	} else {
 		key = ZendStringInit(name, name_length, 0)
 	}
-	ret = ZendDeclareClassConstantEx(ce, key, value, 1<<0, nil)
+	ret = ZendDeclareClassConstantEx(ce, key, value, ZEND_ACC_PUBLIC, nil)
 	ZendStringRelease(key)
 	return ret
 }
@@ -5358,7 +5321,7 @@ func ZendDeclareClassConstant(ce *ZendClassEntry, name *byte, name_length int, v
 
 func ZendDeclareClassConstantNull(ce *ZendClassEntry, name *byte, name_length int) int {
 	var constant Zval
-	&constant.SetTypeInfo(1)
+	ZVAL_NULL(&constant)
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 
@@ -5366,9 +5329,7 @@ func ZendDeclareClassConstantNull(ce *ZendClassEntry, name *byte, name_length in
 
 func ZendDeclareClassConstantLong(ce *ZendClassEntry, name string, name_length int, value ZendLong) int {
 	var constant Zval
-	var __z *Zval = &constant
-	__z.GetValue().SetLval(value)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&constant, value)
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 
@@ -5376,11 +5337,7 @@ func ZendDeclareClassConstantLong(ce *ZendClassEntry, name string, name_length i
 
 func ZendDeclareClassConstantBool(ce *ZendClassEntry, name *byte, name_length int, value ZendBool) int {
 	var constant Zval
-	if value != 0 {
-		&constant.SetTypeInfo(3)
-	} else {
-		&constant.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&constant, value)
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 
@@ -5388,9 +5345,7 @@ func ZendDeclareClassConstantBool(ce *ZendClassEntry, name *byte, name_length in
 
 func ZendDeclareClassConstantDouble(ce *ZendClassEntry, name *byte, name_length int, value float64) int {
 	var constant Zval
-	var __z *Zval = &constant
-	__z.GetValue().SetDval(value)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&constant, value)
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 
@@ -5398,10 +5353,7 @@ func ZendDeclareClassConstantDouble(ce *ZendClassEntry, name *byte, name_length 
 
 func ZendDeclareClassConstantStringl(ce *ZendClassEntry, name *byte, name_length int, value *byte, value_length int) int {
 	var constant Zval
-	var __z *Zval = &constant
-	var __s *ZendString = ZendStringInit(value, value_length, ce.GetType()&1)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_NEW_STR(&constant, ZendStringInit(value, value_length, ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 
@@ -5415,67 +5367,50 @@ func ZendDeclareClassConstantString(ce *ZendClassEntry, name *byte, name_length 
 
 func ZendUpdatePropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, value *Zval) {
 	var property Zval
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	EG.SetFakeScope(scope)
-	var __z *Zval = &property
-	var __s *ZendString = name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	object.GetValue().GetObj().GetHandlers().GetWriteProperty()(object, &property, value, nil)
-	EG.SetFakeScope(old_scope)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	ExecutorGlobals.SetFakeScope(scope)
+	ZVAL_STR(&property, name)
+	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
+	ExecutorGlobals.SetFakeScope(old_scope)
 }
 
 /* }}} */
 
 func ZendUpdateProperty(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *Zval) {
 	var property Zval
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	EG.SetFakeScope(scope)
-	var __z *Zval = &property
-	var __s *ZendString = ZendStringInit(name, name_length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	object.GetValue().GetObj().GetHandlers().GetWriteProperty()(object, &property, value, nil)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	ExecutorGlobals.SetFakeScope(scope)
+	ZVAL_STRINGL(&property, name, name_length)
+	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
 	ZvalPtrDtor(&property)
-	EG.SetFakeScope(old_scope)
+	ExecutorGlobals.SetFakeScope(old_scope)
 }
 
 /* }}} */
 
 func ZendUpdatePropertyNull(scope *ZendClassEntry, object *Zval, name *byte, name_length int) {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
+	ZVAL_NULL(&tmp)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
 /* }}} */
 
-func ZendUnsetProperty(scope *ZendClassEntry, object *Zval, name *byte, name_length int) {
+func ZendUnsetProperty(scope *ZendClassEntry, object *Zval, name string, name_length int) {
 	var property Zval
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	EG.SetFakeScope(scope)
-	var __z *Zval = &property
-	var __s *ZendString = ZendStringInit(name, name_length, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	object.GetValue().GetObj().GetHandlers().GetUnsetProperty()(object, &property, 0)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	ExecutorGlobals.SetFakeScope(scope)
+	ZVAL_STRINGL(&property, name, name_length)
+	Z_OBJ_HT_P(object).GetUnsetProperty()(object, &property, 0)
 	ZvalPtrDtor(&property)
-	EG.SetFakeScope(old_scope)
+	ExecutorGlobals.SetFakeScope(old_scope)
 }
 
 /* }}} */
 
 func ZendUpdatePropertyBool(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value ZendLong) {
 	var tmp Zval
-	if value != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&tmp, value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5483,9 +5418,7 @@ func ZendUpdatePropertyBool(scope *ZendClassEntry, object *Zval, name *byte, nam
 
 func ZendUpdatePropertyLong(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value ZendLong) {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(value)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&tmp, value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5493,9 +5426,7 @@ func ZendUpdatePropertyLong(scope *ZendClassEntry, object *Zval, name *byte, nam
 
 func ZendUpdatePropertyDouble(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value float64) {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(value)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&tmp, value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5503,14 +5434,7 @@ func ZendUpdatePropertyDouble(scope *ZendClassEntry, object *Zval, name *byte, n
 
 func ZendUpdatePropertyStr(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *ZendString) {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = value
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
+	ZVAL_STR(&tmp, value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5518,12 +5442,8 @@ func ZendUpdatePropertyStr(scope *ZendClassEntry, object *Zval, name *byte, name
 
 func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte) {
 	var tmp Zval
-	var _s *byte = value
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZvalSetRefcountP(&tmp, 0)
+	ZVAL_STRING(&tmp, value)
+	Z_SET_REFCOUNT(tmp, 0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5531,11 +5451,8 @@ func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, n
 
 func ZendUpdatePropertyStringl(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte, value_len int) {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(value, value_len, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZvalSetRefcountP(&tmp, 0)
+	ZVAL_STRINGL(&tmp, value, value_len)
+	Z_SET_REFCOUNT(tmp, 0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 
@@ -5545,38 +5462,29 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *
 	var property *Zval
 	var tmp Zval
 	var prop_info *ZendPropertyInfo
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	if (scope.GetCeFlags() & 1 << 12) == 0 {
-		if ZendUpdateClassConstants(scope) != SUCCESS {
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	if UNEXPECTED((scope.GetCeFlags() & ZEND_ACC_CONSTANTS_UPDATED) == 0) {
+		if UNEXPECTED(ZendUpdateClassConstants(scope) != 0) != SUCCESS {
 			return FAILURE
 		}
 	}
-	EG.SetFakeScope(scope)
-	property = ZendStdGetStaticPropertyWithInfo(scope, name, 1, &prop_info)
-	EG.SetFakeScope(old_scope)
+	ExecutorGlobals.SetFakeScope(scope)
+	property = ZendStdGetStaticPropertyWithInfo(scope, name, BP_VAR_W, &prop_info)
+	ExecutorGlobals.SetFakeScope(old_scope)
 	if property == nil {
 		return FAILURE
 	}
-	r.Assert(value.GetType() != 10)
-	if value.GetTypeFlags() != 0 {
-		ZvalAddrefP(value)
-	}
+	ZEND_ASSERT(!(Z_ISREF_P(value)))
+	Z_TRY_ADDREF_P(value)
 	if prop_info.GetType() != 0 {
-		var _z1 *Zval = &tmp
-		var _z2 *Zval = value
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
+		ZVAL_COPY_VALUE(&tmp, value)
 		if ZendVerifyPropertyType(prop_info, &tmp, 0) == 0 {
-			if value.GetTypeFlags() != 0 {
-				ZvalDelrefP(value)
-			}
+			Z_TRY_DELREF_P(value)
 			return FAILURE
 		}
 		value = &tmp
 	}
-	ZendAssignToVariable(property, value, 1<<1, 0)
+	ZendAssignToVariable(property, value, IS_TMP_VAR, 0)
 	return SUCCESS
 }
 
@@ -5593,7 +5501,7 @@ func ZendUpdateStaticProperty(scope *ZendClassEntry, name *byte, name_length int
 
 func ZendUpdateStaticPropertyNull(scope *ZendClassEntry, name *byte, name_length int) int {
 	var tmp Zval
-	&tmp.SetTypeInfo(1)
+	ZVAL_NULL(&tmp)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5601,11 +5509,7 @@ func ZendUpdateStaticPropertyNull(scope *ZendClassEntry, name *byte, name_length
 
 func ZendUpdateStaticPropertyBool(scope *ZendClassEntry, name *byte, name_length int, value ZendLong) int {
 	var tmp Zval
-	if value != 0 {
-		&tmp.SetTypeInfo(3)
-	} else {
-		&tmp.SetTypeInfo(2)
-	}
+	ZVAL_BOOL(&tmp, value)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5613,9 +5517,7 @@ func ZendUpdateStaticPropertyBool(scope *ZendClassEntry, name *byte, name_length
 
 func ZendUpdateStaticPropertyLong(scope *ZendClassEntry, name *byte, name_length int, value ZendLong) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetLval(value)
-	__z.SetTypeInfo(4)
+	ZVAL_LONG(&tmp, value)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5623,9 +5525,7 @@ func ZendUpdateStaticPropertyLong(scope *ZendClassEntry, name *byte, name_length
 
 func ZendUpdateStaticPropertyDouble(scope *ZendClassEntry, name *byte, name_length int, value float64) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	__z.GetValue().SetDval(value)
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(&tmp, value)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5633,12 +5533,8 @@ func ZendUpdateStaticPropertyDouble(scope *ZendClassEntry, name *byte, name_leng
 
 func ZendUpdateStaticPropertyString(scope *ZendClassEntry, name *byte, name_length int, value *byte) int {
 	var tmp Zval
-	var _s *byte = value
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(_s, strlen(_s), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZvalSetRefcountP(&tmp, 0)
+	ZVAL_STRING(&tmp, value)
+	Z_SET_REFCOUNT(tmp, 0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5646,11 +5542,8 @@ func ZendUpdateStaticPropertyString(scope *ZendClassEntry, name *byte, name_leng
 
 func ZendUpdateStaticPropertyStringl(scope *ZendClassEntry, name *byte, name_length int, value *byte, value_len int) int {
 	var tmp Zval
-	var __z *Zval = &tmp
-	var __s *ZendString = ZendStringInit(value, value_len, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	ZvalSetRefcountP(&tmp, 0)
+	ZVAL_STRINGL(&tmp, value, value_len)
+	Z_SET_REFCOUNT(tmp, 0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 
@@ -5659,18 +5552,11 @@ func ZendUpdateStaticPropertyStringl(scope *ZendClassEntry, name *byte, name_len
 func ZendReadPropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, silent ZendBool, rv *Zval) *Zval {
 	var property Zval
 	var value *Zval
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	EG.SetFakeScope(scope)
-	var __z *Zval = &property
-	var __s *ZendString = name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	value = object.GetValue().GetObj().GetHandlers().GetReadProperty()(object, &property, g.Cond(silent != 0, 3, 0), nil, rv)
-	EG.SetFakeScope(old_scope)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	ExecutorGlobals.SetFakeScope(scope)
+	ZVAL_STR(&property, name)
+	value = Z_OBJ_HT_P(object).GetReadProperty()(object, &property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
+	ExecutorGlobals.SetFakeScope(old_scope)
 	return value
 }
 
@@ -5689,10 +5575,10 @@ func ZendReadProperty(scope *ZendClassEntry, object *Zval, name string, name_len
 
 func ZendReadStaticPropertyEx(scope *ZendClassEntry, name *ZendString, silent ZendBool) *Zval {
 	var property *Zval
-	var old_scope *ZendClassEntry = EG.GetFakeScope()
-	EG.SetFakeScope(scope)
-	property = ZendStdGetStaticProperty(scope, name, g.Cond(silent != 0, 3, 0))
-	EG.SetFakeScope(old_scope)
+	var old_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+	ExecutorGlobals.SetFakeScope(scope)
+	property = ZendStdGetStaticProperty(scope, name, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R))
+	ExecutorGlobals.SetFakeScope(old_scope)
 	return property
 }
 
@@ -5708,9 +5594,9 @@ func ZendReadStaticProperty(scope *ZendClassEntry, name *byte, name_length int, 
 /* }}} */
 
 func ZendSaveErrorHandling(current *ZendErrorHandling) {
-	current.SetHandling(EG.GetErrorHandling())
-	current.SetException(EG.GetExceptionClass())
-	&current.user_handler.u1.type_info = 0
+	current.SetHandling(ExecutorGlobals.GetErrorHandling())
+	current.SetException(ExecutorGlobals.GetExceptionClass())
+	ZVAL_UNDEF(&current.user_handler)
 }
 
 /* }}} */
@@ -5719,16 +5605,16 @@ func ZendReplaceErrorHandling(error_handling ZendErrorHandlingT, exception_class
 	if current != nil {
 		ZendSaveErrorHandling(current)
 	}
-	r.Assert(error_handling == EH_THROW || exception_class == nil)
-	EG.SetErrorHandling(error_handling)
-	EG.SetExceptionClass(exception_class)
+	ZEND_ASSERT(error_handling == EH_THROW || exception_class == nil)
+	ExecutorGlobals.SetErrorHandling(error_handling)
+	ExecutorGlobals.SetExceptionClass(exception_class)
 }
 
 /* }}} */
 
 func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
-	EG.SetErrorHandling(saved.GetHandling())
-	EG.SetExceptionClass(saved.GetException())
+	ExecutorGlobals.SetErrorHandling(saved.GetHandling())
+	ExecutorGlobals.SetExceptionClass(saved.GetException())
 }
 
 /* }}} */
@@ -5736,10 +5622,10 @@ func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
 func ZendFindAliasName(ce *ZendClassEntry, name *ZendString) *ZendString {
 	var alias *ZendTraitAlias
 	var alias_ptr **ZendTraitAlias
-	if g.Assign(&alias_ptr, ce.GetTraitAliases()) {
+	if b.Assign(&alias_ptr, ce.GetTraitAliases()) {
 		alias = *alias_ptr
 		for alias != nil {
-			if alias.GetAlias() != nil && (alias.GetAlias().GetLen() == name.GetLen() && ZendBinaryStrcasecmp(alias.GetAlias().GetVal(), alias.GetAlias().GetLen(), name.GetVal(), name.GetLen()) == 0) {
+			if alias.GetAlias() != nil && ZendStringEqualsCi(alias.GetAlias(), name) {
 				return alias.GetAlias()
 			}
 			alias_ptr++
@@ -5755,7 +5641,7 @@ func ZendResolveMethodName(ce *ZendClassEntry, f *ZendFunction) *ZendString {
 	var func_ *ZendFunction
 	var function_table *HashTable
 	var name *ZendString
-	if f.GetCommonType() != 2 || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
+	if f.GetCommonType() != ZEND_USER_FUNCTION || f.GetOpArray().GetRefcount() != nil && (*(f.GetOpArray().GetRefcount())) < 2 || f.GetScope() == nil || f.GetScope().GetTraitAliases() == nil {
 		return f.GetFunctionName()
 	}
 	function_table = &ce.function_table
@@ -5766,16 +5652,16 @@ func ZendResolveMethodName(ce *ZendClassEntry, f *ZendFunction) *ZendString {
 		for ; _p != _end; _p++ {
 			var _z *Zval = &_p.val
 
-			if _z.GetType() == 0 {
+			if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 				continue
 			}
 			name = _p.GetKey()
-			func_ = _z.GetValue().GetPtr()
+			func_ = Z_PTR_P(_z)
 			if func_ == f {
 				if name == nil {
 					return f.GetFunctionName()
 				}
-				if name.GetLen() == f.GetFunctionName().GetLen() && !(strncasecmp(name.GetVal(), f.GetFunctionName().GetVal(), f.GetFunctionName().GetLen())) {
+				if ZSTR_LEN(name) == ZSTR_LEN(f.GetFunctionName()) && !(strncasecmp(ZSTR_VAL(name), ZSTR_VAL(f.GetFunctionName()), ZSTR_LEN(f.GetFunctionName()))) {
 					return f.GetFunctionName()
 				}
 				return ZendFindAliasName(f.GetScope(), name)
@@ -5789,9 +5675,9 @@ func ZendResolveMethodName(ce *ZendClassEntry, f *ZendFunction) *ZendString {
 /* }}} */
 
 func ZendGetObjectType(ce *ZendClassEntry) *byte {
-	if (ce.GetCeFlags() & 1 << 1) != 0 {
+	if (ce.GetCeFlags() & ZEND_ACC_TRAIT) != 0 {
 		return "trait"
-	} else if (ce.GetCeFlags() & 1 << 0) != 0 {
+	} else if (ce.GetCeFlags() & ZEND_ACC_INTERFACE) != 0 {
 		return "interface"
 	} else {
 		return "class"
@@ -5801,11 +5687,11 @@ func ZendGetObjectType(ce *ZendClassEntry) *byte {
 /* }}} */
 
 func ZendIsIterable(iterable *Zval) ZendBool {
-	switch iterable.GetType() {
-	case 7:
+	switch Z_TYPE_P(iterable) {
+	case IS_ARRAY:
 		return 1
-	case 8:
-		return InstanceofFunction(iterable.GetValue().GetObj().GetCe(), ZendCeTraversable)
+	case IS_OBJECT:
+		return InstanceofFunction(Z_OBJCE_P(iterable), ZendCeTraversable)
 	default:
 		return 0
 	}
@@ -5814,14 +5700,14 @@ func ZendIsIterable(iterable *Zval) ZendBool {
 /* }}} */
 
 func ZendIsCountable(countable *Zval) ZendBool {
-	switch countable.GetType() {
-	case 7:
+	switch Z_TYPE_P(countable) {
+	case IS_ARRAY:
 		return 1
-	case 8:
-		if countable.GetValue().GetObj().GetHandlers().GetCountElements() != nil {
+	case IS_OBJECT:
+		if Z_OBJ_HT_P(countable).GetCountElements() != nil {
 			return 1
 		}
-		return InstanceofFunction(countable.GetValue().GetObj().GetCe(), ZendCeCountable)
+		return InstanceofFunction(Z_OBJCE_P(countable), ZendCeCountable)
 	default:
 		return 0
 	}

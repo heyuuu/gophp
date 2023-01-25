@@ -43,12 +43,9 @@ package core
 
 // # include < stdint . h >
 
-// #define INT8_C(c) c
-
-// #define UINT8_C(c) c
-
-// #define INT16_C(c) c
-
-// #define UINT16_C(c) c
+func INT8_C(c __auto__) __auto__   { return c }
+func UINT8_C(c __auto__) __auto__  { return c }
+func INT16_C(c __auto__) __auto__  { return c }
+func UINT16_C(c __auto__) __auto__ { return c }
 
 // #define UINT32_C(c) c ## U

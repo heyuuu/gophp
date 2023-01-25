@@ -17,11 +17,11 @@ package standard
 */
 
 func init() {
-	PhpInfoPrintTableRow(2, "Apache 2.0 Handler", "Ian Holsman, Justin Erenkrantz (based on Apache 2.0 Filter code)")
-	PhpInfoPrintTableRow(2, "CGI / FastCGI", "Rasmus Lerdorf, Stig Bakken, Shane Caraveo, Dmitry Stogov")
-	PhpInfoPrintTableRow(2, "CLI", "Edin Kadribasic, Marcus Boerger, Johannes Schlueter, Moriyoshi Koizumi, Xinchen Hui")
-	PhpInfoPrintTableRow(2, "Embed", "Edin Kadribasic")
-	PhpInfoPrintTableRow(2, "FastCGI Process Manager", "Andrei Nigmatulin, dreamcat4, Antony Dovgal, Jerome Loyet")
-	PhpInfoPrintTableRow(2, "litespeed", "George Wang")
-	PhpInfoPrintTableRow(2, "phpdbg", "Felipe Pena, Joe Watkins, Bob Weinand")
+	CREDIT_LINE("Apache 2.0 Handler", "Ian Holsman, Justin Erenkrantz (based on Apache 2.0 Filter code)")
+	CREDIT_LINE("CGI / FastCGI", "Rasmus Lerdorf, Stig Bakken, Shane Caraveo, Dmitry Stogov")
+	CREDIT_LINE("CLI", "Edin Kadribasic, Marcus Boerger, Johannes Schlueter, Moriyoshi Koizumi, Xinchen Hui")
+	CREDIT_LINE("Embed", "Edin Kadribasic")
+	CREDIT_LINE("FastCGI Process Manager", "Andrei Nigmatulin, dreamcat4, Antony Dovgal, Jerome Loyet")
+	CREDIT_LINE("litespeed", "George Wang")
+	CREDIT_LINE("phpdbg", "Felipe Pena, Joe Watkins, Bob Weinand")
 }

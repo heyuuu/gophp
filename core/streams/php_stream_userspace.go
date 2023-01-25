@@ -22,6 +22,5 @@ package streams
    +----------------------------------------------------------------------+
 */
 
-// #define PHP_STREAM_IS_USERSPACE       & php_stream_userspace_ops
-
-// #define PHP_STREAM_IS_USERSPACE_DIR       & php_stream_userspace_dir_ops
+const PHP_STREAM_IS_USERSPACE = &PhpStreamUserspaceOps
+const PHP_STREAM_IS_USERSPACE_DIR = &PhpStreamUserspaceDirOps

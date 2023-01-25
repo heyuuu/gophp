@@ -31,10 +31,12 @@ import (
 
 var ZifNlLanginfo func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
-// #define strnatcmp(a,b) strnatcmp_ex ( a , strlen ( a ) , b , strlen ( b ) , 0 )
-
-// #define strnatcasecmp(a,b) strnatcmp_ex ( a , strlen ( a ) , b , strlen ( b ) , 1 )
-
-// #define php_mblen(ptr,len) mblen ( ptr , len )
+func Strnatcmp(a *byte, b *byte) int {
+	return StrnatcmpEx(a, strlen(a), b, strlen(b), 0)
+}
+func Strnatcasecmp(a *byte, b *byte) int {
+	return StrnatcmpEx(a, strlen(a), b, strlen(b), 1)
+}
+func PhpMblen(ptr *byte, len_ int) __auto__ { return mblen(ptr, len_) }
 
 // #define php_mb_reset() php_ignore_value ( mblen ( NULL , 0 ) )

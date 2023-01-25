@@ -2,6 +2,10 @@
 
 package standard
 
+import (
+	"sik/zend"
+)
+
 // Source: <ext/standard/php_random.h>
 
 /*
@@ -24,14 +28,14 @@ package standard
 
 // #define PHP_RANDOM_H
 
-// #define php_random_bytes_throw(b,s) php_random_bytes ( ( b ) , ( s ) , 1 )
-
-// #define php_random_bytes_silent(b,s) php_random_bytes ( ( b ) , ( s ) , 0 )
-
-// #define php_random_int_throw(min,max,result) php_random_int ( ( min ) , ( max ) , ( result ) , 1 )
-
-// #define php_random_int_silent(min,max,result) php_random_int ( ( min ) , ( max ) , ( result ) , 0 )
-
-// #define RANDOM_G(v) random_globals . v
+func PhpRandomBytesThrow(b any, s int) int  { return PhpRandomBytes(b, s, 1) }
+func PhpRandomBytesSilent(b any, s int) int { return PhpRandomBytes(b, s, 0) }
+func PhpRandomIntThrow(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong) int {
+	return PhpRandomInt(min, max, result, 1)
+}
+func PhpRandomIntSilent(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong) int {
+	return PhpRandomInt(min, max, result, 0)
+}
+func RANDOM_G(v int) __auto__ { return RandomGlobals.v }
 
 var RandomGlobals PhpRandomGlobals

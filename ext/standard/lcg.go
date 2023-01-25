@@ -3,7 +3,6 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -44,25 +43,22 @@ var LcgGlobals PhpLcgGlobals
  * is equal to the product of both primes.
  */
 
-// #define MODMULT(a,b,c,m,s) q = s / a ; s = b * ( s - a * q ) - c * q ; if ( s < 0 ) s += m
-
+func MODMULT(a int, b int, c int, m int, s int) {
+	q = s / a
+	s = b*(s-a*q) - c*q
+	if s < 0 {
+		s += m
+	}
+}
 func PhpCombinedLcg() float64 {
 	var q int32
 	var z int32
-	if LcgGlobals.GetSeeded() == 0 {
+	if !(LCG(seeded)) {
 		LcgSeed()
 	}
-	q = LcgGlobals.GetS1() / 53668
-	LcgGlobals.SetS1(40014*(LcgGlobals.GetS1()-53668*q) - 12211*q)
-	if LcgGlobals.GetS1() < 0 {
-		LcgGlobals.SetS1(LcgGlobals.GetS1() + 2147483563)
-	}
-	q = LcgGlobals.GetS2() / 52774
-	LcgGlobals.SetS2(40692*(LcgGlobals.GetS2()-52774*q) - 3791*q)
-	if LcgGlobals.GetS2() < 0 {
-		LcgGlobals.SetS2(LcgGlobals.GetS2() + 2147483399)
-	}
-	z = LcgGlobals.GetS1() - LcgGlobals.GetS2()
+	MODMULT(53668, 40014, 12211, 2147483563, LCG(s1))
+	MODMULT(52774, 40692, 3791, 2147483399, LCG(s2))
+	z = LCG(s1) - LCG(s2)
 	if z < 1 {
 		z += 2147483562
 	}
@@ -74,23 +70,23 @@ func PhpCombinedLcg() float64 {
 func LcgSeed() {
 	var tv __struct__timeval
 	if gettimeofday(&tv, nil) == 0 {
-		LcgGlobals.SetS1(tv.tv_sec ^ tv.tv_usec<<11)
+		LCG(s1) = tv.tv_sec ^ tv.tv_usec<<11
 	} else {
-		LcgGlobals.SetS1(1)
+		LCG(s1) = 1
 	}
-	LcgGlobals.SetS2(zend.ZendLong(getpid()))
+	LCG(s2) = zend.ZendLong(getpid())
 
 	/* Add entropy to s2 by calling gettimeofday() again */
 
 	if gettimeofday(&tv, nil) == 0 {
-		LcgGlobals.SetS2(LcgGlobals.GetS2() ^ tv.tv_usec<<11)
+		LCG(s2) ^= tv.tv_usec << 11
 	}
-	LcgGlobals.SetSeeded(1)
+	LCG(seeded) = 1
 }
 
 /* }}} */
 
-func LcgInitGlobals(lcg_globals_p *PhpLcgGlobals) { LcgGlobals.SetSeeded(0) }
+func LcgInitGlobals(lcg_globals_p *PhpLcgGlobals) { LCG(seeded) = 0 }
 
 /* }}} */
 
@@ -102,15 +98,10 @@ func ZmStartupLcg(type_ int, module_number int) int {
 /* }}} */
 
 func ZifLcgValue(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	var __z *zend.Zval = return_value
-	__z.value.dval = PhpCombinedLcg()
-	__z.u1.type_info = 5
+	zend.RETVAL_DOUBLE(PhpCombinedLcg())
 	return
 }
 

@@ -24,19 +24,13 @@ package zend
 
 // #define ZEND_ALLOC_SIZES_H
 
-// #define ZEND_MM_CHUNK_SIZE       ( 2 * 1024 * 1024 )
-
-// #define ZEND_MM_PAGE_SIZE       ( 4 * 1024 )
-
-// #define ZEND_MM_PAGES       ( ZEND_MM_CHUNK_SIZE / ZEND_MM_PAGE_SIZE )
-
-// #define ZEND_MM_FIRST_PAGE       ( 1 )
-
-// #define ZEND_MM_MIN_SMALL_SIZE       8
-
-// #define ZEND_MM_MAX_SMALL_SIZE       3072
-
-// #define ZEND_MM_MAX_LARGE_SIZE       ( ZEND_MM_CHUNK_SIZE - ( ZEND_MM_PAGE_SIZE * ZEND_MM_FIRST_PAGE ) )
+const ZEND_MM_CHUNK_SIZE = 2 * 1024 * 1024
+const ZEND_MM_PAGE_SIZE = 4 * 1024
+const ZEND_MM_PAGES uint32 = ZEND_MM_CHUNK_SIZE / ZEND_MM_PAGE_SIZE
+const ZEND_MM_FIRST_PAGE = 1
+const ZEND_MM_MIN_SMALL_SIZE = 8
+const ZEND_MM_MAX_SMALL_SIZE = 3072
+const ZEND_MM_MAX_LARGE_SIZE = ZEND_MM_CHUNK_SIZE - ZEND_MM_PAGE_SIZE*ZEND_MM_FIRST_PAGE
 
 /* num, size, count, pages */
 

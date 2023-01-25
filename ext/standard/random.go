@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -70,7 +69,7 @@ func PhpRandomBytes(bytes any, size int, should_throw zend.ZendBool) int {
 	var read_bytes int = 0
 	var n ssize_t
 	if read_bytes < size {
-		var fd int = RandomGlobals.GetFd()
+		var fd int = RANDOM_G(fd)
 		var st __struct__stat
 		if fd < 0 {
 			fd = open("/dev/urandom", O_RDONLY)
@@ -90,7 +89,7 @@ func PhpRandomBytes(bytes any, size int, should_throw zend.ZendBool) int {
 				}
 				return zend.FAILURE
 			}
-			RandomGlobals.SetFd(fd)
+			RANDOM_G(fd) = fd
 		}
 		for read_bytes = 0; read_bytes < size; read_bytes += int(n) {
 			n = read(fd, bytes+read_bytes, size-read_bytes)
@@ -114,10 +113,10 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	var size zend.ZendLong
 	var bytes *zend.ZendString
 	for {
-		var _flags int = 1 << 2
+		var _flags int = zend.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -125,7 +124,7 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -134,52 +133,42 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -195,19 +184,12 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	bytes = zend.ZendStringAlloc(size, 0)
-	if PhpRandomBytes(bytes.val, size, 1) == zend.FAILURE {
+	if PhpRandomBytesThrow(zend.ZSTR_VAL(bytes), size) == zend.FAILURE {
 		zend.ZendStringReleaseEx(bytes, 0)
 		return
 	}
-	bytes.val[size] = '0'
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = bytes
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.ZSTR_VAL(bytes)[size] = '0'
+	zend.RETVAL_STR(bytes)
 	return
 }
 
@@ -221,13 +203,13 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 		return zend.SUCCESS
 	}
 	umax = zend.ZendUlong(max - zend.ZendUlong(min))
-	if PhpRandomBytes(&trial, g.SizeOf("trial"), should_throw) == zend.FAILURE {
+	if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == zend.FAILURE {
 		return zend.FAILURE
 	}
 
 	/* Special case where no modulus is required */
 
-	if umax == UINT64_MAX {
+	if umax == zend.ZEND_ULONG_MAX {
 		*result = zend.ZendLong(trial)
 		return zend.SUCCESS
 	}
@@ -242,12 +224,12 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 
 		/* Ceiling under which ZEND_LONG_MAX % max == 0 */
 
-		var limit zend.ZendUlong = UINT64_MAX - UINT64_MAX%umax - 1
+		var limit zend.ZendUlong = zend.ZEND_ULONG_MAX - zend.ZEND_ULONG_MAX%umax - 1
 
 		/* Discard numbers over the limit to avoid modulo bias */
 
 		for trial > limit {
-			if PhpRandomBytes(&trial, g.SizeOf("trial"), should_throw) == zend.FAILURE {
+			if PhpRandomBytes(&trial, b.SizeOf("trial"), should_throw) == zend.FAILURE {
 				return zend.FAILURE
 			}
 		}
@@ -266,10 +248,10 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var max zend.ZendLong
 	var result zend.ZendLong
 	for {
-		var _flags int = 1 << 2
+		var _flags int = zend.ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -277,7 +259,7 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -286,68 +268,48 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &max, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -362,12 +324,10 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendThrowException(zend.ZendCeError, "Minimum value must be less than or equal to the maximum value", 0)
 		return
 	}
-	if PhpRandomInt(min, max, &result, 1) == zend.FAILURE {
+	if PhpRandomIntThrow(min, max, &result) == zend.FAILURE {
 		return
 	}
-	var __z *zend.Zval = return_value
-	__z.value.lval = result
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(result)
 	return
 }
 

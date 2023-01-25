@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -43,7 +42,7 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -51,7 +50,7 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -60,69 +59,49 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &phones, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &phones, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -133,75 +112,80 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if Metaphone((*uint8)(str.val), str.len_, phones, &result, 1) == 0 {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = result
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+	if Metaphone((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), phones, &result, 1) == 0 {
+		zend.RETVAL_STR(result)
 	} else {
 		if result != nil {
 			zend.ZendStringFree(result)
 		}
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 }
 
 /* }}} */
 
-// #define SH       'X'
-
-// #define TH       '0'
+const SH = 'X'
+const TH = '0'
 
 /*-----------------------------  */
 
 var _codes []byte = []byte{1, 16, 4, 16, 9, 2, 4, 16, 9, 2, 0, 2, 2, 2, 1, 4, 0, 2, 4, 4, 1, 0, 0, 0, 8, 0}
 
-// #define ENCODE(c) ( isalpha ( c ) ? _codes [ ( ( toupper ( c ) ) - 'A' ) ] : 0 )
-
-// #define isvowel(c) ( ENCODE ( c ) & 1 )
+func ENCODE(c __auto__) __auto__ {
+	if isalpha(c) {
+		return _codes[toupper(c)-'A']
+	} else {
+		return 0
+	}
+}
+func Isvowel(c byte) int { return ENCODE(c) & 1 }
 
 /* These letters are passed through unchanged */
 
-// #define NOCHANGE(c) ( ENCODE ( c ) & 2 )
+func NOCHANGE(c __auto__) int { return ENCODE(c) & 2 }
 
 /* These form diphthongs when preceding H */
 
-// #define AFFECTH(c) ( ENCODE ( c ) & 4 )
+func AFFECTH(c __auto__) int { return ENCODE(c) & 4 }
 
 /* These make C and G soft */
 
-// #define MAKESOFT(c) ( ENCODE ( c ) & 8 )
+func MAKESOFT(c byte) int { return ENCODE(c) & 8 }
 
 /* These prevent GH from becoming F */
 
-// #define NOGHTOF(c) ( ENCODE ( c ) & 16 )
+func NOGHTOF(c char) int { return ENCODE(c) & 16 }
 
 /*----------------------------- */
 
-// #define Next_Letter       ( toupper ( word [ w_idx + 1 ] ) )
+const Next_Letter byte = toupper(word[w_idx+1])
 
 /* Look at the current letter in the word */
 
-// #define Curr_Letter       ( toupper ( word [ w_idx ] ) )
+const Curr_Letter byte = toupper(word[w_idx])
 
 /* Go N letters back. */
 
-// #define Look_Back_Letter(n) ( w_idx >= n ? toupper ( word [ w_idx - n ] ) : '\0' )
+func Look_Back_Letter(n int) char {
+	if w_idx >= n {
+		return toupper(word[w_idx-n])
+	} else {
+		return '0'
+	}
+}
 
 /* Previous letter.  I dunno, should this return null on failure? */
 
-// #define Prev_Letter       ( Look_Back_Letter ( 1 ) )
+const Prev_Letter = Look_Back_Letter(1)
 
 /* Look two letters down.  It makes sure you don't walk off the string. */
 
-// #define After_Next_Letter       ( Next_Letter != '\0' ? toupper ( word [ w_idx + 2 ] ) : '\0' )
+const After_Next_Letter byte = b.CondF1(Next_Letter != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0')
 
-// #define Look_Ahead_Letter(n) ( toupper ( Lookahead ( ( char * ) word + w_idx , n ) ) )
+func Look_Ahead_Letter(n int) __auto__ {
+	return toupper(Lookahead((*byte)(word+w_idx), n))
+}
 
 /* Allows us to safely look ahead an arbitrary # of letters */
 
@@ -223,7 +207,14 @@ func Lookahead(word *byte, how_far int) byte {
  * re-allocate the buffer size. We're using an extra of 2 characters (this
  * could be one though; or more too). */
 
-// #define Phonize(c) { if ( p_idx >= max_buffer_len ) { * phoned_word = zend_string_extend ( * phoned_word , 2 * sizeof ( char ) + max_buffer_len , 0 ) ; max_buffer_len += 2 ; } ZSTR_VAL ( * phoned_word ) [ p_idx ++ ] = c ; ZSTR_LEN ( * phoned_word ) = p_idx ; }
+func Phonize(c byte) {
+	if p_idx >= max_buffer_len {
+		*phoned_word = zend.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len, 0)
+		max_buffer_len += 2
+	}
+	zend.ZSTR_VAL(*phoned_word)[b.PostInc(&p_idx)] = c
+	zend.ZSTR_LEN(*phoned_word) = p_idx
+}
 
 /* Slap a null character on the end of the phoned word */
 
@@ -231,11 +222,11 @@ func Lookahead(word *byte, how_far int) byte {
 
 /* How long is the phoned word? */
 
-// #define Phone_Len       ( p_idx )
+const Phone_Len = p_idx
 
 /* Note is a letter is a 'break' in the word */
 
-// #define Isbreak(c) ( ! isalpha ( c ) )
+func Isbreak(c byte) bool { return !(isalpha(c)) }
 
 /* {{{ metaphone
  */
@@ -261,48 +252,38 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 	if max_phonemes == 0 {
 		max_buffer_len = word_len
-		*phoned_word = zend.ZendStringAlloc(g.SizeOf("char")*word_len+1, 0)
+		*phoned_word = zend.ZendStringAlloc(b.SizeOf("char")*word_len+1, 0)
 	} else {
 		max_buffer_len = max_phonemes
-		*phoned_word = zend.ZendStringAlloc(g.SizeOf("char")*max_phonemes+1, 0)
+		*phoned_word = zend.ZendStringAlloc(b.SizeOf("char")*max_phonemes+1, 0)
 	}
 
 	/*-- The first phoneme has to be processed specially. --*/
 
-	for ; !(isalpha(toupper(word[w_idx]))); w_idx++ {
+	for ; !(isalpha(Curr_Letter)); w_idx++ {
 
 		/* On the off chance we were given nothing but crap... */
 
-		if toupper(word[w_idx]) == '0' {
+		if Curr_Letter == '0' {
 			if p_idx == max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 1*g.SizeOf("char")+max_buffer_len, 0)
+				*phoned_word = zend.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
 				max_buffer_len += 1
 			}
-			(*phoned_word).val[p_idx] = '0'
-			(*phoned_word).len_ = p_idx
+			zend.ZSTR_VAL(*phoned_word)[p_idx] = '0'
+			zend.ZSTR_LEN(*phoned_word) = p_idx
 			return zend.SUCCESS
 		}
 
 		/* On the off chance we were given nothing but crap... */
 
 	}
-	switch toupper(word[w_idx]) {
+	switch Curr_Letter {
 	case 'A':
-		if toupper(word[w_idx+1]) == 'E' {
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'E'
-			(*phoned_word).len_ = p_idx
+		if Next_Letter == 'E' {
+			Phonize('E')
 			w_idx += 2
 		} else {
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'A'
-			(*phoned_word).len_ = p_idx
+			Phonize('A')
 			w_idx++
 		}
 		break
@@ -311,32 +292,17 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 	case 'K':
 
 	case 'P':
-		if toupper(word[w_idx+1]) == 'N' {
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'N'
-			(*phoned_word).len_ = p_idx
+		if Next_Letter == 'N' {
+			Phonize('N')
 			w_idx += 2
 		}
 		break
 	case 'W':
-		if toupper(word[w_idx+1]) == 'R' {
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = toupper(word[w_idx+1])
-			(*phoned_word).len_ = p_idx
+		if Next_Letter == 'R' {
+			Phonize(Next_Letter)
 			w_idx += 2
-		} else if toupper(word[w_idx+1]) == 'H' || (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0)&1) != 0 {
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'W'
-			(*phoned_word).len_ = p_idx
+		} else if Next_Letter == 'H' || Isvowel(Next_Letter) != 0 {
+			Phonize('W')
 			w_idx += 2
 		}
 
@@ -344,12 +310,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 		break
 	case 'X':
-		if p_idx >= max_buffer_len {
-			*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-			max_buffer_len += 2
-		}
-		(*phoned_word).val[g.PostInc(&p_idx)] = 'S'
-		(*phoned_word).len_ = p_idx
+		Phonize('S')
 		w_idx++
 		break
 	case 'E':
@@ -359,12 +320,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 	case 'O':
 
 	case 'U':
-		if p_idx >= max_buffer_len {
-			*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-			max_buffer_len += 2
-		}
-		(*phoned_word).val[g.PostInc(&p_idx)] = toupper(word[w_idx])
-		(*phoned_word).len_ = p_idx
+		Phonize(Curr_Letter)
 		w_idx++
 		break
 	default:
@@ -376,7 +332,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 	/* On to the metaphoning */
 
-	for ; toupper(word[w_idx]) != '0' && (max_phonemes == 0 || p_idx < int(max_phonemes)); w_idx++ {
+	for ; Curr_Letter != '0' && (max_phonemes == 0 || Phone_Len < int(max_phonemes)); w_idx++ {
 
 		/* How many letters to skip because an eariler encoding handled
 		 * multiple letters */
@@ -390,285 +346,129 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		 * Hell, I'm trying it.
 		 */
 
-		if !(isalpha(toupper(word[w_idx]))) {
+		if !(isalpha(Curr_Letter)) {
 			continue
 		}
 
 		/* Drop duplicates, except CC */
 
-		if toupper(word[w_idx]) == g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') && toupper(word[w_idx]) != 'C' {
+		if Curr_Letter == Prev_Letter && Curr_Letter != 'C' {
 			continue
 		}
-		switch toupper(word[w_idx]) {
+		switch Curr_Letter {
 		case 'B':
-			if g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') != 'M' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'B'
-				(*phoned_word).len_ = p_idx
+			if Prev_Letter != 'M' {
+				Phonize('B')
 			}
 			break
 		case 'C':
-			if (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0) & 8) != 0 {
-				if g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'A' && toupper(word[w_idx+1]) == 'I' {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-					(*phoned_word).len_ = p_idx
-				} else if g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') == 'S' {
+			if MAKESOFT(Next_Letter) != 0 {
+				if After_Next_Letter == 'A' && Next_Letter == 'I' {
+					Phonize(SH)
+				} else if Prev_Letter == 'S' {
 
 				} else {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'S'
-					(*phoned_word).len_ = p_idx
+					Phonize('S')
 				}
-			} else if toupper(word[w_idx+1]) == 'H' {
-				if traditional == 0 && (g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'R' || g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') == 'S') {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-					(*phoned_word).len_ = p_idx
+			} else if Next_Letter == 'H' {
+				if traditional == 0 && (After_Next_Letter == 'R' || Prev_Letter == 'S') {
+					Phonize('K')
 				} else {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-					(*phoned_word).len_ = p_idx
+					Phonize(SH)
 				}
 				skip_letter++
 			} else {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-				(*phoned_word).len_ = p_idx
+				Phonize('K')
 			}
 			break
 		case 'D':
-			if toupper(word[w_idx+1]) == 'G' && (g.CondF1(isalpha(g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0')), func() byte {
-				return _codes[toupper(g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0'))-'A']
-			}, 0)&8) != 0 {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'J'
-				(*phoned_word).len_ = p_idx
+			if Next_Letter == 'G' && MAKESOFT(After_Next_Letter) != 0 {
+				Phonize('J')
 				skip_letter++
 			} else {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'T'
-				(*phoned_word).len_ = p_idx
+				Phonize('T')
 			}
 			break
 		case 'G':
-			if toupper(word[w_idx+1]) == 'H' {
-				if !((g.CondF1(isalpha(g.CondF1(w_idx >= 3, func() __auto__ { return toupper(word[w_idx-3]) }, '0')), func() byte {
-					return _codes[toupper(g.CondF1(w_idx >= 3, func() __auto__ { return toupper(word[w_idx-3]) }, '0'))-'A']
-				}, 0)&16) != 0 || g.CondF1(w_idx >= 4, func() __auto__ { return toupper(word[w_idx-4]) }, '0') == 'H') {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'F'
-					(*phoned_word).len_ = p_idx
+			if Next_Letter == 'H' {
+				if !(NOGHTOF(Look_Back_Letter(3)) != 0 || Look_Back_Letter(4) == 'H') {
+					Phonize('F')
 					skip_letter++
 				}
-			} else if toupper(word[w_idx+1]) == 'N' {
-				if !(isalpha(g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0'))) || g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'E' && toupper(Lookahead((*byte)(word+w_idx), 3)) == 'D' {
+			} else if Next_Letter == 'N' {
+				if Isbreak(After_Next_Letter) || After_Next_Letter == 'E' && Look_Ahead_Letter(3) == 'D' {
 
 				} else {
-					if p_idx >= max_buffer_len {
-						*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-						max_buffer_len += 2
-					}
-					(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-					(*phoned_word).len_ = p_idx
+					Phonize('K')
 				}
-			} else if (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0)&8) != 0 && g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') != 'G' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'J'
-				(*phoned_word).len_ = p_idx
+			} else if MAKESOFT(Next_Letter) != 0 && Prev_Letter != 'G' {
+				Phonize('J')
 			} else {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-				(*phoned_word).len_ = p_idx
+				Phonize('K')
 			}
 			break
 		case 'H':
-			if (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0)&1) != 0 && (g.CondF1(isalpha(g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0')), func() byte {
-				return _codes[toupper(g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0'))-'A']
-			}, 0)&4) == 0 {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'H'
-				(*phoned_word).len_ = p_idx
+			if Isvowel(Next_Letter) != 0 && AFFECTH(Prev_Letter) == 0 {
+				Phonize('H')
 			}
 			break
 		case 'K':
-			if g.CondF1(w_idx >= 1, func() __auto__ { return toupper(word[w_idx-1]) }, '0') != 'C' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-				(*phoned_word).len_ = p_idx
+			if Prev_Letter != 'C' {
+				Phonize('K')
 			}
 			break
 		case 'P':
-			if toupper(word[w_idx+1]) == 'H' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'F'
-				(*phoned_word).len_ = p_idx
+			if Next_Letter == 'H' {
+				Phonize('F')
 			} else {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'P'
-				(*phoned_word).len_ = p_idx
+				Phonize('P')
 			}
 			break
 		case 'Q':
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-			(*phoned_word).len_ = p_idx
+			Phonize('K')
 			break
 		case 'S':
-			if toupper(word[w_idx+1]) == 'I' && (g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'O' || g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'A') {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-				(*phoned_word).len_ = p_idx
-			} else if toupper(word[w_idx+1]) == 'H' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-				(*phoned_word).len_ = p_idx
+			if Next_Letter == 'I' && (After_Next_Letter == 'O' || After_Next_Letter == 'A') {
+				Phonize(SH)
+			} else if Next_Letter == 'H' {
+				Phonize(SH)
 				skip_letter++
-			} else if traditional == 0 && (toupper(word[w_idx+1]) == 'C' && toupper(Lookahead((*byte)(word+w_idx), 2)) == 'H' && toupper(Lookahead((*byte)(word+w_idx), 3)) == 'W') {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-				(*phoned_word).len_ = p_idx
+			} else if traditional == 0 && (Next_Letter == 'C' && Look_Ahead_Letter(2) == 'H' && Look_Ahead_Letter(3) == 'W') {
+				Phonize(SH)
 				skip_letter += 2
 			} else {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'S'
-				(*phoned_word).len_ = p_idx
+				Phonize('S')
 			}
 			break
 		case 'T':
-			if toupper(word[w_idx+1]) == 'I' && (g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'O' || g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'A') {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'X'
-				(*phoned_word).len_ = p_idx
-			} else if toupper(word[w_idx+1]) == 'H' {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = '0'
-				(*phoned_word).len_ = p_idx
+			if Next_Letter == 'I' && (After_Next_Letter == 'O' || After_Next_Letter == 'A') {
+				Phonize(SH)
+			} else if Next_Letter == 'H' {
+				Phonize(TH)
 				skip_letter++
-			} else if !(toupper(word[w_idx+1]) == 'C' && g.CondF1(toupper(word[w_idx+1]) != '0', func() __auto__ { return toupper(word[w_idx+2]) }, '0') == 'H') {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'T'
-				(*phoned_word).len_ = p_idx
+			} else if !(Next_Letter == 'C' && After_Next_Letter == 'H') {
+				Phonize('T')
 			}
 			break
 		case 'V':
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'F'
-			(*phoned_word).len_ = p_idx
+			Phonize('F')
 			break
 		case 'W':
-			if (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0) & 1) != 0 {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'W'
-				(*phoned_word).len_ = p_idx
+			if Isvowel(Next_Letter) != 0 {
+				Phonize('W')
 			}
 			break
 		case 'X':
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'K'
-			(*phoned_word).len_ = p_idx
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'S'
-			(*phoned_word).len_ = p_idx
+			Phonize('K')
+			Phonize('S')
 			break
 		case 'Y':
-			if (g.CondF1(isalpha(toupper(word[w_idx+1])), func() byte { return _codes[toupper(toupper(word[w_idx+1]))-'A'] }, 0) & 1) != 0 {
-				if p_idx >= max_buffer_len {
-					*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-					max_buffer_len += 2
-				}
-				(*phoned_word).val[g.PostInc(&p_idx)] = 'Y'
-				(*phoned_word).len_ = p_idx
+			if Isvowel(Next_Letter) != 0 {
+				Phonize('Y')
 			}
 			break
 		case 'Z':
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = 'S'
-			(*phoned_word).len_ = p_idx
+			Phonize('S')
 			break
 		case 'F':
 
@@ -681,12 +481,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		case 'N':
 
 		case 'R':
-			if p_idx >= max_buffer_len {
-				*phoned_word = zend.ZendStringExtend(*phoned_word, 2*g.SizeOf("char")+max_buffer_len, 0)
-				max_buffer_len += 2
-			}
-			(*phoned_word).val[g.PostInc(&p_idx)] = toupper(word[w_idx])
-			(*phoned_word).len_ = p_idx
+			Phonize(Curr_Letter)
 			break
 		default:
 
@@ -697,11 +492,11 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		w_idx += skip_letter
 	}
 	if p_idx == max_buffer_len {
-		*phoned_word = zend.ZendStringExtend(*phoned_word, 1*g.SizeOf("char")+max_buffer_len, 0)
+		*phoned_word = zend.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
 		max_buffer_len += 1
 	}
-	(*phoned_word).val[p_idx] = '0'
-	(*phoned_word).len_ = p_idx
+	zend.ZSTR_VAL(*phoned_word)[p_idx] = '0'
+	zend.ZSTR_LEN(*phoned_word) = p_idx
 	return 0
 }
 

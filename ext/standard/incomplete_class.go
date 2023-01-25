@@ -3,8 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -34,7 +34,7 @@ import (
 
 // # include "php_incomplete_class.h"
 
-// #define INCOMPLETE_CLASS_MSG       "The script tried to execute a method or " "access a property of an incomplete object. " "Please ensure that the class definition \"%s\" of the object " "you are trying to operate on was loaded _before_ " "unserialize() gets called or provide an autoloader " "to load the class definition"
+const INCOMPLETE_CLASS_MSG string = "The script tried to execute a method or " + "access a property of an incomplete object. " + "Please ensure that the class definition \"%s\" of the object " + "you are trying to operate on was loaded _before_ " + "unserialize() gets called or provide an autoloader " + "to load the class definition"
 
 var PhpIncompleteObjectHandlers zend.ZendObjectHandlers
 
@@ -45,49 +45,49 @@ func IncompleteClassMessage(object *zend.Zval, error_type int) {
 	var class_name *zend.ZendString
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
-		core.PhpErrorDocref(nil, error_type, "The script tried to execute a method or "+"access a property of an incomplete object. "+"Please ensure that the class definition \"%s\" of the object "+"you are trying to operate on was loaded _before_ "+"unserialize() gets called or provide an autoloader "+"to load the class definition", class_name.val)
+		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, zend.ZSTR_VAL(class_name))
 		zend.ZendStringReleaseEx(class_name, 0)
 	} else {
-		core.PhpErrorDocref(nil, error_type, "The script tried to execute a method or "+"access a property of an incomplete object. "+"Please ensure that the class definition \"%s\" of the object "+"you are trying to operate on was loaded _before_ "+"unserialize() gets called or provide an autoloader "+"to load the class definition", "unknown")
+		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, "unknown")
 	}
 }
 
 /* }}} */
 
 func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any, rv *zend.Zval) *zend.Zval {
-	IncompleteClassMessage(object, 1<<3)
-	if type_ == 1 || type_ == 2 {
-		rv.u1.type_info = 15
+	IncompleteClassMessage(object, zend.E_NOTICE)
+	if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
+		zend.ZVAL_ERROR(rv)
 		return rv
 	} else {
-		return &zend.EG.uninitialized_zval
+		return &(zend.ExecutorGlobals.uninitialized_zval)
 	}
 }
 
 /* }}} */
 
 func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *zend.Zval, cache_slot *any) *zend.Zval {
-	IncompleteClassMessage(object, 1<<3)
+	IncompleteClassMessage(object, zend.E_NOTICE)
 	return value
 }
 
 /* }}} */
 
 func IncompleteClassGetPropertyPtrPtr(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any) *zend.Zval {
-	IncompleteClassMessage(object, 1<<3)
-	return &zend.EG.error_zval
+	IncompleteClassMessage(object, zend.E_NOTICE)
+	return &(zend.ExecutorGlobals.error_zval)
 }
 
 /* }}} */
 
 func IncompleteClassUnsetProperty(object *zend.Zval, member *zend.Zval, cache_slot *any) {
-	IncompleteClassMessage(object, 1<<3)
+	IncompleteClassMessage(object, zend.E_NOTICE)
 }
 
 /* }}} */
 
 func IncompleteClassHasProperty(object *zend.Zval, member *zend.Zval, check_empty int, cache_slot *any) int {
-	IncompleteClassMessage(object, 1<<3)
+	IncompleteClassMessage(object, zend.E_NOTICE)
 	return 0
 }
 
@@ -95,10 +95,8 @@ func IncompleteClassHasProperty(object *zend.Zval, member *zend.Zval, check_empt
 
 func IncompleteClassGetMethod(object **zend.ZendObject, method *zend.ZendString, key *zend.Zval) *zend.ZendFunction {
 	var zobject zend.Zval
-	var __z *zend.Zval = &zobject
-	__z.value.obj = *object
-	__z.u1.type_info = 8 | 1<<0<<8 | 1<<1<<8
-	IncompleteClassMessage(&zobject, 1<<0)
+	zend.ZVAL_OBJ(&zobject, *object)
+	IncompleteClassMessage(&zobject, zend.E_ERROR)
 	return nil
 }
 
@@ -113,11 +111,11 @@ func PhpCreateIncompleteObject(class_type *zend.ZendClassEntry) *zend.ZendObject
 }
 func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 	var incomplete_class zend.ZendClassEntry
-	memset(&incomplete_class, 0, g.SizeOf("zend_class_entry"))
-	incomplete_class.name = zend.ZendStringInitInterned("__PHP_Incomplete_Class", g.SizeOf("INCOMPLETE_CLASS")-1, 1)
+	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
+	incomplete_class.name = zend.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1)
 	incomplete_class.info.internal.builtin_functions = nil
 	incomplete_class.create_object = PhpCreateIncompleteObject
-	memcpy(&PhpIncompleteObjectHandlers, &zend.StdObjectHandlers, g.SizeOf("zend_object_handlers"))
+	memcpy(&PhpIncompleteObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
 	PhpIncompleteObjectHandlers.read_property = IncompleteClassGetProperty
 	PhpIncompleteObjectHandlers.has_property = IncompleteClassHasProperty
 	PhpIncompleteObjectHandlers.unset_property = IncompleteClassUnsetProperty
@@ -132,9 +130,9 @@ func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 	var val *zend.Zval
 	var object_properties *zend.HashTable
-	object_properties = object.value.obj.handlers.get_properties(&(*object))
-	if g.Assign(&val, zend.ZendHashStrFind(object_properties, "__PHP_Incomplete_Class_Name", g.SizeOf("MAGIC_MEMBER")-1)) != nil && val.u1.v.type_ == 6 {
-		return zend.ZendStringCopy(val.value.str)
+	object_properties = zend.Z_OBJPROP_P(object)
+	if b.Assign(&val, zend.ZendHashStrFind(object_properties, MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && zend.Z_TYPE_P(val) == zend.IS_STRING {
+		return zend.ZendStringCopy(zend.Z_STR_P(val))
 	}
 	return nil
 }
@@ -143,11 +141,8 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 
 func PhpStoreClassName(object *zend.Zval, name *byte, len_ int) {
 	var val zend.Zval
-	var __z *zend.Zval = &val
-	var __s *zend.ZendString = zend.ZendStringInit(name, len_, 0)
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
-	zend.ZendHashStrUpdate(object.value.obj.handlers.get_properties(&(*object)), "__PHP_Incomplete_Class_Name", g.SizeOf("MAGIC_MEMBER")-1, &val)
+	zend.ZVAL_STRINGL(&val, name, len_)
+	zend.ZendHashStrUpdate(zend.Z_OBJPROP_P(object), MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1, &val)
 }
 
 /* }}} */

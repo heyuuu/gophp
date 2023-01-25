@@ -3,8 +3,8 @@
 package zend
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 )
 
 // Source: <Zend/zend_language_scanner.h>
@@ -93,36 +93,14 @@ import (
 
 // #define YYFILL(n) { if ( ( YYCURSOR + n ) >= ( YYLIMIT + ZEND_MMAP_AHEAD ) ) { return 0 ; } }
 
-// #define YYCURSOR       SCNG ( yy_cursor )
-
-// #define YYLIMIT       SCNG ( yy_limit )
-
-// #define YYMARKER       SCNG ( yy_marker )
-
-// #define YYGETCONDITION() SCNG ( yy_state )
-
-// #define YYSETCONDITION(s) SCNG ( yy_state ) = s
-
 // #define STATE(name) yyc ## name
 
 /* emulate flex constructs */
 
-// #define BEGIN(state) YYSETCONDITION ( STATE ( state ) )
-
-// #define YYSTATE       YYGETCONDITION ( )
-
-// #define yytext       ( ( char * ) SCNG ( yy_text ) )
-
-// #define yyleng       SCNG ( yy_leng )
-
-// #define yyless(x) do { YYCURSOR = ( unsigned char * ) yytext + x ; yyleng = ( unsigned int ) x ; } while ( 0 )
-
-// #define yymore() goto yymore_restart
+func Yymore() { goto yymore_restart }
 
 /* perform sanity check. If this message is triggered you should
    increase the ZEND_MMAP_AHEAD value in the zend_streams.h file */
-
-// #define YYMAXFILL       16
 
 // # include < stdarg . h >
 
@@ -130,26 +108,39 @@ import (
 
 /* Globals Macros */
 
-// #define SCNG       LANG_SCNG
-
-// #define HANDLE_NEWLINES(s,l) do { char * p = ( s ) , * boundary = p + ( l ) ; while ( p < boundary ) { if ( * p == '\n' || ( * p == '\r' && ( * ( p + 1 ) != '\n' ) ) ) { CG ( zend_lineno ) ++ ; } p ++ ; } } while ( 0 )
-
-// #define HANDLE_NEWLINE(c) { if ( c == '\n' || c == '\r' ) { CG ( zend_lineno ) ++ ; } }
+func HANDLE_NEWLINES(s *byte, l *byte) {
+	var p *byte = s
+	var boundary *byte = p + l
+	for p < boundary {
+		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
+			CompilerGlobals.GetZendLineno()++
+		}
+		p++
+	}
+}
+func HANDLE_NEWLINE(c byte) {
+	if c == '\n' || c == '\r' {
+		CompilerGlobals.GetZendLineno()++
+	}
+}
 
 /* To save initial string length after scanning to first variable */
 
-// #define SET_DOUBLE_QUOTES_SCANNED_LENGTH(len) SCNG ( scanned_string_len ) = ( len )
-
-// #define GET_DOUBLE_QUOTES_SCANNED_LENGTH() SCNG ( scanned_string_len )
-
-// #define IS_LABEL_START(c) ( ( ( c ) >= 'a' && ( c ) <= 'z' ) || ( ( c ) >= 'A' && ( c ) <= 'Z' ) || ( c ) == '_' || ( c ) >= 0x80 )
-
-// #define IS_LABEL_SUCCESSOR(c) ( ( ( c ) >= 'a' && ( c ) <= 'z' ) || ( ( c ) >= 'A' && ( c ) <= 'Z' ) || ( ( c ) >= '0' && ( c ) <= '9' ) || ( c ) == '_' || ( c ) >= 0x80 )
-
-// #define ZEND_IS_OCT(c) ( ( c ) >= '0' && ( c ) <= '7' )
-
-// #define ZEND_IS_HEX(c) ( ( ( c ) >= '0' && ( c ) <= '9' ) || ( ( c ) >= 'a' && ( c ) <= 'f' ) || ( ( c ) >= 'A' && ( c ) <= 'F' ) )
-
+func SET_DOUBLE_QUOTES_SCANNED_LENGTH(len_ int) __auto__ {
+	SCNG(scanned_string_len) = len_
+	return SCNG(scanned_string_len)
+}
+func GET_DOUBLE_QUOTES_SCANNED_LENGTH() __auto__ { return SCNG(scanned_string_len) }
+func IS_LABEL_START(c __auto__) bool {
+	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c >= 0x80
+}
+func IS_LABEL_SUCCESSOR(c __auto__) bool {
+	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_' || c >= 0x80
+}
+func ZEND_IS_OCT(c byte) bool { return c >= '0' && c <= '7' }
+func ZEND_IS_HEX(c byte) bool {
+	return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F'
+}
 func StripUnderscores(str *byte, len_ *int) {
 	var src *byte = str
 	var dest *byte = str
@@ -166,109 +157,103 @@ func StripUnderscores(str *byte, len_ *int) {
 }
 func EncodingFilterScriptToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	r.Assert(internal_encoding != nil)
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LANG_SCNG.GetScriptEncoding())
+	ZEND_ASSERT(internal_encoding != nil)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LanguageScannerGlobals.GetScriptEncoding())
 }
 func EncodingFilterScriptToIntermediate(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, LANG_SCNG.GetScriptEncoding())
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, LanguageScannerGlobals.GetScriptEncoding())
 }
 func EncodingFilterIntermediateToScript(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, LANG_SCNG.GetScriptEncoding(), ZendMultibyteEncodingUtf8)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, LanguageScannerGlobals.GetScriptEncoding(), ZendMultibyteEncodingUtf8)
 }
 func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	r.Assert(internal_encoding != nil)
+	ZEND_ASSERT(internal_encoding != nil)
 	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
 }
 
 // #define yy_push_state(state_and_tsrm) _yy_push_state ( yyc ## state_and_tsrm )
 
 func StartupScanner() {
-	CG.SetParseError(0)
-	CG.SetDocComment(nil)
-	CG.SetExtraFnFlags(0)
-	ZendStackInit(&LANG_SCNG.state_stack, g.SizeOf("int"))
-	ZendPtrStackInit(&LANG_SCNG.heredoc_label_stack)
-	LANG_SCNG.SetHeredocScanAhead(0)
+	CompilerGlobals.SetParseError(0)
+	CompilerGlobals.SetDocComment(nil)
+	CompilerGlobals.SetExtraFnFlags(0)
+	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
+	ZendPtrStackInit(&SCNG(heredoc_label_stack))
+	SCNG(heredoc_scan_ahead) = 0
 }
-func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { _efree(heredoc_label.GetLabel()) }
+func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { Efree(heredoc_label.GetLabel()) }
 func ShutdownScanner() {
-	CG.SetParseError(0)
-	if CG.GetDocComment() != nil {
-		ZendStringReleaseEx(CG.GetDocComment(), 0)
-		CG.SetDocComment(nil)
-	}
-	ZendStackDestroy(&LANG_SCNG.state_stack)
-	ZendPtrStackClean(&LANG_SCNG.heredoc_label_stack, (func(any))(&HeredocLabelDtor), 1)
-	ZendPtrStackDestroy(&LANG_SCNG.heredoc_label_stack)
-	LANG_SCNG.SetHeredocScanAhead(0)
-	LANG_SCNG.SetOnEvent(nil)
+	CompilerGlobals.SetParseError(0)
+	RESET_DOC_COMMENT()
+	ZendStackDestroy(&SCNG(state_stack))
+	ZendPtrStackClean(&SCNG(heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
+	ZendPtrStackDestroy(&SCNG(heredoc_label_stack))
+	SCNG(heredoc_scan_ahead) = 0
+	SCNG(on_event) = nil
 }
 func ZendSaveLexicalState(lex_state *ZendLexState) {
-	lex_state.SetYyLeng(LANG_SCNG.GetYyLeng())
-	lex_state.SetYyStart(LANG_SCNG.GetYyStart())
-	lex_state.SetYyText(LANG_SCNG.GetYyText())
-	lex_state.SetYyCursor(LANG_SCNG.GetYyCursor())
-	lex_state.SetYyMarker(LANG_SCNG.GetYyMarker())
-	lex_state.SetYyLimit(LANG_SCNG.GetYyLimit())
-	lex_state.SetStateStack(LANG_SCNG.GetStateStack())
-	ZendStackInit(&LANG_SCNG.state_stack, g.SizeOf("int"))
-	lex_state.SetHeredocLabelStack(LANG_SCNG.GetHeredocLabelStack())
-	ZendPtrStackInit(&LANG_SCNG.heredoc_label_stack)
-	lex_state.SetIn(LANG_SCNG.GetYyIn())
-	lex_state.SetYyState(LANG_SCNG.GetYyState())
+	lex_state.SetYyLeng(SCNG(yy_leng))
+	lex_state.SetYyStart(SCNG(yy_start))
+	lex_state.SetYyText(SCNG(yy_text))
+	lex_state.SetYyCursor(SCNG(yy_cursor))
+	lex_state.SetYyMarker(SCNG(yy_marker))
+	lex_state.SetYyLimit(SCNG(yy_limit))
+	lex_state.SetStateStack(SCNG(state_stack))
+	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
+	lex_state.SetHeredocLabelStack(SCNG(heredoc_label_stack))
+	ZendPtrStackInit(&SCNG(heredoc_label_stack))
+	lex_state.SetIn(SCNG(yy_in))
+	lex_state.SetYyState(YYSTATE)
 	lex_state.SetFilename(ZendGetCompiledFilename())
-	lex_state.SetLineno(CG.GetZendLineno())
-	lex_state.SetScriptOrg(LANG_SCNG.GetScriptOrg())
-	lex_state.SetScriptOrgSize(LANG_SCNG.GetScriptOrgSize())
-	lex_state.SetScriptFiltered(LANG_SCNG.GetScriptFiltered())
-	lex_state.SetScriptFilteredSize(LANG_SCNG.GetScriptFilteredSize())
-	lex_state.SetInputFilter(LANG_SCNG.GetInputFilter())
-	lex_state.SetOutputFilter(LANG_SCNG.GetOutputFilter())
-	lex_state.SetScriptEncoding(LANG_SCNG.GetScriptEncoding())
-	lex_state.SetOnEvent(LANG_SCNG.GetOnEvent())
-	lex_state.SetOnEventContext(LANG_SCNG.GetOnEventContext())
-	lex_state.SetAst(CG.GetAst())
-	lex_state.SetAstArena(CG.GetAstArena())
+	lex_state.SetLineno(CompilerGlobals.GetZendLineno())
+	lex_state.SetScriptOrg(SCNG(script_org))
+	lex_state.SetScriptOrgSize(SCNG(script_org_size))
+	lex_state.SetScriptFiltered(SCNG(script_filtered))
+	lex_state.SetScriptFilteredSize(SCNG(script_filtered_size))
+	lex_state.SetInputFilter(SCNG(input_filter))
+	lex_state.SetOutputFilter(SCNG(output_filter))
+	lex_state.SetScriptEncoding(SCNG(script_encoding))
+	lex_state.SetOnEvent(SCNG(on_event))
+	lex_state.SetOnEventContext(SCNG(on_event_context))
+	lex_state.SetAst(CompilerGlobals.GetAst())
+	lex_state.SetAstArena(CompilerGlobals.GetAstArena())
 }
 func ZendRestoreLexicalState(lex_state *ZendLexState) {
-	LANG_SCNG.SetYyLeng(lex_state.GetYyLeng())
-	LANG_SCNG.SetYyStart(lex_state.GetYyStart())
-	LANG_SCNG.SetYyText(lex_state.GetYyText())
-	LANG_SCNG.SetYyCursor(lex_state.GetYyCursor())
-	LANG_SCNG.SetYyMarker(lex_state.GetYyMarker())
-	LANG_SCNG.SetYyLimit(lex_state.GetYyLimit())
-	ZendStackDestroy(&LANG_SCNG.state_stack)
-	LANG_SCNG.SetStateStack(lex_state.GetStateStack())
-	ZendPtrStackClean(&LANG_SCNG.heredoc_label_stack, (func(any))(&HeredocLabelDtor), 1)
-	ZendPtrStackDestroy(&LANG_SCNG.heredoc_label_stack)
-	LANG_SCNG.SetHeredocLabelStack(lex_state.GetHeredocLabelStack())
-	LANG_SCNG.SetYyIn(lex_state.GetIn())
-	LANG_SCNG.SetYyState(lex_state.GetYyState())
-	CG.SetZendLineno(lex_state.GetLineno())
+	SCNG(yy_leng) = lex_state.GetYyLeng()
+	SCNG(yy_start) = lex_state.GetYyStart()
+	SCNG(yy_text) = lex_state.GetYyText()
+	SCNG(yy_cursor) = lex_state.GetYyCursor()
+	SCNG(yy_marker) = lex_state.GetYyMarker()
+	SCNG(yy_limit) = lex_state.GetYyLimit()
+	ZendStackDestroy(&SCNG(state_stack))
+	SCNG(state_stack) = lex_state.GetStateStack()
+	ZendPtrStackClean(&SCNG(heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
+	ZendPtrStackDestroy(&SCNG(heredoc_label_stack))
+	SCNG(heredoc_label_stack) = lex_state.GetHeredocLabelStack()
+	SCNG(yy_in) = lex_state.GetIn()
+	YYSETCONDITION(lex_state.GetYyState())
+	CompilerGlobals.SetZendLineno(lex_state.GetLineno())
 	ZendRestoreCompiledFilename(lex_state.GetFilename())
-	if LANG_SCNG.GetScriptFiltered() != nil {
-		_efree(LANG_SCNG.GetScriptFiltered())
-		LANG_SCNG.SetScriptFiltered(nil)
+	if SCNG(script_filtered) {
+		Efree(SCNG(script_filtered))
+		SCNG(script_filtered) = nil
 	}
-	LANG_SCNG.SetScriptOrg(lex_state.GetScriptOrg())
-	LANG_SCNG.SetScriptOrgSize(lex_state.GetScriptOrgSize())
-	LANG_SCNG.SetScriptFiltered(lex_state.GetScriptFiltered())
-	LANG_SCNG.SetScriptFilteredSize(lex_state.GetScriptFilteredSize())
-	LANG_SCNG.SetInputFilter(lex_state.GetInputFilter())
-	LANG_SCNG.SetOutputFilter(lex_state.GetOutputFilter())
-	LANG_SCNG.SetScriptEncoding(lex_state.GetScriptEncoding())
-	LANG_SCNG.SetOnEvent(lex_state.GetOnEvent())
-	LANG_SCNG.SetOnEventContext(lex_state.GetOnEventContext())
-	CG.SetAst(lex_state.GetAst())
-	CG.SetAstArena(lex_state.GetAstArena())
-	if CG.GetDocComment() != nil {
-		ZendStringReleaseEx(CG.GetDocComment(), 0)
-		CG.SetDocComment(nil)
-	}
+	SCNG(script_org) = lex_state.GetScriptOrg()
+	SCNG(script_org_size) = lex_state.GetScriptOrgSize()
+	SCNG(script_filtered) = lex_state.GetScriptFiltered()
+	SCNG(script_filtered_size) = lex_state.GetScriptFilteredSize()
+	SCNG(input_filter) = lex_state.GetInputFilter()
+	SCNG(output_filter) = lex_state.GetOutputFilter()
+	SCNG(script_encoding) = lex_state.GetScriptEncoding()
+	SCNG(on_event) = lex_state.GetOnEvent()
+	SCNG(on_event_context) = lex_state.GetOnEventContext()
+	CompilerGlobals.SetAst(lex_state.GetAst())
+	CompilerGlobals.SetAstArena(lex_state.GetAstArena())
+	RESET_DOC_COMMENT()
 }
 func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
-	ZendLlistDelElement(&CG.open_files, file_handle, (func(any, any) int)(ZendCompareFileHandles))
+	ZendLlistDelElement(&(CompilerGlobals.GetOpenFiles()), file_handle, (func(any, any) int)(ZendCompareFileHandles))
 
 	/* zend_file_handle_dtor() operates on the copy, so we have to NULLify the original here */
 
@@ -278,24 +263,17 @@ func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
 	}
 }
 func ZendLexTstring(zv *Zval) {
-	if LANG_SCNG.GetOnEvent() != nil {
-		LANG_SCNG.GetOnEvent()(ON_FEEDBACK, T_STRING, 0, LANG_SCNG.GetOnEventContext())
+	if SCNG(on_event) {
+		SCNG(on_event)(ON_FEEDBACK, T_STRING, 0, SCNG(on_event_context))
 	}
-	var __z *Zval = zv
-	var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRINGL(zv, (*byte)(SCNG(yy_text)), SCNG(yy_leng))
 }
 
-// #define BOM_UTF32_BE       "\x00\x00\xfe\xff"
-
-// #define BOM_UTF32_LE       "\xff\xfe\x00\x00"
-
-// #define BOM_UTF16_BE       "\xfe\xff"
-
-// #define BOM_UTF16_LE       "\xff\xfe"
-
-// #define BOM_UTF8       "\xef\xbb\xbf"
+const BOM_UTF32_BE = "x00x00xfexff"
+const BOM_UTF32_LE = "xffxfex00x00"
+const BOM_UTF16_BE = "xfexff"
+const BOM_UTF16_LE = "xffxfe"
+const BOM_UTF8 = "xefxbbxbf"
 
 func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncoding {
 	var p *uint8
@@ -364,52 +342,52 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 	var bom_size int
 	var pos1 *uint8
 	var pos2 *uint8
-	if LANG_SCNG.GetScriptOrgSize() < g.SizeOf("BOM_UTF32_LE")-1 {
+	if LanguageScannerGlobals.GetScriptOrgSize() < b.SizeOf("BOM_UTF32_LE")-1 {
 		return nil
 	}
 
 	/* check out BOM */
 
-	if !(memcmp(LANG_SCNG.GetScriptOrg(), "x00x00xfexff", g.SizeOf("BOM_UTF32_BE")-1)) {
+	if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf32be
-		bom_size = g.SizeOf("BOM_UTF32_BE") - 1
-	} else if !(memcmp(LANG_SCNG.GetScriptOrg(), "xffxfex00x00", g.SizeOf("BOM_UTF32_LE")-1)) {
+		bom_size = b.SizeOf("BOM_UTF32_BE") - 1
+	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf32le
-		bom_size = g.SizeOf("BOM_UTF32_LE") - 1
-	} else if !(memcmp(LANG_SCNG.GetScriptOrg(), "xfexff", g.SizeOf("BOM_UTF16_BE")-1)) {
+		bom_size = b.SizeOf("BOM_UTF32_LE") - 1
+	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf16be
-		bom_size = g.SizeOf("BOM_UTF16_BE") - 1
-	} else if !(memcmp(LANG_SCNG.GetScriptOrg(), "xffxfe", g.SizeOf("BOM_UTF16_LE")-1)) {
+		bom_size = b.SizeOf("BOM_UTF16_BE") - 1
+	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf16le
-		bom_size = g.SizeOf("BOM_UTF16_LE") - 1
-	} else if !(memcmp(LANG_SCNG.GetScriptOrg(), "xefxbbxbf", g.SizeOf("BOM_UTF8")-1)) {
+		bom_size = b.SizeOf("BOM_UTF16_LE") - 1
+	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf8
-		bom_size = g.SizeOf("BOM_UTF8") - 1
+		bom_size = b.SizeOf("BOM_UTF8") - 1
 	}
 	if script_encoding != nil {
 
 		/* remove BOM */
 
-		LANG_SCNG.SetScriptOrg(LANG_SCNG.GetScriptOrg() + bom_size)
-		LANG_SCNG.SetScriptOrgSize(LANG_SCNG.GetScriptOrgSize() - bom_size)
+		LanguageScannerGlobals.SetScriptOrg(LanguageScannerGlobals.GetScriptOrg() + bom_size)
+		LanguageScannerGlobals.SetScriptOrgSize(LanguageScannerGlobals.GetScriptOrgSize() - bom_size)
 		return script_encoding
 	}
 
 	/* script contains NULL bytes -> auto-detection */
 
-	if g.Assign(&pos1, memchr(LANG_SCNG.GetScriptOrg(), 0, LANG_SCNG.GetScriptOrgSize())) {
+	if b.Assign(&pos1, memchr(LanguageScannerGlobals.GetScriptOrg(), 0, LanguageScannerGlobals.GetScriptOrgSize())) {
 
 		/* check if the NULL byte is after the __HALT_COMPILER(); */
 
-		pos2 = LANG_SCNG.GetScriptOrg()
-		for size_t(pos1-pos2) >= g.SizeOf("\"__HALT_COMPILER();\"")-1 {
+		pos2 = LanguageScannerGlobals.GetScriptOrg()
+		for size_t(pos1-pos2) >= b.SizeOf("\"__HALT_COMPILER();\"")-1 {
 			pos2 = memchr(pos2, '_', pos1-pos2)
 			if pos2 == nil {
 				break
 			}
 			pos2++
-			if strncasecmp((*byte)(pos2), "_HALT_COMPILER", g.SizeOf("\"_HALT_COMPILER\"")-1) == 0 {
-				pos2 += g.SizeOf("\"_HALT_COMPILER\"") - 1
+			if strncasecmp((*byte)(pos2), "_HALT_COMPILER", b.SizeOf("\"_HALT_COMPILER\"")-1) == 0 {
+				pos2 += b.SizeOf("\"_HALT_COMPILER\"") - 1
 				for (*pos2) == ' ' || (*pos2) == '\t' || (*pos2) == '\r' || (*pos2) == '\n' {
 					pos2++
 				}
@@ -433,7 +411,7 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 
 		/* make best effort if BOM is missing */
 
-		return ZendMultibyteDetectUtfEncoding(LANG_SCNG.GetScriptOrg(), LANG_SCNG.GetScriptOrgSize())
+		return ZendMultibyteDetectUtfEncoding(LanguageScannerGlobals.GetScriptOrg(), LanguageScannerGlobals.GetScriptOrgSize())
 
 		/* make best effort if BOM is missing */
 
@@ -442,7 +420,7 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 }
 func ZendMultibyteFindScriptEncoding() *ZendEncoding {
 	var script_encoding *ZendEncoding
-	if CG.GetDetectUnicode() != 0 {
+	if CompilerGlobals.GetDetectUnicode() != 0 {
 
 		/* check out bom(byte order mark) and see if containing wchars */
 
@@ -460,54 +438,54 @@ func ZendMultibyteFindScriptEncoding() *ZendEncoding {
 
 	/* if no script_encoding specified, just leave alone */
 
-	if CG.GetScriptEncodingList() == nil || CG.GetScriptEncodingListSize() == 0 {
+	if CompilerGlobals.GetScriptEncodingList() == nil || CompilerGlobals.GetScriptEncodingListSize() == 0 {
 		return nil
 	}
 
 	/* if multiple encodings specified, detect automagically */
 
-	if CG.GetScriptEncodingListSize() > 1 {
-		return ZendMultibyteEncodingDetector(LANG_SCNG.GetScriptOrg(), LANG_SCNG.GetScriptOrgSize(), CG.GetScriptEncodingList(), CG.GetScriptEncodingListSize())
+	if CompilerGlobals.GetScriptEncodingListSize() > 1 {
+		return ZendMultibyteEncodingDetector(LanguageScannerGlobals.GetScriptOrg(), LanguageScannerGlobals.GetScriptOrgSize(), CompilerGlobals.GetScriptEncodingList(), CompilerGlobals.GetScriptEncodingListSize())
 	}
-	return CG.GetScriptEncodingList()[0]
+	return CompilerGlobals.GetScriptEncodingList()[0]
 }
 func ZendMultibyteSetFilter(onetime_encoding *ZendEncoding) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	var script_encoding *ZendEncoding = g.CondF2(onetime_encoding != nil, onetime_encoding, func() *ZendEncoding { return ZendMultibyteFindScriptEncoding() })
+	var script_encoding *ZendEncoding = b.CondF2(onetime_encoding != nil, onetime_encoding, func() *ZendEncoding { return ZendMultibyteFindScriptEncoding() })
 	if script_encoding == nil {
 		return FAILURE
 	}
 
 	/* judge input/output filter */
 
-	LANG_SCNG.SetScriptEncoding(script_encoding)
-	LANG_SCNG.SetInputFilter(nil)
-	LANG_SCNG.SetOutputFilter(nil)
-	if internal_encoding == nil || LANG_SCNG.GetScriptEncoding() == internal_encoding {
-		if ZendMultibyteCheckLexerCompatibility(LANG_SCNG.GetScriptEncoding()) == 0 {
+	LanguageScannerGlobals.SetScriptEncoding(script_encoding)
+	LanguageScannerGlobals.SetInputFilter(nil)
+	LanguageScannerGlobals.SetOutputFilter(nil)
+	if internal_encoding == nil || LanguageScannerGlobals.GetScriptEncoding() == internal_encoding {
+		if ZendMultibyteCheckLexerCompatibility(LanguageScannerGlobals.GetScriptEncoding()) == 0 {
 
 			/* and if not, work around w/ script_encoding -> utf-8 -> script_encoding conversion */
 
-			LANG_SCNG.SetInputFilter(EncodingFilterScriptToIntermediate)
-			LANG_SCNG.SetOutputFilter(EncodingFilterIntermediateToScript)
+			LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToIntermediate)
+			LanguageScannerGlobals.SetOutputFilter(EncodingFilterIntermediateToScript)
 		} else {
-			LANG_SCNG.SetInputFilter(nil)
-			LANG_SCNG.SetOutputFilter(nil)
+			LanguageScannerGlobals.SetInputFilter(nil)
+			LanguageScannerGlobals.SetOutputFilter(nil)
 		}
 		return SUCCESS
 	}
 	if ZendMultibyteCheckLexerCompatibility(internal_encoding) != 0 {
-		LANG_SCNG.SetInputFilter(EncodingFilterScriptToInternal)
-		LANG_SCNG.SetOutputFilter(nil)
-	} else if ZendMultibyteCheckLexerCompatibility(LANG_SCNG.GetScriptEncoding()) != 0 {
-		LANG_SCNG.SetInputFilter(nil)
-		LANG_SCNG.SetOutputFilter(EncodingFilterScriptToInternal)
+		LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToInternal)
+		LanguageScannerGlobals.SetOutputFilter(nil)
+	} else if ZendMultibyteCheckLexerCompatibility(LanguageScannerGlobals.GetScriptEncoding()) != 0 {
+		LanguageScannerGlobals.SetInputFilter(nil)
+		LanguageScannerGlobals.SetOutputFilter(EncodingFilterScriptToInternal)
 	} else {
 
 		/* both script and internal encodings are incompatible w/ flex */
 
-		LANG_SCNG.SetInputFilter(EncodingFilterScriptToIntermediate)
-		LANG_SCNG.SetOutputFilter(EncodingFilterIntermediateToInternal)
+		LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToIntermediate)
+		LanguageScannerGlobals.SetOutputFilter(EncodingFilterIntermediateToInternal)
 	}
 	return 0
 }
@@ -519,13 +497,13 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 
 		/* Still add it to open_files to make destroy_file_handle work */
 
-		ZendLlistAddElement(&CG.open_files, file_handle)
+		ZendLlistAddElement(&(CompilerGlobals.GetOpenFiles()), file_handle)
 		return FAILURE
 	}
-	r.Assert(EG.GetException() == nil && "stream_fixup() should have failed")
-	ZendLlistAddElement(&CG.open_files, file_handle)
+	ZEND_ASSERT(ExecutorGlobals.GetException() == nil && "stream_fixup() should have failed")
+	ZendLlistAddElement(&(CompilerGlobals.GetOpenFiles()), file_handle)
 	if file_handle.GetStream().GetHandle() >= any(file_handle != nil && file_handle.GetStream().GetHandle() <= any(file_handle+1)) {
-		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLastEx(&CG.open_files, nil))
+		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(&(CompilerGlobals.GetOpenFiles())))
 		var diff int = (*byte)(file_handle.GetStream().GetHandle() - (*byte)(file_handle))
 		fh.GetStream().SetHandle(any((*byte)(fh) + diff))
 		file_handle.GetStream().SetHandle(fh.GetStream().GetHandle())
@@ -533,32 +511,32 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 
 	/* Reset the scanner for scanning the new file */
 
-	LANG_SCNG.SetYyIn(file_handle)
-	LANG_SCNG.SetYyStart(nil)
+	SCNG(yy_in) = file_handle
+	SCNG(yy_start) = nil
 	if size != size_t-1 {
-		if CG.GetMultibyte() != 0 {
-			LANG_SCNG.SetScriptOrg((*uint8)(buf))
-			LANG_SCNG.SetScriptOrgSize(size)
-			LANG_SCNG.SetScriptFiltered(nil)
+		if CompilerGlobals.GetMultibyte() != 0 {
+			SCNG(script_org) = (*uint8)(buf)
+			SCNG(script_org_size) = size
+			SCNG(script_filtered) = nil
 			ZendMultibyteSetFilter(nil)
-			if LANG_SCNG.GetInputFilter() != nil {
-				if size_t-1 == LANG_SCNG.GetInputFilter()(&LANG_SCNG.script_filtered, &LANG_SCNG.script_filtered_size, LANG_SCNG.GetScriptOrg(), LANG_SCNG.GetScriptOrgSize()) {
-					ZendErrorNoreturn(1<<6, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LANG_SCNG.GetScriptEncoding()))
+			if SCNG(input_filter) {
+				if size_t-1 == SCNG(input_filter)(&SCNG(script_filtered), &SCNG(script_filtered_size), SCNG(script_org), SCNG(script_org_size)) {
+					ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
 				}
-				buf = (*byte)(LANG_SCNG.GetScriptFiltered())
-				size = LANG_SCNG.GetScriptFilteredSize()
+				buf = (*byte)(SCNG(script_filtered))
+				size = SCNG(script_filtered_size)
 			}
 		}
-		LANG_SCNG.SetYyStart((*uint8)(buf))
+		SCNG(yy_start) = (*uint8)(buf)
 		YyScanBuffer(buf, size)
 	} else {
-		ZendErrorNoreturn(1<<6, "zend_stream_mmap() failed")
+		ZendErrorNoreturn(E_COMPILE_ERROR, "zend_stream_mmap() failed")
 	}
-	if CG.GetSkipShebang() != 0 {
-		CG.SetSkipShebang(0)
-		LANG_SCNG.SetYyState(yycSHEBANG)
+	if CompilerGlobals.GetSkipShebang() != 0 {
+		CompilerGlobals.SetSkipShebang(0)
+		BEGIN(SHEBANG)
 	} else {
-		LANG_SCNG.SetYyState(yycINITIAL)
+		BEGIN(INITIAL)
 	}
 	if file_handle.GetOpenedPath() != nil {
 		compiled_filename = ZendStringCopy(file_handle.GetOpenedPath())
@@ -567,50 +545,47 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	}
 	ZendSetCompiledFilename(compiled_filename)
 	ZendStringReleaseEx(compiled_filename, 0)
-	if CG.GetDocComment() != nil {
-		ZendStringReleaseEx(CG.GetDocComment(), 0)
-		CG.SetDocComment(nil)
-	}
-	CG.SetZendLineno(1)
-	CG.SetIncrementLineno(0)
+	RESET_DOC_COMMENT()
+	CompilerGlobals.SetZendLineno(1)
+	CompilerGlobals.SetIncrementLineno(0)
 	return SUCCESS
 }
 func ZendCompile(type_ int) *ZendOpArray {
 	var op_array *ZendOpArray = nil
-	var original_in_compilation ZendBool = CG.GetInCompilation()
-	CG.SetInCompilation(1)
-	CG.SetAst(nil)
-	CG.SetAstArena(ZendArenaCreate(1024 * 32))
+	var original_in_compilation ZendBool = CompilerGlobals.GetInCompilation()
+	CompilerGlobals.SetInCompilation(1)
+	CompilerGlobals.SetAst(nil)
+	CompilerGlobals.SetAstArena(ZendArenaCreate(1024 * 32))
 	if Zendparse() == 0 {
-		var last_lineno int = CG.GetZendLineno()
+		var last_lineno int = CompilerGlobals.GetZendLineno()
 		var original_file_context ZendFileContext
 		var original_oparray_context ZendOparrayContext
-		var original_active_op_array *ZendOpArray = CG.GetActiveOpArray()
-		op_array = _emalloc(g.SizeOf("zend_op_array"))
-		InitOpArray(op_array, type_, 64)
-		CG.SetActiveOpArray(op_array)
+		var original_active_op_array *ZendOpArray = CompilerGlobals.GetActiveOpArray()
+		op_array = Emalloc(b.SizeOf("zend_op_array"))
+		InitOpArray(op_array, type_, INITIAL_OP_ARRAY_SIZE)
+		CompilerGlobals.SetActiveOpArray(op_array)
 
 		/* Use heap to not waste arena memory */
 
-		op_array.SetFnFlags(op_array.GetFnFlags() | 1<<22)
+		op_array.SetFnFlags(op_array.GetFnFlags() | ZEND_ACC_HEAP_RT_CACHE)
 		if ZendAstProcess != nil {
-			ZendAstProcess(CG.GetAst())
+			ZendAstProcess(CompilerGlobals.GetAst())
 		}
 		ZendFileContextBegin(&original_file_context)
 		ZendOparrayContextBegin(&original_oparray_context)
-		ZendCompileTopStmt(CG.GetAst())
-		CG.SetZendLineno(last_lineno)
-		ZendEmitFinalReturn(type_ == 2)
+		ZendCompileTopStmt(CompilerGlobals.GetAst())
+		CompilerGlobals.SetZendLineno(last_lineno)
+		ZendEmitFinalReturn(type_ == ZEND_USER_FUNCTION)
 		op_array.SetLineStart(1)
 		op_array.SetLineEnd(last_lineno)
 		PassTwo(op_array)
 		ZendOparrayContextEnd(&original_oparray_context)
 		ZendFileContextEnd(&original_file_context)
-		CG.SetActiveOpArray(original_active_op_array)
+		CompilerGlobals.SetActiveOpArray(original_active_op_array)
 	}
-	ZendAstDestroy(CG.GetAst())
-	ZendArenaDestroy(CG.GetAstArena())
-	CG.SetInCompilation(original_in_compilation)
+	ZendAstDestroy(CompilerGlobals.GetAst())
+	ZendArenaDestroy(CompilerGlobals.GetAstArena())
+	CompilerGlobals.SetInCompilation(original_in_compilation)
 	return op_array
 }
 func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
@@ -618,16 +593,16 @@ func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
 	var op_array *ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(file_handle) == FAILURE {
-		if EG.GetException() == nil {
-			if type_ == 1<<3 {
-				ZendMessageDispatcher(2, file_handle.GetFilename())
-				_zendBailout(__FILE__, __LINE__)
+		if ExecutorGlobals.GetException() == nil {
+			if type_ == ZEND_REQUIRE {
+				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.GetFilename())
+				ZendBailout()
 			} else {
-				ZendMessageDispatcher(1, file_handle.GetFilename())
+				ZendMessageDispatcher(ZMSG_FAILED_INCLUDE_FOPEN, file_handle.GetFilename())
 			}
 		}
 	} else {
-		op_array = ZendCompile(2)
+		op_array = ZendCompile(ZEND_USER_FUNCTION)
 	}
 	ZendRestoreLexicalState(&original_lex_state)
 	return op_array
@@ -637,31 +612,24 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	var tmp Zval
 	var retval *ZendOpArray
 	var opened_path *ZendString = nil
-	if filename.GetType() != 6 {
-		var __z *Zval = &tmp
-		var __s *ZendString = ZvalGetString(filename)
-		__z.GetValue().SetStr(__s)
-		if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-			__z.SetTypeInfo(6)
-		} else {
-			__z.SetTypeInfo(6 | 1<<0<<8)
-		}
+	if Z_TYPE_P(filename) != IS_STRING {
+		ZVAL_STR(&tmp, ZvalGetString(filename))
 		filename = &tmp
 	}
-	ZendStreamInitFilename(&file_handle, filename.GetValue().GetStr().GetVal())
+	ZendStreamInitFilename(&file_handle, Z_STRVAL_P(filename))
 	retval = ZendCompileFile(&file_handle, type_)
 	if retval != nil && file_handle.GetStream().GetHandle() {
 		if file_handle.GetOpenedPath() == nil {
-			opened_path = ZendStringCopy(filename.GetValue().GetStr())
+			opened_path = ZendStringCopy(Z_STR_P(filename))
 			file_handle.SetOpenedPath(opened_path)
 		}
-		ZendHashAddEmptyElement(&EG.included_files, file_handle.GetOpenedPath())
+		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
 		if opened_path != nil {
 			ZendStringReleaseEx(opened_path, 0)
 		}
 	}
 	ZendDestroyFileHandle(&file_handle)
-	if filename == &tmp {
+	if UNEXPECTED(filename == &tmp) {
 		ZvalPtrDtor(&tmp)
 	}
 	return retval
@@ -674,50 +642,47 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
-	old_len = str.GetValue().GetStr().GetLen()
-	str.GetValue().SetStr(ZendStringExtend(str.GetValue().GetStr(), old_len+32, 0))
-	str.SetTypeInfo(6 | 1<<0<<8)
-	memset(str.GetValue().GetStr().GetVal()+old_len, 0, 32+1)
-	LANG_SCNG.SetYyIn(nil)
-	LANG_SCNG.SetYyStart(nil)
-	buf = str.GetValue().GetStr().GetVal()
+	old_len = Z_STRLEN_P(str)
+	Z_STR_P(str) = ZendStringExtend(Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
+	Z_TYPE_INFO_P(str) = IS_STRING_EX
+	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
+	SCNG(yy_in) = nil
+	SCNG(yy_start) = nil
+	buf = Z_STRVAL_P(str)
 	size = old_len
-	if CG.GetMultibyte() != 0 {
-		LANG_SCNG.SetScriptOrg((*uint8)(buf))
-		LANG_SCNG.SetScriptOrgSize(size)
-		LANG_SCNG.SetScriptFiltered(nil)
+	if CompilerGlobals.GetMultibyte() != 0 {
+		SCNG(script_org) = (*uint8)(buf)
+		SCNG(script_org_size) = size
+		SCNG(script_filtered) = nil
 		ZendMultibyteSetFilter(ZendMultibyteGetInternalEncoding())
-		if LANG_SCNG.GetInputFilter() != nil {
-			if size_t-1 == LANG_SCNG.GetInputFilter()(&LANG_SCNG.script_filtered, &LANG_SCNG.script_filtered_size, LANG_SCNG.GetScriptOrg(), LANG_SCNG.GetScriptOrgSize()) {
-				ZendErrorNoreturn(1<<6, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LANG_SCNG.GetScriptEncoding()))
+		if SCNG(input_filter) {
+			if size_t-1 == SCNG(input_filter)(&SCNG(script_filtered), &SCNG(script_filtered_size), SCNG(script_org), SCNG(script_org_size)) {
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
 			}
-			buf = (*byte)(LANG_SCNG.GetScriptFiltered())
-			size = LANG_SCNG.GetScriptFilteredSize()
+			buf = (*byte)(SCNG(script_filtered))
+			size = SCNG(script_filtered_size)
 		}
 	}
 	YyScanBuffer(buf, size)
 	new_compiled_filename = ZendStringInit(filename, strlen(filename), 0)
 	ZendSetCompiledFilename(new_compiled_filename)
 	ZendStringReleaseEx(new_compiled_filename, 0)
-	CG.SetZendLineno(1)
-	CG.SetIncrementLineno(0)
-	if CG.GetDocComment() != nil {
-		ZendStringReleaseEx(CG.GetDocComment(), 0)
-		CG.SetDocComment(nil)
-	}
+	CompilerGlobals.SetZendLineno(1)
+	CompilerGlobals.SetIncrementLineno(0)
+	RESET_DOC_COMMENT()
 	return SUCCESS
 }
 func ZendGetScannedFileOffset() int {
-	var offset int = LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyStart()
-	if LANG_SCNG.GetInputFilter() != nil {
+	var offset int = SCNG(yy_cursor) - SCNG(yy_start)
+	if SCNG(input_filter) {
 		var original_offset int = offset
 		var length int = 0
 		for {
 			var p *uint8 = nil
-			if size_t-1 == LANG_SCNG.GetInputFilter()(&p, &length, LANG_SCNG.GetScriptOrg(), offset) {
+			if size_t-1 == SCNG(input_filter)(&p, &length, SCNG(script_org), offset) {
 				return size_t - 1
 			}
-			_efree(p)
+			Efree(p)
 			if length > original_offset {
 				offset--
 			} else if length < original_offset {
@@ -734,34 +699,19 @@ func CompileString(source_string *Zval, filename *byte) *ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *ZendOpArray = nil
 	var tmp Zval
-	if source_string.GetType() != 6 {
-		var __z *Zval = &tmp
-		var __s *ZendString = ZvalGetStringFunc(source_string)
-		__z.GetValue().SetStr(__s)
-		if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-			__z.SetTypeInfo(6)
-		} else {
-			__z.SetTypeInfo(6 | 1<<0<<8)
-		}
+	if UNEXPECTED(Z_TYPE_P(source_string) != IS_STRING) {
+		ZVAL_STR(&tmp, ZvalGetStringFunc(source_string))
 	} else {
-		var _z1 *Zval = &tmp
-		var _z2 *Zval = source_string
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
-		if (_t & 0xff00) != 0 {
-			ZendGcAddref(&_gc.gc)
-		}
+		ZVAL_COPY(&tmp, source_string)
 	}
-	if tmp.GetValue().GetStr().GetLen() == 0 {
+	if Z_STRLEN(tmp) == 0 {
 		ZvalPtrDtor(&tmp)
 		return nil
 	}
 	ZendSaveLexicalState(&original_lex_state)
 	if ZendPrepareStringForScanning(&tmp, filename) == SUCCESS {
-		LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-		op_array = ZendCompile(4)
+		BEGIN(ST_IN_SCRIPTING)
+		op_array = ZendCompile(ZEND_EVAL_CODE)
 	}
 	ZendRestoreLexicalState(&original_lex_state)
 	ZvalPtrDtor(&tmp)
@@ -773,14 +723,14 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *ZendSyntaxHighlighter
 	ZendStreamInitFilename(&file_handle, filename)
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(&file_handle) == FAILURE {
-		ZendMessageDispatcher(3, filename)
+		ZendMessageDispatcher(ZMSG_FAILED_HIGHLIGHT_FOPEN, filename)
 		ZendRestoreLexicalState(&original_lex_state)
 		return FAILURE
 	}
 	ZendHighlight(syntax_highlighter_ini)
-	if LANG_SCNG.GetScriptFiltered() != nil {
-		_efree(LANG_SCNG.GetScriptFiltered())
-		LANG_SCNG.SetScriptFiltered(nil)
+	if SCNG(script_filtered) {
+		Efree(SCNG(script_filtered))
+		SCNG(script_filtered) = nil
 	}
 	ZendDestroyFileHandle(&file_handle)
 	ZendRestoreLexicalState(&original_lex_state)
@@ -789,33 +739,26 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *ZendSyntaxHighlighter
 func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni, str_name *byte) int {
 	var original_lex_state ZendLexState
 	var tmp Zval
-	if str.GetType() != 6 {
-		var __z *Zval = &tmp
-		var __s *ZendString = ZvalGetStringFunc(str)
-		__z.GetValue().SetStr(__s)
-		if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-			__z.SetTypeInfo(6)
-		} else {
-			__z.SetTypeInfo(6 | 1<<0<<8)
-		}
+	if UNEXPECTED(Z_TYPE_P(str) != IS_STRING) {
+		ZVAL_STR(&tmp, ZvalGetStringFunc(str))
 		str = &tmp
 	}
 	ZendSaveLexicalState(&original_lex_state)
 	if ZendPrepareStringForScanning(str, str_name) == FAILURE {
 		ZendRestoreLexicalState(&original_lex_state)
-		if str == &tmp {
+		if UNEXPECTED(str == &tmp) {
 			ZvalPtrDtor(&tmp)
 		}
 		return FAILURE
 	}
-	LANG_SCNG.SetYyState(yycINITIAL)
+	BEGIN(INITIAL)
 	ZendHighlight(syntax_highlighter_ini)
-	if LANG_SCNG.GetScriptFiltered() != nil {
-		_efree(LANG_SCNG.GetScriptFiltered())
-		LANG_SCNG.SetScriptFiltered(nil)
+	if SCNG(script_filtered) {
+		Efree(SCNG(script_filtered))
+		SCNG(script_filtered) = nil
 	}
 	ZendRestoreLexicalState(&original_lex_state)
-	if str == &tmp {
+	if UNEXPECTED(str == &tmp) {
 		ZvalPtrDtor(&tmp)
 	}
 	return SUCCESS
@@ -826,72 +769,74 @@ func ZendMultibyteYyinputAgain(old_input_filter ZendEncodingFilter, old_encoding
 
 	/* convert and set */
 
-	if LANG_SCNG.GetInputFilter() == nil {
-		if LANG_SCNG.GetScriptFiltered() != nil {
-			_efree(LANG_SCNG.GetScriptFiltered())
-			LANG_SCNG.SetScriptFiltered(nil)
+	if !(SCNG(input_filter)) {
+		if SCNG(script_filtered) {
+			Efree(SCNG(script_filtered))
+			SCNG(script_filtered) = nil
 		}
-		LANG_SCNG.SetScriptFilteredSize(0)
-		length = LANG_SCNG.GetScriptOrgSize()
-		new_yy_start = LANG_SCNG.GetScriptOrg()
+		SCNG(script_filtered_size) = 0
+		length = SCNG(script_org_size)
+		new_yy_start = SCNG(script_org)
 	} else {
-		if size_t-1 == LANG_SCNG.GetInputFilter()(&new_yy_start, &length, LANG_SCNG.GetScriptOrg(), LANG_SCNG.GetScriptOrgSize()) {
-			ZendErrorNoreturn(1<<6, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LANG_SCNG.GetScriptEncoding()))
+		if size_t-1 == SCNG(input_filter)(&new_yy_start, &length, SCNG(script_org), SCNG(script_org_size)) {
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
 		}
-		if LANG_SCNG.GetScriptFiltered() != nil {
-			_efree(LANG_SCNG.GetScriptFiltered())
+		if SCNG(script_filtered) {
+			Efree(SCNG(script_filtered))
 		}
-		LANG_SCNG.SetScriptFiltered(new_yy_start)
-		LANG_SCNG.SetScriptFilteredSize(length)
+		SCNG(script_filtered) = new_yy_start
+		SCNG(script_filtered_size) = length
 	}
-	LANG_SCNG.SetYyCursor(new_yy_start + (LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyStart()))
-	LANG_SCNG.SetYyMarker(new_yy_start + (LANG_SCNG.GetYyMarker() - LANG_SCNG.GetYyStart()))
-	LANG_SCNG.SetYyText(new_yy_start + (LANG_SCNG.GetYyText() - LANG_SCNG.GetYyStart()))
-	LANG_SCNG.SetYyLimit(new_yy_start + length)
-	LANG_SCNG.SetYyStart(new_yy_start)
+	SCNG(yy_cursor) = new_yy_start + (SCNG(yy_cursor) - SCNG(yy_start))
+	SCNG(yy_marker) = new_yy_start + (SCNG(yy_marker) - SCNG(yy_start))
+	SCNG(yy_text) = new_yy_start + (SCNG(yy_text) - SCNG(yy_start))
+	SCNG(yy_limit) = new_yy_start + length
+	SCNG(yy_start) = new_yy_start
 }
 
 // TODO: avoid reallocation ???
 
-// #define zend_copy_value(zendlval,yytext,yyleng) if ( SCNG ( output_filter ) ) { size_t sz = 0 ; char * s = NULL ; SCNG ( output_filter ) ( ( unsigned char * * ) & s , & sz , ( unsigned char * ) yytext , ( size_t ) yyleng ) ; ZVAL_STRINGL ( zendlval , s , sz ) ; efree ( s ) ; } else if ( yyleng == 1 ) { ZVAL_INTERNED_STR ( zendlval , ZSTR_CHAR ( ( zend_uchar ) * ( yytext ) ) ) ; } else { ZVAL_STRINGL ( zendlval , yytext , yyleng ) ; }
-
+func ZendCopyValue(zendlval *Zval, yytext *byte, yyleng int) {
+	if SCNG(output_filter) {
+		var sz int = 0
+		var s *byte = nil
+		SCNG(output_filter)((**uint8)(&s), &sz, (*uint8)(yytext), int(yyleng))
+		ZVAL_STRINGL(zendlval, s, sz)
+		Efree(s)
+	} else if yyleng == 1 {
+		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*yytext))
+	} else {
+		ZVAL_STRINGL(zendlval, yytext, yyleng)
+	}
+}
 func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) int {
 	var s *byte
 	var t *byte
 	var end *byte
 	if len_ <= 1 {
 		if len_ < 1 {
-			var __z *Zval = zendlval
-			var __s *ZendString = ZendEmptyString
-			__z.GetValue().SetStr(__s)
-			__z.SetTypeInfo(6)
+			ZVAL_EMPTY_STRING(zendlval)
 		} else {
 			var c ZendUchar = zend_uchar * str
 			if c == '\n' || c == '\r' {
-				CG.GetZendLineno()++
+				CompilerGlobals.GetZendLineno()++
 			}
-			var __z *Zval = zendlval
-			var __s *ZendString = ZendOneCharString[c]
-			__z.GetValue().SetStr(__s)
-			__z.SetTypeInfo(6)
+			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
 		}
 		goto skip_escape_conversion
 	}
-	var __z *Zval = zendlval
-	var __s *ZendString = ZendStringInit(str, len_, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRINGL(zendlval, str, len_)
 
 	/* convert escape sequences */
 
-	s = zendlval.GetValue().GetStr().GetVal()
-	end = s + zendlval.GetValue().GetStr().GetLen()
+	s = Z_STRVAL_P(zendlval)
+	end = s + Z_STRLEN_P(zendlval)
 	for true {
-		if (*s) == '\\' {
+		if UNEXPECTED((*s) == '\\') {
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG.GetZendLineno()++
+			CompilerGlobals.GetZendLineno()++
 		}
 		s++
 		if s == end {
@@ -903,54 +848,54 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 		if (*s) == '\\' {
 			s++
 			if s >= end {
-				g.PostInc(&(*t)) = '\\'
+				b.PostInc(&(*t)) = '\\'
 				break
 			}
 			switch *s {
 			case 'n':
-				g.PostInc(&(*t)) = '\n'
+				b.PostInc(&(*t)) = '\n'
 				break
 			case 'r':
-				g.PostInc(&(*t)) = '\r'
+				b.PostInc(&(*t)) = '\r'
 				break
 			case 't':
-				g.PostInc(&(*t)) = '\t'
+				b.PostInc(&(*t)) = '\t'
 				break
 			case 'f':
-				g.PostInc(&(*t)) = 'f'
+				b.PostInc(&(*t)) = 'f'
 				break
 			case 'v':
-				g.PostInc(&(*t)) = 'v'
+				b.PostInc(&(*t)) = 'v'
 				break
 			case 'e':
-				g.PostInc(&(*t)) = 'e'
+				b.PostInc(&(*t)) = 'e'
 				break
 			case '"':
 
 			case '`':
 				if (*s) != quote_type {
-					g.PostInc(&(*t)) = '\\'
-					g.PostInc(&(*t)) = *s
+					b.PostInc(&(*t)) = '\\'
+					b.PostInc(&(*t)) = *s
 					break
 				}
 			case '\\':
 
 			case '$':
-				g.PostInc(&(*t)) = *s
+				b.PostInc(&(*t)) = *s
 				break
 			case 'x':
 
 			case 'X':
-				if (*(s + 1)) >= '0' && (*(s + 1)) <= '9' || (*(s + 1)) >= 'a' && (*(s + 1)) <= 'f' || (*(s + 1)) >= 'A' && (*(s + 1)) <= 'F' {
+				if ZEND_IS_HEX(*(s + 1)) {
 					var hex_buf []byte = []byte{0, 0, 0}
-					hex_buf[0] = *(g.PreInc(&s))
-					if (*(s + 1)) >= '0' && (*(s + 1)) <= '9' || (*(s + 1)) >= 'a' && (*(s + 1)) <= 'f' || (*(s + 1)) >= 'A' && (*(s + 1)) <= 'F' {
-						hex_buf[1] = *(g.PreInc(&s))
+					hex_buf[0] = *(b.PreInc(&s))
+					if ZEND_IS_HEX(*(s + 1)) {
+						hex_buf[1] = *(b.PreInc(&s))
 					}
-					g.PostInc(&(*t)) = byte(strtoll(hex_buf, nil, 16))
+					b.PostInc(&(*t)) = byte(ZEND_STRTOL(hex_buf, nil, 16))
 				} else {
-					g.PostInc(&(*t)) = '\\'
-					g.PostInc(&(*t)) = *s
+					b.PostInc(&(*t)) = '\\'
+					b.PostInc(&(*t)) = *s
 				}
 				break
 			case 'u':
@@ -967,8 +912,8 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 					 * with JSON in string literals (e.g. "\"\u202e\""
 					 */
 
-					g.PostInc(&(*t)) = '\\'
-					g.PostInc(&(*t)) = 'u'
+					b.PostInc(&(*t)) = '\\'
+					b.PostInc(&(*t)) = 'u'
 					break
 				} else {
 
@@ -978,7 +923,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 					len_++
 					s++
 					for (*s) != '}' {
-						if !((*s) >= '0' && (*s) <= '9' || (*s) >= 'a' && (*s) <= 'f' || (*s) >= 'A' && (*s) <= 'F') {
+						if !(ZEND_IS_HEX(*s)) {
 							valid = 0
 							break
 						} else {
@@ -1000,7 +945,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 				if valid == 0 {
 					ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence", 0)
 					ZvalPtrDtor(zendlval)
-					zendlval.SetTypeInfo(0)
+					ZVAL_UNDEF(zendlval)
 					return FAILURE
 				}
 				errno = 0
@@ -1011,26 +956,26 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 				if codepoint > 0x10ffff || errno {
 					ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
 					ZvalPtrDtor(zendlval)
-					zendlval.SetTypeInfo(0)
+					ZVAL_UNDEF(zendlval)
 					return FAILURE
 				}
 
 				/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
 
 				if codepoint < 0x80 {
-					g.PostInc(&(*t)) = codepoint
+					b.PostInc(&(*t)) = codepoint
 				} else if codepoint <= 0x7ff {
-					g.PostInc(&(*t)) = (codepoint >> 6) + 0xc0
-					g.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint >> 6) + 0xc0
+					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
 				} else if codepoint <= 0xffff {
-					g.PostInc(&(*t)) = (codepoint >> 12) + 0xe0
-					g.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
-					g.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint >> 12) + 0xe0
+					b.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
 				} else if codepoint <= 0x10ffff {
-					g.PostInc(&(*t)) = (codepoint >> 18) + 0xf0
-					g.PostInc(&(*t)) = (codepoint >> 12 & 0x3f) + 0x80
-					g.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
-					g.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint >> 18) + 0xf0
+					b.PostInc(&(*t)) = (codepoint >> 12 & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
+					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
 				}
 
 				/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
@@ -1040,63 +985,59 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 
 				/* check for an octal */
 
-				if (*s) >= '0' && (*s) <= '7' {
+				if ZEND_IS_OCT(*s) {
 					var octal_buf []byte = []byte{0, 0, 0, 0}
 					octal_buf[0] = *s
-					if (*(s + 1)) >= '0' && (*(s + 1)) <= '7' {
-						octal_buf[1] = *(g.PreInc(&s))
-						if (*(s + 1)) >= '0' && (*(s + 1)) <= '7' {
-							octal_buf[2] = *(g.PreInc(&s))
+					if ZEND_IS_OCT(*(s + 1)) {
+						octal_buf[1] = *(b.PreInc(&s))
+						if ZEND_IS_OCT(*(s + 1)) {
+							octal_buf[2] = *(b.PreInc(&s))
 						}
 					}
-					if octal_buf[2] && octal_buf[0] > '3' && LANG_SCNG.GetHeredocScanAhead() == 0 {
+					if octal_buf[2] && octal_buf[0] > '3' && !(SCNG(heredoc_scan_ahead)) {
 
 						/* 3 octit values must not overflow 0xFF (\377) */
 
-						ZendError(1<<7, "Octal escape sequence overflow \\%s is greater than \\377", octal_buf)
+						ZendError(E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", octal_buf)
 
 						/* 3 octit values must not overflow 0xFF (\377) */
 
 					}
-					g.PostInc(&(*t)) = byte(strtoll(octal_buf, nil, 8))
+					b.PostInc(&(*t)) = byte(ZEND_STRTOL(octal_buf, nil, 8))
 				} else {
-					g.PostInc(&(*t)) = '\\'
-					g.PostInc(&(*t)) = *s
+					b.PostInc(&(*t)) = '\\'
+					b.PostInc(&(*t)) = *s
 				}
 				break
 			}
 		} else {
-			g.PostInc(&(*t)) = *s
+			b.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG.GetZendLineno()++
+			CompilerGlobals.GetZendLineno()++
 		}
 		s++
 	}
 	*t = 0
-	zendlval.GetValue().GetStr().SetLen(t - zendlval.GetValue().GetStr().GetVal())
+	Z_STRLEN_P(zendlval) = t - Z_STRVAL_P(zendlval)
 skip_escape_conversion:
-	if LANG_SCNG.GetOutputFilter() != nil {
+	if SCNG(output_filter) {
 		var sz int = 0
 		var str *uint8
 
 		// TODO: avoid realocation ???
 
-		s = zendlval.GetValue().GetStr().GetVal()
-		LANG_SCNG.GetOutputFilter()(&str, &sz, (*uint8)(s), size_t(zendlval.GetValue().GetStr()).len_)
+		s = Z_STRVAL_P(zendlval)
+		SCNG(output_filter)(&str, &sz, (*uint8)(s), int(Z_STRLEN_P(zendlval)))
 		ZvalPtrDtor(zendlval)
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit((*byte)(str), sz, 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
-		_efree(str)
+		ZVAL_STRINGL(zendlval, (*byte)(str), sz)
+		Efree(str)
 	}
 	return SUCCESS
 }
 
-// #define HEREDOC_USING_SPACES       1
-
-// #define HEREDOC_USING_TABS       2
+const HEREDOC_USING_SPACES = 1
+const HEREDOC_USING_TABS = 2
 
 func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	for ; str < end; str++ {
@@ -1116,9 +1057,9 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	return nil
 }
 func StripMultilineStringIndentation(zendlval *Zval, indentation int, using_spaces ZendBool, newline_at_start ZendBool, newline_at_end ZendBool) ZendBool {
-	var str *byte = zendlval.GetValue().GetStr().GetVal()
-	var end *byte = str + zendlval.GetValue().GetStr().GetLen()
-	var copy *byte = zendlval.GetValue().GetStr().GetVal()
+	var str *byte = Z_STRVAL_P(zendlval)
+	var end *byte = str + Z_STRLEN_P(zendlval)
+	var copy *byte = Z_STRVAL_P(zendlval)
 	var newline_count int = 0
 	var newline_len int
 	var nl *byte
@@ -1156,12 +1097,12 @@ func StripMultilineStringIndentation(zendlval *Zval, indentation int, using_spac
 
 			}
 			if str == end || (*str) != ' ' && (*str) != '\t' {
-				CG.SetZendLineno(CG.GetZendLineno() + newline_count)
+				CompilerGlobals.SetZendLineno(CompilerGlobals.GetZendLineno() + newline_count)
 				ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", indentation)
 				goto error
 			}
 			if using_spaces == 0 && (*str) == ' ' || using_spaces != 0 && (*str) == '\t' {
-				CG.SetZendLineno(CG.GetZendLineno() + newline_count)
+				CompilerGlobals.SetZendLineno(CompilerGlobals.GetZendLineno() + newline_count)
 				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 				goto error
 			}
@@ -1171,59 +1112,68 @@ func StripMultilineStringIndentation(zendlval *Zval, indentation int, using_spac
 		if str == end {
 			break
 		}
-		var len_ int = g.Cond(nl != nil, nl-str+newline_len, end-str)
+		var len_ int = b.Cond(nl != nil, nl-str+newline_len, end-str)
 		memmove(copy, str, len_)
 		str += len_
 		copy += len_
 		newline_count++
 	}
 	*copy = '0'
-	zendlval.GetValue().GetStr().SetLen(copy - zendlval.GetValue().GetStr().GetVal())
+	Z_STRLEN_P(zendlval) = copy - Z_STRVAL_P(zendlval)
 	return 1
 error:
 	ZvalPtrDtorStr(zendlval)
-	zendlval.SetTypeInfo(0)
+	ZVAL_UNDEF(zendlval)
 	return 0
 }
 func CopyHeredocLabelStack(void_heredoc_label any) {
 	var heredoc_label *ZendHeredocLabel = void_heredoc_label
-	var new_heredoc_label *ZendHeredocLabel = _emalloc(g.SizeOf("zend_heredoc_label"))
+	var new_heredoc_label *ZendHeredocLabel = Emalloc(b.SizeOf("zend_heredoc_label"))
 	*new_heredoc_label = *heredoc_label
-	new_heredoc_label.SetLabel(_estrndup(heredoc_label.GetLabel(), heredoc_label.GetLength()))
-	ZendPtrStackPush(&LANG_SCNG.heredoc_label_stack, any(new_heredoc_label))
+	new_heredoc_label.SetLabel(Estrndup(heredoc_label.GetLabel(), heredoc_label.GetLength()))
+	ZendPtrStackPush(&SCNG(heredoc_label_stack), any(new_heredoc_label))
 }
-
-// #define PARSER_MODE() EXPECTED ( elem != NULL )
+func PARSER_MODE() __auto__ { return EXPECTED(elem != nil) }
 
 // #define RETURN_TOKEN(_token) do { token = _token ; goto emit_token ; } while ( 0 )
 
-// #define RETURN_TOKEN_WITH_VAL(_token) do { token = _token ; goto emit_token_with_val ; } while ( 0 )
-
-// #define RETURN_TOKEN_WITH_STR(_token,_offset) do { token = _token ; offset = _offset ; goto emit_token_with_str ; } while ( 0 )
-
-// #define RETURN_OR_SKIP_TOKEN(_token) do { token = _token ; if ( PARSER_MODE ( ) ) { goto skip_token ; } goto emit_token ; } while ( 0 )
-
+func RETURN_TOKEN_WITH_VAL(_token Yytokentype) {
+	token = _token
+	goto emit_token_with_val
+}
+func RETURN_TOKEN_WITH_STR(_token Yytokentype, _offset int) {
+	token = _token
+	offset = _offset
+	goto emit_token_with_str
+}
+func RETURN_OR_SKIP_TOKEN(_token Yytokentype) {
+	token = _token
+	if PARSER_MODE() {
+		goto skip_token
+	}
+	goto emit_token
+}
 func LexScan(zendlval *Zval, elem *ZendParserStackElem) int {
 	var token int
 	var offset int
-	var start_line int = CG.GetZendLineno()
-	zendlval.SetTypeInfo(0)
+	var start_line int = CompilerGlobals.GetZendLineno()
+	ZVAL_UNDEF(zendlval)
 restart:
-	LANG_SCNG.SetYyText(LANG_SCNG.GetYyCursor())
+	SCNG(yy_text) = YYCURSOR
 	var yych uint8
 	var yyaccept uint = 0
-	if LANG_SCNG.GetYyState() < 5 {
-		if LANG_SCNG.GetYyState() < 2 {
-			if LANG_SCNG.GetYyState() < 1 {
+	if YYGETCONDITION() < 5 {
+		if YYGETCONDITION() < 2 {
+			if YYGETCONDITION() < 1 {
 				goto yyc_ST_IN_SCRIPTING
 			} else {
 				goto yyc_ST_LOOKING_FOR_PROPERTY
 			}
 		} else {
-			if LANG_SCNG.GetYyState() < 3 {
+			if YYGETCONDITION() < 3 {
 				goto yyc_ST_BACKQUOTE
 			} else {
-				if LANG_SCNG.GetYyState() < 4 {
+				if YYGETCONDITION() < 4 {
 					goto yyc_ST_DOUBLE_QUOTES
 				} else {
 					goto yyc_ST_HEREDOC
@@ -1231,21 +1181,21 @@ restart:
 			}
 		}
 	} else {
-		if LANG_SCNG.GetYyState() < 8 {
-			if LANG_SCNG.GetYyState() < 6 {
+		if YYGETCONDITION() < 8 {
+			if YYGETCONDITION() < 6 {
 				goto yyc_ST_LOOKING_FOR_VARNAME
 			} else {
-				if LANG_SCNG.GetYyState() < 7 {
+				if YYGETCONDITION() < 7 {
 					goto yyc_ST_VAR_OFFSET
 				} else {
 					goto yyc_SHEBANG
 				}
 			}
 		} else {
-			if LANG_SCNG.GetYyState() < 9 {
+			if YYGETCONDITION() < 9 {
 				goto yyc_INITIAL
 			} else {
-				if LANG_SCNG.GetYyState() < 10 {
+				if YYGETCONDITION() < 10 {
 					goto yyc_ST_END_HEREDOC
 				} else {
 					goto yyc_ST_NOWDOC
@@ -1258,10 +1208,10 @@ restart:
 
 yyc_ST_IN_SCRIPTING:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 216, 216, 152, 152, 152, 152, 152, 152, 152, 152, 0, 0, 0, 0, 0, 0, 0, 144, 144, 144, 144, 144, 144, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 0, 0, 0, 0, 16, 0, 144, 144, 144, 144, 144, 144, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 0, 0, 0, 0, 0, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16}
-	if LANG_SCNG.GetYyCursor()+16 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+16 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy2
 	}
@@ -1502,99 +1452,98 @@ yyc_ST_IN_SCRIPTING:
 		goto yy35
 	}
 yy1:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	if LANG_SCNG.GetHeredocScanAhead() == 0 {
-		ZendError(1<<7, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", (*byte)(LANG_SCNG.GetYyText())[0], (*byte)(LANG_SCNG.GetYyText())[0], LANG_SCNG.GetYyState())
+	if !(SCNG(heredoc_scan_ahead)) {
+		ZendError(E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", Yytext[0], Yytext[0], YYSTATE)
 	}
-	if elem != nil {
+	if PARSER_MODE() {
 		goto restart
 	} else {
 		token = T_BAD_CHARACTER
 		goto emit_token
 	}
 yy2:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy2
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	goto return_whitespace
 yy3:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy57
 	}
 yy4:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = (*byte)(LANG_SCNG.GetYyText())[0]
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	token = Yytext[0]
 	goto emit_token
 yy5:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var bprefix int = g.Cond((*byte)(LANG_SCNG.yy_text)[0] != '"', 1, 0)
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	var bprefix int = b.Cond(yytext[0] != '"', 1, 0)
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '"':
-			LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-			if ZendScanEscapeString(zendlval, (*byte)(LANG_SCNG.GetYyText())+bprefix+1, LANG_SCNG.GetYyLeng()-bprefix-2, '"') == SUCCESS || !elem != nil {
-				token = T_CONSTANT_ENCAPSED_STRING
-				goto emit_token_with_val
+			Yyleng = YYCURSOR - SCNG(yy_text)
+			if EXPECTED(ZendScanEscapeString(zendlval, Yytext+bprefix+1, Yyleng-bprefix-2, '"') == SUCCESS) || !(PARSER_MODE()) {
+				RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
 			} else {
 				token = T_ERROR
 				goto emit_token
 			}
 		case '$':
-			if LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80 || LANG_SCNG.yy_cursor == '{' {
+			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
 		case '{':
-			if LANG_SCNG.yy_cursor == '$' {
+			if (*YYCURSOR) == '$' {
 				break
 			}
 			continue
 		case '\\':
-			if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.GetYyCursor()++
+			if YYCURSOR < YYLIMIT {
+				YYCURSOR++
 			}
 		default:
 			continue
 		}
-		LANG_SCNG.GetYyCursor()--
+		YYCURSOR--
 		break
 	}
 
 	/* Remember how much was scanned to save rescanning */
 
-	LANG_SCNG.SetScannedStringLen(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText() - LANG_SCNG.GetYyLeng())
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyText() + LANG_SCNG.GetYyLeng())
-	LANG_SCNG.SetYyState(yycST_DOUBLE_QUOTES)
+	SET_DOUBLE_QUOTES_SCANNED_LENGTH(YYCURSOR - SCNG(yy_text) - Yyleng)
+	YYCURSOR = SCNG(yy_text) + Yyleng
+	BEGIN(ST_DOUBLE_QUOTES)
 	token = '"'
 	goto emit_token
 yy6:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '\r':
-			if LANG_SCNG.yy_cursor == '\n' {
-				LANG_SCNG.GetYyCursor()++
+			if (*YYCURSOR) == '\n' {
+				YYCURSOR++
 			}
 		case '\n':
-			CG.GetZendLineno()++
+			CompilerGlobals.GetZendLineno()++
 			break
 		case '?':
-			if LANG_SCNG.yy_cursor == '>' {
-				LANG_SCNG.GetYyCursor()--
+			if (*YYCURSOR) == '>' {
+				YYCURSOR--
 				break
 			}
 		default:
@@ -1602,14 +1551,10 @@ yy6:
 		}
 		break
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_COMMENT
-	if elem != nil {
-		goto skip_token
-	}
-	goto emit_token
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_OR_SKIP_TOKEN(T_COMMENT)
 yy7:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy4
@@ -1634,13 +1579,13 @@ yy7:
 		goto yy59
 	}
 yy8:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy61
 	}
 	goto yy4
 yy9:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '&' {
 		goto yy62
 	}
@@ -1649,66 +1594,56 @@ yy9:
 	}
 	goto yy4
 yy10:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	var s *byte
 	var t *byte
 	var end *byte
-	var bprefix int = g.Cond((*byte)(LANG_SCNG.yy_text)[0] != '\'', 1, 0)
+	var bprefix int = b.Cond(yytext[0] != '\'', 1, 0)
 	for true {
-		if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-			if LANG_SCNG.yy_cursor == '\'' {
-				LANG_SCNG.GetYyCursor()++
-				LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+		if YYCURSOR < YYLIMIT {
+			if (*YYCURSOR) == '\'' {
+				YYCURSOR++
+				Yyleng = YYCURSOR - SCNG(yy_text)
 				break
-			} else if g.PostInc(&(LANG_SCNG.yy_cursor)) == '\\' && LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.GetYyCursor()++
+			} else if b.PostInc(&(*YYCURSOR)) == '\\' && YYCURSOR < YYLIMIT {
+				YYCURSOR++
 			}
 		} else {
-			LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyLimit() - LANG_SCNG.GetYyText())
+			Yyleng = YYLIMIT - SCNG(yy_text)
 
 			/* Unclosed single quotes; treat similar to double quotes, but without a separate token
 			 * for ' (unrecognized by parser), instead of old flex fallback to "Unexpected character..."
 			 * rule, which continued in ST_IN_SCRIPTING state after the quote */
 
-			zendlval.SetTypeInfo(1)
-			token = T_ENCAPSED_AND_WHITESPACE
-			goto emit_token_with_val
+			ZVAL_NULL(zendlval)
+			RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 		}
 	}
-	if LANG_SCNG.GetYyLeng()-bprefix-2 <= 1 {
-		if LANG_SCNG.GetYyLeng()-bprefix-2 < 1 {
-			var __z *Zval = zendlval
-			var __s *ZendString = ZendEmptyString
-			__z.GetValue().SetStr(__s)
-			__z.SetTypeInfo(6)
+	if Yyleng-bprefix-2 <= 1 {
+		if Yyleng-bprefix-2 < 1 {
+			ZVAL_EMPTY_STRING(zendlval)
 		} else {
-			var c ZendUchar = zend_uchar * ((*byte)(LANG_SCNG.GetYyText()) + bprefix + 1)
+			var c ZendUchar = zend_uchar * (Yytext + bprefix + 1)
 			if c == '\n' || c == '\r' {
-				CG.GetZendLineno()++
+				CompilerGlobals.GetZendLineno()++
 			}
-			var __z *Zval = zendlval
-			var __s *ZendString = ZendOneCharString[c]
-			__z.GetValue().SetStr(__s)
-			__z.SetTypeInfo(6)
+			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
 		}
 		goto skip_escape_conversion
 	}
-	var __z *Zval = zendlval
-	var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText())+bprefix+1, LANG_SCNG.GetYyLeng()-bprefix-2, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_STRINGL(zendlval, Yytext+bprefix+1, Yyleng-bprefix-2)
 
 	/* convert escape sequences */
 
-	s = zendlval.GetValue().GetStr().GetVal()
-	end = s + zendlval.GetValue().GetStr().GetLen()
+	s = Z_STRVAL_P(zendlval)
+	end = s + Z_STRLEN_P(zendlval)
 	for true {
-		if (*s) == '\\' {
+		if UNEXPECTED((*s) == '\\') {
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG.GetZendLineno()++
+			CompilerGlobals.GetZendLineno()++
 		}
 		s++
 		if s == end {
@@ -1720,50 +1655,42 @@ yy10:
 		if (*s) == '\\' {
 			s++
 			if (*s) == '\\' || (*s) == '\'' {
-				g.PostInc(&(*t)) = *s
+				b.PostInc(&(*t)) = *s
 			} else {
-				g.PostInc(&(*t)) = '\\'
-				g.PostInc(&(*t)) = *s
+				b.PostInc(&(*t)) = '\\'
+				b.PostInc(&(*t)) = *s
 			}
 		} else {
-			g.PostInc(&(*t)) = *s
+			b.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG.GetZendLineno()++
+			CompilerGlobals.GetZendLineno()++
 		}
 		s++
 	}
 	*t = 0
-	zendlval.GetValue().GetStr().SetLen(t - zendlval.GetValue().GetStr().GetVal())
+	Z_STRLEN_P(zendlval) = t - Z_STRVAL_P(zendlval)
 skip_escape_conversion:
-	if LANG_SCNG.GetOutputFilter() != nil {
+	if SCNG(output_filter) {
 		var sz int = 0
 		var str *byte = nil
 		var new_str *ZendString
-		s = zendlval.GetValue().GetStr().GetVal()
+		s = Z_STRVAL_P(zendlval)
 
 		// TODO: avoid reallocation ???
 
-		LANG_SCNG.GetOutputFilter()((**uint8)(&str), &sz, (*uint8)(s), size_t(zendlval.GetValue().GetStr()).len_)
+		SCNG(output_filter)((**uint8)(&str), &sz, (*uint8)(s), int(Z_STRLEN_P(zendlval)))
 		new_str = ZendStringInit(str, sz, 0)
 		if str != s {
-			_efree(str)
+			Efree(str)
 		}
-		ZendStringReleaseEx(zendlval.GetValue().GetStr(), 0)
-		var __z *Zval = zendlval
-		var __s *ZendString = new_str
-		__z.GetValue().SetStr(__s)
-		if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-			__z.SetTypeInfo(6)
-		} else {
-			__z.SetTypeInfo(6 | 1<<0<<8)
-		}
+		ZendStringReleaseEx(Z_STR_P(zendlval), 0)
+		ZVAL_STR(zendlval, new_str)
 	}
-	token = T_CONSTANT_ENCAPSED_STRING
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
 yy11:
 	yyaccept = 0
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'S' {
 		if yych <= 'D' {
 			if yych <= ' ' {
@@ -1846,10 +1773,10 @@ yy11:
 		}
 	}
 yy12:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 	goto yy4
 yy13:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '*' {
 		goto yy76
 	}
@@ -1858,7 +1785,7 @@ yy13:
 	}
 	goto yy4
 yy14:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '+' {
 		goto yy78
 	}
@@ -1867,7 +1794,7 @@ yy14:
 	}
 	goto yy4
 yy15:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '<' {
 		if yych == '-' {
 			goto yy80
@@ -1884,7 +1811,7 @@ yy15:
 	}
 yy16:
 	yyaccept = 0
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		if yych == '.' {
 			goto yy83
@@ -1900,7 +1827,7 @@ yy16:
 		goto yy4
 	}
 yy17:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '.' {
 		if yych == '*' {
 			goto yy88
@@ -1917,7 +1844,7 @@ yy17:
 	}
 yy18:
 	yyaccept = 1
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'X' {
 		if yych == 'B' {
 			goto yy92
@@ -1940,14 +1867,14 @@ yy18:
 		}
 	}
 yy19:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var len int = LANG_SCNG.yy_leng
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	var len int = yyleng
 	var end *byte
-	var lnum *byte = (*byte)(LANG_SCNG.GetYyText())
+	var lnum *byte = Yytext
 	var is_octal ZendBool = lnum[0] == '0'
 	var contains_underscores zend_bool = memchr(lnum, '_', len) != nil
 	if contains_underscores != 0 {
-		lnum = _estrndup(lnum, len_)
+		lnum = Estrndup(lnum, len_)
 		StripUnderscores(lnum, &len_)
 	}
 
@@ -1958,11 +1885,11 @@ yy19:
 		for i = 0; i < len_; i++ {
 			if lnum[i] == '8' || lnum[i] == '9' {
 				ZendThrowException(ZendCeParseError, "Invalid numeric literal", 0)
-				if elem != nil {
+				if PARSER_MODE() {
 					if contains_underscores != 0 {
-						_efree(lnum)
+						Efree(lnum)
 					}
-					zendlval.SetTypeInfo(0)
+					ZVAL_UNDEF(zendlval)
 					token = T_ERROR
 					goto emit_token
 				}
@@ -1974,54 +1901,44 @@ yy19:
 			}
 		}
 	}
-	if len_ < 20-1 {
+	if len_ < MAX_LENGTH_OF_LONG-1 {
 		errno = 0
 
 		/* base must be passed explicitly for correct parse error on Windows */
 
-		var __z *Zval = zendlval
-		__z.GetValue().SetLval(strtoll(lnum, &end, g.Cond(is_octal != 0, 8, 10)))
-		__z.SetTypeInfo(4)
-		r.Assert(end == lnum+len_)
+		ZVAL_LONG(zendlval, ZEND_STRTOL(lnum, &end, b.Cond(is_octal != 0, 8, 10)))
+		ZEND_ASSERT(end == lnum+len_)
 	} else {
 		errno = 0
-		var __z *Zval = zendlval
-		__z.GetValue().SetLval(strtoll(lnum, &end, 0))
-		__z.SetTypeInfo(4)
+		ZVAL_LONG(zendlval, ZEND_STRTOL(lnum, &end, 0))
 		if errno == ERANGE {
 			errno = 0
 			if is_octal != 0 {
-				var __z *Zval = zendlval
-				__z.GetValue().SetDval(ZendOctStrtod(lnum, (**byte)(&end)))
-				__z.SetTypeInfo(5)
+				ZVAL_DOUBLE(zendlval, ZendOctStrtod(lnum, (**byte)(&end)))
 			} else {
-				var __z *Zval = zendlval
-				__z.GetValue().SetDval(ZendStrtod(lnum, (**byte)(&end)))
-				__z.SetTypeInfo(5)
+				ZVAL_DOUBLE(zendlval, ZendStrtod(lnum, (**byte)(&end)))
 			}
-			r.Assert(end == lnum+len_)
+			ZEND_ASSERT(end == lnum+len_)
 			if contains_underscores != 0 {
-				_efree(lnum)
+				Efree(lnum)
 			}
-			token = T_DNUMBER
-			goto emit_token_with_val
+			RETURN_TOKEN_WITH_VAL(T_DNUMBER)
 		}
-		r.Assert(end == lnum+len_)
+		ZEND_ASSERT(end == lnum+len_)
 	}
-	r.Assert(!errno)
+	ZEND_ASSERT(!errno)
 	if contains_underscores != 0 {
-		_efree(lnum)
+		Efree(lnum)
 	}
-	token = T_LNUMBER
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_LNUMBER)
 yy20:
 	yyaccept = 1
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy21:
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy20
@@ -2048,13 +1965,13 @@ yy21:
 		}
 	}
 yy22:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == ':' {
 		goto yy96
 	}
 	goto yy4
 yy23:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= ';' {
 		goto yy4
 	}
@@ -2069,7 +1986,7 @@ yy23:
 	}
 	goto yy4
 yy24:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '<' {
 		goto yy4
 	}
@@ -2081,7 +1998,7 @@ yy24:
 	}
 	goto yy4
 yy25:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '<' {
 		goto yy4
 	}
@@ -2093,7 +2010,7 @@ yy25:
 	}
 	goto yy4
 yy26:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '=' {
 		goto yy4
 	}
@@ -2105,7 +2022,7 @@ yy26:
 	}
 	goto yy4
 yy27:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'S' {
 		if yych <= 'M' {
 			if yych == 'B' {
@@ -2147,13 +2064,11 @@ yy27:
 		}
 	}
 yy28:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_STRING
-	offset = 0
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_STRING, 0)
 yy29:
 	yyaccept = 2
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= ';' {
 		if yych <= '"' {
 			if yych <= '!' {
@@ -2183,7 +2098,7 @@ yy29:
 		}
 	}
 yy30:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych <= 'K' {
 			if yych == 'A' {
@@ -2216,7 +2131,7 @@ yy30:
 		}
 	}
 yy31:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych <= 'H' {
 			if yych == 'E' {
@@ -2249,7 +2164,7 @@ yy31:
 		}
 	}
 yy32:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'C':
 
@@ -2279,7 +2194,7 @@ yy32:
 		goto yy36
 	}
 yy33:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'U' {
 		if yych <= 'M' {
 			if yych == 'I' {
@@ -2318,7 +2233,7 @@ yy33:
 		}
 	}
 yy34:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych == 'L' {
 			goto yy130
@@ -2341,18 +2256,18 @@ yy34:
 		}
 	}
 yy35:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy36:
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
 	goto yy28
 yy37:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'S' {
 		if yych <= 'L' {
 			if yych == 'F' {
@@ -2391,7 +2306,7 @@ yy37:
 		}
 	}
 yy38:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy136
 	}
@@ -2400,7 +2315,7 @@ yy38:
 	}
 	goto yy36
 yy39:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'E' {
 		if yych == 'A' {
 			goto yy137
@@ -2423,7 +2338,7 @@ yy39:
 		}
 	}
 yy40:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy139
 	}
@@ -2432,7 +2347,7 @@ yy40:
 	}
 	goto yy36
 yy41:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'U' {
 		if yych == 'R' {
 			goto yy140
@@ -2455,7 +2370,7 @@ yy41:
 		}
 	}
 yy42:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy142
 	}
@@ -2464,7 +2379,7 @@ yy42:
 	}
 	goto yy36
 yy43:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'W' {
 		if yych == 'T' {
 			goto yy143
@@ -2487,7 +2402,7 @@ yy43:
 		}
 	}
 yy44:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'R' {
 		if yych == 'H' {
 			goto yy145
@@ -2510,7 +2425,7 @@ yy44:
 		}
 	}
 yy45:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'S' {
 		if yych == 'N' {
 			goto yy147
@@ -2533,7 +2448,7 @@ yy45:
 		}
 	}
 yy46:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy149
 	}
@@ -2542,7 +2457,7 @@ yy46:
 	}
 	goto yy36
 yy47:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy150
 	}
@@ -2551,7 +2466,7 @@ yy47:
 	}
 	goto yy36
 yy48:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy151
 	}
@@ -2560,7 +2475,7 @@ yy48:
 	}
 	goto yy36
 yy49:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy152
 	}
@@ -2569,36 +2484,36 @@ yy49:
 	}
 	goto yy36
 yy50:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_NS_SEPARATOR
 	goto emit_token
 yy51:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy153
 	}
 	goto yy4
 yy52:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy154
 	}
 	goto yy36
 yy53:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyState(yycST_BACKQUOTE)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(ST_BACKQUOTE)
 	token = '`'
 	goto emit_token
 yy54:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_IN_SCRIPTING)
 	token = '{'
 	goto emit_token
 yy55:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy155
 	}
@@ -2607,32 +2522,29 @@ yy55:
 	}
 	goto yy4
 yy56:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if CG.GetDocComment() != nil {
-		ZendStringReleaseEx(CG.GetDocComment(), 0)
-		CG.SetDocComment(nil)
-	}
-	if ZendStackIsEmpty(&LANG_SCNG.state_stack) == 0 {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RESET_DOC_COMMENT()
+	if ZendStackIsEmpty(&SCNG(state_stack)) == 0 {
 		YyPopState()
 	}
 	token = '}'
 	goto emit_token
 yy57:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy157
 	}
 yy58:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_NOT_EQUAL
 	goto emit_token
 yy59:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '^' {
 		if yych <= '9' {
 			if yych >= '0' {
@@ -2661,31 +2573,29 @@ yy59:
 		}
 	}
 yy60:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy61:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_MOD_EQUAL
 	goto emit_token
 yy62:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_BOOLEAN_AND
 	goto emit_token
 yy63:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_AND_EQUAL
 	goto emit_token
 yy64:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+7 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+7 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy65:
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy64
@@ -2731,7 +2641,7 @@ yy65:
 		goto yy66
 	}
 yy66:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	if yyaccept <= 4 {
 		if yyaccept <= 2 {
 			if yyaccept <= 1 {
@@ -2766,7 +2676,7 @@ yy66:
 		}
 	}
 yy67:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy158
 	}
@@ -2775,7 +2685,7 @@ yy67:
 	}
 	goto yy66
 yy68:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych == 'I' {
 			goto yy159
@@ -2798,7 +2708,7 @@ yy68:
 		}
 	}
 yy69:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy161
 	}
@@ -2807,7 +2717,7 @@ yy69:
 	}
 	goto yy66
 yy70:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy162
 	}
@@ -2816,7 +2726,7 @@ yy70:
 	}
 	goto yy66
 yy71:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy163
 	}
@@ -2825,7 +2735,7 @@ yy71:
 	}
 	goto yy66
 yy72:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'B' {
 		goto yy164
 	}
@@ -2834,7 +2744,7 @@ yy72:
 	}
 	goto yy66
 yy73:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy165
 	}
@@ -2843,7 +2753,7 @@ yy73:
 	}
 	goto yy66
 yy74:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy166
 	}
@@ -2852,7 +2762,7 @@ yy74:
 	}
 	goto yy66
 yy75:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy167
 	}
@@ -2861,58 +2771,58 @@ yy75:
 	}
 	goto yy66
 yy76:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy168
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_POW
 	goto emit_token
 yy77:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_MUL_EQUAL
 	goto emit_token
 yy78:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INC
 	goto emit_token
 yy79:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PLUS_EQUAL
 	goto emit_token
 yy80:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DEC
 	goto emit_token
 yy81:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_MINUS_EQUAL
 	goto emit_token
 yy82:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_LOOKING_FOR_PROPERTY)
 	token = T_OBJECT_OPERATOR
 	goto emit_token
 yy83:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '.' {
 		goto yy169
 	}
 	goto yy66
 yy84:
 	yyaccept = 3
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy85:
 	if yych <= 'E' {
 		if yych <= '/' {
@@ -2936,106 +2846,85 @@ yy85:
 		}
 	}
 yy86:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	var end *byte
-	var len int = LANG_SCNG.yy_leng
-	var dnum *byte = (*byte)(LANG_SCNG.GetYyText())
+	var len int = yyleng
+	var dnum *byte = Yytext
 	var contains_underscores zend_bool = memchr(dnum, '_', len) != nil
 	if contains_underscores != 0 {
-		dnum = _estrndup(dnum, len_)
+		dnum = Estrndup(dnum, len_)
 		StripUnderscores(dnum, &len_)
 	}
-	var __z *Zval = zendlval
-	__z.GetValue().SetDval(ZendStrtod(dnum, &end))
-	__z.SetTypeInfo(5)
+	ZVAL_DOUBLE(zendlval, ZendStrtod(dnum, &end))
 
 	/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-	r.Assert(end == dnum+len_)
+	ZEND_ASSERT(end == dnum+len_)
 	if contains_underscores != 0 {
-		_efree(dnum)
+		Efree(dnum)
 	}
-	token = T_DNUMBER
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_DNUMBER)
 yy87:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CONCAT_EQUAL
 	goto emit_token
 yy88:
 	yyaccept = 4
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == '*' {
 		goto yy171
 	}
 yy89:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	var doc_com int
-	if LANG_SCNG.GetYyLeng() > 2 {
+	if Yyleng > 2 {
 		doc_com = 1
-		if CG.GetDocComment() != nil {
-			ZendStringReleaseEx(CG.GetDocComment(), 0)
-			CG.SetDocComment(nil)
-		}
+		RESET_DOC_COMMENT()
 	} else {
 		doc_com = 0
 	}
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		if g.PostInc(&(LANG_SCNG.yy_cursor)) == '*' && LANG_SCNG.yy_cursor == '/' {
+	for YYCURSOR < YYLIMIT {
+		if b.PostInc(&(*YYCURSOR)) == '*' && (*YYCURSOR) == '/' {
 			break
 		}
 	}
-	if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		LANG_SCNG.GetYyCursor()++
-	} else if LANG_SCNG.GetHeredocScanAhead() == 0 {
-		ZendError(1<<7, "Unterminated comment starting line %d", CG.GetZendLineno())
+	if YYCURSOR < YYLIMIT {
+		YYCURSOR++
+	} else if !(SCNG(heredoc_scan_ahead)) {
+		ZendError(E_COMPILE_WARNING, "Unterminated comment starting line %d", CompilerGlobals.GetZendLineno())
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var p *byte = (*byte)(LANG_SCNG.GetYyText())
-	var boundary *byte = p + LANG_SCNG.GetYyLeng()
-	for p < boundary {
-		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG.GetZendLineno()++
-		}
-		p++
-	}
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	HANDLE_NEWLINES(Yytext, Yyleng)
 	if doc_com != 0 {
-		CG.SetDocComment(ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), 0))
-		token = T_DOC_COMMENT
-		if elem != nil {
-			goto skip_token
-		}
-		goto emit_token
+		CompilerGlobals.SetDocComment(ZendStringInit(Yytext, Yyleng, 0))
+		RETURN_OR_SKIP_TOKEN(T_DOC_COMMENT)
 	}
-	token = T_COMMENT
-	if elem != nil {
-		goto skip_token
-	}
-	goto emit_token
+	RETURN_OR_SKIP_TOKEN(T_COMMENT)
 yy90:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DIV_EQUAL
 	goto emit_token
 yy91:
 	yyaccept = 3
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == '_' {
 		goto yy86
 	}
 	goto yy85
 yy92:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy172
 	}
 	goto yy66
 yy93:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= ',' {
 		if yych == '+' {
 			goto yy174
@@ -3054,33 +2943,33 @@ yy93:
 		goto yy66
 	}
 yy94:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy176
 	}
 	goto yy66
 yy95:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy20
 	}
 	goto yy66
 yy96:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PAAMAYIM_NEKUDOTAYIM
 	goto emit_token
 yy97:
 	yyaccept = 5
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= ';' {
 		goto yy98
 	}
@@ -3091,48 +2980,48 @@ yy97:
 		goto yy179
 	}
 yy98:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SL
 	goto emit_token
 yy99:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '>' {
 		goto yy180
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_SMALLER_OR_EQUAL
 	goto emit_token
 yy100:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 	goto yy58
 yy101:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy181
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_EQUAL
 	goto emit_token
 yy102:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DOUBLE_ARROW
 	goto emit_token
 yy103:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_GREATER_OR_EQUAL
 	goto emit_token
 yy104:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy182
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SR
 	goto emit_token
 yy105:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy183
 	}
@@ -3140,27 +3029,27 @@ yy105:
 		goto yy184
 	}
 yy106:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyState(yycINITIAL)
-	if (*byte)(LANG_SCNG.GetYyText())[LANG_SCNG.GetYyLeng()-1] != '>' {
-		CG.SetIncrementLineno(1)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	if Yytext[Yyleng-1] != '>' {
+		CompilerGlobals.SetIncrementLineno(1)
 	}
-	if elem != nil {
+	if PARSER_MODE() {
 		token = ';'
 		goto emit_token
 	}
 	token = T_CLOSE_TAG
 	goto emit_token
 yy107:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '=' {
 		goto yy185
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_COALESCE
 	goto emit_token
 yy108:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy186
 	}
@@ -3169,7 +3058,7 @@ yy108:
 	}
 	goto yy36
 yy109:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy187
 	}
@@ -3178,7 +3067,7 @@ yy109:
 	}
 	goto yy36
 yy110:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy188
 	}
@@ -3187,21 +3076,21 @@ yy110:
 	}
 	goto yy36
 yy111:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_AS
 	goto emit_token
 yy112:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '<' {
 		goto yy189
 	}
 	goto yy66
 yy113:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy190
 	}
@@ -3210,7 +3099,7 @@ yy113:
 	}
 	goto yy36
 yy114:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'T' {
 		if yych <= 'L' {
 			if yych <= 'K' {
@@ -3243,7 +3132,7 @@ yy114:
 		}
 	}
 yy115:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych == 'A' {
 			goto yy194
@@ -3266,7 +3155,7 @@ yy115:
 		}
 	}
 yy116:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy196
 	}
@@ -3275,7 +3164,7 @@ yy116:
 	}
 	goto yy36
 yy117:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'F' {
 		if yych == 'C' {
 			goto yy197
@@ -3298,7 +3187,7 @@ yy117:
 		}
 	}
 yy118:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy199
 	}
@@ -3307,15 +3196,15 @@ yy118:
 	}
 	goto yy36
 yy119:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DO
 	goto emit_token
 yy120:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy200
 	}
@@ -3324,7 +3213,7 @@ yy120:
 	}
 	goto yy36
 yy121:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy201
 	}
@@ -3333,7 +3222,7 @@ yy121:
 	}
 	goto yy36
 yy122:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy202
 	}
@@ -3342,7 +3231,7 @@ yy122:
 	}
 	goto yy36
 yy123:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy203
 	}
@@ -3351,7 +3240,7 @@ yy123:
 	}
 	goto yy36
 yy124:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy204
 	}
@@ -3360,7 +3249,7 @@ yy124:
 	}
 	goto yy36
 yy125:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'T' {
 		if yych == 'I' {
 			goto yy205
@@ -3383,7 +3272,7 @@ yy125:
 		}
 	}
 yy126:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy207
 	}
@@ -3392,15 +3281,15 @@ yy126:
 	}
 	goto yy36
 yy127:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FN
 	goto emit_token
 yy128:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy208
 	}
@@ -3409,7 +3298,7 @@ yy128:
 	}
 	goto yy36
 yy129:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy210
 	}
@@ -3418,7 +3307,7 @@ yy129:
 	}
 	goto yy36
 yy130:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy211
 	}
@@ -3427,7 +3316,7 @@ yy130:
 	}
 	goto yy36
 yy131:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy212
 	}
@@ -3436,15 +3325,15 @@ yy131:
 	}
 	goto yy36
 yy132:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IF
 	goto emit_token
 yy133:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy213
 	}
@@ -3453,7 +3342,7 @@ yy133:
 	}
 	goto yy36
 yy134:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'T' {
 		if yych <= 'C' {
 			if yych <= 'B' {
@@ -3486,7 +3375,7 @@ yy134:
 		}
 	}
 yy135:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy217
 	}
@@ -3495,7 +3384,7 @@ yy135:
 	}
 	goto yy36
 yy136:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy218
 	}
@@ -3504,7 +3393,7 @@ yy136:
 	}
 	goto yy36
 yy137:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'M' {
 		goto yy219
 	}
@@ -3513,7 +3402,7 @@ yy137:
 	}
 	goto yy36
 yy138:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'W' {
 		goto yy220
 	}
@@ -3522,15 +3411,15 @@ yy138:
 	}
 	goto yy36
 yy139:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_LOGICAL_OR
 	goto emit_token
 yy140:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'O' {
 		if yych == 'I' {
 			goto yy221
@@ -3553,7 +3442,7 @@ yy140:
 		}
 	}
 yy141:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'B' {
 		goto yy223
 	}
@@ -3562,7 +3451,7 @@ yy141:
 	}
 	goto yy36
 yy142:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'T' {
 		if yych == 'Q' {
 			goto yy224
@@ -3585,7 +3474,7 @@ yy142:
 		}
 	}
 yy143:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy226
 	}
@@ -3594,7 +3483,7 @@ yy143:
 	}
 	goto yy36
 yy144:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy227
 	}
@@ -3603,7 +3492,7 @@ yy144:
 	}
 	goto yy36
 yy145:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy228
 	}
@@ -3612,7 +3501,7 @@ yy145:
 	}
 	goto yy36
 yy146:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'Y' {
 		if yych == 'A' {
 			goto yy229
@@ -3635,7 +3524,7 @@ yy146:
 		}
 	}
 yy147:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy231
 	}
@@ -3644,7 +3533,7 @@ yy147:
 	}
 	goto yy36
 yy148:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy232
 	}
@@ -3653,7 +3542,7 @@ yy148:
 	}
 	goto yy36
 yy149:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy233
 	}
@@ -3662,7 +3551,7 @@ yy149:
 	}
 	goto yy36
 yy150:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy234
 	}
@@ -3671,7 +3560,7 @@ yy150:
 	}
 	goto yy36
 yy151:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy235
 	}
@@ -3680,7 +3569,7 @@ yy151:
 	}
 	goto yy36
 yy152:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy236
 	}
@@ -3689,12 +3578,12 @@ yy152:
 	}
 	goto yy36
 yy153:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_XOR_EQUAL
 	goto emit_token
 yy154:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'C':
 
@@ -3732,22 +3621,22 @@ yy154:
 		goto yy36
 	}
 yy155:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_OR_EQUAL
 	goto emit_token
 yy156:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_BOOLEAN_OR
 	goto emit_token
 yy157:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_NOT_IDENTICAL
 	goto emit_token
 yy158:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy245
 	}
@@ -3756,7 +3645,7 @@ yy158:
 	}
 	goto yy66
 yy159:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy246
 	}
@@ -3765,7 +3654,7 @@ yy159:
 	}
 	goto yy66
 yy160:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy247
 	}
@@ -3774,7 +3663,7 @@ yy160:
 	}
 	goto yy66
 yy161:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy248
 	}
@@ -3783,7 +3672,7 @@ yy161:
 	}
 	goto yy66
 yy162:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy249
 	}
@@ -3792,7 +3681,7 @@ yy162:
 	}
 	goto yy66
 yy163:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy250
 	}
@@ -3801,7 +3690,7 @@ yy163:
 	}
 	goto yy66
 yy164:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'J' {
 		goto yy251
 	}
@@ -3810,7 +3699,7 @@ yy164:
 	}
 	goto yy66
 yy165:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy252
 	}
@@ -3819,7 +3708,7 @@ yy165:
 	}
 	goto yy66
 yy166:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy253
 	}
@@ -3828,7 +3717,7 @@ yy166:
 	}
 	goto yy66
 yy167:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy254
 	}
@@ -3837,21 +3726,21 @@ yy167:
 	}
 	goto yy66
 yy168:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_POW_EQUAL
 	goto emit_token
 yy169:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ELLIPSIS
 	goto emit_token
 yy170:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy66
 	}
@@ -3860,7 +3749,7 @@ yy170:
 	}
 	goto yy66
 yy171:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'f' {
 		if yych <= 0x8 {
 			goto yy66
@@ -3880,12 +3769,12 @@ yy171:
 	}
 yy172:
 	yyaccept = 6
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy172
 	}
@@ -3893,13 +3782,13 @@ yy172:
 		goto yy92
 	}
 yy173:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* The +/- 2 skips "0b" */
 
-	var len int = LANG_SCNG.yy_leng - 2
+	var len int = yyleng - 2
 	var end *byte
-	var bin *byte = (*byte)(LANG_SCNG.GetYyText()) + 2
+	var bin *byte = Yytext + 2
 	var contains_underscores zend_bool
 
 	/* Skip any leading 0s */
@@ -3910,46 +3799,38 @@ yy173:
 	}
 	contains_underscores = memchr(bin, '_', len_) != nil
 	if contains_underscores != 0 {
-		bin = _estrndup(bin, len_)
+		bin = Estrndup(bin, len_)
 		StripUnderscores(bin, &len_)
 	}
-	if len_ < 8*8 {
+	if len_ < SIZEOF_ZEND_LONG*8 {
 		if len_ == 0 {
-			var __z *Zval = zendlval
-			__z.GetValue().SetLval(0)
-			__z.SetTypeInfo(4)
+			ZVAL_LONG(zendlval, 0)
 		} else {
 			errno = 0
-			var __z *Zval = zendlval
-			__z.GetValue().SetLval(strtoll(bin, &end, 2))
-			__z.SetTypeInfo(4)
-			r.Assert(!errno && end == bin+len_)
+			ZVAL_LONG(zendlval, ZEND_STRTOL(bin, &end, 2))
+			ZEND_ASSERT(!errno && end == bin+len_)
 		}
 		if contains_underscores != 0 {
-			_efree(bin)
+			Efree(bin)
 		}
-		token = T_LNUMBER
-		goto emit_token_with_val
+		RETURN_TOKEN_WITH_VAL(T_LNUMBER)
 	} else {
-		var __z *Zval = zendlval
-		__z.GetValue().SetDval(ZendBinStrtod(bin, (**byte)(&end)))
-		__z.SetTypeInfo(5)
+		ZVAL_DOUBLE(zendlval, ZendBinStrtod(bin, (**byte)(&end)))
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-		r.Assert(end == bin+len_)
+		ZEND_ASSERT(end == bin+len_)
 		if contains_underscores != 0 {
-			_efree(bin)
+			Efree(bin)
 		}
-		token = T_DNUMBER
-		goto emit_token_with_val
+		RETURN_TOKEN_WITH_VAL(T_DNUMBER)
 	}
 yy174:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy66
 	}
@@ -3958,12 +3839,12 @@ yy174:
 	}
 yy175:
 	yyaccept = 3
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy86
 	}
@@ -3976,12 +3857,12 @@ yy175:
 	goto yy86
 yy176:
 	yyaccept = 7
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy176
 	}
@@ -3989,13 +3870,13 @@ yy176:
 		goto yy94
 	}
 yy177:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* The +/- 2 skips "0x" */
 
-	var len_ int = LANG_SCNG.GetYyLeng() - 2
+	var len_ int = Yyleng - 2
 	var end *byte
-	var hex *byte = (*byte)(LANG_SCNG.GetYyText()) + 2
+	var hex *byte = Yytext + 2
 	var contains_underscores ZendBool
 
 	/* Skip any leading 0s */
@@ -4006,46 +3887,38 @@ yy177:
 	}
 	contains_underscores = memchr(hex, '_', len_) != nil
 	if contains_underscores != 0 {
-		hex = _estrndup(hex, len_)
+		hex = Estrndup(hex, len_)
 		StripUnderscores(hex, &len_)
 	}
-	if len_ < 8*2 || len_ == 8*2 && (*hex) <= '7' {
+	if len_ < SIZEOF_ZEND_LONG*2 || len_ == SIZEOF_ZEND_LONG*2 && (*hex) <= '7' {
 		if len_ == 0 {
-			var __z *Zval = zendlval
-			__z.GetValue().SetLval(0)
-			__z.SetTypeInfo(4)
+			ZVAL_LONG(zendlval, 0)
 		} else {
 			errno = 0
-			var __z *Zval = zendlval
-			__z.GetValue().SetLval(strtoll(hex, &end, 16))
-			__z.SetTypeInfo(4)
-			r.Assert(!errno && end == hex+len_)
+			ZVAL_LONG(zendlval, ZEND_STRTOL(hex, &end, 16))
+			ZEND_ASSERT(!errno && end == hex+len_)
 		}
 		if contains_underscores != 0 {
-			_efree(hex)
+			Efree(hex)
 		}
-		token = T_LNUMBER
-		goto emit_token_with_val
+		RETURN_TOKEN_WITH_VAL(T_LNUMBER)
 	} else {
-		var __z *Zval = zendlval
-		__z.GetValue().SetDval(ZendHexStrtod(hex, (**byte)(&end)))
-		__z.SetTypeInfo(5)
+		ZVAL_DOUBLE(zendlval, ZendHexStrtod(hex, (**byte)(&end)))
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
-		r.Assert(end == hex+len_)
+		ZEND_ASSERT(end == hex+len_)
 		if contains_underscores != 0 {
-			_efree(hex)
+			Efree(hex)
 		}
-		token = T_DNUMBER
-		goto emit_token_with_val
+		RETURN_TOKEN_WITH_VAL(T_DNUMBER)
 	}
 yy178:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '\'' {
 		if yych <= ' ' {
 			if yych == '\t' {
@@ -4090,41 +3963,41 @@ yy178:
 		}
 	}
 yy179:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SL_EQUAL
 	goto emit_token
 yy180:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SPACESHIP
 	goto emit_token
 yy181:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IS_IDENTICAL
 	goto emit_token
 yy182:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SR_EQUAL
 	goto emit_token
 yy183:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 	goto yy106
 yy184:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy183
 	}
 	goto yy106
 yy185:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_COALESCE_EQUAL
 	goto emit_token
 yy186:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy259
 	}
@@ -4133,15 +4006,15 @@ yy186:
 	}
 	goto yy36
 yy187:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_LOGICAL_AND
 	goto emit_token
 yy188:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy260
 	}
@@ -4150,13 +4023,13 @@ yy188:
 	}
 	goto yy36
 yy189:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '<' {
 		goto yy178
 	}
 	goto yy66
 yy190:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy261
 	}
@@ -4165,7 +4038,7 @@ yy190:
 	}
 	goto yy36
 yy191:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy262
 	}
@@ -4174,7 +4047,7 @@ yy191:
 	}
 	goto yy36
 yy192:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy263
 	}
@@ -4183,7 +4056,7 @@ yy192:
 	}
 	goto yy36
 yy193:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy264
 	}
@@ -4192,7 +4065,7 @@ yy193:
 	}
 	goto yy36
 yy194:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy265
 	}
@@ -4201,7 +4074,7 @@ yy194:
 	}
 	goto yy36
 yy195:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy266
 	}
@@ -4210,7 +4083,7 @@ yy195:
 	}
 	goto yy36
 yy196:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'T' {
 		if yych <= 'R' {
 			goto yy36
@@ -4232,7 +4105,7 @@ yy196:
 		goto yy36
 	}
 yy197:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy269
 	}
@@ -4241,7 +4114,7 @@ yy197:
 	}
 	goto yy36
 yy198:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy270
 	}
@@ -4250,15 +4123,15 @@ yy198:
 	}
 	goto yy36
 yy199:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_EXIT
 	goto emit_token
 yy200:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy271
 	}
@@ -4267,7 +4140,7 @@ yy200:
 	}
 	goto yy36
 yy201:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy272
 	}
@@ -4276,7 +4149,7 @@ yy201:
 	}
 	goto yy36
 yy202:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy274
 	}
@@ -4285,7 +4158,7 @@ yy202:
 	}
 	goto yy36
 yy203:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'D':
 
@@ -4311,7 +4184,7 @@ yy203:
 		goto yy36
 	}
 yy204:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy280
 	}
@@ -4320,7 +4193,7 @@ yy204:
 	}
 	goto yy36
 yy205:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy281
 	}
@@ -4329,7 +4202,7 @@ yy205:
 	}
 	goto yy36
 yy206:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy282
 	}
@@ -4338,7 +4211,7 @@ yy206:
 	}
 	goto yy36
 yy207:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy283
 	}
@@ -4347,7 +4220,7 @@ yy207:
 	}
 	goto yy36
 yy208:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '@' {
 			if yych <= '/' {
@@ -4382,11 +4255,11 @@ yy208:
 		}
 	}
 yy209:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FOR
 	goto emit_token
 yy210:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy285
 	}
@@ -4395,7 +4268,7 @@ yy210:
 	}
 	goto yy36
 yy211:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'B' {
 		goto yy286
 	}
@@ -4404,7 +4277,7 @@ yy211:
 	}
 	goto yy36
 yy212:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy287
 	}
@@ -4413,7 +4286,7 @@ yy212:
 	}
 	goto yy36
 yy213:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy288
 	}
@@ -4422,7 +4295,7 @@ yy213:
 	}
 	goto yy36
 yy214:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy289
 	}
@@ -4431,7 +4304,7 @@ yy214:
 	}
 	goto yy36
 yy215:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy290
 	}
@@ -4440,7 +4313,7 @@ yy215:
 	}
 	goto yy36
 yy216:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy291
 	}
@@ -4449,7 +4322,7 @@ yy216:
 	}
 	goto yy36
 yy217:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy292
 	}
@@ -4458,7 +4331,7 @@ yy217:
 	}
 	goto yy36
 yy218:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy293
 	}
@@ -4467,7 +4340,7 @@ yy218:
 	}
 	goto yy36
 yy219:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy294
 	}
@@ -4476,15 +4349,15 @@ yy219:
 	}
 	goto yy36
 yy220:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_NEW
 	goto emit_token
 yy221:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'V' {
 		if yych == 'N' {
 			goto yy295
@@ -4507,7 +4380,7 @@ yy221:
 		}
 	}
 yy222:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy297
 	}
@@ -4516,7 +4389,7 @@ yy222:
 	}
 	goto yy36
 yy223:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy298
 	}
@@ -4525,7 +4398,7 @@ yy223:
 	}
 	goto yy36
 yy224:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy299
 	}
@@ -4534,7 +4407,7 @@ yy224:
 	}
 	goto yy36
 yy225:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy300
 	}
@@ -4543,7 +4416,7 @@ yy225:
 	}
 	goto yy36
 yy226:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy301
 	}
@@ -4552,7 +4425,7 @@ yy226:
 	}
 	goto yy36
 yy227:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy302
 	}
@@ -4561,7 +4434,7 @@ yy227:
 	}
 	goto yy36
 yy228:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy303
 	}
@@ -4570,7 +4443,7 @@ yy228:
 	}
 	goto yy36
 yy229:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy304
 	}
@@ -4579,15 +4452,15 @@ yy229:
 	}
 	goto yy36
 yy230:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_TRY
 	goto emit_token
 yy231:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy305
 	}
@@ -4596,23 +4469,23 @@ yy231:
 	}
 	goto yy36
 yy232:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_USE
 	goto emit_token
 yy233:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_VAR
 	goto emit_token
 yy234:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy306
 	}
@@ -4621,15 +4494,15 @@ yy234:
 	}
 	goto yy36
 yy235:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_LOGICAL_XOR
 	goto emit_token
 yy236:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy307
 	}
@@ -4638,7 +4511,7 @@ yy236:
 	}
 	goto yy36
 yy237:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy308
 	}
@@ -4647,7 +4520,7 @@ yy237:
 	}
 	goto yy36
 yy238:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy309
 	}
@@ -4656,7 +4529,7 @@ yy238:
 	}
 	goto yy36
 yy239:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'U' {
 		if yych == 'I' {
 			goto yy310
@@ -4679,7 +4552,7 @@ yy239:
 		}
 	}
 yy240:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy312
 	}
@@ -4688,7 +4561,7 @@ yy240:
 	}
 	goto yy36
 yy241:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy313
 	}
@@ -4697,7 +4570,7 @@ yy241:
 	}
 	goto yy36
 yy242:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy314
 	}
@@ -4706,7 +4579,7 @@ yy242:
 	}
 	goto yy36
 yy243:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy315
 	}
@@ -4715,7 +4588,7 @@ yy243:
 	}
 	goto yy36
 yy244:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy316
 	}
@@ -4724,7 +4597,7 @@ yy244:
 	}
 	goto yy36
 yy245:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy317
 	}
@@ -4733,7 +4606,7 @@ yy245:
 	}
 	goto yy66
 yy246:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy318
 	}
@@ -4742,7 +4615,7 @@ yy246:
 	}
 	goto yy66
 yy247:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy319
 	}
@@ -4751,7 +4624,7 @@ yy247:
 	}
 	goto yy66
 yy248:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'B' {
 		goto yy320
 	}
@@ -4760,7 +4633,7 @@ yy248:
 	}
 	goto yy66
 yy249:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy321
 	}
@@ -4769,7 +4642,7 @@ yy249:
 	}
 	goto yy66
 yy250:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy324
 	}
@@ -4778,7 +4651,7 @@ yy250:
 	}
 	goto yy323
 yy251:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy325
 	}
@@ -4787,7 +4660,7 @@ yy251:
 	}
 	goto yy66
 yy252:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy326
 	}
@@ -4796,7 +4669,7 @@ yy252:
 	}
 	goto yy66
 yy253:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy327
 	}
@@ -4805,7 +4678,7 @@ yy253:
 	}
 	goto yy66
 yy254:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy328
 	}
@@ -4814,11 +4687,11 @@ yy254:
 	}
 	goto yy66
 yy255:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 'f' {
 		if yych <= 0x8 {
 			goto yy89
@@ -4837,7 +4710,7 @@ yy255:
 		goto yy89
 	}
 yy256:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '"' {
 		goto yy66
 	}
@@ -4849,7 +4722,7 @@ yy256:
 	}
 	goto yy330
 yy257:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\'' {
 		goto yy66
 	}
@@ -4861,11 +4734,11 @@ yy257:
 	}
 	goto yy332
 yy258:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '@' {
 		if yych <= 'f' {
 			if yych == '\n' {
@@ -4907,7 +4780,7 @@ yy258:
 		}
 	}
 yy259:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy336
 	}
@@ -4916,7 +4789,7 @@ yy259:
 	}
 	goto yy36
 yy260:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'Y' {
 		goto yy337
 	}
@@ -4925,7 +4798,7 @@ yy260:
 	}
 	goto yy36
 yy261:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'K' {
 		goto yy338
 	}
@@ -4934,7 +4807,7 @@ yy261:
 	}
 	goto yy36
 yy262:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy339
 	}
@@ -4943,15 +4816,15 @@ yy262:
 	}
 	goto yy36
 yy263:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CASE
 	goto emit_token
 yy264:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy340
 	}
@@ -4960,7 +4833,7 @@ yy264:
 	}
 	goto yy36
 yy265:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy341
 	}
@@ -4969,7 +4842,7 @@ yy265:
 	}
 	goto yy36
 yy266:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy342
 	}
@@ -4978,7 +4851,7 @@ yy266:
 	}
 	goto yy36
 yy267:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy343
 	}
@@ -4987,7 +4860,7 @@ yy267:
 	}
 	goto yy36
 yy268:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy344
 	}
@@ -4996,7 +4869,7 @@ yy268:
 	}
 	goto yy36
 yy269:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy345
 	}
@@ -5005,7 +4878,7 @@ yy269:
 	}
 	goto yy36
 yy270:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy346
 	}
@@ -5014,15 +4887,15 @@ yy270:
 	}
 	goto yy36
 yy271:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ECHO
 	goto emit_token
 yy272:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '@' {
 			if yych <= '/' {
@@ -5057,11 +4930,11 @@ yy272:
 		}
 	}
 yy273:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ELSE
 	goto emit_token
 yy274:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'Y' {
 		goto yy348
 	}
@@ -5070,7 +4943,7 @@ yy274:
 	}
 	goto yy36
 yy275:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy349
 	}
@@ -5079,7 +4952,7 @@ yy275:
 	}
 	goto yy36
 yy276:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy350
 	}
@@ -5088,7 +4961,7 @@ yy276:
 	}
 	goto yy36
 yy277:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy351
 	}
@@ -5097,7 +4970,7 @@ yy277:
 	}
 	goto yy36
 yy278:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'W' {
 		goto yy352
 	}
@@ -5106,7 +4979,7 @@ yy278:
 	}
 	goto yy36
 yy279:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy353
 	}
@@ -5115,23 +4988,23 @@ yy279:
 	}
 	goto yy36
 yy280:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_EVAL
 	goto emit_token
 yy281:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_EXIT
 	goto emit_token
 yy282:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy354
 	}
@@ -5140,7 +5013,7 @@ yy282:
 	}
 	goto yy36
 yy283:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy355
 	}
@@ -5149,7 +5022,7 @@ yy283:
 	}
 	goto yy36
 yy284:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy357
 	}
@@ -5158,7 +5031,7 @@ yy284:
 	}
 	goto yy36
 yy285:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy358
 	}
@@ -5167,7 +5040,7 @@ yy285:
 	}
 	goto yy36
 yy286:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy359
 	}
@@ -5176,15 +5049,15 @@ yy286:
 	}
 	goto yy36
 yy287:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_GOTO
 	goto emit_token
 yy288:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy360
 	}
@@ -5193,7 +5066,7 @@ yy288:
 	}
 	goto yy36
 yy289:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy361
 	}
@@ -5202,7 +5075,7 @@ yy289:
 	}
 	goto yy36
 yy290:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'E' {
 		if yych == 'A' {
 			goto yy362
@@ -5225,7 +5098,7 @@ yy290:
 		}
 	}
 yy291:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy364
 	}
@@ -5234,7 +5107,7 @@ yy291:
 	}
 	goto yy36
 yy292:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy365
 	}
@@ -5243,15 +5116,15 @@ yy292:
 	}
 	goto yy36
 yy293:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_LIST
 	goto emit_token
 yy294:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy366
 	}
@@ -5260,7 +5133,7 @@ yy294:
 	}
 	goto yy36
 yy295:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy367
 	}
@@ -5269,7 +5142,7 @@ yy295:
 	}
 	goto yy36
 yy296:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy368
 	}
@@ -5278,7 +5151,7 @@ yy296:
 	}
 	goto yy36
 yy297:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy369
 	}
@@ -5287,7 +5160,7 @@ yy297:
 	}
 	goto yy36
 yy298:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy370
 	}
@@ -5296,7 +5169,7 @@ yy298:
 	}
 	goto yy36
 yy299:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy371
 	}
@@ -5305,7 +5178,7 @@ yy299:
 	}
 	goto yy36
 yy300:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy372
 	}
@@ -5314,7 +5187,7 @@ yy300:
 	}
 	goto yy36
 yy301:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy373
 	}
@@ -5323,7 +5196,7 @@ yy301:
 	}
 	goto yy36
 yy302:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy374
 	}
@@ -5332,7 +5205,7 @@ yy302:
 	}
 	goto yy36
 yy303:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'W' {
 		goto yy375
 	}
@@ -5341,7 +5214,7 @@ yy303:
 	}
 	goto yy36
 yy304:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy376
 	}
@@ -5350,7 +5223,7 @@ yy304:
 	}
 	goto yy36
 yy305:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy377
 	}
@@ -5359,7 +5232,7 @@ yy305:
 	}
 	goto yy36
 yy306:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy378
 	}
@@ -5368,7 +5241,7 @@ yy306:
 	}
 	goto yy36
 yy307:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy379
 	}
@@ -5377,7 +5250,7 @@ yy307:
 	}
 	goto yy36
 yy308:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy381
 	}
@@ -5386,7 +5259,7 @@ yy308:
 	}
 	goto yy36
 yy309:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy382
 	}
@@ -5395,7 +5268,7 @@ yy309:
 	}
 	goto yy36
 yy310:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy383
 	}
@@ -5404,7 +5277,7 @@ yy310:
 	}
 	goto yy36
 yy311:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy384
 	}
@@ -5413,7 +5286,7 @@ yy311:
 	}
 	goto yy36
 yy312:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy385
 	}
@@ -5422,7 +5295,7 @@ yy312:
 	}
 	goto yy36
 yy313:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy386
 	}
@@ -5431,7 +5304,7 @@ yy313:
 	}
 	goto yy36
 yy314:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy387
 	}
@@ -5440,7 +5313,7 @@ yy314:
 	}
 	goto yy36
 yy315:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'M' {
 		goto yy388
 	}
@@ -5449,7 +5322,7 @@ yy315:
 	}
 	goto yy36
 yy316:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy389
 	}
@@ -5458,7 +5331,7 @@ yy316:
 	}
 	goto yy36
 yy317:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'Y' {
 		goto yy390
 	}
@@ -5467,7 +5340,7 @@ yy317:
 	}
 	goto yy66
 yy318:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy391
 	}
@@ -5476,7 +5349,7 @@ yy318:
 	}
 	goto yy66
 yy319:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy394
 	}
@@ -5485,7 +5358,7 @@ yy319:
 	}
 	goto yy393
 yy320:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy395
 	}
@@ -5494,7 +5367,7 @@ yy320:
 	}
 	goto yy66
 yy321:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy396
 	}
@@ -5503,11 +5376,11 @@ yy321:
 	}
 	goto yy66
 yy322:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy323:
 	if yych <= 0x1f {
 		if yych == '\t' {
@@ -5522,12 +5395,12 @@ yy323:
 			goto yy66
 		}
 	}
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INT_CAST
 	goto emit_token
 yy324:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'G' {
 		goto yy397
 	}
@@ -5536,7 +5409,7 @@ yy324:
 	}
 	goto yy66
 yy325:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy398
 	}
@@ -5545,11 +5418,11 @@ yy325:
 	}
 	goto yy66
 yy326:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy326
@@ -5565,7 +5438,7 @@ yy326:
 		goto yy66
 	}
 yy327:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy400
 	}
@@ -5574,7 +5447,7 @@ yy327:
 	}
 	goto yy66
 yy328:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy401
 	}
@@ -5583,11 +5456,11 @@ yy328:
 	}
 	goto yy66
 yy329:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy330:
 	if yych <= 'Z' {
 		if yych <= '/' {
@@ -5621,11 +5494,11 @@ yy330:
 		}
 	}
 yy331:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy332:
 	if yych <= 'Z' {
 		if yych <= '/' {
@@ -5659,19 +5532,19 @@ yy332:
 		}
 	}
 yy333:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy334:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	var s *byte
 	var saved_cursor *uint8
-	var bprefix int = g.Cond((*byte)(LANG_SCNG.GetYyText())[0] != '<', 1, 0)
+	var bprefix int = b.Cond(Yytext[0] != '<', 1, 0)
 	var spacing int = 0
 	var indentation int = 0
-	var heredoc_label *zend_heredoc_label = _emalloc(g.SizeOf("zend_heredoc_label"))
+	var heredoc_label *zend_heredoc_label = emalloc(b.SizeOf("zend_heredoc_label"))
 	var is_heredoc ZendBool = 1
-	CG.GetZendLineno()++
-	heredoc_label.SetLength(LANG_SCNG.GetYyLeng() - bprefix - 3 - 1 - g.Cond((*byte)(LANG_SCNG.GetYyText())[LANG_SCNG.GetYyLeng()-2] == '\r', 1, 0))
-	s = (*byte)(LANG_SCNG.GetYyText()) + bprefix + 3
+	CompilerGlobals.GetZendLineno()++
+	heredoc_label.SetLength(Yyleng - bprefix - 3 - 1 - b.Cond(Yytext[Yyleng-2] == '\r', 1, 0))
+	s = Yytext + bprefix + 3
 	for (*s) == ' ' || (*s) == '\t' {
 		s++
 		heredoc_label.GetLength()--
@@ -5680,73 +5553,73 @@ yy334:
 		s++
 		heredoc_label.SetLength(heredoc_label.GetLength() - 2)
 		is_heredoc = 0
-		LANG_SCNG.SetYyState(yycST_NOWDOC)
+		BEGIN(ST_NOWDOC)
 	} else {
 		if (*s) == '"' {
 			s++
 			heredoc_label.SetLength(heredoc_label.GetLength() - 2)
 		}
-		LANG_SCNG.SetYyState(yycST_HEREDOC)
+		BEGIN(ST_HEREDOC)
 	}
-	heredoc_label.SetLabel(_estrndup(s, heredoc_label.GetLength()))
+	heredoc_label.SetLabel(Estrndup(s, heredoc_label.GetLength()))
 	heredoc_label.SetIndentation(0)
-	saved_cursor = LANG_SCNG.GetYyCursor()
-	ZendPtrStackPush(&LANG_SCNG.heredoc_label_stack, any(heredoc_label))
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() && (LANG_SCNG.yy_cursor == ' ' || LANG_SCNG.yy_cursor == '\t') {
-		if LANG_SCNG.yy_cursor == '\t' {
-			spacing |= 2
+	saved_cursor = YYCURSOR
+	ZendPtrStackPush(&SCNG(heredoc_label_stack), any(heredoc_label))
+	for YYCURSOR < YYLIMIT && ((*YYCURSOR) == ' ' || (*YYCURSOR) == '\t') {
+		if (*YYCURSOR) == '\t' {
+			spacing |= HEREDOC_USING_TABS
 		} else {
-			spacing |= 1
+			spacing |= HEREDOC_USING_SPACES
 		}
-		LANG_SCNG.GetYyCursor()++
+		YYCURSOR++
 		indentation++
 	}
-	if LANG_SCNG.GetYyCursor() == LANG_SCNG.GetYyLimit() {
-		LANG_SCNG.SetYyCursor(saved_cursor)
+	if YYCURSOR == YYLIMIT {
+		YYCURSOR = saved_cursor
 		token = T_START_HEREDOC
 		goto emit_token
 	}
 
 	/* Check for ending label on the next line */
 
-	if heredoc_label.GetLength() < LANG_SCNG.GetYyLimit()-LANG_SCNG.GetYyCursor() && !(memcmp(LANG_SCNG.GetYyCursor(), s, heredoc_label.GetLength())) {
-		if !(LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'a' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'A' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'Z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= '0' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= '9' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] == '_' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 0x80) {
-			if spacing == (1 | 2) {
+	if heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, s, heredoc_label.GetLength())) {
+		if !(IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()])) {
+			if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
 				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
-				if elem != nil {
+				if PARSER_MODE() {
 					token = T_ERROR
 					goto emit_token
 				}
 			}
-			LANG_SCNG.SetYyCursor(saved_cursor)
+			YYCURSOR = saved_cursor
 			heredoc_label.SetIndentation(indentation)
-			LANG_SCNG.SetYyState(yycST_END_HEREDOC)
+			BEGIN(ST_END_HEREDOC)
 			token = T_START_HEREDOC
 			goto emit_token
 		}
 	}
-	LANG_SCNG.SetYyCursor(saved_cursor)
-	if is_heredoc != 0 && LANG_SCNG.GetHeredocScanAhead() == 0 {
+	YYCURSOR = saved_cursor
+	if is_heredoc != 0 && !(SCNG(heredoc_scan_ahead)) {
 		var current_state ZendLexState
-		var saved_doc_comment *ZendString = CG.GetDocComment()
+		var saved_doc_comment *ZendString = CompilerGlobals.GetDocComment()
 		var heredoc_nesting_level int = 1
 		var first_token int = 0
 		var error int = 0
 		ZendSaveLexicalState(&current_state)
-		LANG_SCNG.SetHeredocScanAhead(1)
-		LANG_SCNG.SetHeredocIndentation(0)
-		LANG_SCNG.SetHeredocIndentationUsesSpaces(0)
-		LANG_SCNG.SetOnEvent(nil)
-		CG.SetDocComment(nil)
+		SCNG(heredoc_scan_ahead) = 1
+		SCNG(heredoc_indentation) = 0
+		SCNG(heredoc_indentation_uses_spaces) = 0
+		LanguageScannerGlobals.SetOnEvent(nil)
+		CompilerGlobals.SetDocComment(nil)
 		ZendPtrStackReverseApply(&current_state.heredoc_label_stack, CopyHeredocLabelStack)
 		ZendExceptionSave()
 		for heredoc_nesting_level != 0 {
 			var zv Zval
 			var retval int
-			&zv.SetTypeInfo(0)
+			ZVAL_UNDEF(&zv)
 			retval = LexScan(&zv, nil)
 			ZvalPtrDtorNogc(&zv)
-			if EG.GetException() != nil {
+			if ExecutorGlobals.GetException() != nil {
 				ZendClearException()
 				break
 			}
@@ -5765,17 +5638,17 @@ yy334:
 			}
 		}
 		ZendExceptionRestore()
-		if (first_token == T_VARIABLE || first_token == T_DOLLAR_OPEN_CURLY_BRACES || first_token == T_CURLY_OPEN) && LANG_SCNG.GetHeredocIndentation() != 0 {
-			ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", LANG_SCNG.GetHeredocIndentation())
+		if (first_token == T_VARIABLE || first_token == T_DOLLAR_OPEN_CURLY_BRACES || first_token == T_CURLY_OPEN) && SCNG(heredoc_indentation) {
+			ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", SCNG(heredoc_indentation))
 			error = 1
 		}
-		heredoc_label.SetIndentation(LANG_SCNG.GetHeredocIndentation())
-		heredoc_label.SetIndentationUsesSpaces(LANG_SCNG.GetHeredocIndentationUsesSpaces())
+		heredoc_label.SetIndentation(SCNG(heredoc_indentation))
+		heredoc_label.SetIndentationUsesSpaces(SCNG(heredoc_indentation_uses_spaces))
 		ZendRestoreLexicalState(&current_state)
-		LANG_SCNG.SetHeredocScanAhead(0)
-		CG.SetIncrementLineno(0)
-		CG.SetDocComment(saved_doc_comment)
-		if elem != nil && error != 0 {
+		SCNG(heredoc_scan_ahead) = 0
+		CompilerGlobals.SetIncrementLineno(0)
+		CompilerGlobals.SetDocComment(saved_doc_comment)
+		if PARSER_MODE() && error != 0 {
 			token = T_ERROR
 			goto emit_token
 		}
@@ -5783,13 +5656,13 @@ yy334:
 	token = T_START_HEREDOC
 	goto emit_token
 yy335:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy333
 	}
 	goto yy334
 yy336:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy403
 	}
@@ -5798,23 +5671,23 @@ yy336:
 	}
 	goto yy36
 yy337:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ARRAY
 	goto emit_token
 yy338:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_BREAK
 	goto emit_token
 yy339:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'B' {
 		goto yy404
 	}
@@ -5823,39 +5696,39 @@ yy339:
 	}
 	goto yy36
 yy340:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CATCH
 	goto emit_token
 yy341:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CLASS
 	goto emit_token
 yy342:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CLONE
 	goto emit_token
 yy343:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CONST
 	goto emit_token
 yy344:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy405
 	}
@@ -5864,7 +5737,7 @@ yy344:
 	}
 	goto yy36
 yy345:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy406
 	}
@@ -5873,7 +5746,7 @@ yy345:
 	}
 	goto yy36
 yy346:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy407
 	}
@@ -5882,7 +5755,7 @@ yy346:
 	}
 	goto yy36
 yy347:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy408
 	}
@@ -5891,15 +5764,15 @@ yy347:
 	}
 	goto yy36
 yy348:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_EMPTY
 	goto emit_token
 yy349:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy409
 	}
@@ -5908,7 +5781,7 @@ yy349:
 	}
 	goto yy36
 yy350:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy410
 	}
@@ -5917,15 +5790,15 @@ yy350:
 	}
 	goto yy36
 yy351:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDIF
 	goto emit_token
 yy352:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy412
 	}
@@ -5934,7 +5807,7 @@ yy352:
 	}
 	goto yy36
 yy353:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy413
 	}
@@ -5943,7 +5816,7 @@ yy353:
 	}
 	goto yy36
 yy354:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy414
 	}
@@ -5952,7 +5825,7 @@ yy354:
 	}
 	goto yy36
 yy355:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '@' {
 			if yych <= '/' {
@@ -5987,11 +5860,11 @@ yy355:
 		}
 	}
 yy356:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FINAL
 	goto emit_token
 yy357:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy416
 	}
@@ -6000,7 +5873,7 @@ yy357:
 	}
 	goto yy36
 yy358:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy417
 	}
@@ -6009,7 +5882,7 @@ yy358:
 	}
 	goto yy36
 yy359:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy418
 	}
@@ -6018,7 +5891,7 @@ yy359:
 	}
 	goto yy36
 yy360:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'M' {
 		goto yy419
 	}
@@ -6027,7 +5900,7 @@ yy360:
 	}
 	goto yy36
 yy361:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy420
 	}
@@ -6036,7 +5909,7 @@ yy361:
 	}
 	goto yy36
 yy362:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy421
 	}
@@ -6045,7 +5918,7 @@ yy362:
 	}
 	goto yy36
 yy363:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy422
 	}
@@ -6054,7 +5927,7 @@ yy363:
 	}
 	goto yy36
 yy364:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy423
 	}
@@ -6063,15 +5936,15 @@ yy364:
 	}
 	goto yy36
 yy365:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ISSET
 	goto emit_token
 yy366:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy424
 	}
@@ -6080,15 +5953,15 @@ yy366:
 	}
 	goto yy36
 yy367:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PRINT
 	goto emit_token
 yy368:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy425
 	}
@@ -6097,7 +5970,7 @@ yy368:
 	}
 	goto yy36
 yy369:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy426
 	}
@@ -6106,7 +5979,7 @@ yy369:
 	}
 	goto yy36
 yy370:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy427
 	}
@@ -6115,7 +5988,7 @@ yy370:
 	}
 	goto yy36
 yy371:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy428
 	}
@@ -6124,7 +5997,7 @@ yy371:
 	}
 	goto yy36
 yy372:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy429
 	}
@@ -6133,7 +6006,7 @@ yy372:
 	}
 	goto yy36
 yy373:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy430
 	}
@@ -6142,7 +6015,7 @@ yy373:
 	}
 	goto yy36
 yy374:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy431
 	}
@@ -6151,40 +6024,40 @@ yy374:
 	}
 	goto yy36
 yy375:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_THROW
 	goto emit_token
 yy376:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_TRAIT
 	goto emit_token
 yy377:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_UNSET
 	goto emit_token
 yy378:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_WHILE
 	goto emit_token
 yy379:
 	yyaccept = 8
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
@@ -6204,11 +6077,11 @@ yy379:
 		}
 	}
 yy380:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_YIELD
 	goto emit_token
 yy381:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy433
 	}
@@ -6217,13 +6090,13 @@ yy381:
 	}
 	goto yy36
 yy382:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy434
 	}
 	goto yy36
 yy383:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy435
 	}
@@ -6232,7 +6105,7 @@ yy383:
 	}
 	goto yy36
 yy384:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy436
 	}
@@ -6241,7 +6114,7 @@ yy384:
 	}
 	goto yy36
 yy385:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy437
 	}
@@ -6250,7 +6123,7 @@ yy385:
 	}
 	goto yy36
 yy386:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy438
 	}
@@ -6259,7 +6132,7 @@ yy386:
 	}
 	goto yy36
 yy387:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy439
 	}
@@ -6268,7 +6141,7 @@ yy387:
 	}
 	goto yy36
 yy388:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy440
 	}
@@ -6277,7 +6150,7 @@ yy388:
 	}
 	goto yy36
 yy389:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy441
 	}
@@ -6286,11 +6159,11 @@ yy389:
 	}
 	goto yy36
 yy390:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy390
@@ -6306,7 +6179,7 @@ yy390:
 		goto yy66
 	}
 yy391:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'Y' {
 		goto yy443
 	}
@@ -6315,11 +6188,11 @@ yy391:
 	}
 	goto yy66
 yy392:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy393:
 	if yych <= 0x1f {
 		if yych == '\t' {
@@ -6334,12 +6207,12 @@ yy393:
 			goto yy66
 		}
 	}
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_BOOL_CAST
 	goto emit_token
 yy394:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy444
 	}
@@ -6348,7 +6221,7 @@ yy394:
 	}
 	goto yy66
 yy395:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy396
 	}
@@ -6356,11 +6229,11 @@ yy395:
 		goto yy66
 	}
 yy396:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy396
@@ -6376,7 +6249,7 @@ yy396:
 		goto yy66
 	}
 yy397:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy446
 	}
@@ -6385,7 +6258,7 @@ yy397:
 	}
 	goto yy66
 yy398:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy447
 	}
@@ -6394,15 +6267,15 @@ yy398:
 	}
 	goto yy66
 yy399:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if elem != nil {
-		ZendError(1<<13, "The (real) cast is deprecated, use (float) instead")
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if PARSER_MODE() {
+		ZendError(E_DEPRECATED, "The (real) cast is deprecated, use (float) instead")
 	}
 	token = T_DOUBLE_CAST
 	goto emit_token
 yy400:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'G' {
 		goto yy443
 	}
@@ -6411,11 +6284,11 @@ yy400:
 	}
 	goto yy66
 yy401:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy401
@@ -6431,7 +6304,7 @@ yy401:
 		goto yy66
 	}
 yy402:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy333
 	}
@@ -6440,7 +6313,7 @@ yy402:
 	}
 	goto yy66
 yy403:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy449
 	}
@@ -6449,7 +6322,7 @@ yy403:
 	}
 	goto yy36
 yy404:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy450
 	}
@@ -6458,7 +6331,7 @@ yy404:
 	}
 	goto yy36
 yy405:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy451
 	}
@@ -6467,7 +6340,7 @@ yy405:
 	}
 	goto yy36
 yy406:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy452
 	}
@@ -6476,7 +6349,7 @@ yy406:
 	}
 	goto yy36
 yy407:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy453
 	}
@@ -6485,15 +6358,15 @@ yy407:
 	}
 	goto yy36
 yy408:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ELSEIF
 	goto emit_token
 yy409:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy454
 	}
@@ -6502,7 +6375,7 @@ yy409:
 	}
 	goto yy36
 yy410:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '@' {
 			if yych <= '/' {
@@ -6537,11 +6410,11 @@ yy410:
 		}
 	}
 yy411:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDFOR
 	goto emit_token
 yy412:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy456
 	}
@@ -6550,7 +6423,7 @@ yy412:
 	}
 	goto yy36
 yy413:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy457
 	}
@@ -6559,7 +6432,7 @@ yy413:
 	}
 	goto yy36
 yy414:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy458
 	}
@@ -6568,7 +6441,7 @@ yy414:
 	}
 	goto yy36
 yy415:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'Y' {
 		goto yy459
 	}
@@ -6577,7 +6450,7 @@ yy415:
 	}
 	goto yy36
 yy416:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy460
 	}
@@ -6586,7 +6459,7 @@ yy416:
 	}
 	goto yy36
 yy417:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy461
 	}
@@ -6595,15 +6468,15 @@ yy417:
 	}
 	goto yy36
 yy418:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_GLOBAL
 	goto emit_token
 yy419:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy462
 	}
@@ -6612,7 +6485,7 @@ yy419:
 	}
 	goto yy36
 yy420:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy463
 	}
@@ -6621,7 +6494,7 @@ yy420:
 	}
 	goto yy36
 yy421:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy465
 	}
@@ -6630,7 +6503,7 @@ yy421:
 	}
 	goto yy36
 yy422:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy466
 	}
@@ -6639,7 +6512,7 @@ yy422:
 	}
 	goto yy36
 yy423:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy467
 	}
@@ -6648,7 +6521,7 @@ yy423:
 	}
 	goto yy36
 yy424:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy468
 	}
@@ -6657,7 +6530,7 @@ yy424:
 	}
 	goto yy36
 yy425:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy469
 	}
@@ -6666,7 +6539,7 @@ yy425:
 	}
 	goto yy36
 yy426:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy470
 	}
@@ -6675,15 +6548,15 @@ yy426:
 	}
 	goto yy36
 yy427:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PUBLIC
 	goto emit_token
 yy428:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy471
 	}
@@ -6692,35 +6565,35 @@ yy428:
 	}
 	goto yy36
 yy429:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_RETURN
 	goto emit_token
 yy430:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_STATIC
 	goto emit_token
 yy431:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_SWITCH
 	goto emit_token
 yy432:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+5 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+5 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych <= '\n' {
 			if yych <= 0x8 {
@@ -6750,7 +6623,7 @@ yy432:
 		}
 	}
 yy433:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy474
 	}
@@ -6759,19 +6632,19 @@ yy433:
 	}
 	goto yy36
 yy434:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy475
 	}
 	goto yy36
 yy435:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy476
 	}
 	goto yy36
 yy436:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy477
 	}
@@ -6780,19 +6653,19 @@ yy436:
 	}
 	goto yy36
 yy437:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy478
 	}
 	goto yy36
 yy438:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy479
 	}
 	goto yy36
 yy439:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy480
 	}
@@ -6801,7 +6674,7 @@ yy439:
 	}
 	goto yy36
 yy440:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy481
 	}
@@ -6810,7 +6683,7 @@ yy440:
 	}
 	goto yy36
 yy441:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy482
 	}
@@ -6819,16 +6692,16 @@ yy441:
 	}
 	goto yy36
 yy442:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ARRAY_CAST
 	goto emit_token
 yy443:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy443
@@ -6844,7 +6717,7 @@ yy443:
 		goto yy66
 	}
 yy444:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy392
 	}
@@ -6853,12 +6726,12 @@ yy444:
 	}
 	goto yy66
 yy445:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DOUBLE_CAST
 	goto emit_token
 yy446:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy322
 	}
@@ -6867,11 +6740,11 @@ yy446:
 	}
 	goto yy66
 yy447:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy447
@@ -6887,12 +6760,12 @@ yy447:
 		goto yy66
 	}
 yy448:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_UNSET_CAST
 	goto emit_token
 yy449:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy485
 	}
@@ -6901,7 +6774,7 @@ yy449:
 	}
 	goto yy36
 yy450:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy486
 	}
@@ -6910,7 +6783,7 @@ yy450:
 	}
 	goto yy36
 yy451:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy487
 	}
@@ -6919,23 +6792,23 @@ yy451:
 	}
 	goto yy36
 yy452:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DECLARE
 	goto emit_token
 yy453:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DEFAULT
 	goto emit_token
 yy454:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy488
 	}
@@ -6944,7 +6817,7 @@ yy454:
 	}
 	goto yy36
 yy455:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy489
 	}
@@ -6953,7 +6826,7 @@ yy455:
 	}
 	goto yy36
 yy456:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy490
 	}
@@ -6962,7 +6835,7 @@ yy456:
 	}
 	goto yy36
 yy457:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy491
 	}
@@ -6971,31 +6844,31 @@ yy457:
 	}
 	goto yy36
 yy458:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_EXTENDS
 	goto emit_token
 yy459:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FINALLY
 	goto emit_token
 yy460:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FOREACH
 	goto emit_token
 yy461:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy492
 	}
@@ -7004,7 +6877,7 @@ yy461:
 	}
 	goto yy36
 yy462:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy493
 	}
@@ -7013,7 +6886,7 @@ yy462:
 	}
 	goto yy36
 yy463:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '9' {
 			if yych >= '0' {
@@ -7042,11 +6915,11 @@ yy463:
 		}
 	}
 yy464:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INCLUDE
 	goto emit_token
 yy465:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy495
 	}
@@ -7055,7 +6928,7 @@ yy465:
 	}
 	goto yy36
 yy466:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy496
 	}
@@ -7064,7 +6937,7 @@ yy466:
 	}
 	goto yy36
 yy467:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy497
 	}
@@ -7073,7 +6946,7 @@ yy467:
 	}
 	goto yy36
 yy468:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy498
 	}
@@ -7082,15 +6955,15 @@ yy468:
 	}
 	goto yy36
 yy469:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PRIVATE
 	goto emit_token
 yy470:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy499
 	}
@@ -7099,7 +6972,7 @@ yy470:
 	}
 	goto yy36
 yy471:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '9' {
 			if yych >= '0' {
@@ -7128,11 +7001,11 @@ yy471:
 		}
 	}
 yy472:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_REQUIRE
 	goto emit_token
 yy473:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy501
 	}
@@ -7141,27 +7014,27 @@ yy473:
 	}
 	goto yy66
 yy474:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy502
 	}
 	goto yy36
 yy475:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_DIR
 	goto emit_token
 yy476:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy503
 	}
 	goto yy36
 yy477:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy504
 	}
@@ -7170,7 +7043,7 @@ yy477:
 	}
 	goto yy36
 yy478:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy505
 	}
@@ -7179,13 +7052,13 @@ yy478:
 	}
 	goto yy36
 yy479:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy506
 	}
 	goto yy36
 yy480:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy507
 	}
@@ -7194,7 +7067,7 @@ yy480:
 	}
 	goto yy36
 yy481:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy508
 	}
@@ -7203,47 +7076,47 @@ yy481:
 	}
 	goto yy36
 yy482:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy509
 	}
 	goto yy36
 yy483:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_STRING_CAST
 	goto emit_token
 yy484:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_OBJECT_CAST
 	goto emit_token
 yy485:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ABSTRACT
 	goto emit_token
 yy486:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CALLABLE
 	goto emit_token
 yy487:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CONTINUE
 	goto emit_token
 yy488:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy510
 	}
@@ -7252,7 +7125,7 @@ yy488:
 	}
 	goto yy36
 yy489:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy511
 	}
@@ -7261,7 +7134,7 @@ yy489:
 	}
 	goto yy36
 yy490:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy512
 	}
@@ -7270,23 +7143,23 @@ yy490:
 	}
 	goto yy36
 yy491:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDWHILE
 	goto emit_token
 yy492:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FUNCTION
 	goto emit_token
 yy493:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'T' {
 		goto yy513
 	}
@@ -7295,7 +7168,7 @@ yy493:
 	}
 	goto yy36
 yy494:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy514
 	}
@@ -7304,7 +7177,7 @@ yy494:
 	}
 	goto yy36
 yy495:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy515
 	}
@@ -7313,7 +7186,7 @@ yy495:
 	}
 	goto yy36
 yy496:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy516
 	}
@@ -7322,7 +7195,7 @@ yy496:
 	}
 	goto yy36
 yy497:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy517
 	}
@@ -7331,7 +7204,7 @@ yy497:
 	}
 	goto yy36
 yy498:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy518
 	}
@@ -7340,7 +7213,7 @@ yy498:
 	}
 	goto yy36
 yy499:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'D' {
 		goto yy519
 	}
@@ -7349,7 +7222,7 @@ yy499:
 	}
 	goto yy36
 yy500:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy520
 	}
@@ -7358,7 +7231,7 @@ yy500:
 	}
 	goto yy36
 yy501:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy521
 	}
@@ -7367,21 +7240,21 @@ yy501:
 	}
 	goto yy66
 yy502:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy522
 	}
 	goto yy36
 yy503:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FILE
 	goto emit_token
 yy504:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy523
 	}
@@ -7390,7 +7263,7 @@ yy504:
 	}
 	goto yy36
 yy505:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'O' {
 		goto yy524
 	}
@@ -7399,21 +7272,21 @@ yy505:
 	}
 	goto yy36
 yy506:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_LINE
 	goto emit_token
 yy507:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy525
 	}
 	goto yy36
 yy508:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy526
 	}
@@ -7422,13 +7295,13 @@ yy508:
 	}
 	goto yy36
 yy509:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy527
 	}
 	goto yy36
 yy510:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy528
 	}
@@ -7437,7 +7310,7 @@ yy510:
 	}
 	goto yy36
 yy511:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy529
 	}
@@ -7446,15 +7319,15 @@ yy511:
 	}
 	goto yy36
 yy512:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDSWITCH
 	goto emit_token
 yy513:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy530
 	}
@@ -7463,7 +7336,7 @@ yy513:
 	}
 	goto yy36
 yy514:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy531
 	}
@@ -7472,7 +7345,7 @@ yy514:
 	}
 	goto yy36
 yy515:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy532
 	}
@@ -7481,39 +7354,39 @@ yy515:
 	}
 	goto yy36
 yy516:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INSTEADOF
 	goto emit_token
 yy517:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INTERFACE
 	goto emit_token
 yy518:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_NAMESPACE
 	goto emit_token
 yy519:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_PROTECTED
 	goto emit_token
 yy520:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy533
 	}
@@ -7522,7 +7395,7 @@ yy520:
 	}
 	goto yy36
 yy521:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'M' {
 		goto yy534
 	}
@@ -7531,15 +7404,15 @@ yy521:
 	}
 	goto yy66
 yy522:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_CLASS_C
 	goto emit_token
 yy523:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy535
 	}
@@ -7548,7 +7421,7 @@ yy523:
 	}
 	goto yy36
 yy524:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'M' {
 		goto yy536
 	}
@@ -7557,13 +7430,13 @@ yy524:
 	}
 	goto yy36
 yy525:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy537
 	}
 	goto yy36
 yy526:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy538
 	}
@@ -7572,39 +7445,39 @@ yy526:
 	}
 	goto yy36
 yy527:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_TRAIT_C
 	goto emit_token
 yy528:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDDECLARE
 	goto emit_token
 yy529:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_ENDFOREACH
 	goto emit_token
 yy530:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_IMPLEMENTS
 	goto emit_token
 yy531:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy539
 	}
@@ -7613,15 +7486,15 @@ yy531:
 	}
 	goto yy36
 yy532:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INSTANCEOF
 	goto emit_token
 yy533:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'C' {
 		goto yy540
 	}
@@ -7630,7 +7503,7 @@ yy533:
 	}
 	goto yy36
 yy534:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '^' {
 		if yych <= '9' {
 			if yych <= '/' {
@@ -7663,13 +7536,13 @@ yy534:
 		}
 	}
 yy535:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy542
 	}
 	goto yy36
 yy536:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy543
 	}
@@ -7678,15 +7551,15 @@ yy536:
 	}
 	goto yy36
 yy537:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_METHOD_C
 	goto emit_token
 yy538:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy544
 	}
@@ -7695,7 +7568,7 @@ yy538:
 	}
 	goto yy36
 yy539:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy545
 	}
@@ -7704,7 +7577,7 @@ yy539:
 	}
 	goto yy36
 yy540:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy546
 	}
@@ -7713,28 +7586,20 @@ yy540:
 	}
 	goto yy36
 yy541:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 1))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 1))
-	var p *byte = (*byte)(LANG_SCNG.GetYyText())
-	var boundary *byte = p + LANG_SCNG.GetYyLeng()
-	for p < boundary {
-		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG.GetZendLineno()++
-		}
-		p++
-	}
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 1)
+	HANDLE_NEWLINES(Yytext, Yyleng)
 	token = T_YIELD_FROM
 	goto emit_token
 yy542:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy547
 	}
 	goto yy36
 yy543:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'I' {
 		goto yy548
 	}
@@ -7743,37 +7608,37 @@ yy543:
 	}
 	goto yy36
 yy544:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy549
 	}
 	goto yy36
 yy545:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_INCLUDE_ONCE
 	goto emit_token
 yy546:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_REQUIRE_ONCE
 	goto emit_token
 yy547:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_FUNC_C
 	goto emit_token
 yy548:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy550
 	}
@@ -7782,13 +7647,13 @@ yy548:
 	}
 	goto yy36
 yy549:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '_' {
 		goto yy551
 	}
 	goto yy36
 yy550:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy552
 	}
@@ -7797,15 +7662,15 @@ yy550:
 	}
 	goto yy36
 yy551:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_NS_C
 	goto emit_token
 yy552:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy553
 	}
@@ -7813,11 +7678,11 @@ yy552:
 		goto yy36
 	}
 yy553:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy35
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_HALT_COMPILER
 	goto emit_token
 
@@ -7825,10 +7690,10 @@ yy553:
 
 yyc_ST_LOOKING_FOR_PROPERTY:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy557
 	}
@@ -7860,47 +7725,44 @@ yyc_ST_LOOKING_FOR_PROPERTY:
 		}
 	}
 yy555:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy556:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 0))
-	LANG_SCNG.SetYyLeng(uint(0))
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(0)
 	YyPopState()
 	goto restart
 yy557:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy557
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	goto return_whitespace
 yy558:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '>' {
 		goto yy560
 	}
 	goto yy556
 yy559:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy559
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	YyPopState()
-	token = T_STRING
-	offset = 0
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_STRING, 0)
 yy560:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	token = T_OBJECT_OPERATOR
 	goto emit_token
 
@@ -7908,10 +7770,10 @@ yy560:
 
 yyc_ST_BACKQUOTE:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '_' {
 		if yych == '$' {
 			goto yy563
@@ -7924,50 +7786,49 @@ yyc_ST_BACKQUOTE:
 			goto yy565
 		}
 	}
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy562:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	if (*byte)(LANG_SCNG.GetYyText())[0] == '\\' && LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		LANG_SCNG.GetYyCursor()++
+	if Yytext[0] == '\\' && YYCURSOR < YYLIMIT {
+		YYCURSOR++
 	}
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '`':
 			break
 		case '$':
-			if LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80 || LANG_SCNG.yy_cursor == '{' {
+			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
 		case '{':
-			if LANG_SCNG.yy_cursor == '$' {
+			if (*YYCURSOR) == '$' {
 				break
 			}
 			continue
 		case '\\':
-			if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.GetYyCursor()++
+			if YYCURSOR < YYLIMIT {
+				YYCURSOR++
 			}
 		default:
 			continue
 		}
-		LANG_SCNG.GetYyCursor()--
+		YYCURSOR--
 		break
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if ZendScanEscapeString(zendlval, (*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), '`') == SUCCESS || !elem != nil {
-		token = T_ENCAPSED_AND_WHITESPACE
-		goto emit_token_with_val
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if EXPECTED(ZendScanEscapeString(zendlval, Yytext, Yyleng, '`') == SUCCESS) || !(PARSER_MODE()) {
+		RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		token = T_ERROR
 		goto emit_token
 	}
 yy563:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy562
@@ -7996,24 +7857,24 @@ yy563:
 		}
 	}
 yy564:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(ST_IN_SCRIPTING)
 	token = '`'
 	goto emit_token
 yy565:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '$' {
 		goto yy569
 	}
 	goto yy562
 yy566:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy566
 	}
@@ -8027,43 +7888,37 @@ yy566:
 		goto yy572
 	}
 yy567:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy568:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_LOOKING_FOR_VARNAME)
 	token = T_DOLLAR_OPEN_CURLY_BRACES
 	goto emit_token
 yy569:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_IN_SCRIPTING)
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 1))
-	LANG_SCNG.SetYyLeng(uint(1))
+	Yyless(1)
 	token = T_CURLY_OPEN
 	goto emit_token
 yy570:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '>' {
 		goto yy573
 	}
 yy571:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	goto yy567
 yy572:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 1))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 1))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 1)
 	_yyPushState(yycST_VAR_OFFSET)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy573:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy571
@@ -8086,23 +7941,20 @@ yy573:
 		}
 	}
 yy574:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 3))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 3))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 3)
 	_yyPushState(yycST_LOOKING_FOR_PROPERTY)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 
 	/* *********************************** */
 
 yyc_ST_DOUBLE_QUOTES:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '#' {
 		if yych == '"' {
 			goto yy577
@@ -8115,62 +7967,61 @@ yyc_ST_DOUBLE_QUOTES:
 			goto yy579
 		}
 	}
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy576:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetScannedStringLen() != 0 {
-		LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyCursor() + LANG_SCNG.GetScannedStringLen() - 1)
-		LANG_SCNG.SetScannedStringLen(0)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if GET_DOUBLE_QUOTES_SCANNED_LENGTH() {
+		YYCURSOR += GET_DOUBLE_QUOTES_SCANNED_LENGTH() - 1
+		SET_DOUBLE_QUOTES_SCANNED_LENGTH(0)
 		goto double_quotes_scan_done
 	}
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	if (*byte)(LANG_SCNG.GetYyText())[0] == '\\' && LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		LANG_SCNG.GetYyCursor()++
+	if Yytext[0] == '\\' && YYCURSOR < YYLIMIT {
+		YYCURSOR++
 	}
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '"':
 			break
 		case '$':
-			if LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80 || LANG_SCNG.yy_cursor == '{' {
+			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
 		case '{':
-			if LANG_SCNG.yy_cursor == '$' {
+			if (*YYCURSOR) == '$' {
 				break
 			}
 			continue
 		case '\\':
-			if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.GetYyCursor()++
+			if YYCURSOR < YYLIMIT {
+				YYCURSOR++
 			}
 		default:
 			continue
 		}
-		LANG_SCNG.GetYyCursor()--
+		YYCURSOR--
 		break
 	}
 double_quotes_scan_done:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if ZendScanEscapeString(zendlval, (*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), '"') == SUCCESS || !elem != nil {
-		token = T_ENCAPSED_AND_WHITESPACE
-		goto emit_token_with_val
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if EXPECTED(ZendScanEscapeString(zendlval, Yytext, Yyleng, '"') == SUCCESS) || !(PARSER_MODE()) {
+		RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		token = T_ERROR
 		goto emit_token
 	}
 yy577:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(ST_IN_SCRIPTING)
 	token = '"'
 	goto emit_token
 yy578:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy576
@@ -8199,18 +8050,18 @@ yy578:
 		}
 	}
 yy579:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '$' {
 		goto yy583
 	}
 	goto yy576
 yy580:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy580
 	}
@@ -8224,43 +8075,37 @@ yy580:
 		goto yy586
 	}
 yy581:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy582:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_LOOKING_FOR_VARNAME)
 	token = T_DOLLAR_OPEN_CURLY_BRACES
 	goto emit_token
 yy583:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_IN_SCRIPTING)
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 1))
-	LANG_SCNG.SetYyLeng(uint(1))
+	Yyless(1)
 	token = T_CURLY_OPEN
 	goto emit_token
 yy584:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '>' {
 		goto yy587
 	}
 yy585:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	goto yy581
 yy586:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 1))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 1))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 1)
 	_yyPushState(yycST_VAR_OFFSET)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy587:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy585
@@ -8283,83 +8128,72 @@ yy587:
 		}
 	}
 yy588:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 3))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 3))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 3)
 	_yyPushState(yycST_LOOKING_FOR_PROPERTY)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 
 	/* *********************************** */
 
 yyc_ST_HEREDOC:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych == '$' {
 		goto yy591
 	}
 	if yych == '{' {
 		goto yy592
 	}
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy590:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var heredoc_label *zend_heredoc_label = zend_ptr_stack_top(&LANG_SCNG.heredoc_label_stack)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	var heredoc_label *zend_heredoc_label = zend_ptr_stack_top(&SCNG(heredoc_label_stack))
 	var newline int = 0
 	var indentation int = 0
 	var spacing int = 0
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	LANG_SCNG.GetYyCursor()--
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	YYCURSOR--
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '\r':
-			if LANG_SCNG.yy_cursor == '\n' {
-				LANG_SCNG.GetYyCursor()++
+			if (*YYCURSOR) == '\n' {
+				YYCURSOR++
 			}
 		case '\n':
 			spacing = 0
 			indentation = spacing
-			for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() && (LANG_SCNG.yy_cursor == ' ' || LANG_SCNG.yy_cursor == '\t') {
-				if LANG_SCNG.yy_cursor == '\t' {
-					spacing |= 2
+			for YYCURSOR < YYLIMIT && ((*YYCURSOR) == ' ' || (*YYCURSOR) == '\t') {
+				if (*YYCURSOR) == '\t' {
+					spacing |= HEREDOC_USING_TABS
 				} else {
-					spacing |= 1
+					spacing |= HEREDOC_USING_SPACES
 				}
-				LANG_SCNG.GetYyCursor()++
+				YYCURSOR++
 				indentation++
 			}
-			if LANG_SCNG.GetYyCursor() == LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-				var p *byte = (*byte)(LANG_SCNG.GetYyText())
-				var boundary *byte = p + LANG_SCNG.GetYyLeng()
-				for p < boundary {
-					if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-						CG.GetZendLineno()++
-					}
-					p++
-				}
-				zendlval.SetTypeInfo(1)
-				token = T_ENCAPSED_AND_WHITESPACE
-				goto emit_token_with_val
+			if YYCURSOR == YYLIMIT {
+				Yyleng = YYCURSOR - SCNG(yy_text)
+				HANDLE_NEWLINES(Yytext, Yyleng)
+				ZVAL_NULL(zendlval)
+				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 
 			/* Check for ending label on the next line */
 
-			if (LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80) && heredoc_label.GetLength() < LANG_SCNG.GetYyLimit()-LANG_SCNG.GetYyCursor() && !(memcmp(LANG_SCNG.GetYyCursor(), heredoc_label.GetLabel(), heredoc_label.GetLength())) {
-				if LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'a' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'A' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'Z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= '0' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= '9' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] == '_' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 0x80 {
+			if IS_LABEL_START(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
+				if IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()]) {
 					continue
 				}
-				if spacing == (1 | 2) {
+				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
 					ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
-					if elem != nil {
+					if PARSER_MODE() {
 						token = T_ERROR
 						goto emit_token
 					}
@@ -8368,75 +8202,64 @@ yy590:
 				/* newline before label will be subtracted from returned text, but
 				 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 
-				if LANG_SCNG.GetYyCursor()[-indentation-2] == '\r' && LANG_SCNG.GetYyCursor()[-indentation-1] == '\n' {
+				if YYCURSOR[-indentation-2] == '\r' && YYCURSOR[-indentation-1] == '\n' {
 					newline = 2
 				} else {
 					newline = 1
 				}
-				CG.SetIncrementLineno(1)
-				if LANG_SCNG.GetHeredocScanAhead() != 0 {
-					LANG_SCNG.SetHeredocIndentation(indentation)
-					LANG_SCNG.SetHeredocIndentationUsesSpaces(spacing == 1)
+				CompilerGlobals.SetIncrementLineno(1)
+				if SCNG(heredoc_scan_ahead) {
+					SCNG(heredoc_indentation) = indentation
+					SCNG(heredoc_indentation_uses_spaces) = spacing == HEREDOC_USING_SPACES
 				} else {
-					LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyCursor() - indentation)
+					YYCURSOR -= indentation
 				}
-				LANG_SCNG.SetYyState(yycST_END_HEREDOC)
+				BEGIN(ST_END_HEREDOC)
 				goto heredoc_scan_done
 			}
 			continue
 		case '$':
-			if LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80 || LANG_SCNG.yy_cursor == '{' {
+			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
 		case '{':
-			if LANG_SCNG.yy_cursor == '$' {
+			if (*YYCURSOR) == '$' {
 				break
 			}
 			continue
 		case '\\':
-			if LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() && LANG_SCNG.yy_cursor != '\n' && LANG_SCNG.yy_cursor != '\r' {
-				LANG_SCNG.GetYyCursor()++
+			if YYCURSOR < YYLIMIT && (*YYCURSOR) != '\n' && (*YYCURSOR) != '\r' {
+				YYCURSOR++
 			}
 		default:
 			continue
 		}
-		LANG_SCNG.GetYyCursor()--
+		YYCURSOR--
 		break
 	}
 heredoc_scan_done:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var __z *Zval = zendlval
-	var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng()-newline, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	if LANG_SCNG.GetHeredocScanAhead() == 0 && EG.GetException() == nil && elem != nil {
-		var newline_at_start ZendBool = (*((*byte)(LANG_SCNG.GetYyText()) - 1)) == '\n' || (*((*byte)(LANG_SCNG.GetYyText()) - 1)) == '\r'
-		var copy *ZendString = zendlval.GetValue().GetStr()
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
+	if !(SCNG(heredoc_scan_ahead)) && ExecutorGlobals.GetException() == nil && PARSER_MODE() {
+		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
+		var copy *ZendString = Z_STR_P(zendlval)
 		if StripMultilineStringIndentation(zendlval, heredoc_label.GetIndentation(), heredoc_label.GetIndentationUsesSpaces(), newline_at_start, newline != 0) == 0 {
 			token = T_ERROR
 			goto emit_token
 		}
-		if ZendScanEscapeString(zendlval, copy.GetVal(), copy.GetLen(), 0) != SUCCESS {
+		if UNEXPECTED(ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS) {
 			ZendStringEfree(copy)
 			token = T_ERROR
 			goto emit_token
 		}
 		ZendStringEfree(copy)
 	} else {
-		var p *byte = (*byte)(LANG_SCNG.GetYyText())
-		var boundary *byte = p + (LANG_SCNG.GetYyLeng() - newline)
-		for p < boundary {
-			if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-				CG.GetZendLineno()++
-			}
-			p++
-		}
+		HANDLE_NEWLINES(Yytext, Yyleng-newline)
 	}
-	token = T_ENCAPSED_AND_WHITESPACE
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 yy591:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy590
@@ -8465,18 +8288,18 @@ yy591:
 		}
 	}
 yy592:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '$' {
 		goto yy596
 	}
 	goto yy590
 yy593:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+3 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+3 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy593
 	}
@@ -8490,43 +8313,37 @@ yy593:
 		goto yy599
 	}
 yy594:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy595:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_LOOKING_FOR_VARNAME)
 	token = T_DOLLAR_OPEN_CURLY_BRACES
 	goto emit_token
 yy596:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_IN_SCRIPTING)
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 1))
-	LANG_SCNG.SetYyLeng(uint(1))
+	Yyless(1)
 	token = T_CURLY_OPEN
 	goto emit_token
 yy597:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '>' {
 		goto yy600
 	}
 yy598:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	goto yy594
 yy599:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 1))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 1))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 1)
 	_yyPushState(yycST_VAR_OFFSET)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy600:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy598
@@ -8549,23 +8366,20 @@ yy600:
 		}
 	}
 yy601:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 3))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 3))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 3)
 	_yyPushState(yycST_LOOKING_FOR_PROPERTY)
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 
 	/* *********************************** */
 
 yyc_ST_LOOKING_FOR_VARNAME:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy603
@@ -8588,16 +8402,15 @@ yyc_ST_LOOKING_FOR_VARNAME:
 		}
 	}
 yy603:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy604:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 0))
-	LANG_SCNG.SetYyLeng(uint(0))
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(0)
 	YyPopState()
 	_yyPushState(yycST_IN_SCRIPTING)
 	goto restart
 yy605:
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '_' {
 		if yych <= '@' {
 			if yych <= '/' {
@@ -8636,11 +8449,11 @@ yy605:
 		}
 	}
 yy606:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 yy607:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy606
@@ -8655,27 +8468,24 @@ yy607:
 		goto yy609
 	}
 yy608:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	goto yy604
 yy609:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + LANG_SCNG.GetYyLeng() - 1))
-	LANG_SCNG.SetYyLeng(uint(LANG_SCNG.GetYyLeng() - 1))
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(Yyleng - 1)
 	YyPopState()
 	_yyPushState(yycST_IN_SCRIPTING)
-	token = T_STRING_VARNAME
-	offset = 0
-	goto emit_token_with_str
+	RETURN_TOKEN_WITH_STR(T_STRING_VARNAME, 0)
 
 	/* *********************************** */
 
 yyc_ST_VAR_OFFSET:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 240, 240, 176, 176, 176, 176, 176, 176, 176, 176, 0, 0, 0, 0, 0, 0, 0, 160, 160, 160, 160, 160, 160, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 0, 0, 0, 0, 32, 0, 160, 160, 160, 160, 160, 160, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '0' {
 		if yych <= ' ' {
 			if yych <= 'f' {
@@ -8751,47 +8561,45 @@ yyc_ST_VAR_OFFSET:
 		}
 	}
 yy611:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	if LANG_SCNG.GetHeredocScanAhead() == 0 {
-		ZendError(1<<7, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", (*byte)(LANG_SCNG.GetYyText())[0], (*byte)(LANG_SCNG.GetYyText())[0], LANG_SCNG.GetYyState())
+	if !(SCNG(heredoc_scan_ahead)) {
+		ZendError(E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", Yytext[0], Yytext[0], YYSTATE)
 	}
-	if elem != nil {
+	if PARSER_MODE() {
 		goto restart
 	} else {
 		token = T_BAD_CHARACTER
 		goto emit_token
 	}
 yy612:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Invalid rule to return a more explicit parse error with proper line number */
 
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 0))
-	LANG_SCNG.SetYyLeng(uint(0))
+	Yyless(0)
 	YyPopState()
-	zendlval.SetTypeInfo(1)
-	token = T_ENCAPSED_AND_WHITESPACE
-	goto emit_token_with_val
+	ZVAL_NULL(zendlval)
+	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 yy613:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy614:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Only '[' or '-' can be valid, but returning other tokens will allow a more explicit parse error */
 
-	token = (*byte)(LANG_SCNG.GetYyText())[0]
+	token = Yytext[0]
 	goto emit_token
 
 	/* Only '[' or '-' can be valid, but returning other tokens will allow a more explicit parse error */
 
 yy615:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '_' {
 		if yych <= '@' {
 			goto yy614
@@ -8817,7 +8625,7 @@ yy615:
 	}
 yy616:
 	yyaccept = 0
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'X' {
 		if yych <= 'A' {
 			if yych <= '/' {
@@ -8849,34 +8657,28 @@ yy616:
 		}
 	}
 yy617:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyLeng() < 20-1 || LANG_SCNG.GetYyLeng() == 20-1 && strcmp((*byte)(LANG_SCNG.GetYyText()), LongMinDigits) < 0 {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if Yyleng < MAX_LENGTH_OF_LONG-1 || Yyleng == MAX_LENGTH_OF_LONG-1 && strcmp(Yytext, LongMinDigits) < 0 {
 		var end *byte
 		errno = 0
-		var __z *Zval = zendlval
-		__z.GetValue().SetLval(strtoll((*byte)(LANG_SCNG.GetYyText()), &end, 10))
-		__z.SetTypeInfo(4)
+		ZVAL_LONG(zendlval, ZEND_STRTOL(Yytext, &end, 10))
 		if errno == ERANGE {
 			goto string
 		}
-		r.Assert(end == (*byte)(LANG_SCNG.GetYyText())+LANG_SCNG.GetYyLeng())
+		ZEND_ASSERT(end == Yytext+Yyleng)
 	} else {
 	string:
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}
-	token = T_NUM_STRING
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_NUM_STRING)
 yy618:
 	yyaccept = 0
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy618
 	}
@@ -8885,30 +8687,28 @@ yy618:
 	}
 	goto yy617
 yy619:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy619
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_STRING
-	offset = 0
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_STRING, 0)
 yy620:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	YyPopState()
 	token = ']'
 	goto emit_token
 yy621:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '^' {
 		if yych <= '9' {
 			if yych >= '0' {
@@ -8937,18 +8737,16 @@ yy621:
 		}
 	}
 yy622:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	token = T_VARIABLE
-	offset = 1
-	goto emit_token_with_str
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	RETURN_TOKEN_WITH_STR(T_VARIABLE, 1)
 yy623:
 	yyaccept = 1
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy624
 	}
@@ -8959,52 +8757,45 @@ yy623:
 		goto yy628
 	}
 yy624:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyLeng() == 1 {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendOneCharString[zend_uchar*(*byte)(LANG_SCNG.GetYyText())]
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if Yyleng == 1 {
+		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*Yytext))
 	} else {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}
-	token = T_NUM_STRING
-	goto emit_token_with_val
+	RETURN_TOKEN_WITH_VAL(T_NUM_STRING)
 yy625:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy629
 	}
 yy626:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	if yyaccept == 0 {
 		goto yy617
 	} else {
 		goto yy624
 	}
 yy627:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy630
 	}
 	goto yy626
 yy628:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy626
 	}
@@ -9014,12 +8805,12 @@ yy628:
 	goto yy626
 yy629:
 	yyaccept = 1
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy629
 	}
@@ -9029,12 +8820,12 @@ yy629:
 	goto yy624
 yy630:
 	yyaccept = 1
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyMarker(LANG_SCNG.GetYyCursor())
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy630
 	}
@@ -9047,120 +8838,101 @@ yy630:
 
 yyc_SHEBANG:
 	var yybm []uint8 = []uint8{128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if LANG_SCNG.GetYyCursor()+2 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+2 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych == '#' {
 		goto yy633
 	}
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy632:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 0))
-	LANG_SCNG.SetYyLeng(uint(0))
-	LANG_SCNG.SetYyState(yycINITIAL)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(0)
+	BEGIN(INITIAL)
 	goto restart
 yy633:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '!' {
 		goto yy632
 	}
 yy634:
-	LANG_SCNG.GetYyCursor()++
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	YYCURSOR++
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy634
 	}
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	CG.GetZendLineno()++
-	LANG_SCNG.SetYyState(yycINITIAL)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	CompilerGlobals.GetZendLineno()++
+	BEGIN(INITIAL)
 	goto restart
 
 	/* *********************************** */
 
 yyc_INITIAL:
-	if LANG_SCNG.GetYyCursor()+7 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+7 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	yych = LANG_SCNG.yy_cursor
+	yych = *YYCURSOR
 	if yych == '<' {
 		goto yy637
 	}
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy636:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
 inline_char_handler:
 	for true {
-		var ptr *uint8 = memchr(LANG_SCNG.GetYyCursor(), '<', LANG_SCNG.GetYyLimit()-LANG_SCNG.GetYyCursor())
+		var ptr *uint8 = memchr(YYCURSOR, '<', YYLIMIT-YYCURSOR)
 		if ptr != nil {
-			LANG_SCNG.SetYyCursor(ptr + 1)
+			YYCURSOR = ptr + 1
 		} else {
-			LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyLimit())
+			YYCURSOR = YYLIMIT
 		}
-		if LANG_SCNG.GetYyCursor() >= LANG_SCNG.GetYyLimit() {
+		if YYCURSOR >= YYLIMIT {
 			break
 		}
-		if LANG_SCNG.yy_cursor == '?' {
-			if CG.GetShortTags() != 0 || (*(LANG_SCNG.GetYyCursor() + 1)) == '=' || !(strncasecmp((*byte)(LANG_SCNG.GetYyCursor()+1), "php", 3)) && (LANG_SCNG.GetYyCursor()+4 == LANG_SCNG.GetYyLimit() || LANG_SCNG.GetYyCursor()[4] == ' ' || LANG_SCNG.GetYyCursor()[4] == '\t' || LANG_SCNG.GetYyCursor()[4] == '\n' || LANG_SCNG.GetYyCursor()[4] == '\r') {
-				LANG_SCNG.GetYyCursor()--
+		if (*YYCURSOR) == '?' {
+			if CompilerGlobals.GetShortTags() != 0 || (*(YYCURSOR + 1)) == '=' || !(strncasecmp((*byte)(YYCURSOR+1), "php", 3)) && (YYCURSOR+4 == YYLIMIT || YYCURSOR[4] == ' ' || YYCURSOR[4] == '\t' || YYCURSOR[4] == '\n' || YYCURSOR[4] == '\r') {
+				YYCURSOR--
 				break
 			}
 		}
 	}
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if LANG_SCNG.GetOutputFilter() != nil {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(output_filter) {
 		var readsize int
 		var s *byte = nil
 		var sz int = 0
 
 		// TODO: avoid reallocation ???
 
-		readsize = LANG_SCNG.GetOutputFilter()((**uint8)(&s), &sz, (*uint8)((*byte)(LANG_SCNG.GetYyText())), int(LANG_SCNG.GetYyLeng()))
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit(s, sz, 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
-		_efree(s)
-		if readsize < LANG_SCNG.GetYyLeng() {
-			LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + readsize))
-			LANG_SCNG.SetYyLeng(uint(readsize))
+		readsize = SCNG(output_filter)((**uint8)(&s), &sz, (*uint8)(Yytext), int(Yyleng))
+		ZVAL_STRINGL(zendlval, s, sz)
+		Efree(s)
+		if readsize < Yyleng {
+			Yyless(readsize)
 		}
-	} else if LANG_SCNG.GetYyLeng() == 1 {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendOneCharString[zend_uchar*(*byte)(LANG_SCNG.GetYyText())]
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6)
+	} else if Yyleng == 1 {
+		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*Yytext))
 	} else {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng(), 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}
-	var p *byte = (*byte)(LANG_SCNG.GetYyText())
-	var boundary *byte = p + LANG_SCNG.GetYyLeng()
-	for p < boundary {
-		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG.GetZendLineno()++
-		}
-		p++
-	}
-	token = T_INLINE_HTML
-	goto emit_token_with_val
+	HANDLE_NEWLINES(Yytext, Yyleng)
+	RETURN_TOKEN_WITH_VAL(T_INLINE_HTML)
 yy637:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '?' {
 		goto yy636
 	}
-	yych = *(g.Assign(&(LANG_SCNG.GetYyMarker()), g.PreInc(&(LANG_SCNG.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'O' {
 		if yych == '=' {
 			goto yy639
@@ -9174,29 +8946,25 @@ yy637:
 		}
 	}
 yy638:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if CG.GetShortTags() != 0 {
-		LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-		token = T_OPEN_TAG
-		if elem != nil {
-			goto skip_token
-		}
-		goto emit_token
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if CompilerGlobals.GetShortTags() != 0 {
+		BEGIN(ST_IN_SCRIPTING)
+		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 	} else {
 		goto inline_char_handler
 	}
 yy639:
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-	if elem != nil {
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(ST_IN_SCRIPTING)
+	if PARSER_MODE() {
 		token = T_ECHO
 		goto emit_token
 	}
 	token = T_OPEN_TAG_WITH_ECHO
 	goto emit_token
 yy640:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'H' {
 		goto yy642
 	}
@@ -9204,10 +8972,10 @@ yy640:
 		goto yy642
 	}
 yy641:
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyMarker())
+	YYCURSOR = YYMARKER
 	goto yy638
 yy642:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'P' {
 		goto yy643
 	}
@@ -9215,7 +8983,7 @@ yy642:
 		goto yy641
 	}
 yy643:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'f' {
 		if yych <= 0x8 {
 			goto yy644
@@ -9232,47 +9000,32 @@ yy643:
 		}
 	}
 yy644:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Allow <?php followed by end of file. */
 
-	if LANG_SCNG.GetYyCursor() == LANG_SCNG.GetYyLimit() {
-		LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-		token = T_OPEN_TAG
-		if elem != nil {
-			goto skip_token
-		}
-		goto emit_token
+	if YYCURSOR == YYLIMIT {
+		BEGIN(ST_IN_SCRIPTING)
+		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 	}
 
 	/* Degenerate case: <?phpX is interpreted as <? phpX with short tags. */
 
-	if CG.GetShortTags() != 0 {
-		LANG_SCNG.SetYyCursor((*uint8)((*byte)(LANG_SCNG.GetYyText()) + 2))
-		LANG_SCNG.SetYyLeng(uint(2))
-		LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-		token = T_OPEN_TAG
-		if elem != nil {
-			goto skip_token
-		}
-		goto emit_token
+	if CompilerGlobals.GetShortTags() != 0 {
+		Yyless(2)
+		BEGIN(ST_IN_SCRIPTING)
+		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 	}
 	goto inline_char_handler
 yy645:
-	LANG_SCNG.GetYyCursor()++
+	YYCURSOR++
 yy646:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	if (*byte)(LANG_SCNG.GetYyText())[LANG_SCNG.GetYyLeng()-1] == '\n' || (*byte)(LANG_SCNG.GetYyText())[LANG_SCNG.GetYyLeng()-1] == '\r' {
-		CG.GetZendLineno()++
-	}
-	LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
-	token = T_OPEN_TAG
-	if elem != nil {
-		goto skip_token
-	}
-	goto emit_token
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	HANDLE_NEWLINE(Yytext[Yyleng-1])
+	BEGIN(ST_IN_SCRIPTING)
+	RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 yy647:
-	yych = *(g.PreInc(&(LANG_SCNG.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy645
 	}
@@ -9281,79 +9034,71 @@ yy647:
 	/* *********************************** */
 
 yyc_ST_END_HEREDOC:
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var heredoc_label *zend_heredoc_label = zend_ptr_stack_pop(&LANG_SCNG.heredoc_label_stack)
-	LANG_SCNG.SetYyLeng(heredoc_label.GetIndentation() + heredoc_label.GetLength())
-	LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyCursor() + LANG_SCNG.GetYyLeng() - 1)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	var heredoc_label *zend_heredoc_label = zend_ptr_stack_pop(&SCNG(heredoc_label_stack))
+	Yyleng = heredoc_label.GetIndentation() + heredoc_label.GetLength()
+	YYCURSOR += Yyleng - 1
 	HeredocLabelDtor(heredoc_label)
-	_efree(heredoc_label)
-	LANG_SCNG.SetYyState(yycST_IN_SCRIPTING)
+	Efree(heredoc_label)
+	BEGIN(ST_IN_SCRIPTING)
 	token = T_END_HEREDOC
 	goto emit_token
 
 	/* *********************************** */
 
 yyc_ST_NOWDOC:
-	if LANG_SCNG.GetYyCursor()+1 >= LANG_SCNG.GetYyLimit()+32 {
+	if YYCURSOR+1 >= YYLIMIT+ZEND_MMAP_AHEAD {
 		return 0
 	}
-	LANG_SCNG.GetYyCursor()++
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var heredoc_label *ZendHeredocLabel = ZendPtrStackTop(&LANG_SCNG.heredoc_label_stack)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	var heredoc_label *ZendHeredocLabel = ZendPtrStackTop(&SCNG(heredoc_label_stack))
 	var newline int = 0
 	var indentation int = 0
 	var spacing int = -1
-	if LANG_SCNG.GetYyCursor() > LANG_SCNG.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		token = END
 		goto emit_token
 	}
-	LANG_SCNG.GetYyCursor()--
-	for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() {
-		switch g.PostInc(&(LANG_SCNG.yy_cursor)) {
+	YYCURSOR--
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '\r':
-			if LANG_SCNG.yy_cursor == '\n' {
-				LANG_SCNG.GetYyCursor()++
+			if (*YYCURSOR) == '\n' {
+				YYCURSOR++
 			}
 		case '\n':
 			spacing = 0
 			indentation = spacing
-			for LANG_SCNG.GetYyCursor() < LANG_SCNG.GetYyLimit() && (LANG_SCNG.yy_cursor == ' ' || LANG_SCNG.yy_cursor == '\t') {
-				if LANG_SCNG.yy_cursor == '\t' {
-					spacing |= 2
+			for YYCURSOR < YYLIMIT && ((*YYCURSOR) == ' ' || (*YYCURSOR) == '\t') {
+				if (*YYCURSOR) == '\t' {
+					spacing |= HEREDOC_USING_TABS
 				} else {
-					spacing |= 1
+					spacing |= HEREDOC_USING_SPACES
 				}
-				LANG_SCNG.GetYyCursor()++
+				YYCURSOR++
 				indentation++
 			}
-			if LANG_SCNG.GetYyCursor() == LANG_SCNG.GetYyLimit() {
-				LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-				var p *byte = (*byte)(LANG_SCNG.GetYyText())
-				var boundary *byte = p + LANG_SCNG.GetYyLeng()
-				for p < boundary {
-					if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-						CG.GetZendLineno()++
-					}
-					p++
-				}
-				zendlval.SetTypeInfo(1)
-				token = T_ENCAPSED_AND_WHITESPACE
-				goto emit_token_with_val
+			if YYCURSOR == YYLIMIT {
+				Yyleng = YYCURSOR - SCNG(yy_text)
+				HANDLE_NEWLINES(Yytext, Yyleng)
+				ZVAL_NULL(zendlval)
+				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 
 			/* Check for ending label on the next line */
 
-			if (LANG_SCNG.yy_cursor >= 'a' && LANG_SCNG.yy_cursor <= 'z' || LANG_SCNG.yy_cursor >= 'A' && LANG_SCNG.yy_cursor <= 'Z' || LANG_SCNG.yy_cursor == '_' || LANG_SCNG.yy_cursor >= 0x80) && heredoc_label.GetLength() < LANG_SCNG.GetYyLimit()-LANG_SCNG.GetYyCursor() && !(memcmp(LANG_SCNG.GetYyCursor(), heredoc_label.GetLabel(), heredoc_label.GetLength())) {
-				if LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'a' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 'A' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= 'Z' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= '0' && LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] <= '9' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] == '_' || LANG_SCNG.GetYyCursor()[heredoc_label.GetLength()] >= 0x80 {
+			if IS_LABEL_START(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
+				if IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()]) {
 					continue
 				}
-				if spacing == (1 | 2) {
+				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
 					ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
-					if elem != nil {
+					if PARSER_MODE() {
 						token = T_ERROR
 						goto emit_token
 					}
@@ -9362,15 +9107,15 @@ yyc_ST_NOWDOC:
 				/* newline before label will be subtracted from returned text, but
 				 * yyleng/yytext will include it, for zend_highlight/strip, tokenizer, etc. */
 
-				if LANG_SCNG.GetYyCursor()[-indentation-2] == '\r' && LANG_SCNG.GetYyCursor()[-indentation-1] == '\n' {
+				if YYCURSOR[-indentation-2] == '\r' && YYCURSOR[-indentation-1] == '\n' {
 					newline = 2
 				} else {
 					newline = 1
 				}
-				CG.SetIncrementLineno(1)
-				LANG_SCNG.SetYyCursor(LANG_SCNG.GetYyCursor() - indentation)
+				CompilerGlobals.SetIncrementLineno(1)
+				YYCURSOR -= indentation
 				heredoc_label.SetIndentation(indentation)
-				LANG_SCNG.SetYyState(yycST_END_HEREDOC)
+				BEGIN(ST_END_HEREDOC)
 				goto nowdoc_scan_done
 			}
 		default:
@@ -9378,81 +9123,44 @@ yyc_ST_NOWDOC:
 		}
 	}
 nowdoc_scan_done:
-	LANG_SCNG.SetYyLeng(LANG_SCNG.GetYyCursor() - LANG_SCNG.GetYyText())
-	var __z *Zval = zendlval
-	var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText()), LANG_SCNG.GetYyLeng()-newline, 0)
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	if EG.GetException() == nil && spacing != -1 && elem != nil {
-		var newline_at_start ZendBool = (*((*byte)(LANG_SCNG.GetYyText()) - 1)) == '\n' || (*((*byte)(LANG_SCNG.GetYyText()) - 1)) == '\r'
-		if StripMultilineStringIndentation(zendlval, indentation, spacing == 1, newline_at_start, newline != 0) == 0 {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
+	if ExecutorGlobals.GetException() == nil && spacing != -1 && PARSER_MODE() {
+		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
+		if StripMultilineStringIndentation(zendlval, indentation, spacing == HEREDOC_USING_SPACES, newline_at_start, newline != 0) == 0 {
 			token = T_ERROR
 			goto emit_token
 		}
 	}
-	var p *byte = (*byte)(LANG_SCNG.GetYyText())
-	var boundary *byte = p + (LANG_SCNG.GetYyLeng() - newline)
-	for p < boundary {
-		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG.GetZendLineno()++
-		}
-		p++
-	}
-	token = T_ENCAPSED_AND_WHITESPACE
-	goto emit_token_with_val
+	HANDLE_NEWLINES(Yytext, Yyleng-newline)
+	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 emit_token_with_str:
-	if LANG_SCNG.GetOutputFilter() != nil {
-		var sz int = 0
-		var s *byte = nil
-		LANG_SCNG.GetOutputFilter()((**uint8)(&s), &sz, (*uint8)((*byte)(LANG_SCNG.GetYyText())+offset), size_t(LANG_SCNG.GetYyLeng()-offset))
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit(s, sz, 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
-		_efree(s)
-	} else if LANG_SCNG.GetYyLeng()-offset == 1 {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendOneCharString[zend_uchar*((*byte)(LANG_SCNG.GetYyText())+offset)]
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6)
-	} else {
-		var __z *Zval = zendlval
-		var __s *ZendString = ZendStringInit((*byte)(LANG_SCNG.GetYyText())+offset, LANG_SCNG.GetYyLeng()-offset, 0)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
+	ZendCopyValue(zendlval, Yytext+offset, Yyleng-offset)
 emit_token_with_val:
-	if elem != nil {
-		r.Assert(zendlval.GetType() != 0)
+	if PARSER_MODE() {
+		ZEND_ASSERT(Z_TYPE_P(zendlval) != IS_UNDEF)
 		elem.SetAst(ZendAstCreateZvalWithLineno(zendlval, start_line))
 	}
 emit_token:
-	if LANG_SCNG.GetOnEvent() != nil {
-		LANG_SCNG.GetOnEvent()(ON_TOKEN, token, start_line, LANG_SCNG.GetOnEventContext())
+	if SCNG(on_event) {
+		SCNG(on_event)(ON_TOKEN, token, start_line, SCNG(on_event_context))
 	}
 	return token
 return_whitespace:
-	var p *byte = (*byte)(LANG_SCNG.GetYyText())
-	var boundary *byte = p + LANG_SCNG.GetYyLeng()
-	for p < boundary {
-		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG.GetZendLineno()++
-		}
-		p++
+	HANDLE_NEWLINES(Yytext, Yyleng)
+	if SCNG(on_event) {
+		SCNG(on_event)(ON_TOKEN, T_WHITESPACE, start_line, SCNG(on_event_context))
 	}
-	if LANG_SCNG.GetOnEvent() != nil {
-		LANG_SCNG.GetOnEvent()(ON_TOKEN, T_WHITESPACE, start_line, LANG_SCNG.GetOnEventContext())
-	}
-	if elem != nil {
-		start_line = CG.GetZendLineno()
+	if PARSER_MODE() {
+		start_line = CompilerGlobals.GetZendLineno()
 		goto restart
 	} else {
 		return T_WHITESPACE
 	}
 skip_token:
-	if LANG_SCNG.GetOnEvent() != nil {
-		LANG_SCNG.GetOnEvent()(ON_TOKEN, token, start_line, LANG_SCNG.GetOnEventContext())
+	if SCNG(on_event) {
+		SCNG(on_event)(ON_TOKEN, token, start_line, SCNG(on_event_context))
 	}
-	start_line = CG.GetZendLineno()
+	start_line = CompilerGlobals.GetZendLineno()
 	goto restart
 }

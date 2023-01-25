@@ -3,9 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	"sik/sapi/cli"
 	"sik/zend"
 )
 
@@ -43,7 +43,7 @@ import (
 
 // # include "zend_globals.h"
 
-// #define BROWSCAP_NUM_CONTAINS       5
+const BROWSCAP_NUM_CONTAINS = 5
 
 /* browser data defined in startup phase, eagerly loaded in MINIT */
 
@@ -54,27 +54,27 @@ var GlobalBdata BrowserData = BrowserData{0}
 
 var BrowscapGlobals ZendBrowscapGlobals
 
-// #define BROWSCAP_G(v) ZEND_MODULE_GLOBALS_ACCESSOR ( browscap , v )
+func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
 
-// #define DEFAULT_SECTION_NAME       "Default Browser Capability Settings"
+const DEFAULT_SECTION_NAME = "Default Browser Capability Settings"
 
 /* OBJECTS_FIXME: This whole extension needs going through. The use of objects looks pretty broken here */
 
 func BrowscapEntryDtor(zvalue *zend.Zval) {
-	var entry *BrowscapEntry = zvalue.value.ptr
+	var entry *BrowscapEntry = zend.Z_PTR_P(zvalue)
 	zend.ZendStringReleaseEx(entry.GetPattern(), 0)
 	if entry.GetParent() != nil {
 		zend.ZendStringReleaseEx(entry.GetParent(), 0)
 	}
-	zend._efree(entry)
+	zend.Efree(entry)
 }
 func BrowscapEntryDtorPersistent(zvalue *zend.Zval) {
-	var entry *BrowscapEntry = zvalue.value.ptr
+	var entry *BrowscapEntry = zend.Z_PTR_P(zvalue)
 	zend.ZendStringReleaseEx(entry.GetPattern(), 1)
 	if entry.GetParent() != nil {
 		zend.ZendStringReleaseEx(entry.GetParent(), 1)
 	}
-	g.CondF(true, func() { return zend.Free(entry) }, func() { return zend._efree(entry) })
+	zend.Pefree(entry, 1)
 }
 func IsPlaceholder(c byte) zend.ZendBool { return c == '?' || c == '*' }
 
@@ -82,25 +82,25 @@ func IsPlaceholder(c byte) zend.ZendBool { return c == '?' || c == '*' }
 
 func BrowscapComputePrefixLen(pattern *zend.ZendString) uint8 {
 	var i int
-	for i = 0; i < pattern.len_; i++ {
-		if IsPlaceholder(pattern.val[i]) != 0 {
+	for i = 0; i < zend.ZSTR_LEN(pattern); i++ {
+		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) != 0 {
 			break
 		}
 	}
-	return uint8_t(g.Cond(i < UINT8_MAX, i, UINT8_MAX))
+	return uint8(cli.MIN(i, UINT8_MAX))
 }
 func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_start *uint16, contains_len *uint8) int {
 	var i int = start_pos
 
 	/* Find first non-placeholder character after prefix */
 
-	for ; i < pattern.len_; i++ {
-		if IsPlaceholder(pattern.val[i]) == 0 {
+	for ; i < zend.ZSTR_LEN(pattern); i++ {
+		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) == 0 {
 
 			/* Skip the case of a single non-placeholder character.
 			 * Let's try to find something longer instead. */
 
-			if i+1 < pattern.len_ && IsPlaceholder(pattern.val[i+1]) == 0 {
+			if i+1 < zend.ZSTR_LEN(pattern) && IsPlaceholder(zend.ZSTR_VAL(pattern)[i+1]) == 0 {
 				break
 			}
 
@@ -113,12 +113,12 @@ func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_s
 
 	/* Find first placeholder character after that */
 
-	for ; i < pattern.len_; i++ {
-		if IsPlaceholder(pattern.val[i]) != 0 {
+	for ; i < zend.ZSTR_LEN(pattern); i++ {
+		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) != 0 {
 			break
 		}
 	}
-	*contains_len = uint8_t(g.Cond(i-(*contains_start) < UINT8_MAX, i-(*contains_start), UINT8_MAX))
+	*contains_len = uint8(cli.MIN(i-(*contains_start), UINT8_MAX))
 	return i
 }
 
@@ -126,9 +126,9 @@ func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_s
 
 func BrowscapComputeRegexLen(pattern *zend.ZendString) int {
 	var i int
-	var len_ int = pattern.len_
-	for i = 0; i < pattern.len_; i++ {
-		switch pattern.val[i] {
+	var len_ int = zend.ZSTR_LEN(pattern)
+	for i = 0; i < zend.ZSTR_LEN(pattern); i++ {
+		switch zend.ZSTR_VAL(pattern)[i] {
 		case '*':
 
 		case '.':
@@ -146,7 +146,7 @@ func BrowscapComputeRegexLen(pattern *zend.ZendString) int {
 			break
 		}
 	}
-	return len_ + g.SizeOf("\"~^$~\"") - 1
+	return len_ + b.SizeOf("\"~^$~\"") - 1
 }
 func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.ZendString {
 	var i int
@@ -155,42 +155,42 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 	var res *zend.ZendString
 	var lc_pattern *byte
 	res = zend.ZendStringAlloc(BrowscapComputeRegexLen(pattern), persistent)
-	t = res.val
-	lc_pattern = zend._emalloc(pattern.len_ + 1)
-	zend.ZendStrTolowerCopy(lc_pattern, pattern.val, pattern.len_)
-	t[g.PostInc(&j)] = '~'
-	t[g.PostInc(&j)] = '^'
-	for i = 0; i < pattern.len_; {
+	t = zend.ZSTR_VAL(res)
+	lc_pattern = zend.DoAlloca(zend.ZSTR_LEN(pattern)+1, use_heap)
+	zend.ZendStrTolowerCopy(lc_pattern, zend.ZSTR_VAL(pattern), zend.ZSTR_LEN(pattern))
+	t[b.PostInc(&j)] = '~'
+	t[b.PostInc(&j)] = '^'
+	for i = 0; i < zend.ZSTR_LEN(pattern); {
 		switch lc_pattern[i] {
 		case '?':
 			t[j] = '.'
 			break
 		case '*':
-			t[g.PostInc(&j)] = '.'
+			t[b.PostInc(&j)] = '.'
 			t[j] = '*'
 			break
 		case '.':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = '.'
 			break
 		case '\\':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = '\\'
 			break
 		case '(':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = '('
 			break
 		case ')':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = ')'
 			break
 		case '~':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = '~'
 			break
 		case '+':
-			t[g.PostInc(&j)] = '\\'
+			t[b.PostInc(&j)] = '\\'
 			t[j] = '+'
 			break
 		default:
@@ -200,11 +200,11 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 		i++
 		j++
 	}
-	t[g.PostInc(&j)] = '$'
-	t[g.PostInc(&j)] = '~'
+	t[b.PostInc(&j)] = '$'
+	t[b.PostInc(&j)] = '~'
 	t[j] = 0
-	res.len_ = j
-	zend._efree(lc_pattern)
+	zend.ZSTR_LEN(res) = j
+	zend.FreeAlloca(lc_pattern, use_heap)
 	return res
 }
 
@@ -226,12 +226,8 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent 
 func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persistent zend.ZendBool) *zend.ZendString {
 	var lcname *zend.ZendString
 	var interned *zend.ZendString
-	lcname = (*zend.ZendString)(zend._emalloc(zend_long((*byte)(&((*zend.ZendString)(nil).val))-(*byte)(nil)) + str.len_ + 1 + (8-1) & ^(8-1)))
-	zend.ZendGcSetRefcount(&lcname.gc, 1)
-	lcname.gc.u.type_info = 6
-	lcname.h = 0
-	lcname.len_ = str.len_
-	zend.ZendStrTolowerCopy(lcname.val, str.val, str.len_)
+	zend.ZSTR_ALLOCA_ALLOC(lcname, zend.ZSTR_LEN(str), use_heap)
+	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lcname), zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
 	interned = zend.ZendHashFindPtr(&ctx.str_interned, lcname)
 	if interned != nil {
 		zend.ZendStringAddref(interned)
@@ -242,17 +238,13 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persisten
 		}
 		zend.ZendHashAddNewPtr(&ctx.str_interned, interned, interned)
 	}
-	zend._efree(lcname)
+	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
 	return interned
 }
 func BrowscapAddKv(bdata *BrowserData, key *zend.ZendString, value *zend.ZendString, persistent zend.ZendBool) {
 	if bdata.GetKvUsed() == bdata.GetKvSize() {
 		bdata.SetKvSize(bdata.GetKvSize() * 2)
-		if persistent != 0 {
-			bdata.SetKv(zend._safeRealloc(bdata.GetKv(), g.SizeOf("browscap_kv"), bdata.GetKvSize(), 0))
-		} else {
-			bdata.SetKv(zend._safeErealloc(bdata.GetKv(), g.SizeOf("browscap_kv"), bdata.GetKvSize(), 0))
-		}
+		bdata.SetKv(zend.SafePerealloc(bdata.GetKv(), b.SizeOf("browscap_kv"), bdata.GetKvSize(), 0, persistent))
 	}
 	bdata.GetKv()[bdata.GetKvUsed()].SetKey(key)
 	bdata.GetKv()[bdata.GetKvUsed()].SetValue(value)
@@ -261,48 +253,17 @@ func BrowscapAddKv(bdata *BrowserData, key *zend.ZendString, value *zend.ZendStr
 func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTable {
 	var tmp zend.Zval
 	var i uint32
-	var ht *zend.HashTable = zend._zendNewArray(8)
-	var __z *zend.Zval = &tmp
-	var __s *zend.ZendString = BrowscapConvertPattern(entry.GetPattern(), 0)
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
-	zend.ZendHashStrAdd(ht, "browser_name_regex", g.SizeOf("\"browser_name_regex\"")-1, &tmp)
-	var __z *zend.Zval = &tmp
-	var __s *zend.ZendString = entry.GetPattern()
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		zend.ZendGcAddref(&__s.gc)
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
-	zend.ZendHashStrAdd(ht, "browser_name_pattern", g.SizeOf("\"browser_name_pattern\"")-1, &tmp)
+	var ht *zend.HashTable = zend.ZendNewArray(8)
+	zend.ZVAL_STR(&tmp, BrowscapConvertPattern(entry.GetPattern(), 0))
+	zend.ZendHashStrAdd(ht, "browser_name_regex", b.SizeOf("\"browser_name_regex\"")-1, &tmp)
+	zend.ZVAL_STR_COPY(&tmp, entry.GetPattern())
+	zend.ZendHashStrAdd(ht, "browser_name_pattern", b.SizeOf("\"browser_name_pattern\"")-1, &tmp)
 	if entry.GetParent() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = entry.GetParent()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashStrAdd(ht, "parent", g.SizeOf("\"parent\"")-1, &tmp)
+		zend.ZVAL_STR_COPY(&tmp, entry.GetParent())
+		zend.ZendHashStrAdd(ht, "parent", b.SizeOf("\"parent\"")-1, &tmp)
 	}
 	for i = entry.GetKvStart(); i < entry.GetKvEnd(); i++ {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = bdata.GetKv()[i].GetValue()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+		zend.ZVAL_STR_COPY(&tmp, bdata.GetKv()[i].GetValue())
 		zend.ZendHashAdd(ht, bdata.GetKv()[i].GetKey(), &tmp)
 	}
 	return ht
@@ -310,31 +271,31 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTa
 func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arg any) {
 	var ctx *BrowscapParserCtx = arg
 	var bdata *BrowserData = ctx.GetBdata()
-	var persistent int = zend.ZvalGcFlags(bdata.GetHtab().gc.u.type_info) & 1 << 7
+	var persistent int = zend.GC_FLAGS(bdata.GetHtab()) & zend.IS_ARRAY_PERSISTENT
 	if arg1 == nil {
 		return
 	}
 	switch callback_type {
-	case 1:
+	case zend.ZEND_INI_PARSER_ENTRY:
 		if ctx.GetCurrentEntry() != nil && arg2 != nil {
 			var new_key *zend.ZendString
 			var new_value *zend.ZendString
 
 			/* Set proper value for true/false settings */
 
-			if arg2.value.str.len_ == 2 && !(strncasecmp(arg2.value.str.val, "on", g.SizeOf("\"on\"")-1)) || arg2.value.str.len_ == 3 && !(strncasecmp(arg2.value.str.val, "yes", g.SizeOf("\"yes\"")-1)) || arg2.value.str.len_ == 4 && !(strncasecmp(arg2.value.str.val, "true", g.SizeOf("\"true\"")-1)) {
-				new_value = zend.ZendOneCharString['1']
-			} else if arg2.value.str.len_ == 2 && !(strncasecmp(arg2.value.str.val, "no", g.SizeOf("\"no\"")-1)) || arg2.value.str.len_ == 3 && !(strncasecmp(arg2.value.str.val, "off", g.SizeOf("\"off\"")-1)) || arg2.value.str.len_ == 4 && !(strncasecmp(arg2.value.str.val, "none", g.SizeOf("\"none\"")-1)) || arg2.value.str.len_ == 5 && !(strncasecmp(arg2.value.str.val, "false", g.SizeOf("\"false\"")-1)) {
-				new_value = zend.ZendEmptyString
+			if zend.Z_STRLEN_P(arg2) == 2 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "on", b.SizeOf("\"on\"")-1)) || zend.Z_STRLEN_P(arg2) == 3 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "yes", b.SizeOf("\"yes\"")-1)) || zend.Z_STRLEN_P(arg2) == 4 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "true", b.SizeOf("\"true\"")-1)) {
+				new_value = zend.ZSTR_CHAR('1')
+			} else if zend.Z_STRLEN_P(arg2) == 2 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "no", b.SizeOf("\"no\"")-1)) || zend.Z_STRLEN_P(arg2) == 3 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "off", b.SizeOf("\"off\"")-1)) || zend.Z_STRLEN_P(arg2) == 4 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "none", b.SizeOf("\"none\"")-1)) || zend.Z_STRLEN_P(arg2) == 5 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "false", b.SizeOf("\"false\"")-1)) {
+				new_value = zend.ZSTR_EMPTY_ALLOC()
 			} else {
-				new_value = BrowscapInternStr(ctx, arg2.value.str, persistent)
+				new_value = BrowscapInternStr(ctx, zend.Z_STR_P(arg2), persistent)
 			}
-			if !(strcasecmp(arg1.value.str.val, "parent")) {
+			if !(strcasecmp(zend.Z_STRVAL_P(arg1), "parent")) {
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().val, arg2.value.str.val)) {
-					zend.ZendError(1<<4, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().val, zend.ZendIniStringEx("browscap", g.SizeOf("\"browscap\"")-1, 0, nil))
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(zend.ZSTR_VAL(ctx.GetCurrentSectionName()), zend.Z_STRVAL_P(arg2))) {
+					zend.ZendError(zend.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", zend.ZSTR_VAL(ctx.GetCurrentSectionName()), zend.INI_STR("browscap"))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -342,34 +303,30 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, arg1.value.str, persistent)
+				new_key = BrowscapInternStrCi(ctx, zend.Z_STR_P(arg1), persistent)
 				BrowscapAddKv(bdata, new_key, new_value, persistent)
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
 		}
 		break
-	case 2:
+	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *zend.ZendString = arg1.value.str
+		var pattern *zend.ZendString = zend.Z_STR_P(arg1)
 		var pos int
 		var i int
-		if pattern.len_ > UINT16_MAX {
-			core.PhpErrorDocref(nil, 1<<1, "Skipping excessively long pattern of length %zd", pattern.len_)
+		if zend.ZSTR_LEN(pattern) > UINT16_MAX {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Skipping excessively long pattern of length %zd", zend.ZSTR_LEN(pattern))
 			break
 		}
 		if persistent != 0 {
 			pattern = zend.ZendNewInternedString(zend.ZendStringCopy(pattern))
-			if (zend.ZvalGcFlags(pattern.gc.u.type_info) & 1 << 6) != 0 {
-				arg1.u1.v.type_flags = 0
+			if zend.ZSTR_IS_INTERNED(pattern) != 0 {
+				zend.Z_TYPE_FLAGS_P(arg1) = 0
 			} else {
 				zend.ZendStringRelease(pattern)
 			}
 		}
-		if persistent != 0 {
-			ctx.SetCurrentEntry(zend.__zendMalloc(g.SizeOf("browscap_entry")))
-		} else {
-			ctx.SetCurrentEntry(zend._emalloc(g.SizeOf("browscap_entry")))
-		}
+		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
 		entry = ctx.GetCurrentEntry()
 		zend.ZendHashUpdatePtr(bdata.GetHtab(), pattern, entry)
 		if ctx.GetCurrentSectionName() != nil {
@@ -382,7 +339,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		entry.SetParent(nil)
 		entry.SetPrefixLen(BrowscapComputePrefixLen(pattern))
 		pos = entry.GetPrefixLen()
-		for i = 0; i < 5; i++ {
+		for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 			pos = BrowscapComputeContains(pattern, pos, &entry.contains_start[i], &entry.contains_len[i])
 		}
 		break
@@ -391,39 +348,31 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 
 /* }}} */
 
-func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zv.value.str) }
+func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zend.Z_STR_P(zv)) }
 func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
 	var fh zend.ZendFileHandle
 	var ctx BrowscapParserCtx = BrowscapParserCtx{0}
 	if filename == nil || filename[0] == '0' {
 		return zend.FAILURE
 	}
-	zend.ZendStreamInitFp(&fh, r.Fopen(filename, "r"), filename)
+	zend.ZendStreamInitFp(&fh, zend.VCWD_FOPEN(filename, "r"), filename)
 	if fh.handle.fp == nil {
-		zend.ZendError(1<<5, "Cannot open '%s' for reading", filename)
+		zend.ZendError(zend.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return zend.FAILURE
 	}
-	if persistent != 0 {
-		browdata.SetHtab(zend.__zendMalloc(sizeof * browdata.GetHtab()))
-	} else {
-		browdata.SetHtab(zend._emalloc(sizeof * browdata.GetHtab()))
-	}
-	zend._zendHashInit(browdata.GetHtab(), 0, g.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent)
+	browdata.SetHtab(zend.Pemalloc(sizeof*browdata.GetHtab(), persistent))
+	zend.ZendHashInitEx(browdata.GetHtab(), 0, nil, b.Cond(persistent != 0, BrowscapEntryDtorPersistent, BrowscapEntryDtor), persistent, 0)
 	browdata.SetKvSize(16 * 1024)
 	browdata.SetKvUsed(0)
-	if persistent != 0 {
-		browdata.SetKv(zend.__zendMalloc(g.SizeOf("browscap_kv") * browdata.GetKvSize()))
-	} else {
-		browdata.SetKv(zend._emalloc(g.SizeOf("browscap_kv") * browdata.GetKvSize()))
-	}
+	browdata.SetKv(zend.Pemalloc(b.SizeOf("browscap_kv")*browdata.GetKvSize(), persistent))
 
 	/* Create parser context */
 
 	ctx.SetBdata(browdata)
 	ctx.SetCurrentEntry(nil)
 	ctx.SetCurrentSectionName(nil)
-	zend._zendHashInit(&ctx.str_interned, 8, StrInternedDtor, persistent)
-	zend.ZendParseIniFile(&fh, 1, 1, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
+	zend.ZendHashInit(&ctx.str_interned, 8, nil, StrInternedDtor, persistent)
+	zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_RAW, zend.ZendIniParserCbT(PhpBrowscapParserCb), &ctx)
 
 	/* Destroy parser context */
 
@@ -440,13 +389,13 @@ func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 	if bdata.GetHtab() != nil {
 		var i uint32
 		zend.ZendHashDestroy(bdata.GetHtab())
-		g.CondF(persistent != 0, func() { return zend.Free(bdata.GetHtab()) }, func() { return zend._efree(bdata.GetHtab()) })
+		zend.Pefree(bdata.GetHtab(), persistent)
 		bdata.SetHtab(nil)
 		for i = 0; i < bdata.GetKvUsed(); i++ {
 			zend.ZendStringRelease(bdata.GetKv()[i].GetKey())
 			zend.ZendStringRelease(bdata.GetKv()[i].GetValue())
 		}
-		g.CondF(persistent != 0, func() { return zend.Free(bdata.GetKv()) }, func() { return zend._efree(bdata.GetKv()) })
+		zend.Pefree(bdata.GetKv(), persistent)
 		bdata.SetKv(nil)
 	}
 	bdata.GetFilename()[0] = '0'
@@ -455,7 +404,7 @@ func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 /* }}} */
 
 func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if stage == 1<<0 {
+	if stage == core.PHP_INI_STAGE_STARTUP {
 
 		/* value handled in browscap.c's MINIT */
 
@@ -463,12 +412,12 @@ func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 
 		/* value handled in browscap.c's MINIT */
 
-	} else if stage == 1<<2 {
-		var bdata *BrowserData = &(BrowscapGlobals.GetActivationBdata())
+	} else if stage == core.PHP_INI_STAGE_ACTIVATE {
+		var bdata *BrowserData = &BROWSCAP_G(activation_bdata)
 		if bdata.GetFilename()[0] != '0' {
 			BrowscapBdataDtor(bdata, 0)
 		}
-		if zend.TsrmRealpath(new_value.val, bdata.GetFilename()) == nil {
+		if zend.VCWD_REALPATH(zend.ZSTR_VAL(new_value), bdata.GetFilename()) == nil {
 			return zend.FAILURE
 		}
 		return zend.SUCCESS
@@ -479,7 +428,7 @@ func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 /* }}} */
 
 func ZmStartupBrowscap(type_ int, module_number int) int {
-	var browscap *byte = zend.ZendIniStringEx("browscap", g.SizeOf("\"browscap\"")-1, 0, nil)
+	var browscap *byte = zend.INI_STR("browscap")
 
 	/* ctor call not really needed for non-ZTS */
 
@@ -494,7 +443,7 @@ func ZmStartupBrowscap(type_ int, module_number int) int {
 /* }}} */
 
 func ZmDeactivateBrowscap(type_ int, module_number int) int {
-	var bdata *BrowserData = &(BrowscapGlobals.GetActivationBdata())
+	var bdata *BrowserData = &BROWSCAP_G(activation_bdata)
 	if bdata.GetFilename()[0] != '0' {
 		BrowscapBdataDtor(bdata, 0)
 	}
@@ -513,7 +462,7 @@ func ZmShutdownBrowscap(type_ int, module_number int) int {
 func BrowscapGetMinimumLength(entry *BrowscapEntry) int {
 	var len_ int = entry.GetPrefixLen()
 	var i int
-	for i = 0; i < 5; i++ {
+	for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 		len_ += entry.GetContainsLen()[i]
 	}
 	return len_
@@ -531,33 +480,29 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 
 	/* Agent name too short */
 
-	if agent_name.len_ < BrowscapGetMinimumLength(entry) {
+	if zend.ZSTR_LEN(agent_name) < BrowscapGetMinimumLength(entry) {
 		return 0
 	}
 
 	/* Quickly discard patterns where the prefix doesn't match. */
 
-	if zend.ZendBinaryStrcasecmp(agent_name.val, entry.GetPrefixLen(), entry.GetPattern().val, entry.GetPrefixLen()) != 0 {
+	if zend.ZendBinaryStrcasecmp(zend.ZSTR_VAL(agent_name), entry.GetPrefixLen(), zend.ZSTR_VAL(entry.GetPattern()), entry.GetPrefixLen()) != 0 {
 		return 0
 	}
 
 	/* Lowercase the pattern, the agent name is already lowercase */
 
-	pattern_lc = (*zend.ZendString)(zend._emalloc(zend_long((*byte)(&((*zend.ZendString)(nil).val))-(*byte)(nil)) + entry.GetPattern().len_ + 1 + (8-1) & ^(8-1)))
-	zend.ZendGcSetRefcount(&pattern_lc.gc, 1)
-	pattern_lc.gc.u.type_info = 6
-	pattern_lc.h = 0
-	pattern_lc.len_ = entry.GetPattern().len_
-	zend.ZendStrTolowerCopy(pattern_lc.val, entry.GetPattern().val, entry.GetPattern().len_)
+	zend.ZSTR_ALLOCA_ALLOC(pattern_lc, zend.ZSTR_LEN(entry.GetPattern()), use_heap)
+	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(pattern_lc), zend.ZSTR_VAL(entry.GetPattern()), zend.ZSTR_LEN(entry.GetPattern()))
 
 	/* Check if the agent contains the "contains" portions */
 
-	cur = agent_name.val + entry.GetPrefixLen()
-	for i = 0; i < 5; i++ {
+	cur = zend.ZSTR_VAL(agent_name) + entry.GetPrefixLen()
+	for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 		if entry.GetContainsLen()[i] != 0 {
-			cur = zend.ZendMemnstr(cur, pattern_lc.val+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.val+agent_name.len_)
+			cur = zend.ZendMemnstr(cur, zend.ZSTR_VAL(pattern_lc)+entry.GetContainsStart()[i], entry.GetContainsLen()[i], zend.ZSTR_VAL(agent_name)+zend.ZSTR_LEN(agent_name))
 			if cur == nil {
-				zend._efree(pattern_lc)
+				zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 				return 0
 			}
 			cur += entry.GetContainsLen()[i]
@@ -568,23 +513,23 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 
 	if zend.ZendStringEquals(agent_name, pattern_lc) != 0 {
 		*found_entry_ptr = entry
-		zend._efree(pattern_lc)
+		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 		return 1
 	}
 	regex = BrowscapConvertPattern(entry.GetPattern(), 0)
 	re = pcre_get_compiled_regex(regex, &capture_count)
 	if re == nil {
-		zend._efree(pattern_lc)
+		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 		zend.ZendStringRelease(regex)
 		return 0
 	}
 	match_data = php_pcre_create_match_data(capture_count, re)
 	if match_data == nil {
-		zend._efree(pattern_lc)
+		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 		zend.ZendStringRelease(regex)
 		return 0
 	}
-	rc = pcre2_match(re, PCRE2_SPTR(agent_name).val, agent_name.len_, 0, 0, match_data, php_pcre_mctx())
+	rc = pcre2_match(re, PCRE2_SPTR(zend.ZSTR_VAL(agent_name)), zend.ZSTR_LEN(agent_name), 0, 0, match_data, php_pcre_mctx())
 	php_pcre_free_match_data(match_data)
 	if PCRE2_ERROR_NOMATCH != rc {
 
@@ -598,8 +543,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 			var curr_len int = 0
 			var previous_match *zend.ZendString = found_entry.GetPattern()
 			var current_match *zend.ZendString = entry.GetPattern()
-			for i = 0; i < previous_match.len_; i++ {
-				switch previous_match.val[i] {
+			for i = 0; i < zend.ZSTR_LEN(previous_match); i++ {
+				switch zend.ZSTR_VAL(previous_match)[i] {
 				case '?':
 
 				case '*':
@@ -611,8 +556,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 					prev_len++
 				}
 			}
-			for i = 0; i < current_match.len_; i++ {
-				switch current_match.val[i] {
+			for i = 0; i < zend.ZSTR_LEN(current_match); i++ {
+				switch zend.ZSTR_VAL(current_match)[i] {
 				case '?':
 
 				case '*':
@@ -644,7 +589,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 		   the previous match found and the current match. */
 
 	}
-	zend._efree(pattern_lc)
+	zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 	zend.ZendStringRelease(regex)
 	return 0
 }
@@ -652,17 +597,14 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 /* }}} */
 
 func BrowscapZvalCopyCtor(p *zend.Zval) {
-	if p.u1.v.type_flags != 0 {
+	if zend.Z_REFCOUNTED_P(p) {
 		var str *zend.ZendString
-		r.Assert(p.u1.v.type_ == 6)
-		str = p.value.str
-		if (zend.ZvalGcFlags(str.gc.u.type_info) & 1 << 7) == 0 {
-			zend.ZendGcAddref(&str.gc)
+		zend.ZEND_ASSERT(zend.Z_TYPE_P(p) == zend.IS_STRING)
+		str = zend.Z_STR_P(p)
+		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
+			zend.GC_ADDREF(str)
 		} else {
-			var __z *zend.Zval = p
-			var __s *zend.ZendString = zend.ZendStringInit(str.val, str.len_, 0)
-			__z.value.str = __s
-			__z.u1.type_info = 6 | 1<<0<<8
+			zend.ZVAL_NEW_STR(p, zend.ZendStringInit(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str), 0))
 		}
 	}
 }
@@ -676,18 +618,18 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	var bdata *BrowserData
 	var found_entry *BrowscapEntry = nil
 	var agent_ht *zend.HashTable
-	if BrowscapGlobals.GetActivationBdata().GetFilename()[0] != '0' {
-		bdata = &(BrowscapGlobals.GetActivationBdata())
+	if BROWSCAP_G(activation_bdata).filename[0] != '0' {
+		bdata = &BROWSCAP_G(activation_bdata)
 		if bdata.GetHtab() == nil {
 			if BrowscapReadFile(bdata.GetFilename(), bdata, 0) == zend.FAILURE {
-				return_value.u1.type_info = 2
+				zend.RETVAL_FALSE
 				return
 			}
 		}
 	} else {
 		if GlobalBdata.GetHtab() == nil {
-			core.PhpErrorDocref(nil, 1<<1, "browscap ini directive not set")
-			return_value.u1.type_info = 2
+			core.PhpErrorDocref(nil, zend.E_WARNING, "browscap ini directive not set")
+			zend.RETVAL_FALSE
 			return
 		}
 		bdata = &GlobalBdata
@@ -696,7 +638,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 0
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -704,7 +646,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -713,69 +655,49 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &agent_name, 1) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &agent_name, 1) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &return_array, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &return_array, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -788,17 +710,17 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	if agent_name == nil {
 		var http_user_agent *zend.Zval = nil
-		if core.CoreGlobals.http_globals[3].u1.v.type_ == 7 || zend.ZendIsAutoGlobalStr("_SERVER", g.SizeOf("\"_SERVER\"")-1) != 0 {
-			http_user_agent = zend.ZendHashStrFind(&core.CoreGlobals.http_globals[3].value.arr, "HTTP_USER_AGENT", g.SizeOf("\"HTTP_USER_AGENT\"")-1)
+		if zend.Z_TYPE(core.PG(http_globals)[core.TRACK_VARS_SERVER]) == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
+			http_user_agent = zend.ZendHashStrFind(zend.Z_ARRVAL_P(&core.PG(http_globals)[core.TRACK_VARS_SERVER]), "HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
 		}
 		if http_user_agent == nil {
-			core.PhpErrorDocref(nil, 1<<1, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
-			return_value.u1.type_info = 2
+			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
+			zend.RETVAL_FALSE
 			return
 		}
-		agent_name = http_user_agent.value.str
+		agent_name = zend.Z_STR_P(http_user_agent)
 	}
-	lookup_browser_name = zend.ZendStringTolowerEx(agent_name, 0)
+	lookup_browser_name = zend.ZendStringTolower(agent_name)
 	found_entry = zend.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
 	if found_entry == nil {
 		var entry *BrowscapEntry
@@ -809,10 +731,10 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = &_p.val
 
-				if _z.u1.v.type_ == 0 {
+				if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 					continue
 				}
-				entry = _z.value.ptr
+				entry = zend.Z_PTR_P(_z)
 				if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
 					break
 				}
@@ -820,20 +742,17 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			break
 		}
 		if found_entry == nil {
-			found_entry = zend.ZendHashStrFindPtr(bdata.GetHtab(), "Default Browser Capability Settings", g.SizeOf("DEFAULT_SECTION_NAME")-1)
+			found_entry = zend.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME, b.SizeOf("DEFAULT_SECTION_NAME")-1)
 			if found_entry == nil {
 				zend.ZendStringRelease(lookup_browser_name)
-				return_value.u1.type_info = 2
+				zend.RETVAL_FALSE
 				return
 			}
 		}
 	}
 	agent_ht = BrowscapEntryToArray(bdata, found_entry)
 	if return_array != 0 {
-		var __arr *zend.ZendArray = agent_ht
-		var __z *zend.Zval = return_value
-		__z.value.arr = __arr
-		__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+		zend.RETVAL_ARR(agent_ht)
 	} else {
 		zend.ObjectAndPropertiesInit(return_value, zend.ZendStandardClassDef, agent_ht)
 	}
@@ -844,12 +763,12 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		agent_ht = BrowscapEntryToArray(bdata, found_entry)
 		if return_array != 0 {
-			zend.ZendHashMerge(return_value.value.arr, agent_ht, zend.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			zend.ZendHashMerge(zend.Z_ARRVAL_P(return_value), agent_ht, zend.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		} else {
-			zend.ZendHashMerge(return_value.value.obj.handlers.get_properties(&(*return_value)), agent_ht, zend.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
+			zend.ZendHashMerge(zend.Z_OBJPROP_P(return_value), agent_ht, zend.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		}
 		zend.ZendHashDestroy(agent_ht)
-		zend._efree(agent_ht)
+		zend.Efree(agent_ht)
 	}
 	zend.ZendStringReleaseEx(lookup_browser_name, 0)
 }

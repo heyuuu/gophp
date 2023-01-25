@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	"sik/core"
+)
+
 // Source: <Zend/zend_range_check.h>
 
 /*
@@ -30,38 +34,48 @@ package zend
    always sizeof(signed) == sizeof(unsigned), so no need to
    overcomplicate things. */
 
-// #define ZEND_LONG_CAN_OVFL_INT       1
-
-// #define ZEND_LONG_CAN_OVFL_UINT       1
+const ZEND_LONG_CAN_OVFL_INT = 1
+const ZEND_LONG_CAN_OVFL_UINT = 1
 
 /* size_t can always overflow signed int on the same platform.
    Furthermore, by the current design, size_t can always
    overflow zend_long. */
 
-// #define ZEND_SIZE_T_CAN_OVFL_UINT       1
+const ZEND_SIZE_T_CAN_OVFL_UINT = 1
 
 /* zend_long vs. (unsigned) int checks. */
 
-// #define ZEND_LONG_INT_OVFL(zlong) UNEXPECTED ( ( zlong ) > ( zend_long ) INT_MAX )
-
-// #define ZEND_LONG_INT_UDFL(zlong) UNEXPECTED ( ( zlong ) < ( zend_long ) INT_MIN )
-
-// #define ZEND_LONG_EXCEEDS_INT(zlong) UNEXPECTED ( ZEND_LONG_INT_OVFL ( zlong ) || ZEND_LONG_INT_UDFL ( zlong ) )
-
-// #define ZEND_LONG_UINT_OVFL(zlong) UNEXPECTED ( ( zlong ) < 0 || ( zlong ) > ( zend_long ) UINT_MAX )
+func ZEND_LONG_INT_OVFL(zlong __auto__) __auto__ {
+	return UNEXPECTED(zlong > ZendLong(core.INT_MAX))
+}
+func ZEND_LONG_INT_UDFL(zlong __auto__) __auto__ {
+	return UNEXPECTED(zlong < ZendLong(core.INT_MIN))
+}
+func ZEND_LONG_EXCEEDS_INT(zlong __auto__) __auto__ {
+	return UNEXPECTED(ZEND_LONG_INT_OVFL(zlong) || ZEND_LONG_INT_UDFL(zlong))
+}
+func ZEND_LONG_UINT_OVFL(zlong __auto__) __auto__ {
+	return UNEXPECTED(zlong < 0 || zlong > ZendLong(UINT_MAX))
+}
 
 /* size_t vs (unsigned) int checks. */
 
-// #define ZEND_SIZE_T_INT_OVFL(size) UNEXPECTED ( ( size ) > ( size_t ) INT_MAX )
-
-// #define ZEND_SIZE_T_UINT_OVFL(size) UNEXPECTED ( ( size ) > ( size_t ) UINT_MAX )
+func ZEND_SIZE_T_INT_OVFL(size int) __auto__ {
+	return UNEXPECTED(size > int(core.INT_MAX))
+}
+func ZEND_SIZE_T_UINT_OVFL(size __auto__) __auto__ { return UNEXPECTED(size > int(UINT_MAX)) }
 
 /* Comparison zend_long vs size_t */
 
-// #define ZEND_SIZE_T_GT_ZEND_LONG(size,zlong) ( ( zlong ) < 0 || ( size ) > ( size_t ) ( zlong ) )
-
-// #define ZEND_SIZE_T_GTE_ZEND_LONG(size,zlong) ( ( zlong ) < 0 || ( size ) >= ( size_t ) ( zlong ) )
-
-// #define ZEND_SIZE_T_LT_ZEND_LONG(size,zlong) ( ( zlong ) >= 0 && ( size ) < ( size_t ) ( zlong ) )
-
-// #define ZEND_SIZE_T_LTE_ZEND_LONG(size,zlong) ( ( zlong ) >= 0 && ( size ) <= ( size_t ) ( zlong ) )
+func ZEND_SIZE_T_GT_ZEND_LONG(size __auto__, zlong __auto__) bool {
+	return zlong < 0 || size > size_t(zlong)
+}
+func ZEND_SIZE_T_GTE_ZEND_LONG(size __auto__, zlong __auto__) bool {
+	return zlong < 0 || size >= size_t(zlong)
+}
+func ZEND_SIZE_T_LT_ZEND_LONG(size __auto__, zlong __auto__) bool {
+	return zlong >= 0 && size < size_t(zlong)
+}
+func ZEND_SIZE_T_LTE_ZEND_LONG(size __auto__, zlong __auto__) bool {
+	return zlong >= 0 && size <= size_t(zlong)
+}

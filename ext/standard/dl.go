@@ -3,9 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -77,7 +76,7 @@ import (
 
 // # include < sys / param . h >
 
-// #define GET_DL_ERROR() DL_ERROR ( )
+func GET_DL_ERROR() __auto__ { return zend.DL_ERROR() }
 
 /* {{{ proto int dl(string extension_filename)
    Load a PHP extension at runtime */
@@ -89,7 +88,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -97,7 +96,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -106,52 +105,42 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &filename, &filename_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &filename, &filename_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -162,19 +151,19 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if core.CoreGlobals.enable_dl == 0 {
-		core.PhpErrorDocref(nil, 1<<1, "Dynamically loaded extensions aren't enabled")
-		return_value.u1.type_info = 2
+	if !(core.PG(enable_dl)) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Dynamically loaded extensions aren't enabled")
+		zend.RETVAL_FALSE
 		return
 	}
-	if filename_len >= 256 {
-		core.PhpErrorDocref(nil, 1<<1, "File name exceeds the maximum allowed length of %d characters", 256)
-		return_value.u1.type_info = 2
+	if filename_len >= core.MAXPATHLEN {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "File name exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
+		zend.RETVAL_FALSE
 		return
 	}
-	PhpDl(filename, 2, return_value, 0)
-	if return_value.u1.v.type_ == 3 {
-		zend.EG.full_tables_cleanup = 1
+	PhpDl(filename, zend.MODULE_TEMPORARY, return_value, 0)
+	if zend.Z_TYPE_P(return_value) == zend.IS_TRUE {
+		zend.ExecutorGlobals.full_tables_cleanup = 1
 	}
 }
 
@@ -186,11 +175,11 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 func PhpLoadShlib(path *byte, errp **byte) any {
 	var handle any
 	var err *byte
-	handle = dlopen(path, 1|0)
+	handle = zend.DL_LOAD(path)
 	if !handle {
-		err = dlerror()
-		*errp = zend._estrdup(err)
-		dlerror()
+		err = GET_DL_ERROR()
+		*errp = zend.Estrdup(err)
+		GET_DL_ERROR()
 	}
 	return handle
 }
@@ -207,37 +196,37 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 	var extension_dir *byte
 	var err1 *byte
 	var err2 *byte
-	if type_ == 1 {
-		extension_dir = zend.ZendIniStringEx("extension_dir", g.SizeOf("\"extension_dir\"")-1, 0, nil)
+	if type_ == zend.MODULE_PERSISTENT {
+		extension_dir = zend.INI_STR("extension_dir")
 	} else {
-		extension_dir = core.CoreGlobals.extension_dir
+		extension_dir = core.PG(extension_dir)
 	}
-	if type_ == 2 {
-		error_type = 1 << 1
+	if type_ == zend.MODULE_TEMPORARY {
+		error_type = zend.E_WARNING
 	} else {
-		error_type = 1 << 5
+		error_type = zend.E_CORE_WARNING
 	}
 
 	/* Check if passed filename contains directory separators */
 
-	if strchr(filename, '/') != nil || strchr(filename, '/') != nil {
+	if strchr(filename, '/') != nil || strchr(filename, zend.DEFAULT_SLASH) != nil {
 
 		/* Passing modules with full path is not supported for dynamically loaded extensions */
 
-		if type_ == 2 {
-			core.PhpErrorDocref(nil, 1<<1, "Temporary module name should contain only filename")
+		if type_ == zend.MODULE_TEMPORARY {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Temporary module name should contain only filename")
 			return zend.FAILURE
 		}
-		libpath = zend._estrdup(filename)
+		libpath = zend.Estrdup(filename)
 	} else if extension_dir != nil && extension_dir[0] {
-		slash_suffix = extension_dir[strlen(extension_dir)-1] == '/'
+		slash_suffix = zend.IS_SLASH(extension_dir[strlen(extension_dir)-1])
 
 		/* Try as filename first */
 
 		if slash_suffix != 0 {
-			zend.ZendSpprintf(&libpath, 0, "%s%s", extension_dir, filename)
+			core.Spprintf(&libpath, 0, "%s%s", extension_dir, filename)
 		} else {
-			zend.ZendSpprintf(&libpath, 0, "%s%c%s", extension_dir, '/', filename)
+			core.Spprintf(&libpath, 0, "%s%c%s", extension_dir, zend.DEFAULT_SLASH, filename)
 		}
 
 		/* Try as filename first */
@@ -252,68 +241,68 @@ func PhpLoadExtension(filename *byte, type_ int, start_now int) int {
 
 		var orig_libpath *byte = libpath
 		if slash_suffix != 0 {
-			zend.ZendSpprintf(&libpath, 0, "%s"+""+"%s."+"so", extension_dir, filename)
+			core.Spprintf(&libpath, 0, "%s"+core.PHP_SHLIB_EXT_PREFIX+"%s."+core.PHP_SHLIB_SUFFIX, extension_dir, filename)
 		} else {
-			zend.ZendSpprintf(&libpath, 0, "%s%c"+""+"%s."+"so", extension_dir, '/', filename)
+			core.Spprintf(&libpath, 0, "%s%c"+core.PHP_SHLIB_EXT_PREFIX+"%s."+core.PHP_SHLIB_SUFFIX, extension_dir, zend.DEFAULT_SLASH, filename)
 		}
 		handle = PhpLoadShlib(libpath, &err2)
 		if !handle {
 			core.PhpErrorDocref(nil, error_type, "Unable to load dynamic library '%s' (tried: %s (%s), %s (%s))", filename, orig_libpath, err1, libpath, err2)
-			zend._efree(orig_libpath)
-			zend._efree(err1)
-			zend._efree(libpath)
-			zend._efree(err2)
+			zend.Efree(orig_libpath)
+			zend.Efree(err1)
+			zend.Efree(libpath)
+			zend.Efree(err2)
 			return zend.FAILURE
 		}
-		zend._efree(orig_libpath)
-		zend._efree(err1)
+		zend.Efree(orig_libpath)
+		zend.Efree(err1)
 	}
-	zend._efree(libpath)
-	get_module = (func() *zend.ZendModuleEntry)(dlsym(handle, "get_module"))
+	zend.Efree(libpath)
+	get_module = (func() *zend.ZendModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "get_module"))
 
 	/* Some OS prepend _ to symbol names while their dynamic linker
 	 * does not do that automatically. Thus we check manually for
 	 * _get_module. */
 
 	if get_module == nil {
-		get_module = (func() *zend.ZendModuleEntry)(dlsym(handle, "_get_module"))
+		get_module = (func() *zend.ZendModuleEntry)(zend.DL_FETCH_SYMBOL(handle, "_get_module"))
 	}
 	if get_module == nil {
-		if dlsym(handle, "zend_extension_entry") || dlsym(handle, "_zend_extension_entry") {
-			dlclose(handle)
+		if zend.DL_FETCH_SYMBOL(handle, "zend_extension_entry") || zend.DL_FETCH_SYMBOL(handle, "_zend_extension_entry") {
+			zend.DL_UNLOAD(handle)
 			core.PhpErrorDocref(nil, error_type, "Invalid library (appears to be a Zend Extension, try loading using zend_extension=%s from php.ini)", filename)
 			return zend.FAILURE
 		}
-		dlclose(handle)
+		zend.DL_UNLOAD(handle)
 		core.PhpErrorDocref(nil, error_type, "Invalid library (maybe not a PHP library) '%s'", filename)
 		return zend.FAILURE
 	}
 	module_entry = get_module()
-	if module_entry.zend_api != 20190902 {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.name, module_entry.zend_api, 20190902)
-		dlclose(handle)
+	if module_entry.zend_api != zend.ZEND_MODULE_API_NO {
+		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with module API=%d\n"+"PHP    compiled with module API=%d\n"+"These options need to match\n", module_entry.name, module_entry.zend_api, zend.ZEND_MODULE_API_NO)
+		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	if strcmp(module_entry.build_id, "API"+"20190902"+",NTS") {
-		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.name, module_entry.build_id, "API"+"20190902"+",NTS")
-		dlclose(handle)
+	if strcmp(module_entry.build_id, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS) {
+		core.PhpErrorDocref(nil, error_type, "%s: Unable to initialize module\n"+"Module compiled with build ID=%s\n"+"PHP    compiled with build ID=%s\n"+"These options need to match\n", module_entry.name, module_entry.build_id, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
 	module_entry.type_ = type_
 	module_entry.module_number = zend.ZendNextFreeModule()
 	module_entry.handle = handle
-	if g.Assign(&module_entry, zend.ZendRegisterModuleEx(module_entry)) == nil {
-		dlclose(handle)
+	if b.Assign(&module_entry, zend.ZendRegisterModuleEx(module_entry)) == nil {
+		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	if (type_ == 2 || start_now != 0) && zend.ZendStartupModuleEx(module_entry) == zend.FAILURE {
-		dlclose(handle)
+	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && zend.ZendStartupModuleEx(module_entry) == zend.FAILURE {
+		zend.DL_UNLOAD(handle)
 		return zend.FAILURE
 	}
-	if (type_ == 2 || start_now != 0) && module_entry.request_startup_func != nil {
+	if (type_ == zend.MODULE_TEMPORARY || start_now != 0) && module_entry.request_startup_func != nil {
 		if module_entry.request_startup_func(type_, module_entry.module_number) == zend.FAILURE {
 			core.PhpErrorDocref(nil, error_type, "Unable to initialize module '%s'", module_entry.name)
-			dlclose(handle)
+			zend.DL_UNLOAD(handle)
 			return zend.FAILURE
 		}
 	}
@@ -326,9 +315,9 @@ func PhpDl(file *byte, type_ int, return_value *zend.Zval, start_now int) {
 	/* Load extension */
 
 	if PhpLoadExtension(file, type_, start_now) == zend.FAILURE {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 	} else {
-		return_value.u1.type_info = 3
+		zend.RETVAL_TRUE
 	}
 
 	/* Load extension */
@@ -336,6 +325,6 @@ func PhpDl(file *byte, type_ int, return_value *zend.Zval, start_now int) {
 
 /* }}} */
 
-func ZmInfoDl(zend_module *zend.ZendModuleEntry) {
+func ZmInfoDl(ZEND_MODULE_INFO_FUNC_ARGS) {
 	PhpInfoPrintTableRow(2, "Dynamic Library Support", "enabled")
 }

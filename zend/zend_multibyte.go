@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_multibyte.h>
@@ -87,11 +87,7 @@ func DummyEncodingConverter(to **uint8, to_length *int, from *uint8, from_length
 	return size_t - 1
 }
 func DummyEncodingListParser(encoding_list *byte, encoding_list_len int, return_list ***ZendEncoding, return_size *int, persistent int) int {
-	if persistent != 0 {
-		*return_list = __zendMalloc(0)
-	} else {
-		*return_list = _emalloc(0)
-	}
+	*return_list = Pemalloc(0, persistent)
 	*return_size = 0
 	return SUCCESS
 }
@@ -134,7 +130,7 @@ func ZendMultibyteSetFunctions(functions *ZendMultibyteFunctions) int {
 	 * populated, we need to reinitialize script_encoding here.
 	 */
 
-	var value *byte = ZendIniString("zend.script_encoding", g.SizeOf("\"zend.script_encoding\"")-1, 0)
+	var value *byte = ZendIniString("zend.script_encoding", b.SizeOf("\"zend.script_encoding\"")-1, 0)
 	ZendMultibyteSetScriptEncodingByString(value, strlen(value))
 	return SUCCESS
 }
@@ -169,13 +165,15 @@ func ZendMultibyteParseEncodingList(encoding_list *byte, encoding_list_len int, 
 func ZendMultibyteGetInternalEncoding() *ZendEncoding {
 	return MultibyteFunctions.GetInternalEncodingGetter()()
 }
-func ZendMultibyteGetScriptEncoding() *ZendEncoding { return LANG_SCNG.GetScriptEncoding() }
+func ZendMultibyteGetScriptEncoding() *ZendEncoding {
+	return LanguageScannerGlobals.GetScriptEncoding()
+}
 func ZendMultibyteSetScriptEncoding(encoding_list **ZendEncoding, encoding_list_size int) int {
-	if CG.GetScriptEncodingList() != nil {
-		Free((*byte)(CG.GetScriptEncodingList()))
+	if CompilerGlobals.GetScriptEncodingList() != nil {
+		Free((*byte)(CompilerGlobals.GetScriptEncodingList()))
 	}
-	CG.SetScriptEncodingList(encoding_list)
-	CG.SetScriptEncodingListSize(encoding_list_size)
+	CompilerGlobals.SetScriptEncodingList(encoding_list)
+	CompilerGlobals.SetScriptEncodingListSize(encoding_list_size)
 	return SUCCESS
 }
 func ZendMultibyteSetInternalEncoding(encoding *ZendEncoding) int {
@@ -192,7 +190,7 @@ func ZendMultibyteSetScriptEncodingByString(new_value *byte, new_value_length in
 		return FAILURE
 	}
 	if size == 0 {
-		g.CondF(true, func() { return Free(any(list)) }, func() { return _efree(any(list)) })
+		Pefree(any(list), 1)
 		return FAILURE
 	}
 	if FAILURE == ZendMultibyteSetScriptEncoding(list, size) {

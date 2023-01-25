@@ -24,47 +24,35 @@ package core
 
 // #define PHP_OUTPUT_H
 
-// #define PHP_OUTPUT_NEWAPI       1
+const PHP_OUTPUT_NEWAPI = 1
 
 /* handler ops */
 
-// #define PHP_OUTPUT_HANDLER_WRITE       0x00
-
-// #define PHP_OUTPUT_HANDLER_START       0x01
-
-// #define PHP_OUTPUT_HANDLER_CLEAN       0x02
-
-// #define PHP_OUTPUT_HANDLER_FLUSH       0x04
-
-// #define PHP_OUTPUT_HANDLER_FINAL       0x08
-
-// #define PHP_OUTPUT_HANDLER_CONT       PHP_OUTPUT_HANDLER_WRITE
-
-// #define PHP_OUTPUT_HANDLER_END       PHP_OUTPUT_HANDLER_FINAL
+const PHP_OUTPUT_HANDLER_WRITE = 0x0
+const PHP_OUTPUT_HANDLER_START = 0x1
+const PHP_OUTPUT_HANDLER_CLEAN = 0x2
+const PHP_OUTPUT_HANDLER_FLUSH = 0x4
+const PHP_OUTPUT_HANDLER_FINAL = 0x8
+const PHP_OUTPUT_HANDLER_CONT = PHP_OUTPUT_HANDLER_WRITE
+const PHP_OUTPUT_HANDLER_END = PHP_OUTPUT_HANDLER_FINAL
 
 /* handler types */
 
-// #define PHP_OUTPUT_HANDLER_INTERNAL       0x0000
-
-// #define PHP_OUTPUT_HANDLER_USER       0x0001
+const PHP_OUTPUT_HANDLER_INTERNAL = 0x0
+const PHP_OUTPUT_HANDLER_USER = 0x1
 
 /* handler ability flags */
 
-// #define PHP_OUTPUT_HANDLER_CLEANABLE       0x0010
-
-// #define PHP_OUTPUT_HANDLER_FLUSHABLE       0x0020
-
-// #define PHP_OUTPUT_HANDLER_REMOVABLE       0x0040
-
-// #define PHP_OUTPUT_HANDLER_STDFLAGS       0x0070
+const PHP_OUTPUT_HANDLER_CLEANABLE = 0x10
+const PHP_OUTPUT_HANDLER_FLUSHABLE = 0x20
+const PHP_OUTPUT_HANDLER_REMOVABLE = 0x40
+const PHP_OUTPUT_HANDLER_STDFLAGS = 0x70
 
 /* handler status flags */
 
-// #define PHP_OUTPUT_HANDLER_STARTED       0x1000
-
-// #define PHP_OUTPUT_HANDLER_DISABLED       0x2000
-
-// #define PHP_OUTPUT_HANDLER_PROCESSED       0x4000
+const PHP_OUTPUT_HANDLER_STARTED = 0x1000
+const PHP_OUTPUT_HANDLER_DISABLED = 0x2000
+const PHP_OUTPUT_HANDLER_PROCESSED = 0x4000
 
 /* handler op return values */
 
@@ -78,33 +66,26 @@ const (
 
 /* php_output_stack_pop() flags */
 
-// #define PHP_OUTPUT_POP_TRY       0x000
-
-// #define PHP_OUTPUT_POP_FORCE       0x001
-
-// #define PHP_OUTPUT_POP_DISCARD       0x010
-
-// #define PHP_OUTPUT_POP_SILENT       0x100
+const PHP_OUTPUT_POP_TRY = 0x0
+const PHP_OUTPUT_POP_FORCE = 0x1
+const PHP_OUTPUT_POP_DISCARD = 0x10
+const PHP_OUTPUT_POP_SILENT = 0x100
 
 /* real global flags */
 
-// #define PHP_OUTPUT_IMPLICITFLUSH       0x01
-
-// #define PHP_OUTPUT_DISABLED       0x02
-
-// #define PHP_OUTPUT_WRITTEN       0x04
-
-// #define PHP_OUTPUT_SENT       0x08
+const PHP_OUTPUT_IMPLICITFLUSH = 0x1
+const PHP_OUTPUT_DISABLED = 0x2
+const PHP_OUTPUT_WRITTEN = 0x4
+const PHP_OUTPUT_SENT = 0x8
 
 /* supplementary flags for php_output_get_status() */
 
-// #define PHP_OUTPUT_ACTIVE       0x10
-
-// #define PHP_OUTPUT_LOCKED       0x20
+const PHP_OUTPUT_ACTIVE = 0x10
+const PHP_OUTPUT_LOCKED = 0x20
 
 /* output layer is ready to use */
 
-// #define PHP_OUTPUT_ACTIVATED       0x100000
+const PHP_OUTPUT_ACTIVATED = 0x100000
 
 /* handler hooks */
 
@@ -119,11 +100,16 @@ const (
 	PHP_OUTPUT_HANDLER_HOOK_LAST
 )
 
-// #define PHP_OUTPUT_HANDLER_INITBUF_SIZE(s) ( ( ( s ) > 1 ) ? ( s ) + PHP_OUTPUT_HANDLER_ALIGNTO_SIZE - ( ( s ) % ( PHP_OUTPUT_HANDLER_ALIGNTO_SIZE ) ) : PHP_OUTPUT_HANDLER_DEFAULT_SIZE )
+func PHP_OUTPUT_HANDLER_INITBUF_SIZE(s int) __auto__ {
+	if s > 1 {
+		return s + PHP_OUTPUT_HANDLER_ALIGNTO_SIZE - s%PHP_OUTPUT_HANDLER_ALIGNTO_SIZE
+	} else {
+		return PHP_OUTPUT_HANDLER_DEFAULT_SIZE
+	}
+}
 
-// #define PHP_OUTPUT_HANDLER_ALIGNTO_SIZE       0x1000
-
-// #define PHP_OUTPUT_HANDLER_DEFAULT_SIZE       0x4000
+const PHP_OUTPUT_HANDLER_ALIGNTO_SIZE = 0x1000
+const PHP_OUTPUT_HANDLER_DEFAULT_SIZE = 0x4000
 
 /* old-style, stateless callback */
 
@@ -147,25 +133,35 @@ type PhpOutputHandlerAliasCtorT func(handler_name *byte, handler_name_len int, c
 
 /* there should not be a need to use OG() from outside of output.c */
 
-// #define OG(v) ( output_globals . v )
+func OG(v **PhpOutputHandler) __auto__ { return OutputGlobals.v }
 
 /* convenience macros */
 
-// #define PHPWRITE(str,str_len) php_output_write ( ( str ) , ( str_len ) )
-
-// #define PHPWRITE_H(str,str_len) php_output_write_unbuffered ( ( str ) , ( str_len ) )
-
-// #define PUTC(c) php_output_write ( ( const char * ) & ( c ) , 1 )
-
-// #define PUTC_H(c) php_output_write_unbuffered ( ( const char * ) & ( c ) , 1 )
-
-// #define PUTS(str) do { const char * __str = ( str ) ; php_output_write ( __str , strlen ( __str ) ) ; } while ( 0 )
-
-// #define PUTS_H(str) do { const char * __str = ( str ) ; php_output_write_unbuffered ( __str , strlen ( __str ) ) ; } while ( 0 )
-
-// #define php_output_tearup() php_output_startup ( ) ; php_output_activate ( )
-
-// #define php_output_teardown() php_output_end_all ( ) ; php_output_deactivate ( ) ; php_output_shutdown ( )
+func PHPWRITE(str *byte, str_len int) int { return PhpOutputWrite(str, str_len) }
+func PHPWRITE_H(str *byte, str_len int) int {
+	return PhpOutputWriteUnbuffered(str, str_len)
+}
+func PUTC(c __auto__) int { return PhpOutputWrite((*byte)(&c), 1) }
+func PUTC_H(c __auto__) int {
+	return PhpOutputWriteUnbuffered((*byte)(&c), 1)
+}
+func PUTS(str string) {
+	var __str *byte = str
+	PhpOutputWrite(__str, strlen(__str))
+}
+func PUTS_H(str *byte) {
+	var __str *byte = str
+	PhpOutputWriteUnbuffered(__str, strlen(__str))
+}
+func PhpOutputTearup() {
+	PhpOutputStartup()
+	PhpOutputActivate()
+}
+func PhpOutputTeardown() {
+	PhpOutputEndAll()
+	PhpOutputDeactivate()
+	PhpOutputShutdown()
+}
 
 /* MINIT */
 

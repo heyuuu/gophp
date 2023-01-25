@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_ini.h>
@@ -28,13 +28,10 @@ import (
 
 // #define ZEND_INI_H
 
-// #define ZEND_INI_USER       ( 1 << 0 )
-
-// #define ZEND_INI_PERDIR       ( 1 << 1 )
-
-// #define ZEND_INI_SYSTEM       ( 1 << 2 )
-
-// #define ZEND_INI_ALL       ( ZEND_INI_USER | ZEND_INI_PERDIR | ZEND_INI_SYSTEM )
+const ZEND_INI_USER = 1 << 0
+const ZEND_INI_PERDIR ZendLong = 1 << 1
+const ZEND_INI_SYSTEM uint8 = 1 << 2
+const ZEND_INI_ALL ZendLong = ZEND_INI_USER | ZEND_INI_PERDIR | ZEND_INI_SYSTEM
 
 // #define ZEND_INI_MH(name) int name ( zend_ini_entry * entry , zend_string * new_value , void * mh_arg1 , void * mh_arg2 , void * mh_arg3 , int stage )
 
@@ -70,51 +67,49 @@ var DisplayIniEntries func(module *ZendModuleEntry)
 
 // #define STD_ZEND_INI_BOOLEAN(name,default_value,modifiable,on_modify,property_name,struct_type,struct_ptr) ZEND_INI_ENTRY3_EX ( name , default_value , modifiable , on_modify , ( void * ) XtOffsetOf ( struct_type , property_name ) , ( void * ) & struct_ptr , NULL , zend_ini_boolean_displayer_cb )
 
-// #define INI_INT(name) zend_ini_long ( ( name ) , sizeof ( name ) - 1 , 0 )
-
-// #define INI_FLT(name) zend_ini_double ( ( name ) , sizeof ( name ) - 1 , 0 )
-
-// #define INI_STR(name) zend_ini_string_ex ( ( name ) , sizeof ( name ) - 1 , 0 , NULL )
-
-// #define INI_BOOL(name) ( ( zend_bool ) INI_INT ( name ) )
-
-// #define INI_ORIG_INT(name) zend_ini_long ( ( name ) , sizeof ( name ) - 1 , 1 )
-
-// #define INI_ORIG_FLT(name) zend_ini_double ( ( name ) , sizeof ( name ) - 1 , 1 )
-
-// #define INI_ORIG_STR(name) zend_ini_string ( ( name ) , sizeof ( name ) - 1 , 1 )
-
-// #define INI_ORIG_BOOL(name) ( ( zend_bool ) INI_ORIG_INT ( name ) )
-
-// #define REGISTER_INI_ENTRIES() zend_register_ini_entries ( ini_entries , module_number )
-
-// #define UNREGISTER_INI_ENTRIES() zend_unregister_ini_entries ( module_number )
-
-// #define DISPLAY_INI_ENTRIES() display_ini_entries ( zend_module )
-
-// #define REGISTER_INI_DISPLAYER(name,displayer) zend_ini_register_displayer ( ( name ) , sizeof ( name ) - 1 , displayer )
-
-// #define REGISTER_INI_BOOLEAN(name) REGISTER_INI_DISPLAYER ( name , zend_ini_boolean_displayer_cb )
+func INI_INT(name string) ZendLong {
+	return ZendIniLong(name, b.SizeOf("name")-1, 0)
+}
+func INI_FLT(name *byte) float64 {
+	return ZendIniDouble(name, b.SizeOf("name")-1, 0)
+}
+func INI_STR(name string) *byte {
+	return ZendIniStringEx(name, b.SizeOf("name")-1, 0, nil)
+}
+func INI_BOOL(name *byte) ZendBool { return ZendBool(INI_INT(name)) }
+func INI_ORIG_INT(name *byte) ZendLong {
+	return ZendIniLong(name, b.SizeOf("name")-1, 1)
+}
+func INI_ORIG_FLT(name *byte) float64 {
+	return ZendIniDouble(name, b.SizeOf("name")-1, 1)
+}
+func INI_ORIG_STR(name *byte) *byte {
+	return ZendIniString(name, b.SizeOf("name")-1, 1)
+}
+func INI_ORIG_BOOL(name *byte) ZendBool { return ZendBool(INI_ORIG_INT(name)) }
+func REGISTER_INI_ENTRIES() int {
+	return ZendRegisterIniEntries(IniEntries, module_number)
+}
+func UNREGISTER_INI_ENTRIES() { ZendUnregisterIniEntries(module_number) }
+func DISPLAY_INI_ENTRIES()    { DisplayIniEntries(zend_module) }
+func REGISTER_INI_DISPLAYER(name *byte, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
+	return ZendIniRegisterDisplayer(name, b.SizeOf("name")-1, displayer)
+}
+func REGISTER_INI_BOOLEAN(name *byte) int {
+	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
+}
 
 /* Standard message handlers */
 
-// #define ZEND_INI_DISPLAY_ORIG       1
-
-// #define ZEND_INI_DISPLAY_ACTIVE       2
-
-// #define ZEND_INI_STAGE_STARTUP       ( 1 << 0 )
-
-// #define ZEND_INI_STAGE_SHUTDOWN       ( 1 << 1 )
-
-// #define ZEND_INI_STAGE_ACTIVATE       ( 1 << 2 )
-
-// #define ZEND_INI_STAGE_DEACTIVATE       ( 1 << 3 )
-
-// #define ZEND_INI_STAGE_RUNTIME       ( 1 << 4 )
-
-// #define ZEND_INI_STAGE_HTACCESS       ( 1 << 5 )
-
-// #define ZEND_INI_STAGE_IN_REQUEST       ( ZEND_INI_STAGE_ACTIVATE | ZEND_INI_STAGE_DEACTIVATE | ZEND_INI_STAGE_RUNTIME | ZEND_INI_STAGE_HTACCESS )
+const ZEND_INI_DISPLAY_ORIG = 1
+const ZEND_INI_DISPLAY_ACTIVE = 2
+const ZEND_INI_STAGE_STARTUP = 1 << 0
+const ZEND_INI_STAGE_SHUTDOWN = 1 << 1
+const ZEND_INI_STAGE_ACTIVATE = 1 << 2
+const ZEND_INI_STAGE_DEACTIVATE = 1 << 3
+const ZEND_INI_STAGE_RUNTIME = 1 << 4
+const ZEND_INI_STAGE_HTACCESS = 1 << 5
+const ZEND_INI_STAGE_IN_REQUEST = ZEND_INI_STAGE_ACTIVATE | ZEND_INI_STAGE_DEACTIVATE | ZEND_INI_STAGE_RUNTIME | ZEND_INI_STAGE_HTACCESS
 
 /* INI parsing engine */
 
@@ -122,11 +117,9 @@ type ZendIniParserCbT func(arg1 *Zval, arg2 *Zval, arg3 *Zval, callback_type int
 
 /* INI entries */
 
-// #define ZEND_INI_PARSER_ENTRY       1
-
-// #define ZEND_INI_PARSER_SECTION       2
-
-// #define ZEND_INI_PARSER_POP_ENTRY       3
+const ZEND_INI_PARSER_ENTRY = 1
+const ZEND_INI_PARSER_SECTION = 2
+const ZEND_INI_PARSER_POP_ENTRY = 3
 
 // Source: <Zend/zend_ini.c>
 
@@ -164,16 +157,15 @@ type ZendIniParserCbT func(arg1 *Zval, arg2 *Zval, arg3 *Zval, callback_type int
 
 var RegisteredZendIniDirectives *HashTable
 
-// #define NO_VALUE_PLAINTEXT       "no value"
-
-// #define NO_VALUE_HTML       "<i>no value</i>"
+const NO_VALUE_PLAINTEXT = "no value"
+const NO_VALUE_HTML = "<i>no value</i>"
 
 /*
  * hash_apply functions
  */
 
 func ZendRemoveIniEntries(el *Zval, arg any) int {
-	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.GetValue().GetPtr())
+	var ini_entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(el))
 	var module_number int = *((*int)(arg))
 	return ini_entry.GetModuleNumber() == module_number
 }
@@ -184,10 +176,10 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 	var result int = FAILURE
 	if ini_entry.GetModified() != 0 {
 		if ini_entry.GetOnModify() != nil {
-			var __orig_bailout *sigjmp_buf = EG.GetBailout()
-			var __bailout sigjmp_buf
-			EG.SetBailout(&__bailout)
-			if sigsetjmp(__bailout, 0) == 0 {
+			var __orig_bailout *JMP_BUF = ExecutorGlobals.GetBailout()
+			var __bailout JMP_BUF
+			ExecutorGlobals.SetBailout(&__bailout)
+			if SETJMP(__bailout) == 0 {
 
 				/* even if on_modify bails out, we have to continue on with restoring,
 				   since there can be allocated variables that would be freed on MM shutdown
@@ -200,9 +192,9 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 				   and would lead to memory corruption later ini entry is modified again */
 
 			}
-			EG.SetBailout(__orig_bailout)
+			ExecutorGlobals.SetBailout(__orig_bailout)
 		}
-		if stage == 1<<4 && result == FAILURE {
+		if stage == ZEND_INI_STAGE_RUNTIME && result == FAILURE {
 
 			/* runtime failure is OK */
 
@@ -226,7 +218,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 /* }}} */
 
 func FreeIniEntry(zv *Zval) {
-	var entry *ZendIniEntry = (*ZendIniEntry)(zv.GetValue().GetPtr())
+	var entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(zv))
 	ZendStringReleaseEx(entry.GetName(), 1)
 	if entry.GetValue() != nil {
 		ZendStringRelease(entry.GetValue())
@@ -240,18 +232,18 @@ func FreeIniEntry(zv *Zval) {
 /* }}} */
 
 func ZendIniStartup() int {
-	RegisteredZendIniDirectives = (*HashTable)(Malloc(g.SizeOf("HashTable")))
-	EG.SetIniDirectives(RegisteredZendIniDirectives)
-	EG.SetModifiedIniDirectives(nil)
-	EG.SetErrorReportingIniEntry(nil)
-	_zendHashInit(RegisteredZendIniDirectives, 128, FreeIniEntry, 1)
+	RegisteredZendIniDirectives = (*HashTable)(Malloc(b.SizeOf("HashTable")))
+	ExecutorGlobals.SetIniDirectives(RegisteredZendIniDirectives)
+	ExecutorGlobals.SetModifiedIniDirectives(nil)
+	ExecutorGlobals.SetErrorReportingIniEntry(nil)
+	ZendHashInitEx(RegisteredZendIniDirectives, 128, nil, FreeIniEntry, 1, 0)
 	return SUCCESS
 }
 
 /* }}} */
 
 func ZendIniShutdown() int {
-	ZendIniDtor(EG.GetIniDirectives())
+	ZendIniDtor(ExecutorGlobals.GetIniDirectives())
 	return SUCCESS
 }
 
@@ -273,26 +265,26 @@ func ZendIniGlobalShutdown() int {
 /* }}} */
 
 func ZendIniDeactivate() int {
-	if EG.GetModifiedIniDirectives() != nil {
+	if ExecutorGlobals.GetModifiedIniDirectives() != nil {
 		var ini_entry *ZendIniEntry
 		for {
-			var __ht *HashTable = EG.GetModifiedIniDirectives()
+			var __ht *HashTable = ExecutorGlobals.GetModifiedIniDirectives()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
-				ini_entry = _z.GetValue().GetPtr()
-				ZendRestoreIniEntryCb(ini_entry, 1<<3)
+				ini_entry = Z_PTR_P(_z)
+				ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
 			}
 			break
 		}
-		ZendHashDestroy(EG.GetModifiedIniDirectives())
-		_efree(EG.GetModifiedIniDirectives())
-		EG.SetModifiedIniDirectives(nil)
+		ZendHashDestroy(ExecutorGlobals.GetModifiedIniDirectives())
+		FREE_HASHTABLE(ExecutorGlobals.GetModifiedIniDirectives())
+		ExecutorGlobals.SetModifiedIniDirectives(nil)
 	}
 	return SUCCESS
 }
@@ -316,14 +308,14 @@ func IniKeyCompare(a any, b any) int {
 	} else if s.GetKey() == nil {
 		return 1
 	} else {
-		return ZendBinaryStrcasecmp(f.GetKey().GetVal(), f.GetKey().GetLen(), s.GetKey().GetVal(), s.GetKey().GetLen())
+		return ZendBinaryStrcasecmp(ZSTR_VAL(f.GetKey()), ZSTR_LEN(f.GetKey()), ZSTR_VAL(s.GetKey()), ZSTR_LEN(s.GetKey()))
 	}
 }
 
 /* }}} */
 
 func ZendIniSortEntries() {
-	ZendHashSortEx(EG.GetIniDirectives(), ZendSort, IniKeyCompare, 0)
+	ZendHashSort(ExecutorGlobals.GetIniDirectives(), IniKeyCompare, 0)
 }
 
 /* }}} */
@@ -333,7 +325,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 	var default_value *Zval
 	var directives *HashTable = RegisteredZendIniDirectives
 	for ini_entry.GetName() != nil {
-		p = __zendMalloc(g.SizeOf("zend_ini_entry"))
+		p = Pemalloc(b.SizeOf("zend_ini_entry"), 1)
 		p.SetName(ZendStringInitInterned(ini_entry.GetName(), ini_entry.GetNameLength(), 1))
 		p.SetOnModify(ini_entry.GetOnModify())
 		p.SetMhArg1(ini_entry.GetMhArg1())
@@ -353,8 +345,8 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 			ZendUnregisterIniEntries(module_number)
 			return FAILURE
 		}
-		if g.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, default_value.GetValue().GetStr(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), 1<<0) == SUCCESS) {
-			p.SetValue(ZendNewInternedString(ZendStringCopy(default_value.GetValue().GetStr())))
+		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, Z_STR_P(default_value), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
+			p.SetValue(ZendNewInternedString(ZendStringCopy(Z_STR_P(default_value))))
 		} else {
 			if ini_entry.GetValue() != nil {
 				p.SetValue(ZendStringInitInterned(ini_entry.GetValue(), ini_entry.GetValueLength(), 1))
@@ -362,7 +354,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 				p.SetValue(nil)
 			}
 			if p.GetOnModify() != nil {
-				p.GetOnModify()(p, p.GetValue(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), 1<<0)
+				p.GetOnModify()(p, p.GetValue(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP)
 			}
 		}
 		ini_entry++
@@ -387,7 +379,7 @@ func ZendAlterIniEntry(name *ZendString, new_value *ZendString, modify_type int,
 func ZendAlterIniEntryChars(name *ZendString, value string, value_length int, modify_type int, stage int) int {
 	var ret int
 	var new_value *ZendString
-	new_value = ZendStringInit(value, value_length, !(stage & (1<<2 | 1<<3 | 1<<4 | 1<<5)))
+	new_value = ZendStringInit(value, value_length, !(stage & ZEND_INI_STAGE_IN_REQUEST))
 	ret = ZendAlterIniEntryEx(name, new_value, modify_type, stage, 0)
 	ZendStringRelease(new_value)
 	return ret
@@ -398,7 +390,7 @@ func ZendAlterIniEntryChars(name *ZendString, value string, value_length int, mo
 func ZendAlterIniEntryCharsEx(name *ZendString, value *byte, value_length int, modify_type int, stage int, force_change int) int {
 	var ret int
 	var new_value *ZendString
-	new_value = ZendStringInit(value, value_length, !(stage & (1<<2 | 1<<3 | 1<<4 | 1<<5)))
+	new_value = ZendStringInit(value, value_length, !(stage & ZEND_INI_STAGE_IN_REQUEST))
 	ret = ZendAlterIniEntryEx(name, new_value, modify_type, stage, force_change)
 	ZendStringRelease(new_value)
 	return ret
@@ -411,28 +403,28 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 	var duplicate *ZendString
 	var modifiable uint8
 	var modified ZendBool
-	if g.Assign(&ini_entry, ZendHashFindPtr(EG.GetIniDirectives(), name)) == nil {
+	if b.Assign(&ini_entry, ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)) == nil {
 		return FAILURE
 	}
 	modifiable = ini_entry.GetModifiable()
 	modified = ini_entry.GetModified()
-	if stage == 1<<2 && modify_type == 1<<2 {
-		ini_entry.SetModifiable(1 << 2)
+	if stage == ZEND_INI_STAGE_ACTIVATE && modify_type == ZEND_INI_SYSTEM {
+		ini_entry.SetModifiable(ZEND_INI_SYSTEM)
 	}
 	if force_change == 0 {
 		if (ini_entry.GetModifiable() & modify_type) == 0 {
 			return FAILURE
 		}
 	}
-	if EG.GetModifiedIniDirectives() == nil {
-		EG.SetModifiedIniDirectives((*HashTable)(_emalloc(g.SizeOf("HashTable"))))
-		_zendHashInit(EG.GetModifiedIniDirectives(), 8, nil, 0)
+	if ExecutorGlobals.GetModifiedIniDirectives() == nil {
+		ALLOC_HASHTABLE(ExecutorGlobals.GetModifiedIniDirectives())
+		ZendHashInit(ExecutorGlobals.GetModifiedIniDirectives(), 8, nil, nil, 0)
 	}
 	if modified == 0 {
 		ini_entry.SetOrigValue(ini_entry.GetValue())
 		ini_entry.SetOrigModifiable(modifiable)
 		ini_entry.SetModified(1)
-		ZendHashAddPtr(EG.GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
+		ZendHashAddPtr(ExecutorGlobals.GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
 	}
 	duplicate = ZendStringCopy(new_value)
 	if ini_entry.GetOnModify() == nil || ini_entry.GetOnModify()(ini_entry, duplicate, ini_entry.GetMhArg1(), ini_entry.GetMhArg2(), ini_entry.GetMhArg3(), stage) == SUCCESS {
@@ -451,12 +443,12 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 
 func ZendRestoreIniEntry(name *ZendString, stage int) int {
 	var ini_entry *ZendIniEntry
-	if g.Assign(&ini_entry, ZendHashFindPtr(EG.GetIniDirectives(), name)) == nil || stage == 1<<4 && (ini_entry.GetModifiable()&1<<0) == 0 {
+	if b.Assign(&ini_entry, ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)) == nil || stage == ZEND_INI_STAGE_RUNTIME && (ini_entry.GetModifiable()&ZEND_INI_USER) == 0 {
 		return FAILURE
 	}
-	if EG.GetModifiedIniDirectives() != nil {
+	if ExecutorGlobals.GetModifiedIniDirectives() != nil {
 		if ZendRestoreIniEntryCb(ini_entry, stage) == 0 {
-			ZendHashDel(EG.GetModifiedIniDirectives(), name)
+			ZendHashDel(ExecutorGlobals.GetModifiedIniDirectives(), name)
 		} else {
 			return FAILURE
 		}
@@ -478,19 +470,19 @@ func ZendIniRegisterDisplayer(name *byte, name_length uint32, displayer func(ini
 
 /* }}} */
 
-func ZendIniLong(name string, name_length int, orig int) ZendLong {
+func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(EG.GetIniDirectives(), name, name_length)
+	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
-				return strtoll(ini_entry.GetOrigValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ZSTR_VAL(ini_entry.GetOrigValue()), nil, 0)
 			} else {
 				return 0
 			}
 		} else {
 			if ini_entry.GetValue() != nil {
-				return strtoll(ini_entry.GetValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ZSTR_VAL(ini_entry.GetValue()), nil, 0)
 			} else {
 				return 0
 			}
@@ -503,12 +495,12 @@ func ZendIniLong(name string, name_length int, orig int) ZendLong {
 
 func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(EG.GetIniDirectives(), name, name_length)
+	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
-			return float64(g.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ini_entry.GetOrigValue().GetVal(), nil) }, 0.0))
+			return float64(b.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ZSTR_VAL(ini_entry.GetOrigValue()), nil) }, 0.0))
 		} else {
-			return float64(g.CondF1(ini_entry.GetValue() != nil, func() float64 { return ZendStrtod(ini_entry.GetValue().GetVal(), nil) }, 0.0))
+			return float64(b.CondF1(ini_entry.GetValue() != nil, func() float64 { return ZendStrtod(ZSTR_VAL(ini_entry.GetValue()), nil) }, 0.0))
 		}
 	}
 	return 0.0
@@ -516,22 +508,22 @@ func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 
 /* }}} */
 
-func ZendIniStringEx(name string, name_length int, orig int, exists *ZendBool) *byte {
+func ZendIniStringEx(name *byte, name_length int, orig int, exists *ZendBool) *byte {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashStrFindPtr(EG.GetIniDirectives(), name, name_length)
+	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
 	if ini_entry != nil {
 		if exists != nil {
 			*exists = 1
 		}
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
-				return ini_entry.GetOrigValue().GetVal()
+				return ZSTR_VAL(ini_entry.GetOrigValue())
 			} else {
 				return nil
 			}
 		} else {
 			if ini_entry.GetValue() != nil {
-				return ini_entry.GetValue().GetVal()
+				return ZSTR_VAL(ini_entry.GetValue())
 			} else {
 				return nil
 			}
@@ -562,12 +554,12 @@ func ZendIniString(name string, name_length int, orig int) *byte {
 
 func ZendIniGetValue(name *ZendString) *ZendString {
 	var ini_entry *ZendIniEntry
-	ini_entry = ZendHashFindPtr(EG.GetIniDirectives(), name)
+	ini_entry = ZendHashFindPtr(ExecutorGlobals.GetIniDirectives(), name)
 	if ini_entry != nil {
 		if ini_entry.GetValue() != nil {
 			return ini_entry.GetValue()
 		} else {
-			return ZendEmptyString
+			return ZSTR_EMPTY_ALLOC()
 		}
 	} else {
 		return nil
@@ -577,16 +569,16 @@ func ZendIniGetValue(name *ZendString) *ZendString {
 /* }}} */
 
 func ZendIniParseBool(str *ZendString) ZendBool {
-	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
+	if ZSTR_LEN(str) == 4 && strcasecmp(ZSTR_VAL(str), "true") == 0 || ZSTR_LEN(str) == 3 && strcasecmp(ZSTR_VAL(str), "yes") == 0 || ZSTR_LEN(str) == 2 && strcasecmp(ZSTR_VAL(str), "on") == 0 {
 		return 1
 	} else {
-		return atoi(str.GetVal()) != 0
+		return atoi(ZSTR_VAL(str)) != 0
 	}
 }
 func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value int
 	var tmp_value *ZendString
-	if type_ == 1 && ini_entry.GetModified() != 0 {
+	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
 		if ini_entry.GetOrigValue() != nil {
 			tmp_value = ini_entry.GetOrigValue()
 		} else {
@@ -603,9 +595,9 @@ func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		value = 0
 	}
 	if value != 0 {
-		ZendWrite("On", strlen("On"))
+		ZEND_PUTS("On")
 	} else {
-		ZendWrite("Off", strlen("Off"))
+		ZEND_PUTS("Off")
 	}
 }
 
@@ -613,10 +605,10 @@ func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 
 func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value *byte
-	if type_ == 1 && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
+	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
+		value = ZSTR_VAL(ini_entry.GetOrigValue())
 	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetValue())
 	} else {
 		value = nil
 	}
@@ -624,13 +616,13 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		if ZendUv.GetHtmlErrors() != 0 {
 			ZendPrintf("<font style=\"color: %s\">%s</font>", value, value)
 		} else {
-			ZendWrite(value, strlen(value))
+			ZEND_PUTS(value)
 		}
 	} else {
 		if ZendUv.GetHtmlErrors() != 0 {
-			ZendWrite("<i>no value</i>", strlen("<i>no value</i>"))
+			ZEND_PUTS(NO_VALUE_HTML)
 		} else {
-			ZendWrite("no value", strlen("no value"))
+			ZEND_PUTS(NO_VALUE_PLAINTEXT)
 		}
 	}
 }
@@ -639,16 +631,16 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 
 func DisplayLinkNumbers(ini_entry *ZendIniEntry, type_ int) {
 	var value *byte
-	if type_ == 1 && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
+	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
+		value = ZSTR_VAL(ini_entry.GetOrigValue())
 	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetValue())
 	} else {
 		value = nil
 	}
 	if value != nil {
 		if atoi(value) == -1 {
-			ZendWrite("Unlimited", strlen("Unlimited"))
+			ZEND_PUTS("Unlimited")
 		} else {
 			ZendPrintf("%s", value)
 		}
@@ -671,7 +663,7 @@ func OnUpdateLong(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_ar
 	var p *ZendLong
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendLong)(base + int(mh_arg1))
-	*p = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	*p = ZendAtol(ZSTR_VAL(new_value), ZSTR_LEN(new_value))
 	return SUCCESS
 }
 
@@ -681,7 +673,7 @@ func OnUpdateLongGEZero(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any,
 	var p *ZendLong
 	var tmp ZendLong
 	var base *byte = (*byte)(mh_arg2)
-	tmp = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	tmp = ZendAtol(ZSTR_VAL(new_value), ZSTR_LEN(new_value))
 	if tmp < 0 {
 		return FAILURE
 	}
@@ -696,7 +688,7 @@ func OnUpdateReal(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_ar
 	var p *float64
 	var base *byte = (*byte)(mh_arg2)
 	p = (*float64)(base + int(mh_arg1))
-	*p = ZendStrtod(new_value.GetVal(), nil)
+	*p = ZendStrtod(ZSTR_VAL(new_value), nil)
 	return SUCCESS
 }
 
@@ -707,7 +699,7 @@ func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_
 	var base *byte = (*byte)(mh_arg2)
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = ZSTR_VAL(new_value)
 	} else {
 		*p = nil
 	}
@@ -719,12 +711,12 @@ func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_
 func OnUpdateStringUnempty(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
-	if new_value != nil && !(new_value.GetVal()[0]) {
+	if new_value != nil && !(ZSTR_VAL(new_value)[0]) {
 		return FAILURE
 	}
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = ZSTR_VAL(new_value)
 	} else {
 		*p = nil
 	}

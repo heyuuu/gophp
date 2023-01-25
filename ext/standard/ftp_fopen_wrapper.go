@@ -3,9 +3,11 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/core/streams"
-	g "sik/runtime/grammar"
+	r "sik/runtime"
+	"sik/sapi/cli"
 	"sik/zend"
 )
 
@@ -68,16 +70,18 @@ import (
 
 // # include "php_fopen_wrappers.h"
 
-// #define FTPS_ENCRYPT_DATA       1
+const FTPS_ENCRYPT_DATA = 1
 
-// #define GET_FTP_RESULT(stream) get_ftp_result ( ( stream ) , tmp_line , sizeof ( tmp_line ) )
+func GET_FTP_RESULT(stream *core.PhpStream) int {
+	return GetFtpResult(stream, tmp_line, b.SizeOf("tmp_line"))
+}
 
 /* {{{ get_ftp_result
  */
 
 func GetFtpResult(stream *core.PhpStream, buffer *byte, buffer_size int) int {
 	buffer[0] = '0'
-	for streams._phpStreamGetLine(stream, buffer, buffer_size-1, nil) != nil && !(isdigit(int(buffer[0])) && isdigit(int(buffer[1])) && isdigit(int(buffer[2])) && buffer[3] == ' ') {
+	for core.PhpStreamGets(stream, buffer, buffer_size-1) != nil && !(isdigit(int(buffer[0])) && isdigit(int(buffer[1])) && isdigit(int(buffer[2])) && buffer[3] == ' ') {
 
 	}
 	return strtol(buffer, nil, 10)
@@ -107,14 +111,14 @@ func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStr
 
 			/* For write modes close data stream first to signal EOF to server */
 
-			result = GetFtpResult(controlstream, tmp_line, g.SizeOf("tmp_line"))
+			result = GET_FTP_RESULT(controlstream)
 			if result != 226 && result != 250 {
-				core.PhpErrorDocref(nil, 1<<1, "FTP server error %d:%s", result, tmp_line)
-				ret = -1
+				core.PhpErrorDocref(nil, zend.E_WARNING, "FTP server error %d:%s", result, tmp_line)
+				ret = r.EOF
 			}
 		}
-		streams._phpStreamWrite(controlstream, "QUIT\r\n", strlen("QUIT\r\n"))
-		streams._phpStreamFree(controlstream, 1|2)
+		core.PhpStreamWriteString(controlstream, "QUIT\r\n")
+		core.PhpStreamClose(controlstream)
 		stream.wrapperthis = nil
 	}
 	return ret
@@ -139,52 +143,48 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 		}
 		return nil
 	}
-	use_ssl = resource.GetScheme() != nil && resource.GetScheme().len_ > 3 && resource.GetScheme().val[3] == 's'
+	use_ssl = resource.GetScheme() != nil && zend.ZSTR_LEN(resource.GetScheme()) > 3 && zend.ZSTR_VAL(resource.GetScheme())[3] == 's'
 
 	/* use port 21 if one wasn't specified */
 
 	if resource.GetPort() == 0 {
 		resource.SetPort(21)
 	}
-	transport_len = int(zend.ZendSpprintf(&transport, 0, "tcp://%s:%d", resource.GetHost().val, resource.GetPort()))
-	stream = streams._phpStreamXportCreate(transport, transport_len, 0x8, 0|2, nil, nil, context, nil, nil)
-	zend._efree(transport)
+	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", zend.ZSTR_VAL(resource.GetHost()), resource.GetPort()))
+	stream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, nil, nil)
+	zend.Efree(transport)
 	if stream == nil {
 		result = 0
 		goto connect_errexit
 	}
 	streams.PhpStreamContextSet(stream, context)
-	if context != nil && context.notifier != nil {
-		streams.PhpStreamNotificationNotify(context, 2, 0, nil, 0, 0, 0, nil)
-	}
+	streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_CONNECT, nil, 0)
 
 	/* Start talking to ftp server */
 
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	result = GET_FTP_RESULT(stream)
 	if result > 299 || result < 200 {
-		if context != nil && context.notifier != nil {
-			streams.PhpStreamNotificationNotify(context, 9, 2, tmp_line, result, 0, 0, nil)
-		}
+		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
 		goto connect_errexit
 	}
 	if use_ssl != 0 {
 
 		/* send the AUTH TLS request name */
 
-		streams._phpStreamWrite(stream, "AUTH TLS\r\n", strlen("AUTH TLS\r\n"))
+		core.PhpStreamWriteString(stream, "AUTH TLS\r\n")
 
 		/* get the response */
 
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		result = GET_FTP_RESULT(stream)
 		if result != 234 {
 
 			/* AUTH TLS not supported try AUTH SSL */
 
-			streams._phpStreamWrite(stream, "AUTH SSL\r\n", strlen("AUTH SSL\r\n"))
+			core.PhpStreamWriteString(stream, "AUTH SSL\r\n")
 
 			/* get the response */
 
-			result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+			result = GET_FTP_RESULT(stream)
 			if result != 334 {
 				streams.PhpStreamWrapperLogError(wrapper, options, "Server doesn't support FTPS.")
 				goto connect_errexit
@@ -202,26 +202,26 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 	if use_ssl != 0 {
 		if streams.PhpStreamXportCryptoSetup(stream, streams.STREAM_CRYPTO_METHOD_SSLv23_CLIENT, nil) < 0 || streams.PhpStreamXportCryptoEnable(stream, 1) < 0 {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Unable to activate SSL mode")
-			streams._phpStreamFree(stream, 1|2)
+			core.PhpStreamClose(stream)
 			stream = nil
 			goto connect_errexit
 		}
 
 		/* set PBSZ to 0 */
 
-		streams._phpStreamWrite(stream, "PBSZ 0\r\n", strlen("PBSZ 0\r\n"))
+		core.PhpStreamWriteString(stream, "PBSZ 0\r\n")
 
 		/* ignore the response */
 
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		result = GET_FTP_RESULT(stream)
 
 		/* set data connection protection level */
 
-		streams._phpStreamWrite(stream, "PROT P\r\n", strlen("PROT P\r\n"))
+		core.PhpStreamWriteString(stream, "PROT P\r\n")
 
 		/* get the response */
 
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		result = GET_FTP_RESULT(stream)
 		use_ssl_on_data = result >= 200 && result <= 299 || reuseid != nil
 	}
 
@@ -230,52 +230,50 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 	/* send the user name */
 
 	if resource.GetUser() != nil {
-		resource.GetUser().len_ = PhpRawUrlDecode(resource.GetUser().val, resource.GetUser().len_)
-		var s *uint8 = (*uint8)(resource.GetUser().val)
-		var e *uint8 = (*uint8)(s + resource.GetUser().len_)
+		zend.ZSTR_LEN(resource.GetUser()) = PhpRawUrlDecode(zend.ZSTR_VAL(resource.GetUser()), zend.ZSTR_LEN(resource.GetUser()))
+		var s *uint8 = (*uint8)(zend.ZSTR_VAL(resource.GetUser()))
+		var e *uint8 = (*uint8)(s + zend.ZSTR_LEN(resource.GetUser()))
 		for s < e {
 			if iscntrl(*s) {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.GetUser().val)
+				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", zend.ZSTR_VAL(resource.GetUser()))
 				goto connect_errexit
 			}
 			s++
 		}
-		streams._phpStreamPrintf(stream, "USER %s\r\n", resource.GetUser().val)
+		core.PhpStreamPrintf(stream, "USER %s\r\n", zend.ZSTR_VAL(resource.GetUser()))
 	} else {
-		streams._phpStreamWrite(stream, "USER anonymous\r\n", strlen("USER anonymous\r\n"))
+		core.PhpStreamWriteString(stream, "USER anonymous\r\n")
 	}
 
 	/* get the response */
 
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	result = GET_FTP_RESULT(stream)
 
 	/* if a password is required, send it */
 
 	if result >= 300 && result <= 399 {
-		if context != nil && context.notifier != nil {
-			streams.PhpStreamNotificationNotify(context, 3, 0, tmp_line, 0, 0, 0, nil)
-		}
+		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, tmp_line, 0)
 		if resource.GetPass() != nil {
-			resource.GetPass().len_ = PhpRawUrlDecode(resource.GetPass().val, resource.GetPass().len_)
-			var s *uint8 = (*uint8)(resource.GetPass().val)
-			var e *uint8 = (*uint8)(s + resource.GetPass().len_)
+			zend.ZSTR_LEN(resource.GetPass()) = PhpRawUrlDecode(zend.ZSTR_VAL(resource.GetPass()), zend.ZSTR_LEN(resource.GetPass()))
+			var s *uint8 = (*uint8)(zend.ZSTR_VAL(resource.GetPass()))
+			var e *uint8 = (*uint8)(s + zend.ZSTR_LEN(resource.GetPass()))
 			for s < e {
 				if iscntrl(*s) {
-					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.GetPass().val)
+					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", zend.ZSTR_VAL(resource.GetPass()))
 					goto connect_errexit
 				}
 				s++
 			}
-			streams._phpStreamPrintf(stream, "PASS %s\r\n", resource.GetPass().val)
+			core.PhpStreamPrintf(stream, "PASS %s\r\n", zend.ZSTR_VAL(resource.GetPass()))
 		} else {
 
 			/* if the user has configured who they are,
 			   send that as the password */
 
-			if FileGlobals.GetFromAddress() != nil {
-				streams._phpStreamPrintf(stream, "PASS %s\r\n", FileGlobals.GetFromAddress())
+			if FG(from_address) {
+				core.PhpStreamPrintf(stream, "PASS %s\r\n", FG(from_address))
 			} else {
-				streams._phpStreamWrite(stream, "PASS anonymous\r\n", strlen("PASS anonymous\r\n"))
+				core.PhpStreamWriteString(stream, "PASS anonymous\r\n")
 			}
 
 			/* if the user has configured who they are,
@@ -285,15 +283,11 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 
 		/* read the response */
 
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		result = GET_FTP_RESULT(stream)
 		if result > 299 || result < 200 {
-			if context != nil && context.notifier != nil {
-				streams.PhpStreamNotificationNotify(context, 10, 2, tmp_line, result, 0, 0, nil)
-			}
+			streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_AUTH_RESULT, tmp_line, result)
 		} else {
-			if context != nil && context.notifier != nil {
-				streams.PhpStreamNotificationNotify(context, 10, 0, tmp_line, result, 0, 0, nil)
-			}
+			streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_RESULT, tmp_line, result)
 		}
 	}
 	if result > 299 || result < 200 {
@@ -317,7 +311,7 @@ connect_errexit:
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return nil
 }
@@ -335,8 +329,8 @@ func PhpFopenDoPasv(stream *core.PhpStream, ip *byte, ip_size int, phoststart **
 
 	/* We try EPSV first, needed for IPv6 and works on some IPv4 servers */
 
-	streams._phpStreamWrite(stream, "EPSV\r\n", strlen("EPSV\r\n"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamWriteString(stream, "EPSV\r\n")
+	result = GET_FTP_RESULT(stream)
 
 	/* check if we got a 229 response */
 
@@ -344,8 +338,8 @@ func PhpFopenDoPasv(stream *core.PhpStream, ip *byte, ip_size int, phoststart **
 
 		/* EPSV failed, let's try PASV */
 
-		streams._phpStreamWrite(stream, "PASV\r\n", strlen("PASV\r\n"))
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		core.PhpStreamWriteString(stream, "PASV\r\n")
+		result = GET_FTP_RESULT(stream)
 
 		/* make sure we got a 227 response */
 
@@ -491,7 +485,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		streams.PhpStreamWrapperLogError(wrapper, options, "Unknown file open mode")
 		return nil
 	}
-	if context != nil && g.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "proxy")) != nil {
+	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "proxy")) != nil {
 		if read_write == 1 {
 
 			/* Use http wrapper to proxy ftp request */
@@ -515,19 +509,19 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* set the connection to be binary */
 
-	streams._phpStreamWrite(stream, "TYPE I\r\n", strlen("TYPE I\r\n"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamWriteString(stream, "TYPE I\r\n")
+	result = GET_FTP_RESULT(stream)
 	if result > 299 || result < 200 {
 		goto errexit
 	}
 
 	/* find out the size of the file (verifying it exists) */
 
-	streams._phpStreamPrintf(stream, "SIZE %s\r\n", resource.GetPath().val)
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
 
 	/* read the response */
 
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	result = GET_FTP_RESULT(stream)
 	if read_write == 1 {
 
 		/* Read Mode */
@@ -544,16 +538,14 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		if sizestr != nil {
 			sizestr++
 			file_size = atoi(sizestr)
-			if context != nil && context.notifier != nil {
-				streams.PhpStreamNotificationNotify(context, 5, 0, tmp_line, result, 0, file_size, nil)
-			}
+			streams.PhpStreamNotifyFileSize(context, file_size, tmp_line, result)
 		}
 	} else if read_write == 2 {
 
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 
-		if context != nil && g.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
-			if tmpzval.value.lval != 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
+			if zend.Z_LVAL_P(tmpzval) != 0 {
 				allow_overwrite = 1
 			} else {
 				allow_overwrite = 0
@@ -565,8 +557,8 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 				/* Context permits overwriting file,
 				   so we just delete whatever's there in preparation */
 
-				streams._phpStreamPrintf(stream, "DELE %s\r\n", resource.GetPath().val)
-				result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+				core.PhpStreamPrintf(stream, "DELE %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+				result = GET_FTP_RESULT(stream)
 				if result >= 300 || result <= 199 {
 					goto errexit
 				}
@@ -580,7 +572,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* set up the passive connection */
 
-	portno = PhpFopenDoPasv(stream, ip, g.SizeOf("ip"), &hoststart)
+	portno = PhpFopenDoPasv(stream, ip, b.SizeOf("ip"), &hoststart)
 	if portno == 0 {
 		goto errexit
 	}
@@ -591,18 +583,18 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 		/* set resume position if applicable */
 
-		if context != nil && g.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.u1.v.type_ == 4 && tmpzval.value.lval > 0 {
-			streams._phpStreamPrintf(stream, "REST "+"%"+"lld"+"\r\n", tmpzval.value.lval)
-			result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_LONG && zend.Z_LVAL_P(tmpzval) > 0 {
+			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", zend.Z_LVAL_P(tmpzval))
+			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+"%"+"lld", tmpzval.value.lval)
+				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+zend.ZEND_LONG_FMT, zend.Z_LVAL_P(tmpzval))
 				goto errexit
 			}
 		}
 
 		/* retrieve file */
 
-		memcpy(tmp_line, "RETR", g.SizeOf("\"RETR\""))
+		memcpy(tmp_line, "RETR", b.SizeOf("\"RETR\""))
 
 		/* retrieve file */
 
@@ -610,7 +602,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 		/* Write new file */
 
-		memcpy(tmp_line, "STOR", g.SizeOf("\"STOR\""))
+		memcpy(tmp_line, "STOR", b.SizeOf("\"STOR\""))
 
 		/* Write new file */
 
@@ -618,48 +610,41 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 		/* Append */
 
-		memcpy(tmp_line, "APPE", g.SizeOf("\"APPE\""))
+		memcpy(tmp_line, "APPE", b.SizeOf("\"APPE\""))
 
 		/* Append */
 
 	}
-	streams._phpStreamPrintf(stream, "%s %s\r\n", tmp_line, g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
+	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
 
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = resource.GetHost().val
+		hoststart = zend.ZSTR_VAL(resource.GetHost())
 	}
-	transport_len = int(zend.ZendSpprintf(&transport, 0, "tcp://%s:%d", hoststart, portno))
-	datastream = streams._phpStreamXportCreate(transport, transport_len, 0x8, 0|2, nil, nil, context, &error_message, nil)
-	zend._efree(transport)
+	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", hoststart, portno))
+	datastream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, &error_message, nil)
+	zend.Efree(transport)
 	if datastream == nil {
 		tmp_line[0] = '0'
 		goto errexit
 	}
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	result = GET_FTP_RESULT(stream)
 	if result != 150 && result != 125 {
 
 		/* Could not retrieve or send the file
 		 * this data will only be sent to us after connection on the data port was initiated.
 		 */
 
-		streams._phpStreamFree(datastream, 1|2)
+		core.PhpStreamClose(datastream)
 		datastream = nil
 		goto errexit
 	}
 	streams.PhpStreamContextSet(datastream, context)
-	if context != nil && context.notifier != nil {
-		context.notifier.progress = 0
-		context.notifier.progress_max = file_size
-		context.notifier.mask |= 1
-		if context != nil && context.notifier != nil {
-			streams.PhpStreamNotificationNotify(context, 7, 0, nil, 0, 0, file_size, nil)
-		}
-	}
+	streams.PhpStreamNotifyProgressInit(context, 0, file_size)
 	if use_ssl_on_data != 0 && (streams.PhpStreamXportCryptoSetup(datastream, streams.STREAM_CRYPTO_METHOD_SSLv23_CLIENT, nil) < 0 || streams.PhpStreamXportCryptoEnable(datastream, 1) < 0) {
 		streams.PhpStreamWrapperLogError(wrapper, options, "Unable to activate SSL mode")
-		streams._phpStreamFree(datastream, 1|2)
+		core.PhpStreamClose(datastream)
 		datastream = nil
 		tmp_line[0] = '0'
 		goto errexit
@@ -675,16 +660,14 @@ errexit:
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		if context != nil && context.notifier != nil {
-			streams.PhpStreamNotificationNotify(context, 9, 2, tmp_line, result, 0, 0, nil)
-		}
-		streams._phpStreamFree(stream, 1|2)
+		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
+		core.PhpStreamClose(stream)
 	}
 	if tmp_line[0] != '0' {
 		streams.PhpStreamWrapperLogError(wrapper, options, "FTP server reports %s", tmp_line)
 	}
 	if error_message != nil {
-		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", error_message.val)
+		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", zend.ZSTR_VAL(error_message))
 		zend.ZendStringRelease(error_message)
 	}
 	return nil
@@ -698,31 +681,27 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var tmp_len int
 	var basename *zend.ZendString
 	innerstream = (*PhpFtpDirstreamData)(stream.abstract).GetDatastream()
-	if count != g.SizeOf("php_stream_dirent") {
+	if count != b.SizeOf("php_stream_dirent") {
 		return -1
 	}
-	if streams._phpStreamEof(innerstream) != 0 {
+	if core.PhpStreamEof(innerstream) != 0 {
 		return 0
 	}
-	if streams._phpStreamGetLine(innerstream, ent.d_name, g.SizeOf("ent -> d_name"), &tmp_len) == nil {
+	if core.PhpStreamGetLine(innerstream, ent.d_name, b.SizeOf("ent -> d_name"), &tmp_len) == nil {
 		return -1
 	}
 	basename = PhpBasename(ent.d_name, tmp_len, nil, 0)
-	if g.SizeOf("ent -> d_name") < basename.len_-1 {
-		tmp_len = g.SizeOf("ent -> d_name")
-	} else {
-		tmp_len = basename.len_ - 1
-	}
-	memcpy(ent.d_name, basename.val, tmp_len)
+	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), zend.ZSTR_LEN(basename)-1)
+	memcpy(ent.d_name, zend.ZSTR_VAL(basename), tmp_len)
 	ent.d_name[tmp_len-1] = '0'
 	zend.ZendStringReleaseEx(basename, 0)
 
 	/* Trim off trailing whitespace characters */
 
 	for tmp_len > 0 && (ent.d_name[tmp_len-1] == '\n' || ent.d_name[tmp_len-1] == '\r' || ent.d_name[tmp_len-1] == '\t' || ent.d_name[tmp_len-1] == ' ') {
-		ent.d_name[g.PreDec(&tmp_len)] = '0'
+		ent.d_name[b.PreDec(&tmp_len)] = '0'
 	}
-	return g.SizeOf("php_stream_dirent")
+	return b.SizeOf("php_stream_dirent")
 }
 
 /* }}} */
@@ -733,15 +712,15 @@ func PhpFtpDirstreamClose(stream *core.PhpStream, close_handle int) int {
 	/* close control connection */
 
 	if data.GetControlstream() != nil {
-		streams._phpStreamFree(data.GetControlstream(), 1|2)
+		core.PhpStreamClose(data.GetControlstream())
 		data.SetControlstream(nil)
 	}
 
 	/* close data connection */
 
-	streams._phpStreamFree(data.GetDatastream(), 1|2)
+	core.PhpStreamClose(data.GetDatastream())
 	data.SetDatastream(nil)
-	zend._efree(data)
+	zend.Efree(data)
 	stream.abstract = nil
 	return 0
 }
@@ -774,8 +753,8 @@ func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* set the connection to be ascii */
 
-	streams._phpStreamWrite(stream, "TYPE A\r\n", strlen("TYPE A\r\n"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamWriteString(stream, "TYPE A\r\n")
+	result = GET_FTP_RESULT(stream)
 	if result > 299 || result < 200 {
 		goto opendir_errexit
 	}
@@ -786,7 +765,7 @@ func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* set up the passive connection */
 
-	portno = PhpFopenDoPasv(stream, ip, g.SizeOf("ip"), &hoststart)
+	portno = PhpFopenDoPasv(stream, ip, b.SizeOf("ip"), &hoststart)
 	if portno == 0 {
 		goto opendir_errexit
 	}
@@ -794,46 +773,44 @@ func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = resource.GetHost().val
+		hoststart = zend.ZSTR_VAL(resource.GetHost())
 	}
-	datastream = core._phpStreamSockOpenHost(hoststart, portno, SOCK_STREAM, 0, 0)
+	datastream = core.PhpStreamSockOpenHost(hoststart, portno, SOCK_STREAM, 0, 0)
 	if datastream == nil {
 		goto opendir_errexit
 	}
-	streams._phpStreamPrintf(stream, "NLST %s\r\n", g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "NLST %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result != 150 && result != 125 {
 
 		/* Could not retrieve or send the file
 		 * this data will only be sent to us after connection on the data port was initiated.
 		 */
 
-		streams._phpStreamFree(datastream, 1|2)
+		core.PhpStreamClose(datastream)
 		datastream = nil
 		goto opendir_errexit
 	}
 	streams.PhpStreamContextSet(datastream, context)
 	if use_ssl_on_data != 0 && (streams.PhpStreamXportCryptoSetup(datastream, streams.STREAM_CRYPTO_METHOD_SSLv23_CLIENT, nil) < 0 || streams.PhpStreamXportCryptoEnable(datastream, 1) < 0) {
 		streams.PhpStreamWrapperLogError(wrapper, options, "Unable to activate SSL mode")
-		streams._phpStreamFree(datastream, 1|2)
+		core.PhpStreamClose(datastream)
 		datastream = nil
 		goto opendir_errexit
 	}
 	PhpUrlFree(resource)
-	dirsdata = zend._emalloc(sizeof * dirsdata)
+	dirsdata = zend.Emalloc(sizeof * dirsdata)
 	dirsdata.SetDatastream(datastream)
 	dirsdata.SetControlstream(stream)
-	dirsdata.SetDirstream(streams._phpStreamAlloc(&PhpFtpDirstreamOps, dirsdata, 0, mode))
+	dirsdata.SetDirstream(core.PhpStreamAlloc(&PhpFtpDirstreamOps, dirsdata, 0, mode))
 	return dirsdata.GetDirstream()
 opendir_errexit:
 	if resource != nil {
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		if context != nil && context.notifier != nil {
-			streams.PhpStreamNotificationNotify(context, 9, 2, tmp_line, result, 0, 0, nil)
-		}
-		streams._phpStreamFree(stream, 1|2)
+		streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_FAILURE, tmp_line, result)
+		core.PhpStreamClose(stream)
 	}
 	if tmp_line[0] != '0' {
 		streams.PhpStreamWrapperLogError(wrapper, options, "FTP server reports %s", tmp_line)
@@ -859,20 +836,20 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		goto stat_errexit
 	}
 	ssb.sb.st_mode = 0644
-	streams._phpStreamPrintf(stream, "CWD %s\r\n", g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "CWD %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		ssb.sb.st_mode |= S_IFREG
 	} else {
 		ssb.sb.st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH
 	}
-	streams._phpStreamWrite(stream, "TYPE I\r\n", strlen("TYPE I\r\n"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamWriteString(stream, "TYPE I\r\n")
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		goto stat_errexit
 	}
-	streams._phpStreamPrintf(stream, "SIZE %s\r\n", g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 
 		/* Failure either means it doesn't exist
@@ -892,8 +869,8 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	} else {
 		ssb.sb.st_size = atoi(tmp_line + 4)
 	}
-	streams._phpStreamPrintf(stream, "MDTM %s\r\n", g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "MDTM %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result == 213 {
 		var p *byte = tmp_line + 4
 		var n int
@@ -901,10 +878,10 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		var tmbuf __struct__tm
 		var gmt *__struct__tm
 		var stamp int64
-		for size_t(p-tmp_line) < g.SizeOf("tmp_line") && !(isdigit(*p)) {
+		for size_t(p-tmp_line) < b.SizeOf("tmp_line") && !(isdigit(*p)) {
 			p++
 		}
-		if size_t(p-tmp_line) > g.SizeOf("tmp_line") {
+		if size_t(p-tmp_line) > b.SizeOf("tmp_line") {
 			goto mdtm_error
 		}
 		n = sscanf(p, "%4u%2u%2u%2u%2u%2u", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec)
@@ -918,7 +895,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		/* figure out the GMT offset */
 
 		stamp = time(nil)
-		gmt = gmtime_r(&stamp, &tmbuf)
+		gmt = core.PhpGmtimeR(&stamp, &tmbuf)
 		if gmt == nil {
 			goto mdtm_error
 		}
@@ -946,7 +923,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	ssb.sb.st_rdev = -1
 	ssb.sb.st_blksize = 4096
 	ssb.sb.st_blocks = int((4095 + ssb.sb.st_size) / ssb.sb.st_blksize)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	PhpUrlFree(resource)
 	return 0
 stat_errexit:
@@ -954,7 +931,7 @@ stat_errexit:
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return -1
 }
@@ -968,37 +945,37 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 	var tmp_line []byte
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Unable to connect to %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto unlink_errexit
 	}
 	if resource.GetPath() == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Invalid path provided in %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto unlink_errexit
 	}
 
 	/* Attempt to delete the file */
 
-	streams._phpStreamPrintf(stream, "DELE %s\r\n", g.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "DELE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Error Deleting file: %s", tmp_line)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Deleting file: %s", tmp_line)
 		}
 		goto unlink_errexit
 	}
 	PhpUrlFree(resource)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	return 1
 unlink_errexit:
 	if resource != nil {
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return 0
 }
@@ -1023,36 +1000,36 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	}
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)
 	if stream == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Unable to connect to %s", resource_from.GetHost().val)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", zend.ZSTR_VAL(resource_from.GetHost()))
 		}
 		goto rename_errexit
 	}
 
 	/* Rename FROM */
 
-	streams._phpStreamPrintf(stream, "RNFR %s\r\n", g.CondF1(resource_from.GetPath() != nil, func() []byte { return resource_from.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "RNFR %s\r\n", b.CondF1(resource_from.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource_from.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result < 300 || result > 399 {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Error Renaming file: %s", tmp_line)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Renaming file: %s", tmp_line)
 		}
 		goto rename_errexit
 	}
 
 	/* Rename TO */
 
-	streams._phpStreamPrintf(stream, "RNTO %s\r\n", g.CondF1(resource_to.GetPath() != nil, func() []byte { return resource_to.GetPath().val }, "/"))
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "RNTO %s\r\n", b.CondF1(resource_to.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource_to.GetPath()) }, "/"))
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Error Renaming file: %s", tmp_line)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Error Renaming file: %s", tmp_line)
 		}
 		goto rename_errexit
 	}
 	PhpUrlFree(resource_from)
 	PhpUrlFree(resource_to)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	return 1
 rename_errexit:
 	if resource_from != nil {
@@ -1062,7 +1039,7 @@ rename_errexit:
 		PhpUrlFree(resource_to)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return 0
 }
@@ -1073,24 +1050,24 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 	var stream *core.PhpStream = nil
 	var resource *PhpUrl = nil
 	var result int
-	var recursive int = options & 1
+	var recursive int = options & core.PHP_STREAM_MKDIR_RECURSIVE
 	var tmp_line []byte
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Unable to connect to %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto mkdir_errexit
 	}
 	if resource.GetPath() == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Invalid path provided in %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto mkdir_errexit
 	}
 	if recursive == 0 {
-		streams._phpStreamPrintf(stream, "MKD %s\r\n", resource.GetPath().val)
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		core.PhpStreamPrintf(stream, "MKD %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+		result = GET_FTP_RESULT(stream)
 	} else {
 
 		/* we look for directory separator from the end of string, thus hopefully reducing our work load */
@@ -1098,22 +1075,22 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		var p *byte
 		var e *byte
 		var buf *byte
-		buf = zend._estrndup(resource.GetPath().val, resource.GetPath().len_)
-		e = buf + resource.GetPath().len_
+		buf = zend.Estrndup(zend.ZSTR_VAL(resource.GetPath()), zend.ZSTR_LEN(resource.GetPath()))
+		e = buf + zend.ZSTR_LEN(resource.GetPath())
 
 		/* find a top level directory we need to create */
 
-		for g.Assign(&p, strrchr(buf, '/')) {
+		for b.Assign(&p, strrchr(buf, '/')) {
 			*p = '0'
-			streams._phpStreamPrintf(stream, "CWD %s\r\n", g.Cond(strlen(buf), buf, "/"))
-			result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+			core.PhpStreamPrintf(stream, "CWD %s\r\n", b.Cond(strlen(buf), buf, "/"))
+			result = GET_FTP_RESULT(stream)
 			if result >= 200 && result <= 299 {
 				*p = '/'
 				break
 			}
 		}
-		streams._phpStreamPrintf(stream, "MKD %s\r\n", g.Cond(strlen(buf), buf, "/"))
-		result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+		core.PhpStreamPrintf(stream, "MKD %s\r\n", b.Cond(strlen(buf), buf, "/"))
+		result = GET_FTP_RESULT(stream)
 		if result >= 200 && result <= 299 {
 			if p == nil {
 				p = buf
@@ -1124,11 +1101,11 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 			for p != e {
 				if (*p) == '0' && (*(p + 1)) != '0' {
 					*p = '/'
-					streams._phpStreamPrintf(stream, "MKD %s\r\n", buf)
-					result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+					core.PhpStreamPrintf(stream, "MKD %s\r\n", buf)
+					result = GET_FTP_RESULT(stream)
 					if result < 200 || result > 299 {
-						if (options & 0x8) != 0 {
-							core.PhpErrorDocref(nil, 1<<1, "%s", tmp_line)
+						if (options & core.REPORT_ERRORS) != 0 {
+							core.PhpErrorDocref(nil, zend.E_WARNING, "%s", tmp_line)
 						}
 						break
 					}
@@ -1139,10 +1116,10 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 			/* create any needed directories if the creation of the 1st directory worked */
 
 		}
-		zend._efree(buf)
+		zend.Efree(buf)
 	}
 	PhpUrlFree(resource)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	if result < 200 || result > 299 {
 
 		/* Failure */
@@ -1158,7 +1135,7 @@ mkdir_errexit:
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return 0
 }
@@ -1172,34 +1149,34 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 	var tmp_line []byte
 	stream = PhpFtpFopenConnect(wrapper, url, "r", 0, nil, context, nil, &resource, nil, nil)
 	if stream == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Unable to connect to %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", url)
 		}
 		goto rmdir_errexit
 	}
 	if resource.GetPath() == nil {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "Invalid path provided in %s", url)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid path provided in %s", url)
 		}
 		goto rmdir_errexit
 	}
-	streams._phpStreamPrintf(stream, "RMD %s\r\n", resource.GetPath().val)
-	result = GetFtpResult(stream, tmp_line, g.SizeOf("tmp_line"))
+	core.PhpStreamPrintf(stream, "RMD %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
-		if (options & 0x8) != 0 {
-			core.PhpErrorDocref(nil, 1<<1, "%s", tmp_line)
+		if (options & core.REPORT_ERRORS) != 0 {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", tmp_line)
 		}
 		goto rmdir_errexit
 	}
 	PhpUrlFree(resource)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	return 1
 rmdir_errexit:
 	if resource != nil {
 		PhpUrlFree(resource)
 	}
 	if stream != nil {
-		streams._phpStreamFree(stream, 1|2)
+		core.PhpStreamClose(stream)
 	}
 	return 0
 }

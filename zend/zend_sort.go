@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_sort.h>
@@ -56,7 +56,7 @@ import (
 
 // # include < limits . h >
 
-// #define QSORT_STACK_SIZE       ( sizeof ( size_t ) * CHAR_BIT )
+const QSORT_STACK_SIZE = b.SizeOf("size_t") * CHAR_BIT
 
 func ZendQsort(base any, nmemb int, siz int, compare CompareFuncT, swp SwapFuncT) {
 	var begin_stack []any
@@ -74,7 +74,7 @@ func ZendQsort(base any, nmemb int, siz int, compare CompareFuncT, swp SwapFuncT
 		begin = begin_stack[loop]
 		end = end_stack[loop]
 		for begin < end {
-			offset = end - begin>>1
+			offset = end - begin>>Z_L(1)
 			swp(begin, begin+(offset-offset%siz))
 			seg1 = begin + siz
 			seg2 = end
@@ -97,13 +97,13 @@ func ZendQsort(base any, nmemb int, siz int, compare CompareFuncT, swp SwapFuncT
 			if seg2p-begin <= end-seg2p {
 				if seg2p+siz < end {
 					begin_stack[loop] = seg2p + siz
-					end_stack[g.PostInc(&loop)] = end
+					end_stack[b.PostInc(&loop)] = end
 				}
 				end = seg2p - siz
 			} else {
 				if seg2p-siz > begin {
 					begin_stack[loop] = begin
-					end_stack[g.PostInc(&loop)] = seg2p - siz
+					end_stack[b.PostInc(&loop)] = seg2p - siz
 				}
 				begin = seg2p + siz
 			}
@@ -267,10 +267,10 @@ func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
 			var j *byte
 			var start *byte = (*byte)(base)
 			var end *byte = start + nmemb*siz
-			var offset int = nmemb >> 1
+			var offset int = nmemb >> Z_L(1)
 			var pivot *byte = start + offset*siz
-			if nmemb>>10 != 0 {
-				var delta int = (offset >> 1) * siz
+			if nmemb>>Z_L(10) != 0 {
+				var delta int = (offset >> Z_L(1)) * siz
 				ZendSort5(start, start+delta, pivot, pivot+delta, end-siz, cmp, swp)
 			} else {
 				ZendSort3(start, pivot, end-siz, cmp, swp)
@@ -282,23 +282,23 @@ func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
 			for true {
 				for cmp(pivot, i) > 0 {
 					i += siz
-					if i == j {
+					if UNEXPECTED(i == j) {
 						goto done
 					}
 				}
 				j -= siz
-				if j == i {
+				if UNEXPECTED(j == i) {
 					goto done
 				}
 				for cmp(j, pivot) > 0 {
 					j -= siz
-					if j == i {
+					if UNEXPECTED(j == i) {
 						goto done
 					}
 				}
 				swp(i, j)
 				i += siz
-				if i == j {
+				if UNEXPECTED(i == j) {
 					goto done
 				}
 			}

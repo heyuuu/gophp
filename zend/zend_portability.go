@@ -2,6 +2,11 @@
 
 package zend
 
+import (
+	b "sik/builtin"
+	"sik/core"
+)
+
 // Source: <Zend/zend_portability.h>
 
 /*
@@ -36,7 +41,7 @@ package zend
 
 // # include < zend_config . h >
 
-// #define ZEND_PATHS_SEPARATOR       ':'
+const ZEND_PATHS_SEPARATOR = ':'
 
 // failed # include "../TSRM/TSRM.h"
 
@@ -60,48 +65,43 @@ package zend
 
 /* GCC x.y.z supplies __GNUC__ = x and __GNUC_MINOR__ = y */
 
-// #define ZEND_GCC_VERSION       0
+const ZEND_GCC_VERSION = 0
 
 /* Compatibility with non-clang compilers */
 
-// #define __has_attribute(x) 0
-
-// #define __has_builtin(x) 0
-
-// #define __has_feature(x) 0
+func __hasAttribute(x __auto__) int { return 0 }
+func __hasBuiltin(x __auto__) int   { return 0 }
+func __hasFeature(x __auto__) int   { return 0 }
 
 // #define ZEND_ASSUME(c)
 
-// #define ZEND_ASSERT(c) ZEND_ASSUME ( c )
+func ZEND_ASSERT(c bool) {}
 
 /* Only use this macro if you know for sure that all of the switches values
    are covered by its case statements */
 
 // #define EMPTY_SWITCH_DEFAULT_CASE() default : ZEND_ASSUME ( 0 ) ; break ;
 
-// #define ZEND_IGNORE_VALUE(x) ( ( void ) ( x ) )
-
-// #define zend_quiet_write() ZEND_IGNORE_VALUE ( write ( __VA_ARGS__ ) )
+func ZEND_IGNORE_VALUE(x __auto__) { void(x) }
+func ZendQuietWrite()              { ZEND_IGNORE_VALUE(write(__VA_ARGS__)) }
 
 /* all HAVE_XXX test have to be after the include of zend_config above */
 
-// #define RTLD_LAZY       1
+const RTLD_LAZY = 1
+const RTLD_GLOBAL = 0
+const PHP_RTLD_MODE = RTLD_LAZY
 
-// #define RTLD_GLOBAL       0
+func DL_LOAD(libname *byte) __auto__ {
+	return dlopen(libname, PHP_RTLD_MODE|RTLD_GLOBAL)
+}
 
-// #define PHP_RTLD_MODE       RTLD_LAZY
-
-// #define DL_LOAD(libname) dlopen ( libname , PHP_RTLD_MODE | RTLD_GLOBAL )
-
-// #define DL_UNLOAD       dlclose
-
-// #define DL_FETCH_SYMBOL       dlsym
-
-// #define DL_ERROR       dlerror
+const DL_UNLOAD = dlclose
+const DL_FETCH_SYMBOL = dlsym
+const DL_ERROR = dlerror
 
 // #define DL_HANDLE       void *
 
-// #define ZEND_EXTENSIONS_SUPPORT       1
+const ZEND_EXTENSIONS_SUPPORT = 1
 
 /* AIX requires this to be the first thing in the file.  */
 
@@ -137,15 +137,14 @@ package zend
 
 // #define ZEND_NORETURN
 
-// #define ZEND_CONST_COND(_condition,_default) ( _default )
+func ZEND_CONST_COND(_condition __auto__, _default __auto__) __auto__ { return _default }
 
 // #define zend_always_inline       inline
 
 // #define zend_never_inline
 
-// #define EXPECTED(condition) __builtin_expect ( ! ! ( condition ) , 1 )
-
-// #define UNEXPECTED(condition) __builtin_expect ( ! ! ( condition ) , 0 )
+func EXPECTED(condition bool) __auto__   { return __builtin_expect(!!condition, 1) }
+func UNEXPECTED(condition bool) __auto__ { return __builtin_expect(!!condition, 0) }
 
 // #define XtOffset(p_type,field) ( ( zend_long ) ( ( ( char * ) ( & ( ( ( p_type ) NULL ) -> field ) ) ) - ( ( char * ) NULL ) ) )
 
@@ -155,15 +154,12 @@ package zend
 
 // #define SET_ALLOCA_FLAG(name)
 
-// #define do_alloca(p,use_heap) emalloc ( p )
+func DoAlloca(p int, use_heap __auto__) any          { return Emalloc(p) }
+func FreeAlloca(p any, use_heap __auto__)            { Efree(p) }
+func SETJMP(a JMP_BUF) __auto__                      { return sigsetjmp(a, 0) }
+func LONGJMP(a JMP_BUF, b ZEND_RESULT_CODE) __auto__ { return siglongjmp(a, b) }
 
-// #define free_alloca(p,use_heap) efree ( p )
-
-// #define SETJMP(a) sigsetjmp ( a , 0 )
-
-// #define LONGJMP(a,b) siglongjmp ( a , b )
-
-// #define JMP_BUF       sigjmp_buf
+const JMP_BUF = sigjmp_buf
 
 // #define ZEND_FILE_LINE_D       void
 
@@ -191,19 +187,28 @@ package zend
 
 // #define Z_DBG(expr)
 
-// #define ZTS_V       0
+const ZTS_V = 0
+const LONG_MAX = 2147483647
+const LONG_MIN = -LONG_MAX - 1
+const MAX_LENGTH_OF_DOUBLE = 32
 
-// #define LONG_MAX       2147483647L
-
-// #define LONG_MIN       ( - LONG_MAX - 1 )
-
-// #define MAX_LENGTH_OF_DOUBLE       32
-
-// #define MAX(a,b) ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
-
-// #define MIN(a,b) ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
-
-// #define ZEND_BIT_TEST(bits,bit) ( ( ( bits ) [ ( bit ) / ( sizeof ( ( bits ) [ 0 ] ) * 8 ) ] >> ( ( bit ) & ( sizeof ( ( bits ) [ 0 ] ) * 8 - 1 ) ) ) & 1 )
+func MAX(a int, b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+func MIN(a __auto__, b __auto__) __auto__ {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+func ZEND_BIT_TEST(bits []uint32, bit uint32) int {
+	return bits[bit/(b.SizeOf("( bits ) [ 0 ]")*8)] >> (bit&b.SizeOf("( bits ) [ 0 ]")*8 - 1) & 1
+}
 
 /* We always define a __special__  function, even if there's a macro or expression we could
  * alias, so that using it in contexts where we can't make function calls
@@ -212,38 +217,58 @@ package zend
 
 func _zendGetInf() float64 { return HUGE_VAL }
 
-// #define ZEND_INFINITY       ( _zend_get_inf ( ) )
+const ZEND_INFINITY float64 = _zendGetInf()
 
 func _zendGetNan() float64 { return 0.0 / 0.0 }
 
-// #define ZEND_NAN       ( _zend_get_nan ( ) )
+const ZEND_NAN float64 = _zendGetNan()
 
-// #define ZEND_STRL(str) ( str ) , ( sizeof ( str ) - 1 )
+func ZEND_STRL(str string) {
+	str
+	b.SizeOf("str") - 1
+}
+func ZEND_STRS(str __auto__) {
+	str
+	b.SizeOf("str")
+}
+func ZEND_NORMALIZE_BOOL(n ZendLong) int {
+	if n != 0 {
+		if n < 0 {
+			return -1
+		} else {
+			return 1
+		}
+	} else {
+		return 0
+	}
+}
+func ZEND_TRUTH(x __auto__) int {
+	if x {
+		return 1
+	} else {
+		return 0
+	}
+}
+func ZEND_LOG_XOR(a __auto__, b __auto__) int { return ZEND_TRUTH(a) ^ ZEND_TRUTH(b) }
 
-// #define ZEND_STRS(str) ( str ) , ( sizeof ( str ) )
-
-// #define ZEND_NORMALIZE_BOOL(n) ( ( n ) ? ( ( ( n ) < 0 ) ? - 1 : 1 ) : 0 )
-
-// #define ZEND_TRUTH(x) ( ( x ) ? 1 : 0 )
-
-// #define ZEND_LOG_XOR(a,b) ( ZEND_TRUTH ( a ) ^ ZEND_TRUTH ( b ) )
-
-// #define ZEND_MAX_RESERVED_RESOURCES       6
+const ZEND_MAX_RESERVED_RESOURCES = 6
 
 /* excpt.h on Digital Unix 4.0 defines function_table */
 
-// #define ZEND_SECURE_ZERO(var,size) explicit_bzero ( ( var ) , ( size ) )
+func ZEND_SECURE_ZERO(var_ __auto__, size __auto__) __auto__ { return core.ExplicitBzero(var_, size) }
 
 /* This check should only be used on network socket, not file descriptors */
 
-// #define ZEND_VALID_SOCKET(sock) ( ( sock ) >= 0 )
+func ZEND_VALID_SOCKET(sock core.PhpSocketT) bool { return sock >= 0 }
 
 /* va_copy() is __va_copy() in old gcc versions.
  * According to the autoconf manual, using
  * memcpy(&dst, &src, sizeof(va_list))
  * gives maximum portability. */
 
-// #define va_copy(dest,src) memcpy ( & ( dest ) , & ( src ) , sizeof ( va_list ) )
+func VaCopy(dest ...any, src ...any) __auto__ {
+	return memcpy(&dest, &src, b.SizeOf("va_list"))
+}
 
 /* Intrinsics macros start. */
 
@@ -263,11 +288,13 @@ func _zendGetNan() float64 { return 0.0 / 0.0 }
 
 // #define ZEND_SET_ALIGNED(alignment,decl) decl
 
-// #define ZEND_SLIDE_TO_ALIGNED(alignment,ptr) ( ( ( zend_uintptr_t ) ( ptr ) + ( ( alignment ) - 1 ) ) & ~ ( ( alignment ) - 1 ) )
-
-// #define ZEND_SLIDE_TO_ALIGNED16(ptr) ZEND_SLIDE_TO_ALIGNED ( Z_UL ( 16 ) , ptr )
-
-// #define ZEND_EXPAND_VA(code) code
+func ZEND_SLIDE_TO_ALIGNED(alignment int, ptr __auto__) int {
+	return zend_uintptr_t(ptr) + (alignment-1) & ^(alignment-1)
+}
+func ZEND_SLIDE_TO_ALIGNED16(ptr __auto__) int {
+	return ZEND_SLIDE_TO_ALIGNED(Z_UL(16), ptr)
+}
+func ZEND_EXPAND_VA(code __auto__) __auto__ { return code }
 
 /* On CPU with few registers, it's cheaper to reload value then use spill slot */
 

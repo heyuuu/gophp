@@ -3,8 +3,8 @@
 package zend
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 )
 
 // Source: <Zend/zend_extensions.h>
@@ -53,7 +53,7 @@ You can use the following macro to check the extension API version for compatibi
 #endif
 */
 
-// #define ZEND_EXTENSION_API_NO       320190902
+const ZEND_EXTENSION_API_NO = 320190902
 
 // #define ZEND_EXTENSION_BUILD_ID       "API" ZEND_TOSTR ( ZEND_EXTENSION_API_NO ) ZEND_BUILD_TS ZEND_BUILD_DEBUG ZEND_BUILD_SYSTEM ZEND_BUILD_EXTRA
 
@@ -73,7 +73,7 @@ type OpArrayDtorFuncT func(op_array *ZendOpArray)
 type OpArrayPersistCalcFuncT func(op_array *ZendOpArray) int
 type OpArrayPersistFuncT func(op_array *ZendOpArray, mem any) int
 
-// #define ZEND_EXTMSG_NEW_EXTENSION       1
+const ZEND_EXTMSG_NEW_EXTENSION = 1
 
 // #define ZEND_EXTENSION() ZEND_EXT_API zend_extension_version_info extension_version_info = { ZEND_EXTENSION_API_NO , ZEND_EXTENSION_BUILD_ID }
 
@@ -85,15 +85,11 @@ type OpArrayPersistFuncT func(op_array *ZendOpArray, mem any) int
 
 var ZendExtensions ZendLlist
 
-// #define ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR       ( 1 << 0 )
-
-// #define ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR       ( 1 << 1 )
-
-// #define ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER       ( 1 << 2 )
-
-// #define ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC       ( 1 << 3 )
-
-// #define ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST       ( 1 << 4 )
+const ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR = 1 << 0
+const ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR = 1 << 1
+const ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER = 1 << 2
+const ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC = 1 << 3
+const ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST = 1 << 4
 
 // Source: <Zend/zend_extensions.c>
 
@@ -124,9 +120,9 @@ var LastResourceNumber int
 
 func ZendLoadExtension(path *byte) int {
 	var handle any
-	handle = dlopen(path, 1|0)
+	handle = DL_LOAD(path)
 	if !handle {
-		r.Fprintf(stderr, "Failed loading %s:  %s\n", path, dlerror())
+		r.Fprintf(stderr, "Failed loading %s:  %s\n", path, DL_ERROR())
 		return FAILURE
 	}
 	return ZendLoadExtensionHandle(handle, path)
@@ -134,54 +130,54 @@ func ZendLoadExtension(path *byte) int {
 func ZendLoadExtensionHandle(handle any, path *byte) int {
 	var new_extension *ZendExtension
 	var extension_version_info *ZendExtensionVersionInfo
-	extension_version_info = (*ZendExtensionVersionInfo)(dlsym(handle, "extension_version_info"))
+	extension_version_info = (*ZendExtensionVersionInfo)(DL_FETCH_SYMBOL(handle, "extension_version_info"))
 	if extension_version_info == nil {
-		extension_version_info = (*ZendExtensionVersionInfo)(dlsym(handle, "_extension_version_info"))
+		extension_version_info = (*ZendExtensionVersionInfo)(DL_FETCH_SYMBOL(handle, "_extension_version_info"))
 	}
-	new_extension = (*ZendExtension)(dlsym(handle, "zend_extension_entry"))
+	new_extension = (*ZendExtension)(DL_FETCH_SYMBOL(handle, "zend_extension_entry"))
 	if new_extension == nil {
-		new_extension = (*ZendExtension)(dlsym(handle, "_zend_extension_entry"))
+		new_extension = (*ZendExtension)(DL_FETCH_SYMBOL(handle, "_zend_extension_entry"))
 	}
 	if extension_version_info == nil || new_extension == nil {
 		r.Fprintf(stderr, "%s doesn't appear to be a valid Zend extension\n", path)
 
 		/* See http://support.microsoft.com/kb/190351 */
 
-		dlclose(handle)
+		DL_UNLOAD(handle)
 		return FAILURE
 	}
 
 	/* allow extension to proclaim compatibility with any Zend version */
 
-	if extension_version_info.GetZendExtensionApiNo() != 320190902 && (new_extension.GetApiNoCheck() == nil || new_extension.GetApiNoCheck()(320190902) != SUCCESS) {
-		if extension_version_info.GetZendExtensionApiNo() > 320190902 {
-			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is outdated.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902)
+	if extension_version_info.GetZendExtensionApiNo() != ZEND_EXTENSION_API_NO && (new_extension.GetApiNoCheck() == nil || new_extension.GetApiNoCheck()(ZEND_EXTENSION_API_NO) != SUCCESS) {
+		if extension_version_info.GetZendExtensionApiNo() > ZEND_EXTENSION_API_NO {
+			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is outdated.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), ZEND_EXTENSION_API_NO)
 
 			/* See http://support.microsoft.com/kb/190351 */
 
-			dlclose(handle)
+			DL_UNLOAD(handle)
 			return FAILURE
-		} else if extension_version_info.GetZendExtensionApiNo() < 320190902 {
-			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is newer.\n"+"Contact %s at %s for a later version of %s.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), 320190902, new_extension.GetAuthor(), new_extension.GetURL(), new_extension.GetName())
+		} else if extension_version_info.GetZendExtensionApiNo() < ZEND_EXTENSION_API_NO {
+			r.Fprintf(stderr, "%s requires Zend Engine API version %d.\n"+"The Zend Engine API version %d which is installed, is newer.\n"+"Contact %s at %s for a later version of %s.\n\n", new_extension.GetName(), extension_version_info.GetZendExtensionApiNo(), ZEND_EXTENSION_API_NO, new_extension.GetAuthor(), new_extension.GetURL(), new_extension.GetName())
 
 			/* See http://support.microsoft.com/kb/190351 */
 
-			dlclose(handle)
+			DL_UNLOAD(handle)
 			return FAILURE
 		}
-	} else if strcmp("API"+"320190902"+",NTS", extension_version_info.GetBuildId()) && (new_extension.GetBuildIdCheck() == nil || new_extension.GetBuildIdCheck()("API"+"320190902"+",NTS") != SUCCESS) {
-		r.Fprintf(stderr, "Cannot load %s - it was built with configuration %s, whereas running engine is %s\n", new_extension.GetName(), extension_version_info.GetBuildId(), "API"+"320190902"+",NTS")
+	} else if strcmp("API"+"ZEND_EXTENSION_API_NO"+ZEND_BUILD_TS, extension_version_info.GetBuildId()) && (new_extension.GetBuildIdCheck() == nil || new_extension.GetBuildIdCheck()("API"+"ZEND_EXTENSION_API_NO"+ZEND_BUILD_TS) != SUCCESS) {
+		r.Fprintf(stderr, "Cannot load %s - it was built with configuration %s, whereas running engine is %s\n", new_extension.GetName(), extension_version_info.GetBuildId(), "API"+"ZEND_EXTENSION_API_NO"+ZEND_BUILD_TS)
 
 		/* See http://support.microsoft.com/kb/190351 */
 
-		dlclose(handle)
+		DL_UNLOAD(handle)
 		return FAILURE
 	} else if ZendGetExtension(new_extension.GetName()) != nil {
 		r.Fprintf(stderr, "Cannot load %s - it was already loaded\n", new_extension.GetName())
 
 		/* See http://support.microsoft.com/kb/190351 */
 
-		dlclose(handle)
+		DL_UNLOAD(handle)
 		return FAILURE
 	}
 	return ZendRegisterExtension(new_extension, handle)
@@ -190,22 +186,22 @@ func ZendRegisterExtension(new_extension *ZendExtension, handle any) int {
 	var extension ZendExtension
 	extension = *new_extension
 	extension.SetHandle(handle)
-	ZendExtensionDispatchMessage(1, &extension)
+	ZendExtensionDispatchMessage(ZEND_EXTMSG_NEW_EXTENSION, &extension)
 	ZendLlistAddElement(&ZendExtensions, &extension)
 	if extension.GetOpArrayCtor() != nil {
-		ZendExtensionFlags |= 1 << 0
+		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR
 	}
 	if extension.GetOpArrayDtor() != nil {
-		ZendExtensionFlags |= 1 << 1
+		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR
 	}
 	if extension.GetOpArrayHandler() != nil {
-		ZendExtensionFlags |= 1 << 2
+		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER
 	}
 	if extension.GetOpArrayPersistCalc() != nil {
-		ZendExtensionFlags |= 1 << 3
+		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC
 	}
 	if extension.GetOpArrayPersist() != nil {
-		ZendExtensionFlags |= 1 << 4
+		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST
 	}
 
 	/*fprintf(stderr, "Loaded %s, version %s\n", extension.name, extension.version);*/
@@ -231,7 +227,7 @@ func ZendExtensionStartup(extension *ZendExtension) int {
 func ZendStartupExtensionsMechanism() int {
 	/* Startup extensions mechanism */
 
-	ZendLlistInit(&ZendExtensions, g.SizeOf("zend_extension"), (func(any))(ZendExtensionDtor), 1)
+	ZendLlistInit(&ZendExtensions, b.SizeOf("zend_extension"), (func(any))(ZendExtensionDtor), 1)
 	ZendOpArrayExtensionHandles = 0
 	LastResourceNumber = 0
 	return SUCCESS
@@ -246,7 +242,7 @@ func ZendShutdownExtensions() {
 }
 func ZendExtensionDtor(extension *ZendExtension) {
 	if extension.GetHandle() && !(getenv("ZEND_DONT_UNLOAD_MODULES")) {
-		dlclose(extension.GetHandle())
+		DL_UNLOAD(extension.GetHandle())
 	}
 }
 func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args ...any) {
@@ -263,7 +259,7 @@ func ZendExtensionDispatchMessage(message int, arg any) {
 	ZendLlistApplyWithArguments(&ZendExtensions, LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher), 2, message, arg)
 }
 func ZendGetResourceHandle(extension *ZendExtension) int {
-	if LastResourceNumber < 6 {
+	if LastResourceNumber < ZEND_MAX_RESERVED_RESOURCES {
 		extension.SetResourceNumber(LastResourceNumber)
 		LastResourceNumber++
 		return LastResourceNumber - 1
@@ -301,7 +297,7 @@ func ZendExtensionOpArrayPersistHandler(extension *ZendExtension, data *ZendExte
 	}
 }
 func ZendExtensionsOpArrayPersistCalc(op_array *ZendOpArray) int {
-	if (ZendExtensionFlags & 1 << 3) != 0 {
+	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST_CALC) != 0 {
 		var data ZendExtensionPersistData
 		data.SetOpArray(op_array)
 		data.SetSize(0)
@@ -312,7 +308,7 @@ func ZendExtensionsOpArrayPersistCalc(op_array *ZendOpArray) int {
 	return 0
 }
 func ZendExtensionsOpArrayPersist(op_array *ZendOpArray, mem any) int {
-	if (ZendExtensionFlags & 1 << 4) != 0 {
+	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_PERSIST) != 0 {
 		var data ZendExtensionPersistData
 		data.SetOpArray(op_array)
 		data.SetSize(0)

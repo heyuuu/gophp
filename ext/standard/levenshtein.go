@@ -3,8 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -38,7 +38,7 @@ import (
 
 // # include "php_string.h"
 
-// #define LEVENSHTEIN_MAX_LENGTH       255
+const LEVENSHTEIN_MAX_LENGTH = 255
 
 /* {{{ reference_levdist
  * reference implementation, only optimized for memory usage, not speed */
@@ -58,18 +58,18 @@ func ReferenceLevdist(s1 *byte, l1 int, s2 *byte, l2 int, cost_ins zend.ZendLong
 	if l2 == 0 {
 		return l1 * cost_del
 	}
-	if l1 > 255 || l2 > 255 {
+	if l1 > LEVENSHTEIN_MAX_LENGTH || l2 > LEVENSHTEIN_MAX_LENGTH {
 		return -1
 	}
-	p1 = zend._safeEmalloc(l2+1, g.SizeOf("zend_long"), 0)
-	p2 = zend._safeEmalloc(l2+1, g.SizeOf("zend_long"), 0)
+	p1 = zend.SafeEmalloc(l2+1, b.SizeOf("zend_long"), 0)
+	p2 = zend.SafeEmalloc(l2+1, b.SizeOf("zend_long"), 0)
 	for i2 = 0; i2 <= l2; i2++ {
 		p1[i2] = i2 * cost_ins
 	}
 	for i1 = 0; i1 < l1; i1++ {
 		p2[0] = p1[0] + cost_del
 		for i2 = 0; i2 < l2; i2++ {
-			c0 = p1[i2] + g.Cond(s1[i1] == s2[i2], 0, cost_rep)
+			c0 = p1[i2] + b.Cond(s1[i1] == s2[i2], 0, cost_rep)
 			c1 = p1[i2+1] + cost_del
 			if c1 < c0 {
 				c0 = c1
@@ -85,15 +85,15 @@ func ReferenceLevdist(s1 *byte, l1 int, s2 *byte, l2 int, cost_ins zend.ZendLong
 		p2 = tmp
 	}
 	c0 = p1[l2]
-	zend._efree(p1)
-	zend._efree(p2)
+	zend.Efree(p1)
+	zend.Efree(p2)
 	return c0
 }
 
 /* }}} */
 
 func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
-	core.PhpErrorDocref(nil, 1<<1, "The general Levenshtein support is not there yet")
+	core.PhpErrorDocref(nil, zend.E_WARNING, "The general Levenshtein support is not there yet")
 
 	/* not there yet */
 
@@ -105,7 +105,7 @@ func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
 /* }}} */
 
 func ZifLevenshtein(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var argc int = execute_data.This.u2.num_args
+	var argc int = zend.ZEND_NUM_ARGS()
 	var str1 *byte
 	var str2 *byte
 	var callback_name *byte
@@ -136,15 +136,12 @@ func ZifLevenshtein(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		distance = CustomLevdist(str1, str2, callback_name)
 		break
 	default:
-		zend.ZendWrongParamCount()
-		return
+		zend.WRONG_PARAM_COUNT
 	}
-	if distance < 0 && execute_data.This.u2.num_args != 3 {
-		core.PhpErrorDocref(nil, 1<<1, "Argument string(s) too long")
+	if distance < 0 && zend.ZEND_NUM_ARGS() != 3 {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Argument string(s) too long")
 	}
-	var __z *zend.Zval = return_value
-	__z.value.lval = distance
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(distance)
 	return
 }
 

@@ -33,8 +33,6 @@ package standard
 
 // # include "php_rand.h"
 
-// #define PHP_MT_RAND_MAX       ( ( zend_long ) ( 0x7FFFFFFF ) )
-
-// #define MT_RAND_MT19937       0
-
-// #define MT_RAND_PHP       1
+const PHP_MT_RAND_MAX = zend_long(0x7fffffff)
+const MT_RAND_MT19937 = 0
+const MT_RAND_PHP = 1

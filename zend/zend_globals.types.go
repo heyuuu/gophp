@@ -169,7 +169,7 @@ type ZendExecutorGlobals struct {
 	symtable_cache_ptr                  **ZendArray
 	symbol_table                        ZendArray
 	included_files                      HashTable
-	bailout                             *sigjmp_buf
+	bailout                             *JMP_BUF
 	error_reporting                     int
 	exit_status                         int
 	function_table                      *HashTable
@@ -248,8 +248,8 @@ func (this ZendExecutorGlobals) GetSymbolTable() ZendArray          { return thi
 func (this *ZendExecutorGlobals) SetSymbolTable(value ZendArray)    { this.symbol_table = value }
 func (this ZendExecutorGlobals) GetIncludedFiles() HashTable        { return this.included_files }
 func (this *ZendExecutorGlobals) SetIncludedFiles(value HashTable)  { this.included_files = value }
-func (this ZendExecutorGlobals) GetBailout() *sigjmp_buf            { return this.bailout }
-func (this *ZendExecutorGlobals) SetBailout(value *sigjmp_buf)      { this.bailout = value }
+func (this ZendExecutorGlobals) GetBailout() *JMP_BUF               { return this.bailout }
+func (this *ZendExecutorGlobals) SetBailout(value *JMP_BUF)         { this.bailout = value }
 func (this ZendExecutorGlobals) GetErrorReporting() int             { return this.error_reporting }
 func (this *ZendExecutorGlobals) SetErrorReporting(value int)       { this.error_reporting = value }
 func (this ZendExecutorGlobals) GetExitStatus() int                 { return this.exit_status }

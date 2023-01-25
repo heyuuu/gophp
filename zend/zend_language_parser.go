@@ -3,7 +3,8 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/core"
 )
 
 // Source: <Zend/zend_language_parser.h>
@@ -171,39 +172,23 @@ const (
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 
-// #define YYBISON       1
-
 /* Bison version.  */
-
-// #define YYBISON_VERSION       "3.0.2"
 
 /* Skeleton name.  */
 
-// #define YYSKELETON_NAME       "yacc.c"
-
 /* Pure parsers.  */
-
-// #define YYPURE       2
 
 /* Push parsers.  */
 
-// #define YYPUSH       0
-
 /* Pull parsers.  */
-
-// #define YYPULL       1
 
 /* Substitute the variable and function names.  */
 
-// #define yyparse       zendparse
-
-// #define yylex       zendlex
-
-// #define yyerror       zenderror
-
-// #define yydebug       zenddebug
-
-// #define yynerrs       zendnerrs
+const LangYyparse = Zendparse
+const LangYylex = Zendlex
+const LangYyerror = Zenderror
+const LangYydebug = zenddebug
+const LangYynerrs = zendnerrs
 
 /* Copy the first part of user declarations.  */
 
@@ -223,17 +208,11 @@ const (
 
 // # include "zend_exceptions.h"
 
-// #define YYSIZE_T       size_t
-
-// #define yytnamerr       zend_yytnamerr
+const LangYytnamerr = ZendYytnamerr
 
 // #define YYSTYPE       zend_parser_stack_elem
 
-// #define YY_NULLPTR       0
-
 /* Enabling verbose error messages.  */
-
-// #define YYERROR_VERBOSE       1
 
 /* In a future release of Bison, this section will be replaced
    by #include "zend_language_parser.h".  */
@@ -400,10 +379,6 @@ type LangYytypeInt8 = signed__char
 type LangYytypeUint16 = unsigned__short__int
 type LangYytypeInt16 = short__int
 
-// #define YYSIZE_MAXIMUM       ( ( YYSIZE_T ) - 1 )
-
-// #define YY_(Msgid) Msgid
-
 // #define YY_ATTRIBUTE(Spec)
 
 // #define YY_ATTRIBUTE_PURE       YY_ATTRIBUTE ( ( __pure__ ) )
@@ -414,8 +389,6 @@ type LangYytypeInt16 = short__int
 
 /* Suppress unused-variable warnings by "using" E.  */
 
-// #define YYUSE(E) ( ( void ) ( E ) )
-
 // #define YY_INITIAL_VALUE(Value) Value
 
 // #define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
@@ -424,28 +397,12 @@ type LangYytypeInt16 = short__int
 
 /* The parser invokes alloca or malloc; define the __special__  necessary symbols.  */
 
-// #define YYSTACK_ALLOC       YYMALLOC
-
-// #define YYSTACK_FREE       YYFREE
-
-// #define YYSTACK_ALLOC_MAXIMUM       YYSIZE_MAXIMUM
-
-// #define YYMALLOC       malloc
-
-// #define YYFREE       free
-
 /* A type that is properly aligned for any stack member.  */
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 
-// #define YYSTACK_GAP_MAXIMUM       ( sizeof ( union yyalloc ) - 1 )
-
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
-
-// #define YYSTACK_BYTES(N) ( ( N ) * ( sizeof ( yytype_int16 ) + sizeof ( YYSTYPE ) ) + YYSTACK_GAP_MAXIMUM )
-
-// #define YYCOPY_NEEDED       1
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
@@ -458,40 +415,20 @@ type LangYytypeInt16 = short__int
 /* Copy COUNT objects from SRC to DST.  The source and destination do
    not overlap.  */
 
-// #define YYCOPY(Dst,Src,Count) do { YYSIZE_T yyi ; for ( yyi = 0 ; yyi < ( Count ) ; yyi ++ ) ( Dst ) [ yyi ] = ( Src ) [ yyi ] ; } while ( 0 )
-
 /* YYFINAL -- State number of the termination state.  */
-
-// #define YYFINAL       3
 
 /* YYLAST -- Last index in YYTABLE.  */
 
-// #define YYLAST       7174
-
 /* YYNTOKENS -- Number of terminals.  */
-
-// #define YYNTOKENS       170
 
 /* YYNNTS -- Number of nonterminals.  */
 
-// #define YYNNTS       140
-
 /* YYNRULES -- Number of rules.  */
-
-// #define YYNRULES       504
 
 /* YYNSTATES -- Number of states.  */
 
-// #define YYNSTATES       955
-
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
-
-// #define YYUNDEFTOK       2
-
-// #define YYMAXUTOK       396
-
-// #define YYTRANSLATE(YYX) ( ( unsigned int ) ( YYX ) <= YYMAXUTOK ? yytranslate [ YYX ] : YYUNDEFTOK )
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, without out-of-bounds checking.  */
@@ -812,16 +749,11 @@ var LangYytname []*byte = []*byte{
 	"internal_functions_in_yacc",
 	"isset_variables",
 	"isset_variable",
-	0,
+	YY_NULLPTR,
 }
 
-// #define YYPACT_NINF       - 753
-
-// #define yypact_value_is_default(Yystate) ( ! ! ( ( Yystate ) == ( - 753 ) ) )
-
-// #define YYTABLE_NINF       - 477
-
-// #define yytable_value_is_error(Yytable_value) ( ! ! ( ( Yytable_value ) == ( - 477 ) ) )
+func LangYypactValueIsDefault(Yystate __auto__) bool      { return !!(Yystate == -753) }
+func LangYytableValueIsError(Yytable_value __auto__) bool { return !!(Yytable_value == -477) }
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
@@ -862,13 +794,8 @@ var LangYyr1 []yytype_uint16 = []yytype_uint16{0, 170, 171, 172, 172, 172, 172, 
 
 var LangYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0, 1, 3, 1, 3, 2, 1, 1, 1, 1, 1, 4, 3, 0, 6, 0, 5, 3, 4, 3, 4, 3, 1, 1, 6, 7, 6, 7, 0, 1, 3, 1, 3, 1, 3, 1, 1, 2, 1, 3, 1, 2, 3, 1, 2, 0, 1, 1, 1, 1, 1, 4, 3, 1, 1, 5, 7, 9, 5, 3, 3, 3, 3, 3, 3, 1, 2, 6, 7, 9, 0, 6, 1, 6, 3, 3, 2, 0, 9, 1, 3, 0, 4, 1, 3, 1, 13, 0, 1, 0, 1, 0, 10, 0, 9, 1, 2, 1, 1, 0, 7, 0, 8, 0, 2, 0, 2, 0, 2, 1, 2, 4, 3, 1, 4, 1, 4, 1, 4, 3, 4, 4, 5, 0, 5, 4, 1, 1, 1, 4, 5, 6, 1, 3, 6, 7, 3, 6, 1, 0, 1, 3, 4, 6, 0, 1, 1, 2, 1, 1, 1, 0, 2, 2, 4, 1, 3, 1, 2, 3, 1, 1, 3, 1, 1, 3, 2, 0, 4, 4, 3, 12, 1, 3, 1, 2, 3, 1, 2, 2, 2, 3, 3, 3, 4, 3, 1, 1, 3, 1, 3, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, 1, 2, 4, 3, 1, 4, 4, 3, 1, 1, 0, 1, 3, 1, 0, 9, 3, 2, 1, 6, 5, 3, 4, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 5, 4, 3, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 3, 2, 1, 2, 4, 2, 1, 2, 13, 12, 1, 1, 0, 0, 0, 0, 1, 0, 4, 3, 1, 1, 2, 2, 4, 4, 2, 1, 1, 1, 1, 0, 3, 0, 1, 1, 0, 1, 4, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 3, 3, 1, 1, 1, 3, 3, 0, 1, 1, 1, 3, 1, 1, 3, 1, 1, 4, 4, 4, 4, 1, 1, 1, 3, 1, 4, 2, 3, 3, 1, 4, 4, 3, 3, 3, 1, 3, 1, 1, 3, 1, 1, 0, 1, 3, 1, 3, 1, 4, 2, 2, 6, 4, 2, 2, 1, 2, 1, 4, 3, 3, 3, 6, 3, 1, 1, 2, 1, 5, 4, 2, 2, 4, 2, 2, 1, 3, 1}
 
-// #define yyerrok       ( yyerrstatus = 0 )
-
-// #define yyclearin       ( yychar = YYEMPTY )
-
-// #define YYEMPTY       ( - 2 )
-
-// #define YYEOF       0
+const LangYyerrok = b.Assign(&yyerrstatus, 0)
+const LangYyclearin = b.Assign(&yychar, YYEMPTY)
 
 // #define YYACCEPT       goto yyacceptlab
 
@@ -876,15 +803,7 @@ var LangYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 // #define YYERROR       goto yyerrorlab
 
-// #define YYRECOVERING() ( ! ! yyerrstatus )
-
-// #define YYBACKUP(Token,Value) do if ( yychar == YYEMPTY ) { yychar = ( Token ) ; yylval = ( Value ) ; YYPOPSTACK ( yylen ) ; yystate = * yyssp ; goto yybackup ; } else { yyerror ( YY_ ( "syntax error: cannot back up" ) ) ; YYERROR ; } while ( 0 )
-
 /* Error token number */
-
-// #define YYTERROR       1
-
-// #define YYERRCODE       256
 
 /* Enable debugging if requested.  */
 
@@ -898,8 +817,6 @@ var LangYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
 
-// #define YYINITDEPTH       200
-
 /* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
    if the built-in stack extension method is used).
 
@@ -907,12 +824,10 @@ var LangYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
    YYSTACK_ALLOC_MAXIMUM < YYSTACK_BYTES (YYMAXDEPTH)
    evaluated with infinite-precision integer arithmetic.  */
 
-// #define YYMAXDEPTH       10000
-
 /* Return the length of YYSTR.  */
 
-func LangYystrlen(yystr *byte) int {
-	var yylen int
+func LangYystrlen(yystr *byte) YYSIZE_T {
+	var yylen YYSIZE_T
 	for yylen = 0; yystr[yylen]; yylen++ {
 		continue
 	}
@@ -925,7 +840,7 @@ func LangYystrlen(yystr *byte) int {
 func LangYystpcpy(yydest *byte, yysrc *byte) *byte {
 	var yyd *byte = yydest
 	var yys *byte = yysrc
-	for g.Assign(&(g.PostInc(&(*yyd))), g.PostInc(&(*yys))) != '0' {
+	for b.Assign(&(b.PostInc(&(*yyd))), b.PostInc(&(*yys))) != '0' {
 		continue
 	}
 	return yyd - 1
@@ -940,14 +855,14 @@ func LangYystpcpy(yydest *byte, yysrc *byte) *byte {
    *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
    required number of bytes is too large to store.  */
 
-func LangYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytoken int) int {
-	var yysize0 int = ZendYytnamerr(0, yytname[yytoken])
-	var yysize int = yysize0
+func LangYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, yytoken int) int {
+	var yysize0 YYSIZE_T = yytnamerr(YY_NULLPTR, yytname[yytoken])
+	var yysize YYSIZE_T = yysize0
 	const YYERROR_VERBOSE_ARGS_MAXIMUM = 5
 
 	/* Internationalized format string. */
 
-	var yyformat *byte = 0
+	var yyformat *byte = YY_NULLPTR
 
 	/* Arguments of yyformat. */
 
@@ -982,32 +897,32 @@ func LangYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yyto
 	     accepted due to an error action in a later state.
 	*/
 
-	if yytoken != -2 {
+	if yytoken != YYEMPTY {
 		var yyn int = yypact[*yyssp]
-		yyarg[g.PostInc(&yycount)] = yytname[yytoken]
-		if yyn != -753 {
+		yyarg[b.PostInc(&yycount)] = yytname[yytoken]
+		if !(yypact_value_is_default(yyn)) {
 
 			/* Start YYX at -YYN if negative to avoid negative indexes in
 			   YYCHECK.  In other words, skip the first -YYN actions for
 			   this state because they are default actions.  */
 
-			var yyxbegin int = g.Cond(yyn < 0, -yyn, 0)
+			var yyxbegin int = b.Cond(yyn < 0, -yyn, 0)
 
 			/* Stay within bounds of both yycheck and yytname.  */
 
-			var yychecklim int = 7174 - yyn + 1
-			var yyxend int = g.Cond(yychecklim < 170, yychecklim, 170)
+			var yychecklim int = YYLAST - yyn + 1
+			var yyxend int = b.Cond(yychecklim < YYNTOKENS, yychecklim, YYNTOKENS)
 			var yyx int
 			for yyx = yyxbegin; yyx < yyxend; yyx++ {
-				if yycheck[yyx+yyn] == yyx && yyx != 1 && yytable[yyx+yyn] != -477 {
+				if yycheck[yyx+yyn] == yyx && yyx != YYTERROR && !(yytable_value_is_error(yytable[yyx+yyn])) {
 					if yycount == YYERROR_VERBOSE_ARGS_MAXIMUM {
 						yycount = 1
 						yysize = yysize0
 						break
 					}
-					yyarg[g.PostInc(&yycount)] = yytname[yyx]
-					var yysize1 int = yysize + ZendYytnamerr(0, yytname[yyx])
-					if !(yysize <= yysize1 && yysize1 <= size_t-1) {
+					yyarg[b.PostInc(&yycount)] = yytname[yyx]
+					var yysize1 YYSIZE_T = yysize + yytnamerr(YY_NULLPTR, yytname[yyx])
+					if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
 						return 2
 					}
 					yysize = yysize1
@@ -1017,33 +932,33 @@ func LangYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yyto
 	}
 	switch yycount {
 	case 0:
-		yyformat = "syntax error"
+		yyformat = YY_("syntax error")
 		break
 	case 1:
-		yyformat = "syntax error, unexpected %s"
+		yyformat = YY_("syntax error, unexpected %s")
 		break
 	case 2:
-		yyformat = "syntax error, unexpected %s, expecting %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s")
 		break
 	case 3:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s")
 		break
 	case 4:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s")
 		break
 	case 5:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s or %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s")
 		break
 	}
-	var yysize1 int = yysize + yystrlen(yyformat)
-	if !(yysize <= yysize1 && yysize1 <= size_t-1) {
+	var yysize1 YYSIZE_T = yysize + yystrlen(yyformat)
+	if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
 		return 2
 	}
 	yysize = yysize1
 	if (*yymsg_alloc) < yysize {
 		*yymsg_alloc = 2 * yysize
-		if !(yysize <= (*yymsg_alloc) && (*yymsg_alloc) <= size_t-1) {
-			*yymsg_alloc = size_t - 1
+		if !(yysize <= (*yymsg_alloc) && (*yymsg_alloc) <= YYSTACK_ALLOC_MAXIMUM) {
+			*yymsg_alloc = YYSTACK_ALLOC_MAXIMUM
 		}
 		return 1
 	}
@@ -1054,9 +969,9 @@ func LangYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yyto
 
 	var yyp *byte = *yymsg
 	var yyi int = 0
-	for g.Assign(&(*yyp), *yyformat) != '0' {
+	for b.Assign(&(*yyp), *yyformat) != '0' {
 		if (*yyp) == '%' && yyformat[1] == 's' && yyi < yycount {
-			yyp += ZendYytnamerr(yyp, yyarg[g.PostInc(&yyi)])
+			yyp += yytnamerr(yyp, yyarg[b.PostInc(&yyi)])
 			yyformat += 2
 		} else {
 			yyp++
@@ -1071,7 +986,7 @@ func LangYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yyto
 `-----------------------------------------------*/
 
 func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
-	void(yyvaluep)
+	YYUSE(yyvaluep)
 	if yymsg == nil {
 		yymsg = "Deleting"
 	}
@@ -1450,1795 +1365,6 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 | yyparse.  |
 `----------*/
 
-func Zendparse() int {
-	/* The lookahead symbol.  */
-
-	var yychar int
-
-	/* The semantic value of the lookahead symbol.  */
-
-	var yyval_default ZendParserStackElem
-	var yylval ZendParserStackElem = yyval_default
-
-	/* Number of syntax errors so far.  */
-
-	var zendnerrs int
-	var yystate int
-
-	/* Number of tokens to shift before error messages enabled.  */
-
-	var yyerrstatus int
-
-	/* The stacks and their tools:
-	   'yyss': related to states.
-	   'yyvs': related to semantic values.
-
-	   Refer to the stacks through separate pointers, to allow yyoverflow
-	   to reallocate them elsewhere.  */
-
-	var yyssa []yytype_int16
-	var yyss *yytype_int16
-	var yyssp *yytype_int16
-
-	/* The semantic value stack.  */
-
-	var yyvsa []ZendParserStackElem
-	var yyvs *ZendParserStackElem
-	var yyvsp *ZendParserStackElem
-	var yystacksize int
-	var yyn int
-	var yyresult int
-
-	/* Lookahead token as an internal (translated) token number.  */
-
-	var yytoken int = 0
-
-	/* The variables used to return semantic value and location from the
-	   action routines.  */
-
-	var yyval ZendParserStackElem
-
-	/* Buffer for error messages, and its allocated size.  */
-
-	var yymsgbuf []byte
-	var yymsg *byte = yymsgbuf
-	var yymsg_alloc int = g.SizeOf(yymsgbuf)
-
-	// #define YYPOPSTACK(N) ( yyvsp -= ( N ) , yyssp -= ( N ) )
-
-	/* The number of symbols on the RHS of the reduced rule.
-	   Keep to zero when no symbol should be popped.  */
-
-	var yylen int = 0
-	yyss = yyssa
-	yyssp = yyss
-	yyvs = yyvsa
-	yyvsp = yyvs
-	yystacksize = 200
-	yystate = 0
-	yyerrstatus = 0
-	zendnerrs = 0
-	yychar = -2
-	goto yysetstate
-
-	/*------------------------------------------------------------.
-	  | yynewstate -- Push a new state, which is found in yystate.  |
-	  `------------------------------------------------------------*/
-
-yynewstate:
-
-	/* In all cases, when you get here, the value and location stacks
-	   have just been pushed.  So pushing a state here evens the stacks.  */
-
-	yyssp++
-yysetstate:
-	*yyssp = yystate
-	if yyss+yystacksize-1 <= yyssp {
-
-		/* Get the current used size of the three stacks, in elements.  */
-
-		var yysize int = yyssp - yyss + 1
-
-		/* Extend the stack our own way.  */
-
-		if 10000 <= yystacksize {
-			goto yyexhaustedlab
-		}
-		yystacksize *= 2
-		if 10000 < yystacksize {
-			yystacksize = 10000
-		}
-		var yyss1 *yytype_int16 = yyss
-		var yyptr *__union__yyalloc = (*__union__yyalloc)(Malloc(yystacksize*(g.SizeOf("yytype_int16")+g.SizeOf("YYSTYPE")) + (g.SizeOf("union yyalloc") - 1)))
-		if yyptr == nil {
-			goto yyexhaustedlab
-		}
-		var yynewbytes int
-		var yyi int
-		for yyi = 0; yyi < yysize; yyi++ {
-			&yyptr.yyss_alloc[yyi] = yyss[yyi]
-		}
-		yyss = &yyptr.yyss_alloc
-		yynewbytes = yystacksize*g.SizeOf("* yyss") + (g.SizeOf("union yyalloc") - 1)
-		yyptr += yynewbytes / g.SizeOf("* yyptr")
-		var yynewbytes int
-		var yyi int
-		for yyi = 0; yyi < yysize; yyi++ {
-			&yyptr.yyvs_alloc[yyi] = yyvs[yyi]
-		}
-		yyvs = &yyptr.yyvs_alloc
-		yynewbytes = yystacksize*g.SizeOf("* yyvs") + (g.SizeOf("union yyalloc") - 1)
-		yyptr += yynewbytes / g.SizeOf("* yyptr")
-		if yyss1 != yyssa {
-			Free(yyss1)
-		}
-		yyssp = yyss + yysize - 1
-		yyvsp = yyvs + yysize - 1
-		if yyss+yystacksize-1 <= yyssp {
-			goto yyabortlab
-		}
-	}
-	if yystate == 3 {
-		goto yyacceptlab
-	}
-	goto yybackup
-
-	/*-----------.
-	  | yybackup.  |
-	  `-----------*/
-
-yybackup:
-
-	/* Do appropriate processing given the current state.  Read a
-	   lookahead token if we need one and don't already have one.  */
-
-	yyn = yypact[yystate]
-	if yyn == -753 {
-		goto yydefault
-	}
-
-	/* Not known => get a lookahead token if don't already have one.  */
-
-	if yychar == -2 {
-		yychar = Zendlex(&yylval)
-	}
-	if yychar <= 0 {
-		yytoken = 0
-		yychar = yytoken
-	} else {
-		yytoken = uint(g.CondF1(yychar <= 396, func() __auto__ { return yytranslate[yychar] }, 2))
-	}
-
-	/* If the proper action on seeing token YYTOKEN is to reduce or to
-	   detect an error, take that action.  */
-
-	yyn += yytoken
-	if yyn < 0 || 7174 < yyn || yycheck[yyn] != yytoken {
-		goto yydefault
-	}
-	yyn = yytable[yyn]
-	if yyn <= 0 {
-		if yyn == -477 {
-			goto yyerrlab
-		}
-		yyn = -yyn
-		goto yyreduce
-	}
-
-	/* Count tokens shifted since error; after three, turn off error
-	   status.  */
-
-	if yyerrstatus != 0 {
-		yyerrstatus--
-	}
-
-	/* Shift the lookahead token.  */
-
-	/* Discard the shifted token.  */
-
-	yychar = -2
-	yystate = yyn
-	*(g.PreInc(&yyvsp)) = yylval
-	goto yynewstate
-
-	/*-----------------------------------------------------------.
-	  | yydefault -- do the default action for the current state.  |
-	  `-----------------------------------------------------------*/
-
-yydefault:
-	yyn = yydefact[yystate]
-	if yyn == 0 {
-		goto yyerrlab
-	}
-	goto yyreduce
-
-	/*-----------------------------.
-	  | yyreduce -- Do a reduction.  |
-	  `-----------------------------*/
-
-yyreduce:
-
-	/* yyn is the number of a rule to reduce with.  */
-
-	yylen = yyr2[yyn]
-
-	/* If YYLEN is nonzero, implement the default value of the action:
-	   '$$ = $1'.
-
-	   Otherwise, the following line sets YYVAL to garbage.
-	   This behavior is undocumented and Bison
-	   users should not rely upon it.  Assigning to YYVAL
-	   unconditionally makes the parser a bit smaller, and it avoids a
-	   GCC warning that YYVAL may be used uninitialized.  */
-
-	yyval = yyvsp[1-yylen]
-	switch yyn {
-	case 2:
-		CG.SetAst(yyvsp[0].GetAst())
-		break
-	case 78:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 79:
-		var zv Zval
-		ZendLexTstring(&zv)
-		yyval.SetAst(ZendAstCreateZval(&zv))
-		break
-	case 80:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 81:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_STMT_LIST))
-		break
-	case 82:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 83:
-		yyval.SetAst(ZendAstAppendStr(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 84:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(1)
-		break
-	case 85:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(2)
-		break
-	case 86:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(0)
-		break
-	case 87:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 88:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 89:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 90:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 91:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 92:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_HALT_COMPILER, ZendAstCreateZvalFromLong(ZendGetScannedFileOffset())))
-		ZendStopLexing()
-		break
-	case 93:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_NAMESPACE, yyvsp[-1].GetAst(), nil))
-		if CG.GetDocComment() != nil {
-			ZendStringReleaseEx(CG.GetDocComment(), 0)
-			CG.SetDocComment(nil)
-		}
-		break
-	case 94:
-		if CG.GetDocComment() != nil {
-			ZendStringReleaseEx(CG.GetDocComment(), 0)
-			CG.SetDocComment(nil)
-		}
-		break
-	case 95:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_NAMESPACE, yyvsp[-4].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 96:
-		if CG.GetDocComment() != nil {
-			ZendStringReleaseEx(CG.GetDocComment(), 0)
-			CG.SetDocComment(nil)
-		}
-		break
-	case 97:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_NAMESPACE, nil, yyvsp[-1].GetAst()))
-		break
-	case 98:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 99:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(yyvsp[-2].GetNum())
-		break
-	case 100:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(1 << 0)
-		break
-	case 101:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(yyvsp[-2].GetNum())
-		break
-	case 102:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 103:
-		yyval.SetNum(1 << 1)
-		break
-	case 104:
-		yyval.SetNum(1 << 2)
-		break
-	case 105:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GROUP_USE, yyvsp[-5].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 106:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GROUP_USE, yyvsp[-5].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 107:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GROUP_USE, yyvsp[-5].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 108:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GROUP_USE, yyvsp[-5].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 111:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 112:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_USE, yyvsp[0].GetAst()))
-		break
-	case 113:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 114:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_USE, yyvsp[0].GetAst()))
-		break
-	case 115:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 116:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_USE, yyvsp[0].GetAst()))
-		break
-	case 117:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(1 << 0)
-		break
-	case 118:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(yyvsp[-1].GetNum())
-		break
-	case 119:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_USE_ELEM, yyvsp[0].GetAst(), nil))
-		break
-	case 120:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_USE_ELEM, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 121:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 122:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 123:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 124:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_CONST_DECL, yyvsp[0].GetAst()))
-		break
-	case 125:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 126:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_STMT_LIST))
-		break
-	case 127:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 128:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 129:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 130:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 131:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 132:
-		yyval.SetAst(nil)
-		ZendThrowException(ZendCeCompileError, "__HALT_COMPILER() can only be used from the outermost scope", 0)
-		goto yyerrorlab
-		break
-	case 133:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 134:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 135:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 136:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_WHILE, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 137:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DO_WHILE, yyvsp[-5].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 138:
-		yyval.SetAst(ZendAstCreate4(ZEND_AST_FOR, yyvsp[-6].GetAst(), yyvsp[-4].GetAst(), yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 139:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_SWITCH, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 140:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_BREAK, yyvsp[-1].GetAst()))
-		break
-	case 141:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_CONTINUE, yyvsp[-1].GetAst()))
-		break
-	case 142:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_RETURN, yyvsp[-1].GetAst()))
-		break
-	case 143:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 144:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 145:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 146:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_ECHO, yyvsp[0].GetAst()))
-		break
-	case 147:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 148:
-		yyval.SetAst(yyvsp[-3].GetAst())
-		break
-	case 149:
-		yyval.SetAst(ZendAstCreate4(ZEND_AST_FOREACH, yyvsp[-4].GetAst(), yyvsp[-2].GetAst(), nil, yyvsp[0].GetAst()))
-		break
-	case 150:
-		yyval.SetAst(ZendAstCreate4(ZEND_AST_FOREACH, yyvsp[-6].GetAst(), yyvsp[-2].GetAst(), yyvsp[-4].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 151:
-		if ZendHandleEncodingDeclaration(yyvsp[-1].GetAst()) == 0 {
-			goto yyerrorlab
-		}
-		break
-	case 152:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DECLARE, yyvsp[-3].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 153:
-		yyval.SetAst(nil)
-		break
-	case 154:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_TRY, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 155:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_THROW, yyvsp[-1].GetAst()))
-		break
-	case 156:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_GOTO, yyvsp[-1].GetAst()))
-		break
-	case 157:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_LABEL, yyvsp[-1].GetAst()))
-		break
-	case 158:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_CATCH_LIST))
-		break
-	case 159:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-8].GetAst(), ZendAstCreate3(ZEND_AST_CATCH, yyvsp[-5].GetAst(), yyvsp[-4].GetAst(), yyvsp[-1].GetAst())))
-		break
-	case 160:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_NAME_LIST, yyvsp[0].GetAst()))
-		break
-	case 161:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 162:
-		yyval.SetAst(nil)
-		break
-	case 163:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 164:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_STMT_LIST, yyvsp[0].GetAst()))
-		break
-	case 165:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 166:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_UNSET, yyvsp[0].GetAst()))
-		break
-	case 167:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_FUNC_DECL, yyvsp[-11].GetNum()|yyvsp[0].GetNum(), yyvsp[-12].GetNum(), yyvsp[-9].GetStr(), ZendAstGetStr(yyvsp[-10].GetAst()), yyvsp[-7].GetAst(), nil, yyvsp[-2].GetAst(), yyvsp[-5].GetAst()))
-		CG.SetExtraFnFlags(yyvsp[-4].GetNum())
-		break
-	case 168:
-		yyval.SetNum(0)
-		break
-	case 169:
-		yyval.SetNum(1 << 0)
-		break
-	case 170:
-		yyval.SetNum(0)
-		break
-	case 171:
-		yyval.SetNum(1 << 1)
-		break
-	case 172:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 173:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_CLASS, yyvsp[-9].GetNum(), yyvsp[-7].GetNum(), yyvsp[-3].GetStr(), ZendAstGetStr(yyvsp[-6].GetAst()), yyvsp[-5].GetAst(), yyvsp[-4].GetAst(), yyvsp[-1].GetAst(), nil))
-		break
-	case 174:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 175:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_CLASS, 0, yyvsp[-7].GetNum(), yyvsp[-3].GetStr(), ZendAstGetStr(yyvsp[-6].GetAst()), yyvsp[-5].GetAst(), yyvsp[-4].GetAst(), yyvsp[-1].GetAst(), nil))
-		break
-	case 176:
-		yyval.SetNum(yyvsp[0].GetNum())
-		break
-	case 177:
-		yyval.SetNum(ZendAddClassModifier(yyvsp[-1].GetNum(), yyvsp[0].GetNum()))
-		if yyval.GetNum() == 0 {
-			goto yyerrorlab
-		}
-		break
-	case 178:
-		yyval.SetNum(1 << 6)
-		break
-	case 179:
-		yyval.SetNum(1 << 5)
-		break
-	case 180:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 181:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_CLASS, 1<<1, yyvsp[-5].GetNum(), yyvsp[-3].GetStr(), ZendAstGetStr(yyvsp[-4].GetAst()), nil, nil, yyvsp[-1].GetAst(), nil))
-		break
-	case 182:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 183:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_CLASS, 1<<0, yyvsp[-6].GetNum(), yyvsp[-3].GetStr(), ZendAstGetStr(yyvsp[-5].GetAst()), nil, yyvsp[-4].GetAst(), yyvsp[-1].GetAst(), nil))
-		break
-	case 184:
-		yyval.SetAst(nil)
-		break
-	case 185:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 186:
-		yyval.SetAst(nil)
-		break
-	case 187:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 188:
-		yyval.SetAst(nil)
-		break
-	case 189:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 190:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 191:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_REF, yyvsp[0].GetAst()))
-		break
-	case 192:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(1)
-		break
-	case 193:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(3)
-		break
-	case 194:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 195:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 196:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 197:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 198:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 199:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 200:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 201:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 202:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 203:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 204:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_SWITCH_LIST))
-		break
-	case 205:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-4].GetAst(), ZendAstCreate2(ZEND_AST_SWITCH_CASE, yyvsp[-2].GetAst(), yyvsp[0].GetAst())))
-		break
-	case 206:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-3].GetAst(), ZendAstCreate2(ZEND_AST_SWITCH_CASE, nil, yyvsp[0].GetAst())))
-		break
-	case 209:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 210:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 211:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_IF, ZendAstCreate2(ZEND_AST_IF_ELEM, yyvsp[-2].GetAst(), yyvsp[0].GetAst())))
-		break
-	case 212:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-5].GetAst(), ZendAstCreate2(ZEND_AST_IF_ELEM, yyvsp[-2].GetAst(), yyvsp[0].GetAst())))
-		break
-	case 213:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 214:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), ZendAstCreate2(ZEND_AST_IF_ELEM, nil, yyvsp[0].GetAst())))
-		break
-	case 215:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_IF, ZendAstCreate2(ZEND_AST_IF_ELEM, yyvsp[-3].GetAst(), yyvsp[0].GetAst())))
-		break
-	case 216:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-6].GetAst(), ZendAstCreate2(ZEND_AST_IF_ELEM, yyvsp[-3].GetAst(), yyvsp[0].GetAst())))
-		break
-	case 217:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 218:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-5].GetAst(), ZendAstCreate2(ZEND_AST_IF_ELEM, nil, yyvsp[-2].GetAst())))
-		break
-	case 219:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 220:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_PARAM_LIST))
-		break
-	case 221:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_PARAM_LIST, yyvsp[0].GetAst()))
-		break
-	case 222:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 223:
-		yyval.SetAst(ZendAstCreateEx3(ZEND_AST_PARAM, yyvsp[-2].GetNum()|yyvsp[-1].GetNum(), yyvsp[-3].GetAst(), yyvsp[0].GetAst(), nil))
-		break
-	case 224:
-		yyval.SetAst(ZendAstCreateEx3(ZEND_AST_PARAM, yyvsp[-4].GetNum()|yyvsp[-3].GetNum(), yyvsp[-5].GetAst(), yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 225:
-		yyval.SetAst(nil)
-		break
-	case 226:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 227:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 228:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(yyval.GetAst().GetAttr() | 1<<8)
-		break
-	case 229:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_TYPE, 7))
-		break
-	case 230:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_TYPE, 17))
-		break
-	case 231:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 232:
-		yyval.SetAst(nil)
-		break
-	case 233:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 234:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_ARG_LIST))
-		break
-	case 235:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 236:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_ARG_LIST, yyvsp[0].GetAst()))
-		break
-	case 237:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 238:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 239:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_UNPACK, yyvsp[0].GetAst()))
-		break
-	case 240:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 241:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_STMT_LIST, yyvsp[0].GetAst()))
-		break
-	case 242:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_GLOBAL, ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst())))
-		break
-	case 243:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 244:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_STMT_LIST, yyvsp[0].GetAst()))
-		break
-	case 245:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC, yyvsp[0].GetAst(), nil))
-		break
-	case 246:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 247:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 248:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_STMT_LIST))
-		break
-	case 249:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_PROP_GROUP, yyvsp[-2].GetAst(), yyvsp[-1].GetAst()))
-		yyval.GetAst().SetAttr(yyvsp[-3].GetNum())
-		break
-	case 250:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(yyvsp[-3].GetNum())
-		break
-	case 251:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_USE_TRAIT, yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 252:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_METHOD, yyvsp[-9].GetNum()|yyvsp[-11].GetNum()|yyvsp[0].GetNum(), yyvsp[-10].GetNum(), yyvsp[-7].GetStr(), ZendAstGetStr(yyvsp[-8].GetAst()), yyvsp[-5].GetAst(), nil, yyvsp[-1].GetAst(), yyvsp[-3].GetAst()))
-		CG.SetExtraFnFlags(yyvsp[-2].GetNum())
-		break
-	case 253:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_NAME_LIST, yyvsp[0].GetAst()))
-		break
-	case 254:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 255:
-		yyval.SetAst(nil)
-		break
-	case 256:
-		yyval.SetAst(nil)
-		break
-	case 257:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 258:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_TRAIT_ADAPTATIONS, yyvsp[0].GetAst()))
-		break
-	case 259:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 260:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 261:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 262:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_TRAIT_PRECEDENCE, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 263:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_TRAIT_ALIAS, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 264:
-		var zv Zval
-		ZendLexTstring(&zv)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_TRAIT_ALIAS, yyvsp[-2].GetAst(), ZendAstCreateZval(&zv)))
-		break
-	case 265:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_TRAIT_ALIAS, yyvsp[-1].GetNum(), yyvsp[-3].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 266:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_TRAIT_ALIAS, yyvsp[0].GetNum(), yyvsp[-2].GetAst(), nil))
-		break
-	case 267:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_METHOD_REFERENCE, nil, yyvsp[0].GetAst()))
-		break
-	case 268:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 269:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_METHOD_REFERENCE, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 270:
-		yyval.SetAst(nil)
-		break
-	case 271:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 272:
-		yyval.SetNum(yyvsp[0].GetNum())
-		break
-	case 273:
-		yyval.SetNum(1 << 0)
-		break
-	case 274:
-		yyval.SetNum(1 << 0)
-		break
-	case 275:
-		yyval.SetNum(yyvsp[0].GetNum())
-		if (yyval.GetNum() & (1<<0 | 1<<1 | 1<<2)) == 0 {
-			yyval.SetNum(yyval.GetNum() | 1<<0)
-		}
-		break
-	case 276:
-		yyval.SetNum(yyvsp[0].GetNum())
-		break
-	case 277:
-		yyval.SetNum(ZendAddMemberModifier(yyvsp[-1].GetNum(), yyvsp[0].GetNum()))
-		if yyval.GetNum() == 0 {
-			goto yyerrorlab
-		}
-		break
-	case 278:
-		yyval.SetNum(1 << 0)
-		break
-	case 279:
-		yyval.SetNum(1 << 1)
-		break
-	case 280:
-		yyval.SetNum(1 << 2)
-		break
-	case 281:
-		yyval.SetNum(1 << 4)
-		break
-	case 282:
-		yyval.SetNum(1 << 6)
-		break
-	case 283:
-		yyval.SetNum(1 << 5)
-		break
-	case 284:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 285:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_PROP_DECL, yyvsp[0].GetAst()))
-		break
-	case 286:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_PROP_ELEM, yyvsp[-1].GetAst(), nil, g.CondF1(yyvsp[0].GetStr() != nil, func() *ZendAst { return ZendAstCreateZvalFromStr(yyvsp[0].GetStr()) }, nil)))
-		break
-	case 287:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_PROP_ELEM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), g.CondF1(yyvsp[0].GetStr() != nil, func() *ZendAst { return ZendAstCreateZvalFromStr(yyvsp[0].GetStr()) }, nil)))
-		break
-	case 288:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 289:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_CLASS_CONST_DECL, yyvsp[0].GetAst()))
-		break
-	case 290:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_CONST_ELEM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), g.CondF1(yyvsp[0].GetStr() != nil, func() *ZendAst { return ZendAstCreateZvalFromStr(yyvsp[0].GetStr()) }, nil)))
-		break
-	case 291:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_CONST_ELEM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), g.CondF1(yyvsp[0].GetStr() != nil, func() *ZendAst { return ZendAstCreateZvalFromStr(yyvsp[0].GetStr()) }, nil)))
-		break
-	case 292:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 293:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_STMT_LIST, yyvsp[0].GetAst()))
-		break
-	case 294:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_ECHO, yyvsp[0].GetAst()))
-		break
-	case 295:
-		yyval.SetAst(nil)
-		break
-	case 296:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 297:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 298:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_EXPR_LIST, yyvsp[0].GetAst()))
-		break
-	case 299:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 300:
-		var decl *ZendAst = ZendAstCreateDecl(ZEND_AST_CLASS, 1<<2, yyvsp[-7].GetNum(), yyvsp[-3].GetStr(), nil, yyvsp[-5].GetAst(), yyvsp[-4].GetAst(), yyvsp[-1].GetAst(), nil)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_NEW, decl, yyvsp[-6].GetAst()))
-		break
-	case 301:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_NEW, yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 302:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 303:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 304:
-		yyvsp[-3].GetAst().SetAttr(1)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ASSIGN, yyvsp[-3].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 305:
-		yyvsp[-3].GetAst().SetAttr(3)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ASSIGN, yyvsp[-3].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 306:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ASSIGN, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 307:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ASSIGN_REF, yyvsp[-3].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 308:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_CLONE, yyvsp[0].GetAst()))
-		break
-	case 309:
-		yyval.SetAst(ZendAstCreateAssignOp(1, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 310:
-		yyval.SetAst(ZendAstCreateAssignOp(2, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 311:
-		yyval.SetAst(ZendAstCreateAssignOp(3, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 312:
-		yyval.SetAst(ZendAstCreateAssignOp(12, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 313:
-		yyval.SetAst(ZendAstCreateAssignOp(4, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 314:
-		yyval.SetAst(ZendAstCreateAssignOp(8, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 315:
-		yyval.SetAst(ZendAstCreateAssignOp(5, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 316:
-		yyval.SetAst(ZendAstCreateAssignOp(10, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 317:
-		yyval.SetAst(ZendAstCreateAssignOp(9, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 318:
-		yyval.SetAst(ZendAstCreateAssignOp(11, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 319:
-		yyval.SetAst(ZendAstCreateAssignOp(6, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 320:
-		yyval.SetAst(ZendAstCreateAssignOp(7, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 321:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ASSIGN_COALESCE, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 322:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_POST_INC, yyvsp[-1].GetAst()))
-		break
-	case 323:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_PRE_INC, yyvsp[0].GetAst()))
-		break
-	case 324:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_POST_DEC, yyvsp[-1].GetAst()))
-		break
-	case 325:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_PRE_DEC, yyvsp[0].GetAst()))
-		break
-	case 326:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_OR, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 327:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_AND, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 328:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_OR, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 329:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_AND, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 330:
-		yyval.SetAst(ZendAstCreateBinaryOp(15, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 331:
-		yyval.SetAst(ZendAstCreateBinaryOp(9, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 332:
-		yyval.SetAst(ZendAstCreateBinaryOp(10, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 333:
-		yyval.SetAst(ZendAstCreateBinaryOp(11, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 334:
-		yyval.SetAst(ZendAstCreateBinaryOp(8, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 335:
-		yyval.SetAst(ZendAstCreateBinaryOp(1, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 336:
-		yyval.SetAst(ZendAstCreateBinaryOp(2, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 337:
-		yyval.SetAst(ZendAstCreateBinaryOp(3, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 338:
-		yyval.SetAst(ZendAstCreateBinaryOp(12, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 339:
-		yyval.SetAst(ZendAstCreateBinaryOp(4, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 340:
-		yyval.SetAst(ZendAstCreateBinaryOp(5, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 341:
-		yyval.SetAst(ZendAstCreateBinaryOp(6, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 342:
-		yyval.SetAst(ZendAstCreateBinaryOp(7, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 343:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_UNARY_PLUS, yyvsp[0].GetAst()))
-		break
-	case 344:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_UNARY_MINUS, yyvsp[0].GetAst()))
-		break
-	case 345:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_UNARY_OP, 14, yyvsp[0].GetAst()))
-		break
-	case 346:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_UNARY_OP, 13, yyvsp[0].GetAst()))
-		break
-	case 347:
-		yyval.SetAst(ZendAstCreateBinaryOp(16, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 348:
-		yyval.SetAst(ZendAstCreateBinaryOp(17, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 349:
-		yyval.SetAst(ZendAstCreateBinaryOp(18, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 350:
-		yyval.SetAst(ZendAstCreateBinaryOp(19, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 351:
-		yyval.SetAst(ZendAstCreateBinaryOp(20, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 352:
-		yyval.SetAst(ZendAstCreateBinaryOp(21, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 353:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GREATER, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 354:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_GREATER_EQUAL, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 355:
-		yyval.SetAst(ZendAstCreateBinaryOp(170, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 356:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_INSTANCEOF, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 357:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		if yyval.GetAst().GetKind() == ZEND_AST_CONDITIONAL {
-			yyval.GetAst().SetAttr(1)
-		}
-		if yyval.GetAst().GetKind() == ZEND_AST_BINARY_OP && yyval.GetAst().GetAttr() == 8 {
-			yyval.GetAst().SetAttr(252)
-		}
-		break
-	case 358:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 359:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_CONDITIONAL, yyvsp[-4].GetAst(), yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 360:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_CONDITIONAL, yyvsp[-3].GetAst(), nil, yyvsp[0].GetAst()))
-		break
-	case 361:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_COALESCE, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 362:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 363:
-		yyval.SetAst(ZendAstCreateCast(4, yyvsp[0].GetAst()))
-		break
-	case 364:
-		yyval.SetAst(ZendAstCreateCast(5, yyvsp[0].GetAst()))
-		break
-	case 365:
-		yyval.SetAst(ZendAstCreateCast(6, yyvsp[0].GetAst()))
-		break
-	case 366:
-		yyval.SetAst(ZendAstCreateCast(7, yyvsp[0].GetAst()))
-		break
-	case 367:
-		yyval.SetAst(ZendAstCreateCast(8, yyvsp[0].GetAst()))
-		break
-	case 368:
-		yyval.SetAst(ZendAstCreateCast(16, yyvsp[0].GetAst()))
-		break
-	case 369:
-		yyval.SetAst(ZendAstCreateCast(1, yyvsp[0].GetAst()))
-		break
-	case 370:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_EXIT, yyvsp[0].GetAst()))
-		break
-	case 371:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_SILENCE, yyvsp[0].GetAst()))
-		break
-	case 372:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 373:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_SHELL_EXEC, yyvsp[-1].GetAst()))
-		break
-	case 374:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_PRINT, yyvsp[0].GetAst()))
-		break
-	case 375:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_YIELD, nil, nil))
-		CG.SetExtraFnFlags(CG.GetExtraFnFlags() | 1<<24)
-		break
-	case 376:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_YIELD, yyvsp[0].GetAst(), nil))
-		CG.SetExtraFnFlags(CG.GetExtraFnFlags() | 1<<24)
-		break
-	case 377:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_YIELD, yyvsp[0].GetAst(), yyvsp[-2].GetAst()))
-		CG.SetExtraFnFlags(CG.GetExtraFnFlags() | 1<<24)
-		break
-	case 378:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_YIELD_FROM, yyvsp[0].GetAst()))
-		CG.SetExtraFnFlags(CG.GetExtraFnFlags() | 1<<24)
-		break
-	case 379:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 380:
-		yyval.SetAst(yyvsp[0].GetAst())
-		(*ZendAstDecl)(yyval.GetAst()).SetFlags((*ZendAstDecl)(yyval.GetAst()).GetFlags() | 1<<4)
-		break
-	case 381:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_CLOSURE, yyvsp[-11].GetNum()|yyvsp[0].GetNum(), yyvsp[-12].GetNum(), yyvsp[-10].GetStr(), ZendStringInit("{closure}", g.SizeOf("\"{closure}\"")-1, 0), yyvsp[-8].GetAst(), yyvsp[-6].GetAst(), yyvsp[-2].GetAst(), yyvsp[-5].GetAst()))
-		CG.SetExtraFnFlags(yyvsp[-4].GetNum())
-		break
-	case 382:
-		yyval.SetAst(ZendAstCreateDecl(ZEND_AST_ARROW_FUNC, yyvsp[-10].GetNum()|yyvsp[0].GetNum(), yyvsp[-11].GetNum(), yyvsp[-5].GetStr(), ZendStringInit("{closure}", g.SizeOf("\"{closure}\"")-1, 0), yyvsp[-8].GetAst(), nil, ZendAstCreate1(ZEND_AST_RETURN, yyvsp[-1].GetAst()), yyvsp[-6].GetAst()))
-		(*ZendAstDecl)(yyval.GetAst()).SetLexPos(yyvsp[-2].GetPtr())
-		CG.SetExtraFnFlags(yyvsp[-3].GetNum())
-		break
-	case 383:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 384:
-		yyval.SetNum(CG.GetZendLineno())
-		break
-	case 385:
-		yyval.SetStr(CG.GetDocComment())
-		CG.SetDocComment(nil)
-		break
-	case 386:
-		yyval.SetNum(CG.GetExtraFnFlags())
-		CG.SetExtraFnFlags(0)
-		break
-	case 387:
-		yyval.SetPtr(LANG_SCNG.GetYyText())
-		break
-	case 388:
-		yyval.SetNum(0)
-		break
-	case 389:
-		yyval.SetNum(1 << 12)
-		break
-	case 390:
-		yyval.SetAst(nil)
-		break
-	case 391:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 392:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 393:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_CLOSURE_USES, yyvsp[0].GetAst()))
-		break
-	case 394:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 395:
-		yyval.SetAst(yyvsp[0].GetAst())
-		yyval.GetAst().SetAttr(1)
-		break
-	case 396:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_CALL, yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 397:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_STATIC_CALL, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 398:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_STATIC_CALL, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 399:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_CALL, yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 400:
-		var zv Zval
-		var __z *Zval = &zv
-		var __s *ZendString = ZendKnownStrings[ZEND_STR_STATIC]
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6)
-		yyval.SetAst(ZendAstCreateZvalEx(&zv, 1))
-		break
-	case 401:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 402:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 403:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 404:
-		yyval.SetAst(nil)
-		break
-	case 405:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 406:
-		yyval.SetAst(ZendAstCreateZvalFromStr(ZendEmptyString))
-		break
-	case 407:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 408:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 409:
-		yyval.SetAst(ZendAstCreateList0(ZEND_AST_ARG_LIST))
-		break
-	case 410:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 411:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(2)
-		break
-	case 412:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		yyval.GetAst().SetAttr(3)
-		break
-	case 413:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 414:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 415:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 416:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_LINE))
-		break
-	case 417:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_FILE))
-		break
-	case 418:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_DIR))
-		break
-	case 419:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_TRAIT_C))
-		break
-	case 420:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_METHOD_C))
-		break
-	case 421:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_FUNC_C))
-		break
-	case 422:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_NS_C))
-		break
-	case 423:
-		yyval.SetAst(ZendAstCreateEx0(ZEND_AST_MAGIC_CONST, T_CLASS_C))
-		break
-	case 424:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 425:
-		yyval.SetAst(ZendAstCreateZvalFromStr(ZendEmptyString))
-		break
-	case 426:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 427:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 428:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 429:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 430:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_CONST, yyvsp[0].GetAst()))
-		break
-	case 431:
-		yyval.SetAst(ZendAstCreateClassConstOrName(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 432:
-		yyval.SetAst(ZendAstCreateClassConstOrName(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 433:
-		yyval.SetAst(nil)
-		break
-	case 434:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 435:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 436:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 437:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 438:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 439:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 440:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 441:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 442:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 443:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DIM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 444:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DIM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 445:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_DIM, 1<<1, yyvsp[-3].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 446:
-		yyval.SetAst(ZendAstCreate3(ZEND_AST_METHOD_CALL, yyvsp[-3].GetAst(), yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 447:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 448:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 449:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 450:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 451:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 452:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 453:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 454:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 455:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 456:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 457:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DIM, yyvsp[-3].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 458:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_DIM, 1<<1, yyvsp[-3].GetAst(), yyvsp[-1].GetAst()))
-		break
-	case 459:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 460:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 461:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_STATIC_PROP, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 462:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 463:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 464:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 465:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 466:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 467:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 468:
-		yyval.SetAst(ZendAstListRtrim(yyvsp[0].GetAst()))
-		break
-	case 469:
-		yyval.SetAst(nil)
-		break
-	case 470:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 471:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 472:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_ARRAY, yyvsp[0].GetAst()))
-		break
-	case 473:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ARRAY_ELEM, yyvsp[0].GetAst(), yyvsp[-2].GetAst()))
-		break
-	case 474:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ARRAY_ELEM, yyvsp[0].GetAst(), nil))
-		break
-	case 475:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_ARRAY_ELEM, 1, yyvsp[0].GetAst(), yyvsp[-3].GetAst()))
-		break
-	case 476:
-		yyval.SetAst(ZendAstCreateEx2(ZEND_AST_ARRAY_ELEM, 1, yyvsp[0].GetAst(), nil))
-		break
-	case 477:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_UNPACK, yyvsp[0].GetAst()))
-		break
-	case 478:
-		yyvsp[-1].GetAst().SetAttr(1)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ARRAY_ELEM, yyvsp[-1].GetAst(), yyvsp[-5].GetAst()))
-		break
-	case 479:
-		yyvsp[-1].GetAst().SetAttr(1)
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_ARRAY_ELEM, yyvsp[-1].GetAst(), nil))
-		break
-	case 480:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 481:
-		yyval.SetAst(ZendAstListAdd(yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 482:
-		yyval.SetAst(ZendAstCreateList1(ZEND_AST_ENCAPS_LIST, yyvsp[0].GetAst()))
-		break
-	case 483:
-		yyval.SetAst(ZendAstCreateList2(ZEND_AST_ENCAPS_LIST, yyvsp[-1].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 484:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 485:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DIM, ZendAstCreate1(ZEND_AST_VAR, yyvsp[-3].GetAst()), yyvsp[-1].GetAst()))
-		break
-	case 486:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_PROP, ZendAstCreate1(ZEND_AST_VAR, yyvsp[-2].GetAst()), yyvsp[0].GetAst()))
-		break
-	case 487:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[-1].GetAst()))
-		break
-	case 488:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[-1].GetAst()))
-		break
-	case 489:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_DIM, ZendAstCreate1(ZEND_AST_VAR, yyvsp[-4].GetAst()), yyvsp[-2].GetAst()))
-		break
-	case 490:
-		yyval.SetAst(yyvsp[-1].GetAst())
-		break
-	case 491:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 492:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 493:
-		yyval.SetAst(ZendNegateNumString(yyvsp[0].GetAst()))
-		break
-	case 494:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_VAR, yyvsp[0].GetAst()))
-		break
-	case 495:
-		yyval.SetAst(yyvsp[-2].GetAst())
-		break
-	case 496:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_EMPTY, yyvsp[-1].GetAst()))
-		break
-	case 497:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_INCLUDE_OR_EVAL, 1<<1, yyvsp[0].GetAst()))
-		break
-	case 498:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_INCLUDE_OR_EVAL, 1<<2, yyvsp[0].GetAst()))
-		break
-	case 499:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_INCLUDE_OR_EVAL, 1<<0, yyvsp[-1].GetAst()))
-		break
-	case 500:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_INCLUDE_OR_EVAL, 1<<3, yyvsp[0].GetAst()))
-		break
-	case 501:
-		yyval.SetAst(ZendAstCreateEx1(ZEND_AST_INCLUDE_OR_EVAL, 1<<4, yyvsp[0].GetAst()))
-		break
-	case 502:
-		yyval.SetAst(yyvsp[0].GetAst())
-		break
-	case 503:
-		yyval.SetAst(ZendAstCreate2(ZEND_AST_AND, yyvsp[-2].GetAst(), yyvsp[0].GetAst()))
-		break
-	case 504:
-		yyval.SetAst(ZendAstCreate1(ZEND_AST_ISSET, yyvsp[0].GetAst()))
-		break
-	default:
-		break
-	}
-
-	/* User semantic actions sometimes alter yychar, and that requires
-	   that yytoken be updated with the new translation.  We take the
-	   approach of translating immediately before every use of yytoken.
-	   One alternative is translating here after every semantic action,
-	   but that translation would be missed if the semantic action invokes
-	   YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-	   if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-	   incorrect destructor might then be invoked immediately.  In the
-	   case of YYERROR or YYBACKUP, subsequent parser actions might lead
-	   to an incorrect destructor call or verbose syntax error message
-	   before the lookahead is translated.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	yylen = 0
-	*(g.PreInc(&yyvsp)) = yyval
-
-	/* Now 'shift' the result of the reduction.  Determine what state
-	   that goes to, based on the state we popped back to and the rule
-	   number reduced by.  */
-
-	yyn = yyr1[yyn]
-	yystate = yypgoto[yyn-170] + (*yyssp)
-	if 0 <= yystate && yystate <= 7174 && yycheck[yystate] == (*yyssp) {
-		yystate = yytable[yystate]
-	} else {
-		yystate = yydefgoto[yyn-170]
-	}
-	goto yynewstate
-
-	/*--------------------------------------.
-	  | yyerrlab -- here on detecting error.  |
-	  `--------------------------------------*/
-
-yyerrlab:
-
-	/* Make sure we have latest lookahead translation.  See comments at
-	   user semantic actions for why this is necessary.  */
-
-	if yychar == -2 {
-		yytoken = -2
-	} else {
-		yytoken = uint(g.CondF1(yychar <= 396, func() __auto__ { return yytranslate[yychar] }, 2))
-	}
-
-	/* If not already recovering from an error, report this error.  */
-
-	if yyerrstatus == 0 {
-		zendnerrs++
-
-		// #define YYSYNTAX_ERROR       yysyntax_error ( & yymsg_alloc , & yymsg , yyssp , yytoken )
-
-		var yymsgp *byte = "syntax error"
-		var yysyntax_error_status int
-		yysyntax_error_status = yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
-		if yysyntax_error_status == 0 {
-			yymsgp = yymsg
-		} else if yysyntax_error_status == 1 {
-			if yymsg != yymsgbuf {
-				Free(yymsg)
-			}
-			yymsg = (*byte)(Malloc(yymsg_alloc))
-			if yymsg == nil {
-				yymsg = yymsgbuf
-				yymsg_alloc = g.SizeOf(yymsgbuf)
-				yysyntax_error_status = 2
-			} else {
-				yysyntax_error_status = yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
-				yymsgp = yymsg
-			}
-		}
-		Zenderror(yymsgp)
-		if yysyntax_error_status == 2 {
-			goto yyexhaustedlab
-		}
-
-		// #define YYSYNTAX_ERROR       yysyntax_error ( & yymsg_alloc , & yymsg , yyssp , yytoken )
-
-	}
-	if yyerrstatus == 3 {
-
-		/* If just tried and failed to reuse lookahead token after an
-		   error, discard it.  */
-
-		if yychar <= 0 {
-
-			/* Return failure if at end of input.  */
-
-			if yychar == 0 {
-				goto yyabortlab
-			}
-
-			/* Return failure if at end of input.  */
-
-		} else {
-			yydestruct("Error: discarding", yytoken, &yylval)
-			yychar = -2
-		}
-
-		/* If just tried and failed to reuse lookahead token after an
-		   error, discard it.  */
-
-	}
-
-	/* Else will try to reuse lookahead token after shifting the error
-	   token.  */
-
-	goto yyerrlab1
-
-	/*---------------------------------------------------.
-	  | yyerrorlab -- error raised explicitly by YYERROR.  |
-	  `---------------------------------------------------*/
-
-yyerrorlab:
-
-	/* Pacify compilers like GCC when the user code never invokes
-	   YYERROR and the label yyerrorlab therefore never appears in user
-	   code.  */
-
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYERROR.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	yylen = 0
-	yystate = *yyssp
-	goto yyerrlab1
-
-	/*-------------------------------------------------------------.
-	  | yyerrlab1 -- common code for both syntax error and YYERROR.  |
-	  `-------------------------------------------------------------*/
-
-yyerrlab1:
-	yyerrstatus = 3
-	for {
-		yyn = yypact[yystate]
-		if yyn != -753 {
-			yyn += 1
-			if 0 <= yyn && yyn <= 7174 && yycheck[yyn] == 1 {
-				yyn = yytable[yyn]
-				if 0 < yyn {
-					break
-				}
-			}
-		}
-
-		/* Pop the current state because it cannot handle the error token.  */
-
-		if yyssp == yyss {
-			goto yyabortlab
-		}
-		yydestruct("Error: popping", yystos[yystate], yyvsp)
-		yyvsp -= 1
-		yyssp -= 1
-		yystate = *yyssp
-	}
-	*(g.PreInc(&yyvsp)) = yylval
-
-	/* Shift the error token.  */
-
-	yystate = yyn
-	goto yynewstate
-
-	/*-------------------------------------.
-	  | yyacceptlab -- YYACCEPT comes here.  |
-	  `-------------------------------------*/
-
-yyacceptlab:
-	yyresult = 0
-	goto yyreturn
-
-	/*-----------------------------------.
-	  | yyabortlab -- YYABORT comes here.  |
-	  `-----------------------------------*/
-
-yyabortlab:
-	yyresult = 1
-	goto yyreturn
-
-	/*-------------------------------------------------.
-	  | yyexhaustedlab -- memory exhaustion comes here.  |
-	  `-------------------------------------------------*/
-
-yyexhaustedlab:
-	Zenderror("memory exhausted")
-	yyresult = 2
-
-	/* Fall through.  */
-
-yyreturn:
-	if yychar != -2 {
-
-		/* Make sure we have latest lookahead translation.  See comments at
-		   user semantic actions for why this is necessary.  */
-
-		yytoken = uint(g.CondF1(yychar <= 396, func() __auto__ { return yytranslate[yychar] }, 2))
-		yydestruct("Cleanup: discarding lookahead", yytoken, &yylval)
-	}
-
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYABORT or YYACCEPT.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	for yyssp != yyss {
-		yydestruct("Cleanup: popping", yystos[*yyssp], yyvsp)
-		yyvsp -= 1
-		yyssp -= 1
-	}
-	if yyss != yyssa {
-		Free(yyss)
-	}
-	if yymsg != yymsgbuf {
-		Free(yymsg)
-	}
-	return yyresult
-}
-
 /* Copy to YYRES the contents of YYSTR after stripping away unnecessary
    quotes and backslashes, so that it's suitable for yyerror.  The
    heuristic is that double-quoting is unnecessary unless the string
@@ -3247,7 +1373,7 @@ yyreturn:
    null, do not copy; instead, return the length of what the result
    would have been.  */
 
-func ZendYytnamerr(yyres *byte, yystr *byte) int {
+func ZendYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 	/* CG(parse_error) states:
 	 * 0 => yyres = NULL, yystr is the unexpected token
 	 * 1 => yyres = NULL, yystr is one of the expected tokens
@@ -3255,10 +1381,10 @@ func ZendYytnamerr(yyres *byte, yystr *byte) int {
 	 * 3 => yyres != NULL, yystr is one of the expected tokens
 	 */
 
-	if yyres != nil && CG.GetParseError() < 2 {
-		CG.SetParseError(2)
+	if yyres != nil && CompilerGlobals.GetParseError() < 2 {
+		CompilerGlobals.SetParseError(2)
 	}
-	if CG.GetParseError()%2 == 0 {
+	if CompilerGlobals.GetParseError()%2 == 0 {
 
 		/* The unexpected token */
 
@@ -3270,17 +1396,17 @@ func ZendYytnamerr(yyres *byte, yystr *byte) int {
 		var len_ uint = 0
 		var toklen uint = 0
 		var yystr_len uint
-		CG.GetParseError()++
-		if LANG_SCNG.GetYyText()[0] == 0 && LANG_SCNG.GetYyLeng() == 1 && strcmp(yystr, "\"end of file\"") == 0 {
+		CompilerGlobals.GetParseError()++
+		if LanguageScannerGlobals.GetYyText()[0] == 0 && LanguageScannerGlobals.GetYyLeng() == 1 && strcmp(yystr, "\"end of file\"") == 0 {
 			if yyres != nil {
 				yystpcpy(yyres, "end of file")
 			}
-			return g.SizeOf("\"end of file\"") - 1
+			return b.SizeOf("\"end of file\"") - 1
 		}
-		str = LANG_SCNG.GetYyText()
-		end = memchr(str, '\n', LANG_SCNG.GetYyLeng())
+		str = LanguageScannerGlobals.GetYyText()
+		end = memchr(str, '\n', LanguageScannerGlobals.GetYyLeng())
 		yystr_len = uint(yystrlen(yystr))
-		if g.Assign(&tok1, memchr(yystr, '(', yystr_len)) != nil && g.Assign(&tok2, ZendMemrchr(yystr, ')', yystr_len)) != nil {
+		if b.Assign(&tok1, memchr(yystr, '(', yystr_len)) != nil && b.Assign(&tok2, ZendMemrchr(yystr, ')', yystr_len)) != nil {
 			toklen = tok2 - tok1 + 1
 		} else {
 			tok2 = nil
@@ -3288,10 +1414,10 @@ func ZendYytnamerr(yyres *byte, yystr *byte) int {
 			toklen = 0
 		}
 		if end == nil {
-			if LANG_SCNG.GetYyLeng() > 30 {
+			if LanguageScannerGlobals.GetYyLeng() > 30 {
 				len_ = 30
 			} else {
-				len_ = LANG_SCNG.GetYyLeng()
+				len_ = LanguageScannerGlobals.GetYyLeng()
 			}
 		} else {
 			if end-str > 30 {
@@ -3302,24 +1428,24 @@ func ZendYytnamerr(yyres *byte, yystr *byte) int {
 		}
 		if yyres != nil {
 			if toklen != 0 {
-				snprintf(buffer, g.SizeOf("buffer"), "'%.*s' %.*s", len_, str, toklen, tok1)
+				core.Snprintf(buffer, b.SizeOf("buffer"), "'%.*s' %.*s", len_, str, toklen, tok1)
 			} else {
-				snprintf(buffer, g.SizeOf("buffer"), "'%.*s'", len_, str)
+				core.Snprintf(buffer, b.SizeOf("buffer"), "'%.*s'", len_, str)
 			}
 			yystpcpy(yyres, buffer)
 		}
-		return len_ + g.Cond(toklen != 0, toklen+1, 0) + 2
+		return len_ + b.Cond(toklen != 0, toklen+1, 0) + 2
 	}
 
 	/* One of the expected tokens */
 
 	if yyres == nil {
-		return yystrlen(yystr) - g.Cond((*yystr) == '"', 2, 0)
+		return yystrlen(yystr) - b.Cond((*yystr) == '"', 2, 0)
 	}
 	if (*yystr) == '"' {
-		var yyn int = 0
+		var yyn YYSIZE_T = 0
 		var yyp *byte = yystr
-		for ; (*(g.PreInc(&yyp))) != '"'; yyn++ {
+		for ; (*(b.PreInc(&yyp))) != '"'; yyn++ {
 			yyres[yyn] = *yyp
 		}
 		yyres[yyn] = '0'

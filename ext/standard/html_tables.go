@@ -3,7 +3,7 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <ext/standard/html_tables.h>
@@ -55,11 +55,9 @@ const (
 	CsNumelems
 )
 
-// #define CHARSET_UNICODE_COMPAT(cs) ( ( cs ) <= cs_8859_1 )
-
-// #define CHARSET_SINGLE_BYTE(cs) ( ( cs ) > cs_utf_8 && ( cs ) < cs_big5 )
-
-// #define CHARSET_PARTIAL_SUPPORT(cs) ( ( cs ) >= cs_big5 )
+func CHARSET_UNICODE_COMPAT(cs EntityCharset) bool  { return cs <= Cs88591 }
+func CHARSET_SINGLE_BYTE(cs EntityCharset) bool     { return cs > CsUtf8 && cs < CsBig5 }
+func CHARSET_PARTIAL_SUPPORT(cs EntityCharset) bool { return cs >= CsBig5 }
 
 var CharsetMap []struct {
 	codeset     *byte
@@ -70,44 +68,44 @@ var CharsetMap []struct {
 	codeset_len uint32
 	charset     EntityCharset
 }{
-	{"ISO-8859-1", g.SizeOf("\"ISO-8859-1\"") - 1, Cs88591},
-	{"ISO8859-1", g.SizeOf("\"ISO8859-1\"") - 1, Cs88591},
-	{"ISO-8859-15", g.SizeOf("\"ISO-8859-15\"") - 1, Cs885915},
-	{"ISO8859-15", g.SizeOf("\"ISO8859-15\"") - 1, Cs885915},
-	{"utf-8", g.SizeOf("\"utf-8\"") - 1, CsUtf8},
-	{"cp1252", g.SizeOf("\"cp1252\"") - 1, CsCp1252},
-	{"Windows-1252", g.SizeOf("\"Windows-1252\"") - 1, CsCp1252},
-	{"1252", g.SizeOf("\"1252\"") - 1, CsCp1252},
-	{"BIG5", g.SizeOf("\"BIG5\"") - 1, CsBig5},
-	{"950", g.SizeOf("\"950\"") - 1, CsBig5},
-	{"GB2312", g.SizeOf("\"GB2312\"") - 1, CsGb2312},
-	{"936", g.SizeOf("\"936\"") - 1, CsGb2312},
-	{"BIG5-HKSCS", g.SizeOf("\"BIG5-HKSCS\"") - 1, CsBig5hkscs},
-	{"Shift_JIS", g.SizeOf("\"Shift_JIS\"") - 1, CsSjis},
-	{"SJIS", g.SizeOf("\"SJIS\"") - 1, CsSjis},
-	{"932", g.SizeOf("\"932\"") - 1, CsSjis},
-	{"SJIS-win", g.SizeOf("\"SJIS-win\"") - 1, CsSjis},
-	{"CP932", g.SizeOf("\"CP932\"") - 1, CsSjis},
-	{"EUCJP", g.SizeOf("\"EUCJP\"") - 1, CsEucjp},
-	{"EUC-JP", g.SizeOf("\"EUC-JP\"") - 1, CsEucjp},
-	{"eucJP-win", g.SizeOf("\"eucJP-win\"") - 1, CsEucjp},
-	{"KOI8-R", g.SizeOf("\"KOI8-R\"") - 1, CsKoi8r},
-	{"koi8-ru", g.SizeOf("\"koi8-ru\"") - 1, CsKoi8r},
-	{"koi8r", g.SizeOf("\"koi8r\"") - 1, CsKoi8r},
-	{"cp1251", g.SizeOf("\"cp1251\"") - 1, CsCp1251},
-	{"Windows-1251", g.SizeOf("\"Windows-1251\"") - 1, CsCp1251},
-	{"win-1251", g.SizeOf("\"win-1251\"") - 1, CsCp1251},
-	{"iso8859-5", g.SizeOf("\"iso8859-5\"") - 1, Cs88595},
-	{"iso-8859-5", g.SizeOf("\"iso-8859-5\"") - 1, Cs88595},
-	{"cp866", g.SizeOf("\"cp866\"") - 1, CsCp866},
-	{"866", g.SizeOf("\"866\"") - 1, CsCp866},
-	{"ibm866", g.SizeOf("\"ibm866\"") - 1, CsCp866},
-	{"MacRoman", g.SizeOf("\"MacRoman\"") - 1, CsMacroman},
+	{"ISO-8859-1", b.SizeOf("\"ISO-8859-1\"") - 1, Cs88591},
+	{"ISO8859-1", b.SizeOf("\"ISO8859-1\"") - 1, Cs88591},
+	{"ISO-8859-15", b.SizeOf("\"ISO-8859-15\"") - 1, Cs885915},
+	{"ISO8859-15", b.SizeOf("\"ISO8859-15\"") - 1, Cs885915},
+	{"utf-8", b.SizeOf("\"utf-8\"") - 1, CsUtf8},
+	{"cp1252", b.SizeOf("\"cp1252\"") - 1, CsCp1252},
+	{"Windows-1252", b.SizeOf("\"Windows-1252\"") - 1, CsCp1252},
+	{"1252", b.SizeOf("\"1252\"") - 1, CsCp1252},
+	{"BIG5", b.SizeOf("\"BIG5\"") - 1, CsBig5},
+	{"950", b.SizeOf("\"950\"") - 1, CsBig5},
+	{"GB2312", b.SizeOf("\"GB2312\"") - 1, CsGb2312},
+	{"936", b.SizeOf("\"936\"") - 1, CsGb2312},
+	{"BIG5-HKSCS", b.SizeOf("\"BIG5-HKSCS\"") - 1, CsBig5hkscs},
+	{"Shift_JIS", b.SizeOf("\"Shift_JIS\"") - 1, CsSjis},
+	{"SJIS", b.SizeOf("\"SJIS\"") - 1, CsSjis},
+	{"932", b.SizeOf("\"932\"") - 1, CsSjis},
+	{"SJIS-win", b.SizeOf("\"SJIS-win\"") - 1, CsSjis},
+	{"CP932", b.SizeOf("\"CP932\"") - 1, CsSjis},
+	{"EUCJP", b.SizeOf("\"EUCJP\"") - 1, CsEucjp},
+	{"EUC-JP", b.SizeOf("\"EUC-JP\"") - 1, CsEucjp},
+	{"eucJP-win", b.SizeOf("\"eucJP-win\"") - 1, CsEucjp},
+	{"KOI8-R", b.SizeOf("\"KOI8-R\"") - 1, CsKoi8r},
+	{"koi8-ru", b.SizeOf("\"koi8-ru\"") - 1, CsKoi8r},
+	{"koi8r", b.SizeOf("\"koi8r\"") - 1, CsKoi8r},
+	{"cp1251", b.SizeOf("\"cp1251\"") - 1, CsCp1251},
+	{"Windows-1251", b.SizeOf("\"Windows-1251\"") - 1, CsCp1251},
+	{"win-1251", b.SizeOf("\"win-1251\"") - 1, CsCp1251},
+	{"iso8859-5", b.SizeOf("\"iso8859-5\"") - 1, Cs88595},
+	{"iso-8859-5", b.SizeOf("\"iso-8859-5\"") - 1, Cs88595},
+	{"cp866", b.SizeOf("\"cp866\"") - 1, CsCp866},
+	{"866", b.SizeOf("\"866\"") - 1, CsCp866},
+	{"ibm866", b.SizeOf("\"ibm866\"") - 1, CsCp866},
+	{"MacRoman", b.SizeOf("\"MacRoman\"") - 1, CsMacroman},
 }
 
 /* longest entity name length excluding & and ; */
 
-// #define LONGEST_ENTITY_LENGTH       31
+const LONGEST_ENTITY_LENGTH = 31
 
 /* Definitions for mappings *to* Unicode.
  * The origin charset must have at most 256 code points.
@@ -115,11 +113,11 @@ var CharsetMap []struct {
 
 /* bits 7-8 bits (only single bytes encodings supported )*/
 
-// #define ENT_ENC_TO_UNI_STAGE1(k) ( ( k & 0xC0 ) >> 6 )
+func ENT_ENC_TO_UNI_STAGE1(k unsigned) int { return (k & 0xc0) >> 6 }
 
 /* bits 1-6 */
 
-// #define ENT_ENC_TO_UNI_STAGE2(k) ( ( k ) & 0x3F )
+func ENT_ENC_TO_UNI_STAGE2(k unsigned) int { return k & 0x3f }
 
 /* {{{ Mappings *to* Unicode for ISO-8859-1 */
 
@@ -279,13 +277,10 @@ var UnimapMacroman []UniToEnc = []UniToEnc{{0xa0, 0xca}, {0xa1, 0xc1}, {0xa2, 0x
 
 /* {{{ end of mappings *from* Unicode for MacRoman */
 
-// #define ENT_STAGE1_INDEX(k) ( ( ( k ) & 0xFFF000 ) >> 12 )
-
-// #define ENT_STAGE2_INDEX(k) ( ( ( k ) & 0xFC0 ) >> 6 )
-
-// #define ENT_STAGE3_INDEX(k) ( ( k ) & 0x3F )
-
-// #define ENT_CODE_POINT_FROM_STAGES(i,j,k) ( ( ( i ) << 12 ) | ( ( j ) << 6 ) | ( k ) )
+func ENT_STAGE1_INDEX(k __auto__) int                                   { return (k & 0xfff000) >> 12 }
+func ENT_STAGE2_INDEX(k __auto__) int                                   { return (k & 0xfc0) >> 6 }
+func ENT_STAGE3_INDEX(k __auto__) int                                   { return k & 0x3f }
+func ENT_CODE_POINT_FROM_STAGES(i unsigned, j unsigned, k unsigned) int { return i<<12 | j<<6 | k }
 
 /* The default entity may be NULL. Binary search is still possible while
    is senseless as there are just two rows (see also find_entity_for_char()). */

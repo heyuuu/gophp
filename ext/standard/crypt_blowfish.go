@@ -3,7 +3,7 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <ext/standard/crypt_blowfish.h>
@@ -77,22 +77,24 @@ import (
 
 // # include < errno . h >
 
-// #define __set_errno(val) errno = ( val )
+func __setErrno(val int) __auto__ {
+	errno = val
+	return errno
+}
 
 /* Just to make sure the prototypes match the actual definitions */
 
 // # include "crypt_blowfish.h"
 
-// #define BF_ASM       0
-
-// #define BF_SCALE       0
+const BF_ASM = 0
+const BF_SCALE = 0
 
 type BF_word = uint
 type BF_word_signed = signed__int
 
 /* Number of Blowfish rounds, this is also hardcoded into a few places */
 
-// #define BF_N       16
+const BF_N = 16
 
 type BF_key []BF_word
 
@@ -131,11 +133,11 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 	var c3 uint
 	var c4 uint
 	for {
-		tmp = uint8(g.PostInc(&(*sptr)))
+		tmp = uint8(b.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(g.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -143,11 +145,11 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c1 = tmp
-		tmp = uint8(g.PostInc(&(*sptr)))
+		tmp = uint8(b.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(g.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -155,15 +157,15 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c2 = tmp
-		g.PostInc(&(*dptr)) = c1<<2 | (c2&0x30)>>4
+		b.PostInc(&(*dptr)) = c1<<2 | (c2&0x30)>>4
 		if dptr >= end {
 			break
 		}
-		tmp = uint8(g.PostInc(&(*sptr)))
+		tmp = uint8(b.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(g.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -171,15 +173,15 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c3 = tmp
-		g.PostInc(&(*dptr)) = (c2&0xf)<<4 | (c3&0x3c)>>2
+		b.PostInc(&(*dptr)) = (c2&0xf)<<4 | (c3&0x3c)>>2
 		if dptr >= end {
 			break
 		}
-		tmp = uint8(g.PostInc(&(*sptr)))
+		tmp = uint8(b.PostInc(&(*sptr)))
 		if tmp == '$' {
 			break
 		}
-		if uint(g.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
+		if uint(b.AssignOp(&tmp, "-=", 0x20) >= 0x60) != 0 {
 			return -1
 		}
 		tmp = BF_atoi64[tmp]
@@ -187,7 +189,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 			return -1
 		}
 		c4 = tmp
-		g.PostInc(&(*dptr)) = (c3&0x3)<<6 | c4
+		b.PostInc(&(*dptr)) = (c3&0x3)<<6 | c4
 		if dptr >= end {
 			break
 		}
@@ -196,7 +198,7 @@ func BF_decode(dst *BF_word, src *byte, size int) int {
 		return -1
 	}
 	for dptr < end {
-		g.PostInc(&(*dptr)) = 0
+		b.PostInc(&(*dptr)) = 0
 	}
 	return 0
 }
@@ -209,26 +211,26 @@ func BF_encode(dst *byte, src *BF_word, size int) {
 	for {
 		*sptr++
 		c1 = (*sptr) - 1
-		g.PostInc(&(*dptr)) = BF_itoa64[c1>>2]
+		b.PostInc(&(*dptr)) = BF_itoa64[c1>>2]
 		c1 = (c1 & 0x3) << 4
 		if sptr >= end {
-			g.PostInc(&(*dptr)) = BF_itoa64[c1]
+			b.PostInc(&(*dptr)) = BF_itoa64[c1]
 			break
 		}
 		*sptr++
 		c2 = (*sptr) - 1
 		c1 |= c2 >> 4
-		g.PostInc(&(*dptr)) = BF_itoa64[c1]
+		b.PostInc(&(*dptr)) = BF_itoa64[c1]
 		c1 = (c2 & 0xf) << 2
 		if sptr >= end {
-			g.PostInc(&(*dptr)) = BF_itoa64[c1]
+			b.PostInc(&(*dptr)) = BF_itoa64[c1]
 			break
 		}
 		*sptr++
 		c2 = (*sptr) - 1
 		c1 |= c2 >> 6
-		g.PostInc(&(*dptr)) = BF_itoa64[c1]
-		g.PostInc(&(*dptr)) = BF_itoa64[c2&0x3f]
+		b.PostInc(&(*dptr)) = BF_itoa64[c1]
+		b.PostInc(&(*dptr)) = BF_itoa64[c2&0x3f]
 		if sptr >= end {
 			break
 		}
@@ -242,8 +244,8 @@ func BF_swap(x *BF_word, count int) {
 		for {
 			tmp = *x
 			tmp = tmp<<16 | tmp>>16
-			g.PostInc(&(*x)) = (tmp&0xff00ff)<<8 | tmp>>8&0xff00ff
-			if !(g.PreDec(&count)) {
+			b.PostInc(&(*x)) = (tmp&0xff00ff)<<8 | tmp>>8&0xff00ff
+			if !(b.PreDec(&count)) {
 				break
 			}
 		}
@@ -252,9 +254,25 @@ func BF_swap(x *BF_word, count int) {
 
 /* Architectures with no complicated addressing modes supported */
 
-// #define BF_INDEX(S,i) ( * ( ( BF_word * ) ( ( ( unsigned char * ) S ) + ( i ) ) ) )
-
-// #define BF_ROUND(L,R,N) tmp1 = L & 0xFF ; tmp1 <<= 2 ; tmp2 = L >> 6 ; tmp2 &= 0x3FC ; tmp3 = L >> 14 ; tmp3 &= 0x3FC ; tmp4 = L >> 22 ; tmp4 &= 0x3FC ; tmp1 = BF_INDEX ( data . ctx . S [ 3 ] , tmp1 ) ; tmp2 = BF_INDEX ( data . ctx . S [ 2 ] , tmp2 ) ; tmp3 = BF_INDEX ( data . ctx . S [ 1 ] , tmp3 ) ; tmp3 += BF_INDEX ( data . ctx . S [ 0 ] , tmp4 ) ; tmp3 ^= tmp2 ; R ^= data . ctx . P [ N + 1 ] ; tmp3 += tmp1 ; R ^= tmp3 ;
+func BF_INDEX(S __auto__, i *uint8) BF_word { return *((*BF_word)((*uint8)(S) + i)) }
+func BF_ROUND(L BF_word, R BF_word, N int) {
+	tmp1 = L & 0xff
+	tmp1 <<= 2
+	tmp2 = L >> 6
+	tmp2 &= 0x3fc
+	tmp3 = L >> 14
+	tmp3 &= 0x3fc
+	tmp4 = L >> 22
+	tmp4 &= 0x3fc
+	tmp1 = BF_INDEX(data.ctx.S[3], tmp1)
+	tmp2 = BF_INDEX(data.ctx.S[2], tmp2)
+	tmp3 = BF_INDEX(data.ctx.S[1], tmp3)
+	tmp3 += BF_INDEX(data.ctx.S[0], tmp4)
+	tmp3 ^= tmp2
+	R ^= data.ctx.P[N+1]
+	tmp3 += tmp1
+	R ^= tmp3
+}
 
 /*
  * Encrypt one block, BF_N is hardcoded here.
@@ -262,8 +280,68 @@ func BF_swap(x *BF_word, count int) {
 
 // #define BF_ENCRYPT       L ^= data . ctx . P [ 0 ] ; BF_ROUND ( L , R , 0 ) ; BF_ROUND ( R , L , 1 ) ; BF_ROUND ( L , R , 2 ) ; BF_ROUND ( R , L , 3 ) ; BF_ROUND ( L , R , 4 ) ; BF_ROUND ( R , L , 5 ) ; BF_ROUND ( L , R , 6 ) ; BF_ROUND ( R , L , 7 ) ; BF_ROUND ( L , R , 8 ) ; BF_ROUND ( R , L , 9 ) ; BF_ROUND ( L , R , 10 ) ; BF_ROUND ( R , L , 11 ) ; BF_ROUND ( L , R , 12 ) ; BF_ROUND ( R , L , 13 ) ; BF_ROUND ( L , R , 14 ) ; BF_ROUND ( R , L , 15 ) ; tmp4 = R ; R = L ; L = tmp4 ^ data . ctx . P [ BF_N + 1 ] ;
 
-// #define BF_body() L = R = 0 ; ptr = data . ctx . P ; do { ptr += 2 ; BF_ENCRYPT ; * ( ptr - 2 ) = L ; * ( ptr - 1 ) = R ; } while ( ptr < & data . ctx . P [ BF_N + 2 ] ) ; ptr = data . ctx . S [ 0 ] ; do { ptr += 2 ; BF_ENCRYPT ; * ( ptr - 2 ) = L ; * ( ptr - 1 ) = R ; } while ( ptr < & data . ctx . S [ 3 ] [ 0xFF ] ) ;
-
+func BF_body() {
+	R = 0
+	L = R
+	ptr = data.ctx.P
+	for {
+		ptr += 2
+		L ^= data.ctx.P[0]
+		BF_ROUND(L, R, 0)
+		BF_ROUND(R, L, 1)
+		BF_ROUND(L, R, 2)
+		BF_ROUND(R, L, 3)
+		BF_ROUND(L, R, 4)
+		BF_ROUND(R, L, 5)
+		BF_ROUND(L, R, 6)
+		BF_ROUND(R, L, 7)
+		BF_ROUND(L, R, 8)
+		BF_ROUND(R, L, 9)
+		BF_ROUND(L, R, 10)
+		BF_ROUND(R, L, 11)
+		BF_ROUND(L, R, 12)
+		BF_ROUND(R, L, 13)
+		BF_ROUND(L, R, 14)
+		BF_ROUND(R, L, 15)
+		tmp4 = R
+		R = L
+		L = tmp4 ^ data.ctx.P[BF_N+1]
+		*(ptr - 2) = L
+		*(ptr - 1) = R
+		if ptr >= &data.ctx.P[BF_N+2] {
+			break
+		}
+	}
+	ptr = data.ctx.S[0]
+	for {
+		ptr += 2
+		L ^= data.ctx.P[0]
+		BF_ROUND(L, R, 0)
+		BF_ROUND(R, L, 1)
+		BF_ROUND(L, R, 2)
+		BF_ROUND(R, L, 3)
+		BF_ROUND(L, R, 4)
+		BF_ROUND(R, L, 5)
+		BF_ROUND(L, R, 6)
+		BF_ROUND(R, L, 7)
+		BF_ROUND(L, R, 8)
+		BF_ROUND(R, L, 9)
+		BF_ROUND(L, R, 10)
+		BF_ROUND(R, L, 11)
+		BF_ROUND(L, R, 12)
+		BF_ROUND(R, L, 13)
+		BF_ROUND(L, R, 14)
+		BF_ROUND(R, L, 15)
+		tmp4 = R
+		R = L
+		L = tmp4 ^ data.ctx.P[BF_N+1]
+		*(ptr - 2) = L
+		*(ptr - 1) = R
+		if ptr >= &data.ctx.S[3][0xff] {
+			break
+		}
+	}
+}
 func BF_set_key(key *byte, expanded BF_key, initial BF_key, flags uint8) {
 	var ptr *byte = key
 	var bug uint
@@ -314,7 +392,7 @@ func BF_set_key(key *byte, expanded BF_key, initial BF_key, flags uint8) {
 	safety = BF_word(flags&2) << 15
 	diff = 0
 	sign = diff
-	for i = 0; i < 16+2; i++ {
+	for i = 0; i < BF_N+2; i++ {
 		tmp[1] = 0
 		tmp[0] = tmp[1]
 		for j = 0; j < 4; j++ {
@@ -408,818 +486,98 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 	var count BF_word
 	var i int
 	if size < 7+22+31+1 {
-		errno = ERANGE
+		__setErrno(ERANGE)
 		return nil
 	}
 	if setting[0] != '$' || setting[1] != '2' || setting[2] < 'a' || setting[2] > 'z' || FlagsBySubtype[uint(uint8(setting[2]-'a'))] == 0 || setting[3] != '$' || setting[4] < '0' || setting[4] > '3' || setting[5] < '0' || setting[5] > '9' || setting[4] == '3' && setting[5] > '1' || setting[6] != '$' {
-		errno = EINVAL
+		__setErrno(EINVAL)
 		return nil
 	}
 	count = BF_word(1<<(setting[4]-'0')*10 + (setting[5] - '0'))
 	if count < min || BF_decode(data.binary.salt, &setting[7], 16) != 0 {
-		errno = EINVAL
+		__setErrno(EINVAL)
 		return nil
 	}
 	BF_swap(data.binary.salt, 4)
 	BF_set_key(key, data.expanded_key, data.ctx.GetP(), FlagsBySubtype[uint(uint8(setting[2]-'a'))])
-	memcpy(data.ctx.GetS(), BF_init_state.GetS(), g.SizeOf("data . ctx . S"))
+	memcpy(data.ctx.GetS(), BF_init_state.GetS(), b.SizeOf("data . ctx . S"))
 	R = 0
 	L = R
-	for i = 0; i < 16+2; i += 2 {
+	for i = 0; i < BF_N+2; i += 2 {
 		L ^= data.binary.salt[i&2]
 		R ^= data.binary.salt[(i&2)+1]
 		L ^= data.ctx.GetP()[0]
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[0+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[1+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[2+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[3+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[4+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[5+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[6+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[7+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[8+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[9+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[10+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[11+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[12+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[13+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[14+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[15+1]
-		tmp3 += tmp1
-		L ^= tmp3
+		BF_ROUND(L, R, 0)
+		BF_ROUND(R, L, 1)
+		BF_ROUND(L, R, 2)
+		BF_ROUND(R, L, 3)
+		BF_ROUND(L, R, 4)
+		BF_ROUND(R, L, 5)
+		BF_ROUND(L, R, 6)
+		BF_ROUND(R, L, 7)
+		BF_ROUND(L, R, 8)
+		BF_ROUND(R, L, 9)
+		BF_ROUND(L, R, 10)
+		BF_ROUND(R, L, 11)
+		BF_ROUND(L, R, 12)
+		BF_ROUND(R, L, 13)
+		BF_ROUND(L, R, 14)
+		BF_ROUND(R, L, 15)
 		tmp4 = R
 		R = L
-		L = tmp4 ^ data.ctx.GetP()[16+1]
+		L = tmp4 ^ data.ctx.GetP()[BF_N+1]
 		data.ctx.GetP()[i] = L
 		data.ctx.GetP()[i+1] = R
 	}
 	ptr = data.ctx.GetS()[0]
 	for {
 		ptr += 4
-		L ^= data.binary.salt[16+2&3]
-		R ^= data.binary.salt[16+3&3]
+		L ^= data.binary.salt[BF_N+2&3]
+		R ^= data.binary.salt[BF_N+3&3]
 		L ^= data.ctx.GetP()[0]
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[0+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[1+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[2+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[3+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[4+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[5+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[6+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[7+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[8+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[9+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[10+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[11+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[12+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[13+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[14+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[15+1]
-		tmp3 += tmp1
-		L ^= tmp3
+		BF_ROUND(L, R, 0)
+		BF_ROUND(R, L, 1)
+		BF_ROUND(L, R, 2)
+		BF_ROUND(R, L, 3)
+		BF_ROUND(L, R, 4)
+		BF_ROUND(R, L, 5)
+		BF_ROUND(L, R, 6)
+		BF_ROUND(R, L, 7)
+		BF_ROUND(L, R, 8)
+		BF_ROUND(R, L, 9)
+		BF_ROUND(L, R, 10)
+		BF_ROUND(R, L, 11)
+		BF_ROUND(L, R, 12)
+		BF_ROUND(R, L, 13)
+		BF_ROUND(L, R, 14)
+		BF_ROUND(R, L, 15)
 		tmp4 = R
 		R = L
-		L = tmp4 ^ data.ctx.GetP()[16+1]
+		L = tmp4 ^ data.ctx.GetP()[BF_N+1]
 		*(ptr - 4) = L
 		*(ptr - 3) = R
-		L ^= data.binary.salt[16+4&3]
-		R ^= data.binary.salt[16+5&3]
+		L ^= data.binary.salt[BF_N+4&3]
+		R ^= data.binary.salt[BF_N+5&3]
 		L ^= data.ctx.GetP()[0]
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[0+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[1+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[2+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[3+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[4+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[5+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[6+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[7+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[8+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[9+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[10+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[11+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[12+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[13+1]
-		tmp3 += tmp1
-		L ^= tmp3
-		tmp1 = L & 0xff
-		tmp1 <<= 2
-		tmp2 = L >> 6
-		tmp2 &= 0x3fc
-		tmp3 = L >> 14
-		tmp3 &= 0x3fc
-		tmp4 = L >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		R ^= data.ctx.GetP()[14+1]
-		tmp3 += tmp1
-		R ^= tmp3
-		tmp1 = R & 0xff
-		tmp1 <<= 2
-		tmp2 = R >> 6
-		tmp2 &= 0x3fc
-		tmp3 = R >> 14
-		tmp3 &= 0x3fc
-		tmp4 = R >> 22
-		tmp4 &= 0x3fc
-		tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-		tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-		tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-		tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-		tmp3 ^= tmp2
-		L ^= data.ctx.GetP()[15+1]
-		tmp3 += tmp1
-		L ^= tmp3
+		BF_ROUND(L, R, 0)
+		BF_ROUND(R, L, 1)
+		BF_ROUND(L, R, 2)
+		BF_ROUND(R, L, 3)
+		BF_ROUND(L, R, 4)
+		BF_ROUND(R, L, 5)
+		BF_ROUND(L, R, 6)
+		BF_ROUND(R, L, 7)
+		BF_ROUND(L, R, 8)
+		BF_ROUND(R, L, 9)
+		BF_ROUND(L, R, 10)
+		BF_ROUND(R, L, 11)
+		BF_ROUND(L, R, 12)
+		BF_ROUND(R, L, 13)
+		BF_ROUND(L, R, 14)
+		BF_ROUND(R, L, 15)
 		tmp4 = R
 		R = L
-		L = tmp4 ^ data.ctx.GetP()[16+1]
+		L = tmp4 ^ data.ctx.GetP()[BF_N+1]
 		*(ptr - 2) = L
 		*(ptr - 1) = R
 		if ptr >= &data.ctx.GetS()[3][0xff] {
@@ -1228,552 +586,13 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 	}
 	for {
 		var done int
-		for i = 0; i < 16+2; i += 2 {
+		for i = 0; i < BF_N+2; i += 2 {
 			data.ctx.GetP()[i] ^= data.expanded_key[i]
 			data.ctx.GetP()[i+1] ^= data.expanded_key[i+1]
 		}
 		done = 0
 		for {
-			R = 0
-			L = R
-			ptr = data.ctx.GetP()
-			for {
-				ptr += 2
-				L ^= data.ctx.GetP()[0]
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[0+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[1+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[2+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[3+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[4+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[5+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[6+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[7+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[8+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[9+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[10+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[11+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[12+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[13+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[14+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[15+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp4 = R
-				R = L
-				L = tmp4 ^ data.ctx.GetP()[16+1]
-				*(ptr - 2) = L
-				*(ptr - 1) = R
-				if ptr >= &data.ctx.GetP()[16+2] {
-					break
-				}
-			}
-			ptr = data.ctx.GetS()[0]
-			for {
-				ptr += 2
-				L ^= data.ctx.GetP()[0]
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[0+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[1+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[2+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[3+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[4+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[5+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[6+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[7+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[8+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[9+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[10+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[11+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[12+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[13+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp1 = L & 0xff
-				tmp1 <<= 2
-				tmp2 = L >> 6
-				tmp2 &= 0x3fc
-				tmp3 = L >> 14
-				tmp3 &= 0x3fc
-				tmp4 = L >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				R ^= data.ctx.GetP()[14+1]
-				tmp3 += tmp1
-				R ^= tmp3
-				tmp1 = R & 0xff
-				tmp1 <<= 2
-				tmp2 = R >> 6
-				tmp2 &= 0x3fc
-				tmp3 = R >> 14
-				tmp3 &= 0x3fc
-				tmp4 = R >> 22
-				tmp4 &= 0x3fc
-				tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-				tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-				tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-				tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-				tmp3 ^= tmp2
-				L ^= data.ctx.GetP()[15+1]
-				tmp3 += tmp1
-				L ^= tmp3
-				tmp4 = R
-				R = L
-				L = tmp4 ^ data.ctx.GetP()[16+1]
-				*(ptr - 2) = L
-				*(ptr - 1) = R
-				if ptr >= &data.ctx.GetS()[3][0xff] {
-					break
-				}
-			}
+			BF_body()
 			if done != 0 {
 				break
 			}
@@ -1782,7 +601,7 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 			tmp2 = data.binary.salt[1]
 			tmp3 = data.binary.salt[2]
 			tmp4 = data.binary.salt[3]
-			for i = 0; i < 16; i += 4 {
+			for i = 0; i < BF_N; i += 4 {
 				data.ctx.GetP()[i] ^= tmp1
 				data.ctx.GetP()[i+1] ^= tmp2
 				data.ctx.GetP()[i+2] ^= tmp3
@@ -1792,7 +611,7 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 			data.ctx.GetP()[17] ^= tmp2
 
 		}
-		if !(g.PreDec(&count)) {
+		if !(b.PreDec(&count)) {
 			break
 		}
 	}
@@ -1802,266 +621,26 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 		count = 64
 		for {
 			L ^= data.ctx.GetP()[0]
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[0+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[1+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[2+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[3+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[4+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[5+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[6+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[7+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[8+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[9+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[10+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[11+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[12+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[13+1]
-			tmp3 += tmp1
-			L ^= tmp3
-			tmp1 = L & 0xff
-			tmp1 <<= 2
-			tmp2 = L >> 6
-			tmp2 &= 0x3fc
-			tmp3 = L >> 14
-			tmp3 &= 0x3fc
-			tmp4 = L >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			R ^= data.ctx.GetP()[14+1]
-			tmp3 += tmp1
-			R ^= tmp3
-			tmp1 = R & 0xff
-			tmp1 <<= 2
-			tmp2 = R >> 6
-			tmp2 &= 0x3fc
-			tmp3 = R >> 14
-			tmp3 &= 0x3fc
-			tmp4 = R >> 22
-			tmp4 &= 0x3fc
-			tmp1 = *((*BF_word)((*uint8)(data.ctx.GetS()[3]) + tmp1))
-			tmp2 = *((*BF_word)((*uint8)(data.ctx.GetS()[2]) + tmp2))
-			tmp3 = *((*BF_word)((*uint8)(data.ctx.GetS()[1]) + tmp3))
-			tmp3 += *((*BF_word)((*uint8)(data.ctx.GetS()[0]) + tmp4))
-			tmp3 ^= tmp2
-			L ^= data.ctx.GetP()[15+1]
-			tmp3 += tmp1
-			L ^= tmp3
+			BF_ROUND(L, R, 0)
+			BF_ROUND(R, L, 1)
+			BF_ROUND(L, R, 2)
+			BF_ROUND(R, L, 3)
+			BF_ROUND(L, R, 4)
+			BF_ROUND(R, L, 5)
+			BF_ROUND(L, R, 6)
+			BF_ROUND(R, L, 7)
+			BF_ROUND(L, R, 8)
+			BF_ROUND(R, L, 9)
+			BF_ROUND(L, R, 10)
+			BF_ROUND(R, L, 11)
+			BF_ROUND(L, R, 12)
+			BF_ROUND(R, L, 13)
+			BF_ROUND(L, R, 14)
+			BF_ROUND(R, L, 15)
 			tmp4 = R
 			R = L
-			L = tmp4 ^ data.ctx.GetP()[16+1]
-			if !(g.PreDec(&count)) {
+			L = tmp4 ^ data.ctx.GetP()[BF_N+1]
+			if !(b.PreDec(&count)) {
 				break
 			}
 		}
@@ -2141,15 +720,15 @@ func PhpCryptBlowfishRn(key *byte, setting *byte, output *byte, size int) *byte 
 	 * detected by the self-test.
 	 */
 
-	memcpy(buf.s, test_setting, g.SizeOf("buf . s"))
+	memcpy(buf.s, test_setting, b.SizeOf("buf . s"))
 	if retval != nil {
 		var flags uint = FlagsBySubtype[uint(uint8(setting[2]-'a'))]
 		test_hash = test_hashes[flags&1]
 		buf.s[2] = setting[2]
 	}
-	memset(buf.o, 0x55, g.SizeOf("buf . o"))
-	buf.o[g.SizeOf("buf . o")-1] = 0
-	p = BF_crypt(test_key, buf.s, buf.o, g.SizeOf("buf . o")-(1+1), 1)
+	memset(buf.o, 0x55, b.SizeOf("buf . o"))
+	buf.o[b.SizeOf("buf . o")-1] = 0
+	p = BF_crypt(test_key, buf.s, buf.o, b.SizeOf("buf . o")-(1+1), 1)
 	ok = p == buf.o && !(memcmp(p, buf.s, 7+22)) && !(memcmp(p+(7+22), test_hash, 31+1+1+1))
 	var k *byte = "xffxa3" + "34" + "xffxffxffxa3" + "345"
 	var ae BF_key
@@ -2159,8 +738,8 @@ func PhpCryptBlowfishRn(key *byte, setting *byte, output *byte, size int) *byte 
 	BF_set_key(k, ae, ai, 2)
 	BF_set_key(k, ye, yi, 4)
 	ai[0] ^= 0x10000
-	ok = ok != 0 && ai[0] == 0xdb9c59bc && ye[17] == 0x33343500 && !(memcmp(ae, ye, g.SizeOf("ae"))) && !(memcmp(ai, yi, g.SizeOf("ai")))
-	errno = save_errno
+	ok = ok != 0 && ai[0] == 0xdb9c59bc && ye[17] == 0x33343500 && !(memcmp(ae, ye, b.SizeOf("ae"))) && !(memcmp(ai, yi, b.SizeOf("ai")))
+	__setErrno(save_errno)
 	if ok != 0 {
 		return retval
 	}
@@ -2168,6 +747,6 @@ func PhpCryptBlowfishRn(key *byte, setting *byte, output *byte, size int) *byte 
 	/* Should not happen */
 
 	_cryptOutputMagic(setting, output, size)
-	errno = EINVAL
+	__setErrno(EINVAL)
 	return nil
 }

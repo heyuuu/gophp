@@ -3,8 +3,8 @@
 package cli
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 )
 
 // Source: <sapi/cli/php_http_parser.h>
@@ -42,11 +42,11 @@ import (
  * faster
  */
 
-// #define PHP_HTTP_PARSER_STRICT       1
+const PHP_HTTP_PARSER_STRICT = 1
 
 /* Maximium header size allowed */
 
-// #define PHP_HTTP_MAX_HEADER_SIZE       ( 80 * 1024 )
+const PHP_HTTP_MAX_HEADER_SIZE = 80 * 1024
 
 /* Callbacks should return non-zero to indicate an error. The parser will
  * then halt execution.
@@ -204,7 +204,13 @@ const (
 
 // # include "php_http_parser.h"
 
-// #define MIN(a,b) ( ( a ) < ( b ) ? ( a ) : ( b ) )
+func MIN(a int, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
 
 // #define CALLBACK2(FOR) do { if ( settings -> on_ ## FOR ) { if ( 0 != settings -> on_ ## FOR ( parser ) ) return ( p - data ) ; } } while ( 0 )
 
@@ -214,21 +220,14 @@ const (
 
 // #define CALLBACK(FOR) do { CALLBACK_NOCLEAR ( FOR ) ; FOR ## _mark = NULL ; } while ( 0 )
 
-// #define PROXY_CONNECTION       "proxy-connection"
-
-// #define CONNECTION       "connection"
-
-// #define CONTENT_LENGTH       "content-length"
-
-// #define TRANSFER_ENCODING       "transfer-encoding"
-
-// #define UPGRADE       "upgrade"
-
-// #define CHUNKED       "chunked"
-
-// #define KEEP_ALIVE       "keep-alive"
-
-// #define CLOSE       "close"
+const PROXY_CONNECTION = "proxy-connection"
+const CONNECTION = "connection"
+const CONTENT_LENGTH = "content-length"
+const TRANSFER_ENCODING = "transfer-encoding"
+const UPGRADE = "upgrade"
+const CHUNKED = "chunked"
+const KEEP_ALIVE = "keep-alive"
+const CLOSE = "close"
 
 var MethodStrings []*byte = []*byte{"DELETE", "GET", "HEAD", "POST", "PUT", "PATCH", "CONNECT", "OPTIONS", "TRACE", "COPY", "LOCK", "MKCOL", "MOVE", "MKCALENDAR", "PROPFIND", "PROPPATCH", "SEARCH", "UNLOCK", "REPORT", "MKACTIVITY", "CHECKOUT", "MERGE", "M-SEARCH", "NOTIFY", "SUBSCRIBE", "UNSUBSCRIBE", "NOTIMPLEMENTED"}
 
@@ -244,7 +243,9 @@ var Tokens []byte = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 var Unhex []int8_t = []int8_t{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 var NormalUrlChar []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}
 
-// #define PARSING_HEADER(state) ( state <= s_headers_almost_done && 0 == ( parser -> flags & F_TRAILING ) )
+func PARSING_HEADER(state State) bool {
+	return state <= SHeadersAlmostDone && 0 == (parser.flags&F_TRAILING)
+}
 
 type HeaderStates = int
 
@@ -280,21 +281,17 @@ const (
 	F_UPGRADE               Flags = 1 << 4
 	F_SKIPBODY              Flags = 1 << 5
 )
+const CR = '\r'
+const LF = '\n'
 
-// #define CR       '\r'
+func LOWER(c byte) uint8 { return uint8(c | 0x20) }
+func TOKEN(c byte) byte  { return Tokens[uint8(c)] }
 
-// #define LF       '\n'
-
-// #define LOWER(c) ( unsigned char ) ( c | 0x20 )
-
-// #define TOKEN(c) tokens [ ( unsigned char ) c ]
-
-// #define start_state       ( parser -> type == PHP_HTTP_REQUEST ? s_start_req : s_start_res )
+const StartState = b.Cond(parser.type_ == PHP_HTTP_REQUEST, SStartReq, SStartRes)
 
 // #define STRICT_CHECK(cond)
 
-// #define NEW_MESSAGE() start_state
-
+func NEW_MESSAGE() __auto__ { return StartState }
 func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings, data *byte, len_ int) int {
 	var ch byte
 	var c signed__char
@@ -348,12 +345,12 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 	pe = data + len_
 	for ; p != pe; p++ {
 		ch = *p
-		if state <= SHeadersAlmostDone && 0 == (parser.GetFlags()&F_TRAILING) {
+		if PARSING_HEADER(state) {
 			nread++
 
 			/* Buffer overflow attack */
 
-			if nread > 80*1024 {
+			if nread > PHP_HTTP_MAX_HEADER_SIZE {
 				goto error
 			}
 
@@ -369,7 +366,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 
 			goto error
 		case SStartReqOrRes:
-			if ch == '\r' || ch == '\n' {
+			if ch == CR || ch == LF {
 				break
 			}
 			parser.SetFlags(0)
@@ -412,9 +409,9 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			case 'H':
 				state = s_res_H
 				break
-			case '\r':
+			case CR:
 
-			case '\n':
+			case LF:
 				break
 			default:
 				goto error
@@ -490,10 +487,10 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				case ' ':
 					state = SResStatus
 					break
-				case '\r':
+				case CR:
 					state = SResLineAlmostDone
 					break
-				case '\n':
+				case LF:
 					state = SHeaderFieldStart
 					break
 				default:
@@ -512,11 +509,11 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			/* the human readable status. e.g. "NOT FOUND"
 			 * we are not humans so just ignore this */
 
-			if ch == '\r' {
+			if ch == CR {
 				state = SResLineAlmostDone
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 				state = SHeaderFieldStart
 				break
 			}
@@ -525,7 +522,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SHeaderFieldStart
 			break
 		case SStartReq:
-			if ch == '\r' || ch == '\n' {
+			if ch == CR || ch == LF {
 				break
 			}
 			parser.SetFlags(0)
@@ -649,7 +646,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				state = SReqPath
 				break
 			}
-			c = uint8(ch | 0x20)
+			c = LOWER(ch)
 			if c >= 'a' && c <= 'z' {
 				url_mark = p
 				state = SReqSchema
@@ -657,7 +654,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			goto error
 		case SReqSchema:
-			c = uint8(ch | 0x20)
+			c = LOWER(ch)
 			if c >= 'a' && c <= 'z' {
 				break
 			}
@@ -679,7 +676,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SReqHost
 			break
 		case SReqHost:
-			c = uint8(ch | 0x20)
+			c = LOWER(ch)
 			if c >= 'a' && c <= 'z' {
 				break
 			}
@@ -769,7 +766,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				path_mark = nil
 				state = SReqHttpStart
 				break
-			case '\r':
+			case CR:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -790,7 +787,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				parser.SetHttpMinor(9)
 				state = SReqLineAlmostDone
 				break
-			case '\n':
+			case LF:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -857,7 +854,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				url_mark = nil
 				state = SReqHttpStart
 				break
-			case '\r':
+			case CR:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -870,7 +867,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				parser.SetHttpMinor(9)
 				state = SReqLineAlmostDone
 				break
-			case '\n':
+			case LF:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -919,7 +916,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				query_string_mark = nil
 				state = SReqHttpStart
 				break
-			case '\r':
+			case CR:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -940,7 +937,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				parser.SetHttpMinor(9)
 				state = SReqLineAlmostDone
 				break
-			case '\n':
+			case LF:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -994,7 +991,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				url_mark = nil
 				state = SReqHttpStart
 				break
-			case '\r':
+			case CR:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -1007,7 +1004,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				parser.SetHttpMinor(9)
 				state = SReqLineAlmostDone
 				break
-			case '\n':
+			case LF:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -1054,7 +1051,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				fragment_mark = nil
 				state = SReqHttpStart
 				break
-			case '\r':
+			case CR:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -1075,7 +1072,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				parser.SetHttpMinor(9)
 				state = SReqLineAlmostDone
 				break
-			case '\n':
+			case LF:
 				if url_mark != nil {
 					if settings.GetOnUrl() != nil {
 						if 0 != settings.GetOnUrl()(parser, url_mark, p-url_mark) {
@@ -1156,11 +1153,11 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SReqHttpMinor
 			break
 		case SReqHttpMinor:
-			if ch == '\r' {
+			if ch == CR {
 				state = SReqLineAlmostDone
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 				state = SHeaderFieldStart
 				break
 			}
@@ -1177,17 +1174,17 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SReqLineAlmostDone:
-			if ch != '\n' {
+			if ch != LF {
 				goto error
 			}
 			state = SHeaderFieldStart
 			break
 		case SHeaderFieldStart:
-			if ch == '\r' {
+			if ch == CR {
 				state = SHeadersAlmostDone
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 
 				/* they might be just sending \n instead of \r\n so this would be
 				 * the second \n to denote the end of headers*/
@@ -1195,7 +1192,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				state = SHeadersAlmostDone
 				goto headers_almost_done
 			}
-			c = Tokens[uint8(ch)]
+			c = TOKEN(ch)
 			if !c {
 				goto error
 			}
@@ -1221,7 +1218,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SHeaderField:
-			c = Tokens[uint8(ch)]
+			c = TOKEN(ch)
 			if c {
 				switch header_state {
 				case HGeneral:
@@ -1258,41 +1255,41 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 					break
 				case HMatchingConnection:
 					index++
-					if index > g.SizeOf("CONNECTION")-1 || c != "connection"[index] {
+					if index > b.SizeOf("CONNECTION")-1 || c != CONNECTION[index] {
 						header_state = HGeneral
-					} else if index == g.SizeOf("CONNECTION")-2 {
+					} else if index == b.SizeOf("CONNECTION")-2 {
 						header_state = HConnection
 					}
 					break
 				case HMatchingProxyConnection:
 					index++
-					if index > g.SizeOf("PROXY_CONNECTION")-1 || c != "proxy-connection"[index] {
+					if index > b.SizeOf("PROXY_CONNECTION")-1 || c != PROXY_CONNECTION[index] {
 						header_state = HGeneral
-					} else if index == g.SizeOf("PROXY_CONNECTION")-2 {
+					} else if index == b.SizeOf("PROXY_CONNECTION")-2 {
 						header_state = HConnection
 					}
 					break
 				case HMatchingContentLength:
 					index++
-					if index > g.SizeOf("CONTENT_LENGTH")-1 || c != "content-length"[index] {
+					if index > b.SizeOf("CONTENT_LENGTH")-1 || c != CONTENT_LENGTH[index] {
 						header_state = HGeneral
-					} else if index == g.SizeOf("CONTENT_LENGTH")-2 {
+					} else if index == b.SizeOf("CONTENT_LENGTH")-2 {
 						header_state = HContentLength
 					}
 					break
 				case HMatchingTransferEncoding:
 					index++
-					if index > g.SizeOf("TRANSFER_ENCODING")-1 || c != "transfer-encoding"[index] {
+					if index > b.SizeOf("TRANSFER_ENCODING")-1 || c != TRANSFER_ENCODING[index] {
 						header_state = HGeneral
-					} else if index == g.SizeOf("TRANSFER_ENCODING")-2 {
+					} else if index == b.SizeOf("TRANSFER_ENCODING")-2 {
 						header_state = HTransferEncoding
 					}
 					break
 				case HMatchingUpgrade:
 					index++
-					if index > g.SizeOf("UPGRADE")-1 || c != "upgrade"[index] {
+					if index > b.SizeOf("UPGRADE")-1 || c != UPGRADE[index] {
 						header_state = HGeneral
-					} else if index == g.SizeOf("UPGRADE")-2 {
+					} else if index == b.SizeOf("UPGRADE")-2 {
 						header_state = HUpgrade
 					}
 					break
@@ -1325,7 +1322,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				state = SHeaderValueStart
 				break
 			}
-			if ch == '\r' {
+			if ch == CR {
 				state = SHeaderAlmostDone
 				if header_field_mark != nil {
 					if settings.GetOnHeaderField() != nil {
@@ -1337,7 +1334,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				header_field_mark = nil
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 				if header_field_mark != nil {
 					if settings.GetOnHeaderField() != nil {
 						if 0 != settings.GetOnHeaderField()(parser, header_field_mark, p-header_field_mark) {
@@ -1357,8 +1354,8 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			header_value_mark = p
 			state = SHeaderValue
 			index = 0
-			c = uint8(ch | 0x20)
-			if ch == '\r' {
+			c = LOWER(ch)
+			if ch == CR {
 				if header_value_mark != nil {
 					if settings.GetOnHeaderValue() != nil {
 						if 0 != settings.GetOnHeaderValue()(parser, header_value_mark, p-header_value_mark) {
@@ -1371,7 +1368,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				state = SHeaderAlmostDone
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 				if header_value_mark != nil {
 					if settings.GetOnHeaderValue() != nil {
 						if 0 != settings.GetOnHeaderValue()(parser, header_value_mark, p-header_value_mark) {
@@ -1422,8 +1419,8 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SHeaderValue:
-			c = uint8(ch | 0x20)
-			if ch == '\r' {
+			c = LOWER(ch)
+			if ch == CR {
 				if header_value_mark != nil {
 					if settings.GetOnHeaderValue() != nil {
 						if 0 != settings.GetOnHeaderValue()(parser, header_value_mark, p-header_value_mark) {
@@ -1435,7 +1432,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				state = SHeaderAlmostDone
 				break
 			}
-			if ch == '\n' {
+			if ch == LF {
 				if header_value_mark != nil {
 					if settings.GetOnHeaderValue() != nil {
 						if 0 != settings.GetOnHeaderValue()(parser, header_value_mark, p-header_value_mark) {
@@ -1466,25 +1463,25 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				break
 			case HMatchingTransferEncodingChunked:
 				index++
-				if index > g.SizeOf("CHUNKED")-1 || c != "chunked"[index] {
+				if index > b.SizeOf("CHUNKED")-1 || c != CHUNKED[index] {
 					header_state = HGeneral
-				} else if index == g.SizeOf("CHUNKED")-2 {
+				} else if index == b.SizeOf("CHUNKED")-2 {
 					header_state = HTransferEncodingChunked
 				}
 				break
 			case HMatchingConnectionKeepAlive:
 				index++
-				if index > g.SizeOf("KEEP_ALIVE")-1 || c != "keep-alive"[index] {
+				if index > b.SizeOf("KEEP_ALIVE")-1 || c != KEEP_ALIVE[index] {
 					header_state = HGeneral
-				} else if index == g.SizeOf("KEEP_ALIVE")-2 {
+				} else if index == b.SizeOf("KEEP_ALIVE")-2 {
 					header_state = HConnectionKeepAlive
 				}
 				break
 			case HMatchingConnectionClose:
 				index++
-				if index > g.SizeOf("CLOSE")-1 || c != "close"[index] {
+				if index > b.SizeOf("CLOSE")-1 || c != CLOSE[index] {
 					header_state = HGeneral
-				} else if index == g.SizeOf("CLOSE")-2 {
+				} else if index == b.SizeOf("CLOSE")-2 {
 					header_state = HConnectionClose
 				}
 				break
@@ -1531,11 +1528,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 						return p - data
 					}
 				}
-				if parser.GetType() == PHP_HTTP_REQUEST {
-					state = SStartReq
-				} else {
-					state = SStartRes
-				}
+				state = NEW_MESSAGE()
 				break
 			}
 			nread = 0
@@ -1572,11 +1565,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 						return p - data
 					}
 				}
-				if parser.GetType() == PHP_HTTP_REQUEST {
-					state = SStartReq
-				} else {
-					state = SStartRes
-				}
+				state = NEW_MESSAGE()
 			} else if (parser.GetFlags() & F_CHUNKED) != 0 {
 
 				/* chunked encoding - ignore Content-Length header */
@@ -1595,11 +1584,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 							return p - data
 						}
 					}
-					if parser.GetType() == PHP_HTTP_REQUEST {
-						state = SStartReq
-					} else {
-						state = SStartRes
-					}
+					state = NEW_MESSAGE()
 				} else if parser.GetContentLength() > 0 {
 
 					/* Content-Length header given and non-zero */
@@ -1618,11 +1603,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 								return p - data
 							}
 						}
-						if parser.GetType() == PHP_HTTP_REQUEST {
-							state = SStartReq
-						} else {
-							state = SStartRes
-						}
+						state = NEW_MESSAGE()
 					} else {
 
 						/* Read body until EOF */
@@ -1637,11 +1618,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			break
 		case SBodyIdentity:
 			r.Assert(pe >= p)
-			if size_t(pe-p) < int(parser.GetContentLength()) {
-				to_read = size_t(pe - p)
-			} else {
-				to_read = int(parser.GetContentLength())
-			}
+			to_read = MIN(size_t(pe-p), int(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
 					settings.GetOnBody()(parser, p, to_read)
@@ -1654,11 +1631,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 							return p - data
 						}
 					}
-					if parser.GetType() == PHP_HTTP_REQUEST {
-						state = SStartReq
-					} else {
-						state = SStartRes
-					}
+					state = NEW_MESSAGE()
 				}
 			}
 			break
@@ -1682,7 +1655,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			break
 		case SChunkSize:
 			r.Assert((parser.GetFlags() & F_CHUNKED) != 0)
-			if ch == '\r' {
+			if ch == CR {
 				state = SChunkSizeAlmostDone
 				break
 			}
@@ -1702,7 +1675,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 
 			/* just ignore this shit. TODO check for overflow */
 
-			if ch == '\r' {
+			if ch == CR {
 				state = SChunkSizeAlmostDone
 				break
 			}
@@ -1719,11 +1692,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 		case SChunkData:
 			r.Assert((parser.GetFlags() & F_CHUNKED) != 0)
 			r.Assert(pe >= p)
-			if size_t(pe-p) < size_t(parser.GetContentLength()) {
-				to_read = size_t(pe - p)
-			} else {
-				to_read = size_t(parser.GetContentLength())
-			}
+			to_read = MIN(size_t(pe-p), size_t(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
 					settings.GetOnBody()(parser, p, to_read)

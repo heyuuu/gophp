@@ -3,7 +3,7 @@
 package core
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -29,7 +29,7 @@ import (
 
 // #define PHP_CONTENT_TYPES_H
 
-// #define DEFAULT_POST_CONTENT_TYPE       "application/x-www-form-urlencoded"
+const DEFAULT_POST_CONTENT_TYPE = "application/x-www-form-urlencoded"
 
 // Source: <main/php_content_types.c>
 
@@ -64,20 +64,20 @@ import (
 
 var PhpPostEntries []SapiPostEntry = []SapiPostEntry{
 	{
-		"application/x-www-form-urlencoded",
-		g.SizeOf("DEFAULT_POST_CONTENT_TYPE") - 1,
+		DEFAULT_POST_CONTENT_TYPE,
+		b.SizeOf("DEFAULT_POST_CONTENT_TYPE") - 1,
 		SapiReadStandardFormData,
 		PhpStdPostHandler,
 	},
-	{"multipart/form-data", g.SizeOf("MULTIPART_CONTENT_TYPE") - 1, nil, Rfc1867PostHandler},
+	{MULTIPART_CONTENT_TYPE, b.SizeOf("MULTIPART_CONTENT_TYPE") - 1, nil, Rfc1867PostHandler},
 	{nil, 0, nil, nil},
 }
 
 /* }}} */
 
 func PhpDefaultPostReader() {
-	if !(strcmp(sapi_globals.GetRequestInfo().GetRequestMethod(), "POST")) {
-		if nil == sapi_globals.GetRequestInfo().GetPostEntry() {
+	if !(strcmp(SG(request_info).request_method, "POST")) {
+		if nil == SG(request_info).post_entry {
 
 			/* no post handler registered, so we just swallow the data */
 

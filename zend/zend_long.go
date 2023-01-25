@@ -2,6 +2,10 @@
 
 package zend
 
+import (
+	"sik/core"
+)
+
 // Source: <Zend/zend_long.h>
 
 /*
@@ -28,7 +32,7 @@ package zend
 
 /* This is the heart of the whole int64 enablement in zval. */
 
-// #define ZEND_ENABLE_ZVAL_LONG64       1
+const ZEND_ENABLE_ZVAL_LONG64 = 1
 
 /* Integer types. */
 
@@ -36,50 +40,41 @@ type ZendLong = int64
 type ZendUlong = uint64
 type ZendOffT = int64
 
-// #define ZEND_LONG_MAX       INT64_MAX
+const ZEND_LONG_MAX ZendLong = INT64_MAX
+const ZEND_LONG_MIN float = INT64_MIN
+const ZEND_ULONG_MAX = UINT64_MAX
 
-// #define ZEND_LONG_MIN       INT64_MIN
+func Z_L(i int) __auto__  { return int64(i) }
+func Z_UL(i int) __auto__ { return uint64(i) }
 
-// #define ZEND_ULONG_MAX       UINT64_MAX
-
-// #define Z_L(i) INT64_C ( i )
-
-// #define Z_UL(i) UINT64_C ( i )
-
-// #define SIZEOF_ZEND_LONG       8
+const SIZEOF_ZEND_LONG = 8
 
 /* Conversion macros. */
 
-// #define ZEND_LTOA_BUF_LEN       65
+const ZEND_LTOA_BUF_LEN = 65
+const ZEND_LONG_FMT string = "%" + "lld"
+const ZEND_ULONG_FMT *byte = "%" + "llu"
+const ZEND_XLONG_FMT = "%" + PRIx64
+const ZEND_LONG_FMT_SPEC = "lld"
+const ZEND_ULONG_FMT_SPEC = "llu"
 
-// #define ZEND_LONG_FMT       "%" PRId64
+func ZEND_LTOA(i __auto__, s []char, len_ __auto__) {
+	var st int = core.Snprintf(s, len_, ZEND_LONG_FMT, i)
+	s[st] = '0'
+}
+func ZEND_ATOL(i __auto__, s __auto__) __auto__ {
+	i = atoll(s)
+	return i
+}
+func ZEND_STRTOL(s0 __auto__, s1 **byte, base int) __auto__  { return strtoll(s0, s1, base) }
+func ZEND_STRTOUL(s0 __auto__, s1 **byte, base int) __auto__ { return strtoull(s0, s1, base) }
 
-// #define ZEND_ULONG_FMT       "%" PRIu64
+const ZEND_STRTOL_PTR = strtoll
+const ZEND_STRTOUL_PTR = strtoull
+const ZEND_ABS = imaxabs
+const MAX_LENGTH_OF_LONG = 20
+const LONG_MIN_DIGITS = "9223372036854775808"
 
-// #define ZEND_XLONG_FMT       "%" PRIx64
+var LongMinDigits []byte = LONG_MIN_DIGITS
 
-// #define ZEND_LONG_FMT_SPEC       PRId64
-
-// #define ZEND_ULONG_FMT_SPEC       PRIu64
-
-// #define ZEND_LTOA(i,s,len) do { int st = snprintf ( ( s ) , ( len ) , ZEND_LONG_FMT , ( i ) ) ; ( s ) [ st ] = '\0' ; } while ( 0 )
-
-// #define ZEND_ATOL(i,s) ( i ) = atoll ( ( s ) )
-
-// #define ZEND_STRTOL(s0,s1,base) strtoll ( ( s0 ) , ( s1 ) , ( base ) )
-
-// #define ZEND_STRTOUL(s0,s1,base) strtoull ( ( s0 ) , ( s1 ) , ( base ) )
-
-// #define ZEND_STRTOL_PTR       strtoll
-
-// #define ZEND_STRTOUL_PTR       strtoull
-
-// #define ZEND_ABS       imaxabs
-
-// #define MAX_LENGTH_OF_LONG       20
-
-// #define LONG_MIN_DIGITS       "9223372036854775808"
-
-var LongMinDigits []byte = "9223372036854775808"
-
-// #define ZEND_ADDR_FMT       "0x%016zx"
+const ZEND_ADDR_FMT = "0x%016zx"

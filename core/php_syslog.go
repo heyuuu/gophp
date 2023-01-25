@@ -36,13 +36,10 @@ import (
 
 /* Syslog filters */
 
-// #define PHP_SYSLOG_FILTER_ALL       0
-
-// #define PHP_SYSLOG_FILTER_NO_CTRL       1
-
-// #define PHP_SYSLOG_FILTER_ASCII       2
-
-// #define PHP_SYSLOG_FILTER_RAW       3
+const PHP_SYSLOG_FILTER_ALL = 0
+const PHP_SYSLOG_FILTER_NO_CTRL = 1
+const PHP_SYSLOG_FILTER_ASCII = 2
+const PHP_SYSLOG_FILTER_RAW = 3
 
 var PhpOpenlog func(*byte, int, int)
 
@@ -98,19 +95,19 @@ func PhpSyslog(priority int, format string, _ ...any) {
 	 * correct parameters!
 	 */
 
-	if CoreGlobals.GetHaveCalledOpenlog() == 0 {
-		PhpOpenlog(CoreGlobals.GetSyslogIdent(), 0, CoreGlobals.GetSyslogFacility())
+	if !(PG(have_called_openlog)) {
+		PhpOpenlog(PG(syslog_ident), 0, PG(syslog_facility))
 	}
 	va_start(args, format)
 	zend.ZendPrintfToSmartString(&fbuf, format, args)
 	zend.SmartString0(&fbuf)
 	va_end(args)
-	if CoreGlobals.GetSyslogFilter() == 3 {
+	if PG(syslog_filter) == PHP_SYSLOG_FILTER_RAW {
 
 		/* Just send it directly to the syslog */
 
 		syslog(priority, "%.*s", int(fbuf.len_), fbuf.c)
-		zend.SmartStringFreeEx(&fbuf, 0)
+		zend.SmartStringFree(&fbuf)
 		return
 	}
 	for ptr = fbuf.c; ; ptr++ {
@@ -123,27 +120,27 @@ func PhpSyslog(priority int, format string, _ ...any) {
 		/* check for NVT ASCII only unless test disabled */
 
 		if 0x20 <= c && c <= 0x7e {
-			zend.SmartStringAppendcEx(&sbuf, c, 0)
-		} else if c >= 0x80 && CoreGlobals.GetSyslogFilter() != 2 {
-			zend.SmartStringAppendcEx(&sbuf, c, 0)
+			zend.SmartStringAppendc(&sbuf, c)
+		} else if c >= 0x80 && PG(syslog_filter) != PHP_SYSLOG_FILTER_ASCII {
+			zend.SmartStringAppendc(&sbuf, c)
 		} else if c == '\n' {
 			syslog(priority, "%.*s", int(sbuf.len_), sbuf.c)
 			zend.SmartStringReset(&sbuf)
-		} else if c < 0x20 && CoreGlobals.GetSyslogFilter() == 0 {
-			zend.SmartStringAppendcEx(&sbuf, c, 0)
+		} else if c < 0x20 && PG(syslog_filter) == PHP_SYSLOG_FILTER_ALL {
+			zend.SmartStringAppendc(&sbuf, c)
 		} else {
 			var xdigits []byte = "0123456789abcdef"
-			zend.SmartStringAppendlEx(&sbuf, "\\x", 2, 0)
-			zend.SmartStringAppendcEx(&sbuf, xdigits[c/0x10], 0)
+			zend.SmartStringAppendl(&sbuf, "\\x", 2)
+			zend.SmartStringAppendc(&sbuf, xdigits[c/0x10])
 			c &= 0xf
-			zend.SmartStringAppendcEx(&sbuf, xdigits[c], 0)
+			zend.SmartStringAppendc(&sbuf, xdigits[c])
 		}
 
 		/* check for NVT ASCII only unless test disabled */
 
 	}
-	zend.SmartStringFreeEx(&fbuf, 0)
-	zend.SmartStringFreeEx(&sbuf, 0)
+	zend.SmartStringFree(&fbuf)
+	zend.SmartStringFree(&sbuf)
 }
 
 /* }}} */

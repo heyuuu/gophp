@@ -2,6 +2,10 @@
 
 package standard
 
+import (
+	"sik/core"
+)
+
 // Source: <ext/standard/php_standard.h>
 
 /*
@@ -110,6 +114,5 @@ package standard
 
 // # include "php_version.h"
 
-// #define PHP_STANDARD_VERSION       PHP_VERSION
-
-// #define phpext_standard_ptr       basic_functions_module_ptr
+const PHP_STANDARD_VERSION = core.PHP_VERSION
+const PhpextStandardPtr = BasicFunctionsModulePtr

@@ -3,9 +3,8 @@
 package core
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
-	"sik/zend"
 )
 
 // Source: <main/getopt.c>
@@ -38,11 +37,9 @@ import (
 
 // # include "php_getopt.h"
 
-// #define OPTERRCOLON       ( 1 )
-
-// #define OPTERRNF       ( 2 )
-
-// #define OPTERRARG       ( 3 )
+const OPTERRCOLON = 1
+const OPTERRNF = 2
+const OPTERRARG = 3
 
 // Print error message to stderr and return -2 to distinguish it from '?' command line option.
 
@@ -50,13 +47,13 @@ func PhpOptError(argc int, argv **byte, oint int, optchr int, err int, show_err 
 	if show_err != 0 {
 		r.Fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1)
 		switch err {
-		case 1:
+		case OPTERRCOLON:
 			r.Fprintf(stderr, ": in flags\n")
 			break
-		case 2:
+		case OPTERRNF:
 			r.Fprintf(stderr, "option not found %c\n", argv[oint][optchr])
 			break
-		case 3:
+		case OPTERRARG:
 			r.Fprintf(stderr, "no argument for option %c\n", argv[oint][optchr])
 			break
 		default:
@@ -64,7 +61,7 @@ func PhpOptError(argc int, argv **byte, oint int, optchr int, err int, show_err 
 			break
 		}
 	}
-	return -2
+	return PHP_GETOPT_INVALID_ARG
 }
 
 /* }}} */
@@ -85,11 +82,11 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 	}
 	prev_optarg = optarg
 	if (*optind) >= argc {
-		return -1
+		return r.EOF
 	}
 	if dash == 0 {
 		if argv[*optind][0] != '-' {
-			return -1
+			return r.EOF
 		} else {
 			if !(argv[*optind][1]) {
 
@@ -98,7 +95,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 				 * the following args
 				 */
 
-				return -1
+				return r.EOF
 
 				/*
 				 * use to specify stdin. Need to let pgm process this and
@@ -116,13 +113,13 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 
 		if argv[*optind][2] == '0' {
 			*optind++
-			return -1
+			return r.EOF
 		}
 		arg_start = 2
 
 		/* Check for <arg>=<val> */
 
-		if g.Assign(&pos, zend.ZendMemnstr(&argv[*optind][arg_start], "=", 1, argv[*optind]+arg_end)) != nil {
+		if b.Assign(&pos, PhpMemnstr(&argv[*optind][arg_start], "=", 1, argv[*optind]+arg_end)) != nil {
 			arg_end = pos - &argv[*optind][arg_start]
 			arg_start++
 		} else {
@@ -132,7 +129,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 			PhpOptidx++
 			if opts[PhpOptidx].GetOptChar() == '-' {
 				*optind++
-				return PhpOptError(argc, argv, (*optind)-1, optchr, 3, show_err)
+				return PhpOptError(argc, argv, (*optind)-1, optchr, OPTERRARG, show_err)
 			} else if opts[PhpOptidx].GetOptName() != nil && !(strncmp(&argv[*optind][2], opts[PhpOptidx].GetOptName(), arg_end)) && arg_end == strlen(opts[PhpOptidx].GetOptName()) {
 				break
 			}
@@ -151,7 +148,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 		if argv[*optind][optchr] == ':' {
 			dash = 0
 			*optind++
-			return PhpOptError(argc, argv, (*optind)-1, optchr, 1, show_err)
+			return PhpOptError(argc, argv, (*optind)-1, optchr, OPTERRCOLON, show_err)
 		}
 		arg_start = 1 + optchr
 	}
@@ -168,7 +165,7 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 					optchr++
 					arg_start++
 				}
-				return PhpOptError(argc, argv, errind, errchr, 2, show_err)
+				return PhpOptError(argc, argv, errind, errchr, OPTERRNF, show_err)
 			} else if argv[*optind][optchr] == opts[PhpOptidx].GetOptChar() {
 				break
 			}
@@ -187,13 +184,13 @@ func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, sh
 				/* Was the value required or is it optional? */
 
 				if opts[PhpOptidx].GetNeedParam() == 1 {
-					return PhpOptError(argc, argv, (*optind)-1, optchr, 3, show_err)
+					return PhpOptError(argc, argv, (*optind)-1, optchr, OPTERRARG, show_err)
 				}
 
 				/* Was the value required or is it optional? */
 
 			} else if opts[PhpOptidx].GetNeedParam() == 1 {
-				*optarg = argv[g.PostInc(&(*optind))]
+				*optarg = argv[b.PostInc(&(*optind))]
 			}
 		} else if argv[*optind][arg_start] == '=' {
 			arg_start++

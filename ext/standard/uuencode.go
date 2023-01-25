@@ -3,9 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -35,14 +35,20 @@ import (
 
 // # include "php_uuencode.h"
 
-// #define PHP_UU_ENC(c) ( ( c ) ? ( ( c ) & 077 ) + ' ' : '`' )
-
-// #define PHP_UU_ENC_C2(c) PHP_UU_ENC ( ( ( * ( c ) << 4 ) & 060 ) | ( ( * ( ( c ) + 1 ) >> 4 ) & 017 ) )
-
-// #define PHP_UU_ENC_C3(c) PHP_UU_ENC ( ( ( * ( c + 1 ) << 2 ) & 074 ) | ( ( * ( ( c ) + 2 ) >> 6 ) & 03 ) )
-
-// #define PHP_UU_DEC(c) ( ( ( c ) - ' ' ) & 077 )
-
+func PHP_UU_ENC(c __auto__) __auto__ {
+	if c {
+		return (c & 077) + ' '
+	} else {
+		return '`'
+	}
+}
+func PHP_UU_ENC_C2(c int) __auto__ {
+	return PHP_UU_ENC((*c)<<4&060 | (*(c + 1))>>4&017)
+}
+func PHP_UU_ENC_C3(c int) __auto__ {
+	return PHP_UU_ENC((*(c + 1))<<2&074 | (*(c + 2))>>6&3)
+}
+func PHP_UU_DEC(c char) int { return c - ' '&077 }
 func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 	var len_ int = 45
 	var p *uint8
@@ -56,7 +62,7 @@ func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 	*/
 
 	dest = zend.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
-	p = (*uint8)(dest.val)
+	p = (*uint8)(zend.ZSTR_VAL(dest))
 	s = (*uint8)(src)
 	e = s + src_len
 	for s+3 < e {
@@ -68,95 +74,43 @@ func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 				ee = s + int(floor(float64(len_/3))*3)
 			}
 		}
-		if len_ != 0 {
-			g.PostInc(&(*p)) = (len_ & 077) + ' '
-		} else {
-			g.PostInc(&(*p)) = '`'
-		}
+		b.PostInc(&(*p)) = PHP_UU_ENC(len_)
 		for s < ee {
-			if (*s)>>2 != 0 {
-				g.PostInc(&(*p)) = ((*s) >> 2 & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
-			if ((*s)<<4&060 | (*(s + 1))>>4&017) != 0 {
-				g.PostInc(&(*p)) = (((*s)<<4&060 | (*(s + 1))>>4&017) & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
-			if ((*(s + 1))<<2&074 | (*(s + 2))>>6&3) != 0 {
-				g.PostInc(&(*p)) = (((*(s + 1))<<2&074 | (*(s + 2))>>6&3) & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
-			if ((*(s + 2)) & 077) != 0 {
-				g.PostInc(&(*p)) = ((*(s + 2)) & 077 & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
+			b.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
+			b.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
+			b.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
 			s += 3
 		}
 		if len_ == 45 {
-			g.PostInc(&(*p)) = '\n'
+			b.PostInc(&(*p)) = '\n'
 		}
 	}
 	if s < e {
 		if len_ == 45 {
-			if e-s != 0 {
-				g.PostInc(&(*p)) = (e - s&077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC(e - s)
 			len_ = 0
 		}
-		if (*s)>>2 != 0 {
-			g.PostInc(&(*p)) = ((*s) >> 2 & 077) + ' '
-		} else {
-			g.PostInc(&(*p)) = '`'
-		}
-		if ((*s)<<4&060 | (*(s + 1))>>4&017) != 0 {
-			g.PostInc(&(*p)) = (((*s)<<4&060 | (*(s + 1))>>4&017) & 077) + ' '
-		} else {
-			g.PostInc(&(*p)) = '`'
-		}
+		b.PostInc(&(*p)) = PHP_UU_ENC((*s) >> 2)
+		b.PostInc(&(*p)) = PHP_UU_ENC_C2(s)
 		if e-s > 1 {
-			if ((*(s + 1))<<2&074 | (*(s + 2))>>6&3) != 0 {
-				g.PostInc(&(*p)) = (((*(s + 1))<<2&074 | (*(s + 2))>>6&3) & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC_C3(s)
 		} else {
-			if '0' {
-				g.PostInc(&(*p)) = ('0' & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC('0')
 		}
 		if e-s > 2 {
-			if ((*(s + 2)) & 077) != 0 {
-				g.PostInc(&(*p)) = ((*(s + 2)) & 077 & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC((*(s + 2)) & 077)
 		} else {
-			if '0' {
-				g.PostInc(&(*p)) = ('0' & 077) + ' '
-			} else {
-				g.PostInc(&(*p)) = '`'
-			}
+			b.PostInc(&(*p)) = PHP_UU_ENC('0')
 		}
 	}
 	if len_ < 45 {
-		g.PostInc(&(*p)) = '\n'
+		b.PostInc(&(*p)) = '\n'
 	}
-	if '0' {
-		g.PostInc(&(*p)) = ('0' & 077) + ' '
-	} else {
-		g.PostInc(&(*p)) = '`'
-	}
-	g.PostInc(&(*p)) = '\n'
+	b.PostInc(&(*p)) = PHP_UU_ENC('0')
+	b.PostInc(&(*p)) = '\n'
 	*p = '0'
-	dest = zend.ZendStringTruncate(dest, (*byte)(p-dest.val), 0)
+	dest = zend.ZendStringTruncate(dest, (*byte)(p-zend.ZSTR_VAL(dest)), 0)
 	return dest
 }
 
@@ -171,11 +125,11 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 	var ee *byte
 	var dest *zend.ZendString
 	dest = zend.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
-	p = dest.val
+	p = zend.ZSTR_VAL(dest)
 	s = src
 	e = src + src_len
 	for s < e {
-		if g.Assign(&len_, g.PostInc(&(*s))-' '&077) == 0 {
+		if b.Assign(&len_, PHP_UU_DEC(b.PostInc(&(*s)))) == 0 {
 			break
 		}
 
@@ -185,7 +139,7 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 			goto err
 		}
 		total_len += len_
-		ee = s + g.CondF2(len_ == 45, 60, func() int { return int(floor(len_ * 1.33)) })
+		ee = s + b.CondF2(len_ == 45, 60, func() int { return int(floor(len_ * 1.33)) })
 
 		/* sanity check */
 
@@ -196,9 +150,9 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 			if s+4 > e {
 				goto err
 			}
-			g.PostInc(&(*p)) = ((*s)-' '&077)<<2 | ((*(s + 1))-' '&077)>>4
-			g.PostInc(&(*p)) = ((*(s + 1))-' '&077)<<4 | ((*(s + 2))-' '&077)>>2
-			g.PostInc(&(*p)) = ((*(s + 2))-' '&077)<<6 | (*(s + 3)) - ' '&077
+			b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
+			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
+			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
 			s += 4
 		}
 		if len_ < 45 {
@@ -212,18 +166,18 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 		/* skip \n */
 
 	}
-	r.Assert(p >= dest.val)
-	if g.Assign(&len_, total_len) > size_t(p-dest.val) {
-		g.PostInc(&(*p)) = ((*s)-' '&077)<<2 | ((*(s + 1))-' '&077)>>4
+	r.Assert(p >= zend.ZSTR_VAL(dest))
+	if b.Assign(&len_, total_len) > size_t(p-zend.ZSTR_VAL(dest)) {
+		b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
 		if len_ > 1 {
-			g.PostInc(&(*p)) = ((*(s + 1))-' '&077)<<4 | ((*(s + 2))-' '&077)>>2
+			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
 			if len_ > 2 {
-				g.PostInc(&(*p)) = ((*(s + 2))-' '&077)<<6 | (*(s + 3)) - ' '&077
+				b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 2))<<6 | PHP_UU_DEC(*(s + 3))
 			}
 		}
 	}
-	dest.len_ = total_len
-	dest.val[dest.len_] = '0'
+	zend.ZSTR_LEN(dest) = total_len
+	zend.ZSTR_VAL(dest)[zend.ZSTR_LEN(dest)] = '0'
 	return dest
 err:
 	zend.ZendStringEfree(dest)
@@ -238,7 +192,7 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -246,7 +200,7 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -255,75 +209,58 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &src, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &src, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
-	if src.len_ < 1 {
-		return_value.u1.type_info = 2
+	if zend.ZSTR_LEN(src) < 1 {
+		zend.RETVAL_FALSE
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = PhpUuencode(src.val, src.len_)
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(PhpUuencode(zend.ZSTR_VAL(src), zend.ZSTR_LEN(src)))
 	return
 }
 
@@ -336,7 +273,7 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -344,7 +281,7 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -353,80 +290,63 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &src, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &src, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
-	if src.len_ < 1 {
-		return_value.u1.type_info = 2
+	if zend.ZSTR_LEN(src) < 1 {
+		zend.RETVAL_FALSE
 		return
 	}
-	if g.Assign(&dest, PhpUudecode(src.val, src.len_)) == nil {
-		core.PhpErrorDocref(nil, 1<<1, "The given parameter is not a valid uuencoded string")
-		return_value.u1.type_info = 2
+	if b.Assign(&dest, PhpUudecode(zend.ZSTR_VAL(src), zend.ZSTR_LEN(src))) == nil {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "The given parameter is not a valid uuencoded string")
+		zend.RETVAL_FALSE
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = dest
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(dest)
 	return
 }
 

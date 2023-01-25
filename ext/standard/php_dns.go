@@ -26,16 +26,13 @@ package standard
 
 // #define PHP_DNS_H
 
-// #define php_dns_search(res,dname,class,type,answer,anslen) ( ( int ) dns_search ( res , dname , class , type , ( char * ) answer , anslen , ( struct sockaddr * ) & from , & fromsize ) )
+func PhpDnsSearch(res dns_handle_t, dname *byte, class __auto__, type_ int, answer []u_char, anslen __auto__) int {
+	return int(dns_search(res, dname, class, type_, (*byte)(answer), anslen, (*__struct__sockaddr)(&from), &fromsize))
+}
+func PhpDnsFreeHandle(res dns_handle_t) __auto__ { return dns_free(res) }
+func PhpDnsErrno(handle dns_handle_t) __auto__   { return h_errno }
 
-// #define php_dns_free_handle(res) dns_free ( res )
-
-// #define php_dns_errno(handle) h_errno
-
-// #define HAVE_DNS_SEARCH_FUNC       1
-
-// #define HAVE_FULL_DNS_FUNCS       1
-
-// #define INT16SZ       2
-
-// #define INT32SZ       4
+const HAVE_DNS_SEARCH_FUNC = 1
+const HAVE_FULL_DNS_FUNCS = 1
+const INT16SZ = 2
+const INT32SZ = 4

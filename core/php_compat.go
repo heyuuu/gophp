@@ -26,315 +26,166 @@ package core
 
 // # include < php_config . h >
 
-// #define pcre2_jit_callback_8       php_pcre2_jit_callback
-
-// #define pcre2_callout_enumerate_8       php_pcre2_callout_enumerate
-
-// #define pcre2_code_copy_8       php_pcre2_code_copy
-
-// #define pcre2_code_copy_with_tables_8       php_pcre2_code_copy_with_tables
-
-// #define pcre2_code_free_8       php_pcre2_code_free
-
-// #define pcre2_compile_8       php_pcre2_compile
-
-// #define pcre2_compile_context_copy_8       php_pcre2_compile_context_copy
-
-// #define pcre2_compile_context_create_8       php_pcre2_compile_context_create
-
-// #define pcre2_compile_context_free_8       php_pcre2_compile_context_free
-
-// #define pcre2_config_8       php_pcre2_config
-
-// #define pcre2_convert_context_copy_8       php_pcre2_convert_context_copy
-
-// #define pcre2_convert_context_create_8       php_pcre2_convert_context_create
-
-// #define pcre2_convert_context_free_8       php_pcre2_convert_context_free
-
-// #define pcre2_dfa_match_8       php_pcre2_dfa_match
-
-// #define pcre2_general_context_copy_8       php_pcre2_general_context_copy
-
-// #define pcre2_general_context_create_8       php_pcre2_general_context_create
-
-// #define pcre2_general_context_free_8       php_pcre2_general_context_free
-
-// #define pcre2_get_error_message_8       php_pcre2_get_error_message
-
-// #define pcre2_get_mark_8       php_pcre2_get_mark
-
-// #define pcre2_get_ovector_pointer_8       php_pcre2_get_ovector_pointer
-
-// #define pcre2_get_ovector_count_8       php_pcre2_get_ovector_count
-
-// #define pcre2_get_startchar_8       php_pcre2_get_startchar
-
-// #define pcre2_jit_compile_8       php_pcre2_jit_compile
-
-// #define pcre2_jit_match_8       php_pcre2_jit_match
-
-// #define pcre2_jit_free_unused_memory_8       php_pcre2_jit_free_unused_memory
-
-// #define pcre2_jit_stack_assign_8       php_pcre2_jit_stack_assign
-
-// #define pcre2_jit_stack_create_8       php_pcre2_jit_stack_create
-
-// #define pcre2_jit_stack_free_8       php_pcre2_jit_stack_free
-
-// #define pcre2_maketables_8       php_pcre2_maketables
-
-// #define pcre2_match_8       php_pcre2_match
-
-// #define pcre2_match_context_copy_8       php_pcre2_match_context_copy
-
-// #define pcre2_match_context_create_8       php_pcre2_match_context_create
-
-// #define pcre2_match_context_free_8       php_pcre2_match_context_free
-
-// #define pcre2_match_data_create_8       php_pcre2_match_data_create
-
-// #define pcre2_match_data_create_from_pattern_8       php_pcre2_match_data_create_from_pattern
-
-// #define pcre2_match_data_free_8       php_pcre2_match_data_free
-
-// #define pcre2_pattern_info_8       php_pcre2_pattern_info
-
-// #define pcre2_serialize_decode_8       php_pcre2_serialize_decode
-
-// #define pcre2_serialize_encode_8       php_pcre2_serialize_encode
-
-// #define pcre2_serialize_free_8       php_pcre2_serialize_free
-
-// #define pcre2_serialize_get_number_of_codes_8       php_pcre2_serialize_get_number_of_codes
-
-// #define pcre2_set_bsr_8       php_pcre2_set_bsr
-
-// #define pcre2_set_callout_8       php_pcre2_set_callout
-
-// #define pcre2_set_character_tables_8       php_pcre2_set_character_tables
-
-// #define pcre2_set_compile_extra_options_8       php_pcre2_set_compile_extra_options
-
-// #define pcre2_set_compile_recursion_guard_8       php_pcre2_set_compile_recursion_guard
-
-// #define pcre2_set_depth_limit_8       php_pcre2_set_depth_limit
-
-// #define pcre2_set_glob_escape_8       php_pcre2_set_glob_escape
-
-// #define pcre2_set_glob_separator_8       php_pcre2_set_glob_separator
-
-// #define pcre2_set_heap_limit_8       php_pcre2_set_heap_limit
-
-// #define pcre2_set_match_limit_8       php_pcre2_set_match_limit
-
-// #define pcre2_set_max_pattern_length_8       php_pcre2_set_max_pattern_length
-
-// #define pcre2_set_newline_8       php_pcre2_set_newline
-
-// #define pcre2_set_parens_nest_limit_8       php_pcre2_set_parens_nest_limit
-
-// #define pcre2_set_offset_limit_8       php_pcre2_set_offset_limit
-
-// #define pcre2_substitute_8       php_pcre2_substitute
-
-// #define pcre2_substring_copy_byname_8       php_pcre2_substring_copy_byname
-
-// #define pcre2_substring_copy_bynumber_8       php_pcre2_substring_copy_bynumber
-
-// #define pcre2_substring_free_8       php_pcre2_substring_free
-
-// #define pcre2_substring_get_byname_8       php_pcre2_substring_get_byname
-
-// #define pcre2_substring_get_bynumber_8       php_pcre2_substring_get_bynumber
-
-// #define pcre2_substring_length_byname_8       php_pcre2_substring_length_byname
-
-// #define pcre2_substring_length_bynumber_8       php_pcre2_substring_length_bynumber
-
-// #define pcre2_substring_list_get_8       php_pcre2_substring_list_get
-
-// #define pcre2_substring_list_free_8       php_pcre2_substring_list_free
-
-// #define pcre2_substring_nametable_scan_8       php_pcre2_substring_nametable_scan
-
-// #define pcre2_substring_number_from_name_8       php_pcre2_substring_number_from_name
-
-// #define pcre2_set_recursion_limit_8       php_pcre2_set_recursion_limit
-
-// #define pcre2_set_recursion_memory_management_8       php_pcre2_set_recursion_memory_management
-
-// #define lookup       php_lookup
-
-// #define hashTableInit       php_hashTableInit
-
-// #define hashTableDestroy       php_hashTableDestroy
-
-// #define hashTableIterInit       php_hashTableIterInit
-
-// #define hashTableIterNext       php_hashTableIterNext
-
-// #define XML_DefaultCurrent       php_XML_DefaultCurrent
-
-// #define XML_ErrorString       php_XML_ErrorString
-
-// #define XML_ExpatVersion       php_XML_ExpatVersion
-
-// #define XML_ExpatVersionInfo       php_XML_ExpatVersionInfo
-
-// #define XML_ExternalEntityParserCreate       php_XML_ExternalEntityParserCreate
-
-// #define XML_GetBase       php_XML_GetBase
-
-// #define XML_GetBuffer       php_XML_GetBuffer
-
-// #define XML_GetCurrentByteCount       php_XML_GetCurrentByteCount
-
-// #define XML_GetCurrentByteIndex       php_XML_GetCurrentByteIndex
-
-// #define XML_GetCurrentColumnNumber       php_XML_GetCurrentColumnNumber
-
-// #define XML_GetCurrentLineNumber       php_XML_GetCurrentLineNumber
-
-// #define XML_GetErrorCode       php_XML_GetErrorCode
-
-// #define XML_GetIdAttributeIndex       php_XML_GetIdAttributeIndex
-
-// #define XML_GetInputContext       php_XML_GetInputContext
-
-// #define XML_GetSpecifiedAttributeCount       php_XML_GetSpecifiedAttributeCount
-
-// #define XmlGetUtf16InternalEncodingNS       php_XmlGetUtf16InternalEncodingNS
-
-// #define XmlGetUtf16InternalEncoding       php_XmlGetUtf16InternalEncoding
-
-// #define XmlGetUtf8InternalEncodingNS       php_XmlGetUtf8InternalEncodingNS
-
-// #define XmlGetUtf8InternalEncoding       php_XmlGetUtf8InternalEncoding
-
-// #define XmlInitEncoding       php_XmlInitEncoding
-
-// #define XmlInitEncodingNS       php_XmlInitEncodingNS
-
-// #define XmlInitUnknownEncoding       php_XmlInitUnknownEncoding
-
-// #define XmlInitUnknownEncodingNS       php_XmlInitUnknownEncodingNS
-
-// #define XML_ParseBuffer       php_XML_ParseBuffer
-
-// #define XML_Parse       php_XML_Parse
-
-// #define XML_ParserCreate_MM       php_XML_ParserCreate_MM
-
-// #define XML_ParserCreateNS       php_XML_ParserCreateNS
-
-// #define XML_ParserCreate       php_XML_ParserCreate
-
-// #define XML_ParserFree       php_XML_ParserFree
-
-// #define XmlParseXmlDecl       php_XmlParseXmlDecl
-
-// #define XmlParseXmlDeclNS       php_XmlParseXmlDeclNS
-
-// #define XmlPrologStateInitExternalEntity       php_XmlPrologStateInitExternalEntity
-
-// #define XmlPrologStateInit       php_XmlPrologStateInit
-
-// #define XML_SetAttlistDeclHandler       php_XML_SetAttlistDeclHandler
-
-// #define XML_SetBase       php_XML_SetBase
-
-// #define XML_SetCdataSectionHandler       php_XML_SetCdataSectionHandler
-
-// #define XML_SetCharacterDataHandler       php_XML_SetCharacterDataHandler
-
-// #define XML_SetCommentHandler       php_XML_SetCommentHandler
-
-// #define XML_SetDefaultHandlerExpand       php_XML_SetDefaultHandlerExpand
-
-// #define XML_SetDefaultHandler       php_XML_SetDefaultHandler
-
-// #define XML_SetDoctypeDeclHandler       php_XML_SetDoctypeDeclHandler
-
-// #define XML_SetElementDeclHandler       php_XML_SetElementDeclHandler
-
-// #define XML_SetElementHandler       php_XML_SetElementHandler
-
-// #define XML_SetEncoding       php_XML_SetEncoding
-
-// #define XML_SetEndCdataSectionHandler       php_XML_SetEndCdataSectionHandler
-
-// #define XML_SetEndDoctypeDeclHandler       php_XML_SetEndDoctypeDeclHandler
-
-// #define XML_SetEndElementHandler       php_XML_SetEndElementHandler
-
-// #define XML_SetEndNamespaceDeclHandler       php_XML_SetEndNamespaceDeclHandler
-
-// #define XML_SetEntityDeclHandler       php_XML_SetEntityDeclHandler
-
-// #define XML_SetExternalEntityRefHandlerArg       php_XML_SetExternalEntityRefHandlerArg
-
-// #define XML_SetExternalEntityRefHandler       php_XML_SetExternalEntityRefHandler
-
-// #define XML_SetNamespaceDeclHandler       php_XML_SetNamespaceDeclHandler
-
-// #define XML_SetNotationDeclHandler       php_XML_SetNotationDeclHandler
-
-// #define XML_SetNotStandaloneHandler       php_XML_SetNotStandaloneHandler
-
-// #define XML_SetParamEntityParsing       php_XML_SetParamEntityParsing
-
-// #define XML_SetProcessingInstructionHandler       php_XML_SetProcessingInstructionHandler
-
-// #define XML_SetReturnNSTriplet       php_XML_SetReturnNSTriplet
-
-// #define XML_SetStartCdataSectionHandler       php_XML_SetStartCdataSectionHandler
-
-// #define XML_SetStartDoctypeDeclHandler       php_XML_SetStartDoctypeDeclHandler
-
-// #define XML_SetStartElementHandler       php_XML_SetStartElementHandler
-
-// #define XML_SetStartNamespaceDeclHandler       php_XML_SetStartNamespaceDeclHandler
-
-// #define XML_SetUnknownEncodingHandler       php_XML_SetUnknownEncodingHandler
-
-// #define XML_SetUnparsedEntityDeclHandler       php_XML_SetUnparsedEntityDeclHandler
-
-// #define XML_SetUserData       php_XML_SetUserData
-
-// #define XML_SetXmlDeclHandler       php_XML_SetXmlDeclHandler
-
-// #define XmlSizeOfUnknownEncoding       php_XmlSizeOfUnknownEncoding
-
-// #define XML_UseParserAsHandlerArg       php_XML_UseParserAsHandlerArg
-
-// #define XmlUtf16Encode       php_XmlUtf16Encode
-
-// #define XmlUtf8Encode       php_XmlUtf8Encode
-
-// #define XML_FreeContentModel       php_XML_FreeContentModel
-
-// #define XML_MemMalloc       php_XML_MemMalloc
-
-// #define XML_MemRealloc       php_XML_MemRealloc
-
-// #define XML_MemFree       php_XML_MemFree
-
-// #define XML_UseForeignDTD       php_XML_UseForeignDTD
-
-// #define XML_GetFeatureList       php_XML_GetFeatureList
-
-// #define XML_ParserReset       php_XML_ParserReset
+const Pcre2JitCallback8 = php_pcre2_jit_callback
+const Pcre2CalloutEnumerate8 = php_pcre2_callout_enumerate
+const Pcre2CodeCopy8 = php_pcre2_code_copy
+const Pcre2CodeCopyWithTables8 = php_pcre2_code_copy_with_tables
+const Pcre2CodeFree8 = php_pcre2_code_free
+const Pcre2Compile8 = php_pcre2_compile
+const Pcre2CompileContextCopy8 = php_pcre2_compile_context_copy
+const Pcre2CompileContextCreate8 = php_pcre2_compile_context_create
+const Pcre2CompileContextFree8 = php_pcre2_compile_context_free
+const Pcre2Config8 = php_pcre2_config
+const Pcre2ConvertContextCopy8 = php_pcre2_convert_context_copy
+const Pcre2ConvertContextCreate8 = php_pcre2_convert_context_create
+const Pcre2ConvertContextFree8 = php_pcre2_convert_context_free
+const Pcre2DfaMatch8 = php_pcre2_dfa_match
+const Pcre2GeneralContextCopy8 = php_pcre2_general_context_copy
+const Pcre2GeneralContextCreate8 = php_pcre2_general_context_create
+const Pcre2GeneralContextFree8 = php_pcre2_general_context_free
+const Pcre2GetErrorMessage8 = php_pcre2_get_error_message
+const Pcre2GetMark8 = php_pcre2_get_mark
+const Pcre2GetOvectorPointer8 = php_pcre2_get_ovector_pointer
+const Pcre2GetOvectorCount8 = php_pcre2_get_ovector_count
+const Pcre2GetStartchar8 = php_pcre2_get_startchar
+const Pcre2JitCompile8 = php_pcre2_jit_compile
+const Pcre2JitMatch8 = php_pcre2_jit_match
+const Pcre2JitFreeUnusedMemory8 = php_pcre2_jit_free_unused_memory
+const Pcre2JitStackAssign8 = php_pcre2_jit_stack_assign
+const Pcre2JitStackCreate8 = php_pcre2_jit_stack_create
+const Pcre2JitStackFree8 = php_pcre2_jit_stack_free
+const Pcre2Maketables8 = php_pcre2_maketables
+const Pcre2Match8 = php_pcre2_match
+const Pcre2MatchContextCopy8 = php_pcre2_match_context_copy
+const Pcre2MatchContextCreate8 = php_pcre2_match_context_create
+const Pcre2MatchContextFree8 = php_pcre2_match_context_free
+const Pcre2MatchDataCreate8 = php_pcre2_match_data_create
+const Pcre2MatchDataCreateFromPattern8 = php_pcre2_match_data_create_from_pattern
+const Pcre2MatchDataFree8 = php_pcre2_match_data_free
+const Pcre2PatternInfo8 = php_pcre2_pattern_info
+const Pcre2SerializeDecode8 = php_pcre2_serialize_decode
+const Pcre2SerializeEncode8 = php_pcre2_serialize_encode
+const Pcre2SerializeFree8 = php_pcre2_serialize_free
+const Pcre2SerializeGetNumberOfCodes8 = php_pcre2_serialize_get_number_of_codes
+const Pcre2SetBsr8 = php_pcre2_set_bsr
+const Pcre2SetCallout8 = php_pcre2_set_callout
+const Pcre2SetCharacterTables8 = php_pcre2_set_character_tables
+const Pcre2SetCompileExtraOptions8 = php_pcre2_set_compile_extra_options
+const Pcre2SetCompileRecursionGuard8 = php_pcre2_set_compile_recursion_guard
+const Pcre2SetDepthLimit8 = php_pcre2_set_depth_limit
+const Pcre2SetGlobEscape8 = php_pcre2_set_glob_escape
+const Pcre2SetGlobSeparator8 = php_pcre2_set_glob_separator
+const Pcre2SetHeapLimit8 = php_pcre2_set_heap_limit
+const Pcre2SetMatchLimit8 = php_pcre2_set_match_limit
+const Pcre2SetMaxPatternLength8 = php_pcre2_set_max_pattern_length
+const Pcre2SetNewline8 = php_pcre2_set_newline
+const Pcre2SetParensNestLimit8 = php_pcre2_set_parens_nest_limit
+const Pcre2SetOffsetLimit8 = php_pcre2_set_offset_limit
+const Pcre2Substitute8 = php_pcre2_substitute
+const Pcre2SubstringCopyByname8 = php_pcre2_substring_copy_byname
+const Pcre2SubstringCopyBynumber8 = php_pcre2_substring_copy_bynumber
+const Pcre2SubstringFree8 = php_pcre2_substring_free
+const Pcre2SubstringGetByname8 = php_pcre2_substring_get_byname
+const Pcre2SubstringGetBynumber8 = php_pcre2_substring_get_bynumber
+const Pcre2SubstringLengthByname8 = php_pcre2_substring_length_byname
+const Pcre2SubstringLengthBynumber8 = php_pcre2_substring_length_bynumber
+const Pcre2SubstringListGet8 = php_pcre2_substring_list_get
+const Pcre2SubstringListFree8 = php_pcre2_substring_list_free
+const Pcre2SubstringNametableScan8 = php_pcre2_substring_nametable_scan
+const Pcre2SubstringNumberFromName8 = php_pcre2_substring_number_from_name
+const Pcre2SetRecursionLimit8 = php_pcre2_set_recursion_limit
+const Pcre2SetRecursionMemoryManagement8 = php_pcre2_set_recursion_memory_management
+const Lookup = php_lookup
+const hashTableInit = php_hashTableInit
+const hashTableDestroy = php_hashTableDestroy
+const hashTableIterInit = php_hashTableIterInit
+const hashTableIterNext = php_hashTableIterNext
+const XML_DefaultCurrent = php_XML_DefaultCurrent
+const XML_ErrorString = php_XML_ErrorString
+const XML_ExpatVersion = php_XML_ExpatVersion
+const XML_ExpatVersionInfo = php_XML_ExpatVersionInfo
+const XML_ExternalEntityParserCreate = php_XML_ExternalEntityParserCreate
+const XML_GetBase = php_XML_GetBase
+const XML_GetBuffer = php_XML_GetBuffer
+const XML_GetCurrentByteCount = php_XML_GetCurrentByteCount
+const XML_GetCurrentByteIndex = php_XML_GetCurrentByteIndex
+const XML_GetCurrentColumnNumber = php_XML_GetCurrentColumnNumber
+const XML_GetCurrentLineNumber = php_XML_GetCurrentLineNumber
+const XML_GetErrorCode = php_XML_GetErrorCode
+const XML_GetIdAttributeIndex = php_XML_GetIdAttributeIndex
+const XML_GetInputContext = php_XML_GetInputContext
+const XML_GetSpecifiedAttributeCount = php_XML_GetSpecifiedAttributeCount
+const XmlGetUtf16InternalEncodingNS = php_XmlGetUtf16InternalEncodingNS
+const XmlGetUtf16InternalEncoding = php_XmlGetUtf16InternalEncoding
+const XmlGetUtf8InternalEncodingNS = php_XmlGetUtf8InternalEncodingNS
+const XmlGetUtf8InternalEncoding = php_XmlGetUtf8InternalEncoding
+const XmlInitEncoding = php_XmlInitEncoding
+const XmlInitEncodingNS = php_XmlInitEncodingNS
+const XmlInitUnknownEncoding = php_XmlInitUnknownEncoding
+const XmlInitUnknownEncodingNS = php_XmlInitUnknownEncodingNS
+const XML_ParseBuffer = php_XML_ParseBuffer
+const XML_Parse = php_XML_Parse
+const XML_ParserCreate_MM = php_XML_ParserCreate_MM
+const XML_ParserCreateNS = php_XML_ParserCreateNS
+const XML_ParserCreate = php_XML_ParserCreate
+const XML_ParserFree = php_XML_ParserFree
+const XmlParseXmlDecl = php_XmlParseXmlDecl
+const XmlParseXmlDeclNS = php_XmlParseXmlDeclNS
+const XmlPrologStateInitExternalEntity = php_XmlPrologStateInitExternalEntity
+const XmlPrologStateInit = php_XmlPrologStateInit
+const XML_SetAttlistDeclHandler = php_XML_SetAttlistDeclHandler
+const XML_SetBase = php_XML_SetBase
+const XML_SetCdataSectionHandler = php_XML_SetCdataSectionHandler
+const XML_SetCharacterDataHandler = php_XML_SetCharacterDataHandler
+const XML_SetCommentHandler = php_XML_SetCommentHandler
+const XML_SetDefaultHandlerExpand = php_XML_SetDefaultHandlerExpand
+const XML_SetDefaultHandler = php_XML_SetDefaultHandler
+const XML_SetDoctypeDeclHandler = php_XML_SetDoctypeDeclHandler
+const XML_SetElementDeclHandler = php_XML_SetElementDeclHandler
+const XML_SetElementHandler = php_XML_SetElementHandler
+const XML_SetEncoding = php_XML_SetEncoding
+const XML_SetEndCdataSectionHandler = php_XML_SetEndCdataSectionHandler
+const XML_SetEndDoctypeDeclHandler = php_XML_SetEndDoctypeDeclHandler
+const XML_SetEndElementHandler = php_XML_SetEndElementHandler
+const XML_SetEndNamespaceDeclHandler = php_XML_SetEndNamespaceDeclHandler
+const XML_SetEntityDeclHandler = php_XML_SetEntityDeclHandler
+const XML_SetExternalEntityRefHandlerArg = php_XML_SetExternalEntityRefHandlerArg
+const XML_SetExternalEntityRefHandler = php_XML_SetExternalEntityRefHandler
+const XML_SetNamespaceDeclHandler = php_XML_SetNamespaceDeclHandler
+const XML_SetNotationDeclHandler = php_XML_SetNotationDeclHandler
+const XML_SetNotStandaloneHandler = php_XML_SetNotStandaloneHandler
+const XML_SetParamEntityParsing = php_XML_SetParamEntityParsing
+const XML_SetProcessingInstructionHandler = php_XML_SetProcessingInstructionHandler
+const XML_SetReturnNSTriplet = php_XML_SetReturnNSTriplet
+const XML_SetStartCdataSectionHandler = php_XML_SetStartCdataSectionHandler
+const XML_SetStartDoctypeDeclHandler = php_XML_SetStartDoctypeDeclHandler
+const XML_SetStartElementHandler = php_XML_SetStartElementHandler
+const XML_SetStartNamespaceDeclHandler = php_XML_SetStartNamespaceDeclHandler
+const XML_SetUnknownEncodingHandler = php_XML_SetUnknownEncodingHandler
+const XML_SetUnparsedEntityDeclHandler = php_XML_SetUnparsedEntityDeclHandler
+const XML_SetUserData = php_XML_SetUserData
+const XML_SetXmlDeclHandler = php_XML_SetXmlDeclHandler
+const XmlSizeOfUnknownEncoding = php_XmlSizeOfUnknownEncoding
+const XML_UseParserAsHandlerArg = php_XML_UseParserAsHandlerArg
+const XmlUtf16Encode = php_XmlUtf16Encode
+const XmlUtf8Encode = php_XmlUtf8Encode
+const XML_FreeContentModel = php_XML_FreeContentModel
+const XML_MemMalloc = php_XML_MemMalloc
+const XML_MemRealloc = php_XML_MemRealloc
+const XML_MemFree = php_XML_MemFree
+const XML_UseForeignDTD = php_XML_UseForeignDTD
+const XML_GetFeatureList = php_XML_GetFeatureList
+const XML_ParserReset = php_XML_ParserReset
 
 /* Define to specify how much context to retain around the current parse
    point. */
 
-// #define XML_CONTEXT_BYTES       1024
+const XML_CONTEXT_BYTES = 1024
 
 /* Define to make parameter entity parsing functionality available. */
 
-// #define XML_DTD       1
+const XML_DTD = 1
 
 /* Define to make XML Namespaces functionality available. */
 
-// #define XML_NS       1
+const XML_NS = 1

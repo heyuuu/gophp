@@ -3,10 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/core/streams"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -32,25 +31,16 @@ import (
 
 // #define URL_H
 
-// #define PHP_URL_SCHEME       0
-
-// #define PHP_URL_HOST       1
-
-// #define PHP_URL_PORT       2
-
-// #define PHP_URL_USER       3
-
-// #define PHP_URL_PASS       4
-
-// #define PHP_URL_PATH       5
-
-// #define PHP_URL_QUERY       6
-
-// #define PHP_URL_FRAGMENT       7
-
-// #define PHP_QUERY_RFC1738       1
-
-// #define PHP_QUERY_RFC3986       2
+const PHP_URL_SCHEME = 0
+const PHP_URL_HOST = 1
+const PHP_URL_PORT = 2
+const PHP_URL_USER = 3
+const PHP_URL_PASS = 4
+const PHP_URL_PATH = 5
+const PHP_URL_QUERY = 6
+const PHP_URL_FRAGMENT = 7
+const PHP_QUERY_RFC1738 = 1
+const PHP_QUERY_RFC3986 = 2
 
 // Source: <ext/standard/url.c>
 
@@ -111,7 +101,7 @@ func PhpUrlFree(theurl *PhpUrl) {
 	if theurl.GetFragment() != nil {
 		zend.ZendStringReleaseEx(theurl.GetFragment(), 0)
 	}
-	zend._efree(theurl)
+	zend.Efree(theurl)
 }
 
 /* }}} */
@@ -161,7 +151,7 @@ func PhpUrlParseEx(str *byte, length int) *PhpUrl {
 
 func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 	var port_buf []byte
-	var ret *PhpUrl = zend._ecalloc(1, g.SizeOf("php_url"))
+	var ret *PhpUrl = zend.Ecalloc(1, b.SizeOf("php_url"))
 	var s *byte
 	var e byte
 	var p byte
@@ -173,7 +163,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 
 	/* parse scheme */
 
-	if g.Assign(&e, memchr(s, ':', length)) && e != s {
+	if b.Assign(&e, memchr(s, ':', length)) && e != s {
 
 		/* validate scheme */
 
@@ -197,7 +187,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 		}
 		if e+1 == ue {
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().val, ret.GetScheme().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			return ret
 		}
 
@@ -220,15 +210,15 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 				goto parse_port
 			}
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().val, ret.GetScheme().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			s = e + 1
 			goto just_path
 		} else {
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().val, ret.GetScheme().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
-				if ret.GetScheme().len_ == g.SizeOf("\"file\"")-1 && zend.ZendBinaryStrcasecmp(ret.GetScheme().val, ret.GetScheme().len_, "file", g.SizeOf("\"file\"")-1) == 0 {
+				if zend.ZendStringEqualsLiteralCi(ret.GetScheme(), "file") {
 					if e+3 < ue && (*(e + 3)) == '/' {
 
 						/* support windows drive letters as in:
@@ -264,7 +254,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 			var end *byte
 			memcpy(port_buf, p, pp-p)
 			port_buf[pp-p] = '0'
-			port = strtoll(port_buf, &end, 10)
+			port = zend.ZEND_STRTOL(port_buf, &end, 10)
 			if port >= 0 && port <= 65535 && end != port_buf {
 				*has_port = 1
 				ret.SetPort(uint16(port))
@@ -293,16 +283,16 @@ parse_host:
 
 	/* check for login and password */
 
-	if g.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
-		if g.Assign(&pp, memchr(s, ':', p-s)) {
+	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
+		if b.Assign(&pp, memchr(s, ':', p-s)) {
 			ret.SetUser(zend.ZendStringInit(s, pp-s, 0))
-			PhpReplaceControlcharsEx(ret.GetUser().val, ret.GetUser().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetUser()), zend.ZSTR_LEN(ret.GetUser()))
 			pp++
 			ret.SetPass(zend.ZendStringInit(pp, p-pp, 0))
-			PhpReplaceControlcharsEx(ret.GetPass().val, ret.GetPass().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetPass()), zend.ZSTR_LEN(ret.GetPass()))
 		} else {
 			ret.SetUser(zend.ZendStringInit(s, p-s, 0))
-			PhpReplaceControlcharsEx(ret.GetUser().val, ret.GetUser().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetUser()), zend.ZSTR_LEN(ret.GetUser()))
 		}
 		s = p + 1
 	}
@@ -335,7 +325,7 @@ parse_host:
 				var end *byte
 				memcpy(port_buf, p, e-p)
 				port_buf[e-p] = '0'
-				port = strtoll(port_buf, &end, 10)
+				port = zend.ZEND_STRTOL(port_buf, &end, 10)
 				if port >= 0 && port <= 65535 && end != port_buf {
 					*has_port = 1
 					ret.SetPort(uint16(port))
@@ -357,7 +347,7 @@ parse_host:
 		return nil
 	}
 	ret.SetHost(zend.ZendStringInit(s, p-s, 0))
-	PhpReplaceControlcharsEx(ret.GetHost().val, ret.GetHost().len_)
+	PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetHost()), zend.ZSTR_LEN(ret.GetHost()))
 	if e == ue {
 		return ret
 	}
@@ -369,7 +359,7 @@ just_path:
 		p++
 		if p < e {
 			ret.SetFragment(zend.ZendStringInit(p, e-p, 0))
-			PhpReplaceControlcharsEx(ret.GetFragment().val, ret.GetFragment().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetFragment()), zend.ZSTR_LEN(ret.GetFragment()))
 		}
 		e = p - 1
 	}
@@ -378,13 +368,13 @@ just_path:
 		p++
 		if p < e {
 			ret.SetQuery(zend.ZendStringInit(p, e-p, 0))
-			PhpReplaceControlcharsEx(ret.GetQuery().val, ret.GetQuery().len_)
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetQuery()), zend.ZSTR_LEN(ret.GetQuery()))
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
 		ret.SetPath(zend.ZendStringInit(s, e-s, 0))
-		PhpReplaceControlcharsEx(ret.GetPath().val, ret.GetPath().len_)
+		PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetPath()), zend.ZSTR_LEN(ret.GetPath()))
 	}
 	return ret
 }
@@ -402,7 +392,7 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -410,7 +400,7 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -419,69 +409,49 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &key, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &key, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -497,214 +467,95 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* @todo Find a method to determine why php_url_parse_ex() failed */
 
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	if key > -1 {
 		switch key {
-		case 0:
+		case PHP_URL_SCHEME:
 			if resource.GetScheme() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetScheme()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetScheme())
 			}
 			break
-		case 1:
+		case PHP_URL_HOST:
 			if resource.GetHost() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetHost()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetHost())
 			}
 			break
-		case 2:
+		case PHP_URL_PORT:
 			if has_port != 0 {
-				var __z *zend.Zval = return_value
-				__z.value.lval = resource.GetPort()
-				__z.u1.type_info = 4
+				zend.RETVAL_LONG(resource.GetPort())
 			}
 			break
-		case 3:
+		case PHP_URL_USER:
 			if resource.GetUser() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetUser()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetUser())
 			}
 			break
-		case 4:
+		case PHP_URL_PASS:
 			if resource.GetPass() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetPass()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetPass())
 			}
 			break
-		case 5:
+		case PHP_URL_PATH:
 			if resource.GetPath() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetPath()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetPath())
 			}
 			break
-		case 6:
+		case PHP_URL_QUERY:
 			if resource.GetQuery() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetQuery()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetQuery())
 			}
 			break
-		case 7:
+		case PHP_URL_FRAGMENT:
 			if resource.GetFragment() != nil {
-				var __z *zend.Zval = return_value
-				var __s *zend.ZendString = resource.GetFragment()
-				__z.value.str = __s
-				if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-					__z.u1.type_info = 6
-				} else {
-					zend.ZendGcAddref(&__s.gc)
-					__z.u1.type_info = 6 | 1<<0<<8
-				}
+				zend.RETVAL_STR_COPY(resource.GetFragment())
 			}
 			break
 		default:
-			core.PhpErrorDocref(nil, 1<<1, "Invalid URL component identifier "+"%"+"lld", key)
-			return_value.u1.type_info = 2
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
+			zend.RETVAL_FALSE
 		}
 		goto done
 	}
 
 	/* allocate an array for return */
 
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(return_value)
 
 	/* add the various elements to the array */
 
 	if resource.GetScheme() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetScheme()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_SCHEME], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetScheme())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
 	}
 	if resource.GetHost() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetHost()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_HOST], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetHost())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
 	}
 	if has_port != 0 {
-		var __z *zend.Zval = &tmp
-		__z.value.lval = resource.GetPort()
-		__z.u1.type_info = 4
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_PORT], &tmp)
+		zend.ZVAL_LONG(&tmp, resource.GetPort())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
 	}
 	if resource.GetUser() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetUser()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_USER], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetUser())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
 	}
 	if resource.GetPass() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetPass()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_PASS], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetPass())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
 	}
 	if resource.GetPath() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetPath()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_PATH], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetPath())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
 	}
 	if resource.GetQuery() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetQuery()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_QUERY], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetQuery())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
 	}
 	if resource.GetFragment() != nil {
-		var __z *zend.Zval = &tmp
-		var __s *zend.ZendString = resource.GetFragment()
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		zend.ZendHashAddNew(return_value.value.arr, zend.ZendKnownStrings[zend.ZEND_STR_FRAGMENT], &tmp)
+		zend.ZVAL_STR_COPY(&tmp, resource.GetFragment())
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -719,7 +570,7 @@ func PhpHtoi(s *byte) int {
 	if isupper(c) {
 		c = tolower(c)
 	}
-	value = g.Cond(c >= '0' && c <= '9', c-'0', c-'a'+10) * 16
+	value = b.Cond(c >= '0' && c <= '9', c-'0', c-'a'+10) * 16
 	c = (*uint8)(s)[1]
 	if isupper(c) {
 		c = tolower(c)
@@ -748,23 +599,23 @@ func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
 	from = (*uint8)(s)
 	end = (*uint8)(s + len_)
 	start = zend.ZendStringSafeAlloc(3, len_, 0, 0)
-	to = (*uint8)(start.val)
+	to = (*uint8)(zend.ZSTR_VAL(start))
 	for from < end {
 		*from++
 		c = (*from) - 1
 		if c == ' ' {
-			g.PostInc(&(*to)) = '+'
+			b.PostInc(&(*to)) = '+'
 		} else if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' {
 			to[0] = '%'
 			to[1] = Hexchars[c>>4]
 			to[2] = Hexchars[c&15]
 			to += 3
 		} else {
-			g.PostInc(&(*to)) = c
+			b.PostInc(&(*to)) = c
 		}
 	}
 	*to = '0'
-	start = zend.ZendStringTruncate(start, to-(*uint8)(start.val), 0)
+	start = zend.ZendStringTruncate(start, to-(*uint8)(zend.ZSTR_VAL(start)), 0)
 	return start
 }
 
@@ -776,7 +627,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -784,7 +635,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -793,52 +644,42 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &in_str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -849,14 +690,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = PhpUrlEncode(in_str.val, in_str.len_)
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(PhpUrlEncode(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str)))
 	return
 }
 
@@ -869,7 +703,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -877,7 +711,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -886,52 +720,42 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &in_str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -942,12 +766,9 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.val, in_str.len_, 0)
-	out_str.len_ = PhpUrlDecode(out_str.val, out_str.len_)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = out_str
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	out_str = zend.ZendStringInit(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str), 0)
+	zend.ZSTR_LEN(out_str) = PhpUrlDecode(zend.ZSTR_VAL(out_str), zend.ZSTR_LEN(out_str))
+	zend.RETVAL_NEW_STR(out_str)
 	return
 }
 
@@ -956,7 +777,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 func PhpUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str
 	var data *byte = str
-	for g.PostDec(&len_) {
+	for b.PostDec(&len_) {
 		if (*data) == '+' {
 			*dest = ' '
 		} else if (*data) == '%' && len_ >= 2 && isxdigit(int(*(data + 1))) && isxdigit(int(*(data + 2))) {
@@ -981,15 +802,15 @@ func PhpRawUrlEncode(s *byte, len_ int) *zend.ZendString {
 	var str *zend.ZendString
 	var ret *byte
 	str = zend.ZendStringSafeAlloc(3, len_, 0, 0)
-	ret = str.val
+	ret = zend.ZSTR_VAL(str)
 	x = 0
 	y = 0
-	for g.PostDec(&len_) {
+	for b.PostDec(&len_) {
 		var c byte = s[x]
 		ret[y] = c
 		if c < '0' && c != '-' && c != '.' || c < 'A' && c > '9' || c > 'Z' && c < 'a' && c != '_' || c > 'z' && c != '~' {
-			ret[g.PostInc(&y)] = '%'
-			ret[g.PostInc(&y)] = Hexchars[uint8(c>>4)]
+			ret[b.PostInc(&y)] = '%'
+			ret[b.PostInc(&y)] = Hexchars[uint8(c>>4)]
 			ret[y] = Hexchars[uint8(c&15)]
 		}
 		x++
@@ -1008,7 +829,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1016,7 +837,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1025,52 +846,42 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &in_str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1081,14 +892,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = PhpRawUrlEncode(in_str.val, in_str.len_)
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(PhpRawUrlEncode(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str)))
 	return
 }
 
@@ -1101,7 +905,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1109,7 +913,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1118,52 +922,42 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &in_str, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1174,12 +968,9 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.val, in_str.len_, 0)
-	out_str.len_ = PhpRawUrlDecode(out_str.val, out_str.len_)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = out_str
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	out_str = zend.ZendStringInit(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str), 0)
+	zend.ZSTR_LEN(out_str) = PhpRawUrlDecode(zend.ZSTR_VAL(out_str), zend.ZSTR_LEN(out_str))
+	zend.RETVAL_NEW_STR(out_str)
 	return
 }
 
@@ -1188,7 +979,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 func PhpRawUrlDecode(str *byte, len_ int) int {
 	var dest *byte = str
 	var data *byte = str
-	for g.PostDec(&len_) {
+	for b.PostDec(&len_) {
 		if (*data) == '%' && len_ >= 2 && isxdigit(int(*(data + 1))) && isxdigit(int(*(data + 2))) {
 			*dest = byte(PhpHtoi(data + 1))
 			data += 2
@@ -1218,7 +1009,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -1226,7 +1017,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -1235,85 +1026,55 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgPath(_arg, &url, &url_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &url, &url_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_PATH
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &format, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &format, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgResource(_arg, &zcontext, 1) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgResource(_arg, &zcontext, 1) == 0) {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -1324,58 +1085,50 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	if g.CondF2(g.CondF1(zcontext != nil, func() any { return zend.ZendFetchResourceEx(zcontext, "Stream-Context", PhpLeStreamContext()) }, 0), nil, func() *core.PhpStreamContext { return FileGlobals.GetDefaultContext() }) {
-		context = FileGlobals.GetDefaultContext()
-	} else {
-		FileGlobals.SetDefaultContext(streams.PhpStreamContextAlloc())
-		context = FileGlobals.GetDefaultContext()
-	}
-	if !(g.Assign(&stream, streams._phpStreamOpenWrapperEx(url, "r", 0x8|0x100|0x200, nil, context))) {
-		return_value.u1.type_info = 2
+	context = streams.PhpStreamContextFromZval(zcontext, 0)
+	if !(b.Assign(&stream, core.PhpStreamOpenWrapperEx(url, "r", core.REPORT_ERRORS|core.STREAM_USE_URL|core.STREAM_ONLY_GET_HEADERS, nil, context))) {
+		zend.RETVAL_FALSE
 		return
 	}
-	if stream.wrapperdata.u1.v.type_ != 7 {
-		streams._phpStreamFree(stream, 1|2)
-		return_value.u1.type_info = 2
+	if zend.Z_TYPE(stream.wrapperdata) != zend.IS_ARRAY {
+		core.PhpStreamClose(stream)
+		zend.RETVAL_FALSE
 		return
 	}
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(return_value)
 	for {
-		var __ht *zend.HashTable = &stream.wrapperdata.value.arr
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(&stream.wrapperdata)
 		var _p *zend.Bucket = __ht.arData
 		var _end *zend.Bucket = _p + __ht.nNumUsed
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
 			hdr = _z
-			if hdr.u1.v.type_ != 6 {
+			if zend.Z_TYPE_P(hdr) != zend.IS_STRING {
 				continue
 			}
 			if format == 0 {
 			no_name_header:
-				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(hdr.value.str))
+				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(zend.Z_STR_P(hdr)))
 			} else {
 				var c byte
 				var s *byte
 				var p *byte
-				if g.Assign(&p, strchr(hdr.value.str.val, ':')) {
+				if b.Assign(&p, strchr(zend.Z_STRVAL_P(hdr), ':')) {
 					c = *p
 					*p = '0'
 					s = p + 1
 					for isspace(int(*((*uint8)(s)))) {
 						s++
 					}
-					if g.Assign(&prev_val, zend.ZendHashStrFind(return_value.value.arr, hdr.value.str.val, p-hdr.value.str.val)) == nil {
-						zend.AddAssocStringlEx(return_value, hdr.value.str.val, p-hdr.value.str.val, s, hdr.value.str.len_-(s-hdr.value.str.val))
+					if b.Assign(&prev_val, zend.ZendHashStrFind(zend.Z_ARRVAL_P(return_value), zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
+						zend.AddAssocStringlEx(return_value, zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
 					} else {
 						zend.ConvertToArray(prev_val)
-						zend.AddNextIndexStringl(prev_val, s, hdr.value.str.len_-(s-hdr.value.str.val))
+						zend.AddNextIndexStringl(prev_val, s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
 					}
 					*p = c
 				} else {
@@ -1385,7 +1138,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 }
 
 /* }}} */

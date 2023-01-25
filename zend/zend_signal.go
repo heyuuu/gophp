@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_signal.h>
@@ -32,15 +32,14 @@ import (
 
 // # include < signal . h >
 
-// #define NSIG       65
-
-// #define ZEND_SIGNAL_QUEUE_SIZE       64
+const NSIG = 65
+const ZEND_SIGNAL_QUEUE_SIZE = 64
 
 /* Signal structs */
 
 /* Signal Globals */
 
-// #define SIGG(v) ( zend_signal_globals . v )
+func SIGG(v __auto__) __auto__ { return ZendSignalGlobals.v }
 
 var ZendSignalGlobals ZendSignalGlobalsT
 
@@ -91,17 +90,22 @@ var ZendSignalGlobals ZendSignalGlobalsT
 
 // # include "zend_signal.h"
 
-// #define SIGNAL_BEGIN_CRITICAL() sigset_t oldmask ; zend_sigprocmask ( SIG_BLOCK , & global_sigmask , & oldmask ) ;
+func SIGNAL_BEGIN_CRITICAL() {
+	var oldmask sigset_t
+	ZendSigprocmask(SIG_BLOCK, &GlobalSigmask, &oldmask)
+}
+func SIGNAL_END_CRITICAL() __auto__ {
+	return ZendSigprocmask(SIG_SETMASK, &oldmask, nil)
+}
+func ZendSigprocmask(signo __auto__, set *sigset_t, oldset *sigset_t) __auto__ {
+	return sigprocmask(signo, set, oldset)
+}
 
-// #define SIGNAL_END_CRITICAL() zend_sigprocmask ( SIG_SETMASK , & oldmask , NULL ) ;
+const TIMEOUT_SIG = SIGPROF
 
-// #define zend_sigprocmask(signo,set,oldset) sigprocmask ( ( signo ) , ( set ) , ( oldset ) )
+var ZendSigs []int = []int{TIMEOUT_SIG, SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2}
 
-// #define TIMEOUT_SIG       SIGPROF
-
-var ZendSigs []int = []int{SIGPROF, SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGUSR1, SIGUSR2}
-
-// #define SA_FLAGS_MASK       ~ ( SA_NODEFER | SA_RESETHAND )
+const SA_FLAGS_MASK = ^(SA_NODEFER | SA_RESETHAND)
 
 /* True globals, written only at process startup */
 
@@ -115,40 +119,40 @@ func ZendSignalHandlerDefer(signo int, siginfo *siginfo_t, context any) {
 	var errno_save int = errno
 	var queue *ZendSignalQueueT
 	var qtmp *ZendSignalQueueT
-	if ZendSignalGlobals.GetActive() != 0 {
-		if ZendSignalGlobals.GetDepth() == 0 {
-			if ZendSignalGlobals.GetBlocked() != 0 {
-				ZendSignalGlobals.SetBlocked(0)
+	if EXPECTED(SIGG(active)) {
+		if UNEXPECTED(SIGG(depth) == 0) {
+			if UNEXPECTED(SIGG(blocked)) {
+				SIGG(blocked) = 0
 			}
-			if ZendSignalGlobals.GetRunning() == 0 {
-				ZendSignalGlobals.SetRunning(1)
+			if EXPECTED(SIGG(running) == 0) {
+				SIGG(running) = 1
 				ZendSignalHandler(signo, siginfo, context)
-				queue = ZendSignalGlobals.GetPhead()
-				ZendSignalGlobals.SetPhead(nil)
+				queue = SIGG(phead)
+				SIGG(phead) = nil
 				for queue != nil {
 					ZendSignalHandler(queue.GetZendSignal().GetSigno(), queue.GetZendSignal().GetSiginfo(), queue.GetZendSignal().GetContext())
 					qtmp = queue.GetNext()
-					queue.SetNext(ZendSignalGlobals.GetPavail())
+					queue.SetNext(SIGG(pavail))
 					queue.GetZendSignal().SetSigno(0)
-					ZendSignalGlobals.SetPavail(queue)
+					SIGG(pavail) = queue
 					queue = qtmp
 				}
-				ZendSignalGlobals.SetRunning(0)
+				SIGG(running) = 0
 			}
 		} else {
-			ZendSignalGlobals.SetBlocked(1)
-			if g.Assign(&queue, ZendSignalGlobals.GetPavail()) {
-				ZendSignalGlobals.SetPavail(queue.GetNext())
+			SIGG(blocked) = 1
+			if b.Assign(&queue, SIGG(pavail)) {
+				SIGG(pavail) = queue.GetNext()
 				queue.GetZendSignal().SetSigno(signo)
 				queue.GetZendSignal().SetSiginfo(siginfo)
 				queue.GetZendSignal().SetContext(context)
 				queue.SetNext(nil)
-				if ZendSignalGlobals.GetPhead() != nil && ZendSignalGlobals.GetPtail() != nil {
-					ZendSignalGlobals.GetPtail().SetNext(queue)
+				if SIGG(phead) && SIGG(ptail) {
+					SIGG(ptail).next = queue
 				} else {
-					ZendSignalGlobals.SetPhead(queue)
+					SIGG(phead) = queue
 				}
-				ZendSignalGlobals.SetPtail(queue)
+				SIGG(ptail) = queue
 			}
 		}
 	} else {
@@ -169,17 +173,16 @@ func ZendSignalHandlerDefer(signo int, siginfo *siginfo_t, context any) {
 func ZendSignalHandlerUnblock() {
 	var queue *ZendSignalQueueT
 	var zend_signal ZendSignalT
-	if ZendSignalGlobals.GetActive() != 0 {
-		var oldmask sigset_t
-		sigprocmask(SIG_BLOCK, &GlobalSigmask, &oldmask)
-		queue = ZendSignalGlobals.GetPhead()
-		ZendSignalGlobals.SetPhead(queue.GetNext())
+	if EXPECTED(SIGG(active)) {
+		SIGNAL_BEGIN_CRITICAL()
+		queue = SIGG(phead)
+		SIGG(phead) = queue.GetNext()
 		zend_signal = queue.GetZendSignal()
-		queue.SetNext(ZendSignalGlobals.GetPavail())
+		queue.SetNext(SIGG(pavail))
 		queue.GetZendSignal().SetSigno(0)
-		ZendSignalGlobals.SetPavail(queue)
+		SIGG(pavail) = queue
 		ZendSignalHandlerDefer(zend_signal.GetSigno(), zend_signal.GetSiginfo(), zend_signal.GetContext())
-		sigprocmask(SIG_SETMASK, &oldmask, nil)
+		SIGNAL_END_CRITICAL()
 	}
 }
 
@@ -190,7 +193,7 @@ func ZendSignalHandler(signo int, siginfo *siginfo_t, context any) {
 	var sa __struct__sigaction
 	var sigset sigset_t
 	var p_sig ZendSignalEntryT
-	p_sig = ZendSignalGlobals.GetHandlers()[signo-1]
+	p_sig = SIGG(handlers)[signo-1]
 	if p_sig.GetHandler() == SIG_DFL {
 		if sigaction(signo, nil, &sa) == 0 {
 			sa.sa_handler = SIG_DFL
@@ -201,15 +204,15 @@ func ZendSignalHandler(signo int, siginfo *siginfo_t, context any) {
 
 				/* throw away any blocked signals */
 
-				sigprocmask(SIG_UNBLOCK, &sigset, nil)
+				ZendSigprocmask(SIG_UNBLOCK, &sigset, nil)
 				kill(getpid(), signo)
 			}
 		}
 	} else if p_sig.GetHandler() != SIG_IGN {
 		if (p_sig.GetFlags() & SA_SIGINFO) != 0 {
 			if (p_sig.GetFlags() & SA_RESETHAND) != 0 {
-				ZendSignalGlobals.GetHandlers()[signo-1].SetFlags(0)
-				ZendSignalGlobals.GetHandlers()[signo-1].SetHandler(SIG_DFL)
+				SIGG(handlers)[signo-1].flags = 0
+				SIGG(handlers)[signo-1].handler = SIG_DFL
 			}
 			(*((func(int, *siginfo_t, any))(p_sig.GetHandler())))(signo, siginfo, context)
 		} else {
@@ -226,34 +229,34 @@ func ZendSigaction(signo int, act *__struct__sigaction, oldact *__struct__sigact
 	var sa __struct__sigaction
 	var sigset sigset_t
 	if oldact != nil {
-		oldact.sa_flags = ZendSignalGlobals.GetHandlers()[signo-1].GetFlags()
-		oldact.sa_handler = any(ZendSignalGlobals.GetHandlers()[signo-1].GetHandler())
+		oldact.sa_flags = SIGG(handlers)[signo-1].flags
+		oldact.sa_handler = any(SIGG(handlers)[signo-1].handler)
 		oldact.sa_mask = GlobalSigmask
 	}
 	if act != nil {
-		ZendSignalGlobals.GetHandlers()[signo-1].SetFlags(act.sa_flags)
+		SIGG(handlers)[signo-1].flags = act.sa_flags
 		if (act.sa_flags & SA_SIGINFO) != 0 {
-			ZendSignalGlobals.GetHandlers()[signo-1].SetHandler(any(act.sa_sigaction))
+			SIGG(handlers)[signo-1].handler = any(act.sa_sigaction)
 		} else {
-			ZendSignalGlobals.GetHandlers()[signo-1].SetHandler(any(act.sa_handler))
+			SIGG(handlers)[signo-1].handler = any(act.sa_handler)
 		}
-		memset(&sa, 0, g.SizeOf("sa"))
-		if ZendSignalGlobals.GetHandlers()[signo-1].GetHandler() == any(SIG_IGN) {
+		memset(&sa, 0, b.SizeOf("sa"))
+		if SIGG(handlers)[signo-1].handler == any(SIG_IGN) {
 			sa.sa_sigaction = any(SIG_IGN)
 		} else {
-			sa.sa_flags = SA_SIGINFO | act.sa_flags & ^(SA_NODEFER|SA_RESETHAND)
+			sa.sa_flags = SA_SIGINFO | act.sa_flags&SA_FLAGS_MASK
 			sa.sa_sigaction = ZendSignalHandlerDefer
 			sa.sa_mask = GlobalSigmask
 		}
 		if sigaction(signo, &sa, nil) < 0 {
-			ZendErrorNoreturn(1<<0, "Error installing signal handler for %d", signo)
+			ZendErrorNoreturn(E_ERROR, "Error installing signal handler for %d", signo)
 		}
 
 		/* unsure this signal is not blocked */
 
 		sigemptyset(&sigset)
 		sigaddset(&sigset, signo)
-		sigprocmask(SIG_UNBLOCK, &sigset, nil)
+		ZendSigprocmask(SIG_UNBLOCK, &sigset, nil)
 	}
 	return SUCCESS
 }
@@ -262,7 +265,7 @@ func ZendSigaction(signo int, act *__struct__sigaction, oldact *__struct__sigact
 
 func ZendSignal(signo int, handler func(int)) int {
 	var sa __struct__sigaction
-	memset(&sa, 0, g.SizeOf("sa"))
+	memset(&sa, 0, b.SizeOf("sa"))
 	sa.sa_flags = 0
 	sa.sa_handler = handler
 	sa.sa_mask = GlobalSigmask
@@ -277,17 +280,17 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 		if (sa.sa_flags&SA_SIGINFO) != 0 && sa.sa_sigaction == handler {
 			return FAILURE
 		}
-		ZendSignalGlobals.GetHandlers()[signo-1].SetFlags(sa.sa_flags)
+		SIGG(handlers)[signo-1].flags = sa.sa_flags
 		if (sa.sa_flags & SA_SIGINFO) != 0 {
-			ZendSignalGlobals.GetHandlers()[signo-1].SetHandler(any(sa.sa_sigaction))
+			SIGG(handlers)[signo-1].handler = any(sa.sa_sigaction)
 		} else {
-			ZendSignalGlobals.GetHandlers()[signo-1].SetHandler(any(sa.sa_handler))
+			SIGG(handlers)[signo-1].handler = any(sa.sa_handler)
 		}
 		sa.sa_flags = SA_SIGINFO
 		sa.sa_sigaction = handler
 		sa.sa_mask = GlobalSigmask
 		if sigaction(signo, &sa, nil) < 0 {
-			ZendErrorNoreturn(1<<0, "Error installing signal handler for %d", signo)
+			ZendErrorNoreturn(E_ERROR, "Error installing signal handler for %d", signo)
 		}
 		return SUCCESS
 	}
@@ -299,33 +302,33 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 
 func ZendSignalActivate() {
 	var x int
-	memcpy(&(ZendSignalGlobals.GetHandlers()), &GlobalOrigHandlers, g.SizeOf("global_orig_handlers"))
-	if ZendSignalGlobals.GetReset() != 0 {
-		for x = 0; x < g.SizeOf("zend_sigs")/g.SizeOf("* zend_sigs"); x++ {
+	memcpy(&SIGG(handlers), &GlobalOrigHandlers, b.SizeOf("global_orig_handlers"))
+	if SIGG(reset) {
+		for x = 0; x < b.SizeOf("zend_sigs")/b.SizeOf("* zend_sigs"); x++ {
 			ZendSignalRegister(ZendSigs[x], ZendSignalHandlerDefer)
 		}
 	}
-	ZendSignalGlobals.SetActive(1)
-	ZendSignalGlobals.SetDepth(0)
+	SIGG(active) = 1
+	SIGG(depth) = 0
 }
 
 /* {{{ zend_signal_deactivate
  * */
 
 func ZendSignalDeactivate() {
-	if ZendSignalGlobals.GetCheck() != 0 {
+	if SIGG(check) {
 		var x int
 		var sa __struct__sigaction
-		if ZendSignalGlobals.GetDepth() != 0 {
-			ZendError(1<<5, "zend_signal: shutdown with non-zero blocking depth (%d)", ZendSignalGlobals.GetDepth())
+		if SIGG(depth) != 0 {
+			ZendError(E_CORE_WARNING, "zend_signal: shutdown with non-zero blocking depth (%d)", SIGG(depth))
 		}
 
 		/* did anyone steal our installed handler */
 
-		for x = 0; x < g.SizeOf("zend_sigs")/g.SizeOf("* zend_sigs"); x++ {
+		for x = 0; x < b.SizeOf("zend_sigs")/b.SizeOf("* zend_sigs"); x++ {
 			sigaction(ZendSigs[x], nil, &sa)
 			if sa.sa_sigaction != ZendSignalHandlerDefer && sa.sa_sigaction != any(SIG_IGN) {
-				ZendError(1<<5, "zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x])
+				ZendError(E_CORE_WARNING, "zend_signal: handler was replaced for signal (%d) after startup", ZendSigs[x])
 			}
 		}
 
@@ -336,18 +339,18 @@ func ZendSignalDeactivate() {
 	/* After active=0 is set, signal handlers will be called directly and other
 	 * state that is reset below will not be accessed. */
 
-	*((*volatile__int)(&(ZendSignalGlobals.GetActive()))) = 0
-	ZendSignalGlobals.SetRunning(0)
-	ZendSignalGlobals.SetBlocked(0)
-	ZendSignalGlobals.SetDepth(0)
+	*((*volatile__int)(&SIGG(active))) = 0
+	SIGG(running) = 0
+	SIGG(blocked) = 0
+	SIGG(depth) = 0
 
 	/* If there are any queued signals because of a missed unblock, drop them. */
 
-	if ZendSignalGlobals.GetPhead() != nil && ZendSignalGlobals.GetPtail() != nil {
-		ZendSignalGlobals.GetPtail().SetNext(ZendSignalGlobals.GetPavail())
-		ZendSignalGlobals.SetPavail(ZendSignalGlobals.GetPhead())
-		ZendSignalGlobals.SetPhead(nil)
-		ZendSignalGlobals.SetPtail(nil)
+	if SIGG(phead) && SIGG(ptail) {
+		SIGG(ptail).next = SIGG(pavail)
+		SIGG(pavail) = SIGG(phead)
+		SIGG(phead) = nil
+		SIGG(ptail) = nil
 	}
 
 	/* If there are any queued signals because of a missed unblock, drop them. */
@@ -357,9 +360,9 @@ func ZendSignalDeactivate() {
 
 func ZendSignalGlobalsCtor(zend_signal_globals *ZendSignalGlobalsT) {
 	var x int
-	memset(zend_signal_globals, 0, g.SizeOf("* zend_signal_globals"))
+	memset(zend_signal_globals, 0, b.SizeOf("* zend_signal_globals"))
 	zend_signal_globals.SetReset(1)
-	for x = 0; x < g.SizeOf("zend_signal_globals -> pstorage")/g.SizeOf("* zend_signal_globals -> pstorage"); x++ {
+	for x = 0; x < b.SizeOf("zend_signal_globals -> pstorage")/b.SizeOf("* zend_signal_globals -> pstorage"); x++ {
 		var queue *ZendSignalQueueT = &zend_signal_globals.pstorage[x]
 		queue.GetZendSignal().SetSigno(0)
 		queue.SetNext(zend_signal_globals.GetPavail())
@@ -375,8 +378,8 @@ func ZendSignalInit() {
 
 	/* Save previously registered signal handlers into orig_handlers */
 
-	memset(&GlobalOrigHandlers, 0, g.SizeOf("global_orig_handlers"))
-	for signo = 1; signo < 65; signo++ {
+	memset(&GlobalOrigHandlers, 0, b.SizeOf("global_orig_handlers"))
+	for signo = 1; signo < NSIG; signo++ {
 		if sigaction(signo, nil, &sa) == 0 {
 			GlobalOrigHandlers[signo-1].SetFlags(sa.sa_flags)
 			if (sa.sa_flags & SA_SIGINFO) != 0 {

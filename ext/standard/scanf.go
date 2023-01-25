@@ -3,9 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -31,23 +30,19 @@ import (
 
 // #define SCANF_H
 
-// #define SCAN_MAX_ARGS       0xFF
+const SCAN_MAX_ARGS = 0xff
 
 /* passed to (f|s)scanf. This is an artificial   */
 
-// #define SCAN_SUCCESS       SUCCESS
-
-// #define SCAN_ERROR_EOF       - 1
+const SCAN_SUCCESS = zend.SUCCESS
+const SCAN_ERROR_EOF = -1
 
 /* can be caused by bad parameters or format*/
 
-// #define SCAN_ERROR_INVALID_FORMAT       ( SCAN_ERROR_EOF - 1 )
-
-// #define SCAN_ERROR_VAR_PASSED_BYVAL       ( SCAN_ERROR_INVALID_FORMAT - 1 )
-
-// #define SCAN_ERROR_WRONG_PARAM_COUNT       ( SCAN_ERROR_VAR_PASSED_BYVAL - 1 )
-
-// #define SCAN_ERROR_INTERNAL       ( SCAN_ERROR_WRONG_PARAM_COUNT - 1 )
+const SCAN_ERROR_INVALID_FORMAT = SCAN_ERROR_EOF - 1
+const SCAN_ERROR_VAR_PASSED_BYVAL = SCAN_ERROR_INVALID_FORMAT - 1
+const SCAN_ERROR_WRONG_PARAM_COUNT = SCAN_ERROR_VAR_PASSED_BYVAL - 1
+const SCAN_ERROR_INTERNAL = SCAN_ERROR_WRONG_PARAM_COUNT - 1
 
 /*
  * The following are here solely for the benefit of the scanf type functions
@@ -102,27 +97,18 @@ import (
  * Flag values used internally by [f|s]canf.
  */
 
-// #define SCAN_NOSKIP       0x1
+const SCAN_NOSKIP = 0x1
+const SCAN_SUPPRESS = 0x2
+const SCAN_UNSIGNED = 0x4
+const SCAN_WIDTH = 0x8
+const SCAN_SIGNOK = 0x10
+const SCAN_NODIGITS = 0x20
+const SCAN_NOZERO = 0x40
+const SCAN_XOK = 0x80
+const SCAN_PTOK = 0x100
+const SCAN_EXPOK = 0x200
 
-// #define SCAN_SUPPRESS       0x2
-
-// #define SCAN_UNSIGNED       0x4
-
-// #define SCAN_WIDTH       0x8
-
-// #define SCAN_SIGNOK       0x10
-
-// #define SCAN_NODIGITS       0x20
-
-// #define SCAN_NOZERO       0x40
-
-// #define SCAN_XOK       0x80
-
-// #define SCAN_PTOK       0x100
-
-// #define SCAN_EXPOK       0x200
-
-// #define UCHAR(x) ( zend_uchar ) ( x )
+func UCHAR(x byte) __auto__ { return zend_uchar(x) }
 
 /*
  * The following structure contains the information associated with
@@ -156,7 +142,7 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 	var start byte
 	var nranges int
 	var end *byte
-	memset(cset, 0, g.SizeOf("CharSet"))
+	memset(cset, 0, b.SizeOf("CharSet"))
 	ch = format
 	if (*ch) == '^' {
 		cset.SetExclude(1)
@@ -181,9 +167,9 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 		end++
 		ch = end - 1
 	}
-	cset.SetChars((*byte)(zend._safeEmalloc(g.SizeOf("char"), end-format-1, 0)))
+	cset.SetChars((*byte)(zend.SafeEmalloc(b.SizeOf("char"), end-format-1, 0)))
 	if nranges > 0 {
-		cset.SetRanges((*__struct__Range)(zend._safeEmalloc(g.SizeOf("struct Range"), nranges, 0)))
+		cset.SetRanges((*__struct__Range)(zend.SafeEmalloc(b.SizeOf("struct Range"), nranges, 0)))
 	} else {
 		cset.SetRanges(nil)
 	}
@@ -198,7 +184,7 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 	ch = format - 1
 	start = *ch
 	if (*ch) == ']' || (*ch) == '-' {
-		cset.GetChars()[g.PostInc(&(cset.GetNchars()))] = *ch
+		cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
 		format++
 		ch = format - 1
 	}
@@ -226,8 +212,8 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 			 */
 
 			if (*format) == ']' {
-				cset.GetChars()[g.PostInc(&(cset.GetNchars()))] = start
-				cset.GetChars()[g.PostInc(&(cset.GetNchars()))] = *ch
+				cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = start
+				cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
 			} else {
 				format++
 				ch = format - 1
@@ -253,7 +239,7 @@ func BuildCharSet(cset *CharSet, format *byte) *byte {
 			 */
 
 		} else {
-			cset.GetChars()[g.PostInc(&(cset.GetNchars()))] = *ch
+			cset.GetChars()[b.PostInc(&(cset.GetNchars()))] = *ch
 		}
 		format++
 		ch = format - 1
@@ -291,9 +277,9 @@ func CharInSet(cset *CharSet, c int) int {
 /* }}} */
 
 func ReleaseCharSet(cset *CharSet) {
-	zend._efree((*byte)(cset.GetChars()))
+	zend.Efree((*byte)(cset.GetChars()))
 	if cset.GetRanges() != nil {
-		zend._efree((*byte)(cset.GetRanges()))
+		zend.Efree((*byte)(cset.GetRanges()))
 	}
 }
 
@@ -322,7 +308,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 	 */
 
 	if numVars > nspace {
-		nassign = (*int)(zend._safeEmalloc(g.SizeOf("int"), numVars, 0))
+		nassign = (*int)(zend.SafeEmalloc(b.SizeOf("int"), numVars, 0))
 		nspace = numVars
 	}
 	for i = 0; i < nspace; i++ {
@@ -345,7 +331,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			continue
 		}
 		if (*ch) == '*' {
-			flags |= 0x2
+			flags |= SCAN_SUPPRESS
 			format++
 			ch = format - 1
 			goto xpgCheckDone
@@ -358,7 +344,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			 * in the same format string.
 			 */
 
-			value = strtoull(format-1, &end, 10)
+			value = zend.ZEND_STRTOUL(format-1, &end, 10)
 			if (*end) != '$' {
 				goto notXpg
 			}
@@ -381,7 +367,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 				 * guaranteed to be > 0.
 				 */
 
-				if value > 0xff {
+				if value > SCAN_MAX_ARGS {
 					goto badIndex
 				}
 				if xpgSize > value {
@@ -396,7 +382,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 		gotSequential = 1
 		if gotXpg != 0 {
 		mixedXPG:
-			core.PhpErrorDocref(nil, 1<<1, "%s", "cannot mix \"%\" and \"%n$\" conversion specifiers")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", "cannot mix \"%\" and \"%n$\" conversion specifiers")
 			goto error
 		}
 	xpgCheckDone:
@@ -405,9 +391,9 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 		 * Parse any width specifier.
 		 */
 
-		if isdigit(zend_uchar(*ch)) {
-			value = strtoull(format-1, &format, 10)
-			flags |= 0x8
+		if isdigit(UCHAR(*ch)) {
+			value = zend.ZEND_STRTOUL(format-1, &format, 10)
+			flags |= SCAN_WIDTH
 			format++
 			ch = format - 1
 		}
@@ -420,7 +406,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			format++
 			ch = format - 1
 		}
-		if (flags&0x2) == 0 && numVars != 0 && objIndex >= numVars {
+		if (flags&SCAN_SUPPRESS) == 0 && numVars != 0 && objIndex >= numVars {
 			goto badIndex
 		}
 
@@ -489,13 +475,13 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			}
 			break
 		badSet:
-			core.PhpErrorDocref(nil, 1<<1, "Unmatched [ in format string")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unmatched [ in format string")
 			goto error
 		default:
-			core.PhpErrorDocref(nil, 1<<1, "Bad scan conversion character \"%c\"", *ch)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Bad scan conversion character \"%c\"", *ch)
 			goto error
 		}
-		if (flags & 0x2) == 0 {
+		if (flags & SCAN_SUPPRESS) == 0 {
 			if objIndex >= nspace {
 
 				/*
@@ -511,12 +497,12 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 					nspace += 16
 				}
 				if nassign == staticAssign {
-					nassign = any(zend._safeEmalloc(nspace, g.SizeOf("int"), 0))
+					nassign = any(zend.SafeEmalloc(nspace, b.SizeOf("int"), 0))
 					for i = 0; i < 16; i++ {
 						nassign[i] = staticAssign[i]
 					}
 				} else {
-					nassign = any(zend._erealloc(any(nassign), nspace*g.SizeOf("int")))
+					nassign = any(zend.Erealloc(any(nassign), nspace*b.SizeOf("int")))
 				}
 				for i = value; i < nspace; i++ {
 					nassign[i] = 0
@@ -543,7 +529,7 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 	}
 	for i = 0; i < numVars; i++ {
 		if nassign[i] > 1 {
-			core.PhpErrorDocref(nil, 1<<1, "%s", "Variable is assigned by multiple \"%n$\" conversion specifiers")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "%s", "Variable is assigned by multiple \"%n$\" conversion specifiers")
 			goto error
 		} else if xpgSize == 0 && nassign[i] == 0 {
 
@@ -552,25 +538,25 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 			 * used, and/or numVars != 0), then too many vars were given
 			 */
 
-			core.PhpErrorDocref(nil, 1<<1, "Variable is not assigned by any conversion specifiers")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Variable is not assigned by any conversion specifiers")
 			goto error
 		}
 	}
 	if nassign != staticAssign {
-		zend._efree((*byte)(nassign))
+		zend.Efree((*byte)(nassign))
 	}
-	return zend.SUCCESS
+	return SCAN_SUCCESS
 badIndex:
 	if gotXpg != 0 {
-		core.PhpErrorDocref(nil, 1<<1, "%s", "\"%n$\" argument index out of range")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", "\"%n$\" argument index out of range")
 	} else {
-		core.PhpErrorDocref(nil, 1<<1, "Different numbers of variable names and field specifiers")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Different numbers of variable names and field specifiers")
 	}
 error:
 	if nassign != staticAssign {
-		zend._efree((*byte)(nassign))
+		zend.Efree((*byte)(nassign))
 	}
-	return -1 - 1
+	return SCAN_ERROR_INVALID_FORMAT
 }
 
 /* }}} */
@@ -599,7 +585,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 	/* do some sanity checking */
 
 	if varStart > argCount || varStart < 0 {
-		varStart = 0xff + 1
+		varStart = SCAN_MAX_ARGS + 1
 	}
 	numVars = argCount - varStart
 	if numVars < 0 {
@@ -610,9 +596,9 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 	 * Check for errors in the format string.
 	 */
 
-	if ValidateFormat(format, numVars, &totalVars) != zend.SUCCESS {
+	if ValidateFormat(format, numVars, &totalVars) != SCAN_SUCCESS {
 		ScanSetErrorReturn(numVars, return_value)
-		return -1 - 1
+		return SCAN_ERROR_INVALID_FORMAT
 	}
 	if numVars != 0 {
 		objIndex = varStart
@@ -626,10 +612,10 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 	if numVars != 0 {
 		for i = varStart; i < argCount; i++ {
-			if args[i].u1.v.type_ != 10 {
-				core.PhpErrorDocref(nil, 1<<1, "Parameter %d must be passed by reference", i)
+			if !(zend.Z_ISREF(args[i])) {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter %d must be passed by reference", i)
 				ScanSetErrorReturn(numVars, return_value)
-				return -1 - 1 - 1
+				return SCAN_ERROR_VAR_PASSED_BYVAL
 			}
 		}
 	}
@@ -644,12 +630,9 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 		/* allocate an array for return */
 
-		var __arr *zend.ZendArray = zend._zendNewArray(0)
-		var __z *zend.Zval = return_value
-		__z.value.arr = __arr
-		__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+		zend.ArrayInit(return_value)
 		for i = 0; i < totalVars; i++ {
-			&tmp.u1.type_info = 1
+			zend.ZVAL_NULL(&tmp)
 			if zend.AddNextIndexZval(return_value, &tmp) == zend.FAILURE {
 				ScanSetErrorReturn(0, return_value)
 				return zend.FAILURE
@@ -714,11 +697,11 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 		 */
 
 		if (*ch) == '*' {
-			flags |= 0x2
+			flags |= SCAN_SUPPRESS
 			format++
 			ch = format - 1
-		} else if isdigit(zend_uchar(*ch)) {
-			value = strtoull(format-1, &end, 10)
+		} else if isdigit(UCHAR(*ch)) {
+			value = zend.ZEND_STRTOUL(format-1, &end, 10)
 			if (*end) == '$' {
 				format = end + 1
 				format++
@@ -731,8 +714,8 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 		 * Parse any width specifier.
 		 */
 
-		if isdigit(zend_uchar(*ch)) {
-			width = strtoull(format-1, &format, 10)
+		if isdigit(UCHAR(*ch)) {
+			width = zend.ZEND_STRTOUL(format-1, &format, 10)
 			format++
 			ch = format - 1
 		} else {
@@ -754,31 +737,14 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 		switch *ch {
 		case 'n':
-			if (flags & 0x2) == 0 {
+			if (flags & SCAN_SUPPRESS) == 0 {
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + g.PostInc(&objIndex)
-					for {
-						r.Assert(current.u1.v.type_ == 10)
-						for {
-							var _zv *zend.Zval = current
-							var ref *zend.ZendReference = _zv.value.ref
-							if ref.sources.ptr != nil {
-								zend.ZendTryAssignTypedRefLong(ref, zend_long(string-baseString))
-								break
-							}
-							_zv = &ref.val
-							zend.ZvalPtrDtor(_zv)
-							var __z *zend.Zval = _zv
-							__z.value.lval = zend_long(string - baseString)
-							__z.u1.type_info = 4
-							break
-						}
-						break
-					}
+					current = args + b.PostInc(&objIndex)
+					zend.ZEND_TRY_ASSIGN_REF_LONG(current, zend_long(string-baseString))
 				} else {
-					zend.AddIndexLong(return_value, g.PostInc(&objIndex), string-baseString)
+					zend.AddIndexLong(return_value, b.PostInc(&objIndex), string-baseString)
 				}
 			}
 			nconversions++
@@ -788,30 +754,30 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 		case 'D':
 			op = 'i'
 			base = 10
-			fn = (func() zend.ZendLong)(strtoll)
+			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
 			break
 		case 'i':
 			op = 'i'
 			base = 0
-			fn = (func() zend.ZendLong)(strtoll)
+			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
 			break
 		case 'o':
 			op = 'i'
 			base = 8
-			fn = (func() zend.ZendLong)(strtoll)
+			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
 			break
 		case 'x':
 
 		case 'X':
 			op = 'i'
 			base = 16
-			fn = (func() zend.ZendLong)(strtoll)
+			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
 			break
 		case 'u':
 			op = 'i'
 			base = 10
-			flags |= 0x4
-			fn = (func() zend.ZendLong)(strtoull)
+			flags |= SCAN_UNSIGNED
+			fn = (func() zend.ZendLong)(zend.ZEND_STRTOUL_PTR)
 			break
 		case 'f':
 
@@ -827,7 +793,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			break
 		case 'c':
 			op = 's'
-			flags |= 0x1
+			flags |= SCAN_NOSKIP
 
 			/*-cc-*/
 
@@ -840,7 +806,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			break
 		case '[':
 			op = '['
-			flags |= 0x1
+			flags |= SCAN_NOSKIP
 			break
 		}
 
@@ -859,7 +825,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 		 * the format suppresses this behavior.
 		 */
 
-		if (flags & 0x1) == 0 {
+		if (flags & SCAN_NOSKIP) == 0 {
 			for (*string) != '0' {
 				sch = *string
 				if !(isspace(int(sch))) {
@@ -896,36 +862,18 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					break
 				}
 				end++
-				if g.PreDec(&width) == 0 {
+				if b.PreDec(&width) == 0 {
 					break
 				}
 			}
-			if (flags & 0x2) == 0 {
+			if (flags & SCAN_SUPPRESS) == 0 {
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + g.PostInc(&objIndex)
-					for {
-						r.Assert(current.u1.v.type_ == 10)
-						for {
-							var _zv *zend.Zval = current
-							var ref *zend.ZendReference = _zv.value.ref
-							if ref.sources.ptr != nil {
-								zend.ZendTryAssignTypedRefStringl(ref, string, end-string)
-								break
-							}
-							_zv = &ref.val
-							zend.ZvalPtrDtor(_zv)
-							var __z *zend.Zval = _zv
-							var __s *zend.ZendString = zend.ZendStringInit(string, end-string, 0)
-							__z.value.str = __s
-							__z.u1.type_info = 6 | 1<<0<<8
-							break
-						}
-						break
-					}
+					current = args + b.PostInc(&objIndex)
+					zend.ZEND_TRY_ASSIGN_REF_STRINGL(current, string, end-string)
 				} else {
-					zend.AddIndexStringl(return_value, g.PostInc(&objIndex), string, end-string)
+					zend.AddIndexStringl(return_value, b.PostInc(&objIndex), string, end-string)
 				}
 			}
 			string = end
@@ -943,7 +891,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					break
 				}
 				end++
-				if g.PreDec(&width) == 0 {
+				if b.PreDec(&width) == 0 {
 					break
 				}
 			}
@@ -961,32 +909,14 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				 */
 
 			}
-			if (flags & 0x2) == 0 {
+			if (flags & SCAN_SUPPRESS) == 0 {
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + g.PostInc(&objIndex)
-					for {
-						r.Assert(current.u1.v.type_ == 10)
-						for {
-							var _zv *zend.Zval = current
-							var ref *zend.ZendReference = _zv.value.ref
-							if ref.sources.ptr != nil {
-								zend.ZendTryAssignTypedRefStringl(ref, string, end-string)
-								break
-							}
-							_zv = &ref.val
-							zend.ZvalPtrDtor(_zv)
-							var __z *zend.Zval = _zv
-							var __s *zend.ZendString = zend.ZendStringInit(string, end-string, 0)
-							__z.value.str = __s
-							__z.u1.type_info = 6 | 1<<0<<8
-							break
-						}
-						break
-					}
+					current = args + b.PostInc(&objIndex)
+					zend.ZEND_TRY_ASSIGN_REF_STRINGL(current, string, end-string)
 				} else {
-					zend.AddIndexStringl(return_value, g.PostInc(&objIndex), string, end-string)
+					zend.AddIndexStringl(return_value, b.PostInc(&objIndex), string, end-string)
 				}
 			}
 			string = end
@@ -1001,10 +931,10 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 			/*-cc-*/
 
-			if width == 0 || width > g.SizeOf("buf")-1 {
-				width = g.SizeOf("buf") - 1
+			if width == 0 || width > b.SizeOf("buf")-1 {
+				width = b.SizeOf("buf") - 1
 			}
-			flags |= 0x10 | 0x20 | 0x40
+			flags |= SCAN_SIGNOK | SCAN_NODIGITS | SCAN_NOZERO
 			for end = buf; width > 0; width-- {
 				switch *string {
 				case '0':
@@ -1012,19 +942,19 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					/*-cc-*/
 
 					if base == 16 {
-						flags |= 0x80
+						flags |= SCAN_XOK
 					}
 
 					/*-cc-*/
 
 					if base == 0 {
 						base = 8
-						flags |= 0x80
+						flags |= SCAN_XOK
 					}
-					if (flags & 0x40) != 0 {
-						flags &= ^(0x10 | 0x20 | 0x40)
+					if (flags & SCAN_NOZERO) != 0 {
+						flags &= ^(SCAN_SIGNOK | SCAN_NODIGITS | SCAN_NOZERO)
 					} else {
-						flags &= ^(0x10 | 0x80 | 0x20)
+						flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					}
 					goto addToInt
 				case '1':
@@ -1043,7 +973,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					if base == 0 {
 						base = 10
 					}
-					flags &= ^(0x10 | 0x80 | 0x20)
+					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
 				case '8':
 
@@ -1054,7 +984,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					if base <= 8 {
 						break
 					}
-					flags &= ^(0x10 | 0x80 | 0x20)
+					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
 				case 'A':
 
@@ -1082,22 +1012,22 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					if base <= 10 {
 						break
 					}
-					flags &= ^(0x10 | 0x80 | 0x20)
+					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
 				case '+':
 
 				case '-':
-					if (flags & 0x10) != 0 {
-						flags &= ^0x10
+					if (flags & SCAN_SIGNOK) != 0 {
+						flags &= ^SCAN_SIGNOK
 						goto addToInt
 					}
 					break
 				case 'x':
 
 				case 'X':
-					if (flags&0x80) != 0 && end == buf+1 {
+					if (flags&SCAN_XOK) != 0 && end == buf+1 {
 						base = 16
-						flags &= ^0x80
+						flags &= ^SCAN_XOK
 						goto addToInt
 					}
 					break
@@ -1115,7 +1045,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				 */
 
 				*string++
-				g.PostInc(&(*end)) = (*string) - 1
+				b.PostInc(&(*end)) = (*string) - 1
 				if (*string) == '0' {
 					break
 				}
@@ -1126,7 +1056,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			 * sign or a trailing x after a 0.
 			 */
 
-			if (flags & 0x20) != 0 {
+			if (flags & SCAN_NODIGITS) != 0 {
 				if (*string) == '0' {
 					underflow = 1
 				}
@@ -1142,66 +1072,30 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			 * to a string since PHP only supports signed values.
 			 */
 
-			if (flags & 0x2) == 0 {
+			if (flags & SCAN_SUPPRESS) == 0 {
 				*end = '0'
 				value = zend_long(*fn)(buf, nil, base)
-				if (flags&0x4) != 0 && value < 0 {
-					core.ApPhpSnprintf(buf, g.SizeOf("buf"), "%"+"llu", value)
+				if (flags&SCAN_UNSIGNED) != 0 && value < 0 {
+					core.Snprintf(buf, b.SizeOf("buf"), zend.ZEND_ULONG_FMT, value)
 					if numVars != 0 && objIndex >= argCount {
 						break
 					} else if numVars != 0 {
 
 						/* change passed value type to string */
 
-						current = args + g.PostInc(&objIndex)
-						for {
-							r.Assert(current.u1.v.type_ == 10)
-							for {
-								var _zv *zend.Zval = current
-								var ref *zend.ZendReference = _zv.value.ref
-								if ref.sources.ptr != nil {
-									zend.ZendTryAssignTypedRefString(ref, buf)
-									break
-								}
-								_zv = &ref.val
-								zend.ZvalPtrDtor(_zv)
-								var _s *byte = buf
-								var __z *zend.Zval = _zv
-								var __s *zend.ZendString = zend.ZendStringInit(_s, strlen(_s), 0)
-								__z.value.str = __s
-								__z.u1.type_info = 6 | 1<<0<<8
-								break
-							}
-							break
-						}
+						current = args + b.PostInc(&objIndex)
+						zend.ZEND_TRY_ASSIGN_REF_STRING(current, buf)
 					} else {
-						zend.AddIndexString(return_value, g.PostInc(&objIndex), buf)
+						zend.AddIndexString(return_value, b.PostInc(&objIndex), buf)
 					}
 				} else {
 					if numVars != 0 && objIndex >= argCount {
 						break
 					} else if numVars != 0 {
-						current = args + g.PostInc(&objIndex)
-						for {
-							r.Assert(current.u1.v.type_ == 10)
-							for {
-								var _zv *zend.Zval = current
-								var ref *zend.ZendReference = _zv.value.ref
-								if ref.sources.ptr != nil {
-									zend.ZendTryAssignTypedRefLong(ref, value)
-									break
-								}
-								_zv = &ref.val
-								zend.ZvalPtrDtor(_zv)
-								var __z *zend.Zval = _zv
-								__z.value.lval = value
-								__z.u1.type_info = 4
-								break
-							}
-							break
-						}
+						current = args + b.PostInc(&objIndex)
+						zend.ZEND_TRY_ASSIGN_REF_LONG(current, value)
 					} else {
-						zend.AddIndexLong(return_value, g.PostInc(&objIndex), value)
+						zend.AddIndexLong(return_value, b.PostInc(&objIndex), value)
 					}
 				}
 			}
@@ -1213,10 +1107,10 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			 */
 
 			buf[0] = '0'
-			if width == 0 || width > g.SizeOf("buf")-1 {
-				width = g.SizeOf("buf") - 1
+			if width == 0 || width > b.SizeOf("buf")-1 {
+				width = b.SizeOf("buf") - 1
 			}
-			flags |= 0x10 | 0x20 | 0x100 | 0x200
+			flags |= SCAN_SIGNOK | SCAN_NODIGITS | SCAN_PTOK | SCAN_EXPOK
 			for end = buf; width > 0; width-- {
 				switch *string {
 				case '0':
@@ -1238,19 +1132,19 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				case '8':
 
 				case '9':
-					flags &= ^(0x10 | 0x20)
+					flags &= ^(SCAN_SIGNOK | SCAN_NODIGITS)
 					goto addToFloat
 				case '+':
 
 				case '-':
-					if (flags & 0x10) != 0 {
-						flags &= ^0x10
+					if (flags & SCAN_SIGNOK) != 0 {
+						flags &= ^SCAN_SIGNOK
 						goto addToFloat
 					}
 					break
 				case '.':
-					if (flags & 0x100) != 0 {
-						flags &= ^(0x10 | 0x100)
+					if (flags & SCAN_PTOK) != 0 {
+						flags &= ^(SCAN_SIGNOK | SCAN_PTOK)
 						goto addToFloat
 					}
 					break
@@ -1263,8 +1157,8 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 					 * been at least one digit.
 					 */
 
-					if (flags & (0x20 | 0x200)) == 0x200 {
-						flags = flags & ^(0x200|0x100) | 0x10 | 0x20
+					if (flags & (SCAN_NODIGITS | SCAN_EXPOK)) == SCAN_EXPOK {
+						flags = flags & ^(SCAN_EXPOK|SCAN_PTOK) | SCAN_SIGNOK | SCAN_NODIGITS
 						goto addToFloat
 					}
 					break
@@ -1282,7 +1176,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 				 */
 
 				*string++
-				g.PostInc(&(*end)) = (*string) - 1
+				b.PostInc(&(*end)) = (*string) - 1
 				if (*string) == '0' {
 					break
 				}
@@ -1293,8 +1187,8 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			 * trailing 'e' or sign.
 			 */
 
-			if (flags & 0x20) != 0 {
-				if (flags & 0x200) != 0 {
+			if (flags & SCAN_NODIGITS) != 0 {
+				if (flags & SCAN_EXPOK) != 0 {
 
 					/*
 					 * There were no digits at all so scanning has
@@ -1323,34 +1217,17 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 			 * Scan the value from the temporary buffer.
 			 */
 
-			if (flags & 0x2) == 0 {
+			if (flags & SCAN_SUPPRESS) == 0 {
 				var dvalue float64
 				*end = '0'
 				dvalue = zend.ZendStrtod(buf, nil)
 				if numVars != 0 && objIndex >= argCount {
 					break
 				} else if numVars != 0 {
-					current = args + g.PostInc(&objIndex)
-					for {
-						r.Assert(current.u1.v.type_ == 10)
-						for {
-							var _zv *zend.Zval = current
-							var ref *zend.ZendReference = _zv.value.ref
-							if ref.sources.ptr != nil {
-								zend.ZendTryAssignTypedRefDouble(ref, dvalue)
-								break
-							}
-							_zv = &ref.val
-							zend.ZvalPtrDtor(_zv)
-							var __z *zend.Zval = _zv
-							__z.value.dval = dvalue
-							__z.u1.type_info = 5
-							break
-						}
-						break
-					}
+					current = args + b.PostInc(&objIndex)
+					zend.ZEND_TRY_ASSIGN_REF_DOUBLE(current, dvalue)
 				} else {
-					zend.AddIndexDouble(return_value, g.PostInc(&objIndex), dvalue)
+					zend.AddIndexDouble(return_value, b.PostInc(&objIndex), dvalue)
 				}
 			}
 			break
@@ -1358,15 +1235,13 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 		nconversions++
 	}
 done:
-	result = zend.SUCCESS
+	result = SCAN_SUCCESS
 	if underflow != 0 && 0 == nconversions {
 		ScanSetErrorReturn(numVars, return_value)
-		result = -1
+		result = SCAN_ERROR_EOF
 	} else if numVars != 0 {
 		zend.ZvalPtrDtor(return_value)
-		var __z *zend.Zval = return_value
-		__z.value.lval = nconversions
-		__z.u1.type_info = 4
+		zend.ZVAL_LONG(return_value, nconversions)
 	} else if nconversions < totalVars {
 
 	}
@@ -1377,9 +1252,7 @@ done:
 
 func ScanSetErrorReturn(numVars int, return_value *zend.Zval) {
 	if numVars != 0 {
-		var __z *zend.Zval = return_value
-		__z.value.lval = -1
-		__z.u1.type_info = 4
+		zend.ZVAL_LONG(return_value, SCAN_ERROR_EOF)
 	} else {
 
 		/* convert_to_null calls destructor */

@@ -31,9 +31,8 @@ package core
 
 // # include < dirent . h >
 
-// #define php_scandir       scandir
-
-// #define php_alphasort       alphasort
+const PhpScandir = scandir
+const PhpAlphasort = alphasort
 
 // Source: <main/php_scandir.c>
 

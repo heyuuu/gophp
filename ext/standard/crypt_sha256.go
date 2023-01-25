@@ -3,8 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	g "sik/runtime/grammar"
+	"sik/sapi/cli"
 	"sik/zend"
 )
 
@@ -44,7 +45,9 @@ func __phpMempcpy(dst any, src any, len_ int) any {
 
 /* Structure to save state of computation between the single steps.  */
 
-// #define SWAP(n) ( ( ( n ) << 24 ) | ( ( ( n ) & 0xff00 ) << 8 ) | ( ( ( n ) >> 8 ) & 0xff00 ) | ( ( n ) >> 24 ) )
+func SWAP(n __auto__) int {
+	return n<<24 | (n&0xff00)<<8 | n>>8&0xff00 | n>>24
+}
 
 /* This array contains the bytes used to pad the buffer to the next
    64-byte boundary.  (FIPS 180-2:5.1.1)  */
@@ -60,7 +63,7 @@ var K32 []uint32 = []uint32{0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x39
 
 func Sha256ProcessBlock(buffer any, len_ int, ctx *Sha256Ctx) {
 	var words *uint32 = buffer
-	var nwords int = len_ / g.SizeOf("uint32_t")
+	var nwords int = len_ / b.SizeOf("uint32_t")
 	var t uint
 	var a uint32 = ctx.GetH()[0]
 	var b uint32 = ctx.GetH()[1]
@@ -96,38 +99,41 @@ func Sha256ProcessBlock(buffer any, len_ int, ctx *Sha256Ctx) {
 
 		/* Operators defined in FIPS 180-2:4.1.2.  */
 
-		// #define Ch(x,y,z) ( ( x & y ) ^ ( ~ x & z ) )
-
-		// #define Maj(x,y,z) ( ( x & y ) ^ ( x & z ) ^ ( y & z ) )
-
-		// #define S0(x) ( CYCLIC ( x , 2 ) ^ CYCLIC ( x , 13 ) ^ CYCLIC ( x , 22 ) )
-
-		// #define S1(x) ( CYCLIC ( x , 6 ) ^ CYCLIC ( x , 11 ) ^ CYCLIC ( x , 25 ) )
-
-		// #define R0(x) ( CYCLIC ( x , 7 ) ^ CYCLIC ( x , 18 ) ^ ( x >> 3 ) )
-
-		// #define R1(x) ( CYCLIC ( x , 17 ) ^ CYCLIC ( x , 19 ) ^ ( x >> 10 ) )
+		var Ch func(x uint32, y uint32, z uint32) int = func(x uint32, y uint32, z uint32) int { return x&y ^ ^x&z }
+		var Maj func(x uint32, y uint32, z uint32) int = func(x uint32, y uint32, z uint32) int { return x&y ^ x&z ^ y&z }
+		var S0 func(x uint32) int = func(x uint32) int {
+			return CYCLIC(x, 2) ^ CYCLIC(x, 13) ^ CYCLIC(x, 22)
+		}
+		var S1 func(x uint32) int = func(x uint32) int {
+			return CYCLIC(x, 6) ^ CYCLIC(x, 11) ^ CYCLIC(x, 25)
+		}
+		var R0 func(x uint32) int = func(x uint32) int {
+			return CYCLIC(x, 7) ^ CYCLIC(x, 18) ^ x>>3
+		}
+		var R1 func(x uint32) int = func(x uint32) int {
+			return CYCLIC(x, 17) ^ CYCLIC(x, 19) ^ x>>10
+		}
 
 		/* It is unfortunate that C does not provide an operator for
 		   cyclic rotation.  Hope the C compiler is smart enough.  */
 
-		// #define CYCLIC(w,s) ( ( w >> s ) | ( w << ( 32 - s ) ) )
+		var CYCLIC func(w uint32, s int) int = func(w uint32, s int) int { return w>>s | w<<32 - s }
 
 		/* Compute the message schedule according to FIPS 180-2:6.2.2 step 2.  */
 
 		for t = 0; t < 16; t++ {
-			W[t] = (*words)<<24 | ((*words)&0xff00)<<8 | (*words)>>8&0xff00 | (*words)>>24
+			W[t] = SWAP(*words)
 			words++
 		}
 		for t = 16; t < 64; t++ {
-			W[t] = ((W[t-2]>>17 | W[t-2]<<32 - 17) ^ (W[t-2]>>19 | W[t-2]<<32 - 19) ^ W[t-2]>>10) + W[t-7] + ((W[t-15]>>7 | W[t-15]<<32 - 7) ^ (W[t-15]>>18 | W[t-15]<<32 - 18) ^ W[t-15]>>3) + W[t-16]
+			W[t] = R1(W[t-2]) + W[t-7] + R0(W[t-15]) + W[t-16]
 		}
 
 		/* The actual computation according to FIPS 180-2:6.2.2 step 3.  */
 
 		for t = 0; t < 64; t++ {
-			var T1 uint32 = h + ((e>>6 | e<<32 - 6) ^ (e>>11 | e<<32 - 11) ^ (e>>25 | e<<32 - 25)) + (e&f ^ ^e&g) + K[t] + W[t]
-			var T2 uint32 = ((a>>2 | a<<32 - 2) ^ (a>>13 | a<<32 - 13) ^ (a>>22 | a<<32 - 22)) + (a&b ^ a&c ^ b&c)
+			var T1 uint32 = h + S1(e) + Ch(e, f, g) + K[t] + W[t]
+			var T2 uint32 = S0(a) + Maj(a, b, c)
 			h = g
 			g = f
 			f = e
@@ -215,8 +221,8 @@ func Sha256FinishCtx(ctx *Sha256Ctx, resbuf any) any {
 
 	/* Put the 64-bit file length in *bits* at the end of the buffer.  */
 
-	*((*uint32)(&ctx.buffer[bytes+pad+4])) = ctx.GetTotal()[0]<<3<<24 | (ctx.GetTotal()[0]<<3&0xff00)<<8 | ctx.GetTotal()[0]<<3>>8&0xff00 | ctx.GetTotal()[0]<<3>>24
-	*((*uint32)(&ctx.buffer[bytes+pad])) = (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>29)<<24 | ((ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>29)&0xff00)<<8 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>29)>>8&0xff00 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>29)>>24
+	*((*uint32)(&ctx.buffer[bytes+pad+4])) = SWAP(ctx.GetTotal()[0] << 3)
+	*((*uint32)(&ctx.buffer[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>29)
 
 	/* Process last bytes.  */
 
@@ -225,7 +231,7 @@ func Sha256FinishCtx(ctx *Sha256Ctx, resbuf any) any {
 	/* Put result from CTX in first 32 bytes following RESBUF.  */
 
 	for i = 0; i < 8; i++ {
-		(*uint32)(resbuf)[i] = ctx.GetH()[i]<<24 | (ctx.GetH()[i]&0xff00)<<8 | ctx.GetH()[i]>>8&0xff00 | ctx.GetH()[i]>>24
+		(*uint32)(resbuf)[i] = SWAP(ctx.GetH()[i])
 	}
 	return resbuf
 }
@@ -235,7 +241,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 	if ctx.GetBuflen() != 0 {
 		var left_over int = ctx.GetBuflen()
-		var add int = g.Cond(128-left_over > len_, len_, 128-left_over)
+		var add int = b.Cond(128-left_over > len_, len_, 128-left_over)
 		memcpy(&ctx.buffer[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + uint32(add))
 		if ctx.GetBuflen() > 64 {
@@ -260,9 +266,10 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 		/* To check alignment gcc has an appropriate operator.  Other
 		   compilers don't.  */
 
-		// #define UNALIGNED_P(p) ( ( ( uintptr_t ) p ) % sizeof ( uint32_t ) != 0 )
-
-		if uintPtr(buffer)%g.SizeOf("uint32_t") != 0 {
+		var UNALIGNED_P func(p any) bool = func(p any) bool {
+			return uintPtr(p)%b.SizeOf("uint32_t") != 0
+		}
+		if UNALIGNED_P(buffer) {
 			for len_ > 64 {
 				Sha256ProcessBlock(memcpy(ctx.GetBuffer(), buffer, 64), 64, ctx)
 				buffer = (*byte)(buffer + 64)
@@ -273,12 +280,6 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 			buffer = (*byte)(buffer + (len_ & ^63))
 			len_ &= 63
 		}
-
-		/* To check alignment gcc has an appropriate operator.  Other
-		   compilers don't.  */
-
-		// #define UNALIGNED_P(p) ( ( ( uintptr_t ) p ) % sizeof ( uint32_t ) != 0 )
-
 	}
 
 	/* Move remaining bytes into internal buffer.  */
@@ -309,19 +310,19 @@ var Sha256RoundsPrefix []byte = "rounds="
 
 /* Maximum salt string length.  */
 
-// #define SALT_LEN_MAX       16
+const SALT_LEN_MAX = 16
 
 /* Default number of rounds if not explicitly specified.  */
 
-// #define ROUNDS_DEFAULT       5000
+const ROUNDS_DEFAULT = 5000
 
 /* Minimum number of rounds.  */
 
-// #define ROUNDS_MIN       1000
+const ROUNDS_MIN = 1000
 
 /* Maximum number of rounds.  */
 
-// #define ROUNDS_MAX       999999999
+const ROUNDS_MAX = 999999999
 
 /* Table with characters for base64 transformation.  */
 
@@ -343,53 +344,41 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 
 	/* Default number of rounds.  */
 
-	var rounds int = 5000
+	var rounds int = ROUNDS_DEFAULT
 	var rounds_custom zend.ZendBool = 0
 
 	/* Find beginning of salt string.  The prefix should normally always
 	   be present.  Just in case it is not.  */
 
-	if strncmp(Sha256SaltPrefix, salt, g.SizeOf("sha256_salt_prefix")-1) == 0 {
+	if strncmp(Sha256SaltPrefix, salt, b.SizeOf("sha256_salt_prefix")-1) == 0 {
 
 		/* Skip salt prefix.  */
 
-		salt += g.SizeOf("sha256_salt_prefix") - 1
+		salt += b.SizeOf("sha256_salt_prefix") - 1
 
 		/* Skip salt prefix.  */
 
 	}
-	if strncmp(salt, Sha256RoundsPrefix, g.SizeOf("sha256_rounds_prefix")-1) == 0 {
-		var num *byte = salt + g.SizeOf("sha256_rounds_prefix") - 1
+	if strncmp(salt, Sha256RoundsPrefix, b.SizeOf("sha256_rounds_prefix")-1) == 0 {
+		var num *byte = salt + b.SizeOf("sha256_rounds_prefix") - 1
 		var endp *byte
-		var srounds zend.ZendUlong = strtoull(num, &endp, 10)
+		var srounds zend.ZendUlong = zend.ZEND_STRTOUL(num, &endp, 10)
 		if (*endp) == '$' {
 			salt = endp + 1
-			if 1000 > g.Cond(srounds < 999999999, srounds, 999999999) {
-				rounds = 1000
-			} else {
-				if srounds < 999999999 {
-					rounds = srounds
-				} else {
-					rounds = 999999999
-				}
-			}
+			rounds = zend.MAX(ROUNDS_MIN, cli.MIN(srounds, ROUNDS_MAX))
 			rounds_custom = 1
 		}
 	}
-	if strcspn(salt, "$") < 16 {
-		salt_len = strcspn(salt, "$")
-	} else {
-		salt_len = 16
-	}
+	salt_len = cli.MIN(strcspn(salt, "$"), SALT_LEN_MAX)
 	key_len = strlen(key)
-	if (key-(*byte)(0))%__alignof__(uint32) != 0 {
-		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint32)))
-		copied_key = memcpy(tmp+__alignof__(uint32)-(tmp-(*byte)(0))%__alignof__(uint32), key, key_len)
+	if (key-(*byte)(0))%__alignof__(uint32_t) != 0 {
+		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint32_t)))
+		copied_key = memcpy(tmp+__alignof__(uint32_t)-(tmp-(*byte)(0))%__alignof__(uint32_t), key, key_len)
 		key = copied_key
 	}
-	if (salt-(*byte)(0))%__alignof__(uint32) != 0 {
-		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint32)))
-		copied_salt = memcpy(tmp+__alignof__(uint32)-(tmp-(*byte)(0))%__alignof__(uint32), salt, salt_len)
+	if (salt-(*byte)(0))%__alignof__(uint32_t) != 0 {
+		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint32_t)))
+		copied_salt = memcpy(tmp+__alignof__(uint32_t)-(tmp-(*byte)(0))%__alignof__(uint32_t), salt, salt_len)
 		salt = copied_salt
 		copied_salt[salt_len] = 0
 	}
@@ -546,107 +535,39 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Now we can construct the result string.  It consists of three
 	   parts.  */
 
-	cp = __phpStpncpy(buffer, Sha256SaltPrefix, g.Cond(0 > buflen, 0, buflen))
-	buflen -= g.SizeOf("sha256_salt_prefix") - 1
+	cp = __phpStpncpy(buffer, Sha256SaltPrefix, zend.MAX(0, buflen))
+	buflen -= b.SizeOf("sha256_salt_prefix") - 1
 	if rounds_custom != 0 {
-		var n int = core.ApPhpSnprintf(cp, g.Cond(0 > buflen, 0, buflen), "%s%zu$", Sha256RoundsPrefix, rounds)
+		var n int = core.Snprintf(cp, zend.MAX(0, buflen), "%s%zu$", Sha256RoundsPrefix, rounds)
 		cp += n
 		buflen -= n
 	}
-	cp = __phpStpncpy(cp, salt, g.CondF1(size_t(g.Cond(0 > buflen, 0, buflen)) < salt_len, func() __auto__ { return size_t(g.Cond(0 > buflen, 0, buflen)) }, salt_len))
-	if g.Cond(0 > buflen, 0, buflen) < int(salt_len) {
-		if 0 > buflen {
-			buflen -= 0
-		} else {
-			buflen -= buflen
-		}
-	} else {
-		buflen -= int(salt_len)
-	}
+	cp = __phpStpncpy(cp, salt, cli.MIN(int(zend.MAX(0, buflen)), salt_len))
+	buflen -= cli.MIN(zend.MAX(0, buflen), int(salt_len))
 	if buflen > 0 {
-		g.PostInc(&(*cp)) = '$'
+		b.PostInc(&(*cp)) = '$'
 		buflen--
 	}
-
-	// #define b64_from_24bit(B2,B1,B0,N) do { unsigned int w = ( ( B2 ) << 16 ) | ( ( B1 ) << 8 ) | ( B0 ) ; int n = ( N ) ; while ( n -- > 0 && buflen > 0 ) { * cp ++ = b64t [ w & 0x3f ] ; -- buflen ; w >>= 6 ; } } while ( 0 )
-
-	var w uint = alt_result[0]<<16 | alt_result[10]<<8 | alt_result[20]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
+	var b64_from_24bit func(B2 __auto__, B1 uint8, B0 uint8, N int) = func(B2 __auto__, B1 uint8, B0 uint8, N int) {
+		var w uint = B2<<16 | B1<<8 | B0
+		var n int = N
+		for b.PostDec(&n) > 0 && buflen > 0 {
+			b.PostInc(&(*cp)) = B64t[w&0x3f]
+			buflen--
+			w >>= 6
+		}
 	}
-	var w uint = alt_result[21]<<16 | alt_result[1]<<8 | alt_result[11]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[12]<<16 | alt_result[22]<<8 | alt_result[2]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[3]<<16 | alt_result[13]<<8 | alt_result[23]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[24]<<16 | alt_result[4]<<8 | alt_result[14]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[15]<<16 | alt_result[25]<<8 | alt_result[5]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[6]<<16 | alt_result[16]<<8 | alt_result[26]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[27]<<16 | alt_result[7]<<8 | alt_result[17]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[18]<<16 | alt_result[28]<<8 | alt_result[8]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[9]<<16 | alt_result[19]<<8 | alt_result[29]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = 0<<16 | alt_result[31]<<8 | alt_result[30]
-	var n int = 3
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
+	b64_from_24bit(alt_result[0], alt_result[10], alt_result[20], 4)
+	b64_from_24bit(alt_result[21], alt_result[1], alt_result[11], 4)
+	b64_from_24bit(alt_result[12], alt_result[22], alt_result[2], 4)
+	b64_from_24bit(alt_result[3], alt_result[13], alt_result[23], 4)
+	b64_from_24bit(alt_result[24], alt_result[4], alt_result[14], 4)
+	b64_from_24bit(alt_result[15], alt_result[25], alt_result[5], 4)
+	b64_from_24bit(alt_result[6], alt_result[16], alt_result[26], 4)
+	b64_from_24bit(alt_result[27], alt_result[7], alt_result[17], 4)
+	b64_from_24bit(alt_result[18], alt_result[28], alt_result[8], 4)
+	b64_from_24bit(alt_result[9], alt_result[19], alt_result[29], 4)
+	b64_from_24bit(0, alt_result[31], alt_result[30], 3)
 	if buflen <= 0 {
 		errno = ERANGE
 		buffer = nil
@@ -661,16 +582,16 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 
 	Sha256InitCtx(&ctx)
 	Sha256FinishCtx(&ctx, alt_result)
-	core.PhpExplicitBzero(temp_result, g.SizeOf("temp_result"))
-	core.PhpExplicitBzero(p_bytes, key_len)
-	core.PhpExplicitBzero(s_bytes, salt_len)
-	core.PhpExplicitBzero(&ctx, g.SizeOf("ctx"))
-	core.PhpExplicitBzero(&alt_ctx, g.SizeOf("alt_ctx"))
+	zend.ZEND_SECURE_ZERO(temp_result, b.SizeOf("temp_result"))
+	zend.ZEND_SECURE_ZERO(p_bytes, key_len)
+	zend.ZEND_SECURE_ZERO(s_bytes, salt_len)
+	zend.ZEND_SECURE_ZERO(&ctx, b.SizeOf("ctx"))
+	zend.ZEND_SECURE_ZERO(&alt_ctx, b.SizeOf("alt_ctx"))
 	if copied_key != nil {
-		core.PhpExplicitBzero(copied_key, key_len)
+		zend.ZEND_SECURE_ZERO(copied_key, key_len)
 	}
 	if copied_salt != nil {
-		core.PhpExplicitBzero(copied_salt, salt_len)
+		zend.ZEND_SECURE_ZERO(copied_salt, salt_len)
 	}
 	return buffer
 }
@@ -686,7 +607,7 @@ func PhpSha256Crypt(key *byte, salt *byte) *byte {
 
 	var buffer *byte
 	var buflen int = 0
-	var needed int = g.SizeOf("sha256_salt_prefix") - 1 + g.SizeOf("sha256_rounds_prefix") + 9 + 1 + int(strlen(salt)+1+43+1)
+	var needed int = b.SizeOf("sha256_salt_prefix") - 1 + b.SizeOf("sha256_rounds_prefix") + 9 + 1 + int(strlen(salt)+1+43+1)
 	if buflen < needed {
 		var new_buffer *byte = (*byte)(realloc(buffer, needed))
 		if new_buffer == nil {

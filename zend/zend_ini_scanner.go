@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_ini_scanner.h>
@@ -31,11 +31,9 @@ import (
 
 /* Scanner modes */
 
-// #define ZEND_INI_SCANNER_NORMAL       0
-
-// #define ZEND_INI_SCANNER_RAW       1
-
-// #define ZEND_INI_SCANNER_TYPED       2
+const ZEND_INI_SCANNER_NORMAL = 0
+const ZEND_INI_SCANNER_RAW = 1
+const ZEND_INI_SCANNER_TYPED = 2
 
 // Source: <Zend/zend_ini_scanner.c>
 
@@ -64,33 +62,34 @@ import (
 
 // #define YYFILL(n) { if ( YYCURSOR > YYLIMIT ) return 0 ; }
 
-// #define YYCURSOR       SCNG ( yy_cursor )
+const YYCURSOR = SCNG(yy_cursor)
+const YYLIMIT = SCNG(yy_limit)
+const YYMARKER = SCNG(yy_marker)
 
-// #define YYLIMIT       SCNG ( yy_limit )
-
-// #define YYMARKER       SCNG ( yy_marker )
-
-// #define YYGETCONDITION() SCNG ( yy_state )
-
-// #define YYSETCONDITION(s) SCNG ( yy_state ) = s
+func YYGETCONDITION() __auto__ { return SCNG(yy_state) }
+func YYSETCONDITION(s int) __auto__ {
+	SCNG(yy_state) = s
+	return SCNG(yy_state)
+}
 
 // #define STATE(name) yyc ## name
 
 /* emulate flex constructs */
 
-// #define BEGIN(state) YYSETCONDITION ( STATE ( state ) )
+func BEGIN(state __auto__) __auto__ { return YYSETCONDITION(yycstate) }
 
-// #define YYSTATE       YYGETCONDITION ( )
+const YYSTATE = YYGETCONDITION()
+const Yytext *byte = (*byte)(SCNG(yy_text))
+const Yyleng = SCNG(yy_leng)
 
-// #define yytext       ( ( char * ) SCNG ( yy_text ) )
-
-// #define yyleng       SCNG ( yy_leng )
-
-// #define yyless(x) do { YYCURSOR = ( unsigned char * ) yytext + x ; yyleng = ( unsigned int ) x ; } while ( 0 )
+func Yyless(x *byte) {
+	YYCURSOR = (*uint8)(Yytext + x)
+	Yyleng = uint(x)
+}
 
 /* #define yymore()     goto yymore_restart */
 
-// #define YYMAXFILL       6
+const YYMAXFILL = 6
 
 /* How it works (for the core ini directives):
  * ===========================================
@@ -112,23 +111,35 @@ import (
  *    stored in separate hash defined by SAPI.
  */
 
-// #define SCNG       INI_SCNG
-
-// #define ZEND_SYSTEM_INI       CG ( ini_parser_unbuffered_errors )
+const SCNG = INI_SCNG
 
 /* Eat leading whitespace */
 
-// #define EAT_LEADING_WHITESPACE() while ( yyleng ) { if ( yytext [ 0 ] == ' ' || yytext [ 0 ] == '\t' ) { SCNG ( yy_text ) ++ ; yyleng -- ; } else { break ; } }
+func EAT_LEADING_WHITESPACE() {
+	for Yyleng != 0 {
+		if Yytext[0] == ' ' || Yytext[0] == '\t' {
+			SCNG(yy_text)++
+			Yyleng--
+		} else {
+			break
+		}
+	}
+}
 
 /* Eat trailing whitespace + extra char */
 
-// #define EAT_TRAILING_WHITESPACE_EX(ch) while ( yyleng && ( ( ch != 'X' && yytext [ yyleng - 1 ] == ch ) || yytext [ yyleng - 1 ] == '\n' || yytext [ yyleng - 1 ] == '\r' || yytext [ yyleng - 1 ] == '\t' || yytext [ yyleng - 1 ] == ' ' ) ) { yyleng -- ; }
+func EAT_TRAILING_WHITESPACE_EX(ch char) {
+	for Yyleng != 0 && (ch != 'X' && Yytext[Yyleng-1] == ch || Yytext[Yyleng-1] == '\n' || Yytext[Yyleng-1] == '\r' || Yytext[Yyleng-1] == '\t' || Yytext[Yyleng-1] == ' ') {
+		Yyleng--
+	}
+}
 
 /* Eat trailing whitespace */
 
-// #define EAT_TRAILING_WHITESPACE() EAT_TRAILING_WHITESPACE_EX ( 'X' )
-
-// #define zend_ini_copy_value(retval,str,len) ZVAL_NEW_STR ( retval , zend_string_init ( str , len , ZEND_SYSTEM_INI ) )
+func EAT_TRAILING_WHITESPACE() { EAT_TRAILING_WHITESPACE_EX('X') }
+func ZendIniCopyValue(retval *Zval, str *byte, len_ int) {
+	ZVAL_NEW_STR(retval, ZendStringInit(str, len_, ZEND_SYSTEM_INI))
+}
 
 // #define RETURN_TOKEN(type,str,len) { if ( SCNG ( scanner_mode ) == ZEND_INI_SCANNER_TYPED && ( YYSTATE == STATE ( ST_VALUE ) || YYSTATE == STATE ( ST_RAW ) ) ) { zend_ini_copy_typed_value ( ini_lval , type , str , len ) ; } else { zend_ini_copy_value ( ini_lval , str , len ) ; } return type ; }
 
@@ -137,16 +148,12 @@ func ConvertToNumber(retval *Zval, str *byte, str_len int) int {
 	var overflow int
 	var lval ZendLong
 	var dval float64
-	if g.Assign(&type_, IsNumericStringEx(str, str_len, &lval, &dval, 0, &overflow)) != 0 {
-		if type_ == 4 {
-			var __z *Zval = retval
-			__z.GetValue().SetLval(lval)
-			__z.SetTypeInfo(4)
+	if b.Assign(&type_, IsNumericStringEx(str, str_len, &lval, &dval, 0, &overflow)) != 0 {
+		if type_ == IS_LONG {
+			ZVAL_LONG(retval, lval)
 			return SUCCESS
-		} else if type_ == 5 && overflow == 0 {
-			var __z *Zval = retval
-			__z.GetValue().SetDval(dval)
-			__z.SetTypeInfo(5)
+		} else if type_ == IS_DOUBLE && overflow == 0 {
+			ZVAL_DOUBLE(retval, dval)
 			return SUCCESS
 		}
 	}
@@ -157,45 +164,38 @@ func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
 	case BOOL_FALSE:
 
 	case BOOL_TRUE:
-		if type_ == BOOL_TRUE {
-			retval.SetTypeInfo(3)
-		} else {
-			retval.SetTypeInfo(2)
-		}
+		ZVAL_BOOL(retval, type_ == BOOL_TRUE)
 		break
 	case NULL_NULL:
-		retval.SetTypeInfo(1)
+		ZVAL_NULL(retval)
 		break
 	case TC_NUMBER:
 		if ConvertToNumber(retval, str, len_) == SUCCESS {
 			break
 		}
 	default:
-		var __z *Zval = retval
-		var __s *ZendString = ZendStringInit(str, len_, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(retval, str, len_)
 	}
 }
 func _yyPushState(new_state int) {
-	ZendStackPush(&(IniScannerGlobals.GetStateStack()), any(&(IniScannerGlobals.GetYyState())))
-	IniScannerGlobals.SetYyState(new_state)
+	ZendStackPush(&SCNG(state_stack), any(&YYGETCONDITION()))
+	YYSETCONDITION(new_state)
 }
 
 // #define yy_push_state(state_and_tsrm) _yy_push_state ( yyc ## state_and_tsrm )
 
 func YyPopState() {
-	var stack_state *int = ZendStackTop(&(IniScannerGlobals.GetStateStack()))
-	IniScannerGlobals.SetYyState(*stack_state)
-	ZendStackDelTop(&(IniScannerGlobals.GetStateStack()))
+	var stack_state *int = ZendStackTop(&SCNG(state_stack))
+	YYSETCONDITION(*stack_state)
+	ZendStackDelTop(&SCNG(state_stack))
 }
 func YyScanBuffer(str *byte, len_ uint) {
-	IniScannerGlobals.SetYyCursor((*uint8)(str))
-	IniScannerGlobals.SetYyStart(IniScannerGlobals.GetYyCursor())
-	IniScannerGlobals.SetYyLimit(IniScannerGlobals.GetYyCursor() + len_)
+	YYCURSOR = (*uint8)(str)
+	SCNG(yy_start) = YYCURSOR
+	YYLIMIT = YYCURSOR + len_
 }
 
-// #define ini_filename       SCNG ( filename )
+const IniFilename any = SCNG(filename)
 
 /* {{{ init_ini_scanner()
  */
@@ -203,41 +203,41 @@ func YyScanBuffer(str *byte, len_ uint) {
 func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 	/* Sanity check */
 
-	if scanner_mode != 0 && scanner_mode != 1 && scanner_mode != 2 {
-		ZendError(1<<1, "Invalid scanner mode")
+	if scanner_mode != ZEND_INI_SCANNER_NORMAL && scanner_mode != ZEND_INI_SCANNER_RAW && scanner_mode != ZEND_INI_SCANNER_TYPED {
+		ZendError(E_WARNING, "Invalid scanner mode")
 		return FAILURE
 	}
-	IniScannerGlobals.SetLineno(1)
-	IniScannerGlobals.SetScannerMode(scanner_mode)
-	IniScannerGlobals.SetYyIn(fh)
+	SCNG(lineno) = 1
+	SCNG(scanner_mode) = scanner_mode
+	SCNG(yy_in) = fh
 	if fh != nil {
-		IniScannerGlobals.SetFilename(ZendStrndup(fh.GetFilename(), strlen(fh.GetFilename())))
+		IniFilename = ZendStrndup(fh.GetFilename(), strlen(fh.GetFilename()))
 	} else {
-		IniScannerGlobals.SetFilename(nil)
+		IniFilename = nil
 	}
-	ZendStackInit(&(IniScannerGlobals.GetStateStack()), g.SizeOf("int"))
-	IniScannerGlobals.SetYyState(yycINITIAL)
+	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
+	BEGIN(INITIAL)
 	return SUCCESS
 }
 
 /* }}} */
 
 func ShutdownIniScanner() {
-	ZendStackDestroy(&(IniScannerGlobals.GetStateStack()))
-	if IniScannerGlobals.GetFilename() != nil {
-		Free(IniScannerGlobals.GetFilename())
+	ZendStackDestroy(&SCNG(state_stack))
+	if IniFilename {
+		Free(IniFilename)
 	}
 }
 
 /* }}} */
 
-func ZendIniScannerGetLineno() int { return IniScannerGlobals.GetLineno() }
+func ZendIniScannerGetLineno() int { return SCNG(lineno) }
 
 /* }}} */
 
 func ZendIniScannerGetFilename() *byte {
-	if IniScannerGlobals.GetFilename() != nil {
-		return IniScannerGlobals.GetFilename()
+	if IniFilename {
+		return IniFilename
 	} else {
 		return "Unknown"
 	}
@@ -276,46 +276,43 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 	var s *byte
 	var t *byte
 	var end *byte
-	var __z *Zval = lval
-	var __s *ZendString = ZendStringInit(str, len_, CG.GetIniParserUnbufferedErrors())
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZendIniCopyValue(lval, str, len_)
 
 	/* convert escape sequences */
 
-	t = lval.GetValue().GetStr().GetVal()
+	t = Z_STRVAL_P(lval)
 	s = t
-	end = s + lval.GetValue().GetStr().GetLen()
+	end = s + Z_STRLEN_P(lval)
 	for s < end {
 		if (*s) == '\\' {
 			s++
 			if s >= end {
-				g.PostInc(&(*t)) = '\\'
+				b.PostInc(&(*t)) = '\\'
 				continue
 			}
 			switch *s {
 			case '"':
 				if (*s) != quote_type {
-					g.PostInc(&(*t)) = '\\'
-					g.PostInc(&(*t)) = *s
+					b.PostInc(&(*t)) = '\\'
+					b.PostInc(&(*t)) = *s
 					break
 				}
 			case '\\':
 
 			case '$':
-				g.PostInc(&(*t)) = *s
-				lval.GetValue().GetStr().GetLen()--
+				b.PostInc(&(*t)) = *s
+				Z_STRLEN_P(lval)--
 				break
 			default:
-				g.PostInc(&(*t)) = '\\'
-				g.PostInc(&(*t)) = *s
+				b.PostInc(&(*t)) = '\\'
+				b.PostInc(&(*t)) = *s
 				break
 			}
 		} else {
-			g.PostInc(&(*t)) = *s
+			b.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			IniScannerGlobals.GetLineno()++
+			SCNG(lineno)++
 		}
 		s++
 	}
@@ -326,13 +323,13 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 
 func IniLex(ini_lval *Zval) int {
 restart:
-	IniScannerGlobals.SetYyText(IniScannerGlobals.GetYyCursor())
+	SCNG(yy_text) = YYCURSOR
 
 	/* yymore_restart: */
 
-	if IniScannerGlobals.GetYyCursor() >= IniScannerGlobals.GetYyLimit() {
-		if IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW {
-			IniScannerGlobals.SetYyState(yycINITIAL)
+	if YYCURSOR >= YYLIMIT {
+		if YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW {
+			BEGIN(INITIAL)
 			return END_OF_LINE
 		}
 		return 0
@@ -340,37 +337,37 @@ restart:
 
 	/* Eat any UTF-8 BOM we find in the first 3 bytes */
 
-	if IniScannerGlobals.GetYyCursor() == IniScannerGlobals.GetYyStart() && IniScannerGlobals.GetYyCursor()+3 < IniScannerGlobals.GetYyLimit() {
-		if memcmp(IniScannerGlobals.GetYyCursor(), "xefxbbxbf", 3) == 0 {
-			IniScannerGlobals.SetYyCursor(IniScannerGlobals.GetYyCursor() + 3)
+	if YYCURSOR == SCNG(yy_start) && YYCURSOR+3 < YYLIMIT {
+		if memcmp(YYCURSOR, "xefxbbxbf", 3) == 0 {
+			YYCURSOR += 3
 			goto restart
 		}
 	}
 	var yych uint8
 	var yyaccept uint = 0
-	if IniScannerGlobals.GetYyState() < 4 {
-		if IniScannerGlobals.GetYyState() < 2 {
-			if IniScannerGlobals.GetYyState() < 1 {
+	if YYGETCONDITION() < 4 {
+		if YYGETCONDITION() < 2 {
+			if YYGETCONDITION() < 1 {
 				goto yyc_INITIAL
 			} else {
 				goto yyc_ST_OFFSET
 			}
 		} else {
-			if IniScannerGlobals.GetYyState() < 3 {
+			if YYGETCONDITION() < 3 {
 				goto yyc_ST_SECTION_VALUE
 			} else {
 				goto yyc_ST_VALUE
 			}
 		}
 	} else {
-		if IniScannerGlobals.GetYyState() < 6 {
-			if IniScannerGlobals.GetYyState() < 5 {
+		if YYGETCONDITION() < 6 {
+			if YYGETCONDITION() < 5 {
 				goto yyc_ST_SECTION_RAW
 			} else {
 				goto yyc_ST_DOUBLE_QUOTES
 			}
 		} else {
-			if IniScannerGlobals.GetYyState() < 7 {
+			if YYGETCONDITION() < 7 {
 				goto yyc_ST_VARNAME
 			} else {
 				goto yyc_ST_RAW
@@ -382,10 +379,10 @@ restart:
 
 yyc_INITIAL:
 	var yybm []uint8 = []uint8{144, 144, 144, 144, 144, 144, 144, 144, 144, 160, 0, 144, 144, 0, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 240, 128, 128, 144, 128, 144, 128, 144, 128, 128, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 128, 144, 128, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 128, 144, 144, 128, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 128, 128, 128, 128, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144, 144}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	switch yych {
 	case '\t':
 		goto yy4
@@ -475,43 +472,31 @@ yyc_INITIAL:
 		goto yy2
 	}
 yy2:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy25
 yy3:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading whitespace */
 
-	for IniScannerGlobals.GetYyLeng() != 0 {
-		if (*byte)(IniScannerGlobals.GetYyText())[0] == ' ' || (*byte)(IniScannerGlobals.GetYyText())[0] == '\t' {
-			IniScannerGlobals.GetYyText()++
-			IniScannerGlobals.GetYyLeng()--
-		} else {
-			break
-		}
-	}
+	EAT_LEADING_WHITESPACE()
 
 	/* Eat trailing whitespace */
 
-	for IniScannerGlobals.GetYyLeng() != 0 && ('X' != 'X' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == 'X' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\n' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\r' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\t' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == ' ') {
-		IniScannerGlobals.GetYyLeng()--
-	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_LABEL, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	EAT_TRAILING_WHITESPACE()
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_LABEL, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_LABEL
 yy4:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy63
 yy5:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* eat whitespace */
 
@@ -520,20 +505,20 @@ yy5:
 	/* eat whitespace */
 
 yy6:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy7:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy8:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy66
 	}
 	goto yy7
 yy9:
 	yyaccept = 1
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 0x1f {
 		if yych <= '\n' {
 			if yych <= 0x8 {
@@ -566,32 +551,32 @@ yy9:
 		}
 	}
 yy10:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	return (*byte)(IniScannerGlobals.GetYyText())[0]
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	return Yytext[0]
 yy12:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy25
 yy13:
 	yyaccept = 2
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy58
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
 yy15:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy56
 yy16:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 1 {
-		IniScannerGlobals.SetYyState(yycST_RAW)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_RAW {
+		BEGIN(ST_RAW)
 	} else {
-		IniScannerGlobals.SetYyState(yycST_VALUE)
+		BEGIN(ST_VALUE)
 	}
 	return '='
 yy17:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy52
 	}
@@ -600,7 +585,7 @@ yy17:
 	}
 	goto yy25
 yy18:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'U' {
 		if yych == 'O' {
 			goto yy43
@@ -623,7 +608,7 @@ yy18:
 		}
 	}
 yy19:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= 'N' {
 		if yych == 'F' {
 			goto yy37
@@ -646,7 +631,7 @@ yy19:
 		}
 	}
 yy20:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'R' {
 		goto yy35
 	}
@@ -655,7 +640,7 @@ yy20:
 	}
 	goto yy25
 yy21:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy26
 	}
@@ -664,23 +649,23 @@ yy21:
 	}
 	goto yy25
 yy22:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Enter section data lookup state */
 
-	if IniScannerGlobals.GetScannerMode() == 1 {
-		IniScannerGlobals.SetYyState(yycST_SECTION_RAW)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_RAW {
+		BEGIN(ST_SECTION_RAW)
 	} else {
-		IniScannerGlobals.SetYyState(yycST_SECTION_VALUE)
+		BEGIN(ST_SECTION_VALUE)
 	}
 	return TC_SECTION
 yy24:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy25:
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy24
@@ -690,7 +675,7 @@ yy25:
 	}
 	goto yy3
 yy26:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy30
 	}
@@ -699,51 +684,39 @@ yy26:
 	}
 	goto yy25
 yy27:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy27
 	}
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading whitespace */
 
-	for IniScannerGlobals.GetYyLeng() != 0 {
-		if (*byte)(IniScannerGlobals.GetYyText())[0] == ' ' || (*byte)(IniScannerGlobals.GetYyText())[0] == '\t' {
-			IniScannerGlobals.GetYyText()++
-			IniScannerGlobals.GetYyLeng()--
-		} else {
-			break
-		}
-	}
+	EAT_LEADING_WHITESPACE()
 
 	/* Eat trailing whitespace and [ */
 
-	for IniScannerGlobals.GetYyLeng() != 0 && ('[' != 'X' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '[' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\n' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\r' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\t' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == ' ') {
-		IniScannerGlobals.GetYyLeng()--
-	}
+	EAT_TRAILING_WHITESPACE_EX('[')
 
 	/* Enter offset lookup state */
 
-	IniScannerGlobals.SetYyState(yycST_OFFSET)
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_OFFSET, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	BEGIN(ST_OFFSET)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_OFFSET, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_OFFSET
 yy30:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy30
 	}
@@ -805,22 +778,19 @@ yy30:
 		}
 	}
 yy32:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, BOOL_TRUE, "1", 1)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("1", 1, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "1", 1)
 	}
 	return BOOL_TRUE
 yy33:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '\t' {
 		goto yy33
 	}
@@ -829,7 +799,7 @@ yy33:
 	}
 	goto yy32
 yy35:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'U' {
 		goto yy36
 	}
@@ -837,7 +807,7 @@ yy35:
 		goto yy25
 	}
 yy36:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy30
 	}
@@ -846,7 +816,7 @@ yy36:
 	}
 	goto yy25
 yy37:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'F' {
 		goto yy38
 	}
@@ -854,11 +824,11 @@ yy37:
 		goto yy25
 	}
 yy38:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -921,22 +891,19 @@ yy38:
 		}
 	}
 yy40:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, BOOL_FALSE, "", 0)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("", 0, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "", 0)
 	}
 	return BOOL_FALSE
 yy41:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '\t' {
 		goto yy41
 	}
@@ -945,7 +912,7 @@ yy41:
 	}
 	goto yy40
 yy43:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '\'' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -1021,7 +988,7 @@ yy43:
 		}
 	}
 yy44:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy45
 	}
@@ -1029,7 +996,7 @@ yy44:
 		goto yy25
 	}
 yy45:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy46
 	}
@@ -1037,11 +1004,11 @@ yy45:
 		goto yy25
 	}
 yy46:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -1104,22 +1071,19 @@ yy46:
 		}
 	}
 yy48:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, NULL_NULL, "", 0)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("", 0, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "", 0)
 	}
 	return NULL_NULL
 yy49:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '\t' {
 		goto yy49
 	}
@@ -1128,7 +1092,7 @@ yy49:
 	}
 	goto yy48
 yy51:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy38
 	}
@@ -1137,7 +1101,7 @@ yy51:
 	}
 	goto yy25
 yy52:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'L' {
 		goto yy53
 	}
@@ -1145,7 +1109,7 @@ yy52:
 		goto yy25
 	}
 yy53:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'S' {
 		goto yy54
 	}
@@ -1153,7 +1117,7 @@ yy53:
 		goto yy25
 	}
 yy54:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'E' {
 		goto yy38
 	}
@@ -1162,11 +1126,11 @@ yy54:
 	}
 	goto yy25
 yy55:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy56:
 	if yych == '\t' {
 		goto yy55
@@ -1176,11 +1140,11 @@ yy56:
 	}
 	goto yy16
 yy57:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy58:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy57
@@ -1189,26 +1153,26 @@ yy58:
 		goto yy61
 	}
 yy59:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy60:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy61:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy59
 	}
 	goto yy60
 yy62:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy63:
 	if yych <= 0x1f {
 		if yych <= '\n' {
@@ -1243,12 +1207,12 @@ yy63:
 	}
 yy64:
 	yyaccept = 1
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -1320,11 +1284,11 @@ yy64:
 		}
 	}
 yy66:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy7
 yy67:
-	IniScannerGlobals.GetYyCursor()++
-	if g.Assign(&yych, *(IniScannerGlobals.GetYyCursor())) == '\n' {
+	YYCURSOR++
+	if b.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy66
 	}
 	goto yy7
@@ -1333,70 +1297,70 @@ yy67:
 
 yyc_ST_DOUBLE_QUOTES:
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '"' {
 		goto yy72
 	}
 	if yych == '$' {
 		goto yy74
 	}
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy71:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	for IniScannerGlobals.GetYyCursor() < IniScannerGlobals.GetYyLimit() {
-		switch g.PostInc(&(*(IniScannerGlobals.GetYyCursor()))) {
+	for YYCURSOR < YYLIMIT {
+		switch b.PostInc(&(*YYCURSOR)) {
 		case '"':
-			if IniScannerGlobals.GetYyCursor() < IniScannerGlobals.GetYyLimit() && IniScannerGlobals.GetYyCursor()[-2] == '\\' && (*(IniScannerGlobals.GetYyCursor())) != '\r' && (*(IniScannerGlobals.GetYyCursor())) != '\n' {
+			if YYCURSOR < YYLIMIT && YYCURSOR[-2] == '\\' && (*YYCURSOR) != '\r' && (*YYCURSOR) != '\n' {
 				continue
 			}
 			break
 		case '$':
-			if (*(IniScannerGlobals.GetYyCursor())) == '{' {
+			if (*YYCURSOR) == '{' {
 				break
 			}
 			continue
 		case '\\':
-			if IniScannerGlobals.GetYyCursor() < IniScannerGlobals.GetYyLimit() && (*(IniScannerGlobals.GetYyCursor())) != '"' {
-				IniScannerGlobals.GetYyCursor()++
+			if YYCURSOR < YYLIMIT && (*YYCURSOR) != '"' {
+				YYCURSOR++
 			}
 		default:
 			continue
 		}
-		IniScannerGlobals.GetYyCursor()--
+		YYCURSOR--
 		break
 	}
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	ZendIniEscapeString(ini_lval, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), '"')
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	ZendIniEscapeString(ini_lval, Yytext, Yyleng, '"')
 	return TC_QUOTED_STRING
 yy72:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy78
 yy73:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	YyPopState()
 	return '"'
 yy74:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '{' {
 		goto yy71
 	}
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_VARNAME)
 	return TC_DOLLAR_CURLY
 yy77:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy78:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy77
@@ -1407,10 +1371,10 @@ yy78:
 
 yyc_ST_OFFSET:
 	var yybm []uint8 = []uint8{66, 66, 66, 66, 66, 66, 66, 66, 66, 194, 64, 66, 66, 64, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 194, 66, 64, 66, 68, 66, 66, 0, 66, 66, 66, 66, 66, 66, 66, 66, 114, 114, 114, 114, 114, 114, 114, 114, 114, 114, 66, 64, 66, 66, 66, 66, 66, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 66, 72, 64, 66, 82, 66, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 82, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '-' {
 		if yych <= ' ' {
 			if yych <= '\n' {
@@ -1486,22 +1450,19 @@ yyc_ST_OFFSET:
 	}
 yy81:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy100
 yy82:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_STRING, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_STRING, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_STRING
 yy83:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy126
 	}
@@ -1513,18 +1474,18 @@ yy83:
 	}
 	goto yy100
 yy84:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy85:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
 yy86:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy87:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy88:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy85
@@ -1541,14 +1502,14 @@ yy88:
 	}
 yy89:
 	yyaccept = 1
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy120
 	}
 	goto yy85
 yy90:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy100
 	}
@@ -1558,7 +1519,7 @@ yy90:
 	goto yy100
 yy91:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy100
 	}
@@ -1568,7 +1529,7 @@ yy91:
 	goto yy100
 yy92:
 	yyaccept = 2
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '\'' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -1607,19 +1568,16 @@ yy92:
 		}
 	}
 yy93:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_NUMBER
 yy94:
 	yyaccept = 3
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy110
 	}
@@ -1651,33 +1609,30 @@ yy94:
 		}
 	}
 yy95:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_CONSTANT
 yy96:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy99
 yy97:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy98:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
 	return ']'
 yy99:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy100:
 	if (yybm[0+yych] & 2) != 0 {
 		goto yy99
@@ -1689,18 +1644,18 @@ yy100:
 		goto yy82
 	}
 yy101:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	goto yy99
 yy102:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy103
@@ -1715,7 +1670,7 @@ yy102:
 		}
 	}
 yy103:
-	IniScannerGlobals.SetYyCursor(IniScannerGlobals.GetYyMarker())
+	YYCURSOR = YYMARKER
 	if yyaccept <= 1 {
 		if yyaccept <= 0 {
 			goto yy82
@@ -1730,11 +1685,11 @@ yy103:
 		}
 	}
 yy104:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy105
 	}
@@ -1743,11 +1698,11 @@ yy104:
 	}
 	goto yy99
 yy105:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy105
 	}
@@ -1756,11 +1711,11 @@ yy105:
 	}
 	goto yy99
 yy107:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy105
 	}
@@ -1769,11 +1724,11 @@ yy107:
 	}
 	goto yy99
 yy109:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy105
 	}
@@ -1783,12 +1738,12 @@ yy109:
 	goto yy99
 yy110:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy110
 	}
@@ -1834,12 +1789,12 @@ yy110:
 	}
 yy112:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy112
 	}
@@ -1885,12 +1840,12 @@ yy112:
 	}
 yy114:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '\'' {
 		if yych <= '!' {
 			if yych <= '\n' {
@@ -1955,12 +1910,12 @@ yy114:
 	}
 yy116:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -2014,12 +1969,12 @@ yy116:
 	}
 yy118:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -2072,45 +2027,42 @@ yy118:
 		}
 	}
 yy120:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy120
 	}
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading and trailing single quotes */
 
-	if (*byte)(IniScannerGlobals.GetYyText())[0] == '\'' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\'' {
-		IniScannerGlobals.GetYyText()++
-		IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyLeng() - 2)
+	if Yytext[0] == '\'' && Yytext[Yyleng-1] == '\'' {
+		SCNG(yy_text)++
+		Yyleng = Yyleng - 2
 	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_RAW, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_RAW, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_RAW
 yy124:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_VARNAME)
 	return TC_DOLLAR_CURLY
 yy126:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy126
 	}
@@ -2155,21 +2107,21 @@ yy126:
 		}
 	}
 yy128:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy87
 yy129:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy98
 
 	/* *********************************** */
 
 yyc_ST_RAW:
 	var yybm []uint8 = []uint8{64, 64, 64, 64, 64, 64, 64, 64, 64, 192, 0, 64, 64, 0, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 192, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= 'f' {
 		if yych <= 0x8 {
 			if yych >= 0x1 {
@@ -2200,25 +2152,18 @@ yyc_ST_RAW:
 			goto yy134
 		}
 	}
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
 	return END_OF_LINE
 yy134:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy135:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	var sc *uint8 = nil
-	for IniScannerGlobals.GetYyLeng() != 0 {
-		if (*byte)(IniScannerGlobals.GetYyText())[0] == ' ' || (*byte)(IniScannerGlobals.GetYyText())[0] == '\t' {
-			IniScannerGlobals.GetYyText()++
-			IniScannerGlobals.GetYyLeng()--
-		} else {
-			break
-		}
-	}
-	for IniScannerGlobals.GetYyCursor() < IniScannerGlobals.GetYyLimit() {
-		switch *(IniScannerGlobals.GetYyCursor()) {
+	EAT_LEADING_WHITESPACE()
+	for YYCURSOR < YYLIMIT {
+		switch *YYCURSOR {
 		case '\n':
 
 		case '\r':
@@ -2226,49 +2171,44 @@ yy135:
 			break
 		case ';':
 			if sc == nil {
-				sc = IniScannerGlobals.GetYyCursor()
+				sc = YYCURSOR
 			}
-			IniScannerGlobals.GetYyCursor()++
+			YYCURSOR++
 			break
 		case '"':
-			if (*byte)(IniScannerGlobals.GetYyText())[0] == '"' {
+			if Yytext[0] == '"' {
 				sc = nil
 			}
-			IniScannerGlobals.GetYyCursor()++
+			YYCURSOR++
 			break
 		default:
-			IniScannerGlobals.GetYyCursor()++
+			YYCURSOR++
 			break
 		}
 	}
 end_raw_value_chars:
 	if sc != nil {
-		IniScannerGlobals.SetYyLeng(sc - IniScannerGlobals.GetYyText())
+		Yyleng = sc - SCNG(yy_text)
 	} else {
-		IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+		Yyleng = YYCURSOR - SCNG(yy_text)
 	}
-	for IniScannerGlobals.GetYyLeng() != 0 && ('X' != 'X' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == 'X' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\n' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\r' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\t' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == ' ') {
-		IniScannerGlobals.GetYyLeng()--
-	}
+	EAT_TRAILING_WHITESPACE()
 
 	/* Eat leading and trailing double quotes */
 
-	if IniScannerGlobals.GetYyLeng() > 1 && (*byte)(IniScannerGlobals.GetYyText())[0] == '"' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '"' {
-		IniScannerGlobals.GetYyText()++
-		IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyLeng() - 2)
+	if Yyleng > 1 && Yytext[0] == '"' && Yytext[Yyleng-1] == '"' {
+		SCNG(yy_text)++
+		Yyleng = Yyleng - 2
 	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_RAW, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_RAW, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_RAW
 yy136:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '\r' {
 		if yych <= 0x8 {
 			goto yy135
@@ -2294,28 +2234,28 @@ yy136:
 		}
 	}
 yy137:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy138:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy139:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy146
 	}
 	goto yy138
 yy140:
 	yyaccept = 1
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy142
 yy141:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy142:
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy141
@@ -2324,29 +2264,29 @@ yy142:
 		goto yy145
 	}
 yy143:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy144:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy145:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy143
 	}
 	goto yy144
 yy146:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy138
 yy147:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy148:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy147
@@ -2363,7 +2303,7 @@ yy148:
 			goto yy141
 		}
 	}
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* eat whitespace */
 
@@ -2372,8 +2312,8 @@ yy148:
 	/* eat whitespace */
 
 yy150:
-	IniScannerGlobals.GetYyCursor()++
-	if g.Assign(&yych, *(IniScannerGlobals.GetYyCursor())) == '\n' {
+	YYCURSOR++
+	if b.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy146
 	}
 	goto yy138
@@ -2382,10 +2322,10 @@ yy150:
 
 yyc_ST_SECTION_RAW:
 	var yybm []uint8 = []uint8{128, 128, 128, 128, 128, 128, 128, 128, 128, 192, 0, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 192, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= 'f' {
 		if yych == '\n' {
 			goto yy155
@@ -2398,39 +2338,36 @@ yyc_ST_SECTION_RAW:
 			goto yy157
 		}
 	}
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy164
 yy154:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_RAW, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_RAW, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_RAW
 yy155:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
 yy157:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy160
 yy158:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return ']'
 yy159:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy160:
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy159
@@ -2443,20 +2380,20 @@ yy160:
 	}
 	goto yy158
 yy161:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy158
 yy162:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy161
 	}
 	goto yy158
 yy163:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy164:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy163
@@ -2467,10 +2404,10 @@ yy164:
 
 yyc_ST_SECTION_VALUE:
 	var yybm []uint8 = []uint8{132, 132, 132, 132, 132, 132, 132, 132, 132, 134, 128, 132, 132, 128, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 134, 132, 128, 132, 136, 132, 132, 0, 132, 132, 132, 132, 132, 132, 132, 132, 228, 228, 228, 228, 228, 228, 228, 228, 228, 228, 132, 128, 132, 132, 132, 132, 132, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 132, 144, 128, 132, 164, 132, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132, 132}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '-' {
 		if yych <= ' ' {
 			if yych <= '\n' {
@@ -2546,22 +2483,19 @@ yyc_ST_SECTION_VALUE:
 	}
 yy167:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy190
 yy168:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_STRING, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_STRING, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_STRING
 yy169:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 0x1f {
 		if yych == '\t' {
 			goto yy216
@@ -2577,18 +2511,18 @@ yy169:
 		goto yy190
 	}
 yy170:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy171:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
 yy172:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy173:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy174:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy171
@@ -2605,14 +2539,14 @@ yy174:
 	}
 yy175:
 	yyaccept = 1
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy210
 	}
 	goto yy171
 yy176:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy190
 	}
@@ -2622,7 +2556,7 @@ yy176:
 	goto yy190
 yy177:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy190
 	}
@@ -2632,7 +2566,7 @@ yy177:
 	goto yy190
 yy178:
 	yyaccept = 2
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '\'' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -2671,19 +2605,16 @@ yy178:
 		}
 	}
 yy179:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_NUMBER
 yy180:
 	yyaccept = 3
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy200
 	}
@@ -2715,34 +2646,31 @@ yy180:
 		}
 	}
 yy181:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_CONSTANT
 yy182:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy189
 yy183:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy186
 yy184:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return ']'
 yy185:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy186:
 	if (yybm[0+yych] & 2) != 0 {
 		goto yy185
@@ -2755,22 +2683,22 @@ yy186:
 	}
 	goto yy184
 yy187:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy184
 yy188:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy187
 	}
 	goto yy184
 yy189:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy190:
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy189
@@ -2782,18 +2710,18 @@ yy190:
 		goto yy168
 	}
 yy191:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	goto yy189
 yy192:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy193
@@ -2808,7 +2736,7 @@ yy192:
 		}
 	}
 yy193:
-	IniScannerGlobals.SetYyCursor(IniScannerGlobals.GetYyMarker())
+	YYCURSOR = YYMARKER
 	if yyaccept <= 1 {
 		if yyaccept <= 0 {
 			goto yy168
@@ -2823,11 +2751,11 @@ yy193:
 		}
 	}
 yy194:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy195
 	}
@@ -2836,11 +2764,11 @@ yy194:
 	}
 	goto yy189
 yy195:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy195
 	}
@@ -2849,11 +2777,11 @@ yy195:
 	}
 	goto yy189
 yy197:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy195
 	}
@@ -2862,11 +2790,11 @@ yy197:
 	}
 	goto yy189
 yy199:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy195
 	}
@@ -2876,12 +2804,12 @@ yy199:
 	goto yy189
 yy200:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy200
 	}
@@ -2927,12 +2855,12 @@ yy200:
 	}
 yy202:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy202
 	}
@@ -2978,12 +2906,12 @@ yy202:
 	}
 yy204:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '\'' {
 		if yych <= '!' {
 			if yych <= '\n' {
@@ -3048,12 +2976,12 @@ yy204:
 	}
 yy206:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -3107,12 +3035,12 @@ yy206:
 	}
 yy208:
 	yyaccept = 2
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '&' {
 		if yych <= '\r' {
 			if yych == '\n' {
@@ -3165,45 +3093,42 @@ yy208:
 		}
 	}
 yy210:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy210
 	}
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading and trailing single quotes */
 
-	if (*byte)(IniScannerGlobals.GetYyText())[0] == '\'' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\'' {
-		IniScannerGlobals.GetYyText()++
-		IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyLeng() - 2)
+	if Yytext[0] == '\'' && Yytext[Yyleng-1] == '\'' {
+		SCNG(yy_text)++
+		Yyleng = Yyleng - 2
 	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_RAW, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_RAW, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_RAW
 yy214:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_VARNAME)
 	return TC_DOLLAR_CURLY
 yy216:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '"' {
 		if yych <= 'f' {
 			if yych <= 0x8 {
@@ -3262,18 +3187,18 @@ yy216:
 		}
 	}
 yy218:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy173
 
 	/* *********************************** */
 
 yyc_ST_VALUE:
 	var yybm []uint8 = []uint8{160, 162, 162, 162, 162, 162, 162, 162, 162, 176, 128, 162, 162, 128, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 176, 160, 160, 162, 168, 162, 160, 32, 160, 160, 162, 162, 162, 162, 162, 162, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 162, 160, 162, 160, 162, 162, 162, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 162, 162, 162, 160, 166, 162, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 166, 162, 160, 162, 160, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162, 162}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	switch yych {
 	case 0x0:
 		goto yy221
@@ -3443,69 +3368,63 @@ yyc_ST_VALUE:
 		goto yy223
 	}
 yy221:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy222:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
 	return END_OF_LINE
 yy223:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy251
 yy224:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_STRING, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_STRING, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_STRING
 yy225:
 	yyaccept = 1
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy305
 yy226:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_WHITESPACE, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_WHITESPACE, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_WHITESPACE
 yy227:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy228:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy229:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy303
 	}
 	goto yy228
 yy230:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy302
 yy231:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	return (*byte)(IniScannerGlobals.GetYyText())[0]
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	return Yytext[0]
 yy232:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy233:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_DOUBLE_QUOTES)
 	return '"'
 yy234:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy222
@@ -3522,14 +3441,14 @@ yy234:
 	}
 yy235:
 	yyaccept = 2
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy295
 	}
 	goto yy222
 yy236:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy251
 	}
@@ -3539,7 +3458,7 @@ yy236:
 	goto yy251
 yy237:
 	yyaccept = 0
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		goto yy251
 	}
@@ -3549,7 +3468,7 @@ yy237:
 	goto yy251
 yy238:
 	yyaccept = 3
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '/' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -3609,30 +3528,26 @@ yy238:
 		}
 	}
 yy239:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_NUMBER, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_NUMBER
 yy240:
 	yyaccept = 2
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	goto yy283
 yy241:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyCursor((*uint8)((*byte)(IniScannerGlobals.GetYyText()) + 0))
-	IniScannerGlobals.SetYyLeng(uint(0))
-	IniScannerGlobals.SetYyState(yycINITIAL)
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	Yyless(0)
+	BEGIN(INITIAL)
 	return END_OF_LINE
 yy243:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -3691,19 +3606,16 @@ yy243:
 		}
 	}
 yy244:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_CONSTANT, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_CONSTANT
 yy245:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '<' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -3789,7 +3701,7 @@ yy245:
 	}
 yy246:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'N' {
 		if yych <= '%' {
 			if yych <= 'f' {
@@ -3893,7 +3805,7 @@ yy246:
 	}
 yy247:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= 'E' {
 		if yych <= '%' {
 			if yych <= 'f' {
@@ -3997,7 +3909,7 @@ yy247:
 	}
 yy248:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4083,7 +3995,7 @@ yy248:
 	}
 yy249:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4169,12 +4081,12 @@ yy249:
 	}
 yy250:
 	yyaccept = 0
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy251:
 	if (yybm[0+yych] & 2) != 0 {
 		goto yy250
@@ -4185,12 +4097,12 @@ yy251:
 	goto yy224
 yy252:
 	yyaccept = 4
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -4261,7 +4173,7 @@ yy252:
 	}
 yy254:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4346,11 +4258,11 @@ yy254:
 		}
 	}
 yy255:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '\\' {
 		if yych <= 0x0 {
 			goto yy256
@@ -4365,7 +4277,7 @@ yy255:
 		}
 	}
 yy256:
-	IniScannerGlobals.SetYyCursor(IniScannerGlobals.GetYyMarker())
+	YYCURSOR = YYMARKER
 	if yyaccept <= 3 {
 		if yyaccept <= 1 {
 			if yyaccept <= 0 {
@@ -4396,21 +4308,21 @@ yy256:
 		}
 	}
 yy257:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy258
 	}
 	goto yy250
 yy258:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 8) != 0 {
 		goto yy258
 	}
@@ -4423,7 +4335,7 @@ yy258:
 	goto yy250
 yy260:
 	yyaccept = 5
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy262
 	}
@@ -4498,29 +4410,26 @@ yy260:
 		}
 	}
 yy261:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, BOOL_TRUE, "1", 1)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("1", 1, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "1", 1)
 	}
 	return BOOL_TRUE
 yy262:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 16) != 0 {
 		goto yy262
 	}
 	goto yy261
 yy264:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4605,7 +4514,7 @@ yy264:
 	}
 yy265:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4691,7 +4600,7 @@ yy265:
 	}
 yy266:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -4776,7 +4685,7 @@ yy266:
 	}
 yy267:
 	yyaccept = 6
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -4839,22 +4748,19 @@ yy267:
 		}
 	}
 yy268:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, BOOL_FALSE, "", 0)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("", 0, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "", 0)
 	}
 	return BOOL_FALSE
 yy269:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '\t' {
 		goto yy269
 	}
@@ -4864,7 +4770,7 @@ yy269:
 	goto yy268
 yy271:
 	yyaccept = 6
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '<' {
 		if yych <= ' ' {
 			if yych <= '\n' {
@@ -4960,7 +4866,7 @@ yy271:
 	}
 yy272:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5045,7 +4951,7 @@ yy272:
 	}
 yy273:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5130,7 +5036,7 @@ yy273:
 	}
 yy274:
 	yyaccept = 7
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if (yybm[0+yych] & 4) != 0 {
 		goto yy252
 	}
@@ -5193,22 +5099,19 @@ yy274:
 		}
 	}
 yy275:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
 		ZendIniCopyTypedValue(ini_lval, NULL_NULL, "", 0)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit("", 0, CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, "", 0)
 	}
 	return NULL_NULL
 yy276:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych == '\t' {
 		goto yy276
 	}
@@ -5218,7 +5121,7 @@ yy276:
 	goto yy275
 yy278:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5304,7 +5207,7 @@ yy278:
 	}
 yy279:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5389,7 +5292,7 @@ yy279:
 	}
 yy280:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5474,7 +5377,7 @@ yy280:
 	}
 yy281:
 	yyaccept = 4
-	yych = *(g.Assign(&(IniScannerGlobals.GetYyMarker()), g.PreInc(&(IniScannerGlobals.GetYyCursor()))))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych <= '=' {
 		if yych <= '"' {
 			if yych <= '\n' {
@@ -5559,11 +5462,11 @@ yy281:
 		}
 	}
 yy282:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy283:
 	if (yybm[0+yych] & 32) != 0 {
 		goto yy282
@@ -5572,26 +5475,26 @@ yy283:
 		goto yy286
 	}
 yy284:
-	IniScannerGlobals.GetYyCursor()++
+	YYCURSOR++
 yy285:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
-	IniScannerGlobals.SetYyState(yycINITIAL)
-	IniScannerGlobals.GetLineno()++
+	Yyleng = YYCURSOR - SCNG(yy_text)
+	BEGIN(INITIAL)
+	SCNG(lineno)++
 	return END_OF_LINE
 yy286:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '\n' {
 		goto yy284
 	}
 	goto yy285
 yy287:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 64) != 0 {
 		goto yy287
 	}
@@ -5662,12 +5565,12 @@ yy287:
 	}
 yy289:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '.' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -5741,12 +5644,12 @@ yy289:
 	}
 yy291:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '/' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -5817,12 +5720,12 @@ yy291:
 	}
 yy293:
 	yyaccept = 3
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= '/' {
 		if yych <= 0x1f {
 			if yych <= '\n' {
@@ -5892,43 +5795,40 @@ yy293:
 		}
 	}
 yy295:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy295
 	}
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading and trailing single quotes */
 
-	if (*byte)(IniScannerGlobals.GetYyText())[0] == '\'' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\'' {
-		IniScannerGlobals.GetYyText()++
-		IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyLeng() - 2)
+	if Yytext[0] == '\'' && Yytext[Yyleng-1] == '\'' {
+		SCNG(yy_text)++
+		Yyleng = Yyleng - 2
 	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_RAW, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_RAW, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_RAW
 yy299:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	_yyPushState(yycST_VARNAME)
 	return TC_DOLLAR_CURLY
 yy301:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy302:
 	if yych == '\t' {
 		goto yy301
@@ -5938,16 +5838,16 @@ yy302:
 	}
 	goto yy231
 yy303:
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy228
 yy304:
 	yyaccept = 1
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyMarker(IniScannerGlobals.GetYyCursor())
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	YYMARKER = YYCURSOR
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy305:
 	if yych <= 0x1f {
 		if yych <= '\n' {
@@ -5979,11 +5879,11 @@ yy305:
 			goto yy226
 		}
 	}
-	yych = *(g.PreInc(&(IniScannerGlobals.GetYyCursor())))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy233
 yy307:
-	IniScannerGlobals.GetYyCursor()++
-	if g.Assign(&yych, *(IniScannerGlobals.GetYyCursor())) == '\n' {
+	YYCURSOR++
+	if b.Assign(&yych, *YYCURSOR) == '\n' {
 		goto yy303
 	}
 	goto yy228
@@ -5992,10 +5892,10 @@ yy307:
 
 yyc_ST_VARNAME:
 	var yybm []uint8 = []uint8{128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 128, 0, 128, 0, 128, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 	if yych <= ')' {
 		if yych <= '"' {
 			if yych <= 'f' {
@@ -6054,52 +5954,40 @@ yyc_ST_VARNAME:
 		}
 	}
 yy310:
-	IniScannerGlobals.GetYyCursor()++
-	yych = *(IniScannerGlobals.GetYyCursor())
+	YYCURSOR++
+	yych = *YYCURSOR
 	goto yy317
 yy311:
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	Yyleng = YYCURSOR - SCNG(yy_text)
 
 	/* Eat leading whitespace */
 
-	for IniScannerGlobals.GetYyLeng() != 0 {
-		if (*byte)(IniScannerGlobals.GetYyText())[0] == ' ' || (*byte)(IniScannerGlobals.GetYyText())[0] == '\t' {
-			IniScannerGlobals.GetYyText()++
-			IniScannerGlobals.GetYyLeng()--
-		} else {
-			break
-		}
-	}
+	EAT_LEADING_WHITESPACE()
 
 	/* Eat trailing whitespace */
 
-	for IniScannerGlobals.GetYyLeng() != 0 && ('X' != 'X' && (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == 'X' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\n' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\r' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == '\t' || (*byte)(IniScannerGlobals.GetYyText())[IniScannerGlobals.GetYyLeng()-1] == ' ') {
-		IniScannerGlobals.GetYyLeng()--
-	}
-	if IniScannerGlobals.GetScannerMode() == 2 && (IniScannerGlobals.GetYyState() == yycST_VALUE || IniScannerGlobals.GetYyState() == yycST_RAW) {
-		ZendIniCopyTypedValue(ini_lval, TC_VARNAME, (*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng())
+	EAT_TRAILING_WHITESPACE()
+	if SCNG(scanner_mode) == ZEND_INI_SCANNER_TYPED && (YYSTATE == yycST_VALUE || YYSTATE == yycST_RAW) {
+		ZendIniCopyTypedValue(ini_lval, TC_VARNAME, Yytext, Yyleng)
 	} else {
-		var __z *Zval = ini_lval
-		var __s *ZendString = ZendStringInit((*byte)(IniScannerGlobals.GetYyText()), IniScannerGlobals.GetYyLeng(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZendIniCopyValue(ini_lval, Yytext, Yyleng)
 	}
 	return TC_VARNAME
 yy312:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	return 0
 yy314:
-	IniScannerGlobals.GetYyCursor()++
-	IniScannerGlobals.SetYyLeng(IniScannerGlobals.GetYyCursor() - IniScannerGlobals.GetYyText())
+	YYCURSOR++
+	Yyleng = YYCURSOR - SCNG(yy_text)
 	YyPopState()
 	return '}'
 yy316:
-	IniScannerGlobals.GetYyCursor()++
-	if IniScannerGlobals.GetYyCursor() > IniScannerGlobals.GetYyLimit() {
+	YYCURSOR++
+	if YYCURSOR > YYLIMIT {
 		return 0
 	}
-	yych = *(IniScannerGlobals.GetYyCursor())
+	yych = *YYCURSOR
 yy317:
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy316

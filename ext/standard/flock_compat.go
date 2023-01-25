@@ -3,7 +3,9 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/core"
+	r "sik/runtime"
 )
 
 // Source: <ext/standard/flock_compat.h>
@@ -35,13 +37,10 @@ import (
 
 /* Userland LOCK_* constants */
 
-// #define PHP_LOCK_SH       1
-
-// #define PHP_LOCK_EX       2
-
-// #define PHP_LOCK_UN       3
-
-// #define PHP_LOCK_NB       4
+const PHP_LOCK_SH = 1
+const PHP_LOCK_EX = 2
+const PHP_LOCK_UN = 3
+const PHP_LOCK_NB = 4
 
 // Source: <ext/standard/flock_compat.c>
 
@@ -80,7 +79,7 @@ func PhpFlock(fd int, operation int) int {
 	var ret int
 	flck.l_len = 0
 	flck.l_start = flck.l_len
-	flck.l_whence = 0
+	flck.l_whence = r.SEEK_SET
 	if (operation & LOCK_SH) != 0 {
 		flck.l_type = F_RDLCK
 	} else if (operation & LOCK_EX) != 0 {
@@ -91,9 +90,9 @@ func PhpFlock(fd int, operation int) int {
 		errno = EINVAL
 		return -1
 	}
-	ret = fcntl(fd, g.Cond((operation&LOCK_NB) != 0, F_SETLK, F_SETLKW), &flck)
+	ret = fcntl(fd, b.Cond((operation&LOCK_NB) != 0, F_SETLK, F_SETLKW), &flck)
 	if (operation&LOCK_NB) != 0 && ret == -1 && (errno == EACCES || errno == EAGAIN) {
-		errno = EWOULDBLOCK
+		errno = core.EWOULDBLOCK
 	}
 	if ret != -1 {
 		ret = 0

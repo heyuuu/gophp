@@ -57,7 +57,7 @@ package zend
 
 // #define XPFPA_DECLARE
 
-// #define XPFPA_HAVE_CW       0
+const XPFPA_HAVE_CW = 0
 
 // #define XPFPA_CW_DATATYPE       unsigned int
 
@@ -105,11 +105,11 @@ package zend
 
 // # include "zend_float.h"
 
-func ZendInitFpu() { EG.SetSavedFpuCwPtr(nil) }
+func ZendInitFpu() { ExecutorGlobals.SetSavedFpuCwPtr(nil) }
 
 /* }}} */
 
-func ZendShutdownFpu() { EG.SetSavedFpuCwPtr(nil) }
+func ZendShutdownFpu() { ExecutorGlobals.SetSavedFpuCwPtr(nil) }
 
 /* }}} */
 

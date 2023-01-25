@@ -25,11 +25,9 @@ package zend
 
 // #define ZEND_STACK_H
 
-// #define STACK_BLOCK_SIZE       16
-
-// #define ZEND_STACK_APPLY_TOPDOWN       1
-
-// #define ZEND_STACK_APPLY_BOTTOMUP       2
+const STACK_BLOCK_SIZE = 16
+const ZEND_STACK_APPLY_TOPDOWN = 1
+const ZEND_STACK_APPLY_BOTTOMUP = 2
 
 // Source: <Zend/zend_stack.c>
 
@@ -56,8 +54,9 @@ package zend
 
 // # include "zend_stack.h"
 
-// #define ZEND_STACK_ELEMENT(stack,n) ( ( void * ) ( ( char * ) ( stack ) -> elements + ( stack ) -> size * ( n ) ) )
-
+func ZEND_STACK_ELEMENT(stack *ZendStack, n int) any {
+	return any((*byte)(stack.GetElements() + stack.GetSize()*n))
+}
 func ZendStackInit(stack *ZendStack, size int) int {
 	stack.SetSize(size)
 	stack.SetTop(0)
@@ -69,16 +68,16 @@ func ZendStackPush(stack *ZendStack, element any) int {
 	/* We need to allocate more memory */
 
 	if stack.GetTop() >= stack.GetMax() {
-		stack.SetMax(stack.GetMax() + 16)
-		stack.SetElements(_safeErealloc(stack.GetElements(), stack.GetSize(), stack.GetMax(), 0))
+		stack.SetMax(stack.GetMax() + STACK_BLOCK_SIZE)
+		stack.SetElements(SafeErealloc(stack.GetElements(), stack.GetSize(), stack.GetMax(), 0))
 	}
-	memcpy(any((*byte)(stack.GetElements()+stack.GetSize()*stack.GetTop())), element, stack.GetSize())
+	memcpy(ZEND_STACK_ELEMENT(stack, stack.GetTop()), element, stack.GetSize())
 	stack.GetTop()++
 	return stack.GetTop() - 1
 }
 func ZendStackTop(stack *ZendStack) any {
 	if stack.GetTop() > 0 {
-		return any((*byte)(stack.GetElements() + stack.GetSize()*(stack.GetTop()-1)))
+		return ZEND_STACK_ELEMENT(stack, stack.GetTop()-1)
 	} else {
 		return nil
 	}
@@ -98,7 +97,7 @@ func ZendStackIntTop(stack *ZendStack) int {
 func ZendStackIsEmpty(stack *ZendStack) int { return stack.GetTop() == 0 }
 func ZendStackDestroy(stack *ZendStack) int {
 	if stack.GetElements() {
-		_efree(stack.GetElements())
+		Efree(stack.GetElements())
 		stack.SetElements(nil)
 	}
 	return SUCCESS
@@ -108,16 +107,16 @@ func ZendStackCount(stack *ZendStack) int { return stack.GetTop() }
 func ZendStackApply(stack *ZendStack, type_ int, apply_function func(element any) int) {
 	var i int
 	switch type_ {
-	case 1:
+	case ZEND_STACK_APPLY_TOPDOWN:
 		for i = stack.GetTop() - 1; i >= 0; i-- {
-			if apply_function(any((*byte)(stack.GetElements()+stack.GetSize()*i))) != 0 {
+			if apply_function(ZEND_STACK_ELEMENT(stack, i)) != 0 {
 				break
 			}
 		}
 		break
-	case 2:
+	case ZEND_STACK_APPLY_BOTTOMUP:
 		for i = 0; i < stack.GetTop(); i++ {
-			if apply_function(any((*byte)(stack.GetElements()+stack.GetSize()*i))) != 0 {
+			if apply_function(ZEND_STACK_ELEMENT(stack, i)) != 0 {
 				break
 			}
 		}
@@ -127,16 +126,16 @@ func ZendStackApply(stack *ZendStack, type_ int, apply_function func(element any
 func ZendStackApplyWithArgument(stack *ZendStack, type_ int, apply_function func(element any, arg any) int, arg any) {
 	var i int
 	switch type_ {
-	case 1:
+	case ZEND_STACK_APPLY_TOPDOWN:
 		for i = stack.GetTop() - 1; i >= 0; i-- {
-			if apply_function(any((*byte)(stack.GetElements()+stack.GetSize()*i)), arg) != 0 {
+			if apply_function(ZEND_STACK_ELEMENT(stack, i), arg) != 0 {
 				break
 			}
 		}
 		break
-	case 2:
+	case ZEND_STACK_APPLY_BOTTOMUP:
 		for i = 0; i < stack.GetTop(); i++ {
-			if apply_function(any((*byte)(stack.GetElements()+stack.GetSize()*i)), arg) != 0 {
+			if apply_function(ZEND_STACK_ELEMENT(stack, i), arg) != 0 {
 				break
 			}
 		}
@@ -147,12 +146,12 @@ func ZendStackClean(stack *ZendStack, func_ func(any), free_elements ZendBool) {
 	var i int
 	if func_ != nil {
 		for i = 0; i < stack.GetTop(); i++ {
-			func_(any((*byte)(stack.GetElements() + stack.GetSize()*i)))
+			func_(ZEND_STACK_ELEMENT(stack, i))
 		}
 	}
 	if free_elements != 0 {
 		if stack.GetElements() {
-			_efree(stack.GetElements())
+			Efree(stack.GetElements())
 			stack.SetElements(nil)
 		}
 		stack.SetMax(0)

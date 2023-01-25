@@ -3,9 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -23,54 +22,51 @@ import (
 
 /* {{{ reference-handling for unserializer: var_* */
 
-// #define VAR_ENTRIES_MAX       1018
-
-// #define VAR_DTOR_ENTRIES_MAX       255
-
-// #define VAR_ENTRIES_DBG       0
+const VAR_ENTRIES_MAX = 1018
+const VAR_DTOR_ENTRIES_MAX = 255
+const VAR_ENTRIES_DBG = 0
 
 /* VAR_FLAG used in var_dtor entries to signify an entry on which
  * __wakeup/__unserialize should be called */
 
-// #define VAR_WAKEUP_FLAG       1
-
-// #define VAR_UNSERIALIZE_FLAG       2
+const VAR_WAKEUP_FLAG = 1
+const VAR_UNSERIALIZE_FLAG = 2
 
 func PhpVarUnserializeInit() PhpUnserializeDataT {
 	var d PhpUnserializeDataT
 
 	/* fprintf(stderr, "UNSERIALIZE_INIT    == lock: %u, level: %u\n", BG(serialize_lock), BG(unserialize).level); */
 
-	if BasicGlobals.GetSerializeLock() || !(BasicGlobals.GetUnserializeLevel()) {
-		d = zend._emalloc(g.SizeOf("struct php_unserialize_data"))
+	if BG(serialize_lock) || !(BG(unserialize).level) {
+		d = zend.Emalloc(b.SizeOf("struct php_unserialize_data"))
 		d.SetLast(&d.entries)
 		d.SetLastDtor(nil)
 		d.SetFirstDtor(d.GetLastDtor())
 		d.SetAllowedClasses(nil)
 		d.SetRefProps(nil)
 		d.SetCurDepth(0)
-		d.SetMaxDepth(BasicGlobals.GetUnserializeMaxDepth())
+		d.SetMaxDepth(BG(unserialize_max_depth))
 		d.GetEntries().SetUsedSlots(0)
 		d.GetEntries().SetNext(nil)
-		if !(BasicGlobals.GetSerializeLock()) {
-			BasicGlobals.SetUnserializeData(d)
-			BasicGlobals.SetUnserializeLevel(1)
+		if !(BG(serialize_lock)) {
+			BG(unserialize).data = d
+			BG(unserialize).level = 1
 		}
 	} else {
-		d = BasicGlobals.GetUnserializeData()
-		BasicGlobals.GetUnserializeLevel()++
+		d = BG(unserialize).data
+		BG(unserialize).level++
 	}
 	return d
 }
 func PhpVarUnserializeDestroy(d PhpUnserializeDataT) {
 	/* fprintf(stderr, "UNSERIALIZE_DESTROY == lock: %u, level: %u\n", BG(serialize_lock), BG(unserialize).level); */
 
-	if BasicGlobals.GetSerializeLock() || BasicGlobals.GetUnserializeLevel() == 1 {
+	if BG(serialize_lock) || BG(unserialize).level == 1 {
 		VarDestroy(&d)
-		zend._efree(d)
+		zend.Efree(d)
 	}
-	if !(BasicGlobals.GetSerializeLock()) && !(g.PreDec(&(BasicGlobals.GetUnserializeLevel()))) {
-		BasicGlobals.SetUnserializeData(nil)
+	if !(BG(serialize_lock)) && !(b.PreDec(&(BG(unserialize).level))) {
+		BG(unserialize).data = nil
 	}
 }
 func PhpVarUnserializeGetAllowedClasses(d PhpUnserializeDataT) *zend.HashTable {
@@ -89,30 +85,22 @@ func PhpVarUnserializeSetCurDepth(d PhpUnserializeDataT, cur_depth zend.ZendLong
 func PhpVarUnserializeGetCurDepth(d PhpUnserializeDataT) zend.ZendLong { return d.GetCurDepth() }
 func VarPush(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
 	var var_hash *VarEntries = (*var_hashx).GetLast()
-	if var_hash.GetUsedSlots() == 1018 {
-		var_hash = zend._emalloc(g.SizeOf("var_entries"))
+	if var_hash.GetUsedSlots() == VAR_ENTRIES_MAX {
+		var_hash = zend.Emalloc(b.SizeOf("var_entries"))
 		var_hash.SetUsedSlots(0)
 		var_hash.SetNext(0)
 		(*var_hashx).GetLast().SetNext(var_hash)
 		(*var_hashx).SetLast(var_hash)
 	}
-	var_hash.GetData()[g.PostInc(&(var_hash.GetUsedSlots()))] = rval
+	var_hash.GetData()[b.PostInc(&(var_hash.GetUsedSlots()))] = rval
 }
 func VarPushDtor(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
-	if rval.u1.v.type_flags != 0 {
+	if zend.Z_REFCOUNTED_P(rval) {
 		var tmp_var *zend.Zval = VarTmpVar(var_hashx)
 		if tmp_var == nil {
 			return
 		}
-		var _z1 *zend.Zval = tmp_var
-		var _z2 *zend.Zval = rval
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
-		if (_t & 0xff00) != 0 {
-			zend.ZendGcAddref(&_gc.gc)
-		}
+		zend.ZVAL_COPY(tmp_var, rval)
 	}
 }
 func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
@@ -122,8 +110,8 @@ func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
 		return nil
 	}
 	var_hash = (*var_hashx).GetLastDtor()
-	if var_hash == nil || var_hash.GetUsedSlots()+num > 255 {
-		var_hash = zend._emalloc(g.SizeOf("var_dtor_entries"))
+	if var_hash == nil || var_hash.GetUsedSlots()+num > VAR_DTOR_ENTRIES_MAX {
+		var_hash = zend.Emalloc(b.SizeOf("var_dtor_entries"))
 		var_hash.SetUsedSlots(0)
 		var_hash.SetNext(0)
 		if (*var_hashx).GetFirstDtor() == nil {
@@ -134,8 +122,8 @@ func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
 		(*var_hashx).SetLastDtor(var_hash)
 	}
 	for used_slots = var_hash.GetUsedSlots(); var_hash.GetUsedSlots() < used_slots+num; var_hash.GetUsedSlots()++ {
-		&var_hash.data[var_hash.GetUsedSlots()].u1.type_info = 0
-		var_hash.GetData()[var_hash.GetUsedSlots()].u2.extra = 0
+		zend.ZVAL_UNDEF(&var_hash.data[var_hash.GetUsedSlots()])
+		zend.Z_EXTRA(var_hash.GetData()[var_hash.GetUsedSlots()]) = 0
 	}
 	return &var_hash.data[used_slots]
 }
@@ -154,9 +142,9 @@ func VarReplace(var_hashx *PhpUnserializeDataT, ozval *zend.Zval, nzval *zend.Zv
 }
 func VarAccess(var_hashx *PhpUnserializeDataT, id zend.ZendLong) *zend.Zval {
 	var var_hash *VarEntries = &(*var_hashx).entries
-	for id >= 1018 && var_hash != nil && var_hash.GetUsedSlots() == 1018 {
+	for id >= VAR_ENTRIES_MAX && var_hash != nil && var_hash.GetUsedSlots() == VAR_ENTRIES_MAX {
 		var_hash = var_hash.GetNext()
-		id -= 1018
+		id -= VAR_ENTRIES_MAX
 	}
 	if var_hash == nil {
 		return nil
@@ -174,73 +162,59 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	var delayed_call_failed zend.ZendBool = 0
 	var wakeup_name zend.Zval
 	var unserialize_name zend.Zval
-	&wakeup_name.u1.type_info = 0
-	&unserialize_name.u1.type_info = 0
+	zend.ZVAL_UNDEF(&wakeup_name)
+	zend.ZVAL_UNDEF(&unserialize_name)
 	for var_hash != nil {
 		next = var_hash.GetNext()
-		zend._efree(var_hash)
+		zend.EfreeSize(var_hash, b.SizeOf("var_entries"))
 		var_hash = next
 	}
 	for var_dtor_hash != nil {
 		for i = 0; i < var_dtor_hash.GetUsedSlots(); i++ {
 			var zv *zend.Zval = &var_dtor_hash.data[i]
-			if zv.u2.extra == 1 {
+			if zend.Z_EXTRA_P(zv) == VAR_WAKEUP_FLAG {
 
 				/* Perform delayed __wakeup calls */
 
 				if delayed_call_failed == 0 {
 					var retval zend.Zval
-					if wakeup_name.u1.v.type_ == 0 {
-						var __z *zend.Zval = &wakeup_name
-						var __s *zend.ZendString = zend.ZendStringInit("__wakeup", g.SizeOf("\"__wakeup\"")-1, 0)
-						__z.value.str = __s
-						__z.u1.type_info = 6 | 1<<0<<8
+					if zend.Z_ISUNDEF(wakeup_name) {
+						zend.ZVAL_STRINGL(&wakeup_name, "__wakeup", b.SizeOf("\"__wakeup\"")-1)
 					}
-					BasicGlobals.GetSerializeLock()++
-					if zend._callUserFunctionEx(zv, &wakeup_name, &retval, 0, 0, 1) == zend.FAILURE || retval.u1.v.type_ == 0 {
+					BG(serialize_lock)++
+					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zv.value.obj.gc.u.type_info |= 1 << 8 << 0
+						zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
-					BasicGlobals.GetSerializeLock()--
+					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.value.obj.gc.u.type_info |= 1 << 8 << 0
+					zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __wakeup calls */
 
-			} else if zv.u2.extra == 2 {
+			} else if zend.Z_EXTRA_P(zv) == VAR_UNSERIALIZE_FLAG {
 
 				/* Perform delayed __unserialize calls */
 
 				if delayed_call_failed == 0 {
 					var retval zend.Zval
 					var param zend.Zval
-					var _z1 *zend.Zval = &param
-					var _z2 *zend.Zval = &var_dtor_hash.data[i+1]
-					var _gc *zend.ZendRefcounted = _z2.value.counted
-					var _t uint32 = _z2.u1.type_info
-					_z1.value.counted = _gc
-					_z1.u1.type_info = _t
-					if (_t & 0xff00) != 0 {
-						zend.ZendGcAddref(&_gc.gc)
+					zend.ZVAL_COPY(&param, &var_dtor_hash.data[i+1])
+					if zend.Z_ISUNDEF(unserialize_name) {
+						zend.ZVAL_STRINGL(&unserialize_name, "__unserialize", b.SizeOf("\"__unserialize\"")-1)
 					}
-					if unserialize_name.u1.v.type_ == 0 {
-						var __z *zend.Zval = &unserialize_name
-						var __s *zend.ZendString = zend.ZendStringInit("__unserialize", g.SizeOf("\"__unserialize\"")-1, 0)
-						__z.value.str = __s
-						__z.u1.type_info = 6 | 1<<0<<8
-					}
-					BasicGlobals.GetSerializeLock()++
-					if zend._callUserFunctionEx(zv, &unserialize_name, &retval, 1, &param, 1) == zend.FAILURE || retval.u1.v.type_ == 0 {
+					BG(serialize_lock)++
+					if zend.CallUserFunction(zend.CompilerGlobals.function_table, zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zv.value.obj.gc.u.type_info |= 1 << 8 << 0
+						zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
-					BasicGlobals.GetSerializeLock()--
+					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&param)
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zv.value.obj.gc.u.type_info |= 1 << 8 << 0
+					zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __unserialize calls */
@@ -249,14 +223,14 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 			zend.IZvalPtrDtor(zv)
 		}
 		next = var_dtor_hash.GetNext()
-		zend._efree(var_dtor_hash)
+		zend.EfreeSize(var_dtor_hash, b.SizeOf("var_dtor_entries"))
 		var_dtor_hash = next
 	}
 	zend.ZvalPtrDtorNogc(&wakeup_name)
 	zend.ZvalPtrDtorNogc(&unserialize_name)
 	if (*var_hashx).GetRefProps() != nil {
 		zend.ZendHashDestroy((*var_hashx).GetRefProps())
-		zend._efree((*var_hashx).GetRefProps())
+		zend.FREE_HASHTABLE((*var_hashx).GetRefProps())
 	}
 }
 
@@ -277,7 +251,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
 			return nil
 		}
 		if (*(*p)) != '\\' {
-			str.val[i] = byte(*(*p))
+			zend.ZSTR_VAL(str)[i] = byte(*(*p))
 		} else {
 			var ch uint8 = 0
 			for j = 0; j < 2; j++ {
@@ -293,12 +267,12 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
 					return nil
 				}
 			}
-			str.val[i] = byte(ch)
+			zend.ZSTR_VAL(str)[i] = byte(ch)
 		}
 		*p++
 	}
-	str.val[i] = 0
-	str.len_ = i
+	zend.ZSTR_VAL(str)[i] = 0
+	zend.ZSTR_LEN(str) = i
 	return str
 }
 func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserializeDataT) int {
@@ -308,29 +282,19 @@ func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserial
 	if classes == nil {
 		return 1
 	}
-	if classes.nNumOfElements == 0 {
+	if !(zend.ZendHashNumElements(classes)) {
 		return 0
 	}
-	lcname = (*zend.ZendString)(zend._emalloc(zend_long((*byte)(&((*zend.ZendString)(nil).val))-(*byte)(nil)) + class_name.len_ + 1 + (8-1) & ^(8-1)))
-	zend.ZendGcSetRefcount(&lcname.gc, 1)
-	lcname.gc.u.type_info = 6
-	lcname.h = 0
-	lcname.len_ = class_name.len_
-	zend.ZendStrTolowerCopy(lcname.val, class_name.val, class_name.len_)
+	zend.ZSTR_ALLOCA_ALLOC(lcname, zend.ZSTR_LEN(class_name), use_heap)
+	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lcname), zend.ZSTR_VAL(class_name), zend.ZSTR_LEN(class_name))
 	res = zend.ZendHashExists(classes, lcname)
-	zend._efree(lcname)
+	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
 	return res
 }
 
 // #define YYFILL(n) do { } while ( 0 )
 
 // #define YYCTYPE       unsigned char
-
-// #define YYCURSOR       cursor
-
-// #define YYLIMIT       limit
-
-// #define YYMARKER       marker
 
 func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 	var result zend.ZendUlong = 0
@@ -339,10 +303,10 @@ func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 	if (*p) == '-' {
 		neg = 1
 		p++
-	} else if (*p) == '+' {
+	} else if zend.UNEXPECTED((*p) == '+') {
 		p++
 	}
-	for (*p) == '0' {
+	for zend.UNEXPECTED((*p) == '0') {
 		p++
 	}
 	start = p
@@ -356,15 +320,15 @@ func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
 
 	/* number too long or overflow */
 
-	if p-start > 20-1 || result > INT64_MAX+neg {
-		core.PhpErrorDocref(nil, 1<<1, "Numerical result out of range")
+	if zend.UNEXPECTED(p-start > zend.MAX_LENGTH_OF_LONG-1) || zend.SIZEOF_ZEND_LONG == 4 && zend.UNEXPECTED(p-start == zend.MAX_LENGTH_OF_LONG-1) && zend.UNEXPECTED((*start) > '2') || zend.UNEXPECTED(result > zend.ZEND_LONG_MAX+neg) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Numerical result out of range")
 		if neg == 0 {
-			return INT64_MAX
+			return zend.ZEND_LONG_MAX
 		} else {
-			return INT64_MIN
+			return zend.ZEND_LONG_MIN
 		}
 	}
-	return zend_long(g.Cond(neg == 0, result, -result))
+	return zend_long(b.Cond(neg == 0, result, -result))
 }
 func ParseIv(p *uint8) zend.ZendLong { return ParseIv2(p, nil) }
 
@@ -392,30 +356,30 @@ func ParseUiv(p *uint8) int {
 func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ht *zend.HashTable, elements zend.ZendLong, obj *zend.ZendObject) int {
 	if var_hash != nil {
 		if (*var_hash).GetMaxDepth() > 0 && (*var_hash).GetCurDepth() >= (*var_hash).GetMaxDepth() {
-			core.PhpErrorDocref(nil, 1<<1, "Maximum depth of "+"%"+"lld"+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", (*var_hash).GetMaxDepth())
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", (*var_hash).GetMaxDepth())
 			return 0
 		}
 		(*var_hash).GetCurDepth()++
 	}
-	for g.PostDec(&elements) > 0 {
+	for b.PostDec(&elements) > 0 {
 		var key zend.Zval
 		var data *zend.Zval
 		var d zend.Zval
 		var old_data *zend.Zval
 		var idx zend.ZendUlong
 		var info *zend.ZendPropertyInfo = nil
-		&key.u1.type_info = 0
+		zend.ZVAL_UNDEF(&key)
 		if PhpVarUnserializeInternal(&key, p, max, nil, 1) == 0 {
 			zend.ZvalPtrDtor(&key)
 			goto failure
 		}
 		data = nil
-		&d.u1.type_info = 0
+		zend.ZVAL_UNDEF(&d)
 		if obj == nil {
-			if key.u1.v.type_ == 4 {
-				idx = key.value.lval
+			if zend.Z_TYPE(key) == zend.IS_LONG {
+				idx = zend.Z_LVAL(key)
 			numeric_key:
-				if g.Assign(&old_data, zend.ZendHashIndexFind(ht, idx)) != nil {
+				if zend.UNEXPECTED(b.Assign(&old_data, zend.ZendHashIndexFind(ht, idx)) != nil) {
 
 					//??? update hash
 
@@ -424,98 +388,89 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 				} else {
 					data = zend.ZendHashIndexAddNew(ht, idx, &d)
 				}
-			} else if key.u1.v.type_ == 6 {
-				if zend._zendHandleNumericStr(key.value.str.val, key.value.str.len_, &idx) != 0 {
+			} else if zend.Z_TYPE(key) == zend.IS_STRING {
+				if zend.UNEXPECTED(zend.ZEND_HANDLE_NUMERIC(zend.Z_STR(key), idx) != 0) {
 					goto numeric_key
 				}
-				if g.Assign(&old_data, zend.ZendHashFind(ht, key.value.str)) != nil {
+				if zend.UNEXPECTED(b.Assign(&old_data, zend.ZendHashFind(ht, zend.Z_STR(key))) != nil) {
 
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = zend.ZendHashUpdate(ht, key.value.str, &d)
+					data = zend.ZendHashUpdate(ht, zend.Z_STR(key), &d)
 				} else {
-					data = zend.ZendHashAddNew(ht, key.value.str, &d)
+					data = zend.ZendHashAddNew(ht, zend.Z_STR(key), &d)
 				}
 			} else {
 				zend.ZvalPtrDtor(&key)
 				goto failure
 			}
 		} else {
-			if key.u1.v.type_ == 6 {
+			if zend.EXPECTED(zend.Z_TYPE(key) == zend.IS_STRING) {
 			string_key:
-				if obj != nil && &obj.ce.properties_info.nNumOfElements > 0 {
+				if obj != nil && zend.ZendHashNumElements(&obj.ce.properties_info) > 0 {
 					var existing_propinfo *zend.ZendPropertyInfo
 					var new_key *zend.ZendString
 					var unmangled_class *byte = nil
 					var unmangled_prop *byte
 					var unmangled_prop_len int
 					var unmangled *zend.ZendString
-					if zend.ZendUnmanglePropertyNameEx(key.value.str, &unmangled_class, &unmangled_prop, &unmangled_prop_len) == zend.FAILURE {
+					if zend.UNEXPECTED(zend.ZendUnmanglePropertyNameEx(zend.Z_STR(key), &unmangled_class, &unmangled_prop, &unmangled_prop_len) == zend.FAILURE) {
 						zend.ZvalPtrDtor(&key)
 						goto failure
 					}
 					unmangled = zend.ZendStringInit(unmangled_prop, unmangled_prop_len, 0)
 					existing_propinfo = zend.ZendHashFindPtr(&obj.ce.properties_info, unmangled)
-					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.ce.name.val))) && existing_propinfo != nil && (existing_propinfo.flags&(1<<0|1<<1|1<<2)) != 0 {
-						if (existing_propinfo.flags & 1 << 1) != 0 {
-							new_key = zend.ZendManglePropertyName("*", 1, unmangled.val, unmangled.len_, 0)
+					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, zend.ZSTR_VAL(obj.ce.name)))) && existing_propinfo != nil && (existing_propinfo.flags&zend.ZEND_ACC_PPP_MASK) != 0 {
+						if (existing_propinfo.flags & zend.ZEND_ACC_PROTECTED) != 0 {
+							new_key = zend.ZendManglePropertyName("*", 1, zend.ZSTR_VAL(unmangled), zend.ZSTR_LEN(unmangled), 0)
 							zend.ZendStringReleaseEx(unmangled, 0)
-						} else if (existing_propinfo.flags & 1 << 2) != 0 {
+						} else if (existing_propinfo.flags & zend.ZEND_ACC_PRIVATE) != 0 {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
-								new_key = zend.ZendManglePropertyName(unmangled_class, strlen(unmangled_class), unmangled.val, unmangled.len_, 0)
+								new_key = zend.ZendManglePropertyName(unmangled_class, strlen(unmangled_class), zend.ZSTR_VAL(unmangled), zend.ZSTR_LEN(unmangled), 0)
 							} else {
-								new_key = zend.ZendManglePropertyName(existing_propinfo.ce.name.val, existing_propinfo.ce.name.len_, unmangled.val, unmangled.len_, 0)
+								new_key = zend.ZendManglePropertyName(zend.ZSTR_VAL(existing_propinfo.ce.name), zend.ZSTR_LEN(existing_propinfo.ce.name), zend.ZSTR_VAL(unmangled), zend.ZSTR_LEN(unmangled), 0)
 							}
 							zend.ZendStringReleaseEx(unmangled, 0)
 						} else {
-							r.Assert((existing_propinfo.flags & 1 << 0) != 0)
+							zend.ZEND_ASSERT((existing_propinfo.flags & zend.ZEND_ACC_PUBLIC) != 0)
 							new_key = unmangled
 						}
 						zend.ZvalPtrDtorStr(&key)
-						var __z *zend.Zval = &key
-						var __s *zend.ZendString = new_key
-						__z.value.str = __s
-						if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-							__z.u1.type_info = 6
-						} else {
-							__z.u1.type_info = 6 | 1<<0<<8
-						}
+						zend.ZVAL_STR(&key, new_key)
 					} else {
 						zend.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if g.Assign(&old_data, zend.ZendHashFind(ht, key.value.str)) != nil {
-					if old_data.u1.v.type_ == 13 {
-						old_data = old_data.value.zv
+				if b.Assign(&old_data, zend.ZendHashFind(ht, zend.Z_STR(key))) != nil {
+					if zend.Z_TYPE_P(old_data) == zend.IS_INDIRECT {
+						old_data = zend.Z_INDIRECT_P(old_data)
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
-						data = zend.ZendHashUpdateInd(ht, key.value.str, &d)
-						if info != nil {
+						data = zend.ZendHashUpdateInd(ht, zend.Z_STR(key), &d)
+						if zend.UNEXPECTED(info != nil) {
 
 							/* Remember to which property this slot belongs, so we can add a
 							 * type source if it is turned into a reference lateron. */
 
 							if (*var_hash).GetRefProps() == nil {
-								(*var_hash).SetRefProps(zend._emalloc(g.SizeOf("HashTable")))
-								zend._zendHashInit((*var_hash).GetRefProps(), 8, nil, 0)
+								(*var_hash).SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
+								zend.ZendHashInit((*var_hash).GetRefProps(), 8, nil, nil, 0)
 							}
 							zend.ZendHashIndexUpdatePtr((*var_hash).GetRefProps(), zend.ZendUintptrT(data), info)
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
-						data = zend.ZendHashUpdateInd(ht, key.value.str, &d)
+						data = zend.ZendHashUpdateInd(ht, zend.Z_STR(key), &d)
 					}
 				} else {
-					data = zend.ZendHashAddNew(ht, key.value.str, &d)
+					data = zend.ZendHashAddNew(ht, zend.Z_STR(key), &d)
 				}
-			} else if key.u1.v.type_ == 4 {
+			} else if zend.Z_TYPE(key) == zend.IS_LONG {
 
 				/* object properties should include no integers */
 
-				if &key.u1.v.type_ != 6 {
-					zend._convertToString(&key)
-				}
+				zend.ConvertToString(&key)
 				goto string_key
 			} else {
 				zend.ZvalPtrDtor(&key)
@@ -526,18 +481,18 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 			zend.ZvalPtrDtor(&key)
 			goto failure
 		}
-		if info != nil {
+		if zend.UNEXPECTED(info != nil) {
 			if zend.ZendVerifyPropAssignableByRef(info, data, 1) == 0 {
 				zend.ZvalPtrDtor(data)
-				data.u1.type_info = 0
-				zend.ZvalPtrDtorNogc(&key)
+				zend.ZVAL_UNDEF(data)
+				zend.ZvalDtor(&key)
 				goto failure
 			}
-			if data.u1.v.type_ == 10 {
-				zend.ZendRefAddTypeSource(&(data.value.ref).sources, info)
+			if zend.Z_ISREF_P(data) {
+				zend.ZEND_REF_ADD_TYPE_SOURCE(zend.Z_REF_P(data), info)
 			}
 		}
-		if BasicGlobals.GetUnserializeLevel() > 1 {
+		if BG(unserialize).level > 1 {
 			VarPushDtor(var_hash, data)
 		}
 		zend.ZvalPtrDtorStr(&key)
@@ -568,7 +523,7 @@ func ObjectCustom(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	datalen = ParseIv2((*p)+2, p)
 	*p += 2
 	if datalen < 0 || max-(*p) <= datalen {
-		zend.ZendError(1<<1, "Insufficient data for unserializing - "+"%"+"lld"+" required, "+"%"+"lld"+" present", datalen, zend_long(max-(*p)))
+		zend.ZendError(zend.E_WARNING, "Insufficient data for unserializing - "+zend.ZEND_LONG_FMT+" required, "+zend.ZEND_LONG_FMT+" present", datalen, zend_long(max-(*p)))
 		return 0
 	}
 
@@ -580,7 +535,7 @@ func ObjectCustom(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		return 0
 	}
 	if ce.unserialize == nil {
-		zend.ZendError(1<<1, "Class %s has no unserializer", ce.name.val)
+		zend.ZendError(zend.E_WARNING, "Class %s has no unserializer", zend.ZSTR_VAL(ce.name))
 		zend.ObjectInitEx(rval, ce)
 	} else if ce.unserialize(rval, ce, (*uint8)(*p), datalen, (*zend.ZendUnserializeData)(var_hash)) != zend.SUCCESS {
 		return 0
@@ -594,22 +549,17 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	if has_unserialize != 0 {
 		var ary zend.Zval
 		var tmp *zend.Zval
-		if elements >= 0x80000000 {
+		if elements >= zend.HT_MAX_SIZE {
 			return 0
 		}
-		var __arr *zend.ZendArray = zend._zendNewArray(elements)
-		var __z *zend.Zval = &ary
-		__z.value.arr = __arr
-		__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+		zend.ArrayInitSize(&ary, elements)
 
 		/* Avoid reallocation due to packed -> mixed conversion. */
 
-		zend.ZendHashRealInitMixed(ary.value.arr)
-		if ProcessNestedData(rval, p, max, var_hash, ary.value.arr, elements, nil) == 0 {
-			if rval.u1.v.type_ == 10 {
-				rval = &(*rval).value.ref.val
-			}
-			rval.value.obj.gc.u.type_info |= 1 << 8 << 0
+		zend.ZendHashRealInitMixed(zend.Z_ARRVAL(ary))
+		if ProcessNestedData(rval, p, max, var_hash, zend.Z_ARRVAL(ary), elements, nil) == 0 {
+			zend.ZVAL_DEREF(rval)
+			zend.GC_ADD_FLAGS(zend.Z_OBJ_P(rval), zend.IS_OBJ_DESTRUCTOR_CALLED)
 			zend.ZvalPtrDtor(&ary)
 			return 0
 		}
@@ -617,68 +567,41 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		/* Delay __unserialize() call until end of serialization. We use two slots here to
 		 * store both the object and the unserialized data array. */
 
-		if rval.u1.v.type_ == 10 {
-			rval = &(*rval).value.ref.val
-		}
+		zend.ZVAL_DEREF(rval)
 		tmp = TmpVar(var_hash, 2)
-		var _z1 *zend.Zval = tmp
-		var _z2 *zend.Zval = rval
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
-		if (_t & 0xff00) != 0 {
-			zend.ZendGcAddref(&_gc.gc)
-		}
-		tmp.u2.extra = 2
+		zend.ZVAL_COPY(tmp, rval)
+		zend.Z_EXTRA_P(tmp) = VAR_UNSERIALIZE_FLAG
 		tmp++
-		var _z1 *zend.Zval = tmp
-		var _z2 *zend.Zval = &ary
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
+		zend.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = rval.value.obj.ce != BasicGlobals.GetIncompleteClass() && zend.ZendHashStrExists(&(rval.value.obj.ce).function_table, "__wakeup", g.SizeOf("\"__wakeup\"")-1) != 0
-	ht = rval.value.obj.handlers.get_properties(&(*rval))
-	if elements >= zend_long(0x80000000-ht.nNumOfElements) {
+	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.ZendHashStrExists(&zend.Z_OBJCE_P(rval).function_table, "__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
+	ht = zend.Z_OBJPROP_P(rval)
+	if elements >= zend_long(zend.HT_MAX_SIZE-zend.ZendHashNumElements(ht)) {
 		return 0
 	}
-	zend.ZendHashExtend(ht, ht.nNumOfElements+elements, ht.u.flags&1<<2)
-	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.value.obj) == 0 {
+	zend.ZendHashExtend(ht, zend.ZendHashNumElements(ht)+elements, zend.HT_FLAGS(ht)&zend.HASH_FLAG_PACKED)
+	if ProcessNestedData(rval, p, max, var_hash, ht, elements, zend.Z_OBJ_P(rval)) == 0 {
 		if has_wakeup != 0 {
-			if rval.u1.v.type_ == 10 {
-				rval = &(*rval).value.ref.val
-			}
-			rval.value.obj.gc.u.type_info |= 1 << 8 << 0
+			zend.ZVAL_DEREF(rval)
+			zend.GC_ADD_FLAGS(zend.Z_OBJ_P(rval), zend.IS_OBJ_DESTRUCTOR_CALLED)
 		}
 		return 0
 	}
-	if rval.u1.v.type_ == 10 {
-		rval = &(*rval).value.ref.val
-	}
+	zend.ZVAL_DEREF(rval)
 	if has_wakeup != 0 {
 
 		/* Delay __wakeup call until end of serialization */
 
 		var wakeup_var *zend.Zval = VarTmpVar(var_hash)
-		var _z1 *zend.Zval = wakeup_var
-		var _z2 *zend.Zval = rval
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
-		if (_t & 0xff00) != 0 {
-			zend.ZendGcAddref(&_gc.gc)
-		}
-		wakeup_var.u2.extra = 1
+		zend.ZVAL_COPY(wakeup_var, rval)
+		zend.Z_EXTRA_P(wakeup_var) = VAR_WAKEUP_FLAG
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 }
 func PhpVarUnserialize(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT) int {
 	var orig_var_entries *VarEntries = (*var_hash).GetLast()
-	var orig_used_slots zend.ZendLong = g.CondF1(orig_var_entries != nil, func() zend.ZendLong { return orig_var_entries.GetUsedSlots() }, 0)
+	var orig_used_slots zend.ZendLong = b.CondF1(orig_var_entries != nil, func() zend.ZendLong { return orig_var_entries.GetUsedSlots() }, 0)
 	var result int
 	result = PhpVarUnserializeInternal(rval, p, max, var_hash, 0)
 	if result == 0 {
@@ -707,7 +630,7 @@ func PhpVarUnserializeInternal(rval *zend.Zval, p **uint8, max *uint8, var_hash 
 	var rval_ref *zend.Zval
 	limit = max
 	cursor = *p
-	if cursor >= limit {
+	if YYCURSOR >= YYLIMIT {
 		return 0
 	}
 	if var_hash != nil && (*p)[0] != 'R' {
@@ -716,10 +639,10 @@ func PhpVarUnserializeInternal(rval *zend.Zval, p **uint8, max *uint8, var_hash 
 	start = cursor
 	var yych uint8
 	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	if limit-cursor < 7 {
+	if YYLIMIT-YYCURSOR < 7 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= 'a' {
 		if yych <= 'O' {
 			if yych <= 'C' {
@@ -784,101 +707,101 @@ func PhpVarUnserializeInternal(rval *zend.Zval, p **uint8, max *uint8, var_hash 
 			}
 		}
 	}
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy84
 	}
 yy3:
 	return 0
 yy4:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy79
 	}
 	goto yy3
 yy5:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == ';' {
 		goto yy77
 	}
 	goto yy3
 yy6:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy70
 	}
 	goto yy3
 yy7:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy64
 	}
 	goto yy3
 yy8:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy41
 	}
 	goto yy3
 yy9:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy35
 	}
 	goto yy3
 yy10:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy29
 	}
 	goto yy3
 yy11:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy23
 	}
 	goto yy3
 yy12:
-	yych = *(g.Assign(&marker, g.PreInc(&cursor)))
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
 	if yych == ':' {
 		goto yy16
 	}
 	goto yy3
 yy13:
-	cursor++
+	YYCURSOR++
 
 	/* this is the case where we have less data than planned */
 
-	core.PhpErrorDocref(nil, 1<<3, "Unexpected end of serialized data")
+	core.PhpErrorDocref(nil, zend.E_NOTICE, "Unexpected end of serialized data")
 	return 0
 yy15:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	goto yy3
 yy16:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy18
 	}
 yy17:
-	cursor = marker
+	YYCURSOR = YYMARKER
 	goto yy3
 yy18:
-	cursor++
-	if limit-cursor < 2 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 2 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if (yybm[0+yych] & 128) != 0 {
 		goto yy18
 	}
 	if yych != ':' {
 		goto yy17
 	}
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var len int
 	var len2 int
 	var len3 int
@@ -901,95 +824,83 @@ yy18:
 	}
 	len_ = ParseUiv(start + 2)
 	len2 = len_
-	maxlen = max - cursor
+	maxlen = max - YYCURSOR
 	if maxlen < len_ || len_ == 0 {
 		*p = start + 2
 		return 0
 	}
-	str = (*byte)(cursor)
-	cursor += len_
-	if (*cursor) != '"' {
-		*p = cursor
+	str = (*byte)(YYCURSOR)
+	YYCURSOR += len_
+	if (*YYCURSOR) != '"' {
+		*p = YYCURSOR
 		return 0
 	}
-	if (*(cursor + 1)) != ':' {
-		*p = cursor + 1
+	if (*(YYCURSOR + 1)) != ':' {
+		*p = YYCURSOR + 1
 		return 0
 	}
 	len3 = strspn(str, "0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ177200201202203204205206207210211212213214215216217220221222223224225226227230231232233234235236237240241242243244245246247250251252253254255256257260261262263264265266267270271272273274275276277300301302303304305306307310311312313314315316317320321322323324325326327330331332333334335336337340341342343344345346347350351352353354355356357360361362363364365366367370371372373374375376377\\")
 	if len3 != len_ {
-		*p = cursor + len3 - len_
+		*p = YYCURSOR + len3 - len_
 		return 0
 	}
 	class_name = zend.ZendStringInit(str, len_, 0)
 	for {
 		if UnserializeAllowedClass(class_name, var_hash) == 0 {
 			incomplete_class = 1
-			ce = BasicGlobals.GetIncompleteClass()
+			ce = PHP_IC_ENTRY
 			break
 		}
 
 		/* Try to find class directly */
 
-		BasicGlobals.GetSerializeLock()++
+		BG(serialize_lock)++
 		ce = zend.ZendLookupClass(class_name)
 		if ce != nil {
-			BasicGlobals.GetSerializeLock()--
-			if zend.EG.exception != nil {
+			BG(serialize_lock)--
+			if zend.ExecutorGlobals.exception != nil {
 				zend.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
-		BasicGlobals.GetSerializeLock()--
-		if zend.EG.exception != nil {
+		BG(serialize_lock)--
+		if zend.ExecutorGlobals.exception != nil {
 			zend.ZendStringReleaseEx(class_name, 0)
 			return 0
 		}
 
 		/* Check for unserialize callback */
 
-		if core.CoreGlobals.unserialize_callback_func == nil || core.CoreGlobals.unserialize_callback_func[0] == '0' {
+		if core.PG(unserialize_callback_func) == nil || core.PG(unserialize_callback_func)[0] == '0' {
 			incomplete_class = 1
-			ce = BasicGlobals.GetIncompleteClass()
+			ce = PHP_IC_ENTRY
 			break
 		}
 
 		/* Call unserialize callback */
 
-		var _s *byte = core.CoreGlobals.unserialize_callback_func
-		var __z *zend.Zval = &user_func
-		var __s *zend.ZendString = zend.ZendStringInit(_s, strlen(_s), 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
-		var __z *zend.Zval = &args[0]
-		var __s *zend.ZendString = class_name
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			zend.ZendGcAddref(&__s.gc)
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
-		BasicGlobals.GetSerializeLock()++
-		if zend._callUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != zend.SUCCESS {
-			BasicGlobals.GetSerializeLock()--
-			if zend.EG.exception != nil {
+		zend.ZVAL_STRING(&user_func, core.PG(unserialize_callback_func))
+		zend.ZVAL_STR_COPY(&args[0], class_name)
+		BG(serialize_lock)++
+		if zend.CallUserFunctionEx(nil, nil, &user_func, &retval, 1, args, 0, nil) != zend.SUCCESS {
+			BG(serialize_lock)--
+			if zend.ExecutorGlobals.exception != nil {
 				zend.ZendStringReleaseEx(class_name, 0)
 				zend.ZvalPtrDtor(&user_func)
 				zend.ZvalPtrDtor(&args[0])
 				return 0
 			}
-			core.PhpErrorDocref(nil, 1<<1, "defined (%s) but not found", user_func.value.str.val)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "defined (%s) but not found", zend.Z_STRVAL(user_func))
 			incomplete_class = 1
-			ce = BasicGlobals.GetIncompleteClass()
+			ce = PHP_IC_ENTRY
 			zend.ZvalPtrDtor(&user_func)
 			zend.ZvalPtrDtor(&args[0])
 			break
 		}
-		BasicGlobals.GetSerializeLock()--
+		BG(serialize_lock)--
 		zend.ZvalPtrDtor(&retval)
-		if zend.EG.exception != nil {
+		if zend.ExecutorGlobals.exception != nil {
 			zend.ZendStringReleaseEx(class_name, 0)
 			zend.ZvalPtrDtor(&user_func)
 			zend.ZvalPtrDtor(&args[0])
@@ -998,40 +909,40 @@ yy18:
 
 		/* The callback function may have defined the class */
 
-		BasicGlobals.GetSerializeLock()++
-		if g.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
-			core.PhpErrorDocref(nil, 1<<1, "Function %s() hasn't defined the class it was called for", user_func.value.str.val)
+		BG(serialize_lock)++
+		if b.Assign(&ce, zend.ZendLookupClass(class_name)) == nil {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Function %s() hasn't defined the class it was called for", zend.Z_STRVAL(user_func))
 			incomplete_class = 1
-			ce = BasicGlobals.GetIncompleteClass()
+			ce = PHP_IC_ENTRY
 		}
-		BasicGlobals.GetSerializeLock()--
+		BG(serialize_lock)--
 		zend.ZvalPtrDtor(&user_func)
 		zend.ZvalPtrDtor(&args[0])
 		break
 
 	}
-	*p = cursor
+	*p = YYCURSOR
 	if custom_object != 0 {
 		var ret int
 		ret = ObjectCustom(rval, p, max, var_hash, ce)
 		if ret != 0 && incomplete_class != 0 {
-			PhpStoreClassName(rval, class_name.val, len2)
+			PhpStoreClassName(rval, zend.ZSTR_VAL(class_name), len2)
 		}
 		zend.ZendStringReleaseEx(class_name, 0)
 		return ret
 	}
 	if (*p) >= max-2 {
-		zend.ZendError(1<<1, "Bad unserialize data")
+		zend.ZendError(zend.E_WARNING, "Bad unserialize data")
 		zend.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	elements = ParseIv2((*p)+2, p)
-	if elements < 0 || elements > max-cursor {
+	if elements < 0 || elements > max-YYCURSOR {
 		zend.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
 	*p += 2
-	has_unserialize = incomplete_class == 0 && zend.ZendHashStrExists(&ce.function_table, "__unserialize", g.SizeOf("\"__unserialize\"")-1) != 0
+	has_unserialize = incomplete_class == 0 && zend.ZendHashStrExists(&ce.function_table, "__unserialize", b.SizeOf("\"__unserialize\"")-1) != 0
 
 	/* If this class implements Serializable, it should not land here but in object_custom().
 	 * The passed string obviously doesn't descend from the regular serializer. However, if
@@ -1039,7 +950,7 @@ yy18:
 	 * depending on the serialization format. */
 
 	if ce.serialize != nil && has_unserialize == 0 {
-		zend.ZendError(1<<1, "Erroneous data format for unserializing '%s'", ce.name.val)
+		zend.ZendError(zend.E_WARNING, "Erroneous data format for unserializing '%s'", zend.ZSTR_VAL(ce.name))
 		zend.ZendStringReleaseEx(class_name, 0)
 		return 0
 	}
@@ -1048,12 +959,12 @@ yy18:
 		return 0
 	}
 	if incomplete_class != 0 {
-		PhpStoreClassName(rval, class_name.val, len2)
+		PhpStoreClassName(rval, zend.ZSTR_VAL(class_name), len2)
 	}
 	zend.ZendStringReleaseEx(class_name, 0)
 	return ObjectCommon(rval, p, max, var_hash, elements, has_unserialize)
 yy23:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1061,11 +972,11 @@ yy23:
 		goto yy17
 	}
 yy24:
-	cursor++
-	if limit-cursor < 2 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 2 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1075,40 +986,35 @@ yy24:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '{' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var elements zend.ZendLong = ParseIv(start + 2)
 
 	/* use iv() not uiv() in order to check data range */
 
-	*p = cursor
+	*p = YYCURSOR
 	if var_hash == nil {
 		return 0
 	}
-	if elements < 0 || elements >= 0x80000000 || elements > max-cursor {
+	if elements < 0 || elements >= zend.HT_MAX_SIZE || elements > max-YYCURSOR {
 		return 0
 	}
 	if elements != 0 {
-		var __arr *zend.ZendArray = zend._zendNewArray(elements)
-		var __z *zend.Zval = rval
-		__z.value.arr = __arr
-		__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+		zend.ArrayInitSize(rval, elements)
 
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
 
-		zend.ZendHashRealInitMixed(rval.value.arr)
+		zend.ZendHashRealInitMixed(zend.Z_ARRVAL_P(rval))
 
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
 
 	} else {
-		var __z *zend.Zval = rval
-		__z.value.arr = (*zend.ZendArray)(&zend.ZendEmptyArray)
-		__z.u1.type_info = 7
+		zend.ZVAL_EMPTY_ARRAY(rval)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
 
@@ -1117,12 +1023,12 @@ yy24:
 	 * unserialize (in practice unserialization handlers also see it). Ideally we should
 	 * prohibit "r:" references to non-objects, as we only generate them for objects. */
 
-	if ProcessNestedData(rval, p, max, var_hash, rval.value.arr, elements, nil) == 0 {
+	if ProcessNestedData(rval, p, max, var_hash, zend.Z_ARRVAL_P(rval), elements, nil) == 0 {
 		return 0
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 yy29:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1130,11 +1036,11 @@ yy29:
 		goto yy17
 	}
 yy30:
-	cursor++
-	if limit-cursor < 2 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 2 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1144,46 +1050,39 @@ yy30:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var len int
 	var maxlen int
 	var str *zend_string
 	len_ = ParseUiv(start + 2)
-	maxlen = max - cursor
+	maxlen = max - YYCURSOR
 	if maxlen < len_ {
 		*p = start + 2
 		return 0
 	}
-	if g.Assign(&str, UnserializeStr(&cursor, len_, maxlen)) == nil {
+	if b.Assign(&str, UnserializeStr(&YYCURSOR, len_, maxlen)) == nil {
 		return 0
 	}
-	if (*cursor) != '"' {
+	if (*YYCURSOR) != '"' {
 		zend.ZendStringEfree(str)
-		*p = cursor
+		*p = YYCURSOR
 		return 0
 	}
-	if (*(cursor + 1)) != ';' {
-		zend._efree(str)
-		*p = cursor + 1
+	if (*(YYCURSOR + 1)) != ';' {
+		zend.Efree(str)
+		*p = YYCURSOR + 1
 		return 0
 	}
-	cursor += 2
-	*p = cursor
-	var __z *zend.Zval = rval
-	var __s *zend.ZendString = str
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	YYCURSOR += 2
+	*p = YYCURSOR
+	zend.ZVAL_STR(rval, str)
 	return 1
 yy35:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1191,11 +1090,11 @@ yy35:
 		goto yy17
 	}
 yy36:
-	cursor++
-	if limit-cursor < 2 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 2 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1205,60 +1104,44 @@ yy36:
 	if yych >= ';' {
 		goto yy17
 	}
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != '"' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var len_ int
 	var maxlen int
 	var str *byte
 	len_ = ParseUiv(start + 2)
-	maxlen = max - cursor
+	maxlen = max - YYCURSOR
 	if maxlen < len_ {
 		*p = start + 2
 		return 0
 	}
-	str = (*byte)(cursor)
-	cursor += len_
-	if (*cursor) != '"' {
-		*p = cursor
+	str = (*byte)(YYCURSOR)
+	YYCURSOR += len_
+	if (*YYCURSOR) != '"' {
+		*p = YYCURSOR
 		return 0
 	}
-	if (*(cursor + 1)) != ';' {
-		*p = cursor + 1
+	if (*(YYCURSOR + 1)) != ';' {
+		*p = YYCURSOR + 1
 		return 0
 	}
-	cursor += 2
-	*p = cursor
+	YYCURSOR += 2
+	*p = YYCURSOR
 	if len_ == 0 {
-		var __z *zend.Zval = rval
-		var __s *zend.ZendString = zend.ZendEmptyString
-		__z.value.str = __s
-		__z.u1.type_info = 6
+		zend.ZVAL_EMPTY_STRING(rval)
 	} else if len_ == 1 {
-		var __z *zend.Zval = rval
-		var __s *zend.ZendString = zend.ZendOneCharString[zend_uchar*str]
-		__z.value.str = __s
-		__z.u1.type_info = 6
+		zend.ZVAL_INTERNED_STR(rval, zend.ZSTR_CHAR(zend_uchar*str))
 	} else if as_key != 0 {
-		var __z *zend.Zval = rval
-		var __s *zend.ZendString = zend.ZendStringInitInterned(str, len_, 0)
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+		zend.ZVAL_STR(rval, zend.ZendStringInitInterned(str, len_, 0))
 	} else {
-		var __z *zend.Zval = rval
-		var __s *zend.ZendString = zend.ZendStringInit(str, len_, 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
+		zend.ZVAL_STRINGL(rval, str, len_)
 	}
 	return 1
 yy41:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		if yych <= ',' {
 			if yych == '+' {
@@ -1289,13 +1172,13 @@ yy41:
 			}
 		}
 	}
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'A' {
 		goto yy63
 	}
 	goto yy17
 yy43:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		if yych == '.' {
 			goto yy48
@@ -1310,13 +1193,13 @@ yy43:
 		}
 	}
 yy44:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy59
 	}
 	goto yy17
 yy45:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == '.' {
 		goto yy48
 	}
@@ -1327,11 +1210,11 @@ yy45:
 		goto yy17
 	}
 yy46:
-	cursor++
-	if limit-cursor < 3 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 3 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= ':' {
 		if yych <= '.' {
 			if yych <= '-' {
@@ -1364,7 +1247,7 @@ yy46:
 		}
 	}
 yy48:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1372,11 +1255,11 @@ yy48:
 		goto yy17
 	}
 yy49:
-	cursor++
-	if limit-cursor < 3 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 3 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= ';' {
 		if yych <= '/' {
 			goto yy17
@@ -1401,14 +1284,12 @@ yy49:
 		}
 	}
 yy51:
-	cursor++
-	*p = cursor
-	var __z *zval = rval
-	__z.value.dval = zend.ZendStrtod((*byte)(start+2), nil)
-	__z.u1.type_info = 5
+	YYCURSOR++
+	*p = YYCURSOR
+	zend.ZVAL_DOUBLE(rval, zend.ZendStrtod((*byte)(start+2), nil))
 	return 1
 yy53:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= ',' {
 		if yych != '+' {
 			goto yy17
@@ -1426,7 +1307,7 @@ yy53:
 		goto yy17
 	}
 yy54:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1434,11 +1315,11 @@ yy54:
 		goto yy17
 	}
 yy55:
-	cursor++
-	if limit <= cursor {
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1450,11 +1331,11 @@ yy55:
 	}
 	goto yy17
 yy57:
-	cursor++
-	if limit-cursor < 3 {
+	YYCURSOR++
+	if YYLIMIT-YYCURSOR < 3 {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= ';' {
 		if yych <= '/' {
 			goto yy17
@@ -1480,41 +1361,35 @@ yy57:
 		}
 	}
 yy59:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != 'F' {
 		goto yy17
 	}
 yy60:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != ';' {
 		goto yy17
 	}
-	cursor++
-	*p = cursor
+	YYCURSOR++
+	*p = YYCURSOR
 	if !(strncmp((*byte)(start+2), "NAN", 3)) {
-		var __z *zend.Zval = rval
-		__z.value.dval = zend._zendGetNan()
-		__z.u1.type_info = 5
+		zend.ZVAL_DOUBLE(rval, zend.ZEND_NAN)
 	} else if !(strncmp((*byte)(start+2), "INF", 3)) {
-		var __z *zend.Zval = rval
-		__z.value.dval = zend._zendGetInf()
-		__z.u1.type_info = 5
+		zend.ZVAL_DOUBLE(rval, zend.ZEND_INFINITY)
 	} else if !(strncmp((*byte)(start+2), "-INF", 4)) {
-		var __z *zend.Zval = rval
-		__z.value.dval = -(zend._zendGetInf())
-		__z.u1.type_info = 5
+		zend.ZVAL_DOUBLE(rval, -zend.ZEND_INFINITY)
 	} else {
-		rval.u1.type_info = 1
+		zend.ZVAL_NULL(rval)
 	}
 	return 1
 yy63:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == 'N' {
 		goto yy60
 	}
 	goto yy17
 yy64:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= ',' {
 		if yych != '+' {
 			goto yy17
@@ -1532,7 +1407,7 @@ yy64:
 		goto yy17
 	}
 yy65:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1540,11 +1415,11 @@ yy65:
 		goto yy17
 	}
 yy66:
-	cursor++
-	if limit <= cursor {
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1554,14 +1429,12 @@ yy66:
 	if yych != ';' {
 		goto yy17
 	}
-	cursor++
-	*p = cursor
-	var __z *zend.Zval = rval
-	__z.value.lval = ParseIv(start + 2)
-	__z.u1.type_info = 4
+	YYCURSOR++
+	*p = YYCURSOR
+	zend.ZVAL_LONG(rval, ParseIv(start+2))
 	return 1
 yy70:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1573,32 +1446,32 @@ yy70:
 	}
 	goto yy17
 yy71:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych == ';' {
 		goto yy75
 	}
 	goto yy17
 yy72:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych != ';' {
 		goto yy17
 	}
-	cursor++
-	*p = cursor
-	rval.u1.type_info = 3
+	YYCURSOR++
+	*p = YYCURSOR
+	zend.ZVAL_TRUE(rval)
 	return 1
 yy75:
-	cursor++
-	*p = cursor
-	rval.u1.type_info = 2
+	YYCURSOR++
+	*p = YYCURSOR
+	zend.ZVAL_FALSE(rval)
 	return 1
 yy77:
-	cursor++
-	*p = cursor
-	rval.u1.type_info = 1
+	YYCURSOR++
+	*p = YYCURSOR
+	zend.ZVAL_NULL(rval)
 	return 1
 yy79:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1606,11 +1479,11 @@ yy79:
 		goto yy17
 	}
 yy80:
-	cursor++
-	if limit <= cursor {
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1620,37 +1493,27 @@ yy80:
 	if yych != ';' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var id zend_long
-	*p = cursor
+	*p = YYCURSOR
 	if var_hash == nil {
 		return 0
 	}
 	id = ParseUiv(start+2) - 1
-	if id == -1 || g.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
+	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
 	if rval_ref == rval {
 		return 0
 	}
-	if rval_ref.u1.v.type_ == 10 {
-		rval_ref = &(*rval_ref).value.ref.val
-	}
-	if rval_ref.u1.v.type_ != 8 {
+	zend.ZVAL_DEREF(rval_ref)
+	if zend.Z_TYPE_P(rval_ref) != zend.IS_OBJECT {
 		return 0
 	}
-	var _z1 *zend.Zval = rval
-	var _z2 *zend.Zval = rval_ref
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
-	if (_t & 0xff00) != 0 {
-		zend.ZendGcAddref(&_gc.gc)
-	}
+	zend.ZVAL_COPY(rval, rval_ref)
 	return 1
 yy84:
-	yych = *(g.PreInc(&cursor))
+	yych = *(b.PreInc(&YYCURSOR))
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1658,11 +1521,11 @@ yy84:
 		goto yy17
 	}
 yy85:
-	cursor++
-	if limit <= cursor {
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
 
 	}
-	yych = *cursor
+	yych = *YYCURSOR
 	if yych <= '/' {
 		goto yy17
 	}
@@ -1672,49 +1535,30 @@ yy85:
 	if yych != ';' {
 		goto yy17
 	}
-	cursor++
+	YYCURSOR++
 	var id zend.ZendLong
-	*p = cursor
+	*p = YYCURSOR
 	if var_hash == nil {
 		return 0
 	}
 	id = ParseUiv(start+2) - 1
-	if id == -1 || g.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
+	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
-	if rval_ref.u1.v.type_ == 0 || rval_ref.u1.v.type_ == 10 && &(*rval_ref).value.ref.val.u1.v.type_ == 0 {
+	if zend.Z_ISUNDEF_P(rval_ref) || zend.Z_ISREF_P(rval_ref) && zend.Z_ISUNDEF_P(zend.Z_REFVAL_P(rval_ref)) {
 		return 0
 	}
-	if rval_ref.u1.v.type_ != 10 {
+	if !(zend.Z_ISREF_P(rval_ref)) {
 		var info *zend.ZendPropertyInfo = nil
 		if (*var_hash).GetRefProps() != nil {
 			info = zend.ZendHashIndexFindPtr((*var_hash).GetRefProps(), zend.ZendUintptrT(rval_ref))
 		}
-		var _ref *zend.ZendReference = (*zend.ZendReference)(zend._emalloc(g.SizeOf("zend_reference")))
-		zend.ZendGcSetRefcount(&_ref.gc, 1)
-		_ref.gc.u.type_info = 10
-		var _z1 *zend.Zval = &_ref.val
-		var _z2 *zend.Zval = rval_ref
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
-		_ref.sources.ptr = nil
-		rval_ref.value.ref = _ref
-		rval_ref.u1.type_info = 10 | 1<<0<<8
+		zend.ZVAL_NEW_REF(rval_ref, rval_ref)
 		if info != nil {
-			zend.ZendRefAddTypeSource(&(rval_ref.value.ref).sources, info)
+			zend.ZEND_REF_ADD_TYPE_SOURCE(zend.Z_REF_P(rval_ref), info)
 		}
 	}
-	var _z1 *zend.Zval = rval
-	var _z2 *zend.Zval = rval_ref
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
-	if (_t & 0xff00) != 0 {
-		zend.ZendGcAddref(&_gc.gc)
-	}
+	zend.ZVAL_COPY(rval, rval_ref)
 	return 1
 	return 0
 }

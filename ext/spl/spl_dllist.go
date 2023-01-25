@@ -3,9 +3,9 @@
 package spl
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -85,21 +85,30 @@ var spl_ce_SplStack *zend.ZendClassEntry
 
 var spl_handler_SplDoublyLinkedList zend.ZendObjectHandlers
 
-// #define SPL_LLIST_DELREF(elem) if ( ! -- ( elem ) -> rc ) { efree ( elem ) ; }
+func SPL_LLIST_DELREF(elem any) {
+	if !(b.PreDec(&(elem.rc))) {
+		zend.Efree(elem)
+	}
+}
+func SPL_LLIST_CHECK_DELREF(elem any) {
+	if elem && !(b.PreDec(&(elem.rc))) {
+		zend.Efree(elem)
+	}
+}
+func SPL_LLIST_ADDREF(elem __auto__) int {
+	elem.rc++
+	return elem.rc - 1
+}
+func SPL_LLIST_CHECK_ADDREF(elem *SplPtrLlistElement) {
+	if elem != nil {
+		elem.GetRc()++
+	}
+}
 
-// #define SPL_LLIST_CHECK_DELREF(elem) if ( ( elem ) && ! -- ( elem ) -> rc ) { efree ( elem ) ; }
-
-// #define SPL_LLIST_ADDREF(elem) ( elem ) -> rc ++
-
-// #define SPL_LLIST_CHECK_ADDREF(elem) if ( elem ) ( elem ) -> rc ++
-
-// #define SPL_DLLIST_IT_DELETE       0x00000001
-
-// #define SPL_DLLIST_IT_LIFO       0x00000002
-
-// #define SPL_DLLIST_IT_MASK       0x00000003
-
-// #define SPL_DLLIST_IT_FIX       0x00000004
+const SPL_DLLIST_IT_DELETE = 0x1
+const SPL_DLLIST_IT_LIFO = 0x2
+const SPL_DLLIST_IT_MASK = 0x3
+const SPL_DLLIST_IT_FIX = 0x4
 
 type SplPtrLlistDtorFunc func(*SplPtrLlistElement)
 type SplPtrLlistCtorFunc func(*SplPtrLlistElement)
@@ -112,29 +121,31 @@ func SplDllistFromObj(obj *zend.ZendObject) *SplDllistObject {
 
 /* }}} */
 
-// #define Z_SPLDLLIST_P(zv) spl_dllist_from_obj ( Z_OBJ_P ( ( zv ) ) )
+func Z_SPLDLLIST_P(zv *zend.Zval) *SplDllistObject {
+	return SplDllistFromObj(zend.Z_OBJ_P(zv))
+}
 
 /* {{{  spl_ptr_llist */
 
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
-	if elem.data.u1.v.type_ != 0 {
+	if !(zend.Z_ISUNDEF(elem.GetData())) {
 		zend.ZvalPtrDtor(&elem.data)
-		&elem.data.u1.type_info = 0
+		zend.ZVAL_UNDEF(&elem.data)
 	}
 }
 
 /* }}} */
 
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
-	if elem.data.u1.v.type_flags != 0 {
-		zend.ZvalAddrefP(&(elem.GetData()))
+	if zend.Z_REFCOUNTED(elem.GetData()) {
+		zend.Z_ADDREF(elem.GetData())
 	}
 }
 
 /* }}} */
 
 func SplPtrLlistInit(ctor SplPtrLlistCtorFunc, dtor SplPtrLlistDtorFunc) *SplPtrLlist {
-	var llist *SplPtrLlist = zend._emalloc(g.SizeOf("spl_ptr_llist"))
+	var llist *SplPtrLlist = zend.Emalloc(b.SizeOf("spl_ptr_llist"))
 	llist.SetHead(nil)
 	llist.SetTail(nil)
 	llist.SetCount(0)
@@ -158,12 +169,10 @@ func SplPtrLlistDestroy(llist *SplPtrLlist) {
 		if dtor != nil {
 			dtor(current)
 		}
-		if !(g.PreDec(&(current.GetRc()))) {
-			zend._efree(current)
-		}
+		SPL_LLIST_DELREF(current)
 		current = next
 	}
-	zend._efree(llist)
+	zend.Efree(llist)
 }
 
 /* }}} */
@@ -190,16 +199,11 @@ func SplPtrLlistOffset(llist *SplPtrLlist, offset zend.ZendLong, backward int) *
 /* }}} */
 
 func SplPtrLlistUnshift(llist *SplPtrLlist, data *zend.Zval) {
-	var elem *SplPtrLlistElement = zend._emalloc(g.SizeOf("spl_ptr_llist_element"))
+	var elem *SplPtrLlistElement = zend.Emalloc(b.SizeOf("spl_ptr_llist_element"))
 	elem.SetRc(1)
 	elem.SetPrev(nil)
 	elem.SetNext(llist.GetHead())
-	var _z1 *zend.Zval = &elem.data
-	var _z2 *zend.Zval = data
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
+	zend.ZVAL_COPY_VALUE(&elem.data, data)
 	if llist.GetHead() != nil {
 		llist.GetHead().SetPrev(elem)
 	} else {
@@ -215,16 +219,11 @@ func SplPtrLlistUnshift(llist *SplPtrLlist, data *zend.Zval) {
 /* }}} */
 
 func SplPtrLlistPush(llist *SplPtrLlist, data *zend.Zval) {
-	var elem *SplPtrLlistElement = zend._emalloc(g.SizeOf("spl_ptr_llist_element"))
+	var elem *SplPtrLlistElement = zend.Emalloc(b.SizeOf("spl_ptr_llist_element"))
 	elem.SetRc(1)
 	elem.SetPrev(llist.GetTail())
 	elem.SetNext(nil)
-	var _z1 *zend.Zval = &elem.data
-	var _z2 *zend.Zval = data
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
+	zend.ZVAL_COPY_VALUE(&elem.data, data)
 	if llist.GetTail() != nil {
 		llist.GetTail().SetNext(elem)
 	} else {
@@ -242,7 +241,7 @@ func SplPtrLlistPush(llist *SplPtrLlist, data *zend.Zval) {
 func SplPtrLlistPop(llist *SplPtrLlist, ret *zend.Zval) {
 	var tail *SplPtrLlistElement = llist.GetTail()
 	if tail == nil {
-		ret.u1.type_info = 0
+		zend.ZVAL_UNDEF(ret)
 		return
 	}
 	if tail.GetPrev() != nil {
@@ -252,23 +251,13 @@ func SplPtrLlistPop(llist *SplPtrLlist, ret *zend.Zval) {
 	}
 	llist.SetTail(tail.GetPrev())
 	llist.GetCount()--
-	var _z1 *zend.Zval = ret
-	var _z2 *zend.Zval = &tail.data
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
-	if (_t & 0xff00) != 0 {
-		zend.ZendGcAddref(&_gc.gc)
-	}
+	zend.ZVAL_COPY(ret, &tail.data)
 	tail.SetPrev(nil)
 	if llist.GetDtor() != nil {
 		llist.GetDtor()(tail)
 	}
-	&tail.data.u1.type_info = 0
-	if !(g.PreDec(&(tail.GetRc()))) {
-		zend._efree(tail)
-	}
+	zend.ZVAL_UNDEF(&tail.data)
+	SPL_LLIST_DELREF(tail)
 }
 
 /* }}} */
@@ -298,7 +287,7 @@ func SplPtrLlistFirst(llist *SplPtrLlist) *zend.Zval {
 func SplPtrLlistShift(llist *SplPtrLlist, ret *zend.Zval) {
 	var head *SplPtrLlistElement = llist.GetHead()
 	if head == nil {
-		ret.u1.type_info = 0
+		zend.ZVAL_UNDEF(ret)
 		return
 	}
 	if head.GetNext() != nil {
@@ -308,23 +297,13 @@ func SplPtrLlistShift(llist *SplPtrLlist, ret *zend.Zval) {
 	}
 	llist.SetHead(head.GetNext())
 	llist.GetCount()--
-	var _z1 *zend.Zval = ret
-	var _z2 *zend.Zval = &head.data
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
-	if (_t & 0xff00) != 0 {
-		zend.ZendGcAddref(&_gc.gc)
-	}
+	zend.ZVAL_COPY(ret, &head.data)
 	head.SetNext(nil)
 	if llist.GetDtor() != nil {
 		llist.GetDtor()(head)
 	}
-	&head.data.u1.type_info = 0
-	if !(g.PreDec(&(head.GetRc()))) {
-		zend._efree(head)
-	}
+	zend.ZVAL_UNDEF(&head.data)
+	SPL_LLIST_DELREF(head)
 }
 
 /* }}} */
@@ -362,12 +341,10 @@ func SplDllistObjectFreeStorage(object *zend.ZendObject) {
 		zend.ZvalPtrDtor(&tmp)
 	}
 	if intern.GetGcData() != nil {
-		zend._efree(intern.GetGcData())
+		zend.Efree(intern.GetGcData())
 	}
 	SplPtrLlistDestroy(intern.GetLlist())
-	if intern.GetTraversePointer() != nil && !(g.PreDec(&(intern.GetTraversePointer().GetRc()))) {
-		zend._efree(intern.GetTraversePointer())
-	}
+	SPL_LLIST_CHECK_DELREF(intern.GetTraversePointer())
 }
 
 /* }}} */
@@ -376,42 +353,36 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clon
 	var intern *SplDllistObject
 	var parent *zend.ZendClassEntry = class_type
 	var inherited int = 0
-	intern = zend.ZendObjectAlloc(g.SizeOf("spl_dllist_object"), parent)
+	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dllist_object"), parent)
 	zend.ZendObjectStdInit(&intern.std, class_type)
 	zend.ObjectPropertiesInit(&intern.std, class_type)
 	intern.SetFlags(0)
 	intern.SetTraversePosition(0)
 	if orig != nil {
-		var other *SplDllistObject = SplDllistFromObj(orig.value.obj)
+		var other *SplDllistObject = Z_SPLDLLIST_P(orig)
 		intern.SetCeGetIterator(other.GetCeGetIterator())
 		if clone_orig != 0 {
 			intern.SetLlist((*SplPtrLlist)(SplPtrLlistInit(other.GetLlist().GetCtor(), other.GetLlist().GetDtor())))
 			SplPtrLlistCopy(other.GetLlist(), intern.GetLlist())
 			intern.SetTraversePointer(intern.GetLlist().GetHead())
-			if intern.GetTraversePointer() != nil {
-				intern.GetTraversePointer().GetRc()++
-			}
+			SPL_LLIST_CHECK_ADDREF(intern.GetTraversePointer())
 		} else {
 			intern.SetLlist(other.GetLlist())
 			intern.SetTraversePointer(intern.GetLlist().GetHead())
-			if intern.GetTraversePointer() != nil {
-				intern.GetTraversePointer().GetRc()++
-			}
+			SPL_LLIST_CHECK_ADDREF(intern.GetTraversePointer())
 		}
 		intern.SetFlags(other.GetFlags())
 	} else {
 		intern.SetLlist((*SplPtrLlist)(SplPtrLlistInit(SplPtrLlistZvalCtor, SplPtrLlistZvalDtor)))
 		intern.SetTraversePointer(intern.GetLlist().GetHead())
-		if intern.GetTraversePointer() != nil {
-			intern.GetTraversePointer().GetRc()++
-		}
+		SPL_LLIST_CHECK_ADDREF(intern.GetTraversePointer())
 	}
 	for parent != nil {
 		if parent == spl_ce_SplStack {
-			intern.SetFlags(intern.GetFlags() | 0x4 | 0x2)
+			intern.SetFlags(intern.GetFlags() | SPL_DLLIST_IT_FIX | SPL_DLLIST_IT_LIFO)
 			intern.std.handlers = &spl_handler_SplDoublyLinkedList
 		} else if parent == spl_ce_SplQueue {
-			intern.SetFlags(intern.GetFlags() | 0x4)
+			intern.SetFlags(intern.GetFlags() | SPL_DLLIST_IT_FIX)
 			intern.std.handlers = &spl_handler_SplDoublyLinkedList
 		}
 		if parent == spl_ce_SplDoublyLinkedList {
@@ -422,26 +393,26 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clon
 		inherited = 1
 	}
 	if parent == nil {
-		core.PhpErrorDocref(nil, 1<<6, "Internal compiler error, Class is not child of SplDoublyLinkedList")
+		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
 	}
 	if inherited != 0 {
-		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetget", g.SizeOf("\"offsetget\"")-1))
+		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetget", b.SizeOf("\"offsetget\"")-1))
 		if intern.GetFptrOffsetGet().common.scope == parent {
 			intern.SetFptrOffsetGet(nil)
 		}
-		intern.SetFptrOffsetSet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetset", g.SizeOf("\"offsetset\"")-1))
+		intern.SetFptrOffsetSet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetset", b.SizeOf("\"offsetset\"")-1))
 		if intern.GetFptrOffsetSet().common.scope == parent {
 			intern.SetFptrOffsetSet(nil)
 		}
-		intern.SetFptrOffsetHas(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetexists", g.SizeOf("\"offsetexists\"")-1))
+		intern.SetFptrOffsetHas(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetexists", b.SizeOf("\"offsetexists\"")-1))
 		if intern.GetFptrOffsetHas().common.scope == parent {
 			intern.SetFptrOffsetHas(nil)
 		}
-		intern.SetFptrOffsetDel(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetunset", g.SizeOf("\"offsetunset\"")-1))
+		intern.SetFptrOffsetDel(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetunset", b.SizeOf("\"offsetunset\"")-1))
 		if intern.GetFptrOffsetDel().common.scope == parent {
 			intern.SetFptrOffsetDel(nil)
 		}
-		intern.SetFptrCount(zend.ZendHashStrFindPtr(&class_type.function_table, "count", g.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(zend.ZendHashStrFindPtr(&class_type.function_table, "count", b.SizeOf("\"count\"")-1))
 		if intern.GetFptrCount().common.scope == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -460,7 +431,7 @@ func SplDllistObjectNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 func SplDllistObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var old_object *zend.ZendObject
 	var new_object *zend.ZendObject
-	old_object = zobject.value.obj
+	old_object = zend.Z_OBJ_P(zobject)
 	new_object = SplDllistObjectNewEx(old_object.ce, zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -469,11 +440,11 @@ func SplDllistObjectClone(zobject *zend.Zval) *zend.ZendObject {
 /* }}} */
 
 func SplDllistObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
-	var intern *SplDllistObject = SplDllistFromObj(object.value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(object)
 	if intern.GetFptrCount() != nil {
 		var rv zend.Zval
-		zend.ZendCallMethod(object, intern.std.ce, &intern.fptr_count, "count", g.SizeOf("\"count\"")-1, &rv, 0, nil, nil)
-		if rv.u1.v.type_ != 0 {
+		zend.ZendCallMethodWith0Params(object, intern.std.ce, &intern.fptr_count, "count", &rv)
+		if !(zend.Z_ISUNDEF(rv)) {
 			*count = zend.ZvalGetLong(&rv)
 			zend.ZvalPtrDtor(&rv)
 			return zend.SUCCESS
@@ -488,7 +459,7 @@ func SplDllistObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
 /* }}} */
 
 func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
-	var intern *SplDllistObject = SplDllistFromObj(obj.value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(obj)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
 	var tmp zend.Zval
@@ -499,28 +470,23 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 	if intern.std.properties == nil {
 		zend.RebuildObjectProperties(&intern.std)
 	}
-	debug_info = zend._zendNewArray(1)
+	debug_info = zend.ZendNewArray(1)
 	zend.ZendHashCopy(debug_info, intern.std.properties, zend.CopyCtorFuncT(zend.ZvalAddRef))
-	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags", g.SizeOf("\"flags\"")-1)
-	var __z *zend.Zval = &tmp
-	__z.value.lval = intern.GetFlags()
-	__z.u1.type_info = 4
+	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags", b.SizeOf("\"flags\"")-1)
+	zend.ZVAL_LONG(&tmp, intern.GetFlags())
 	zend.ZendHashAdd(debug_info, pnstr, &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = &dllist_array
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(&dllist_array)
 	for current != nil {
 		next = current.GetNext()
 		zend.AddIndexZval(&dllist_array, i, &current.data)
-		if current.data.u1.v.type_flags != 0 {
-			zend.ZvalAddrefP(&(current.GetData()))
+		if zend.Z_REFCOUNTED(current.GetData()) {
+			zend.Z_ADDREF(current.GetData())
 		}
 		i++
 		current = next
 	}
-	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist", g.SizeOf("\"dllist\"")-1)
+	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist", b.SizeOf("\"dllist\"")-1)
 	zend.ZendHashAdd(debug_info, pnstr, &dllist_array)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
@@ -529,20 +495,15 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 /* }}}} */
 
 func SplDllistObjectGetGc(obj *zend.Zval, gc_data **zend.Zval, gc_data_count *int) *zend.HashTable {
-	var intern *SplDllistObject = SplDllistFromObj(obj.value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(obj)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var i int = 0
 	if intern.GetGcDataCount() < intern.GetLlist().GetCount() {
 		intern.SetGcDataCount(intern.GetLlist().GetCount())
-		intern.SetGcData(zend._safeErealloc(intern.GetGcData(), intern.GetGcDataCount(), g.SizeOf("zval"), 0))
+		intern.SetGcData(zend.SafeErealloc(intern.GetGcData(), intern.GetGcDataCount(), b.SizeOf("zval"), 0))
 	}
 	for current != nil {
-		var _z1 *zend.Zval = &intern.gc_data[g.PostInc(&i)]
-		var _z2 *zend.Zval = &current.data
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
+		zend.ZVAL_COPY_VALUE(&intern.gc_data[b.PostInc(&i)], &current.data)
 		current = current.GetNext()
 	}
 	*gc_data = intern.GetGcData()
@@ -555,12 +516,12 @@ func SplDllistObjectGetGc(obj *zend.Zval, gc_data **zend.Zval, gc_data_count *in
 func zim_spl_SplDoublyLinkedList_push(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "z", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistPush(intern.GetLlist(), value)
-	return_value.u1.type_info = 3
+	zend.RETVAL_TRUE
 	return
 }
 
@@ -569,12 +530,12 @@ func zim_spl_SplDoublyLinkedList_push(execute_data *zend.ZendExecuteData, return
 func zim_spl_SplDoublyLinkedList_unshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "z", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistUnshift(intern.GetLlist(), value)
-	return_value.u1.type_info = 3
+	zend.RETVAL_TRUE
 	return
 }
 
@@ -582,17 +543,14 @@ func zim_spl_SplDoublyLinkedList_unshift(execute_data *zend.ZendExecuteData, ret
 
 func zim_spl_SplDoublyLinkedList_pop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistPop(intern.GetLlist(), return_value)
-	if return_value.u1.v.type_ == 0 {
+	if zend.Z_ISUNDEF_P(return_value) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't pop from an empty datastructure", 0)
-		return_value.u1.type_info = 1
+		zend.RETVAL_NULL()
 		return
 	}
 }
@@ -601,17 +559,14 @@ func zim_spl_SplDoublyLinkedList_pop(execute_data *zend.ZendExecuteData, return_
 
 func zim_spl_SplDoublyLinkedList_shift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistShift(intern.GetLlist(), return_value)
-	if return_value.u1.v.type_ == 0 {
+	if zend.Z_ISUNDEF_P(return_value) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't shift from an empty datastructure", 0)
-		return_value.u1.type_info = 1
+		zend.RETVAL_NULL()
 		return
 	}
 }
@@ -621,35 +576,16 @@ func zim_spl_SplDoublyLinkedList_shift(execute_data *zend.ZendExecuteData, retur
 func zim_spl_SplDoublyLinkedList_top(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	value = SplPtrLlistLast(intern.GetLlist())
-	if value == nil || value.u1.v.type_ == 0 {
+	if value == nil || zend.Z_ISUNDEF_P(value) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
-	var _z3 *zend.Zval = value
-	if (_z3.u1.type_info & 0xff00) != 0 {
-		if (_z3.u1.type_info & 0xff) == 10 {
-			_z3 = &(*_z3).value.ref.val
-			if (_z3.u1.type_info & 0xff00) != 0 {
-				zend.ZvalAddrefP(_z3)
-			}
-		} else {
-			zend.ZvalAddrefP(_z3)
-		}
-	}
-	var _z1 *zend.Zval = return_value
-	var _z2 *zend.Zval = _z3
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
+	zend.ZVAL_COPY_DEREF(return_value, value)
 }
 
 /* }}} */
@@ -657,52 +593,28 @@ func zim_spl_SplDoublyLinkedList_top(execute_data *zend.ZendExecuteData, return_
 func zim_spl_SplDoublyLinkedList_bottom(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	value = SplPtrLlistFirst(intern.GetLlist())
-	if value == nil || value.u1.v.type_ == 0 {
+	if value == nil || zend.Z_ISUNDEF_P(value) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
-	var _z3 *zend.Zval = value
-	if (_z3.u1.type_info & 0xff00) != 0 {
-		if (_z3.u1.type_info & 0xff) == 10 {
-			_z3 = &(*_z3).value.ref.val
-			if (_z3.u1.type_info & 0xff00) != 0 {
-				zend.ZvalAddrefP(_z3)
-			}
-		} else {
-			zend.ZvalAddrefP(_z3)
-		}
-	}
-	var _z1 *zend.Zval = return_value
-	var _z2 *zend.Zval = _z3
-	var _gc *zend.ZendRefcounted = _z2.value.counted
-	var _t uint32 = _z2.u1.type_info
-	_z1.value.counted = _gc
-	_z1.u1.type_info = _t
+	zend.ZVAL_COPY_DEREF(return_value, value)
 }
 
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_count(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var count zend.ZendLong
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	count = SplPtrLlistCount(intern.GetLlist())
-	var __z *zend.Zval = return_value
-	__z.value.lval = count
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(count)
 	return
 }
 
@@ -710,18 +622,11 @@ func zim_spl_SplDoublyLinkedList_count(execute_data *zend.ZendExecuteData, retur
 
 func zim_spl_SplDoublyLinkedList_isEmpty(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var count zend.ZendLong
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	SplDllistObjectCountElements(&(execute_data.This), &count)
-	if count == 0 {
-		return_value.u1.type_info = 3
-	} else {
-		return_value.u1.type_info = 2
-	}
+	SplDllistObjectCountElements(zend.ZEND_THIS, &count)
+	zend.RETVAL_BOOL(count == 0)
 	return
 }
 
@@ -730,18 +635,16 @@ func zim_spl_SplDoublyLinkedList_isEmpty(execute_data *zend.ZendExecuteData, ret
 func zim_spl_SplDoublyLinkedList_setIteratorMode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var value zend.ZendLong
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "l", &value) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &value) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
-	if (intern.GetFlags()&0x4) != 0 && (intern.GetFlags()&0x2) != (value&0x2) {
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if (intern.GetFlags()&SPL_DLLIST_IT_FIX) != 0 && (intern.GetFlags()&SPL_DLLIST_IT_LIFO) != (value&SPL_DLLIST_IT_LIFO) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Iterators' LIFO/FIFO modes for SplStack/SplQueue objects are frozen", 0)
 		return
 	}
-	intern.SetFlags(value&0x3 | intern.GetFlags()&0x4)
-	var __z *zend.Zval = return_value
-	__z.value.lval = intern.GetFlags()
-	__z.u1.type_info = 4
+	intern.SetFlags(value&SPL_DLLIST_IT_MASK | intern.GetFlags()&SPL_DLLIST_IT_FIX)
+	zend.RETVAL_LONG(intern.GetFlags())
 	return
 }
 
@@ -749,16 +652,11 @@ func zim_spl_SplDoublyLinkedList_setIteratorMode(execute_data *zend.ZendExecuteD
 
 func zim_spl_SplDoublyLinkedList_getIteratorMode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
-	var __z *zend.Zval = return_value
-	__z.value.lval = intern.GetFlags()
-	__z.u1.type_info = 4
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	zend.RETVAL_LONG(intern.GetFlags())
 	return
 }
 
@@ -768,16 +666,12 @@ func zim_spl_SplDoublyLinkedList_offsetExists(execute_data *zend.ZendExecuteData
 	var zindex *zend.Zval
 	var intern *SplDllistObject
 	var index zend.ZendLong
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	index = SplOffsetConvertToLong(zindex)
-	if index >= 0 && index < intern.GetLlist().GetCount() {
-		return_value.u1.type_info = 3
-	} else {
-		return_value.u1.type_info = 2
-	}
+	zend.RETVAL_BOOL(index >= 0 && index < intern.GetLlist().GetCount())
 	return
 }
 
@@ -789,35 +683,19 @@ func zim_spl_SplDoublyLinkedList_offsetGet(execute_data *zend.ZendExecuteData, r
 	var index zend.ZendLong
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index >= intern.GetLlist().GetCount() {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
-	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&0x2)
+	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
 	if element != nil {
 		var value *zend.Zval = &element.data
-		var _z3 *zend.Zval = value
-		if (_z3.u1.type_info & 0xff00) != 0 {
-			if (_z3.u1.type_info & 0xff) == 10 {
-				_z3 = &(*_z3).value.ref.val
-				if (_z3.u1.type_info & 0xff00) != 0 {
-					zend.ZvalAddrefP(_z3)
-				}
-			} else {
-				zend.ZvalAddrefP(_z3)
-			}
-		}
-		var _z1 *zend.Zval = return_value
-		var _z2 *zend.Zval = _z3
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
+		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 	}
@@ -830,11 +708,11 @@ func zim_spl_SplDoublyLinkedList_offsetSet(execute_data *zend.ZendExecuteData, r
 	var zindex *zend.Zval
 	var value *zend.Zval
 	var intern *SplDllistObject
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "zz", &zindex, &value) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
-	if zindex.u1.v.type_ == 1 {
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.Z_TYPE_P(zindex) == zend.IS_NULL {
 
 		/* $obj[] = ... */
 
@@ -853,7 +731,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(execute_data *zend.ZendExecuteData, r
 			zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 			return
 		}
-		element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&0x2)
+		element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
 		if element != nil {
 
 			/* call dtor on the old element as in spl_ptr_llist_pop */
@@ -866,12 +744,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(execute_data *zend.ZendExecuteData, r
 			 * SplDoublyLinkedList::pop() */
 
 			zend.ZvalPtrDtor(&element.data)
-			var _z1 *zend.Zval = &element.data
-			var _z2 *zend.Zval = value
-			var _gc *zend.ZendRefcounted = _z2.value.counted
-			var _t uint32 = _z2.u1.type_info
-			_z1.value.counted = _gc
-			_z1.u1.type_info = _t
+			zend.ZVAL_COPY_VALUE(&element.data, value)
 
 			/* new element, call ctor as in spl_ptr_llist_push */
 
@@ -898,17 +771,17 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(execute_data *zend.ZendExecuteData,
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
 	var llist *SplPtrLlist
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "z", &zindex) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	index = SplOffsetConvertToLong(zindex)
 	llist = intern.GetLlist()
 	if index < 0 || index >= intern.GetLlist().GetCount() {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset out of range", 0)
 		return
 	}
-	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&0x2)
+	element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
 	if element != nil {
 
 		/* connect the neightbors */
@@ -936,16 +809,12 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(execute_data *zend.ZendExecuteData,
 			llist.GetDtor()(element)
 		}
 		if intern.GetTraversePointer() == element {
-			if !(g.PreDec(&(element.GetRc()))) {
-				zend._efree(element)
-			}
+			SPL_LLIST_DELREF(element)
 			intern.SetTraversePointer(nil)
 		}
 		zend.ZvalPtrDtor(&element.data)
-		&element.data.u1.type_info = 0
-		if !(g.PreDec(&(element.GetRc()))) {
-			zend._efree(element)
-		}
+		zend.ZVAL_UNDEF(&element.data)
+		SPL_LLIST_DELREF(element)
 	} else {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
 		return
@@ -953,9 +822,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(execute_data *zend.ZendExecuteData,
 }
 func SplDllistItDtor(iter *zend.ZendObjectIterator) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
-	if iterator.GetTraversePointer() != nil && !(g.PreDec(&(iterator.GetTraversePointer().GetRc()))) {
-		zend._efree(iterator.GetTraversePointer())
-	}
+	SPL_LLIST_CHECK_DELREF(iterator.GetTraversePointer())
 	zend.ZendUserItInvalidateCurrent(iter)
 	zend.ZvalPtrDtor(&iterator.intern.it.data)
 }
@@ -963,19 +830,15 @@ func SplDllistItDtor(iter *zend.ZendObjectIterator) {
 /* }}} */
 
 func SplDllistItHelperRewind(traverse_pointer_ptr **SplPtrLlistElement, traverse_position_ptr *int, llist *SplPtrLlist, flags int) {
-	if (*traverse_pointer_ptr) != nil && !(g.PreDec(&((*traverse_pointer_ptr).GetRc()))) {
-		zend._efree(*traverse_pointer_ptr)
-	}
-	if (flags & 0x2) != 0 {
+	SPL_LLIST_CHECK_DELREF(*traverse_pointer_ptr)
+	if (flags & SPL_DLLIST_IT_LIFO) != 0 {
 		*traverse_position_ptr = llist.GetCount() - 1
 		*traverse_pointer_ptr = llist.GetTail()
 	} else {
 		*traverse_position_ptr = 0
 		*traverse_pointer_ptr = llist.GetHead()
 	}
-	if (*traverse_pointer_ptr) != nil {
-		(*traverse_pointer_ptr).GetRc()++
-	}
+	SPL_LLIST_CHECK_ADDREF(*traverse_pointer_ptr)
 }
 
 /* }}} */
@@ -983,17 +846,17 @@ func SplDllistItHelperRewind(traverse_pointer_ptr **SplPtrLlistElement, traverse
 func SplDllistItHelperMoveForward(traverse_pointer_ptr **SplPtrLlistElement, traverse_position_ptr *int, llist *SplPtrLlist, flags int) {
 	if (*traverse_pointer_ptr) != nil {
 		var old *SplPtrLlistElement = *traverse_pointer_ptr
-		if (flags & 0x2) != 0 {
+		if (flags & SPL_DLLIST_IT_LIFO) != 0 {
 			*traverse_pointer_ptr = old.GetPrev()
 			*traverse_position_ptr--
-			if (flags & 0x1) != 0 {
+			if (flags & SPL_DLLIST_IT_DELETE) != 0 {
 				var prev zend.Zval
 				SplPtrLlistPop(llist, &prev)
 				zend.ZvalPtrDtor(&prev)
 			}
 		} else {
 			*traverse_pointer_ptr = old.GetNext()
-			if (flags & 0x1) != 0 {
+			if (flags & SPL_DLLIST_IT_DELETE) != 0 {
 				var prev zend.Zval
 				SplPtrLlistShift(llist, &prev)
 				zend.ZvalPtrDtor(&prev)
@@ -1001,12 +864,8 @@ func SplDllistItHelperMoveForward(traverse_pointer_ptr **SplPtrLlistElement, tra
 				*traverse_position_ptr++
 			}
 		}
-		if !(g.PreDec(&(old.GetRc()))) {
-			zend._efree(old)
-		}
-		if (*traverse_pointer_ptr) != nil {
-			(*traverse_pointer_ptr).GetRc()++
-		}
+		SPL_LLIST_DELREF(old)
+		SPL_LLIST_CHECK_ADDREF(*traverse_pointer_ptr)
 	}
 }
 
@@ -1014,7 +873,7 @@ func SplDllistItHelperMoveForward(traverse_pointer_ptr **SplPtrLlistElement, tra
 
 func SplDllistItRewind(iter *zend.ZendObjectIterator) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
-	var object *SplDllistObject = SplDllistFromObj(&iter.data.value.obj)
+	var object *SplDllistObject = Z_SPLDLLIST_P(&iter.data)
 	var llist *SplPtrLlist = object.GetLlist()
 	SplDllistItHelperRewind(&iterator.traverse_pointer, &iterator.traverse_position, llist, object.GetFlags())
 }
@@ -1036,7 +895,7 @@ func SplDllistItValid(iter *zend.ZendObjectIterator) int {
 func SplDllistItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
 	var element *SplPtrLlistElement = iterator.GetTraversePointer()
-	if element == nil || element.data.u1.v.type_ == 0 {
+	if element == nil || zend.Z_ISUNDEF(element.GetData()) {
 		return nil
 	}
 	return &element.data
@@ -1046,16 +905,14 @@ func SplDllistItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 
 func SplDllistItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
-	var __z *zend.Zval = key
-	__z.value.lval = iterator.GetTraversePosition()
-	__z.u1.type_info = 4
+	zend.ZVAL_LONG(key, iterator.GetTraversePosition())
 }
 
 /* }}} */
 
 func SplDllistItMoveForward(iter *zend.ZendObjectIterator) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
-	var object *SplDllistObject = SplDllistFromObj(&iter.data.value.obj)
+	var object *SplDllistObject = Z_SPLDLLIST_P(&iter.data)
 	zend.ZendUserItInvalidateCurrent(iter)
 	SplDllistItHelperMoveForward(&iterator.traverse_pointer, &iterator.traverse_position, object.GetLlist(), object.GetFlags())
 }
@@ -1063,40 +920,29 @@ func SplDllistItMoveForward(iter *zend.ZendObjectIterator) {
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_key(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	var __z *zend.Zval = return_value
-	__z.value.lval = intern.GetTraversePosition()
-	__z.u1.type_info = 4
+	zend.RETVAL_LONG(intern.GetTraversePosition())
 	return
 }
 
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_prev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	SplDllistItHelperMoveForward(&intern.traverse_pointer, &intern.traverse_position, intern.GetLlist(), intern.GetFlags()^0x2)
+	SplDllistItHelperMoveForward(&intern.traverse_pointer, &intern.traverse_position, intern.GetLlist(), intern.GetFlags()^SPL_DLLIST_IT_LIFO)
 }
 
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	SplDllistItHelperMoveForward(&intern.traverse_pointer, &intern.traverse_position, intern.GetLlist(), intern.GetFlags())
@@ -1105,29 +951,19 @@ func zim_spl_SplDoublyLinkedList_next(execute_data *zend.ZendExecuteData, return
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_valid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	if intern.GetTraversePointer() != nil {
-		return_value.u1.type_info = 3
-	} else {
-		return_value.u1.type_info = 2
-	}
+	zend.RETVAL_BOOL(intern.GetTraversePointer() != nil)
 	return
 }
 
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_rewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	SplDllistItHelperRewind(&intern.traverse_pointer, &intern.traverse_position, intern.GetLlist(), intern.GetFlags())
@@ -1136,67 +972,43 @@ func zim_spl_SplDoublyLinkedList_rewind(execute_data *zend.ZendExecuteData, retu
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_current(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	var element *SplPtrLlistElement = intern.GetTraversePointer()
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	if element == nil || element.data.u1.v.type_ == 0 {
-		return_value.u1.type_info = 1
+	if element == nil || zend.Z_ISUNDEF(element.GetData()) {
+		zend.RETVAL_NULL()
 		return
 	} else {
 		var value *zend.Zval = &element.data
-		var _z3 *zend.Zval = value
-		if (_z3.u1.type_info & 0xff00) != 0 {
-			if (_z3.u1.type_info & 0xff) == 10 {
-				_z3 = &(*_z3).value.ref.val
-				if (_z3.u1.type_info & 0xff00) != 0 {
-					zend.ZvalAddrefP(_z3)
-				}
-			} else {
-				zend.ZvalAddrefP(_z3)
-			}
-		}
-		var _z1 *zend.Zval = return_value
-		var _z2 *zend.Zval = _z3
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
+		zend.ZVAL_COPY_DEREF(return_value, value)
 	}
 }
 
 /* }}} */
 
 func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	var buf zend.SmartStr = zend.SmartStr{0}
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
 	var flags zend.Zval
 	var var_hash standard.PhpSerializeDataT
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	var_hash = standard.PhpVarSerializeInit()
+	standard.PHP_VAR_SERIALIZE_INIT(var_hash)
 
 	/* flags */
 
-	var __z *zend.Zval = &flags
-	__z.value.lval = intern.GetFlags()
-	__z.u1.type_info = 4
+	zend.ZVAL_LONG(&flags, intern.GetFlags())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 
 	/* elements */
 
 	for current != nil {
-		zend.SmartStrAppendcEx(&buf, ':', 0)
+		zend.SmartStrAppendc(&buf, ':')
 		next = current.GetNext()
 		standard.PhpVarSerialize(&buf, &current.data, &var_hash)
 		current = next
@@ -1205,15 +1017,12 @@ func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, r
 
 	/* done */
 
-	standard.PhpVarSerializeDestroy(var_hash)
+	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
 	if buf.s != nil {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = buf.s
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
+		zend.RETVAL_NEW_STR(buf.s)
 		return
 	} else {
-		return_value.u1.type_info = 1
+		zend.RETVAL_NULL()
 		return
 	}
 }
@@ -1222,7 +1031,7 @@ func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, r
 Unserializes storage */
 
 func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	var flags *zend.Zval
 	var elem *zend.Zval
 	var buf *byte
@@ -1230,7 +1039,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData,
 	var p *uint8
 	var s *uint8
 	var var_hash standard.PhpUnserializeDataT
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "s", &buf, &buf_len) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "s", &buf, &buf_len) == zend.FAILURE {
 		return
 	}
 	if buf_len == 0 {
@@ -1243,15 +1052,15 @@ func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData,
 	}
 	p = (*uint8)(buf)
 	s = p
-	var_hash = standard.PhpVarUnserializeInit()
+	standard.PHP_VAR_UNSERIALIZE_INIT(var_hash)
 
 	/* flags */
 
 	flags = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || flags.u1.v.type_ != 4 {
+	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || zend.Z_TYPE_P(flags) != zend.IS_LONG {
 		goto error
 	}
-	intern.SetFlags(int(flags.value.lval))
+	intern.SetFlags(int(zend.Z_LVAL_P(flags)))
 
 	/* elements */
 
@@ -1267,10 +1076,10 @@ func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData,
 	if (*p) != '0' {
 		goto error
 	}
-	standard.PhpVarUnserializeDestroy(var_hash)
+	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
 	return
 error:
-	standard.PhpVarUnserializeDestroy(var_hash)
+	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
 	zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Error at offset %zd of %zd bytes", (*byte)(p-buf), buf_len)
 	return
 }
@@ -1278,82 +1087,64 @@ error:
 /* {{{ proto array SplDoublyLinkedList::__serialize() */
 
 func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var tmp zend.Zval
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneException()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNoneThrow() == zend.FAILURE {
 		return
 	}
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(return_value)
 
 	/* flags */
 
-	var __z *zend.Zval = &tmp
-	__z.value.lval = intern.GetFlags()
-	__z.u1.type_info = 4
-	zend.ZendHashNextIndexInsert(return_value.value.arr, &tmp)
+	zend.ZVAL_LONG(&tmp, intern.GetFlags())
+	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
 
 	/* elements */
 
-	var __arr *zend.ZendArray = zend._zendNewArray(intern.GetLlist().GetCount())
-	var __z *zend.Zval = &tmp
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
-		zend.ZendHashNextIndexInsert(tmp.value.arr, &current.data)
-		if &(current.GetData()).u1.v.type_flags != 0 {
-			zend.ZvalAddrefP(&(current.GetData()))
-		}
+		zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(tmp), &current.data)
+		zend.Z_TRY_ADDREF(current.GetData())
 		current = current.GetNext()
 	}
-	zend.ZendHashNextIndexInsert(return_value.value.arr, &tmp)
+	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
 
 	/* members */
 
-	var __arr *zend.ZendArray = zend.ZendStdGetProperties(&(execute_data.This))
-	var __z *zend.Zval = &tmp
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
-	if &tmp.u1.v.type_flags != 0 {
-		zend.ZvalAddrefP(&tmp)
-	}
-	zend.ZendHashNextIndexInsert(return_value.value.arr, &tmp)
+	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
+	zend.Z_TRY_ADDREF(tmp)
+	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
 }
 
 /* {{{ proto void SplDoublyLinkedList::__unserialize(array serialized) */
 
 func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = SplDllistFromObj(&(execute_data.This).value.obj)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	var data *zend.HashTable
 	var flags_zv *zend.Zval
 	var storage_zv *zend.Zval
 	var members_zv *zend.Zval
 	var elem *zend.Zval
-	if zend.ZendParseParametersThrow(execute_data.This.u2.num_args, "h", &data) == zend.FAILURE {
+	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
 		return
 	}
 	flags_zv = zend.ZendHashIndexFind(data, 0)
 	storage_zv = zend.ZendHashIndexFind(data, 1)
 	members_zv = zend.ZendHashIndexFind(data, 2)
-	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.u1.v.type_ != 4 || storage_zv.u1.v.type_ != 7 || members_zv.u1.v.type_ != 7 {
+	if flags_zv == nil || storage_zv == nil || members_zv == nil || zend.Z_TYPE_P(flags_zv) != zend.IS_LONG || zend.Z_TYPE_P(storage_zv) != zend.IS_ARRAY || zend.Z_TYPE_P(members_zv) != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	intern.SetFlags(int(flags_zv.value.lval))
+	intern.SetFlags(int(zend.Z_LVAL_P(flags_zv)))
 	for {
-		var __ht *zend.HashTable = storage_zv.value.arr
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(storage_zv)
 		var _p *zend.Bucket = __ht.arData
 		var _end *zend.Bucket = _p + __ht.nNumUsed
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
 			elem = _z
@@ -1361,7 +1152,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		}
 		break
 	}
-	zend.ObjectPropertiesLoad(&intern.std, members_zv.value.arr)
+	zend.ObjectPropertiesLoad(&intern.std, zend.Z_ARRVAL_P(members_zv))
 }
 
 /* {{{ proto void SplDoublyLinkedList::add(mixed index, mixed newval)
@@ -1373,18 +1164,16 @@ func zim_spl_SplDoublyLinkedList_add(execute_data *zend.ZendExecuteData, return_
 	var intern *SplDllistObject
 	var element *SplPtrLlistElement
 	var index zend.ZendLong
-	if zend.ZendParseParameters(execute_data.This.u2.num_args, "zz", &zindex, &value) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
-	intern = SplDllistFromObj(&(execute_data.This).value.obj)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index > intern.GetLlist().GetCount() {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
-	if value.u1.v.type_flags != 0 {
-		zend.ZvalAddrefP(value)
-	}
+	zend.Z_TRY_ADDREF_P(value)
 	if index == intern.GetLlist().GetCount() {
 
 		/* If index is the last entry+1 then we do a push because we're not inserting before any entry */
@@ -1397,17 +1186,12 @@ func zim_spl_SplDoublyLinkedList_add(execute_data *zend.ZendExecuteData, return_
 
 		/* Create the new element we want to insert */
 
-		var elem *SplPtrLlistElement = zend._emalloc(g.SizeOf("spl_ptr_llist_element"))
+		var elem *SplPtrLlistElement = zend.Emalloc(b.SizeOf("spl_ptr_llist_element"))
 
 		/* Get the element we want to insert before */
 
-		element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&0x2)
-		var _z1 *zend.Zval = &elem.data
-		var _z2 *zend.Zval = value
-		var _gc *zend.ZendRefcounted = _z2.value.counted
-		var _t uint32 = _z2.u1.type_info
-		_z1.value.counted = _gc
-		_z1.u1.type_info = _t
+		element = SplPtrLlistOffset(intern.GetLlist(), index, intern.GetFlags()&SPL_DLLIST_IT_LIFO)
+		zend.ZVAL_COPY_VALUE(&elem.data, value)
 		elem.SetRc(1)
 
 		/* connect to the neighbours */
@@ -1433,16 +1217,10 @@ func zim_spl_SplDoublyLinkedList_add(execute_data *zend.ZendExecuteData, return_
 /* {{{ proto void SplDoublyLinkedList::__debugInfo() */
 
 func zim_spl_SplDoublyLinkedList___debugInfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	var __arr *zend.ZendArray = SplDllistObjectGetDebugInfo(g.CondF1(&(execute_data.This).u1.v.type_ == 8, func() *zend.Zval { return &(execute_data.This) }, nil))
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.RETVAL_ARR(SplDllistObjectGetDebugInfo(zend.getThis()))
 	return
 }
 
@@ -1452,51 +1230,58 @@ var SplDllistItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs
 
 func SplDllistGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplDllistIt
-	var dllist_object *SplDllistObject = SplDllistFromObj(object.value.obj)
+	var dllist_object *SplDllistObject = Z_SPLDLLIST_P(object)
 	if by_ref != 0 {
 		zend.ZendThrowException(spl_ce_RuntimeException, "An iterator cannot be used with foreach by reference", 0)
 		return nil
 	}
-	iterator = zend._emalloc(g.SizeOf("spl_dllist_it"))
+	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	zend.ZvalAddrefP(object)
-	var __z *zend.Zval = &iterator.intern.it.data
-	__z.value.obj = object.value.obj
-	__z.u1.type_info = 8 | 1<<0<<8 | 1<<1<<8
+	zend.Z_ADDREF_P(object)
+	zend.ZVAL_OBJ(&iterator.intern.it.data, zend.Z_OBJ_P(object))
 	iterator.intern.it.funcs = &SplDllistItFuncs
 	iterator.intern.ce = ce
 	iterator.SetTraversePosition(dllist_object.GetTraversePosition())
 	iterator.SetTraversePointer(dllist_object.GetTraversePointer())
-	iterator.SetFlags(dllist_object.GetFlags() & 0x3)
-	&iterator.intern.value.u1.type_info = 0
-	if iterator.GetTraversePointer() != nil {
-		iterator.GetTraversePointer().GetRc()++
-	}
+	iterator.SetFlags(dllist_object.GetFlags() & SPL_DLLIST_IT_MASK)
+	zend.ZVAL_UNDEF(&iterator.intern.value)
+	SPL_LLIST_CHECK_ADDREF(iterator.GetTraversePointer())
 	return &iterator.intern.it
 }
 
 /* }}} */
 
-var ArginfoDllistSetiteratormode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"mode", 0, 0, 0}}
-var ArginfoDllistPush []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"value", 0, 0, 0}}
+var ArginfoDllistSetiteratormode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{"mode", 0, 0, 0},
+}
+var ArginfoDllistPush []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{"value", 0, 0, 0},
+}
 var arginfo_dllist_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"index", 0, 0, 0}}
 var arginfo_dllist_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"index", 0, 0, 0}, {"newval", 0, 0, 0}}
-var ArginfoDllistVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}}
-var ArginfoDllistSerialized []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"serialized", 0, 0, 0}}
+var ArginfoDllistVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+}
+var ArginfoDllistSerialized []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{"serialized", 0, 0, 0},
+}
 var spl_funcs_SplQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"enqueue",
 		zim_spl_SplDoublyLinkedList_push,
 		ArginfoDllistPush,
-		uint32(g.SizeOf("arginfo_dllist_push")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"dequeue",
 		zim_spl_SplDoublyLinkedList_shift,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{nil, nil, nil, 0, 0},
 }
@@ -1505,183 +1290,183 @@ var spl_funcs_SplDoublyLinkedList []zend.ZendFunctionEntry = []zend.ZendFunction
 		"pop",
 		zim_spl_SplDoublyLinkedList_pop,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"shift",
 		zim_spl_SplDoublyLinkedList_shift,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"push",
 		zim_spl_SplDoublyLinkedList_push,
 		ArginfoDllistPush,
-		uint32(g.SizeOf("arginfo_dllist_push")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"unshift",
 		zim_spl_SplDoublyLinkedList_unshift,
 		ArginfoDllistPush,
-		uint32(g.SizeOf("arginfo_dllist_push")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"top",
 		zim_spl_SplDoublyLinkedList_top,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"bottom",
 		zim_spl_SplDoublyLinkedList_bottom,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"isEmpty",
 		zim_spl_SplDoublyLinkedList_isEmpty,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"setIteratorMode",
 		zim_spl_SplDoublyLinkedList_setIteratorMode,
 		ArginfoDllistSetiteratormode,
-		uint32(g.SizeOf("arginfo_dllist_setiteratormode")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_setiteratormode")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"getIteratorMode",
 		zim_spl_SplDoublyLinkedList_getIteratorMode,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"__debugInfo",
 		zim_spl_SplDoublyLinkedList___debugInfo,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"count",
 		zim_spl_SplDoublyLinkedList_count,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"offsetExists",
 		zim_spl_SplDoublyLinkedList_offsetExists,
 		arginfo_dllist_offsetGet,
-		uint32(g.SizeOf("arginfo_dllist_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"offsetGet",
 		zim_spl_SplDoublyLinkedList_offsetGet,
 		arginfo_dllist_offsetGet,
-		uint32(g.SizeOf("arginfo_dllist_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"offsetSet",
 		zim_spl_SplDoublyLinkedList_offsetSet,
 		arginfo_dllist_offsetSet,
-		uint32(g.SizeOf("arginfo_dllist_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_offsetSet")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"offsetUnset",
 		zim_spl_SplDoublyLinkedList_offsetUnset,
 		arginfo_dllist_offsetGet,
-		uint32(g.SizeOf("arginfo_dllist_offsetGet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"add",
 		zim_spl_SplDoublyLinkedList_add,
 		arginfo_dllist_offsetSet,
-		uint32(g.SizeOf("arginfo_dllist_offsetSet")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_offsetSet")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"rewind",
 		zim_spl_SplDoublyLinkedList_rewind,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"current",
 		zim_spl_SplDoublyLinkedList_current,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"key",
 		zim_spl_SplDoublyLinkedList_key,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"next",
 		zim_spl_SplDoublyLinkedList_next,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"prev",
 		zim_spl_SplDoublyLinkedList_prev,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"valid",
 		zim_spl_SplDoublyLinkedList_valid,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"unserialize",
 		zim_spl_SplDoublyLinkedList_unserialize,
 		ArginfoDllistSerialized,
-		uint32(g.SizeOf("arginfo_dllist_serialized")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_serialized")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"serialize",
 		zim_spl_SplDoublyLinkedList_serialize,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"__unserialize",
 		zim_spl_SplDoublyLinkedList___unserialize,
 		ArginfoDllistSerialized,
-		uint32(g.SizeOf("arginfo_dllist_serialized")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_serialized")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{
 		"__serialize",
 		zim_spl_SplDoublyLinkedList___serialize,
 		ArginfoDllistVoid,
-		uint32(g.SizeOf("arginfo_dllist_void")/g.SizeOf("struct _zend_internal_arg_info") - 1),
-		1 << 0,
+		uint32_t(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		zend.ZEND_ACC_PUBLIC,
 	},
 	{nil, nil, nil, 0, 0},
 }
@@ -1690,21 +1475,21 @@ var spl_funcs_SplDoublyLinkedList []zend.ZendFunctionEntry = []zend.ZendFunction
 
 func ZmStartupSplDllist(type_ int, module_number int) int {
 	SplRegisterStdClass(&spl_ce_SplDoublyLinkedList, "SplDoublyLinkedList", SplDllistObjectNew, spl_funcs_SplDoublyLinkedList)
-	memcpy(&spl_handler_SplDoublyLinkedList, &zend.StdObjectHandlers, g.SizeOf("zend_object_handlers"))
+	memcpy(&spl_handler_SplDoublyLinkedList, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
 	spl_handler_SplDoublyLinkedList.offset = zend_long((*byte)(&((*SplDllistObject)(nil).GetStd())) - (*byte)(nil))
 	spl_handler_SplDoublyLinkedList.clone_obj = SplDllistObjectClone
 	spl_handler_SplDoublyLinkedList.count_elements = SplDllistObjectCountElements
 	spl_handler_SplDoublyLinkedList.get_gc = SplDllistObjectGetGc
 	spl_handler_SplDoublyLinkedList.dtor_obj = zend.ZendObjectsDestroyObject
 	spl_handler_SplDoublyLinkedList.free_obj = SplDllistObjectFreeStorage
-	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_LIFO", g.SizeOf("\"IT_MODE_LIFO\"")-1, zend.ZendLong(0x2))
-	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_FIFO", g.SizeOf("\"IT_MODE_FIFO\"")-1, zend.ZendLong(0))
-	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_DELETE", g.SizeOf("\"IT_MODE_DELETE\"")-1, zend.ZendLong(0x1))
-	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_KEEP", g.SizeOf("\"IT_MODE_KEEP\"")-1, zend.ZendLong(0))
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, zend.ZendCeIterator)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, zend.ZendCeCountable)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, zend.ZendCeArrayaccess)
-	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, zend.ZendCeSerializable)
+	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_LIFO", b.SizeOf("\"IT_MODE_LIFO\"")-1, zend.ZendLong(SPL_DLLIST_IT_LIFO))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_FIFO", b.SizeOf("\"IT_MODE_FIFO\"")-1, zend.ZendLong(0))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_DELETE", b.SizeOf("\"IT_MODE_DELETE\"")-1, zend.ZendLong(SPL_DLLIST_IT_DELETE))
+	zend.ZendDeclareClassConstantLong(spl_ce_SplDoublyLinkedList, "IT_MODE_KEEP", b.SizeOf("\"IT_MODE_KEEP\"")-1, zend.ZendLong(0))
+	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Iterator)
+	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Countable)
+	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_ArrayAccess)
+	zend.ZendClassImplements(spl_ce_SplDoublyLinkedList, 1, spl_ce_Serializable)
 	spl_ce_SplDoublyLinkedList.get_iterator = SplDllistGetIterator
 	SplRegisterSubClass(&spl_ce_SplQueue, spl_ce_SplDoublyLinkedList, "SplQueue", SplDllistObjectNew, spl_funcs_SplQueue)
 	SplRegisterSubClass(&spl_ce_SplStack, spl_ce_SplDoublyLinkedList, "SplStack", SplDllistObjectNew, nil)

@@ -2,6 +2,11 @@
 
 package standard
 
+import (
+	b "sik/builtin"
+	"sik/zend"
+)
+
 // Source: <ext/standard/php_incomplete_class.h>
 
 /*
@@ -26,14 +31,22 @@ package standard
 
 // # include "ext/standard/basic_functions.h"
 
-// #define PHP_IC_ENTRY       BG ( incomplete_class )
+const PHP_IC_ENTRY *zend.ZendClassEntry = BG(incomplete_class)
 
-// #define PHP_SET_CLASS_ATTRIBUTES(struc) if ( Z_OBJCE_P ( struc ) == BG ( incomplete_class ) ) { class_name = php_lookup_class_name ( struc ) ; if ( ! class_name ) { class_name = zend_string_init ( INCOMPLETE_CLASS , sizeof ( INCOMPLETE_CLASS ) - 1 , 0 ) ; } incomplete_class = 1 ; } else { class_name = zend_string_copy ( Z_OBJCE_P ( struc ) -> name ) ; }
-
-// #define PHP_CLEANUP_CLASS_ATTRIBUTES() zend_string_release_ex ( class_name , 0 )
+func PHP_SET_CLASS_ATTRIBUTES(struc *zend.Zval) {
+	if zend.Z_OBJCE_P(struc) == BG(incomplete_class) {
+		class_name = PhpLookupClassName(struc)
+		if !class_name {
+			class_name = zend.ZendStringInit(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 0)
+		}
+		incomplete_class = 1
+	} else {
+		class_name = zend.ZendStringCopy(zend.Z_OBJCE_P(struc).name)
+	}
+}
+func PHP_CLEANUP_CLASS_ATTRIBUTES() { zend.ZendStringReleaseEx(class_name, 0) }
 
 // #define PHP_CLASS_ATTRIBUTES       zend_string * class_name ; zend_bool incomplete_class ZEND_ATTRIBUTE_UNUSED = 0
 
-// #define INCOMPLETE_CLASS       "__PHP_Incomplete_Class"
-
-// #define MAGIC_MEMBER       "__PHP_Incomplete_Class_Name"
+const INCOMPLETE_CLASS = "__PHP_Incomplete_Class"
+const MAGIC_MEMBER = "__PHP_Incomplete_Class_Name"

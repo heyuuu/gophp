@@ -3,8 +3,8 @@
 package zend
 
 import (
+	b "sik/builtin"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 )
 
 // Source: <Zend/zend_ini_parser.h>
@@ -46,51 +46,48 @@ const (
 
 type YYSTYPE = int
 
-// #define YYSTYPE_IS_TRIVIAL       1
+const YYSTYPE_IS_TRIVIAL = 1
+const YYSTYPE_IS_DECLARED = 1
 
-// #define YYSTYPE_IS_DECLARED       1
+var IniParse func() int
 
 // Source: <Zend/zend_ini_parser.c>
 
 /* A Bison parser, made by GNU Bison 3.0.2.  */
 
-// #define YYBISON       1
+const YYBISON = 1
 
 /* Bison version.  */
 
-// #define YYBISON_VERSION       "3.0.2"
+const YYBISON_VERSION = "3.0.2"
 
 /* Skeleton name.  */
 
-// #define YYSKELETON_NAME       "yacc.c"
+const YYSKELETON_NAME = "yacc.c"
 
 /* Pure parsers.  */
 
-// #define YYPURE       2
+const YYPURE = 2
 
 /* Push parsers.  */
 
-// #define YYPUSH       0
+const YYPUSH = 0
 
 /* Pull parsers.  */
 
-// #define YYPULL       1
+const YYPULL = 1
 
 /* Substitute the variable and function names.  */
 
-// #define yyparse       ini_parse
-
-// #define yylex       ini_lex
-
-// #define yyerror       ini_error
-
-// #define yydebug       ini_debug
-
-// #define yynerrs       ini_nerrs
+const IniYyparse = IniParse
+const IniYylex = IniLex
+const IniYyerror = IniError
+const IniYydebug = ini_debug
+const IniYynerrs = ini_nerrs
 
 /* Copy the first part of user declarations.  */
 
-// #define DEBUG_CFG_PARSER       0
+const DEBUG_CFG_PARSER = 0
 
 // # include "zend.h"
 
@@ -106,21 +103,19 @@ type YYSTYPE = int
 
 // #define YYSTYPE       zval
 
-// #define ZEND_INI_PARSER_CB       ( CG ( ini_parser_param ) ) -> ini_parser_cb
-
-// #define ZEND_INI_PARSER_ARG       ( CG ( ini_parser_param ) ) -> arg
-
-// #define ZEND_SYSTEM_INI       CG ( ini_parser_unbuffered_errors )
+const ZEND_INI_PARSER_CB = CompilerGlobals.GetIniParserParam().GetIniParserCb()
+const ZEND_INI_PARSER_ARG = CompilerGlobals.GetIniParserParam().GetArg()
+const ZEND_SYSTEM_INI = CompilerGlobals.GetIniParserUnbufferedErrors()
 
 func GetIntVal(op *Zval) int {
-	switch op.GetType() {
-	case 4:
-		return op.GetValue().GetLval()
-	case 5:
-		return int(op.GetValue().GetDval())
-	case 6:
-		var val int = atoi(op.GetValue().GetStr().GetVal())
-		ZendStringFree(op.GetValue().GetStr())
+	switch Z_TYPE_P(op) {
+	case IS_LONG:
+		return Z_LVAL_P(op)
+	case IS_DOUBLE:
+		return int(Z_DVAL_P(op))
+	case IS_STRING:
+		var val int = atoi(Z_STRVAL_P(op))
+		ZendStringFree(Z_STR_P(op))
 		return val
 	default:
 		break
@@ -163,25 +158,16 @@ func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
 		break
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	var __z *Zval = result
-	var __s *ZendString = ZendStringInit(str_result, str_len, CG.GetIniParserUnbufferedErrors())
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
+	ZVAL_NEW_STR(result, ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
 }
 
 /* }}} */
 
 func ZendIniInitString(result *Zval) {
-	if CG.GetIniParserUnbufferedErrors() != 0 {
-		var __z *Zval = result
-		var __s *ZendString = ZendStringInit("", 0, 1)
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+	if ZEND_SYSTEM_INI != 0 {
+		ZVAL_EMPTY_PSTRING(result)
 	} else {
-		var __z *Zval = result
-		var __s *ZendString = ZendEmptyString
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6)
+		ZVAL_EMPTY_STRING(result)
 	}
 }
 
@@ -190,44 +176,29 @@ func ZendIniInitString(result *Zval) {
 func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 	var length int
 	var op1_len int
-	if op1.GetType() != 6 {
+	if Z_TYPE_P(op1) != IS_STRING {
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
-		if CG.GetIniParserUnbufferedErrors() != 0 {
+		if ZEND_SYSTEM_INI != 0 {
 			var tmp_str *ZendString
 			var str *ZendString = ZvalGetTmpString(op1, &tmp_str)
-			var __z *Zval = op1
-			var __s *ZendString = ZendStringInit(str.GetVal(), str.GetLen(), 1)
-			__z.GetValue().SetStr(__s)
-			__z.SetTypeInfo(6 | 1<<0<<8)
+			ZVAL_PSTRINGL(op1, ZSTR_VAL(str), ZSTR_LEN(str))
 			ZendTmpStringRelease(tmp_str)
 		} else {
-			var __z *Zval = op1
-			var __s *ZendString = ZvalGetStringFunc(op1)
-			__z.GetValue().SetStr(__s)
-			if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-				__z.SetTypeInfo(6)
-			} else {
-				__z.SetTypeInfo(6 | 1<<0<<8)
-			}
+			ZVAL_STR(op1, ZvalGetStringFunc(op1))
 		}
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 	}
-	op1_len = int(op1.GetValue().GetStr().GetLen())
-	if op2.GetType() != 6 {
-		if op2.GetType() != 6 {
-			_convertToString(op2)
-		}
+	op1_len = int(Z_STRLEN_P(op1))
+	if Z_TYPE_P(op2) != IS_STRING {
+		ConvertToString(op2)
 	}
-	length = op1_len + int(op2.GetValue().GetStr().GetLen())
-	var __z *Zval = result
-	var __s *ZendString = ZendStringExtend(op1.GetValue().GetStr(), length, CG.GetIniParserUnbufferedErrors())
-	__z.GetValue().SetStr(__s)
-	__z.SetTypeInfo(6 | 1<<0<<8)
-	memcpy(result.GetValue().GetStr().GetVal()+op1_len, op2.GetValue().GetStr().GetVal(), op2.GetValue().GetStr().GetLen()+1)
+	length = op1_len + int(Z_STRLEN_P(op2))
+	ZVAL_NEW_STR(result, ZendStringExtend(Z_STR_P(op1), length, ZEND_SYSTEM_INI))
+	memcpy(Z_STRVAL_P(result)+op1_len, Z_STRVAL_P(op2), Z_STRLEN_P(op2)+1)
 }
 
 /* }}} */
@@ -238,37 +209,20 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
-	if !(memchr(name.GetValue().GetStr().GetVal(), ':', name.GetValue().GetStr().GetLen())) && g.Assign(&c, ZendGetConstant(name.GetValue().GetStr())) != 0 {
-		if c.GetType() != 6 {
-			var _z1 *Zval = &tmp
-			var _z2 *Zval = c
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
-			if (_t & 0xff00) != 0 {
-				if (ZvalGcFlags(_gc.GetGc().GetTypeInfo()) & 1 << 7) == 0 {
-					ZendGcAddref(&_gc.gc)
-				} else {
-					ZvalCopyCtorFunc(_z1)
-				}
-			}
-			if (tmp.GetTypeInfo() & 0xff) == 11 {
+	if !(memchr(Z_STRVAL_P(name), ':', Z_STRLEN_P(name))) && b.Assign(&c, ZendGetConstant(Z_STR_P(name))) != 0 {
+		if Z_TYPE_P(c) != IS_STRING {
+			ZVAL_COPY_OR_DUP(&tmp, c)
+			if Z_OPT_CONSTANT(tmp) {
 				ZvalUpdateConstantEx(&tmp, nil)
 			}
-			if &tmp.GetType() != 6 {
-				_convertToString(&tmp)
-			}
+			ConvertToString(&tmp)
 			c = &tmp
 		}
-		var __z *Zval = result
-		var __s *ZendString = ZendStringInit(c.GetValue().GetStr().GetVal(), c.GetValue().GetStr().GetLen(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(c), Z_STRLEN_P(c), ZEND_SYSTEM_INI))
 		if c == &tmp {
-			ZendStringRelease(tmp.GetValue().GetStr())
+			ZendStringRelease(Z_STR(tmp))
 		}
-		ZendStringFree(name.GetValue().GetStr())
+		ZendStringFree(Z_STR_P(name))
 	} else {
 		*result = *name
 	}
@@ -284,16 +238,10 @@ func ZendIniGetVar(result *Zval, name *Zval) {
 
 	/* Fetch configuration option value */
 
-	if g.Assign(&curval, ZendGetConfigurationDirective(name.GetValue().GetStr())) != nil {
-		var __z *Zval = result
-		var __s *ZendString = ZendStringInit(curval.GetValue().GetStr().GetVal(), curval.GetValue().GetStr().GetLen(), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	} else if g.Assign(&envvar, ZendGetenv(name.GetValue().GetStr().GetVal(), name.GetValue().GetStr().GetLen())) != nil || g.Assign(&envvar, getenv(name.GetValue().GetStr().GetVal())) != nil {
-		var __z *Zval = result
-		var __s *ZendString = ZendStringInit(envvar, strlen(envvar), CG.GetIniParserUnbufferedErrors())
-		__z.GetValue().SetStr(__s)
-		__z.SetTypeInfo(6 | 1<<0<<8)
+	if b.Assign(&curval, ZendGetConfigurationDirective(Z_STR_P(name))) != nil {
+		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(curval), Z_STRLEN_P(curval), ZEND_SYSTEM_INI))
+	} else if b.Assign(&envvar, ZendGetenv(Z_STRVAL_P(name), Z_STRLEN_P(name))) != nil || b.Assign(&envvar, getenv(Z_STRVAL_P(name))) != nil {
+		ZVAL_NEW_STR(result, ZendStringInit(envvar, strlen(envvar), ZEND_SYSTEM_INI))
 	} else {
 		ZendIniInitString(result)
 	}
@@ -310,17 +258,17 @@ func IniError(msg *byte) {
 	currently_parsed_filename = ZendIniScannerGetFilename()
 	if currently_parsed_filename != nil {
 		error_buf_len = 128 + int(strlen(msg)+int(strlen(currently_parsed_filename)))
-		error_buf = (*byte)(_emalloc(error_buf_len))
+		error_buf = (*byte)(Emalloc(error_buf_len))
 		sprintf(error_buf, "%s in %s on line %d\n", msg, currently_parsed_filename, ZendIniScannerGetLineno())
 	} else {
-		error_buf = _estrdup("Invalid configuration directive\n")
+		error_buf = Estrdup("Invalid configuration directive\n")
 	}
-	if CG.GetIniParserUnbufferedErrors() != 0 {
+	if CompilerGlobals.GetIniParserUnbufferedErrors() != 0 {
 		r.Fprintf(stderr, "PHP:  %s", error_buf)
 	} else {
-		ZendError(1<<1, "%s", error_buf)
+		ZendError(E_WARNING, "%s", error_buf)
 	}
-	_efree(error_buf)
+	Efree(error_buf)
 }
 
 /* }}} */
@@ -330,11 +278,11 @@ func ZendParseIniFile(fh *ZendFileHandle, unbuffered_errors ZendBool, scanner_mo
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
-	CG.SetIniParserParam(&ini_parser_param)
+	CompilerGlobals.SetIniParserParam(&ini_parser_param)
 	if ZendIniOpenFileForScanning(fh, scanner_mode) == FAILURE {
 		return FAILURE
 	}
-	CG.SetIniParserUnbufferedErrors(unbuffered_errors)
+	CompilerGlobals.SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	ZendFileHandleDtor(fh)
 	ShutdownIniScanner()
@@ -352,11 +300,11 @@ func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int,
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
-	CG.SetIniParserParam(&ini_parser_param)
+	CompilerGlobals.SetIniParserParam(&ini_parser_param)
 	if ZendIniPrepareStringForScanning(str, scanner_mode) == FAILURE {
 		return FAILURE
 	}
-	CG.SetIniParserUnbufferedErrors(unbuffered_errors)
+	CompilerGlobals.SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	ShutdownIniScanner()
 	if retval == 0 {
@@ -369,18 +317,18 @@ func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int,
 /* }}} */
 
 func ZvalIniDtor(zv *Zval) {
-	if zv.GetType() == 6 {
-		ZendStringRelease(zv.GetValue().GetStr())
+	if Z_TYPE_P(zv) == IS_STRING {
+		ZendStringRelease(Z_STR_P(zv))
 	}
 }
 
 /* }}} */
 
-// #define YY_NULLPTR       0
+const YY_NULLPTR = 0
 
 /* Enabling verbose error messages.  */
 
-// #define YYERROR_VERBOSE       1
+const YYERROR_VERBOSE = 1
 
 /* In a future release of Bison, this section will be replaced
    by #include "zend_ini_parser.h".  */
@@ -425,11 +373,10 @@ type IniYytypeInt16 = short__int
 
 // # include < stddef . h >
 
-// #define YYSIZE_T       size_t
+const YYSIZE_T = size_t
+const YYSIZE_MAXIMUM = YYSIZE_T - 1
 
-// #define YYSIZE_MAXIMUM       ( ( YYSIZE_T ) - 1 )
-
-// #define YY_(Msgid) Msgid
+func YY_(Msgid string) string { return Msgid }
 
 // #define YY_ATTRIBUTE(Spec)
 
@@ -441,7 +388,7 @@ type IniYytypeInt16 = short__int
 
 /* Suppress unused-variable warnings by "using" E.  */
 
-// #define YYUSE(E) ( ( void ) ( E ) )
+func YYUSE(E __auto__) { void(E) }
 
 // #define YY_INITIAL_VALUE(Value) Value
 
@@ -451,17 +398,14 @@ type IniYytypeInt16 = short__int
 
 /* The parser invokes alloca or malloc; define the __special__  necessary symbols.  */
 
-// #define YYSTACK_ALLOC       YYMALLOC
+const YYSTACK_ALLOC = YYMALLOC
+const YYSTACK_FREE = YYFREE
+const YYSTACK_ALLOC_MAXIMUM YYSIZE_T = YYSIZE_MAXIMUM
+const YYMALLOC = Malloc
 
-// #define YYSTACK_FREE       YYFREE
+var Malloc func(YYSIZE_T) any
 
-// #define YYSTACK_ALLOC_MAXIMUM       YYSIZE_MAXIMUM
-
-// #define YYMALLOC       malloc
-
-var Malloc func(int) any
-
-// #define YYFREE       free
+const YYFREE = Free
 
 var Free func(any)
 
@@ -469,14 +413,16 @@ var Free func(any)
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 
-// #define YYSTACK_GAP_MAXIMUM       ( sizeof ( union yyalloc ) - 1 )
+const YYSTACK_GAP_MAXIMUM = b.SizeOf("union yyalloc") - 1
 
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 
-// #define YYSTACK_BYTES(N) ( ( N ) * ( sizeof ( yytype_int16 ) + sizeof ( YYSTYPE ) ) + YYSTACK_GAP_MAXIMUM )
+func YYSTACK_BYTES(N __auto__) int {
+	return N*(b.SizeOf("yytype_int16")+b.SizeOf("YYSTYPE")) + YYSTACK_GAP_MAXIMUM
+}
 
-// #define YYCOPY_NEEDED       1
+const YYCOPY_NEEDED = 1
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
@@ -489,40 +435,46 @@ var Free func(any)
 /* Copy COUNT objects from SRC to DST.  The source and destination do
    not overlap.  */
 
-// #define YYCOPY(Dst,Src,Count) do { YYSIZE_T yyi ; for ( yyi = 0 ; yyi < ( Count ) ; yyi ++ ) ( Dst ) [ yyi ] = ( Src ) [ yyi ] ; } while ( 0 )
+func YYCOPY(Dst __auto__, Src __auto__, Count __auto__) {
+	var yyi YYSIZE_T
+	for yyi = 0; yyi < Count; yyi++ {
+		Dst[yyi] = Src[yyi]
+	}
+}
 
 /* YYFINAL -- State number of the termination state.  */
 
-// #define YYFINAL       2
+const YYFINAL = 2
 
 /* YYLAST -- Last index in YYTABLE.  */
 
-// #define YYLAST       123
+const YYLAST = 123
 
 /* YYNTOKENS -- Number of terminals.  */
 
-// #define YYNTOKENS       44
+const YYNTOKENS = 44
 
 /* YYNNTS -- Number of nonterminals.  */
 
-// #define YYNNTS       13
+const YYNNTS = 13
 
 /* YYNRULES -- Number of rules.  */
 
-// #define YYNRULES       50
+const YYNRULES = 50
 
 /* YYNSTATES -- Number of states.  */
 
-// #define YYNSTATES       72
+const YYNSTATES = 72
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 
-// #define YYUNDEFTOK       2
+const YYUNDEFTOK = 2
+const YYMAXUTOK = 272
 
-// #define YYMAXUTOK       272
-
-// #define YYTRANSLATE(YYX) ( ( unsigned int ) ( YYX ) <= YYMAXUTOK ? yytranslate [ YYX ] : YYUNDEFTOK )
+func YYTRANSLATE(YYX __auto__) uint {
+	return uint(b.CondF1(YYX <= YYMAXUTOK, func() __auto__ { return yytranslate[YYX] }, YYUNDEFTOK))
+}
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex, without out-of-bounds checking.  */
@@ -532,15 +484,15 @@ var IniYytranslate []yytype_uint8 = []yytype_uint8{0, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 
-var IniYytname []*byte = []*byte{"\"end of file\"", "error", "$undefined", "TC_SECTION", "TC_RAW", "TC_CONSTANT", "TC_NUMBER", "TC_STRING", "TC_WHITESPACE", "TC_LABEL", "TC_OFFSET", "TC_DOLLAR_CURLY", "TC_VARNAME", "TC_QUOTED_STRING", "BOOL_TRUE", "BOOL_FALSE", "NULL_NULL", "END_OF_LINE", "'='", "':'", "','", "'.'", "'\"'", "'\\''", "'^'", "'+'", "'-'", "'/'", "'*'", "'%'", "'$'", "'~'", "'<'", "'>'", "'?'", "'@'", "'{'", "'}'", "'|'", "'&'", "'!'", "']'", "'('", "')'", "$accept", "statement_list", "statement", "section_string_or_value", "string_or_value", "option_offset", "encapsed_list", "var_string_list_section", "var_string_list", "expr", "cfg_var_ref", "constant_literal", "constant_string", 0}
+var IniYytname []*byte = []*byte{"\"end of file\"", "error", "$undefined", "TC_SECTION", "TC_RAW", "TC_CONSTANT", "TC_NUMBER", "TC_STRING", "TC_WHITESPACE", "TC_LABEL", "TC_OFFSET", "TC_DOLLAR_CURLY", "TC_VARNAME", "TC_QUOTED_STRING", "BOOL_TRUE", "BOOL_FALSE", "NULL_NULL", "END_OF_LINE", "'='", "':'", "','", "'.'", "'\"'", "'\\''", "'^'", "'+'", "'-'", "'/'", "'*'", "'%'", "'$'", "'~'", "'<'", "'>'", "'?'", "'@'", "'{'", "'}'", "'|'", "'&'", "'!'", "']'", "'('", "')'", "$accept", "statement_list", "statement", "section_string_or_value", "string_or_value", "option_offset", "encapsed_list", "var_string_list_section", "var_string_list", "expr", "cfg_var_ref", "constant_literal", "constant_string", YY_NULLPTR}
 
-// #define YYPACT_NINF       - 25
+const YYPACT_NINF = -25
 
-// #define yypact_value_is_default(Yystate) ( ! ! ( ( Yystate ) == ( - 25 ) ) )
+func IniYypactValueIsDefault(Yystate __auto__) bool { return !!(Yystate == -25) }
 
-// #define YYTABLE_NINF       - 1
+const YYTABLE_NINF = -1
 
-// #define yytable_value_is_error(Yytable_value) 0
+func IniYytableValueIsError(Yytable_value __auto__) int { return 0 }
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
@@ -581,13 +533,10 @@ var IniYyr1 []yytype_uint8 = []yytype_uint8{0, 44, 45, 45, 46, 46, 46, 46, 46, 4
 
 var IniYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 2, 0, 3, 3, 5, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 2, 2, 0, 1, 1, 3, 2, 2, 4, 1, 1, 3, 2, 2, 4, 1, 3, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
-// #define yyerrok       ( yyerrstatus = 0 )
-
-// #define yyclearin       ( yychar = YYEMPTY )
-
-// #define YYEMPTY       ( - 2 )
-
-// #define YYEOF       0
+const IniYyerrok = b.Assign(&yyerrstatus, 0)
+const IniYyclearin = b.Assign(&yychar, YYEMPTY)
+const YYEMPTY = -2
+const YYEOF = 0
 
 // #define YYACCEPT       goto yyacceptlab
 
@@ -595,15 +544,24 @@ var IniYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 2, 0, 3, 3, 5, 1, 1, 1, 0, 1, 
 
 // #define YYERROR       goto yyerrorlab
 
-// #define YYRECOVERING() ( ! ! yyerrstatus )
-
-// #define YYBACKUP(Token,Value) do if ( yychar == YYEMPTY ) { yychar = ( Token ) ; yylval = ( Value ) ; YYPOPSTACK ( yylen ) ; yystate = * yyssp ; goto yybackup ; } else { yyerror ( YY_ ( "syntax error: cannot back up" ) ) ; YYERROR ; } while ( 0 )
+func YYRECOVERING() bool { return !!yyerrstatus }
+func YYBACKUP(Token __auto__, Value __auto__) {
+	if yychar == YYEMPTY {
+		yychar = Token
+		yylval = Value
+		YYPOPSTACK(yylen)
+		yystate = *yyssp
+		goto yybackup
+	} else {
+		yyerror(YY_("syntax error: cannot back up"))
+		goto yyerrorlab
+	}
+}
 
 /* Error token number */
 
-// #define YYTERROR       1
-
-// #define YYERRCODE       256
+const YYTERROR = 1
+const YYERRCODE = 256
 
 /* Enable debugging if requested.  */
 
@@ -617,7 +575,7 @@ var IniYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 2, 0, 3, 3, 5, 1, 1, 1, 0, 1, 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
 
-// #define YYINITDEPTH       200
+const YYINITDEPTH = 200
 
 /* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
    if the built-in stack extension method is used).
@@ -626,12 +584,12 @@ var IniYyr2 []yytype_uint8 = []yytype_uint8{0, 2, 2, 0, 3, 3, 5, 1, 1, 1, 0, 1, 
    YYSTACK_ALLOC_MAXIMUM < YYSTACK_BYTES (YYMAXDEPTH)
    evaluated with infinite-precision integer arithmetic.  */
 
-// #define YYMAXDEPTH       10000
+const YYMAXDEPTH = 10000
 
 /* Return the length of YYSTR.  */
 
-func IniYystrlen(yystr *byte) int {
-	var yylen int
+func IniYystrlen(yystr *byte) YYSIZE_T {
+	var yylen YYSIZE_T
 	for yylen = 0; yystr[yylen]; yylen++ {
 		continue
 	}
@@ -644,7 +602,7 @@ func IniYystrlen(yystr *byte) int {
 func IniYystpcpy(yydest *byte, yysrc *byte) *byte {
 	var yyd *byte = yydest
 	var yys *byte = yysrc
-	for g.Assign(&(g.PostInc(&(*yyd))), g.PostInc(&(*yys))) != '0' {
+	for b.Assign(&(b.PostInc(&(*yyd))), b.PostInc(&(*yys))) != '0' {
 		continue
 	}
 	return yyd - 1
@@ -658,18 +616,18 @@ func IniYystpcpy(yydest *byte, yysrc *byte) *byte {
    null, do not copy; instead, return the length of what the result
    would have been.  */
 
-func IniYytnamerr(yyres *byte, yystr *byte) int {
+func IniYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 	if (*yystr) == '"' {
-		var yyn int = 0
+		var yyn YYSIZE_T = 0
 		var yyp *byte = yystr
 		for {
-			switch *(g.PreInc(&yyp)) {
+			switch *(b.PreInc(&yyp)) {
 			case '\'':
 
 			case ',':
 				goto do_not_strip_quotes
 			case '\\':
-				if (*(g.PreInc(&yyp))) != '\\' {
+				if (*(b.PreInc(&yyp))) != '\\' {
 					goto do_not_strip_quotes
 				}
 			default:
@@ -702,14 +660,14 @@ func IniYytnamerr(yyres *byte, yystr *byte) int {
    *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
    required number of bytes is too large to store.  */
 
-func IniYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytoken int) int {
-	var yysize0 int = yytnamerr(0, yytname[yytoken])
-	var yysize int = yysize0
+func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, yytoken int) int {
+	var yysize0 YYSIZE_T = yytnamerr(YY_NULLPTR, yytname[yytoken])
+	var yysize YYSIZE_T = yysize0
 	const YYERROR_VERBOSE_ARGS_MAXIMUM = 5
 
 	/* Internationalized format string. */
 
-	var yyformat *byte = 0
+	var yyformat *byte = YY_NULLPTR
 
 	/* Arguments of yyformat. */
 
@@ -744,32 +702,32 @@ func IniYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytok
 	     accepted due to an error action in a later state.
 	*/
 
-	if yytoken != -2 {
+	if yytoken != YYEMPTY {
 		var yyn int = yypact[*yyssp]
-		yyarg[g.PostInc(&yycount)] = yytname[yytoken]
-		if yyn != -25 {
+		yyarg[b.PostInc(&yycount)] = yytname[yytoken]
+		if !(yypact_value_is_default(yyn)) {
 
 			/* Start YYX at -YYN if negative to avoid negative indexes in
 			   YYCHECK.  In other words, skip the first -YYN actions for
 			   this state because they are default actions.  */
 
-			var yyxbegin int = g.Cond(yyn < 0, -yyn, 0)
+			var yyxbegin int = b.Cond(yyn < 0, -yyn, 0)
 
 			/* Stay within bounds of both yycheck and yytname.  */
 
-			var yychecklim int = 123 - yyn + 1
-			var yyxend int = g.Cond(yychecklim < 44, yychecklim, 44)
+			var yychecklim int = YYLAST - yyn + 1
+			var yyxend int = b.Cond(yychecklim < YYNTOKENS, yychecklim, YYNTOKENS)
 			var yyx int
 			for yyx = yyxbegin; yyx < yyxend; yyx++ {
-				if yycheck[yyx+yyn] == yyx && yyx != 1 {
+				if yycheck[yyx+yyn] == yyx && yyx != YYTERROR && !(yytable_value_is_error(yytable[yyx+yyn])) {
 					if yycount == YYERROR_VERBOSE_ARGS_MAXIMUM {
 						yycount = 1
 						yysize = yysize0
 						break
 					}
-					yyarg[g.PostInc(&yycount)] = yytname[yyx]
-					var yysize1 int = yysize + yytnamerr(0, yytname[yyx])
-					if !(yysize <= yysize1 && yysize1 <= size_t-1) {
+					yyarg[b.PostInc(&yycount)] = yytname[yyx]
+					var yysize1 YYSIZE_T = yysize + yytnamerr(YY_NULLPTR, yytname[yyx])
+					if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
 						return 2
 					}
 					yysize = yysize1
@@ -779,33 +737,33 @@ func IniYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytok
 	}
 	switch yycount {
 	case 0:
-		yyformat = "syntax error"
+		yyformat = YY_("syntax error")
 		break
 	case 1:
-		yyformat = "syntax error, unexpected %s"
+		yyformat = YY_("syntax error, unexpected %s")
 		break
 	case 2:
-		yyformat = "syntax error, unexpected %s, expecting %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s")
 		break
 	case 3:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s")
 		break
 	case 4:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s")
 		break
 	case 5:
-		yyformat = "syntax error, unexpected %s, expecting %s or %s or %s or %s"
+		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s")
 		break
 	}
-	var yysize1 int = yysize + yystrlen(yyformat)
-	if !(yysize <= yysize1 && yysize1 <= size_t-1) {
+	var yysize1 YYSIZE_T = yysize + yystrlen(yyformat)
+	if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
 		return 2
 	}
 	yysize = yysize1
 	if (*yymsg_alloc) < yysize {
 		*yymsg_alloc = 2 * yysize
-		if !(yysize <= (*yymsg_alloc) && (*yymsg_alloc) <= size_t-1) {
-			*yymsg_alloc = size_t - 1
+		if !(yysize <= (*yymsg_alloc) && (*yymsg_alloc) <= YYSTACK_ALLOC_MAXIMUM) {
+			*yymsg_alloc = YYSTACK_ALLOC_MAXIMUM
 		}
 		return 1
 	}
@@ -816,9 +774,9 @@ func IniYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytok
 
 	var yyp *byte = *yymsg
 	var yyi int = 0
-	for g.Assign(&(*yyp), *yyformat) != '0' {
+	for b.Assign(&(*yyp), *yyformat) != '0' {
 		if (*yyp) == '%' && yyformat[1] == 's' && yyi < yycount {
-			yyp += yytnamerr(yyp, yyarg[g.PostInc(&yyi)])
+			yyp += yytnamerr(yyp, yyarg[b.PostInc(&yyi)])
 			yyformat += 2
 		} else {
 			yyp++
@@ -833,7 +791,7 @@ func IniYysyntaxError(yymsg_alloc *int, yymsg **byte, yyssp *yytype_int16, yytok
 `-----------------------------------------------*/
 
 func IniYydestruct(yymsg *byte, yytype int, yyvaluep *Zval) {
-	void(yyvaluep)
+	YYUSE(yyvaluep)
 	if yymsg == nil {
 		yymsg = "Deleting"
 	}
@@ -909,600 +867,3 @@ func IniYydestruct(yymsg *byte, yytype int, yyvaluep *Zval) {
 /*----------.
 | yyparse.  |
 `----------*/
-
-func IniParse() int {
-	/* The lookahead symbol.  */
-
-	var yychar int
-
-	/* The semantic value of the lookahead symbol.  */
-
-	var yyval_default Zval
-	var yylval Zval = yyval_default
-
-	/* Number of syntax errors so far.  */
-
-	var ini_nerrs int
-	var yystate int
-
-	/* Number of tokens to shift before error messages enabled.  */
-
-	var yyerrstatus int
-
-	/* The stacks and their tools:
-	   'yyss': related to states.
-	   'yyvs': related to semantic values.
-
-	   Refer to the stacks through separate pointers, to allow yyoverflow
-	   to reallocate them elsewhere.  */
-
-	var yyssa []yytype_int16
-	var yyss *yytype_int16
-	var yyssp *yytype_int16
-
-	/* The semantic value stack.  */
-
-	var yyvsa []Zval
-	var yyvs *Zval
-	var yyvsp *Zval
-	var yystacksize int
-	var yyn int
-	var yyresult int
-
-	/* Lookahead token as an internal (translated) token number.  */
-
-	var yytoken int = 0
-
-	/* The variables used to return semantic value and location from the
-	   action routines.  */
-
-	var yyval Zval
-
-	/* Buffer for error messages, and its allocated size.  */
-
-	var yymsgbuf []byte
-	var yymsg *byte = yymsgbuf
-	var yymsg_alloc int = g.SizeOf(yymsgbuf)
-
-	// #define YYPOPSTACK(N) ( yyvsp -= ( N ) , yyssp -= ( N ) )
-
-	/* The number of symbols on the RHS of the reduced rule.
-	   Keep to zero when no symbol should be popped.  */
-
-	var yylen int = 0
-	yyss = yyssa
-	yyssp = yyss
-	yyvs = yyvsa
-	yyvsp = yyvs
-	yystacksize = 200
-	yystate = 0
-	yyerrstatus = 0
-	ini_nerrs = 0
-	yychar = -2
-	goto yysetstate
-
-	/*------------------------------------------------------------.
-	  | yynewstate -- Push a new state, which is found in yystate.  |
-	  `------------------------------------------------------------*/
-
-yynewstate:
-
-	/* In all cases, when you get here, the value and location stacks
-	   have just been pushed.  So pushing a state here evens the stacks.  */
-
-	yyssp++
-yysetstate:
-	*yyssp = yystate
-	if yyss+yystacksize-1 <= yyssp {
-
-		/* Get the current used size of the three stacks, in elements.  */
-
-		var yysize int = yyssp - yyss + 1
-
-		/* Extend the stack our own way.  */
-
-		if 10000 <= yystacksize {
-			goto yyexhaustedlab
-		}
-		yystacksize *= 2
-		if 10000 < yystacksize {
-			yystacksize = 10000
-		}
-		var yyss1 *yytype_int16 = yyss
-		var yyptr *__union__yyalloc = (*__union__yyalloc)(Malloc(yystacksize*(g.SizeOf("yytype_int16")+g.SizeOf("YYSTYPE")) + (g.SizeOf("union yyalloc") - 1)))
-		if yyptr == nil {
-			goto yyexhaustedlab
-		}
-		var yynewbytes int
-		var yyi int
-		for yyi = 0; yyi < yysize; yyi++ {
-			&yyptr.yyss_alloc[yyi] = yyss[yyi]
-		}
-		yyss = &yyptr.yyss_alloc
-		yynewbytes = yystacksize*g.SizeOf("* yyss") + (g.SizeOf("union yyalloc") - 1)
-		yyptr += yynewbytes / g.SizeOf("* yyptr")
-		var yynewbytes int
-		var yyi int
-		for yyi = 0; yyi < yysize; yyi++ {
-			&yyptr.yyvs_alloc[yyi] = yyvs[yyi]
-		}
-		yyvs = &yyptr.yyvs_alloc
-		yynewbytes = yystacksize*g.SizeOf("* yyvs") + (g.SizeOf("union yyalloc") - 1)
-		yyptr += yynewbytes / g.SizeOf("* yyptr")
-		if yyss1 != yyssa {
-			Free(yyss1)
-		}
-		yyssp = yyss + yysize - 1
-		yyvsp = yyvs + yysize - 1
-		if yyss+yystacksize-1 <= yyssp {
-			goto yyabortlab
-		}
-	}
-	if yystate == 2 {
-		goto yyacceptlab
-	}
-	goto yybackup
-
-	/*-----------.
-	  | yybackup.  |
-	  `-----------*/
-
-yybackup:
-
-	/* Do appropriate processing given the current state.  Read a
-	   lookahead token if we need one and don't already have one.  */
-
-	yyn = yypact[yystate]
-	if yyn == -25 {
-		goto yydefault
-	}
-
-	/* Not known => get a lookahead token if don't already have one.  */
-
-	if yychar == -2 {
-		yychar = IniLex(&yylval)
-	}
-	if yychar <= 0 {
-		yytoken = 0
-		yychar = yytoken
-	} else {
-		yytoken = uint(g.CondF1(yychar <= 272, func() __auto__ { return yytranslate[yychar] }, 2))
-	}
-
-	/* If the proper action on seeing token YYTOKEN is to reduce or to
-	   detect an error, take that action.  */
-
-	yyn += yytoken
-	if yyn < 0 || 123 < yyn || yycheck[yyn] != yytoken {
-		goto yydefault
-	}
-	yyn = yytable[yyn]
-	if yyn <= 0 {
-
-		yyn = -yyn
-		goto yyreduce
-	}
-
-	/* Count tokens shifted since error; after three, turn off error
-	   status.  */
-
-	if yyerrstatus != 0 {
-		yyerrstatus--
-	}
-
-	/* Shift the lookahead token.  */
-
-	/* Discard the shifted token.  */
-
-	yychar = -2
-	yystate = yyn
-	*(g.PreInc(&yyvsp)) = yylval
-	goto yynewstate
-
-	/*-----------------------------------------------------------.
-	  | yydefault -- do the default action for the current state.  |
-	  `-----------------------------------------------------------*/
-
-yydefault:
-	yyn = yydefact[yystate]
-	if yyn == 0 {
-		goto yyerrlab
-	}
-	goto yyreduce
-
-	/*-----------------------------.
-	  | yyreduce -- Do a reduction.  |
-	  `-----------------------------*/
-
-yyreduce:
-
-	/* yyn is the number of a rule to reduce with.  */
-
-	yylen = yyr2[yyn]
-
-	/* If YYLEN is nonzero, implement the default value of the action:
-	   '$$ = $1'.
-
-	   Otherwise, the following line sets YYVAL to garbage.
-	   This behavior is undocumented and Bison
-	   users should not rely upon it.  Assigning to YYVAL
-	   unconditionally makes the parser a bit smaller, and it avoids a
-	   GCC warning that YYVAL may be used uninitialized.  */
-
-	yyval = yyvsp[1-yylen]
-	switch yyn {
-	case 4:
-		CG.GetIniParserParam().GetIniParserCb()(&yyvsp[-1], nil, nil, 2, CG.GetIniParserParam().GetArg())
-		ZendStringRelease(yyvsp[-1].GetValue().GetStr())
-		break
-	case 5:
-		CG.GetIniParserParam().GetIniParserCb()(&yyvsp[-2], &yyvsp[0], nil, 1, CG.GetIniParserParam().GetArg())
-		ZendStringRelease(yyvsp[-2].GetValue().GetStr())
-		ZvalIniDtor(&yyvsp[0])
-		break
-	case 6:
-		CG.GetIniParserParam().GetIniParserCb()(&yyvsp[-4], &yyvsp[0], &yyvsp[-3], 3, CG.GetIniParserParam().GetArg())
-		ZendStringRelease(yyvsp[-4].GetValue().GetStr())
-		ZvalIniDtor(&yyvsp[-3])
-		ZvalIniDtor(&yyvsp[0])
-		break
-	case 7:
-		CG.GetIniParserParam().GetIniParserCb()(&yyvsp[0], nil, nil, 1, CG.GetIniParserParam().GetArg())
-		ZendStringRelease(yyvsp[0].GetValue().GetStr())
-		break
-	case 9:
-		yyval = yyvsp[0]
-		break
-	case 10:
-		ZendIniInitString(&yyval)
-		break
-	case 11:
-		yyval = yyvsp[0]
-		break
-	case 12:
-		yyval = yyvsp[0]
-		break
-	case 13:
-		yyval = yyvsp[0]
-		break
-	case 14:
-		yyval = yyvsp[0]
-		break
-	case 15:
-		ZendIniInitString(&yyval)
-		break
-	case 16:
-		yyval = yyvsp[0]
-		break
-	case 17:
-		ZendIniInitString(&yyval)
-		break
-	case 18:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 19:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 20:
-		ZendIniInitString(&yyval)
-		break
-	case 21:
-		yyval = yyvsp[0]
-		break
-	case 22:
-		yyval = yyvsp[0]
-		break
-	case 23:
-		yyval = yyvsp[-1]
-		break
-	case 24:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 25:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 26:
-		ZendIniAddString(&yyval, &yyvsp[-3], &yyvsp[-1])
-		ZendStringFree(yyvsp[-1].GetValue().GetStr())
-		break
-	case 27:
-		yyval = yyvsp[0]
-		break
-	case 28:
-		yyval = yyvsp[0]
-		break
-	case 29:
-		yyval = yyvsp[-1]
-		break
-	case 30:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 31:
-		ZendIniAddString(&yyval, &yyvsp[-1], &yyvsp[0])
-		ZendStringFree(yyvsp[0].GetValue().GetStr())
-		break
-	case 32:
-		ZendIniAddString(&yyval, &yyvsp[-3], &yyvsp[-1])
-		ZendStringFree(yyvsp[-1].GetValue().GetStr())
-		break
-	case 33:
-		yyval = yyvsp[0]
-		break
-	case 34:
-		ZendIniDoOp('|', &yyval, &yyvsp[-2], &yyvsp[0])
-		break
-	case 35:
-		ZendIniDoOp('&', &yyval, &yyvsp[-2], &yyvsp[0])
-		break
-	case 36:
-		ZendIniDoOp('^', &yyval, &yyvsp[-2], &yyvsp[0])
-		break
-	case 37:
-		ZendIniDoOp('~', &yyval, &yyvsp[0], nil)
-		break
-	case 38:
-		ZendIniDoOp('!', &yyval, &yyvsp[0], nil)
-		break
-	case 39:
-		yyval = yyvsp[-1]
-		break
-	case 40:
-		ZendIniGetVar(&yyval, &yyvsp[-1])
-		ZendStringFree(yyvsp[-1].GetValue().GetStr())
-		break
-	case 41:
-		yyval = yyvsp[0]
-		break
-	case 42:
-		yyval = yyvsp[0]
-		break
-	case 43:
-		yyval = yyvsp[0]
-		break
-	case 44:
-		yyval = yyvsp[0]
-		break
-	case 45:
-		yyval = yyvsp[0]
-		break
-	case 46:
-		ZendIniGetConstant(&yyval, &yyvsp[0])
-		break
-	case 47:
-		yyval = yyvsp[0]
-		break
-	case 48:
-		yyval = yyvsp[0]
-		break
-	case 49:
-		yyval = yyvsp[0]
-		break
-	case 50:
-		yyval = yyvsp[0]
-		break
-	default:
-		break
-	}
-
-	/* User semantic actions sometimes alter yychar, and that requires
-	   that yytoken be updated with the new translation.  We take the
-	   approach of translating immediately before every use of yytoken.
-	   One alternative is translating here after every semantic action,
-	   but that translation would be missed if the semantic action invokes
-	   YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
-	   if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
-	   incorrect destructor might then be invoked immediately.  In the
-	   case of YYERROR or YYBACKUP, subsequent parser actions might lead
-	   to an incorrect destructor call or verbose syntax error message
-	   before the lookahead is translated.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	yylen = 0
-	*(g.PreInc(&yyvsp)) = yyval
-
-	/* Now 'shift' the result of the reduction.  Determine what state
-	   that goes to, based on the state we popped back to and the rule
-	   number reduced by.  */
-
-	yyn = yyr1[yyn]
-	yystate = yypgoto[yyn-44] + (*yyssp)
-	if 0 <= yystate && yystate <= 123 && yycheck[yystate] == (*yyssp) {
-		yystate = yytable[yystate]
-	} else {
-		yystate = yydefgoto[yyn-44]
-	}
-	goto yynewstate
-
-	/*--------------------------------------.
-	  | yyerrlab -- here on detecting error.  |
-	  `--------------------------------------*/
-
-yyerrlab:
-
-	/* Make sure we have latest lookahead translation.  See comments at
-	   user semantic actions for why this is necessary.  */
-
-	if yychar == -2 {
-		yytoken = -2
-	} else {
-		yytoken = uint(g.CondF1(yychar <= 272, func() __auto__ { return yytranslate[yychar] }, 2))
-	}
-
-	/* If not already recovering from an error, report this error.  */
-
-	if yyerrstatus == 0 {
-		ini_nerrs++
-
-		// #define YYSYNTAX_ERROR       yysyntax_error ( & yymsg_alloc , & yymsg , yyssp , yytoken )
-
-		var yymsgp *byte = "syntax error"
-		var yysyntax_error_status int
-		yysyntax_error_status = yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
-		if yysyntax_error_status == 0 {
-			yymsgp = yymsg
-		} else if yysyntax_error_status == 1 {
-			if yymsg != yymsgbuf {
-				Free(yymsg)
-			}
-			yymsg = (*byte)(Malloc(yymsg_alloc))
-			if yymsg == nil {
-				yymsg = yymsgbuf
-				yymsg_alloc = g.SizeOf(yymsgbuf)
-				yysyntax_error_status = 2
-			} else {
-				yysyntax_error_status = yysyntax_error(&yymsg_alloc, &yymsg, yyssp, yytoken)
-				yymsgp = yymsg
-			}
-		}
-		IniError(yymsgp)
-		if yysyntax_error_status == 2 {
-			goto yyexhaustedlab
-		}
-
-		// #define YYSYNTAX_ERROR       yysyntax_error ( & yymsg_alloc , & yymsg , yyssp , yytoken )
-
-	}
-	if yyerrstatus == 3 {
-
-		/* If just tried and failed to reuse lookahead token after an
-		   error, discard it.  */
-
-		if yychar <= 0 {
-
-			/* Return failure if at end of input.  */
-
-			if yychar == 0 {
-				goto yyabortlab
-			}
-
-			/* Return failure if at end of input.  */
-
-		} else {
-			yydestruct("Error: discarding", yytoken, &yylval)
-			yychar = -2
-		}
-
-		/* If just tried and failed to reuse lookahead token after an
-		   error, discard it.  */
-
-	}
-
-	/* Else will try to reuse lookahead token after shifting the error
-	   token.  */
-
-	goto yyerrlab1
-
-	/*---------------------------------------------------.
-	  | yyerrorlab -- error raised explicitly by YYERROR.  |
-	  `---------------------------------------------------*/
-
-yyerrorlab:
-
-	/* Pacify compilers like GCC when the user code never invokes
-	   YYERROR and the label yyerrorlab therefore never appears in user
-	   code.  */
-
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYERROR.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	yylen = 0
-	yystate = *yyssp
-	goto yyerrlab1
-
-	/*-------------------------------------------------------------.
-	  | yyerrlab1 -- common code for both syntax error and YYERROR.  |
-	  `-------------------------------------------------------------*/
-
-yyerrlab1:
-	yyerrstatus = 3
-	for {
-		yyn = yypact[yystate]
-		if yyn != -25 {
-			yyn += 1
-			if 0 <= yyn && yyn <= 123 && yycheck[yyn] == 1 {
-				yyn = yytable[yyn]
-				if 0 < yyn {
-					break
-				}
-			}
-		}
-
-		/* Pop the current state because it cannot handle the error token.  */
-
-		if yyssp == yyss {
-			goto yyabortlab
-		}
-		yydestruct("Error: popping", yystos[yystate], yyvsp)
-		yyvsp -= 1
-		yyssp -= 1
-		yystate = *yyssp
-	}
-	*(g.PreInc(&yyvsp)) = yylval
-
-	/* Shift the error token.  */
-
-	yystate = yyn
-	goto yynewstate
-
-	/*-------------------------------------.
-	  | yyacceptlab -- YYACCEPT comes here.  |
-	  `-------------------------------------*/
-
-yyacceptlab:
-	yyresult = 0
-	goto yyreturn
-
-	/*-----------------------------------.
-	  | yyabortlab -- YYABORT comes here.  |
-	  `-----------------------------------*/
-
-yyabortlab:
-	yyresult = 1
-	goto yyreturn
-
-	/*-------------------------------------------------.
-	  | yyexhaustedlab -- memory exhaustion comes here.  |
-	  `-------------------------------------------------*/
-
-yyexhaustedlab:
-	IniError("memory exhausted")
-	yyresult = 2
-
-	/* Fall through.  */
-
-yyreturn:
-	if yychar != -2 {
-
-		/* Make sure we have latest lookahead translation.  See comments at
-		   user semantic actions for why this is necessary.  */
-
-		yytoken = uint(g.CondF1(yychar <= 272, func() __auto__ { return yytranslate[yychar] }, 2))
-		yydestruct("Cleanup: discarding lookahead", yytoken, &yylval)
-	}
-
-	/* Do not reclaim the symbols of the rule whose action triggered
-	   this YYABORT or YYACCEPT.  */
-
-	yyvsp -= yylen
-	yyssp -= yylen
-	for yyssp != yyss {
-		yydestruct("Cleanup: popping", yystos[*yyssp], yyvsp)
-		yyvsp -= 1
-		yyssp -= 1
-	}
-	if yyss != yyssa {
-		Free(yyss)
-	}
-	if yymsg != yymsgbuf {
-		Free(yymsg)
-	}
-	return yyresult
-}

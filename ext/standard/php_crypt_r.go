@@ -3,8 +3,8 @@
 package standard
 
 import (
-	"sik/core"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/zend"
 )
 
 // Source: <ext/standard/php_crypt_r.h>
@@ -36,8 +36,6 @@ import (
 /*PHPAPI char* crypt(const char *key, const char *salt);*/
 
 var PhpCryptR func(__key *byte, __salt *byte, __data *PhpCryptExtendedData) *byte
-
-// #define MD5_HASH_MAX_LEN       120
 
 // # include "crypt_blowfish.h"
 
@@ -92,8 +90,8 @@ func _cryptExtendedInitR() {
 // #define MD5_MAGIC_LEN       3
 
 func To64(s *byte, v int32, n int) {
-	for g.PreDec(&n) >= 0 {
-		g.PostInc(&(*s)) = Itoa64[v&0x3f]
+	for b.PreDec(&n) >= 0 {
+		b.PostInc(&(*s)) = Itoa64[v&0x3f]
 		v >>= 6
 	}
 }
@@ -158,12 +156,12 @@ func PhpMd5CryptR(pw *byte, salt *byte, out *byte) *byte {
 	PHP_MD5Update(&ctx1, (*uint8)(pw), pwl)
 	PHP_MD5Final(final, &ctx1)
 	for pl = pwl; pl > 0; pl -= 16 {
-		PHP_MD5Update(&ctx, final, uint(g.Cond(pl > 16, 16, pl)))
+		PHP_MD5Update(&ctx, final, uint(b.Cond(pl > 16, 16, pl)))
 	}
 
 	/* Don't leave anything around in vm they could use. */
 
-	core.PhpExplicitBzero(final, g.SizeOf("final"))
+	zend.ZEND_SECURE_ZERO(final, b.SizeOf("final"))
 
 	/* Then something really weird... */
 
@@ -231,6 +229,6 @@ func PhpMd5CryptR(pw *byte, salt *byte, out *byte) *byte {
 
 	/* Don't leave anything around in vm they could use. */
 
-	core.PhpExplicitBzero(final, g.SizeOf("final"))
+	zend.ZEND_SECURE_ZERO(final, b.SizeOf("final"))
 	return passwd
 }

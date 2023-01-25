@@ -2,6 +2,11 @@
 
 package streams
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 // Source: <main/streams/php_streams_int.h>
 
 /*
@@ -22,19 +27,16 @@ package streams
   +----------------------------------------------------------------------+
 */
 
-// #define pemalloc_rel_orig(size,persistent) pemalloc ( ( size ) , ( persistent ) )
+func PemallocRelOrig(size int, persistent __auto__) any { return zend.Pemalloc(size, persistent) }
+func PereallocRelOrig(ptr any, size int, persistent uint8) any {
+	return zend.Perealloc(ptr, size, persistent)
+}
+func EmallocRelOrig(size int) any { return zend.Emalloc(size) }
 
-// #define perealloc_rel_orig(ptr,size,persistent) perealloc ( ( ptr ) , ( size ) , ( persistent ) )
-
-// #define emalloc_rel_orig(size) emalloc ( ( size ) )
-
-// #define STREAM_DEBUG       0
-
-// #define STREAM_WRAPPER_PLAIN_FILES       ( ( php_stream_wrapper * ) - 1 )
-
-// #define MAP_FAILED       ( ( void * ) - 1 )
-
-// #define CHUNK_SIZE       8192
+const STREAM_DEBUG = 0
+const STREAM_WRAPPER_PLAIN_FILES = (*core.PhpStreamWrapper)(-1)
+const MAP_FAILED = any(-1)
+const CHUNK_SIZE = 8192
 
 /* This functions transforms the first char to 'w' if it's not 'r', 'a' or 'w'
  * and strips any subsequent chars except '+' and 'b'.

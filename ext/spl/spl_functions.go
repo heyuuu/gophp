@@ -3,8 +3,7 @@
 package spl
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -98,7 +97,7 @@ type CreateObjectFuncT func(class_type *zend.ZendClassEntry) *zend.ZendObject
 
 func SplRegisterInterface(ppce **zend.ZendClassEntry, class_name string, functions *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
-	memset(&ce, 0, g.SizeOf("zend_class_entry"))
+	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.name = zend.ZendStringInitInterned(class_name, strlen(class_name), 1)
 	ce.info.internal.builtin_functions = functions
 	*ppce = zend.ZendRegisterInternalInterface(&ce)
@@ -108,7 +107,7 @@ func SplRegisterInterface(ppce **zend.ZendClassEntry, class_name string, functio
 
 func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
-	memset(&ce, 0, g.SizeOf("zend_class_entry"))
+	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.name = zend.ZendStringInitInterned(class_name, strlen(class_name), 1)
 	ce.info.internal.builtin_functions = function_list
 	*ppce = zend.ZendRegisterInternalClass(&ce)
@@ -126,7 +125,7 @@ func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor
 
 func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEntry, class_name string, obj_ctor any, function_list *zend.ZendFunctionEntry) {
 	var ce zend.ZendClassEntry
-	memset(&ce, 0, g.SizeOf("zend_class_entry"))
+	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.name = zend.ZendStringInitInterned(class_name, strlen(class_name), 1)
 	ce.info.internal.builtin_functions = function_list
 	*ppce = zend.ZendRegisterInternalClassEx(&ce, parent_ce)
@@ -153,18 +152,10 @@ func SplRegisterProperty(class_entry *zend.ZendClassEntry, prop_name string, pro
 func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	if allow == 0 || allow > 0 && (pce.ce_flags&ce_flags) != 0 || allow < 0 && (pce.ce_flags&ce_flags) == 0 {
 		var tmp *zend.Zval
-		if g.Assign(&tmp, zend.ZendHashFind(list.value.arr, pce.name)) == nil {
+		if b.Assign(&tmp, zend.ZendHashFind(zend.Z_ARRVAL_P(list), pce.name)) == nil {
 			var t zend.Zval
-			var __z *zend.Zval = &t
-			var __s *zend.ZendString = pce.name
-			__z.value.str = __s
-			if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-				__z.u1.type_info = 6
-			} else {
-				zend.ZendGcAddref(&__s.gc)
-				__z.u1.type_info = 6 | 1<<0<<8
-			}
-			zend.ZendHashAdd(list.value.arr, pce.name, &t)
+			zend.ZVAL_STR_COPY(&t, pce.name)
+			zend.ZendHashAdd(zend.Z_ARRVAL_P(list), pce.name, &t)
 		}
 	}
 }
@@ -174,7 +165,7 @@ func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_fl
 func SplAddInterfaces(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	var num_interfaces uint32
 	if pce.num_interfaces != 0 {
-		r.Assert((pce.ce_flags & 1 << 3) != 0)
+		zend.ZEND_ASSERT((pce.ce_flags & zend.ZEND_ACC_LINKED) != 0)
 		for num_interfaces = 0; num_interfaces < pce.num_interfaces; num_interfaces++ {
 			SplAddClassName(list, pce.interfaces[num_interfaces], allow, ce_flags)
 		}
@@ -187,8 +178,8 @@ func SplAddTraits(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags
 	var num_traits uint32
 	var trait *zend.ZendClassEntry
 	for num_traits = 0; num_traits < pce.num_traits; num_traits++ {
-		trait = zend.ZendFetchClassByName(pce.trait_names[num_traits].name, pce.trait_names[num_traits].lc_name, 6)
-		r.Assert(trait != nil)
+		trait = zend.ZendFetchClassByName(pce.trait_names[num_traits].name, pce.trait_names[num_traits].lc_name, zend.ZEND_FETCH_CLASS_TRAIT)
+		zend.ZEND_ASSERT(trait != nil)
 		SplAddClassName(list, trait, allow, ce_flags)
 	}
 }
@@ -213,7 +204,7 @@ func SplAddClasses(pce *zend.ZendClassEntry, list *zend.Zval, sub int, allow int
 /* }}} */
 
 func SplGenPrivatePropName(ce *zend.ZendClassEntry, prop_name string, prop_len int) *zend.ZendString {
-	return zend.ZendManglePropertyName(ce.name.val, ce.name.len_, prop_name, prop_len, 0)
+	return zend.ZendManglePropertyName(zend.ZSTR_VAL(ce.name), zend.ZSTR_LEN(ce.name), prop_name, prop_len, 0)
 }
 
 /* }}} */

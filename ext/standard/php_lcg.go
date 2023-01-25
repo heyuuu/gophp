@@ -26,4 +26,4 @@ package standard
 
 // # include "ext/standard/basic_functions.h"
 
-// #define LCG(v) ( lcg_globals . v )
+func LCG(v __auto__) __auto__ { return LcgGlobals.v }

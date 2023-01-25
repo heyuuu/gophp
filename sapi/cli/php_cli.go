@@ -3,11 +3,10 @@
 package cli
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	"sik/core/streams"
 	"sik/ext/standard"
 	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -95,37 +94,27 @@ import (
 
 // # include "php_cli_process_title.h"
 
-// #define php_select(m,r,w,e,t) select ( m , r , w , e , t )
+func PhpSelect(m core.PhpSocketT, r fd_set, w __auto__, e __auto__, t *__struct__timeval) __auto__ {
+	return select_(m, r, w, e, t)
+}
 
 var PhpIniOpenedPath *byte
 var PhpIniScannedPath *byte
 var PhpIniScannedFiles *byte
 
-// #define O_BINARY       0
-
-// #define PHP_MODE_STANDARD       1
-
-// #define PHP_MODE_HIGHLIGHT       2
-
-// #define PHP_MODE_LINT       4
-
-// #define PHP_MODE_STRIP       5
-
-// #define PHP_MODE_CLI_DIRECT       6
-
-// #define PHP_MODE_PROCESS_STDIN       7
-
-// #define PHP_MODE_REFLECTION_FUNCTION       8
-
-// #define PHP_MODE_REFLECTION_CLASS       9
-
-// #define PHP_MODE_REFLECTION_EXTENSION       10
-
-// #define PHP_MODE_REFLECTION_EXT_INFO       11
-
-// #define PHP_MODE_REFLECTION_ZEND_EXTENSION       12
-
-// #define PHP_MODE_SHOW_INI_CONFIG       13
+const O_BINARY = 0
+const PHP_MODE_STANDARD = 1
+const PHP_MODE_HIGHLIGHT = 2
+const PHP_MODE_LINT = 4
+const PHP_MODE_STRIP = 5
+const PHP_MODE_CLI_DIRECT = 6
+const PHP_MODE_PROCESS_STDIN = 7
+const PHP_MODE_REFLECTION_FUNCTION = 8
+const PHP_MODE_REFLECTION_CLASS = 9
+const PHP_MODE_REFLECTION_EXTENSION = 10
+const PHP_MODE_REFLECTION_EXT_INFO = 11
+const PHP_MODE_REFLECTION_ZEND_EXTENSION = 12
+const PHP_MODE_SHOW_INI_CONFIG = 13
 
 var CliShellCallbacks CliShellCallbacksT = CliShellCallbacksT{nil, nil, nil}
 
@@ -137,7 +126,7 @@ var OPTIONS []core.Opt = []core.Opt{{'a', 0, "interactive"}, {'B', 1, "process-b
 func ModuleNameCmp(a any, b any) int {
 	var f *zend.Bucket = (*zend.Bucket)(a)
 	var s *zend.Bucket = (*zend.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(f.val.value.ptr).name, (*zend.ZendModuleEntry)(s.val.value.ptr).name)
+	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.val)).name, (*zend.ZendModuleEntry)(zend.Z_PTR(s.val)).name)
 }
 
 /* }}} */
@@ -145,9 +134,9 @@ func ModuleNameCmp(a any, b any) int {
 func PrintModules() {
 	var sorted_registry zend.HashTable
 	var module *zend.ZendModuleEntry
-	zend._zendHashInit(&sorted_registry, 50, nil, 0)
+	zend.ZendHashInit(&sorted_registry, 50, nil, nil, 0)
 	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-	zend.ZendHashSortEx(&sorted_registry, zend.ZendSort, ModuleNameCmp, 0)
+	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
 		var _p *zend.Bucket = __ht.arData
@@ -155,10 +144,10 @@ func PrintModules() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
-			module = _z.value.ptr
+			module = zend.Z_PTR_P(_z)
 			core.PhpPrintf("%s\n", module.name)
 		}
 		break
@@ -170,7 +159,7 @@ func PrintModules() {
 
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.name)
-	return 0
+	return zend.ZEND_HASH_APPLY_KEEP
 }
 
 /* }}} */
@@ -194,21 +183,18 @@ func PrintExtensions() {
 
 /* }}} */
 
-// #define STDOUT_FILENO       1
-
-// #define STDERR_FILENO       2
+const STDOUT_FILENO = 1
+const STDERR_FILENO = 2
 
 func SapiCliSelect(fd core.PhpSocketT) int {
 	var wfd fd_set
 	var tv __struct__timeval
 	var ret int
 	FD_ZERO(&wfd)
-	if fd < FD_SETSIZE {
-		FD_SET(fd, &wfd)
-	}
-	tv.tv_sec = long(standard.FileGlobals.default_socket_timeout)
+	core.PHP_SAFE_FD_SET(fd, &wfd)
+	tv.tv_sec = long(standard.FG(default_socket_timeout))
 	tv.tv_usec = 0
-	ret = select_(fd+1, nil, &wfd, nil, &tv)
+	ret = PhpSelect(fd+1, nil, &wfd, nil, &tv)
 	return ret != -1
 }
 func SapiCliSingleWrite(str *byte, str_length int) ssize_t {
@@ -217,8 +203,8 @@ func SapiCliSingleWrite(str *byte, str_length int) ssize_t {
 		CliShellCallbacks.GetCliShellWrite()(str, str_length)
 	}
 	for {
-		ret = write(1, str, str_length)
-		if !(ret <= 0 && errno == EAGAIN && SapiCliSelect(1) != 0) {
+		ret = write(STDOUT_FILENO, str, str_length)
+		if !(ret <= 0 && errno == EAGAIN && SapiCliSelect(STDOUT_FILENO) != 0) {
 			break
 		}
 	}
@@ -244,7 +230,7 @@ func SapiCliUbWrite(str *byte, str_length int) int {
 	for remaining > 0 {
 		ret = SapiCliSingleWrite(ptr, remaining)
 		if ret < 0 {
-			zend.EG.exit_status = 255
+			zend.ExecutorGlobals.exit_status = 255
 			core.PhpHandleAbortedConnection()
 			break
 		}
@@ -261,7 +247,7 @@ func SapiCliFlush(server_context any) {
 	 * are/could be closed before fflush() is called.
 	 */
 
-	if r.Fflush(stdout) == -1 && errno != EBADF {
+	if r.Fflush(stdout) == r.EOF && errno != EBADF {
 		core.PhpHandleAbortedConnection()
 	}
 
@@ -288,27 +274,27 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 	/* Build the special-case PHP_SELF variable for the CLI version */
 
 	len_ = strlen(PhpSelf)
-	if core.sapi_module.input_filter(5, "PHP_SELF", &PhpSelf, len_, &len_) != 0 {
+	if core.sapi_module.input_filter(core.PARSE_SERVER, "PHP_SELF", &PhpSelf, len_, &len_) != 0 {
 		core.PhpRegisterVariable("PHP_SELF", PhpSelf, track_vars_array)
 	}
-	if core.sapi_module.input_filter(5, "SCRIPT_NAME", &PhpSelf, len_, &len_) != 0 {
+	if core.sapi_module.input_filter(core.PARSE_SERVER, "SCRIPT_NAME", &PhpSelf, len_, &len_) != 0 {
 		core.PhpRegisterVariable("SCRIPT_NAME", PhpSelf, track_vars_array)
 	}
 
 	/* filenames are empty for stdin */
 
 	len_ = strlen(ScriptFilename)
-	if core.sapi_module.input_filter(5, "SCRIPT_FILENAME", &ScriptFilename, len_, &len_) != 0 {
+	if core.sapi_module.input_filter(core.PARSE_SERVER, "SCRIPT_FILENAME", &ScriptFilename, len_, &len_) != 0 {
 		core.PhpRegisterVariable("SCRIPT_FILENAME", ScriptFilename, track_vars_array)
 	}
-	if core.sapi_module.input_filter(5, "PATH_TRANSLATED", &ScriptFilename, len_, &len_) != 0 {
+	if core.sapi_module.input_filter(core.PARSE_SERVER, "PATH_TRANSLATED", &ScriptFilename, len_, &len_) != 0 {
 		core.PhpRegisterVariable("PATH_TRANSLATED", ScriptFilename, track_vars_array)
 	}
 
 	/* just make it available */
 
 	len_ = 0
-	if core.sapi_module.input_filter(5, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
+	if core.sapi_module.input_filter(core.PARSE_SERVER, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
 	}
 }
@@ -321,9 +307,9 @@ func SapiCliLogMessage(message *byte, syslog_type_int int) { r.Fprintf(stderr, "
 
 func SapiCliDeactivate() int {
 	r.Fflush(stdout)
-	if core.sapi_globals.request_info.argv0 != nil {
-		zend.Free(core.sapi_globals.request_info.argv0)
-		core.sapi_globals.request_info.argv0 = nil
+	if core.SG(request_info).argv0 {
+		zend.Free(core.SG(request_info).argv0)
+		core.SG(request_info).argv0 = nil
 	}
 	return zend.SUCCESS
 }
@@ -344,7 +330,7 @@ func SapiCliSendHeaders(sapi_headers *core.SapiHeaders) int {
 	/* We do nothing here, this function is needed to prevent that the fallback
 	 * header handling is called. */
 
-	return 1
+	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 
 	/* We do nothing here, this function is needed to prevent that the fallback
 	 * header handling is called. */
@@ -365,29 +351,26 @@ func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
 
 /* }}} */
 
-// #define INI_DEFAULT(name,value) ZVAL_NEW_STR ( & tmp , zend_string_init ( value , sizeof ( value ) - 1 , 1 ) ) ; zend_hash_str_update ( configuration_hash , name , sizeof ( name ) - 1 , & tmp ) ;
-
+func INI_DEFAULT(name string, value string) {
+	zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
+	zend.ZendHashStrUpdate(core.ConfigurationHash, name, b.SizeOf("name")-1, &tmp)
+}
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
 	var tmp zend.Zval
-	var __z *zend.Zval = &tmp
-	var __s *zend.ZendString = zend.ZendStringInit("0", g.SizeOf("\"0\"")-1, 1)
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
-	zend.ZendHashStrUpdate(configuration_hash, "report_zend_debug", g.SizeOf("\"report_zend_debug\"")-1, &tmp)
-	var __z *zend.Zval = &tmp
-	var __s *zend.ZendString = zend.ZendStringInit("1", g.SizeOf("\"1\"")-1, 1)
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
-	zend.ZendHashStrUpdate(configuration_hash, "display_errors", g.SizeOf("\"display_errors\"")-1, &tmp)
+	INI_DEFAULT("report_zend_debug", "0")
+	INI_DEFAULT("display_errors", "1")
 }
 
 /* }}} */
 
-var CliSapiModule core.sapi_module_struct = core.sapi_module_struct{"cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, zend.ZendError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
+var CliSapiModule core.sapi_module_struct = core.sapi_module_struct{"cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, core.PhpError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
 
 /* }}} */
 
-var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(-1)), 0, 0, 0}, {"extension_filename", 0, 0, 0}}
+var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{"extension_filename", 0, 0, 0},
+}
 
 /* }}} */
 
@@ -396,21 +379,21 @@ var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 		"dl",
 		standard.ZifDl,
 		ArginfoDl,
-		uint32(g.SizeOf("arginfo_dl")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		uint32_t(b.SizeOf("arginfo_dl")/b.SizeOf("struct _zend_internal_arg_info") - 1),
 		0,
 	},
 	{
 		"cli_set_process_title",
 		ZifCliSetProcessTitle,
 		ArginfoCliSetProcessTitle,
-		uint32(g.SizeOf("arginfo_cli_set_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		uint32_t(b.SizeOf("arginfo_cli_set_process_title")/b.SizeOf("struct _zend_internal_arg_info") - 1),
 		0,
 	},
 	{
 		"cli_get_process_title",
 		ZifCliGetProcessTitle,
 		ArginfoCliGetProcessTitle,
-		uint32(g.SizeOf("arginfo_cli_get_process_title")/g.SizeOf("struct _zend_internal_arg_info") - 1),
+		uint32_t(b.SizeOf("arginfo_cli_get_process_title")/b.SizeOf("struct _zend_internal_arg_info") - 1),
 		0,
 	},
 	{nil, nil, nil, 0, 0},
@@ -444,42 +427,33 @@ func CliRegisterFileHandles() {
 	var ic zend.ZendConstant
 	var oc zend.ZendConstant
 	var ec zend.ZendConstant
-	s_in = streams._phpStreamOpenWrapperEx("php://stdin", "rb", 0, nil, sc_in)
-	s_out = streams._phpStreamOpenWrapperEx("php://stdout", "wb", 0, nil, sc_out)
-	s_err = streams._phpStreamOpenWrapperEx("php://stderr", "wb", 0, nil, sc_err)
+	s_in = core.PhpStreamOpenWrapperEx("php://stdin", "rb", 0, nil, sc_in)
+	s_out = core.PhpStreamOpenWrapperEx("php://stdout", "wb", 0, nil, sc_out)
+	s_err = core.PhpStreamOpenWrapperEx("php://stderr", "wb", 0, nil, sc_err)
 	if s_in == nil || s_out == nil || s_err == nil {
 		if s_in != nil {
-			streams._phpStreamFree(s_in, 1|2)
+			core.PhpStreamClose(s_in)
 		}
 		if s_out != nil {
-			streams._phpStreamFree(s_out, 1|2)
+			core.PhpStreamClose(s_out)
 		}
 		if s_err != nil {
-			streams._phpStreamFree(s_err, 1|2)
+			core.PhpStreamClose(s_err)
 		}
 		return
 	}
 	SInProcess = s_in
-	var __z *zend.Zval = &ic.value
-	__z.value.res = s_in.res
-	__z.u1.type_info = 9 | 1<<0<<8
-	s_in.__exposed = 1
-	var __z *zend.Zval = &oc.value
-	__z.value.res = s_out.res
-	__z.u1.type_info = 9 | 1<<0<<8
-	s_out.__exposed = 1
-	var __z *zend.Zval = &ec.value
-	__z.value.res = s_err.res
-	__z.u1.type_info = 9 | 1<<0<<8
-	s_err.__exposed = 1
-	&ic.value.u2.constant_flags = 1<<0&0xff | 0<<8
-	ic.name = zend.ZendStringInitInterned("STDIN", g.SizeOf("\"STDIN\"")-1, 0)
+	core.PhpStreamToZval(s_in, &ic.value)
+	core.PhpStreamToZval(s_out, &oc.value)
+	core.PhpStreamToZval(s_err, &ec.value)
+	zend.ZEND_CONSTANT_SET_FLAGS(&ic, zend.CONST_CS, 0)
+	ic.name = zend.ZendStringInitInterned("STDIN", b.SizeOf("\"STDIN\"")-1, 0)
 	zend.ZendRegisterConstant(&ic)
-	&oc.value.u2.constant_flags = 1<<0&0xff | 0<<8
-	oc.name = zend.ZendStringInitInterned("STDOUT", g.SizeOf("\"STDOUT\"")-1, 0)
+	zend.ZEND_CONSTANT_SET_FLAGS(&oc, zend.CONST_CS, 0)
+	oc.name = zend.ZendStringInitInterned("STDOUT", b.SizeOf("\"STDOUT\"")-1, 0)
 	zend.ZendRegisterConstant(&oc)
-	&ec.value.u2.constant_flags = 1<<0&0xff | 0<<8
-	ec.name = zend.ZendStringInitInterned("STDERR", g.SizeOf("\"STDERR\"")-1, 0)
+	zend.ZEND_CONSTANT_SET_FLAGS(&ec, zend.CONST_CS, 0)
+	ec.name = zend.ZendStringInitInterned("STDERR", b.SizeOf("\"STDERR\"")-1, 0)
 	zend.ZendRegisterConstant(&ec)
 }
 
@@ -491,7 +465,7 @@ var ParamModeConflict *byte = "Either execute direct code, process stdin or use 
  */
 
 func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {
-	var fp *r.FILE = r.Fopen(script_file, "rb")
+	var fp *r.FILE = zend.VCWD_FOPEN(script_file, "rb")
 	if fp == nil {
 		core.PhpPrintf("Could not open input file: %s\n", script_file)
 		return zend.FAILURE
@@ -507,7 +481,7 @@ func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {
 func DoCli(argc int, argv **byte) int {
 	var c int
 	var file_handle zend.ZendFileHandle
-	var behavior int = 1
+	var behavior int = PHP_MODE_STANDARD
 	var reflection_what *byte = nil
 	var request_started int = 0
 	var exit_status int = 0
@@ -526,24 +500,24 @@ func DoCli(argc int, argv **byte) int {
 	var interactive int = 0
 	var param_error *byte = nil
 	var hide_argv int = 0
-	var __orig_bailout *sigjmp_buf = zend.EG.bailout
-	var __bailout sigjmp_buf
-	zend.EG.bailout = &__bailout
-	if sigsetjmp(__bailout, 0) == 0 {
-		zend.CG.in_compilation = 0
-		for g.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
+	var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.bailout
+	var __bailout JMP_BUF
+	zend.ExecutorGlobals.bailout = &__bailout
+	if zend.SETJMP(__bailout) == 0 {
+		zend.CompilerGlobals.in_compilation = 0
+		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'i':
 				if core.PhpRequestStartup() == zend.FAILURE {
 					goto err
 				}
 				request_started = 1
-				standard.PhpPrintInfo(0xffffffff & ^(1 << 1))
+				standard.PhpPrintInfo(standard.PHP_INFO_ALL & ^standard.PHP_INFO_CREDITS)
 				core.PhpOutputEndAll()
 				exit_status = c == '?' && argc > 1 && !(strchr(argv[1], c))
 				goto out
 			case 'v':
-				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", "7.4.33", CliSapiModule.name, __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
+				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, CliSapiModule.name, __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
 				core.SapiDeactivate()
 				goto out
 			case 'm':
@@ -566,14 +540,14 @@ func DoCli(argc int, argv **byte) int {
 
 		/* Set some CLI defaults */
 
-		core.sapi_globals.options |= 1
+		core.SG(options) |= core.SAPI_OPTION_NO_CHDIR
 		php_optind = orig_optind
 		php_optarg = orig_optarg
-		for g.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
+		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'a':
 				if interactive == 0 {
-					if behavior != 1 {
+					if behavior != PHP_MODE_STANDARD {
 						param_error = ParamModeConflict
 						break
 					}
@@ -586,20 +560,20 @@ func DoCli(argc int, argv **byte) int {
 
 				break
 			case 'F':
-				if behavior == 7 {
+				if behavior == PHP_MODE_PROCESS_STDIN {
 					if exec_run != nil || script_file != nil {
 						param_error = "You can use -R or -F only once.\n"
 						break
 					}
-				} else if behavior != 1 {
+				} else if behavior != PHP_MODE_STANDARD {
 					param_error = ParamModeConflict
 					break
 				}
-				behavior = 7
+				behavior = PHP_MODE_PROCESS_STDIN
 				script_file = php_optarg
 				break
 			case 'f':
-				if behavior == 6 || behavior == 7 {
+				if behavior == PHP_MODE_CLI_DIRECT || behavior == PHP_MODE_PROCESS_STDIN {
 					param_error = ParamModeConflict
 					break
 				} else if script_file != nil {
@@ -609,10 +583,10 @@ func DoCli(argc int, argv **byte) int {
 				script_file = php_optarg
 				break
 			case 'l':
-				if behavior != 1 {
+				if behavior != PHP_MODE_STANDARD {
 					break
 				}
-				behavior = 4
+				behavior = PHP_MODE_LINT
 				break
 			case 'q':
 
@@ -620,70 +594,70 @@ func DoCli(argc int, argv **byte) int {
 
 				break
 			case 'r':
-				if behavior == 6 {
+				if behavior == PHP_MODE_CLI_DIRECT {
 					if exec_direct != nil || script_file != nil {
 						param_error = "You can use -r only once.\n"
 						break
 					}
-				} else if behavior != 1 || interactive != 0 {
+				} else if behavior != PHP_MODE_STANDARD || interactive != 0 {
 					param_error = ParamModeConflict
 					break
 				}
-				behavior = 6
+				behavior = PHP_MODE_CLI_DIRECT
 				exec_direct = php_optarg
 				break
 			case 'R':
-				if behavior == 7 {
+				if behavior == PHP_MODE_PROCESS_STDIN {
 					if exec_run != nil || script_file != nil {
 						param_error = "You can use -R or -F only once.\n"
 						break
 					}
-				} else if behavior != 1 {
+				} else if behavior != PHP_MODE_STANDARD {
 					param_error = ParamModeConflict
 					break
 				}
-				behavior = 7
+				behavior = PHP_MODE_PROCESS_STDIN
 				exec_run = php_optarg
 				break
 			case 'B':
-				if behavior == 7 {
+				if behavior == PHP_MODE_PROCESS_STDIN {
 					if exec_begin != nil {
 						param_error = "You can use -B only once.\n"
 						break
 					}
-				} else if behavior != 1 || interactive != 0 {
+				} else if behavior != PHP_MODE_STANDARD || interactive != 0 {
 					param_error = ParamModeConflict
 					break
 				}
-				behavior = 7
+				behavior = PHP_MODE_PROCESS_STDIN
 				exec_begin = php_optarg
 				break
 			case 'E':
-				if behavior == 7 {
+				if behavior == PHP_MODE_PROCESS_STDIN {
 					if exec_end != nil {
 						param_error = "You can use -E only once.\n"
 						break
 					}
-				} else if behavior != 1 || interactive != 0 {
+				} else if behavior != PHP_MODE_STANDARD || interactive != 0 {
 					param_error = ParamModeConflict
 					break
 				}
-				behavior = 7
+				behavior = PHP_MODE_PROCESS_STDIN
 				exec_end = php_optarg
 				break
 			case 's':
-				if behavior == 6 || behavior == 7 {
+				if behavior == PHP_MODE_CLI_DIRECT || behavior == PHP_MODE_PROCESS_STDIN {
 					param_error = "Source highlighting only works for files.\n"
 					break
 				}
-				behavior = 2
+				behavior = PHP_MODE_HIGHLIGHT
 				break
 			case 'w':
-				if behavior == 6 || behavior == 7 {
+				if behavior == PHP_MODE_CLI_DIRECT || behavior == PHP_MODE_PROCESS_STDIN {
 					param_error = "Source stripping only works for files.\n"
 					break
 				}
-				behavior = 5
+				behavior = PHP_MODE_STRIP
 				break
 			case 'z':
 				zend.ZendLoadExtension(php_optarg)
@@ -692,35 +666,34 @@ func DoCli(argc int, argv **byte) int {
 				hide_argv = 1
 				break
 			case 10:
-				behavior = 8
+				behavior = PHP_MODE_REFLECTION_FUNCTION
 				reflection_what = php_optarg
 				break
 			case 11:
-				behavior = 9
+				behavior = PHP_MODE_REFLECTION_CLASS
 				reflection_what = php_optarg
 				break
 			case 12:
-				behavior = 10
+				behavior = PHP_MODE_REFLECTION_EXTENSION
 				reflection_what = php_optarg
 				break
 			case 13:
-				behavior = 12
+				behavior = PHP_MODE_REFLECTION_ZEND_EXTENSION
 				reflection_what = php_optarg
 				break
 			case 14:
-				behavior = 11
+				behavior = PHP_MODE_REFLECTION_EXT_INFO
 				reflection_what = php_optarg
 				break
 			case 15:
-				behavior = 13
+				behavior = PHP_MODE_SHOW_INI_CONFIG
 				break
 			default:
 				break
 			}
 		}
 		if param_error != nil {
-			var __str *byte = param_error
-			core.PhpOutputWrite(__str, strlen(__str))
+			core.PUTS(param_error)
 			exit_status = 1
 			goto err
 		}
@@ -731,7 +704,7 @@ func DoCli(argc int, argv **byte) int {
 
 		/* only set script_file if not set already and not in direct mode and not at end of parameter list */
 
-		if argc > php_optind && script_file == nil && behavior != 6 && behavior != 7 && strcmp(argv[php_optind-1], "--") {
+		if argc > php_optind && script_file == nil && behavior != PHP_MODE_CLI_DIRECT && behavior != PHP_MODE_PROCESS_STDIN && strcmp(argv[php_optind-1], "--") {
 			script_file = argv[php_optind]
 			php_optind++
 		}
@@ -740,7 +713,7 @@ func DoCli(argc int, argv **byte) int {
 				goto err
 			} else {
 				var real_path []byte
-				if zend.TsrmRealpath(script_file, real_path) != nil {
+				if zend.VCWD_REALPATH(script_file, real_path) != nil {
 					translated_path = strdup(real_path)
 				}
 				ScriptFilename = script_file
@@ -758,26 +731,25 @@ func DoCli(argc int, argv **byte) int {
 
 		/* before registering argv to module exchange the *new* argv[0] */
 
-		core.sapi_globals.request_info.argc = argc - php_optind + 1
+		core.SG(request_info).argc = argc - php_optind + 1
 		arg_excp = argv + php_optind - 1
 		arg_free = argv[php_optind-1]
 		if translated_path != nil {
-			core.sapi_globals.request_info.path_translated = translated_path
+			core.SG(request_info).path_translated = translated_path
 		} else {
-			core.sapi_globals.request_info.path_translated = (*byte)(file_handle.filename)
+			core.SG(request_info).path_translated = (*byte)(file_handle.filename)
 		}
 		argv[php_optind-1] = (*byte)(file_handle.filename)
-		core.sapi_globals.request_info.argv = argv + php_optind - 1
+		core.SG(request_info).argv = argv + php_optind - 1
 		if core.PhpRequestStartup() == zend.FAILURE {
 			*arg_excp = arg_free
 			r.Fclose(file_handle.handle.fp)
-			var __str *byte = "Could not startup.\n"
-			core.PhpOutputWrite(__str, strlen(__str))
+			core.PUTS("Could not startup.\n")
 			goto err
 		}
 		request_started = 1
-		zend.CG.skip_shebang = 1
-		zend.ZendRegisterBoolConstant("PHP_CLI_PROCESS_TITLE", g.SizeOf("\"PHP_CLI_PROCESS_TITLE\"")-1, IsPsTitleAvailable() == 0, 1<<0, 0)
+		zend.CompilerGlobals.skip_shebang = 1
+		zend.ZendRegisterBoolConstant(zend.ZEND_STRL("PHP_CLI_PROCESS_TITLE"), IsPsTitleAvailable() == PS_TITLE_SUCCESS, zend.CONST_CS, 0)
 		*arg_excp = arg_free
 		if hide_argv != 0 {
 			var i int
@@ -785,10 +757,10 @@ func DoCli(argc int, argv **byte) int {
 				memset(argv[i], 0, strlen(argv[i]))
 			}
 		}
-		zend.ZendIsAutoGlobalStr("_SERVER", g.SizeOf("\"_SERVER\"")-1)
-		core.CoreGlobals.during_request_startup = 0
+		zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER"))
+		core.PG(during_request_startup) = 0
 		switch behavior {
-		case 1:
+		case PHP_MODE_STANDARD:
 			if strcmp(file_handle.filename, "Standard input code") {
 				CliRegisterFileHandles()
 			}
@@ -796,10 +768,10 @@ func DoCli(argc int, argv **byte) int {
 				exit_status = CliShellCallbacks.GetCliShellRun()()
 			} else {
 				core.PhpExecuteScript(&file_handle)
-				exit_status = zend.EG.exit_status
+				exit_status = zend.ExecutorGlobals.exit_status
 			}
 			break
-		case 4:
+		case PHP_MODE_LINT:
 			exit_status = core.PhpLintScript(&file_handle)
 			if exit_status == zend.SUCCESS {
 				zend.ZendPrintf("No syntax errors detected in %s\n", file_handle.filename)
@@ -807,13 +779,13 @@ func DoCli(argc int, argv **byte) int {
 				zend.ZendPrintf("Errors parsing %s\n", file_handle.filename)
 			}
 			break
-		case 5:
+		case PHP_MODE_STRIP:
 			if zend.OpenFileForScanning(&file_handle) == zend.SUCCESS {
 				zend.ZendStrip()
 			}
 			goto out
 			break
-		case 2:
+		case PHP_MODE_HIGHLIGHT:
 			var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 			if zend.OpenFileForScanning(&file_handle) == zend.SUCCESS {
 				standard.PhpGetHighlight(&syntax_highlighter_ini)
@@ -821,13 +793,13 @@ func DoCli(argc int, argv **byte) int {
 			}
 			goto out
 			break
-		case 6:
+		case PHP_MODE_CLI_DIRECT:
 			CliRegisterFileHandles()
 			if zend.ZendEvalStringEx(exec_direct, nil, "Command line code", 1) == zend.FAILURE {
 				exit_status = 254
 			}
 			break
-		case 7:
+		case PHP_MODE_PROCESS_STDIN:
 			var input *byte
 			var len_ int
 			var index int = 0
@@ -837,21 +809,15 @@ func DoCli(argc int, argv **byte) int {
 			if exec_begin != nil && zend.ZendEvalStringEx(exec_begin, nil, "Command line begin code", 1) == zend.FAILURE {
 				exit_status = 254
 			}
-			for exit_status == zend.SUCCESS && g.Assign(&input, streams._phpStreamGetLine(SInProcess, nil, 0, nil)) != nil {
+			for exit_status == zend.SUCCESS && b.Assign(&input, core.PhpStreamGets(SInProcess, nil, 0)) != nil {
 				len_ = strlen(input)
-				for len_ > 0 && g.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
+				for len_ > 0 && b.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
 					input[len_] = '0'
 				}
-				var __z *zend.Zval = &argn
-				var __s *zend.ZendString = zend.ZendStringInit(input, len_+1, 0)
-				__z.value.str = __s
-				__z.u1.type_info = 6 | 1<<0<<8
-				zend.ZendHashStrUpdate(&zend.EG.symbol_table, "argn", g.SizeOf("\"argn\"")-1, &argn)
-				var __z *zend.Zval = &argi
-				index++
-				__z.value.lval = index
-				__z.u1.type_info = 4
-				zend.ZendHashStrUpdate(&zend.EG.symbol_table, "argi", g.SizeOf("\"argi\"")-1, &argi)
+				zend.ZVAL_STRINGL(&argn, input, len_+1)
+				zend.ZendHashStrUpdate(&(zend.ExecutorGlobals.symbol_table), "argn", b.SizeOf("\"argn\"")-1, &argn)
+				zend.ZVAL_LONG(&argi, b.PreInc(&index))
+				zend.ZendHashStrUpdate(&(zend.ExecutorGlobals.symbol_table), "argi", b.SizeOf("\"argi\"")-1, &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254
@@ -861,25 +827,25 @@ func DoCli(argc int, argv **byte) int {
 						if CliSeekFileBegin(&file_handle, script_file) != zend.SUCCESS {
 							exit_status = 1
 						} else {
-							zend.CG.skip_shebang = 1
+							zend.CompilerGlobals.skip_shebang = 1
 							core.PhpExecuteScript(&file_handle)
-							exit_status = zend.EG.exit_status
+							exit_status = zend.ExecutorGlobals.exit_status
 						}
 					}
 				}
-				zend._efree(input)
+				zend.Efree(input)
 			}
 			if exec_end != nil && zend.ZendEvalStringEx(exec_end, nil, "Command line end code", 1) == zend.FAILURE {
 				exit_status = 254
 			}
 			break
-		case 8:
+		case PHP_MODE_REFLECTION_FUNCTION:
 
-		case 9:
+		case PHP_MODE_REFLECTION_CLASS:
 
-		case 10:
+		case PHP_MODE_REFLECTION_EXTENSION:
 
-		case 12:
+		case PHP_MODE_REFLECTION_ZEND_EXTENSION:
 			var pce *zend.ZendClassEntry = nil
 			var arg zend.Zval
 			var ref zend.Zval
@@ -887,43 +853,37 @@ func DoCli(argc int, argv **byte) int {
 			switch behavior {
 			default:
 				break
-			case 8:
+			case PHP_MODE_REFLECTION_FUNCTION:
 				if strstr(reflection_what, "::") {
 					pce = reflection_method_ptr
 				} else {
 					pce = reflection_function_ptr
 				}
 				break
-			case 9:
+			case PHP_MODE_REFLECTION_CLASS:
 				pce = reflection_class_ptr
 				break
-			case 10:
+			case PHP_MODE_REFLECTION_EXTENSION:
 				pce = reflection_extension_ptr
 				break
-			case 12:
+			case PHP_MODE_REFLECTION_ZEND_EXTENSION:
 				pce = reflection_zend_extension_ptr
 				break
 			}
-			var _s *byte = reflection_what
-			var __z *zend.Zval = &arg
-			var __s *zend.ZendString = zend.ZendStringInit(_s, strlen(_s), 0)
-			__z.value.str = __s
-			__z.u1.type_info = 6 | 1<<0<<8
+			zend.ZVAL_STRING(&arg, reflection_what)
 			zend.ObjectInitEx(&ref, pce)
-			memset(&execute_data, 0, g.SizeOf("zend_execute_data"))
-			zend.EG.current_execute_data = &execute_data
-			zend.ZendCallMethod(&ref, pce, &pce.constructor, "__construct", g.SizeOf("\"__construct\"")-1, nil, 1, &arg, nil)
-			if zend.EG.exception != nil {
+			memset(&execute_data, 0, b.SizeOf("zend_execute_data"))
+			zend.ExecutorGlobals.current_execute_data = &execute_data
+			zend.ZendCallMethodWith1Params(&ref, pce, &pce.constructor, "__construct", nil, &arg)
+			if zend.ExecutorGlobals.exception != nil {
 				var tmp zend.Zval
 				var msg *zend.Zval
 				var rv zend.Zval
-				var __z *zend.Zval = &tmp
-				__z.value.obj = zend.EG.exception
-				__z.u1.type_info = 8 | 1<<0<<8 | 1<<1<<8
-				msg = zend.ZendReadProperty(zend.ZendCeException, &tmp, "message", g.SizeOf("\"message\"")-1, 0, &rv)
-				zend.ZendPrintf("Exception: %s\n", msg.value.str.val)
+				zend.ZVAL_OBJ(&tmp, zend.ExecutorGlobals.exception)
+				msg = zend.ZendReadProperty(zend.ZendCeException, &tmp, "message", b.SizeOf("\"message\"")-1, 0, &rv)
+				zend.ZendPrintf("Exception: %s\n", zend.Z_STRVAL_P(msg))
 				zend.ZvalPtrDtor(&tmp)
-				zend.EG.exception = nil
+				zend.ExecutorGlobals.exception = nil
 				exit_status = 1
 			} else {
 				zend.ZendPrintZval(&ref, 0)
@@ -932,11 +892,11 @@ func DoCli(argc int, argv **byte) int {
 			zend.ZvalPtrDtor(&ref)
 			zend.ZvalPtrDtor(&arg)
 			break
-		case 11:
+		case PHP_MODE_REFLECTION_EXT_INFO:
 			var len_ int = strlen(reflection_what)
 			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
 			var module *zend.ZendModuleEntry
-			if g.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
+			if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
 				if !(strcmp(reflection_what, "main")) {
 					core.DisplayIniEntries(nil)
 				} else {
@@ -946,17 +906,17 @@ func DoCli(argc int, argv **byte) int {
 			} else {
 				standard.PhpInfoPrintModule(module)
 			}
-			zend._efree(lcname)
+			zend.Efree(lcname)
 			break
-		case 13:
-			zend.ZendPrintf("Configuration File (php.ini) Path: %s\n", "/usr/local/lib")
-			zend.ZendPrintf("Loaded Configuration File:         %s\n", g.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
-			zend.ZendPrintf("Scan for additional .ini files in: %s\n", g.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
-			zend.ZendPrintf("Additional .ini files parsed:      %s\n", g.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
+		case PHP_MODE_SHOW_INI_CONFIG:
+			zend.ZendPrintf("Configuration File (php.ini) Path: %s\n", core.PHP_CONFIG_FILE_PATH)
+			zend.ZendPrintf("Loaded Configuration File:         %s\n", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
+			zend.ZendPrintf("Scan for additional .ini files in: %s\n", b.Cond(PhpIniScannedPath != nil, PhpIniScannedPath, "(none)"))
+			zend.ZendPrintf("Additional .ini files parsed:      %s\n", b.Cond(PhpIniScannedFiles != nil, PhpIniScannedFiles, "(none)"))
 			break
 		}
 	}
-	zend.EG.bailout = __orig_bailout
+	zend.ExecutorGlobals.bailout = __orig_bailout
 out:
 	if request_started != 0 {
 		core.PhpRequestShutdown(any(0))
@@ -965,7 +925,7 @@ out:
 		zend.Free(translated_path)
 	}
 	if exit_status == 0 {
-		exit_status = zend.EG.exit_status
+		exit_status = zend.ExecutorGlobals.exit_status
 	}
 	return exit_status
 err:
@@ -999,7 +959,7 @@ func Main(argc int, argv []*byte) int {
 	argv = SavePsArgs(argc, argv)
 	CliSapiModule.additional_functions = AdditionalFunctions
 	zend.ZendSignalStartup()
-	for g.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
+	for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
 		switch c {
 		case 'c':
 			if ini_path_override != nil {
@@ -1016,29 +976,29 @@ func Main(argc int, argv []*byte) int {
 
 			var len_ int = strlen(php_optarg)
 			var val *byte
-			if g.Assign(&val, strchr(php_optarg, '=')) {
+			if b.Assign(&val, strchr(php_optarg, '=')) {
 				val++
 				if !(isalnum(*val)) && (*val) != '"' && (*val) != '\'' && (*val) != '0' {
-					ini_entries = realloc(ini_entries, ini_entries_len+len_+g.SizeOf("\"\\\"\\\"\\n\\0\""))
+					ini_entries = realloc(ini_entries, ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\""))
 					memcpy(ini_entries+ini_entries_len, php_optarg, val-php_optarg)
 					ini_entries_len += val - php_optarg
 					memcpy(ini_entries+ini_entries_len, "\"", 1)
 					ini_entries_len++
 					memcpy(ini_entries+ini_entries_len, val, len_-(val-php_optarg))
 					ini_entries_len += len_ - (val - php_optarg)
-					memcpy(ini_entries+ini_entries_len, "\"\n0", g.SizeOf("\"\\\"\\n\\0\""))
-					ini_entries_len += g.SizeOf("\"\\n\\0\\\"\"") - 2
+					memcpy(ini_entries+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
+					ini_entries_len += b.SizeOf("\"\\n\\0\\\"\"") - 2
 				} else {
-					ini_entries = realloc(ini_entries, ini_entries_len+len_+g.SizeOf("\"\\n\\0\""))
+					ini_entries = realloc(ini_entries, ini_entries_len+len_+b.SizeOf("\"\\n\\0\""))
 					memcpy(ini_entries+ini_entries_len, php_optarg, len_)
-					memcpy(ini_entries+ini_entries_len+len_, "\n0", g.SizeOf("\"\\n\\0\""))
-					ini_entries_len += len_ + g.SizeOf("\"\\n\\0\"") - 2
+					memcpy(ini_entries+ini_entries_len+len_, "\n0", b.SizeOf("\"\\n\\0\""))
+					ini_entries_len += len_ + b.SizeOf("\"\\n\\0\"") - 2
 				}
 			} else {
-				ini_entries = realloc(ini_entries, ini_entries_len+len_+g.SizeOf("\"=1\\n\\0\""))
+				ini_entries = realloc(ini_entries, ini_entries_len+len_+b.SizeOf("\"=1\\n\\0\""))
 				memcpy(ini_entries+ini_entries_len, php_optarg, len_)
-				memcpy(ini_entries+ini_entries_len+len_, "=1\n0", g.SizeOf("\"=1\\n\\0\""))
-				ini_entries_len += len_ + g.SizeOf("\"=1\\n\\0\"") - 2
+				memcpy(ini_entries+ini_entries_len+len_, "=1\n0", b.SizeOf("\"=1\\n\\0\""))
+				ini_entries_len += len_ + b.SizeOf("\"=1\\n\\0\"") - 2
 			}
 			break
 		case 'S':
@@ -1050,7 +1010,7 @@ func Main(argc int, argv []*byte) int {
 		case '?':
 			PhpCliUsage(argv[0])
 			goto out
-		case -2:
+		case core.PHP_GETOPT_INVALID_ARG:
 			PhpCliUsage(argv[0])
 			exit_status = 1
 			goto out
@@ -1077,14 +1037,14 @@ exit_loop:
 	sapi_module.executable_location = argv[0]
 	if sapi_module == &CliSapiModule {
 		if ini_entries != nil {
-			ini_entries = realloc(ini_entries, ini_entries_len+g.SizeOf("HARDCODED_INI"))
-			memmove(ini_entries+g.SizeOf("HARDCODED_INI")-2, ini_entries, ini_entries_len+1)
-			memcpy(ini_entries, HARDCODED_INI, g.SizeOf("HARDCODED_INI")-2)
+			ini_entries = realloc(ini_entries, ini_entries_len+b.SizeOf("HARDCODED_INI"))
+			memmove(ini_entries+b.SizeOf("HARDCODED_INI")-2, ini_entries, ini_entries_len+1)
+			memcpy(ini_entries, HARDCODED_INI, b.SizeOf("HARDCODED_INI")-2)
 		} else {
-			ini_entries = zend.Malloc(g.SizeOf("HARDCODED_INI"))
-			memcpy(ini_entries, HARDCODED_INI, g.SizeOf("HARDCODED_INI"))
+			ini_entries = zend.Malloc(b.SizeOf("HARDCODED_INI"))
+			memcpy(ini_entries, HARDCODED_INI, b.SizeOf("HARDCODED_INI"))
 		}
-		ini_entries_len += g.SizeOf("HARDCODED_INI") - 2
+		ini_entries_len += b.SizeOf("HARDCODED_INI") - 2
 	}
 	sapi_module.ini_entries = ini_entries
 
@@ -1106,20 +1066,20 @@ exit_loop:
 	/* -e option */
 
 	if use_extended_info != 0 {
-		zend.CG.compiler_options |= 1<<0 | 1<<1
+		zend.CompilerGlobals.compiler_options |= zend.ZEND_COMPILE_EXTENDED_INFO
 	}
-	zend.EG.bailout = nil
-	var __orig_bailout *sigjmp_buf = zend.EG.bailout
-	var __bailout sigjmp_buf
-	zend.EG.bailout = &__bailout
-	if sigsetjmp(__bailout, 0) == 0 {
+	zend.ExecutorGlobals.bailout = nil
+	var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.bailout
+	var __bailout JMP_BUF
+	zend.ExecutorGlobals.bailout = &__bailout
+	if zend.SETJMP(__bailout) == 0 {
 		if sapi_module == &CliSapiModule {
 			exit_status = DoCli(argc, argv)
 		} else {
 			exit_status = DoCliServer(argc, argv)
 		}
 	}
-	zend.EG.bailout = __orig_bailout
+	zend.ExecutorGlobals.bailout = __orig_bailout
 out:
 	if ini_path_override != nil {
 		zend.Free(ini_path_override)

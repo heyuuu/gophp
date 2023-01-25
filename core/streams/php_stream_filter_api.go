@@ -2,6 +2,11 @@
 
 package streams
 
+import (
+	"sik/core"
+	"sik/zend"
+)
+
 // Source: <main/streams/php_stream_filter_api.h>
 
 /*
@@ -25,11 +30,9 @@ package streams
    +----------------------------------------------------------------------+
 */
 
-// #define PHP_STREAM_FILTER_READ       0x0001
-
-// #define PHP_STREAM_FILTER_WRITE       0x0002
-
-// #define PHP_STREAM_FILTER_ALL       ( PHP_STREAM_FILTER_READ | PHP_STREAM_FILTER_WRITE )
+const PHP_STREAM_FILTER_READ = 0x1
+const PHP_STREAM_FILTER_WRITE = 0x2
+const PHP_STREAM_FILTER_ALL zend.ZendLong = PHP_STREAM_FILTER_READ | PHP_STREAM_FILTER_WRITE
 
 type PhpStreamFilterStatusT = int
 
@@ -41,24 +44,32 @@ const (
 
 /* Buckets API. */
 
-// #define php_stream_bucket_addref(bucket) ( bucket ) -> refcount ++
+func PhpStreamBucketAddref(bucket __auto__) int {
+	bucket.refcount++
+	return bucket.refcount - 1
+}
 
-// #define PSFS_FLAG_NORMAL       0
-
-// #define PSFS_FLAG_FLUSH_INC       1
-
-// #define PSFS_FLAG_FLUSH_CLOSE       2
+const PSFS_FLAG_NORMAL = 0
+const PSFS_FLAG_FLUSH_INC = 1
+const PSFS_FLAG_FLUSH_CLOSE = 2
 
 /* stack filter onto a stream */
 
-// #define php_stream_filter_alloc(fops,thisptr,persistent) _php_stream_filter_alloc ( ( fops ) , ( thisptr ) , ( persistent ) STREAMS_CC )
-
-// #define php_stream_filter_alloc_rel(fops,thisptr,persistent) _php_stream_filter_alloc ( ( fops ) , ( thisptr ) , ( persistent ) STREAMS_REL_CC )
-
-// #define php_stream_filter_prepend(chain,filter) _php_stream_filter_prepend ( ( chain ) , ( filter ) )
-
-// #define php_stream_filter_append(chain,filter) _php_stream_filter_append ( ( chain ) , ( filter ) )
-
-// #define php_stream_filter_flush(filter,finish) _php_stream_filter_flush ( ( filter ) , ( finish ) )
-
-// #define php_stream_is_filtered(stream) ( ( stream ) -> readfilters . head || ( stream ) -> writefilters . head )
+func PhpStreamFilterAlloc(fops *PhpStreamFilterOps, thisptr any, persistent uint8) *core.PhpStreamFilter {
+	return _phpStreamFilterAlloc(fops, thisptr, persistent)
+}
+func PhpStreamFilterAllocRel(fops *PhpStreamFilterOps, thisptr any, persistent uint8) *core.PhpStreamFilter {
+	return _phpStreamFilterAlloc(fops, thisptr, persistent)
+}
+func PhpStreamFilterPrepend(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) {
+	_phpStreamFilterPrepend(chain, filter)
+}
+func PhpStreamFilterAppend(chain PhpStreamFilterChain, filter *core.PhpStreamFilter) {
+	_phpStreamFilterAppend(chain, filter)
+}
+func PhpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
+	return _phpStreamFilterFlush(filter, finish)
+}
+func PhpStreamIsFiltered(stream *core.PhpStream) bool {
+	return stream.readfilters.GetHead() != nil || stream.writefilters.GetHead() != nil
+}

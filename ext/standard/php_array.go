@@ -27,28 +27,17 @@ package standard
 
 // #define PHP_ARRAY_H
 
-// #define PHP_SORT_REGULAR       0
+const PHP_SORT_REGULAR = 0
+const PHP_SORT_NUMERIC = 1
+const PHP_SORT_STRING = 2
+const PHP_SORT_DESC = 3
+const PHP_SORT_ASC = 4
+const PHP_SORT_LOCALE_STRING = 5
+const PHP_SORT_NATURAL = 6
+const PHP_SORT_FLAG_CASE = 8
+const COUNT_NORMAL = 0
+const COUNT_RECURSIVE = 1
+const ARRAY_FILTER_USE_BOTH = 1
+const ARRAY_FILTER_USE_KEY = 2
 
-// #define PHP_SORT_NUMERIC       1
-
-// #define PHP_SORT_STRING       2
-
-// #define PHP_SORT_DESC       3
-
-// #define PHP_SORT_ASC       4
-
-// #define PHP_SORT_LOCALE_STRING       5
-
-// #define PHP_SORT_NATURAL       6
-
-// #define PHP_SORT_FLAG_CASE       8
-
-// #define COUNT_NORMAL       0
-
-// #define COUNT_RECURSIVE       1
-
-// #define ARRAY_FILTER_USE_BOTH       1
-
-// #define ARRAY_FILTER_USE_KEY       2
-
-// #define ARRAYG(v) ZEND_MODULE_GLOBALS_ACCESSOR ( array , v )
+func ARRAYG(v __auto__) __auto__ { return ArrayGlobals.v }

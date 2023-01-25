@@ -3,8 +3,7 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -71,11 +70,11 @@ import (
  */
 
 func PhpBase64EncodeStr(str *zend.ZendString) *zend.ZendString {
-	return PhpBase64Encode((*uint8)(str.val), str.len_)
+	return PhpBase64Encode((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str))
 }
 func PhpBase64Decode(str *uint8, len_ int) *zend.ZendString { return PhpBase64DecodeEx(str, len_, 0) }
 func PhpBase64DecodeStr(str *zend.ZendString) *zend.ZendString {
-	return PhpBase64DecodeEx((*uint8)(str.val), str.len_, 0)
+	return PhpBase64DecodeEx((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), 0)
 }
 
 // Source: <ext/standard/base64.c>
@@ -115,10 +114,10 @@ var Base64ReverseTable []short = []short{-2, -2, -2, -2, -2, -2, -2, -2, -2, -1,
 
 func PhpBase64EncodeImpl(in *uint8, inl int, out *uint8) *uint8 {
 	for inl > 2 {
-		g.PostInc(&(*out)) = Base64Table[in[0]>>2]
-		g.PostInc(&(*out)) = Base64Table[((in[0]&0x3)<<4)+(in[1]>>4)]
-		g.PostInc(&(*out)) = Base64Table[((in[1]&0xf)<<2)+(in[2]>>6)]
-		g.PostInc(&(*out)) = Base64Table[in[2]&0x3f]
+		b.PostInc(&(*out)) = Base64Table[in[0]>>2]
+		b.PostInc(&(*out)) = Base64Table[((in[0]&0x3)<<4)+(in[1]>>4)]
+		b.PostInc(&(*out)) = Base64Table[((in[1]&0xf)<<2)+(in[2]>>6)]
+		b.PostInc(&(*out)) = Base64Table[in[2]&0x3f]
 		in += 3
 		inl -= 3
 	}
@@ -126,15 +125,15 @@ func PhpBase64EncodeImpl(in *uint8, inl int, out *uint8) *uint8 {
 	/* now deal with the tail end of things */
 
 	if inl != 0 {
-		g.PostInc(&(*out)) = Base64Table[in[0]>>2]
+		b.PostInc(&(*out)) = Base64Table[in[0]>>2]
 		if inl > 1 {
-			g.PostInc(&(*out)) = Base64Table[((in[0]&0x3)<<4)+(in[1]>>4)]
-			g.PostInc(&(*out)) = Base64Table[(in[1]&0xf)<<2]
-			g.PostInc(&(*out)) = Base64Pad
+			b.PostInc(&(*out)) = Base64Table[((in[0]&0x3)<<4)+(in[1]>>4)]
+			b.PostInc(&(*out)) = Base64Table[(in[1]&0xf)<<2]
+			b.PostInc(&(*out)) = Base64Pad
 		} else {
-			g.PostInc(&(*out)) = Base64Table[(in[0]&0x3)<<4]
-			g.PostInc(&(*out)) = Base64Pad
-			g.PostInc(&(*out)) = Base64Pad
+			b.PostInc(&(*out)) = Base64Table[(in[0]&0x3)<<4]
+			b.PostInc(&(*out)) = Base64Pad
+			b.PostInc(&(*out)) = Base64Pad
 		}
 	}
 	*out = '0'
@@ -151,7 +150,7 @@ func PhpBase64DecodeImpl(in *uint8, inl int, out *uint8, outl *int, strict zend.
 
 	/* run through the whole string, converting as we go */
 
-	for g.PostDec(&inl) > 0 {
+	for b.PostDec(&inl) > 0 {
 		*in++
 		ch = (*in) - 1
 		if ch == Base64Pad {
@@ -191,15 +190,15 @@ func PhpBase64DecodeImpl(in *uint8, inl int, out *uint8, outl *int, strict zend.
 			out[j] = ch << 2
 			break
 		case 1:
-			out[g.PostInc(&j)] |= ch >> 4
+			out[b.PostInc(&j)] |= ch >> 4
 			out[j] = (ch & 0xf) << 4
 			break
 		case 2:
-			out[g.PostInc(&j)] |= ch >> 2
+			out[b.PostInc(&j)] |= ch >> 2
 			out[j] = (ch & 0x3) << 6
 			break
 		case 3:
-			out[g.PostInc(&j)] |= ch
+			out[b.PostInc(&j)] |= ch
 			break
 		}
 		i++
@@ -231,21 +230,21 @@ fail:
 func PhpBase64Encode(str *uint8, length int) *zend.ZendString {
 	var p *uint8
 	var result *zend.ZendString
-	result = zend.ZendStringSafeAlloc((length+2)/3, 4*g.SizeOf("char"), 0, 0)
-	p = (*uint8)(result.val)
+	result = zend.ZendStringSafeAlloc((length+2)/3, 4*b.SizeOf("char"), 0, 0)
+	p = (*uint8)(zend.ZSTR_VAL(result))
 	p = PhpBase64EncodeImpl(str, length, p)
-	result.len_ = p - (*uint8)(result.val)
+	zend.ZSTR_LEN(result) = p - (*uint8)(zend.ZSTR_VAL(result))
 	return result
 }
 func PhpBase64DecodeEx(str *uint8, length int, strict zend.ZendBool) *zend.ZendString {
 	var result *zend.ZendString
 	var outl int = 0
 	result = zend.ZendStringAlloc(length, 0)
-	if PhpBase64DecodeImpl(str, length, (*uint8)(result.val), &outl, strict) == 0 {
+	if PhpBase64DecodeImpl(str, length, (*uint8)(zend.ZSTR_VAL(result)), &outl, strict) == 0 {
 		zend.ZendStringEfree(result)
 		return nil
 	}
-	result.len_ = outl
+	zend.ZSTR_LEN(result) = outl
 	return result
 }
 
@@ -259,7 +258,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -267,7 +266,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -276,52 +275,42 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -333,14 +322,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		break
 	}
 	result = PhpBase64Encode((*uint8)(str), str_len)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = result
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
+	zend.RETVAL_STR(result)
 	return
 }
 
@@ -355,7 +337,7 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -363,7 +345,7 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -372,69 +354,49 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &strict, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -447,17 +409,10 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	result = PhpBase64DecodeEx((*uint8)(str), str_len, strict)
 	if result != nil {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = result
-		__z.value.str = __s
-		if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-			__z.u1.type_info = 6
-		} else {
-			__z.u1.type_info = 6 | 1<<0<<8
-		}
+		zend.RETVAL_STR(result)
 		return
 	} else {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 }

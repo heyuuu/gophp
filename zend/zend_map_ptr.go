@@ -26,13 +26,12 @@ package zend
 
 // # include "zend_portability.h"
 
-// #define ZEND_MAP_PTR_KIND_PTR       0
-
-// #define ZEND_MAP_PTR_KIND_PTR_OR_OFFSET       1
+const ZEND_MAP_PTR_KIND_PTR = 0
+const ZEND_MAP_PTR_KIND_PTR_OR_OFFSET = 1
 
 //#if defined(ZTS) || defined(TSRM_WIN32)
 
-// #define ZEND_MAP_PTR_KIND       ZEND_MAP_PTR_KIND_PTR_OR_OFFSET
+const ZEND_MAP_PTR_KIND = ZEND_MAP_PTR_KIND_PTR_OR_OFFSET
 
 //#else
 
@@ -40,16 +39,26 @@ package zend
 
 // #define ZEND_MAP_PTR_DEF(type,name) type * ZEND_MAP_PTR ( name )
 
-// #define ZEND_MAP_PTR_IS_OFFSET(ptr) ( ( ( uintptr_t ) ZEND_MAP_PTR ( ptr ) ) & 1L )
-
-// #define ZEND_MAP_PTR_OFFSET2PTR(ptr) ( ( void * * ) ( ( char * ) CG ( map_ptr_base ) + ( uintptr_t ) ZEND_MAP_PTR ( ptr ) - 1 ) )
-
-// #define ZEND_MAP_PTR_PTR2OFFSET(ptr) ( ( void * ) ( ( uintptr_t ) ( ( ( char * ) ( ptr ) ) - ( ( char * ) CG ( map_ptr_base ) ) ) | 1L ) )
-
-// #define ZEND_MAP_PTR_GET(ptr) ( ZEND_MAP_PTR_IS_OFFSET ( ptr ) ? * ( ZEND_MAP_PTR_OFFSET2PTR ( ptr ) ) : ( void * ) ( * ( ZEND_MAP_PTR ( ptr ) ) ) )
-
-// #define ZEND_MAP_PTR_SET(ptr,val) do { if ( ZEND_MAP_PTR_IS_OFFSET ( ptr ) ) { * ( ZEND_MAP_PTR_OFFSET2PTR ( ptr ) ) = ( val ) ; } else { * ( ZEND_MAP_PTR ( ptr ) ) = ( val ) ; } } while ( 0 )
-
-// #define ZEND_MAP_PTR_INIT(ptr,val) do { ZEND_MAP_PTR ( ptr ) = ( val ) ; } while ( 0 )
-
-// #define ZEND_MAP_PTR_NEW(ptr) do { ZEND_MAP_PTR ( ptr ) = zend_map_ptr_new ( ) ; } while ( 0 )
+func ZEND_MAP_PTR_IS_OFFSET(ptr __auto__) int { return uintPtr(ptr__ptr) & 1 }
+func ZEND_MAP_PTR_OFFSET2PTR(ptr __auto__) *any {
+	return (*any)((*byte)(CG(map_ptr_base) + uintPtr(ptr__ptr-1)))
+}
+func ZEND_MAP_PTR_PTR2OFFSET(ptr *any) any {
+	return any(uintptr_t((*byte)(ptr)-(*byte)(CG(map_ptr_base))) | 1)
+}
+func ZEND_MAP_PTR_GET(ptr __auto__) any {
+	if ZEND_MAP_PTR_IS_OFFSET(ptr) != 0 {
+		return *(ZEND_MAP_PTR_OFFSET2PTR(ptr))
+	} else {
+		return any(*ptr__ptr)
+	}
+}
+func ZEND_MAP_PTR_SET(ptr __auto__, val any) {
+	if ZEND_MAP_PTR_IS_OFFSET(ptr) != 0 {
+		*(ZEND_MAP_PTR_OFFSET2PTR(ptr)) = val
+	} else {
+		*ptr__ptr = val
+	}
+}
+func ZEND_MAP_PTR_INIT(ptr __auto__, val __auto__) { ptr__ptr = val }
+func ZEND_MAP_PTR_NEW(ptr __auto__)                { ptr__ptr = ZendMapPtrNew() }

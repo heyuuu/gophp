@@ -3,8 +3,9 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	g "sik/runtime/grammar"
+	"sik/sapi/cli"
 	"sik/zend"
 )
 
@@ -35,8 +36,6 @@ import (
 
 /* Structure to save state of computation between the single steps.  */
 
-// #define SWAP(n) ( ( ( n ) << 56 ) | ( ( ( n ) & 0xff00 ) << 40 ) | ( ( ( n ) & 0xff0000 ) << 24 ) | ( ( ( n ) & 0xff000000 ) << 8 ) | ( ( ( n ) >> 8 ) & 0xff000000 ) | ( ( ( n ) >> 24 ) & 0xff0000 ) | ( ( ( n ) >> 40 ) & 0xff00 ) | ( ( n ) >> 56 ) )
-
 /* This array contains the bytes used to pad the buffer to the next
    64-byte boundary.  (FIPS 180-2:5.1.2)  */
 
@@ -49,7 +48,7 @@ var K64 []uint64 = []uint64{uint64(0x428a2f98d728ae22), uint64(0x7137449123ef65c
 
 func Sha512ProcessBlock(buffer any, len_ int, ctx *Sha512Ctx) {
 	var words *uint64 = buffer
-	var nwords int = len_ / g.SizeOf("uint64_t")
+	var nwords int = len_ / b.SizeOf("uint64_t")
 	var a uint64 = ctx.GetH()[0]
 	var b uint64 = ctx.GetH()[1]
 	var c uint64 = ctx.GetH()[2]
@@ -85,38 +84,41 @@ func Sha512ProcessBlock(buffer any, len_ int, ctx *Sha512Ctx) {
 
 		/* Operators defined in FIPS 180-2:4.1.2.  */
 
-		// #define Ch(x,y,z) ( ( x & y ) ^ ( ~ x & z ) )
-
-		// #define Maj(x,y,z) ( ( x & y ) ^ ( x & z ) ^ ( y & z ) )
-
-		// #define S0(x) ( CYCLIC ( x , 28 ) ^ CYCLIC ( x , 34 ) ^ CYCLIC ( x , 39 ) )
-
-		// #define S1(x) ( CYCLIC ( x , 14 ) ^ CYCLIC ( x , 18 ) ^ CYCLIC ( x , 41 ) )
-
-		// #define R0(x) ( CYCLIC ( x , 1 ) ^ CYCLIC ( x , 8 ) ^ ( x >> 7 ) )
-
-		// #define R1(x) ( CYCLIC ( x , 19 ) ^ CYCLIC ( x , 61 ) ^ ( x >> 6 ) )
+		var Ch func(x uint64, y uint64, z uint64) int = func(x uint64, y uint64, z uint64) int { return x&y ^ ^x&z }
+		var Maj func(x uint64, y uint64, z uint64) int = func(x uint64, y uint64, z uint64) int { return x&y ^ x&z ^ y&z }
+		var S0 func(x uint64) int = func(x uint64) int {
+			return CYCLIC(x, 28) ^ CYCLIC(x, 34) ^ CYCLIC(x, 39)
+		}
+		var S1 func(x uint64) int = func(x uint64) int {
+			return CYCLIC(x, 14) ^ CYCLIC(x, 18) ^ CYCLIC(x, 41)
+		}
+		var R0 func(x uint64) int = func(x uint64) int {
+			return CYCLIC(x, 1) ^ CYCLIC(x, 8) ^ x>>7
+		}
+		var R1 func(x uint64) int = func(x uint64) int {
+			return CYCLIC(x, 19) ^ CYCLIC(x, 61) ^ x>>6
+		}
 
 		/* It is unfortunate that C does not provide an operator for
 		   cyclic rotation.  Hope the C compiler is smart enough.  */
 
-		// #define CYCLIC(w,s) ( ( w >> s ) | ( w << ( 64 - s ) ) )
+		var CYCLIC func(w uint64, s int) int = func(w uint64, s int) int { return w>>s | w<<64 - s }
 
 		/* Compute the message schedule according to FIPS 180-2:6.3.2 step 2.  */
 
 		for t = 0; t < 16; t++ {
-			W[t] = (*words)<<56 | ((*words)&0xff00)<<40 | ((*words)&0xff0000)<<24 | ((*words)&0xff000000)<<8 | (*words)>>8&0xff000000 | (*words)>>24&0xff0000 | (*words)>>40&0xff00 | (*words)>>56
+			W[t] = SWAP(*words)
 			words++
 		}
 		for t = 16; t < 80; t++ {
-			W[t] = ((W[t-2]>>19 | W[t-2]<<64 - 19) ^ (W[t-2]>>61 | W[t-2]<<64 - 61) ^ W[t-2]>>6) + W[t-7] + ((W[t-15]>>1 | W[t-15]<<64 - 1) ^ (W[t-15]>>8 | W[t-15]<<64 - 8) ^ W[t-15]>>7) + W[t-16]
+			W[t] = R1(W[t-2]) + W[t-7] + R0(W[t-15]) + W[t-16]
 		}
 
 		/* The actual computation according to FIPS 180-2:6.3.2 step 3.  */
 
 		for t = 0; t < 80; t++ {
-			var T1 uint64 = h + ((e>>14 | e<<64 - 14) ^ (e>>18 | e<<64 - 18) ^ (e>>41 | e<<64 - 41)) + (e&f ^ ^e&g) + K[t] + W[t]
-			var T2 uint64 = ((a>>28 | a<<64 - 28) ^ (a>>34 | a<<64 - 34) ^ (a>>39 | a<<64 - 39)) + (a&b ^ a&c ^ b&c)
+			var T1 uint64 = h + S1(e) + Ch(e, f, g) + K[t] + W[t]
+			var T2 uint64 = S0(a) + Maj(a, b, c)
 			h = g
 			g = f
 			f = e
@@ -204,8 +206,8 @@ func Sha512FinishCtx(ctx *Sha512Ctx, resbuf any) any {
 
 	/* Put the 128-bit file length in *bits* at the end of the buffer.  */
 
-	*((*uint64)(&ctx.buffer[bytes+pad+8])) = ctx.GetTotal()[0]<<3<<56 | (ctx.GetTotal()[0]<<3&0xff00)<<40 | (ctx.GetTotal()[0]<<3&0xff0000)<<24 | (ctx.GetTotal()[0]<<3&0xff000000)<<8 | ctx.GetTotal()[0]<<3>>8&0xff000000 | ctx.GetTotal()[0]<<3>>24&0xff0000 | ctx.GetTotal()[0]<<3>>40&0xff00 | ctx.GetTotal()[0]<<3>>56
-	*((*uint64)(&ctx.buffer[bytes+pad])) = (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)<<56 | ((ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)&0xff00)<<40 | ((ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)&0xff0000)<<24 | ((ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)&0xff000000)<<8 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)>>8&0xff000000 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)>>24&0xff0000 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)>>40&0xff00 | (ctx.GetTotal()[1]<<3|ctx.GetTotal()[0]>>61)>>56
+	*((*uint64)(&ctx.buffer[bytes+pad+8])) = SWAP(ctx.GetTotal()[0] << 3)
+	*((*uint64)(&ctx.buffer[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>61)
 
 	/* Process last bytes.  */
 
@@ -214,7 +216,7 @@ func Sha512FinishCtx(ctx *Sha512Ctx, resbuf any) any {
 	/* Put result from CTX in first 64 bytes following RESBUF.  */
 
 	for i = 0; i < 8; i++ {
-		(*uint64)(resbuf)[i] = ctx.GetH()[i]<<56 | (ctx.GetH()[i]&0xff00)<<40 | (ctx.GetH()[i]&0xff0000)<<24 | (ctx.GetH()[i]&0xff000000)<<8 | ctx.GetH()[i]>>8&0xff000000 | ctx.GetH()[i]>>24&0xff0000 | ctx.GetH()[i]>>40&0xff00 | ctx.GetH()[i]>>56
+		(*uint64)(resbuf)[i] = SWAP(ctx.GetH()[i])
 	}
 	return resbuf
 }
@@ -224,7 +226,7 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 
 	if ctx.GetBuflen() != 0 {
 		var left_over int = int(ctx.GetBuflen())
-		var add int = size_t(g.Cond(256-left_over > len_, len_, 256-left_over))
+		var add int = size_t(b.Cond(256-left_over > len_, len_, 256-left_over))
 		memcpy(&ctx.buffer[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + add)
 		if ctx.GetBuflen() > 128 {
@@ -249,9 +251,10 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 		/* To check alignment gcc has an appropriate operator.  Other
 		   compilers don't.  */
 
-		// #define UNALIGNED_P(p) ( ( ( uintptr_t ) p ) % sizeof ( uint64_t ) != 0 )
-
-		if uintPtr(buffer)%g.SizeOf("uint64_t") != 0 {
+		var UNALIGNED_P func(p any) bool = func(p any) bool {
+			return uintPtr(p)%b.SizeOf("uint64_t") != 0
+		}
+		if UNALIGNED_P(buffer) {
 			for len_ > 128 {
 				Sha512ProcessBlock(memcpy(ctx.GetBuffer(), buffer, 128), 128, ctx)
 				buffer = (*byte)(buffer + 128)
@@ -262,12 +265,6 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 			buffer = (*byte)(buffer + (len_ & ^127))
 			len_ &= 127
 		}
-
-		/* To check alignment gcc has an appropriate operator.  Other
-		   compilers don't.  */
-
-		// #define UNALIGNED_P(p) ( ( ( uintptr_t ) p ) % sizeof ( uint64_t ) != 0 )
-
 	}
 
 	/* Move remaining bytes into internal buffer.  */
@@ -298,19 +295,11 @@ var Sha512RoundsPrefix []byte = "rounds="
 
 /* Maximum salt string length.  */
 
-// #define SALT_LEN_MAX       16
-
 /* Default number of rounds if not explicitly specified.  */
-
-// #define ROUNDS_DEFAULT       5000
 
 /* Minimum number of rounds.  */
 
-// #define ROUNDS_MIN       1000
-
 /* Maximum number of rounds.  */
-
-// #define ROUNDS_MAX       999999999
 
 /* Table with characters for base64 transformation.  */
 
@@ -330,53 +319,41 @@ func PhpSha512CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 
 	/* Default number of rounds.  */
 
-	var rounds int = 5000
+	var rounds int = ROUNDS_DEFAULT
 	var rounds_custom zend.ZendBool = 0
 
 	/* Find beginning of salt string.  The prefix should normally always
 	   be present.  Just in case it is not.  */
 
-	if strncmp(Sha512SaltPrefix, salt, g.SizeOf("sha512_salt_prefix")-1) == 0 {
+	if strncmp(Sha512SaltPrefix, salt, b.SizeOf("sha512_salt_prefix")-1) == 0 {
 
 		/* Skip salt prefix.  */
 
-		salt += g.SizeOf("sha512_salt_prefix") - 1
+		salt += b.SizeOf("sha512_salt_prefix") - 1
 
 		/* Skip salt prefix.  */
 
 	}
-	if strncmp(salt, Sha512RoundsPrefix, g.SizeOf("sha512_rounds_prefix")-1) == 0 {
-		var num *byte = salt + g.SizeOf("sha512_rounds_prefix") - 1
+	if strncmp(salt, Sha512RoundsPrefix, b.SizeOf("sha512_rounds_prefix")-1) == 0 {
+		var num *byte = salt + b.SizeOf("sha512_rounds_prefix") - 1
 		var endp *byte
-		var srounds zend.ZendUlong = strtoull(num, &endp, 10)
+		var srounds zend.ZendUlong = zend.ZEND_STRTOUL(num, &endp, 10)
 		if (*endp) == '$' {
 			salt = endp + 1
-			if 1000 > g.Cond(srounds < 999999999, srounds, 999999999) {
-				rounds = 1000
-			} else {
-				if srounds < 999999999 {
-					rounds = srounds
-				} else {
-					rounds = 999999999
-				}
-			}
+			rounds = zend.MAX(ROUNDS_MIN, cli.MIN(srounds, ROUNDS_MAX))
 			rounds_custom = 1
 		}
 	}
-	if strcspn(salt, "$") < 16 {
-		salt_len = strcspn(salt, "$")
-	} else {
-		salt_len = 16
-	}
+	salt_len = cli.MIN(strcspn(salt, "$"), SALT_LEN_MAX)
 	key_len = strlen(key)
-	if (key-(*byte)(0))%__alignof__(uint64) != 0 {
-		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint64)))
-		copied_key = memcpy(tmp+__alignof__(uint64)-(tmp-(*byte)(0))%__alignof__(uint64), key, key_len)
+	if (key-(*byte)(0))%__alignof__(uint64_t) != 0 {
+		var tmp *byte = (*byte)(alloca(key_len + __alignof__(uint64_t)))
+		copied_key = memcpy(tmp+__alignof__(uint64_t)-(tmp-(*byte)(0))%__alignof__(uint64_t), key, key_len)
 		key = copied_key
 	}
-	if (salt-(*byte)(0))%__alignof__(uint64) != 0 {
-		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint64)))
-		copied_salt = memcpy(tmp+__alignof__(uint64)-(tmp-(*byte)(0))%__alignof__(uint64), salt, salt_len)
+	if (salt-(*byte)(0))%__alignof__(uint64_t) != 0 {
+		var tmp *byte = (*byte)(alloca(salt_len + 1 + __alignof__(uint64_t)))
+		copied_salt = memcpy(tmp+__alignof__(uint64_t)-(tmp-(*byte)(0))%__alignof__(uint64_t), salt, salt_len)
 		salt = copied_salt
 		copied_salt[salt_len] = 0
 	}
@@ -533,176 +510,50 @@ func PhpSha512CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Now we can construct the result string.  It consists of three
 	   parts.  */
 
-	cp = __phpStpncpy(buffer, Sha512SaltPrefix, g.Cond(0 > buflen, 0, buflen))
-	buflen -= g.SizeOf("sha512_salt_prefix") - 1
+	cp = __phpStpncpy(buffer, Sha512SaltPrefix, zend.MAX(0, buflen))
+	buflen -= b.SizeOf("sha512_salt_prefix") - 1
 	if rounds_custom != 0 {
-		var n int = core.ApPhpSnprintf(cp, g.Cond(0 > buflen, 0, buflen), "%s%zu$", Sha512RoundsPrefix, rounds)
+		var n int = core.Snprintf(cp, zend.MAX(0, buflen), "%s%zu$", Sha512RoundsPrefix, rounds)
 		cp += n
 		buflen -= n
 	}
-	cp = __phpStpncpy(cp, salt, g.CondF1(size_t(g.Cond(0 > buflen, 0, buflen)) < salt_len, func() __auto__ { return size_t(g.Cond(0 > buflen, 0, buflen)) }, salt_len))
-	buflen -= int(g.CondF1(size_t(g.Cond(0 > buflen, 0, buflen)) < salt_len, func() __auto__ { return size_t(g.Cond(0 > buflen, 0, buflen)) }, salt_len))
+	cp = __phpStpncpy(cp, salt, cli.MIN(int(zend.MAX(0, buflen)), salt_len))
+	buflen -= int(cli.MIN(int(zend.MAX(0, buflen)), salt_len))
 	if buflen > 0 {
-		g.PostInc(&(*cp)) = '$'
+		b.PostInc(&(*cp)) = '$'
 		buflen--
 	}
-
-	// #define b64_from_24bit(B2,B1,B0,N) do { unsigned int w = ( ( B2 ) << 16 ) | ( ( B1 ) << 8 ) | ( B0 ) ; int n = ( N ) ; while ( n -- > 0 && buflen > 0 ) { * cp ++ = b64t [ w & 0x3f ] ; -- buflen ; w >>= 6 ; } } while ( 0 )
-
-	var w uint = alt_result[0]<<16 | alt_result[21]<<8 | alt_result[42]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
+	var b64_from_24bit func(B2 __auto__, B1 __auto__, B0 uint8, N int) = func(B2 __auto__, B1 __auto__, B0 uint8, N int) {
+		var w uint = B2<<16 | B1<<8 | B0
+		var n int = N
+		for b.PostDec(&n) > 0 && buflen > 0 {
+			b.PostInc(&(*cp)) = B64t[w&0x3f]
+			buflen--
+			w >>= 6
+		}
 	}
-	var w uint = alt_result[22]<<16 | alt_result[43]<<8 | alt_result[1]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[44]<<16 | alt_result[2]<<8 | alt_result[23]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[3]<<16 | alt_result[24]<<8 | alt_result[45]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[25]<<16 | alt_result[46]<<8 | alt_result[4]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[47]<<16 | alt_result[5]<<8 | alt_result[26]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[6]<<16 | alt_result[27]<<8 | alt_result[48]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[28]<<16 | alt_result[49]<<8 | alt_result[7]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[50]<<16 | alt_result[8]<<8 | alt_result[29]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[9]<<16 | alt_result[30]<<8 | alt_result[51]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[31]<<16 | alt_result[52]<<8 | alt_result[10]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[53]<<16 | alt_result[11]<<8 | alt_result[32]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[12]<<16 | alt_result[33]<<8 | alt_result[54]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[34]<<16 | alt_result[55]<<8 | alt_result[13]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[56]<<16 | alt_result[14]<<8 | alt_result[35]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[15]<<16 | alt_result[36]<<8 | alt_result[57]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[37]<<16 | alt_result[58]<<8 | alt_result[16]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[59]<<16 | alt_result[17]<<8 | alt_result[38]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[18]<<16 | alt_result[39]<<8 | alt_result[60]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[40]<<16 | alt_result[61]<<8 | alt_result[19]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = alt_result[62]<<16 | alt_result[20]<<8 | alt_result[41]
-	var n int = 4
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
-	var w uint = 0<<16 | 0<<8 | alt_result[63]
-	var n int = 2
-	for g.PostDec(&n) > 0 && buflen > 0 {
-		g.PostInc(&(*cp)) = B64t[w&0x3f]
-		buflen--
-		w >>= 6
-	}
+	b64_from_24bit(alt_result[0], alt_result[21], alt_result[42], 4)
+	b64_from_24bit(alt_result[22], alt_result[43], alt_result[1], 4)
+	b64_from_24bit(alt_result[44], alt_result[2], alt_result[23], 4)
+	b64_from_24bit(alt_result[3], alt_result[24], alt_result[45], 4)
+	b64_from_24bit(alt_result[25], alt_result[46], alt_result[4], 4)
+	b64_from_24bit(alt_result[47], alt_result[5], alt_result[26], 4)
+	b64_from_24bit(alt_result[6], alt_result[27], alt_result[48], 4)
+	b64_from_24bit(alt_result[28], alt_result[49], alt_result[7], 4)
+	b64_from_24bit(alt_result[50], alt_result[8], alt_result[29], 4)
+	b64_from_24bit(alt_result[9], alt_result[30], alt_result[51], 4)
+	b64_from_24bit(alt_result[31], alt_result[52], alt_result[10], 4)
+	b64_from_24bit(alt_result[53], alt_result[11], alt_result[32], 4)
+	b64_from_24bit(alt_result[12], alt_result[33], alt_result[54], 4)
+	b64_from_24bit(alt_result[34], alt_result[55], alt_result[13], 4)
+	b64_from_24bit(alt_result[56], alt_result[14], alt_result[35], 4)
+	b64_from_24bit(alt_result[15], alt_result[36], alt_result[57], 4)
+	b64_from_24bit(alt_result[37], alt_result[58], alt_result[16], 4)
+	b64_from_24bit(alt_result[59], alt_result[17], alt_result[38], 4)
+	b64_from_24bit(alt_result[18], alt_result[39], alt_result[60], 4)
+	b64_from_24bit(alt_result[40], alt_result[61], alt_result[19], 4)
+	b64_from_24bit(alt_result[62], alt_result[20], alt_result[41], 4)
+	b64_from_24bit(0, 0, alt_result[63], 2)
 	if buflen <= 0 {
 		errno = ERANGE
 		buffer = nil
@@ -717,16 +568,16 @@ func PhpSha512CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 
 	Sha512InitCtx(&ctx)
 	Sha512FinishCtx(&ctx, alt_result)
-	core.PhpExplicitBzero(temp_result, g.SizeOf("temp_result"))
-	core.PhpExplicitBzero(p_bytes, key_len)
-	core.PhpExplicitBzero(s_bytes, salt_len)
-	core.PhpExplicitBzero(&ctx, g.SizeOf("ctx"))
-	core.PhpExplicitBzero(&alt_ctx, g.SizeOf("alt_ctx"))
+	zend.ZEND_SECURE_ZERO(temp_result, b.SizeOf("temp_result"))
+	zend.ZEND_SECURE_ZERO(p_bytes, key_len)
+	zend.ZEND_SECURE_ZERO(s_bytes, salt_len)
+	zend.ZEND_SECURE_ZERO(&ctx, b.SizeOf("ctx"))
+	zend.ZEND_SECURE_ZERO(&alt_ctx, b.SizeOf("alt_ctx"))
 	if copied_key != nil {
-		core.PhpExplicitBzero(copied_key, key_len)
+		zend.ZEND_SECURE_ZERO(copied_key, key_len)
 	}
 	if copied_salt != nil {
-		core.PhpExplicitBzero(copied_salt, salt_len)
+		zend.ZEND_SECURE_ZERO(copied_salt, salt_len)
 	}
 	return buffer
 }
@@ -742,7 +593,7 @@ func PhpSha512Crypt(key *byte, salt *byte) *byte {
 
 	var buffer *byte
 	var buflen int = 0
-	var needed int = int(g.SizeOf("sha512_salt_prefix") - 1 + g.SizeOf("sha512_rounds_prefix") + 9 + 1 + strlen(salt) + 1 + 86 + 1)
+	var needed int = int(b.SizeOf("sha512_salt_prefix") - 1 + b.SizeOf("sha512_rounds_prefix") + 9 + 1 + strlen(salt) + 1 + 86 + 1)
 	if buflen < needed {
 		var new_buffer *byte = (*byte)(realloc(buffer, needed))
 		if new_buffer == nil {

@@ -28,7 +28,7 @@ package zend
 
 // #define ZEND_TOSTR(x) ZEND_TOSTR_ ( x )
 
-// #define ZEND_BUILD_TS       ",NTS"
+const ZEND_BUILD_TS = ",NTS"
 
 // #define ZEND_BUILD_DEBUG
 

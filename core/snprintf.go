@@ -3,7 +3,7 @@
 package core
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -40,13 +40,10 @@ const (
 
 var Php0cvt func(value float64, ndigit int, dec_point byte, exponent byte, buf *byte) *byte
 
-// #define slprintf       ap_php_slprintf
-
-// #define vslprintf       ap_php_vslprintf
-
-// #define snprintf       ap_php_snprintf
-
-// #define vsnprintf       ap_php_vsnprintf
+const Slprintf = ApPhpSlprintf
+const Vslprintf = ApPhpVslprintf
+const Snprintf = ApPhpSnprintf
+const Vsnprintf = ApPhpVsnprintf
 
 type LengthModifierE = int
 
@@ -76,7 +73,7 @@ type UWideInt = unsigned__long__long
  * This should be reasonably smaller than MAX_BUF_SIZE (I think MAX_BUF_SIZE - 9
  * should be enough, but let's give some more space) */
 
-// #define FORMAT_CONV_MAX_PRECISION       500
+const FORMAT_CONV_MAX_PRECISION = 500
 
 // Source: <main/snprintf.c>
 
@@ -124,7 +121,7 @@ type UWideInt = unsigned__long__long
 
 // # include < locale . h >
 
-// #define LCONV_DECIMAL_POINT       ( * lconv -> decimal_point )
+const LCONV_DECIMAL_POINT = (*lconv).decimal_point
 
 /*
  * Copyright (c) 2002, 2006 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -163,10 +160,10 @@ func __cvt(value float64, ndigit int, decpt *int, sign *int, fmode int, pad int)
 	if value == 0.0 {
 		*decpt = 1 - fmode
 		*sign = 0
-		if g.Assign(&rve, g.Assign(&s, (*byte)(zend.Malloc(g.Cond(ndigit != 0, siz, 2))))) == nil {
+		if b.Assign(&rve, b.Assign(&s, (*byte)(zend.Malloc(b.Cond(ndigit != 0, siz, 2))))) == nil {
 			return nil
 		}
-		g.PostInc(&(*rve)) = '0'
+		b.PostInc(&(*rve)) = '0'
 		*rve = '0'
 		if ndigit == 0 {
 			return s
@@ -180,7 +177,7 @@ func __cvt(value float64, ndigit int, decpt *int, sign *int, fmode int, pad int)
 			*decpt = 0
 			c = *p
 			zend.ZendFreedtoa(p)
-			return strdup(g.Cond(c == 'I', "INF", "NAN"))
+			return strdup(b.Cond(c == 'I', "INF", "NAN"))
 		}
 
 		/* Make a local copy and adjust rve to be in terms of s */
@@ -188,7 +185,7 @@ func __cvt(value float64, ndigit int, decpt *int, sign *int, fmode int, pad int)
 		if pad != 0 && fmode != 0 {
 			siz += *decpt
 		}
-		if g.Assign(&s, (*byte)(zend.Malloc(siz+1))) == nil {
+		if b.Assign(&s, (*byte)(zend.Malloc(siz+1))) == nil {
 			zend.ZendFreedtoa(p)
 			return nil
 		}
@@ -201,8 +198,8 @@ func __cvt(value float64, ndigit int, decpt *int, sign *int, fmode int, pad int)
 
 	if pad != 0 {
 		siz -= rve - s
-		for g.PreDec(&siz) {
-			g.PostInc(&(*rve)) = '0'
+		for b.PreDec(&siz) {
+			b.PostInc(&(*rve)) = '0'
 		}
 		*rve = '0'
 	}
@@ -230,7 +227,7 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 	var i int
 	var decpt int
 	var sign int
-	var mode int = g.Cond(ndigit >= 0, 2, 0)
+	var mode int = b.Cond(ndigit >= 0, 2, 0)
 	if mode == 0 {
 		ndigit = 17
 	}
@@ -242,19 +239,19 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		 * We assume the buffer is at least ndigit long.
 		 */
 
-		ApPhpSnprintf(buf, ndigit+1, "%s%s", g.Cond(sign != 0 && (*digits) == 'I', "-", ""), g.Cond((*digits) == 'I', "INF", "NAN"))
+		Snprintf(buf, ndigit+1, "%s%s", b.Cond(sign != 0 && (*digits) == 'I', "-", ""), b.Cond((*digits) == 'I', "INF", "NAN"))
 		zend.ZendFreedtoa(digits)
 		return buf
 	}
 	dst = buf
 	if sign != 0 {
-		g.PostInc(&(*dst)) = '-'
+		b.PostInc(&(*dst)) = '-'
 	}
 	if decpt >= 0 && decpt > ndigit || decpt < -3 {
 
 		/* exponential format (e.g. 1.2345e+13) */
 
-		if g.PreDec(&decpt) < 0 {
+		if b.PreDec(&decpt) < 0 {
 			sign = 1
 			decpt = -decpt
 		} else {
@@ -262,27 +259,27 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		}
 		src = digits
 		*src++
-		g.PostInc(&(*dst)) = (*src) - 1
-		g.PostInc(&(*dst)) = dec_point
+		b.PostInc(&(*dst)) = (*src) - 1
+		b.PostInc(&(*dst)) = dec_point
 		if (*src) == '0' {
-			g.PostInc(&(*dst)) = '0'
+			b.PostInc(&(*dst)) = '0'
 		} else {
 			for {
 				*src++
-				g.PostInc(&(*dst)) = (*src) - 1
+				b.PostInc(&(*dst)) = (*src) - 1
 				if (*src) == '0' {
 					break
 				}
 			}
 		}
-		g.PostInc(&(*dst)) = exponent
+		b.PostInc(&(*dst)) = exponent
 		if sign != 0 {
-			g.PostInc(&(*dst)) = '-'
+			b.PostInc(&(*dst)) = '-'
 		} else {
-			g.PostInc(&(*dst)) = '+'
+			b.PostInc(&(*dst)) = '+'
 		}
 		if decpt < 10 {
-			g.PostInc(&(*dst)) = '0' + decpt
+			b.PostInc(&(*dst)) = '0' + decpt
 			*dst = '0'
 		} else {
 
@@ -290,12 +287,12 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 
 			sign = decpt
 			i = 0
-			for ; g.AssignOp(&sign, "/=", 10) != 0; i++ {
+			for ; b.AssignOp(&sign, "/=", 10) != 0; i++ {
 
 			}
 			dst[i+1] = '0'
 			for decpt != 0 {
-				dst[g.PostDec(&i)] = '0' + decpt%10
+				dst[b.PostDec(&i)] = '0' + decpt%10
 				decpt /= 10
 			}
 		}
@@ -303,18 +300,18 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 
 		/* standard format 0. */
 
-		g.PostInc(&(*dst)) = '0'
-		g.PostInc(&(*dst)) = dec_point
+		b.PostInc(&(*dst)) = '0'
+		b.PostInc(&(*dst)) = dec_point
 		for {
-			g.PostInc(&(*dst)) = '0'
-			if g.PreInc(&decpt) >= 0 {
+			b.PostInc(&(*dst)) = '0'
+			if b.PreInc(&decpt) >= 0 {
 				break
 			}
 		}
 		src = digits
 		for (*src) != '0' {
 			*src++
-			g.PostInc(&(*dst)) = (*src) - 1
+			b.PostInc(&(*dst)) = (*src) - 1
 		}
 		*dst = '0'
 	} else {
@@ -326,18 +323,18 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 		for ; i < decpt; i++ {
 			if (*src) != '0' {
 				*src++
-				g.PostInc(&(*dst)) = (*src) - 1
+				b.PostInc(&(*dst)) = (*src) - 1
 			} else {
-				g.PostInc(&(*dst)) = '0'
+				b.PostInc(&(*dst)) = '0'
 			}
 		}
 		if (*src) != '0' {
 			if src == digits {
-				g.PostInc(&(*dst)) = '0'
+				b.PostInc(&(*dst)) = '0'
 			}
-			g.PostInc(&(*dst)) = dec_point
+			b.PostInc(&(*dst)) = dec_point
 			for i = decpt; digits[i] != '0'; i++ {
-				g.PostInc(&(*dst)) = digits[i]
+				b.PostInc(&(*dst)) = digits[i]
 			}
 		}
 		*dst = '0'
@@ -348,21 +345,14 @@ func PhpGcvt(value float64, ndigit int, dec_point byte, exponent byte, buf *byte
 
 /* }}} */
 
-// #define FALSE       0
-
-// #define TRUE       1
-
-// #define NUL       '\0'
-
-// #define INT_NULL       ( ( int * ) 0 )
-
-// #define S_NULL       "(null)"
-
-// #define S_NULL_LEN       6
-
-// #define FLOAT_DIGITS       6
-
-// #define EXPONENT_LENGTH       10
+const FALSE = 0
+const TRUE = 1
+const NUL = '0'
+const INT_NULL = (*int)(0)
+const S_NULL = "(null)"
+const S_NULL_LEN = 6
+const FLOAT_DIGITS = 6
+const EXPONENT_LENGTH = 10
 
 /*
  * Convert num to its decimal format.
@@ -382,7 +372,7 @@ func ApPhpConv10(num WideInt, is_unsigned BoolInt, is_negative *BoolInt, buf_end
 	var magnitude UWideInt
 	if is_unsigned != 0 {
 		magnitude = UWideInt(num)
-		*is_negative = 0
+		*is_negative = FALSE
 	} else {
 		*is_negative = num < 0
 
@@ -421,7 +411,7 @@ func ApPhpConv10(num WideInt, is_unsigned BoolInt, is_negative *BoolInt, buf_end
 
 	for {
 		var new_magnitude UWideInt = magnitude / 10
-		*(g.PreDec(&p)) = byte(magnitude - new_magnitude*10 + '0')
+		*(b.PreDec(&p)) = byte(magnitude - new_magnitude*10 + '0')
 		magnitude = new_magnitude
 		if !magnitude {
 			break
@@ -433,7 +423,7 @@ func ApPhpConv10(num WideInt, is_unsigned BoolInt, is_negative *BoolInt, buf_end
 
 /* }}} */
 
-// #define NDIG       320
+const NDIG = 320
 
 /*
  * Convert a floating point number to a string formats 'f', 'e' or 'E'.
@@ -447,8 +437,8 @@ func PhpConvFp(format byte, num float64, add_dp BooleanE, precision int, dec_poi
 	var p *byte
 	var p_orig *byte
 	var decimal_point int
-	if precision >= 320-1 {
-		precision = 320 - 2
+	if precision >= NDIG-1 {
+		precision = NDIG - 2
 	}
 	if format == 'F' {
 		p = PhpFcvt(num, precision, &decimal_point, is_negative)
@@ -465,42 +455,42 @@ func PhpConvFp(format byte, num float64, add_dp BooleanE, precision int, dec_poi
 	if isalpha(int(*p)) {
 		*len_ = strlen(p)
 		memcpy(buf, p, (*len_)+1)
-		*is_negative = 0
+		*is_negative = FALSE
 		zend.Free(p_orig)
 		return buf
 	}
 	if format == 'F' {
 		if decimal_point <= 0 {
 			if num != 0 || precision > 0 {
-				g.PostInc(&(*s)) = '0'
+				b.PostInc(&(*s)) = '0'
 				if precision > 0 {
-					g.PostInc(&(*s)) = dec_point
-					for g.PostInc(&decimal_point) < 0 {
-						g.PostInc(&(*s)) = '0'
+					b.PostInc(&(*s)) = dec_point
+					for b.PostInc(&decimal_point) < 0 {
+						b.PostInc(&(*s)) = '0'
 					}
 				} else if add_dp != 0 {
-					g.PostInc(&(*s)) = dec_point
+					b.PostInc(&(*s)) = dec_point
 				}
 			}
 		} else {
-			var addz int = g.Cond(decimal_point >= 320, decimal_point-320+1, 0)
+			var addz int = b.Cond(decimal_point >= NDIG, decimal_point-NDIG+1, 0)
 			decimal_point -= addz
-			for g.PostDec(&decimal_point) > 0 {
+			for b.PostDec(&decimal_point) > 0 {
 				*p++
-				g.PostInc(&(*s)) = (*p) - 1
+				b.PostInc(&(*s)) = (*p) - 1
 			}
-			for g.PostDec(&addz) > 0 {
-				g.PostInc(&(*s)) = '0'
+			for b.PostDec(&addz) > 0 {
+				b.PostInc(&(*s)) = '0'
 			}
 			if precision > 0 || add_dp != 0 {
-				g.PostInc(&(*s)) = dec_point
+				b.PostInc(&(*s)) = dec_point
 			}
 		}
 	} else {
 		*p++
-		g.PostInc(&(*s)) = (*p) - 1
+		b.PostInc(&(*s)) = (*p) - 1
 		if precision > 0 || add_dp != 0 {
-			g.PostInc(&(*s)) = '.'
+			b.PostInc(&(*s)) = '.'
 		}
 	}
 
@@ -510,29 +500,29 @@ func PhpConvFp(format byte, num float64, add_dp BooleanE, precision int, dec_poi
 
 	for *p {
 		*p++
-		g.PostInc(&(*s)) = (*p) - 1
+		b.PostInc(&(*s)) = (*p) - 1
 	}
 	if format != 'F' {
 		var temp []byte
 		var t_len int
 		var exponent_is_negative BoolInt
-		g.PostInc(&(*s)) = format
+		b.PostInc(&(*s)) = format
 		decimal_point--
 		if decimal_point != 0 {
-			p = ApPhpConv10(WideInt(decimal_point), 0, &exponent_is_negative, &temp[10], &t_len)
+			p = ApPhpConv10(WideInt(decimal_point), FALSE, &exponent_is_negative, &temp[EXPONENT_LENGTH], &t_len)
 			if exponent_is_negative != 0 {
-				g.PostInc(&(*s)) = '-'
+				b.PostInc(&(*s)) = '-'
 			} else {
-				g.PostInc(&(*s)) = '+'
+				b.PostInc(&(*s)) = '+'
 			}
 
 			/*
 			 * Make sure the exponent has at least 2 digits
 			 */
 
-			for g.PostDec(&t_len) {
+			for b.PostDec(&t_len) {
 				*p++
-				g.PostInc(&(*s)) = (*p) - 1
+				b.PostInc(&(*s)) = (*p) - 1
 			}
 
 			/*
@@ -540,8 +530,8 @@ func PhpConvFp(format byte, num float64, add_dp BooleanE, precision int, dec_poi
 			 */
 
 		} else {
-			g.PostInc(&(*s)) = '+'
-			g.PostInc(&(*s)) = '0'
+			b.PostInc(&(*s)) = '+'
+			b.PostInc(&(*s)) = '0'
 		}
 	}
 	*len_ = s - buf
@@ -556,9 +546,9 @@ func ApPhpConvP2(num UWideInt, nbits int, format byte, buf_end *byte, len_ *int)
 	var p *byte = buf_end
 	var low_digits []byte = "0123456789abcdef"
 	var upper_digits []byte = "0123456789ABCDEF"
-	var digits *byte = g.Cond(format == 'X', upper_digits, low_digits)
+	var digits *byte = b.Cond(format == 'X', upper_digits, low_digits)
 	for {
-		*(g.PreDec(&p)) = digits[num&mask]
+		*(b.PreDec(&p)) = digits[num&mask]
 		num >>= nbits
 		if !num {
 			break
@@ -570,7 +560,7 @@ func ApPhpConvP2(num UWideInt, nbits int, format byte, buf_end *byte, len_ *int)
 
 /* }}} */
 
-// #define NUM_BUF_SIZE       2048
+const NUM_BUF_SIZE = 2048
 
 /*
  * Descriptor for buffer area
@@ -591,9 +581,14 @@ type Buffy = BufArea
 
 // #define INS_CHAR(c,sp,bep,cc) { if ( sp < bep ) { * sp ++ = c ; } cc ++ ; }
 
-// #define NUM(c) ( c - '0' )
-
-// #define STR_TO_DEC(str,num) num = NUM ( * str ++ ) ; while ( isdigit ( ( int ) * str ) ) { num *= 10 ; num += NUM ( * str ++ ) ; }
+func NUM(c char) int { return c - '0' }
+func STR_TO_DEC(str *byte, num int) {
+	num = NUM(b.PostInc(&(*str)))
+	for isdigit(int(*str)) {
+		num *= 10
+		num += NUM(b.PostInc(&(*str)))
+	}
+}
 
 /*
  * This macro does zero padding so that the precision
@@ -602,14 +597,32 @@ type Buffy = BufArea
  * to be printed.
  */
 
-// #define FIX_PRECISION(adjust,precision,s,s_len) if ( adjust ) while ( s_len < ( size_t ) precision ) { * -- s = '0' ; s_len ++ ; }
+func FIX_PRECISION(adjust BooleanE, precision int, s *byte, s_len int) {
+	if adjust != 0 {
+		for s_len < int(precision) {
+			*(b.PreDec(&s)) = '0'
+			s_len++
+		}
+	}
+}
 
 /*
  * Macro that does padding. The padding is done by printing
  * the character ch.
  */
 
-// #define PAD(width,len,ch) do { INS_CHAR ( ch , sp , bep , cc ) ; width -- ; } while ( ( size_t ) width > len )
+func PAD(width int, len_ int, ch byte) {
+	for {
+		if sp < bep {
+			b.PostInc(&(*sp)) = ch
+		}
+		cc++
+		width--
+		if int(width > len_) == 0 {
+			break
+		}
+	}
+}
 
 /*
  * Prefix the character ch to the string str
@@ -617,7 +630,11 @@ type Buffy = BufArea
  * Set the has_prefix flag
  */
 
-// #define PREFIX(str,length,ch) * -- str = ch ; length ++ ; has_prefix = YES
+func PREFIX(str __auto__, length __auto__, ch __auto__) {
+	*(b.PreDec(&str)) = ch
+	length++
+	has_prefix = YES
+}
 
 /*
  * Do format conversion placing the output in buffer
@@ -661,7 +678,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 	for *fmt {
 		if (*fmt) != '%' {
 			if sp < bep {
-				g.PostInc(&(*sp)) = *fmt
+				b.PostInc(&(*sp)) = *fmt
 			}
 			cc++
 		} else {
@@ -675,7 +692,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 			print_sign = print_blank
 			alternate_form = print_sign
 			pad_char = ' '
-			prefix_char = '0'
+			prefix_char = NUL
 			free_zcopy = 0
 			fmt++
 
@@ -710,11 +727,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				 */
 
 				if isdigit(int(*fmt)) {
-					min_width = g.PostInc(&(*fmt)) - '0'
-					for isdigit(int(*fmt)) {
-						min_width *= 10
-						min_width += g.PostInc(&(*fmt)) - '0'
-					}
+					STR_TO_DEC(fmt, min_width)
 					adjust_width = YES
 				} else if (*fmt) == '*' {
 					min_width = __va_arg(ap, int(_))
@@ -736,11 +749,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					adjust_precision = YES
 					fmt++
 					if isdigit(int(*fmt)) {
-						precision = g.PostInc(&(*fmt)) - '0'
-						for isdigit(int(*fmt)) {
-							precision *= 10
-							precision += g.PostInc(&(*fmt)) - '0'
-						}
+						STR_TO_DEC(fmt, precision)
 					} else if (*fmt) == '*' {
 						precision = __va_arg(ap, int(_))
 						fmt++
@@ -750,8 +759,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					} else {
 						precision = 0
 					}
-					if precision > 500 {
-						precision = 500
+					if precision > FORMAT_CONV_MAX_PRECISION {
+						precision = FORMAT_CONV_MAX_PRECISION
 					}
 				} else {
 					adjust_precision = NO
@@ -841,8 +850,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if free_zcopy != 0 {
 					zvp = &zcopy
 				}
-				s_len = zvp.value.str.len_
-				s = zvp.value.str.val
+				s_len = zend.Z_STRLEN_P(zvp)
+				s = zend.Z_STRVAL_P(zvp)
 				if adjust_precision != 0 && int(precision < s_len) != 0 {
 					s_len = precision
 				}
@@ -908,13 +917,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 						break
 					}
 				}
-				s = ApPhpConv10(i_num, (*fmt) == 'u', &is_negative, &num_buf[2048], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConv10(i_num, (*fmt) == 'u', &is_negative, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if (*fmt) != 'u' {
 					if is_negative != 0 {
 						prefix_char = '-'
@@ -951,15 +955,10 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
 					break
 				}
-				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[2048], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && (*s) != '0' {
-					*(g.PreDec(&s)) = '0'
+					*(b.PreDec(&s)) = '0'
 					s_len++
 				}
 				break
@@ -991,16 +990,11 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
 					break
 				}
-				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[2048], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && i_num != 0 {
-					*(g.PreDec(&s)) = *fmt
-					*(g.PreDec(&s)) = '0'
+					*(b.PreDec(&s)) = *fmt
+					*(b.PreDec(&s)) = '0'
 					s_len += 2
 				}
 				break
@@ -1014,8 +1008,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 						s_len = precision
 					}
 				} else {
-					s = "(null)"
-					s_len = 6
+					s = S_NULL
+					s_len = S_NULL_LEN
 				}
 				pad_char = ' '
 				break
@@ -1036,17 +1030,17 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				default:
 					goto fmt_error
 				}
-				if isnan(fp_num) {
+				if ZendIsnan(fp_num) {
 					s = "NAN"
 					s_len = 3
-				} else if isinf(fp_num) {
+				} else if ZendIsinf(fp_num) {
 					s = "INF"
 					s_len = 3
 				} else {
 					if lconv == nil {
 						lconv = localeconv()
 					}
-					s = PhpConvFp(g.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, g.Cond(adjust_precision == NO, 6, precision), g.CondF1((*fmt) == 'f', func() __auto__ { return (*lconv).decimal_point }, '.'), &is_negative, &num_buf[1], &s_len)
+					s = PhpConvFp(b.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, b.Cond(adjust_precision == NO, FLOAT_DIGITS, precision), b.Cond((*fmt) == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
 					if is_negative != 0 {
 						prefix_char = '-'
 					} else if print_sign != 0 {
@@ -1073,11 +1067,11 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				default:
 					goto fmt_error
 				}
-				if isnan(fp_num) {
+				if ZendIsnan(fp_num) {
 					s = "NAN"
 					s_len = 3
 					break
-				} else if isinf(fp_num) {
+				} else if ZendIsinf(fp_num) {
 					if fp_num > 0 {
 						s = "INF"
 						s_len = 3
@@ -1088,7 +1082,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					break
 				}
 				if adjust_precision == NO {
-					precision = 6
+					precision = FLOAT_DIGITS
 				} else if precision == 0 {
 					precision = 1
 				}
@@ -1100,7 +1094,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if lconv == nil {
 					lconv = localeconv()
 				}
-				s = PhpGcvt(fp_num, precision, g.CondF2((*fmt) == 'H' || (*fmt) == 'k', '.', func() __auto__ { return (*lconv).decimal_point }), g.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
+				s = PhpGcvt(fp_num, precision, b.Cond((*fmt) == 'H' || (*fmt) == 'k', '.', LCONV_DECIMAL_POINT), b.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
 				if (*s) == '-' {
 					*s++
 					prefix_char = (*s) - 1
@@ -1111,7 +1105,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				}
 				s_len = strlen(s)
 				if alternate_form != 0 && strchr(s, '.') == nil {
-					s[g.PostInc(&s_len)] = '.'
+					s[b.PostInc(&s_len)] = '.'
 				}
 				break
 			case 'c':
@@ -1130,12 +1124,12 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				*(__va_arg(ap, (*int)(_))) = cc
 				goto skip_output
 			case 'p':
-				if g.SizeOf("char *") <= g.SizeOf("u_wide_int") {
+				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))
-					s = ApPhpConvP2(ui_num, 4, 'x', &num_buf[2048], &s_len)
+					s = ApPhpConvP2(ui_num, 4, 'x', &num_buf[NUM_BUF_SIZE], &s_len)
 					if ui_num != 0 {
-						*(g.PreDec(&s)) = 'x'
-						*(g.PreDec(&s)) = '0'
+						*(b.PreDec(&s)) = 'x'
+						*(b.PreDec(&s)) = '0'
 						s_len += 2
 					}
 				} else {
@@ -1144,7 +1138,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				}
 				pad_char = ' '
 				break
-			case '0':
+			case NUL:
 
 				/*
 				 * The last character of the format string was %.
@@ -1153,7 +1147,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 
 				continue
 			fmt_error:
-				zend.ZendError(1<<0, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
+				PhpError(zend.E_ERROR, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
 			default:
 				char_buf[0] = '%'
 				char_buf[1] = *fmt
@@ -1162,30 +1156,21 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				pad_char = ' '
 				break
 			}
-			if prefix_char != '0' {
-				*(g.PreDec(&s)) = prefix_char
+			if prefix_char != NUL {
+				*(b.PreDec(&s)) = prefix_char
 				s_len++
 			}
 			if adjust_width != 0 && adjust == RIGHT && int(min_width > s_len) != 0 {
-				if pad_char == '0' && prefix_char != '0' {
+				if pad_char == '0' && prefix_char != NUL {
 					if sp < bep {
-						g.PostInc(&(*sp)) = *s
+						b.PostInc(&(*sp)) = *s
 					}
 					cc++
 					s++
 					s_len--
 					min_width--
 				}
-				for {
-					if sp < bep {
-						g.PostInc(&(*sp)) = pad_char
-					}
-					cc++
-					min_width--
-					if int(min_width > s_len) == 0 {
-						break
-					}
-				}
+				PAD(min_width, s_len, pad_char)
 			}
 
 			/*
@@ -1194,22 +1179,13 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 
 			for i = s_len; i != 0; i-- {
 				if sp < bep {
-					g.PostInc(&(*sp)) = *s
+					b.PostInc(&(*sp)) = *s
 				}
 				cc++
 				s++
 			}
 			if adjust_width != 0 && adjust == LEFT && int(min_width > s_len) != 0 {
-				for {
-					if sp < bep {
-						g.PostInc(&(*sp)) = pad_char
-					}
-					cc++
-					min_width--
-					if int(min_width > s_len) == 0 {
-						break
-					}
-				}
+				PAD(min_width, s_len, pad_char)
 			}
 			if free_zcopy != 0 {
 				zend.ZvalPtrDtorStr(&zcopy)
@@ -1257,7 +1233,7 @@ func StrxPrintv(ccp *int, buf *byte, len_ int, format *byte, ap ...any) {
 
 /* }}} */
 
-func ApPhpSlprintf(buf *byte, len_ int, format string, _ ...any) int {
+func ApPhpSlprintf(buf *byte, len_ int, format *byte, _ ...any) int {
 	var cc int
 	var ap va_list
 	va_start(ap, format)
@@ -1284,7 +1260,7 @@ func ApPhpVslprintf(buf *byte, len_ int, format *byte, ap ...any) int {
 
 /* }}} */
 
-func ApPhpSnprintf(buf *byte, len_ int, format string, _ ...any) int {
+func ApPhpSnprintf(buf *byte, len_ int, format *byte, _ ...any) int {
 	var cc int
 	var ap va_list
 	va_start(ap, format)
@@ -1306,13 +1282,13 @@ func ApPhpVsnprintf(buf *byte, len_ int, format *byte, ap ...any) int {
 func ApPhpVasprintf(buf **byte, format *byte, ap ...any) int {
 	var ap2 va_list
 	var cc int
-	memcpy(&ap2, &ap, g.SizeOf("va_list"))
+	zend.VaCopy(ap2, ap)
 	cc = ApPhpVsnprintf(nil, 0, format, ap2)
 	va_end(ap2)
 	*buf = nil
 	if cc >= 0 {
-		if g.Assign(&(*buf), zend.Malloc(g.PreInc(&cc))) != nil {
-			if g.Assign(&cc, ApPhpVsnprintf(*buf, cc, format, ap)) < 0 {
+		if b.Assign(&(*buf), zend.Malloc(b.PreInc(&cc))) != nil {
+			if b.Assign(&cc, ApPhpVsnprintf(*buf, cc, format, ap)) < 0 {
 				zend.Free(*buf)
 				*buf = nil
 			}

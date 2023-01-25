@@ -4,7 +4,6 @@ package standard
 
 import (
 	"sik/core"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -78,15 +77,15 @@ import (
 func PhpStatpage() {
 	var pstat *zend.ZendStatT
 	pstat = core.SapiGetStat()
-	if BasicGlobals.GetPageUid() == -1 || BasicGlobals.GetPageGid() == -1 {
+	if BG(page_uid) == -1 || BG(page_gid) == -1 {
 		if pstat != nil {
-			BasicGlobals.SetPageUid(pstat.st_uid)
-			BasicGlobals.SetPageGid(pstat.st_gid)
-			BasicGlobals.SetPageInode(pstat.st_ino)
-			BasicGlobals.SetPageMtime(pstat.st_mtime)
+			BG(page_uid) = pstat.st_uid
+			BG(page_gid) = pstat.st_gid
+			BG(page_inode) = pstat.st_ino
+			BG(page_mtime) = pstat.st_mtime
 		} else {
-			BasicGlobals.SetPageUid(getuid())
-			BasicGlobals.SetPageGid(getgid())
+			BG(page_uid) = getuid()
+			BG(page_gid) = getgid()
 		}
 	}
 }
@@ -95,14 +94,14 @@ func PhpStatpage() {
 
 func PhpGetuid() zend.ZendLong {
 	PhpStatpage()
-	return BasicGlobals.GetPageUid()
+	return BG(page_uid)
 }
 
 /* }}} */
 
 func PhpGetgid() zend.ZendLong {
 	PhpStatpage()
-	return BasicGlobals.GetPageGid()
+	return BG(page_gid)
 }
 
 /* {{{ proto int getmyuid(void)
@@ -110,20 +109,15 @@ func PhpGetgid() zend.ZendLong {
 
 func ZifGetmyuid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var uid zend.ZendLong
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	uid = PhpGetuid()
 	if uid < 0 {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		__z.value.lval = uid
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(uid)
 		return
 	}
 }
@@ -132,20 +126,15 @@ func ZifGetmyuid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 func ZifGetmygid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var gid zend.ZendLong
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	gid = PhpGetgid()
 	if gid < 0 {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		__z.value.lval = gid
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(gid)
 		return
 	}
 }
@@ -154,20 +143,15 @@ func ZifGetmygid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 func ZifGetmypid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var pid zend.ZendLong
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	pid = getpid()
 	if pid < 0 {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		__z.value.lval = pid
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(pid)
 		return
 	}
 }
@@ -175,20 +159,15 @@ func ZifGetmypid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 /* }}} */
 
 func ZifGetmyinode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	PhpStatpage()
-	if BasicGlobals.GetPageInode() < 0 {
-		return_value.u1.type_info = 2
+	if BG(page_inode) < 0 {
+		zend.RETVAL_FALSE
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		__z.value.lval = BasicGlobals.GetPageInode()
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(BG(page_inode))
 		return
 	}
 }
@@ -197,7 +176,7 @@ func ZifGetmyinode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 func PhpGetlastmod() int64 {
 	PhpStatpage()
-	return BasicGlobals.GetPageMtime()
+	return BG(page_mtime)
 }
 
 /* {{{ proto int getlastmod(void)
@@ -205,20 +184,15 @@ func PhpGetlastmod() int64 {
 
 func ZifGetlastmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var lm zend.ZendLong
-	if g.CondF2(execute_data.This.u2.num_args == 0, zend.SUCCESS, func() zend.ZEND_RESULT_CODE {
-		zend.ZendWrongParametersNoneError()
-		return zend.FAILURE
-	}) == zend.FAILURE {
+	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	lm = PhpGetlastmod()
 	if lm < 0 {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		__z.value.lval = lm
-		__z.u1.type_info = 4
+		zend.RETVAL_LONG(lm)
 		return
 	}
 }

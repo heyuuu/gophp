@@ -29,13 +29,13 @@ import (
 
 // #define PHP_H
 
-// #define PHP_API_VERSION       20190902
+const PHP_API_VERSION = 20190902
 
 // #define PHP_HAVE_STREAMS
 
 // #define YYDEBUG       0
 
-// #define PHP_DEFAULT_CHARSET       "UTF-8"
+const PHP_DEFAULT_CHARSET = "UTF-8"
 
 // # include "php_version.h"
 
@@ -47,23 +47,22 @@ import (
 
 // # include "zend_API.h"
 
-// #define php_sprintf       sprintf
+const PhpSprintf = sprintf
 
 /* Operating system family definition */
 
-// #define PHP_OS_FAMILY       "Unknown"
+const PHP_OS_FAMILY = "Unknown"
 
 /* PHP's DEBUG value must match Zend's ZEND_DEBUG value */
 
-// #define PHP_DEBUG       ZEND_DEBUG
+const PHP_DEBUG zend.ZendLong = ZEND_DEBUG
 
 // #define PHPAPI
 
 // #define THREAD_LS
 
-// #define PHP_DIR_SEPARATOR       '/'
-
-// #define PHP_EOL       "\n"
+const PHP_DIR_SEPARATOR = '/'
+const PHP_EOL = "\n"
 
 /* Windows specific defines */
 
@@ -84,9 +83,18 @@ import (
  * src_size is the number of bytes excluding the NUL of src
  */
 
-// #define PHP_STRLCPY(dst,src,size,src_size) { size_t php_str_len ; if ( src_size >= size ) php_str_len = size - 1 ; else php_str_len = src_size ; memcpy ( dst , src , php_str_len ) ; dst [ php_str_len ] = '\0' ; }
+func PHP_STRLCPY(dst []char, src __auto__, size int, src_size int) {
+	var php_str_len int
+	if src_size >= size {
+		php_str_len = size - 1
+	} else {
+		php_str_len = src_size
+	}
+	memcpy(dst, src, php_str_len)
+	dst[php_str_len] = '0'
+}
 
-// #define explicit_bzero       php_explicit_bzero
+const ExplicitBzero = PhpExplicitBzero
 
 // #define CREATE_MUTEX(a,b)
 
@@ -124,17 +132,15 @@ import (
 
 // # include < limits . h >
 
-// #define INT_MAX       2147483647
-
-// #define INT_MIN       ( - INT_MAX - 1 )
+const INT_MAX = 2147483647
+const INT_MIN = -INT_MAX - 1
 
 /* double limits */
 
 // # include < float . h >
 
-// #define PHP_DOUBLE_MAX_LENGTH       1080
-
-// #define PHP_GCC_VERSION       ZEND_GCC_VERSION
+const PHP_DOUBLE_MAX_LENGTH = 1080
+const PHP_GCC_VERSION = zend.ZEND_GCC_VERSION
 
 // #define PHP_ATTRIBUTE_MALLOC       ZEND_ATTRIBUTE_MALLOC
 
@@ -144,56 +150,55 @@ import (
 
 // # include "spprintf.h"
 
-// #define EXEC_INPUT_BUF       4096
-
-// #define PHP_MIME_TYPE       "application/x-httpd-php"
+const EXEC_INPUT_BUF = 4096
+const PHP_MIME_TYPE = "application/x-httpd-php"
 
 /* macros */
 
-// #define STR_PRINT(str) ( ( str ) ? ( str ) : "" )
+func STR_PRINT(str *byte) string {
+	if str != nil {
+		return str
+	} else {
+		return ""
+	}
+}
 
-// #define MAXPATHLEN       256
+const MAXPATHLEN = 256
 
-// #define php_ignore_value(x) ZEND_IGNORE_VALUE ( x )
+func PhpIgnoreValue(x __auto__) { zend.ZEND_IGNORE_VALUE(x) }
 
 /* global variables */
 
 // #define PHP_SLEEP_NON_VOID
 
-// #define php_sleep       sleep
+const PhpSleep = sleep
 
 var Environ **byte
 var Phperror func(error *byte)
 
 // # include "php_syslog.h"
 
-// #define php_log_err(msg) php_log_err_with_severity ( msg , LOG_NOTICE )
+func PhpLogErr(msg *byte) { PhpLogErrWithSeverity(msg, LOG_NOTICE) }
 
 var Debug func(format *byte, _ ...any) int
 var Cfgparse func() int
 
-// #define php_error       zend_error
+const PhpError = zend.ZendError
+const ErrorHandlingT = zend_error_handling_t
 
-// #define error_handling_t       zend_error_handling_t
-
-func PhpSetErrorHandling(error_handling zend.ZendErrorHandlingT, exception_class *zend.ZendClassEntry) {
+func PhpSetErrorHandling(error_handling error_handling_t, exception_class *zend.ZendClassEntry) {
 	zend.ZendReplaceErrorHandling(error_handling, exception_class, nil)
 }
 func PhpStdErrorHandling() {}
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 
-// #define zenderror       phperror
-
-// #define zendlex       phplex
-
-// #define phpparse       zendparse
-
-// #define phprestart       zendrestart
-
-// #define phpin       zendin
-
-// #define php_memnstr       zend_memnstr
+const Zenderror = Phperror
+const Zendlex = phplex
+const Phpparse = zend.Zendparse
+const Phprestart = zendrestart
+const Phpin = zendin
+const PhpMemnstr = zend.ZendMemnstr
 
 /* functions */
 
@@ -203,7 +208,7 @@ var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 // #define PHP_FN       ZEND_FN
 
-// #define PHP_MN       ZEND_MN
+const PHP_MN = ZEND_MN
 
 // #define PHP_NAMED_FUNCTION       ZEND_NAMED_FUNCTION
 
@@ -227,31 +232,21 @@ var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 // #define PHP_MALIAS       ZEND_MALIAS
 
-// #define PHP_ABSTRACT_ME       ZEND_ABSTRACT_ME
-
-// #define PHP_ME_MAPPING       ZEND_ME_MAPPING
+const PHP_ABSTRACT_ME = ZEND_ABSTRACT_ME
+const PHP_ME_MAPPING = ZEND_ME_MAPPING
 
 // #define PHP_FE_END       ZEND_FE_END
 
-// #define PHP_MODULE_STARTUP_N       ZEND_MODULE_STARTUP_N
-
-// #define PHP_MODULE_SHUTDOWN_N       ZEND_MODULE_SHUTDOWN_N
-
-// #define PHP_MODULE_ACTIVATE_N       ZEND_MODULE_ACTIVATE_N
-
-// #define PHP_MODULE_DEACTIVATE_N       ZEND_MODULE_DEACTIVATE_N
-
-// #define PHP_MODULE_INFO_N       ZEND_MODULE_INFO_N
-
-// #define PHP_MODULE_STARTUP_D       ZEND_MODULE_STARTUP_D
-
-// #define PHP_MODULE_SHUTDOWN_D       ZEND_MODULE_SHUTDOWN_D
-
-// #define PHP_MODULE_ACTIVATE_D       ZEND_MODULE_ACTIVATE_D
-
-// #define PHP_MODULE_DEACTIVATE_D       ZEND_MODULE_DEACTIVATE_D
-
-// #define PHP_MODULE_INFO_D       ZEND_MODULE_INFO_D
+const PHP_MODULE_STARTUP_N = ZEND_MODULE_STARTUP_N
+const PHP_MODULE_SHUTDOWN_N = ZEND_MODULE_SHUTDOWN_N
+const PHP_MODULE_ACTIVATE_N = ZEND_MODULE_ACTIVATE_N
+const PHP_MODULE_DEACTIVATE_N = ZEND_MODULE_DEACTIVATE_N
+const PHP_MODULE_INFO_N = ZEND_MODULE_INFO_N
+const PHP_MODULE_STARTUP_D = ZEND_MODULE_STARTUP_D
+const PHP_MODULE_SHUTDOWN_D = ZEND_MODULE_SHUTDOWN_D
+const PHP_MODULE_ACTIVATE_D = ZEND_MODULE_ACTIVATE_D
+const PHP_MODULE_DEACTIVATE_D = ZEND_MODULE_DEACTIVATE_D
+const PHP_MODULE_INFO_D = ZEND_MODULE_INFO_D
 
 /* Compatibility macros */
 
@@ -265,9 +260,8 @@ var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 // #define PHP_MINFO       ZEND_MODULE_INFO_N
 
-// #define PHP_GINIT       ZEND_GINIT
-
-// #define PHP_GSHUTDOWN       ZEND_GSHUTDOWN
+const PHP_GINIT = zend.ZEND_GINIT
+const PHP_GSHUTDOWN = zend.ZEND_GSHUTDOWN
 
 // #define PHP_MINIT_FUNCTION       ZEND_MODULE_STARTUP_D
 
@@ -281,9 +275,8 @@ var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 // #define PHP_GINIT_FUNCTION       ZEND_GINIT_FUNCTION
 
-// #define PHP_GSHUTDOWN_FUNCTION       ZEND_GSHUTDOWN_FUNCTION
-
-// #define PHP_MODULE_GLOBALS       ZEND_MODULE_GLOBALS
+const PHP_GSHUTDOWN_FUNCTION = zend.ZEND_GSHUTDOWN_FUNCTION
+const PHP_MODULE_GLOBALS = ZEND_MODULE_GLOBALS
 
 /* Output support */
 
@@ -303,10 +296,8 @@ var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 /* connection status states */
 
-// #define PHP_CONNECTION_NORMAL       0
-
-// #define PHP_CONNECTION_ABORTED       1
-
-// #define PHP_CONNECTION_TIMEOUT       2
+const PHP_CONNECTION_NORMAL = 0
+const PHP_CONNECTION_ABORTED = 1
+const PHP_CONNECTION_TIMEOUT = 2
 
 // # include "php_reentrancy.h"

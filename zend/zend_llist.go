@@ -3,7 +3,7 @@
 package zend
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <Zend/zend_llist.h>
@@ -39,13 +39,10 @@ type ZendLlistPosition *ZendLlistElement
 
 /* traversal */
 
-// #define zend_llist_get_first(l) zend_llist_get_first_ex ( l , NULL )
-
-// #define zend_llist_get_last(l) zend_llist_get_last_ex ( l , NULL )
-
-// #define zend_llist_get_next(l) zend_llist_get_next_ex ( l , NULL )
-
-// #define zend_llist_get_prev(l) zend_llist_get_prev_ex ( l , NULL )
+func ZendLlistGetFirst(l *ZendLlist) any { return ZendLlistGetFirstEx(l, nil) }
+func ZendLlistGetLast(l *ZendLlist) any  { return ZendLlistGetLastEx(l, nil) }
+func ZendLlistGetNext(l *ZendLlist) any  { return ZendLlistGetNextEx(l, nil) }
+func ZendLlistGetPrev(l *ZendLlist) any  { return ZendLlistGetPrevEx(l, nil) }
 
 // Source: <Zend/zend_llist.c>
 
@@ -83,7 +80,7 @@ func ZendLlistInit(l *ZendLlist, size int, dtor LlistDtorFuncT, persistent uint8
 	l.SetPersistent(persistent)
 }
 func ZendLlistAddElement(l *ZendLlist, element any) {
-	var tmp *ZendLlistElement = g.CondF(l.GetPersistent() != 0, func() any { return __zendMalloc(g.SizeOf("zend_llist_element") + l.GetSize() - 1) }, func() any { return _emalloc(g.SizeOf("zend_llist_element") + l.GetSize() - 1) })
+	var tmp *ZendLlistElement = Pemalloc(b.SizeOf("zend_llist_element")+l.GetSize()-1, l.GetPersistent())
 	tmp.SetPrev(l.GetTail())
 	tmp.SetNext(nil)
 	if l.GetTail() != nil {
@@ -96,7 +93,7 @@ func ZendLlistAddElement(l *ZendLlist, element any) {
 	l.GetCount()++
 }
 func ZendLlistPrependElement(l *ZendLlist, element any) {
-	var tmp *ZendLlistElement = g.CondF(l.GetPersistent() != 0, func() any { return __zendMalloc(g.SizeOf("zend_llist_element") + l.GetSize() - 1) }, func() any { return _emalloc(g.SizeOf("zend_llist_element") + l.GetSize() - 1) })
+	var tmp *ZendLlistElement = Pemalloc(b.SizeOf("zend_llist_element")+l.GetSize()-1, l.GetPersistent())
 	tmp.SetNext(l.GetHead())
 	tmp.SetPrev(nil)
 	if l.GetHead() != nil {
@@ -108,28 +105,28 @@ func ZendLlistPrependElement(l *ZendLlist, element any) {
 	memcpy(tmp.GetData(), element, l.GetSize())
 	l.GetCount()++
 }
-
-// #define DEL_LLIST_ELEMENT(current,l) if ( ( current ) -> prev ) { ( current ) -> prev -> next = ( current ) -> next ; } else { ( l ) -> head = ( current ) -> next ; } if ( ( current ) -> next ) { ( current ) -> next -> prev = ( current ) -> prev ; } else { ( l ) -> tail = ( current ) -> prev ; } if ( ( l ) -> dtor ) { ( l ) -> dtor ( ( current ) -> data ) ; } pefree ( ( current ) , ( l ) -> persistent ) ; -- l -> count ;
-
+func DEL_LLIST_ELEMENT(current any, l *ZendLlist) {
+	if current.prev {
+		current.prev.next = current.next
+	} else {
+		l.SetHead(current.next)
+	}
+	if current.next {
+		current.next.prev = current.prev
+	} else {
+		l.SetTail(current.prev)
+	}
+	if l.GetDtor() != nil {
+		l.GetDtor()(current.data)
+	}
+	Pefree(current, l.GetPersistent())
+	l.GetCount()--
+}
 func ZendLlistDelElement(l *ZendLlist, element any, compare func(element1 any, element2 any) int) {
 	var current *ZendLlistElement = l.GetHead()
 	for current != nil {
 		if compare(current.GetData(), element) != 0 {
-			if current.GetPrev() != nil {
-				current.GetPrev().SetNext(current.GetNext())
-			} else {
-				l.SetHead(current.GetNext())
-			}
-			if current.GetNext() != nil {
-				current.GetNext().SetPrev(current.GetPrev())
-			} else {
-				l.SetTail(current.GetPrev())
-			}
-			if l.GetDtor() != nil {
-				l.GetDtor()(current.GetData())
-			}
-			g.CondF(l.GetPersistent() != 0, func() { return Free(current) }, func() { return _efree(current) })
-			l.GetCount()--
+			DEL_LLIST_ELEMENT(current, l)
 			break
 		}
 		current = current.GetNext()
@@ -143,7 +140,7 @@ func ZendLlistDestroy(l *ZendLlist) {
 		if l.GetDtor() != nil {
 			l.GetDtor()(current.GetData())
 		}
-		g.CondF(l.GetPersistent() != 0, func() { return Free(current) }, func() { return _efree(current) })
+		Pefree(current, l.GetPersistent())
 		current = next
 	}
 	l.SetCount(0)
@@ -168,7 +165,7 @@ func ZendLlistRemoveTail(l *ZendLlist) {
 	if l.GetDtor() != nil {
 		l.GetDtor()(old_tail.GetData())
 	}
-	g.CondF(l.GetPersistent() != 0, func() { return Free(old_tail) }, func() { return _efree(old_tail) })
+	Pefree(old_tail, l.GetPersistent())
 }
 func ZendLlistCopy(dst *ZendLlist, src *ZendLlist) {
 	var ptr *ZendLlistElement
@@ -186,21 +183,7 @@ func ZendLlistApplyWithDel(l *ZendLlist, func_ func(data any) int) {
 	for element != nil {
 		next = element.GetNext()
 		if func_(element.GetData()) != 0 {
-			if element.GetPrev() != nil {
-				element.GetPrev().SetNext(element.GetNext())
-			} else {
-				l.SetHead(element.GetNext())
-			}
-			if element.GetNext() != nil {
-				element.GetNext().SetPrev(element.GetPrev())
-			} else {
-				l.SetTail(element.GetPrev())
-			}
-			if l.GetDtor() != nil {
-				l.GetDtor()(element.GetData())
-			}
-			g.CondF(l.GetPersistent() != 0, func() { return Free(element) }, func() { return _efree(element) })
-			l.GetCount()--
+			DEL_LLIST_ELEMENT(element, l)
 		}
 		element = next
 	}
@@ -225,12 +208,12 @@ func ZendLlistSort(l *ZendLlist, comp_func LlistCompareFuncT) {
 	if l.GetCount() == 0 {
 		return
 	}
-	elements = (**ZendLlistElement)(_emalloc(l.GetCount() * g.SizeOf("zend_llist_element *")))
+	elements = (**ZendLlistElement)(Emalloc(l.GetCount() * b.SizeOf("zend_llist_element *")))
 	ptr = &elements[0]
 	for element = l.GetHead(); element != nil; element = element.GetNext() {
-		g.PostInc(&(*ptr)) = element
+		b.PostInc(&(*ptr)) = element
 	}
-	ZendSort(elements, l.GetCount(), g.SizeOf("zend_llist_element *"), CompareFuncT(comp_func), SwapFuncT(ZendLlistSwap))
+	ZendSort(elements, l.GetCount(), b.SizeOf("zend_llist_element *"), CompareFuncT(comp_func), SwapFuncT(ZendLlistSwap))
 	l.SetHead(elements[0])
 	elements[0].SetPrev(nil)
 	for i = 1; i < l.GetCount(); i++ {
@@ -239,7 +222,7 @@ func ZendLlistSort(l *ZendLlist, comp_func LlistCompareFuncT) {
 	}
 	elements[i-1].SetNext(nil)
 	l.SetTail(elements[i-1])
-	_efree(elements)
+	Efree(elements)
 }
 func ZendLlistApplyWithArgument(l *ZendLlist, func_ LlistApplyWithArgFuncT, arg any) {
 	var element *ZendLlistElement
@@ -258,7 +241,7 @@ func ZendLlistApplyWithArguments(l *ZendLlist, func_ LlistApplyWithArgsFuncT, nu
 }
 func ZendLlistCount(l *ZendLlist) int { return l.GetCount() }
 func ZendLlistGetFirstEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = g.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
 	*current = l.GetHead()
 	if (*current) != nil {
 		return (*current).GetData()
@@ -267,7 +250,7 @@ func ZendLlistGetFirstEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	}
 }
 func ZendLlistGetLastEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = g.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
 	*current = l.GetTail()
 	if (*current) != nil {
 		return (*current).GetData()
@@ -276,7 +259,7 @@ func ZendLlistGetLastEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	}
 }
 func ZendLlistGetNextEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = g.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
 	if (*current) != nil {
 		*current = (*current).GetNext()
 		if (*current) != nil {
@@ -286,7 +269,7 @@ func ZendLlistGetNextEx(l *ZendLlist, pos *ZendLlistPosition) any {
 	return nil
 }
 func ZendLlistGetPrevEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = g.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.traverse_ptr })
 	if (*current) != nil {
 		*current = (*current).GetPrev()
 		if (*current) != nil {

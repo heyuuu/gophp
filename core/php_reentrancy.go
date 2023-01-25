@@ -35,25 +35,16 @@ package core
 /* currently, PHP does not check for these functions, but assumes
    that they are available on all systems. */
 
-// #define HAVE_LOCALTIME       1
-
-// #define HAVE_GMTIME       1
-
-// #define HAVE_ASCTIME       1
-
-// #define HAVE_CTIME       1
-
-// #define php_localtime_r       localtime_r
-
-// #define php_ctime_r       ctime_r
-
-// #define php_asctime_r       asctime_r
-
-// #define php_gmtime_r       gmtime_r
-
-// #define php_strtok_r       strtok_r
-
-// #define php_rand_r       rand_r
+const HAVE_LOCALTIME = 1
+const HAVE_GMTIME = 1
+const HAVE_ASCTIME = 1
+const HAVE_CTIME = 1
+const PhpLocaltimeR = localtime_r
+const PhpCtimeR = ctime_r
+const PhpAsctimeR = asctime_r
+const PhpGmtimeR = gmtime_r
+const PhpStrtokR = strtok_r
+const PhpRandR = rand_r
 
 // #define reentrancy_startup()
 

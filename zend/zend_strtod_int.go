@@ -40,12 +40,12 @@ package zend
    make more perf. destroy_freelist()
    should be adapted then. */
 
-// #define Omit_Private_Memory       1
+const Omit_Private_Memory = 1
 
 /* HEX strings aren't supported as per
    https://wiki.php.net/rfc/remove_hex_support_in_numeric_strings */
 
-// #define NO_HEX_FP       1
+const NO_HEX_FP = 1
 
 // # include < inttypes . h >
 
@@ -53,6 +53,5 @@ package zend
 
 // #define NO_ERRNO
 
-// #define IEEE_LITTLE_ENDIAN       1
-
-// #define IEEE_8087       1
+const IEEE_LITTLE_ENDIAN = 1
+const IEEE_8087 = 1

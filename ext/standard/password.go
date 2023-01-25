@@ -3,9 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -54,8 +53,7 @@ var PhpPasswordAlgos zend.ZendArray
 
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	var zalgo zend.Zval
-	&zalgo.value.ptr = (*PhpPasswordAlgo)(algo)
-	&zalgo.u1.type_info = 14
+	zend.ZVAL_PTR(&zalgo, (*PhpPasswordAlgo)(algo))
 	if zend.ZendHashStrAdd(&PhpPasswordAlgos, ident, strlen(ident), &zalgo) != nil {
 		return zend.SUCCESS
 	}
@@ -83,7 +81,7 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 		return zend.FAILURE
 	}
 	buffer = PhpBase64Encode((*uint8)(str), str_len)
-	if buffer.len_ < out_len {
+	if zend.ZSTR_LEN(buffer) < out_len {
 
 		/* Too short of an encoded string generated */
 
@@ -91,13 +89,13 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 		return zend.FAILURE
 	}
 	for pos = 0; pos < out_len; pos++ {
-		if buffer.val[pos] == '+' {
+		if zend.ZSTR_VAL(buffer)[pos] == '+' {
 			ret[pos] = '.'
-		} else if buffer.val[pos] == '=' {
+		} else if zend.ZSTR_VAL(buffer)[pos] == '=' {
 			zend.ZendStringFree(buffer)
 			return zend.FAILURE
 		} else {
-			ret[pos] = buffer.val[pos]
+			ret[pos] = zend.ZSTR_VAL(buffer)[pos]
 		}
 	}
 	zend.ZendStringFree(buffer)
@@ -109,25 +107,25 @@ func PhpPasswordSaltTo64(str *byte, str_len int, out_len int, ret *byte) int {
 func PhpPasswordMakeSalt(length int) *zend.ZendString {
 	var ret *zend.ZendString
 	var buffer *zend.ZendString
-	if length > 2147483647/3 {
-		core.PhpErrorDocref(nil, 1<<1, "Length is too large to safely generate")
+	if length > core.INT_MAX/3 {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Length is too large to safely generate")
 		return nil
 	}
 	buffer = zend.ZendStringAlloc(length*3/4+1, 0)
-	if zend.FAILURE == PhpRandomBytes(buffer.val, buffer.len_, 0) {
-		core.PhpErrorDocref(nil, 1<<1, "Unable to generate salt")
+	if zend.FAILURE == PhpRandomBytesSilent(zend.ZSTR_VAL(buffer), zend.ZSTR_LEN(buffer)) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to generate salt")
 		zend.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
 	ret = zend.ZendStringAlloc(length, 0)
-	if PhpPasswordSaltTo64(buffer.val, buffer.len_, length, ret.val) == zend.FAILURE {
-		core.PhpErrorDocref(nil, 1<<1, "Generated salt too short")
+	if PhpPasswordSaltTo64(zend.ZSTR_VAL(buffer), zend.ZSTR_LEN(buffer), length, zend.ZSTR_VAL(ret)) == zend.FAILURE {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Generated salt too short")
 		zend.ZendStringReleaseEx(buffer, 0)
 		zend.ZendStringReleaseEx(ret, 0)
 		return nil
 	}
 	zend.ZendStringReleaseEx(buffer, 0)
-	ret.val[length] = 0
+	zend.ZSTR_VAL(ret)[length] = 0
 	return ret
 }
 
@@ -136,36 +134,36 @@ func PhpPasswordMakeSalt(length int) *zend.ZendString {
 func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend.HashTable) *zend.ZendString {
 	var buffer *zend.ZendString
 	var option_buffer *zend.Zval
-	if options == nil || !(g.Assign(&option_buffer, zend.ZendHashStrFind(options, "salt", g.SizeOf("\"salt\"")-1))) {
+	if options == nil || !(b.Assign(&option_buffer, zend.ZendHashStrFind(options, "salt", b.SizeOf("\"salt\"")-1))) {
 		return PhpPasswordMakeSalt(required_salt_len)
 	}
-	core.PhpErrorDocref(nil, 1<<13, "Use of the 'salt' option to password_hash is deprecated")
-	switch option_buffer.u1.v.type_ {
-	case 6:
-		buffer = zend.ZendStringCopy(option_buffer.value.str)
+	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
+	switch zend.Z_TYPE_P(option_buffer) {
+	case zend.IS_STRING:
+		buffer = zend.ZendStringCopy(zend.Z_STR_P(option_buffer))
 		break
-	case 4:
+	case zend.IS_LONG:
 
-	case 5:
+	case zend.IS_DOUBLE:
 
-	case 8:
+	case zend.IS_OBJECT:
 		buffer = zend.ZvalTryGetString(option_buffer)
-		if buffer == nil {
+		if zend.UNEXPECTED(buffer == nil) {
 			return nil
 		}
 		break
-	case 2:
+	case zend.IS_FALSE:
 
-	case 3:
+	case zend.IS_TRUE:
 
-	case 1:
+	case zend.IS_NULL:
 
-	case 9:
+	case zend.IS_RESOURCE:
 
-	case 7:
+	case zend.IS_ARRAY:
 
 	default:
-		core.PhpErrorDocref(nil, 1<<1, "Non-string salt parameter supplied")
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Non-string salt parameter supplied")
 		return nil
 	}
 
@@ -173,20 +171,20 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 	   That should be revised for size_t and then we maybe don't require
 	   the > INT_MAX check. */
 
-	if buffer.len_ > int(2147483647) {
-		core.PhpErrorDocref(nil, 1<<1, "Supplied salt is too long")
+	if zend.ZEND_SIZE_T_INT_OVFL(zend.ZSTR_LEN(buffer)) {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Supplied salt is too long")
 		zend.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
-	if buffer.len_ < required_salt_len {
-		core.PhpErrorDocref(nil, 1<<1, "Provided salt is too short: %zd expecting %zd", buffer.len_, required_salt_len)
+	if zend.ZSTR_LEN(buffer) < required_salt_len {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Provided salt is too short: %zd expecting %zd", zend.ZSTR_LEN(buffer), required_salt_len)
 		zend.ZendStringReleaseEx(buffer, 0)
 		return nil
 	}
-	if PhpPasswordSaltIsAlphabet(buffer.val, buffer.len_) == zend.FAILURE {
+	if PhpPasswordSaltIsAlphabet(zend.ZSTR_VAL(buffer), zend.ZSTR_LEN(buffer)) == zend.FAILURE {
 		var salt *zend.ZendString = zend.ZendStringAlloc(required_salt_len, 0)
-		if PhpPasswordSaltTo64(buffer.val, buffer.len_, required_salt_len, salt.val) == zend.FAILURE {
-			core.PhpErrorDocref(nil, 1<<1, "Provided salt is too short: %zd", buffer.len_)
+		if PhpPasswordSaltTo64(zend.ZSTR_VAL(buffer), zend.ZSTR_LEN(buffer), required_salt_len, zend.ZSTR_VAL(salt)) == zend.FAILURE {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Provided salt is too short: %zd", zend.ZSTR_LEN(buffer))
 			zend.ZendStringReleaseEx(salt, 0)
 			zend.ZendStringReleaseEx(buffer, 0)
 			return nil
@@ -195,7 +193,7 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 		return salt
 	} else {
 		var salt *zend.ZendString = zend.ZendStringAlloc(required_salt_len, 0)
-		memcpy(salt.val, buffer.val, required_salt_len)
+		memcpy(zend.ZSTR_VAL(salt), zend.ZSTR_VAL(buffer), required_salt_len)
 		zend.ZendStringReleaseEx(buffer, 0)
 		return salt
 	}
@@ -204,11 +202,11 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 /* bcrypt implementation */
 
 func PhpPasswordBcryptValid(hash *zend.ZendString) zend.ZendBool {
-	var h *byte = hash.val
-	return hash.len_ == 60 && h[0] == '$' && h[1] == '2' && h[2] == 'y'
+	var h *byte = zend.ZSTR_VAL(hash)
+	return zend.ZSTR_LEN(hash) == 60 && h[0] == '$' && h[1] == '2' && h[2] == 'y'
 }
 func PhpPasswordBcryptGetInfo(return_value *zend.Zval, hash *zend.ZendString) int {
-	var cost zend.ZendLong = 10
+	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	if PhpPasswordBcryptValid(hash) == 0 {
 
 		/* Should never get called this way. */
@@ -218,14 +216,14 @@ func PhpPasswordBcryptGetInfo(return_value *zend.Zval, hash *zend.ZendString) in
 		/* Should never get called this way. */
 
 	}
-	sscanf(hash.val, "$2y$"+"%"+"lld"+"$", &cost)
-	zend.AddAssocLongEx(return_value, "cost", strlen("cost"), cost)
+	sscanf(zend.ZSTR_VAL(hash), "$2y$"+zend.ZEND_LONG_FMT+"$", &cost)
+	zend.AddAssocLong(return_value, "cost", cost)
 	return zend.SUCCESS
 }
 func PhpPasswordBcryptNeedsRehash(hash *zend.ZendString, options *zend.ZendArray) zend.ZendBool {
 	var znew_cost *zend.Zval
-	var old_cost zend.ZendLong = 10
-	var new_cost zend.ZendLong = 10
+	var old_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
+	var new_cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
 	if PhpPasswordBcryptValid(hash) == 0 {
 
 		/* Should never get called this way. */
@@ -235,8 +233,8 @@ func PhpPasswordBcryptNeedsRehash(hash *zend.ZendString, options *zend.ZendArray
 		/* Should never get called this way. */
 
 	}
-	sscanf(hash.val, "$2y$"+"%"+"lld"+"$", &old_cost)
-	if options != nil && g.Assign(&znew_cost, zend.ZendHashStrFind(options, "cost", g.SizeOf("\"cost\"")-1)) != nil {
+	sscanf(zend.ZSTR_VAL(hash), "$2y$"+zend.ZEND_LONG_FMT+"$", &old_cost)
+	if options != nil && b.Assign(&znew_cost, zend.ZendHashStrFind(options, "cost", b.SizeOf("\"cost\"")-1)) != nil {
 		new_cost = zend.ZvalGetLong(znew_cost)
 	}
 	return old_cost != new_cost
@@ -244,11 +242,11 @@ func PhpPasswordBcryptNeedsRehash(hash *zend.ZendString, options *zend.ZendArray
 func PhpPasswordBcryptVerify(password *zend.ZendString, hash *zend.ZendString) zend.ZendBool {
 	var i int
 	var status int = 0
-	var ret *zend.ZendString = PhpCrypt(password.val, int(password.len_), hash.val, int(hash.len_), 1)
+	var ret *zend.ZendString = PhpCrypt(zend.ZSTR_VAL(password), int(zend.ZSTR_LEN(password)), zend.ZSTR_VAL(hash), int(zend.ZSTR_LEN(hash)), 1)
 	if ret == nil {
 		return 0
 	}
-	if ret.len_ != hash.len_ || hash.len_ < 13 {
+	if zend.ZSTR_LEN(ret) != zend.ZSTR_LEN(hash) || zend.ZSTR_LEN(hash) < 13 {
 		zend.ZendStringFree(ret)
 		return 0
 	}
@@ -258,8 +256,8 @@ func PhpPasswordBcryptVerify(password *zend.ZendString, hash *zend.ZendString) z
 	 * equality check that will always check every byte of both
 	 * values. */
 
-	for i = 0; i < hash.len_; i++ {
-		status |= ret.val[i] ^ hash.val[i]
+	for i = 0; i < zend.ZSTR_LEN(hash); i++ {
+		status |= zend.ZSTR_VAL(ret)[i] ^ zend.ZSTR_VAL(hash)[i]
 	}
 	zend.ZendStringFree(ret)
 	return status == 0
@@ -271,32 +269,32 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 	var hash *zend.ZendString
 	var salt *zend.ZendString
 	var zcost *zend.Zval
-	var cost zend.ZendLong = 10
-	if options != nil && g.Assign(&zcost, zend.ZendHashStrFind(options, "cost", g.SizeOf("\"cost\"")-1)) != nil {
+	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
+	if options != nil && b.Assign(&zcost, zend.ZendHashStrFind(options, "cost", b.SizeOf("\"cost\"")-1)) != nil {
 		cost = zend.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
-		core.PhpErrorDocref(nil, 1<<1, "Invalid bcrypt cost parameter specified: "+"%"+"lld", cost)
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid bcrypt cost parameter specified: "+zend.ZEND_LONG_FMT, cost)
 		return nil
 	}
-	hash_format_len = core.ApPhpSnprintf(hash_format, g.SizeOf("hash_format"), "$2y$%02"+"lld"+"$", cost)
-	if !(g.Assign(&salt, PhpPasswordGetSalt(nil, 22, options))) {
+	hash_format_len = core.Snprintf(hash_format, b.SizeOf("hash_format"), "$2y$%02"+zend.ZEND_LONG_FMT_SPEC+"$", cost)
+	if !(b.Assign(&salt, PhpPasswordGetSalt(nil, zend.Z_UL(22), options))) {
 		return nil
 	}
-	salt.val[salt.len_] = 0
-	hash = zend.ZendStringAlloc(salt.len_+hash_format_len, 0)
-	sprintf(hash.val, "%s%s", hash_format, salt.val)
-	hash.val[hash_format_len+salt.len_] = 0
+	zend.ZSTR_VAL(salt)[zend.ZSTR_LEN(salt)] = 0
+	hash = zend.ZendStringAlloc(zend.ZSTR_LEN(salt)+hash_format_len, 0)
+	sprintf(zend.ZSTR_VAL(hash), "%s%s", hash_format, zend.ZSTR_VAL(salt))
+	zend.ZSTR_VAL(hash)[hash_format_len+zend.ZSTR_LEN(salt)] = 0
 	zend.ZendStringReleaseEx(salt, 0)
 
 	/* This cast is safe, since both values are defined here in code and cannot overflow */
 
-	result = PhpCrypt(password.val, int(password.len_), hash.val, int(hash.len_), 1)
+	result = PhpCrypt(zend.ZSTR_VAL(password), int(zend.ZSTR_LEN(password)), zend.ZSTR_VAL(hash), int(zend.ZSTR_LEN(hash)), 1)
 	zend.ZendStringReleaseEx(hash, 0)
 	if result == nil {
 		return nil
 	}
-	if result.len_ < 13 {
+	if zend.ZSTR_LEN(result) < 13 {
 		zend.ZendStringFree(result)
 		return nil
 	}
@@ -306,13 +304,13 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 var PhpPasswordAlgoBcrypt PhpPasswordAlgo = PhpPasswordAlgo{"bcrypt", PhpPasswordBcryptHash, PhpPasswordBcryptVerify, PhpPasswordBcryptNeedsRehash, PhpPasswordBcryptGetInfo, PhpPasswordBcryptValid}
 
 func ZmStartupPassword(type_ int, module_number int) int {
-	zend._zendHashInit(&PhpPasswordAlgos, 4, zend.ZvalPtrDtor, 1)
-	zend.ZendRegisterStringConstant("PASSWORD_DEFAULT", g.SizeOf("\"PASSWORD_DEFAULT\"")-1, "2y", 1<<0|1<<1, module_number)
+	zend.ZendHashInit(&PhpPasswordAlgos, 4, nil, zend.ZVAL_PTR_DTOR, 1)
+	zend.REGISTER_STRING_CONSTANT("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT)
 	if zend.FAILURE == PhpPasswordAlgoRegister("2y", &PhpPasswordAlgoBcrypt) {
 		return zend.FAILURE
 	}
-	zend.ZendRegisterStringConstant("PASSWORD_BCRYPT", g.SizeOf("\"PASSWORD_BCRYPT\"")-1, "2y", 1<<0|1<<1, module_number)
-	zend.ZendRegisterLongConstant("PASSWORD_BCRYPT_DEFAULT_COST", g.SizeOf("\"PASSWORD_BCRYPT_DEFAULT_COST\"")-1, 10, 1<<0|1<<1, module_number)
+	zend.REGISTER_STRING_CONSTANT("PASSWORD_BCRYPT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT)
+	zend.REGISTER_LONG_CONSTANT("PASSWORD_BCRYPT_DEFAULT_COST", PHP_PASSWORD_BCRYPT_COST, zend.CONST_CS|zend.CONST_PERSISTENT)
 	return zend.SUCCESS
 }
 
@@ -332,38 +330,38 @@ func PhpPasswordAlgoFind(ident *zend.ZendString) *PhpPasswordAlgo {
 		return nil
 	}
 	tmp = zend.ZendHashFind(&PhpPasswordAlgos, (*zend.ZendString)(ident))
-	if tmp == nil || tmp.u1.v.type_ != 14 {
+	if tmp == nil || zend.Z_TYPE_P(tmp) != zend.IS_PTR {
 		return nil
 	}
-	return tmp.value.ptr
+	return zend.Z_PTR_P(tmp)
 }
 func PhpPasswordAlgoFindZvalEx(arg *zend.Zval, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
-	if arg == nil || arg.u1.v.type_ == 1 {
+	if arg == nil || zend.Z_TYPE_P(arg) == zend.IS_NULL {
 		return default_algo
 	}
-	if arg.u1.v.type_ == 4 {
-		switch arg.value.lval {
+	if zend.Z_TYPE_P(arg) == zend.IS_LONG {
+		switch zend.Z_LVAL_P(arg) {
 		case 0:
 			return default_algo
 		case 1:
 			return &PhpPasswordAlgoBcrypt
 		case 2:
-			var n *zend.ZendString = zend.ZendStringInit("argon2i", g.SizeOf("\"argon2i\"")-1, 0)
+			var n *zend.ZendString = zend.ZendStringInit("argon2i", b.SizeOf("\"argon2i\"")-1, 0)
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			zend.ZendStringRelease(n)
 			return ret
 		case 3:
-			var n *zend.ZendString = zend.ZendStringInit("argon2id", g.SizeOf("\"argon2id\"")-1, 0)
+			var n *zend.ZendString = zend.ZendStringInit("argon2id", b.SizeOf("\"argon2id\"")-1, 0)
 			var ret *PhpPasswordAlgo = PhpPasswordAlgoFind(n)
 			zend.ZendStringRelease(n)
 			return ret
 		}
 		return nil
 	}
-	if arg.u1.v.type_ != 6 {
+	if zend.Z_TYPE_P(arg) != zend.IS_STRING {
 		return nil
 	}
-	return PhpPasswordAlgoFind(arg.value.str)
+	return PhpPasswordAlgoFind(zend.Z_STR_P(arg))
 }
 func PhpPasswordAlgoFindZval(arg *zend.Zval) *PhpPasswordAlgo {
 	return PhpPasswordAlgoFindZvalEx(arg, PhpPasswordAlgoDefault())
@@ -371,7 +369,7 @@ func PhpPasswordAlgoFindZval(arg *zend.Zval) *PhpPasswordAlgo {
 func PhpPasswordAlgoExtractIdent(hash *zend.ZendString) *zend.ZendString {
 	var ident *byte
 	var ident_end *byte
-	if hash == nil || hash.len_ < 3 {
+	if hash == nil || zend.ZSTR_LEN(hash) < 3 {
 
 		/* Minimum prefix: "$x$" */
 
@@ -380,7 +378,7 @@ func PhpPasswordAlgoExtractIdent(hash *zend.ZendString) *zend.ZendString {
 		/* Minimum prefix: "$x$" */
 
 	}
-	ident = hash.val + 1
+	ident = zend.ZSTR_VAL(hash) + 1
 	ident_end = strchr(ident, '$')
 	if ident_end == nil {
 
@@ -420,7 +418,7 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 1
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -428,7 +426,7 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -437,52 +435,42 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &hash, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -493,35 +481,29 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = &options
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(return_value)
+	zend.ArrayInit(&options)
 	ident = PhpPasswordAlgoExtractIdent(hash)
 	algo = PhpPasswordAlgoFind(ident)
 	if algo == nil || algo.GetValid() != nil && algo.GetValid()(hash) == 0 {
 		if ident != nil {
 			zend.ZendStringRelease(ident)
 		}
-		zend.AddAssocNullEx(return_value, "algo", strlen("algo"))
-		zend.AddAssocStringEx(return_value, "algoName", strlen("algoName"), "unknown")
-		zend.AddAssocZvalEx(return_value, "options", strlen("options"), &options)
+		zend.AddAssocNull(return_value, "algo")
+		zend.AddAssocString(return_value, "algoName", "unknown")
+		zend.AddAssocZval(return_value, "options", &options)
 		return
 	}
-	zend.AddAssocStrEx(return_value, "algo", strlen("algo"), PhpPasswordAlgoExtractIdent(hash))
+	zend.AddAssocStr(return_value, "algo", PhpPasswordAlgoExtractIdent(hash))
 	zend.ZendStringRelease(ident)
-	zend.AddAssocStringEx(return_value, "algoName", strlen("algoName"), algo.GetName())
+	zend.AddAssocString(return_value, "algoName", algo.GetName())
 	if algo.GetGetInfo() != nil && zend.FAILURE == algo.GetGetInfo()(&options, hash) {
-		zend.ZvalPtrDtorNogc(&options)
-		zend.ZvalPtrDtorNogc(return_value)
-		return_value.u1.type_info = 1
+		zend.ZvalDtor(&options)
+		zend.ZvalDtor(return_value)
+		zend.RETVAL_NULL()
 		return
 	}
-	zend.AddAssocZvalEx(return_value, "options", strlen("options"), &options)
+	zend.AddAssocZval(return_value, "options", &options)
 }
 
 /** }}} */
@@ -536,7 +518,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -544,7 +526,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -553,81 +535,51 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &hash, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &znew_algo, 0)
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_ARRAY
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -643,7 +595,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 
 		/* Unknown new algorithm, never prompt to rehash. */
 
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	old_algo = PhpPasswordAlgoIdentifyEx(hash, nil)
@@ -651,14 +603,10 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 
 		/* Different algorithm preferred, always rehash. */
 
-		return_value.u1.type_info = 3
+		zend.RETVAL_TRUE
 		return
 	}
-	if old_algo.GetNeedsRehash()(hash, options) != 0 {
-		return_value.u1.type_info = 3
-	} else {
-		return_value.u1.type_info = 2
-	}
+	zend.RETVAL_BOOL(old_algo.GetNeedsRehash()(hash, options) != 0)
 	return
 }
 
@@ -672,7 +620,7 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -680,7 +628,7 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -689,85 +637,61 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &password, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &hash, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
 	algo = PhpPasswordAlgoIdentify(hash)
-	if algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0) {
-		return_value.u1.type_info = 3
-	} else {
-		return_value.u1.type_info = 2
-	}
+	zend.RETVAL_BOOL(algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
 	return
 }
 
@@ -783,7 +707,7 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _flags int = 0
 		var _min_num_args int = 2
 		var _max_num_args int = 3
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -791,7 +715,7 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -800,81 +724,51 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &password, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
+			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zalgo, 0)
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgArrayHt(_arg, &options, 0, 1, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_ARRAY
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -888,9 +782,9 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	algo = PhpPasswordAlgoFindZval(zalgo)
 	if algo == nil {
 		var algostr *zend.ZendString = zend.ZvalGetString(zalgo)
-		core.PhpErrorDocref(nil, 1<<1, "Unknown password hashing algorithm: %s", algostr.val)
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown password hashing algorithm: %s", zend.ZSTR_VAL(algostr))
 		zend.ZendStringRelease(algostr)
-		return_value.u1.type_info = 1
+		zend.RETVAL_NULL()
 		return
 	}
 	digest = algo.GetHash()(password, options)
@@ -898,13 +792,10 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 		/* algo->hash should have raised an error. */
 
-		return_value.u1.type_info = 1
+		zend.RETVAL_NULL()
 		return
 	}
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = digest
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	zend.RETVAL_NEW_STR(digest)
 	return
 }
 
@@ -912,14 +803,11 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var algo *zend.ZendString
-	if execute_data.This.u2.num_args != 0 {
+	if zend.UNEXPECTED(zend.ZEND_NUM_ARGS() != 0) {
 		zend.ZendWrongParametersNoneError()
 		return
 	}
-	var __arr *zend.ZendArray = zend._zendNewArray(0)
-	var __z *zend.Zval = return_value
-	__z.value.arr = __arr
-	__z.u1.type_info = 7 | 1<<0<<8 | 1<<1<<8
+	zend.ArrayInit(return_value)
 	for {
 		var __ht *zend.HashTable = &PhpPasswordAlgos
 		var _p *zend.Bucket = __ht.arData
@@ -927,7 +815,7 @@ func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
 			algo = _p.key

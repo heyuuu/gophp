@@ -3,8 +3,8 @@
 package zend
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/core"
 )
 
 // Source: <Zend/zend_object_handlers.h>
@@ -30,21 +30,21 @@ import (
 
 // #define ZEND_OBJECT_HANDLERS_H
 
-// #define ZEND_WRONG_PROPERTY_INFO       ( ( struct _zend_property_info * ) ( ( intptr_t ) - 1 ) )
+const ZEND_WRONG_PROPERTY_INFO *ZendPropertyInfo = (*ZendPropertyInfo)(intptr_t - 1)
+const ZEND_DYNAMIC_PROPERTY_OFFSET = uintptr_t(intptr_t)(-1)
 
-// #define ZEND_DYNAMIC_PROPERTY_OFFSET       ( ( uintptr_t ) ( intptr_t ) ( - 1 ) )
-
-// #define IS_VALID_PROPERTY_OFFSET(offset) ( ( intptr_t ) ( offset ) > 0 )
-
-// #define IS_WRONG_PROPERTY_OFFSET(offset) ( ( intptr_t ) ( offset ) == 0 )
-
-// #define IS_DYNAMIC_PROPERTY_OFFSET(offset) ( ( intptr_t ) ( offset ) < 0 )
-
-// #define IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset) ( offset == ZEND_DYNAMIC_PROPERTY_OFFSET )
-
-// #define ZEND_DECODE_DYN_PROP_OFFSET(offset) ( ( uintptr_t ) ( - ( intptr_t ) ( offset ) - 2 ) )
-
-// #define ZEND_ENCODE_DYN_PROP_OFFSET(offset) ( ( uintptr_t ) ( - ( ( intptr_t ) ( offset ) + 2 ) ) )
+func IS_VALID_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) > 0 }
+func IS_WRONG_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) == 0 }
+func IS_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool { return intptr_t(offset) < 0 }
+func IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(offset uintPtr) bool {
+	return offset == ZEND_DYNAMIC_PROPERTY_OFFSET
+}
+func ZEND_DECODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ {
+	return uintptr_t(-(intptr_t(offset)) - 2)
+}
+func ZEND_ENCODE_DYN_PROP_OFFSET(offset uintPtr) __auto__ {
+	return uintptr_t(-(intptr_t(offset) + 2))
+}
 
 /* The following rule applies to read_property() and read_dimension() implementations:
    If you return a zval which is not otherwise referenced by the extension or the engine's
@@ -154,15 +154,18 @@ type ZendObjectGetClosureT func(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **Z
 type ZendObjectGetGcT func(object *Zval, table **Zval, n *int) *HashTable
 type ZendObjectDoOperationT func(opcode ZendUchar, result *Zval, op1 *Zval, op2 *Zval) int
 
-// #define zend_get_std_object_handlers() ( & std_object_handlers )
+func ZendGetStdObjectHandlers() *ZendObjectHandlers { return &StdObjectHandlers }
+func ZendGetFunctionRootClass(fbc *ZendFunction) *ZendClassEntry {
+	if fbc.GetPrototype() != nil {
+		return fbc.GetPrototype().GetScope()
+	} else {
+		return fbc.GetScope()
+	}
+}
 
-// #define zend_get_function_root_class(fbc) ( ( fbc ) -> common . prototype ? ( fbc ) -> common . prototype -> common . scope : ( fbc ) -> common . scope )
-
-// #define ZEND_PROPERTY_ISSET       0x0
-
-// #define ZEND_PROPERTY_NOT_EMPTY       ZEND_ISEMPTY
-
-// #define ZEND_PROPERTY_EXISTS       0x2
+const ZEND_PROPERTY_ISSET = 0x0
+const ZEND_PROPERTY_NOT_EMPTY = ZEND_ISEMPTY
+const ZEND_PROPERTY_EXISTS = 0x2
 
 /* Default behavior for get_properties_for. For use as a fallback in custom
  * get_properties_for implementations. */
@@ -170,9 +173,18 @@ type ZendObjectDoOperationT func(opcode ZendUchar, result *Zval, op1 *Zval, op2 
 /* Will call get_properties_for handler or use default behavior. For use by
  * consumers of the get_properties_for API. */
 
-// #define zend_release_properties(ht) do { if ( ( ht ) && ! ( GC_FLAGS ( ht ) & GC_IMMUTABLE ) && ! GC_DELREF ( ht ) ) { zend_array_destroy ( ht ) ; } } while ( 0 )
-
-// #define zend_free_trampoline(func) do { if ( ( func ) == & EG ( trampoline ) ) { EG ( trampoline ) . common . function_name = NULL ; } else { efree ( func ) ; } } while ( 0 )
+func ZendReleaseProperties(ht *HashTable) {
+	if ht != nil && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+		ZendArrayDestroy(ht)
+	}
+}
+func ZendFreeTrampoline(func_ any) {
+	if func_ == &EG(trampoline) {
+		EG(trampoline).common.function_name = nil
+	} else {
+		Efree(func_)
+	}
+}
 
 // Source: <Zend/zend_object_handlers.c>
 
@@ -220,19 +232,15 @@ type ZendObjectDoOperationT func(opcode ZendUchar, result *Zval, op1 *Zval, op2 
 
 // # include "zend_hash.h"
 
-// #define DEBUG_OBJECT_HANDLERS       0
-
-// #define ZEND_WRONG_PROPERTY_OFFSET       0
+const DEBUG_OBJECT_HANDLERS = 0
+const ZEND_WRONG_PROPERTY_OFFSET = 0
 
 /* guard flags */
 
-// #define IN_GET       ( 1 << 0 )
-
-// #define IN_SET       ( 1 << 1 )
-
-// #define IN_UNSET       ( 1 << 2 )
-
-// #define IN_ISSET       ( 1 << 3 )
+const IN_GET = 1 << 0
+const IN_SET = 1 << 1
+const IN_UNSET = 1 << 2
+const IN_ISSET = 1 << 3
 
 /*
   __X accessors explanation:
@@ -256,7 +264,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 		var prop_info *ZendPropertyInfo
 		var ce *ZendClassEntry = zobj.GetCe()
 		var flags uint32 = 0
-		zobj.SetProperties(_zendNewArray(ce.GetDefaultPropertiesCount()))
+		zobj.SetProperties(ZendNewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			ZendHashRealInitMixed(zobj.GetProperties())
 			for {
@@ -266,21 +274,21 @@ func RebuildObjectProperties(zobj *ZendObject) {
 				for ; _p != _end; _p++ {
 					var _z *Zval = &_p.val
 
-					if _z.GetType() == 0 {
+					if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 						continue
 					}
-					prop_info = _z.GetValue().GetPtr()
-					if (prop_info.GetFlags() & 1 << 4) == 0 {
+					prop_info = Z_PTR_P(_z)
+					if (prop_info.GetFlags() & ZEND_ACC_STATIC) == 0 {
 						flags |= prop_info.GetFlags()
-						if (*Zval)((*byte)(zobj+prop_info.GetOffset())).GetType() == 0 {
-							zobj.GetProperties().SetUFlags(zobj.GetProperties().GetUFlags() | 1<<5)
+						if UNEXPECTED(Z_TYPE_P(OBJ_PROP(zobj, prop_info.GetOffset())) == IS_UNDEF) {
+							HT_FLAGS(zobj.GetProperties()) |= HASH_FLAG_HAS_EMPTY_IND
 						}
-						_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), (*Zval)((*byte)(zobj+prop_info.GetOffset())))
+						_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 					}
 				}
 				break
 			}
-			if (flags & 1 << 3) != 0 {
+			if (flags & ZEND_ACC_CHANGED) != 0 {
 				for ce.parent && ce.parent.default_properties_count {
 					ce = ce.parent
 					for {
@@ -290,17 +298,16 @@ func RebuildObjectProperties(zobj *ZendObject) {
 						for ; _p != _end; _p++ {
 							var _z *Zval = &_p.val
 
-							if _z.GetType() == 0 {
+							if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 								continue
 							}
-							prop_info = _z.GetValue().GetPtr()
-							if prop_info.GetCe() == ce && (prop_info.GetFlags()&1<<4) == 0 && (prop_info.GetFlags()&1<<2) != 0 {
+							prop_info = Z_PTR_P(_z)
+							if prop_info.GetCe() == ce && (prop_info.GetFlags()&ZEND_ACC_STATIC) == 0 && (prop_info.GetFlags()&ZEND_ACC_PRIVATE) != 0 {
 								var zv Zval
-								if (*Zval)((*byte)(zobj+prop_info.GetOffset())).GetType() == 0 {
-									zobj.GetProperties().SetUFlags(zobj.GetProperties().GetUFlags() | 1<<5)
+								if UNEXPECTED(Z_TYPE_P(OBJ_PROP(zobj, prop_info.GetOffset())) == IS_UNDEF) {
+									HT_FLAGS(zobj.GetProperties()) |= HASH_FLAG_HAS_EMPTY_IND
 								}
-								&zv.GetValue().SetZv((*Zval)((*byte)(zobj + prop_info.GetOffset())))
-								&zv.SetTypeInfo(13)
+								ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
 								ZendHashAdd(zobj.GetProperties(), prop_info.GetName(), &zv)
 							}
 						}
@@ -316,7 +323,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 
 func ZendStdGetProperties(object *Zval) *HashTable {
 	var zobj *ZendObject
-	zobj = object.GetValue().GetObj()
+	zobj = Z_OBJ_P(object)
 	if zobj.GetProperties() == nil {
 		RebuildObjectProperties(zobj)
 	}
@@ -326,17 +333,17 @@ func ZendStdGetProperties(object *Zval) *HashTable {
 /* }}} */
 
 func ZendStdGetGc(object *Zval, table **Zval, n *int) *HashTable {
-	if object.GetValue().GetObj().GetHandlers().GetGetProperties() != ZendStdGetProperties {
+	if Z_OBJ_HANDLER_P(object, get_properties) != ZendStdGetProperties {
 		*table = nil
 		*n = 0
-		return object.GetValue().GetObj().GetHandlers().GetGetProperties()(object)
+		return Z_OBJ_HANDLER_P(object, get_properties)(object)
 	} else {
-		var zobj *ZendObject = object.GetValue().GetObj()
+		var zobj *ZendObject = Z_OBJ_P(object)
 		if zobj.GetProperties() != nil {
 			*table = nil
 			*n = 0
-			if ZendGcRefcount(&(zobj.GetProperties()).gc) > 1 && (ZvalGcFlags(zobj.GetProperties().GetGc().GetTypeInfo())&1<<6) == 0 {
-				ZendGcDelref(&(zobj.GetProperties()).gc)
+			if UNEXPECTED(GC_REFCOUNT(zobj.GetProperties()) > 1) && EXPECTED((GC_FLAGS(zobj.GetProperties())&IS_ARRAY_IMMUTABLE) == 0) {
+				GC_DELREF(zobj.GetProperties())
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
 			return zobj.GetProperties()
@@ -351,33 +358,33 @@ func ZendStdGetGc(object *Zval, table **Zval, n *int) *HashTable {
 /* }}} */
 
 func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
-	var ce *ZendClassEntry = object.GetValue().GetObj().GetCe()
+	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var retval Zval
 	var ht *HashTable
 	if ce.GetDebugInfo() == nil {
 		*is_temp = 0
-		return object.GetValue().GetObj().GetHandlers().GetGetProperties()(object)
+		return Z_OBJ_HANDLER_P(object, get_properties)(object)
 	}
-	ZendCallMethod(object, ce, &ce.__debugInfo, "__debuginfo", g.SizeOf("ZEND_DEBUGINFO_FUNC_NAME")-1, &retval, 0, nil, nil)
-	if retval.GetType() == 7 {
-		if retval.GetTypeFlags() == 0 {
+	ZendCallMethodWith0Params(object, ce, &ce.__debugInfo, ZEND_DEBUGINFO_FUNC_NAME, &retval)
+	if Z_TYPE(retval) == IS_ARRAY {
+		if !(Z_REFCOUNTED(retval)) {
 			*is_temp = 1
-			return ZendArrayDup(retval.GetValue().GetArr())
-		} else if ZvalRefcountP(&retval) <= 1 {
+			return ZendArrayDup(Z_ARRVAL(retval))
+		} else if Z_REFCOUNT(retval) <= 1 {
 			*is_temp = 1
-			ht = retval.GetValue().GetArr()
+			ht = Z_ARR(retval)
 			return ht
 		} else {
 			*is_temp = 0
 			ZvalPtrDtor(&retval)
-			return retval.GetValue().GetArr()
+			return Z_ARRVAL(retval)
 		}
-	} else if retval.GetType() == 1 {
+	} else if Z_TYPE(retval) == IS_NULL {
 		*is_temp = 1
-		ht = _zendNewArray(0)
+		ht = ZendNewArray(0)
 		return ht
 	}
-	ZendErrorNoreturn(1<<0, "__debuginfo"+"() must return an array")
+	ZendErrorNoreturn(E_ERROR, ZEND_DEBUGINFO_FUNC_NAME+"() must return an array")
 	return nil
 }
 
@@ -385,11 +392,11 @@ func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 
 func ZendStdCallGetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) {
 	var ce *ZendClassEntry = zobj.GetCe()
-	var orig_fake_scope *ZendClassEntry = EG.GetFakeScope()
+	var orig_fake_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 	var fci ZendFcallInfo
 	var fcic ZendFcallInfoCache
 	var member Zval
-	EG.SetFakeScope(nil)
+	ExecutorGlobals.SetFakeScope(nil)
 
 	/* __get handler is called with one argument:
 	      property name
@@ -397,122 +404,96 @@ func ZendStdCallGetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) {
 	   it should return whether the call was successful or not
 	*/
 
-	var __z *Zval = &member
-	var __s *ZendString = prop_name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	fci.SetSize(g.SizeOf("fci"))
+	ZVAL_STR(&member, prop_name)
+	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(retval)
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	&fci.function_name.u1.type_info = 0
+	ZVAL_UNDEF(&fci.function_name)
 	fcic.SetFunctionHandler(ce.GetGet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
-	EG.SetFakeScope(orig_fake_scope)
+	ExecutorGlobals.SetFakeScope(orig_fake_scope)
 }
 
 /* }}} */
 
 func ZendStdCallSetter(zobj *ZendObject, prop_name *ZendString, value *Zval) {
 	var ce *ZendClassEntry = zobj.GetCe()
-	var orig_fake_scope *ZendClassEntry = EG.GetFakeScope()
+	var orig_fake_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 	var fci ZendFcallInfo
 	var fcic ZendFcallInfoCache
 	var args []Zval
 	var ret Zval
-	EG.SetFakeScope(nil)
+	ExecutorGlobals.SetFakeScope(nil)
 
 	/* __set handler is called with two arguments:
 	   property name
 	   value to be set
 	*/
 
-	var __z *Zval = &args[0]
-	var __s *ZendString = prop_name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	var _z1 *Zval = &args[1]
-	var _z2 *Zval = value
-	var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	_z1.GetValue().SetCounted(_gc)
-	_z1.SetTypeInfo(_t)
-	&ret.SetTypeInfo(0)
-	fci.SetSize(g.SizeOf("fci"))
+	ZVAL_STR(&args[0], prop_name)
+	ZVAL_COPY_VALUE(&args[1], value)
+	ZVAL_UNDEF(&ret)
+	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(&ret)
 	fci.SetParamCount(2)
 	fci.SetParams(args)
 	fci.SetNoSeparation(1)
-	&fci.function_name.u1.type_info = 0
+	ZVAL_UNDEF(&fci.function_name)
 	fcic.SetFunctionHandler(ce.GetSet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
 	ZvalPtrDtor(&ret)
-	EG.SetFakeScope(orig_fake_scope)
+	ExecutorGlobals.SetFakeScope(orig_fake_scope)
 }
 
 /* }}} */
 
 func ZendStdCallUnsetter(zobj *ZendObject, prop_name *ZendString) {
 	var ce *ZendClassEntry = zobj.GetCe()
-	var orig_fake_scope *ZendClassEntry = EG.GetFakeScope()
+	var orig_fake_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 	var fci ZendFcallInfo
 	var fcic ZendFcallInfoCache
 	var ret Zval
 	var member Zval
-	EG.SetFakeScope(nil)
+	ExecutorGlobals.SetFakeScope(nil)
 
 	/* __unset handler is called with one argument:
 	   property name
 	*/
 
-	var __z *Zval = &member
-	var __s *ZendString = prop_name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	&ret.SetTypeInfo(0)
-	fci.SetSize(g.SizeOf("fci"))
+	ZVAL_STR(&member, prop_name)
+	ZVAL_UNDEF(&ret)
+	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(&ret)
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	&fci.function_name.u1.type_info = 0
+	ZVAL_UNDEF(&fci.function_name)
 	fcic.SetFunctionHandler(ce.GetUnset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
 	ZvalPtrDtor(&ret)
-	EG.SetFakeScope(orig_fake_scope)
+	ExecutorGlobals.SetFakeScope(orig_fake_scope)
 }
 
 /* }}} */
 
 func ZendStdCallIssetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) {
 	var ce *ZendClassEntry = zobj.GetCe()
-	var orig_fake_scope *ZendClassEntry = EG.GetFakeScope()
+	var orig_fake_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
 	var fci ZendFcallInfo
 	var fcic ZendFcallInfoCache
 	var member Zval
-	EG.SetFakeScope(nil)
+	ExecutorGlobals.SetFakeScope(nil)
 
 	/* __isset handler is called with one argument:
 	      property name
@@ -520,26 +501,19 @@ func ZendStdCallIssetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) 
 	   it should return whether the property is set or not
 	*/
 
-	var __z *Zval = &member
-	var __s *ZendString = prop_name
-	__z.GetValue().SetStr(__s)
-	if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-		__z.SetTypeInfo(6)
-	} else {
-		__z.SetTypeInfo(6 | 1<<0<<8)
-	}
-	fci.SetSize(g.SizeOf("fci"))
+	ZVAL_STR(&member, prop_name)
+	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(retval)
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	&fci.function_name.u1.type_info = 0
+	ZVAL_UNDEF(&fci.function_name)
 	fcic.SetFunctionHandler(ce.GetIsset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
 	ZendCallFunction(&fci, &fcic)
-	EG.SetFakeScope(orig_fake_scope)
+	ExecutorGlobals.SetFakeScope(orig_fake_scope)
 }
 
 /* }}} */
@@ -569,8 +543,8 @@ func ZendGetParentPrivateProperty(scope *ZendClassEntry, ce *ZendClassEntry, mem
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
 		zv = ZendHashFind(&scope.properties_info, member)
 		if zv != nil {
-			prop_info = (*ZendPropertyInfo)(zv.GetValue().GetPtr())
-			if (prop_info.GetFlags()&1<<2) != 0 && prop_info.GetCe() == scope {
+			prop_info = (*ZendPropertyInfo)(Z_PTR_P(zv))
+			if (prop_info.GetFlags()&ZEND_ACC_PRIVATE) != 0 && prop_info.GetCe() == scope {
 				return prop_info
 			}
 		}
@@ -581,7 +555,7 @@ func ZendGetParentPrivateProperty(scope *ZendClassEntry, ce *ZendClassEntry, mem
 /* }}} */
 
 func ZendBadPropertyAccess(property_info *ZendPropertyInfo, ce *ZendClassEntry, member *ZendString) {
-	ZendThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(property_info.GetFlags()), ce.GetName().GetVal(), member.GetVal())
+	ZendThrowError(nil, "Cannot access %s property %s::$%s", ZendVisibilityString(property_info.GetFlags()), ZSTR_VAL(ce.GetName()), ZSTR_VAL(member))
 }
 
 /* }}} */
@@ -598,35 +572,34 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 	var flags uint32
 	var scope *ZendClassEntry
 	var offset uintPtr
-	if cache_slot != nil && ce == cache_slot[0] {
-		*info_ptr = (cache_slot + 2)[0]
-		return uintptr_t(cache_slot + 1)[0]
+	if cache_slot != nil && EXPECTED(ce == CACHED_PTR_EX(cache_slot)) {
+		*info_ptr = CACHED_PTR_EX(cache_slot + 2)
+		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
-	if &ce.properties_info.nNumOfElements == 0 || g.Assign(&zv, ZendHashFind(&ce.properties_info, member)) == nil {
-		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
+	if UNEXPECTED(ZendHashNumElements(&ce.properties_info) == 0) || UNEXPECTED(b.Assign(&zv, ZendHashFind(&ce.properties_info, member)) == nil) {
+		if UNEXPECTED(ZSTR_VAL(member)[0] == '0') && ZSTR_LEN(member) != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
 			}
-			return 0
+			return ZEND_WRONG_PROPERTY_OFFSET
 		}
 	dynamic:
 		if cache_slot != nil {
-			cache_slot[0] = ce
-			cache_slot[1] = any(uintptr_t(intptr_t)(-1))
-			(cache_slot + 2)[0] = nil
+			CACHE_POLYMORPHIC_PTR_EX(cache_slot, ce, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
+			CACHE_PTR_EX(cache_slot+2, nil)
 		}
-		return uintptr_t(intptr_t)(-1)
+		return ZEND_DYNAMIC_PROPERTY_OFFSET
 	}
-	property_info = (*ZendPropertyInfo)(zv.GetValue().GetPtr())
+	property_info = (*ZendPropertyInfo)(Z_PTR_P(zv))
 	flags = property_info.GetFlags()
-	if (flags & (1<<3 | 1<<2 | 1<<1)) != 0 {
-		if EG.GetFakeScope() != nil {
-			scope = EG.GetFakeScope()
+	if (flags & (ZEND_ACC_CHANGED | ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED)) != 0 {
+		if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
+			scope = ExecutorGlobals.GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
 		if property_info.GetCe() != scope {
-			if (flags & 1 << 3) != 0 {
+			if (flags & ZEND_ACC_CHANGED) != 0 {
 				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member)
 
 				/* If there is a public/protected instance property on ce, don't try to use a
@@ -634,11 +607,11 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 				 * property on scope. This will throw a static property notice, rather than
 				 * a visibility error. */
 
-				if p != nil && ((p.GetFlags()&1<<4) == 0 || (flags&1<<4) != 0) {
+				if p != nil && ((p.GetFlags()&ZEND_ACC_STATIC) == 0 || (flags&ZEND_ACC_STATIC) != 0) {
 					property_info = p
 					flags = property_info.GetFlags()
 					goto found
-				} else if (flags & 1 << 0) != 0 {
+				} else if (flags & ZEND_ACC_PUBLIC) != 0 {
 					goto found
 				}
 
@@ -648,7 +621,7 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 				 * a visibility error. */
 
 			}
-			if (flags & 1 << 2) != 0 {
+			if (flags & ZEND_ACC_PRIVATE) != 0 {
 				if property_info.GetCe() != ce {
 					goto dynamic
 				} else {
@@ -659,33 +632,32 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 					if silent == 0 {
 						ZendBadPropertyAccess(property_info, ce, member)
 					}
-					return 0
+					return ZEND_WRONG_PROPERTY_OFFSET
 				}
 			} else {
-				r.Assert((flags & 1 << 1) != 0)
-				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
+				ZEND_ASSERT((flags & ZEND_ACC_PROTECTED) != 0)
+				if UNEXPECTED(IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0) {
 					goto wrong
 				}
 			}
 		}
 	}
 found:
-	if (flags & 1 << 4) != 0 {
+	if UNEXPECTED((flags & ZEND_ACC_STATIC) != 0) {
 		if silent == 0 {
-			ZendError(1<<3, "Accessing static property %s::$%s as non static", ce.GetName().GetVal(), member.GetVal())
+			ZendError(E_NOTICE, "Accessing static property %s::$%s as non static", ZSTR_VAL(ce.GetName()), ZSTR_VAL(member))
 		}
-		return uintptr_t(intptr_t)(-1)
+		return ZEND_DYNAMIC_PROPERTY_OFFSET
 	}
 	offset = property_info.GetOffset()
-	if property_info.GetType() == 0 {
+	if EXPECTED(property_info.GetType() == 0) {
 		property_info = nil
 	} else {
 		*info_ptr = property_info
 	}
 	if cache_slot != nil {
-		cache_slot[0] = ce
-		cache_slot[1] = any(uintPtr(offset))
-		(cache_slot + 2)[0] = property_info
+		CACHE_POLYMORPHIC_PTR_EX(cache_slot, ce, any(uintPtr(offset)))
+		CACHE_PTR_EX(cache_slot+2, property_info)
 	}
 	return offset
 }
@@ -709,36 +681,36 @@ func ZendGetPropertyInfo(ce *ZendClassEntry, member *ZendString, silent int) *Ze
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *ZendClassEntry
-	if &ce.properties_info.nNumOfElements == 0 || g.Assign(&zv, ZendHashFind(&ce.properties_info, member)) == nil {
-		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
+	if UNEXPECTED(ZendHashNumElements(&ce.properties_info) == 0) || EXPECTED(b.Assign(&zv, ZendHashFind(&ce.properties_info, member)) == nil) {
+		if UNEXPECTED(ZSTR_VAL(member)[0] == '0') && ZSTR_LEN(member) != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
 			}
-			return (*ZendPropertyInfo)(intptr_t - 1)
+			return ZEND_WRONG_PROPERTY_INFO
 		}
 	dynamic:
 		return nil
 	}
-	property_info = (*ZendPropertyInfo)(zv.GetValue().GetPtr())
+	property_info = (*ZendPropertyInfo)(Z_PTR_P(zv))
 	flags = property_info.GetFlags()
-	if (flags & (1<<3 | 1<<2 | 1<<1)) != 0 {
-		if EG.GetFakeScope() != nil {
-			scope = EG.GetFakeScope()
+	if (flags & (ZEND_ACC_CHANGED | ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED)) != 0 {
+		if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
+			scope = ExecutorGlobals.GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
 		if property_info.GetCe() != scope {
-			if (flags & 1 << 3) != 0 {
+			if (flags & ZEND_ACC_CHANGED) != 0 {
 				var p *ZendPropertyInfo = ZendGetParentPrivateProperty(scope, ce, member)
 				if p != nil {
 					property_info = p
 					flags = property_info.GetFlags()
 					goto found
-				} else if (flags & 1 << 0) != 0 {
+				} else if (flags & ZEND_ACC_PUBLIC) != 0 {
 					goto found
 				}
 			}
-			if (flags & 1 << 2) != 0 {
+			if (flags & ZEND_ACC_PRIVATE) != 0 {
 				if property_info.GetCe() != ce {
 					goto dynamic
 				} else {
@@ -749,20 +721,20 @@ func ZendGetPropertyInfo(ce *ZendClassEntry, member *ZendString, silent int) *Ze
 					if silent == 0 {
 						ZendBadPropertyAccess(property_info, ce, member)
 					}
-					return (*ZendPropertyInfo)(intptr_t - 1)
+					return ZEND_WRONG_PROPERTY_INFO
 				}
 			} else {
-				r.Assert((flags & 1 << 1) != 0)
-				if IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
+				ZEND_ASSERT((flags & ZEND_ACC_PROTECTED) != 0)
+				if UNEXPECTED(IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0) {
 					goto wrong
 				}
 			}
 		}
 	}
 found:
-	if (flags & 1 << 4) != 0 {
+	if UNEXPECTED((flags & ZEND_ACC_STATIC) != 0) {
 		if silent == 0 {
-			ZendError(1<<3, "Accessing static property %s::$%s as non static", ce.GetName().GetVal(), member.GetVal())
+			ZendError(E_NOTICE, "Accessing static property %s::$%s as non static", ZSTR_VAL(ce.GetName()), ZSTR_VAL(member))
 		}
 	}
 	return property_info
@@ -776,7 +748,7 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 	var prop_name *byte
 	var member *ZendString
 	var prop_name_len int
-	if prop_info_name.GetVal()[0] == 0 {
+	if ZSTR_VAL(prop_info_name)[0] == 0 {
 		if is_dynamic != 0 {
 			return SUCCESS
 		}
@@ -784,11 +756,11 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 		member = ZendStringInit(prop_name, prop_name_len, 0)
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), member, 1)
 		ZendStringReleaseEx(member, 0)
-		if property_info == nil || property_info == (*ZendPropertyInfo)(intptr_t-1) {
+		if property_info == nil || property_info == ZEND_WRONG_PROPERTY_INFO {
 			return FAILURE
 		}
 		if class_name[0] != '*' {
-			if (property_info.GetFlags() & 1 << 2) == 0 {
+			if (property_info.GetFlags() & ZEND_ACC_PRIVATE) == 0 {
 
 				/* we we're looking for a private prop but found a non private one of the same name */
 
@@ -796,7 +768,7 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 
 				/* we we're looking for a private prop but found a non private one of the same name */
 
-			} else if strcmp(prop_info_name.GetVal()+1, property_info.GetName().GetVal()+1) {
+			} else if strcmp(ZSTR_VAL(prop_info_name)+1, ZSTR_VAL(property_info.GetName())+1) {
 
 				/* we we're looking for a private prop but found a private one of the same name but another class */
 
@@ -806,18 +778,18 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 
 			}
 		} else {
-			r.Assert((property_info.GetFlags() & 1 << 1) != 0)
+			ZEND_ASSERT((property_info.GetFlags() & ZEND_ACC_PROTECTED) != 0)
 		}
 		return SUCCESS
 	} else {
 		property_info = ZendGetPropertyInfo(zobj.GetCe(), prop_info_name, 1)
 		if property_info == nil {
-			r.Assert(is_dynamic != 0)
+			ZEND_ASSERT(is_dynamic != 0)
 			return SUCCESS
-		} else if property_info == (*ZendPropertyInfo)(intptr_t-1) {
+		} else if property_info == ZEND_WRONG_PROPERTY_INFO {
 			return FAILURE
 		}
-		if (property_info.GetFlags() & 1 << 0) != 0 {
+		if (property_info.GetFlags() & ZEND_ACC_PUBLIC) != 0 {
 			return SUCCESS
 		} else {
 			return FAILURE
@@ -828,9 +800,9 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 /* }}} */
 
 func ZendPropertyGuardDtor(el *Zval) {
-	var ptr *uint32 = (*uint32)(el.GetValue().GetPtr())
-	if (ZendUintptrT(ptr) & 1) == 0 {
-		_efree(ptr)
+	var ptr *uint32 = (*uint32)(Z_PTR_P(el))
+	if EXPECTED((ZendUintptrT(ptr) & 1) == 0) {
+		EfreeSize(ptr, b.SizeOf("uint32_t"))
 	}
 }
 
@@ -840,62 +812,43 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	var guards *HashTable
 	var zv *Zval
 	var ptr *uint32
-	r.Assert((zobj.GetCe().GetCeFlags() & 1 << 11) != 0)
+	ZEND_ASSERT((zobj.GetCe().GetCeFlags() & ZEND_ACC_USE_GUARDS) != 0)
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
-	if zv.GetType() == 6 {
-		var str *ZendString = zv.GetValue().GetStr()
-		if str == member || str.GetH() == ZendStringHashVal(member) && ZendStringEqualContent(str, member) != 0 {
-			return &(*zv).u2.property_guard
-		} else if zv.GetPropertyGuard() == 0 {
+	if EXPECTED(Z_TYPE_P(zv) == IS_STRING) {
+		var str *ZendString = Z_STR_P(zv)
+		if EXPECTED(str == member) || EXPECTED(ZSTR_H(str) == ZendStringHashVal(member)) && EXPECTED(ZendStringEqualContent(str, member) != 0) {
+			return &Z_PROPERTY_GUARD_P(zv)
+		} else if EXPECTED(Z_PROPERTY_GUARD_P(zv) == 0) {
 			ZvalPtrDtorStr(zv)
-			var __z *Zval = zv
-			var __s *ZendString = member
-			__z.GetValue().SetStr(__s)
-			if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-				__z.SetTypeInfo(6)
-			} else {
-				ZendGcAddref(&__s.gc)
-				__z.SetTypeInfo(6 | 1<<0<<8)
-			}
-			return &(*zv).u2.property_guard
+			ZVAL_STR_COPY(zv, member)
+			return &Z_PROPERTY_GUARD_P(zv)
 		} else {
-			guards = (*HashTable)(_emalloc(g.SizeOf("HashTable")))
-			_zendHashInit(guards, 8, ZendPropertyGuardDtor, 0)
+			ALLOC_HASHTABLE(guards)
+			ZendHashInit(guards, 8, nil, ZendPropertyGuardDtor, 0)
 
 			/* mark pointer as "special" using low bit */
 
-			ZendHashAddNewPtr(guards, str, any(zend_uintptr_t&zv.GetPropertyGuard()|1))
+			ZendHashAddNewPtr(guards, str, any(zend_uintptr_t&Z_PROPERTY_GUARD_P(zv)|1))
 			ZvalPtrDtorStr(zv)
-			var __arr *ZendArray = guards
-			var __z *Zval = zv
-			__z.GetValue().SetArr(__arr)
-			__z.SetTypeInfo(7 | 1<<0<<8 | 1<<1<<8)
+			ZVAL_ARR(zv, guards)
 		}
-	} else if zv.GetType() == 7 {
-		guards = zv.GetValue().GetArr()
-		r.Assert(guards != nil)
+	} else if EXPECTED(Z_TYPE_P(zv) == IS_ARRAY) {
+		guards = Z_ARRVAL_P(zv)
+		ZEND_ASSERT(guards != nil)
 		zv = ZendHashFind(guards, member)
 		if zv != nil {
-			return (*uint32)(zend_uintptr_t(*zv).value.ptr & ^1)
+			return (*uint32)(ZendUintptrT(Z_PTR_P(zv)) & ^1)
 		}
 	} else {
-		r.Assert(zv.GetType() == 0)
-		var __z *Zval = zv
-		var __s *ZendString = member
-		__z.GetValue().SetStr(__s)
-		if (ZvalGcFlags(__s.GetGc().GetTypeInfo()) & 1 << 6) != 0 {
-			__z.SetTypeInfo(6)
-		} else {
-			ZendGcAddref(&__s.gc)
-			__z.SetTypeInfo(6 | 1<<0<<8)
-		}
-		zv.SetPropertyGuard(0)
-		return &(*zv).u2.property_guard
+		ZEND_ASSERT(Z_TYPE_P(zv) == IS_UNDEF)
+		ZVAL_STR_COPY(zv, member)
+		Z_PROPERTY_GUARD_P(zv) = 0
+		return &Z_PROPERTY_GUARD_P(zv)
 	}
 
 	/* we have to allocate uint32_t separately because ht->arData may be reallocated */
 
-	ptr = (*uint32)(_emalloc(g.SizeOf("uint32_t")))
+	ptr = (*uint32)(Emalloc(b.SizeOf("uint32_t")))
 	*ptr = 0
 	return (*uint32)(ZendHashAddNewPtr(guards, member, ptr))
 }
@@ -910,21 +863,21 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
 	var guard *uint32 = nil
-	zobj = object.GetValue().GetObj()
+	zobj = Z_OBJ_P(object)
 	name = ZvalTryGetTmpString(member, &tmp_name)
-	if name == nil {
-		return &EG.uninitialized_zval
+	if UNEXPECTED(name == nil) {
+		return &(ExecutorGlobals.GetUninitializedZval())
 	}
 
 	/* make zend_get_property_info silent if we have getter - we may want to use it */
 
-	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, type_ == 3 || zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
-	if intptr_t(property_offset) > 0 {
-		retval = (*Zval)((*byte)(zobj + property_offset))
-		if retval.GetType() != 0 {
+	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, type_ == BP_VAR_IS || zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
+	if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+		retval = OBJ_PROP(zobj, property_offset)
+		if EXPECTED(Z_TYPE_P(retval) != IS_UNDEF) {
 			goto exit
 		}
-		if retval.GetU2Extra() == 1 {
+		if UNEXPECTED(Z_PROP_FLAG_P(retval) == IS_PROP_UNINIT) {
 
 			/* Skip __get() for uninitialized typed properties */
 
@@ -933,59 +886,59 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 			/* Skip __get() for uninitialized typed properties */
 
 		}
-	} else if intptr_t(property_offset) < 0 {
-		if zobj.GetProperties() != nil {
-			if property_offset != uintptr_t(intptr_t)(-1) {
-				var idx uintPtr = uintptr_t(-(intptr_t(property_offset)) - 2)
-				if idx < zobj.GetProperties().GetNNumUsed()*g.SizeOf("Bucket") {
+	} else if EXPECTED(IS_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+		if EXPECTED(zobj.GetProperties() != nil) {
+			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
+				if EXPECTED(idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket")) {
 					var p *Bucket = (*Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-					if p.GetVal().GetType() != 0 && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if EXPECTED(Z_TYPE(p.GetVal()) != IS_UNDEF) && (EXPECTED(p.GetKey() == name) || EXPECTED(p.GetH() == ZSTR_H(name)) && EXPECTED(p.GetKey() != nil) && EXPECTED(ZendStringEqualContent(p.GetKey(), name) != 0)) {
 						retval = &p.val
 						goto exit
 					}
 				}
-				(cache_slot + 1)[0] = any(uintptr_t(intptr_t)(-1))
+				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
 			retval = ZendHashFind(zobj.GetProperties(), name)
-			if retval != nil {
+			if EXPECTED(retval != nil) {
 				if cache_slot != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
-					(cache_slot + 1)[0] = any(uintptr_t(-(intptr_t(idx) + 2)))
+					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
 				}
 				goto exit
 			}
 		}
-	} else if EG.GetException() != nil {
-		retval = &EG.uninitialized_zval
+	} else if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		retval = &(ExecutorGlobals.GetUninitializedZval())
 		goto exit
 	}
 
 	/* magic isset */
 
-	if type_ == 3 && zobj.GetCe().GetIsset() != nil {
+	if type_ == BP_VAR_IS && zobj.GetCe().GetIsset() != nil {
 		var tmp_result Zval
 		guard = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & 1 << 3) == 0 {
-			if tmp_name == nil && (ZvalGcFlags(name.GetGc().GetTypeInfo())&1<<6) == 0 {
+		if ((*guard) & IN_ISSET) == 0 {
+			if tmp_name == nil && ZSTR_IS_INTERNED(name) == 0 {
 				tmp_name = ZendStringCopy(name)
 			}
-			ZendGcAddref(&zobj.gc)
-			&tmp_result.SetTypeInfo(0)
-			*guard |= 1 << 3
+			GC_ADDREF(zobj)
+			ZVAL_UNDEF(&tmp_result)
+			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &tmp_result)
-			*guard &= ^(1 << 3)
+			*guard &= ^IN_ISSET
 			if ZendIsTrue(&tmp_result) == 0 {
-				retval = &EG.uninitialized_zval
-				ZendObjectRelease(zobj)
+				retval = &(ExecutorGlobals.GetUninitializedZval())
+				OBJ_RELEASE(zobj)
 				ZvalPtrDtor(&tmp_result)
 				goto exit
 			}
 			ZvalPtrDtor(&tmp_result)
-			if zobj.GetCe().GetGet() != nil && ((*guard)&1<<0) == 0 {
+			if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 				goto call_getter
 			}
-			ZendObjectRelease(zobj)
-		} else if zobj.GetCe().GetGet() != nil && ((*guard)&1<<0) == 0 {
+			OBJ_RELEASE(zobj)
+		} else if zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
 			goto call_getter_addref
 		}
 	} else if zobj.GetCe().GetGet() != nil {
@@ -993,50 +946,50 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 		/* magic get */
 
 		guard = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & 1 << 0) == 0 {
+		if ((*guard) & IN_GET) == 0 {
 
 			/* have getter - try with it! */
 
 		call_getter_addref:
-			ZendGcAddref(&zobj.gc)
+			GC_ADDREF(zobj)
 		call_getter:
-			*guard |= 1 << 0
+			*guard |= IN_GET
 			ZendStdCallGetter(zobj, name, rv)
-			*guard &= ^(1 << 0)
-			if rv.GetType() != 0 {
+			*guard &= ^IN_GET
+			if Z_TYPE_P(rv) != IS_UNDEF {
 				retval = rv
-				if rv.GetType() != 10 && (type_ == 1 || type_ == 2 || type_ == 5) {
-					if rv.GetType() != 8 {
-						ZendError(1<<3, "Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().GetName().GetVal(), name.GetVal())
+				if !(Z_ISREF_P(rv)) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
+					if UNEXPECTED(Z_TYPE_P(rv) != IS_OBJECT) {
+						ZendError(E_NOTICE, "Indirect modification of overloaded property %s::$%s has no effect", ZSTR_VAL(zobj.GetCe().GetName()), ZSTR_VAL(name))
 					}
 				}
 			} else {
-				retval = &EG.uninitialized_zval
+				retval = &(ExecutorGlobals.GetUninitializedZval())
 			}
-			if prop_info != nil {
-				ZendVerifyPropAssignableByRef(prop_info, retval, (zobj.GetCe().GetGet().GetFnFlags()&1<<31) != 0)
+			if UNEXPECTED(prop_info != nil) {
+				ZendVerifyPropAssignableByRef(prop_info, retval, (zobj.GetCe().GetGet().GetFnFlags()&ZEND_ACC_STRICT_TYPES) != 0)
 			}
-			ZendObjectRelease(zobj)
+			OBJ_RELEASE(zobj)
 			goto exit
-		} else if intptr_t(property_offset) == 0 {
+		} else if UNEXPECTED(IS_WRONG_PROPERTY_OFFSET(property_offset)) {
 
 			/* Trigger the correct error */
 
 			ZendGetPropertyOffset(zobj.GetCe(), name, 0, nil, &prop_info)
-			r.Assert(EG.GetException() != nil)
-			retval = &EG.uninitialized_zval
+			ZEND_ASSERT(ExecutorGlobals.GetException() != nil)
+			retval = &(ExecutorGlobals.GetUninitializedZval())
 			goto exit
 		}
 	}
 uninit_error:
-	if type_ != 3 {
-		if prop_info != nil {
-			ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().GetName().GetVal(), name.GetVal())
+	if type_ != BP_VAR_IS {
+		if UNEXPECTED(prop_info != nil) {
+			ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", ZSTR_VAL(prop_info.GetCe().GetName()), ZSTR_VAL(name))
 		} else {
-			ZendError(1<<3, "Undefined property: %s::$%s", zobj.GetCe().GetName().GetVal(), name.GetVal())
+			ZendError(E_NOTICE, "Undefined property: %s::$%s", ZSTR_VAL(zobj.GetCe().GetName()), ZSTR_VAL(name))
 		}
 	}
-	retval = &EG.uninitialized_zval
+	retval = &(ExecutorGlobals.GetUninitializedZval())
 exit:
 	ZendTmpStringRelease(tmp_name)
 	return retval
@@ -1045,8 +998,8 @@ exit:
 /* }}} */
 
 func PropertyUsesStrictTypes() ZendBool {
-	var execute_data *ZendExecuteData = EG.GetCurrentExecuteData()
-	return execute_data != nil && execute_data.GetFunc() != nil && (EG.GetCurrentExecuteData().GetFunc().GetFnFlags()&1<<31) != 0
+	var execute_data *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
+	return execute_data != nil && execute_data.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(ExecutorGlobals.GetCurrentExecuteData())
 }
 func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *any) *Zval {
 	var zobj *ZendObject
@@ -1056,63 +1009,52 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	var tmp Zval
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	r.Assert(value.GetType() != 10)
-	zobj = object.GetValue().GetObj()
+	ZEND_ASSERT(!(Z_ISREF_P(value)))
+	zobj = Z_OBJ_P(object)
 	name = ZvalTryGetTmpString(member, &tmp_name)
-	if name == nil {
+	if UNEXPECTED(name == nil) {
 		return value
 	}
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetSet() != nil, cache_slot, &prop_info)
-	if intptr_t(property_offset) > 0 {
-		variable_ptr = (*Zval)((*byte)(zobj + property_offset))
-		if variable_ptr.GetType() != 0 {
-			if value.GetTypeFlags() != 0 {
-				ZvalAddrefP(value)
-			}
-			if prop_info != nil {
-				var _z1 *Zval = &tmp
-				var _z2 *Zval = value
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
-					if value.GetTypeFlags() != 0 {
-						ZvalDelrefP(value)
-					}
-					variable_ptr = &EG.error_zval
+	if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+		variable_ptr = OBJ_PROP(zobj, property_offset)
+		if Z_TYPE_P(variable_ptr) != IS_UNDEF {
+			Z_TRY_ADDREF_P(value)
+			if UNEXPECTED(prop_info != nil) {
+				ZVAL_COPY_VALUE(&tmp, value)
+				if UNEXPECTED(ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0) {
+					Z_TRY_DELREF_P(value)
+					variable_ptr = &(ExecutorGlobals.GetErrorZval())
 					goto exit
 				}
 				value = &tmp
 			}
 		found:
-			variable_ptr = ZendAssignToVariable(variable_ptr, value, 1<<1, PropertyUsesStrictTypes())
+			variable_ptr = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, PropertyUsesStrictTypes())
 			goto exit
 		}
-		if variable_ptr.GetU2Extra() == 1 {
+		if Z_PROP_FLAG_P(variable_ptr) == IS_PROP_UNINIT {
 
 			/* Writes to uninitializde typed properties bypass __set(). */
 
-			variable_ptr.SetU2Extra(0)
+			Z_PROP_FLAG_P(variable_ptr) = 0
 			goto write_std_property
 		}
-	} else if intptr_t(property_offset) < 0 {
-		if zobj.GetProperties() != nil {
-			if ZendGcRefcount(&(zobj.GetProperties()).gc) > 1 {
-				if (ZvalGcFlags(zobj.GetProperties().GetGc().GetTypeInfo()) & 1 << 6) == 0 {
-					ZendGcDelref(&(zobj.GetProperties()).gc)
+	} else if EXPECTED(IS_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+		if EXPECTED(zobj.GetProperties() != nil) {
+			if UNEXPECTED(GC_REFCOUNT(zobj.GetProperties()) > 1) {
+				if EXPECTED((GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0) {
+					GC_DELREF(zobj.GetProperties())
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			if g.Assign(&variable_ptr, ZendHashFind(zobj.GetProperties(), name)) != nil {
-				if value.GetTypeFlags() != 0 {
-					ZvalAddrefP(value)
-				}
+			if b.Assign(&variable_ptr, ZendHashFind(zobj.GetProperties(), name)) != nil {
+				Z_TRY_ADDREF_P(value)
 				goto found
 			}
 		}
-	} else if EG.GetException() != nil {
-		variable_ptr = &EG.error_zval
+	} else if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
+		variable_ptr = &(ExecutorGlobals.GetErrorZval())
 		goto exit
 	}
 
@@ -1120,52 +1062,40 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 
 	if zobj.GetCe().GetSet() != nil {
 		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & 1 << 1) == 0 {
-			ZendGcAddref(&zobj.gc)
-			*guard |= 1 << 1
+		if ((*guard) & IN_SET) == 0 {
+			GC_ADDREF(zobj)
+			*guard |= IN_SET
 			ZendStdCallSetter(zobj, name, value)
-			*guard &= ^(1 << 1)
-			ZendObjectRelease(zobj)
+			*guard &= ^IN_SET
+			OBJ_RELEASE(zobj)
 			variable_ptr = value
-		} else if intptr_t(property_offset) != 0 {
+		} else if EXPECTED(!(IS_WRONG_PROPERTY_OFFSET(property_offset))) {
 			goto write_std_property
 		} else {
 
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			r.Assert(EG.GetException() != nil)
-			variable_ptr = &EG.error_zval
+			ZEND_ASSERT(ExecutorGlobals.GetException() != nil)
+			variable_ptr = &(ExecutorGlobals.GetErrorZval())
 			goto exit
 		}
 	} else {
-		r.Assert(intptr_t(property_offset) != 0)
+		ZEND_ASSERT(!(IS_WRONG_PROPERTY_OFFSET(property_offset)))
 	write_std_property:
-		if value.GetTypeFlags() != 0 {
-			ZvalAddrefP(value)
-		}
-		if intptr_t(property_offset) > 0 {
-			variable_ptr = (*Zval)((*byte)(zobj + property_offset))
-			if prop_info != nil {
-				var _z1 *Zval = &tmp
-				var _z2 *Zval = value
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
+		Z_TRY_ADDREF_P(value)
+		if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+			variable_ptr = OBJ_PROP(zobj, property_offset)
+			if UNEXPECTED(prop_info != nil) {
+				ZVAL_COPY_VALUE(&tmp, value)
+				if UNEXPECTED(ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0) {
 					ZvalPtrDtor(value)
 					goto exit
 				}
 				value = &tmp
 				goto found
 			}
-			var _z1 *Zval = variable_ptr
-			var _z2 *Zval = value
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
+			ZVAL_COPY_VALUE(variable_ptr, value)
 		} else {
 			if zobj.GetProperties() == nil {
 				RebuildObjectProperties(zobj)
@@ -1181,50 +1111,32 @@ exit:
 /* }}} */
 
 func ZendBadArrayAccess(ce *ZendClassEntry) {
-	ZendThrowError(nil, "Cannot use object of type %s as array", ce.GetName().GetVal())
+	ZendThrowError(nil, "Cannot use object of type %s as array", ZSTR_VAL(ce.GetName()))
 }
 
 /* }}} */
 
 func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval {
-	var ce *ZendClassEntry = object.GetValue().GetObj().GetCe()
+	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var tmp_offset Zval
 	var tmp_object Zval
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if EXPECTED(InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0) {
 		if offset == nil {
 
 			/* [] construct */
 
-			&tmp_offset.SetTypeInfo(1)
+			ZVAL_NULL(&tmp_offset)
 
 			/* [] construct */
 
 		} else {
-			var _z3 *Zval = offset
-			if (_z3.GetTypeInfo() & 0xff00) != 0 {
-				if (_z3.GetTypeInfo() & 0xff) == 10 {
-					_z3 = &(*_z3).value.GetRef().GetVal()
-					if (_z3.GetTypeInfo() & 0xff00) != 0 {
-						ZvalAddrefP(_z3)
-					}
-				} else {
-					ZvalAddrefP(_z3)
-				}
-			}
-			var _z1 *Zval = &tmp_offset
-			var _z2 *Zval = _z3
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
+			ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
-		ZvalAddrefP(object)
-		var __z *Zval = &tmp_object
-		__z.GetValue().SetObj(object.GetValue().GetObj())
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
-		if type_ == 3 {
-			ZendCallMethod(&tmp_object, ce, nil, "offsetexists", g.SizeOf("\"offsetexists\"")-1, rv, 1, &tmp_offset, nil)
-			if rv.GetType() == 0 {
+		Z_ADDREF_P(object)
+		ZVAL_OBJ(&tmp_object, Z_OBJ_P(object))
+		if type_ == BP_VAR_IS {
+			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", rv, &tmp_offset)
+			if UNEXPECTED(Z_ISUNDEF_P(rv)) {
 				ZvalPtrDtor(&tmp_object)
 				ZvalPtrDtor(&tmp_offset)
 				return nil
@@ -1233,16 +1145,16 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 				ZvalPtrDtor(&tmp_object)
 				ZvalPtrDtor(&tmp_offset)
 				ZvalPtrDtor(rv)
-				return &EG.uninitialized_zval
+				return &(ExecutorGlobals.GetUninitializedZval())
 			}
 			ZvalPtrDtor(rv)
 		}
-		ZendCallMethod(&tmp_object, ce, nil, "offsetget", g.SizeOf("\"offsetget\"")-1, rv, 1, &tmp_offset, nil)
+		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
-		if rv.GetType() == 0 {
-			if EG.GetException() == nil {
-				ZendThrowError(nil, "Undefined offset for object of type %s used as array", ce.GetName().GetVal())
+		if UNEXPECTED(Z_TYPE_P(rv) == IS_UNDEF) {
+			if UNEXPECTED(ExecutorGlobals.GetException() == nil) {
+				ZendThrowError(nil, "Undefined offset for object of type %s used as array", ZSTR_VAL(ce.GetName()))
 			}
 			return nil
 		}
@@ -1256,36 +1168,18 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 /* }}} */
 
 func ZendStdWriteDimension(object *Zval, offset *Zval, value *Zval) {
-	var ce *ZendClassEntry = object.GetValue().GetObj().GetCe()
+	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var tmp_offset Zval
 	var tmp_object Zval
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
+	if EXPECTED(InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0) {
 		if offset == nil {
-			&tmp_offset.SetTypeInfo(1)
+			ZVAL_NULL(&tmp_offset)
 		} else {
-			var _z3 *Zval = offset
-			if (_z3.GetTypeInfo() & 0xff00) != 0 {
-				if (_z3.GetTypeInfo() & 0xff) == 10 {
-					_z3 = &(*_z3).value.GetRef().GetVal()
-					if (_z3.GetTypeInfo() & 0xff00) != 0 {
-						ZvalAddrefP(_z3)
-					}
-				} else {
-					ZvalAddrefP(_z3)
-				}
-			}
-			var _z1 *Zval = &tmp_offset
-			var _z2 *Zval = _z3
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
+			ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
-		ZvalAddrefP(object)
-		var __z *Zval = &tmp_object
-		__z.GetValue().SetObj(object.GetValue().GetObj())
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
-		ZendCallMethod(&tmp_object, ce, nil, "offsetset", g.SizeOf("\"offsetset\"")-1, nil, 2, &tmp_offset, value)
+		Z_ADDREF_P(object)
+		ZVAL_OBJ(&tmp_object, Z_OBJ_P(object))
+		ZendCallMethodWith2Params(&tmp_object, ce, nil, "offsetset", nil, &tmp_offset, value)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
 	} else {
@@ -1296,38 +1190,20 @@ func ZendStdWriteDimension(object *Zval, offset *Zval, value *Zval) {
 /* }}} */
 
 func ZendStdHasDimension(object *Zval, offset *Zval, check_empty int) int {
-	var ce *ZendClassEntry = object.GetValue().GetObj().GetCe()
+	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var retval Zval
 	var tmp_offset Zval
 	var tmp_object Zval
 	var result int
-	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
-		var _z3 *Zval = offset
-		if (_z3.GetTypeInfo() & 0xff00) != 0 {
-			if (_z3.GetTypeInfo() & 0xff) == 10 {
-				_z3 = &(*_z3).value.GetRef().GetVal()
-				if (_z3.GetTypeInfo() & 0xff00) != 0 {
-					ZvalAddrefP(_z3)
-				}
-			} else {
-				ZvalAddrefP(_z3)
-			}
-		}
-		var _z1 *Zval = &tmp_offset
-		var _z2 *Zval = _z3
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
-		ZvalAddrefP(object)
-		var __z *Zval = &tmp_object
-		__z.GetValue().SetObj(object.GetValue().GetObj())
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
-		ZendCallMethod(&tmp_object, ce, nil, "offsetexists", g.SizeOf("\"offsetexists\"")-1, &retval, 1, &tmp_offset, nil)
+	if EXPECTED(InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0) {
+		ZVAL_COPY_DEREF(&tmp_offset, offset)
+		Z_ADDREF_P(object)
+		ZVAL_OBJ(&tmp_object, Z_OBJ_P(object))
+		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
 		result = IZendIsTrue(&retval)
 		ZvalPtrDtor(&retval)
-		if check_empty != 0 && result != 0 && EG.GetException() == nil {
-			ZendCallMethod(&tmp_object, ce, nil, "offsetget", g.SizeOf("\"offsetget\"")-1, &retval, 1, &tmp_offset, nil)
+		if check_empty != 0 && result != 0 && EXPECTED(ExecutorGlobals.GetException() == nil) {
+			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", &retval, &tmp_offset)
 			result = IZendIsTrue(&retval)
 			ZvalPtrDtor(&retval)
 		}
@@ -1349,23 +1225,23 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 	var retval *Zval = nil
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetValue().GetObj()
+	zobj = Z_OBJ_P(object)
 	name = ZvalTryGetTmpString(member, &tmp_name)
-	if name == nil {
-		return &EG.error_zval
+	if UNEXPECTED(name == nil) {
+		return &(ExecutorGlobals.GetErrorZval())
 	}
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
-	if intptr_t(property_offset) > 0 {
-		retval = (*Zval)((*byte)(zobj + property_offset))
-		if retval.GetType() == 0 {
-			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&1<<0) != 0 || prop_info != nil && retval.GetU2Extra() == 1 {
-				if type_ == 2 || type_ == 0 {
-					if prop_info != nil {
-						ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().GetName().GetVal(), name.GetVal())
-						retval = &EG.error_zval
+	if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+		retval = OBJ_PROP(zobj, property_offset)
+		if UNEXPECTED(Z_TYPE_P(retval) == IS_UNDEF) {
+			if EXPECTED(zobj.GetCe().GetGet() == nil) || UNEXPECTED(((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0) || UNEXPECTED(prop_info != nil && Z_PROP_FLAG_P(retval) == IS_PROP_UNINIT) {
+				if UNEXPECTED(type_ == BP_VAR_RW || type_ == BP_VAR_R) {
+					if UNEXPECTED(prop_info != nil) {
+						ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", ZSTR_VAL(prop_info.GetCe().GetName()), ZSTR_VAL(name))
+						retval = &(ExecutorGlobals.GetErrorZval())
 					} else {
-						retval.SetTypeInfo(1)
-						ZendError(1<<3, "Undefined property: %s::$%s", zobj.GetCe().GetName().GetVal(), name.GetVal())
+						ZVAL_NULL(retval)
+						ZendError(E_NOTICE, "Undefined property: %s::$%s", ZSTR_VAL(zobj.GetCe().GetName()), ZSTR_VAL(name))
 					}
 				}
 			} else {
@@ -1378,30 +1254,30 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 
 			}
 		}
-	} else if intptr_t(property_offset) < 0 {
-		if zobj.GetProperties() != nil {
-			if ZendGcRefcount(&(zobj.GetProperties()).gc) > 1 {
-				if (ZvalGcFlags(zobj.GetProperties().GetGc().GetTypeInfo()) & 1 << 6) == 0 {
-					ZendGcDelref(&(zobj.GetProperties()).gc)
+	} else if EXPECTED(IS_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+		if EXPECTED(zobj.GetProperties() != nil) {
+			if UNEXPECTED(GC_REFCOUNT(zobj.GetProperties()) > 1) {
+				if EXPECTED((GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0) {
+					GC_DELREF(zobj.GetProperties())
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			if g.Assign(&retval, ZendHashFind(zobj.GetProperties(), name)) != nil {
+			if EXPECTED(b.Assign(&retval, ZendHashFind(zobj.GetProperties(), name)) != nil) {
 				ZendTmpStringRelease(tmp_name)
 				return retval
 			}
 		}
-		if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&1<<0) != 0 {
-			if zobj.GetProperties() == nil {
+		if EXPECTED(zobj.GetCe().GetGet() == nil) || UNEXPECTED(((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0) {
+			if UNEXPECTED(zobj.GetProperties() == nil) {
 				RebuildObjectProperties(zobj)
 			}
-			retval = ZendHashUpdate(zobj.GetProperties(), name, &EG.uninitialized_zval)
+			retval = ZendHashUpdate(zobj.GetProperties(), name, &(ExecutorGlobals.GetUninitializedZval()))
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
 			 * being overwritten in an error handler. */
 
-			if type_ == 2 || type_ == 0 {
-				ZendError(1<<3, "Undefined property: %s::$%s", zobj.GetCe().GetName().GetVal(), name.GetVal())
+			if UNEXPECTED(type_ == BP_VAR_RW || type_ == BP_VAR_R) {
+				ZendError(E_NOTICE, "Undefined property: %s::$%s", ZSTR_VAL(zobj.GetCe().GetName()), ZSTR_VAL(name))
 			}
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
@@ -1409,7 +1285,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 
 		}
 	} else if zobj.GetCe().GetGet() == nil {
-		retval = &EG.error_zval
+		retval = &(ExecutorGlobals.GetErrorZval())
 	}
 	ZendTmpStringRelease(tmp_name)
 	return retval
@@ -1423,52 +1299,47 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 	var tmp_name *ZendString
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetValue().GetObj()
+	zobj = Z_OBJ_P(object)
 	name = ZvalTryGetTmpString(member, &tmp_name)
-	if name == nil {
+	if UNEXPECTED(name == nil) {
 		return
 	}
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetUnset() != nil, cache_slot, &prop_info)
-	if intptr_t(property_offset) > 0 {
-		var slot *Zval = (*Zval)((*byte)(zobj + property_offset))
-		if slot.GetType() != 0 {
-			if slot.GetType() == 10 && slot.GetValue().GetRef().GetSources().GetPtr() != nil {
+	if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+		var slot *Zval = OBJ_PROP(zobj, property_offset)
+		if Z_TYPE_P(slot) != IS_UNDEF {
+			if UNEXPECTED(Z_ISREF_P(slot)) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(slot))) {
 				if prop_info != nil {
-					ZendRefDelTypeSource(&(slot.GetValue().GetRef()).sources, prop_info)
+					ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(slot), prop_info)
 				}
 			}
 			var tmp Zval
-			var _z1 *Zval = &tmp
-			var _z2 *Zval = slot
-			var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-			var _t uint32 = _z2.GetTypeInfo()
-			_z1.GetValue().SetCounted(_gc)
-			_z1.SetTypeInfo(_t)
-			slot.SetTypeInfo(0)
+			ZVAL_COPY_VALUE(&tmp, slot)
+			ZVAL_UNDEF(slot)
 			ZvalPtrDtor(&tmp)
 			if zobj.GetProperties() != nil {
-				zobj.GetProperties().SetUFlags(zobj.GetProperties().GetUFlags() | 1<<5)
+				HT_FLAGS(zobj.GetProperties()) |= HASH_FLAG_HAS_EMPTY_IND
 			}
 			goto exit
 		}
-		if slot.GetU2Extra() == 1 {
+		if UNEXPECTED(Z_PROP_FLAG_P(slot) == IS_PROP_UNINIT) {
 
 			/* Reset the IS_PROP_UNINIT flag, if it exists and bypass __unset(). */
 
-			slot.SetU2Extra(0)
+			Z_PROP_FLAG_P(slot) = 0
 			goto exit
 		}
-	} else if intptr_t(property_offset) < 0 && zobj.GetProperties() != nil {
-		if ZendGcRefcount(&(zobj.GetProperties()).gc) > 1 {
-			if (ZvalGcFlags(zobj.GetProperties().GetGc().GetTypeInfo()) & 1 << 6) == 0 {
-				ZendGcDelref(&(zobj.GetProperties()).gc)
+	} else if EXPECTED(IS_DYNAMIC_PROPERTY_OFFSET(property_offset)) && EXPECTED(zobj.GetProperties() != nil) {
+		if UNEXPECTED(GC_REFCOUNT(zobj.GetProperties()) > 1) {
+			if EXPECTED((GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0) {
+				GC_DELREF(zobj.GetProperties())
 			}
 			zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 		}
-		if ZendHashDel(zobj.GetProperties(), name) != FAILURE {
+		if EXPECTED(ZendHashDel(zobj.GetProperties(), name) != FAILURE) {
 			goto exit
 		}
-	} else if EG.GetException() != nil {
+	} else if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 		goto exit
 	}
 
@@ -1476,19 +1347,19 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 
 	if zobj.GetCe().GetUnset() != nil {
 		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & 1 << 2) == 0 {
+		if ((*guard) & IN_UNSET) == 0 {
 
 			/* have unseter - try with it! */
 
-			*guard |= 1 << 2
+			*guard |= IN_UNSET
 			ZendStdCallUnsetter(zobj, name)
-			*guard &= ^(1 << 2)
-		} else if intptr_t(property_offset) == 0 {
+			*guard &= ^IN_UNSET
+		} else if UNEXPECTED(IS_WRONG_PROPERTY_OFFSET(property_offset)) {
 
 			/* Trigger the correct error */
 
 			ZendWrongOffset(zobj.GetCe(), name)
-			r.Assert(EG.GetException() != nil)
+			ZEND_ASSERT(ExecutorGlobals.GetException() != nil)
 			goto exit
 		}
 	}
@@ -1499,32 +1370,14 @@ exit:
 /* }}} */
 
 func ZendStdUnsetDimension(object *Zval, offset *Zval) {
-	var ce *ZendClassEntry = object.GetValue().GetObj().GetCe()
+	var ce *ZendClassEntry = Z_OBJCE_P(object)
 	var tmp_offset Zval
 	var tmp_object Zval
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
-		var _z3 *Zval = offset
-		if (_z3.GetTypeInfo() & 0xff00) != 0 {
-			if (_z3.GetTypeInfo() & 0xff) == 10 {
-				_z3 = &(*_z3).value.GetRef().GetVal()
-				if (_z3.GetTypeInfo() & 0xff00) != 0 {
-					ZvalAddrefP(_z3)
-				}
-			} else {
-				ZvalAddrefP(_z3)
-			}
-		}
-		var _z1 *Zval = &tmp_offset
-		var _z2 *Zval = _z3
-		var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-		var _t uint32 = _z2.GetTypeInfo()
-		_z1.GetValue().SetCounted(_gc)
-		_z1.SetTypeInfo(_t)
-		ZvalAddrefP(object)
-		var __z *Zval = &tmp_object
-		__z.GetValue().SetObj(object.GetValue().GetObj())
-		__z.SetTypeInfo(8 | 1<<0<<8 | 1<<1<<8)
-		ZendCallMethod(&tmp_object, ce, nil, "offsetunset", g.SizeOf("\"offsetunset\"")-1, nil, 1, &tmp_offset, nil)
+		ZVAL_COPY_DEREF(&tmp_offset, offset)
+		Z_ADDREF_P(object)
+		ZVAL_OBJ(&tmp_object, Z_OBJ_P(object))
+		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetunset", nil, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
 	} else {
@@ -1540,8 +1393,8 @@ func ZendGetParentPrivateMethod(scope *ZendClassEntry, ce *ZendClassEntry, funct
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
 		func_ = ZendHashFind(&scope.function_table, function_name)
 		if func_ != nil {
-			fbc = func_.GetValue().GetFunc()
-			if (fbc.GetFnFlags()&1<<2) != 0 && fbc.GetScope() == scope {
+			fbc = Z_FUNC_P(func_)
+			if (fbc.GetFnFlags()&ZEND_ACC_PRIVATE) != 0 && fbc.GetScope() == scope {
 				return fbc
 			}
 		}
@@ -1583,53 +1436,49 @@ func ZendCheckProtected(ce *ZendClassEntry, scope *ZendClassEntry) int {
 func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_static int) *ZendFunction {
 	var mname_len int
 	var func_ *ZendOpArray
-	var fbc *ZendFunction = g.CondF(is_static != 0, func() *ZendFunction { return ce.GetCallstatic() }, func() *ZendFunction { return ce.GetCall() })
+	var fbc *ZendFunction = b.CondF(is_static != 0, func() *ZendFunction { return ce.GetCallstatic() }, func() *ZendFunction { return ce.GetCall() })
 
 	/* We use non-NULL value to avoid useless run_time_cache allocation.
 	 * The low bit must be zero, to not be interpreted as a MAP_PTR offset.
 	 */
 
 	var dummy any = any(intPtr(2))
-	r.Assert(fbc != nil)
-	if EG.GetTrampoline().GetFunctionName() == nil {
-		func_ = &EG.trampoline.GetOpArray()
+	ZEND_ASSERT(fbc != nil)
+	if EXPECTED(ExecutorGlobals.GetTrampoline().GetFunctionName() == nil) {
+		func_ = &(ExecutorGlobals.GetTrampoline()).op_array
 	} else {
-		func_ = _ecalloc(1, g.SizeOf("zend_op_array"))
+		func_ = Ecalloc(1, b.SizeOf("zend_op_array"))
 	}
-	func_.SetType(2)
+	func_.SetType(ZEND_USER_FUNCTION)
 	func_.GetArgFlags()[0] = 0
 	func_.GetArgFlags()[1] = 0
 	func_.GetArgFlags()[2] = 0
-	func_.SetFnFlags(1<<18 | 1<<0)
+	func_.SetFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE | ZEND_ACC_PUBLIC)
 	if is_static != 0 {
-		func_.SetFnFlags(func_.GetFnFlags() | 1<<4)
+		func_.SetFnFlags(func_.GetFnFlags() | ZEND_ACC_STATIC)
 	}
-	func_.SetOpcodes(&EG.call_trampoline_op)
-	func_.SetRunTimeCachePtr((**any)(&dummy))
+	func_.SetOpcodes(&(ExecutorGlobals.GetCallTrampolineOp()))
+	ZEND_MAP_PTR_INIT(func_.run_time_cache, (**any)(&dummy))
 	func_.SetScope(fbc.GetScope())
 
 	/* reserve space for arguments, local and temporary variables */
 
-	if fbc.GetType() == 2 {
-		if fbc.GetOpArray().GetLastVar()+fbc.GetOpArray().GetT() > 2 {
-			func_.SetT(fbc.GetOpArray().GetLastVar() + fbc.GetOpArray().GetT())
-		} else {
-			func_.SetT(2)
-		}
+	if fbc.GetType() == ZEND_USER_FUNCTION {
+		func_.SetT(MAX(fbc.GetOpArray().GetLastVar()+fbc.GetOpArray().GetT(), 2))
 	} else {
 		func_.SetT(2)
 	}
-	if fbc.GetType() == 2 {
+	if fbc.GetType() == ZEND_USER_FUNCTION {
 		func_.SetFilename(fbc.GetOpArray().GetFilename())
 	} else {
-		func_.SetFilename(ZendEmptyString)
+		func_.SetFilename(ZSTR_EMPTY_ALLOC())
 	}
-	if fbc.GetType() == 2 {
+	if fbc.GetType() == ZEND_USER_FUNCTION {
 		func_.SetLineStart(fbc.GetOpArray().GetLineStart())
 	} else {
 		func_.SetLineStart(0)
 	}
-	if fbc.GetType() == 2 {
+	if fbc.GetType() == ZEND_USER_FUNCTION {
 		func_.SetLineEnd(fbc.GetOpArray().GetLineEnd())
 	} else {
 		func_.SetLineEnd(0)
@@ -1637,8 +1486,8 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_s
 
 	//??? keep compatibility for "\0" characters
 
-	if g.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
-		func_.SetFunctionName(ZendStringInit(method_name.GetVal(), mname_len, 0))
+	if UNEXPECTED(b.Assign(&mname_len, strlen(ZSTR_VAL(method_name))) != ZSTR_LEN(method_name)) {
+		func_.SetFunctionName(ZendStringInit(ZSTR_VAL(method_name), mname_len, 0))
 	} else {
 		func_.SetFunctionName(ZendStringCopy(method_name))
 	}
@@ -1658,7 +1507,7 @@ func ZendGetUserCallFunction(ce *ZendClassEntry, method_name *ZendString) *ZendF
 /* }}} */
 
 func ZendBadMethodCall(fbc *ZendFunction, method_name *ZendString, scope *ZendClassEntry) {
-	ZendThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), g.CondF1(fbc != nil && fbc.GetScope() != nil, func() []byte { return fbc.GetScope().GetName().GetVal() }, ""), method_name.GetVal(), g.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+	ZendThrowError(nil, "Call to %s method %s::%s() from context '%s'", ZendVisibilityString(fbc.GetFnFlags()), ZEND_FN_SCOPE_NAME(fbc), ZSTR_VAL(method_name), b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""))
 }
 
 /* }}} */
@@ -1669,19 +1518,15 @@ func ZendStdGetMethod(obj_ptr **ZendObject, method_name *ZendString, key *Zval) 
 	var fbc *ZendFunction
 	var lc_method_name *ZendString
 	var scope *ZendClassEntry
-	if key != nil {
-		lc_method_name = key.GetValue().GetStr()
+	if EXPECTED(key != nil) {
+		lc_method_name = Z_STR_P(key)
 	} else {
-		lc_method_name = (*ZendString)(_emalloc(zend_long((*byte)(&((*ZendString)(nil).GetVal()))-(*byte)(nil)) + method_name.GetLen() + 1 + (8-1) & ^(8-1)))
-		ZendGcSetRefcount(&lc_method_name.gc, 1)
-		lc_method_name.GetGc().SetTypeInfo(6)
-		lc_method_name.SetH(0)
-		lc_method_name.SetLen(method_name.GetLen())
-		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
+		ZSTR_ALLOCA_ALLOC(lc_method_name, ZSTR_LEN(method_name), use_heap)
+		ZendStrTolowerCopy(ZSTR_VAL(lc_method_name), ZSTR_VAL(method_name), ZSTR_LEN(method_name))
 	}
-	if g.Assign(&func_, ZendHashFind(&zobj.ce.GetFunctionTable(), lc_method_name)) == nil {
-		if key == nil {
-			_efree(lc_method_name)
+	if UNEXPECTED(b.Assign(&func_, ZendHashFind(&zobj.ce.GetFunctionTable(), lc_method_name)) == nil) {
+		if UNEXPECTED(key == nil) {
+			ZSTR_ALLOCA_FREE(lc_method_name, use_heap)
 		}
 		if zobj.GetCe().GetCall() != nil {
 			return ZendGetUserCallFunction(zobj.GetCe(), method_name)
@@ -1689,23 +1534,23 @@ func ZendStdGetMethod(obj_ptr **ZendObject, method_name *ZendString, key *Zval) 
 			return nil
 		}
 	}
-	fbc = func_.GetValue().GetFunc()
+	fbc = Z_FUNC_P(func_)
 
 	/* Check access level */
 
-	if (fbc.GetOpArray().GetFnFlags() & (1<<3 | 1<<2 | 1<<1)) != 0 {
+	if (fbc.GetOpArray().GetFnFlags() & (ZEND_ACC_CHANGED | ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED)) != 0 {
 		scope = ZendGetExecutedScope()
 		if fbc.GetScope() != scope {
-			if (fbc.GetOpArray().GetFnFlags() & 1 << 3) != 0 {
+			if (fbc.GetOpArray().GetFnFlags() & ZEND_ACC_CHANGED) != 0 {
 				var updated_fbc *ZendFunction = ZendGetParentPrivateMethod(scope, zobj.GetCe(), lc_method_name)
-				if updated_fbc != nil {
+				if EXPECTED(updated_fbc != nil) {
 					fbc = updated_fbc
 					goto exit
-				} else if (fbc.GetOpArray().GetFnFlags() & 1 << 0) != 0 {
+				} else if (fbc.GetOpArray().GetFnFlags() & ZEND_ACC_PUBLIC) != 0 {
 					goto exit
 				}
 			}
-			if (fbc.GetOpArray().GetFnFlags()&1<<2) != 0 || ZendCheckProtected(g.CondF(fbc.GetPrototype() != nil, func() *ZendClassEntry { return fbc.GetPrototype().GetScope() }, func() *ZendClassEntry { return fbc.GetScope() }), scope) == 0 {
+			if UNEXPECTED((fbc.GetOpArray().GetFnFlags()&ZEND_ACC_PRIVATE) != 0) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
 				if zobj.GetCe().GetCall() != nil {
 					fbc = ZendGetUserCallFunction(zobj.GetCe(), method_name)
 				} else {
@@ -1716,8 +1561,8 @@ func ZendStdGetMethod(obj_ptr **ZendObject, method_name *ZendString, key *Zval) 
 		}
 	}
 exit:
-	if key == nil {
-		_efree(lc_method_name)
+	if UNEXPECTED(key == nil) {
+		ZSTR_ALLOCA_FREE(lc_method_name, use_heap)
 	}
 	return fbc
 }
@@ -1735,21 +1580,21 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 	var lc_function_name *ZendString
 	var object *ZendObject
 	var scope *ZendClassEntry
-	if key != nil {
-		lc_function_name = key.GetValue().GetStr()
+	if EXPECTED(key != nil) {
+		lc_function_name = Z_STR_P(key)
 	} else {
-		lc_function_name = ZendStringTolowerEx(function_name, 0)
+		lc_function_name = ZendStringTolower(function_name)
 	}
 	var func_ *Zval = ZendHashFind(&ce.function_table, lc_function_name)
-	if func_ != nil {
-		fbc = func_.GetValue().GetFunc()
-	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetVal(), lc_function_name.GetLen(), ce.GetName().GetVal(), lc_function_name.GetLen(), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
+	if EXPECTED(func_ != nil) {
+		fbc = Z_FUNC_P(func_)
+	} else if ce.GetConstructor() != nil && ZSTR_LEN(lc_function_name) == ZSTR_LEN(ce.GetName()) && ZendBinaryStrncasecmp(ZSTR_VAL(lc_function_name), ZSTR_LEN(lc_function_name), ZSTR_VAL(ce.GetName()), ZSTR_LEN(lc_function_name), ZSTR_LEN(lc_function_name)) == 0 && (ZSTR_VAL(ce.GetConstructor().GetFunctionName())[0] != '_' || ZSTR_VAL(ce.GetConstructor().GetFunctionName())[1] != '_') {
 		fbc = ce.GetConstructor()
 	} else {
-		if key == nil {
+		if UNEXPECTED(key == nil) {
 			ZendStringReleaseEx(lc_function_name, 0)
 		}
-		if ce.GetCall() != nil && g.Assign(&object, ZendGetThisObject(EG.GetCurrentExecuteData())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
+		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(ExecutorGlobals.GetCurrentExecuteData())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
 
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */
@@ -1765,10 +1610,10 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 			return nil
 		}
 	}
-	if (fbc.GetOpArray().GetFnFlags() & 1 << 0) == 0 {
+	if (fbc.GetOpArray().GetFnFlags() & ZEND_ACC_PUBLIC) == 0 {
 		scope = ZendGetExecutedScope()
-		if fbc.GetScope() != scope {
-			if (fbc.GetOpArray().GetFnFlags()&1<<2) != 0 || ZendCheckProtected(g.CondF(fbc.GetPrototype() != nil, func() *ZendClassEntry { return fbc.GetPrototype().GetScope() }, func() *ZendClassEntry { return fbc.GetScope() }), scope) == 0 {
+		if UNEXPECTED(fbc.GetScope() != scope) {
+			if UNEXPECTED((fbc.GetOpArray().GetFnFlags()&ZEND_ACC_PRIVATE) != 0) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
 				if ce.GetCallstatic() != nil {
 					fbc = ZendGetUserCallstaticFunction(ce, function_name)
 				} else {
@@ -1778,7 +1623,7 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 			}
 		}
 	}
-	if key == nil {
+	if UNEXPECTED(key == nil) {
 		ZendStringReleaseEx(lc_function_name, 0)
 	}
 	return fbc
@@ -1789,48 +1634,19 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 func ZendClassInitStatics(class_type *ZendClassEntry) {
 	var i int
 	var p *Zval
-	if class_type.GetDefaultStaticMembersCount() != 0 && (*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-		return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-	}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) })) == nil {
+	if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
 		if class_type.parent {
 			ZendClassInitStatics(class_type.parent)
 		}
-		if (uintPtr(class_type.GetStaticMembersTablePtr()) & 1) != 0 {
-			*((*any)((*byte)(CG.GetMapPtrBase() + uintPtr(class_type.GetStaticMembersTablePtr()-1)))) = _emalloc(g.SizeOf("zval") * class_type.GetDefaultStaticMembersCount())
-		} else {
-			*(class_type.GetStaticMembersTablePtr()) = _emalloc(g.SizeOf("zval") * class_type.GetDefaultStaticMembersCount())
-		}
+		ZEND_MAP_PTR_SET(class_type.static_members_table, Emalloc(b.SizeOf("zval")*class_type.GetDefaultStaticMembersCount()))
 		for i = 0; i < class_type.GetDefaultStaticMembersCount(); i++ {
 			p = &class_type.default_static_members_table[i]
-			if p.GetType() == 13 {
-				var q *Zval = &(*Zval)(g.CondF((uintptr_t(class_type.parent).static_members_table__ptr&1) != 0, func() any {
-					return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type.parent).static_members_table__ptr - 1)))
-				}, func() any { return any(*(class_type.parent.static_members_table__ptr)) }))[i]
-				if q.GetType() == 13 {
-					q = q.GetValue().GetZv()
-				}
-				&(*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-					return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-				}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) }))[i].GetValue().SetZv(q)
-				&(*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-					return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-				}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) }))[i].SetTypeInfo(13)
+			if Z_TYPE_P(p) == IS_INDIRECT {
+				var q *Zval = &CE_STATIC_MEMBERS(class_type.parent)[i]
+				ZVAL_DEINDIRECT(q)
+				ZVAL_INDIRECT(&CE_STATIC_MEMBERS(class_type)[i], q)
 			} else {
-				var _z1 *Zval = &(*Zval)(g.CondF((uintptr_t(class_type).static_members_table__ptr&1) != 0, func() any {
-					return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(class_type).static_members_table__ptr - 1)))
-				}, func() any { return any(*(class_type.GetStaticMembersTablePtr())) }))[i]
-				var _z2 *Zval = p
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
-				if (_t & 0xff00) != 0 {
-					if (ZvalGcFlags(_gc.GetGc().GetTypeInfo()) & 1 << 7) == 0 {
-						ZendGcAddref(&_gc.gc)
-					} else {
-						ZvalCopyCtorFunc(_z1)
-					}
-				}
+				ZVAL_COPY_OR_DUP(&CE_STATIC_MEMBERS(class_type)[i], p)
 			}
 		}
 	}
@@ -1840,56 +1656,50 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 	var scope *ZendClassEntry
 	var property_info *ZendPropertyInfo = ZendHashFindPtr(&ce.properties_info, property_name)
 	*property_info_ptr = property_info
-	if property_info == nil {
+	if UNEXPECTED(property_info == nil) {
 		goto undeclared_property
 	}
-	if (property_info.GetFlags() & 1 << 0) == 0 {
-		if EG.GetFakeScope() != nil {
-			scope = EG.GetFakeScope()
+	if (property_info.GetFlags() & ZEND_ACC_PUBLIC) == 0 {
+		if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
+			scope = ExecutorGlobals.GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
 		if property_info.GetCe() != scope {
-			if (property_info.GetFlags()&1<<2) != 0 || IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0 {
-				if type_ != 3 {
+			if UNEXPECTED((property_info.GetFlags()&ZEND_ACC_PRIVATE) != 0) || UNEXPECTED(IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0) {
+				if type_ != BP_VAR_IS {
 					ZendBadPropertyAccess(property_info, ce, property_name)
 				}
 				return nil
 			}
 		}
 	}
-	if (property_info.GetFlags() & 1 << 4) == 0 {
+	if UNEXPECTED((property_info.GetFlags() & ZEND_ACC_STATIC) == 0) {
 		goto undeclared_property
 	}
-	if (ce.GetCeFlags() & 1 << 12) == 0 {
-		if ZendUpdateClassConstants(ce) != SUCCESS {
+	if UNEXPECTED((ce.GetCeFlags() & ZEND_ACC_CONSTANTS_UPDATED) == 0) {
+		if UNEXPECTED(ZendUpdateClassConstants(ce) != 0) != SUCCESS {
 			return nil
 		}
 	}
 
 	/* check if static properties were destroyed */
 
-	if (*Zval)(g.CondF((uintptr_t(ce).static_members_table__ptr&1) != 0, func() any {
-		return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(ce).static_members_table__ptr - 1)))
-	}, func() any { return any(*(ce.GetStaticMembersTablePtr())) })) == nil {
-		if ce.GetType() == 1 || (ce.GetCeFlags()&(1<<7|1<<10)) != 0 {
+	if UNEXPECTED(CE_STATIC_MEMBERS(ce) == nil) {
+		if ce.GetType() == ZEND_INTERNAL_CLASS || (ce.GetCeFlags()&(ZEND_ACC_IMMUTABLE|ZEND_ACC_PRELOADED)) != 0 {
 			ZendClassInitStatics(ce)
 		} else {
 		undeclared_property:
-			if type_ != 3 {
-				ZendThrowError(nil, "Access to undeclared static property: %s::$%s", ce.GetName().GetVal(), property_name.GetVal())
+			if type_ != BP_VAR_IS {
+				ZendThrowError(nil, "Access to undeclared static property: %s::$%s", ZSTR_VAL(ce.GetName()), ZSTR_VAL(property_name))
 			}
 			return nil
 		}
 	}
-	ret = (*Zval)(g.CondF((uintptr_t(ce).static_members_table__ptr&1) != 0, func() any {
-		return *((*any)((*byte)(CG.GetMapPtrBase() + uintptr_t(ce).static_members_table__ptr - 1)))
-	}, func() any { return any(*(ce.GetStaticMembersTablePtr())) })) + property_info.GetOffset()
-	if ret.GetType() == 13 {
-		ret = ret.GetValue().GetZv()
-	}
-	if (type_ == 0 || type_ == 2) && ret.GetType() == 0 && property_info.GetType() != 0 {
-		ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(property_name))
+	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
+	ZVAL_DEINDIRECT(ret)
+	if UNEXPECTED((type_ == BP_VAR_R || type_ == BP_VAR_RW) && Z_TYPE_P(ret) == IS_UNDEF && property_info.GetType() != 0) {
+		ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", ZSTR_VAL(property_info.GetCe().GetName()), ZendGetUnmangledPropertyName(property_name))
 		return nil
 	}
 	return ret
@@ -1902,7 +1712,7 @@ func ZendStdGetStaticProperty(ce *ZendClassEntry, property_name *ZendString, typ
 	return ZendStdGetStaticPropertyWithInfo(ce, property_name, type_, &prop_info)
 }
 func ZendStdUnsetStaticProperty(ce *ZendClassEntry, property_name *ZendString) ZendBool {
-	ZendThrowError(nil, "Attempt to unset static property %s::$%s", ce.GetName().GetVal(), property_name.GetVal())
+	ZendThrowError(nil, "Attempt to unset static property %s::$%s", ZSTR_VAL(ce.GetName()), ZSTR_VAL(property_name))
 	return 0
 }
 
@@ -1910,9 +1720,9 @@ func ZendStdUnsetStaticProperty(ce *ZendClassEntry, property_name *ZendString) Z
 
 func ZendBadConstructorCall(constructor *ZendFunction, scope *ZendClassEntry) {
 	if scope != nil {
-		ZendThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal(), scope.GetName().GetVal())
+		ZendThrowError(nil, "Call to %s %s::%s() from context '%s'", ZendVisibilityString(constructor.GetFnFlags()), ZSTR_VAL(constructor.GetScope().GetName()), ZSTR_VAL(constructor.GetFunctionName()), ZSTR_VAL(scope.GetName()))
 	} else {
-		ZendThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), constructor.GetScope().GetName().GetVal(), constructor.GetFunctionName().GetVal())
+		ZendThrowError(nil, "Call to %s %s::%s() from invalid context", ZendVisibilityString(constructor.GetFnFlags()), ZSTR_VAL(constructor.GetScope().GetName()), ZSTR_VAL(constructor.GetFunctionName()))
 	}
 }
 
@@ -1922,14 +1732,14 @@ func ZendStdGetConstructor(zobj *ZendObject) *ZendFunction {
 	var constructor *ZendFunction = zobj.GetCe().GetConstructor()
 	var scope *ZendClassEntry
 	if constructor != nil {
-		if (constructor.GetOpArray().GetFnFlags() & 1 << 0) == 0 {
-			if EG.GetFakeScope() != nil {
-				scope = EG.GetFakeScope()
+		if UNEXPECTED((constructor.GetOpArray().GetFnFlags() & ZEND_ACC_PUBLIC) == 0) {
+			if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
+				scope = ExecutorGlobals.GetFakeScope()
 			} else {
 				scope = ZendGetExecutedScope()
 			}
-			if constructor.GetScope() != scope {
-				if (constructor.GetOpArray().GetFnFlags()&1<<2) != 0 || ZendCheckProtected(g.CondF(constructor.GetPrototype() != nil, func() *ZendClassEntry { return constructor.GetPrototype().GetScope() }, func() *ZendClassEntry { return constructor.GetScope() }), scope) == 0 {
+			if UNEXPECTED(constructor.GetScope() != scope) {
+				if UNEXPECTED((constructor.GetOpArray().GetFnFlags()&ZEND_ACC_PRIVATE) != 0) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(constructor), scope) == 0) {
 					ZendBadConstructorCall(constructor, scope)
 					constructor = nil
 				}
@@ -1944,8 +1754,8 @@ func ZendStdGetConstructor(zobj *ZendObject) *ZendFunction {
 func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 	var zobj1 *ZendObject
 	var zobj2 *ZendObject
-	zobj1 = o1.GetValue().GetObj()
-	zobj2 = o2.GetValue().GetObj()
+	zobj1 = Z_OBJ_P(o1)
+	zobj2 = Z_OBJ_P(o2)
 	if zobj1 == zobj2 {
 		return 0
 	}
@@ -1963,10 +1773,10 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 		 * false recursion detection.
 		 */
 
-		if (ZvalGcFlags(o1.GetValue().GetCounted().GetGc().GetTypeInfo()) & 1 << 5) != 0 {
-			ZendErrorNoreturn(1<<0, "Nesting level too deep - recursive dependency?")
+		if UNEXPECTED(Z_IS_RECURSIVE_P(o1) != 0) {
+			ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
-		o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() | 1<<5<<0)
+		Z_PROTECT_RECURSION_P(o1)
 		for {
 			var __ht *HashTable = &zobj1.ce.GetPropertiesInfo()
 			var _p *Bucket = __ht.GetArData()
@@ -1974,40 +1784,40 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 			for ; _p != _end; _p++ {
 				var _z *Zval = &_p.val
 
-				if _z.GetType() == 0 {
+				if UNEXPECTED(Z_TYPE_P(_z) == IS_UNDEF) {
 					continue
 				}
-				info = _z.GetValue().GetPtr()
-				var p1 *Zval = (*Zval)((*byte)(zobj1 + info.GetOffset()))
-				var p2 *Zval = (*Zval)((*byte)(zobj2 + info.GetOffset()))
-				if (info.GetFlags() & 1 << 4) != 0 {
+				info = Z_PTR_P(_z)
+				var p1 *Zval = OBJ_PROP(zobj1, info.GetOffset())
+				var p2 *Zval = OBJ_PROP(zobj2, info.GetOffset())
+				if (info.GetFlags() & ZEND_ACC_STATIC) != 0 {
 					continue
 				}
-				if p1.GetType() != 0 {
-					if p2.GetType() != 0 {
+				if Z_TYPE_P(p1) != IS_UNDEF {
+					if Z_TYPE_P(p2) != IS_UNDEF {
 						var result Zval
 						if CompareFunction(&result, p1, p2) == FAILURE {
-							o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() &^ (1 << 5 << 0))
+							Z_UNPROTECT_RECURSION_P(o1)
 							return 1
 						}
-						if result.GetValue().GetLval() != 0 {
-							o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() &^ (1 << 5 << 0))
-							return result.GetValue().GetLval()
+						if Z_LVAL(result) != 0 {
+							Z_UNPROTECT_RECURSION_P(o1)
+							return Z_LVAL(result)
 						}
 					} else {
-						o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() &^ (1 << 5 << 0))
+						Z_UNPROTECT_RECURSION_P(o1)
 						return 1
 					}
 				} else {
-					if p2.GetType() != 0 {
-						o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() &^ (1 << 5 << 0))
+					if Z_TYPE_P(p2) != IS_UNDEF {
+						Z_UNPROTECT_RECURSION_P(o1)
 						return 1
 					}
 				}
 			}
 			break
 		}
-		o1.GetValue().GetCounted().GetGc().SetTypeInfo(o1.GetValue().GetCounted().GetGc().GetTypeInfo() &^ (1 << 5 << 0))
+		Z_UNPROTECT_RECURSION_P(o1)
 		return 0
 	} else {
 		if zobj1.GetProperties() == nil {
@@ -2030,92 +1840,90 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 	var tmp_name *ZendString
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	zobj = object.GetValue().GetObj()
+	zobj = Z_OBJ_P(object)
 	name = ZvalTryGetTmpString(member, &tmp_name)
-	if name == nil {
+	if UNEXPECTED(name == nil) {
 		return 0
 	}
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, 1, cache_slot, &prop_info)
-	if intptr_t(property_offset) > 0 {
-		value = (*Zval)((*byte)(zobj + property_offset))
-		if value.GetType() != 0 {
+	if EXPECTED(IS_VALID_PROPERTY_OFFSET(property_offset)) {
+		value = OBJ_PROP(zobj, property_offset)
+		if Z_TYPE_P(value) != IS_UNDEF {
 			goto found
 		}
-		if value.GetU2Extra() == 1 {
+		if UNEXPECTED(Z_PROP_FLAG_P(value) == IS_PROP_UNINIT) {
 
 			/* Skip __isset() for uninitialized typed properties */
 
 			result = 0
 			goto exit
 		}
-	} else if intptr_t(property_offset) < 0 {
-		if zobj.GetProperties() != nil {
-			if property_offset != uintptr_t(intptr_t)(-1) {
-				var idx uintPtr = uintptr_t(-(intptr_t(property_offset)) - 2)
-				if idx < zobj.GetProperties().GetNNumUsed()*g.SizeOf("Bucket") {
+	} else if EXPECTED(IS_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+		if EXPECTED(zobj.GetProperties() != nil) {
+			if !(IS_UNKNOWN_DYNAMIC_PROPERTY_OFFSET(property_offset)) {
+				var idx uintPtr = ZEND_DECODE_DYN_PROP_OFFSET(property_offset)
+				if EXPECTED(idx < zobj.GetProperties().GetNNumUsed()*b.SizeOf("Bucket")) {
 					var p *Bucket = (*Bucket)((*byte)(zobj.GetProperties().GetArData() + idx))
-					if p.GetVal().GetType() != 0 && (p.GetKey() == name || p.GetH() == name.GetH() && p.GetKey() != nil && ZendStringEqualContent(p.GetKey(), name) != 0) {
+					if EXPECTED(Z_TYPE(p.GetVal()) != IS_UNDEF) && (EXPECTED(p.GetKey() == name) || EXPECTED(p.GetH() == ZSTR_H(name)) && EXPECTED(p.GetKey() != nil) && EXPECTED(ZendStringEqualContent(p.GetKey(), name) != 0)) {
 						value = &p.val
 						goto found
 					}
 				}
-				(cache_slot + 1)[0] = any(uintptr_t(intptr_t)(-1))
+				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
 			value = ZendHashFind(zobj.GetProperties(), name)
 			if value != nil {
 				if cache_slot != nil {
 					var idx uintPtr = (*byte)(value - (*byte)(zobj.GetProperties().GetArData()))
-					(cache_slot + 1)[0] = any(uintptr_t(-(intptr_t(idx) + 2)))
+					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
 				}
 			found:
-				if has_set_exists == 1<<0 {
+				if has_set_exists == ZEND_PROPERTY_NOT_EMPTY {
 					result = ZendIsTrue(value)
-				} else if has_set_exists < 1<<0 {
-					r.Assert(has_set_exists == 0x0)
-					if value.GetType() == 10 {
-						value = &(*value).value.GetRef().GetVal()
-					}
-					result = value.GetType() != 1
+				} else if has_set_exists < ZEND_PROPERTY_NOT_EMPTY {
+					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_ISSET)
+					ZVAL_DEREF(value)
+					result = Z_TYPE_P(value) != IS_NULL
 				} else {
-					r.Assert(has_set_exists == 0x2)
+					ZEND_ASSERT(has_set_exists == ZEND_PROPERTY_EXISTS)
 					result = 1
 				}
 				goto exit
 			}
 		}
-	} else if EG.GetException() != nil {
+	} else if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 		result = 0
 		goto exit
 	}
 	result = 0
-	if has_set_exists != 0x2 && zobj.GetCe().GetIsset() != nil {
+	if has_set_exists != ZEND_PROPERTY_EXISTS && zobj.GetCe().GetIsset() != nil {
 		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
-		if ((*guard) & 1 << 3) == 0 {
+		if ((*guard) & IN_ISSET) == 0 {
 			var rv Zval
 
 			/* have issetter - try with it! */
 
-			if tmp_name == nil && (ZvalGcFlags(name.GetGc().GetTypeInfo())&1<<6) == 0 {
+			if tmp_name == nil && ZSTR_IS_INTERNED(name) == 0 {
 				tmp_name = ZendStringCopy(name)
 			}
-			ZendGcAddref(&zobj.gc)
-			*guard |= 1 << 3
+			GC_ADDREF(zobj)
+			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = ZendIsTrue(&rv)
 			ZvalPtrDtor(&rv)
-			if has_set_exists == 1<<0 && result != 0 {
-				if EG.GetException() == nil && zobj.GetCe().GetGet() != nil && ((*guard)&1<<0) == 0 {
-					*guard |= 1 << 0
+			if has_set_exists == ZEND_PROPERTY_NOT_EMPTY && result != 0 {
+				if EXPECTED(ExecutorGlobals.GetException() == nil) && zobj.GetCe().GetGet() != nil && ((*guard)&IN_GET) == 0 {
+					*guard |= IN_GET
 					ZendStdCallGetter(zobj, name, &rv)
-					*guard &= ^(1 << 0)
+					*guard &= ^IN_GET
 					result = IZendIsTrue(&rv)
 					ZvalPtrDtor(&rv)
 				} else {
 					result = 0
 				}
 			}
-			*guard &= ^(1 << 3)
-			ZendObjectRelease(zobj)
+			*guard &= ^IN_ISSET
+			OBJ_RELEASE(zobj)
 		}
 	}
 exit:
@@ -2135,54 +1943,43 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 	var retval Zval
 	var ce *ZendClassEntry
 	switch type_ {
-	case 6:
-		ce = readobj.GetValue().GetObj().GetCe()
+	case IS_STRING:
+		ce = Z_OBJCE_P(readobj)
 		if ce.GetTostring() != nil {
-			var fake_scope *ZendClassEntry = EG.GetFakeScope()
-			EG.SetFakeScope(nil)
-			ZendCallMethod(readobj, ce, &ce.__tostring, "__tostring", g.SizeOf("\"__tostring\"")-1, &retval, 0, nil, nil)
-			EG.SetFakeScope(fake_scope)
-			if retval.GetType() == 6 {
-				var _z1 *Zval = writeobj
-				var _z2 *Zval = &retval
-				var _gc *ZendRefcounted = _z2.GetValue().GetCounted()
-				var _t uint32 = _z2.GetTypeInfo()
-				_z1.GetValue().SetCounted(_gc)
-				_z1.SetTypeInfo(_t)
+			var fake_scope *ZendClassEntry = ExecutorGlobals.GetFakeScope()
+			ExecutorGlobals.SetFakeScope(nil)
+			ZendCallMethodWith0Params(readobj, ce, &ce.__tostring, "__tostring", &retval)
+			ExecutorGlobals.SetFakeScope(fake_scope)
+			if EXPECTED(Z_TYPE(retval) == IS_STRING) {
+				ZVAL_COPY_VALUE(writeobj, &retval)
 				return SUCCESS
 			}
 			ZvalPtrDtor(&retval)
-			if EG.GetException() == nil {
-				ZendThrowError(nil, "Method %s::__toString() must return a string value", ce.GetName().GetVal())
+			if ExecutorGlobals.GetException() == nil {
+				ZendThrowError(nil, "Method %s::__toString() must return a string value", ZSTR_VAL(ce.GetName()))
 			}
 		}
 		return FAILURE
-	case 16:
-		writeobj.SetTypeInfo(3)
+	case _IS_BOOL:
+		ZVAL_TRUE(writeobj)
 		return SUCCESS
-	case 4:
-		ce = readobj.GetValue().GetObj().GetCe()
-		ZendError(1<<3, "Object of class %s could not be converted to int", ce.GetName().GetVal())
-		var __z *Zval = writeobj
-		__z.GetValue().SetLval(1)
-		__z.SetTypeInfo(4)
+	case IS_LONG:
+		ce = Z_OBJCE_P(readobj)
+		ZendError(E_NOTICE, "Object of class %s could not be converted to int", ZSTR_VAL(ce.GetName()))
+		ZVAL_LONG(writeobj, 1)
 		return SUCCESS
-	case 5:
-		ce = readobj.GetValue().GetObj().GetCe()
-		ZendError(1<<3, "Object of class %s could not be converted to float", ce.GetName().GetVal())
-		var __z *Zval = writeobj
-		__z.GetValue().SetDval(1)
-		__z.SetTypeInfo(5)
+	case IS_DOUBLE:
+		ce = Z_OBJCE_P(readobj)
+		ZendError(E_NOTICE, "Object of class %s could not be converted to float", ZSTR_VAL(ce.GetName()))
+		ZVAL_DOUBLE(writeobj, 1)
 		return SUCCESS
-	case 20:
-		ce = readobj.GetValue().GetObj().GetCe()
-		ZendError(1<<3, "Object of class %s could not be converted to number", ce.GetName().GetVal())
-		var __z *Zval = writeobj
-		__z.GetValue().SetLval(1)
-		__z.SetTypeInfo(4)
+	case _IS_NUMBER:
+		ce = Z_OBJCE_P(readobj)
+		ZendError(E_NOTICE, "Object of class %s could not be converted to number", ZSTR_VAL(ce.GetName()))
+		ZVAL_LONG(writeobj, 1)
 		return SUCCESS
 	default:
-		writeobj.SetTypeInfo(1)
+		ZVAL_NULL(writeobj)
 		break
 	}
 	return FAILURE
@@ -2192,19 +1989,19 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 
 func ZendStdGetClosure(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **ZendObject) int {
 	var func_ *Zval
-	var ce *ZendClassEntry = obj.GetValue().GetObj().GetCe()
-	if g.Assign(&func_, ZendHashFindEx(&ce.function_table, ZendKnownStrings[ZEND_STR_MAGIC_INVOKE], 1)) == nil {
+	var ce *ZendClassEntry = Z_OBJCE_P(obj)
+	if b.Assign(&func_, ZendHashFindEx(&ce.function_table, ZSTR_KNOWN(ZEND_STR_MAGIC_INVOKE), 1)) == nil {
 		return FAILURE
 	}
-	*fptr_ptr = func_.GetValue().GetFunc()
+	*fptr_ptr = Z_FUNC_P(func_)
 	*ce_ptr = ce
-	if ((*fptr_ptr).GetFnFlags() & 1 << 4) != 0 {
+	if ((*fptr_ptr).GetFnFlags() & ZEND_ACC_STATIC) != 0 {
 		if obj_ptr != nil {
 			*obj_ptr = nil
 		}
 	} else {
 		if obj_ptr != nil {
-			*obj_ptr = obj.GetValue().GetObj()
+			*obj_ptr = Z_OBJ_P(obj)
 		}
 	}
 	return SUCCESS
@@ -2216,11 +2013,11 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 	var ht *HashTable
 	switch purpose {
 	case ZEND_PROP_PURPOSE_DEBUG:
-		if obj.GetValue().GetObj().GetHandlers().GetGetDebugInfo() != nil {
+		if Z_OBJ_HT_P(obj).GetGetDebugInfo() != nil {
 			var is_temp int
-			ht = obj.GetValue().GetObj().GetHandlers().GetGetDebugInfo()(obj, &is_temp)
-			if ht != nil && is_temp == 0 && (ZvalGcFlags(ht.GetGc().GetTypeInfo())&1<<6) == 0 {
-				ZendGcAddref(&ht.gc)
+			ht = Z_OBJ_HT_P(obj).GetGetDebugInfo()(obj, &is_temp)
+			if ht != nil && is_temp == 0 && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 {
+				GC_ADDREF(ht)
 			}
 			return ht
 		}
@@ -2233,19 +2030,19 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 	case ZEND_PROP_PURPOSE_JSON:
 
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
-		ht = obj.GetValue().GetObj().GetHandlers().GetGetProperties()(obj)
-		if ht != nil && (ZvalGcFlags(ht.GetGc().GetTypeInfo())&1<<6) == 0 {
-			ZendGcAddref(&ht.gc)
+		ht = Z_OBJ_HT_P(obj).GetGetProperties()(obj)
+		if ht != nil && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 {
+			GC_ADDREF(ht)
 		}
 		return ht
 	default:
-		r.Assert(false)
+		ZEND_ASSERT(false)
 		return nil
 	}
 }
 func ZendGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
-	if obj.GetValue().GetObj().GetHandlers().GetGetPropertiesFor() != nil {
-		return obj.GetValue().GetObj().GetHandlers().GetGetPropertiesFor()(obj, purpose)
+	if Z_OBJ_HT_P(obj).GetGetPropertiesFor() != nil {
+		return Z_OBJ_HT_P(obj).GetGetPropertiesFor()(obj, purpose)
 	}
 	return ZendStdGetPropertiesFor(obj, purpose)
 }

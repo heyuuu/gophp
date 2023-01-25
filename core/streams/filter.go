@@ -3,10 +3,9 @@
 package streams
 
 import (
+	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -57,8 +56,8 @@ func PhpGetStreamFiltersHashGlobal() *zend.HashTable { return &StreamFiltersHash
 /* Normal hash selection/retrieval call */
 
 func _phpGetStreamFiltersHash() *zend.HashTable {
-	if standard.FileGlobals.stream_filters != nil {
-		return standard.FileGlobals.stream_filters
+	if standard.FG(stream_filters) {
+		return standard.FG(stream_filters)
 	} else {
 		return &StreamFiltersHash
 	}
@@ -84,12 +83,12 @@ func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 /* API for registering VOLATILE wrappers */
 
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, factory *PhpStreamFilterFactory) int {
-	if standard.FileGlobals.stream_filters == nil {
-		standard.FileGlobals.stream_filters = (*zend.HashTable)(zend._emalloc(g.SizeOf("HashTable")))
-		zend._zendHashInit(standard.FileGlobals.stream_filters, &StreamFiltersHash.nNumOfElements+1, nil, 0)
-		zend.ZendHashCopy(standard.FileGlobals.stream_filters, &StreamFiltersHash, nil)
+	if !(standard.FG(stream_filters)) {
+		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
+		zend.ZendHashInit(standard.FG(stream_filters), zend.ZendHashNumElements(&StreamFiltersHash)+1, nil, nil, 0)
+		zend.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
-	if zend.ZendHashAddPtr(standard.FileGlobals.stream_filters, filterpattern, any(factory)) {
+	if zend.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {
 		return zend.SUCCESS
 	} else {
 		return zend.FAILURE
@@ -99,16 +98,16 @@ func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, fact
 /* Buckets */
 
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
-	var is_persistent int = stream.is_persistent
+	var is_persistent int = core.PhpStreamIsPersistent(stream)
 	var bucket *PhpStreamBucket
-	bucket = (*PhpStreamBucket)(g.CondF(is_persistent != 0, func() any { return zend.__zendMalloc(g.SizeOf("php_stream_bucket")) }, func() any { return zend._emalloc(g.SizeOf("php_stream_bucket")) }))
+	bucket = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket"), is_persistent))
 	bucket.SetPrev(nil)
 	bucket.SetNext(bucket.GetPrev())
 	if is_persistent != 0 && buf_persistent == 0 {
 
 		/* all data in a persistent bucket must also be persistent */
 
-		bucket.SetBuf(zend.__zendMalloc(buflen))
+		bucket.SetBuf(zend.Pemalloc(buflen, 1))
 		memcpy(bucket.GetBuf(), buf, buflen)
 		bucket.SetBuflen(buflen)
 		bucket.SetOwnBuf(1)
@@ -137,13 +136,9 @@ func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
 	if bucket.GetRefcount() == 1 && bucket.GetOwnBuf() != 0 {
 		return bucket
 	}
-	retval = (*PhpStreamBucket)(g.CondF(bucket.GetIsPersistent() != 0, func() any { return zend.__zendMalloc(g.SizeOf("php_stream_bucket")) }, func() any { return zend._emalloc(g.SizeOf("php_stream_bucket")) }))
-	memcpy(retval, bucket, g.SizeOf("* retval"))
-	if retval.GetIsPersistent() != 0 {
-		retval.SetBuf(zend.__zendMalloc(retval.GetBuflen()))
-	} else {
-		retval.SetBuf(zend._emalloc(retval.GetBuflen()))
-	}
+	retval = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket"), bucket.GetIsPersistent()))
+	memcpy(retval, bucket, b.SizeOf("* retval"))
+	retval.SetBuf(zend.Pemalloc(retval.GetBuflen(), retval.GetIsPersistent()))
 	memcpy(retval.GetBuf(), bucket.GetBuf(), retval.GetBuflen())
 	retval.SetRefcount(1)
 	retval.SetOwnBuf(1)
@@ -151,24 +146,16 @@ func PhpStreamBucketMakeWriteable(bucket *PhpStreamBucket) *PhpStreamBucket {
 	return retval
 }
 func PhpStreamBucketSplit(in *PhpStreamBucket, left **PhpStreamBucket, right **PhpStreamBucket, length int) int {
-	*left = (*PhpStreamBucket)(g.CondF(in.GetIsPersistent() != 0, func() any { return zend.__zendCalloc(1, g.SizeOf("php_stream_bucket")) }, func() any { return zend._ecalloc(1, g.SizeOf("php_stream_bucket")) }))
-	*right = (*PhpStreamBucket)(g.CondF(in.GetIsPersistent() != 0, func() any { return zend.__zendCalloc(1, g.SizeOf("php_stream_bucket")) }, func() any { return zend._ecalloc(1, g.SizeOf("php_stream_bucket")) }))
-	if in.GetIsPersistent() != 0 {
-		(*left).SetBuf(zend.__zendMalloc(length))
-	} else {
-		(*left).SetBuf(zend._emalloc(length))
-	}
+	*left = (*PhpStreamBucket)(zend.Pecalloc(1, b.SizeOf("php_stream_bucket"), in.GetIsPersistent()))
+	*right = (*PhpStreamBucket)(zend.Pecalloc(1, b.SizeOf("php_stream_bucket"), in.GetIsPersistent()))
+	(*left).SetBuf(zend.Pemalloc(length, in.GetIsPersistent()))
 	(*left).SetBuflen(length)
 	memcpy((*left).GetBuf(), in.GetBuf(), length)
 	(*left).SetRefcount(1)
 	(*left).SetOwnBuf(1)
 	(*left).SetIsPersistent(in.GetIsPersistent())
 	(*right).SetBuflen(in.GetBuflen() - length)
-	if in.GetIsPersistent() != 0 {
-		(*right).SetBuf(zend.__zendMalloc((*right).GetBuflen()))
-	} else {
-		(*right).SetBuf(zend._emalloc((*right).GetBuflen()))
-	}
+	(*right).SetBuf(zend.Pemalloc((*right).GetBuflen(), in.GetIsPersistent()))
 	memcpy((*right).GetBuf(), in.GetBuf()+length, (*right).GetBuflen())
 	(*right).SetRefcount(1)
 	(*right).SetOwnBuf(1)
@@ -176,11 +163,11 @@ func PhpStreamBucketSplit(in *PhpStreamBucket, left **PhpStreamBucket, right **P
 	return zend.SUCCESS
 }
 func PhpStreamBucketDelref(bucket *PhpStreamBucket) {
-	if g.PreDec(&(bucket.GetRefcount())) == 0 {
+	if b.PreDec(&(bucket.GetRefcount())) == 0 {
 		if bucket.GetOwnBuf() != 0 {
-			g.CondF(bucket.GetIsPersistent() != 0, func() { return zend.Free(bucket.GetBuf()) }, func() { return zend._efree(bucket.GetBuf()) })
+			zend.Pefree(bucket.GetBuf(), bucket.GetIsPersistent())
 		}
-		g.CondF(bucket.GetIsPersistent() != 0, func() { return zend.Free(bucket) }, func() { return zend._efree(bucket) })
+		zend.Pefree(bucket, bucket.GetIsPersistent())
 	}
 }
 func PhpStreamBucketPrepend(brigade *PhpStreamBucketBrigade, bucket *PhpStreamBucket) {
@@ -231,42 +218,42 @@ func PhpStreamBucketUnlink(bucket *PhpStreamBucket) {
  * charsets (for example) but still be able to provide them all as filters */
 
 func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
-	var filter_hash *zend.HashTable = g.CondF1(standard.FileGlobals.stream_filters != nil, func() *zend.HashTable { return standard.FileGlobals.stream_filters }, &StreamFiltersHash)
+	var filter_hash *zend.HashTable = b.CondF1(standard.FG(stream_filters), func() __auto__ { return standard.FG(stream_filters) }, &StreamFiltersHash)
 	var factory *PhpStreamFilterFactory = nil
 	var filter *core.PhpStreamFilter = nil
 	var n int
 	var period *byte
 	n = strlen(filtername)
-	if nil != g.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, filtername, n)) {
+	if nil != b.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, filtername, n)) {
 		filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
-	} else if g.Assign(&period, strrchr(filtername, '.')) {
+	} else if b.Assign(&period, strrchr(filtername, '.')) {
 
 		/* try a wildcard */
 
 		var wildname *byte
-		wildname = zend._safeEmalloc(1, n, 3)
+		wildname = zend.SafeEmalloc(1, n, 3)
 		memcpy(wildname, filtername, n+1)
 		period = wildname + (period - filtername)
 		for period != nil && filter == nil {
-			r.Assert(period[0] == '.')
+			zend.ZEND_ASSERT(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
-			if nil != g.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {
+			if nil != b.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {
 				filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 			}
 			*period = '0'
 			period = strrchr(wildname, '.')
 		}
-		zend._efree(wildname)
+		zend.Efree(wildname)
 	}
 	if filter == nil {
 
 		/* TODO: these need correct docrefs */
 
 		if factory == nil {
-			core.PhpErrorDocref(nil, 1<<1, "unable to locate filter \"%s\"", filtername)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "unable to locate filter \"%s\"", filtername)
 		} else {
-			core.PhpErrorDocref(nil, 1<<1, "unable to create or locate filter \"%s\"", filtername)
+			core.PhpErrorDocref(nil, zend.E_WARNING, "unable to create or locate filter \"%s\"", filtername)
 		}
 
 		/* TODO: these need correct docrefs */
@@ -276,10 +263,10 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent
 }
 func _phpStreamFilterAlloc(fops *PhpStreamFilterOps, abstract any, persistent uint8) *core.PhpStreamFilter {
 	var filter *core.PhpStreamFilter
-	filter = (*core.PhpStreamFilter)(g.CondF(persistent != 0, func() any { return zend.__zendMalloc(g.SizeOf("php_stream_filter")) }, func() any { return zend._emalloc(g.SizeOf("php_stream_filter")) }))
-	memset(filter, 0, g.SizeOf("php_stream_filter"))
+	filter = (*core.PhpStreamFilter)(PemallocRelOrig(b.SizeOf("php_stream_filter"), persistent))
+	memset(filter, 0, b.SizeOf("php_stream_filter"))
 	filter.SetFops(fops)
-	filter.abstract.value.ptr = abstract
+	zend.Z_PTR(filter.GetAbstract()) = abstract
 	filter.SetIsPersistent(persistent)
 	return filter
 }
@@ -287,7 +274,7 @@ func PhpStreamFilterFree(filter *core.PhpStreamFilter) {
 	if filter.GetFops().GetDtor() != nil {
 		filter.GetFops().GetDtor()(filter)
 	}
-	g.CondF(filter.GetIsPersistent() != 0, func() { return zend.Free(filter) }, func() { return zend._efree(filter) })
+	zend.Pefree(filter, filter.GetIsPersistent())
 }
 func PhpStreamFilterPrependEx(chain *PhpStreamFilterChain, filter *core.PhpStreamFilter) int {
 	filter.SetNext(chain.GetHead())
@@ -328,7 +315,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 		var consumed int = 0
 		bucket = PhpStreamBucketNew(stream, (*byte)(stream.readbuf+stream.readpos), stream.writepos-stream.readpos, 0, 0)
 		PhpStreamBucketAppend(brig_inp, bucket)
-		status = filter.GetFops().GetFilter()(stream, filter, brig_inp, brig_outp, &consumed, 0)
+		status = filter.GetFops().GetFilter()(stream, filter, brig_inp, brig_outp, &consumed, PSFS_FLAG_NORMAL)
 		if stream.readpos+consumed > uint32(stream.writepos) {
 
 			/* No behaving filter should cause this. */
@@ -350,7 +337,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 				PhpStreamBucketUnlink(bucket)
 				PhpStreamBucketDelref(bucket)
 			}
-			core.PhpErrorDocref(nil, 1<<1, "Filter failed to process pre-buffered data")
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Filter failed to process pre-buffered data")
 			return zend.FAILURE
 		case PSFS_FEED_ME:
 
@@ -376,11 +363,7 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 
 				if stream.readbuflen-stream.writepos < bucket.GetBuflen() {
 					stream.readbuflen += bucket.GetBuflen()
-					if stream.is_persistent != 0 {
-						stream.readbuf = zend.__zendRealloc(stream.readbuf, stream.readbuflen)
-					} else {
-						stream.readbuf = zend._erealloc(stream.readbuf, stream.readbuflen)
-					}
+					stream.readbuf = zend.Perealloc(stream.readbuf, stream.readbuflen, stream.is_persistent)
 				}
 				memcpy(stream.readbuf+stream.writepos, bucket.GetBuf(), bucket.GetBuflen())
 				stream.writepos += bucket.GetBuflen()
@@ -414,7 +397,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 	var current *core.PhpStreamFilter
 	var stream *core.PhpStream
 	var flushed_size int = 0
-	var flags long = g.Cond(finish != 0, 2, 1)
+	var flags long = b.Cond(finish != 0, PSFS_FLAG_FLUSH_CLOSE, PSFS_FLAG_FLUSH_INC)
 	if filter.GetChain() == nil || filter.GetChain().GetStream() == nil {
 
 		/* Filter is not attached to a chain, or chain is somehow not part of a stream */
@@ -450,7 +433,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 		outp = brig_temp
 		outp.SetHead(nil)
 		outp.SetTail(nil)
-		flags = 0
+		flags = PSFS_FLAG_NORMAL
 	}
 
 	/* Last filter returned data via PSFS_PASS_ON
@@ -484,16 +467,12 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 			/* Grow the buffer */
 
-			if stream.is_persistent != 0 {
-				stream.readbuf = zend.__zendRealloc(stream.readbuf, stream.writepos+flushed_size+stream.chunk_size)
-			} else {
-				stream.readbuf = zend._erealloc(stream.readbuf, stream.writepos+flushed_size+stream.chunk_size)
-			}
+			stream.readbuf = zend.Perealloc(stream.readbuf, stream.writepos+flushed_size+stream.chunk_size, stream.is_persistent)
 
 			/* Grow the buffer */
 
 		}
-		for g.Assign(&bucket, inp.GetHead()) {
+		for b.Assign(&bucket, inp.GetHead()) {
 			memcpy(stream.readbuf+stream.writepos, bucket.GetBuf(), bucket.GetBuflen())
 			stream.writepos += bucket.GetBuflen()
 			PhpStreamBucketUnlink(bucket)
@@ -503,7 +482,7 @@ func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
 
 		/* Send flushed data to the stream */
 
-		for g.Assign(&bucket, inp.GetHead()) {
+		for b.Assign(&bucket, inp.GetHead()) {
 			var count ssize_t = stream.ops.write(stream, bucket.GetBuf(), bucket.GetBuflen())
 			if count > 0 {
 				stream.position += count

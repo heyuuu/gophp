@@ -6,21 +6,16 @@ package runtime
 
 type __sFILE = FILE
 
-// #define BUFSIZ       1024
-
-// #define EOF       ( - 1 )
+const BUFSIZ = 1024
+const EOF = -1
 
 /* must be == _POSIX_STREAM_MAX <limits.h> */
 
-// #define FOPEN_MAX       20
-
-// #define FILENAME_MAX       1024
-
-// #define SEEK_SET       0
-
-// #define SEEK_CUR       1
-
-// #define SEEK_END       2
+const FOPEN_MAX = 20
+const FILENAME_MAX = 1024
+const SEEK_SET = 0
+const SEEK_CUR = 1
+const SEEK_END = 2
 
 var Clearerr func(*FILE)
 var Fclose func(*FILE) int

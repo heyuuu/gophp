@@ -3,7 +3,10 @@
 package streams
 
 import (
+	b "sik/builtin"
 	"sik/core"
+	"sik/ext/standard"
+	"sik/zend"
 )
 
 // Source: <main/streams/php_stream_context.h>
@@ -28,52 +31,73 @@ import (
 
 type PhpStreamNotificationFunc func(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any)
 
-// #define PHP_STREAM_NOTIFIER_PROGRESS       1
+const PHP_STREAM_NOTIFIER_PROGRESS = 1
 
 /* Attempt to fetch context from the zval passed,
    If no context was passed, use the default context
    The default context has not yet been created, do it now. */
 
-// #define php_stream_context_from_zval(zcontext,nocontext) ( ( zcontext ) ? zend_fetch_resource_ex ( zcontext , "Stream-Context" , php_le_stream_context ( ) ) : ( nocontext ) ? NULL : FG ( default_context ) ? FG ( default_context ) : ( FG ( default_context ) = php_stream_context_alloc ( ) ) )
-
-// #define php_stream_context_to_zval(context,zval) { ZVAL_RES ( zval , ( context ) -> res ) ; GC_ADDREF ( ( context ) -> res ) ; }
+func PhpStreamContextFromZval(zcontext *zend.Zval, nocontext int) __auto__ {
+	if b.CondF2(b.CondF1(zcontext != nil, func() any { return zend.ZendFetchResourceEx(zcontext, "Stream-Context", standard.PhpLeStreamContext()) }, nocontext), nil, func() __auto__ { return standard.FG(default_context) }) {
+		return standard.FG(default_context)
+	} else {
+		standard.FG(default_context) = PhpStreamContextAlloc()
+		return standard.FG(default_context)
+	}
+}
+func PhpStreamContextToZval(context *core.PhpStreamContext, zval *zend.Zval) {
+	zend.ZVAL_RES(zval, context.GetRes())
+	zend.GC_ADDREF(context.GetRes())
+}
 
 /* not all notification codes are implemented */
 
-// #define PHP_STREAM_NOTIFY_RESOLVE       1
+const PHP_STREAM_NOTIFY_RESOLVE = 1
+const PHP_STREAM_NOTIFY_CONNECT = 2
+const PHP_STREAM_NOTIFY_AUTH_REQUIRED = 3
+const PHP_STREAM_NOTIFY_MIME_TYPE_IS = 4
+const PHP_STREAM_NOTIFY_FILE_SIZE_IS = 5
+const PHP_STREAM_NOTIFY_REDIRECTED = 6
+const PHP_STREAM_NOTIFY_PROGRESS = 7
+const PHP_STREAM_NOTIFY_COMPLETED = 8
+const PHP_STREAM_NOTIFY_FAILURE = 9
+const PHP_STREAM_NOTIFY_AUTH_RESULT = 10
+const PHP_STREAM_NOTIFY_SEVERITY_INFO = 0
+const PHP_STREAM_NOTIFY_SEVERITY_WARN = 1
+const PHP_STREAM_NOTIFY_SEVERITY_ERR = 2
 
-// #define PHP_STREAM_NOTIFY_CONNECT       2
-
-// #define PHP_STREAM_NOTIFY_AUTH_REQUIRED       3
-
-// #define PHP_STREAM_NOTIFY_MIME_TYPE_IS       4
-
-// #define PHP_STREAM_NOTIFY_FILE_SIZE_IS       5
-
-// #define PHP_STREAM_NOTIFY_REDIRECTED       6
-
-// #define PHP_STREAM_NOTIFY_PROGRESS       7
-
-// #define PHP_STREAM_NOTIFY_COMPLETED       8
-
-// #define PHP_STREAM_NOTIFY_FAILURE       9
-
-// #define PHP_STREAM_NOTIFY_AUTH_RESULT       10
-
-// #define PHP_STREAM_NOTIFY_SEVERITY_INFO       0
-
-// #define PHP_STREAM_NOTIFY_SEVERITY_WARN       1
-
-// #define PHP_STREAM_NOTIFY_SEVERITY_ERR       2
-
-// #define php_stream_notify_info(context,code,xmsg,xcode) do { if ( ( context ) && ( context ) -> notifier ) { php_stream_notification_notify ( ( context ) , ( code ) , PHP_STREAM_NOTIFY_SEVERITY_INFO , ( xmsg ) , ( xcode ) , 0 , 0 , NULL ) ; } } while ( 0 )
-
-// #define php_stream_notify_progress(context,bsofar,bmax) do { if ( ( context ) && ( context ) -> notifier ) { php_stream_notification_notify ( ( context ) , PHP_STREAM_NOTIFY_PROGRESS , PHP_STREAM_NOTIFY_SEVERITY_INFO , NULL , 0 , ( bsofar ) , ( bmax ) , NULL ) ; } } while ( 0 )
-
-// #define php_stream_notify_progress_init(context,sofar,bmax) do { if ( ( context ) && ( context ) -> notifier ) { ( context ) -> notifier -> progress = ( sofar ) ; ( context ) -> notifier -> progress_max = ( bmax ) ; ( context ) -> notifier -> mask |= PHP_STREAM_NOTIFIER_PROGRESS ; php_stream_notify_progress ( ( context ) , ( sofar ) , ( bmax ) ) ; } } while ( 0 )
-
-// #define php_stream_notify_progress_increment(context,dsofar,dmax) do { if ( ( context ) && ( context ) -> notifier && ( context ) -> notifier -> mask & PHP_STREAM_NOTIFIER_PROGRESS ) { ( context ) -> notifier -> progress += ( dsofar ) ; ( context ) -> notifier -> progress_max += ( dmax ) ; php_stream_notify_progress ( ( context ) , ( context ) -> notifier -> progress , ( context ) -> notifier -> progress_max ) ; } } while ( 0 )
-
-// #define php_stream_notify_file_size(context,file_size,xmsg,xcode) do { if ( ( context ) && ( context ) -> notifier ) { php_stream_notification_notify ( ( context ) , PHP_STREAM_NOTIFY_FILE_SIZE_IS , PHP_STREAM_NOTIFY_SEVERITY_INFO , ( xmsg ) , ( xcode ) , 0 , ( file_size ) , NULL ) ; } } while ( 0 )
-
-// #define php_stream_notify_error(context,code,xmsg,xcode) do { if ( ( context ) && ( context ) -> notifier ) { php_stream_notification_notify ( ( context ) , ( code ) , PHP_STREAM_NOTIFY_SEVERITY_ERR , ( xmsg ) , ( xcode ) , 0 , 0 , NULL ) ; } } while ( 0 )
+func PhpStreamNotifyInfo(context *core.PhpStreamContext, code zend.ZendLong, xmsg *byte, xcode int) {
+	if context != nil && context.GetNotifier() != nil {
+		PhpStreamNotificationNotify(context, code, PHP_STREAM_NOTIFY_SEVERITY_INFO, xmsg, xcode, 0, 0, nil)
+	}
+}
+func PhpStreamNotifyProgress(context *core.PhpStreamContext, bsofar int, bmax int) {
+	if context != nil && context.GetNotifier() != nil {
+		PhpStreamNotificationNotify(context, PHP_STREAM_NOTIFY_PROGRESS, PHP_STREAM_NOTIFY_SEVERITY_INFO, nil, 0, bsofar, bmax, nil)
+	}
+}
+func PhpStreamNotifyProgressInit(context *core.PhpStreamContext, sofar int, bmax int) {
+	if context != nil && context.GetNotifier() != nil {
+		context.GetNotifier().SetProgress(sofar)
+		context.GetNotifier().SetProgressMax(bmax)
+		context.GetNotifier().SetMask(context.GetNotifier().GetMask() | PHP_STREAM_NOTIFIER_PROGRESS)
+		PhpStreamNotifyProgress(context, sofar, bmax)
+	}
+}
+func PhpStreamNotifyProgressIncrement(context *core.PhpStreamContext, dsofar ssize_t, dmax int) {
+	if context != nil && context.GetNotifier() != nil && (context.GetNotifier().GetMask()&PHP_STREAM_NOTIFIER_PROGRESS) != 0 {
+		context.GetNotifier().SetProgress(context.GetNotifier().GetProgress() + dsofar)
+		context.GetNotifier().SetProgressMax(context.GetNotifier().GetProgressMax() + dmax)
+		PhpStreamNotifyProgress(context, context.GetNotifier().GetProgress(), context.GetNotifier().GetProgressMax())
+	}
+}
+func PhpStreamNotifyFileSize(context *core.PhpStreamContext, file_size int, xmsg *byte, xcode int) {
+	if context != nil && context.GetNotifier() != nil {
+		PhpStreamNotificationNotify(context, PHP_STREAM_NOTIFY_FILE_SIZE_IS, PHP_STREAM_NOTIFY_SEVERITY_INFO, xmsg, xcode, 0, file_size, nil)
+	}
+}
+func PhpStreamNotifyError(context *core.PhpStreamContext, code zend.ZendLong, xmsg *byte, xcode int) {
+	if context != nil && context.GetNotifier() != nil {
+		PhpStreamNotificationNotify(context, code, PHP_STREAM_NOTIFY_SEVERITY_ERR, xmsg, xcode, 0, 0, nil)
+	}
+}

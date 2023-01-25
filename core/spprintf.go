@@ -3,7 +3,7 @@
 package core
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -35,13 +35,10 @@ import (
 
 // # include "zend_smart_string_public.h"
 
-// #define spprintf       zend_spprintf
-
-// #define strpprintf       zend_strpprintf
-
-// #define vspprintf       zend_vspprintf
-
-// #define vstrpprintf       zend_vstrpprintf
+const Spprintf = zend.ZendSpprintf
+const Strpprintf = zend.ZendStrpprintf
+const Vspprintf = zend.ZendVspprintf
+const Vstrpprintf = zend.ZendVstrpprintf
 
 // Source: <main/spprintf.c>
 
@@ -87,25 +84,7 @@ import (
 
 // # include < locale . h >
 
-// #define LCONV_DECIMAL_POINT       ( * lconv -> decimal_point )
-
 // # include "snprintf.h"
-
-// #define FALSE       0
-
-// #define TRUE       1
-
-// #define NUL       '\0'
-
-// #define INT_NULL       ( ( int * ) 0 )
-
-// #define S_NULL       "(null)"
-
-// #define S_NULL_LEN       6
-
-// #define FLOAT_DIGITS       6
-
-// #define EXPONENT_LENGTH       10
 
 // # include "zend_smart_str.h"
 
@@ -115,20 +94,29 @@ import (
 
 // #define INS_CHAR(xbuf,ch,is_char) do { if ( ( is_char ) ) { smart_string_appendc ( ( smart_string * ) ( xbuf ) , ( ch ) ) ; } else { smart_str_appendc ( ( smart_str * ) ( xbuf ) , ( ch ) ) ; } } while ( 0 ) ;
 
-// #define INS_STRING(xbuf,str,len,is_char) do { if ( ( is_char ) ) { smart_string_appendl ( ( smart_string * ) ( xbuf ) , ( str ) , ( len ) ) ; } else { smart_str_appendl ( ( smart_str * ) ( xbuf ) , ( str ) , ( len ) ) ; } } while ( 0 ) ;
-
-// #define PAD_CHAR(xbuf,ch,count,is_char) do { if ( ( is_char ) ) { smart_string_alloc ( ( ( smart_string * ) ( xbuf ) ) , ( count ) , 0 ) ; memset ( ( ( smart_string * ) ( xbuf ) ) -> c + ( ( smart_string * ) ( xbuf ) ) -> len , ( ch ) , ( count ) ) ; ( ( smart_string * ) ( xbuf ) ) -> len += ( count ) ; } else { smart_str_alloc ( ( ( smart_str * ) ( xbuf ) ) , ( count ) , 0 ) ; memset ( ZSTR_VAL ( ( ( smart_str * ) ( xbuf ) ) -> s ) + ZSTR_LEN ( ( ( smart_str * ) ( xbuf ) ) -> s ) , ( ch ) , ( count ) ) ; ZSTR_LEN ( ( ( smart_str * ) ( xbuf ) ) -> s ) += ( count ) ; } } while ( 0 ) ;
+func INS_STRING(xbuf any, str *byte, len_ int, is_char zend.ZendBool) {
+	if is_char != 0 {
+		zend.SmartStringAppendl((*zend.SmartString)(xbuf), str, len_)
+	} else {
+		zend.SmartStrAppendl((*zend.SmartStr)(xbuf), str, len_)
+	}
+}
+func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {
+	if is_char != 0 {
+		zend.SmartStringAlloc((*zend.SmartString)(xbuf), count, 0)
+		memset((*zend.SmartString)(xbuf).c+(*zend.SmartString)(xbuf).len_, ch, count)
+		(*zend.SmartString)(xbuf).len_ += count
+	} else {
+		zend.SmartStrAlloc((*zend.SmartStr)(xbuf), count, 0)
+		memset(zend.ZSTR_VAL((*zend.SmartStr)(xbuf).s)+zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s), ch, count)
+		zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s) += count
+	}
+}
 
 /*
  * NUM_BUF_SIZE is the size of the buffer used for arithmetic conversions
  * which can be at most max length of double
  */
-
-// #define NUM_BUF_SIZE       PHP_DOUBLE_MAX_LENGTH
-
-// #define NUM(c) ( c - '0' )
-
-// #define STR_TO_DEC(str,num) do { num = NUM ( * str ++ ) ; while ( isdigit ( ( int ) * str ) ) { num *= 10 ; num += NUM ( * str ++ ) ; if ( num >= INT_MAX / 10 ) { while ( isdigit ( ( int ) * str ++ ) ) ; break ; } } } while ( 0 )
 
 /*
  * This macro does zero padding so that the precision
@@ -136,8 +124,6 @@ import (
  * adding '0's to the left of the string that is going
  * to be printed.
  */
-
-// #define FIX_PRECISION(adjust,precision,s,s_len) do { if ( adjust ) while ( s_len < ( size_t ) precision ) { * -- s = '0' ; s_len ++ ; } } while ( 0 )
 
 /* }}} */
 
@@ -177,9 +163,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 	for *fmt {
 		if (*fmt) != '%' {
 			if is_char != 0 {
-				zend.SmartStringAppendcEx((*zend.SmartString)(xbuf), *fmt, 0)
+				zend.SmartStringAppendc((*zend.SmartString)(xbuf), *fmt)
 			} else {
-				zend.SmartStrAppendcEx((*zend.SmartStr)(xbuf), *fmt, 0)
+				zend.SmartStrAppendc((*zend.SmartStr)(xbuf), *fmt)
 			}
 		} else {
 
@@ -192,7 +178,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 			print_sign = print_blank
 			alternate_form = print_sign
 			pad_char = ' '
-			prefix_char = '0'
+			prefix_char = NUL
 			free_zcopy = 0
 			fmt++
 
@@ -227,20 +213,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				 */
 
 				if isdigit(int(*fmt)) {
-					for {
-						min_width = g.PostInc(&(*fmt)) - '0'
-						for isdigit(int(*fmt)) {
-							min_width *= 10
-							min_width += g.PostInc(&(*fmt)) - '0'
-							if min_width >= 2147483647/10 {
-								for isdigit(int(g.PostInc(&(*fmt)))) {
-
-								}
-								break
-							}
-						}
-						break
-					}
+					STR_TO_DEC(fmt, min_width)
 					adjust_width = YES
 				} else if (*fmt) == '*' {
 					min_width = __va_arg(ap, int(_))
@@ -262,20 +235,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					adjust_precision = YES
 					fmt++
 					if isdigit(int(*fmt)) {
-						for {
-							precision = g.PostInc(&(*fmt)) - '0'
-							for isdigit(int(*fmt)) {
-								precision *= 10
-								precision += g.PostInc(&(*fmt)) - '0'
-								if precision >= 2147483647/10 {
-									for isdigit(int(g.PostInc(&(*fmt)))) {
-
-									}
-									break
-								}
-							}
-							break
-						}
+						STR_TO_DEC(fmt, precision)
 					} else if (*fmt) == '*' {
 						precision = __va_arg(ap, int(_))
 						fmt++
@@ -285,8 +245,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					} else {
 						precision = 0
 					}
-					if precision > 500 {
-						precision = 500
+					if precision > FORMAT_CONV_MAX_PRECISION {
+						precision = FORMAT_CONV_MAX_PRECISION
 					}
 				} else {
 					adjust_precision = NO
@@ -381,8 +341,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				if free_zcopy != 0 {
 					zvp = &zcopy
 				}
-				s_len = zvp.value.str.len_
-				s = zvp.value.str.val
+				s_len = zend.Z_STRLEN_P(zvp)
+				s = zend.Z_STRVAL_P(zvp)
 				if adjust_precision != 0 && int(precision < s_len) != 0 {
 					s_len = precision
 				}
@@ -448,13 +408,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 						break
 					}
 				}
-				s = ApPhpConv10(i_num, (*fmt) == 'u', &is_negative, &num_buf[1080], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConv10(i_num, (*fmt) == 'u', &is_negative, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if (*fmt) != 'u' {
 					if is_negative != 0 {
 						prefix_char = '-'
@@ -491,15 +446,10 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
 					break
 				}
-				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[1080], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && (*s) != '0' {
-					*(g.PreDec(&s)) = '0'
+					*(b.PreDec(&s)) = '0'
 					s_len++
 				}
 				break
@@ -531,16 +481,11 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
 					break
 				}
-				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[1080], &s_len)
-				if adjust_precision != 0 {
-					for s_len < int(precision) {
-						*(g.PreDec(&s)) = '0'
-						s_len++
-					}
-				}
+				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
+				FIX_PRECISION(adjust_precision, precision, s, s_len)
 				if alternate_form != 0 && ui_num != 0 {
-					*(g.PreDec(&s)) = *fmt
-					*(g.PreDec(&s)) = '0'
+					*(b.PreDec(&s)) = *fmt
+					*(b.PreDec(&s)) = '0'
 					s_len += 2
 				}
 				break
@@ -555,8 +500,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 						s_len = strnlen(s, precision)
 					}
 				} else {
-					s = "(null)"
-					s_len = 6
+					s = S_NULL
+					s_len = S_NULL_LEN
 				}
 				pad_char = ' '
 				break
@@ -577,17 +522,17 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				default:
 					goto fmt_error
 				}
-				if isnan(fp_num) {
+				if ZendIsnan(fp_num) {
 					s = "nan"
 					s_len = 3
-				} else if isinf(fp_num) {
+				} else if ZendIsinf(fp_num) {
 					s = "inf"
 					s_len = 3
 				} else {
 					if lconv == nil {
 						lconv = localeconv()
 					}
-					s = PhpConvFp(g.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, g.Cond(adjust_precision == NO, 6, precision), g.CondF1((*fmt) == 'f', func() __auto__ { return (*lconv).decimal_point }, '.'), &is_negative, &num_buf[1], &s_len)
+					s = PhpConvFp(b.Cond((*fmt) == 'f', 'F', *fmt), fp_num, alternate_form, b.Cond(adjust_precision == NO, FLOAT_DIGITS, precision), b.Cond((*fmt) == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
 					if is_negative != 0 {
 						prefix_char = '-'
 					} else if print_sign != 0 {
@@ -614,11 +559,11 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				default:
 					goto fmt_error
 				}
-				if isnan(fp_num) {
+				if ZendIsnan(fp_num) {
 					s = "NAN"
 					s_len = 3
 					break
-				} else if isinf(fp_num) {
+				} else if ZendIsinf(fp_num) {
 					if fp_num > 0 {
 						s = "INF"
 						s_len = 3
@@ -629,7 +574,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					break
 				}
 				if adjust_precision == NO {
-					precision = 6
+					precision = FLOAT_DIGITS
 				} else if precision == 0 {
 					precision = 1
 				}
@@ -641,7 +586,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				if lconv == nil {
 					lconv = localeconv()
 				}
-				s = PhpGcvt(fp_num, precision, g.CondF2((*fmt) == 'H' || (*fmt) == 'k', '.', func() __auto__ { return (*lconv).decimal_point }), g.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
+				s = PhpGcvt(fp_num, precision, b.Cond((*fmt) == 'H' || (*fmt) == 'k', '.', LCONV_DECIMAL_POINT), b.Cond((*fmt) == 'G' || (*fmt) == 'H', 'E', 'e'), &num_buf[1])
 				if (*s) == '-' {
 					*s++
 					prefix_char = (*s) - 1
@@ -652,7 +597,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				}
 				s_len = strlen(s)
 				if alternate_form != 0 && strchr(s, '.') == nil {
-					s[g.PostInc(&s_len)] = '.'
+					s[b.PostInc(&s_len)] = '.'
 				}
 				break
 			case 'c':
@@ -671,16 +616,16 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				if is_char != 0 {
 					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartString)(xbuf).len_)
 				} else {
-					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartStr)(xbuf).s.len_)
+					*(__va_arg(ap, (*int)(_))) = int(zend.ZSTR_LEN((*zend.SmartStr)(xbuf).s))
 				}
 				goto skip_output
 			case 'p':
-				if g.SizeOf("char *") <= g.SizeOf("u_wide_int") {
+				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))
-					s = ApPhpConvP2(ui_num, 4, 'x', &num_buf[1080], &s_len)
+					s = ApPhpConvP2(ui_num, 4, 'x', &num_buf[NUM_BUF_SIZE], &s_len)
 					if ui_num != 0 {
-						*(g.PreDec(&s)) = 'x'
-						*(g.PreDec(&s)) = '0'
+						*(b.PreDec(&s)) = 'x'
+						*(b.PreDec(&s)) = '0'
 						s_len += 2
 					}
 				} else {
@@ -689,7 +634,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				}
 				pad_char = ' '
 				break
-			case '0':
+			case NUL:
 
 				/*
 				 * The last character of the format string was %.
@@ -698,7 +643,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 
 				continue
 			fmt_error:
-				zend.ZendError(1<<0, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
+				PhpError(zend.E_ERROR, "Illegal length modifier specified '%c' in s[np]printf call", *fmt)
 			default:
 				char_buf[0] = '%'
 				char_buf[1] = *fmt
@@ -707,51 +652,31 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				pad_char = ' '
 				break
 			}
-			if prefix_char != '0' {
-				*(g.PreDec(&s)) = prefix_char
+			if prefix_char != NUL {
+				*(b.PreDec(&s)) = prefix_char
 				s_len++
 			}
 			if adjust_width != 0 && adjust == RIGHT && int(min_width > s_len) != 0 {
-				if pad_char == '0' && prefix_char != '0' {
+				if pad_char == '0' && prefix_char != NUL {
 					if is_char != 0 {
-						zend.SmartStringAppendcEx((*zend.SmartString)(xbuf), *s, 0)
+						zend.SmartStringAppendc((*zend.SmartString)(xbuf), *s)
 					} else {
-						zend.SmartStrAppendcEx((*zend.SmartStr)(xbuf), *s, 0)
+						zend.SmartStrAppendc((*zend.SmartStr)(xbuf), *s)
 					}
 					s++
 					s_len--
 					min_width--
 				}
-				if is_char != 0 {
-					zend.SmartStringAlloc((*zend.SmartString)(xbuf), min_width-s_len, 0)
-					memset((*zend.SmartString)(xbuf).c+(*zend.SmartString)(xbuf).len_, pad_char, min_width-s_len)
-					(*zend.SmartString)(xbuf).len_ += min_width - s_len
-				} else {
-					zend.SmartStrAlloc((*zend.SmartStr)(xbuf), min_width-s_len, 0)
-					memset((*zend.SmartStr)(xbuf).s.val+(*zend.SmartStr)(xbuf).s.len_, pad_char, min_width-s_len)
-					(*zend.SmartStr)(xbuf).s.len_ += min_width - s_len
-				}
+				PAD_CHAR(xbuf, pad_char, min_width-s_len, is_char)
 			}
 
 			/*
 			 * Print the string s.
 			 */
 
-			if is_char != 0 {
-				zend.SmartStringAppendlEx((*zend.SmartString)(xbuf), s, s_len, 0)
-			} else {
-				zend.SmartStrAppendlEx((*zend.SmartStr)(xbuf), s, s_len, 0)
-			}
+			INS_STRING(xbuf, s, s_len, is_char)
 			if adjust_width != 0 && adjust == LEFT && int(min_width > s_len) != 0 {
-				if is_char != 0 {
-					zend.SmartStringAlloc((*zend.SmartString)(xbuf), min_width-s_len, 0)
-					memset((*zend.SmartString)(xbuf).c+(*zend.SmartString)(xbuf).len_, pad_char, min_width-s_len)
-					(*zend.SmartString)(xbuf).len_ += min_width - s_len
-				} else {
-					zend.SmartStrAlloc((*zend.SmartStr)(xbuf), min_width-s_len, 0)
-					memset((*zend.SmartStr)(xbuf).s.val+(*zend.SmartStr)(xbuf).s.len_, pad_char, min_width-s_len)
-					(*zend.SmartStr)(xbuf).s.len_ += min_width - s_len
-				}
+				PAD_CHAR(xbuf, pad_char, min_width-s_len, is_char)
 			}
 			if free_zcopy != 0 {
 				zend.ZvalPtrDtorStr(&zcopy)

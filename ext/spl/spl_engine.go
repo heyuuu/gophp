@@ -3,7 +3,7 @@
 package spl
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -40,7 +40,7 @@ import (
 func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval) int {
 	var func_ *zend.ZendFunction = pce.constructor
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.common.function_name.val, func_.common.function_name.len_, nil, 1, arg1, nil)
+	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.common.function_name), zend.ZSTR_LEN(func_.common.function_name), nil, 1, arg1, nil)
 	return 0
 }
 
@@ -49,7 +49,7 @@ func SplInstantiateArgEx1(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zen
 func SplInstantiateArgEx2(pce *zend.ZendClassEntry, retval *zend.Zval, arg1 *zend.Zval, arg2 *zend.Zval) int {
 	var func_ *zend.ZendFunction = pce.constructor
 	SplInstantiate(pce, retval)
-	zend.ZendCallMethod(retval, pce, &func_, func_.common.function_name.val, func_.common.function_name.len_, nil, 2, arg1, arg2)
+	zend.ZendCallMethod(retval, pce, &func_, zend.ZSTR_VAL(func_.common.function_name), zend.ZSTR_LEN(func_.common.function_name), nil, 2, arg1, arg2)
 	return 0
 }
 
@@ -61,23 +61,16 @@ func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *zend.Zval, argc int, a
 	var fcc zend.ZendFcallInfoCache
 	var dummy zend.Zval
 	SplInstantiate(pce, retval)
-	fci.size = g.SizeOf("zend_fcall_info")
-	var __z *zend.Zval = &fci.function_name
-	var __s *zend.ZendString = func_.common.function_name
-	__z.value.str = __s
-	if (zend.ZvalGcFlags(__s.gc.u.type_info) & 1 << 6) != 0 {
-		__z.u1.type_info = 6
-	} else {
-		__z.u1.type_info = 6 | 1<<0<<8
-	}
-	fci.object = retval.value.obj
+	fci.size = b.SizeOf("zend_fcall_info")
+	zend.ZVAL_STR(&fci.function_name, func_.common.function_name)
+	fci.object = zend.Z_OBJ_P(retval)
 	fci.retval = &dummy
 	fci.param_count = argc
 	fci.params = argv
 	fci.no_separation = 1
 	fcc.function_handler = func_
 	fcc.called_scope = pce
-	fcc.object = retval.value.obj
+	fcc.object = zend.Z_OBJ_P(retval)
 	zend.ZendCallFunction(&fci, &fcc)
 }
 
@@ -128,25 +121,25 @@ func SplInstantiate(pce *zend.ZendClassEntry, object *zend.Zval) { zend.ObjectIn
 func SplOffsetConvertToLong(offset *zend.Zval) zend.ZendLong {
 	var idx zend.ZendUlong
 try_again:
-	switch offset.u1.v.type_ {
-	case 6:
-		if zend._zendHandleNumericStr(offset.value.str.val, offset.value.str.len_, &idx) != 0 {
+	switch zend.Z_TYPE_P(offset) {
+	case zend.IS_STRING:
+		if zend.ZEND_HANDLE_NUMERIC(zend.Z_STR_P(offset), idx) != 0 {
 			return idx
 		}
 		break
-	case 5:
-		return zend_long(*offset).value.dval
-	case 4:
-		return offset.value.lval
-	case 2:
+	case zend.IS_DOUBLE:
+		return zend.ZendLong(zend.Z_DVAL_P(offset))
+	case zend.IS_LONG:
+		return zend.Z_LVAL_P(offset)
+	case zend.IS_FALSE:
 		return 0
-	case 3:
+	case zend.IS_TRUE:
 		return 1
-	case 10:
-		offset = &(*offset).value.ref.val
+	case zend.IS_REFERENCE:
+		offset = zend.Z_REFVAL_P(offset)
 		goto try_again
-	case 9:
-		return offset.value.res.handle
+	case zend.IS_RESOURCE:
+		return zend.Z_RES_HANDLE_P(offset)
 	}
 	return -1
 }

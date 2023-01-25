@@ -3,8 +3,8 @@
 package standard
 
 import (
-	r "sik/runtime"
-	g "sik/runtime/grammar"
+	b "sik/builtin"
+	"sik/core"
 	"sik/zend"
 )
 
@@ -34,7 +34,7 @@ import (
 
 // # include "url.h"
 
-// #define URL_DEFAULT_ARG_SEP       "&"
+const URL_DEFAULT_ARG_SEP = "&"
 
 /* {{{ php_url_encode_hash */
 
@@ -51,7 +51,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 	if ht == nil {
 		return zend.FAILURE
 	}
-	if (zend.ZvalGcFlags(ht.gc.u.type_info) & 1 << 5) != 0 {
+	if zend.GC_IS_RECURSIVE(ht) != 0 {
 
 		/* Prevent recursion */
 
@@ -61,9 +61,9 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 
 	}
 	if arg_sep == nil {
-		arg_sep = zend.ZendIniStringEx("arg_separator.output", g.SizeOf("\"arg_separator.output\"")-1, 0, nil)
+		arg_sep = zend.INI_STR("arg_separator.output")
 		if arg_sep == nil || !(strlen(arg_sep)) {
-			arg_sep = "&"
+			arg_sep = URL_DEFAULT_ARG_SEP
 		}
 	}
 	arg_sep_len = strlen(arg_sep)
@@ -74,16 +74,16 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = &_p.val
 
-			if _z.u1.v.type_ == 0 {
+			if zend.UNEXPECTED(zend.Z_TYPE_P(_z) == zend.IS_UNDEF) {
 				continue
 			}
 			idx = _p.h
 			key = _p.key
 			zdata = _z
 			var is_dynamic zend.ZendBool = 1
-			if zdata.u1.v.type_ == 13 {
-				zdata = zdata.value.zv
-				if zdata.u1.v.type_ == 0 {
+			if zend.Z_TYPE_P(zdata) == zend.IS_INDIRECT {
+				zdata = zend.Z_INDIRECT_P(zdata)
+				if zend.Z_ISUNDEF_P(zdata) {
 					continue
 				}
 				is_dynamic = 0
@@ -92,9 +92,9 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 			/* handling for private & protected object properties */
 
 			if key != nil {
-				prop_name = key.val
-				prop_len = key.len_
-				if type_ != nil && zend.ZendCheckPropertyAccess(type_.value.obj, key, is_dynamic) != zend.SUCCESS {
+				prop_name = zend.ZSTR_VAL(key)
+				prop_len = zend.ZSTR_LEN(key)
+				if type_ != nil && zend.ZendCheckPropertyAccess(zend.Z_OBJ_P(type_), key, is_dynamic) != zend.SUCCESS {
 
 					/* property not visible in this scope */
 
@@ -103,45 +103,43 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					/* property not visible in this scope */
 
 				}
-				if key.val[0] == '0' && type_ != nil {
+				if zend.ZSTR_VAL(key)[0] == '0' && type_ != nil {
 					var tmp *byte
 					zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
 				} else {
-					prop_name = key.val
-					prop_len = key.len_
+					prop_name = zend.ZSTR_VAL(key)
+					prop_len = zend.ZSTR_LEN(key)
 				}
 			} else {
 				prop_name = nil
 				prop_len = 0
 			}
-			if zdata.u1.v.type_ == 10 {
-				zdata = &(*zdata).value.ref.val
-			}
-			if zdata.u1.v.type_ == 7 || zdata.u1.v.type_ == 8 {
+			zend.ZVAL_DEREF(zdata)
+			if zend.Z_TYPE_P(zdata) == zend.IS_ARRAY || zend.Z_TYPE_P(zdata) == zend.IS_OBJECT {
 				if key != nil {
 					var ekey *zend.ZendString
-					if enc_type == 2 {
+					if enc_type == PHP_QUERY_RFC3986 {
 						ekey = PhpRawUrlEncode(prop_name, prop_len)
 					} else {
 						ekey = PhpUrlEncode(prop_name, prop_len)
 					}
-					newprefix_len = key_suffix_len + ekey.len_ + key_prefix_len + 3
-					newprefix = zend._emalloc(newprefix_len + 1)
+					newprefix_len = key_suffix_len + zend.ZSTR_LEN(ekey) + key_prefix_len + 3
+					newprefix = zend.Emalloc(newprefix_len + 1)
 					p = newprefix
 					if key_prefix != nil {
 						memcpy(p, key_prefix, key_prefix_len)
 						p += key_prefix_len
 					}
-					memcpy(p, ekey.val, ekey.len_)
-					p += ekey.len_
+					memcpy(p, zend.ZSTR_VAL(ekey), zend.ZSTR_LEN(ekey))
+					p += zend.ZSTR_LEN(ekey)
 					zend.ZendStringFree(ekey)
 					if key_suffix {
 						memcpy(p, key_suffix, key_suffix_len)
 						p += key_suffix_len
 					}
-					*(g.PostInc(&p)) = '%'
-					*(g.PostInc(&p)) = '5'
-					*(g.PostInc(&p)) = 'B'
+					*(b.PostInc(&p)) = '%'
+					*(b.PostInc(&p)) = '5'
+					*(b.PostInc(&p)) = 'B'
 					*p = '0'
 				} else {
 					var ekey *byte
@@ -149,9 +147,9 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 
 					/* Is an integer key */
 
-					ekey_len = zend.ZendSpprintf(&ekey, 0, "%"+"lld", idx)
+					ekey_len = core.Spprintf(&ekey, 0, zend.ZEND_LONG_FMT, idx)
 					newprefix_len = key_prefix_len + num_prefix_len + ekey_len + key_suffix_len + 3
-					newprefix = zend._emalloc(newprefix_len + 1)
+					newprefix = zend.Emalloc(newprefix_len + 1)
 					p = newprefix
 					if key_prefix != nil {
 						memcpy(p, key_prefix, key_prefix_len)
@@ -163,31 +161,25 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					}
 					memcpy(p, ekey, ekey_len)
 					p += ekey_len
-					zend._efree(ekey)
+					zend.Efree(ekey)
 					if key_suffix {
 						memcpy(p, key_suffix, key_suffix_len)
 						p += key_suffix_len
 					}
-					*(g.PostInc(&p)) = '%'
-					*(g.PostInc(&p)) = '5'
-					*(g.PostInc(&p)) = 'B'
+					*(b.PostInc(&p)) = '%'
+					*(b.PostInc(&p)) = '5'
+					*(b.PostInc(&p)) = 'B'
 					*p = '0'
 				}
-				if (zend.ZvalGcFlags(ht.gc.u.type_info) & 1 << 6) == 0 {
-					ht.gc.u.type_info |= 1 << 5 << 0
+				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
+					zend.GC_PROTECT_RECURSION(ht)
 				}
-				PhpUrlEncodeHashEx(g.CondF(zdata.u1.v.type_ == 7, func() *zend.ZendArray { return zdata.value.arr }, func() __auto__ {
-					if zdata.u1.v.type_ == 8 {
-						return zdata.value.obj.handlers.get_properties(zdata)
-					} else {
-						return nil
-					}
-				}), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, g.Cond(zdata.u1.v.type_ == 8, zdata, nil), arg_sep, enc_type)
-				if (zend.ZvalGcFlags(ht.gc.u.type_info) & 1 << 6) == 0 {
-					ht.gc.u.type_info &= ^(1 << 5 << 0)
+				PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zend.Z_TYPE_P(zdata) == zend.IS_OBJECT, zdata, nil), arg_sep, enc_type)
+				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
+					zend.GC_UNPROTECT_RECURSION(ht)
 				}
-				zend._efree(newprefix)
-			} else if zdata.u1.v.type_ == 1 || zdata.u1.v.type_ == 9 {
+				zend.Efree(newprefix)
+			} else if zend.Z_TYPE_P(zdata) == zend.IS_NULL || zend.Z_TYPE_P(zdata) == zend.IS_RESOURCE {
 
 				/* Skip these types */
 
@@ -197,66 +189,66 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 
 			} else {
 				if formstr.s != nil {
-					zend.SmartStrAppendlEx(formstr, arg_sep, arg_sep_len, 0)
+					zend.SmartStrAppendl(formstr, arg_sep, arg_sep_len)
 				}
 
 				/* Simple key=value */
 
 				if key_prefix != nil {
-					zend.SmartStrAppendlEx(formstr, key_prefix, key_prefix_len, 0)
+					zend.SmartStrAppendl(formstr, key_prefix, key_prefix_len)
 				}
 				if key != nil {
 					var ekey *zend.ZendString
-					if enc_type == 2 {
+					if enc_type == PHP_QUERY_RFC3986 {
 						ekey = PhpRawUrlEncode(prop_name, prop_len)
 					} else {
 						ekey = PhpUrlEncode(prop_name, prop_len)
 					}
-					zend.SmartStrAppendEx(formstr, ekey, 0)
+					zend.SmartStrAppend(formstr, ekey)
 					zend.ZendStringFree(ekey)
 				} else {
 
 					/* Numeric key */
 
 					if num_prefix != nil {
-						zend.SmartStrAppendlEx(formstr, num_prefix, num_prefix_len, 0)
+						zend.SmartStrAppendl(formstr, num_prefix, num_prefix_len)
 					}
-					zend.SmartStrAppendLongEx(formstr, idx, 0)
+					zend.SmartStrAppendLong(formstr, idx)
 				}
 				if key_suffix {
-					zend.SmartStrAppendlEx(formstr, key_suffix, key_suffix_len, 0)
+					zend.SmartStrAppendl(formstr, key_suffix, key_suffix_len)
 				}
-				zend.SmartStrAppendlEx(formstr, "=", 1, 0)
-				switch zdata.u1.v.type_ {
-				case 6:
+				zend.SmartStrAppendl(formstr, "=", 1)
+				switch zend.Z_TYPE_P(zdata) {
+				case zend.IS_STRING:
 					var ekey *zend.ZendString
-					if enc_type == 2 {
-						ekey = PhpRawUrlEncode(zdata.value.str.val, zdata.value.str.len_)
+					if enc_type == PHP_QUERY_RFC3986 {
+						ekey = PhpRawUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
 					} else {
-						ekey = PhpUrlEncode(zdata.value.str.val, zdata.value.str.len_)
+						ekey = PhpUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
 					}
-					zend.SmartStrAppendEx(formstr, ekey, 0)
+					zend.SmartStrAppend(formstr, ekey)
 					zend.ZendStringFree(ekey)
 					break
-				case 4:
-					zend.SmartStrAppendLongEx(formstr, zdata.value.lval, 0)
+				case zend.IS_LONG:
+					zend.SmartStrAppendLong(formstr, zend.Z_LVAL_P(zdata))
 					break
-				case 2:
-					zend.SmartStrAppendlEx(formstr, "0", g.SizeOf("\"0\"")-1, 0)
+				case zend.IS_FALSE:
+					zend.SmartStrAppendl(formstr, "0", b.SizeOf("\"0\"")-1)
 					break
-				case 3:
-					zend.SmartStrAppendlEx(formstr, "1", g.SizeOf("\"1\"")-1, 0)
+				case zend.IS_TRUE:
+					zend.SmartStrAppendl(formstr, "1", b.SizeOf("\"1\"")-1)
 					break
 				default:
 					var ekey *zend.ZendString
 					var tmp *zend.ZendString
 					var str *zend.ZendString = zend.ZvalGetTmpString(zdata, &tmp)
-					if enc_type == 2 {
-						ekey = PhpRawUrlEncode(str.val, str.len_)
+					if enc_type == PHP_QUERY_RFC3986 {
+						ekey = PhpRawUrlEncode(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
 					} else {
-						ekey = PhpUrlEncode(str.val, str.len_)
+						ekey = PhpUrlEncode(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
 					}
-					zend.SmartStrAppendEx(formstr, ekey, 0)
+					zend.SmartStrAppend(formstr, ekey)
 					zend.ZendTmpStringRelease(tmp)
 					zend.ZendStringFree(ekey)
 				}
@@ -276,12 +268,12 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	var arg_sep_len int = 0
 	var prefix_len int = 0
 	var formstr zend.SmartStr = zend.SmartStr{0}
-	var enc_type zend.ZendLong = 1
+	var enc_type zend.ZendLong = PHP_QUERY_RFC1738
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 4
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -289,7 +281,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -298,137 +290,85 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgArray(_arg, &formdata, 0, 1) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgArray(_arg, &formdata, 0, 1) == 0) {
 				_expected_type = zend.Z_EXPECTED_ARRAY
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &prefix, &prefix_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgString(_arg, &arg_sep, &arg_sep_len, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &arg_sep, &arg_sep_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgLong(_arg, &enc_type, &_dummy, 0, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &enc_type, &_dummy, 0, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_LONG
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
 					}
 				}
 			}
-			return_value.u1.type_info = 2
+			zend.RETVAL_FALSE
 			return
 		}
 		break
 	}
-	if PhpUrlEncodeHashEx(g.CondF(formdata.u1.v.type_ == 7, func() *zend.ZendArray { return formdata.value.arr }, func() __auto__ {
-		if formdata.u1.v.type_ == 8 {
-			return formdata.value.obj.handlers.get_properties(formdata)
-		} else {
-			return nil
-		}
-	}), &formstr, prefix, prefix_len, nil, 0, nil, 0, g.Cond(formdata.u1.v.type_ == 8, formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
+	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(zend.Z_TYPE_P(formdata) == zend.IS_OBJECT, formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
 		if formstr.s != nil {
-			zend.SmartStrFreeEx(&formstr, 0)
+			zend.SmartStrFree(&formstr)
 		}
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	if formstr.s == nil {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendEmptyString
-		__z.value.str = __s
-		__z.u1.type_info = 6
+		zend.RETVAL_EMPTY_STRING()
 		return
 	}
 	zend.SmartStr0(&formstr)
-	var __z *zend.Zval = return_value
-	var __s *zend.ZendString = formstr.s
-	__z.value.str = __s
-	__z.u1.type_info = 6 | 1<<0<<8
+	zend.RETVAL_NEW_STR(formstr.s)
 	return
 }
 

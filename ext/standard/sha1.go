@@ -3,10 +3,8 @@
 package standard
 
 import (
+	b "sik/builtin"
 	"sik/core"
-	"sik/core/streams"
-	r "sik/runtime"
-	g "sik/runtime/grammar"
 	"sik/zend"
 )
 
@@ -78,7 +76,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -86,7 +84,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -95,69 +93,49 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgStr(_arg, &arg, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_STRING
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -169,20 +147,14 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_SHA1Init(&context)
-	PHP_SHA1Update(&context, (*uint8)(arg.val), arg.len_)
+	PHP_SHA1Update(&context, (*uint8)(zend.ZSTR_VAL(arg)), zend.ZSTR_LEN(arg))
 	PHP_SHA1Final(digest, &context)
 	if raw_output != 0 {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendStringInit((*byte)(digest), 20, 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
+		zend.RETVAL_STRINGL((*byte)(digest), 20)
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendStringAlloc(40, 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
-		MakeDigestEx(return_value.value.str.val, digest, 20)
+		zend.RETVAL_NEW_STR(zend.ZendStringAlloc(40, 0))
+		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 20)
 	}
 }
 
@@ -201,7 +173,7 @@ func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _flags int = 0
 		var _min_num_args int = 1
 		var _max_num_args int = 2
-		var _num_args int = execute_data.This.u2.num_args
+		var _num_args int = zend.EX_NUM_ARGS()
 		var _i int = 0
 		var _real_arg *zend.Zval
 		var _arg *zend.Zval = nil
@@ -209,7 +181,7 @@ func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _error *byte = nil
 		var _dummy zend.ZendBool
 		var _optional zend.ZendBool = 0
-		var _error_code int = 0
+		var _error_code int = zend.ZPP_ERROR_OK
 		void(_i)
 		void(_real_arg)
 		void(_arg)
@@ -218,69 +190,49 @@ func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		void(_dummy)
 		void(_optional)
 		for {
-			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
-				if (_flags & 1 << 1) == 0 {
-					if (_flags & 1 << 2) != 0 {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
 					} else {
 						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
 					}
 				}
-				_error_code = 1
+				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = (*zend.Zval)(execute_data) + (int(((g.SizeOf("zend_execute_data")+8 - 1 & ^(8-1))+(g.SizeOf("zval")+8 - 1 & ^(8-1))-1)/(g.SizeOf("zval")+8 - 1 & ^(8-1))) + int(int(0)-1))
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0 {
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_PATH
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			_optional = 1
-			_i++
-			r.Assert(_i <= _min_num_args || _optional == 1)
-			r.Assert(_i > _min_num_args || _optional == 0)
-			if _optional != 0 {
-				if _i > _num_args {
-					break
-				}
-			}
-			_real_arg++
-			_arg = _real_arg
-
-			if zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0 {
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgBool(_arg, &raw_output, &_dummy, 0) == 0) {
 				_expected_type = zend.Z_EXPECTED_BOOL
-				_error_code = 4
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
 			}
 			break
 		}
-		if _error_code != 0 {
-			if (_flags & 1 << 1) == 0 {
-				if _error_code == 2 {
-					if (_flags & 1 << 2) != 0 {
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongCallbackException(_i, _error)
 					} else {
 						zend.ZendWrongCallbackError(_i, _error)
 					}
-				} else if _error_code == 3 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterClassException(_i, _error, _arg)
 					} else {
 						zend.ZendWrongParameterClassError(_i, _error, _arg)
 					}
-				} else if _error_code == 4 {
-					if (_flags & 1 << 2) != 0 {
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
 						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
 					} else {
 						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
@@ -291,29 +243,23 @@ func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	stream = streams._phpStreamOpenWrapperEx(arg, "rb", 0x8, nil, nil)
+	stream = core.PhpStreamOpenWrapper(arg, "rb", core.REPORT_ERRORS, nil)
 	if stream == nil {
-		return_value.u1.type_info = 2
+		zend.RETVAL_FALSE
 		return
 	}
 	PHP_SHA1Init(&context)
-	for g.Assign(&n, streams._phpStreamRead(stream, (*byte)(buf), g.SizeOf("buf"))) > 0 {
+	for b.Assign(&n, core.PhpStreamRead(stream, (*byte)(buf), b.SizeOf("buf"))) > 0 {
 		PHP_SHA1Update(&context, buf, n)
 	}
 	PHP_SHA1Final(digest, &context)
-	streams._phpStreamFree(stream, 1|2)
+	core.PhpStreamClose(stream)
 	if raw_output != 0 {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendStringInit((*byte)(digest), 20, 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
+		zend.RETVAL_STRINGL((*byte)(digest), 20)
 		return
 	} else {
-		var __z *zend.Zval = return_value
-		var __s *zend.ZendString = zend.ZendStringAlloc(40, 0)
-		__z.value.str = __s
-		__z.u1.type_info = 6 | 1<<0<<8
-		MakeDigestEx(return_value.value.str.val, digest, 20)
+		zend.RETVAL_NEW_STR(zend.ZendStringAlloc(40, 0))
+		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 20)
 	}
 }
 
@@ -327,34 +273,43 @@ var PADDING []uint8 = []uint8{0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 /* F, G, H and I are basic SHA1 functions.
  */
 
-// #define F(x,y,z) ( ( z ) ^ ( ( x ) & ( ( y ) ^ ( z ) ) ) )
-
-// #define G(x,y,z) ( ( x ) ^ ( y ) ^ ( z ) )
-
-// #define H(x,y,z) ( ( ( x ) & ( y ) ) | ( ( z ) & ( ( x ) | ( y ) ) ) )
-
-// #define I(x,y,z) ( ( x ) ^ ( y ) ^ ( z ) )
-
 /* ROTATE_LEFT rotates x left n bits.
  */
 
-// #define ROTATE_LEFT(x,n) ( ( ( x ) << ( n ) ) | ( ( x ) >> ( 32 - ( n ) ) ) )
+func ROTATE_LEFT(x uint32, n int) int { return x<<n | x>>32 - n }
 
 /* W[i]
  */
 
-// #define W(i) ( tmp = x [ ( i - 3 ) & 15 ] ^ x [ ( i - 8 ) & 15 ] ^ x [ ( i - 14 ) & 15 ] ^ x [ i & 15 ] , ( x [ i & 15 ] = ROTATE_LEFT ( tmp , 1 ) ) )
+func W(i int) __auto__ {
+	tmp = x[i-3&15] ^ x[i-8&15] ^ x[i-14&15] ^ x[i&15]
+	x[i&15] = ROTATE_LEFT(tmp, 1)
+	return x[i&15]
+}
 
 /* FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
  */
 
-// #define FF(a,b,c,d,e,w) { ( e ) += F ( ( b ) , ( c ) , ( d ) ) + ( w ) + ( uint32_t ) ( 0x5A827999 ) ; ( e ) += ROTATE_LEFT ( ( a ) , 5 ) ; ( b ) = ROTATE_LEFT ( ( b ) , 30 ) ; }
-
-// #define GG(a,b,c,d,e,w) { ( e ) += G ( ( b ) , ( c ) , ( d ) ) + ( w ) + ( uint32_t ) ( 0x6ED9EBA1 ) ; ( e ) += ROTATE_LEFT ( ( a ) , 5 ) ; ( b ) = ROTATE_LEFT ( ( b ) , 30 ) ; }
-
-// #define HH(a,b,c,d,e,w) { ( e ) += H ( ( b ) , ( c ) , ( d ) ) + ( w ) + ( uint32_t ) ( 0x8F1BBCDC ) ; ( e ) += ROTATE_LEFT ( ( a ) , 5 ) ; ( b ) = ROTATE_LEFT ( ( b ) , 30 ) ; }
-
-// #define II(a,b,c,d,e,w) { ( e ) += I ( ( b ) , ( c ) , ( d ) ) + ( w ) + ( uint32_t ) ( 0xCA62C1D6 ) ; ( e ) += ROTATE_LEFT ( ( a ) , 5 ) ; ( b ) = ROTATE_LEFT ( ( b ) , 30 ) ; }
+func FF(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+	e += F(b, c, d) + w + uint32_t(0x5a827999)
+	e += ROTATE_LEFT(a, 5)
+	b = ROTATE_LEFT(b, 30)
+}
+func GG(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+	e += G(b, c, d) + w + uint32_t(0x6ed9eba1)
+	e += ROTATE_LEFT(a, 5)
+	b = ROTATE_LEFT(b, 30)
+}
+func HH(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+	e += H(b, c, d) + w + uint32_t(0x8f1bbcdc)
+	e += ROTATE_LEFT(a, 5)
+	b = ROTATE_LEFT(b, 30)
+}
+func II(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+	e += I(b, c, d) + w + uint32_t(0xca62c1d6)
+	e += ROTATE_LEFT(a, 5)
+	b = ROTATE_LEFT(b, 30)
+}
 
 /* {{{ PHP_SHA1Init
  * SHA1 initialization. Begins an SHA1 operation, writing a new context.
@@ -387,7 +342,7 @@ func PHP_SHA1Update(context *PHP_SHA1_CTX, input *uint8, inputLen int) {
 
 	/* Update number of bits */
 
-	if g.AssignOp(&context.GetCount()[0], "+=", uint32(inputLen<<3)) < uint32(inputLen<<3) {
+	if b.AssignOp(&context.GetCount()[0], "+=", uint32(inputLen<<3)) < uint32(inputLen<<3) {
 		context.GetCount()[1]++
 	}
 	context.GetCount()[1] += uint32(inputLen >> 29)
@@ -454,7 +409,7 @@ func PHP_SHA1Final(digest []uint8, context *PHP_SHA1_CTX) {
 	/* Zeroize sensitive information.
 	 */
 
-	core.PhpExplicitBzero((*uint8)(context), g.SizeOf("* context"))
+	zend.ZEND_SECURE_ZERO((*uint8)(context), b.SizeOf("* context"))
 
 	/* Zeroize sensitive information.
 	 */

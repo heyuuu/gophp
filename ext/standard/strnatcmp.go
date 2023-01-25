@@ -3,7 +3,7 @@
 package standard
 
 import (
-	g "sik/runtime/grammar"
+	b "sik/builtin"
 )
 
 // Source: <ext/standard/strnatcmp.c>
@@ -131,20 +131,20 @@ func StrnatcmpEx(a *byte, a_len int, b *byte, b_len int, fold_case int) int {
 		/* skip over leading zeros */
 
 		for leading && ca == '0' && ap+1 < aend && isdigit(int(uint8(*(ap + 1)))) {
-			ca = *(g.PreInc(&ap))
+			ca = *(b.PreInc(&ap))
 		}
 		for leading && cb == '0' && bp+1 < bend && isdigit(int(uint8(*(bp + 1)))) {
-			cb = *(g.PreInc(&bp))
+			cb = *(b.PreInc(&bp))
 		}
 		leading = 0
 
 		/* Skip consecutive whitespace */
 
 		for isspace(int(uint8(ca))) {
-			ca = *(g.PreInc(&ap))
+			ca = *(b.PreInc(&ap))
 		}
 		for isspace(int(uint8(cb))) {
-			cb = *(g.PreInc(&bp))
+			cb = *(b.PreInc(&bp))
 		}
 
 		/* process run of digits */

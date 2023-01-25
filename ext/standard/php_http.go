@@ -2,6 +2,10 @@
 
 package standard
 
+import (
+	"sik/zend"
+)
+
 // Source: <ext/standard/php_http.h>
 
 /*
@@ -28,4 +32,6 @@ package standard
 
 // # include "zend_smart_str.h"
 
-// #define php_url_encode_hash(ht,formstr) php_url_encode_hash_ex ( ( ht ) , ( formstr ) , NULL , 0 , NULL , 0 , NULL , 0 , NULL )
+func PhpUrlEncodeHash(ht *zend.HashTable, formstr *zend.SmartStr) int {
+	return PhpUrlEncodeHashEx(ht, formstr, nil, 0, nil, 0, nil, 0, nil)
+}

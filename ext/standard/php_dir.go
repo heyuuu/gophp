@@ -26,8 +26,6 @@ package standard
 
 /* directory functions */
 
-// #define PHP_SCANDIR_SORT_ASCENDING       0
-
-// #define PHP_SCANDIR_SORT_DESCENDING       1
-
-// #define PHP_SCANDIR_SORT_NONE       2
+const PHP_SCANDIR_SORT_ASCENDING = 0
+const PHP_SCANDIR_SORT_DESCENDING = 1
+const PHP_SCANDIR_SORT_NONE = 2
