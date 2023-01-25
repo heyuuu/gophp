@@ -29,8 +29,6 @@ import (
 /* {{{ proto string metaphone(string text[, int phones])
    Break english phrases down into their phonemes */
 
-/* }}} */
-
 const SH = 'X'
 const TH = '0'
 
@@ -81,5 +79,3 @@ const Phone_Len = p_idx
 
 /* {{{ metaphone
  */
-
-/* }}} */

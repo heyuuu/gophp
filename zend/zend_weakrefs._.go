@@ -85,5 +85,3 @@ var ZendWeakrefMethods []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */

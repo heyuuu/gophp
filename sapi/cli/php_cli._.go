@@ -57,57 +57,16 @@ var CliShellCallbacks CliShellCallbacksT = CliShellCallbacksT{nil, nil, nil}
 var HARDCODED_INI []byte = "html_errors=0\n" + "register_argc_argv=1\n" + "implicit_flush=1\n" + "output_buffering=0\n" + "max_execution_time=0\n" + "max_input_time=-1\n0"
 var OPTIONS []core.Opt = []core.Opt{{'a', 0, "interactive"}, {'B', 1, "process-begin"}, {'C', 0, "no-chdir"}, {'c', 1, "php-ini"}, {'d', 1, "define"}, {'E', 1, "process-end"}, {'e', 0, "profile-info"}, {'F', 1, "process-file"}, {'f', 1, "file"}, {'h', 0, "help"}, {'i', 0, "info"}, {'l', 0, "syntax-check"}, {'m', 0, "modules"}, {'n', 0, "no-php-ini"}, {'q', 0, "no-header"}, {'R', 1, "process-code"}, {'H', 0, "hide-args"}, {'r', 1, "run"}, {'s', 0, "syntax-highlight"}, {'s', 0, "syntax-highlighting"}, {'S', 1, "server"}, {'t', 1, "docroot"}, {'w', 0, "strip"}, {'?', 0, "usage"}, {'v', 0, "version"}, {'z', 1, "zend-extension"}, {10, 1, "rf"}, {10, 1, "rfunction"}, {11, 1, "rc"}, {11, 1, "rclass"}, {12, 1, "re"}, {12, 1, "rextension"}, {13, 1, "rz"}, {13, 1, "rzendextension"}, {14, 1, "ri"}, {14, 1, "rextinfo"}, {15, 0, "ini"}, {'-', 0, nil}}
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const STDOUT_FILENO = 1
 const STDERR_FILENO = 2
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var PhpSelf *byte = ""
 var ScriptFilename *byte = ""
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var CliSapiModule core.sapi_module_struct = core.sapi_module_struct{"cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, core.PhpError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
-
-/* }}} */
-
 var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"extension_filename", 0, 0, 0},
 }
-
-/* }}} */
-
 var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"dl",
@@ -136,21 +95,10 @@ var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 /* {{{ php_cli_usage
  */
 
-/* }}} */
-
 var SInProcess *core.PhpStream = nil
-
-/* }}} */
-
 var ParamModeConflict *byte = "Either execute direct code, process stdin or use a file.\n"
 
 /* {{{ cli_seek_file_begin
  */
 
-/* }}} */
-
 /*}}}*/
-
-/* }}} */
-
-/* }}} */

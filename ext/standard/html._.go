@@ -86,72 +86,16 @@ const ENT_DISALLOWED = 128
 /* {{{ get_default_charset
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ traverse_for_entities
  * Auxiliary function to php_unescape_html_entities().
  * - The argument "all" determines if all numeric entities are decode or only those
  *   that correspond to quotes (depending on quote_style).
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ find_entity_for_char */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 const HTML_SPECIALCHARS = 0
 const HTML_ENTITIES = 1
 
 /* {{{ register_html_constants
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

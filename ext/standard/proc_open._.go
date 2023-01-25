@@ -62,28 +62,10 @@ var LeProcOpen int
 
 /* {{{ _php_array_to_envp */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const DESC_PIPE = 1
 const DESC_FILE = 2
 const DESC_REDIRECT = 3
 const DESC_PARENT_MODE_WRITE = 8
 
-/* }}} */
-
 /* {{{ proto resource proc_open(string|array command, array descriptorspec, array &pipes [, string cwd [, array env [, array other_options]]])
    Run a process with more control over it's file descriptors */
-
-/* }}} */

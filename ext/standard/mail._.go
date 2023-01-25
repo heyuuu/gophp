@@ -27,16 +27,8 @@ package standard
 /* {{{ proto int ezmlm_hash(string addr)
    Calculate EZMLM list hash value. */
 
-/* }}} */
-
 /* {{{ proto int mail(string to, string subject, string message [, string additional_headers [, string additional_parameters]])
    Send an email message */
 
-/* }}} */
-
 /* {{{ php_mail
  */
-
-/* }}} */
-
-/* }}} */

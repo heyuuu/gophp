@@ -70,15 +70,9 @@ const PSIZE = b.SizeOf("u_char *")
  * Arguments are as for qsort.
  */
 
-/* }}} */
-
 /* {{{ setup
  * Optional hybrid natural/pairwise first pass.  Eats up list1 in runs of
  * increasing order, list2 in a corresponding linked list.  Checks for runs
  * when THRESHOLD/2 pairs compare with same sense.  (Only used when NATURAL
  * is defined.  Otherwise simple pairwise merging is used.)
  */
-
-/* }}} */
-
-/* }}} */

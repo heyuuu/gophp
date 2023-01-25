@@ -85,17 +85,3 @@ var UserFilterFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFa
 
 /* {{{ proto object stream_bucket_make_writeable(resource brigade)
    Return a bucket object from the brigade for operating on */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

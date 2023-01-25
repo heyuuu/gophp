@@ -46,14 +46,4 @@ package standard
 *  Converting HEX char to INT value
  */
 
-/* }}} */
-
-/* }}} */
-
 const PHP_QPRINT_MAXL = 75
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

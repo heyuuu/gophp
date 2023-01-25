@@ -65,14 +65,6 @@ const Vstrpprintf = zend.ZendVstrpprintf
  * to be printed.
  */
 
-/* }}} */
-
 /*
  * Do format conversion placing the output in buffer
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

@@ -57,11 +57,7 @@ type PhpHrtimeT = uint64
 
 const NANO_IN_SEC = 1000000000
 
-/* }}} */
-
 /* {{{ */
-
-/* }}} */
 
 /* {{{ proto mixed hrtime([bool get_as_number = false])
    Returns an array of integers in form [seconds, nanoseconds] counted
@@ -69,5 +65,3 @@ const NANO_IN_SEC = 1000000000
    passed, returns an integer on 64-bit platforms or float on 32-bit
    containing the current high-resolution time in nanoseconds. The
    delivered timestamp is monotonic and can not be adjusted. */
-
-/* }}} */

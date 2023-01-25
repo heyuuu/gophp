@@ -82,122 +82,29 @@ var FileGlobals PhpFileGlobals
    +----------------------------------------------------------------------+
 */
 
-/* }}} */
-
 /* {{{ ZTS-stuff / Globals / Prototypes */
 
 var LeStreamContext int = zend.FAILURE
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var FlockValues []int = []int{LOCK_SH, LOCK_EX, LOCK_UN}
 
 /* {{{ proto bool flock(resource fp, int operation [, int &wouldblock])
    Portable file locking */
-
-/* }}} */
 
 const PHP_META_UNSAFE = ".\\+*?[^]$() "
 
 /* {{{ proto array get_meta_tags(string filename [, bool use_include_path])
    Extracts all meta tag content attributes from a file and returns an array */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const PHP_FILE_BUF_SIZE = 80
 
 /* {{{ proto array file(string filename [, int flags[, resource context]])
    Read entire file into an array */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto int fputcsv(resource fp, array fields [, string delimiter [, string enclosure [, string escape_char]]])
    Format line as CSV and write to file pointer */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string realpath(string path)
    Return the resolved path */
-
-/* }}} */
 
 /* See http://www.w3.org/TR/html4/intro/sgmltut.html#h-3.2.2 */
 
@@ -206,14 +113,8 @@ const PHP_META_HTML401_CHARS = "-_.:"
 /* {{{ php_next_meta_token
    Tokenizes an HTML file for get_meta_tags */
 
-/* }}} */
-
 /* {{{ proto bool fnmatch(string pattern, string filename [, int flags])
    Match filename against pattern */
 
-/* }}} */
-
 /* {{{ proto string sys_get_temp_dir()
    Returns directory path used for temporary files */
-
-/* }}} */

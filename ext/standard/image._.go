@@ -46,22 +46,8 @@ var PhpSigWebp []byte = []byte{'W', 'E', 'B', 'P'}
 /* {{{ PHP_MINIT_FUNCTION(imagetypes)
  * Register IMAGETYPE_<xxx> constants used by GetImageSize(), image_type_to_mime_type, ext/exif */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ php_handle_swf
  */
-
-/* }}} */
-
-/* }}} */
 
 const M_SOF0 = 0xc0
 const M_SOF1 = 0xc1
@@ -101,18 +87,6 @@ const M_PSEUDO = 0xffd8
 /* {{{ php_read2
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const JPEG2000_MARKER_PREFIX = 0xff
 const JPEG2000_MARKER_SOC = 0x4f
 const JPEG2000_MARKER_SOT = 0x90
@@ -134,12 +108,6 @@ const JPEG2000_MARKER_SOP = 0x91
 const JPEG2000_MARKER_EPH = 0x92
 const JPEG2000_MARKER_CRG = 0x63
 const JPEG2000_MARKER_COM = 0x64
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var PhpTiffBytesPerFormat []int = []int{0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8}
 
@@ -164,48 +132,5 @@ const TAG_FMT_SLONG = 9
 const TAG_FMT_SRATIONAL = 10
 const TAG_FMT_SINGLE = 11
 const TAG_FMT_DOUBLE = 12
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const FROM_DATA = 0
 const FROM_PATH = 1
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

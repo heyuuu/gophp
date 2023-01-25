@@ -91,11 +91,6 @@ const FFFFFFFF = 0xffffffff
 const Kmax = 7
 
 var Freelist []*Bigint
-
-/* }}} */
-
-/* }}} */
-
 var P5s *Bigint
 var Tens []float64 = []float64{1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 1.0e7, 1.0e8, 1.0e9, 1.0e10, 9.9999998e10, 1.0e12, 9.9999998e12, 1.0e14, 9.9999999e14, 1.00000003e16, 9.9999998e16, 9.9999998e17, 1.0e19, 1.0e20, 1.0e21, 1.0e22}
 var Bigtens []float64 = []float64{1.00000003e16, 1.0e32, Infinity, Infinity, Infinity}

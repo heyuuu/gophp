@@ -82,17 +82,3 @@ const IniFilename any = SCNG(filename)
 
 /* {{{ init_ini_scanner()
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

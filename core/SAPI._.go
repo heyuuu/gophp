@@ -95,8 +95,6 @@ const SAPI_PHP_VERSION_HEADER *byte = "X-Powered-By: PHP/" + PHP_VERSION
 /* {{{ proto bool header_register_callback(mixed callback)
    call a header function */
 
-/* }}} */
-
 /*
  * Add charset on content-type header if the MIME type starts with
  * "text/", the default_charset directive is not empty and
@@ -117,5 +115,3 @@ const SAPI_PHP_VERSION_HEADER *byte = "X-Powered-By: PHP/" + PHP_VERSION
  * since zend_llist_del_element only remove one matched item once,
  * we should remove them by ourself
  */
-
-/* }}} */

@@ -30,9 +30,3 @@ package standard
 
 /* {{{ compare_right
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

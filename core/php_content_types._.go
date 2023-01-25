@@ -61,11 +61,3 @@ var PhpPostEntries []SapiPostEntry = []SapiPostEntry{
 	{MULTIPART_CONTENT_TYPE, b.SizeOf("MULTIPART_CONTENT_TYPE") - 1, nil, Rfc1867PostHandler},
 	{nil, 0, nil, nil},
 }
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

@@ -23,11 +23,3 @@ package standard
 */
 
 /* {{{ php_canonicalize_version() */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

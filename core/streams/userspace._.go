@@ -193,12 +193,6 @@ const USERSTREAM_METADATA = "stream_metadata"
 /* {{{ proto bool stream_wrapper_register(string protocol, string classname[, int flags])
    Registers a custom URL protocol handler class */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* parse the return value from one of the stat functions and store the
  * relevant fields into the statbuf provided */
 

@@ -48,8 +48,6 @@ type SplForeignCloneT func(src *SplFilesystemObject, dst *SplFilesystemObject)
 
 /* define an __special__  overloaded iterator structure */
 
-/* }}} */
-
 const SPL_FILE_OBJECT_DROP_NEW_LINE = 0x1
 const SPL_FILE_OBJECT_READ_AHEAD = 0x2
 const SPL_FILE_OBJECT_SKIP_EMPTY = 0x4
@@ -99,133 +97,25 @@ var SplFilesystemObjectCheckHandlers zend.ZendObjectHandlers
 
 /* {{{ spl_ce_dir_object_new */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ spl_filesystem_object_clone */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 const DIT_CTOR_FLAGS = 0x1
 const DIT_CTOR_GLOB = 0x2
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string DirectoryIterator::valid()
    Check whether dir contains more entries */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* }}}*/
 
-/* }}} */
-
 /* }}}*/
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto string SplFileInfo::getRealPath()
    Return the resolved path */
 
-/* }}} */
-
 /* {{{ proto SplFileObject SplFileInfo::openFile([string mode = 'r' [, bool use_include_path  [, resource context]]])
    Open the current file */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{  proto SplFileInfo::_bad_state_ex(void) */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto void FilesystemIterator::setFlags(long $flags)
    Set handling flags */
@@ -233,63 +123,15 @@ const DIT_CTOR_GLOB = 0x2
 /* {{{ proto bool RecursiveDirectoryIterator::hasChildren([bool $allow_links = false])
    Returns whether current entry is a directory and not '.' or '..' */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto GlobIterator::__construct(string path [, int flags])
 Cronstructs a new dir iterator from a glob expression (no glob:// needed). */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ forward declarations to the iterator handlers */
 
 /* iterator handler table */
 
 var SplFilesystemDirItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplFilesystemDirItDtor, SplFilesystemDirItValid, SplFilesystemDirItCurrentData, SplFilesystemDirItCurrentKey, SplFilesystemDirItMoveForward, SplFilesystemDirItRewind, nil}
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var SplFilesystemTreeItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplFilesystemTreeItDtor, SplFilesystemDirItValid, SplFilesystemTreeItCurrentData, SplFilesystemTreeItCurrentKey, SplFilesystemTreeItMoveForward, SplFilesystemTreeItRewind, nil}
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var ArginfoInfoConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"file_name", 0, 0, 0},
@@ -732,14 +574,6 @@ var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 	{nil, nil, nil, 0, 0},
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto SplFileObject::__construct(string filename [, string mode = 'r' [, bool use_include_path  [, resource context]]]])
    Construct a new file object */
 
@@ -787,18 +621,6 @@ var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 
 /* {{{ FileFunction */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto int SplFileObject::ftell()
    Return current file position */
 
@@ -817,12 +639,8 @@ var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 /* {{{ proto bool SplFileObject::fscanf(string format [, string ...])
    Implements a mostly ANSI compatible fscanf() */
 
-/* }}} */
-
 /* {{{ proto bool SplFileObject::fstat()
    Stat() on a filehandle */
-
-/* }}} */
 
 /* {{{ proto void SplFileObject::seek(int line_pos)
    Seek to specified line */
@@ -1093,7 +911,3 @@ var spl_SplTempFileObject_functions []zend.ZendFunctionEntry = []zend.ZendFuncti
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */

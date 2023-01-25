@@ -47,9 +47,3 @@ package standard
 */
 
 /* {{{ php_fsockopen() */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

@@ -56,47 +56,11 @@ var ZendCeCountable *ZendClassEntry
 /* {{{ zend_call_method
 Only returns the returned zval if retval_ptr != NULL */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var ZendInterfaceIteratorFuncsIterator ZendObjectIteratorFuncs = ZendObjectIteratorFuncs{ZendUserItDtor, ZendUserItValid, ZendUserItGetCurrentData, ZendUserItGetCurrentKey, ZendUserItMoveForward, ZendUserItRewind, ZendUserItInvalidateCurrent}
 
 /* {{{ zend_user_it_get_iterator */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* }}}*/
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* }}}*/
 
@@ -219,7 +183,3 @@ var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */

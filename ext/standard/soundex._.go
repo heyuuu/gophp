@@ -23,5 +23,3 @@ package standard
 */
 
 /* Simple soundex algorithm as described by Knuth in TAOCP, vol 3 */
-
-/* }}} */

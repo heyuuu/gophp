@@ -57,21 +57,3 @@ type CreateObjectFuncT func(class_type *zend.ZendClassEntry) *zend.ZendObject
 */
 
 /* {{{ spl_register_interface */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

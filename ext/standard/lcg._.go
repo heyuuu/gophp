@@ -30,13 +30,3 @@ var LcgGlobals PhpLcgGlobals
  * 2^31 - 85 and 2^31 - 249. The period of this function
  * is equal to the product of both primes.
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

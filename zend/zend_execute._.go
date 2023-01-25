@@ -114,12 +114,6 @@ const ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
 
 /* 1: valid, 0: invalid, -1: may be valid after type coercion */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /*
  * Stack Frame Layout (the whole stack frame is allocated at once)
  * ==================
@@ -140,50 +134,7 @@ const ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
  *                             +----------------------------------------+
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const ZEND_FAKE_OP_ARRAY *ZendOpArray = (*ZendOpArray)(zend_intptr_t - 1)
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const _zendVmStackPushCallFrameEx = ZendVmStackPushCallFrameEx
 const _zendVmStackPushCallFrame = ZendVmStackPushCallFrame
 const VM_SMART_OPCODES = 1

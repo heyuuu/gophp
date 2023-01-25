@@ -86,16 +86,10 @@ var ArginfoSetTimeLimit []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"seconds", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoHeaderRegisterCallback []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"callback", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoObStart []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"user_function", 0, 0, 0}, {"chunk_size", 0, 0, 0}, {"flags", 0, 0, 0}}
 var ArginfoObFlush []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -137,9 +131,6 @@ var ArginfoOutputAddRewriteVar []zend.ZendInternalArgInfo = []zend.ZendInternalA
 	{"name", 0, 0, 0},
 	{"value", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoStreamWrapperRegister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"protocol", 0, 0, 0}, {"classname", 0, 0, 0}, {"flags", 0, 0, 0}}
 var ArginfoStreamWrapperUnregister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -149,9 +140,6 @@ var ArginfoStreamWrapperRestore []zend.ZendInternalArgInfo = []zend.ZendInternal
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"protocol", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoKrsort []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"arg", 0, 1, 0}, {"sort_flags", 0, 0, 0}}
 var ArginfoKsort []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"arg", 0, 1, 0}, {"sort_flags", 0, 0, 0}}
 var ArginfoCount []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"var", 0, 0, 0}, {"mode", 0, 0, 0}}
@@ -375,9 +363,6 @@ var ArginfoArrayCombine []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"keys", 0, 0, 0},
 	{"values", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoGetMagicQuotesGpc []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
@@ -520,54 +505,30 @@ var ArginfoParseIniString []zend.ZendInternalArgInfo = []zend.ZendInternalArgInf
 var ArginfoSysGetloadavg []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoAssert []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"assertion", 0, 0, 0}, {"description", 0, 0, 0}}
 var ArginfoAssertOptions []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"what", 0, 0, 0}, {"value", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoBase64Encode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 }
 var ArginfoBase64Decode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"str", 0, 0, 0}, {"strict", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoGetBrowser []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"browser_name", 0, 0, 0}, {"return_array", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoCrc32 []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoCrypt []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"str", 0, 0, 0}, {"salt", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoConvertCyrString []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 	{"from", 0, 0, 0},
 	{"to", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoStrptime []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"timestamp", 0, 0, 0},
 	{"format", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoOpendir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"path", 0, 0, 0}, {"context", 0, 0, 0}}
 var ArginfoDir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"directory", 0, 0, 0}, {"context", 0, 0, 0}}
 var ArginfoClosedir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"dir_handle", 0, 0, 0}}
@@ -586,9 +547,6 @@ var ArginfoRewinddir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*
 var ArginfoReaddir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"dir_handle", 0, 0, 0}}
 var ArginfoGlob []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"pattern", 0, 0, 0}, {"flags", 0, 0, 0}}
 var ArginfoScandir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"dir", 0, 0, 0}, {"sorting_order", 0, 0, 0}, {"context", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoGethostbyaddr []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"ip_address", 0, 0, 0},
@@ -617,9 +575,6 @@ var ArginfoDnsGetRecord []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"raw", 0, 0, 0},
 }
 var ArginfoDnsGetMx []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"hostname", 0, 0, 0}, {"mxhosts", 0, 1, 0}, {"weight", 0, 1, 0}}
-
-/* }}} */
-
 var ArginfoExec []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"command", 0, 0, 0}, {"output", 0, 1, 0}, {"return_value", 0, 1, 0}}
 var ArginfoSystem []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"command", 0, 0, 0}, {"return_value", 0, 1, 0}}
 var ArginfoPassthru []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"command", 0, 0, 0}, {"return_value", 0, 1, 0}}
@@ -639,9 +594,6 @@ var ArginfoProcNice []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"priority", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoFlock []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"fp", 0, 0, 0}, {"operation", 0, 0, 0}, {"wouldblock", 0, 1, 0}}
 var ArginfoGetMetaTags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"filename", 0, 0, 0}, {"use_include_path", 0, 0, 0}}
 var ArginfoFileGetContents []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"filename", 0, 0, 0}, {"flags", 0, 0, 0}, {"context", 0, 0, 0}, {"offset", 0, 0, 0}, {"maxlen", 0, 0, 0}}
@@ -729,9 +681,6 @@ var ArginfoFnmatch []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*by
 var ArginfoSysGetTempDir []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoDiskTotalSpace []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"path", 0, 0, 0},
@@ -845,9 +794,6 @@ var ArginfoStat []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"filename", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoSprintf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"format", 0, 0, 0}, {"args", 0, 0, 1}}
 var ArginfoVsprintf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -867,22 +813,13 @@ var ArginfoVfprintf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"format", 0, 0, 0},
 	{"args", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoFsockopen []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"hostname", 0, 0, 0}, {"port", 0, 0, 0}, {"errno", 0, 1, 0}, {"errstr", 0, 1, 0}, {"timeout", 0, 0, 0}}
 var ArginfoPfsockopen []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"hostname", 0, 0, 0}, {"port", 0, 0, 0}, {"errno", 0, 1, 0}, {"errstr", 0, 1, 0}, {"timeout", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoFtok []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"pathname", 0, 0, 0},
 	{"proj", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoHeader []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"header", 0, 0, 0}, {"replace", 0, 0, 0}, {"http_response_code", 0, 0, 0}}
 var ArginfoHeaderRemove []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"name", 0, 0, 0}}
 var ArginfoSetcookie []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"name", 0, 0, 0}, {"value", 0, 0, 0}, {"expires_or_options", 0, 0, 0}, {"path", 0, 0, 0}, {"domain", 0, 0, 0}, {"secure", 0, 0, 0}, {"httponly", 0, 0, 0}}
@@ -892,37 +829,22 @@ var ArginfoHeadersList []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
 var ArginfoHttpResponseCode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"response_code", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoHrtime []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"get_as_number", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoHtmlspecialchars []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"string", 0, 0, 0}, {"quote_style", 0, 0, 0}, {"encoding", 0, 0, 0}, {"double_encode", 0, 0, 0}}
 var ArginfoHtmlspecialcharsDecode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"string", 0, 0, 0}, {"quote_style", 0, 0, 0}}
 var ArginfoHtmlEntityDecode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"string", 0, 0, 0}, {"quote_style", 0, 0, 0}, {"encoding", 0, 0, 0}}
 var ArginfoHtmlentities []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"string", 0, 0, 0}, {"quote_style", 0, 0, 0}, {"encoding", 0, 0, 0}, {"double_encode", 0, 0, 0}}
 var ArginfoGetHtmlTranslationTable []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"table", 0, 0, 0}, {"quote_style", 0, 0, 0}, {"encoding", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoHttpBuildQuery []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"formdata", 0, 0, 0}, {"prefix", 0, 0, 0}, {"arg_separator", 0, 0, 0}, {"enc_type", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoImageTypeToMimeType []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"imagetype", 0, 0, 0},
 }
 var ArginfoImageTypeToExtension []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"imagetype", 0, 0, 0}, {"include_dot", 0, 0, 0}}
 var ArginfoGetimagesize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"imagefile", 0, 0, 0}, {"info", 0, 1, 0}}
-
-/* }}} */
-
 var ArginfoPhpinfo []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"what", 0, 0, 0}}
 var ArginfoPhpversion []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"extension", 0, 0, 0}}
 var ArginfoPhpcredits []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"flag", 0, 0, 0}}
@@ -936,27 +858,15 @@ var ArginfoPhpIniScannedFiles []zend.ZendInternalArgInfo = []zend.ZendInternalAr
 var ArginfoPhpIniLoadedFile []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoIptcembed []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"iptcdata", 0, 0, 0}, {"jpeg_file_name", 0, 0, 0}, {"spool", 0, 0, 0}}
 var ArginfoIptcparse []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"iptcdata", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoLcgValue []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoLevenshtein []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"str1", 0, 0, 0}, {"str2", 0, 0, 0}, {"cost_ins", 0, 0, 0}, {"cost_rep", 0, 0, 0}, {"cost_del", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoReadlink []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"filename", 0, 0, 0},
@@ -975,17 +885,11 @@ var ArginfoLink []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"target", 0, 0, 0},
 	{"link", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoEzmlmHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"addr", 0, 0, 0},
 }
 var ArginfoMail []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(3)), 0, 0, 0}, {"to", 0, 0, 0}, {"subject", 0, 0, 0}, {"message", 0, 0, 0}, {"additional_headers", 0, 0, 0}, {"additional_parameters", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoAbs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"number", 0, 0, 0},
@@ -1147,29 +1051,14 @@ var ArginfoIntdiv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"dividend", 0, 0, 0},
 	{"divisor", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoMd5 []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"str", 0, 0, 0}, {"raw_output", 0, 0, 0}}
 var ArginfoMd5File []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"filename", 0, 0, 0}, {"raw_output", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoMetaphone []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"text", 0, 0, 0}, {"phones", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoMicrotime []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"get_as_float", 0, 0, 0}}
 var ArginfoGettimeofday []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"get_as_float", 0, 0, 0}}
 var ArginfoGetrusage []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"who", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoPack []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"format", 0, 0, 0}, {"args", 0, 0, 1}}
 var ArginfoUnpack []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"format", 0, 0, 0}, {"input", 0, 0, 0}, {"offset", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoGetmyuid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
@@ -1185,9 +1074,6 @@ var ArginfoGetmyinode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 var ArginfoGetlastmod []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoPasswordHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"password", 0, 0, 0}, {"algo", 0, 0, 0}, {"options", 0, 0, 0}}
 var ArginfoPasswordGetInfo []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"hash", 0, 0, 0}}
 var ArginfoPasswordNeedsRehash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"hash", 0, 0, 0}, {"algo", 0, 0, 0}, {"options", 0, 0, 0}}
@@ -1195,9 +1081,6 @@ var ArginfoPasswordVerify []zend.ZendInternalArgInfo = []zend.ZendInternalArgInf
 var ArginfoPasswordAlgos []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoProcTerminate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"process", 0, 0, 0}, {"signal", 0, 0, 0}}
 var ArginfoProcClose []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -1208,48 +1091,27 @@ var ArginfoProcGetStatus []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo
 	{"process", 0, 0, 0},
 }
 var ArginfoProcOpen []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(3)), 0, 0, 0}, {"command", 0, 0, 0}, {"descriptorspec", 0, 0, 0}, {"pipes", 0, 1, 0}, {"cwd", 0, 0, 0}, {"env", 0, 0, 0}, {"other_options", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoQuotedPrintableDecode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoQuotedPrintableEncode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoMtSrand []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"seed", 0, 0, 0}, {"mode", 0, 0, 0}}
 var ArginfoMtRand []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"min", 0, 0, 0}, {"max", 0, 0, 0}}
 var ArginfoMtGetrandmax []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
-
-/* }}} */
-
 var ArginfoRandomBytes []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"length", 0, 0, 0}}
 var ArginfoRandomInt []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"min", 0, 0, 0}, {"max", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoSha1 []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"str", 0, 0, 0}, {"raw_output", 0, 0, 0}}
 var ArginfoSha1File []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"filename", 0, 0, 0}, {"raw_output", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoSoundex []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"str", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoStreamSocketPair []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"domain", 0, 0, 0},
@@ -1343,9 +1205,6 @@ var ArginfoStreamSocketShutdown []zend.ZendInternalArgInfo = []zend.ZendInternal
 	{"stream", 0, 0, 0},
 	{"how", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoBin2hex []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"data", 0, 0, 0},
@@ -1491,9 +1350,6 @@ var ArginfoStrpbrk []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*by
 var ArginfoSubstrCompare []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(3)), 0, 0, 0}, {"main_str", 0, 0, 0}, {"str", 0, 0, 0}, {"offset", 0, 0, 0}, {"length", 0, 0, 0}, {"case_sensitivity", 0, 0, 0}}
 var ArginfoUtf8Encode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"data", 0, 0, 0}}
 var ArginfoUtf8Decode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"data", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoOpenlog []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"ident", 0, 0, 0},
@@ -1508,9 +1364,6 @@ var ArginfoSyslog []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"priority", 0, 0, 0},
 	{"message", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoGettype []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"var", 0, 0, 0},
@@ -1579,13 +1432,7 @@ var ArginfoIsCountable []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"var", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoUniqid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"prefix", 0, 0, 0}, {"more_entropy", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoParseUrl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"url", 0, 0, 0}, {"component", 0, 0, 0}}
 var ArginfoUrlencode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -1604,9 +1451,6 @@ var ArginfoRawurldecode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{"str", 0, 0, 0},
 }
 var ArginfoGetHeaders []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"url", 0, 0, 0}, {"format", 0, 0, 0}, {"context", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoStreamBucketMakeWriteable []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"brigade", 0, 0, 0},
@@ -1634,9 +1478,6 @@ var ArginfoStreamFilterRegister []zend.ZendInternalArgInfo = []zend.ZendInternal
 	{"filtername", 0, 0, 0},
 	{"classname", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoConvertUuencode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"data", 0, 0, 0},
@@ -1645,9 +1486,6 @@ var ArginfoConvertUudecode []zend.ZendInternalArgInfo = []zend.ZendInternalArgIn
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"data", 0, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoVarDump []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"vars", 0, 0, 1}}
 var ArginfoDebugZvalDump []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"vars", 0, 0, 1}}
 var ArginfoVarExport []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"var", 0, 0, 0}, {"return", 0, 0, 0}}
@@ -1658,15 +1496,7 @@ var ArginfoSerialize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 var ArginfoUnserialize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"variable_representation", 0, 0, 0}, {"allowed_classes", 0, 0, 0}}
 var ArginfoMemoryGetUsage []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"real_usage", 0, 0, 0}}
 var ArginfoMemoryGetPeakUsage []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"real_usage", 0, 0, 0}}
-
-/* }}} */
-
 var ArginfoVersionCompare []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"ver1", 0, 0, 0}, {"ver2", 0, 0, 0}, {"oper", 0, 0, 0}}
-
-/* }}} */
-
-/* }}} */
-
 var BasicFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"constant",
@@ -5422,16 +5252,10 @@ var BasicFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
 var StandardDeps []zend.ZendModuleDep = []zend.ZendModuleDep{
 	{"session", nil, nil, zend.MODULE_DEP_OPTIONAL},
 	{nil, nil, nil, 0},
 }
-
-/* }}} */
-
 var BasicFunctionsModule zend.ZendModuleEntry = zend.ZendModuleEntry{
 	b.SizeOf("zend_module_entry"),
 	zend.ZEND_MODULE_API_NO,
@@ -5459,210 +5283,44 @@ var BasicFunctionsModule zend.ZendModuleEntry = zend.ZendModuleEntry{
 	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string inet_ntop(string in_addr)
    Converts a packed inet address to a human readable IP address string */
-
-/* }}} */
 
 /* {{{ proto string inet_pton(string ip_address)
    Converts a human readable IP address to a packed binary string */
 
-/* }}} */
-
 /* {{{ proto int ip2long(string ip_address)
    Converts a string containing an (IPv4) Internet Protocol dotted address into a proper address */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto bool putenv(string setting)
    Set the value of an environment variable */
 
-/* }}} */
-
 /* {{{ free_argv()
    Free the memory allocated to an argv array. */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto mixed time_nanosleep(int seconds, int nanoseconds)
    Delay for a number of seconds and nano seconds */
 
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string get_current_user(void)
    Get the name of the owner of the current PHP script */
-
-/* }}} */
 
 /* {{{ add_config_entry
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto int getservbyname(string service, string protocol)
    Returns port associated with service. Protocol must be "tcp" or "udp" */
-
-/* }}} */
 
 /* {{{ proto string getservbyport(int port, string protocol)
    Returns service name associated with port. Protocol must be "tcp" or "udp" */
 
-/* }}} */
-
 /* {{{ proto int getprotobyname(string name)
    Returns protocol number associated with name as per /etc/protocols */
-
-/* }}} */
 
 /* {{{ proto string getprotobynumber(int proto)
    Returns protocol name associated with protocol number proto */
 
-/* }}} */
-
 /* {{{ proto bool register_tick_function(string function_name [, mixed arg [, mixed ... ]])
    Registers a tick callback function */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto array sys_getloadavg()
  */
-
-/* }}} */

@@ -36,8 +36,6 @@ var PhpFileLeStreamFilter func() int
 /* these functions relay the file/line number information. They are depth aware, so they will pass
  * the ultimate ancestor, which is useful, because there can be several layers of calls */
 
-/* }}} */
-
 /* operations on streams that are file-handles */
 
 const PHP_STREAM_FLAG_NO_SEEK = 0x1

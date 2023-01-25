@@ -63,21 +63,11 @@ var SplAutoloadCallFn *zend.ZendFunction = nil
 /* {{{ PHP_GINIT_FUNCTION
  */
 
-/* }}} */
-
 /* {{{ proto array class_parents(object instance [, bool autoload = true])
 Return an array containing the names of all parent classes */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto array spl_classes()
 Return an array containing the names of all clsses and interfaces defined in SPL */
-
-/* }}} */
 
 /* {{{ proto void spl_autoload(string class_name [, string file_extensions])
 Default implementation for __autoload() */
@@ -100,16 +90,8 @@ Return all registered __autoload() functionns */
 /* {{{ proto string spl_object_hash(object obj)
 Return hash id for given object */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ PHP_MINFO(spl)
  */
-
-/* }}} */
 
 var ArginfoIteratorToArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
@@ -157,9 +139,6 @@ var ArginfoSplAutoloadRegister []zend.ZendInternalArgInfo = []zend.ZendInternalA
 var ArginfoSplAutoloadUnregister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"autoload_function", 0, 0, 0}}
 var ArginfoSplObjectHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"obj", 0, 0, 0}}
 var ArginfoSplObjectId []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"obj", 0, 0, 0}}
-
-/* }}} */
-
 var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"spl_classes",
@@ -269,10 +248,6 @@ var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{nil, nil, nil, 0, 0},
 }
 
-/* }}} */
-
-/* }}} */
-
 /* {{{ spl_module_entry
  */
 
@@ -301,5 +276,3 @@ var SplModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
 	0,
 	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
 }
-
-/* }}} */

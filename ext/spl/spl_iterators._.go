@@ -186,9 +186,6 @@ const (
 
 var SplHandlersRecItIt zend.ZendObjectHandlers
 var SplHandlersDualIt zend.ZendObjectHandlers
-
-/* }}} */
-
 var SplRecursiveItIteratorFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplRecursiveItDtor, SplRecursiveItValid, SplRecursiveItGetCurrentData, SplRecursiveItGetCurrentKey, SplRecursiveItMoveForward, SplRecursiveItRewind, nil}
 
 /* {{{ proto RecursiveIteratorIterator::__construct(RecursiveIterator|IteratorAggregate it [, int mode = RIT_LEAVES_ONLY [, int flags = 0]]) throws InvalidArgumentException
@@ -246,16 +243,6 @@ var SplRecursiveItIteratorFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIt
    Return the maximum accepted depth or false if any depth is allowed */
 
 /* {{{ spl_RecursiveIteratorIterator_dtor */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var ArginfoRecursiveItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
@@ -643,8 +630,6 @@ Move the iterator forward */
 /* {{{ proto bool CallbackFilterIterator::accept()
    Calls the callback with the current value, the current key and the inner iterator as arguments */
 
-/* }}} */
-
 /* {{{ proto string RegexIterator::getRegex()
    Returns current regular expression */
 
@@ -673,12 +658,6 @@ Move the iterator forward */
    Return the inner iterator's children contained in a RecursiveRegexIterator */
 
 /* {{{ spl_dual_it_dtor */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var ArginfoFilterItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -1120,22 +1099,6 @@ var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 
 /* {{{ proto void CachingIterator::offsetSet(mixed index, mixed newval)
    Set given index in cache */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var ArginfoCachingItConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
@@ -1656,21 +1619,6 @@ var spl_funcs_AppendIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var spl_funcs_OuterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"getInnerIterator",
@@ -1684,5 +1632,3 @@ var spl_funcs_OuterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 
 /* {{{ PHP_MINIT_FUNCTION(spl_iterators)
  */
-
-/* }}} */

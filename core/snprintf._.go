@@ -108,14 +108,6 @@ const LCONV_DECIMAL_POINT = (*lconv).decimal_point
  * Materiel Command, USAF, under agreement number F39502-99-1-0512.
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const FALSE = 0
 const TRUE = 1
 const NUL = '0'
@@ -138,8 +130,6 @@ const EXPONENT_LENGTH = 10
  * is declared as buf[ 100 ], buf_end should be &buf[ 100 ])
  */
 
-/* }}} */
-
 const NDIG = 320
 
 /*
@@ -148,10 +138,6 @@ const NDIG = 320
  * The sign is returned in the is_negative argument (and is not placed
  * in buf).
  */
-
-/* }}} */
-
-/* }}} */
 
 const NUM_BUF_SIZE = 2048
 
@@ -193,19 +179,3 @@ type Buffy = BufArea
 /*
  * Do format conversion placing the output in buffer
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

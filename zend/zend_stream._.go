@@ -79,5 +79,3 @@ const ZendStat = stat
 */
 
 var Isatty func(fd int) int
-
-/* }}} */

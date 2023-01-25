@@ -66,69 +66,10 @@ var ZEND_GENERATOR_DO_INIT ZendUchar = 0x8
 
 var ZendGeneratorHandlers ZendObjectHandlers
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* Pay attention so that the root of each subtree of the Generators tree is referenced
  * once per leaf */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = ZendObjectIteratorFuncs{ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil}
-
-/* }}} */
-
 var ArginfoGeneratorVoid []ZendInternalArgInfo = []ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0},
 }
@@ -193,5 +134,3 @@ var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */

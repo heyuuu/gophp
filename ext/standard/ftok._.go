@@ -24,5 +24,3 @@ package standard
 
 /* {{{ proto int ftok(string pathname, string proj)
    Convert a pathname and a project identifier to a System V IPC key */
-
-/* }}} */

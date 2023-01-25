@@ -79,25 +79,11 @@ var GlobalSigmask sigset_t
 /* {{{ zend_signal_handler_unblock
  * Handle deferred signal from HANDLE_UNBLOCK_ALARMS */
 
-/* }}} */
-
 /* {{{ zend_sigaction
  *  Register a signal handler that will be deferred in critical sections */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ zend_signal_activate
  *  Install our signal handlers, per request */
 
 /* {{{ zend_signal_deactivate
  * */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

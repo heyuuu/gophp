@@ -27,11 +27,3 @@ const VOLUME_NAME_DOS = 0x0
 
 /* {{{ proto string readlink(string filename)
    Return the target of a symbolic link */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

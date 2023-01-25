@@ -56,23 +56,9 @@ var ZmActivateHead func(type_ int, module_number int) int
 
 /* Implementation of the language Header() function */
 
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto bool setcookie(string name [, string value [, int expires [, string path [, string domain [, bool secure[, bool httponly]]]]]])
                setcookie(string name [, string value [, array options]])
 Send a cookie */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto array headers_list(void)
    Return list of headers to be sent / already sent */
-
-/* }}} */
-
-/* }}} */

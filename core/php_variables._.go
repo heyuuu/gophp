@@ -71,12 +71,4 @@ type PostVarData = PostVarDataT
 /* {{{ php_build_argv
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* Upgly hack to fix HTTP_PROXY issue, see bug #72573 */

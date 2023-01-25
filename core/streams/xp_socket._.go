@@ -31,8 +31,6 @@ const MSG_PEEK = 0
 
 /* {{{ Generic socket stream operations */
 
-/* }}} */
-
 var PhpStreamGenericSocketOps core.PhpStreamOps = core.PhpStreamOps{PhpSockopWrite, PhpSockopRead, PhpSockopClose, PhpSockopFlush, "generic_socket", nil, PhpSockopCast, PhpSockopStat, PhpSockopSetOption}
 var PhpStreamSocketOps core.PhpStreamOps = core.PhpStreamOps{PhpSockopWrite, PhpSockopRead, PhpSockopClose, PhpSockopFlush, "tcp_socket", nil, PhpSockopCast, PhpSockopStat, PhpTcpSockopSetOption}
 var PhpStreamUdpSocketOps core.PhpStreamOps = core.PhpStreamOps{PhpSockopWrite, PhpSockopRead, PhpSockopClose, PhpSockopFlush, "udp_socket", nil, PhpSockopCast, PhpSockopStat, PhpTcpSockopSetOption}

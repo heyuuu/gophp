@@ -51,5 +51,3 @@ var Crc32tab []uint = []uint{0x0, 0x77073096, 0xee0e612c, 0x990951ba, 0x76dc419,
 
 /* {{{ proto string crc32(string str)
    Calculate the crc32 polynomial of a string */
-
-/* }}} */

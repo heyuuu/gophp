@@ -30,10 +30,6 @@ const PHP_TIMEOUT_ERROR_VALUE = ETIMEDOUT
 /* {{{ php_network_freeaddresses
  */
 
-/* }}} */
-
-/* }}} */
-
 const O_NONBLOCK = O_NDELAY
 
 type PhpNonBlockingFlagsT = int
@@ -43,12 +39,6 @@ type PhpNonBlockingFlagsT = int
  * enable non-blocking mode on the socket.
  * */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* Accept a client connection from a server socket,
  * using an optional timeout.
  * Returns the peer address in addr/addrlen (it will emalloc
@@ -56,15 +46,3 @@ type PhpNonBlockingFlagsT = int
  * If you specify textaddr, a text-printable
  * version of the address will be emalloc'd and returned.
  * */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

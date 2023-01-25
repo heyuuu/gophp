@@ -49,10 +49,6 @@ package standard
 /* {{{ proto string sha1(string str [, bool raw_output])
    Calculate the sha1 hash of a string */
 
-/* }}} */
-
-/* }}} */
-
 var SHA1Transform func([]uint32, []uint8)
 var SHA1Encode func(*uint8, *uint32, uint)
 var SHA1Decode func(*uint32, *uint8, uint)
@@ -73,9 +69,3 @@ var PADDING []uint8 = []uint8{0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 /* {{{ PHP_SHA1Init
  * SHA1 initialization. Begins an SHA1 operation, writing a new context.
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

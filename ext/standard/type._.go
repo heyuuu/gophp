@@ -25,44 +25,6 @@ package standard
 /* {{{ proto string gettype(mixed var)
    Returns the type of the variable */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto bool is_null(mixed var)
    Returns true if variable is null
    Warning: This function is special-cased by zend_compile.c and so is usually bypassed */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

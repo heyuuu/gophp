@@ -88,24 +88,6 @@ const ZEND_SYSTEM_INI = CompilerGlobals.GetIniParserUnbufferedErrors()
 /* {{{ zend_ini_do_op()
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const YY_NULLPTR = 0
 
 /* Enabling verbose error messages.  */

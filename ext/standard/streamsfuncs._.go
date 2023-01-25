@@ -62,82 +62,12 @@ type PhpTimeoutUll = unsigned__long__long
 /* {{{ proto array stream_socket_pair(int domain, int type, int protocol)
    Creates a pair of connected, indistinguishable socket streams */
 
-/* }}} */
-
 /* {{{ proto resource stream_socket_client(string remoteaddress [, int &errcode [, string &errstring [, double timeout [, int flags [, resource context]]]]])
    Open a client connection to a remote address */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* given a zval which is either a stream or a context, return the underlying
  * stream_context.  If it is a stream that does not have a context assigned, it
  * will create and assign a context and return that.  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto bool stream_isatty(resource stream)
 Check if a stream is a TTY.
@@ -149,5 +79,3 @@ Check if a stream is a TTY.
    be disallowed. If how is SHUT_WR, further transmissions will be disallowed.
    If how is SHUT_RDWR,  further  receptions and transmissions will be
    disallowed. */
-
-/* }}} */

@@ -86,9 +86,6 @@ var ArginfoGetDefinedConstants []ZendInternalArgInfo = []ZendInternalArgInfo{{(*
 var ArginfoDebugBacktrace []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"options", 0, 0, 0}, {"limit", 0, 0, 0}}
 var ArginfoDebugPrintBacktrace []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"options", 0, 0, 0}, {"limit", 0, 0, 0}}
 var ArginfoExtensionLoaded []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"extension_name", 0, 0, 0}}
-
-/* }}} */
-
 var BuiltinFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	{
 		"zend_version",
@@ -491,11 +488,6 @@ var BuiltinFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */
-
 var ZendBuiltinModule ZendModuleEntry = ZendModuleEntry{
 	b.SizeOf("zend_module_entry"),
 	ZEND_MODULE_API_NO,
@@ -523,150 +515,16 @@ var ZendBuiltinModule ZendModuleEntry = ZendModuleEntry{
 	"API" + "ZEND_MODULE_API_NO" + ZEND_BUILD_TS,
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 const LAMBDA_TEMP_FUNCNAME = "__lambda_func"
 
 /* {{{ proto string create_function(string args, string code)
    Creates an anonymous function, and returns its name (funny, eh?) */
 
-/* }}} */
-
 /* {{{ proto string get_resource_type(resource res)
    Get the resource type name for a given resource */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

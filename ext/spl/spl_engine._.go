@@ -24,12 +24,6 @@ package spl
 
 /* {{{ spl_instantiate_arg_ex1 */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 // Source: <ext/spl/spl_engine.c>
 
 /*
@@ -51,7 +45,3 @@ package spl
 */
 
 /* {{{ spl_instantiate */
-
-/* }}} */
-
-/* }}} */

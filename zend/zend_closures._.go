@@ -58,57 +58,6 @@ const ZEND_CLOSURE_PRINT_NAME = "Closure object"
 /* non-static since it needs to be referenced */
 
 var ClosureHandlers ZendObjectHandlers
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var ArginfoClosureBindto []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"newthis", 0, 0, 0}, {"newscope", 0, 0, 0}}
 var ArginfoClosureBind []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"closure", 0, 0, 0}, {"newthis", 0, 0, 0}, {"newscope", 0, 0, 0}}
 var ArginfoClosureCall []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"newthis", 0, 0, 0}, {"parameters", 0, 0, 1}}
@@ -151,15 +100,3 @@ var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

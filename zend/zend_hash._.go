@@ -112,10 +112,6 @@ var UninitializedBucket []uint32 = []uint32{HT_INVALID_IDX, HT_INVALID_IDX}
 
 //ZEND_API const HashTable zend_empty_array = {
 
-/* }}} */
-
-/* }}} */
-
 /* This is used to recurse elements and selectively delete certain entries
  * from a hashtable. apply_func() receives the data and decides if the entry
  * should be deleted or recursion should be stopped. The following three

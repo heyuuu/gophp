@@ -32,8 +32,6 @@ var DirClassEntryPtr *zend.ZendClassEntry
 
 /* {{{ arginfo */
 
-/* }}} */
-
 var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"close",
@@ -59,38 +57,14 @@ var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{nil, nil, nil, 0, 0},
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto bool chroot(string directory)
    Change root directory */
-
-/* }}} */
 
 /* {{{ proto bool chdir(string directory)
    Change the current directory */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto array glob(string pattern [, int flags])
    Find pathnames matching a pattern */
 
-/* }}} */
-
 /* {{{ proto array scandir(string dir [, int sorting_order [, resource context]])
    List files & directories inside the specified path */
-
-/* }}} */

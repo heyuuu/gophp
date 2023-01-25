@@ -70,29 +70,7 @@ const SPL_ARRAY_METHOD_NO_ARG = 0
 const SPL_ARRAY_METHOD_USE_ARG = 1
 const SPL_ARRAY_METHOD_MAY_USER_ARG = 2
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ spl_array_object_new_ex */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto bool ArrayObject::offsetExists(mixed $index)
     proto bool ArrayIterator::offsetExists(mixed $index)
@@ -118,47 +96,7 @@ Unsets the value at the specified $index. */
    proto array ArrayIterator::getArrayCopy()
 Return a copy of the contained array */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var SplArrayItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplArrayItDtor, SplArrayItValid, SplArrayItGetCurrentData, SplArrayItGetCurrentKey, SplArrayItMoveForward, SplArrayItRewind, nil}
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto int ArrayObject::count()
     proto int ArrayIterator::count()
@@ -191,27 +129,11 @@ Sort the entries by key using case insensitive "natural order" algorithm. */
 /* {{{ proto mixed|NULL ArrayIterator::current()
    Return current array entry */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto void ArrayObject::unserialize(string serialized)
  * unserialize the object
  */
 
 /* {{{ proto array ArrayObject::__serialize() */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ arginfo and function table */
 
@@ -640,7 +562,3 @@ var spl_funcs_RecursiveArrayIterator []zend.ZendFunctionEntry = []zend.ZendFunct
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */

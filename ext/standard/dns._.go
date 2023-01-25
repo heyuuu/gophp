@@ -54,26 +54,12 @@ const DNS_T_A6 = 38
 const DNS_T_CAA = 257
 const DNS_T_ANY = 255
 
-/* }}} */
-
 /* {{{ proto string gethostname()
    Get the host name of the current machine */
-
-/* }}} */
 
 /* TODO: Reimplement the gethostby* functions using the new winxp+ API, in dns_win32.c, then
 we can have a dns.c, dns_unix.c and dns_win32.c instead of a messy dns.c full of #ifdef
 */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 const PHP_DNS_NUM_TYPES = 13
 const PHP_DNS_A = 0x1
@@ -107,12 +93,4 @@ const MAXRESOURCERECORDS = 64
 /* {{{ proto bool dns_check_record(string host [, string type])
    Check DNS records corresponding to a given Internet host name or IP address */
 
-/* }}} */
-
 /* {{{ php_parserr */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

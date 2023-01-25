@@ -28,8 +28,6 @@ import (
    +----------------------------------------------------------------------+
 */
 
-/* }}} */
-
 var AssertGlobals ZendAssertGlobals
 var AssertionErrorCe *zend.ZendClassEntry
 
@@ -41,8 +39,6 @@ const (
 	ASSERT_QUIET_EVAL
 	ASSERT_EXCEPTION
 )
-
-/* }}} */
 
 var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
@@ -108,17 +104,3 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	},
 	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

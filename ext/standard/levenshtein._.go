@@ -26,9 +26,3 @@ const LEVENSHTEIN_MAX_LENGTH = 255
 
 /* {{{ reference_levdist
  * reference implementation, only optimized for memory usage, not speed */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

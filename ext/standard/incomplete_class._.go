@@ -32,23 +32,3 @@ var PhpIncompleteObjectHandlers zend.ZendObjectHandlers
 
 /* {{{ incomplete_class_message
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

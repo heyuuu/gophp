@@ -74,6 +74,4 @@ const PHP_STREAM_IS_SOCKET = &PhpStreamSocketOps
 
 /* {{{ memory debug */
 
-/* }}} */
-
 const MAXFQDNLEN = 255

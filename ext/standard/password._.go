@@ -29,29 +29,11 @@ import (
 
 var PhpPasswordAlgos zend.ZendArray
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* bcrypt implementation */
 
 var PhpPasswordAlgoBcrypt PhpPasswordAlgo = PhpPasswordAlgo{"bcrypt", PhpPasswordBcryptHash, PhpPasswordBcryptVerify, PhpPasswordBcryptNeedsRehash, PhpPasswordBcryptGetInfo, PhpPasswordBcryptValid}
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto array password_get_info(string $hash)
 Retrieves information about a given hash */
 
 /** }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

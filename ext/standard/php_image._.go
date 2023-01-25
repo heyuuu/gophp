@@ -52,5 +52,3 @@ const (
 	IMAGE_FILETYPE_WEBP
 	IMAGE_FILETYPE_COUNT
 )
-
-/* }}} */

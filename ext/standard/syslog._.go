@@ -25,13 +25,5 @@ package standard
 /* {{{ PHP_MINIT_FUNCTION
  */
 
-/* }}} */
-
 /* {{{ proto bool openlog(string ident, int option, int facility)
    Open connection to system logger */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

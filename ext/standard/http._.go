@@ -25,7 +25,3 @@ package standard
 const URL_DEFAULT_ARG_SEP = "&"
 
 /* {{{ php_url_encode_hash */
-
-/* }}} */
-
-/* }}} */

@@ -121,22 +121,6 @@ var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 
 /* {{{ storage is an assoc array of [zend_object*]=>[zval *obj, zval *inf] */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto void SplObjectStorage::attach(object obj, mixed data = NULL)
 Attaches an object to the storage if not yet contained */
 
@@ -157,8 +141,6 @@ Remove all elements contained in $os */
 
 /* {{{ proto bool SplObjectStorage::removeAllExcept(SplObjectStorage $os)
 Remove elements not common to both this SplObjectStorage instance and $os */
-
-/* }}} */
 
 /* {{{ proto int SplObjectStorage::count()
 Determine number of objects in storage */
@@ -195,8 +177,6 @@ Unserializes storage */
 /* {{{ proto void SplObjectStorage::__unserialize(array serialized) */
 
 /* {{{ proto array SplObjectStorage::__debugInfo() */
-
-/* }}} */
 
 var arginfo_Object []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
@@ -405,26 +385,6 @@ const SPL_MULTIPLE_ITERATOR_GET_ALL_KEY = 2
 /* {{{ proto MultipleIterator::__construct([int flags = MIT_NEED_ALL|MIT_KEYS_NUMERIC])
    Iterator that iterates over several iterators one after the other */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var arginfo_MultipleIterator_attachIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
 	{
@@ -550,5 +510,3 @@ var spl_funcs_MultipleIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 }
 
 /* {{{ PHP_MINIT_FUNCTION(spl_observer) */
-
-/* }}} */

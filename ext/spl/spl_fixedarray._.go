@@ -53,69 +53,15 @@ var spl_ce_SplFixedArray *zend.ZendClassEntry
 
 var spl_handler_SplFixedArray zend.ZendObjectHandlers
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const SPL_FIXEDARRAY_OVERLOADED_REWIND = 0x1
 const SPL_FIXEDARRAY_OVERLOADED_VALID = 0x2
 const SPL_FIXEDARRAY_OVERLOADED_KEY = 0x4
 const SPL_FIXEDARRAY_OVERLOADED_CURRENT = 0x8
 const SPL_FIXEDARRAY_OVERLOADED_NEXT = 0x10
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* }}}} */
 
 /* }}}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto mixed SplFixedArray::offsetGet(mixed $index)
 Returns the value at the specified $index. */
@@ -126,32 +72,7 @@ Sets the value at the specified $index to $newval. */
 /* {{{ proto void SplFixedArray::offsetUnset(mixed $index)
 Unsets the value at the specified $index. */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var SplFixedarrayItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplFixedarrayItDtor, SplFixedarrayItValid, SplFixedarrayItGetCurrentData, SplFixedarrayItGetCurrentKey, SplFixedarrayItMoveForward, SplFixedarrayItRewind, nil}
-
-/* }}} */
-
 var ArginfoSplfixedarrayConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"size", 0, 0, 0}}
 var arginfo_fixedarray_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"index", 0, 0, 0}}
 var arginfo_fixedarray_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(2)), 0, 0, 0}, {"index", 0, 0, 0}, {"newval", 0, 0, 0}}
@@ -278,7 +199,3 @@ var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */

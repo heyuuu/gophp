@@ -36,17 +36,7 @@ var LeStream int = zend.FAILURE
 var LePstream int = zend.FAILURE
 var LeStreamFilter int = zend.FAILURE
 
-/* }}} */
-
 /* {{{ wrapper error reporting */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* Like php_stream_read(), but reading into a zend_string buffer. This has some similarity
  * to the copy_to_mem() operation, but only performs a single direct read. */
@@ -69,8 +59,6 @@ var LeStreamFilter int = zend.FAILURE
  * Returns 1 when source len is 0.
  * Deprecated in favor of php_stream_copy_to_stream_ex() */
 
-/* }}} */
-
 /* Validate protocol scheme names during registration
  * Must conform to /^[a-zA-Z0-9+.-]+$/
  */
@@ -78,27 +66,3 @@ var LeStreamFilter int = zend.FAILURE
 /* API for registering GLOBAL wrappers */
 
 /* API for registering VOLATILE wrappers */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

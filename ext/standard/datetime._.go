@@ -51,9 +51,5 @@ var DayShortNames []*byte = []*byte{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "S
 /* {{{ PHPAPI char *php_std_date(time_t t)
    Return date string in standard format for http headers */
 
-/* }}} */
-
 /* {{{ proto string strptime(string timestamp, string format)
    Parse a time/date generated with strftime() */
-
-/* }}} */

@@ -63,5 +63,3 @@ var spl_ce_UnexpectedValueException *zend.ZendClassEntry
 const spl_ce_Exception *zend.ZendClassEntry = zend.ZendCeException
 
 /* {{{ PHP_MINIT_FUNCTION(spl_exceptions) */
-
-/* }}} */

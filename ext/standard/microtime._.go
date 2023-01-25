@@ -51,11 +51,5 @@ const SEC_IN_MIN = 60
 /* {{{ proto mixed microtime([bool get_as_float])
    Returns either a string or a float containing the current time in seconds and microseconds */
 
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto array getrusage([int who])
    Returns an array of usage statistics */
-
-/* }}} */

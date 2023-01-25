@@ -56,7 +56,3 @@ var ArginfoCliGetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalAr
 
 /* {{{ proto bool cli_set_process_title(string arg)
    Return a boolean to confirm if the process title was successfully changed or not */
-
-/* }}} */
-
-/* }}} */

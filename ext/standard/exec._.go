@@ -47,29 +47,5 @@ var CmdMaxLen int
 
 /* {{{ PHP_MINIT_FUNCTION(exec) */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto bool proc_nice(int priority)
    Change the priority of the current process */
-
-/* }}} */

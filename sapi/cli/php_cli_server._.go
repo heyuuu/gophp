@@ -97,15 +97,6 @@ var CliServerGlobals ZendCliServerGlobals
  */
 
 var PhpCliServerCss []byte = "<style>\n" + "body { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\n" + "h1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\n" + "h1, p { padding-left: 10px; }\n" + "code.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n" + "</style>\n"
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	{
 		"cli_server.color",
@@ -147,9 +138,6 @@ var CliServerModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
 	0,
 	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
 }
-
-/* }}} */
-
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
@@ -192,12 +180,6 @@ var ServerAdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntr
 	{nil, nil, nil, 0, 0},
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ sapi_module_struct cli_server_sapi_module
  */
 
@@ -205,20 +187,4 @@ var CliServerSapiModule core.sapi_module_struct = core.sapi_module_struct{"cli-s
 
 /* {{{ php_cli_server_client_read_request */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var Server PhpCliServer
-
-/* }}} */

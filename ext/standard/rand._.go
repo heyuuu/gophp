@@ -32,9 +32,3 @@ package standard
 
 /* {{{ php_srand
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

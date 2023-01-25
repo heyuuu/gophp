@@ -56,8 +56,6 @@ const P_tmpdir = ""
 
 /* {{{ php_do_open_temporary_file */
 
-/* }}} */
-
 /* {{{ php_open_temporary_file
  *
  * Unlike tempnam(), the supplied dir argument takes precedence
@@ -65,5 +63,3 @@ const P_tmpdir = ""
  * This function should do its best to return a file pointer to a newly created
  * unique file, on every platform.
  */
-
-/* }}} */

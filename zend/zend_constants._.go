@@ -59,5 +59,3 @@ const ZEND_CONSTANT_DTOR DtorFuncT = FreeZendConstant
 /* Protection from recursive self-referencing class constants */
 
 const IS_CONSTANT_VISITED_MARK = 0x80
-
-/* }}} */

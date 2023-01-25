@@ -34,38 +34,10 @@ const FTPS_ENCRYPT_DATA = 1
 /* {{{ get_ftp_result
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var PhpFtpDirstreamOps core.PhpStreamOps = core.PhpStreamOps{nil, PhpFtpDirstreamRead, PhpFtpDirstreamClose, nil, "ftpdir", nil, nil, nil, nil}
 
 /* {{{ php_stream_ftp_opendir
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var FtpStreamWops core.PhpStreamWrapperOps = core.PhpStreamWrapperOps{PhpStreamUrlWrapFtp, PhpStreamFtpStreamClose, PhpStreamFtpStreamStat, PhpStreamFtpUrlStat, PhpStreamFtpOpendir, "ftp", PhpStreamFtpUnlink, PhpStreamFtpRename, PhpStreamFtpMkdir, PhpStreamFtpRmdir, nil}
 var PhpStreamFtpWrapper core.PhpStreamWrapper = core.PhpStreamWrapper{&FtpStreamWops, nil, 1}

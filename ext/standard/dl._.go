@@ -51,13 +51,5 @@ package standard
 /* {{{ proto int dl(string extension_filename)
    Load a PHP extension at runtime */
 
-/* }}} */
-
 /* {{{ php_load_shlib
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

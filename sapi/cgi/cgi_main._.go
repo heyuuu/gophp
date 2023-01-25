@@ -87,8 +87,6 @@ type _phpCgiGlobals = php_cgi_globals_struct
  *       between separate files.
  */
 
-/* }}} */
-
 var php_cgi_globals php_cgi_globals_struct
 
 const STDOUT_FILENO = 1
@@ -98,22 +96,14 @@ const STDIN_FILENO = 0
 /* {{{ php_cgi_ini_activate_user_config
  */
 
-/* }}} */
-
 /* {{{ sapi_module_struct cgi_sapi_module
  */
 
 var CgiSapiModule core.sapi_module_struct = core.sapi_module_struct{"cgi-fcgi", "CGI/FastCGI", PhpCgiStartup, core.PhpModuleShutdownWrapper, SapiCgiActivate, SapiCgiDeactivate, SapiCgiUbWrite, SapiCgiFlush, nil, SapiCgiGetenv, core.PhpError, nil, SapiCgiSendHeaders, nil, SapiCgiReadPost, SapiCgiReadCookies, SapiCgiRegisterVariables, SapiCgiLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
-
-/* }}} */
-
 var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"extension_filename", 0, 0, 0},
 }
-
-/* }}} */
-
 var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	{
 		"dl",
@@ -127,10 +117,6 @@ var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 
 /* {{{ php_cgi_usage
  */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ init_request_info
 
@@ -198,8 +184,6 @@ QUERY_STRING=a=b
 Comments in the code below refer to using the above URL in a request
 
 */
-
-/* }}} */
 
 /**
  * Clean up child processes upon exit
@@ -308,22 +292,6 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 /* {{{ php_cgi_globals_ctor
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 }
@@ -387,5 +355,3 @@ var CgiModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
 
 /* {{{ main
  */
-
-/* }}} */

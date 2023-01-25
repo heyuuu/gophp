@@ -78,61 +78,11 @@ var DefaultExceptionHandlers ZendObjectHandlers
 
 /* {{{ zend_implement_throwable */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string Exception|Error::getFile()
    Get the file in which the exception occurred */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto string Exception|Error::__toString()
    Obtain the string representation of the Exception object */
-
-/* }}} */
 
 var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
 	{
@@ -193,9 +143,6 @@ var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
 var ArginfoExceptionConstruct []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"message", 0, 0, 0}, {"code", 0, 0, 0}, {"previous", 0, 0, 0}}
 var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	{
@@ -295,25 +242,3 @@ var ErrorExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

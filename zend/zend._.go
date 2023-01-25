@@ -136,16 +136,6 @@ var ZendPreloadAutoload func(filename *ZendString) int = nil
 var ZendMessageDispatcherP func(message ZendLong, data any)
 var ZendGetConfigurationDirectiveP func(name *ZendString) *Zval
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const SIGNAL_CHECK_DEFAULT = "0"
 
 var IniEntries []ZendIniEntryDef = []ZendIniEntryDef{
@@ -215,99 +205,6 @@ var IniEntries []ZendIniEntryDef = []ZendIniEntryDef{
 	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
 }
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const ShortTagsDefault = 1
 const CompilerOptionsDefault uint32 = ZEND_COMPILE_DEFAULT
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const COMPILED_STRING_DESCRIPTION_FORMAT = "%s(%d) : %s"
-
-/* }}} */
-
-/* }}} */

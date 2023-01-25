@@ -31,58 +31,16 @@ import (
 
 // failed # include "ext/date/php_date.h"
 
-/* }}} */
-
 var PhpRegisterInternalExtensionsFunc func() int = PhpRegisterInternalExtensions
 var CoreGlobals PhpCoreGlobals
 
 /* {{{ PHP_INI_MH
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var PhpInternalEncodingChanged func() = nil
 
 /* {{{ PHP_INI_MH
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 var OnChangeBrowscap func(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int
 
@@ -910,78 +868,19 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	},
 	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
 }
-
-/* }}} */
-
 var ModuleInitialized int = 0
 var ModuleStartup int = 1
 var ModuleShutdown int = 0
 
 /* {{{ php_during_module_startup */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ php_html_puts */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ php_request_startup
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ core_globals_dtor
  */
-
-/* }}} */
-
-/* }}} */
 
 /* A very long time ago php_module_startup() was refactored in a way
  * which broke calling it with more than one additional module.
@@ -991,23 +890,5 @@ var ModuleShutdown int = 0
  * See algo: https://bugs.php.net/bug.php?id=63159
  */
 
-/* }}} */
-
 /* {{{ php_module_startup
  */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

@@ -87,10 +87,6 @@ var PhpIniScannedFiles *byte = nil
 /* {{{ php_ini_displayer_cb
  */
 
-/* }}} */
-
-/* }}} */
-
 const PHP_EXTENSION_TOKEN = "extension"
 const ZEND_EXTENSION_TOKEN = "zend_extension"
 
@@ -98,39 +94,3 @@ const ZEND_EXTENSION_TOKEN = "zend_extension"
  */
 
 /* Reset / free active_ini_sectin global */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

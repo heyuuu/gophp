@@ -44,20 +44,6 @@ package zend
    +----------------------------------------------------------------------+
 */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* Instanceof that's safe to use on unlinked classes. */
 
 /* Unresolved means that class declarations that are currently not available are needed to
@@ -71,75 +57,8 @@ const (
 	INHERITANCE_ERROR                        = 0
 	INHERITANCE_SUCCESS                      = 1
 )
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const MAX_ABSTRACT_INFO_CNT = 3
 const MAX_ABSTRACT_INFO_FMT = "%s%s%s%s"
-
-/* }}} */
-
-/* }}} */
 
 type VarianceObligationType = int
 
@@ -148,9 +67,3 @@ const (
 	OBLIGATION_COMPATIBILITY
 	OBLIGATION_PROPERTY_COMPATIBILITY
 )
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

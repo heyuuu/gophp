@@ -27,21 +27,7 @@ package standard
 /* {{{ php_iptc_put1
  */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 var Psheader []byte = "xFFxED00Photoshop 3.008BIMx04x040000"
 
 /* {{{ proto array iptcembed(string iptcdata, string jpeg_file_name [, int spool])
    Embed binary IPTC data into a JPEG image. */
-
-/* }}} */
-
-/* }}} */

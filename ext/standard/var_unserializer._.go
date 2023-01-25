@@ -18,6 +18,4 @@ const VAR_ENTRIES_DBG = 0
 const VAR_WAKEUP_FLAG = 1
 const VAR_UNSERIALIZE_FLAG = 2
 
-/* }}} */
-
 /* no need to check for length - re2c already did */

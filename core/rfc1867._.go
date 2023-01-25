@@ -91,25 +91,6 @@ const UPLOAD_ERROR_D = 4
 const UPLOAD_ERROR_E = 6
 const UPLOAD_ERROR_F = 7
 const UPLOAD_ERROR_X = 8
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 const FILLUNIT = 1024 * 5
 
 /*
@@ -153,9 +134,3 @@ const FILLUNIT = 1024 * 5
   XXX: this is horrible memory-usage-wise, but we only expect
   to do this on small pieces of form data.
 */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

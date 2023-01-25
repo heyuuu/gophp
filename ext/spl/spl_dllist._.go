@@ -63,69 +63,9 @@ type SplPtrLlistCtorFunc func(*SplPtrLlistElement)
 
 /* define an __special__  overloaded iterator structure */
 
-/* }}} */
-
 /* {{{  spl_ptr_llist */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* }}}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto mixed SplDoublyLinkedList::offsetGet(mixed index)
 Returns the value at the specified $index. */
@@ -135,34 +75,6 @@ Sets the value at the specified $index to $newval. */
 
 /* {{{ proto void SplDoublyLinkedList::offsetUnset(mixed index)
 Unsets the value at the specified $index. */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
 
 /* {{{ proto void SplDoublyLinkedList::unserialize(string serialized)
 Unserializes storage */
@@ -179,9 +91,6 @@ Inserts a new entry before the specified $index consisting of $newval. */
 /* {{{ iterator handler table */
 
 var SplDllistItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplDllistItDtor, SplDllistItValid, SplDllistItGetCurrentData, SplDllistItGetCurrentKey, SplDllistItMoveForward, SplDllistItRewind, nil}
-
-/* }}} */
-
 var ArginfoDllistSetiteratormode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
 	{"mode", 0, 0, 0},
@@ -401,7 +310,3 @@ var spl_funcs_SplDoublyLinkedList []zend.ZendFunctionEntry = []zend.ZendFunction
 	},
 	{nil, nil, nil, 0, 0},
 }
-
-/* }}} */
-
-/* }}} */

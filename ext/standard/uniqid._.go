@@ -46,5 +46,3 @@ var PrevTv __struct__timeval = __struct__timeval{0, 0}
 
 /* {{{ proto string uniqid([string prefix [, bool more_entropy]])
    Generates a unique ID */
-
-/* }}} */

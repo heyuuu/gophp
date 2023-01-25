@@ -53,5 +53,3 @@ const PHP_LOCK_NB = 4
    | Author: Sascha Schumann <sascha@schumann.cx>                         |
    +----------------------------------------------------------------------+
 */
-
-/* }}} */

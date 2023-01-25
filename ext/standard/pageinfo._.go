@@ -45,22 +45,8 @@ package standard
 /* {{{ php_statpage
  */
 
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto int getmyuid(void)
    Get PHP script owner's UID */
 
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
 /* {{{ proto int getlastmod(void)
    Get time of last page modification */
-
-/* }}} */

@@ -42,25 +42,3 @@ const DEFAULT_SECTION_NAME = "Default Browser Capability Settings"
 /* Length of prefix not containing any wildcards */
 
 /* Length of regex, including escapes, anchors, etc. */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */
-
-/* }}} */

@@ -41,5 +41,3 @@ package standard
    | Authors: Colin Viebrock <colin@viebrock.ca>                          |
    +----------------------------------------------------------------------+
 */
-
-/* }}} */
