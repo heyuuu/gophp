@@ -1228,20 +1228,20 @@ tail_call:
 
 	case ZEND_AST_METHOD:
 		decl = (*ZendAstDecl)(ast)
-		if decl.isPublic() {
+		if decl.IsPublic() {
 			SmartStrAppends(str, "public ")
-		} else if decl.isProtected() {
+		} else if decl.IsProtected() {
 			SmartStrAppends(str, "protected ")
-		} else if decl.isPrivate() {
+		} else if decl.IsPrivate() {
 			SmartStrAppends(str, "private ")
 		}
-		if decl.isStatic() {
+		if decl.IsStatic() {
 			SmartStrAppends(str, "static ")
 		}
-		if decl.isAbstract() {
+		if decl.IsAbstract() {
 			SmartStrAppends(str, "abstract ")
 		}
-		if decl.isFinal() {
+		if decl.IsFinal() {
 			SmartStrAppends(str, "final ")
 		}
 		if decl.GetKind() == ZEND_AST_ARROW_FUNC {
@@ -1249,7 +1249,7 @@ tail_call:
 		} else {
 			SmartStrAppends(str, "function ")
 		}
-		if decl.isReturnReference() {
+		if decl.IsReturnReference() {
 			SmartStrAppendc(str, '&')
 		}
 		if ast.GetKind() != ZEND_AST_CLOSURE && ast.GetKind() != ZEND_AST_ARROW_FUNC {
@@ -1286,15 +1286,15 @@ tail_call:
 		break
 	case ZEND_AST_CLASS:
 		decl = (*ZendAstDecl)(ast)
-		if decl.isInterface() {
+		if decl.IsInterface() {
 			SmartStrAppends(str, "interface ")
-		} else if decl.isTrait() {
+		} else if decl.IsTrait() {
 			SmartStrAppends(str, "trait ")
 		} else {
-			if decl.isExplicitAbstractClass() {
+			if decl.IsExplicitAbstractClass() {
 				SmartStrAppends(str, "abstract ")
 			}
-			if decl.isFinal() {
+			if decl.IsFinal() {
 				SmartStrAppends(str, "final ")
 			}
 			SmartStrAppends(str, "class ")

@@ -237,7 +237,7 @@ func ZendImplementTraversable(interface_ *ZendClassEntry, class_type *ZendClassE
 		return SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
-		ZEND_ASSERT(class_type.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
+		ZEND_ASSERT(class_type.IsResolvedInterfaces())
 		for i = 0; i < class_type.GetNumInterfaces(); i++ {
 			if class_type.interfaces[i] == ZendCeAggregate || class_type.interfaces[i] == ZendCeIterator {
 				return SUCCESS
@@ -265,7 +265,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			/* c-level get_iterator cannot be changed (exception being only Traversable is implemented) */
 
 			if class_type.GetNumInterfaces() != 0 {
-				ZEND_ASSERT(class_type.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
+				ZEND_ASSERT(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
 					if class_type.interfaces[i] == ZendCeIterator {
 						ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", ZSTR_VAL(class_type.GetName()), ZSTR_VAL(interface_.GetName()), ZSTR_VAL(ZendCeIterator.GetName()))
@@ -283,7 +283,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 	}
 	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
 		class_type.SetGetIterator(class_type.parent.get_iterator)
-		class_type.AddCeFlags(ZEND_ACC_REUSE_GET_ITERATOR)
+		class_type.SetIsReuseGetIterator(true)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetNewIterator)
 	}
@@ -328,7 +328,7 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 	}
 	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
 		class_type.SetGetIterator(class_type.parent.get_iterator)
-		class_type.AddCeFlags(ZEND_ACC_REUSE_GET_ITERATOR)
+		class_type.SetIsReuseGetIterator(true)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetIterator)
 	}

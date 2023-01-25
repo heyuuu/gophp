@@ -280,3 +280,7 @@ func (this *PhpStream) SwitchFlags(value uint32, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this PhpStream) IsAvoidBlocking() bool { return this.HasFlags(PHP_STREAM_FLAG_AVOID_BLOCKING) }
+func (this *PhpStream) SetIsAvoidBlocking(cond bool) {
+	this.SwitchFlags(PHP_STREAM_FLAG_AVOID_BLOCKING, cond)
+}

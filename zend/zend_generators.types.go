@@ -105,19 +105,19 @@ func (this *ZendGenerator) SwitchFlags(value ZendUchar, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendGenerator) isCurrentlyRunning() bool {
+func (this ZendGenerator) IsCurrentlyRunning() bool {
 	return this.HasFlags(ZEND_GENERATOR_CURRENTLY_RUNNING)
 }
-func (this ZendGenerator) isDoInit() bool       { return this.HasFlags(ZEND_GENERATOR_DO_INIT) }
-func (this ZendGenerator) isAtFirstYield() bool { return this.HasFlags(ZEND_GENERATOR_AT_FIRST_YIELD) }
-func (this ZendGenerator) isForcedClose() bool  { return this.HasFlags(ZEND_GENERATOR_FORCED_CLOSE) }
-func (this *ZendGenerator) setIsCurrentlyRunning(cond bool) {
+func (this ZendGenerator) IsDoInit() bool       { return this.HasFlags(ZEND_GENERATOR_DO_INIT) }
+func (this ZendGenerator) IsAtFirstYield() bool { return this.HasFlags(ZEND_GENERATOR_AT_FIRST_YIELD) }
+func (this ZendGenerator) IsForcedClose() bool  { return this.HasFlags(ZEND_GENERATOR_FORCED_CLOSE) }
+func (this *ZendGenerator) SetIsCurrentlyRunning(cond bool) {
 	this.SwitchFlags(ZEND_GENERATOR_CURRENTLY_RUNNING, cond)
 }
-func (this *ZendGenerator) setIsDoInit(cond bool) { this.SwitchFlags(ZEND_GENERATOR_DO_INIT, cond) }
-func (this *ZendGenerator) setIsAtFirstYield(cond bool) {
+func (this *ZendGenerator) SetIsDoInit(cond bool) { this.SwitchFlags(ZEND_GENERATOR_DO_INIT, cond) }
+func (this *ZendGenerator) SetIsAtFirstYield(cond bool) {
 	this.SwitchFlags(ZEND_GENERATOR_AT_FIRST_YIELD, cond)
 }
-func (this *ZendGenerator) setIsForcedClose(cond bool) {
+func (this *ZendGenerator) SetIsForcedClose(cond bool) {
 	this.SwitchFlags(ZEND_GENERATOR_FORCED_CLOSE, cond)
 }

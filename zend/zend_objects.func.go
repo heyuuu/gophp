@@ -13,7 +13,7 @@ func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
 	object.SetCe(ce)
 	object.SetProperties(nil)
 	ZendObjectsStorePut(object)
-	if UNEXPECTED(ce.isUseGuards()) {
+	if UNEXPECTED(ce.IsUseGuards()) {
 		ZVAL_UNDEF(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount())
 	}
 }
@@ -47,7 +47,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			}
 		}
 	}
-	if UNEXPECTED(object.GetCe().isUseGuards()) {
+	if UNEXPECTED(object.GetCe().IsUseGuards()) {
 		if EXPECTED(Z_TYPE_P(p) == IS_STRING) {
 			ZvalPtrDtorStr(p)
 		} else if Z_TYPE_P(p) == IS_ARRAY {
@@ -71,7 +71,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		var fcic ZendFcallInfoCache
 		var ret Zval
 		if destructor.GetOpArray().HasFnFlags(ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED) {
-			if destructor.GetOpArray().isPrivate() {
+			if destructor.GetOpArray().IsPrivate() {
 
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */

@@ -180,3 +180,9 @@ func (this *SplFilesystemObject) SwitchFlags(value zend.ZendLong, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this SplFilesystemObject) IsDirFollowSymlinks() bool {
+	return this.HasFlags(SPL_FILE_DIR_FOLLOW_SYMLINKS)
+}
+func (this *SplFilesystemObject) SetIsDirFollowSymlinks(cond bool) {
+	this.SwitchFlags(SPL_FILE_DIR_FOLLOW_SYMLINKS, cond)
+}

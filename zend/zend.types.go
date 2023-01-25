@@ -294,28 +294,102 @@ func (this *ZendClassEntry) SwitchCeFlags(value uint32, cond bool) {
 		this.SubCeFlags(value)
 	}
 }
-func (this ZendClassEntry) isConstantsUpdated() bool {
+func (this ZendClassEntry) IsConstantsUpdated() bool {
 	return this.HasCeFlags(ZEND_ACC_CONSTANTS_UPDATED)
 }
-func (this ZendClassEntry) isInterface() bool { return this.HasCeFlags(ZEND_ACC_INTERFACE) }
-func (this ZendClassEntry) isTrait() bool     { return this.HasCeFlags(ZEND_ACC_TRAIT) }
-func (this ZendClassEntry) isImplicitAbstractClass() bool {
+func (this ZendClassEntry) IsInterface() bool      { return this.HasCeFlags(ZEND_ACC_INTERFACE) }
+func (this ZendClassEntry) IsTrait() bool          { return this.HasCeFlags(ZEND_ACC_TRAIT) }
+func (this ZendClassEntry) IsImmutable() bool      { return this.HasCeFlags(ZEND_ACC_IMMUTABLE) }
+func (this ZendClassEntry) IsResolvedParent() bool { return this.HasCeFlags(ZEND_ACC_RESOLVED_PARENT) }
+func (this ZendClassEntry) IsLinked() bool         { return this.HasCeFlags(ZEND_ACC_LINKED) }
+func (this ZendClassEntry) IsImplementTraits() bool {
+	return this.HasCeFlags(ZEND_ACC_IMPLEMENT_TRAITS)
+}
+func (this ZendClassEntry) IsHasStaticInMethods() bool {
+	return this.HasCeFlags(ZEND_HAS_STATIC_IN_METHODS)
+}
+func (this ZendClassEntry) IsNearlyLinked() bool { return this.HasCeFlags(ZEND_ACC_NEARLY_LINKED) }
+func (this ZendClassEntry) IsResolvedInterfaces() bool {
+	return this.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES)
+}
+func (this ZendClassEntry) IsFinal() bool { return this.HasCeFlags(ZEND_ACC_FINAL) }
+func (this ZendClassEntry) IsImplementInterfaces() bool {
+	return this.HasCeFlags(ZEND_ACC_IMPLEMENT_INTERFACES)
+}
+func (this ZendClassEntry) IsImplicitAbstractClass() bool {
 	return this.HasCeFlags(ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
 }
-func (this ZendClassEntry) isFinal() bool     { return this.HasCeFlags(ZEND_ACC_FINAL) }
-func (this ZendClassEntry) isUseGuards() bool { return this.HasCeFlags(ZEND_ACC_USE_GUARDS) }
-func (this ZendClassEntry) isAnonBound() bool { return this.HasCeFlags(ZEND_ACC_ANON_BOUND) }
-func (this *ZendClassEntry) setIsConstantsUpdated(cond bool) {
+func (this ZendClassEntry) IsUnresolvedVariance() bool {
+	return this.HasCeFlags(ZEND_ACC_UNRESOLVED_VARIANCE)
+}
+func (this ZendClassEntry) IsHasUnlinkedUses() bool {
+	return this.HasCeFlags(ZEND_ACC_HAS_UNLINKED_USES)
+}
+func (this ZendClassEntry) IsUseGuards() bool { return this.HasCeFlags(ZEND_ACC_USE_GUARDS) }
+func (this ZendClassEntry) IsPropertyTypesResolved() bool {
+	return this.HasCeFlags(ZEND_ACC_PROPERTY_TYPES_RESOLVED)
+}
+func (this ZendClassEntry) IsExplicitAbstractClass() bool {
+	return this.HasCeFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)
+}
+func (this ZendClassEntry) IsHasTypeHints() bool { return this.HasCeFlags(ZEND_ACC_HAS_TYPE_HINTS) }
+func (this ZendClassEntry) IsPreloaded() bool    { return this.HasCeFlags(ZEND_ACC_PRELOADED) }
+func (this ZendClassEntry) IsInherited() bool    { return this.HasCeFlags(ZEND_ACC_INHERITED) }
+func (this ZendClassEntry) IsTopLevel() bool     { return this.HasCeFlags(ZEND_ACC_TOP_LEVEL) }
+func (this ZendClassEntry) IsReuseGetIterator() bool {
+	return this.HasCeFlags(ZEND_ACC_REUSE_GET_ITERATOR)
+}
+func (this *ZendClassEntry) SetIsConstantsUpdated(cond bool) {
 	this.SwitchCeFlags(ZEND_ACC_CONSTANTS_UPDATED, cond)
 }
-func (this *ZendClassEntry) setIsInterface(cond bool) { this.SwitchCeFlags(ZEND_ACC_INTERFACE, cond) }
-func (this *ZendClassEntry) setIsTrait(cond bool)     { this.SwitchCeFlags(ZEND_ACC_TRAIT, cond) }
-func (this *ZendClassEntry) setIsImplicitAbstractClass(cond bool) {
+func (this *ZendClassEntry) SetIsInterface(cond bool) { this.SwitchCeFlags(ZEND_ACC_INTERFACE, cond) }
+func (this *ZendClassEntry) SetIsTrait(cond bool)     { this.SwitchCeFlags(ZEND_ACC_TRAIT, cond) }
+func (this *ZendClassEntry) SetIsImmutable(cond bool) { this.SwitchCeFlags(ZEND_ACC_IMMUTABLE, cond) }
+func (this *ZendClassEntry) SetIsResolvedParent(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_RESOLVED_PARENT, cond)
+}
+func (this *ZendClassEntry) SetIsLinked(cond bool) { this.SwitchCeFlags(ZEND_ACC_LINKED, cond) }
+func (this *ZendClassEntry) SetIsImplementTraits(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_IMPLEMENT_TRAITS, cond)
+}
+func (this *ZendClassEntry) SetIsHasStaticInMethods(cond bool) {
+	this.SwitchCeFlags(ZEND_HAS_STATIC_IN_METHODS, cond)
+}
+func (this *ZendClassEntry) SetIsNearlyLinked(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_NEARLY_LINKED, cond)
+}
+func (this *ZendClassEntry) SetIsResolvedInterfaces(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_RESOLVED_INTERFACES, cond)
+}
+func (this *ZendClassEntry) SetIsFinal(cond bool) { this.SwitchCeFlags(ZEND_ACC_FINAL, cond) }
+func (this *ZendClassEntry) SetIsImplementInterfaces(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_IMPLEMENT_INTERFACES, cond)
+}
+func (this *ZendClassEntry) SetIsImplicitAbstractClass(cond bool) {
 	this.SwitchCeFlags(ZEND_ACC_IMPLICIT_ABSTRACT_CLASS, cond)
 }
-func (this *ZendClassEntry) setIsFinal(cond bool)     { this.SwitchCeFlags(ZEND_ACC_FINAL, cond) }
-func (this *ZendClassEntry) setIsUseGuards(cond bool) { this.SwitchCeFlags(ZEND_ACC_USE_GUARDS, cond) }
-func (this *ZendClassEntry) setIsAnonBound(cond bool) { this.SwitchCeFlags(ZEND_ACC_ANON_BOUND, cond) }
+func (this *ZendClassEntry) SetIsUnresolvedVariance(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_UNRESOLVED_VARIANCE, cond)
+}
+func (this *ZendClassEntry) SetIsHasUnlinkedUses(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_HAS_UNLINKED_USES, cond)
+}
+func (this *ZendClassEntry) SetIsUseGuards(cond bool) { this.SwitchCeFlags(ZEND_ACC_USE_GUARDS, cond) }
+func (this *ZendClassEntry) SetIsPropertyTypesResolved(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_PROPERTY_TYPES_RESOLVED, cond)
+}
+func (this *ZendClassEntry) SetIsExplicitAbstractClass(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_EXPLICIT_ABSTRACT_CLASS, cond)
+}
+func (this *ZendClassEntry) SetIsHasTypeHints(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_HAS_TYPE_HINTS, cond)
+}
+func (this *ZendClassEntry) SetIsPreloaded(cond bool) { this.SwitchCeFlags(ZEND_ACC_PRELOADED, cond) }
+func (this *ZendClassEntry) SetIsInherited(cond bool) { this.SwitchCeFlags(ZEND_ACC_INHERITED, cond) }
+func (this *ZendClassEntry) SetIsTopLevel(cond bool)  { this.SwitchCeFlags(ZEND_ACC_TOP_LEVEL, cond) }
+func (this *ZendClassEntry) SetIsReuseGetIterator(cond bool) {
+	this.SwitchCeFlags(ZEND_ACC_REUSE_GET_ITERATOR, cond)
+}
 
 /**
  * ZendUtilityFunctions

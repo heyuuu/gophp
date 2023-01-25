@@ -59,6 +59,22 @@ func (this *PhpHttpParser) SwitchFlags(value uint8, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this PhpHttpParser) IsTrailing() bool            { return this.HasFlags(F_TRAILING) }
+func (this PhpHttpParser) IsUpgrade() bool             { return this.HasFlags(F_UPGRADE) }
+func (this PhpHttpParser) IsSkipbody() bool            { return this.HasFlags(F_SKIPBODY) }
+func (this PhpHttpParser) IsChunked() bool             { return this.HasFlags(F_CHUNKED) }
+func (this PhpHttpParser) IsConnectionClose() bool     { return this.HasFlags(F_CONNECTION_CLOSE) }
+func (this PhpHttpParser) IsConnectionKeepAlive() bool { return this.HasFlags(F_CONNECTION_KEEP_ALIVE) }
+func (this *PhpHttpParser) SetIsTrailing(cond bool)    { this.SwitchFlags(F_TRAILING, cond) }
+func (this *PhpHttpParser) SetIsUpgrade(cond bool)     { this.SwitchFlags(F_UPGRADE, cond) }
+func (this *PhpHttpParser) SetIsSkipbody(cond bool)    { this.SwitchFlags(F_SKIPBODY, cond) }
+func (this *PhpHttpParser) SetIsChunked(cond bool)     { this.SwitchFlags(F_CHUNKED, cond) }
+func (this *PhpHttpParser) SetIsConnectionClose(cond bool) {
+	this.SwitchFlags(F_CONNECTION_CLOSE, cond)
+}
+func (this *PhpHttpParser) SetIsConnectionKeepAlive(cond bool) {
+	this.SwitchFlags(F_CONNECTION_KEEP_ALIVE, cond)
+}
 
 /**
  * PhpHttpParserSettings

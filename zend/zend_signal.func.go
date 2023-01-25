@@ -104,8 +104,8 @@ func ZendSignalHandler(signo int, siginfo *siginfo_t, context any) {
 			}
 		}
 	} else if p_sig.GetHandler() != SIG_IGN {
-		if p_sig.HasFlags(SA_SIGINFO) {
-			if p_sig.HasFlags(SA_RESETHAND) {
+		if p_sig.IsSiginfo() {
+			if p_sig.IsResethand() {
 				SIGG(handlers)[signo-1].flags = 0
 				SIGG(handlers)[signo-1].handler = SIG_DFL
 			}

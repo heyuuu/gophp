@@ -1312,14 +1312,14 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 			}
 			key = _p.GetKey()
 			prop_info = Z_PTR_P(_z)
-			if prop_info.isProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.isPrivate() && prop_info.GetCe() != scope {
+			if prop_info.IsProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.IsPrivate() && prop_info.GetCe() != scope {
 				continue
 			}
 			prop = nil
-			if statics != 0 && prop_info.isStatic() {
+			if statics != 0 && prop_info.IsStatic() {
 				prop = &ce.default_static_members_table[prop_info.GetOffset()]
 				ZVAL_DEINDIRECT(prop)
-			} else if statics == 0 && !prop_info.isStatic() {
+			} else if statics == 0 && !prop_info.IsStatic() {
 				prop = &ce.default_properties_table[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
 			}
 			if prop == nil {
@@ -1370,7 +1370,7 @@ func ZifGetClassVars(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	} else {
 		ArrayInit(return_value)
-		if UNEXPECTED(!ce.isConstantsUpdated()) {
+		if UNEXPECTED(!ce.IsConstantsUpdated()) {
 			if UNEXPECTED(ZendUpdateClassConstants(ce) != SUCCESS) {
 				return
 			}
@@ -1662,7 +1662,7 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 			key = _p.GetKey()
 			mptr = Z_PTR_P(_z)
-			if mptr.isPublic() || scope != nil && (mptr.isProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.isPrivate() && scope == mptr.GetScope()) {
+			if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
 				if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || (*mptr).op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
 					ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
 					Z_ARRVAL_P(return_value).NextIndexInsertNew(&method_name)
@@ -1770,14 +1770,14 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
 
-		RETVAL_BOOL(Z_TYPE_P(klass) == IS_OBJECT || !func_.isPrivate() || func_.GetScope() == ce)
+		RETVAL_BOOL(Z_TYPE_P(klass) == IS_OBJECT || !func_.IsPrivate() || func_.GetScope() == ce)
 		return
 	}
 	if Z_TYPE_P(klass) == IS_OBJECT {
 		var obj *ZendObject = Z_OBJ_P(klass)
 		func_ = Z_OBJ_HT_P(klass).GetGetMethod()(&obj, method_name, nil)
 		if func_ != nil {
-			if func_.isCallViaTrampoline() {
+			if func_.IsCallViaTrampoline() {
 
 				/* Returns true to the fake Closure's __invoke */
 
@@ -1820,7 +1820,7 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	property_info = &ce.properties_info.FindPtr(property)
-	if property_info != nil && (!property_info.isPrivate() || property_info.GetCe() == ce) {
+	if property_info != nil && (!property_info.IsPrivate() || property_info.GetCe() == ce) {
 		RETVAL_TRUE
 		return
 	}
@@ -2205,7 +2205,7 @@ func ZifRestoreExceptionHandler(execute_data *ZendExecuteData, return_value *Zva
 	return
 }
 func CopyClassOrInterfaceName(array *Zval, key *ZendString, ce *ZendClassEntry) {
-	if ce.GetRefcount() == 1 && !ce.HasCeFlags(ZEND_ACC_IMMUTABLE) || SameName(key, ce.GetName()) != 0 {
+	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) != 0 {
 		key = ce.GetName()
 	}
 	AddNextIndexStr(array, ZendStringCopy(key))
@@ -2953,7 +2953,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 			var prev_call *ZendExecuteData = skip
 			var prev *ZendExecuteData = skip.GetPrevExecuteData()
 			for prev != nil {
-				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetCommonType())) && !prev_call.GetFunc().isCallViaTrampoline() {
+				if prev_call != nil && prev_call.GetFunc() != nil && !(ZEND_USER_CODE(prev_call.GetFunc().GetCommonType())) && !prev_call.GetFunc().IsCallViaTrampoline() {
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {

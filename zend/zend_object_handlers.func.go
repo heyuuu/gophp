@@ -58,7 +58,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 						continue
 					}
 					prop_info = Z_PTR_P(_z)
-					if !prop_info.isStatic() {
+					if !prop_info.IsStatic() {
 						flags |= prop_info.GetFlags()
 						if UNEXPECTED(Z_TYPE_P(OBJ_PROP(zobj, prop_info.GetOffset())) == IS_UNDEF) {
 							zobj.GetProperties().Flags() |= HASH_FLAG_HAS_EMPTY_IND
@@ -82,7 +82,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 								continue
 							}
 							prop_info = Z_PTR_P(_z)
-							if prop_info.GetCe() == ce && !prop_info.isStatic() && prop_info.isPrivate() {
+							if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 								var zv Zval
 								if UNEXPECTED(Z_TYPE_P(OBJ_PROP(zobj, prop_info.GetOffset())) == IS_UNDEF) {
 									zobj.GetProperties().Flags() |= HASH_FLAG_HAS_EMPTY_IND
@@ -294,7 +294,7 @@ func ZendGetParentPrivateProperty(scope *ZendClassEntry, ce *ZendClassEntry, mem
 		zv = &scope.properties_info.Find(member)
 		if zv != nil {
 			prop_info = (*ZendPropertyInfo)(Z_PTR_P(zv))
-			if prop_info.isPrivate() && prop_info.GetCe() == scope {
+			if prop_info.IsPrivate() && prop_info.GetCe() == scope {
 				return prop_info
 			}
 		}
@@ -348,7 +348,7 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 				 * property on scope. This will throw a static property notice, rather than
 				 * a visibility error. */
 
-				if p != nil && (!p.isStatic() || (flags&ZEND_ACC_STATIC) != 0) {
+				if p != nil && (!p.IsStatic() || (flags&ZEND_ACC_STATIC) != 0) {
 					property_info = p
 					flags = property_info.GetFlags()
 					goto found
@@ -492,7 +492,7 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 			return FAILURE
 		}
 		if class_name[0] != '*' {
-			if !property_info.isPrivate() {
+			if !property_info.IsPrivate() {
 
 				/* we we're looking for a private prop but found a non private one of the same name */
 
@@ -510,7 +510,7 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 
 			}
 		} else {
-			ZEND_ASSERT(property_info.isProtected())
+			ZEND_ASSERT(property_info.IsProtected())
 		}
 		return SUCCESS
 	} else {
@@ -521,7 +521,7 @@ func ZendCheckPropertyAccess(zobj *ZendObject, prop_info_name *ZendString, is_dy
 		} else if property_info == ZEND_WRONG_PROPERTY_INFO {
 			return FAILURE
 		}
-		if property_info.isPublic() {
+		if property_info.IsPublic() {
 			return SUCCESS
 		} else {
 			return FAILURE
@@ -538,7 +538,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	var guards *HashTable
 	var zv *Zval
 	var ptr *uint32
-	ZEND_ASSERT(zobj.GetCe().isUseGuards())
+	ZEND_ASSERT(zobj.GetCe().IsUseGuards())
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if EXPECTED(Z_TYPE_P(zv) == IS_STRING) {
 		var str *ZendString = Z_STR_P(zv)
@@ -690,7 +690,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 				retval = &(ExecutorGlobals.GetUninitializedZval())
 			}
 			if UNEXPECTED(prop_info != nil) {
-				ZendVerifyPropAssignableByRef(prop_info, retval, zobj.GetCe().GetGet().isStrictTypes())
+				ZendVerifyPropAssignableByRef(prop_info, retval, zobj.GetCe().GetGet().IsStrictTypes())
 			}
 			OBJ_RELEASE(zobj)
 			goto exit
@@ -1090,7 +1090,7 @@ func ZendGetParentPrivateMethod(scope *ZendClassEntry, ce *ZendClassEntry, funct
 		func_ = &scope.function_table.Find(function_name)
 		if func_ != nil {
 			fbc = Z_FUNC_P(func_)
-			if fbc.isPrivate() && fbc.GetScope() == scope {
+			if fbc.IsPrivate() && fbc.GetScope() == scope {
 				return fbc
 			}
 		}
@@ -1145,7 +1145,7 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_s
 	func_.GetArgFlags()[2] = 0
 	func_.SetFnFlags(ZEND_ACC_CALL_VIA_TRAMPOLINE | ZEND_ACC_PUBLIC)
 	if is_static != 0 {
-		func_.setIsStatic(true)
+		func_.SetIsStatic(true)
 	}
 	func_.SetOpcodes(&(ExecutorGlobals.GetCallTrampolineOp()))
 	ZEND_MAP_PTR_INIT(func_.run_time_cache, (**any)(&dummy))
@@ -1222,16 +1222,16 @@ func ZendStdGetMethod(obj_ptr **ZendObject, method_name *ZendString, key *Zval) 
 	if fbc.GetOpArray().HasFnFlags(ZEND_ACC_CHANGED | ZEND_ACC_PRIVATE | ZEND_ACC_PROTECTED) {
 		scope = ZendGetExecutedScope()
 		if fbc.GetScope() != scope {
-			if fbc.GetOpArray().isChanged() {
+			if fbc.GetOpArray().IsChanged() {
 				var updated_fbc *ZendFunction = ZendGetParentPrivateMethod(scope, zobj.GetCe(), lc_method_name)
 				if EXPECTED(updated_fbc != nil) {
 					fbc = updated_fbc
 					goto exit
-				} else if fbc.GetOpArray().isPublic() {
+				} else if fbc.GetOpArray().IsPublic() {
 					goto exit
 				}
 			}
-			if UNEXPECTED(fbc.GetOpArray().isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
+			if UNEXPECTED(fbc.GetOpArray().IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
 				if zobj.GetCe().GetCall() != nil {
 					fbc = ZendGetUserCallFunction(zobj.GetCe(), method_name)
 				} else {
@@ -1285,10 +1285,10 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 			return nil
 		}
 	}
-	if !fbc.GetOpArray().isPublic() {
+	if !fbc.GetOpArray().IsPublic() {
 		scope = ZendGetExecutedScope()
 		if UNEXPECTED(fbc.GetScope() != scope) {
-			if UNEXPECTED(fbc.GetOpArray().isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
+			if UNEXPECTED(fbc.GetOpArray().IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(fbc), scope) == 0) {
 				if ce.GetCallstatic() != nil {
 					fbc = ZendGetUserCallstaticFunction(ce, function_name)
 				} else {
@@ -1331,14 +1331,14 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 	if UNEXPECTED(property_info == nil) {
 		goto undeclared_property
 	}
-	if !property_info.isPublic() {
+	if !property_info.IsPublic() {
 		if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
 			scope = ExecutorGlobals.GetFakeScope()
 		} else {
 			scope = ZendGetExecutedScope()
 		}
 		if property_info.GetCe() != scope {
-			if UNEXPECTED(property_info.isPrivate()) || UNEXPECTED(IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0) {
+			if UNEXPECTED(property_info.IsPrivate()) || UNEXPECTED(IsProtectedCompatibleScope(property_info.GetCe(), scope) == 0) {
 				if type_ != BP_VAR_IS {
 					ZendBadPropertyAccess(property_info, ce, property_name)
 				}
@@ -1346,10 +1346,10 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 			}
 		}
 	}
-	if UNEXPECTED(!property_info.isStatic()) {
+	if UNEXPECTED(!property_info.IsStatic()) {
 		goto undeclared_property
 	}
-	if UNEXPECTED(!ce.isConstantsUpdated()) {
+	if UNEXPECTED(!ce.IsConstantsUpdated()) {
 		if UNEXPECTED(ZendUpdateClassConstants(ce) != 0) != SUCCESS {
 			return nil
 		}
@@ -1395,14 +1395,14 @@ func ZendStdGetConstructor(zobj *ZendObject) *ZendFunction {
 	var constructor *ZendFunction = zobj.GetCe().GetConstructor()
 	var scope *ZendClassEntry
 	if constructor != nil {
-		if UNEXPECTED(!constructor.GetOpArray().isPublic()) {
+		if UNEXPECTED(!constructor.GetOpArray().IsPublic()) {
 			if UNEXPECTED(ExecutorGlobals.GetFakeScope() != nil) {
 				scope = ExecutorGlobals.GetFakeScope()
 			} else {
 				scope = ZendGetExecutedScope()
 			}
 			if UNEXPECTED(constructor.GetScope() != scope) {
-				if UNEXPECTED(constructor.GetOpArray().isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(constructor), scope) == 0) {
+				if UNEXPECTED(constructor.GetOpArray().IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(constructor), scope) == 0) {
 					ZendBadConstructorCall(constructor, scope)
 					constructor = nil
 				}
@@ -1450,7 +1450,7 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 				info = Z_PTR_P(_z)
 				var p1 *Zval = OBJ_PROP(zobj1, info.GetOffset())
 				var p2 *Zval = OBJ_PROP(zobj2, info.GetOffset())
-				if info.isStatic() {
+				if info.IsStatic() {
 					continue
 				}
 				if Z_TYPE_P(p1) != IS_UNDEF {
@@ -1643,7 +1643,7 @@ func ZendStdGetClosure(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFuncti
 	}
 	*fptr_ptr = Z_FUNC_P(func_)
 	*ce_ptr = ce
-	if (*fptr_ptr).isStatic() {
+	if (*fptr_ptr).IsStatic() {
 		if obj_ptr != nil {
 			*obj_ptr = nil
 		}

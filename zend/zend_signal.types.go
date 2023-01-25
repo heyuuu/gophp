@@ -26,6 +26,10 @@ func (this *ZendSignalEntryT) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this ZendSignalEntryT) IsSiginfo() bool           { return this.HasFlags(SA_SIGINFO) }
+func (this ZendSignalEntryT) IsResethand() bool         { return this.HasFlags(SA_RESETHAND) }
+func (this *ZendSignalEntryT) SetIsSiginfo(cond bool)   { this.SwitchFlags(SA_SIGINFO, cond) }
+func (this *ZendSignalEntryT) SetIsResethand(cond bool) { this.SwitchFlags(SA_RESETHAND, cond) }
 
 /**
  * ZendSignalT

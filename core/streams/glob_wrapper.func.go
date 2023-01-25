@@ -140,7 +140,7 @@ func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	}
 	pglob.SetPatternLen(strlen(pos))
 	pglob.SetPattern(zend.Estrndup(pos, pglob.GetPatternLen()))
-	pglob.AddFlags(GLOB_APPEND)
+	pglob.SetIsAppend(true)
 	if pglob.glob.gl_pathc {
 		PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[0], 1, &tmp)
 	} else {

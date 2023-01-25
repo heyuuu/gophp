@@ -161,12 +161,6 @@ func (this *Zval) SwitchTypeFlags(value ZendUchar, cond bool) {
 		this.SubTypeFlags(value)
 	}
 }
-func (this Zval) isRefcounted() bool         { return this.HasTypeFlags(IS_TYPE_REFCOUNTED) }
-func (this Zval) isConstant() bool           { return this.HasTypeFlags(IS_TYPE_CONSTANT) }
-func (this Zval) isCopyable() bool           { return this.HasTypeFlags(IS_TYPE_COPYABLE) }
-func (this *Zval) setIsRefcounted(cond bool) { this.SwitchTypeFlags(IS_TYPE_REFCOUNTED, cond) }
-func (this *Zval) setIsConstant(cond bool)   { this.SwitchTypeFlags(IS_TYPE_CONSTANT, cond) }
-func (this *Zval) setIsCopyable(cond bool)   { this.SwitchTypeFlags(IS_TYPE_COPYABLE, cond) }
 
 /* Zval.u2.access_flags */
 func (this *Zval) AddAccessFlags(value uint32)     { this.u2.access_flags |= value }
@@ -179,12 +173,6 @@ func (this *Zval) SwitchAccessFlags(value uint32, cond bool) {
 		this.SubAccessFlags(value)
 	}
 }
-func (this Zval) isPublic() bool            { return this.HasAccessFlags(ZEND_ACC_PUBLIC) }
-func (this Zval) isPrivate() bool           { return this.HasAccessFlags(ZEND_ACC_PRIVATE) }
-func (this Zval) isProtected() bool         { return this.HasAccessFlags(ZEND_ACC_PROTECTED) }
-func (this *Zval) setIsPublic(cond bool)    { this.SwitchAccessFlags(ZEND_ACC_PUBLIC, cond) }
-func (this *Zval) setIsPrivate(cond bool)   { this.SwitchAccessFlags(ZEND_ACC_PRIVATE, cond) }
-func (this *Zval) setIsProtected(cond bool) { this.SwitchAccessFlags(ZEND_ACC_PROTECTED, cond) }
 
 /* Zval.u2.constant_flags */
 func (this *Zval) AddConstantFlags(value uint32)     { this.u2.constant_flags |= value }

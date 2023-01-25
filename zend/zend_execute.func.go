@@ -722,7 +722,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 	}
 	if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
 		if ce != nil {
-			if ce.isInterface() {
+			if ce.IsInterface() {
 				*need_msg = "implement interface "
 				is_interface = 1
 			} else {
@@ -917,7 +917,7 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
 
-		if UNEXPECTED(self_ce.isTrait()) {
+		if UNEXPECTED(self_ce.IsTrait()) {
 			ZendThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(ZEND_TYPE_ALLOW_NULL(*type_), " non-null", ""))
 			return 0
 		}
@@ -1034,7 +1034,7 @@ func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_valu
 	var ce *ZendClassEntry
 	if EXPECTED(arg_num <= zf.GetNumArgs()) {
 		cur_arg_info = &zf.common.arg_info[arg_num-1]
-	} else if UNEXPECTED(zf.isVariadic()) {
+	} else if UNEXPECTED(zf.IsVariadic()) {
 		cur_arg_info = &zf.common.arg_info[zf.GetNumArgs()]
 	} else {
 		return 1
@@ -1062,7 +1062,7 @@ func ZendVerifyVariadicArgType(zf *ZendFunction, arg_num uint32, arg *Zval, defa
 	var cur_arg_info *ZendArgInfo
 	var ce *ZendClassEntry
 	ZEND_ASSERT(arg_num > zf.GetNumArgs())
-	ZEND_ASSERT(zf.isVariadic())
+	ZEND_ASSERT(zf.IsVariadic())
 	cur_arg_info = &zf.common.arg_info[zf.GetNumArgs()]
 	ce = nil
 	if UNEXPECTED(ZendCheckType(cur_arg_info.GetType(), arg, &ce, cache_slot, default_value, zf.GetScope(), 0) == 0) {
@@ -1832,7 +1832,7 @@ func ZendInvalidMethodCall(object *Zval, function_name *Zval) {
 	ZendThrowError(nil, "Call to a member function %s() on %s", Z_STRVAL_P(function_name), ZendGetTypeByConst(Z_TYPE_P(object)))
 }
 func ZendNonStaticMethodCall(fbc *ZendFunction) {
-	if fbc.isAllowStatic() {
+	if fbc.IsAllowStatic() {
 		ZendError(E_DEPRECATED, "Non-static method %s::%s() should not be called statically", ZSTR_VAL(fbc.GetScope().GetName()), ZSTR_VAL(fbc.GetFunctionName()))
 	} else {
 		ZendThrowError(ZendCeError, "Non-static method %s::%s() cannot be called statically", ZSTR_VAL(fbc.GetScope().GetName()), ZSTR_VAL(fbc.GetFunctionName()))
@@ -3151,7 +3151,7 @@ func ZendCopyExtraArgs(EXECUTE_DATA_D) {
 	var delta int
 	var count uint32
 	var type_flags uint32 = 0
-	if EXPECTED(!op_array.isHasTypeHints()) {
+	if EXPECTED(!op_array.IsHasTypeHints()) {
 
 		/* Skip useless ZEND_RECV and ZEND_RECV_INIT opcodes */
 
@@ -3219,10 +3219,10 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 	first_extra_arg = op_array.GetNumArgs()
 	num_args = EX_NUM_ARGS()
 	if UNEXPECTED(num_args > first_extra_arg) {
-		if may_be_trampoline == 0 || EXPECTED(!op_array.isCallViaTrampoline()) {
+		if may_be_trampoline == 0 || EXPECTED(!op_array.IsCallViaTrampoline()) {
 			ZendCopyExtraArgs(EXECUTE_DATA_C)
 		}
-	} else if EXPECTED(!op_array.isHasTypeHints()) {
+	} else if EXPECTED(!op_array.IsHasTypeHints()) {
 
 		/* Skip useless ZEND_RECV and ZEND_RECV_INIT opcodes */
 
@@ -3281,7 +3281,7 @@ func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, 
 	ZendAttachSymbolTable(execute_data)
 	if op_array.GetRunTimeCachePtr() == nil {
 		var ptr any
-		ZEND_ASSERT(op_array.HasFnFlags(ZEND_ACC_HEAP_RT_CACHE))
+		ZEND_ASSERT(op_array.IsHeapRtCache())
 		ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
 		ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
 		ptr = (*byte)(ptr + b.SizeOf("void *"))
@@ -3500,9 +3500,9 @@ func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_RELEASE_THIS) != 0 {
 				OBJ_RELEASE(Z_OBJ(call.GetThis()))
 			}
-			if call.GetFunc().isClosure() {
+			if call.GetFunc().IsClosure() {
 				ZendObjectRelease(ZEND_CLOSURE_OBJECT(call.GetFunc()))
-			} else if call.GetFunc().isCallViaTrampoline() {
+			} else if call.GetFunc().IsCallViaTrampoline() {
 				ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 				ZendFreeTrampoline(call.GetFunc())
 			}
@@ -3634,7 +3634,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		}
 		ZendStringReleaseEx(lcname, 0)
 		ZendStringReleaseEx(mname, 0)
-		if UNEXPECTED(!fbc.isStatic()) {
+		if UNEXPECTED(!fbc.IsStatic()) {
 			ZendNonStaticMethodCall(fbc)
 			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 				return nil
@@ -3672,13 +3672,13 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
 	if EXPECTED(Z_OBJ_HANDLER_P(function, get_closure)) && EXPECTED(Z_OBJ_HANDLER_P(function, get_closure)(function, &called_scope, &fbc, &object) == SUCCESS) {
 		object_or_called_scope = called_scope
-		if fbc.isClosure() {
+		if fbc.IsClosure() {
 
 			/* Delay closure destruction until its invocation */
 
 			GC_ADDREF(ZEND_CLOSURE_OBJECT(fbc))
 			call_info |= ZEND_CALL_CLOSURE
-			if fbc.isFakeClosure() {
+			if fbc.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
 			}
 			if object != nil {
@@ -3738,7 +3738,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				}
 				return nil
 			}
-			if !fbc.isStatic() {
+			if !fbc.IsStatic() {
 				ZendNonStaticMethodCall(fbc)
 				if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 					return nil
@@ -3754,7 +3754,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				}
 				return nil
 			}
-			if fbc.isStatic() {
+			if fbc.IsStatic() {
 				object_or_called_scope = object.GetCe()
 			} else {
 				call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS

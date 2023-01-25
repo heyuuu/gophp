@@ -454,9 +454,17 @@ func (this *ZendExecutorGlobals) SwitchFlags(value ZendUchar, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendExecutorGlobals) isInShutdown() bool { return this.HasFlags(EG_FLAGS_IN_SHUTDOWN) }
-func (this *ZendExecutorGlobals) setIsInShutdown(cond bool) {
-	this.SwitchFlags(EG_FLAGS_IN_SHUTDOWN, cond)
+func (this ZendExecutorGlobals) IsObjectStoreNoReuse() bool {
+	return this.HasFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE)
+}
+func (this ZendExecutorGlobals) IsInResourceShutdown() bool {
+	return this.HasFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN)
+}
+func (this *ZendExecutorGlobals) SetIsObjectStoreNoReuse(cond bool) {
+	this.SwitchFlags(EG_FLAGS_OBJECT_STORE_NO_REUSE, cond)
+}
+func (this *ZendExecutorGlobals) SetIsInResourceShutdown(cond bool) {
+	this.SwitchFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN, cond)
 }
 
 /**

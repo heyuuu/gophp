@@ -454,7 +454,7 @@ func ZendCompile(type_ int) *ZendOpArray {
 
 		/* Use heap to not waste arena memory */
 
-		op_array.AddFnFlags(ZEND_ACC_HEAP_RT_CACHE)
+		op_array.SetIsHeapRtCache(true)
 		if ZendAstProcess != nil {
 			ZendAstProcess(CompilerGlobals.GetAst())
 		}

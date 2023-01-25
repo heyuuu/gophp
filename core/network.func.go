@@ -634,7 +634,7 @@ func _phpStreamSockOpenFromSocket(socket PhpSocketT, persistent_id *byte) *PhpSt
 	if stream == nil {
 		zend.Pefree(sock, b.Cond(persistent_id != nil, 1, 0))
 	} else {
-		stream.AddFlags(PHP_STREAM_FLAG_AVOID_BLOCKING)
+		stream.SetIsAvoidBlocking(true)
 	}
 	return stream
 }

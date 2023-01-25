@@ -108,6 +108,8 @@ func (this *SplDllistObject) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this SplDllistObject) IsItFix() bool         { return this.HasFlags(SPL_DLLIST_IT_FIX) }
+func (this *SplDllistObject) SetIsItFix(cond bool) { this.SwitchFlags(SPL_DLLIST_IT_FIX, cond) }
 
 /**
  * SplDllistIt

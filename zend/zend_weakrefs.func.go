@@ -232,7 +232,7 @@ func ZendRegisterWeakrefCe() {
 	ce.SetName(ZendStringInitInterned("WeakReference", b.SizeOf("\"WeakReference\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)
 	ZendCeWeakref = ZendRegisterInternalClass(&ce)
-	ZendCeWeakref.setIsFinal(true)
+	ZendCeWeakref.SetIsFinal(true)
 	ZendCeWeakref.create_object = ZendWeakrefNew
 	ZendCeWeakref.SetSerialize(ZendClassSerializeDeny)
 	ZendCeWeakref.SetUnserialize(ZendClassUnserializeDeny)

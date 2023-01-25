@@ -188,7 +188,7 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 			root = next
 		}
 	}
-	if EXPECTED(ex == nil) || EXPECTED(!ex.GetFunc().GetOpArray().isHasFinallyBlock()) || CompilerGlobals.GetUncleanShutdown() != 0 {
+	if EXPECTED(ex == nil) || EXPECTED(!ex.GetFunc().GetOpArray().IsHasFinallyBlock()) || CompilerGlobals.GetUncleanShutdown() != 0 {
 		return
 	}
 
@@ -224,7 +224,7 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 			ExecutorGlobals.SetException(nil)
 			Z_OPLINE_NUM_P(fast_call) = uint32_t - 1
 			ex.SetOpline(&ex.func_.GetOpArray().GetOpcodes()[try_catch.GetFinallyOp()])
-			generator.setIsForcedClose(true)
+			generator.SetIsForcedClose(true)
 			ZendGeneratorResume(generator)
 
 			/* TODO: If we hit another yield inside try/finally,
@@ -358,7 +358,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		*n = 3
 		return nil
 	}
-	if generator.isCurrentlyRunning() {
+	if generator.IsCurrentlyRunning() {
 
 		/* If the generator is currently running, we certainly won't be able to GC any values it
 		 * holds on to. The execute_data state might be inconsistent during execution (e.g. because
@@ -611,7 +611,7 @@ func ZendGeneratorYieldFrom(generator *ZendGenerator, from *ZendGenerator) {
 	generator.GetNode().SetParent(from)
 	ZendGeneratorGetCurrent(generator)
 	GC_DELREF(&from.std)
-	generator.setIsDoInit(true)
+	generator.SetIsDoInit(true)
 }
 func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *ZendGenerator {
 	var old_root *ZendGenerator
@@ -774,27 +774,27 @@ func ZendGeneratorResume(orig_generator *ZendGenerator) {
 		return
 	}
 try_again:
-	if generator.isCurrentlyRunning() {
+	if generator.IsCurrentlyRunning() {
 		ZendThrowError(nil, "Cannot resume an already running generator")
 		return
 	}
-	if UNEXPECTED(orig_generator.isDoInit() && !(Z_ISUNDEF(generator.GetValue()))) {
+	if UNEXPECTED(orig_generator.IsDoInit() && !(Z_ISUNDEF(generator.GetValue()))) {
 
 		/* We must not advance Generator if we yield from a Generator being currently run */
 
-		orig_generator.setIsDoInit(false)
+		orig_generator.SetIsDoInit(false)
 		return
 	}
 	if UNEXPECTED(!(Z_ISUNDEF(generator.GetValues()))) {
 		if EXPECTED(ZendGeneratorGetNextDelegatedValue(generator) == SUCCESS) {
-			orig_generator.setIsDoInit(false)
+			orig_generator.SetIsDoInit(false)
 			return
 		}
 	}
 
 	/* Drop the AT_FIRST_YIELD flag */
 
-	orig_generator.setIsAtFirstYield(false)
+	orig_generator.SetIsAtFirstYield(false)
 
 	/* Backup executor globals */
 
@@ -830,9 +830,9 @@ try_again:
 
 	/* Resume execution */
 
-	generator.setIsCurrentlyRunning(true)
+	generator.SetIsCurrentlyRunning(true)
 	ZendExecuteEx(generator.GetExecuteData())
-	generator.setIsCurrentlyRunning(false)
+	generator.SetIsCurrentlyRunning(false)
 	generator.SetFrozenCallStack(nil)
 	if EXPECTED(generator.GetExecuteData() != nil) && UNEXPECTED(generator.GetExecuteData().GetCall() != nil) {
 
@@ -864,7 +864,7 @@ try_again:
 		} else {
 			generator = ZendGeneratorGetCurrent(orig_generator)
 			ZendGeneratorThrowException(generator, nil)
-			orig_generator.setIsDoInit(false)
+			orig_generator.SetIsDoInit(false)
 			goto try_again
 		}
 	}
@@ -878,17 +878,17 @@ try_again:
 
 	/* yield from was used, try another resume. */
 
-	orig_generator.setIsDoInit(false)
+	orig_generator.SetIsDoInit(false)
 }
 func ZendGeneratorEnsureInitialized(generator *ZendGenerator) {
 	if UNEXPECTED(Z_TYPE(generator.GetValue()) == IS_UNDEF) && EXPECTED(generator.GetExecuteData() != nil) && EXPECTED(generator.GetNode().GetParent() == nil) {
 		ZendGeneratorResume(generator)
-		generator.setIsAtFirstYield(true)
+		generator.SetIsAtFirstYield(true)
 	}
 }
 func ZendGeneratorRewind(generator *ZendGenerator) {
 	ZendGeneratorEnsureInitialized(generator)
-	if !generator.isAtFirstYield() {
+	if !generator.IsAtFirstYield() {
 		ZendThrowException(nil, "Cannot rewind a generator that was already run", 0)
 	}
 }
@@ -1196,7 +1196,7 @@ func ZendGeneratorGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 		ZendThrowException(nil, "Cannot traverse an already closed generator", 0)
 		return nil
 	}
-	if UNEXPECTED(by_ref != 0) && !generator.GetExecuteData().GetFunc().GetOpArray().isReturnReference() {
+	if UNEXPECTED(by_ref != 0) && !generator.GetExecuteData().GetFunc().GetOpArray().IsReturnReference() {
 		ZendThrowException(nil, "You can only iterate a generator by-reference if it declared that it yields by-reference", 0)
 		return nil
 	}
@@ -1214,7 +1214,7 @@ func ZendRegisterGeneratorCe() {
 	ce.SetName(ZendStringInitInterned("Generator", b.SizeOf("\"Generator\"")-1, 1))
 	ce.SetBuiltinFunctions(GeneratorFunctions)
 	ZendCeGenerator = ZendRegisterInternalClass(&ce)
-	ZendCeGenerator.setIsFinal(true)
+	ZendCeGenerator.SetIsFinal(true)
 	ZendCeGenerator.create_object = ZendGeneratorCreate
 	ZendCeGenerator.SetSerialize(ZendClassSerializeDeny)
 	ZendCeGenerator.SetUnserialize(ZendClassUnserializeDeny)

@@ -525,7 +525,7 @@ func ZendResolvePropertyTypes() {
 					break
 				}
 			}
-			ce.AddCeFlags(ZEND_ACC_PROPERTY_TYPES_RESOLVED)
+			ce.SetIsPropertyTypesResolved(true)
 		}
 		break
 	}

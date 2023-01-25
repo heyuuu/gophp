@@ -59,3 +59,49 @@ func (this *SplArrayObject) SwitchArFlags(value int, cond bool) {
 		this.SubArFlags(value)
 	}
 }
+func (this SplArrayObject) IsIsSelf() bool       { return this.HasArFlags(SPL_ARRAY_IS_SELF) }
+func (this SplArrayObject) IsUseOther() bool     { return this.HasArFlags(SPL_ARRAY_USE_OTHER) }
+func (this SplArrayObject) IsStdPropList() bool  { return this.HasArFlags(SPL_ARRAY_STD_PROP_LIST) }
+func (this SplArrayObject) IsArrayAsProps() bool { return this.HasArFlags(SPL_ARRAY_ARRAY_AS_PROPS) }
+func (this SplArrayObject) IsOverloadedValid() bool {
+	return this.HasArFlags(SPL_ARRAY_OVERLOADED_VALID)
+}
+func (this SplArrayObject) IsOverloadedCurrent() bool {
+	return this.HasArFlags(SPL_ARRAY_OVERLOADED_CURRENT)
+}
+func (this SplArrayObject) IsOverloadedKey() bool  { return this.HasArFlags(SPL_ARRAY_OVERLOADED_KEY) }
+func (this SplArrayObject) IsOverloadedNext() bool { return this.HasArFlags(SPL_ARRAY_OVERLOADED_NEXT) }
+func (this SplArrayObject) IsOverloadedRewind() bool {
+	return this.HasArFlags(SPL_ARRAY_OVERLOADED_REWIND)
+}
+func (this SplArrayObject) IsChildArraysOnly() bool {
+	return this.HasArFlags(SPL_ARRAY_CHILD_ARRAYS_ONLY)
+}
+func (this SplArrayObject) IsCloneMask() bool        { return this.HasArFlags(SPL_ARRAY_CLONE_MASK) }
+func (this *SplArrayObject) SetIsIsSelf(cond bool)   { this.SwitchArFlags(SPL_ARRAY_IS_SELF, cond) }
+func (this *SplArrayObject) SetIsUseOther(cond bool) { this.SwitchArFlags(SPL_ARRAY_USE_OTHER, cond) }
+func (this *SplArrayObject) SetIsStdPropList(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_STD_PROP_LIST, cond)
+}
+func (this *SplArrayObject) SetIsArrayAsProps(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_ARRAY_AS_PROPS, cond)
+}
+func (this *SplArrayObject) SetIsOverloadedValid(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_OVERLOADED_VALID, cond)
+}
+func (this *SplArrayObject) SetIsOverloadedCurrent(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_OVERLOADED_CURRENT, cond)
+}
+func (this *SplArrayObject) SetIsOverloadedKey(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_OVERLOADED_KEY, cond)
+}
+func (this *SplArrayObject) SetIsOverloadedNext(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_OVERLOADED_NEXT, cond)
+}
+func (this *SplArrayObject) SetIsOverloadedRewind(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_OVERLOADED_REWIND, cond)
+}
+func (this *SplArrayObject) SetIsChildArraysOnly(cond bool) {
+	this.SwitchArFlags(SPL_ARRAY_CHILD_ARRAYS_ONLY, cond)
+}
+func (this *SplArrayObject) SetIsCloneMask(cond bool) { this.SwitchArFlags(SPL_ARRAY_CLONE_MASK, cond) }

@@ -48,6 +48,8 @@ func (this *SplPtrHeap) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this SplPtrHeap) IsHeapCorrupted() bool         { return this.HasFlags(SPL_HEAP_CORRUPTED) }
+func (this *SplPtrHeap) SetIsHeapCorrupted(cond bool) { this.SwitchFlags(SPL_HEAP_CORRUPTED, cond) }
 
 /**
  * SplHeapObject

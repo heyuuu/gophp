@@ -95,8 +95,6 @@ func (this *ZendArray) SwitchFlags(value ZendUchar, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendArray) isHasEmptyInd() bool         { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
-func (this *ZendArray) setIsHasEmptyInd(cond bool) { this.SwitchFlags(HASH_FLAG_HAS_EMPTY_IND, cond) }
 
 /* ZendArray.u.flags */
 func (this *ZendArray) AddUFlags(value uint32)     { this.u.flags |= value }
@@ -109,11 +107,3 @@ func (this *ZendArray) SwitchUFlags(value uint32, cond bool) {
 		this.SubUFlags(value)
 	}
 }
-func (this ZendArray) isApplyProtection() bool { return this.HasUFlags(HASH_FLAG_APPLY_PROTECTION) }
-func (this ZendArray) isPacked() bool          { return this.HasUFlags(HASH_FLAG_PACKED) }
-func (this ZendArray) isInitialized() bool     { return this.HasUFlags(HASH_FLAG_INITIALIZED) }
-func (this *ZendArray) setIsApplyProtection(cond bool) {
-	this.SwitchUFlags(HASH_FLAG_APPLY_PROTECTION, cond)
-}
-func (this *ZendArray) setIsPacked(cond bool)      { this.SwitchUFlags(HASH_FLAG_PACKED, cond) }
-func (this *ZendArray) setIsInitialized(cond bool) { this.SwitchUFlags(HASH_FLAG_INITIALIZED, cond) }

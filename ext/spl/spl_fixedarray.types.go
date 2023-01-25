@@ -77,6 +77,30 @@ func (this *SplFixedarrayObject) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this SplFixedarrayObject) IsRewind() bool {
+	return this.HasFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND)
+}
+func (this SplFixedarrayObject) IsValid() bool { return this.HasFlags(SPL_FIXEDARRAY_OVERLOADED_VALID) }
+func (this SplFixedarrayObject) IsCurrent() bool {
+	return this.HasFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT)
+}
+func (this SplFixedarrayObject) IsKey() bool  { return this.HasFlags(SPL_FIXEDARRAY_OVERLOADED_KEY) }
+func (this SplFixedarrayObject) IsNext() bool { return this.HasFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT) }
+func (this *SplFixedarrayObject) SetIsRewind(cond bool) {
+	this.SwitchFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND, cond)
+}
+func (this *SplFixedarrayObject) SetIsValid(cond bool) {
+	this.SwitchFlags(SPL_FIXEDARRAY_OVERLOADED_VALID, cond)
+}
+func (this *SplFixedarrayObject) SetIsCurrent(cond bool) {
+	this.SwitchFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT, cond)
+}
+func (this *SplFixedarrayObject) SetIsKey(cond bool) {
+	this.SwitchFlags(SPL_FIXEDARRAY_OVERLOADED_KEY, cond)
+}
+func (this *SplFixedarrayObject) SetIsNext(cond bool) {
+	this.SwitchFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT, cond)
+}
 
 /**
  * SplFixedarrayIt

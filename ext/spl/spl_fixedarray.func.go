@@ -154,19 +154,19 @@ func SplFixedarrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, 
 	}
 	if inherited != 0 {
 		if funcs_ptr.zf_rewind.common.scope != parent {
-			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND)
+			intern.SetIsRewind(true)
 		}
 		if funcs_ptr.zf_valid.common.scope != parent {
-			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_VALID)
+			intern.SetIsValid(true)
 		}
 		if funcs_ptr.zf_key.common.scope != parent {
-			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_KEY)
+			intern.SetIsKey(true)
 		}
 		if funcs_ptr.zf_current.common.scope != parent {
-			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT)
+			intern.SetIsCurrent(true)
 		}
 		if funcs_ptr.zf_next.common.scope != parent {
-			intern.AddFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT)
+			intern.SetIsNext(true)
 		}
 		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(&class_type.function_table, "offsetget", b.SizeOf("\"offsetget\"")-1))
 		if intern.GetFptrOffsetGet().common.scope == parent {
@@ -638,7 +638,7 @@ func SplFixedarrayItDtor(iter *zend.ZendObjectIterator) {
 }
 func SplFixedarrayItRewind(iter *zend.ZendObjectIterator) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_REWIND) {
+	if object.IsRewind() {
 		zend.ZendUserItRewind(iter)
 	} else {
 		object.SetCurrent(0)
@@ -646,7 +646,7 @@ func SplFixedarrayItRewind(iter *zend.ZendObjectIterator) {
 }
 func SplFixedarrayItValid(iter *zend.ZendObjectIterator) int {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_VALID) {
+	if object.IsValid() {
 		return zend.ZendUserItValid(iter)
 	}
 	if object.GetCurrent() >= 0 && object.GetCurrent() < object.GetArray().GetSize() {
@@ -657,7 +657,7 @@ func SplFixedarrayItValid(iter *zend.ZendObjectIterator) int {
 func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var zindex zend.Zval
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_CURRENT) {
+	if object.IsCurrent() {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
 		var data *zend.Zval
@@ -671,7 +671,7 @@ func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 }
 func SplFixedarrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_KEY) {
+	if object.IsKey() {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
 		zend.ZVAL_LONG(key, object.GetCurrent())
@@ -679,7 +679,7 @@ func SplFixedarrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval)
 }
 func SplFixedarrayItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(&iter.data)
-	if object.HasFlags(SPL_FIXEDARRAY_OVERLOADED_NEXT) {
+	if object.IsNext() {
 		zend.ZendUserItMoveForward(iter)
 	} else {
 		zend.ZendUserItInvalidateCurrent(iter)

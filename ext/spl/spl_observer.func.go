@@ -830,7 +830,7 @@ func zim_spl_MultipleIterator_valid(execute_data *zend.ZendExecuteData, return_v
 		zend.RETVAL_FALSE
 		return
 	}
-	if intern.HasFlags(MIT_NEED_ALL) {
+	if intern.IsNeedAll() {
 		expect = 1
 	} else {
 		expect = 0
@@ -886,7 +886,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 				zend.ZendThrowException(spl_ce_RuntimeException, "Failed to call sub iterator method", 0)
 				return
 			}
-		} else if intern.HasFlags(MIT_NEED_ALL) {
+		} else if intern.IsNeedAll() {
 			if SPL_MULTIPLE_ITERATOR_GET_ALL_CURRENT == get_type {
 				zend.ZendThrowException(spl_ce_RuntimeException, "Called current() with non valid sub iterator", 0)
 			} else {
@@ -896,7 +896,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 		} else {
 			zend.ZVAL_NULL(&retval)
 		}
-		if intern.HasFlags(MIT_KEYS_ASSOC) {
+		if intern.IsKeysAssoc() {
 			switch zend.Z_TYPE(element.GetInf()) {
 			case zend.IS_LONG:
 				zend.AddIndexZval(return_value, zend.Z_LVAL(element.GetInf()), &retval)

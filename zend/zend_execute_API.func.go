@@ -156,7 +156,7 @@ func ShutdownExecutor() {
 		ZendLlistDestroy(&(CompilerGlobals.GetOpenFiles()))
 	}
 	ExecutorGlobals.SetBailout(__orig_bailout)
-	ExecutorGlobals.AddFlags(EG_FLAGS_IN_RESOURCE_SHUTDOWN)
+	ExecutorGlobals.SetIsInResourceShutdown(true)
 	var __orig_bailout *JMP_BUF = executor_globals.bailout
 	var __bailout JMP_BUF
 	ExecutorGlobals.SetBailout(&__bailout)
@@ -220,7 +220,7 @@ func ShutdownExecutor() {
 				if ce.GetDefaultStaticMembersCount() != 0 {
 					ZendCleanupInternalClassData(ce)
 				}
-				if ce.HasCeFlags(ZEND_HAS_STATIC_IN_METHODS) {
+				if ce.IsHasStaticInMethods() {
 					var op_array *ZendOpArray
 					for {
 						var __ht *HashTable = &ce.function_table
@@ -680,7 +680,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		}
 	}
 	func_ = fci_cache.GetFunctionHandler()
-	if func_.isStatic() || fci_cache.GetObject() == nil {
+	if func_.IsStatic() || fci_cache.GetObject() == nil {
 		fci.SetObject(nil)
 		object_or_called_scope = fci_cache.GetCalledScope()
 		call_info = ZEND_CALL_TOP_FUNCTION | ZEND_CALL_DYNAMIC
@@ -690,7 +690,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		call_info = ZEND_CALL_TOP_FUNCTION | ZEND_CALL_DYNAMIC | ZEND_CALL_HAS_THIS
 	}
 	call = ZendVmStackPushCallFrame(call_info, func_, fci.GetParamCount(), object_or_called_scope)
-	if UNEXPECTED(func_.isDeprecated()) {
+	if UNEXPECTED(func_.IsDeprecated()) {
 		ZendError(E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return ZSTR_VAL(func_.GetScope().GetName()) }, ""), b.Cond(func_.GetScope() != nil, "::", ""), ZSTR_VAL(func_.GetFunctionName()))
 		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			ZendVmStackFreeCallFrame(call)
@@ -734,7 +734,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 				}
 			}
 		} else {
-			if Z_ISREF_P(arg) && !func_.isCallViaTrampoline() {
+			if Z_ISREF_P(arg) && !func_.IsCallViaTrampoline() {
 
 				/* don't separate references for __call */
 
@@ -752,17 +752,17 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 			ZVAL_NEW_REF(param, arg)
 		}
 	}
-	if UNEXPECTED(func_.GetOpArray().isClosure()) {
+	if UNEXPECTED(func_.GetOpArray().IsClosure()) {
 		var call_info uint32
 		GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
 		call_info = ZEND_CALL_CLOSURE
-		if func_.isFakeClosure() {
+		if func_.IsFakeClosure() {
 			call_info |= ZEND_CALL_FAKE_CLOSURE
 		}
 		ZEND_ADD_CALL_FLAG(call, call_info)
 	}
 	if func_.GetType() == ZEND_USER_FUNCTION {
-		var call_via_handler int = func_.isCallViaTrampoline()
+		var call_via_handler int = func_.IsCallViaTrampoline()
 		var current_opline_before_exception *ZendOp = ExecutorGlobals.GetOplineBeforeException()
 		ZendInitFuncExecuteData(call, &func_.op_array, fci.GetRetval())
 		ZendExecuteEx(call)
@@ -777,7 +777,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 		}
 	} else if func_.GetType() == ZEND_INTERNAL_FUNCTION {
-		var call_via_handler int = func_.isCallViaTrampoline()
+		var call_via_handler int = func_.IsCallViaTrampoline()
 		ZVAL_NULL(fci.GetRetval())
 		call.SetPrevExecuteData(ExecutorGlobals.GetCurrentExecuteData())
 		ExecutorGlobals.SetCurrentExecuteData(call)
@@ -871,9 +871,9 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 			ZendStringReleaseEx(lc_name, 0)
 		}
 		ce = (*ZendClassEntry)(Z_PTR_P(zv))
-		if UNEXPECTED(!ce.HasCeFlags(ZEND_ACC_LINKED)) {
-			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.HasCeFlags(ZEND_ACC_NEARLY_LINKED) {
-				ce.AddCeFlags(ZEND_ACC_HAS_UNLINKED_USES)
+		if UNEXPECTED(!ce.IsLinked()) {
+			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
+				ce.SetIsHasUnlinkedUses(true)
 				return ce
 			}
 			return nil

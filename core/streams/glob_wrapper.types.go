@@ -41,3 +41,5 @@ func (this *GlobST) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this GlobST) IsAppend() bool         { return this.HasFlags(GLOB_APPEND) }
+func (this *GlobST) SetIsAppend(cond bool) { this.SwitchFlags(GLOB_APPEND, cond) }

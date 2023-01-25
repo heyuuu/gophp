@@ -2797,7 +2797,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 	var i uint32
 	if instance_ce.GetNumInterfaces() != 0 {
-		ZEND_ASSERT(instance_ce.HasCeFlags(ZEND_ACC_RESOLVED_INTERFACES))
+		ZEND_ASSERT(instance_ce.IsResolvedInterfaces())
 		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
 			if instance_ce.interfaces[i] == ce {
 				return 1
@@ -2808,15 +2808,15 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBo
 }
 func InstanceofFunctionEx(instance_ce *ZendClassEntry, ce *ZendClassEntry, is_interface ZendBool) ZendBool {
 	if is_interface != 0 {
-		ZEND_ASSERT(ce.isInterface())
+		ZEND_ASSERT(ce.IsInterface())
 		return InstanceofInterface(instance_ce, ce)
 	} else {
-		ZEND_ASSERT(!ce.isInterface())
+		ZEND_ASSERT(!ce.IsInterface())
 		return InstanceofClass(instance_ce, ce)
 	}
 }
 func InstanceofFunction(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
-	if ce.isInterface() {
+	if ce.IsInterface() {
 		return InstanceofInterface(instance_ce, ce)
 	} else {
 		return InstanceofClass(instance_ce, ce)

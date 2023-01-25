@@ -744,7 +744,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteD
 	} else {
 		var retval Zval
 		ZEND_ASSERT(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
-		if UNEXPECTED(fbc.isDeprecated()) {
+		if UNEXPECTED(fbc.IsDeprecated()) {
 			ZendDeprecatedFunction(fbc)
 			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 				UNDEF_RESULT()
@@ -755,7 +755,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteD
 		}
 		call.SetPrevExecuteData(execute_data)
 		ExecutorGlobals.SetCurrentExecuteData(call)
-		if UNEXPECTED(fbc.isHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
+		if UNEXPECTED(fbc.IsHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
 			UNDEF_RESULT()
 			ret = &retval
 			ZVAL_UNDEF(ret)
@@ -794,7 +794,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(execute_data *ZendExecuteDat
 	} else {
 		var retval Zval
 		ZEND_ASSERT(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
-		if UNEXPECTED(fbc.isDeprecated()) {
+		if UNEXPECTED(fbc.IsDeprecated()) {
 			ZendDeprecatedFunction(fbc)
 			if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 				UNDEF_RESULT()
@@ -804,7 +804,7 @@ func ZEND_DO_FCALL_BY_NAME_SPEC_RETVAL_USED_HANDLER(execute_data *ZendExecuteDat
 		}
 		call.SetPrevExecuteData(execute_data)
 		ExecutorGlobals.SetCurrentExecuteData(call)
-		if UNEXPECTED(fbc.isHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
+		if UNEXPECTED(fbc.IsHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
 			UNDEF_RESULT()
 
 			goto fcall_by_name_end
@@ -834,7 +834,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int
 	var retval Zval
 	EX(call) = call.GetPrevExecuteData()
 	if UNEXPECTED(fbc.HasFnFlags(ZEND_ACC_ABSTRACT | ZEND_ACC_DEPRECATED)) {
-		if UNEXPECTED(fbc.isAbstract()) {
+		if UNEXPECTED(fbc.IsAbstract()) {
 			ZendAbstractMethod(fbc)
 		fcall_except:
 			UNDEF_RESULT()
@@ -864,7 +864,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int
 	} else if EXPECTED(fbc.GetType() < ZEND_USER_FUNCTION) {
 		call.SetPrevExecuteData(execute_data)
 		ExecutorGlobals.SetCurrentExecuteData(call)
-		if UNEXPECTED(fbc.isHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
+		if UNEXPECTED(fbc.IsHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
 			goto fcall_except
 		}
 		ret = &retval
@@ -913,7 +913,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(execute_data *ZendExecuteData) int {
 	var retval Zval
 	EX(call) = call.GetPrevExecuteData()
 	if UNEXPECTED(fbc.HasFnFlags(ZEND_ACC_ABSTRACT | ZEND_ACC_DEPRECATED)) {
-		if UNEXPECTED(fbc.isAbstract()) {
+		if UNEXPECTED(fbc.IsAbstract()) {
 			ZendAbstractMethod(fbc)
 		fcall_except:
 			UNDEF_RESULT()
@@ -942,7 +942,7 @@ func ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER(execute_data *ZendExecuteData) int {
 	} else if EXPECTED(fbc.GetType() < ZEND_USER_FUNCTION) {
 		call.SetPrevExecuteData(execute_data)
 		ExecutorGlobals.SetCurrentExecuteData(call)
-		if UNEXPECTED(fbc.isHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
+		if UNEXPECTED(fbc.IsHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
 			goto fcall_except
 		}
 		ret = EX_VAR(opline.GetResult().GetVar())
@@ -1635,7 +1635,7 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		ZEND_ASSERT(zv != nil)
 		ce = Z_CE_P(zv)
-		if !ce.HasCeFlags(ZEND_ACC_LINKED) {
+		if !ce.IsLinked() {
 			if ZendDoLinkClass(ce, b.CondF1(opline.GetOp2Type() == IS_CONST, func() *ZendString { return Z_STR_P(RT_CONSTANT(opline, opline.GetOp2())) }, nil)) == FAILURE {
 				HANDLE_EXCEPTION()
 			}
@@ -1922,7 +1922,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	call = execute_data
 	ExecutorGlobals.SetCurrentExecuteData(EX(prev_execute_data))
 	execute_data = ExecutorGlobals.GetCurrentExecuteData()
-	if fbc.GetOpArray().isStatic() {
+	if fbc.GetOpArray().IsStatic() {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCallstatic())
 	} else {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCall())
@@ -1954,7 +1954,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		var retval Zval
 		ZEND_ASSERT(fbc.GetType() == ZEND_INTERNAL_FUNCTION)
 		ExecutorGlobals.SetCurrentExecuteData(call)
-		if UNEXPECTED(fbc.isHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
+		if UNEXPECTED(fbc.IsHasTypeHints()) && UNEXPECTED(ZendVerifyInternalArgTypes(fbc, call) == 0) {
 			ZendVmStackFreeCallFrame(call)
 			if ret != nil {
 				ZVAL_UNDEF(ret)
@@ -2069,7 +2069,7 @@ try_function_name:
 	if (IS_CONST & (IS_VAR | IS_TMP_VAR)) != 0 {
 		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			if call != nil {
-				if call.GetFunc().isCallViaTrampoline() {
+				if call.GetFunc().IsCallViaTrampoline() {
 					ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 					ZendFreeTrampoline(call.GetFunc())
 				}
@@ -2214,7 +2214,7 @@ try_function_name:
 	if ((IS_TMP_VAR | IS_VAR) & (IS_VAR | IS_TMP_VAR)) != 0 {
 		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			if call != nil {
-				if call.GetFunc().isCallViaTrampoline() {
+				if call.GetFunc().IsCallViaTrampoline() {
 					ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 					ZendFreeTrampoline(call.GetFunc())
 				}
@@ -2324,7 +2324,7 @@ try_function_name:
 	if (IS_CV & (IS_VAR | IS_TMP_VAR)) != 0 {
 		if UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			if call != nil {
-				if call.GetFunc().isCallViaTrampoline() {
+				if call.GetFunc().IsCallViaTrampoline() {
 					ZendStringReleaseEx(call.GetFunc().GetFunctionName(), 0)
 					ZendFreeTrampoline(call.GetFunc())
 				}
@@ -2877,10 +2877,10 @@ func ZEND_CLONE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		HANDLE_EXCEPTION()
 	}
-	if clone != nil && !clone.isPublic() {
+	if clone != nil && !clone.IsPublic() {
 		scope = EX(func_).op_array.scope
 		if clone.GetScope() != scope {
-			if UNEXPECTED(clone.isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
+			if UNEXPECTED(clone.IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
 				ZendWrongCloneCall(clone, scope)
 				ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 				HANDLE_EXCEPTION()
@@ -3299,7 +3299,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
 	var val *Zval
 	val = RT_CONSTANT(opline, opline.GetOp1())
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -4476,7 +4476,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDat
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CONST&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -4586,7 +4586,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExe
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -4595,7 +4595,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExe
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -4648,13 +4648,13 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData)
 			}
 		}
 		object_or_called_scope = fcc.GetCalledScope()
-		if func_.isClosure() {
+		if func_.IsClosure() {
 
 			/* Delay closure destruction until its invocation */
 
 			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
 			call_info |= ZEND_CALL_CLOSURE
-			if func_.isFakeClosure() {
+			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
 			}
 			if fcc.GetObject() != nil {
@@ -5046,7 +5046,7 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) 
 func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -6514,7 +6514,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteDa
 		ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CONST&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -6629,7 +6629,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendEx
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -6638,7 +6638,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendEx
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -6693,13 +6693,13 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData
 			}
 		}
 		object_or_called_scope = fcc.GetCalledScope()
-		if func_.isClosure() {
+		if func_.IsClosure() {
 
 			/* Delay closure destruction until its invocation */
 
 			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
 			call_info |= ZEND_CALL_CLOSURE
-			if func_.isFakeClosure() {
+			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
 			}
 			if fcc.GetObject() != nil {
@@ -6983,7 +6983,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteDa
 func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -7140,7 +7140,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -7489,7 +7489,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -7498,7 +7498,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -7790,7 +7790,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 	}
 	if Z_TYPE(EX(This)) == IS_OBJECT {
 		called_scope = Z_OBJCE(EX(This))
-		if UNEXPECTED(func_.isStatic() || (EX(func_).common.fn_flags&ZEND_ACC_STATIC) != 0) {
+		if UNEXPECTED(func_.IsStatic() || (EX(func_).common.fn_flags&ZEND_ACC_STATIC) != 0) {
 			object = nil
 		} else {
 			object = &EX(This)
@@ -7805,7 +7805,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -8685,7 +8685,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) 
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CONST&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -8795,7 +8795,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecut
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -8804,7 +8804,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecut
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -8857,13 +8857,13 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) in
 			}
 		}
 		object_or_called_scope = fcc.GetCalledScope()
-		if func_.isClosure() {
+		if func_.IsClosure() {
 
 			/* Delay closure destruction until its invocation */
 
 			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
 			call_info |= ZEND_CALL_CLOSURE
-			if func_.isFakeClosure() {
+			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
 			}
 			if fcc.GetObject() != nil {
@@ -9136,7 +9136,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) 
 func ZEND_YIELD_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -11449,10 +11449,10 @@ func ZEND_CLONE_SPEC_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		HANDLE_EXCEPTION()
 	}
-	if clone != nil && !clone.isPublic() {
+	if clone != nil && !clone.IsPublic() {
 		scope = EX(func_).op_array.scope
 		if clone.GetScope() != scope {
-			if UNEXPECTED(clone.isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
+			if UNEXPECTED(clone.IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
 				ZendWrongCloneCall(clone, scope)
 				ZvalPtrDtorNogc(free_op1)
 				ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
@@ -12512,7 +12512,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteDa
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		ZvalPtrDtorNogc(free_op1)
 		if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
@@ -13812,7 +13812,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		ZvalPtrDtorNogc(free_op1)
 		if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
@@ -14931,7 +14931,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData)
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		ZvalPtrDtorNogc(free_op1)
 		if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
@@ -15778,7 +15778,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var val *Zval
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
@@ -16114,7 +16114,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -16576,7 +16576,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) i
 func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -16734,7 +16734,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -17021,7 +17021,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteData) int 
 func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -17410,7 +17410,7 @@ func ZEND_INIT_ARRAY_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -18989,7 +18989,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var val *Zval
 	var free_op1 ZendFreeOp
 	val = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		ZvalPtrDtorNogc(free_op1)
 		UNDEF_RESULT()
@@ -20681,7 +20681,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecu
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -20690,7 +20690,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecu
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -21018,7 +21018,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -22765,7 +22765,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExec
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -22774,7 +22774,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExec
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -23122,7 +23122,7 @@ func ZEND_ASSIGN_SPEC_VAR_TMP_RETVAL_USED_HANDLER(execute_data *ZendExecuteData)
 func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -23391,7 +23391,7 @@ func ZEND_ASSIGN_REF_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -24187,7 +24187,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExec
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -24196,7 +24196,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExec
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -24424,7 +24424,7 @@ func ZEND_SEPARATE_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -26192,7 +26192,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteD
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -26201,7 +26201,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteD
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -26463,7 +26463,7 @@ func ZEND_UNSET_OBJ_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -26778,10 +26778,10 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		HANDLE_EXCEPTION()
 	}
-	if clone != nil && !clone.isPublic() {
+	if clone != nil && !clone.IsPublic() {
 		scope = EX(func_).op_array.scope
 		if clone.GetScope() != scope {
-			if UNEXPECTED(clone.isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
+			if UNEXPECTED(clone.IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
 				ZendWrongCloneCall(clone, scope)
 				ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 				HANDLE_EXCEPTION()
@@ -27935,7 +27935,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteDa
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_UNUSED&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -28045,7 +28045,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendEx
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -28054,7 +28054,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendEx
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -28240,7 +28240,7 @@ isset_object_finish:
 func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -29533,7 +29533,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_UNUSED&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -29648,7 +29648,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendE
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -29657,7 +29657,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendE
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -29770,7 +29770,7 @@ isset_object_finish:
 func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -29927,7 +29927,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -30200,7 +30200,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendE
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -30209,7 +30209,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendE
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -30335,7 +30335,7 @@ func ZEND_INIT_ARRAY_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) i
 func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -31739,7 +31739,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData)
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_UNUSED&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -31849,7 +31849,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecu
 			ZendThrowError(nil, "Cannot call constructor")
 			HANDLE_EXCEPTION()
 		}
-		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().isPrivate() {
+		if Z_TYPE(EX(This)) == IS_OBJECT && Z_OBJ(EX(This)).GetCe() != ce.GetConstructor().GetScope() && ce.GetConstructor().IsPrivate() {
 			ZendThrowError(nil, "Cannot call private %s::__construct()", ZSTR_VAL(ce.GetName()))
 			HANDLE_EXCEPTION()
 		}
@@ -31858,7 +31858,7 @@ func ZEND_INIT_STATIC_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecu
 			InitFuncRunTimeCache(&fbc.op_array)
 		}
 	}
-	if !fbc.isStatic() {
+	if !fbc.IsStatic() {
 		if Z_TYPE(EX(This)) == IS_OBJECT && InstanceofFunction(Z_OBJCE(EX(This)), ce) != 0 {
 			ce = (*ZendClassEntry)(Z_OBJ(EX(This)))
 			call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
@@ -31967,7 +31967,7 @@ isset_object_finish:
 func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -32879,10 +32879,10 @@ func ZEND_CLONE_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		HANDLE_EXCEPTION()
 	}
-	if clone != nil && !clone.isPublic() {
+	if clone != nil && !clone.IsPublic() {
 		scope = EX(func_).op_array.scope
 		if clone.GetScope() != scope {
-			if UNEXPECTED(clone.isPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
+			if UNEXPECTED(clone.IsPrivate()) || UNEXPECTED(ZendCheckProtected(ZendGetFunctionRootClass(clone), scope) == 0) {
 				ZendWrongCloneCall(clone, scope)
 				ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 				HANDLE_EXCEPTION()
@@ -33296,7 +33296,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
 	var val *Zval
 	val = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		ZendThrowError(nil, "Cannot use \"yield from\" in a force-closed generator")
 		UNDEF_RESULT()
 		HANDLE_EXCEPTION()
@@ -35889,7 +35889,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) 
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CV&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -36303,7 +36303,7 @@ try_instanceof:
 func ZEND_YIELD_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -38966,7 +38966,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 		ZvalPtrDtorNogc(free_op2)
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CV&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -39421,7 +39421,7 @@ func ZEND_ASSIGN_SPEC_CV_TMP_RETVAL_USED_HANDLER(execute_data *ZendExecuteData) 
 func ZEND_YIELD_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -39713,7 +39713,7 @@ try_instanceof:
 func ZEND_YIELD_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -40773,7 +40773,7 @@ try_instanceof:
 func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 
@@ -43420,7 +43420,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int
 
 	}
 	call_info = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_HAS_THIS
-	if UNEXPECTED(fbc.isStatic()) {
+	if UNEXPECTED(fbc.IsStatic()) {
 		if (IS_CV&(IS_VAR|IS_TMP_VAR)) != 0 && UNEXPECTED(ExecutorGlobals.GetException() != nil) {
 			HANDLE_EXCEPTION()
 		}
@@ -43794,7 +43794,7 @@ func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int
 func ZEND_YIELD_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var generator *ZendGenerator = ZendGetRunningGenerator(EXECUTE_DATA_C)
-	if UNEXPECTED(generator.isForcedClose()) {
+	if UNEXPECTED(generator.IsForcedClose()) {
 		return zend_yield_in_closed_generator_helper_SPEC(execute_data)
 	}
 

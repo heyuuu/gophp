@@ -109,6 +109,20 @@ func (this *PhpOutputHandler) SwitchFlags(value int, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this PhpOutputHandler) IsUser() bool         { return this.HasFlags(PHP_OUTPUT_HANDLER_USER) }
+func (this PhpOutputHandler) IsStarted() bool      { return this.HasFlags(PHP_OUTPUT_HANDLER_STARTED) }
+func (this PhpOutputHandler) IsDisabled() bool     { return this.HasFlags(PHP_OUTPUT_HANDLER_DISABLED) }
+func (this PhpOutputHandler) IsProcessed() bool    { return this.HasFlags(PHP_OUTPUT_HANDLER_PROCESSED) }
+func (this *PhpOutputHandler) SetIsUser(cond bool) { this.SwitchFlags(PHP_OUTPUT_HANDLER_USER, cond) }
+func (this *PhpOutputHandler) SetIsStarted(cond bool) {
+	this.SwitchFlags(PHP_OUTPUT_HANDLER_STARTED, cond)
+}
+func (this *PhpOutputHandler) SetIsDisabled(cond bool) {
+	this.SwitchFlags(PHP_OUTPUT_HANDLER_DISABLED, cond)
+}
+func (this *PhpOutputHandler) SetIsProcessed(cond bool) {
+	this.SwitchFlags(PHP_OUTPUT_HANDLER_PROCESSED, cond)
+}
 
 /**
  * ZendOutputGlobals

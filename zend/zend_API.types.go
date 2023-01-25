@@ -35,12 +35,12 @@ func (this *ZendFunctionEntry) SwitchFlags(value uint32, cond bool) {
 		this.SubFlags(value)
 	}
 }
-func (this ZendFunctionEntry) isPppMask() bool          { return this.HasFlags(ZEND_ACC_PPP_MASK) }
-func (this ZendFunctionEntry) isAbstract() bool         { return this.HasFlags(ZEND_ACC_ABSTRACT) }
-func (this ZendFunctionEntry) isStatic() bool           { return this.HasFlags(ZEND_ACC_STATIC) }
-func (this *ZendFunctionEntry) setIsPppMask(cond bool)  { this.SwitchFlags(ZEND_ACC_PPP_MASK, cond) }
-func (this *ZendFunctionEntry) setIsAbstract(cond bool) { this.SwitchFlags(ZEND_ACC_ABSTRACT, cond) }
-func (this *ZendFunctionEntry) setIsStatic(cond bool)   { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
+func (this ZendFunctionEntry) IsPppMask() bool          { return this.HasFlags(ZEND_ACC_PPP_MASK) }
+func (this ZendFunctionEntry) IsAbstract() bool         { return this.HasFlags(ZEND_ACC_ABSTRACT) }
+func (this ZendFunctionEntry) IsStatic() bool           { return this.HasFlags(ZEND_ACC_STATIC) }
+func (this *ZendFunctionEntry) SetIsPppMask(cond bool)  { this.SwitchFlags(ZEND_ACC_PPP_MASK, cond) }
+func (this *ZendFunctionEntry) SetIsAbstract(cond bool) { this.SwitchFlags(ZEND_ACC_ABSTRACT, cond) }
+func (this *ZendFunctionEntry) SetIsStatic(cond bool)   { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
 
 /**
  * ZendFcallInfo

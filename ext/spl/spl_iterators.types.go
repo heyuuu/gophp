@@ -134,6 +134,38 @@ func (this *SplDualItObject) SwitchUCachingFlags(value zend.ZendLong, cond bool)
 		this.SubUCachingFlags(value)
 	}
 }
+func (this SplDualItObject) IsValid() bool         { return this.HasUCachingFlags(CIT_VALID) }
+func (this SplDualItObject) IsFullCache() bool     { return this.HasUCachingFlags(CIT_FULL_CACHE) }
+func (this SplDualItObject) IsCatchGetChild() bool { return this.HasUCachingFlags(CIT_CATCH_GET_CHILD) }
+func (this SplDualItObject) IsTostringUseInner() bool {
+	return this.HasUCachingFlags(CIT_TOSTRING_USE_INNER)
+}
+func (this SplDualItObject) IsTostringUseKey() bool {
+	return this.HasUCachingFlags(CIT_TOSTRING_USE_KEY)
+}
+func (this SplDualItObject) IsTostringUseCurrent() bool {
+	return this.HasUCachingFlags(CIT_TOSTRING_USE_CURRENT)
+}
+func (this SplDualItObject) IsCallTostring() bool  { return this.HasUCachingFlags(CIT_CALL_TOSTRING) }
+func (this *SplDualItObject) SetIsValid(cond bool) { this.SwitchUCachingFlags(CIT_VALID, cond) }
+func (this *SplDualItObject) SetIsFullCache(cond bool) {
+	this.SwitchUCachingFlags(CIT_FULL_CACHE, cond)
+}
+func (this *SplDualItObject) SetIsCatchGetChild(cond bool) {
+	this.SwitchUCachingFlags(CIT_CATCH_GET_CHILD, cond)
+}
+func (this *SplDualItObject) SetIsTostringUseInner(cond bool) {
+	this.SwitchUCachingFlags(CIT_TOSTRING_USE_INNER, cond)
+}
+func (this *SplDualItObject) SetIsTostringUseKey(cond bool) {
+	this.SwitchUCachingFlags(CIT_TOSTRING_USE_KEY, cond)
+}
+func (this *SplDualItObject) SetIsTostringUseCurrent(cond bool) {
+	this.SwitchUCachingFlags(CIT_TOSTRING_USE_CURRENT, cond)
+}
+func (this *SplDualItObject) SetIsCallTostring(cond bool) {
+	this.SwitchUCachingFlags(CIT_CALL_TOSTRING, cond)
+}
 
 /* SplDualItObject.u.regex.flags */
 func (this *SplDualItObject) AddURegexFlags(value zend.ZendLong) { this.u.regex.flags |= value }
@@ -148,6 +180,10 @@ func (this *SplDualItObject) SwitchURegexFlags(value zend.ZendLong, cond bool) {
 		this.SubURegexFlags(value)
 	}
 }
+func (this SplDualItObject) IsUseKey() bool           { return this.HasURegexFlags(REGIT_USE_KEY) }
+func (this SplDualItObject) IsInverted() bool         { return this.HasURegexFlags(REGIT_INVERTED) }
+func (this *SplDualItObject) SetIsUseKey(cond bool)   { this.SwitchURegexFlags(REGIT_USE_KEY, cond) }
+func (this *SplDualItObject) SetIsInverted(cond bool) { this.SwitchURegexFlags(REGIT_INVERTED, cond) }
 
 /* SplDualItObject.u.regex.preg_flags */
 func (this *SplDualItObject) AddPregFlags(value zend.ZendLong) { this.u.regex.preg_flags |= value }
@@ -272,6 +308,20 @@ func (this *SplRecursiveItObject) SwitchFlags(value int, cond bool) {
 	} else {
 		this.SubFlags(value)
 	}
+}
+func (this SplRecursiveItObject) IsRitCatchGetChild() bool { return this.HasFlags(RIT_CATCH_GET_CHILD) }
+func (this SplRecursiveItObject) IsRtitBypassCurrent() bool {
+	return this.HasFlags(RTIT_BYPASS_CURRENT)
+}
+func (this SplRecursiveItObject) IsRtitBypassKey() bool { return this.HasFlags(RTIT_BYPASS_KEY) }
+func (this *SplRecursiveItObject) SetIsRitCatchGetChild(cond bool) {
+	this.SwitchFlags(RIT_CATCH_GET_CHILD, cond)
+}
+func (this *SplRecursiveItObject) SetIsRtitBypassCurrent(cond bool) {
+	this.SwitchFlags(RTIT_BYPASS_CURRENT, cond)
+}
+func (this *SplRecursiveItObject) SetIsRtitBypassKey(cond bool) {
+	this.SwitchFlags(RTIT_BYPASS_KEY, cond)
 }
 
 /**

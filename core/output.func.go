@@ -437,7 +437,7 @@ func PhpOutputHandlerDtor(handler *PhpOutputHandler) {
 	if handler.GetBuffer().GetData() != nil {
 		zend.Efree(handler.GetBuffer().GetData())
 	}
-	if handler.HasFlags(PHP_OUTPUT_HANDLER_USER) {
+	if handler.IsUser() {
 		zend.ZvalPtrDtor(&handler.func_.user.GetZoh())
 		zend.Efree(handler.GetUser())
 	}
@@ -596,11 +596,11 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 		/* need to start? */
 
-		if !handler.HasFlags(PHP_OUTPUT_HANDLER_STARTED) {
+		if !handler.IsStarted() {
 			context.SetOp(context.GetOp() | PHP_OUTPUT_HANDLER_START)
 		}
 		OG(running) = handler
-		if handler.HasFlags(PHP_OUTPUT_HANDLER_USER) {
+		if handler.IsUser() {
 			var retval zend.Zval
 			var ob_data zend.Zval
 			var ob_mode zend.Zval
@@ -648,7 +648,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 				status = PHP_OUTPUT_HANDLER_FAILURE
 			}
 		}
-		handler.AddFlags(PHP_OUTPUT_HANDLER_STARTED)
+		handler.SetIsStarted(true)
 		OG(running) = nil
 	}
 	switch status {
@@ -656,7 +656,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 
 		/* disable this handler */
 
-		handler.AddFlags(PHP_OUTPUT_HANDLER_DISABLED)
+		handler.SetIsDisabled(true)
 
 		/* discard any output */
 
@@ -683,7 +683,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		/* no more buffered data */
 
 		handler.GetBuffer().SetUsed(0)
-		handler.AddFlags(PHP_OUTPUT_HANDLER_PROCESSED)
+		handler.SetIsProcessed(true)
 		break
 	}
 	context.SetOp(original_op)
@@ -709,7 +709,7 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 		context.GetIn().SetUsed(len_)
 		if obh_cnt > 1 {
 			zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
-		} else if b.Assign(&active, zend.ZendStackTop(&OG(handlers))) && !(*active).HasFlags(PHP_OUTPUT_HANDLER_DISABLED) {
+		} else if b.Assign(&active, zend.ZendStackTop(&OG(handlers))) && !(*active).IsDisabled() {
 			PhpOutputHandlerOp(*active, &context)
 		} else {
 			PhpOutputContextPass(&context)

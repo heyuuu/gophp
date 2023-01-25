@@ -175,7 +175,7 @@ func SplPtrHeapInsert(heap *SplPtrHeap, elem any, cmp_userdata any) {
 
 		/* exception thrown during comparison */
 
-		heap.AddFlags(SPL_HEAP_CORRUPTED)
+		heap.SetIsHeapCorrupted(true)
 
 		/* exception thrown during comparison */
 
@@ -226,7 +226,7 @@ func SplPtrHeapDeleteTop(heap *SplPtrHeap, elem any, cmp_userdata any) int {
 
 		/* exception thrown during comparison */
 
-		heap.AddFlags(SPL_HEAP_CORRUPTED)
+		heap.SetIsHeapCorrupted(true)
 
 		/* exception thrown during comparison */
 
@@ -424,7 +424,7 @@ func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *ze
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -439,7 +439,7 @@ func zim_spl_SplHeap_extract(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -457,7 +457,7 @@ func zim_spl_SplPriorityQueue_insert(execute_data *zend.ZendExecuteData, return_
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -474,7 +474,7 @@ func zim_spl_SplPriorityQueue_extract(execute_data *zend.ZendExecuteData, return
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -492,7 +492,7 @@ func zim_spl_SplPriorityQueue_top(execute_data *zend.ZendExecuteData, return_val
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -544,7 +544,7 @@ func zim_spl_SplHeap_isCorrupted(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	zend.RETVAL_BOOL(intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED))
+	zend.RETVAL_BOOL(intern.GetHeap().IsHeapCorrupted())
 	return
 }
 func zim_spl_SplPriorityQueue_compare(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -563,7 +563,7 @@ func zim_spl_SplHeap_top(execute_data *zend.ZendExecuteData, return_value *zend.
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	if intern.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if intern.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
@@ -607,7 +607,7 @@ func SplHeapItValid(iter *zend.ZendObjectIterator) int {
 }
 func SplHeapItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var object *SplHeapObject = Z_SPLHEAP_P(&iter.data)
-	if object.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if object.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return nil
 	}
@@ -620,7 +620,7 @@ func SplHeapItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 func SplPqueueItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var user_it *zend.ZendUserIterator = (*zend.ZendUserIterator)(iter)
 	var object *SplHeapObject = Z_SPLHEAP_P(&iter.data)
-	if object.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if object.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return nil
 	}
@@ -639,7 +639,7 @@ func SplHeapItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 }
 func SplHeapItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplHeapObject = Z_SPLHEAP_P(&iter.data)
-	if object.GetHeap().HasFlags(SPL_HEAP_CORRUPTED) {
+	if object.GetHeap().IsHeapCorrupted() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}

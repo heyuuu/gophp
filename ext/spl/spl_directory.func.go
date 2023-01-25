@@ -1230,7 +1230,7 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(execute_data *zend.ZendExecu
 		return
 	} else {
 		SplFilesystemObjectGetFileName(intern)
-		if allow_links == 0 && !intern.HasFlags(SPL_FILE_DIR_FOLLOW_SYMLINKS) {
+		if allow_links == 0 && !intern.IsDirFollowSymlinks() {
 			standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_LINK, return_value)
 			if zend.ZendIsTrue(return_value) != 0 {
 				zend.RETVAL_FALSE

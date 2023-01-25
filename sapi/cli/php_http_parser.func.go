@@ -1110,7 +1110,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			switch header_state {
 			case HUpgrade:
-				parser.AddFlags(F_UPGRADE)
+				parser.SetIsUpgrade(true)
 				header_state = HGeneral
 				break
 			case HTransferEncoding:
@@ -1233,13 +1233,13 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SHeaderFieldStart
 			switch header_state {
 			case HConnectionKeepAlive:
-				parser.AddFlags(F_CONNECTION_KEEP_ALIVE)
+				parser.SetIsConnectionKeepAlive(true)
 				break
 			case HConnectionClose:
-				parser.AddFlags(F_CONNECTION_CLOSE)
+				parser.SetIsConnectionClose(true)
 				break
 			case HTransferEncodingChunked:
-				parser.AddFlags(F_CHUNKED)
+				parser.SetIsChunked(true)
 				break
 			default:
 				break
@@ -1247,7 +1247,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			break
 		case SHeadersAlmostDone:
 		headers_almost_done:
-			if parser.HasFlags(F_TRAILING) {
+			if parser.IsTrailing() {
 
 				/* End of a chunked request */
 
@@ -1260,7 +1260,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				break
 			}
 			nread = 0
-			if parser.HasFlags(F_UPGRADE) || parser.GetMethod() == PHP_HTTP_CONNECT {
+			if parser.IsUpgrade() || parser.GetMethod() == PHP_HTTP_CONNECT {
 				parser.SetUpgrade(1)
 			}
 
@@ -1276,7 +1276,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 				case 0:
 					break
 				case 1:
-					parser.AddFlags(F_SKIPBODY)
+					parser.SetIsSkipbody(true)
 					break
 				default:
 					return p - data
@@ -1287,14 +1287,14 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			 * support HTTP/1 for now.
 			 */
 
-			if parser.HasFlags(F_SKIPBODY) {
+			if parser.IsSkipbody() {
 				if settings.GetOnMessageComplete() != nil {
 					if 0 != settings.GetOnMessageComplete()(parser) {
 						return p - data
 					}
 				}
 				state = NEW_MESSAGE()
-			} else if parser.HasFlags(F_CHUNKED) {
+			} else if parser.IsChunked() {
 
 				/* chunked encoding - ignore Content-Length header */
 
@@ -1373,7 +1373,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SChunkSizeStart:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			c = Unhex[uint8(ch)]
 			if c == -1 {
 				goto error
@@ -1382,7 +1382,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			state = SChunkSize
 			break
 		case SChunkSize:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			if ch == CR {
 				state = SChunkSizeAlmostDone
 				break
@@ -1399,7 +1399,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			parser.SetContentLength(parser.GetContentLength() + c)
 			break
 		case SChunkParameters:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 
 			/* just ignore this shit. TODO check for overflow */
 
@@ -1409,16 +1409,16 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			break
 		case SChunkSizeAlmostDone:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			if parser.GetContentLength() == 0 {
-				parser.AddFlags(F_TRAILING)
+				parser.SetIsTrailing(true)
 				state = SHeaderFieldStart
 			} else {
 				state = SChunkData
 			}
 			break
 		case SChunkData:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			r.Assert(pe >= p)
 			to_read = MIN(size_t(pe-p), size_t(parser.GetContentLength()))
 			if to_read > 0 {
@@ -1433,11 +1433,11 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			parser.SetContentLength(parser.GetContentLength() - to_read)
 			break
 		case SChunkDataAlmostDone:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			state = SChunkDataDone
 			break
 		case SChunkDataDone:
-			r.Assert(parser.HasFlags(F_CHUNKED))
+			r.Assert(parser.IsChunked())
 			state = SChunkSizeStart
 			break
 		default:
@@ -1501,7 +1501,7 @@ func PhpHttpShouldKeepAlive(parser *PhpHttpParser) int {
 
 		/* HTTP/1.1 */
 
-		if parser.HasFlags(F_CONNECTION_CLOSE) {
+		if parser.IsConnectionClose() {
 			return 0
 		} else {
 			return 1
@@ -1513,7 +1513,7 @@ func PhpHttpShouldKeepAlive(parser *PhpHttpParser) int {
 
 		/* HTTP/1.0 or earlier */
 
-		if parser.HasFlags(F_CONNECTION_KEEP_ALIVE) {
+		if parser.IsConnectionKeepAlive() {
 			return 1
 		} else {
 			return 0

@@ -50,6 +50,10 @@ func (this *spl_SplObjectStorage) SwitchFlags(value zend.ZendLong, cond bool) {
 		this.SubFlags(value)
 	}
 }
+func (this spl_SplObjectStorage) IsNeedAll() bool           { return this.HasFlags(MIT_NEED_ALL) }
+func (this spl_SplObjectStorage) IsKeysAssoc() bool         { return this.HasFlags(MIT_KEYS_ASSOC) }
+func (this *spl_SplObjectStorage) SetIsNeedAll(cond bool)   { this.SwitchFlags(MIT_NEED_ALL, cond) }
+func (this *spl_SplObjectStorage) SetIsKeysAssoc(cond bool) { this.SwitchFlags(MIT_KEYS_ASSOC, cond) }
 
 /**
  * spl_SplObjectStorageElement
