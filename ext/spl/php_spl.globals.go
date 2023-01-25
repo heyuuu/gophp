@@ -1,0 +1,200 @@
+// <<generate>>
+
+package spl
+
+import (
+	b "sik/builtin"
+	"sik/core"
+	"sik/zend"
+)
+
+const PHP_SPL_VERSION = core.PHP_VERSION
+const PhpextSplPtr = &SplModuleEntry
+
+var ZmShutdownSpl func(type_ int, module_number int) int
+
+var SplGlobals ZendSplGlobals
+
+const SPL_DEFAULT_FILE_EXTENSIONS = ".inc,.php"
+
+var SplAutoloadFn *zend.ZendFunction = nil
+var SplAutoloadCallFn *zend.ZendFunction = nil
+var ArginfoIteratorToArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(1)), 0, 0, 0},
+	{
+		"iterator",
+		zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0),
+		0,
+		0,
+	},
+	{"use_keys", 0, 0, 0},
+}
+var ArginfoIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	{
+		"iterator",
+		zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0),
+		0,
+		0,
+	},
+}
+var ArginfoIteratorApply []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(2)), 0, 0, 0},
+	{
+		"iterator",
+		zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0),
+		0,
+		0,
+	},
+	{"function", 0, 0, 0},
+	{"args", zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1), 0, 0},
+}
+var ArginfoClassParents []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"instance", 0, 0, 0}, {"autoload", 0, 0, 0}}
+var ArginfoClassImplements []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"what", 0, 0, 0}, {"autoload", 0, 0, 0}}
+var ArginfoClassUses []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"what", 0, 0, 0}, {"autoload", 0, 0, 0}}
+var ArginfoSplClasses []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+}
+var ArginfoSplAutoloadFunctions []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+}
+var ArginfoSplAutoload []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"class_name", 0, 0, 0}, {"file_extensions", 0, 0, 0}}
+var ArginfoSplAutoloadExtensions []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"file_extensions", 0, 0, 0}}
+var ArginfoSplAutoloadCall []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"class_name", 0, 0, 0}}
+var ArginfoSplAutoloadRegister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"autoload_function", 0, 0, 0}, {"throw", 0, 0, 0}, {"prepend", 0, 0, 0}}
+var ArginfoSplAutoloadUnregister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"autoload_function", 0, 0, 0}}
+var ArginfoSplObjectHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"obj", 0, 0, 0}}
+var ArginfoSplObjectId []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"obj", 0, 0, 0}}
+var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+	{
+		"spl_classes",
+		ZifSplClasses,
+		ArginfoSplClasses,
+		uint32_t(b.SizeOf("arginfo_spl_classes")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload",
+		ZifSplAutoload,
+		ArginfoSplAutoload,
+		uint32_t(b.SizeOf("arginfo_spl_autoload")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_extensions",
+		ZifSplAutoloadExtensions,
+		ArginfoSplAutoloadExtensions,
+		uint32_t(b.SizeOf("arginfo_spl_autoload_extensions")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_register",
+		ZifSplAutoloadRegister,
+		ArginfoSplAutoloadRegister,
+		uint32_t(b.SizeOf("arginfo_spl_autoload_register")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_unregister",
+		ZifSplAutoloadUnregister,
+		ArginfoSplAutoloadUnregister,
+		uint32_t(b.SizeOf("arginfo_spl_autoload_unregister")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_functions",
+		ZifSplAutoloadFunctions,
+		ArginfoSplAutoloadFunctions,
+		uint32_t(b.SizeOf("arginfo_spl_autoload_functions")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_autoload_call",
+		ZifSplAutoloadCall,
+		ArginfoSplAutoloadCall,
+		uint32_t(b.SizeOf("arginfo_spl_autoload_call")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_parents",
+		ZifClassParents,
+		ArginfoClassParents,
+		uint32_t(b.SizeOf("arginfo_class_parents")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_implements",
+		ZifClassImplements,
+		ArginfoClassImplements,
+		uint32_t(b.SizeOf("arginfo_class_implements")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"class_uses",
+		ZifClassUses,
+		ArginfoClassUses,
+		uint32_t(b.SizeOf("arginfo_class_uses")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_object_hash",
+		ZifSplObjectHash,
+		ArginfoSplObjectHash,
+		uint32_t(b.SizeOf("arginfo_spl_object_hash")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"spl_object_id",
+		ZifSplObjectId,
+		ArginfoSplObjectId,
+		uint32_t(b.SizeOf("arginfo_spl_object_id")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_to_array",
+		ZifIteratorToArray,
+		ArginfoIteratorToArray,
+		uint32_t(b.SizeOf("arginfo_iterator_to_array")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_count",
+		ZifIteratorCount,
+		ArginfoIterator,
+		uint32_t(b.SizeOf("arginfo_iterator")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{
+		"iterator_apply",
+		ZifIteratorApply,
+		ArginfoIteratorApply,
+		uint32_t(b.SizeOf("arginfo_iterator_apply")/b.SizeOf("struct _zend_internal_arg_info") - 1),
+		0,
+	},
+	{nil, nil, nil, 0, 0},
+}
+var SplModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
+	b.SizeOf("zend_module_entry"),
+	zend.ZEND_MODULE_API_NO,
+	core.ZEND_DEBUG,
+	zend.USING_ZTS,
+	nil,
+	nil,
+	"SPL",
+	SplFunctions,
+	ZmStartupSpl,
+	nil,
+	ZmActivateSpl,
+	ZmDeactivateSpl,
+	ZmInfoSpl,
+	PHP_SPL_VERSION,
+	core.PHP_MODULE_GLOBALS(spl),
+	core.PHP_GINIT(spl),
+	nil,
+	nil,
+	0,
+	0,
+	nil,
+	0,
+	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
+}

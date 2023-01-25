@@ -1,0 +1,46 @@
+// <<generate>>
+
+package standard
+
+// Source: <ext/standard/user_filters.c>
+
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors:                                                             |
+   | Wez Furlong (wez@thebrainroom.com)                                   |
+   | Sara Golemon (pollita@php.net)                                       |
+   +----------------------------------------------------------------------+
+*/
+
+/* to provide context for calling into the next filter from user-space */
+
+/* define the __special__  base filter class */
+
+/* {{{ proto object stream_bucket_make_writeable(resource brigade)
+   Return a bucket object from the brigade for operating on */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */

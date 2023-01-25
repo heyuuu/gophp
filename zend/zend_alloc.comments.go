@@ -1,0 +1,210 @@
+// <<generate>>
+
+package zend
+
+// Source: <Zend/zend_alloc.h>
+
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   |          Dmitry Stogov <dmitry@php.net>                              |
+   +----------------------------------------------------------------------+
+*/
+
+// failed # include "../TSRM/TSRM.h"
+
+/* _emalloc() & _efree() specialization */
+
+/* Standard wrapper macros */
+
+/* Relay wrapper macros */
+
+/* Selective persistent/non persistent allocation macros */
+
+/* fast cache for HashTables */
+
+/* Heap functions */
+
+/*
+
+// The following example shows how to use zend_mm_heap API with custom storage
+
+static zend_mm_heap *apc_heap = NULL;
+static HashTable    *apc_ht = NULL;
+
+typedef struct _apc_data {
+    void     *mem;
+    uint32_t  free_pages;
+} apc_data;
+
+static void *apc_chunk_alloc(zend_mm_storage *storage, size_t size, size_t alignment)
+{
+    apc_data *data = (apc_data*)(storage->data);
+    size_t real_size = ((size + (ZEND_MM_CHUNK_SIZE-1)) & ~(ZEND_MM_CHUNK_SIZE-1));
+    uint32_t count = real_size / ZEND_MM_CHUNK_SIZE;
+    uint32_t first, last, i;
+
+    ZEND_ASSERT(alignment == ZEND_MM_CHUNK_SIZE);
+
+    for (first = 0; first < 32; first++) {
+        if (!(data->free_pages & (1 << first))) {
+            last = first;
+            do {
+                if (last - first == count - 1) {
+                    for (i = first; i <= last; i++) {
+                        data->free_pages |= (1 << i);
+                    }
+                    return (void *)(((char*)(data->mem)) + ZEND_MM_CHUNK_SIZE * (1 << first));
+                }
+                last++;
+            } while (last < 32 && !(data->free_pages & (1 << last)));
+            first = last;
+        }
+    }
+    return NULL;
+}
+
+static void apc_chunk_free(zend_mm_storage *storage, void *chunk, size_t size)
+{
+    apc_data *data = (apc_data*)(storage->data);
+    uint32_t i;
+
+    ZEND_ASSERT(((uintptr_t)chunk & (ZEND_MM_CHUNK_SIZE - 1)) == 0);
+
+    i = ((uintptr_t)chunk - (uintptr_t)(data->mem)) / ZEND_MM_CHUNK_SIZE;
+    while (1) {
+        data->free_pages &= ~(1 << i);
+        if (size <= ZEND_MM_CHUNK_SIZE) {
+            break;
+        }
+        size -= ZEND_MM_CHUNK_SIZE;
+    }
+}
+
+static void apc_init_heap(void)
+{
+    zend_mm_handlers apc_handlers = {
+        apc_chunk_alloc,
+        apc_chunk_free,
+        NULL,
+        NULL,
+    };
+    apc_data tmp_data;
+    zend_mm_heap *old_heap;
+
+    // Preallocate properly aligned SHM chunks (64MB)
+    tmp_data.mem = shm_memalign(ZEND_MM_CHUNK_SIZE, ZEND_MM_CHUNK_SIZE * 32);
+
+    // Initialize temporary storage data
+    tmp_data.free_pages = 0;
+
+    // Create heap
+    apc_heap = zend_mm_startup_ex(&apc_handlers, &tmp_data, sizeof(tmp_data));
+
+    // Allocate some data in the heap
+    old_heap = zend_mm_set_heap(apc_heap);
+    ALLOC_HASHTABLE(apc_ht);
+    zend_hash_init(apc_ht, 64, NULL, ZVAL_PTR_DTOR, 0);
+    zend_mm_set_heap(old_heap);
+}
+
+*/
+
+// Source: <Zend/zend_alloc.c>
+
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   |          Dmitry Stogov <dmitry@php.net>                              |
+   +----------------------------------------------------------------------+
+*/
+
+/* NetBSD has an mremap() function with a signature that is incompatible with Linux (WTF?),
+ * so pretend it doesn't exist. */
+
+/* USE_ZEND_ALLOC=0 may switch to system malloc() */
+
+/*
+ * Memory is retrieved from OS by chunks of fixed size 2MB.
+ * Inside chunk it's managed by pages of fixed size 4096B.
+ * So each chunk consists from 512 pages.
+ * The first page of each chunk is reserved for chunk header.
+ * It contains service information about all pages.
+ *
+ * free_pages - current number of free pages in this chunk
+ *
+ * free_tail  - number of continuous free pages at the end of chunk
+ *
+ * free_map   - bitset (a bit for each page). The bit is set if the corresponding
+ *              page is allocated. Allocator for "lage sizes" may easily find a
+ *              free page (or a continuous number of pages) searching for zero
+ *              bits.
+ *
+ * map        - contains service information for each page. (32-bits for each
+ *              page).
+ *    usage:
+ *                (2 bits)
+ *                 FRUN - free page,
+ *              LRUN - first page of "large" allocation
+ *              SRUN - first page of a bin used for "small" allocation
+ *
+ *    lrun_pages:
+ *              (10 bits) number of allocated pages
+ *
+ *    srun_bin_num:
+ *              (5 bits) bin number (e.g. 0 for sizes 0-2, 1 for 3-4,
+ *               2 for 5-8, 3 for 9-16 etc) see zend_alloc_sizes.h
+ */
+
+/*
+ * bin - is one or few continuous pages (up to 8) used for allocation of
+ * a particular "small size".
+ */
+
+/*****************/
+
+/***********/
+
+/**********/
+
+/***********************/
+
+/**************/
+
+/**************/
+
+/********/
+
+/*********************/
+
+/******************/
+
+/**************/
+
+/**********************/

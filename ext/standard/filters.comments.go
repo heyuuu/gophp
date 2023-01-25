@@ -1,0 +1,61 @@
+// <<generate>>
+
+package standard
+
+// Source: <ext/standard/filters.c>
+
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors:                                                             |
+   | Wez Furlong (wez@thebrainroom.com)                                   |
+   | Sara Golemon (pollita@php.net)                                       |
+   | Moriyoshi Koizumi (moriyoshi@php.net)                                |
+   | Marcus Boerger (helly@php.net)                                       |
+   +----------------------------------------------------------------------+
+*/
+
+/* {{{ rot13 stream filter implementation */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* {{{ php_conv_base64_encode */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* XXX this might need an additional fix so it uses size_t, whereby unsigned is quite big so leaving as is for now */
+
+/* {{{ strfilter_convert_append_bucket */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* }}} */
+
+/* {{{ filter MINIT and MSHUTDOWN */
+
+/* }}} */

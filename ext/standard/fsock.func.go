@@ -1,0 +1,168 @@
+// <<generate>>
+
+package standard
+
+import (
+	b "sik/builtin"
+	"sik/core"
+	"sik/core/streams"
+	"sik/zend"
+)
+
+func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Zval, persistent int) {
+	var host *byte
+	var host_len int
+	var port zend.ZendLong = -1
+	var zerrno *zend.Zval = nil
+	var zerrstr *zend.Zval = nil
+	var timeout float64 = float64(FG(default_socket_timeout))
+	var conv int64
+	var tv __struct__timeval
+	var hashkey *byte = nil
+	var stream *core.PhpStream = nil
+	var err int
+	var hostname *byte = nil
+	var hostname_len int
+	var errstr *zend.ZendString = nil
+	zend.RETVAL_FALSE
+	for {
+		var _flags int = 0
+		var _min_num_args int = 1
+		var _max_num_args int = 5
+		var _num_args int = zend.EX_NUM_ARGS()
+		var _i int = 0
+		var _real_arg *zend.Zval
+		var _arg *zend.Zval = nil
+		var _expected_type zend.ZendExpectedType = zend.Z_EXPECTED_LONG
+		var _error *byte = nil
+		var _dummy zend.ZendBool
+		var _optional zend.ZendBool = 0
+		var _error_code int = zend.ZPP_ERROR_OK
+		void(_i)
+		void(_real_arg)
+		void(_arg)
+		void(_expected_type)
+		void(_error)
+		void(_dummy)
+		void(_optional)
+		for {
+			if zend.UNEXPECTED(_num_args < _min_num_args) || zend.UNEXPECTED(_num_args > _max_num_args) && zend.EXPECTED(_max_num_args >= 0) {
+				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
+						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+					} else {
+						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+					}
+				}
+				_error_code = zend.ZPP_ERROR_FAILURE
+				break
+			}
+			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0) {
+				_expected_type = zend.Z_EXPECTED_STRING
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
+				break
+			}
+			_optional = 1
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgLong(_arg, &port, &_dummy, 0, 0) == 0) {
+				_expected_type = zend.Z_EXPECTED_LONG
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
+				break
+			}
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			zend.ZendParseArgZvalDeref(_arg, &zerrno, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			zend.ZendParseArgZvalDeref(_arg, &zerrstr, 0)
+			zend.Z_PARAM_PROLOGUE(0, 0)
+			if zend.UNEXPECTED(zend.ZendParseArgDouble(_arg, &timeout, &_dummy, 0) == 0) {
+				_expected_type = zend.Z_EXPECTED_DOUBLE
+				_error_code = zend.ZPP_ERROR_WRONG_ARG
+				break
+			}
+			break
+		}
+		if zend.UNEXPECTED(_error_code != zend.ZPP_ERROR_OK) {
+			if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
+				if _error_code == zend.ZPP_ERROR_WRONG_CALLBACK {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
+						zend.ZendWrongCallbackException(_i, _error)
+					} else {
+						zend.ZendWrongCallbackError(_i, _error)
+					}
+				} else if _error_code == zend.ZPP_ERROR_WRONG_CLASS {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
+						zend.ZendWrongParameterClassException(_i, _error, _arg)
+					} else {
+						zend.ZendWrongParameterClassError(_i, _error, _arg)
+					}
+				} else if _error_code == zend.ZPP_ERROR_WRONG_ARG {
+					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
+						zend.ZendWrongParameterTypeException(_i, _expected_type, _arg)
+					} else {
+						zend.ZendWrongParameterTypeError(_i, _expected_type, _arg)
+					}
+				}
+			}
+			zend.RETVAL_FALSE
+			return
+		}
+		break
+	}
+	if persistent != 0 {
+		core.Spprintf(&hashkey, 0, "pfsockopen__%s:"+zend.ZEND_LONG_FMT, host, port)
+	}
+	if port > 0 {
+		hostname_len = core.Spprintf(&hostname, 0, "%s:"+zend.ZEND_LONG_FMT, host, port)
+	} else {
+		hostname_len = host_len
+		hostname = host
+	}
+
+	/* prepare the timeout value for use */
+
+	conv = time_t(timeout * 1000000.0)
+	tv.tv_sec = conv / 1000000
+	tv.tv_usec = conv % 1000000
+	stream = streams.PhpStreamXportCreate(hostname, hostname_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, hashkey, &tv, nil, &errstr, &err)
+	if port > 0 {
+		zend.Efree(hostname)
+	}
+	if stream == nil {
+		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s:"+zend.ZEND_LONG_FMT+" (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return zend.ZSTR_VAL(errstr) }))
+	}
+	if hashkey != nil {
+		zend.Efree(hashkey)
+	}
+	if stream == nil {
+		if zerrno != nil {
+			zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, err)
+		}
+		if errstr != nil {
+			if zerrstr != nil {
+				zend.ZEND_TRY_ASSIGN_REF_STR(zerrstr, errstr)
+			} else {
+				zend.ZendStringRelease(errstr)
+			}
+		}
+		zend.RETVAL_FALSE
+		return
+	}
+	if zerrno != nil {
+		zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, 0)
+	}
+	if zerrstr != nil {
+		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
+	}
+	if errstr != nil {
+		zend.ZendStringReleaseEx(errstr, 0)
+	}
+	core.PhpStreamToZval(stream, return_value)
+}
+func ZifFsockopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpFsockopenStream(execute_data, return_value, 0)
+}
+func ZifPfsockopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpFsockopenStream(execute_data, return_value, 1)
+}

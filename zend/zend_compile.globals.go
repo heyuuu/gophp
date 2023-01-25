@@ -1,0 +1,243 @@
+// <<generate>>
+
+package zend
+
+import (
+	b "sik/builtin"
+)
+
+const ZEND_USE_ABS_JMP_ADDR = 0
+const ZEND_USE_ABS_CONST_ADDR = 0
+
+type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
+
+const ZEND_LIVE_TMPVAR = 0
+const ZEND_LIVE_LOOP = 1
+const ZEND_LIVE_SILENCE = 2
+const ZEND_LIVE_ROPE = 3
+const ZEND_LIVE_NEW = 4
+const ZEND_LIVE_MASK = 7
+
+const ZEND_ACC_PUBLIC uint32 = 1 << 0
+const ZEND_ACC_PROTECTED = 1 << 1
+const ZEND_ACC_PRIVATE = 1 << 2
+const ZEND_ACC_CHANGED = 1 << 3
+const ZEND_ACC_STATIC = 1 << 4
+const ZEND_ACC_FINAL = 1 << 5
+const ZEND_ACC_ABSTRACT = 1 << 6
+const ZEND_ACC_EXPLICIT_ABSTRACT_CLASS = 1 << 6
+const ZEND_ACC_IMMUTABLE = 1 << 7
+const ZEND_ACC_HAS_TYPE_HINTS = 1 << 8
+const ZEND_ACC_TOP_LEVEL = 1 << 9
+const ZEND_ACC_PRELOADED = 1 << 10
+const ZEND_ACC_INTERFACE uint32 = 1 << 0
+const ZEND_ACC_TRAIT = 1 << 1
+const ZEND_ACC_ANON_CLASS = 1 << 2
+const ZEND_ACC_LINKED = 1 << 3
+const ZEND_ACC_IMPLICIT_ABSTRACT_CLASS = 1 << 4
+const ZEND_ACC_USE_GUARDS = 1 << 11
+const ZEND_ACC_CONSTANTS_UPDATED uint32 = 1 << 12
+const ZEND_ACC_INHERITED = 1 << 13
+const ZEND_ACC_IMPLEMENT_INTERFACES = 1 << 14
+const ZEND_ACC_IMPLEMENT_TRAITS = 1 << 15
+const ZEND_HAS_STATIC_IN_METHODS = 1 << 16
+const ZEND_ACC_PROPERTY_TYPES_RESOLVED = 1 << 17
+const ZEND_ACC_REUSE_GET_ITERATOR = 1 << 18
+const ZEND_ACC_RESOLVED_PARENT = 1 << 19
+const ZEND_ACC_RESOLVED_INTERFACES = 1 << 20
+const ZEND_ACC_UNRESOLVED_VARIANCE = 1 << 21
+const ZEND_ACC_NEARLY_LINKED = 1 << 22
+const ZEND_ACC_HAS_UNLINKED_USES = 1 << 23
+const ZEND_ACC_DEPRECATED = 1 << 11
+const ZEND_ACC_RETURN_REFERENCE = 1 << 12
+const ZEND_ACC_HAS_RETURN_TYPE = 1 << 13
+const ZEND_ACC_VARIADIC = 1 << 14
+const ZEND_ACC_HAS_FINALLY_BLOCK = 1 << 15
+const ZEND_ACC_EARLY_BINDING = 1 << 16
+const ZEND_ACC_ALLOW_STATIC = 1 << 17
+const ZEND_ACC_CALL_VIA_TRAMPOLINE = 1 << 18
+const ZEND_ACC_NEVER_CACHE = 1 << 19
+const ZEND_ACC_CLOSURE = 1 << 20
+const ZEND_ACC_FAKE_CLOSURE = 1 << 21
+const ZEND_ACC_HEAP_RT_CACHE = 1 << 22
+const ZEND_ACC_USER_ARG_INFO = 1 << 22
+const ZEND_ACC_GENERATOR = 1 << 24
+const ZEND_ACC_DONE_PASS_TWO = 1 << 25
+const ZEND_ACC_ARENA_ALLOCATED = 1 << 25
+const ZEND_ACC_TRAIT_CLONE = 1 << 27
+const ZEND_ACC_CTOR = 1 << 28
+const ZEND_ACC_DTOR = 1 << 29
+const ZEND_ACC_USES_THIS = 1 << 30
+const ZEND_ACC_STRICT_TYPES = 1 << 31
+const ZEND_ACC_PPP_MASK = ZEND_ACC_PUBLIC | ZEND_ACC_PROTECTED | ZEND_ACC_PRIVATE
+const ZEND_ACC_CALL_VIA_HANDLER = ZEND_ACC_CALL_VIA_TRAMPOLINE
+
+const ZEND_RETURN_VALUE = 0
+const ZEND_RETURN_REFERENCE = 1
+
+type ZifHandler func(execute_data *ZendExecuteData, return_value *Zval)
+
+const ZEND_CALL_HAS_THIS = IS_OBJECT_EX
+const ZEND_CALL_FUNCTION uint32 = 0 << 16
+const ZEND_CALL_CODE = 1 << 16
+const ZEND_CALL_NESTED = 0 << 17
+const ZEND_CALL_TOP uint32 = 1 << 17
+const ZEND_CALL_ALLOCATED uint32 = 1 << 18
+const ZEND_CALL_FREE_EXTRA_ARGS uint32 = 1 << 19
+const ZEND_CALL_HAS_SYMBOL_TABLE uint32 = 1 << 20
+const ZEND_CALL_RELEASE_THIS = 1 << 21
+const ZEND_CALL_CLOSURE uint32 = 1 << 22
+const ZEND_CALL_FAKE_CLOSURE = 1 << 23
+const ZEND_CALL_GENERATOR = 1 << 24
+const ZEND_CALL_DYNAMIC = 1 << 25
+const ZEND_CALL_SEND_ARG_BY_REF uint32 = 1 << 31
+const ZEND_CALL_NESTED_FUNCTION uint32 = ZEND_CALL_FUNCTION | ZEND_CALL_NESTED
+const ZEND_CALL_NESTED_CODE = ZEND_CALL_CODE | ZEND_CALL_NESTED
+const ZEND_CALL_TOP_FUNCTION = ZEND_CALL_TOP | ZEND_CALL_FUNCTION
+const ZEND_CALL_TOP_CODE = ZEND_CALL_CODE | ZEND_CALL_TOP
+const ZEND_CALL_FRAME_SLOT = int((ZEND_MM_ALIGNED_SIZE(b.SizeOf("zend_execute_data")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")))
+const IS_UNUSED = 0
+const IS_CONST ZendUchar = 1 << 0
+const IS_TMP_VAR ZendUchar = 1 << 1
+const IS_VAR ZendUchar = 1 << 2
+const IS_CV ZendUchar = 1 << 3
+const ZEND_EXTRA_VALUE = 1
+
+var ZendCompileFile func(file_handle *ZendFileHandle, type_ int) *ZendOpArray
+var ZendCompileString func(source_string *Zval, filename *byte) *ZendOpArray
+
+type UnaryOpType func(*Zval, *Zval) int
+type BinaryOpType func(*Zval, *Zval, *Zval) int
+
+var ZendDoExtendedInfo func()
+
+const INITIAL_OP_ARRAY_SIZE = 64
+const ZEND_FUNCTION_DTOR DtorFuncT = ZendFunctionDtor
+const ZEND_CLASS_DTOR DtorFuncT = DestroyZendClass
+
+type ZendNeedsLiveRangeCb func(op_array *ZendOpArray, opline *ZendOp) ZendBool
+type ZendAutoGlobalCallback func(name *ZendString) ZendBool
+
+const ZEND_FETCH_CLASS_DEFAULT = 0
+const ZEND_FETCH_CLASS_SELF = 1
+const ZEND_FETCH_CLASS_PARENT = 2
+const ZEND_FETCH_CLASS_STATIC = 3
+const ZEND_FETCH_CLASS_AUTO = 4
+const ZEND_FETCH_CLASS_INTERFACE = 5
+const ZEND_FETCH_CLASS_TRAIT = 6
+const ZEND_FETCH_CLASS_MASK = 0xf
+const ZEND_FETCH_CLASS_NO_AUTOLOAD = 0x80
+const ZEND_FETCH_CLASS_SILENT = 0x100
+const ZEND_FETCH_CLASS_EXCEPTION = 0x200
+const ZEND_FETCH_CLASS_ALLOW_UNLINKED = 0x400
+const ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED = 0x800
+const ZEND_PARAM_REF = 1 << 0
+const ZEND_PARAM_VARIADIC = 1 << 1
+const ZEND_NAME_FQ = 0
+const ZEND_NAME_NOT_FQ = 1
+const ZEND_NAME_RELATIVE = 2
+const ZEND_TYPE_NULLABLE = 1 << 8
+const ZEND_ARRAY_SYNTAX_LIST = 1
+const ZEND_ARRAY_SYNTAX_LONG = 2
+const ZEND_ARRAY_SYNTAX_SHORT = 3
+const BP_VAR_R = 0
+const BP_VAR_W = 1
+const BP_VAR_RW = 2
+const BP_VAR_IS = 3
+const BP_VAR_FUNC_ARG = 4
+const BP_VAR_UNSET = 5
+const ZEND_INTERNAL_FUNCTION = 1
+const ZEND_USER_FUNCTION = 2
+const ZEND_OVERLOADED_FUNCTION = 3
+const ZEND_EVAL_CODE = 4
+const ZEND_OVERLOADED_FUNCTION_TEMPORARY = 5
+const ZEND_INTERNAL_CLASS = 1
+const ZEND_USER_CLASS = 2
+const ZEND_EVAL = 1 << 0
+const ZEND_INCLUDE = 1 << 1
+const ZEND_INCLUDE_ONCE = 1 << 2
+const ZEND_REQUIRE = 1 << 3
+const ZEND_REQUIRE_ONCE = 1 << 4
+const ZEND_FETCH_GLOBAL uint32 = 1 << 1
+const ZEND_FETCH_LOCAL uint32 = 1 << 2
+const ZEND_FETCH_GLOBAL_LOCK uint32 = 1 << 3
+const ZEND_FETCH_TYPE_MASK = 0xe
+const ZEND_FETCH_REF = 1
+const ZEND_FETCH_DIM_WRITE = 2
+const ZEND_FETCH_OBJ_WRITE = 3
+const ZEND_FETCH_OBJ_FLAGS = 3
+const ZEND_ISEMPTY = 1 << 0
+const ZEND_LAST_CATCH = 1 << 0
+const ZEND_FREE_ON_RETURN uint32 = 1 << 0
+const ZEND_FREE_SWITCH uint32 = 1 << 1
+const ZEND_SEND_BY_VAL = 0
+const ZEND_SEND_BY_REF = 1
+const ZEND_SEND_PREFER_REF = 2
+const ZEND_DIM_IS = 1 << 0
+const ZEND_DIM_ALTERNATIVE_SYNTAX = 1 << 1
+const IS_CONSTANT_UNQUALIFIED = 0x10
+const IS_CONSTANT_CLASS = 0x80
+const IS_CONSTANT_IN_NAMESPACE = 0x100
+const MAX_ARG_FLAG_NUM = 12
+const ZEND_RETURN_VAL = 0
+const ZEND_RETURN_REF = 1
+const ZEND_BIND_VAL = 0
+const ZEND_BIND_REF = 1
+const ZEND_BIND_IMPLICIT = 2
+const ZEND_RETURNS_FUNCTION uint32 = 1 << 0
+const ZEND_RETURNS_VALUE uint32 = 1 << 1
+const ZEND_ARRAY_ELEMENT_REF = 1 << 0
+const ZEND_ARRAY_NOT_PACKED = 1 << 1
+const ZEND_ARRAY_SIZE_SHIFT = 2
+const ZEND_PARENTHESIZED_CONDITIONAL = 1
+const ZEND_SYMBOL_CLASS uint32 = 1 << 0
+const ZEND_SYMBOL_FUNCTION uint32 = 1 << 1
+const ZEND_SYMBOL_CONST uint32 = 1 << 2
+const ZEND_PARENTHESIZED_CONCAT = 252
+const ZEND_GOTO = 253
+const ZEND_BRK = 254
+const ZEND_CONT = 255
+const ZEND_CLONE_FUNC_NAME = "__clone"
+const ZEND_CONSTRUCTOR_FUNC_NAME = "__construct"
+const ZEND_DESTRUCTOR_FUNC_NAME = "__destruct"
+const ZEND_GET_FUNC_NAME = "__get"
+const ZEND_SET_FUNC_NAME = "__set"
+const ZEND_UNSET_FUNC_NAME = "__unset"
+const ZEND_ISSET_FUNC_NAME = "__isset"
+const ZEND_CALL_FUNC_NAME = "__call"
+const ZEND_CALLSTATIC_FUNC_NAME = "__callstatic"
+const ZEND_TOSTRING_FUNC_NAME = "__tostring"
+const ZEND_AUTOLOAD_FUNC_NAME = "__autoload"
+const ZEND_INVOKE_FUNC_NAME = "__invoke"
+const ZEND_DEBUGINFO_FUNC_NAME = "__debuginfo"
+const ZEND_COMPILE_EXTENDED_STMT = 1 << 0
+const ZEND_COMPILE_EXTENDED_FCALL = 1 << 1
+const ZEND_COMPILE_EXTENDED_INFO = ZEND_COMPILE_EXTENDED_STMT | ZEND_COMPILE_EXTENDED_FCALL
+const ZEND_COMPILE_HANDLE_OP_ARRAY = 1 << 2
+const ZEND_COMPILE_IGNORE_INTERNAL_FUNCTIONS = 1 << 3
+const ZEND_COMPILE_IGNORE_INTERNAL_CLASSES = 1 << 4
+const ZEND_COMPILE_DELAYED_BINDING = 1 << 5
+const ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION = 1 << 6
+const ZEND_COMPILE_NO_BUILTIN_STRLEN = 1 << 7
+const ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION = 1 << 8
+const ZEND_COMPILE_IGNORE_USER_FUNCTIONS = 1 << 9
+const ZEND_COMPILE_GUARDS = 1 << 10
+const ZEND_COMPILE_NO_BUILTINS = 1 << 11
+const ZEND_COMPILE_WITH_FILE_CACHE = 1 << 12
+const ZEND_COMPILE_IGNORE_OTHER_FILES = 1 << 13
+const ZEND_COMPILE_WITHOUT_EXECUTION = 1 << 14
+const ZEND_COMPILE_PRELOAD = 1 << 15
+const ZEND_COMPILE_NO_JUMPTABLES = 1 << 16
+const ZEND_COMPILE_PRELOAD_IN_CHILD = 1 << 17
+const ZEND_COMPILE_DEFAULT = ZEND_COMPILE_HANDLE_OP_ARRAY
+const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
+
+var CompilerGlobals ZendCompilerGlobals
+var ExecutorGlobals ZendExecutorGlobals
+var ReservedClassNames []ReservedClassName = []ReservedClassName{{ZEND_STRL("bool")}, {ZEND_STRL("false")}, {ZEND_STRL("float")}, {ZEND_STRL("int")}, {ZEND_STRL("null")}, {ZEND_STRL("parent")}, {ZEND_STRL("self")}, {ZEND_STRL("static")}, {ZEND_STRL("string")}, {ZEND_STRL("true")}, {ZEND_STRL("void")}, {ZEND_STRL("iterable")}, {ZEND_STRL("object")}, {nil, 0}}
+
+var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{{ZEND_STRL("int"), IS_LONG}, {ZEND_STRL("float"), IS_DOUBLE}, {ZEND_STRL("string"), IS_STRING}, {ZEND_STRL("bool"), _IS_BOOL}, {ZEND_STRL("void"), IS_VOID}, {ZEND_STRL("iterable"), IS_ITERABLE}, {ZEND_STRL("object"), IS_OBJECT}, {nil, 0, IS_UNDEF}}
+
+const ZEND_MEMOIZE_NONE = 0
+const ZEND_MEMOIZE_COMPILE = 1
+const ZEND_MEMOIZE_FETCH = 2

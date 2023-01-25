@@ -1,0 +1,13 @@
+// <<generate>>
+
+package core
+
+const PHP_DISPLAY_ERRORS_STDOUT = 1
+const PHP_DISPLAY_ERRORS_STDERR = 2
+const TRACK_VARS_POST = 0
+const TRACK_VARS_GET = 1
+const TRACK_VARS_COOKIE = 2
+const TRACK_VARS_SERVER = 3
+const TRACK_VARS_ENV = 4
+const TRACK_VARS_FILES = 5
+const TRACK_VARS_REQUEST = 6

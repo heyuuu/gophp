@@ -1,0 +1,1134 @@
+// <<generate>>
+
+package standard
+
+import (
+	b "sik/builtin"
+	"sik/core"
+	"sik/zend"
+)
+
+func TagDtor(zv *zend.Zval) { zend.Free(zend.Z_PTR_P(zv)) }
+func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int, type_ int) int {
+	var ctx *UrlAdaptStateExT
+	var key *byte
+	var tmp *byte
+	var lasts *byte = nil
+	if type_ != 0 {
+		ctx = &BG(url_adapt_session_ex)
+	} else {
+		ctx = &BG(url_adapt_output_ex)
+	}
+	tmp = zend.Estrndup(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
+	if ctx.GetTags() != nil {
+		zend.ZendHashDestroy(ctx.GetTags())
+	} else {
+		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
+		if ctx.GetTags() == nil {
+			zend.Efree(tmp)
+			return zend.FAILURE
+		}
+	}
+	zend.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
+	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
+		var val *byte
+		val = strchr(key, '=')
+		if val != nil {
+			var q *byte
+			var keylen int
+			var str *zend.ZendString
+			b.PostInc(&(*val)) = '0'
+			for q = key; *q; q++ {
+				*q = tolower(*q)
+			}
+			keylen = q - key
+			str = zend.ZendStringInit(key, keylen, 1)
+			zend.GC_MAKE_PERSISTENT_LOCAL(str)
+			zend.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
+			zend.ZendStringReleaseEx(str, 1)
+		}
+	}
+	zend.Efree(tmp)
+	return zend.SUCCESS
+}
+func OnUpdateSessionTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+	return PhpIniOnUpdateTags(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 1)
+}
+func OnUpdateOutputTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+	return PhpIniOnUpdateTags(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 0)
+}
+func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int, type_ int) int {
+	var hosts *zend.HashTable
+	var key *byte
+	var tmp *byte
+	var lasts *byte = nil
+	if type_ != 0 {
+		hosts = &BG(url_adapt_session_hosts_ht)
+	} else {
+		hosts = &BG(url_adapt_output_hosts_ht)
+	}
+	zend.ZendHashClean(hosts)
+
+	/* Use user supplied host whitelist */
+
+	tmp = zend.Estrndup(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
+	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
+		var keylen int
+		var tmp_key *zend.ZendString
+		var q *byte
+		for q = key; *q; q++ {
+			*q = tolower(*q)
+		}
+		keylen = q - key
+		if keylen > 0 {
+			tmp_key = zend.ZendStringInit(key, keylen, 0)
+			zend.ZendHashAddEmptyElement(hosts, tmp_key)
+			zend.ZendStringReleaseEx(tmp_key, 0)
+		}
+	}
+	zend.Efree(tmp)
+	return zend.SUCCESS
+}
+func OnUpdateSessionHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+	return PhpIniOnUpdateHosts(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 1)
+}
+func OnUpdateOutputHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+	return PhpIniOnUpdateHosts(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 0)
+}
+func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.SmartStr, separator *byte) {
+	var url_parts *PhpUrl
+	zend.SmartStr0(url)
+	url_parts = PhpUrlParseEx(zend.ZSTR_VAL(url.s), zend.ZSTR_LEN(url.s))
+
+	/* Ignore malformed URLs */
+
+	if url_parts == nil {
+		zend.SmartStrAppendSmartStr(dest, url)
+		return
+	}
+
+	/* Don't modify URLs of the format "#mark" */
+
+	if url_parts.GetFragment() != nil && '#' == zend.ZSTR_VAL(url.s)[0] {
+		zend.SmartStrAppendSmartStr(dest, url)
+		PhpUrlFree(url_parts)
+		return
+	}
+
+	/* Check protocol. Only http/https is allowed. */
+
+	if url_parts.GetScheme() != nil && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+		zend.SmartStrAppendSmartStr(dest, url)
+		PhpUrlFree(url_parts)
+		return
+	}
+
+	/* Check host whitelist. If it's not listed, do nothing. */
+
+	if url_parts.GetHost() != nil {
+		var tmp *zend.ZendString = zend.ZendStringTolower(url_parts.GetHost())
+		if zend.ZendHashExists(&BG(url_adapt_session_hosts_ht), tmp) == 0 {
+			zend.ZendStringReleaseEx(tmp, 0)
+			zend.SmartStrAppendSmartStr(dest, url)
+			PhpUrlFree(url_parts)
+			return
+		}
+		zend.ZendStringReleaseEx(tmp, 0)
+	}
+
+	/*
+	 * When URL does not have path and query string add "/?".
+	 * i.e. If URL is only "?foo=bar", should not add "/?".
+	 */
+
+	if url_parts.GetPath() == nil && url_parts.GetQuery() == nil && url_parts.GetFragment() == nil {
+
+		/* URL is http://php.net or like */
+
+		zend.SmartStrAppendSmartStr(dest, url)
+		zend.SmartStrAppendc(dest, '/')
+		zend.SmartStrAppendc(dest, '?')
+		zend.SmartStrAppendSmartStr(dest, url_app)
+		PhpUrlFree(url_parts)
+		return
+	}
+	if url_parts.GetScheme() != nil {
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetScheme()))
+		zend.SmartStrAppends(dest, "://")
+	} else if (*(zend.ZSTR_VAL(url.s))) == '/' && (*(zend.ZSTR_VAL(url.s) + 1)) == '/' {
+		zend.SmartStrAppends(dest, "//")
+	}
+	if url_parts.GetUser() != nil {
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetUser()))
+		if url_parts.GetPass() != nil {
+			zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetPass()))
+			zend.SmartStrAppendc(dest, ':')
+		}
+		zend.SmartStrAppendc(dest, '@')
+	}
+	if url_parts.GetHost() != nil {
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetHost()))
+	}
+	if url_parts.GetPort() != 0 {
+		zend.SmartStrAppendc(dest, ':')
+		zend.SmartStrAppendUnsigned(dest, long(url_parts.GetPort()))
+	}
+	if url_parts.GetPath() != nil {
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetPath()))
+	}
+	zend.SmartStrAppendc(dest, '?')
+	if url_parts.GetQuery() != nil {
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetQuery()))
+		zend.SmartStrAppends(dest, separator)
+		zend.SmartStrAppendSmartStr(dest, url_app)
+	} else {
+		zend.SmartStrAppendSmartStr(dest, url_app)
+	}
+	if url_parts.GetFragment() != nil {
+		zend.SmartStrAppendc(dest, '#')
+		zend.SmartStrAppends(dest, zend.ZSTR_VAL(url_parts.GetFragment()))
+	}
+	PhpUrlFree(url_parts)
+}
+func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
+	var f byte = 0
+
+	/* arg.s is string WITHOUT NUL.
+	   To avoid partial match, NUL is added here */
+
+	zend.ZSTR_VAL(ctx.arg.s)[zend.ZSTR_LEN(ctx.arg.s)] = '0'
+	if !(strcasecmp(zend.ZSTR_VAL(ctx.arg.s), ctx.GetLookupData())) {
+		f = 1
+	}
+	if quotes {
+		zend.SmartStrAppendc(&ctx.result, type_)
+	}
+	if f {
+		AppendModifiedUrl(&ctx.val, &ctx.result, &ctx.url_app, core.PG(arg_separator).output)
+	} else {
+		zend.SmartStrAppendSmartStr(&ctx.result, &ctx.val)
+	}
+	if quotes {
+		zend.SmartStrAppendc(&ctx.result, type_)
+	}
+}
+func Passthru(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
+	zend.SmartStrAppendl(&ctx.result, start, YYCURSOR-start)
+}
+func CheckHttpHost(target *byte) int {
+	var host *zend.Zval
+	var tmp *zend.Zval
+	var host_tmp *zend.ZendString
+	var colon *byte
+	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.symbol_table), zend.ZEND_STRL("_SERVER"))) && zend.Z_TYPE_P(tmp) == zend.IS_ARRAY && b.Assign(&host, zend.ZendHashStrFind(zend.Z_ARRVAL_P(tmp), zend.ZEND_STRL("HTTP_HOST"))) && zend.Z_TYPE_P(host) == zend.IS_STRING {
+		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
+
+		/* HTTP_HOST could be 'localhost:8888' etc. */
+
+		colon = strchr(zend.ZSTR_VAL(host_tmp), ':')
+		if colon != nil {
+			zend.ZSTR_LEN(host_tmp) = colon - zend.ZSTR_VAL(host_tmp)
+			zend.ZSTR_VAL(host_tmp)[zend.ZSTR_LEN(host_tmp)] = '0'
+		}
+		if !(strcasecmp(zend.ZSTR_VAL(host_tmp), target)) {
+			zend.ZendStringReleaseEx(host_tmp, 0)
+			return zend.SUCCESS
+		}
+		zend.ZendStringReleaseEx(host_tmp, 0)
+	}
+	return zend.FAILURE
+}
+func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
+	var url_parts *PhpUrl = nil
+	var allowed_hosts *zend.HashTable = b.CondF(ctx.GetType() != 0, func() __auto__ { return &BG(url_adapt_session_hosts_ht) }, func() __auto__ { return &BG(url_adapt_output_hosts_ht) })
+	zend.ZEND_ASSERT(ctx.GetTagType() == TAG_FORM)
+	if ctx.attr_val.s != nil && zend.ZSTR_LEN(ctx.attr_val.s) != 0 {
+		url_parts = PhpUrlParseEx(zend.ZSTR_VAL(ctx.attr_val.s), zend.ZSTR_LEN(ctx.attr_val.s))
+	} else {
+		return zend.SUCCESS
+	}
+	if url_parts == nil {
+		return zend.FAILURE
+	}
+	if url_parts.GetScheme() != nil {
+
+		/* Only http/https should be handled.
+		   A bit hacky check this here, but saves a URL parse. */
+
+		if !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
+			PhpUrlFree(url_parts)
+			return zend.FAILURE
+		}
+
+		/* Only http/https should be handled.
+		   A bit hacky check this here, but saves a URL parse. */
+
+	}
+	if url_parts.GetHost() == nil {
+		PhpUrlFree(url_parts)
+		return zend.SUCCESS
+	}
+	if !(zend.ZendHashNumElements(allowed_hosts)) && CheckHttpHost(zend.ZSTR_VAL(url_parts.GetHost())) == zend.SUCCESS {
+		PhpUrlFree(url_parts)
+		return zend.SUCCESS
+	}
+	if zend.ZendHashFind(allowed_hosts, url_parts.GetHost()) == nil {
+		PhpUrlFree(url_parts)
+		return zend.FAILURE
+	}
+	PhpUrlFree(url_parts)
+	return zend.SUCCESS
+}
+func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
+	var doit int = 0
+	if zend.ZSTR_LEN(ctx.form_app.s) > 0 {
+		switch zend.ZSTR_LEN(ctx.tag.s) {
+		case b.SizeOf("\"form\"") - 1:
+			if !(strncasecmp(zend.ZSTR_VAL(ctx.tag.s), "form", zend.ZSTR_LEN(ctx.tag.s))) && CheckHostWhitelist(ctx) == zend.SUCCESS {
+				doit = 1
+			}
+			break
+		}
+	}
+	if doit != 0 {
+		zend.SmartStrAppendSmartStr(&ctx.result, &ctx.form_app)
+	}
+}
+func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
+	var ok int = 0
+	var i uint
+	if ctx.tag.s != nil {
+		zend.ZSTR_LEN(ctx.tag.s) = 0
+	}
+	zend.SmartStrAppendl(&ctx.tag, start, YYCURSOR-start)
+	for i = 0; i < zend.ZSTR_LEN(ctx.tag.s); i++ {
+		zend.ZSTR_VAL(ctx.tag.s)[i] = tolower(int(uint8(zend.ZSTR_VAL(ctx.tag.s)[i])))
+	}
+
+	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
+
+	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), zend.ZSTR_VAL(ctx.tag.s), zend.ZSTR_LEN(ctx.tag.s))) != nil {
+		ok = 1
+		if zend.ZSTR_LEN(ctx.tag.s) == b.SizeOf("\"form\"")-1 && !(strncasecmp(zend.ZSTR_VAL(ctx.tag.s), "form", zend.ZSTR_LEN(ctx.tag.s))) {
+			ctx.SetTagType(TAG_FORM)
+		} else {
+			ctx.SetTagType(TAG_NORMAL)
+		}
+	}
+	if ok != 0 {
+		ctx.SetState(STATE_NEXT_ARG)
+	} else {
+		ctx.SetState(STATE_PLAIN)
+	}
+}
+func HandleArg(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
+	if ctx.arg.s != nil {
+		zend.ZSTR_LEN(ctx.arg.s) = 0
+	}
+	zend.SmartStrAppendl(&ctx.arg, start, YYCURSOR-start)
+	if ctx.GetTagType() == TAG_FORM && strncasecmp(zend.ZSTR_VAL(ctx.arg.s), "action", zend.ZSTR_LEN(ctx.arg.s)) == 0 {
+		ctx.SetAttrType(ATTR_ACTION)
+	} else {
+		ctx.SetAttrType(ATTR_NORMAL)
+	}
+}
+func HandleVal(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte, quotes byte, type_ byte) {
+	zend.SmartStrSetl(&ctx.val, start+quotes, YYCURSOR-start-quotes*2)
+	if ctx.GetTagType() == TAG_FORM && ctx.GetAttrType() == ATTR_ACTION {
+		zend.SmartStrSetl(&ctx.attr_val, start+quotes, YYCURSOR-start-quotes*2)
+	}
+	TagArg(ctx, quotes, type_)
+}
+func XxMainloop(ctx *UrlAdaptStateExT, newdata *byte, newlen int) {
+	var end *byte
+	var q *byte
+	var xp *byte
+	var start *byte
+	var rest int
+	zend.SmartStrAppendl(&ctx.buf, newdata, newlen)
+	YYCURSOR = zend.ZSTR_VAL(ctx.buf.s)
+	YYLIMIT = zend.ZSTR_VAL(ctx.buf.s) + zend.ZSTR_LEN(ctx.buf.s)
+	switch ctx.GetState() {
+	case STATE_PLAIN:
+		goto state_plain
+	case STATE_TAG:
+		goto state_tag
+	case STATE_NEXT_ARG:
+		goto state_next_arg
+	case STATE_ARG:
+		goto state_arg
+	case STATE_BEFORE_VAL:
+		goto state_before_val
+	case STATE_VAL:
+		goto state_val
+	}
+state_plain_begin:
+	ctx.SetState(STATE_PLAIN)
+state_plain:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128}
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy4
+	}
+	YYCURSOR++
+	Passthru(ctx, start, xp)
+	ctx.SetState(STATE_TAG)
+	goto state_tag
+yy4:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy4
+	}
+	Passthru(ctx, start, xp)
+	goto state_plain
+state_tag:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	if YYLIMIT-YYCURSOR < 2 {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych <= '@' {
+		if yych != ':' {
+			goto yy11
+		}
+	} else {
+		if yych <= 'Z' {
+			goto yy9
+		}
+		if yych <= '`' {
+			goto yy11
+		}
+		if yych >= '{' {
+			goto yy11
+		}
+	}
+yy9:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy14
+yy10:
+	HandleTag(ctx, start, xp)
+	Passthru(ctx, start, xp)
+	if ctx.GetState() == STATE_PLAIN {
+		goto state_plain
+	} else {
+		goto state_next_arg
+	}
+yy11:
+	YYCURSOR++
+	Passthru(ctx, start, xp)
+	goto state_plain_begin
+yy13:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy14:
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy13
+	}
+	goto yy10
+state_next_arg_begin:
+	ctx.SetState(STATE_NEXT_ARG)
+state_next_arg:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	if YYLIMIT-YYCURSOR < 2 {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych <= '.' {
+		if yych <= 'f' {
+			if yych <= 0x8 {
+				goto yy25
+			}
+			if yych <= 'v' {
+				goto yy21
+			}
+			goto yy25
+		} else {
+			if yych <= '\r' {
+				goto yy21
+			}
+			if yych == ' ' {
+				goto yy21
+			}
+			goto yy25
+		}
+	} else {
+		if yych <= '@' {
+			if yych <= '/' {
+				goto yy17
+			}
+			if yych == '>' {
+				goto yy19
+			}
+			goto yy25
+		} else {
+			if yych <= 'Z' {
+				goto yy23
+			}
+			if yych <= '`' {
+				goto yy25
+			}
+			if yych <= 'z' {
+				goto yy23
+			}
+			goto yy25
+		}
+	}
+yy17:
+	YYCURSOR++
+	if b.Assign(&yych, *YYCURSOR) == '>' {
+		goto yy28
+	}
+yy18:
+	Passthru(ctx, start, xp)
+	goto state_plain_begin
+yy19:
+	YYCURSOR++
+yy20:
+	Passthru(ctx, start, xp)
+	HandleForm(ctx, start, xp)
+	goto state_plain_begin
+yy21:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy27
+yy22:
+	Passthru(ctx, start, xp)
+	goto state_next_arg
+yy23:
+	YYCURSOR++
+	YYCURSOR--
+	ctx.SetState(STATE_ARG)
+	goto state_arg
+yy25:
+	yych = *(b.PreInc(&YYCURSOR))
+	goto yy18
+yy26:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy27:
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy26
+	}
+	goto yy22
+yy28:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy20
+state_arg:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	if YYLIMIT-YYCURSOR < 2 {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych <= '@' {
+		goto yy33
+	}
+	if yych <= 'Z' {
+		goto yy31
+	}
+	if yych <= '`' {
+		goto yy33
+	}
+	if yych >= '{' {
+		goto yy33
+	}
+yy31:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy36
+yy32:
+	Passthru(ctx, start, xp)
+	HandleArg(ctx, start, xp)
+	ctx.SetState(STATE_BEFORE_VAL)
+	goto state_before_val
+yy33:
+	YYCURSOR++
+	Passthru(ctx, start, xp)
+	ctx.SetState(STATE_NEXT_ARG)
+	goto state_next_arg
+yy35:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy36:
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy35
+	}
+	goto yy32
+state_before_val:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	if YYLIMIT-YYCURSOR < 2 {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych == ' ' {
+		goto yy39
+	}
+	if yych == '=' {
+		goto yy41
+	}
+	goto yy43
+yy39:
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	if yych == ' ' {
+		goto yy46
+	}
+	if yych == '=' {
+		goto yy44
+	}
+yy40:
+	YYCURSOR--
+	goto state_next_arg_begin
+yy41:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy45
+yy42:
+	Passthru(ctx, start, xp)
+	ctx.SetState(STATE_VAL)
+	goto state_val
+yy43:
+	yych = *(b.PreInc(&YYCURSOR))
+	goto yy40
+yy44:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy45:
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy44
+	}
+	goto yy42
+yy46:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych == ' ' {
+		goto yy46
+	}
+	if yych == '=' {
+		goto yy44
+	}
+	YYCURSOR = YYMARKER
+	goto yy40
+state_val:
+	start = YYCURSOR
+	var yych uint8
+	var yybm []uint8 = []uint8{224, 224, 224, 224, 224, 224, 224, 224, 224, 192, 192, 224, 224, 192, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 192, 224, 64, 224, 224, 224, 224, 128, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 0, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224, 224}
+	if YYLIMIT-YYCURSOR < 2 {
+		goto stop
+	}
+	yych = *YYCURSOR
+	if yych <= ' ' {
+		if yych <= 'f' {
+			if yych <= 0x8 {
+				goto yy54
+			}
+			if yych <= '\n' {
+				goto yy56
+			}
+			goto yy54
+		} else {
+			if yych <= '\r' {
+				goto yy56
+			}
+			if yych <= 0x1f {
+				goto yy54
+			}
+			goto yy56
+		}
+	} else {
+		if yych <= '&' {
+			if yych != '"' {
+				goto yy54
+			}
+		} else {
+			if yych <= '\'' {
+				goto yy53
+			}
+			if yych == '>' {
+				goto yy56
+			}
+			goto yy54
+		}
+	}
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	if yych != '>' {
+		goto yy65
+	}
+yy52:
+	Passthru(ctx, start, xp)
+	goto state_next_arg_begin
+yy53:
+	yych = *(b.Assign(&YYMARKER, b.PreInc(&YYCURSOR)))
+	if yych == '>' {
+		goto yy52
+	}
+	goto yy60
+yy54:
+	YYCURSOR++
+	yych = *YYCURSOR
+	goto yy58
+yy55:
+	HandleVal(ctx, start, xp, 0, ' ')
+	goto state_next_arg_begin
+yy56:
+	yych = *(b.PreInc(&YYCURSOR))
+	goto yy52
+yy57:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy58:
+	if (yybm[0+yych] & 32) != 0 {
+		goto yy57
+	}
+	goto yy55
+yy59:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy60:
+	if (yybm[0+yych] & 64) != 0 {
+		goto yy59
+	}
+	if yych <= '=' {
+		goto yy62
+	}
+yy61:
+	YYCURSOR = YYMARKER
+	goto yy52
+yy62:
+	YYCURSOR++
+	HandleVal(ctx, start, xp, 1, '\'')
+	goto state_next_arg_begin
+yy64:
+	YYCURSOR++
+	if YYLIMIT <= YYCURSOR {
+		goto stop
+	}
+	yych = *YYCURSOR
+yy65:
+	if (yybm[0+yych] & 128) != 0 {
+		goto yy64
+	}
+	if yych >= '>' {
+		goto yy61
+	}
+	YYCURSOR++
+	HandleVal(ctx, start, xp, 1, '"')
+	goto state_next_arg_begin
+stop:
+	if YYLIMIT < start {
+
+		/* XXX: Crash avoidance. Need to work with reporter to figure out what goes wrong */
+
+		rest = 0
+
+		/* XXX: Crash avoidance. Need to work with reporter to figure out what goes wrong */
+
+	} else {
+		rest = YYLIMIT - start
+	}
+	if rest != 0 {
+		memmove(zend.ZSTR_VAL(ctx.buf.s), start, rest)
+	}
+	zend.ZSTR_LEN(ctx.buf.s) = rest
+}
+func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte, newlen *int, encode int) *byte {
+	var result *byte
+	var surl zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.SmartStr{0}
+	var url_app zend.SmartStr = zend.SmartStr{0}
+	var encoded *zend.ZendString
+	zend.SmartStrAppendl(&surl, url, urllen)
+	if encode != 0 {
+		encoded = PhpRawUrlEncode(name, strlen(name))
+		zend.SmartStrAppendl(&url_app, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+	} else {
+		zend.SmartStrAppends(&url_app, name)
+	}
+	zend.SmartStrAppendc(&url_app, '=')
+	if encode != 0 {
+		encoded = PhpRawUrlEncode(value, strlen(value))
+		zend.SmartStrAppendl(&url_app, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+	} else {
+		zend.SmartStrAppends(&url_app, value)
+	}
+	AppendModifiedUrl(&surl, &buf, &url_app, core.PG(arg_separator).output)
+	zend.SmartStr0(&buf)
+	if newlen != nil {
+		*newlen = zend.ZSTR_LEN(buf.s)
+	}
+	result = zend.Estrndup(zend.ZSTR_VAL(buf.s), zend.ZSTR_LEN(buf.s))
+	zend.SmartStrFree(&url_app)
+	zend.SmartStrFree(&buf)
+	return result
+}
+func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush zend.ZendBool, ctx *UrlAdaptStateExT) *byte {
+	var retval *byte
+	XxMainloop(ctx, src, srclen)
+	if ctx.result.s == nil {
+		zend.SmartStrAppendl(&ctx.result, "", 0)
+		*newlen = 0
+	} else {
+		*newlen = zend.ZSTR_LEN(ctx.result.s)
+	}
+	zend.SmartStr0(&ctx.result)
+	if do_flush != 0 {
+		zend.SmartStrAppend(&ctx.result, ctx.buf.s)
+		*newlen += zend.ZSTR_LEN(ctx.buf.s)
+		zend.SmartStrFree(&ctx.buf)
+		zend.SmartStrFree(&ctx.val)
+		zend.SmartStrFree(&ctx.attr_val)
+	}
+	retval = zend.Estrndup(zend.ZSTR_VAL(ctx.result.s), zend.ZSTR_LEN(ctx.result.s))
+	zend.SmartStrFree(&ctx.result)
+	return retval
+}
+func PhpUrlScannerExActivate(type_ int) int {
+	var ctx *UrlAdaptStateExT
+	if type_ != 0 {
+		ctx = &BG(url_adapt_session_ex)
+	} else {
+		ctx = &BG(url_adapt_output_ex)
+	}
+	memset(ctx, 0, zend_long((*byte)(&((*UrlAdaptStateExT)(nil).GetTags()))-(*byte)(nil)))
+	return zend.SUCCESS
+}
+func PhpUrlScannerExDeactivate(type_ int) int {
+	var ctx *UrlAdaptStateExT
+	if type_ != 0 {
+		ctx = &BG(url_adapt_session_ex)
+	} else {
+		ctx = &BG(url_adapt_output_ex)
+	}
+	zend.SmartStrFree(&ctx.result)
+	zend.SmartStrFree(&ctx.buf)
+	zend.SmartStrFree(&ctx.tag)
+	zend.SmartStrFree(&ctx.arg)
+	zend.SmartStrFree(&ctx.attr_val)
+	return zend.SUCCESS
+}
+func PhpUrlScannerSessionHandlerImpl(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int, type_ int) {
+	var len_ int
+	var url_state *UrlAdaptStateExT
+	if type_ != 0 {
+		url_state = &BG(url_adapt_session_ex)
+	} else {
+		url_state = &BG(url_adapt_output_ex)
+	}
+	if zend.ZSTR_LEN(url_state.url_app.s) != 0 {
+		*handled_output = UrlAdaptExt(output, output_len, &len_, zend_bool(b.Cond((mode&(core.PHP_OUTPUT_HANDLER_END|core.PHP_OUTPUT_HANDLER_CONT|core.PHP_OUTPUT_HANDLER_FLUSH|core.PHP_OUTPUT_HANDLER_FINAL)) != 0, 1, 0)), url_state)
+		if b.SizeOf("unsigned int") < b.SizeOf("size_t") {
+			if len_ > UINT_MAX {
+				len_ = UINT_MAX
+			}
+		}
+		*handled_output_len = len_
+	} else if zend.ZSTR_LEN(url_state.url_app.s) == 0 {
+		var ctx *UrlAdaptStateExT = url_state
+		if ctx.buf.s != nil && zend.ZSTR_LEN(ctx.buf.s) != 0 {
+			zend.SmartStrAppend(&ctx.result, ctx.buf.s)
+			zend.SmartStrAppendl(&ctx.result, output, output_len)
+			*handled_output = zend.Estrndup(zend.ZSTR_VAL(ctx.result.s), zend.ZSTR_LEN(ctx.result.s))
+			*handled_output_len = zend.ZSTR_LEN(ctx.buf.s) + output_len
+			zend.SmartStrFree(&ctx.buf)
+			zend.SmartStrFree(&ctx.result)
+		} else {
+			*handled_output = zend.Estrndup(output, b.Assign(&(*handled_output_len), output_len))
+		}
+	} else {
+		*handled_output = nil
+	}
+}
+func PhpUrlScannerSessionHandler(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int) {
+	PhpUrlScannerSessionHandlerImpl(output, output_len, handled_output, handled_output_len, mode, 1)
+}
+func PhpUrlScannerOutputHandler(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int) {
+	PhpUrlScannerSessionHandlerImpl(output, output_len, handled_output, handled_output_len, mode, 0)
+}
+func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len int, encode int, type_ int) int {
+	var sname zend.SmartStr = zend.SmartStr{0}
+	var svalue zend.SmartStr = zend.SmartStr{0}
+	var hname zend.SmartStr = zend.SmartStr{0}
+	var hvalue zend.SmartStr = zend.SmartStr{0}
+	var encoded *zend.ZendString
+	var url_state *UrlAdaptStateExT
+	var handler core.PhpOutputHandlerFuncT
+	if type_ != 0 {
+		url_state = &BG(url_adapt_session_ex)
+		handler = PhpUrlScannerSessionHandler
+	} else {
+		url_state = &BG(url_adapt_output_ex)
+		handler = PhpUrlScannerOutputHandler
+	}
+	if url_state.GetActive() == 0 {
+		PhpUrlScannerExActivate(type_)
+		core.PhpOutputStartInternal(zend.ZEND_STRL("URL-Rewriter"), handler, 0, core.PHP_OUTPUT_HANDLER_STDFLAGS)
+		url_state.SetActive(1)
+	}
+	if url_state.url_app.s != nil && zend.ZSTR_LEN(url_state.url_app.s) != 0 {
+		zend.SmartStrAppends(&url_state.url_app, core.PG(arg_separator).output)
+	}
+	if encode != 0 {
+		encoded = PhpRawUrlEncode(name, name_len)
+		zend.SmartStrAppendl(&sname, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+		encoded = PhpRawUrlEncode(value, value_len)
+		zend.SmartStrAppendl(&svalue, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(name), name_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG(default_charset), 0)
+		zend.SmartStrAppendl(&hname, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(value), value_len, 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG(default_charset), 0)
+		zend.SmartStrAppendl(&hvalue, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+	} else {
+		zend.SmartStrAppendl(&sname, name, name_len)
+		zend.SmartStrAppendl(&svalue, value, value_len)
+		zend.SmartStrAppendl(&hname, name, name_len)
+		zend.SmartStrAppendl(&hvalue, value, value_len)
+	}
+	zend.SmartStrAppendSmartStr(&url_state.url_app, &sname)
+	zend.SmartStrAppendc(&url_state.url_app, '=')
+	zend.SmartStrAppendSmartStr(&url_state.url_app, &svalue)
+	zend.SmartStrAppends(&url_state.form_app, "<input type=\"hidden\" name=\"")
+	zend.SmartStrAppendSmartStr(&url_state.form_app, &hname)
+	zend.SmartStrAppends(&url_state.form_app, "\" value=\"")
+	zend.SmartStrAppendSmartStr(&url_state.form_app, &hvalue)
+	zend.SmartStrAppends(&url_state.form_app, "\" />")
+	zend.SmartStrFree(&sname)
+	zend.SmartStrFree(&svalue)
+	zend.SmartStrFree(&hname)
+	zend.SmartStrFree(&hvalue)
+	return zend.SUCCESS
+}
+func PhpUrlScannerAddSessionVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
+	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 1)
+}
+func PhpUrlScannerAddVar(name *byte, name_len int, value *byte, value_len int, encode int) int {
+	return PhpUrlScannerAddVarImpl(name, name_len, value, value_len, encode, 0)
+}
+func PhpUrlScannerResetVarsImpl(type_ int) {
+	var url_state *UrlAdaptStateExT
+	if type_ != 0 {
+		url_state = &BG(url_adapt_session_ex)
+	} else {
+		url_state = &BG(url_adapt_output_ex)
+	}
+	if url_state.form_app.s != nil {
+		zend.ZSTR_LEN(url_state.form_app.s) = 0
+	}
+	if url_state.url_app.s != nil {
+		zend.ZSTR_LEN(url_state.url_app.s) = 0
+	}
+}
+func PhpUrlScannerResetSessionVars() int {
+	PhpUrlScannerResetVarsImpl(1)
+	return zend.SUCCESS
+}
+func PhpUrlScannerResetVars() int {
+	PhpUrlScannerResetVarsImpl(0)
+	return zend.SUCCESS
+}
+func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int {
+	var start *byte
+	var end *byte
+	var limit *byte
+	var separator_len int
+	var sname zend.SmartStr = zend.SmartStr{0}
+	var hname zend.SmartStr = zend.SmartStr{0}
+	var url_app zend.SmartStr = zend.SmartStr{0}
+	var form_app zend.SmartStr = zend.SmartStr{0}
+	var encoded *zend.ZendString
+	var ret int = zend.SUCCESS
+	var sep_removed zend.ZendBool = 0
+	var url_state *UrlAdaptStateExT
+	if type_ != 0 {
+		url_state = &BG(url_adapt_session_ex)
+	} else {
+		url_state = &BG(url_adapt_output_ex)
+	}
+
+	/* Short circuit check. Only check url_app. */
+
+	if url_state.url_app.s == nil || zend.ZSTR_LEN(url_state.url_app.s) == 0 {
+		return zend.SUCCESS
+	}
+	if encode != 0 {
+		encoded = PhpRawUrlEncode(zend.ZSTR_VAL(name), zend.ZSTR_LEN(name))
+		zend.SmartStrAppendl(&sname, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+		encoded = PhpEscapeHtmlEntitiesEx((*uint8)(zend.ZSTR_VAL(name)), zend.ZSTR_LEN(name), 0, ENT_QUOTES|ENT_SUBSTITUTE, core.SG(default_charset), 0)
+		zend.SmartStrAppendl(&hname, zend.ZSTR_VAL(encoded), zend.ZSTR_LEN(encoded))
+		zend.ZendStringFree(encoded)
+	} else {
+		zend.SmartStrAppendl(&sname, zend.ZSTR_VAL(name), zend.ZSTR_LEN(name))
+		zend.SmartStrAppendl(&hname, zend.ZSTR_VAL(name), zend.ZSTR_LEN(name))
+	}
+	zend.SmartStr0(&sname)
+	zend.SmartStr0(&hname)
+	zend.SmartStrAppendSmartStr(&url_app, &sname)
+	zend.SmartStrAppendc(&url_app, '=')
+	zend.SmartStr0(&url_app)
+	zend.SmartStrAppends(&form_app, "<input type=\"hidden\" name=\"")
+	zend.SmartStrAppendSmartStr(&form_app, &hname)
+	zend.SmartStrAppends(&form_app, "\" value=\"")
+	zend.SmartStr0(&form_app)
+
+	/* Short circuit check. Only check url_app. */
+
+	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.url_app.s), zend.ZSTR_VAL(url_app.s), zend.ZSTR_LEN(url_app.s), zend.ZSTR_VAL(url_state.url_app.s)+zend.ZSTR_LEN(url_state.url_app.s)))
+	if start == nil {
+		ret = zend.FAILURE
+		goto finish
+	}
+
+	/* Get end of url var */
+
+	limit = zend.ZSTR_VAL(url_state.url_app.s) + zend.ZSTR_LEN(url_state.url_app.s)
+	end = start + zend.ZSTR_LEN(url_app.s)
+	separator_len = strlen(core.PG(arg_separator).output)
+	for end < limit {
+		if !(memcmp(end, core.PG(arg_separator).output, separator_len)) {
+			end += separator_len
+			sep_removed = 1
+			break
+		}
+		end++
+	}
+
+	/* Remove all when this is the only rewrite var */
+
+	if zend.ZSTR_LEN(url_state.url_app.s) == end-start {
+		PhpUrlScannerResetVarsImpl(type_)
+		goto finish
+	}
+
+	/* Check preceding separator */
+
+	if sep_removed == 0 && size_t(start-core.PG(arg_separator).output) >= separator_len && !(memcmp(start-separator_len, core.PG(arg_separator).output, separator_len)) {
+		start -= separator_len
+	}
+
+	/* Remove partially */
+
+	memmove(start, end, zend.ZSTR_LEN(url_state.url_app.s)-(end-zend.ZSTR_VAL(url_state.url_app.s)))
+	zend.ZSTR_LEN(url_state.url_app.s) -= end - start
+	zend.ZSTR_VAL(url_state.url_app.s)[zend.ZSTR_LEN(url_state.url_app.s)] = '0'
+
+	/* Remove form var */
+
+	start = (*byte)(core.PhpMemnstr(zend.ZSTR_VAL(url_state.form_app.s), zend.ZSTR_VAL(form_app.s), zend.ZSTR_LEN(form_app.s), zend.ZSTR_VAL(url_state.form_app.s)+zend.ZSTR_LEN(url_state.form_app.s)))
+	if start == nil {
+
+		/* Should not happen */
+
+		ret = zend.FAILURE
+		PhpUrlScannerResetVarsImpl(type_)
+		goto finish
+	}
+
+	/* Get end of form var */
+
+	limit = zend.ZSTR_VAL(url_state.form_app.s) + zend.ZSTR_LEN(url_state.form_app.s)
+	end = start + zend.ZSTR_LEN(form_app.s)
+	for end < limit {
+		if (*end) == '>' {
+			end += 1
+			break
+		}
+		end++
+	}
+
+	/* Remove partially */
+
+	memmove(start, end, zend.ZSTR_LEN(url_state.form_app.s)-(end-zend.ZSTR_VAL(url_state.form_app.s)))
+	zend.ZSTR_LEN(url_state.form_app.s) -= end - start
+	zend.ZSTR_VAL(url_state.form_app.s)[zend.ZSTR_LEN(url_state.form_app.s)] = '0'
+finish:
+	zend.SmartStrFree(&url_app)
+	zend.SmartStrFree(&form_app)
+	zend.SmartStrFree(&sname)
+	zend.SmartStrFree(&hname)
+	return ret
+}
+func PhpUrlScannerResetSessionVar(name *zend.ZendString, encode int) int {
+	return PhpUrlScannerResetVarImpl(name, encode, 1)
+}
+func PhpUrlScannerResetVar(name *zend.ZendString, encode int) int {
+	return PhpUrlScannerResetVarImpl(name, encode, 0)
+}
+func ZmStartupUrlScanner(type_ int, module_number int) int {
+	zend.REGISTER_INI_ENTRIES()
+	return zend.SUCCESS
+}
+func ZmShutdownUrlScanner(type_ int, module_number int) int {
+	zend.UNREGISTER_INI_ENTRIES()
+	return zend.SUCCESS
+}
+func ZmActivateUrlScanner(type_ int, module_number int) int {
+	BG(url_adapt_session_ex).active = 0
+	BG(url_adapt_session_ex).tag_type = 0
+	BG(url_adapt_session_ex).attr_type = 0
+	BG(url_adapt_output_ex).active = 0
+	BG(url_adapt_output_ex).tag_type = 0
+	BG(url_adapt_output_ex).attr_type = 0
+	return zend.SUCCESS
+}
+func ZmDeactivateUrlScanner(type_ int, module_number int) int {
+	if BG(url_adapt_session_ex).active {
+		PhpUrlScannerExDeactivate(1)
+		BG(url_adapt_session_ex).active = 0
+		BG(url_adapt_session_ex).tag_type = 0
+		BG(url_adapt_session_ex).attr_type = 0
+	}
+	zend.SmartStrFree(&BG(url_adapt_session_ex).form_app)
+	zend.SmartStrFree(&BG(url_adapt_session_ex).url_app)
+	if BG(url_adapt_output_ex).active {
+		PhpUrlScannerExDeactivate(0)
+		BG(url_adapt_output_ex).active = 0
+		BG(url_adapt_output_ex).tag_type = 0
+		BG(url_adapt_output_ex).attr_type = 0
+	}
+	zend.SmartStrFree(&BG(url_adapt_output_ex).form_app)
+	zend.SmartStrFree(&BG(url_adapt_output_ex).url_app)
+	return zend.SUCCESS
+}
