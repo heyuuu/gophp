@@ -165,8 +165,8 @@ func VirtualGetcwd(buf *byte, size int) *byte {
 func RealpathCacheKey(path *byte, path_len int) ZendUlong {
 	var h ZendUlong
 	var e *byte = path + path_len
-	for h = Z_UL(2166136261); path < e; {
-		h *= Z_UL(16777619)
+	for h = uint64(2166136261); path < e; {
+		h *= uint64(16777619)
 		*path++
 		h ^= (*path) - 1
 	}

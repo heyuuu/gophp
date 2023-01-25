@@ -65,7 +65,7 @@ func OnChangeMemoryLimit(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	if new_value != nil {
 		value = zend.ZendAtol(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
 	} else {
-		value = zend.Z_L(1) << 30
+		value = int64(1) << 30
 	}
 	if zend.ZendSetMemoryLimit(value) == zend.FAILURE {
 

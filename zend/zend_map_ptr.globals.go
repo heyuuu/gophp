@@ -1,7 +1,0 @@
-// <<generate>>
-
-package zend
-
-const ZEND_MAP_PTR_KIND_PTR = 0
-const ZEND_MAP_PTR_KIND_PTR_OR_OFFSET = 1
-const ZEND_MAP_PTR_KIND = ZEND_MAP_PTR_KIND_PTR_OR_OFFSET

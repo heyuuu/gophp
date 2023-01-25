@@ -20,28 +20,30 @@ func ZEND_ENDIAN_LOHI_C_4(a __auto__, b __auto__, c __auto__, d __auto__) {
 	c
 	d
 }
-func ZEND_TYPE_IS_SET(t ZendType) bool   { return t > Z_L(0x3) }
-func ZEND_TYPE_IS_CODE(t ZendType) bool  { return t > Z_L(0x3) && t <= Z_L(0x3ff) }
-func ZEND_TYPE_IS_CLASS(t ZendType) bool { return t > Z_L(0x3ff) }
-func ZEND_TYPE_IS_CE(t ZendType) bool    { return (t & Z_L(0x2)) != 0 }
+func ZEND_TYPE_IS_SET(t ZendType) bool { return t > int64(0x3) }
+func ZEND_TYPE_IS_CODE(t ZendType) bool {
+	return t > int64(0x3) && t <= int64(0x3ff)
+}
+func ZEND_TYPE_IS_CLASS(t ZendType) bool { return t > int64(0x3ff) }
+func ZEND_TYPE_IS_CE(t ZendType) bool    { return (t & int64(0x2)) != 0 }
 func ZEND_TYPE_IS_NAME(t ZendType) bool {
 	return ZEND_TYPE_IS_CLASS(t) && !(ZEND_TYPE_IS_CE(t))
 }
-func ZEND_TYPE_NAME(t ZendType) *ZendString { return (*ZendString)(t & ^(Z_L(0x3))) }
+func ZEND_TYPE_NAME(t ZendType) *ZendString { return (*ZendString)(t & ^(int64(0x3))) }
 func ZEND_TYPE_CE(t ZendType) *ZendClassEntry {
-	return (*ZendClassEntry)(t & ^(Z_L(0x3)))
+	return (*ZendClassEntry)(t & ^(int64(0x3)))
 }
-func ZEND_TYPE_CODE(t ZendType) int         { return t >> Z_L(2) }
-func ZEND_TYPE_ALLOW_NULL(t ZendType) bool  { return (t & Z_L(0x1)) != 0 }
-func ZEND_TYPE_WITHOUT_NULL(t __auto__) int { return t & ^(Z_L(0x1)) }
+func ZEND_TYPE_CODE(t ZendType) int         { return t >> int64(2) }
+func ZEND_TYPE_ALLOW_NULL(t ZendType) bool  { return (t & int64(0x1)) != 0 }
+func ZEND_TYPE_WITHOUT_NULL(t __auto__) int { return t & ^(int64(0x1)) }
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) int {
-	return code<<Z_L(2) | b.CondF(allow_null != 0, func() __auto__ { return Z_L(0x1) }, func() __auto__ { return Z_L(0x0) })
+	return code<<int64(2) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
 }
 func ZEND_TYPE_ENCODE_CE(ce *ZendClassEntry, allow_null bool) int {
-	return uintptr_t(ce) | b.CondF(allow_null, func() __auto__ { return Z_L(0x3) }, func() __auto__ { return Z_L(0x2) })
+	return uintptr_t(ce) | b.CondF(allow_null, func() __auto__ { return int64(0x3) }, func() __auto__ { return int64(0x2) })
 }
 func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) int {
-	return uintptr_t(class_name) | b.CondF(allow_null != 0, func() __auto__ { return Z_L(0x1) }, func() __auto__ { return Z_L(0x0) })
+	return uintptr_t(class_name) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
 }
 func ZEND_TYPE_ENCODE_CLASS_CONST_0(class_name __auto__) ZendType { return ZendType(class_name) }
 func ZEND_TYPE_ENCODE_CLASS_CONST_1(class_name string) ZendType   { return ZendType("?" + class_name) }

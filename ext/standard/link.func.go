@@ -182,7 +182,7 @@ func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
 		zend.Efree(dirname)
-		zend.RETVAL_LONG(zend.Z_L(-1))
+		zend.RETVAL_LONG(int64(-1))
 		return
 	}
 	zend.Efree(dirname)

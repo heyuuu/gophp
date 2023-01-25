@@ -6,8 +6,6 @@ import (
 	"sik/core"
 )
 
-func Z_L(i int) __auto__  { return int64(i) }
-func Z_UL(i int) __auto__ { return uint64(i) }
 func ZEND_LTOA(i __auto__, s []char, len_ __auto__) {
 	var st int = core.Snprintf(s, len_, ZEND_LONG_FMT, i)
 	s[st] = '0'

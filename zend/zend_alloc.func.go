@@ -318,7 +318,7 @@ func ZendMmBitsetNts(bitset ZendMmBitset) int {
 	if b.SizeOf("zend_mm_bitset") == 8 {
 		if (bitset & 0xffffffff) == 0xffffffff {
 			n += 32
-			bitset = bitset >> Z_UL(32)
+			bitset = bitset >> uint64(32)
 		}
 	}
 	if (bitset & 0xffff) == 0xffff {
@@ -341,10 +341,10 @@ func ZendMmBitsetNts(bitset ZendMmBitset) int {
 }
 func ZendMmBitsetIsSet(bitset *ZendMmBitset, bit int) int { return ZEND_BIT_TEST(bitset, bit) }
 func ZendMmBitsetSetBit(bitset *ZendMmBitset, bit int) {
-	bitset[bit/ZEND_MM_BITSET_LEN] |= Z_UL(1) << (bit&ZEND_MM_BITSET_LEN - 1)
+	bitset[bit/ZEND_MM_BITSET_LEN] |= uint64(1) << (bit&ZEND_MM_BITSET_LEN - 1)
 }
 func ZendMmBitsetResetBit(bitset *ZendMmBitset, bit int) {
-	bitset[bit/ZEND_MM_BITSET_LEN] &= ^(Z_UL(1) << (bit&ZEND_MM_BITSET_LEN - 1))
+	bitset[bit/ZEND_MM_BITSET_LEN] &= ^(uint64(1) << (bit&ZEND_MM_BITSET_LEN - 1))
 }
 func ZendMmBitsetSetRange(bitset *ZendMmBitset, start int, len_ int) {
 	if len_ == 1 {
@@ -398,7 +398,7 @@ func ZendMmBitsetResetRange(bitset *ZendMmBitset, start int, len_ int) {
 
 			/* reset bits from "bit" to ZEND_MM_BITSET_LEN-1 */
 
-			tmp = ^((Z_UL(1) << bit) - 1)
+			tmp = ^((uint64(1) << bit) - 1)
 			bitset[b.PostInc(&pos)] &= ^tmp
 			for pos != end {
 
@@ -1239,7 +1239,7 @@ func ZendMmInit() *ZendMmHeap {
 	chunk.SetFreePages(ZEND_MM_PAGES - ZEND_MM_FIRST_PAGE)
 	chunk.SetFreeTail(ZEND_MM_FIRST_PAGE)
 	chunk.SetNum(0)
-	chunk.GetFreeMap()[0] = (Z_L(1) << ZEND_MM_FIRST_PAGE) - 1
+	chunk.GetFreeMap()[0] = (int64(1) << ZEND_MM_FIRST_PAGE) - 1
 	chunk.GetMap()[0] = ZEND_MM_LRUN(ZEND_MM_FIRST_PAGE)
 	heap.SetMainChunk(chunk)
 	heap.SetCachedChunks(nil)
@@ -1253,7 +1253,7 @@ func ZendMmInit() *ZendMmHeap {
 	heap.SetRealPeak(ZEND_MM_CHUNK_SIZE)
 	heap.SetSize(0)
 	heap.SetPeak(0)
-	heap.SetLimit(int(Z_L(-1) >> int(Z_L(1))))
+	heap.SetLimit(int(int64(-1) >> int(int64(1))))
 	heap.SetOverflow(0)
 	heap.SetUseCustomHeap(ZEND_MM_CUSTOM_HEAP_NONE)
 	heap.SetStorage(nil)
@@ -1794,7 +1794,7 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	chunk.SetFreePages(ZEND_MM_PAGES - ZEND_MM_FIRST_PAGE)
 	chunk.SetFreeTail(ZEND_MM_FIRST_PAGE)
 	chunk.SetNum(0)
-	chunk.GetFreeMap()[0] = (Z_L(1) << ZEND_MM_FIRST_PAGE) - 1
+	chunk.GetFreeMap()[0] = (int64(1) << ZEND_MM_FIRST_PAGE) - 1
 	chunk.GetMap()[0] = ZEND_MM_LRUN(ZEND_MM_FIRST_PAGE)
 	heap.SetMainChunk(chunk)
 	heap.SetCachedChunks(nil)
@@ -1808,7 +1808,7 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	heap.SetRealPeak(ZEND_MM_CHUNK_SIZE)
 	heap.SetSize(0)
 	heap.SetPeak(0)
-	heap.SetLimit(Z_L(-1) >> Z_L(1))
+	heap.SetLimit(int64(-1) >> int64(1))
 	heap.SetOverflow(0)
 	heap.SetUseCustomHeap(0)
 	heap.SetStorage(&tmp_storage)

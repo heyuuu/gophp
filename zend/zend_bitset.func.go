@@ -7,19 +7,19 @@ import (
 )
 
 func ZEND_BITSET_ELM_NUM(n uint32) int { return n >> 6 }
-func ZEND_BITSET_BIT_NUM(n uint32) int { return zend_ulong(n) & Z_UL(0x3f) }
+func ZEND_BITSET_BIT_NUM(n uint32) int { return zend_ulong(n) & uint64(0x3f) }
 func ZEND_BITSET_ALLOCA(n uint32, use_heap __auto__) ZendBitset {
 	return ZendBitset(DoAlloca(n*ZEND_BITSET_ELM_SIZE, use_heap))
 }
 func ZendUlongNtz(num ZendUlong) int {
 	var n int
-	if num == Z_UL(0) {
+	if num == uint64(0) {
 		return SIZEOF_ZEND_LONG * 8
 	}
 	n = 1
 	if (num & 0xffffffff) == 0 {
 		n += 32
-		num = num >> Z_UL(32)
+		num = num >> uint64(32)
 	}
 	if (num & 0xffff) == 0 {
 		n += 16
@@ -44,10 +44,10 @@ func ZendBitsetLen(n uint32) uint32 {
 }
 func ZendBitsetIn(set ZendBitset, n uint32) ZendBool { return ZEND_BIT_TEST(set, n) }
 func ZendBitsetIncl(set ZendBitset, n uint32) {
-	set[ZEND_BITSET_ELM_NUM(n)] |= Z_UL(1) << ZEND_BITSET_BIT_NUM(n)
+	set[ZEND_BITSET_ELM_NUM(n)] |= uint64(1) << ZEND_BITSET_BIT_NUM(n)
 }
 func ZendBitsetExcl(set ZendBitset, n uint32) {
-	set[ZEND_BITSET_ELM_NUM(n)] &= ^(Z_UL(1) << ZEND_BITSET_BIT_NUM(n))
+	set[ZEND_BITSET_ELM_NUM(n)] &= ^(uint64(1) << ZEND_BITSET_BIT_NUM(n))
 }
 func ZendBitsetClear(set ZendBitset, len_ uint32) {
 	memset(set, 0, len_*ZEND_BITSET_ELM_SIZE)
@@ -125,8 +125,8 @@ func ZendBitsetLast(set ZendBitset, len_ uint32) int {
 		if set[i] {
 			var j int = ZEND_BITSET_ELM_SIZE*8*i - 1
 			var x ZendUlong = set[i]
-			for x != Z_UL(0) {
-				x = x >> Z_UL(1)
+			for x != uint64(0) {
+				x = x >> uint64(1)
 				j++
 			}
 			return j

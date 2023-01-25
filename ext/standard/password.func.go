@@ -223,7 +223,7 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 		return nil
 	}
 	hash_format_len = core.Snprintf(hash_format, b.SizeOf("hash_format"), "$2y$%02"+zend.ZEND_LONG_FMT_SPEC+"$", cost)
-	if !(b.Assign(&salt, PhpPasswordGetSalt(nil, zend.Z_UL(22), options))) {
+	if !(b.Assign(&salt, PhpPasswordGetSalt(nil, uint64(22), options))) {
 		return nil
 	}
 	zend.ZSTR_VAL(salt)[zend.ZSTR_LEN(salt)] = 0

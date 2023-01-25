@@ -7353,7 +7353,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	input_size = zend.ZendHashNumElements(zend.Z_ARRVAL_P(input))
 	pad_size_abs = zend.ZEND_ABS(pad_size)
-	if pad_size_abs < 0 || pad_size_abs-input_size > zend.Z_L(1048576) {
+	if pad_size_abs < 0 || pad_size_abs-input_size > int64(1048576) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "You may only pad up to 1048576 elements at a time")
 		zend.RETVAL_FALSE
 		return

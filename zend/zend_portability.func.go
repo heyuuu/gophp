@@ -78,6 +78,6 @@ func ZEND_SLIDE_TO_ALIGNED(alignment int, ptr __auto__) int {
 	return zend_uintptr_t(ptr) + (alignment-1) & ^(alignment-1)
 }
 func ZEND_SLIDE_TO_ALIGNED16(ptr __auto__) int {
-	return ZEND_SLIDE_TO_ALIGNED(Z_UL(16), ptr)
+	return ZEND_SLIDE_TO_ALIGNED(uint64(16), ptr)
 }
 func ZEND_EXPAND_VA(code __auto__) __auto__ { return code }

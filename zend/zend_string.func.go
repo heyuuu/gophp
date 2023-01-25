@@ -222,7 +222,7 @@ func ZendStringEqualsLiteral(str *ZendString, literal string) bool {
 	return ZSTR_LEN(str) == b.SizeOf("literal")-1 && !(memcmp(ZSTR_VAL(str), literal, b.SizeOf("literal")-1))
 }
 func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
-	var hash ZendUlong = Z_UL(5381)
+	var hash ZendUlong = uint64(5381)
 
 	/* variant with the hash unrolled eight times */
 
@@ -260,7 +260,7 @@ func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
 
 	/* Hash value can't be zero, so we always set the high bit */
 
-	return hash | Z_UL(-0x8000000000000000)
+	return hash | uint64(-0x8000000000000000)
 
 	/* Hash value can't be zero, so we always set the high bit */
 }

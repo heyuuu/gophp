@@ -22,7 +22,7 @@ func ZendQsort(base any, nmemb int, siz int, compare CompareFuncT, swp SwapFuncT
 		begin = begin_stack[loop]
 		end = end_stack[loop]
 		for begin < end {
-			offset = end - begin>>Z_L(1)
+			offset = end - begin>>int64(1)
 			swp(begin, begin+(offset-offset%siz))
 			seg1 = begin + siz
 			seg2 = end
@@ -197,10 +197,10 @@ func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
 			var j *byte
 			var start *byte = (*byte)(base)
 			var end *byte = start + nmemb*siz
-			var offset int = nmemb >> Z_L(1)
+			var offset int = nmemb >> int64(1)
 			var pivot *byte = start + offset*siz
-			if nmemb>>Z_L(10) != 0 {
-				var delta int = (offset >> Z_L(1)) * siz
+			if nmemb>>int64(10) != 0 {
+				var delta int = (offset >> int64(1)) * siz
 				ZendSort5(start, start+delta, pivot, pivot+delta, end-siz, cmp, swp)
 			} else {
 				ZendSort3(start, pivot, end-siz, cmp, swp)

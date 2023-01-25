@@ -734,7 +734,7 @@ func ProcessNumericEntity(buf **byte, code_point *unsigned) int {
 	/* many more are invalid, but that depends on whether it's HTML
 	 * (and which version) or XML. */
 
-	if code_l > zend.Z_L(0x10ffff) {
+	if code_l > int64(0x10ffff) {
 		return zend.FAILURE
 	}
 	if code_point != nil {

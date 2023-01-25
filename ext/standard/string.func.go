@@ -4293,8 +4293,8 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 
 				/* remember possible key length */
 
-				num_bitset[len_/b.SizeOf("zend_ulong")] |= zend.Z_UL(1) << len_ % b.SizeOf("zend_ulong")
-				bitset[uint8(zend.ZSTR_VAL(str_key)[0])/b.SizeOf("zend_ulong")] |= zend.Z_UL(1) << uint8(zend.ZSTR_VAL(str_key)[0]) % b.SizeOf("zend_ulong")
+				num_bitset[len_/b.SizeOf("zend_ulong")] |= uint64(1) << len_ % b.SizeOf("zend_ulong")
+				bitset[uint8(zend.ZSTR_VAL(str_key)[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(zend.ZSTR_VAL(str_key)[0]) % b.SizeOf("zend_ulong")
 			}
 		}
 		break
@@ -4339,8 +4339,8 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 
 					/* remember possible key length */
 
-					num_bitset[len_/b.SizeOf("zend_ulong")] |= zend.Z_UL(1) << len_ % b.SizeOf("zend_ulong")
-					bitset[uint8(zend.ZSTR_VAL(key_used)[0])/b.SizeOf("zend_ulong")] |= zend.Z_UL(1) << uint8(zend.ZSTR_VAL(key_used)[0]) % b.SizeOf("zend_ulong")
+					num_bitset[len_/b.SizeOf("zend_ulong")] |= uint64(1) << len_ % b.SizeOf("zend_ulong")
+					bitset[uint8(zend.ZSTR_VAL(key_used)[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(zend.ZSTR_VAL(key_used)[0]) % b.SizeOf("zend_ulong")
 				} else {
 					key_used = str_key
 					len_ = zend.ZSTR_LEN(key_used)
@@ -4378,13 +4378,13 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 	old_pos = pos
 	for pos <= slen-minlen {
 		key = str + pos
-		if (bitset[uint8(key[0])/b.SizeOf("zend_ulong")] & zend.Z_UL(1) << uint8(key[0]) % b.SizeOf("zend_ulong")) != 0 {
+		if (bitset[uint8(key[0])/b.SizeOf("zend_ulong")] & uint64(1) << uint8(key[0]) % b.SizeOf("zend_ulong")) != 0 {
 			len_ = maxlen
 			if len_ > slen-pos {
 				len_ = slen - pos
 			}
 			for len_ >= minlen {
-				if (num_bitset[len_/b.SizeOf("zend_ulong")] & zend.Z_UL(1) << len_ % b.SizeOf("zend_ulong")) != 0 {
+				if (num_bitset[len_/b.SizeOf("zend_ulong")] & uint64(1) << len_ % b.SizeOf("zend_ulong")) != 0 {
 					entry = zend.ZendHashStrFind(pats, key, len_)
 					if entry != nil {
 						var tmp *zend.ZendString

@@ -1,9 +1,0 @@
-// <<generate>>
-
-package standard
-
-const VAR_ENTRIES_MAX = 1018
-const VAR_DTOR_ENTRIES_MAX = 255
-const VAR_ENTRIES_DBG = 0
-const VAR_WAKEUP_FLAG = 1
-const VAR_UNSERIALIZE_FLAG = 2
