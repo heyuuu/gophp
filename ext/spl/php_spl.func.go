@@ -19,7 +19,7 @@ func SplFindCeByName(name *zend.ZendString, autoload zend.ZendBool) *zend.ZendCl
 	var ce *zend.ZendClassEntry
 	if autoload == 0 {
 		var lc_name *zend.ZendString = zend.ZendStringTolower(name)
-		ce = zend.ZendHashFindPtr(zend.ExecutorGlobals.GetClassTable(), lc_name)
+		ce = zend.ExecutorGlobals.GetClassTable().FindPtr(lc_name)
 		zend.ZendStringRelease(lc_name)
 	} else {
 		ce = zend.ZendLookupClass(name)
@@ -185,7 +185,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 		}
 		opened_path = zend.ZendStringCopy(file_handle.GetOpenedPath())
 		zend.ZVAL_NULL(&dummy)
-		if zend.ZendHashAdd(&(zend.ExecutorGlobals.GetIncludedFiles()), opened_path, &dummy) != nil {
+		if &(zend.ExecutorGlobals.GetIncludedFiles()).Add(opened_path, &dummy) != nil {
 			new_op_array = zend.ZendCompileFile(&file_handle, zend.ZEND_REQUIRE)
 			zend.ZendDestroyFileHandle(&file_handle)
 		} else {
@@ -202,7 +202,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 				zend.ZvalPtrDtor(&result)
 			}
 			zend.Efree(class_file)
-			return zend.ZendHashExists(zend.ExecutorGlobals.GetClassTable(), lc_name)
+			return zend.ExecutorGlobals.GetClassTable().Exists(lc_name)
 		}
 	}
 	zend.Efree(class_file)
@@ -310,9 +310,9 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		fci.SetParams(class_name)
 		fci.SetNoSeparation(1)
 		zend.ZVAL_UNDEF(&fci.GetFunctionName())
-		zend.ZendHashInternalPointerResetEx(SPL_G(autoload_functions), &pos)
-		for zend.ZendHashGetCurrentKeyEx(SPL_G(autoload_functions), &func_name, &num_idx, &pos) == zend.HASH_KEY_IS_STRING {
-			alfi = zend.ZendHashGetCurrentDataPtrEx(SPL_G(autoload_functions), &pos)
+		SPL_G(autoload_functions).InternalPointerResetEx(&pos)
+		for SPL_G(autoload_functions).GetCurrentKeyEx(&func_name, &num_idx, &pos) == zend.HASH_KEY_IS_STRING {
+			alfi = SPL_G(autoload_functions).GetCurrentDataPtrEx(&pos)
 			func_ = alfi.GetFuncPtr()
 			if func_.HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
@@ -339,10 +339,10 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			if zend.ExecutorGlobals.GetException() != nil {
 				break
 			}
-			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.ZendHashExists(zend.ExecutorGlobals.GetClassTable(), lc_name) != 0 {
+			if pos+1 == SPL_G(autoload_functions).nNumUsed || zend.ExecutorGlobals.GetClassTable().Exists(lc_name) != 0 {
 				break
 			}
-			zend.ZendHashMoveForwardEx(SPL_G(autoload_functions), &pos)
+			SPL_G(autoload_functions).MoveForwardEx(&pos)
 		}
 		zend.ZendStringReleaseEx(lc_name, 0)
 		SPL_G(autoload_running) = l_autoload_running
@@ -371,7 +371,7 @@ func (this *zend.HashTable) MoveTailToHead() {
 	var tmp zend.Bucket = this.GetArData()[this.GetNNumUsed()-1]
 	memmove(this.GetArData()+1, this.GetArData(), b.SizeOf("Bucket")*(this.GetNNumUsed()-1))
 	this.GetArData()[0] = tmp
-	zend.ZendHashRehash(this)
+	this.Rehash()
 }
 func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var func_name *zend.ZendString
@@ -472,7 +472,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 
 		}
 		zend.ZendStringReleaseEx(func_name, 0)
-		if SPL_G(autoload_functions) && zend.ZendHashExists(SPL_G(autoload_functions), lc_name) != 0 {
+		if SPL_G(autoload_functions) && SPL_G(autoload_functions).Exists(lc_name) != 0 {
 			if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
 				zend.Z_DELREF_P(&alfi.GetClosure())
 			}
@@ -492,7 +492,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 		if !(SPL_G(autoload_functions)) {
 			zend.ALLOC_HASHTABLE(SPL_G(autoload_functions))
-			zend.ZendHashInit(SPL_G(autoload_functions), 1, nil, AutoloadFuncInfoDtor, 0)
+			SPL_G(autoload_functions).Init(1, nil, AutoloadFuncInfoDtor, 0)
 		}
 		spl_func_ptr = SplAutoloadFn
 		if zend.ExecutorGlobals.GetAutoloadFunc() == spl_func_ptr {
@@ -501,7 +501,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			zend.ZVAL_UNDEF(&spl_alfi.GetObj())
 			zend.ZVAL_UNDEF(&spl_alfi.GetClosure())
 			spl_alfi.SetCe(nil)
-			zend.ZendHashAddMem(SPL_G(autoload_functions), SplAutoloadFn.GetFunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
+			SPL_G(autoload_functions).AddMem(SplAutoloadFn.GetFunctionName(), &spl_alfi, b.SizeOf("autoload_func_info"))
 			if prepend != 0 && SPL_G(autoload_functions).nNumOfElements > 1 {
 
 				/* Move the newly created element to the head of the hashtable */
@@ -518,7 +518,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			alfi.GetFuncPtr().SetFunctionName(nil)
 			alfi.SetFuncPtr(copy)
 		}
-		if zend.ZendHashAddMem(SPL_G(autoload_functions), lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
+		if SPL_G(autoload_functions).AddMem(lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 				zend.Z_DELREF(alfi.GetObj())
 			}
@@ -603,24 +603,24 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 			/* remove all */
 
 			if !(SPL_G(autoload_running)) {
-				zend.ZendHashDestroy(SPL_G(autoload_functions))
+				SPL_G(autoload_functions).Destroy()
 				zend.FREE_HASHTABLE(SPL_G(autoload_functions))
 				SPL_G(autoload_functions) = nil
 				zend.ExecutorGlobals.SetAutoloadFunc(nil)
 			} else {
-				zend.ZendHashClean(SPL_G(autoload_functions))
+				SPL_G(autoload_functions).Clean()
 			}
 			success = zend.SUCCESS
 		} else {
 
 			/* remove specific */
 
-			success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
+			success = SPL_G(autoload_functions).Del(lc_name)
 			if success != zend.SUCCESS && obj_ptr != nil {
 				lc_name = zend.ZendStringExtend(lc_name, zend.ZSTR_LEN(lc_name)+b.SizeOf("uint32_t"), 0)
 				memcpy(zend.ZSTR_VAL(lc_name)+zend.ZSTR_LEN(lc_name)-b.SizeOf("uint32_t"), &obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 				zend.ZSTR_VAL(lc_name)[zend.ZSTR_LEN(lc_name)] = '0'
-				success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
+				success = SPL_G(autoload_functions).Del(lc_name)
 			}
 		}
 	} else if zend.ZendStringEquals(lc_name, SplAutoloadFn.GetFunctionName()) != 0 {
@@ -644,11 +644,11 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	if zend.ExecutorGlobals.GetAutoloadFunc() == nil {
-		if b.Assign(&fptr, zend.ZendHashFindPtr(zend.ExecutorGlobals.GetFunctionTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))) {
+		if b.Assign(&fptr, zend.ExecutorGlobals.GetFunctionTable().FindPtr(zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))) {
 			var tmp zend.Zval
 			zend.ArrayInit(return_value)
 			zend.ZVAL_STR_COPY(&tmp, zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))
-			zend.ZendHashNextIndexInsertNew(zend.Z_ARR_P(return_value), &tmp)
+			zend.Z_ARR_P(return_value).NextIndexInsertNew(&tmp)
 			return
 		}
 		zend.RETVAL_FALSE
@@ -964,8 +964,8 @@ func ZmStartupSpl(type_ int, module_number int) int {
 	ZmStartupSplHeap(type_, module_number)
 	ZmStartupSplFixedarray(type_, module_number)
 	ZmStartupSplObserver(type_, module_number)
-	SplAutoloadFn = zend.ZendHashStrFindPtr(zend.CompilerGlobals.GetFunctionTable(), "spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
-	SplAutoloadCallFn = zend.ZendHashStrFindPtr(zend.CompilerGlobals.GetFunctionTable(), "spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
+	SplAutoloadFn = zend.CompilerGlobals.GetFunctionTable().StrFindPtr("spl_autoload", b.SizeOf("\"spl_autoload\"")-1)
+	SplAutoloadCallFn = zend.CompilerGlobals.GetFunctionTable().StrFindPtr("spl_autoload_call", b.SizeOf("\"spl_autoload_call\"")-1)
 	zend.ZEND_ASSERT(SplAutoloadFn != nil && SplAutoloadCallFn != nil)
 	return zend.SUCCESS
 }
@@ -981,7 +981,7 @@ func ZmDeactivateSpl(type_ int, module_number int) int {
 		SPL_G(autoload_extensions) = nil
 	}
 	if SPL_G(autoload_functions) {
-		zend.ZendHashDestroy(SPL_G(autoload_functions))
+		SPL_G(autoload_functions).Destroy()
 		zend.FREE_HASHTABLE(SPL_G(autoload_functions))
 		SPL_G(autoload_functions) = nil
 	}

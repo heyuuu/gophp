@@ -683,7 +683,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 		}
 		zend.ZVAL_STRINGL(&http_response, tmp_line, tmp_line_len)
-		zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_response)
+		zend.Z_ARRVAL_P(response_header).NextIndexInsert(&http_response)
 	} else {
 		core.PhpStreamClose(stream)
 		stream = nil
@@ -794,7 +794,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 			var http_header zend.Zval
 			zend.ZVAL_STRINGL(&http_header, http_header_line, http_header_line_length)
-			zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_header)
+			zend.Z_ARRVAL_P(response_header).NextIndexInsert(&http_header)
 		} else {
 			break
 		}

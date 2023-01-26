@@ -21,7 +21,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 	}
 	tmp = zend.Estrndup(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
 	if ctx.GetTags() != nil {
-		zend.ZendHashDestroy(ctx.GetTags())
+		ctx.GetTags().Destroy()
 	} else {
 		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
 		if ctx.GetTags() == nil {
@@ -29,7 +29,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 			return zend.FAILURE
 		}
 	}
-	zend.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
+	ctx.GetTags().Init(0, nil, TagDtor, 1)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')
@@ -44,7 +44,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 			keylen = q - key
 			str = zend.ZendStringInit(key, keylen, 1)
 			zend.GC_MAKE_PERSISTENT_LOCAL(str)
-			zend.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
+			ctx.GetTags().AddMem(str, val, strlen(val)+1)
 			zend.ZendStringReleaseEx(str, 1)
 		}
 	}
@@ -67,7 +67,7 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	} else {
 		hosts = &BG(url_adapt_output_hosts_ht)
 	}
-	zend.ZendHashClean(hosts)
+	hosts.Clean()
 
 	/* Use user supplied host whitelist */
 
@@ -82,7 +82,7 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 		keylen = q - key
 		if keylen > 0 {
 			tmp_key = zend.ZendStringInit(key, keylen, 0)
-			zend.ZendHashAddEmptyElement(hosts, tmp_key)
+			hosts.AddEmptyElement(tmp_key)
 			zend.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}
@@ -127,7 +127,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *zend.ZendString = zend.ZendStringTolower(url_parts.GetHost())
-		if zend.ZendHashExists(&BG(url_adapt_session_hosts_ht), tmp) == 0 {
+		if &BG(url_adapt_session_hosts_ht).Exists(tmp) == 0 {
 			zend.ZendStringReleaseEx(tmp, 0)
 			zend.SmartStrAppendSmartStr(dest, url)
 			PhpUrlFree(url_parts)
@@ -220,7 +220,7 @@ func CheckHttpHost(target *byte) int {
 	var tmp *zend.Zval
 	var host_tmp *zend.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZEND_STRL("_SERVER"))) && zend.Z_TYPE_P(tmp) == zend.IS_ARRAY && b.Assign(&host, zend.ZendHashStrFind(zend.Z_ARRVAL_P(tmp), zend.ZEND_STRL("HTTP_HOST"))) && zend.Z_TYPE_P(host) == zend.IS_STRING {
+	if b.Assign(&tmp, &(zend.ExecutorGlobals.GetSymbolTable()).StrFind(zend.ZEND_STRL("_SERVER"))) && zend.Z_TYPE_P(tmp) == zend.IS_ARRAY && b.Assign(&host, zend.Z_ARRVAL_P(tmp).StrFind(zend.ZEND_STRL("HTTP_HOST"))) && zend.Z_TYPE_P(host) == zend.IS_STRING {
 		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */
@@ -268,11 +268,11 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		PhpUrlFree(url_parts)
 		return zend.SUCCESS
 	}
-	if !(zend.ZendHashNumElements(allowed_hosts)) && CheckHttpHost(zend.ZSTR_VAL(url_parts.GetHost())) == zend.SUCCESS {
+	if !(allowed_hosts.NumElements()) && CheckHttpHost(zend.ZSTR_VAL(url_parts.GetHost())) == zend.SUCCESS {
 		PhpUrlFree(url_parts)
 		return zend.SUCCESS
 	}
-	if zend.ZendHashFind(allowed_hosts, url_parts.GetHost()) == nil {
+	if allowed_hosts.Find(url_parts.GetHost()) == nil {
 		PhpUrlFree(url_parts)
 		return zend.FAILURE
 	}
@@ -307,7 +307,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
 
-	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), zend.ZSTR_VAL(ctx.GetTag().GetS()), zend.ZSTR_LEN(ctx.GetTag().GetS()))) != nil {
+	if b.Assign(&(ctx.GetLookupData()), ctx.GetTags().StrFindPtr(zend.ZSTR_VAL(ctx.GetTag().GetS()), zend.ZSTR_LEN(ctx.GetTag().GetS()))) != nil {
 		ok = 1
 		if zend.ZSTR_LEN(ctx.GetTag().GetS()) == b.SizeOf("\"form\"")-1 && !(strncasecmp(zend.ZSTR_VAL(ctx.GetTag().GetS()), "form", zend.ZSTR_LEN(ctx.GetTag().GetS()))) {
 			ctx.SetTagType(TAG_FORM)

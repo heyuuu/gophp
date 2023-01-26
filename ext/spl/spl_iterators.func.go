@@ -372,31 +372,31 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 	intern.SetMaxDepth(-1)
 	intern.SetInIteration(0)
 	intern.SetCe(zend.Z_OBJCE_P(object))
-	intern.SetBeginIteration(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "beginiteration", b.SizeOf("\"beginiteration\"")-1))
+	intern.SetBeginIteration(&intern.GetCe().GetFunctionTable().StrFindPtr("beginiteration", b.SizeOf("\"beginiteration\"")-1))
 	if intern.GetBeginIteration().GetScope() == ce_base {
 		intern.SetBeginIteration(nil)
 	}
-	intern.SetEndIteration(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "enditeration", b.SizeOf("\"enditeration\"")-1))
+	intern.SetEndIteration(&intern.GetCe().GetFunctionTable().StrFindPtr("enditeration", b.SizeOf("\"enditeration\"")-1))
 	if intern.GetEndIteration().GetScope() == ce_base {
 		intern.SetEndIteration(nil)
 	}
-	intern.SetCallHasChildren(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "callhaschildren", b.SizeOf("\"callHasChildren\"")-1))
+	intern.SetCallHasChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("callhaschildren", b.SizeOf("\"callHasChildren\"")-1))
 	if intern.GetCallHasChildren().GetScope() == ce_base {
 		intern.SetCallHasChildren(nil)
 	}
-	intern.SetCallGetChildren(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "callgetchildren", b.SizeOf("\"callGetChildren\"")-1))
+	intern.SetCallGetChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("callgetchildren", b.SizeOf("\"callGetChildren\"")-1))
 	if intern.GetCallGetChildren().GetScope() == ce_base {
 		intern.SetCallGetChildren(nil)
 	}
-	intern.SetBeginChildren(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "beginchildren", b.SizeOf("\"beginchildren\"")-1))
+	intern.SetBeginChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("beginchildren", b.SizeOf("\"beginchildren\"")-1))
 	if intern.GetBeginChildren().GetScope() == ce_base {
 		intern.SetBeginChildren(nil)
 	}
-	intern.SetEndChildren(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "endchildren", b.SizeOf("\"endchildren\"")-1))
+	intern.SetEndChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("endchildren", b.SizeOf("\"endchildren\"")-1))
 	if intern.GetEndChildren().GetScope() == ce_base {
 		intern.SetEndChildren(nil)
 	}
-	intern.SetNextElement(zend.ZendHashStrFindPtr(&intern.GetCe().GetFunctionTable(), "nextelement", b.SizeOf("\"nextElement\"")-1))
+	intern.SetNextElement(&intern.GetCe().GetFunctionTable().StrFindPtr("nextelement", b.SizeOf("\"nextElement\"")-1))
 	if intern.GetNextElement().GetScope() == ce_base {
 		intern.SetNextElement(nil)
 	}
@@ -622,7 +622,7 @@ func SplRecursiveItGetMethod(zobject **zend.ZendObject, method *zend.ZendString,
 	zobj = &object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
 	if function_handler == nil {
-		if b.Assign(&function_handler, zend.ZendHashFindPtr(&zend.Z_OBJCE_P(zobj).GetFunctionTable(), method)) == nil {
+		if b.Assign(&function_handler, &zend.Z_OBJCE_P(zobj).GetFunctionTable().FindPtr(method)) == nil {
 			*zobject = zend.Z_OBJ_P(zobj)
 			function_handler = (*zobject).GetHandlers().GetGetMethod()(zobject, method, key)
 		} else {
@@ -905,7 +905,7 @@ func SplDualItGetMethod(object **zend.ZendObject, method *zend.ZendString, key *
 	intern = SplDualItFromObj(*object)
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
-		if b.Assign(&function_handler, zend.ZendHashFindPtr(&intern.GetCe().GetFunctionTable(), method)) == nil {
+		if b.Assign(&function_handler, &intern.GetCe().GetFunctionTable().FindPtr(method)) == nil {
 			if zend.Z_OBJ_HT(intern.GetZobject()).GetGetMethod() != nil {
 				*object = zend.Z_OBJ(intern.GetZobject())
 				function_handler = (*object).GetHandlers().GetGetMethod()(object, method, key)
@@ -1496,7 +1496,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		zend.ZvalPtrDtor(&intern.GetData())
 		zend.ZVAL_UNDEF(&intern.GetData())
 		php_pcre_split_impl(intern.GetPce(), subject, &intern.GetData(), -1, intern.GetPregFlags())
-		count = zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetData()))
+		count = zend.Z_ARRVAL(intern.GetData()).NumElements()
 		zend.RETVAL_BOOL(count > 1)
 		break
 	case REGIT_MODE_REPLACE:
@@ -1673,7 +1673,7 @@ func zim_spl_RecursiveRegexIterator_accept(execute_data *zend.ZendExecuteData, r
 		zend.RETVAL_FALSE
 		return
 	} else if intern.GetData().IsType(zend.IS_ARRAY) {
-		zend.RETVAL_BOOL(zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetData())) > 0)
+		zend.RETVAL_BOOL(zend.Z_ARRVAL(intern.GetData()).NumElements() > 0)
 		return
 	}
 	zend.ZendCallMethodWith0Params(zend.ZEND_THIS, spl_ce_RegexIterator, nil, "accept", return_value)
@@ -1934,7 +1934,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 }
 func SplCachingItRewind(intern *SplDualItObject) {
 	SplDualItRewind(intern)
-	zend.ZendHashClean(zend.Z_ARRVAL(intern.GetZcache()))
+	zend.Z_ARRVAL(intern.GetZcache()).Clean()
 	SplCachingItNext(intern)
 }
 func zim_spl_CachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2162,7 +2162,7 @@ func zim_spl_CachingIterator_setFlags(execute_data *zend.ZendExecuteData, return
 
 		/* clear on (re)enable */
 
-		zend.ZendHashClean(zend.Z_ARRVAL(intern.GetZcache()))
+		zend.Z_ARRVAL(intern.GetZcache()).Clean()
 
 		/* clear on (re)enable */
 
@@ -2184,7 +2184,7 @@ func zim_spl_CachingIterator_count(execute_data *zend.ZendExecuteData, return_va
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
 		return
 	}
-	zend.RETVAL_LONG(zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetZcache())))
+	zend.RETVAL_LONG(zend.Z_ARRVAL(intern.GetZcache()).NumElements())
 	return
 }
 func zim_spl_RecursiveCachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

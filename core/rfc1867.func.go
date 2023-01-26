@@ -85,11 +85,11 @@ func NormalizeProtectedVariable(varname *byte) {
 }
 func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
-	zend.ZendHashStrAddEmptyElement(&PG(rfc1867_protected_variables), varname, strlen(varname))
+	&PG(rfc1867_protected_variables).StrAddEmptyElement(varname, strlen(varname))
 }
 func IsProtectedVariable(varname *byte) zend.ZendBool {
 	NormalizeProtectedVariable(varname)
-	return zend.ZendHashStrExists(&PG(rfc1867_protected_variables), varname, strlen(varname))
+	return &PG(rfc1867_protected_variables).StrExists(varname, strlen(varname))
 }
 func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *zend.Zval, override_protection zend.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
@@ -129,7 +129,7 @@ func DestroyUploadedFilesHash() {
 		}
 		break
 	}
-	zend.ZendHashDestroy(SG(rfc1867_uploaded_files))
+	SG(rfc1867_uploaded_files).Destroy()
 	zend.FREE_HASHTABLE(SG(rfc1867_uploaded_files))
 }
 func FillBuffer(self *MultipartBuffer) int {
@@ -618,9 +618,9 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Initialize $_FILES[] */
 
-	zend.ZendHashInit(&PG(rfc1867_protected_variables), 8, nil, nil, 0)
+	&PG(rfc1867_protected_variables).Init(8, nil, nil, 0)
 	zend.ALLOC_HASHTABLE(uploaded_files)
-	zend.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
+	uploaded_files.Init(8, nil, FreeFilename, 0)
 	SG(rfc1867_uploaded_files) = uploaded_files
 	if PG(http_globals)[TRACK_VARS_FILES].u1.v.type_ != zend.IS_ARRAY {
 
@@ -926,7 +926,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				}
 				temp_filename = nil
 			} else {
-				zend.ZendHashAddPtr(SG(rfc1867_uploaded_files), temp_filename, temp_filename)
+				SG(rfc1867_uploaded_files).AddPtr(temp_filename, temp_filename)
 			}
 
 			/* is_arr_upload is true when name of file upload field
@@ -1128,7 +1128,7 @@ fileupload_done:
 	if array_index != nil {
 		zend.Efree(array_index)
 	}
-	zend.ZendHashDestroy(&PG(rfc1867_protected_variables))
+	&PG(rfc1867_protected_variables).Destroy()
 	zend.ZendLlistDestroy(&header)
 	if mbuff.GetBoundaryNext() != nil {
 		zend.Efree(mbuff.GetBoundaryNext())

@@ -45,7 +45,7 @@ func PhpInfoPrint(str *byte) int {
 func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 	var key *zend.ZendString
 	if ht != nil {
-		if zend.ZendHashNumElements(ht) {
+		if ht.NumElements() {
 			var first int = 1
 			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
@@ -126,7 +126,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var key *zend.ZendString
 	key = zend.ZendStringInit(name, name_length, 0)
 	zend.ZendIsAutoGlobal(key)
-	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.GetSymbolTable()), key)) != nil && zend.Z_TYPE_P(data) == zend.IS_ARRAY {
+	if b.Assign(&data, &(zend.ExecutorGlobals.GetSymbolTable()).FindDeref(key)) != nil && zend.Z_TYPE_P(data) == zend.IS_ARRAY {
 		for {
 			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
 			var _p *zend.Bucket = __ht.GetArData()
@@ -354,9 +354,9 @@ func PhpPrintInfo(flag int) {
 	if (flag & PHP_INFO_MODULES) != 0 {
 		var sorted_registry zend.HashTable
 		var module *zend.ZendModuleEntry
-		zend.ZendHashInit(&sorted_registry, zend.ZendHashNumElements(&zend.ModuleRegistry), nil, nil, 1)
-		zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-		zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
+		&sorted_registry.Init(&zend.ModuleRegistry.NumElements(), nil, nil, 1)
+		&sorted_registry.Copy(&zend.ModuleRegistry, nil)
+		&sorted_registry.Sort(ModuleNameCmp, 0)
 		for {
 			var __ht *zend.HashTable = &sorted_registry
 			var _p *zend.Bucket = __ht.GetArData()
@@ -395,7 +395,7 @@ func PhpPrintInfo(flag int) {
 			break
 		}
 		PhpInfoPrintTableEnd()
-		zend.ZendHashDestroy(&sorted_registry)
+		&sorted_registry.Destroy()
 	}
 	if (flag & PHP_INFO_ENVIRONMENT) != 0 {
 		SECTION("Environment")
@@ -421,16 +421,16 @@ func PhpPrintInfo(flag int) {
 		SECTION("PHP Variables")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(2, "Variable", "Value")
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, &(zend.ExecutorGlobals.GetSymbolTable()).StrFind("PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_SELF", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, &(zend.ExecutorGlobals.GetSymbolTable()).StrFind("PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, &(zend.ExecutorGlobals.GetSymbolTable()).StrFind("PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
+		if b.Assign(&data, &(zend.ExecutorGlobals.GetSymbolTable()).StrFind("PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", zend.Z_STRVAL_P(data))
 		}
 		PhpPrintGpcseArray(zend.ZEND_STRL("_REQUEST"))

@@ -308,11 +308,11 @@ func SplHeapObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clone_
 		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplHeap")
 	}
 	if inherited != 0 {
-		intern.SetFptrCmp(zend.ZendHashStrFindPtr(&class_type.GetFunctionTable(), "compare", b.SizeOf("\"compare\"")-1))
+		intern.SetFptrCmp(&class_type.GetFunctionTable().StrFindPtr("compare", b.SizeOf("\"compare\"")-1))
 		if intern.GetFptrCmp().GetScope() == parent {
 			intern.SetFptrCmp(nil)
 		}
-		intern.SetFptrCount(zend.ZendHashStrFindPtr(&class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(&class_type.GetFunctionTable().StrFindPtr("count", b.SizeOf("\"count\"")-1))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -356,15 +356,15 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(&intern.GetStd())
 	}
-	debug_info = zend.ZendNewArray(zend.ZendHashNumElements(intern.GetStd().GetProperties()) + 1)
-	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
+	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().NumElements() + 1)
+	debug_info.Copy(intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(ce, "flags", b.SizeOf("\"flags\"")-1)
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
-	zend.ZendHashUpdate(debug_info, pnstr, &tmp)
+	debug_info.Update(pnstr, &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	pnstr = SplGenPrivatePropName(ce, "isCorrupted", b.SizeOf("\"isCorrupted\"")-1)
 	zend.ZVAL_BOOL(&tmp, intern.GetHeap().GetFlags()&SPL_HEAP_CORRUPTED)
-	zend.ZendHashUpdate(debug_info, pnstr, &tmp)
+	debug_info.Update(pnstr, &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&heap_array)
 	for i = 0; i < intern.GetHeap().GetCount(); i++ {
@@ -380,7 +380,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 		}
 	}
 	pnstr = SplGenPrivatePropName(ce, "heap", b.SizeOf("\"heap\"")-1)
-	zend.ZendHashUpdate(debug_info, pnstr, &heap_array)
+	debug_info.Update(pnstr, &heap_array)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }

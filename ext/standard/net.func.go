@@ -84,22 +84,22 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *zend.Zval = zend.ZendHashStrFind(zend.Z_ARR_P(return_value), p.ifa_name, strlen(p.ifa_name))
+		var iface *zend.Zval = zend.Z_ARR_P(return_value).StrFind(p.ifa_name, strlen(p.ifa_name))
 		var unicast *zend.Zval
 		var status *zend.Zval
 		if iface == nil {
 			var newif zend.Zval
 			zend.ArrayInit(&newif)
-			iface = zend.ZendHashStrAdd(zend.Z_ARR_P(return_value), p.ifa_name, strlen(p.ifa_name), &newif)
+			iface = zend.Z_ARR_P(return_value).StrAdd(p.ifa_name, strlen(p.ifa_name), &newif)
 		}
-		unicast = zend.ZendHashStrFind(zend.Z_ARR_P(iface), "unicast", b.SizeOf("\"unicast\"")-1)
+		unicast = zend.Z_ARR_P(iface).StrFind("unicast", b.SizeOf("\"unicast\"")-1)
 		if unicast == nil {
 			var newuni zend.Zval
 			zend.ArrayInit(&newuni)
-			unicast = zend.ZendHashStrAdd(zend.Z_ARR_P(iface), "unicast", b.SizeOf("\"unicast\"")-1, &newuni)
+			unicast = zend.Z_ARR_P(iface).StrAdd("unicast", b.SizeOf("\"unicast\"")-1, &newuni)
 		}
 		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
-		status = zend.ZendHashStrFind(zend.Z_ARR_P(iface), "up", b.SizeOf("\"up\"")-1)
+		status = zend.Z_ARR_P(iface).StrFind("up", b.SizeOf("\"up\"")-1)
 		if status == nil {
 			zend.AddAssocBool(iface, "up", (p.ifa_flags&IFF_UP) != 0)
 		}

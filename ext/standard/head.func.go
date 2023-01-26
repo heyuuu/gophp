@@ -322,7 +322,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 
 	/* Array is not empty but no valid keys were found */
 
-	if found == 0 && zend.ZendHashNumElements(zend.Z_ARRVAL_P(options)) > 0 {
+	if found == 0 && zend.Z_ARRVAL_P(options).NumElements() > 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No valid options were found in the given array")
 	}
 

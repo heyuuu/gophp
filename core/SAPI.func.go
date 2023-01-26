@@ -12,11 +12,11 @@ func SapiAddHeader(a *byte, b int, c zend.ZendBool) int { return SapiAddHeaderEx
 func _typeDtor(zv *zend.Zval)                           { zend.Free(zend.Z_PTR_P(zv)) }
 func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
 	memset(sapi_globals, 0, b.SizeOf("* sapi_globals"))
-	zend.ZendHashInitEx(&sapi_globals.GetKnownPostContentTypes(), 8, nil, _typeDtor, 1, 0)
+	&sapi_globals.GetKnownPostContentTypes().InitEx(8, nil, _typeDtor, 1, 0)
 	PhpSetupSapiContentTypes()
 }
 func SapiGlobalsDtor(sapi_globals *sapi_globals_struct) {
-	zend.ZendHashDestroy(&sapi_globals.GetKnownPostContentTypes())
+	&sapi_globals.GetKnownPostContentTypes().Destroy()
 }
 func SapiStartup(sf *sapi_module_struct) {
 	sf.SetIniEntries(nil)
@@ -102,7 +102,7 @@ func SapiReadPostData() {
 
 	/* now try to find an appropriate POST content handler */
 
-	if b.Assign(&post_entry, zend.ZendHashStrFindPtr(&SG(known_post_content_types), content_type, content_type_length)) != nil {
+	if b.Assign(&post_entry, &SG(known_post_content_types).StrFindPtr(content_type, content_type_length)) != nil {
 
 		/* found one, register it for use */
 
@@ -787,7 +787,7 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	}
 	key = zend.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
-	if zend.ZendHashAddMem(&SG(known_post_content_types), key, any(post_entry), b.SizeOf("sapi_post_entry")) {
+	if &SG(known_post_content_types).AddMem(key, any(post_entry), b.SizeOf("sapi_post_entry")) {
 		ret = zend.SUCCESS
 	} else {
 		ret = zend.FAILURE
@@ -799,7 +799,7 @@ func SapiUnregisterPostEntry(post_entry *SapiPostEntry) {
 	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		return
 	}
-	zend.ZendHashStrDel(&SG(known_post_content_types), post_entry.GetContentType(), post_entry.GetContentTypeLen())
+	&SG(known_post_content_types).StrDel(post_entry.GetContentType(), post_entry.GetContentTypeLen())
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
 	if SG(sapi_started) && zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
