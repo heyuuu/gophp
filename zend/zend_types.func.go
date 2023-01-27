@@ -91,8 +91,6 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
 func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGcRefcount() }
 func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return p.SetGcRefcount(rc) }
-func GC_ADDREF_EX(p ZendRefcounted, rc uint32) uint32    { return p.IncGcRefcountEx(rc) }
-func GC_ADD_FLAGS(p ZendRefcounted, flags uint32)        { p.AddGcFlags(flags) }
 func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
 func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags() & GC_PROTECTED }
