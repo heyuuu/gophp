@@ -16,3 +16,16 @@ func ForceCastPtr[T any, N integer](ptr N) *T {
 func ForceUintPtr[T any](ptr *T) uintptr {
 	return uintptr(unsafe.Pointer(ptr))
 }
+
+func HashStr(str string) uint {
+	return HashBytes([]byte(str))
+}
+
+func HashBytes(bytes []byte) uint {
+	var hash uint = 5381
+	for _, c := range bytes {
+		hash = hash<<5 + hash + uint(c)
+	}
+	/* Hash value can't be zero, so we always set the high bit */
+	return hash | -0x8000000000000000
+}

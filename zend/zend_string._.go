@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 // Source: <Zend/zend_string.h>
@@ -33,10 +31,6 @@ var ZendOneCharString []*ZendString
 /* Shortcuts */
 
 /* Compatibility macros */
-
-const _STR_HEADER_SIZE = _ZSTR_HEADER_SIZE
-
-/*---*/
 
 const _ZSTR_HEADER_SIZE = zend_long((*byte)(&((*ZendString)(nil).GetVal())) - (*byte)(nil))
 const ZSTR_MAX_OVERHEAD = ZEND_MM_ALIGNED_SIZE(_ZSTR_HEADER_SIZE + 1)

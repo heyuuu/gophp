@@ -21,3 +21,7 @@ func (this StrArg) Str() string {
 
 	return string(bytes)
 }
+
+func (this StrArg) Hash() uint {
+	return HashStr(this.Str())
+}
