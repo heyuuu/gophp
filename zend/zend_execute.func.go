@@ -29,7 +29,7 @@ func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, r
 			Z_ADDREF_P(variable_ptr)
 		}
 	} else if ZEND_CONST_COND(value_type == IS_VAR, 1) && ref != nil {
-		if GC_DELREF(ref) == 0 {
+		if ref.DecGcRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else if Z_OPT_REFCOUNTED_P(variable_ptr) {
 			Z_ADDREF_P(variable_ptr)
@@ -60,7 +60,7 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 			}
 			garbage = variable_ptr.GetCounted()
 			ZendCopyToVariable(variable_ptr, value, value_type, ref)
-			if GC_DELREF(garbage) == 0 {
+			if garbage.DecGcRefcount() == 0 {
 				RcDtorFunc(garbage)
 			} else {
 
@@ -119,7 +119,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 		for {
 			if Z_REFCOUNTED_P(p) {
 				var r *ZendRefcounted = p.GetCounted()
-				if GC_DELREF(r) == 0 {
+				if r.DecGcRefcount() == 0 {
 					ZVAL_NULL(p)
 					RcDtorFunc(r)
 				} else {
@@ -143,7 +143,7 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 		for {
 			if Z_REFCOUNTED_P(p) {
 				var r *ZendRefcounted = p.GetCounted()
-				if GC_DELREF(r) == 0 {
+				if r.DecGcRefcount() == 0 {
 					ZVAL_NULL(p)
 					RcDtorFunc(r)
 				}
@@ -262,7 +262,7 @@ func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *Zval, result *Zval) {
 	var __container_to_free *Zval = free_op
 	if __container_to_free != nil && Z_REFCOUNTED_P(__container_to_free) {
 		var __ref *ZendRefcounted = __container_to_free.GetCounted()
-		if GC_DELREF(__ref) == 0 {
+		if __ref.DecGcRefcount() == 0 {
 			var __zv *Zval = result
 			if __zv.IsType(IS_INDIRECT) {
 				ZVAL_COPY(__zv, __zv.GetZv())
@@ -587,10 +587,10 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 		return
 	}
 	ref = value_ptr.GetRef()
-	GC_ADDREF(ref)
+	ref.IncGcRefcount()
 	if Z_REFCOUNTED_P(variable_ptr) {
 		var garbage *ZendRefcounted = variable_ptr.GetCounted()
-		if GC_DELREF(garbage) == 0 {
+		if garbage.DecGcRefcount() == 0 {
 			ZVAL_REF(variable_ptr, ref)
 			RcDtorFunc(garbage)
 			return
@@ -691,7 +691,7 @@ func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA
 	Z_ADDREF_P(object)
 	obj = object.GetObj()
 	ZendError(E_WARNING, "Creating default object from empty value")
-	if GC_REFCOUNT(obj) == 1 {
+	if obj.GetGcRefcount() == 1 {
 
 		/* the enclosing container was deleted, obj is unreferenced */
 
@@ -1789,11 +1789,11 @@ func ZendUndefinedOffsetWrite(ht *HashTable, lval ZendLong) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
-	if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(ht)
+	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		ht.IncGcRefcount()
 	}
 	ZendUndefinedOffset(lval)
-	if (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DecGcRefcount() == 0 {
 		ZendArrayDestroy(ht)
 		return FAILURE
 	}
@@ -1806,11 +1806,11 @@ func ZendUndefinedIndexWrite(ht *HashTable, offset *ZendString) int {
 	/* The array may be destroyed while throwing the notice.
 	 * Temporarily increase the refcount to detect this situation. */
 
-	if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(ht)
+	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		ht.IncGcRefcount()
 	}
 	ZendUndefinedIndex(offset)
-	if (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DecGcRefcount() == 0 {
 		ZendArrayDestroy(ht)
 		return FAILURE
 	}
@@ -1866,11 +1866,11 @@ func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA
 		/* The array may be destroyed while throwing the notice.
 		 * Temporarily increase the refcount to detect this situation. */
 
-		if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-			GC_ADDREF(ht)
+		if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+			ht.IncGcRefcount()
 		}
 		ZVAL_UNDEFINED_OP2()
-		if (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+		if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DecGcRefcount() == 0 {
 			ZendArrayDestroy(ht)
 			return IS_NULL
 		}
@@ -1975,7 +1975,7 @@ try_again:
 
 				/* Key may be released while throwing the undefined index warning. */
 
-				ZendStringAddref(offset_key)
+				offset_key.IncGcRefcount()
 				if ZendUndefinedIndexWrite(ht, offset_key) == FAILURE {
 					ZendStringRelease(offset_key)
 					return nil
@@ -2619,9 +2619,9 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 				return
 			}
 		} else if zobj.GetProperties() != nil {
-			if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-				if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(zobj.GetProperties())
+			if zobj.GetProperties().GetGcRefcount() > 1 {
+				if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					zobj.GetProperties().DecGcRefcount()
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
@@ -2942,7 +2942,7 @@ func IZvalPtrDtorNoref(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
 		ZEND_ASSERT(zval_ptr.GetType() != IS_REFERENCE)
-		if GC_DELREF(ref) == 0 {
+		if ref.DecGcRefcount() == 0 {
 			RcDtorFunc(ref)
 		} else if GC_MAY_LEAK(ref) {
 			GcPossibleRoot(ref)
@@ -2963,7 +2963,7 @@ func ZendAssignToTypedRef(variable_ptr *Zval, orig_value *Zval, value_type ZendU
 	}
 	if (value_type & (IS_VAR | IS_TMP_VAR)) != 0 {
 		if ref != nil {
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				ZvalPtrDtor(orig_value)
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			}
@@ -3115,7 +3115,7 @@ func IFreeCompiledVariables(execute_data *ZendExecuteData) {
 	for count != 0 {
 		if Z_REFCOUNTED_P(cv) {
 			var r *ZendRefcounted = cv.GetCounted()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				ZVAL_NULL(cv)
 				RcDtorFunc(r)
 			} else {
@@ -3670,7 +3670,7 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 
 			/* Delay closure destruction until its invocation */
 
-			GC_ADDREF(ZEND_CLOSURE_OBJECT(fbc))
+			ZEND_CLOSURE_OBJECT(fbc).IncGcRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if fbc.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -3681,7 +3681,7 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 			}
 		} else if object != nil {
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
-			GC_ADDREF(object)
+			object.IncGcRefcount()
 			object_or_called_scope = object
 		}
 	} else {
@@ -3752,7 +3752,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				object_or_called_scope = object.GetCe()
 			} else {
 				call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
-				GC_ADDREF(object)
+				object.IncGcRefcount()
 				object_or_called_scope = object
 			}
 		}

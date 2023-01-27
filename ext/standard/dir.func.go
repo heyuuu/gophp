@@ -15,7 +15,7 @@ func PhpSetDefaultDir(res *zend.ZendResource) {
 		zend.ZendListDelete(DIRG(default_dir))
 	}
 	if res != nil {
-		zend.GC_ADDREF(res)
+		res.IncGcRefcount()
 	}
 	DIRG(default_dir) = res
 }

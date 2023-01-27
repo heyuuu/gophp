@@ -15,9 +15,9 @@ func OverriddenPtrDtor(zv *Zval) {
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
-	ZendStringAddref(new_property_info.GetName())
+	new_property_info.GetName().IncGcRefcount()
 	if new_property_info.GetType().IsName() {
-		ZendStringAddref(new_property_info.GetType().Name())
+		new_property_info.GetType().Name().IncGcRefcount()
 	}
 	return new_property_info
 }
@@ -32,7 +32,7 @@ func ZendDuplicateInternalFunction(func_ *ZendFunction, ce *ZendClassEntry) *Zen
 		new_function.SetIsArenaAllocated(true)
 	}
 	if new_function.GetFunctionName() != nil {
-		ZendStringAddref(new_function.GetFunctionName())
+		new_function.GetFunctionName().IncGcRefcount()
 	}
 	return new_function
 }
@@ -49,8 +49,8 @@ func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 		/* See: Zend/tests/method_static_var.phpt */
 
 	}
-	if (GC_FLAGS(new_function.GetOpArray().GetStaticVariables()) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(new_function.GetOpArray().GetStaticVariables())
+	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		new_function.GetOpArray().GetStaticVariables().IncGcRefcount()
 	}
 	if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		ZEND_ASSERT(new_function.GetOpArray().IsPreloaded())
@@ -2078,7 +2078,7 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 					doc_comment = nil
 				}
 				if property_info.GetType().IsName() {
-					ZendStringAddref(property_info.GetType().Name())
+					property_info.GetType().Name().IncGcRefcount()
 				}
 				ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
 				ZendStringReleaseEx(prop_name, 0)

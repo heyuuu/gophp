@@ -33,7 +33,7 @@ func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
 	if wr == nil {
 		return 0
 	}
-	GC_ADDREF(wr.GetStd())
+	wr.GetStd().IncGcRefcount()
 	ZVAL_OBJ(return_value, wr.GetStd())
 	return 1
 }

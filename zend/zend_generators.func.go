@@ -561,7 +561,7 @@ func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
 	if was_leaf != 0 {
 		var next *ZendGenerator = generator.GetNode().GetParent()
 		leaf.GetNode().SetRoot(generator.GetNode().GetRoot())
-		GC_ADDREF(generator.GetStd())
+		generator.GetStd().IncGcRefcount()
 		generator.GetNode().SetPtrLeaf(leaf)
 		for next != nil {
 			if next.GetNode().GetChildren() > 1 {
@@ -610,7 +610,7 @@ func ZendGeneratorYieldFrom(generator *ZendGenerator, from *ZendGenerator) {
 	ZendGeneratorAddChild(from, generator)
 	generator.GetNode().SetParent(from)
 	ZendGeneratorGetCurrent(generator)
-	GC_DELREF(from.GetStd())
+	from.GetStd().DecGcRefcount()
 	generator.SetIsDoInit(true)
 }
 func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *ZendGenerator {
@@ -670,7 +670,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 		} else {
 			for {
 				root = root.GetNode().GetParent()
-				GC_ADDREF(root.GetStd())
+				root.GetStd().IncGcRefcount()
 				if root.GetNode().GetParent() == nil {
 					break
 				}

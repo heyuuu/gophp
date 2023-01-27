@@ -117,7 +117,7 @@ func ProcOpenRsrcDtor(rsrc *zend.ZendResource) {
 
 	for i = 0; i < proc.GetNpipes(); i++ {
 		if proc.GetPipes()[i] != 0 {
-			zend.GC_DELREF(proc.GetPipes()[i])
+			proc.GetPipes()[i].DecGcRefcount()
 			zend.ZendListClose(proc.GetPipes()[i])
 			proc.GetPipes()[i] = 0
 		}

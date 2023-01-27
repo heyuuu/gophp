@@ -20,14 +20,14 @@ func ZendListInsert(ptr any, type_ int) *Zval {
 	return ExecutorGlobals.GetRegularList().IndexAddNew(index, &zv)
 }
 func ZendListDelete(res *ZendResource) int {
-	if GC_DELREF(res) <= 0 {
+	if res.DecGcRefcount() <= 0 {
 		return ExecutorGlobals.GetRegularList().IndexDel(res.GetHandle())
 	} else {
 		return SUCCESS
 	}
 }
 func ZendListFree(res *ZendResource) int {
-	if GC_REFCOUNT(res) <= 0 {
+	if res.GetGcRefcount() <= 0 {
 		return ExecutorGlobals.GetRegularList().IndexDel(res.GetHandle())
 	} else {
 		return SUCCESS
@@ -48,7 +48,7 @@ func ZendResourceDtor(res *ZendResource) {
 	}
 }
 func ZendListClose(res *ZendResource) int {
-	if GC_REFCOUNT(res) <= 0 {
+	if res.GetGcRefcount() <= 0 {
 		return ZendListFree(res)
 	} else if res.GetType() >= 0 {
 		ZendResourceDtor(res)

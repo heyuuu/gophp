@@ -2571,7 +2571,7 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				var ref *ZendRefcounted = retval_ptr.GetCounted()
 				retval_ptr = Z_REFVAL_P(retval_ptr)
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if Z_OPT_REFCOUNTED_P(retval_ptr) {
 					Z_ADDREF_P(retval_ptr)
@@ -2652,7 +2652,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int
 			var ref *ZendRefcounted = retval.GetCounted()
 			retval = Z_REFVAL_P(retval)
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(retval) {
 				Z_ADDREF_P(retval)
@@ -2956,7 +2956,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_OBJ(result, ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsType(IS_ARRAY) {
 				ht = ZendSymtableToProptable(expr.GetArr())
-				if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) != 0 {
+				if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -3051,9 +3051,9 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_CONST != IS_CONST && array_ptr.IsType(IS_OBJECT) {
 		if Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *HashTable
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -3137,9 +3137,9 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
 				ZVAL_COPY_VALUE(array_ptr, array_ref)
 			}
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -3203,7 +3203,7 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if IS_CONST == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -3237,7 +3237,7 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if (IS_CONST&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -4285,7 +4285,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -4332,7 +4332,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 			if op1_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -4344,7 +4344,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 			if op2_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -4478,9 +4478,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDat
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CONST & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CONST == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -4643,7 +4643,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData)
 
 			/* Delay closure destruction until its invocation */
 
-			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
+			ZEND_CLOSURE_OBJECT(func_).IncGcRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -4653,7 +4653,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData)
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			GC_ADDREF(fcc.GetObject())
+			fcc.GetObject().IncGcRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
@@ -4772,7 +4772,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -5985,7 +5985,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -6315,7 +6315,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -6365,7 +6365,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 			if op1_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -6377,7 +6377,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 			if op2_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -6516,9 +6516,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteDa
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CONST & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CONST == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -6688,7 +6688,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData
 
 			/* Delay closure destruction until its invocation */
 
-			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
+			ZEND_CLOSURE_OBJECT(func_).IncGcRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -6698,7 +6698,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			GC_ADDREF(fcc.GetObject())
+			fcc.GetObject().IncGcRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
@@ -6753,7 +6753,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -7616,7 +7616,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -8175,7 +8175,7 @@ func ZEND_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -8491,7 +8491,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -8541,7 +8541,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if op1_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -8553,7 +8553,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if op2_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -8687,9 +8687,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CONST & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CONST == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -8852,7 +8852,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) in
 
 			/* Delay closure destruction until its invocation */
 
-			GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
+			ZEND_CLOSURE_OBJECT(func_).IncGcRefcount()
 			call_info |= ZEND_CALL_CLOSURE
 			if func_.IsFakeClosure() {
 				call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -8862,7 +8862,7 @@ func ZEND_INIT_USER_CALL_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) in
 				call_info |= ZEND_CALL_HAS_THIS
 			}
 		} else if fcc.GetObject() != nil {
-			GC_ADDREF(fcc.GetObject())
+			fcc.GetObject().IncGcRefcount()
 			object_or_called_scope = fcc.GetObject()
 			call_info |= ZEND_CALL_RELEASE_THIS | ZEND_CALL_HAS_THIS
 		}
@@ -8915,7 +8915,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -11639,7 +11639,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -12313,7 +12313,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -12363,7 +12363,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 			if op1_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -12375,7 +12375,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 			if op2_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -12515,9 +12515,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteDa
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if ((IS_TMP_VAR | IS_VAR) & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if (IS_TMP_VAR | IS_VAR) == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 			ZvalPtrDtorNogc(free_op1)
 		}
 
@@ -12914,7 +12914,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -13611,7 +13611,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -13658,7 +13658,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 			if op1_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -13670,7 +13670,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 			if op2_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -13815,9 +13815,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if ((IS_TMP_VAR | IS_VAR) & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if (IS_TMP_VAR | IS_VAR) == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 			ZvalPtrDtorNogc(free_op1)
 		}
 
@@ -14437,7 +14437,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -14735,7 +14735,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -14782,7 +14782,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 			if op1_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -14794,7 +14794,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 			if op2_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -14934,9 +14934,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if ((IS_TMP_VAR | IS_VAR) & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if (IS_TMP_VAR | IS_VAR) == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 			ZvalPtrDtorNogc(free_op1)
 		}
 
@@ -15194,7 +15194,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				var ref *ZendRefcounted = retval_ptr.GetCounted()
 				retval_ptr = Z_REFVAL_P(retval_ptr)
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if Z_OPT_REFCOUNTED_P(retval_ptr) {
 					Z_ADDREF_P(retval_ptr)
@@ -15277,7 +15277,7 @@ func ZEND_GENERATOR_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = retval.GetCounted()
 			retval = Z_REFVAL_P(retval)
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(retval) {
 				Z_ADDREF_P(retval)
@@ -15459,7 +15459,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_OBJ(result, ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsType(IS_ARRAY) {
 				ht = ZendSymtableToProptable(expr.GetArr())
-				if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) != 0 {
+				if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -15505,9 +15505,9 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_TMP_VAR != IS_CONST && array_ptr.IsType(IS_OBJECT) {
 		if Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *HashTable
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -15594,9 +15594,9 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
 				ZVAL_COPY_VALUE(array_ptr, array_ref)
 			}
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -15673,7 +15673,7 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if IS_TMP_VAR == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -15709,7 +15709,7 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if (IS_TMP_VAR&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -16010,7 +16010,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -16438,7 +16438,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -16917,7 +16917,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -17306,7 +17306,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -17836,7 +17836,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				var ref *ZendRefcounted = retval_ptr.GetCounted()
 				retval_ptr = Z_REFVAL_P(retval_ptr)
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if Z_OPT_REFCOUNTED_P(retval_ptr) {
 					Z_ADDREF_P(retval_ptr)
@@ -17926,7 +17926,7 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = retval.GetCounted()
 			retval = Z_REFVAL_P(retval)
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(retval) {
 				Z_ADDREF_P(retval)
@@ -18000,7 +18000,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -18115,7 +18115,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -18150,7 +18150,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_QUICK_HANDLER(execute_data *ZendExecuteData) int 
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -18175,7 +18175,7 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		var ref *ZendRefcounted = varptr.GetCounted()
 		varptr = Z_REFVAL_P(varptr)
 		ZVAL_COPY_VALUE(arg, varptr)
-		if GC_DELREF(ref) == 0 {
+		if ref.DecGcRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else if Z_OPT_REFCOUNTED_P(arg) {
 			Z_ADDREF_P(arg)
@@ -18276,7 +18276,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_OBJ(result, ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsType(IS_ARRAY) {
 				ht = ZendSymtableToProptable(expr.GetArr())
-				if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) != 0 {
+				if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -18323,9 +18323,9 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_VAR != IS_CONST && array_ptr.IsType(IS_OBJECT) {
 		if Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *HashTable
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -18416,9 +18416,9 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
 				ZVAL_COPY_VALUE(array_ptr, array_ref)
 			}
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -18620,7 +18620,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		var gc *ZendRefcounted = value.GetCounted()
 		ZVAL_COPY_VALUE_EX(res, value, gc, value_type)
 		if Z_TYPE_INFO_REFCOUNTED(value_type) {
-			GC_ADDREF(gc)
+			gc.IncGcRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -18801,7 +18801,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		if variable_ptr != value {
 			var ref *ZendReference
 			ref = value.GetRef()
-			GC_ADDREF(ref)
+			ref.IncGcRefcount()
 			IZvalPtrDtor(variable_ptr)
 			ZVAL_REF(variable_ptr, ref)
 		}
@@ -18843,7 +18843,7 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if IS_VAR == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -18879,7 +18879,7 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if (IS_VAR&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -19582,9 +19582,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -19605,7 +19605,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -19696,9 +19696,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -19719,7 +19719,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -19811,9 +19811,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -19834,7 +19834,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -19925,9 +19925,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -19948,7 +19948,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -20747,7 +20747,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -21682,9 +21682,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -21705,7 +21705,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -21798,9 +21798,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -21821,7 +21821,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -21915,9 +21915,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -21938,7 +21938,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -22031,9 +22031,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -22054,7 +22054,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -22765,7 +22765,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -24244,7 +24244,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -24517,7 +24517,7 @@ func ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		if !(Z_ISREF_P(op1)) {
 			ZVAL_MAKE_REF_EX(op1, 2)
 		} else {
-			GC_ADDREF(op1.GetRef())
+			op1.GetRef().IncGcRefcount()
 		}
 		ZVAL_REF(EX_VAR(opline.GetResult().GetVar()), op1.GetRef())
 	} else {
@@ -25042,9 +25042,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -25065,7 +25065,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -25156,9 +25156,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -25179,7 +25179,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -25271,9 +25271,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -25294,7 +25294,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -25385,9 +25385,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -25408,7 +25408,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -26168,7 +26168,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -27212,9 +27212,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -27235,7 +27235,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -27322,9 +27322,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -27345,7 +27345,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -27433,9 +27433,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -27456,7 +27456,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -27543,9 +27543,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -27566,7 +27566,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -27843,9 +27843,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteDa
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_UNUSED & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_UNUSED == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -28791,9 +28791,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -28814,7 +28814,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -28903,9 +28903,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -28926,7 +28926,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -29016,9 +29016,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -29039,7 +29039,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -29128,9 +29128,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -29151,7 +29151,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -29441,9 +29441,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_UNUSED & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_UNUSED == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -31016,9 +31016,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -31039,7 +31039,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -31126,9 +31126,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -31149,7 +31149,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -31237,9 +31237,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -31260,7 +31260,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -31347,9 +31347,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -31370,7 +31370,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -31647,9 +31647,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_UNUSED & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_UNUSED == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -32433,7 +32433,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 				var ref *ZendRefcounted = retval_ptr.GetCounted()
 				retval_ptr = Z_REFVAL_P(retval_ptr)
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if Z_OPT_REFCOUNTED_P(retval_ptr) {
 					Z_ADDREF_P(retval_ptr)
@@ -32514,7 +32514,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = retval.GetCounted()
 			retval = Z_REFVAL_P(retval)
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(retval) {
 				Z_ADDREF_P(retval)
@@ -32584,7 +32584,7 @@ func ZEND_SEND_VAR_SPEC_CV_INLINE_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -32641,7 +32641,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -32675,7 +32675,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_QUICK_HANDLER(execute_data *ZendExecuteData) int {
 			var ref *ZendRefcounted = varptr.GetCounted()
 			varptr = Z_REFVAL_P(varptr)
 			ZVAL_COPY_VALUE(arg, varptr)
-			if GC_DELREF(ref) == 0 {
+			if ref.DecGcRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(arg) {
 				Z_ADDREF_P(arg)
@@ -32847,7 +32847,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_OBJ(result, ZendObjectsNew(ZendStandardClassDef))
 			if expr.IsType(IS_ARRAY) {
 				ht = ZendSymtableToProptable(expr.GetArr())
-				if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) != 0 {
+				if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
 					/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -32942,9 +32942,9 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_CV != IS_CONST && array_ptr.IsType(IS_OBJECT) {
 		if Z_OBJCE_P(array_ptr).GetGetIterator() == nil {
 			var properties *HashTable
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -33028,9 +33028,9 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
 				ZVAL_COPY_VALUE(array_ptr, array_ref)
 			}
-			if Z_OBJ_P(array_ptr).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(array_ptr).GetProperties()) > 1 {
-				if (GC_FLAGS(Z_OBJ_P(array_ptr).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(Z_OBJ_P(array_ptr).GetProperties())
+			if Z_OBJ_P(array_ptr).GetProperties() != nil && Z_OBJ_P(array_ptr).GetProperties().GetGcRefcount() > 1 {
+				if (Z_OBJ_P(array_ptr).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					Z_OBJ_P(array_ptr).GetProperties().DecGcRefcount()
 				}
 				Z_OBJ_P(array_ptr).SetProperties(ZendArrayDup(Z_OBJ_P(array_ptr).GetProperties()))
 			}
@@ -33094,7 +33094,7 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if IS_CV == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -33128,7 +33128,7 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			}
 		} else if (IS_CV&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
-			if GC_DELREF(r) == 0 {
+			if r.DecGcRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_REFCOUNTED_P(result) {
 				Z_ADDREF_P(result)
@@ -33507,7 +33507,7 @@ func ZEND_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -34626,9 +34626,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -34649,7 +34649,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -34736,9 +34736,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -34759,7 +34759,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -34847,9 +34847,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -34870,7 +34870,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -34957,9 +34957,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -34980,7 +34980,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -35560,7 +35560,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -35610,7 +35610,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if op1_str.GetLen() == 0 {
 				if IS_CONST == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -35622,7 +35622,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if op2_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -35756,9 +35756,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) 
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CV & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CV == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -35797,7 +35797,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -36368,12 +36368,12 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ref = value.GetRef()
 		} else {
 			ref = value.GetRef()
-			GC_ADDREF(ref)
+			ref.IncGcRefcount()
 		}
 		variable_ptr = EX_VAR(opline.GetOp1().GetVar())
 		if Z_REFCOUNTED_P(variable_ptr) {
 			var ref *ZendRefcounted = variable_ptr.GetCounted()
-			var refcnt uint32 = GC_DELREF(ref)
+			var refcnt uint32 = ref.DecGcRefcount()
 			if variable_ptr != value {
 				if refcnt == 0 {
 					RcDtorFunc(ref)
@@ -36582,7 +36582,7 @@ func ZEND_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -37713,9 +37713,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -37736,7 +37736,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -37825,9 +37825,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -37848,7 +37848,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -37938,9 +37938,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -37961,7 +37961,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -38050,9 +38050,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -38073,7 +38073,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -38635,7 +38635,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -38682,7 +38682,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 			if op1_str.GetLen() == 0 {
 				if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -38694,7 +38694,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 			if op2_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -38833,9 +38833,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CV & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CV == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -38874,7 +38874,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -40376,7 +40376,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
@@ -40465,7 +40465,7 @@ func ZEND_UNSET_CV_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	if Z_REFCOUNTED_P(var_) {
 		var garbage *ZendRefcounted = var_.GetCounted()
 		ZVAL_UNDEF(var_)
-		if GC_DELREF(garbage) == 0 {
+		if garbage.DecGcRefcount() == 0 {
 			RcDtorFunc(garbage)
 		} else {
 			GcCheckPossibleRoot(garbage)
@@ -40778,9 +40778,9 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int 
 		ZEND_ASSERT((EX(func_).op_array.fn_flags & (ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED)) != 0)
 		ht = ZendArrayDup(EX(func_).op_array.static_variables)
 		ZEND_MAP_PTR_SET(EX(func_).op_array.static_variables_ptr, ht)
-	} else if GC_REFCOUNT(ht) > 1 {
-		if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-			GC_DELREF(ht)
+	} else if ht.GetGcRefcount() > 1 {
+		if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+			ht.DecGcRefcount()
 		}
 		ht = ZendArrayDup(ht)
 		ZEND_MAP_PTR_SET(EX(func_).op_array.static_variables_ptr, ht)
@@ -40796,7 +40796,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int 
 		if !(Z_ISREF_P(value)) {
 			var ref *ZendReference = (*ZendReference)(Emalloc(b.SizeOf("zend_reference")))
 			GC_SET_REFCOUNT(ref, 2)
-			GC_TYPE_INFO(ref) = IS_REFERENCE
+			ref.GetGcTypeInfo() = IS_REFERENCE
 			ZVAL_COPY_VALUE(ref.GetVal(), value)
 			ref.GetSources().SetPtr(nil)
 			value.SetRef(ref)
@@ -40842,7 +40842,7 @@ func ZEND_MAKE_REF_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		if !(Z_ISREF_P(op1)) {
 			ZVAL_MAKE_REF_EX(op1, 2)
 		} else {
-			GC_ADDREF(op1.GetRef())
+			op1.GetRef().IncGcRefcount()
 		}
 		ZVAL_REF(EX_VAR(opline.GetResult().GetVar()), op1.GetRef())
 	} else {
@@ -40997,7 +40997,7 @@ func ZEND_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -42113,9 +42113,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -42136,7 +42136,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CONST == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -42223,9 +42223,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -42246,7 +42246,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_TMP_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -42334,9 +42334,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -42357,7 +42357,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_VAR == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -42444,9 +42444,9 @@ assign_object:
 			}
 		} else {
 			if zobj.GetProperties() != nil {
-				if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-					if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-						GC_DELREF(zobj.GetProperties())
+				if zobj.GetProperties().GetGcRefcount() > 1 {
+					if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+						zobj.GetProperties().DecGcRefcount()
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
@@ -42467,7 +42467,7 @@ assign_object:
 					if Z_ISREF_P(value) {
 						if IS_CV == IS_VAR {
 							var ref *ZendReference = value.GetRef()
-							if GC_DELREF(ref) == 0 {
+							if ref.DecGcRefcount() == 0 {
 								ZVAL_COPY_VALUE(&tmp, Z_REFVAL_P(value))
 								EfreeSize(ref, b.SizeOf("zend_reference"))
 								value = &tmp
@@ -43070,7 +43070,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && op1_str.GetGcRefcount() == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -43117,7 +43117,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if op1_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op2) {
-						GC_ADDREF(op2_str)
+						op2_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op2_str)
@@ -43129,7 +43129,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if op2_str.GetLen() == 0 {
 				if IS_CV == IS_CONST {
 					if Z_REFCOUNTED_P(op1) {
-						GC_ADDREF(op1_str)
+						op1_str.IncGcRefcount()
 					}
 				}
 				ZVAL_STR(EX_VAR(opline.GetResult().GetVar()), op1_str)
@@ -43263,9 +43263,9 @@ func ZEND_INIT_METHOD_CALL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int
 		call_info = ZEND_CALL_NESTED_FUNCTION
 	} else if (IS_CV & (IS_VAR | IS_TMP_VAR | IS_CV)) != 0 {
 		if IS_CV == IS_CV {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		} else if free_op1 != object {
-			GC_ADDREF(obj)
+			obj.IncGcRefcount()
 		}
 
 		/* CV may be changed indirectly (e.g. when it's a reference) */
@@ -43304,7 +43304,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 			if Z_ISREF_P(expr_ptr) {
 				var ref *ZendRefcounted = expr_ptr.GetCounted()
 				expr_ptr = Z_REFVAL_P(expr_ptr)
-				if GC_DELREF(ref) == 0 {
+				if ref.DecGcRefcount() == 0 {
 					ZVAL_COPY_VALUE(&new_expr, expr_ptr)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))

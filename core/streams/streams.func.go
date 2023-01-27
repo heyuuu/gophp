@@ -85,14 +85,14 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 						}
 						regentry = _z.GetPtr()
 						if regentry.GetPtr() == le.GetPtr() {
-							zend.GC_ADDREF(regentry)
+							regentry.IncGcRefcount()
 							stream.SetRes(regentry)
 							return core.PHP_STREAM_PERSISTENT_SUCCESS
 						}
 					}
 					break
 				}
-				zend.GC_ADDREF(le)
+				le.IncGcRefcount()
 				stream.SetRes(zend.ZendRegisterResource(*stream, LePstream))
 			}
 			return core.PHP_STREAM_PERSISTENT_SUCCESS
@@ -1948,7 +1948,7 @@ func PhpStreamContextSet(stream *core.PhpStream, context *core.PhpStreamContext)
 	var oldcontext *core.PhpStreamContext = core.PHP_STREAM_CONTEXT(stream)
 	if context != nil {
 		stream.SetCtx(context.GetRes())
-		zend.GC_ADDREF(context.GetRes())
+		context.GetRes().IncGcRefcount()
 	} else {
 		stream.SetCtx(nil)
 	}

@@ -28,7 +28,7 @@ func ZendIteratorInit(iter *ZendObjectIterator) {
 	iter.GetStd().SetHandlers(&IteratorObjectHandlers)
 }
 func ZendIteratorDtor(iter *ZendObjectIterator) {
-	if GC_DELREF(iter.GetStd()) > 0 {
+	if iter.GetStd().DecGcRefcount() > 0 {
 		return
 	}
 	ZendObjectsStoreDel(iter.GetStd())

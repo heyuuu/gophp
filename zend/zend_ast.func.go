@@ -743,7 +743,7 @@ func ZendAstCopy(ast *ZendAst) *ZendAstRef {
 	ref = Emalloc(tree_size)
 	ZendAstTreeCopy(ast, GC_AST(ref))
 	GC_SET_REFCOUNT(ref, 1)
-	GC_TYPE_INFO(ref) = IS_CONSTANT_AST
+	ref.GetGcTypeInfo() = IS_CONSTANT_AST
 	return ref
 }
 func ZendAstDestroy(ast *ZendAst) {

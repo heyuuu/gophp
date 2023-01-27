@@ -408,7 +408,7 @@ func GetTemporaryVariable() uint32 {
 func LookupCv(name *ZendString) int {
 	var op_array *ZendOpArray = CompilerGlobals.GetActiveOpArray()
 	var i int = 0
-	var hash_value ZendUlong = ZendStringHashVal(name)
+	var hash_value ZendUlong = name.GetHash()
 	for i < op_array.GetLastVar() {
 		if op_array.GetVars()[i].GetH() == hash_value && ZendStringEquals(op_array.GetVars()[i], name) != 0 {
 			return int(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, i)))
@@ -781,7 +781,7 @@ func ZendResolveClassName(name *ZendString, type_ uint32) *ZendString {
 		if name.GetVal()[0] == '\\' {
 			name = ZendStringInit(name.GetVal()+1, name.GetLen()-1, 0)
 		} else {
-			ZendStringAddref(name)
+			name.IncGcRefcount()
 		}
 
 		/* Ensure that \self, \parent and \static are not used */
@@ -849,8 +849,8 @@ func FunctionAddRef(function *ZendFunction) {
 			op_array.refcount++
 		}
 		if op_array.GetStaticVariables() != nil {
-			if (GC_FLAGS(op_array.GetStaticVariables()) & IS_ARRAY_IMMUTABLE) == 0 {
-				GC_ADDREF(op_array.GetStaticVariables())
+			if (op_array.GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				op_array.GetStaticVariables().IncGcRefcount()
 			}
 		}
 		if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
@@ -864,7 +864,7 @@ func FunctionAddRef(function *ZendFunction) {
 		}
 	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
 		if function.GetFunctionName() != nil {
-			ZendStringAddref(function.GetFunctionName())
+			function.GetFunctionName().IncGcRefcount()
 		}
 	}
 }
@@ -3428,7 +3428,7 @@ func ZendCompileGlobalVar(ast *ZendAst) {
 		var opline *ZendOp = ZendEmitOp(&result, ZEND_FETCH_W, &name_node, nil)
 		opline.SetExtendedValue(ZEND_FETCH_GLOBAL_LOCK)
 		if name_node.GetOpType() == IS_CONST {
-			ZendStringAddref(name_node.GetConstant().GetStr())
+			name_node.GetConstant().GetStr().IncGcRefcount()
 		}
 		ZendEmitAssignRefZnode(ZendAstCreate(ZEND_AST_VAR, ZendAstCreateZnode(&name_node)), &result)
 	}
@@ -4479,7 +4479,7 @@ func ZendCompileTypename(ast *ZendAst, force_allow_null ZendBool) ZendType {
 				ZendAssertValidClassName(class_name)
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
-				ZendStringAddref(class_name)
+				class_name.IncGcRefcount()
 			}
 			type_ = ZEND_TYPE_ENCODE_CLASS(class_name, allow_null)
 		}
@@ -5678,7 +5678,7 @@ func ZendCompileUse(ast *ZendAst) {
 				ZendCheckAlreadyInUse(type_, old_name, new_name, lookup_name)
 			}
 		}
-		ZendStringAddref(old_name)
+		old_name.IncGcRefcount()
 		old_name = ZendNewInternedString(old_name)
 		if !(current_import.AddPtr(lookup_name, old_name)) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use%s %s as %s because the name "+"is already in use", ZendGetUseTypeStr(type_), old_name.GetVal(), new_name.GetVal())
@@ -7109,7 +7109,7 @@ func ZendCompileConstExprClassConst(ast_ptr **ZendAst) {
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		class_name = ZendResolveClassNameAst(class_ast)
 	} else {
-		ZendStringAddref(class_name)
+		class_name.IncGcRefcount()
 	}
 	name = ZendConcat3(class_name.GetVal(), class_name.GetLen(), "::", 2, const_name.GetVal(), const_name.GetLen())
 	ZendAstDestroy(ast)

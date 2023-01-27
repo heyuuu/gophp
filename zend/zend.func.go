@@ -257,7 +257,7 @@ func ZendPrintFlatZvalR(expr *Zval) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
 			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				ZEND_PUTS(" *RECURSION*")
 				return
@@ -266,7 +266,7 @@ func ZendPrintFlatZvalR(expr *Zval) {
 		}
 		PrintFlatHash(expr.GetArr())
 		ZEND_PUTS(")")
-		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
 			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break
@@ -299,7 +299,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		SmartStrAppends(buf, "Array\n")
-		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
 			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				SmartStrAppends(buf, " *RECURSION*")
 				return
@@ -307,7 +307,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 			GC_PROTECT_RECURSION(expr.GetArr())
 		}
 		PrintHash(buf, expr.GetArr(), indent, 0)
-		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
 			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break

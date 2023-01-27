@@ -410,8 +410,8 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			var s *byte
 			var t *byte
 			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
-			if zend.GC_REFCOUNT(tmp) > 1 {
-				zend.GC_DELREF(tmp)
+			if tmp.GetGcRefcount() > 1 {
+				tmp.DecGcRefcount()
 				tmp = zend.ZendStringInit(tmp.GetVal(), tmp.GetLen(), 0)
 			}
 

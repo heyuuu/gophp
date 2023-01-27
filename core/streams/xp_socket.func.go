@@ -457,7 +457,7 @@ func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xp
 		if xparam.GetClient() != nil {
 			xparam.GetClient().SetCtx(stream.GetCtx())
 			if stream.GetCtx() != nil {
-				zend.GC_ADDREF(stream.GetCtx())
+				stream.GetCtx().IncGcRefcount()
 			}
 		}
 	}

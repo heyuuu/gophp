@@ -266,7 +266,7 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 		zend.RETVAL_STRINGL(SPL_DEFAULT_FILE_EXTENSIONS, b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS")-1)
 		return
 	} else {
-		zend.ZendStringAddref(SPL_G(autoload_extensions))
+		SPL_G(autoload_extensions).IncGcRefcount()
 		zend.RETVAL_STR(SPL_G(autoload_extensions))
 		return
 	}
@@ -317,7 +317,7 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			if func_.HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
 				memcpy(func_, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
-				zend.ZendStringAddref(func_.GetOpArray().GetFunctionName())
+				func_.GetOpArray().GetFunctionName().IncGcRefcount()
 			}
 			zend.ZVAL_UNDEF(&retval)
 			fcic.SetFunctionHandler(func_)

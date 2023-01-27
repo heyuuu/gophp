@@ -194,7 +194,7 @@ func ShutdownExecutor() {
 				if op_array.GetStaticVariables() != nil {
 					var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 					if ht != nil {
-						if (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+						if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DecGcRefcount() == 0 {
 							ZendArrayDestroy(ht)
 						}
 						ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
@@ -237,7 +237,7 @@ func ShutdownExecutor() {
 								if op_array.GetStaticVariables() != nil {
 									var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 									if ht != nil {
-										if (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+										if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DecGcRefcount() == 0 {
 											ZendArrayDestroy(ht)
 										}
 										ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
@@ -754,7 +754,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	}
 	if func_.GetOpArray().IsClosure() {
 		var call_info uint32
-		GC_ADDREF(ZEND_CLOSURE_OBJECT(func_))
+		ZEND_CLOSURE_OBJECT(func_).IncGcRefcount()
 		call_info = ZEND_CALL_CLOSURE
 		if func_.IsFakeClosure() {
 			call_info |= ZEND_CALL_FAKE_CLOSURE
@@ -1348,7 +1348,7 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 	}
 	if execute_data != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
-			var h ZendUlong = ZendStringHashVal(name)
+			var h ZendUlong = name.GetHash()
 			var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **ZendString = op_array.GetVars()

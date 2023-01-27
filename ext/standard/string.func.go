@@ -5660,7 +5660,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 
 		/* Duplicate subject string for repeated replacement */
 
-		zend.ZendStringAddref(subject_str)
+		subject_str.IncGcRefcount()
 		if replace.IsType(zend.IS_ARRAY) {
 			replace_idx = 0
 		} else {
@@ -5756,7 +5756,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 				zend.ZendTmpStringRelease(tmp_search_str)
 				zend.ZendTmpStringRelease(tmp_replace_entry_str)
 				if subject_str == tmp_result {
-					zend.ZendStringDelref(subject_str)
+					subject_str.DecGcRefcount()
 				} else {
 					zend.ZendStringReleaseEx(subject_str, 0)
 					subject_str = tmp_result

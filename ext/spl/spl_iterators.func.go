@@ -1072,7 +1072,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.Z_TRY_ADDREF(cfi.GetFci().GetFunctionName())
 		cfi.SetObject(cfi.GetFcc().GetObject())
 		if cfi.GetObject() != nil {
-			zend.GC_ADDREF(cfi.GetObject())
+			cfi.GetObject().IncGcRefcount()
 		}
 		intern.SetCbfilter(cfi)
 		break

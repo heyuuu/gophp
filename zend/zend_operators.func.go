@@ -971,7 +971,7 @@ try_again:
 	case IS_ARRAY:
 		var ht *HashTable = ZendSymtableToProptable(op.GetArr())
 		var obj *ZendObject
-		if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) != 0 {
+		if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
 			/* TODO: try not to duplicate immutable arrays as well ??? */
 
@@ -982,7 +982,7 @@ try_again:
 		} else if ht != op.GetArr() {
 			ZvalPtrDtor(op)
 		} else {
-			GC_DELREF(ht)
+			ht.DecGcRefcount()
 		}
 		obj = ZendObjectsNew(ZendStandardClassDef)
 		obj.SetProperties(ht)

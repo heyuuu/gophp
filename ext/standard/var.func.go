@@ -83,7 +83,7 @@ again:
 		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				if zend.GC_IS_RECURSIVE(myht) != 0 {
 					core.PUTS("*RECURSION*\n")
@@ -91,7 +91,7 @@ again:
 				}
 				zend.GC_PROTECT_RECURSION(myht)
 			}
-			zend.GC_ADDREF(myht)
+			myht.IncGcRefcount()
 		}
 		count = zend.ZendArrayCount(myht)
 		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
@@ -114,11 +114,11 @@ again:
 			}
 			break
 		}
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				zend.GC_UNPROTECT_RECURSION(myht)
 			}
-			zend.GC_DELREF(myht)
+			myht.DecGcRefcount()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -344,7 +344,7 @@ again:
 		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				if zend.GC_IS_RECURSIVE(myht) != 0 {
 					core.PUTS("*RECURSION*\n")
@@ -352,7 +352,7 @@ again:
 				}
 				zend.GC_PROTECT_RECURSION(myht)
 			}
-			zend.GC_ADDREF(myht)
+			myht.IncGcRefcount()
 		}
 		count = zend.ZendArrayCount(myht)
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(zend.Z_REFCOUNTED_P(struc), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
@@ -375,11 +375,11 @@ again:
 			}
 			break
 		}
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				zend.GC_UNPROTECT_RECURSION(myht)
 			}
-			zend.GC_DELREF(myht)
+			myht.DecGcRefcount()
 		}
 		if level > 1 {
 			core.PhpPrintf("%*c", level-1, ' ')
@@ -636,13 +636,13 @@ again:
 		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if zend.GC_IS_RECURSIVE(myht) != 0 {
 				zend.SmartStrAppendl(buf, "NULL", 4)
 				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
 				return
 			}
-			zend.GC_ADDREF(myht)
+			myht.IncGcRefcount()
 			zend.GC_PROTECT_RECURSION(myht)
 		}
 		if level > 1 {
@@ -669,9 +669,9 @@ again:
 			}
 			break
 		}
-		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
+		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			zend.GC_UNPROTECT_RECURSION(myht)
-			zend.GC_DELREF(myht)
+			myht.DecGcRefcount()
 		}
 		if level > 1 {
 			BufferAppendSpaces(buf, level-1)
