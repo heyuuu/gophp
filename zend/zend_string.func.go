@@ -6,19 +6,9 @@ import (
 	b "sik/builtin"
 )
 
-func ZSTR_VAL(zstr *ZendString) []byte     { return zstr.GetVal() }
-func ZSTR_LEN(zstr *ZendString) int        { return zstr.GetLen() }
-func ZSTR_H(zstr *ZendString) ZendUlong    { return zstr.GetH() }
-func ZSTR_HASH(zstr *ZendString) ZendUlong { return ZendStringHashVal(zstr) }
-func IS_INTERNED(s *ZendString) int        { return ZSTR_IS_INTERNED(s) }
-func STR_EMPTY_ALLOC() *ZendString         { return ZSTR_EMPTY_ALLOC() }
-func STR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
-	ZSTR_ALLOCA_ALLOC(str, _len, use_heap)
-}
-func STR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) {
-	ZSTR_ALLOCA_INIT(str, s, len_, use_heap)
-}
-func STR_ALLOCA_FREE(str any, use_heap __auto__)   { ZSTR_ALLOCA_FREE(str, use_heap) }
+func ZSTR_VAL(zstr *ZendString) []byte             { return zstr.GetVal() }
+func ZSTR_HASH(zstr *ZendString) ZendUlong         { return ZendStringHashVal(zstr) }
+func STR_EMPTY_ALLOC() *ZendString                 { return ZSTR_EMPTY_ALLOC() }
 func ZSTR_IS_INTERNED(s *ZendString) int           { return GC_FLAGS(s) & IS_STR_INTERNED }
 func ZSTR_EMPTY_ALLOC() *ZendString                { return ZendEmptyString }
 func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }

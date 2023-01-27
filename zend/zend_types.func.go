@@ -84,49 +84,24 @@ func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
 func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 	return faketype == realtype || faketype == _IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
-func Z_TYPE_FLAGS_P(zval_p *Zval) ZendUchar            { return zval_p.GetTypeFlags() }
-func Z_TYPE_INFO_P(zval_p *Zval) uint32                { return zval_p.GetTypeInfo() }
-func Z_CACHE_SLOT_P(zval_p *Zval) uint32               { return zval_p.GetCacheSlot() }
-func Z_LINENO_P(zval_p *Zval) uint32                   { return zval_p.GetLineno() }
-func Z_OPLINE_NUM_P(zval_p *Zval) uint32               { return zval_p.GetOplineNum() }
-func Z_FE_ITER_P(zval_p *Zval) uint32                  { return zval_p.GetFeIterIdx() }
-func Z_ACCESS_FLAGS_P(zval_p *Zval) uint32             { return zval_p.GetAccessFlags() }
-func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32           { return zval_p.GetPropertyGuard() }
-func Z_EXTRA_P(zval_p *Zval) uint32                    { return zval_p.GetU2Extra() }
-func Z_COUNTED_P(zval_p *Zval) *ZendRefcounted         { return zval_p.GetCounted() }
-func GC_REFCOUNT(p *HashTable) uint32                  { return p.GetGc().GetRefcount() }
-func GC_SET_REFCOUNT(p __auto__, rc uint32) uint32     { return ZendGcSetRefcount(p.gc, rc) }
-func GC_ADDREF(p *ZendResource) uint32                 { return ZendGcAddref(p.GetGc()) }
-func GC_DELREF(p *HashTable) uint32                    { return ZendGcDelref(p.GetGc()) }
-func GC_ADDREF_EX(p *ZendRefcounted, rc uint32) uint32 { return ZendGcAddrefEx(p.GetGc(), rc) }
-func ZvalGcType(gc_type_info uint32) ZendUchar         { return gc_type_info & GC_TYPE_MASK }
-func ZvalGcFlags(gc_type_info uint32) uint32 {
-	return gc_type_info >> GC_FLAGS_SHIFT & GC_FLAGS_MASK >> GC_FLAGS_SHIFT
-}
-func ZvalGcInfo(gc_type_info uint32) uint32 { return gc_type_info >> GC_INFO_SHIFT }
-func GC_TYPE_INFO(p __auto__) __auto__      { return p.gc.u.type_info }
-func GC_TYPE(p __auto__) ZendUchar          { return ZvalGcType(GC_TYPE_INFO(p)) }
-func GC_FLAGS(p *HashTable) uint32          { return ZvalGcFlags(GC_TYPE_INFO(p)) }
-func GC_INFO(p *ZendRefcounted) uint32      { return ZvalGcInfo(GC_TYPE_INFO(p)) }
-func GC_ADD_FLAGS(p *ZendObject, flags int) {
-	GC_TYPE_INFO(p) |= flags << GC_FLAGS_SHIFT
-}
-func GC_DEL_FLAGS(p __auto__, flags int) {
-	GC_TYPE_INFO(p) &= ^(flags << GC_FLAGS_SHIFT)
-}
-func Z_GC_TYPE(zval Zval) ZendUchar          { return GC_TYPE(zval.GetCounted()) }
-func Z_GC_TYPE_P(zval_p *Zval) ZendUchar     { return Z_GC_TYPE(*zval_p) }
-func Z_GC_FLAGS(zval Zval) uint32            { return GC_FLAGS(zval.GetCounted()) }
-func Z_GC_FLAGS_P(zval_p *Zval) uint32       { return Z_GC_FLAGS(*zval_p) }
-func Z_GC_INFO(zval Zval) uint32             { return GC_INFO(zval.GetCounted()) }
-func Z_GC_INFO_P(zval_p *Zval) uint32        { return Z_GC_INFO(*zval_p) }
-func Z_GC_TYPE_INFO(zval Zval) __auto__      { return GC_TYPE_INFO(zval.GetCounted()) }
-func Z_GC_TYPE_INFO_P(zval_p *Zval) __auto__ { return Z_GC_TYPE_INFO(*zval_p) }
-func Z_TYPE_INFO_REFCOUNTED(t uint32) bool   { return (t & Z_TYPE_FLAGS_MASK) != 0 }
-func OBJ_FLAGS(obj __auto__) uint32          { return GC_FLAGS(obj) }
-func GC_IS_RECURSIVE(p *HashTable) int       { return GC_FLAGS(p) & GC_PROTECTED }
-func GC_PROTECT_RECURSION(p *HashTable)      { GC_ADD_FLAGS(p, GC_PROTECTED) }
-func GC_UNPROTECT_RECURSION(p *HashTable)    { GC_DEL_FLAGS(p, GC_PROTECTED) }
+func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
+func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32             { return zval_p.GetPropertyGuard() }
+func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGc().GetRefcount() }
+func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return ZendGcSetRefcount(p.gc, rc) }
+func GC_ADDREF(p *ZendResource) uint32                   { return ZendGcAddref(p.GetGc()) }
+func GC_DELREF(p *HashTable) uint32                      { return ZendGcDelref(p.GetGc()) }
+func GC_ADDREF_EX(p *ZendRefcounted, rc uint32) uint32   { return ZendGcAddrefEx(p.GetGc(), rc) }
+func GC_TYPE_INFO(p ZendRefcounted) uint32               { return p.GetGcTypeInfo() }
+func GC_TYPE(p ZendRefcounted) ZendUchar                 { return p.GetGcType() }
+func GC_FLAGS(p ZendRefcounted) uint32                   { return p.GetGcFlags() }
+func GC_INFO(p ZendRefcounted) uint32                    { return p.GetGcInfo() }
+func GC_ADD_FLAGS(p ZendRefcounted, flags uint32)        { p.AddGcFlags(flags) }
+func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
+func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
+func OBJ_FLAGS(obj ZendRefcounted) uint32                { return obj.GetGcFlags() }
+func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags() & GC_PROTECTED }
+func GC_PROTECT_RECURSION(p *HashTable)                  { GC_ADD_FLAGS(p, GC_PROTECTED) }
+func GC_UNPROTECT_RECURSION(p *HashTable)                { GC_DEL_FLAGS(p, GC_PROTECTED) }
 func GC_TRY_PROTECT_RECURSION(p *HashTable) {
 	if (GC_FLAGS(p) & GC_IMMUTABLE) == 0 {
 		GC_PROTECT_RECURSION(p)
@@ -216,13 +191,9 @@ func Z_RES_HANDLE_P(zval_p *Zval) int     { return Z_RES_HANDLE(*zval_p) }
 func Z_RES_TYPE(zval Zval) int            { return Z_RES(zval).GetType() }
 func Z_RES_TYPE_P(zval_p *Zval) int       { return Z_RES_TYPE(*zval_p) }
 func Z_RES_VAL(zval Zval) any             { return Z_RES(zval).GetPtr() }
-func Z_RES_VAL_P(zval_p *Zval) any        { return Z_RES_VAL(*zval_p) }
 func Z_REF(zval Zval) *ZendReference      { return zval.GetRef() }
-func Z_REF_P(zval_p *Zval) *ZendReference { return zval_p.GetRef() }
 func Z_REFVAL(zval Zval) Zval             { return &Z_REF(zval).GetVal() }
 func Z_REFVAL_P(zval_p *Zval) Zval        { return Z_REFVAL(*zval_p) }
-func Z_AST(zval Zval) *ZendAstRef         { return zval.GetAst() }
-func Z_AST_P(zval_p *Zval) *ZendAstRef    { return zval_p.GetAst() }
 func GC_AST(p *ZendAstRef) *ZendAst {
 	return (*ZendAst)((*byte)(p) + b.SizeOf("zend_ast_ref"))
 }
