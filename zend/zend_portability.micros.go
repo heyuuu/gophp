@@ -76,6 +76,10 @@ package zend
 
 // #define zend_never_inline
 
+// #define EXPECTED(condition) __builtin_expect ( ! ! ( condition ) , 1 )
+
+// #define UNEXPECTED(condition) __builtin_expect ( ! ! ( condition ) , 0 )
+
 // #define XtOffset(p_type,field) ( ( zend_long ) ( ( ( char * ) ( & ( ( ( p_type ) NULL ) -> field ) ) ) - ( ( char * ) NULL ) ) )
 
 // #define XtOffsetOf(s_type,field) XtOffset ( s_type * , field )
