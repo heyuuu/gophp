@@ -18,7 +18,7 @@ func PhpSockopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	if sock == nil || sock.GetSocket() == -1 {
 		return 0
 	}
-	if sock.timeout.tv_sec == -1 {
+	if sock.GetTimeout().tv_sec == -1 {
 		ptimeout = nil
 	} else {
 		ptimeout = &sock.GetTimeout()
@@ -80,7 +80,7 @@ func PhpSockStreamWaitForData(stream *core.PhpStream, sock *core.PhpNetstreamDat
 		return
 	}
 	sock.SetTimeoutEvent(0)
-	if sock.timeout.tv_sec == -1 {
+	if sock.GetTimeout().tv_sec == -1 {
 		ptimeout = nil
 	} else {
 		ptimeout = &sock.GetTimeout()
@@ -111,7 +111,7 @@ func PhpSockopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 			return 0
 		}
 	}
-	nr_bytes = recv(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), b.Cond(sock.GetIsBlocked() && sock.timeout.tv_sec != -1, MSG_DONTWAIT, 0))
+	nr_bytes = recv(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(count), b.Cond(sock.GetIsBlocked() && sock.GetTimeout().tv_sec != -1, MSG_DONTWAIT, 0))
 	err = core.PhpSocketErrno()
 	if nr_bytes < 0 {
 		if err == EAGAIN || err == core.EWOULDBLOCK {
@@ -209,7 +209,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		var buf byte
 		var alive int = 1
 		if value == -1 {
-			if sock.timeout.tv_sec == -1 {
+			if sock.GetTimeout().tv_sec == -1 {
 				tv.tv_sec = standard.FG(default_socket_timeout)
 				tv.tv_usec = 0
 			} else {
@@ -516,8 +516,8 @@ func PhpStreamGenericSocketFactory(proto *byte, protolen int, resourcename *byte
 	sock = zend.Pemalloc(b.SizeOf("php_netstream_data_t"), b.Cond(persistent_id != nil, 1, 0))
 	memset(sock, 0, b.SizeOf("php_netstream_data_t"))
 	sock.SetIsBlocked(1)
-	sock.timeout.tv_sec = standard.FG(default_socket_timeout)
-	sock.timeout.tv_usec = 0
+	sock.GetTimeout().tv_sec = standard.FG(default_socket_timeout)
+	sock.GetTimeout().tv_usec = 0
 
 	/* we don't know the socket until we have determined if we are binding or
 	 * connecting */

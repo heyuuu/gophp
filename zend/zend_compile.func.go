@@ -180,7 +180,7 @@ func ZEND_IS_BINARY_ASSIGN_OP_OPCODE(opcode __auto__) bool {
 	return opcode >= ZEND_ADD && opcode <= ZEND_POW
 }
 func FC(member __auto__) __auto__ {
-	return CompilerGlobals.file_context.member
+	return CompilerGlobals.GetFileContext().member
 }
 func ZendAllocCacheSlots(count unsigned) uint32 {
 	var op_array *ZendOpArray = CompilerGlobals.GetActiveOpArray()

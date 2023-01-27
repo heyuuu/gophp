@@ -1011,7 +1011,7 @@ func PhpZendStreamFsizer(handle any) int {
 		return 0
 	}
 	if PhpStreamStat(stream, &ssb) == 0 {
-		return ssb.sb.st_size
+		return ssb.GetSb().st_size
 	}
 	return 0
 }

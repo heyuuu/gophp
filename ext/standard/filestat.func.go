@@ -993,11 +993,11 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 	}
 	stat_sb = &ssb.GetSb()
 	if type_ >= FS_IS_W && type_ <= FS_IS_X {
-		if ssb.sb.st_uid == getuid() {
+		if ssb.GetSb().st_uid == getuid() {
 			rmask = S_IRUSR
 			wmask = S_IWUSR
 			xmask = S_IXUSR
-		} else if ssb.sb.st_gid == getgid() {
+		} else if ssb.GetSb().st_gid == getgid() {
 			rmask = S_IRGRP
 			wmask = S_IWGRP
 			xmask = S_IXGRP
@@ -1011,7 +1011,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 				gids = (*gid_t)(zend.SafeEmalloc(groups, b.SizeOf("gid_t"), 0))
 				n = getgroups(groups, gids)
 				for i = 0; i < n; i++ {
-					if ssb.sb.st_gid == gids[i] {
+					if ssb.GetSb().st_gid == gids[i] {
 						rmask = S_IRGRP
 						wmask = S_IWGRP
 						xmask = S_IXGRP
@@ -1040,35 +1040,35 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 	}
 	switch type_ {
 	case FS_PERMS:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_mode))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_mode))
 		return
 	case FS_INODE:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_ino))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_ino))
 		return
 	case FS_SIZE:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_size))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_size))
 		return
 	case FS_OWNER:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_uid))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_uid))
 		return
 	case FS_GROUP:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_gid))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_gid))
 		return
 	case FS_ATIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_atime))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_atime))
 		return
 	case FS_MTIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_mtime))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_mtime))
 		return
 	case FS_CTIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.sb.st_ctime))
+		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_ctime))
 		return
 	case FS_TYPE:
-		if zend.S_ISLNK(ssb.sb.st_mode) {
+		if zend.S_ISLNK(ssb.GetSb().st_mode) {
 			zend.RETVAL_STRING("link")
 			return
 		}
-		switch ssb.sb.st_mode & S_IFMT {
+		switch ssb.GetSb().st_mode & S_IFMT {
 		case zend.S_IFIFO:
 			zend.RETVAL_STRING("fifo")
 			return
@@ -1085,26 +1085,26 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 			zend.RETVAL_STRING("file")
 			return
 		}
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "Unknown file type (%d)", ssb.sb.st_mode&S_IFMT)
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
 		zend.RETVAL_STRING("unknown")
 		return
 	case FS_IS_W:
-		zend.RETVAL_BOOL((ssb.sb.st_mode & wmask) != 0)
+		zend.RETVAL_BOOL((ssb.GetSb().st_mode & wmask) != 0)
 		return
 	case FS_IS_R:
-		zend.RETVAL_BOOL((ssb.sb.st_mode & rmask) != 0)
+		zend.RETVAL_BOOL((ssb.GetSb().st_mode & rmask) != 0)
 		return
 	case FS_IS_X:
-		zend.RETVAL_BOOL((ssb.sb.st_mode & xmask) != 0)
+		zend.RETVAL_BOOL((ssb.GetSb().st_mode & xmask) != 0)
 		return
 	case FS_IS_FILE:
-		zend.RETVAL_BOOL(zend.S_ISREG(ssb.sb.st_mode))
+		zend.RETVAL_BOOL(zend.S_ISREG(ssb.GetSb().st_mode))
 		return
 	case FS_IS_DIR:
-		zend.RETVAL_BOOL(zend.S_ISDIR(ssb.sb.st_mode))
+		zend.RETVAL_BOOL(zend.S_ISDIR(ssb.GetSb().st_mode))
 		return
 	case FS_IS_LINK:
-		zend.RETVAL_BOOL(zend.S_ISLNK(ssb.sb.st_mode))
+		zend.RETVAL_BOOL(zend.S_ISLNK(ssb.GetSb().st_mode))
 		return
 	case FS_EXISTS:
 		zend.RETVAL_TRUE

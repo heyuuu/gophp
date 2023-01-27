@@ -3251,19 +3251,19 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZVAL_LONG(&stat_dev, stat_ssb.sb.st_dev)
-	zend.ZVAL_LONG(&stat_ino, stat_ssb.sb.st_ino)
-	zend.ZVAL_LONG(&stat_mode, stat_ssb.sb.st_mode)
-	zend.ZVAL_LONG(&stat_nlink, stat_ssb.sb.st_nlink)
-	zend.ZVAL_LONG(&stat_uid, stat_ssb.sb.st_uid)
-	zend.ZVAL_LONG(&stat_gid, stat_ssb.sb.st_gid)
-	zend.ZVAL_LONG(&stat_rdev, stat_ssb.sb.st_rdev)
-	zend.ZVAL_LONG(&stat_size, stat_ssb.sb.st_size)
-	zend.ZVAL_LONG(&stat_atime, stat_ssb.sb.st_atime)
-	zend.ZVAL_LONG(&stat_mtime, stat_ssb.sb.st_mtime)
-	zend.ZVAL_LONG(&stat_ctime, stat_ssb.sb.st_ctime)
-	zend.ZVAL_LONG(&stat_blksize, stat_ssb.sb.st_blksize)
-	zend.ZVAL_LONG(&stat_blocks, stat_ssb.sb.st_blocks)
+	zend.ZVAL_LONG(&stat_dev, stat_ssb.GetSb().st_dev)
+	zend.ZVAL_LONG(&stat_ino, stat_ssb.GetSb().st_ino)
+	zend.ZVAL_LONG(&stat_mode, stat_ssb.GetSb().st_mode)
+	zend.ZVAL_LONG(&stat_nlink, stat_ssb.GetSb().st_nlink)
+	zend.ZVAL_LONG(&stat_uid, stat_ssb.GetSb().st_uid)
+	zend.ZVAL_LONG(&stat_gid, stat_ssb.GetSb().st_gid)
+	zend.ZVAL_LONG(&stat_rdev, stat_ssb.GetSb().st_rdev)
+	zend.ZVAL_LONG(&stat_size, stat_ssb.GetSb().st_size)
+	zend.ZVAL_LONG(&stat_atime, stat_ssb.GetSb().st_atime)
+	zend.ZVAL_LONG(&stat_mtime, stat_ssb.GetSb().st_mtime)
+	zend.ZVAL_LONG(&stat_ctime, stat_ssb.GetSb().st_ctime)
+	zend.ZVAL_LONG(&stat_blksize, stat_ssb.GetSb().st_blksize)
+	zend.ZVAL_LONG(&stat_blocks, stat_ssb.GetSb().st_blocks)
 
 	/* Store numeric indexes in proper order */
 
@@ -3419,7 +3419,7 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 	default:
 		return ret
 	}
-	if zend.S_ISDIR(src_s.sb.st_mode) {
+	if zend.S_ISDIR(src_s.GetSb().st_mode) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The first argument to copy() function cannot be a directory")
 		return zend.FAILURE
 	}
@@ -3435,14 +3435,14 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 	default:
 		return ret
 	}
-	if zend.S_ISDIR(dest_s.sb.st_mode) {
+	if zend.S_ISDIR(dest_s.GetSb().st_mode) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The second argument to copy() function cannot be a directory")
 		return zend.FAILURE
 	}
-	if !(src_s.sb.st_ino) || !(dest_s.sb.st_ino) {
+	if !(src_s.GetSb().st_ino) || !(dest_s.GetSb().st_ino) {
 		goto no_stat
 	}
-	if src_s.sb.st_ino == dest_s.sb.st_ino && src_s.sb.st_dev == dest_s.sb.st_dev {
+	if src_s.GetSb().st_ino == dest_s.GetSb().st_ino && src_s.GetSb().st_dev == dest_s.GetSb().st_dev {
 		return ret
 	} else {
 		goto safe_to_copy

@@ -142,27 +142,27 @@ func PhpStreamMemoryStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int
 	/* read-only across the board */
 
 	if (ms.GetMode() & core.TEMP_STREAM_READONLY) != 0 {
-		ssb.sb.st_mode = 0444
+		ssb.GetSb().st_mode = 0444
 	} else {
-		ssb.sb.st_mode = 0666
+		ssb.GetSb().st_mode = 0666
 	}
-	ssb.sb.st_size = ms.GetFsize()
-	ssb.sb.st_mode |= S_IFREG
-	ssb.sb.st_mtime = timestamp
-	ssb.sb.st_atime = timestamp
-	ssb.sb.st_ctime = timestamp
-	ssb.sb.st_nlink = 1
-	ssb.sb.st_rdev = -1
+	ssb.GetSb().st_size = ms.GetFsize()
+	ssb.GetSb().st_mode |= S_IFREG
+	ssb.GetSb().st_mtime = timestamp
+	ssb.GetSb().st_atime = timestamp
+	ssb.GetSb().st_ctime = timestamp
+	ssb.GetSb().st_nlink = 1
+	ssb.GetSb().st_rdev = -1
 
 	/* this is only for APC, so use /dev/null device - no chance of conflict there! */
 
-	ssb.sb.st_dev = 0xc
+	ssb.GetSb().st_dev = 0xc
 
 	/* generate unique inode number for alias/filename, so no phars will conflict */
 
-	ssb.sb.st_ino = 0
-	ssb.sb.st_blksize = -1
-	ssb.sb.st_blocks = -1
+	ssb.GetSb().st_ino = 0
+	ssb.GetSb().st_blksize = -1
+	ssb.GetSb().st_blocks = -1
 	return 0
 }
 func PhpStreamMemorySetOption(stream *core.PhpStream, option int, value int, ptrparam any) int {

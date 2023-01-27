@@ -2393,12 +2393,12 @@ func zim_spl_AppendIterator___construct(execute_data *zend.ZendExecuteData, retu
 func zim_spl_AppendIterator_append(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
 	var it *zend.Zval
-	var it *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS)
-	if it.GetDitType() == DIT_Unknown {
+	var it__1 *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS)
+	if it__1.GetDitType() == DIT_Unknown {
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
 		return
 	}
-	intern = it
+	intern = it__1
 	if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "O", &it, zend.ZendCeIterator) == zend.FAILURE {
 		return
 	}

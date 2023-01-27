@@ -243,14 +243,14 @@ func FcgiListen(path *byte, backlog int) int {
 
 	if tcp != 0 {
 		memset(&sa.GetSaInet(), 0, b.SizeOf("sa . sa_inet"))
-		sa.sa_inet.sin_family = AF_INET
-		sa.sa_inet.sin_port = htons(port)
+		sa.GetSaInet().sin_family = AF_INET
+		sa.GetSaInet().sin_port = htons(port)
 		sock_len = b.SizeOf("sa . sa_inet")
 		if !(*host) || !(strncmp(host, "*", b.SizeOf("\"*\"")-1)) {
-			sa.sa_inet.sin_addr.s_addr = htonl(INADDR_ANY)
+			sa.GetSaInet().sin_addr.s_addr = htonl(INADDR_ANY)
 		} else {
-			sa.sa_inet.sin_addr.s_addr = inet_addr(host)
-			if sa.sa_inet.sin_addr.s_addr == INADDR_NONE {
+			sa.GetSaInet().sin_addr.s_addr = inet_addr(host)
+			if sa.GetSaInet().sin_addr.s_addr == INADDR_NONE {
 				var hep *__struct__hostent
 				if strlen(host) > MAXFQDNLEN {
 					hep = nil
@@ -264,7 +264,7 @@ func FcgiListen(path *byte, backlog int) int {
 					FcgiLog(FCGI_ERROR, "Host '%s' has multiple addresses. You must choose one explicitly!\n", host)
 					return -1
 				}
-				sa.sa_inet.sin_addr.s_addr = (*__struct__in_addr)(hep.h_addr_list[0]).s_addr
+				sa.GetSaInet().sin_addr.s_addr = (*__struct__in_addr)(hep.h_addr_list[0]).s_addr
 			}
 		}
 	} else {
@@ -274,16 +274,16 @@ func FcgiListen(path *byte, backlog int) int {
 			return -1
 		}
 		memset(&sa.GetSaUnix(), 0, b.SizeOf("sa . sa_unix"))
-		sa.sa_unix.sun_family = AF_UNIX
-		memcpy(sa.sa_unix.sun_path, path, path_len+1)
+		sa.GetSaUnix().sun_family = AF_UNIX
+		memcpy(sa.GetSaUnix().sun_path, path, path_len+1)
 		sock_len = size_t((*__struct__sockaddr_un)(0).sun_path) + path_len
-		sa.sa_unix.sun_len = sock_len
+		sa.GetSaUnix().sun_len = sock_len
 		unlink(path)
 	}
 
 	/* Create, bind socket and start listen on it */
 
-	if b.Assign(&listen_socket, socket(sa.sa.sa_family, SOCK_STREAM, 0)) < 0 || bind(listen_socket, (*__struct__sockaddr)(&sa), sock_len) < 0 || listen(listen_socket, backlog) < 0 {
+	if b.Assign(&listen_socket, socket(sa.GetSa().sa_family, SOCK_STREAM, 0)) < 0 || bind(listen_socket, (*__struct__sockaddr)(&sa), sock_len) < 0 || listen(listen_socket, backlog) < 0 {
 		close(listen_socket)
 		FcgiLog(FCGI_ERROR, "Cannot bind/listen socket - [%d] %s.\n", errno, strerror(errno))
 		return -1
@@ -314,18 +314,18 @@ func FcgiListen(path *byte, backlog int) int {
 					*end = 0
 					end++
 				}
-				if inet_pton(AF_INET, cur, &AllowedClients[n].sa_inet.sin_addr) > 0 {
-					AllowedClients[n].sa.sa_family = AF_INET
+				if inet_pton(AF_INET, cur, &AllowedClients[n].GetSaInet().sin_addr) > 0 {
+					AllowedClients[n].GetSa().sa_family = AF_INET
 					n++
-				} else if inet_pton(AF_INET6, cur, &AllowedClients[n].sa_inet6.sin6_addr) > 0 {
-					AllowedClients[n].sa.sa_family = AF_INET6
+				} else if inet_pton(AF_INET6, cur, &AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
+					AllowedClients[n].GetSa().sa_family = AF_INET6
 					n++
 				} else {
 					FcgiLog(FCGI_ERROR, "Wrong IP address '%s' in listen.allowed_clients", cur)
 				}
 				cur = end
 			}
-			AllowedClients[n].sa.sa_family = 0
+			AllowedClients[n].GetSa().sa_family = 0
 			zend.Free(ip)
 			if n == 0 {
 				FcgiLog(FCGI_ERROR, "There are no allowed addresses")
@@ -365,18 +365,18 @@ func FcgiSetAllowedClients(ip *byte) {
 				*end = 0
 				end++
 			}
-			if inet_pton(AF_INET, cur, &AllowedClients[n].sa_inet.sin_addr) > 0 {
-				AllowedClients[n].sa.sa_family = AF_INET
+			if inet_pton(AF_INET, cur, &AllowedClients[n].GetSaInet().sin_addr) > 0 {
+				AllowedClients[n].GetSa().sa_family = AF_INET
 				n++
-			} else if inet_pton(AF_INET6, cur, &AllowedClients[n].sa_inet6.sin6_addr) > 0 {
-				AllowedClients[n].sa.sa_family = AF_INET6
+			} else if inet_pton(AF_INET6, cur, &AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
+				AllowedClients[n].GetSa().sa_family = AF_INET6
 				n++
 			} else {
 				FcgiLog(FCGI_ERROR, "Wrong IP address '%s' in listen.allowed_clients", cur)
 			}
 			cur = end
 		}
-		AllowedClients[n].sa.sa_family = 0
+		AllowedClients[n].GetSa().sa_family = 0
 		zend.Free(ip)
 		if n == 0 {
 			FcgiLog(FCGI_ERROR, "There are no allowed addresses")
@@ -732,22 +732,22 @@ func FcgiClose(req *FcgiRequest, force int, destroy int) {
 func FcgiIsClosed(req *FcgiRequest) int { return req.GetFd() < 0 }
 func FcgiIsAllowed() int {
 	var i int
-	if ClientSa.sa.sa_family == AF_UNIX {
+	if ClientSa.GetSa().sa_family == AF_UNIX {
 		return 1
 	}
 	if AllowedClients == nil {
 		return 1
 	}
-	if ClientSa.sa.sa_family == AF_INET {
-		for i = 0; AllowedClients[i].sa.sa_family; i++ {
-			if AllowedClients[i].sa.sa_family == AF_INET && !(memcmp(&ClientSa.sa_inet.sin_addr, &AllowedClients[i].sa_inet.sin_addr, 4)) {
+	if ClientSa.GetSa().sa_family == AF_INET {
+		for i = 0; AllowedClients[i].GetSa().sa_family; i++ {
+			if AllowedClients[i].GetSa().sa_family == AF_INET && !(memcmp(&ClientSa.GetSaInet().sin_addr, &AllowedClients[i].GetSaInet().sin_addr, 4)) {
 				return 1
 			}
 		}
 	}
-	if ClientSa.sa.sa_family == AF_INET6 {
-		for i = 0; AllowedClients[i].sa.sa_family; i++ {
-			if AllowedClients[i].sa.sa_family == AF_INET6 && !(memcmp(&ClientSa.sa_inet6.sin6_addr, &AllowedClients[i].sa_inet6.sin6_addr, 12)) {
+	if ClientSa.GetSa().sa_family == AF_INET6 {
+		for i = 0; AllowedClients[i].GetSa().sa_family; i++ {
+			if AllowedClients[i].GetSa().sa_family == AF_INET6 && !(memcmp(&ClientSa.GetSaInet6().sin6_addr, &AllowedClients[i].GetSaInet6().sin6_addr, 12)) {
 				return 1
 			}
 		}
@@ -990,14 +990,14 @@ func FcgiGetLastClientIp() *byte {
 
 	/* Ipv4 */
 
-	if ClientSa.sa.sa_family == AF_INET {
-		return inet_ntop(ClientSa.sa.sa_family, &ClientSa.sa_inet.sin_addr, str, INET6_ADDRSTRLEN)
+	if ClientSa.GetSa().sa_family == AF_INET {
+		return inet_ntop(ClientSa.GetSa().sa_family, &ClientSa.GetSaInet().sin_addr, str, INET6_ADDRSTRLEN)
 	}
 
 	/* Ipv6 */
 
-	if ClientSa.sa.sa_family == AF_INET6 {
-		return inet_ntop(ClientSa.sa.sa_family, &ClientSa.sa_inet6.sin6_addr, str, INET6_ADDRSTRLEN)
+	if ClientSa.GetSa().sa_family == AF_INET6 {
+		return inet_ntop(ClientSa.GetSa().sa_family, &ClientSa.GetSaInet6().sin6_addr, str, INET6_ADDRSTRLEN)
 	}
 
 	/* Unix socket */

@@ -1360,8 +1360,8 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 	 * by a downsize of the buffer, overestimate by the step size (which is
 	 * 8K).  */
 
-	if core.PhpStreamStat(src, &ssbuf) == 0 && ssbuf.sb.st_size > 0 {
-		max_len = zend.MAX(ssbuf.sb.st_size-src.GetPosition(), 0) + step
+	if core.PhpStreamStat(src, &ssbuf) == 0 && ssbuf.GetSb().st_size > 0 {
+		max_len = zend.MAX(ssbuf.GetSb().st_size-src.GetPosition(), 0) + step
 	} else {
 		max_len = step
 	}
@@ -1406,7 +1406,7 @@ func _phpStreamCopyToStreamEx(src *core.PhpStream, dest *core.PhpStream, maxlen 
 		maxlen = 0
 	}
 	if core.PhpStreamStat(src, &ssbuf) == 0 {
-		if ssbuf.sb.st_size == 0 && zend.S_ISREG(ssbuf.sb.st_mode) {
+		if ssbuf.GetSb().st_size == 0 && zend.S_ISREG(ssbuf.GetSb().st_mode) {
 			*len_ = 0
 			return zend.SUCCESS
 		}

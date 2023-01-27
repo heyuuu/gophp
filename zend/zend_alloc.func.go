@@ -716,9 +716,9 @@ found:
 func ZendMmAllocLargeEx(heap *ZendMmHeap, size int) any {
 	var pages_count int = int(ZEND_MM_SIZE_TO_NUM(size, ZEND_MM_PAGE_SIZE))
 	var ptr any = ZendMmAllocPages(heap, pages_count)
-	var size int = heap.GetSize() + pages_count*ZEND_MM_PAGE_SIZE
-	var peak int = MAX(heap.GetPeak(), size)
-	heap.SetSize(size)
+	var size__1 int = heap.GetSize() + pages_count*ZEND_MM_PAGE_SIZE
+	var peak int = MAX(heap.GetPeak(), size__1)
+	heap.SetSize(size__1)
 	heap.SetPeak(peak)
 	return ptr
 }
@@ -1207,14 +1207,14 @@ func ZendMmAllocHuge(heap *ZendMmHeap, size int) any {
 
 	}
 	ZendMmAddHugeBlock(heap, ptr, new_size)
-	var size int = heap.GetRealSize() + new_size
-	var peak int = MAX(heap.GetRealPeak(), size)
-	heap.SetRealSize(size)
+	var size__1 int = heap.GetRealSize() + new_size
+	var peak int = MAX(heap.GetRealPeak(), size__1)
+	heap.SetRealSize(size__1)
 	heap.SetRealPeak(peak)
-	var size int = heap.GetSize() + new_size
-	var peak int = MAX(heap.GetPeak(), size)
-	heap.SetSize(size)
-	heap.SetPeak(peak)
+	var size__2 int = heap.GetSize() + new_size
+	var peak__1 int = MAX(heap.GetPeak(), size__2)
+	heap.SetSize(size__2)
+	heap.SetPeak(peak__1)
 	return ptr
 }
 func ZendMmFreeHuge(heap *ZendMmHeap, ptr any) {

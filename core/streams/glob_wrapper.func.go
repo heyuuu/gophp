@@ -42,7 +42,7 @@ func _phpGlobStreamGetCount(stream *core.PhpStream, pflags *int) int {
 		if pflags != nil {
 			*pflags = pglob.GetFlags()
 		}
-		return pglob.glob.gl_pathc
+		return pglob.GetGlob().gl_pathc
 	} else {
 		if pflags != nil {
 			*pflags = 0
@@ -76,12 +76,12 @@ func PhpGlobStreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	/* avoid problems if someone mis-uses the stream */
 
 	if count == b.SizeOf("php_stream_dirent") && pglob != nil {
-		if pglob.GetIndex() < int(pglob.glob.gl_pathc) {
-			PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[b.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
+		if pglob.GetIndex() < int(pglob.GetGlob().gl_pathc) {
+			PhpGlobStreamPathSplit(pglob, pglob.GetGlob().gl_pathv[b.PostInc(&(pglob.GetIndex()))], pglob.GetFlags()&GLOB_APPEND, &path)
 			core.PHP_STRLCPY(ent.GetDName(), path, b.SizeOf("ent -> d_name"), strlen(path))
 			return b.SizeOf("php_stream_dirent")
 		}
-		pglob.SetIndex(pglob.glob.gl_pathc)
+		pglob.SetIndex(pglob.GetGlob().gl_pathc)
 		if pglob.GetPath() != nil {
 			zend.Efree(pglob.GetPath())
 			pglob.SetPath(nil)
@@ -141,8 +141,8 @@ func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	pglob.SetPatternLen(strlen(pos))
 	pglob.SetPattern(zend.Estrndup(pos, pglob.GetPatternLen()))
 	pglob.SetIsAppend(true)
-	if pglob.glob.gl_pathc {
-		PhpGlobStreamPathSplit(pglob, pglob.glob.gl_pathv[0], 1, &tmp)
+	if pglob.GetGlob().gl_pathc {
+		PhpGlobStreamPathSplit(pglob, pglob.GetGlob().gl_pathv[0], 1, &tmp)
 	} else {
 		PhpGlobStreamPathSplit(pglob, path, 1, &tmp)
 	}

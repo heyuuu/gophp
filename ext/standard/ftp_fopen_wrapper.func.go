@@ -738,13 +738,13 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	if stream == nil {
 		goto stat_errexit
 	}
-	ssb.sb.st_mode = 0644
+	ssb.GetSb().st_mode = 0644
 	core.PhpStreamPrintf(stream, "CWD %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
-		ssb.sb.st_mode |= S_IFREG
+		ssb.GetSb().st_mode |= S_IFREG
 	} else {
-		ssb.sb.st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH
+		ssb.GetSb().st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH
 	}
 	core.PhpStreamWriteString(stream, "TYPE I\r\n")
 	result = GET_FTP_RESULT(stream)
@@ -759,8 +759,8 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		   or it's a directory and this server
 		   fails on listing directory sizes */
 
-		if (ssb.sb.st_mode & S_IFDIR) != 0 {
-			ssb.sb.st_size = 0
+		if (ssb.GetSb().st_mode & S_IFDIR) != 0 {
+			ssb.GetSb().st_size = 0
 		} else {
 			goto stat_errexit
 		}
@@ -770,7 +770,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		   fails on listing directory sizes */
 
 	} else {
-		ssb.sb.st_size = atoi(tmp_line + 4)
+		ssb.GetSb().st_size = atoi(tmp_line + 4)
 	}
 	core.PhpStreamPrintf(stream, "MDTM %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
 	result = GET_FTP_RESULT(stream)
@@ -808,24 +808,24 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 
 		tm.tm_sec += long(stamp - mktime(gmt))
 		tm.tm_isdst = gmt.tm_isdst
-		ssb.sb.st_mtime = mktime(&tm)
+		ssb.GetSb().st_mtime = mktime(&tm)
 	} else {
 
 		/* error or unsupported command */
 
 	mdtm_error:
-		ssb.sb.st_mtime = -1
+		ssb.GetSb().st_mtime = -1
 	}
-	ssb.sb.st_ino = 0
-	ssb.sb.st_dev = 0
-	ssb.sb.st_uid = 0
-	ssb.sb.st_gid = 0
-	ssb.sb.st_atime = -1
-	ssb.sb.st_ctime = -1
-	ssb.sb.st_nlink = 1
-	ssb.sb.st_rdev = -1
-	ssb.sb.st_blksize = 4096
-	ssb.sb.st_blocks = int((4095 + ssb.sb.st_size) / ssb.sb.st_blksize)
+	ssb.GetSb().st_ino = 0
+	ssb.GetSb().st_dev = 0
+	ssb.GetSb().st_uid = 0
+	ssb.GetSb().st_gid = 0
+	ssb.GetSb().st_atime = -1
+	ssb.GetSb().st_ctime = -1
+	ssb.GetSb().st_nlink = 1
+	ssb.GetSb().st_rdev = -1
+	ssb.GetSb().st_blksize = 4096
+	ssb.GetSb().st_blocks = int((4095 + ssb.GetSb().st_size) / ssb.GetSb().st_blksize)
 	core.PhpStreamClose(stream)
 	PhpUrlFree(resource)
 	return 0

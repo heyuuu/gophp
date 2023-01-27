@@ -461,11 +461,11 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			if DoFstat(data, 1) != 0 {
 				return core.PHP_STREAM_OPTION_RETURN_ERR
 			}
-			if range_.GetOffset() > data.sb.st_size {
-				range_.SetOffset(data.sb.st_size)
+			if range_.GetOffset() > data.GetSb().st_size {
+				range_.SetOffset(data.GetSb().st_size)
 			}
-			if range_.GetLength() == 0 || range_.GetLength() > data.sb.st_size-range_.GetOffset() {
-				range_.SetLength(data.sb.st_size - range_.GetOffset())
+			if range_.GetLength() == 0 || range_.GetLength() > data.GetSb().st_size-range_.GetOffset() {
+				range_.SetLength(data.GetSb().st_size - range_.GetOffset())
 			}
 			switch range_.GetMode() {
 			case PHP_STREAM_MAP_MODE_READONLY:
@@ -638,7 +638,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 				var self *PhpStdioStreamData = (*PhpStdioStreamData)(ret.GetAbstract())
 				var r int
 				r = DoFstat(self, 0)
-				if r == 0 && !(zend.S_ISREG(self.sb.st_mode)) {
+				if r == 0 && !(zend.S_ISREG(self.GetSb().st_mode)) {
 					if opened_path != nil {
 						zend.ZendStringReleaseEx(*opened_path, 0)
 						*opened_path = nil

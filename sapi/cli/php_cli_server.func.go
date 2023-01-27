@@ -1482,7 +1482,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 		zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
 	}
 	zend.SmartStrAppendsEx(&buffer, "Content-Length: ", 1)
-	zend.SmartStrAppendUnsignedEx(&buffer, client.request.sb.st_size, 1)
+	zend.SmartStrAppendUnsignedEx(&buffer, client.GetRequest().GetSb().st_size, 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
 	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), zend.ZSTR_VAL(buffer.GetS()), zend.ZSTR_LEN(buffer.GetS()))

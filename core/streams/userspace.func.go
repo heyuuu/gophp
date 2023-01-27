@@ -522,43 +522,43 @@ func StatbufFromArray(array *zend.Zval, ssb *core.PhpStreamStatbuf) int {
 
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("dev", b.SizeOf("\"dev\"")-1)) {
-		ssb.sb.st_dev = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_dev = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("ino", b.SizeOf("\"ino\"")-1)) {
-		ssb.sb.st_ino = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_ino = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("mode", b.SizeOf("\"mode\"")-1)) {
-		ssb.sb.st_mode = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_mode = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("nlink", b.SizeOf("\"nlink\"")-1)) {
-		ssb.sb.st_nlink = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_nlink = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("uid", b.SizeOf("\"uid\"")-1)) {
-		ssb.sb.st_uid = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_uid = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("gid", b.SizeOf("\"gid\"")-1)) {
-		ssb.sb.st_gid = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_gid = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("rdev", b.SizeOf("\"rdev\"")-1)) {
-		ssb.sb.st_rdev = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_rdev = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("size", b.SizeOf("\"size\"")-1)) {
-		ssb.sb.st_size = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_size = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("atime", b.SizeOf("\"atime\"")-1)) {
-		ssb.sb.st_atime = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_atime = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("mtime", b.SizeOf("\"mtime\"")-1)) {
-		ssb.sb.st_mtime = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_mtime = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("ctime", b.SizeOf("\"ctime\"")-1)) {
-		ssb.sb.st_ctime = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_ctime = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("blksize", b.SizeOf("\"blksize\"")-1)) {
-		ssb.sb.st_blksize = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_blksize = zend.ZvalGetLong(elem)
 	}
 	if nil != b.Assign(&elem, zend.Z_ARRVAL_P(array).StrFind("blocks", b.SizeOf("\"blocks\"")-1)) {
-		ssb.sb.st_blocks = zend.ZvalGetLong(elem)
+		ssb.GetSb().st_blocks = zend.ZvalGetLong(elem)
 	}
 	return zend.SUCCESS
 }

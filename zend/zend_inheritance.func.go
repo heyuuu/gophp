@@ -40,11 +40,11 @@ func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 	var new_function *ZendFunction
 	new_function = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_op_array"))
 	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
-	if ZEND_MAP_PTR_GET(func_.op_array.static_variables_ptr) {
+	if ZEND_MAP_PTR_GET(func_.GetOpArray().static_variables_ptr) {
 
 		/* See: Zend/tests/method_static_var.phpt */
 
-		new_function.GetOpArray().SetStaticVariables(ZEND_MAP_PTR_GET(func_.op_array.static_variables_ptr))
+		new_function.GetOpArray().SetStaticVariables(ZEND_MAP_PTR_GET(func_.GetOpArray().static_variables_ptr))
 
 		/* See: Zend/tests/method_static_var.phpt */
 
@@ -54,9 +54,9 @@ func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 	}
 	if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		ZEND_ASSERT(new_function.GetOpArray().IsPreloaded())
-		ZEND_MAP_PTR_NEW(new_function.op_array.static_variables_ptr)
+		ZEND_MAP_PTR_NEW(new_function.GetOpArray().static_variables_ptr)
 	} else {
-		ZEND_MAP_PTR_INIT(new_function.op_array.static_variables_ptr, &new_function.GetOpArray().GetStaticVariables())
+		ZEND_MAP_PTR_INIT(new_function.GetOpArray().static_variables_ptr, &new_function.GetOpArray().GetStaticVariables())
 	}
 	return new_function
 }

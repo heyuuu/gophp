@@ -113,9 +113,9 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 			var ptr any
 			my_function.GetOpArray().SetIsHeapRtCache(true)
 			ptr = Emalloc(b.SizeOf("void *") + my_function.GetOpArray().GetCacheSize())
-			ZEND_MAP_PTR_INIT(my_function.op_array.run_time_cache, ptr)
+			ZEND_MAP_PTR_INIT(my_function.GetOpArray().run_time_cache, ptr)
 			ptr = (*byte)(ptr + b.SizeOf("void *"))
-			ZEND_MAP_PTR_SET(my_function.op_array.run_time_cache, ptr)
+			ZEND_MAP_PTR_SET(my_function.GetOpArray().run_time_cache, ptr)
 			memset(ptr, 0, my_function.GetOpArray().GetCacheSize())
 		}
 
@@ -404,7 +404,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 	debug_info = ZendNewArray(8)
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *Zval
-		var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.func_.op_array.static_variables_ptr)
+		var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 		ZVAL_ARR(&val, ZendArrayDup(static_variables))
 		debug_info.Update(ZSTR_KNOWN(ZEND_STR_STATIC), &val)
 		for {
@@ -473,7 +473,7 @@ func ZendClosureGetGc(obj *Zval, table **Zval, n *int) *HashTable {
 		*n = 0
 	}
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
-		return ZEND_MAP_PTR_GET(closure.func_.op_array.static_variables_ptr)
+		return ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	} else {
 		return nil
 	}
@@ -532,13 +532,13 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 		if closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 			closure.GetFunc().GetOpArray().SetStaticVariables(ZendArrayDup(closure.GetFunc().GetOpArray().GetStaticVariables()))
 		}
-		ZEND_MAP_PTR_INIT(closure.func_.op_array.static_variables_ptr, &closure.GetFunc().GetOpArray().GetStaticVariables())
+		ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().static_variables_ptr, &closure.GetFunc().GetOpArray().GetStaticVariables())
 
 		/* Runtime cache is scope-dependent, so we cannot reuse it if the scope changed */
 
-		if !(ZEND_MAP_PTR_GET(closure.func_.op_array.run_time_cache)) || func_.GetScope() != scope || func_.IsHeapRtCache() {
+		if !(ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().run_time_cache)) || func_.GetScope() != scope || func_.IsHeapRtCache() {
 			var ptr any
-			if !(ZEND_MAP_PTR_GET(func_.op_array.run_time_cache)) && func_.IsClosure() && (func_.GetScope() == scope || !func_.IsImmutable()) {
+			if !(ZEND_MAP_PTR_GET(func_.GetOpArray().run_time_cache)) && func_.IsClosure() && (func_.GetScope() == scope || !func_.IsImmutable()) {
 
 				/* If a real closure is used for the first time, we create a shared runtime cache
 				 * and remember which scope it is for. */
@@ -548,17 +548,17 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 				}
 				closure.GetFunc().GetOpArray().SetIsHeapRtCache(false)
 				ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), func_.GetOpArray().GetCacheSize())
-				ZEND_MAP_PTR_SET(func_.op_array.run_time_cache, ptr)
-				ZEND_MAP_PTR_SET(closure.func_.op_array.run_time_cache, ptr)
+				ZEND_MAP_PTR_SET(func_.GetOpArray().run_time_cache, ptr)
+				ZEND_MAP_PTR_SET(closure.GetFunc().GetOpArray().run_time_cache, ptr)
 			} else {
 
 				/* Otherwise, we use a non-shared runtime cache */
 
 				closure.GetFunc().GetOpArray().SetIsHeapRtCache(true)
 				ptr = Emalloc(b.SizeOf("void *") + func_.GetOpArray().GetCacheSize())
-				ZEND_MAP_PTR_INIT(closure.func_.op_array.run_time_cache, ptr)
+				ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().run_time_cache, ptr)
 				ptr = (*byte)(ptr + b.SizeOf("void *"))
-				ZEND_MAP_PTR_SET(closure.func_.op_array.run_time_cache, ptr)
+				ZEND_MAP_PTR_SET(closure.GetFunc().GetOpArray().run_time_cache, ptr)
 			}
 			memset(ptr, 0, func_.GetOpArray().GetCacheSize())
 		}
@@ -613,12 +613,12 @@ func ZendCreateFakeClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry
 }
 func ZendClosureBindVar(closure_zv *Zval, var_name *ZendString, var_ *Zval) {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(closure_zv))
-	var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.func_.op_array.static_variables_ptr)
+	var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	static_variables.Update(var_name, var_)
 }
 func ZendClosureBindVarEx(closure_zv *Zval, offset uint32, val *Zval) {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(closure_zv))
-	var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.func_.op_array.static_variables_ptr)
+	var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 	var var_ *Zval = (*Zval)((*byte)(static_variables.GetArData() + offset))
 	ZvalPtrDtor(var_)
 	ZVAL_COPY_VALUE(var_, val)
