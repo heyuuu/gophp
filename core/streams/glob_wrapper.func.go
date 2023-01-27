@@ -93,7 +93,7 @@ func PhpGlobStreamClose(stream *core.PhpStream, close_handle int) int {
 	var pglob *GlobST = (*GlobST)(stream.GetAbstract())
 	if pglob != nil {
 		pglob.SetIndex(0)
-		globfree(&pglob.GetGlob())
+		globfree(pglob.GetGlob())
 		if pglob.GetPath() != nil {
 			zend.Efree(pglob.GetPath())
 		}
@@ -130,7 +130,7 @@ func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		return nil
 	}
 	pglob = zend.Ecalloc(b.SizeOf("* pglob"), 1)
-	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, &pglob.GetGlob())) {
+	if 0 != b.Assign(&ret, glob(path, pglob.GetFlags()&GLOB_FLAGMASK, nil, pglob.GetGlob())) {
 		zend.Efree(pglob)
 		return nil
 	}

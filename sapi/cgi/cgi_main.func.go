@@ -13,7 +13,7 @@ import (
 )
 
 func UserConfigCacheEntryDtor(el *zend.Zval) {
-	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(zend.Z_PTR_P(el))
+	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
 	entry.GetUserConfig().Destroy()
 	zend.Free(entry.GetUserConfig())
 	zend.Free(entry)
@@ -33,33 +33,33 @@ func ModuleNameCmp(a any, b any) int {
 func PrintModules() {
 	var sorted_registry zend.HashTable
 	var module *zend.ZendModuleEntry
-	&sorted_registry.Init(64, nil, nil, 1)
-	&sorted_registry.Copy(&zend.ModuleRegistry, nil)
-	&sorted_registry.Sort(ModuleNameCmp, 0)
+	sorted_registry.Init(64, nil, nil, 1)
+	sorted_registry.Copy(&zend.ModuleRegistry, nil)
+	sorted_registry.Sort(ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
-			module = zend.Z_PTR_P(_z)
+			module = _z.GetPtr()
 			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break
 	}
-	&sorted_registry.Destroy()
+	sorted_registry.Destroy()
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
 	return 0
 }
 func ExtensionNameCmp(f **zend.ZendLlistElement, s **zend.ZendLlistElement) int {
-	var fe *zend.ZendExtension = (*zend.ZendExtension)((*f).GetData())
-	var se *zend.ZendExtension = (*zend.ZendExtension)((*s).GetData())
+	var fe *zend.ZendExtension = (*zend.ZendExtension)(f.GetData())
+	var se *zend.ZendExtension = (*zend.ZendExtension)(s.GetData())
 	return strcmp(fe.GetName(), se.GetName())
 }
 func PrintExtensions() {
@@ -147,13 +147,13 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
-				h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.GetHeaders(), &pos))
+				h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
 				for h != nil {
 					if h.GetHeaderLen() > b.SizeOf("\"Status:\"")-1 && strncasecmp(h.GetHeader(), "Status:", b.SizeOf("\"Status:\"")-1) == 0 {
 						has_status = 1
 						break
 					}
-					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
+					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 				}
 				if has_status == 0 {
 					var err *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(core.HttpStatusMap)
@@ -177,7 +177,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			ignore_status = 1
 		}
 	}
-	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(&sapi_headers.GetHeaders(), &pos))
+	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
 	for h != nil {
 
 		/* prevent CRLFCRLF */
@@ -190,14 +190,14 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 					core.PHPWRITE_H("\r\n", 2)
 				}
 			} else if response_status == 304 && h.GetHeaderLen() > b.SizeOf("\"Content-Type:\"")-1 && strncasecmp(h.GetHeader(), "Content-Type:", b.SizeOf("\"Content-Type:\"")-1) == 0 {
-				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
+				h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 				continue
 			} else {
 				core.PHPWRITE_H(h.GetHeader(), h.GetHeaderLen())
 				core.PHPWRITE_H("\r\n", 2)
 			}
 		}
-		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(&sapi_headers.GetHeaders(), &pos))
+		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 	}
 	core.PHPWRITE_H("\r\n", 2)
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
@@ -274,7 +274,7 @@ func SapiFcgiReadCookies() *byte {
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var array_ptr *zend.Zval = (*zend.Zval)(arg)
-	var filter_arg int = b.Cond(zend.Z_ARR_P(array_ptr) == zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]), core.PARSE_ENV, core.PARSE_SERVER)
+	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.sapi_module.GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
@@ -285,9 +285,9 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != zend.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && zend.Z_ARR_P(array_ptr) != zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]) {
-			zend.ZendArrayDestroy(zend.Z_ARR_P(array_ptr))
-			zend.Z_ARR_P(array_ptr) = zend.ZendArrayDup(zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]))
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
+			zend.ZendArrayDestroy(array_ptr.GetArr())
+			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
 			return
 		}
 	}
@@ -923,7 +923,7 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	&php_cgi_globals.GetUserConfigCache().Init(8, nil, UserConfigCacheEntryDtor, 1)
+	php_cgi_globals.GetUserConfigCache().Init(8, nil, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES()

@@ -209,7 +209,7 @@ func ZendTsHashMinmax(ht *TsHashTable, compar CompareFuncT, flag int) *Zval {
 func ZendTsHashNumElements(ht *TsHashTable) int {
 	var retval int
 	BeginRead(ht)
-	retval = TS_HASH(ht).NumElements()
+	retval = TS_HASH(ht).GetNNumOfElements()
 	EndRead(ht)
 	return retval
 }

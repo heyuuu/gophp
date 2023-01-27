@@ -212,7 +212,7 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
 		return 0
 	}
 	core.Snprintf(markername, b.SizeOf("markername"), "APP%d", marker-M_APP0)
-	if b.Assign(&tmp, zend.Z_ARRVAL_P(info).StrFind(markername, strlen(markername))) == nil {
+	if b.Assign(&tmp, info.GetArr().StrFind(markername, strlen(markername))) == nil {
 
 		/* XXX we only catch the 1st tag of it's kind! */
 
@@ -702,8 +702,8 @@ func PhpGetWbmp(stream *core.PhpStream, result **Gfxinfo, check int) int {
 		return 0
 	}
 	if check == 0 {
-		(*result).SetWidth(width)
-		(*result).SetHeight(height)
+		result.SetWidth(width)
+		result.SetHeight(height)
 	}
 	return IMAGE_FILETYPE_WBMP
 }
@@ -760,8 +760,8 @@ func PhpGetXbm(stream *core.PhpStream, result **Gfxinfo) int {
 	if width != 0 && height != 0 {
 		if result != nil {
 			*result = (*Gfxinfo)(zend.Ecalloc(1, b.SizeOf("struct gfxinfo")))
-			(*result).SetWidth(width)
-			(*result).SetHeight(height)
+			result.SetWidth(width)
+			result.SetHeight(height)
 		}
 		return IMAGE_FILETYPE_XBM
 	}

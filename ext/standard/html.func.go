@@ -841,7 +841,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 	lim = old + oldlen
 	r.Assert((*lim) == '0')
 	p = old
-	q = zend.ZSTR_VAL(ret)
+	q = ret.GetVal()
 	for p < lim {
 		var code unsigned
 		var code2 unsigned = 0
@@ -944,7 +944,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 		}
 	}
 	*q = '0'
-	zend.ZSTR_LEN(ret) = size_t(q - zend.ZSTR_VAL(ret))
+	ret.SetLen(size_t(q - ret.GetVal()))
 }
 func UnescapeInverseMap(all int, flags int) *EntityHt {
 	var document_type int = flags & ENT_HTML_DOC_TYPE_MASK
@@ -991,7 +991,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 	var charset EntityCharset
 	var inverse_map *EntityHt
 	var new_size int
-	if !(memchr(zend.ZSTR_VAL(str), '&', zend.ZSTR_LEN(str))) {
+	if !(memchr(str.GetVal(), '&', str.GetLen())) {
 		return zend.ZendStringCopy(str)
 	}
 	if all != 0 {
@@ -1002,8 +1002,8 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 
 	/* don't use LIMIT_ALL! */
 
-	new_size = TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(zend.ZSTR_LEN(str))
-	if zend.ZSTR_LEN(str) > new_size {
+	new_size = TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(str.GetLen())
+	if str.GetLen() > new_size {
 
 		/* overflow, refuse to do anything */
 
@@ -1017,7 +1017,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 
 	/* replace numeric entities */
 
-	TraverseForEntities(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str), ret, all, flags, inverse_map, charset)
+	TraverseForEntities(str.GetVal(), str.GetLen(), ret, all, flags, inverse_map, charset)
 	return ret
 }
 func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *zend.ZendString {
@@ -1051,7 +1051,7 @@ func FindEntityForChar(k uint, charset EntityCharset, table *EntityStage1Row, en
 		}
 		var s *EntityMulticodepointRow
 		var e *EntityMulticodepointRow
-		s = &c.GetMulticodepointTable()[1]
+		s = c.GetMulticodepointTable()[1]
 		e = s - 1 + c.GetMulticodepointTable()[0].GetSize()
 
 		/* we could do a binary search but it's not worth it since we have
@@ -1203,10 +1203,10 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 				FindEntityForCharBasic(this_char, entity_table.GetTable(), &rep, &rep_len)
 			}
 			if rep != nil {
-				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = '&'
+				replaced.GetVal()[b.PostInc(&len_)] = '&'
 				memcpy(&zend.ZSTR_VAL(replaced)[len_], rep, rep_len)
 				len_ += rep_len
-				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = ';'
+				replaced.GetVal()[b.PostInc(&len_)] = ';'
 			} else {
 
 				/* we did not find an entity for this char.
@@ -1253,10 +1253,10 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 				}
 			pass_char_through:
 				if mbseqlen > 1 {
-					memcpy(zend.ZSTR_VAL(replaced)+len_, mbsequence, mbseqlen)
+					memcpy(replaced.GetVal()+len_, mbsequence, mbseqlen)
 					len_ += mbseqlen
 				} else {
-					zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = mbsequence[0]
+					replaced.GetVal()[b.PostInc(&len_)] = mbsequence[0]
 				}
 			}
 		} else {
@@ -1321,16 +1321,16 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 					replaced = zend.ZendStringSafeRealloc(replaced, maxlen, 1, ent_len+128, 0)
 					maxlen += ent_len + 128
 				}
-				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = '&'
+				replaced.GetVal()[b.PostInc(&len_)] = '&'
 				memcpy(&zend.ZSTR_VAL(replaced)[len_], &old[cursor], ent_len)
 				len_ += ent_len
-				zend.ZSTR_VAL(replaced)[b.PostInc(&len_)] = ';'
+				replaced.GetVal()[b.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
 			}
 		}
 	}
-	zend.ZSTR_VAL(replaced)[len_] = '0'
-	zend.ZSTR_LEN(replaced) = len_
+	replaced.GetVal()[len_] = '0'
+	replaced.SetLen(len_)
 	return replaced
 }
 func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval, all int) {
@@ -1429,7 +1429,7 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), all, int(flags), b.CondF1(hint_charset != nil, func() []byte { return zend.ZSTR_VAL(hint_charset) }, default_charset), double_encode)
+	replaced = PhpEscapeHtmlEntitiesEx((*uint8)(str.GetVal()), str.GetLen(), all, int(flags), b.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset), double_encode)
 	zend.RETVAL_STR(replaced)
 }
 func RegisterHtmlConstants(type_ int, module_number int) {
@@ -1624,7 +1624,7 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 	if hint_charset == nil {
 		default_charset = GetDefaultCharset()
 	}
-	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), b.CondF1(hint_charset != nil, func() []byte { return zend.ZSTR_VAL(hint_charset) }, default_charset))
+	replaced = PhpUnescapeHtmlEntities(str, 1, int(quote_style), b.CondF1(hint_charset != nil, func() []byte { return hint_charset.GetVal() }, default_charset))
 	if replaced != nil {
 		zend.RETVAL_STR(replaced)
 		return
@@ -1852,7 +1852,7 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 		var j unsigned
 		var numelems unsigned = b.SizeOf("stage3_table_be_noapos_00000") / b.SizeOf("* stage3_table_be_noapos_00000")
 		for j = 0; j < numelems; j++ {
-			var r *EntityStage3Row = &entity_table.GetTable()[j]
+			var r *EntityStage3Row = entity_table.GetTable()[j]
 			if r.GetEntity() == nil {
 				continue
 			}

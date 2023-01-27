@@ -70,7 +70,7 @@ func DoFstat(d *PhpStdioStreamData, force int) int {
 		var fd int
 		var r int
 		PHP_STDIOP_GET_FD(fd, d)
-		r = zend.ZendFstat(fd, &d.GetSb())
+		r = zend.ZendFstat(fd, d.GetSb())
 		d.SetCachedFstat(r == 0)
 		return r
 	}
@@ -115,7 +115,7 @@ func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **zend.
 		if stream != nil {
 			var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 			stream.SetWrapper((*core.PhpStreamWrapper)(&PhpPlainFilesWrapper))
-			stream.SetOrigPath(zend.Estrndup(zend.ZSTR_VAL(opened_path), zend.ZSTR_LEN(opened_path)))
+			stream.SetOrigPath(zend.Estrndup(opened_path.GetVal(), opened_path.GetLen()))
 			self.SetTempName(opened_path)
 			self.SetLockFlag(LOCK_UN)
 			return stream
@@ -285,7 +285,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 			return 0
 		}
 		if data.GetTempName() != nil {
-			unlink(zend.ZSTR_VAL(data.GetTempName()))
+			unlink(data.GetTempName().GetVal())
 
 			/* temporary streams are never persistent */
 
@@ -397,7 +397,7 @@ func PhpStdiopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var data *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 	r.Assert(data != nil)
 	if b.Assign(&ret, DoFstat(data, 1)) == 0 {
-		memcpy(&ssb.GetSb(), &data.GetSb(), b.SizeOf("ssb -> sb"))
+		memcpy(ssb.GetSb(), data.GetSb(), b.SizeOf("ssb -> sb"))
 	}
 	return ret
 }
@@ -683,9 +683,9 @@ func PhpPlainFilesUrlStater(wrapper *core.PhpStreamWrapper, url *byte, flags int
 		return -1
 	}
 	if (flags & core.PHP_STREAM_URL_STAT_LINK) != 0 {
-		return zend.VCWD_LSTAT(url, &ssb.GetSb())
+		return zend.VCWD_LSTAT(url, ssb.GetSb())
 	} else {
-		return zend.VCWD_STAT(url, &ssb.GetSb())
+		return zend.VCWD_STAT(url, ssb.GetSb())
 	}
 }
 func PhpPlainFilesUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, context *core.PhpStreamContext) int {
@@ -972,8 +972,8 @@ not_relative_path:
 	/* check in provided path */
 
 	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = zend.ZSTR_VAL(exec_filename)
-		var exec_fname_length int = zend.ZSTR_LEN(exec_filename)
+		var exec_fname *byte = exec_filename.GetVal()
+		var exec_fname_length int = exec_filename.GetLen()
 		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}

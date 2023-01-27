@@ -69,14 +69,14 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 		}
 		return nil
 	}
-	use_ssl = resource.GetScheme() != nil && zend.ZSTR_LEN(resource.GetScheme()) > 3 && zend.ZSTR_VAL(resource.GetScheme())[3] == 's'
+	use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 3 && resource.GetScheme().GetVal()[3] == 's'
 
 	/* use port 21 if one wasn't specified */
 
 	if resource.GetPort() == 0 {
 		resource.SetPort(21)
 	}
-	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", zend.ZSTR_VAL(resource.GetHost()), resource.GetPort()))
+	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", resource.GetHost().GetVal(), resource.GetPort()))
 	stream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, nil, nil)
 	zend.Efree(transport)
 	if stream == nil {
@@ -156,17 +156,17 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 	/* send the user name */
 
 	if resource.GetUser() != nil {
-		zend.ZSTR_LEN(resource.GetUser()) = PhpRawUrlDecode(zend.ZSTR_VAL(resource.GetUser()), zend.ZSTR_LEN(resource.GetUser()))
-		var s *uint8 = (*uint8)(zend.ZSTR_VAL(resource.GetUser()))
-		var e *uint8 = (*uint8)(s + zend.ZSTR_LEN(resource.GetUser()))
+		resource.GetUser().SetLen(PhpRawUrlDecode(resource.GetUser().GetVal(), resource.GetUser().GetLen()))
+		var s *uint8 = (*uint8)(resource.GetUser().GetVal())
+		var e *uint8 = (*uint8)(s + resource.GetUser().GetLen())
 		for s < e {
 			if iscntrl(*s) {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", zend.ZSTR_VAL(resource.GetUser()))
+				streams.PhpStreamWrapperLogError(wrapper, options, "Invalid login %s", resource.GetUser().GetVal())
 				goto connect_errexit
 			}
 			s++
 		}
-		core.PhpStreamPrintf(stream, "USER %s\r\n", zend.ZSTR_VAL(resource.GetUser()))
+		core.PhpStreamPrintf(stream, "USER %s\r\n", resource.GetUser().GetVal())
 	} else {
 		core.PhpStreamWriteString(stream, "USER anonymous\r\n")
 	}
@@ -180,17 +180,17 @@ func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, 
 	if result >= 300 && result <= 399 {
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, tmp_line, 0)
 		if resource.GetPass() != nil {
-			zend.ZSTR_LEN(resource.GetPass()) = PhpRawUrlDecode(zend.ZSTR_VAL(resource.GetPass()), zend.ZSTR_LEN(resource.GetPass()))
-			var s *uint8 = (*uint8)(zend.ZSTR_VAL(resource.GetPass()))
-			var e *uint8 = (*uint8)(s + zend.ZSTR_LEN(resource.GetPass()))
+			resource.GetPass().SetLen(PhpRawUrlDecode(resource.GetPass().GetVal(), resource.GetPass().GetLen()))
+			var s *uint8 = (*uint8)(resource.GetPass().GetVal())
+			var e *uint8 = (*uint8)(s + resource.GetPass().GetLen())
 			for s < e {
 				if iscntrl(*s) {
-					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", zend.ZSTR_VAL(resource.GetPass()))
+					streams.PhpStreamWrapperLogError(wrapper, options, "Invalid password %s", resource.GetPass().GetVal())
 					goto connect_errexit
 				}
 				s++
 			}
-			core.PhpStreamPrintf(stream, "PASS %s\r\n", zend.ZSTR_VAL(resource.GetPass()))
+			core.PhpStreamPrintf(stream, "PASS %s\r\n", resource.GetPass().GetVal())
 		} else {
 
 			/* if the user has configured who they are,
@@ -437,7 +437,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 	/* find out the size of the file (verifying it exists) */
 
-	core.PhpStreamPrintf(stream, "SIZE %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", resource.GetPath().GetVal())
 
 	/* read the response */
 
@@ -465,7 +465,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		/* when writing file (but not appending), it must NOT exist, unless a context option exists which allows it */
 
 		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "overwrite")) != nil {
-			if zend.Z_LVAL_P(tmpzval) != 0 {
+			if tmpzval.GetLval() != 0 {
 				allow_overwrite = 1
 			} else {
 				allow_overwrite = 0
@@ -477,7 +477,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 				/* Context permits overwriting file,
 				   so we just delete whatever's there in preparation */
 
-				core.PhpStreamPrintf(stream, "DELE %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+				core.PhpStreamPrintf(stream, "DELE %s\r\n", resource.GetPath().GetVal())
 				result = GET_FTP_RESULT(stream)
 				if result >= 300 || result <= 199 {
 					goto errexit
@@ -503,11 +503,11 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_LONG && zend.Z_LVAL_P(tmpzval) > 0 {
-			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", zend.Z_LVAL_P(tmpzval))
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(zend.IS_LONG) && tmpzval.GetLval() > 0 {
+			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.GetLval())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {
-				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+zend.ZEND_LONG_FMT, zend.Z_LVAL_P(tmpzval))
+				streams.PhpStreamWrapperLogError(wrapper, options, "Unable to resume from offset "+zend.ZEND_LONG_FMT, tmpzval.GetLval())
 				goto errexit
 			}
 		}
@@ -535,12 +535,12 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 		/* Append */
 
 	}
-	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "%s %s\r\n", tmp_line, b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = zend.ZSTR_VAL(resource.GetHost())
+		hoststart = resource.GetHost().GetVal()
 	}
 	transport_len = int(core.Spprintf(&transport, 0, "tcp://%s:%d", hoststart, portno))
 	datastream = streams.PhpStreamXportCreate(transport, transport_len, core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|streams.STREAM_XPORT_CONNECT, nil, nil, context, &error_message, nil)
@@ -587,7 +587,7 @@ errexit:
 		streams.PhpStreamWrapperLogError(wrapper, options, "FTP server reports %s", tmp_line)
 	}
 	if error_message != nil {
-		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", zend.ZSTR_VAL(error_message))
+		streams.PhpStreamWrapperLogError(wrapper, options, "Failed to set up data channel: %s", error_message.GetVal())
 		zend.ZendStringRelease(error_message)
 	}
 	return nil
@@ -608,8 +608,8 @@ func PhpFtpDirstreamRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 		return -1
 	}
 	basename = PhpBasename(ent.GetDName(), tmp_len, nil, 0)
-	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), zend.ZSTR_LEN(basename)-1)
-	memcpy(ent.GetDName(), zend.ZSTR_VAL(basename), tmp_len)
+	tmp_len = cli.MIN(b.SizeOf("ent -> d_name"), basename.GetLen()-1)
+	memcpy(ent.GetDName(), basename.GetVal(), tmp_len)
 	ent.GetDName()[tmp_len-1] = '0'
 	zend.ZendStringReleaseEx(basename, 0)
 
@@ -679,13 +679,13 @@ func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 	/* open the data channel */
 
 	if hoststart == nil {
-		hoststart = zend.ZSTR_VAL(resource.GetHost())
+		hoststart = resource.GetHost().GetVal()
 	}
 	datastream = core.PhpStreamSockOpenHost(hoststart, portno, SOCK_STREAM, 0, 0)
 	if datastream == nil {
 		goto opendir_errexit
 	}
-	core.PhpStreamPrintf(stream, "NLST %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "NLST %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result != 150 && result != 125 {
 
@@ -739,7 +739,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		goto stat_errexit
 	}
 	ssb.GetSb().st_mode = 0644
-	core.PhpStreamPrintf(stream, "CWD %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "CWD %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		ssb.GetSb().st_mode |= S_IFREG
@@ -751,7 +751,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	if result < 200 || result > 299 {
 		goto stat_errexit
 	}
-	core.PhpStreamPrintf(stream, "SIZE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "SIZE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 
@@ -772,7 +772,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 	} else {
 		ssb.GetSb().st_size = atoi(tmp_line + 4)
 	}
-	core.PhpStreamPrintf(stream, "MDTM %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "MDTM %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result == 213 {
 		var p *byte = tmp_line + 4
@@ -787,7 +787,7 @@ func PhpStreamFtpUrlStat(wrapper *core.PhpStreamWrapper, url *byte, flags int, s
 		if size_t(p-tmp_line) > b.SizeOf("tmp_line") {
 			goto mdtm_error
 		}
-		n = sscanf(p, "%4u%2u%2u%2u%2u%2u", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec)
+		n = sscanf(p, "%4u%2u%2u%2u%2u%2u", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec)
 		if n != 6 {
 			goto mdtm_error
 		}
@@ -859,7 +859,7 @@ func PhpStreamFtpUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, 
 
 	/* Attempt to delete the file */
 
-	core.PhpStreamPrintf(stream, "DELE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "DELE %s\r\n", b.CondF1(resource.GetPath() != nil, func() []byte { return resource.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -898,14 +898,14 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 	stream = PhpFtpFopenConnect(wrapper, url_from, "r", 0, nil, context, nil, nil, nil, nil)
 	if stream == nil {
 		if (options & core.REPORT_ERRORS) != 0 {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", zend.ZSTR_VAL(resource_from.GetHost()))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to connect to %s", resource_from.GetHost().GetVal())
 		}
 		goto rename_errexit
 	}
 
 	/* Rename FROM */
 
-	core.PhpStreamPrintf(stream, "RNFR %s\r\n", b.CondF1(resource_from.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource_from.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "RNFR %s\r\n", b.CondF1(resource_from.GetPath() != nil, func() []byte { return resource_from.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 300 || result > 399 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -916,7 +916,7 @@ func PhpStreamFtpRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *
 
 	/* Rename TO */
 
-	core.PhpStreamPrintf(stream, "RNTO %s\r\n", b.CondF1(resource_to.GetPath() != nil, func() []byte { return zend.ZSTR_VAL(resource_to.GetPath()) }, "/"))
+	core.PhpStreamPrintf(stream, "RNTO %s\r\n", b.CondF1(resource_to.GetPath() != nil, func() []byte { return resource_to.GetPath().GetVal() }, "/"))
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {
@@ -960,7 +960,7 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		goto mkdir_errexit
 	}
 	if recursive == 0 {
-		core.PhpStreamPrintf(stream, "MKD %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+		core.PhpStreamPrintf(stream, "MKD %s\r\n", resource.GetPath().GetVal())
 		result = GET_FTP_RESULT(stream)
 	} else {
 
@@ -969,8 +969,8 @@ func PhpStreamFtpMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, opti
 		var p *byte
 		var e *byte
 		var buf *byte
-		buf = zend.Estrndup(zend.ZSTR_VAL(resource.GetPath()), zend.ZSTR_LEN(resource.GetPath()))
-		e = buf + zend.ZSTR_LEN(resource.GetPath())
+		buf = zend.Estrndup(resource.GetPath().GetVal(), resource.GetPath().GetLen())
+		e = buf + resource.GetPath().GetLen()
 
 		/* find a top level directory we need to create */
 
@@ -1051,7 +1051,7 @@ func PhpStreamFtpRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 		}
 		goto rmdir_errexit
 	}
-	core.PhpStreamPrintf(stream, "RMD %s\r\n", zend.ZSTR_VAL(resource.GetPath()))
+	core.PhpStreamPrintf(stream, "RMD %s\r\n", resource.GetPath().GetVal())
 	result = GET_FTP_RESULT(stream)
 	if result < 200 || result > 299 {
 		if (options & core.REPORT_ERRORS) != 0 {

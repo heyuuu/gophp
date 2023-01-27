@@ -185,7 +185,7 @@ func BF_body() {
 		L = tmp4 ^ data.ctx.P[BF_N+1]
 		*(ptr - 2) = L
 		*(ptr - 1) = R
-		if ptr >= &data.ctx.P[BF_N+2] {
+		if ptr >= data.ctx.P[BF_N+2] {
 			break
 		}
 	}
@@ -214,7 +214,7 @@ func BF_body() {
 		L = tmp4 ^ data.ctx.P[BF_N+1]
 		*(ptr - 2) = L
 		*(ptr - 1) = R
-		if ptr >= &data.ctx.S[3][0xff] {
+		if ptr >= data.ctx.S[3][0xff] {
 			break
 		}
 	}
@@ -454,7 +454,7 @@ func BF_crypt(key *byte, setting *byte, output *byte, size int, min BF_word) *by
 		L = tmp4 ^ data.ctx.GetP()[BF_N+1]
 		*(ptr - 2) = L
 		*(ptr - 1) = R
-		if ptr >= &data.ctx.GetS()[3][0xff] {
+		if ptr >= data.ctx.GetS()[3][0xff] {
 			break
 		}
 	}

@@ -42,17 +42,17 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			idx = _p.GetH()
 			key = _p.GetKey()
 			zdata = _z
 			var is_dynamic zend.ZendBool = 1
-			if zend.Z_TYPE_P(zdata) == zend.IS_INDIRECT {
-				zdata = zend.Z_INDIRECT_P(zdata)
+			if zdata.IsType(zend.IS_INDIRECT) {
+				zdata = zdata.GetZv()
 				if zend.Z_ISUNDEF_P(zdata) {
 					continue
 				}
@@ -62,9 +62,9 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 			/* handling for private & protected object properties */
 
 			if key != nil {
-				prop_name = zend.ZSTR_VAL(key)
-				prop_len = zend.ZSTR_LEN(key)
-				if type_ != nil && zend.ZendCheckPropertyAccess(zend.Z_OBJ_P(type_), key, is_dynamic) != zend.SUCCESS {
+				prop_name = key.GetVal()
+				prop_len = key.GetLen()
+				if type_ != nil && zend.ZendCheckPropertyAccess(type_.GetObj(), key, is_dynamic) != zend.SUCCESS {
 
 					/* property not visible in this scope */
 
@@ -73,19 +73,19 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					/* property not visible in this scope */
 
 				}
-				if zend.ZSTR_VAL(key)[0] == '0' && type_ != nil {
+				if key.GetVal()[0] == '0' && type_ != nil {
 					var tmp *byte
 					zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
 				} else {
-					prop_name = zend.ZSTR_VAL(key)
-					prop_len = zend.ZSTR_LEN(key)
+					prop_name = key.GetVal()
+					prop_len = key.GetLen()
 				}
 			} else {
 				prop_name = nil
 				prop_len = 0
 			}
 			zend.ZVAL_DEREF(zdata)
-			if zend.Z_TYPE_P(zdata) == zend.IS_ARRAY || zend.Z_TYPE_P(zdata) == zend.IS_OBJECT {
+			if zdata.IsType(zend.IS_ARRAY) || zdata.IsType(zend.IS_OBJECT) {
 				if key != nil {
 					var ekey *zend.ZendString
 					if enc_type == PHP_QUERY_RFC3986 {
@@ -93,15 +93,15 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					} else {
 						ekey = PhpUrlEncode(prop_name, prop_len)
 					}
-					newprefix_len = key_suffix_len + zend.ZSTR_LEN(ekey) + key_prefix_len + 3
+					newprefix_len = key_suffix_len + ekey.GetLen() + key_prefix_len + 3
 					newprefix = zend.Emalloc(newprefix_len + 1)
 					p = newprefix
 					if key_prefix != nil {
 						memcpy(p, key_prefix, key_prefix_len)
 						p += key_prefix_len
 					}
-					memcpy(p, zend.ZSTR_VAL(ekey), zend.ZSTR_LEN(ekey))
-					p += zend.ZSTR_LEN(ekey)
+					memcpy(p, ekey.GetVal(), ekey.GetLen())
+					p += ekey.GetLen()
 					zend.ZendStringFree(ekey)
 					if key_suffix {
 						memcpy(p, key_suffix, key_suffix_len)
@@ -144,12 +144,12 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
 					zend.GC_PROTECT_RECURSION(ht)
 				}
-				PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zend.Z_TYPE_P(zdata) == zend.IS_OBJECT, zdata, nil), arg_sep, enc_type)
+				PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(zend.IS_OBJECT), zdata, nil), arg_sep, enc_type)
 				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
 					zend.GC_UNPROTECT_RECURSION(ht)
 				}
 				zend.Efree(newprefix)
-			} else if zend.Z_TYPE_P(zdata) == zend.IS_NULL || zend.Z_TYPE_P(zdata) == zend.IS_RESOURCE {
+			} else if zdata.IsType(zend.IS_NULL) || zdata.IsType(zend.IS_RESOURCE) {
 
 				/* Skip these types */
 
@@ -189,7 +189,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					zend.SmartStrAppendl(formstr, key_suffix, key_suffix_len)
 				}
 				zend.SmartStrAppendl(formstr, "=", 1)
-				switch zend.Z_TYPE_P(zdata) {
+				switch zdata.GetType() {
 				case zend.IS_STRING:
 					var ekey *zend.ZendString
 					if enc_type == PHP_QUERY_RFC3986 {
@@ -201,7 +201,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					zend.ZendStringFree(ekey)
 					break
 				case zend.IS_LONG:
-					zend.SmartStrAppendLong(formstr, zend.Z_LVAL_P(zdata))
+					zend.SmartStrAppendLong(formstr, zdata.GetLval())
 					break
 				case zend.IS_FALSE:
 					zend.SmartStrAppendl(formstr, "0", b.SizeOf("\"0\"")-1)
@@ -214,9 +214,9 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					var tmp *zend.ZendString
 					var str *zend.ZendString = zend.ZvalGetTmpString(zdata, &tmp)
 					if enc_type == PHP_QUERY_RFC3986 {
-						ekey = PhpRawUrlEncode(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
+						ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
 					} else {
-						ekey = PhpUrlEncode(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
+						ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
 					}
 					zend.SmartStrAppend(formstr, ekey)
 					zend.ZendTmpStringRelease(tmp)
@@ -323,7 +323,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		}
 		break
 	}
-	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(zend.Z_TYPE_P(formdata) == zend.IS_OBJECT, formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
+	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(formdata.IsType(zend.IS_OBJECT), formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
 		if formstr.GetS() != nil {
 			zend.SmartStrFree(&formstr)
 		}

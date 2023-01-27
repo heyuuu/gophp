@@ -86,7 +86,7 @@ const FORMAT_CONV_MAX_PRECISION = 500
   +----------------------------------------------------------------------+
 */
 
-const LCONV_DECIMAL_POINT = (*lconv).decimal_point
+const LCONV_DECIMAL_POINT = lconv.decimal_point
 
 /*
  * Copyright (c) 2002, 2006 Todd C. Miller <Todd.Miller@courtesan.com>

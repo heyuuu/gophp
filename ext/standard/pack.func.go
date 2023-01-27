@@ -11,7 +11,7 @@ import (
 func PhpPack(val *zend.Zval, size int, map_ *int, output *byte) {
 	var i int
 	var v *byte
-	if zend.Z_TYPE_P(val) != zend.IS_LONG {
+	if val.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(val)
 	}
 	v = (*byte)(&zend.Z_LVAL_P(val))
@@ -47,7 +47,7 @@ func PhpPackCopyFloat(is_little_endian int, dst any, f float) {
 	if is_little_endian == 0 {
 		m.i = PhpPackReverseInt32(m.i)
 	}
-	memcpy(dst, &m.f, b.SizeOf("float"))
+	memcpy(dst, m.f, b.SizeOf("float"))
 }
 func PhpPackCopyDouble(is_little_endian int, dst any, d float64) {
 	var m struct /* union */ {
@@ -58,14 +58,14 @@ func PhpPackCopyDouble(is_little_endian int, dst any, d float64) {
 	if is_little_endian == 0 {
 		m.i = PhpPackReverseInt64(m.i)
 	}
-	memcpy(dst, &m.d, b.SizeOf("double"))
+	memcpy(dst, m.d, b.SizeOf("double"))
 }
 func PhpPackParseFloat(is_little_endian int, src any) float {
 	var m struct /* union */ {
 		f float
 		i uint32
 	}
-	memcpy(&m.i, src, b.SizeOf("float"))
+	memcpy(m.i, src, b.SizeOf("float"))
 	if is_little_endian == 0 {
 		m.i = PhpPackReverseInt32(m.i)
 	}
@@ -76,7 +76,7 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 		d float64
 		i uint64
 	}
-	memcpy(&m.i, src, b.SizeOf("double"))
+	memcpy(m.i, src, b.SizeOf("double"))
 	if is_little_endian == 0 {
 		m.i = PhpPackReverseInt64(m.i)
 	}
@@ -485,7 +485,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var tmp_str *zend.ZendString
 			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			memset(&zend.ZSTR_VAL(output)[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
-			memcpy(&zend.ZSTR_VAL(output)[outputpos], zend.ZSTR_VAL(str), b.CondF1(zend.ZSTR_LEN(str) < arg_cp, func() int { return zend.ZSTR_LEN(str) }, arg_cp))
+			memcpy(&zend.ZSTR_VAL(output)[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
 			zend.ZendTmpStringRelease(tmp_str)
 			break
@@ -496,11 +496,11 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var first int = 1
 			var tmp_str *zend.ZendString
 			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			var v *byte = zend.ZSTR_VAL(str)
+			var v *byte = str.GetVal()
 			outputpos--
-			if int(arg > zend.ZSTR_LEN(str)) != 0 {
+			if int(arg > str.GetLen()) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough characters in string", code)
-				arg = zend.ZSTR_LEN(str)
+				arg = str.GetLen()
 			}
 			for b.PostDec(&arg) > 0 {
 				var n byte = b.PostInc(&(*v))
@@ -515,11 +515,11 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					n = 0
 				}
 				if b.PostDec(&first) {
-					zend.ZSTR_VAL(output)[b.PreInc(&outputpos)] = 0
+					output.GetVal()[b.PreInc(&outputpos)] = 0
 				} else {
 					first = 1
 				}
-				zend.ZSTR_VAL(output)[outputpos] |= n << nibbleshift
+				output.GetVal()[outputpos] |= n << nibbleshift
 				nibbleshift = nibbleshift + 4&7
 			}
 			outputpos++
@@ -669,8 +669,8 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.Efree(formatcodes)
 	zend.Efree(formatargs)
-	zend.ZSTR_VAL(output)[outputpos] = '0'
-	zend.ZSTR_LEN(output) = outputpos
+	output.GetVal()[outputpos] = '0'
+	output.SetLen(outputpos)
 	zend.RETVAL_NEW_STR(output)
 	return
 }
@@ -779,10 +779,10 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	format = zend.ZSTR_VAL(formatarg)
-	formatlen = zend.ZSTR_LEN(formatarg)
-	input = zend.ZSTR_VAL(inputarg)
-	inputlen = zend.ZSTR_LEN(inputarg)
+	format = formatarg.GetVal()
+	formatlen = formatarg.GetLen()
+	input = inputarg.GetVal()
+	inputlen = inputarg.GetLen()
 	inputpos = 0
 	if offset < 0 || offset > inputlen {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Offset "+zend.ZEND_LONG_FMT+" is out of input range", offset)
@@ -914,14 +914,14 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format type %c", type_)
-			zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+			zend.ZendArrayDestroy(return_value.GetArr())
 			zend.RETVAL_FALSE
 			return
 			break
 		}
 		if size != 0 && size != -1 && size < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
-			zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+			zend.ZendArrayDestroy(return_value.GetArr())
 			zend.RETVAL_FALSE
 			return
 		}
@@ -952,7 +952,7 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
-				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+				zend.ZendArrayDestroy(return_value.GetArr())
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1052,14 +1052,14 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						} else {
 							cc += 'a' - 10
 						}
-						zend.ZSTR_VAL(buf)[opos] = cc
+						buf.GetVal()[opos] = cc
 						nibbleshift = nibbleshift + 4&7
 						if b.PostDec(&first) == 0 {
 							ipos++
 							first = 1
 						}
 					}
-					zend.ZSTR_VAL(buf)[len_] = '0'
+					buf.GetVal()[len_] = '0'
 					zend.AddAssocStr(return_value, n, buf)
 					break
 				case 'c':
@@ -1229,7 +1229,7 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
-				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+				zend.ZendArrayDestroy(return_value.GetArr())
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1297,7 +1297,7 @@ func ZmStartupPack(type_ int, module_number int) int {
 	} else {
 		var val zend.Zval
 		var size int = b.SizeOf("Z_LVAL ( val )")
-		zend.Z_LVAL(val) = 0
+		val.SetLval(0)
 
 		/* Where to get hi to lo bytes from */
 

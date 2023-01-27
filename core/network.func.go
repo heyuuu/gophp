@@ -65,7 +65,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				zend.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", zend.ZSTR_VAL(*error_string))
+			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
 		} else {
 			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
 		}
@@ -79,7 +79,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				zend.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", zend.ZSTR_VAL(*error_string))
+			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
 		} else {
 			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
 		}
@@ -303,14 +303,14 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 
 	/* first, try interpreting the address as a numeric address */
 
-	if inet_pton(AF_INET6, tmp, &in6.sin6_addr) > 0 {
+	if inet_pton(AF_INET6, tmp, in6.sin6_addr) > 0 {
 		in6.sin6_port = htons(port)
 		in6.sin6_family = AF_INET6
 		*sl = b.SizeOf("struct sockaddr_in6")
 		ret = zend.SUCCESS
 		goto out
 	}
-	if inet_aton(tmp, &in4.sin_addr) > 0 {
+	if inet_aton(tmp, in4.sin_addr) > 0 {
 		in4.sin_port = htons(port)
 		in4.sin_family = AF_INET
 		*sl = b.SizeOf("struct sockaddr_in")
@@ -323,7 +323,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 	n = PhpNetworkGetaddresses(tmp, SOCK_DGRAM, &psal, &errstr)
 	if n == 0 {
 		if errstr != nil {
-			PhpErrorDocref(nil, zend.E_WARNING, "Failed to resolve `%s': %s", tmp, zend.ZSTR_VAL(errstr))
+			PhpErrorDocref(nil, zend.E_WARNING, "Failed to resolve `%s': %s", tmp, errstr.GetVal())
 			zend.ZendStringReleaseEx(errstr, 0)
 		}
 		goto out
@@ -331,7 +331,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 
 	/* copy the details from the first item */
 
-	switch (*psal).sa_family {
+	switch psal.sa_family {
 	case AF_INET6:
 		*in6 = *(*((**__struct__sockaddr_in6)(psal)))
 		in6.sin6_port = htons(port)
@@ -370,7 +370,7 @@ func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, te
 			}
 			break
 		case AF_INET6:
-			buf = (*byte)(inet_ntop(sa.sa_family, &((*__struct__sockaddr_in6)(sa)).sin6_addr, (*byte)(&abuf), b.SizeOf("abuf")))
+			buf = (*byte)(inet_ntop(sa.sa_family, (*__struct__sockaddr_in6)(sa).sin6_addr, (*byte)(&abuf), b.SizeOf("abuf")))
 			if buf != nil {
 				*textaddr = Strpprintf(0, "[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port))
 			}
@@ -509,7 +509,7 @@ func PhpNetworkConnectSocketToHost(host *byte, port uint16, socktype int, asynch
 					local_address_len = b.SizeOf("struct sockaddr_in")
 					in4.sin_family = sa.sa_family
 					in4.sin_port = htons(bindport)
-					if !(inet_aton(bindto, &in4.sin_addr)) {
+					if !(inet_aton(bindto, in4.sin_addr)) {
 						PhpErrorDocref(nil, zend.E_WARNING, "Invalid IP Address: %s", bindto)
 						goto skip_bind
 					}
@@ -520,7 +520,7 @@ func PhpNetworkConnectSocketToHost(host *byte, port uint16, socktype int, asynch
 					local_address_len = b.SizeOf("struct sockaddr_in6")
 					in6.sin6_family = sa.sa_family
 					in6.sin6_port = htons(bindport)
-					if inet_pton(AF_INET6, bindto, &in6.sin6_addr) < 1 {
+					if inet_pton(AF_INET6, bindto, in6.sin6_addr) < 1 {
 						PhpErrorDocref(nil, zend.E_WARNING, "Invalid IP Address: %s", bindto)
 						goto skip_bind
 					}

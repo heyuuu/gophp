@@ -24,7 +24,7 @@ func _phpStreamGetUrlStreamWrappersHash() *zend.HashTable {
 func PhpStreamGetUrlStreamWrappersHashGlobal() *zend.HashTable { return &UrlStreamWrappersHash }
 func ForgetPersistentResourceIdNumbers(el *zend.Zval) int {
 	var stream *core.PhpStream
-	var rsrc *zend.ZendResource = zend.Z_RES_P(el)
+	var rsrc *zend.ZendResource = el.GetRes()
 	if rsrc.GetType() != LePstream {
 		return 0
 	}
@@ -43,9 +43,9 @@ func ZmDeactivateStreams(type_ int, module_number int) int {
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			el = _z
@@ -63,7 +63,7 @@ func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *cor
 }
 func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int {
 	var le *zend.ZendResource
-	if b.Assign(&le, &(zend.ExecutorGlobals.GetPersistentList()).StrFindPtr(persistent_id, strlen(persistent_id))) != nil {
+	if b.Assign(&le, zend.ExecutorGlobals.GetPersistentList().StrFindPtr(persistent_id, strlen(persistent_id))) != nil {
 		if le.GetType() == LePstream {
 			if stream != nil {
 				var regentry *zend.ZendResource = nil
@@ -78,22 +78,22 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 					var _p *zend.Bucket = __ht.GetArData()
 					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.GetVal()
+						var _z *zend.Zval = _p.GetVal()
 
-						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+						if _z.IsType(zend.IS_UNDEF) {
 							continue
 						}
-						regentry = zend.Z_PTR_P(_z)
+						regentry = _z.GetPtr()
 						if regentry.GetPtr() == le.GetPtr() {
 							zend.GC_ADDREF(regentry)
-							(*stream).SetRes(regentry)
+							stream.SetRes(regentry)
 							return core.PHP_STREAM_PERSISTENT_SUCCESS
 						}
 					}
 					break
 				}
 				zend.GC_ADDREF(le)
-				(*stream).SetRes(zend.ZendRegisterResource(*stream, LePstream))
+				stream.SetRes(zend.ZendRegisterResource(*stream, LePstream))
 			}
 			return core.PHP_STREAM_PERSISTENT_SUCCESS
 		}
@@ -128,7 +128,7 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 			var l int = 0
 			var brlen int
 			var i int
-			var count int = int(zend.ZendLlistCount(err_list))
+			var count int = int(err_list.GetCount())
 			var br *byte
 			var err_buf_p **byte
 			var pos zend.ZendLlistPosition
@@ -186,7 +186,7 @@ func PhpStreamTidyWrapperErrorLog(wrapper *core.PhpStreamWrapper) {
 }
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
 func WrapperListDtor(item *zend.Zval) {
-	var list *zend.ZendLlist = (*zend.ZendLlist)(zend.Z_PTR_P(item))
+	var list *zend.ZendLlist = (*zend.ZendLlist)(item.GetPtr())
 	zend.ZendLlistDestroy(list)
 	zend.Efree(list)
 }
@@ -248,7 +248,7 @@ func _phpStreamAlloc(ops *core.PhpStreamOps, abstract any, persistent_id *byte, 
 	strlcpy(ret.GetMode(), mode, b.SizeOf("ret -> mode"))
 	ret.SetWrapper(nil)
 	ret.SetWrapperthis(nil)
-	zend.ZVAL_UNDEF(&ret.GetWrapperdata())
+	zend.ZVAL_UNDEF(ret.GetWrapperdata())
 	ret.SetStdiocast(nil)
 	ret.SetOrigPath(nil)
 	ret.SetCtx(nil)
@@ -260,7 +260,7 @@ func _phpStreamFreeEnclosed(stream_enclosed *core.PhpStream, close_options int) 
 	return core.PhpStreamFree(stream_enclosed, close_options|core.PHP_STREAM_FREE_IGNORE_ENCLOSING)
 }
 func _phpStreamFreePersistent(zv *zend.Zval, pStream any) int {
-	var le *zend.ZendResource = zend.Z_RES_P(zv)
+	var le *zend.ZendResource = zv.GetRes()
 	return le.GetPtr() == pStream
 }
 func _phpStreamFree(stream *core.PhpStream, close_options int) int {
@@ -412,8 +412,8 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 			stream.SetWrapper(nil)
 		}
 		if stream.GetWrapperdata().GetType() != zend.IS_UNDEF {
-			zend.ZvalPtrDtor(&stream.GetWrapperdata())
-			zend.ZVAL_UNDEF(&stream.GetWrapperdata())
+			zend.ZvalPtrDtor(stream.GetWrapperdata())
+			zend.ZVAL_UNDEF(stream.GetWrapperdata())
 		}
 		if stream.GetReadbuf() != nil {
 			zend.Pefree(stream.GetReadbuf(), stream.GetIsPersistent())
@@ -423,7 +423,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 
 			/* we don't work with *stream but need its value for comparison */
 
-			&(zend.ExecutorGlobals.GetPersistentList()).ApplyWithArgument(_phpStreamFreePersistent, stream)
+			zend.ExecutorGlobals.GetPersistentList().ApplyWithArgument(_phpStreamFreePersistent, stream)
 
 			/* we don't work with *stream but need its value for comparison */
 
@@ -679,13 +679,13 @@ func _phpStreamRead(stream *core.PhpStream, buf *byte, size int) ssize_t {
 }
 func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *zend.ZendString {
 	var str *zend.ZendString = zend.ZendStringAlloc(len_, 0)
-	var read ssize_t = core.PhpStreamRead(stream, zend.ZSTR_VAL(str), len_)
+	var read ssize_t = core.PhpStreamRead(stream, str.GetVal(), len_)
 	if read < 0 {
 		zend.ZendStringEfree(str)
 		return nil
 	}
-	zend.ZSTR_LEN(str) = read
-	zend.ZSTR_VAL(str)[read] = 0
+	str.SetLen(read)
+	str.GetVal()[read] = 0
 	if int(read < len_/2) != 0 {
 		return zend.ZendStringTruncate(str, read, 0)
 	}
@@ -757,8 +757,8 @@ func PhpStreamLocateEol(stream *core.PhpStream, buf *zend.ZendString) *byte {
 		readptr = (*byte)(stream.GetReadbuf() + stream.GetReadpos())
 		avail = stream.GetWritepos() - stream.GetReadpos()
 	} else {
-		readptr = zend.ZSTR_VAL(buf)
-		avail = zend.ZSTR_LEN(buf)
+		readptr = buf.GetVal()
+		avail = buf.GetLen()
 	}
 
 	/* Look for EOL */
@@ -907,9 +907,9 @@ func _phpStreamSearchDelim(stream *core.PhpStream, maxlen int, skiplen int, deli
 		return nil
 	}
 	if delim_len == 1 {
-		return memchr(&stream.GetReadbuf()[stream.GetReadpos()+skiplen], delim[0], seek_len-skiplen)
+		return memchr(stream.GetReadbuf()[stream.GetReadpos()+skiplen], delim[0], seek_len-skiplen)
 	} else {
-		return core.PhpMemnstr((*byte)(&stream.GetReadbuf()[stream.GetReadpos()+skiplen]), delim, delim_len, (*byte)(&stream.GetReadbuf()[stream.GetReadpos()+seek_len]))
+		return core.PhpMemnstr((*byte)(stream.GetReadbuf()[stream.GetReadpos()+skiplen]), delim, delim_len, (*byte)(stream.GetReadbuf()[stream.GetReadpos()+seek_len]))
 	}
 }
 func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_len int) *zend.ZendString {
@@ -958,7 +958,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 		buffered_len += just_read
 	}
 	if has_delim != 0 && found_delim != nil {
-		tent_ret_len = found_delim - (*byte)(&stream.GetReadbuf()[stream.GetReadpos()])
+		tent_ret_len = found_delim - (*byte)(stream.GetReadbuf()[stream.GetReadpos()])
 	} else if has_delim == 0 && STREAM_BUFFERED_AMOUNT(stream) >= maxlen {
 		tent_ret_len = maxlen
 	} else {
@@ -995,12 +995,12 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 	/* php_stream_read will not call ops->read here because the necessary
 	 * data is guaranteedly buffered */
 
-	zend.ZSTR_LEN(ret_buf) = core.PhpStreamRead(stream, zend.ZSTR_VAL(ret_buf), tent_ret_len)
+	ret_buf.SetLen(core.PhpStreamRead(stream, ret_buf.GetVal(), tent_ret_len))
 	if found_delim != nil {
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
 	}
-	zend.ZSTR_VAL(ret_buf)[zend.ZSTR_LEN(ret_buf)] = '0'
+	ret_buf.GetVal()[ret_buf.GetLen()] = '0'
 	return ret_buf
 }
 func _phpStreamWriteBuffer(stream *core.PhpStream, buf *byte, count int) ssize_t {
@@ -1014,7 +1014,7 @@ func _phpStreamWriteBuffer(stream *core.PhpStream, buf *byte, count int) ssize_t
 	if stream.GetOps().GetSeek() != nil && !stream.HasFlags(core.PHP_STREAM_FLAG_NO_SEEK) && stream.GetReadpos() != stream.GetWritepos() {
 		stream.SetWritepos(0)
 		stream.SetReadpos(stream.GetWritepos())
-		stream.GetOps().GetSeek()(stream, stream.GetPosition(), r.SEEK_SET, &stream.GetPosition())
+		stream.GetOps().GetSeek()(stream, stream.GetPosition(), r.SEEK_SET, stream.GetPosition())
 	}
 	for count > 0 {
 		var towrite int = count
@@ -1197,7 +1197,7 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 			whence = r.SEEK_SET
 			break
 		}
-		ret = stream.GetOps().GetSeek()(stream, offset, whence, &stream.GetPosition())
+		ret = stream.GetOps().GetSeek()(stream, offset, whence, stream.GetPosition())
 		if !stream.HasFlags(core.PHP_STREAM_FLAG_NO_SEEK) || ret == 0 {
 			if ret == 0 {
 				stream.SetEof(0)
@@ -1319,7 +1319,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 	}
 	if maxlen > 0 {
 		result = zend.ZendStringAlloc(maxlen, persistent)
-		ptr = zend.ZSTR_VAL(result)
+		ptr = result.GetVal()
 		for len_ < maxlen && core.PhpStreamEof(src) == 0 {
 			ret = core.PhpStreamRead(src, ptr, maxlen-len_)
 			if ret <= 0 {
@@ -1335,8 +1335,8 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 			ptr += ret
 		}
 		if len_ != 0 {
-			zend.ZSTR_LEN(result) = len_
-			zend.ZSTR_VAL(result)[len_] = '0'
+			result.SetLen(len_)
+			result.GetVal()[len_] = '0'
 
 			/* Only truncate if the savings are large enough */
 
@@ -1366,7 +1366,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 		max_len = step
 	}
 	result = zend.ZendStringAlloc(max_len, persistent)
-	ptr = zend.ZSTR_VAL(result)
+	ptr = result.GetVal()
 
 	// TODO: Propagate error?
 
@@ -1375,14 +1375,14 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 		if len_+min_room >= max_len {
 			result = zend.ZendStringExtend(result, max_len+step, persistent)
 			max_len += step
-			ptr = zend.ZSTR_VAL(result) + len_
+			ptr = result.GetVal() + len_
 		} else {
 			ptr += ret
 		}
 	}
 	if len_ != 0 {
 		result = zend.ZendStringTruncate(result, len_, persistent)
-		zend.ZSTR_VAL(result)[len_] = '0'
+		result.GetVal()[len_] = '0'
 	} else {
 		zend.ZendStringFree(result)
 		result = nil
@@ -1541,7 +1541,7 @@ func PhpInitStreamWrappers(module_number int) int {
 	/* Filters are cleaned up by the streams they're attached to */
 
 	LeStreamFilter = zend.ZendRegisterListDestructorsEx(nil, nil, "stream filter", module_number)
-	&UrlStreamWrappersHash.Init(8, nil, nil, 1)
+	UrlStreamWrappersHash.Init(8, nil, nil, 1)
 	PhpGetStreamFiltersHashGlobal().Init(8, nil, nil, 1)
 	PhpStreamXportGetHash().Init(8, nil, nil, 1)
 	if PhpStreamXportRegister("tcp", PhpStreamGenericSocketFactory) == zend.SUCCESS && PhpStreamXportRegister("udp", PhpStreamGenericSocketFactory) == zend.SUCCESS {
@@ -1551,7 +1551,7 @@ func PhpInitStreamWrappers(module_number int) int {
 	}
 }
 func PhpShutdownStreamWrappers(module_number int) int {
-	&UrlStreamWrappersHash.Destroy()
+	UrlStreamWrappersHash.Destroy()
 	PhpGetStreamFiltersHashGlobal().Destroy()
 	PhpStreamXportGetHash().Destroy()
 	return zend.SUCCESS
@@ -1573,7 +1573,7 @@ func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper
 		return zend.FAILURE
 	}
 	str = zend.ZendStringInitInterned(protocol, protocol_len, 1)
-	if &UrlStreamWrappersHash.AddPtr(str, any(wrapper)) {
+	if UrlStreamWrappersHash.AddPtr(str, any(wrapper)) {
 		ret = zend.SUCCESS
 	} else {
 		ret = zend.FAILURE
@@ -1582,15 +1582,15 @@ func PhpRegisterUrlStreamWrapper(protocol string, wrapper *core.PhpStreamWrapper
 	return ret
 }
 func PhpUnregisterUrlStreamWrapper(protocol string) int {
-	return &UrlStreamWrappersHash.StrDel(protocol, strlen(protocol))
+	return UrlStreamWrappersHash.StrDel(protocol, strlen(protocol))
 }
 func CloneWrapperHash() {
 	zend.ALLOC_HASHTABLE(standard.FG(stream_wrappers))
-	standard.FG(stream_wrappers).Init(&UrlStreamWrappersHash.NumElements(), nil, nil, 0)
+	standard.FG(stream_wrappers).Init(UrlStreamWrappersHash.GetNNumOfElements(), nil, nil, 0)
 	standard.FG(stream_wrappers).Copy(&UrlStreamWrappersHash, nil)
 }
 func PhpRegisterUrlStreamWrapperVolatile(protocol *zend.ZendString, wrapper *core.PhpStreamWrapper) int {
-	if PhpStreamWrapperSchemeValidate(zend.ZSTR_VAL(protocol), zend.ZSTR_LEN(protocol)) == zend.FAILURE {
+	if PhpStreamWrapperSchemeValidate(protocol.GetVal(), protocol.GetLen()) == zend.FAILURE {
 		return zend.FAILURE
 	}
 	if !(standard.FG(stream_wrappers)) {
@@ -1840,7 +1840,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 	if (options & core.USE_PATH) != 0 {
 		resolved_path = zend.ZendResolvePath(path, strlen(path))
 		if resolved_path != nil {
-			path = zend.ZSTR_VAL(resolved_path)
+			path = resolved_path.GetVal()
 
 			/* we've found this file, don't re-check include_path or run realpath */
 
@@ -1964,8 +1964,8 @@ func PhpStreamNotificationNotify(context *core.PhpStreamContext, notifycode int,
 }
 func PhpStreamContextFree(context *core.PhpStreamContext) {
 	if context.GetOptions().GetType() != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&context.GetOptions())
-		zend.ZVAL_UNDEF(&context.GetOptions())
+		zend.ZvalPtrDtor(context.GetOptions())
+		zend.ZVAL_UNDEF(context.GetOptions())
 	}
 	if context.GetNotifier() != nil {
 		PhpStreamNotificationFree(context.GetNotifier())
@@ -1977,7 +1977,7 @@ func PhpStreamContextAlloc() *core.PhpStreamContext {
 	var context *core.PhpStreamContext
 	context = zend.Ecalloc(1, b.SizeOf("php_stream_context"))
 	context.SetNotifier(nil)
-	zend.ArrayInit(&context.GetOptions())
+	zend.ArrayInit(context.GetOptions())
 	context.SetRes(zend.ZendRegisterResource(context, standard.PhpLeStreamContext()))
 	return context
 }
@@ -1992,31 +1992,31 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *zend.Zval {
 	var wrapperhash *zend.Zval
-	if nil == b.Assign(&wrapperhash, zend.Z_ARRVAL(context.GetOptions()).StrFind(wrappername, strlen(wrappername))) {
+	if nil == b.Assign(&wrapperhash, context.GetOptions().GetArr().StrFind(wrappername, strlen(wrappername))) {
 		return nil
 	}
-	return zend.Z_ARRVAL_P(wrapperhash).StrFind(optionname, strlen(optionname))
+	return wrapperhash.GetArr().StrFind(optionname, strlen(optionname))
 }
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *zend.Zval) int {
 	var wrapperhash *zend.Zval
 	var category zend.Zval
-	zend.SEPARATE_ARRAY(&context.GetOptions())
-	wrapperhash = zend.Z_ARRVAL(context.GetOptions()).StrFind(wrappername, strlen(wrappername))
+	zend.SEPARATE_ARRAY(context.GetOptions())
+	wrapperhash = context.GetOptions().GetArr().StrFind(wrappername, strlen(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
-		wrapperhash = zend.Z_ARRVAL(context.GetOptions()).StrUpdate((*byte)(wrappername), strlen(wrappername), &category)
+		wrapperhash = context.GetOptions().GetArr().StrUpdate((*byte)(wrappername), strlen(wrappername), &category)
 	}
 	zend.ZVAL_DEREF(optionvalue)
 	zend.Z_TRY_ADDREF_P(optionvalue)
 	zend.SEPARATE_ARRAY(wrapperhash)
-	zend.Z_ARRVAL_P(wrapperhash).StrUpdate(optionname, strlen(optionname), optionvalue)
+	wrapperhash.GetArr().StrUpdate(optionname, strlen(optionname), optionvalue)
 	return zend.SUCCESS
 }
 func PhpStreamDirentAlphasort(a **zend.ZendString, b **zend.ZendString) int {
-	return strcoll(zend.ZSTR_VAL(*a), zend.ZSTR_VAL(*b))
+	return strcoll(a.GetVal(), b.GetVal())
 }
 func PhpStreamDirentAlphasortr(a **zend.ZendString, b **zend.ZendString) int {
-	return strcoll(zend.ZSTR_VAL(*b), zend.ZSTR_VAL(*a))
+	return strcoll(b.GetVal(), a.GetVal())
 }
 func _phpStreamScandir(dirname *byte, namelist []**zend.ZendString, flags int, context *core.PhpStreamContext, compare func(a **zend.ZendString, b **zend.ZendString) int) int {
 	var stream *core.PhpStream

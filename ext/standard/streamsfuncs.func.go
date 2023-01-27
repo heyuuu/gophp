@@ -229,7 +229,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if (flags & PHP_STREAM_CLIENT_PERSISTENT) != 0 {
-		core.Spprintf(&hashkey, 0, "stream_socket_client__%s", zend.ZSTR_VAL(host))
+		core.Spprintf(&hashkey, 0, "stream_socket_client__%s", host.GetVal())
 	}
 
 	/* prepare the timeout value for use */
@@ -243,13 +243,13 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	if zerrstr != nil {
 		zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zerrstr)
 	}
-	stream = streams.PhpStreamXportCreate(zend.ZSTR_VAL(host), zend.ZSTR_LEN(host), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|b.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|b.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
+	stream = streams.PhpStreamXportCreate(host.GetVal(), host.GetLen(), core.REPORT_ERRORS, streams.STREAM_XPORT_CLIENT|b.Cond((flags&PHP_STREAM_CLIENT_CONNECT) != 0, streams.STREAM_XPORT_CONNECT, 0)|b.Cond((flags&PHP_STREAM_CLIENT_ASYNC_CONNECT) != 0, streams.STREAM_XPORT_CONNECT_ASYNC, 0), hashkey, &tv, context, &errstr, &err)
 	if stream == nil {
 
 		/* host might contain binary characters */
 
 		var quoted_host *zend.ZendString = PhpAddslashes(host)
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", zend.ZSTR_VAL(quoted_host), b.CondF2(errstr == nil, "Unknown error", func() []byte { return zend.ZSTR_VAL(errstr) }))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", quoted_host.GetVal(), b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 		zend.ZendStringReleaseEx(quoted_host, 0)
 	}
 	if hashkey != nil {
@@ -381,7 +381,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	stream = streams.PhpStreamXportCreate(host, host_len, core.REPORT_ERRORS, streams.STREAM_XPORT_SERVER|int(flags), nil, nil, context, &errstr, &err)
 	if stream == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", host, b.CondF2(errstr == nil, "Unknown error", func() []byte { return zend.ZSTR_VAL(errstr) }))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s (%s)", host, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 	}
 	if stream == nil {
 		if zerrno != nil {
@@ -503,7 +503,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 		if peername != nil {
 			zend.ZendStringRelease(peername)
 		}
-		core.PhpErrorDocref(nil, zend.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return zend.ZSTR_VAL(errstr) }, "Unknown error"))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
 		zend.RETVAL_FALSE
 	}
 	if errstr != nil {
@@ -594,7 +594,7 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.ZSTR_LEN(name) == 0 || zend.ZSTR_VAL(name)[0] == 0 {
+	if name.GetLen() == 0 || name.GetVal()[0] == 0 {
 		zend.ZendStringReleaseEx(name, 0)
 		zend.RETVAL_FALSE
 		return
@@ -817,13 +817,13 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	read_buf = zend.ZendStringAlloc(to_read, 0)
-	recvd = streams.PhpStreamXportRecvfrom(stream, zend.ZSTR_VAL(read_buf), to_read, int(flags), nil, nil, b.Cond(zremote != nil, &remote_addr, nil))
+	recvd = streams.PhpStreamXportRecvfrom(stream, read_buf.GetVal(), to_read, int(flags), nil, nil, b.Cond(zremote != nil, &remote_addr, nil))
 	if recvd >= 0 {
 		if zremote != nil && remote_addr != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
 		}
-		zend.ZSTR_VAL(read_buf)[recvd] = '0'
-		zend.ZSTR_LEN(read_buf) = recvd
+		read_buf.GetVal()[recvd] = '0'
+		read_buf.SetLen(recvd)
 		zend.RETVAL_NEW_STR(read_buf)
 		return
 	}
@@ -1148,8 +1148,8 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.AddAssocBool(return_value, "eof", core.PhpStreamEof(stream))
 	}
 	if !(zend.Z_ISUNDEF(stream.GetWrapperdata())) {
-		zend.Z_ADDREF_P(&stream.GetWrapperdata())
-		zend.AddAssocZval(return_value, "wrapper_data", &stream.GetWrapperdata())
+		zend.Z_ADDREF_P(stream.GetWrapperdata())
+		zend.AddAssocZval(return_value, "wrapper_data", stream.GetWrapperdata())
 	}
 	if stream.GetWrapper() != nil {
 		zend.AddAssocString(return_value, "wrapper_type", (*byte)(stream.GetWrapper().GetWops().GetLabel()))
@@ -1175,9 +1175,9 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.GetVal()
+				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				stream_xport = _p.GetKey()
@@ -1203,9 +1203,9 @@ func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.GetVal()
+				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				stream_protocol = _p.GetKey()
@@ -1224,17 +1224,17 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 	var elem *zend.Zval
 	var stream *core.PhpStream
 	var cnt int = 0
-	if zend.Z_TYPE_P(stream_array) != zend.IS_ARRAY {
+	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			elem = _z
@@ -1287,18 +1287,18 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 	var ret int = 0
 	var key *zend.ZendString
 	var num_ind zend.ZendUlong
-	if zend.Z_TYPE_P(stream_array) != zend.IS_ARRAY {
+	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).NumElements())
+	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			num_ind = _p.GetH()
@@ -1354,18 +1354,18 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 	var ret int = 0
 	var num_ind zend.ZendUlong
 	var key *zend.ZendString
-	if zend.Z_TYPE_P(stream_array) != zend.IS_ARRAY {
+	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).NumElements())
+	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			num_ind = _p.GetH()
@@ -1606,7 +1606,7 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	return
 }
 func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any) {
-	var callback *zend.Zval = &context.GetNotifier().GetPtr()
+	var callback *zend.Zval = context.GetNotifier().GetPtr()
 	var retval zend.Zval
 	var zvs []zend.Zval
 	var i int
@@ -1630,8 +1630,8 @@ func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, sev
 }
 func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
 	if notifier != nil && notifier.GetPtr().GetType() != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&notifier.GetPtr())
-		zend.ZVAL_UNDEF(&notifier.GetPtr())
+		zend.ZvalPtrDtor(notifier.GetPtr())
+		zend.ZVAL_UNDEF(notifier.GetPtr())
 	}
 }
 func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int {
@@ -1641,33 +1641,33 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 	var okey *zend.ZendString
 	var ret int = zend.SUCCESS
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(options)
+		var __ht *zend.HashTable = options.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			wkey = _p.GetKey()
 			wval = _z
 			zend.ZVAL_DEREF(wval)
-			if wkey != nil && zend.Z_TYPE_P(wval) == zend.IS_ARRAY {
+			if wkey != nil && wval.IsType(zend.IS_ARRAY) {
 				for {
-					var __ht *zend.HashTable = zend.Z_ARRVAL_P(wval)
+					var __ht *zend.HashTable = wval.GetArr()
 					var _p *zend.Bucket = __ht.GetArData()
 					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
-						var _z *zend.Zval = &_p.GetVal()
+						var _z *zend.Zval = _p.GetVal()
 
-						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+						if _z.IsType(zend.IS_UNDEF) {
 							continue
 						}
 						okey = _p.GetKey()
 						oval = _z
 						if okey != nil {
-							streams.PhpStreamContextSetOption(context, zend.ZSTR_VAL(wkey), zend.ZSTR_VAL(okey), oval)
+							streams.PhpStreamContextSetOption(context, wkey.GetVal(), okey.GetVal(), oval)
 						}
 					}
 					break
@@ -1683,18 +1683,18 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 	var ret int = zend.SUCCESS
 	var tmp *zend.Zval
-	if nil != b.Assign(&tmp, zend.Z_ARRVAL_P(params).StrFind("notification", b.SizeOf("\"notification\"")-1)) {
+	if nil != b.Assign(&tmp, params.GetArr().StrFind("notification", b.SizeOf("\"notification\"")-1)) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
 			context.SetNotifier(nil)
 		}
 		context.SetNotifier(streams.PhpStreamNotificationAlloc())
 		context.GetNotifier().SetFunc(UserSpaceStreamNotifier)
-		zend.ZVAL_COPY(&context.GetNotifier().GetPtr(), tmp)
+		zend.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
-	if nil != b.Assign(&tmp, zend.Z_ARRVAL_P(params).StrFind("options", b.SizeOf("\"options\"")-1)) {
-		if zend.Z_TYPE_P(tmp) == zend.IS_ARRAY {
+	if nil != b.Assign(&tmp, params.GetArr().StrFind("options", b.SizeOf("\"options\"")-1)) {
+		if tmp.IsType(zend.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
@@ -1801,7 +1801,7 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 		zend.RETVAL_FALSE
 		return
 	}
-	zend.ZVAL_COPY(return_value, &context.GetOptions())
+	zend.ZVAL_COPY(return_value, context.GetOptions())
 }
 func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval = nil
@@ -2158,10 +2158,10 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 	zend.ArrayInit(return_value)
 	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().GetType() != zend.IS_UNDEF && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
 		zend.Z_TRY_ADDREF(context.GetNotifier().GetPtr())
-		zend.AddAssocZvalEx(return_value, "notification", b.SizeOf("\"notification\"")-1, &context.GetNotifier().GetPtr())
+		zend.AddAssocZvalEx(return_value, "notification", b.SizeOf("\"notification\"")-1, context.GetNotifier().GetPtr())
 	}
 	zend.Z_TRY_ADDREF(context.GetOptions())
-	zend.AddAssocZvalEx(return_value, "options", b.SizeOf("\"options\"")-1, &context.GetOptions())
+	zend.AddAssocZvalEx(return_value, "options", b.SizeOf("\"options\"")-1, context.GetOptions())
 }
 func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var params *zend.Zval = nil
@@ -2519,15 +2519,15 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 		}
 	}
 	if (read_write & streams.PHP_STREAM_FILTER_READ) != 0 {
-		filter = streams.PhpStreamFilterCreate(filtername, filterparams, core.PhpStreamIsPersistent(stream))
+		filter = streams.PhpStreamFilterCreate(filtername, filterparams, stream.GetIsPersistent())
 		if filter == nil {
 			zend.RETVAL_FALSE
 			return
 		}
 		if append != 0 {
-			ret = streams.PhpStreamFilterAppendEx(&stream.GetReadfilters(), filter)
+			ret = streams.PhpStreamFilterAppendEx(stream.GetReadfilters(), filter)
 		} else {
-			ret = streams.PhpStreamFilterPrependEx(&stream.GetReadfilters(), filter)
+			ret = streams.PhpStreamFilterPrependEx(stream.GetReadfilters(), filter)
 		}
 		if ret != zend.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
@@ -2536,15 +2536,15 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 		}
 	}
 	if (read_write & streams.PHP_STREAM_FILTER_WRITE) != 0 {
-		filter = streams.PhpStreamFilterCreate(filtername, filterparams, core.PhpStreamIsPersistent(stream))
+		filter = streams.PhpStreamFilterCreate(filtername, filterparams, stream.GetIsPersistent())
 		if filter == nil {
 			zend.RETVAL_FALSE
 			return
 		}
 		if append != 0 {
-			ret = streams.PhpStreamFilterAppendEx(&stream.GetWritefilters(), filter)
+			ret = streams.PhpStreamFilterAppendEx(stream.GetWritefilters(), filter)
 		} else {
-			ret = streams.PhpStreamFilterPrependEx(&stream.GetWritefilters(), filter)
+			ret = streams.PhpStreamFilterPrependEx(stream.GetWritefilters(), filter)
 		}
 		if ret != zend.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
@@ -2639,7 +2639,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 		}
 		break
 	}
-	filter = zend.ZendFetchResource(zend.Z_RES_P(zfilter), nil, streams.PhpFileLeStreamFilter())
+	filter = zend.ZendFetchResource(zfilter.GetRes(), nil, streams.PhpFileLeStreamFilter())
 	if filter == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid resource given, not a stream filter")
 		zend.RETVAL_FALSE
@@ -2650,7 +2650,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.ZendListClose(zend.Z_RES_P(zfilter)) == zend.FAILURE {
+	if zend.ZendListClose(zfilter.GetRes()) == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not invalidate filter, not removing")
 		zend.RETVAL_FALSE
 		return
@@ -3343,7 +3343,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 				zend.RETVAL_FALSE
 				return
 			}
-			cryptokind = zend.Z_LVAL_P(val)
+			cryptokind = val.GetLval()
 		}
 		if zsessstream != nil {
 			core.PhpStreamFromZval(sessstream, zsessstream)
@@ -3513,7 +3513,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		break
 	}
-	if zend.Z_TYPE_P(zstream) == zend.IS_RESOURCE {
+	if zstream.IsType(zend.IS_RESOURCE) {
 		core.PhpStreamFromZval(stream, zstream)
 		if stream == nil {
 			zend.RETVAL_FALSE

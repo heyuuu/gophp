@@ -255,7 +255,7 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(zend.Z_RES_P(id), "Directory", streams.PhpFileLeStream()))) == nil {
+		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -559,7 +559,7 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(zend.Z_RES_P(id), "Directory", streams.PhpFileLeStream()))) == nil {
+		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -664,7 +664,7 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 		}
 	} else {
-		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(zend.Z_RES_P(id), "Directory", streams.PhpFileLeStream()))) == nil {
+		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -830,8 +830,8 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.AddNextIndexString(return_value, globbuf.gl_pathv[n]+cwd_skip)
 	}
 	globfree(&globbuf)
-	if basedir_limit != 0 && !(zend.Z_ARRVAL_P(return_value).NumElements()) {
-		zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+	if basedir_limit != 0 && !(zend.Z_ARRVAL_P(return_value).GetNNumOfElements()) {
+		zend.ZendArrayDestroy(return_value.GetArr())
 		zend.RETVAL_FALSE
 		return
 	}

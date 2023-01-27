@@ -98,7 +98,7 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_MD5Init(&context)
-	PHP_MD5Update(&context, zend.ZSTR_VAL(arg), zend.ZSTR_LEN(arg))
+	PHP_MD5Update(&context, arg.GetVal(), arg.GetLen())
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
 		zend.RETVAL_STRINGL((*byte)(digest), 16)
@@ -488,10 +488,10 @@ func PHP_MD5Update(ctx *PHP_MD5_CTX, data any, size int) {
 	if used != 0 {
 		free = 64 - used
 		if size < free {
-			memcpy(&ctx.GetBuffer()[used], data, size)
+			memcpy(ctx.GetBuffer()[used], data, size)
 			return
 		}
-		memcpy(&ctx.GetBuffer()[used], data, free)
+		memcpy(ctx.GetBuffer()[used], data, free)
 		data = (*uint8)(data + free)
 		size -= free
 		Body(ctx, ctx.GetBuffer(), 64)
@@ -509,12 +509,12 @@ func PHP_MD5Final(result *uint8, ctx *PHP_MD5_CTX) {
 	ctx.GetBuffer()[b.PostInc(&used)] = 0x80
 	free = 64 - used
 	if free < 8 {
-		memset(&ctx.GetBuffer()[used], 0, free)
+		memset(ctx.GetBuffer()[used], 0, free)
 		Body(ctx, ctx.GetBuffer(), 64)
 		used = 0
 		free = 64
 	}
-	memset(&ctx.GetBuffer()[used], 0, free-8)
+	memset(ctx.GetBuffer()[used], 0, free-8)
 	ctx.SetLo(ctx.GetLo() << 3)
 	ctx.GetBuffer()[56] = ctx.GetLo()
 	ctx.GetBuffer()[57] = ctx.GetLo() >> 8

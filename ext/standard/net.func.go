@@ -19,8 +19,8 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	switch addr.sa_family {
 	case AF_INET:
 		var ret *zend.ZendString = zend.ZendStringAlloc(INET_ADDRSTRLEN, 0)
-		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), zend.ZSTR_VAL(ret), INET_ADDRSTRLEN) {
-			zend.ZSTR_LEN(ret) = strlen(zend.ZSTR_VAL(ret))
+		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
+			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
 		zend.ZendStringEfree(ret)
@@ -32,15 +32,15 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	switch addr.sa_family {
 	case AF_INET:
 		var ret *zend.ZendString = zend.ZendStringAlloc(NI_MAXHOST, 0)
-		if getnameinfo(addr, addrlen, zend.ZSTR_VAL(ret), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == zend.SUCCESS {
+		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == zend.SUCCESS {
 
 			/* Also demangle numeric host with %name suffix */
 
-			var colon *byte = strchr(zend.ZSTR_VAL(ret), '%')
+			var colon *byte = strchr(ret.GetVal(), '%')
 			if colon != nil {
 				*colon = 0
 			}
-			zend.ZSTR_LEN(ret) = strlen(zend.ZSTR_VAL(ret))
+			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
 		zend.ZendStringEfree(ret)
@@ -84,22 +84,22 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *zend.Zval = zend.Z_ARR_P(return_value).StrFind(p.ifa_name, strlen(p.ifa_name))
+		var iface *zend.Zval = return_value.GetArr().StrFind(p.ifa_name, strlen(p.ifa_name))
 		var unicast *zend.Zval
 		var status *zend.Zval
 		if iface == nil {
 			var newif zend.Zval
 			zend.ArrayInit(&newif)
-			iface = zend.Z_ARR_P(return_value).StrAdd(p.ifa_name, strlen(p.ifa_name), &newif)
+			iface = return_value.GetArr().StrAdd(p.ifa_name, strlen(p.ifa_name), &newif)
 		}
-		unicast = zend.Z_ARR_P(iface).StrFind("unicast", b.SizeOf("\"unicast\"")-1)
+		unicast = iface.GetArr().StrFind("unicast", b.SizeOf("\"unicast\"")-1)
 		if unicast == nil {
 			var newuni zend.Zval
 			zend.ArrayInit(&newuni)
-			unicast = zend.Z_ARR_P(iface).StrAdd("unicast", b.SizeOf("\"unicast\"")-1, &newuni)
+			unicast = iface.GetArr().StrAdd("unicast", b.SizeOf("\"unicast\"")-1, &newuni)
 		}
 		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
-		status = zend.Z_ARR_P(iface).StrFind("up", b.SizeOf("\"up\"")-1)
+		status = iface.GetArr().StrFind("up", b.SizeOf("\"up\"")-1)
 		if status == nil {
 			zend.AddAssocBool(iface, "up", (p.ifa_flags&IFF_UP) != 0)
 		}

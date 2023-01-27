@@ -1232,7 +1232,7 @@ func ZendMmInit() *ZendMmHeap {
 		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
-	heap = &chunk.GetHeapSlot()
+	heap = chunk.GetHeapSlot()
 	chunk.SetHeap(heap)
 	chunk.SetNext(chunk)
 	chunk.SetPrev(chunk)
@@ -1302,7 +1302,7 @@ func ZendMmGc(heap *ZendMmHeap) int {
 		if has_free_pages == 0 {
 			continue
 		}
-		q = &heap.GetFreeSlot()[i]
+		q = heap.GetFreeSlot()[i]
 		p = *q
 		for p != nil {
 			chunk = (*ZendMmChunk)(ZEND_MM_ALIGNED_BASE(p, ZEND_MM_CHUNK_SIZE))
@@ -1326,7 +1326,7 @@ func ZendMmGc(heap *ZendMmHeap) int {
 				p = p.GetNextFreeSlot()
 				*q = p
 			} else {
-				q = &p.GetNextFreeSlot()
+				q = p.GetNextFreeSlot()
 				p = *q
 			}
 		}
@@ -1469,7 +1469,7 @@ func ZendMmShutdown(heap *ZendMmHeap, full int, silent int) {
 		/* reinitialize the first chunk and heap */
 
 		p = heap.GetMainChunk()
-		p.SetHeap(&p.GetHeapSlot())
+		p.SetHeap(p.GetHeapSlot())
 		p.SetNext(p)
 		p.SetPrev(p)
 		p.SetFreePages(ZEND_MM_PAGES - ZEND_MM_FIRST_PAGE)
@@ -1696,9 +1696,9 @@ func TrackedFreeAll() {
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *Zval = &_p.GetVal()
+			var _z *Zval = _p.GetVal()
 
-			if Z_TYPE_P(_z) == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			h = _p.GetH()
@@ -1780,14 +1780,14 @@ func ZendMmStartupEx(handlers *ZendMmHandlers, data any, data_size int) *ZendMmH
 	var storage *ZendMmStorage
 	var chunk *ZendMmChunk
 	var heap *ZendMmHeap
-	memcpy((*ZendMmHandlers)(&tmp_storage.GetHandlers()), handlers, b.SizeOf("zend_mm_handlers"))
+	memcpy((*ZendMmHandlers)(tmp_storage.GetHandlers()), handlers, b.SizeOf("zend_mm_handlers"))
 	tmp_storage.SetData(data)
 	chunk = (*ZendMmChunk)(handlers.GetChunkAlloc()(&tmp_storage, ZEND_MM_CHUNK_SIZE, ZEND_MM_CHUNK_SIZE))
 	if chunk == nil {
 		r.Fprintf(stderr, "\nCan't initialize heap: [%d] %s\n", errno, strerror(errno))
 		return nil
 	}
-	heap = &chunk.GetHeapSlot()
+	heap = chunk.GetHeapSlot()
 	chunk.SetHeap(heap)
 	chunk.SetNext(chunk)
 	chunk.SetPrev(chunk)

@@ -293,7 +293,7 @@ func PhpStreamTempClose(stream *core.PhpStream, close_handle int) int {
 	} else {
 		ret = 0
 	}
-	zend.ZvalPtrDtor(&ts.GetMeta())
+	zend.ZvalPtrDtor(ts.GetMeta())
 	if ts.GetTmpdir() != nil {
 		zend.Efree(ts.GetTmpdir())
 	}
@@ -379,7 +379,7 @@ func PhpStreamTempSetOption(stream *core.PhpStream, option int, value int, ptrpa
 	switch option {
 	case core.PHP_STREAM_OPTION_META_DATA_API:
 		if ts.GetMeta().GetType() != zend.IS_UNDEF {
-			zend.Z_ARRVAL_P((*zend.Zval)(ptrparam)).Copy(zend.Z_ARRVAL(ts.GetMeta()), zend.ZvalAddRef)
+			(*zend.Zval)(ptrparam).GetArr().Copy(ts.GetMeta().GetArr(), zend.ZvalAddRef)
 		}
 		return core.PHP_STREAM_OPTION_RETURN_OK
 	default:
@@ -395,7 +395,7 @@ func _phpStreamTempCreateEx(mode int, max_memory_usage int, tmpdir *byte) *core.
 	self = zend.Ecalloc(1, b.SizeOf("* self"))
 	self.SetSmax(max_memory_usage)
 	self.SetMode(mode)
-	zend.ZVAL_UNDEF(&self.GetMeta())
+	zend.ZVAL_UNDEF(self.GetMeta())
 	if tmpdir != nil {
 		self.SetTmpdir(zend.Estrdup(tmpdir))
 	}
@@ -534,8 +534,8 @@ func PhpStreamUrlWrapRfc2397(wrapper *core.PhpStreamWrapper, path *byte, mode *b
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
 			return nil
 		}
-		comma = zend.ZSTR_VAL(base64_comma)
-		ilen = zend.ZSTR_LEN(base64_comma)
+		comma = base64_comma.GetVal()
+		ilen = base64_comma.GetLen()
 	} else {
 		comma = zend.Estrndup(comma, dlen)
 		dlen = PhpUrlDecode(comma, dlen)
@@ -564,7 +564,7 @@ func PhpStreamUrlWrapRfc2397(wrapper *core.PhpStreamWrapper, path *byte, mode *b
 		} else {
 			ts.SetMode(0)
 		}
-		zend.ZVAL_COPY_VALUE(&ts.GetMeta(), &meta)
+		zend.ZVAL_COPY_VALUE(ts.GetMeta(), &meta)
 	}
 	if base64_comma != nil {
 		zend.ZendStringFree(base64_comma)

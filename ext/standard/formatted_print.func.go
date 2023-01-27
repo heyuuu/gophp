@@ -10,14 +10,14 @@ import (
 )
 
 func PhpSprintfAppendchar(buffer **zend.ZendString, pos *int, add byte) {
-	if (*pos)+1 >= zend.ZSTR_LEN(*buffer) {
-		*buffer = zend.ZendStringExtend(*buffer, zend.ZSTR_LEN(*buffer)<<1, 0)
+	if (*pos)+1 >= buffer.GetLen() {
+		*buffer = zend.ZendStringExtend(*buffer, buffer.GetLen()<<1, 0)
 	}
-	zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = add
+	buffer.GetVal()[b.PostInc(&(*pos))] = add
 }
 func PhpSprintfAppendchars(buffer **zend.ZendString, pos *int, add *byte, len_ int) {
-	if (*pos)+len_ >= zend.ZSTR_LEN(*buffer) {
-		var nlen int = zend.ZSTR_LEN(*buffer)
+	if (*pos)+len_ >= buffer.GetLen() {
+		var nlen int = buffer.GetLen()
 		for {
 			nlen = nlen << 1
 			if (*pos)+len_ < nlen {
@@ -26,7 +26,7 @@ func PhpSprintfAppendchars(buffer **zend.ZendString, pos *int, add *byte, len_ i
 		}
 		*buffer = zend.ZendStringExtend(*buffer, nlen, 0)
 	}
-	memcpy(zend.ZSTR_VAL(*buffer)+(*pos), add, len_)
+	memcpy(buffer.GetVal()+(*pos), add, len_)
 	*pos += len_
 }
 func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_width int, max_width int, padding byte, alignment int, len_ int, neg int, expprec int, always_sign int) {
@@ -49,8 +49,8 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 		zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", m_width)
 	}
 	req_size = (*pos) + m_width + 1
-	if req_size > zend.ZSTR_LEN(*buffer) {
-		var size int = zend.ZSTR_LEN(*buffer)
+	if req_size > buffer.GetLen() {
+		var size int = buffer.GetLen()
 		for req_size > size {
 			if size > zend.ZEND_SIZE_MAX/2 {
 				zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", req_size)
@@ -62,23 +62,23 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 	if alignment == ALIGN_RIGHT {
 		if (neg != 0 || always_sign != 0) && padding == '0' {
 			if neg != 0 {
-				zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = '-'
+				buffer.GetVal()[b.PostInc(&(*pos))] = '-'
 			} else {
-				zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = '+'
+				buffer.GetVal()[b.PostInc(&(*pos))] = '+'
 			}
 			add++
 			len_--
 			copy_len--
 		}
 		for b.PostDec(&npad) > 0 {
-			zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = padding
+			buffer.GetVal()[b.PostInc(&(*pos))] = padding
 		}
 	}
 	memcpy(&zend.ZSTR_VAL(*buffer)[*pos], add, copy_len+1)
 	*pos += copy_len
 	if alignment == ALIGN_LEFT {
 		for b.PostDec(&npad) {
-			zend.ZSTR_VAL(*buffer)[b.PostInc(&(*pos))] = padding
+			buffer.GetVal()[b.PostInc(&(*pos))] = padding
 		}
 	}
 }
@@ -385,7 +385,7 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 			case 's':
 				var t *zend.ZendString
 				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
-				PhpSprintfAppendstring(&result, &outpos, zend.ZSTR_VAL(str), width, precision, padding, alignment, zend.ZSTR_LEN(str), 0, expprec, 0)
+				PhpSprintfAppendstring(&result, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
 				zend.ZendTmpStringRelease(t)
 				break
 			case 'd':
@@ -441,28 +441,28 @@ exit:
 
 	/* possibly, we have to make sure we have room for the terminating null? */
 
-	zend.ZSTR_VAL(result)[outpos] = 0
-	zend.ZSTR_LEN(result) = outpos
+	result.GetVal()[outpos] = 0
+	result.SetLen(outpos)
 	return result
 }
 func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 	var args *zend.Zval
 	var zv *zend.Zval
 	var n int
-	if zend.Z_TYPE_P(array) != zend.IS_ARRAY {
+	if array.GetType() != zend.IS_ARRAY {
 		zend.ConvertToArray(array)
 	}
-	n = zend.Z_ARRVAL_P(array).NumElements()
+	n = zend.Z_ARRVAL_P(array).GetNNumOfElements()
 	args = (*zend.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
+		var __ht *zend.HashTable = array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			zv = _z
@@ -726,7 +726,7 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		zend.RETVAL_FALSE
 		return
 	}
-	rlen = core.PHPWRITE(zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
+	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
 	zend.ZendStringEfree(result)
 	zend.RETVAL_LONG(rlen)
 	return
@@ -811,7 +811,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_FALSE
 		return
 	}
-	rlen = core.PHPWRITE(zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
+	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
 	zend.ZendStringEfree(result)
 	zend.RETVAL_LONG(rlen)
 	return
@@ -912,8 +912,8 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_FALSE
 		return
 	}
-	core.PhpStreamWrite(stream, zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
-	zend.RETVAL_LONG(zend.ZSTR_LEN(result))
+	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
+	zend.RETVAL_LONG(result.GetLen())
 	zend.ZendStringEfree(result)
 }
 func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1007,7 +1007,7 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_FALSE
 		return
 	}
-	core.PhpStreamWrite(stream, zend.ZSTR_VAL(result), zend.ZSTR_LEN(result))
-	zend.RETVAL_LONG(zend.ZSTR_LEN(result))
+	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
+	zend.RETVAL_LONG(result.GetLen())
 	zend.ZendStringEfree(result)
 }

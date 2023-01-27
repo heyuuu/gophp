@@ -22,7 +22,7 @@ func InitOpArray(op_array *ZendOpArray, type_ ZendUchar, initial_ops_size int) {
 	op_array.GetArgFlags()[1] = 0
 	op_array.GetArgFlags()[2] = 0
 	op_array.SetRefcount((*uint32)(Emalloc(b.SizeOf("uint32_t"))))
-	(*op_array).refcount = 1
+	op_array.refcount = 1
 	op_array.SetLast(0)
 	op_array.SetOpcodes(Emalloc(initial_ops_size * b.SizeOf("zend_op")))
 	op_array.SetLastVar(0)
@@ -40,7 +40,7 @@ func InitOpArray(op_array *ZendOpArray, type_ ZendUchar, initial_ops_size int) {
 	op_array.SetTryCatchArray(nil)
 	op_array.SetLastLiveRange(0)
 	op_array.SetStaticVariables(nil)
-	ZEND_MAP_PTR_INIT(op_array.static_variables_ptr, &op_array.GetStaticVariables())
+	ZEND_MAP_PTR_INIT(op_array.static_variables_ptr, op_array.GetStaticVariables())
 	op_array.SetLastTryCatch(0)
 	op_array.SetFnFlags(0)
 	op_array.SetLastLiteral(0)
@@ -77,7 +77,7 @@ func ZendFunctionDtor(zv *Zval) {
 	var function *ZendFunction = Z_PTR_P(zv)
 	if function.GetType() == ZEND_USER_FUNCTION {
 		ZEND_ASSERT(function.GetFunctionName() != nil)
-		DestroyOpArray(&function.GetOpArray())
+		DestroyOpArray(function.GetOpArray())
 	} else {
 		ZEND_ASSERT(function.GetType() == ZEND_INTERNAL_FUNCTION)
 		ZEND_ASSERT(function.GetFunctionName() != nil)
@@ -86,7 +86,7 @@ func ZendFunctionDtor(zv *Zval) {
 		/* For methods this will be called explicitly. */
 
 		if function.GetScope() == nil {
-			ZendFreeInternalArgInfo(&function.GetInternalFunction())
+			ZendFreeInternalArgInfo(function.GetInternalFunction())
 		}
 		if !function.IsArenaAllocated() {
 			Pefree(function, 1)
@@ -98,7 +98,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 		var static_members *Zval = CE_STATIC_MEMBERS(ce)
 		var p *Zval = static_members
 		var end *Zval = p + ce.GetDefaultStaticMembersCount()
-		if ce.GetStaticMembersTablePtr() == &ce.GetDefaultStaticMembersTable() {
+		if ce.GetStaticMembersTablePtr() == ce.GetDefaultStaticMembersTable() {
 
 			/* Special case: If this is a static property on a dl'ed internal class, then the
 			 * static property table and the default property table are the same. In this case we
@@ -119,7 +119,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 								_prop = _list.GetPtr()
 								_end = _list.GetPtr() + _list.GetNum()
 							} else {
-								_prop = &_source_list.GetPtr()
+								_prop = _source_list.GetPtr()
 								_end = _prop + 1
 							}
 							for ; _prop < _end; _prop++ {
@@ -159,7 +159,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 								_prop = _list.GetPtr()
 								_end = _list.GetPtr() + _list.GetNum()
 							} else {
-								_prop = &_source_list.GetPtr()
+								_prop = _source_list.GetPtr()
 								_end = _prop + 1
 							}
 							for ; _prop < _end; _prop++ {
@@ -230,13 +230,13 @@ func DestroyZendClass(zv *Zval) {
 		}
 		if ce.IsHasStaticInMethods() {
 			for {
-				var __ht *HashTable = &ce.GetFunctionTable()
+				var __ht *HashTable = ce.GetFunctionTable()
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *Zval = &_p.GetVal()
+					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					op_array = Z_PTR_P(_z)
@@ -282,7 +282,7 @@ func DestroyZendClass(zv *Zval) {
 								_prop = _list.GetPtr()
 								_end = _list.GetPtr() + _list.GetNum()
 							} else {
-								_prop = &_source_list.GetPtr()
+								_prop = _source_list.GetPtr()
 								_end = _prop + 1
 							}
 							for ; _prop < _end; _prop++ {
@@ -302,13 +302,13 @@ func DestroyZendClass(zv *Zval) {
 			Efree(ce.GetDefaultStaticMembersTable())
 		}
 		for {
-			var __ht *HashTable = &ce.GetPropertiesInfo()
+			var __ht *HashTable = ce.GetPropertiesInfo()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *Zval = &_p.GetVal()
+				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				prop_info = Z_PTR_P(_z)
@@ -324,24 +324,24 @@ func DestroyZendClass(zv *Zval) {
 			}
 			break
 		}
-		&ce.GetPropertiesInfo().Destroy()
+		ce.GetPropertiesInfo().Destroy()
 		ZendStringReleaseEx(ce.GetName(), 0)
-		&ce.GetFunctionTable().Destroy()
-		if &ce.GetConstantsTable().NumElements() {
+		ce.GetFunctionTable().Destroy()
+		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
-				var __ht *HashTable = &ce.GetConstantsTable()
+				var __ht *HashTable = ce.GetConstantsTable()
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *Zval = &_p.GetVal()
+					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					c = Z_PTR_P(_z)
 					if c.GetCe() == ce {
-						ZvalPtrDtorNogc(&c.GetValue())
+						ZvalPtrDtorNogc(c.GetValue())
 						if c.GetDocComment() != nil {
 							ZendStringReleaseEx(c.GetDocComment(), 0)
 						}
@@ -350,7 +350,7 @@ func DestroyZendClass(zv *Zval) {
 				break
 			}
 		}
-		&ce.GetConstantsTable().Destroy()
+		ce.GetConstantsTable().Destroy()
 		if ce.GetNumInterfaces() > 0 {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
@@ -386,48 +386,48 @@ func DestroyZendClass(zv *Zval) {
 				p++
 			}
 			Free(ce.GetDefaultStaticMembersTable())
-			if ce.GetStaticMembersTablePtr() != &ce.GetDefaultStaticMembersTable() {
+			if ce.GetStaticMembersTablePtr() != ce.GetDefaultStaticMembersTable() {
 				ZendCleanupInternalClassData(ce)
 			}
 		}
-		&ce.GetPropertiesInfo().Destroy()
+		ce.GetPropertiesInfo().Destroy()
 		ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
 
 		for {
-			var __ht *HashTable = &ce.GetFunctionTable()
+			var __ht *HashTable = ce.GetFunctionTable()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *Zval = &_p.GetVal()
+				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				fn = Z_PTR_P(_z)
 				if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
-					ZendFreeInternalArgInfo(&fn.GetInternalFunction())
+					ZendFreeInternalArgInfo(fn.GetInternalFunction())
 				}
 			}
 			break
 		}
-		&ce.GetFunctionTable().Destroy()
-		if &ce.GetConstantsTable().NumElements() {
+		ce.GetFunctionTable().Destroy()
+		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
-				var __ht *HashTable = &ce.GetConstantsTable()
+				var __ht *HashTable = ce.GetConstantsTable()
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *Zval = &_p.GetVal()
+					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					c = Z_PTR_P(_z)
 					if c.GetCe() == ce {
-						ZvalInternalPtrDtor(&c.GetValue())
+						ZvalInternalPtrDtor(c.GetValue())
 						if c.GetDocComment() != nil {
 							ZendStringReleaseEx(c.GetDocComment(), 1)
 						}
@@ -436,7 +436,7 @@ func DestroyZendClass(zv *Zval) {
 				}
 				break
 			}
-			&ce.GetConstantsTable().Destroy()
+			ce.GetConstantsTable().Destroy()
 		}
 		if ce.GetIteratorFuncsPtr() != nil {
 			Free(ce.GetIteratorFuncsPtr())
@@ -470,7 +470,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 	if op_array.IsHeapRtCache() && op_array.GetRunTimeCachePtr() != nil {
 		Efree(op_array.GetRunTimeCachePtr())
 	}
-	if op_array.GetRefcount() == nil || b.PreDec(&((*op_array).refcount)) > 0 {
+	if op_array.GetRefcount() == nil || b.PreDec(&(op_array.refcount)) > 0 {
 		return
 	}
 	EfreeSize(op_array.GetRefcount(), b.SizeOf("* ( op_array -> refcount )"))
@@ -579,7 +579,7 @@ func ZendGetBrkContTarget(op_array *ZendOpArray, opline *ZendOp) uint32 {
 	var array_offset int = opline.GetOp1().GetNum()
 	var jmp_to *ZendBrkContElement
 	for {
-		jmp_to = &(CompilerGlobals.GetContext()).GetBrkContArray()[array_offset]
+		jmp_to = CompilerGlobals.GetContext().GetBrkContArray()[array_offset]
 		if nest_levels > 1 {
 			array_offset = jmp_to.GetParent()
 		}
@@ -598,16 +598,16 @@ func EmitLiveRangeRaw(op_array *ZendOpArray, var_num uint32, kind uint32, start 
 	op_array.GetLastLiveRange()++
 	op_array.SetLiveRange(Erealloc(op_array.GetLiveRange(), b.SizeOf("zend_live_range")*op_array.GetLastLiveRange()))
 	ZEND_ASSERT(start < end)
-	range_ = &op_array.GetLiveRange()[op_array.GetLastLiveRange()-1]
+	range_ = op_array.GetLiveRange()[op_array.GetLastLiveRange()-1]
 	range_.SetVar(uint32(intPtr(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+var_num))))
 	range_.SetVar(range_.GetVar() | kind)
 	range_.SetStart(start)
 	range_.SetEnd(end)
 }
 func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint32, needs_live_range ZendNeedsLiveRangeCb) {
-	var def_opline *ZendOp = &op_array.GetOpcodes()[start]
+	var def_opline *ZendOp = op_array.GetOpcodes()[start]
 	var orig_def_opline *ZendOp = def_opline
-	var use_opline *ZendOp = &op_array.GetOpcodes()[end]
+	var use_opline *ZendOp = op_array.GetOpcodes()[end]
 	var kind uint32
 	switch def_opline.GetOpcode() {
 	case ZEND_ADD_ARRAY_ELEMENT:
@@ -773,7 +773,7 @@ func SwapLiveRange(a *ZendLiveRange, b *ZendLiveRange) {
 }
 func ZendCalcLiveRanges(op_array *ZendOpArray, needs_live_range ZendNeedsLiveRangeCb) {
 	var opnum uint32 = op_array.GetLast()
-	var opline *ZendOp = &op_array.GetOpcodes()[opnum]
+	var opline *ZendOp = op_array.GetOpcodes()[opnum]
 	var var_offset uint32 = op_array.GetLastVar()
 	var last_use *uint32 = DoAlloca(b.SizeOf("uint32_t")*op_array.GetT(), use_heap)
 	memset(last_use, -1, b.SizeOf("uint32_t")*op_array.GetT())
@@ -920,7 +920,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		switch opline.GetOpcode() {
 		case ZEND_RECV_INIT:
 			var val *Zval = CT_CONSTANT(opline.GetOp2())
-			if Z_TYPE_P(val) == IS_CONSTANT_AST {
+			if val.IsType(IS_CONSTANT_AST) {
 				var slot uint32 = ZEND_MM_ALIGNED_SIZE_EX(op_array.GetCacheSize(), 8)
 				Z_CACHE_SLOT_P(val) = slot
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))
@@ -976,7 +976,7 @@ func PassTwo(op_array *ZendOpArray) int {
 
 			/* If result of assert is unused, result of check is unused as well */
 
-			var call *ZendOp = &op_array.GetOpcodes()[opline.GetOp2().GetOplineNum()-1]
+			var call *ZendOp = op_array.GetOpcodes()[opline.GetOp2().GetOplineNum()-1]
 			if call.GetOpcode() == ZEND_EXT_FCALL_END {
 				call--
 			}
@@ -1018,9 +1018,9 @@ func PassTwo(op_array *ZendOpArray) int {
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
-					var _z *Zval = &_p.GetVal()
+					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					zv = _z

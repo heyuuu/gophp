@@ -89,7 +89,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_SHA1Init(&context)
-	PHP_SHA1Update(&context, (*uint8)(zend.ZSTR_VAL(arg)), zend.ZSTR_LEN(arg))
+	PHP_SHA1Update(&context, (*uint8)(arg.GetVal()), arg.GetLen())
 	PHP_SHA1Final(digest, &context)
 	if raw_output != 0 {
 		zend.RETVAL_STRINGL((*byte)(digest), 20)
@@ -261,7 +261,7 @@ func PHP_SHA1Update(context *PHP_SHA1_CTX, input *uint8, inputLen int) {
 	 */
 
 	if inputLen >= partLen {
-		memcpy((*uint8)(&context.GetBuffer()[index]), (*uint8)(input), partLen)
+		memcpy((*uint8)(context.GetBuffer()[index]), (*uint8)(input), partLen)
 		SHA1Transform(context.GetState(), context.GetBuffer())
 		for i = partLen; i+63 < inputLen; i += 64 {
 			SHA1Transform(context.GetState(), &input[i])
@@ -273,7 +273,7 @@ func PHP_SHA1Update(context *PHP_SHA1_CTX, input *uint8, inputLen int) {
 
 	/* Buffer remaining input */
 
-	memcpy((*uint8)(&context.GetBuffer()[index]), (*uint8)(&input[i]), inputLen-i)
+	memcpy((*uint8)(context.GetBuffer()[index]), (*uint8)(&input[i]), inputLen-i)
 
 	/* Buffer remaining input */
 }

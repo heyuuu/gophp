@@ -48,9 +48,9 @@ func ZendObjectStdDtor(object *ZendObject) {
 		}
 	}
 	if object.GetCe().IsUseGuards() {
-		if Z_TYPE_P(p) == IS_STRING {
+		if p.IsType(IS_STRING) {
 			ZvalPtrDtorStr(p)
-		} else if Z_TYPE_P(p) == IS_ARRAY {
+		} else if p.IsType(IS_ARRAY) {
 			var guards *HashTable
 			guards = Z_ARRVAL_P(p)
 			ZEND_ASSERT(guards != nil)
@@ -79,11 +79,11 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				if ExecutorGlobals.GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
-						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", ZSTR_VAL(object.GetCe().GetName()), b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""))
+						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", ZSTR_VAL(object.GetCe().GetName()))
+					ZendError(E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
 
@@ -98,11 +98,11 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				if ExecutorGlobals.GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
-						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", ZSTR_VAL(object.GetCe().GetName()), b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""))
+						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", ZSTR_VAL(object.GetCe().GetName()))
+					ZendError(E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
 					return
 				}
 
@@ -136,7 +136,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
-		ZVAL_UNDEF(&fci.GetFunctionName())
+		ZVAL_UNDEF(fci.GetFunctionName())
 		fcic.SetFunctionHandler(destructor)
 		fcic.SetCalledScope(object.GetCe())
 		fcic.SetObject(object)
@@ -195,32 +195,32 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		/* fast copy */
 
 	}
-	if old_object.GetProperties() != nil && old_object.GetProperties().NumElements() {
+	if old_object.GetProperties() != nil && old_object.GetProperties().GetNNumOfElements() {
 		var prop *Zval
 		var new_prop Zval
 		var num_key ZendUlong
 		var key *ZendString
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(ZendNewArray(old_object.GetProperties().NumElements()))
+			new_object.SetProperties(ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
 			new_object.GetProperties().RealInitMixed()
 		} else {
-			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().NumElements(), 0)
+			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().GetNNumOfElements(), 0)
 		}
-		new_object.GetProperties().Flags() |= old_object.GetProperties().Flags() & HASH_FLAG_HAS_EMPTY_IND
+		new_object.GetProperties().AddUFlags(old_object.GetProperties().GetUFlags() & HASH_FLAG_HAS_EMPTY_IND)
 		for {
 			var __ht *HashTable = old_object.GetProperties()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *Zval = &_p.GetVal()
+				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				num_key = _p.GetH()
 				key = _p.GetKey()
 				prop = _z
-				if Z_TYPE_P(prop) == IS_INDIRECT {
+				if prop.IsType(IS_INDIRECT) {
 					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(Z_INDIRECT_P(prop)-old_object.GetPropertiesTable()))
 				} else {
 					ZVAL_COPY_VALUE(&new_prop, prop)
@@ -247,7 +247,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
-		ZVAL_UNDEF(&fci.GetFunctionName())
+		ZVAL_UNDEF(fci.GetFunctionName())
 		fcic.SetFunctionHandler(new_object.GetCe().GetClone())
 		fcic.SetCalledScope(new_object.GetCe())
 		fcic.SetObject(new_object)

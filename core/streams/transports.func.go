@@ -12,12 +12,12 @@ import (
 func PhpStreamXportGetHash() *zend.HashTable { return &XportHash }
 func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
 	var str *zend.ZendString = zend.ZendStringInitInterned(protocol, strlen(protocol), 1)
-	&XportHash.UpdatePtr(str, factory)
+	XportHash.UpdatePtr(str, factory)
 	zend.ZendStringReleaseEx(str, 1)
 	return zend.SUCCESS
 }
 func PhpStreamXportUnregister(protocol *byte) int {
-	return &XportHash.StrDel(protocol, strlen(protocol))
+	return XportHash.StrDel(protocol, strlen(protocol))
 }
 func ERR_REPORT(out_err **zend.ZendString, fmt string, arg []byte) {
 	if out_err != nil {
@@ -30,7 +30,7 @@ func ERR_RETURN(out_err **zend.ZendString, local_err *zend.ZendString, fmt strin
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return zend.ZSTR_VAL(local_err) }, "Unspecified error"))
+		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
 		if local_err != nil {
 			zend.ZendStringReleaseEx(local_err, 0)
 			local_err = nil
@@ -88,7 +88,7 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 		n = 3
 	}
 	if protocol != nil {
-		if nil == b.Assign(&factory, &XportHash.StrFindPtr(protocol, n)) {
+		if nil == b.Assign(&factory, XportHash.StrFindPtr(protocol, n)) {
 			var wrapper_name []byte
 			if n >= b.SizeOf("wrapper_name") {
 				n = b.SizeOf("wrapper_name") - 1

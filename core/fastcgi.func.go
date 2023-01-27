@@ -117,15 +117,15 @@ func FcgiHashSet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val *by
 }
 func FcgiHashDel(h *FcgiHash, hash_value uint, var_ *byte, var_len uint) {
 	var idx uint = hash_value & FCGI_HASH_TABLE_MASK
-	var p **FcgiHashBucket = &h.GetHashTable()[idx]
+	var p **FcgiHashBucket = h.GetHashTable()[idx]
 	for (*p) != nil {
-		if (*p).GetHashValue() == hash_value && (*p).GetVarLen() == var_len && memcmp((*p).GetVar(), var_, var_len) == 0 {
-			(*p).SetVal(nil)
-			(*p).SetValLen(0)
-			*p = (*p).GetNext()
+		if p.GetHashValue() == hash_value && p.GetVarLen() == var_len && memcmp(p.GetVar(), var_, var_len) == 0 {
+			p.SetVal(nil)
+			p.SetValLen(0)
+			*p = p.GetNext()
 			return
 		}
-		p = &(*p).GetNext()
+		p = p.GetNext()
 	}
 }
 func FcgiHashGet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val_len *uint) *byte {
@@ -157,7 +157,7 @@ func FcgiSignalHandler(signo int) {
 func FcgiSetupSignals() {
 	var new_sa __struct__sigaction
 	var old_sa __struct__sigaction
-	sigemptyset(&new_sa.sa_mask)
+	sigemptyset(new_sa.sa_mask)
 	new_sa.sa_flags = 0
 	new_sa.sa_handler = FcgiSignalHandler
 	sigaction(SIGUSR1, &new_sa, nil)
@@ -176,7 +176,7 @@ func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
-		&FcgiMgmtVars.Init(8, nil, FcgiFreeMgmtVarCb, 1)
+		FcgiMgmtVars.Init(8, nil, FcgiFreeMgmtVarCb, 1)
 		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
 		IsInitialized = 1
 		errno = 0
@@ -200,7 +200,7 @@ func FcgiIsFastcgi() int {
 }
 func FcgiShutdown() {
 	if IsInitialized != 0 {
-		&FcgiMgmtVars.Destroy()
+		FcgiMgmtVars.Destroy()
 	}
 	IsFastcgi = 0
 	if AllowedClients != nil {
@@ -242,7 +242,7 @@ func FcgiListen(path *byte, backlog int) int {
 	/* Prepare socket address */
 
 	if tcp != 0 {
-		memset(&sa.GetSaInet(), 0, b.SizeOf("sa . sa_inet"))
+		memset(sa.GetSaInet(), 0, b.SizeOf("sa . sa_inet"))
 		sa.GetSaInet().sin_family = AF_INET
 		sa.GetSaInet().sin_port = htons(port)
 		sock_len = b.SizeOf("sa . sa_inet")
@@ -273,7 +273,7 @@ func FcgiListen(path *byte, backlog int) int {
 			FcgiLog(FCGI_ERROR, "Listening socket's path name is too long.\n")
 			return -1
 		}
-		memset(&sa.GetSaUnix(), 0, b.SizeOf("sa . sa_unix"))
+		memset(sa.GetSaUnix(), 0, b.SizeOf("sa . sa_unix"))
 		sa.GetSaUnix().sun_family = AF_UNIX
 		memcpy(sa.GetSaUnix().sun_path, path, path_len+1)
 		sock_len = size_t((*__struct__sockaddr_un)(0).sun_path) + path_len
@@ -314,10 +314,10 @@ func FcgiListen(path *byte, backlog int) int {
 					*end = 0
 					end++
 				}
-				if inet_pton(AF_INET, cur, &AllowedClients[n].GetSaInet().sin_addr) > 0 {
+				if inet_pton(AF_INET, cur, AllowedClients[n].GetSaInet().sin_addr) > 0 {
 					AllowedClients[n].GetSa().sa_family = AF_INET
 					n++
-				} else if inet_pton(AF_INET6, cur, &AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
+				} else if inet_pton(AF_INET6, cur, AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
 					AllowedClients[n].GetSa().sa_family = AF_INET6
 					n++
 				} else {
@@ -365,10 +365,10 @@ func FcgiSetAllowedClients(ip *byte) {
 				*end = 0
 				end++
 			}
-			if inet_pton(AF_INET, cur, &AllowedClients[n].GetSaInet().sin_addr) > 0 {
+			if inet_pton(AF_INET, cur, AllowedClients[n].GetSaInet().sin_addr) > 0 {
 				AllowedClients[n].GetSa().sa_family = AF_INET
 				n++
-			} else if inet_pton(AF_INET6, cur, &AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
+			} else if inet_pton(AF_INET6, cur, AllowedClients[n].GetSaInet6().sin6_addr) > 0 {
 				AllowedClients[n].GetSa().sa_family = AF_INET6
 				n++
 			} else {
@@ -421,11 +421,11 @@ func FcgiInitRequest(listen_socket int, on_accept func(), on_read func(), on_clo
 	} else {
 		req.GetHook().SetOnClose(FcgiHookDummy)
 	}
-	FcgiHashInit(&req.GetEnv())
+	FcgiHashInit(req.GetEnv())
 	return req
 }
 func FcgiDestroyRequest(req *FcgiRequest) {
-	FcgiHashDestroy(&req.GetEnv())
+	FcgiHashDestroy(req.GetEnv())
 	zend.Free(req)
 }
 func SafeWrite(req *FcgiRequest, buf any, count int) ssize_t {
@@ -519,7 +519,7 @@ func FcgiGetParams(req *FcgiRequest, p *uint8, end *uint8) int {
 			/* Malformated request */
 
 		}
-		FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC(p, name_len), (*byte)(p), name_len, (*byte)(p+name_len), val_len)
+		FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC(p, name_len), (*byte)(p), name_len, (*byte)(p+name_len), val_len)
 		p += name_len + val_len
 	}
 	return 1
@@ -535,7 +535,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 	req.SetOutHdr(nil)
 	req.SetOutPos(req.GetOutBuf())
 	if req.GetHasEnv() != 0 {
-		FcgiHashClean(&req.GetEnv())
+		FcgiHashClean(req.GetEnv())
 	} else {
 		req.SetHasEnv(1)
 	}
@@ -564,13 +564,13 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		req.SetKeep(b.GetFlags() & FCGI_KEEP_CONN)
 		switch (b.GetRoleB1() << 8) + b.GetRoleB0() {
 		case FCGI_RESPONDER:
-			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
 			break
 		case FCGI_AUTHORIZER:
-			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
 			break
 		case FCGI_FILTER:
-			FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
+			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
 			break
 		default:
 			return 0
@@ -614,7 +614,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 		q = req.GetEnv().GetList()
 		for q != nil {
-			if b.Assign(&value, &FcgiMgmtVars.StrFind(q.GetVar(), q.GetVarLen())) == nil {
+			if b.Assign(&value, FcgiMgmtVars.StrFind(q.GetVar(), q.GetVarLen())) == nil {
 				q = q.GetListNext()
 				continue
 			}
@@ -707,7 +707,7 @@ func FcgiRead(req *FcgiRequest, str *byte, len_ int) int {
 }
 func FcgiClose(req *FcgiRequest, force int, destroy int) {
 	if destroy != 0 && req.GetHasEnv() != 0 {
-		FcgiHashClean(&req.GetEnv())
+		FcgiHashClean(req.GetEnv())
 		req.SetHasEnv(0)
 	}
 	if (force != 0 || req.GetKeep() == 0) && req.GetFd() >= 0 {
@@ -740,14 +740,14 @@ func FcgiIsAllowed() int {
 	}
 	if ClientSa.GetSa().sa_family == AF_INET {
 		for i = 0; AllowedClients[i].GetSa().sa_family; i++ {
-			if AllowedClients[i].GetSa().sa_family == AF_INET && !(memcmp(&ClientSa.GetSaInet().sin_addr, &AllowedClients[i].GetSaInet().sin_addr, 4)) {
+			if AllowedClients[i].GetSa().sa_family == AF_INET && !(memcmp(ClientSa.GetSaInet().sin_addr, AllowedClients[i].GetSaInet().sin_addr, 4)) {
 				return 1
 			}
 		}
 	}
 	if ClientSa.GetSa().sa_family == AF_INET6 {
 		for i = 0; AllowedClients[i].GetSa().sa_family; i++ {
-			if AllowedClients[i].GetSa().sa_family == AF_INET6 && !(memcmp(&ClientSa.GetSaInet6().sin6_addr, &AllowedClients[i].GetSaInet6().sin6_addr, 12)) {
+			if AllowedClients[i].GetSa().sa_family == AF_INET6 && !(memcmp(ClientSa.GetSaInet6().sin6_addr, AllowedClients[i].GetSaInet6().sin6_addr, 12)) {
 				return 1
 			}
 		}
@@ -825,7 +825,7 @@ func FcgiFlush(req *FcgiRequest, end int) int {
 	len_ = int(req.GetOutPos() - req.GetOutBuf())
 	if end != 0 {
 		var rec *FcgiEndRequestRec = (*FcgiEndRequestRec)(req.GetOutPos())
-		FcgiMakeHeader(&rec.GetHdr(), FCGI_END_REQUEST, req.GetId(), b.SizeOf("fcgi_end_request"))
+		FcgiMakeHeader(rec.GetHdr(), FCGI_END_REQUEST, req.GetId(), b.SizeOf("fcgi_end_request"))
 		rec.GetBody().SetAppStatusB3(0)
 		rec.GetBody().SetAppStatusB2(0)
 		rec.GetBody().SetAppStatusB1(0)
@@ -947,57 +947,57 @@ func FcgiGetenv(req *FcgiRequest, var_ *byte, var_len int) *byte {
 	if req == nil {
 		return nil
 	}
-	return FcgiHashGet(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), (*byte)(var_), var_len, &val_len)
+	return FcgiHashGet(req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), (*byte)(var_), var_len, &val_len)
 }
 func FcgiQuickGetenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint) *byte {
 	var val_len uint
-	return FcgiHashGet(&req.GetEnv(), hash_value, (*byte)(var_), var_len, &val_len)
+	return FcgiHashGet(req.GetEnv(), hash_value, (*byte)(var_), var_len, &val_len)
 }
 func FcgiPutenv(req *FcgiRequest, var_ *byte, var_len int, val *byte) *byte {
 	if req == nil {
 		return nil
 	}
 	if val == nil {
-		FcgiHashDel(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len)
+		FcgiHashDel(req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len)
 		return nil
 	} else {
-		return FcgiHashSet(&req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len, val, uint(strlen(val)))
+		return FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC(var_, var_len), var_, var_len, val, uint(strlen(val)))
 	}
 }
 func FcgiQuickPutenv(req *FcgiRequest, var_ *byte, var_len int, hash_value uint, val *byte) *byte {
 	if val == nil {
-		FcgiHashDel(&req.GetEnv(), hash_value, var_, var_len)
+		FcgiHashDel(req.GetEnv(), hash_value, var_, var_len)
 		return nil
 	} else {
-		return FcgiHashSet(&req.GetEnv(), hash_value, var_, var_len, val, uint(strlen(val)))
+		return FcgiHashSet(req.GetEnv(), hash_value, var_, var_len, val, uint(strlen(val)))
 	}
 }
 func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *zend.Zval) {
-	FcgiHashApply(&req.GetEnv(), func_, array)
+	FcgiHashApply(req.GetEnv(), func_, array)
 }
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue zend.Zval
 	var key *zend.ZendString = zend.ZendStringInit(name, name_len, 1)
 	zend.ZVAL_NEW_STR(&zvalue, zend.ZendStringInit(value, value_len, 1))
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
-	zend.GC_MAKE_PERSISTENT_LOCAL(zend.Z_STR(zvalue))
-	&FcgiMgmtVars.Add(key, &zvalue)
+	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
+	FcgiMgmtVars.Add(key, &zvalue)
 	zend.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zend.Z_STR_P(zv), 1) }
+func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zv.GetStr(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 
 	/* Ipv4 */
 
 	if ClientSa.GetSa().sa_family == AF_INET {
-		return inet_ntop(ClientSa.GetSa().sa_family, &ClientSa.GetSaInet().sin_addr, str, INET6_ADDRSTRLEN)
+		return inet_ntop(ClientSa.GetSa().sa_family, ClientSa.GetSaInet().sin_addr, str, INET6_ADDRSTRLEN)
 	}
 
 	/* Ipv6 */
 
 	if ClientSa.GetSa().sa_family == AF_INET6 {
-		return inet_ntop(ClientSa.GetSa().sa_family, &ClientSa.GetSaInet6().sin6_addr, str, INET6_ADDRSTRLEN)
+		return inet_ntop(ClientSa.GetSa().sa_family, ClientSa.GetSaInet6().sin6_addr, str, INET6_ADDRSTRLEN)
 	}
 
 	/* Unix socket */

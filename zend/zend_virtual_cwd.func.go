@@ -69,7 +69,7 @@ func PhpIsFileOk(state *CwdState) int {
 	return 1
 }
 func CwdGlobalsCtor(cwd_g *VirtualCwdGlobals) {
-	CWD_STATE_COPY(&cwd_g.GetCwd(), &MainCwdState)
+	CWD_STATE_COPY(cwd_g.GetCwd(), &MainCwdState)
 	cwd_g.SetRealpathCacheSize(0)
 	cwd_g.SetRealpathCacheSizeLimit(REALPATH_CACHE_SIZE)
 	cwd_g.SetRealpathCacheTtl(REALPATH_CACHE_TTL)
@@ -89,7 +89,7 @@ func RealpathCacheCleanHelper(max_entries uint32, cache **RealpathCacheBucket, c
 	*cache_size = 0
 }
 func CwdGlobalsDtor(cwd_g *VirtualCwdGlobals) {
-	RealpathCacheCleanHelper(b.SizeOf("cwd_g -> realpath_cache")/b.SizeOf("cwd_g -> realpath_cache [ 0 ]"), cwd_g.GetRealpathCache(), &cwd_g.GetRealpathCacheSize())
+	RealpathCacheCleanHelper(b.SizeOf("cwd_g -> realpath_cache")/b.SizeOf("cwd_g -> realpath_cache [ 0 ]"), cwd_g.GetRealpathCache(), cwd_g.GetRealpathCacheSize())
 }
 func VirtualCwdMainCwdInit(reinit uint8) {
 	var cwd []byte
@@ -180,9 +180,9 @@ func RealpathCacheDel(path *byte, path_len int) {
 	var n ZendUlong = key % (b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"))
 	var bucket **RealpathCacheBucket = &CWDG(realpath_cache)[n]
 	for (*bucket) != nil {
-		if key == (*bucket).GetKey() && path_len == (*bucket).GetPathLen() && memcmp(path, (*bucket).GetPath(), path_len) == 0 {
+		if key == bucket.GetKey() && path_len == bucket.GetPathLen() && memcmp(path, bucket.GetPath(), path_len) == 0 {
 			var r *RealpathCacheBucket = *bucket
-			*bucket = (*bucket).GetNext()
+			*bucket = bucket.GetNext()
 
 			/* if the pointers match then only subtract the length of the path */
 
@@ -194,7 +194,7 @@ func RealpathCacheDel(path *byte, path_len int) {
 			Free(r)
 			return
 		} else {
-			bucket = &(*bucket).GetNext()
+			bucket = bucket.GetNext()
 		}
 	}
 }
@@ -235,9 +235,9 @@ func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 	var n ZendUlong = key % (b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]"))
 	var bucket **RealpathCacheBucket = &CWDG(realpath_cache)[n]
 	for (*bucket) != nil {
-		if CWDG(realpath_cache_ttl) && (*bucket).GetExpires() < t {
+		if CWDG(realpath_cache_ttl) && bucket.GetExpires() < t {
 			var r *RealpathCacheBucket = *bucket
-			*bucket = (*bucket).GetNext()
+			*bucket = bucket.GetNext()
 
 			/* if the pointers match then only subtract the length of the path */
 
@@ -247,10 +247,10 @@ func RealpathCacheFind(path *byte, path_len int, t int64) *RealpathCacheBucket {
 				CWDG(RealpathCacheSize) -= b.SizeOf("realpath_cache_bucket") + r.GetPathLen() + 1 + r.GetRealpathLen() + 1
 			}
 			Free(r)
-		} else if key == (*bucket).GetKey() && path_len == (*bucket).GetPathLen() && memcmp(path, (*bucket).GetPath(), path_len) == 0 {
+		} else if key == bucket.GetKey() && path_len == bucket.GetPathLen() && memcmp(path, bucket.GetPath(), path_len) == 0 {
 			return *bucket
 		} else {
-			bucket = &(*bucket).GetNext()
+			bucket = bucket.GetNext()
 		}
 	}
 	return nil

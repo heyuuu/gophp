@@ -154,12 +154,12 @@ func Sha512FinishCtx(ctx *Sha512Ctx, resbuf any) any {
 	} else {
 		pad = 112 - int(bytes)
 	}
-	memcpy(&ctx.GetBuffer()[bytes], Fillbuf, pad)
+	memcpy(ctx.GetBuffer()[bytes], Fillbuf, pad)
 
 	/* Put the 128-bit file length in *bits* at the end of the buffer.  */
 
-	*((*uint64)(&ctx.GetBuffer()[bytes+pad+8])) = SWAP(ctx.GetTotal()[0] << 3)
-	*((*uint64)(&ctx.GetBuffer()[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>61)
+	*((*uint64)(ctx.GetBuffer()[bytes+pad+8])) = SWAP(ctx.GetTotal()[0] << 3)
+	*((*uint64)(ctx.GetBuffer()[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>61)
 
 	/* Process last bytes.  */
 
@@ -179,7 +179,7 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 	if ctx.GetBuflen() != 0 {
 		var left_over int = int(ctx.GetBuflen())
 		var add int = size_t(b.Cond(256-left_over > len_, len_, 256-left_over))
-		memcpy(&ctx.GetBuffer()[left_over], buffer, add)
+		memcpy(ctx.GetBuffer()[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + add)
 		if ctx.GetBuflen() > 128 {
 			Sha512ProcessBlock(ctx.GetBuffer(), ctx.GetBuflen() & ^127, ctx)
@@ -187,7 +187,7 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 
 			/* The regions in the following copy operation cannot overlap.  */
 
-			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[left_over + add & ^127], int(ctx.GetBuflen()))
+			memcpy(ctx.GetBuffer(), ctx.GetBuffer()[left_over + add & ^127], int(ctx.GetBuflen()))
 
 			/* The regions in the following copy operation cannot overlap.  */
 
@@ -223,12 +223,12 @@ func Sha512ProcessBytes(buffer any, len_ int, ctx *Sha512Ctx) {
 
 	if len_ > 0 {
 		var left_over int = int(ctx.GetBuflen())
-		memcpy(&ctx.GetBuffer()[left_over], buffer, len_)
+		memcpy(ctx.GetBuffer()[left_over], buffer, len_)
 		left_over += len_
 		if left_over >= 128 {
 			Sha512ProcessBlock(ctx.GetBuffer(), 128, ctx)
 			left_over -= 128
-			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[128], left_over)
+			memcpy(ctx.GetBuffer(), ctx.GetBuffer()[128], left_over)
 		}
 		ctx.SetBuflen(left_over)
 	}

@@ -24,17 +24,17 @@ func IterWrapperGetGc(object *Zval, table **Zval, n *int) *HashTable {
 	return nil
 }
 func ZendIteratorInit(iter *ZendObjectIterator) {
-	ZendObjectStdInit(&iter.GetStd(), &ZendIteratorClassEntry)
+	ZendObjectStdInit(iter.GetStd(), &ZendIteratorClassEntry)
 	iter.GetStd().SetHandlers(&IteratorObjectHandlers)
 }
 func ZendIteratorDtor(iter *ZendObjectIterator) {
-	if GC_DELREF(&iter.GetStd()) > 0 {
+	if GC_DELREF(iter.GetStd()) > 0 {
 		return
 	}
-	ZendObjectsStoreDel(&iter.GetStd())
+	ZendObjectsStoreDel(iter.GetStd())
 }
 func ZendIteratorUnwrap(array_ptr *Zval) *ZendObjectIterator {
-	ZEND_ASSERT(Z_TYPE_P(array_ptr) == IS_OBJECT)
+	ZEND_ASSERT(array_ptr.IsType(IS_OBJECT))
 	if Z_OBJ_HT_P(array_ptr) == &IteratorObjectHandlers {
 		return (*ZendObjectIterator)(Z_OBJ_P(array_ptr))
 	}

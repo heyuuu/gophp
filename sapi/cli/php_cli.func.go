@@ -22,33 +22,33 @@ func ModuleNameCmp(a any, b any) int {
 func PrintModules() {
 	var sorted_registry zend.HashTable
 	var module *zend.ZendModuleEntry
-	&sorted_registry.Init(50, nil, nil, 0)
-	&sorted_registry.Copy(&zend.ModuleRegistry, nil)
-	&sorted_registry.Sort(ModuleNameCmp, 0)
+	sorted_registry.Init(50, nil, nil, 0)
+	sorted_registry.Copy(&zend.ModuleRegistry, nil)
+	sorted_registry.Sort(ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
-			module = zend.Z_PTR_P(_z)
+			module = _z.GetPtr()
 			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break
 	}
-	&sorted_registry.Destroy()
+	sorted_registry.Destroy()
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
 	return zend.ZEND_HASH_APPLY_KEEP
 }
 func ExtensionNameCmp(f **zend.ZendLlistElement, s **zend.ZendLlistElement) int {
-	var fe *zend.ZendExtension = (*zend.ZendExtension)((*f).GetData())
-	var se *zend.ZendExtension = (*zend.ZendExtension)((*s).GetData())
+	var fe *zend.ZendExtension = (*zend.ZendExtension)(f.GetData())
+	var se *zend.ZendExtension = (*zend.ZendExtension)(s.GetData())
 	return strcmp(fe.GetName(), se.GetName())
 }
 func PrintExtensions() {
@@ -233,9 +233,9 @@ func CliRegisterFileHandles() {
 		return
 	}
 	SInProcess = s_in
-	core.PhpStreamToZval(s_in, &ic.GetValue())
-	core.PhpStreamToZval(s_out, &oc.GetValue())
-	core.PhpStreamToZval(s_err, &ec.GetValue())
+	core.PhpStreamToZval(s_in, ic.GetValue())
+	core.PhpStreamToZval(s_out, oc.GetValue())
+	core.PhpStreamToZval(s_err, ec.GetValue())
 	zend.ZEND_CONSTANT_SET_FLAGS(&ic, zend.CONST_CS, 0)
 	ic.SetName(zend.ZendStringInitInterned("STDIN", b.SizeOf("\"STDIN\"")-1, 0))
 	zend.ZendRegisterConstant(&ic)
@@ -592,9 +592,9 @@ func DoCli(argc int, argv **byte) int {
 					input[len_] = '0'
 				}
 				zend.ZVAL_STRINGL(&argn, input, len_+1)
-				&(zend.ExecutorGlobals.GetSymbolTable()).StrUpdate("argn", b.SizeOf("\"argn\"")-1, &argn)
+				zend.ExecutorGlobals.GetSymbolTable().StrUpdate("argn", b.SizeOf("\"argn\"")-1, &argn)
 				zend.ZVAL_LONG(&argi, b.PreInc(&index))
-				&(zend.ExecutorGlobals.GetSymbolTable()).StrUpdate("argi", b.SizeOf("\"argi\"")-1, &argi)
+				zend.ExecutorGlobals.GetSymbolTable().StrUpdate("argi", b.SizeOf("\"argi\"")-1, &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254
@@ -651,7 +651,7 @@ func DoCli(argc int, argv **byte) int {
 			zend.ObjectInitEx(&ref, pce)
 			memset(&execute_data, 0, b.SizeOf("zend_execute_data"))
 			zend.ExecutorGlobals.SetCurrentExecuteData(&execute_data)
-			zend.ZendCallMethodWith1Params(&ref, pce, &pce.GetConstructor(), "__construct", nil, &arg)
+			zend.ZendCallMethodWith1Params(&ref, pce, pce.GetConstructor(), "__construct", nil, &arg)
 			if zend.ExecutorGlobals.GetException() != nil {
 				var tmp zend.Zval
 				var msg *zend.Zval
@@ -673,7 +673,7 @@ func DoCli(argc int, argv **byte) int {
 			var len_ int = strlen(reflection_what)
 			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
 			var module *zend.ZendModuleEntry
-			if b.Assign(&module, &zend.ModuleRegistry.StrFindPtr(lcname, len_)) == nil {
+			if b.Assign(&module, zend.ModuleRegistry.StrFindPtr(lcname, len_)) == nil {
 				if !(strcmp(reflection_what, "main")) {
 					core.DisplayIniEntries(nil)
 				} else {

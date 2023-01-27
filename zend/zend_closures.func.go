@@ -25,7 +25,7 @@ func zim_Closure___invoke(execute_data *ZendExecuteData, return_value *Zval) {
 	Efree(func_)
 }
 func ZendValidClosureBinding(closure *ZendClosure, newthis *Zval, scope *ZendClassEntry) ZendBool {
-	var func_ *ZendFunction = &closure.GetFunc()
+	var func_ *ZendFunction = closure.GetFunc()
 	var is_fake_closure ZendBool = func_.IsFakeClosure()
 	if newthis != nil {
 		if func_.IsStatic() {
@@ -36,7 +36,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *Zval, scope *ZendCla
 
 			/* Binding incompatible $this to an internal method is not supported. */
 
-			ZendError(E_WARNING, "Cannot bind method %s::%s() to object of class %s", ZSTR_VAL(func_.GetScope().GetName()), ZSTR_VAL(func_.GetFunctionName()), ZSTR_VAL(Z_OBJCE_P(newthis).GetName()))
+			ZendError(E_WARNING, "Cannot bind method %s::%s() to object of class %s", func_.GetScope().GetName().GetVal(), func_.GetFunctionName().GetVal(), Z_OBJCE_P(newthis).GetName().GetVal())
 			return 0
 		}
 	} else if is_fake_closure != 0 && func_.GetScope() != nil && !func_.IsStatic() {
@@ -59,7 +59,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *Zval, scope *ZendCla
 
 		/* rebinding to internal class is not allowed */
 
-		ZendError(E_WARNING, "Cannot bind closure to scope of internal class %s", ZSTR_VAL(scope.GetName()))
+		ZendError(E_WARNING, "Cannot bind closure to scope of internal class %s", scope.GetName().GetVal())
 		return 0
 	}
 	if is_fake_closure != 0 && scope != func_.GetScope() {
@@ -82,7 +82,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 	var newobj *ZendObject
 	fci.SetParamCount(0)
 	fci.SetParams(nil)
-	if ZendParseParameters(ZEND_NUM_ARGS(), "o*", &newthis, &fci.GetParams(), &fci.GetParamCount()) == FAILURE {
+	if ZendParseParameters(ZEND_NUM_ARGS(), "o*", &newthis, fci.GetParams(), fci.GetParamCount()) == FAILURE {
 		return
 	}
 	closure = (*ZendClosure)(Z_OBJ_P(ZEND_THIS))
@@ -92,11 +92,11 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if closure.GetFunc().IsGenerator() {
 		var new_closure Zval
-		ZendCreateClosure(&new_closure, &closure.GetFunc(), Z_OBJCE_P(newthis), closure.GetCalledScope(), newthis)
-		closure = (*ZendClosure)(Z_OBJ(new_closure))
-		fci_cache.SetFunctionHandler(&closure.GetFunc())
+		ZendCreateClosure(&new_closure, closure.GetFunc(), Z_OBJCE_P(newthis), closure.GetCalledScope(), newthis)
+		closure = (*ZendClosure)(new_closure.GetObj())
+		fci_cache.SetFunctionHandler(closure.GetFunc())
 	} else {
-		memcpy(&my_function, &closure.GetFunc(), b.CondF(closure.GetFunc().GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
+		memcpy(&my_function, closure.GetFunc(), b.CondF(closure.GetFunc().GetType() == ZEND_USER_FUNCTION, func() __auto__ { return b.SizeOf("zend_op_array") }, func() __auto__ { return b.SizeOf("zend_internal_function") }))
 		my_function.SetIsClosure(false)
 
 		/* use scope of passed object */
@@ -126,7 +126,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 	fci.SetObject(newobj)
 	fci_cache.SetObject(fci.GetObject())
 	fci.SetSize(b.SizeOf("fci"))
-	ZVAL_OBJ(&fci.GetFunctionName(), &closure.GetStd())
+	ZVAL_OBJ(fci.GetFunctionName(), closure.GetStd())
 	fci.SetRetval(&closure_result)
 	fci.SetNoSeparation(1)
 	if ZendCallFunction(&fci, &fci_cache) == SUCCESS && closure_result.GetType() != IS_UNDEF {
@@ -139,7 +139,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 
 		/* copied upon generator creation */
 
-		GC_DELREF(&closure.GetStd())
+		GC_DELREF(closure.GetStd())
 
 		/* copied upon generator creation */
 
@@ -159,9 +159,9 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	closure = (*ZendClosure)(Z_OBJ_P(zclosure))
 	if scope_arg != nil {
-		if Z_TYPE_P(scope_arg) == IS_OBJECT {
+		if scope_arg.IsType(IS_OBJECT) {
 			ce = Z_OBJCE_P(scope_arg)
-		} else if Z_TYPE_P(scope_arg) == IS_NULL {
+		} else if scope_arg.IsType(IS_NULL) {
 			ce = nil
 		} else {
 			var tmp_class_name *ZendString
@@ -169,7 +169,7 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 			if ZendStringEqualsLiteral(class_name, "static") {
 				ce = closure.GetFunc().GetScope()
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
-				ZendError(E_WARNING, "Class '%s' not found", ZSTR_VAL(class_name))
+				ZendError(E_WARNING, "Class '%s' not found", class_name.GetVal())
 				ZendTmpStringRelease(tmp_class_name)
 				RETVAL_NULL()
 				return
@@ -187,7 +187,7 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		called_scope = ce
 	}
-	ZendCreateClosure(return_value, &closure.GetFunc(), ce, called_scope, newthis)
+	ZendCreateClosure(return_value, closure.GetFunc(), ce, called_scope, newthis)
 }
 func ZendClosureCallMagic(execute_data *ZendExecuteData, return_value *Zval) {
 	var fci ZendFcallInfo
@@ -204,18 +204,18 @@ func ZendClosureCallMagic(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	fci.SetParams(params)
 	fci.SetParamCount(2)
-	ZVAL_STR(&fci.GetParams()[0], EX(func_).common.function_name)
+	ZVAL_STR(fci.GetParams()[0], EX(func_).common.function_name)
 	if ZEND_NUM_ARGS() != 0 {
-		ArrayInitSize(&fci.GetParams()[1], ZEND_NUM_ARGS())
-		ZendCopyParametersArray(ZEND_NUM_ARGS(), &fci.GetParams()[1])
+		ArrayInitSize(fci.GetParams()[1], ZEND_NUM_ARGS())
+		ZendCopyParametersArray(ZEND_NUM_ARGS(), fci.GetParams()[1])
 	} else {
-		ZVAL_EMPTY_ARRAY(&fci.GetParams()[1])
+		ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
 	}
 	fci.SetObject(Z_OBJ_P(ZEND_THIS))
 	fcc.SetObject(fci.GetObject())
 	fcc.SetCalledScope(ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData()))
 	ZendCallFunction(&fci, &fcc)
-	ZvalPtrDtor(&fci.GetParams()[1])
+	ZvalPtrDtor(fci.GetParams()[1])
 }
 func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **byte) int {
 	var fcc ZendFcallInfoCache
@@ -272,7 +272,7 @@ func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval)
 	if ZendParseParameters(ZEND_NUM_ARGS(), "z", &callable) == FAILURE {
 		return
 	}
-	if Z_TYPE_P(callable) == IS_OBJECT && InstanceofFunction(Z_OBJCE_P(callable), ZendCeClosure) != 0 {
+	if callable.IsType(IS_OBJECT) && InstanceofFunction(Z_OBJCE_P(callable), ZendCeClosure) != 0 {
 
 		/* It's already a closure */
 
@@ -324,11 +324,11 @@ func ZendGetClosureInvokeMethod(object *ZendObject) *ZendFunction {
 }
 func ZendGetClosureMethodDef(obj *Zval) *ZendFunction {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(obj))
-	return &closure.GetFunc()
+	return closure.GetFunc()
 }
 func ZendGetClosureThisPtr(obj *Zval) *Zval {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(obj))
-	return &closure.GetThisPtr()
+	return closure.GetThisPtr()
 }
 func ZendClosureGetMethod(object **ZendObject, method *ZendString, key *Zval) *ZendFunction {
 	if ZendStringEqualsLiteralCi(method, ZEND_INVOKE_FUNC_NAME) {
@@ -359,36 +359,36 @@ func ZendClosureUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 }
 func ZendClosureFreeStorage(object *ZendObject) {
 	var closure *ZendClosure = (*ZendClosure)(object)
-	ZendObjectStdDtor(&closure.GetStd())
+	ZendObjectStdDtor(closure.GetStd())
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION {
-		DestroyOpArray(&closure.GetFunc().GetOpArray())
+		DestroyOpArray(closure.GetFunc().GetOpArray())
 	} else if closure.GetOrigInternalHandler() == ZendClosureCallMagic {
 		ZendStringRelease(closure.GetFunc().GetFunctionName())
 	}
 	if closure.GetThisPtr().GetType() != IS_UNDEF {
-		ZvalPtrDtor(&closure.GetThisPtr())
+		ZvalPtrDtor(closure.GetThisPtr())
 	}
 }
 func ZendClosureNew(class_type *ZendClassEntry) *ZendObject {
 	var closure *ZendClosure
 	closure = Emalloc(b.SizeOf("zend_closure"))
 	memset(closure, 0, b.SizeOf("zend_closure"))
-	ZendObjectStdInit(&closure.GetStd(), class_type)
+	ZendObjectStdInit(closure.GetStd(), class_type)
 	closure.GetStd().SetHandlers(&ClosureHandlers)
 	return (*ZendObject)(closure)
 }
 func ZendClosureClone(zobject *Zval) *ZendObject {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(zobject))
 	var result Zval
-	ZendCreateClosure(&result, &closure.GetFunc(), closure.GetFunc().GetScope(), closure.GetCalledScope(), &closure.GetThisPtr())
-	return Z_OBJ(result)
+	ZendCreateClosure(&result, closure.GetFunc(), closure.GetFunc().GetScope(), closure.GetCalledScope(), closure.GetThisPtr())
+	return result.GetObj()
 }
 func ZendClosureGetClosure(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **ZendObject) int {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(obj))
-	*fptr_ptr = &closure.GetFunc()
+	*fptr_ptr = closure.GetFunc()
 	*ce_ptr = closure.GetCalledScope()
 	if closure.GetThisPtr().GetType() != IS_UNDEF {
-		*obj_ptr = Z_OBJ(closure.GetThisPtr())
+		*obj_ptr = closure.GetThisPtr().GetObj()
 	} else {
 		*obj_ptr = nil
 	}
@@ -412,13 +412,13 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *Zval = &_p.GetVal()
+				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				var_ = _z
-				if Z_TYPE_P(var_) == IS_CONSTANT_AST {
+				if var_.IsType(IS_CONSTANT_AST) {
 					ZvalPtrDtor(var_)
 					ZVAL_STRING(var_, "<constant ast>")
 				}
@@ -428,7 +428,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 	}
 	if closure.GetThisPtr().GetType() != IS_UNDEF {
 		Z_ADDREF(closure.GetThisPtr())
-		debug_info.Update(ZSTR_KNOWN(ZEND_STR_THIS), &closure.GetThisPtr())
+		debug_info.Update(ZSTR_KNOWN(ZEND_STR_THIS), closure.GetThisPtr())
 	}
 	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {
 		var i uint32
@@ -444,7 +444,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			var info Zval
 			if arg_info.GetName() != nil {
 				if zstr_args != 0 {
-					name = ZendStrpprintf(0, "%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), ZSTR_VAL(arg_info.GetName()))
+					name = ZendStrpprintf(0, "%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), arg_info.GetName().GetVal())
 				} else {
 					name = ZendStrpprintf(0, "%s$%s", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), (*ZendInternalArgInfo)(arg_info).GetName())
 				}
@@ -463,7 +463,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 func ZendClosureGetGc(obj *Zval, table **Zval, n *int) *HashTable {
 	var closure *ZendClosure = (*ZendClosure)(Z_OBJ_P(obj))
 	if closure.GetThisPtr().GetType() != IS_NULL {
-		*table = &closure.GetThisPtr()
+		*table = closure.GetThisPtr()
 	} else {
 		*table = nil
 	}
@@ -516,7 +516,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 	var closure *ZendClosure
 	ObjectInitEx(res, ZendCeClosure)
 	closure = (*ZendClosure)(Z_OBJ_P(res))
-	if scope == nil && this_ptr != nil && Z_TYPE_P(this_ptr) != IS_UNDEF {
+	if scope == nil && this_ptr != nil && this_ptr.GetType() != IS_UNDEF {
 
 		/* use dummy scope if we're binding an object without specifying a scope */
 
@@ -526,13 +526,13 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 
 	}
 	if func_.GetType() == ZEND_USER_FUNCTION {
-		memcpy(&closure.GetFunc(), func_, b.SizeOf("zend_op_array"))
+		memcpy(closure.GetFunc(), func_, b.SizeOf("zend_op_array"))
 		closure.GetFunc().SetIsClosure(true)
 		closure.GetFunc().SetIsImmutable(false)
 		if closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 			closure.GetFunc().GetOpArray().SetStaticVariables(ZendArrayDup(closure.GetFunc().GetOpArray().GetStaticVariables()))
 		}
-		ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().static_variables_ptr, &closure.GetFunc().GetOpArray().GetStaticVariables())
+		ZEND_MAP_PTR_INIT(closure.GetFunc().GetOpArray().static_variables_ptr, closure.GetFunc().GetOpArray().GetStaticVariables())
 
 		/* Runtime cache is scope-dependent, so we cannot reuse it if the scope changed */
 
@@ -563,10 +563,10 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 			memset(ptr, 0, func_.GetOpArray().GetCacheSize())
 		}
 		if closure.GetFunc().GetOpArray().GetRefcount() != nil {
-			(*closure).func_.op_array.refcount++
+			closure.func_.op_array.refcount++
 		}
 	} else {
-		memcpy(&closure.GetFunc(), func_, b.SizeOf("zend_internal_function"))
+		memcpy(closure.GetFunc(), func_, b.SizeOf("zend_internal_function"))
 		closure.GetFunc().SetIsClosure(true)
 
 		/* wrap internal function handler to avoid memory leak */
@@ -590,7 +590,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 			scope = nil
 		}
 	}
-	ZVAL_UNDEF(&closure.GetThisPtr())
+	ZVAL_UNDEF(closure.GetThisPtr())
 
 	/* Invariant:
 	 * If the closure is unscoped or static, it has no bound object. */
@@ -599,9 +599,9 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 	closure.SetCalledScope(called_scope)
 	if scope != nil {
 		closure.GetFunc().SetIsPublic(true)
-		if this_ptr != nil && Z_TYPE_P(this_ptr) == IS_OBJECT && !closure.GetFunc().IsStatic() {
+		if this_ptr != nil && this_ptr.IsType(IS_OBJECT) && !closure.GetFunc().IsStatic() {
 			Z_ADDREF_P(this_ptr)
-			ZVAL_OBJ(&closure.GetThisPtr(), Z_OBJ_P(this_ptr))
+			ZVAL_OBJ(closure.GetThisPtr(), Z_OBJ_P(this_ptr))
 		}
 	}
 }

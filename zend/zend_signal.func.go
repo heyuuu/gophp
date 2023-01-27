@@ -92,7 +92,7 @@ func ZendSignalHandler(signo int, siginfo *siginfo_t, context any) {
 	if p_sig.GetHandler() == SIG_DFL {
 		if sigaction(signo, nil, &sa) == 0 {
 			sa.sa_handler = SIG_DFL
-			sigemptyset(&sa.sa_mask)
+			sigemptyset(sa.sa_mask)
 			sigemptyset(&sigset)
 			sigaddset(&sigset, signo)
 			if sigaction(signo, &sa, nil) == 0 {
@@ -237,7 +237,7 @@ func ZendSignalGlobalsCtor(zend_signal_globals *ZendSignalGlobalsT) {
 	memset(zend_signal_globals, 0, b.SizeOf("* zend_signal_globals"))
 	zend_signal_globals.SetReset(1)
 	for x = 0; x < b.SizeOf("zend_signal_globals -> pstorage")/b.SizeOf("* zend_signal_globals -> pstorage"); x++ {
-		var queue *ZendSignalQueueT = &zend_signal_globals.GetPstorage()[x]
+		var queue *ZendSignalQueueT = zend_signal_globals.GetPstorage()[x]
 		queue.GetZendSignal().SetSigno(0)
 		queue.SetNext(zend_signal_globals.GetPavail())
 		zend_signal_globals.SetPavail(queue)

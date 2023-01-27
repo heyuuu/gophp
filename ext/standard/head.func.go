@@ -46,7 +46,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, &ctr.GetLine(), &len_, 0) == 0 {
+			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -59,7 +59,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgLong(_arg, &ctr.GetResponseCode(), &_dummy, 0, 0) == 0 {
+			if zend.ZendParseArgLong(_arg, ctr.GetResponseCode(), &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -133,7 +133,7 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgString(_arg, &ctr.GetLine(), &len_, 0) == 0 {
+			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
 				_error_code = zend.ZPP_ERROR_WRONG_ARG
 				break
@@ -181,26 +181,26 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 	var ctr core.SapiHeaderLine = core.SapiHeaderLine{0}
 	var result int
 	var buf zend.SmartStr = zend.SmartStr{0}
-	if zend.ZSTR_LEN(name) == 0 {
+	if name.GetLen() == 0 {
 		zend.ZendError(zend.E_WARNING, "Cookie names must not be empty")
 		return zend.FAILURE
-	} else if strpbrk(zend.ZSTR_VAL(name), "=,; \t\r\n013014") != nil {
+	} else if strpbrk(name.GetVal(), "=,; \t\r\n013014") != nil {
 		zend.ZendError(zend.E_WARNING, "Cookie names cannot contain any of the following '=,; \\t\\r\\n\\013\\014'")
 		return zend.FAILURE
 	}
-	if url_encode == 0 && value != nil && strpbrk(zend.ZSTR_VAL(value), ",; \t\r\n013014") != nil {
+	if url_encode == 0 && value != nil && strpbrk(value.GetVal(), ",; \t\r\n013014") != nil {
 		zend.ZendError(zend.E_WARNING, "Cookie values cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return zend.FAILURE
 	}
-	if path != nil && strpbrk(zend.ZSTR_VAL(path), ",; \t\r\n013014") != nil {
+	if path != nil && strpbrk(path.GetVal(), ",; \t\r\n013014") != nil {
 		zend.ZendError(zend.E_WARNING, "Cookie paths cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return zend.FAILURE
 	}
-	if domain != nil && strpbrk(zend.ZSTR_VAL(domain), ",; \t\r\n013014") != nil {
+	if domain != nil && strpbrk(domain.GetVal(), ",; \t\r\n013014") != nil {
 		zend.ZendError(zend.E_WARNING, "Cookie domains cannot contain any of the following ',; \\t\\r\\n\\013\\014'")
 		return zend.FAILURE
 	}
-	if value == nil || zend.ZSTR_LEN(value) == 0 {
+	if value == nil || value.GetLen() == 0 {
 
 		/*
 		 * MSIE doesn't delete a cookie when you set it to a null value
@@ -220,7 +220,7 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 		zend.SmartStrAppend(&buf, name)
 		zend.SmartStrAppendc(&buf, '=')
 		if url_encode != 0 {
-			var encoded_value *zend.ZendString = PhpRawUrlEncode(zend.ZSTR_VAL(value), zend.ZSTR_LEN(value))
+			var encoded_value *zend.ZendString = PhpRawUrlEncode(value.GetVal(), value.GetLen())
 			zend.SmartStrAppend(&buf, encoded_value)
 			zend.ZendStringReleaseEx(encoded_value, 0)
 		} else {
@@ -234,7 +234,7 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 
 			/* check to make sure that the year does not exceed 4 digits in length */
 
-			p = zend.ZendMemrchr(zend.ZSTR_VAL(dt), '-', zend.ZSTR_LEN(dt))
+			p = zend.ZendMemrchr(dt.GetVal(), '-', dt.GetLen())
 			if p == nil || (*(p + 5)) != ' ' {
 				zend.ZendStringFree(dt)
 				zend.SmartStrFree(&buf)
@@ -251,11 +251,11 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 			zend.SmartStrAppendLong(&buf, zend.ZendLong(diff))
 		}
 	}
-	if path != nil && zend.ZSTR_LEN(path) != 0 {
+	if path != nil && path.GetLen() != 0 {
 		zend.SmartStrAppends(&buf, COOKIE_PATH)
 		zend.SmartStrAppend(&buf, path)
 	}
-	if domain != nil && zend.ZSTR_LEN(domain) != 0 {
+	if domain != nil && domain.GetLen() != 0 {
 		zend.SmartStrAppends(&buf, COOKIE_DOMAIN)
 		zend.SmartStrAppend(&buf, domain)
 	}
@@ -265,12 +265,12 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 	if httponly != 0 {
 		zend.SmartStrAppends(&buf, COOKIE_HTTPONLY)
 	}
-	if samesite != nil && zend.ZSTR_LEN(samesite) != 0 {
+	if samesite != nil && samesite.GetLen() != 0 {
 		zend.SmartStrAppends(&buf, COOKIE_SAMESITE)
 		zend.SmartStrAppend(&buf, samesite)
 	}
-	ctr.SetLine(zend.ZSTR_VAL(buf.GetS()))
-	ctr.SetLineLen(uint32(zend.ZSTR_LEN(buf.GetS())))
+	ctr.SetLine(buf.GetS().GetVal())
+	ctr.SetLineLen(uint32(buf.GetS().GetLen()))
 	result = core.SapiHeaderOp(core.SAPI_HEADER_ADD, &ctr)
 	zend.ZendStringRelease(buf.GetS())
 	return result
@@ -280,13 +280,13 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 	var key *zend.ZendString
 	var value *zend.Zval
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(options)
+		var __ht *zend.HashTable = options.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -311,7 +311,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 					*samesite = zend.ZvalGetString(value)
 					found++
 				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Unrecognized key '%s' found in the options array", zend.ZSTR_VAL(key))
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
 				}
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric key found in the options array")
@@ -322,7 +322,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 
 	/* Array is not empty but no valid keys were found */
 
-	if found == 0 && zend.Z_ARRVAL_P(options).NumElements() > 0 {
+	if found == 0 && zend.Z_ARRVAL_P(options).GetNNumOfElements() > 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No valid options were found in the given array")
 	}
 
@@ -439,7 +439,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if expires_or_options != nil {
-		if zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
+		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
@@ -457,7 +457,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.RETVAL_FALSE
 		}
 	}
-	if expires_or_options != nil && zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
+	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
 		if path != nil {
 			zend.ZendStringRelease(path)
 		}
@@ -580,7 +580,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		break
 	}
 	if expires_or_options != nil {
-		if zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
+		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
@@ -598,7 +598,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			zend.RETVAL_FALSE
 		}
 	}
-	if expires_or_options != nil && zend.Z_TYPE_P(expires_or_options) == zend.IS_ARRAY {
+	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
 		if path != nil {
 			zend.ZendStringRelease(path)
 		}

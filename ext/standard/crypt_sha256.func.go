@@ -167,12 +167,12 @@ func Sha256FinishCtx(ctx *Sha256Ctx, resbuf any) any {
 	} else {
 		pad = 56 - bytes
 	}
-	memcpy(&ctx.GetBuffer()[bytes], Fillbuf, pad)
+	memcpy(ctx.GetBuffer()[bytes], Fillbuf, pad)
 
 	/* Put the 64-bit file length in *bits* at the end of the buffer.  */
 
-	*((*uint32)(&ctx.GetBuffer()[bytes+pad+4])) = SWAP(ctx.GetTotal()[0] << 3)
-	*((*uint32)(&ctx.GetBuffer()[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>29)
+	*((*uint32)(ctx.GetBuffer()[bytes+pad+4])) = SWAP(ctx.GetTotal()[0] << 3)
+	*((*uint32)(ctx.GetBuffer()[bytes+pad])) = SWAP(ctx.GetTotal()[1]<<3 | ctx.GetTotal()[0]>>29)
 
 	/* Process last bytes.  */
 
@@ -192,7 +192,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 	if ctx.GetBuflen() != 0 {
 		var left_over int = ctx.GetBuflen()
 		var add int = b.Cond(128-left_over > len_, len_, 128-left_over)
-		memcpy(&ctx.GetBuffer()[left_over], buffer, add)
+		memcpy(ctx.GetBuffer()[left_over], buffer, add)
 		ctx.SetBuflen(ctx.GetBuflen() + uint32(add))
 		if ctx.GetBuflen() > 64 {
 			Sha256ProcessBlock(ctx.GetBuffer(), ctx.GetBuflen() & ^63, ctx)
@@ -200,7 +200,7 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 			/* The regions in the following copy operation cannot overlap.  */
 
-			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[left_over + add & ^63], ctx.GetBuflen())
+			memcpy(ctx.GetBuffer(), ctx.GetBuffer()[left_over + add & ^63], ctx.GetBuflen())
 
 			/* The regions in the following copy operation cannot overlap.  */
 
@@ -236,12 +236,12 @@ func Sha256ProcessBytes(buffer any, len_ int, ctx *Sha256Ctx) {
 
 	if len_ > 0 {
 		var left_over int = ctx.GetBuflen()
-		memcpy(&ctx.GetBuffer()[left_over], buffer, len_)
+		memcpy(ctx.GetBuffer()[left_over], buffer, len_)
 		left_over += len_
 		if left_over >= 64 {
 			Sha256ProcessBlock(ctx.GetBuffer(), 64, ctx)
 			left_over -= 64
-			memcpy(ctx.GetBuffer(), &ctx.GetBuffer()[64], left_over)
+			memcpy(ctx.GetBuffer(), ctx.GetBuffer()[64], left_over)
 		}
 		ctx.SetBuflen(uint32(left_over))
 	}

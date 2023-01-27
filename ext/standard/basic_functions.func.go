@@ -12,7 +12,7 @@ import (
 
 func BG(v *uint32) __auto__ { return BasicGlobals.v }
 func PhpPutenvDestructor(zv *zend.Zval) {
-	var pe *PutenvEntry = zend.Z_PTR_P(zv)
+	var pe *PutenvEntry = zv.GetPtr()
 	if pe.GetPreviousValue() != nil {
 		putenv(pe.GetPreviousValue())
 	} else {
@@ -59,8 +59,8 @@ func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
 		basic_globals_p.GetUrlAdaptOutputEx().GetTags().Destroy()
 		zend.Free(basic_globals_p.GetUrlAdaptOutputEx().GetTags())
 	}
-	&basic_globals_p.GetUrlAdaptSessionHostsHt().Destroy()
-	&basic_globals_p.GetUrlAdaptOutputHostsHt().Destroy()
+	basic_globals_p.GetUrlAdaptSessionHostsHt().Destroy()
+	basic_globals_p.GetUrlAdaptOutputHostsHt().Destroy()
 }
 func PhpGetNan() float64 { return zend.ZEND_NAN }
 func PhpGetInf() float64 { return zend.ZEND_INFINITY }
@@ -373,14 +373,14 @@ func ZifConstant(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	c = zend.ZendGetConstantEx(const_name, scope, zend.ZEND_FETCH_CLASS_SILENT)
 	if c != nil {
 		zend.ZVAL_COPY_OR_DUP(return_value, c)
-		if zend.Z_TYPE_P(return_value) == zend.IS_CONSTANT_AST {
+		if return_value.IsType(zend.IS_CONSTANT_AST) {
 			if zend.ZvalUpdateConstantEx(return_value, scope) != zend.SUCCESS {
 				return
 			}
 		}
 	} else {
 		if zend.ExecutorGlobals.GetException() == nil {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Couldn't find constant %s", zend.ZSTR_VAL(const_name))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
 		}
 		zend.RETVAL_NULL()
 		return
@@ -1107,14 +1107,14 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.Z_ARRVAL_P(&core.PG(http_globals)[core.TRACK_VARS_SERVER]).FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, &(zend.ExecutorGlobals.GetSymbolTable()).FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
+	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, &core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ExecutorGlobals.GetSymbolTable().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
 		var pos int = 0
 		var entry *zend.Zval
-		if zend.Z_TYPE_P(args) != zend.IS_ARRAY {
+		if args.GetType() != zend.IS_ARRAY {
 			zend.RETVAL_FALSE
 			return
 		}
-		argc = zend.Z_ARRVAL_P(args).NumElements()
+		argc = zend.Z_ARRVAL_P(args).GetNNumOfElements()
 
 		/* Attempt to allocate enough memory to hold all of the arguments
 		 * and a trailing NULL */
@@ -1124,19 +1124,19 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Iterate over the hash to construct the argv array. */
 
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(args)
+			var __ht *zend.HashTable = args.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.GetVal()
+				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				entry = _z
 				var tmp_arg_str *zend.ZendString
 				var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
-				argv[b.PostInc(&pos)] = zend.Estrdup(zend.ZSTR_VAL(arg_str))
+				argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
 				zend.ZendTmpStringRelease(tmp_arg_str)
 			}
 			break
@@ -1161,7 +1161,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if p_longopts != nil {
 		var count int
 		var entry *zend.Zval
-		count = zend.Z_ARRVAL_P(p_longopts).NumElements()
+		count = zend.Z_ARRVAL_P(p_longopts).GetNNumOfElements()
 
 		/* the first <len> slots are filled by the one short ops
 		 * we now extend our array and jump to the new added structs */
@@ -1174,20 +1174,20 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Iterate over the hash to construct the argv array. */
 
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(p_longopts)
+			var __ht *zend.HashTable = p_longopts.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
-				var _z *zend.Zval = &_p.GetVal()
+				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				entry = _z
 				var tmp_arg_str *zend.ZendString
 				var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
 				opts.SetNeedParam(0)
-				opts.SetOptName(zend.Estrdup(zend.ZSTR_VAL(arg_str)))
+				opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
 				len_ = strlen(opts.GetOptName())
 				if len_ > 0 && opts.GetOptName()[len_-1] == ':' {
 					opts.GetNeedParam()++
@@ -1264,25 +1264,25 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
-			if b.Assign(&args, zend.Z_ARRVAL_P(return_value).IndexFind(optname_int)) != nil {
-				if zend.Z_TYPE_P(args) != zend.IS_ARRAY {
+			if b.Assign(&args, return_value.GetArr().IndexFind(optname_int)) != nil {
+				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				zend.Z_ARRVAL_P(args).NextIndexInsert(&val)
+				args.GetArr().NextIndexInsert(&val)
 			} else {
-				zend.Z_ARRVAL_P(return_value).IndexUpdate(optname_int, &val)
+				return_value.GetArr().IndexUpdate(optname_int, &val)
 			}
 		} else {
 
 			/* other strings */
 
-			if b.Assign(&args, zend.Z_ARRVAL_P(return_value).StrFind(optname, strlen(optname))) != nil {
-				if zend.Z_TYPE_P(args) != zend.IS_ARRAY {
+			if b.Assign(&args, return_value.GetArr().StrFind(optname, strlen(optname))) != nil {
+				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				zend.Z_ARRVAL_P(args).NextIndexInsert(&val)
+				args.GetArr().NextIndexInsert(&val)
 			} else {
-				zend.Z_ARRVAL_P(return_value).StrAdd(optname, strlen(optname), &val)
+				return_value.GetArr().StrAdd(optname, strlen(optname), &val)
 			}
 
 			/* other strings */
@@ -1674,25 +1674,25 @@ func ZifGetCurrentUser(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	return
 }
 func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
-	if zend.Z_TYPE_P(entry) == zend.IS_STRING {
-		var str *zend.ZendString = zend.Z_STR_P(entry)
+	if entry.IsType(zend.IS_STRING) {
+		var str *zend.ZendString = entry.GetStr()
 		if zend.ZSTR_IS_INTERNED(str) == 0 {
 			if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
 				zend.ZendStringAddref(str)
 			} else {
-				str = zend.ZendStringInit(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str), 0)
+				str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 			}
 		}
 		if key != nil {
-			zend.AddAssocStrEx(retval, zend.ZSTR_VAL(key), zend.ZSTR_LEN(key), str)
+			zend.AddAssocStrEx(retval, key.GetVal(), key.GetLen(), str)
 		} else {
 			zend.AddIndexStr(retval, h, str)
 		}
-	} else if zend.Z_TYPE_P(entry) == zend.IS_ARRAY {
+	} else if entry.IsType(zend.IS_ARRAY) {
 		var tmp zend.Zval
 		zend.ArrayInit(&tmp)
-		AddConfigEntries(zend.Z_ARRVAL_P(entry), &tmp)
-		zend.Z_ARRVAL_P(retval).Update(key, &tmp)
+		AddConfigEntries(entry.GetArr(), &tmp)
+		retval.GetArr().Update(key, &tmp)
 	}
 }
 func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
@@ -1704,9 +1704,9 @@ func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			h = _p.GetH()
@@ -1790,9 +1790,9 @@ func ZifGetCfgVar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	retval = core.CfgGetEntry(varname, uint32(varname_len))
 	if retval != nil {
-		if zend.Z_TYPE_P(retval) == zend.IS_ARRAY {
+		if retval.IsType(zend.IS_ARRAY) {
 			zend.ArrayInit(return_value)
-			AddConfigEntries(zend.Z_ARRVAL_P(retval), return_value)
+			AddConfigEntries(retval.GetArr(), return_value)
 			return
 		} else {
 			zend.RETVAL_STRING(zend.Z_STRVAL_P(retval))
@@ -2388,9 +2388,9 @@ func ZifForwardStaticCallArray(execute_data *zend.ZendExecuteData, return_value 
 }
 func UserShutdownFunctionDtor(zv *zend.Zval) {
 	var i int
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zend.Z_PTR_P(zv)
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
-		zend.ZvalPtrDtor(&shutdown_function_entry.GetArguments()[i])
+		zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
 	}
 	zend.Efree(shutdown_function_entry.GetArguments())
 	zend.Efree(shutdown_function_entry)
@@ -2398,27 +2398,27 @@ func UserShutdownFunctionDtor(zv *zend.Zval) {
 func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	var i int
 	for i = 0; i < tick_function_entry.GetArgCount(); i++ {
-		zend.ZvalPtrDtor(&tick_function_entry.GetArguments()[i])
+		zend.ZvalPtrDtor(tick_function_entry.GetArguments()[i])
 	}
 	zend.Efree(tick_function_entry.GetArguments())
 }
 func UserShutdownFunctionCall(zv *zend.Zval) int {
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zend.Z_PTR_P(zv)
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	var retval zend.Zval
-	if zend.ZendIsCallable(&shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var function_name *zend.ZendString = zend.ZendGetCallableName(&shutdown_function_entry.GetArguments()[0])
-		core.PhpError(zend.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", zend.ZSTR_VAL(function_name))
+	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
+		var function_name *zend.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		core.PhpError(zend.E_WARNING, "(Registered shutdown functions) Unable to call %s() - function does not exist", function_name.GetVal())
 		zend.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
-	if zend.CallUserFunction(nil, nil, &shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == zend.SUCCESS {
+	if zend.CallUserFunction(nil, nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == zend.SUCCESS {
 		zend.ZvalPtrDtor(&retval)
 	}
 	return 0
 }
 func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 	var retval zend.Zval
-	var function *zend.Zval = &tick_fe.GetArguments()[0]
+	var function *zend.Zval = tick_fe.GetArguments()[0]
 
 	/* Prevent reentrant calls to the same user ticks function */
 
@@ -2429,10 +2429,10 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 		} else {
 			var obj *zend.Zval
 			var method *zend.Zval
-			if zend.Z_TYPE_P(function) == zend.IS_STRING {
+			if function.IsType(zend.IS_STRING) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", zend.Z_STRVAL_P(function))
-			} else if zend.Z_TYPE_P(function) == zend.IS_ARRAY && b.Assign(&obj, zend.Z_ARRVAL_P(function).IndexFind(0)) != nil && b.Assign(&method, zend.Z_ARRVAL_P(function).IndexFind(1)) != nil && zend.Z_TYPE_P(obj) == zend.IS_OBJECT && zend.Z_TYPE_P(method) == zend.IS_STRING {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.ZSTR_VAL(zend.Z_OBJCE_P(obj).GetName()), zend.Z_STRVAL_P(method))
+			} else if function.IsType(zend.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFind(0)) != nil && b.Assign(&method, function.GetArr().IndexFind(1)) != nil && obj.IsType(zend.IS_OBJECT) && method.IsType(zend.IS_STRING) {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.Z_OBJCE_P(obj).GetName().GetVal(), zend.Z_STRVAL_P(method))
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call tick function")
 			}
@@ -2446,14 +2446,14 @@ func RunUserTickFunctions(tick_count int, arg any) {
 	zend.ZendLlistApply(BG(user_tick_functions), zend.LlistApplyFuncT(UserTickFunctionCall))
 }
 func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
-	var func1 *zend.Zval = &tick_fe1.GetArguments()[0]
-	var func2 *zend.Zval = &tick_fe2.GetArguments()[0]
+	var func1 *zend.Zval = tick_fe1.GetArguments()[0]
+	var func2 *zend.Zval = tick_fe2.GetArguments()[0]
 	var ret int
-	if zend.Z_TYPE_P(func1) == zend.IS_STRING && zend.Z_TYPE_P(func2) == zend.IS_STRING {
+	if func1.IsType(zend.IS_STRING) && func2.IsType(zend.IS_STRING) {
 		ret = zend.ZendBinaryZvalStrcmp(func1, func2) == 0
-	} else if zend.Z_TYPE_P(func1) == zend.IS_ARRAY && zend.Z_TYPE_P(func2) == zend.IS_ARRAY {
+	} else if func1.IsType(zend.IS_ARRAY) && func2.IsType(zend.IS_ARRAY) {
 		ret = zend.ZendCompareArrays(func1, func2) == 0
-	} else if zend.Z_TYPE_P(func1) == zend.IS_OBJECT && zend.Z_TYPE_P(func2) == zend.IS_OBJECT {
+	} else if func1.IsType(zend.IS_OBJECT) && func2.IsType(zend.IS_OBJECT) {
 		ret = zend.ZendCompareObjects(func1, func2) == 0
 	} else {
 		ret = 0
@@ -2511,9 +2511,9 @@ func ZifRegisterShutdownFunction(execute_data *zend.ZendExecuteData, return_valu
 
 	/* Prevent entering of anything but valid callback (syntax check only!) */
 
-	if zend.ZendIsCallable(&shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
-		var callback_name *zend.ZendString = zend.ZendGetCallableName(&shutdown_function_entry.GetArguments()[0])
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid shutdown callback '%s' passed", zend.ZSTR_VAL(callback_name))
+	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
+		var callback_name *zend.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
 		zend.ZendStringReleaseEx(callback_name, 0)
 		zend.RETVAL_FALSE
@@ -2933,14 +2933,14 @@ func ZifIniGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if zend.ZSTR_IS_INTERNED(val) != 0 {
 		zend.RETVAL_INTERNED_STR(val)
-	} else if zend.ZSTR_LEN(val) == 0 {
+	} else if val.GetLen() == 0 {
 		zend.RETVAL_EMPTY_STRING()
-	} else if zend.ZSTR_LEN(val) == 1 {
-		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(zend.ZSTR_VAL(val)[0])))
+	} else if val.GetLen() == 1 {
+		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 	} else if (zend.GC_FLAGS(val) & zend.GC_PERSISTENT) == 0 {
 		zend.ZVAL_NEW_STR(return_value, zend.ZendStringCopy(val))
 	} else {
-		zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(zend.ZSTR_VAL(val), zend.ZSTR_LEN(val), 0))
+		zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 	}
 }
 func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3027,7 +3027,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZendIniSortEntries()
 	if extname != nil {
-		if b.Assign(&module, &zend.ModuleRegistry.StrFindPtr(extname, extname_len)) == nil {
+		if b.Assign(&module, zend.ModuleRegistry.StrFindPtr(extname, extname_len)) == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find extension '%s'", extname)
 			zend.RETVAL_FALSE
 			return
@@ -3040,18 +3040,18 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
-			ini_entry = zend.Z_PTR_P(_z)
+			ini_entry = _z.GetPtr()
 			var option zend.Zval
 			if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
 				continue
 			}
-			if key == nil || zend.ZSTR_VAL(key)[0] != 0 {
+			if key == nil || key.GetVal()[0] != 0 {
 				if details != 0 {
 					zend.ArrayInit(&option)
 					if ini_entry.GetOrigValue() != nil {
@@ -3067,14 +3067,14 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						zend.AddAssocNull(&option, "local_value")
 					}
 					zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
-					zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), ini_entry.GetName(), &option)
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &option)
 				} else {
 					if ini_entry.GetValue() != nil {
 						var zv zend.Zval
 						zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
-						zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), ini_entry.GetName(), &zv)
+						zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &zv)
 					} else {
-						zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), ini_entry.GetName(), &(zend.ExecutorGlobals.GetUninitializedZval()))
+						zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &(zend.ExecutorGlobals.GetUninitializedZval()))
 					}
 				}
 			}
@@ -3172,14 +3172,14 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if val != nil {
 		if zend.ZSTR_IS_INTERNED(val) != 0 {
 			zend.RETVAL_INTERNED_STR(val)
-		} else if zend.ZSTR_LEN(val) == 0 {
+		} else if val.GetLen() == 0 {
 			zend.RETVAL_EMPTY_STRING()
-		} else if zend.ZSTR_LEN(val) == 1 {
-			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(zend.ZSTR_VAL(val)[0])))
+		} else if val.GetLen() == 1 {
+			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 		} else if (zend.GC_FLAGS(val) & zend.GC_PERSISTENT) == 0 {
 			zend.ZVAL_NEW_STR(return_value, zend.ZendStringCopy(val))
 		} else {
-			zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(zend.ZSTR_VAL(val), zend.ZSTR_LEN(val), 0))
+			zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 		}
 	} else {
 		zend.RETVAL_FALSE
@@ -3190,8 +3190,8 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* open basedir check */
 
 	if core.PG(open_basedir) {
-		if PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(zend.ZSTR_VAL(varname), zend.ZSTR_LEN(varname), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
-			if core.PhpCheckOpenBasedir(zend.ZSTR_VAL(new_value)) != 0 {
+		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
+			if core.PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 				zend.ZvalPtrDtorStr(return_value)
 				zend.RETVAL_FALSE
 				return
@@ -3906,9 +3906,9 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.ZendIsCallable(&tick_fe.GetArguments()[0], 0, &function_name) == 0 {
+	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
 		zend.Efree(tick_fe.GetArguments())
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid tick callback '%s' passed", zend.ZSTR_VAL(function_name))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
 		zend.ZendStringReleaseEx(function_name, 0)
 		zend.RETVAL_FALSE
 		return
@@ -3916,7 +3916,7 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 		zend.ZendStringReleaseEx(function_name, 0)
 	}
 	if tick_fe.GetArguments()[0].GetType() != zend.IS_ARRAY && tick_fe.GetArguments()[0].GetType() != zend.IS_OBJECT {
-		zend.ConvertToStringEx(&tick_fe.GetArguments()[0])
+		zend.ConvertToStringEx(tick_fe.GetArguments()[0])
 	}
 	if !(BG(user_tick_functions)) {
 		BG(user_tick_functions) = (*zend.ZendLlist)(zend.Emalloc(b.SizeOf("zend_llist")))
@@ -3999,11 +3999,11 @@ func ZifUnregisterTickFunction(execute_data *zend.ZendExecuteData, return_value 
 	if !(BG(user_tick_functions)) {
 		return
 	}
-	if zend.Z_TYPE_P(function) != zend.IS_ARRAY && zend.Z_TYPE_P(function) != zend.IS_OBJECT {
+	if function.GetType() != zend.IS_ARRAY && function.GetType() != zend.IS_OBJECT {
 		zend.ConvertToString(function)
 	}
 	tick_fe.SetArguments((*zend.Zval)(zend.Emalloc(b.SizeOf("zval"))))
-	zend.ZVAL_COPY_VALUE(&tick_fe.GetArguments()[0], function)
+	zend.ZVAL_COPY_VALUE(tick_fe.GetArguments()[0], function)
 	tick_fe.SetArgCount(1)
 	zend.ZendLlistDelElement(BG(user_tick_functions), &tick_fe, (func(any, any) int)(UserTickFunctionCompare))
 	zend.Efree(tick_fe.GetArguments())
@@ -4216,7 +4216,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 
 		}
 		zend.Z_TRY_ADDREF_P(arg2)
-		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1), arg2)
+		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), arg2)
 		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash zend.Zval
@@ -4232,25 +4232,25 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		}
 		if !(zend.Z_STRLEN_P(arg1) > 1 && zend.Z_STRVAL_P(arg1)[0] == '0') && zend.IsNumericString(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1), nil, nil, 0) == zend.IS_LONG {
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1)))
-			if b.Assign(&find_hash, zend.Z_ARRVAL_P(arr).IndexFind(key)) == nil {
+			if b.Assign(&find_hash, arr.GetArr().IndexFind(key)) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = zend.Z_ARRVAL_P(arr).IndexAddNew(key, &hash)
+				find_hash = arr.GetArr().IndexAddNew(key, &hash)
 			}
 		} else {
-			if b.Assign(&find_hash, zend.Z_ARRVAL_P(arr).Find(zend.Z_STR_P(arg1))) == nil {
+			if b.Assign(&find_hash, arr.GetArr().Find(arg1.GetStr())) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = zend.Z_ARRVAL_P(arr).AddNew(zend.Z_STR_P(arg1), &hash)
+				find_hash = arr.GetArr().AddNew(arg1.GetStr(), &hash)
 			}
 		}
-		if zend.Z_TYPE_P(find_hash) != zend.IS_ARRAY {
+		if find_hash.GetType() != zend.IS_ARRAY {
 			zend.ZvalPtrDtorNogc(find_hash)
 			zend.ArrayInit(find_hash)
 		}
-		if arg3 == nil || zend.Z_TYPE_P(arg3) == zend.IS_STRING && zend.Z_STRLEN_P(arg3) == 0 {
+		if arg3 == nil || arg3.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(arg3) == 0 {
 			zend.Z_TRY_ADDREF_P(arg2)
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
-			zend.ArraySetZvalKey(zend.Z_ARRVAL_P(find_hash), arg3, arg2)
+			zend.ArraySetZvalKey(find_hash.GetArr(), arg3, arg2)
 		}
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
@@ -4260,7 +4260,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&BG(active_ini_file_section))
-		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1), &BG(active_ini_file_section))
+		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), &BG(active_ini_file_section))
 	} else if arg2 != nil {
 		var active_arr *zend.Zval
 		if BG(active_ini_file_section).u1.v.type_ != zend.IS_UNDEF {
@@ -4379,7 +4379,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ZendStreamInitFilename(&fh, filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+		zend.ZendArrayDestroy(return_value.GetArr())
 		zend.RETVAL_FALSE
 		return
 	}
@@ -4492,7 +4492,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+		zend.ZendArrayDestroy(return_value.GetArr())
 		zend.RETVAL_FALSE
 	}
 	zend.Efree(string)

@@ -157,7 +157,7 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ZEND_ASSERT(zend.Z_ISREF_P(var_))
-	if zend.ZEND_REF_HAS_TYPE_SOURCES(zend.Z_REF_P(var_)) {
+	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
 		zend.ZVAL_COPY(&tmp, zend.Z_REFVAL_P(var_))
 		ptr = &tmp
 	} else {
@@ -196,7 +196,7 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	if ptr == &tmp {
-		zend.ZendTryAssignTypedRef(zend.Z_REF_P(var_), &tmp)
+		zend.ZendTryAssignTypedRef(var_.GetRef(), &tmp)
 	}
 	zend.RETVAL_TRUE
 }
@@ -273,7 +273,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE_P(num) != zend.IS_STRING || base == 10 {
+	if num.GetType() != zend.IS_STRING || base == 10 {
 		zend.RETVAL_LONG(zend.ZvalGetLong(num))
 		return
 	}
@@ -587,9 +587,9 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 		}
 		break
 	}
-	if zend.Z_TYPE_P(arg) == type_ {
+	if arg.IsType(type_) {
 		if type_ == zend.IS_RESOURCE {
-			var type_name *byte = zend.ZendRsrcListGetRsrcType(zend.Z_RES_P(arg))
+			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.GetRes())
 			if type_name == nil {
 				zend.RETVAL_FALSE
 				return
@@ -674,7 +674,7 @@ func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_BOOL(zend.Z_TYPE_P(arg) == zend.IS_FALSE || zend.Z_TYPE_P(arg) == zend.IS_TRUE)
+	zend.RETVAL_BOOL(arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
 	return
 }
 func ZifIsInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -757,7 +757,7 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	switch zend.Z_TYPE_P(arg) {
+	switch arg.GetType() {
 	case zend.IS_LONG:
 
 	case zend.IS_DOUBLE:
@@ -844,7 +844,7 @@ func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	switch zend.Z_TYPE_P(arg) {
+	switch arg.GetType() {
 	case zend.IS_FALSE:
 
 	case zend.IS_TRUE:

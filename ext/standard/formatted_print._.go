@@ -22,7 +22,7 @@ package standard
    +----------------------------------------------------------------------+
 */
 
-const LCONV_DECIMAL_POINT byte = (*lconv).decimal_point
+const LCONV_DECIMAL_POINT byte = lconv.decimal_point
 const ALIGN_LEFT = 0
 const ALIGN_RIGHT = 1
 const ADJ_WIDTH = 1

@@ -17,9 +17,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		var display_string_length int
 		var esc_html int = 0
 		if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-			if ini_entry.GetOrigValue() != nil && zend.ZSTR_VAL(ini_entry.GetOrigValue())[0] {
-				display_string = zend.ZSTR_VAL(ini_entry.GetOrigValue())
-				display_string_length = zend.ZSTR_LEN(ini_entry.GetOrigValue())
+			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetVal()[0] {
+				display_string = ini_entry.GetOrigValue().GetVal()
+				display_string_length = ini_entry.GetOrigValue().GetLen()
 				esc_html = !(sapi_module.GetPhpinfoAsText())
 			} else {
 				if sapi_module.GetPhpinfoAsText() == 0 {
@@ -30,9 +30,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 					display_string_length = b.SizeOf("\"no value\"") - 1
 				}
 			}
-		} else if ini_entry.GetValue() != nil && zend.ZSTR_VAL(ini_entry.GetValue())[0] {
-			display_string = zend.ZSTR_VAL(ini_entry.GetValue())
-			display_string_length = zend.ZSTR_LEN(ini_entry.GetValue())
+		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetVal()[0] {
+			display_string = ini_entry.GetValue().GetVal()
+			display_string_length = ini_entry.GetValue().GetLen()
 			esc_html = !(sapi_module.GetPhpinfoAsText())
 		} else {
 			if sapi_module.GetPhpinfoAsText() == 0 {
@@ -64,12 +64,12 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
-			ini_entry = zend.Z_PTR_P(_z)
+			ini_entry = _z.GetPtr()
 			if ini_entry.GetModuleNumber() != module_number {
 				continue
 			}
@@ -81,14 +81,14 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 			if sapi_module.GetPhpinfoAsText() == 0 {
 				PUTS("<tr>")
 				PUTS("<td class=\"e\">")
-				PHPWRITE(zend.ZSTR_VAL(ini_entry.GetName()), zend.ZSTR_LEN(ini_entry.GetName()))
+				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
 				PUTS("</td><td class=\"v\">")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 				PUTS("</td><td class=\"v\">")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
 				PUTS("</td></tr>\n")
 			} else {
-				PHPWRITE(zend.ZSTR_VAL(ini_entry.GetName()), zend.ZSTR_LEN(ini_entry.GetName()))
+				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
 				PUTS(" => ")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 				PUTS(" => ")
@@ -103,11 +103,11 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	}
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
-	if zend.Z_TYPE_P(zvalue) == zend.IS_ARRAY {
-		zend.Z_ARRVAL_P(zvalue).Destroy()
-		zend.Free(zend.Z_ARR_P(zvalue))
-	} else if zend.Z_TYPE_P(zvalue) == zend.IS_STRING {
-		zend.ZendStringReleaseEx(zend.Z_STR_P(zvalue), 1)
+	if zvalue.IsType(zend.IS_ARRAY) {
+		zvalue.GetArr().Destroy()
+		zend.Free(zvalue.GetArr())
+	} else if zvalue.IsType(zend.IS_STRING) {
+		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
 func RESET_ACTIVE_INI_HASH() {
@@ -139,16 +139,16 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), PHP_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
-			zend.ZendLlistAddElement(&ExtensionLists.GetFunctions(), &extension_name)
+			zend.ZendLlistAddElement(ExtensionLists.GetFunctions(), &extension_name)
 		} else if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), ZEND_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
-			zend.ZendLlistAddElement(&ExtensionLists.GetEngine(), &extension_name)
+			zend.ZendLlistAddElement(ExtensionLists.GetEngine(), &extension_name)
 		} else {
 
 			/* Store in active hash */
 
-			entry = active_hash.Update(zend.Z_STR_P(arg1), arg2)
-			zend.Z_STR_P(entry) = zend.ZendStringDup(zend.Z_STR_P(entry), 1)
+			entry = active_hash.Update(arg1.GetStr(), arg2)
+			entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -169,20 +169,20 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.Find(zend.Z_STR_P(arg1))) == nil || zend.Z_TYPE_P(find_arr) != zend.IS_ARRAY {
+		if b.Assign(&find_arr, active_hash.Find(arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
-			zend.Z_ARRVAL(option_arr).Init(8, nil, ConfigZvalDtor, 1)
-			find_arr = active_hash.Update(zend.Z_STR_P(arg1), &option_arr)
+			option_arr.GetArr().Init(8, nil, ConfigZvalDtor, 1)
+			find_arr = active_hash.Update(arg1.GetStr(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
 
 		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
-			entry = zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(find_arr), zend.Z_STR_P(arg3), arg2)
+			entry = zend.ZendSymtableUpdate(find_arr.GetArr(), arg3.GetStr(), arg2)
 		} else {
-			entry = zend.Z_ARRVAL_P(find_arr).NextIndexInsert(arg2)
+			entry = find_arr.GetArr().NextIndexInsert(arg2)
 		}
-		zend.Z_STR_P(entry) = zend.ZendStringDup(zend.Z_STR_P(entry), 1)
+		entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
 
@@ -235,11 +235,11 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			if b.Assign(&entry, target_hash.StrFind(key, key_len)) == nil {
 				var section_arr zend.Zval
 				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				zend.Z_ARRVAL(section_arr).Init(8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
+				section_arr.GetArr().Init(8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
 				entry = target_hash.StrUpdate(key, key_len, &section_arr)
 			}
-			if zend.Z_TYPE_P(entry) == zend.IS_ARRAY {
-				ActiveIniHash = zend.Z_ARRVAL_P(entry)
+			if entry.IsType(zend.IS_ARRAY) {
+				ActiveIniHash = entry.GetArr()
 			}
 		}
 		break
@@ -308,12 +308,12 @@ func PhpInitConfig() int {
 	var opened_path *zend.ZendString = nil
 	var fp *r.FILE
 	var filename *byte
-	&ConfigurationHash.Init(8, nil, ConfigZvalDtor, 1)
+	ConfigurationHash.Init(8, nil, ConfigZvalDtor, 1)
 	if sapi_module.GetIniDefaults() != nil {
 		sapi_module.GetIniDefaults()(&ConfigurationHash)
 	}
-	zend.ZendLlistInit(&ExtensionLists.GetEngine(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
-	zend.ZendLlistInit(&ExtensionLists.GetFunctions(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+	zend.ZendLlistInit(ExtensionLists.GetEngine(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+	zend.ZendLlistInit(ExtensionLists.GetFunctions(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	open_basedir = PG(open_basedir)
 	if sapi_module.GetPhpIniPathOverride() != nil {
 		php_ini_file_name = sapi_module.GetPhpIniPathOverride()
@@ -417,7 +417,7 @@ func PhpInitConfig() int {
 			fp = PhpFopenWithPath(ini_fname, "r", php_ini_search_path, &opened_path)
 			zend.Efree(ini_fname)
 			if fp != nil {
-				filename = zend.ZSTR_VAL(opened_path)
+				filename = opened_path.GetVal()
 			}
 		}
 
@@ -426,7 +426,7 @@ func PhpInitConfig() int {
 		if fp == nil {
 			fp = PhpFopenWithPath("php.ini", "r", php_ini_search_path, &opened_path)
 			if fp != nil {
-				filename = zend.ZSTR_VAL(opened_path)
+				filename = opened_path.GetVal()
 			}
 		}
 
@@ -444,7 +444,7 @@ func PhpInitConfig() int {
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 		var tmp zend.Zval
 		zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
-		&ConfigurationHash.StrUpdate("cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1, &tmp)
+		ConfigurationHash.StrUpdate("cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1, &tmp)
 		if opened_path != nil {
 			zend.ZendStringReleaseEx(opened_path, 0)
 		} else {
@@ -579,7 +579,7 @@ func PhpInitConfig() int {
 	return zend.SUCCESS
 }
 func PhpShutdownConfig() int {
-	&ConfigurationHash.Destroy()
+	ConfigurationHash.Destroy()
 	if PhpIniOpenedPath != nil {
 		zend.Free(PhpIniOpenedPath)
 		PhpIniOpenedPath = nil
@@ -591,10 +591,10 @@ func PhpShutdownConfig() int {
 	return zend.SUCCESS
 }
 func PhpIniRegisterExtensions() {
-	zend.ZendLlistApply(&ExtensionLists.GetEngine(), PhpLoadZendExtensionCb)
-	zend.ZendLlistApply(&ExtensionLists.GetFunctions(), PhpLoadPhpExtensionCb)
-	zend.ZendLlistDestroy(&ExtensionLists.GetEngine())
-	zend.ZendLlistDestroy(&ExtensionLists.GetFunctions())
+	zend.ZendLlistApply(ExtensionLists.GetEngine(), PhpLoadZendExtensionCb)
+	zend.ZendLlistApply(ExtensionLists.GetFunctions(), PhpLoadPhpExtensionCb)
+	zend.ZendLlistDestroy(ExtensionLists.GetEngine())
+	zend.ZendLlistDestroy(ExtensionLists.GetFunctions())
 }
 func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.HashTable) int {
 	var sb zend.ZendStatT
@@ -635,14 +635,14 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
-			var _z *zend.Zval = &_p.GetVal()
+			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			str = _p.GetKey()
 			data = _z
-			zend.ZendAlterIniEntryEx(str, zend.Z_STR_P(data), modify_type, stage, 0)
+			zend.ZendAlterIniEntryEx(str, data.GetStr(), modify_type, stage, 0)
 		}
 		break
 	}
@@ -666,8 +666,8 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, &ConfigurationHash.StrFind(path, strlen(path))) != nil {
-				PhpIniActivateConfig(zend.Z_ARRVAL_P(tmp2), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
+			if b.Assign(&tmp2, ConfigurationHash.StrFind(path, strlen(path))) != nil {
+				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
 			ptr++
@@ -683,21 +683,21 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 		/* Search for source array matching the host from configuration_hash */
 
-		if b.Assign(&tmp, &ConfigurationHash.StrFind(host, host_len)) != nil {
-			PhpIniActivateConfig(zend.Z_ARRVAL_P(tmp), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
+		if b.Assign(&tmp, ConfigurationHash.StrFind(host, host_len)) != nil {
+			PhpIniActivateConfig(tmp.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
 
 		/* Search for source array matching the host from configuration_hash */
 
 	}
 }
-func CfgGetEntryEx(name *zend.ZendString) *zend.Zval { return &ConfigurationHash.Find(name) }
+func CfgGetEntryEx(name *zend.ZendString) *zend.Zval { return ConfigurationHash.Find(name) }
 func CfgGetEntry(name *byte, name_length int) *zend.Zval {
-	return &ConfigurationHash.StrFind(name, name_length)
+	return ConfigurationHash.StrFind(name, name_length)
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, &ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
 		*result = 0
 		return zend.FAILURE
 	}
@@ -706,7 +706,7 @@ func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 }
 func CfgGetDouble(varname *byte, result *float64) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, &ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
 		*result = float64(0)
 		return zend.FAILURE
 	}
@@ -715,7 +715,7 @@ func CfgGetDouble(varname *byte, result *float64) int {
 }
 func CfgGetString(varname *byte, result **byte) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, &ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
 		*result = nil
 		return zend.FAILURE
 	}

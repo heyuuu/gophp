@@ -61,7 +61,7 @@ func ZendObjectsStoreInit(objects *ZendObjectsStore, init_size uint32) {
 	objects.SetTop(1)
 	objects.SetSize(init_size)
 	objects.SetFreeListHead(-1)
-	memset(&objects.GetObjectBuckets()[0], 0, b.SizeOf("zend_object *"))
+	memset(objects.GetObjectBuckets()[0], 0, b.SizeOf("zend_object *"))
 }
 func ZendObjectsStoreDestroy(objects *ZendObjectsStore) {
 	Efree(objects.GetObjectBuckets())

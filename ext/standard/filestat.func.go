@@ -320,10 +320,10 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if zend.Z_TYPE_P(group) == zend.IS_LONG {
+			if group.IsType(zend.IS_LONG) {
 				option = core.PHP_STREAM_META_GROUP
 				value = &zend.Z_LVAL_P(group)
-			} else if zend.Z_TYPE_P(group) == zend.IS_STRING {
+			} else if group.IsType(zend.IS_STRING) {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = zend.Z_STRVAL_P(group)
 			} else {
@@ -347,9 +347,9 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			return
 		}
 	}
-	if zend.Z_TYPE_P(group) == zend.IS_LONG {
-		gid = gid_t(zend.Z_LVAL_P(group))
-	} else if zend.Z_TYPE_P(group) == zend.IS_STRING {
+	if group.IsType(zend.IS_LONG) {
+		gid = gid_t(group.GetLval())
+	} else if group.IsType(zend.IS_STRING) {
 		if PhpGetGidByName(zend.Z_STRVAL_P(group), &gid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find gid for %s", zend.Z_STRVAL_P(group))
 			zend.RETVAL_FALSE
@@ -475,10 +475,10 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if zend.Z_TYPE_P(user) == zend.IS_LONG {
+			if user.IsType(zend.IS_LONG) {
 				option = core.PHP_STREAM_META_OWNER
 				value = &zend.Z_LVAL_P(user)
-			} else if zend.Z_TYPE_P(user) == zend.IS_STRING {
+			} else if user.IsType(zend.IS_STRING) {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = zend.Z_STRVAL_P(user)
 			} else {
@@ -502,9 +502,9 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			return
 		}
 	}
-	if zend.Z_TYPE_P(user) == zend.IS_LONG {
-		uid = uid_t(zend.Z_LVAL_P(user))
-	} else if zend.Z_TYPE_P(user) == zend.IS_STRING {
+	if user.IsType(zend.IS_LONG) {
+		uid = uid_t(user.GetLval())
+	} else if user.IsType(zend.IS_STRING) {
 		if PhpGetUidByName(zend.Z_STRVAL_P(user), &uid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find uid for %s", zend.Z_STRVAL_P(user))
 			zend.RETVAL_FALSE
@@ -991,7 +991,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 		zend.RETVAL_FALSE
 		return
 	}
-	stat_sb = &ssb.GetSb()
+	stat_sb = ssb.GetSb()
 	if type_ >= FS_IS_W && type_ <= FS_IS_X {
 		if ssb.GetSb().st_uid == getuid() {
 			rmask = S_IRUSR
@@ -1129,35 +1129,35 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 
 		/* Store numeric indexes in proper order */
 
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_dev)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_ino)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_mode)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_nlink)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_uid)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_gid)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_rdev)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_size)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_atime)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_mtime)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_ctime)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_blksize)
-		zend.Z_ARRVAL_P(return_value).NextIndexInsert(&stat_blocks)
+		return_value.GetArr().NextIndexInsert(&stat_dev)
+		return_value.GetArr().NextIndexInsert(&stat_ino)
+		return_value.GetArr().NextIndexInsert(&stat_mode)
+		return_value.GetArr().NextIndexInsert(&stat_nlink)
+		return_value.GetArr().NextIndexInsert(&stat_uid)
+		return_value.GetArr().NextIndexInsert(&stat_gid)
+		return_value.GetArr().NextIndexInsert(&stat_rdev)
+		return_value.GetArr().NextIndexInsert(&stat_size)
+		return_value.GetArr().NextIndexInsert(&stat_atime)
+		return_value.GetArr().NextIndexInsert(&stat_mtime)
+		return_value.GetArr().NextIndexInsert(&stat_ctime)
+		return_value.GetArr().NextIndexInsert(&stat_blksize)
+		return_value.GetArr().NextIndexInsert(&stat_blocks)
 
 		/* Store string indexes referencing the same zval*/
 
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[0], strlen(stat_sb_names[0]), &stat_dev)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[1], strlen(stat_sb_names[1]), &stat_ino)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[2], strlen(stat_sb_names[2]), &stat_mode)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[3], strlen(stat_sb_names[3]), &stat_nlink)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[4], strlen(stat_sb_names[4]), &stat_uid)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[5], strlen(stat_sb_names[5]), &stat_gid)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[6], strlen(stat_sb_names[6]), &stat_rdev)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[7], strlen(stat_sb_names[7]), &stat_size)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[8], strlen(stat_sb_names[8]), &stat_atime)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[9], strlen(stat_sb_names[9]), &stat_mtime)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[10], strlen(stat_sb_names[10]), &stat_ctime)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[11], strlen(stat_sb_names[11]), &stat_blksize)
-		zend.Z_ARRVAL_P(return_value).StrAddNew(stat_sb_names[12], strlen(stat_sb_names[12]), &stat_blocks)
+		return_value.GetArr().StrAddNew(stat_sb_names[0], strlen(stat_sb_names[0]), &stat_dev)
+		return_value.GetArr().StrAddNew(stat_sb_names[1], strlen(stat_sb_names[1]), &stat_ino)
+		return_value.GetArr().StrAddNew(stat_sb_names[2], strlen(stat_sb_names[2]), &stat_mode)
+		return_value.GetArr().StrAddNew(stat_sb_names[3], strlen(stat_sb_names[3]), &stat_nlink)
+		return_value.GetArr().StrAddNew(stat_sb_names[4], strlen(stat_sb_names[4]), &stat_uid)
+		return_value.GetArr().StrAddNew(stat_sb_names[5], strlen(stat_sb_names[5]), &stat_gid)
+		return_value.GetArr().StrAddNew(stat_sb_names[6], strlen(stat_sb_names[6]), &stat_rdev)
+		return_value.GetArr().StrAddNew(stat_sb_names[7], strlen(stat_sb_names[7]), &stat_size)
+		return_value.GetArr().StrAddNew(stat_sb_names[8], strlen(stat_sb_names[8]), &stat_atime)
+		return_value.GetArr().StrAddNew(stat_sb_names[9], strlen(stat_sb_names[9]), &stat_mtime)
+		return_value.GetArr().StrAddNew(stat_sb_names[10], strlen(stat_sb_names[10]), &stat_ctime)
+		return_value.GetArr().StrAddNew(stat_sb_names[11], strlen(stat_sb_names[11]), &stat_blksize)
+		return_value.GetArr().StrAddNew(stat_sb_names[12], strlen(stat_sb_names[12]), &stat_blocks)
 		return
 	}
 	core.PhpErrorDocref(nil, zend.E_WARNING, "Didn't understand stat call")
@@ -2490,7 +2490,7 @@ func ZifRealpathCacheGet(execute_data *zend.ZendExecuteData, return_value *zend.
 			zend.AddAssocBoolEx(&entry, "is_dir", b.SizeOf("\"is_dir\"")-1, bucket.GetIsDir())
 			zend.AddAssocStringlEx(&entry, "realpath", b.SizeOf("\"realpath\"")-1, bucket.GetRealpath(), bucket.GetRealpathLen())
 			zend.AddAssocLongEx(&entry, "expires", b.SizeOf("\"expires\"")-1, bucket.GetExpires())
-			zend.Z_ARRVAL_P(return_value).StrUpdate(bucket.GetPath(), bucket.GetPathLen(), &entry)
+			return_value.GetArr().StrUpdate(bucket.GetPath(), bucket.GetPathLen(), &entry)
 			bucket = bucket.GetNext()
 		}
 		buckets++

@@ -180,39 +180,39 @@ func ZendLlistApplyWithArguments(l *ZendLlist, func_ LlistApplyWithArgsFuncT, nu
 }
 func ZendLlistCount(l *ZendLlist) int { return l.GetCount() }
 func ZendLlistGetFirstEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return l.GetTraversePtr() })
 	*current = l.GetHead()
 	if (*current) != nil {
-		return (*current).GetData()
+		return current.GetData()
 	} else {
 		return nil
 	}
 }
 func ZendLlistGetLastEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return l.GetTraversePtr() })
 	*current = l.GetTail()
 	if (*current) != nil {
-		return (*current).GetData()
+		return current.GetData()
 	} else {
 		return nil
 	}
 }
 func ZendLlistGetNextEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return l.GetTraversePtr() })
 	if (*current) != nil {
-		*current = (*current).GetNext()
+		*current = current.GetNext()
 		if (*current) != nil {
-			return (*current).GetData()
+			return current.GetData()
 		}
 	}
 	return nil
 }
 func ZendLlistGetPrevEx(l *ZendLlist, pos *ZendLlistPosition) any {
-	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return &l.GetTraversePtr() })
+	var current *ZendLlistPosition = b.CondF2(pos != nil, pos, func() *ZendLlistElement { return l.GetTraversePtr() })
 	if (*current) != nil {
-		*current = (*current).GetPrev()
+		*current = current.GetPrev()
 		if (*current) != nil {
-			return (*current).GetData()
+			return current.GetData()
 		}
 	}
 	return nil

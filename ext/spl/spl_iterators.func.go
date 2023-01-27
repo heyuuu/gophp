@@ -11,14 +11,12 @@ import (
 func SplDualItFromObj(obj *zend.ZendObject) *SplDualItObject {
 	return (*SplDualItObject)((*byte)(obj - zend_long((*byte)(&((*SplDualItObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLDUAL_IT_P(zv *zend.Zval) *SplDualItObject {
-	return SplDualItFromObj(zend.Z_OBJ_P(zv))
-}
+func Z_SPLDUAL_IT_P(zv *zend.Zval) *SplDualItObject { return SplDualItFromObj(zv.GetObj()) }
 func SplRecursiveItFromObj(obj *zend.ZendObject) *SplRecursiveItObject {
 	return (*SplRecursiveItObject)((*byte)(obj - zend_long((*byte)(&((*SplRecursiveItObject)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLRECURSIVE_IT_P(zv *zend.Zval) *SplRecursiveItObject {
-	return SplRecursiveItFromObj(zend.Z_OBJ_P(zv))
+	return SplRecursiveItFromObj(zv.GetObj())
 }
 func SPL_FETCH_SUB_ITERATOR(var_ *zend.ZendObjectIterator, object *SplRecursiveItObject) {
 	if object.GetIterators() == nil {
@@ -29,19 +27,19 @@ func SPL_FETCH_SUB_ITERATOR(var_ *zend.ZendObjectIterator, object *SplRecursiveI
 }
 func SplRecursiveItDtor(_iter *zend.ZendObjectIterator) {
 	var iter *SplRecursiveItIterator = (*SplRecursiveItIterator)(_iter)
-	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(&iter.GetIntern().GetData())
+	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(iter.GetIntern().GetData())
 	var sub_iter *zend.ZendObjectIterator
 	for object.GetLevel() > 0 {
 		if !(zend.Z_ISUNDEF(object.GetIterators()[object.GetLevel()].GetZobject())) {
 			sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
 			zend.ZendIteratorDtor(sub_iter)
-			zend.ZvalPtrDtor(&object.GetIterators()[object.GetLevel()].GetZobject())
+			zend.ZvalPtrDtor(object.GetIterators()[object.GetLevel()].GetZobject())
 		}
 		object.GetLevel()--
 	}
 	object.SetIterators(zend.Erealloc(object.GetIterators(), b.SizeOf("spl_sub_iterator")))
 	object.SetLevel(0)
-	zend.ZvalPtrDtor(&iter.GetIntern().GetData())
+	zend.ZvalPtrDtor(iter.GetIntern().GetData())
 }
 func SplRecursiveItValidEx(object *SplRecursiveItObject, zthis *zend.Zval) int {
 	var sub_iter *zend.ZendObjectIterator
@@ -57,21 +55,21 @@ func SplRecursiveItValidEx(object *SplRecursiveItObject, zthis *zend.Zval) int {
 		level--
 	}
 	if object.GetEndIteration() != nil && object.GetInIteration() != 0 {
-		zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetEndIteration(), "endIteration", nil)
+		zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetEndIteration(), "endIteration", nil)
 	}
 	object.SetInIteration(0)
 	return zend.FAILURE
 }
 func SplRecursiveItValid(iter *zend.ZendObjectIterator) int {
-	return SplRecursiveItValidEx(Z_SPLRECURSIVE_IT_P(&iter.GetData()), &iter.GetData())
+	return SplRecursiveItValidEx(Z_SPLRECURSIVE_IT_P(iter.GetData()), iter.GetData())
 }
 func SplRecursiveItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
-	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(&iter.GetData())
+	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(iter.GetData())
 	var sub_iter *zend.ZendObjectIterator = object.GetIterators()[object.GetLevel()].GetIterator()
 	return sub_iter.GetFuncs().GetGetCurrentData()(sub_iter)
 }
 func SplRecursiveItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
-	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(&iter.GetData())
+	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(iter.GetData())
 	var sub_iter *zend.ZendObjectIterator = object.GetIterators()[object.GetLevel()].GetIterator()
 	if sub_iter.GetFuncs().GetGetCurrentKey() != nil {
 		sub_iter.GetFuncs().GetGetCurrentKey()(sub_iter, key)
@@ -108,9 +106,9 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			object.GetIterators()[object.GetLevel()].SetState(RS_TEST)
 		case RS_TEST:
 			ce = object.GetIterators()[object.GetLevel()].GetCe()
-			zobject = &object.GetIterators()[object.GetLevel()].GetZobject()
+			zobject = object.GetIterators()[object.GetLevel()].GetZobject()
 			if object.GetCallHasChildren() != nil {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetCallHasChildren(), "callHasChildren", &retval)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetCallHasChildren(), "callHasChildren", &retval)
 			} else {
 				zend.ZendCallMethodWith0Params(zobject, ce, nil, "haschildren", &retval)
 			}
@@ -155,7 +153,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 				}
 			}
 			if object.GetNextElement() != nil {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetNextElement(), "nextelement", nil)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetNextElement(), "nextelement", nil)
 			}
 			object.GetIterators()[object.GetLevel()].SetState(RS_NEXT)
 			if zend.ExecutorGlobals.GetException() != nil {
@@ -168,7 +166,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			return
 		case RS_SELF:
 			if object.GetNextElement() != nil && (object.GetMode() == RIT_SELF_FIRST || object.GetMode() == RIT_CHILD_FIRST) {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetNextElement(), "nextelement", nil)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetNextElement(), "nextelement", nil)
 			}
 			if object.GetMode() == RIT_SELF_FIRST {
 				object.GetIterators()[object.GetLevel()].SetState(RS_CHILD)
@@ -178,9 +176,9 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			return
 		case RS_CHILD:
 			ce = object.GetIterators()[object.GetLevel()].GetCe()
-			zobject = &object.GetIterators()[object.GetLevel()].GetZobject()
+			zobject = object.GetIterators()[object.GetLevel()].GetZobject()
 			if object.GetCallGetChildren() != nil {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetCallGetChildren(), "callGetChildren", &child)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetCallGetChildren(), "callGetChildren", &child)
 			} else {
 				zend.ZendCallMethodWith0Params(zobject, ce, nil, "getchildren", &child)
 			}
@@ -206,7 +204,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			}
 			object.SetIterators(zend.Erealloc(object.GetIterators(), b.SizeOf("spl_sub_iterator")*(b.PreInc(&(object.GetLevel()))+1)))
 			sub_iter = ce.GetGetIterator()(ce, &child, 0)
-			zend.ZVAL_COPY_VALUE(&object.GetIterators()[object.GetLevel()].GetZobject(), &child)
+			zend.ZVAL_COPY_VALUE(object.GetIterators()[object.GetLevel()].GetZobject(), &child)
 			object.GetIterators()[object.GetLevel()].SetIterator(sub_iter)
 			object.GetIterators()[object.GetLevel()].SetCe(ce)
 			object.GetIterators()[object.GetLevel()].SetState(RS_START)
@@ -214,7 +212,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 				sub_iter.GetFuncs().GetRewind()(sub_iter)
 			}
 			if object.GetBeginChildren() != nil {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetBeginChildren(), "beginchildren", nil)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetBeginChildren(), "beginchildren", nil)
 				if zend.ExecutorGlobals.GetException() != nil {
 					if !object.IsRitCatchGetChild() {
 						return
@@ -230,7 +228,7 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 
 		if object.GetLevel() > 0 {
 			if object.GetEndChildren() != nil {
-				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetEndChildren(), "endchildren", nil)
+				zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetEndChildren(), "endchildren", nil)
 				if zend.ExecutorGlobals.GetException() != nil {
 					if !object.IsRitCatchGetChild() {
 						return
@@ -241,8 +239,8 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 			}
 			if object.GetLevel() > 0 {
 				var garbage zend.Zval
-				zend.ZVAL_COPY_VALUE(&garbage, &object.GetIterators()[object.GetLevel()].GetZobject())
-				zend.ZVAL_UNDEF(&object.GetIterators()[object.GetLevel()].GetZobject())
+				zend.ZVAL_COPY_VALUE(&garbage, object.GetIterators()[object.GetLevel()].GetZobject())
+				zend.ZVAL_UNDEF(object.GetIterators()[object.GetLevel()].GetZobject())
 				zend.ZvalPtrDtor(&garbage)
 				zend.ZendIteratorDtor(iterator)
 				object.GetLevel()--
@@ -261,9 +259,9 @@ func SplRecursiveItRewindEx(object *SplRecursiveItObject, zthis *zend.Zval) {
 	for object.GetLevel() != 0 {
 		sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
 		zend.ZendIteratorDtor(sub_iter)
-		zend.ZvalPtrDtor(&object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
+		zend.ZvalPtrDtor(object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
 		if zend.ExecutorGlobals.GetException() == nil && (object.GetEndChildren() == nil || object.GetEndChildren().GetScope() != spl_ce_RecursiveIteratorIterator) {
-			zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetEndChildren(), "endchildren", nil)
+			zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetEndChildren(), "endchildren", nil)
 		}
 	}
 	object.SetIterators(zend.Erealloc(object.GetIterators(), b.SizeOf("spl_sub_iterator")))
@@ -273,16 +271,16 @@ func SplRecursiveItRewindEx(object *SplRecursiveItObject, zthis *zend.Zval) {
 		sub_iter.GetFuncs().GetRewind()(sub_iter)
 	}
 	if zend.ExecutorGlobals.GetException() == nil && object.GetBeginIteration() != nil && object.GetInIteration() == 0 {
-		zend.ZendCallMethodWith0Params(zthis, object.GetCe(), &object.GetBeginIteration(), "beginIteration", nil)
+		zend.ZendCallMethodWith0Params(zthis, object.GetCe(), object.GetBeginIteration(), "beginIteration", nil)
 	}
 	object.SetInIteration(1)
 	SplRecursiveItMoveForwardEx(object, zthis)
 }
 func SplRecursiveItMoveForward(iter *zend.ZendObjectIterator) {
-	SplRecursiveItMoveForwardEx(Z_SPLRECURSIVE_IT_P(&iter.GetData()), &iter.GetData())
+	SplRecursiveItMoveForwardEx(Z_SPLRECURSIVE_IT_P(iter.GetData()), iter.GetData())
 }
 func SplRecursiveItRewind(iter *zend.ZendObjectIterator) {
-	SplRecursiveItRewindEx(Z_SPLRECURSIVE_IT_P(&iter.GetData()), &iter.GetData())
+	SplRecursiveItRewindEx(Z_SPLRECURSIVE_IT_P(iter.GetData()), iter.GetData())
 }
 func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *zend.Zval, by_ref int) *zend.ZendObjectIterator {
 	var iterator *SplRecursiveItIterator
@@ -298,7 +296,7 @@ func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *zend.Zval, by_r
 	}
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	zend.Z_ADDREF_P(zobject)
-	zend.ZVAL_OBJ(&iterator.GetIntern().GetData(), zend.Z_OBJ_P(zobject))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), zobject.GetObj())
 	iterator.GetIntern().SetFuncs(&SplRecursiveItIteratorFuncs)
 	return (*zend.ZendObjectIterator)(iterator)
 }
@@ -372,37 +370,37 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 	intern.SetMaxDepth(-1)
 	intern.SetInIteration(0)
 	intern.SetCe(zend.Z_OBJCE_P(object))
-	intern.SetBeginIteration(&intern.GetCe().GetFunctionTable().StrFindPtr("beginiteration", b.SizeOf("\"beginiteration\"")-1))
+	intern.SetBeginIteration(intern.GetCe().GetFunctionTable().StrFindPtr("beginiteration", b.SizeOf("\"beginiteration\"")-1))
 	if intern.GetBeginIteration().GetScope() == ce_base {
 		intern.SetBeginIteration(nil)
 	}
-	intern.SetEndIteration(&intern.GetCe().GetFunctionTable().StrFindPtr("enditeration", b.SizeOf("\"enditeration\"")-1))
+	intern.SetEndIteration(intern.GetCe().GetFunctionTable().StrFindPtr("enditeration", b.SizeOf("\"enditeration\"")-1))
 	if intern.GetEndIteration().GetScope() == ce_base {
 		intern.SetEndIteration(nil)
 	}
-	intern.SetCallHasChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("callhaschildren", b.SizeOf("\"callHasChildren\"")-1))
+	intern.SetCallHasChildren(intern.GetCe().GetFunctionTable().StrFindPtr("callhaschildren", b.SizeOf("\"callHasChildren\"")-1))
 	if intern.GetCallHasChildren().GetScope() == ce_base {
 		intern.SetCallHasChildren(nil)
 	}
-	intern.SetCallGetChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("callgetchildren", b.SizeOf("\"callGetChildren\"")-1))
+	intern.SetCallGetChildren(intern.GetCe().GetFunctionTable().StrFindPtr("callgetchildren", b.SizeOf("\"callGetChildren\"")-1))
 	if intern.GetCallGetChildren().GetScope() == ce_base {
 		intern.SetCallGetChildren(nil)
 	}
-	intern.SetBeginChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("beginchildren", b.SizeOf("\"beginchildren\"")-1))
+	intern.SetBeginChildren(intern.GetCe().GetFunctionTable().StrFindPtr("beginchildren", b.SizeOf("\"beginchildren\"")-1))
 	if intern.GetBeginChildren().GetScope() == ce_base {
 		intern.SetBeginChildren(nil)
 	}
-	intern.SetEndChildren(&intern.GetCe().GetFunctionTable().StrFindPtr("endchildren", b.SizeOf("\"endchildren\"")-1))
+	intern.SetEndChildren(intern.GetCe().GetFunctionTable().StrFindPtr("endchildren", b.SizeOf("\"endchildren\"")-1))
 	if intern.GetEndChildren().GetScope() == ce_base {
 		intern.SetEndChildren(nil)
 	}
-	intern.SetNextElement(&intern.GetCe().GetFunctionTable().StrFindPtr("nextelement", b.SizeOf("\"nextElement\"")-1))
+	intern.SetNextElement(intern.GetCe().GetFunctionTable().StrFindPtr("nextelement", b.SizeOf("\"nextElement\"")-1))
 	if intern.GetNextElement().GetScope() == ce_base {
 		intern.SetNextElement(nil)
 	}
 	ce_iterator = zend.Z_OBJCE_P(iterator)
 	intern.GetIterators()[0].SetIterator(ce_iterator.GetGetIterator()(ce_iterator, iterator, 0))
-	zend.ZVAL_OBJ(&intern.GetIterators()[0].GetZobject(), zend.Z_OBJ_P(iterator))
+	zend.ZVAL_OBJ(intern.GetIterators()[0].GetZobject(), iterator.GetObj())
 	intern.GetIterators()[0].SetCe(ce_iterator)
 	intern.GetIterators()[0].SetState(RS_START)
 	zend.ZendRestoreErrorHandling(&error_handling)
@@ -411,7 +409,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 		for intern.GetLevel() >= 0 {
 			sub_iter = intern.GetIterators()[intern.GetLevel()].GetIterator()
 			zend.ZendIteratorDtor(sub_iter)
-			zend.ZvalPtrDtor(&intern.GetIterators()[b.PostDec(&(intern.GetLevel()))].GetZobject())
+			zend.ZvalPtrDtor(intern.GetIterators()[b.PostDec(&(intern.GetLevel()))].GetZobject())
 		}
 		zend.Efree(intern.GetIterators())
 		intern.SetIterators(nil)
@@ -492,7 +490,7 @@ func zim_spl_RecursiveIteratorIterator_getSubIterator(execute_data *zend.ZendExe
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
 		return
 	}
-	value = &object.GetIterators()[level].GetZobject()
+	value = object.GetIterators()[level].GetZobject()
 	zend.ZVAL_COPY_DEREF(return_value, value)
 }
 func zim_spl_RecursiveIteratorIterator_getInnerIterator(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -505,7 +503,7 @@ func zim_spl_RecursiveIteratorIterator_getInnerIterator(execute_data *zend.ZendE
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "The object is in an invalid state as the parent constructor was not called")
 		return
 	}
-	zobject = &object.GetIterators()[object.GetLevel()].GetZobject()
+	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
 	zend.ZVAL_COPY_DEREF(return_value, zobject)
 }
 func zim_spl_RecursiveIteratorIterator_beginIteration(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -534,13 +532,13 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(execute_data *zend.ZendEx
 		return
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
-	zobject = &object.GetIterators()[object.GetLevel()].GetZobject()
-	if zend.Z_TYPE_P(zobject) == zend.IS_UNDEF {
+	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
+	if zobject.IsType(zend.IS_UNDEF) {
 		zend.RETVAL_FALSE
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "haschildren", return_value)
-		if zend.Z_TYPE_P(return_value) == zend.IS_UNDEF {
+		if return_value.IsType(zend.IS_UNDEF) {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -558,12 +556,12 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(execute_data *zend.ZendEx
 		return
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
-	zobject = &object.GetIterators()[object.GetLevel()].GetZobject()
-	if zend.Z_TYPE_P(zobject) == zend.IS_UNDEF {
+	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
+	if zobject.IsType(zend.IS_UNDEF) {
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "getchildren", return_value)
-		if zend.Z_TYPE_P(return_value) == zend.IS_UNDEF {
+		if return_value.IsType(zend.IS_UNDEF) {
 			zend.RETVAL_NULL()
 			return
 		}
@@ -617,16 +615,16 @@ func SplRecursiveItGetMethod(zobject **zend.ZendObject, method *zend.ZendString,
 	var level zend.ZendLong = object.GetLevel()
 	var zobj *zend.Zval
 	if object.GetIterators() == nil {
-		core.PhpErrorDocref(nil, zend.E_ERROR, "The %s instance wasn't initialized properly", zend.ZSTR_VAL((*zobject).GetCe().GetName()))
+		core.PhpErrorDocref(nil, zend.E_ERROR, "The %s instance wasn't initialized properly", zobject.GetCe().GetName().GetVal())
 	}
-	zobj = &object.GetIterators()[level].GetZobject()
+	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
 	if function_handler == nil {
 		if b.Assign(&function_handler, &zend.Z_OBJCE_P(zobj).GetFunctionTable().FindPtr(method)) == nil {
-			*zobject = zend.Z_OBJ_P(zobj)
-			function_handler = (*zobject).GetHandlers().GetGetMethod()(zobject, method, key)
+			*zobject = zobj.GetObj()
+			function_handler = zobject.GetHandlers().GetGetMethod()(zobject, method, key)
 		} else {
-			*zobject = zend.Z_OBJ_P(zobj)
+			*zobject = zobj.GetObj()
 		}
 	}
 	return function_handler
@@ -642,7 +640,7 @@ func spl_RecursiveIteratorIterator_dtor(_object *zend.ZendObject) {
 		for object.GetLevel() >= 0 {
 			sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
 			zend.ZendIteratorDtor(sub_iter)
-			zend.ZvalPtrDtor(&object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
+			zend.ZvalPtrDtor(object.GetIterators()[b.PostDec(&(object.GetLevel()))].GetZobject())
 		}
 		zend.Efree(object.GetIterators())
 		object.SetIterators(nil)
@@ -655,31 +653,31 @@ func spl_RecursiveIteratorIterator_free_storage(_object *zend.ZendObject) {
 		object.SetIterators(nil)
 		object.SetLevel(0)
 	}
-	zend.ZendObjectStdDtor(&object.GetStd())
-	zend.SmartStrFree(&object.GetPrefix()[0])
-	zend.SmartStrFree(&object.GetPrefix()[1])
-	zend.SmartStrFree(&object.GetPrefix()[2])
-	zend.SmartStrFree(&object.GetPrefix()[3])
-	zend.SmartStrFree(&object.GetPrefix()[4])
-	zend.SmartStrFree(&object.GetPrefix()[5])
-	zend.SmartStrFree(&object.GetPostfix()[0])
+	zend.ZendObjectStdDtor(object.GetStd())
+	zend.SmartStrFree(object.GetPrefix()[0])
+	zend.SmartStrFree(object.GetPrefix()[1])
+	zend.SmartStrFree(object.GetPrefix()[2])
+	zend.SmartStrFree(object.GetPrefix()[3])
+	zend.SmartStrFree(object.GetPrefix()[4])
+	zend.SmartStrFree(object.GetPrefix()[5])
+	zend.SmartStrFree(object.GetPostfix()[0])
 }
 func spl_RecursiveIteratorIterator_new_ex(class_type *zend.ZendClassEntry, init_prefix int) *zend.ZendObject {
 	var intern *SplRecursiveItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_recursive_it_object"), class_type)
 	if init_prefix != 0 {
-		zend.SmartStrAppendl(&intern.GetPrefix()[0], "", 0)
-		zend.SmartStrAppendl(&intern.GetPrefix()[1], "| ", 2)
-		zend.SmartStrAppendl(&intern.GetPrefix()[2], "  ", 2)
-		zend.SmartStrAppendl(&intern.GetPrefix()[3], "|-", 2)
-		zend.SmartStrAppendl(&intern.GetPrefix()[4], "\\-", 2)
-		zend.SmartStrAppendl(&intern.GetPrefix()[5], "", 0)
-		zend.SmartStrAppendl(&intern.GetPostfix()[0], "", 0)
+		zend.SmartStrAppendl(intern.GetPrefix()[0], "", 0)
+		zend.SmartStrAppendl(intern.GetPrefix()[1], "| ", 2)
+		zend.SmartStrAppendl(intern.GetPrefix()[2], "  ", 2)
+		zend.SmartStrAppendl(intern.GetPrefix()[3], "|-", 2)
+		zend.SmartStrAppendl(intern.GetPrefix()[4], "\\-", 2)
+		zend.SmartStrAppendl(intern.GetPrefix()[5], "", 0)
+		zend.SmartStrAppendl(intern.GetPostfix()[0], "", 0)
 	}
-	zend.ZendObjectStdInit(&intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(&intern.GetStd(), class_type)
+	zend.ZendObjectStdInit(intern.GetStd(), class_type)
+	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
 	intern.GetStd().SetHandlers(&SplHandlersRecItIt)
-	return &intern.GetStd()
+	return intern.GetStd()
 }
 func spl_RecursiveIteratorIterator_new(class_type *zend.ZendClassEntry) *zend.ZendObject {
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 0)
@@ -691,28 +689,28 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	var str zend.SmartStr = zend.SmartStr{0}
 	var has_next zend.Zval
 	var level int
-	zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[0].GetS()), zend.ZSTR_LEN(object.GetPrefix()[0].GetS()))
+	zend.SmartStrAppendl(&str, object.GetPrefix()[0].GetS().GetVal(), object.GetPrefix()[0].GetS().GetLen())
 	for level = 0; level < object.GetLevel(); level++ {
-		zend.ZendCallMethodWith0Params(&object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
+		zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 		if has_next.GetType() != zend.IS_UNDEF {
 			if has_next.IsType(zend.IS_TRUE) {
-				zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[1].GetS()), zend.ZSTR_LEN(object.GetPrefix()[1].GetS()))
+				zend.SmartStrAppendl(&str, object.GetPrefix()[1].GetS().GetVal(), object.GetPrefix()[1].GetS().GetLen())
 			} else {
-				zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[2].GetS()), zend.ZSTR_LEN(object.GetPrefix()[2].GetS()))
+				zend.SmartStrAppendl(&str, object.GetPrefix()[2].GetS().GetVal(), object.GetPrefix()[2].GetS().GetLen())
 			}
 			zend.ZvalPtrDtor(&has_next)
 		}
 	}
-	zend.ZendCallMethodWith0Params(&object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
+	zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 	if has_next.GetType() != zend.IS_UNDEF {
 		if has_next.IsType(zend.IS_TRUE) {
-			zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[3].GetS()), zend.ZSTR_LEN(object.GetPrefix()[3].GetS()))
+			zend.SmartStrAppendl(&str, object.GetPrefix()[3].GetS().GetVal(), object.GetPrefix()[3].GetS().GetLen())
 		} else {
-			zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[4].GetS()), zend.ZSTR_LEN(object.GetPrefix()[4].GetS()))
+			zend.SmartStrAppendl(&str, object.GetPrefix()[4].GetS().GetVal(), object.GetPrefix()[4].GetS().GetLen())
 		}
 		zend.ZvalPtrDtor(&has_next)
 	}
-	zend.SmartStrAppendl(&str, zend.ZSTR_VAL(object.GetPrefix()[5].GetS()), zend.ZSTR_LEN(object.GetPrefix()[5].GetS()))
+	zend.SmartStrAppendl(&str, object.GetPrefix()[5].GetS().GetVal(), object.GetPrefix()[5].GetS().GetLen())
 	zend.SmartStr0(&str)
 	zend.RETVAL_NEW_STR(str.GetS())
 	return
@@ -726,7 +724,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 
 		/* TODO: Remove this special case? */
 
-		if zend.Z_TYPE_P(data) == zend.IS_ARRAY {
+		if data.IsType(zend.IS_ARRAY) {
 			zend.RETVAL_INTERNED_STR(zend.ZSTR_KNOWN(zend.ZEND_STR_ARRAY_CAPITALIZED))
 		} else {
 			zend.ZVAL_COPY(return_value, data)
@@ -756,8 +754,8 @@ func zim_spl_RecursiveTreeIterator_setPrefixPart(execute_data *zend.ZendExecuteD
 		zend.ZendThrowExceptionEx(spl_ce_OutOfRangeException, 0, "Use RecursiveTreeIterator::PREFIX_* constant")
 		return
 	}
-	zend.SmartStrFree(&object.GetPrefix()[part])
-	zend.SmartStrAppendl(&object.GetPrefix()[part], prefix, prefix_len)
+	zend.SmartStrFree(object.GetPrefix()[part])
+	zend.SmartStrAppendl(object.GetPrefix()[part], prefix, prefix_len)
 }
 func zim_spl_RecursiveTreeIterator_getPrefix(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS)
@@ -777,8 +775,8 @@ func zim_spl_RecursiveTreeIterator_setPostfix(execute_data *zend.ZendExecuteData
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "s", &postfix, &postfix_len) == zend.FAILURE {
 		return
 	}
-	zend.SmartStrFree(&object.GetPostfix()[0])
-	zend.SmartStrAppendl(&object.GetPostfix()[0], postfix, postfix_len)
+	zend.SmartStrFree(object.GetPostfix()[0])
+	zend.SmartStrAppendl(object.GetPostfix()[0], postfix, postfix_len)
 }
 func zim_spl_RecursiveTreeIterator_getEntry(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS)
@@ -841,7 +839,7 @@ func zim_spl_RecursiveTreeIterator_current(execute_data *zend.ZendExecuteData, r
 	}
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
 	str = zend.ZendStringAlloc(zend.Z_STRLEN(prefix)+zend.Z_STRLEN(entry)+zend.Z_STRLEN(postfix), 0)
-	ptr = zend.ZSTR_VAL(str)
+	ptr = str.GetVal()
 	memcpy(ptr, zend.Z_STRVAL(prefix), zend.Z_STRLEN(prefix))
 	ptr += zend.Z_STRLEN(prefix)
 	memcpy(ptr, zend.Z_STRVAL(entry), zend.Z_STRLEN(entry))
@@ -885,7 +883,7 @@ func zim_spl_RecursiveTreeIterator_key(execute_data *zend.ZendExecuteData, retur
 	SplRecursiveTreeIteratorGetPrefix(object, &prefix)
 	SplRecursiveTreeIteratorGetPostfix(object, &postfix)
 	str = zend.ZendStringAlloc(zend.Z_STRLEN(prefix)+zend.Z_STRLEN(key)+zend.Z_STRLEN(postfix), 0)
-	ptr = zend.ZSTR_VAL(str)
+	ptr = str.GetVal()
 	memcpy(ptr, zend.Z_STRVAL(prefix), zend.Z_STRLEN(prefix))
 	ptr += zend.Z_STRLEN(prefix)
 	memcpy(ptr, zend.Z_STRVAL(key), zend.Z_STRLEN(key))
@@ -905,20 +903,20 @@ func SplDualItGetMethod(object **zend.ZendObject, method *zend.ZendString, key *
 	intern = SplDualItFromObj(*object)
 	function_handler = zend.ZendStdGetMethod(object, method, key)
 	if function_handler == nil && intern.GetCe() != nil {
-		if b.Assign(&function_handler, &intern.GetCe().GetFunctionTable().FindPtr(method)) == nil {
+		if b.Assign(&function_handler, intern.GetCe().GetFunctionTable().FindPtr(method)) == nil {
 			if zend.Z_OBJ_HT(intern.GetZobject()).GetGetMethod() != nil {
-				*object = zend.Z_OBJ(intern.GetZobject())
-				function_handler = (*object).GetHandlers().GetGetMethod()(object, method, key)
+				*object = intern.GetZobject().GetObj()
+				function_handler = object.GetHandlers().GetGetMethod()(object, method, key)
 			}
 		} else {
-			*object = zend.Z_OBJ(intern.GetZobject())
+			*object = intern.GetZobject().GetObj()
 		}
 	}
 	return function_handler
 }
 func APPENDIT_CHECK_CTOR(intern *SplDualItObject) {
 	if intern.GetDitType() == DIT_Unknown {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "Classes derived from %s must call %s::__construct()", zend.ZSTR_VAL(spl_ce_AppendIterator.GetName()), zend.ZSTR_VAL(spl_ce_AppendIterator.GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "Classes derived from %s must call %s::__construct()", spl_ce_AppendIterator.GetName().GetVal(), spl_ce_AppendIterator.GetName().GetVal())
 		return
 	}
 }
@@ -959,7 +957,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var error_handling zend.ZendErrorHandling
 	intern = Z_SPLDUAL_IT_P(zend.ZEND_THIS)
 	if intern.GetDitType() != DIT_Unknown {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s::getIterator() must be called exactly once per instance", zend.ZSTR_VAL(ce_base.GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s::getIterator() must be called exactly once per instance", ce_base.GetName().GetVal())
 		return nil
 	}
 	intern.SetDitType(dit_type)
@@ -967,7 +965,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	case DIT_LimitIterator:
 		intern.SetOffset(0)
 		intern.SetCount(-1)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|ll", &zobject, ce_inner, &intern.GetOffset(), &intern.GetCount()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|ll", &zobject, ce_inner, intern.GetOffset(), intern.GetCount()) == zend.FAILURE {
 			return nil
 		}
 		if intern.GetOffset() < 0 {
@@ -991,7 +989,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			return nil
 		}
 		intern.AddUCachingFlags(flags & CIT_PUBLIC)
-		zend.ArrayInit(&intern.GetZcache())
+		zend.ArrayInit(intern.GetZcache())
 		break
 	case DIT_IteratorIterator:
 		var ce_cast *zend.ZendClassEntry
@@ -1009,13 +1007,13 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				ce = ce_cast
 			}
 			if zend.InstanceofFunction(ce, zend.ZendCeAggregate) != 0 {
-				zend.ZendCallMethodWith0Params(zobject, ce, &ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &retval)
+				zend.ZendCallMethodWith0Params(zobject, ce, ce.GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &retval)
 				if zend.ExecutorGlobals.GetException() != nil {
 					zend.ZvalPtrDtor(&retval)
 					return nil
 				}
 				if retval.GetType() != zend.IS_OBJECT || zend.InstanceofFunction(zend.Z_OBJCE(retval), zend.ZendCeTraversable) == 0 {
-					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", zend.ZSTR_VAL(ce.GetName()))
+					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "%s::getIterator() must return an object that implements Traversable", ce.GetName().GetVal())
 					return nil
 				}
 				zobject = &retval
@@ -1026,9 +1024,9 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		break
 	case DIT_AppendIterator:
 		zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_InvalidArgumentException, &error_handling)
-		SplInstantiate(spl_ce_ArrayIterator, &intern.GetZarrayit())
-		zend.ZendCallMethodWith0Params(&intern.GetZarrayit(), spl_ce_ArrayIterator, &spl_ce_ArrayIterator.GetConstructor(), "__construct", nil)
-		intern.SetUAppendIterator(spl_ce_ArrayIterator.GetGetIterator()(spl_ce_ArrayIterator, &intern.GetZarrayit(), 0))
+		SplInstantiate(spl_ce_ArrayIterator, intern.GetZarrayit())
+		zend.ZendCallMethodWith0Params(intern.GetZarrayit(), spl_ce_ArrayIterator, spl_ce_ArrayIterator.GetConstructor(), "__construct", nil)
+		intern.SetUAppendIterator(spl_ce_ArrayIterator.GetGetIterator()(spl_ce_ArrayIterator, intern.GetZarrayit(), 0))
 		zend.ZendRestoreErrorHandling(&error_handling)
 		return intern
 	case DIT_RegexIterator:
@@ -1039,7 +1037,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		intern.SetUseFlags(zend.ZEND_NUM_ARGS() >= 5)
 		intern.SetURegexFlags(0)
 		intern.SetPregFlags(0)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "OS|lll", &zobject, ce_inner, &regex, &mode, &intern.GetURegexFlags(), &intern.GetPregFlags()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "OS|lll", &zobject, ce_inner, &regex, &mode, intern.GetURegexFlags(), intern.GetPregFlags()) == zend.FAILURE {
 			return nil
 		}
 		if mode < 0 || mode >= REGIT_MODE_MAX {
@@ -1067,7 +1065,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	case DIT_RecursiveCallbackFilterIterator:
 		var cfi *_spl_cbfilter_it_intern = zend.Emalloc(b.SizeOf("* cfi"))
 		cfi.GetFci().SetObject(nil)
-		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "Of", &zobject, ce_inner, &cfi.GetFci(), &cfi.GetFcc()) == zend.FAILURE {
+		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "Of", &zobject, ce_inner, cfi.GetFci(), cfi.GetFcc()) == zend.FAILURE {
 			zend.Efree(cfi)
 			return nil
 		}
@@ -1087,13 +1085,13 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if inc_refcount != 0 {
 		zend.Z_ADDREF_P(zobject)
 	}
-	zend.ZVAL_OBJ(&intern.GetZobject(), zend.Z_OBJ_P(zobject))
+	zend.ZVAL_OBJ(intern.GetZobject(), zobject.GetObj())
 	if dit_type == DIT_IteratorIterator {
 		intern.SetCe(ce)
 	} else {
 		intern.SetCe(zend.Z_OBJCE_P(zobject))
 	}
-	intern.SetObject(zend.Z_OBJ_P(zobject))
+	intern.SetObject(zobject.GetObj())
 	intern.SetInnerIterator(intern.GetCe().GetGetIterator()(intern.GetCe(), zobject, 0))
 	return intern
 }
@@ -1115,7 +1113,7 @@ func zim_spl_dual_it_getInnerIterator(execute_data *zend.ZendExecuteData, return
 	}
 	intern = it
 	if !(zend.Z_ISUNDEF(intern.GetZobject())) {
-		var value *zend.Zval = &intern.GetZobject()
+		var value *zend.Zval = intern.GetZobject()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.RETVAL_NULL()
@@ -1127,21 +1125,21 @@ func SplDualItFree(intern *SplDualItObject) {
 		intern.GetInnerIterator().GetFuncs().GetInvalidateCurrent()(intern.GetInnerIterator())
 	}
 	if intern.GetData().GetType() != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&intern.GetData())
-		zend.ZVAL_UNDEF(&intern.GetData())
+		zend.ZvalPtrDtor(intern.GetData())
+		zend.ZVAL_UNDEF(intern.GetData())
 	}
 	if intern.GetKey().GetType() != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&intern.GetKey())
-		zend.ZVAL_UNDEF(&intern.GetKey())
+		zend.ZvalPtrDtor(intern.GetKey())
+		zend.ZVAL_UNDEF(intern.GetKey())
 	}
 	if intern.GetDitType() == DIT_CachingIterator || intern.GetDitType() == DIT_RecursiveCachingIterator {
 		if intern.GetZstr().GetType() != zend.IS_UNDEF {
-			zend.ZvalPtrDtor(&intern.GetZstr())
-			zend.ZVAL_UNDEF(&intern.GetZstr())
+			zend.ZvalPtrDtor(intern.GetZstr())
+			zend.ZVAL_UNDEF(intern.GetZstr())
 		}
 		if intern.GetZchildren().GetType() != zend.IS_UNDEF {
-			zend.ZvalPtrDtor(&intern.GetZchildren())
-			zend.ZVAL_UNDEF(&intern.GetZchildren())
+			zend.ZvalPtrDtor(intern.GetZchildren())
+			zend.ZVAL_UNDEF(intern.GetZchildren())
 		}
 	}
 }
@@ -1169,16 +1167,16 @@ func SplDualItFetch(intern *SplDualItObject, check_more int) int {
 	if check_more == 0 || SplDualItValid(intern) == zend.SUCCESS {
 		data = intern.GetInnerIterator().GetFuncs().GetGetCurrentData()(intern.GetInnerIterator())
 		if data != nil {
-			zend.ZVAL_COPY(&intern.GetData(), data)
+			zend.ZVAL_COPY(intern.GetData(), data)
 		}
 		if intern.GetInnerIterator().GetFuncs().GetGetCurrentKey() != nil {
-			intern.GetInnerIterator().GetFuncs().GetGetCurrentKey()(intern.GetInnerIterator(), &intern.GetKey())
+			intern.GetInnerIterator().GetFuncs().GetGetCurrentKey()(intern.GetInnerIterator(), intern.GetKey())
 			if zend.ExecutorGlobals.GetException() != nil {
-				zend.ZvalPtrDtor(&intern.GetKey())
-				zend.ZVAL_UNDEF(&intern.GetKey())
+				zend.ZvalPtrDtor(intern.GetKey())
+				zend.ZVAL_UNDEF(intern.GetKey())
 			}
 		} else {
-			zend.ZVAL_LONG(&intern.GetKey(), intern.GetPos())
+			zend.ZVAL_LONG(intern.GetKey(), intern.GetPos())
 		}
 		if zend.ExecutorGlobals.GetException() != nil {
 			return zend.FAILURE
@@ -1238,7 +1236,7 @@ func ZimSplDualItKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	intern = it
 	if intern.GetKey().GetType() != zend.IS_UNDEF {
-		var value *zend.Zval = &intern.GetKey()
+		var value *zend.Zval = intern.GetKey()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.RETVAL_NULL()
@@ -1257,7 +1255,7 @@ func ZimSplDualItCurrent(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	intern = it
 	if intern.GetData().GetType() != zend.IS_UNDEF {
-		var value *zend.Zval = &intern.GetData()
+		var value *zend.Zval = intern.GetData()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.RETVAL_NULL()
@@ -1348,7 +1346,7 @@ func zim_spl_RecursiveFilterIterator_hasChildren(execute_data *zend.ZendExecuteD
 		return
 	}
 	intern = it
-	zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "haschildren", &retval)
+	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "haschildren", &retval)
 	if retval.GetType() != zend.IS_UNDEF {
 		zend.RETVAL_ZVAL(&retval, 0, 1)
 		return
@@ -1369,7 +1367,7 @@ func zim_spl_RecursiveFilterIterator_getChildren(execute_data *zend.ZendExecuteD
 		return
 	}
 	intern = it
-	zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
+	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
 	if zend.ExecutorGlobals.GetException() == nil && retval.GetType() != zend.IS_UNDEF {
 		SplInstantiateArgEx1(zend.Z_OBJCE_P(zend.ZEND_THIS), return_value, &retval)
 	}
@@ -1387,9 +1385,9 @@ func zim_spl_RecursiveCallbackFilterIterator_getChildren(execute_data *zend.Zend
 		return
 	}
 	intern = it
-	zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
+	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
 	if zend.ExecutorGlobals.GetException() == nil && retval.GetType() != zend.IS_UNDEF {
-		SplInstantiateArgEx2(zend.Z_OBJCE_P(zend.ZEND_THIS), return_value, &retval, &intern.GetCbfilter().GetFci().GetFunctionName())
+		SplInstantiateArgEx2(zend.Z_OBJCE_P(zend.ZEND_THIS), return_value, &retval, intern.GetCbfilter().GetFci().GetFunctionName())
 	}
 	zend.ZvalPtrDtor(&retval)
 }
@@ -1401,8 +1399,8 @@ func zim_spl_RegexIterator___construct(execute_data *zend.ZendExecuteData, retur
 }
 func zim_spl_CallbackFilterIterator_accept(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject = Z_SPLDUAL_IT_P(zend.ZEND_THIS)
-	var fci *zend.ZendFcallInfo = &intern.GetCbfilter().GetFci()
-	var fcc *zend.ZendFcallInfoCache = &intern.GetCbfilter().GetFcc()
+	var fci *zend.ZendFcallInfo = intern.GetCbfilter().GetFci()
+	var fcc *zend.ZendFcallInfoCache = intern.GetCbfilter().GetFcc()
 	var params []zend.Zval
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -1411,9 +1409,9 @@ func zim_spl_CallbackFilterIterator_accept(execute_data *zend.ZendExecuteData, r
 		zend.RETVAL_FALSE
 		return
 	}
-	zend.ZVAL_COPY_VALUE(&params[0], &intern.GetData())
-	zend.ZVAL_COPY_VALUE(&params[1], &intern.GetKey())
-	zend.ZVAL_COPY_VALUE(&params[2], &intern.GetZobject())
+	zend.ZVAL_COPY_VALUE(&params[0], intern.GetData())
+	zend.ZVAL_COPY_VALUE(&params[1], intern.GetKey())
+	zend.ZVAL_COPY_VALUE(&params[2], intern.GetZobject())
 	fci.SetRetval(return_value)
 	fci.SetParamCount(3)
 	fci.SetParams(params)
@@ -1429,8 +1427,8 @@ func zim_spl_CallbackFilterIterator_accept(execute_data *zend.ZendExecuteData, r
 
 	/* zend_call_function may change args to IS_REF */
 
-	zend.ZVAL_COPY_VALUE(&intern.GetData(), &params[0])
-	zend.ZVAL_COPY_VALUE(&intern.GetKey(), &params[1])
+	zend.ZVAL_COPY_VALUE(intern.GetData(), &params[0])
+	zend.ZVAL_COPY_VALUE(intern.GetKey(), &params[1])
 }
 func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -1456,13 +1454,13 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		return
 	}
 	if intern.IsUseKey() {
-		subject = zend.ZvalGetString(&intern.GetKey())
+		subject = zend.ZvalGetString(intern.GetKey())
 	} else {
 		if intern.GetData().IsType(zend.IS_ARRAY) {
 			zend.RETVAL_FALSE
 			return
 		}
-		subject = zend.ZvalGetString(&intern.GetData())
+		subject = zend.ZvalGetString(intern.GetData())
 	}
 
 	/* Exception during string conversion. */
@@ -1480,23 +1478,23 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 			zend.RETVAL_FALSE
 			return
 		}
-		rc = pcre2_match(re, PCRE2_SPTR(zend.ZSTR_VAL(subject)), zend.ZSTR_LEN(subject), 0, 0, match_data, php_pcre_mctx())
+		rc = pcre2_match(re, PCRE2_SPTR(subject.GetVal()), subject.GetLen(), 0, 0, match_data, php_pcre_mctx())
 		zend.RETVAL_BOOL(rc >= 0)
 		php_pcre_free_match_data(match_data)
 		break
 	case REGIT_MODE_ALL_MATCHES:
 
 	case REGIT_MODE_GET_MATCH:
-		zend.ZvalPtrDtor(&intern.GetData())
-		zend.ZVAL_UNDEF(&intern.GetData())
-		php_pcre_match_impl(intern.GetPce(), subject, &zcount, &intern.GetData(), intern.GetMode() == REGIT_MODE_ALL_MATCHES, intern.GetUseFlags(), intern.GetPregFlags(), 0)
-		zend.RETVAL_BOOL(zend.Z_LVAL(zcount) > 0)
+		zend.ZvalPtrDtor(intern.GetData())
+		zend.ZVAL_UNDEF(intern.GetData())
+		php_pcre_match_impl(intern.GetPce(), subject, &zcount, intern.GetData(), intern.GetMode() == REGIT_MODE_ALL_MATCHES, intern.GetUseFlags(), intern.GetPregFlags(), 0)
+		zend.RETVAL_BOOL(zcount.GetLval() > 0)
 		break
 	case REGIT_MODE_SPLIT:
-		zend.ZvalPtrDtor(&intern.GetData())
-		zend.ZVAL_UNDEF(&intern.GetData())
-		php_pcre_split_impl(intern.GetPce(), subject, &intern.GetData(), -1, intern.GetPregFlags())
-		count = zend.Z_ARRVAL(intern.GetData()).NumElements()
+		zend.ZvalPtrDtor(intern.GetData())
+		zend.ZVAL_UNDEF(intern.GetData())
+		php_pcre_split_impl(intern.GetPce(), subject, intern.GetData(), -1, intern.GetPregFlags())
+		count = zend.Z_ARRVAL(intern.GetData()).GetNNumOfElements()
 		zend.RETVAL_BOOL(count > 1)
 		break
 	case REGIT_MODE_REPLACE:
@@ -1505,19 +1503,19 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		if replacement_str == nil {
 			return
 		}
-		result = php_pcre_replace_impl(intern.GetPce(), subject, zend.ZSTR_VAL(subject), zend.ZSTR_LEN(subject), replacement_str, -1, &count)
+		result = php_pcre_replace_impl(intern.GetPce(), subject, subject.GetVal(), subject.GetLen(), replacement_str, -1, &count)
 		if intern.IsUseKey() {
-			zend.ZvalPtrDtor(&intern.GetKey())
-			zend.ZVAL_STR(&intern.GetKey(), result)
+			zend.ZvalPtrDtor(intern.GetKey())
+			zend.ZVAL_STR(intern.GetKey(), result)
 		} else {
-			zend.ZvalPtrDtor(&intern.GetData())
-			zend.ZVAL_STR(&intern.GetData(), result)
+			zend.ZvalPtrDtor(intern.GetData())
+			zend.ZVAL_STR(intern.GetData(), result)
 		}
 		zend.ZendStringRelease(replacement_str)
 		zend.RETVAL_BOOL(count > 0)
 	}
 	if intern.IsInverted() {
-		zend.RETVAL_BOOL(zend.Z_TYPE_P(return_value) != zend.IS_TRUE)
+		zend.RETVAL_BOOL(return_value.GetType() != zend.IS_TRUE)
 	}
 	zend.ZendStringReleaseEx(subject, 0)
 }
@@ -1644,7 +1642,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(execute_data *zend.ZendExecuteDa
 		return
 	}
 	intern = it
-	zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
+	zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &retval)
 	if zend.ExecutorGlobals.GetException() == nil {
 		var args []zend.Zval
 		zend.ZVAL_COPY(&args[0], &retval)
@@ -1673,7 +1671,7 @@ func zim_spl_RecursiveRegexIterator_accept(execute_data *zend.ZendExecuteData, r
 		zend.RETVAL_FALSE
 		return
 	} else if intern.GetData().IsType(zend.IS_ARRAY) {
-		zend.RETVAL_BOOL(zend.Z_ARRVAL(intern.GetData()).NumElements() > 0)
+		zend.RETVAL_BOOL(zend.Z_ARRVAL(intern.GetData()).GetNNumOfElements() > 0)
 		return
 	}
 	zend.ZendCallMethodWith0Params(zend.ZEND_THIS, spl_ce_RegexIterator, nil, "accept", return_value)
@@ -1692,16 +1690,16 @@ func SplDualItDtor(_object *zend.ZendObject) {
 func SplDualItFreeStorage(_object *zend.ZendObject) {
 	var object *SplDualItObject = SplDualItFromObj(_object)
 	if !(zend.Z_ISUNDEF(object.GetZobject())) {
-		zend.ZvalPtrDtor(&object.GetZobject())
+		zend.ZvalPtrDtor(object.GetZobject())
 	}
 	if object.GetDitType() == DIT_AppendIterator {
 		zend.ZendIteratorDtor(object.GetUAppendIterator())
 		if object.GetZarrayit().GetType() != zend.IS_UNDEF {
-			zend.ZvalPtrDtor(&object.GetZarrayit())
+			zend.ZvalPtrDtor(object.GetZarrayit())
 		}
 	}
 	if object.GetDitType() == DIT_CachingIterator || object.GetDitType() == DIT_RecursiveCachingIterator {
-		zend.ZvalPtrDtor(&object.GetZcache())
+		zend.ZvalPtrDtor(object.GetZcache())
 	}
 	if object.GetDitType() == DIT_RegexIterator || object.GetDitType() == DIT_RecursiveRegexIterator {
 		if object.GetPce() != nil {
@@ -1715,23 +1713,23 @@ func SplDualItFreeStorage(_object *zend.ZendObject) {
 		if object.GetCbfilter() != nil {
 			var cbfilter *_spl_cbfilter_it_intern = object.GetCbfilter()
 			object.SetCbfilter(nil)
-			zend.ZvalPtrDtor(&cbfilter.GetFci().GetFunctionName())
+			zend.ZvalPtrDtor(cbfilter.GetFci().GetFunctionName())
 			if cbfilter.GetFci().GetObject() != nil {
 				zend.OBJ_RELEASE(cbfilter.GetFci().GetObject())
 			}
 			zend.Efree(cbfilter)
 		}
 	}
-	zend.ZendObjectStdDtor(&object.GetStd())
+	zend.ZendObjectStdDtor(object.GetStd())
 }
 func SplDualItNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 	var intern *SplDualItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_dual_it_object"), class_type)
 	intern.SetDitType(DIT_Unknown)
-	zend.ZendObjectStdInit(&intern.GetStd(), class_type)
-	zend.ObjectPropertiesInit(&intern.GetStd(), class_type)
+	zend.ZendObjectStdInit(intern.GetStd(), class_type)
+	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
 	intern.GetStd().SetHandlers(&SplHandlersDualIt)
-	return &intern.GetStd()
+	return intern.GetStd()
 }
 func SplLimitItValid(intern *SplDualItObject) int {
 	/* FAILURE / SUCCESS */
@@ -1758,7 +1756,7 @@ func SplLimitItSeek(intern *SplDualItObject, pos zend.ZendLong) {
 	if pos != intern.GetPos() && zend.InstanceofFunction(intern.GetCe(), spl_ce_SeekableIterator) != 0 {
 		zend.ZVAL_LONG(&zpos, pos)
 		SplDualItFree(intern)
-		zend.ZendCallMethodWith1Params(&intern.GetZobject(), intern.GetCe(), nil, "seek", nil, &zpos)
+		zend.ZendCallMethodWith1Params(intern.GetZobject(), intern.GetCe(), nil, "seek", nil, &zpos)
 		if zend.ExecutorGlobals.GetException() == nil {
 			intern.SetPos(pos)
 			if SplLimitItValid(intern) == zend.SUCCESS {
@@ -1863,11 +1861,11 @@ func SplCachingItNext(intern *SplDualItObject) {
 		/* Full cache ? */
 
 		if intern.IsFullCache() {
-			var key *zend.Zval = &intern.GetKey()
-			var data *zend.Zval = &intern.GetData()
+			var key *zend.Zval = intern.GetKey()
+			var data *zend.Zval = intern.GetData()
 			zend.ZVAL_DEREF(data)
 			zend.Z_TRY_ADDREF_P(data)
-			zend.ArraySetZvalKey(zend.Z_ARRVAL(intern.GetZcache()), key, data)
+			zend.ArraySetZvalKey(intern.GetZcache().GetArr(), key, data)
 			zend.ZvalPtrDtor(data)
 		}
 
@@ -1877,7 +1875,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			var retval zend.Zval
 			var zchildren zend.Zval
 			var zflags zend.Zval
-			zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "haschildren", &retval)
+			zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "haschildren", &retval)
 			if zend.ExecutorGlobals.GetException() != nil {
 				zend.ZvalPtrDtor(&retval)
 				if intern.IsCatchGetChild() {
@@ -1887,7 +1885,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 				}
 			} else {
 				if zend.ZendIsTrue(&retval) != 0 {
-					zend.ZendCallMethodWith0Params(&intern.GetZobject(), intern.GetCe(), nil, "getchildren", &zchildren)
+					zend.ZendCallMethodWith0Params(intern.GetZobject(), intern.GetCe(), nil, "getchildren", &zchildren)
 					if zend.ExecutorGlobals.GetException() != nil {
 						zend.ZvalPtrDtor(&zchildren)
 						if intern.IsCatchGetChild() {
@@ -1898,7 +1896,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 						}
 					} else {
 						zend.ZVAL_LONG(&zflags, intern.GetUCachingFlags()&CIT_PUBLIC)
-						SplInstantiateArgEx2(spl_ce_RecursiveCachingIterator, &intern.GetZchildren(), &zchildren, &zflags)
+						SplInstantiateArgEx2(spl_ce_RecursiveCachingIterator, intern.GetZchildren(), &zchildren, &zflags)
 						zend.ZvalPtrDtor(&zchildren)
 					}
 				}
@@ -1916,13 +1914,13 @@ func SplCachingItNext(intern *SplDualItObject) {
 			var use_copy int
 			var expr_copy zend.Zval
 			if intern.IsTostringUseInner() {
-				zend.ZVAL_COPY_VALUE(&intern.GetZstr(), &intern.GetZobject())
+				zend.ZVAL_COPY_VALUE(intern.GetZstr(), intern.GetZobject())
 			} else {
-				zend.ZVAL_COPY_VALUE(&intern.GetZstr(), &intern.GetData())
+				zend.ZVAL_COPY_VALUE(intern.GetZstr(), intern.GetData())
 			}
-			use_copy = zend.ZendMakePrintableZval(&intern.GetZstr(), &expr_copy)
+			use_copy = zend.ZendMakePrintableZval(intern.GetZstr(), &expr_copy)
 			if use_copy != 0 {
-				zend.ZVAL_COPY_VALUE(&intern.GetZstr(), &expr_copy)
+				zend.ZVAL_COPY_VALUE(intern.GetZstr(), &expr_copy)
 			} else {
 				zend.Z_TRY_ADDREF(intern.GetZstr())
 			}
@@ -1934,7 +1932,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 }
 func SplCachingItRewind(intern *SplDualItObject) {
 	SplDualItRewind(intern)
-	zend.Z_ARRVAL(intern.GetZcache()).Clean()
+	intern.GetZcache().GetArr().Clean()
 	SplCachingItNext(intern)
 }
 func zim_spl_CachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2003,20 +2001,20 @@ func zim_spl_CachingIterator___toString(execute_data *zend.ZendExecuteData, retu
 	}
 	intern = it
 	if !intern.HasUCachingFlags(CIT_CALL_TOSTRING | CIT_TOSTRING_USE_KEY | CIT_TOSTRING_USE_CURRENT | CIT_TOSTRING_USE_INNER) {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not fetch string value (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
 	if intern.IsTostringUseKey() {
-		zend.ZVAL_COPY(return_value, &intern.GetKey())
+		zend.ZVAL_COPY(return_value, intern.GetKey())
 		zend.ConvertToString(return_value)
 		return
 	} else if intern.IsTostringUseCurrent() {
-		zend.ZVAL_COPY(return_value, &intern.GetData())
+		zend.ZVAL_COPY(return_value, intern.GetData())
 		zend.ConvertToString(return_value)
 		return
 	}
 	if intern.GetZstr().IsType(zend.IS_STRING) {
-		zend.RETVAL_STR_COPY(zend.Z_STR_P(&intern.GetZstr()))
+		zend.RETVAL_STR_COPY(intern.GetZstr().GetStr())
 		return
 	} else {
 		zend.RETVAL_EMPTY_STRING()
@@ -2034,14 +2032,14 @@ func zim_spl_CachingIterator_offsetSet(execute_data *zend.ZendExecuteData, retur
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Sz", &key, &value) == zend.FAILURE {
 		return
 	}
 	zend.Z_TRY_ADDREF_P(value)
-	zend.ZendSymtableUpdate(zend.Z_ARRVAL(intern.GetZcache()), key, value)
+	zend.ZendSymtableUpdate(intern.GetZcache().GetArr(), key, value)
 }
 func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2054,14 +2052,14 @@ func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, retur
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	if b.Assign(&value, zend.ZendSymtableFind(zend.Z_ARRVAL(intern.GetZcache()), key)) == nil {
-		zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.ZSTR_VAL(key))
+	if b.Assign(&value, zend.ZendSymtableFind(intern.GetZcache().GetArr(), key)) == nil {
+		zend.ZendError(zend.E_NOTICE, "Undefined index: %s", key.GetVal())
 		return
 	}
 	zend.ZVAL_COPY_DEREF(return_value, value)
@@ -2076,13 +2074,13 @@ func zim_spl_CachingIterator_offsetUnset(execute_data *zend.ZendExecuteData, ret
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	zend.ZendSymtableDel(zend.Z_ARRVAL(intern.GetZcache()), key)
+	zend.ZendSymtableDel(intern.GetZcache().GetArr(), key)
 }
 func zim_spl_CachingIterator_offsetExists(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2094,13 +2092,13 @@ func zim_spl_CachingIterator_offsetExists(execute_data *zend.ZendExecuteData, re
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(zend.ZendSymtableExists(zend.Z_ARRVAL(intern.GetZcache()), key) != 0)
+	zend.RETVAL_BOOL(zend.ZendSymtableExists(intern.GetZcache().GetArr(), key) != 0)
 	return
 }
 func zim_spl_CachingIterator_getCache(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2115,10 +2113,10 @@ func zim_spl_CachingIterator_getCache(execute_data *zend.ZendExecuteData, return
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
-	zend.ZVAL_COPY(return_value, &intern.GetZcache())
+	zend.ZVAL_COPY(return_value, intern.GetZcache())
 }
 func zim_spl_CachingIterator_getFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2162,7 +2160,7 @@ func zim_spl_CachingIterator_setFlags(execute_data *zend.ZendExecuteData, return
 
 		/* clear on (re)enable */
 
-		zend.Z_ARRVAL(intern.GetZcache()).Clean()
+		intern.GetZcache().GetArr().Clean()
 
 		/* clear on (re)enable */
 
@@ -2181,10 +2179,10 @@ func zim_spl_CachingIterator_count(execute_data *zend.ZendExecuteData, return_va
 	}
 	intern = it
 	if !intern.IsFullCache() {
-		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.ZSTR_VAL(zend.Z_OBJCE_P(zend.ZEND_THIS).GetName()))
+		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
-	zend.RETVAL_LONG(zend.Z_ARRVAL(intern.GetZcache()).NumElements())
+	zend.RETVAL_LONG(zend.Z_ARRVAL(intern.GetZcache()).GetNNumOfElements())
 	return
 }
 func zim_spl_RecursiveCachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2216,7 +2214,7 @@ func zim_spl_RecursiveCachingIterator_getChildren(execute_data *zend.ZendExecute
 	}
 	intern = it
 	if intern.GetZchildren().GetType() != zend.IS_UNDEF {
-		var value *zend.Zval = &intern.GetZchildren()
+		var value *zend.Zval = intern.GetZchildren()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.RETVAL_NULL()
@@ -2352,8 +2350,8 @@ func zim_spl_EmptyIterator_next(execute_data *zend.ZendExecuteData, return_value
 func SplAppendItNextIterator(intern *SplDualItObject) int {
 	SplDualItFree(intern)
 	if !(zend.Z_ISUNDEF(intern.GetZobject())) {
-		zend.ZvalPtrDtor(&intern.GetZobject())
-		zend.ZVAL_UNDEF(&intern.GetZobject())
+		zend.ZvalPtrDtor(intern.GetZobject())
+		zend.ZVAL_UNDEF(intern.GetZobject())
 		intern.SetCe(nil)
 		if intern.GetInnerIterator() != nil {
 			zend.ZendIteratorDtor(intern.GetInnerIterator())
@@ -2363,7 +2361,7 @@ func SplAppendItNextIterator(intern *SplDualItObject) int {
 	if intern.GetUAppendIterator().GetFuncs().GetValid()(intern.GetUAppendIterator()) == zend.SUCCESS {
 		var it *zend.Zval
 		it = intern.GetUAppendIterator().GetFuncs().GetGetCurrentData()(intern.GetUAppendIterator())
-		zend.ZVAL_COPY(&intern.GetZobject(), it)
+		zend.ZVAL_COPY(intern.GetZobject(), it)
 		intern.SetCe(zend.Z_OBJCE_P(it))
 		intern.SetInnerIterator(intern.GetCe().GetGetIterator()(intern.GetCe(), it, 0))
 		SplDualItRewind(intern)
@@ -2403,10 +2401,10 @@ func zim_spl_AppendIterator_append(execute_data *zend.ZendExecuteData, return_va
 		return
 	}
 	if intern.GetUAppendIterator().GetFuncs().GetValid()(intern.GetUAppendIterator()) == zend.SUCCESS && SplDualItValid(intern) != zend.SUCCESS {
-		SplArrayIteratorAppend(&intern.GetZarrayit(), it)
+		SplArrayIteratorAppend(intern.GetZarrayit(), it)
 		intern.GetUAppendIterator().GetFuncs().GetMoveForward()(intern.GetUAppendIterator())
 	} else {
-		SplArrayIteratorAppend(&intern.GetZarrayit(), it)
+		SplArrayIteratorAppend(intern.GetZarrayit(), it)
 	}
 	if intern.GetInnerIterator() == nil || SplDualItValid(intern) != zend.SUCCESS {
 		if intern.GetUAppendIterator().GetFuncs().GetValid()(intern.GetUAppendIterator()) != zend.SUCCESS {
@@ -2414,7 +2412,7 @@ func zim_spl_AppendIterator_append(execute_data *zend.ZendExecuteData, return_va
 		}
 		for {
 			SplAppendItNextIterator(intern)
-			if zend.Z_OBJ(intern.GetZobject()) == zend.Z_OBJ_P(it) {
+			if intern.GetZobject().GetObj() == it.GetObj() {
 				break
 			}
 		}
@@ -2434,7 +2432,7 @@ func zim_spl_AppendIterator_current(execute_data *zend.ZendExecuteData, return_v
 	intern = it
 	SplDualItFetch(intern, 1)
 	if intern.GetData().GetType() != zend.IS_UNDEF {
-		var value *zend.Zval = &intern.GetData()
+		var value *zend.Zval = intern.GetData()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
 		zend.RETVAL_NULL()
@@ -2496,7 +2494,7 @@ func zim_spl_AppendIterator_getIteratorIndex(execute_data *zend.ZendExecuteData,
 	}
 	intern = it
 	APPENDIT_CHECK_CTOR(intern)
-	SplArrayIteratorKey(&intern.GetZarrayit(), return_value)
+	SplArrayIteratorKey(intern.GetZarrayit(), return_value)
 }
 func zim_spl_AppendIterator_getArrayIterator(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2510,7 +2508,7 @@ func zim_spl_AppendIterator_getArrayIterator(execute_data *zend.ZendExecuteData,
 		return
 	}
 	intern = it
-	value = &intern.GetZarrayit()
+	value = intern.GetZarrayit()
 	zend.ZVAL_COPY_DEREF(return_value, value)
 }
 func SplIteratorApply(obj *zend.Zval, apply_func SplIteratorApplyFuncT, puser any) int {
@@ -2566,7 +2564,7 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 		if zend.ExecutorGlobals.GetException() != nil {
 			return zend.ZEND_HASH_APPLY_STOP
 		}
-		zend.ArraySetZvalKey(zend.Z_ARRVAL_P(return_value), &key, data)
+		zend.ArraySetZvalKey(return_value.GetArr(), &key, data)
 		zend.ZvalPtrDtor(&key)
 	} else {
 		zend.Z_TRY_ADDREF_P(data)
@@ -2620,7 +2618,7 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 	var apply_info *SplIteratorApplyInfo = (*SplIteratorApplyInfo)(puser)
 	var result int
 	apply_info.GetCount()++
-	zend.ZendFcallInfoCall(&apply_info.GetFci(), &apply_info.GetFcc(), &retval, nil)
+	zend.ZendFcallInfoCall(apply_info.GetFci(), apply_info.GetFcc(), &retval, nil)
 	if zend.ZendIsTrue(&retval) != 0 {
 		result = zend.ZEND_HASH_APPLY_KEEP
 	} else {
@@ -2632,16 +2630,16 @@ func SplIteratorFuncApply(iter *zend.ZendObjectIterator, puser any) int {
 func ZifIteratorApply(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var apply_info SplIteratorApplyInfo
 	apply_info.SetArgs(nil)
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Of|a!", &apply_info.GetObj(), zend.ZendCeTraversable, &apply_info.GetFci(), &apply_info.GetFcc(), &apply_info.GetArgs()) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Of|a!", apply_info.GetObj(), zend.ZendCeTraversable, apply_info.GetFci(), apply_info.GetFcc(), apply_info.GetArgs()) == zend.FAILURE {
 		return
 	}
 	apply_info.SetCount(0)
-	zend.ZendFcallInfoArgs(&apply_info.GetFci(), apply_info.GetArgs())
+	zend.ZendFcallInfoArgs(apply_info.GetFci(), apply_info.GetArgs())
 	if SplIteratorApply(apply_info.GetObj(), SplIteratorFuncApply, any(&apply_info)) == zend.FAILURE {
-		zend.ZendFcallInfoArgs(&apply_info.GetFci(), nil)
+		zend.ZendFcallInfoArgs(apply_info.GetFci(), nil)
 		return
 	}
-	zend.ZendFcallInfoArgs(&apply_info.GetFci(), nil)
+	zend.ZendFcallInfoArgs(apply_info.GetFci(), nil)
 	zend.RETVAL_LONG(apply_info.GetCount())
 	return
 }
