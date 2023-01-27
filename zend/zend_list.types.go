@@ -13,13 +13,13 @@ type ZendRsrcListDtorsEntry struct {
 	resource_id   int
 }
 
-func (this ZendRsrcListDtorsEntry) GetListDtorEx() RsrcDtorFuncT        { return this.list_dtor_ex }
+func (this *ZendRsrcListDtorsEntry) GetListDtorEx() RsrcDtorFuncT       { return this.list_dtor_ex }
 func (this *ZendRsrcListDtorsEntry) SetListDtorEx(value RsrcDtorFuncT)  { this.list_dtor_ex = value }
-func (this ZendRsrcListDtorsEntry) GetPlistDtorEx() RsrcDtorFuncT       { return this.plist_dtor_ex }
+func (this *ZendRsrcListDtorsEntry) GetPlistDtorEx() RsrcDtorFuncT      { return this.plist_dtor_ex }
 func (this *ZendRsrcListDtorsEntry) SetPlistDtorEx(value RsrcDtorFuncT) { this.plist_dtor_ex = value }
-func (this ZendRsrcListDtorsEntry) GetTypeName() *byte                  { return this.type_name }
+func (this *ZendRsrcListDtorsEntry) GetTypeName() *byte                 { return this.type_name }
 func (this *ZendRsrcListDtorsEntry) SetTypeName(value *byte)            { this.type_name = value }
-func (this ZendRsrcListDtorsEntry) GetModuleNumber() int                { return this.module_number }
+func (this *ZendRsrcListDtorsEntry) GetModuleNumber() int               { return this.module_number }
 func (this *ZendRsrcListDtorsEntry) SetModuleNumber(value int)          { this.module_number = value }
-func (this ZendRsrcListDtorsEntry) GetResourceId() int                  { return this.resource_id }
+func (this *ZendRsrcListDtorsEntry) GetResourceId() int                 { return this.resource_id }
 func (this *ZendRsrcListDtorsEntry) SetResourceId(value int)            { this.resource_id = value }

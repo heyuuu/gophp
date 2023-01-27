@@ -10,7 +10,7 @@ type ZendWeakref struct {
 	std      ZendObject
 }
 
-func (this ZendWeakref) GetReferent() *ZendObject       { return this.referent }
+func (this *ZendWeakref) GetReferent() *ZendObject      { return this.referent }
 func (this *ZendWeakref) SetReferent(value *ZendObject) { this.referent = value }
-func (this ZendWeakref) GetStd() ZendObject             { return this.std }
+func (this *ZendWeakref) GetStd() ZendObject            { return this.std }
 func (this *ZendWeakref) SetStd(value ZendObject)       { this.std = value }

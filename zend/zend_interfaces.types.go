@@ -11,9 +11,9 @@ type ZendUserIterator struct {
 	value Zval
 }
 
-func (this ZendUserIterator) GetIt() ZendObjectIterator       { return this.it }
+func (this *ZendUserIterator) GetIt() ZendObjectIterator      { return this.it }
 func (this *ZendUserIterator) SetIt(value ZendObjectIterator) { this.it = value }
-func (this ZendUserIterator) GetCe() *ZendClassEntry          { return this.ce }
+func (this *ZendUserIterator) GetCe() *ZendClassEntry         { return this.ce }
 func (this *ZendUserIterator) SetCe(value *ZendClassEntry)    { this.ce = value }
-func (this ZendUserIterator) GetValue() Zval                  { return this.value }
+func (this *ZendUserIterator) GetValue() Zval                 { return this.value }
 func (this *ZendUserIterator) SetValue(value Zval)            { this.value = value }

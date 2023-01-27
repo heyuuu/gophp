@@ -10,7 +10,7 @@ type SpecialFormsT struct {
 	order int
 }
 
-func (this SpecialFormsT) GetName() *byte       { return this.name }
+func (this *SpecialFormsT) GetName() *byte      { return this.name }
 func (this *SpecialFormsT) SetName(value *byte) { this.name = value }
-func (this SpecialFormsT) GetOrder() int        { return this.order }
+func (this *SpecialFormsT) GetOrder() int       { return this.order }
 func (this *SpecialFormsT) SetOrder(value int)  { this.order = value }

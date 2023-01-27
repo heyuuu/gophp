@@ -16,15 +16,15 @@ type CharSet struct {
 	}
 }
 
-func (this CharSet) GetExclude() int       { return this.exclude }
+func (this *CharSet) GetExclude() int      { return this.exclude }
 func (this *CharSet) SetExclude(value int) { this.exclude = value }
-func (this CharSet) GetNchars() int        { return this.nchars }
+func (this *CharSet) GetNchars() int       { return this.nchars }
 func (this *CharSet) SetNchars(value int)  { this.nchars = value }
-func (this CharSet) GetChars() *byte       { return this.chars }
+func (this *CharSet) GetChars() *byte      { return this.chars }
 func (this *CharSet) SetChars(value *byte) { this.chars = value }
-func (this CharSet) GetNranges() int       { return this.nranges }
+func (this *CharSet) GetNranges() int      { return this.nranges }
 func (this *CharSet) SetNranges(value int) { this.nranges = value }
-func (this CharSet) GetRanges() *struct {
+func (this *CharSet) GetRanges() *struct {
 	start byte
 	end   byte
 } {

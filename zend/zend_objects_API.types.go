@@ -12,11 +12,11 @@ type ZendObjectsStore struct {
 	free_list_head int
 }
 
-func (this ZendObjectsStore) GetObjectBuckets() **ZendObject       { return this.object_buckets }
+func (this *ZendObjectsStore) GetObjectBuckets() **ZendObject      { return this.object_buckets }
 func (this *ZendObjectsStore) SetObjectBuckets(value **ZendObject) { this.object_buckets = value }
-func (this ZendObjectsStore) GetTop() uint32                       { return this.top }
+func (this *ZendObjectsStore) GetTop() uint32                      { return this.top }
 func (this *ZendObjectsStore) SetTop(value uint32)                 { this.top = value }
-func (this ZendObjectsStore) GetSize() uint32                      { return this.size }
+func (this *ZendObjectsStore) GetSize() uint32                     { return this.size }
 func (this *ZendObjectsStore) SetSize(value uint32)                { this.size = value }
-func (this ZendObjectsStore) GetFreeListHead() int                 { return this.free_list_head }
+func (this *ZendObjectsStore) GetFreeListHead() int                { return this.free_list_head }
 func (this *ZendObjectsStore) SetFreeListHead(value int)           { this.free_list_head = value }

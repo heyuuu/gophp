@@ -18,33 +18,33 @@ type ZendIniEntryDef struct {
 	modifiable   uint8
 }
 
-func (this ZendIniEntryDef) GetName() *byte       { return this.name }
+func (this *ZendIniEntryDef) GetName() *byte      { return this.name }
 func (this *ZendIniEntryDef) SetName(value *byte) { this.name = value }
-func (this ZendIniEntryDef) GetOnModify() func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func (this *ZendIniEntryDef) GetOnModify() func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	return this.on_modify
 }
 func (this *ZendIniEntryDef) SetOnModify(value func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int) {
 	this.on_modify = value
 }
-func (this ZendIniEntryDef) GetMhArg1() any        { return this.mh_arg1 }
+func (this *ZendIniEntryDef) GetMhArg1() any       { return this.mh_arg1 }
 func (this *ZendIniEntryDef) SetMhArg1(value any)  { this.mh_arg1 = value }
-func (this ZendIniEntryDef) GetMhArg2() any        { return this.mh_arg2 }
+func (this *ZendIniEntryDef) GetMhArg2() any       { return this.mh_arg2 }
 func (this *ZendIniEntryDef) SetMhArg2(value any)  { this.mh_arg2 = value }
-func (this ZendIniEntryDef) GetMhArg3() any        { return this.mh_arg3 }
+func (this *ZendIniEntryDef) GetMhArg3() any       { return this.mh_arg3 }
 func (this *ZendIniEntryDef) SetMhArg3(value any)  { this.mh_arg3 = value }
-func (this ZendIniEntryDef) GetValue() *byte       { return this.value }
+func (this *ZendIniEntryDef) GetValue() *byte      { return this.value }
 func (this *ZendIniEntryDef) SetValue(value *byte) { this.value = value }
-func (this ZendIniEntryDef) GetDisplayer() func(ini_entry *ZendIniEntry, type_ int) {
+func (this *ZendIniEntryDef) GetDisplayer() func(ini_entry *ZendIniEntry, type_ int) {
 	return this.displayer
 }
 func (this *ZendIniEntryDef) SetDisplayer(value func(ini_entry *ZendIniEntry, type_ int)) {
 	this.displayer = value
 }
-func (this ZendIniEntryDef) GetValueLength() uint32       { return this.value_length }
+func (this *ZendIniEntryDef) GetValueLength() uint32      { return this.value_length }
 func (this *ZendIniEntryDef) SetValueLength(value uint32) { this.value_length = value }
-func (this ZendIniEntryDef) GetNameLength() uint16        { return this.name_length }
+func (this *ZendIniEntryDef) GetNameLength() uint16       { return this.name_length }
 func (this *ZendIniEntryDef) SetNameLength(value uint16)  { this.name_length = value }
-func (this ZendIniEntryDef) GetModifiable() uint8         { return this.modifiable }
+func (this *ZendIniEntryDef) GetModifiable() uint8        { return this.modifiable }
 func (this *ZendIniEntryDef) SetModifiable(value uint8)   { this.modifiable = value }
 
 /**
@@ -65,37 +65,37 @@ type ZendIniEntry struct {
 	modified        uint8
 }
 
-func (this ZendIniEntry) GetName() *ZendString       { return this.name }
+func (this *ZendIniEntry) GetName() *ZendString      { return this.name }
 func (this *ZendIniEntry) SetName(value *ZendString) { this.name = value }
-func (this ZendIniEntry) GetOnModify() func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func (this *ZendIniEntry) GetOnModify() func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	return this.on_modify
 }
 func (this *ZendIniEntry) SetOnModify(value func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int) {
 	this.on_modify = value
 }
-func (this ZendIniEntry) GetMhArg1() any                  { return this.mh_arg1 }
+func (this *ZendIniEntry) GetMhArg1() any                 { return this.mh_arg1 }
 func (this *ZendIniEntry) SetMhArg1(value any)            { this.mh_arg1 = value }
-func (this ZendIniEntry) GetMhArg2() any                  { return this.mh_arg2 }
+func (this *ZendIniEntry) GetMhArg2() any                 { return this.mh_arg2 }
 func (this *ZendIniEntry) SetMhArg2(value any)            { this.mh_arg2 = value }
-func (this ZendIniEntry) GetMhArg3() any                  { return this.mh_arg3 }
+func (this *ZendIniEntry) GetMhArg3() any                 { return this.mh_arg3 }
 func (this *ZendIniEntry) SetMhArg3(value any)            { this.mh_arg3 = value }
-func (this ZendIniEntry) GetValue() *ZendString           { return this.value }
+func (this *ZendIniEntry) GetValue() *ZendString          { return this.value }
 func (this *ZendIniEntry) SetValue(value *ZendString)     { this.value = value }
-func (this ZendIniEntry) GetOrigValue() *ZendString       { return this.orig_value }
+func (this *ZendIniEntry) GetOrigValue() *ZendString      { return this.orig_value }
 func (this *ZendIniEntry) SetOrigValue(value *ZendString) { this.orig_value = value }
-func (this ZendIniEntry) GetDisplayer() func(ini_entry *ZendIniEntry, type_ int) {
+func (this *ZendIniEntry) GetDisplayer() func(ini_entry *ZendIniEntry, type_ int) {
 	return this.displayer
 }
 func (this *ZendIniEntry) SetDisplayer(value func(ini_entry *ZendIniEntry, type_ int)) {
 	this.displayer = value
 }
-func (this ZendIniEntry) GetModuleNumber() int           { return this.module_number }
+func (this *ZendIniEntry) GetModuleNumber() int          { return this.module_number }
 func (this *ZendIniEntry) SetModuleNumber(value int)     { this.module_number = value }
-func (this ZendIniEntry) GetModifiable() uint8           { return this.modifiable }
+func (this *ZendIniEntry) GetModifiable() uint8          { return this.modifiable }
 func (this *ZendIniEntry) SetModifiable(value uint8)     { this.modifiable = value }
-func (this ZendIniEntry) GetOrigModifiable() uint8       { return this.orig_modifiable }
+func (this *ZendIniEntry) GetOrigModifiable() uint8      { return this.orig_modifiable }
 func (this *ZendIniEntry) SetOrigModifiable(value uint8) { this.orig_modifiable = value }
-func (this ZendIniEntry) GetModified() uint8             { return this.modified }
+func (this *ZendIniEntry) GetModified() uint8            { return this.modified }
 func (this *ZendIniEntry) SetModified(value uint8)       { this.modified = value }
 
 /**
@@ -106,7 +106,7 @@ type ZendIniParserParam struct {
 	arg           any
 }
 
-func (this ZendIniParserParam) GetIniParserCb() ZendIniParserCbT       { return this.ini_parser_cb }
+func (this *ZendIniParserParam) GetIniParserCb() ZendIniParserCbT      { return this.ini_parser_cb }
 func (this *ZendIniParserParam) SetIniParserCb(value ZendIniParserCbT) { this.ini_parser_cb = value }
-func (this ZendIniParserParam) GetArg() any                            { return this.arg }
+func (this *ZendIniParserParam) GetArg() any                           { return this.arg }
 func (this *ZendIniParserParam) SetArg(value any)                      { this.arg = value }
