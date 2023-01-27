@@ -12,3 +12,7 @@ func FlagMatchNum[T integer](flags T, flag T) T { return flags & flag }
 func ForceCastPtr[T any, N integer](ptr N) *T {
 	return (*T)(unsafe.Pointer(uintptr(ptr)))
 }
+
+func ForceUintPtr[T any](ptr *T) uintptr {
+	return uintptr(unsafe.Pointer(ptr))
+}

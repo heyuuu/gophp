@@ -2,6 +2,11 @@
 
 package zend
 
+import (
+	"math"
+	b "sik/builtin"
+)
+
 // Source: <Zend/zend_types.h>
 
 /*
@@ -33,10 +38,10 @@ const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1
 )
-const ZEND_SIZE_MAX = SIZE_MAX
+const ZEND_SIZE_MAX = math.MaxUint
 
-type ZendIntptrT = intPtr
-type ZendUintptrT = uintPtr
+type ZendIntptrT = uintptr
+type ZendUintptrT = uintptr
 
 type CompareFuncT func(any, any) int
 type SwapFuncT func(any, any)
@@ -64,26 +69,28 @@ type CopyCtorFuncT func(pElement *Zval)
  * construction.
  */
 
-type ZendType = uintPtr
-type HashTable = ZendArray
+type ZendType uint // uintptr
 
-/*
- * HashTable Data Layout
- * =====================
- *
- *                 +=============================+
- *                 | HT_HASH(ht, ht->nTableMask) |
- *                 | ...                         |
- *                 | HT_HASH(ht, -1)             |
- *                 +-----------------------------+
- * ht->arData ---> | Bucket[0]                   |
- *                 | ...                         |
- *                 | Bucket[ht->nTableSize-1]    |
- *                 +=============================+
- */
+func (this ZendType) IsSet() bool { return this > 0x3 }
+func (this ZendType) IsCode() bool {
+	return this > 0x3 && this <= 0x3ff
+}
+func (this ZendType) IsClass() bool { return this > 0x3ff }
+func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
+func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
+func (this ZendType) Name() *ZendString {
+	var ptr = this &^ 0x3
+	return b.ForceCastPtr[ZendString](ptr)
+}
+func (this ZendType) Ce() *ZendClassEntry {
+	var ptr = this &^ 0x3
+	return b.ForceCastPtr[ZendClassEntry](ptr)
+}
+func (this ZendType) Code() int       { return this >> int64(2) }
+func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
 
-const HT_INVALID_IDX uint32 = uint32 - 1
-const HT_MIN_MASK uint32 = uint32 - 2
+const HT_INVALID_IDX uint32 = math.MaxUint32  // uint32(-1)
+const HT_MIN_MASK uint32 = math.MaxUint32 - 1 // uint32(-2)
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 
@@ -191,8 +198,6 @@ const IS_OBJ_FREE_CALLED = 1 << 9
 /* the following Z_OPT_* macros make better code when Z_TYPE_INFO accessed before */
 
 /* deprecated: (COPYABLE is the same as IS_ARRAY) */
-
-const ZEND_RC_DEBUG = 0
 
 /* ZVAL_COPY_OR_DUP() should be used instead of ZVAL_COPY() and ZVAL_DUP()
  * in all places where the source may be a persistent zval.

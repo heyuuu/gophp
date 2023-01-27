@@ -6,39 +6,37 @@ import (
 	b "sik/builtin"
 )
 
-func (this ZendType) IsSet() bool { return this > int64(0x3) }
-func (this ZendType) IsCode() bool {
-	return this > int64(0x3) && this <= int64(0x3ff)
-}
-func (this ZendType) IsClass() bool { return this > int64(0x3ff) }
-func (this ZendType) IsCe() bool    { return (this & int64(0x2)) != 0 }
-func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
-func (this ZendType) Name() *ZendString {
-	return (*ZendString)(this & ^(int64(0x3)))
-}
-func (this ZendType) Ce() *ZendClassEntry {
-	return (*ZendClassEntry)(this & ^(int64(0x3)))
-}
-func (this ZendType) Code() int             { return this >> int64(2) }
-func (this ZendType) AllowNull() bool       { return (this & int64(0x1)) != 0 }
-func ZEND_TYPE_WITHOUT_NULL(t __auto__) int { return t & ^(int64(0x1)) }
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) int {
-	return code<<int64(2) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
+	if allow_null != 0 {
+		return int(code)<<2 | 0x1
+	} else {
+		return int(code)<<2 | 0x0
+	}
 }
 func ZEND_TYPE_ENCODE_CE(ce *ZendClassEntry, allow_null bool) int {
-	return uintPtr(ce) | b.CondF(allow_null, func() __auto__ { return int64(0x3) }, func() __auto__ { return int64(0x2) })
+	var ptr = b.ForceUintPtr(ce)
+	if allow_null {
+		return int(ptr)<<2 | 0x3
+	} else {
+		return int(ptr)<<2 | 0x2
+	}
 }
 func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) int {
-	return uintPtr(class_name) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
+	var ptr = b.ForceUintPtr(class_name)
+	if allow_null != 0 {
+		return int(ptr)<<2 | 0x1
+	} else {
+		return int(ptr)<<2 | 0x0
+	}
 }
-func ZEND_TYPE_ENCODE_CLASS_CONST_0(class_name __auto__) ZendType { return ZendType(class_name) }
-func ZEND_TYPE_ENCODE_CLASS_CONST_1(class_name string) ZendType   { return ZendType("?" + class_name) }
 func ZEND_TYPE_ENCODE_CLASS_CONST_Q2(macro __auto__, class_name string) __auto__ {
 	return macro(class_name)
 }
+
 func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) __auto__ {
 	return ZEND_TYPE_ENCODE_CLASS_CONST_Q2(ZEND_TYPE_ENCODE_CLASS_CONST_allow_null, class_name)
 }
+
 func HT_HASH_TO_BUCKET_EX(data *Bucket, idx uint32) __auto__ { return data + idx }
 func HT_IDX_TO_HASH(idx __auto__) __auto__                   { return idx }
 func HT_HASH_TO_IDX(idx uint32) uint32                       { return idx }
@@ -83,44 +81,24 @@ func ZEND_PROPERTY_INFO_SOURCE_TO_LIST(list uintPtr) *ZendPropertyInfoList {
 	return (*ZendPropertyInfoList)(list & ^0x1)
 }
 func ZEND_PROPERTY_INFO_SOURCE_IS_LIST(list uintPtr) int { return list & 0x1 }
-func ZvalGetType(pz *Zval) ZendUchar                     { return pz.GetType() }
 func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 	return faketype == realtype || faketype == _IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
-func Z_TYPE(zval Zval) ZendUchar                       { return zval.GetType() }
-func Z_TYPE_P(zval_p *Zval) ZendUchar                  { return zval_p.GetType() }
-func Z_TYPE_FLAGS(zval Zval) ZendUchar                 { return zval.GetTypeFlags() }
 func Z_TYPE_FLAGS_P(zval_p *Zval) ZendUchar            { return zval_p.GetTypeFlags() }
-func Z_TYPE_INFO(zval Zval) uint32                     { return zval.GetTypeInfo() }
 func Z_TYPE_INFO_P(zval_p *Zval) uint32                { return zval_p.GetTypeInfo() }
-func Z_NEXT(zval Zval) uint32                          { return zval.GetNext() }
-func Z_NEXT_P(zval_p *Zval) uint32                     { return zval_p.GetNext() }
-func Z_CACHE_SLOT(zval Zval) uint32                    { return zval.GetCacheSlot() }
 func Z_CACHE_SLOT_P(zval_p *Zval) uint32               { return zval_p.GetCacheSlot() }
-func Z_LINENO(zval Zval) uint32                        { return zval.GetLineno() }
 func Z_LINENO_P(zval_p *Zval) uint32                   { return zval_p.GetLineno() }
-func Z_OPLINE_NUM(zval Zval) uint32                    { return zval.GetOplineNum() }
 func Z_OPLINE_NUM_P(zval_p *Zval) uint32               { return zval_p.GetOplineNum() }
-func Z_FE_POS(zval Zval) uint32                        { return zval.GetFePos() }
-func Z_FE_POS_P(zval_p *Zval) uint32                   { return zval_p.GetFePos() }
-func Z_FE_ITER(zval Zval) uint32                       { return zval.GetFeIterIdx() }
 func Z_FE_ITER_P(zval_p *Zval) uint32                  { return zval_p.GetFeIterIdx() }
-func Z_ACCESS_FLAGS(zval Zval) uint32                  { return zval.GetAccessFlags() }
 func Z_ACCESS_FLAGS_P(zval_p *Zval) uint32             { return zval_p.GetAccessFlags() }
-func Z_PROPERTY_GUARD(zval Zval) uint32                { return zval.GetPropertyGuard() }
 func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32           { return zval_p.GetPropertyGuard() }
-func Z_CONSTANT_FLAGS(zval Zval) uint32                { return zval.GetConstantFlags() }
-func Z_CONSTANT_FLAGS_P(zval_p *Zval) uint32           { return zval_p.GetConstantFlags() }
-func Z_EXTRA(zval Zval) uint32                         { return zval.GetU2Extra() }
 func Z_EXTRA_P(zval_p *Zval) uint32                    { return zval_p.GetU2Extra() }
-func Z_COUNTED(zval Zval) *ZendRefcounted              { return zval.GetCounted() }
 func Z_COUNTED_P(zval_p *Zval) *ZendRefcounted         { return zval_p.GetCounted() }
 func GC_REFCOUNT(p *HashTable) uint32                  { return p.GetGc().GetRefcount() }
 func GC_SET_REFCOUNT(p __auto__, rc uint32) uint32     { return ZendGcSetRefcount(p.gc, rc) }
 func GC_ADDREF(p *ZendResource) uint32                 { return ZendGcAddref(p.GetGc()) }
 func GC_DELREF(p *HashTable) uint32                    { return ZendGcDelref(p.GetGc()) }
 func GC_ADDREF_EX(p *ZendRefcounted, rc uint32) uint32 { return ZendGcAddrefEx(p.GetGc(), rc) }
-func GC_DELREF_EX(p __auto__, rc uint32) uint32        { return ZendGcDelrefEx(p.gc, rc) }
 func ZvalGcType(gc_type_info uint32) ZendUchar         { return gc_type_info & GC_TYPE_MASK }
 func ZvalGcFlags(gc_type_info uint32) uint32 {
 	return gc_type_info >> GC_FLAGS_SHIFT & GC_FLAGS_MASK >> GC_FLAGS_SHIFT
@@ -176,15 +154,11 @@ func Z_REFCOUNTED_P(zval_p *Zval) bool { return Z_REFCOUNTED(*zval_p) }
 func Z_COLLECTABLE(zval Zval) bool {
 	return zval.HasTypeFlags(IS_TYPE_COLLECTABLE)
 }
-func Z_COLLECTABLE_P(zval_p *Zval) bool   { return Z_COLLECTABLE(*zval_p) }
-func Z_COPYABLE(zval __auto__) bool       { return zval.u1.v.type_ == IS_ARRAY }
-func Z_COPYABLE_P(zval_p __auto__) bool   { return Z_COPYABLE(*zval_p) }
-func Z_IMMUTABLE(zval Zval) bool          { return zval.GetTypeInfo() == IS_ARRAY }
-func Z_IMMUTABLE_P(zval_p *Zval) bool     { return Z_IMMUTABLE(*zval_p) }
-func Z_OPT_IMMUTABLE(zval __auto__) bool  { return Z_IMMUTABLE(zval_p) }
-func Z_OPT_IMMUTABLE_P(zval_p *Zval) bool { return Z_IMMUTABLE(*zval_p) }
-func Z_OPT_TYPE(zval Zval) int            { return zval.GetTypeInfo() & Z_TYPE_MASK }
-func Z_OPT_TYPE_P(zval_p *Zval) int       { return Z_OPT_TYPE(*zval_p) }
+func Z_COLLECTABLE_P(zval_p *Zval) bool { return Z_COLLECTABLE(*zval_p) }
+func Z_COPYABLE(zval Zval) bool         { return zval.u1.v.type_ == IS_ARRAY }
+func Z_IMMUTABLE(zval Zval) bool        { return zval.GetTypeInfo() == IS_ARRAY }
+func Z_OPT_TYPE(zval Zval) int          { return zval.GetTypeInfo() & Z_TYPE_MASK }
+func Z_OPT_TYPE_P(zval_p *Zval) int     { return Z_OPT_TYPE(*zval_p) }
 func Z_OPT_CONSTANT(zval Zval) bool {
 	return Z_OPT_TYPE(zval) == IS_CONSTANT_AST
 }
@@ -201,8 +175,8 @@ func Z_ISREF(zval Zval) bool                           { return zval.IsType(IS_R
 func Z_ISREF_P(zval_p *Zval) bool                      { return Z_ISREF(*zval_p) }
 func Z_ISUNDEF(zval Zval) bool                         { return zval.IsType(IS_UNDEF) }
 func Z_ISUNDEF_P(zval_p *Zval) bool                    { return Z_ISUNDEF(*zval_p) }
-func Z_ISNULL(zval __auto__) bool                      { return zval.u1.v.type_ == IS_NULL }
-func Z_ISNULL_P(zval_p __auto__) bool                  { return Z_ISNULL(*zval_p) }
+func Z_ISNULL(zval Zval) bool                          { return zval.u1.v.type_ == IS_NULL }
+func Z_ISNULL_P(zval_p *Zval) bool                     { return Z_ISNULL(*zval_p) }
 func Z_ISERROR(zval Zval) bool                         { return zval.IsType(_IS_ERROR) }
 func Z_ISERROR_P(zval_p *Zval) bool                    { return Z_ISERROR(*zval_p) }
 func Z_LVAL(zval Zval) ZendLong                        { return zval.GetLval() }
@@ -463,23 +437,19 @@ func ZendGcSetRefcount(p *ZendRefcountedH, rc uint32) uint32 {
 	return p.GetRefcount()
 }
 func ZendGcAddref(p *ZendRefcountedH) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.GetRefcount()++
 	return p.GetRefcount()
 }
 func ZendGcDelref(p *ZendRefcountedH) uint32 {
 	ZEND_ASSERT(p.GetRefcount() > 0)
-	ZEND_RC_MOD_CHECK(p)
 	p.GetRefcount()--
 	return p.GetRefcount()
 }
 func ZendGcAddrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.SetRefcount(p.GetRefcount() + rc)
 	return p.GetRefcount()
 }
 func ZendGcDelrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.SetRefcount(p.GetRefcount() - rc)
 	return p.GetRefcount()
 }

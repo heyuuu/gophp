@@ -20,9 +20,16 @@ func (this *ZendRefcountedH) SetTypeInfo(value uint32) { this.u.type_info = valu
 /**
  * ZendRefcounted
  */
-type ZendRefcounted struct {
+type ZendRefcounted interface {
+	GetGc() ZendRefcountedH
+	SetGc(value ZendRefcountedH)
+}
+
+type baseZendRefcounted struct {
 	gc ZendRefcountedH
 }
 
-func (this ZendRefcounted) GetGc() ZendRefcountedH       { return this.gc }
-func (this *ZendRefcounted) SetGc(value ZendRefcountedH) { this.gc = value }
+var _ ZendRefcounted = &baseZendRefcounted{}
+
+func (this *baseZendRefcounted) GetGc() ZendRefcountedH      { return this.gc }
+func (this *baseZendRefcounted) SetGc(value ZendRefcountedH) { this.gc = value }
