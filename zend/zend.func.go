@@ -154,7 +154,7 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 			if _z.IsType(IS_INDIRECT) {
-				_z = Z_INDIRECT_P(_z)
+				_z = _z.GetZv()
 			}
 			if _z.IsType(IS_UNDEF) {
 				continue
@@ -212,7 +212,7 @@ func PrintFlatHash(ht *HashTable) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 			if _z.IsType(IS_INDIRECT) {
-				_z = Z_INDIRECT_P(_z)
+				_z = _z.GetZv()
 			}
 			if _z.IsType(IS_UNDEF) {
 				continue
@@ -257,33 +257,33 @@ func ZendPrintFlatZvalR(expr *Zval) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(Z_ARRVAL_P(expr)) != 0 {
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				ZEND_PUTS(" *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(Z_ARRVAL_P(expr))
+			GC_PROTECT_RECURSION(expr.GetArr())
 		}
-		PrintFlatHash(Z_ARRVAL_P(expr))
+		PrintFlatHash(expr.GetArr())
 		ZEND_PUTS(")")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(Z_ARRVAL_P(expr))
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break
 	case IS_OBJECT:
 		var properties *HashTable
-		var class_name *ZendString = Z_OBJ_HANDLER_P(expr, get_class_name)(Z_OBJ_P(expr))
+		var class_name *ZendString = Z_OBJ_HANDLER_P(expr, get_class_name)(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
 		ZendStringReleaseEx(class_name, 0)
-		if GC_IS_RECURSIVE(Z_COUNTED_P(expr)) != 0 {
+		if GC_IS_RECURSIVE(expr.GetCounted()) != 0 {
 			ZEND_PUTS(" *RECURSION*")
 			return
 		}
 		properties = Z_OBJPROP_P(expr)
 		if properties != nil {
-			GC_PROTECT_RECURSION(Z_OBJ_P(expr))
+			GC_PROTECT_RECURSION(expr.GetObj())
 			PrintFlatHash(properties)
-			GC_UNPROTECT_RECURSION(Z_OBJ_P(expr))
+			GC_UNPROTECT_RECURSION(expr.GetObj())
 		}
 		ZEND_PUTS(")")
 		break
@@ -299,44 +299,44 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		SmartStrAppends(buf, "Array\n")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(Z_ARRVAL_P(expr)) != 0 {
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				SmartStrAppends(buf, " *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(Z_ARRVAL_P(expr))
+			GC_PROTECT_RECURSION(expr.GetArr())
 		}
-		PrintHash(buf, Z_ARRVAL_P(expr), indent, 0)
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(Z_ARRVAL_P(expr))
+		PrintHash(buf, expr.GetArr(), indent, 0)
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break
 	case IS_OBJECT:
 		var properties *HashTable
-		var class_name *ZendString = Z_OBJ_HANDLER_P(expr, get_class_name)(Z_OBJ_P(expr))
+		var class_name *ZendString = Z_OBJ_HANDLER_P(expr, get_class_name)(expr.GetObj())
 		SmartStrAppends(buf, class_name.GetVal())
 		ZendStringReleaseEx(class_name, 0)
 		SmartStrAppends(buf, " Object\n")
-		if GC_IS_RECURSIVE(Z_OBJ_P(expr)) != 0 {
+		if GC_IS_RECURSIVE(expr.GetObj()) != 0 {
 			SmartStrAppends(buf, " *RECURSION*")
 			return
 		}
 		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
 			break
 		}
-		GC_PROTECT_RECURSION(Z_OBJ_P(expr))
+		GC_PROTECT_RECURSION(expr.GetObj())
 		PrintHash(buf, properties, indent, 1)
-		GC_UNPROTECT_RECURSION(Z_OBJ_P(expr))
+		GC_UNPROTECT_RECURSION(expr.GetObj())
 		ZendReleaseProperties(properties)
 		break
 	case IS_LONG:
-		SmartStrAppendLong(buf, Z_LVAL_P(expr))
+		SmartStrAppendLong(buf, expr.GetLval())
 		break
 	case IS_REFERENCE:
 		ZendPrintZvalRToBuf(buf, Z_REFVAL_P(expr), indent)
 		break
 	case IS_STRING:
-		SmartStrAppend(buf, Z_STR_P(expr))
+		SmartStrAppend(buf, expr.GetStr())
 		break
 	default:
 		var str *ZendString = ZvalGetStringFunc(expr)
@@ -383,7 +383,7 @@ func ZendInitCallTrampolineOp() {
 	ExecutorGlobals.GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
 	ZEND_VM_SET_OPCODE_HANDLER(&(ExecutorGlobals.GetCallTrampolineOp()))
 }
-func AutoGlobalDtor(zv *Zval) { Free(Z_PTR_P(zv)) }
+func AutoGlobalDtor(zv *Zval) { Free(zv.GetPtr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
@@ -391,7 +391,7 @@ func PhpScannerGlobalsCtor(scanner_globals_p *ZendPhpScannerGlobals) {
 	memset(scanner_globals_p, 0, b.SizeOf("* scanner_globals_p"))
 }
 func ModuleDestructorZval(zv *Zval) {
-	var module *ZendModuleEntry = (*ZendModuleEntry)(Z_PTR_P(zv))
+	var module *ZendModuleEntry = (*ZendModuleEntry)(zv.GetPtr())
 	ModuleDestructor(module)
 	Free(module)
 }
@@ -401,7 +401,7 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
 	ZVAL_ARR(&globals, &(ExecutorGlobals.GetSymbolTable()))
-	Z_TYPE_FLAGS_P(&globals) = 0
+	globals.SetTypeFlags(0)
 	ZVAL_NEW_REF(&globals, &globals)
 	ExecutorGlobals.GetSymbolTable().Update(name, &globals)
 	return 0
@@ -496,7 +496,7 @@ func ZendResolvePropertyTypes() {
 			if _z.IsType(IS_UNDEF) {
 				continue
 			}
-			ce = Z_PTR_P(_z)
+			ce = _z.GetPtr()
 			if ce.GetType() != ZEND_INTERNAL_CLASS {
 				continue
 			}
@@ -511,7 +511,7 @@ func ZendResolvePropertyTypes() {
 						if _z.IsType(IS_UNDEF) {
 							continue
 						}
-						prop_info = Z_PTR_P(_z)
+						prop_info = _z.GetPtr()
 						if prop_info.GetType().IsName() {
 							var type_name *ZendString = prop_info.GetType().Name()
 							var lc_type_name *ZendString = ZendStringTolower(type_name)

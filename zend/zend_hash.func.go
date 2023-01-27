@@ -31,8 +31,8 @@ func (this *HashTable) DecIteratorsCount() {
 }
 func ZVAL_EMPTY_ARRAY(z *Zval) {
 	var __z *Zval = z
-	Z_ARR_P(__z) = (*ZendArray)(&ZendEmptyArray)
-	Z_TYPE_INFO_P(__z) = IS_ARRAY
+	__z.SetArr((*ZendArray)(&ZendEmptyArray))
+	__z.SetTypeInfo(IS_ARRAY)
 }
 func (this *HashTable) Init(nSize uint32, pHashFunction __auto__, pDestructor DtorFuncT, persistent ZendBool) {
 	this._init(nSize, pDestructor, persistent)
@@ -142,7 +142,7 @@ func (this *HashTable) FindInd(key *ZendString) *Zval {
 	zv = this.Find(key)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return Z_INDIRECT_P(zv)
+			return zv.GetZv()
 		} else {
 			return nil
 		}
@@ -155,7 +155,7 @@ func (this *HashTable) FindExInd(key *ZendString, known_hash ZendBool) *Zval {
 	zv = this.FindEx(key, known_hash)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return Z_INDIRECT_P(zv)
+			return zv.GetZv()
 		} else {
 			return nil
 		}
@@ -173,7 +173,7 @@ func (this *HashTable) StrFindInd(str *byte, len_ int) *Zval {
 	zv = this.StrFind(str, len_)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return Z_INDIRECT_P(zv)
+			return zv.GetZv()
 		} else {
 			return nil
 		}
@@ -312,7 +312,7 @@ func (this *HashTable) AddPtr(key *ZendString, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.Add(key, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -323,7 +323,7 @@ func (this *HashTable) AddNewPtr(key *ZendString, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.AddNew(key, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -334,7 +334,7 @@ func (this *HashTable) StrAddPtr(str *byte, len_ int, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.StrAdd(str, len_, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -345,7 +345,7 @@ func (this *HashTable) StrAddNewPtr(str *byte, len_ int, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.StrAddNew(str, len_, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -355,23 +355,23 @@ func (this *HashTable) UpdatePtr(key *ZendString, pData any) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
 	zv = this.Update(key, &tmp)
-	return Z_PTR_P(zv)
+	return zv.GetPtr()
 }
 func (this *HashTable) StrUpdatePtr(str *byte, len_ int, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
 	zv = this.StrUpdate(str, len_, &tmp)
-	return Z_PTR_P(zv)
+	return zv.GetPtr()
 }
 func (this *HashTable) AddMem(key *ZendString, pData any, size int) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.Add(key, &tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -380,9 +380,9 @@ func (this *HashTable) AddNewMem(key *ZendString, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.AddNew(key, &tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -391,9 +391,9 @@ func (this *HashTable) StrAddMem(str *byte, len_ int, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.StrAdd(str, len_, &tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -402,9 +402,9 @@ func (this *HashTable) StrAddNewMem(str *byte, len_ int, pData any, size int) an
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.StrAddNew(str, len_, &tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -426,7 +426,7 @@ func (this *HashTable) IndexAddPtr(h ZendUlong, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.IndexAdd(h, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -437,7 +437,7 @@ func (this *HashTable) IndexAddNewPtr(h ZendUlong, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.IndexAddNew(h, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -447,16 +447,16 @@ func (this *HashTable) IndexUpdatePtr(h ZendUlong, pData any) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
 	zv = this.IndexUpdate(h, &tmp)
-	return Z_PTR_P(zv)
+	return zv.GetPtr()
 }
 func (this *HashTable) IndexAddMem(h ZendUlong, pData any, size int) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.IndexAdd(h, &tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -466,7 +466,7 @@ func (this *HashTable) NextIndexInsertPtr(pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = this.NextIndexInsert(&tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -482,9 +482,9 @@ func (this *HashTable) NextIndexInsertMem(pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, this.NextIndexInsert(&tmp)) {
-		Z_PTR_P(zv) = Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT)
-		memcpy(Z_PTR_P(zv), pData, size)
-		return Z_PTR_P(zv)
+		zv.SetPtr(Pemalloc(size, GC_FLAGS(this)&IS_ARRAY_PERSISTENT))
+		memcpy(zv.GetPtr(), pData, size)
+		return zv.GetPtr()
 	}
 	return nil
 }
@@ -492,7 +492,7 @@ func (this *HashTable) FindPtr(key *ZendString) any {
 	var zv *Zval
 	zv = this.Find(key)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -501,7 +501,7 @@ func (this *HashTable) FindExPtr(key *ZendString, known_hash ZendBool) any {
 	var zv *Zval
 	zv = this.FindEx(key, known_hash)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -510,7 +510,7 @@ func (this *HashTable) StrFindPtr(str string, len_ int) any {
 	var zv *Zval
 	zv = this.StrFind(str, len_)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -519,7 +519,7 @@ func (this *HashTable) IndexFindPtr(h ZendUlong) any {
 	var zv *Zval
 	zv = this.IndexFind(h)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -557,7 +557,7 @@ func (this *HashTable) GetCurrentDataPtrEx(pos *HashPosition) any {
 	var zv *Zval
 	zv = this.GetCurrentDataEx(pos)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -970,7 +970,7 @@ func ZendHashIteratorPos(idx uint32, ht *HashTable) HashPosition {
 	return iter.GetPos()
 }
 func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
-	var ht *HashTable = Z_ARRVAL_P(array)
+	var ht *HashTable = array.GetArr()
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators() + idx
 	ZEND_ASSERT(idx != uint32-1)
 	if iter.GetHt() != ht {
@@ -978,7 +978,7 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 			iter.GetHt().DecIteratorsCount()
 		}
 		SEPARATE_ARRAY(array)
-		ht = Z_ARRVAL_P(array)
+		ht = array.GetArr()
 		if !(ht.IteratorsOverflow()) {
 			ht.IncIteratorsCount()
 		}
@@ -1158,7 +1158,7 @@ func (this *HashTable) _addOrUpdateI(key *ZendString, pData *Zval, flag uint32) 
 				ZEND_ASSERT(p.GetVal() != pData)
 				data = p.GetVal()
 				if data.IsType(IS_INDIRECT) {
-					data = Z_INDIRECT_P(data)
+					data = data.GetZv()
 					if data.GetType() != IS_UNDEF {
 						return nil
 					}
@@ -1169,7 +1169,7 @@ func (this *HashTable) _addOrUpdateI(key *ZendString, pData *Zval, flag uint32) 
 				ZEND_ASSERT(p.GetVal() != pData)
 				data = p.GetVal()
 				if (flag&HASH_UPDATE_INDIRECT) != 0 && data.IsType(IS_INDIRECT) {
-					data = Z_INDIRECT_P(data)
+					data = data.GetZv()
 				}
 			}
 			if this.GetPDestructor() != nil {
@@ -1227,7 +1227,7 @@ func (this *HashTable) _strAddOrUpdateI(str *byte, len_ int, h ZendUlong, pData 
 				ZEND_ASSERT(p.GetVal() != pData)
 				data = p.GetVal()
 				if data.IsType(IS_INDIRECT) {
-					data = Z_INDIRECT_P(data)
+					data = data.GetZv()
 					if data.GetType() != IS_UNDEF {
 						return nil
 					}
@@ -1238,7 +1238,7 @@ func (this *HashTable) _strAddOrUpdateI(str *byte, len_ int, h ZendUlong, pData 
 				ZEND_ASSERT(p.GetVal() != pData)
 				data = p.GetVal()
 				if (flag&HASH_UPDATE_INDIRECT) != 0 && data.IsType(IS_INDIRECT) {
-					data = Z_INDIRECT_P(data)
+					data = data.GetZv()
 				}
 			}
 			if this.GetPDestructor() != nil {
@@ -2225,7 +2225,7 @@ func (this *HashTable) Copy(source *HashTable, pCopyConstructor CopyCtorFuncT) {
 
 		data = p.GetVal()
 		if data.IsType(IS_INDIRECT) {
-			data = Z_INDIRECT_P(data)
+			data = data.GetZv()
 			if data.IsType(IS_UNDEF) {
 				continue
 			}
@@ -2243,19 +2243,19 @@ func (this *HashTable) Copy(source *HashTable, pCopyConstructor CopyCtorFuncT) {
 func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bucket, q *Bucket, packed int, static_keys int, with_holes int) int {
 	var data *Zval = p.GetVal()
 	if with_holes != 0 {
-		if packed == 0 && Z_TYPE_INFO_P(data) == IS_INDIRECT {
-			data = Z_INDIRECT_P(data)
+		if packed == 0 && data.GetTypeInfo() == IS_INDIRECT {
+			data = data.GetZv()
 		}
-		if Z_TYPE_INFO_P(data) == IS_UNDEF {
+		if data.GetTypeInfo() == IS_UNDEF {
 			return 0
 		}
 	} else if packed == 0 {
 
 		/* INDIRECT element may point to UNDEF-ined slots */
 
-		if Z_TYPE_INFO_P(data) == IS_INDIRECT {
-			data = Z_INDIRECT_P(data)
-			if Z_TYPE_INFO_P(data) == IS_UNDEF {
+		if data.GetTypeInfo() == IS_INDIRECT {
+			data = data.GetZv()
+			if data.GetTypeInfo() == IS_UNDEF {
 				return 0
 			}
 		}
@@ -2265,7 +2265,7 @@ func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bu
 	}
 	for {
 		if Z_OPT_REFCOUNTED_P(data) {
-			if Z_ISREF_P(data) && Z_REFCOUNT_P(data) == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_ARRVAL_P(Z_REFVAL_P(data)) != source) {
+			if Z_ISREF_P(data) && Z_REFCOUNT_P(data) == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_REFVAL_P(data).GetArr() != source) {
 				data = Z_REFVAL_P(data)
 				if !(Z_OPT_REFCOUNTED_P(data)) {
 					break
@@ -2426,7 +2426,7 @@ func (this *HashTable) Merge(source *HashTable, pCopyConstructor CopyCtorFuncT, 
 			p = source.GetArData() + idx
 			s = p.GetVal()
 			if s.IsType(IS_INDIRECT) {
-				s = Z_INDIRECT_P(s)
+				s = s.GetZv()
 			}
 			if s.IsType(IS_UNDEF) {
 				continue
@@ -2448,7 +2448,7 @@ func (this *HashTable) Merge(source *HashTable, pCopyConstructor CopyCtorFuncT, 
 			p = source.GetArData() + idx
 			s = p.GetVal()
 			if s.IsType(IS_INDIRECT) {
-				s = Z_INDIRECT_P(s)
+				s = s.GetZv()
 			}
 			if s.IsType(IS_UNDEF) {
 				continue
@@ -2827,10 +2827,10 @@ func (this *HashTable) CompareImpl(ht2 *HashTable, compar CompareFuncT, ordered 
 		}
 		pData1 = p1.GetVal()
 		if pData1.IsType(IS_INDIRECT) {
-			pData1 = Z_INDIRECT_P(pData1)
+			pData1 = pData1.GetZv()
 		}
 		if pData2.IsType(IS_INDIRECT) {
-			pData2 = Z_INDIRECT_P(pData2)
+			pData2 = pData2.GetZv()
 		}
 		if pData1.IsType(IS_UNDEF) {
 			if pData2.GetType() != IS_UNDEF {
@@ -3051,7 +3051,7 @@ convert:
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 			if _z.IsType(IS_INDIRECT) {
-				_z = Z_INDIRECT_P(_z)
+				_z = _z.GetZv()
 			}
 			if _z.IsType(IS_UNDEF) {
 				continue

@@ -28,7 +28,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 	}
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {
-		fci.SetObject(Z_OBJ_P(object))
+		fci.SetObject(object.GetObj())
 	} else {
 		fci.SetObject(nil)
 	}
@@ -99,7 +99,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 			}
 		}
 		if object != nil {
-			fcic.SetObject(Z_OBJ_P(object))
+			fcic.SetObject(object.GetObj())
 		} else {
 			fcic.SetObject(nil)
 		}
@@ -202,7 +202,7 @@ func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendOb
 	iterator = Emalloc(b.SizeOf("zend_user_iterator"))
 	ZendIteratorInit((*ZendObjectIterator)(iterator))
 	Z_ADDREF_P(object)
-	ZVAL_OBJ(iterator.GetIt().GetData(), Z_OBJ_P(object))
+	ZVAL_OBJ(iterator.GetIt().GetData(), object.GetObj())
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
 	iterator.SetCe(Z_OBJCE_P(object))
 	ZVAL_UNDEF(iterator.GetValue())
@@ -218,7 +218,7 @@ func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 	} else {
 		ce_it = nil
 	}
-	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == Z_OBJ_P(object) {
+	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == object.GetObj() {
 		if ExecutorGlobals.GetException() == nil {
 			ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return Z_OBJCE_P(object).GetName().GetVal() }))
 		}

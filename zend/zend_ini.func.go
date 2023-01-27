@@ -38,7 +38,7 @@ func REGISTER_INI_BOOLEAN(name *byte) int {
 	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
 }
 func ZendRemoveIniEntries(el *Zval, arg any) int {
-	var ini_entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(el))
+	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	return ini_entry.GetModuleNumber() == module_number
 }
@@ -85,7 +85,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 	return 0
 }
 func FreeIniEntry(zv *Zval) {
-	var entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(zv))
+	var entry *ZendIniEntry = (*ZendIniEntry)(zv.GetPtr())
 	ZendStringReleaseEx(entry.GetName(), 1)
 	if entry.GetValue() != nil {
 		ZendStringRelease(entry.GetValue())
@@ -129,7 +129,7 @@ func ZendIniDeactivate() int {
 				if _z.IsType(IS_UNDEF) {
 					continue
 				}
-				ini_entry = Z_PTR_P(_z)
+				ini_entry = _z.GetPtr()
 				ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
 			}
 			break
@@ -188,8 +188,8 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 			ZendUnregisterIniEntries(module_number)
 			return FAILURE
 		}
-		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, Z_STR_P(default_value), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
-			p.SetValue(ZendNewInternedString(ZendStringCopy(Z_STR_P(default_value))))
+		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, default_value.GetStr(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
+			p.SetValue(ZendNewInternedString(ZendStringCopy(default_value.GetStr())))
 		} else {
 			if ini_entry.GetValue() != nil {
 				p.SetValue(ZendStringInitInterned(ini_entry.GetValue(), ini_entry.GetValueLength(), 1))

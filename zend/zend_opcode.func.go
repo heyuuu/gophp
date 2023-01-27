@@ -74,7 +74,7 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 	}
 }
 func ZendFunctionDtor(zv *Zval) {
-	var function *ZendFunction = Z_PTR_P(zv)
+	var function *ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_USER_FUNCTION {
 		ZEND_ASSERT(function.GetFunctionName() != nil)
 		DestroyOpArray(function.GetOpArray())
@@ -109,7 +109,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(Z_REF_P(p))
+						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(p.GetRef())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -125,7 +125,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-static_members == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
 									break
 								}
 							}
@@ -149,7 +149,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(Z_REF_P(p))
+						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(p.GetRef())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -165,7 +165,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-static_members == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
 									break
 								}
 							}
@@ -221,7 +221,7 @@ func _destroyZendClassTraitsInfo(ce *ZendClassEntry) {
 }
 func DestroyZendClass(zv *Zval) {
 	var prop_info *ZendPropertyInfo
-	var ce *ZendClassEntry = Z_PTR_P(zv)
+	var ce *ZendClassEntry = zv.GetPtr()
 	var fn *ZendFunction
 	if ce.HasCeFlags(ZEND_ACC_IMMUTABLE | ZEND_ACC_PRELOADED) {
 		var op_array *ZendOpArray
@@ -239,7 +239,7 @@ func DestroyZendClass(zv *Zval) {
 					if _z.IsType(IS_UNDEF) {
 						continue
 					}
-					op_array = Z_PTR_P(_z)
+					op_array = _z.GetPtr()
 					if op_array.GetType() == ZEND_USER_FUNCTION {
 						DestroyOpArray(op_array)
 					}
@@ -272,7 +272,7 @@ func DestroyZendClass(zv *Zval) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(Z_REF_P(p))
+						var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(p.GetRef())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -288,7 +288,7 @@ func DestroyZendClass(zv *Zval) {
 							for ; _prop < _end; _prop++ {
 								prop_info = *_prop
 								if prop_info.GetCe() == ce && p-ce.GetDefaultStaticMembersTable() == prop_info.GetOffset() {
-									ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info)
+									ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
 									break
 								}
 							}
@@ -311,7 +311,7 @@ func DestroyZendClass(zv *Zval) {
 				if _z.IsType(IS_UNDEF) {
 					continue
 				}
-				prop_info = Z_PTR_P(_z)
+				prop_info = _z.GetPtr()
 				if prop_info.GetCe() == ce {
 					ZendStringReleaseEx(prop_info.GetName(), 0)
 					if prop_info.GetDocComment() != nil {
@@ -339,7 +339,7 @@ func DestroyZendClass(zv *Zval) {
 					if _z.IsType(IS_UNDEF) {
 						continue
 					}
-					c = Z_PTR_P(_z)
+					c = _z.GetPtr()
 					if c.GetCe() == ce {
 						ZvalPtrDtorNogc(c.GetValue())
 						if c.GetDocComment() != nil {
@@ -405,7 +405,7 @@ func DestroyZendClass(zv *Zval) {
 				if _z.IsType(IS_UNDEF) {
 					continue
 				}
-				fn = Z_PTR_P(_z)
+				fn = _z.GetPtr()
 				if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
 					ZendFreeInternalArgInfo(fn.GetInternalFunction())
 				}
@@ -425,7 +425,7 @@ func DestroyZendClass(zv *Zval) {
 					if _z.IsType(IS_UNDEF) {
 						continue
 					}
-					c = Z_PTR_P(_z)
+					c = _z.GetPtr()
 					if c.GetCe() == ce {
 						ZvalInternalPtrDtor(c.GetValue())
 						if c.GetDocComment() != nil {
@@ -452,7 +452,7 @@ func DestroyZendClass(zv *Zval) {
 	}
 }
 func ZendClassAddRef(zv *Zval) {
-	var ce *ZendClassEntry = Z_PTR_P(zv)
+	var ce *ZendClassEntry = zv.GetPtr()
 	if !ce.IsImmutable() {
 		ce.GetRefcount()++
 	}
@@ -922,7 +922,7 @@ func PassTwo(op_array *ZendOpArray) int {
 			var val *Zval = CT_CONSTANT(opline.GetOp2())
 			if val.IsType(IS_CONSTANT_AST) {
 				var slot uint32 = ZEND_MM_ALIGNED_SIZE_EX(op_array.GetCacheSize(), 8)
-				Z_CACHE_SLOT_P(val) = slot
+				val.SetCacheSlot(slot)
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))
 			}
 			break
@@ -1011,7 +1011,7 @@ func PassTwo(op_array *ZendOpArray) int {
 
 			/* absolute indexes to relative offsets */
 
-			var jumptable *HashTable = Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
+			var jumptable *HashTable = CT_CONSTANT(opline.GetOp2()).GetArr()
 			var zv *Zval
 			for {
 				var __ht *HashTable = jumptable
@@ -1024,7 +1024,7 @@ func PassTwo(op_array *ZendOpArray) int {
 						continue
 					}
 					zv = _z
-					Z_LVAL_P(zv) = ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, Z_LVAL_P(zv))
+					zv.SetLval(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.GetLval()))
 				}
 				break
 			}

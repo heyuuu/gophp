@@ -270,7 +270,7 @@ func ZendStringHashFunc(str *ZendString) ZendUlong {
 }
 func ZendHashFunc(str *byte, len_ int) ZendUlong { return ZendInlineHashFunc(str, len_) }
 func _strDtor(zv *Zval) {
-	var str *ZendString = Z_STR_P(zv)
+	var str *ZendString = zv.GetStr()
 	Pefree(str, GC_FLAGS(str)&IS_STR_PERSISTENT)
 }
 func ZendInitInternedStringsHt(interned_strings *HashTable, permanent int) {

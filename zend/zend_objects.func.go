@@ -33,10 +33,10 @@ func ZendObjectStdDtor(object *ZendObject) {
 		end = p + object.GetCe().GetDefaultPropertiesCount()
 		for {
 			if Z_REFCOUNTED_P(p) {
-				if Z_ISREF_P(p) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(p))) {
+				if Z_ISREF_P(p) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(p.GetRef())) {
 					var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(object, p)
 					if prop_info.GetType() != 0 {
-						ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info)
+						ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
 					}
 				}
 				IZvalPtrDtor(p)
@@ -52,7 +52,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			ZvalPtrDtorStr(p)
 		} else if p.IsType(IS_ARRAY) {
 			var guards *HashTable
-			guards = Z_ARRVAL_P(p)
+			guards = p.GetArr()
 			ZEND_ASSERT(guards != nil)
 			guards.Destroy()
 			FREE_HASHTABLE(guards)
@@ -168,10 +168,10 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			IZvalPtrDtor(dst)
 			ZVAL_COPY_VALUE_PROP(dst, src)
 			ZvalAddRef(dst)
-			if Z_ISREF_P(dst) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(dst))) {
+			if Z_ISREF_P(dst) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(dst.GetRef())) {
 				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
 				if prop_info.GetType() != 0 {
-					ZEND_REF_ADD_TYPE_SOURCE(Z_REF_P(dst), prop_info)
+					ZEND_REF_ADD_TYPE_SOURCE(dst.GetRef(), prop_info)
 				}
 			}
 			src++
@@ -221,7 +221,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 				key = _p.GetKey()
 				prop = _z
 				if prop.IsType(IS_INDIRECT) {
-					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(Z_INDIRECT_P(prop)-old_object.GetPropertiesTable()))
+					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(prop.GetZv()-old_object.GetPropertiesTable()))
 				} else {
 					ZVAL_COPY_VALUE(&new_prop, prop)
 					ZvalAddRef(&new_prop)
@@ -263,7 +263,7 @@ func ZendObjectsCloneObj(zobject *Zval) *ZendObject {
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
 
-	old_object = Z_OBJ_P(zobject)
+	old_object = zobject.GetObj()
 	new_object = ZendObjectsNew(old_object.GetCe())
 
 	/* zend_objects_clone_members() expect the properties to be initialized. */
