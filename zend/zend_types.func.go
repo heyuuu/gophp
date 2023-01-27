@@ -29,12 +29,16 @@ func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) int {
 		return int(ptr)<<2 | 0x0
 	}
 }
-func ZEND_TYPE_ENCODE_CLASS_CONST_Q2(macro __auto__, class_name string) __auto__ {
-	return macro(class_name)
-}
 
-func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) __auto__ {
-	return ZEND_TYPE_ENCODE_CLASS_CONST_Q2(ZEND_TYPE_ENCODE_CLASS_CONST_allow_null, class_name)
+func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
+	var fullClassName string
+	if allow_null != 0 {
+		fullClassName = "?" + class_name
+	} else {
+		fullClassName = class_name
+	}
+	var ptr = b.ForceUintPtr(&fullClassName)
+	return ZendType(ptr)
 }
 
 func HT_HASH_TO_BUCKET_EX(data *Bucket, idx uint32) __auto__ { return data + idx }
@@ -86,12 +90,8 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 }
 func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
 func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGcRefcount() }
-func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return ZendGcSetRefcount(p.gc, rc) }
-func GC_ADDREF(p ZendRefcounted) uint32                  { return p.IncGcRefcount() }
-func GC_DELREF(p ZendRefcounted) uint32                  { return p.DecGcRefcount() }
+func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return p.SetGcRefcount(rc) }
 func GC_ADDREF_EX(p ZendRefcounted, rc uint32) uint32    { return p.IncGcRefcountEx(rc) }
-func GC_TYPE_INFO(p ZendRefcounted) uint32               { return p.GetGcTypeInfo() }
-func GC_FLAGS(p ZendRefcounted) uint32                   { return p.GetGcFlags() }
 func GC_ADD_FLAGS(p ZendRefcounted, flags uint32)        { p.AddGcFlags(flags) }
 func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
@@ -142,8 +142,6 @@ func Z_ISUNDEF(zval Zval) bool                         { return zval.IsType(IS_U
 func Z_ISUNDEF_P(zval_p *Zval) bool                    { return Z_ISUNDEF(*zval_p) }
 func Z_ISERROR(zval Zval) bool                         { return zval.IsType(_IS_ERROR) }
 func Z_ISERROR_P(zval_p *Zval) bool                    { return Z_ISERROR(*zval_p) }
-func Z_LVAL_P(zval_p *Zval) ZendLong                   { return zval_p.GetLval() }
-func Z_DVAL_P(zval_p *Zval) float64                    { return zval_p.GetDval() }
 func Z_STR(zval Zval) *ZendString                      { return zval.GetStr() }
 func Z_STR_P(zval_p *Zval) *ZendString                 { return zval_p.GetStr() }
 func Z_STRVAL(zval Zval) []byte                        { return Z_STR(zval).GetVal() }
@@ -367,26 +365,10 @@ func Z_TRY_DELREF_P(pz *Zval) {
 		Z_DELREF_P(pz)
 	}
 }
-func Z_TRY_ADDREF(z Zval)                      { Z_TRY_ADDREF_P(&z) }
-func Z_TRY_DELREF(z Zval)                      { Z_TRY_DELREF_P(&z) }
-func ZEND_RC_MOD_CHECK(p *ZendRefcountedH)     {}
-func GC_MAKE_PERSISTENT_LOCAL(p *ZendString)   {}
-func ZendGcRefcount(p *ZendRefcountedH) uint32 { return p.GetRefcount() }
-func ZendGcSetRefcount(p *ZendRefcountedH, rc uint32) uint32 {
-	p.SetRefcount(rc)
-	return p.GetRefcount()
-}
-func ZendGcAddref(p ZendRefcountedH) uint32  { return p.IncRefcount() }
-func ZendGcDelref(p *ZendRefcountedH) uint32 { return p.DecRefcount() }
-func ZendGcAddrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	p.SetRefcount(p.GetRefcount() + rc)
-	return p.GetRefcount()
-}
-func ZendGcDelrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	p.SetRefcount(p.GetRefcount() - rc)
-	return p.GetRefcount()
-}
-func ZvalRefcountP(pz *Zval) uint32 { return GC_REFCOUNT(pz.GetCounted()) }
+func Z_TRY_ADDREF(z Zval)                    { Z_TRY_ADDREF_P(&z) }
+func Z_TRY_DELREF(z Zval)                    { Z_TRY_DELREF_P(&z) }
+func GC_MAKE_PERSISTENT_LOCAL(p *ZendString) {}
+func ZvalRefcountP(pz *Zval) uint32          { return GC_REFCOUNT(pz.GetCounted()) }
 func ZvalSetRefcountP(pz *Zval, rc uint32) uint32 {
 	ZEND_ASSERT(Z_REFCOUNTED_P(pz))
 	return GC_SET_REFCOUNT(pz.GetCounted(), rc)

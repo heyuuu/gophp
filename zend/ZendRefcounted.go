@@ -12,8 +12,11 @@ type ZendRefcountedH struct {
 	}
 }
 
-func (this *ZendRefcountedH) GetRefcount() uint32      { return this.refcount }
-func (this *ZendRefcountedH) SetRefcount(value uint32) { this.refcount = value }
+func (this *ZendRefcountedH) GetRefcount() uint32 { return this.refcount }
+func (this *ZendRefcountedH) SetRefcount(value uint32) uint32 {
+	this.refcount = value
+	return this.refcount
+}
 
 func (this *ZendRefcountedH) IncRefcount() uint32 {
 	this.refcount++
@@ -74,7 +77,7 @@ type ZendRefcounted interface {
 	SetGc(value ZendRefcountedH)
 
 	GetGcRefcount() uint32
-	SetGcRefcount(value uint32)
+	SetGcRefcount(value uint32) uint32
 	IncGcRefcount() uint32
 	IncGcRefcountEx(rc uint32) uint32
 	DecGcRefcount() uint32
@@ -98,11 +101,11 @@ var _ ZendRefcounted = &baseZendRefcounted{}
 func (this *baseZendRefcounted) GetGc() *ZendRefcountedH     { return &this.gc }
 func (this *baseZendRefcounted) SetGc(value ZendRefcountedH) { this.gc = value }
 
-func (this *baseZendRefcounted) GetGcRefcount() uint32            { return this.gc.GetRefcount() }
-func (this *baseZendRefcounted) SetGcRefcount(value uint32)       { this.gc.SetRefcount(value) }
-func (this *baseZendRefcounted) IncGcRefcount() uint32            { return this.gc.IncRefcount() }
-func (this *baseZendRefcounted) IncGcRefcountEx(rc uint32) uint32 { return this.gc.IncRefcountEx(rc) }
-func (this *baseZendRefcounted) DecGcRefcount() uint32            { return this.gc.DecRefcount() }
+func (this *baseZendRefcounted) GetGcRefcount() uint32             { return this.gc.GetRefcount() }
+func (this *baseZendRefcounted) SetGcRefcount(value uint32) uint32 { return this.gc.SetRefcount(value) }
+func (this *baseZendRefcounted) IncGcRefcount() uint32             { return this.gc.IncRefcount() }
+func (this *baseZendRefcounted) IncGcRefcountEx(rc uint32) uint32  { return this.gc.IncRefcountEx(rc) }
+func (this *baseZendRefcounted) DecGcRefcount() uint32             { return this.gc.DecRefcount() }
 
 func (this *baseZendRefcounted) GetGcTypeInfo() uint32      { return this.gc.GetTypeInfo() }
 func (this *baseZendRefcounted) SetGcTypeInfo(value uint32) { this.gc.SetTypeInfo(value) }
