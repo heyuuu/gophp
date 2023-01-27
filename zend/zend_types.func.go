@@ -220,11 +220,7 @@ func ZVAL_STR(z *Zval, s *ZendString) {
 	var __z *Zval = z
 	var __s *ZendString = s
 	__z.SetStr(__s)
-	if ZSTR_IS_INTERNED(__s) != 0 {
-		__z.SetTypeInfo(IS_INTERNED_STRING_EX)
-	} else {
-		__z.SetTypeInfo(IS_STRING_EX)
-	}
+	__z.SetTypeInfo(IS_STRING_EX)
 }
 func ZVAL_INTERNED_STR(z *Zval, s *ZendString) {
 	var __z *Zval = z
@@ -242,12 +238,8 @@ func ZVAL_STR_COPY(z *Zval, s *ZendString) {
 	var __z *Zval = z
 	var __s *ZendString = s
 	__z.SetStr(__s)
-	if ZSTR_IS_INTERNED(__s) != 0 {
-		__z.SetTypeInfo(IS_INTERNED_STRING_EX)
-	} else {
-		GC_ADDREF(__s)
-		__z.SetTypeInfo(IS_STRING_EX)
-	}
+	GC_ADDREF(__s)
+	__z.SetTypeInfo(IS_STRING_EX)
 }
 func ZVAL_ARR(z *Zval, a *ZendArray) {
 	var __arr *ZendArray = a
@@ -522,7 +514,7 @@ func SEPARATE_STRING(zv *Zval) {
 	if Z_REFCOUNT_P(_zv) > 1 {
 		var _str *ZendString = _zv.GetStr()
 		ZEND_ASSERT(Z_REFCOUNTED_P(_zv))
-		ZEND_ASSERT(ZSTR_IS_INTERNED(_str) == 0)
+		ZEND_ASSERT(true)
 		Z_DELREF_P(_zv)
 		ZVAL_NEW_STR(_zv, ZendStringInit(_str.GetVal(), _str.GetLen(), 0))
 	}

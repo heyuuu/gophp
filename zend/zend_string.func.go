@@ -15,8 +15,6 @@ func ZSTR_EMPTY_ALLOC() *ZendString                { return ZendEmptyString }
 func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }
 func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx] }
 
-func ZSTR_IS_INTERNED(s *ZendString) int { return GC_FLAGS(s) & IS_STR_INTERNED }
-
 func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
 func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
 	str = NewZendStringByLen(_len)
@@ -27,25 +25,19 @@ func ZendStringForgetHashVal(s *ZendString) {
 	GC_DEL_FLAGS(s, IS_STR_VALID_UTF8)
 }
 func ZendStringAddref(s *ZendString) uint32 {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		return GC_ADDREF(s)
-	}
-	return 1
+	return GC_ADDREF(s)
 }
 func ZendStringDelref(s *ZendString) uint32 {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		return GC_DELREF(s)
-	}
-	return 1
+	return GC_DELREF(s)
 }
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
-	var ret *ZendString = (*ZendString)(Pemalloc(ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-	GC_SET_REFCOUNT(ret, 1)
-	GC_TYPE_INFO(ret) = IS_STRING | b.Cond(persistent != 0, IS_STR_PERSISTENT, 0)<<GC_FLAGS_SHIFT
-	ret.SetH(0)
-	ret.SetLen(len_)
+	var ret = NewZendStringByLen(len_)
+	if persistent != 0 {
+		ret.AddGcFlags(IS_STR_PERSISTENT)
+	}
 	return ret
 }
+
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString = (*ZendString)(SafePemalloc(n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
 	GC_SET_REFCOUNT(ret, 1)
@@ -55,123 +47,97 @@ func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 	return ret
 }
 func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
+	var strArg = b.NewStrArg(str, len_)
+
 	var ret *ZendString = ZendStringAlloc(len_, persistent)
 	memcpy(ret.GetVal(), str, len_)
 	ret.GetVal()[len_] = '0'
 	return ret
 }
 func ZendStringCopy(s *ZendString) *ZendString {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		GC_ADDREF(s)
-	}
+	GC_ADDREF(s)
 	return s
 }
 func ZendStringDup(s *ZendString, persistent int) *ZendString {
-	if ZSTR_IS_INTERNED(s) != 0 {
-		return s
-	} else {
-		return ZendStringInit(s.GetVal(), s.GetLen(), persistent)
-	}
+	return ZendStringInit(s.GetVal(), s.GetLen(), persistent)
 }
 func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_REFCOUNT(s) == 1 {
-			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-			ret.SetLen(len_)
-			ZendStringForgetHashVal(ret)
-			return ret
-		}
+	if GC_REFCOUNT(s) == 1 {
+		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
+		ret.SetLen(len_)
+		ZendStringForgetHashVal(ret)
+		return ret
 	}
 	ret = ZendStringAlloc(len_, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), MIN(len_, s.GetLen())+1)
-	if ZSTR_IS_INTERNED(s) == 0 {
-		GC_DELREF(s)
-	}
+	GC_DELREF(s)
 	return ret
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	ZEND_ASSERT(len_ >= s.GetLen())
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_REFCOUNT(s) == 1 {
-			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-			ret.SetLen(len_)
-			ZendStringForgetHashVal(ret)
-			return ret
-		}
+	if GC_REFCOUNT(s) == 1 {
+		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
+		ret.SetLen(len_)
+		ZendStringForgetHashVal(ret)
+		return ret
 	}
 	ret = ZendStringAlloc(len_, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), s.GetLen()+1)
-	if ZSTR_IS_INTERNED(s) == 0 {
-		GC_DELREF(s)
-	}
+	GC_DELREF(s)
 	return ret
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	ZEND_ASSERT(len_ <= s.GetLen())
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_REFCOUNT(s) == 1 {
-			ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-			ret.SetLen(len_)
-			ZendStringForgetHashVal(ret)
-			return ret
-		}
+	if GC_REFCOUNT(s) == 1 {
+		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
+		ret.SetLen(len_)
+		ZendStringForgetHashVal(ret)
+		return ret
 	}
 	ret = ZendStringAlloc(len_, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), len_+1)
-	if ZSTR_IS_INTERNED(s) == 0 {
-		GC_DELREF(s)
-	}
+	GC_DELREF(s)
 	return ret
 }
 func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_REFCOUNT(s) == 1 {
-			ret = (*ZendString)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
-			ret.SetLen(n*m + l)
-			ZendStringForgetHashVal(ret)
-			return ret
-		}
+	if GC_REFCOUNT(s) == 1 {
+		ret = (*ZendString)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
+		ret.SetLen(n*m + l)
+		ZendStringForgetHashVal(ret)
+		return ret
 	}
 	ret = ZendStringSafeAlloc(n, m, l, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), MIN(n*m+l, s.GetLen())+1)
-	if ZSTR_IS_INTERNED(s) == 0 {
-		GC_DELREF(s)
-	}
+	GC_DELREF(s)
 	return ret
 }
 func ZendStringFree(s *ZendString) {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		ZEND_ASSERT(GC_REFCOUNT(s) <= 1)
-		Pefree(s, GC_FLAGS(s)&IS_STR_PERSISTENT)
-	}
+	ZEND_ASSERT(GC_REFCOUNT(s) <= 1)
+	Pefree(s, GC_FLAGS(s)&IS_STR_PERSISTENT)
 }
 func ZendStringEfree(s *ZendString) {
-	ZEND_ASSERT(ZSTR_IS_INTERNED(s) == 0)
+	ZEND_ASSERT(true)
 	ZEND_ASSERT(GC_REFCOUNT(s) <= 1)
 	ZEND_ASSERT((GC_FLAGS(s) & IS_STR_PERSISTENT) == 0)
 	Efree(s)
 }
 func ZendStringRelease(s *ZendString) {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_DELREF(s) == 0 {
-			Pefree(s, GC_FLAGS(s)&IS_STR_PERSISTENT)
-		}
+	if GC_DELREF(s) == 0 {
+		Pefree(s, GC_FLAGS(s)&IS_STR_PERSISTENT)
 	}
 }
 func ZendStringReleaseEx(s *ZendString, persistent int) {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		if GC_DELREF(s) == 0 {
-			if persistent != 0 {
-				ZEND_ASSERT((GC_FLAGS(s) & IS_STR_PERSISTENT) != 0)
-				Free(s)
-			} else {
-				ZEND_ASSERT((GC_FLAGS(s) & IS_STR_PERSISTENT) == 0)
-				Efree(s)
-			}
+	if GC_DELREF(s) == 0 {
+		if persistent != 0 {
+			ZEND_ASSERT((GC_FLAGS(s) & IS_STR_PERSISTENT) != 0)
+			Free(s)
+		} else {
+			ZEND_ASSERT((GC_FLAGS(s) & IS_STR_PERSISTENT) == 0)
+			Efree(s)
 		}
 	}
 }
@@ -290,9 +256,7 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 }
 func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 	var ret *ZendString
-	if ZSTR_IS_INTERNED(str) != 0 {
-		return str
-	}
+
 	ZendStringHashVal(str)
 	ret = ZendInternedStringHtLookup(str, &InternedStringsPermanent)
 	if ret != nil {
@@ -310,9 +274,7 @@ func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 }
 func ZendNewInternedStringRequest(str *ZendString) *ZendString {
 	var ret *ZendString
-	if ZSTR_IS_INTERNED(str) != 0 {
-		return str
-	}
+
 	ZendStringHashVal(str)
 
 	/* Check for permanent strings, the table is readonly at this point. */

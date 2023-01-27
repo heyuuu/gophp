@@ -638,7 +638,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 		var tmp_result Zval
 		guard = ZendGetPropertyGuard(zobj, name)
 		if ((*guard) & IN_ISSET) == 0 {
-			if tmp_name == nil && ZSTR_IS_INTERNED(name) == 0 {
+			if tmp_name == nil {
 				tmp_name = ZendStringCopy(name)
 			}
 			GC_ADDREF(zobj)
@@ -1556,7 +1556,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 
 			/* have issetter - try with it! */
 
-			if tmp_name == nil && ZSTR_IS_INTERNED(name) == 0 {
+			if tmp_name == nil {
 				tmp_name = ZendStringCopy(name)
 			}
 			GC_ADDREF(zobj)

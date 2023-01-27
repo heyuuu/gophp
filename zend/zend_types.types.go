@@ -10,9 +10,9 @@ type HashTableIterator struct {
 	pos HashPosition
 }
 
-func (this HashTableIterator) GetHt() *HashTable          { return this.ht }
+func (this *HashTableIterator) GetHt() *HashTable         { return this.ht }
 func (this *HashTableIterator) SetHt(value *HashTable)    { this.ht = value }
-func (this HashTableIterator) GetPos() HashPosition       { return this.pos }
+func (this *HashTableIterator) GetPos() HashPosition      { return this.pos }
 func (this *HashTableIterator) SetPos(value HashPosition) { this.pos = value }
 
 /**
@@ -29,15 +29,15 @@ type ZendObject struct {
 
 var _ ZendRefcounted = &ZendObject{}
 
-func (this ZendObject) GetHandle() uint32                      { return this.handle }
+func (this *ZendObject) GetHandle() uint32                     { return this.handle }
 func (this *ZendObject) SetHandle(value uint32)                { this.handle = value }
-func (this ZendObject) GetCe() *ZendClassEntry                 { return this.ce }
+func (this *ZendObject) GetCe() *ZendClassEntry                { return this.ce }
 func (this *ZendObject) SetCe(value *ZendClassEntry)           { this.ce = value }
-func (this ZendObject) GetHandlers() *ZendObjectHandlers       { return this.handlers }
+func (this *ZendObject) GetHandlers() *ZendObjectHandlers      { return this.handlers }
 func (this *ZendObject) SetHandlers(value *ZendObjectHandlers) { this.handlers = value }
-func (this ZendObject) GetProperties() *HashTable              { return this.properties }
+func (this *ZendObject) GetProperties() *HashTable             { return this.properties }
 func (this *ZendObject) SetProperties(value *HashTable)        { this.properties = value }
-func (this ZendObject) GetPropertiesTable() []Zval             { return this.properties_table }
+func (this *ZendObject) GetPropertiesTable() []Zval            { return this.properties_table }
 func (this *ZendObject) SetPropertiesTable(value []Zval)       { this.properties_table = value }
 
 /**
@@ -52,11 +52,11 @@ type ZendResource struct {
 
 var _ ZendRefcounted = &ZendResource{}
 
-func (this ZendResource) GetHandle() int       { return this.handle }
+func (this *ZendResource) GetHandle() int      { return this.handle }
 func (this *ZendResource) SetHandle(value int) { this.handle = value }
-func (this ZendResource) GetType() int         { return this.type_ }
+func (this *ZendResource) GetType() int        { return this.type_ }
 func (this *ZendResource) SetType(value int)   { this.type_ = value }
-func (this ZendResource) GetPtr() any          { return this.ptr }
+func (this *ZendResource) GetPtr() any         { return this.ptr }
 func (this *ZendResource) SetPtr(value any)    { this.ptr = value }
 
 /**
@@ -68,11 +68,11 @@ type ZendPropertyInfoList struct {
 	ptr           []*ZendPropertyInfo
 }
 
-func (this ZendPropertyInfoList) GetNum() int                       { return this.num }
+func (this *ZendPropertyInfoList) GetNum() int                      { return this.num }
 func (this *ZendPropertyInfoList) SetNum(value int)                 { this.num = value }
-func (this ZendPropertyInfoList) GetNumAllocated() int              { return this.num_allocated }
+func (this *ZendPropertyInfoList) GetNumAllocated() int             { return this.num_allocated }
 func (this *ZendPropertyInfoList) SetNumAllocated(value int)        { this.num_allocated = value }
-func (this ZendPropertyInfoList) GetPtr() []*ZendPropertyInfo       { return this.ptr }
+func (this *ZendPropertyInfoList) GetPtr() []*ZendPropertyInfo      { return this.ptr }
 func (this *ZendPropertyInfoList) SetPtr(value []*ZendPropertyInfo) { this.ptr = value }
 
 /**
@@ -83,9 +83,9 @@ type ZendPropertyInfoSourceList struct /* union */ {
 	list uintptr
 }
 
-func (this ZendPropertyInfoSourceList) GetPtr() *ZendPropertyInfo       { return this.ptr }
+func (this *ZendPropertyInfoSourceList) GetPtr() *ZendPropertyInfo      { return this.ptr }
 func (this *ZendPropertyInfoSourceList) SetPtr(value *ZendPropertyInfo) { this.ptr = value }
-func (this ZendPropertyInfoSourceList) GetList() uintptr                { return this.list }
+func (this *ZendPropertyInfoSourceList) GetList() uintptr               { return this.list }
 func (this *ZendPropertyInfoSourceList) SetList(value uintptr)          { this.list = value }
 
 /**
@@ -99,9 +99,9 @@ type ZendReference struct {
 
 var _ ZendRefcounted = &ZendReference{}
 
-func (this ZendReference) GetVal() Zval                                 { return this.val }
+func (this *ZendReference) GetVal() Zval                                { return this.val }
 func (this *ZendReference) SetVal(value Zval)                           { this.val = value }
-func (this ZendReference) GetSources() ZendPropertyInfoSourceList       { return this.sources }
+func (this *ZendReference) GetSources() ZendPropertyInfoSourceList      { return this.sources }
 func (this *ZendReference) SetSources(value ZendPropertyInfoSourceList) { this.sources = value }
 
 /**

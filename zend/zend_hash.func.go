@@ -587,7 +587,7 @@ func (this *HashTable) _appendEx(key *ZendString, zv *Zval, interned int) *Zval 
 	var nIndex uint32
 	var p *Bucket = this.GetArData() + idx
 	ZVAL_COPY_VALUE(p.GetVal(), zv)
-	if interned == 0 && ZSTR_IS_INTERNED(key) == 0 {
+	if interned == 0 {
 		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 		ZendStringAddref(key)
 		ZendStringHashVal(key)
@@ -606,7 +606,7 @@ func (this *HashTable) _appendPtrEx(key *ZendString, ptr any, interned int) *Zva
 	var nIndex uint32
 	var p *Bucket = this.GetArData() + idx
 	ZVAL_PTR(p.GetVal(), ptr)
-	if interned == 0 && ZSTR_IS_INTERNED(key) == 0 {
+	if interned == 0 {
 		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 		ZendStringAddref(key)
 		ZendStringHashVal(key)
@@ -627,11 +627,9 @@ func (this *HashTable) _appendInd(key *ZendString, ptr *Zval) {
 	var nIndex uint32
 	var p *Bucket = this.GetArData() + idx
 	ZVAL_INDIRECT(p.GetVal(), ptr)
-	if ZSTR_IS_INTERNED(key) == 0 {
-		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		ZendStringAddref(key)
-		ZendStringHashVal(key)
-	}
+	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
+	ZendStringAddref(key)
+	ZendStringHashVal(key)
 	p.SetKey(key)
 	p.SetH(key.GetH())
 	nIndex = uint32(p.GetH() | this.GetNTableMask())
@@ -1132,19 +1130,15 @@ func (this *HashTable) _addOrUpdateI(key *ZendString, pData *Zval, flag uint32) 
 	if this.HasUFlags(HASH_FLAG_UNINITIALIZED | HASH_FLAG_PACKED) {
 		if this.HasUFlags(HASH_FLAG_UNINITIALIZED) {
 			this.RealInitMixed()
-			if ZSTR_IS_INTERNED(key) == 0 {
-				ZendStringAddref(key)
-				this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-				ZendStringHashVal(key)
-			}
+			ZendStringAddref(key)
+			this.SubUFlags(HASH_FLAG_STATIC_KEYS)
+			ZendStringHashVal(key)
 			goto add_to_hash
 		} else {
 			this.PackedToHash()
-			if ZSTR_IS_INTERNED(key) == 0 {
-				ZendStringAddref(key)
-				this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-				ZendStringHashVal(key)
-			}
+			ZendStringAddref(key)
+			this.SubUFlags(HASH_FLAG_STATIC_KEYS)
+			ZendStringHashVal(key)
 		}
 	} else if (flag&HASH_ADD_NEW) == 0 || core.ZEND_DEBUG != 0 {
 		p = this.FindBucket(key, 0)
@@ -1178,11 +1172,9 @@ func (this *HashTable) _addOrUpdateI(key *ZendString, pData *Zval, flag uint32) 
 			ZVAL_COPY_VALUE(data, pData)
 			return data
 		}
-		if ZSTR_IS_INTERNED(key) == 0 {
-			ZendStringAddref(key)
-			this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		}
-	} else if ZSTR_IS_INTERNED(key) == 0 {
+		ZendStringAddref(key)
+		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
+	} else {
 		ZendStringAddref(key)
 		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 		ZendStringHashVal(key)
@@ -1464,10 +1456,8 @@ func (this *HashTable) SetBucketKey(b *Bucket, key *ZendString) *Zval {
 			return nil
 		}
 	}
-	if ZSTR_IS_INTERNED(key) == 0 {
-		ZendStringAddref(key)
-		this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	}
+	ZendStringAddref(key)
+	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	arData = this.GetArData()
 
 	/* del from hash */

@@ -3998,9 +3998,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 func ZvalMakeInternedString(zv *Zval) *ZendString {
 	ZEND_ASSERT(zv.IsType(IS_STRING))
 	zv.SetStr(ZendNewInternedString(zv.GetStr()))
-	if ZSTR_IS_INTERNED(zv.GetStr()) != 0 {
-		zv.SetTypeFlags(0)
-	}
+
 	return zv.GetStr()
 }
 func IsPersistentClass(ce *ZendClassEntry) ZendBool {
@@ -4020,7 +4018,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 			ce.SetIsConstantsUpdated(false)
 		}
 	}
-	if property.IsType(IS_STRING) && ZSTR_IS_INTERNED(property.GetStr()) == 0 {
+	if property.IsType(IS_STRING) {
 		ZvalMakeInternedString(property)
 	}
 	if (access_type & ZEND_ACC_PPP_MASK) == 0 {
@@ -4243,7 +4241,7 @@ func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zva
 	if ZendStringEqualsLiteralCi(name, "class") {
 		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
-	if value.IsType(IS_STRING) && ZSTR_IS_INTERNED(value.GetStr()) == 0 {
+	if value.IsType(IS_STRING) {
 		ZvalMakeInternedString(value)
 	}
 	if ce.GetType() == ZEND_INTERNAL_CLASS {

@@ -1676,12 +1676,10 @@ func ZifGetCurrentUser(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
 	if entry.IsType(zend.IS_STRING) {
 		var str *zend.ZendString = entry.GetStr()
-		if zend.ZSTR_IS_INTERNED(str) == 0 {
-			if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
-				zend.ZendStringAddref(str)
-			} else {
-				str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
-			}
+		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
+			zend.ZendStringAddref(str)
+		} else {
+			str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		}
 		if key != nil {
 			zend.AddAssocStrEx(retval, key.GetVal(), key.GetLen(), str)
@@ -2931,9 +2929,7 @@ func ZifIniGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.ZSTR_IS_INTERNED(val) != 0 {
-		zend.RETVAL_INTERNED_STR(val)
-	} else if val.GetLen() == 0 {
+	if val.GetLen() == 0 {
 		zend.RETVAL_EMPTY_STRING()
 	} else if val.GetLen() == 1 {
 		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
@@ -3170,9 +3166,7 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* copy to return here, because alter might free it! */
 
 	if val != nil {
-		if zend.ZSTR_IS_INTERNED(val) != 0 {
-			zend.RETVAL_INTERNED_STR(val)
-		} else if val.GetLen() == 0 {
+		if val.GetLen() == 0 {
 			zend.RETVAL_EMPTY_STRING()
 		} else if val.GetLen() == 1 {
 			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))

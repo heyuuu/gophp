@@ -16,6 +16,15 @@ type ZendString struct {
 
 var _ ZendRefcounted = &ZendString{}
 
+func NewZendString(str string) *ZendString {
+	var zs = &ZendString{len_: len(str), val: []byte(str)}
+
+	zs.SetGcRefcount(1)
+	zs.SetGcTypeInfo(IS_STRING)
+
+	return zs
+}
+
 func NewZendStringByLen(len_ int) *ZendString {
 	var val = make([]byte, len_)
 	var str = &ZendString{len_: len_, val: val}

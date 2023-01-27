@@ -4285,7 +4285,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -5985,7 +5985,7 @@ func ZEND_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -6315,7 +6315,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -8175,7 +8175,7 @@ func ZEND_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -8491,7 +8491,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CONST != IS_CONST && IS_CONST != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -11639,7 +11639,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -12313,7 +12313,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -12914,7 +12914,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -13611,7 +13611,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -14437,7 +14437,7 @@ func ZEND_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -14735,7 +14735,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if (IS_TMP_VAR|IS_VAR) != IS_CONST && (IS_TMP_VAR|IS_VAR) != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -33507,7 +33507,7 @@ func ZEND_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -35560,7 +35560,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -36582,7 +36582,7 @@ func ZEND_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -38635,7 +38635,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 			if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)
@@ -40997,7 +40997,7 @@ func ZEND_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			if len_ > ZSTR_MAX_LEN-op2_str.GetLen() {
 				ZendErrorNoreturn(E_ERROR, "Integer overflow in memory allocation")
@@ -43070,7 +43070,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 				ZendStringReleaseEx(op2_str, 0)
 			}
-		} else if IS_CV != IS_CONST && IS_CV != IS_CV && ZSTR_IS_INTERNED(op1_str) == 0 && GC_REFCOUNT(op1_str) == 1 {
+		} else if IS_CV != IS_CONST && IS_CV != IS_CV && GC_REFCOUNT(op1_str) == 1 {
 			var len_ int = op1_str.GetLen()
 			str = ZendStringExtend(op1_str, len_+op2_str.GetLen(), 0)
 			memcpy(str.GetVal()+len_, op2_str.GetVal(), op2_str.GetLen()+1)

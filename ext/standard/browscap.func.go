@@ -261,11 +261,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		}
 		if persistent != 0 {
 			pattern = zend.ZendNewInternedString(zend.ZendStringCopy(pattern))
-			if zend.ZSTR_IS_INTERNED(pattern) != 0 {
-				arg1.SetTypeFlags(0)
-			} else {
-				zend.ZendStringRelease(pattern)
-			}
+			zend.ZendStringRelease(pattern)
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
 		entry = ctx.GetCurrentEntry()
