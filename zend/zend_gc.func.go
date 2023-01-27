@@ -1152,7 +1152,7 @@ func ZendGcCollectCycles() int {
 							current.SetRef(GC_MAKE_DTOR_GARBAGE(obj))
 							GC_REF_SET_COLOR(obj, GC_PURPLE)
 						} else {
-							GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
+							obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 						}
 					}
 				}
@@ -1196,7 +1196,7 @@ func ZendGcCollectCycles() int {
 
 					if (p.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 						var obj *ZendObject = (*ZendObject)(p)
-						GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
+						obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 						obj.IncGcRefcount()
 						obj.GetHandlers().GetDtorObj()(obj)
 						obj.DecGcRefcount()
@@ -1235,7 +1235,7 @@ func ZendGcCollectCycles() int {
 
 					current.SetRef(GC_MAKE_GARBAGE((*byte)(obj) - obj.GetHandlers().GetOffset()))
 					if (obj.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
-						GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
+						obj.AddGcFlags(IS_OBJ_FREE_CALLED)
 						obj.IncGcRefcount()
 						obj.GetHandlers().GetFreeObj()(obj)
 						obj.DecGcRefcount()

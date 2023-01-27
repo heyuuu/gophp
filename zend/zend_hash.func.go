@@ -723,7 +723,7 @@ func (this *HashTable) RealInitEx(packed int) {
 	}
 }
 func (this *HashTable) _initInt(nSize uint32, pDestructor DtorFuncT, persistent ZendBool) {
-	GC_SET_REFCOUNT(this, 1)
+	this.SetGcRefcount(1)
 	this.GetGcTypeInfo() = IS_ARRAY | b.Cond(persistent != 0, GC_PERSISTENT<<GC_FLAGS_SHIFT, GC_COLLECTABLE<<GC_FLAGS_SHIFT)
 	this.SetUFlags(HASH_FLAG_UNINITIALIZED)
 	this.SetNTableMask(HT_MIN_MASK)
@@ -2334,7 +2334,7 @@ func ZendArrayDup(source *HashTable) *HashTable {
 	var idx uint32
 	var target *HashTable
 	ALLOC_HASHTABLE(target)
-	GC_SET_REFCOUNT(target, 1)
+	target.SetGcRefcount(1)
 	target.GetGcTypeInfo() = IS_ARRAY | GC_COLLECTABLE<<GC_FLAGS_SHIFT
 	target.SetPDestructor(ZVAL_PTR_DTOR)
 	if source.GetNNumOfElements() == 0 {

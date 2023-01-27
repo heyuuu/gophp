@@ -65,7 +65,7 @@ func (this *HashTable) UsedSize() int {
 	return HT_HASH_SIZE(this.GetNTableMask()) + size_t(this).nNumUsed*b.SizeOf("Bucket")
 }
 func (this *HashTable) HashReset() __auto__ {
-	return memset(&HT_HASH(this, this.GetNTableMask()), HT_INVALID_IDX, HT_HASH_SIZE(this.GetNTableMask()))
+	return memset(&(this.Hash(this.GetNTableMask())), HT_INVALID_IDX, HT_HASH_SIZE(this.GetNTableMask()))
 }
 func (this *HashTable) HashResetPacked() {
 	this.Hash(-2) = HT_INVALID_IDX
@@ -96,8 +96,8 @@ func GC_ADD_FLAGS(p ZendRefcounted, flags uint32)        { p.AddGcFlags(flags) }
 func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
 func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags() & GC_PROTECTED }
-func GC_PROTECT_RECURSION(p *HashTable)                  { GC_ADD_FLAGS(p, GC_PROTECTED) }
-func GC_UNPROTECT_RECURSION(p *HashTable)                { GC_DEL_FLAGS(p, GC_PROTECTED) }
+func GC_PROTECT_RECURSION(p *HashTable)                  { p.AddGcFlags(GC_PROTECTED) }
+func GC_UNPROTECT_RECURSION(p *HashTable)                { p.DelGcFlags(GC_PROTECTED) }
 func GC_TRY_PROTECT_RECURSION(p *HashTable) {
 	if (p.GetGcFlags() & GC_IMMUTABLE) == 0 {
 		GC_PROTECT_RECURSION(p)

@@ -20,10 +20,8 @@ func ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST(h int) {
 	SET_OBJ_BUCKET_NUMBER(ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[h], ExecutorGlobals.GetObjectsStore().GetFreeListHead())
 	ExecutorGlobals.GetObjectsStore().SetFreeListHead(h)
 }
-func OBJ_RELEASE(obj *ZendObject) { ZendObjectRelease(obj) }
-func ZendObjectStoreCtorFailed(obj *ZendObject) {
-	GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
-}
+func OBJ_RELEASE(obj *ZendObject)               { ZendObjectRelease(obj) }
+func ZendObjectStoreCtorFailed(obj *ZendObject) { obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED) }
 func ZendObjectRelease(obj *ZendObject) {
 	if obj.DecGcRefcount() == 0 {
 		ZendObjectsStoreDel(obj)
@@ -75,7 +73,7 @@ func ZendObjectsStoreCallDestructors(objects *ZendObjectsStore) {
 			var obj *ZendObject = objects.GetObjectBuckets()[i]
 			if IS_OBJ_VALID(obj) {
 				if (obj.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
-					GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
+					obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 					if obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil {
 						obj.IncGcRefcount()
 						obj.GetHandlers().GetDtorObj()(obj)
@@ -93,7 +91,7 @@ func ZendObjectsStoreMarkDestructed(objects *ZendObjectsStore) {
 		for {
 			var obj *ZendObject = *obj_ptr
 			if IS_OBJ_VALID(obj) {
-				GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
+				obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 			}
 			obj_ptr++
 			if obj_ptr == end {
@@ -121,7 +119,7 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 			obj = *obj_ptr
 			if IS_OBJ_VALID(obj) {
 				if (obj.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
-					GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
+					obj.AddGcFlags(IS_OBJ_FREE_CALLED)
 					if obj.GetHandlers().GetFreeObj() != ZendObjectStdDtor {
 						obj.IncGcRefcount()
 						obj.GetHandlers().GetFreeObj()(obj)
@@ -138,7 +136,7 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 			obj = *obj_ptr
 			if IS_OBJ_VALID(obj) {
 				if (obj.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
-					GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
+					obj.AddGcFlags(IS_OBJ_FREE_CALLED)
 					obj.IncGcRefcount()
 					obj.GetHandlers().GetFreeObj()(obj)
 				}
@@ -197,9 +195,9 @@ func ZendObjectsStoreDel(object *ZendObject) {
 	*/
 
 	if (object.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
-		GC_ADD_FLAGS(object, IS_OBJ_DESTRUCTOR_CALLED)
+		object.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 		if object.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || object.GetCe().GetDestructor() != nil {
-			GC_SET_REFCOUNT(object, 1)
+			object.SetGcRefcount(1)
 			object.GetHandlers().GetDtorObj()(object)
 			object.DecGcRefcount()
 		}
@@ -211,8 +209,8 @@ func ZendObjectsStoreDel(object *ZendObject) {
 		ZEND_ASSERT(IS_OBJ_VALID(ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[handle]))
 		ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[handle] = SET_OBJ_INVALID(object)
 		if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
-			GC_ADD_FLAGS(object, IS_OBJ_FREE_CALLED)
-			GC_SET_REFCOUNT(object, 1)
+			object.AddGcFlags(IS_OBJ_FREE_CALLED)
+			object.SetGcRefcount(1)
 			object.GetHandlers().GetFreeObj()(object)
 		}
 		ptr = (*byte)(object) - object.GetHandlers().GetOffset()

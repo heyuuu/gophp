@@ -4053,7 +4053,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Z_ARRVAL_P(return_value).SetNNumOfElements(uint32(num))
 			zend.Z_ARRVAL_P(return_value).SetNNextFreeElement(zend_long(start_key + num))
 			if zend.Z_REFCOUNTED_P(val) {
-				zend.GC_ADDREF_EX(val.GetCounted(), uint32(num))
+				val.GetCounted().IncGcRefcountEx(uint32(num))
 			}
 			p = zend.Z_ARRVAL_P(return_value).GetArData()
 			n = start_key
@@ -4075,7 +4075,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ArrayInitSize(return_value, uint32(num))
 			return_value.GetArr().RealInitMixed()
 			if zend.Z_REFCOUNTED_P(val) {
-				zend.GC_ADDREF_EX(val.GetCounted(), uint32(num))
+				val.GetCounted().IncGcRefcountEx(uint32(num))
 			}
 			return_value.GetArr().IndexAddNew(start_key, val)
 			for b.PreDec(&num) {
@@ -7367,7 +7367,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	num_pads = pad_size_abs - input_size
 	if zend.Z_REFCOUNTED_P(pad_value) {
-		zend.GC_ADDREF_EX(pad_value.GetCounted(), num_pads)
+		pad_value.GetCounted().IncGcRefcountEx(num_pads)
 	}
 	zend.ArrayInitSize(return_value, pad_size_abs)
 	if zend.Z_ARRVAL_P(input).HasUFlags(zend.HASH_FLAG_PACKED) {

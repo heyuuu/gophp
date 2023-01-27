@@ -544,7 +544,7 @@ func ZendPostStartup() int {
 }
 func ZendShutdown() {
 	ZendVmDtor()
-	ZendDestroyRsrcList(&(ExecutorGlobals.GetPersistentList()))
+	ExecutorGlobals.GetPersistentList().GracefulReverseDestroy()
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
@@ -656,7 +656,7 @@ func ZendDeactivate() {
 		ShutdownCompiler()
 	}
 	ExecutorGlobals.SetBailout(__orig_bailout)
-	ZendDestroyRsrcList(&(ExecutorGlobals.GetRegularList()))
+	ExecutorGlobals.GetRegularList().GracefulReverseDestroy()
 }
 func ZendMessageDispatcher(message ZendLong, data any) {
 	if ZendMessageDispatcherP != nil {

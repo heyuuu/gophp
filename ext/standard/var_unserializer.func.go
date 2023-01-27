@@ -160,12 +160,12 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG(serialize_lock)++
 					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __wakeup calls */
@@ -184,13 +184,13 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG(serialize_lock)++
 					if zend.CallUserFunction(zend.CompilerGlobals.GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&param)
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __unserialize calls */
@@ -519,7 +519,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		ary.GetArr().RealInitMixed()
 		if ProcessNestedData(rval, p, max, var_hash, ary.GetArr(), elements, nil) == 0 {
 			zend.ZVAL_DEREF(rval)
-			zend.GC_ADD_FLAGS(rval.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 			zend.ZvalPtrDtor(&ary)
 			return 0
 		}
@@ -544,7 +544,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
 			zend.ZVAL_DEREF(rval)
-			zend.GC_ADD_FLAGS(rval.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
+			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 		}
 		return 0
 	}

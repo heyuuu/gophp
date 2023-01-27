@@ -8,7 +8,7 @@ import (
 )
 
 func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
-	GC_SET_REFCOUNT(object, 1)
+	object.SetGcRefcount(1)
 	object.GetGcTypeInfo() = IS_OBJECT | GC_COLLECTABLE<<GC_FLAGS_SHIFT
 	object.SetCe(ce)
 	object.SetProperties(nil)
