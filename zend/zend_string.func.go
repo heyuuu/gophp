@@ -6,8 +6,10 @@ import (
 	b "sik/builtin"
 )
 
-func ZSTR_VAL(zstr *ZendString) []byte             { return zstr.GetVal() }
-func ZSTR_HASH(zstr *ZendString) ZendUlong         { return zstr.GetHash() }
+func ZSTR_VAL(str *ZendString) []byte             { return str.GetVal() }
+func ZSTR_HASH(str *ZendString) ZendUlong         { return str.GetHash() }
+func ZendStringHashVal(str *ZendString) ZendUlong { return str.GetHash() }
+
 func STR_EMPTY_ALLOC() *ZendString                 { return ZendEmptyString }
 func ZSTR_EMPTY_ALLOC() *ZendString                { return ZendEmptyString }
 func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }
@@ -17,28 +19,12 @@ func ZSTR_IS_INTERNED(s *ZendString) int { return GC_FLAGS(s) & IS_STR_INTERNED 
 
 func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
 func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
-	str = (*ZendString)(DoAlloca(ZEND_MM_ALIGNED_SIZE_EX(_ZSTR_STRUCT_SIZE(_len), 8), use_heap))
-	GC_SET_REFCOUNT(str, 1)
-	GC_TYPE_INFO(str) = IS_STRING
-	str.SetH(0)
-	str.SetLen(_len)
+	str = NewZendStringByLen(_len)
 }
-func ZSTR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) {
-	ZSTR_ALLOCA_ALLOC(str, len_, use_heap)
-	memcpy(str.GetVal(), s, len_)
-	str.GetVal()[len_] = '0'
-}
-func ZSTR_ALLOCA_FREE(str any, use_heap __auto__) { FreeAlloca(str, use_heap) }
-func ZendStringHashVal(s *ZendString) ZendUlong   { return s.GetHash() }
+func ZSTR_ALLOCA_FREE(str any, use_heap any) { b.Free(str) }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	GC_DEL_FLAGS(s, IS_STR_VALID_UTF8)
-}
-func ZendStringRefcount(s *ZendString) uint32 {
-	if ZSTR_IS_INTERNED(s) == 0 {
-		return GC_REFCOUNT(s)
-	}
-	return 1
 }
 func ZendStringAddref(s *ZendString) uint32 {
 	if ZSTR_IS_INTERNED(s) == 0 {
@@ -301,10 +287,6 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 	ZVAL_INTERNED_STR(&val, str)
 	interned_strings.AddNew(str, &val)
 	return str
-}
-func ZendInternedStringFindPermanent(str *ZendString) *ZendString {
-	ZendStringHashVal(str)
-	return ZendInternedStringHtLookup(str, &InternedStringsPermanent)
 }
 func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 	var ret *ZendString

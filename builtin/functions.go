@@ -29,3 +29,7 @@ func HashBytes(bytes []byte) uint {
 	/* Hash value can't be zero, so we always set the high bit */
 	return hash | -0x8000000000000000
 }
+
+func Free(ptr any) {
+	// todo 单纯作为内存失败的标识
+}
