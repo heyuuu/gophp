@@ -85,20 +85,16 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 	return faketype == realtype || faketype == _IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
 func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
-func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32             { return zval_p.GetPropertyGuard() }
 func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGcRefcount() }
 func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return ZendGcSetRefcount(p.gc, rc) }
 func GC_ADDREF(p ZendRefcounted) uint32                  { return p.IncGcRefcount() }
 func GC_DELREF(p ZendRefcounted) uint32                  { return p.DecGcRefcount() }
 func GC_ADDREF_EX(p ZendRefcounted, rc uint32) uint32    { return p.IncGcRefcountEx(rc) }
 func GC_TYPE_INFO(p ZendRefcounted) uint32               { return p.GetGcTypeInfo() }
-func GC_TYPE(p ZendRefcounted) ZendUchar                 { return p.GetGcType() }
 func GC_FLAGS(p ZendRefcounted) uint32                   { return p.GetGcFlags() }
-func GC_INFO(p ZendRefcounted) uint32                    { return p.GetGcInfo() }
 func GC_ADD_FLAGS(p ZendRefcounted, flags uint32)        { p.AddGcFlags(flags) }
 func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
-func OBJ_FLAGS(obj ZendRefcounted) uint32                { return obj.GetGcFlags() }
 func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags() & GC_PROTECTED }
 func GC_PROTECT_RECURSION(p *HashTable)                  { GC_ADD_FLAGS(p, GC_PROTECTED) }
 func GC_UNPROTECT_RECURSION(p *HashTable)                { GC_DEL_FLAGS(p, GC_PROTECTED) }
@@ -424,20 +420,6 @@ func ZVAL_COPY(z *Zval, v *Zval) {
 		GC_ADDREF(_gc)
 	}
 }
-func ZVAL_DUP(z *Zval, v *Zval) {
-	var _z1 *Zval = z
-	var _z2 *Zval = v
-	var _gc *ZendRefcounted = _z2.GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	if (_t & Z_TYPE_MASK) == IS_ARRAY {
-		ZVAL_ARR(_z1, ZendArrayDup((*ZendArray)(_gc)))
-	} else {
-		if Z_TYPE_INFO_REFCOUNTED(_t) {
-			GC_ADDREF(_gc)
-		}
-		ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
-	}
-}
 func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
 	var _z1 *Zval = z
 	var _z2 *Zval = v
@@ -460,11 +442,6 @@ func ZVAL_DEREF(z *Zval) {
 func ZVAL_DEINDIRECT(z *Zval) {
 	if z.IsType(IS_INDIRECT) {
 		z = z.GetZv()
-	}
-}
-func ZVAL_OPT_DEREF(z *Zval) {
-	if Z_OPT_ISREF_P(z) {
-		z = Z_REFVAL_P(z)
 	}
 }
 func ZVAL_MAKE_REF(zv *Zval) {
@@ -557,7 +534,6 @@ func SEPARATE_ARG_IF_REF(varptr *Zval) {
 		Z_ADDREF_P(varptr)
 	}
 }
-func Z_PROP_FLAG_P(z *Zval) uint32          { return z.GetU2Extra() }
 func ZVAL_COPY_VALUE_PROP(z *Zval, v *Zval) { *z = *v }
 func ZVAL_COPY_PROP(z *Zval, v *Zval) {
 	ZVAL_COPY(z, v)

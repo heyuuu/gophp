@@ -755,7 +755,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		if zend.Z_OBJ_HT_P(array).GetCountElements() != nil {
 			zend.RETVAL_LONG(1)
-			if zend.SUCCESS == zend.Z_OBJ_HT(*array).GetCountElements()(array, &zend.Z_LVAL_P(return_value)) {
+			if zend.SUCCESS == zend.Z_OBJ_HT(*array).GetCountElements()(array, &(return_value.GetLval())) {
 				return
 			}
 			if zend.ExecutorGlobals.GetException() != nil {
@@ -1235,7 +1235,7 @@ func PhpArrayUserCompare(a any, b any) int {
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		zend.ZvalPtrDtor(&args[1])
@@ -1262,7 +1262,7 @@ func PHP_ARRAY_CMP_FUNC_BACKUP() {
 	BG(user_compare_fci_cache) = zend.EmptyFcallInfoCache
 }
 func PHP_ARRAY_CMP_FUNC_RESTORE() {
-	zend.ZendReleaseFcallInfoCache(&BG(user_compare_fci_cache))
+	zend.ZendReleaseFcallInfoCache(&(BG(user_compare_fci_cache)))
 	BG(user_compare_fci) = old_user_compare_fci
 	BG(user_compare_fci_cache) = old_user_compare_fci_cache
 }
@@ -1313,7 +1313,7 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgFunc(_arg, &BG(user_compare_fci), &BG(user_compare_fci_cache), 0, &_error) == 0 {
+			if zend.ZendParseArgFunc(_arg, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache)), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -1401,7 +1401,7 @@ func PhpArrayUserKeyCompare(a any, b any) int {
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		result = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 	} else {
@@ -2230,7 +2230,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 			/* Call the userland function */
 
-			result = zend.ZendCallFunction(&BG(array_walk_fci), &BG(array_walk_fci_cache))
+			result = zend.ZendCallFunction(&(BG(array_walk_fci)), &(BG(array_walk_fci_cache)))
 			if result == zend.SUCCESS {
 				zend.ZvalPtrDtor(&retval)
 			}
@@ -2317,7 +2317,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0 {
+			if zend.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -2363,7 +2363,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PhpArrayWalk(array, userdata, 0)
-	zend.ZendReleaseFcallInfoCache(&BG(array_walk_fci_cache))
+	zend.ZendReleaseFcallInfoCache(&(BG(array_walk_fci_cache)))
 	BG(array_walk_fci) = orig_array_walk_fci
 	BG(array_walk_fci_cache) = orig_array_walk_fci_cache
 	zend.RETVAL_TRUE
@@ -2416,7 +2416,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 				break
 			}
 			zend.Z_PARAM_PROLOGUE(0, 0)
-			if zend.ZendParseArgFunc(_arg, &BG(array_walk_fci), &BG(array_walk_fci_cache), 0, &_error) == 0 {
+			if zend.ZendParseArgFunc(_arg, &(BG(array_walk_fci)), &(BG(array_walk_fci_cache)), 0, &_error) == 0 {
 				if _error == nil {
 					_expected_type = zend.Z_EXPECTED_FUNC
 					_error_code = zend.ZPP_ERROR_WRONG_ARG
@@ -2462,7 +2462,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 		break
 	}
 	PhpArrayWalk(array, userdata, 1)
-	zend.ZendReleaseFcallInfoCache(&BG(array_walk_fci_cache))
+	zend.ZendReleaseFcallInfoCache(&(BG(array_walk_fci_cache)))
 	BG(array_walk_fci) = orig_array_walk_fci
 	BG(array_walk_fci_cache) = orig_array_walk_fci_cache
 	zend.RETVAL_TRUE
@@ -7889,7 +7889,7 @@ func ZvalUserCompare(a *zend.Zval, b *zend.Zval) int {
 	BG(user_compare_fci).params = args
 	BG(user_compare_fci).retval = &retval
 	BG(user_compare_fci).no_separation = 0
-	if zend.ZendCallFunction(&BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
+	if zend.ZendCallFunction(&(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		var ret zend.ZendLong = zend.ZvalGetLong(&retval)
 		zend.ZvalPtrDtor(&retval)
 		return zend.ZEND_NORMALIZE_BOOL(ret)
@@ -7935,7 +7935,7 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 		core.PhpErrorDocref(nil, zend.E_WARNING, "at least %d parameters are required, %d given", req_args, argc)
 		return
 	}
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &argc, &BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.FAILURE {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), param_spec, &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
 		return
 	}
 	for i = 0; i < argc; i++ {
@@ -8317,7 +8317,7 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			core.PhpErrorDocref(nil, zend.E_WARNING, "at least 3 parameters are required, %d given", zend.ZEND_NUM_ARGS())
 			return
 		}
-		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "+f", &args, &argc, &BG(user_compare_fci), &BG(user_compare_fci_cache)) == zend.FAILURE {
+		if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "+f", &args, &argc, &(BG(user_compare_fci)), &(BG(user_compare_fci_cache))) == zend.FAILURE {
 			return
 		}
 		diff_data_compare_func = ZvalUserCompare
@@ -10200,7 +10200,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 							zend.ZVAL_NULL(&zv)
 							break
 						} else if zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal().GetType() != zend.IS_UNDEF {
-							zend.ZVAL_COPY(&zv, &zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
+							zend.ZVAL_COPY(&zv, zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
 							array_pos[i] = pos + 1
 							break
 						}
@@ -10230,7 +10230,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 							zend.ZVAL_NULL(&params[i])
 							break
 						} else if zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal().GetType() != zend.IS_UNDEF {
-							zend.ZVAL_COPY(&params[i], &zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
+							zend.ZVAL_COPY(&params[i], zend.Z_ARRVAL(arrays[i]).GetArData()[pos].GetVal())
 							array_pos[i] = pos + 1
 							break
 						}

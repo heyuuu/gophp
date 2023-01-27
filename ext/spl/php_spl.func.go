@@ -454,7 +454,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			zend.ZVAL_COPY(alfi.GetClosure(), zcallable)
 			lc_name = zend.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
 			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
-			memcpy(lc_name.GetVal()+func_name.GetLen(), &zend.Z_OBJ_HANDLE_P(zcallable), b.SizeOf("uint32_t"))
+			memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
 			lc_name.GetVal()[lc_name.GetLen()] = '0'
 		} else {
 			zend.ZVAL_UNDEF(alfi.GetClosure())
@@ -580,7 +580,7 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 	if zcallable.IsType(zend.IS_OBJECT) {
 		lc_name = zend.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
 		zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
-		memcpy(lc_name.GetVal()+func_name.GetLen(), &zend.Z_OBJ_HANDLE_P(zcallable), b.SizeOf("uint32_t"))
+		memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
 		lc_name.GetVal()[lc_name.GetLen()] = '0'
 	} else {
 

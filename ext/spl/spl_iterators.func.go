@@ -319,7 +319,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 		flags = RTIT_BYPASS_KEY
 		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "o|lzl", &iterator, &flags, &user_caching_it_flags, &mode) == zend.SUCCESS {
 			if zend.InstanceofFunction(zend.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
-				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), &zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
+				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
 				zend.Z_ADDREF_P(iterator)
@@ -344,7 +344,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 		flags = 0
 		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "o|ll", &iterator, &mode, &flags) == zend.SUCCESS {
 			if zend.InstanceofFunction(zend.Z_OBJCE_P(iterator), zend.ZendCeAggregate) != 0 {
-				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), &zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
+				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
 				zend.Z_ADDREF_P(iterator)
@@ -620,7 +620,7 @@ func SplRecursiveItGetMethod(zobject **zend.ZendObject, method *zend.ZendString,
 	zobj = object.GetIterators()[level].GetZobject()
 	function_handler = zend.ZendStdGetMethod(zobject, method, key)
 	if function_handler == nil {
-		if b.Assign(&function_handler, &zend.Z_OBJCE_P(zobj).GetFunctionTable().FindPtr(method)) == nil {
+		if b.Assign(&function_handler, zend.Z_OBJCE_P(zobj).GetFunctionTable().FindPtr(method)) == nil {
 			*zobject = zobj.GetObj()
 			function_handler = zobject.GetHandlers().GetGetMethod()(zobject, method, key)
 		} else {

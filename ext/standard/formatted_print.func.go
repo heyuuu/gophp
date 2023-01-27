@@ -74,7 +74,7 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 			buffer.GetVal()[b.PostInc(&(*pos))] = padding
 		}
 	}
-	memcpy(&zend.ZSTR_VAL(*buffer)[*pos], add, copy_len+1)
+	memcpy(&buffer.GetVal()[*pos], add, copy_len+1)
 	*pos += copy_len
 	if alignment == ALIGN_LEFT {
 		for b.PostDec(&npad) {

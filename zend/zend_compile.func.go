@@ -317,11 +317,11 @@ func ZendFileContextBegin(prev_context *ZendFileContext) {
 	FC(in_namespace) = 0
 	FC(has_bracketed_namespaces) = 0
 	FC(declarables).ticks = 0
-	&FC(seen_symbols).Init(8, nil, nil, 0)
+	FC(seen_symbols).Init(8, nil, nil, 0)
 }
 func ZendFileContextEnd(prev_context *ZendFileContext) {
 	ZendEndNamespace()
-	&FC(seen_symbols).Destroy()
+	FC(seen_symbols).Destroy()
 	CompilerGlobals.SetFileContext(*prev_context)
 }
 func ZendInitCompilerDataStructures() {
@@ -335,17 +335,17 @@ func ZendInitCompilerDataStructures() {
 	CompilerGlobals.SetMemoizeMode(0)
 }
 func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
-	var zv *Zval = &FC(seen_symbols).Find(name)
+	var zv *Zval = FC(seen_symbols).Find(name)
 	if zv != nil {
 		zv.SetLval(zv.GetLval() | kind)
 	} else {
 		var tmp Zval
 		ZVAL_LONG(&tmp, kind)
-		&FC(seen_symbols).AddNew(name, &tmp)
+		FC(seen_symbols).AddNew(name, &tmp)
 	}
 }
 func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
-	var zv *Zval = &FC(seen_symbols).Find(name)
+	var zv *Zval = FC(seen_symbols).Find(name)
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
 func FileHandleDtor(fh *ZendFileHandle) { ZendFileHandleDtor(fh) }
@@ -1446,7 +1446,7 @@ func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {
 	var len_ int = left_len + right.GetLen() + 1
 	result = ZendStringExtend(left, len_, 0)
 	result.GetVal()[left_len] = '\\'
-	memcpy(&ZSTR_VAL(result)[left_len+1], right.GetVal(), right.GetLen())
+	memcpy(&result.GetVal()[left_len+1], right.GetVal(), right.GetLen())
 	result.GetVal()[len_] = '0'
 	ZendStringReleaseEx(right, 0)
 	ZVAL_STR(left_zv, result)

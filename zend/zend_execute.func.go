@@ -219,10 +219,10 @@ func ZEND_CLASS_HAS_TYPE_HINTS(ce *ZendClassEntry) bool {
 	return (ce.GetCeFlags() & ZEND_ACC_HAS_TYPE_HINTS) == ZEND_ACC_HAS_TYPE_HINTS
 }
 func ZEND_REF_ADD_TYPE_SOURCE(ref *ZendReference, source *ZendPropertyInfo) {
-	ZendRefAddTypeSource(&ZEND_REF_TYPE_SOURCES(ref), source)
+	ZendRefAddTypeSource(&(ref.GetSources()), source)
 }
 func ZEND_REF_DEL_TYPE_SOURCE(ref *ZendReference, source *ZendPropertyInfo) {
-	ZendRefDelTypeSource(&ZEND_REF_TYPE_SOURCES(ref), source)
+	ZendRefDelTypeSource(&(ref.GetSources()), source)
 }
 func GetZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int) *Zval {
 	return _getZvalPtr(op_type, node, should_free, type_, EXECUTE_DATA_C, OPLINE_C)
@@ -561,21 +561,21 @@ func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ in
 func _getObjZvalPtr(op_type int, op ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &EX(This)
+		return &(EX(This))
 	}
 	return GetZvalPtr(op_type, op, should_free, type_)
 }
 func _getObjZvalPtrUndef(op_type int, op ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &EX(This)
+		return &(EX(This))
 	}
 	return GetZvalPtrUndef(op_type, op, should_free, type_)
 }
 func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
-		return &EX(This)
+		return &(EX(This))
 	}
 	return GetZvalPtrPtr(op_type, node, should_free, type_)
 }
@@ -1486,7 +1486,7 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 }
 func ZendGetPropNotAcceptingDouble(ref *ZendReference) *ZendPropertyInfo {
 	var prop *ZendPropertyInfo
-	var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(ref)
+	var _source_list *ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
 	var _list *ZendPropertyInfoList
@@ -2453,7 +2453,7 @@ func check_type_stdClass_assignable(type_ ZendType) ZendBool {
 func ZendVerifyRefArrayAssignable(ref *ZendReference) ZendBool {
 	var prop *ZendPropertyInfo
 	ZEND_ASSERT(ZEND_REF_HAS_TYPE_SOURCES(ref))
-	var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(ref)
+	var _source_list *ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
 	var _list *ZendPropertyInfoList
@@ -2479,7 +2479,7 @@ func ZendVerifyRefArrayAssignable(ref *ZendReference) ZendBool {
 func zend_verify_ref_stdClass_assignable(ref *ZendReference) ZendBool {
 	var prop *ZendPropertyInfo
 	ZEND_ASSERT(ZEND_REF_HAS_TYPE_SOURCES(ref))
-	var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(ref)
+	var _source_list *ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
 	var _list *ZendPropertyInfoList
@@ -2896,7 +2896,7 @@ func ZendVerifyRefAssignableZval(ref *ZendReference, zv *Zval, strict ZendBool) 
 	var seen_type ZendUchar
 	var needs_coercion ZendBool = 0
 	ZEND_ASSERT(zv.GetType() != IS_REFERENCE)
-	var _source_list *ZendPropertyInfoSourceList = &ZEND_REF_TYPE_SOURCES(ref)
+	var _source_list *ZendPropertyInfoSourceList = &(ref.GetSources())
 	var _prop **ZendPropertyInfo
 	var _end ***ZendPropertyInfo
 	var _list *ZendPropertyInfoList
@@ -3138,7 +3138,7 @@ func ZEND_VM_LOOP_INTERRUPT_CHECK() {
 	}
 }
 func ZendCopyExtraArgs(EXECUTE_DATA_D) {
-	var op_array *ZendOpArray = &EX(func_).op_array
+	var op_array *ZendOpArray = EX(func_).op_array
 	var first_extra_arg uint32 = op_array.GetNumArgs()
 	var num_args uint32 = EX_NUM_ARGS()
 	var src *Zval
@@ -3522,7 +3522,7 @@ func FindLiveRange(op_array *ZendOpArray, op_num uint32, var_num uint32) *ZendLi
 func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num uint32) {
 	var i int
 	for i = 0; i < EX(func_).op_array.last_live_range; i++ {
-		var range_ *ZendLiveRange = &EX(func_).op_array.live_range[i]
+		var range_ *ZendLiveRange = EX(func_).op_array.live_range[i]
 		if range_.GetStart() > op_num {
 
 			/* further blocks will not be relevant... */

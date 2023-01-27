@@ -25,7 +25,7 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **zend.HashTable {
 		var other *SplArrayObject = Z_SPLARRAY_P(intern.GetArray())
 		return SplArrayGetHashTablePtr(other)
 	} else if intern.GetArray().IsType(zend.IS_ARRAY) {
-		return &zend.Z_ARRVAL(intern.GetArray())
+		return &(intern.GetArray().GetArr())
 	} else {
 		var obj *zend.ZendObject = intern.GetArray().GetObj()
 		if obj.GetProperties() == nil {

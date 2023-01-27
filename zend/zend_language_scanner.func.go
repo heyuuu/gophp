@@ -72,17 +72,17 @@ func StartupScanner() {
 	CompilerGlobals.SetParseError(0)
 	CompilerGlobals.SetDocComment(nil)
 	CompilerGlobals.SetExtraFnFlags(0)
-	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
-	ZendPtrStackInit(&SCNG(heredoc_label_stack))
+	ZendStackInit(&(SCNG(state_stack)), b.SizeOf("int"))
+	ZendPtrStackInit(&(SCNG(heredoc_label_stack)))
 	SCNG(heredoc_scan_ahead) = 0
 }
 func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { Efree(heredoc_label.GetLabel()) }
 func ShutdownScanner() {
 	CompilerGlobals.SetParseError(0)
 	RESET_DOC_COMMENT()
-	ZendStackDestroy(&SCNG(state_stack))
-	ZendPtrStackClean(&SCNG(heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
-	ZendPtrStackDestroy(&SCNG(heredoc_label_stack))
+	ZendStackDestroy(&(SCNG(state_stack)))
+	ZendPtrStackClean(&(SCNG(heredoc_label_stack)), (func(any))(&HeredocLabelDtor), 1)
+	ZendPtrStackDestroy(&(SCNG(heredoc_label_stack)))
 	SCNG(heredoc_scan_ahead) = 0
 	SCNG(on_event) = nil
 }
@@ -94,9 +94,9 @@ func ZendSaveLexicalState(lex_state *ZendLexState) {
 	lex_state.SetYyMarker(SCNG(yy_marker))
 	lex_state.SetYyLimit(SCNG(yy_limit))
 	lex_state.SetStateStack(SCNG(state_stack))
-	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
+	ZendStackInit(&(SCNG(state_stack)), b.SizeOf("int"))
 	lex_state.SetHeredocLabelStack(SCNG(heredoc_label_stack))
-	ZendPtrStackInit(&SCNG(heredoc_label_stack))
+	ZendPtrStackInit(&(SCNG(heredoc_label_stack)))
 	lex_state.SetIn(SCNG(yy_in))
 	lex_state.SetYyState(YYSTATE)
 	lex_state.SetFilename(ZendGetCompiledFilename())
@@ -120,10 +120,10 @@ func ZendRestoreLexicalState(lex_state *ZendLexState) {
 	SCNG(yy_cursor) = lex_state.GetYyCursor()
 	SCNG(yy_marker) = lex_state.GetYyMarker()
 	SCNG(yy_limit) = lex_state.GetYyLimit()
-	ZendStackDestroy(&SCNG(state_stack))
+	ZendStackDestroy(&(SCNG(state_stack)))
 	SCNG(state_stack) = lex_state.GetStateStack()
-	ZendPtrStackClean(&SCNG(heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
-	ZendPtrStackDestroy(&SCNG(heredoc_label_stack))
+	ZendPtrStackClean(&(SCNG(heredoc_label_stack)), (func(any))(&HeredocLabelDtor), 1)
+	ZendPtrStackDestroy(&(SCNG(heredoc_label_stack)))
 	SCNG(heredoc_label_stack) = lex_state.GetHeredocLabelStack()
 	SCNG(yy_in) = lex_state.GetIn()
 	YYSETCONDITION(lex_state.GetYyState())
@@ -407,7 +407,7 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 			SCNG(script_filtered) = nil
 			ZendMultibyteSetFilter(nil)
 			if SCNG(input_filter) {
-				if size_t-1 == SCNG(input_filter)(&SCNG(script_filtered), &SCNG(script_filtered_size), SCNG(script_org), SCNG(script_org_size)) {
+				if size_t-1 == SCNG(input_filter)(&(SCNG(script_filtered)), &(SCNG(script_filtered_size)), SCNG(script_org), SCNG(script_org_size)) {
 					ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
 				}
 				buf = (*byte)(SCNG(script_filtered))
@@ -543,7 +543,7 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 		SCNG(script_filtered) = nil
 		ZendMultibyteSetFilter(ZendMultibyteGetInternalEncoding())
 		if SCNG(input_filter) {
-			if size_t-1 == SCNG(input_filter)(&SCNG(script_filtered), &SCNG(script_filtered_size), SCNG(script_org), SCNG(script_org_size)) {
+			if size_t-1 == SCNG(input_filter)(&(SCNG(script_filtered)), &(SCNG(script_filtered_size)), SCNG(script_org), SCNG(script_org_size)) {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
 			}
 			buf = (*byte)(SCNG(script_filtered))
@@ -1011,7 +1011,7 @@ func CopyHeredocLabelStack(void_heredoc_label any) {
 	var new_heredoc_label *ZendHeredocLabel = Emalloc(b.SizeOf("zend_heredoc_label"))
 	*new_heredoc_label = *heredoc_label
 	new_heredoc_label.SetLabel(Estrndup(heredoc_label.GetLabel(), heredoc_label.GetLength()))
-	ZendPtrStackPush(&SCNG(heredoc_label_stack), any(new_heredoc_label))
+	ZendPtrStackPush(&(SCNG(heredoc_label_stack)), any(new_heredoc_label))
 }
 func PARSER_MODE() bool { return elem != nil }
 func RETURN_TOKEN_WITH_VAL(_token Yytokentype) {
@@ -2402,7 +2402,7 @@ yy56:
 	YYCURSOR++
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	RESET_DOC_COMMENT()
-	if ZendStackIsEmpty(&SCNG(state_stack)) == 0 {
+	if ZendStackIsEmpty(&(SCNG(state_stack))) == 0 {
 		YyPopState()
 	}
 	token = '}'
@@ -5441,7 +5441,7 @@ yy334:
 	heredoc_label.SetLabel(Estrndup(s, heredoc_label.GetLength()))
 	heredoc_label.SetIndentation(0)
 	saved_cursor = YYCURSOR
-	ZendPtrStackPush(&SCNG(heredoc_label_stack), any(heredoc_label))
+	ZendPtrStackPush(&(SCNG(heredoc_label_stack)), any(heredoc_label))
 	for YYCURSOR < YYLIMIT && ((*YYCURSOR) == ' ' || (*YYCURSOR) == '\t') {
 		if (*YYCURSOR) == '\t' {
 			spacing |= HEREDOC_USING_TABS
@@ -8028,7 +8028,7 @@ yyc_ST_HEREDOC:
 	YYCURSOR++
 yy590:
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	var heredoc_label *zend_heredoc_label = zend_ptr_stack_top(&SCNG(heredoc_label_stack))
+	var heredoc_label *zend_heredoc_label = zend_ptr_stack_top(&(SCNG(heredoc_label_stack)))
 	var newline int = 0
 	var indentation int = 0
 	var spacing int = 0
@@ -8916,7 +8916,7 @@ yyc_ST_END_HEREDOC:
 	}
 	YYCURSOR++
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	var heredoc_label *zend_heredoc_label = zend_ptr_stack_pop(&SCNG(heredoc_label_stack))
+	var heredoc_label *zend_heredoc_label = zend_ptr_stack_pop(&(SCNG(heredoc_label_stack)))
 	Yyleng = heredoc_label.GetIndentation() + heredoc_label.GetLength()
 	YYCURSOR += Yyleng - 1
 	HeredocLabelDtor(heredoc_label)
@@ -8933,7 +8933,7 @@ yyc_ST_NOWDOC:
 	}
 	YYCURSOR++
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	var heredoc_label *ZendHeredocLabel = ZendPtrStackTop(&SCNG(heredoc_label_stack))
+	var heredoc_label *ZendHeredocLabel = ZendPtrStackTop(&(SCNG(heredoc_label_stack)))
 	var newline int = 0
 	var indentation int = 0
 	var spacing int = -1

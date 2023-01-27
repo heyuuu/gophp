@@ -559,7 +559,7 @@ try_again:
 	case IS_STRING:
 		var str *ZendString
 		str = op.GetStr()
-		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetVal(), str.GetLen(), &Z_LVAL_P(op), &Z_DVAL_P(op), b.Cond(silent != 0, 1, -1))) == 0 {
+		if b.Assign(&(op.GetTypeInfo()), IsNumericString(str.GetVal(), str.GetLen(), &(op.GetLval()), &(op.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			ZVAL_LONG(op, 0)
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")
@@ -607,7 +607,7 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		ZVAL_LONG(holder, 1)
 		return holder
 	case IS_STRING:
-		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(Z_STRVAL_P(op), Z_STRLEN_P(op), &Z_LVAL_P(holder), &Z_DVAL_P(holder), b.Cond(silent != 0, 1, -1))) == 0 {
+		if b.Assign(&(holder.GetTypeInfo()), IsNumericString(Z_STRVAL_P(op), Z_STRLEN_P(op), &(holder.GetLval()), &(holder.GetDval()), b.Cond(silent != 0, 1, -1))) == 0 {
 			ZVAL_LONG(holder, 0)
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")

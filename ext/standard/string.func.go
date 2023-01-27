@@ -1369,8 +1369,8 @@ func ZifStrtok(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZEND_NUM_ARGS() == 1 {
 		tok = str
 	} else {
-		zend.ZvalPtrDtor(&BG(strtok_zval))
-		zend.ZVAL_STRINGL(&BG(strtok_zval), str.GetVal(), str.GetLen())
+		zend.ZvalPtrDtor(&(BG(strtok_zval)))
+		zend.ZVAL_STRINGL(&(BG(strtok_zval)), str.GetVal(), str.GetLen())
 		BG(strtok_string) = zend.Z_STRVAL(BG(strtok_zval))
 		BG(strtok_last) = BG(strtok_string)
 		BG(strtok_len) = str.GetLen()
@@ -3459,7 +3459,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			if repl.IsType(zend.IS_ARRAY) {
 				repl_idx = 0
 				for repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
-					tmp_repl = &zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
+					tmp_repl = zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
 					if tmp_repl.GetType() != zend.IS_UNDEF {
 						break
 					}
@@ -3515,7 +3515,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				var orig_str *zend.ZendString = zend.ZvalGetTmpString(tmp_str, &tmp_orig_str)
 				if from.IsType(zend.IS_ARRAY) {
 					for from_idx < zend.Z_ARRVAL_P(from).GetNNumUsed() {
-						tmp_from = &zend.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
+						tmp_from = zend.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
 						if tmp_from.GetType() != zend.IS_UNDEF {
 							break
 						}
@@ -3548,7 +3548,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				}
 				if argc > 3 && len_.IsType(zend.IS_ARRAY) {
 					for len_idx < zend.Z_ARRVAL_P(len_).GetNNumUsed() {
-						tmp_len = &zend.Z_ARRVAL_P(len_).GetArData()[len_idx].GetVal()
+						tmp_len = zend.Z_ARRVAL_P(len_).GetArData()[len_idx].GetVal()
 						if tmp_len.GetType() != zend.IS_UNDEF {
 							break
 						}
@@ -3579,7 +3579,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				result_len = orig_str.GetLen() - l
 				if repl.IsType(zend.IS_ARRAY) {
 					for repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
-						tmp_repl = &zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
+						tmp_repl = zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
 						if tmp_repl.GetType() != zend.IS_UNDEF {
 							break
 						}
@@ -5702,7 +5702,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 
 					var replace_entry *zend.Zval = nil
 					for replace_idx < zend.Z_ARRVAL_P(replace).GetNNumUsed() {
-						replace_entry = &zend.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
+						replace_entry = zend.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
 						if replace_entry.GetType() != zend.IS_UNDEF {
 							break
 						}
@@ -6544,7 +6544,7 @@ func ZifSetlocale(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	for true {
 		if args[0].IsType(zend.IS_ARRAY) {
 			for idx < zend.Z_ARRVAL(args[0]).GetNNumUsed() {
-				plocale = &zend.Z_ARRVAL(args[0]).GetArData()[idx].GetVal()
+				plocale = zend.Z_ARRVAL(args[0]).GetArData()[idx].GetVal()
 				if plocale.GetType() != zend.IS_UNDEF {
 					break
 				}

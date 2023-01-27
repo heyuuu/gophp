@@ -14,7 +14,7 @@ func PhpPack(val *zend.Zval, size int, map_ *int, output *byte) {
 	if val.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(val)
 	}
-	v = (*byte)(&zend.Z_LVAL_P(val))
+	v = (*byte)(&(val.GetLval()))
 	for i = 0; i < size; i++ {
 		b.PostInc(&(*output)) = v[map_[i]]
 	}
@@ -484,8 +484,8 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return zend.MAX(0, arg-1) })
 			var tmp_str *zend.ZendString
 			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			memset(&zend.ZSTR_VAL(output)[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
-			memcpy(&zend.ZSTR_VAL(output)[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
+			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)
+			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
 			zend.ZendTmpStringRelease(tmp_str)
 			break
@@ -529,7 +529,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		case 'C':
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 1, ByteMap, &zend.ZSTR_VAL(output)[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 1, ByteMap, &output.GetVal()[outputpos])
 				outputpos++
 			}
 			break
@@ -547,7 +547,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				map_ = LittleEndianShortMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 2, map_, &zend.ZSTR_VAL(output)[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 2, map_, &output.GetVal()[outputpos])
 				outputpos += 2
 			}
 			break
@@ -555,7 +555,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		case 'I':
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], b.SizeOf("int"), IntMap, &zend.ZSTR_VAL(output)[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], b.SizeOf("int"), IntMap, &output.GetVal()[outputpos])
 				outputpos += b.SizeOf("int")
 			}
 			break
@@ -573,7 +573,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				map_ = LittleEndianLongMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 4, map_, &zend.ZSTR_VAL(output)[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 4, map_, &output.GetVal()[outputpos])
 				outputpos += 4
 			}
 			break
@@ -591,14 +591,14 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				map_ = LittleEndianLonglongMap
 			}
 			for b.PostDec(&arg) > 0 {
-				PhpPack(&argv[b.PostInc(&currentarg)], 8, map_, &zend.ZSTR_VAL(output)[outputpos])
+				PhpPack(&argv[b.PostInc(&currentarg)], 8, map_, &output.GetVal()[outputpos])
 				outputpos += 8
 			}
 			break
 		case 'f':
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				memcpy(&zend.ZSTR_VAL(output)[outputpos], &v, b.SizeOf("v"))
+				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
 			break
@@ -608,7 +608,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyFloat(1, &zend.ZSTR_VAL(output)[outputpos], v)
+				PhpPackCopyFloat(1, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 			break
@@ -618,14 +618,14 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyFloat(0, &zend.ZSTR_VAL(output)[outputpos], v)
+				PhpPackCopyFloat(0, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 			break
 		case 'd':
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				memcpy(&zend.ZSTR_VAL(output)[outputpos], &v, b.SizeOf("v"))
+				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
 			break
@@ -635,7 +635,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyDouble(1, &zend.ZSTR_VAL(output)[outputpos], v)
+				PhpPackCopyDouble(1, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 			break
@@ -645,12 +645,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
-				PhpPackCopyDouble(0, &zend.ZSTR_VAL(output)[outputpos], v)
+				PhpPackCopyDouble(0, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
 			break
 		case 'x':
-			memset(&zend.ZSTR_VAL(output)[outputpos], '0', arg)
+			memset(&output.GetVal()[outputpos], '0', arg)
 			outputpos += arg
 			break
 		case 'X':
@@ -661,7 +661,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			break
 		case '@':
 			if arg > outputpos {
-				memset(&zend.ZSTR_VAL(output)[outputpos], '0', arg-outputpos)
+				memset(&output.GetVal()[outputpos], '0', arg-outputpos)
 			}
 			outputpos = arg
 			break

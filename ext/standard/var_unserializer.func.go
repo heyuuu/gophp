@@ -535,7 +535,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		zend.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && &zend.Z_OBJCE_P(rval).GetFunctionTable().StrExists("__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
+	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.Z_OBJCE_P(rval).GetFunctionTable().StrExists("__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
 	ht = zend.Z_OBJPROP_P(rval)
 	if elements >= zend_long(zend.HT_MAX_SIZE-ht.GetNNumOfElements()) {
 		return 0

@@ -85,11 +85,11 @@ func NormalizeProtectedVariable(varname *byte) {
 }
 func AddProtectedVariable(varname *byte) {
 	NormalizeProtectedVariable(varname)
-	&PG(rfc1867_protected_variables).StrAddEmptyElement(varname, strlen(varname))
+	PG(rfc1867_protected_variables).StrAddEmptyElement(varname, strlen(varname))
 }
 func IsProtectedVariable(varname *byte) zend.ZendBool {
 	NormalizeProtectedVariable(varname)
-	return &PG(rfc1867_protected_variables).StrExists(varname, strlen(varname))
+	return PG(rfc1867_protected_variables).StrExists(varname, strlen(varname))
 }
 func SafePhpRegisterVariable(var_ *byte, strval *byte, val_len int, track_vars_array *zend.Zval, override_protection zend.ZendBool) {
 	if override_protection != 0 || IsProtectedVariable(var_) == 0 {
@@ -618,7 +618,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 	/* Initialize $_FILES[] */
 
-	&PG(rfc1867_protected_variables).Init(8, nil, nil, 0)
+	PG(rfc1867_protected_variables).Init(8, nil, nil, 0)
 	zend.ALLOC_HASHTABLE(uploaded_files)
 	uploaded_files.Init(8, nil, FreeFilename, 0)
 	SG(rfc1867_uploaded_files) = uploaded_files
@@ -1128,7 +1128,7 @@ fileupload_done:
 	if array_index != nil {
 		zend.Efree(array_index)
 	}
-	&PG(rfc1867_protected_variables).Destroy()
+	PG(rfc1867_protected_variables).Destroy()
 	zend.ZendLlistDestroy(&header)
 	if mbuff.GetBoundaryNext() != nil {
 		zend.Efree(mbuff.GetBoundaryNext())

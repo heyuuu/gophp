@@ -605,7 +605,7 @@ func zend_leave_helper_SPEC(execute_data *ZendExecuteData) int {
 		return 2
 	} else if (call_info & ZEND_CALL_TOP) == 0 {
 		ZendDetachSymbolTable(execute_data)
-		DestroyOpArray(&EX(func_).op_array)
+		DestroyOpArray(EX(func_).op_array)
 		EfreeSize(EX(func_), b.SizeOf("zend_op_array"))
 		old_execute_data = execute_data
 		ExecutorGlobals.SetCurrentExecuteData(EX(prev_execute_data))
@@ -1079,7 +1079,7 @@ send_again:
 		var arg *Zval
 		var top *Zval
 		var name *ZendString
-		ZendVmStackExtendCallFrame(&EX(call), arg_num-1, ht.GetNNumOfElements())
+		ZendVmStackExtendCallFrame(&(EX(call)), arg_num-1, ht.GetNNumOfElements())
 		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && Z_REFCOUNT_P(args) > 1 {
 			var i uint32
 			var separate int = 0
@@ -1181,7 +1181,7 @@ send_again:
 				}
 				ZVAL_DEREF(arg)
 				Z_TRY_ADDREF_P(arg)
-				ZendVmStackExtendCallFrame(&EX(call), arg_num-1, 1)
+				ZendVmStackExtendCallFrame(&(EX(call)), arg_num-1, 1)
 				top = ZEND_CALL_ARG(EX(call), arg_num)
 				ZVAL_COPY_VALUE(top, arg)
 				ZEND_CALL_NUM_ARGS(EX(call))++
@@ -1243,7 +1243,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 				if len_ > zend_long(count-skip) {
 					len_ = zend_long(count - skip)
 				}
-				ZendVmStackExtendCallFrame(&EX(call), 0, len_)
+				ZendVmStackExtendCallFrame(&(EX(call)), 0, len_)
 				arg_num = 1
 				param = ZEND_CALL_ARG(EX(call), 1)
 				for {
@@ -1300,7 +1300,7 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 			}
 			FREE_OP(free_op2)
 		} else {
-			ZendVmStackExtendCallFrame(&EX(call), 0, ht.GetNNumOfElements())
+			ZendVmStackExtendCallFrame(&(EX(call)), 0, ht.GetNNumOfElements())
 			arg_num = 1
 			param = ZEND_CALL_ARG(EX(call), 1)
 			for {
@@ -1677,13 +1677,13 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 	/* Walk try/catch/finally structures upwards, performing the necessary actions */
 
 	for try_catch_offset != uint32-1 {
-		var try_catch *ZendTryCatchElement = &EX(func_).op_array.try_catch_array[try_catch_offset]
+		var try_catch *ZendTryCatchElement = EX(func_).op_array.try_catch_array[try_catch_offset]
 		if op_num < try_catch.GetCatchOp() && ex != nil {
 
 			/* Go to catch block */
 
 			CleanupLiveVars(execute_data, op_num, try_catch.GetCatchOp())
-			ZEND_VM_JMP_EX(&EX(func_).op_array.opcodes[try_catch.GetCatchOp()], 0)
+			ZEND_VM_JMP_EX(EX(func_).op_array.opcodes[try_catch.GetCatchOp()], 0)
 		} else if op_num < try_catch.GetFinallyOp() {
 
 			/* Go to finally block */
@@ -1693,7 +1693,7 @@ func zend_dispatch_try_catch_finally_helper_SPEC(try_catch_offset uint32, op_num
 			fast_call.SetObj(ExecutorGlobals.GetException())
 			ExecutorGlobals.SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
-			ZEND_VM_JMP_EX(&EX(func_).op_array.opcodes[try_catch.GetFinallyOp()], 0)
+			ZEND_VM_JMP_EX(EX(func_).op_array.opcodes[try_catch.GetFinallyOp()], 0)
 		} else if op_num < try_catch.GetFinallyEnd() {
 			var fast_call *Zval = EX_VAR(EX(func_).op_array.opcodes[try_catch.GetFinallyEnd()].op1.var_)
 
@@ -1750,14 +1750,14 @@ func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		 * throw_op_num.
 		 */
 
-		var range_ *ZendLiveRange = FindLiveRange(&EX(func_).op_array, throw_op_num, throw_op.GetOp1().GetVar())
+		var range_ *ZendLiveRange = FindLiveRange(EX(func_).op_array, throw_op_num, throw_op.GetOp1().GetVar())
 		throw_op_num = range_.GetEnd()
 	}
 
 	/* Find the innermost try/catch/finally the exception was thrown in */
 
 	for i = 0; i < EX(func_).op_array.last_try_catch; i++ {
-		var try_catch *ZendTryCatchElement = &EX(func_).op_array.try_catch_array[i]
+		var try_catch *ZendTryCatchElement = EX(func_).op_array.try_catch_array[i]
 		if try_catch.GetTryOp() > throw_op_num {
 
 			/* further blocks will not be relevant... */
@@ -7784,7 +7784,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 		if func_.IsStatic() || (EX(func_).common.fn_flags&ZEND_ACC_STATIC) != 0 {
 			object = nil
 		} else {
-			object = &EX(This)
+			object = &(EX(This))
 		}
 	} else {
 		called_scope = EX(This).GetCe()
@@ -26643,7 +26643,7 @@ func ZEND_CLONE_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var scope *ZendClassEntry
 	var clone *ZendFunction
 	var clone_call ZendObjectCloneObjT
-	obj = &EX(This)
+	obj = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && obj.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -26734,7 +26734,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData)
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -26821,7 +26821,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) i
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -26876,7 +26876,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) 
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -26927,7 +26927,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(execute_data *ZendExecute
 	var container *Zval
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27022,7 +27022,7 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) i
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27040,7 +27040,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) 
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27057,7 +27057,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) 
 	var container *Zval
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27153,7 +27153,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteDat
 	var container *Zval
 	var property *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27171,7 +27171,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CONST_HANDLER(execute_data *ZendE
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27281,7 +27281,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_TMP_HANDLER(execute_data *ZendExe
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27392,7 +27392,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(execute_data *ZendExe
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27502,7 +27502,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CONST_OP_DATA_CV_HANDLER(execute_data *ZendExec
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27611,7 +27611,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CONST_OP_DATA_VAR_HANDLER(execute_data *Zen
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27641,7 +27641,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CONST_OP_DATA_CV_HANDLER(execute_data *Zend
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -27741,7 +27741,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteDa
 	var obj *ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28082,7 +28082,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int
 	var opline *ZendOp = EX(opline)
 	var container *Zval
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28111,7 +28111,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExe
 	var container *Zval
 	var result int
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28300,7 +28300,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28389,7 +28389,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28446,7 +28446,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28499,7 +28499,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 	var free_op2 ZendFreeOp
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28593,7 +28593,7 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28613,7 +28613,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28632,7 +28632,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 	var free_op2 ZendFreeOp
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28730,7 +28730,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteDa
 	var container *Zval
 	var property *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28750,7 +28750,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CONST_HANDLER(execute_data *Zend
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28862,7 +28862,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_TMP_HANDLER(execute_data *ZendEx
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -28975,7 +28975,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *ZendEx
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29087,7 +29087,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(execute_data *ZendExe
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29198,7 +29198,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *Ze
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29230,7 +29230,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_TMPVAR_OP_DATA_CV_HANDLER(execute_data *Zen
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29336,7 +29336,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteD
 	var obj *ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29609,7 +29609,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) in
 	var free_op2 ZendFreeOp
 	var container *Zval
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -29640,7 +29640,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendEx
 	var container *Zval
 	var result int
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30541,7 +30541,7 @@ func ZEND_ASSIGN_OBJ_OP_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) in
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30628,7 +30628,7 @@ func ZEND_PRE_INC_OBJ_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int 
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30683,7 +30683,7 @@ func ZEND_POST_INC_OBJ_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int
 	var zptr *Zval
 	var cache_slot *any
 	var prop_info *ZendPropertyInfo
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30734,7 +30734,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int 
 	var container *Zval
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30826,7 +30826,7 @@ func ZEND_FETCH_OBJ_W_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int 
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30844,7 +30844,7 @@ func ZEND_FETCH_OBJ_RW_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int
 	var property *Zval
 	var container *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30861,7 +30861,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int
 	var container *Zval
 	var offset *Zval
 	var cache_slot *any = nil
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30957,7 +30957,7 @@ func ZEND_FETCH_OBJ_UNSET_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) 
 	var container *Zval
 	var property *Zval
 	var result *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -30975,7 +30975,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31085,7 +31085,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31196,7 +31196,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31306,7 +31306,7 @@ func ZEND_ASSIGN_OBJ_SPEC_UNUSED_CV_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 	var property *Zval
 	var value *Zval
 	var tmp Zval
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31415,7 +31415,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CV_OP_DATA_VAR_HANDLER(execute_data *ZendEx
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31445,7 +31445,7 @@ func ZEND_ASSIGN_OBJ_REF_SPEC_UNUSED_CV_OP_DATA_CV_HANDLER(execute_data *ZendExe
 	var property *Zval
 	var container *Zval
 	var value_ptr *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31545,7 +31545,7 @@ func ZEND_INIT_METHOD_CALL_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData)
 	var obj *ZendObject
 	var call *ZendExecuteData
 	var call_info uint32
-	object = &EX(This)
+	object = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && object.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31809,7 +31809,7 @@ func ZEND_UNSET_OBJ_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	var container *Zval
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}
@@ -31838,7 +31838,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecut
 	var container *Zval
 	var result int
 	var offset *Zval
-	container = &EX(This)
+	container = &(EX(This))
 	if IS_UNUSED == IS_UNUSED && container.IsType(IS_UNDEF) {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
 	}

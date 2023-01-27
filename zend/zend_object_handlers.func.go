@@ -29,7 +29,7 @@ func ZendReleaseProperties(ht *HashTable) {
 	}
 }
 func ZendFreeTrampoline(func_ any) {
-	if func_ == &EG(trampoline) {
+	if func_ == &(EG(trampoline)) {
 		EG(trampoline).common.function_name = nil
 	} else {
 		Efree(func_)
@@ -539,11 +539,11 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	if zv.IsType(IS_STRING) {
 		var str *ZendString = zv.GetStr()
 		if str == member || str.GetH() == member.GetHash() && ZendStringEqualContent(str, member) != 0 {
-			return &Z_PROPERTY_GUARD_P(zv)
+			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
 			ZvalPtrDtorStr(zv)
 			ZVAL_STR_COPY(zv, member)
-			return &Z_PROPERTY_GUARD_P(zv)
+			return &(zv.GetPropertyGuard())
 		} else {
 			ALLOC_HASHTABLE(guards)
 			guards.Init(8, nil, ZendPropertyGuardDtor, 0)
@@ -565,7 +565,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 		ZEND_ASSERT(zv.IsType(IS_UNDEF))
 		ZVAL_STR_COPY(zv, member)
 		zv.SetPropertyGuard(0)
-		return &Z_PROPERTY_GUARD_P(zv)
+		return &(zv.GetPropertyGuard())
 	}
 
 	/* we have to allocate uint32_t separately because ht->arData may be reallocated */

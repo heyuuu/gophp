@@ -1640,7 +1640,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()) {
 					idx++
 				}
-				first = &zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
+				first = zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
 				return first.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(first) == 0
 			}
 			return zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 0

@@ -796,7 +796,7 @@ func zim_spl_MultipleIterator_rewind(execute_data *zend.ZendExecuteData, return_
 	intern.GetStorage().InternalPointerResetEx(intern.GetPos())
 	for b.Assign(&element, intern.GetStorage().GetCurrentDataPtrEx(intern.GetPos())) != nil && zend.ExecutorGlobals.GetException() == nil {
 		it = element.GetObj()
-		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
+		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfRewind(), "rewind", nil)
 		intern.GetStorage().MoveForwardEx(intern.GetPos())
 	}
 }
@@ -811,7 +811,7 @@ func zim_spl_MultipleIterator_next(execute_data *zend.ZendExecuteData, return_va
 	intern.GetStorage().InternalPointerResetEx(intern.GetPos())
 	for b.Assign(&element, intern.GetStorage().GetCurrentDataPtrEx(intern.GetPos())) != nil && zend.ExecutorGlobals.GetException() == nil {
 		it = element.GetObj()
-		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfNext(), "next", nil)
+		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfNext(), "next", nil)
 		intern.GetStorage().MoveForwardEx(intern.GetPos())
 	}
 }
@@ -838,7 +838,7 @@ func zim_spl_MultipleIterator_valid(execute_data *zend.ZendExecuteData, return_v
 	intern.GetStorage().InternalPointerResetEx(intern.GetPos())
 	for b.Assign(&element, intern.GetStorage().GetCurrentDataPtrEx(intern.GetPos())) != nil && zend.ExecutorGlobals.GetException() == nil {
 		it = element.GetObj()
-		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
+		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(zend.Z_ISUNDEF(retval)) {
 			valid = retval.IsType(zend.IS_TRUE)
 			zend.ZvalPtrDtor(&retval)
@@ -869,7 +869,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 	intern.GetStorage().InternalPointerResetEx(intern.GetPos())
 	for b.Assign(&element, intern.GetStorage().GetCurrentDataPtrEx(intern.GetPos())) != nil && zend.ExecutorGlobals.GetException() == nil {
 		it = element.GetObj()
-		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
+		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
 		if !(zend.Z_ISUNDEF(retval)) {
 			valid = retval.IsType(zend.IS_TRUE)
 			zend.ZvalPtrDtor(&retval)
@@ -878,9 +878,9 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 		}
 		if valid != 0 {
 			if SPL_MULTIPLE_ITERATOR_GET_ALL_CURRENT == get_type {
-				zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfCurrent(), "current", &retval)
+				zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfCurrent(), "current", &retval)
 			} else {
-				zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), &zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
+				zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
 			}
 			if zend.Z_ISUNDEF(retval) {
 				zend.ZendThrowException(spl_ce_RuntimeException, "Failed to call sub iterator method", 0)

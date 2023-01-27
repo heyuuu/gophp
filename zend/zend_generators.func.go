@@ -282,7 +282,7 @@ func CalcGcBufferSize(generator *ZendGenerator) uint32 {
 	var size uint32 = 4
 	if generator.GetExecuteData() != nil {
 		var execute_data *ZendExecuteData = generator.GetExecuteData()
-		var op_array *ZendOpArray = &EX(func_).op_array
+		var op_array *ZendOpArray = EX(func_).op_array
 
 		/* Compiled variables */
 
@@ -369,7 +369,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		*n = 0
 		return nil
 	}
-	op_array = &EX(func_).op_array
+	op_array = EX(func_).op_array
 	gc_buffer_size = CalcGcBufferSize(generator)
 	if generator.GetGcBufferSize() < gc_buffer_size {
 		generator.SetGcBuffer(SafeErealloc(generator.GetGcBuffer(), b.SizeOf("zval"), gc_buffer_size, 0))

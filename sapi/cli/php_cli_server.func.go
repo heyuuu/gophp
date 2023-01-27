@@ -172,7 +172,7 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(&core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	zend.ZendLlistApplyWithArgument(core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
 func CliServerInitGlobals(cg *ZendCliServerGlobals) { cg.SetColor(0) }
 func ZmStartupCliServer(type_ int, module_number int) int {
@@ -1498,7 +1498,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 }
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
-	PhpCliServerClientPopulateRequestInfo(client, &core.SG(request_info))
+	PhpCliServerClientPopulateRequestInfo(client, &(core.SG(request_info)))
 	if nil != b.Assign(&auth, client.GetRequest().GetHeaders().StrFindPtr("authorization", b.SizeOf("\"authorization\"")-1)) {
 		core.PhpHandleAuthData(auth)
 	}
@@ -1507,7 +1507,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 
 		/* should never be happen */
 
-		DestroyRequestInfo(&core.SG(request_info))
+		DestroyRequestInfo(&(core.SG(request_info)))
 		return zend.FAILURE
 	}
 	core.PG(during_request_startup) = 0
@@ -1516,7 +1516,7 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {
 	core.PhpRequestShutdown(0)
 	PhpCliServerCloseConnection(server, client)
-	DestroyRequestInfo(&core.SG(request_info))
+	DestroyRequestInfo(&(core.SG(request_info)))
 	core.SG(server_context) = nil
 	core.SG(rfc1867_uploaded_files) = nil
 	return zend.SUCCESS
@@ -1562,7 +1562,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 		if zend.FAILURE == PhpCliServerRequestStartup(server, client) {
 			core.SG(server_context) = nil
 			PhpCliServerCloseConnection(server, client)
-			DestroyRequestInfo(&core.SG(request_info))
+			DestroyRequestInfo(&(core.SG(request_info)))
 			return zend.SUCCESS
 		}
 	}
@@ -1604,7 +1604,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 		return zend.SUCCESS
 	}
 	core.SG(server_context) = nil
-	DestroyRequestInfo(&core.SG(request_info))
+	DestroyRequestInfo(&(core.SG(request_info)))
 	return zend.SUCCESS
 }
 func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerExtMimeTypePair) int {

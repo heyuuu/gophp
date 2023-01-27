@@ -38,14 +38,14 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 	BG(user_tick_functions) = nil
 	BG(user_filter_map) = nil
 	BG(serialize_lock) = 0
-	memset(&BG(serialize), 0, b.SizeOf("BG ( serialize )"))
-	memset(&BG(unserialize), 0, b.SizeOf("BG ( unserialize )"))
-	memset(&BG(url_adapt_session_ex), 0, b.SizeOf("BG ( url_adapt_session_ex )"))
-	memset(&BG(url_adapt_output_ex), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
+	memset(&(BG(serialize)), 0, b.SizeOf("BG ( serialize )"))
+	memset(&(BG(unserialize)), 0, b.SizeOf("BG ( unserialize )"))
+	memset(&(BG(url_adapt_session_ex)), 0, b.SizeOf("BG ( url_adapt_session_ex )"))
+	memset(&(BG(url_adapt_output_ex)), 0, b.SizeOf("BG ( url_adapt_output_ex )"))
 	BG(url_adapt_session_ex).type_ = 1
 	BG(url_adapt_output_ex).type_ = 0
-	&BG(url_adapt_session_hosts_ht).Init(0, nil, nil, 1)
-	&BG(url_adapt_output_hosts_ht).Init(0, nil, nil, 1)
+	BG(url_adapt_session_hosts_ht).Init(0, nil, nil, 1)
+	BG(url_adapt_output_hosts_ht).Init(0, nil, nil, 1)
 	BG(incomplete_class) = IncompleteClassEntry
 	BG(page_uid) = -1
 	BG(page_gid) = -1
@@ -214,10 +214,10 @@ func ZmShutdownBasic(type_ int, module_number int) int {
 func ZmActivateBasic(type_ int, module_number int) int {
 	memset(BG(strtok_table), 0, 256)
 	BG(serialize_lock) = 0
-	memset(&BG(serialize), 0, b.SizeOf("BG ( serialize )"))
-	memset(&BG(unserialize), 0, b.SizeOf("BG ( unserialize )"))
+	memset(&(BG(serialize)), 0, b.SizeOf("BG ( serialize )"))
+	memset(&(BG(unserialize)), 0, b.SizeOf("BG ( unserialize )"))
 	BG(strtok_string) = nil
-	zend.ZVAL_UNDEF(&BG(strtok_zval))
+	zend.ZVAL_UNDEF(&(BG(strtok_zval)))
 	BG(strtok_last) = nil
 	BG(locale_string) = nil
 	BG(locale_changed) = 0
@@ -229,7 +229,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	BG(page_gid) = -1
 	BG(page_inode) = -1
 	BG(page_mtime) = -1
-	&BG(putenv_ht).Init(1, nil, PhpPutenvDestructor, 0)
+	BG(putenv_ht).Init(1, nil, PhpPutenvDestructor, 0)
 	BG(user_shutdown_function_names) = nil
 	ZmActivateFilestat(type_, module_number)
 	ZmActivateSyslog(type_, module_number)
@@ -250,11 +250,11 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
-	zend.ZvalPtrDtor(&BG(strtok_zval))
-	zend.ZVAL_UNDEF(&BG(strtok_zval))
+	zend.ZvalPtrDtor(&(BG(strtok_zval)))
+	zend.ZVAL_UNDEF(&(BG(strtok_zval)))
 	BG(strtok_string) = nil
 	tsrm_env_lock()
-	&BG(putenv_ht).Destroy()
+	BG(putenv_ht).Destroy()
 	tsrm_env_unlock()
 	BG(mt_rand_is_seeded) = 0
 	if BG(umask) != -1 {
@@ -923,7 +923,7 @@ func ZifPutenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	pe.SetKeyLen(strlen(pe.GetKey()))
 	tsrm_env_lock()
-	&BG(putenv_ht).StrDel(pe.GetKey(), pe.GetKeyLen())
+	BG(putenv_ht).StrDel(pe.GetKey(), pe.GetKeyLen())
 
 	/* find previous value */
 
@@ -938,7 +938,7 @@ func ZifPutenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		unsetenv(pe.GetPutenvString())
 	}
 	if p == nil || putenv(pe.GetPutenvString()) == 0 {
-		&BG(putenv_ht).StrAddMem(pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
+		BG(putenv_ht).StrAddMem(pe.GetKey(), pe.GetKeyLen(), &pe, b.SizeOf("putenv_entry"))
 		if !(strncmp(pe.GetKey(), "TZ", pe.GetKeyLen())) {
 			tzset()
 		}
@@ -1107,7 +1107,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, &core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ExecutorGlobals.GetSymbolTable().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
+	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ExecutorGlobals.GetSymbolTable().FindExInd(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
 		var pos int = 0
 		var entry *zend.Zval
 		if args.GetType() != zend.IS_ARRAY {
@@ -4253,12 +4253,12 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 }
 func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
-		zend.ArrayInit(&BG(active_ini_file_section))
-		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), &BG(active_ini_file_section))
+		zend.ArrayInit(&(BG(active_ini_file_section)))
+		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), &(BG(active_ini_file_section)))
 	} else if arg2 != nil {
 		var active_arr *zend.Zval
 		if BG(active_ini_file_section).u1.v.type_ != zend.IS_UNDEF {
-			active_arr = &BG(active_ini_file_section)
+			active_arr = &(BG(active_ini_file_section))
 		} else {
 			active_arr = arr
 		}
@@ -4362,7 +4362,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	/* Set callback function */
 
 	if process_sections != 0 {
-		zend.ZVAL_UNDEF(&BG(active_ini_file_section))
+		zend.ZVAL_UNDEF(&(BG(active_ini_file_section)))
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)
@@ -4473,7 +4473,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	/* Set callback function */
 
 	if process_sections != 0 {
-		zend.ZVAL_UNDEF(&BG(active_ini_file_section))
+		zend.ZVAL_UNDEF(&(BG(active_ini_file_section)))
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)

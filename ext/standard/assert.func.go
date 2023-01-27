@@ -19,11 +19,11 @@ func SAFE_STRING(s *byte) string {
 func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	if zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
-			zend.ZvalPtrDtor(&ASSERTG(callback))
-			zend.ZVAL_UNDEF(&ASSERTG(callback))
+			zend.ZvalPtrDtor(&(ASSERTG(callback)))
+			zend.ZVAL_UNDEF(&(ASSERTG(callback)))
 		}
 		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || new_value.GetLen() != 0) {
-			zend.ZVAL_STR_COPY(&ASSERTG(callback), new_value)
+			zend.ZVAL_STR_COPY(&(ASSERTG(callback)), new_value)
 		}
 	} else {
 		if ASSERTG(cb) {
@@ -68,8 +68,8 @@ func ZmShutdownAssert(type_ int, module_number int) int {
 }
 func ZmDeactivateAssert(type_ int, module_number int) int {
 	if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&ASSERTG(callback))
-		zend.ZVAL_UNDEF(&ASSERTG(callback))
+		zend.ZvalPtrDtor(&(ASSERTG(callback)))
+		zend.ZVAL_UNDEF(&(ASSERTG(callback)))
 	}
 	return zend.SUCCESS
 }
@@ -193,7 +193,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	if ASSERTG(callback).u1.v.type_ == zend.IS_UNDEF && ASSERTG(cb) {
-		zend.ZVAL_STRING(&ASSERTG(callback), ASSERTG(cb))
+		zend.ZVAL_STRING(&(ASSERTG(callback)), ASSERTG(cb))
 	}
 	if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 		var args []zend.Zval
@@ -208,12 +208,12 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* XXX do we want to check for error here? */
 
 		if description == nil {
-			zend.CallUserFunction(nil, nil, &ASSERTG(callback), &retval, 3, args)
+			zend.CallUserFunction(nil, nil, &(ASSERTG(callback)), &retval, 3, args)
 			zend.ZvalPtrDtor(&args[2])
 			zend.ZvalPtrDtor(&args[0])
 		} else {
 			zend.ZVAL_STR(&args[3], zend.ZvalGetString(description))
-			zend.CallUserFunction(nil, nil, &ASSERTG(callback), &retval, 4, args)
+			zend.CallUserFunction(nil, nil, &(ASSERTG(callback)), &retval, 4, args)
 			zend.ZvalPtrDtor(&args[3])
 			zend.ZvalPtrDtor(&args[2])
 			zend.ZvalPtrDtor(&args[0])
@@ -393,15 +393,15 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		break
 	case ASSERT_CALLBACK:
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
-			zend.ZVAL_COPY(return_value, &ASSERTG(callback))
+			zend.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
 			zend.RETVAL_STRING(ASSERTG(cb))
 		} else {
 			zend.RETVAL_NULL()
 		}
 		if ac == 2 {
-			zend.ZvalPtrDtor(&ASSERTG(callback))
-			zend.ZVAL_COPY(&ASSERTG(callback), value)
+			zend.ZvalPtrDtor(&(ASSERTG(callback)))
+			zend.ZVAL_COPY(&(ASSERTG(callback)), value)
 		}
 		return
 	case ASSERT_EXCEPTION:

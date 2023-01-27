@@ -152,7 +152,7 @@ func SmartStrAppendEscaped(str *SmartStr, s *byte, l int) {
 	var i int
 	var len_ int = ZendComputeEscapedStringLen(s, l)
 	SmartStrAlloc(str, len_, 0)
-	res = &ZSTR_VAL(str.GetS())[str.GetS().GetLen()]
+	res = &str.GetS().GetVal()[str.GetS().GetLen()]
 	str.GetS().SetLen(str.GetS().GetLen() + len_)
 	for i = 0; i < l; i++ {
 		var c uint8 = s[i]

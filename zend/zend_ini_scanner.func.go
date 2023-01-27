@@ -70,13 +70,13 @@ func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
 	}
 }
 func _yyPushState(new_state int) {
-	ZendStackPush(&SCNG(state_stack), any(&YYGETCONDITION()))
+	ZendStackPush(&(SCNG(state_stack)), any(&(YYGETCONDITION())))
 	YYSETCONDITION(new_state)
 }
 func YyPopState() {
-	var stack_state *int = ZendStackTop(&SCNG(state_stack))
+	var stack_state *int = ZendStackTop(&(SCNG(state_stack)))
 	YYSETCONDITION(*stack_state)
-	ZendStackDelTop(&SCNG(state_stack))
+	ZendStackDelTop(&(SCNG(state_stack)))
 }
 func YyScanBuffer(str *byte, len_ uint) {
 	YYCURSOR = (*uint8)(str)
@@ -98,12 +98,12 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 	} else {
 		IniFilename = nil
 	}
-	ZendStackInit(&SCNG(state_stack), b.SizeOf("int"))
+	ZendStackInit(&(SCNG(state_stack)), b.SizeOf("int"))
 	BEGIN(INITIAL)
 	return SUCCESS
 }
 func ShutdownIniScanner() {
-	ZendStackDestroy(&SCNG(state_stack))
+	ZendStackDestroy(&(SCNG(state_stack)))
 	if IniFilename {
 		Free(IniFilename)
 	}

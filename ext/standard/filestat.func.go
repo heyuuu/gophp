@@ -322,7 +322,7 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			var value any
 			if group.IsType(zend.IS_LONG) {
 				option = core.PHP_STREAM_META_GROUP
-				value = &zend.Z_LVAL_P(group)
+				value = &(group.GetLval())
 			} else if group.IsType(zend.IS_STRING) {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = zend.Z_STRVAL_P(group)
@@ -477,7 +477,7 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			var value any
 			if user.IsType(zend.IS_LONG) {
 				option = core.PHP_STREAM_META_OWNER
-				value = &zend.Z_LVAL_P(user)
+				value = &(user.GetLval())
 			} else if user.IsType(zend.IS_STRING) {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = zend.Z_STRVAL_P(user)

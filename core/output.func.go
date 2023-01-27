@@ -58,7 +58,7 @@ func PhpOutputShutdown() {
 }
 func PhpOutputActivate() int {
 	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
-	zend.ZendStackInit(&OG(handlers), b.SizeOf("php_output_handler *"))
+	zend.ZendStackInit(&(OG(handlers)), b.SizeOf("php_output_handler *"))
 	OG(flags) |= PHP_OUTPUT_ACTIVATED
 	return zend.SUCCESS
 }
@@ -73,12 +73,12 @@ func PhpOutputDeactivate() {
 		/* release all output handlers */
 
 		if OG(handlers).elements {
-			for b.Assign(&handler, zend.ZendStackTop(&OG(handlers))) {
+			for b.Assign(&handler, zend.ZendStackTop(&(OG(handlers)))) {
 				PhpOutputHandlerFree(handler)
-				zend.ZendStackDelTop(&OG(handlers))
+				zend.ZendStackDelTop(&(OG(handlers)))
 			}
 		}
-		zend.ZendStackDestroy(&OG(handlers))
+		zend.ZendStackDestroy(&(OG(handlers)))
 	}
 }
 func PhpOutputRegisterConstants() {
@@ -124,9 +124,9 @@ func PhpOutputFlush() int {
 		PhpOutputContextInit(&context, PHP_OUTPUT_HANDLER_FLUSH)
 		PhpOutputHandlerOp(OG(active), &context)
 		if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 {
-			zend.ZendStackDelTop(&OG(handlers))
+			zend.ZendStackDelTop(&(OG(handlers)))
 			PhpOutputWrite(context.GetOut().GetData(), context.GetOut().GetUsed())
-			zend.ZendStackPush(&OG(handlers), &OG(active))
+			zend.ZendStackPush(&(OG(handlers)), &(OG(active)))
 		}
 		PhpOutputContextDtor(&context)
 		return zend.SUCCESS
@@ -152,7 +152,7 @@ func PhpOutputCleanAll() {
 	var context PhpOutputContext
 	if OG(active) {
 		PhpOutputContextInit(&context, PHP_OUTPUT_HANDLER_CLEAN)
-		zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyClean, &context)
+		zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyClean, &context)
 	}
 }
 func PhpOutputEnd() int {
@@ -179,7 +179,7 @@ func PhpOutputDiscardAll() {
 }
 func PhpOutputGetLevel() int {
 	if OG(active) {
-		return &OG(handlers).GetTop()
+		return OG(handlers).GetTop()
 	} else {
 		return 0
 	}
@@ -326,7 +326,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 
 	/* zend_stack_push returns stack level */
 
-	handler.SetLevel(zend.ZendStackPush(&OG(handlers), &handler))
+	handler.SetLevel(zend.ZendStackPush(&(OG(handlers)), &handler))
 	OG(active) = handler
 	return zend.SUCCESS
 }
@@ -335,7 +335,7 @@ func PhpOutputHandlerStarted(name *byte, name_len int) int {
 	var i int
 	var count int = PhpOutputGetLevel()
 	if count != 0 {
-		handlers = (**PhpOutputHandler)(&OG(handlers).GetElements())
+		handlers = (**PhpOutputHandler)(OG(handlers).GetElements())
 		for i = 0; i < count; i++ {
 			if name_len == handlers[i].GetName().GetLen() && !(memcmp(handlers[i].GetName().GetVal(), name, name_len)) {
 				return 1
@@ -410,7 +410,7 @@ func PhpOutputHandlerHook(type_ PhpOutputHandlerHookT, arg any) int {
 	if OG(running) {
 		switch type_ {
 		case PHP_OUTPUT_HANDLER_HOOK_GET_OPAQ:
-			*((**any)(arg)) = &OG(running).opaq
+			*((**any)(arg)) = OG(running).opaq
 			return zend.SUCCESS
 		case PHP_OUTPUT_HANDLER_HOOK_GET_FLAGS:
 			*((*int)(arg)) = OG(running).flags
@@ -704,12 +704,12 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 	 *  - or apply op to the handler stack
 	 */
 
-	if OG(active) && b.Assign(&obh_cnt, &OG(handlers).GetTop()) {
+	if OG(active) && b.Assign(&obh_cnt, OG(handlers).GetTop()) {
 		context.GetIn().SetData((*byte)(str))
 		context.GetIn().SetUsed(len_)
 		if obh_cnt > 1 {
-			zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
-		} else if b.Assign(&active, zend.ZendStackTop(&OG(handlers))) && !active.IsDisabled() {
+			zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
+		} else if b.Assign(&active, zend.ZendStackTop(&(OG(handlers)))) && !active.IsDisabled() {
 			PhpOutputHandlerOp(*active, &context)
 		} else {
 			PhpOutputContextPass(&context)
@@ -859,8 +859,8 @@ func PhpOutputStackPop(flags int) int {
 
 		/* pop it off the stack */
 
-		zend.ZendStackDelTop(&OG(handlers))
-		if b.Assign(&current, zend.ZendStackTop(&OG(handlers))) {
+		zend.ZendStackDelTop(&(OG(handlers)))
+		if b.Assign(&current, zend.ZendStackTop(&(OG(handlers)))) {
 			OG(active) = *current
 		} else {
 			OG(active) = nil
@@ -1042,7 +1042,7 @@ func ZifObListHandlers(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	if !(OG(active)) {
 		return
 	}
-	zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
+	zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
 func ZifObGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var full_status zend.ZendBool = 0
@@ -1055,7 +1055,7 @@ func ZifObGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if full_status != 0 {
 		zend.ArrayInit(return_value)
-		zend.ZendStackApplyWithArgument(&OG(handlers), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyStatus, return_value)
+		zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyStatus, return_value)
 	} else {
 		PhpOutputHandlerStatus(OG(active), return_value)
 	}

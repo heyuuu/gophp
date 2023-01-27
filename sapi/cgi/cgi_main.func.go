@@ -392,12 +392,12 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 	/* Find cached config entry: If not found, create one */
 
-	if b.Assign(&entry, &CGIG(user_config_cache).StrFindPtr(path, path_len)) == nil {
+	if b.Assign(&entry, CGIG(user_config_cache).StrFindPtr(path, path_len)) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig((*zend.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
 		new_entry.GetUserConfig().Init(8, nil, zend.DtorFuncT(core.ConfigZvalDtor), 1)
-		entry = &CGIG(user_config_cache).StrUpdatePtr(path, path_len, new_entry)
+		entry = CGIG(user_config_cache).StrUpdatePtr(path, path_len, new_entry)
 	}
 
 	/* Check whether cache entry has expired and rescan if it is */
@@ -930,7 +930,7 @@ func ZmStartupCgi(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
-	&CGIG(user_config_cache).Destroy()
+	CGIG(user_config_cache).Destroy()
 	zend.UNREGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }
@@ -1078,7 +1078,7 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(&core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	zend.ZendLlistApplyWithArgument(core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
 func Main(argc int, argv []*byte) int {
 	var free_query_string int = 0

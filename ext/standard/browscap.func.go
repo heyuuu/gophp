@@ -341,7 +341,7 @@ func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 		/* value handled in browscap.c's MINIT */
 
 	} else if stage == core.PHP_INI_STAGE_ACTIVATE {
-		var bdata *BrowserData = &BROWSCAP_G(activation_bdata)
+		var bdata *BrowserData = &(BROWSCAP_G(activation_bdata))
 		if bdata.GetFilename()[0] != '0' {
 			BrowscapBdataDtor(bdata, 0)
 		}
@@ -365,7 +365,7 @@ func ZmStartupBrowscap(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmDeactivateBrowscap(type_ int, module_number int) int {
-	var bdata *BrowserData = &BROWSCAP_G(activation_bdata)
+	var bdata *BrowserData = &(BROWSCAP_G(activation_bdata))
 	if bdata.GetFilename()[0] != '0' {
 		BrowscapBdataDtor(bdata, 0)
 	}
@@ -529,7 +529,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	var found_entry *BrowscapEntry = nil
 	var agent_ht *zend.HashTable
 	if BROWSCAP_G(activation_bdata).filename[0] != '0' {
-		bdata = &BROWSCAP_G(activation_bdata)
+		bdata = &(BROWSCAP_G(activation_bdata))
 		if bdata.GetHtab() == nil {
 			if BrowscapReadFile(bdata.GetFilename(), bdata, 0) == zend.FAILURE {
 				zend.RETVAL_FALSE
@@ -621,7 +621,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	if agent_name == nil {
 		var http_user_agent *zend.Zval = nil
 		if core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
-			http_user_agent = &core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().StrFind("HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
+			http_user_agent = core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().StrFind("HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
 		}
 		if http_user_agent == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")

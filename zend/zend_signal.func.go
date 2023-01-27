@@ -183,7 +183,7 @@ func ZendSignalRegister(signo int, handler func(int, *siginfo_t, any)) int {
 }
 func ZendSignalActivate() {
 	var x int
-	memcpy(&SIGG(handlers), &GlobalOrigHandlers, b.SizeOf("global_orig_handlers"))
+	memcpy(&(SIGG(handlers)), &GlobalOrigHandlers, b.SizeOf("global_orig_handlers"))
 	if SIGG(reset) {
 		for x = 0; x < b.SizeOf("zend_sigs")/b.SizeOf("* zend_sigs"); x++ {
 			ZendSignalRegister(ZendSigs[x], ZendSignalHandlerDefer)
@@ -216,7 +216,7 @@ func ZendSignalDeactivate() {
 	/* After active=0 is set, signal handlers will be called directly and other
 	 * state that is reset below will not be accessed. */
 
-	*((*volatile__int)(&SIGG(active))) = 0
+	*((*volatile__int)(&(SIGG(active)))) = 0
 	SIGG(running) = 0
 	SIGG(blocked) = 0
 	SIGG(depth) = 0

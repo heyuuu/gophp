@@ -715,7 +715,7 @@ func ZifHeadersList(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(&core.SG(sapi_headers).headers, PhpHeadApplyHeaderListToHash, return_value)
+	zend.ZendLlistApplyWithArgument(core.SG(sapi_headers).headers, PhpHeadApplyHeaderListToHash, return_value)
 }
 func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var response_code zend.ZendLong = 0

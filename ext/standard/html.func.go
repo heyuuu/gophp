@@ -1160,7 +1160,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 			if (flags & ENT_HTML_IGNORE_ERRORS) != 0 {
 				continue
 			} else if (flags & ENT_HTML_SUBSTITUTE_ERRORS) != 0 {
-				memcpy(&zend.ZSTR_VAL(replaced)[len_], replacement, replacement_len)
+				memcpy(&replaced.GetVal()[len_], replacement, replacement_len)
 				len_ += replacement_len
 				continue
 			} else {
@@ -1204,7 +1204,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 			}
 			if rep != nil {
 				replaced.GetVal()[b.PostInc(&len_)] = '&'
-				memcpy(&zend.ZSTR_VAL(replaced)[len_], rep, rep_len)
+				memcpy(&replaced.GetVal()[len_], rep, rep_len)
 				len_ += rep_len
 				replaced.GetVal()[b.PostInc(&len_)] = ';'
 			} else {
@@ -1262,7 +1262,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 		} else {
 			if double_encode != 0 {
 			encode_amp:
-				memcpy(&zend.ZSTR_VAL(replaced)[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
+				memcpy(&replaced.GetVal()[len_], "&amp;", b.SizeOf("\"&amp;\"")-1)
 				len_ += b.SizeOf("\"&amp;\"") - 1
 			} else {
 
@@ -1322,7 +1322,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 					maxlen += ent_len + 128
 				}
 				replaced.GetVal()[b.PostInc(&len_)] = '&'
-				memcpy(&zend.ZSTR_VAL(replaced)[len_], &old[cursor], ent_len)
+				memcpy(&replaced.GetVal()[len_], &old[cursor], ent_len)
 				len_ += ent_len
 				replaced.GetVal()[b.PostInc(&len_)] = ';'
 				cursor += ent_len + 1
