@@ -16,7 +16,7 @@ func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c]
 func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx] }
 
 func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
-func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
+func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap any) {
 	str = NewZendStringByLen(_len)
 }
 func ZSTR_ALLOCA_FREE(str any, use_heap any) { b.Free(str) }

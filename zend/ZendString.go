@@ -26,13 +26,8 @@ func NewZendString(str string) *ZendString {
 }
 
 func NewZendStringByLen(len_ int) *ZendString {
-	var val = make([]byte, len_)
-	var str = &ZendString{len_: len_, val: val}
-
-	str.SetGcRefcount(1)
-	str.SetGcTypeInfo(IS_STRING)
-
-	return str
+	var str = string(make([]byte, len_))
+	return NewZendString(str)
 }
 
 func (this *ZendString) GetH() ZendUlong      { return this.h }

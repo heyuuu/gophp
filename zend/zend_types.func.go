@@ -88,9 +88,9 @@ func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIt
 func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32             { return zval_p.GetPropertyGuard() }
 func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGc().GetRefcount() }
 func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return ZendGcSetRefcount(p.gc, rc) }
-func GC_ADDREF(p *ZendResource) uint32                   { return ZendGcAddref(p.GetGc()) }
-func GC_DELREF(p *HashTable) uint32                      { return ZendGcDelref(p.GetGc()) }
-func GC_ADDREF_EX(p *ZendRefcounted, rc uint32) uint32   { return ZendGcAddrefEx(p.GetGc(), rc) }
+func GC_ADDREF(p *ZendResource) uint32                   { return p.IncGcRefcount() }
+func GC_DELREF(p *HashTable) uint32                      { return p.DecGcRefcount() }
+func GC_ADDREF_EX(p ZendRefcounted, rc uint32) uint32    { return p.IncGcRefcountEx(rc) }
 func GC_TYPE_INFO(p ZendRefcounted) uint32               { return p.GetGcTypeInfo() }
 func GC_TYPE(p ZendRefcounted) ZendUchar                 { return p.GetGcType() }
 func GC_FLAGS(p ZendRefcounted) uint32                   { return p.GetGcFlags() }
@@ -138,7 +138,6 @@ func Z_OPT_REFCOUNTED(zval Zval) bool {
 	return Z_TYPE_INFO_REFCOUNTED(zval.GetTypeInfo())
 }
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool             { return Z_OPT_REFCOUNTED(*zval_p) }
-func Z_OPT_COPYABLE(zval Zval) bool                    { return Z_OPT_TYPE(zval) == IS_ARRAY }
 func Z_OPT_ISREF(zval Zval) bool                       { return Z_OPT_TYPE(zval) == IS_REFERENCE }
 func Z_OPT_ISREF_P(zval_p *Zval) bool                  { return Z_OPT_ISREF(*zval_p) }
 func Z_ISREF(zval Zval) bool                           { return zval.IsType(IS_REFERENCE) }
@@ -155,7 +154,6 @@ func Z_STRVAL(zval Zval) []byte                        { return Z_STR(zval).GetV
 func Z_STRVAL_P(zval_p *Zval) []byte                   { return Z_STRVAL(*zval_p) }
 func Z_STRLEN(zval Zval) int                           { return Z_STR(zval).GetLen() }
 func Z_STRLEN_P(zval_p *Zval) int                      { return Z_STRLEN(*zval_p) }
-func Z_STRHASH(zval Zval) ZendUlong                    { return ZSTR_HASH(zval.GetStr()) }
 func Z_ARRVAL(zval Zval) *ZendArray                    { return zval.GetArr() }
 func Z_ARRVAL_P(zval_p *Zval) *ZendArray               { return zval_p.GetArr() }
 func Z_OBJ(zval Zval) *ZendObject                      { return zval.GetObj() }
@@ -178,27 +176,22 @@ func Z_RES_HANDLE(zval Zval) int          { return Z_RES(zval).GetHandle() }
 func Z_RES_HANDLE_P(zval_p *Zval) int     { return Z_RES_HANDLE(*zval_p) }
 func Z_RES_TYPE(zval Zval) int            { return Z_RES(zval).GetType() }
 func Z_RES_TYPE_P(zval_p *Zval) int       { return Z_RES_TYPE(*zval_p) }
-func Z_RES_VAL(zval Zval) any             { return Z_RES(zval).GetPtr() }
 func Z_REF(zval Zval) *ZendReference      { return zval.GetRef() }
 func Z_REFVAL(zval Zval) Zval             { return &Z_REF(zval).GetVal() }
 func Z_REFVAL_P(zval_p *Zval) Zval        { return Z_REFVAL(*zval_p) }
 func GC_AST(p *ZendAstRef) *ZendAst {
 	return (*ZendAst)((*byte)(p) + b.SizeOf("zend_ast_ref"))
 }
-func Z_ASTVAL(zval Zval) *ZendAst         { return GC_AST(zval.GetAst()) }
-func Z_ASTVAL_P(zval_p *Zval) *ZendAst    { return Z_ASTVAL(*zval_p) }
-func Z_INDIRECT(zval Zval) *Zval          { return zval.GetZv() }
-func Z_INDIRECT_P(zval_p *Zval) *Zval     { return zval_p.GetZv() }
-func Z_CE(zval Zval) *ZendClassEntry      { return zval.GetCe() }
-func Z_CE_P(zval_p *Zval) *ZendClassEntry { return zval_p.GetCe() }
-func Z_FUNC(zval Zval) *ZendFunction      { return zval.GetFunc() }
-func Z_FUNC_P(zval_p *Zval) *ZendFunction { return zval_p.GetFunc() }
-func Z_PTR(zval Zval) any                 { return zval.GetPtr() }
-func Z_PTR_P(zval_p *Zval) any            { return zval_p.GetPtr() }
-func ZVAL_UNDEF(z *Zval)                  { z.SetTypeInfo(IS_UNDEF) }
-func ZVAL_NULL(z *Zval)                   { z.SetTypeInfo(IS_NULL) }
-func ZVAL_FALSE(z *Zval)                  { z.SetTypeInfo(IS_FALSE) }
-func ZVAL_TRUE(z *Zval)                   { z.SetTypeInfo(IS_TRUE) }
+func Z_ASTVAL(zval Zval) *ZendAst      { return GC_AST(zval.GetAst()) }
+func Z_ASTVAL_P(zval_p *Zval) *ZendAst { return Z_ASTVAL(*zval_p) }
+func Z_INDIRECT(zval Zval) *Zval       { return zval.GetZv() }
+func Z_INDIRECT_P(zval_p *Zval) *Zval  { return zval_p.GetZv() }
+func Z_CE(zval Zval) *ZendClassEntry   { return zval.GetCe() }
+func Z_PTR(zval Zval) any              { return zval.GetPtr() }
+func ZVAL_UNDEF(z *Zval)               { z.SetTypeInfo(IS_UNDEF) }
+func ZVAL_NULL(z *Zval)                { z.SetTypeInfo(IS_NULL) }
+func ZVAL_FALSE(z *Zval)               { z.SetTypeInfo(IS_FALSE) }
+func ZVAL_TRUE(z *Zval)                { z.SetTypeInfo(IS_TRUE) }
 func ZVAL_BOOL(z *Zval, b int) {
 	if b != 0 {
 		z.SetTypeInfo(IS_TRUE)
@@ -387,15 +380,8 @@ func ZendGcSetRefcount(p *ZendRefcountedH, rc uint32) uint32 {
 	p.SetRefcount(rc)
 	return p.GetRefcount()
 }
-func ZendGcAddref(p *ZendRefcountedH) uint32 {
-	p.GetRefcount()++
-	return p.GetRefcount()
-}
-func ZendGcDelref(p *ZendRefcountedH) uint32 {
-	ZEND_ASSERT(p.GetRefcount() > 0)
-	p.GetRefcount()--
-	return p.GetRefcount()
-}
+func ZendGcAddref(p ZendRefcountedH) uint32  { return p.IncRefcount() }
+func ZendGcDelref(p *ZendRefcountedH) uint32 { return p.DecRefcount() }
 func ZendGcAddrefEx(p *ZendRefcountedH, rc uint32) uint32 {
 	p.SetRefcount(p.GetRefcount() + rc)
 	return p.GetRefcount()
