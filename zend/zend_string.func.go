@@ -7,7 +7,6 @@ import (
 )
 
 func ZSTR_VAL(str *ZendString) []byte             { return str.GetVal() }
-func ZSTR_HASH(str *ZendString) ZendUlong         { return str.GetHash() }
 func ZendStringHashVal(str *ZendString) ZendUlong { return str.GetHash() }
 
 func STR_EMPTY_ALLOC() *ZendString                 { return ZendEmptyString }
@@ -24,12 +23,8 @@ func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	GC_DEL_FLAGS(s, IS_STR_VALID_UTF8)
 }
-func ZendStringAddref(s *ZendString) uint32 {
-	return GC_ADDREF(s)
-}
-func ZendStringDelref(s *ZendString) uint32 {
-	return GC_DELREF(s)
-}
+func ZendStringAddref(s *ZendString) uint32 { return s.IncGcRefcount() }
+func ZendStringDelref(s *ZendString) uint32 { return s.DecGcRefcount() }
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var ret = NewZendStringByLen(len_)
 	if persistent != 0 {
@@ -61,22 +56,9 @@ func ZendStringCopy(s *ZendString) *ZendString {
 func ZendStringDup(s *ZendString, persistent int) *ZendString {
 	return ZendStringInit(s.GetVal(), s.GetLen(), persistent)
 }
-func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
-	var ret *ZendString
-	if GC_REFCOUNT(s) == 1 {
-		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.SetLen(len_)
-		ZendStringForgetHashVal(ret)
-		return ret
-	}
-	ret = ZendStringAlloc(len_, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), MIN(len_, s.GetLen())+1)
-	GC_DELREF(s)
-	return ret
-}
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
-	var ret *ZendString
 	ZEND_ASSERT(len_ >= s.GetLen())
+	var ret *ZendString
 	if GC_REFCOUNT(s) == 1 {
 		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 		ret.SetLen(len_)
@@ -162,14 +144,10 @@ func ZendStringEqualsLiteral(str *ZendString, literal string) bool {
 func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
 	return b.NewStrArg(str, uint(len_)).Hash()
 }
-func ZendStringHashFunc(str *ZendString) ZendUlong {
-	str.SetH(ZendHashFunc(str.GetVal(), str.GetLen()))
-	return str.GetH()
-}
 func ZendHashFunc(str *byte, len_ int) ZendUlong { return ZendInlineHashFunc(str, len_) }
 func _strDtor(zv *Zval) {
 	var str *ZendString = zv.GetStr()
-	Pefree(str, GC_FLAGS(str)&IS_STR_PERSISTENT)
+	b.Free(str)
 }
 func ZendInitInternedStringsHt(interned_strings *HashTable, permanent int) {
 	interned_strings.Init(1024, nil, _strDtor, permanent)

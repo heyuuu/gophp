@@ -86,10 +86,10 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 }
 func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
 func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32             { return zval_p.GetPropertyGuard() }
-func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGc().GetRefcount() }
+func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGcRefcount() }
 func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return ZendGcSetRefcount(p.gc, rc) }
-func GC_ADDREF(p *ZendResource) uint32                   { return p.IncGcRefcount() }
-func GC_DELREF(p *HashTable) uint32                      { return p.DecGcRefcount() }
+func GC_ADDREF(p ZendRefcounted) uint32                  { return p.IncGcRefcount() }
+func GC_DELREF(p ZendRefcounted) uint32                  { return p.DecGcRefcount() }
 func GC_ADDREF_EX(p ZendRefcounted, rc uint32) uint32    { return p.IncGcRefcountEx(rc) }
 func GC_TYPE_INFO(p ZendRefcounted) uint32               { return p.GetGcTypeInfo() }
 func GC_TYPE(p ZendRefcounted) ZendUchar                 { return p.GetGcType() }
