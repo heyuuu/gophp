@@ -99,12 +99,12 @@ func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags()
 func GC_PROTECT_RECURSION(p *HashTable)                  { GC_ADD_FLAGS(p, GC_PROTECTED) }
 func GC_UNPROTECT_RECURSION(p *HashTable)                { GC_DEL_FLAGS(p, GC_PROTECTED) }
 func GC_TRY_PROTECT_RECURSION(p *HashTable) {
-	if (GC_FLAGS(p) & GC_IMMUTABLE) == 0 {
+	if (p.GetGcFlags() & GC_IMMUTABLE) == 0 {
 		GC_PROTECT_RECURSION(p)
 	}
 }
 func GC_TRY_UNPROTECT_RECURSION(p *HashTable) {
-	if (GC_FLAGS(p) & GC_IMMUTABLE) == 0 {
+	if (p.GetGcFlags() & GC_IMMUTABLE) == 0 {
 		GC_UNPROTECT_RECURSION(p)
 	}
 }
@@ -227,7 +227,7 @@ func ZVAL_STR_COPY(z *Zval, s *ZendString) {
 	var __z *Zval = z
 	var __s *ZendString = s
 	__z.SetStr(__s)
-	GC_ADDREF(__s)
+	__s.IncGcRefcount()
 	__z.SetTypeInfo(IS_STRING_EX)
 }
 func ZVAL_ARR(z *Zval, a *ZendArray) {
@@ -262,7 +262,7 @@ func ZVAL_NEW_RES(z *Zval, h int, p any, t int) {
 	var _res *ZendResource = (*ZendResource)(Emalloc(b.SizeOf("zend_resource")))
 	var __z *Zval
 	GC_SET_REFCOUNT(_res, 1)
-	GC_TYPE_INFO(_res) = IS_RESOURCE
+	_res.GetGcTypeInfo() = IS_RESOURCE
 	_res.SetHandle(h)
 	_res.SetType(t)
 	_res.SetPtr(p)
@@ -274,7 +274,7 @@ func ZVAL_NEW_PERSISTENT_RES(z *Zval, h int, p any, t int) {
 	var _res *ZendResource = (*ZendResource)(Malloc(b.SizeOf("zend_resource")))
 	var __z *Zval
 	GC_SET_REFCOUNT(_res, 1)
-	GC_TYPE_INFO(_res) = IS_RESOURCE | GC_PERSISTENT<<GC_FLAGS_SHIFT
+	_res.GetGcTypeInfo() = IS_RESOURCE | GC_PERSISTENT<<GC_FLAGS_SHIFT
 	_res.SetHandle(h)
 	_res.SetType(t)
 	_res.SetPtr(p)
@@ -290,7 +290,7 @@ func ZVAL_REF(z *Zval, r *ZendReference) {
 func ZVAL_NEW_EMPTY_REF(z *Zval) {
 	var _ref *ZendReference = (*ZendReference)(Emalloc(b.SizeOf("zend_reference")))
 	GC_SET_REFCOUNT(_ref, 1)
-	GC_TYPE_INFO(_ref) = IS_REFERENCE
+	_ref.GetGcTypeInfo() = IS_REFERENCE
 	_ref.GetSources().SetPtr(nil)
 	z.SetRef(_ref)
 	z.SetTypeInfo(IS_REFERENCE_EX)
@@ -298,7 +298,7 @@ func ZVAL_NEW_EMPTY_REF(z *Zval) {
 func ZVAL_NEW_REF(z *Zval, r *Zval) {
 	var _ref *ZendReference = (*ZendReference)(Emalloc(b.SizeOf("zend_reference")))
 	GC_SET_REFCOUNT(_ref, 1)
-	GC_TYPE_INFO(_ref) = IS_REFERENCE
+	_ref.GetGcTypeInfo() = IS_REFERENCE
 	ZVAL_COPY_VALUE(_ref.GetVal(), r)
 	_ref.GetSources().SetPtr(nil)
 	z.SetRef(_ref)
@@ -308,7 +308,7 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	var _z *Zval = z
 	var _ref *ZendReference = (*ZendReference)(Emalloc(b.SizeOf("zend_reference")))
 	GC_SET_REFCOUNT(_ref, refcount)
-	GC_TYPE_INFO(_ref) = IS_REFERENCE
+	_ref.GetGcTypeInfo() = IS_REFERENCE
 	ZVAL_COPY_VALUE(_ref.GetVal(), _z)
 	_ref.GetSources().SetPtr(nil)
 	_z.SetRef(_ref)
@@ -317,7 +317,7 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 func ZVAL_NEW_PERSISTENT_REF(z *Zval, r *Zval) {
 	var _ref *ZendReference = (*ZendReference)(Malloc(b.SizeOf("zend_reference")))
 	GC_SET_REFCOUNT(_ref, 1)
-	GC_TYPE_INFO(_ref) = IS_REFERENCE | GC_PERSISTENT<<GC_FLAGS_SHIFT
+	_ref.GetGcTypeInfo() = IS_REFERENCE | GC_PERSISTENT<<GC_FLAGS_SHIFT
 	ZVAL_COPY_VALUE(_ref.GetVal(), r)
 	_ref.GetSources().SetPtr(nil)
 	z.SetRef(_ref)
@@ -393,11 +393,11 @@ func ZvalSetRefcountP(pz *Zval, rc uint32) uint32 {
 }
 func ZvalAddrefP(pz *Zval) uint32 {
 	ZEND_ASSERT(Z_REFCOUNTED_P(pz))
-	return GC_ADDREF(pz.GetCounted())
+	return pz.GetCounted().IncGcRefcount()
 }
 func ZvalDelrefP(pz *Zval) uint32 {
 	ZEND_ASSERT(Z_REFCOUNTED_P(pz))
-	return GC_DELREF(pz.GetCounted())
+	return pz.GetCounted().DecGcRefcount()
 }
 func ZVAL_COPY_VALUE_EX(z *Zval, v *Zval, gc *ZendRefcounted, t uint32) {
 	z.SetCounted(gc)
@@ -417,7 +417,7 @@ func ZVAL_COPY(z *Zval, v *Zval) {
 	var _t uint32 = _z2.GetTypeInfo()
 	ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
 	if Z_TYPE_INFO_REFCOUNTED(_t) {
-		GC_ADDREF(_gc)
+		_gc.IncGcRefcount()
 	}
 }
 func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
@@ -427,8 +427,8 @@ func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
 	var _t uint32 = _z2.GetTypeInfo()
 	ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
 	if Z_TYPE_INFO_REFCOUNTED(_t) {
-		if (GC_FLAGS(_gc) & GC_PERSISTENT) == 0 {
-			GC_ADDREF(_gc)
+		if (_gc.GetGcFlags() & GC_PERSISTENT) == 0 {
+			_gc.IncGcRefcount()
 		} else {
 			ZvalCopyCtorFunc(_z1)
 		}
@@ -485,9 +485,9 @@ func SEPARATE_STRING(zv *Zval) {
 func SEPARATE_ARRAY(zv *Zval) {
 	var _zv *Zval = zv
 	var _arr *ZendArray = _zv.GetArr()
-	if GC_REFCOUNT(_arr) > 1 {
+	if _arr.GetGcRefcount() > 1 {
 		if Z_REFCOUNTED_P(_zv) {
-			GC_DELREF(_arr)
+			_arr.DecGcRefcount()
 		}
 		ZVAL_ARR(_zv, ZendArrayDup(_arr))
 	}
@@ -514,7 +514,7 @@ func SEPARATE_ZVAL(zv *Zval) {
 		if Z_ISREF_P(_zv) {
 			var _r *ZendReference = _zv.GetRef()
 			ZVAL_COPY_VALUE(_zv, _r.GetVal())
-			if GC_DELREF(_r) == 0 {
+			if _r.DecGcRefcount() == 0 {
 				EfreeSize(_r, b.SizeOf("zend_reference"))
 			} else if Z_OPT_TYPE_P(_zv) == IS_ARRAY {
 				ZVAL_ARR(_zv, ZendArrayDup(_zv.GetArr()))
