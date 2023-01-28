@@ -24,10 +24,10 @@ func HT_ITERATORS_OVERFLOW(ht *HashTable) bool        { return ht.GetNIteratorsC
 func HT_HAS_ITERATORS(ht *HashTable) bool             { return ht.GetNIteratorsCount() != 0 }
 func HT_SET_ITERATORS_COUNT(ht *HashTable, iters int) { ht.SetNIteratorsCount(iters) }
 func HT_INC_ITERATORS_COUNT(ht *HashTable) {
-	HT_SET_ITERATORS_COUNT(ht, ht.GetNIteratorsCount()+1)
+	ht.SetNIteratorsCount(ht.GetNIteratorsCount() + 1)
 }
 func HT_DEC_ITERATORS_COUNT(ht *HashTable) {
-	HT_SET_ITERATORS_COUNT(ht, ht.GetNIteratorsCount()-1)
+	ht.SetNIteratorsCount(ht.GetNIteratorsCount() - 1)
 }
 func ZVAL_EMPTY_ARRAY(z *Zval) {
 	var __z *Zval = z

@@ -4848,8 +4848,8 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 
 	/* replace HashTable data */
 
-	zend.HT_SET_ITERATORS_COUNT(&out_hash, in_hash.GetNIteratorsCount())
-	zend.HT_SET_ITERATORS_COUNT(in_hash, 0)
+	out_hash.SetNIteratorsCount(in_hash.GetNIteratorsCount())
+	in_hash.SetNIteratorsCount(0)
 	in_hash.SetPDestructor(nil)
 	zend.ZendHashDestroy(in_hash)
 	in_hash.SetUFlags(out_hash.GetUFlags())
@@ -5353,8 +5353,8 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	if zend.HT_HAS_ITERATORS(stack.GetArr()) {
 		zend.ZendHashIteratorsAdvance(stack.GetArr(), argc)
-		zend.HT_SET_ITERATORS_COUNT(&new_hash, zend.Z_ARRVAL_P(stack).GetNIteratorsCount())
-		zend.HT_SET_ITERATORS_COUNT(stack.GetArr(), 0)
+		new_hash.SetNIteratorsCount(zend.Z_ARRVAL_P(stack).GetNIteratorsCount())
+		stack.GetArr().SetNIteratorsCount(0)
 	}
 
 	/* replace HashTable data */

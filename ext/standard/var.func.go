@@ -41,9 +41,9 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, inde
 	}
 	if zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
-			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(zend.ZEND_TYPE_CODE(prop_info.GetType())) }))
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
+			return b.CondF(prop_info.GetType().IsCe(), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return prop_info.GetType().Name() }).GetVal()
+		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpVarDump(zv, level+2)
 	}
@@ -302,9 +302,9 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, ind
 	}
 	if prop_info != nil && zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
-			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(zend.ZEND_TYPE_CODE(prop_info.GetType())) }))
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
+			return b.CondF(prop_info.GetType().IsCe(), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return prop_info.GetType().Name() }).GetVal()
+		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
 	} else {
 		PhpDebugZvalDump(zv, level+2)
 	}
