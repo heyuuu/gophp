@@ -6,15 +6,11 @@ import (
 	b "sik/builtin"
 )
 
-func HT_IS_PACKED(ht *HashTable) bool { return ht.HasUFlags(HASH_FLAG_PACKED) }
-func HT_IS_WITHOUT_HOLES(ht *HashTable) bool {
-	return ht.GetNNumUsed() == ht.GetNNumOfElements()
-}
-func HT_HAS_STATIC_KEYS_ONLY(ht *HashTable) bool {
-	return ht.HasUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
-}
-func HT_ITERATORS_OVERFLOW(ht *HashTable) bool { return ht.GetNIteratorsCount() == 0xff }
-func HT_HAS_ITERATORS(ht *HashTable) bool      { return ht.GetNIteratorsCount() != 0 }
+func HT_IS_PACKED(ht *HashTable) bool            { return false }
+func HT_IS_WITHOUT_HOLES(ht *HashTable) bool     { return ht.IsWithoutHoles() }
+func HT_HAS_STATIC_KEYS_ONLY(ht *HashTable) bool { return ht.IsStaticKeys() }
+func HT_ITERATORS_OVERFLOW(ht *HashTable) bool   { return ht.GetNIteratorsCount() == 0xff }
+func HT_HAS_ITERATORS(ht *HashTable) bool        { return ht.GetNIteratorsCount() != 0 }
 func HT_INC_ITERATORS_COUNT(ht *HashTable) {
 	ht.SetNIteratorsCount(ht.GetNIteratorsCount() + 1)
 }
@@ -22,9 +18,8 @@ func HT_DEC_ITERATORS_COUNT(ht *HashTable) {
 	ht.SetNIteratorsCount(ht.GetNIteratorsCount() - 1)
 }
 func ZVAL_EMPTY_ARRAY(z *Zval) {
-	var __z *Zval = z
-	__z.SetArr((*ZendArray)(&ZendEmptyArray))
-	__z.SetTypeInfo(IS_ARRAY)
+	z.SetArr((*ZendArray)(&ZendEmptyArray))
+	z.SetTypeInfo(IS_ARRAY)
 }
 func ZendHashInit(ht *HashTable, nSize uint32, pHashFunction any, pDestructor DtorFuncT, persistent ZendBool) {
 	*ht = *NewZendArrayEx(nSize, pDestructor, persistent != 0)
@@ -40,20 +35,9 @@ func ZendHashFindEx(ht *HashTable, key *ZendString, known_hash ZendBool) *Zval {
 	}
 }
 func ZEND_HASH_INDEX_FIND(_ht *HashTable, _h ZendUlong, _ret *Zval, _not_found __auto__) {
-	if _ht.HasUFlags(HASH_FLAG_PACKED) {
-		if zend_ulong(_h) < zend_ulong(_ht).nNumUsed {
-			_ret = _ht.GetArData()[_h].GetVal()
-			if _ret.IsType(IS_UNDEF) {
-				goto _not_found
-			}
-		} else {
-			goto _not_found
-		}
-	} else {
-		_ret = _zendHashIndexFind(_ht, _h)
-		if _ret == nil {
-			goto _not_found
-		}
+	_ret = _zendHashIndexFind(_ht, _h)
+	if _ret == nil {
+		goto _not_found
 	}
 }
 func ZendHashExists(ht *HashTable, key *ZendString) ZendBool { return ZendHashFind(ht, key) != nil }
@@ -68,9 +52,6 @@ func ZendHashHasMoreElementsEx(ht *HashTable, pos *HashPosition) ZEND_RESULT_COD
 		return SUCCESS
 	}
 }
-func ZendHashHasMoreElements(ht *HashTable) ZEND_RESULT_CODE {
-	return ZendHashHasMoreElementsEx(ht, ht.GetNInternalPointer())
-}
 func ZendHashMoveForward(ht *HashTable) int {
 	return ZendHashMoveForwardEx(ht, ht.GetNInternalPointer())
 }
@@ -82,9 +63,6 @@ func ZendHashGetCurrentKey(ht *HashTable, str_index **ZendString, num_index *Zen
 }
 func ZendHashGetCurrentKeyZval(ht *HashTable, key *Zval) {
 	ZendHashGetCurrentKeyZvalEx(ht, key, ht.GetNInternalPointer())
-}
-func ZendHashGetCurrentKeyType(ht *HashTable) int {
-	return ZendHashGetCurrentKeyTypeEx(ht, ht.GetNInternalPointer())
 }
 func ZendHashGetCurrentData(ht *HashTable) *Zval {
 	return ZendHashGetCurrentDataEx(ht, ht.GetNInternalPointer())
@@ -649,62 +627,30 @@ func ZendHashPackedGrow(ht *HashTable) {
 	ht.SetNTableSize(ht.GetNTableSize() + ht.GetNTableSize())
 	HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 }
-func ZendHashRealInit(ht *HashTable, packed ZendBool) { ht.realInit() }
-func ZendHashRealInitPacked(ht *HashTable)            { ht.realInit() }
-func ZendHashRealInitMixed(ht *HashTable)             { ht.realInit() }
-func ZendHashPackedToHash(ht *HashTable) {
-	var new_data any
-	var old_data any = HT_GET_DATA_ADDR(ht)
-	var old_buckets *Bucket = ht.GetArData()
-	var nSize uint32 = ht.GetNTableSize()
-	ht.assertRc1()
-	ht.SubUFlags(HASH_FLAG_PACKED)
-	new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-	ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
-	HT_SET_DATA_ADDR(ht, new_data)
-	memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-	Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-	ZendHashRehash(ht)
-}
+func ZendHashRealInit(ht *HashTable, packed ZendBool) { ht.RealInit() }
+func ZendHashRealInitPacked(ht *HashTable)            { ht.RealInit() }
+func ZendHashRealInitMixed(ht *HashTable)             { ht.RealInit() }
 func ZendHashToPacked(ht *HashTable) {
-	var new_data any
-	var old_data any = HT_GET_DATA_ADDR(ht)
-	var old_buckets *Bucket = ht.GetArData()
-	ht.assertRc1()
-	new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-	ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
-	ht.SetNTableMask(HT_MIN_MASK)
-	HT_SET_DATA_ADDR(ht, new_data)
-	HT_HASH_RESET_PACKED(ht)
-	memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-	Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+	// todo 此函数不应被调用
+	ZEND_ASSERT(false)
 }
 func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 	ht.assertRc1()
 	if nSize == 0 {
 		return
 	}
-	if packed != 0 {
-		ZEND_ASSERT(ht.HasUFlags(HASH_FLAG_PACKED))
-		if nSize > ht.GetNTableSize() {
-			ht.SetNTableSize(ZendHashCheckSize(nSize))
-			HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
-		}
-	} else {
-		ZEND_ASSERT(!ht.HasUFlags(HASH_FLAG_PACKED))
-		if nSize > ht.GetNTableSize() {
-			var new_data any
-			var old_data any = HT_GET_DATA_ADDR(ht)
-			var old_buckets *Bucket = ht.GetArData()
-			nSize = ZendHashCheckSize(nSize)
-			ht.SetNTableSize(nSize)
-			new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-			ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
-			HT_SET_DATA_ADDR(ht, new_data)
-			memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-			Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-			ZendHashRehash(ht)
-		}
+	if nSize > ht.GetNTableSize() {
+		var new_data any
+		var old_data any = HT_GET_DATA_ADDR(ht)
+		var old_buckets *Bucket = ht.GetArData()
+		nSize = ZendHashCheckSize(nSize)
+		ht.SetNTableSize(nSize)
+		new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+		ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
+		HT_SET_DATA_ADDR(ht, new_data)
+		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
+		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+		ZendHashRehash(ht)
 	}
 }
 func ZendHashDiscard(ht *HashTable, nNumUsed uint32) {
@@ -908,216 +854,26 @@ func ZendHashIteratorsAdvance(ht *HashTable, step HashPosition) {
 		iter++
 	}
 }
-func ZendHashFindBucket(ht *HashTable, key *ZendString, known_hash ZendBool) *Bucket {
-	var h ZendUlong
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	var arData *Bucket
-	if known_hash != 0 {
-		h = key.GetH()
-	} else {
-		h = key.GetHash()
-	}
-	arData = ht.GetArData()
-	nIndex = h | ht.GetNTableMask()
-	idx = HT_HASH_EX(arData, nIndex)
-	if idx == HT_INVALID_IDX {
-		return nil
-	}
-	p = HT_HASH_TO_BUCKET_EX(arData, idx)
-	if p.GetKey() == key {
-		return p
-	}
-	for true {
-		if p.GetH() == key.GetH() && p.GetKey() != nil && ZendStringEqualContent(p.GetKey(), key) != 0 {
-			return p
-		}
-		idx = p.GetVal().GetNext()
-		if idx == HT_INVALID_IDX {
-			return nil
-		}
-		p = HT_HASH_TO_BUCKET_EX(arData, idx)
-		if p.GetKey() == key {
-			return p
-		}
-	}
+func ZendHashFindBucket(ht *HashTable, key *ZendString) *Bucket {
+	var strKey = key.GetStr()
+	return ht.FindBucket(strKey)
 }
-func ZendHashStrFindBucket(ht *HashTable, str *byte, len_ int, h ZendUlong) *Bucket {
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	var arData *Bucket
-	arData = ht.GetArData()
-	nIndex = h | ht.GetNTableMask()
-	idx = HT_HASH_EX(arData, nIndex)
-	for idx != HT_INVALID_IDX {
-		ZEND_ASSERT(idx < HT_IDX_TO_HASH(ht.GetNTableSize()))
-		p = HT_HASH_TO_BUCKET_EX(arData, idx)
-		if p.GetH() == h && p.GetKey() != nil && p.GetKey().GetLen() == len_ && !(memcmp(p.GetKey().GetVal(), str, len_)) {
-			return p
-		}
-		idx = p.GetVal().GetNext()
-	}
-	return nil
+func ZendHashStrFindBucket(ht *HashTable, str *byte, len_ int) *Bucket {
+	var strKey = b.CastStr(str, len_)
+	return ht.FindBucket(strKey)
 }
 func ZendHashIndexFindBucket(ht *HashTable, h ZendUlong) *Bucket {
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	var arData *Bucket
-	arData = ht.GetArData()
-	nIndex = h | ht.GetNTableMask()
-	idx = HT_HASH_EX(arData, nIndex)
-	for idx != HT_INVALID_IDX {
-		ZEND_ASSERT(idx < HT_IDX_TO_HASH(ht.GetNTableSize()))
-		p = HT_HASH_TO_BUCKET_EX(arData, idx)
-		if p.GetH() == h && p.GetKey() == nil {
-			return p
-		}
-		idx = p.GetVal().GetNext()
-	}
-	return nil
+	var indexKey = int(h)
+	return ht.IndexFindBucket(indexKey)
 }
 func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uint32) *Zval {
-	ht.assertRc1()
-
-	var h ZendUlong
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	var arData *Bucket
-
-	if ht.IsPacked() {
-		ZendHashPackedToHash(ht)
-		key.AddRefcount()
-		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		key.GetHash()
-	} else if (flag & HASH_ADD_NEW) == 0 {
-		p = ZendHashFindBucket(ht, key, 0)
-		if p != nil {
-			var data *Zval
-			ZEND_ASSERT((flag & HASH_ADD_NEW) == 0)
-			if (flag & HASH_ADD) != 0 {
-				if (flag & HASH_UPDATE_INDIRECT) == 0 {
-					return nil
-				}
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-					if data.GetType() != IS_UNDEF {
-						return nil
-					}
-				} else {
-					return nil
-				}
-			} else {
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if (flag&HASH_UPDATE_INDIRECT) != 0 && data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-				}
-			}
-			if ht.GetPDestructor() != nil {
-				ht.GetPDestructor()(data)
-			}
-			ZVAL_COPY_VALUE(data, pData)
-			return data
-		}
-		key.AddRefcount()
-		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	} else {
-		key.AddRefcount()
-		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		key.GetHash()
-	}
-	ZEND_HASH_IF_FULL_DO_RESIZE(ht)
-add_to_hash:
-	ht.GetNNumUsed()++
-	idx = ht.GetNNumUsed() - 1
-	ht.GetNNumOfElements()++
-	arData = ht.GetArData()
-	p = arData + idx
-	p.SetKey(key)
-	h = key.GetH()
-	p.SetH(h)
-	nIndex = h | ht.GetNTableMask()
-	p.GetVal().GetNext() = HT_HASH_EX(arData, nIndex)
-	HT_HASH_EX(arData, nIndex) = HT_IDX_TO_HASH(idx)
-	ZVAL_COPY_VALUE(p.GetVal(), pData)
-	return p.GetVal()
+	var strKey = key.GetStr()
+	return ht.addOrUpdate(strKey, pData, flag)
 }
 
-func _zendHashStrAddOrUpdateI(ht *HashTable, str *byte, len_ int, h ZendUlong, pData *Zval, flag uint32) *Zval {
-	var key *ZendString
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	ht.assertRc1()
-
-	if ht.IsPacked() {
-		ZendHashPackedToHash(ht)
-	} else if (flag & HASH_ADD_NEW) == 0 {
-		p = ZendHashStrFindBucket(ht, str, len_, h)
-		if p != nil {
-			var data *Zval
-			if (flag & HASH_ADD) != 0 {
-				if (flag & HASH_UPDATE_INDIRECT) == 0 {
-					return nil
-				}
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-					if data.GetType() != IS_UNDEF {
-						return nil
-					}
-				} else {
-					return nil
-				}
-			} else {
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if (flag&HASH_UPDATE_INDIRECT) != 0 && data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-				}
-			}
-			if ht.GetPDestructor() != nil {
-				ht.GetPDestructor()(data)
-			}
-			ZVAL_COPY_VALUE(data, pData)
-			return data
-		}
-	}
-	ZEND_HASH_IF_FULL_DO_RESIZE(ht)
-add_to_hash:
-	ht.GetNNumUsed()++
-	idx = ht.GetNNumUsed() - 1
-	ht.GetNNumOfElements()++
-	p = ht.GetArData() + idx
-	key = ZendStringInit(str, len_, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-	p.SetKey(key)
-	key.SetH(h)
-	p.SetH(key.GetH())
-	ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	ZVAL_COPY_VALUE(p.GetVal(), pData)
-	nIndex = h | ht.GetNTableMask()
-	p.GetVal().GetNext() = HT_HASH(ht, nIndex)
-	HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(idx)
-	return p.GetVal()
-}
-func ZendHashAddOrUpdate(ht *HashTable, key *ZendString, pData *Zval, flag uint32) *Zval {
-	if flag == HASH_ADD {
-		return ZendHashAdd(ht, key, pData)
-	} else if flag == HASH_ADD_NEW {
-		return ZendHashAddNew(ht, key, pData)
-	} else if flag == HASH_UPDATE {
-		return ZendHashUpdate(ht, key, pData)
-	} else {
-		ZEND_ASSERT(flag == (HASH_UPDATE | HASH_UPDATE_INDIRECT))
-		return ZendHashUpdateInd(ht, key, pData)
-	}
+func _zendHashStrAddOrUpdateI(ht *HashTable, str *byte, len_ int, pData *Zval, flag uint32) *Zval {
+	var strKey = b.CastStr(str, len_)
+	return ht.addOrUpdate(strKey, pData, flag)
 }
 func ZendHashAdd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
 	return _zendHashAddOrUpdateI(ht, key, pData, HASH_ADD)
@@ -1131,33 +887,17 @@ func ZendHashUpdateInd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
 func ZendHashAddNew(ht *HashTable, key *ZendString, pData *Zval) *Zval {
 	return _zendHashAddOrUpdateI(ht, key, pData, HASH_ADD_NEW)
 }
-func ZendHashStrAddOrUpdate(ht *HashTable, str *byte, len_ int, pData *Zval, flag uint32) *Zval {
-	if flag == HASH_ADD {
-		return ZendHashStrAdd(ht, str, len_, pData)
-	} else if flag == HASH_ADD_NEW {
-		return ZendHashStrAddNew(ht, str, len_, pData)
-	} else if flag == HASH_UPDATE {
-		return ZendHashStrUpdate(ht, str, len_, pData)
-	} else {
-		ZEND_ASSERT(flag == (HASH_UPDATE | HASH_UPDATE_INDIRECT))
-		return ZendHashStrUpdateInd(ht, str, len_, pData)
-	}
-}
 func ZendHashStrUpdate(ht *HashTable, str string, len_ int, pData *Zval) *Zval {
-	var h ZendUlong = ZendHashFunc(str, len_)
-	return _zendHashStrAddOrUpdateI(ht, str, len_, h, pData, HASH_UPDATE)
+	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_UPDATE)
 }
 func ZendHashStrUpdateInd(ht *HashTable, str string, len_ int, pData *Zval) *Zval {
-	var h ZendUlong = ZendHashFunc(str, len_)
-	return _zendHashStrAddOrUpdateI(ht, str, len_, h, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 }
 func ZendHashStrAdd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	var h ZendUlong = ZendHashFunc(str, len_)
-	return _zendHashStrAddOrUpdateI(ht, str, len_, h, pData, HASH_ADD)
+	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_ADD)
 }
 func ZendHashStrAddNew(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	var h ZendUlong = ZendHashFunc(str, len_)
-	return _zendHashStrAddOrUpdateI(ht, str, len_, h, pData, HASH_ADD_NEW)
+	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_ADD_NEW)
 }
 func ZendHashIndexAddEmptyElement(ht *HashTable, h ZendUlong) *Zval {
 	var dummy Zval
@@ -1175,99 +915,7 @@ func ZendHashStrAddEmptyElement(ht *HashTable, str *byte, len_ int) *Zval {
 	return ZendHashStrAdd(ht, str, len_, &dummy)
 }
 func _zendHashIndexAddOrUpdateI(ht *HashTable, h ZendUlong, pData *Zval, flag uint32) *Zval {
-	var nIndex uint32
-	var idx uint32
-	var p *Bucket
-	ht.assertRc1()
-	if ht.HasUFlags(HASH_FLAG_PACKED) {
-		if h < ht.GetNNumUsed() {
-			p = ht.GetArData() + h
-			if p.GetVal().GetType() != IS_UNDEF {
-			replace:
-				if (flag & HASH_ADD) != 0 {
-					return nil
-				}
-				if ht.GetPDestructor() != nil {
-					ht.GetPDestructor()(p.GetVal())
-				}
-				ZVAL_COPY_VALUE(p.GetVal(), pData)
-				return p.GetVal()
-			} else {
-				goto convert_to_hash
-			}
-		} else if h < ht.GetNTableSize() {
-		add_to_packed:
-			p = ht.GetArData() + h
-
-			/* incremental initialization of empty Buckets */
-
-			if (flag & (HASH_ADD_NEW | HASH_ADD_NEXT)) != (HASH_ADD_NEW | HASH_ADD_NEXT) {
-				if h > ht.GetNNumUsed() {
-					var q *Bucket = ht.GetArData() + ht.GetNNumUsed()
-					for q != p {
-						ZVAL_UNDEF(q.GetVal())
-						q++
-					}
-				}
-			}
-			ht.SetNNumUsed(h + 1)
-			ht.SetNNextFreeElement(ht.GetNNumUsed())
-			goto add
-		} else if h>>1 < ht.GetNTableSize() && ht.GetNTableSize()>>1 < ht.GetNNumOfElements() {
-			ZendHashPackedGrow(ht)
-			goto add_to_packed
-		} else {
-			if ht.GetNNumUsed() >= ht.GetNTableSize() {
-				ht.SetNTableSize(ht.GetNTableSize() + ht.GetNTableSize())
-			}
-		convert_to_hash:
-			ZendHashPackedToHash(ht)
-		}
-	} else {
-		if (flag & HASH_ADD_NEW) == 0 {
-			p = ZendHashIndexFindBucket(ht, h)
-			if p != nil {
-				ZEND_ASSERT((flag & HASH_ADD_NEW) == 0)
-				goto replace
-			}
-		}
-		ZEND_HASH_IF_FULL_DO_RESIZE(ht)
-	}
-	ht.GetNNumUsed()++
-	idx = ht.GetNNumUsed() - 1
-	nIndex = h | ht.GetNTableMask()
-	p = ht.GetArData() + idx
-	p.GetVal().GetNext() = HT_HASH(ht, nIndex)
-	HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(idx)
-	if ZendLong(h >= ZendLong(ht.GetNNextFreeElement())) != 0 {
-		if h < ZEND_LONG_MAX {
-			ht.SetNNextFreeElement(h + 1)
-		} else {
-			ht.SetNNextFreeElement(ZEND_LONG_MAX)
-		}
-	}
-add:
-	ht.GetNNumOfElements()++
-	p.SetH(h)
-	p.SetKey(nil)
-	ZVAL_COPY_VALUE(p.GetVal(), pData)
-	return p.GetVal()
-}
-func ZendHashIndexAddOrUpdate(ht *HashTable, h ZendUlong, pData *Zval, flag uint32) *Zval {
-	if flag == HASH_ADD {
-		return ZendHashIndexAdd(ht, h, pData)
-	} else if flag == (HASH_ADD | HASH_ADD_NEW) {
-		return ZendHashIndexAddNew(ht, h, pData)
-	} else if flag == (HASH_ADD | HASH_ADD_NEXT) {
-		ZEND_ASSERT(h == ht.GetNNextFreeElement())
-		return ZendHashNextIndexInsert(ht, pData)
-	} else if flag == (HASH_ADD | HASH_ADD_NEW | HASH_ADD_NEXT) {
-		ZEND_ASSERT(h == ht.GetNNextFreeElement())
-		return ZendHashNextIndexInsertNew(ht, pData)
-	} else {
-		ZEND_ASSERT(flag == HASH_UPDATE)
-		return ZendHashIndexUpdate(ht, h, pData)
-	}
+	return ht.indexAddOrUpdate(int(h), pData, flag)
 }
 func ZendHashIndexAdd(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
 	return _zendHashIndexAddOrUpdateI(ht, h, pData, HASH_ADD)
@@ -1291,8 +939,7 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var p *Bucket
 	var arData *Bucket
 	ht.assertRc1()
-	ZEND_ASSERT(!ht.HasUFlags(HASH_FLAG_PACKED))
-	p = ZendHashFindBucket(ht, key, 0)
+	p = ZendHashFindBucket(ht, key)
 	if p != nil {
 		if p == b {
 			return p.GetVal()
@@ -1462,12 +1109,10 @@ func ZendHashRehash(ht *HashTable) int {
 	return SUCCESS
 }
 func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {
-	if !ht.HasUFlags(HASH_FLAG_PACKED) {
-		if prev != nil {
-			prev.GetVal().GetNext() = p.GetVal().GetNext()
-		} else {
-			HT_HASH(ht, p.GetH()|ht.GetNTableMask()) = p.GetVal().GetNext()
-		}
+	if prev != nil {
+		prev.GetVal().GetNext() = p.GetVal().GetNext()
+	} else {
+		HT_HASH(ht, p.GetH()|ht.GetNTableMask()) = p.GetVal().GetNext()
 	}
 	idx = HT_HASH_TO_IDX(idx)
 	ht.GetNNumOfElements()--
@@ -1510,15 +1155,13 @@ func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {
 }
 func _zendHashDelEl(ht *HashTable, idx uint32, p *Bucket) {
 	var prev *Bucket = nil
-	if !ht.HasUFlags(HASH_FLAG_PACKED) {
-		var nIndex uint32 = p.GetH() | ht.GetNTableMask()
-		var i uint32 = HT_HASH(ht, nIndex)
-		if i != idx {
+	var nIndex uint32 = p.GetH() | ht.GetNTableMask()
+	var i uint32 = HT_HASH(ht, nIndex)
+	if i != idx {
+		prev = HT_HASH_TO_BUCKET(ht, i)
+		for prev.GetVal().GetNext() != idx {
+			i = prev.GetVal().GetNext()
 			prev = HT_HASH_TO_BUCKET(ht, i)
-			for prev.GetVal().GetNext() != idx {
-				i = prev.GetVal().GetNext()
-				prev = HT_HASH_TO_BUCKET(ht, i)
-			}
 		}
 	}
 	_zendHashDelElEx(ht, idx, p, prev)
@@ -1647,16 +1290,6 @@ func ZendHashIndexDel(ht *HashTable, h ZendUlong) int {
 	var p *Bucket
 	var prev *Bucket = nil
 	ht.assertRc1()
-	if ht.HasUFlags(HASH_FLAG_PACKED) {
-		if h < ht.GetNNumUsed() {
-			p = ht.GetArData() + h
-			if p.GetVal().GetType() != IS_UNDEF {
-				_zendHashDelElEx(ht, HT_IDX_TO_HASH(h), p, nil)
-				return SUCCESS
-			}
-		}
-		return FAILURE
-	}
 	nIndex = h | ht.GetNTableMask()
 	idx = HT_HASH(ht, nIndex)
 	for idx != HT_INVALID_IDX {
@@ -1864,9 +1497,7 @@ func ZendHashClean(ht *HashTable) {
 				}
 			}
 		}
-		if !ht.HasUFlags(HASH_FLAG_PACKED) {
-			HT_HASH_RESET(ht)
-		}
+		HT_HASH_RESET(ht)
 	}
 	ht.SetNNumUsed(0)
 	ht.SetNNumOfElements(0)
@@ -2172,25 +1803,6 @@ func ZendArrayDup(source *HashTable) *HashTable {
 		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE(target)))
 		target.SetNInternalPointer(source.GetNInternalPointer())
 		memcpy(HT_GET_DATA_ADDR(target), HT_GET_DATA_ADDR(source), HT_USED_SIZE(source))
-	} else if source.HasUFlags(HASH_FLAG_PACKED) {
-		target.SetUFlags(source.GetUFlags() & HASH_FLAG_MASK)
-		target.SetNTableMask(HT_MIN_MASK)
-		target.SetNNumUsed(source.GetNNumUsed())
-		target.SetNNumOfElements(source.GetNNumOfElements())
-		target.SetNNextFreeElement(source.GetNNextFreeElement())
-		target.SetNTableSize(source.GetNTableSize())
-		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE_EX(target.GetNTableSize(), HT_MIN_MASK)))
-		if source.GetNInternalPointer() < source.GetNNumUsed() {
-			target.SetNInternalPointer(source.GetNInternalPointer())
-		} else {
-			target.SetNInternalPointer(0)
-		}
-		HT_HASH_RESET_PACKED(target)
-		if HT_IS_WITHOUT_HOLES(target) {
-			ZendArrayDupPackedElements(source, target, 0)
-		} else {
-			ZendArrayDupPackedElements(source, target, 1)
-		}
 	} else {
 		target.SetUFlags(source.GetUFlags() & HASH_FLAG_MASK)
 		target.SetNTableMask(source.GetNTableMask())
@@ -2299,7 +1911,7 @@ func ZendHashMergeEx(target *HashTable, source *HashTable, pCopyConstructor Copy
 }
 func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
 	var p *Bucket
-	p = ZendHashFindBucket(ht, key, 0)
+	p = ZendHashFindBucket(ht, key)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -2308,7 +1920,7 @@ func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
 }
 func _zendHashFindKnownHash(ht *HashTable, key *ZendString) *Zval {
 	var p *Bucket
-	p = ZendHashFindBucket(ht, key, 1)
+	p = ZendHashFindBucket(ht, key)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -2319,7 +1931,7 @@ func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
 	var h ZendUlong
 	var p *Bucket
 	h = ZendInlineHashFunc(str, len_)
-	p = ZendHashStrFindBucket(ht, str, len_, h)
+	p = ZendHashStrFindBucket(ht, str, len_)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -2328,15 +1940,6 @@ func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
 }
 func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval {
 	var p *Bucket
-	if ht.HasUFlags(HASH_FLAG_PACKED) {
-		if h < ht.GetNNumUsed() {
-			p = ht.GetArData() + h
-			if p.GetVal().GetType() != IS_UNDEF {
-				return p.GetVal()
-			}
-		}
-		return nil
-	}
 	p = ZendHashIndexFindBucket(ht, h)
 	if p != nil {
 		return p.GetVal()
@@ -2533,25 +2136,19 @@ func ZendHashSortEx(ht *HashTable, sort SortFuncT, compar CompareFuncT, renumber
 		}
 		ht.SetNNextFreeElement(i)
 	}
-	if ht.HasUFlags(HASH_FLAG_PACKED) {
-		if renumber == 0 {
-			ZendHashPackedToHash(ht)
-		}
+	if renumber != 0 {
+		var new_data any
+		var old_data any = HT_GET_DATA_ADDR(ht)
+		var old_buckets *Bucket = ht.GetArData()
+		new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+		ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
+		ht.SetNTableMask(HT_MIN_MASK)
+		HT_SET_DATA_ADDR(ht, new_data)
+		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
+		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
+		HT_HASH_RESET_PACKED(ht)
 	} else {
-		if renumber != 0 {
-			var new_data any
-			var old_data any = HT_GET_DATA_ADDR(ht)
-			var old_buckets *Bucket = ht.GetArData()
-			new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-			ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
-			ht.SetNTableMask(HT_MIN_MASK)
-			HT_SET_DATA_ADDR(ht, new_data)
-			memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-			Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-			HT_HASH_RESET_PACKED(ht)
-		} else {
-			ZendHashRehash(ht)
-		}
+		ZendHashRehash(ht)
 	}
 	return SUCCESS
 }
@@ -2747,9 +2344,6 @@ func ZendSymtableToProptable(ht *HashTable) *HashTable {
 	var num_key ZendUlong
 	var str_key *ZendString
 	var zv *Zval
-	if HT_IS_PACKED(ht) {
-		goto convert
-	}
 	for {
 		var __ht *HashTable = ht
 		var _p *Bucket = __ht.GetArData()

@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendHashKey
  */
@@ -21,10 +23,28 @@ func (this *ZendHashKey) SetKey(value *ZendString) { this.key = value }
 type Bucket struct {
 	val Zval
 	h   ZendUlong
-	key *ZendString
+	key *string
 }
 
-func (this *Bucket) GetVal() Zval             { return this.val }
+func NewBucket(strKey string, zval *Zval) *Bucket {
+	var bucket = &Bucket{
+		h:   b.HashStr(strKey),
+		key: &strKey,
+	}
+	ZVAL_COPY_VALUE(&bucket.val, zval)
+	return bucket
+}
+
+func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
+	var bucket = &Bucket{
+		h:   uint(indexKey),
+		key: nil,
+	}
+	ZVAL_COPY_VALUE(&bucket.val, zval)
+	return bucket
+}
+
+func (this *Bucket) GetVal() *Zval            { return &this.val }
 func (this *Bucket) SetVal(value Zval)        { this.val = value }
 func (this *Bucket) GetH() ZendUlong          { return this.h }
 func (this *Bucket) SetH(value ZendUlong)     { this.h = value }
@@ -68,7 +88,7 @@ type ZendArray struct {
 	//
 	arData *Bucket // C 源码中存储数据的地方，实际不使用
 
-	data     []*Bucket         // 实际存储数据的地方
+	data     []Bucket          // 实际存储数据的地方
 	indexMap map[int]uint32    // 数字索引到具体位置的映射
 	keyMap   map[string]uint32 // 字符串索引到具体位置的映射
 }
@@ -117,10 +137,8 @@ const HASH_FLAG_PACKED = 1 << 2
 const HASH_FLAG_STATIC_KEYS = 1 << 4
 const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
 
-func (this *ZendArray) IsPacked() bool      { return this.HasFlags(HASH_FLAG_PACKED) }
 func (this *ZendArray) IsStaticKeys() bool  { return this.HasFlags(HASH_FLAG_STATIC_KEYS) }
 func (this *ZendArray) IsHasEmptyInd() bool { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
-func (this *ZendArray) SetIsPacked()        { this.AddFlags(HASH_FLAG_PACKED) }
 func (this *ZendArray) SetIsStaticKeys()    { this.AddFlags(HASH_FLAG_STATIC_KEYS) }
 func (this *ZendArray) SetIsHasEmptyInd()   { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
 
@@ -136,4 +154,54 @@ func (this *ZendArray) SwitchUFlags(value uint32, cond bool) {
 	} else {
 		this.SubUFlags(value)
 	}
+}
+
+/**
+ * Constructor && Init
+ */
+func NewZendArray(size uint32) *ZendArray {
+	return NewZendArrayEx(size, ZVAL_PTR_DTOR, false)
+}
+
+func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendArray {
+	var ht = &ZendArray{
+		nNumUsed:         0,
+		nNumOfElements:   0,
+		nTableSize:       ZendHashCheckSize(size),
+		nInternalPointer: 0,
+		nNextFreeElement: 0,
+		pDestructor:      pDestructor,
+
+		// 数据存储
+		data:     nil,
+		indexMap: make(map[int]uint32),
+		keyMap:   make(map[string]uint32),
+	}
+
+	// GC 信息
+	ht.SetRefcount(1)
+	ht.SetGcTypeInfo(IS_ARRAY)
+	if persistent {
+		ht.AddGcFlags(GC_PERSISTENT)
+	} else {
+		ht.AddGcFlags(GC_COLLECTABLE)
+	}
+
+	return ht
+}
+
+func (this *ZendArray) assertRc1() {
+	ZEND_ASSERT(this.GetRefcount() == 1)
+}
+
+func (this *ZendArray) RealInit() {
+	this.assertRc1()
+
+	this.nNumUsed = 0
+	this.nNumOfElements = 0
+	this.data = nil
+	this.indexMap = make(map[int]uint32)
+	this.keyMap = make(map[string]uint32)
+
+	this.SetIsStaticKeys()
 }
