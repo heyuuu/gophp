@@ -1015,7 +1015,7 @@ func zim_spl_Array_getIteratorClass(execute_data *zend.ZendExecuteData, return_v
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZendStringAddref(intern.GetCeGetIterator().GetName())
+	intern.GetCeGetIterator().GetName().AddRefcount()
 	zend.RETVAL_STR(intern.GetCeGetIterator().GetName())
 	return
 }

@@ -148,7 +148,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			/* Store in active hash */
 
 			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr(), arg2)
-			entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
+			entry.SetStr(entry.GetStr().Dup(1))
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -182,7 +182,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		} else {
 			entry = zend.ZendHashNextIndexInsert(find_arr.GetArr(), arg2)
 		}
-		entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
+		entry.SetStr(entry.GetStr().Dup(1))
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
 

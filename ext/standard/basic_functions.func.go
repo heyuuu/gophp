@@ -1677,7 +1677,7 @@ func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, re
 	if entry.IsType(zend.IS_STRING) {
 		var str *zend.ZendString = entry.GetStr()
 		if (str.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
-			zend.ZendStringAddref(str)
+			str.AddRefcount()
 		} else {
 			str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		}
@@ -2934,7 +2934,7 @@ func ZifIniGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else if val.GetLen() == 1 {
 		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 	} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
-		zend.ZVAL_NEW_STR(return_value, zend.ZendStringCopy(val))
+		zend.ZVAL_NEW_STR(return_value, val.Copy())
 	} else {
 		zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 	}
@@ -3051,14 +3051,14 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				if details != 0 {
 					zend.ArrayInit(&option)
 					if ini_entry.GetOrigValue() != nil {
-						zend.AddAssocStr(&option, "global_value", zend.ZendStringCopy(ini_entry.GetOrigValue()))
+						zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().Copy())
 					} else if ini_entry.GetValue() != nil {
-						zend.AddAssocStr(&option, "global_value", zend.ZendStringCopy(ini_entry.GetValue()))
+						zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().Copy())
 					} else {
 						zend.AddAssocNull(&option, "global_value")
 					}
 					if ini_entry.GetValue() != nil {
-						zend.AddAssocStr(&option, "local_value", zend.ZendStringCopy(ini_entry.GetValue()))
+						zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().Copy())
 					} else {
 						zend.AddAssocNull(&option, "local_value")
 					}
@@ -3171,7 +3171,7 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else if val.GetLen() == 1 {
 			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 		} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
-			zend.ZVAL_NEW_STR(return_value, zend.ZendStringCopy(val))
+			zend.ZVAL_NEW_STR(return_value, val.Copy())
 		} else {
 			zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 		}

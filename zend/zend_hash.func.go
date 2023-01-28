@@ -591,8 +591,8 @@ func _zendHashAppendEx(ht *HashTable, key *ZendString, zv *Zval, interned int) *
 	ZVAL_COPY_VALUE(p.GetVal(), zv)
 	if interned == 0 {
 		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		ZendStringAddref(key)
-		ZendStringHashVal(key)
+		key.AddRefcount()
+		key.GetHash()
 	}
 	p.SetKey(key)
 	p.SetH(key.GetH())
@@ -612,8 +612,8 @@ func _zendHashAppendPtrEx(ht *HashTable, key *ZendString, ptr any, interned int)
 	ZVAL_PTR(p.GetVal(), ptr)
 	if interned == 0 {
 		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		ZendStringAddref(key)
-		ZendStringHashVal(key)
+		key.AddRefcount()
+		key.GetHash()
 	}
 	p.SetKey(key)
 	p.SetH(key.GetH())
@@ -632,8 +632,8 @@ func _zendHashAppendInd(ht *HashTable, key *ZendString, ptr *Zval) {
 	var p *Bucket = ht.GetArData() + idx
 	ZVAL_INDIRECT(p.GetVal(), ptr)
 	ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	ZendStringAddref(key)
-	ZendStringHashVal(key)
+	key.AddRefcount()
+	key.GetHash()
 	p.SetKey(key)
 	p.SetH(key.GetH())
 	nIndex = uint32(p.GetH() | ht.GetNTableMask())
@@ -1062,7 +1062,7 @@ func ZendHashFindBucket(ht *HashTable, key *ZendString, known_hash ZendBool) *Bu
 	if known_hash != 0 {
 		h = key.GetH()
 	} else {
-		h = ZendStringHashVal(key)
+		h = key.GetHash()
 	}
 	arData = ht.GetArData()
 	nIndex = h | ht.GetNTableMask()
@@ -1134,15 +1134,15 @@ func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uin
 	if ht.HasUFlags(HASH_FLAG_UNINITIALIZED | HASH_FLAG_PACKED) {
 		if ht.HasUFlags(HASH_FLAG_UNINITIALIZED) {
 			ZendHashRealInitMixed(ht)
-			ZendStringAddref(key)
+			key.AddRefcount()
 			ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-			ZendStringHashVal(key)
+			key.GetHash()
 			goto add_to_hash
 		} else {
 			ZendHashPackedToHash(ht)
-			ZendStringAddref(key)
+			key.AddRefcount()
 			ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-			ZendStringHashVal(key)
+			key.GetHash()
 		}
 	} else if (flag&HASH_ADD_NEW) == 0 || core.ZEND_DEBUG != 0 {
 		p = ZendHashFindBucket(ht, key, 0)
@@ -1176,12 +1176,12 @@ func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uin
 			ZVAL_COPY_VALUE(data, pData)
 			return data
 		}
-		ZendStringAddref(key)
+		key.AddRefcount()
 		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	} else {
-		ZendStringAddref(key)
+		key.AddRefcount()
 		ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-		ZendStringHashVal(key)
+		key.GetHash()
 	}
 	ZEND_HASH_IF_FULL_DO_RESIZE(ht)
 add_to_hash:
@@ -1460,7 +1460,7 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 			return nil
 		}
 	}
-	ZendStringAddref(key)
+	key.AddRefcount()
 	ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	arData = ht.GetArData()
 
@@ -1696,7 +1696,7 @@ func ZendHashDel(ht *HashTable, key *ZendString) int {
 	var p *Bucket
 	var prev *Bucket = nil
 	HT_ASSERT_RC1(ht)
-	h = ZendStringHashVal(key)
+	h = key.GetHash()
 	nIndex = h | ht.GetNTableMask()
 	idx = HT_HASH(ht, nIndex)
 	for idx != HT_INVALID_IDX {
@@ -1717,7 +1717,7 @@ func ZendHashDelInd(ht *HashTable, key *ZendString) int {
 	var p *Bucket
 	var prev *Bucket = nil
 	HT_ASSERT_RC1(ht)
-	h = ZendStringHashVal(key)
+	h = key.GetHash()
 	nIndex = h | ht.GetNTableMask()
 	idx = HT_HASH(ht, nIndex)
 	for idx != HT_INVALID_IDX {
@@ -2277,7 +2277,7 @@ func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bu
 		var nIndex uint32
 		q.SetKey(p.GetKey())
 		if static_keys == 0 && q.GetKey() != nil {
-			ZendStringAddref(q.GetKey())
+			q.GetKey().AddRefcount()
 		}
 		nIndex = q.GetH() | target.GetNTableMask()
 		q.GetVal().GetNext() = HT_HASH(target, nIndex)
@@ -2976,7 +2976,7 @@ convert:
 			zv = _z
 			if str_key == nil {
 				str_key = ZendLongToStr(num_key)
-				ZendStringDelref(str_key)
+				str_key.DelRefcount()
 			}
 			for {
 				if Z_OPT_REFCOUNTED_P(zv) {

@@ -4310,7 +4310,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 	if IS_CONST == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -4320,7 +4320,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 	if IS_CONST == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -5028,7 +5028,7 @@ func ZEND_DECLARE_CONST_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) 
 	/* non persistent, case sensitive */
 
 	ZEND_CONSTANT_SET_FLAGS(&c, CONST_CS, PHP_USER_CONSTANT)
-	c.SetName(ZendStringCopy(name.GetStr()))
+	c.SetName(name.GetStr().Copy())
 	if ZendRegisterConstant(&c) == FAILURE {
 
 	}
@@ -6343,7 +6343,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 	if IS_CONST == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -6353,7 +6353,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -8519,7 +8519,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CONST == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -8529,7 +8529,7 @@ func ZEND_FAST_CONCAT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CV == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -12341,7 +12341,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -12351,7 +12351,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 	if IS_CONST == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -13636,7 +13636,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -13646,7 +13646,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -14760,7 +14760,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -14770,7 +14770,7 @@ func ZEND_FAST_CONCAT_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 	if IS_CV == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -15920,7 +15920,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		if var_.IsType(IS_STRING) {
 			if IS_CONST == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -15953,7 +15953,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		if var_.IsType(IS_STRING) {
 			if IS_CONST == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -16345,7 +16345,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		if var_.IsType(IS_STRING) {
 			if (IS_TMP_VAR | IS_VAR) == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -16380,7 +16380,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		if var_.IsType(IS_STRING) {
 			if (IS_TMP_VAR | IS_VAR) == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -17216,7 +17216,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
 		if var_.IsType(IS_STRING) {
 			if IS_CV == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -17249,7 +17249,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
 		if var_.IsType(IS_STRING) {
 			if IS_CV == IS_CV {
-				rope[opline.GetExtendedValue()] = ZendStringCopy(var_.GetStr())
+				rope[opline.GetExtendedValue()] = var_.GetStr().Copy()
 			} else {
 				rope[opline.GetExtendedValue()] = var_.GetStr()
 			}
@@ -27681,7 +27681,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		if var_.IsType(IS_STRING) {
 			if IS_CONST == IS_CV {
-				rope[0] = ZendStringCopy(var_.GetStr())
+				rope[0] = var_.GetStr().Copy()
 			} else {
 				rope[0] = var_.GetStr()
 			}
@@ -29272,7 +29272,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) in
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		if var_.IsType(IS_STRING) {
 			if (IS_TMP_VAR | IS_VAR) == IS_CV {
-				rope[0] = ZendStringCopy(var_.GetStr())
+				rope[0] = var_.GetStr().Copy()
 			} else {
 				rope[0] = var_.GetStr()
 			}
@@ -31485,7 +31485,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
 		if var_.IsType(IS_STRING) {
 			if IS_CV == IS_CV {
-				rope[0] = ZendStringCopy(var_.GetStr())
+				rope[0] = var_.GetStr().Copy()
 			} else {
 				rope[0] = var_.GetStr()
 			}
@@ -35588,7 +35588,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CV == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -35598,7 +35598,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CONST == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CONST == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -38660,7 +38660,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 	if IS_CV == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -38670,7 +38670,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if (IS_TMP_VAR|IS_VAR) == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
@@ -43095,7 +43095,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CV == IS_CONST {
 		op1_str = op1.GetStr()
 	} else if op1.IsType(IS_STRING) {
-		op1_str = ZendStringCopy(op1.GetStr())
+		op1_str = op1.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op1.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
@@ -43105,7 +43105,7 @@ func ZEND_FAST_CONCAT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CV == IS_CONST {
 		op2_str = op2.GetStr()
 	} else if op2.IsType(IS_STRING) {
-		op2_str = ZendStringCopy(op2.GetStr())
+		op2_str = op2.GetStr().Copy()
 	} else {
 		if IS_CV == IS_CV && op2.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()

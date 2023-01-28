@@ -538,7 +538,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
 	if zv.IsType(IS_STRING) {
 		var str *ZendString = zv.GetStr()
-		if str == member || str.GetH() == ZendStringHashVal(member) && ZendStringEqualContent(str, member) != 0 {
+		if str == member || str.GetH() == member.GetHash() && ZendStringEqualContent(str, member) != 0 {
 			return &(zv.GetPropertyGuard())
 		} else if zv.GetPropertyGuard() == 0 {
 			ZvalPtrDtorStr(zv)
@@ -639,7 +639,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 		guard = ZendGetPropertyGuard(zobj, name)
 		if ((*guard) & IN_ISSET) == 0 {
 			if tmp_name == nil {
-				tmp_name = ZendStringCopy(name)
+				tmp_name = name.Copy()
 			}
 			zobj.AddRefcount()
 			ZVAL_UNDEF(&tmp_result)
@@ -1175,7 +1175,7 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_s
 	if b.Assign(&mname_len, strlen(method_name.GetVal())) != method_name.GetLen() {
 		func_.SetFunctionName(ZendStringInit(method_name.GetVal(), mname_len, 0))
 	} else {
-		func_.SetFunctionName(ZendStringCopy(method_name))
+		func_.SetFunctionName(method_name.Copy())
 	}
 	func_.SetPrototype(nil)
 	func_.SetNumArgs(0)
@@ -1557,7 +1557,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 			/* have issetter - try with it! */
 
 			if tmp_name == nil {
-				tmp_name = ZendStringCopy(name)
+				tmp_name = name.Copy()
 			}
 			zobj.AddRefcount()
 			*guard |= IN_ISSET
@@ -1583,9 +1583,7 @@ exit:
 	ZendTmpStringRelease(tmp_name)
 	return result
 }
-func ZendStdGetClassName(zobj *ZendObject) *ZendString {
-	return ZendStringCopy(zobj.GetCe().GetName())
-}
+func ZendStdGetClassName(zobj *ZendObject) *ZendString { return zobj.GetCe().GetName().Copy() }
 func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 	var retval Zval
 	var ce *ZendClassEntry

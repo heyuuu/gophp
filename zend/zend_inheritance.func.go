@@ -15,9 +15,9 @@ func OverriddenPtrDtor(zv *Zval) {
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	memcpy(new_property_info, property_info, b.SizeOf("zend_property_info"))
-	ZendStringAddref(new_property_info.GetName())
+	new_property_info.GetName().AddRefcount()
 	if new_property_info.GetType().IsName() {
-		ZendStringAddref(new_property_info.GetType().Name())
+		new_property_info.GetType().Name().AddRefcount()
 	}
 	return new_property_info
 }
@@ -32,7 +32,7 @@ func ZendDuplicateInternalFunction(func_ *ZendFunction, ce *ZendClassEntry) *Zen
 		new_function.SetIsArenaAllocated(true)
 	}
 	if new_function.GetFunctionName() != nil {
-		ZendStringAddref(new_function.GetFunctionName())
+		new_function.GetFunctionName().AddRefcount()
 	}
 	return new_function
 }
@@ -1696,7 +1696,7 @@ func ZendTraitsCopyFunctions(fnname *ZendString, fn *ZendFunction, ce *ZendClass
 
 					/* TODO: try to avoid this assignment (it's necessary only for reflection) */
 
-					alias.GetTraitMethod().SetClassName(ZendStringCopy(fn.GetScope().GetName()))
+					alias.GetTraitMethod().SetClassName(fn.GetScope().GetName().Copy())
 
 					/* TODO: try to avoid this assignment (it's necessary only for reflection) */
 
@@ -1735,7 +1735,7 @@ func ZendTraitsCopyFunctions(fnname *ZendString, fn *ZendFunction, ce *ZendClass
 
 						/* TODO: try to avoid this assignment (it's necessary only for reflection) */
 
-						alias.GetTraitMethod().SetClassName(ZendStringCopy(fn.GetScope().GetName()))
+						alias.GetTraitMethod().SetClassName(fn.GetScope().GetName().Copy())
 
 						/* TODO: try to avoid this assignment (it's necessary only for reflection) */
 
@@ -1998,7 +1998,7 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 
 				flags = property_info.GetFlags()
 				if (flags & ZEND_ACC_PUBLIC) != 0 {
-					prop_name = ZendStringCopy(property_info.GetName())
+					prop_name = property_info.GetName().Copy()
 				} else {
 					var pname *byte
 					var pname_len int
@@ -2073,12 +2073,12 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 				}
 				Z_TRY_ADDREF_P(prop_value)
 				if property_info.GetDocComment() != nil {
-					doc_comment = ZendStringCopy(property_info.GetDocComment())
+					doc_comment = property_info.GetDocComment().Copy()
 				} else {
 					doc_comment = nil
 				}
 				if property_info.GetType().IsName() {
-					ZendStringAddref(property_info.GetType().Name())
+					property_info.GetType().Name().AddRefcount()
 				}
 				ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
 				ZendStringReleaseEx(prop_name, 0)

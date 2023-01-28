@@ -88,7 +88,7 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch option_buffer.GetType() {
 	case zend.IS_STRING:
-		buffer = zend.ZendStringCopy(option_buffer.GetStr())
+		buffer = option_buffer.GetStr().Copy()
 		break
 	case zend.IS_LONG:
 
@@ -739,7 +739,7 @@ func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				continue
 			}
 			algo = _p.GetKey()
-			zend.AddNextIndexStr(return_value, zend.ZendStringCopy(algo))
+			zend.AddNextIndexStr(return_value, algo.Copy())
 		}
 		break
 	}

@@ -530,7 +530,7 @@ func PhpOutputContextDtor(context *PhpOutputContext) {
 func PhpOutputHandlerInit(name *zend.ZendString, chunk_size int, flags int) *PhpOutputHandler {
 	var handler *PhpOutputHandler
 	handler = zend.Ecalloc(1, b.SizeOf("php_output_handler"))
-	handler.SetName(zend.ZendStringCopy(name))
+	handler.SetName(name.Copy())
 	handler.SetSize(chunk_size)
 	handler.SetFlags(flags)
 	handler.GetBuffer().SetSize(PHP_OUTPUT_HANDLER_INITBUF_SIZE(chunk_size))
@@ -800,7 +800,7 @@ func PhpOutputStackApplyClean(h any, c any) int {
 func PhpOutputStackApplyList(h any, z any) int {
 	var handler *PhpOutputHandler = *((**PhpOutputHandler)(h))
 	var array *zend.Zval = (*zend.Zval)(z)
-	zend.AddNextIndexStr(array, zend.ZendStringCopy(handler.GetName()))
+	zend.AddNextIndexStr(array, handler.GetName().Copy())
 	return 0
 }
 func PhpOutputStackApplyStatus(h any, z any) int {
@@ -813,7 +813,7 @@ func PhpOutputStackApplyStatus(h any, z any) int {
 func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *zend.Zval) *zend.Zval {
 	zend.ZEND_ASSERT(entry != nil)
 	zend.ArrayInit(entry)
-	zend.AddAssocStr(entry, "name", zend.ZendStringCopy(handler.GetName()))
+	zend.AddAssocStr(entry, "name", handler.GetName().Copy())
 	zend.AddAssocLong(entry, "type", zend_long(handler.GetFlags()&0xf))
 	zend.AddAssocLong(entry, "flags", zend.ZendLong(handler.GetFlags()))
 	zend.AddAssocLong(entry, "level", zend.ZendLong(handler.GetLevel()))

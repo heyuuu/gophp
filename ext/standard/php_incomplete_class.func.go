@@ -15,7 +15,7 @@ func PHP_SET_CLASS_ATTRIBUTES(struc *zend.Zval) {
 		}
 		incomplete_class = 1
 	} else {
-		class_name = zend.ZendStringCopy(zend.Z_OBJCE_P(struc).GetName())
+		class_name = zend.Z_OBJCE_P(struc).GetName().Copy()
 	}
 }
 func PHP_CLEANUP_CLASS_ATTRIBUTES() { zend.ZendStringReleaseEx(class_name, 0) }

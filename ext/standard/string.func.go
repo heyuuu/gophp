@@ -572,7 +572,7 @@ func PhpTrimInt(str *zend.ZendString, what *byte, what_len int, mode int) *zend.
 		}
 	}
 	if str.GetLen() == end-start {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	} else if end-start == 0 {
 		return zend.ZSTR_EMPTY_ALLOC()
 	} else {
@@ -1459,7 +1459,7 @@ func PhpStringToupper(s *zend.ZendString) *zend.ZendString {
 		}
 		c++
 	}
-	return zend.ZendStringCopy(s)
+	return s.Copy()
 }
 func ZifStrtoupper(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
@@ -1567,7 +1567,7 @@ func PhpStringTolower(s *zend.ZendString) *zend.ZendString {
 		}
 		c++
 	}
-	return zend.ZendStringCopy(s)
+	return s.Copy()
 }
 func ZifStrtolower(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
@@ -1989,7 +1989,7 @@ func ZifPathinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if have_basename != 0 {
 		ret = PhpBasename(path, path_len, nil, 0)
-		zend.AddAssocStr(&tmp, "basename", zend.ZendStringCopy(ret))
+		zend.AddAssocStr(&tmp, "basename", ret.Copy())
 	}
 	if (opt & PHP_PATHINFO_EXTENSION) == PHP_PATHINFO_EXTENSION {
 		var p *byte
@@ -3884,7 +3884,7 @@ func PhpUcfirst(str *zend.ZendString) *zend.ZendString {
 	var ch uint8 = str.GetVal()[0]
 	var r uint8 = toupper(ch)
 	if r == ch {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	} else {
 		var s *zend.ZendString = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		s.GetVal()[0] = r
@@ -3970,7 +3970,7 @@ func ZifUcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 func PhpLcfirst(str *zend.ZendString) *zend.ZendString {
 	var r uint8 = tolower(str.GetVal()[0])
 	if r == str.GetVal()[0] {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	} else {
 		var s *zend.ZendString = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		s.GetVal()[0] = r
@@ -4182,7 +4182,7 @@ func PhpStrtrEx(str *zend.ZendString, str_from *byte, str_to *byte, trlen int) *
 	var new_str *zend.ZendString = nil
 	var i int
 	if trlen < 1 {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	} else if trlen == 1 {
 		var ch_from byte = *str_from
 		var ch_to byte = *str_to
@@ -4226,7 +4226,7 @@ func PhpStrtrEx(str *zend.ZendString, str_from *byte, str_to *byte, trlen int) *
 		}
 	}
 	if new_str == nil {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	}
 	new_str.GetVal()[new_str.GetLen()] = 0
 	return new_str
@@ -4438,7 +4438,7 @@ func PhpCharToStrEx(str *zend.ZendString, from byte, to *byte, to_len int, case_
 		}
 	}
 	if char_count == 0 {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	}
 	if to_len > 0 {
 		result = zend.ZendStringSafeAlloc(char_count, to_len-1, str.GetLen(), 0)
@@ -4544,7 +4544,7 @@ func PhpStrToStrEx(haystack *zend.ZendString, needle *byte, needle_len int, str 
 		}
 	} else if needle_len > haystack.GetLen() || memcmp(haystack.GetVal(), needle, haystack.GetLen()) {
 	nothing_todo:
-		return zend.ZendStringCopy(haystack)
+		return haystack.Copy()
 	} else {
 		if str_len == 0 {
 			new_str = zend.ZSTR_EMPTY_ALLOC()
@@ -4622,7 +4622,7 @@ func PhpStrToStrIEx(haystack *zend.ZendString, lc_haystack *byte, needle *zend.Z
 		}
 	} else if needle.GetLen() > haystack.GetLen() {
 	nothing_todo:
-		return zend.ZendStringCopy(haystack)
+		return haystack.Copy()
 	} else {
 		lc_needle = PhpStringTolower(needle)
 		if memcmp(lc_haystack, lc_needle.GetVal(), lc_needle.GetLen()) {
@@ -5551,7 +5551,7 @@ func PhpAddslashes(str *zend.ZendString) *zend.ZendString {
 			break
 		}
 	}
-	return zend.ZendStringCopy(str)
+	return str.Copy()
 do_escape:
 	offset = source - (*byte)(str.GetVal())
 	new_str = zend.ZendStringSafeAlloc(2, str.GetLen()-offset, offset, 0)
@@ -5660,7 +5660,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 
 		/* Duplicate subject string for repeated replacement */
 
-		zend.ZendStringAddref(subject_str)
+		subject_str.AddRefcount()
 		if replace.IsType(zend.IS_ARRAY) {
 			replace_idx = 0
 		} else {
@@ -5756,7 +5756,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 				zend.ZendTmpStringRelease(tmp_search_str)
 				zend.ZendTmpStringRelease(tmp_replace_entry_str)
 				if subject_str == tmp_result {
-					zend.ZendStringDelref(subject_str)
+					subject_str.DelRefcount()
 				} else {
 					zend.ZendStringReleaseEx(subject_str, 0)
 					subject_str = tmp_result
@@ -6583,7 +6583,7 @@ func ZifSetlocale(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						zend.ZendStringReleaseEx(BG(locale_string), 0)
 					}
 					if len_ == loc.GetLen() && !(memcmp(loc.GetVal(), retval, len_)) {
-						BG(locale_string) = zend.ZendStringCopy(loc)
+						BG(locale_string) = loc.Copy()
 						zend.RETVAL_STR(BG(locale_string))
 						return
 					} else {

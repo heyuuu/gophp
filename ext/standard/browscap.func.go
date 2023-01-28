@@ -154,9 +154,9 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent zend.ZendBool) *zend.ZendString {
 	var interned *zend.ZendString = zend.ZendHashFindPtr(ctx.GetStrInterned(), str)
 	if interned != nil {
-		zend.ZendStringAddref(interned)
+		interned.AddRefcount()
 	} else {
-		interned = zend.ZendStringCopy(str)
+		interned = str.Copy()
 		if persistent != 0 {
 			interned = zend.ZendNewInternedString(str)
 		}
@@ -171,9 +171,9 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persisten
 	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
 	interned = zend.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
 	if interned != nil {
-		zend.ZendStringAddref(interned)
+		interned.AddRefcount()
 	} else {
-		interned = zend.ZendStringDup(lcname, persistent)
+		interned = lcname.Dup(persistent)
 		if persistent != 0 {
 			interned = zend.ZendNewInternedString(interned)
 		}
@@ -260,7 +260,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 			break
 		}
 		if persistent != 0 {
-			pattern = zend.ZendNewInternedString(zend.ZendStringCopy(pattern))
+			pattern = zend.ZendNewInternedString(pattern.Copy())
 			zend.ZendStringRelease(pattern)
 		}
 		ctx.SetCurrentEntry(zend.Pemalloc(b.SizeOf("browscap_entry"), persistent))
@@ -269,8 +269,8 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		if ctx.GetCurrentSectionName() != nil {
 			zend.ZendStringRelease(ctx.GetCurrentSectionName())
 		}
-		ctx.SetCurrentSectionName(zend.ZendStringCopy(pattern))
-		entry.SetPattern(zend.ZendStringCopy(pattern))
+		ctx.SetCurrentSectionName(pattern.Copy())
+		entry.SetPattern(pattern.Copy())
 		entry.SetKvStart(bdata.GetKvUsed())
 		entry.SetKvEnd(entry.GetKvStart())
 		entry.SetParent(nil)

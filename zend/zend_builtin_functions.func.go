@@ -1016,7 +1016,7 @@ register_constant:
 	/* non persistent */
 
 	ZEND_CONSTANT_SET_FLAGS(&c, case_sensitive, PHP_USER_CONSTANT)
-	c.SetName(ZendStringCopy(name))
+	c.SetName(name.Copy())
 	if ZendRegisterConstant(&c) == SUCCESS {
 		RETVAL_TRUE
 		return
@@ -2083,7 +2083,7 @@ func ZifGetIncludedFiles(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 			entry = _p.GetKey()
 			if entry != nil {
-				AddNextIndexStr(return_value, ZendStringCopy(entry))
+				AddNextIndexStr(return_value, entry.Copy())
 			}
 		}
 		break
@@ -2208,7 +2208,7 @@ func CopyClassOrInterfaceName(array *Zval, key *ZendString, ce *ZendClassEntry) 
 	if ce.GetRefcount() == 1 && !ce.IsImmutable() || SameName(key, ce.GetName()) != 0 {
 		key = ce.GetName()
 	}
-	AddNextIndexStr(array, ZendStringCopy(key))
+	AddNextIndexStr(array, key.Copy())
 }
 func GetDeclaredClassImpl(execute_data *ZendExecuteData, return_value *Zval, flags int, skip_flags int) {
 	var key *ZendString
@@ -2271,9 +2271,9 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 			func_ = _z.GetPtr()
 			if key != nil && key.GetVal()[0] != 0 {
 				if func_.GetType() == ZEND_INTERNAL_FUNCTION && (exclude_disabled == 0 || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction) {
-					AddNextIndexStr(&internal, ZendStringCopy(key))
+					AddNextIndexStr(&internal, key.Copy())
 				} else if func_.GetType() == ZEND_USER_FUNCTION {
-					AddNextIndexStr(&user, ZendStringCopy(key))
+					AddNextIndexStr(&user, key.Copy())
 				}
 			}
 		}
@@ -3144,7 +3144,7 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 					ArrayInit(return_value)
 					array = 1
 				}
-				AddNextIndexStr(return_value, ZendStringCopy(zif.GetFunctionName()))
+				AddNextIndexStr(return_value, zif.GetFunctionName().Copy())
 			}
 		}
 		break

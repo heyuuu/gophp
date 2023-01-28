@@ -143,7 +143,7 @@ func ZvalGetDouble(op *Zval) float64 {
 }
 func ZvalGetString(op *Zval) *ZendString {
 	if op.IsType(IS_STRING) {
-		return ZendStringCopy(op.GetStr())
+		return op.GetStr().Copy()
 	} else {
 		return ZvalGetStringFunc(op)
 	}
@@ -164,7 +164,7 @@ func ZendTmpStringRelease(tmp *ZendString) {
 }
 func ZvalTryGetString(op *Zval) *ZendString {
 	if op.IsType(IS_STRING) {
-		var ret *ZendString = ZendStringCopy(op.GetStr())
+		var ret *ZendString = op.GetStr().Copy()
 		return ret
 	} else {
 		return ZvalTryGetStringFunc(op)
@@ -1197,7 +1197,7 @@ try_again:
 		op = Z_REFVAL_P(op)
 		goto try_again
 	case IS_STRING:
-		return ZendStringCopy(op.GetStr())
+		return op.GetStr().Copy()
 	default:
 		break
 	}
@@ -3120,7 +3120,7 @@ func ZendStringTolowerEx(str *ZendString, persistent int) *ZendString {
 		}
 		p++
 	}
-	return ZendStringCopy(str)
+	return str.Copy()
 }
 func ZendBinaryStrcmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	var retval int

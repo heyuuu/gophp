@@ -9,7 +9,7 @@ import (
 func ZSTR_VAL(zstr *ZendString) []byte     { return zstr.GetVal() }
 func ZSTR_LEN(zstr *ZendString) int        { return zstr.GetLen() }
 func ZSTR_H(zstr *ZendString) ZendUlong    { return zstr.GetH() }
-func ZSTR_HASH(zstr *ZendString) ZendUlong { return ZendStringHashVal(zstr) }
+func ZSTR_HASH(zstr *ZendString) ZendUlong { return zstr.GetHash() }
 func IS_INTERNED(s __auto__) int           { return 0 }
 func STR_EMPTY_ALLOC() *ZendString         { return ZSTR_EMPTY_ALLOC() }
 func STR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
@@ -302,13 +302,13 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 	return str
 }
 func ZendInternedStringFindPermanent(str *ZendString) *ZendString {
-	ZendStringHashVal(str)
+	str.GetHash()
 	return ZendInternedStringHtLookup(str, &InternedStringsPermanent)
 }
 func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 	var ret *ZendString
 
-	ZendStringHashVal(str)
+	str.GetHash()
 	ret = ZendInternedStringHtLookup(str, &InternedStringsPermanent)
 	if ret != nil {
 		ZendStringRelease(str)
@@ -317,7 +317,7 @@ func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 	ZEND_ASSERT((str.GetGcFlags() & GC_PERSISTENT) != 0)
 	if str.GetRefcount() > 1 {
 		var h ZendUlong = str.GetH()
-		ZendStringDelref(str)
+		str.DelRefcount()
 		str = ZendStringInit(str.GetVal(), str.GetLen(), 1)
 		str.SetH(h)
 	}
@@ -326,7 +326,7 @@ func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 func ZendNewInternedStringRequest(str *ZendString) *ZendString {
 	var ret *ZendString
 
-	ZendStringHashVal(str)
+	str.GetHash()
 
 	/* Check for permanent strings, the table is readonly at this point. */
 
@@ -345,7 +345,7 @@ func ZendNewInternedStringRequest(str *ZendString) *ZendString {
 
 	if str.GetRefcount() > 1 {
 		var h ZendUlong = str.GetH()
-		ZendStringDelref(str)
+		str.DelRefcount()
 		str = ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		str.SetH(h)
 	}

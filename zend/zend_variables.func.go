@@ -85,6 +85,6 @@ func ZvalCopyCtorFunc(zvalue *Zval) {
 		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsType(IS_STRING) {
 		ZEND_ASSERT(true)
-		ZVAL_NEW_STR(zvalue, ZendStringDup(zvalue.GetStr(), 0))
+		ZVAL_NEW_STR(zvalue, zvalue.GetStr().Dup(0))
 	}
 }

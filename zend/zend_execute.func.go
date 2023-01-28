@@ -1975,7 +1975,7 @@ try_again:
 
 				/* Key may be released while throwing the undefined index warning. */
 
-				ZendStringAddref(offset_key)
+				offset_key.AddRefcount()
 				if ZendUndefinedIndexWrite(ht, offset_key) == FAILURE {
 					ZendStringRelease(offset_key)
 					return nil
@@ -3794,11 +3794,11 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
 			break
 		} else {
-			resolved_path = ZendStringCopy(inc_filename.GetStr())
+			resolved_path = inc_filename.GetStr().Copy()
 		}
 		if SUCCESS == ZendStreamOpen(resolved_path.GetVal(), &file_handle) {
 			if file_handle.GetOpenedPath() == nil {
-				file_handle.SetOpenedPath(ZendStringCopy(resolved_path))
+				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
 			if ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))

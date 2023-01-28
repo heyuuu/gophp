@@ -1181,7 +1181,7 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 					continue
 				}
 				stream_xport = _p.GetKey()
-				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(stream_xport))
+				zend.AddNextIndexStr(return_value, stream_xport.Copy())
 			}
 			break
 		}
@@ -1210,7 +1210,7 @@ func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend
 				}
 				stream_protocol = _p.GetKey()
 				if stream_protocol != nil {
-					zend.AddNextIndexStr(return_value, zend.ZendStringCopy(stream_protocol))
+					zend.AddNextIndexStr(return_value, stream_protocol.Copy())
 				}
 			}
 			break

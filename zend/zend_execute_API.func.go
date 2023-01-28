@@ -1348,7 +1348,7 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 	}
 	if execute_data != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
-			var h ZendUlong = ZendStringHashVal(name)
+			var h ZendUlong = name.GetHash()
 			var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **ZendString = op_array.GetVars()

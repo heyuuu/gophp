@@ -426,7 +426,7 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 		BEGIN(INITIAL)
 	}
 	if file_handle.GetOpenedPath() != nil {
-		compiled_filename = ZendStringCopy(file_handle.GetOpenedPath())
+		compiled_filename = file_handle.GetOpenedPath().Copy()
 	} else {
 		compiled_filename = ZendStringInit(file_handle.GetFilename(), strlen(file_handle.GetFilename()), 0)
 	}
@@ -507,7 +507,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	retval = ZendCompileFile(&file_handle, type_)
 	if retval != nil && file_handle.GetStream().GetHandle() {
 		if file_handle.GetOpenedPath() == nil {
-			opened_path = ZendStringCopy(filename.GetStr())
+			opened_path = filename.GetStr().Copy()
 			file_handle.SetOpenedPath(opened_path)
 		}
 		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())

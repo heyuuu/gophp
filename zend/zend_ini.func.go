@@ -189,7 +189,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 			return FAILURE
 		}
 		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, default_value.GetStr(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
-			p.SetValue(ZendNewInternedString(ZendStringCopy(default_value.GetStr())))
+			p.SetValue(ZendNewInternedString(default_value.GetStr().Copy()))
 		} else {
 			if ini_entry.GetValue() != nil {
 				p.SetValue(ZendStringInitInterned(ini_entry.GetValue(), ini_entry.GetValueLength(), 1))
@@ -254,7 +254,7 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 		ini_entry.SetModified(1)
 		ZendHashAddPtr(ExecutorGlobals.GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
 	}
-	duplicate = ZendStringCopy(new_value)
+	duplicate = new_value.Copy()
 	if ini_entry.GetOnModify() == nil || ini_entry.GetOnModify()(ini_entry, duplicate, ini_entry.GetMhArg1(), ini_entry.GetMhArg2(), ini_entry.GetMhArg3(), stage) == SUCCESS {
 		if modified != 0 && ini_entry.GetOrigValue() != ini_entry.GetValue() {
 			ZendStringRelease(ini_entry.GetValue())

@@ -650,7 +650,7 @@ func ZifStreamGetFilters(execute_data *zend.ZendExecuteData, return_value *zend.
 				}
 				filter_name = _p.GetKey()
 				if filter_name != nil {
-					zend.AddNextIndexStr(return_value, zend.ZendStringCopy(filter_name))
+					zend.AddNextIndexStr(return_value, filter_name.Copy())
 				}
 			}
 			break
@@ -749,7 +749,7 @@ func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *z
 		zend.ZendHashInit(BG(user_filter_map), 8, nil, zend.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
-	fdat.SetClassname(zend.ZendStringCopy(classname))
+	fdat.SetClassname(classname.Copy())
 	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == zend.SUCCESS {
 		zend.RETVAL_TRUE
 	} else {

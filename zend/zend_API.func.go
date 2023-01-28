@@ -3490,7 +3490,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		/* Try to fetch find static method of given class. */
 
 		mname = callable.GetStr()
-		ZendStringAddref(mname)
+		mname.AddRefcount()
 		ftable = ce_org.GetFunctionTable()
 		fcc.SetCallingScope(ce_org)
 	} else {
@@ -3658,7 +3658,7 @@ try_again:
 		if object != nil {
 			return ZendCreateMethodString(object.GetCe().GetName(), callable.GetStr())
 		}
-		return ZendStringCopy(callable.GetStr())
+		return callable.GetStr().Copy()
 	case IS_ARRAY:
 		var method *Zval = nil
 		var obj *Zval = nil
@@ -3830,8 +3830,8 @@ func ZendMakeCallable(callable *Zval, callable_name **ZendString) ZendBool {
 		if callable.IsType(IS_STRING) && fcc.GetCallingScope() != nil {
 			ZvalPtrDtorStr(callable)
 			ArrayInit(callable)
-			AddNextIndexStr(callable, ZendStringCopy(fcc.GetCallingScope().GetName()))
-			AddNextIndexStr(callable, ZendStringCopy(fcc.GetFunctionHandler().GetFunctionName()))
+			AddNextIndexStr(callable, fcc.GetCallingScope().GetName().Copy())
+			AddNextIndexStr(callable, fcc.GetFunctionHandler().GetFunctionName().Copy())
 		}
 		ZendReleaseFcallInfoCache(&fcc)
 		return 1
@@ -4097,14 +4097,14 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		/* Must be interned to avoid ZTS data races */
 
 		if IsPersistentClass(ce) != 0 {
-			name = ZendNewInternedString(ZendStringCopy(name))
+			name = ZendNewInternedString(name.Copy())
 		}
 
 		/* Must be interned to avoid ZTS data races */
 
 	}
 	if (access_type & ZEND_ACC_PUBLIC) != 0 {
-		property_info.SetName(ZendStringCopy(name))
+		property_info.SetName(name.Copy())
 	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
 		property_info.SetName(ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
 	} else {

@@ -183,7 +183,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 		if file_handle.GetOpenedPath() == nil {
 			file_handle.SetOpenedPath(zend.ZendStringInit(class_file, class_file_len, 0))
 		}
-		opened_path = zend.ZendStringCopy(file_handle.GetOpenedPath())
+		opened_path = file_handle.GetOpenedPath().Copy()
 		zend.ZVAL_NULL(&dummy)
 		if zend.ZendHashAdd(&(zend.ExecutorGlobals.GetIncludedFiles()), opened_path, &dummy) != nil {
 			new_op_array = zend.ZendCompileFile(&file_handle, zend.ZEND_REQUIRE)
@@ -260,13 +260,13 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 		if SPL_G(autoload_extensions) {
 			zend.ZendStringReleaseEx(SPL_G(autoload_extensions), 0)
 		}
-		SPL_G(autoload_extensions) = zend.ZendStringCopy(file_exts)
+		SPL_G(autoload_extensions) = file_exts.Copy()
 	}
 	if SPL_G(autoload_extensions) == nil {
 		zend.RETVAL_STRINGL(SPL_DEFAULT_FILE_EXTENSIONS, b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS")-1)
 		return
 	} else {
-		zend.ZendStringAddref(SPL_G(autoload_extensions))
+		SPL_G(autoload_extensions).AddRefcount()
 		zend.RETVAL_STR(SPL_G(autoload_extensions))
 		return
 	}
@@ -317,7 +317,7 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			if func_.HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 				func_ = zend.Emalloc(b.SizeOf("zend_op_array"))
 				memcpy(func_, alfi.GetFuncPtr(), b.SizeOf("zend_op_array"))
-				zend.ZendStringAddref(func_.GetOpArray().GetFunctionName())
+				func_.GetOpArray().GetFunctionName().AddRefcount()
 			}
 			zend.ZVAL_UNDEF(&retval)
 			fcic.SetFunctionHandler(func_)
@@ -680,15 +680,15 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 						zend.Z_ADDREF(alfi.GetObj())
 						zend.AddNextIndexZval(&tmp, alfi.GetObj())
 					} else {
-						zend.AddNextIndexStr(&tmp, zend.ZendStringCopy(alfi.GetCe().GetName()))
+						zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())
 					}
-					zend.AddNextIndexStr(&tmp, zend.ZendStringCopy(alfi.GetFuncPtr().GetFunctionName()))
+					zend.AddNextIndexStr(&tmp, alfi.GetFuncPtr().GetFunctionName().Copy())
 					zend.AddNextIndexZval(return_value, &tmp)
 				} else {
 					if strncmp(alfi.GetFuncPtr().GetFunctionName().GetVal(), "__lambda_func", b.SizeOf("\"__lambda_func\"")-1) {
-						zend.AddNextIndexStr(return_value, zend.ZendStringCopy(alfi.GetFuncPtr().GetFunctionName()))
+						zend.AddNextIndexStr(return_value, alfi.GetFuncPtr().GetFunctionName().Copy())
 					} else {
-						zend.AddNextIndexStr(return_value, zend.ZendStringCopy(key))
+						zend.AddNextIndexStr(return_value, key.Copy())
 					}
 				}
 			}
@@ -697,7 +697,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.AddNextIndexStr(return_value, zend.ZendStringCopy(zend.ExecutorGlobals.GetAutoloadFunc().GetFunctionName()))
+	zend.AddNextIndexStr(return_value, zend.ExecutorGlobals.GetAutoloadFunc().GetFunctionName().Copy())
 }
 func ZifSplObjectHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval

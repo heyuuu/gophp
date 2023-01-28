@@ -992,7 +992,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 	var inverse_map *EntityHt
 	var new_size int
 	if !(memchr(str.GetVal(), '&', str.GetLen())) {
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 	}
 	if all != 0 {
 		charset = DetermineCharset(hint_charset)
@@ -1007,7 +1007,7 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 
 		/* overflow, refuse to do anything */
 
-		return zend.ZendStringCopy(str)
+		return str.Copy()
 
 		/* overflow, refuse to do anything */
 

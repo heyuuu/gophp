@@ -149,7 +149,7 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 		/* if the opened path is set, copy it out */
 
 		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).IsType(zend.IS_STRING) && opened_path != nil {
-			*opened_path = zend.ZendStringCopy(zend.Z_REFVAL(args[3]).GetStr())
+			*opened_path = zend.Z_REFVAL(args[3]).GetStr().Copy()
 		}
 
 		/* set wrapper data to be a reference to our object */
