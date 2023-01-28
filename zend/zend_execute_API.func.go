@@ -88,17 +88,17 @@ func InitExecutor() {
 	ExecutorGlobals.SetActive(1)
 }
 func ZvalCallDestructor(zv *Zval) int {
-	if zv.GetType() == IS_INDIRECT {
+	if zv.IsType(IS_INDIRECT) {
 		zv = zv.GetZv()
 	}
-	if zv.GetType() == IS_OBJECT && Z_REFCOUNT_P(zv) == 1 {
+	if zv.IsType(IS_OBJECT) && Z_REFCOUNT_P(zv) == 1 {
 		return ZEND_HASH_APPLY_REMOVE
 	} else {
 		return ZEND_HASH_APPLY_KEEP
 	}
 }
 func ZendUncleanZvalPtrDtor(zv *Zval) {
-	if zv.GetType() == IS_INDIRECT {
+	if zv.IsType(IS_INDIRECT) {
 		zv = zv.GetZv()
 	}
 	IZvalPtrDtor(zv)
@@ -183,7 +183,7 @@ func ShutdownExecutor() {
 				_p--
 				_z = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				zv = _z
@@ -212,7 +212,7 @@ func ShutdownExecutor() {
 				_p--
 				_z = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				zv = _z
@@ -229,7 +229,7 @@ func ShutdownExecutor() {
 						for ; _p != _end; _p++ {
 							var _z *Zval = _p.GetVal()
 
-							if _z.GetType() == IS_UNDEF {
+							if _z.IsType(IS_UNDEF) {
 								continue
 							}
 							op_array = _z.GetPtr()
@@ -303,7 +303,7 @@ func ShutdownExecutor() {
 					_p--
 					_z = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					key = _p.GetKey()
@@ -345,7 +345,7 @@ func ShutdownExecutor() {
 					_p--
 					_z = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					key = _p.GetKey()
@@ -383,7 +383,7 @@ func ShutdownExecutor() {
 					_p--
 					_z = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					key = _p.GetKey()
@@ -568,7 +568,7 @@ func ZendUseUndefinedConstant(name *ZendString, attr ZendAstAttr, result *Zval) 
 	return SUCCESS
 }
 func ZvalUpdateConstantEx(p *Zval, scope *ZendClassEntry) int {
-	if p.GetType() == IS_CONSTANT_AST {
+	if p.IsType(IS_CONSTANT_AST) {
 		var ast *ZendAst = Z_ASTVAL_P(p)
 		if ast.GetKind() == ZEND_AST_CONSTANT {
 			var name *ZendString = ZendAstGetConstantName(ast)
@@ -1292,7 +1292,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 		for {
 			var zv *Zval = ZendHashFindEx(ht, *str, 1)
 			if zv != nil {
-				if zv.GetType() == IS_INDIRECT {
+				if zv.IsType(IS_INDIRECT) {
 					var val *Zval = zv.GetZv()
 					ZVAL_COPY_VALUE(var_, val)
 				} else {
@@ -1325,7 +1325,7 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 		var end **ZendString = str + op_array.GetLastVar()
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
-			if var_.GetType() == IS_UNDEF {
+			if var_.IsType(IS_UNDEF) {
 				ZendHashDel(ht, *str)
 			} else {
 				ZendHashUpdate(ht, *str, var_)

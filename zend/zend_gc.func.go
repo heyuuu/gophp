@@ -440,7 +440,7 @@ tail_call:
 	for true {
 		end--
 		zv = end.GetVal()
-		if zv.GetType() == IS_INDIRECT {
+		if zv.IsType(IS_INDIRECT) {
 			zv = zv.GetZv()
 		}
 		if Z_REFCOUNTED_P(zv) {
@@ -452,7 +452,7 @@ tail_call:
 	}
 	for p != end {
 		zv = p.GetVal()
-		if zv.GetType() == IS_INDIRECT {
+		if zv.IsType(IS_INDIRECT) {
 			zv = zv.GetZv()
 		}
 		if Z_REFCOUNTED_P(zv) {
@@ -466,7 +466,7 @@ tail_call:
 		p++
 	}
 	zv = p.GetVal()
-	if zv.GetType() == IS_INDIRECT {
+	if zv.IsType(IS_INDIRECT) {
 		zv = zv.GetZv()
 	}
 	ref = zv.GetCounted()
@@ -562,7 +562,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 		for true {
 			end--
 			zv = end.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -574,7 +574,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 		}
 		for p != end {
 			zv = p.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -588,7 +588,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			p++
 		}
 		zv = p.GetVal()
-		if zv.GetType() == IS_INDIRECT {
+		if zv.IsType(IS_INDIRECT) {
 			zv = zv.GetZv()
 		}
 		ref = zv.GetCounted()
@@ -746,7 +746,7 @@ tail_call:
 			for true {
 				end--
 				zv = end.GetVal()
-				if zv.GetType() == IS_INDIRECT {
+				if zv.IsType(IS_INDIRECT) {
 					zv = zv.GetZv()
 				}
 				if Z_REFCOUNTED_P(zv) {
@@ -758,7 +758,7 @@ tail_call:
 			}
 			for p != end {
 				zv = p.GetVal()
-				if zv.GetType() == IS_INDIRECT {
+				if zv.IsType(IS_INDIRECT) {
 					zv = zv.GetZv()
 				}
 				if Z_REFCOUNTED_P(zv) {
@@ -771,7 +771,7 @@ tail_call:
 				p++
 			}
 			zv = p.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			ref = zv.GetCounted()
@@ -918,7 +918,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 		for true {
 			end--
 			zv = end.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -930,7 +930,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 		}
 		for p != end {
 			zv = p.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -944,7 +944,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			p++
 		}
 		zv = p.GetVal()
-		if zv.GetType() == IS_INDIRECT {
+		if zv.IsType(IS_INDIRECT) {
 			zv = zv.GetZv()
 		}
 		ref = zv.GetCounted()
@@ -1073,7 +1073,7 @@ tail_call:
 		for true {
 			end--
 			zv = end.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -1085,7 +1085,7 @@ tail_call:
 		}
 		for p != end {
 			zv = p.GetVal()
-			if zv.GetType() == IS_INDIRECT {
+			if zv.IsType(IS_INDIRECT) {
 				zv = zv.GetZv()
 			}
 			if Z_REFCOUNTED_P(zv) {
@@ -1095,7 +1095,7 @@ tail_call:
 			p++
 		}
 		zv = p.GetVal()
-		if zv.GetType() == IS_INDIRECT {
+		if zv.IsType(IS_INDIRECT) {
 			zv = zv.GetZv()
 		}
 		ref = zv.GetCounted()

@@ -670,7 +670,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.Efree(formatcodes)
 	zend.Efree(formatargs)
 	output.GetVal()[outputpos] = '0'
-	output.GetLen() = outputpos
+	output.SetLen(outputpos)
 	zend.RETVAL_NEW_STR(output)
 	return
 }
@@ -1297,7 +1297,7 @@ func ZmStartupPack(type_ int, module_number int) int {
 	} else {
 		var val zend.Zval
 		var size int = b.SizeOf("Z_LVAL ( val )")
-		val.GetLval() = 0
+		val.SetLval(0)
 
 		/* Where to get hi to lo bytes from */
 

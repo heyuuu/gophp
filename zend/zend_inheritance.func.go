@@ -574,22 +574,22 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 					}
 					if precv != nil && precv.GetOpcode() == ZEND_RECV_INIT && precv.GetOp2Type() != IS_UNUSED {
 						var zv *Zval = RT_CONSTANT(precv, precv.GetOp2())
-						if zv.GetType() == IS_FALSE {
+						if zv.IsType(IS_FALSE) {
 							SmartStrAppends(&str, "false")
-						} else if zv.GetType() == IS_TRUE {
+						} else if zv.IsType(IS_TRUE) {
 							SmartStrAppends(&str, "true")
-						} else if zv.GetType() == IS_NULL {
+						} else if zv.IsType(IS_NULL) {
 							SmartStrAppends(&str, "NULL")
-						} else if zv.GetType() == IS_STRING {
+						} else if zv.IsType(IS_STRING) {
 							SmartStrAppendc(&str, '\'')
 							SmartStrAppendl(&str, Z_STRVAL_P(zv), MIN(Z_STRLEN_P(zv), 10))
 							if Z_STRLEN_P(zv) > 10 {
 								SmartStrAppends(&str, "...")
 							}
 							SmartStrAppendc(&str, '\'')
-						} else if zv.GetType() == IS_ARRAY {
+						} else if zv.IsType(IS_ARRAY) {
 							SmartStrAppends(&str, "Array")
-						} else if zv.GetType() == IS_CONSTANT_AST {
+						} else if zv.IsType(IS_CONSTANT_AST) {
 							var ast *ZendAst = Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
 								SmartStrAppend(&str, ZendAstGetConstantName(ast))
@@ -739,7 +739,7 @@ func DoInheritanceCheckOnMethodEx(child *ZendFunction, parent *ZendFunction, ce 
 					var new_function *ZendFunction = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_op_array"))
 					memcpy(new_function, child, b.SizeOf("zend_op_array"))
 					child = new_function
-					child_zv.GetPtr() = child
+					child_zv.SetPtr(child)
 				}
 			}
 			child.SetPrototype(proto)
@@ -1002,7 +1002,7 @@ func ZendBuildPropertiesInfoTable(ce *ZendClassEntry) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			prop = _z.GetPtr()
@@ -1167,7 +1167,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.GetType() == IS_INDIRECT {
+				if src.IsType(IS_INDIRECT) {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
@@ -1185,12 +1185,12 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.GetType() == IS_INDIRECT {
+				if src.IsType(IS_INDIRECT) {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
 				}
-				if dst.GetZv().GetType() == IS_CONSTANT_AST {
+				if Z_INDIRECT_P(dst).IsType(IS_CONSTANT_AST) {
 					ce.SetIsConstantsUpdated(false)
 				}
 				if dst == end {
@@ -1202,7 +1202,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.GetType() == IS_INDIRECT {
+				if src.IsType(IS_INDIRECT) {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
@@ -1235,7 +1235,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			property_info = _z.GetPtr()
@@ -1258,7 +1258,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				key = _p.GetKey()
@@ -1278,7 +1278,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				key = _p.GetKey()
@@ -1298,7 +1298,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					key = _p.GetKey()
@@ -1315,7 +1315,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					key = _p.GetKey()
@@ -1371,7 +1371,7 @@ func DoInterfaceImplementation(ce *ZendClassEntry, iface *ZendClassEntry) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -1387,7 +1387,7 @@ func DoInterfaceImplementation(ce *ZendClassEntry, iface *ZendClassEntry) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -1432,7 +1432,7 @@ func ZendDoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				key = _p.GetKey()
@@ -1491,7 +1491,7 @@ func ZendDoImplementInterfaces(ce *ZendClassEntry, interfaces **ZendClassEntry) 
 					for ; _p != _end; _p++ {
 						var _z *Zval = _p.GetVal()
 
-						if _z.GetType() == IS_UNDEF {
+						if _z.IsType(IS_UNDEF) {
 							continue
 						}
 						key = _p.GetKey()
@@ -1890,7 +1890,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 					for ; _p != _end; _p++ {
 						var _z *Zval = _p.GetVal()
 
-						if _z.GetType() == IS_UNDEF {
+						if _z.IsType(IS_UNDEF) {
 							continue
 						}
 						key = _p.GetKey()
@@ -1916,7 +1916,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 					for ; _p != _end; _p++ {
 						var _z *Zval = _p.GetVal()
 
-						if _z.GetType() == IS_UNDEF {
+						if _z.IsType(IS_UNDEF) {
 							continue
 						}
 						key = _p.GetKey()
@@ -1935,7 +1935,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			fn = _z.GetPtr()
@@ -1987,7 +1987,7 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				property_info = _z.GetPtr()
@@ -2037,12 +2037,12 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 
 							/* if any of the values is a constant, we try to resolve it */
 
-							if op1.GetType() == IS_CONSTANT_AST {
+							if op1.IsType(IS_CONSTANT_AST) {
 								ZVAL_COPY_OR_DUP(&op1_tmp, op1)
 								ZvalUpdateConstantEx(&op1_tmp, ce)
 								op1 = &op1_tmp
 							}
-							if op2.GetType() == IS_CONSTANT_AST {
+							if op2.IsType(IS_CONSTANT_AST) {
 								ZVAL_COPY_OR_DUP(&op2_tmp, op2)
 								ZvalUpdateConstantEx(&op2_tmp, ce)
 								op2 = &op2_tmp
@@ -2250,7 +2250,7 @@ func ZendVerifyAbstractClass(ce *ZendClassEntry) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			func_ = _z.GetPtr()
@@ -2378,7 +2378,7 @@ func LoadDelayedClasses() {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			name = _p.GetKey()
@@ -2418,7 +2418,7 @@ func ReportVarianceErrors(ce *ZendClassEntry) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			obligation = _z.GetPtr()
@@ -2545,7 +2545,7 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -2572,7 +2572,7 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()

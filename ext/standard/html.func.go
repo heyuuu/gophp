@@ -944,7 +944,7 @@ func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, f
 		}
 	}
 	*q = '0'
-	ret.GetLen() = size_t(q - ret.GetVal())
+	ret.SetLen(size_t(q - ret.GetVal()))
 }
 func UnescapeInverseMap(all int, flags int) *EntityHt {
 	var document_type int = flags & ENT_HTML_DOC_TYPE_MASK
@@ -1330,7 +1330,7 @@ func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_ch
 		}
 	}
 	replaced.GetVal()[len_] = '0'
-	replaced.GetLen() = len_
+	replaced.SetLen(len_)
 	return replaced
 }
 func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval, all int) {

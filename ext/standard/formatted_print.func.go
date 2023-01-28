@@ -442,7 +442,7 @@ exit:
 	/* possibly, we have to make sure we have room for the terminating null? */
 
 	result.GetVal()[outpos] = 0
-	result.GetLen() = outpos
+	result.SetLen(outpos)
 	return result
 }
 func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
@@ -452,7 +452,7 @@ func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 	if array.GetType() != zend.IS_ARRAY {
 		zend.ConvertToArray(array)
 	}
-	n = array.GetArr().GetNNumOfElements()
+	n = zend.Z_ARRVAL_P(array).GetNNumOfElements()
 	args = (*zend.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
 	for {
@@ -462,7 +462,7 @@ func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			zv = _z

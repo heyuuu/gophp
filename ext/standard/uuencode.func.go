@@ -147,7 +147,7 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 			}
 		}
 	}
-	dest.GetLen() = total_len
+	dest.SetLen(total_len)
 	dest.GetVal()[dest.GetLen()] = '0'
 	return dest
 err:

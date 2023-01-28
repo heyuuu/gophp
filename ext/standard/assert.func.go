@@ -150,7 +150,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if assertion.GetType() == zend.IS_STRING {
+	if assertion.IsType(zend.IS_STRING) {
 		var retval zend.Zval
 		var old_error_reporting int = 0
 		if zend.ZendForbidDynamicCall("assert() with string argument") == zend.FAILURE {
@@ -223,7 +223,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if ASSERTG(exception) {
 		if description == nil {
 			zend.ZendThrowException(AssertionErrorCe, nil, zend.E_ERROR)
-		} else if description.GetType() == zend.IS_OBJECT && zend.InstanceofFunction(zend.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
+		} else if description.IsType(zend.IS_OBJECT) && zend.InstanceofFunction(zend.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
 			zend.Z_ADDREF_P(description)
 			zend.ZendThrowExceptionObject(description)
 		} else {

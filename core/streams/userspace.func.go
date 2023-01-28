@@ -148,7 +148,7 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 
 		/* if the opened path is set, copy it out */
 
-		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).GetType() == zend.IS_STRING && opened_path != nil {
+		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).IsType(zend.IS_STRING) && opened_path != nil {
 			*opened_path = zend.ZendStringCopy(zend.Z_REFVAL(args[3]).GetStr())
 		}
 
@@ -610,17 +610,17 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	case core.PHP_STREAM_OPTION_LOCKING:
 		zend.ZVAL_LONG(&args[0], 0)
 		if (value & LOCK_NB) != 0 {
-			args[0].GetLval() |= standard.PHP_LOCK_NB
+			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_NB)
 		}
 		switch value & ^LOCK_NB {
 		case LOCK_SH:
-			args[0].GetLval() |= standard.PHP_LOCK_SH
+			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_SH)
 			break
 		case LOCK_EX:
-			args[0].GetLval() |= standard.PHP_LOCK_EX
+			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_EX)
 			break
 		case LOCK_UN:
-			args[0].GetLval() |= standard.PHP_LOCK_UN
+			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_UN)
 			break
 		}
 

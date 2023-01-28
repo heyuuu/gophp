@@ -245,7 +245,7 @@ func UnserializeStr(p **uint8, len_ int, maxlen int) *zend.ZendString {
 		*p++
 	}
 	str.GetVal()[i] = 0
-	str.GetLen() = i
+	str.SetLen(i)
 	return str
 }
 func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserializeDataT) int {
@@ -403,7 +403,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 					}
 				}
 				if b.Assign(&old_data, zend.ZendHashFind(ht, key.GetStr())) != nil {
-					if old_data.GetType() == zend.IS_INDIRECT {
+					if old_data.IsType(zend.IS_INDIRECT) {
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
@@ -530,7 +530,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		zend.ZVAL_DEREF(rval)
 		tmp = TmpVar(var_hash, 2)
 		zend.ZVAL_COPY(tmp, rval)
-		tmp.GetU2Extra() = VAR_UNSERIALIZE_FLAG
+		tmp.SetU2Extra(VAR_UNSERIALIZE_FLAG)
 		tmp++
 		zend.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
@@ -555,7 +555,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 
 		var wakeup_var *zend.Zval = VarTmpVar(var_hash)
 		zend.ZVAL_COPY(wakeup_var, rval)
-		wakeup_var.GetU2Extra() = VAR_WAKEUP_FLAG
+		wakeup_var.SetU2Extra(VAR_WAKEUP_FLAG)
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 }

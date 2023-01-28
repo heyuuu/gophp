@@ -171,7 +171,7 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *zend.ZendString, val *zend.
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			tmp_key = _p.GetKey()
@@ -194,7 +194,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var key *zend.ZendString
 	var val *zend.Zval
 	var s zend.SmartStr = zend.SmartStr{0}
-	zend.ZEND_ASSERT(headers.GetType() == zend.IS_ARRAY)
+	zend.ZEND_ASSERT(headers.IsType(zend.IS_ARRAY))
 	for {
 		var __ht *zend.HashTable = headers.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
@@ -202,7 +202,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			idx = _p.GetH()

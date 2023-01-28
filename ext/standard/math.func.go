@@ -247,10 +247,10 @@ func ZifAbs(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if value.GetType() == zend.IS_DOUBLE {
+	if value.IsType(zend.IS_DOUBLE) {
 		zend.RETVAL_DOUBLE(fabs(value.GetDval()))
 		return
-	} else if value.GetType() == zend.IS_LONG {
+	} else if value.IsType(zend.IS_LONG) {
 		if value.GetLval() == zend.ZEND_LONG_MIN {
 			zend.RETVAL_DOUBLE(-float64(zend.ZEND_LONG_MIN))
 			return
@@ -328,10 +328,10 @@ func ZifCeil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if value.GetType() == zend.IS_DOUBLE {
+	if value.IsType(zend.IS_DOUBLE) {
 		zend.RETVAL_DOUBLE(ceil(value.GetDval()))
 		return
-	} else if value.GetType() == zend.IS_LONG {
+	} else if value.IsType(zend.IS_LONG) {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
 		return
 	}
@@ -404,10 +404,10 @@ func ZifFloor(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if value.GetType() == zend.IS_DOUBLE {
+	if value.IsType(zend.IS_DOUBLE) {
 		zend.RETVAL_DOUBLE(floor(value.GetDval()))
 		return
-	} else if value.GetType() == zend.IS_LONG {
+	} else if value.IsType(zend.IS_LONG) {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
 		return
 	}
@@ -522,7 +522,7 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 	case zend.IS_DOUBLE:
-		if value.GetType() == zend.IS_LONG {
+		if value.IsType(zend.IS_LONG) {
 			return_val = float64(value.GetLval())
 		} else {
 			return_val = value.GetDval()
@@ -2593,7 +2593,7 @@ func _phpMathZvaltobase(arg *zend.Zval, base int) *zend.ZendString {
 	if arg.GetType() != zend.IS_LONG && arg.GetType() != zend.IS_DOUBLE || base < 2 || base > 36 {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
-	if arg.GetType() == zend.IS_DOUBLE {
+	if arg.IsType(zend.IS_DOUBLE) {
 		var fvalue float64 = floor(arg.GetDval())
 		var ptr *byte
 		var end *byte
@@ -3282,7 +3282,7 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	if is_negative != 0 {
 		b.PostDec(&(*t)) = '-'
 	}
-	res.GetLen() = reslen
+	res.SetLen(reslen)
 	zend.ZendStringReleaseEx(tmpbuf, 0)
 	return res
 }

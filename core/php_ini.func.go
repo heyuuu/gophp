@@ -66,7 +66,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			ini_entry = _z.GetPtr()
@@ -103,10 +103,10 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	}
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
-	if zvalue.GetType() == zend.IS_ARRAY {
+	if zvalue.IsType(zend.IS_ARRAY) {
 		zend.ZendHashDestroy(zvalue.GetArr())
 		zend.Free(zvalue.GetArr())
-	} else if zvalue.GetType() == zend.IS_STRING {
+	} else if zvalue.IsType(zend.IS_STRING) {
 		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
@@ -148,7 +148,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			/* Store in active hash */
 
 			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr(), arg2)
-			entry.GetStr() = zend.ZendStringDup(entry.GetStr(), 1)
+			entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -182,7 +182,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		} else {
 			entry = zend.ZendHashNextIndexInsert(find_arr.GetArr(), arg2)
 		}
-		entry.GetStr() = zend.ZendStringDup(entry.GetStr(), 1)
+		entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
 
@@ -238,7 +238,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
 				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
 			}
-			if entry.GetType() == zend.IS_ARRAY {
+			if entry.IsType(zend.IS_ARRAY) {
 				ActiveIniHash = entry.GetArr()
 			}
 		}
@@ -637,7 +637,7 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			str = _p.GetKey()

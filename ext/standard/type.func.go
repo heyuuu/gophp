@@ -587,7 +587,7 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 		}
 		break
 	}
-	if arg.GetType() == type_ {
+	if arg.IsType(type_) {
 		if type_ == zend.IS_RESOURCE {
 			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.GetRes())
 			if type_name == nil {
@@ -674,7 +674,7 @@ func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_BOOL(arg.GetType() == zend.IS_FALSE || arg.GetType() == zend.IS_TRUE)
+	zend.RETVAL_BOOL(arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
 	return
 }
 func ZifIsInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

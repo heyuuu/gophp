@@ -100,7 +100,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 		}
 	}
 	*p2 = '0'
-	retval.GetLen() = decoded_len
+	retval.SetLen(decoded_len)
 	return retval
 }
 func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
@@ -278,7 +278,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		}
 	}
 	str_out.GetVal()[j] = '0'
-	str_out.GetLen() = j
+	str_out.SetLen(j)
 	zend.RETVAL_NEW_STR(str_out)
 }
 func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

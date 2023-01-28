@@ -147,7 +147,7 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 	t[b.PostInc(&j)] = '$'
 	t[b.PostInc(&j)] = '~'
 	t[j] = 0
-	res.GetLen() = j
+	res.SetLen(j)
 	zend.FreeAlloca(lc_pattern, use_heap)
 	return res
 }
@@ -512,7 +512,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 func BrowscapZvalCopyCtor(p *zend.Zval) {
 	if zend.Z_REFCOUNTED_P(p) {
 		var str *zend.ZendString
-		zend.ZEND_ASSERT(p.GetType() == zend.IS_STRING)
+		zend.ZEND_ASSERT(p.IsType(zend.IS_STRING))
 		str = p.GetStr()
 		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
 			zend.GC_ADDREF(str)
@@ -641,7 +641,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				entry = _z.GetPtr()

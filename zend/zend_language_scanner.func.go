@@ -530,8 +530,8 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = Z_STRLEN_P(str)
-	str.GetStr() = ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0)
-	str.GetTypeInfo() = IS_STRING_EX
+	str.SetStr(ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0))
+	str.SetTypeInfo(IS_STRING_EX)
 	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
 	SCNG(yy_in) = nil
 	SCNG(yy_start) = nil

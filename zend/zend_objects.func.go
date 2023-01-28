@@ -48,9 +48,9 @@ func ZendObjectStdDtor(object *ZendObject) {
 		}
 	}
 	if object.GetCe().IsUseGuards() {
-		if p.GetType() == IS_STRING {
+		if p.IsType(IS_STRING) {
 			ZvalPtrDtorStr(p)
-		} else if p.GetType() == IS_ARRAY {
+		} else if p.IsType(IS_ARRAY) {
 			var guards *HashTable
 			guards = p.GetArr()
 			ZEND_ASSERT(guards != nil)
@@ -214,13 +214,13 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				num_key = _p.GetH()
 				key = _p.GetKey()
 				prop = _z
-				if prop.GetType() == IS_INDIRECT {
+				if prop.IsType(IS_INDIRECT) {
 					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(prop.GetZv()-old_object.GetPropertiesTable()))
 				} else {
 					ZVAL_COPY_VALUE(&new_prop, prop)

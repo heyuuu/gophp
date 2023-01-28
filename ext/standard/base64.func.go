@@ -127,7 +127,7 @@ func PhpBase64Encode(str *uint8, length int) *zend.ZendString {
 	result = zend.ZendStringSafeAlloc((length+2)/3, 4*b.SizeOf("char"), 0, 0)
 	p = (*uint8)(result.GetVal())
 	p = PhpBase64EncodeImpl(str, length, p)
-	result.GetLen() = p - (*uint8)(result.GetVal())
+	result.SetLen(p - (*uint8)(result.GetVal()))
 	return result
 }
 func PhpBase64DecodeEx(str *uint8, length int, strict zend.ZendBool) *zend.ZendString {
@@ -138,7 +138,7 @@ func PhpBase64DecodeEx(str *uint8, length int, strict zend.ZendBool) *zend.ZendS
 		zend.ZendStringEfree(result)
 		return nil
 	}
-	result.GetLen() = outl
+	result.SetLen(outl)
 	return result
 }
 func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

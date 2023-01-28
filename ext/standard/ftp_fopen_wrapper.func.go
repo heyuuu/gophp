@@ -503,7 +503,7 @@ func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 
 		/* set resume position if applicable */
 
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.GetType() == zend.IS_LONG && tmpzval.GetLval() > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ftp", "resume_pos")) != nil && tmpzval.IsType(zend.IS_LONG) && tmpzval.GetLval() > 0 {
 			core.PhpStreamPrintf(stream, "REST "+zend.ZEND_LONG_FMT+"\r\n", tmpzval.GetLval())
 			result = GET_FTP_RESULT(stream)
 			if result < 300 || result > 399 {

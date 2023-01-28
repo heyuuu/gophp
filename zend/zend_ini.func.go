@@ -126,7 +126,7 @@ func ZendIniDeactivate() int {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				ini_entry = _z.GetPtr()

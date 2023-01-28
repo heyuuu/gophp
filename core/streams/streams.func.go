@@ -45,7 +45,7 @@ func ZmDeactivateStreams(type_ int, module_number int) int {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			el = _z
@@ -80,7 +80,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 					for ; _p != _end; _p++ {
 						var _z *zend.Zval = _p.GetVal()
 
-						if _z.GetType() == zend.IS_UNDEF {
+						if _z.IsType(zend.IS_UNDEF) {
 							continue
 						}
 						regentry = _z.GetPtr()
@@ -684,7 +684,7 @@ func PhpStreamReadToStr(stream *core.PhpStream, len_ int) *zend.ZendString {
 		zend.ZendStringEfree(str)
 		return nil
 	}
-	str.GetLen() = read
+	str.SetLen(read)
 	str.GetVal()[read] = 0
 	if int(read < len_/2) != 0 {
 		return zend.ZendStringTruncate(str, read, 0)
@@ -995,7 +995,7 @@ func PhpStreamGetRecord(stream *core.PhpStream, maxlen int, delim *byte, delim_l
 	/* php_stream_read will not call ops->read here because the necessary
 	 * data is guaranteedly buffered */
 
-	ret_buf.GetLen() = core.PhpStreamRead(stream, ret_buf.GetVal(), tent_ret_len)
+	ret_buf.SetLen(core.PhpStreamRead(stream, ret_buf.GetVal(), tent_ret_len))
 	if found_delim != nil {
 		stream.SetReadpos(stream.GetReadpos() + delim_len)
 		stream.SetPosition(stream.GetPosition() + delim_len)
@@ -1335,7 +1335,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 			ptr += ret
 		}
 		if len_ != 0 {
-			result.GetLen() = len_
+			result.SetLen(len_)
 			result.GetVal()[len_] = '0'
 
 			/* Only truncate if the savings are large enough */

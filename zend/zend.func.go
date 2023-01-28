@@ -153,10 +153,10 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
-			if _z.GetType() == IS_INDIRECT {
+			if _z.IsType(IS_INDIRECT) {
 				_z = _z.GetZv()
 			}
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			num_key = _p.GetH()
@@ -211,10 +211,10 @@ func PrintFlatHash(ht *HashTable) {
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
-			if _z.GetType() == IS_INDIRECT {
+			if _z.IsType(IS_INDIRECT) {
 				_z = _z.GetZv()
 			}
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			num_key = _p.GetH()
@@ -236,7 +236,7 @@ func PrintFlatHash(ht *HashTable) {
 	}
 }
 func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
-	if expr.GetType() == IS_STRING {
+	if expr.IsType(IS_STRING) {
 		return 0
 	} else {
 		ZVAL_STR(expr_copy, ZvalGetStringFunc(expr))
@@ -401,7 +401,7 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
 	ZVAL_ARR(&globals, &(ExecutorGlobals.GetSymbolTable()))
-	globals.GetTypeFlags() = 0
+	globals.SetTypeFlags(0)
 	ZVAL_NEW_REF(&globals, &globals)
 	ZendHashUpdate(&(ExecutorGlobals.GetSymbolTable()), name, &globals)
 	return 0
@@ -493,7 +493,7 @@ func ZendResolvePropertyTypes() {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			ce = _z.GetPtr()
@@ -508,7 +508,7 @@ func ZendResolvePropertyTypes() {
 					for ; _p != _end; _p++ {
 						var _z *Zval = _p.GetVal()
 
-						if _z.GetType() == IS_UNDEF {
+						if _z.IsType(IS_UNDEF) {
 							continue
 						}
 						prop_info = _z.GetPtr()

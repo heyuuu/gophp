@@ -220,9 +220,9 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 
 			var fast_call *Zval = ZEND_CALL_VAR(ex, ex.GetFunc().GetOpArray().GetOpcodes()[try_catch.GetFinallyEnd()].GetOp1().GetVar())
 			ZendGeneratorCleanupUnfinishedExecution(generator, ex, try_catch.GetFinallyOp())
-			fast_call.GetObj() = ExecutorGlobals.GetException()
+			fast_call.SetObj(ExecutorGlobals.GetException())
 			ExecutorGlobals.SetException(nil)
-			fast_call.GetOplineNum() = uint32 - 1
+			fast_call.SetOplineNum(uint32 - 1)
 			ex.SetOpline(ex.GetFunc().GetOpArray().GetOpcodes()[try_catch.GetFinallyOp()])
 			generator.SetIsForcedClose(true)
 			ZendGeneratorResume(generator)
@@ -545,7 +545,7 @@ func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNod
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			leaf = _p.GetH()
@@ -701,7 +701,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 			}
 			p = ht.GetArData()[pos]
 			value = p.GetVal()
-			if value.GetType() == IS_INDIRECT {
+			if value.IsType(IS_INDIRECT) {
 				value = value.GetZv()
 			}
 			pos++

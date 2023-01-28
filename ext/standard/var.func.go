@@ -39,7 +39,7 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, inde
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
-	if zv.GetType() == zend.IS_UNDEF {
+	if zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
 			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
@@ -101,10 +101,10 @@ again:
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
-				if _z.GetType() == zend.IS_INDIRECT {
+				if _z.IsType(zend.IS_INDIRECT) {
 					_z = _z.GetZv()
 				}
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				num = _p.GetH()
@@ -146,14 +146,14 @@ again:
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					num = _p.GetH()
 					key = _p.GetKey()
 					val = _z
 					var prop_info *zend.ZendPropertyInfo = nil
-					if val.GetType() == zend.IS_INDIRECT {
+					if val.IsType(zend.IS_INDIRECT) {
 						val = val.GetZv()
 						if key != nil {
 							prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
@@ -300,7 +300,7 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, ind
 		}
 		zend.ZEND_PUTS("]=>\n")
 	}
-	if prop_info != nil && zv.GetType() == zend.IS_UNDEF {
+	if prop_info != nil && zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
 		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
 			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
@@ -362,10 +362,10 @@ again:
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
-				if _z.GetType() == zend.IS_INDIRECT {
+				if _z.IsType(zend.IS_INDIRECT) {
 					_z = _z.GetZv()
 				}
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -407,14 +407,14 @@ again:
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					index = _p.GetH()
 					key = _p.GetKey()
 					val = _z
 					var prop_info *zend.ZendPropertyInfo = nil
-					if val.GetType() == zend.IS_INDIRECT {
+					if val.IsType(zend.IS_INDIRECT) {
 						val = val.GetZv()
 						if key != nil {
 							prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
@@ -656,10 +656,10 @@ again:
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
-				if _z.GetType() == zend.IS_INDIRECT {
+				if _z.IsType(zend.IS_INDIRECT) {
 					_z = _z.GetZv()
 				}
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -710,10 +710,10 @@ again:
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
-					if _z.GetType() == zend.IS_INDIRECT {
+					if _z.IsType(zend.IS_INDIRECT) {
 						_z = _z.GetZv()
 					}
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					index = _p.GetH()
@@ -846,7 +846,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 
 	/* References to objects are treated as if the reference didn't exist */
 
-	if is_ref != 0 && zend.Z_REFVAL_P(var_).GetType() == zend.IS_OBJECT {
+	if is_ref != 0 && zend.Z_REFVAL_P(var_).IsType(zend.IS_OBJECT) {
 		var_ = zend.Z_REFVAL_P(var_)
 	}
 
@@ -945,9 +945,9 @@ func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, n
 	if val == nil {
 		return zend.FAILURE
 	}
-	if val.GetType() == zend.IS_INDIRECT {
+	if val.IsType(zend.IS_INDIRECT) {
 		val = val.GetZv()
-		if val.GetType() == zend.IS_UNDEF {
+		if val.IsType(zend.IS_UNDEF) {
 			var info *zend.ZendPropertyInfo = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 			if info != nil {
 				return zend.SUCCESS
@@ -978,10 +978,10 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
-			if _z.GetType() == zend.IS_INDIRECT {
+			if _z.IsType(zend.IS_INDIRECT) {
 				_z = _z.GetZv()
 			}
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			name_val = _z
@@ -1049,10 +1049,10 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
-				if _z.GetType() == zend.IS_INDIRECT {
+				if _z.IsType(zend.IS_INDIRECT) {
 					_z = _z.GetZv()
 				}
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -1073,8 +1073,8 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 				/* we should still add element even if it's not OK,
 				 * since we already wrote the length of the array before */
 
-				if data.GetType() == zend.IS_ARRAY {
-					if zend.Z_IS_RECURSIVE_P(data) != 0 || struc.GetType() == zend.IS_ARRAY && data.GetArr() == struc.GetArr() {
+				if data.IsType(zend.IS_ARRAY) {
+					if zend.Z_IS_RECURSIVE_P(data) != 0 || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
 						PhpAddVarHash(var_hash, struc)
 						zend.SmartStrAppendl(buf, "N;", 2)
 					} else {
@@ -1125,7 +1125,7 @@ func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSer
 			zend.SmartStrAppendLong(buf, var_already)
 			zend.SmartStrAppendc(buf, ';')
 			return
-		} else if struc.GetType() == zend.IS_OBJECT {
+		} else if struc.IsType(zend.IS_OBJECT) {
 			zend.SmartStrAppendl(buf, "r:", 2)
 			zend.SmartStrAppendLong(buf, var_already)
 			zend.SmartStrAppendc(buf, ';')
@@ -1184,10 +1184,10 @@ again:
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
-					if _z.GetType() == zend.IS_INDIRECT {
+					if _z.IsType(zend.IS_INDIRECT) {
 						_z = _z.GetZv()
 					}
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					index = _p.GetH()
@@ -1511,11 +1511,11 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.RETVAL_FALSE
 			goto cleanup
 		}
-		if classes != nil && (classes.GetType() == zend.IS_ARRAY || zend.ZendIsTrue(classes) == 0) {
+		if classes != nil && (classes.IsType(zend.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			zend.ZendHashInit(class_hash, b.CondF1(classes.GetType() == zend.IS_ARRAY, func() __auto__ { return classes.GetArr().GetNNumOfElements() }, 0), nil, nil, 0)
+			zend.ZendHashInit(class_hash, b.CondF1(classes.IsType(zend.IS_ARRAY), func() __auto__ { return zend.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
 		}
-		if class_hash != nil && classes.GetType() == zend.IS_ARRAY {
+		if class_hash != nil && classes.IsType(zend.IS_ARRAY) {
 			var entry *zend.Zval
 			var lcname *zend.ZendString
 			for {
@@ -1525,7 +1525,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					entry = _z

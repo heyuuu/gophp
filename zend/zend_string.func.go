@@ -27,8 +27,8 @@ func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
 	str = (*ZendString)(DoAlloca(ZEND_MM_ALIGNED_SIZE_EX(_ZSTR_STRUCT_SIZE(_len), 8), use_heap))
 	GC_SET_REFCOUNT(str, 1)
 	GC_TYPE_INFO(str) = IS_STRING
-	str.GetH() = 0
-	str.GetLen() = _len
+	str.SetH(0)
+	str.SetLen(_len)
 }
 func ZSTR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) {
 	ZSTR_ALLOCA_ALLOC(str, len_, use_heap)
@@ -44,7 +44,7 @@ func ZendStringHashVal(s *ZendString) ZendUlong {
 	}
 }
 func ZendStringForgetHashVal(s *ZendString) {
-	s.GetH() = 0
+	s.SetH(0)
 	GC_DEL_FLAGS(s, IS_STR_VALID_UTF8)
 }
 func ZendStringRefcount(s *ZendString) uint32 {
@@ -63,16 +63,16 @@ func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var ret *ZendString = (*ZendString)(Pemalloc(ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 	GC_SET_REFCOUNT(ret, 1)
 	GC_TYPE_INFO(ret) = IS_STRING | b.Cond(persistent != 0, IS_STR_PERSISTENT, 0)<<GC_FLAGS_SHIFT
-	ret.GetH() = 0
-	ret.GetLen() = len_
+	ret.SetH(0)
+	ret.SetLen(len_)
 	return ret
 }
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString = (*ZendString)(SafePemalloc(n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
 	GC_SET_REFCOUNT(ret, 1)
 	GC_TYPE_INFO(ret) = IS_STRING | b.Cond(persistent != 0, IS_STR_PERSISTENT, 0)<<GC_FLAGS_SHIFT
-	ret.GetH() = 0
-	ret.GetLen() = n*m + l
+	ret.SetH(0)
+	ret.SetLen(n*m + l)
 	return ret
 }
 func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
@@ -92,7 +92,7 @@ func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	if GC_REFCOUNT(s) == 1 {
 		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.GetLen() = len_
+		ret.SetLen(len_)
 		ZendStringForgetHashVal(ret)
 		return ret
 	}
@@ -106,7 +106,7 @@ func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	ZEND_ASSERT(len_ >= s.GetLen())
 	if GC_REFCOUNT(s) == 1 {
 		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.GetLen() = len_
+		ret.SetLen(len_)
 		ZendStringForgetHashVal(ret)
 		return ret
 	}
@@ -120,7 +120,7 @@ func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	ZEND_ASSERT(len_ <= s.GetLen())
 	if GC_REFCOUNT(s) == 1 {
 		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.GetLen() = len_
+		ret.SetLen(len_)
 		ZendStringForgetHashVal(ret)
 		return ret
 	}
@@ -133,7 +133,7 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 	var ret *ZendString
 	if GC_REFCOUNT(s) == 1 {
 		ret = (*ZendString)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
-		ret.GetLen() = n*m + l
+		ret.SetLen(n*m + l)
 		ZendStringForgetHashVal(ret)
 		return ret
 	}
@@ -230,7 +230,7 @@ func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
 	/* Hash value can't be zero, so we always set the high bit */
 }
 func ZendStringHashFunc(str *ZendString) ZendUlong {
-	str.GetH() = ZendHashFunc(str.GetVal(), str.GetLen())
+	str.SetH(ZendHashFunc(str.GetVal(), str.GetLen()))
 	return str.GetH()
 }
 func ZendHashFunc(str *byte, len_ int) ZendUlong { return ZendInlineHashFunc(str, len_) }
@@ -339,7 +339,7 @@ func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 		var h ZendUlong = str.GetH()
 		ZendStringDelref(str)
 		str = ZendStringInit(str.GetVal(), str.GetLen(), 1)
-		str.GetH() = h
+		str.SetH(h)
 	}
 	return ZendAddInternedString(str, &InternedStringsPermanent, IS_STR_PERMANENT)
 }
@@ -367,7 +367,7 @@ func ZendNewInternedStringRequest(str *ZendString) *ZendString {
 		var h ZendUlong = str.GetH()
 		ZendStringDelref(str)
 		str = ZendStringInit(str.GetVal(), str.GetLen(), 0)
-		str.GetH() = h
+		str.SetH(h)
 	}
 	ret = ZendAddInternedString(str, &(CompilerGlobals.GetInternedStrings()), 0)
 	return ret
@@ -381,7 +381,7 @@ func ZendStringInitInternedPermanent(str *byte, size int, permanent int) *ZendSt
 	}
 	ZEND_ASSERT(permanent != 0)
 	ret = ZendStringInit(str, size, permanent)
-	ret.GetH() = h
+	ret.SetH(h)
 	return ZendAddInternedString(ret, &InternedStringsPermanent, IS_STR_PERMANENT)
 }
 func ZendStringInitInternedRequest(str *byte, size int, permanent int) *ZendString {
@@ -399,7 +399,7 @@ func ZendStringInitInternedRequest(str *byte, size int, permanent int) *ZendStri
 		return ret
 	}
 	ret = ZendStringInit(str, size, permanent)
-	ret.GetH() = h
+	ret.SetH(h)
 
 	/* Create a short living interned, freed after the request. */
 

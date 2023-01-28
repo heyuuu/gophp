@@ -177,7 +177,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 				max_buffer_len += 1
 			}
 			phoned_word.GetVal()[p_idx] = '0'
-			phoned_word.GetLen() = p_idx
+			phoned_word.SetLen(p_idx)
 			return zend.SUCCESS
 		}
 
@@ -403,6 +403,6 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		max_buffer_len += 1
 	}
 	phoned_word.GetVal()[p_idx] = '0'
-	phoned_word.GetLen() = p_idx
+	phoned_word.SetLen(p_idx)
 	return 0
 }

@@ -54,7 +54,7 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 					break
 				}
 			}
-			if variable_ptr.GetType() == IS_OBJECT && Z_OBJ_HT(*variable_ptr).GetSet() != nil {
+			if variable_ptr.IsType(IS_OBJECT) && Z_OBJ_HT(*variable_ptr).GetSet() != nil {
 				Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
 				return variable_ptr
 			}
@@ -264,7 +264,7 @@ func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *Zval, result *Zval) {
 		var __ref *ZendRefcounted = __container_to_free.GetCounted()
 		if GC_DELREF(__ref) == 0 {
 			var __zv *Zval = result
-			if __zv.GetType() == IS_INDIRECT {
+			if __zv.IsType(IS_INDIRECT) {
 				ZVAL_COPY(__zv, __zv.GetZv())
 			}
 			RcDtorFunc(__ref)
@@ -387,7 +387,7 @@ func _getZvalCvLookup(ptr *Zval, var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval
 }
 func _getZvalPtrCv(var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		if type_ == BP_VAR_W {
 			ZVAL_NULL(ret)
 		} else {
@@ -398,7 +398,7 @@ func _getZvalPtrCv(var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval {
 }
 func _getZvalPtrCvDeref(var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		if type_ == BP_VAR_W {
 			ZVAL_NULL(ret)
 			return ret
@@ -411,14 +411,14 @@ func _getZvalPtrCvDeref(var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval {
 }
 func _get_zval_ptr_cv_BP_VAR_R(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		return ZvalUndefinedCv(var_, EXECUTE_DATA_C)
 	}
 	return ret
 }
 func _get_zval_ptr_cv_deref_BP_VAR_R(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		return ZvalUndefinedCv(var_, EXECUTE_DATA_C)
 	}
 	ZVAL_DEREF(ret)
@@ -430,7 +430,7 @@ func _get_zval_ptr_cv_BP_VAR_IS(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 }
 func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		ZVAL_NULL(ret)
 		ZvalUndefinedCv(var_, EXECUTE_DATA_C)
 		return ret
@@ -439,7 +439,7 @@ func _get_zval_ptr_cv_BP_VAR_RW(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 }
 func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_UNDEF {
+	if ret.IsType(IS_UNDEF) {
 		ZVAL_NULL(ret)
 	}
 	return ret
@@ -541,7 +541,7 @@ func _getZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ 
 }
 func _getZvalPtrPtrVar(var_ uint32, should_free *ZendFreeOp, _ EXECUTE_DATA_D) *Zval {
 	var ret *Zval = EX_VAR(var_)
-	if ret.GetType() == IS_INDIRECT {
+	if ret.IsType(IS_INDIRECT) {
 		*should_free = nil
 		ret = ret.GetZv()
 	} else {
@@ -760,7 +760,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 		*need_or_null = ""
 	}
 	if value != nil {
-		if ZEND_TYPE_IS_CLASS(arg_info.GetType()) && value.GetType() == IS_OBJECT {
+		if ZEND_TYPE_IS_CLASS(arg_info.GetType()) && value.IsType(IS_OBJECT) {
 			*given_msg = "instance of "
 			*given_kind = Z_OBJCE_P(value).GetName().GetVal()
 		} else {
@@ -809,7 +809,7 @@ func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce
 	}
 }
 func IsNullConstant(scope *ZendClassEntry, default_value *Zval) int {
-	if default_value.GetType() == IS_CONSTANT_AST {
+	if default_value.IsType(IS_CONSTANT_AST) {
 		var constant Zval
 		ZVAL_COPY(&constant, default_value)
 		if ZvalUpdateConstantEx(&constant, scope) != SUCCESS {
@@ -872,7 +872,7 @@ func ZendVerifyScalarTypeHint(type_hint ZendUchar, arg *Zval, strict ZendBool) Z
 
 		/* SSTH Exception: IS_LONG may be accepted as IS_DOUBLE (converted) */
 
-	} else if arg.GetType() == IS_NULL {
+	} else if arg.IsType(IS_NULL) {
 
 		/* NULL may be accepted only by nullable hints (this is already checked) */
 
@@ -898,9 +898,9 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *Zval) {
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
 	if ZEND_TYPE_IS_CLASS(info.GetType()) {
-		ZendTypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.GetType() == IS_OBJECT, func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		ZendTypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.GetType() == IS_OBJECT, func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	}
 }
 func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
@@ -936,7 +936,7 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendB
 	ZEND_ASSERT(!(Z_ISREF_P(property)))
 	if ZEND_TYPE_IS_CLASS(info.GetType()) {
 		if property.GetType() != IS_OBJECT {
-			return property.GetType() == IS_NULL && ZEND_TYPE_ALLOW_NULL(info.GetType())
+			return property.IsType(IS_NULL) && ZEND_TYPE_ALLOW_NULL(info.GetType())
 		}
 		if !(ZEND_TYPE_IS_CE(info.GetType())) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
 			return 0
@@ -946,9 +946,9 @@ func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendB
 	ZEND_ASSERT(ZEND_TYPE_CODE(info.GetType()) != IS_CALLABLE)
 	if ZEND_TYPE_CODE(info.GetType()) == property.GetType() {
 		return 1
-	} else if property.GetType() == IS_NULL {
+	} else if property.IsType(IS_NULL) {
 		return ZEND_TYPE_ALLOW_NULL(info.GetType())
-	} else if ZEND_TYPE_CODE(info.GetType()) == _IS_BOOL && property.GetType() == IS_FALSE || property.GetType() == IS_TRUE {
+	} else if ZEND_TYPE_CODE(info.GetType()) == _IS_BOOL && property.IsType(IS_FALSE) || property.IsType(IS_TRUE) {
 		return 1
 	} else if ZEND_TYPE_CODE(info.GetType()) == IS_ITERABLE {
 		return ZendIsIterable(property)
@@ -991,18 +991,18 @@ func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *a
 		} else {
 			*ce = ZendFetchClass(ZEND_TYPE_NAME(type_), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
-				return arg.GetType() == IS_NULL && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
+				return arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
 			}
 			*cache_slot = any(*ce)
 		}
-		if arg.GetType() == IS_OBJECT {
+		if arg.IsType(IS_OBJECT) {
 			return InstanceofFunction(Z_OBJCE_P(arg), *ce)
 		}
-		return arg.GetType() == IS_NULL && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
+		return arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
 	} else if ZEND_TYPE_CODE(type_) == arg.GetType() {
 		return 1
 	}
-	if arg.GetType() == IS_NULL && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0) {
+	if arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0) {
 
 		/* Null passed to nullable type */
 
@@ -1015,7 +1015,7 @@ func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *a
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
 	} else if ZEND_TYPE_CODE(type_) == IS_ITERABLE {
 		return ZendIsIterable(arg)
-	} else if ZEND_TYPE_CODE(type_) == _IS_BOOL && arg.GetType() == IS_FALSE || arg.GetType() == IS_TRUE {
+	} else if ZEND_TYPE_CODE(type_) == _IS_BOOL && arg.IsType(IS_FALSE) || arg.IsType(IS_TRUE) {
 		return 1
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return 0
@@ -1155,7 +1155,7 @@ func ZendBinaryAssignOpObjDim(object *Zval, property *Zval, opline *ZendOp, _ EX
 	var res Zval
 	value = GetOpDataZvalPtrR((opline + 1).GetOp1Type(), (opline + 1).GetOp1(), &free_op_data1)
 	if b.Assign(&z, Z_OBJ_HT_P(object).GetReadDimension()(object, property, BP_VAR_R, &rv)) != nil {
-		if z.GetType() == IS_OBJECT && Z_OBJ_HT_P(z).GetGet() != nil {
+		if z.IsType(IS_OBJECT) && Z_OBJ_HT_P(z).GetGet() != nil {
 			var rv2 Zval
 			var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 			if z == &rv {
@@ -1204,9 +1204,9 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value 
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
 
-	if opline.GetExtendedValue() == ZEND_CONCAT && zptr.GetType() == IS_STRING {
+	if opline.GetExtendedValue() == ZEND_CONCAT && zptr.IsType(IS_STRING) {
 		ConcatFunction(zptr, zptr, value)
-		ZEND_ASSERT(zptr.GetType() == IS_STRING && "Concat should return string")
+		ZEND_ASSERT(zptr.IsType(IS_STRING) && "Concat should return string")
 		return
 	}
 	ZendBinaryOp(&z_copy, zptr, value, OPLINE_C)
@@ -1547,7 +1547,7 @@ func ZendIncdecTypedRef(ref *ZendReference, copy *Zval, opline *ZendOp, _ EXECUT
 	} else {
 		DecrementFunction(var_ptr)
 	}
-	if var_ptr.GetType() == IS_DOUBLE && copy.GetType() == IS_LONG {
+	if var_ptr.IsType(IS_DOUBLE) && copy.IsType(IS_LONG) {
 		var val ZendLong = ZendThrowIncdecRefError(ref, OPLINE_C)
 		ZVAL_LONG(var_ptr, val)
 	} else if ZendVerifyRefAssignableZval(ref, var_ptr, EX_USES_STRICT_TYPES()) == 0 {
@@ -1569,7 +1569,7 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *Zval, copy *Zval,
 	} else {
 		DecrementFunction(var_ptr)
 	}
-	if var_ptr.GetType() == IS_DOUBLE && copy.GetType() == IS_LONG {
+	if var_ptr.IsType(IS_DOUBLE) && copy.IsType(IS_LONG) {
 		var val ZendLong = ZendThrowIncdecPropError(prop_info, OPLINE_C)
 		ZVAL_LONG(var_ptr, val)
 	} else if ZendVerifyPropertyType(prop_info, var_ptr, EX_USES_STRICT_TYPES()) == 0 {
@@ -1581,7 +1581,7 @@ func ZendIncdecTypedProp(prop_info *ZendPropertyInfo, var_ptr *Zval, copy *Zval,
 	}
 }
 func ZendPreIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *ZendOp, _ EXECUTE_DATA_D) {
-	if prop.GetType() == IS_LONG {
+	if prop.IsType(IS_LONG) {
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			FastLongIncrementFunction(prop)
 		} else {
@@ -1616,7 +1616,7 @@ func ZendPreIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *
 	}
 }
 func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *ZendOp, _ EXECUTE_DATA_D) {
-	if prop.GetType() == IS_LONG {
+	if prop.IsType(IS_LONG) {
 		ZVAL_LONG(EX_VAR(opline.GetResult().GetVar()), prop.GetLval())
 		if ZEND_IS_INCREMENT(opline.GetOpcode()) {
 			FastLongIncrementFunction(prop)
@@ -1661,7 +1661,7 @@ func ZendPostIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		return
 	}
-	if z.GetType() == IS_OBJECT && Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsType(IS_OBJECT) && Z_OBJ_HT_P(z).GetGet() != nil {
 		var rv2 Zval
 		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
@@ -1696,7 +1696,7 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 		}
 		return
 	}
-	if z.GetType() == IS_OBJECT && Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsType(IS_OBJECT) && Z_OBJ_HT_P(z).GetGet() != nil {
 		var rv2 Zval
 		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
@@ -1733,7 +1733,7 @@ func ZendAssignOpOverloadedProperty(object *Zval, property *Zval, cache_slot *an
 		}
 		return
 	}
-	if z.GetType() == IS_OBJECT && Z_OBJ_HT_P(z).GetGet() != nil {
+	if z.IsType(IS_OBJECT) && Z_OBJ_HT_P(z).GetGet() != nil {
 		var rv2 Zval
 		var value *Zval = Z_OBJ_HT_P(z).GetGet()(z, &rv2)
 		if z == &rv {
@@ -1848,7 +1848,7 @@ func ZendUseNewElementForString() {
 	ZendThrowError(nil, "[] operator not supported for strings")
 }
 func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
-	if container.GetType() == IS_STRING {
+	if container.IsType(IS_STRING) {
 		if opline.GetOp2Type() == IS_UNUSED {
 			ZendUseNewElementForString()
 		} else {
@@ -1903,7 +1903,7 @@ func ZendFetchDimensionAddressInner(ht *HashTable, dim *Zval, dim_type int, type
 	var offset_key *ZendString
 	var hval ZendUlong
 try_again:
-	if dim.GetType() == IS_LONG {
+	if dim.IsType(IS_LONG) {
 		hval = dim.GetLval()
 	num_index:
 		ZEND_HASH_INDEX_FIND(ht, hval, retval, num_undef)
@@ -1925,7 +1925,7 @@ try_again:
 			retval = ZendHashIndexAddNew(ht, hval, &(ExecutorGlobals.GetUninitializedZval()))
 			break
 		}
-	} else if dim.GetType() == IS_STRING {
+	} else if dim.IsType(IS_STRING) {
 		offset_key = dim.GetStr()
 		if ZEND_CONST_COND(dim_type != IS_CONST, 1) {
 			if ZEND_HANDLE_NUMERIC(offset_key, hval) != 0 {
@@ -1938,9 +1938,9 @@ try_again:
 
 			/* support for $GLOBALS[...] */
 
-			if retval.GetType() == IS_INDIRECT {
+			if retval.IsType(IS_INDIRECT) {
 				retval = retval.GetZv()
-				if retval.GetType() == IS_UNDEF {
+				if retval.IsType(IS_UNDEF) {
 					switch type_ {
 					case BP_VAR_R:
 						ZendUndefinedIndex(offset_key)
@@ -1988,7 +1988,7 @@ try_again:
 				break
 			}
 		}
-	} else if dim.GetType() == IS_REFERENCE {
+	} else if dim.IsType(IS_REFERENCE) {
 		dim = Z_REFVAL_P(dim)
 		goto try_again
 	} else {
@@ -2024,7 +2024,7 @@ func zend_fetch_dimension_address_inner_RW_CONST(ht *HashTable, dim *Zval, _ EXE
 }
 func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_type int, type_ int, _ EXECUTE_DATA_D) {
 	var retval *Zval
-	if container.GetType() == IS_ARRAY {
+	if container.IsType(IS_ARRAY) {
 	try_array:
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
@@ -2044,10 +2044,10 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		}
 		ZVAL_INDIRECT(result, retval)
 		return
-	} else if container.GetType() == IS_REFERENCE {
+	} else if container.IsType(IS_REFERENCE) {
 		var ref *ZendReference = container.GetRef()
 		container = Z_REFVAL_P(container)
-		if container.GetType() == IS_ARRAY {
+		if container.IsType(IS_ARRAY) {
 			goto try_array
 		} else if container.GetType() <= IS_FALSE {
 			if type_ != BP_VAR_UNSET {
@@ -2064,7 +2064,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			}
 		}
 	}
-	if container.GetType() == IS_STRING {
+	if container.IsType(IS_STRING) {
 		if dim == nil {
 			ZendUseNewElementForString()
 		} else {
@@ -2072,8 +2072,8 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			ZendWrongStringOffset(EXECUTE_DATA_C)
 		}
 		ZVAL_ERROR(result)
-	} else if container.GetType() == IS_OBJECT {
-		if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.GetType() == IS_UNDEF {
+	} else if container.IsType(IS_OBJECT) {
+		if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.IsType(IS_UNDEF) {
 			dim = ZVAL_UNDEFINED_OP2()
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -2105,7 +2105,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		}
 	} else {
 		if container.GetType() <= IS_FALSE {
-			if type_ != BP_VAR_W && container.GetType() == IS_UNDEF {
+			if type_ != BP_VAR_W && container.IsType(IS_UNDEF) {
 				ZVAL_UNDEFINED_OP1()
 			}
 			if type_ != BP_VAR_UNSET {
@@ -2116,7 +2116,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 
 				/* for read-mode only */
 
-				if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.GetType() == IS_UNDEF {
+				if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.IsType(IS_UNDEF) {
 					ZVAL_UNDEFINED_OP2()
 				}
 				ZVAL_NULL(result)
@@ -2149,19 +2149,19 @@ func zend_fetch_dimension_address_UNSET(container_ptr *Zval, dim *Zval, dim_type
 func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim_type int, type_ int, is_list int, slow int, _ EXECUTE_DATA_D) {
 	var retval *Zval
 	if slow == 0 {
-		if container.GetType() == IS_ARRAY {
+		if container.IsType(IS_ARRAY) {
 		try_array:
 			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
 			ZVAL_COPY_DEREF(result, retval)
 			return
-		} else if container.GetType() == IS_REFERENCE {
+		} else if container.IsType(IS_REFERENCE) {
 			container = Z_REFVAL_P(container)
-			if container.GetType() == IS_ARRAY {
+			if container.IsType(IS_ARRAY) {
 				goto try_array
 			}
 		}
 	}
-	if is_list == 0 && container.GetType() == IS_STRING {
+	if is_list == 0 && container.IsType(IS_STRING) {
 		var offset ZendLong
 	try_string_offset:
 		if dim.GetType() != IS_LONG {
@@ -2218,8 +2218,8 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 			c = ZendUchar(Z_STRVAL_P(container)[real_offset])
 			ZVAL_INTERNED_STR(result, ZSTR_CHAR(c))
 		}
-	} else if container.GetType() == IS_OBJECT {
-		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.GetType() == IS_UNDEF {
+	} else if container.IsType(IS_OBJECT) {
+		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.IsType(IS_UNDEF) {
 			dim = ZVAL_UNDEFINED_OP2()
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -2237,10 +2237,10 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 			ZVAL_NULL(result)
 		}
 	} else {
-		if type_ != BP_VAR_IS && container.GetType() == IS_UNDEF {
+		if type_ != BP_VAR_IS && container.IsType(IS_UNDEF) {
 			container = ZVAL_UNDEFINED_OP1()
 		}
-		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.GetType() == IS_UNDEF {
+		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP2()
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {
@@ -2270,23 +2270,23 @@ func ZendFetchDimensionConst(result *Zval, container *Zval, dim *Zval, type_ int
 }
 func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 	var hval ZendUlong
-	if offset.GetType() == IS_DOUBLE {
+	if offset.IsType(IS_DOUBLE) {
 		hval = ZendDvalToLval(offset.GetDval())
 	num_idx:
 		return ZendHashIndexFind(ht, hval)
-	} else if offset.GetType() == IS_NULL {
+	} else if offset.IsType(IS_NULL) {
 	str_idx:
 		return ZendHashFindExInd(ht, ZSTR_EMPTY_ALLOC(), 1)
-	} else if offset.GetType() == IS_FALSE {
+	} else if offset.IsType(IS_FALSE) {
 		hval = 0
 		goto num_idx
-	} else if offset.GetType() == IS_TRUE {
+	} else if offset.IsType(IS_TRUE) {
 		hval = 1
 		goto num_idx
-	} else if offset.GetType() == IS_RESOURCE {
+	} else if offset.IsType(IS_RESOURCE) {
 		hval = Z_RES_HANDLE_P(offset)
 		goto num_idx
-	} else if offset.GetType() == IS_UNDEF {
+	} else if offset.IsType(IS_UNDEF) {
 		ZVAL_UNDEFINED_OP2()
 		goto str_idx
 	} else {
@@ -2295,14 +2295,14 @@ func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 	}
 }
 func ZendIssetDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
-	if offset.GetType() == IS_UNDEF {
+	if offset.IsType(IS_UNDEF) {
 		offset = ZVAL_UNDEFINED_OP2()
 	}
-	if container.GetType() == IS_OBJECT {
+	if container.IsType(IS_OBJECT) {
 		return Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 0)
-	} else if container.GetType() == IS_STRING {
+	} else if container.IsType(IS_STRING) {
 		var lval ZendLong
-		if offset.GetType() == IS_LONG {
+		if offset.IsType(IS_LONG) {
 			lval = offset.GetLval()
 		str_offset:
 			if lval < 0 {
@@ -2321,7 +2321,7 @@ func ZendIssetDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
 
 			/*}*/
 
-			if offset.GetType() < IS_STRING || offset.GetType() == IS_STRING && IS_LONG == IsNumericString(Z_STRVAL_P(offset), Z_STRLEN_P(offset), nil, nil, 0) {
+			if offset.GetType() < IS_STRING || offset.IsType(IS_STRING) && IS_LONG == IsNumericString(Z_STRVAL_P(offset), Z_STRLEN_P(offset), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -2332,14 +2332,14 @@ func ZendIssetDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
 	}
 }
 func ZendIsemptyDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
-	if offset.GetType() == IS_UNDEF {
+	if offset.IsType(IS_UNDEF) {
 		offset = ZVAL_UNDEFINED_OP2()
 	}
-	if container.GetType() == IS_OBJECT {
+	if container.IsType(IS_OBJECT) {
 		return !(Z_OBJ_HT_P(container).GetHasDimension()(container, offset, 1))
-	} else if container.GetType() == IS_STRING {
+	} else if container.IsType(IS_STRING) {
 		var lval ZendLong
-		if offset.GetType() == IS_LONG {
+		if offset.IsType(IS_LONG) {
 			lval = offset.GetLval()
 		str_offset:
 			if lval < 0 {
@@ -2358,7 +2358,7 @@ func ZendIsemptyDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
 
 			/*}*/
 
-			if offset.GetType() < IS_STRING || offset.GetType() == IS_STRING && IS_LONG == IsNumericString(Z_STRVAL_P(offset), Z_STRLEN_P(offset), nil, nil, 0) {
+			if offset.GetType() < IS_STRING || offset.IsType(IS_STRING) && IS_LONG == IsNumericString(Z_STRVAL_P(offset), Z_STRLEN_P(offset), nil, nil, 0) {
 				lval = ZvalGetLong(offset)
 				goto str_offset
 			}
@@ -2372,7 +2372,7 @@ func ZendArrayKeyExistsFast(ht *HashTable, key *Zval, opline *ZendOp, _ EXECUTE_
 	var str *ZendString
 	var hval ZendUlong
 try_again:
-	if key.GetType() == IS_STRING {
+	if key.IsType(IS_STRING) {
 		str = key.GetStr()
 		if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
 			goto num_key
@@ -2383,7 +2383,7 @@ try_again:
 		} else {
 			return IS_FALSE
 		}
-	} else if key.GetType() == IS_LONG {
+	} else if key.IsType(IS_LONG) {
 		hval = key.GetLval()
 	num_key:
 		if ZendHashIndexFind(ht, hval) != nil {
@@ -2395,7 +2395,7 @@ try_again:
 		key = Z_REFVAL_P(key)
 		goto try_again
 	} else if key.GetType() <= IS_NULL {
-		if key.GetType() == IS_UNDEF {
+		if key.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
 		}
 		str = ZSTR_EMPTY_ALLOC()
@@ -2406,14 +2406,14 @@ try_again:
 	}
 }
 func ZendArrayKeyExistsSlow(subject *Zval, key *Zval, opline *ZendOp, _ EXECUTE_DATA_D) uint32 {
-	if subject.GetType() == IS_OBJECT {
+	if subject.IsType(IS_OBJECT) {
 		ZendError(E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 		var ht *HashTable = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
 		var result uint32 = ZendArrayKeyExistsFast(ht, key, OPLINE_C, EXECUTE_DATA_C)
 		ZendReleaseProperties(ht)
 		return result
 	} else {
-		if key.GetType() == IS_UNDEF {
+		if key.IsType(IS_UNDEF) {
 			ZVAL_UNDEFINED_OP1()
 		}
 		if subject.GetTypeInfo() == IS_UNDEF {
@@ -2428,7 +2428,7 @@ func PromotesToArray(val *Zval) ZendBool {
 }
 func PromotesToObject(val *Zval) ZendBool {
 	ZVAL_DEREF(val)
-	return val.GetType() <= IS_FALSE || val.GetType() == IS_STRING && Z_STRLEN_P(val) == 0
+	return val.GetType() <= IS_FALSE || val.IsType(IS_STRING) && Z_STRLEN_P(val) == 0
 }
 func CheckTypeArrayAssignable(type_ ZendType) ZendBool {
 	if type_ == 0 {
@@ -2558,7 +2558,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 					break
 				}
 			}
-			if ptr.GetType() == IS_UNDEF {
+			if ptr.IsType(IS_UNDEF) {
 				if !(ZEND_TYPE_ALLOW_NULL(prop_info.GetType())) {
 					ZendThrowAccessUninitPropByRefError(prop_info)
 					if result != nil {
@@ -2581,11 +2581,11 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 	var ptr *Zval
 	if container_op_type != IS_UNUSED && container.GetType() != IS_OBJECT {
 		for {
-			if Z_ISREF_P(container) && Z_REFVAL_P(container).GetType() == IS_OBJECT {
+			if Z_ISREF_P(container) && Z_REFVAL_P(container).IsType(IS_OBJECT) {
 				container = Z_REFVAL_P(container)
 				break
 			}
-			if container_op_type == IS_CV && type_ != BP_VAR_W && container.GetType() == IS_UNDEF {
+			if container_op_type == IS_CV && type_ != BP_VAR_W && container.IsType(IS_UNDEF) {
 				ZVAL_UNDEFINED_OP1()
 			}
 
@@ -2665,7 +2665,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			}
 		}
 	}
-	if init_undef != 0 && ptr.GetType() == IS_UNDEF {
+	if init_undef != 0 && ptr.IsType(IS_UNDEF) {
 		ZVAL_NULL(ptr)
 	}
 }
@@ -2674,7 +2674,7 @@ func ZendAssignToPropertyReference(container *Zval, container_op_type uint32, pr
 	var variable_ptr *Zval = &variable
 	var cache_addr *any = b.CondF1(prop_op_type == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION) }, nil)
 	ZendFetchPropertyAddress(variable_ptr, container, container_op_type, prop_ptr, prop_op_type, cache_addr, BP_VAR_W, 0, 0, OPLINE_C, EXECUTE_DATA_C)
-	if variable_ptr.GetType() == IS_INDIRECT {
+	if variable_ptr.IsType(IS_INDIRECT) {
 		variable_ptr = variable_ptr.GetZv()
 	}
 	if Z_ISERROR_P(variable_ptr) {
@@ -2758,11 +2758,11 @@ func ZendFetchStaticPropertyAddressEx(retval **Zval, prop_info **ZendPropertyInf
 		name = RT_CONSTANT(opline, opline.GetOp1()).GetStr()
 	} else {
 		var varname *Zval = GetZvalPtrUndef(opline.GetOp1Type(), opline.GetOp1(), &free_op1, BP_VAR_R)
-		if varname.GetType() == IS_STRING {
+		if varname.IsType(IS_STRING) {
 			name = varname.GetStr()
 			tmp_name = nil
 		} else {
-			if op1_type == IS_CV && varname.GetType() == IS_UNDEF {
+			if op1_type == IS_CV && varname.IsType(IS_UNDEF) {
 				ZvalUndefinedCv(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 			}
 			name = ZvalGetTmpString(varname, &tmp_name)
@@ -2791,7 +2791,7 @@ func ZendFetchStaticPropertyAddress(retval **Zval, prop_info **ZendPropertyInfo,
 	if opline.GetOp1Type() == IS_CONST && (opline.GetOp2Type() == IS_CONST || opline.GetOp2Type() == IS_UNUSED && (opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_SELF || opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_PARENT)) && CACHED_PTR(cache_slot) != nil {
 		*retval = CACHED_PTR(cache_slot + b.SizeOf("void *"))
 		property_info = CACHED_PTR(cache_slot + b.SizeOf("void *")*2)
-		if (fetch_type == BP_VAR_R || fetch_type == BP_VAR_RW) && retval.GetType() == IS_UNDEF && property_info.GetType() != 0 {
+		if (fetch_type == BP_VAR_R || fetch_type == BP_VAR_RW) && retval.IsType(IS_UNDEF) && property_info.GetType() != 0 {
 			ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(property_info.GetName()))
 			return FAILURE
 		}
@@ -2816,13 +2816,13 @@ func ZendThrowRefTypeErrorType(prop1 *ZendPropertyInfo, prop2 *ZendPropertyInfo,
 	var prop2_type2 *byte
 	ZendFormatType(prop1.GetType(), &prop1_type1, &prop1_type2)
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
-	ZendTypeError("Reference with value of type %s held by property %s::$%s of type %s%s is not compatible with property %s::$%s of type %s%s", b.CondF(zv.GetType() == IS_OBJECT, func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
+	ZendTypeError("Reference with value of type %s held by property %s::$%s of type %s%s is not compatible with property %s::$%s of type %s%s", b.CondF(zv.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
 }
 func ZendThrowRefTypeErrorZval(prop *ZendPropertyInfo, zv *Zval) {
 	var prop_type1 *byte
 	var prop_type2 *byte
 	ZendFormatType(prop.GetType(), &prop_type1, &prop_type2)
-	ZendTypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s", b.CondF(zv.GetType() == IS_OBJECT, func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
+	ZendTypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s", b.CondF(zv.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop.GetName()), prop_type1, prop_type2)
 }
 func ZendThrowConflictingCoercionError(prop1 *ZendPropertyInfo, prop2 *ZendPropertyInfo, zv *Zval) {
 	var prop1_type1 *byte
@@ -2831,7 +2831,7 @@ func ZendThrowConflictingCoercionError(prop1 *ZendPropertyInfo, prop2 *ZendPrope
 	var prop2_type2 *byte
 	ZendFormatType(prop1.GetType(), &prop1_type1, &prop1_type2)
 	ZendFormatType(prop2.GetType(), &prop2_type1, &prop2_type2)
-	ZendTypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.GetType() == IS_OBJECT, func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
+	ZendTypeError("Cannot assign %s to reference held by property %s::$%s of type %s%s and property %s::$%s of type %s%s, as this would result in an inconsistent type conversion", b.CondF(zv.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(zv).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(zv.GetType()) }), prop1.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop1.GetName()), prop1_type1, prop1_type2, prop2.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(prop2.GetName()), prop2_type1, prop2_type2)
 }
 func IZendVerifyTypeAssignableZval(type_ptr *ZendType, self_ce *ZendClassEntry, zv *Zval, strict ZendBool) int {
 	var type_ ZendType = *type_ptr
@@ -3540,7 +3540,7 @@ func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num 
 					ZvalPtrDtorNogc(var_)
 				} else if kind == ZEND_LIVE_NEW {
 					var obj *ZendObject
-					ZEND_ASSERT(var_.GetType() == IS_OBJECT)
+					ZEND_ASSERT(var_.IsType(IS_OBJECT))
 					obj = var_.GetObj()
 					ZendObjectStoreCtorFailed(obj)
 					OBJ_RELEASE(obj)
@@ -3716,7 +3716,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 			ZendThrowError(nil, "Second array member is not a valid method")
 			return nil
 		}
-		if obj.GetType() == IS_STRING {
+		if obj.IsType(IS_STRING) {
 			var called_scope *ZendClassEntry = ZendFetchClassByName(obj.GetStr(), nil, ZEND_FETCH_CLASS_DEFAULT|ZEND_FETCH_CLASS_EXCEPTION)
 			if called_scope == nil {
 				return nil
@@ -3899,7 +3899,7 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_
 	}
 	iter.SetIndex(-1)
 	ZVAL_OBJ(EX_VAR(opline.GetResult().GetVar()), iter.GetStd())
-	EX_VAR(opline.GetResult().GetVar()).GetFeIterIdx() = uint32 - 1
+	EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
 func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opline *ZendOp, _ EXECUTE_DATA_D) int {

@@ -519,7 +519,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(execute_data *zend.ZendExecuteData, r
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
-	if zindex.GetType() == zend.IS_NULL {
+	if zindex.IsType(zend.IS_NULL) {
 
 		/* $obj[] = ... */
 
@@ -895,7 +895,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			elem = _z

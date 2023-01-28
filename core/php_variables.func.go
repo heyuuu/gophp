@@ -46,7 +46,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	var is_array zend.ZendBool = 0
 	var symtable1 *zend.HashTable = nil
 	r.Assert(var_name != nil)
-	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
+	if track_vars_array != nil && track_vars_array.IsType(zend.IS_ARRAY) {
 		symtable1 = track_vars_array.GetArr()
 	}
 	if symtable1 == nil {
@@ -197,7 +197,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 					zend.ArrayInit(&tmp)
 					gpc_element_p = zend.ZendSymtableStrUpdateInd(symtable1, index, index_len, &tmp)
 				} else {
-					if gpc_element_p.GetType() == zend.IS_INDIRECT {
+					if gpc_element_p.IsType(zend.IS_INDIRECT) {
 						gpc_element_p = gpc_element_p.GetZv()
 					}
 					if gpc_element_p.GetType() != zend.IS_ARRAY {
@@ -587,7 +587,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 		zend.ZendHashUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
 		zend.ZendHashUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
 	}
-	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
+	if track_vars_array != nil && track_vars_array.IsType(zend.IS_ARRAY) {
 		zend.Z_ADDREF(arr)
 		zend.ZendHashUpdate(track_vars_array.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
 		zend.ZendHashUpdate(track_vars_array.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
@@ -643,7 +643,7 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			num_key = _p.GetH()

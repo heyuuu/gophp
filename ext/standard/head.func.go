@@ -286,7 +286,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -322,7 +322,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 
 	/* Array is not empty but no valid keys were found */
 
-	if found == 0 && options.GetArr().GetNNumOfElements() > 0 {
+	if found == 0 && zend.Z_ARRVAL_P(options).GetNNumOfElements() > 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No valid options were found in the given array")
 	}
 
@@ -439,7 +439,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if expires_or_options != nil {
-		if expires_or_options.GetType() == zend.IS_ARRAY {
+		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
@@ -457,7 +457,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.RETVAL_FALSE
 		}
 	}
-	if expires_or_options != nil && expires_or_options.GetType() == zend.IS_ARRAY {
+	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
 		if path != nil {
 			zend.ZendStringRelease(path)
 		}
@@ -580,7 +580,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		break
 	}
 	if expires_or_options != nil {
-		if expires_or_options.GetType() == zend.IS_ARRAY {
+		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
 				zend.RETVAL_FALSE
@@ -598,7 +598,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			zend.RETVAL_FALSE
 		}
 	}
-	if expires_or_options != nil && expires_or_options.GetType() == zend.IS_ARRAY {
+	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
 		if path != nil {
 			zend.ZendStringRelease(path)
 		}

@@ -13,7 +13,7 @@ import (
 
 func FG(v __auto__) __auto__ { return FileGlobals.v }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *zend.Zval) {
-	zend.ZEND_ASSERT(arg.GetType() == zend.IS_RESOURCE)
+	zend.ZEND_ASSERT(arg.IsType(zend.IS_RESOURCE))
 	core.PhpStreamFromRes(stream, arg.GetRes())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
@@ -672,7 +672,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	if data.GetType() == zend.IS_RESOURCE {
+	if data.IsType(zend.IS_RESOURCE) {
 		core.PhpStreamFromZval(srcstream, data)
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
@@ -739,7 +739,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	case zend.IS_ARRAY:
-		if data.GetArr().GetNNumOfElements() {
+		if zend.Z_ARRVAL_P(data).GetNNumOfElements() {
 			var bytes_written ssize_t
 			var tmp *zend.Zval
 			for {
@@ -749,7 +749,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					tmp = _z
@@ -1639,7 +1639,7 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if line_len < int(len_/2) {
 			str = zend.ZendStringTruncate(str, line_len, 0)
 		} else {
-			str.GetLen() = line_len
+			str.SetLen(line_len)
 		}
 		zend.RETVAL_NEW_STR(str)
 		return
@@ -3790,7 +3790,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var field_tmp *zend.Zval
 	var csvline zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
-	count = fields.GetArr().GetNNumOfElements()
+	count = zend.Z_ARRVAL_P(fields).GetNNumOfElements()
 	for {
 		var __ht *zend.HashTable = fields.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
@@ -3798,7 +3798,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			field_tmp = _z

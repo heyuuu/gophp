@@ -272,10 +272,10 @@ func PhpPasswordAlgoFind(ident *zend.ZendString) *PhpPasswordAlgo {
 	return tmp.GetPtr()
 }
 func PhpPasswordAlgoFindZvalEx(arg *zend.Zval, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
-	if arg == nil || arg.GetType() == zend.IS_NULL {
+	if arg == nil || arg.IsType(zend.IS_NULL) {
 		return default_algo
 	}
-	if arg.GetType() == zend.IS_LONG {
+	if arg.IsType(zend.IS_LONG) {
 		switch arg.GetLval() {
 		case 0:
 			return default_algo
@@ -735,7 +735,7 @@ func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			algo = _p.GetKey()

@@ -220,14 +220,14 @@ func CheckHttpHost(target *byte) int {
 	var tmp *zend.Zval
 	var host_tmp *zend.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZEND_STRL("_SERVER"))) && tmp.GetType() == zend.IS_ARRAY && b.Assign(&host, zend.ZendHashStrFind(tmp.GetArr(), zend.ZEND_STRL("HTTP_HOST"))) && host.GetType() == zend.IS_STRING {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZEND_STRL("_SERVER"))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, zend.ZendHashStrFind(tmp.GetArr(), zend.ZEND_STRL("HTTP_HOST"))) && host.IsType(zend.IS_STRING) {
 		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */
 
 		colon = strchr(host_tmp.GetVal(), ':')
 		if colon != nil {
-			host_tmp.GetLen() = colon - host_tmp.GetVal()
+			host_tmp.SetLen(colon - host_tmp.GetVal())
 			host_tmp.GetVal()[host_tmp.GetLen()] = '0'
 		}
 		if !(strcasecmp(host_tmp.GetVal(), target)) {

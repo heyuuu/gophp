@@ -117,7 +117,7 @@ func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *zend.Zval, other
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			element = _z.GetPtr()
@@ -183,7 +183,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			element = _z.GetPtr()
@@ -221,7 +221,7 @@ func SplObjectStorageGetGc(obj *zend.Zval, table **zend.Zval, n *int) *zend.Hash
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			element = _z.GetPtr()
@@ -363,7 +363,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(execute_data *zend.ZendExecuteData
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			element = _z.GetPtr()
@@ -663,7 +663,7 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			elem = _z.GetPtr()
@@ -698,7 +698,7 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	if storage_zv.GetArr().GetNNumOfElements()%2 != 0 {
+	if zend.Z_ARRVAL_P(storage_zv).GetNNumOfElements()%2 != 0 {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
 		return
 	}
@@ -710,7 +710,7 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			val = _z

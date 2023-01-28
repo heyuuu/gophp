@@ -663,7 +663,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
-	out_str.GetLen() = PhpUrlDecode(out_str.GetVal(), out_str.GetLen())
+	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	zend.RETVAL_NEW_STR(out_str)
 	return
 }
@@ -853,7 +853,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		break
 	}
 	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
-	out_str.GetLen() = PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen())
+	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
 	zend.RETVAL_NEW_STR(out_str)
 	return
 }
@@ -981,7 +981,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			hdr = _z

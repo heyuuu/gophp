@@ -20,7 +20,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	case AF_INET:
 		var ret *zend.ZendString = zend.ZendStringAlloc(INET_ADDRSTRLEN, 0)
 		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
-			ret.GetLen() = strlen(ret.GetVal())
+			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
 		zend.ZendStringEfree(ret)
@@ -40,7 +40,7 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 			if colon != nil {
 				*colon = 0
 			}
-			ret.GetLen() = strlen(ret.GetVal())
+			ret.SetLen(strlen(ret.GetVal()))
 			return ret
 		}
 		zend.ZendStringEfree(ret)

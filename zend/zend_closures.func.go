@@ -159,9 +159,9 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	closure = (*ZendClosure)(zclosure.GetObj())
 	if scope_arg != nil {
-		if scope_arg.GetType() == IS_OBJECT {
+		if scope_arg.IsType(IS_OBJECT) {
 			ce = Z_OBJCE_P(scope_arg)
-		} else if scope_arg.GetType() == IS_NULL {
+		} else if scope_arg.IsType(IS_NULL) {
 			ce = nil
 		} else {
 			var tmp_class_name *ZendString
@@ -272,7 +272,7 @@ func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval)
 	if ZendParseParameters(ZEND_NUM_ARGS(), "z", &callable) == FAILURE {
 		return
 	}
-	if callable.GetType() == IS_OBJECT && InstanceofFunction(Z_OBJCE_P(callable), ZendCeClosure) != 0 {
+	if callable.IsType(IS_OBJECT) && InstanceofFunction(Z_OBJCE_P(callable), ZendCeClosure) != 0 {
 
 		/* It's already a closure */
 
@@ -414,11 +414,11 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				var_ = _z
-				if var_.GetType() == IS_CONSTANT_AST {
+				if var_.IsType(IS_CONSTANT_AST) {
 					ZvalPtrDtor(var_)
 					ZVAL_STRING(var_, "<constant ast>")
 				}
@@ -599,7 +599,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 	closure.SetCalledScope(called_scope)
 	if scope != nil {
 		closure.GetFunc().SetIsPublic(true)
-		if this_ptr != nil && this_ptr.GetType() == IS_OBJECT && !closure.GetFunc().IsStatic() {
+		if this_ptr != nil && this_ptr.IsType(IS_OBJECT) && !closure.GetFunc().IsStatic() {
 			Z_ADDREF_P(this_ptr)
 			ZVAL_OBJ(closure.GetThisPtr(), this_ptr.GetObj())
 		}

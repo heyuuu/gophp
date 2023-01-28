@@ -50,13 +50,13 @@ func RebuildObjectProperties(zobj *ZendObject) {
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if _z.GetType() == IS_UNDEF {
+					if _z.IsType(IS_UNDEF) {
 						continue
 					}
 					prop_info = _z.GetPtr()
 					if !prop_info.IsStatic() {
 						flags |= prop_info.GetFlags()
-						if OBJ_PROP(zobj, prop_info.GetOffset()).GetType() == IS_UNDEF {
+						if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
 							zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 						}
 						_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
@@ -74,13 +74,13 @@ func RebuildObjectProperties(zobj *ZendObject) {
 						for ; _p != _end; _p++ {
 							var _z *Zval = _p.GetVal()
 
-							if _z.GetType() == IS_UNDEF {
+							if _z.IsType(IS_UNDEF) {
 								continue
 							}
 							prop_info = _z.GetPtr()
 							if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 								var zv Zval
-								if OBJ_PROP(zobj, prop_info.GetOffset()).GetType() == IS_UNDEF {
+								if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
 									zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 								}
 								ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
@@ -536,7 +536,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	var ptr *uint32
 	ZEND_ASSERT(zobj.GetCe().IsUseGuards())
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
-	if zv.GetType() == IS_STRING {
+	if zv.IsType(IS_STRING) {
 		var str *ZendString = zv.GetStr()
 		if str == member || str.GetH() == ZendStringHashVal(member) && ZendStringEqualContent(str, member) != 0 {
 			return &(zv.GetPropertyGuard())
@@ -554,7 +554,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 			ZvalPtrDtorStr(zv)
 			ZVAL_ARR(zv, guards)
 		}
-	} else if zv.GetType() == IS_ARRAY {
+	} else if zv.IsType(IS_ARRAY) {
 		guards = zv.GetArr()
 		ZEND_ASSERT(guards != nil)
 		zv = ZendHashFind(guards, member)
@@ -562,9 +562,9 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 			return (*uint32)(ZendUintptrT(zv.GetPtr()) & ^1)
 		}
 	} else {
-		ZEND_ASSERT(zv.GetType() == IS_UNDEF)
+		ZEND_ASSERT(zv.IsType(IS_UNDEF))
 		ZVAL_STR_COPY(zv, member)
-		zv.GetPropertyGuard() = 0
+		zv.SetPropertyGuard(0)
 		return &(zv.GetPropertyGuard())
 	}
 
@@ -753,7 +753,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 
 			/* Writes to uninitializde typed properties bypass __set(). */
 
-			variable_ptr.GetU2Extra() = 0
+			variable_ptr.SetU2Extra(0)
 			goto write_std_property
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
@@ -862,7 +862,7 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
-		if rv.GetType() == IS_UNDEF {
+		if rv.IsType(IS_UNDEF) {
 			if ExecutorGlobals.GetException() == nil {
 				ZendThrowError(nil, "Undefined offset for object of type %s used as array", ce.GetName().GetVal())
 			}
@@ -934,7 +934,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
-		if retval.GetType() == IS_UNDEF {
+		if retval.IsType(IS_UNDEF) {
 			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 || prop_info != nil && retval.GetU2Extra() == IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
@@ -1024,7 +1024,7 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 
 			/* Reset the IS_PROP_UNINIT flag, if it exists and bypass __unset(). */
 
-			slot.GetU2Extra() = 0
+			slot.SetU2Extra(0)
 			goto exit
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) && zobj.GetProperties() != nil {
@@ -1309,7 +1309,7 @@ func ZendClassInitStatics(class_type *ZendClassEntry) {
 		ZEND_MAP_PTR_SET(class_type.static_members_table, Emalloc(b.SizeOf("zval")*class_type.GetDefaultStaticMembersCount()))
 		for i = 0; i < class_type.GetDefaultStaticMembersCount(); i++ {
 			p = class_type.GetDefaultStaticMembersTable()[i]
-			if p.GetType() == IS_INDIRECT {
+			if p.IsType(IS_INDIRECT) {
 				var q *Zval = &CE_STATIC_MEMBERS(class_type.parent)[i]
 				ZVAL_DEINDIRECT(q)
 				ZVAL_INDIRECT(&CE_STATIC_MEMBERS(class_type)[i], q)
@@ -1366,7 +1366,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 	}
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
 	ZVAL_DEINDIRECT(ret)
-	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.GetType() == IS_UNDEF && property_info.GetType() != 0 {
+	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsType(IS_UNDEF) && property_info.GetType() != 0 {
 		ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(property_name))
 		return nil
 	}
@@ -1440,7 +1440,7 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				info = _z.GetPtr()

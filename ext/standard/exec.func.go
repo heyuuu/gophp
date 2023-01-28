@@ -221,7 +221,7 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 	if ret_array == nil {
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
-		if zend.Z_REFVAL_P(ret_array).GetType() == zend.IS_ARRAY {
+		if zend.Z_REFVAL_P(ret_array).IsType(zend.IS_ARRAY) {
 			zend.ZVAL_DEREF(ret_array)
 			zend.SEPARATE_ARRAY(ret_array)
 		} else {
@@ -351,7 +351,7 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 		 * Arbitrary cutoff point of 4096 */
 
 	}
-	cmd.GetLen() = y
+	cmd.SetLen(y)
 	return cmd
 }
 func PhpEscapeShellArg(str *byte) *zend.ZendString {
@@ -409,7 +409,7 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 		 * Arbitrary cutoff point of 4096 */
 
 	}
-	cmd.GetLen() = y
+	cmd.SetLen(y)
 	return cmd
 }
 func ZifEscapeshellcmd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

@@ -25,7 +25,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 	if environment == nil {
 		return env
 	}
-	cnt = environment.GetArr().GetNNumOfElements()
+	cnt = zend.Z_ARRVAL_P(environment).GetNNumOfElements()
 	if cnt < 1 {
 		env.SetEnvarray((**byte)(zend.Pecalloc(1, b.SizeOf("char *"), is_persistent)))
 		env.SetEnvp((*byte)(zend.Pecalloc(4, 1, is_persistent)))
@@ -43,7 +43,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -74,7 +74,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -558,9 +558,9 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	memset(&env, 0, b.SizeOf("env"))
-	if command_zv.GetType() == zend.IS_ARRAY {
+	if command_zv.IsType(zend.IS_ARRAY) {
 		var arg_zv *zend.Zval
-		var num_elems uint32 = command_zv.GetArr().GetNNumOfElements()
+		var num_elems uint32 = zend.Z_ARRVAL_P(command_zv).GetNNumOfElements()
 		if num_elems == 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Command array must have at least one element")
 			zend.RETVAL_FALSE
@@ -575,7 +575,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				arg_zv = _z
@@ -607,7 +607,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if environment != nil {
 		env = _phpArrayToEnvp(environment, is_persistent)
 	}
-	ndescriptors_array = descriptorspec.GetArr().GetNNumOfElements()
+	ndescriptors_array = zend.Z_ARRVAL_P(descriptorspec).GetNNumOfElements()
 	descriptors = zend.SafeEmalloc(b.SizeOf("struct php_proc_open_descriptor_item"), ndescriptors_array, 0)
 	memset(descriptors, 0, b.SizeOf("struct php_proc_open_descriptor_item")*ndescriptors_array)
 
@@ -620,7 +620,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			nindex = _p.GetH()
@@ -632,7 +632,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				goto exit_fail
 			}
 			descriptors[ndesc].SetIndex(int(nindex))
-			if descitem.GetType() == zend.IS_RESOURCE {
+			if descitem.IsType(zend.IS_RESOURCE) {
 
 				/* should be a stream - try and dup the descriptor */
 

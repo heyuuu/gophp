@@ -823,7 +823,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 			zend.ZEND_TRY_ASSIGN_REF_STR(zremote, remote_addr)
 		}
 		read_buf.GetVal()[recvd] = '0'
-		read_buf.GetLen() = recvd
+		read_buf.SetLen(recvd)
 		zend.RETVAL_NEW_STR(read_buf)
 		return
 	}
@@ -1177,7 +1177,7 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				stream_xport = _p.GetKey()
@@ -1205,7 +1205,7 @@ func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				stream_protocol = _p.GetKey()
@@ -1234,7 +1234,7 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			elem = _z
@@ -1290,7 +1290,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(stream_array.GetArr().GetNNumOfElements())
+	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
 	for {
 		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
@@ -1298,7 +1298,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			num_ind = _p.GetH()
@@ -1357,7 +1357,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(stream_array.GetArr().GetNNumOfElements())
+	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
 	for {
 		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
@@ -1365,7 +1365,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			num_ind = _p.GetH()
@@ -1647,13 +1647,13 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			wkey = _p.GetKey()
 			wval = _z
 			zend.ZVAL_DEREF(wval)
-			if wkey != nil && wval.GetType() == zend.IS_ARRAY {
+			if wkey != nil && wval.IsType(zend.IS_ARRAY) {
 				for {
 					var __ht *zend.HashTable = wval.GetArr()
 					var _p *zend.Bucket = __ht.GetArData()
@@ -1661,7 +1661,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 					for ; _p != _end; _p++ {
 						var _z *zend.Zval = _p.GetVal()
 
-						if _z.GetType() == zend.IS_UNDEF {
+						if _z.IsType(zend.IS_UNDEF) {
 							continue
 						}
 						okey = _p.GetKey()
@@ -1694,7 +1694,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
 	if nil != b.Assign(&tmp, zend.ZendHashStrFind(params.GetArr(), "options", b.SizeOf("\"options\"")-1)) {
-		if tmp.GetType() == zend.IS_ARRAY {
+		if tmp.IsType(zend.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
@@ -3513,7 +3513,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		break
 	}
-	if zstream.GetType() == zend.IS_RESOURCE {
+	if zstream.IsType(zend.IS_RESOURCE) {
 		core.PhpStreamFromZval(stream, zstream)
 		if stream == nil {
 			zend.RETVAL_FALSE

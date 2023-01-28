@@ -167,7 +167,7 @@ func ZendCloseRsrcList(ht *HashTable) {
 			_p--
 			_z = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			res = _z.GetPtr()
@@ -220,7 +220,7 @@ func ZendFetchListDtorId(type_name *byte) int {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			lde = _z.GetPtr()

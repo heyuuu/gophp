@@ -106,7 +106,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 	var allowed_tags *zend.ZendString = nil
 	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "The string.strip_tags filter is deprecated")
 	if filterparams != nil {
-		if filterparams.GetType() == zend.IS_ARRAY {
+		if filterparams.IsType(zend.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.SmartStr{0}
 			var tmp *zend.Zval
 			for {
@@ -116,7 +116,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.GetType() == zend.IS_UNDEF {
+					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
 					tmp = _z

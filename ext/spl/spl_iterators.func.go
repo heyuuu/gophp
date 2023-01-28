@@ -533,12 +533,12 @@ func zim_spl_RecursiveIteratorIterator_callHasChildren(execute_data *zend.ZendEx
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
 	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
-	if zobject.GetType() == zend.IS_UNDEF {
+	if zobject.IsType(zend.IS_UNDEF) {
 		zend.RETVAL_FALSE
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "haschildren", return_value)
-		if return_value.GetType() == zend.IS_UNDEF {
+		if return_value.IsType(zend.IS_UNDEF) {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -557,11 +557,11 @@ func zim_spl_RecursiveIteratorIterator_callGetChildren(execute_data *zend.ZendEx
 	}
 	ce = object.GetIterators()[object.GetLevel()].GetCe()
 	zobject = object.GetIterators()[object.GetLevel()].GetZobject()
-	if zobject.GetType() == zend.IS_UNDEF {
+	if zobject.IsType(zend.IS_UNDEF) {
 		return
 	} else {
 		zend.ZendCallMethodWith0Params(zobject, ce, nil, "getchildren", return_value)
-		if return_value.GetType() == zend.IS_UNDEF {
+		if return_value.IsType(zend.IS_UNDEF) {
 			zend.RETVAL_NULL()
 			return
 		}
@@ -724,7 +724,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 
 		/* TODO: Remove this special case? */
 
-		if data.GetType() == zend.IS_ARRAY {
+		if data.IsType(zend.IS_ARRAY) {
 			zend.RETVAL_INTERNED_STR(zend.ZSTR_KNOWN(zend.ZEND_STR_ARRAY_CAPITALIZED))
 		} else {
 			zend.ZVAL_COPY(return_value, data)
@@ -1494,7 +1494,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		zend.ZvalPtrDtor(intern.GetData())
 		zend.ZVAL_UNDEF(intern.GetData())
 		php_pcre_split_impl(intern.GetPce(), subject, intern.GetData(), -1, intern.GetPregFlags())
-		count = intern.GetData().GetArr().GetNNumOfElements()
+		count = zend.Z_ARRVAL(intern.GetData()).GetNNumOfElements()
 		zend.RETVAL_BOOL(count > 1)
 		break
 	case REGIT_MODE_REPLACE:
@@ -1671,7 +1671,7 @@ func zim_spl_RecursiveRegexIterator_accept(execute_data *zend.ZendExecuteData, r
 		zend.RETVAL_FALSE
 		return
 	} else if intern.GetData().IsType(zend.IS_ARRAY) {
-		zend.RETVAL_BOOL(intern.GetData().GetArr().GetNNumOfElements() > 0)
+		zend.RETVAL_BOOL(zend.Z_ARRVAL(intern.GetData()).GetNNumOfElements() > 0)
 		return
 	}
 	zend.ZendCallMethodWith0Params(zend.ZEND_THIS, spl_ce_RegexIterator, nil, "accept", return_value)
@@ -2182,7 +2182,7 @@ func zim_spl_CachingIterator_count(execute_data *zend.ZendExecuteData, return_va
 		zend.ZendThrowExceptionEx(spl_ce_BadMethodCallException, 0, "%s does not use a full cache (see CachingIterator::__construct)", zend.Z_OBJCE_P(zend.ZEND_THIS).GetName().GetVal())
 		return
 	}
-	zend.RETVAL_LONG(intern.GetZcache().GetArr().GetNNumOfElements())
+	zend.RETVAL_LONG(zend.Z_ARRVAL(intern.GetZcache()).GetNNumOfElements())
 	return
 }
 func zim_spl_RecursiveCachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

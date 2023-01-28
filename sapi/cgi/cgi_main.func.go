@@ -43,7 +43,7 @@ func PrintModules() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.GetType() == zend.IS_UNDEF {
+			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
 			module = _z.GetPtr()
@@ -287,7 +287,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 		}
 		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
 			zend.ZendArrayDestroy(array_ptr.GetArr())
-			array_ptr.GetArr() = zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr())
+			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
 			return
 		}
 	}

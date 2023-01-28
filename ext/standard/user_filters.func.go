@@ -499,7 +499,7 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 		zend.RETVAL_FALSE
 		return
 	}
-	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.GetType() == zend.IS_STRING {
+	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(zend.IS_STRING) {
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
@@ -645,7 +645,7 @@ func ZifStreamGetFilters(execute_data *zend.ZendExecuteData, return_value *zend.
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.GetType() == zend.IS_UNDEF {
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
 				filter_name = _p.GetKey()

@@ -164,7 +164,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 		var __fill_ht *HashTable = return_value.GetArr()
 		var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		ZEND_ASSERT((__fill_ht.GetUFlags() & HASH_FLAG_PACKED) != 0)
+		ZEND_ASSERT(__fill_ht.HasUFlags(HASH_FLAG_PACKED))
 		i = 0
 		p = ZEND_CALL_ARG(ex, 1)
 		if arg_count > first_extra_arg {
@@ -645,9 +645,9 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		if entry == nil {
 			RETVAL_FALSE
 			return
-		} else if entry.GetType() == IS_INDIRECT {
+		} else if entry.IsType(IS_INDIRECT) {
 			entry = entry.GetZv()
-			if entry.GetType() == IS_UNDEF {
+			if entry.IsType(IS_UNDEF) {
 				ZendHashMoveForward(target_hash)
 				continue
 			}
@@ -776,7 +776,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 				ZendStringReleaseEx(p.GetValue(), 0)
 			}
 			p.SetValue(new_val)
-			if err.GetType() == IS_LONG {
+			if err.IsType(IS_LONG) {
 				ExecutorGlobals.SetErrorReporting(err.GetLval())
 			} else {
 				ExecutorGlobals.SetErrorReporting(atoi(p.GetValue().GetVal()))
@@ -796,16 +796,16 @@ func ValidateConstantArray(ht *HashTable) int {
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
-			if _z.GetType() == IS_INDIRECT {
+			if _z.IsType(IS_INDIRECT) {
 				_z = _z.GetZv()
 			}
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			val = _z
 			ZVAL_DEREF(val)
 			if Z_REFCOUNTED_P(val) {
-				if val.GetType() == IS_ARRAY {
+				if val.IsType(IS_ARRAY) {
 					if Z_REFCOUNTED_P(val) {
 						if Z_IS_RECURSIVE_P(val) != 0 {
 							ZendError(E_WARNING, "Constants cannot be recursive arrays")
@@ -833,17 +833,17 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 	var idx ZendUlong
 	var new_val *Zval
 	var val *Zval
-	ArrayInitSize(dst, src.GetArr().GetNNumOfElements())
+	ArrayInitSize(dst, Z_ARRVAL_P(src).GetNNumOfElements())
 	for {
 		var __ht *HashTable = src.GetArr()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
-			if _z.GetType() == IS_INDIRECT {
+			if _z.IsType(IS_INDIRECT) {
 				_z = _z.GetZv()
 			}
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			idx = _p.GetH()
@@ -858,7 +858,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 			} else {
 				new_val = ZendHashIndexAddNew(dst.GetArr(), idx, val)
 			}
-			if val.GetType() == IS_ARRAY {
+			if val.IsType(IS_ARRAY) {
 				if Z_REFCOUNTED_P(val) {
 					CopyConstantArray(new_val, val)
 				}
@@ -1156,9 +1156,9 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 	}
-	if arg.GetType() == IS_OBJECT {
+	if arg.IsType(IS_OBJECT) {
 		ce = Z_OBJ_P(arg).GetCe()
-	} else if arg.GetType() == IS_STRING {
+	} else if arg.IsType(IS_STRING) {
 		ce = ZendLookupClass(arg.GetStr())
 	}
 	if ce != nil && ce.parent {
@@ -1260,13 +1260,13 @@ func IsAImpl(execute_data *ZendExecuteData, return_value *Zval, only_subclass Ze
 	 *   and there is no easy way to deprecate this.
 	 */
 
-	if allow_string != 0 && obj.GetType() == IS_STRING {
+	if allow_string != 0 && obj.IsType(IS_STRING) {
 		instance_ce = ZendLookupClass(obj.GetStr())
 		if instance_ce == nil {
 			RETVAL_FALSE
 			return
 		}
-	} else if obj.GetType() == IS_OBJECT {
+	} else if obj.IsType(IS_OBJECT) {
 		instance_ce = Z_OBJCE_P(obj)
 	} else {
 		RETVAL_FALSE
@@ -1307,7 +1307,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -1479,14 +1479,14 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				num_key = _p.GetH()
 				key = _p.GetKey()
 				value = _z
 				var is_dynamic ZendBool = 1
-				if value.GetType() == IS_INDIRECT {
+				if value.IsType(IS_INDIRECT) {
 					value = value.GetZv()
 					if Z_ISUNDEF_P(value) {
 						continue
@@ -1639,9 +1639,9 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParameters(ZEND_NUM_ARGS(), "z", &klass) == FAILURE {
 		return
 	}
-	if klass.GetType() == IS_OBJECT {
+	if klass.IsType(IS_OBJECT) {
 		ce = Z_OBJCE_P(klass)
-	} else if klass.GetType() == IS_STRING {
+	} else if klass.IsType(IS_STRING) {
 		ce = ZendLookupClass(klass.GetStr())
 	}
 	if ce == nil {
@@ -1657,7 +1657,7 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -1750,9 +1750,9 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	if klass.GetType() == IS_OBJECT {
+	if klass.IsType(IS_OBJECT) {
 		ce = Z_OBJCE_P(klass)
-	} else if klass.GetType() == IS_STRING {
+	} else if klass.IsType(IS_STRING) {
 		if b.Assign(&ce, ZendLookupClass(klass.GetStr())) == nil {
 			RETVAL_FALSE
 			return
@@ -1770,10 +1770,10 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
 
-		RETVAL_BOOL(klass.GetType() == IS_OBJECT || !func_.IsPrivate() || func_.GetScope() == ce)
+		RETVAL_BOOL(klass.IsType(IS_OBJECT) || !func_.IsPrivate() || func_.GetScope() == ce)
 		return
 	}
-	if klass.GetType() == IS_OBJECT {
+	if klass.IsType(IS_OBJECT) {
 		var obj *ZendObject = klass.GetObj()
 		func_ = Z_OBJ_HT_P(klass).GetGetMethod()(&obj, method_name, nil)
 		if func_ != nil {
@@ -1806,13 +1806,13 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		RETVAL_FALSE
 		return
 	}
-	if object.GetType() == IS_STRING {
+	if object.IsType(IS_STRING) {
 		ce = ZendLookupClass(object.GetStr())
 		if ce == nil {
 			RETVAL_FALSE
 			return
 		}
-	} else if object.GetType() == IS_OBJECT {
+	} else if object.IsType(IS_OBJECT) {
 		ce = Z_OBJCE_P(object)
 	} else {
 		ZendError(E_WARNING, "First parameter must either be an object or the name of an existing class")
@@ -1825,7 +1825,7 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	ZVAL_STR(&property_z, property)
-	if object.GetType() == IS_OBJECT && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
+	if object.IsType(IS_OBJECT) && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
 		RETVAL_TRUE
 		return
 	}
@@ -2078,7 +2078,7 @@ func ZifGetIncludedFiles(execute_data *ZendExecuteData, return_value *Zval) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			entry = _p.GetKey()
@@ -2134,7 +2134,7 @@ func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ZendStackPush(&(ExecutorGlobals.GetUserErrorHandlersErrorReporting()), &(ExecutorGlobals.GetUserErrorHandlerErrorReporting()))
 	ZendStackPush(&(ExecutorGlobals.GetUserErrorHandlers()), &(ExecutorGlobals.GetUserErrorHandler()))
-	if error_handler.GetType() == IS_NULL {
+	if error_handler.IsType(IS_NULL) {
 		ZVAL_UNDEF(&(ExecutorGlobals.GetUserErrorHandler()))
 		return
 	}
@@ -2181,7 +2181,7 @@ func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 		ZVAL_COPY(return_value, &(ExecutorGlobals.GetUserExceptionHandler()))
 	}
 	ZendStackPush(&(ExecutorGlobals.GetUserExceptionHandlers()), &(ExecutorGlobals.GetUserExceptionHandler()))
-	if exception_handler.GetType() == IS_NULL {
+	if exception_handler.IsType(IS_NULL) {
 		ZVAL_UNDEF(&(ExecutorGlobals.GetUserExceptionHandler()))
 		return
 	}
@@ -2224,7 +2224,7 @@ func GetDeclaredClassImpl(execute_data *ZendExecuteData, return_value *Zval, fla
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -2264,7 +2264,7 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			key = _p.GetKey()
@@ -2341,7 +2341,7 @@ func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
 		function_name = ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
 		function_name.GetVal()[0] = '0'
 		for {
-			function_name.GetLen() = core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(ExecutorGlobals.GetLambdaCount()))) + 1
+			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(ExecutorGlobals.GetLambdaCount()))) + 1)
 			if ZendHashAddPtr(ExecutorGlobals.GetFunctionTable(), function_name, func_) != nil {
 				break
 			}
@@ -2386,7 +2386,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -2408,7 +2408,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -2436,7 +2436,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				index = _p.GetH()
@@ -2473,7 +2473,7 @@ func ZifGetLoadedExtensions(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				module = _z.GetPtr()
@@ -2507,7 +2507,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				module = _z.GetPtr()
@@ -2524,7 +2524,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				val = _z.GetPtr()
@@ -2571,7 +2571,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.GetType() == IS_UNDEF {
+				if _z.IsType(IS_UNDEF) {
 					continue
 				}
 				constant = _z.GetPtr()
@@ -2601,7 +2601,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 		var __fill_ht *HashTable = arg_array.GetArr()
 		var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-		ZEND_ASSERT((__fill_ht.GetUFlags() & HASH_FLAG_PACKED) != 0)
+		ZEND_ASSERT(__fill_ht.HasUFlags(HASH_FLAG_PACKED))
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
 			var first_extra_arg uint32 = MIN(num_args, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
@@ -2676,7 +2676,7 @@ func DebugPrintBacktraceArgs(arg_array *Zval) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			tmp = _z
@@ -3135,7 +3135,7 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if _z.GetType() == IS_UNDEF {
+			if _z.IsType(IS_UNDEF) {
 				continue
 			}
 			zif = _z.GetPtr()
