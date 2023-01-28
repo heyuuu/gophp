@@ -97,68 +97,37 @@ func ZvalGetType(pz *Zval) ZendUchar                     { return pz.GetType() }
 func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 	return faketype == realtype || faketype == _IS_BOOL && (realtype == IS_TRUE || realtype == IS_FALSE)
 }
-func Z_TYPE(zval Zval) ZendUchar                       { return zval.GetType() }
-func Z_TYPE_P(zval_p *Zval) ZendUchar                  { return zval_p.GetType() }
-func Z_TYPE_FLAGS(zval Zval) ZendUchar                 { return zval.GetTypeFlags() }
-func Z_TYPE_FLAGS_P(zval_p *Zval) ZendUchar            { return zval_p.GetTypeFlags() }
-func Z_TYPE_INFO(zval Zval) uint32                     { return zval.GetTypeInfo() }
-func Z_TYPE_INFO_P(zval_p *Zval) uint32                { return zval_p.GetTypeInfo() }
-func Z_NEXT(zval Zval) uint32                          { return zval.GetNext() }
-func Z_NEXT_P(zval_p *Zval) uint32                     { return zval_p.GetNext() }
-func Z_CACHE_SLOT(zval Zval) uint32                    { return zval.GetCacheSlot() }
-func Z_CACHE_SLOT_P(zval_p *Zval) uint32               { return zval_p.GetCacheSlot() }
-func Z_LINENO(zval Zval) uint32                        { return zval.GetLineno() }
-func Z_LINENO_P(zval_p *Zval) uint32                   { return zval_p.GetLineno() }
-func Z_OPLINE_NUM(zval Zval) uint32                    { return zval.GetOplineNum() }
-func Z_OPLINE_NUM_P(zval_p *Zval) uint32               { return zval_p.GetOplineNum() }
-func Z_FE_POS(zval Zval) uint32                        { return zval.GetFePos() }
-func Z_FE_POS_P(zval_p *Zval) uint32                   { return zval_p.GetFePos() }
-func Z_FE_ITER(zval Zval) uint32                       { return zval.GetFeIterIdx() }
-func Z_FE_ITER_P(zval_p *Zval) uint32                  { return zval_p.GetFeIterIdx() }
-func Z_ACCESS_FLAGS(zval Zval) uint32                  { return zval.GetAccessFlags() }
-func Z_ACCESS_FLAGS_P(zval_p *Zval) uint32             { return zval_p.GetAccessFlags() }
-func Z_PROPERTY_GUARD(zval Zval) uint32                { return zval.GetPropertyGuard() }
-func Z_PROPERTY_GUARD_P(zval_p *Zval) uint32           { return zval_p.GetPropertyGuard() }
-func Z_CONSTANT_FLAGS(zval Zval) uint32                { return zval.GetConstantFlags() }
-func Z_CONSTANT_FLAGS_P(zval_p *Zval) uint32           { return zval_p.GetConstantFlags() }
-func Z_EXTRA(zval Zval) uint32                         { return zval.GetU2Extra() }
-func Z_EXTRA_P(zval_p *Zval) uint32                    { return zval_p.GetU2Extra() }
-func Z_COUNTED(zval Zval) *ZendRefcounted              { return zval.GetCounted() }
-func Z_COUNTED_P(zval_p *Zval) *ZendRefcounted         { return zval_p.GetCounted() }
-func GC_REFCOUNT(p *HashTable) uint32                  { return p.GetGc().GetRefcount() }
-func GC_SET_REFCOUNT(p __auto__, rc uint32) uint32     { return ZendGcSetRefcount(p.gc, rc) }
-func GC_ADDREF(p *ZendResource) uint32                 { return ZendGcAddref(p.GetGc()) }
-func GC_DELREF(p *HashTable) uint32                    { return ZendGcDelref(p.GetGc()) }
-func GC_ADDREF_EX(p *ZendRefcounted, rc uint32) uint32 { return ZendGcAddrefEx(p.GetGc(), rc) }
-func GC_DELREF_EX(p __auto__, rc uint32) uint32        { return ZendGcDelrefEx(p.gc, rc) }
-func ZvalGcType(gc_type_info uint32) ZendUchar         { return gc_type_info & GC_TYPE_MASK }
+func Z_FE_ITER_P(zval_p *Zval) uint32                 { return zval_p.GetFeIterIdx() }
+func GC_REFCOUNT(p *HashTable) uint32                 { return p.GetRefcount() }
+func GC_SET_REFCOUNT(p IRefcounted, rc uint32) uint32 { return p.SetRefcount(rc) }
+func GC_ADDREF(p IRefcounted) uint32                  { return p.AddRefcount() }
+func GC_DELREF(p IRefcounted) uint32                  { return p.DelRefcount() }
+func GC_ADDREF_EX(p IRefcounted, rc uint32) uint32    { return p.AddRefcountEx(rc) }
+func GC_DELREF_EX(p IRefcounted, rc uint32) uint32    { return p.DelRefcountEx(rc) }
+func ZvalGcType(gc_type_info uint32) ZendUchar        { return gc_type_info & GC_TYPE_MASK }
 func ZvalGcFlags(gc_type_info uint32) uint32 {
 	return gc_type_info >> GC_FLAGS_SHIFT & GC_FLAGS_MASK >> GC_FLAGS_SHIFT
 }
-func ZvalGcInfo(gc_type_info uint32) uint32 { return gc_type_info >> GC_INFO_SHIFT }
-func GC_TYPE_INFO(p __auto__) __auto__      { return p.gc.u.type_info }
-func GC_TYPE(p __auto__) ZendUchar          { return ZvalGcType(GC_TYPE_INFO(p)) }
-func GC_FLAGS(p *HashTable) uint32          { return ZvalGcFlags(GC_TYPE_INFO(p)) }
-func GC_INFO(p *ZendRefcounted) uint32      { return ZvalGcInfo(GC_TYPE_INFO(p)) }
-func GC_ADD_FLAGS(p *ZendObject, flags int) {
-	GC_TYPE_INFO(p) |= flags << GC_FLAGS_SHIFT
-}
-func GC_DEL_FLAGS(p __auto__, flags int) {
-	GC_TYPE_INFO(p) &= ^(flags << GC_FLAGS_SHIFT)
-}
-func Z_GC_TYPE(zval Zval) ZendUchar          { return GC_TYPE(zval.GetCounted()) }
-func Z_GC_TYPE_P(zval_p *Zval) ZendUchar     { return Z_GC_TYPE(*zval_p) }
-func Z_GC_FLAGS(zval Zval) uint32            { return GC_FLAGS(zval.GetCounted()) }
-func Z_GC_FLAGS_P(zval_p *Zval) uint32       { return Z_GC_FLAGS(*zval_p) }
-func Z_GC_INFO(zval Zval) uint32             { return GC_INFO(zval.GetCounted()) }
-func Z_GC_INFO_P(zval_p *Zval) uint32        { return Z_GC_INFO(*zval_p) }
-func Z_GC_TYPE_INFO(zval Zval) __auto__      { return GC_TYPE_INFO(zval.GetCounted()) }
-func Z_GC_TYPE_INFO_P(zval_p *Zval) __auto__ { return Z_GC_TYPE_INFO(*zval_p) }
-func Z_TYPE_INFO_REFCOUNTED(t uint32) bool   { return (t & Z_TYPE_FLAGS_MASK) != 0 }
-func OBJ_FLAGS(obj __auto__) uint32          { return GC_FLAGS(obj) }
-func GC_IS_RECURSIVE(p *HashTable) int       { return GC_FLAGS(p) & GC_PROTECTED }
-func GC_PROTECT_RECURSION(p *HashTable)      { GC_ADD_FLAGS(p, GC_PROTECTED) }
-func GC_UNPROTECT_RECURSION(p *HashTable)    { GC_DEL_FLAGS(p, GC_PROTECTED) }
+func ZvalGcInfo(gc_type_info uint32) uint32    { return gc_type_info >> GC_INFO_SHIFT }
+func GC_TYPE_INFO(p IRefcounted) uint32        { return p.GetGcTypeInfo() }
+func GC_TYPE(p IRefcounted) ZendUchar          { return p.GetGcType() }
+func GC_FLAGS(p IRefcounted) uint32            { return p.GetGcFlags() }
+func GC_INFO(p IRefcounted) uint32             { return p.GetGcInfo() }
+func GC_ADD_FLAGS(p IRefcounted, flags uint32) { p.AddGcFlags(flags) }
+func GC_DEL_FLAGS(p IRefcounted, flags uint32) { p.DelGcFlags(flags) }
+func Z_GC_TYPE(zval Zval) ZendUchar            { return zval.GetCounted().GetGcType() }
+func Z_GC_TYPE_P(zval_p *Zval) ZendUchar       { return Z_GC_TYPE(*zval_p) }
+func Z_GC_FLAGS(zval Zval) uint32              { return GC_FLAGS(zval.GetCounted()) }
+func Z_GC_FLAGS_P(zval_p *Zval) uint32         { return Z_GC_FLAGS(*zval_p) }
+func Z_GC_INFO(zval Zval) uint32               { return GC_INFO(zval.GetCounted()) }
+func Z_GC_INFO_P(zval_p *Zval) uint32          { return Z_GC_INFO(*zval_p) }
+func Z_GC_TYPE_INFO(zval Zval) __auto__        { return GC_TYPE_INFO(zval.GetCounted()) }
+func Z_GC_TYPE_INFO_P(zval_p *Zval) __auto__   { return Z_GC_TYPE_INFO(*zval_p) }
+func Z_TYPE_INFO_REFCOUNTED(t uint32) bool     { return (t & Z_TYPE_FLAGS_MASK) != 0 }
+func OBJ_FLAGS(obj IRefcounted) uint32         { return obj.GetGcFlags() }
+func GC_IS_RECURSIVE(p *HashTable) int         { return GC_FLAGS(p) & GC_PROTECTED }
+func GC_PROTECT_RECURSION(p *HashTable)        { GC_ADD_FLAGS(p, GC_PROTECTED) }
+func GC_UNPROTECT_RECURSION(p *HashTable)      { GC_DEL_FLAGS(p, GC_PROTECTED) }
 func GC_TRY_PROTECT_RECURSION(p *HashTable) {
 	if (GC_FLAGS(p) & GC_IMMUTABLE) == 0 {
 		GC_PROTECT_RECURSION(p)
@@ -463,23 +432,18 @@ func ZendGcSetRefcount(p *ZendRefcountedH, rc uint32) uint32 {
 	return p.GetRefcount()
 }
 func ZendGcAddref(p *ZendRefcountedH) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.GetRefcount()++
 	return p.GetRefcount()
 }
 func ZendGcDelref(p *ZendRefcountedH) uint32 {
-	ZEND_ASSERT(p.GetRefcount() > 0)
-	ZEND_RC_MOD_CHECK(p)
 	p.GetRefcount()--
 	return p.GetRefcount()
 }
 func ZendGcAddrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.SetRefcount(p.GetRefcount() + rc)
 	return p.GetRefcount()
 }
 func ZendGcDelrefEx(p *ZendRefcountedH, rc uint32) uint32 {
-	ZEND_RC_MOD_CHECK(p)
 	p.SetRefcount(p.GetRefcount() - rc)
 	return p.GetRefcount()
 }

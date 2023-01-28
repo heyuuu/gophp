@@ -111,11 +111,6 @@ const _IS_NUMBER = 20
 const Z_TYPE_MASK = 0xff
 const Z_TYPE_FLAGS_MASK = 0xff00
 const Z_TYPE_FLAGS_SHIFT = 8
-const GC_TYPE_MASK = 0xf
-const GC_FLAGS_MASK = 0x3f0
-const GC_INFO_MASK = 0xfffffc00
-const GC_FLAGS_SHIFT = 0
-const GC_INFO_SHIFT = 10
 
 /* zval_gc_flags(zval.value->gc.u.type_info) (common flags) */
 
