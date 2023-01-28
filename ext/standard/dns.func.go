@@ -632,14 +632,14 @@ func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, st
 
 			}
 			if n {
-				memcpy(tp.GetVal()+l2, cp+l1+1, n)
+				memcpy(zend.ZSTR_VAL(tp)+l2, cp+l1+1, n)
 				zend.AddNextIndexStringl(&entries, (*byte)(cp+l1+1), n)
 			}
 			l1 = l1 + n + 1
 			l2 = l2 + n
 		}
-		tp.GetVal()[l2] = '0'
-		tp.SetLen(l2)
+		zend.ZSTR_VAL(tp)[l2] = '0'
+		zend.ZSTR_LEN(tp) = l2
 		cp += dlen
 		zend.AddAssocStr(subarray, "txt", tp)
 		zend.AddAssocZval(subarray, "entries", &entries)
@@ -1130,7 +1130,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		if type_to_fetch != 0 {
 			handle = dns_open(nil)
 			if handle == nil {
-				zend.ZendArrayDestroy(return_value.GetArr())
+				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1152,7 +1152,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				default:
 					core.PhpErrorDocref(nil, zend.E_WARNING, "DNS Query failed")
 				}
-				zend.ZendArrayDestroy(return_value.GetArr())
+				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1170,7 +1170,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				n = dn_skipname(cp, end)
 				if n < 0 {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to parse DNS data received")
-					zend.ZendArrayDestroy(return_value.GetArr())
+					zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
 					PhpDnsFreeHandle(handle)
 					zend.RETVAL_FALSE
 					return
@@ -1374,7 +1374,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	zend.RETVAL_BOOL(zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
+	zend.RETVAL_BOOL(zend.ZendHashNumElements(zend.Z_ARRVAL_P(mx_list)) != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {

@@ -138,7 +138,7 @@ func PhpSockopClose(stream *core.PhpStream, close_handle int) int {
 			sock.SetSocket(core.SOCK_ERR)
 		}
 	}
-	zend.Pefree(sock, stream.GetIsPersistent())
+	zend.Pefree(sock, core.PhpStreamIsPersistent(stream))
 	return 0
 }
 func PhpSockopFlush(stream *core.PhpStream) int { return 0 }
@@ -399,7 +399,7 @@ func PhpTcpSockopConnect(stream *core.PhpStream, sock *core.PhpNetstreamDataT, x
 		return -1
 	}
 	if core.PHP_STREAM_CONTEXT(stream) != nil && b.Assign(&tmpzval, PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), "socket", "bindto")) != nil {
-		if tmpzval.GetType() != zend.IS_STRING {
+		if zend.Z_TYPE_P(tmpzval) != zend.IS_STRING {
 			if xparam.GetWantErrortext() != 0 {
 				xparam.SetErrorText(core.Strpprintf(0, "local_addr context option is not a string."))
 			}
@@ -457,7 +457,7 @@ func PhpTcpSockopAccept(stream *core.PhpStream, sock *core.PhpNetstreamDataT, xp
 		if xparam.GetClient() != nil {
 			xparam.GetClient().SetCtx(stream.GetCtx())
 			if stream.GetCtx() != nil {
-				stream.GetCtx().IncGcRefcount()
+				zend.GC_ADDREF(stream.GetCtx())
 			}
 		}
 	}

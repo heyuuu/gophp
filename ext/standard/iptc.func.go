@@ -203,7 +203,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 		spoolbuf = zend.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
-		poi = (*uint8)(spoolbuf.GetVal())
+		poi = (*uint8)(zend.ZSTR_VAL(spoolbuf))
 		memset(poi, 0, iptcdata_len+b.SizeOf("psheader")+sb.st_size+1024+1)
 	}
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xff {
@@ -281,7 +281,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	r.Fclose(fp)
 	if spool < 2 {
-		spoolbuf = zend.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()), 0)
+		spoolbuf = zend.ZendStringTruncate(spoolbuf, poi-(*uint8)(zend.ZSTR_VAL(spoolbuf)), 0)
 		zend.RETVAL_NEW_STR(spoolbuf)
 		return
 	} else {
@@ -402,9 +402,9 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if tagsfound == 0 {
 			zend.ArrayInit(return_value)
 		}
-		if b.Assign(&element, zend.ZendHashStrFind(return_value.GetArr(), key, strlen(key))) == nil {
+		if b.Assign(&element, zend.ZendHashStrFind(zend.Z_ARRVAL_P(return_value), key, strlen(key))) == nil {
 			zend.ArrayInit(&values)
-			element = zend.ZendHashStrUpdate(return_value.GetArr(), key, strlen(key), &values)
+			element = zend.ZendHashStrUpdate(zend.Z_ARRVAL_P(return_value), key, strlen(key), &values)
 		}
 		zend.AddNextIndexStringl(element, (*byte)(buffer+inx), len_)
 		inx += len_

@@ -78,14 +78,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 	for p != nil {
 		PhpUrlDecode(p, strlen(p))
 		if read_chain != 0 {
-			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
+			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, core.PhpStreamIsPersistent(stream))) {
 				streams.PhpStreamFilterAppend(stream.GetReadfilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create filter (%s)", p)
 			}
 		}
 		if write_chain != 0 {
-			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, stream.GetIsPersistent())) {
+			if b.Assign(&temp_filter, streams.PhpStreamFilterCreate(p, nil, core.PhpStreamIsPersistent(stream))) {
 				streams.PhpStreamFilterAppend(stream.GetWritefilters(), temp_filter)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create filter (%s)", p)

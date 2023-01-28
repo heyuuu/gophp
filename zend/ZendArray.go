@@ -33,23 +33,10 @@ func (this *Bucket) SetKey(value *ZendString) { this.key = value }
 
 /**
  * ZendArray
- * HashTable Data Layout
- * =====================
- *
- *                 +=============================+
- *                 | HT_HASH(ht, ht->nTableMask) |
- *                 | ...                         |
- *                 | HT_HASH(ht, -1)             |
- *                 +-----------------------------+
- * ht->arData ---> | Bucket[0]                   |
- *                 | ...                         |
- *                 | Bucket[ht->nTableSize-1]    |
- *                 +=============================+
  */
-type HashTable = ZendArray
 type ZendArray struct {
-	baseZendRefcounted
-	u struct /* union */ {
+	gc ZendRefcountedH
+	u  struct /* union */ {
 		v struct {
 			flags           ZendUchar
 			_unused         ZendUchar
@@ -68,8 +55,8 @@ type ZendArray struct {
 	pDestructor      DtorFuncT
 }
 
-var _ ZendRefcounted = &ZendArray{}
-
+func (this *ZendArray) GetGc() ZendRefcountedH             { return this.gc }
+func (this *ZendArray) SetGc(value ZendRefcountedH)        { this.gc = value }
 func (this *ZendArray) GetFlags() ZendUchar                { return this.u.v.flags }
 func (this *ZendArray) SetFlags(value ZendUchar)           { this.u.v.flags = value }
 func (this *ZendArray) GetUnused() ZendUchar               { return this.u.v._unused }

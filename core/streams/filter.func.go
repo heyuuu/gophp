@@ -34,7 +34,7 @@ func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {
 		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
-		zend.ZendHashInit(standard.FG(stream_filters), StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)
+		zend.ZendHashInit(standard.FG(stream_filters), zend.ZendHashNumElements(&StreamFiltersHash)+1, nil, nil, 0)
 		zend.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
 	if zend.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {
@@ -44,7 +44,7 @@ func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, fact
 	}
 }
 func PhpStreamBucketNew(stream *core.PhpStream, buf *byte, buflen int, own_buf uint8, buf_persistent uint8) *PhpStreamBucket {
-	var is_persistent int = stream.GetIsPersistent()
+	var is_persistent int = core.PhpStreamIsPersistent(stream)
 	var bucket *PhpStreamBucket
 	bucket = (*PhpStreamBucket)(zend.Pemalloc(b.SizeOf("php_stream_bucket"), is_persistent))
 	bucket.SetPrev(nil)
@@ -196,7 +196,7 @@ func _phpStreamFilterAlloc(fops *PhpStreamFilterOps, abstract any, persistent ui
 	filter = (*core.PhpStreamFilter)(PemallocRelOrig(b.SizeOf("php_stream_filter"), persistent))
 	memset(filter, 0, b.SizeOf("php_stream_filter"))
 	filter.SetFops(fops)
-	filter.GetAbstract().SetPtr(abstract)
+	zend.Z_PTR(filter.GetAbstract()) = abstract
 	filter.SetIsPersistent(persistent)
 	return filter
 }

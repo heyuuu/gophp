@@ -2,6 +2,14 @@
 
 package zend
 
+import (
+	"sik/core"
+)
+
+func ZEND_LTOA(i __auto__, s []char, len_ __auto__) {
+	var st int = core.Snprintf(s, len_, ZEND_LONG_FMT, i)
+	s[st] = '0'
+}
 func ZEND_ATOL(i __auto__, s __auto__) __auto__ {
 	i = atoll(s)
 	return i

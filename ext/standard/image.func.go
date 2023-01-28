@@ -212,7 +212,7 @@ func php_read_APP(stream *core.PhpStream, marker uint, info *zend.Zval) int {
 		return 0
 	}
 	core.Snprintf(markername, b.SizeOf("markername"), "APP%d", marker-M_APP0)
-	if b.Assign(&tmp, zend.ZendHashStrFind(info.GetArr(), markername, strlen(markername))) == nil {
+	if b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_ARRVAL_P(info), markername, strlen(markername))) == nil {
 
 		/* XXX we only catch the 1st tag of it's kind! */
 

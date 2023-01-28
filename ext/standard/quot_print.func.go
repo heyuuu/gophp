@@ -46,7 +46,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 	retval = zend.ZendStringAlloc(buf_size, 0)
 	i = length
 	p1 = str
-	p2 = (*uint8)(retval.GetVal())
+	p2 = (*uint8)(zend.ZSTR_VAL(retval))
 	decoded_len = 0
 	for i > 0 && (*p1) != '0' {
 		if (*p1) == '=' {
@@ -100,7 +100,7 @@ func PhpQuotPrintDecode(str *uint8, length int, replace_us_by_ws int) *zend.Zend
 		}
 	}
 	*p2 = '0'
-	retval.SetLen(decoded_len)
+	zend.ZSTR_LEN(retval) = decoded_len
 	return retval
 }
 func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
@@ -110,7 +110,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 	var hex *byte = "0123456789ABCDEF"
 	var ret *zend.ZendString
 	ret = zend.ZendStringSafeAlloc(3, length+(3*length/(PHP_QPRINT_MAXL-9)+1), 0, 0)
-	d = (*uint8)(ret.GetVal())
+	d = (*uint8)(zend.ZSTR_VAL(ret))
 	for b.PostDec(&length) {
 		if b.Assign(&c, b.PostInc(&(*str))) == '0' && (*str) == '0' && length > 0 {
 			b.PostInc(&(*d)) = '0'
@@ -141,7 +141,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 		}
 	}
 	*d = '0'
-	ret = zend.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
+	ret = zend.ZendStringTruncate(ret, d-(*uint8)(zend.ZSTR_VAL(ret)), 0)
 	return ret
 }
 func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -218,20 +218,20 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 		}
 		break
 	}
-	if arg1.GetLen() == 0 {
+	if zend.ZSTR_LEN(arg1) == 0 {
 
 		/* shortcut */
 
 		zend.RETVAL_EMPTY_STRING()
 		return
 	}
-	str_in = arg1.GetVal()
-	str_out = zend.ZendStringAlloc(arg1.GetLen(), 0)
+	str_in = zend.ZSTR_VAL(arg1)
+	str_out = zend.ZendStringAlloc(zend.ZSTR_LEN(arg1), 0)
 	for str_in[i] {
 		switch str_in[i] {
 		case '=':
 			if str_in[i+1] && str_in[i+2] && isxdigit(int(str_in[i+1])) && isxdigit(int(str_in[i+2])) {
-				str_out.GetVal()[b.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
+				zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = (PhpHex2int(int(str_in[i+1])) << 4) + PhpHex2int(int(str_in[i+2]))
 				i += 3
 			} else {
 				k = 1
@@ -269,16 +269,16 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 					/* CR or LF */
 
 				} else {
-					str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
+					zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 				}
 			}
 			break
 		default:
-			str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
+			zend.ZSTR_VAL(str_out)[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 		}
 	}
-	str_out.GetVal()[j] = '0'
-	str_out.SetLen(j)
+	zend.ZSTR_VAL(str_out)[j] = '0'
+	zend.ZSTR_LEN(str_out) = j
 	zend.RETVAL_NEW_STR(str_out)
 }
 func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -351,11 +351,11 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		}
 		break
 	}
-	if str.GetLen() == 0 {
+	if zend.ZSTR_LEN(str) == 0 {
 		zend.RETVAL_EMPTY_STRING()
 		return
 	}
-	new_str = PhpQuotPrintEncode((*uint8)(str.GetVal()), str.GetLen())
+	new_str = PhpQuotPrintEncode((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str))
 	zend.RETVAL_STR(new_str)
 	return
 }

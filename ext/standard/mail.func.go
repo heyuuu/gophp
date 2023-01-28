@@ -106,7 +106,7 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 }
 func PhpMailBuildHeadersCheckFieldValue(val *zend.Zval) zend.ZendBool {
 	var len_ int = 0
-	var value *zend.ZendString = val.GetStr()
+	var value *zend.ZendString = zend.Z_STR_P(val)
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 
@@ -139,14 +139,14 @@ func PhpMailBuildHeadersCheckFieldName(key *zend.ZendString) zend.ZendBool {
 	return zend.SUCCESS
 }
 func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Zval) {
-	switch val.GetType() {
+	switch zend.Z_TYPE_P(val) {
 	case zend.IS_STRING:
 		if PhpMailBuildHeadersCheckFieldName(key) != zend.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field name (%s) contains invalid chars", key.GetVal())
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field name (%s) contains invalid chars", zend.ZSTR_VAL(key))
 			return
 		}
 		if PhpMailBuildHeadersCheckFieldValue(val) != zend.SUCCESS {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), zend.Z_STRVAL_P(val))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", zend.ZSTR_VAL(key), zend.Z_STRVAL_P(val))
 			return
 		}
 		zend.SmartStrAppend(s, key)
@@ -158,30 +158,30 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 		PhpMailBuildHeadersElems(s, key, val)
 		break
 	default:
-		core.PhpErrorDocref(nil, zend.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
+		core.PhpErrorDocref(nil, zend.E_WARNING, "headers array elements must be string or array (%s)", zend.ZSTR_VAL(key))
 	}
 }
 func PhpMailBuildHeadersElems(s *zend.SmartStr, key *zend.ZendString, val *zend.Zval) {
 	var tmp_key *zend.ZendString
 	var tmp_val *zend.Zval
 	for {
-		var __ht *zend.HashTable = val.GetArr()
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(val)
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			tmp_key = _p.GetKey()
 			tmp_val = _z
 			if tmp_key != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", zend.ZSTR_VAL(tmp_key))
 				continue
 			}
-			if tmp_val.GetType() != zend.IS_STRING {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
+			if zend.Z_TYPE_P(tmp_val) != zend.IS_STRING {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header values must be string (%s)", zend.ZSTR_VAL(key))
 				continue
 			}
 			PhpMailBuildHeadersElem(s, key, tmp_val)
@@ -194,15 +194,15 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var key *zend.ZendString
 	var val *zend.Zval
 	var s zend.SmartStr = zend.SmartStr{0}
-	zend.ZEND_ASSERT(headers.IsType(zend.IS_ARRAY))
+	zend.ZEND_ASSERT(zend.Z_TYPE_P(headers) == zend.IS_ARRAY)
 	for {
-		var __ht *zend.HashTable = headers.GetArr()
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(headers)
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			idx = _p.GetH()
@@ -215,71 +215,71 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 
 			/* https://tools.ietf.org/html/rfc2822#section-3.6 */
 
-			switch key.GetLen() {
+			switch zend.ZSTR_LEN(key) {
 			case b.SizeOf("\"orig-date\"") - 1:
-				if !(strncasecmp("orig-date", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("orig-date", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("orig-date", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"from\"") - 1:
-				if !(strncasecmp("from", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("from", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("from", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"sender\"") - 1:
-				if !(strncasecmp("sender", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("sender", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("sender", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"reply-to\"") - 1:
-				if !(strncasecmp("reply-to", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("reply-to", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("reply-to", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"to\"") - 1:
-				if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("to", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'To' header")
 					continue
 				}
-				if !(strncasecmp("cc", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("cc", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("cc", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"bcc\"") - 1:
-				if !(strncasecmp("bcc", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("bcc", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("bcc", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"message-id\"") - 1:
-				if !(strncasecmp("message-id", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("message-id", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("message-id", s, key, val)
-				} else if !(strncasecmp("references", key.GetVal(), key.GetLen())) {
+				} else if !(strncasecmp("references", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("references", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"in-reply-to\"") - 1:
-				if !(strncasecmp("in-reply-to", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("in-reply-to", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					PHP_MAIL_BUILD_HEADER_CHECK("in-reply-to", s, key, val)
 				} else {
 					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 				}
 				break
 			case b.SizeOf("\"subject\"") - 1:
-				if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
+				if !(strncasecmp("subject", zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))) {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'Subject' header")
 					continue
 				}
@@ -415,10 +415,10 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	MAIL_ASCIIZ_CHECK(subject, subject_len)
 	MAIL_ASCIIZ_CHECK(message, message_len)
 	if headers != nil {
-		switch headers.GetType() {
+		switch zend.Z_TYPE_P(headers) {
 		case zend.IS_STRING:
 			tmp_headers = zend.ZendStringInit(zend.Z_STRVAL_P(headers), zend.Z_STRLEN_P(headers), 0)
-			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
+			MAIL_ASCIIZ_CHECK(zend.ZSTR_VAL(tmp_headers), zend.ZSTR_LEN(tmp_headers))
 			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
 			zend.ZendStringReleaseEx(tmp_headers, 0)
 			break
@@ -432,7 +432,7 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	if extra_cmd != nil {
-		MAIL_ASCIIZ_CHECK(extra_cmd.GetVal(), extra_cmd.GetLen())
+		MAIL_ASCIIZ_CHECK(zend.ZSTR_VAL(extra_cmd), zend.ZSTR_LEN(extra_cmd))
 	}
 	if to_len > 0 {
 		to_r = zend.Estrndup(to, to_len)
@@ -477,9 +477,9 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if force_extra_parameters != nil {
 		extra_cmd = PhpEscapeShellCmd(force_extra_parameters)
 	} else if extra_cmd != nil {
-		extra_cmd = PhpEscapeShellCmd(extra_cmd.GetVal())
+		extra_cmd = PhpEscapeShellCmd(zend.ZSTR_VAL(extra_cmd))
 	}
-	if PhpMail(to_r, subject_r, message, b.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetVal() }, nil), b.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetVal() }, nil)) != 0 {
+	if PhpMail(to_r, subject_r, message, b.CondF1(str_headers != nil && zend.ZSTR_LEN(str_headers) != 0, func() []byte { return zend.ZSTR_VAL(str_headers) }, nil), b.CondF1(extra_cmd != nil, func() []byte { return zend.ZSTR_VAL(extra_cmd) }, nil)) != 0 {
 		zend.RETVAL_TRUE
 	} else {
 		zend.RETVAL_FALSE
@@ -608,9 +608,9 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 		var f *zend.ZendString
 		f = PhpBasename(tmp, strlen(tmp), nil, 0)
 		if headers != nil && (*headers) {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), f.GetVal(), headers)
+			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s\n%s", PhpGetuid(), zend.ZSTR_VAL(f), headers)
 		} else {
-			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s", PhpGetuid(), f.GetVal())
+			core.Spprintf(&hdr, 0, "X-PHP-Originating-Script: "+zend.ZEND_LONG_FMT+":%s", PhpGetuid(), zend.ZSTR_VAL(f))
 		}
 		zend.ZendStringReleaseEx(f, 0)
 	}

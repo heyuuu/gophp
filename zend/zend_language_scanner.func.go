@@ -499,7 +499,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	var tmp Zval
 	var retval *ZendOpArray
 	var opened_path *ZendString = nil
-	if filename.GetType() != IS_STRING {
+	if Z_TYPE_P(filename) != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetString(filename))
 		filename = &tmp
 	}
@@ -507,7 +507,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	retval = ZendCompileFile(&file_handle, type_)
 	if retval != nil && file_handle.GetStream().GetHandle() {
 		if file_handle.GetOpenedPath() == nil {
-			opened_path = ZendStringCopy(filename.GetStr())
+			opened_path = ZendStringCopy(Z_STR_P(filename))
 			file_handle.SetOpenedPath(opened_path)
 		}
 		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
@@ -530,8 +530,8 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = Z_STRLEN_P(str)
-	str.SetStr(ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0))
-	str.SetTypeInfo(IS_STRING_EX)
+	Z_STR_P(str) = ZendStringExtend(Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
+	Z_TYPE_INFO_P(str) = IS_STRING_EX
 	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
 	SCNG(yy_in) = nil
 	SCNG(yy_start) = nil
@@ -586,7 +586,7 @@ func CompileString(source_string *Zval, filename *byte) *ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *ZendOpArray = nil
 	var tmp Zval
-	if source_string.GetType() != IS_STRING {
+	if Z_TYPE_P(source_string) != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(source_string))
 	} else {
 		ZVAL_COPY(&tmp, source_string)
@@ -626,7 +626,7 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *ZendSyntaxHighlighter
 func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni, str_name *byte) int {
 	var original_lex_state ZendLexState
 	var tmp Zval
-	if str.GetType() != IS_STRING {
+	if Z_TYPE_P(str) != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(str))
 		str = &tmp
 	}
@@ -1561,7 +1561,7 @@ skip_escape_conversion:
 		if str != s {
 			Efree(str)
 		}
-		ZendStringReleaseEx(zendlval.GetStr(), 0)
+		ZendStringReleaseEx(Z_STR_P(zendlval), 0)
 		ZVAL_STR(zendlval, new_str)
 	}
 	RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
@@ -8120,12 +8120,12 @@ heredoc_scan_done:
 	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
 	if !(SCNG(heredoc_scan_ahead)) && ExecutorGlobals.GetException() == nil && PARSER_MODE() {
 		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
-		var copy *ZendString = zendlval.GetStr()
+		var copy *ZendString = Z_STR_P(zendlval)
 		if StripMultilineStringIndentation(zendlval, heredoc_label.GetIndentation(), heredoc_label.GetIndentationUsesSpaces(), newline_at_start, newline != 0) == 0 {
 			token = T_ERROR
 			goto emit_token
 		}
-		if ZendScanEscapeString(zendlval, copy.GetVal(), copy.GetLen(), 0) != SUCCESS {
+		if ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS {
 			ZendStringEfree(copy)
 			token = T_ERROR
 			goto emit_token
@@ -9015,7 +9015,7 @@ emit_token_with_str:
 	ZendCopyValue(zendlval, Yytext+offset, Yyleng-offset)
 emit_token_with_val:
 	if PARSER_MODE() {
-		ZEND_ASSERT(zendlval.GetType() != IS_UNDEF)
+		ZEND_ASSERT(Z_TYPE_P(zendlval) != IS_UNDEF)
 		elem.SetAst(ZendAstCreateZvalWithLineno(zendlval, start_line))
 	}
 emit_token:

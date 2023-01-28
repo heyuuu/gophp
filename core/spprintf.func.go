@@ -21,8 +21,8 @@ func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {
 		(*zend.SmartString)(xbuf).SetLen((*zend.SmartString)(xbuf).GetLen() + count)
 	} else {
 		zend.SmartStrAlloc((*zend.SmartStr)(xbuf), count, 0)
-		memset((*zend.SmartStr)(xbuf).GetS().GetVal()+(*zend.SmartStr)(xbuf).GetS().GetLen(), ch, count)
-		(*zend.SmartStr)(xbuf).GetS().SetLen((*zend.SmartStr)(xbuf).GetS().GetLen() + count)
+		memset(zend.ZSTR_VAL((*zend.SmartStr)(xbuf).GetS())+zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()), ch, count)
+		zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()) += count
 	}
 }
 func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) {
@@ -510,7 +510,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				if is_char != 0 {
 					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartString)(xbuf).GetLen())
 				} else {
-					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartStr)(xbuf).GetS().GetLen())
+					*(__va_arg(ap, (*int)(_))) = int(zend.ZSTR_LEN((*zend.SmartStr)(xbuf).GetS()))
 				}
 				goto skip_output
 			case 'p':

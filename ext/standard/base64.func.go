@@ -8,11 +8,11 @@ import (
 )
 
 func PhpBase64EncodeStr(str *zend.ZendString) *zend.ZendString {
-	return PhpBase64Encode((*uint8)(str.GetVal()), str.GetLen())
+	return PhpBase64Encode((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str))
 }
 func PhpBase64Decode(str *uint8, len_ int) *zend.ZendString { return PhpBase64DecodeEx(str, len_, 0) }
 func PhpBase64DecodeStr(str *zend.ZendString) *zend.ZendString {
-	return PhpBase64DecodeEx((*uint8)(str.GetVal()), str.GetLen(), 0)
+	return PhpBase64DecodeEx((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), 0)
 }
 func PhpBase64EncodeImpl(in *uint8, inl int, out *uint8) *uint8 {
 	for inl > 2 {
@@ -125,20 +125,20 @@ func PhpBase64Encode(str *uint8, length int) *zend.ZendString {
 	var p *uint8
 	var result *zend.ZendString
 	result = zend.ZendStringSafeAlloc((length+2)/3, 4*b.SizeOf("char"), 0, 0)
-	p = (*uint8)(result.GetVal())
+	p = (*uint8)(zend.ZSTR_VAL(result))
 	p = PhpBase64EncodeImpl(str, length, p)
-	result.SetLen(p - (*uint8)(result.GetVal()))
+	zend.ZSTR_LEN(result) = p - (*uint8)(zend.ZSTR_VAL(result))
 	return result
 }
 func PhpBase64DecodeEx(str *uint8, length int, strict zend.ZendBool) *zend.ZendString {
 	var result *zend.ZendString
 	var outl int = 0
 	result = zend.ZendStringAlloc(length, 0)
-	if PhpBase64DecodeImpl(str, length, (*uint8)(result.GetVal()), &outl, strict) == 0 {
+	if PhpBase64DecodeImpl(str, length, (*uint8)(zend.ZSTR_VAL(result)), &outl, strict) == 0 {
 		zend.ZendStringEfree(result)
 		return nil
 	}
-	result.SetLen(outl)
+	zend.ZSTR_LEN(result) = outl
 	return result
 }
 func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

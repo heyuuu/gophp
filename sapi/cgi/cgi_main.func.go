@@ -13,7 +13,7 @@ import (
 )
 
 func UserConfigCacheEntryDtor(el *zend.Zval) {
-	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
+	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(zend.Z_PTR_P(el))
 	zend.ZendHashDestroy(entry.GetUserConfig())
 	zend.Free(entry.GetUserConfig())
 	zend.Free(entry)
@@ -43,10 +43,10 @@ func PrintModules() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			module = _z.GetPtr()
+			module = zend.Z_PTR_P(_z)
 			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break
@@ -274,7 +274,7 @@ func SapiFcgiReadCookies() *byte {
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var array_ptr *zend.Zval = (*zend.Zval)(arg)
-	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
+	var filter_arg int = b.Cond(zend.Z_ARR_P(array_ptr) == zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
 	if core.sapi_module.GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
@@ -285,9 +285,9 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ != zend.IS_ARRAY {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
-		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
-			zend.ZendArrayDestroy(array_ptr.GetArr())
-			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
+		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && zend.Z_ARR_P(array_ptr) != zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]) {
+			zend.ZendArrayDestroy(zend.Z_ARR_P(array_ptr))
+			zend.Z_ARR_P(array_ptr) = zend.ZendArrayDup(zend.Z_ARR(core.PG(http_globals)[core.TRACK_VARS_ENV]))
 			return
 		}
 	}

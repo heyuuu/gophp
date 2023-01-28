@@ -8,8 +8,8 @@ import (
 )
 
 func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
-	object.SetGcRefcount(1)
-	object.GetGcTypeInfo() = IS_OBJECT | GC_COLLECTABLE<<GC_FLAGS_SHIFT
+	GC_SET_REFCOUNT(object, 1)
+	GC_TYPE_INFO(object) = IS_OBJECT | GC_COLLECTABLE<<GC_FLAGS_SHIFT
 	object.SetCe(ce)
 	object.SetProperties(nil)
 	ZendObjectsStorePut(object)
@@ -22,8 +22,8 @@ func ZendObjectStdDtor(object *ZendObject) {
 	var p *Zval
 	var end *Zval
 	if object.GetProperties() != nil {
-		if (object.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-			if object.GetProperties().DecGcRefcount() == 0 && object.GetProperties().GetGcType() != IS_NULL {
+		if (GC_FLAGS(object.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
+			if GC_DELREF(object.GetProperties()) == 0 && GC_TYPE(object.GetProperties()) != IS_NULL {
 				ZendArrayDestroy(object.GetProperties())
 			}
 		}
@@ -33,10 +33,10 @@ func ZendObjectStdDtor(object *ZendObject) {
 		end = p + object.GetCe().GetDefaultPropertiesCount()
 		for {
 			if Z_REFCOUNTED_P(p) {
-				if Z_ISREF_P(p) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(p.GetRef())) {
+				if Z_ISREF_P(p) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(p))) {
 					var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(object, p)
 					if prop_info.GetType() != 0 {
-						ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
+						ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(p), prop_info)
 					}
 				}
 				IZvalPtrDtor(p)
@@ -48,17 +48,17 @@ func ZendObjectStdDtor(object *ZendObject) {
 		}
 	}
 	if object.GetCe().IsUseGuards() {
-		if p.IsType(IS_STRING) {
+		if Z_TYPE_P(p) == IS_STRING {
 			ZvalPtrDtorStr(p)
-		} else if p.IsType(IS_ARRAY) {
+		} else if Z_TYPE_P(p) == IS_ARRAY {
 			var guards *HashTable
-			guards = p.GetArr()
+			guards = Z_ARRVAL_P(p)
 			ZEND_ASSERT(guards != nil)
 			ZendHashDestroy(guards)
 			FREE_HASHTABLE(guards)
 		}
 	}
-	if (object.GetGcFlags() & IS_OBJ_WEAKLY_REFERENCED) != 0 {
+	if (GC_FLAGS(object) & IS_OBJ_WEAKLY_REFERENCED) != 0 {
 		ZendWeakrefsNotify(object)
 	}
 }
@@ -79,11 +79,11 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				if ExecutorGlobals.GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
-						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", ZSTR_VAL(object.GetCe().GetName()), b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					ZendError(E_WARNING, "Call to private %s::__destruct() from context '' during shutdown ignored", ZSTR_VAL(object.GetCe().GetName()))
 					return
 				}
 
@@ -98,11 +98,11 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				if ExecutorGlobals.GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
-						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
+						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", ZSTR_VAL(object.GetCe().GetName()), b.CondF1(scope != nil, func() []byte { return ZSTR_VAL(scope.GetName()) }, ""))
 						return
 					}
 				} else {
-					ZendError(E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", object.GetCe().GetName().GetVal())
+					ZendError(E_WARNING, "Call to protected %s::__destruct() from context '' during shutdown ignored", ZSTR_VAL(object.GetCe().GetName()))
 					return
 				}
 
@@ -111,7 +111,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 
 			}
 		}
-		object.IncGcRefcount()
+		GC_ADDREF(object)
 
 		/* Make sure that destructors are protected from previously thrown exceptions.
 		 * For example, if an exception was thrown in a function and when the function's
@@ -168,10 +168,10 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			IZvalPtrDtor(dst)
 			ZVAL_COPY_VALUE_PROP(dst, src)
 			ZvalAddRef(dst)
-			if Z_ISREF_P(dst) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(dst.GetRef())) {
+			if Z_ISREF_P(dst) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(dst))) {
 				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
 				if prop_info.GetType() != 0 {
-					ZEND_REF_ADD_TYPE_SOURCE(dst.GetRef(), prop_info)
+					ZEND_REF_ADD_TYPE_SOURCE(Z_REF_P(dst), prop_info)
 				}
 			}
 			src++
@@ -185,8 +185,8 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		/* fast copy */
 
 		if old_object.GetHandlers() == &StdObjectHandlers {
-			if (old_object.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
-				old_object.GetProperties().IncGcRefcount()
+			if (GC_FLAGS(old_object.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
+				GC_ADDREF(old_object.GetProperties())
 			}
 			new_object.SetProperties(old_object.GetProperties())
 			return
@@ -195,18 +195,18 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		/* fast copy */
 
 	}
-	if old_object.GetProperties() != nil && old_object.GetProperties().GetNNumOfElements() {
+	if old_object.GetProperties() != nil && ZendHashNumElements(old_object.GetProperties()) {
 		var prop *Zval
 		var new_prop Zval
 		var num_key ZendUlong
 		var key *ZendString
 		if new_object.GetProperties() == nil {
-			new_object.SetProperties(ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
+			new_object.SetProperties(ZendNewArray(ZendHashNumElements(old_object.GetProperties())))
 			ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
-			ZendHashExtend(new_object.GetProperties(), new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().GetNNumOfElements(), 0)
+			ZendHashExtend(new_object.GetProperties(), new_object.GetProperties().GetNNumUsed()+ZendHashNumElements(old_object.GetProperties()), 0)
 		}
-		new_object.GetProperties().AddUFlags(old_object.GetProperties().GetUFlags() & HASH_FLAG_HAS_EMPTY_IND)
+		HT_FLAGS(new_object.GetProperties()) |= HT_FLAGS(old_object.GetProperties()) & HASH_FLAG_HAS_EMPTY_IND
 		for {
 			var __ht *HashTable = old_object.GetProperties()
 			var _p *Bucket = __ht.GetArData()
@@ -214,14 +214,14 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
+				if Z_TYPE_P(_z) == IS_UNDEF {
 					continue
 				}
 				num_key = _p.GetH()
 				key = _p.GetKey()
 				prop = _z
-				if prop.IsType(IS_INDIRECT) {
-					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(prop.GetZv()-old_object.GetPropertiesTable()))
+				if Z_TYPE_P(prop) == IS_INDIRECT {
+					ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(Z_INDIRECT_P(prop)-old_object.GetPropertiesTable()))
 				} else {
 					ZVAL_COPY_VALUE(&new_prop, prop)
 					ZvalAddRef(&new_prop)
@@ -239,7 +239,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		var fci ZendFcallInfo
 		var fcic ZendFcallInfoCache
 		var ret Zval
-		new_object.IncGcRefcount()
+		GC_ADDREF(new_object)
 		ZVAL_UNDEF(&ret)
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(new_object)
@@ -263,7 +263,7 @@ func ZendObjectsCloneObj(zobject *Zval) *ZendObject {
 	/* assume that create isn't overwritten, so when clone depends on the
 	 * overwritten one then it must itself be overwritten */
 
-	old_object = zobject.GetObj()
+	old_object = Z_OBJ_P(zobject)
 	new_object = ZendObjectsNew(old_object.GetCe())
 
 	/* zend_objects_clone_members() expect the properties to be initialized. */

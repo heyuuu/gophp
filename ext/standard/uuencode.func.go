@@ -36,7 +36,7 @@ func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 	*/
 
 	dest = zend.ZendStringSafeAlloc(src_len/2, 3, 46, 0)
-	p = (*uint8)(dest.GetVal())
+	p = (*uint8)(zend.ZSTR_VAL(dest))
 	s = (*uint8)(src)
 	e = s + src_len
 	for s+3 < e {
@@ -84,7 +84,7 @@ func PhpUuencode(src *byte, src_len int) *zend.ZendString {
 	b.PostInc(&(*p)) = PHP_UU_ENC('0')
 	b.PostInc(&(*p)) = '\n'
 	*p = '0'
-	dest = zend.ZendStringTruncate(dest, (*byte)(p-dest.GetVal()), 0)
+	dest = zend.ZendStringTruncate(dest, (*byte)(p-zend.ZSTR_VAL(dest)), 0)
 	return dest
 }
 func PhpUudecode(src *byte, src_len int) *zend.ZendString {
@@ -96,7 +96,7 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 	var ee *byte
 	var dest *zend.ZendString
 	dest = zend.ZendStringAlloc(int(ceil(src_len*0.75)), 0)
-	p = dest.GetVal()
+	p = zend.ZSTR_VAL(dest)
 	s = src
 	e = src + src_len
 	for s < e {
@@ -137,8 +137,8 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 		/* skip \n */
 
 	}
-	r.Assert(p >= dest.GetVal())
-	if b.Assign(&len_, total_len) > size_t(p-dest.GetVal()) {
+	r.Assert(p >= zend.ZSTR_VAL(dest))
+	if b.Assign(&len_, total_len) > size_t(p-zend.ZSTR_VAL(dest)) {
 		b.PostInc(&(*p)) = PHP_UU_DEC(*s)<<2 | PHP_UU_DEC(*(s + 1))>>4
 		if len_ > 1 {
 			b.PostInc(&(*p)) = PHP_UU_DEC(*(s + 1))<<4 | PHP_UU_DEC(*(s + 2))>>2
@@ -147,8 +147,8 @@ func PhpUudecode(src *byte, src_len int) *zend.ZendString {
 			}
 		}
 	}
-	dest.SetLen(total_len)
-	dest.GetVal()[dest.GetLen()] = '0'
+	zend.ZSTR_LEN(dest) = total_len
+	zend.ZSTR_VAL(dest)[zend.ZSTR_LEN(dest)] = '0'
 	return dest
 err:
 	zend.ZendStringEfree(dest)
@@ -224,11 +224,11 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	if src.GetLen() < 1 {
+	if zend.ZSTR_LEN(src) < 1 {
 		zend.RETVAL_FALSE
 		return
 	}
-	zend.RETVAL_STR(PhpUuencode(src.GetVal(), src.GetLen()))
+	zend.RETVAL_STR(PhpUuencode(zend.ZSTR_VAL(src), zend.ZSTR_LEN(src)))
 	return
 }
 func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -302,11 +302,11 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	if src.GetLen() < 1 {
+	if zend.ZSTR_LEN(src) < 1 {
 		zend.RETVAL_FALSE
 		return
 	}
-	if b.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
+	if b.Assign(&dest, PhpUudecode(zend.ZSTR_VAL(src), zend.ZSTR_LEN(src))) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The given parameter is not a valid uuencoded string")
 		zend.RETVAL_FALSE
 		return

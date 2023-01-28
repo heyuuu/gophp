@@ -38,7 +38,7 @@ func REGISTER_INI_BOOLEAN(name *byte) int {
 	return REGISTER_INI_DISPLAYER(name, ZendIniBooleanDisplayerCb)
 }
 func ZendRemoveIniEntries(el *Zval, arg any) int {
-	var ini_entry *ZendIniEntry = (*ZendIniEntry)(el.GetPtr())
+	var ini_entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(el))
 	var module_number int = *((*int)(arg))
 	return ini_entry.GetModuleNumber() == module_number
 }
@@ -85,7 +85,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 	return 0
 }
 func FreeIniEntry(zv *Zval) {
-	var entry *ZendIniEntry = (*ZendIniEntry)(zv.GetPtr())
+	var entry *ZendIniEntry = (*ZendIniEntry)(Z_PTR_P(zv))
 	ZendStringReleaseEx(entry.GetName(), 1)
 	if entry.GetValue() != nil {
 		ZendStringRelease(entry.GetValue())
@@ -126,10 +126,10 @@ func ZendIniDeactivate() int {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
+				if Z_TYPE_P(_z) == IS_UNDEF {
 					continue
 				}
-				ini_entry = _z.GetPtr()
+				ini_entry = Z_PTR_P(_z)
 				ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
 			}
 			break
@@ -157,7 +157,7 @@ func IniKeyCompare(a any, b any) int {
 	} else if s.GetKey() == nil {
 		return 1
 	} else {
-		return ZendBinaryStrcasecmp(f.GetKey().GetVal(), f.GetKey().GetLen(), s.GetKey().GetVal(), s.GetKey().GetLen())
+		return ZendBinaryStrcasecmp(ZSTR_VAL(f.GetKey()), ZSTR_LEN(f.GetKey()), ZSTR_VAL(s.GetKey()), ZSTR_LEN(s.GetKey()))
 	}
 }
 func ZendIniSortEntries() {
@@ -188,8 +188,8 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 			ZendUnregisterIniEntries(module_number)
 			return FAILURE
 		}
-		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, default_value.GetStr(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
-			p.SetValue(ZendNewInternedString(ZendStringCopy(default_value.GetStr())))
+		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, Z_STR_P(default_value), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
+			p.SetValue(ZendNewInternedString(ZendStringCopy(Z_STR_P(default_value))))
 		} else {
 			if ini_entry.GetValue() != nil {
 				p.SetValue(ZendStringInitInterned(ini_entry.GetValue(), ini_entry.GetValueLength(), 1))
@@ -295,13 +295,13 @@ func ZendIniLong(name *byte, name_length int, orig int) ZendLong {
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
-				return ZEND_STRTOL(ini_entry.GetOrigValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ZSTR_VAL(ini_entry.GetOrigValue()), nil, 0)
 			} else {
 				return 0
 			}
 		} else {
 			if ini_entry.GetValue() != nil {
-				return ZEND_STRTOL(ini_entry.GetValue().GetVal(), nil, 0)
+				return ZEND_STRTOL(ZSTR_VAL(ini_entry.GetValue()), nil, 0)
 			} else {
 				return 0
 			}
@@ -314,9 +314,9 @@ func ZendIniDouble(name *byte, name_length int, orig int) float64 {
 	ini_entry = ZendHashStrFindPtr(ExecutorGlobals.GetIniDirectives(), name, name_length)
 	if ini_entry != nil {
 		if orig != 0 && ini_entry.GetModified() != 0 {
-			return float64(b.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ini_entry.GetOrigValue().GetVal(), nil) }, 0.0))
+			return float64(b.CondF1(ini_entry.GetOrigValue() != nil, func() float64 { return ZendStrtod(ZSTR_VAL(ini_entry.GetOrigValue()), nil) }, 0.0))
 		} else {
-			return float64(b.CondF1(ini_entry.GetValue() != nil, func() float64 { return ZendStrtod(ini_entry.GetValue().GetVal(), nil) }, 0.0))
+			return float64(b.CondF1(ini_entry.GetValue() != nil, func() float64 { return ZendStrtod(ZSTR_VAL(ini_entry.GetValue()), nil) }, 0.0))
 		}
 	}
 	return 0.0
@@ -330,13 +330,13 @@ func ZendIniStringEx(name *byte, name_length int, orig int, exists *ZendBool) *b
 		}
 		if orig != 0 && ini_entry.GetModified() != 0 {
 			if ini_entry.GetOrigValue() != nil {
-				return ini_entry.GetOrigValue().GetVal()
+				return ZSTR_VAL(ini_entry.GetOrigValue())
 			} else {
 				return nil
 			}
 		} else {
 			if ini_entry.GetValue() != nil {
-				return ini_entry.GetValue().GetVal()
+				return ZSTR_VAL(ini_entry.GetValue())
 			} else {
 				return nil
 			}
@@ -373,10 +373,10 @@ func ZendIniGetValue(name *ZendString) *ZendString {
 	}
 }
 func ZendIniParseBool(str *ZendString) ZendBool {
-	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
+	if ZSTR_LEN(str) == 4 && strcasecmp(ZSTR_VAL(str), "true") == 0 || ZSTR_LEN(str) == 3 && strcasecmp(ZSTR_VAL(str), "yes") == 0 || ZSTR_LEN(str) == 2 && strcasecmp(ZSTR_VAL(str), "on") == 0 {
 		return 1
 	} else {
-		return atoi(str.GetVal()) != 0
+		return atoi(ZSTR_VAL(str)) != 0
 	}
 }
 func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
@@ -407,9 +407,9 @@ func ZendIniBooleanDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	var value *byte
 	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetOrigValue())
 	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetValue())
 	} else {
 		value = nil
 	}
@@ -430,9 +430,9 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 func DisplayLinkNumbers(ini_entry *ZendIniEntry, type_ int) {
 	var value *byte
 	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetOrigValue())
 	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
+		value = ZSTR_VAL(ini_entry.GetValue())
 	} else {
 		value = nil
 	}
@@ -455,14 +455,14 @@ func OnUpdateLong(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_ar
 	var p *ZendLong
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendLong)(base + int(mh_arg1))
-	*p = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	*p = ZendAtol(ZSTR_VAL(new_value), ZSTR_LEN(new_value))
 	return SUCCESS
 }
 func OnUpdateLongGEZero(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var p *ZendLong
 	var tmp ZendLong
 	var base *byte = (*byte)(mh_arg2)
-	tmp = ZendAtol(new_value.GetVal(), new_value.GetLen())
+	tmp = ZendAtol(ZSTR_VAL(new_value), ZSTR_LEN(new_value))
 	if tmp < 0 {
 		return FAILURE
 	}
@@ -474,7 +474,7 @@ func OnUpdateReal(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_ar
 	var p *float64
 	var base *byte = (*byte)(mh_arg2)
 	p = (*float64)(base + int(mh_arg1))
-	*p = ZendStrtod(new_value.GetVal(), nil)
+	*p = ZendStrtod(ZSTR_VAL(new_value), nil)
 	return SUCCESS
 }
 func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
@@ -482,7 +482,7 @@ func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_
 	var base *byte = (*byte)(mh_arg2)
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = ZSTR_VAL(new_value)
 	} else {
 		*p = nil
 	}
@@ -491,12 +491,12 @@ func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_
 func OnUpdateStringUnempty(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
-	if new_value != nil && !(new_value.GetVal()[0]) {
+	if new_value != nil && !(ZSTR_VAL(new_value)[0]) {
 		return FAILURE
 	}
 	p = (**byte)(base + int(mh_arg1))
 	if new_value != nil {
-		*p = new_value.GetVal()
+		*p = ZSTR_VAL(new_value)
 	} else {
 		*p = nil
 	}

@@ -30,7 +30,7 @@ func ERR_RETURN(out_err **zend.ZendString, local_err *zend.ZendString, fmt strin
 	if out_err != nil {
 		*out_err = local_err
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return local_err.GetVal() }, "Unspecified error"))
+		core.PhpErrorDocref(nil, zend.E_WARNING, fmt, b.CondF1(local_err != nil, func() []byte { return zend.ZSTR_VAL(local_err) }, "Unspecified error"))
 		if local_err != nil {
 			zend.ZendStringReleaseEx(local_err, 0)
 			local_err = nil

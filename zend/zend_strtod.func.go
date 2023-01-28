@@ -444,7 +444,7 @@ func Ulp(x *U) float64 {
 	L = (Word0(x) & Exp_mask) - (P-1)*Exp_msk1
 	Word0(&u) = L
 	Word1(&u) = 0
-	return u.GetD()
+	return Dval(&u)
 }
 func B2d(a *Bigint, e *int) float64 {
 	var xa *ULong
@@ -492,7 +492,7 @@ func B2d(a *Bigint, e *int) float64 {
 		Word1(&d) = z
 	}
 ret_d:
-	return d.GetD()
+	return Dval(&d)
 }
 func D2b(d *U, e *int, bits *int) *Bigint {
 	var b *Bigint
@@ -549,8 +549,8 @@ func Ratio(a *Bigint, b *Bigint) float64 {
 	var k int
 	var ka int
 	var kb int
-	da.SetD(B2d(a, &ka))
-	db.SetD(B2d(b, &kb))
+	Dval(&da) = B2d(a, &ka)
+	Dval(&db) = B2d(b, &kb)
 	k = ka - kb + 32*(a.GetWds()-b.GetWds())
 	if k > 0 {
 		Word0(&da) += k * Exp_msk1
@@ -558,7 +558,7 @@ func Ratio(a *Bigint, b *Bigint) float64 {
 		k = -k
 		Word0(&db) += k * Exp_msk1
 	}
-	return da.GetD() / db.GetD()
+	return Dval(&da) / Dval(&db)
 }
 func Dshift(b *Bigint, p2 int) int {
 	var rv int = Hi0bits(b.GetX()[b.GetWds()-1]) - 4
@@ -771,11 +771,11 @@ ret:
 		if dsign == 0 {
 		retlow1:
 		}
-		rv.SetD(rv.GetD() - Sulp(rv, bc))
+		Dval(rv) -= Sulp(rv, bc)
 	} else if dd > 0 {
 		if dsign != 0 {
 		rethi1:
-			rv.SetD(rv.GetD() + Sulp(rv, bc))
+			Dval(rv) += Sulp(rv, bc)
 		}
 	} else {
 
@@ -853,7 +853,7 @@ func ZendStrtod(s00 *byte, se **byte) float64 {
 	nz1 = nz
 	nz0 = nz1
 	sign = nz0
-	rv.SetD(0.0)
+	Dval(&rv) = 0.0
 	for s = s00; ; s++ {
 		switch *s {
 		case '-':
@@ -1037,9 +1037,9 @@ dig_done:
 	} else {
 		k = DBL_DIG + 2
 	}
-	rv.SetD(y)
+	Dval(&rv) = y
 	if k > 9 {
-		rv.SetD(Tens[k-9]*rv.GetD() + z)
+		Dval(&rv) = Tens[k-9]*Dval(&rv) + z
 	}
 	bd0 = 0
 	if nd <= DBL_DIG && Flt_Rounds == 1 {
@@ -1051,7 +1051,7 @@ dig_done:
 
 				/* rv = */
 
-				RoundedProduct(rv.GetD(), Tens[e])
+				RoundedProduct(Dval(&rv), Tens[e])
 				goto ret
 			}
 			i = DBL_DIG - nd
@@ -1062,18 +1062,18 @@ dig_done:
 				 */
 
 				e -= i
-				rv.SetD(rv.GetD() * Tens[i])
+				Dval(&rv) *= Tens[i]
 
 				/* rv = */
 
-				RoundedProduct(rv.GetD(), Tens[e])
+				RoundedProduct(Dval(&rv), Tens[e])
 				goto ret
 			}
 		} else if e >= -Ten_pmax {
 
 			/* rv = */
 
-			RoundedQuotient(rv.GetD(), Tens[-e])
+			RoundedQuotient(Dval(&rv), Tens[-e])
 			goto ret
 		}
 	}
@@ -1084,7 +1084,7 @@ dig_done:
 
 	if e1 > 0 {
 		if b.Assign(&i, e1&15) {
-			rv.SetD(rv.GetD() * Tens[i])
+			Dval(&rv) *= Tens[i]
 		}
 		if b.AssignOp(&e1, "&=", ^15) {
 			if e1 > DBL_MAX_10_EXP {
@@ -1107,7 +1107,7 @@ dig_done:
 			e1 >>= 4
 			for j = 0; e1 > 1; {
 				if (e1 & 1) != 0 {
-					rv.SetD(rv.GetD() * Bigtens[j])
+					Dval(&rv) *= Bigtens[j]
 				}
 				j++
 				e1 >>= 1
@@ -1116,7 +1116,7 @@ dig_done:
 			/* The last multiplication could overflow. */
 
 			Word0(&rv) -= P * Exp_msk1
-			rv.SetD(rv.GetD() * Bigtens[j])
+			Dval(&rv) *= Bigtens[j]
 			if b.Assign(&z, Word0(&rv)&Exp_mask) > Exp_msk1*(DBL_MAX_EXP+Bias-P) {
 				goto ovfl
 			}
@@ -1133,7 +1133,7 @@ dig_done:
 	} else if e1 < 0 {
 		e1 = -e1
 		if b.Assign(&i, e1&15) {
-			rv.SetD(rv.GetD() / Tens[i])
+			Dval(&rv) /= Tens[i]
 		}
 		if b.AssignOp(&e1, ">>=", 4) {
 			if e1 >= 1<<NBigtens {
@@ -1144,7 +1144,7 @@ dig_done:
 			}
 			for j = 0; e1 > 0; {
 				if (e1 & 1) != 0 {
-					rv.SetD(rv.GetD() * Tinytens[j])
+					Dval(&rv) *= Tinytens[j]
 				}
 				j++
 				e1 >>= 1
@@ -1170,9 +1170,9 @@ dig_done:
 				/* scaled rv is denormal; clear j low bits */
 
 			}
-			if !(rv.GetD()) {
+			if !(Dval(&rv)) {
 			undfl:
-				rv.SetD(0.0)
+				Dval(&rv) = 0.0
 				goto range_err
 			}
 		}
@@ -1386,10 +1386,10 @@ dig_done:
 				break
 			}
 			if bc.GetDsign() != 0 {
-				rv.SetD(rv.GetD() + Sulp(&rv, &bc))
+				Dval(&rv) += Sulp(&rv, &bc)
 			} else {
-				rv.SetD(rv.GetD() - Sulp(&rv, &bc))
-				if !(rv.GetD()) {
+				Dval(&rv) -= Sulp(&rv, &bc)
+				if !(Dval(&rv)) {
 					if bc.GetNd() > nd {
 						bc.SetUflchk(1)
 						break
@@ -1441,10 +1441,10 @@ dig_done:
 		/* Check for overflow */
 
 		if y == Exp_msk1*(DBL_MAX_EXP+Bias-1) {
-			rv0.SetD(rv.GetD())
+			Dval(&rv0) = Dval(&rv)
 			Word0(&rv) -= P * Exp_msk1
 			adj.SetD(aadj1 * Ulp(&rv))
-			rv.SetD(rv.GetD() + adj.GetD())
+			Dval(&rv) += adj.GetD()
 			if (Word0(&rv) & Exp_mask) >= Exp_msk1*(DBL_MAX_EXP+Bias-P) {
 				if Word0(&rv0) == Big0 && Word1(&rv0) == Big1 {
 					goto ovfl
@@ -1468,18 +1468,18 @@ dig_done:
 						aadj1 = -aadj
 					}
 				}
-				aadj2.SetD(aadj1)
+				Dval(&aadj2) = aadj1
 				Word0(&aadj2) += (2*P+1)*Exp_msk1 - y
-				aadj1 = aadj2.GetD()
+				aadj1 = Dval(&aadj2)
 				adj.SetD(aadj1 * Ulp(&rv))
-				rv.SetD(rv.GetD() + adj.GetD())
+				Dval(&rv) += adj.GetD()
 				if rv.GetD() == 0.0 {
 					req_bigcomp = 1
 					break
 				}
 			} else {
 				adj.SetD(aadj1 * Ulp(&rv))
-				rv.SetD(rv.GetD() + adj.GetD())
+				Dval(&rv) += adj.GetD()
 			}
 		}
 		z = Word0(&rv) & Exp_mask
@@ -1533,16 +1533,16 @@ dig_done:
 	if bc.GetScale() != 0 {
 		Word0(&rv0) = Exp_1 - 2*P*Exp_msk1
 		Word1(&rv0) = 0
-		rv.SetD(rv.GetD() * rv0.GetD())
+		Dval(&rv) *= Dval(&rv0)
 	}
 ret:
 	if se != nil {
 		*se = (*byte)(s)
 	}
 	if sign != 0 {
-		return -(rv.GetD())
+		return -(Dval(&rv))
 	} else {
-		return rv.GetD()
+		return Dval(&rv)
 	}
 }
 func RvAlloc(i int) *byte {
@@ -1676,13 +1676,13 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 		}
 		return NrvAlloc("NaN", rve, 3)
 	}
-	if !(u.GetD()) {
+	if !(Dval(&u)) {
 		*decpt = 1
 		return NrvAlloc("0", rve, 1)
 	}
 	b = D2b(&u, &be, &bbits)
 	if b.Assign(&i, int(Word0(&u)>>Exp_shift1&Exp_mask>>Exp_shift1)) {
-		d2.SetD(u.GetD())
+		Dval(&d2) = Dval(&u)
 		Word0(&d2) &= Frac_mask1
 		Word0(&d2) |= Exp_11
 
@@ -1720,19 +1720,19 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 		} else {
 			x = Word1(&u)<<32 - i
 		}
-		d2.SetD(x)
+		Dval(&d2) = x
 		Word0(&d2) -= 31 * Exp_msk1
 		i -= Bias + (P - 1) - 1 + 1
 		denorm = 1
 	}
-	ds = (d2.GetD()-1.5)*0.28952965 + 0.17609125 + i*0.30103
+	ds = (Dval(&d2)-1.5)*0.28952965 + 0.17609125 + i*0.30103
 	k = int(ds)
 	if ds < 0.0 && ds != k {
 		k--
 	}
 	k_check = 1
 	if k >= 0 && k <= Ten_pmax {
-		if u.GetD() < Tens[k] {
+		if Dval(&u) < Tens[k] {
 			k--
 		}
 		k_check = 0
@@ -1802,7 +1802,7 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 		/* Try to get by with floating-point arithmetic. */
 
 		i = 0
-		d2.SetD(u.GetD())
+		Dval(&d2) = Dval(&u)
 		k0 = k
 		ilim0 = ilim
 		ieps = 2
@@ -1814,7 +1814,7 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 				/* prevent overflows */
 
 				j &= Bletch - 1
-				u.SetD(u.GetD() / Bigtens[NBigtens-1])
+				Dval(&u) /= Bigtens[NBigtens-1]
 				ieps++
 			}
 			for j != 0 {
@@ -1825,37 +1825,37 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 				j >>= 1
 				i++
 			}
-			u.SetD(u.GetD() / ds)
+			Dval(&u) /= ds
 		} else if b.Assign(&j1, -k) {
-			u.SetD(u.GetD() * Tens[j1&0xf])
+			Dval(&u) *= Tens[j1&0xf]
 			for j = j1 >> 4; j != 0; {
 				if (j & 1) != 0 {
 					ieps++
-					u.SetD(u.GetD() * Bigtens[i])
+					Dval(&u) *= Bigtens[i]
 				}
 				j >>= 1
 				i++
 			}
 		}
-		if k_check != 0 && u.GetD() < 1.0 && ilim > 0 {
+		if k_check != 0 && Dval(&u) < 1.0 && ilim > 0 {
 			if ilim1 <= 0 {
 				goto fast_failed
 			}
 			ilim = ilim1
 			k--
-			u.SetD(u.GetD() * 10.0)
+			Dval(&u) *= 10.0
 			ieps++
 		}
-		eps.SetD(ieps*u.GetD() + 7.0)
+		Dval(&eps) = ieps*Dval(&u) + 7.0
 		Word0(&eps) -= (P - 1) * Exp_msk1
 		if ilim == 0 {
 			mhi = 0
 			S = mhi
-			u.SetD(u.GetD() - 5.0)
-			if u.GetD() > eps.GetD() {
+			Dval(&u) -= 5.0
+			if Dval(&u) > Dval(&eps) {
 				goto one_digit
 			}
-			if u.GetD() < -(eps.GetD()) {
+			if Dval(&u) < -(Dval(&eps)) {
 				goto no_digits
 			}
 			goto fast_failed
@@ -1866,16 +1866,16 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 			 * generating digits needed.
 			 */
 
-			eps.SetD(0.5/Tens[ilim-1] - eps.GetD())
+			Dval(&eps) = 0.5/Tens[ilim-1] - Dval(&eps)
 			if k0 < 0 && j1 >= 307 {
 				eps1.SetD(Infinity)
 				Word0(&eps1) -= Exp_msk1 * (Bias + P - 1)
-				eps1.SetD(eps1.GetD() * Tens[j1&0xf])
+				Dval(&eps1) *= Tens[j1&0xf]
 				i = 0
 				j = j1 - 256>>4
 				for j != 0 {
 					if (j & 1) != 0 {
-						eps1.SetD(eps1.GetD() * Bigtens[i])
+						Dval(&eps1) *= Bigtens[i]
 					}
 					j >>= 1
 					i++
@@ -1885,36 +1885,36 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 				}
 			}
 			for i = 0; ; {
-				L = u.GetD()
-				u.SetD(u.GetD() - L)
+				L = Dval(&u)
+				Dval(&u) -= L
 				b.PostInc(&(*s)) = '0' + int(L)
-				if 1.0-u.GetD() < eps.GetD() {
+				if 1.0-Dval(&u) < Dval(&eps) {
 					goto bump_up
 				}
-				if u.GetD() < eps.GetD() {
+				if Dval(&u) < Dval(&eps) {
 					goto ret1
 				}
 				if b.PreInc(&i) >= ilim {
 					break
 				}
-				eps.SetD(eps.GetD() * 10.0)
-				u.SetD(u.GetD() * 10.0)
+				Dval(&eps) *= 10.0
+				Dval(&u) *= 10.0
 			}
 		} else {
 
 			/* Generate ilim digits, then fix them up. */
 
-			eps.SetD(eps.GetD() * Tens[ilim-1])
+			Dval(&eps) *= Tens[ilim-1]
 			for i = 1; ; {
-				L = Long(u.GetD())
-				if !(b.AssignOp(&(u.GetD()), "-=", L)) {
+				L = Long(Dval(&u))
+				if !(b.AssignOp(&(Dval(&u)), "-=", L)) {
 					ilim = i
 				}
 				b.PostInc(&(*s)) = '0' + int(L)
 				if i == ilim {
-					if u.GetD() > 0.5+eps.GetD() {
+					if Dval(&u) > 0.5+Dval(&eps) {
 						goto bump_up
-					} else if u.GetD() < 0.5-eps.GetD() {
+					} else if Dval(&u) < 0.5-Dval(&eps) {
 						for (*(b.PreDec(&s))) == '0' {
 
 						}
@@ -1924,12 +1924,12 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 					break
 				}
 				i++
-				u.SetD(u.GetD() * 10.0)
+				Dval(&u) *= 10.0
 			}
 		}
 	fast_failed:
 		s = s0
-		u.SetD(d2.GetD())
+		Dval(&u) = Dval(&d2)
 		k = k0
 		ilim = ilim0
 	}
@@ -1944,21 +1944,21 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 		if ndigits < 0 && ilim <= 0 {
 			mhi = 0
 			S = mhi
-			if ilim < 0 || u.GetD() <= 5*ds {
+			if ilim < 0 || Dval(&u) <= 5*ds {
 				goto no_digits
 			}
 			goto one_digit
 		}
 		for i = 1; ; {
-			L = Long(u.GetD() / ds)
-			u.SetD(u.GetD() - L*ds)
+			L = Long(Dval(&u) / ds)
+			Dval(&u) -= L * ds
 			b.PostInc(&(*s)) = '0' + int(L)
-			if !(u.GetD()) {
+			if !(Dval(&u)) {
 				break
 			}
 			if i == ilim {
-				u.SetD(u.GetD() + u.GetD())
-				if u.GetD() > ds || u.GetD() == ds && (L&1) != 0 {
+				Dval(&u) += Dval(&u)
+				if Dval(&u) > ds || Dval(&u) == ds && (L&1) != 0 {
 				bump_up:
 					for (*(b.PreDec(&s))) == '9' {
 						if s == s0 {
@@ -1972,7 +1972,7 @@ func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **by
 				break
 			}
 			i++
-			u.SetD(u.GetD() * 10.0)
+			Dval(&u) *= 10.0
 		}
 		goto ret1
 	}

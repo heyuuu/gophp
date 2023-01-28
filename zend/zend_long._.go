@@ -2,8 +2,6 @@
 
 package zend
 
-import "math"
-
 // Source: <Zend/zend_long.h>
 
 /*
@@ -30,20 +28,20 @@ const ZEND_ENABLE_ZVAL_LONG64 = 1
 
 /* Integer types. */
 
-type ZendLong = int
-type ZendUlong = uint
-type ZendOffT = int
+type ZendLong = int64
+type ZendUlong = uint64
+type ZendOffT = int64
 
-const ZEND_LONG_MAX ZendLong = math.MaxInt
-const ZEND_LONG_MIN ZendLong = math.MinInt
-const ZEND_ULONG_MAX = math.MaxUint
+const ZEND_LONG_MAX ZendLong = INT64_MAX
+const ZEND_LONG_MIN float = INT64_MIN
+const ZEND_ULONG_MAX = UINT64_MAX
 const SIZEOF_ZEND_LONG = 8
 
 /* Conversion macros. */
 
 const ZEND_LTOA_BUF_LEN = 65
-const ZEND_LONG_FMT string = "%lld"
-const ZEND_ULONG_FMT string = "%llu"
+const ZEND_LONG_FMT string = "%" + "lld"
+const ZEND_ULONG_FMT *byte = "%" + "llu"
 const ZEND_XLONG_FMT = "%" + PRIx64
 const ZEND_LONG_FMT_SPEC = "lld"
 const ZEND_ULONG_FMT_SPEC = "llu"

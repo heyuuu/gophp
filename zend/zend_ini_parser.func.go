@@ -8,14 +8,14 @@ import (
 )
 
 func GetIntVal(op *Zval) int {
-	switch op.GetType() {
+	switch Z_TYPE_P(op) {
 	case IS_LONG:
-		return op.GetLval()
+		return Z_LVAL_P(op)
 	case IS_DOUBLE:
-		return int(op.GetDval())
+		return int(Z_DVAL_P(op))
 	case IS_STRING:
 		var val int = atoi(Z_STRVAL_P(op))
-		ZendStringFree(op.GetStr())
+		ZendStringFree(Z_STR_P(op))
 		return val
 	default:
 		break
@@ -66,14 +66,14 @@ func ZendIniInitString(result *Zval) {
 func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 	var length int
 	var op1_len int
-	if op1.GetType() != IS_STRING {
+	if Z_TYPE_P(op1) != IS_STRING {
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
 
 		if ZEND_SYSTEM_INI != 0 {
 			var tmp_str *ZendString
 			var str *ZendString = ZvalGetTmpString(op1, &tmp_str)
-			ZVAL_PSTRINGL(op1, str.GetVal(), str.GetLen())
+			ZVAL_PSTRINGL(op1, ZSTR_VAL(str), ZSTR_LEN(str))
 			ZendTmpStringRelease(tmp_str)
 		} else {
 			ZVAL_STR(op1, ZvalGetStringFunc(op1))
@@ -83,11 +83,11 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 
 	}
 	op1_len = int(Z_STRLEN_P(op1))
-	if op2.GetType() != IS_STRING {
+	if Z_TYPE_P(op2) != IS_STRING {
 		ConvertToString(op2)
 	}
 	length = op1_len + int(Z_STRLEN_P(op2))
-	ZVAL_NEW_STR(result, ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
+	ZVAL_NEW_STR(result, ZendStringExtend(Z_STR_P(op1), length, ZEND_SYSTEM_INI))
 	memcpy(Z_STRVAL_P(result)+op1_len, Z_STRVAL_P(op2), Z_STRLEN_P(op2)+1)
 }
 func ZendIniGetConstant(result *Zval, name *Zval) {
@@ -96,8 +96,8 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 
-	if !(memchr(Z_STRVAL_P(name), ':', Z_STRLEN_P(name))) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
-		if c.GetType() != IS_STRING {
+	if !(memchr(Z_STRVAL_P(name), ':', Z_STRLEN_P(name))) && b.Assign(&c, ZendGetConstant(Z_STR_P(name))) != 0 {
+		if Z_TYPE_P(c) != IS_STRING {
 			ZVAL_COPY_OR_DUP(&tmp, c)
 			if Z_OPT_CONSTANT(tmp) {
 				ZvalUpdateConstantEx(&tmp, nil)
@@ -107,9 +107,9 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 		}
 		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(c), Z_STRLEN_P(c), ZEND_SYSTEM_INI))
 		if c == &tmp {
-			ZendStringRelease(tmp.GetStr())
+			ZendStringRelease(Z_STR(tmp))
 		}
-		ZendStringFree(name.GetStr())
+		ZendStringFree(Z_STR_P(name))
 	} else {
 		*result = *name
 	}
@@ -122,7 +122,7 @@ func ZendIniGetVar(result *Zval, name *Zval) {
 
 	/* Fetch configuration option value */
 
-	if b.Assign(&curval, ZendGetConfigurationDirective(name.GetStr())) != nil {
+	if b.Assign(&curval, ZendGetConfigurationDirective(Z_STR_P(name))) != nil {
 		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(curval), Z_STRLEN_P(curval), ZEND_SYSTEM_INI))
 	} else if b.Assign(&envvar, ZendGetenv(Z_STRVAL_P(name), Z_STRLEN_P(name))) != nil || b.Assign(&envvar, getenv(Z_STRVAL_P(name))) != nil {
 		ZVAL_NEW_STR(result, ZendStringInit(envvar, strlen(envvar), ZEND_SYSTEM_INI))
@@ -189,8 +189,8 @@ func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int,
 	}
 }
 func ZvalIniDtor(zv *Zval) {
-	if zv.IsType(IS_STRING) {
-		ZendStringRelease(zv.GetStr())
+	if Z_TYPE_P(zv) == IS_STRING {
+		ZendStringRelease(Z_STR_P(zv))
 	}
 }
 func YY_(Msgid string) string { return Msgid }

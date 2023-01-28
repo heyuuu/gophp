@@ -2,11 +2,6 @@
 
 package zend
 
-import (
-	"math"
-	b "sik/builtin"
-)
-
 // Source: <Zend/zend_types.h>
 
 /*
@@ -38,10 +33,10 @@ const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1
 )
-const ZEND_SIZE_MAX = math.MaxUint
+const ZEND_SIZE_MAX = SIZE_MAX
 
-type ZendIntptrT = uintptr
-type ZendUintptrT = uintptr
+type ZendIntptrT = intPtr
+type ZendUintptrT = uintPtr
 
 type CompareFuncT func(any, any) int
 type SwapFuncT func(any, any)
@@ -69,28 +64,26 @@ type CopyCtorFuncT func(pElement *Zval)
  * construction.
  */
 
-type ZendType uint // uintptr
+type ZendType = uintPtr
+type HashTable = ZendArray
 
-func (this ZendType) IsSet() bool { return this > 0x3 }
-func (this ZendType) IsCode() bool {
-	return this > 0x3 && this <= 0x3ff
-}
-func (this ZendType) IsClass() bool { return this > 0x3ff }
-func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
-func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
-func (this ZendType) Name() *ZendString {
-	var ptr = this &^ 0x3
-	return b.ForceCastPtr[ZendString](ptr)
-}
-func (this ZendType) Ce() *ZendClassEntry {
-	var ptr = this &^ 0x3
-	return b.ForceCastPtr[ZendClassEntry](ptr)
-}
-func (this ZendType) Code() int       { return this >> int64(2) }
-func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
+/*
+ * HashTable Data Layout
+ * =====================
+ *
+ *                 +=============================+
+ *                 | HT_HASH(ht, ht->nTableMask) |
+ *                 | ...                         |
+ *                 | HT_HASH(ht, -1)             |
+ *                 +-----------------------------+
+ * ht->arData ---> | Bucket[0]                   |
+ *                 | ...                         |
+ *                 | Bucket[ht->nTableSize-1]    |
+ *                 +=============================+
+ */
 
-const HT_INVALID_IDX uint32 = math.MaxUint32  // uint32(-1)
-const HT_MIN_MASK uint32 = math.MaxUint32 - 1 // uint32(-2)
+const HT_INVALID_IDX uint32 = uint32 - 1
+const HT_MIN_MASK uint32 = uint32 - 2
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 
@@ -134,6 +127,11 @@ const _IS_NUMBER = 20
 const Z_TYPE_MASK = 0xff
 const Z_TYPE_FLAGS_MASK = 0xff00
 const Z_TYPE_FLAGS_SHIFT = 8
+const GC_TYPE_MASK = 0xf
+const GC_FLAGS_MASK = 0x3f0
+const GC_INFO_MASK = 0xfffffc00
+const GC_FLAGS_SHIFT = 0
+const GC_INFO_SHIFT = 10
 
 /* zval_gc_flags(zval.value->gc.u.type_info) (common flags) */
 

@@ -9,10 +9,10 @@ import (
 func ZendWeakrefFrom(o *ZendObject) *ZendWeakref {
 	return (*ZendWeakref)((*byte)(o) - zend_long((*byte)(&((*ZendWeakref)(nil).GetStd()))-(*byte)(nil)))
 }
-func ZendWeakrefFetch(z *Zval) *ZendWeakref { return ZendWeakrefFrom(z.GetObj()) }
+func ZendWeakrefFetch(z *Zval) *ZendWeakref { return ZendWeakrefFrom(Z_OBJ_P(z)) }
 func ZendWeakrefUnref(zv *Zval) {
-	var wr *ZendWeakref = (*ZendWeakref)(zv.GetPtr())
-	wr.GetReferent().DelGcFlags(IS_OBJ_WEAKLY_REFERENCED)
+	var wr *ZendWeakref = (*ZendWeakref)(Z_PTR_P(zv))
+	GC_DEL_FLAGS(wr.GetReferent(), IS_OBJ_WEAKLY_REFERENCED)
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
@@ -31,11 +31,11 @@ func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	return wr.GetStd()
 }
 func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
-	var wr *ZendWeakref = ZendHashIndexFindPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(referent.GetObj()))
+	var wr *ZendWeakref = ZendHashIndexFindPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(Z_OBJ_P(referent)))
 	if wr == nil {
 		return 0
 	}
-	wr.GetStd().IncGcRefcount()
+	GC_ADDREF(wr.GetStd())
 	ZVAL_OBJ(return_value, wr.GetStd())
 	return 1
 }
@@ -43,9 +43,9 @@ func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
 	var wr *ZendWeakref
 	ObjectInitEx(return_value, ZendCeWeakref)
 	wr = ZendWeakrefFetch(return_value)
-	wr.SetReferent(referent.GetObj())
+	wr.SetReferent(Z_OBJ_P(referent))
 	ZendHashIndexAddPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(wr.GetReferent()), wr)
-	wr.GetReferent().AddGcFlags(IS_OBJ_WEAKLY_REFERENCED)
+	GC_ADD_FLAGS(wr.GetReferent(), IS_OBJ_WEAKLY_REFERENCED)
 }
 func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 	var wr *ZendWeakref = ZendWeakrefFetch(weakref)

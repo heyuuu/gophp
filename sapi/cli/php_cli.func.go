@@ -32,10 +32,10 @@ func PrintModules() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
-			module = _z.GetPtr()
+			module = zend.Z_PTR_P(_z)
 			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break

@@ -980,11 +980,11 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var key *zend.ZendString = zend.ZendStringInit(name, name_len, 1)
 	zend.ZVAL_NEW_STR(&zvalue, zend.ZendStringInit(value, value_len, 1))
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
-	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
+	zend.GC_MAKE_PERSISTENT_LOCAL(zend.Z_STR(zvalue))
 	zend.ZendHashAdd(&FcgiMgmtVars, key, &zvalue)
 	zend.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zv.GetStr(), 1) }
+func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zend.Z_STR_P(zv), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

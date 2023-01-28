@@ -60,7 +60,7 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 	}
 	if context != nil {
 		zend.AddPropertyResource(object, "context", context.GetRes())
-		context.GetRes().IncGcRefcount()
+		zend.GC_ADDREF(context.GetRes())
 	} else {
 		zend.AddPropertyNull(object, "context")
 	}
@@ -70,16 +70,16 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		var retval zend.Zval
 		fci.SetSize(b.SizeOf("fci"))
 		zend.ZVAL_UNDEF(fci.GetFunctionName())
-		fci.SetObject(object.GetObj())
+		fci.SetObject(zend.Z_OBJ_P(object))
 		fci.SetRetval(&retval)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
 		fcc.SetFunctionHandler(uwrap.GetCe().GetConstructor())
 		fcc.SetCalledScope(zend.Z_OBJCE_P(object))
-		fcc.SetObject(object.GetObj())
+		fcc.SetObject(zend.Z_OBJ_P(object))
 		if zend.ZendCallFunction(&fci, &fcc) == zend.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", zend.ZSTR_VAL(uwrap.GetCe().GetName()), zend.ZSTR_VAL(uwrap.GetCe().GetConstructor().GetFunctionName()))
 			zend.ZvalPtrDtor(object)
 			zend.ZVAL_UNDEF(object)
 		} else {
@@ -148,8 +148,8 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 
 		/* if the opened path is set, copy it out */
 
-		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).IsType(zend.IS_STRING) && opened_path != nil {
-			*opened_path = zend.ZendStringCopy(zend.Z_REFVAL(args[3]).GetStr())
+		if zend.Z_ISREF(args[3]) && zend.Z_TYPE_P(zend.Z_REFVAL(args[3])) == zend.IS_STRING && opened_path != nil {
+			*opened_path = zend.ZendStringCopy(zend.Z_STR_P(zend.Z_REFVAL(args[3])))
 		}
 
 		/* set wrapper data to be a reference to our object */
@@ -251,8 +251,8 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	uwrap = (*PhpUserStreamWrapper)(zend.Ecalloc(1, b.SizeOf("* uwrap")))
-	uwrap.SetProtoname(zend.Estrndup(protocol.GetVal(), protocol.GetLen()))
-	uwrap.SetClassname(zend.Estrndup(classname.GetVal(), classname.GetLen()))
+	uwrap.SetProtoname(zend.Estrndup(zend.ZSTR_VAL(protocol), zend.ZSTR_LEN(protocol)))
+	uwrap.SetClassname(zend.Estrndup(zend.ZSTR_VAL(classname), zend.ZSTR_LEN(classname)))
 	uwrap.GetWrapper().SetWops(&UserStreamWops)
 	uwrap.GetWrapper().SetAbstract(uwrap)
 	uwrap.GetWrapper().SetIsUrl((flags & core.PHP_STREAM_IS_URL) != 0)
@@ -266,12 +266,12 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 			/* We failed.  But why? */
 
 			if zend.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", zend.ZSTR_VAL(protocol))
 			} else {
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.GetVal(), protocol.GetVal())
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", zend.ZSTR_VAL(classname), zend.ZSTR_VAL(protocol))
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
@@ -281,7 +281,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", classname.GetVal())
+		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", zend.ZSTR_VAL(classname))
 	}
 	zend.ZendListDelete(rsrc)
 	zend.RETVAL_FALSE
@@ -297,7 +297,7 @@ func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value
 
 		/* We failed */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", protocol.GetVal())
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", zend.ZSTR_VAL(protocol))
 		zend.RETVAL_FALSE
 		return
 	}
@@ -315,13 +315,13 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
 	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", zend.ZSTR_VAL(protocol))
 		zend.RETVAL_FALSE
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
 	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", zend.ZSTR_VAL(protocol))
 		zend.RETVAL_TRUE
 		return
 	}
@@ -330,7 +330,7 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 
 	PhpUnregisterUrlStreamWrapperVolatile(protocol)
 	if PhpRegisterUrlStreamWrapperVolatile(protocol, wrapper) == zend.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", zend.ZSTR_VAL(protocol))
 		zend.RETVAL_FALSE
 		return
 	}
@@ -358,7 +358,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 			didwrite = -1
 		} else {
 			zend.ConvertToLong(&retval)
-			didwrite = retval.GetLval()
+			didwrite = zend.Z_LVAL(retval)
 		}
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_WRITE+" is not implemented!", us.GetWrapper().GetClassname())
@@ -501,7 +501,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	zend.ZVAL_STRINGL(&func_name, USERSTREAM_TELL, b.SizeOf("USERSTREAM_TELL")-1)
 	call_result = zend.CallUserFunction(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.IsType(zend.IS_LONG) {
-		*newoffs = retval.GetLval()
+		*newoffs = zend.Z_LVAL(retval)
 		ret = 0
 	} else if call_result == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_TELL+" is not implemented!", us.GetWrapper().GetClassname())
@@ -521,43 +521,43 @@ func StatbufFromArray(array *zend.Zval, ssb *core.PhpStreamStatbuf) int {
 	// #define STAT_PROP_ENTRY(name) STAT_PROP_ENTRY_EX ( name , name )
 
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "dev", b.SizeOf("\"dev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "dev", b.SizeOf("\"dev\"")-1)) {
 		ssb.GetSb().st_dev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ino", b.SizeOf("\"ino\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "ino", b.SizeOf("\"ino\"")-1)) {
 		ssb.GetSb().st_ino = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mode", b.SizeOf("\"mode\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "mode", b.SizeOf("\"mode\"")-1)) {
 		ssb.GetSb().st_mode = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "nlink", b.SizeOf("\"nlink\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "nlink", b.SizeOf("\"nlink\"")-1)) {
 		ssb.GetSb().st_nlink = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "uid", b.SizeOf("\"uid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "uid", b.SizeOf("\"uid\"")-1)) {
 		ssb.GetSb().st_uid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "gid", b.SizeOf("\"gid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "gid", b.SizeOf("\"gid\"")-1)) {
 		ssb.GetSb().st_gid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "rdev", b.SizeOf("\"rdev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "rdev", b.SizeOf("\"rdev\"")-1)) {
 		ssb.GetSb().st_rdev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "size", b.SizeOf("\"size\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "size", b.SizeOf("\"size\"")-1)) {
 		ssb.GetSb().st_size = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "atime", b.SizeOf("\"atime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "atime", b.SizeOf("\"atime\"")-1)) {
 		ssb.GetSb().st_atime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mtime", b.SizeOf("\"mtime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "mtime", b.SizeOf("\"mtime\"")-1)) {
 		ssb.GetSb().st_mtime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ctime", b.SizeOf("\"ctime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "ctime", b.SizeOf("\"ctime\"")-1)) {
 		ssb.GetSb().st_ctime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blksize", b.SizeOf("\"blksize\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "blksize", b.SizeOf("\"blksize\"")-1)) {
 		ssb.GetSb().st_blksize = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blocks", b.SizeOf("\"blocks\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "blocks", b.SizeOf("\"blocks\"")-1)) {
 		ssb.GetSb().st_blocks = zend.ZvalGetLong(elem)
 	}
 	return zend.SUCCESS
@@ -610,17 +610,17 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	case core.PHP_STREAM_OPTION_LOCKING:
 		zend.ZVAL_LONG(&args[0], 0)
 		if (value & LOCK_NB) != 0 {
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_NB)
+			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_NB
 		}
 		switch value & ^LOCK_NB {
 		case LOCK_SH:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_SH)
+			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_SH
 			break
 		case LOCK_EX:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_EX)
+			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_EX
 			break
 		case LOCK_UN:
-			args[0].SetLval(args[0].GetLval() | standard.PHP_LOCK_UN)
+			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_UN
 			break
 		}
 
@@ -652,7 +652,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		zend.ZVAL_STRINGL(&func_name, USERSTREAM_TRUNCATE, b.SizeOf("USERSTREAM_TRUNCATE")-1)
 		switch value {
 		case core.PHP_STREAM_TRUNCATE_SUPPORTED:
-			if zend.ZendIsCallableEx(&func_name, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() *zend.ZendObject { return us.GetObject().GetObj() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
+			if zend.ZendIsCallableEx(&func_name, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() *zend.ZendObject { return zend.Z_OBJ(us.GetObject()) }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
 				ret = core.PHP_STREAM_OPTION_RETURN_OK
 			} else {
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR

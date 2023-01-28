@@ -379,7 +379,7 @@ func PhpStreamTempSetOption(stream *core.PhpStream, option int, value int, ptrpa
 	switch option {
 	case core.PHP_STREAM_OPTION_META_DATA_API:
 		if ts.GetMeta().GetType() != zend.IS_UNDEF {
-			zend.ZendHashCopy((*zend.Zval)(ptrparam).GetArr(), ts.GetMeta().GetArr(), zend.ZvalAddRef)
+			zend.ZendHashCopy(zend.Z_ARRVAL_P((*zend.Zval)(ptrparam)), zend.Z_ARRVAL(ts.GetMeta()), zend.ZvalAddRef)
 		}
 		return core.PHP_STREAM_OPTION_RETURN_OK
 	default:
@@ -534,8 +534,8 @@ func PhpStreamUrlWrapRfc2397(wrapper *core.PhpStreamWrapper, path *byte, mode *b
 			PhpStreamWrapperLogError(wrapper, options, "rfc2397: unable to decode")
 			return nil
 		}
-		comma = base64_comma.GetVal()
-		ilen = base64_comma.GetLen()
+		comma = zend.ZSTR_VAL(base64_comma)
+		ilen = zend.ZSTR_LEN(base64_comma)
 	} else {
 		comma = zend.Estrndup(comma, dlen)
 		dlen = PhpUrlDecode(comma, dlen)

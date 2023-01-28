@@ -23,7 +23,7 @@ func PhpInfoPrintHtmlEsc(str *byte, len_ int) int {
 	var written int
 	var new_str *zend.ZendString
 	new_str = PhpEscapeHtmlEntities((*uint8)(str), len_, 0, ENT_QUOTES, "utf-8")
-	written = core.PhpOutputWrite(new_str.GetVal(), new_str.GetLen())
+	written = core.PhpOutputWrite(zend.ZSTR_VAL(new_str), zend.ZSTR_LEN(new_str))
 	zend.ZendStringFree(new_str)
 	return written
 }
@@ -45,7 +45,7 @@ func PhpInfoPrint(str *byte) int {
 func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 	var key *zend.ZendString
 	if ht != nil {
-		if ht.GetNNumOfElements() {
+		if zend.ZendHashNumElements(ht) {
 			var first int = 1
 			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
@@ -59,7 +59,7 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					key = _p.GetKey()
@@ -70,9 +70,9 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 							PhpInfoPrint(", ")
 						}
 						if core.sapi_module.GetPhpinfoAsText() == 0 {
-							PhpInfoPrintHtmlEsc(key.GetVal(), key.GetLen())
+							PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(key), zend.ZSTR_LEN(key))
 						} else {
-							PhpInfoPrint(key.GetVal())
+							PhpInfoPrint(zend.ZSTR_VAL(key))
 						}
 					}
 				}
@@ -94,8 +94,8 @@ func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
 	if zend_module.GetInfoFunc() != nil || zend_module.GetVersion() != nil {
 		if core.sapi_module.GetPhpinfoAsText() == 0 {
 			var url_name *zend.ZendString = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
-			PhpStrtolower(url_name.GetVal(), url_name.GetLen())
-			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", url_name.GetVal(), zend_module.GetName())
+			PhpStrtolower(zend.ZSTR_VAL(url_name), zend.ZSTR_LEN(url_name))
+			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", zend.ZSTR_VAL(url_name), zend_module.GetName())
 			zend.Efree(url_name)
 		} else {
 			PhpInfoPrintTableStart()
@@ -126,15 +126,15 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	var key *zend.ZendString
 	key = zend.ZendStringInit(name, name_length, 0)
 	zend.ZendIsAutoGlobal(key)
-	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.GetSymbolTable()), key)) != nil && data.IsType(zend.IS_ARRAY) {
+	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.GetSymbolTable()), key)) != nil && zend.Z_TYPE_P(data) == zend.IS_ARRAY {
 		for {
-			var __ht *zend.HashTable = data.GetArr()
+			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
 				num_key = _p.GetH()
@@ -149,9 +149,9 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 				PhpInfoPrint("['")
 				if string_key != nil {
 					if core.sapi_module.GetPhpinfoAsText() == 0 {
-						PhpInfoPrintHtmlEsc(string_key.GetVal(), string_key.GetLen())
+						PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(string_key), zend.ZSTR_LEN(string_key))
 					} else {
-						PhpInfoPrint(string_key.GetVal())
+						PhpInfoPrint(zend.ZSTR_VAL(string_key))
 					}
 				} else {
 					PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
@@ -163,11 +163,11 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 					PhpInfoPrint(" => ")
 				}
 				zend.ZVAL_DEREF(tmp)
-				if tmp.IsType(zend.IS_ARRAY) {
+				if zend.Z_TYPE_P(tmp) == zend.IS_ARRAY {
 					if core.sapi_module.GetPhpinfoAsText() == 0 {
 						var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
 						PhpInfoPrint("<pre>")
-						PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
+						PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
 						PhpInfoPrint("</pre>")
 						zend.ZendStringReleaseEx(str, 0)
 					} else {
@@ -177,13 +177,13 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 					var tmp2 *zend.ZendString
 					var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
 					if core.sapi_module.GetPhpinfoAsText() == 0 {
-						if str.GetLen() == 0 {
+						if zend.ZSTR_LEN(str) == 0 {
 							PhpInfoPrint("<i>no value</i>")
 						} else {
-							PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
+							PhpInfoPrintHtmlEsc(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
 						}
 					} else {
-						PhpInfoPrint(str.GetVal())
+						PhpInfoPrint(zend.ZSTR_VAL(str))
 					}
 					zend.ZendTmpStringRelease(tmp2)
 				}
@@ -282,7 +282,7 @@ func PhpPrintInfo(flag int) {
 		}
 		PhpInfoPrintBoxEnd()
 		PhpInfoPrintTableStart()
-		PhpInfoPrintTableRow(2, "System", php_uname.GetVal())
+		PhpInfoPrintTableRow(2, "System", zend.ZSTR_VAL(php_uname))
 		PhpInfoPrintTableRow(2, "Build Date", __DATE__+" "+__TIME__)
 		PhpInfoPrintTableRow(2, "Configure Command", core.CONFIGURE_COMMAND)
 		if core.sapi_module.GetPrettyName() != nil {
@@ -354,7 +354,7 @@ func PhpPrintInfo(flag int) {
 	if (flag & PHP_INFO_MODULES) != 0 {
 		var sorted_registry zend.HashTable
 		var module *zend.ZendModuleEntry
-		zend.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
+		zend.ZendHashInit(&sorted_registry, zend.ZendHashNumElements(&zend.ModuleRegistry), nil, nil, 1)
 		zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 		for {
@@ -364,10 +364,10 @@ func PhpPrintInfo(flag int) {
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				module = _z.GetPtr()
+				module = zend.Z_PTR_P(_z)
 				if module.GetInfoFunc() != nil || module.GetVersion() != nil {
 					PhpInfoPrintModule(module)
 				}
@@ -384,10 +384,10 @@ func PhpPrintInfo(flag int) {
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
+				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 					continue
 				}
-				module = _z.GetPtr()
+				module = zend.Z_PTR_P(_z)
 				if module.GetInfoFunc() == nil && module.GetVersion() == nil {
 					PhpInfoPrintModule(module)
 				}
@@ -421,16 +421,16 @@ func PhpPrintInfo(flag int) {
 		SECTION("PHP Variables")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(2, "Variable", "Value")
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && data.IsType(zend.IS_STRING) {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_SELF", b.SizeOf("\"PHP_SELF\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_SELF", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && data.IsType(zend.IS_STRING) {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_TYPE", b.SizeOf("\"PHP_AUTH_TYPE\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_TYPE", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && data.IsType(zend.IS_STRING) {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_USER", zend.Z_STRVAL_P(data))
 		}
-		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && data.IsType(zend.IS_STRING) {
+		if b.Assign(&data, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), "PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1)) != nil && zend.Z_TYPE_P(data) == zend.IS_STRING {
 			PhpInfoPrintTableRow(2, "PHP_AUTH_PW", zend.Z_STRVAL_P(data))
 		}
 		PhpPrintGpcseArray(zend.ZEND_STRL("_REQUEST"))

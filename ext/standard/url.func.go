@@ -103,7 +103,7 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 		}
 		if e+1 == ue {
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			return ret
 		}
 
@@ -126,12 +126,12 @@ func PhpUrlParseEx2(str *byte, length int, has_port *zend.ZendBool) *PhpUrl {
 				goto parse_port
 			}
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			s = e + 1
 			goto just_path
 		} else {
 			ret.SetScheme(zend.ZendStringInit(s, e-s, 0))
-			PhpReplaceControlcharsEx(ret.GetScheme().GetVal(), ret.GetScheme().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetScheme()), zend.ZSTR_LEN(ret.GetScheme()))
 			if e+2 < ue && (*(e + 2)) == '/' {
 				s = e + 3
 				if zend.ZendStringEqualsLiteralCi(ret.GetScheme(), "file") {
@@ -202,13 +202,13 @@ parse_host:
 	if b.Assign(&p, zend.ZendMemrchr(s, '@', e-s)) {
 		if b.Assign(&pp, memchr(s, ':', p-s)) {
 			ret.SetUser(zend.ZendStringInit(s, pp-s, 0))
-			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetUser()), zend.ZSTR_LEN(ret.GetUser()))
 			pp++
 			ret.SetPass(zend.ZendStringInit(pp, p-pp, 0))
-			PhpReplaceControlcharsEx(ret.GetPass().GetVal(), ret.GetPass().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetPass()), zend.ZSTR_LEN(ret.GetPass()))
 		} else {
 			ret.SetUser(zend.ZendStringInit(s, p-s, 0))
-			PhpReplaceControlcharsEx(ret.GetUser().GetVal(), ret.GetUser().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetUser()), zend.ZSTR_LEN(ret.GetUser()))
 		}
 		s = p + 1
 	}
@@ -263,7 +263,7 @@ parse_host:
 		return nil
 	}
 	ret.SetHost(zend.ZendStringInit(s, p-s, 0))
-	PhpReplaceControlcharsEx(ret.GetHost().GetVal(), ret.GetHost().GetLen())
+	PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetHost()), zend.ZSTR_LEN(ret.GetHost()))
 	if e == ue {
 		return ret
 	}
@@ -275,7 +275,7 @@ just_path:
 		p++
 		if p < e {
 			ret.SetFragment(zend.ZendStringInit(p, e-p, 0))
-			PhpReplaceControlcharsEx(ret.GetFragment().GetVal(), ret.GetFragment().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetFragment()), zend.ZSTR_LEN(ret.GetFragment()))
 		}
 		e = p - 1
 	}
@@ -284,13 +284,13 @@ just_path:
 		p++
 		if p < e {
 			ret.SetQuery(zend.ZendStringInit(p, e-p, 0))
-			PhpReplaceControlcharsEx(ret.GetQuery().GetVal(), ret.GetQuery().GetLen())
+			PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetQuery()), zend.ZSTR_LEN(ret.GetQuery()))
 		}
 		e = p - 1
 	}
 	if s < e || s == ue {
 		ret.SetPath(zend.ZendStringInit(s, e-s, 0))
-		PhpReplaceControlcharsEx(ret.GetPath().GetVal(), ret.GetPath().GetLen())
+		PhpReplaceControlcharsEx(zend.ZSTR_VAL(ret.GetPath()), zend.ZSTR_LEN(ret.GetPath()))
 	}
 	return ret
 }
@@ -440,35 +440,35 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if resource.GetScheme() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetScheme())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
 	}
 	if resource.GetHost() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetHost())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
 	}
 	if has_port != 0 {
 		zend.ZVAL_LONG(&tmp, resource.GetPort())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
 	}
 	if resource.GetUser() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetUser())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
 	}
 	if resource.GetPass() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPass())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
 	}
 	if resource.GetPath() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPath())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
 	}
 	if resource.GetQuery() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetQuery())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
 	}
 	if resource.GetFragment() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetFragment())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
+		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -501,7 +501,7 @@ func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
 	from = (*uint8)(s)
 	end = (*uint8)(s + len_)
 	start = zend.ZendStringSafeAlloc(3, len_, 0, 0)
-	to = (*uint8)(start.GetVal())
+	to = (*uint8)(zend.ZSTR_VAL(start))
 	for from < end {
 		*from++
 		c = (*from) - 1
@@ -517,7 +517,7 @@ func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
 		}
 	}
 	*to = '0'
-	start = zend.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
+	start = zend.ZendStringTruncate(start, to-(*uint8)(zend.ZSTR_VAL(start)), 0)
 	return start
 }
 func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -589,7 +589,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_STR(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
+	zend.RETVAL_STR(PhpUrlEncode(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str)))
 	return
 }
 func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -662,8 +662,8 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
-	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
+	out_str = zend.ZendStringInit(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str), 0)
+	zend.ZSTR_LEN(out_str) = PhpUrlDecode(zend.ZSTR_VAL(out_str), zend.ZSTR_LEN(out_str))
 	zend.RETVAL_NEW_STR(out_str)
 	return
 }
@@ -692,7 +692,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *zend.ZendString {
 	var str *zend.ZendString
 	var ret *byte
 	str = zend.ZendStringSafeAlloc(3, len_, 0, 0)
-	ret = str.GetVal()
+	ret = zend.ZSTR_VAL(str)
 	x = 0
 	y = 0
 	for b.PostDec(&len_) {
@@ -779,7 +779,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	zend.RETVAL_STR(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
+	zend.RETVAL_STR(PhpRawUrlEncode(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str)))
 	return
 }
 func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -852,8 +852,8 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
-	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
+	out_str = zend.ZendStringInit(zend.ZSTR_VAL(in_str), zend.ZSTR_LEN(in_str), 0)
+	zend.ZSTR_LEN(out_str) = PhpRawUrlDecode(zend.ZSTR_VAL(out_str), zend.ZSTR_LEN(out_str))
 	zend.RETVAL_NEW_STR(out_str)
 	return
 }
@@ -975,22 +975,22 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	zend.ArrayInit(return_value)
 	for {
-		var __ht *zend.HashTable = stream.GetWrapperdata().GetArr()
+		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream.GetWrapperdata())
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			hdr = _z
-			if hdr.GetType() != zend.IS_STRING {
+			if zend.Z_TYPE_P(hdr) != zend.IS_STRING {
 				continue
 			}
 			if format == 0 {
 			no_name_header:
-				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(hdr.GetStr()))
+				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(zend.Z_STR_P(hdr)))
 			} else {
 				var c byte
 				var s *byte
@@ -1002,7 +1002,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 					for isspace(int(*((*uint8)(s)))) {
 						s++
 					}
-					if b.Assign(&prev_val, zend.ZendHashStrFind(return_value.GetArr(), zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
+					if b.Assign(&prev_val, zend.ZendHashStrFind(zend.Z_ARRVAL_P(return_value), zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
 						zend.AddAssocStringlEx(return_value, zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
 					} else {
 						zend.ConvertToArray(prev_val)

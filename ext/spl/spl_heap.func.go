@@ -12,7 +12,7 @@ import (
 func SplHeapFromObj(obj *zend.ZendObject) *SplHeapObject {
 	return (*SplHeapObject)((*byte)(obj - zend_long((*byte)(&((*SplHeapObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLHEAP_P(zv *zend.Zval) *SplHeapObject { return SplHeapFromObj(zv.GetObj()) }
+func Z_SPLHEAP_P(zv *zend.Zval) *SplHeapObject { return SplHeapFromObj(zend.Z_OBJ_P(zv)) }
 func SplHeapElem(heap *SplPtrHeap, i int) any {
 	return any((*byte)(heap.GetElements() + heap.GetElemSize()*i))
 }
@@ -85,7 +85,7 @@ func SplPtrHeapZvalMaxCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, a, b)
-	return int(result.GetLval())
+	return int(zend.Z_LVAL(result))
 }
 func SplPtrHeapZvalMinCmp(x any, y any, object *zend.Zval) int {
 	var a *zend.Zval = x
@@ -111,7 +111,7 @@ func SplPtrHeapZvalMinCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, b, a)
-	return int(result.GetLval())
+	return int(zend.Z_LVAL(result))
 }
 func SplPtrPqueueElemCmp(x any, y any, object *zend.Zval) int {
 	var a *SplPqueueElem = x
@@ -139,7 +139,7 @@ func SplPtrPqueueElemCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, a_priority_p, b_priority_p)
-	return int(result.GetLval())
+	return int(zend.Z_LVAL(result))
 }
 func SplPtrHeapInit(cmp SplPtrHeapCmpFunc, ctor SplPtrHeapCtorFunc, dtor SplPtrHeapDtorFunc, elem_size int) *SplPtrHeap {
 	var heap *SplPtrHeap = zend.Emalloc(b.SizeOf("spl_ptr_heap"))
@@ -325,7 +325,7 @@ func SplHeapObjectNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 func SplHeapObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var old_object *zend.ZendObject
 	var new_object *zend.ZendObject
-	old_object = zobject.GetObj()
+	old_object = zend.Z_OBJ_P(zobject)
 	new_object = SplHeapObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -343,7 +343,7 @@ func SplHeapObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
 		*count = 0
 		return zend.FAILURE
 	}
-	*count = intern.GetHeap().GetCount()
+	*count = SplPtrHeapCount(intern.GetHeap())
 	return zend.SUCCESS
 }
 func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.HashTable {
@@ -356,7 +356,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
-	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
+	debug_info = zend.ZendNewArray(zend.ZendHashNumElements(intern.GetStd().GetProperties()) + 1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(ce, "flags", b.SizeOf("\"flags\"")-1)
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
@@ -405,7 +405,7 @@ func zim_spl_SplHeap_count(execute_data *zend.ZendExecuteData, return_value *zen
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	count = intern.GetHeap().GetCount()
+	count = SplPtrHeapCount(intern.GetHeap())
 	zend.RETVAL_LONG(count)
 	return
 }
@@ -414,7 +414,7 @@ func zim_spl_SplHeap_isEmpty(execute_data *zend.ZendExecuteData, return_value *z
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.GetHeap().GetCount() == 0)
+	zend.RETVAL_BOOL(SplPtrHeapCount(intern.GetHeap()) == 0)
 	return
 }
 func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -724,7 +724,7 @@ func SplHeapGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) 
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit(iterator.GetIntern().GetIt())
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
+	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), zend.Z_OBJ_P(object))
 	iterator.GetIntern().GetIt().SetFuncs(&SplHeapItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())
@@ -741,7 +741,7 @@ func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
+	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), zend.Z_OBJ_P(object))
 	iterator.GetIntern().GetIt().SetFuncs(&SplPqueueItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())

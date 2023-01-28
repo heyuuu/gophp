@@ -77,7 +77,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		return nil
 	}
 	if !(zend.ZendStringEqualsLiteralCi(resource.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(resource.GetScheme(), "https")) {
-		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || tmpzval.GetType() != zend.IS_STRING || zend.Z_STRLEN_P(tmpzval) == 0 {
+		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) == nil || zend.Z_TYPE_P(tmpzval) != zend.IS_STRING || zend.Z_STRLEN_P(tmpzval) == 0 {
 			PhpUrlFree(resource)
 			return core.PhpStreamOpenWrapperEx(path, mode, core.REPORT_ERRORS, nil, context)
 		}
@@ -98,7 +98,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			PhpUrlFree(resource)
 			return nil
 		}
-		use_ssl = resource.GetScheme() != nil && resource.GetScheme().GetLen() > 4 && resource.GetScheme().GetVal()[4] == 's'
+		use_ssl = resource.GetScheme() != nil && zend.ZSTR_LEN(resource.GetScheme()) > 4 && zend.ZSTR_VAL(resource.GetScheme())[4] == 's'
 
 		/* choose default ports */
 
@@ -107,12 +107,12 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		} else if resource.GetPort() == 0 {
 			resource.SetPort(80)
 		}
-		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
+		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "proxy")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
 			use_proxy = 1
 			transport_len = zend.Z_STRLEN_P(tmpzval)
 			transport_string = zend.Estrndup(zend.Z_STRVAL_P(tmpzval), zend.Z_STRLEN_P(tmpzval))
 		} else {
-			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", b.Cond(use_ssl != 0, "ssl", "tcp"), resource.GetHost().GetVal(), resource.GetPort())
+			transport_len = core.Spprintf(&transport_string, 0, "%s://%s:%d", b.Cond(use_ssl != 0, "ssl", "tcp"), zend.ZSTR_VAL(resource.GetHost()), resource.GetPort())
 		}
 	}
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, wrapper.GetWops().GetLabel(), "timeout")) != nil {
@@ -128,7 +128,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_TIMEOUT, 0, &timeout)
 	}
 	if errstr != nil {
-		streams.PhpStreamWrapperLogError(wrapper, options, "%s", errstr.GetVal())
+		streams.PhpStreamWrapperLogError(wrapper, options, "%s", zend.ZSTR_VAL(errstr))
 		zend.ZendStringReleaseEx(errstr, 0)
 		errstr = nil
 	}
@@ -144,7 +144,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			zend.ZvalPtrDtor(&ssl_proxy_peer_name)
 		}
 		zend.SmartStrAppendl(&header, "CONNECT ", b.SizeOf("\"CONNECT \"")-1)
-		zend.SmartStrAppends(&header, resource.GetHost().GetVal())
+		zend.SmartStrAppends(&header, zend.ZSTR_VAL(resource.GetHost()))
 		zend.SmartStrAppendc(&header, ':')
 		zend.SmartStrAppendUnsigned(&header, resource.GetPort())
 		zend.SmartStrAppendl(&header, " HTTP/1.0\r\n", b.SizeOf("\" HTTP/1.0\\r\\n\"")-1)
@@ -154,20 +154,20 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 			var s *byte
 			var p *byte
-			if tmpzval.IsType(zend.IS_ARRAY) {
+			if zend.Z_TYPE_P(tmpzval) == zend.IS_ARRAY {
 				var tmpheader *zend.Zval = nil
 				for {
-					var __ht *zend.HashTable = tmpzval.GetArr()
+					var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
 					var _p *zend.Bucket = __ht.GetArData()
 					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
 						var _z *zend.Zval = _p.GetVal()
 
-						if _z.IsType(zend.IS_UNDEF) {
+						if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 							continue
 						}
 						tmpheader = _z
-						if tmpheader.IsType(zend.IS_STRING) {
+						if zend.Z_TYPE_P(tmpheader) == zend.IS_STRING {
 							s = zend.Z_STRVAL_P(tmpheader)
 							for {
 								for (*s) == ' ' || (*s) == '\t' {
@@ -204,7 +204,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 					}
 					break
 				}
-			} else if tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) != 0 {
+			} else if zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) != 0 {
 				s = zend.Z_STRVAL_P(tmpzval)
 				for {
 					for (*s) == ' ' || (*s) == '\t' {
@@ -241,7 +241,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		}
 	finish:
 		zend.SmartStrAppendl(&header, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
-		if core.PhpStreamWrite(stream, header.GetS().GetVal(), header.GetS().GetLen()) != header.GetS().GetLen() {
+		if core.PhpStreamWrite(stream, zend.ZSTR_VAL(header.GetS()), zend.ZSTR_LEN(header.GetS())) != zend.ZSTR_LEN(header.GetS()) {
 			streams.PhpStreamWrapperLogError(wrapper, options, "Cannot connect to HTTPS server through proxy")
 			core.PhpStreamClose(stream)
 			stream = nil
@@ -297,14 +297,14 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	}
 	custom_request_method = 0
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "method")) != nil {
-		if tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
+		if zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
 
 			/* As per the RFC, automatically redirected requests MUST NOT use other methods than
 			 * GET and HEAD unless it can be confirmed by the user */
 
 			if redirected == 0 || zend.Z_STRLEN_P(tmpzval) == 3 && memcmp("GET", zend.Z_STRVAL_P(tmpzval), 3) == 0 || zend.Z_STRLEN_P(tmpzval) == 4 && memcmp("HEAD", zend.Z_STRVAL_P(tmpzval), 4) == 0 {
 				custom_request_method = 1
-				zend.SmartStrAppend(&req_buf, tmpzval.GetStr())
+				zend.SmartStrAppend(&req_buf, zend.Z_STR_P(tmpzval))
 				zend.SmartStrAppendc(&req_buf, ' ')
 			}
 
@@ -334,8 +334,8 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 		/* Send the traditional /path/to/file?query_string */
 
-		if resource.GetPath() != nil && resource.GetPath().GetLen() != 0 {
-			zend.SmartStrAppends(&req_buf, resource.GetPath().GetVal())
+		if resource.GetPath() != nil && zend.ZSTR_LEN(resource.GetPath()) != 0 {
+			zend.SmartStrAppends(&req_buf, zend.ZSTR_VAL(resource.GetPath()))
 		} else {
 			zend.SmartStrAppendc(&req_buf, '/')
 		}
@@ -344,7 +344,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 		if resource.GetQuery() != nil {
 			zend.SmartStrAppendc(&req_buf, '?')
-			zend.SmartStrAppends(&req_buf, resource.GetQuery().GetVal())
+			zend.SmartStrAppends(&req_buf, zend.ZSTR_VAL(resource.GetQuery()))
 		}
 
 		/* query string */
@@ -365,22 +365,22 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	}
 	if context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "header")) != nil {
 		tmp = nil
-		if tmpzval.IsType(zend.IS_ARRAY) {
+		if zend.Z_TYPE_P(tmpzval) == zend.IS_ARRAY {
 			var tmpheader *zend.Zval = nil
 			var tmpstr zend.SmartStr = zend.SmartStr{0}
 			for {
-				var __ht *zend.HashTable = tmpzval.GetArr()
+				var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
 				var _p *zend.Bucket = __ht.GetArData()
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
+					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 						continue
 					}
 					tmpheader = _z
-					if tmpheader.IsType(zend.IS_STRING) {
-						zend.SmartStrAppend(&tmpstr, tmpheader.GetStr())
+					if zend.Z_TYPE_P(tmpheader) == zend.IS_STRING {
+						zend.SmartStrAppend(&tmpstr, zend.Z_STR_P(tmpheader))
 						zend.SmartStrAppendl(&tmpstr, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
 					}
 				}
@@ -397,28 +397,28 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 			/* Remove newlines and spaces from start and end. there's at least one extra \r\n at the end that needs to go. */
 
-		} else if tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) != 0 {
+		} else if zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) != 0 {
 
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
 
-			tmp = PhpTrim(tmpzval.GetStr(), nil, 0, 3)
+			tmp = PhpTrim(zend.Z_STR_P(tmpzval), nil, 0, 3)
 
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
 
 		}
-		if tmp != nil && tmp.GetLen() != 0 {
+		if tmp != nil && zend.ZSTR_LEN(tmp) != 0 {
 			var s *byte
 			var t *byte
-			user_headers = zend.Estrndup(tmp.GetVal(), tmp.GetLen())
-			if tmp.GetGcRefcount() > 1 {
-				tmp.DecGcRefcount()
-				tmp = zend.ZendStringInit(tmp.GetVal(), tmp.GetLen(), 0)
+			user_headers = zend.Estrndup(zend.ZSTR_VAL(tmp), zend.ZSTR_LEN(tmp))
+			if zend.GC_REFCOUNT(tmp) > 1 {
+				zend.GC_DELREF(tmp)
+				tmp = zend.ZendStringInit(zend.ZSTR_VAL(tmp), zend.ZSTR_LEN(tmp), 0)
 			}
 
 			/* Make lowercase for easy comparison against 'standard' headers */
 
-			PhpStrtolower(tmp.GetVal(), tmp.GetLen())
-			t = tmp.GetVal()
+			PhpStrtolower(zend.ZSTR_VAL(tmp), zend.ZSTR_LEN(tmp))
+			t = zend.ZSTR_VAL(tmp)
 			if header_init == 0 {
 
 				/* strip POST headers on redirect */
@@ -496,19 +496,19 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 		/* decode the strings first */
 
-		PhpUrlDecode(resource.GetUser().GetVal(), resource.GetUser().GetLen())
-		strcpy(scratch, resource.GetUser().GetVal())
+		PhpUrlDecode(zend.ZSTR_VAL(resource.GetUser()), zend.ZSTR_LEN(resource.GetUser()))
+		strcpy(scratch, zend.ZSTR_VAL(resource.GetUser()))
 		strcat(scratch, ":")
 
 		/* Note: password is optional! */
 
 		if resource.GetPass() != nil {
-			PhpUrlDecode(resource.GetPass().GetVal(), resource.GetPass().GetLen())
-			strcat(scratch, resource.GetPass().GetVal())
+			PhpUrlDecode(zend.ZSTR_VAL(resource.GetPass()), zend.ZSTR_LEN(resource.GetPass()))
+			strcat(scratch, zend.ZSTR_VAL(resource.GetPass()))
 		}
 		stmp = PhpBase64Encode((*uint8)(scratch), strlen(scratch))
 		zend.SmartStrAppends(&req_buf, "Authorization: Basic ")
-		zend.SmartStrAppends(&req_buf, stmp.GetVal())
+		zend.SmartStrAppends(&req_buf, zend.ZSTR_VAL(stmp))
 		zend.SmartStrAppends(&req_buf, "\r\n")
 		streams.PhpStreamNotifyInfo(context, streams.PHP_STREAM_NOTIFY_AUTH_REQUIRED, nil, 0)
 		zend.ZendStringFree(stmp)
@@ -527,7 +527,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 	if (have_header & HTTP_HEADER_HOST) == 0 {
 		zend.SmartStrAppends(&req_buf, "Host: ")
-		zend.SmartStrAppends(&req_buf, resource.GetHost().GetVal())
+		zend.SmartStrAppends(&req_buf, zend.ZSTR_VAL(resource.GetHost()))
 		if use_ssl != 0 && resource.GetPort() != 443 && resource.GetPort() != 0 || use_ssl == 0 && resource.GetPort() != 80 && resource.GetPort() != 0 {
 			zend.SmartStrAppendc(&req_buf, ':')
 			zend.SmartStrAppendUnsigned(&req_buf, resource.GetPort())
@@ -545,7 +545,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	if (have_header & HTTP_HEADER_CONNECTION) == 0 {
 		zend.SmartStrAppends(&req_buf, "Connection: close\r\n")
 	}
-	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && ua_zval.IsType(zend.IS_STRING) {
+	if context != nil && b.Assign(&ua_zval, streams.PhpStreamContextGetOption(context, "http", "user_agent")) != nil && zend.Z_TYPE_P(ua_zval) == zend.IS_STRING {
 		ua_str = zend.Z_STRVAL_P(ua_zval)
 	} else if FG(user_agent) {
 		ua_str = FG(user_agent)
@@ -578,7 +578,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		 * see bug #44603 for details. Since Content-Type maybe part of user's headers we need to do this check first.
 		 */
 
-		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
+		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
 			zend.SmartStrAppends(&req_buf, "Content-Length: ")
 			zend.SmartStrAppendUnsigned(&req_buf, zend.Z_STRLEN_P(tmpzval))
 			zend.SmartStrAppends(&req_buf, "\r\n")
@@ -591,7 +591,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 	/* Request content, such as for POST requests */
 
-	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
+	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && zend.Z_TYPE_P(tmpzval) == zend.IS_STRING && zend.Z_STRLEN_P(tmpzval) > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
 			zend.SmartStrAppends(&req_buf, "Content-Length: ")
 			zend.SmartStrAppendUnsigned(&req_buf, zend.Z_STRLEN_P(tmpzval))
@@ -609,7 +609,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 	/* send it */
 
-	core.PhpStreamWrite(stream, req_buf.GetS().GetVal(), req_buf.GetS().GetLen())
+	core.PhpStreamWrite(stream, zend.ZSTR_VAL(req_buf.GetS()), zend.ZSTR_LEN(req_buf.GetS()))
 	location[0] = '0'
 	if zend.Z_ISUNDEF_P(response_header) {
 		zend.ArrayInit(response_header)
@@ -681,7 +681,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 		}
 		zend.ZVAL_STRINGL(&http_response, tmp_line, tmp_line_len)
-		zend.ZendHashNextIndexInsert(response_header.GetArr(), &http_response)
+		zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_response)
 	} else {
 		core.PhpStreamClose(stream)
 		stream = nil
@@ -774,7 +774,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 						decode = zend.ZendIsTrue(tmpzval)
 					}
 					if decode != 0 {
-						transfer_encoding = streams.PhpStreamFilterCreate("dechunk", nil, stream.GetIsPersistent())
+						transfer_encoding = streams.PhpStreamFilterCreate("dechunk", nil, core.PhpStreamIsPersistent(stream))
 						if transfer_encoding != nil {
 
 							/* don't store transfer-encodeing header */
@@ -792,7 +792,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 			var http_header zend.Zval
 			zend.ZVAL_STRINGL(&http_header, http_header_line, http_header_line_length)
-			zend.ZendHashNextIndexInsert(response_header.GetArr(), &http_header)
+			zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_header)
 		} else {
 			break
 		}
@@ -813,22 +813,22 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			if strlen(location) < 8 || strncasecmp(location, "http://", b.SizeOf("\"http://\"")-1) && strncasecmp(location, "https://", b.SizeOf("\"https://\"")-1) && strncasecmp(location, "ftp://", b.SizeOf("\"ftp://\"")-1) && strncasecmp(location, "ftps://", b.SizeOf("\"ftps://\"")-1) {
 				if (*location) != '/' {
 					if (*(location + 1)) != '0' && resource.GetPath() != nil {
-						var s *byte = strrchr(resource.GetPath().GetVal(), '/')
+						var s *byte = strrchr(zend.ZSTR_VAL(resource.GetPath()), '/')
 						if s == nil {
-							s = resource.GetPath().GetVal()
-							if resource.GetPath().GetLen() == 0 {
+							s = zend.ZSTR_VAL(resource.GetPath())
+							if zend.ZSTR_LEN(resource.GetPath()) == 0 {
 								zend.ZendStringReleaseEx(resource.GetPath(), 0)
 								resource.SetPath(zend.ZendStringInit("/", 1, 0))
-								s = resource.GetPath().GetVal()
+								s = zend.ZSTR_VAL(resource.GetPath())
 							} else {
 								*s = '/'
 							}
 						}
 						s[1] = '0'
-						if resource.GetPath() != nil && resource.GetPath().GetVal()[0] == '/' && resource.GetPath().GetVal()[1] == '0' {
-							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s%s", resource.GetPath().GetVal(), location)
+						if resource.GetPath() != nil && zend.ZSTR_VAL(resource.GetPath())[0] == '/' && zend.ZSTR_VAL(resource.GetPath())[1] == '0' {
+							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s%s", zend.ZSTR_VAL(resource.GetPath()), location)
 						} else {
-							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s/%s", resource.GetPath().GetVal(), location)
+							core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "%s/%s", zend.ZSTR_VAL(resource.GetPath()), location)
 						}
 					} else {
 						core.Snprintf(loc_path, b.SizeOf("loc_path")-1, "/%s", location)
@@ -837,9 +837,9 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 					strlcpy(loc_path, location, b.SizeOf("loc_path"))
 				}
 				if use_ssl != 0 && resource.GetPort() != 443 || use_ssl == 0 && resource.GetPort() != 80 {
-					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s:%d%s", resource.GetScheme().GetVal(), resource.GetHost().GetVal(), resource.GetPort(), loc_path)
+					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s:%d%s", zend.ZSTR_VAL(resource.GetScheme()), zend.ZSTR_VAL(resource.GetHost()), resource.GetPort(), loc_path)
 				} else {
-					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s%s", resource.GetScheme().GetVal(), resource.GetHost().GetVal(), loc_path)
+					core.Snprintf(new_path, b.SizeOf("new_path")-1, "%s://%s%s", zend.ZSTR_VAL(resource.GetScheme()), zend.ZSTR_VAL(resource.GetHost()), loc_path)
 				}
 			} else {
 				strlcpy(new_path, location, b.SizeOf("new_path"))
@@ -856,9 +856,9 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 				if val != nil {
 					var s *uint8
 					var e *uint8
-					val.SetLen(PhpUrlDecode(val.GetVal(), val.GetLen()))
-					s = (*uint8)(val.GetVal())
-					e = s + val.GetLen()
+					zend.ZSTR_LEN(val) = PhpUrlDecode(zend.ZSTR_VAL(val), zend.ZSTR_LEN(val))
+					s = (*uint8)(zend.ZSTR_VAL(val))
+					e = s + zend.ZSTR_LEN(val)
 					for s < e {
 						if iscntrl(*s) {
 							streams.PhpStreamWrapperLogError(wrapper, options, "Invalid redirect URL! %s", new_path)

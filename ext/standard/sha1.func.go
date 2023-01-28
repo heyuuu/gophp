@@ -89,7 +89,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_SHA1Init(&context)
-	PHP_SHA1Update(&context, (*uint8)(arg.GetVal()), arg.GetLen())
+	PHP_SHA1Update(&context, (*uint8)(zend.ZSTR_VAL(arg)), zend.ZSTR_LEN(arg))
 	PHP_SHA1Final(digest, &context)
 	if raw_output != 0 {
 		zend.RETVAL_STRINGL((*byte)(digest), 20)

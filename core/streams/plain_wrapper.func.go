@@ -115,7 +115,7 @@ func _phpStreamFopenTemporaryFile(dir *byte, pfx string, opened_path_ptr **zend.
 		if stream != nil {
 			var self *PhpStdioStreamData = (*PhpStdioStreamData)(stream.GetAbstract())
 			stream.SetWrapper((*core.PhpStreamWrapper)(&PhpPlainFilesWrapper))
-			stream.SetOrigPath(zend.Estrndup(opened_path.GetVal(), opened_path.GetLen()))
+			stream.SetOrigPath(zend.Estrndup(zend.ZSTR_VAL(opened_path), zend.ZSTR_LEN(opened_path)))
 			self.SetTempName(opened_path)
 			self.SetLockFlag(LOCK_UN)
 			return stream
@@ -285,7 +285,7 @@ func PhpStdiopClose(stream *core.PhpStream, close_handle int) int {
 			return 0
 		}
 		if data.GetTempName() != nil {
-			unlink(data.GetTempName().GetVal())
+			unlink(zend.ZSTR_VAL(data.GetTempName()))
 
 			/* temporary streams are never persistent */
 
@@ -972,8 +972,8 @@ not_relative_path:
 	/* check in provided path */
 
 	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = exec_filename.GetVal()
-		var exec_fname_length int = exec_filename.GetLen()
+		var exec_fname *byte = zend.ZSTR_VAL(exec_filename)
+		var exec_fname_length int = zend.ZSTR_LEN(exec_filename)
 		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}

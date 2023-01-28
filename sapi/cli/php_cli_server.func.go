@@ -22,7 +22,7 @@ func PhpCliServerGetSystemTime(buf *byte) int {
 	core.PhpAsctimeR(&tm, buf)
 	return 0
 }
-func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zv.GetPtr(), 1) }
+func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zend.Z_PTR_P(zv), 1) }
 func GetLastError() *byte        { return zend.Pestrdup(strerror(errno), 1) }
 func StatusComp(a any, b any) int {
 	var pa *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(a)
@@ -121,7 +121,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	client = core.SG(server_context)
 	headers = client.GetRequest().GetHeadersOriginalCase()
-	zend.ArrayInitSize(return_value, headers.GetNNumOfElements())
+	zend.ArrayInitSize(return_value, zend.ZendHashNumElements(headers))
 	for {
 		var __ht *zend.HashTable = headers
 		var _p *zend.Bucket = __ht.GetArData()
@@ -129,13 +129,13 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
 				continue
 			}
 			key = _p.GetKey()
-			value = _z.GetPtr()
+			value = zend.Z_PTR_P(_z)
 			zend.ZVAL_STRING(&tmp, value)
-			zend.ZendSymtableUpdate(return_value.GetArr(), key, &tmp)
+			zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), key, &tmp)
 		}
 		break
 	}
@@ -243,7 +243,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 	}
 	zend.SmartStrAppendl(&buffer, "\r\n", 2)
-	PhpCliServerClientSendThrough(client, buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	PhpCliServerClientSendThrough(client, zend.ZSTR_VAL(buffer.GetS()), zend.ZSTR_LEN(buffer.GetS()))
 	zend.SmartStrFree(&buffer)
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
@@ -282,8 +282,8 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args ...any, hash_
 		var real_key *byte
 		var key *byte
 		var i uint32
-		key = zend.Estrndup(hash_key.GetKey().GetVal(), hash_key.GetKey().GetLen())
-		for i = 0; i < hash_key.GetKey().GetLen(); i++ {
+		key = zend.Estrndup(zend.ZSTR_VAL(hash_key.GetKey()), zend.ZSTR_LEN(hash_key.GetKey()))
+		for i = 0; i < zend.ZSTR_LEN(hash_key.GetKey()); i++ {
 			if key[i] == '-' {
 				key[i] = '_'
 			} else {
@@ -1064,7 +1064,7 @@ func PhpCliServerClientSaveHeader(client *PhpCliServerClient) {
 
 	var orig_header_name *zend.ZendString = zend.ZendStringInit(client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen(), 1)
 	var lc_header_name *zend.ZendString = zend.ZendStringAlloc(client.GetCurrentHeaderNameLen(), 1)
-	zend.ZendStrTolowerCopy(lc_header_name.GetVal(), client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen())
+	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lc_header_name), client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen())
 	zend.GC_MAKE_PERSISTENT_LOCAL(orig_header_name)
 	zend.GC_MAKE_PERSISTENT_LOCAL(lc_header_name)
 	zend.ZendHashAddPtr(client.GetRequest().GetHeaders(), lc_header_name, client.GetCurrentHeaderValue())
@@ -1302,8 +1302,8 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetAddrLen(addr_len)
 	var addr_str *zend.ZendString = 0
 	core.PhpNetworkPopulateNameFromSockaddr(addr, addr_len, &addr_str, nil, 0)
-	client.SetAddrStr(zend.Pestrndup(addr_str.GetVal(), addr_str.GetLen(), 1))
-	client.SetAddrStrLen(addr_str.GetLen())
+	client.SetAddrStr(zend.Pestrndup(zend.ZSTR_VAL(addr_str), zend.ZSTR_LEN(addr_str), 1))
+	client.SetAddrStrLen(zend.ZSTR_LEN(addr_str))
 	zend.ZendStringReleaseEx(addr_str, 0)
 	PhpHttpParserInit(client.GetParser(), PHP_HTTP_REQUEST)
 	client.SetRequestRead(0)
@@ -1369,7 +1369,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	if chunk == nil {
 		goto fail
 	}
-	core.Snprintf(chunk.GetDataHeapP(), chunk.GetDataHeapLen(), content_template, status_string, escaped_request_uri.GetVal())
+	core.Snprintf(chunk.GetDataHeapP(), chunk.GetDataHeapLen(), content_template, status_string, zend.ZSTR_VAL(escaped_request_uri))
 	chunk.SetDataHeapLen(strlen(chunk.GetDataHeapP()))
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
 	var epilogue_template []byte = "</body></html>"
@@ -1396,7 +1396,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	zend.SmartStrAppendUnsignedEx(&buffer, PhpCliServerBufferSize(client.GetContentSender().GetBuffer()), 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
-	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), zend.ZSTR_VAL(buffer.GetS()), zend.ZSTR_LEN(buffer.GetS()))
 	if chunk == nil {
 		zend.SmartStrFreeEx(&buffer, 1)
 		goto fail
@@ -1485,7 +1485,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	zend.SmartStrAppendUnsignedEx(&buffer, client.GetRequest().GetSb().st_size, 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
 	zend.SmartStrAppendlEx(&buffer, "\r\n", 2, 1)
-	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
+	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), zend.ZSTR_VAL(buffer.GetS()), zend.ZSTR_LEN(buffer.GetS()))
 	if chunk == nil {
 		zend.SmartStrFreeEx(&buffer, 1)
 		PhpCliServerLogResponse(client, 500, nil)
@@ -1654,7 +1654,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 	}
 }
 func PhpCliServerClientDtorWrapper(zv *zend.Zval) {
-	var p *PhpCliServerClient = zv.GetPtr()
+	var p *PhpCliServerClient = zend.Z_PTR_P(zv)
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
 	PhpCliServerPollerRemove(p.GetServer().GetPoller(), POLLIN|POLLOUT, p.GetSock())
@@ -1709,7 +1709,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, rou
 	}
 	server_sock = PhpNetworkListenSocket(host, &port, SOCK_STREAM, server.GetAddressFamily(), server.GetSocklen(), &errstr)
 	if server_sock == core.SOCK_ERR {
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
+		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, b.CondF1(errstr != nil, func() []byte { return zend.ZSTR_VAL(errstr) }, "?"))
 		if errstr != nil {
 			zend.ZendStringReleaseEx(errstr, 0)
 		}

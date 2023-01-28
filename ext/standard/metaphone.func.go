@@ -85,7 +85,7 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if Metaphone((*uint8)(str.GetVal()), str.GetLen(), phones, &result, 1) == 0 {
+	if Metaphone((*uint8)(zend.ZSTR_VAL(str)), zend.ZSTR_LEN(str), phones, &result, 1) == 0 {
 		zend.RETVAL_STR(result)
 	} else {
 		if result != nil {
@@ -134,8 +134,8 @@ func Phonize(c byte) {
 		*phoned_word = zend.ZendStringExtend(*phoned_word, 2*b.SizeOf("char")+max_buffer_len, 0)
 		max_buffer_len += 2
 	}
-	phoned_word.GetVal()[b.PostInc(&p_idx)] = c
-	phoned_word.SetLen(p_idx)
+	zend.ZSTR_VAL(*phoned_word)[b.PostInc(&p_idx)] = c
+	zend.ZSTR_LEN(*phoned_word) = p_idx
 }
 func Isbreak(c byte) bool { return !(isalpha(c)) }
 func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_word **zend.ZendString, traditional int) int {
@@ -176,8 +176,8 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 				*phoned_word = zend.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
 				max_buffer_len += 1
 			}
-			phoned_word.GetVal()[p_idx] = '0'
-			phoned_word.SetLen(p_idx)
+			zend.ZSTR_VAL(*phoned_word)[p_idx] = '0'
+			zend.ZSTR_LEN(*phoned_word) = p_idx
 			return zend.SUCCESS
 		}
 
@@ -402,7 +402,7 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 		*phoned_word = zend.ZendStringExtend(*phoned_word, 1*b.SizeOf("char")+max_buffer_len, 0)
 		max_buffer_len += 1
 	}
-	phoned_word.GetVal()[p_idx] = '0'
-	phoned_word.SetLen(p_idx)
+	zend.ZSTR_VAL(*phoned_word)[p_idx] = '0'
+	zend.ZSTR_LEN(*phoned_word) = p_idx
 	return 0
 }

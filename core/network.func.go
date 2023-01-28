@@ -65,7 +65,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				zend.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
+			PhpErrorDocref(nil, zend.E_WARNING, "%s", zend.ZSTR_VAL(*error_string))
 		} else {
 			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed: %s", PHP_GAI_STRERROR(n))
 		}
@@ -79,7 +79,7 @@ func PhpNetworkGetaddresses(host *byte, socktype int, sal ***__struct__sockaddr,
 				zend.ZendStringReleaseEx(*error_string, 0)
 			}
 			*error_string = Strpprintf(0, "php_network_getaddresses: getaddrinfo failed (null result pointer) errno=%d", errno)
-			PhpErrorDocref(nil, zend.E_WARNING, "%s", error_string.GetVal())
+			PhpErrorDocref(nil, zend.E_WARNING, "%s", zend.ZSTR_VAL(*error_string))
 		} else {
 			PhpErrorDocref(nil, zend.E_WARNING, "php_network_getaddresses: getaddrinfo failed (null result pointer)")
 		}
@@ -323,7 +323,7 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 	n = PhpNetworkGetaddresses(tmp, SOCK_DGRAM, &psal, &errstr)
 	if n == 0 {
 		if errstr != nil {
-			PhpErrorDocref(nil, zend.E_WARNING, "Failed to resolve `%s': %s", tmp, errstr.GetVal())
+			PhpErrorDocref(nil, zend.E_WARNING, "Failed to resolve `%s': %s", tmp, zend.ZSTR_VAL(errstr))
 			zend.ZendStringReleaseEx(errstr, 0)
 		}
 		goto out
