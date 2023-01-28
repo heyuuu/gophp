@@ -665,7 +665,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.ExecutorGlobals.GetSymbolTable().StrUpdateInd("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp)
+			zend.ZendHashStrUpdateInd(&(zend.ExecutorGlobals.GetSymbolTable()), "php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp)
 		}
 	}
 	if replace_buffer != nil {
@@ -950,7 +950,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.ExecutorGlobals.GetSymbolTable().StrUpdateInd("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp)
+			zend.ZendHashStrUpdateInd(&(zend.ExecutorGlobals.GetSymbolTable()), "php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp)
 		}
 	}
 	zend.Efree(buffer)
@@ -1517,7 +1517,7 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 	/* register additional functions */
 
 	if sapi_module.GetAdditionalFunctions() != nil {
-		if b.Assign(&module, zend.ModuleRegistry.StrFindPtr("standard", b.SizeOf("\"standard\"")-1)) != nil {
+		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
 			zend.ExecutorGlobals.SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, sapi_module.GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.ExecutorGlobals.SetCurrentModule(nil)
@@ -1531,7 +1531,7 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 
 	/* make core report what it should */
 
-	if b.Assign(&module, zend.ModuleRegistry.StrFindPtr("core", b.SizeOf("\"core\"")-1)) != nil {
+	if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "core", b.SizeOf("\"core\"")-1)) != nil {
 		module.SetVersion(PHP_VERSION)
 		module.SetInfoFunc(ZmInfoPhpCore)
 	}
@@ -1661,7 +1661,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		if primary_file.GetFilename() != nil && strcmp("Standard input code", primary_file.GetFilename()) && primary_file.GetOpenedPath() == nil && primary_file.GetType() != zend.ZEND_HANDLE_FILENAME {
 			if ExpandFilepath(primary_file.GetFilename(), realfile) != nil {
 				primary_file.SetOpenedPath(zend.ZendStringInit(realfile, strlen(realfile), 0))
-				zend.ExecutorGlobals.GetIncludedFiles().AddEmptyElement(primary_file.GetOpenedPath())
+				zend.ZendHashAddEmptyElement(&(zend.ExecutorGlobals.GetIncludedFiles()), primary_file.GetOpenedPath())
 			}
 		}
 		if PG(auto_prepend_file) && PG(auto_prepend_file)[0] {

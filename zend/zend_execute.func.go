@@ -54,8 +54,8 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 					break
 				}
 			}
-			if variable_ptr.IsType(IS_OBJECT) && Z_OBJ_HANDLER_P(variable_ptr, set) != nil {
-				Z_OBJ_HANDLER_P(variable_ptr, set)(variable_ptr, value)
+			if variable_ptr.IsType(IS_OBJECT) && Z_OBJ_HT(*variable_ptr).GetSet() != nil {
+				Z_OBJ_HT(*variable_ptr).GetSet()(variable_ptr, value)
 				return variable_ptr
 			}
 			garbage = variable_ptr.GetCounted()
@@ -623,19 +623,19 @@ func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opl
 	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, EX_USES_STRICT_TYPES())
 }
 func ZendFormatType(type_ ZendType, part1 **byte, part2 **byte) {
-	if type_.AllowNull() {
+	if ZEND_TYPE_ALLOW_NULL(type_) {
 		*part1 = "?"
 	} else {
 		*part1 = ""
 	}
-	if type_.IsClass() {
-		if type_.IsCe() {
-			*part2 = type_.Ce().GetName().GetVal()
+	if ZEND_TYPE_IS_CLASS(type_) {
+		if ZEND_TYPE_IS_CE(type_) {
+			*part2 = ZEND_TYPE_CE(type_).GetName().GetVal()
 		} else {
-			*part2 = type_.Name().GetVal()
+			*part2 = ZEND_TYPE_NAME(type_).GetVal()
 		}
 	} else {
-		*part2 = ZendGetTypeByConst(type_.Code())
+		*part2 = ZendGetTypeByConst(ZEND_TYPE_CODE(type_))
 	}
 }
 func ZendThrowAutoInitInPropError(prop *ZendPropertyInfo, type_ string) {
@@ -714,7 +714,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 		*fsep = ""
 		*fclass = ""
 	}
-	if arg_info.GetType().IsClass() {
+	if ZEND_TYPE_IS_CLASS(arg_info.GetType()) {
 		if ce != nil {
 			if ce.IsInterface() {
 				*need_msg = "implement interface "
@@ -728,10 +728,10 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 			/* We don't know whether it's a class or interface, assume it's a class */
 
 			*need_msg = "be an instance of "
-			*need_kind = arg_info.GetType().Name().GetVal()
+			*need_kind = ZEND_TYPE_NAME(arg_info.GetType()).GetVal()
 		}
 	} else {
-		switch arg_info.GetType().Code() {
+		switch ZEND_TYPE_CODE(arg_info.GetType()) {
 		case IS_OBJECT:
 			*need_msg = "be an "
 			*need_kind = "object"
@@ -746,11 +746,11 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 			break
 		default:
 			*need_msg = "be of the type "
-			*need_kind = ZendGetTypeByConst(arg_info.GetType().Code())
+			*need_kind = ZendGetTypeByConst(ZEND_TYPE_CODE(arg_info.GetType()))
 			break
 		}
 	}
-	if arg_info.GetType().AllowNull() {
+	if ZEND_TYPE_ALLOW_NULL(arg_info.GetType()) {
 		if is_interface != 0 {
 			*need_or_null = " or be null"
 		} else {
@@ -760,7 +760,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 		*need_or_null = ""
 	}
 	if value != nil {
-		if arg_info.GetType().IsClass() && value.IsType(IS_OBJECT) {
+		if ZEND_TYPE_IS_CLASS(arg_info.GetType()) && value.IsType(IS_OBJECT) {
 			*given_msg = "instance of "
 			*given_kind = Z_OBJCE_P(value).GetName().GetVal()
 		} else {
@@ -897,22 +897,22 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *Zval) {
 
 	ZendFormatType(info.GetType(), &prop_type1, &prop_type2)
 	void(prop_type1)
-	if info.GetType().IsClass() {
-		ZendTypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+	if ZEND_TYPE_IS_CLASS(info.GetType()) {
+		ZendTypeError("Typed property %s::$%s must be an instance of %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	} else {
-		ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(info.GetType().AllowNull(), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
+		ZendTypeError("Typed property %s::$%s must be %s%s, %s used", info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(info.GetName()), prop_type2, b.Cond(ZEND_TYPE_ALLOW_NULL(info.GetType()), " or null", ""), b.CondF(property.IsType(IS_OBJECT), func() []byte { return Z_OBJCE_P(property).GetName().GetVal() }, func() *byte { return ZendGetTypeByConst(property.GetType()) }))
 	}
 }
 func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 	var ce *ZendClassEntry
-	var name *ZendString = type_.Name()
+	var name *ZendString = ZEND_TYPE_NAME(*type_)
 	if ZendStringEqualsLiteralCi(name, "self") {
 
 		/* We need to explicitly check for this here, to avoid updating the type in the trait and
 		 * later using the wrong "self" when the trait is used in a class. */
 
 		if self_ce.IsTrait() {
-			ZendThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(type_.AllowNull(), " non-null", ""))
+			ZendThrowError(nil, "Cannot write a%s value to a 'self' typed static property of a trait", b.Cond(ZEND_TYPE_ALLOW_NULL(*type_), " non-null", ""))
 			return 0
 		}
 		ce = self_ce
@@ -929,31 +929,31 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 		}
 	}
 	ZendStringRelease(name)
-	*type_ = ZEND_TYPE_ENCODE_CE(ce, type_.AllowNull())
+	*type_ = ZEND_TYPE_ENCODE_CE(ce, ZEND_TYPE_ALLOW_NULL(*type_))
 	return 1
 }
 func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendBool) ZendBool {
 	ZEND_ASSERT(!(Z_ISREF_P(property)))
-	if info.GetType().IsClass() {
+	if ZEND_TYPE_IS_CLASS(info.GetType()) {
 		if property.GetType() != IS_OBJECT {
-			return property.IsType(IS_NULL) && info.GetType().AllowNull()
+			return property.IsType(IS_NULL) && ZEND_TYPE_ALLOW_NULL(info.GetType())
 		}
-		if !(info.GetType().IsCe()) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
+		if !(ZEND_TYPE_IS_CE(info.GetType())) && ZendResolveClassType(info.GetType(), info.GetCe()) == 0 {
 			return 0
 		}
-		return InstanceofFunction(Z_OBJCE_P(property), info.GetType().Ce())
+		return InstanceofFunction(Z_OBJCE_P(property), ZEND_TYPE_CE(info.GetType()))
 	}
-	ZEND_ASSERT(info.GetType().Code() != IS_CALLABLE)
-	if info.GetType().Code() == property.GetType() {
+	ZEND_ASSERT(ZEND_TYPE_CODE(info.GetType()) != IS_CALLABLE)
+	if ZEND_TYPE_CODE(info.GetType()) == property.GetType() {
 		return 1
 	} else if property.IsType(IS_NULL) {
-		return info.GetType().AllowNull()
-	} else if info.GetType().Code() == _IS_BOOL && property.IsType(IS_FALSE) || property.IsType(IS_TRUE) {
+		return ZEND_TYPE_ALLOW_NULL(info.GetType())
+	} else if ZEND_TYPE_CODE(info.GetType()) == _IS_BOOL && property.IsType(IS_FALSE) || property.IsType(IS_TRUE) {
 		return 1
-	} else if info.GetType().Code() == IS_ITERABLE {
+	} else if ZEND_TYPE_CODE(info.GetType()) == IS_ITERABLE {
 		return ZendIsIterable(property)
 	} else {
-		return ZendVerifyScalarTypeHint(info.GetType().Code(), property, strict)
+		return ZendVerifyScalarTypeHint(ZEND_TYPE_CODE(info.GetType()), property, strict)
 	}
 }
 func IZendVerifyPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendBool) ZendBool {
@@ -978,31 +978,31 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zv
 }
 func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *any, default_value *Zval, scope *ZendClassEntry, is_return_type ZendBool) ZendBool {
 	var ref *ZendReference = nil
-	if !(type_.IsSet()) {
+	if !(ZEND_TYPE_IS_SET(type_)) {
 		return 1
 	}
 	if Z_ISREF_P(arg) {
 		ref = arg.GetRef()
 		arg = Z_REFVAL_P(arg)
 	}
-	if type_.IsClass() {
+	if ZEND_TYPE_IS_CLASS(type_) {
 		if *cache_slot {
 			*ce = (*ZendClassEntry)(*cache_slot)
 		} else {
-			*ce = ZendFetchClass(type_.Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			*ce = ZendFetchClass(ZEND_TYPE_NAME(type_), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if (*ce) == nil {
-				return arg.IsType(IS_NULL) && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
+				return arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
 			}
 			*cache_slot = any(*ce)
 		}
 		if arg.IsType(IS_OBJECT) {
 			return InstanceofFunction(Z_OBJCE_P(arg), *ce)
 		}
-		return arg.IsType(IS_NULL) && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0)
-	} else if type_.Code() == arg.GetType() {
+		return arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0)
+	} else if ZEND_TYPE_CODE(type_) == arg.GetType() {
 		return 1
 	}
-	if arg.IsType(IS_NULL) && (type_.AllowNull() || default_value != nil && IsNullConstant(scope, default_value) != 0) {
+	if arg.IsType(IS_NULL) && (ZEND_TYPE_ALLOW_NULL(type_) || default_value != nil && IsNullConstant(scope, default_value) != 0) {
 
 		/* Null passed to nullable type */
 
@@ -1011,16 +1011,16 @@ func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *a
 		/* Null passed to nullable type */
 
 	}
-	if type_.Code() == IS_CALLABLE {
+	if ZEND_TYPE_CODE(type_) == IS_CALLABLE {
 		return ZendIsCallable(arg, IS_CALLABLE_CHECK_SILENT, nil)
-	} else if type_.Code() == IS_ITERABLE {
+	} else if ZEND_TYPE_CODE(type_) == IS_ITERABLE {
 		return ZendIsIterable(arg)
-	} else if type_.Code() == _IS_BOOL && arg.IsType(IS_FALSE) || arg.IsType(IS_TRUE) {
+	} else if ZEND_TYPE_CODE(type_) == _IS_BOOL && arg.IsType(IS_FALSE) || arg.IsType(IS_TRUE) {
 		return 1
 	} else if ref != nil && ZEND_REF_HAS_TYPE_SOURCES(ref) {
 		return 0
 	} else {
-		return ZendVerifyScalarTypeHint(type_.Code(), arg, b.CondF(is_return_type != 0, func() bool { return ZEND_RET_USES_STRICT_TYPES() }, func() bool { return ZEND_ARG_USES_STRICT_TYPES() }))
+		return ZendVerifyScalarTypeHint(ZEND_TYPE_CODE(type_), arg, b.CondF(is_return_type != 0, func() bool { return ZEND_RET_USES_STRICT_TYPES() }, func() bool { return ZEND_ARG_USES_STRICT_TYPES() }))
 	}
 }
 func ZendVerifyArgType(zf *ZendFunction, arg_num uint32, arg *Zval, default_value *Zval, cache_slot *any) int {
@@ -1110,13 +1110,13 @@ func ZendVerifyReturnType(zf *ZendFunction, ret *Zval, cache_slot *any) {
 }
 func ZendVerifyMissingReturnType(zf *ZendFunction, cache_slot *any) int {
 	var ret_info *ZendArgInfo = zf.GetArgInfo() - 1
-	if ret_info.GetType().IsSet() && ret_info.GetType().Code() != IS_VOID {
+	if ZEND_TYPE_IS_SET(ret_info.GetType()) && ZEND_TYPE_CODE(ret_info.GetType()) != IS_VOID {
 		var ce *ZendClassEntry = nil
-		if ret_info.GetType().IsClass() {
+		if ZEND_TYPE_IS_CLASS(ret_info.GetType()) {
 			if *cache_slot {
 				ce = (*ZendClassEntry)(*cache_slot)
 			} else {
-				ce = ZendFetchClass(ret_info.GetType().Name(), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				ce = ZendFetchClass(ZEND_TYPE_NAME(ret_info.GetType()), ZEND_FETCH_CLASS_AUTO|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil {
 					*cache_slot = any(ce)
 				}
@@ -1501,7 +1501,7 @@ func ZendGetPropNotAcceptingDouble(ref *ZendReference) *ZendPropertyInfo {
 		}
 		for ; _prop < _end; _prop++ {
 			prop = *_prop
-			if prop.GetType().Code() != IS_DOUBLE {
+			if ZEND_TYPE_CODE(prop.GetType()) != IS_DOUBLE {
 				return prop
 			}
 		}
@@ -1516,10 +1516,10 @@ func ZendThrowIncdecRefError(ref *ZendReference, opline *ZendOp) ZendLong {
 
 	ZEND_ASSERT(error_prop != nil)
 	if ZEND_IS_INCREMENT(opline.GetOpcode()) {
-		ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		ZendTypeError("Cannot increment a reference held by property %s::$%s of type %sint past its maximal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(ZEND_TYPE_ALLOW_NULL(error_prop.GetType()), "?", ""))
 		return ZEND_LONG_MAX
 	} else {
-		ZendTypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(error_prop.GetType().AllowNull(), "?", ""))
+		ZendTypeError("Cannot decrement a reference held by property %s::$%s of type %sint past its minimal value", error_prop.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(error_prop.GetName()), b.Cond(ZEND_TYPE_ALLOW_NULL(error_prop.GetType()), "?", ""))
 		return ZEND_LONG_MIN
 	}
 }
@@ -1922,7 +1922,7 @@ try_again:
 				return nil
 			}
 		case BP_VAR_W:
-			retval = ht.IndexAddNew(hval, &(ExecutorGlobals.GetUninitializedZval()))
+			retval = ZendHashIndexAddNew(ht, hval, &(ExecutorGlobals.GetUninitializedZval()))
 			break
 		}
 	} else if dim.IsType(IS_STRING) {
@@ -1933,7 +1933,7 @@ try_again:
 			}
 		}
 	str_index:
-		retval = ht.FindEx(offset_key, ZEND_CONST_COND(dim_type == IS_CONST, 0))
+		retval = ZendHashFindEx(ht, offset_key, ZEND_CONST_COND(dim_type == IS_CONST, 0))
 		if retval != nil {
 
 			/* support for $GLOBALS[...] */
@@ -1980,11 +1980,11 @@ try_again:
 					ZendStringRelease(offset_key)
 					return nil
 				}
-				retval = ht.AddNew(offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
 				ZendStringRelease(offset_key)
 				break
 			case BP_VAR_W:
-				retval = ht.AddNew(offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
 				break
 			}
 		}
@@ -2029,7 +2029,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = container.GetArr().NextIndexInsert(&(ExecutorGlobals.GetUninitializedZval()))
+			retval = ZendHashNextIndexInsert(container.GetArr(), &(ExecutorGlobals.GetUninitializedZval()))
 			if retval == nil {
 				ZendCannotAddElement()
 				ZVAL_ERROR(result)
@@ -2273,10 +2273,10 @@ func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 	if offset.IsType(IS_DOUBLE) {
 		hval = ZendDvalToLval(offset.GetDval())
 	num_idx:
-		return ht.IndexFind(hval)
+		return ZendHashIndexFind(ht, hval)
 	} else if offset.IsType(IS_NULL) {
 	str_idx:
-		return ht.FindExInd(ZSTR_EMPTY_ALLOC(), 1)
+		return ZendHashFindExInd(ht, ZSTR_EMPTY_ALLOC(), 1)
 	} else if offset.IsType(IS_FALSE) {
 		hval = 0
 		goto num_idx
@@ -2378,7 +2378,7 @@ try_again:
 			goto num_key
 		}
 	str_key:
-		if ht.FindInd(str) != nil {
+		if ZendHashFindInd(ht, str) != nil {
 			return IS_TRUE
 		} else {
 			return IS_FALSE
@@ -2386,7 +2386,7 @@ try_again:
 	} else if key.IsType(IS_LONG) {
 		hval = key.GetLval()
 	num_key:
-		if ht.IndexFind(hval) != nil {
+		if ZendHashIndexFind(ht, hval) != nil {
 			return IS_TRUE
 		} else {
 			return IS_FALSE
@@ -2434,20 +2434,20 @@ func CheckTypeArrayAssignable(type_ ZendType) ZendBool {
 	if type_ == 0 {
 		return 1
 	}
-	return type_.IsCode() && (type_.Code() == IS_ARRAY || type_.Code() == IS_ITERABLE)
+	return ZEND_TYPE_IS_CODE(type_) && (ZEND_TYPE_CODE(type_) == IS_ARRAY || ZEND_TYPE_CODE(type_) == IS_ITERABLE)
 }
 func check_type_stdClass_assignable(type_ ZendType) ZendBool {
 	if type_ == 0 {
 		return 1
 	}
-	if type_.IsClass() {
-		if type_.IsCe() {
-			return type_.Ce() == ZendStandardClassDef
+	if ZEND_TYPE_IS_CLASS(type_) {
+		if ZEND_TYPE_IS_CE(type_) {
+			return ZEND_TYPE_CE(type_) == ZendStandardClassDef
 		} else {
-			return ZendStringEqualsLiteralCi(type_.Name(), "stdclass")
+			return ZendStringEqualsLiteralCi(ZEND_TYPE_NAME(type_), "stdclass")
 		}
 	} else {
-		return type_.Code() == IS_OBJECT
+		return ZEND_TYPE_CODE(type_) == IS_OBJECT
 	}
 }
 func ZendVerifyRefArrayAssignable(ref *ZendReference) ZendBool {
@@ -2559,7 +2559,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 				}
 			}
 			if ptr.IsType(IS_UNDEF) {
-				if !(prop_info.GetType().AllowNull()) {
+				if !(ZEND_TYPE_ALLOW_NULL(prop_info.GetType())) {
 					ZendThrowAccessUninitPropByRefError(prop_info)
 					if result != nil {
 						ZVAL_ERROR(result)
@@ -2625,7 +2625,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			ptr = zobj.GetProperties().FindEx(prop_ptr.GetStr(), 1)
+			ptr = ZendHashFindEx(zobj.GetProperties(), prop_ptr.GetStr(), 1)
 			if ptr != nil {
 				ZVAL_INDIRECT(result, ptr)
 				return
@@ -2837,19 +2837,19 @@ func IZendVerifyTypeAssignableZval(type_ptr *ZendType, self_ce *ZendClassEntry, 
 	var type_ ZendType = *type_ptr
 	var type_code ZendUchar
 	var zv_type ZendUchar = zv.GetType()
-	if type_.AllowNull() && zv_type == IS_NULL {
+	if ZEND_TYPE_ALLOW_NULL(type_) && zv_type == IS_NULL {
 		return 1
 	}
-	if type_.IsClass() {
-		if !(type_.IsCe()) {
+	if ZEND_TYPE_IS_CLASS(type_) {
+		if !(ZEND_TYPE_IS_CE(type_)) {
 			if ZendResolveClassType(type_ptr, self_ce) == 0 {
 				return 0
 			}
 			type_ = *type_ptr
 		}
-		return zv_type == IS_OBJECT && InstanceofFunction(Z_OBJCE_P(zv), type_.Ce()) != 0
+		return zv_type == IS_OBJECT && InstanceofFunction(Z_OBJCE_P(zv), ZEND_TYPE_CE(type_)) != 0
 	}
-	type_code = type_.Code()
+	type_code = ZEND_TYPE_CODE(type_)
 	if type_code == zv_type || type_code == _IS_BOOL && (zv_type == IS_FALSE || zv_type == IS_TRUE) {
 		return 1
 	}
@@ -2921,12 +2921,12 @@ func ZendVerifyRefAssignableZval(ref *ZendReference, zv *Zval, strict ZendBool) 
 			}
 			if seen_prop == nil {
 				seen_prop = prop
-				if prop.GetType().IsClass() {
+				if ZEND_TYPE_IS_CLASS(prop.GetType()) {
 					seen_type = IS_OBJECT
 				} else {
-					seen_type = prop.GetType().Code()
+					seen_type = ZEND_TYPE_CODE(prop.GetType())
 				}
-			} else if needs_coercion != 0 && seen_type != prop.GetType().Code() {
+			} else if needs_coercion != 0 && seen_type != ZEND_TYPE_CODE(prop.GetType()) {
 				ZendThrowConflictingCoercionError(seen_prop, prop, zv)
 				return 0
 			}
@@ -2984,14 +2984,14 @@ func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *Zval, 
 		}
 		if result < 0 {
 			var ref_prop *ZendPropertyInfo = ZEND_REF_FIRST_SOURCE(orig_val.GetRef())
-			if prop_info.GetType().Code() != ref_prop.GetType().Code() {
+			if ZEND_TYPE_CODE(prop_info.GetType()) != ZEND_TYPE_CODE(ref_prop.GetType()) {
 
 				/* Invalid due to conflicting coercion */
 
 				ZendThrowRefTypeErrorType(ref_prop, prop_info, val)
 				return 0
 			}
-			if ZendVerifyWeakScalarTypeHint(prop_info.GetType().Code(), val) != 0 {
+			if ZendVerifyWeakScalarTypeHint(ZEND_TYPE_CODE(prop_info.GetType()), val) != 0 {
 				return 1
 			}
 		}
@@ -3241,7 +3241,7 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *ZendString) *ZendFunction {
-	var zv *Zval = ExecutorGlobals.GetFunctionTable().Find(name)
+	var zv *Zval = ZendHashFind(ExecutorGlobals.GetFunctionTable(), name)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3252,7 +3252,7 @@ func ZendFetchFunction(name *ZendString) *ZendFunction {
 	return nil
 }
 func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
-	var zv *Zval = ExecutorGlobals.GetFunctionTable().StrFind(name, len_)
+	var zv *Zval = ZendHashStrFind(ExecutorGlobals.GetFunctionTable(), name, len_)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3644,7 +3644,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if b.Assign(&func_, ExecutorGlobals.GetFunctionTable().Find(lcname)) == nil {
+		if b.Assign(&func_, ZendHashFind(ExecutorGlobals.GetFunctionTable(), lcname)) == nil {
 			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -3664,7 +3664,7 @@ func ZendInitDynamicCallObject(function *Zval, num_args uint32) *ZendExecuteData
 	var called_scope *ZendClassEntry
 	var object *ZendObject
 	var call_info uint32 = ZEND_CALL_NESTED_FUNCTION | ZEND_CALL_DYNAMIC
-	if Z_OBJ_HANDLER_P(function, get_closure) && Z_OBJ_HANDLER_P(function, get_closure)(function, &called_scope, &fbc, &object) == SUCCESS {
+	if Z_OBJ_HT(*function).GetGetClosure() != nil && Z_OBJ_HT(*function).GetGetClosure()(function, &called_scope, &fbc, &object) == SUCCESS {
 		object_or_called_scope = called_scope
 		if fbc.IsClosure() {
 
@@ -3700,8 +3700,8 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 	if function.GetNNumOfElements() == 2 {
 		var obj *Zval
 		var method *Zval
-		obj = function.IndexFind(0)
-		method = function.IndexFind(1)
+		obj = ZendHashIndexFind(function, 0)
+		method = ZendHashIndexFind(function, 1)
 		if obj == nil || method == nil {
 			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil
@@ -3785,7 +3785,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		var resolved_path *ZendString
 		resolved_path = ZendResolvePath(Z_STRVAL_P(inc_filename), Z_STRLEN_P(inc_filename))
 		if resolved_path != nil {
-			if ExecutorGlobals.GetIncludedFiles().Exists(resolved_path) != 0 {
+			if ZendHashExists(&(ExecutorGlobals.GetIncludedFiles()), resolved_path) != 0 {
 				goto already_compiled
 			}
 		} else if ExecutorGlobals.GetException() != nil {
@@ -3800,7 +3800,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(ZendStringCopy(resolved_path))
 			}
-			if ExecutorGlobals.GetIncludedFiles().AddEmptyElement(file_handle.GetOpenedPath()) != nil {
+			if ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				ZendStringReleaseEx(resolved_path, 0)
@@ -3906,23 +3906,23 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
-	zv = ExecutorGlobals.GetZendConstants().FindEx(key.GetStr(), 1)
+	zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
 	if zv != nil {
 		c = (*ZendConstant)(zv.GetPtr())
 	} else {
 		key++
-		zv = ExecutorGlobals.GetZendConstants().FindEx(key.GetStr(), 1)
+		zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
 		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 			c = (*ZendConstant)(zv.GetPtr())
 		} else {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = ExecutorGlobals.GetZendConstants().FindEx(key.GetStr(), 1)
+				zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
 				if zv != nil {
 					c = (*ZendConstant)(zv.GetPtr())
 				} else {
 					key++
-					zv = ExecutorGlobals.GetZendConstants().FindEx(key.GetStr(), 1)
+					zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
 					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 						c = (*ZendConstant)(zv.GetPtr())
 					}

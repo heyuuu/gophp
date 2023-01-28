@@ -205,7 +205,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	zend.ZvalPtrDtorNogc(&wakeup_name)
 	zend.ZvalPtrDtorNogc(&unserialize_name)
 	if var_hashx.GetRefProps() != nil {
-		var_hashx.GetRefProps().Destroy()
+		zend.ZendHashDestroy(var_hashx.GetRefProps())
 		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
 	}
 }
@@ -260,7 +260,7 @@ func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserial
 	}
 	zend.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen(), use_heap)
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
-	res = classes.Exists(lcname)
+	res = zend.ZendHashExists(classes, lcname)
 	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
 	return res
 }
@@ -339,27 +339,27 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 			if key.IsType(zend.IS_LONG) {
 				idx = key.GetLval()
 			numeric_key:
-				if b.Assign(&old_data, ht.IndexFind(idx)) != nil {
+				if b.Assign(&old_data, zend.ZendHashIndexFind(ht, idx)) != nil {
 
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = ht.IndexUpdate(idx, &d)
+					data = zend.ZendHashIndexUpdate(ht, idx, &d)
 				} else {
-					data = ht.IndexAddNew(idx, &d)
+					data = zend.ZendHashIndexAddNew(ht, idx, &d)
 				}
 			} else if key.IsType(zend.IS_STRING) {
 				if zend.ZEND_HANDLE_NUMERIC(key.GetStr(), idx) != 0 {
 					goto numeric_key
 				}
-				if b.Assign(&old_data, ht.Find(key.GetStr())) != nil {
+				if b.Assign(&old_data, zend.ZendHashFind(ht, key.GetStr())) != nil {
 
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = ht.Update(key.GetStr(), &d)
+					data = zend.ZendHashUpdate(ht, key.GetStr(), &d)
 				} else {
-					data = ht.AddNew(key.GetStr(), &d)
+					data = zend.ZendHashAddNew(ht, key.GetStr(), &d)
 				}
 			} else {
 				zend.ZvalPtrDtor(&key)
@@ -380,7 +380,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 						goto failure
 					}
 					unmangled = zend.ZendStringInit(unmangled_prop, unmangled_prop_len, 0)
-					existing_propinfo = obj.GetCe().GetPropertiesInfo().FindPtr(unmangled)
+					existing_propinfo = zend.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled)
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
 						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
 							new_key = zend.ZendManglePropertyName("*", 1, unmangled.GetVal(), unmangled.GetLen(), 0)
@@ -402,12 +402,12 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 						zend.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if b.Assign(&old_data, ht.Find(key.GetStr())) != nil {
+				if b.Assign(&old_data, zend.ZendHashFind(ht, key.GetStr())) != nil {
 					if old_data.IsType(zend.IS_INDIRECT) {
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
-						data = ht.UpdateInd(key.GetStr(), &d)
+						data = zend.ZendHashUpdateInd(ht, key.GetStr(), &d)
 						if info != nil {
 
 							/* Remember to which property this slot belongs, so we can add a
@@ -415,16 +415,16 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 
 							if var_hash.GetRefProps() == nil {
 								var_hash.SetRefProps(zend.Emalloc(b.SizeOf("HashTable")))
-								var_hash.GetRefProps().Init(8, nil, nil, 0)
+								zend.ZendHashInit(var_hash.GetRefProps(), 8, nil, nil, 0)
 							}
-							var_hash.GetRefProps().IndexUpdatePtr(zend.ZendUintptrT(data), info)
+							zend.ZendHashIndexUpdatePtr(var_hash.GetRefProps(), zend.ZendUintptrT(data), info)
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
-						data = ht.UpdateInd(key.GetStr(), &d)
+						data = zend.ZendHashUpdateInd(ht, key.GetStr(), &d)
 					}
 				} else {
-					data = ht.AddNew(key.GetStr(), &d)
+					data = zend.ZendHashAddNew(ht, key.GetStr(), &d)
 				}
 			} else if key.IsType(zend.IS_LONG) {
 
@@ -516,7 +516,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 
 		/* Avoid reallocation due to packed -> mixed conversion. */
 
-		ary.GetArr().RealInitMixed()
+		zend.ZendHashRealInitMixed(ary.GetArr())
 		if ProcessNestedData(rval, p, max, var_hash, ary.GetArr(), elements, nil) == 0 {
 			zend.ZVAL_DEREF(rval)
 			rval.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
@@ -535,12 +535,12 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		zend.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
 	}
-	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.Z_OBJCE_P(rval).GetFunctionTable().StrExists("__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
+	has_wakeup = zend.Z_OBJCE_P(rval) != PHP_IC_ENTRY && zend.ZendHashStrExists(zend.Z_OBJCE_P(rval).GetFunctionTable(), "__wakeup", b.SizeOf("\"__wakeup\"")-1) != 0
 	ht = zend.Z_OBJPROP_P(rval)
 	if elements >= zend_long(zend.HT_MAX_SIZE-ht.GetNNumOfElements()) {
 		return 0
 	}
-	ht.Extend(ht.GetNNumOfElements()+elements, ht.GetUFlags()&zend.HASH_FLAG_PACKED)
+	zend.ZendHashExtend(ht, ht.GetNNumOfElements()+elements, ht.GetUFlags()&zend.HASH_FLAG_PACKED)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
 			zend.ZVAL_DEREF(rval)
@@ -902,7 +902,7 @@ yy18:
 		return 0
 	}
 	*p += 2
-	has_unserialize = incomplete_class == 0 && ce.GetFunctionTable().StrExists("__unserialize", b.SizeOf("\"__unserialize\"")-1) != 0
+	has_unserialize = incomplete_class == 0 && zend.ZendHashStrExists(ce.GetFunctionTable(), "__unserialize", b.SizeOf("\"__unserialize\"")-1) != 0
 
 	/* If this class implements Serializable, it should not land here but in object_custom().
 	 * The passed string obviously doesn't descend from the regular serializer. However, if
@@ -968,7 +968,7 @@ yy24:
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
 
-		rval.GetArr().RealInitMixed()
+		zend.ZendHashRealInitMixed(rval.GetArr())
 
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
@@ -1511,7 +1511,7 @@ yy85:
 	if !(zend.Z_ISREF_P(rval_ref)) {
 		var info *zend.ZendPropertyInfo = nil
 		if var_hash.GetRefProps() != nil {
-			info = var_hash.GetRefProps().IndexFindPtr(zend.ZendUintptrT(rval_ref))
+			info = zend.ZendHashIndexFindPtr(var_hash.GetRefProps(), zend.ZendUintptrT(rval_ref))
 		}
 		zend.ZVAL_NEW_REF(rval_ref, rval_ref)
 		if info != nil {

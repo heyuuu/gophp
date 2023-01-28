@@ -273,7 +273,7 @@ func ZendGeneratorFreeStorage(object *ZendObject) {
 		ZvalPtrDtor(generator.GetRetval())
 	}
 	if generator.GetNode().GetChildren() > 1 {
-		generator.GetNode().GetHt().Destroy()
+		ZendHashDestroy(generator.GetNode().GetHt())
 		Efree(generator.GetNode().GetHt())
 	}
 	ZendObjectStdDtor(generator.GetStd())
@@ -507,7 +507,7 @@ func ZendGeneratorGetChild(node *ZendGeneratorNode, leaf *ZendGenerator) *ZendGe
 	} else if node.GetChildren() == 1 {
 		return node.GetChildSingleChild()
 	} else {
-		return node.GetHt().IndexFindPtr(ZendUlong(leaf))
+		return ZendHashIndexFindPtr(node.GetHt(), ZendUlong(leaf))
 	}
 }
 func ZendGeneratorSearchMultiChildrenNode(node *ZendGeneratorNode) *ZendGeneratorNode {
@@ -527,11 +527,11 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 	} else {
 		if node.GetChildren() == 1 {
 			var ht *HashTable = Emalloc(b.SizeOf("HashTable"))
-			ht.Init(0, nil, nil, 0)
-			ht.IndexAddPtr(ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
+			ZendHashInit(ht, 0, nil, nil, 0)
+			ZendHashIndexAddPtr(ht, ZendUlong(node.GetChildSingleLeaf()), node.GetChildSingleChild())
 			node.SetHt(ht)
 		}
-		node.GetHt().IndexAddPtr(ZendUlong(leaf), child)
+		ZendHashIndexAddPtr(node.GetHt(), ZendUlong(leaf), child)
 	}
 	node.GetChildren()++
 }
@@ -565,9 +565,9 @@ func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {
 		generator.GetNode().SetPtrLeaf(leaf)
 		for next != nil {
 			if next.GetNode().GetChildren() > 1 {
-				var child *ZendGenerator = next.GetNode().GetHt().IndexFindPtr(ZendUlong(generator))
-				next.GetNode().GetHt().IndexDel(ZendUlong(generator))
-				next.GetNode().GetHt().IndexAddPtr(ZendUlong(leaf), child)
+				var child *ZendGenerator = ZendHashIndexFindPtr(next.GetNode().GetHt(), ZendUlong(generator))
+				ZendHashIndexDel(next.GetNode().GetHt(), ZendUlong(generator))
+				ZendHashIndexAddPtr(next.GetNode().GetHt(), ZendUlong(leaf), child)
 			}
 			next.GetNode().SetPtrLeaf(leaf)
 			next = next.GetNode().GetParent()

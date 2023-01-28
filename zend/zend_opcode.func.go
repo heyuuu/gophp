@@ -66,8 +66,8 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 			num_args++
 		}
 		for i = 0; i < num_args; i++ {
-			if arg_info[i].GetType().IsClass() {
-				ZendStringReleaseEx(arg_info[i].GetType().Name(), 1)
+			if ZEND_TYPE_IS_CLASS(arg_info[i].GetType()) {
+				ZendStringReleaseEx(ZEND_TYPE_NAME(arg_info[i].GetType()), 1)
 			}
 		}
 		Free(arg_info)
@@ -317,16 +317,16 @@ func DestroyZendClass(zv *Zval) {
 					if prop_info.GetDocComment() != nil {
 						ZendStringReleaseEx(prop_info.GetDocComment(), 0)
 					}
-					if prop_info.GetType().IsName() {
-						ZendStringRelease(prop_info.GetType().Name())
+					if ZEND_TYPE_IS_NAME(prop_info.GetType()) {
+						ZendStringRelease(ZEND_TYPE_NAME(prop_info.GetType()))
 					}
 				}
 			}
 			break
 		}
-		ce.GetPropertiesInfo().Destroy()
+		ZendHashDestroy(ce.GetPropertiesInfo())
 		ZendStringReleaseEx(ce.GetName(), 0)
-		ce.GetFunctionTable().Destroy()
+		ZendHashDestroy(ce.GetFunctionTable())
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
@@ -350,7 +350,7 @@ func DestroyZendClass(zv *Zval) {
 				break
 			}
 		}
-		ce.GetConstantsTable().Destroy()
+		ZendHashDestroy(ce.GetConstantsTable())
 		if ce.GetNumInterfaces() > 0 {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
@@ -390,7 +390,7 @@ func DestroyZendClass(zv *Zval) {
 				ZendCleanupInternalClassData(ce)
 			}
 		}
-		ce.GetPropertiesInfo().Destroy()
+		ZendHashDestroy(ce.GetPropertiesInfo())
 		ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
@@ -412,7 +412,7 @@ func DestroyZendClass(zv *Zval) {
 			}
 			break
 		}
-		ce.GetFunctionTable().Destroy()
+		ZendHashDestroy(ce.GetFunctionTable())
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
@@ -436,7 +436,7 @@ func DestroyZendClass(zv *Zval) {
 				}
 				break
 			}
-			ce.GetConstantsTable().Destroy()
+			ZendHashDestroy(ce.GetConstantsTable())
 		}
 		if ce.GetIteratorFuncsPtr() != nil {
 			Free(ce.GetIteratorFuncsPtr())
@@ -525,8 +525,8 @@ func DestroyOpArray(op_array *ZendOpArray) {
 			if arg_info[i].GetName() != nil {
 				ZendStringReleaseEx(arg_info[i].GetName(), 0)
 			}
-			if arg_info[i].GetType().IsClass() {
-				ZendStringReleaseEx(arg_info[i].GetType().Name(), 0)
+			if ZEND_TYPE_IS_CLASS(arg_info[i].GetType()) {
+				ZendStringReleaseEx(ZEND_TYPE_NAME(arg_info[i].GetType()), 0)
 			}
 		}
 		Efree(arg_info)

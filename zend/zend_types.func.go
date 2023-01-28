@@ -6,6 +6,16 @@ import (
 	b "sik/builtin"
 )
 
+func ZEND_TYPE_IS_SET(t ZendType) bool        { return t.IsSet() }
+func ZEND_TYPE_IS_CODE(t ZendType) bool       { return t.IsCode() }
+func ZEND_TYPE_IS_CLASS(t ZendType) bool      { return t.IsClass() }
+func ZEND_TYPE_IS_CE(t ZendType) bool         { return t.IsCe() }
+func ZEND_TYPE_IS_NAME(t ZendType) bool       { return t.IsName() }
+func ZEND_TYPE_NAME(t ZendType) *ZendString   { return t.Name() }
+func ZEND_TYPE_CE(t ZendType) *ZendClassEntry { return t.Ce() }
+func ZEND_TYPE_CODE(t ZendType) int           { return t.Code() }
+func ZEND_TYPE_ALLOW_NULL(t ZendType) bool    { return t.AllowNull() }
+
 func ZEND_TYPE_ENCODE(code uint32, allow_null int) int {
 	if allow_null != 0 {
 		return int(code)<<2 | 0x1

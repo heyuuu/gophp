@@ -52,10 +52,10 @@ func SplRegisterProperty(class_entry *zend.ZendClassEntry, prop_name string, pro
 func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_flags int) {
 	if allow == 0 || allow > 0 && pce.HasCeFlags(ce_flags) || allow < 0 && !pce.HasCeFlags(ce_flags) {
 		var tmp *zend.Zval
-		if b.Assign(&tmp, list.GetArr().Find(pce.GetName())) == nil {
+		if b.Assign(&tmp, zend.ZendHashFind(list.GetArr(), pce.GetName())) == nil {
 			var t zend.Zval
 			zend.ZVAL_STR_COPY(&t, pce.GetName())
-			list.GetArr().Add(pce.GetName(), &t)
+			zend.ZendHashAdd(list.GetArr(), pce.GetName(), &t)
 		}
 	}
 }

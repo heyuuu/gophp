@@ -54,7 +54,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			var guards *HashTable
 			guards = p.GetArr()
 			ZEND_ASSERT(guards != nil)
-			guards.Destroy()
+			ZendHashDestroy(guards)
 			FREE_HASHTABLE(guards)
 		}
 	}
@@ -202,9 +202,9 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		var key *ZendString
 		if new_object.GetProperties() == nil {
 			new_object.SetProperties(ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
-			new_object.GetProperties().RealInitMixed()
+			ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
-			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().GetNNumOfElements(), 0)
+			ZendHashExtend(new_object.GetProperties(), new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().GetNNumOfElements(), 0)
 		}
 		new_object.GetProperties().AddUFlags(old_object.GetProperties().GetUFlags() & HASH_FLAG_HAS_EMPTY_IND)
 		for {
@@ -227,9 +227,9 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 					ZvalAddRef(&new_prop)
 				}
 				if key != nil {
-					new_object.GetProperties()._append(key, &new_prop)
+					_zendHashAppend(new_object.GetProperties(), key, &new_prop)
 				} else {
-					new_object.GetProperties().IndexAddNew(num_key, &new_prop)
+					ZendHashIndexAddNew(new_object.GetProperties(), num_key, &new_prop)
 				}
 			}
 			break

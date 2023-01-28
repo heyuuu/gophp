@@ -239,7 +239,7 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZEND_NUM_ARGS() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).StrFind("handle", b.SizeOf("\"handle\"")-1)) == nil {
+			if b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_OBJPROP_P(myself), "handle", b.SizeOf("\"handle\"")-1)) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				zend.RETVAL_FALSE
 				return
@@ -543,7 +543,7 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZEND_NUM_ARGS() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).StrFind("handle", b.SizeOf("\"handle\"")-1)) == nil {
+			if b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_OBJPROP_P(myself), "handle", b.SizeOf("\"handle\"")-1)) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				zend.RETVAL_FALSE
 				return
@@ -648,7 +648,7 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZEND_NUM_ARGS() == 0 {
 		myself = zend.getThis()
 		if myself != nil {
-			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).StrFind("handle", b.SizeOf("\"handle\"")-1)) == nil {
+			if b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_OBJPROP_P(myself), "handle", b.SizeOf("\"handle\"")-1)) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
 				zend.RETVAL_FALSE
 				return

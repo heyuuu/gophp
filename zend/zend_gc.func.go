@@ -1247,7 +1247,7 @@ func ZendGcCollectCycles() int {
 
 					/* GC may destroy arrays with rc>1. This is valid and safe. */
 
-					arr.Destroy()
+					ZendHashDestroy(arr)
 				}
 			}
 			idx++

@@ -74,7 +74,7 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 	var val *zend.Zval
 	var object_properties *zend.HashTable
 	object_properties = zend.Z_OBJPROP_P(object)
-	if b.Assign(&val, object_properties.StrFind(MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && val.IsType(zend.IS_STRING) {
+	if b.Assign(&val, zend.ZendHashStrFind(object_properties, MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && val.IsType(zend.IS_STRING) {
 		return zend.ZendStringCopy(val.GetStr())
 	}
 	return nil
@@ -82,5 +82,5 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 func PhpStoreClassName(object *zend.Zval, name *byte, len_ int) {
 	var val zend.Zval
 	zend.ZVAL_STRINGL(&val, name, len_)
-	zend.Z_OBJPROP_P(object).StrUpdate(MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1, &val)
+	zend.ZendHashStrUpdate(zend.Z_OBJPROP_P(object), MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1, &val)
 }

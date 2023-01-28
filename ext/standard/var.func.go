@@ -41,9 +41,9 @@ func PhpObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, inde
 	}
 	if zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *zend.ZendString { return prop_info.GetType().Ce().GetName() }, func() *zend.ZendString { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
+			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
+		}, func() *byte { return zend.ZendGetTypeByConst(zend.ZEND_TYPE_CODE(prop_info.GetType())) }))
 	} else {
 		PhpVarDump(zv, level+2)
 	}
@@ -132,7 +132,7 @@ again:
 		}
 		zend.Z_PROTECT_RECURSION_P(struc)
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
-		class_name = zend.Z_OBJ_HANDLER_P(struc, get_class_name)(struc.GetObj())
+		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return zend.ZendArrayCount(myht) }, 0))
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
@@ -302,9 +302,9 @@ func ZvalObjectPropertyDump(prop_info *zend.ZendPropertyInfo, zv *zend.Zval, ind
 	}
 	if prop_info != nil && zv.IsType(zend.IS_UNDEF) {
 		zend.ZEND_ASSERT(prop_info.GetType() != 0)
-		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(prop_info.GetType().AllowNull(), "?", ""), b.CondF(prop_info.GetType().IsClass(), func() []byte {
-			return b.CondF(prop_info.GetType().IsCe(), func() *zend.ZendString { return prop_info.GetType().Ce().GetName() }, func() *zend.ZendString { return prop_info.GetType().Name() }).GetVal()
-		}, func() *byte { return zend.ZendGetTypeByConst(prop_info.GetType().Code()) }))
+		core.PhpPrintf("%*cuninitialized(%s%s)\n", level+1, ' ', b.Cond(zend.ZEND_TYPE_ALLOW_NULL(prop_info.GetType()), "?", ""), b.CondF(zend.ZEND_TYPE_IS_CLASS(prop_info.GetType()), func() []byte {
+			return b.CondF(zend.ZEND_TYPE_IS_CE(prop_info.GetType()), func() *zend.ZendString { return zend.ZEND_TYPE_CE(prop_info.GetType()).GetName() }, func() *zend.ZendString { return zend.ZEND_TYPE_NAME(prop_info.GetType()) }).GetVal()
+		}, func() *byte { return zend.ZendGetTypeByConst(zend.ZEND_TYPE_CODE(prop_info.GetType())) }))
 	} else {
 		PhpDebugZvalDump(zv, level+2)
 	}
@@ -396,7 +396,7 @@ again:
 			}
 			zend.GC_PROTECT_RECURSION(myht)
 		}
-		class_name = zend.Z_OBJ_HANDLER_P(struc, get_class_name)(struc.GetObj())
+		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return zend.ZendArrayCount(myht) }, 0), zend.Z_REFCOUNT_P(struc))
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
@@ -854,7 +854,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	 * the zend_refcounted struct */
 
 	key = zend.ZendUlong(zend.ZendUintptrT(var_.GetCounted()))
-	zv = data.GetHt().IndexFind(key)
+	zv = zend.ZendHashIndexFind(data.GetHt(), key)
 	if zv != nil {
 
 		/* References are only counted once, undo the data->n increment above */
@@ -866,14 +866,14 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	} else {
 		var zv_n zend.Zval
 		zend.ZVAL_LONG(&zv_n, data.GetN())
-		data.GetHt().IndexAddNew(key, &zv_n)
+		zend.ZendHashIndexAddNew(data.GetHt(), key, &zv_n)
 
 		/* Additionally to the index, we also store the variable, to ensure that it is
 		 * not destroyed during serialization and its pointer reused. The variable is
 		 * stored at the numeric value of the pointer + 1, which cannot be the location
 		 * of another zend_refcounted structure. */
 
-		data.GetHt().IndexAddNew(key+1, var_)
+		zend.ZendHashIndexAddNew(data.GetHt(), key+1, var_)
 		zend.Z_ADDREF_P(var_)
 		return 0
 	}
@@ -941,7 +941,7 @@ func PhpVarSerializeCallMagicSerialize(retval *zend.Zval, obj *zend.Zval) int {
 	return zend.SUCCESS
 }
 func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, name *zend.ZendString, error_name *zend.ZendString, struc *zend.Zval) int {
-	var val *zend.Zval = props.Find(name)
+	var val *zend.Zval = zend.ZendHashFind(props, name)
 	if val == nil {
 		return zend.FAILURE
 	}
@@ -955,7 +955,7 @@ func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, n
 			return zend.FAILURE
 		}
 	}
-	if ht.Add(name, val) == nil {
+	if zend.ZendHashAdd(ht, name, val) == nil {
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
 		return zend.SUCCESS
 	}
@@ -967,7 +967,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 	var props *zend.HashTable = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_SERIALIZE)
 	var name_val *zend.Zval
 	var retval int = zend.SUCCESS
-	ht.Init(sleep_retval.GetNNumOfElements(), nil, zend.ZVAL_PTR_DTOR, 0)
+	zend.ZendHashInit(ht, sleep_retval.GetNNumOfElements(), nil, zend.ZVAL_PTR_DTOR, 0)
 
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
@@ -1028,7 +1028,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 				break
 			}
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-			ht.Add(name, &(zend.ExecutorGlobals.GetUninitializedZval()))
+			zend.ZendHashAdd(ht, name, &(zend.ExecutorGlobals.GetUninitializedZval()))
 			zend.ZendTmpStringRelease(tmp_name)
 		}
 		break
@@ -1105,7 +1105,7 @@ func PhpVarSerializeClass(buf *zend.SmartStr, struc *zend.Zval, retval_ptr *zend
 		PhpVarSerializeClassName(buf, struc)
 		PhpVarSerializeNestedData(buf, struc, &props, props.GetNNumOfElements(), 0, var_hash)
 	}
-	props.Destroy()
+	zend.ZendHashDestroy(&props)
 }
 func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSerializeDataT) {
 	var var_already zend.ZendLong
@@ -1160,7 +1160,7 @@ again:
 		var ce *zend.ZendClassEntry = zend.Z_OBJCE_P(struc)
 		var incomplete_class zend.ZendBool
 		var count uint32
-		if ce.GetFunctionTable().StrExists("__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {
+		if zend.ZendHashStrExists(ce.GetFunctionTable(), "__serialize", b.SizeOf("\"__serialize\"")-1) != 0 {
 			var retval zend.Zval
 			var obj zend.Zval
 			var key *zend.ZendString
@@ -1230,7 +1230,7 @@ again:
 
 				/* Mark this value in the var_hash, to avoid creating references to it. */
 
-				var var_idx *zend.Zval = var_hash.GetHt().IndexFind(zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
+				var var_idx *zend.Zval = zend.ZendHashIndexFind(var_hash.GetHt(), zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
 				zend.ZVAL_LONG(var_idx, -1)
 				zend.SmartStrAppendl(buf, "N;", 2)
 			}
@@ -1239,7 +1239,7 @@ again:
 			}
 			return
 		}
-		if ce != PHP_IC_ENTRY && ce.GetFunctionTable().StrExists("__sleep", b.SizeOf("\"__sleep\"")-1) != 0 {
+		if ce != PHP_IC_ENTRY && zend.ZendHashStrExists(ce.GetFunctionTable(), "__sleep", b.SizeOf("\"__sleep\"")-1) != 0 {
 			var retval zend.Zval
 			var tmp zend.Zval
 			zend.Z_ADDREF_P(struc)
@@ -1301,7 +1301,7 @@ func PhpVarSerializeInit() PhpSerializeDataT {
 
 	if BG(serialize_lock) || !(BG(serialize).level) {
 		d = zend.Emalloc(b.SizeOf("struct php_serialize_data"))
-		d.GetHt().Init(16, nil, zend.ZVAL_PTR_DTOR, 0)
+		zend.ZendHashInit(d.GetHt(), 16, nil, zend.ZVAL_PTR_DTOR, 0)
 		d.SetN(0)
 		if !(BG(serialize_lock)) {
 			BG(serialize).data = d
@@ -1317,7 +1317,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG(serialize_lock), BG(serialize).level); */
 
 	if BG(serialize_lock) || BG(serialize).level == 1 {
-		d.GetHt().Destroy()
+		zend.ZendHashDestroy(d.GetHt())
 		zend.Efree(d)
 	}
 	if !(BG(serialize_lock)) && !(b.PreDec(&(BG(serialize).level))) {
@@ -1505,7 +1505,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	if options != nil {
 		var classes *zend.Zval
 		var max_depth *zend.Zval
-		classes = options.GetArr().StrFindDeref("allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
+		classes = zend.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
 		if classes != nil && classes.GetType() != zend.IS_ARRAY && classes.GetType() != zend.IS_TRUE && classes.GetType() != zend.IS_FALSE {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "allowed_classes option should be array or boolean")
 			zend.RETVAL_FALSE
@@ -1513,7 +1513,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		if classes != nil && (classes.IsType(zend.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			class_hash.Init(b.CondF1(classes.IsType(zend.IS_ARRAY), func() __auto__ { return zend.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
+			zend.ZendHashInit(class_hash, b.CondF1(classes.IsType(zend.IS_ARRAY), func() __auto__ { return zend.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
 		}
 		if class_hash != nil && classes.IsType(zend.IS_ARRAY) {
 			var entry *zend.Zval
@@ -1531,7 +1531,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					entry = _z
 					zend.ConvertToStringEx(entry)
 					lcname = zend.ZendStringTolower(entry.GetStr())
-					class_hash.AddEmptyElement(lcname)
+					zend.ZendHashAddEmptyElement(class_hash, lcname)
 					zend.ZendStringReleaseEx(lcname, 0)
 				}
 				break
@@ -1547,7 +1547,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 		}
 		PhpVarUnserializeSetAllowedClasses(var_hash, class_hash)
-		max_depth = options.GetArr().StrFindDeref("max_depth", b.SizeOf("\"max_depth\"")-1)
+		max_depth = zend.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
 		if max_depth != nil {
 			if max_depth.GetType() != zend.IS_LONG {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth should be int")
@@ -1592,7 +1592,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 cleanup:
 	if class_hash != nil {
-		class_hash.Destroy()
+		zend.ZendHashDestroy(class_hash)
 		zend.FREE_HASHTABLE(class_hash)
 	}
 

@@ -60,7 +60,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 		}
 		if fn_proxy == nil || (*fn_proxy) == nil {
 			if obj_ce != nil {
-				fcic.SetFunctionHandler(obj_ce.GetFunctionTable().StrFindPtr(function_name, function_name_len))
+				fcic.SetFunctionHandler(ZendHashStrFindPtr(obj_ce.GetFunctionTable(), function_name, function_name_len))
 				if fcic.GetFunctionHandler() == nil {
 
 					/* error at c-level */
@@ -293,7 +293,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		}
-		funcs_ptr.SetZfNewIterator(class_type.GetFunctionTable().StrFindPtr("getiterator", b.SizeOf("\"getiterator\"")-1))
+		funcs_ptr.SetZfNewIterator(ZendHashStrFindPtr(class_type.GetFunctionTable(), "getiterator", b.SizeOf("\"getiterator\"")-1))
 	} else {
 		if funcs_ptr == nil {
 			funcs_ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_iterator_funcs"))
@@ -338,11 +338,11 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			funcs_ptr = calloc(1, b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 		} else {
-			funcs_ptr.SetZfRewind(class_type.GetFunctionTable().StrFindPtr("rewind", b.SizeOf("\"rewind\"")-1))
-			funcs_ptr.SetZfValid(class_type.GetFunctionTable().StrFindPtr("valid", b.SizeOf("\"valid\"")-1))
-			funcs_ptr.SetZfKey(class_type.GetFunctionTable().StrFindPtr("key", b.SizeOf("\"key\"")-1))
-			funcs_ptr.SetZfCurrent(class_type.GetFunctionTable().StrFindPtr("current", b.SizeOf("\"current\"")-1))
-			funcs_ptr.SetZfNext(class_type.GetFunctionTable().StrFindPtr("next", b.SizeOf("\"next\"")-1))
+			funcs_ptr.SetZfRewind(ZendHashStrFindPtr(class_type.GetFunctionTable(), "rewind", b.SizeOf("\"rewind\"")-1))
+			funcs_ptr.SetZfValid(ZendHashStrFindPtr(class_type.GetFunctionTable(), "valid", b.SizeOf("\"valid\"")-1))
+			funcs_ptr.SetZfKey(ZendHashStrFindPtr(class_type.GetFunctionTable(), "key", b.SizeOf("\"key\"")-1))
+			funcs_ptr.SetZfCurrent(ZendHashStrFindPtr(class_type.GetFunctionTable(), "current", b.SizeOf("\"current\"")-1))
+			funcs_ptr.SetZfNext(ZendHashStrFindPtr(class_type.GetFunctionTable(), "next", b.SizeOf("\"next\"")-1))
 		}
 	} else {
 		if funcs_ptr == nil {

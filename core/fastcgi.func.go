@@ -176,7 +176,7 @@ func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT
 		var len_ socklen_t = b.SizeOf("sa")
-		FcgiMgmtVars.Init(8, nil, FcgiFreeMgmtVarCb, 1)
+		zend.ZendHashInit(&FcgiMgmtVars, 8, nil, FcgiFreeMgmtVarCb, 1)
 		FcgiSetMgmtVar("FCGI_MPXS_CONNS", b.SizeOf("\"FCGI_MPXS_CONNS\"")-1, "0", b.SizeOf("\"0\"")-1)
 		IsInitialized = 1
 		errno = 0
@@ -200,7 +200,7 @@ func FcgiIsFastcgi() int {
 }
 func FcgiShutdown() {
 	if IsInitialized != 0 {
-		FcgiMgmtVars.Destroy()
+		zend.ZendHashDestroy(&FcgiMgmtVars)
 	}
 	IsFastcgi = 0
 	if AllowedClients != nil {
@@ -614,7 +614,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 		q = req.GetEnv().GetList()
 		for q != nil {
-			if b.Assign(&value, FcgiMgmtVars.StrFind(q.GetVar(), q.GetVarLen())) == nil {
+			if b.Assign(&value, zend.ZendHashStrFind(&FcgiMgmtVars, q.GetVar(), q.GetVarLen())) == nil {
 				q = q.GetListNext()
 				continue
 			}
@@ -981,7 +981,7 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	zend.ZVAL_NEW_STR(&zvalue, zend.ZendStringInit(value, value_len, 1))
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
 	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
-	FcgiMgmtVars.Add(key, &zvalue)
+	zend.ZendHashAdd(&FcgiMgmtVars, key, &zvalue)
 	zend.ZendStringReleaseEx(key, 1)
 }
 func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zv.GetStr(), 1) }

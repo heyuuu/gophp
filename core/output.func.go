@@ -41,20 +41,20 @@ func PhpOutputHeader() {
 }
 func ReverseConflictDtor(zv *zend.Zval) {
 	var ht *zend.HashTable = zv.GetPtr()
-	ht.Destroy()
+	zend.ZendHashDestroy(ht)
 }
 func PhpOutputStartup() {
 	PhpOutputInitGlobals(&OutputGlobals)
-	PhpOutputHandlerAliases.Init(8, nil, nil, 1)
-	PhpOutputHandlerConflicts.Init(8, nil, nil, 1)
-	PhpOutputHandlerReverseConflicts.Init(8, nil, ReverseConflictDtor, 1)
+	zend.ZendHashInit(&PhpOutputHandlerAliases, 8, nil, nil, 1)
+	zend.ZendHashInit(&PhpOutputHandlerConflicts, 8, nil, nil, 1)
+	zend.ZendHashInit(&PhpOutputHandlerReverseConflicts, 8, nil, ReverseConflictDtor, 1)
 	PhpOutputDirect = PhpOutputStdout
 }
 func PhpOutputShutdown() {
 	PhpOutputDirect = PhpOutputStderr
-	PhpOutputHandlerAliases.Destroy()
-	PhpOutputHandlerConflicts.Destroy()
-	PhpOutputHandlerReverseConflicts.Destroy()
+	zend.ZendHashDestroy(&PhpOutputHandlerAliases)
+	zend.ZendHashDestroy(&PhpOutputHandlerConflicts)
+	zend.ZendHashDestroy(&PhpOutputHandlerReverseConflicts)
 }
 func PhpOutputActivate() int {
 	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
@@ -299,12 +299,12 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 	if PhpOutputLockError(PHP_OUTPUT_HANDLER_START) != 0 || handler == nil {
 		return zend.FAILURE
 	}
-	if nil != b.Assign(&conflict, PhpOutputHandlerConflicts.FindPtr(handler.GetName())) {
+	if nil != b.Assign(&conflict, zend.ZendHashFindPtr(&PhpOutputHandlerConflicts, handler.GetName())) {
 		if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
 			return zend.FAILURE
 		}
 	}
-	if nil != b.Assign(&rconflicts, PhpOutputHandlerReverseConflicts.FindPtr(handler.GetName())) {
+	if nil != b.Assign(&rconflicts, zend.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
 		for {
 			var __ht *zend.HashTable = rconflicts
 			var _p *zend.Bucket = __ht.GetArData()
@@ -362,7 +362,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 		return zend.FAILURE
 	}
 	str = zend.ZendStringInitInterned(name, name_len, 1)
-	PhpOutputHandlerConflicts.UpdatePtr(str, check_func)
+	zend.ZendHashUpdatePtr(&PhpOutputHandlerConflicts, str, check_func)
 	zend.ZendStringReleaseEx(str, 1)
 	return zend.SUCCESS
 }
@@ -373,27 +373,27 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		zend.ZendError(zend.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return zend.FAILURE
 	}
-	if nil != b.Assign(&rev_ptr, PhpOutputHandlerReverseConflicts.StrFindPtr(name, name_len)) {
-		if rev_ptr.NextIndexInsertPtr(check_func) {
+	if nil != b.Assign(&rev_ptr, zend.ZendHashStrFindPtr(&PhpOutputHandlerReverseConflicts, name, name_len)) {
+		if zend.ZendHashNextIndexInsertPtr(rev_ptr, check_func) {
 			return zend.SUCCESS
 		} else {
 			return zend.FAILURE
 		}
 	} else {
 		var str *zend.ZendString
-		rev.Init(8, nil, nil, 1)
-		if nil == rev.NextIndexInsertPtr(check_func) {
-			rev.Destroy()
+		zend.ZendHashInit(&rev, 8, nil, nil, 1)
+		if nil == zend.ZendHashNextIndexInsertPtr(&rev, check_func) {
+			zend.ZendHashDestroy(&rev)
 			return zend.FAILURE
 		}
 		str = zend.ZendStringInitInterned(name, name_len, 1)
-		PhpOutputHandlerReverseConflicts.UpdateMem(str, &rev, b.SizeOf("HashTable"))
+		zend.ZendHashUpdateMem(&PhpOutputHandlerReverseConflicts, str, &rev, b.SizeOf("HashTable"))
 		zend.ZendStringReleaseEx(str, 1)
 		return zend.SUCCESS
 	}
 }
 func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT {
-	return PhpOutputHandlerAliases.StrFindPtr(name, name_len)
+	return zend.ZendHashStrFindPtr(&PhpOutputHandlerAliases, name, name_len)
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *zend.ZendString
@@ -402,7 +402,7 @@ func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHand
 		return zend.FAILURE
 	}
 	str = zend.ZendStringInitInterned(name, name_len, 1)
-	PhpOutputHandlerAliases.UpdatePtr(str, func_)
+	zend.ZendHashUpdatePtr(&PhpOutputHandlerAliases, str, func_)
 	zend.ZendStringReleaseEx(str, 1)
 	return zend.SUCCESS
 }

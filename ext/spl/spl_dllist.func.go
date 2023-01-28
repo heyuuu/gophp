@@ -259,23 +259,23 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clon
 		core.PhpErrorDocref(nil, zend.E_COMPILE_ERROR, "Internal compiler error, Class is not child of SplDoublyLinkedList")
 	}
 	if inherited != 0 {
-		intern.SetFptrOffsetGet(class_type.GetFunctionTable().StrFindPtr("offsetget", b.SizeOf("\"offsetget\"")-1))
+		intern.SetFptrOffsetGet(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetget", b.SizeOf("\"offsetget\"")-1))
 		if intern.GetFptrOffsetGet().GetScope() == parent {
 			intern.SetFptrOffsetGet(nil)
 		}
-		intern.SetFptrOffsetSet(class_type.GetFunctionTable().StrFindPtr("offsetset", b.SizeOf("\"offsetset\"")-1))
+		intern.SetFptrOffsetSet(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetset", b.SizeOf("\"offsetset\"")-1))
 		if intern.GetFptrOffsetSet().GetScope() == parent {
 			intern.SetFptrOffsetSet(nil)
 		}
-		intern.SetFptrOffsetHas(class_type.GetFunctionTable().StrFindPtr("offsetexists", b.SizeOf("\"offsetexists\"")-1))
+		intern.SetFptrOffsetHas(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetexists", b.SizeOf("\"offsetexists\"")-1))
 		if intern.GetFptrOffsetHas().GetScope() == parent {
 			intern.SetFptrOffsetHas(nil)
 		}
-		intern.SetFptrOffsetDel(class_type.GetFunctionTable().StrFindPtr("offsetunset", b.SizeOf("\"offsetunset\"")-1))
+		intern.SetFptrOffsetDel(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "offsetunset", b.SizeOf("\"offsetunset\"")-1))
 		if intern.GetFptrOffsetDel().GetScope() == parent {
 			intern.SetFptrOffsetDel(nil)
 		}
-		intern.SetFptrCount(class_type.GetFunctionTable().StrFindPtr("count", b.SizeOf("\"count\"")-1))
+		intern.SetFptrCount(zend.ZendHashStrFindPtr(class_type.GetFunctionTable(), "count", b.SizeOf("\"count\"")-1))
 		if intern.GetFptrCount().GetScope() == parent {
 			intern.SetFptrCount(nil)
 		}
@@ -322,10 +322,10 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
 	debug_info = zend.ZendNewArray(1)
-	debug_info.Copy(intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
+	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags", b.SizeOf("\"flags\"")-1)
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
-	debug_info.Add(pnstr, &tmp)
+	zend.ZendHashAdd(debug_info, pnstr, &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&dllist_array)
 	for current != nil {
@@ -338,7 +338,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		current = next
 	}
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist", b.SizeOf("\"dllist\"")-1)
-	debug_info.Add(pnstr, &dllist_array)
+	zend.ZendHashAdd(debug_info, pnstr, &dllist_array)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	return debug_info
 }
@@ -852,23 +852,23 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 	/* flags */
 
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
-	return_value.GetArr().NextIndexInsert(&tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* elements */
 
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
-		tmp.GetArr().NextIndexInsert(current.GetData())
+		zend.ZendHashNextIndexInsert(tmp.GetArr(), current.GetData())
 		zend.Z_TRY_ADDREF(current.GetData())
 		current = current.GetNext()
 	}
-	return_value.GetArr().NextIndexInsert(&tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	return_value.GetArr().NextIndexInsert(&tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
@@ -880,9 +880,9 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
 		return
 	}
-	flags_zv = data.IndexFind(0)
-	storage_zv = data.IndexFind(1)
-	members_zv = data.IndexFind(2)
+	flags_zv = zend.ZendHashIndexFind(data, 0)
+	storage_zv = zend.ZendHashIndexFind(data, 1)
+	members_zv = zend.ZendHashIndexFind(data, 2)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != zend.IS_LONG || storage_zv.GetType() != zend.IS_ARRAY || members_zv.GetType() != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return

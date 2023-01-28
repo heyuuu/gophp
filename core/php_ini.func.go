@@ -104,7 +104,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
 	if zvalue.IsType(zend.IS_ARRAY) {
-		zvalue.GetArr().Destroy()
+		zend.ZendHashDestroy(zvalue.GetArr())
 		zend.Free(zvalue.GetArr())
 	} else if zvalue.IsType(zend.IS_STRING) {
 		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
@@ -147,7 +147,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* Store in active hash */
 
-			entry = active_hash.Update(arg1.GetStr(), arg2)
+			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr(), arg2)
 			entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		}
 
@@ -169,10 +169,10 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.Find(arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
+		if b.Assign(&find_arr, zend.ZendHashFind(active_hash, arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
-			option_arr.GetArr().Init(8, nil, ConfigZvalDtor, 1)
-			find_arr = active_hash.Update(arg1.GetStr(), &option_arr)
+			zend.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
+			find_arr = zend.ZendHashUpdate(active_hash, arg1.GetStr(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
@@ -180,7 +180,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
 			entry = zend.ZendSymtableUpdate(find_arr.GetArr(), arg3.GetStr(), arg2)
 		} else {
-			entry = find_arr.GetArr().NextIndexInsert(arg2)
+			entry = zend.ZendHashNextIndexInsert(find_arr.GetArr(), arg2)
 		}
 		entry.SetStr(zend.ZendStringDup(entry.GetStr(), 1))
 		break
@@ -232,11 +232,11 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* Search for existing entry and if it does not exist create one */
 
-			if b.Assign(&entry, target_hash.StrFind(key, key_len)) == nil {
+			if b.Assign(&entry, zend.ZendHashStrFind(target_hash, key, key_len)) == nil {
 				var section_arr zend.Zval
 				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				section_arr.GetArr().Init(8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
-				entry = target_hash.StrUpdate(key, key_len, &section_arr)
+				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
+				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
 			}
 			if entry.IsType(zend.IS_ARRAY) {
 				ActiveIniHash = entry.GetArr()
@@ -308,7 +308,7 @@ func PhpInitConfig() int {
 	var opened_path *zend.ZendString = nil
 	var fp *r.FILE
 	var filename *byte
-	ConfigurationHash.Init(8, nil, ConfigZvalDtor, 1)
+	zend.ZendHashInit(&ConfigurationHash, 8, nil, ConfigZvalDtor, 1)
 	if sapi_module.GetIniDefaults() != nil {
 		sapi_module.GetIniDefaults()(&ConfigurationHash)
 	}
@@ -444,7 +444,7 @@ func PhpInitConfig() int {
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 		var tmp zend.Zval
 		zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
-		ConfigurationHash.StrUpdate("cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1, &tmp)
+		zend.ZendHashStrUpdate(&ConfigurationHash, "cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1, &tmp)
 		if opened_path != nil {
 			zend.ZendStringReleaseEx(opened_path, 0)
 		} else {
@@ -579,7 +579,7 @@ func PhpInitConfig() int {
 	return zend.SUCCESS
 }
 func PhpShutdownConfig() int {
-	ConfigurationHash.Destroy()
+	zend.ZendHashDestroy(&ConfigurationHash)
 	if PhpIniOpenedPath != nil {
 		zend.Free(PhpIniOpenedPath)
 		PhpIniOpenedPath = nil
@@ -666,7 +666,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, ConfigurationHash.StrFind(path, strlen(path))) != nil {
+			if b.Assign(&tmp2, zend.ZendHashStrFind(&ConfigurationHash, path, strlen(path))) != nil {
 				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
@@ -683,7 +683,7 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 		/* Search for source array matching the host from configuration_hash */
 
-		if b.Assign(&tmp, ConfigurationHash.StrFind(host, host_len)) != nil {
+		if b.Assign(&tmp, zend.ZendHashStrFind(&ConfigurationHash, host, host_len)) != nil {
 			PhpIniActivateConfig(tmp.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
 
@@ -691,13 +691,15 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 	}
 }
-func CfgGetEntryEx(name *zend.ZendString) *zend.Zval { return ConfigurationHash.Find(name) }
+func CfgGetEntryEx(name *zend.ZendString) *zend.Zval {
+	return zend.ZendHashFind(&ConfigurationHash, name)
+}
 func CfgGetEntry(name *byte, name_length int) *zend.Zval {
-	return ConfigurationHash.StrFind(name, name_length)
+	return zend.ZendHashStrFind(&ConfigurationHash, name, name_length)
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&ConfigurationHash, varname, strlen(varname))) == nil {
 		*result = 0
 		return zend.FAILURE
 	}
@@ -706,7 +708,7 @@ func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 }
 func CfgGetDouble(varname *byte, result *float64) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&ConfigurationHash, varname, strlen(varname))) == nil {
 		*result = float64(0)
 		return zend.FAILURE
 	}
@@ -715,7 +717,7 @@ func CfgGetDouble(varname *byte, result *float64) int {
 }
 func CfgGetString(varname *byte, result **byte) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.StrFind(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&ConfigurationHash, varname, strlen(varname))) == nil {
 		*result = nil
 		return zend.FAILURE
 	}

@@ -510,7 +510,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 			opened_path = ZendStringCopy(filename.GetStr())
 			file_handle.SetOpenedPath(opened_path)
 		}
-		ExecutorGlobals.GetIncludedFiles().AddEmptyElement(file_handle.GetOpenedPath())
+		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
 		if opened_path != nil {
 			ZendStringReleaseEx(opened_path, 0)
 		}

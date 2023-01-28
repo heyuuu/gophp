@@ -12,12 +12,12 @@ import (
 func PhpStreamXportGetHash() *zend.HashTable { return &XportHash }
 func PhpStreamXportRegister(protocol string, factory PhpStreamTransportFactory) int {
 	var str *zend.ZendString = zend.ZendStringInitInterned(protocol, strlen(protocol), 1)
-	XportHash.UpdatePtr(str, factory)
+	zend.ZendHashUpdatePtr(&XportHash, str, factory)
 	zend.ZendStringReleaseEx(str, 1)
 	return zend.SUCCESS
 }
 func PhpStreamXportUnregister(protocol *byte) int {
-	return XportHash.StrDel(protocol, strlen(protocol))
+	return zend.ZendHashStrDel(&XportHash, protocol, strlen(protocol))
 }
 func ERR_REPORT(out_err **zend.ZendString, fmt string, arg []byte) {
 	if out_err != nil {
@@ -88,7 +88,7 @@ func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, pers
 		n = 3
 	}
 	if protocol != nil {
-		if nil == b.Assign(&factory, XportHash.StrFindPtr(protocol, n)) {
+		if nil == b.Assign(&factory, zend.ZendHashStrFindPtr(&XportHash, protocol, n)) {
 			var wrapper_name []byte
 			if n >= b.SizeOf("wrapper_name") {
 				n = b.SizeOf("wrapper_name") - 1

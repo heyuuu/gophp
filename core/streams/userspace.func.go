@@ -265,7 +265,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 
 			/* We failed.  But why? */
 
-			if core.PhpStreamGetUrlStreamWrappersHash().Exists(protocol) != 0 {
+			if zend.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
@@ -314,13 +314,13 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
-	if b.Assign(&wrapper, global_wrapper_hash.FindPtr(protocol)) == nil {
+	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		zend.RETVAL_FALSE
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
-	if wrapper_hash == global_wrapper_hash || wrapper_hash.FindPtr(protocol) == wrapper {
+	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
 		zend.RETVAL_TRUE
 		return
@@ -521,43 +521,43 @@ func StatbufFromArray(array *zend.Zval, ssb *core.PhpStreamStatbuf) int {
 	// #define STAT_PROP_ENTRY(name) STAT_PROP_ENTRY_EX ( name , name )
 
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
-	if nil != b.Assign(&elem, array.GetArr().StrFind("dev", b.SizeOf("\"dev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "dev", b.SizeOf("\"dev\"")-1)) {
 		ssb.GetSb().st_dev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("ino", b.SizeOf("\"ino\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ino", b.SizeOf("\"ino\"")-1)) {
 		ssb.GetSb().st_ino = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("mode", b.SizeOf("\"mode\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mode", b.SizeOf("\"mode\"")-1)) {
 		ssb.GetSb().st_mode = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("nlink", b.SizeOf("\"nlink\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "nlink", b.SizeOf("\"nlink\"")-1)) {
 		ssb.GetSb().st_nlink = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("uid", b.SizeOf("\"uid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "uid", b.SizeOf("\"uid\"")-1)) {
 		ssb.GetSb().st_uid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("gid", b.SizeOf("\"gid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "gid", b.SizeOf("\"gid\"")-1)) {
 		ssb.GetSb().st_gid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("rdev", b.SizeOf("\"rdev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "rdev", b.SizeOf("\"rdev\"")-1)) {
 		ssb.GetSb().st_rdev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("size", b.SizeOf("\"size\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "size", b.SizeOf("\"size\"")-1)) {
 		ssb.GetSb().st_size = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("atime", b.SizeOf("\"atime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "atime", b.SizeOf("\"atime\"")-1)) {
 		ssb.GetSb().st_atime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("mtime", b.SizeOf("\"mtime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mtime", b.SizeOf("\"mtime\"")-1)) {
 		ssb.GetSb().st_mtime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("ctime", b.SizeOf("\"ctime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ctime", b.SizeOf("\"ctime\"")-1)) {
 		ssb.GetSb().st_ctime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("blksize", b.SizeOf("\"blksize\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blksize", b.SizeOf("\"blksize\"")-1)) {
 		ssb.GetSb().st_blksize = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, array.GetArr().StrFind("blocks", b.SizeOf("\"blocks\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blocks", b.SizeOf("\"blocks\"")-1)) {
 		ssb.GetSb().st_blocks = zend.ZvalGetLong(elem)
 	}
 	return zend.SUCCESS

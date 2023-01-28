@@ -20,7 +20,7 @@ func _phpGetStreamFiltersHash() *zend.HashTable {
 func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilterFactory) int {
 	var ret int
 	var str *zend.ZendString = zend.ZendStringInitInterned(filterpattern, strlen(filterpattern), 1)
-	if StreamFiltersHash.AddPtr(str, any(factory)) {
+	if zend.ZendHashAddPtr(&StreamFiltersHash, str, any(factory)) {
 		ret = zend.SUCCESS
 	} else {
 		ret = zend.FAILURE
@@ -29,15 +29,15 @@ func PhpStreamFilterRegisterFactory(filterpattern *byte, factory *PhpStreamFilte
 	return ret
 }
 func PhpStreamFilterUnregisterFactory(filterpattern *byte) int {
-	return StreamFiltersHash.StrDel(filterpattern, strlen(filterpattern))
+	return zend.ZendHashStrDel(&StreamFiltersHash, filterpattern, strlen(filterpattern))
 }
 func PhpStreamFilterRegisterFactoryVolatile(filterpattern *zend.ZendString, factory *PhpStreamFilterFactory) int {
 	if !(standard.FG(stream_filters)) {
 		zend.ALLOC_HASHTABLE(standard.FG(stream_filters))
-		standard.FG(stream_filters).Init(StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)
-		standard.FG(stream_filters).Copy(&StreamFiltersHash, nil)
+		zend.ZendHashInit(standard.FG(stream_filters), StreamFiltersHash.GetNNumOfElements()+1, nil, nil, 0)
+		zend.ZendHashCopy(standard.FG(stream_filters), &StreamFiltersHash, nil)
 	}
-	if standard.FG(stream_filters).AddPtr(filterpattern, any(factory)) {
+	if zend.ZendHashAddPtr(standard.FG(stream_filters), filterpattern, any(factory)) {
 		return zend.SUCCESS
 	} else {
 		return zend.FAILURE
@@ -154,7 +154,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent
 	var n int
 	var period *byte
 	n = strlen(filtername)
-	if nil != b.Assign(&factory, filter_hash.StrFindPtr(filtername, n)) {
+	if nil != b.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, filtername, n)) {
 		filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 	} else if b.Assign(&period, strrchr(filtername, '.')) {
 
@@ -168,7 +168,7 @@ func PhpStreamFilterCreate(filtername *byte, filterparams *zend.Zval, persistent
 			zend.ZEND_ASSERT(period[0] == '.')
 			period[1] = '*'
 			period[2] = '0'
-			if nil != b.Assign(&factory, filter_hash.StrFindPtr(wildname, strlen(wildname))) {
+			if nil != b.Assign(&factory, zend.ZendHashStrFindPtr(filter_hash, wildname, strlen(wildname))) {
 				filter = factory.GetCreateFilter()(filtername, filterparams, persistent)
 			}
 			*period = '0'

@@ -59,7 +59,7 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {
 	if BG(user_filter_map) {
-		BG(user_filter_map).Destroy()
+		zend.ZendHashDestroy(BG(user_filter_map))
 		zend.Efree(BG(user_filter_map))
 		BG(user_filter_map) = nil
 	}
@@ -108,7 +108,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 
 	var orig_no_fclose uint32 = stream.GetFlags() & core.PHP_STREAM_FLAG_NO_FCLOSE
 	stream.AddFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
-	if zend.Z_OBJPROP_P(obj).StrExistsInd("stream", b.SizeOf("\"stream\"")-1) == 0 {
+	if zend.ZendHashStrExistsInd(zend.Z_OBJPROP_P(obj), "stream", b.SizeOf("\"stream\"")-1) == 0 {
 		var tmp zend.Zval
 
 		/* Give the userfilter class a hook back to the stream */
@@ -172,7 +172,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 	 * from being destroyed properly */
 
 	zend.ZVAL_STRINGL(&zpropname, "stream", b.SizeOf("\"stream\"")-1)
-	zend.Z_OBJ_HANDLER_P(obj, unset_property)(obj, &zpropname, nil)
+	zend.Z_OBJ_HT(*obj).GetUnsetProperty()(obj, &zpropname, nil)
 	zend.ZvalPtrDtor(&zpropname)
 	zend.ZvalPtrDtor(&args[3])
 	zend.ZvalPtrDtor(&args[2])
@@ -201,7 +201,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 	/* determine the classname/class entry */
 
-	if nil == b.Assign(&fdat, BG(user_filter_map).StrFindPtr((*byte)(filtername), len_)) {
+	if nil == b.Assign(&fdat, zend.ZendHashStrFindPtr(BG(user_filter_map), (*byte)(filtername), len_)) {
 		var period *byte
 
 		/* Userspace Filters using ambiguous wildcards could cause problems.
@@ -221,7 +221,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 				zend.ZEND_ASSERT(period[0] == '.')
 				period[1] = '*'
 				period[2] = '0'
-				if nil != b.Assign(&fdat, BG(user_filter_map).StrFindPtr(wildcard, strlen(wildcard))) {
+				if nil != b.Assign(&fdat, zend.ZendHashStrFindPtr(BG(user_filter_map), wildcard, strlen(wildcard))) {
 					period = nil
 				} else {
 					*period = '0'
@@ -486,7 +486,7 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 		}
 		break
 	}
-	if nil == b.Assign(&pzbucket, zend.Z_OBJPROP_P(zobject).StrFindDeref("bucket", b.SizeOf("\"bucket\"")-1)) {
+	if nil == b.Assign(&pzbucket, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "bucket", b.SizeOf("\"bucket\"")-1)) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Object has no bucket property")
 		zend.RETVAL_FALSE
 		return
@@ -499,7 +499,7 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 		zend.RETVAL_FALSE
 		return
 	}
-	if nil != b.Assign(&pzdata, zend.Z_OBJPROP_P(zobject).StrFindDeref("data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(zend.IS_STRING) {
+	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(zend.IS_STRING) {
 		if bucket.GetOwnBuf() == 0 {
 			bucket = streams.PhpStreamBucketMakeWriteable(bucket)
 		}
@@ -746,11 +746,11 @@ func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	if !(BG(user_filter_map)) {
 		BG(user_filter_map) = (*zend.HashTable)(zend.Emalloc(b.SizeOf("HashTable")))
-		BG(user_filter_map).Init(8, nil, zend.DtorFuncT(FilterItemDtor), 0)
+		zend.ZendHashInit(BG(user_filter_map), 8, nil, zend.DtorFuncT(FilterItemDtor), 0)
 	}
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
 	fdat.SetClassname(zend.ZendStringCopy(classname))
-	if BG(user_filter_map).AddPtr(filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == zend.SUCCESS {
+	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == zend.SUCCESS {
 		zend.RETVAL_TRUE
 	} else {
 		zend.ZendStringReleaseEx(classname, 0)

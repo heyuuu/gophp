@@ -22,9 +22,9 @@ func ModuleNameCmp(a any, b any) int {
 func PrintModules() {
 	var sorted_registry zend.HashTable
 	var module *zend.ZendModuleEntry
-	sorted_registry.Init(50, nil, nil, 0)
-	sorted_registry.Copy(&zend.ModuleRegistry, nil)
-	sorted_registry.Sort(ModuleNameCmp, 0)
+	zend.ZendHashInit(&sorted_registry, 50, nil, nil, 0)
+	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
+	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
 		var _p *zend.Bucket = __ht.GetArData()
@@ -40,7 +40,7 @@ func PrintModules() {
 		}
 		break
 	}
-	sorted_registry.Destroy()
+	zend.ZendHashDestroy(&sorted_registry)
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
@@ -190,7 +190,7 @@ func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
 }
 func INI_DEFAULT(name string, value string) {
 	zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
-	core.ConfigurationHash.StrUpdate(name, b.SizeOf("name")-1, &tmp)
+	zend.ZendHashStrUpdate(core.ConfigurationHash, name, b.SizeOf("name")-1, &tmp)
 }
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
 	var tmp zend.Zval
@@ -592,9 +592,9 @@ func DoCli(argc int, argv **byte) int {
 					input[len_] = '0'
 				}
 				zend.ZVAL_STRINGL(&argn, input, len_+1)
-				zend.ExecutorGlobals.GetSymbolTable().StrUpdate("argn", b.SizeOf("\"argn\"")-1, &argn)
+				zend.ZendHashStrUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), "argn", b.SizeOf("\"argn\"")-1, &argn)
 				zend.ZVAL_LONG(&argi, b.PreInc(&index))
-				zend.ExecutorGlobals.GetSymbolTable().StrUpdate("argi", b.SizeOf("\"argi\"")-1, &argi)
+				zend.ZendHashStrUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), "argi", b.SizeOf("\"argi\"")-1, &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254
@@ -673,7 +673,7 @@ func DoCli(argc int, argv **byte) int {
 			var len_ int = strlen(reflection_what)
 			var lcname *byte = zend.ZendStrTolowerDup(reflection_what, len_)
 			var module *zend.ZendModuleEntry
-			if b.Assign(&module, zend.ModuleRegistry.StrFindPtr(lcname, len_)) == nil {
+			if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, lcname, len_)) == nil {
 				if !(strcmp(reflection_what, "main")) {
 					core.DisplayIniEntries(nil)
 				} else {

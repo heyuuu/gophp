@@ -14,7 +14,7 @@ import (
 
 func UserConfigCacheEntryDtor(el *zend.Zval) {
 	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
-	entry.GetUserConfig().Destroy()
+	zend.ZendHashDestroy(entry.GetUserConfig())
 	zend.Free(entry.GetUserConfig())
 	zend.Free(entry)
 }
@@ -33,9 +33,9 @@ func ModuleNameCmp(a any, b any) int {
 func PrintModules() {
 	var sorted_registry zend.HashTable
 	var module *zend.ZendModuleEntry
-	sorted_registry.Init(64, nil, nil, 1)
-	sorted_registry.Copy(&zend.ModuleRegistry, nil)
-	sorted_registry.Sort(ModuleNameCmp, 0)
+	zend.ZendHashInit(&sorted_registry, 64, nil, nil, 1)
+	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
+	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
 	for {
 		var __ht *zend.HashTable = &sorted_registry
 		var _p *zend.Bucket = __ht.GetArData()
@@ -51,7 +51,7 @@ func PrintModules() {
 		}
 		break
 	}
-	sorted_registry.Destroy()
+	zend.ZendHashDestroy(&sorted_registry)
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
@@ -392,12 +392,12 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 	/* Find cached config entry: If not found, create one */
 
-	if b.Assign(&entry, CGIG(user_config_cache).StrFindPtr(path, path_len)) == nil {
+	if b.Assign(&entry, zend.ZendHashStrFindPtr(&(CGIG(user_config_cache)), path, path_len)) == nil {
 		new_entry = zend.Pemalloc(b.SizeOf("user_config_cache_entry"), 1)
 		new_entry.SetExpires(0)
 		new_entry.SetUserConfig((*zend.HashTable)(zend.Pemalloc(b.SizeOf("HashTable"), 1)))
-		new_entry.GetUserConfig().Init(8, nil, zend.DtorFuncT(core.ConfigZvalDtor), 1)
-		entry = CGIG(user_config_cache).StrUpdatePtr(path, path_len, new_entry)
+		zend.ZendHashInit(new_entry.GetUserConfig(), 8, nil, zend.DtorFuncT(core.ConfigZvalDtor), 1)
+		entry = zend.ZendHashStrUpdatePtr(&(CGIG(user_config_cache)), path, path_len, new_entry)
 	}
 
 	/* Check whether cache entry has expired and rescan if it is */
@@ -410,7 +410,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 		/* Clear the expired config */
 
-		entry.GetUserConfig().Clean()
+		zend.ZendHashClean(entry.GetUserConfig())
 		if !(zend.IS_ABSOLUTE_PATH(path, path_len)) {
 			var real_path_len int
 			real_path = zend.TsrmRealpath(path, nil)
@@ -923,14 +923,14 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	php_cgi_globals.SetFixPathinfo(1)
 	php_cgi_globals.SetDiscardPath(0)
 	php_cgi_globals.SetFcgiLogging(1)
-	php_cgi_globals.GetUserConfigCache().Init(8, nil, UserConfigCacheEntryDtor, 1)
+	zend.ZendHashInit(php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
 	zend.REGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
-	CGIG(user_config_cache).Destroy()
+	zend.ZendHashDestroy(&(CGIG(user_config_cache)))
 	zend.UNREGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }

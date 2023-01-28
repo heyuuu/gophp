@@ -11,13 +11,13 @@ import (
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	var zalgo zend.Zval
 	zend.ZVAL_PTR(&zalgo, (*PhpPasswordAlgo)(algo))
-	if PhpPasswordAlgos.StrAdd(ident, strlen(ident), &zalgo) != nil {
+	if zend.ZendHashStrAdd(&PhpPasswordAlgos, ident, strlen(ident), &zalgo) != nil {
 		return zend.SUCCESS
 	}
 	return zend.FAILURE
 }
 func PhpPasswordAlgoUnregister(ident *byte) {
-	PhpPasswordAlgos.StrDel(ident, strlen(ident))
+	zend.ZendHashStrDel(&PhpPasswordAlgos, ident, strlen(ident))
 }
 func PhpPasswordSaltIsAlphabet(str *byte, len_ int) int {
 	var i int = 0
@@ -82,7 +82,7 @@ func PhpPasswordMakeSalt(length int) *zend.ZendString {
 func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend.HashTable) *zend.ZendString {
 	var buffer *zend.ZendString
 	var option_buffer *zend.Zval
-	if options == nil || !(b.Assign(&option_buffer, options.StrFind("salt", b.SizeOf("\"salt\"")-1))) {
+	if options == nil || !(b.Assign(&option_buffer, zend.ZendHashStrFind(options, "salt", b.SizeOf("\"salt\"")-1))) {
 		return PhpPasswordMakeSalt(required_salt_len)
 	}
 	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
@@ -179,7 +179,7 @@ func PhpPasswordBcryptNeedsRehash(hash *zend.ZendString, options *zend.ZendArray
 
 	}
 	sscanf(hash.GetVal(), "$2y$"+zend.ZEND_LONG_FMT+"$", &old_cost)
-	if options != nil && b.Assign(&znew_cost, options.StrFind("cost", b.SizeOf("\"cost\"")-1)) != nil {
+	if options != nil && b.Assign(&znew_cost, zend.ZendHashStrFind(options, "cost", b.SizeOf("\"cost\"")-1)) != nil {
 		new_cost = zend.ZvalGetLong(znew_cost)
 	}
 	return old_cost != new_cost
@@ -215,7 +215,7 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 	var salt *zend.ZendString
 	var zcost *zend.Zval
 	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
-	if options != nil && b.Assign(&zcost, options.StrFind("cost", b.SizeOf("\"cost\"")-1)) != nil {
+	if options != nil && b.Assign(&zcost, zend.ZendHashStrFind(options, "cost", b.SizeOf("\"cost\"")-1)) != nil {
 		cost = zend.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {
@@ -246,7 +246,7 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 	return result
 }
 func ZmStartupPassword(type_ int, module_number int) int {
-	PhpPasswordAlgos.Init(4, nil, zend.ZVAL_PTR_DTOR, 1)
+	zend.ZendHashInit(&PhpPasswordAlgos, 4, nil, zend.ZVAL_PTR_DTOR, 1)
 	zend.REGISTER_STRING_CONSTANT("PASSWORD_DEFAULT", "2y", zend.CONST_CS|zend.CONST_PERSISTENT)
 	if zend.FAILURE == PhpPasswordAlgoRegister("2y", &PhpPasswordAlgoBcrypt) {
 		return zend.FAILURE
@@ -256,7 +256,7 @@ func ZmStartupPassword(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmShutdownPassword(type_ int, module_number int) int {
-	PhpPasswordAlgos.Destroy()
+	zend.ZendHashDestroy(&PhpPasswordAlgos)
 	return zend.SUCCESS
 }
 func PhpPasswordAlgoDefault() *PhpPasswordAlgo { return &PhpPasswordAlgoBcrypt }
@@ -265,7 +265,7 @@ func PhpPasswordAlgoFind(ident *zend.ZendString) *PhpPasswordAlgo {
 	if ident == nil {
 		return nil
 	}
-	tmp = PhpPasswordAlgos.Find((*zend.ZendString)(ident))
+	tmp = zend.ZendHashFind(&PhpPasswordAlgos, (*zend.ZendString)(ident))
 	if tmp == nil || tmp.GetType() != zend.IS_PTR {
 		return nil
 	}

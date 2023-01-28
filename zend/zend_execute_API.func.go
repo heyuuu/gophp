@@ -58,9 +58,9 @@ func InitExecutor() {
 	ExecutorGlobals.SetErrorHandling(EH_NORMAL)
 	ExecutorGlobals.SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
-	ExecutorGlobals.GetSymbolTable().Init(64, nil, ZVAL_PTR_DTOR, 0)
+	ZendHashInit(&(ExecutorGlobals.GetSymbolTable()), 64, nil, ZVAL_PTR_DTOR, 0)
 	ZendLlistApply(&ZendExtensions, LlistApplyFuncT(ZendExtensionActivator))
-	ExecutorGlobals.GetIncludedFiles().Init(8, nil, nil, 0)
+	ZendHashInit(&(ExecutorGlobals.GetIncludedFiles()), 8, nil, nil, 0)
 	ExecutorGlobals.SetTicksCount(0)
 	ZVAL_UNDEF(&(ExecutorGlobals.GetUserErrorHandler()))
 	ZVAL_UNDEF(&(ExecutorGlobals.GetUserExceptionHandler()))
@@ -127,7 +127,7 @@ func ShutdownDestructors() {
 		var symbols uint32
 		for {
 			symbols = ExecutorGlobals.GetSymbolTable().GetNNumOfElements()
-			ExecutorGlobals.GetSymbolTable().ReverseApply(ApplyFuncT(ZvalCallDestructor))
+			ZendHashReverseApply(&(ExecutorGlobals.GetSymbolTable()), ApplyFuncT(ZvalCallDestructor))
 			if symbols == ExecutorGlobals.GetSymbolTable().GetNNumOfElements() {
 				break
 			}
@@ -169,7 +169,7 @@ func ShutdownExecutor() {
 
 	ExecutorGlobals.SetActive(0)
 	if fast_shutdown == 0 {
-		ExecutorGlobals.GetSymbolTable().GracefulReverseDestroy()
+		ZendHashGracefulReverseDestroy(&(ExecutorGlobals.GetSymbolTable()))
 
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */
@@ -283,16 +283,16 @@ func ShutdownExecutor() {
 		 * each allocated block separately.
 		 */
 
-		ExecutorGlobals.GetZendConstants().Discard(ExecutorGlobals.GetPersistentConstantsCount())
-		ExecutorGlobals.GetFunctionTable().Discard(ExecutorGlobals.GetPersistentFunctionsCount())
-		ExecutorGlobals.GetClassTable().Discard(ExecutorGlobals.GetPersistentClassesCount())
+		ZendHashDiscard(ExecutorGlobals.GetZendConstants(), ExecutorGlobals.GetPersistentConstantsCount())
+		ZendHashDiscard(ExecutorGlobals.GetFunctionTable(), ExecutorGlobals.GetPersistentFunctionsCount())
+		ZendHashDiscard(ExecutorGlobals.GetClassTable(), ExecutorGlobals.GetPersistentClassesCount())
 		ZendCleanupInternalClasses()
 	} else {
 		ZendVmStackDestroy()
 		if ExecutorGlobals.GetFullTablesCleanup() != 0 {
-			ExecutorGlobals.GetZendConstants().ReverseApply(CleanNonPersistentConstantFull)
-			ExecutorGlobals.GetFunctionTable().ReverseApply(CleanNonPersistentFunctionFull)
-			ExecutorGlobals.GetClassTable().ReverseApply(CleanNonPersistentClassFull)
+			ZendHashReverseApply(ExecutorGlobals.GetZendConstants(), CleanNonPersistentConstantFull)
+			ZendHashReverseApply(ExecutorGlobals.GetFunctionTable(), CleanNonPersistentFunctionFull)
+			ZendHashReverseApply(ExecutorGlobals.GetClassTable(), CleanNonPersistentClassFull)
 		} else {
 			for {
 				var __ht *HashTable = ExecutorGlobals.GetZendConstants()
@@ -321,16 +321,16 @@ func ShutdownExecutor() {
 					__ht.GetNNumOfElements()--
 					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
 					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = __ht.Hash(nIndex)
+					var i uint32 = HT_HASH(__ht, nIndex)
 					if j != i {
-						var prev *Bucket = __ht.HashToBucket(i)
+						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
 						for prev.GetVal().GetNext() != j {
 							i = prev.GetVal().GetNext()
-							prev = __ht.HashToBucket(i)
+							prev = HT_HASH_TO_BUCKET(__ht, i)
 						}
 						prev.GetVal().SetNext(_p.GetVal().GetNext())
 					} else {
-						__ht.Hash(nIndex) = _p.GetVal().GetNext()
+						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
 					}
 				}
 				__ht.SetNNumUsed(_idx)
@@ -359,16 +359,16 @@ func ShutdownExecutor() {
 					__ht.GetNNumOfElements()--
 					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
 					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = __ht.Hash(nIndex)
+					var i uint32 = HT_HASH(__ht, nIndex)
 					if j != i {
-						var prev *Bucket = __ht.HashToBucket(i)
+						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
 						for prev.GetVal().GetNext() != j {
 							i = prev.GetVal().GetNext()
-							prev = __ht.HashToBucket(i)
+							prev = HT_HASH_TO_BUCKET(__ht, i)
 						}
 						prev.GetVal().SetNext(_p.GetVal().GetNext())
 					} else {
-						__ht.Hash(nIndex) = _p.GetVal().GetNext()
+						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
 					}
 				}
 				__ht.SetNNumUsed(_idx)
@@ -396,16 +396,16 @@ func ShutdownExecutor() {
 					__ht.GetNNumOfElements()--
 					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
 					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = __ht.Hash(nIndex)
+					var i uint32 = HT_HASH(__ht, nIndex)
 					if j != i {
-						var prev *Bucket = __ht.HashToBucket(i)
+						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
 						for prev.GetVal().GetNext() != j {
 							i = prev.GetVal().GetNext()
-							prev = __ht.HashToBucket(i)
+							prev = HT_HASH_TO_BUCKET(__ht, i)
 						}
 						prev.GetVal().SetNext(_p.GetVal().GetNext())
 					} else {
-						__ht.Hash(nIndex) = _p.GetVal().GetNext()
+						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
 					}
 				}
 				__ht.SetNNumUsed(_idx)
@@ -414,16 +414,16 @@ func ShutdownExecutor() {
 		}
 		for ExecutorGlobals.GetSymtableCachePtr() > ExecutorGlobals.GetSymtableCache() {
 			ExecutorGlobals.GetSymtableCachePtr()--
-			ExecutorGlobals.GetSymtableCachePtr().Destroy()
+			ZendHashDestroy(*(ExecutorGlobals.GetSymtableCachePtr()))
 			FREE_HASHTABLE(*(ExecutorGlobals.GetSymtableCachePtr()))
 		}
-		ExecutorGlobals.GetIncludedFiles().Destroy()
+		ZendHashDestroy(&(ExecutorGlobals.GetIncludedFiles()))
 		ZendStackDestroy(&(ExecutorGlobals.GetUserErrorHandlersErrorReporting()))
 		ZendStackDestroy(&(ExecutorGlobals.GetUserErrorHandlers()))
 		ZendStackDestroy(&(ExecutorGlobals.GetUserExceptionHandlers()))
 		ZendObjectsStoreDestroy(&(ExecutorGlobals.GetObjectsStore()))
 		if ExecutorGlobals.GetInAutoload() != nil {
-			ExecutorGlobals.GetInAutoload().Destroy()
+			ZendHashDestroy(ExecutorGlobals.GetInAutoload())
 			FREE_HASHTABLE(ExecutorGlobals.GetInAutoload())
 		}
 		if ExecutorGlobals.GetHtIterators() != ExecutorGlobals.GetHtIteratorsSlots() {
@@ -865,7 +865,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 			lc_name = ZendStringTolower(name)
 		}
 	}
-	zv = ExecutorGlobals.GetClassTable().Find(lc_name)
+	zv = ZendHashFind(ExecutorGlobals.GetClassTable(), lc_name)
 	if zv != nil {
 		if key == nil {
 			ZendStringReleaseEx(lc_name, 0)
@@ -911,9 +911,9 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 	}
 	if ExecutorGlobals.GetInAutoload() == nil {
 		ALLOC_HASHTABLE(ExecutorGlobals.GetInAutoload())
-		ExecutorGlobals.GetInAutoload().Init(8, nil, nil, 0)
+		ZendHashInit(ExecutorGlobals.GetInAutoload(), 8, nil, nil, 0)
 	}
-	if ExecutorGlobals.GetInAutoload().AddEmptyElement(lc_name) == nil {
+	if ZendHashAddEmptyElement(ExecutorGlobals.GetInAutoload(), lc_name) == nil {
 		if key == nil {
 			ZendStringReleaseEx(lc_name, 0)
 		}
@@ -939,13 +939,13 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 	ExecutorGlobals.SetFakeScope(nil)
 	ZendExceptionSave()
 	if ZendCallFunction(&fcall_info, &fcall_cache) == SUCCESS && ExecutorGlobals.GetException() == nil {
-		ce = ExecutorGlobals.GetClassTable().FindPtr(lc_name)
+		ce = ZendHashFindPtr(ExecutorGlobals.GetClassTable(), lc_name)
 	}
 	ZendExceptionRestore()
 	ExecutorGlobals.SetFakeScope(orig_fake_scope)
 	ZvalPtrDtor(&args[0])
 	ZvalPtrDtorStr(fcall_info.GetFunctionName())
-	ExecutorGlobals.GetInAutoload().Del(lc_name)
+	ZendHashDel(ExecutorGlobals.GetInAutoload(), lc_name)
 	ZvalPtrDtor(&local_retval)
 	if key == nil {
 		ZendStringReleaseEx(lc_name, 0)
@@ -1229,7 +1229,7 @@ func ZendFetchClassByName(class_name *ZendString, key *ZendString, fetch_type in
 	return ce
 }
 func ZendDeleteGlobalVariable(name *ZendString) int {
-	return ExecutorGlobals.GetSymbolTable().DelInd(name)
+	return ZendHashDelInd(&(ExecutorGlobals.GetSymbolTable()), name)
 }
 func ZendRebuildSymbolTable() *ZendArray {
 	var ex *ZendExecuteData
@@ -1254,21 +1254,21 @@ func ZendRebuildSymbolTable() *ZendArray {
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table
 		}
-		symbol_table.Extend(ex.GetFunc().GetOpArray().GetLastVar(), 0)
+		ZendHashExtend(symbol_table, ex.GetFunc().GetOpArray().GetLastVar(), 0)
 	} else {
 		ex.SetSymbolTable(ZendNewArray(ex.GetFunc().GetOpArray().GetLastVar()))
 		symbol_table = ex.GetSymbolTable()
 		if ex.GetFunc().GetOpArray().GetLastVar() == 0 {
 			return symbol_table
 		}
-		symbol_table.RealInitMixed()
+		ZendHashRealInitMixed(symbol_table)
 	}
 	if ex.GetFunc().GetOpArray().GetLastVar() != 0 {
 		var str **ZendString = ex.GetFunc().GetOpArray().GetVars()
 		var end **ZendString = str + ex.GetFunc().GetOpArray().GetLastVar()
 		var var_ *Zval = ZEND_CALL_VAR_NUM(ex, 0)
 		for {
-			symbol_table._appendInd(*str, var_)
+			_zendHashAppendInd(symbol_table, *str, var_)
 			str++
 			var_++
 			if str == end {
@@ -1290,7 +1290,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 		var end **ZendString = str + op_array.GetLastVar()
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
-			var zv *Zval = ht.FindEx(*str, 1)
+			var zv *Zval = ZendHashFindEx(ht, *str, 1)
 			if zv != nil {
 				if zv.IsType(IS_INDIRECT) {
 					var val *Zval = zv.GetZv()
@@ -1300,7 +1300,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 				}
 			} else {
 				ZVAL_UNDEF(var_)
-				zv = ht.AddNew(*str, var_)
+				zv = ZendHashAddNew(ht, *str, var_)
 			}
 			ZVAL_INDIRECT(zv, var_)
 			str++
@@ -1326,9 +1326,9 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
 			if var_.IsType(IS_UNDEF) {
-				ht.Del(*str)
+				ZendHashDel(ht, *str)
 			} else {
-				ht.Update(*str, var_)
+				ZendHashUpdate(ht, *str, var_)
 				ZVAL_UNDEF(var_)
 			}
 			str++
@@ -1368,12 +1368,12 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 			if force != 0 {
 				var symbol_table *ZendArray = ZendRebuildSymbolTable()
 				if symbol_table != nil {
-					symbol_table.Update(name, value)
+					ZendHashUpdate(symbol_table, name, value)
 					return SUCCESS
 				}
 			}
 		} else {
-			execute_data.GetSymbolTable().UpdateInd(name, value)
+			ZendHashUpdateInd(execute_data.GetSymbolTable(), name, value)
 			return SUCCESS
 		}
 	}
@@ -1407,12 +1407,12 @@ func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
 			if force != 0 {
 				var symbol_table *ZendArray = ZendRebuildSymbolTable()
 				if symbol_table != nil {
-					symbol_table.StrUpdate(name, len_, value)
+					ZendHashStrUpdate(symbol_table, name, len_, value)
 					return SUCCESS
 				}
 			}
 		} else {
-			execute_data.GetSymbolTable().StrUpdateInd(name, len_, value)
+			ZendHashStrUpdateInd(execute_data.GetSymbolTable(), name, len_, value)
 			return SUCCESS
 		}
 	}

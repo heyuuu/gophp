@@ -358,7 +358,7 @@ func zim_error_exception_getSeverity(execute_data *ZendExecuteData, return_value
 	ZVAL_COPY(return_value, prop)
 }
 func TRACE_APPEND_KEY(key *ZendString) {
-	tmp = ht.Find(key)
+	tmp = ZendHashFind(ht, key)
 	if tmp {
 		if tmp.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())
@@ -412,7 +412,7 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		SmartStrAppends(str, "Array, ")
 		break
 	case IS_OBJECT:
-		var class_name *ZendString = Z_OBJ_HANDLER_P(arg, get_class_name)(arg.GetObj())
+		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(arg.GetObj())
 		SmartStrAppends(str, "Object(")
 		SmartStrAppends(str, class_name.GetVal())
 		SmartStrAppends(str, "), ")
@@ -426,14 +426,14 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	SmartStrAppendc(str, '#')
 	SmartStrAppendLong(str, num)
 	SmartStrAppendc(str, ' ')
-	file = ht.FindEx(ZSTR_KNOWN(ZEND_STR_FILE), 1)
+	file = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_FILE), 1)
 	if file != nil {
 		if file.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
 			SmartStrAppends(str, "[unknown function]")
 		} else {
 			var line ZendLong
-			tmp = ht.FindEx(ZSTR_KNOWN(ZEND_STR_LINE), 1)
+			tmp = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_LINE), 1)
 			if tmp != nil {
 				if tmp.IsType(IS_LONG) {
 					line = tmp.GetLval()
@@ -456,7 +456,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_TYPE))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_FUNCTION))
 	SmartStrAppendc(str, '(')
-	tmp = ht.FindEx(ZSTR_KNOWN(ZEND_STR_ARGS), 1)
+	tmp = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_ARGS), 1)
 	if tmp != nil {
 		if tmp.IsType(IS_ARRAY) {
 			var last_len int = str.GetS().GetLen()

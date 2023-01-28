@@ -21,7 +21,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 	}
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	if ctx.GetTags() != nil {
-		ctx.GetTags().Destroy()
+		zend.ZendHashDestroy(ctx.GetTags())
 	} else {
 		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
 		if ctx.GetTags() == nil {
@@ -29,7 +29,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 			return zend.FAILURE
 		}
 	}
-	ctx.GetTags().Init(0, nil, TagDtor, 1)
+	zend.ZendHashInit(ctx.GetTags(), 0, nil, TagDtor, 1)
 	for key = core.PhpStrtokR(tmp, ",", &lasts); key != nil; key = core.PhpStrtokR(nil, ",", &lasts) {
 		var val *byte
 		val = strchr(key, '=')
@@ -44,7 +44,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 			keylen = q - key
 			str = zend.ZendStringInit(key, keylen, 1)
 			zend.GC_MAKE_PERSISTENT_LOCAL(str)
-			ctx.GetTags().AddMem(str, val, strlen(val)+1)
+			zend.ZendHashAddMem(ctx.GetTags(), str, val, strlen(val)+1)
 			zend.ZendStringReleaseEx(str, 1)
 		}
 	}
@@ -67,7 +67,7 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	} else {
 		hosts = &(BG(url_adapt_output_hosts_ht))
 	}
-	hosts.Clean()
+	zend.ZendHashClean(hosts)
 
 	/* Use user supplied host whitelist */
 
@@ -82,7 +82,7 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 		keylen = q - key
 		if keylen > 0 {
 			tmp_key = zend.ZendStringInit(key, keylen, 0)
-			hosts.AddEmptyElement(tmp_key)
+			zend.ZendHashAddEmptyElement(hosts, tmp_key)
 			zend.ZendStringReleaseEx(tmp_key, 0)
 		}
 	}
@@ -127,7 +127,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 	if url_parts.GetHost() != nil {
 		var tmp *zend.ZendString = zend.ZendStringTolower(url_parts.GetHost())
-		if BG(url_adapt_session_hosts_ht).Exists(tmp) == 0 {
+		if zend.ZendHashExists(&(BG(url_adapt_session_hosts_ht)), tmp) == 0 {
 			zend.ZendStringReleaseEx(tmp, 0)
 			zend.SmartStrAppendSmartStr(dest, url)
 			PhpUrlFree(url_parts)
@@ -220,7 +220,7 @@ func CheckHttpHost(target *byte) int {
 	var tmp *zend.Zval
 	var host_tmp *zend.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.ExecutorGlobals.GetSymbolTable().StrFind(zend.ZEND_STRL("_SERVER"))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, tmp.GetArr().StrFind(zend.ZEND_STRL("HTTP_HOST"))) && host.IsType(zend.IS_STRING) {
+	if b.Assign(&tmp, zend.ZendHashStrFind(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZEND_STRL("_SERVER"))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, zend.ZendHashStrFind(tmp.GetArr(), zend.ZEND_STRL("HTTP_HOST"))) && host.IsType(zend.IS_STRING) {
 		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */
@@ -272,7 +272,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		PhpUrlFree(url_parts)
 		return zend.SUCCESS
 	}
-	if allowed_hosts.Find(url_parts.GetHost()) == nil {
+	if zend.ZendHashFind(allowed_hosts, url_parts.GetHost()) == nil {
 		PhpUrlFree(url_parts)
 		return zend.FAILURE
 	}
@@ -307,7 +307,7 @@ func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 
 	/* intentionally using str_find here, in case the hash value is set, but the string val is changed later */
 
-	if b.Assign(&(ctx.GetLookupData()), ctx.GetTags().StrFindPtr(ctx.GetTag().GetS().GetVal(), ctx.GetTag().GetS().GetLen())) != nil {
+	if b.Assign(&(ctx.GetLookupData()), zend.ZendHashStrFindPtr(ctx.GetTags(), ctx.GetTag().GetS().GetVal(), ctx.GetTag().GetS().GetLen())) != nil {
 		ok = 1
 		if ctx.GetTag().GetS().GetLen() == b.SizeOf("\"form\"")-1 && !(strncasecmp(ctx.GetTag().GetS().GetVal(), "form", ctx.GetTag().GetS().GetLen())) {
 			ctx.SetTagType(TAG_FORM)
