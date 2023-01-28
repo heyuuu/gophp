@@ -18,12 +18,8 @@ func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx
 
 func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
 
-func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
-	str = (*ZendString)(DoAlloca(ZEND_MM_ALIGNED_SIZE_EX(_ZSTR_STRUCT_SIZE(_len), 8), use_heap))
-	str.SetRefcount(1)
-	str.GetGcTypeInfo() = IS_STRING
-	str.SetH(0)
-	str.SetLen(_len)
+func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap any) {
+	*str = ZendStringAlloc(_len, 0)
 }
 
 func ZSTR_ALLOCA_FREE(str any, use_heap any) { b.Free(str) }
@@ -197,10 +193,6 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 	ZVAL_INTERNED_STR(&val, str)
 	ZendHashAddNew(interned_strings, str, &val)
 	return str
-}
-func ZendInternedStringFindPermanent(str *ZendString) *ZendString {
-	str.GetHash()
-	return ZendInternedStringHtLookup(str, &InternedStringsPermanent)
 }
 func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
 	var ret *ZendString
