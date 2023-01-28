@@ -1,25 +1,11 @@
 package builtin
 
-import "unsafe"
-
 type integer interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
 func FlagMatch[T integer](flags T, flag T) bool { return flags&flag != 0 }
 func FlagMatchNum[T integer](flags T, flag T) T { return flags & flag }
-
-func Cast[T any, P any](ptr *P) *T {
-	return (*T)(unsafe.Pointer(ptr))
-}
-
-func CastPtr[T any, N integer](ptr N) *T {
-	return (*T)(unsafe.Pointer(uintptr(ptr)))
-}
-
-func CastUintptr[T any](ptr *T) uintptr {
-	return uintptr(unsafe.Pointer(ptr))
-}
 
 func HashStr(str string) uint {
 	return HashBytes([]byte(str))

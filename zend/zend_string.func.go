@@ -6,19 +6,9 @@ import (
 	b "sik/builtin"
 )
 
-func ZSTR_VAL(zstr *ZendString) []byte     { return zstr.GetVal() }
-func ZSTR_LEN(zstr *ZendString) int        { return zstr.GetLen() }
-func ZSTR_H(zstr *ZendString) ZendUlong    { return zstr.GetH() }
-func ZSTR_HASH(zstr *ZendString) ZendUlong { return zstr.GetHash() }
-func IS_INTERNED(s __auto__) int           { return 0 }
-func STR_EMPTY_ALLOC() *ZendString         { return ZSTR_EMPTY_ALLOC() }
-func STR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
-	ZSTR_ALLOCA_ALLOC(str, _len, use_heap)
-}
-func STR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) {
-	ZSTR_ALLOCA_INIT(str, s, len_, use_heap)
-}
-func STR_ALLOCA_FREE(str any, use_heap __auto__)   { ZSTR_ALLOCA_FREE(str, use_heap) }
+func ZSTR_VAL(zstr *ZendString) []byte             { return zstr.GetVal() }
+func ZSTR_HASH(zstr *ZendString) ZendUlong         { return zstr.GetHash() }
+func STR_EMPTY_ALLOC() *ZendString                 { return ZSTR_EMPTY_ALLOC() }
 func ZSTR_EMPTY_ALLOC() *ZendString                { return ZendEmptyString }
 func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }
 func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx] }
@@ -30,20 +20,11 @@ func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
 	str.SetH(0)
 	str.SetLen(_len)
 }
-func ZSTR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) {
-	ZSTR_ALLOCA_ALLOC(str, len_, use_heap)
-	memcpy(str.GetVal(), s, len_)
-	str.GetVal()[len_] = '0'
-}
 func ZSTR_ALLOCA_FREE(str any, use_heap __auto__) { FreeAlloca(str, use_heap) }
-func ZendStringHashVal(s *ZendString) ZendUlong   { return s.GetHash() }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	s.DelGcFlags(IS_STR_VALID_UTF8)
 }
-func ZendStringRefcount(s *ZendString) uint32 { return s.GetRefcount() }
-func ZendStringAddref(s *ZendString) uint32   { return s.AddRefcount() }
-func ZendStringDelref(s *ZendString) uint32   { return s.DelRefcount() }
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var ret *ZendString = (*ZendString)(Pemalloc(ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 	ret.SetRefcount(1)
@@ -64,21 +45,6 @@ func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
 	var ret *ZendString = ZendStringAlloc(len_, persistent)
 	memcpy(ret.GetVal(), str, len_)
 	ret.GetVal()[len_] = '0'
-	return ret
-}
-func ZendStringCopy(s *ZendString) *ZendString                { return s.Copy() }
-func ZendStringDup(s *ZendString, persistent int) *ZendString { return s.Dup(persistent) }
-func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
-	var ret *ZendString
-	if s.GetRefcount() == 1 {
-		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.SetLen(len_)
-		ZendStringForgetHashVal(ret)
-		return ret
-	}
-	ret = ZendStringAlloc(len_, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), MIN(len_, s.GetLen())+1)
-	s.DelRefcount()
 	return ret
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
@@ -167,51 +133,8 @@ func ZendStringEqualsLiteral(str *ZendString, literal string) bool {
 	return str.GetLen() == b.SizeOf("literal")-1 && !(memcmp(str.GetVal(), literal, b.SizeOf("literal")-1))
 }
 func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
-	var hash ZendUlong = uint64(5381)
-
-	/* variant with the hash unrolled eight times */
-
-	for ; len_ >= 8; len_ -= 8 {
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	}
-	switch len_ {
-	case 7:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 6:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 5:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 4:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 3:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 2:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-	case 1:
-		hash = (hash << 5) + hash + b.PostInc(&(*str))
-		break
-	case 0:
-		break
-	default:
-		break
-	}
-
-	/* Hash value can't be zero, so we always set the high bit */
-
-	return hash | uint64(-0x8000000000000000)
-
-	/* Hash value can't be zero, so we always set the high bit */
-}
-func ZendStringHashFunc(str *ZendString) ZendUlong {
-	str.SetH(ZendHashFunc(str.GetVal(), str.GetLen()))
-	return str.GetH()
+	var str_ = b.CastStr(str, len_)
+	return b.HashStr(str_)
 }
 func ZendHashFunc(str *byte, len_ int) ZendUlong { return ZendInlineHashFunc(str, len_) }
 func _strDtor(zv *Zval) {
@@ -392,10 +315,6 @@ func ZendInternedStringsActivate() {
 }
 func ZendInternedStringsDeactivate() {
 	ZendHashDestroy(&(CompilerGlobals.GetInternedStrings()))
-}
-func ZendInternedStringsSetRequestStorageHandlers(handler ZendNewInternedStringFuncT, init_handler ZendStringInitInternedFuncT) {
-	InternedStringRequestHandler = handler
-	InternedStringInitRequestHandler = init_handler
 }
 func ZendInternedStringsSwitchStorage(request ZendBool) {
 	if request != 0 {
