@@ -8,18 +8,18 @@ func NewZendArray(size uint32) *ZendArray {
 
 func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendArray {
 	var ht = &ZendArray{
-		nTableMask:       HT_MIN_MASK,
 		nNumUsed:         0,
 		nNumOfElements:   0,
 		nTableSize:       ZendHashCheckSize(size),
 		nInternalPointer: 0,
 		nNextFreeElement: 0,
 		pDestructor:      pDestructor,
-	}
 
-	// todo 待处理
-	ht.SetUFlags(HASH_FLAG_UNINITIALIZED)
-	HT_SET_DATA_ADDR(ht, &UninitializedBucket)
+		// 数据存储
+		data:     nil,
+		indexMap: make(map[int]uint32),
+		keyMap:   make(map[string]uint32),
+	}
 
 	// GC 信息
 	ht.SetRefcount(1)
@@ -35,4 +35,16 @@ func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendAr
 
 func (this *ZendArray) assertRc1() {
 	ZEND_ASSERT(this.GetRefcount() == 1)
+}
+
+func (this *ZendArray) realInit() {
+	this.assertRc1()
+
+	this.nNumUsed = 0
+	this.nNumOfElements = 0
+	this.data = nil
+	this.indexMap = make(map[int]uint32)
+	this.keyMap = make(map[string]uint32)
+
+	this.SetIsStaticKeys()
 }

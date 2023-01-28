@@ -58,22 +58,25 @@ type ZendArray struct {
 		}
 		flags uint32
 	}
-	nTableMask       uint32
-	arData           *Bucket
 	nNumUsed         uint32
 	nNumOfElements   uint32
 	nTableSize       uint32
 	nInternalPointer uint32
 	nNextFreeElement ZendLong
 	pDestructor      DtorFuncT
+
+	//
+	arData *Bucket // C 源码中存储数据的地方，实际不使用
+
+	data     []*Bucket         // 实际存储数据的地方
+	indexMap map[int]uint32    // 数字索引到具体位置的映射
+	keyMap   map[string]uint32 // 字符串索引到具体位置的映射
 }
 
 var _ IRefcounted = &ZendArray{}
 
 func (this *ZendArray) GetNIteratorsCount() ZendUchar      { return this.u.v.nIteratorsCount }
 func (this *ZendArray) SetNIteratorsCount(value ZendUchar) { this.u.v.nIteratorsCount = value }
-func (this *ZendArray) GetNTableMask() uint32              { return this.nTableMask }
-func (this *ZendArray) SetNTableMask(value uint32)         { this.nTableMask = value }
 func (this *ZendArray) GetArData() *Bucket                 { return this.arData }
 func (this *ZendArray) SetArData(value *Bucket)            { this.arData = value }
 func (this *ZendArray) GetNNumUsed() uint32                { return this.nNumUsed }
@@ -88,6 +91,13 @@ func (this *ZendArray) GetNNextFreeElement() ZendLong      { return this.nNextFr
 func (this *ZendArray) SetNNextFreeElement(value ZendLong) { this.nNextFreeElement = value }
 func (this *ZendArray) GetPDestructor() DtorFuncT          { return this.pDestructor }
 func (this *ZendArray) SetPDestructor(value DtorFuncT)     { this.pDestructor = value }
+
+func (this *ZendArray) GetNTableMask() uint32 {
+	return HT_SIZE_TO_MASK(this.nTableSize)
+}
+func (this *ZendArray) SetNTableMask(value uint32) {
+	ZEND_ASSERT(this.GetNTableMask() == value)
+}
 
 /* ZendArray.u.v.flags */
 func (this *ZendArray) GetFlags() ZendUchar           { return this.u.v.flags }
@@ -104,18 +114,15 @@ func (this *ZendArray) SwitchFlags(value ZendUchar, cond bool) {
 }
 
 const HASH_FLAG_PACKED = 1 << 2
-const HASH_FLAG_UNINITIALIZED = 1 << 3
 const HASH_FLAG_STATIC_KEYS = 1 << 4
 const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
 
-func (this *ZendArray) IsPacked() bool        { return this.HasFlags(HASH_FLAG_PACKED) }
-func (this *ZendArray) IsUninitialized() bool { return this.HasFlags(HASH_FLAG_UNINITIALIZED) }
-func (this *ZendArray) IsStaticKeys() bool    { return this.HasFlags(HASH_FLAG_STATIC_KEYS) }
-func (this *ZendArray) IsHasEmptyInd() bool   { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
-func (this *ZendArray) SetIsPacked()          { this.AddFlags(HASH_FLAG_PACKED) }
-func (this *ZendArray) SetIsUninitialized()   { this.AddFlags(HASH_FLAG_UNINITIALIZED) }
-func (this *ZendArray) SetIsStaticKeys()      { this.AddFlags(HASH_FLAG_STATIC_KEYS) }
-func (this *ZendArray) SetIsHasEmptyInd()     { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
+func (this *ZendArray) IsPacked() bool      { return this.HasFlags(HASH_FLAG_PACKED) }
+func (this *ZendArray) IsStaticKeys() bool  { return this.HasFlags(HASH_FLAG_STATIC_KEYS) }
+func (this *ZendArray) IsHasEmptyInd() bool { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
+func (this *ZendArray) SetIsPacked()        { this.AddFlags(HASH_FLAG_PACKED) }
+func (this *ZendArray) SetIsStaticKeys()    { this.AddFlags(HASH_FLAG_STATIC_KEYS) }
+func (this *ZendArray) SetIsHasEmptyInd()   { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
 
 /* ZendArray.u.flags */
 func (this *ZendArray) GetUFlags() uint32           { return this.u.flags }
