@@ -40,7 +40,7 @@ func PhpOutputHeader() {
 	}
 }
 func ReverseConflictDtor(zv *zend.Zval) {
-	var ht *zend.HashTable = zend.Z_PTR_P(zv)
+	var ht *zend.HashTable = zv.GetPtr()
 	zend.ZendHashDestroy(ht)
 }
 func PhpOutputStartup() {
@@ -315,7 +315,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
-				conflict = zend.Z_PTR_P(_z)
+				conflict = _z.GetPtr()
 				if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
 					return zend.FAILURE
 				}

@@ -52,7 +52,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 			zdata = _z
 			var is_dynamic zend.ZendBool = 1
 			if zdata.GetType() == zend.IS_INDIRECT {
-				zdata = zend.Z_INDIRECT_P(zdata)
+				zdata = zdata.GetZv()
 				if zend.Z_ISUNDEF_P(zdata) {
 					continue
 				}
@@ -64,7 +64,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 			if key != nil {
 				prop_name = key.GetVal()
 				prop_len = key.GetLen()
-				if type_ != nil && zend.ZendCheckPropertyAccess(zend.Z_OBJ_P(type_), key, is_dynamic) != zend.SUCCESS {
+				if type_ != nil && zend.ZendCheckPropertyAccess(type_.GetObj(), key, is_dynamic) != zend.SUCCESS {
 
 					/* property not visible in this scope */
 
@@ -201,7 +201,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					zend.ZendStringFree(ekey)
 					break
 				case zend.IS_LONG:
-					zend.SmartStrAppendLong(formstr, zend.Z_LVAL_P(zdata))
+					zend.SmartStrAppendLong(formstr, zdata.GetLval())
 					break
 				case zend.IS_FALSE:
 					zend.SmartStrAppendl(formstr, "0", b.SizeOf("\"0\"")-1)

@@ -12,7 +12,7 @@ func SplObjectStorageFromObj(obj *zend.ZendObject) *spl_SplObjectStorage {
 	return (*spl_SplObjectStorage)((*byte)(obj - zend_long((*byte)(&((*spl_SplObjectStorage)(nil).GetStd()))-(*byte)(nil))))
 }
 func Z_SPLOBJSTORAGE_P(zv *zend.Zval) *spl_SplObjectStorage {
-	return SplObjectStorageFromObj(zend.Z_OBJ_P(zv))
+	return SplObjectStorageFromObj(zv.GetObj())
 }
 func spl_SplObjectStorage_free_storage(object *zend.ZendObject) {
 	var intern *spl_SplObjectStorage = SplObjectStorageFromObj(object)
@@ -50,7 +50,7 @@ func SplObjectStorageFreeHash(intern *spl_SplObjectStorage, key *zend.ZendHashKe
 	}
 }
 func SplObjectStorageDtor(element *zend.Zval) {
-	var el *spl_SplObjectStorageElement = zend.Z_PTR_P(element)
+	var el *spl_SplObjectStorageElement = element.GetPtr()
 	zend.ZvalPtrDtor(el.GetObj())
 	zend.ZvalPtrDtor(el.GetInf())
 	zend.Efree(el)
@@ -120,7 +120,7 @@ func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *zend.Zval, other
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			element = zend.Z_PTR_P(_z)
+			element = _z.GetPtr()
 			SplObjectStorageAttach(intern, this, element.GetObj(), element.GetInf())
 		}
 		break
@@ -158,7 +158,7 @@ func SplObjectStorageNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval) *ze
 func SplObjectStorageClone(zobject *zend.Zval) *zend.ZendObject {
 	var old_object *zend.ZendObject
 	var new_object *zend.ZendObject
-	old_object = zend.Z_OBJ_P(zobject)
+	old_object = zobject.GetObj()
 	new_object = SplObjectStorageNewEx(old_object.GetCe(), zobject)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -186,7 +186,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			element = zend.Z_PTR_P(_z)
+			element = _z.GetPtr()
 			md5str = PhpSplObjectHash(element.GetObj())
 			zend.ArrayInit(&tmp)
 
@@ -196,7 +196,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 			zend.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
 			zend.AddAssocZvalEx(&tmp, "obj", b.SizeOf("\"obj\"")-1, element.GetObj())
 			zend.AddAssocZvalEx(&tmp, "inf", b.SizeOf("\"inf\"")-1, element.GetInf())
-			zend.ZendHashUpdate(zend.Z_ARRVAL(storage), md5str, &tmp)
+			zend.ZendHashUpdate(storage.GetArr(), md5str, &tmp)
 			zend.ZendStringReleaseEx(md5str, 0)
 		}
 		break
@@ -224,7 +224,7 @@ func SplObjectStorageGetGc(obj *zend.Zval, table **zend.Zval, n *int) *zend.Hash
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			element = zend.Z_PTR_P(_z)
+			element = _z.GetPtr()
 			zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetObj())
 			zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetInf())
 		}
@@ -235,8 +235,8 @@ func SplObjectStorageGetGc(obj *zend.Zval, table **zend.Zval, n *int) *zend.Hash
 	return zend.ZendStdGetProperties(obj)
 }
 func SplObjectStorageCompareInfo(e1 *zend.Zval, e2 *zend.Zval) int {
-	var s1 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(zend.Z_PTR_P(e1))
-	var s2 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(zend.Z_PTR_P(e2))
+	var s1 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e1.GetPtr())
+	var s2 *spl_SplObjectStorageElement = (*spl_SplObjectStorageElement)(e2.GetPtr())
 	var result zend.Zval
 	if zend.CompareFunction(&result, s1.GetInf(), s2.GetInf()) == zend.FAILURE {
 		return 1
@@ -244,8 +244,8 @@ func SplObjectStorageCompareInfo(e1 *zend.Zval, e2 *zend.Zval) int {
 	return zend.ZEND_NORMALIZE_BOOL(result.GetLval())
 }
 func SplObjectStorageCompareObjects(o1 *zend.Zval, o2 *zend.Zval) int {
-	var zo1 *zend.ZendObject = (*zend.ZendObject)(zend.Z_OBJ_P(o1))
-	var zo2 *zend.ZendObject = (*zend.ZendObject)(zend.Z_OBJ_P(o2))
+	var zo1 *zend.ZendObject = (*zend.ZendObject)(o1.GetObj())
+	var zo2 *zend.ZendObject = (*zend.ZendObject)(o2.GetObj())
 	if zo1.GetCe() != spl_ce_SplObjectStorage || zo2.GetCe() != spl_ce_SplObjectStorage {
 		return 1
 	}
@@ -366,7 +366,7 @@ func zim_spl_SplObjectStorage_removeAllExcept(execute_data *zend.ZendExecuteData
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			element = zend.Z_PTR_P(_z)
+			element = _z.GetPtr()
 			if SplObjectStorageContains(other, zend.ZEND_THIS, element.GetObj()) == 0 {
 				SplObjectStorageDetach(intern, zend.ZEND_THIS, element.GetObj())
 			}
@@ -559,7 +559,7 @@ func zim_spl_SplObjectStorage_unserialize(execute_data *zend.ZendExecuteData, re
 		goto outexcept
 	}
 	p--
-	count = zend.Z_LVAL_P(pcount)
+	count = pcount.GetLval()
 	if count < 0 {
 		goto outexcept
 	}
@@ -666,11 +666,11 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			elem = zend.Z_PTR_P(_z)
+			elem = _z.GetPtr()
 			zend.Z_TRY_ADDREF(elem.GetObj())
-			zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(tmp), elem.GetObj())
+			zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetObj())
 			zend.Z_TRY_ADDREF(elem.GetInf())
-			zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(tmp), elem.GetInf())
+			zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetInf())
 		}
 		break
 	}

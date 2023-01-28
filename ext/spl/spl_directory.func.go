@@ -15,9 +15,7 @@ import (
 func SplFilesystemFromObj(obj *zend.ZendObject) *SplFilesystemObject {
 	return (*SplFilesystemObject)((*byte)(obj - zend_long((*byte)(&((*SplFilesystemObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLFILESYSTEM_P(zv *zend.Zval) *SplFilesystemObject {
-	return SplFilesystemFromObj(zend.Z_OBJ_P(zv))
-}
+func Z_SPLFILESYSTEM_P(zv *zend.Zval) *SplFilesystemObject { return SplFilesystemFromObj(zv.GetObj()) }
 func SplFilesystemObjectToIterator(obj *SplFilesystemObject) *SplFilesystemIterator {
 	var it *SplFilesystemIterator
 	it = zend.Ecalloc(1, b.SizeOf("spl_filesystem_iterator"))
@@ -275,7 +273,7 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var source *SplFilesystemObject
 	var index int
 	var skip_dots int
-	old_object = zend.Z_OBJ_P(zobject)
+	old_object = zobject.GetObj()
 	source = SplFilesystemFromObj(old_object)
 	new_object = SplFilesystemObjectNewEx(old_object.GetCe())
 	intern = SplFilesystemFromObj(new_object)
@@ -648,7 +646,7 @@ func zim_spl_DirectoryIterator_current(execute_data *zend.ZendExecuteData, retur
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_OBJ(return_value, zend.Z_OBJ_P(zend.ZEND_THIS))
+	zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
 	zend.Z_ADDREF_P(return_value)
 }
 func zim_spl_DirectoryIterator_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -871,7 +869,7 @@ func zim_spl_FilesystemIterator_current(execute_data *zend.ZendExecuteData, retu
 		SplFilesystemObjectGetFileName(intern)
 		SplFilesystemObjectCreateType(0, intern, SPL_FS_INFO, nil, return_value)
 	} else {
-		zend.ZVAL_OBJ(return_value, zend.Z_OBJ_P(zend.ZEND_THIS))
+		zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
 		zend.Z_ADDREF_P(return_value)
 	}
 }
@@ -1328,7 +1326,7 @@ func SplFilesystemDirGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), zend.Z_OBJ_P(object))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemDirItFuncs)
 
 	/* ->current must be initialized; rewind doesn't set it and valid
@@ -1454,7 +1452,7 @@ func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), zend.Z_OBJ_P(object))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemTreeItFuncs)
 	return iterator.GetIntern()
 }
@@ -1636,7 +1634,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 		case zend.IS_STRING:
 			return zend.Z_STRLEN(intern.GetCurrentZval()) == 0
 		case zend.IS_ARRAY:
-			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 1 {
+			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && intern.GetCurrentZval().GetArr().GetNNumOfElements() == 1 {
 				var idx uint32 = 0
 				var first *zend.Zval
 				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()) {
@@ -1645,7 +1643,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 				first = zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
 				return first.GetType() == zend.IS_STRING && zend.Z_STRLEN_P(first) == 0
 			}
-			return zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 0
+			return intern.GetCurrentZval().GetArr().GetNNumOfElements() == 0
 		case zend.IS_NULL:
 			return 1
 		default:

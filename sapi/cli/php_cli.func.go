@@ -35,7 +35,7 @@ func PrintModules() {
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			module = zend.Z_PTR_P(_z)
+			module = _z.GetPtr()
 			core.PhpPrintf("%s\n", module.GetName())
 		}
 		break

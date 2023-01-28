@@ -31,9 +31,7 @@ func SPL_LLIST_CHECK_ADDREF(elem *SplPtrLlistElement) {
 func SplDllistFromObj(obj *zend.ZendObject) *SplDllistObject {
 	return (*SplDllistObject)((*byte)(obj - zend_long((*byte)(&((*SplDllistObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLDLLIST_P(zv *zend.Zval) *SplDllistObject {
-	return SplDllistFromObj(zend.Z_OBJ_P(zv))
-}
+func Z_SPLDLLIST_P(zv *zend.Zval) *SplDllistObject { return SplDllistFromObj(zv.GetObj()) }
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	if !(zend.Z_ISUNDEF(elem.GetData())) {
 		zend.ZvalPtrDtor(elem.GetData())
@@ -290,7 +288,7 @@ func SplDllistObjectNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 func SplDllistObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var old_object *zend.ZendObject
 	var new_object *zend.ZendObject
-	old_object = zend.Z_OBJ_P(zobject)
+	old_object = zobject.GetObj()
 	new_object = SplDllistObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -819,7 +817,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData,
 	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || flags.GetType() != zend.IS_LONG {
 		goto error
 	}
-	intern.SetFlags(int(zend.Z_LVAL_P(flags)))
+	intern.SetFlags(int(flags.GetLval()))
 
 	/* elements */
 
@@ -860,7 +858,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
-		zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(tmp), current.GetData())
+		zend.ZendHashNextIndexInsert(tmp.GetArr(), current.GetData())
 		zend.Z_TRY_ADDREF(current.GetData())
 		current = current.GetNext()
 	}
@@ -889,7 +887,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	intern.SetFlags(int(zend.Z_LVAL_P(flags_zv)))
+	intern.SetFlags(int(flags_zv.GetLval()))
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(storage_zv)
 		var _p *zend.Bucket = __ht.GetArData()
@@ -979,7 +977,7 @@ func SplDllistGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), zend.Z_OBJ_P(object))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplDllistItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetTraversePosition(dllist_object.GetTraversePosition())

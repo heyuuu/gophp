@@ -24,7 +24,7 @@ func _phpStreamGetUrlStreamWrappersHash() *zend.HashTable {
 func PhpStreamGetUrlStreamWrappersHashGlobal() *zend.HashTable { return &UrlStreamWrappersHash }
 func ForgetPersistentResourceIdNumbers(el *zend.Zval) int {
 	var stream *core.PhpStream
-	var rsrc *zend.ZendResource = zend.Z_RES_P(el)
+	var rsrc *zend.ZendResource = el.GetRes()
 	if rsrc.GetType() != LePstream {
 		return 0
 	}
@@ -83,7 +83,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 						if _z.GetType() == zend.IS_UNDEF {
 							continue
 						}
-						regentry = zend.Z_PTR_P(_z)
+						regentry = _z.GetPtr()
 						if regentry.GetPtr() == le.GetPtr() {
 							zend.GC_ADDREF(regentry)
 							stream.SetRes(regentry)
@@ -186,7 +186,7 @@ func PhpStreamTidyWrapperErrorLog(wrapper *core.PhpStreamWrapper) {
 }
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
 func WrapperListDtor(item *zend.Zval) {
-	var list *zend.ZendLlist = (*zend.ZendLlist)(zend.Z_PTR_P(item))
+	var list *zend.ZendLlist = (*zend.ZendLlist)(item.GetPtr())
 	zend.ZendLlistDestroy(list)
 	zend.Efree(list)
 }
@@ -260,7 +260,7 @@ func _phpStreamFreeEnclosed(stream_enclosed *core.PhpStream, close_options int) 
 	return core.PhpStreamFree(stream_enclosed, close_options|core.PHP_STREAM_FREE_IGNORE_ENCLOSING)
 }
 func _phpStreamFreePersistent(zv *zend.Zval, pStream any) int {
-	var le *zend.ZendResource = zend.Z_RES_P(zv)
+	var le *zend.ZendResource = zv.GetRes()
 	return le.GetPtr() == pStream
 }
 func _phpStreamFree(stream *core.PhpStream, close_options int) int {
@@ -1992,7 +1992,7 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *zend.Zval {
 	var wrapperhash *zend.Zval
-	if nil == b.Assign(&wrapperhash, zend.ZendHashStrFind(zend.Z_ARRVAL(context.GetOptions()), wrappername, strlen(wrappername))) {
+	if nil == b.Assign(&wrapperhash, zend.ZendHashStrFind(context.GetOptions().GetArr(), wrappername, strlen(wrappername))) {
 		return nil
 	}
 	return zend.ZendHashStrFind(zend.Z_ARRVAL_P(wrapperhash), optionname, strlen(optionname))
@@ -2001,10 +2001,10 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	var wrapperhash *zend.Zval
 	var category zend.Zval
 	zend.SEPARATE_ARRAY(context.GetOptions())
-	wrapperhash = zend.ZendHashStrFind(zend.Z_ARRVAL(context.GetOptions()), wrappername, strlen(wrappername))
+	wrapperhash = zend.ZendHashStrFind(context.GetOptions().GetArr(), wrappername, strlen(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
-		wrapperhash = zend.ZendHashStrUpdate(zend.Z_ARRVAL(context.GetOptions()), (*byte)(wrappername), strlen(wrappername), &category)
+		wrapperhash = zend.ZendHashStrUpdate(context.GetOptions().GetArr(), (*byte)(wrappername), strlen(wrappername), &category)
 	}
 	zend.ZVAL_DEREF(optionvalue)
 	zend.Z_TRY_ADDREF_P(optionvalue)

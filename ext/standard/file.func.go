@@ -14,7 +14,7 @@ import (
 func FG(v __auto__) __auto__ { return FileGlobals.v }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *zend.Zval) {
 	zend.ZEND_ASSERT(arg.GetType() == zend.IS_RESOURCE)
-	core.PhpStreamFromRes(stream, zend.Z_RES_P(arg))
+	core.PhpStreamFromRes(stream, arg.GetRes())
 }
 func PhpLeStreamContext() int { return LeStreamContext }
 func FileContextDtor(res *zend.ZendResource) {
@@ -1945,7 +1945,7 @@ func ZifFscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	what = zend.ZendFetchResource2(zend.Z_RES_P(file_handle), "File-Handle", streams.PhpFileLeStream(), streams.PhpFileLePstream())
+	what = zend.ZendFetchResource2(file_handle.GetRes(), "File-Handle", streams.PhpFileLeStream(), streams.PhpFileLePstream())
 
 	/* we can't do a ZEND_VERIFY_RESOURCE(what), otherwise we end up
 	 * with a leak if we have an invalid filehandle. This needs changing
@@ -4131,7 +4131,7 @@ func PhpFgetcsv(stream *core.PhpStream, delimiter byte, enclosure byte, escape_c
 							if int(temp_len > size_t(limit-buf)) != 0 {
 								goto quit_loop_2
 							}
-							zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+							zend.ZendArrayDestroy(return_value.GetArr())
 							zend.RETVAL_FALSE
 							goto out
 						}

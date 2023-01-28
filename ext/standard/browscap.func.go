@@ -11,7 +11,7 @@ import (
 
 func BROWSCAP_G(v __auto__) __auto__ { return BrowscapGlobals.v }
 func BrowscapEntryDtor(zvalue *zend.Zval) {
-	var entry *BrowscapEntry = zend.Z_PTR_P(zvalue)
+	var entry *BrowscapEntry = zvalue.GetPtr()
 	zend.ZendStringReleaseEx(entry.GetPattern(), 0)
 	if entry.GetParent() != nil {
 		zend.ZendStringReleaseEx(entry.GetParent(), 0)
@@ -19,7 +19,7 @@ func BrowscapEntryDtor(zvalue *zend.Zval) {
 	zend.Efree(entry)
 }
 func BrowscapEntryDtorPersistent(zvalue *zend.Zval) {
-	var entry *BrowscapEntry = zend.Z_PTR_P(zvalue)
+	var entry *BrowscapEntry = zvalue.GetPtr()
 	zend.ZendStringReleaseEx(entry.GetPattern(), 1)
 	if entry.GetParent() != nil {
 		zend.ZendStringReleaseEx(entry.GetParent(), 1)
@@ -229,7 +229,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 			} else if zend.Z_STRLEN_P(arg2) == 2 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "no", b.SizeOf("\"no\"")-1)) || zend.Z_STRLEN_P(arg2) == 3 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "off", b.SizeOf("\"off\"")-1)) || zend.Z_STRLEN_P(arg2) == 4 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "none", b.SizeOf("\"none\"")-1)) || zend.Z_STRLEN_P(arg2) == 5 && !(strncasecmp(zend.Z_STRVAL_P(arg2), "false", b.SizeOf("\"false\"")-1)) {
 				new_value = zend.ZSTR_EMPTY_ALLOC()
 			} else {
-				new_value = BrowscapInternStr(ctx, zend.Z_STR_P(arg2), persistent)
+				new_value = BrowscapInternStr(ctx, arg2.GetStr(), persistent)
 			}
 			if !(strcasecmp(zend.Z_STRVAL_P(arg1), "parent")) {
 
@@ -244,7 +244,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 				}
 				ctx.GetCurrentEntry().SetParent(new_value)
 			} else {
-				new_key = BrowscapInternStrCi(ctx, zend.Z_STR_P(arg1), persistent)
+				new_key = BrowscapInternStrCi(ctx, arg1.GetStr(), persistent)
 				BrowscapAddKv(bdata, new_key, new_value, persistent)
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
@@ -252,7 +252,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *zend.ZendString = zend.Z_STR_P(arg1)
+		var pattern *zend.ZendString = arg1.GetStr()
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
@@ -282,7 +282,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		break
 	}
 }
-func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zend.Z_STR_P(zv)) }
+func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zv.GetStr()) }
 func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
 	var fh zend.ZendFileHandle
 	var ctx BrowscapParserCtx = BrowscapParserCtx{0}
@@ -513,7 +513,7 @@ func BrowscapZvalCopyCtor(p *zend.Zval) {
 	if zend.Z_REFCOUNTED_P(p) {
 		var str *zend.ZendString
 		zend.ZEND_ASSERT(p.GetType() == zend.IS_STRING)
-		str = zend.Z_STR_P(p)
+		str = p.GetStr()
 		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
 			zend.GC_ADDREF(str)
 		} else {
@@ -628,7 +628,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			zend.RETVAL_FALSE
 			return
 		}
-		agent_name = zend.Z_STR_P(http_user_agent)
+		agent_name = http_user_agent.GetStr()
 	}
 	lookup_browser_name = zend.ZendStringTolower(agent_name)
 	found_entry = zend.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
@@ -644,7 +644,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
-				entry = zend.Z_PTR_P(_z)
+				entry = _z.GetPtr()
 				if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
 					break
 				}

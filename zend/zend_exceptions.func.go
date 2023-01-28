@@ -52,7 +52,7 @@ func ZendExceptionSetPrevious(exception *ZendObject, add_previous *ZendObject) {
 	for {
 		ancestor = ZendReadPropertyEx(IGetExceptionBase(&pv), &pv, ZSTR_KNOWN(ZEND_STR_PREVIOUS), 1, &rv)
 		for ancestor.GetType() == IS_OBJECT {
-			if Z_OBJ_P(ancestor) == Z_OBJ_P(ex) {
+			if ancestor.GetObj() == ex.GetObj() {
 				OBJ_RELEASE(add_previous)
 				return
 			}
@@ -66,7 +66,7 @@ func ZendExceptionSetPrevious(exception *ZendObject, add_previous *ZendObject) {
 			return
 		}
 		ex = previous
-		if Z_OBJ_P(ex) == add_previous {
+		if ex.GetObj() == add_previous {
 			break
 		}
 	}
@@ -93,8 +93,8 @@ func ZendExceptionRestore() {
 func ZendThrowExceptionInternal(exception *Zval) {
 	if exception != nil {
 		var previous *ZendObject = ExecutorGlobals.GetException()
-		ZendExceptionSetPrevious(Z_OBJ_P(exception), ExecutorGlobals.GetException())
-		ExecutorGlobals.SetException(Z_OBJ_P(exception))
+		ZendExceptionSetPrevious(exception.GetObj(), ExecutorGlobals.GetException())
+		ExecutorGlobals.SetException(exception.GetObj())
 		if previous != nil {
 			return
 		}
@@ -401,18 +401,18 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		SmartStrAppends(str, ", ")
 		break
 	case IS_LONG:
-		SmartStrAppendLong(str, Z_LVAL_P(arg))
+		SmartStrAppendLong(str, arg.GetLval())
 		SmartStrAppends(str, ", ")
 		break
 	case IS_DOUBLE:
-		SmartStrAppendPrintf(str, "%.*G", int(ExecutorGlobals.GetPrecision()), Z_DVAL_P(arg))
+		SmartStrAppendPrintf(str, "%.*G", int(ExecutorGlobals.GetPrecision()), arg.GetDval())
 		SmartStrAppends(str, ", ")
 		break
 	case IS_ARRAY:
 		SmartStrAppends(str, "Array, ")
 		break
 	case IS_OBJECT:
-		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(Z_OBJ_P(arg))
+		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(arg.GetObj())
 		SmartStrAppends(str, "Object(")
 		SmartStrAppends(str, class_name.GetVal())
 		SmartStrAppends(str, "), ")
@@ -436,7 +436,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			tmp = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_LINE), 1)
 			if tmp != nil {
 				if tmp.GetType() == IS_LONG {
-					line = Z_LVAL_P(tmp)
+					line = tmp.GetLval()
 				} else {
 					ZendError(E_WARNING, "Line is no long")
 					line = 0
@@ -444,7 +444,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			} else {
 				line = 0
 			}
-			SmartStrAppend(str, Z_STR_P(file))
+			SmartStrAppend(str, file.GetStr())
 			SmartStrAppendc(str, '(')
 			SmartStrAppendLong(str, line)
 			SmartStrAppends(str, "): ")
@@ -560,7 +560,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		var line ZendLong = ZvalGetLong(GET_PROPERTY(exception, ZEND_STR_LINE))
 		fci.SetSize(b.SizeOf("fci"))
 		ZVAL_STR(fci.GetFunctionName(), fname)
-		fci.SetObject(Z_OBJ_P(exception))
+		fci.SetObject(exception.GetObj())
 		fci.SetRetval(&trace)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)

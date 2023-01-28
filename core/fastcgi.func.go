@@ -984,7 +984,7 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	zend.ZendHashAdd(&FcgiMgmtVars, key, &zvalue)
 	zend.ZendStringReleaseEx(key, 1)
 }
-func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zend.Z_STR_P(zv), 1) }
+func FcgiFreeMgmtVarCb(zv *zend.Zval) { zend.Pefree(zv.GetStr(), 1) }
 func FcgiGetLastClientIp() *byte {
 	var str []byte
 

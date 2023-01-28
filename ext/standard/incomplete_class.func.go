@@ -75,7 +75,7 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 	var object_properties *zend.HashTable
 	object_properties = zend.Z_OBJPROP_P(object)
 	if b.Assign(&val, zend.ZendHashStrFind(object_properties, MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && val.GetType() == zend.IS_STRING {
-		return zend.ZendStringCopy(zend.Z_STR_P(val))
+		return zend.ZendStringCopy(val.GetStr())
 	}
 	return nil
 }

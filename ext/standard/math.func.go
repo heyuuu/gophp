@@ -248,14 +248,14 @@ func ZifAbs(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.GetType() == zend.IS_DOUBLE {
-		zend.RETVAL_DOUBLE(fabs(zend.Z_DVAL_P(value)))
+		zend.RETVAL_DOUBLE(fabs(value.GetDval()))
 		return
 	} else if value.GetType() == zend.IS_LONG {
-		if zend.Z_LVAL_P(value) == zend.ZEND_LONG_MIN {
+		if value.GetLval() == zend.ZEND_LONG_MIN {
 			zend.RETVAL_DOUBLE(-float64(zend.ZEND_LONG_MIN))
 			return
 		} else {
-			zend.RETVAL_LONG(b.CondF(zend.Z_LVAL_P(value) < 0, func() int { return -(zend.Z_LVAL_P(value)) }, func() zend.ZendLong { return zend.Z_LVAL_P(value) }))
+			zend.RETVAL_LONG(b.CondF(value.GetLval() < 0, func() int { return -(value.GetLval()) }, func() zend.ZendLong { return value.GetLval() }))
 			return
 		}
 	}
@@ -329,7 +329,7 @@ func ZifCeil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.GetType() == zend.IS_DOUBLE {
-		zend.RETVAL_DOUBLE(ceil(zend.Z_DVAL_P(value)))
+		zend.RETVAL_DOUBLE(ceil(value.GetDval()))
 		return
 	} else if value.GetType() == zend.IS_LONG {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
@@ -405,7 +405,7 @@ func ZifFloor(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.GetType() == zend.IS_DOUBLE {
-		zend.RETVAL_DOUBLE(floor(zend.Z_DVAL_P(value)))
+		zend.RETVAL_DOUBLE(floor(value.GetDval()))
 		return
 	} else if value.GetType() == zend.IS_LONG {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
@@ -518,14 +518,14 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Simple case - long that doesn't need to be rounded. */
 
 		if places >= 0 {
-			zend.RETVAL_DOUBLE(float64(zend.Z_LVAL_P(value)))
+			zend.RETVAL_DOUBLE(float64(value.GetLval()))
 			return
 		}
 	case zend.IS_DOUBLE:
 		if value.GetType() == zend.IS_LONG {
-			return_val = float64(zend.Z_LVAL_P(value))
+			return_val = float64(value.GetLval())
 		} else {
-			return_val = zend.Z_DVAL_P(value)
+			return_val = value.GetDval()
 		}
 		return_val = _phpMathRound(return_val, int(places), int(mode))
 		zend.RETVAL_DOUBLE(return_val)
@@ -2574,7 +2574,7 @@ func _phpMathLongtobase(arg *zend.Zval, base int) *zend.ZendString {
 	if arg.GetType() != zend.IS_LONG || base < 2 || base > 36 {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
-	value = zend.Z_LVAL_P(arg)
+	value = arg.GetLval()
 	ptr = buf + b.SizeOf("buf") - 1
 	end = ptr
 	*ptr = '0'
@@ -2594,7 +2594,7 @@ func _phpMathZvaltobase(arg *zend.Zval, base int) *zend.ZendString {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
 	if arg.GetType() == zend.IS_DOUBLE {
-		var fvalue float64 = floor(zend.Z_DVAL_P(arg))
+		var fvalue float64 = floor(arg.GetDval())
 		var ptr *byte
 		var end *byte
 		var buf []byte

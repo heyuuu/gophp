@@ -12,7 +12,7 @@ import (
 func SplHeapFromObj(obj *zend.ZendObject) *SplHeapObject {
 	return (*SplHeapObject)((*byte)(obj - zend_long((*byte)(&((*SplHeapObject)(nil).GetStd()))-(*byte)(nil))))
 }
-func Z_SPLHEAP_P(zv *zend.Zval) *SplHeapObject { return SplHeapFromObj(zend.Z_OBJ_P(zv)) }
+func Z_SPLHEAP_P(zv *zend.Zval) *SplHeapObject { return SplHeapFromObj(zv.GetObj()) }
 func SplHeapElem(heap *SplPtrHeap, i int) any {
 	return any((*byte)(heap.GetElements() + heap.GetElemSize()*i))
 }
@@ -325,7 +325,7 @@ func SplHeapObjectNew(class_type *zend.ZendClassEntry) *zend.ZendObject {
 func SplHeapObjectClone(zobject *zend.Zval) *zend.ZendObject {
 	var old_object *zend.ZendObject
 	var new_object *zend.ZendObject
-	old_object = zend.Z_OBJ_P(zobject)
+	old_object = zobject.GetObj()
 	new_object = SplHeapObjectNewEx(old_object.GetCe(), zobject, 1)
 	zend.ZendObjectsCloneMembers(new_object, old_object)
 	return new_object
@@ -724,7 +724,7 @@ func SplHeapGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) 
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit(iterator.GetIntern().GetIt())
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), zend.Z_OBJ_P(object))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplHeapItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())
@@ -741,7 +741,7 @@ func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	zend.Z_ADDREF_P(object)
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), zend.Z_OBJ_P(object))
+	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplPqueueItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())

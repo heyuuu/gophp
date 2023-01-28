@@ -22,7 +22,7 @@ func PhpCliServerGetSystemTime(buf *byte) int {
 	core.PhpAsctimeR(&tm, buf)
 	return 0
 }
-func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zend.Z_PTR_P(zv), 1) }
+func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zv.GetPtr(), 1) }
 func GetLastError() *byte        { return zend.Pestrdup(strerror(errno), 1) }
 func StatusComp(a any, b any) int {
 	var pa *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(a)
@@ -133,7 +133,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 				continue
 			}
 			key = _p.GetKey()
-			value = zend.Z_PTR_P(_z)
+			value = _z.GetPtr()
 			zend.ZVAL_STRING(&tmp, value)
 			zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), key, &tmp)
 		}
@@ -1654,7 +1654,7 @@ func PhpCliServerDtor(server *PhpCliServer) {
 	}
 }
 func PhpCliServerClientDtorWrapper(zv *zend.Zval) {
-	var p *PhpCliServerClient = zend.Z_PTR_P(zv)
+	var p *PhpCliServerClient = zv.GetPtr()
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
 	PhpCliServerPollerRemove(p.GetServer().GetPoller(), POLLIN|POLLOUT, p.GetSock())

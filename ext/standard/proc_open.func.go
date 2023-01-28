@@ -78,7 +78,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 				continue
 			}
 			key = _p.GetKey()
-			str = zend.Z_PTR_P(_z)
+			str = _z.GetPtr()
 			*ep = p
 			ep++
 			if key != nil {
@@ -227,7 +227,7 @@ func ZifProcTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		break
 	}
-	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zend.Z_RES_P(zproc), "process", LeProcOpen))) == nil {
+	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -310,12 +310,12 @@ func ZifProcClose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zend.Z_RES_P(zproc), "process", LeProcOpen))) == nil {
+	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
 		zend.RETVAL_FALSE
 		return
 	}
 	FG(pclose_wait) = 1
-	zend.ZendListClose(zend.Z_RES_P(zproc))
+	zend.ZendListClose(zproc.GetRes())
 	FG(pclose_wait) = 0
 	zend.RETVAL_LONG(FG(pclose_ret))
 	return
@@ -399,7 +399,7 @@ func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		break
 	}
-	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zend.Z_RES_P(zproc), "process", LeProcOpen))) == nil {
+	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -735,7 +735,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						goto exit_fail
 					}
 					for i = 0; i < ndesc; i++ {
-						if descriptors[i].GetIndex() == zend.Z_LVAL_P(ztarget) {
+						if descriptors[i].GetIndex() == ztarget.GetLval() {
 							target = &descriptors[i]
 							break
 						}
@@ -743,15 +743,15 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					if target != nil {
 						childend = target.GetChildend()
 					} else {
-						if zend.Z_LVAL_P(ztarget) < 0 || zend.Z_LVAL_P(ztarget) > 2 {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", zend.Z_LVAL_P(ztarget))
+						if ztarget.GetLval() < 0 || ztarget.GetLval() > 2 {
+							core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", ztarget.GetLval())
 							goto exit_fail
 						}
 
 						/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
 						 * which happens whenever an explicit override is not provided. */
 
-						childend = zend.Z_LVAL_P(ztarget)
+						childend = ztarget.GetLval()
 
 						/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
 						 * which happens whenever an explicit override is not provided. */

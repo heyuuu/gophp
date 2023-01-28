@@ -63,7 +63,7 @@ func ZendAstGetZval(ast *ZendAst) *Zval {
 func ZendAstGetStr(ast *ZendAst) *ZendString {
 	var zv *Zval = ZendAstGetZval(ast)
 	ZEND_ASSERT(zv.GetType() == IS_STRING)
-	return Z_STR_P(zv)
+	return zv.GetStr()
 }
 func ZendAstGetConstantName(ast *ZendAst) *ZendString {
 	ZEND_ASSERT(ast.GetKind() == ZEND_AST_CONSTANT)
@@ -77,7 +77,7 @@ func ZendAstGetNumChildren(ast *ZendAst) uint32 {
 func ZendAstGetLineno(ast *ZendAst) uint32 {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
-		return Z_LINENO_P(zv)
+		return zv.GetLineno()
 	} else {
 		return ast.GetLineno()
 	}
@@ -354,14 +354,14 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 		}
 		break
 	case IS_STRING:
-		ZendSymtableUpdate(Z_ARRVAL_P(result), Z_STR_P(offset), expr)
+		ZendSymtableUpdate(Z_ARRVAL_P(result), offset.GetStr(), expr)
 		ZvalPtrDtorStr(offset)
 		break
 	case IS_NULL:
 		ZendSymtableUpdate(Z_ARRVAL_P(result), ZSTR_EMPTY_ALLOC(), expr)
 		break
 	case IS_LONG:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), Z_LVAL_P(offset), expr)
+		ZendHashIndexUpdate(Z_ARRVAL_P(result), offset.GetLval(), expr)
 		break
 	case IS_FALSE:
 		ZendHashIndexUpdate(Z_ARRVAL_P(result), 0, expr)
@@ -370,7 +370,7 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 		ZendHashIndexUpdate(Z_ARRVAL_P(result), 1, expr)
 		break
 	case IS_DOUBLE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), ZendDvalToLval(Z_DVAL_P(offset)), expr)
+		ZendHashIndexUpdate(Z_ARRVAL_P(result), ZendDvalToLval(offset.GetDval()), expr)
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
@@ -867,7 +867,7 @@ func ZendAstExportName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
 		if zv.GetType() == IS_STRING {
-			SmartStrAppend(str, Z_STR_P(zv))
+			SmartStrAppend(str, zv.GetStr())
 			return
 		}
 	}
@@ -882,7 +882,7 @@ func ZendAstExportNsName(str *SmartStr, ast *ZendAst, priority int, indent int) 
 			} else if ast.GetAttr() == ZEND_NAME_RELATIVE {
 				SmartStrAppends(str, "namespace\\")
 			}
-			SmartStrAppend(str, Z_STR_P(zv))
+			SmartStrAppend(str, zv.GetStr())
 			return
 		}
 	}
@@ -920,7 +920,7 @@ func ZendAstExportVar(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
 		if zv.GetType() == IS_STRING && ZendAstValidVarName(Z_STRVAL_P(zv), Z_STRLEN_P(zv)) != 0 {
-			SmartStrAppend(str, Z_STR_P(zv))
+			SmartStrAppend(str, zv.GetStr())
 			return
 		}
 	} else if ast.GetKind() == ZEND_AST_VAR {
@@ -949,7 +949,7 @@ func ZendAstExportEncapsList(str *SmartStr, quote byte, list *ZendAstList, inden
 		if ast.GetKind() == ZEND_AST_ZVAL {
 			var zv *Zval = ZendAstGetZval(ast)
 			ZEND_ASSERT(zv.GetType() == IS_STRING)
-			ZendAstExportQstr(str, quote, Z_STR_P(zv))
+			ZendAstExportQstr(str, quote, zv.GetStr())
 		} else if ast.GetKind() == ZEND_AST_VAR && ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL && (i+1 == list.GetChildren() || list.GetChild()[i+1].GetKind() != ZEND_AST_ZVAL || ZendAstVarNeedsBraces((*Z_STRVAL_P)(ZendAstGetZval(list.GetChild()[i+1]))) == 0) {
 			ZendAstExportEx(str, ast, 0, indent)
 		} else {
@@ -1090,16 +1090,16 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 		SmartStrAppends(str, "true")
 		break
 	case IS_LONG:
-		SmartStrAppendLong(str, Z_LVAL_P(zv))
+		SmartStrAppendLong(str, zv.GetLval())
 		break
 	case IS_DOUBLE:
-		key = ZendStrpprintf(0, "%.*G", int(ExecutorGlobals.GetPrecision()), Z_DVAL_P(zv))
+		key = ZendStrpprintf(0, "%.*G", int(ExecutorGlobals.GetPrecision()), zv.GetDval())
 		SmartStrAppendl(str, key.GetVal(), key.GetLen())
 		ZendStringReleaseEx(key, 0)
 		break
 	case IS_STRING:
 		SmartStrAppendc(str, '\'')
-		ZendAstExportStr(str, Z_STR_P(zv))
+		ZendAstExportStr(str, zv.GetStr())
 		SmartStrAppendc(str, '\'')
 		break
 	case IS_ARRAY:
@@ -1459,7 +1459,7 @@ tail_call:
 			ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_ZVAL)
 			zv = ZendAstGetZval(ast.GetChild()[0])
 			ZEND_ASSERT(zv.GetType() == IS_STRING)
-			ZendAstExportQstr(str, '`', Z_STR_P(zv))
+			ZendAstExportQstr(str, '`', zv.GetStr())
 		}
 		SmartStrAppendc(str, '`')
 		break

@@ -13,7 +13,7 @@ func ZendTsHashStrFindPtr(ht *TsHashTable, str *byte, len_ int) any {
 	var zv *Zval
 	zv = ZendTsHashStrFind(ht, str, len_)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -24,7 +24,7 @@ func ZendTsHashStrUpdatePtr(ht *TsHashTable, str *byte, len_ int, pData any) any
 	ZVAL_PTR(&tmp, pData)
 	zv = ZendTsHashStrUpdate(ht, str, len_, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}
@@ -35,7 +35,7 @@ func ZendTsHashStrAddPtr(ht *TsHashTable, str *byte, len_ int, pData any) any {
 	ZVAL_PTR(&tmp, pData)
 	zv = ZendTsHashStrAdd(ht, str, len_, &tmp)
 	if zv != nil {
-		return Z_PTR_P(zv)
+		return zv.GetPtr()
 	} else {
 		return nil
 	}

@@ -148,7 +148,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	for var_dtor_hash != nil {
 		for i = 0; i < var_dtor_hash.GetUsedSlots(); i++ {
 			var zv *zend.Zval = var_dtor_hash.GetData()[i]
-			if zend.Z_EXTRA_P(zv) == VAR_WAKEUP_FLAG {
+			if zv.GetU2Extra() == VAR_WAKEUP_FLAG {
 
 				/* Perform delayed __wakeup calls */
 
@@ -160,17 +160,17 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG(serialize_lock)++
 					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __wakeup calls */
 
-			} else if zend.Z_EXTRA_P(zv) == VAR_UNSERIALIZE_FLAG {
+			} else if zv.GetU2Extra() == VAR_UNSERIALIZE_FLAG {
 
 				/* Perform delayed __unserialize calls */
 
@@ -184,13 +184,13 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					BG(serialize_lock)++
 					if zend.CallUserFunction(zend.CompilerGlobals.GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
-						zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
+						zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
 					BG(serialize_lock)--
 					zend.ZvalPtrDtor(&param)
 					zend.ZvalPtrDtor(&retval)
 				} else {
-					zend.GC_ADD_FLAGS(zend.Z_OBJ_P(zv), zend.IS_OBJ_DESTRUCTOR_CALLED)
+					zend.GC_ADD_FLAGS(zv.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 				}
 
 				/* Perform delayed __unserialize calls */
@@ -404,7 +404,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 				}
 				if b.Assign(&old_data, zend.ZendHashFind(ht, key.GetStr())) != nil {
 					if old_data.GetType() == zend.IS_INDIRECT {
-						old_data = zend.Z_INDIRECT_P(old_data)
+						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
 						data = zend.ZendHashUpdateInd(ht, key.GetStr(), &d)
@@ -449,7 +449,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 				goto failure
 			}
 			if zend.Z_ISREF_P(data) {
-				zend.ZEND_REF_ADD_TYPE_SOURCE(zend.Z_REF_P(data), info)
+				zend.ZEND_REF_ADD_TYPE_SOURCE(data.GetRef(), info)
 			}
 		}
 		if BG(unserialize).level > 1 {
@@ -516,10 +516,10 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 
 		/* Avoid reallocation due to packed -> mixed conversion. */
 
-		zend.ZendHashRealInitMixed(zend.Z_ARRVAL(ary))
-		if ProcessNestedData(rval, p, max, var_hash, zend.Z_ARRVAL(ary), elements, nil) == 0 {
+		zend.ZendHashRealInitMixed(ary.GetArr())
+		if ProcessNestedData(rval, p, max, var_hash, ary.GetArr(), elements, nil) == 0 {
 			zend.ZVAL_DEREF(rval)
-			zend.GC_ADD_FLAGS(zend.Z_OBJ_P(rval), zend.IS_OBJ_DESTRUCTOR_CALLED)
+			zend.GC_ADD_FLAGS(rval.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 			zend.ZvalPtrDtor(&ary)
 			return 0
 		}
@@ -530,7 +530,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		zend.ZVAL_DEREF(rval)
 		tmp = TmpVar(var_hash, 2)
 		zend.ZVAL_COPY(tmp, rval)
-		zend.Z_EXTRA_P(tmp) = VAR_UNSERIALIZE_FLAG
+		tmp.GetU2Extra() = VAR_UNSERIALIZE_FLAG
 		tmp++
 		zend.ZVAL_COPY_VALUE(tmp, &ary)
 		return FinishNestedData(rval, p, max, var_hash)
@@ -541,10 +541,10 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 		return 0
 	}
 	zend.ZendHashExtend(ht, ht.GetNNumOfElements()+elements, ht.GetUFlags()&zend.HASH_FLAG_PACKED)
-	if ProcessNestedData(rval, p, max, var_hash, ht, elements, zend.Z_OBJ_P(rval)) == 0 {
+	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
 			zend.ZVAL_DEREF(rval)
-			zend.GC_ADD_FLAGS(zend.Z_OBJ_P(rval), zend.IS_OBJ_DESTRUCTOR_CALLED)
+			zend.GC_ADD_FLAGS(rval.GetObj(), zend.IS_OBJ_DESTRUCTOR_CALLED)
 		}
 		return 0
 	}
@@ -555,7 +555,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 
 		var wakeup_var *zend.Zval = VarTmpVar(var_hash)
 		zend.ZVAL_COPY(wakeup_var, rval)
-		zend.Z_EXTRA_P(wakeup_var) = VAR_WAKEUP_FLAG
+		wakeup_var.GetU2Extra() = VAR_WAKEUP_FLAG
 	}
 	return FinishNestedData(rval, p, max, var_hash)
 }
@@ -1515,7 +1515,7 @@ yy85:
 		}
 		zend.ZVAL_NEW_REF(rval_ref, rval_ref)
 		if info != nil {
-			zend.ZEND_REF_ADD_TYPE_SOURCE(zend.Z_REF_P(rval_ref), info)
+			zend.ZEND_REF_ADD_TYPE_SOURCE(rval_ref.GetRef(), info)
 		}
 	}
 	zend.ZVAL_COPY(rval, rval_ref)

@@ -12,7 +12,7 @@ import (
 
 func BG(v *uint32) __auto__ { return BasicGlobals.v }
 func PhpPutenvDestructor(zv *zend.Zval) {
-	var pe *PutenvEntry = zend.Z_PTR_P(zv)
+	var pe *PutenvEntry = zv.GetPtr()
 	if pe.GetPreviousValue() != nil {
 		putenv(pe.GetPreviousValue())
 	} else {
@@ -1675,7 +1675,7 @@ func ZifGetCurrentUser(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 }
 func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
 	if entry.GetType() == zend.IS_STRING {
-		var str *zend.ZendString = zend.Z_STR_P(entry)
+		var str *zend.ZendString = entry.GetStr()
 		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
 			zend.ZendStringAddref(str)
 		} else {
@@ -2386,7 +2386,7 @@ func ZifForwardStaticCallArray(execute_data *zend.ZendExecuteData, return_value 
 }
 func UserShutdownFunctionDtor(zv *zend.Zval) {
 	var i int
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zend.Z_PTR_P(zv)
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
 		zend.ZvalPtrDtor(shutdown_function_entry.GetArguments()[i])
 	}
@@ -2401,7 +2401,7 @@ func UserTickFunctionDtor(tick_function_entry *UserTickFunctionEntry) {
 	zend.Efree(tick_function_entry.GetArguments())
 }
 func UserShutdownFunctionCall(zv *zend.Zval) int {
-	var shutdown_function_entry *PhpShutdownFunctionEntry = zend.Z_PTR_P(zv)
+	var shutdown_function_entry *PhpShutdownFunctionEntry = zv.GetPtr()
 	var retval zend.Zval
 	if zend.ZendIsCallable(shutdown_function_entry.GetArguments()[0], 0, nil) == 0 {
 		var function_name *zend.ZendString = zend.ZendGetCallableName(shutdown_function_entry.GetArguments()[0])
@@ -3042,7 +3042,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				continue
 			}
 			key = _p.GetKey()
-			ini_entry = zend.Z_PTR_P(_z)
+			ini_entry = _z.GetPtr()
 			var option zend.Zval
 			if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
 				continue
@@ -4210,7 +4210,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 
 		}
 		zend.Z_TRY_ADDREF_P(arg2)
-		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1), arg2)
+		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), arg1.GetStr(), arg2)
 		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash zend.Zval
@@ -4231,9 +4231,9 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 				find_hash = zend.ZendHashIndexAddNew(zend.Z_ARRVAL_P(arr), key, &hash)
 			}
 		} else {
-			if b.Assign(&find_hash, zend.ZendHashFind(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1))) == nil {
+			if b.Assign(&find_hash, zend.ZendHashFind(zend.Z_ARRVAL_P(arr), arg1.GetStr())) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = zend.ZendHashAddNew(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1), &hash)
+				find_hash = zend.ZendHashAddNew(zend.Z_ARRVAL_P(arr), arg1.GetStr(), &hash)
 			}
 		}
 		if find_hash.GetType() != zend.IS_ARRAY {
@@ -4254,7 +4254,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG(active_ini_file_section)))
-		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), zend.Z_STR_P(arg1), &(BG(active_ini_file_section)))
+		zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(arr), arg1.GetStr(), &(BG(active_ini_file_section)))
 	} else if arg2 != nil {
 		var active_arr *zend.Zval
 		if BG(active_ini_file_section).u1.v.type_ != zend.IS_UNDEF {
@@ -4373,7 +4373,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ZendStreamInitFilename(&fh, filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+		zend.ZendArrayDestroy(return_value.GetArr())
 		zend.RETVAL_FALSE
 		return
 	}
@@ -4486,7 +4486,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+		zend.ZendArrayDestroy(return_value.GetArr())
 		zend.RETVAL_FALSE
 	}
 	zend.Efree(string)

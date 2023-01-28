@@ -71,18 +71,18 @@ func REGISTER_MAIN_STRINGL_CONSTANT(name string, str *byte, len_ int, flags int)
 	ZendRegisterStringlConstant(name, b.SizeOf("name")-1, str, len_, flags, 0)
 }
 func IS_CONSTANT_VISITED(zv *Zval) int {
-	return Z_ACCESS_FLAGS_P(zv) & IS_CONSTANT_VISITED_MARK
+	return zv.GetAccessFlags() & IS_CONSTANT_VISITED_MARK
 }
 func MARK_CONSTANT_VISITED(zv *Zval) uint32 {
-	Z_ACCESS_FLAGS_P(zv) |= IS_CONSTANT_VISITED_MARK
-	return Z_ACCESS_FLAGS_P(zv)
+	zv.GetAccessFlags() |= IS_CONSTANT_VISITED_MARK
+	return zv.GetAccessFlags()
 }
 func RESET_CONSTANT_VISITED(zv *Zval) uint32 {
-	Z_ACCESS_FLAGS_P(zv) &= ^IS_CONSTANT_VISITED_MARK
-	return Z_ACCESS_FLAGS_P(zv)
+	zv.GetAccessFlags() &= ^IS_CONSTANT_VISITED_MARK
+	return zv.GetAccessFlags()
 }
 func FreeZendConstant(zv *Zval) {
-	var c *ZendConstant = Z_PTR_P(zv)
+	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) == 0 {
 		ZvalPtrDtorNogc(c.GetValue())
 		if c.GetName() != nil {
@@ -98,7 +98,7 @@ func FreeZendConstant(zv *Zval) {
 	}
 }
 func CleanModuleConstant(el *Zval, arg any) int {
-	var c *ZendConstant = (*ZendConstant)(Z_PTR_P(el))
+	var c *ZendConstant = (*ZendConstant)(el.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ZEND_CONSTANT_MODULE_NUMBER(c) == module_number {
 		return ZEND_HASH_APPLY_REMOVE
@@ -250,7 +250,7 @@ func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 		ZendStrTolowerCopy(lcname, name.GetVal(), name.GetLen())
 		zv = ZendHashStrFind(ExecutorGlobals.GetZendConstants(), lcname, name.GetLen())
 		if zv != nil {
-			c = Z_PTR_P(zv)
+			c = zv.GetPtr()
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {
 				c = nil
 			}
@@ -260,7 +260,7 @@ func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 		FreeAlloca(lcname, use_heap)
 		return c
 	} else {
-		return (*ZendConstant)(Z_PTR_P(zv))
+		return (*ZendConstant)(zv.GetPtr())
 	}
 }
 func ZendGetConstant(name *ZendString) *Zval {

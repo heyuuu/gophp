@@ -10,7 +10,7 @@ func ZendDoInheritance(ce *ZendClassEntry, parent_ce *ZendClassEntry) {
 	ZendDoInheritanceEx(ce, parent_ce, 0)
 }
 func OverriddenPtrDtor(zv *Zval) {
-	EfreeSize(Z_PTR_P(zv), b.SizeOf("zend_function"))
+	EfreeSize(zv.GetPtr(), b.SizeOf("zend_function"))
 }
 func ZendDuplicatePropertyInfoInternal(property_info *ZendPropertyInfo) *ZendPropertyInfo {
 	var new_property_info *ZendPropertyInfo = Pemalloc(b.SizeOf("zend_property_info"), 1)
@@ -739,7 +739,7 @@ func DoInheritanceCheckOnMethodEx(child *ZendFunction, parent *ZendFunction, ce 
 					var new_function *ZendFunction = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_op_array"))
 					memcpy(new_function, child, b.SizeOf("zend_op_array"))
 					child = new_function
-					Z_PTR_P(child_zv) = child
+					child_zv.GetPtr() = child
 				}
 			}
 			child.SetPrototype(proto)
@@ -770,7 +770,7 @@ func DoInheritanceCheckOnMethod(child *ZendFunction, parent *ZendFunction, ce *Z
 func DoInheritMethod(key *ZendString, parent *ZendFunction, ce *ZendClassEntry, is_interface ZendBool, checked ZendBool) {
 	var child *Zval = ZendHashFindEx(ce.GetFunctionTable(), key, 1)
 	if child != nil {
-		var func_ *ZendFunction = (*ZendFunction)(Z_PTR_P(child))
+		var func_ *ZendFunction = (*ZendFunction)(child.GetPtr())
 		if is_interface != 0 && func_ == parent {
 
 			/* The same method in interface may be inherited few times */
@@ -852,7 +852,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendC
 	var child *Zval = ZendHashFindEx(ce.GetPropertiesInfo(), key, 1)
 	var child_info *ZendPropertyInfo
 	if child != nil {
-		child_info = Z_PTR_P(child)
+		child_info = child.GetPtr()
 		if parent_info.HasFlags(ZEND_ACC_PRIVATE | ZEND_ACC_CHANGED) {
 			child_info.SetIsChanged(true)
 		}
@@ -946,7 +946,7 @@ func DoInheritClassConstant(name *ZendString, parent_const *ZendClassConstant, c
 	var zv *Zval = ZendHashFindEx(ce.GetConstantsTable(), name, 1)
 	var c *ZendClassConstant
 	if zv != nil {
-		c = (*ZendClassConstant)(Z_PTR_P(zv))
+		c = (*ZendClassConstant)(zv.GetPtr())
 		if (c.GetValue().GetAccessFlags() & ZEND_ACC_PPP_MASK) > (parent_const.GetValue().GetAccessFlags() & ZEND_ACC_PPP_MASK) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.GetName().GetVal(), name.GetVal(), ZendVisibilityString(parent_const.GetValue().GetAccessFlags()), ce.parent.name.GetVal(), b.Cond((parent_const.GetValue().GetAccessFlags()&ZEND_ACC_PUBLIC) != 0, "", " or weaker"))
 		}
@@ -1005,7 +1005,7 @@ func ZendBuildPropertiesInfoTable(ce *ZendClassEntry) {
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			prop = Z_PTR_P(_z)
+			prop = _z.GetPtr()
 			if prop.GetCe() == ce && !prop.IsStatic() {
 				table[OBJ_PROP_TO_NUM(prop.GetOffset())] = prop
 			}
@@ -1168,7 +1168,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.GetType() == IS_INDIRECT {
-					ZVAL_INDIRECT(dst, Z_INDIRECT_P(src))
+					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
 				}
@@ -1186,11 +1186,11 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.GetType() == IS_INDIRECT {
-					ZVAL_INDIRECT(dst, Z_INDIRECT_P(src))
+					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
 				}
-				if Z_INDIRECT_P(dst).GetType() == IS_CONSTANT_AST {
+				if dst.GetZv().GetType() == IS_CONSTANT_AST {
 					ce.SetIsConstantsUpdated(false)
 				}
 				if dst == end {
@@ -1203,7 +1203,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.GetType() == IS_INDIRECT {
-					ZVAL_INDIRECT(dst, Z_INDIRECT_P(src))
+					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
 				}
@@ -1238,7 +1238,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			property_info = Z_PTR_P(_z)
+			property_info = _z.GetPtr()
 			if property_info.GetCe() == ce {
 				if property_info.IsStatic() {
 					property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultStaticMembersCount())
@@ -1262,7 +1262,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 					continue
 				}
 				key = _p.GetKey()
-				property_info = Z_PTR_P(_z)
+				property_info = _z.GetPtr()
 				DoInheritProperty(property_info, key, ce)
 			}
 			break
@@ -1282,7 +1282,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 					continue
 				}
 				key = _p.GetKey()
-				c = Z_PTR_P(_z)
+				c = _z.GetPtr()
 				DoInheritClassConstant(key, c, ce)
 			}
 			break
@@ -1302,7 +1302,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 						continue
 					}
 					key = _p.GetKey()
-					func_ = Z_PTR_P(_z)
+					func_ = _z.GetPtr()
 					DoInheritMethod(key, func_, ce, 0, 1)
 				}
 				break
@@ -1319,7 +1319,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 						continue
 					}
 					key = _p.GetKey()
-					func_ = Z_PTR_P(_z)
+					func_ = _z.GetPtr()
 					DoInheritMethod(key, func_, ce, 0, 0)
 				}
 				break
@@ -1338,7 +1338,7 @@ func DoInheritConstantCheck(child_constants_table *HashTable, parent_constant *Z
 	var zv *Zval = ZendHashFindEx(child_constants_table, name, 1)
 	var old_constant *ZendClassConstant
 	if zv != nil {
-		old_constant = (*ZendClassConstant)(Z_PTR_P(zv))
+		old_constant = (*ZendClassConstant)(zv.GetPtr())
 		if old_constant.GetCe() != parent_constant.GetCe() {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot inherit previously-inherited or override constant %s from interface %s", name.GetVal(), iface.GetName().GetVal())
 		}
@@ -1375,7 +1375,7 @@ func DoInterfaceImplementation(ce *ZendClassEntry, iface *ZendClassEntry) {
 				continue
 			}
 			key = _p.GetKey()
-			c = Z_PTR_P(_z)
+			c = _z.GetPtr()
 			DoInheritIfaceConstant(key, c, ce, iface)
 		}
 		break
@@ -1391,7 +1391,7 @@ func DoInterfaceImplementation(ce *ZendClassEntry, iface *ZendClassEntry) {
 				continue
 			}
 			key = _p.GetKey()
-			func_ = Z_PTR_P(_z)
+			func_ = _z.GetPtr()
 			DoInheritMethod(key, func_, ce, 1, 0)
 		}
 		break
@@ -1436,7 +1436,7 @@ func ZendDoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
 					continue
 				}
 				key = _p.GetKey()
-				c = Z_PTR_P(_z)
+				c = _z.GetPtr()
 				DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
 			}
 			break
@@ -1495,7 +1495,7 @@ func ZendDoImplementInterfaces(ce *ZendClassEntry, interfaces **ZendClassEntry) 
 							continue
 						}
 						key = _p.GetKey()
-						c = Z_PTR_P(_z)
+						c = _z.GetPtr()
 						DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
 					}
 					break
@@ -1894,7 +1894,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 							continue
 						}
 						key = _p.GetKey()
-						fn = Z_PTR_P(_z)
+						fn = _z.GetPtr()
 						ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
 					}
 					break
@@ -1920,7 +1920,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 							continue
 						}
 						key = _p.GetKey()
-						fn = Z_PTR_P(_z)
+						fn = _z.GetPtr()
 						ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
 					}
 					break
@@ -1938,7 +1938,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			fn = Z_PTR_P(_z)
+			fn = _z.GetPtr()
 			ZendFixupTraitMethod(fn, ce)
 		}
 		break
@@ -1990,7 +1990,7 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 				if _z.GetType() == IS_UNDEF {
 					continue
 				}
-				property_info = Z_PTR_P(_z)
+				property_info = _z.GetPtr()
 
 				/* first get the unmangeld name if necessary,
 				 * then check whether the property is already there
@@ -2253,7 +2253,7 @@ func ZendVerifyAbstractClass(ce *ZendClassEntry) {
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			func_ = Z_PTR_P(_z)
+			func_ = _z.GetPtr()
 			ZendVerifyAbstractClassFunction(func_, &ai)
 		}
 		break
@@ -2270,10 +2270,10 @@ func ZendVerifyAbstractClass(ce *ZendClassEntry) {
 
 	}
 }
-func VarianceObligationDtor(zv *Zval) { Efree(Z_PTR_P(zv)) }
+func VarianceObligationDtor(zv *Zval) { Efree(zv.GetPtr()) }
 func VarianceObligationHtDtor(zv *Zval) {
-	ZendHashDestroy(Z_PTR_P(zv))
-	FREE_HASHTABLE(Z_PTR_P(zv))
+	ZendHashDestroy(zv.GetPtr())
+	FREE_HASHTABLE(zv.GetPtr())
 }
 func GetOrInitObligationsForClass(ce *ZendClassEntry) *HashTable {
 	var ht *HashTable
@@ -2329,7 +2329,7 @@ func AddPropertyCompatibilityObligation(ce *ZendClassEntry, child_prop *ZendProp
 	ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func CheckVarianceObligation(zv *Zval) int {
-	var obligation *VarianceObligation = Z_PTR_P(zv)
+	var obligation *VarianceObligation = zv.GetPtr()
 	if obligation.GetType() == OBLIGATION_DEPENDENCY {
 		var dependency_ce *ZendClassEntry = obligation.dependency_ce
 		if dependency_ce.IsUnresolvedVariance() {
@@ -2421,7 +2421,7 @@ func ReportVarianceErrors(ce *ZendClassEntry) {
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			obligation = Z_PTR_P(_z)
+			obligation = _z.GetPtr()
 			var status InheritanceStatus
 			var unresolved_class *ZendString
 			if obligation.GetType() == OBLIGATION_COMPATIBILITY {
@@ -2549,10 +2549,10 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 				continue
 			}
 			key = _p.GetKey()
-			parent_func = Z_PTR_P(_z)
+			parent_func = _z.GetPtr()
 			var zv *Zval = ZendHashFindEx(ce.GetFunctionTable(), key, 1)
 			if zv != nil {
-				var child_func *ZendFunction = Z_FUNC_P(zv)
+				var child_func *ZendFunction = zv.GetFunc()
 				var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
 				if status != INHERITANCE_SUCCESS {
 					if status == INHERITANCE_UNRESOLVED {
@@ -2576,14 +2576,14 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 				continue
 			}
 			key = _p.GetKey()
-			parent_info = Z_PTR_P(_z)
+			parent_info = _z.GetPtr()
 			var zv *Zval
 			if parent_info.IsPrivate() || !(ZEND_TYPE_IS_SET(parent_info.GetType())) {
 				continue
 			}
 			zv = ZendHashFindEx(ce.GetPropertiesInfo(), key, 1)
 			if zv != nil {
-				var child_info *ZendPropertyInfo = Z_PTR_P(zv)
+				var child_info *ZendPropertyInfo = zv.GetPtr()
 				if ZEND_TYPE_IS_SET(child_info.GetType()) {
 					var status InheritanceStatus = PropertyTypesCompatible(parent_info, child_info)
 					if status != INHERITANCE_SUCCESS {

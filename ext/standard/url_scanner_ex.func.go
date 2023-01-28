@@ -8,7 +8,7 @@ import (
 	"sik/zend"
 )
 
-func TagDtor(zv *zend.Zval) { zend.Free(zend.Z_PTR_P(zv)) }
+func TagDtor(zv *zend.Zval) { zend.Free(zv.GetPtr()) }
 func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int, type_ int) int {
 	var ctx *UrlAdaptStateExT
 	var key *byte

@@ -88,7 +88,7 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
 	switch option_buffer.GetType() {
 	case zend.IS_STRING:
-		buffer = zend.ZendStringCopy(zend.Z_STR_P(option_buffer))
+		buffer = zend.ZendStringCopy(option_buffer.GetStr())
 		break
 	case zend.IS_LONG:
 
@@ -269,14 +269,14 @@ func PhpPasswordAlgoFind(ident *zend.ZendString) *PhpPasswordAlgo {
 	if tmp == nil || tmp.GetType() != zend.IS_PTR {
 		return nil
 	}
-	return zend.Z_PTR_P(tmp)
+	return tmp.GetPtr()
 }
 func PhpPasswordAlgoFindZvalEx(arg *zend.Zval, default_algo *PhpPasswordAlgo) *PhpPasswordAlgo {
 	if arg == nil || arg.GetType() == zend.IS_NULL {
 		return default_algo
 	}
 	if arg.GetType() == zend.IS_LONG {
-		switch zend.Z_LVAL_P(arg) {
+		switch arg.GetLval() {
 		case 0:
 			return default_algo
 		case 1:
@@ -297,7 +297,7 @@ func PhpPasswordAlgoFindZvalEx(arg *zend.Zval, default_algo *PhpPasswordAlgo) *P
 	if arg.GetType() != zend.IS_STRING {
 		return nil
 	}
-	return PhpPasswordAlgoFind(zend.Z_STR_P(arg))
+	return PhpPasswordAlgoFind(arg.GetStr())
 }
 func PhpPasswordAlgoFindZval(arg *zend.Zval) *PhpPasswordAlgo {
 	return PhpPasswordAlgoFindZvalEx(arg, PhpPasswordAlgoDefault())

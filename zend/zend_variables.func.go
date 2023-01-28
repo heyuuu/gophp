@@ -8,12 +8,12 @@ import (
 
 func ZvalPtrDtorNogc(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) && Z_DELREF_P(zval_ptr) == 0 {
-		RcDtorFunc(Z_COUNTED_P(zval_ptr))
+		RcDtorFunc(zval_ptr.GetCounted())
 	}
 }
 func IZvalPtrDtor(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
-		var ref *ZendRefcounted = Z_COUNTED_P(zval_ptr)
+		var ref *ZendRefcounted = zval_ptr.GetCounted()
 		if GC_DELREF(ref) == 0 {
 			RcDtorFunc(ref)
 		} else {
@@ -23,14 +23,14 @@ func IZvalPtrDtor(zval_ptr *Zval) {
 }
 func ZvalCopyCtor(zvalue *Zval) {
 	if zvalue.GetType() == IS_ARRAY {
-		ZVAL_ARR(zvalue, ZendArrayDup(Z_ARR_P(zvalue)))
+		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
 	} else if Z_REFCOUNTED_P(zvalue) {
 		Z_ADDREF_P(zvalue)
 	}
 }
 func ZvalOptCopyCtor(zvalue *Zval) {
 	if Z_OPT_TYPE_P(zvalue) == IS_ARRAY {
-		ZVAL_ARR(zvalue, ZendArrayDup(Z_ARR_P(zvalue)))
+		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
 	} else if Z_OPT_REFCOUNTED_P(zvalue) {
 		Z_ADDREF_P(zvalue)
 	}
@@ -39,8 +39,8 @@ func ZvalPtrDtorStr(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) && Z_DELREF_P(zval_ptr) == 0 {
 		ZEND_ASSERT(zval_ptr.GetType() == IS_STRING)
 		ZEND_ASSERT(true)
-		ZEND_ASSERT((GC_FLAGS(Z_STR_P(zval_ptr)) & IS_STR_PERSISTENT) == 0)
-		Efree(Z_STR_P(zval_ptr))
+		ZEND_ASSERT((GC_FLAGS(zval_ptr.GetStr()) & IS_STR_PERSISTENT) == 0)
+		Efree(zval_ptr.GetStr())
 	}
 }
 func ZvalDtor(zvalue *Zval)         { ZvalPtrDtorNogc(zvalue) }
@@ -58,7 +58,7 @@ func ZendEmptyDestroy(ref *ZendReference) {}
 func ZvalPtrDtor(zval_ptr *Zval)          { IZvalPtrDtor(zval_ptr) }
 func ZvalInternalPtrDtor(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
-		var ref *ZendRefcounted = Z_COUNTED_P(zval_ptr)
+		var ref *ZendRefcounted = zval_ptr.GetCounted()
 		if GC_DELREF(ref) == 0 {
 			if zval_ptr.GetType() == IS_STRING {
 				var str *ZendString = (*ZendString)(ref)
@@ -85,6 +85,6 @@ func ZvalCopyCtorFunc(zvalue *Zval) {
 		ZVAL_ARR(zvalue, ZendArrayDup(Z_ARRVAL_P(zvalue)))
 	} else if zvalue.GetType() == IS_STRING {
 		ZEND_ASSERT(true)
-		ZVAL_NEW_STR(zvalue, ZendStringDup(Z_STR_P(zvalue), 0))
+		ZVAL_NEW_STR(zvalue, ZendStringDup(zvalue.GetStr(), 0))
 	}
 }

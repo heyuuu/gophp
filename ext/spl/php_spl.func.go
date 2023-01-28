@@ -45,7 +45,7 @@ func ZifClassParents(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	}
 	if obj.GetType() == zend.IS_STRING {
-		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -73,7 +73,7 @@ func ZifClassImplements(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		return
 	}
 	if obj.GetType() == zend.IS_STRING {
-		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -97,7 +97,7 @@ func ZifClassUses(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	if obj.GetType() == zend.IS_STRING {
-		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
+		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
 			zend.RETVAL_FALSE
 			return
 		}
@@ -272,7 +272,7 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 	}
 }
 func AutoloadFuncInfoDtor(element *zend.Zval) {
-	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(zend.Z_PTR_P(element))
+	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.GetPtr())
 	if !(zend.Z_ISUNDEF(alfi.GetObj())) {
 		zend.ZvalPtrDtor(alfi.GetObj())
 	}
@@ -303,7 +303,7 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		var called_scope *zend.ZendClassEntry = zend.ZendGetCalledScope(execute_data)
 		var l_autoload_running int = SPL_G(autoload_running)
 		SPL_G(autoload_running) = 1
-		lc_name = zend.ZendStringTolower(zend.Z_STR_P(class_name))
+		lc_name = zend.ZendStringTolower(class_name.GetStr())
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetRetval(&retval)
 		fci.SetParamCount(1)
@@ -648,7 +648,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 			var tmp zend.Zval
 			zend.ArrayInit(return_value)
 			zend.ZVAL_STR_COPY(&tmp, zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))
-			zend.ZendHashNextIndexInsertNew(zend.Z_ARR_P(return_value), &tmp)
+			zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
 			return
 		}
 		zend.RETVAL_FALSE
@@ -669,7 +669,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 					continue
 				}
 				key = _p.GetKey()
-				alfi = zend.Z_PTR_P(_z)
+				alfi = _z.GetPtr()
 				if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
 					zend.Z_ADDREF(alfi.GetClosure())
 					zend.AddNextIndexZval(return_value, alfi.GetClosure())

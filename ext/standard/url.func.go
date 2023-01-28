@@ -990,7 +990,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			}
 			if format == 0 {
 			no_name_header:
-				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(zend.Z_STR_P(hdr)))
+				zend.AddNextIndexStr(return_value, zend.ZendStringCopy(hdr.GetStr()))
 			} else {
 				var c byte
 				var s *byte

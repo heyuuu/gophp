@@ -311,7 +311,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 	return filter
 }
 func FilterItemDtor(zv *zend.Zval) {
-	var fdat *PhpUserFilterData = zend.Z_PTR_P(zv)
+	var fdat *PhpUserFilterData = zv.GetPtr()
 	zend.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
@@ -388,7 +388,7 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 		}
 		break
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zend.Z_RES_P(zbrigade), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -491,7 +491,7 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 		zend.RETVAL_FALSE
 		return
 	}
-	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zend.Z_RES_P(zbrigade), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
+	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
 		zend.RETVAL_FALSE
 		return
 	}

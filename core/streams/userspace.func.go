@@ -70,14 +70,14 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		var retval zend.Zval
 		fci.SetSize(b.SizeOf("fci"))
 		zend.ZVAL_UNDEF(fci.GetFunctionName())
-		fci.SetObject(zend.Z_OBJ_P(object))
+		fci.SetObject(object.GetObj())
 		fci.SetRetval(&retval)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
 		fcc.SetFunctionHandler(uwrap.GetCe().GetConstructor())
 		fcc.SetCalledScope(zend.Z_OBJCE_P(object))
-		fcc.SetObject(zend.Z_OBJ_P(object))
+		fcc.SetObject(object.GetObj())
 		if zend.ZendCallFunction(&fci, &fcc) == zend.FAILURE {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
 			zend.ZvalPtrDtor(object)
@@ -149,7 +149,7 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 		/* if the opened path is set, copy it out */
 
 		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).GetType() == zend.IS_STRING && opened_path != nil {
-			*opened_path = zend.ZendStringCopy(zend.Z_STR_P(zend.Z_REFVAL(args[3])))
+			*opened_path = zend.ZendStringCopy(zend.Z_REFVAL(args[3]).GetStr())
 		}
 
 		/* set wrapper data to be a reference to our object */
@@ -610,17 +610,17 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	case core.PHP_STREAM_OPTION_LOCKING:
 		zend.ZVAL_LONG(&args[0], 0)
 		if (value & LOCK_NB) != 0 {
-			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_NB
+			args[0].GetLval() |= standard.PHP_LOCK_NB
 		}
 		switch value & ^LOCK_NB {
 		case LOCK_SH:
-			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_SH
+			args[0].GetLval() |= standard.PHP_LOCK_SH
 			break
 		case LOCK_EX:
-			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_EX
+			args[0].GetLval() |= standard.PHP_LOCK_EX
 			break
 		case LOCK_UN:
-			zend.Z_LVAL_P(&args[0]) |= standard.PHP_LOCK_UN
+			args[0].GetLval() |= standard.PHP_LOCK_UN
 			break
 		}
 

@@ -2639,7 +2639,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 		}
 		break
 	}
-	filter = zend.ZendFetchResource(zend.Z_RES_P(zfilter), nil, streams.PhpFileLeStreamFilter())
+	filter = zend.ZendFetchResource(zfilter.GetRes(), nil, streams.PhpFileLeStreamFilter())
 	if filter == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid resource given, not a stream filter")
 		zend.RETVAL_FALSE
@@ -2650,7 +2650,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.ZendListClose(zend.Z_RES_P(zfilter)) == zend.FAILURE {
+	if zend.ZendListClose(zfilter.GetRes()) == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not invalidate filter, not removing")
 		zend.RETVAL_FALSE
 		return
@@ -3343,7 +3343,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 				zend.RETVAL_FALSE
 				return
 			}
-			cryptokind = zend.Z_LVAL_P(val)
+			cryptokind = val.GetLval()
 		}
 		if zsessstream != nil {
 			core.PhpStreamFromZval(sessstream, zsessstream)

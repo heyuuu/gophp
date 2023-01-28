@@ -18,7 +18,7 @@ func ZendExtensionDeactivator(extension *ZendExtension) {
 	}
 }
 func CleanNonPersistentConstantFull(zv *Zval) int {
-	var c *ZendConstant = Z_PTR_P(zv)
+	var c *ZendConstant = zv.GetPtr()
 	if (ZEND_CONSTANT_FLAGS(c) & CONST_PERSISTENT) != 0 {
 		return ZEND_HASH_APPLY_KEEP
 	} else {
@@ -26,7 +26,7 @@ func CleanNonPersistentConstantFull(zv *Zval) int {
 	}
 }
 func CleanNonPersistentFunctionFull(zv *Zval) int {
-	var function *ZendFunction = Z_PTR_P(zv)
+	var function *ZendFunction = zv.GetPtr()
 	if function.GetType() == ZEND_INTERNAL_FUNCTION {
 		return ZEND_HASH_APPLY_KEEP
 	} else {
@@ -34,7 +34,7 @@ func CleanNonPersistentFunctionFull(zv *Zval) int {
 	}
 }
 func CleanNonPersistentClassFull(zv *Zval) int {
-	var ce *ZendClassEntry = Z_PTR_P(zv)
+	var ce *ZendClassEntry = zv.GetPtr()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		return ZEND_HASH_APPLY_KEEP
 	} else {
@@ -89,7 +89,7 @@ func InitExecutor() {
 }
 func ZvalCallDestructor(zv *Zval) int {
 	if zv.GetType() == IS_INDIRECT {
-		zv = Z_INDIRECT_P(zv)
+		zv = zv.GetZv()
 	}
 	if zv.GetType() == IS_OBJECT && Z_REFCOUNT_P(zv) == 1 {
 		return ZEND_HASH_APPLY_REMOVE
@@ -99,7 +99,7 @@ func ZvalCallDestructor(zv *Zval) int {
 }
 func ZendUncleanZvalPtrDtor(zv *Zval) {
 	if zv.GetType() == IS_INDIRECT {
-		zv = Z_INDIRECT_P(zv)
+		zv = zv.GetZv()
 	}
 	IZvalPtrDtor(zv)
 }
@@ -187,7 +187,7 @@ func ShutdownExecutor() {
 					continue
 				}
 				zv = _z
-				var op_array *ZendOpArray = Z_PTR_P(zv)
+				var op_array *ZendOpArray = zv.GetPtr()
 				if op_array.GetType() == ZEND_INTERNAL_FUNCTION {
 					break
 				}
@@ -216,7 +216,7 @@ func ShutdownExecutor() {
 					continue
 				}
 				zv = _z
-				var ce *ZendClassEntry = Z_PTR_P(zv)
+				var ce *ZendClassEntry = zv.GetPtr()
 				if ce.GetDefaultStaticMembersCount() != 0 {
 					ZendCleanupInternalClassData(ce)
 				}
@@ -232,7 +232,7 @@ func ShutdownExecutor() {
 							if _z.GetType() == IS_UNDEF {
 								continue
 							}
-							op_array = Z_PTR_P(_z)
+							op_array = _z.GetPtr()
 							if op_array.GetType() == ZEND_USER_FUNCTION {
 								if op_array.GetStaticVariables() != nil {
 									var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
@@ -308,7 +308,7 @@ func ShutdownExecutor() {
 					}
 					key = _p.GetKey()
 					zv = _z
-					var c *ZendConstant = Z_PTR_P(zv)
+					var c *ZendConstant = zv.GetPtr()
 					if _idx == ExecutorGlobals.GetPersistentConstantsCount() {
 						break
 					}
@@ -350,7 +350,7 @@ func ShutdownExecutor() {
 					}
 					key = _p.GetKey()
 					zv = _z
-					var func_ *ZendFunction = Z_PTR_P(zv)
+					var func_ *ZendFunction = zv.GetPtr()
 					if _idx == ExecutorGlobals.GetPersistentFunctionsCount() {
 						break
 					}
@@ -596,7 +596,7 @@ func _callUserFunctionEx(object *Zval, function_name *Zval, retval_ptr *Zval, pa
 	var fci ZendFcallInfo
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {
-		fci.SetObject(Z_OBJ_P(object))
+		fci.SetObject(object.GetObj())
 	} else {
 		fci.SetObject(nil)
 	}
@@ -870,7 +870,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 		if key == nil {
 			ZendStringReleaseEx(lc_name, 0)
 		}
-		ce = (*ZendClassEntry)(Z_PTR_P(zv))
+		ce = (*ZendClassEntry)(zv.GetPtr())
 		if !ce.IsLinked() {
 			if (flags&ZEND_FETCH_CLASS_ALLOW_UNLINKED) != 0 || (flags&ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED) != 0 && ce.IsNearlyLinked() {
 				ce.SetIsHasUnlinkedUses(true)
@@ -1293,7 +1293,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 			var zv *Zval = ZendHashFindEx(ht, *str, 1)
 			if zv != nil {
 				if zv.GetType() == IS_INDIRECT {
-					var val *Zval = Z_INDIRECT_P(zv)
+					var val *Zval = zv.GetZv()
 					ZVAL_COPY_VALUE(var_, val)
 				} else {
 					ZVAL_COPY_VALUE(var_, zv)

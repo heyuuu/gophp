@@ -108,7 +108,7 @@ func RegisterHttpPostFilesVariableEx(var_ *byte, val *zend.Zval, http_post_files
 	SafePhpRegisterVariableEx(var_, val, http_post_files, override_protection)
 }
 func FreeFilename(el *zend.Zval) {
-	var filename *zend.ZendString = zend.Z_STR_P(el)
+	var filename *zend.ZendString = el.GetStr()
 	zend.ZendStringReleaseEx(filename, 0)
 }
 func DestroyUploadedFilesHash() {
@@ -124,7 +124,7 @@ func DestroyUploadedFilesHash() {
 				continue
 			}
 			el = _z
-			var filename *zend.ZendString = zend.Z_STR_P(el)
+			var filename *zend.ZendString = el.GetStr()
 			zend.VCWD_UNLINK(filename.GetVal())
 		}
 		break

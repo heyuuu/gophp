@@ -106,7 +106,7 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 }
 func PhpMailBuildHeadersCheckFieldValue(val *zend.Zval) zend.ZendBool {
 	var len_ int = 0
-	var value *zend.ZendString = zend.Z_STR_P(val)
+	var value *zend.ZendString = val.GetStr()
 
 	/* https://tools.ietf.org/html/rfc2822#section-2.2.1 */
 

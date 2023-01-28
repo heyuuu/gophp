@@ -14,7 +14,7 @@ func PhpPack(val *zend.Zval, size int, map_ *int, output *byte) {
 	if val.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(val)
 	}
-	v = (*byte)(&(zend.Z_LVAL_P(val)))
+	v = (*byte)(&(val.GetLval()))
 	for i = 0; i < size; i++ {
 		b.PostInc(&(*output)) = v[map_[i]]
 	}
@@ -914,14 +914,14 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format type %c", type_)
-			zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+			zend.ZendArrayDestroy(return_value.GetArr())
 			zend.RETVAL_FALSE
 			return
 			break
 		}
 		if size != 0 && size != -1 && size < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
-			zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+			zend.ZendArrayDestroy(return_value.GetArr())
 			zend.RETVAL_FALSE
 			return
 		}
@@ -952,7 +952,7 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			if size != 0 && size != -1 && core.INT_MAX-size+1 < inputpos {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
-				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+				zend.ZendArrayDestroy(return_value.GetArr())
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1229,7 +1229,7 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough input, need %d, have "+zend.ZEND_LONG_FMT, type_, size, inputlen-inputpos)
-				zend.ZendArrayDestroy(zend.Z_ARR_P(return_value))
+				zend.ZendArrayDestroy(return_value.GetArr())
 				zend.RETVAL_FALSE
 				return
 			}

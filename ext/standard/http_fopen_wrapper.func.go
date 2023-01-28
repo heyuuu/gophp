@@ -304,7 +304,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 			if redirected == 0 || zend.Z_STRLEN_P(tmpzval) == 3 && memcmp("GET", zend.Z_STRVAL_P(tmpzval), 3) == 0 || zend.Z_STRLEN_P(tmpzval) == 4 && memcmp("HEAD", zend.Z_STRVAL_P(tmpzval), 4) == 0 {
 				custom_request_method = 1
-				zend.SmartStrAppend(&req_buf, zend.Z_STR_P(tmpzval))
+				zend.SmartStrAppend(&req_buf, tmpzval.GetStr())
 				zend.SmartStrAppendc(&req_buf, ' ')
 			}
 
@@ -380,7 +380,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 					}
 					tmpheader = _z
 					if tmpheader.GetType() == zend.IS_STRING {
-						zend.SmartStrAppend(&tmpstr, zend.Z_STR_P(tmpheader))
+						zend.SmartStrAppend(&tmpstr, tmpheader.GetStr())
 						zend.SmartStrAppendl(&tmpstr, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
 					}
 				}
@@ -401,7 +401,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
 
-			tmp = PhpTrim(zend.Z_STR_P(tmpzval), nil, 0, 3)
+			tmp = PhpTrim(tmpzval.GetStr(), nil, 0, 3)
 
 			/* Remove newlines and spaces from start and end php_trim will estrndup() */
 

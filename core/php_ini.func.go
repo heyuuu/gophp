@@ -69,7 +69,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
-			ini_entry = zend.Z_PTR_P(_z)
+			ini_entry = _z.GetPtr()
 			if ini_entry.GetModuleNumber() != module_number {
 				continue
 			}
@@ -105,9 +105,9 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 func ConfigZvalDtor(zvalue *zend.Zval) {
 	if zvalue.GetType() == zend.IS_ARRAY {
 		zend.ZendHashDestroy(zend.Z_ARRVAL_P(zvalue))
-		zend.Free(zend.Z_ARR_P(zvalue))
+		zend.Free(zvalue.GetArr())
 	} else if zvalue.GetType() == zend.IS_STRING {
-		zend.ZendStringReleaseEx(zend.Z_STR_P(zvalue), 1)
+		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
 	}
 }
 func RESET_ACTIVE_INI_HASH() {
@@ -147,8 +147,8 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* Store in active hash */
 
-			entry = zend.ZendHashUpdate(active_hash, zend.Z_STR_P(arg1), arg2)
-			zend.Z_STR_P(entry) = zend.ZendStringDup(zend.Z_STR_P(entry), 1)
+			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr(), arg2)
+			entry.GetStr() = zend.ZendStringDup(entry.GetStr(), 1)
 		}
 
 		/* PHP and Zend extensions are not added into configuration hash! */
@@ -169,20 +169,20 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, zend.ZendHashFind(active_hash, zend.Z_STR_P(arg1))) == nil || find_arr.GetType() != zend.IS_ARRAY {
+		if b.Assign(&find_arr, zend.ZendHashFind(active_hash, arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
-			zend.ZendHashInit(zend.Z_ARRVAL(option_arr), 8, nil, ConfigZvalDtor, 1)
-			find_arr = zend.ZendHashUpdate(active_hash, zend.Z_STR_P(arg1), &option_arr)
+			zend.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
+			find_arr = zend.ZendHashUpdate(active_hash, arg1.GetStr(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
 
 		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
-			entry = zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(find_arr), zend.Z_STR_P(arg3), arg2)
+			entry = zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(find_arr), arg3.GetStr(), arg2)
 		} else {
 			entry = zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(find_arr), arg2)
 		}
-		zend.Z_STR_P(entry) = zend.ZendStringDup(zend.Z_STR_P(entry), 1)
+		entry.GetStr() = zend.ZendStringDup(entry.GetStr(), 1)
 		break
 	case zend.ZEND_INI_PARSER_SECTION:
 
@@ -235,7 +235,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			if b.Assign(&entry, zend.ZendHashStrFind(target_hash, key, key_len)) == nil {
 				var section_arr zend.Zval
 				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
-				zend.ZendHashInit(zend.Z_ARRVAL(section_arr), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
+				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
 				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
 			}
 			if entry.GetType() == zend.IS_ARRAY {
@@ -642,7 +642,7 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 			}
 			str = _p.GetKey()
 			data = _z
-			zend.ZendAlterIniEntryEx(str, zend.Z_STR_P(data), modify_type, stage, 0)
+			zend.ZendAlterIniEntryEx(str, data.GetStr(), modify_type, stage, 0)
 		}
 		break
 	}

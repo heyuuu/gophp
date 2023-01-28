@@ -9,7 +9,7 @@ import (
 
 func SG(v *zend.Zval) __auto__                          { return sapi_globals.v }
 func SapiAddHeader(a *byte, b int, c zend.ZendBool) int { return SapiAddHeaderEx(a, b, c, 1) }
-func _typeDtor(zv *zend.Zval)                           { zend.Free(zend.Z_PTR_P(zv)) }
+func _typeDtor(zv *zend.Zval)                           { zend.Free(zv.GetPtr()) }
 func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
 	memset(sapi_globals, 0, b.SizeOf("* sapi_globals"))
 	zend.ZendHashInitEx(sapi_globals.GetKnownPostContentTypes(), 8, nil, _typeDtor, 1, 0)

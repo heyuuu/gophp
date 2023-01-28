@@ -367,7 +367,7 @@ func PhpPrintInfo(flag int) {
 				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
-				module = zend.Z_PTR_P(_z)
+				module = _z.GetPtr()
 				if module.GetInfoFunc() != nil || module.GetVersion() != nil {
 					PhpInfoPrintModule(module)
 				}
@@ -387,7 +387,7 @@ func PhpPrintInfo(flag int) {
 				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
-				module = zend.Z_PTR_P(_z)
+				module = _z.GetPtr()
 				if module.GetInfoFunc() == nil && module.GetVersion() == nil {
 					PhpInfoPrintModule(module)
 				}

@@ -58,7 +58,7 @@ func ZendListClose(res *ZendResource) int {
 func ZendRegisterResource(rsrc_pointer any, rsrc_type int) *ZendResource {
 	var zv *Zval
 	zv = ZendListInsert(rsrc_pointer, rsrc_type)
-	return Z_RES_P(zv)
+	return zv.GetRes()
 }
 func ZendFetchResource2(res *ZendResource, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	if res != nil {
@@ -104,7 +104,7 @@ func ZendFetchResourceEx(res *Zval, resource_type_name string, resource_type int
 		}
 		return nil
 	}
-	return ZendFetchResource(Z_RES_P(res), resource_type_name, resource_type)
+	return ZendFetchResource(res.GetRes(), resource_type_name, resource_type)
 }
 func ZendFetchResource2Ex(res *Zval, resource_type_name string, resource_type1 int, resource_type2 int) any {
 	var space *byte
@@ -123,10 +123,10 @@ func ZendFetchResource2Ex(res *Zval, resource_type_name string, resource_type1 i
 		}
 		return nil
 	}
-	return ZendFetchResource2(Z_RES_P(res), resource_type_name, resource_type1, resource_type2)
+	return ZendFetchResource2(res.GetRes(), resource_type_name, resource_type1, resource_type2)
 }
 func ListEntryDestructor(zv *Zval) {
-	var res *ZendResource = Z_RES_P(zv)
+	var res *ZendResource = zv.GetRes()
 	ZVAL_UNDEF(zv)
 	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
@@ -134,7 +134,7 @@ func ListEntryDestructor(zv *Zval) {
 	EfreeSize(res, b.SizeOf("zend_resource"))
 }
 func PlistEntryDestructor(zv *Zval) {
-	var res *ZendResource = Z_RES_P(zv)
+	var res *ZendResource = zv.GetRes()
 	if res.GetType() >= 0 {
 		var ld *ZendRsrcListDtorsEntry
 		ld = ZendHashIndexFindPtr(&ListDestructors, res.GetType())
@@ -170,7 +170,7 @@ func ZendCloseRsrcList(ht *HashTable) {
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			res = Z_PTR_P(_z)
+			res = _z.GetPtr()
 			if res.GetType() >= 0 {
 				ZendResourceDtor(res)
 			}
@@ -184,7 +184,7 @@ func CleanModuleResource(zv *Zval, arg any) int {
 	return Z_RES_TYPE_P(zv) == resource_id
 }
 func ZendCleanModuleRsrcDtorsCb(zv *Zval, arg any) int {
-	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(Z_PTR_P(zv))
+	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ld.GetModuleNumber() == module_number {
 		ZendHashApplyWithArgument(&(ExecutorGlobals.GetPersistentList()), CleanModuleResource, any(&(ld.GetResourceId())))
@@ -223,7 +223,7 @@ func ZendFetchListDtorId(type_name *byte) int {
 			if _z.GetType() == IS_UNDEF {
 				continue
 			}
-			lde = Z_PTR_P(_z)
+			lde = _z.GetPtr()
 			if lde.GetTypeName() != nil && strcmp(type_name, lde.GetTypeName()) == 0 {
 				return lde.GetResourceId()
 			}
@@ -232,7 +232,7 @@ func ZendFetchListDtorId(type_name *byte) int {
 	}
 	return 0
 }
-func ListDestructorsDtor(zv *Zval) { Free(Z_PTR_P(zv)) }
+func ListDestructorsDtor(zv *Zval) { Free(zv.GetPtr()) }
 func ZendInitRsrcListDtors() int {
 	ZendHashInit(&ListDestructors, 64, nil, ListDestructorsDtor, 1)
 	ListDestructors.SetNNextFreeElement(1)
@@ -255,7 +255,7 @@ func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_ty
 	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
 	zv = ZendHashUpdate(&(ExecutorGlobals.GetPersistentList()), key, &tmp)
-	return Z_RES_P(zv)
+	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *ZendResource {
 	var str *ZendString = ZendStringInit(key, key_len, 1)

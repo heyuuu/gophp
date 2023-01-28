@@ -507,7 +507,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	retval = ZendCompileFile(&file_handle, type_)
 	if retval != nil && file_handle.GetStream().GetHandle() {
 		if file_handle.GetOpenedPath() == nil {
-			opened_path = ZendStringCopy(Z_STR_P(filename))
+			opened_path = ZendStringCopy(filename.GetStr())
 			file_handle.SetOpenedPath(opened_path)
 		}
 		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
@@ -530,8 +530,8 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 	/* enforce ZEND_MMAP_AHEAD trailing NULLs for flex... */
 
 	old_len = Z_STRLEN_P(str)
-	Z_STR_P(str) = ZendStringExtend(Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
-	Z_TYPE_INFO_P(str) = IS_STRING_EX
+	str.GetStr() = ZendStringExtend(str.GetStr(), old_len+ZEND_MMAP_AHEAD, 0)
+	str.GetTypeInfo() = IS_STRING_EX
 	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
 	SCNG(yy_in) = nil
 	SCNG(yy_start) = nil
@@ -1561,7 +1561,7 @@ skip_escape_conversion:
 		if str != s {
 			Efree(str)
 		}
-		ZendStringReleaseEx(Z_STR_P(zendlval), 0)
+		ZendStringReleaseEx(zendlval.GetStr(), 0)
 		ZVAL_STR(zendlval, new_str)
 	}
 	RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
@@ -8120,7 +8120,7 @@ heredoc_scan_done:
 	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
 	if !(SCNG(heredoc_scan_ahead)) && ExecutorGlobals.GetException() == nil && PARSER_MODE() {
 		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
-		var copy *ZendString = Z_STR_P(zendlval)
+		var copy *ZendString = zendlval.GetStr()
 		if StripMultilineStringIndentation(zendlval, heredoc_label.GetIndentation(), heredoc_label.GetIndentationUsesSpaces(), newline_at_start, newline != 0) == 0 {
 			token = T_ERROR
 			goto emit_token
