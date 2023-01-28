@@ -134,19 +134,6 @@ func ZendHashExistsInd(ht *HashTable, key *ZendString) int {
 	zv = ZendHashFind(ht, key)
 	return zv != nil && (zv.GetType() != IS_INDIRECT || Z_INDIRECT_P(zv).GetType() != IS_UNDEF)
 }
-func ZendHashStrFindInd(ht *HashTable, str *byte, len_ int) *Zval {
-	var zv *Zval
-	zv = ZendHashStrFind(ht, str, len_)
-	if zv != nil && zv.IsType(IS_INDIRECT) {
-		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
-			return zv.GetZv()
-		} else {
-			return nil
-		}
-	} else {
-		return zv
-	}
-}
 func ZendHashStrExistsInd(ht *HashTable, str string, len_ int) int {
 	var zv *Zval
 	zv = ZendHashStrFind(ht, str, len_)
@@ -184,28 +171,12 @@ func ZendSymtableDel(ht *HashTable, key *ZendString) int {
 		return ZendHashDel(ht, key)
 	}
 }
-func ZendSymtableDelInd(ht *HashTable, key *ZendString) int {
-	var idx ZendUlong
-	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
-		return ZendHashIndexDel(ht, idx)
-	} else {
-		return ZendHashDelInd(ht, key)
-	}
-}
 func ZendSymtableFind(ht *HashTable, key *ZendString) *Zval {
 	var idx ZendUlong
 	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
 		return ZendHashIndexFind(ht, idx)
 	} else {
 		return ZendHashFind(ht, key)
-	}
-}
-func ZendSymtableFindInd(ht *HashTable, key *ZendString) *Zval {
-	var idx ZendUlong
-	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
-		return ZendHashIndexFind(ht, idx)
-	} else {
-		return ZendHashFindInd(ht, key)
 	}
 }
 func ZendSymtableExists(ht *HashTable, key *ZendString) int {
@@ -333,33 +304,11 @@ func ZendHashAddMem(ht *HashTable, key *ZendString, pData any, size int) any {
 	}
 	return nil
 }
-func ZendHashAddNewMem(ht *HashTable, key *ZendString, pData any, size int) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ZendHashAddNew(ht, key, &tmp)) {
-		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
-		memcpy(zv.GetPtr(), pData, size)
-		return zv.GetPtr()
-	}
-	return nil
-}
 func ZendHashStrAddMem(ht *HashTable, str *byte, len_ int, pData any, size int) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashStrAdd(ht, str, len_, &tmp)) {
-		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
-		memcpy(zv.GetPtr(), pData, size)
-		return zv.GetPtr()
-	}
-	return nil
-}
-func ZendHashStrAddNewMem(ht *HashTable, str *byte, len_ int, pData any, size int) any {
-	var tmp Zval
-	var zv *Zval
-	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ZendHashStrAddNew(ht, str, len_, &tmp)) {
 		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
