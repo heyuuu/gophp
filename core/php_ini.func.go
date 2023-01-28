@@ -17,9 +17,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		var display_string_length int
 		var esc_html int = 0
 		if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-			if ini_entry.GetOrigValue() != nil && zend.ZSTR_VAL(ini_entry.GetOrigValue())[0] {
-				display_string = zend.ZSTR_VAL(ini_entry.GetOrigValue())
-				display_string_length = zend.ZSTR_LEN(ini_entry.GetOrigValue())
+			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetVal()[0] {
+				display_string = ini_entry.GetOrigValue().GetVal()
+				display_string_length = ini_entry.GetOrigValue().GetLen()
 				esc_html = !(sapi_module.GetPhpinfoAsText())
 			} else {
 				if sapi_module.GetPhpinfoAsText() == 0 {
@@ -30,9 +30,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 					display_string_length = b.SizeOf("\"no value\"") - 1
 				}
 			}
-		} else if ini_entry.GetValue() != nil && zend.ZSTR_VAL(ini_entry.GetValue())[0] {
-			display_string = zend.ZSTR_VAL(ini_entry.GetValue())
-			display_string_length = zend.ZSTR_LEN(ini_entry.GetValue())
+		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetVal()[0] {
+			display_string = ini_entry.GetValue().GetVal()
+			display_string_length = ini_entry.GetValue().GetLen()
 			esc_html = !(sapi_module.GetPhpinfoAsText())
 		} else {
 			if sapi_module.GetPhpinfoAsText() == 0 {
@@ -66,7 +66,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			ini_entry = zend.Z_PTR_P(_z)
@@ -81,14 +81,14 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 			if sapi_module.GetPhpinfoAsText() == 0 {
 				PUTS("<tr>")
 				PUTS("<td class=\"e\">")
-				PHPWRITE(zend.ZSTR_VAL(ini_entry.GetName()), zend.ZSTR_LEN(ini_entry.GetName()))
+				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
 				PUTS("</td><td class=\"v\">")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 				PUTS("</td><td class=\"v\">")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
 				PUTS("</td></tr>\n")
 			} else {
-				PHPWRITE(zend.ZSTR_VAL(ini_entry.GetName()), zend.ZSTR_LEN(ini_entry.GetName()))
+				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
 				PUTS(" => ")
 				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
 				PUTS(" => ")
@@ -103,10 +103,10 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	}
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
-	if zend.Z_TYPE_P(zvalue) == zend.IS_ARRAY {
+	if zvalue.GetType() == zend.IS_ARRAY {
 		zend.ZendHashDestroy(zend.Z_ARRVAL_P(zvalue))
 		zend.Free(zend.Z_ARR_P(zvalue))
-	} else if zend.Z_TYPE_P(zvalue) == zend.IS_STRING {
+	} else if zvalue.GetType() == zend.IS_STRING {
 		zend.ZendStringReleaseEx(zend.Z_STR_P(zvalue), 1)
 	}
 }
@@ -169,7 +169,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, zend.ZendHashFind(active_hash, zend.Z_STR_P(arg1))) == nil || zend.Z_TYPE_P(find_arr) != zend.IS_ARRAY {
+		if b.Assign(&find_arr, zend.ZendHashFind(active_hash, zend.Z_STR_P(arg1))) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
 			zend.ZendHashInit(zend.Z_ARRVAL(option_arr), 8, nil, ConfigZvalDtor, 1)
 			find_arr = zend.ZendHashUpdate(active_hash, zend.Z_STR_P(arg1), &option_arr)
@@ -238,7 +238,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 				zend.ZendHashInit(zend.Z_ARRVAL(section_arr), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
 				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
 			}
-			if zend.Z_TYPE_P(entry) == zend.IS_ARRAY {
+			if entry.GetType() == zend.IS_ARRAY {
 				ActiveIniHash = zend.Z_ARRVAL_P(entry)
 			}
 		}
@@ -417,7 +417,7 @@ func PhpInitConfig() int {
 			fp = PhpFopenWithPath(ini_fname, "r", php_ini_search_path, &opened_path)
 			zend.Efree(ini_fname)
 			if fp != nil {
-				filename = zend.ZSTR_VAL(opened_path)
+				filename = opened_path.GetVal()
 			}
 		}
 
@@ -426,7 +426,7 @@ func PhpInitConfig() int {
 		if fp == nil {
 			fp = PhpFopenWithPath("php.ini", "r", php_ini_search_path, &opened_path)
 			if fp != nil {
-				filename = zend.ZSTR_VAL(opened_path)
+				filename = opened_path.GetVal()
 			}
 		}
 
@@ -637,7 +637,7 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			str = _p.GetKey()

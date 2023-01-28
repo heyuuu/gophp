@@ -22,17 +22,17 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			zend.ZVAL_UNDEF(&(ASSERTG(callback)))
 		}
-		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || zend.ZSTR_LEN(new_value) != 0) {
+		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || new_value.GetLen() != 0) {
 			zend.ZVAL_STR_COPY(&(ASSERTG(callback)), new_value)
 		}
 	} else {
 		if ASSERTG(cb) {
 			zend.Pefree(ASSERTG(cb), 1)
 		}
-		if new_value != nil && zend.ZSTR_LEN(new_value) != 0 {
-			ASSERTG(cb) = zend.Pemalloc(zend.ZSTR_LEN(new_value)+1, 1)
-			memcpy(ASSERTG(cb), zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
-			ASSERTG(cb)[zend.ZSTR_LEN(new_value)] = '0'
+		if new_value != nil && new_value.GetLen() != 0 {
+			ASSERTG(cb) = zend.Pemalloc(new_value.GetLen()+1, 1)
+			memcpy(ASSERTG(cb), new_value.GetVal(), new_value.GetLen())
+			ASSERTG(cb)[new_value.GetLen()] = '0'
 		} else {
 			ASSERTG(cb) = nil
 		}
@@ -150,7 +150,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE_P(assertion) == zend.IS_STRING {
+	if assertion.GetType() == zend.IS_STRING {
 		var retval zend.Zval
 		var old_error_reporting int = 0
 		if zend.ZendForbidDynamicCall("assert() with string argument") == zend.FAILURE {
@@ -170,7 +170,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				zend.ZendThrowError(nil, "Failure evaluating code: %s%s", core.PHP_EOL, myeval)
 			} else {
 				var str *zend.ZendString = zend.ZvalGetString(description)
-				zend.ZendThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, zend.ZSTR_VAL(str), myeval)
+				zend.ZendThrowError(nil, "Failure evaluating code: %s%s:\"%s\"", core.PHP_EOL, str.GetVal(), myeval)
 				zend.ZendStringReleaseEx(str, 0)
 			}
 			if ASSERTG(bail) {
@@ -223,12 +223,12 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if ASSERTG(exception) {
 		if description == nil {
 			zend.ZendThrowException(AssertionErrorCe, nil, zend.E_ERROR)
-		} else if zend.Z_TYPE_P(description) == zend.IS_OBJECT && zend.InstanceofFunction(zend.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
+		} else if description.GetType() == zend.IS_OBJECT && zend.InstanceofFunction(zend.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
 			zend.Z_ADDREF_P(description)
 			zend.ZendThrowExceptionObject(description)
 		} else {
 			var str *zend.ZendString = zend.ZvalGetString(description)
-			zend.ZendThrowException(AssertionErrorCe, zend.ZSTR_VAL(str), zend.E_ERROR)
+			zend.ZendThrowException(AssertionErrorCe, str.GetVal(), zend.E_ERROR)
 			zend.ZendStringReleaseEx(str, 0)
 		}
 	} else if ASSERTG(warning) {
@@ -241,9 +241,9 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else {
 			var str *zend.ZendString = zend.ZvalGetString(description)
 			if myeval != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s: \"%s\" failed", zend.ZSTR_VAL(str), myeval)
+				core.PhpErrorDocref(nil, zend.E_WARNING, "%s: \"%s\" failed", str.GetVal(), myeval)
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "%s failed", zend.ZSTR_VAL(str))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "%s failed", str.GetVal())
 			}
 			zend.ZendStringReleaseEx(str, 0)
 		}

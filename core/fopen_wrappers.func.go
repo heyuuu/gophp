@@ -22,7 +22,7 @@ func OnUpdateBaseDir(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 		/* We're in a PHP_INI_SYSTEM context, no restrictions */
 
 		if new_value != nil {
-			*p = zend.ZSTR_VAL(new_value)
+			*p = new_value.GetVal()
 		} else {
 			*p = nil
 		}
@@ -35,7 +35,7 @@ func OnUpdateBaseDir(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 
 		/* open_basedir not set yet, go ahead and give it a value */
 
-		*p = zend.ZSTR_VAL(new_value)
+		*p = new_value.GetVal()
 		return zend.SUCCESS
 	}
 
@@ -47,7 +47,7 @@ func OnUpdateBaseDir(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 
 	/* Is the proposed open_basedir at least as restrictive as the current setting? */
 
-	pathbuf = zend.Estrdup(zend.ZSTR_VAL(new_value))
+	pathbuf = zend.Estrdup(new_value.GetVal())
 	ptr = pathbuf
 	for ptr != nil && (*ptr) != nil {
 		end = strchr(ptr, zend.DEFAULT_DIR_SEPARATOR)
@@ -75,7 +75,7 @@ func OnUpdateBaseDir(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 
 	/* Everything checks out, set it */
 
-	*p = zend.ZSTR_VAL(new_value)
+	*p = new_value.GetVal()
 	return zend.SUCCESS
 }
 func PhpCheckSpecificOpenBasedir(basedir *byte, path *byte) int {
@@ -473,8 +473,8 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 	 */
 
 	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = zend.ZSTR_VAL(exec_filename)
-		var exec_fname_length int = zend.ZSTR_LEN(exec_filename)
+		var exec_fname *byte = exec_filename.GetVal()
+		var exec_fname_length int = exec_filename.GetLen()
 		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}
@@ -538,8 +538,8 @@ func PhpFopenWithPath(filename *byte, mode string, path *byte, opened_path **zen
 	/* check in provided path */
 
 	if zend.ZendIsExecuting() != 0 && b.Assign(&exec_filename, zend.ZendGetExecutedFilenameEx()) != nil {
-		var exec_fname *byte = zend.ZSTR_VAL(exec_filename)
-		var exec_fname_length int = zend.ZSTR_LEN(exec_filename)
+		var exec_fname *byte = exec_filename.GetVal()
+		var exec_fname_length int = exec_filename.GetLen()
 		for b.PreDec(&exec_fname_length) < SIZE_MAX && !(zend.IS_SLASH(exec_fname[exec_fname_length])) {
 
 		}

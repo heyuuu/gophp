@@ -320,10 +320,10 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if zend.Z_TYPE_P(group) == zend.IS_LONG {
+			if group.GetType() == zend.IS_LONG {
 				option = core.PHP_STREAM_META_GROUP
 				value = &(zend.Z_LVAL_P(group))
-			} else if zend.Z_TYPE_P(group) == zend.IS_STRING {
+			} else if group.GetType() == zend.IS_STRING {
 				option = core.PHP_STREAM_META_GROUP_NAME
 				value = zend.Z_STRVAL_P(group)
 			} else {
@@ -347,9 +347,9 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			return
 		}
 	}
-	if zend.Z_TYPE_P(group) == zend.IS_LONG {
+	if group.GetType() == zend.IS_LONG {
 		gid = gid_t(zend.Z_LVAL_P(group))
-	} else if zend.Z_TYPE_P(group) == zend.IS_STRING {
+	} else if group.GetType() == zend.IS_STRING {
 		if PhpGetGidByName(zend.Z_STRVAL_P(group), &gid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find gid for %s", zend.Z_STRVAL_P(group))
 			zend.RETVAL_FALSE
@@ -475,10 +475,10 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			var option int
 			var value any
-			if zend.Z_TYPE_P(user) == zend.IS_LONG {
+			if user.GetType() == zend.IS_LONG {
 				option = core.PHP_STREAM_META_OWNER
 				value = &(zend.Z_LVAL_P(user))
-			} else if zend.Z_TYPE_P(user) == zend.IS_STRING {
+			} else if user.GetType() == zend.IS_STRING {
 				option = core.PHP_STREAM_META_OWNER_NAME
 				value = zend.Z_STRVAL_P(user)
 			} else {
@@ -502,9 +502,9 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			return
 		}
 	}
-	if zend.Z_TYPE_P(user) == zend.IS_LONG {
+	if user.GetType() == zend.IS_LONG {
 		uid = uid_t(zend.Z_LVAL_P(user))
-	} else if zend.Z_TYPE_P(user) == zend.IS_STRING {
+	} else if user.GetType() == zend.IS_STRING {
 		if PhpGetUidByName(zend.Z_STRVAL_P(user), &uid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find uid for %s", zend.Z_STRVAL_P(user))
 			zend.RETVAL_FALSE

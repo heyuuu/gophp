@@ -41,7 +41,7 @@ func ZendGeneratorRestoreCallStack(generator *ZendGenerator) {
 	var prev_call *ZendExecuteData = nil
 	call = generator.GetFrozenCallStack()
 	for {
-		new_call = ZendVmStackPushCallFrame(ZEND_CALL_INFO(call) & ^ZEND_CALL_ALLOCATED, call.GetFunc(), ZEND_CALL_NUM_ARGS(call), Z_PTR(call.GetThis()))
+		new_call = ZendVmStackPushCallFrame(ZEND_CALL_INFO(call) & ^ZEND_CALL_ALLOCATED, call.GetFunc(), ZEND_CALL_NUM_ARGS(call), call.GetThis().GetPtr())
 		memcpy((*Zval)(new_call)+ZEND_CALL_FRAME_SLOT, (*Zval)(call)+ZEND_CALL_FRAME_SLOT, ZEND_CALL_NUM_ARGS(call)*b.SizeOf("zval"))
 		new_call.SetPrevExecuteData(prev_call)
 		prev_call = new_call
@@ -130,7 +130,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution ZendBool) {
 
 		ZendFreeCompiledVariables(execute_data)
 		if (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0 {
-			OBJ_RELEASE(Z_OBJ(execute_data.GetThis()))
+			OBJ_RELEASE(execute_data.GetThis().GetObj())
 		}
 
 		/* A fatal error / die occurred during the generator execution.
@@ -397,7 +397,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		}
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0 {
-		ZVAL_OBJ(b.PostInc(&gc_buffer), Z_OBJ(execute_data.GetThis()))
+		ZVAL_OBJ(b.PostInc(&gc_buffer), execute_data.GetThis().GetObj())
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
 		ZVAL_OBJ(b.PostInc(&gc_buffer), ZEND_CLOSURE_OBJECT(EX(func_)))
@@ -459,7 +459,7 @@ func ZendGeneratorGetConstructor(object *ZendObject) *ZendFunction {
 func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
 	if ptr.GetFunc() == nil && ptr.GetThis().IsType(IS_OBJECT) {
 		if Z_OBJCE(ptr.GetThis()) == ZendCeGenerator {
-			var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(ptr.GetThis()))
+			var generator *ZendGenerator = (*ZendGenerator)(ptr.GetThis().GetObj())
 			var root *ZendGenerator = b.CondF2(generator.GetNode().GetChildren() < 1, generator, func() *ZendGenerator { return generator.GetNode().GetPtrLeaf() }).node.ptr.root
 			var prev *ZendExecuteData = ptr.GetPrevExecuteData()
 			if generator.GetNode().GetParent() != root {
@@ -545,7 +545,7 @@ func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNod
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if Z_TYPE_P(_z) == IS_UNDEF {
+			if _z.GetType() == IS_UNDEF {
 				continue
 			}
 			leaf = _p.GetH()
@@ -686,8 +686,8 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 	var value *Zval
 	if generator.GetValues().IsType(IS_ARRAY) {
-		var ht *HashTable = Z_ARR(generator.GetValues())
-		var pos HashPosition = Z_FE_POS(generator.GetValues())
+		var ht *HashTable = generator.GetValues().GetArr()
+		var pos HashPosition = generator.GetValues().GetFePos()
 		var p *Bucket
 		for {
 			if pos >= ht.GetNNumUsed() {
@@ -701,7 +701,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 			}
 			p = ht.GetArData()[pos]
 			value = p.GetVal()
-			if Z_TYPE_P(value) == IS_INDIRECT {
+			if value.GetType() == IS_INDIRECT {
 				value = Z_INDIRECT_P(value)
 			}
 			pos++
@@ -717,9 +717,9 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		} else {
 			ZVAL_LONG(generator.GetKey(), p.GetH())
 		}
-		Z_FE_POS(generator.GetValues()) = pos
+		generator.GetValues().GetFePos() = pos
 	} else {
-		var iter *ZendObjectIterator = (*ZendObjectIterator)(Z_OBJ(generator.GetValues()))
+		var iter *ZendObjectIterator = (*ZendObjectIterator)(generator.GetValues().GetObj())
 		if b.PostInc(&(iter.GetIndex())) > 0 {
 			iter.GetFuncs().GetMoveForward()(iter)
 			if ExecutorGlobals.GetException() != nil {
@@ -1147,12 +1147,12 @@ func zim_Generator_getReturn(execute_data *ZendExecuteData, return_value *Zval) 
 	ZVAL_COPY(return_value, generator.GetRetval())
 }
 func ZendGeneratorIteratorDtor(iterator *ZendObjectIterator) {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	generator.SetIterator(nil)
 	ZvalPtrDtor(iterator.GetData())
 }
 func ZendGeneratorIteratorValid(iterator *ZendObjectIterator) int {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	ZendGeneratorGetCurrent(generator)
 	if generator.GetExecuteData() != nil {
@@ -1162,14 +1162,14 @@ func ZendGeneratorIteratorValid(iterator *ZendObjectIterator) int {
 	}
 }
 func ZendGeneratorIteratorGetData(iterator *ZendObjectIterator) *Zval {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	var root *ZendGenerator
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
 	return root.GetValue()
 }
 func ZendGeneratorIteratorGetKey(iterator *ZendObjectIterator, key *Zval) {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	var root *ZendGenerator
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
@@ -1181,12 +1181,12 @@ func ZendGeneratorIteratorGetKey(iterator *ZendObjectIterator, key *Zval) {
 	}
 }
 func ZendGeneratorIteratorMoveForward(iterator *ZendObjectIterator) {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	ZendGeneratorResume(generator)
 }
 func ZendGeneratorIteratorRewind(iterator *ZendObjectIterator) {
-	var generator *ZendGenerator = (*ZendGenerator)(Z_OBJ(iterator.GetData()))
+	var generator *ZendGenerator = (*ZendGenerator)(iterator.GetData().GetObj())
 	ZendGeneratorRewind(generator)
 }
 func ZendGeneratorGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {

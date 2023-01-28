@@ -90,7 +90,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	PhpDl(filename, zend.MODULE_TEMPORARY, return_value, 0)
-	if zend.Z_TYPE_P(return_value) == zend.IS_TRUE {
+	if return_value.GetType() == zend.IS_TRUE {
 		zend.ExecutorGlobals.SetFullTablesCleanup(1)
 	}
 }

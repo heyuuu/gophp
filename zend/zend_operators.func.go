@@ -128,28 +128,28 @@ func ZendMemnrstr(haystack *byte, needle *byte, needle_len int, end *byte) *byte
 	}
 }
 func ZvalGetLong(op *Zval) ZendLong {
-	if Z_TYPE_P(op) == IS_LONG {
+	if op.GetType() == IS_LONG {
 		return Z_LVAL_P(op)
 	} else {
 		return ZvalGetLongFunc(op)
 	}
 }
 func ZvalGetDouble(op *Zval) float64 {
-	if Z_TYPE_P(op) == IS_DOUBLE {
+	if op.GetType() == IS_DOUBLE {
 		return Z_DVAL_P(op)
 	} else {
 		return ZvalGetDoubleFunc(op)
 	}
 }
 func ZvalGetString(op *Zval) *ZendString {
-	if Z_TYPE_P(op) == IS_STRING {
+	if op.GetType() == IS_STRING {
 		return ZendStringCopy(Z_STR_P(op))
 	} else {
 		return ZvalGetStringFunc(op)
 	}
 }
 func ZvalGetTmpString(op *Zval, tmp **ZendString) *ZendString {
-	if Z_TYPE_P(op) == IS_STRING {
+	if op.GetType() == IS_STRING {
 		*tmp = nil
 		return Z_STR_P(op)
 	} else {
@@ -163,7 +163,7 @@ func ZendTmpStringRelease(tmp *ZendString) {
 	}
 }
 func ZvalTryGetString(op *Zval) *ZendString {
-	if Z_TYPE_P(op) == IS_STRING {
+	if op.GetType() == IS_STRING {
 		var ret *ZendString = ZendStringCopy(Z_STR_P(op))
 		return ret
 	} else {
@@ -171,7 +171,7 @@ func ZvalTryGetString(op *Zval) *ZendString {
 	}
 }
 func ZvalTryGetTmpString(op *Zval, tmp **ZendString) *ZendString {
-	if Z_TYPE_P(op) == IS_STRING {
+	if op.GetType() == IS_STRING {
 		var ret *ZendString = Z_STR_P(op)
 		*tmp = nil
 		return ret
@@ -181,7 +181,7 @@ func ZvalTryGetTmpString(op *Zval, tmp **ZendString) *ZendString {
 	}
 }
 func TryConvertToString(op *Zval) ZendBool {
-	if Z_TYPE_P(op) == IS_STRING {
+	if op.GetType() == IS_STRING {
 		return 1
 	}
 	return _tryConvertToString(op)
@@ -193,12 +193,12 @@ func _zvalGetLongFunc(op *Zval) ZendLong      { return ZvalGetLongFunc(op) }
 func _zvalGetDoubleFunc(op *Zval) float64     { return ZvalGetDoubleFunc(op) }
 func _zvalGetStringFunc(op *Zval) *ZendString { return ZvalGetStringFunc(op) }
 func ConvertToCstring(op *Zval) {
-	if Z_TYPE_P(op) != IS_STRING {
+	if op.GetType() != IS_STRING {
 		_convertToCstring(op)
 	}
 }
 func ConvertToString(op *Zval) {
-	if Z_TYPE_P(op) != IS_STRING {
+	if op.GetType() != IS_STRING {
 		_convertToString(op)
 	}
 }
@@ -206,7 +206,7 @@ func ZvalIsTrue(op *Zval) int { return ZendIsTrue(op) }
 func IZendIsTrue(op *Zval) int {
 	var result int = 0
 again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_TRUE:
 		result = 1
 		break
@@ -226,7 +226,7 @@ again:
 		}
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			result = 1
 		}
 		break
@@ -284,7 +284,7 @@ func ConvertToExplicitType(pzv *Zval, type_ __auto__) {
 	}
 }
 func ConvertToExplicitTypeEx(pzv *Zval, str_type __auto__) {
-	if Z_TYPE_P(pzv) != str_type {
+	if pzv.GetType() != str_type {
 		ConvertToExplicitType(pzv, str_type)
 	}
 }
@@ -296,27 +296,27 @@ func ConvertToBooleanEx(pzv *Zval) {
 	}
 }
 func ConvertToStringEx(pzv *Zval) {
-	if Z_TYPE_P(pzv) != IS_STRING {
+	if pzv.GetType() != IS_STRING {
 		ConvertToString(pzv)
 	}
 }
 func ConvertToArrayEx(pzv *Zval) {
-	if Z_TYPE_P(pzv) != IS_ARRAY {
+	if pzv.GetType() != IS_ARRAY {
 		ConvertToArray(pzv)
 	}
 }
 func ConvertToObjectEx(pzv *Zval) {
-	if Z_TYPE_P(pzv) != IS_OBJECT {
+	if pzv.GetType() != IS_OBJECT {
 		ConvertToObject(pzv)
 	}
 }
 func ConvertToNullEx(pzv *Zval) {
-	if Z_TYPE_P(pzv) != IS_NULL {
+	if pzv.GetType() != IS_NULL {
 		ConvertToNull(pzv)
 	}
 }
 func ConvertScalarToNumberEx(pzv *Zval) {
-	if Z_TYPE_P(pzv) != IS_LONG && Z_TYPE_P(pzv) != IS_DOUBLE {
+	if pzv.GetType() != IS_LONG && pzv.GetType() != IS_DOUBLE {
 		ConvertScalarToNumber(pzv)
 	}
 }
@@ -366,19 +366,19 @@ func FastLongAddFunction(result *Zval, op1 *Zval, op2 *Zval) {
 	 */
 }
 func FastAddFunction(result *Zval, op1 *Zval, op2 *Zval) int {
-	if Z_TYPE_P(op1) == IS_LONG {
-		if Z_TYPE_P(op2) == IS_LONG {
+	if op1.GetType() == IS_LONG {
+		if op2.GetType() == IS_LONG {
 			FastLongAddFunction(result, op1, op2)
 			return SUCCESS
-		} else if Z_TYPE_P(op2) == IS_DOUBLE {
+		} else if op2.GetType() == IS_DOUBLE {
 			ZVAL_DOUBLE(result, float64(Z_LVAL_P(op1))+Z_DVAL_P(op2))
 			return SUCCESS
 		}
-	} else if Z_TYPE_P(op1) == IS_DOUBLE {
-		if Z_TYPE_P(op2) == IS_DOUBLE {
+	} else if op1.GetType() == IS_DOUBLE {
+		if op2.GetType() == IS_DOUBLE {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)+Z_DVAL_P(op2))
 			return SUCCESS
-		} else if Z_TYPE_P(op2) == IS_LONG {
+		} else if op2.GetType() == IS_LONG {
 			ZVAL_DOUBLE(result, Z_DVAL_P(op1)+float64(Z_LVAL_P(op2)))
 			return SUCCESS
 		}
@@ -395,7 +395,7 @@ func FastDivFunction(result *Zval, op1 *Zval, op2 *Zval) int { return DivFunctio
 func ZendFastEqualStrings(s1 *ZendString, s2 *ZendString) int {
 	if s1 == s2 {
 		return 1
-	} else if ZSTR_VAL(s1)[0] > '9' || ZSTR_VAL(s2)[0] > '9' {
+	} else if s1.GetVal()[0] > '9' || s2.GetVal()[0] > '9' {
 		return ZendStringEqualContent(s1, s2)
 	} else {
 		return ZendiSmartStreq(s1, s2)
@@ -403,54 +403,54 @@ func ZendFastEqualStrings(s1 *ZendString, s2 *ZendString) int {
 }
 func FastEqualCheckFunction(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if Z_TYPE_P(op1) == IS_LONG {
-		if Z_TYPE_P(op2) == IS_LONG {
+	if op1.GetType() == IS_LONG {
+		if op2.GetType() == IS_LONG {
 			return Z_LVAL_P(op1) == Z_LVAL_P(op2)
-		} else if Z_TYPE_P(op2) == IS_DOUBLE {
+		} else if op2.GetType() == IS_DOUBLE {
 			return float64(Z_LVAL_P(op1)) == Z_DVAL_P(op2)
 		}
-	} else if Z_TYPE_P(op1) == IS_DOUBLE {
-		if Z_TYPE_P(op2) == IS_DOUBLE {
+	} else if op1.GetType() == IS_DOUBLE {
+		if op2.GetType() == IS_DOUBLE {
 			return Z_DVAL_P(op1) == Z_DVAL_P(op2)
-		} else if Z_TYPE_P(op2) == IS_LONG {
+		} else if op2.GetType() == IS_LONG {
 			return Z_DVAL_P(op1) == float64(Z_LVAL_P(op2))
 		}
-	} else if Z_TYPE_P(op1) == IS_STRING {
-		if Z_TYPE_P(op2) == IS_STRING {
+	} else if op1.GetType() == IS_STRING {
+		if op2.GetType() == IS_STRING {
 			return ZendFastEqualStrings(Z_STR_P(op1), Z_STR_P(op2))
 		}
 	}
 	CompareFunction(&result, op1, op2)
-	return Z_LVAL(result) == 0
+	return result.GetLval() == 0
 }
 func FastEqualCheckLong(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if Z_TYPE_P(op2) == IS_LONG {
+	if op2.GetType() == IS_LONG {
 		return Z_LVAL_P(op1) == Z_LVAL_P(op2)
 	}
 	CompareFunction(&result, op1, op2)
-	return Z_LVAL(result) == 0
+	return result.GetLval() == 0
 }
 func FastEqualCheckString(op1 *Zval, op2 *Zval) int {
 	var result Zval
-	if Z_TYPE_P(op2) == IS_STRING {
+	if op2.GetType() == IS_STRING {
 		return ZendFastEqualStrings(Z_STR_P(op1), Z_STR_P(op2))
 	}
 	CompareFunction(&result, op1, op2)
-	return Z_LVAL(result) == 0
+	return result.GetLval() == 0
 }
 func FastIsIdenticalFunction(op1 *Zval, op2 *Zval) ZendBool {
-	if Z_TYPE_P(op1) != Z_TYPE_P(op2) {
+	if op1.GetType() != op2.GetType() {
 		return 0
-	} else if Z_TYPE_P(op1) <= IS_TRUE {
+	} else if op1.GetType() <= IS_TRUE {
 		return 1
 	}
 	return ZendIsIdentical(op1, op2)
 }
 func FastIsNotIdenticalFunction(op1 *Zval, op2 *Zval) ZendBool {
-	if Z_TYPE_P(op1) != Z_TYPE_P(op2) {
+	if op1.GetType() != op2.GetType() {
 		return 1
-	} else if Z_TYPE_P(op1) <= IS_TRUE {
+	} else if op1.GetType() <= IS_TRUE {
 		return 0
 	}
 	return !(ZendIsIdentical(op1, op2))
@@ -540,11 +540,11 @@ func ConvertObjectToType(op *Zval, dst *Zval, ctype int, conv_func func(op *Zval
 	ZVAL_UNDEF(dst)
 	if Z_OBJ_HT_P(op).GetCastObject() != nil {
 		if Z_OBJ_HT_P(op).GetCastObject()(op, dst, ctype) == FAILURE {
-			ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", ZSTR_VAL(Z_OBJCE_P(op).GetName()), ZendGetTypeByConst(ctype))
+			ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to %s", Z_OBJCE_P(op).GetName().GetVal(), ZendGetTypeByConst(ctype))
 		}
 	} else if Z_OBJ_HT_P(op).GetGet() != nil {
 		var newop *Zval = Z_OBJ_HT_P(op).GetGet()(op, dst)
-		if Z_TYPE_P(newop) != IS_OBJECT {
+		if newop.GetType() != IS_OBJECT {
 			ZVAL_COPY_VALUE(dst, newop)
 			conv_func(dst)
 		}
@@ -552,14 +552,14 @@ func ConvertObjectToType(op *Zval, dst *Zval, ctype int, conv_func func(op *Zval
 }
 func _convertScalarToNumber(op *Zval, silent ZendBool, check ZendBool) {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
 	case IS_STRING:
 		var str *ZendString
 		str = Z_STR_P(op)
-		if b.Assign(&(Z_TYPE_INFO_P(op)), IsNumericString(ZSTR_VAL(str), ZSTR_LEN(str), &(Z_LVAL_P(op)), &(Z_DVAL_P(op)), b.Cond(silent != 0, 1, -1))) == 0 {
+		if b.Assign(&(Z_TYPE_INFO_P(op)), IsNumericString(str.GetVal(), str.GetLen(), &(Z_LVAL_P(op)), &(Z_DVAL_P(op)), b.Cond(silent != 0, 1, -1))) == 0 {
 			ZVAL_LONG(op, 0)
 			if silent == 0 {
 				ZendError(E_WARNING, "A non-numeric value encountered")
@@ -597,7 +597,7 @@ try_again:
 }
 func ConvertScalarToNumber(op *Zval) { _convertScalarToNumber(op, 1, 0) }
 func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zval {
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_NULL:
 
 	case IS_FALSE:
@@ -619,7 +619,7 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		return holder
 	case IS_OBJECT:
 		ConvertObjectToType(op, holder, _IS_NUMBER, ConvertScalarToNumber)
-		if ExecutorGlobals.GetException() != nil || Z_TYPE_P(holder) != IS_LONG && Z_TYPE_P(holder) != IS_DOUBLE {
+		if ExecutorGlobals.GetException() != nil || holder.GetType() != IS_LONG && holder.GetType() != IS_DOUBLE {
 			ZVAL_LONG(holder, 1)
 		}
 		return holder
@@ -638,7 +638,7 @@ func _zendiConvertScalarToNumberNoisy(op *Zval, holder *Zval) *Zval {
 	return _zendiConvertScalarToNumberEx(op, holder, 0)
 }
 func ZendiConvertScalarToNumber(op *Zval, holder *Zval, result *Zval, silent ZendBool) *Zval {
-	if Z_TYPE_P(op) == IS_LONG || Z_TYPE_P(op) == IS_DOUBLE {
+	if op.GetType() == IS_LONG || op.GetType() == IS_DOUBLE {
 		return op
 	} else {
 		if op == result {
@@ -654,14 +654,14 @@ func ZendiConvertScalarToNumber(op *Zval, holder *Zval, result *Zval, silent Zen
 	}
 }
 func ConvertToLong(op *Zval) {
-	if Z_TYPE_P(op) != IS_LONG {
+	if op.GetType() != IS_LONG {
 		ConvertToLongBase(op, 10)
 	}
 }
 func ConvertToLongBase(op *Zval, base int) {
 	var tmp ZendLong
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_NULL:
 
 	case IS_FALSE:
@@ -685,12 +685,12 @@ try_again:
 		if base == 10 {
 			ZVAL_LONG(op, ZvalGetLong(op))
 		} else {
-			ZVAL_LONG(op, ZEND_STRTOL(ZSTR_VAL(str), nil, base))
+			ZVAL_LONG(op, ZEND_STRTOL(str.GetVal(), nil, base))
 		}
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -703,7 +703,7 @@ try_again:
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
 		ZvalPtrDtor(op)
 		if dst.IsType(IS_LONG) {
-			ZVAL_LONG(op, Z_LVAL(dst))
+			ZVAL_LONG(op, dst.GetLval())
 		} else {
 			ZVAL_LONG(op, 1)
 		}
@@ -718,7 +718,7 @@ try_again:
 func ConvertToDouble(op *Zval) {
 	var tmp float64
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_NULL:
 
 	case IS_FALSE:
@@ -739,11 +739,11 @@ try_again:
 		break
 	case IS_STRING:
 		var str *ZendString = Z_STR_P(op)
-		ZVAL_DOUBLE(op, ZendStrtod(ZSTR_VAL(str), nil))
+		ZVAL_DOUBLE(op, ZendStrtod(str.GetVal(), nil))
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -756,7 +756,7 @@ try_again:
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
 		ZvalPtrDtor(op)
 		if dst.IsType(IS_DOUBLE) {
-			ZVAL_DOUBLE(op, Z_DVAL(dst))
+			ZVAL_DOUBLE(op, dst.GetDval())
 		} else {
 			ZVAL_DOUBLE(op, 1.0)
 		}
@@ -775,7 +775,7 @@ func ConvertToNull(op *Zval) {
 func ConvertToBoolean(op *Zval) {
 	var tmp int
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_FALSE:
 
 	case IS_TRUE:
@@ -796,7 +796,7 @@ try_again:
 		break
 	case IS_STRING:
 		var str *ZendString = Z_STR_P(op)
-		if ZSTR_LEN(str) == 0 || ZSTR_LEN(str) == 1 && ZSTR_VAL(str)[0] == '0' {
+		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
 			ZVAL_FALSE(op)
 		} else {
 			ZVAL_TRUE(op)
@@ -804,7 +804,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -816,8 +816,8 @@ try_again:
 		var dst Zval
 		ConvertObjectToType(op, &dst, _IS_BOOL, ConvertToBoolean)
 		ZvalPtrDtor(op)
-		if Z_TYPE_INFO(dst) == IS_FALSE || Z_TYPE_INFO(dst) == IS_TRUE {
-			Z_TYPE_INFO_P(op) = Z_TYPE_INFO(dst)
+		if dst.GetTypeInfo() == IS_FALSE || dst.GetTypeInfo() == IS_TRUE {
+			Z_TYPE_INFO_P(op) = dst.GetTypeInfo()
 		} else {
 			ZVAL_TRUE(op)
 		}
@@ -830,7 +830,7 @@ try_again:
 	}
 }
 func _convertToCstring(op *Zval) {
-	if Z_TYPE_P(op) == IS_DOUBLE {
+	if op.GetType() == IS_DOUBLE {
 		var str *ZendString
 		var dval float64 = Z_DVAL_P(op)
 		str = ZendStrpprintfUnchecked(0, "%.*H", int(ExecutorGlobals.GetPrecision()), dval)
@@ -841,7 +841,7 @@ func _convertToCstring(op *Zval) {
 }
 func _convertToString(op *Zval) {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_UNDEF:
 
 	case IS_NULL:
@@ -886,7 +886,7 @@ try_again:
 			}
 		} else if Z_OBJ_HT_P(op).GetGet() != nil {
 			var z *Zval = Z_OBJ_HT_P(op).GetGet()(op, &tmp)
-			if Z_TYPE_P(z) != IS_OBJECT {
+			if z.GetType() != IS_OBJECT {
 				var str *ZendString = ZvalGetString(z)
 				ZvalPtrDtor(z)
 				ZvalPtrDtor(op)
@@ -896,7 +896,7 @@ try_again:
 			ZvalPtrDtor(z)
 		}
 		if ExecutorGlobals.GetException() == nil {
-			ZendThrowError(nil, "Object of class %s could not be converted to string", ZSTR_VAL(Z_OBJCE_P(op).GetName()))
+			ZendThrowError(nil, "Object of class %s could not be converted to string", Z_OBJCE_P(op).GetName().GetVal())
 		}
 		ZvalPtrDtor(op)
 		ZVAL_EMPTY_STRING(op)
@@ -910,7 +910,7 @@ try_again:
 }
 func _tryConvertToString(op *Zval) ZendBool {
 	var str *ZendString
-	ZEND_ASSERT(Z_TYPE_P(op) != IS_STRING)
+	ZEND_ASSERT(op.GetType() != IS_STRING)
 	str = ZvalTryGetStringFunc(op)
 	if str == nil {
 		return 0
@@ -926,7 +926,7 @@ func ConvertScalarToArray(op *Zval) {
 }
 func ConvertToArray(op *Zval) {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_ARRAY:
 		break
 	case IS_OBJECT:
@@ -967,7 +967,7 @@ try_again:
 }
 func ConvertToObject(op *Zval) {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_ARRAY:
 		var ht *HashTable = ZendSymtableToProptable(Z_ARR_P(op))
 		var obj *ZendObject
@@ -1010,7 +1010,7 @@ func MultiConvertToLongEx(argc int, _ ...any) {
 	va_start(ap, argc)
 	for b.PostDec(&argc) {
 		arg = __va_arg(ap, (*Zval)(_))
-		if Z_TYPE_P(arg) != IS_LONG {
+		if arg.GetType() != IS_LONG {
 			ConvertToLong(arg)
 		}
 	}
@@ -1022,7 +1022,7 @@ func MultiConvertToDoubleEx(argc int, _ ...any) {
 	va_start(ap, argc)
 	for b.PostDec(&argc) {
 		arg = __va_arg(ap, (*Zval)(_))
-		if Z_TYPE_P(arg) != IS_DOUBLE {
+		if arg.GetType() != IS_DOUBLE {
 			ConvertToDouble(arg)
 		}
 	}
@@ -1040,7 +1040,7 @@ func MultiConvertToStringEx(argc int, _ ...any) {
 }
 func _zvalGetLongFuncEx(op *Zval, silent ZendBool) ZendLong {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_UNDEF:
 
 	case IS_NULL:
@@ -1084,7 +1084,7 @@ try_again:
 
 		}
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			return 1
 		} else {
 			return 0
@@ -1093,7 +1093,7 @@ try_again:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
 		if dst.IsType(IS_LONG) {
-			return Z_LVAL(dst)
+			return dst.GetLval()
 		} else {
 			return 1
 		}
@@ -1109,7 +1109,7 @@ func ZvalGetLongFunc(op *Zval) ZendLong       { return _zvalGetLongFuncEx(op, 1)
 func _zvalGetLongFuncNoisy(op *Zval) ZendLong { return _zvalGetLongFuncEx(op, 0) }
 func ZvalGetDoubleFunc(op *Zval) float64 {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_NULL:
 
 	case IS_FALSE:
@@ -1125,7 +1125,7 @@ try_again:
 	case IS_STRING:
 		return ZendStrtod(Z_STRVAL_P(op), nil)
 	case IS_ARRAY:
-		if ZendHashNumElements(Z_ARRVAL_P(op)) {
+		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			return 1.0
 		} else {
 			return 0.0
@@ -1134,7 +1134,7 @@ try_again:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
 		if dst.IsType(IS_DOUBLE) {
-			return Z_DVAL(dst)
+			return dst.GetDval()
 		} else {
 			return 1.0
 		}
@@ -1148,7 +1148,7 @@ try_again:
 }
 func __zvalGetStringFunc(op *Zval, try ZendBool) *ZendString {
 try_again:
-	switch Z_TYPE_P(op) {
+	switch op.GetType() {
 	case IS_UNDEF:
 
 	case IS_NULL:
@@ -1174,11 +1174,11 @@ try_again:
 		var tmp Zval
 		if Z_OBJ_HT_P(op).GetCastObject() != nil {
 			if Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, IS_STRING) == SUCCESS {
-				return Z_STR(tmp)
+				return tmp.GetStr()
 			}
 		} else if Z_OBJ_HT_P(op).GetGet() != nil {
 			var z *Zval = Z_OBJ_HT_P(op).GetGet()(op, &tmp)
-			if Z_TYPE_P(z) != IS_OBJECT {
+			if z.GetType() != IS_OBJECT {
 				var str *ZendString = b.CondF(try != 0, func() *ZendString { return ZvalTryGetString(z) }, func() *ZendString { return ZvalGetString(z) })
 				ZvalPtrDtor(z)
 				return str
@@ -1186,7 +1186,7 @@ try_again:
 			ZvalPtrDtor(z)
 		}
 		if ExecutorGlobals.GetException() == nil {
-			ZendThrowError(nil, "Object of class %s could not be converted to string", ZSTR_VAL(Z_OBJCE_P(op).GetName()))
+			ZendThrowError(nil, "Object of class %s could not be converted to string", Z_OBJCE_P(op).GetName().GetVal())
 		}
 		if try != 0 {
 			return nil
@@ -1223,7 +1223,7 @@ func AddFunctionArray(result *Zval, op1 *Zval, op2 *Zval) {
 	ZendHashMerge(Z_ARRVAL_P(result), Z_ARRVAL_P(op2), ZvalAddRef, 0)
 }
 func AddFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
-	var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
+	var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 	if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 		FastLongAddFunction(result, op1, op2)
 		return SUCCESS
@@ -1253,7 +1253,7 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if Z_ISREF_P(op2) {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1262,11 +1262,11 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_ADD, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_ADD, result, op1, op2) {
+			} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_ADD, result, op1, op2) {
 				return SUCCESS
 			}
 			if op1 != op2 {
@@ -1303,7 +1303,7 @@ func AddFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	}
 }
 func SubFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
-	var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
+	var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 	if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 		FastLongSubFunction(result, op1, op2)
 		return SUCCESS
@@ -1330,7 +1330,7 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if Z_ISREF_P(op2) {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1339,11 +1339,11 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SUB, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SUB, result, op1, op2) {
+			} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SUB, result, op1, op2) {
 				return SUCCESS
 			}
 			if op1 != op2 {
@@ -1384,7 +1384,7 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_copy Zval
 	var converted int = 0
 	for true {
-		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
+		var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			var overflow ZendLong
 			ZEND_SIGNED_MULTIPLY_LONG(Z_LVAL_P(op1), Z_LVAL_P(op2), Z_LVAL_P(result), Z_DVAL_P(result), overflow)
@@ -1409,7 +1409,7 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+				if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1418,11 +1418,11 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+				} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 					if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_MUL, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MUL, result, op1, op2) {
+				} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MUL, result, op1, op2) {
 					return SUCCESS
 				}
 				if op1 != op2 {
@@ -1454,7 +1454,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_copy Zval
 	var converted int = 0
 	for true {
-		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
+		var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			if Z_LVAL_P(op2) >= 0 {
 				var l1 ZendLong = 1
@@ -1512,7 +1512,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+				if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1521,15 +1521,15 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+				} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 					if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_POW, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_POW, result, op1, op2) {
+				} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_POW, result, op1, op2) {
 					return SUCCESS
 				}
 				if op1 != op2 {
-					if Z_TYPE_P(op1) == IS_ARRAY {
+					if op1.GetType() == IS_ARRAY {
 						if op1 == result {
 							ZvalPtrDtor(result)
 						}
@@ -1538,7 +1538,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					} else {
 						op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					}
-					if Z_TYPE_P(op2) == IS_ARRAY {
+					if op2.GetType() == IS_ARRAY {
 						if op1 == result {
 							ZvalPtrDtor(result)
 						}
@@ -1548,7 +1548,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 						op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 0)
 					}
 				} else {
-					if Z_TYPE_P(op1) == IS_ARRAY {
+					if op1.GetType() == IS_ARRAY {
 						if op1 == result {
 							ZvalPtrDtor(result)
 						}
@@ -1581,7 +1581,7 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_copy Zval
 	var converted int = 0
 	for true {
-		var type_pair ZendUchar = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))
+		var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
 		if type_pair == TYPE_PAIR(IS_LONG, IS_LONG) {
 			if Z_LVAL_P(op2) == 0 {
 				ZendError(E_WARNING, "Division by zero")
@@ -1624,7 +1624,7 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
-				if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+				if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 					var ret int
 					var rv Zval
 					var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1633,11 +1633,11 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					Z_OBJ_HT(*op1).GetSet()(op1, objval)
 					ZvalPtrDtor(objval)
 					return ret
-				} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+				} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 					if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_DIV, result, op1, op2) {
 						return SUCCESS
 					}
-				} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_DIV, result, op1, op2) {
+				} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_DIV, result, op1, op2) {
 					return SUCCESS
 				}
 				if op1 != op2 {
@@ -1668,15 +1668,15 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if Z_TYPE_P(op1) != IS_LONG {
+		if op1.GetType() != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
-				if Z_TYPE_P(op1) == IS_LONG {
+				if op1.GetType() == IS_LONG {
 					op1_lval = Z_LVAL_P(op1)
 					break
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1685,7 +1685,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_MOD, result, op1, op2) {
 					return SUCCESS
 				}
@@ -1703,15 +1703,15 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if Z_TYPE_P(op2) != IS_LONG {
+		if op2.GetType() != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
-				if Z_TYPE_P(op2) == IS_LONG {
+				if op2.GetType() == IS_LONG {
 					op2_lval = Z_LVAL_P(op2)
 					break
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MOD, result, op1, op2) {
+			if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_MOD, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -1757,22 +1757,22 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_val int
 	var op2_val int
 	for {
-		if Z_TYPE_P(op1) == IS_FALSE {
+		if op1.GetType() == IS_FALSE {
 			op1_val = 0
-		} else if Z_TYPE_P(op1) == IS_TRUE {
+		} else if op1.GetType() == IS_TRUE {
 			op1_val = 1
 		} else {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
-				if Z_TYPE_P(op1) == IS_FALSE {
+				if op1.GetType() == IS_FALSE {
 					op1_val = 0
 					break
-				} else if Z_TYPE_P(op1) == IS_TRUE {
+				} else if op1.GetType() == IS_TRUE {
 					op1_val = 1
 					break
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1781,7 +1781,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
 					return SUCCESS
 				}
@@ -1791,22 +1791,22 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if Z_TYPE_P(op2) == IS_FALSE {
+		if op2.GetType() == IS_FALSE {
 			op2_val = 0
-		} else if Z_TYPE_P(op2) == IS_TRUE {
+		} else if op2.GetType() == IS_TRUE {
 			op2_val = 1
 		} else {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
-				if Z_TYPE_P(op2) == IS_FALSE {
+				if op2.GetType() == IS_FALSE {
 					op2_val = 0
 					break
-				} else if Z_TYPE_P(op2) == IS_TRUE {
+				} else if op2.GetType() == IS_TRUE {
 					op2_val = 1
 					break
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
+			if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BOOL_XOR, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_val = ZvalIsTrue(op2)
@@ -1817,22 +1817,22 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	return SUCCESS
 }
 func BooleanNotFunction(result *Zval, op1 *Zval) int {
-	if Z_TYPE_P(op1) < IS_TRUE {
+	if op1.GetType() < IS_TRUE {
 		ZVAL_TRUE(result)
-	} else if Z_TYPE_P(op1) == IS_TRUE {
+	} else if op1.GetType() == IS_TRUE {
 		ZVAL_FALSE(result)
 	} else {
 		if Z_ISREF_P(op1) {
 			op1 = Z_REFVAL_P(op1)
-			if Z_TYPE_P(op1) < IS_TRUE {
+			if op1.GetType() < IS_TRUE {
 				ZVAL_TRUE(result)
 				return SUCCESS
-			} else if Z_TYPE_P(op1) == IS_TRUE {
+			} else if op1.GetType() == IS_TRUE {
 				ZVAL_FALSE(result)
 				return SUCCESS
 			}
 		}
-		if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
+		if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
 			return SUCCESS
 		}
 		ZVAL_BOOL(result, !(ZvalIsTrue(op1)))
@@ -1841,7 +1841,7 @@ func BooleanNotFunction(result *Zval, op1 *Zval) int {
 }
 func BitwiseNotFunction(result *Zval, op1 *Zval) int {
 try_again:
-	switch Z_TYPE_P(op1) {
+	switch op1.GetType() {
 	case IS_LONG:
 		ZVAL_LONG(result, ^(Z_LVAL_P(op1)))
 		return SUCCESS
@@ -1865,7 +1865,7 @@ try_again:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
 	default:
-		if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_NOT, result, op1, nil) {
+		if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_NOT, result, op1, nil) {
 			return SUCCESS
 		}
 		if result != op1 {
@@ -1878,13 +1878,13 @@ try_again:
 func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
+	if op1.GetType() == IS_LONG && op2.GetType() == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)|Z_LVAL_P(op2))
 		return SUCCESS
 	}
 	ZVAL_DEREF(op1)
 	ZVAL_DEREF(op2)
-	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
+	if op1.GetType() == IS_STRING && op2.GetType() == IS_STRING {
 		var longer *Zval
 		var shorter *Zval
 		var str *ZendString
@@ -1906,17 +1906,17 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		}
 		str = ZendStringAlloc(Z_STRLEN_P(longer), 0)
 		for i = 0; i < Z_STRLEN_P(shorter); i++ {
-			ZSTR_VAL(str)[i] = Z_STRVAL_P(longer)[i] | Z_STRVAL_P(shorter)[i]
+			str.GetVal()[i] = Z_STRVAL_P(longer)[i] | Z_STRVAL_P(shorter)[i]
 		}
-		memcpy(ZSTR_VAL(str)+i, Z_STRVAL_P(longer)+i, Z_STRLEN_P(longer)-i+1)
+		memcpy(str.GetVal()+i, Z_STRVAL_P(longer)+i, Z_STRLEN_P(longer)-i+1)
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if Z_TYPE_P(op1) != IS_LONG {
-		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+	if op1.GetType() != IS_LONG {
+		if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -1925,7 +1925,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+		} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 			if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_OR, result, op1, op2) {
 				return SUCCESS
 			}
@@ -1940,8 +1940,8 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if Z_TYPE_P(op2) != IS_LONG {
-		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_OR, result, op1, op2) {
+	if op2.GetType() != IS_LONG {
+		if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_OR, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -1963,13 +1963,13 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
+	if op1.GetType() == IS_LONG && op2.GetType() == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)&Z_LVAL_P(op2))
 		return SUCCESS
 	}
 	ZVAL_DEREF(op1)
 	ZVAL_DEREF(op2)
-	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
+	if op1.GetType() == IS_STRING && op2.GetType() == IS_STRING {
 		var longer *Zval
 		var shorter *Zval
 		var str *ZendString
@@ -1991,17 +1991,17 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		}
 		str = ZendStringAlloc(Z_STRLEN_P(shorter), 0)
 		for i = 0; i < Z_STRLEN_P(shorter); i++ {
-			ZSTR_VAL(str)[i] = Z_STRVAL_P(shorter)[i] & Z_STRVAL_P(longer)[i]
+			str.GetVal()[i] = Z_STRVAL_P(shorter)[i] & Z_STRVAL_P(longer)[i]
 		}
-		ZSTR_VAL(str)[i] = 0
+		str.GetVal()[i] = 0
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if Z_TYPE_P(op1) != IS_LONG {
-		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+	if op1.GetType() != IS_LONG {
+		if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -2010,7 +2010,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+		} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 			if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_AND, result, op1, op2) {
 				return SUCCESS
 			}
@@ -2025,8 +2025,8 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if Z_TYPE_P(op2) != IS_LONG {
-		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_AND, result, op1, op2) {
+	if op2.GetType() != IS_LONG {
+		if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_AND, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -2048,13 +2048,13 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
-	if Z_TYPE_P(op1) == IS_LONG && Z_TYPE_P(op2) == IS_LONG {
+	if op1.GetType() == IS_LONG && op2.GetType() == IS_LONG {
 		ZVAL_LONG(result, Z_LVAL_P(op1)^Z_LVAL_P(op2))
 		return SUCCESS
 	}
 	ZVAL_DEREF(op1)
 	ZVAL_DEREF(op2)
-	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
+	if op1.GetType() == IS_STRING && op2.GetType() == IS_STRING {
 		var longer *Zval
 		var shorter *Zval
 		var str *ZendString
@@ -2076,17 +2076,17 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		}
 		str = ZendStringAlloc(Z_STRLEN_P(shorter), 0)
 		for i = 0; i < Z_STRLEN_P(shorter); i++ {
-			ZSTR_VAL(str)[i] = Z_STRVAL_P(shorter)[i] ^ Z_STRVAL_P(longer)[i]
+			str.GetVal()[i] = Z_STRVAL_P(shorter)[i] ^ Z_STRVAL_P(longer)[i]
 		}
-		ZSTR_VAL(str)[i] = 0
+		str.GetVal()[i] = 0
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
 		ZVAL_NEW_STR(result, str)
 		return SUCCESS
 	}
-	if Z_TYPE_P(op1) != IS_LONG {
-		if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+	if op1.GetType() != IS_LONG {
+		if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 			var ret int
 			var rv Zval
 			var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -2095,7 +2095,7 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			Z_OBJ_HT(*op1).GetSet()(op1, objval)
 			ZvalPtrDtor(objval)
 			return ret
-		} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+		} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 			if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_XOR, result, op1, op2) {
 				return SUCCESS
 			}
@@ -2110,8 +2110,8 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	} else {
 		op1_lval = Z_LVAL_P(op1)
 	}
-	if Z_TYPE_P(op2) != IS_LONG {
-		if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_XOR, result, op1, op2) {
+	if op2.GetType() != IS_LONG {
+		if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_BW_XOR, result, op1, op2) {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -2134,15 +2134,15 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if Z_TYPE_P(op1) != IS_LONG {
+		if op1.GetType() != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
-				if Z_TYPE_P(op1) == IS_LONG {
+				if op1.GetType() == IS_LONG {
 					op1_lval = Z_LVAL_P(op1)
 					break
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -2151,7 +2151,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SL, result, op1, op2) {
 					return SUCCESS
 				}
@@ -2169,15 +2169,15 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if Z_TYPE_P(op2) != IS_LONG {
+		if op2.GetType() != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
-				if Z_TYPE_P(op2) == IS_LONG {
+				if op2.GetType() == IS_LONG {
 					op2_lval = Z_LVAL_P(op2)
 					break
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SL, result, op1, op2) {
+			if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SL, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -2227,15 +2227,15 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op1_lval ZendLong
 	var op2_lval ZendLong
 	for {
-		if Z_TYPE_P(op1) != IS_LONG {
+		if op1.GetType() != IS_LONG {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
-				if Z_TYPE_P(op1) == IS_LONG {
+				if op1.GetType() == IS_LONG {
 					op1_lval = Z_LVAL_P(op1)
 					break
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -2244,7 +2244,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_SR, result, op1, op2) {
 					return SUCCESS
 				}
@@ -2262,15 +2262,15 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if Z_TYPE_P(op2) != IS_LONG {
+		if op2.GetType() != IS_LONG {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
-				if Z_TYPE_P(op2) == IS_LONG {
+				if op2.GetType() == IS_LONG {
 					op2_lval = Z_LVAL_P(op2)
 					break
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SR, result, op1, op2) {
+			if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_SR, result, op1, op2) {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
@@ -2320,14 +2320,14 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	ZVAL_UNDEF(&op1_copy)
 	ZVAL_UNDEF(&op2_copy)
 	for {
-		if Z_TYPE_P(op1) != IS_STRING {
+		if op1.GetType() != IS_STRING {
 			if Z_ISREF_P(op1) {
 				op1 = Z_REFVAL_P(op1)
-				if Z_TYPE_P(op1) == IS_STRING {
+				if op1.GetType() == IS_STRING {
 					break
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
+			if op1.GetType() == IS_OBJECT && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 				var ret int
 				var rv Zval
 				var objval *Zval = Z_OBJ_HT(*op1).GetGet()(op1, &rv)
@@ -2336,11 +2336,11 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				Z_OBJ_HT(*op1).GetSet()(op1, objval)
 				ZvalPtrDtor(objval)
 				return ret
-			} else if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
+			} else if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetDoOperation() != nil {
 				if SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 					return SUCCESS
 				}
-			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
+			} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
 			ZVAL_STR(&op1_copy, ZvalGetStringFunc(op1))
@@ -2361,14 +2361,14 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		break
 	}
 	for {
-		if Z_TYPE_P(op2) != IS_STRING {
+		if op2.GetType() != IS_STRING {
 			if Z_ISREF_P(op2) {
 				op2 = Z_REFVAL_P(op2)
-				if Z_TYPE_P(op2) == IS_STRING {
+				if op2.GetType() == IS_STRING {
 					break
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
+			if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
 			ZVAL_STR(&op2_copy, ZvalGetStringFunc(op2))
@@ -2422,7 +2422,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 
 		} else {
 			result_str = ZendStringAlloc(result_len, 0)
-			memcpy(ZSTR_VAL(result_str), Z_STRVAL_P(op1), op1_len)
+			memcpy(result_str.GetVal(), Z_STRVAL_P(op1), op1_len)
 			if result == orig_op1 {
 				IZvalPtrDtor(result)
 			}
@@ -2433,8 +2433,8 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		 * point to the new string. The first op2_len bytes of result will still be the same. */
 
 		ZVAL_NEW_STR(result, result_str)
-		memcpy(ZSTR_VAL(result_str)+op1_len, Z_STRVAL_P(op2), op2_len)
-		ZSTR_VAL(result_str)[result_len] = '0'
+		memcpy(result_str.GetVal()+op1_len, Z_STRVAL_P(op2), op2_len)
+		result_str.GetVal()[result_len] = '0'
 	}
 	ZvalPtrDtorStr(&op1_copy)
 	ZvalPtrDtorStr(&op2_copy)
@@ -2447,16 +2447,16 @@ func StringCompareFunctionEx(op1 *Zval, op2 *Zval, case_insensitive ZendBool) in
 	var str2 *ZendString = ZvalGetTmpString(op2, &tmp_str2)
 	var ret int
 	if case_insensitive != 0 {
-		ret = ZendBinaryStrcasecmpL(ZSTR_VAL(str1), ZSTR_LEN(str1), ZSTR_VAL(str2), ZSTR_LEN(str1))
+		ret = ZendBinaryStrcasecmpL(str1.GetVal(), str1.GetLen(), str2.GetVal(), str1.GetLen())
 	} else {
-		ret = ZendBinaryStrcmp(ZSTR_VAL(str1), ZSTR_LEN(str1), ZSTR_VAL(str2), ZSTR_LEN(str2))
+		ret = ZendBinaryStrcmp(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen())
 	}
 	ZendTmpStringRelease(tmp_str1)
 	ZendTmpStringRelease(tmp_str2)
 	return ret
 }
 func StringCompareFunction(op1 *Zval, op2 *Zval) int {
-	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
+	if op1.GetType() == IS_STRING && op2.GetType() == IS_STRING {
 		if Z_STR_P(op1) == Z_STR_P(op2) {
 			return 0
 		} else {
@@ -2467,14 +2467,14 @@ func StringCompareFunction(op1 *Zval, op2 *Zval) int {
 		var tmp_str2 *ZendString
 		var str1 *ZendString = ZvalGetTmpString(op1, &tmp_str1)
 		var str2 *ZendString = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcmp(ZSTR_VAL(str1), ZSTR_LEN(str1), ZSTR_VAL(str2), ZSTR_LEN(str2))
+		var ret int = ZendBinaryStrcmp(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen())
 		ZendTmpStringRelease(tmp_str1)
 		ZendTmpStringRelease(tmp_str2)
 		return ret
 	}
 }
 func StringCaseCompareFunction(op1 *Zval, op2 *Zval) int {
-	if Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op2) == IS_STRING {
+	if op1.GetType() == IS_STRING && op2.GetType() == IS_STRING {
 		if Z_STR_P(op1) == Z_STR_P(op2) {
 			return 0
 		} else {
@@ -2485,7 +2485,7 @@ func StringCaseCompareFunction(op1 *Zval, op2 *Zval) int {
 		var tmp_str2 *ZendString
 		var str1 *ZendString = ZvalGetTmpString(op1, &tmp_str1)
 		var str2 *ZendString = ZvalGetTmpString(op2, &tmp_str2)
-		var ret int = ZendBinaryStrcasecmpL(ZSTR_VAL(str1), ZSTR_LEN(str1), ZSTR_VAL(str2), ZSTR_LEN(str1))
+		var ret int = ZendBinaryStrcasecmpL(str1.GetVal(), str1.GetLen(), str2.GetVal(), str1.GetLen())
 		ZendTmpStringRelease(tmp_str1)
 		ZendTmpStringRelease(tmp_str2)
 		return ret
@@ -2496,7 +2496,7 @@ func StringLocaleCompareFunction(op1 *Zval, op2 *Zval) int {
 	var tmp_str2 *ZendString
 	var str1 *ZendString = ZvalGetTmpString(op1, &tmp_str1)
 	var str2 *ZendString = ZvalGetTmpString(op2, &tmp_str2)
-	var ret int = strcoll(ZSTR_VAL(str1), ZSTR_VAL(str2))
+	var ret int = strcoll(str1.GetVal(), str2.GetVal())
 	ZendTmpStringRelease(tmp_str1)
 	ZendTmpStringRelease(tmp_str2)
 	return ret
@@ -2513,7 +2513,7 @@ func ZendFreeObjGetResult(op *Zval) {
 	ZvalPtrDtor(op)
 }
 func ConvertCompareResultToLong(result *Zval) {
-	if Z_TYPE_P(result) == IS_DOUBLE {
+	if result.GetType() == IS_DOUBLE {
 		ZVAL_LONG(result, ZEND_NORMALIZE_BOOL(Z_DVAL_P(result)))
 	} else {
 		ConvertToLong(result)
@@ -2527,7 +2527,7 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op_free *Zval
 	var tmp_free Zval
 	for true {
-		switch TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2)) {
+		switch TYPE_PAIR(op1.GetType(), op2.GetType()) {
 		case TYPE_PAIR(IS_LONG, IS_LONG):
 			ZVAL_LONG(result, b.CondF2(Z_LVAL_P(op1) > Z_LVAL_P(op2), 1, func() int {
 				if Z_LVAL_P(op1) < Z_LVAL_P(op2) {
@@ -2600,20 +2600,20 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				op2 = Z_REFVAL_P(op2)
 				continue
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && Z_OBJ_HT(*op1).GetCompare() != nil {
+			if op1.GetType() == IS_OBJECT && Z_OBJ_HT(*op1).GetCompare() != nil {
 				ret = Z_OBJ_HT(*op1).GetCompare()(result, op1, op2)
-				if Z_TYPE_P(result) != IS_LONG {
+				if result.GetType() != IS_LONG {
 					ConvertCompareResultToLong(result)
 				}
 				return ret
-			} else if Z_TYPE_P(op2) == IS_OBJECT && Z_OBJ_HT(*op2).GetCompare() != nil {
+			} else if op2.GetType() == IS_OBJECT && Z_OBJ_HT(*op2).GetCompare() != nil {
 				ret = Z_OBJ_HT(*op2).GetCompare()(result, op1, op2)
-				if Z_TYPE_P(result) != IS_LONG {
+				if result.GetType() != IS_LONG {
 					ConvertCompareResultToLong(result)
 				}
 				return ret
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT && Z_TYPE_P(op2) == IS_OBJECT {
+			if op1.GetType() == IS_OBJECT && op2.GetType() == IS_OBJECT {
 				if Z_OBJ_P(op1) == Z_OBJ_P(op2) {
 
 					/* object handles are identical, apparently this is the same object */
@@ -2626,16 +2626,16 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					return SUCCESS
 				}
 			}
-			if Z_TYPE_P(op1) == IS_OBJECT {
+			if op1.GetType() == IS_OBJECT {
 				if Z_OBJ_HT_P(op1).GetGet() != nil {
 					var rv Zval
 					op_free = Z_OBJ_HT_P(op1).GetGet()(op1, &rv)
 					ret = CompareFunction(result, op_free, op2)
 					ZendFreeObjGetResult(op_free)
 					return ret
-				} else if Z_TYPE_P(op2) != IS_OBJECT && Z_OBJ_HT_P(op1).GetCastObject() != nil {
+				} else if op2.GetType() != IS_OBJECT && Z_OBJ_HT_P(op1).GetCastObject() != nil {
 					ZVAL_UNDEF(&tmp_free)
-					if Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(Z_TYPE_P(op2) == IS_FALSE || Z_TYPE_P(op2) == IS_TRUE, _IS_BOOL, func() ZendUchar { return Z_TYPE_P(op2) })) == FAILURE {
+					if Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.GetType() == IS_FALSE || op2.GetType() == IS_TRUE, _IS_BOOL, func() ZendUchar { return op2.GetType() })) == FAILURE {
 						ZVAL_LONG(result, 1)
 						ZendFreeObjGetResult(&tmp_free)
 						return SUCCESS
@@ -2645,16 +2645,16 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					return ret
 				}
 			}
-			if Z_TYPE_P(op2) == IS_OBJECT {
+			if op2.GetType() == IS_OBJECT {
 				if Z_OBJ_HT_P(op2).GetGet() != nil {
 					var rv Zval
 					op_free = Z_OBJ_HT_P(op2).GetGet()(op2, &rv)
 					ret = CompareFunction(result, op1, op_free)
 					ZendFreeObjGetResult(op_free)
 					return ret
-				} else if Z_TYPE_P(op1) != IS_OBJECT && Z_OBJ_HT_P(op2).GetCastObject() != nil {
+				} else if op1.GetType() != IS_OBJECT && Z_OBJ_HT_P(op2).GetCastObject() != nil {
 					ZVAL_UNDEF(&tmp_free)
-					if Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(Z_TYPE_P(op1) == IS_FALSE || Z_TYPE_P(op1) == IS_TRUE, _IS_BOOL, func() ZendUchar { return Z_TYPE_P(op1) })) == FAILURE {
+					if Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.GetType() == IS_FALSE || op1.GetType() == IS_TRUE, _IS_BOOL, func() ZendUchar { return op1.GetType() })) == FAILURE {
 						ZVAL_LONG(result, -1)
 						ZendFreeObjGetResult(&tmp_free)
 						return SUCCESS
@@ -2662,22 +2662,22 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					ret = CompareFunction(result, op1, &tmp_free)
 					ZendFreeObjGetResult(&tmp_free)
 					return ret
-				} else if Z_TYPE_P(op1) == IS_OBJECT {
+				} else if op1.GetType() == IS_OBJECT {
 					ZVAL_LONG(result, 1)
 					return SUCCESS
 				}
 			}
 			if converted == 0 {
-				if Z_TYPE_P(op1) < IS_TRUE {
+				if op1.GetType() < IS_TRUE {
 					ZVAL_LONG(result, b.Cond(ZvalIsTrue(op2) != 0, -1, 0))
 					return SUCCESS
-				} else if Z_TYPE_P(op1) == IS_TRUE {
+				} else if op1.GetType() == IS_TRUE {
 					ZVAL_LONG(result, b.Cond(ZvalIsTrue(op2) != 0, 0, 1))
 					return SUCCESS
-				} else if Z_TYPE_P(op2) < IS_TRUE {
+				} else if op2.GetType() < IS_TRUE {
 					ZVAL_LONG(result, b.Cond(ZvalIsTrue(op1) != 0, 1, 0))
 					return SUCCESS
-				} else if Z_TYPE_P(op2) == IS_TRUE {
+				} else if op2.GetType() == IS_TRUE {
 					ZVAL_LONG(result, b.Cond(ZvalIsTrue(op1) != 0, 0, -1))
 					return SUCCESS
 				} else {
@@ -2691,10 +2691,10 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					}
 					converted = 1
 				}
-			} else if Z_TYPE_P(op1) == IS_ARRAY {
+			} else if op1.GetType() == IS_ARRAY {
 				ZVAL_LONG(result, 1)
 				return SUCCESS
-			} else if Z_TYPE_P(op2) == IS_ARRAY {
+			} else if op2.GetType() == IS_ARRAY {
 				ZVAL_LONG(result, -1)
 				return SUCCESS
 			} else {
@@ -2720,10 +2720,10 @@ func HashZvalIdenticalFunction(z1 *Zval, z2 *Zval) int {
 	return FastIsNotIdenticalFunction(z1, z2)
 }
 func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {
-	if Z_TYPE_P(op1) != Z_TYPE_P(op2) {
+	if op1.GetType() != op2.GetType() {
 		return 0
 	}
-	switch Z_TYPE_P(op1) {
+	switch op1.GetType() {
 	case IS_NULL:
 
 	case IS_FALSE:
@@ -2886,17 +2886,17 @@ func IncrementString(str *Zval) {
 	}
 	if carry != 0 {
 		t = ZendStringAlloc(Z_STRLEN_P(str)+1, 0)
-		memcpy(ZSTR_VAL(t)+1, Z_STRVAL_P(str), Z_STRLEN_P(str))
-		ZSTR_VAL(t)[Z_STRLEN_P(str)+1] = '0'
+		memcpy(t.GetVal()+1, Z_STRVAL_P(str), Z_STRLEN_P(str))
+		t.GetVal()[Z_STRLEN_P(str)+1] = '0'
 		switch last {
 		case NUMERIC:
-			ZSTR_VAL(t)[0] = '1'
+			t.GetVal()[0] = '1'
 			break
 		case UPPER_CASE:
-			ZSTR_VAL(t)[0] = 'A'
+			t.GetVal()[0] = 'A'
 			break
 		case LOWER_CASE:
-			ZSTR_VAL(t)[0] = 'a'
+			t.GetVal()[0] = 'a'
 			break
 		}
 		ZendStringFree(Z_STR_P(str))
@@ -2905,7 +2905,7 @@ func IncrementString(str *Zval) {
 }
 func IncrementFunction(op1 *Zval) int {
 try_again:
-	switch Z_TYPE_P(op1) {
+	switch op1.GetType() {
 	case IS_LONG:
 		FastLongIncrementFunction(op1)
 		break
@@ -2975,7 +2975,7 @@ func DecrementFunction(op1 *Zval) int {
 	var lval ZendLong
 	var dval float64
 try_again:
-	switch Z_TYPE_P(op1) {
+	switch op1.GetType() {
 	case IS_LONG:
 		FastLongDecrementFunction(op1)
 		break
@@ -3039,12 +3039,12 @@ func ZendObjectIsTrue(op *Zval) int {
 		if Z_OBJ_HT_P(op).GetCastObject()(op, &tmp, _IS_BOOL) == SUCCESS {
 			return tmp.IsType(IS_TRUE)
 		}
-		ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", ZSTR_VAL(Z_OBJ_P(op).GetCe().GetName()))
+		ZendError(E_RECOVERABLE_ERROR, "Object of class %s could not be converted to bool", Z_OBJ_P(op).GetCe().GetName().GetVal())
 	} else if Z_OBJ_HT_P(op).GetGet() != nil {
 		var result int
 		var rv Zval
 		var tmp *Zval = Z_OBJ_HT_P(op).GetGet()(op, &rv)
-		if Z_TYPE_P(tmp) != IS_OBJECT {
+		if tmp.GetType() != IS_OBJECT {
 
 			/* for safety - avoid loop */
 
@@ -3100,16 +3100,16 @@ func ZendStrTolowerDupEx(source *byte, length int) *byte {
 	return nil
 }
 func ZendStringTolowerEx(str *ZendString, persistent int) *ZendString {
-	var p *uint8 = (*uint8)(ZSTR_VAL(str))
-	var end *uint8 = p + ZSTR_LEN(str)
+	var p *uint8 = (*uint8)(str.GetVal())
+	var end *uint8 = p + str.GetLen()
 	for p < end {
 		if (*p) != ZendTolowerAscii(*p) {
-			var res *ZendString = ZendStringAlloc(ZSTR_LEN(str), persistent)
+			var res *ZendString = ZendStringAlloc(str.GetLen(), persistent)
 			var r *uint8
-			if p != (*uint8)(ZSTR_VAL(str)) {
-				memcpy(ZSTR_VAL(res), ZSTR_VAL(str), p-(*uint8)(ZSTR_VAL(str)))
+			if p != (*uint8)(str.GetVal()) {
+				memcpy(res.GetVal(), str.GetVal(), p-(*uint8)(str.GetVal()))
 			}
-			r = p + (ZSTR_VAL(res) - ZSTR_VAL(str))
+			r = p + (res.GetVal() - str.GetVal())
 			for p < end {
 				*r = ZendTolowerAscii(*p)
 				p++
@@ -3358,7 +3358,7 @@ func HashZvalCompareFunction(z1 *Zval, z2 *Zval) int {
 	if CompareFunction(&result, z1, z2) == FAILURE {
 		return 1
 	}
-	return Z_LVAL(result)
+	return result.GetLval()
 }
 func ZendCompareSymbolTables(ht1 *HashTable, ht2 *HashTable) int {
 	if ht1 == ht2 {
@@ -3395,7 +3395,7 @@ func ZendLongToStr(num ZendLong) *ZendString {
 	}
 }
 func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUchar {
-	return IsNumericStringEx(ZSTR_VAL(str), ZSTR_LEN(str), lval, dval, -1, nil)
+	return IsNumericStringEx(str.GetVal(), str.GetLen(), lval, dval, -1, nil)
 }
 func _isNumericStringEx(str *byte, length int, lval *ZendLong, dval *float64, allow_errors int, oflow_info *int) ZendUchar {
 	var ptr *byte

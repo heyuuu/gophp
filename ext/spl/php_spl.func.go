@@ -25,7 +25,7 @@ func SplFindCeByName(name *zend.ZendString, autoload zend.ZendBool) *zend.ZendCl
 		ce = zend.ZendLookupClass(name)
 	}
 	if ce == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Class %s does not exist%s", zend.ZSTR_VAL(name), b.Cond(autoload != 0, " and could not be loaded", ""))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Class %s does not exist%s", name.GetVal(), b.Cond(autoload != 0, " and could not be loaded", ""))
 		return nil
 	}
 	return ce
@@ -39,12 +39,12 @@ func ZifClassParents(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) != zend.IS_OBJECT && zend.Z_TYPE_P(obj) != zend.IS_STRING {
+	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) == zend.IS_STRING {
+	if obj.GetType() == zend.IS_STRING {
 		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
 			zend.RETVAL_FALSE
 			return
@@ -67,12 +67,12 @@ func ZifClassImplements(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) != zend.IS_OBJECT && zend.Z_TYPE_P(obj) != zend.IS_STRING {
+	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) == zend.IS_STRING {
+	if obj.GetType() == zend.IS_STRING {
 		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
 			zend.RETVAL_FALSE
 			return
@@ -91,12 +91,12 @@ func ZifClassUses(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) != zend.IS_OBJECT && zend.Z_TYPE_P(obj) != zend.IS_STRING {
+	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(obj) == zend.IS_STRING {
+	if obj.GetType() == zend.IS_STRING {
 		if nil == b.Assign(&ce, SplFindCeByName(zend.Z_STR_P(obj), autoload)) {
 			zend.RETVAL_FALSE
 			return
@@ -176,7 +176,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 	var new_op_array *zend.ZendOpArray
 	var result zend.Zval
 	var ret int
-	class_file_len = int(core.Spprintf(&class_file, 0, "%s%.*s", zend.ZSTR_VAL(lc_name), ext_len, ext))
+	class_file_len = int(core.Spprintf(&class_file, 0, "%s%.*s", lc_name.GetVal(), ext_len, ext))
 	ret = core.PhpStreamOpenForZendEx(class_file, &file_handle, core.USE_PATH|core.STREAM_OPEN_FOR_INCLUDE)
 	if ret == zend.SUCCESS {
 		var opened_path *zend.ZendString
@@ -224,8 +224,8 @@ func ZifSplAutoload(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		pos = SPL_DEFAULT_FILE_EXTENSIONS
 		pos_len = b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS") - 1
 	} else {
-		pos = zend.ZSTR_VAL(file_exts)
-		pos_len = int(zend.ZSTR_LEN(file_exts))
+		pos = file_exts.GetVal()
+		pos_len = int(file_exts.GetLen())
 	}
 	lc_name = zend.ZendStringTolower(class_name)
 	for pos != nil && (*pos) && zend.ExecutorGlobals.GetException() == nil {
@@ -291,7 +291,7 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var lc_name *zend.ZendString
 	var func_name *zend.ZendString
 	var alfi *AutoloadFuncInfo
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &class_name) == zend.FAILURE || zend.Z_TYPE_P(class_name) != zend.IS_STRING {
+	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &class_name) == zend.FAILURE || class_name.GetType() != zend.IS_STRING {
 		return
 	}
 	if SPL_G(autoload_functions) {
@@ -330,8 +330,8 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					fcic.SetCalledScope(called_scope)
 				}
 			} else {
-				fci.SetObject(zend.Z_OBJ(alfi.GetObj()))
-				fcic.SetObject(zend.Z_OBJ(alfi.GetObj()))
+				fci.SetObject(alfi.GetObj().GetObj())
+				fcic.SetObject(alfi.GetObj().GetObj())
 				fcic.SetCalledScope(zend.Z_OBJCE(alfi.GetObj()))
 			}
 			zend.ZendCallFunction(&fci, &fcic)
@@ -392,7 +392,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			alfi.SetCe(fcc.GetCallingScope())
 			alfi.SetFuncPtr(fcc.GetFunctionHandler())
 			obj_ptr = fcc.GetObject()
-			if zend.Z_TYPE_P(zcallable) == zend.IS_ARRAY {
+			if zcallable.GetType() == zend.IS_ARRAY {
 				if obj_ptr == nil && alfi.GetFuncPtr() != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 					if do_throw != 0 {
 						zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array specifies a non static method but no object (%s)", error)
@@ -412,9 +412,9 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 				zend.ZendStringReleaseEx(func_name, 0)
 				zend.RETVAL_FALSE
 				return
-			} else if zend.Z_TYPE_P(zcallable) == zend.IS_STRING {
+			} else if zcallable.GetType() == zend.IS_STRING {
 				if do_throw != 0 {
-					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", zend.ZSTR_VAL(func_name), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
+					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Function '%s' not %s (%s)", func_name.GetVal(), b.Cond(alfi.GetFuncPtr() != nil, "callable", "found"), error)
 				}
 				if error != nil {
 					zend.Efree(error)
@@ -450,20 +450,20 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 		if error != nil {
 			zend.Efree(error)
 		}
-		if zend.Z_TYPE_P(zcallable) == zend.IS_OBJECT {
+		if zcallable.GetType() == zend.IS_OBJECT {
 			zend.ZVAL_COPY(alfi.GetClosure(), zcallable)
-			lc_name = zend.ZendStringAlloc(zend.ZSTR_LEN(func_name)+b.SizeOf("uint32_t"), 0)
-			zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lc_name), zend.ZSTR_VAL(func_name), zend.ZSTR_LEN(func_name))
-			memcpy(zend.ZSTR_VAL(lc_name)+zend.ZSTR_LEN(func_name), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-			zend.ZSTR_VAL(lc_name)[zend.ZSTR_LEN(lc_name)] = '0'
+			lc_name = zend.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
+			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
+			memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
+			lc_name.GetVal()[lc_name.GetLen()] = '0'
 		} else {
 			zend.ZVAL_UNDEF(alfi.GetClosure())
 
 			/* Skip leading \ */
 
-			if zend.ZSTR_VAL(func_name)[0] == '\\' {
-				lc_name = zend.ZendStringAlloc(zend.ZSTR_LEN(func_name)-1, 0)
-				zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lc_name), zend.ZSTR_VAL(func_name)+1, zend.ZSTR_LEN(func_name)-1)
+			if func_name.GetVal()[0] == '\\' {
+				lc_name = zend.ZendStringAlloc(func_name.GetLen()-1, 0)
+				zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
 			} else {
 				lc_name = zend.ZendStringTolower(func_name)
 			}
@@ -482,9 +482,9 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 
 			/* add object id to the hash to ensure uniqueness, for more reference look at bug #40091 */
 
-			lc_name = zend.ZendStringExtend(lc_name, zend.ZSTR_LEN(lc_name)+b.SizeOf("uint32_t"), 0)
-			memcpy(zend.ZSTR_VAL(lc_name)+zend.ZSTR_LEN(lc_name)-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-			zend.ZSTR_VAL(lc_name)[zend.ZSTR_LEN(lc_name)] = '0'
+			lc_name = zend.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
+			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
+			lc_name.GetVal()[lc_name.GetLen()] = '0'
 			zend.ZVAL_OBJ(alfi.GetObj(), obj_ptr)
 			zend.Z_ADDREF(alfi.GetObj())
 		} else {
@@ -577,18 +577,18 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 	if error != nil {
 		zend.Efree(error)
 	}
-	if zend.Z_TYPE_P(zcallable) == zend.IS_OBJECT {
-		lc_name = zend.ZendStringAlloc(zend.ZSTR_LEN(func_name)+b.SizeOf("uint32_t"), 0)
-		zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lc_name), zend.ZSTR_VAL(func_name), zend.ZSTR_LEN(func_name))
-		memcpy(zend.ZSTR_VAL(lc_name)+zend.ZSTR_LEN(func_name), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
-		zend.ZSTR_VAL(lc_name)[zend.ZSTR_LEN(lc_name)] = '0'
+	if zcallable.GetType() == zend.IS_OBJECT {
+		lc_name = zend.ZendStringAlloc(func_name.GetLen()+b.SizeOf("uint32_t"), 0)
+		zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal(), func_name.GetLen())
+		memcpy(lc_name.GetVal()+func_name.GetLen(), &(zend.Z_OBJ_HANDLE_P(zcallable)), b.SizeOf("uint32_t"))
+		lc_name.GetVal()[lc_name.GetLen()] = '0'
 	} else {
 
 		/* Skip leading \ */
 
-		if zend.ZSTR_VAL(func_name)[0] == '\\' {
-			lc_name = zend.ZendStringAlloc(zend.ZSTR_LEN(func_name)-1, 0)
-			zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lc_name), zend.ZSTR_VAL(func_name)+1, zend.ZSTR_LEN(func_name)-1)
+		if func_name.GetVal()[0] == '\\' {
+			lc_name = zend.ZendStringAlloc(func_name.GetLen()-1, 0)
+			zend.ZendStrTolowerCopy(lc_name.GetVal(), func_name.GetVal()+1, func_name.GetLen()-1)
 		} else {
 			lc_name = zend.ZendStringTolower(func_name)
 		}
@@ -617,9 +617,9 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 
 			success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
 			if success != zend.SUCCESS && obj_ptr != nil {
-				lc_name = zend.ZendStringExtend(lc_name, zend.ZSTR_LEN(lc_name)+b.SizeOf("uint32_t"), 0)
-				memcpy(zend.ZSTR_VAL(lc_name)+zend.ZSTR_LEN(lc_name)-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
-				zend.ZSTR_VAL(lc_name)[zend.ZSTR_LEN(lc_name)] = '0'
+				lc_name = zend.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
+				memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
+				lc_name.GetVal()[lc_name.GetLen()] = '0'
 				success = zend.ZendHashDel(SPL_G(autoload_functions), lc_name)
 			}
 		}
@@ -665,7 +665,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				key = _p.GetKey()
@@ -685,7 +685,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 					zend.AddNextIndexStr(&tmp, zend.ZendStringCopy(alfi.GetFuncPtr().GetFunctionName()))
 					zend.AddNextIndexZval(return_value, &tmp)
 				} else {
-					if strncmp(zend.ZSTR_VAL(alfi.GetFuncPtr().GetFunctionName()), "__lambda_func", b.SizeOf("\"__lambda_func\"")-1) {
+					if strncmp(alfi.GetFuncPtr().GetFunctionName().GetVal(), "__lambda_func", b.SizeOf("\"__lambda_func\"")-1) {
 						zend.AddNextIndexStr(return_value, zend.ZendStringCopy(alfi.GetFuncPtr().GetFunctionName()))
 					} else {
 						zend.AddNextIndexStr(return_value, zend.ZendStringCopy(key))
@@ -867,7 +867,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			zv = _z
@@ -875,7 +875,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		}
 		break
 	}
-	zend.ZendArrayDestroy(zend.Z_ARR(list))
+	zend.ZendArrayDestroy(list.GetArr())
 	standard.PhpInfoPrintTableRow(2, "Interfaces", strg+2)
 	zend.Efree(strg)
 	zend.ArrayInit(&list)
@@ -942,7 +942,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			zv = _z
@@ -950,7 +950,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		}
 		break
 	}
-	zend.ZendArrayDestroy(zend.Z_ARR(list))
+	zend.ZendArrayDestroy(list.GetArr())
 	standard.PhpInfoPrintTableRow(2, "Classes", strg+2)
 	zend.Efree(strg)
 	standard.PhpInfoPrintTableEnd()

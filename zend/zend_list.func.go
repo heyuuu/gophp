@@ -10,7 +10,7 @@ import (
 func ZendListInsert(ptr any, type_ int) *Zval {
 	var index int
 	var zv Zval
-	index = ZendHashNextFreeElement(&(ExecutorGlobals.GetRegularList()))
+	index = ExecutorGlobals.GetRegularList().GetNNextFreeElement()
 	if index == 0 {
 		index = 1
 	} else if index == core.INT_MAX {
@@ -97,7 +97,7 @@ func ZendFetchResourceEx(res *Zval, resource_type_name string, resource_type int
 		}
 		return nil
 	}
-	if Z_TYPE_P(res) != IS_RESOURCE {
+	if res.GetType() != IS_RESOURCE {
 		if resource_type_name {
 			class_name = GetActiveClassName(&space)
 			ZendError(E_WARNING, "%s%s%s(): supplied argument is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
@@ -116,7 +116,7 @@ func ZendFetchResource2Ex(res *Zval, resource_type_name string, resource_type1 i
 		}
 		return nil
 	}
-	if Z_TYPE_P(res) != IS_RESOURCE {
+	if res.GetType() != IS_RESOURCE {
 		if resource_type_name {
 			class_name = GetActiveClassName(&space)
 			ZendError(E_WARNING, "%s%s%s(): supplied argument is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
@@ -167,7 +167,7 @@ func ZendCloseRsrcList(ht *HashTable) {
 			_p--
 			_z = _p.GetVal()
 
-			if Z_TYPE_P(_z) == IS_UNDEF {
+			if _z.GetType() == IS_UNDEF {
 				continue
 			}
 			res = Z_PTR_P(_z)
@@ -220,7 +220,7 @@ func ZendFetchListDtorId(type_name *byte) int {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if Z_TYPE_P(_z) == IS_UNDEF {
+			if _z.GetType() == IS_UNDEF {
 				continue
 			}
 			lde = Z_PTR_P(_z)
@@ -252,7 +252,7 @@ func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_ty
 	var zv *Zval
 	var tmp Zval
 	ZVAL_NEW_PERSISTENT_RES(&tmp, -1, rsrc_pointer, rsrc_type)
-	GC_MAKE_PERSISTENT_LOCAL(Z_COUNTED(tmp))
+	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
 	zv = ZendHashUpdate(&(ExecutorGlobals.GetPersistentList()), key, &tmp)
 	return Z_RES_P(zv)

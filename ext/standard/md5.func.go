@@ -98,7 +98,7 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_MD5Init(&context)
-	PHP_MD5Update(&context, zend.ZSTR_VAL(arg), zend.ZSTR_LEN(arg))
+	PHP_MD5Update(&context, arg.GetVal(), arg.GetLen())
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
 		zend.RETVAL_STRINGL((*byte)(digest), 16)

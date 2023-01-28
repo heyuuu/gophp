@@ -29,8 +29,8 @@ func BrowscapEntryDtorPersistent(zvalue *zend.Zval) {
 func IsPlaceholder(c byte) zend.ZendBool { return c == '?' || c == '*' }
 func BrowscapComputePrefixLen(pattern *zend.ZendString) uint8 {
 	var i int
-	for i = 0; i < zend.ZSTR_LEN(pattern); i++ {
-		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) != 0 {
+	for i = 0; i < pattern.GetLen(); i++ {
+		if IsPlaceholder(pattern.GetVal()[i]) != 0 {
 			break
 		}
 	}
@@ -41,13 +41,13 @@ func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_s
 
 	/* Find first non-placeholder character after prefix */
 
-	for ; i < zend.ZSTR_LEN(pattern); i++ {
-		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) == 0 {
+	for ; i < pattern.GetLen(); i++ {
+		if IsPlaceholder(pattern.GetVal()[i]) == 0 {
 
 			/* Skip the case of a single non-placeholder character.
 			 * Let's try to find something longer instead. */
 
-			if i+1 < zend.ZSTR_LEN(pattern) && IsPlaceholder(zend.ZSTR_VAL(pattern)[i+1]) == 0 {
+			if i+1 < pattern.GetLen() && IsPlaceholder(pattern.GetVal()[i+1]) == 0 {
 				break
 			}
 
@@ -60,8 +60,8 @@ func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_s
 
 	/* Find first placeholder character after that */
 
-	for ; i < zend.ZSTR_LEN(pattern); i++ {
-		if IsPlaceholder(zend.ZSTR_VAL(pattern)[i]) != 0 {
+	for ; i < pattern.GetLen(); i++ {
+		if IsPlaceholder(pattern.GetVal()[i]) != 0 {
 			break
 		}
 	}
@@ -70,9 +70,9 @@ func BrowscapComputeContains(pattern *zend.ZendString, start_pos int, contains_s
 }
 func BrowscapComputeRegexLen(pattern *zend.ZendString) int {
 	var i int
-	var len_ int = zend.ZSTR_LEN(pattern)
-	for i = 0; i < zend.ZSTR_LEN(pattern); i++ {
-		switch zend.ZSTR_VAL(pattern)[i] {
+	var len_ int = pattern.GetLen()
+	for i = 0; i < pattern.GetLen(); i++ {
+		switch pattern.GetVal()[i] {
 		case '*':
 
 		case '.':
@@ -99,12 +99,12 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 	var res *zend.ZendString
 	var lc_pattern *byte
 	res = zend.ZendStringAlloc(BrowscapComputeRegexLen(pattern), persistent)
-	t = zend.ZSTR_VAL(res)
-	lc_pattern = zend.DoAlloca(zend.ZSTR_LEN(pattern)+1, use_heap)
-	zend.ZendStrTolowerCopy(lc_pattern, zend.ZSTR_VAL(pattern), zend.ZSTR_LEN(pattern))
+	t = res.GetVal()
+	lc_pattern = zend.DoAlloca(pattern.GetLen()+1, use_heap)
+	zend.ZendStrTolowerCopy(lc_pattern, pattern.GetVal(), pattern.GetLen())
 	t[b.PostInc(&j)] = '~'
 	t[b.PostInc(&j)] = '^'
-	for i = 0; i < zend.ZSTR_LEN(pattern); {
+	for i = 0; i < pattern.GetLen(); {
 		switch lc_pattern[i] {
 		case '?':
 			t[j] = '.'
@@ -147,7 +147,7 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 	t[b.PostInc(&j)] = '$'
 	t[b.PostInc(&j)] = '~'
 	t[j] = 0
-	zend.ZSTR_LEN(res) = j
+	res.GetLen() = j
 	zend.FreeAlloca(lc_pattern, use_heap)
 	return res
 }
@@ -167,8 +167,8 @@ func BrowscapInternStr(ctx *BrowscapParserCtx, str *zend.ZendString, persistent 
 func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persistent zend.ZendBool) *zend.ZendString {
 	var lcname *zend.ZendString
 	var interned *zend.ZendString
-	zend.ZSTR_ALLOCA_ALLOC(lcname, zend.ZSTR_LEN(str), use_heap)
-	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(lcname), zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
+	zend.ZSTR_ALLOCA_ALLOC(lcname, str.GetLen(), use_heap)
+	zend.ZendStrTolowerCopy(lcname.GetVal(), str.GetVal(), str.GetLen())
 	interned = zend.ZendHashFindPtr(ctx.GetStrInterned(), lcname)
 	if interned != nil {
 		zend.ZendStringAddref(interned)
@@ -235,8 +235,8 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 
 				/* parent entry can not be same as current section -> causes infinite loop! */
 
-				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(zend.ZSTR_VAL(ctx.GetCurrentSectionName()), zend.Z_STRVAL_P(arg2))) {
-					zend.ZendError(zend.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", zend.ZSTR_VAL(ctx.GetCurrentSectionName()), zend.INI_STR("browscap"))
+				if ctx.GetCurrentSectionName() != nil && !(strcasecmp(ctx.GetCurrentSectionName().GetVal(), zend.Z_STRVAL_P(arg2))) {
+					zend.ZendError(zend.E_CORE_ERROR, "Invalid browscap ini file: "+"'Parent' value cannot be same as the section name: %s "+"(in file %s)", ctx.GetCurrentSectionName().GetVal(), zend.INI_STR("browscap"))
 					return
 				}
 				if ctx.GetCurrentEntry().GetParent() != nil {
@@ -255,8 +255,8 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		var pattern *zend.ZendString = zend.Z_STR_P(arg1)
 		var pos int
 		var i int
-		if zend.ZSTR_LEN(pattern) > UINT16_MAX {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Skipping excessively long pattern of length %zd", zend.ZSTR_LEN(pattern))
+		if pattern.GetLen() > UINT16_MAX {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Skipping excessively long pattern of length %zd", pattern.GetLen())
 			break
 		}
 		if persistent != 0 {
@@ -345,7 +345,7 @@ func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 		if bdata.GetFilename()[0] != '0' {
 			BrowscapBdataDtor(bdata, 0)
 		}
-		if zend.VCWD_REALPATH(zend.ZSTR_VAL(new_value), bdata.GetFilename()) == nil {
+		if zend.VCWD_REALPATH(new_value.GetVal(), bdata.GetFilename()) == nil {
 			return zend.FAILURE
 		}
 		return zend.SUCCESS
@@ -396,27 +396,27 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 
 	/* Agent name too short */
 
-	if zend.ZSTR_LEN(agent_name) < BrowscapGetMinimumLength(entry) {
+	if agent_name.GetLen() < BrowscapGetMinimumLength(entry) {
 		return 0
 	}
 
 	/* Quickly discard patterns where the prefix doesn't match. */
 
-	if zend.ZendBinaryStrcasecmp(zend.ZSTR_VAL(agent_name), entry.GetPrefixLen(), zend.ZSTR_VAL(entry.GetPattern()), entry.GetPrefixLen()) != 0 {
+	if zend.ZendBinaryStrcasecmp(agent_name.GetVal(), entry.GetPrefixLen(), entry.GetPattern().GetVal(), entry.GetPrefixLen()) != 0 {
 		return 0
 	}
 
 	/* Lowercase the pattern, the agent name is already lowercase */
 
-	zend.ZSTR_ALLOCA_ALLOC(pattern_lc, zend.ZSTR_LEN(entry.GetPattern()), use_heap)
-	zend.ZendStrTolowerCopy(zend.ZSTR_VAL(pattern_lc), zend.ZSTR_VAL(entry.GetPattern()), zend.ZSTR_LEN(entry.GetPattern()))
+	zend.ZSTR_ALLOCA_ALLOC(pattern_lc, entry.GetPattern().GetLen(), use_heap)
+	zend.ZendStrTolowerCopy(pattern_lc.GetVal(), entry.GetPattern().GetVal(), entry.GetPattern().GetLen())
 
 	/* Check if the agent contains the "contains" portions */
 
-	cur = zend.ZSTR_VAL(agent_name) + entry.GetPrefixLen()
+	cur = agent_name.GetVal() + entry.GetPrefixLen()
 	for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 		if entry.GetContainsLen()[i] != 0 {
-			cur = zend.ZendMemnstr(cur, zend.ZSTR_VAL(pattern_lc)+entry.GetContainsStart()[i], entry.GetContainsLen()[i], zend.ZSTR_VAL(agent_name)+zend.ZSTR_LEN(agent_name))
+			cur = zend.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
 			if cur == nil {
 				zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
 				return 0
@@ -445,7 +445,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 		zend.ZendStringRelease(regex)
 		return 0
 	}
-	rc = pcre2_match(re, PCRE2_SPTR(zend.ZSTR_VAL(agent_name)), zend.ZSTR_LEN(agent_name), 0, 0, match_data, php_pcre_mctx())
+	rc = pcre2_match(re, PCRE2_SPTR(agent_name.GetVal()), agent_name.GetLen(), 0, 0, match_data, php_pcre_mctx())
 	php_pcre_free_match_data(match_data)
 	if PCRE2_ERROR_NOMATCH != rc {
 
@@ -459,8 +459,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 			var curr_len int = 0
 			var previous_match *zend.ZendString = found_entry.GetPattern()
 			var current_match *zend.ZendString = entry.GetPattern()
-			for i = 0; i < zend.ZSTR_LEN(previous_match); i++ {
-				switch zend.ZSTR_VAL(previous_match)[i] {
+			for i = 0; i < previous_match.GetLen(); i++ {
+				switch previous_match.GetVal()[i] {
 				case '?':
 
 				case '*':
@@ -472,8 +472,8 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 					prev_len++
 				}
 			}
-			for i = 0; i < zend.ZSTR_LEN(current_match); i++ {
-				switch zend.ZSTR_VAL(current_match)[i] {
+			for i = 0; i < current_match.GetLen(); i++ {
+				switch current_match.GetVal()[i] {
 				case '?':
 
 				case '*':
@@ -512,12 +512,12 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 func BrowscapZvalCopyCtor(p *zend.Zval) {
 	if zend.Z_REFCOUNTED_P(p) {
 		var str *zend.ZendString
-		zend.ZEND_ASSERT(zend.Z_TYPE_P(p) == zend.IS_STRING)
+		zend.ZEND_ASSERT(p.GetType() == zend.IS_STRING)
 		str = zend.Z_STR_P(p)
 		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
 			zend.GC_ADDREF(str)
 		} else {
-			zend.ZVAL_NEW_STR(p, zend.ZendStringInit(zend.ZSTR_VAL(str), zend.ZSTR_LEN(str), 0))
+			zend.ZVAL_NEW_STR(p, zend.ZendStringInit(str.GetVal(), str.GetLen(), 0))
 		}
 	}
 }
@@ -641,7 +641,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				entry = zend.Z_PTR_P(_z)

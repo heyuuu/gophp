@@ -499,7 +499,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	var tmp Zval
 	var retval *ZendOpArray
 	var opened_path *ZendString = nil
-	if Z_TYPE_P(filename) != IS_STRING {
+	if filename.GetType() != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetString(filename))
 		filename = &tmp
 	}
@@ -586,7 +586,7 @@ func CompileString(source_string *Zval, filename *byte) *ZendOpArray {
 	var original_lex_state ZendLexState
 	var op_array *ZendOpArray = nil
 	var tmp Zval
-	if Z_TYPE_P(source_string) != IS_STRING {
+	if source_string.GetType() != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(source_string))
 	} else {
 		ZVAL_COPY(&tmp, source_string)
@@ -626,7 +626,7 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *ZendSyntaxHighlighter
 func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni, str_name *byte) int {
 	var original_lex_state ZendLexState
 	var tmp Zval
-	if Z_TYPE_P(str) != IS_STRING {
+	if str.GetType() != IS_STRING {
 		ZVAL_STR(&tmp, ZvalGetStringFunc(str))
 		str = &tmp
 	}
@@ -8125,7 +8125,7 @@ heredoc_scan_done:
 			token = T_ERROR
 			goto emit_token
 		}
-		if ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS {
+		if ZendScanEscapeString(zendlval, copy.GetVal(), copy.GetLen(), 0) != SUCCESS {
 			ZendStringEfree(copy)
 			token = T_ERROR
 			goto emit_token
@@ -9015,7 +9015,7 @@ emit_token_with_str:
 	ZendCopyValue(zendlval, Yytext+offset, Yyleng-offset)
 emit_token_with_val:
 	if PARSER_MODE() {
-		ZEND_ASSERT(Z_TYPE_P(zendlval) != IS_UNDEF)
+		ZEND_ASSERT(zendlval.GetType() != IS_UNDEF)
 		elem.SetAst(ZendAstCreateZvalWithLineno(zendlval, start_line))
 	}
 emit_token:

@@ -120,12 +120,12 @@ func DestroyUploadedFilesHash() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			el = _z
 			var filename *zend.ZendString = zend.Z_STR_P(el)
-			zend.VCWD_UNLINK(zend.ZSTR_VAL(filename))
+			zend.VCWD_UNLINK(filename.GetVal())
 		}
 		break
 	}
@@ -908,7 +908,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				var event_file_end MultipartEventFileEnd
 				event_file_end.SetPostBytesProcessed(SG(read_post_bytes))
 				if temp_filename != nil {
-					event_file_end.SetTempFilename(zend.ZSTR_VAL(temp_filename))
+					event_file_end.SetTempFilename(temp_filename.GetVal())
 				} else {
 					event_file_end.SetTempFilename(nil)
 				}
@@ -920,7 +920,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			if cancel_upload != 0 {
 				if temp_filename != nil {
 					if cancel_upload != UPLOAD_ERROR_E {
-						unlink(zend.ZSTR_VAL(temp_filename))
+						unlink(temp_filename.GetVal())
 					}
 					zend.ZendStringReleaseEx(temp_filename, 0)
 				}

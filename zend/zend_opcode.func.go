@@ -109,7 +109,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &(ZEND_REF_TYPE_SOURCES(Z_REF_P(p)))
+						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -149,7 +149,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &(ZEND_REF_TYPE_SOURCES(Z_REF_P(p)))
+						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -236,7 +236,7 @@ func DestroyZendClass(zv *Zval) {
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.GetType() == IS_UNDEF {
 						continue
 					}
 					op_array = Z_PTR_P(_z)
@@ -272,7 +272,7 @@ func DestroyZendClass(zv *Zval) {
 				if Z_ISREF_P(p) {
 					var prop_info *ZendPropertyInfo
 					for {
-						var _source_list *ZendPropertyInfoSourceList = &(ZEND_REF_TYPE_SOURCES(Z_REF_P(p)))
+						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())
 						var _prop **ZendPropertyInfo
 						var _end ***ZendPropertyInfo
 						var _list *ZendPropertyInfoList
@@ -308,7 +308,7 @@ func DestroyZendClass(zv *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.GetType() == IS_UNDEF {
 					continue
 				}
 				prop_info = Z_PTR_P(_z)
@@ -327,7 +327,7 @@ func DestroyZendClass(zv *Zval) {
 		ZendHashDestroy(ce.GetPropertiesInfo())
 		ZendStringReleaseEx(ce.GetName(), 0)
 		ZendHashDestroy(ce.GetFunctionTable())
-		if ZendHashNumElements(ce.GetConstantsTable()) {
+		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
 				var __ht *HashTable = ce.GetConstantsTable()
@@ -336,7 +336,7 @@ func DestroyZendClass(zv *Zval) {
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.GetType() == IS_UNDEF {
 						continue
 					}
 					c = Z_PTR_P(_z)
@@ -402,7 +402,7 @@ func DestroyZendClass(zv *Zval) {
 			for ; _p != _end; _p++ {
 				var _z *Zval = _p.GetVal()
 
-				if Z_TYPE_P(_z) == IS_UNDEF {
+				if _z.GetType() == IS_UNDEF {
 					continue
 				}
 				fn = Z_PTR_P(_z)
@@ -413,7 +413,7 @@ func DestroyZendClass(zv *Zval) {
 			break
 		}
 		ZendHashDestroy(ce.GetFunctionTable())
-		if ZendHashNumElements(ce.GetConstantsTable()) {
+		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			for {
 				var __ht *HashTable = ce.GetConstantsTable()
@@ -422,7 +422,7 @@ func DestroyZendClass(zv *Zval) {
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.GetType() == IS_UNDEF {
 						continue
 					}
 					c = Z_PTR_P(_z)
@@ -920,7 +920,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		switch opline.GetOpcode() {
 		case ZEND_RECV_INIT:
 			var val *Zval = CT_CONSTANT(opline.GetOp2())
-			if Z_TYPE_P(val) == IS_CONSTANT_AST {
+			if val.GetType() == IS_CONSTANT_AST {
 				var slot uint32 = ZEND_MM_ALIGNED_SIZE_EX(op_array.GetCacheSize(), 8)
 				Z_CACHE_SLOT_P(val) = slot
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))
@@ -1020,7 +1020,7 @@ func PassTwo(op_array *ZendOpArray) int {
 				for ; _p != _end; _p++ {
 					var _z *Zval = _p.GetVal()
 
-					if Z_TYPE_P(_z) == IS_UNDEF {
+					if _z.GetType() == IS_UNDEF {
 						continue
 					}
 					zv = _z

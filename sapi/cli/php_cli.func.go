@@ -32,7 +32,7 @@ func PrintModules() {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			module = zend.Z_PTR_P(_z)

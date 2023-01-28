@@ -764,10 +764,10 @@ func zim_spl_SplFileInfo_getExtension(execute_data *zend.ZendExecuteData, return
 		flen = intern.GetFileNameLen()
 	}
 	ret = standard.PhpBasename(fname, flen, nil, 0)
-	p = zend.ZendMemrchr(zend.ZSTR_VAL(ret), '.', zend.ZSTR_LEN(ret))
+	p = zend.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
 	if p != nil {
-		idx = p - zend.ZSTR_VAL(ret)
-		zend.RETVAL_STRINGL(zend.ZSTR_VAL(ret)+idx+1, zend.ZSTR_LEN(ret)-idx-1)
+		idx = p - ret.GetVal()
+		zend.RETVAL_STRINGL(ret.GetVal()+idx+1, ret.GetLen()-idx-1)
 		zend.ZendStringReleaseEx(ret, 0)
 		return
 	} else {
@@ -785,10 +785,10 @@ func zim_spl_DirectoryIterator_getExtension(execute_data *zend.ZendExecuteData, 
 		return
 	}
 	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), nil, 0)
-	p = zend.ZendMemrchr(zend.ZSTR_VAL(fname), '.', zend.ZSTR_LEN(fname))
+	p = zend.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
 	if p != nil {
-		idx = p - zend.ZSTR_VAL(fname)
-		zend.RETVAL_STRINGL(zend.ZSTR_VAL(fname)+idx+1, zend.ZSTR_LEN(fname)-idx-1)
+		idx = p - fname.GetVal()
+		zend.RETVAL_STRINGL(fname.GetVal()+idx+1, fname.GetLen()-idx-1)
 		zend.ZendStringReleaseEx(fname, 0)
 	} else {
 		zend.ZendStringReleaseEx(fname, 0)
@@ -1636,16 +1636,16 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 		case zend.IS_STRING:
 			return zend.Z_STRLEN(intern.GetCurrentZval()) == 0
 		case zend.IS_ARRAY:
-			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetCurrentZval())) == 1 {
+			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 1 {
 				var idx uint32 = 0
 				var first *zend.Zval
 				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()) {
 					idx++
 				}
 				first = zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
-				return zend.Z_TYPE_P(first) == zend.IS_STRING && zend.Z_STRLEN_P(first) == 0
+				return first.GetType() == zend.IS_STRING && zend.Z_STRLEN_P(first) == 0
 			}
-			return zend.ZendHashNumElements(zend.Z_ARRVAL(intern.GetCurrentZval())) == 0
+			return zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 0
 		case zend.IS_NULL:
 			return 1
 		default:

@@ -632,14 +632,14 @@ func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, st
 
 			}
 			if n {
-				memcpy(zend.ZSTR_VAL(tp)+l2, cp+l1+1, n)
+				memcpy(tp.GetVal()+l2, cp+l1+1, n)
 				zend.AddNextIndexStringl(&entries, (*byte)(cp+l1+1), n)
 			}
 			l1 = l1 + n + 1
 			l2 = l2 + n
 		}
-		zend.ZSTR_VAL(tp)[l2] = '0'
-		zend.ZSTR_LEN(tp) = l2
+		tp.GetVal()[l2] = '0'
+		tp.GetLen() = l2
 		cp += dlen
 		zend.AddAssocStr(subarray, "txt", tp)
 		zend.AddAssocZval(subarray, "entries", &entries)
@@ -1374,7 +1374,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	zend.RETVAL_BOOL(zend.ZendHashNumElements(zend.Z_ARRVAL_P(mx_list)) != 0)
+	zend.RETVAL_BOOL(zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {

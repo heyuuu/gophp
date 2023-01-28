@@ -87,7 +87,7 @@ func SplFixedarrayObjectGetProperties(obj *zend.Zval) *zend.HashTable {
 	var ht *zend.HashTable = zend.ZendStdGetProperties(obj)
 	var i zend.ZendLong = 0
 	if intern.GetArray().GetSize() > 0 {
-		var j zend.ZendLong = zend.ZendHashNumElements(ht)
+		var j zend.ZendLong = ht.GetNNumOfElements()
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
 				zend.ZendHashIndexUpdate(ht, i, intern.GetArray().GetElements()[i])
@@ -212,7 +212,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedarrayObject, offset 
 		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return nil
 	}
-	if zend.Z_TYPE_P(offset) != zend.IS_LONG {
+	if offset.GetType() != zend.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = zend.Z_LVAL_P(offset)
@@ -258,7 +258,7 @@ func SplFixedarrayObjectWriteDimensionHelper(intern *SplFixedarrayObject, offset
 		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return
 	}
-	if zend.Z_TYPE_P(offset) != zend.IS_LONG {
+	if offset.GetType() != zend.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = zend.Z_LVAL_P(offset)
@@ -298,7 +298,7 @@ func SplFixedarrayObjectWriteDimension(object *zend.Zval, offset *zend.Zval, val
 }
 func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedarrayObject, offset *zend.Zval) {
 	var index zend.ZendLong
-	if zend.Z_TYPE_P(offset) != zend.IS_LONG {
+	if offset.GetType() != zend.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = zend.Z_LVAL_P(offset)
@@ -325,7 +325,7 @@ func SplFixedarrayObjectUnsetDimension(object *zend.Zval, offset *zend.Zval) {
 func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedarrayObject, offset *zend.Zval, check_empty int) int {
 	var index zend.ZendLong
 	var retval int
-	if zend.Z_TYPE_P(offset) != zend.IS_LONG {
+	if offset.GetType() != zend.IS_LONG {
 		index = SplOffsetConvertToLong(offset)
 	} else {
 		index = zend.Z_LVAL_P(offset)
@@ -411,7 +411,7 @@ func zim_spl_SplFixedArray___wakeup(execute_data *zend.ZendExecuteData, return_v
 	}
 	if intern.GetArray().GetSize() == 0 {
 		var index int = 0
-		var size int = zend.ZendHashNumElements(intern_ht)
+		var size int = intern_ht.GetNNumOfElements()
 		SplFixedarrayInit(intern.GetArray(), size)
 		for {
 			var __ht *zend.HashTable = intern_ht
@@ -420,7 +420,7 @@ func zim_spl_SplFixedArray___wakeup(execute_data *zend.ZendExecuteData, return_v
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				data = _z
@@ -481,7 +481,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "a|b", &data, &save_indexes) == zend.FAILURE {
 		return
 	}
-	num = zend.ZendHashNumElements(zend.Z_ARRVAL_P(data))
+	num = zend.Z_ARRVAL_P(data).GetNNumOfElements()
 	if num > 0 && save_indexes != 0 {
 		var element *zend.Zval
 		var str_index *zend.ZendString
@@ -495,7 +495,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				num_index = _p.GetH()
@@ -523,7 +523,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				num_index = _p.GetH()
@@ -544,7 +544,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				element = _z

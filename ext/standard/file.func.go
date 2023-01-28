@@ -13,7 +13,7 @@ import (
 
 func FG(v __auto__) __auto__ { return FileGlobals.v }
 func PHP_STREAM_TO_ZVAL(stream *core.PhpStream, arg *zend.Zval) {
-	zend.ZEND_ASSERT(zend.Z_TYPE_P(arg) == zend.IS_RESOURCE)
+	zend.ZEND_ASSERT(arg.GetType() == zend.IS_RESOURCE)
 	core.PhpStreamFromRes(stream, zend.Z_RES_P(arg))
 }
 func PhpLeStreamContext() int { return LeStreamContext }
@@ -672,7 +672,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	}
-	if zend.Z_TYPE_P(data) == zend.IS_RESOURCE {
+	if data.GetType() == zend.IS_RESOURCE {
 		core.PhpStreamFromZval(srcstream, data)
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
@@ -706,7 +706,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if mode[0] == 'c' {
 		core.PhpStreamTruncateSetSize(stream, 0)
 	}
-	switch zend.Z_TYPE_P(data) {
+	switch data.GetType() {
 	case zend.IS_RESOURCE:
 		var len_ int
 		if core.PhpStreamCopyToStreamEx(srcstream, stream, core.PHP_STREAM_COPY_ALL, &len_) != zend.SUCCESS {
@@ -739,7 +739,7 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	case zend.IS_ARRAY:
-		if zend.ZendHashNumElements(zend.Z_ARRVAL_P(data)) {
+		if zend.Z_ARRVAL_P(data).GetNNumOfElements() {
 			var bytes_written ssize_t
 			var tmp *zend.Zval
 			for {
@@ -749,17 +749,17 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				for ; _p != _end; _p++ {
 					var _z *zend.Zval = _p.GetVal()
 
-					if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+					if _z.GetType() == zend.IS_UNDEF {
 						continue
 					}
 					tmp = _z
 					var t *zend.ZendString
 					var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
-					if zend.ZSTR_LEN(str) != 0 {
-						numbytes += zend.ZSTR_LEN(str)
-						bytes_written = core.PhpStreamWrite(stream, zend.ZSTR_VAL(str), zend.ZSTR_LEN(str))
-						if bytes_written != zend.ZSTR_LEN(str) {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to write %zd bytes to %s", zend.ZSTR_LEN(str), filename)
+					if str.GetLen() != 0 {
+						numbytes += str.GetLen()
+						bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
+						if bytes_written != str.GetLen() {
+							core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
 							zend.ZendTmpStringRelease(t)
 							numbytes = -1
 							break
@@ -914,8 +914,8 @@ func ZifFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	zend.ArrayInit(return_value)
 	if b.Assign(&target_buf, core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)) != nil {
-		s = zend.ZSTR_VAL(target_buf)
-		e = zend.ZSTR_VAL(target_buf) + zend.ZSTR_LEN(target_buf)
+		s = target_buf.GetVal()
+		e = target_buf.GetVal() + target_buf.GetLen()
 		if !(b.Assign(&p, (*byte)(streams.PhpStreamLocateEol(stream, target_buf)))) {
 			p = e
 			goto parse_eol
@@ -940,7 +940,7 @@ func ZifFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else {
 			for {
 				var windows_eol int = 0
-				if p != zend.ZSTR_VAL(target_buf) && eol_marker == '\n' && (*(p - 1)) == '\r' {
+				if p != target_buf.GetVal() && eol_marker == '\n' && (*(p - 1)) == '\r' {
 					windows_eol++
 				}
 				if skip_blank_lines != 0 && p-s-windows_eol == 0 {
@@ -1054,11 +1054,11 @@ func ZifTempnam(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	p = PhpBasename(prefix, prefix_len, nil, 0)
-	if zend.ZSTR_LEN(p) > 64 {
-		zend.ZSTR_VAL(p)[63] = '0'
+	if p.GetLen() > 64 {
+		p.GetVal()[63] = '0'
 	}
 	zend.RETVAL_FALSE
-	if b.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, zend.ZSTR_VAL(p), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
+	if b.Assign(&fd, core.PhpOpenTemporaryFdEx(dir, p.GetVal(), &opened_path, core.PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) >= 0 {
 		close(fd)
 		zend.RETVAL_STR(opened_path)
 	}
@@ -1627,7 +1627,7 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 		str = zend.ZendStringAlloc(len_, 0)
-		if core.PhpStreamGetLine(stream, zend.ZSTR_VAL(str), len_, &line_len) == nil {
+		if core.PhpStreamGetLine(stream, str.GetVal(), len_, &line_len) == nil {
 			zend.ZendStringEfree(str)
 			zend.RETVAL_FALSE
 			return
@@ -1639,7 +1639,7 @@ func ZifFgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if line_len < int(len_/2) {
 			str = zend.ZendStringTruncate(str, line_len, 0)
 		} else {
-			zend.ZSTR_LEN(str) = line_len
+			str.GetLen() = line_len
 		}
 		zend.RETVAL_NEW_STR(str)
 		return
@@ -3615,7 +3615,7 @@ quit_loop:
 	return ptr
 }
 func FPUTCSV_FLD_CHK(c __auto__) __auto__ {
-	return memchr(zend.ZSTR_VAL(field_str), c, zend.ZSTR_LEN(field_str))
+	return memchr(field_str.GetVal(), c, field_str.GetLen())
 }
 func ZifFputcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var delimiter byte = ','
@@ -3790,7 +3790,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var field_tmp *zend.Zval
 	var csvline zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
-	count = zend.ZendHashNumElements(zend.Z_ARRVAL_P(fields))
+	count = zend.Z_ARRVAL_P(fields).GetNNumOfElements()
 	for {
 		var __ht *zend.HashTable = zend.Z_ARRVAL_P(fields)
 		var _p *zend.Bucket = __ht.GetArData()
@@ -3798,7 +3798,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			field_tmp = _z
@@ -3808,8 +3808,8 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 			/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
 			if FPUTCSV_FLD_CHK(delimiter) || FPUTCSV_FLD_CHK(enclosure) || escape_char != PHP_CSV_NO_ESCAPE && FPUTCSV_FLD_CHK(escape_char) || FPUTCSV_FLD_CHK('\n') || FPUTCSV_FLD_CHK('\r') || FPUTCSV_FLD_CHK('\t') || FPUTCSV_FLD_CHK(' ') {
-				var ch *byte = zend.ZSTR_VAL(field_str)
-				var end *byte = ch + zend.ZSTR_LEN(field_str)
+				var ch *byte = field_str.GetVal()
+				var end *byte = ch + field_str.GetLen()
 				var escaped int = 0
 				zend.SmartStrAppendc(&csvline, enclosure)
 				for ch < end {
@@ -3836,7 +3836,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	}
 	zend.SmartStrAppendc(&csvline, '\n')
 	zend.SmartStr0(&csvline)
-	ret = core.PhpStreamWrite(stream, zend.ZSTR_VAL(csvline.GetS()), zend.ZSTR_LEN(csvline.GetS()))
+	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())
 	zend.SmartStrFree(&csvline)
 	return ret
 }
@@ -3992,7 +3992,7 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			escape = uint8(escape_str[0])
 		}
 	}
-	if len_zv != nil && zend.Z_TYPE_P(len_zv) != zend.IS_NULL {
+	if len_zv != nil && len_zv.GetType() != zend.IS_NULL {
 		len_ = zend.ZvalGetLong(len_zv)
 		if len_ < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter may not be negative")

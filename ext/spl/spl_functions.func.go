@@ -92,5 +92,5 @@ func SplAddClasses(pce *zend.ZendClassEntry, list *zend.Zval, sub int, allow int
 	return 0
 }
 func SplGenPrivatePropName(ce *zend.ZendClassEntry, prop_name string, prop_len int) *zend.ZendString {
-	return zend.ZendManglePropertyName(zend.ZSTR_VAL(ce.GetName()), zend.ZSTR_LEN(ce.GetName()), prop_name, prop_len, 0)
+	return zend.ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), prop_name, prop_len, 0)
 }

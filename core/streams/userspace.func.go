@@ -79,7 +79,7 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		fcc.SetCalledScope(zend.Z_OBJCE_P(object))
 		fcc.SetObject(zend.Z_OBJ_P(object))
 		if zend.ZendCallFunction(&fci, &fcc) == zend.FAILURE {
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", zend.ZSTR_VAL(uwrap.GetCe().GetName()), zend.ZSTR_VAL(uwrap.GetCe().GetConstructor().GetFunctionName()))
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Could not execute %s::%s()", uwrap.GetCe().GetName().GetVal(), uwrap.GetCe().GetConstructor().GetFunctionName().GetVal())
 			zend.ZvalPtrDtor(object)
 			zend.ZVAL_UNDEF(object)
 		} else {
@@ -148,7 +148,7 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 
 		/* if the opened path is set, copy it out */
 
-		if zend.Z_ISREF(args[3]) && zend.Z_TYPE_P(zend.Z_REFVAL(args[3])) == zend.IS_STRING && opened_path != nil {
+		if zend.Z_ISREF(args[3]) && zend.Z_REFVAL(args[3]).GetType() == zend.IS_STRING && opened_path != nil {
 			*opened_path = zend.ZendStringCopy(zend.Z_STR_P(zend.Z_REFVAL(args[3])))
 		}
 
@@ -251,8 +251,8 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	uwrap = (*PhpUserStreamWrapper)(zend.Ecalloc(1, b.SizeOf("* uwrap")))
-	uwrap.SetProtoname(zend.Estrndup(zend.ZSTR_VAL(protocol), zend.ZSTR_LEN(protocol)))
-	uwrap.SetClassname(zend.Estrndup(zend.ZSTR_VAL(classname), zend.ZSTR_LEN(classname)))
+	uwrap.SetProtoname(zend.Estrndup(protocol.GetVal(), protocol.GetLen()))
+	uwrap.SetClassname(zend.Estrndup(classname.GetVal(), classname.GetLen()))
 	uwrap.GetWrapper().SetWops(&UserStreamWops)
 	uwrap.GetWrapper().SetAbstract(uwrap)
 	uwrap.GetWrapper().SetIsUrl((flags & core.PHP_STREAM_IS_URL) != 0)
@@ -266,12 +266,12 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 			/* We failed.  But why? */
 
 			if zend.ZendHashExists(core.PhpStreamGetUrlStreamWrappersHash(), protocol) != 0 {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", zend.ZSTR_VAL(protocol))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Protocol %s:// is already defined.", protocol.GetVal())
 			} else {
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", zend.ZSTR_VAL(classname), zend.ZSTR_VAL(protocol))
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid protocol scheme specified. Unable to register wrapper class %s to %s://", classname.GetVal(), protocol.GetVal())
 
 				/* Hash doesn't exist so it must have been an invalid protocol scheme */
 
@@ -281,7 +281,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 
 		}
 	} else {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", zend.ZSTR_VAL(classname))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", classname.GetVal())
 	}
 	zend.ZendListDelete(rsrc)
 	zend.RETVAL_FALSE
@@ -297,7 +297,7 @@ func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value
 
 		/* We failed */
 
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", zend.ZSTR_VAL(protocol))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", protocol.GetVal())
 		zend.RETVAL_FALSE
 		return
 	}
@@ -315,13 +315,13 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
 	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", zend.ZSTR_VAL(protocol))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
 		zend.RETVAL_FALSE
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
 	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
-		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", zend.ZSTR_VAL(protocol))
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
 		zend.RETVAL_TRUE
 		return
 	}
@@ -330,7 +330,7 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 
 	PhpUnregisterUrlStreamWrapperVolatile(protocol)
 	if PhpRegisterUrlStreamWrapperVolatile(protocol, wrapper) == zend.FAILURE {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", zend.ZSTR_VAL(protocol))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
 		zend.RETVAL_FALSE
 		return
 	}
@@ -358,7 +358,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 			didwrite = -1
 		} else {
 			zend.ConvertToLong(&retval)
-			didwrite = zend.Z_LVAL(retval)
+			didwrite = retval.GetLval()
 		}
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_WRITE+" is not implemented!", us.GetWrapper().GetClassname())
@@ -501,7 +501,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	zend.ZVAL_STRINGL(&func_name, USERSTREAM_TELL, b.SizeOf("USERSTREAM_TELL")-1)
 	call_result = zend.CallUserFunction(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.IsType(zend.IS_LONG) {
-		*newoffs = zend.Z_LVAL(retval)
+		*newoffs = retval.GetLval()
 		ret = 0
 	} else if call_result == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s::"+USERSTREAM_TELL+" is not implemented!", us.GetWrapper().GetClassname())
@@ -652,7 +652,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		zend.ZVAL_STRINGL(&func_name, USERSTREAM_TRUNCATE, b.SizeOf("USERSTREAM_TRUNCATE")-1)
 		switch value {
 		case core.PHP_STREAM_TRUNCATE_SUPPORTED:
-			if zend.ZendIsCallableEx(&func_name, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() *zend.ZendObject { return zend.Z_OBJ(us.GetObject()) }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
+			if zend.ZendIsCallableEx(&func_name, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() *zend.ZendObject { return us.GetObject().GetObj() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
 				ret = core.PHP_STREAM_OPTION_RETURN_OK
 			} else {
 				ret = core.PHP_STREAM_OPTION_RETURN_ERR

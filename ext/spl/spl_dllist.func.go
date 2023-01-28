@@ -521,7 +521,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(execute_data *zend.ZendExecuteData, r
 		return
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
-	if zend.Z_TYPE_P(zindex) == zend.IS_NULL {
+	if zindex.GetType() == zend.IS_NULL {
 
 		/* $obj[] = ... */
 
@@ -816,7 +816,7 @@ func zim_spl_SplDoublyLinkedList_unserialize(execute_data *zend.ZendExecuteData,
 	/* flags */
 
 	flags = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || zend.Z_TYPE_P(flags) != zend.IS_LONG {
+	if standard.PhpVarUnserialize(flags, &p, s+buf_len, &var_hash) == 0 || flags.GetType() != zend.IS_LONG {
 		goto error
 	}
 	intern.SetFlags(int(zend.Z_LVAL_P(flags)))
@@ -885,7 +885,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 	flags_zv = zend.ZendHashIndexFind(data, 0)
 	storage_zv = zend.ZendHashIndexFind(data, 1)
 	members_zv = zend.ZendHashIndexFind(data, 2)
-	if flags_zv == nil || storage_zv == nil || members_zv == nil || zend.Z_TYPE_P(flags_zv) != zend.IS_LONG || zend.Z_TYPE_P(storage_zv) != zend.IS_ARRAY || zend.Z_TYPE_P(members_zv) != zend.IS_ARRAY {
+	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != zend.IS_LONG || storage_zv.GetType() != zend.IS_ARRAY || members_zv.GetType() != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
@@ -897,7 +897,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			elem = _z

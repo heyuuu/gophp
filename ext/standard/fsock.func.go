@@ -130,7 +130,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.Efree(hostname)
 	}
 	if stream == nil {
-		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s:"+zend.ZEND_LONG_FMT+" (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return zend.ZSTR_VAL(errstr) }))
+		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to connect to %s:"+zend.ZEND_LONG_FMT+" (%s)", host, port, b.CondF2(errstr == nil, "Unknown error", func() []byte { return errstr.GetVal() }))
 	}
 	if hashkey != nil {
 		zend.Efree(hashkey)

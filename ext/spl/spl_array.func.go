@@ -27,7 +27,7 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **zend.HashTable {
 	} else if intern.GetArray().IsType(zend.IS_ARRAY) {
 		return &(zend.Z_ARRVAL(intern.GetArray()))
 	} else {
-		var obj *zend.ZendObject = zend.Z_OBJ(intern.GetArray())
+		var obj *zend.ZendObject = intern.GetArray().GetObj()
 		if obj.GetProperties() == nil {
 			zend.RebuildObjectProperties(obj)
 		} else if zend.GC_REFCOUNT(obj.GetProperties()) > 1 {
@@ -198,7 +198,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 		return &(zend.ExecutorGlobals.GetErrorZval())
 	}
 try_again:
-	switch zend.Z_TYPE_P(offset) {
+	switch offset.GetType() {
 	case zend.IS_NULL:
 		offset_key = zend.ZSTR_EMPTY_ALLOC()
 		goto fetch_dim_string
@@ -207,19 +207,19 @@ try_again:
 	fetch_dim_string:
 		retval = zend.ZendSymtableFind(ht, offset_key)
 		if retval != nil {
-			if zend.Z_TYPE_P(retval) == zend.IS_INDIRECT {
+			if retval.GetType() == zend.IS_INDIRECT {
 				retval = zend.Z_INDIRECT_P(retval)
-				if zend.Z_TYPE_P(retval) == zend.IS_UNDEF {
+				if retval.GetType() == zend.IS_UNDEF {
 					switch type_ {
 					case zend.BP_VAR_R:
-						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.ZSTR_VAL(offset_key))
+						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 					case zend.BP_VAR_UNSET:
 
 					case zend.BP_VAR_IS:
 						retval = &(zend.ExecutorGlobals.GetUninitializedZval())
 						break
 					case zend.BP_VAR_RW:
-						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.ZSTR_VAL(offset_key))
+						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 					case zend.BP_VAR_W:
 						zend.ZVAL_NULL(retval)
 					}
@@ -228,14 +228,14 @@ try_again:
 		} else {
 			switch type_ {
 			case zend.BP_VAR_R:
-				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.ZSTR_VAL(offset_key))
+				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 			case zend.BP_VAR_UNSET:
 
 			case zend.BP_VAR_IS:
 				retval = &(zend.ExecutorGlobals.GetUninitializedZval())
 				break
 			case zend.BP_VAR_RW:
-				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.ZSTR_VAL(offset_key))
+				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
 			case zend.BP_VAR_W:
 				var value zend.Zval
 				zend.ZVAL_NULL(&value)
@@ -356,7 +356,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *zend.Zval, offset *ze
 		return
 	}
 try_again:
-	switch zend.Z_TYPE_P(offset) {
+	switch offset.GetType() {
 	case zend.IS_STRING:
 		ht = SplArrayGetHashTable(intern)
 		zend.ZendSymtableUpdateInd(ht, zend.Z_STR_P(offset), value)
@@ -410,7 +410,7 @@ func SplArrayUnsetDimensionEx(check_inherited int, object *zend.Zval, offset *ze
 		return
 	}
 try_again:
-	switch zend.Z_TYPE_P(offset) {
+	switch offset.GetType() {
 	case zend.IS_STRING:
 		ht = SplArrayGetHashTable(intern)
 		if ht == &(zend.ExecutorGlobals.GetSymbolTable()) {
@@ -420,14 +420,14 @@ try_again:
 		} else {
 			var data *zend.Zval = zend.ZendSymtableFind(ht, zend.Z_STR_P(offset))
 			if data != nil {
-				if zend.Z_TYPE_P(data) == zend.IS_INDIRECT {
+				if data.GetType() == zend.IS_INDIRECT {
 					data = zend.Z_INDIRECT_P(data)
-					if zend.Z_TYPE_P(data) == zend.IS_UNDEF {
+					if data.GetType() == zend.IS_UNDEF {
 						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
 					} else {
 						zend.ZvalPtrDtor(data)
 						zend.ZVAL_UNDEF(data)
-						zend.HT_FLAGS(ht) |= zend.HASH_FLAG_HAS_EMPTY_IND
+						ht.GetUFlags() |= zend.HASH_FLAG_HAS_EMPTY_IND
 						zend.ZendHashMoveForwardEx(ht, SplArrayGetPosPtr(ht, intern))
 						if SplArrayIsObject(intern) != 0 {
 							SplArraySkipProtected(intern, ht)
@@ -497,7 +497,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 	if value == nil {
 		var ht *zend.HashTable = SplArrayGetHashTable(intern)
 	try_again:
-		switch zend.Z_TYPE_P(offset) {
+		switch offset.GetType() {
 		case zend.IS_STRING:
 			if b.Assign(&tmp, zend.ZendSymtableFind(ht, zend.Z_STR_P(offset))) != nil {
 				if check_empty == 2 {
@@ -543,7 +543,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 			value = tmp
 		}
 	}
-	var result zend.ZendBool = b.CondF(check_empty != 0, func() int { return zend.ZendIsTrue(value) }, func() bool { return zend.Z_TYPE_P(value) != zend.IS_NULL })
+	var result zend.ZendBool = b.CondF(check_empty != 0, func() int { return zend.ZendIsTrue(value) }, func() bool { return value.GetType() != zend.IS_NULL })
 	if value == &rv {
 		zend.ZvalPtrDtor(&rv)
 	}
@@ -582,7 +582,7 @@ func zim_spl_Array_offsetSet(execute_data *zend.ZendExecuteData, return_value *z
 func SplArrayIteratorAppend(object *zend.Zval, append_value *zend.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
 	if SplArrayIsObject(intern) != 0 {
-		zend.ZendThrowError(nil, "Cannot append properties to objects, use %s::offsetSet() instead", zend.ZSTR_VAL(zend.Z_OBJCE_P(object).GetName()))
+		zend.ZendThrowError(nil, "Cannot append properties to objects, use %s::offsetSet() instead", zend.Z_OBJCE_P(object).GetName().GetVal())
 		return
 	}
 	SplArrayWriteDimension(object, nil, append_value)
@@ -655,7 +655,7 @@ func SplArrayGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		return zend.ZendArrayDup(intern.GetStd().GetProperties())
 	} else {
 		var debug_info *zend.HashTable
-		debug_info = zend.ZendNewArray(zend.ZendHashNumElements(intern.GetStd().GetProperties()) + 1)
+		debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 		zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 		storage = intern.GetArray()
 		zend.Z_TRY_ADDREF_P(storage)
@@ -748,9 +748,9 @@ func SplArraySkipProtected(intern *SplArrayObject, aht *zend.HashTable) int {
 		for {
 			if zend.ZendHashGetCurrentKeyEx(aht, &string_key, &num_key, pos_ptr) == zend.HASH_KEY_IS_STRING {
 				data = zend.ZendHashGetCurrentDataEx(aht, pos_ptr)
-				if data != nil && zend.Z_TYPE_P(data) == zend.IS_INDIRECT && zend.Z_TYPE_P(b.Assign(&data, zend.Z_INDIRECT_P(data))) == zend.IS_UNDEF {
+				if data != nil && data.GetType() == zend.IS_INDIRECT && b.Assign(&data, zend.Z_INDIRECT_P(data)).GetType() == zend.IS_UNDEF {
 
-				} else if zend.ZSTR_LEN(string_key) == 0 || zend.ZSTR_VAL(string_key)[0] {
+				} else if string_key.GetLen() == 0 || string_key.GetVal()[0] {
 					return zend.SUCCESS
 				}
 			} else {
@@ -798,7 +798,7 @@ func SplArrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
 		var data *zend.Zval = zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, object))
-		if data != nil && zend.Z_TYPE_P(data) == zend.IS_INDIRECT {
+		if data != nil && data.GetType() == zend.IS_INDIRECT {
 			data = zend.Z_INDIRECT_P(data)
 		}
 		return data
@@ -842,11 +842,11 @@ func SplArrayItRewind(iter *zend.ZendObjectIterator) {
 	}
 }
 func SplArraySetArray(object *zend.Zval, intern *SplArrayObject, array *zend.Zval, ar_flags zend.ZendLong, just_array int) {
-	if zend.Z_TYPE_P(array) != zend.IS_OBJECT && zend.Z_TYPE_P(array) != zend.IS_ARRAY {
+	if array.GetType() != zend.IS_OBJECT && array.GetType() != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_InvalidArgumentException, "Passed variable is not an array or object", 0)
 		return
 	}
-	if zend.Z_TYPE_P(array) == zend.IS_ARRAY {
+	if array.GetType() == zend.IS_ARRAY {
 		zend.ZvalPtrDtor(intern.GetArray())
 		if zend.Z_REFCOUNT_P(array) == 1 {
 			zend.ZVAL_COPY(intern.GetArray(), array)
@@ -876,7 +876,7 @@ func SplArraySetArray(object *zend.Zval, intern *SplArrayObject, array *zend.Zva
 		} else {
 			var handler zend.ZendObjectGetPropertiesT = zend.Z_OBJ_HT(*array).GetGetProperties()
 			if handler != zend.ZendStdGetProperties {
-				zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", zend.ZSTR_VAL(zend.Z_OBJCE_P(array).GetName()), zend.ZSTR_VAL(intern.GetStd().GetCe().GetName()))
+				zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "Overloaded object of type %s is not compatible with %s", zend.Z_OBJCE_P(array).GetName().GetVal(), intern.GetStd().GetCe().GetName().GetVal())
 				return
 			}
 			zend.ZvalPtrDtor(intern.GetArray())
@@ -1106,16 +1106,16 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 			for ; _p != _end; _p++ {
 				var _z *zend.Zval = _p.GetVal()
 
-				if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+				if _z.GetType() == zend.IS_UNDEF {
 					continue
 				}
 				key = _p.GetKey()
 				val = _z
-				if zend.Z_TYPE_P(val) == zend.IS_INDIRECT {
-					if zend.Z_TYPE_P(zend.Z_INDIRECT_P(val)) == zend.IS_UNDEF {
+				if val.GetType() == zend.IS_INDIRECT {
+					if zend.Z_INDIRECT_P(val).GetType() == zend.IS_UNDEF {
 						continue
 					}
-					if key != nil && zend.ZSTR_VAL(key)[0] == '0' {
+					if key != nil && key.GetVal()[0] == '0' {
 						continue
 					}
 				}
@@ -1125,7 +1125,7 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 		}
 		return count
 	} else {
-		return zend.ZendHashNumElements(aht)
+		return aht.GetNNumOfElements()
 	}
 }
 func SplArrayObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
@@ -1196,7 +1196,7 @@ exit:
 	}
 	zend.ZVAL_NULL(zend.Z_REFVAL(params[0]))
 	zend.ZvalPtrDtor(&params[0])
-	zend.ZendStringFree(zend.Z_STR(function_name))
+	zend.ZendStringFree(function_name.GetStr())
 }
 func zim_spl_Array_asort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	SplArrayMethod(execute_data, return_value, "asort", b.SizeOf("\"asort\"")-1, SPL_ARRAY_METHOD_MAY_USER_ARG)
@@ -1227,9 +1227,9 @@ func zim_spl_Array_current(execute_data *zend.ZendExecuteData, return_value *zen
 	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
-	if zend.Z_TYPE_P(entry) == zend.IS_INDIRECT {
+	if entry.GetType() == zend.IS_INDIRECT {
 		entry = zend.Z_INDIRECT_P(entry)
-		if zend.Z_TYPE_P(entry) == zend.IS_UNDEF {
+		if entry.GetType() == zend.IS_UNDEF {
 			return
 		}
 	}
@@ -1277,11 +1277,11 @@ func zim_spl_Array_hasChildren(execute_data *zend.ZendExecuteData, return_value 
 		zend.RETVAL_FALSE
 		return
 	}
-	if zend.Z_TYPE_P(entry) == zend.IS_INDIRECT {
+	if entry.GetType() == zend.IS_INDIRECT {
 		entry = zend.Z_INDIRECT_P(entry)
 	}
 	zend.ZVAL_DEREF(entry)
-	zend.RETVAL_BOOL(zend.Z_TYPE_P(entry) == zend.IS_ARRAY || zend.Z_TYPE_P(entry) == zend.IS_OBJECT && !intern.IsChildArraysOnly())
+	zend.RETVAL_BOOL(entry.GetType() == zend.IS_ARRAY || entry.GetType() == zend.IS_OBJECT && !intern.IsChildArraysOnly())
 	return
 }
 func zim_spl_Array_getChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1296,11 +1296,11 @@ func zim_spl_Array_getChildren(execute_data *zend.ZendExecuteData, return_value 
 	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
 		return
 	}
-	if zend.Z_TYPE_P(entry) == zend.IS_INDIRECT {
+	if entry.GetType() == zend.IS_INDIRECT {
 		entry = zend.Z_INDIRECT_P(entry)
 	}
 	zend.ZVAL_DEREF(entry)
-	if zend.Z_TYPE_P(entry) == zend.IS_OBJECT {
+	if entry.GetType() == zend.IS_OBJECT {
 		if intern.IsChildArraysOnly() {
 			return
 		}
@@ -1387,7 +1387,7 @@ func zim_spl_Array_unserialize(execute_data *zend.ZendExecuteData, return_value 
 	}
 	p++
 	zflags = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(zflags, &p, s+buf_len, &var_hash) == 0 || zend.Z_TYPE_P(zflags) != zend.IS_LONG {
+	if standard.PhpVarUnserialize(zflags, &p, s+buf_len, &var_hash) == 0 || zflags.GetType() != zend.IS_LONG {
 		goto outexcept
 	}
 	p--
@@ -1415,12 +1415,12 @@ func zim_spl_Array_unserialize(execute_data *zend.ZendExecuteData, return_value 
 			goto outexcept
 		}
 		array = standard.VarTmpVar(&var_hash)
-		if standard.PhpVarUnserialize(array, &p, s+buf_len, &var_hash) == 0 || zend.Z_TYPE_P(array) != zend.IS_ARRAY && zend.Z_TYPE_P(array) != zend.IS_OBJECT {
+		if standard.PhpVarUnserialize(array, &p, s+buf_len, &var_hash) == 0 || array.GetType() != zend.IS_ARRAY && array.GetType() != zend.IS_OBJECT {
 			goto outexcept
 		}
 		intern.SetIsCloneMask(false)
 		intern.AddArFlags(flags & SPL_ARRAY_CLONE_MASK)
-		if zend.Z_TYPE_P(array) == zend.IS_ARRAY {
+		if array.GetType() == zend.IS_ARRAY {
 			zend.ZvalPtrDtor(intern.GetArray())
 			zend.ZVAL_COPY_VALUE(intern.GetArray(), array)
 			zend.ZVAL_NULL(array)
@@ -1441,7 +1441,7 @@ func zim_spl_Array_unserialize(execute_data *zend.ZendExecuteData, return_value 
 	}
 	p++
 	members = standard.VarTmpVar(&var_hash)
-	if standard.PhpVarUnserialize(members, &p, s+buf_len, &var_hash) == 0 || zend.Z_TYPE_P(members) != zend.IS_ARRAY {
+	if standard.PhpVarUnserialize(members, &p, s+buf_len, &var_hash) == 0 || members.GetType() != zend.IS_ARRAY {
 		goto outexcept
 	}
 
@@ -1510,7 +1510,7 @@ func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_valu
 	storage_zv = zend.ZendHashIndexFind(data, 1)
 	members_zv = zend.ZendHashIndexFind(data, 2)
 	iterator_class_zv = zend.ZendHashIndexFind(data, 3)
-	if flags_zv == nil || storage_zv == nil || members_zv == nil || zend.Z_TYPE_P(flags_zv) != zend.IS_LONG || zend.Z_TYPE_P(members_zv) != zend.IS_ARRAY || iterator_class_zv != nil && (zend.Z_TYPE_P(iterator_class_zv) != zend.IS_NULL && zend.Z_TYPE_P(iterator_class_zv) != zend.IS_STRING) {
+	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != zend.IS_LONG || members_zv.GetType() != zend.IS_ARRAY || iterator_class_zv != nil && (iterator_class_zv.GetType() != zend.IS_NULL && iterator_class_zv.GetType() != zend.IS_STRING) {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
@@ -1524,13 +1524,13 @@ func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_valu
 		SplArraySetArray(zend.ZEND_THIS, intern, storage_zv, 0, 1)
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(members_zv))
-	if iterator_class_zv != nil && zend.Z_TYPE_P(iterator_class_zv) == zend.IS_STRING {
+	if iterator_class_zv != nil && iterator_class_zv.GetType() == zend.IS_STRING {
 		var ce *zend.ZendClassEntry = zend.ZendLookupClass(zend.Z_STR_P(iterator_class_zv))
 		if ce == nil {
-			zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", zend.ZSTR_VAL(zend.Z_STR_P(iterator_class_zv)))
+			zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; no such class exists", zend.Z_STR_P(iterator_class_zv).GetVal())
 			return
 		} else if zend.InstanceofFunction(ce, spl_ce_Iterator) == 0 {
-			zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", zend.ZSTR_VAL(zend.Z_STR_P(iterator_class_zv)))
+			zend.ZendThrowExceptionEx(spl_ce_UnexpectedValueException, 0, "Cannot deserialize ArrayObject with iterator class '%s'; this class does not implement the Iterator interface", zend.Z_STR_P(iterator_class_zv).GetVal())
 			return
 		} else {
 			intern.SetCeGetIterator(ce)

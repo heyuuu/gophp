@@ -12,7 +12,7 @@ func IncompleteClassMessage(object *zend.Zval, error_type int) {
 	var class_name *zend.ZendString
 	class_name = PhpLookupClassName(object)
 	if class_name != nil {
-		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, zend.ZSTR_VAL(class_name))
+		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, class_name.GetVal())
 		zend.ZendStringReleaseEx(class_name, 0)
 	} else {
 		core.PhpErrorDocref(nil, error_type, INCOMPLETE_CLASS_MSG, "unknown")
@@ -74,7 +74,7 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 	var val *zend.Zval
 	var object_properties *zend.HashTable
 	object_properties = zend.Z_OBJPROP_P(object)
-	if b.Assign(&val, zend.ZendHashStrFind(object_properties, MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && zend.Z_TYPE_P(val) == zend.IS_STRING {
+	if b.Assign(&val, zend.ZendHashStrFind(object_properties, MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1)) != nil && val.GetType() == zend.IS_STRING {
 		return zend.ZendStringCopy(zend.Z_STR_P(val))
 	}
 	return nil

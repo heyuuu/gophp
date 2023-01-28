@@ -247,10 +247,10 @@ func ZifAbs(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if zend.Z_TYPE_P(value) == zend.IS_DOUBLE {
+	if value.GetType() == zend.IS_DOUBLE {
 		zend.RETVAL_DOUBLE(fabs(zend.Z_DVAL_P(value)))
 		return
-	} else if zend.Z_TYPE_P(value) == zend.IS_LONG {
+	} else if value.GetType() == zend.IS_LONG {
 		if zend.Z_LVAL_P(value) == zend.ZEND_LONG_MIN {
 			zend.RETVAL_DOUBLE(-float64(zend.ZEND_LONG_MIN))
 			return
@@ -328,10 +328,10 @@ func ZifCeil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if zend.Z_TYPE_P(value) == zend.IS_DOUBLE {
+	if value.GetType() == zend.IS_DOUBLE {
 		zend.RETVAL_DOUBLE(ceil(zend.Z_DVAL_P(value)))
 		return
-	} else if zend.Z_TYPE_P(value) == zend.IS_LONG {
+	} else if value.GetType() == zend.IS_LONG {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
 		return
 	}
@@ -404,10 +404,10 @@ func ZifFloor(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	zend.ConvertScalarToNumberEx(value)
-	if zend.Z_TYPE_P(value) == zend.IS_DOUBLE {
+	if value.GetType() == zend.IS_DOUBLE {
 		zend.RETVAL_DOUBLE(floor(zend.Z_DVAL_P(value)))
 		return
-	} else if zend.Z_TYPE_P(value) == zend.IS_LONG {
+	} else if value.GetType() == zend.IS_LONG {
 		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
 		return
 	}
@@ -512,7 +512,7 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	zend.ConvertScalarToNumberEx(value)
-	switch zend.Z_TYPE_P(value) {
+	switch value.GetType() {
 	case zend.IS_LONG:
 
 		/* Simple case - long that doesn't need to be rounded. */
@@ -522,7 +522,7 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return
 		}
 	case zend.IS_DOUBLE:
-		if zend.Z_TYPE_P(value) == zend.IS_LONG {
+		if value.GetType() == zend.IS_LONG {
 			return_val = float64(zend.Z_LVAL_P(value))
 		} else {
 			return_val = zend.Z_DVAL_P(value)
@@ -2457,7 +2457,7 @@ func _phpMathBasetolong(arg *zend.Zval, base int) zend.ZendLong {
 	var i zend.ZendLong
 	var c byte
 	var s *byte
-	if zend.Z_TYPE_P(arg) != zend.IS_STRING || base < 2 || base > 36 {
+	if arg.GetType() != zend.IS_STRING || base < 2 || base > 36 {
 		return 0
 	}
 	s = zend.Z_STRVAL_P(arg)
@@ -2492,7 +2492,7 @@ func _phpMathBasetozval(arg *zend.Zval, base int, ret *zend.Zval) int {
 	var cutoff zend.ZendLong
 	var cutlim int
 	var invalidchars int = 0
-	if zend.Z_TYPE_P(arg) != zend.IS_STRING || base < 2 || base > 36 {
+	if arg.GetType() != zend.IS_STRING || base < 2 || base > 36 {
 		return zend.FAILURE
 	}
 	s = zend.Z_STRVAL_P(arg)
@@ -2571,7 +2571,7 @@ func _phpMathLongtobase(arg *zend.Zval, base int) *zend.ZendString {
 	var ptr *byte
 	var end *byte
 	var value zend.ZendUlong
-	if zend.Z_TYPE_P(arg) != zend.IS_LONG || base < 2 || base > 36 {
+	if arg.GetType() != zend.IS_LONG || base < 2 || base > 36 {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
 	value = zend.Z_LVAL_P(arg)
@@ -2590,10 +2590,10 @@ func _phpMathLongtobase(arg *zend.Zval, base int) *zend.ZendString {
 }
 func _phpMathZvaltobase(arg *zend.Zval, base int) *zend.ZendString {
 	var digits []byte = "0123456789abcdefghijklmnopqrstuvwxyz"
-	if zend.Z_TYPE_P(arg) != zend.IS_LONG && zend.Z_TYPE_P(arg) != zend.IS_DOUBLE || base < 2 || base > 36 {
+	if arg.GetType() != zend.IS_LONG && arg.GetType() != zend.IS_DOUBLE || base < 2 || base > 36 {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
-	if zend.Z_TYPE_P(arg) == zend.IS_DOUBLE {
+	if arg.GetType() == zend.IS_DOUBLE {
 		var fvalue float64 = floor(zend.Z_DVAL_P(arg))
 		var ptr *byte
 		var end *byte
@@ -2898,7 +2898,7 @@ func ZifDecbin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE_P(arg) != zend.IS_LONG {
+	if arg.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 2)
@@ -2971,7 +2971,7 @@ func ZifDecoct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE_P(arg) != zend.IS_LONG {
+	if arg.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 8)
@@ -3044,7 +3044,7 @@ func ZifDechex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	if zend.Z_TYPE_P(arg) != zend.IS_LONG {
+	if arg.GetType() != zend.IS_LONG {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 16)
@@ -3174,7 +3174,7 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	tmpbuf = core.Strpprintf(0, "%.*F", dec, d)
 	if tmpbuf == nil {
 		return nil
-	} else if !(isdigit(int(zend.ZSTR_VAL(tmpbuf)[0]))) {
+	} else if !(isdigit(int(tmpbuf.GetVal()[0]))) {
 		return tmpbuf
 	}
 
@@ -3187,7 +3187,7 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	/* find decimal point, if expected */
 
 	if dec != 0 {
-		dp = strpbrk(zend.ZSTR_VAL(tmpbuf), ".,")
+		dp = strpbrk(tmpbuf.GetVal(), ".,")
 	} else {
 		dp = nil
 	}
@@ -3195,12 +3195,12 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	/* calculate the length of the return buffer */
 
 	if dp != nil {
-		integral = dp - zend.ZSTR_VAL(tmpbuf)
+		integral = dp - tmpbuf.GetVal()
 	} else {
 
 		/* no decimal point was found */
 
-		integral = zend.ZSTR_LEN(tmpbuf)
+		integral = tmpbuf.GetLen()
 
 		/* no decimal point was found */
 
@@ -3225,8 +3225,8 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 		reslen++
 	}
 	res = zend.ZendStringAlloc(reslen, 0)
-	s = zend.ZSTR_VAL(tmpbuf) + zend.ZSTR_LEN(tmpbuf) - 1
-	t = zend.ZSTR_VAL(res) + reslen
+	s = tmpbuf.GetVal() + tmpbuf.GetLen() - 1
+	t = res.GetVal() + reslen
 	b.PostDec(&(*t)) = '0'
 
 	/* copy the decimal places.
@@ -3268,10 +3268,10 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	/* copy the numbers before the decimal point, adding thousand
 	 * separator every three digits */
 
-	for s >= zend.ZSTR_VAL(tmpbuf) {
+	for s >= tmpbuf.GetVal() {
 		*s--
 		b.PostDec(&(*t)) = (*s) + 1
-		if thousand_sep != nil && b.PreInc(&count)%3 == 0 && s >= zend.ZSTR_VAL(tmpbuf) {
+		if thousand_sep != nil && b.PreInc(&count)%3 == 0 && s >= tmpbuf.GetVal() {
 			t -= thousand_sep_len
 			memcpy(t+1, thousand_sep, thousand_sep_len)
 		}
@@ -3282,7 +3282,7 @@ func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len i
 	if is_negative != 0 {
 		b.PostDec(&(*t)) = '-'
 	}
-	zend.ZSTR_LEN(res) = reslen
+	res.GetLen() = reslen
 	zend.ZendStringReleaseEx(tmpbuf, 0)
 	return res
 }

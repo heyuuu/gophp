@@ -138,11 +138,11 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	bytes = zend.ZendStringAlloc(size, 0)
-	if PhpRandomBytesThrow(zend.ZSTR_VAL(bytes), size) == zend.FAILURE {
+	if PhpRandomBytesThrow(bytes.GetVal(), size) == zend.FAILURE {
 		zend.ZendStringReleaseEx(bytes, 0)
 		return
 	}
-	zend.ZSTR_VAL(bytes)[size] = '0'
+	bytes.GetVal()[size] = '0'
 	zend.RETVAL_STR(bytes)
 	return
 }

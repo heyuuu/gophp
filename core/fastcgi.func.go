@@ -980,7 +980,7 @@ func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var key *zend.ZendString = zend.ZendStringInit(name, name_len, 1)
 	zend.ZVAL_NEW_STR(&zvalue, zend.ZendStringInit(value, value_len, 1))
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
-	zend.GC_MAKE_PERSISTENT_LOCAL(zend.Z_STR(zvalue))
+	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
 	zend.ZendHashAdd(&FcgiMgmtVars, key, &zvalue)
 	zend.ZendStringReleaseEx(key, 1)
 }

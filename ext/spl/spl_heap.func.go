@@ -85,7 +85,7 @@ func SplPtrHeapZvalMaxCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, a, b)
-	return int(zend.Z_LVAL(result))
+	return int(result.GetLval())
 }
 func SplPtrHeapZvalMinCmp(x any, y any, object *zend.Zval) int {
 	var a *zend.Zval = x
@@ -111,7 +111,7 @@ func SplPtrHeapZvalMinCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, b, a)
-	return int(zend.Z_LVAL(result))
+	return int(result.GetLval())
 }
 func SplPtrPqueueElemCmp(x any, y any, object *zend.Zval) int {
 	var a *SplPqueueElem = x
@@ -139,7 +139,7 @@ func SplPtrPqueueElemCmp(x any, y any, object *zend.Zval) int {
 		}
 	}
 	zend.CompareFunction(&result, a_priority_p, b_priority_p)
-	return int(zend.Z_LVAL(result))
+	return int(result.GetLval())
 }
 func SplPtrHeapInit(cmp SplPtrHeapCmpFunc, ctor SplPtrHeapCtorFunc, dtor SplPtrHeapDtorFunc, elem_size int) *SplPtrHeap {
 	var heap *SplPtrHeap = zend.Emalloc(b.SizeOf("spl_ptr_heap"))
@@ -343,7 +343,7 @@ func SplHeapObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
 		*count = 0
 		return zend.FAILURE
 	}
-	*count = SplPtrHeapCount(intern.GetHeap())
+	*count = intern.GetHeap().GetCount()
 	return zend.SUCCESS
 }
 func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.HashTable {
@@ -356,7 +356,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
-	debug_info = zend.ZendNewArray(zend.ZendHashNumElements(intern.GetStd().GetProperties()) + 1)
+	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(ce, "flags", b.SizeOf("\"flags\"")-1)
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
@@ -405,7 +405,7 @@ func zim_spl_SplHeap_count(execute_data *zend.ZendExecuteData, return_value *zen
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	count = SplPtrHeapCount(intern.GetHeap())
+	count = intern.GetHeap().GetCount()
 	zend.RETVAL_LONG(count)
 	return
 }
@@ -414,7 +414,7 @@ func zim_spl_SplHeap_isEmpty(execute_data *zend.ZendExecuteData, return_value *z
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(SplPtrHeapCount(intern.GetHeap()) == 0)
+	zend.RETVAL_BOOL(intern.GetHeap().GetCount() == 0)
 	return
 }
 func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

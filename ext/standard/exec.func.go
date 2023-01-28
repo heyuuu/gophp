@@ -221,7 +221,7 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 	if ret_array == nil {
 		ret = PhpExec(mode, cmd, nil, return_value)
 	} else {
-		if zend.Z_TYPE_P(zend.Z_REFVAL_P(ret_array)) == zend.IS_ARRAY {
+		if zend.Z_REFVAL_P(ret_array).GetType() == zend.IS_ARRAY {
 			zend.ZVAL_DEREF(ret_array)
 			zend.SEPARATE_ARRAY(ret_array)
 		} else {
@@ -270,7 +270,7 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 		if mb_len < 0 {
 			continue
 		} else if mb_len > 1 {
-			memcpy(zend.ZSTR_VAL(cmd)+y, str+x, mb_len)
+			memcpy(cmd.GetVal()+y, str+x, mb_len)
 			y += mb_len
 			x += mb_len - 1
 			continue
@@ -284,9 +284,9 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 			} else if p != nil && (*p) == str[x] {
 				p = nil
 			} else {
-				zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\\'
+				cmd.GetVal()[b.PostInc(&y)] = '\\'
 			}
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = str[x]
+			cmd.GetVal()[b.PostInc(&y)] = str[x]
 			break
 		case '#':
 
@@ -329,12 +329,12 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 		case 'x':
 
 		case 'x':
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\\'
+			cmd.GetVal()[b.PostInc(&y)] = '\\'
 		default:
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = str[x]
+			cmd.GetVal()[b.PostInc(&y)] = str[x]
 		}
 	}
-	zend.ZSTR_VAL(cmd)[y] = '0'
+	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped command exceeds the allowed length of %zu bytes", CmdMaxLen)
 		zend.ZendStringReleaseEx(cmd, 0)
@@ -351,7 +351,7 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 		 * Arbitrary cutoff point of 4096 */
 
 	}
-	zend.ZSTR_LEN(cmd) = y
+	cmd.GetLen() = y
 	return cmd
 }
 func PhpEscapeShellArg(str *byte) *zend.ZendString {
@@ -368,7 +368,7 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 		return zend.ZSTR_EMPTY_ALLOC()
 	}
 	cmd = zend.ZendStringSafeAlloc(4, l, 2, 0)
-	zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\''
+	cmd.GetVal()[b.PostInc(&y)] = '\''
 	for x = 0; x < l; x++ {
 		var mb_len int = PhpMblen(str+x, l-x)
 
@@ -377,22 +377,22 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 		if mb_len < 0 {
 			continue
 		} else if mb_len > 1 {
-			memcpy(zend.ZSTR_VAL(cmd)+y, str+x, mb_len)
+			memcpy(cmd.GetVal()+y, str+x, mb_len)
 			y += mb_len
 			x += mb_len - 1
 			continue
 		}
 		switch str[x] {
 		case '\'':
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\''
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\\'
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\''
+			cmd.GetVal()[b.PostInc(&y)] = '\''
+			cmd.GetVal()[b.PostInc(&y)] = '\\'
+			cmd.GetVal()[b.PostInc(&y)] = '\''
 		default:
-			zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = str[x]
+			cmd.GetVal()[b.PostInc(&y)] = str[x]
 		}
 	}
-	zend.ZSTR_VAL(cmd)[b.PostInc(&y)] = '\''
-	zend.ZSTR_VAL(cmd)[y] = '0'
+	cmd.GetVal()[b.PostInc(&y)] = '\''
+	cmd.GetVal()[y] = '0'
 	if y > CmdMaxLen+1 {
 		core.PhpErrorDocref(nil, zend.E_ERROR, "Escaped argument exceeds the allowed length of %zu bytes", CmdMaxLen)
 		zend.ZendStringReleaseEx(cmd, 0)
@@ -409,7 +409,7 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 		 * Arbitrary cutoff point of 4096 */
 
 	}
-	zend.ZSTR_LEN(cmd) = y
+	cmd.GetLen() = y
 	return cmd
 }
 func ZifEscapeshellcmd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -661,7 +661,7 @@ func ZifShellExec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	stream = streams.PhpStreamFopenFromPipe(in, "rb")
 	ret = core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)
 	core.PhpStreamClose(stream)
-	if ret != nil && zend.ZSTR_LEN(ret) > 0 {
+	if ret != nil && ret.GetLen() > 0 {
 		zend.RETVAL_STR(ret)
 	}
 }

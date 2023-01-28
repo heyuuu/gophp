@@ -46,7 +46,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	var is_array zend.ZendBool = 0
 	var symtable1 *zend.HashTable = nil
 	r.Assert(var_name != nil)
-	if track_vars_array != nil && zend.Z_TYPE_P(track_vars_array) == zend.IS_ARRAY {
+	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
 		symtable1 = zend.Z_ARRVAL_P(track_vars_array)
 	}
 	if symtable1 == nil {
@@ -185,7 +185,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 			if index == nil {
 				zend.ArrayInit(&gpc_element)
 				if b.Assign(&gpc_element_p, zend.ZendHashNextIndexInsert(symtable1, &gpc_element)) == nil {
-					zend.ZendArrayDestroy(zend.Z_ARR(gpc_element))
+					zend.ZendArrayDestroy(gpc_element.GetArr())
 					zend.ZvalPtrDtorNogc(val)
 					zend.FreeAlloca(var_orig, use_heap)
 					return
@@ -197,10 +197,10 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 					zend.ArrayInit(&tmp)
 					gpc_element_p = zend.ZendSymtableStrUpdateInd(symtable1, index, index_len, &tmp)
 				} else {
-					if zend.Z_TYPE_P(gpc_element_p) == zend.IS_INDIRECT {
+					if gpc_element_p.GetType() == zend.IS_INDIRECT {
 						gpc_element_p = zend.Z_INDIRECT_P(gpc_element_p)
 					}
-					if zend.Z_TYPE_P(gpc_element_p) != zend.IS_ARRAY {
+					if gpc_element_p.GetType() != zend.IS_ARRAY {
 						zend.ZvalPtrDtorNogc(gpc_element_p)
 						zend.ArrayInit(gpc_element_p)
 					} else {
@@ -309,16 +309,16 @@ func AddPostVar(arr *zend.Zval, var_ *PostVarDataT, eof zend.ZendBool) zend.Zend
 }
 func AddPostVars(arr *zend.Zval, vars *PostVarDataT, eof zend.ZendBool) int {
 	var max_vars uint64 = PG(max_input_vars)
-	vars.SetPtr(zend.ZSTR_VAL(vars.GetStr().GetS()))
-	vars.SetEnd(zend.ZSTR_VAL(vars.GetStr().GetS()) + zend.ZSTR_LEN(vars.GetStr().GetS()))
+	vars.SetPtr(vars.GetStr().GetS().GetVal())
+	vars.SetEnd(vars.GetStr().GetS().GetVal() + vars.GetStr().GetS().GetLen())
 	for AddPostVar(arr, vars, eof) != 0 {
 		if b.PreInc(&(vars.GetCnt())) > max_vars {
 			PhpErrorDocref(nil, zend.E_WARNING, "Input variables exceeded %"+"llu"+". "+"To increase the limit change max_input_vars in php.ini.", max_vars)
 			return zend.FAILURE
 		}
 	}
-	if eof == 0 && zend.ZSTR_VAL(vars.GetStr().GetS()) != vars.GetPtr() {
-		memmove(zend.ZSTR_VAL(vars.GetStr().GetS()), vars.GetPtr(), b.Assign(&(zend.ZSTR_LEN(vars.GetStr().GetS())), vars.GetEnd()-vars.GetPtr()))
+	if eof == 0 && vars.GetStr().GetS().GetVal() != vars.GetPtr() {
+		memmove(vars.GetStr().GetS().GetVal(), vars.GetPtr(), b.Assign(&(vars.GetStr().GetS().GetLen()), vars.GetEnd()-vars.GetPtr()))
 	}
 	return zend.SUCCESS
 }
@@ -548,7 +548,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 		for i = 0; i < SG(request_info).argc; i++ {
 			zend.ZVAL_STRING(&tmp, SG(request_info).argv[i])
 			if zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(arr), &tmp) == nil {
-				zend.ZendStringEfree(zend.Z_STR(tmp))
+				zend.ZendStringEfree(tmp.GetStr())
 			}
 		}
 	} else if s != nil && (*s) {
@@ -564,7 +564,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 			zend.ZVAL_STRING(&tmp, ss)
 			count++
 			if zend.ZendHashNextIndexInsert(zend.Z_ARRVAL(arr), &tmp) == nil {
-				zend.ZendStringEfree(zend.Z_STR(tmp))
+				zend.ZendStringEfree(tmp.GetStr())
 			}
 			if space != nil {
 				*space = '+'
@@ -587,7 +587,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 		zend.ZendHashUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
 		zend.ZendHashUpdate(&(zend.ExecutorGlobals.GetSymbolTable()), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
 	}
-	if track_vars_array != nil && zend.Z_TYPE_P(track_vars_array) == zend.IS_ARRAY {
+	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
 		zend.Z_ADDREF(arr)
 		zend.ZendHashUpdate(zend.Z_ARRVAL_P(track_vars_array), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
 		zend.ZendHashUpdate(zend.Z_ARRVAL_P(track_vars_array), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
@@ -627,7 +627,7 @@ func PhpRegisterServerVariables() {
 
 	zend.ZVAL_DOUBLE(&tmp, SapiGetRequestTime())
 	PhpRegisterVariableQuick("REQUEST_TIME_FLOAT", b.SizeOf("\"REQUEST_TIME_FLOAT\"")-1, &tmp, ht)
-	zend.ZVAL_LONG(&tmp, zend.ZendDvalToLval(zend.Z_DVAL(tmp)))
+	zend.ZVAL_LONG(&tmp, zend.ZendDvalToLval(tmp.GetDval()))
 	PhpRegisterVariableQuick("REQUEST_TIME", b.SizeOf("\"REQUEST_TIME\"")-1, &tmp, ht)
 }
 func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
@@ -643,16 +643,16 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 		for ; _p != _end; _p++ {
 			var _z *zend.Zval = _p.GetVal()
 
-			if zend.Z_TYPE_P(_z) == zend.IS_UNDEF {
+			if _z.GetType() == zend.IS_UNDEF {
 				continue
 			}
 			num_key = _p.GetH()
 			string_key = _p.GetKey()
 			src_entry = _z
-			if zend.Z_TYPE_P(src_entry) != zend.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, zend.ZendHashFind(dest, string_key)) == nil || string_key == nil && b.Assign(&dest_entry, zend.ZendHashIndexFind(dest, num_key)) == nil || zend.Z_TYPE_P(dest_entry) != zend.IS_ARRAY {
+			if src_entry.GetType() != zend.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, zend.ZendHashFind(dest, string_key)) == nil || string_key == nil && b.Assign(&dest_entry, zend.ZendHashIndexFind(dest, num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY {
 				zend.Z_TRY_ADDREF_P(src_entry)
 				if string_key != nil {
-					if globals_check == 0 || zend.ZSTR_LEN(string_key) != b.SizeOf("\"GLOBALS\"")-1 || memcmp(zend.ZSTR_VAL(string_key), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
+					if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
 						zend.ZendHashUpdate(dest, string_key, src_entry)
 					} else {
 						zend.Z_TRY_DELREF_P(src_entry)

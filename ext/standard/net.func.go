@@ -19,8 +19,8 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	switch addr.sa_family {
 	case AF_INET:
 		var ret *zend.ZendString = zend.ZendStringAlloc(INET_ADDRSTRLEN, 0)
-		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), zend.ZSTR_VAL(ret), INET_ADDRSTRLEN) {
-			zend.ZSTR_LEN(ret) = strlen(zend.ZSTR_VAL(ret))
+		if inet_ntop(AF_INET, &((*__struct__sockaddr_in)(addr).sin_addr), ret.GetVal(), INET_ADDRSTRLEN) {
+			ret.GetLen() = strlen(ret.GetVal())
 			return ret
 		}
 		zend.ZendStringEfree(ret)
@@ -32,15 +32,15 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	switch addr.sa_family {
 	case AF_INET:
 		var ret *zend.ZendString = zend.ZendStringAlloc(NI_MAXHOST, 0)
-		if getnameinfo(addr, addrlen, zend.ZSTR_VAL(ret), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == zend.SUCCESS {
+		if getnameinfo(addr, addrlen, ret.GetVal(), NI_MAXHOST, nil, 0, NI_NUMERICHOST) == zend.SUCCESS {
 
 			/* Also demangle numeric host with %name suffix */
 
-			var colon *byte = strchr(zend.ZSTR_VAL(ret), '%')
+			var colon *byte = strchr(ret.GetVal(), '%')
 			if colon != nil {
 				*colon = 0
 			}
-			zend.ZSTR_LEN(ret) = strlen(zend.ZSTR_VAL(ret))
+			ret.GetLen() = strlen(ret.GetVal())
 			return ret
 		}
 		zend.ZendStringEfree(ret)

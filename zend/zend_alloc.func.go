@@ -1698,7 +1698,7 @@ func TrackedFreeAll() {
 		for ; _p != _end; _p++ {
 			var _z *Zval = _p.GetVal()
 
-			if Z_TYPE_P(_z) == IS_UNDEF {
+			if _z.GetType() == IS_UNDEF {
 				continue
 			}
 			h = _p.GetH()

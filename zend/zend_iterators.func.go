@@ -34,7 +34,7 @@ func ZendIteratorDtor(iter *ZendObjectIterator) {
 	ZendObjectsStoreDel(iter.GetStd())
 }
 func ZendIteratorUnwrap(array_ptr *Zval) *ZendObjectIterator {
-	ZEND_ASSERT(Z_TYPE_P(array_ptr) == IS_OBJECT)
+	ZEND_ASSERT(array_ptr.GetType() == IS_OBJECT)
 	if Z_OBJ_HT_P(array_ptr) == &IteratorObjectHandlers {
 		return (*ZendObjectIterator)(Z_OBJ_P(array_ptr))
 	}

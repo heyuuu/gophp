@@ -37,12 +37,12 @@ func GetSafeCharsetHint() *byte {
 	return lastCodeset
 }
 func OnSetFacility(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	var facility *byte = zend.ZSTR_VAL(new_value)
+	var facility *byte = new_value.GetVal()
 	return zend.FAILURE
 }
 func OnSetPrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var i zend.ZendLong
-	zend.ZEND_ATOL(i, zend.ZSTR_VAL(new_value))
+	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
 		zend.ExecutorGlobals.SetPrecision(i)
 		return zend.SUCCESS
@@ -52,7 +52,7 @@ func OnSetPrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg
 }
 func OnSetSerializePrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var i zend.ZendLong
-	zend.ZEND_ATOL(i, zend.ZSTR_VAL(new_value))
+	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
 		PG(serialize_precision) = i
 		return zend.SUCCESS
@@ -63,7 +63,7 @@ func OnSetSerializePrecision(entry *zend.ZendIniEntry, new_value *zend.ZendStrin
 func OnChangeMemoryLimit(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	var value int
 	if new_value != nil {
-		value = zend.ZendAtol(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value))
+		value = zend.ZendAtol(new_value.GetVal(), new_value.GetLen())
 	} else {
 		value = int64(1) << 30
 	}
@@ -89,7 +89,7 @@ func OnChangeMemoryLimit(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	return zend.SUCCESS
 }
 func OnSetLogFilter(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	var filter *byte = zend.ZSTR_VAL(new_value)
+	var filter *byte = new_value.GetVal()
 	if !(strcmp(filter, "all")) {
 		PG(syslog_filter) = PHP_SYSLOG_FILTER_ALL
 		return zend.SUCCESS
@@ -214,11 +214,11 @@ func OnUpdateTimeout(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 
 		/* Don't set a timeout on startup, only per-request */
 
-		zend.ZEND_ATOL(zend.ExecutorGlobals.GetTimeoutSeconds(), zend.ZSTR_VAL(new_value))
+		zend.ZEND_ATOL(zend.ExecutorGlobals.GetTimeoutSeconds(), new_value.GetVal())
 		return zend.SUCCESS
 	}
 	zend.ZendUnsetTimeout()
-	zend.ZEND_ATOL(zend.ExecutorGlobals.GetTimeoutSeconds(), zend.ZSTR_VAL(new_value))
+	zend.ZEND_ATOL(zend.ExecutorGlobals.GetTimeoutSeconds(), new_value.GetVal())
 	if stage != PHP_INI_STAGE_DEACTIVATE {
 
 		/*
@@ -264,7 +264,7 @@ func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
 	return mode
 }
 func OnUpdateDisplayErrors(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	PG(display_errors) = zend.ZendBool(PhpGetDisplayErrorsMode(zend.ZSTR_VAL(new_value), zend.ZSTR_LEN(new_value)))
+	PG(display_errors) = zend.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
 	return zend.SUCCESS
 }
 func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
@@ -274,18 +274,18 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 	var tmp_value *byte
 	if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
 		if ini_entry.GetOrigValue() != nil {
-			tmp_value = zend.ZSTR_VAL(ini_entry.GetOrigValue())
+			tmp_value = ini_entry.GetOrigValue().GetVal()
 		} else {
 			tmp_value = nil
 		}
 		if ini_entry.GetOrigValue() != nil {
-			tmp_value_length = zend.ZSTR_LEN(ini_entry.GetOrigValue())
+			tmp_value_length = ini_entry.GetOrigValue().GetLen()
 		} else {
 			tmp_value_length = 0
 		}
 	} else if ini_entry.GetValue() != nil {
-		tmp_value = zend.ZSTR_VAL(ini_entry.GetValue())
-		tmp_value_length = zend.ZSTR_LEN(ini_entry.GetValue())
+		tmp_value = ini_entry.GetValue().GetVal()
+		tmp_value_length = ini_entry.GetValue().GetLen()
 	} else {
 		tmp_value = nil
 		tmp_value_length = 0
@@ -340,7 +340,7 @@ func PhpGetOutputEncoding() *byte {
 	return ""
 }
 func OnUpdateDefaultCharset(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if memchr(zend.ZSTR_VAL(new_value), '0', zend.ZSTR_LEN(new_value)) || strpbrk(zend.ZSTR_VAL(new_value), "\r\n") {
+	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
 		return zend.FAILURE
 	}
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
@@ -353,7 +353,7 @@ func OnUpdateDefaultCharset(entry *zend.ZendIniEntry, new_value *zend.ZendString
 	return zend.SUCCESS
 }
 func OnUpdateDefaultMimeTye(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if memchr(zend.ZSTR_VAL(new_value), '0', zend.ZSTR_LEN(new_value)) || strpbrk(zend.ZSTR_VAL(new_value), "\r\n") {
+	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
 		return zend.FAILURE
 	}
 	return zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
@@ -391,8 +391,8 @@ func OnUpdateOutputEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString
 func OnUpdateErrorLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	/* Only do the safemode/open_basedir check at runtime */
 
-	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(zend.ZSTR_VAL(new_value), "syslog") {
-		if PG(open_basedir) && PhpCheckOpenBasedir(zend.ZSTR_VAL(new_value)) != 0 {
+	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetVal(), "syslog") {
+		if PG(open_basedir) && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 			return zend.FAILURE
 		}
 	}
@@ -403,7 +403,7 @@ func OnUpdateMailLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil {
-		if PG(open_basedir) && PhpCheckOpenBasedir(zend.ZSTR_VAL(new_value)) != 0 {
+		if PG(open_basedir) && PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 			return zend.FAILURE
 		}
 	}
@@ -450,7 +450,7 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 			var error_time_str *zend.ZendString
 			time(&error_time)
 			error_time_str = php_format_date("d-M-Y H:i:s e", 13, error_time, 1)
-			len_ = Spprintf(&tmp, 0, "[%s] %s%s", zend.ZSTR_VAL(error_time_str), log_message, PHP_EOL)
+			len_ = Spprintf(&tmp, 0, "[%s] %s%s", error_time_str.GetVal(), log_message, PHP_EOL)
 			PhpIgnoreValue(write(fd, tmp, len_))
 			zend.Efree(tmp)
 			zend.ZendStringFree(error_time_str)
@@ -506,13 +506,13 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 
 		/* Retry with substituting invalid chars on fail. */
 
-		if replace_buffer == nil || zend.ZSTR_LEN(replace_buffer) < 1 {
+		if replace_buffer == nil || replace_buffer.GetLen() < 1 {
 			replace_buffer = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT|standard.ENT_HTML_SUBSTITUTE_ERRORS, GetSafeCharsetHint())
 		}
 		zend.Efree(buffer)
 		if replace_buffer != nil {
-			buffer = zend.ZSTR_VAL(replace_buffer)
-			buffer_len = int(zend.ZSTR_LEN(replace_buffer))
+			buffer = replace_buffer.GetVal()
+			buffer_len = int(replace_buffer.GetLen())
 		} else {
 			buffer = ""
 			buffer_len = 0
@@ -570,7 +570,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	if PG(html_errors) {
 		replace_origin = standard.PhpEscapeHtmlEntities((*uint8)(origin), origin_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
 		zend.Efree(origin)
-		origin = zend.ZSTR_VAL(replace_origin)
+		origin = replace_origin.GetVal()
 	}
 
 	/* origin and buffer available, so lets come up with the error message */
@@ -864,7 +864,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 				if PG(html_errors) {
 					if type_ == zend.E_ERROR || type_ == zend.E_PARSE {
 						var buf *zend.ZendString = standard.PhpEscapeHtmlEntities((*uint8)(buffer), buffer_len, 0, standard.ENT_COMPAT, GetSafeCharsetHint())
-						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, zend.ZSTR_VAL(buf), error_filename, error_lineno, STR_PRINT(append_string))
+						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buf.GetVal(), error_filename, error_lineno, STR_PRINT(append_string))
 						zend.ZendStringFree(buf)
 					} else {
 						PhpPrintf("%s<br />\n<b>%s</b>:  %s in <b>%s</b> on line <b>%"+"u"+"</b><br />\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
@@ -1758,10 +1758,10 @@ func PhpHandleAuthData(auth *byte) int {
 		var user *zend.ZendString
 		user = standard.PhpBase64Decode((*uint8)(auth+6), auth_len-6)
 		if user != nil {
-			pass = strchr(zend.ZSTR_VAL(user), ':')
+			pass = strchr(user.GetVal(), ':')
 			if pass != nil {
 				b.PostInc(&(*pass)) = '0'
-				SG(request_info).auth_user = zend.Estrndup(zend.ZSTR_VAL(user), zend.ZSTR_LEN(user))
+				SG(request_info).auth_user = zend.Estrndup(user.GetVal(), user.GetLen())
 				SG(request_info).auth_password = zend.Estrdup(pass)
 				ret = 0
 			}
