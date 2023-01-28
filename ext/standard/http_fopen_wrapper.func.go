@@ -157,7 +157,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			if tmpzval.GetType() == zend.IS_ARRAY {
 				var tmpheader *zend.Zval = nil
 				for {
-					var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
+					var __ht *zend.HashTable = tmpzval.GetArr()
 					var _p *zend.Bucket = __ht.GetArData()
 					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
@@ -369,7 +369,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			var tmpheader *zend.Zval = nil
 			var tmpstr zend.SmartStr = zend.SmartStr{0}
 			for {
-				var __ht *zend.HashTable = zend.Z_ARRVAL_P(tmpzval)
+				var __ht *zend.HashTable = tmpzval.GetArr()
 				var _p *zend.Bucket = __ht.GetArData()
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
@@ -681,7 +681,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 		}
 		zend.ZVAL_STRINGL(&http_response, tmp_line, tmp_line_len)
-		zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_response)
+		zend.ZendHashNextIndexInsert(response_header.GetArr(), &http_response)
 	} else {
 		core.PhpStreamClose(stream)
 		stream = nil
@@ -792,7 +792,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			}
 			var http_header zend.Zval
 			zend.ZVAL_STRINGL(&http_header, http_header_line, http_header_line_length)
-			zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(response_header), &http_header)
+			zend.ZendHashNextIndexInsert(response_header.GetArr(), &http_header)
 		} else {
 			break
 		}

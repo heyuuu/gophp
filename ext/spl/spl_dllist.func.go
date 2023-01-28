@@ -852,7 +852,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 	/* flags */
 
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* elements */
 
@@ -862,13 +862,13 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 		zend.Z_TRY_ADDREF(current.GetData())
 		current = current.GetNext()
 	}
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
@@ -889,7 +889,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 	}
 	intern.SetFlags(int(flags_zv.GetLval()))
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(storage_zv)
+		var __ht *zend.HashTable = storage_zv.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -903,7 +903,7 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		}
 		break
 	}
-	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(members_zv))
+	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 }
 func zim_spl_SplDoublyLinkedList_add(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zindex *zend.Zval

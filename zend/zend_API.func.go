@@ -121,14 +121,14 @@ func AddAssocZval(__arg *Zval, __key string, __value *Zval) int {
 	return AddAssocZvalEx(__arg, __key, strlen(__key), __value)
 }
 func AddIndexZval(arg *Zval, index ZendUlong, value *Zval) int {
-	if ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, value) != nil {
+	if ZendHashIndexUpdate(arg.GetArr(), index, value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
 	}
 }
 func AddNextIndexZval(arg *Zval, value *Zval) int {
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), value) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -226,7 +226,7 @@ func RETVAL_OBJ(r *ZendObject)                 { ZVAL_OBJ(return_value, r) }
 func RETVAL_ZVAL(zv *Zval, copy int, dtor int) { ZVAL_ZVAL(return_value, zv, copy, dtor) }
 func HASH_OF(p *Zval) __auto__ {
 	if p.GetType() == IS_ARRAY {
-		return Z_ARRVAL_P(p)
+		return p.GetArr()
 	} else {
 		if p.GetType() == IS_OBJECT {
 			return Z_OBJ_HT_P(p).GetGetProperties()(p)
@@ -776,7 +776,7 @@ func ZendParseArgArray(arg *Zval, dest **Zval, check_null int, or_object int) in
 }
 func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object int, separate int) int {
 	if arg.GetType() == IS_ARRAY {
-		*dest = Z_ARRVAL_P(arg)
+		*dest = arg.GetArr()
 	} else if or_object != 0 && arg.GetType() == IS_OBJECT {
 		if separate != 0 && Z_OBJ_P(arg).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(arg).GetProperties()) > 1 {
 			if (GC_FLAGS(Z_OBJ_P(arg).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
@@ -861,7 +861,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	}
 	for b.PostDec(&param_count) > 0 {
 		Z_TRY_ADDREF_P(param_ptr)
-		ZendHashNextIndexInsertNew(Z_ARRVAL_P(argument_array), param_ptr)
+		ZendHashNextIndexInsertNew(argument_array.GetArr(), param_ptr)
 		param_ptr++
 	}
 	return SUCCESS
@@ -1995,107 +1995,107 @@ func ObjectInit(arg *Zval) int {
 func AddAssocLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
 	var tmp Zval
 	ZVAL_LONG(&tmp, n)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
 	var tmp Zval
 	ZVAL_NULL(&tmp)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
 	var tmp Zval
 	ZVAL_DOUBLE(&tmp, d)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocStringEx(arg *Zval, key string, key_len int, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, &tmp)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, &tmp)
 	return SUCCESS
 }
 func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
-	ZendSymtableStrUpdate(Z_ARRVAL_P(arg), key, key_len, value)
+	ZendSymtableStrUpdate(arg.GetArr(), key, key_len, value)
 	return SUCCESS
 }
 func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
 	var tmp Zval
 	ZVAL_LONG(&tmp, n)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexNull(arg *Zval, index ZendUlong) int {
 	var tmp Zval
 	ZVAL_NULL(&tmp)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 	var tmp Zval
 	ZVAL_DOUBLE(&tmp, d)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	ZendHashIndexUpdate(Z_ARRVAL_P(arg), index, &tmp)
+	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
 	return SUCCESS
 }
 func AddNextIndexLong(arg *Zval, n ZendLong) int {
 	var tmp Zval
 	ZVAL_LONG(&tmp, n)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2104,7 +2104,7 @@ func AddNextIndexLong(arg *Zval, n ZendLong) int {
 func AddNextIndexNull(arg *Zval) int {
 	var tmp Zval
 	ZVAL_NULL(&tmp)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2113,7 +2113,7 @@ func AddNextIndexNull(arg *Zval) int {
 func AddNextIndexBool(arg *Zval, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2122,7 +2122,7 @@ func AddNextIndexBool(arg *Zval, b int) int {
 func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2131,7 +2131,7 @@ func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 func AddNextIndexDouble(arg *Zval, d float64) int {
 	var tmp Zval
 	ZVAL_DOUBLE(&tmp, d)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2140,7 +2140,7 @@ func AddNextIndexDouble(arg *Zval, d float64) int {
 func AddNextIndexStr(arg *Zval, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2149,7 +2149,7 @@ func AddNextIndexStr(arg *Zval, str *ZendString) int {
 func AddNextIndexString(arg *Zval, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2158,7 +2158,7 @@ func AddNextIndexString(arg *Zval, str *byte) int {
 func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	if ZendHashNextIndexInsert(Z_ARRVAL_P(arg), &tmp) != nil {
+	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -3662,9 +3662,9 @@ try_again:
 	case IS_ARRAY:
 		var method *Zval = nil
 		var obj *Zval = nil
-		if Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFindDeref(Z_ARRVAL_P(callable), 0)
-			method = ZendHashIndexFindDeref(Z_ARRVAL_P(callable), 1)
+		if callable.GetArr().GetNNumOfElements() == 2 {
+			obj = ZendHashIndexFindDeref(callable.GetArr(), 0)
+			method = ZendHashIndexFindDeref(callable.GetArr(), 1)
 		}
 		if obj == nil || method == nil || method.GetType() != IS_STRING {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
@@ -3732,9 +3732,9 @@ again:
 	case IS_ARRAY:
 		var method *Zval = nil
 		var obj *Zval = nil
-		if Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFind(Z_ARRVAL_P(callable), 0)
-			method = ZendHashIndexFind(Z_ARRVAL_P(callable), 1)
+		if callable.GetArr().GetNNumOfElements() == 2 {
+			obj = ZendHashIndexFind(callable.GetArr(), 0)
+			method = ZendHashIndexFind(callable.GetArr(), 1)
 		}
 		for {
 			if obj == nil || method == nil {
@@ -3766,7 +3766,7 @@ again:
 			goto check_func
 			break
 		}
-		if Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
+		if callable.GetArr().GetNNumOfElements() == 2 {
 			if obj == nil || b.CondF(!(Z_ISREF_P(obj)), func() bool { return obj.GetType() != IS_STRING && obj.GetType() != IS_OBJECT }, func() bool { return Z_REFVAL_P(obj).GetType() != IS_STRING && Z_REFVAL_P(obj).GetType() != IS_OBJECT }) {
 				if error != nil {
 					*error = Estrdup("first array member is not a valid class name or object")
@@ -3888,11 +3888,11 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 	if args.GetType() != IS_ARRAY {
 		return FAILURE
 	}
-	fci.SetParamCount(Z_ARRVAL_P(args).GetNNumOfElements())
+	fci.SetParamCount(args.GetArr().GetNNumOfElements())
 	params = (*Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
 	for {
-		var __ht *HashTable = Z_ARRVAL_P(args)
+		var __ht *HashTable = args.GetArr()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -4076,9 +4076,9 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 		ZVAL_COPY_VALUE(property_default_ptr, property)
 		if Z_ISUNDEF_P(property) {
-			Z_PROP_FLAG_P(property_default_ptr) = IS_PROP_UNINIT
+			property_default_ptr.GetU2Extra() = IS_PROP_UNINIT
 		} else {
-			Z_PROP_FLAG_P(property_default_ptr) = 0
+			property_default_ptr.GetU2Extra() = 0
 		}
 	}
 	if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {

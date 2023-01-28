@@ -82,7 +82,7 @@ again:
 		core.PUTS("\"\n")
 		break
 	case zend.IS_ARRAY:
-		myht = zend.Z_ARRVAL_P(struc)
+		myht = struc.GetArr()
 		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				if zend.GC_IS_RECURSIVE(myht) != 0 {
@@ -343,7 +343,7 @@ again:
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(zend.Z_REFCOUNTED_P(struc), func() uint32 { return zend.Z_REFCOUNT_P(struc) }, 1))
 		break
 	case zend.IS_ARRAY:
-		myht = zend.Z_ARRVAL_P(struc)
+		myht = struc.GetArr()
 		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
 				if zend.GC_IS_RECURSIVE(myht) != 0 {
@@ -635,7 +635,7 @@ again:
 		zend.ZendStringFree(ztmp2)
 		break
 	case zend.IS_ARRAY:
-		myht = zend.Z_ARRVAL_P(struc)
+		myht = struc.GetArr()
 		if (zend.GC_FLAGS(myht) & zend.GC_IMMUTABLE) == 0 {
 			if zend.GC_IS_RECURSIVE(myht) != 0 {
 				zend.SmartStrAppendl(buf, "NULL", 4)
@@ -1279,7 +1279,7 @@ again:
 		return
 	case zend.IS_ARRAY:
 		zend.SmartStrAppendl(buf, "a:", 2)
-		myht = zend.Z_ARRVAL_P(struc)
+		myht = struc.GetArr()
 		PhpVarSerializeNestedData(buf, struc, myht, zend.ZendArrayCount(myht), 0, var_hash)
 		return
 	case zend.IS_REFERENCE:
@@ -1505,7 +1505,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	if options != nil {
 		var classes *zend.Zval
 		var max_depth *zend.Zval
-		classes = zend.ZendHashStrFindDeref(zend.Z_ARRVAL_P(options), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
+		classes = zend.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
 		if classes != nil && classes.GetType() != zend.IS_ARRAY && classes.GetType() != zend.IS_TRUE && classes.GetType() != zend.IS_FALSE {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "allowed_classes option should be array or boolean")
 			zend.RETVAL_FALSE
@@ -1513,13 +1513,13 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		if classes != nil && (classes.GetType() == zend.IS_ARRAY || zend.ZendIsTrue(classes) == 0) {
 			zend.ALLOC_HASHTABLE(class_hash)
-			zend.ZendHashInit(class_hash, b.CondF1(classes.GetType() == zend.IS_ARRAY, func() __auto__ { return zend.Z_ARRVAL_P(classes).GetNNumOfElements() }, 0), nil, nil, 0)
+			zend.ZendHashInit(class_hash, b.CondF1(classes.GetType() == zend.IS_ARRAY, func() __auto__ { return classes.GetArr().GetNNumOfElements() }, 0), nil, nil, 0)
 		}
 		if class_hash != nil && classes.GetType() == zend.IS_ARRAY {
 			var entry *zend.Zval
 			var lcname *zend.ZendString
 			for {
-				var __ht *zend.HashTable = zend.Z_ARRVAL_P(classes)
+				var __ht *zend.HashTable = classes.GetArr()
 				var _p *zend.Bucket = __ht.GetArData()
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
@@ -1547,7 +1547,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 		}
 		PhpVarUnserializeSetAllowedClasses(var_hash, class_hash)
-		max_depth = zend.ZendHashStrFindDeref(zend.Z_ARRVAL_P(options), "max_depth", b.SizeOf("\"max_depth\"")-1)
+		max_depth = zend.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
 		if max_depth != nil {
 			if max_depth.GetType() != zend.IS_LONG {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth should be int")

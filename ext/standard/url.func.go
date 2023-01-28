@@ -440,35 +440,35 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if resource.GetScheme() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetScheme())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
 	}
 	if resource.GetHost() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetHost())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
 	}
 	if has_port != 0 {
 		zend.ZVAL_LONG(&tmp, resource.GetPort())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
 	}
 	if resource.GetUser() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetUser())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
 	}
 	if resource.GetPass() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPass())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
 	}
 	if resource.GetPath() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPath())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
 	}
 	if resource.GetQuery() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetQuery())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
 	}
 	if resource.GetFragment() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetFragment())
-		zend.ZendHashAddNew(zend.Z_ARRVAL_P(return_value), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
 	}
 done:
 	PhpUrlFree(resource)
@@ -975,7 +975,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	zend.ArrayInit(return_value)
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream.GetWrapperdata())
+		var __ht *zend.HashTable = stream.GetWrapperdata().GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -1002,7 +1002,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 					for isspace(int(*((*uint8)(s)))) {
 						s++
 					}
-					if b.Assign(&prev_val, zend.ZendHashStrFind(zend.Z_ARRVAL_P(return_value), zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
+					if b.Assign(&prev_val, zend.ZendHashStrFind(return_value.GetArr(), zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
 						zend.AddAssocStringlEx(return_value, zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
 					} else {
 						zend.ConvertToArray(prev_val)

@@ -1011,7 +1011,7 @@ func PassTwo(op_array *ZendOpArray) int {
 
 			/* absolute indexes to relative offsets */
 
-			var jumptable *HashTable = Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
+			var jumptable *HashTable = CT_CONSTANT(opline.GetOp2()).GetArr()
 			var zv *Zval
 			for {
 				var __ht *HashTable = jumptable

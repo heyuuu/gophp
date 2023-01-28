@@ -459,10 +459,10 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 		zend.ArrayInit(return_value)
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
-				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), i, intern.GetArray().GetElements()[i])
+				zend.ZendHashIndexUpdate(return_value.GetArr(), i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
-				zend.ZendHashIndexUpdate(zend.Z_ARRVAL_P(return_value), i, &(zend.ExecutorGlobals.GetUninitializedZval()))
+				zend.ZendHashIndexUpdate(return_value.GetArr(), i, &(zend.ExecutorGlobals.GetUninitializedZval()))
 			}
 		}
 	} else {
@@ -479,7 +479,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "a|b", &data, &save_indexes) == zend.FAILURE {
 		return
 	}
-	num = zend.Z_ARRVAL_P(data).GetNNumOfElements()
+	num = data.GetArr().GetNNumOfElements()
 	if num > 0 && save_indexes != 0 {
 		var element *zend.Zval
 		var str_index *zend.ZendString
@@ -487,7 +487,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
+			var __ht *zend.HashTable = data.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
@@ -515,7 +515,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 		}
 		SplFixedarrayInit(&array, tmp)
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
+			var __ht *zend.HashTable = data.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {
@@ -536,7 +536,7 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
+			var __ht *zend.HashTable = data.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {

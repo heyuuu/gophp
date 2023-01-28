@@ -82,7 +82,7 @@ func ZvalAddRef(p *Zval) {
 }
 func ZvalCopyCtorFunc(zvalue *Zval) {
 	if zvalue.GetType() == IS_ARRAY {
-		ZVAL_ARR(zvalue, ZendArrayDup(Z_ARRVAL_P(zvalue)))
+		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.GetType() == IS_STRING {
 		ZEND_ASSERT(true)
 		ZVAL_NEW_STR(zvalue, ZendStringDup(zvalue.GetStr(), 0))

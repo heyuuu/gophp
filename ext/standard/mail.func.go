@@ -165,7 +165,7 @@ func PhpMailBuildHeadersElems(s *zend.SmartStr, key *zend.ZendString, val *zend.
 	var tmp_key *zend.ZendString
 	var tmp_val *zend.Zval
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(val)
+		var __ht *zend.HashTable = val.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -196,7 +196,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var s zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(headers.GetType() == zend.IS_ARRAY)
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(headers)
+		var __ht *zend.HashTable = headers.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {

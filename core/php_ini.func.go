@@ -104,7 +104,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
 	if zvalue.GetType() == zend.IS_ARRAY {
-		zend.ZendHashDestroy(zend.Z_ARRVAL_P(zvalue))
+		zend.ZendHashDestroy(zvalue.GetArr())
 		zend.Free(zvalue.GetArr())
 	} else if zvalue.GetType() == zend.IS_STRING {
 		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
@@ -178,9 +178,9 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		/* arg3 is possible option offset name */
 
 		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
-			entry = zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(find_arr), arg3.GetStr(), arg2)
+			entry = zend.ZendSymtableUpdate(find_arr.GetArr(), arg3.GetStr(), arg2)
 		} else {
-			entry = zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(find_arr), arg2)
+			entry = zend.ZendHashNextIndexInsert(find_arr.GetArr(), arg2)
 		}
 		entry.GetStr() = zend.ZendStringDup(entry.GetStr(), 1)
 		break
@@ -239,7 +239,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
 			}
 			if entry.GetType() == zend.IS_ARRAY {
-				ActiveIniHash = zend.Z_ARRVAL_P(entry)
+				ActiveIniHash = entry.GetArr()
 			}
 		}
 		break
@@ -667,7 +667,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 			/* Search for source array matching the path from configuration_hash */
 
 			if b.Assign(&tmp2, zend.ZendHashStrFind(&ConfigurationHash, path, strlen(path))) != nil {
-				PhpIniActivateConfig(zend.Z_ARRVAL_P(tmp2), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
+				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
 			ptr++
@@ -684,7 +684,7 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 		/* Search for source array matching the host from configuration_hash */
 
 		if b.Assign(&tmp, zend.ZendHashStrFind(&ConfigurationHash, host, host_len)) != nil {
-			PhpIniActivateConfig(zend.Z_ARRVAL_P(tmp), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
+			PhpIniActivateConfig(tmp.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
 
 		/* Search for source array matching the host from configuration_hash */

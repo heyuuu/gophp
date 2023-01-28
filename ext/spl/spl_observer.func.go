@@ -636,7 +636,7 @@ func zim_spl_SplObjectStorage_unserialize(execute_data *zend.ZendExecuteData, re
 
 	/* copy members */
 
-	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(pmembers))
+	zend.ObjectPropertiesLoad(intern.GetStd(), pmembers.GetArr())
 	standard.PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
 	return
 outexcept:
@@ -674,13 +674,13 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 		}
 		break
 	}
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
@@ -698,13 +698,13 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
 	}
-	if zend.Z_ARRVAL_P(storage_zv).GetNNumOfElements()%2 != 0 {
+	if storage_zv.GetArr().GetNNumOfElements()%2 != 0 {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Odd number of elements", 0)
 		return
 	}
 	key = nil
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(storage_zv)
+		var __ht *zend.HashTable = storage_zv.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -727,7 +727,7 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 		}
 		break
 	}
-	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(members_zv))
+	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 }
 func zim_spl_SplObjectStorage___debugInfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
@@ -902,7 +902,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 				zend.AddIndexZval(return_value, element.GetInf().GetLval(), &retval)
 				break
 			case zend.IS_STRING:
-				zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), element.GetInf().GetStr(), &retval)
+				zend.ZendSymtableUpdate(return_value.GetArr(), element.GetInf().GetStr(), &retval)
 				break
 			default:
 				zend.ZvalPtrDtor(&retval)

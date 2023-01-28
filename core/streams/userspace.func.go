@@ -521,43 +521,43 @@ func StatbufFromArray(array *zend.Zval, ssb *core.PhpStreamStatbuf) int {
 	// #define STAT_PROP_ENTRY(name) STAT_PROP_ENTRY_EX ( name , name )
 
 	memset(ssb, 0, b.SizeOf("php_stream_statbuf"))
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "dev", b.SizeOf("\"dev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "dev", b.SizeOf("\"dev\"")-1)) {
 		ssb.GetSb().st_dev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "ino", b.SizeOf("\"ino\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ino", b.SizeOf("\"ino\"")-1)) {
 		ssb.GetSb().st_ino = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "mode", b.SizeOf("\"mode\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mode", b.SizeOf("\"mode\"")-1)) {
 		ssb.GetSb().st_mode = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "nlink", b.SizeOf("\"nlink\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "nlink", b.SizeOf("\"nlink\"")-1)) {
 		ssb.GetSb().st_nlink = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "uid", b.SizeOf("\"uid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "uid", b.SizeOf("\"uid\"")-1)) {
 		ssb.GetSb().st_uid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "gid", b.SizeOf("\"gid\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "gid", b.SizeOf("\"gid\"")-1)) {
 		ssb.GetSb().st_gid = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "rdev", b.SizeOf("\"rdev\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "rdev", b.SizeOf("\"rdev\"")-1)) {
 		ssb.GetSb().st_rdev = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "size", b.SizeOf("\"size\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "size", b.SizeOf("\"size\"")-1)) {
 		ssb.GetSb().st_size = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "atime", b.SizeOf("\"atime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "atime", b.SizeOf("\"atime\"")-1)) {
 		ssb.GetSb().st_atime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "mtime", b.SizeOf("\"mtime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "mtime", b.SizeOf("\"mtime\"")-1)) {
 		ssb.GetSb().st_mtime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "ctime", b.SizeOf("\"ctime\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "ctime", b.SizeOf("\"ctime\"")-1)) {
 		ssb.GetSb().st_ctime = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "blksize", b.SizeOf("\"blksize\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blksize", b.SizeOf("\"blksize\"")-1)) {
 		ssb.GetSb().st_blksize = zend.ZvalGetLong(elem)
 	}
-	if nil != b.Assign(&elem, zend.ZendHashStrFind(zend.Z_ARRVAL_P(array), "blocks", b.SizeOf("\"blocks\"")-1)) {
+	if nil != b.Assign(&elem, zend.ZendHashStrFind(array.GetArr(), "blocks", b.SizeOf("\"blocks\"")-1)) {
 		ssb.GetSb().st_blocks = zend.ZvalGetLong(elem)
 	}
 	return zend.SUCCESS

@@ -968,7 +968,7 @@ yy24:
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
 
-		zend.ZendHashRealInitMixed(zend.Z_ARRVAL_P(rval))
+		zend.ZendHashRealInitMixed(rval.GetArr())
 
 		/* we can't convert from packed to hash during unserialization, because
 		   reference to some zvals might be keept in var_hash (to support references) */
@@ -983,7 +983,7 @@ yy24:
 	 * unserialize (in practice unserialization handlers also see it). Ideally we should
 	 * prohibit "r:" references to non-objects, as we only generate them for objects. */
 
-	if ProcessNestedData(rval, p, max, var_hash, zend.Z_ARRVAL_P(rval), elements, nil) == 0 {
+	if ProcessNestedData(rval, p, max, var_hash, rval.GetArr(), elements, nil) == 0 {
 		return 0
 	}
 	return FinishNestedData(rval, p, max, var_hash)

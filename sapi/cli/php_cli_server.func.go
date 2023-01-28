@@ -135,7 +135,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 			key = _p.GetKey()
 			value = _z.GetPtr()
 			zend.ZVAL_STRING(&tmp, value)
-			zend.ZendSymtableUpdate(zend.Z_ARRVAL_P(return_value), key, &tmp)
+			zend.ZendSymtableUpdate(return_value.GetArr(), key, &tmp)
 		}
 		break
 	}

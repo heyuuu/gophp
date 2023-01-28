@@ -52,7 +52,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			ZvalPtrDtorStr(p)
 		} else if p.GetType() == IS_ARRAY {
 			var guards *HashTable
-			guards = Z_ARRVAL_P(p)
+			guards = p.GetArr()
 			ZEND_ASSERT(guards != nil)
 			ZendHashDestroy(guards)
 			FREE_HASHTABLE(guards)

@@ -974,7 +974,7 @@ func ZendHashIteratorPos(idx uint32, ht *HashTable) HashPosition {
 	return iter.GetPos()
 }
 func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
-	var ht *HashTable = Z_ARRVAL_P(array)
+	var ht *HashTable = array.GetArr()
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators() + idx
 	ZEND_ASSERT(idx != uint32-1)
 	if iter.GetHt() != ht {
@@ -982,7 +982,7 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 			HT_DEC_ITERATORS_COUNT(iter.GetHt())
 		}
 		SEPARATE_ARRAY(array)
-		ht = Z_ARRVAL_P(array)
+		ht = array.GetArr()
 		if !(HT_ITERATORS_OVERFLOW(ht)) {
 			HT_INC_ITERATORS_COUNT(ht)
 		}
@@ -2261,7 +2261,7 @@ func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bu
 	}
 	for {
 		if Z_OPT_REFCOUNTED_P(data) {
-			if Z_ISREF_P(data) && Z_REFCOUNT_P(data) == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_ARRVAL_P(Z_REFVAL_P(data)) != source) {
+			if Z_ISREF_P(data) && Z_REFCOUNT_P(data) == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_REFVAL_P(data).GetArr() != source) {
 				data = Z_REFVAL_P(data)
 				if !(Z_OPT_REFCOUNTED_P(data)) {
 					break

@@ -226,7 +226,7 @@ again:
 		}
 		break
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			result = 1
 		}
 		break
@@ -690,7 +690,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -743,7 +743,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -804,7 +804,7 @@ try_again:
 		ZendStringReleaseEx(str, 0)
 		break
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			tmp = 1
 		} else {
 			tmp = 0
@@ -1084,7 +1084,7 @@ try_again:
 
 		}
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			return 1
 		} else {
 			return 0
@@ -1125,7 +1125,7 @@ try_again:
 	case IS_STRING:
 		return ZendStrtod(Z_STRVAL_P(op), nil)
 	case IS_ARRAY:
-		if Z_ARRVAL_P(op).GetNNumOfElements() {
+		if op.GetArr().GetNNumOfElements() {
 			return 1.0
 		} else {
 			return 0.0
@@ -1220,7 +1220,7 @@ func AddFunctionArray(result *Zval, op1 *Zval, op2 *Zval) {
 	} else {
 		SEPARATE_ARRAY(result)
 	}
-	ZendHashMerge(Z_ARRVAL_P(result), Z_ARRVAL_P(op2), ZvalAddRef, 0)
+	ZendHashMerge(result.GetArr(), op2.GetArr(), ZvalAddRef, 0)
 }
 func AddFunctionFast(result *Zval, op1 *Zval, op2 *Zval) int {
 	var type_pair ZendUchar = TYPE_PAIR(op1.GetType(), op2.GetType())
@@ -2739,7 +2739,7 @@ func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {
 	case IS_STRING:
 		return ZendStringEquals(op1.GetStr(), op2.GetStr())
 	case IS_ARRAY:
-		return Z_ARRVAL_P(op1) == Z_ARRVAL_P(op2) || ZendHashCompare(Z_ARRVAL_P(op1), Z_ARRVAL_P(op2), CompareFuncT(HashZvalIdenticalFunction), 1) == 0
+		return op1.GetArr() == op2.GetArr() || ZendHashCompare(op1.GetArr(), op2.GetArr(), CompareFuncT(HashZvalIdenticalFunction), 1) == 0
 	case IS_OBJECT:
 		return op1.GetObj() == op2.GetObj()
 	default:
@@ -3368,7 +3368,7 @@ func ZendCompareSymbolTables(ht1 *HashTable, ht2 *HashTable) int {
 	}
 }
 func ZendCompareArrays(a1 *Zval, a2 *Zval) int {
-	return ZendCompareSymbolTables(Z_ARRVAL_P(a1), Z_ARRVAL_P(a2))
+	return ZendCompareSymbolTables(a1.GetArr(), a2.GetArr())
 }
 func ZendCompareObjects(o1 *Zval, o2 *Zval) int {
 	if o1.GetObj() == o2.GetObj() {

@@ -555,7 +555,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 			ZVAL_ARR(zv, guards)
 		}
 	} else if zv.GetType() == IS_ARRAY {
-		guards = Z_ARRVAL_P(zv)
+		guards = zv.GetArr()
 		ZEND_ASSERT(guards != nil)
 		zv = ZendHashFind(guards, member)
 		if zv != nil {
@@ -596,7 +596,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 		if retval.GetType() != IS_UNDEF {
 			goto exit
 		}
-		if Z_PROP_FLAG_P(retval) == IS_PROP_UNINIT {
+		if retval.GetU2Extra() == IS_PROP_UNINIT {
 
 			/* Skip __get() for uninitialized typed properties */
 
@@ -749,11 +749,11 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 			variable_ptr = ZendAssignToVariable(variable_ptr, value, IS_TMP_VAR, PropertyUsesStrictTypes())
 			goto exit
 		}
-		if Z_PROP_FLAG_P(variable_ptr) == IS_PROP_UNINIT {
+		if variable_ptr.GetU2Extra() == IS_PROP_UNINIT {
 
 			/* Writes to uninitializde typed properties bypass __set(). */
 
-			Z_PROP_FLAG_P(variable_ptr) = 0
+			variable_ptr.GetU2Extra() = 0
 			goto write_std_property
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
@@ -935,7 +935,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
 		if retval.GetType() == IS_UNDEF {
-			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 || prop_info != nil && Z_PROP_FLAG_P(retval) == IS_PROP_UNINIT {
+			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 || prop_info != nil && retval.GetU2Extra() == IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
 						ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().GetName().GetVal(), name.GetVal())
@@ -1020,11 +1020,11 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 			}
 			goto exit
 		}
-		if Z_PROP_FLAG_P(slot) == IS_PROP_UNINIT {
+		if slot.GetU2Extra() == IS_PROP_UNINIT {
 
 			/* Reset the IS_PROP_UNINIT flag, if it exists and bypass __unset(). */
 
-			Z_PROP_FLAG_P(slot) = 0
+			slot.GetU2Extra() = 0
 			goto exit
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) && zobj.GetProperties() != nil {
@@ -1504,7 +1504,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 		if value.GetType() != IS_UNDEF {
 			goto found
 		}
-		if Z_PROP_FLAG_P(value) == IS_PROP_UNINIT {
+		if value.GetU2Extra() == IS_PROP_UNINIT {
 
 			/* Skip __isset() for uninitialized typed properties */
 

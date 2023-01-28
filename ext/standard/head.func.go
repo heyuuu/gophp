@@ -280,7 +280,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 	var key *zend.ZendString
 	var value *zend.Zval
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(options)
+		var __ht *zend.HashTable = options.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -322,7 +322,7 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 
 	/* Array is not empty but no valid keys were found */
 
-	if found == 0 && zend.Z_ARRVAL_P(options).GetNNumOfElements() > 0 {
+	if found == 0 && options.GetArr().GetNNumOfElements() > 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No valid options were found in the given array")
 	}
 

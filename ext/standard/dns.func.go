@@ -1374,7 +1374,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	zend.RETVAL_BOOL(zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
+	zend.RETVAL_BOOL(mx_list.GetArr().GetNNumOfElements() != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {

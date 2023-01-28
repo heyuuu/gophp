@@ -348,33 +348,33 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 	switch offset.GetType() {
 	case IS_UNDEF:
-		if ZendHashNextIndexInsert(Z_ARRVAL_P(result), expr) == nil {
+		if ZendHashNextIndexInsert(result.GetArr(), expr) == nil {
 			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
 		break
 	case IS_STRING:
-		ZendSymtableUpdate(Z_ARRVAL_P(result), offset.GetStr(), expr)
+		ZendSymtableUpdate(result.GetArr(), offset.GetStr(), expr)
 		ZvalPtrDtorStr(offset)
 		break
 	case IS_NULL:
-		ZendSymtableUpdate(Z_ARRVAL_P(result), ZSTR_EMPTY_ALLOC(), expr)
+		ZendSymtableUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), expr)
 		break
 	case IS_LONG:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), offset.GetLval(), expr)
+		ZendHashIndexUpdate(result.GetArr(), offset.GetLval(), expr)
 		break
 	case IS_FALSE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), 0, expr)
+		ZendHashIndexUpdate(result.GetArr(), 0, expr)
 		break
 	case IS_TRUE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), 1, expr)
+		ZendHashIndexUpdate(result.GetArr(), 1, expr)
 		break
 	case IS_DOUBLE:
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), ZendDvalToLval(offset.GetDval()), expr)
+		ZendHashIndexUpdate(result.GetArr(), ZendDvalToLval(offset.GetDval()), expr)
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
-		ZendHashIndexUpdate(Z_ARRVAL_P(result), Z_RES_HANDLE_P(offset), expr)
+		ZendHashIndexUpdate(result.GetArr(), Z_RES_HANDLE_P(offset), expr)
 		break
 	default:
 		ZendThrowError(nil, "Illegal offset type")
@@ -384,7 +384,7 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 }
 func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 	if expr.GetType() == IS_ARRAY {
-		var ht *HashTable = Z_ARRVAL_P(expr)
+		var ht *HashTable = expr.GetArr()
 		var val *Zval
 		var key *ZendString
 		for {
@@ -403,7 +403,7 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 					ZendThrowError(nil, "Cannot unpack array with string keys")
 					return FAILURE
 				} else {
-					if ZendHashNextIndexInsert(Z_ARRVAL_P(result), val) == nil {
+					if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
 						ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 						break
 					}
@@ -1106,7 +1106,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 		SmartStrAppendc(str, '[')
 		first = 1
 		for {
-			var __ht *HashTable = Z_ARRVAL_P(zv)
+			var __ht *HashTable = zv.GetArr()
 			var _p *Bucket = __ht.GetArData()
 			var _end *Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {

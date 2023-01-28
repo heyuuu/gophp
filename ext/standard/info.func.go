@@ -128,7 +128,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, zend.ZendHashFindDeref(&(zend.ExecutorGlobals.GetSymbolTable()), key)) != nil && data.GetType() == zend.IS_ARRAY {
 		for {
-			var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
+			var __ht *zend.HashTable = data.GetArr()
 			var _p *zend.Bucket = __ht.GetArData()
 			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 			for ; _p != _end; _p++ {

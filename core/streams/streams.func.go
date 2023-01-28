@@ -1995,7 +1995,7 @@ func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername strin
 	if nil == b.Assign(&wrapperhash, zend.ZendHashStrFind(context.GetOptions().GetArr(), wrappername, strlen(wrappername))) {
 		return nil
 	}
-	return zend.ZendHashStrFind(zend.Z_ARRVAL_P(wrapperhash), optionname, strlen(optionname))
+	return zend.ZendHashStrFind(wrapperhash.GetArr(), optionname, strlen(optionname))
 }
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *zend.Zval) int {
 	var wrapperhash *zend.Zval
@@ -2009,7 +2009,7 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	zend.ZVAL_DEREF(optionvalue)
 	zend.Z_TRY_ADDREF_P(optionvalue)
 	zend.SEPARATE_ARRAY(wrapperhash)
-	zend.ZendHashStrUpdate(zend.Z_ARRVAL_P(wrapperhash), optionname, strlen(optionname), optionvalue)
+	zend.ZendHashStrUpdate(wrapperhash.GetArr(), optionname, strlen(optionname), optionvalue)
 	return zend.SUCCESS
 }
 func PhpStreamDirentAlphasort(a **zend.ZendString, b **zend.ZendString) int {

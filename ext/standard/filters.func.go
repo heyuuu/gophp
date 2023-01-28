@@ -110,7 +110,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 			var tags_ss zend.SmartStr = zend.SmartStr{0}
 			var tmp *zend.Zval
 			for {
-				var __ht *zend.HashTable = zend.Z_ARRVAL_P(filterparams)
+				var __ht *zend.HashTable = filterparams.GetArr()
 				var _p *zend.Bucket = __ht.GetArData()
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
@@ -1339,7 +1339,7 @@ func StrfilterConvertCreate(filtername *byte, filterparams *zend.Zval, persisten
 	} else if strcasecmp(dot, "quoted-printable-decode") == 0 {
 		conv_mode = PHP_CONV_QPRINT_DECODE
 	}
-	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *zend.ZendArray { return zend.Z_ARRVAL_P(filterparams) }, nil), filtername, persistent) != zend.SUCCESS {
+	if PhpConvertFilterCtor(inst, conv_mode, b.CondF1(filterparams != nil, func() *zend.ZendArray { return filterparams.GetArr() }, nil), filtername, persistent) != zend.SUCCESS {
 		goto out
 	}
 	retval = streams.PhpStreamFilterAlloc(&StrfilterConvertOps, inst, persistent)

@@ -1228,7 +1228,7 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 		return 0
 	}
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -1290,9 +1290,9 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	ht = zend.ZendNewArray(stream_array.GetArr().GetNNumOfElements())
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -1357,9 +1357,9 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
+	ht = zend.ZendNewArray(stream_array.GetArr().GetNNumOfElements())
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(stream_array)
+		var __ht *zend.HashTable = stream_array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -1641,7 +1641,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 	var okey *zend.ZendString
 	var ret int = zend.SUCCESS
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(options)
+		var __ht *zend.HashTable = options.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -1655,7 +1655,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 			zend.ZVAL_DEREF(wval)
 			if wkey != nil && wval.GetType() == zend.IS_ARRAY {
 				for {
-					var __ht *zend.HashTable = zend.Z_ARRVAL_P(wval)
+					var __ht *zend.HashTable = wval.GetArr()
 					var _p *zend.Bucket = __ht.GetArData()
 					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 					for ; _p != _end; _p++ {
@@ -1683,7 +1683,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 	var ret int = zend.SUCCESS
 	var tmp *zend.Zval
-	if nil != b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_ARRVAL_P(params), "notification", b.SizeOf("\"notification\"")-1)) {
+	if nil != b.Assign(&tmp, zend.ZendHashStrFind(params.GetArr(), "notification", b.SizeOf("\"notification\"")-1)) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
 			context.SetNotifier(nil)
@@ -1693,7 +1693,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 		zend.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
-	if nil != b.Assign(&tmp, zend.ZendHashStrFind(zend.Z_ARRVAL_P(params), "options", b.SizeOf("\"options\"")-1)) {
+	if nil != b.Assign(&tmp, zend.ZendHashStrFind(params.GetArr(), "options", b.SizeOf("\"options\"")-1)) {
 		if tmp.GetType() == zend.IS_ARRAY {
 			ParseContextOptions(context, tmp)
 		} else {

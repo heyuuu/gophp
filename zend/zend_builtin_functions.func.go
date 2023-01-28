@@ -160,8 +160,8 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 	if arg_count != 0 {
 		ArrayInitSize(return_value, arg_count)
 		first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
-		ZendHashRealInitPacked(Z_ARRVAL_P(return_value))
-		var __fill_ht *HashTable = Z_ARRVAL_P(return_value)
+		ZendHashRealInitPacked(return_value.GetArr())
+		var __fill_ht *HashTable = return_value.GetArr()
 		var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		ZEND_ASSERT((__fill_ht.GetUFlags() & HASH_FLAG_PACKED) != 0)
@@ -655,7 +655,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		break
 	}
 	ArrayInitSize(return_value, 4)
-	ZendHashRealInitMixed(Z_ARRVAL_P(return_value))
+	ZendHashRealInitMixed(return_value.GetArr())
 
 	/* add value elements */
 
@@ -663,8 +663,8 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	if Z_REFCOUNTED_P(entry) {
 		GC_ADDREF_EX(entry.GetCounted(), 2)
 	}
-	ZendHashIndexAddNew(Z_ARRVAL_P(return_value), 1, entry)
-	ZendHashAddNew(Z_ARRVAL_P(return_value), ZSTR_KNOWN(ZEND_STR_VALUE), entry)
+	ZendHashIndexAddNew(return_value.GetArr(), 1, entry)
+	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_VALUE), entry)
 
 	/* add the key elements */
 
@@ -674,8 +674,8 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		ZVAL_LONG(&tmp, num_key)
 	}
-	ZendHashIndexAddNew(Z_ARRVAL_P(return_value), 0, &tmp)
-	ZendHashAddNew(Z_ARRVAL_P(return_value), ZSTR_KNOWN(ZEND_STR_KEY), &tmp)
+	ZendHashIndexAddNew(return_value.GetArr(), 0, &tmp)
+	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_KEY), &tmp)
 	ZendHashMoveForward(target_hash)
 }
 func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
@@ -811,7 +811,7 @@ func ValidateConstantArray(ht *HashTable) int {
 							ZendError(E_WARNING, "Constants cannot be recursive arrays")
 							ret = 0
 							break
-						} else if ValidateConstantArray(Z_ARRVAL_P(val)) == 0 {
+						} else if ValidateConstantArray(val.GetArr()) == 0 {
 							ret = 0
 							break
 						}
@@ -833,9 +833,9 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 	var idx ZendUlong
 	var new_val *Zval
 	var val *Zval
-	ArrayInitSize(dst, Z_ARRVAL_P(src).GetNNumOfElements())
+	ArrayInitSize(dst, src.GetArr().GetNNumOfElements())
 	for {
-		var __ht *HashTable = Z_ARRVAL_P(src)
+		var __ht *HashTable = src.GetArr()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -854,9 +854,9 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 
 			ZVAL_DEREF(val)
 			if key != nil {
-				new_val = ZendHashAddNew(Z_ARRVAL_P(dst), key, val)
+				new_val = ZendHashAddNew(dst.GetArr(), key, val)
 			} else {
-				new_val = ZendHashIndexAddNew(Z_ARRVAL_P(dst), idx, val)
+				new_val = ZendHashIndexAddNew(dst.GetArr(), idx, val)
 			}
 			if val.GetType() == IS_ARRAY {
 				if Z_REFCOUNTED_P(val) {
@@ -979,7 +979,7 @@ repeat:
 		break
 	case IS_ARRAY:
 		if Z_REFCOUNTED_P(val) {
-			if ValidateConstantArray(Z_ARRVAL_P(val)) == 0 {
+			if ValidateConstantArray(val.GetArr()) == 0 {
 				RETVAL_FALSE
 				return
 			} else {
@@ -1352,7 +1352,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 					return
 				}
 			}
-			ZendHashAddNew(Z_ARRVAL_P(return_value), key, prop)
+			ZendHashAddNew(return_value.GetArr(), key, prop)
 		}
 		break
 	}
@@ -1504,7 +1504,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 
 					/* This case is only possible due to loopholes, e.g. ArrayObject */
 
-					ZendHashIndexAdd(Z_ARRVAL_P(return_value), num_key, value)
+					ZendHashIndexAdd(return_value.GetArr(), num_key, value)
 
 					/* This case is only possible due to loopholes, e.g. ArrayObject */
 
@@ -1520,7 +1520,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 					 * private, numeric properties. Well, too bad.
 					 */
 
-					ZendHashStrAddNew(Z_ARRVAL_P(return_value), prop_name, prop_len, value)
+					ZendHashStrAddNew(return_value.GetArr(), prop_name, prop_len, value)
 
 					/* We assume here that a mangled property name is never
 					 * numeric. This is probably a safe assumption, but
@@ -1529,7 +1529,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 					 */
 
 				} else {
-					ZendSymtableAddNew(Z_ARRVAL_P(return_value), key, value)
+					ZendSymtableAddNew(return_value.GetArr(), key, value)
 				}
 			}
 			break
@@ -1665,10 +1665,10 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 			if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
 				if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
 					ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
-					ZendHashNextIndexInsertNew(Z_ARRVAL_P(return_value), &method_name)
+					ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
 				} else {
 					ZVAL_STR_COPY(&method_name, mptr.GetFunctionName())
-					ZendHashNextIndexInsertNew(Z_ARRVAL_P(return_value), &method_name)
+					ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
 				}
 			}
 		}
@@ -2279,8 +2279,8 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	ZendHashStrAddNew(Z_ARRVAL_P(return_value), "internal", b.SizeOf("\"internal\"")-1, &internal)
-	ZendHashStrAddNew(Z_ARRVAL_P(return_value), "user", b.SizeOf("\"user\"")-1, &user)
+	ZendHashStrAddNew(return_value.GetArr(), "internal", b.SizeOf("\"internal\"")-1, &internal)
+	ZendHashStrAddNew(return_value.GetArr(), "user", b.SizeOf("\"user\"")-1, &user)
 }
 func ZifGetDefinedVars(execute_data *ZendExecuteData, return_value *Zval) {
 	var symbol_table *ZendArray
@@ -2394,7 +2394,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 				val = _z
 				if key == nil {
 					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(Z_ARRVAL_P(return_value), index, val)
+					ZendHashIndexAddNew(return_value.GetArr(), index, val)
 				}
 			}
 			break
@@ -2416,7 +2416,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 				val = _z
 				if key == nil && Z_RES_TYPE_P(val) <= 0 {
 					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(Z_ARRVAL_P(return_value), index, val)
+					ZendHashIndexAddNew(return_value.GetArr(), index, val)
 				}
 			}
 			break
@@ -2444,7 +2444,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 				val = _z
 				if key == nil && Z_RES_TYPE_P(val) == id {
 					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(Z_ARRVAL_P(return_value), index, val)
+					ZendHashIndexAddNew(return_value.GetArr(), index, val)
 				}
 			}
 			break
@@ -2585,7 +2585,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 
 				}
 				ZVAL_COPY_OR_DUP(&const_val, constant.GetValue())
-				ZendHashAddNew(Z_ARRVAL_P(return_value), constant.GetName(), &const_val)
+				ZendHashAddNew(return_value.GetArr(), constant.GetName(), &const_val)
 			}
 			break
 		}
@@ -2597,8 +2597,8 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 		var i uint32 = 0
 		var p *Zval = ZEND_CALL_ARG(call, 1)
 		ArrayInitSize(arg_array, num_args)
-		ZendHashRealInitPacked(Z_ARRVAL_P(arg_array))
-		var __fill_ht *HashTable = Z_ARRVAL_P(arg_array)
+		ZendHashRealInitPacked(arg_array.GetArr())
+		var __fill_ht *HashTable = arg_array.GetArr()
 		var __fill_bkt *Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		ZEND_ASSERT((__fill_ht.GetUFlags() & HASH_FLAG_PACKED) != 0)
@@ -2670,7 +2670,7 @@ func DebugPrintBacktraceArgs(arg_array *Zval) {
 	var tmp *Zval
 	var i int = 0
 	for {
-		var __ht *HashTable = Z_ARRVAL_P(arg_array)
+		var __ht *HashTable = arg_array.GetArr()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -3071,7 +3071,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 			ZVAL_INTERNED_STR(&tmp, pseudo_function_name)
 			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FUNCTION), &tmp)
 		}
-		ZendHashNextIndexInsertNew(Z_ARRVAL_P(return_value), &stack_frame)
+		ZendHashNextIndexInsertNew(return_value.GetArr(), &stack_frame)
 		include_filename = filename
 		call = skip
 		ptr = skip.GetPrevExecuteData()

@@ -1188,7 +1188,7 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		intern.GetNApplyCount()--
 	}
 exit:
-	var new_ht *zend.HashTable = zend.Z_ARRVAL_P(zend.Z_REFVAL(params[0]))
+	var new_ht *zend.HashTable = zend.Z_REFVAL(params[0]).GetArr()
 	if aht != new_ht {
 		SplArrayReplaceHashTable(intern, new_ht)
 	} else {
@@ -1447,7 +1447,7 @@ func zim_spl_Array_unserialize(execute_data *zend.ZendExecuteData, return_value 
 
 	/* copy members */
 
-	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(members))
+	zend.ObjectPropertiesLoad(intern.GetStd(), members.GetArr())
 
 	/* done reading $serialized */
 
@@ -1469,7 +1469,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	/* flags */
 
 	zend.ZVAL_LONG(&tmp, intern.GetArFlags()&SPL_ARRAY_CLONE_MASK)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* storage */
 
@@ -1478,13 +1478,13 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	} else {
 		zend.ZVAL_COPY(&tmp, intern.GetArray())
 	}
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
 	/* iterator class */
 
@@ -1493,7 +1493,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	} else {
 		zend.ZVAL_STR_COPY(&tmp, intern.GetCeGetIterator().GetName())
 	}
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &tmp)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 }
 func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS)
@@ -1523,7 +1523,7 @@ func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_valu
 	} else {
 		SplArraySetArray(zend.ZEND_THIS, intern, storage_zv, 0, 1)
 	}
-	zend.ObjectPropertiesLoad(intern.GetStd(), zend.Z_ARRVAL_P(members_zv))
+	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 	if iterator_class_zv != nil && iterator_class_zv.GetType() == zend.IS_STRING {
 		var ce *zend.ZendClassEntry = zend.ZendLookupClass(iterator_class_zv.GetStr())
 		if ce == nil {

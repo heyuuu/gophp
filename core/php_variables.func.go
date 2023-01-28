@@ -47,7 +47,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	var symtable1 *zend.HashTable = nil
 	r.Assert(var_name != nil)
 	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
-		symtable1 = zend.Z_ARRVAL_P(track_vars_array)
+		symtable1 = track_vars_array.GetArr()
 	}
 	if symtable1 == nil {
 
@@ -144,7 +144,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 				/* too many levels of nesting */
 
 				if track_vars_array != nil {
-					ht = zend.Z_ARRVAL_P(track_vars_array)
+					ht = track_vars_array.GetArr()
 					zend.ZendSymtableStrDel(ht, var_, var_len)
 				}
 				zend.ZvalPtrDtorNogc(val)
@@ -208,7 +208,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 					}
 				}
 			}
-			symtable1 = zend.Z_ARRVAL_P(gpc_element_p)
+			symtable1 = gpc_element_p.GetArr()
 
 			/* ip pointed to the '[' character, now obtain the key */
 
@@ -521,7 +521,7 @@ func _phpImportEnvironmentVariables(array_ptr *zend.Zval) {
 	var env **byte
 	tsrm_env_lock()
 	for env = Environ; env != nil && (*env) != nil; env++ {
-		ImportEnvironmentVariable(zend.Z_ARRVAL_P(array_ptr), *env)
+		ImportEnvironmentVariable(array_ptr.GetArr(), *env)
 	}
 	tsrm_env_unlock()
 }
@@ -589,8 +589,8 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 	}
 	if track_vars_array != nil && track_vars_array.GetType() == zend.IS_ARRAY {
 		zend.Z_ADDREF(arr)
-		zend.ZendHashUpdate(zend.Z_ARRVAL_P(track_vars_array), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
-		zend.ZendHashUpdate(zend.Z_ARRVAL_P(track_vars_array), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
+		zend.ZendHashUpdate(track_vars_array.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), &arr)
+		zend.ZendHashUpdate(track_vars_array.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), &argc)
 	}
 	zend.ZvalPtrDtorNogc(&arr)
 }
@@ -606,7 +606,7 @@ func PhpRegisterServerVariables() {
 	if sapi_module.GetRegisterServerVariables() != nil {
 		sapi_module.GetRegisterServerVariables()(arr)
 	}
-	ht = zend.Z_ARRVAL_P(arr)
+	ht = arr.GetArr()
 
 	/* PHP Authentication support */
 
@@ -662,7 +662,7 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 				}
 			} else {
 				zend.SEPARATE_ARRAY(dest_entry)
-				PhpAutoglobalMerge(zend.Z_ARRVAL_P(dest_entry), zend.Z_ARRVAL_P(src_entry))
+				PhpAutoglobalMerge(dest_entry.GetArr(), src_entry.GetArr())
 			}
 		}
 		break

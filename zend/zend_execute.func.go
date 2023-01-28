@@ -2029,14 +2029,14 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = ZendHashNextIndexInsert(Z_ARRVAL_P(container), &(ExecutorGlobals.GetUninitializedZval()))
+			retval = ZendHashNextIndexInsert(container.GetArr(), &(ExecutorGlobals.GetUninitializedZval()))
 			if retval == nil {
 				ZendCannotAddElement()
 				ZVAL_ERROR(result)
 				return
 			}
 		} else {
-			retval = ZendFetchDimensionAddressInner(Z_ARRVAL_P(container), dim, dim_type, type_, EXECUTE_DATA_C)
+			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
 			if retval == nil {
 				ZVAL_ERROR(result)
 				return
@@ -2151,7 +2151,7 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 	if slow == 0 {
 		if container.GetType() == IS_ARRAY {
 		try_array:
-			retval = ZendFetchDimensionAddressInner(Z_ARRVAL_P(container), dim, dim_type, type_, EXECUTE_DATA_C)
+			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
 			ZVAL_COPY_DEREF(result, retval)
 			return
 		} else if container.GetType() == IS_REFERENCE {

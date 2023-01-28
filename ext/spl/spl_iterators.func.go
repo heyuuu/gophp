@@ -2564,7 +2564,7 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 		if zend.ExecutorGlobals.GetException() != nil {
 			return zend.ZEND_HASH_APPLY_STOP
 		}
-		zend.ArraySetZvalKey(zend.Z_ARRVAL_P(return_value), &key, data)
+		zend.ArraySetZvalKey(return_value.GetArr(), &key, data)
 		zend.ZvalPtrDtor(&key)
 	} else {
 		zend.Z_TRY_ADDREF_P(data)

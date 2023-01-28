@@ -452,11 +452,11 @@ func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 	if array.GetType() != zend.IS_ARRAY {
 		zend.ConvertToArray(array)
 	}
-	n = zend.Z_ARRVAL_P(array).GetNNumOfElements()
+	n = array.GetArr().GetNNumOfElements()
 	args = (*zend.Zval)(zend.SafeEmalloc(n, b.SizeOf("zval"), 0))
 	n = 0
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(array)
+		var __ht *zend.HashTable = array.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {

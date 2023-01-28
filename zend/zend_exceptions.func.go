@@ -462,7 +462,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			var last_len int = str.GetS().GetLen()
 			var arg *Zval
 			for {
-				var __ht *HashTable = Z_ARRVAL_P(tmp)
+				var __ht *HashTable = tmp.GetArr()
 				var _p *Bucket = __ht.GetArData()
 				var _end *Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
@@ -505,7 +505,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 		return
 	}
 	for {
-		var __ht *HashTable = Z_ARRVAL_P(trace)
+		var __ht *HashTable = trace.GetArr()
 		var _p *Bucket = __ht.GetArData()
 		var _end *Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -520,7 +520,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 				ZendError(E_WARNING, "Expected array for frame "+ZEND_ULONG_FMT, index)
 				continue
 			}
-			_buildTraceString(&str, Z_ARRVAL_P(frame), b.PostInc(&num))
+			_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
 		}
 		break
 	}

@@ -861,7 +861,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(&list)
+		var __ht *zend.HashTable = list.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {
@@ -936,7 +936,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(&list)
+		var __ht *zend.HashTable = list.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {

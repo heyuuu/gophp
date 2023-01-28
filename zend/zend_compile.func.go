@@ -6010,7 +6010,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 		var value *Zval = ZendAstGetZval(value_ast)
 		if elem_ast.GetKind() == ZEND_AST_UNPACK {
 			if value.GetType() == IS_ARRAY {
-				var ht *HashTable = Z_ARRVAL_P(value)
+				var ht *HashTable = value.GetArr()
 				var val *Zval
 				var key *ZendString
 				for {
@@ -6028,7 +6028,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 						if key != nil {
 							ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unpack array with string keys")
 						}
-						if ZendHashNextIndexInsert(Z_ARRVAL_P(result), val) == nil {
+						if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
 							ZvalPtrDtor(result)
 							return 0
 						}
@@ -6047,29 +6047,29 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 			var key *Zval = ZendAstGetZval(key_ast)
 			switch key.GetType() {
 			case IS_LONG:
-				ZendHashIndexUpdate(Z_ARRVAL_P(result), key.GetLval(), value)
+				ZendHashIndexUpdate(result.GetArr(), key.GetLval(), value)
 				break
 			case IS_STRING:
-				ZendSymtableUpdate(Z_ARRVAL_P(result), key.GetStr(), value)
+				ZendSymtableUpdate(result.GetArr(), key.GetStr(), value)
 				break
 			case IS_DOUBLE:
-				ZendHashIndexUpdate(Z_ARRVAL_P(result), ZendDvalToLval(key.GetDval()), value)
+				ZendHashIndexUpdate(result.GetArr(), ZendDvalToLval(key.GetDval()), value)
 				break
 			case IS_FALSE:
-				ZendHashIndexUpdate(Z_ARRVAL_P(result), 0, value)
+				ZendHashIndexUpdate(result.GetArr(), 0, value)
 				break
 			case IS_TRUE:
-				ZendHashIndexUpdate(Z_ARRVAL_P(result), 1, value)
+				ZendHashIndexUpdate(result.GetArr(), 1, value)
 				break
 			case IS_NULL:
-				ZendHashUpdate(Z_ARRVAL_P(result), ZSTR_EMPTY_ALLOC(), value)
+				ZendHashUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), value)
 				break
 			default:
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal offset type")
 				break
 			}
 		} else {
-			if ZendHashNextIndexInsert(Z_ARRVAL_P(result), value) == nil {
+			if ZendHashNextIndexInsert(result.GetArr(), value) == nil {
 				ZvalPtrDtorNogc(value)
 				ZvalPtrDtor(result)
 				return 0

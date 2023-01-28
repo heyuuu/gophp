@@ -739,11 +739,11 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		break
 	case zend.IS_ARRAY:
-		if zend.Z_ARRVAL_P(data).GetNNumOfElements() {
+		if data.GetArr().GetNNumOfElements() {
 			var bytes_written ssize_t
 			var tmp *zend.Zval
 			for {
-				var __ht *zend.HashTable = zend.Z_ARRVAL_P(data)
+				var __ht *zend.HashTable = data.GetArr()
 				var _p *zend.Bucket = __ht.GetArData()
 				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 				for ; _p != _end; _p++ {
@@ -3267,35 +3267,35 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Store numeric indexes in proper order */
 
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_dev)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_ino)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_mode)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_nlink)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_uid)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_gid)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_rdev)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_size)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_atime)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_mtime)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_ctime)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_blksize)
-	zend.ZendHashNextIndexInsert(zend.Z_ARRVAL_P(return_value), &stat_blocks)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_dev)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_ino)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_mode)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_nlink)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_uid)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_gid)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_rdev)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_size)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_atime)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_mtime)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_ctime)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_blksize)
+	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_blocks)
 
 	/* Store string indexes referencing the same zval*/
 
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[0], strlen(stat_sb_names[0]), &stat_dev)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[1], strlen(stat_sb_names[1]), &stat_ino)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[2], strlen(stat_sb_names[2]), &stat_mode)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[3], strlen(stat_sb_names[3]), &stat_nlink)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[4], strlen(stat_sb_names[4]), &stat_uid)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[5], strlen(stat_sb_names[5]), &stat_gid)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[6], strlen(stat_sb_names[6]), &stat_rdev)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[7], strlen(stat_sb_names[7]), &stat_size)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[8], strlen(stat_sb_names[8]), &stat_atime)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[9], strlen(stat_sb_names[9]), &stat_mtime)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[10], strlen(stat_sb_names[10]), &stat_ctime)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[11], strlen(stat_sb_names[11]), &stat_blksize)
-	zend.ZendHashStrAddNew(zend.Z_ARRVAL_P(return_value), stat_sb_names[12], strlen(stat_sb_names[12]), &stat_blocks)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[0], strlen(stat_sb_names[0]), &stat_dev)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[1], strlen(stat_sb_names[1]), &stat_ino)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[2], strlen(stat_sb_names[2]), &stat_mode)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[3], strlen(stat_sb_names[3]), &stat_nlink)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[4], strlen(stat_sb_names[4]), &stat_uid)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[5], strlen(stat_sb_names[5]), &stat_gid)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[6], strlen(stat_sb_names[6]), &stat_rdev)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[7], strlen(stat_sb_names[7]), &stat_size)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[8], strlen(stat_sb_names[8]), &stat_atime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[9], strlen(stat_sb_names[9]), &stat_mtime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[10], strlen(stat_sb_names[10]), &stat_ctime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[11], strlen(stat_sb_names[11]), &stat_blksize)
+	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[12], strlen(stat_sb_names[12]), &stat_blocks)
 }
 func ZifCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var source *byte
@@ -3790,9 +3790,9 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var field_tmp *zend.Zval
 	var csvline zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
-	count = zend.Z_ARRVAL_P(fields).GetNNumOfElements()
+	count = fields.GetArr().GetNNumOfElements()
 	for {
-		var __ht *zend.HashTable = zend.Z_ARRVAL_P(fields)
+		var __ht *zend.HashTable = fields.GetArr()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {

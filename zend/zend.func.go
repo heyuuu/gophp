@@ -257,17 +257,17 @@ func ZendPrintFlatZvalR(expr *Zval) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		ZEND_PUTS("Array (")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(Z_ARRVAL_P(expr)) != 0 {
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				ZEND_PUTS(" *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(Z_ARRVAL_P(expr))
+			GC_PROTECT_RECURSION(expr.GetArr())
 		}
-		PrintFlatHash(Z_ARRVAL_P(expr))
+		PrintFlatHash(expr.GetArr())
 		ZEND_PUTS(")")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(Z_ARRVAL_P(expr))
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break
 	case IS_OBJECT:
@@ -299,16 +299,16 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	switch expr.GetType() {
 	case IS_ARRAY:
 		SmartStrAppends(buf, "Array\n")
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(Z_ARRVAL_P(expr)) != 0 {
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
 				SmartStrAppends(buf, " *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(Z_ARRVAL_P(expr))
+			GC_PROTECT_RECURSION(expr.GetArr())
 		}
-		PrintHash(buf, Z_ARRVAL_P(expr), indent, 0)
-		if (GC_FLAGS(Z_ARRVAL_P(expr)) & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(Z_ARRVAL_P(expr))
+		PrintHash(buf, expr.GetArr(), indent, 0)
+		if (GC_FLAGS(expr.GetArr()) & GC_IMMUTABLE) == 0 {
+			GC_UNPROTECT_RECURSION(expr.GetArr())
 		}
 		break
 	case IS_OBJECT:

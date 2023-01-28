@@ -644,9 +644,9 @@ func Z_PROP_FLAG_P(z *Zval) uint32          { return z.GetU2Extra() }
 func ZVAL_COPY_VALUE_PROP(z *Zval, v *Zval) { *z = *v }
 func ZVAL_COPY_PROP(z *Zval, v *Zval) {
 	ZVAL_COPY(z, v)
-	Z_PROP_FLAG_P(z) = Z_PROP_FLAG_P(v)
+	z.GetU2Extra() = v.GetU2Extra()
 }
 func ZVAL_COPY_OR_DUP_PROP(z *Zval, v *Zval) {
 	ZVAL_COPY_OR_DUP(z, v)
-	Z_PROP_FLAG_P(z) = Z_PROP_FLAG_P(v)
+	z.GetU2Extra() = v.GetU2Extra()
 }
