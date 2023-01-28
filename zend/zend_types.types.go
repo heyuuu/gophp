@@ -2,6 +2,29 @@
 
 package zend
 
+import b "sik/builtin"
+
+/**
+ * ZendType
+ */
+type ZendType uintptr
+
+func (this ZendType) IsSet() bool   { return this > 0x3 }
+func (this ZendType) IsCode() bool  { return this > 0x3 && this <= 0x3ff }
+func (this ZendType) IsClass() bool { return this > 0x3ff }
+func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
+func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
+func (this ZendType) Name() *ZendString {
+	var ptr = this &^ 0x3
+	return b.ForceCastPtr[ZendString](ptr)
+}
+func (this ZendType) Ce() *ZendClassEntry {
+	var ptr = this &^ 0x3
+	return b.ForceCastPtr[ZendClassEntry](ptr)
+}
+func (this ZendType) Code() int       { return this >> int64(2) }
+func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
+
 /**
  * HashTableIterator
  */

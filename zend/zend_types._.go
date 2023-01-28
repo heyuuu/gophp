@@ -2,6 +2,8 @@
 
 package zend
 
+import "math"
+
 // Source: <Zend/zend_types.h>
 
 /*
@@ -64,26 +66,8 @@ type CopyCtorFuncT func(pElement *Zval)
  * construction.
  */
 
-type ZendType = uintPtr
-type HashTable = ZendArray
-
-/*
- * HashTable Data Layout
- * =====================
- *
- *                 +=============================+
- *                 | HT_HASH(ht, ht->nTableMask) |
- *                 | ...                         |
- *                 | HT_HASH(ht, -1)             |
- *                 +-----------------------------+
- * ht->arData ---> | Bucket[0]                   |
- *                 | ...                         |
- *                 | Bucket[ht->nTableSize-1]    |
- *                 +=============================+
- */
-
-const HT_INVALID_IDX uint32 = uint32 - 1
-const HT_MIN_MASK uint32 = uint32 - 2
+const HT_INVALID_IDX uint32 = math.MaxUint32  // uint32(-1)
+const HT_MIN_MASK uint32 = math.MaxUint32 - 1 // uint32(-2)
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 

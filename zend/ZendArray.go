@@ -33,7 +33,20 @@ func (this *Bucket) SetKey(value *ZendString) { this.key = value }
 
 /**
  * ZendArray
+ * HashTable Data Layout
+ * =====================
+ *
+ *                 +=============================+
+ *                 | HT_HASH(ht, ht->nTableMask) |
+ *                 | ...                         |
+ *                 | HT_HASH(ht, -1)             |
+ *                 +-----------------------------+
+ * ht->arData ---> | Bucket[0]                   |
+ *                 | ...                         |
+ *                 | Bucket[ht->nTableSize-1]    |
+ *                 +=============================+
  */
+type HashTable = ZendArray
 type ZendArray struct {
 	ZendRefcounted
 	u struct /* union */ {
