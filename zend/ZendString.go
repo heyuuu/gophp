@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendString
  */
@@ -20,3 +22,20 @@ func (this *ZendString) GetLen() int          { return this.len_ }
 func (this *ZendString) SetLen(value int)     { this.len_ = value }
 func (this *ZendString) GetVal() []byte       { return this.val }
 func (this *ZendString) SetVal(value []byte)  { this.val = value }
+
+func (this *ZendString) GetHash() ZendUlong {
+	if this.h == 0 {
+		this.h = b.HashBytes(this.val[:this.len_])
+	}
+
+	return this.h
+}
+
+func (this *ZendString) Copy() *ZendString {
+	this.AddRefcount()
+	return this
+}
+
+func (this *ZendString) Dup(persistent int) *ZendString {
+	return ZendStringInit(this.GetVal(), this.GetLen(), persistent)
+}

@@ -36,29 +36,14 @@ func ZSTR_ALLOCA_INIT(str *ZendString, s __auto__, len_ int, use_heap __auto__) 
 	str.GetVal()[len_] = '0'
 }
 func ZSTR_ALLOCA_FREE(str any, use_heap __auto__) { FreeAlloca(str, use_heap) }
-func ZendStringHashVal(s *ZendString) ZendUlong {
-	if s.GetH() != 0 {
-		return s.GetH()
-	} else {
-		return ZendStringHashFunc(s)
-	}
-}
+func ZendStringHashVal(s *ZendString) ZendUlong   { return s.GetHash() }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	s.DelGcFlags(IS_STR_VALID_UTF8)
 }
-func ZendStringRefcount(s *ZendString) uint32 {
-	return s.GetRefcount()
-	return 1
-}
-func ZendStringAddref(s *ZendString) uint32 {
-	return s.AddRefcount()
-	return 1
-}
-func ZendStringDelref(s *ZendString) uint32 {
-	return s.DelRefcount()
-	return 1
-}
+func ZendStringRefcount(s *ZendString) uint32 { return s.GetRefcount() }
+func ZendStringAddref(s *ZendString) uint32   { return s.AddRefcount() }
+func ZendStringDelref(s *ZendString) uint32   { return s.DelRefcount() }
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var ret *ZendString = (*ZendString)(Pemalloc(ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
 	ret.SetRefcount(1)
@@ -81,13 +66,8 @@ func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
 	ret.GetVal()[len_] = '0'
 	return ret
 }
-func ZendStringCopy(s *ZendString) *ZendString {
-	s.AddRefcount()
-	return s
-}
-func ZendStringDup(s *ZendString, persistent int) *ZendString {
-	return ZendStringInit(s.GetVal(), s.GetLen(), persistent)
-}
+func ZendStringCopy(s *ZendString) *ZendString                { return s.Copy() }
+func ZendStringDup(s *ZendString, persistent int) *ZendString { return s.Dup(persistent) }
 func ZendStringRealloc(s *ZendString, len_ int, persistent int) *ZendString {
 	var ret *ZendString
 	if s.GetRefcount() == 1 {
