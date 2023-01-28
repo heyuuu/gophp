@@ -70,16 +70,8 @@ type ZendArray struct {
 
 var _ IRefcounted = &ZendArray{}
 
-func (this *ZendArray) GetFlags() ZendUchar                { return this.u.v.flags }
-func (this *ZendArray) SetFlags(value ZendUchar)           { this.u.v.flags = value }
-func (this *ZendArray) GetUnused() ZendUchar               { return this.u.v._unused }
-func (this *ZendArray) SetUnused(value ZendUchar)          { this.u.v._unused = value }
 func (this *ZendArray) GetNIteratorsCount() ZendUchar      { return this.u.v.nIteratorsCount }
 func (this *ZendArray) SetNIteratorsCount(value ZendUchar) { this.u.v.nIteratorsCount = value }
-func (this *ZendArray) GetUnused2() ZendUchar              { return this.u.v._unused2 }
-func (this *ZendArray) SetUnused2(value ZendUchar)         { this.u.v._unused2 = value }
-func (this *ZendArray) GetUFlags() uint32                  { return this.u.flags }
-func (this *ZendArray) SetUFlags(value uint32)             { this.u.flags = value }
 func (this *ZendArray) GetNTableMask() uint32              { return this.nTableMask }
 func (this *ZendArray) SetNTableMask(value uint32)         { this.nTableMask = value }
 func (this *ZendArray) GetArData() *Bucket                 { return this.arData }
@@ -98,6 +90,8 @@ func (this *ZendArray) GetPDestructor() DtorFuncT          { return this.pDestru
 func (this *ZendArray) SetPDestructor(value DtorFuncT)     { this.pDestructor = value }
 
 /* ZendArray.u.v.flags */
+func (this *ZendArray) GetFlags() ZendUchar           { return this.u.v.flags }
+func (this *ZendArray) SetFlags(value ZendUchar)      { this.u.v.flags = value }
 func (this *ZendArray) AddFlags(value ZendUchar)      { this.u.v.flags |= value }
 func (this *ZendArray) SubFlags(value ZendUchar)      { this.u.v.flags &^= value }
 func (this *ZendArray) HasFlags(value ZendUchar) bool { return this.u.v.flags&value != 0 }
@@ -109,7 +103,23 @@ func (this *ZendArray) SwitchFlags(value ZendUchar, cond bool) {
 	}
 }
 
+const HASH_FLAG_PACKED = 1 << 2
+const HASH_FLAG_UNINITIALIZED = 1 << 3
+const HASH_FLAG_STATIC_KEYS = 1 << 4
+const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
+
+func (this *ZendArray) IsPacked() bool        { return this.HasFlags(HASH_FLAG_PACKED) }
+func (this *ZendArray) IsUninitialized() bool { return this.HasFlags(HASH_FLAG_UNINITIALIZED) }
+func (this *ZendArray) IsStaticKeys() bool    { return this.HasFlags(HASH_FLAG_STATIC_KEYS) }
+func (this *ZendArray) IsHasEmptyInd() bool   { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
+func (this *ZendArray) SetIsPacked()          { this.AddFlags(HASH_FLAG_PACKED) }
+func (this *ZendArray) SetIsUninitialized()   { this.AddFlags(HASH_FLAG_UNINITIALIZED) }
+func (this *ZendArray) SetIsStaticKeys()      { this.AddFlags(HASH_FLAG_STATIC_KEYS) }
+func (this *ZendArray) SetIsHasEmptyInd()     { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
+
 /* ZendArray.u.flags */
+func (this *ZendArray) GetUFlags() uint32           { return this.u.flags }
+func (this *ZendArray) SetUFlags(value uint32)      { this.u.flags = value }
 func (this *ZendArray) AddUFlags(value uint32)      { this.u.flags |= value }
 func (this *ZendArray) SubUFlags(value uint32)      { this.u.flags &^= value }
 func (this *ZendArray) HasUFlags(value uint32) bool { return this.u.flags&value != 0 }

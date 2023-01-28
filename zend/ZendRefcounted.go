@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendRefcountedH
  */
@@ -42,6 +44,7 @@ type IRefcounted interface {
 
 	AddGcFlags(flags uint32)
 	DelGcFlags(flags uint32)
+	HasGcFlags(flags uint32) bool
 }
 
 type ZendRefcounted struct {
@@ -123,4 +126,9 @@ func (this *ZendRefcounted) AddGcFlags(flags uint32) {
 
 func (this *ZendRefcounted) DelGcFlags(flags uint32) {
 	this.gc.u.type_info &^= flags << GC_FLAGS_SHIFT
+}
+
+func (this *ZendRefcounted) HasGcFlags(flags uint32) bool {
+	var gcFlags = this.GetGcFlags()
+	return b.FlagMatch(gcFlags, flags)
 }

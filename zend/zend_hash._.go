@@ -32,12 +32,6 @@ const HASH_ADD uint32 = 1 << 1
 const HASH_UPDATE_INDIRECT = 1 << 2
 const HASH_ADD_NEW uint32 = 1 << 3
 const HASH_ADD_NEXT = 1 << 4
-const HASH_FLAG_CONSISTENCY = 1<<0 | 1<<1
-const HASH_FLAG_PACKED = 1 << 2
-const HASH_FLAG_UNINITIALIZED uint32 = 1 << 3
-const HASH_FLAG_STATIC_KEYS ZendUchar = 1 << 4
-const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
-const HASH_FLAG_ALLOW_COW_VIOLATION = 1 << 6
 
 /* Only the low byte are real flags */
 
