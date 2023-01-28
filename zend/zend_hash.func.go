@@ -568,14 +568,6 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	return nSize + 1
 }
 
-func ZendHashPackedGrow(ht *HashTable) {
-	ht.assertRc1()
-	if ht.GetNTableSize() >= HT_MAX_SIZE {
-		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket"), b.SizeOf("Bucket"))
-	}
-	ht.SetNTableSize(ht.GetNTableSize() + ht.GetNTableSize())
-	HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
-}
 func ZendHashRealInit(ht *HashTable, packed ZendBool) { ht.RealInit() }
 func ZendHashRealInitPacked(ht *HashTable)            { ht.RealInit() }
 func ZendHashRealInitMixed(ht *HashTable)             { ht.RealInit() }
