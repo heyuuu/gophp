@@ -6,13 +6,18 @@ import (
 	b "sik/builtin"
 )
 
-func ZSTR_VAL(zstr *ZendString) []byte             { return zstr.GetVal() }
-func ZSTR_HASH(zstr *ZendString) ZendUlong         { return zstr.GetHash() }
-func STR_EMPTY_ALLOC() *ZendString                 { return ZSTR_EMPTY_ALLOC() }
-func ZSTR_EMPTY_ALLOC() *ZendString                { return ZendEmptyString }
+func ZSTR_VAL(zstr *ZendString) []byte { return zstr.GetVal() }
+
+var ZendEmptyString *ZendString = nil
+
+func STR_EMPTY_ALLOC() *ZendString  { return ZendEmptyString }
+func ZSTR_EMPTY_ALLOC() *ZendString { return ZendEmptyString }
+
 func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }
 func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx] }
-func _ZSTR_STRUCT_SIZE(len_ int) int               { return _ZSTR_HEADER_SIZE + len_ + 1 }
+
+func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
+
 func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
 	str = (*ZendString)(DoAlloca(ZEND_MM_ALIGNED_SIZE_EX(_ZSTR_STRUCT_SIZE(_len), 8), use_heap))
 	str.SetRefcount(1)
@@ -20,60 +25,39 @@ func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap __auto__) {
 	str.SetH(0)
 	str.SetLen(_len)
 }
-func ZSTR_ALLOCA_FREE(str any, use_heap __auto__) { FreeAlloca(str, use_heap) }
+
+func ZSTR_ALLOCA_FREE(str any, use_heap any) { b.Free(str) }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	s.DelGcFlags(IS_STR_VALID_UTF8)
 }
+
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
-	var ret *ZendString = (*ZendString)(Pemalloc(ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-	ret.SetRefcount(1)
-	ret.GetGcTypeInfo() = IS_STRING | b.Cond(persistent != 0, IS_STR_PERSISTENT, 0)<<GC_FLAGS_SHIFT
-	ret.SetH(0)
-	ret.SetLen(len_)
-	return ret
+	var str_ = b.EmptyString(len_)
+	return ZendStringNew(str_, persistent != 0)
 }
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
-	var ret *ZendString = (*ZendString)(SafePemalloc(n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
-	ret.SetRefcount(1)
-	ret.GetGcTypeInfo() = IS_STRING | b.Cond(persistent != 0, IS_STR_PERSISTENT, 0)<<GC_FLAGS_SHIFT
-	ret.SetH(0)
-	ret.SetLen(n*m + l)
-	return ret
+	// todo 不太明白参数作用，仅从纯代码功能重构
+	var len_ = n*m + l
+	return ZendStringAlloc(len_, persistent)
 }
 func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
-	var ret *ZendString = ZendStringAlloc(len_, persistent)
-	memcpy(ret.GetVal(), str, len_)
-	ret.GetVal()[len_] = '0'
-	return ret
+	var str_ = b.CastStr(str, len_)
+	return ZendStringNew(str_, persistent != 0)
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
-	var ret *ZendString
 	ZEND_ASSERT(len_ >= s.GetLen())
-	if s.GetRefcount() == 1 {
-		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.SetLen(len_)
-		ZendStringForgetHashVal(ret)
-		return ret
-	}
-	ret = ZendStringAlloc(len_, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), s.GetLen()+1)
+	var oldStr = s.GetStr()
+	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
 	s.DelRefcount()
-	return ret
+	return ZendStringNew(newStr, persistent != 0)
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
-	var ret *ZendString
 	ZEND_ASSERT(len_ <= s.GetLen())
-	if s.GetRefcount() == 1 {
-		ret = (*ZendString)(Perealloc(s, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(len_)), persistent))
-		ret.SetLen(len_)
-		ZendStringForgetHashVal(ret)
-		return ret
-	}
-	ret = ZendStringAlloc(len_, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), len_+1)
+	var oldStr = s.GetStr()
+	var newStr = oldStr[:len_]
 	s.DelRefcount()
-	return ret
+	return ZendStringNew(newStr, persistent != 0)
 }
 func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString
@@ -90,47 +74,37 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 }
 func ZendStringFree(s *ZendString) {
 	ZEND_ASSERT(s.GetRefcount() <= 1)
-	Pefree(s, s.GetGcFlags()&IS_STR_PERSISTENT)
+	b.Free(s)
 }
 func ZendStringEfree(s *ZendString) {
-	ZEND_ASSERT(true)
 	ZEND_ASSERT(s.GetRefcount() <= 1)
 	ZEND_ASSERT((s.GetGcFlags() & IS_STR_PERSISTENT) == 0)
-	Efree(s)
+	b.Free(s)
 }
 func ZendStringRelease(s *ZendString) {
 	if s.DelRefcount() == 0 {
-		Pefree(s, s.GetGcFlags()&IS_STR_PERSISTENT)
+		b.Free(s)
 	}
 }
 func ZendStringReleaseEx(s *ZendString, persistent int) {
 	if s.DelRefcount() == 0 {
-		if persistent != 0 {
-			ZEND_ASSERT((s.GetGcFlags() & IS_STR_PERSISTENT) != 0)
-			Free(s)
-		} else {
-			ZEND_ASSERT((s.GetGcFlags() & IS_STR_PERSISTENT) == 0)
-			Efree(s)
-		}
+		b.Free(s)
 	}
 }
-func ZendStringEqualVal(s1 *ZendString, s2 *ZendString) ZendBool {
-	return !(memcmp(s1.GetVal(), s2.GetVal(), s1.GetLen()))
-}
 func ZendStringEqualContent(s1 *ZendString, s2 *ZendString) ZendBool {
-	return s1.GetLen() == s2.GetLen() && ZendStringEqualVal(s1, s2) != 0
+	return intBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEquals(s1 *ZendString, s2 *ZendString) ZendBool {
-	return s1 == s2 || ZendStringEqualContent(s1, s2) != 0
+	return intBool(s1.GetStr() == s2.GetStr())
 }
 func ZendStringEqualsCi(s1 *ZendString, s2 *ZendString) bool {
-	return s1.GetLen() == s2.GetLen() && ZendBinaryStrcasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()) == 0
+	return strCaseEquals(s1.GetStr(), s2.GetStr())
 }
 func ZendStringEqualsLiteralCi(str *ZendString, c string) bool {
-	return str.GetLen() == b.SizeOf("c")-1 && ZendBinaryStrcasecmp(str.GetVal(), str.GetLen(), c, b.SizeOf("c")-1) == 0
+	return strCaseEquals(str.GetStr(), c)
 }
 func ZendStringEqualsLiteral(str *ZendString, literal string) bool {
-	return str.GetLen() == b.SizeOf("literal")-1 && !(memcmp(str.GetVal(), literal, b.SizeOf("literal")-1))
+	return str.GetStr() == literal
 }
 func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
 	var str_ = b.CastStr(str, len_)

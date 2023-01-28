@@ -159,7 +159,6 @@ const (
 var InternedStringsPermanent HashTable
 var InternedStringRequestHandler ZendNewInternedStringFuncT = ZendNewInternedStringRequest
 var InternedStringInitRequestHandler ZendStringInitInternedFuncT = ZendStringInitInternedRequest
-var ZendEmptyString *ZendString = nil
 var ZendKnownStrings **ZendString = nil
 var KnownStrings []*byte = []*byte{"file", "line", "function", "class", "object", "type", "->", "::", "args", "unknown", "eval", "include", "require", "include_once", "require_once", "scalar", "error_reporting", "static", "this", "value", "key", "__autoload", "__invoke", "previous", "code", "message", "severity", "string", "trace", "scheme", "host", "port", "user", "pass", "path", "query", "fragment", "NULL", "boolean", "integer", "double", "array", "resource", "resource (closed)", "name", "argv", "argc", "Array", nil}
 

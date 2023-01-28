@@ -31,6 +31,14 @@ type ZendBool = uint8
 type ZendUchar = uint8
 type ZEND_RESULT_CODE = int
 
+func intBool(value bool) ZendBool {
+	if value {
+		return 1
+	} else {
+		return 0
+	}
+}
+
 const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1

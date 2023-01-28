@@ -23,3 +23,7 @@ func HashBytes(bytes []byte) uint {
 func Free(ptr any) {
 	// todo 单纯作为内存失败的标识
 }
+
+func EmptyString(len_ int) string {
+	return string(make([]byte, len_))
+}
