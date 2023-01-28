@@ -9,11 +9,15 @@ type integer interface {
 func FlagMatch[T integer](flags T, flag T) bool { return flags&flag != 0 }
 func FlagMatchNum[T integer](flags T, flag T) T { return flags & flag }
 
+func ForceCast[T any, P any](ptr *P) *T {
+	return (*T)(unsafe.Pointer(ptr))
+}
+
 func ForceCastPtr[T any, N integer](ptr N) *T {
 	return (*T)(unsafe.Pointer(uintptr(ptr)))
 }
 
-func ForceUintPtr[T any](ptr *T) uintptr {
+func ForceCastUintptr[T any](ptr *T) uintptr {
 	return uintptr(unsafe.Pointer(ptr))
 }
 

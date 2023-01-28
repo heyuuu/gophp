@@ -35,8 +35,8 @@ func (this *Bucket) SetKey(value *ZendString) { this.key = value }
  * ZendArray
  */
 type ZendArray struct {
-	gc ZendRefcountedH
-	u  struct /* union */ {
+	ZendRefcounted
+	u struct /* union */ {
 		v struct {
 			flags           ZendUchar
 			_unused         ZendUchar
@@ -55,8 +55,8 @@ type ZendArray struct {
 	pDestructor      DtorFuncT
 }
 
-func (this *ZendArray) GetGc() ZendRefcountedH             { return this.gc }
-func (this *ZendArray) SetGc(value ZendRefcountedH)        { this.gc = value }
+var _ IRefcounted = &ZendArray{}
+
 func (this *ZendArray) GetFlags() ZendUchar                { return this.u.v.flags }
 func (this *ZendArray) SetFlags(value ZendUchar)           { this.u.v.flags = value }
 func (this *ZendArray) GetUnused() ZendUchar               { return this.u.v._unused }
