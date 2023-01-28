@@ -16,22 +16,38 @@ func ZEND_TYPE_CE(t ZendType) *ZendClassEntry { return t.Ce() }
 func ZEND_TYPE_CODE(t ZendType) int           { return t.Code() }
 func ZEND_TYPE_ALLOW_NULL(t ZendType) bool    { return t.AllowNull() }
 
-func ZEND_TYPE_ENCODE(code uint32, allow_null int) int {
-	return code<<int64(2) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
+func ZEND_TYPE_ENCODE(code uint32, allow_null int) ZendType {
+	if allow_null != 0 {
+		return ZendType(code<<2 | 0x1)
+	} else {
+		return ZendType(code<<2 | 0x0)
+	}
 }
-func ZEND_TYPE_ENCODE_CE(ce *ZendClassEntry, allow_null bool) int {
-	return uintPtr(ce) | b.CondF(allow_null, func() __auto__ { return int64(0x3) }, func() __auto__ { return int64(0x2) })
+func ZEND_TYPE_ENCODE_CE(ce *ZendClassEntry, allow_null bool) ZendType {
+	var ptr = b.CastUintptr(ce)
+	if allow_null {
+		return ZendType(ptr | 0x3)
+	} else {
+		return ZendType(ptr | 0x2)
+	}
 }
-func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) int {
-	return uintPtr(class_name) | b.CondF(allow_null != 0, func() __auto__ { return int64(0x1) }, func() __auto__ { return int64(0x0) })
-}
-func ZEND_TYPE_ENCODE_CLASS_CONST_0(class_name __auto__) ZendType { return ZendType(class_name) }
-func ZEND_TYPE_ENCODE_CLASS_CONST_1(class_name string) ZendType   { return ZendType("?" + class_name) }
-func ZEND_TYPE_ENCODE_CLASS_CONST_Q2(macro __auto__, class_name string) __auto__ {
-	return macro(class_name)
+func ZEND_TYPE_ENCODE_CLASS(class_name *ZendString, allow_null ZendBool) ZendType {
+	var ptr = b.CastUintptr(class_name)
+	if allow_null != 0 {
+		return ZendType(ptr | 0x1)
+	} else {
+		return ZendType(ptr | 0x0)
+	}
 }
 func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) __auto__ {
-	return ZEND_TYPE_ENCODE_CLASS_CONST_Q2(ZEND_TYPE_ENCODE_CLASS_CONST_allow_null, class_name)
+	var fullClassName string
+	if allow_null != 0 {
+		fullClassName = "?" + class_name
+	} else {
+		fullClassName = class_name
+	}
+	var ptr = b.CastUintptr(&fullClassName)
+	return ZendType(ptr)
 }
 func HT_HASH_TO_BUCKET_EX(data *Bucket, idx uint32) __auto__ { return data + idx }
 func HT_IDX_TO_HASH(idx __auto__) __auto__                   { return idx }

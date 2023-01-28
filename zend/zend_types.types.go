@@ -16,11 +16,11 @@ func (this ZendType) IsCe() bool    { return b.FlagMatch(this, 0x2) }
 func (this ZendType) IsName() bool  { return this.IsClass() && !(this.IsCe()) }
 func (this ZendType) Name() *ZendString {
 	var ptr = this &^ 0x3
-	return b.ForceCastPtr[ZendString](ptr)
+	return b.CastPtr[ZendString](ptr)
 }
 func (this ZendType) Ce() *ZendClassEntry {
 	var ptr = this &^ 0x3
-	return b.ForceCastPtr[ZendClassEntry](ptr)
+	return b.CastPtr[ZendClassEntry](ptr)
 }
 func (this ZendType) Code() int       { return this >> int64(2) }
 func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
