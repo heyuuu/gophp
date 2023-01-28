@@ -49,8 +49,8 @@ func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 		/* See: Zend/tests/method_static_var.phpt */
 
 	}
-	if (GC_FLAGS(new_function.GetOpArray().GetStaticVariables()) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(new_function.GetOpArray().GetStaticVariables())
+	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		new_function.GetOpArray().GetStaticVariables().AddRefcount()
 	}
 	if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		ZEND_ASSERT(new_function.GetOpArray().IsPreloaded())

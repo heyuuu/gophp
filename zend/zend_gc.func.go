@@ -8,15 +8,15 @@ import (
 
 func GC_REMOVE_FROM_BUFFER(p __auto__) {
 	var _p *ZendRefcounted = (*ZendRefcounted)(p)
-	if (GC_TYPE_INFO(_p) & GC_INFO_MASK) != 0 {
+	if (_p.GetGcTypeInfo() & GC_INFO_MASK) != 0 {
 		GcRemoveFromBuffer(_p)
 	}
 }
 func GC_MAY_LEAK(ref *ZendRefcounted) bool {
-	return (GC_TYPE_INFO(ref) & (GC_INFO_MASK | GC_COLLECTABLE<<GC_FLAGS_SHIFT)) == GC_COLLECTABLE<<GC_FLAGS_SHIFT
+	return (ref.GetGcTypeInfo() & (GC_INFO_MASK | GC_COLLECTABLE<<GC_FLAGS_SHIFT)) == GC_COLLECTABLE<<GC_FLAGS_SHIFT
 }
 func GcCheckPossibleRoot(ref *ZendRefcounted) {
-	if GC_TYPE_INFO(ref) == IS_REFERENCE {
+	if ref.GetGcTypeInfo() == IS_REFERENCE {
 		var zv *Zval = (*ZendReference)(ref).GetVal()
 		if !(Z_COLLECTABLE_P(zv)) {
 			return
@@ -28,25 +28,25 @@ func GcCheckPossibleRoot(ref *ZendRefcounted) {
 	}
 }
 func GC_REF_ADDRESS(ref __auto__) int {
-	return (GC_TYPE_INFO(ref) & GC_ADDRESS << GC_INFO_SHIFT) >> GC_INFO_SHIFT
+	return (ref.GetGcTypeInfo() & GC_ADDRESS << GC_INFO_SHIFT) >> GC_INFO_SHIFT
 }
 func GC_REF_COLOR(ref *ZendRefcounted) int {
-	return (GC_TYPE_INFO(ref) & GC_COLOR << GC_INFO_SHIFT) >> GC_INFO_SHIFT
+	return (ref.GetGcTypeInfo() & GC_COLOR << GC_INFO_SHIFT) >> GC_INFO_SHIFT
 }
 func GC_REF_CHECK_COLOR(ref __auto__, color __auto__) bool {
-	return (GC_TYPE_INFO(ref) & GC_COLOR << GC_INFO_SHIFT) == color<<GC_INFO_SHIFT
+	return (ref.GetGcTypeInfo() & GC_COLOR << GC_INFO_SHIFT) == color<<GC_INFO_SHIFT
 }
 func GC_REF_SET_INFO(ref *ZendRefcounted, info int) {
-	GC_TYPE_INFO(ref) = GC_TYPE_INFO(ref)&(GC_TYPE_MASK|GC_FLAGS_MASK) | info<<GC_INFO_SHIFT
+	ref.GetGcTypeInfo() = ref.GetGcTypeInfo()&(GC_TYPE_MASK|GC_FLAGS_MASK) | info<<GC_INFO_SHIFT
 }
 func GC_REF_SET_COLOR(ref __auto__, c __auto__) {
-	GC_TYPE_INFO(ref) = GC_TYPE_INFO(ref) & ^(GC_COLOR<<GC_INFO_SHIFT) | c<<GC_INFO_SHIFT
+	ref.GetGcTypeInfo() = ref.GetGcTypeInfo() & ^(GC_COLOR<<GC_INFO_SHIFT) | c<<GC_INFO_SHIFT
 }
 func GC_REF_SET_BLACK(ref __auto__) {
-	GC_TYPE_INFO(ref) &= ^(GC_COLOR << GC_INFO_SHIFT)
+	ref.GetGcTypeInfo() &= ^(GC_COLOR << GC_INFO_SHIFT)
 }
 func GC_REF_SET_PURPLE(ref __auto__) {
-	GC_TYPE_INFO(ref) |= GC_COLOR << GC_INFO_SHIFT
+	ref.GetGcTypeInfo() |= GC_COLOR << GC_INFO_SHIFT
 }
 func GC_GET_PTR(ptr *ZendRefcounted) any { return any(uintPtr(ptr) & ^GC_BITS) }
 func GC_IS_ROOT(ptr *ZendRefcounted) bool {
@@ -287,15 +287,15 @@ func GcAdjustThreshold(count int) {
 func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 	var idx uint32
 	var newRoot *GcRootBuffer
-	ZEND_ASSERT(GC_TYPE(ref) == IS_ARRAY || GC_TYPE(ref) == IS_OBJECT)
-	ZEND_ASSERT(GC_INFO(ref) == 0)
+	ZEND_ASSERT(ref.GetGcType() == IS_ARRAY || ref.GetGcType() == IS_OBJECT)
+	ZEND_ASSERT(ref.GetGcInfo() == 0)
 	if GcGlobals.GetGcEnabled() != 0 && GcGlobals.GetGcActive() == 0 {
-		GC_ADDREF(ref)
+		ref.AddRefcount()
 		GcAdjustThreshold(GcCollectCycles())
-		if GC_DELREF(ref) == 0 {
+		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
 			return
-		} else if GC_INFO(ref) != 0 {
+		} else if ref.GetGcInfo() != 0 {
 			return
 		}
 	}
@@ -330,8 +330,8 @@ func GcPossibleRoot(ref *ZendRefcounted) {
 		GcPossibleRootWhenFull(ref)
 		return
 	}
-	ZEND_ASSERT(GC_TYPE(ref) == IS_ARRAY || GC_TYPE(ref) == IS_OBJECT)
-	ZEND_ASSERT(GC_INFO(ref) == 0)
+	ZEND_ASSERT(ref.GetGcType() == IS_ARRAY || ref.GetGcType() == IS_OBJECT)
+	ZEND_ASSERT(ref.GetGcInfo() == 0)
 	newRoot = GC_IDX2PTR(idx)
 	newRoot.SetRef(ref)
 	idx = GcCompress(idx)
@@ -367,9 +367,9 @@ func GcScanBlack(ref *ZendRefcounted, stack *GcStack) {
 	var zv *Zval
 	GC_STACK_DCL(stack)
 tail_call:
-	if GC_TYPE(ref) == IS_OBJECT {
+	if ref.GetGcType() == IS_OBJECT {
 		var obj *ZendObject = (*ZendObject)(ref)
-		if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
+		if (ref.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 			var n int
 			var zv *Zval
 			var end *Zval
@@ -393,7 +393,7 @@ tail_call:
 			for zv != end {
 				if Z_REFCOUNTED_P(zv) {
 					ref = zv.GetCounted()
-					GC_ADDREF(ref)
+					ref.AddRefcount()
 					if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 						GC_REF_SET_BLACK(ref)
 						GC_STACK_PUSH(ref)
@@ -403,7 +403,7 @@ tail_call:
 			}
 			if ht == nil {
 				ref = zv.GetCounted()
-				GC_ADDREF(ref)
+				ref.AddRefcount()
 				if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 					GC_REF_SET_BLACK(ref)
 					goto tail_call
@@ -413,16 +413,16 @@ tail_call:
 		} else {
 			goto next
 		}
-	} else if GC_TYPE(ref) == IS_ARRAY {
+	} else if ref.GetGcType() == IS_ARRAY {
 		if (*ZendArray)(ref != &(ExecutorGlobals.GetSymbolTable())) != nil {
 			ht = (*ZendArray)(ref)
 		} else {
 			goto next
 		}
-	} else if GC_TYPE(ref) == IS_REFERENCE {
+	} else if ref.GetGcType() == IS_REFERENCE {
 		if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
 			ref = (*ZendReference)(ref).GetVal().GetCounted()
-			GC_ADDREF(ref)
+			ref.AddRefcount()
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 				GC_REF_SET_BLACK(ref)
 				goto tail_call
@@ -457,7 +457,7 @@ tail_call:
 		}
 		if Z_REFCOUNTED_P(zv) {
 			ref = zv.GetCounted()
-			GC_ADDREF(ref)
+			ref.AddRefcount()
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 				GC_REF_SET_BLACK(ref)
 				GC_STACK_PUSH(ref)
@@ -470,7 +470,7 @@ tail_call:
 		zv = zv.GetZv()
 	}
 	ref = zv.GetCounted()
-	GC_ADDREF(ref)
+	ref.AddRefcount()
 	if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 		GC_REF_SET_BLACK(ref)
 		goto tail_call
@@ -488,9 +488,9 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 	var zv *Zval
 	GC_STACK_DCL(stack)
 	for {
-		if GC_TYPE(ref) == IS_OBJECT {
+		if ref.GetGcType() == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
+			if (ref.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -514,7 +514,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				for zv != end {
 					if Z_REFCOUNTED_P(zv) {
 						ref = zv.GetCounted()
-						GC_DELREF(ref)
+						ref.DelRefcount()
 						if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
 							GC_REF_SET_COLOR(ref, GC_GREY)
 							GC_STACK_PUSH(ref)
@@ -524,7 +524,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				}
 				if ht == nil {
 					ref = zv.GetCounted()
-					GC_DELREF(ref)
+					ref.DelRefcount()
 					if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
 						GC_REF_SET_COLOR(ref, GC_GREY)
 						continue
@@ -534,17 +534,17 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			} else {
 				goto next
 			}
-		} else if GC_TYPE(ref) == IS_ARRAY {
+		} else if ref.GetGcType() == IS_ARRAY {
 			if (*ZendArray)(ref) == &(ExecutorGlobals.GetSymbolTable()) {
 				GC_REF_SET_BLACK(ref)
 				goto next
 			} else {
 				ht = (*ZendArray)(ref)
 			}
-		} else if GC_TYPE(ref) == IS_REFERENCE {
+		} else if ref.GetGcType() == IS_REFERENCE {
 			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
-				GC_DELREF(ref)
+				ref.DelRefcount()
 				if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
 					GC_REF_SET_COLOR(ref, GC_GREY)
 					continue
@@ -579,7 +579,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			}
 			if Z_REFCOUNTED_P(zv) {
 				ref = zv.GetCounted()
-				GC_DELREF(ref)
+				ref.DelRefcount()
 				if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
 					GC_REF_SET_COLOR(ref, GC_GREY)
 					GC_STACK_PUSH(ref)
@@ -592,7 +592,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			zv = zv.GetZv()
 		}
 		ref = zv.GetCounted()
-		GC_DELREF(ref)
+		ref.DelRefcount()
 		if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
 			GC_REF_SET_COLOR(ref, GC_GREY)
 			continue
@@ -661,7 +661,7 @@ func GcScan(ref *ZendRefcounted, stack *GcStack) {
 	GC_STACK_DCL(stack)
 tail_call:
 	if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
-		if GC_REFCOUNT(ref) > 0 {
+		if ref.GetRefcount() > 0 {
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
 				GC_REF_SET_BLACK(ref)
 				if !(_stack.next) {
@@ -675,9 +675,9 @@ tail_call:
 				_stack.next.prev = _stack
 			}
 		} else {
-			if GC_TYPE(ref) == IS_OBJECT {
+			if ref.GetGcType() == IS_OBJECT {
 				var obj *ZendObject = (*ZendObject)(ref)
-				if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
+				if (ref.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 					var n int
 					var zv *Zval
 					var end *Zval
@@ -719,14 +719,14 @@ tail_call:
 				} else {
 					goto next
 				}
-			} else if GC_TYPE(ref) == IS_ARRAY {
+			} else if ref.GetGcType() == IS_ARRAY {
 				if (*ZendArray)(ref == &(ExecutorGlobals.GetSymbolTable())) != nil {
 					GC_REF_SET_BLACK(ref)
 					goto next
 				} else {
 					ht = (*ZendArray)(ref)
 				}
-			} else if GC_TYPE(ref) == IS_REFERENCE {
+			} else if ref.GetGcType() == IS_REFERENCE {
 				if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
 					ref = (*ZendReference)(ref).GetVal().GetCounted()
 					if GC_REF_CHECK_COLOR(ref, GC_GREY) {
@@ -831,12 +831,12 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 
 		/* don't count references for compatibility ??? */
 
-		if GC_TYPE(ref) != IS_REFERENCE {
+		if ref.GetGcType() != IS_REFERENCE {
 			count++
 		}
-		if GC_TYPE(ref) == IS_OBJECT {
+		if ref.GetGcType() == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
+			if (ref.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -844,10 +844,10 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 
 				/* optimization: color is GC_BLACK (0) */
 
-				if GC_INFO(ref) == 0 {
+				if ref.GetGcInfo() == 0 {
 					GcAddGarbage(ref)
 				}
-				if (OBJ_FLAGS(obj)&IS_OBJ_DESTRUCTOR_CALLED) == 0 && (obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil) {
+				if (obj.GetGcFlags()&IS_OBJ_DESTRUCTOR_CALLED) == 0 && (obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil) {
 					*flags |= GC_HAS_DESTRUCTORS
 				}
 				ZVAL_OBJ(&tmp, obj)
@@ -869,7 +869,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 				for zv != end {
 					if Z_REFCOUNTED_P(zv) {
 						ref = zv.GetCounted()
-						GC_ADDREF(ref)
+						ref.AddRefcount()
 						if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
 							GC_REF_SET_BLACK(ref)
 							GC_STACK_PUSH(ref)
@@ -879,7 +879,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 				}
 				if ht == nil {
 					ref = zv.GetCounted()
-					GC_ADDREF(ref)
+					ref.AddRefcount()
 					if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
 						GC_REF_SET_BLACK(ref)
 						continue
@@ -889,18 +889,18 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			} else {
 				goto next
 			}
-		} else if GC_TYPE(ref) == IS_ARRAY {
+		} else if ref.GetGcType() == IS_ARRAY {
 
 			/* optimization: color is GC_BLACK (0) */
 
-			if GC_INFO(ref) == 0 {
+			if ref.GetGcInfo() == 0 {
 				GcAddGarbage(ref)
 			}
 			ht = (*ZendArray)(ref)
-		} else if GC_TYPE(ref) == IS_REFERENCE {
+		} else if ref.GetGcType() == IS_REFERENCE {
 			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
-				GC_ADDREF(ref)
+				ref.AddRefcount()
 				if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
 					GC_REF_SET_BLACK(ref)
 					continue
@@ -935,7 +935,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			}
 			if Z_REFCOUNTED_P(zv) {
 				ref = zv.GetCounted()
-				GC_ADDREF(ref)
+				ref.AddRefcount()
 				if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
 					GC_REF_SET_BLACK(ref)
 					GC_STACK_PUSH(ref)
@@ -948,7 +948,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			zv = zv.GetZv()
 		}
 		ref = zv.GetCounted()
-		GC_ADDREF(ref)
+		ref.AddRefcount()
 		if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
 			GC_REF_SET_BLACK(ref)
 			continue
@@ -1014,7 +1014,7 @@ tail_call:
 		} else if GC_REF_ADDRESS(ref) != 0 && GC_REF_CHECK_COLOR(ref, GC_BLACK) {
 			GC_REMOVE_FROM_BUFFER(ref)
 			count++
-		} else if GC_TYPE(ref) == IS_REFERENCE {
+		} else if ref.GetGcType() == IS_REFERENCE {
 			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
 				goto tail_call
@@ -1023,9 +1023,9 @@ tail_call:
 		} else {
 			return count
 		}
-		if GC_TYPE(ref) == IS_OBJECT {
+		if ref.GetGcType() == IS_OBJECT {
 			var obj *ZendObject = (*ZendObject)(ref)
-			if (OBJ_FLAGS(ref) & IS_OBJ_FREE_CALLED) == 0 {
+			if (ref.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 				var n int
 				var zv *Zval
 				var end *Zval
@@ -1060,7 +1060,7 @@ tail_call:
 			} else {
 				return count
 			}
-		} else if GC_TYPE(ref) == IS_ARRAY {
+		} else if ref.GetGcType() == IS_ARRAY {
 			ht = (*ZendArray)(ref)
 		} else {
 			return count
@@ -1146,13 +1146,13 @@ func ZendGcCollectCycles() int {
 			for idx != end {
 				if GC_IS_GARBAGE(current.GetRef()) {
 					p = GC_GET_PTR(current.GetRef())
-					if GC_TYPE(p) == IS_OBJECT && (OBJ_FLAGS(p)&IS_OBJ_DESTRUCTOR_CALLED) == 0 {
+					if p.GetGcType() == IS_OBJECT && (p.GetGcFlags()&IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 						var obj *ZendObject = (*ZendObject)(p)
 						if obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil {
 							current.SetRef(GC_MAKE_DTOR_GARBAGE(obj))
 							GC_REF_SET_COLOR(obj, GC_PURPLE)
 						} else {
-							GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
+							obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
 						}
 					}
 				}
@@ -1194,12 +1194,12 @@ func ZendGcCollectCycles() int {
 					/* Double check that the destructor hasn't been called yet. It could have
 					 * already been invoked indirectly by some other destructor. */
 
-					if (OBJ_FLAGS(p) & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
+					if (p.GetGcFlags() & IS_OBJ_DESTRUCTOR_CALLED) == 0 {
 						var obj *ZendObject = (*ZendObject)(p)
-						GC_ADD_FLAGS(obj, IS_OBJ_DESTRUCTOR_CALLED)
-						GC_ADDREF(obj)
+						obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED)
+						obj.AddRefcount()
 						obj.GetHandlers().GetDtorObj()(obj)
-						GC_DELREF(obj)
+						obj.DelRefcount()
 					}
 
 					/* Double check that the destructor hasn't been called yet. It could have
@@ -1226,24 +1226,24 @@ func ZendGcCollectCycles() int {
 			current = GC_IDX2PTR(idx)
 			if GC_IS_GARBAGE(current.GetRef()) {
 				p = GC_GET_PTR(current.GetRef())
-				if GC_TYPE(p) == IS_OBJECT {
+				if p.GetGcType() == IS_OBJECT {
 					var obj *ZendObject = (*ZendObject)(p)
 					ExecutorGlobals.GetObjectsStore().GetObjectBuckets()[obj.GetHandle()] = SET_OBJ_INVALID(obj)
-					GC_TYPE_INFO(obj) = IS_NULL | GC_TYPE_INFO(obj) & ^GC_TYPE_MASK
+					obj.GetGcTypeInfo() = IS_NULL | obj.GetGcTypeInfo() & ^GC_TYPE_MASK
 
 					/* Modify current before calling free_obj (bug #78811: free_obj() can cause the root buffer (with current) to be reallocated.) */
 
 					current.SetRef(GC_MAKE_GARBAGE((*byte)(obj) - obj.GetHandlers().GetOffset()))
-					if (OBJ_FLAGS(obj) & IS_OBJ_FREE_CALLED) == 0 {
-						GC_ADD_FLAGS(obj, IS_OBJ_FREE_CALLED)
-						GC_ADDREF(obj)
+					if (obj.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
+						obj.AddGcFlags(IS_OBJ_FREE_CALLED)
+						obj.AddRefcount()
 						obj.GetHandlers().GetFreeObj()(obj)
-						GC_DELREF(obj)
+						obj.DelRefcount()
 					}
 					ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST(obj.GetHandle())
-				} else if GC_TYPE(p) == IS_ARRAY {
+				} else if p.GetGcType() == IS_ARRAY {
 					var arr *ZendArray = (*ZendArray)(p)
-					GC_TYPE_INFO(arr) = IS_NULL | GC_TYPE_INFO(arr) & ^GC_TYPE_MASK
+					arr.GetGcTypeInfo() = IS_NULL | arr.GetGcTypeInfo() & ^GC_TYPE_MASK
 
 					/* GC may destroy arrays with rc>1. This is valid and safe. */
 

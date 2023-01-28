@@ -8,8 +8,8 @@ import (
 )
 
 func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
-	GC_SET_REFCOUNT(object, 1)
-	GC_TYPE_INFO(object) = IS_OBJECT | GC_COLLECTABLE<<GC_FLAGS_SHIFT
+	object.SetRefcount(1)
+	object.GetGcTypeInfo() = IS_OBJECT | GC_COLLECTABLE<<GC_FLAGS_SHIFT
 	object.SetCe(ce)
 	object.SetProperties(nil)
 	ZendObjectsStorePut(object)
@@ -22,8 +22,8 @@ func ZendObjectStdDtor(object *ZendObject) {
 	var p *Zval
 	var end *Zval
 	if object.GetProperties() != nil {
-		if (GC_FLAGS(object.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-			if GC_DELREF(object.GetProperties()) == 0 && GC_TYPE(object.GetProperties()) != IS_NULL {
+		if (object.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+			if object.GetProperties().DelRefcount() == 0 && object.GetProperties().GetGcType() != IS_NULL {
 				ZendArrayDestroy(object.GetProperties())
 			}
 		}
@@ -58,7 +58,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			FREE_HASHTABLE(guards)
 		}
 	}
-	if (GC_FLAGS(object) & IS_OBJ_WEAKLY_REFERENCED) != 0 {
+	if (object.GetGcFlags() & IS_OBJ_WEAKLY_REFERENCED) != 0 {
 		ZendWeakrefsNotify(object)
 	}
 }
@@ -111,7 +111,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 
 			}
 		}
-		GC_ADDREF(object)
+		object.AddRefcount()
 
 		/* Make sure that destructors are protected from previously thrown exceptions.
 		 * For example, if an exception was thrown in a function and when the function's
@@ -185,8 +185,8 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		/* fast copy */
 
 		if old_object.GetHandlers() == &StdObjectHandlers {
-			if (GC_FLAGS(old_object.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-				GC_ADDREF(old_object.GetProperties())
+			if (old_object.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				old_object.GetProperties().AddRefcount()
 			}
 			new_object.SetProperties(old_object.GetProperties())
 			return
@@ -239,7 +239,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		var fci ZendFcallInfo
 		var fcic ZendFcallInfoCache
 		var ret Zval
-		GC_ADDREF(new_object)
+		new_object.AddRefcount()
 		ZVAL_UNDEF(&ret)
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(new_object)

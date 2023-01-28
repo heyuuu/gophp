@@ -62,7 +62,7 @@ func ZendExceptionSetPrevious(exception *ZendObject, add_previous *ZendObject) {
 		previous = ZendReadPropertyEx(base_ce, ex, ZSTR_KNOWN(ZEND_STR_PREVIOUS), 1, &rv)
 		if previous.IsType(IS_NULL) {
 			ZendUpdatePropertyEx(base_ce, ex, ZSTR_KNOWN(ZEND_STR_PREVIOUS), &pv)
-			GC_DELREF(add_previous)
+			add_previous.DelRefcount()
 			return
 		}
 		ex = previous

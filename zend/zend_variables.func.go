@@ -14,7 +14,7 @@ func ZvalPtrDtorNogc(zval_ptr *Zval) {
 func IZvalPtrDtor(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
-		if GC_DELREF(ref) == 0 {
+		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
 		} else {
 			GcCheckPossibleRoot(ref)
@@ -39,15 +39,15 @@ func ZvalPtrDtorStr(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) && Z_DELREF_P(zval_ptr) == 0 {
 		ZEND_ASSERT(zval_ptr.IsType(IS_STRING))
 		ZEND_ASSERT(true)
-		ZEND_ASSERT((GC_FLAGS(zval_ptr.GetStr()) & IS_STR_PERSISTENT) == 0)
+		ZEND_ASSERT((zval_ptr.GetStr().GetGcFlags() & IS_STR_PERSISTENT) == 0)
 		Efree(zval_ptr.GetStr())
 	}
 }
 func ZvalDtor(zvalue *Zval)         { ZvalPtrDtorNogc(zvalue) }
 func ZvalInternalDtor(zvalue *Zval) { ZvalInternalPtrDtor(zvalue) }
 func RcDtorFunc(p *ZendRefcounted) {
-	ZEND_ASSERT(GC_TYPE(p) <= IS_CONSTANT_AST)
-	ZendRcDtorFunc[GC_TYPE(p)](p)
+	ZEND_ASSERT(p.GetGcType() <= IS_CONSTANT_AST)
+	ZendRcDtorFunc[p.GetGcType()](p)
 }
 func ZendReferenceDestroy(ref *ZendReference) {
 	ZEND_ASSERT(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
@@ -59,11 +59,11 @@ func ZvalPtrDtor(zval_ptr *Zval)          { IZvalPtrDtor(zval_ptr) }
 func ZvalInternalPtrDtor(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
-		if GC_DELREF(ref) == 0 {
+		if ref.DelRefcount() == 0 {
 			if zval_ptr.IsType(IS_STRING) {
 				var str *ZendString = (*ZendString)(ref)
 				ZEND_ASSERT(true)
-				ZEND_ASSERT((GC_FLAGS(str) & IS_STR_PERSISTENT) != 0)
+				ZEND_ASSERT((str.GetGcFlags() & IS_STR_PERSISTENT) != 0)
 				Free(str)
 			} else {
 				ZendErrorNoreturn(E_CORE_ERROR, "Internal zval's can't be arrays, objects, resources or reference")

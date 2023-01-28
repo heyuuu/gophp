@@ -778,9 +778,9 @@ func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object 
 	if arg.IsType(IS_ARRAY) {
 		*dest = arg.GetArr()
 	} else if or_object != 0 && arg.IsType(IS_OBJECT) {
-		if separate != 0 && Z_OBJ_P(arg).GetProperties() != nil && GC_REFCOUNT(Z_OBJ_P(arg).GetProperties()) > 1 {
-			if (GC_FLAGS(Z_OBJ_P(arg).GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-				GC_DELREF(Z_OBJ_P(arg).GetProperties())
+		if separate != 0 && Z_OBJ_P(arg).GetProperties() != nil && Z_OBJ_P(arg).GetProperties().GetRefcount() > 1 {
+			if (Z_OBJ_P(arg).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				Z_OBJ_P(arg).GetProperties().DelRefcount()
 			}
 			Z_OBJ_P(arg).SetProperties(ZendArrayDup(Z_OBJ_P(arg).GetProperties()))
 		}

@@ -371,7 +371,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, flags&PHP_FILE_NO_DEFAULT_CONTEXT)
 	if context != nil {
-		zend.GC_ADDREF(context.GetRes())
+		context.GetRes().AddRefcount()
 	}
 	if zerrno != nil {
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zerrno, 0)
@@ -2554,7 +2554,7 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 	}
 	if filter != nil {
 		filter.SetRes(zend.ZendRegisterResource(filter, streams.PhpFileLeStreamFilter()))
-		zend.GC_ADDREF(filter.GetRes())
+		filter.GetRes().AddRefcount()
 		zend.RETVAL_RES(filter.GetRes())
 		return
 	} else {

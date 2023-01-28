@@ -30,9 +30,9 @@ func SplArrayGetHashTablePtr(intern *SplArrayObject) **zend.HashTable {
 		var obj *zend.ZendObject = intern.GetArray().GetObj()
 		if obj.GetProperties() == nil {
 			zend.RebuildObjectProperties(obj)
-		} else if zend.GC_REFCOUNT(obj.GetProperties()) > 1 {
-			if (zend.GC_FLAGS(obj.GetProperties()) & zend.IS_ARRAY_IMMUTABLE) == 0 {
-				zend.GC_DELREF(obj.GetProperties())
+		} else if obj.GetProperties().GetRefcount() > 1 {
+			if (obj.GetProperties().GetGcFlags() & zend.IS_ARRAY_IMMUTABLE) == 0 {
+				obj.GetProperties().DelRefcount()
 			}
 			obj.SetProperties(zend.ZendArrayDup(obj.GetProperties()))
 		}
@@ -639,7 +639,7 @@ func SplArrayGetPropertiesFor(object *zend.Zval, purpose zend.ZendPropPurpose) *
 	if dup != 0 {
 		ht = zend.ZendArrayDup(ht)
 	} else {
-		zend.GC_ADDREF(ht)
+		ht.AddRefcount()
 	}
 	return ht
 }
@@ -1161,7 +1161,7 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 	zend.ZVAL_STRINGL(&function_name, fname, fname_len)
 	zend.ZVAL_NEW_EMPTY_REF(&params[0])
 	zend.ZVAL_ARR(zend.Z_REFVAL(params[0]), aht)
-	zend.GC_ADDREF(aht)
+	aht.AddRefcount()
 	if use_arg == 0 {
 		intern.GetNApplyCount()++
 		zend.CallUserFunction(zend.ExecutorGlobals.GetFunctionTable(), nil, &function_name, return_value, 1, params)
@@ -1192,7 +1192,7 @@ exit:
 	if aht != new_ht {
 		SplArrayReplaceHashTable(intern, new_ht)
 	} else {
-		zend.GC_DELREF(aht)
+		aht.DelRefcount()
 	}
 	zend.ZVAL_NULL(zend.Z_REFVAL(params[0]))
 	zend.ZvalPtrDtor(&params[0])

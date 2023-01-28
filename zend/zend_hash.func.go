@@ -371,7 +371,7 @@ func ZendHashAddMem(ht *HashTable, key *ZendString, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashAdd(ht, key, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -382,7 +382,7 @@ func ZendHashAddNewMem(ht *HashTable, key *ZendString, pData any, size int) any 
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashAddNew(ht, key, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -393,7 +393,7 @@ func ZendHashStrAddMem(ht *HashTable, str *byte, len_ int, pData any, size int) 
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashStrAdd(ht, str, len_, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -404,7 +404,7 @@ func ZendHashStrAddNewMem(ht *HashTable, str *byte, len_ int, pData any, size in
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashStrAddNew(ht, str, len_, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -412,13 +412,13 @@ func ZendHashStrAddNewMem(ht *HashTable, str *byte, len_ int, pData any, size in
 }
 func ZendHashUpdateMem(ht *HashTable, key *ZendString, pData any, size int) any {
 	var p any
-	p = Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	p = Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	memcpy(p, pData, size)
 	return ZendHashUpdatePtr(ht, key, p)
 }
 func ZendHashStrUpdateMem(ht *HashTable, str *byte, len_ int, pData any, size int) any {
 	var p any
-	p = Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	p = Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	memcpy(p, pData, size)
 	return ZendHashStrUpdatePtr(ht, str, len_, p)
 }
@@ -456,7 +456,7 @@ func ZendHashIndexAddMem(ht *HashTable, h ZendUlong, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashIndexAdd(ht, h, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -475,7 +475,7 @@ func ZendHashNextIndexInsertPtr(ht *HashTable, pData any) any {
 }
 func ZendHashIndexUpdateMem(ht *HashTable, h ZendUlong, pData any, size int) any {
 	var p any
-	p = Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	p = Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	memcpy(p, pData, size)
 	return ZendHashIndexUpdatePtr(ht, h, p)
 }
@@ -484,7 +484,7 @@ func ZendHashNextIndexInsertMem(ht *HashTable, pData any, size int) any {
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
 	if b.Assign(&zv, ZendHashNextIndexInsert(ht, &tmp)) {
-		zv.SetPtr(Pemalloc(size, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
 	}
@@ -665,7 +665,7 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 }
 func ZendHashRealInitPackedEx(ht *HashTable) {
 	var data any
-	if (GC_FLAGS(ht) & IS_ARRAY_PERSISTENT) != 0 {
+	if (ht.GetGcFlags() & IS_ARRAY_PERSISTENT) != 0 {
 		data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), 1)
 	} else if ht.GetNTableSize() == HT_MIN_SIZE {
 		data = Emalloc(HT_SIZE_EX(HT_MIN_SIZE, HT_MIN_MASK))
@@ -682,7 +682,7 @@ func ZendHashRealInitPackedEx(ht *HashTable) {
 func ZendHashRealInitMixedEx(ht *HashTable) {
 	var data any
 	var nSize uint32 = ht.GetNTableSize()
-	if (GC_FLAGS(ht) & IS_ARRAY_PERSISTENT) != 0 {
+	if (ht.GetGcFlags() & IS_ARRAY_PERSISTENT) != 0 {
 		data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), 1)
 	} else if nSize == HT_MIN_SIZE {
 		data = Emalloc(HT_SIZE_EX(HT_MIN_SIZE, HT_SIZE_TO_MASK(HT_MIN_SIZE)))
@@ -727,8 +727,8 @@ func ZendHashRealInitEx(ht *HashTable, packed int) {
 	}
 }
 func _zendHashInitInt(ht *HashTable, nSize uint32, pDestructor DtorFuncT, persistent ZendBool) {
-	GC_SET_REFCOUNT(ht, 1)
-	GC_TYPE_INFO(ht) = IS_ARRAY | b.Cond(persistent != 0, GC_PERSISTENT<<GC_FLAGS_SHIFT, GC_COLLECTABLE<<GC_FLAGS_SHIFT)
+	ht.SetRefcount(1)
+	ht.GetGcTypeInfo() = IS_ARRAY | b.Cond(persistent != 0, GC_PERSISTENT<<GC_FLAGS_SHIFT, GC_COLLECTABLE<<GC_FLAGS_SHIFT)
 	ht.SetUFlags(HASH_FLAG_UNINITIALIZED)
 	ht.SetNTableMask(HT_MIN_MASK)
 	HT_SET_DATA_ADDR(ht, &UninitializedBucket)
@@ -776,7 +776,7 @@ func ZendHashPackedGrow(ht *HashTable) {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket"), b.SizeOf("Bucket"))
 	}
 	ht.SetNTableSize(ht.GetNTableSize() + ht.GetNTableSize())
-	HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+	HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 }
 func ZendHashRealInit(ht *HashTable, packed ZendBool) {
 	HT_ASSERT_RC1(ht)
@@ -797,11 +797,11 @@ func ZendHashPackedToHash(ht *HashTable) {
 	var nSize uint32 = ht.GetNTableSize()
 	HT_ASSERT_RC1(ht)
 	ht.SubUFlags(HASH_FLAG_PACKED)
-	new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
 	HT_SET_DATA_ADDR(ht, new_data)
 	memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-	Pefree(old_data, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	ZendHashRehash(ht)
 }
 func ZendHashToPacked(ht *HashTable) {
@@ -809,13 +809,13 @@ func ZendHashToPacked(ht *HashTable) {
 	var old_data any = HT_GET_DATA_ADDR(ht)
 	var old_buckets *Bucket = ht.GetArData()
 	HT_ASSERT_RC1(ht)
-	new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
 	ht.SetNTableMask(HT_MIN_MASK)
 	HT_SET_DATA_ADDR(ht, new_data)
 	HT_HASH_RESET_PACKED(ht)
 	memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-	Pefree(old_data, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 }
 func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 	HT_ASSERT_RC1(ht)
@@ -832,7 +832,7 @@ func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 			ZEND_ASSERT(ht.HasUFlags(HASH_FLAG_PACKED))
 			if nSize > ht.GetNTableSize() {
 				ht.SetNTableSize(ZendHashCheckSize(nSize))
-				HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT))
+				HT_SET_DATA_ADDR(ht, Perealloc2(HT_GET_DATA_ADDR(ht), HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), HT_USED_SIZE(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 			}
 		} else {
 			ZEND_ASSERT(!ht.HasUFlags(HASH_FLAG_PACKED))
@@ -842,11 +842,11 @@ func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
 				var old_buckets *Bucket = ht.GetArData()
 				nSize = ZendHashCheckSize(nSize)
 				ht.SetNTableSize(nSize)
-				new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+				new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 				ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
 				HT_SET_DATA_ADDR(ht, new_data)
 				memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-				Pefree(old_data, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+				Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 				ZendHashRehash(ht)
 			}
 		}
@@ -1250,7 +1250,7 @@ add_to_hash:
 	idx = ht.GetNNumUsed() - 1
 	ht.GetNNumOfElements()++
 	p = ht.GetArData() + idx
-	key = ZendStringInit(str, len_, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	key = ZendStringInit(str, len_, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	p.SetKey(key)
 	key.SetH(h)
 	p.SetH(key.GetH())
@@ -1513,11 +1513,11 @@ func ZendHashDoResize(ht *HashTable) {
 		var nSize uint32 = ht.GetNTableSize() + ht.GetNTableSize()
 		var old_buckets *Bucket = ht.GetArData()
 		ht.SetNTableSize(nSize)
-		new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+		new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 		ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
 		HT_SET_DATA_ADDR(ht, new_data)
 		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-		Pefree(old_data, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 		ZendHashRehash(ht)
 	} else {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket")+b.SizeOf("uint32_t"), b.SizeOf("Bucket"))
@@ -1898,7 +1898,7 @@ func ZendHashDestroy(ht *HashTable) {
 	} else if ht.HasUFlags(HASH_FLAG_UNINITIALIZED) {
 		return
 	}
-	Pefree(HT_GET_DATA_ADDR(ht), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+	Pefree(HT_GET_DATA_ADDR(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 }
 func ZendArrayDestroy(ht *HashTable) {
 	var p *Bucket
@@ -1907,7 +1907,7 @@ func ZendArrayDestroy(ht *HashTable) {
 	/* break possible cycles */
 
 	GC_REMOVE_FROM_BUFFER(ht)
-	GC_TYPE_INFO(ht) = IS_NULL
+	ht.GetGcTypeInfo() = IS_NULL
 	if ht.GetNNumUsed() != 0 {
 
 		/* In some rare cases destructors of regular arrays may be changed */
@@ -2097,7 +2097,7 @@ func ZendHashGracefulDestroy(ht *HashTable) {
 		p++
 	}
 	if !ht.HasUFlags(HASH_FLAG_UNINITIALIZED) {
-		Pefree(HT_GET_DATA_ADDR(ht), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+		Pefree(HT_GET_DATA_ADDR(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	}
 }
 func ZendHashGracefulReverseDestroy(ht *HashTable) {
@@ -2115,7 +2115,7 @@ func ZendHashGracefulReverseDestroy(ht *HashTable) {
 		_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
 	}
 	if !ht.HasUFlags(HASH_FLAG_UNINITIALIZED) {
-		Pefree(HT_GET_DATA_ADDR(ht), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+		Pefree(HT_GET_DATA_ADDR(ht), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 	}
 }
 func ZendHashApply(ht *HashTable, apply_func ApplyFuncT) {
@@ -2338,8 +2338,8 @@ func ZendArrayDup(source *HashTable) *HashTable {
 	var idx uint32
 	var target *HashTable
 	ALLOC_HASHTABLE(target)
-	GC_SET_REFCOUNT(target, 1)
-	GC_TYPE_INFO(target) = IS_ARRAY | GC_COLLECTABLE<<GC_FLAGS_SHIFT
+	target.SetRefcount(1)
+	target.GetGcTypeInfo() = IS_ARRAY | GC_COLLECTABLE<<GC_FLAGS_SHIFT
 	target.SetPDestructor(ZVAL_PTR_DTOR)
 	if source.GetNNumOfElements() == 0 {
 		target.SetUFlags(HASH_FLAG_UNINITIALIZED)
@@ -2350,7 +2350,7 @@ func ZendArrayDup(source *HashTable) *HashTable {
 		target.SetNInternalPointer(0)
 		target.SetNTableSize(HT_MIN_SIZE)
 		HT_SET_DATA_ADDR(target, &UninitializedBucket)
-	} else if (GC_FLAGS(source) & IS_ARRAY_IMMUTABLE) != 0 {
+	} else if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 		target.SetUFlags(source.GetUFlags() & HASH_FLAG_MASK)
 		target.SetNTableMask(source.GetNTableMask())
 		target.SetNNumUsed(source.GetNNumUsed())
@@ -2730,12 +2730,12 @@ func ZendHashSortEx(ht *HashTable, sort SortFuncT, compar CompareFuncT, renumber
 			var new_data any
 			var old_data any = HT_GET_DATA_ADDR(ht)
 			var old_buckets *Bucket = ht.GetArData()
-			new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+			new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 			ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
 			ht.SetNTableMask(HT_MIN_MASK)
 			HT_SET_DATA_ADDR(ht, new_data)
 			memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-			Pefree(old_data, GC_FLAGS(ht)&IS_ARRAY_PERSISTENT)
+			Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
 			HT_HASH_RESET_PACKED(ht)
 		} else {
 			ZendHashRehash(ht)
@@ -2857,11 +2857,11 @@ func ZendHashCompare(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, ordere
 	if GC_IS_RECURSIVE(ht1) != 0 {
 		ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
-	if (GC_FLAGS(ht1) & GC_IMMUTABLE) == 0 {
+	if (ht1.GetGcFlags() & GC_IMMUTABLE) == 0 {
 		GC_PROTECT_RECURSION(ht1)
 	}
 	result = ZendHashCompareImpl(ht1, ht2, compar, ordered)
-	if (GC_FLAGS(ht1) & GC_IMMUTABLE) == 0 {
+	if (ht1.GetGcFlags() & GC_IMMUTABLE) == 0 {
 		GC_UNPROTECT_RECURSION(ht1)
 	}
 	return result
@@ -2955,8 +2955,8 @@ func ZendSymtableToProptable(ht *HashTable) *HashTable {
 		}
 		break
 	}
-	if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(ht)
+	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		ht.AddRefcount()
 	}
 	return ht
 convert:
@@ -3034,8 +3034,8 @@ func ZendProptableToSymtable(ht *HashTable, always_duplicate ZendBool) *HashTabl
 	if always_duplicate != 0 {
 		return ZendArrayDup(ht)
 	}
-	if (GC_FLAGS(ht) & IS_ARRAY_IMMUTABLE) == 0 {
-		GC_ADDREF(ht)
+	if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+		ht.AddRefcount()
 	}
 	return ht
 convert:

@@ -139,7 +139,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 
 		/* copied upon generator creation */
 
-		GC_DELREF(closure.GetStd())
+		closure.GetStd().DelRefcount()
 
 		/* copied upon generator creation */
 
@@ -232,7 +232,7 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 
 		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && ZendStringEqualsLiteral(mptr.GetFunctionName(), "__invoke") {
 			ZVAL_OBJ(return_value, fcc.GetObject())
-			GC_ADDREF(fcc.GetObject())
+			fcc.GetObject().AddRefcount()
 			ZendFreeTrampoline(mptr)
 			return SUCCESS
 		}

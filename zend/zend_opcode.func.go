@@ -461,8 +461,8 @@ func DestroyOpArray(op_array *ZendOpArray) {
 	var i uint32
 	if op_array.GetStaticVariables() != nil {
 		var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
-		if ht != nil && (GC_FLAGS(ht)&IS_ARRAY_IMMUTABLE) == 0 {
-			if GC_DELREF(ht) == 0 {
+		if ht != nil && (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 {
+			if ht.DelRefcount() == 0 {
 				ZendArrayDestroy(ht)
 			}
 		}

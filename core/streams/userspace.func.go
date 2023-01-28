@@ -60,7 +60,7 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 	}
 	if context != nil {
 		zend.AddPropertyResource(object, "context", context.GetRes())
-		zend.GC_ADDREF(context.GetRes())
+		context.GetRes().AddRefcount()
 	} else {
 		zend.AddPropertyNull(object, "context")
 	}

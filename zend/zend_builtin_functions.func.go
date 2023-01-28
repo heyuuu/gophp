@@ -661,7 +661,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 
 	ZVAL_DEREF(entry)
 	if Z_REFCOUNTED_P(entry) {
-		GC_ADDREF_EX(entry.GetCounted(), 2)
+		entry.GetCounted().AddRefcountEx(2)
 	}
 	ZendHashIndexAddNew(return_value.GetArr(), 1, entry)
 	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_VALUE), entry)

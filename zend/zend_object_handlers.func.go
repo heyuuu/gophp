@@ -24,7 +24,7 @@ func ZendGetFunctionRootClass(fbc *ZendFunction) *ZendClassEntry {
 	}
 }
 func ZendReleaseProperties(ht *HashTable) {
-	if ht != nil && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 && GC_DELREF(ht) == 0 {
+	if ht != nil && (ht.GetGcFlags()&GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
 		ZendArrayDestroy(ht)
 	}
 }
@@ -112,8 +112,8 @@ func ZendStdGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		if zobj.GetProperties() != nil {
 			*table = nil
 			*n = 0
-			if GC_REFCOUNT(zobj.GetProperties()) > 1 && (GC_FLAGS(zobj.GetProperties())&IS_ARRAY_IMMUTABLE) == 0 {
-				GC_DELREF(zobj.GetProperties())
+			if zobj.GetProperties().GetRefcount() > 1 && (zobj.GetProperties().GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 {
+				zobj.GetProperties().DelRefcount()
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
 			return zobj.GetProperties()
@@ -641,7 +641,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 			if tmp_name == nil {
 				tmp_name = ZendStringCopy(name)
 			}
-			GC_ADDREF(zobj)
+			zobj.AddRefcount()
 			ZVAL_UNDEF(&tmp_result)
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &tmp_result)
@@ -670,7 +670,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 			/* have getter - try with it! */
 
 		call_getter_addref:
-			GC_ADDREF(zobj)
+			zobj.AddRefcount()
 		call_getter:
 			*guard |= IN_GET
 			ZendStdCallGetter(zobj, name, rv)
@@ -758,9 +758,9 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
-			if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-				if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(zobj.GetProperties())
+			if zobj.GetProperties().GetRefcount() > 1 {
+				if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					zobj.GetProperties().DelRefcount()
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
@@ -779,7 +779,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	if zobj.GetCe().GetSet() != nil {
 		var guard *uint32 = ZendGetPropertyGuard(zobj, name)
 		if ((*guard) & IN_SET) == 0 {
-			GC_ADDREF(zobj)
+			zobj.AddRefcount()
 			*guard |= IN_SET
 			ZendStdCallSetter(zobj, name, value)
 			*guard &= ^IN_SET
@@ -957,9 +957,9 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) {
 		if zobj.GetProperties() != nil {
-			if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-				if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-					GC_DELREF(zobj.GetProperties())
+			if zobj.GetProperties().GetRefcount() > 1 {
+				if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+					zobj.GetProperties().DelRefcount()
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
@@ -1028,9 +1028,9 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 			goto exit
 		}
 	} else if IS_DYNAMIC_PROPERTY_OFFSET(property_offset) && zobj.GetProperties() != nil {
-		if GC_REFCOUNT(zobj.GetProperties()) > 1 {
-			if (GC_FLAGS(zobj.GetProperties()) & IS_ARRAY_IMMUTABLE) == 0 {
-				GC_DELREF(zobj.GetProperties())
+		if zobj.GetProperties().GetRefcount() > 1 {
+			if (zobj.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				zobj.GetProperties().DelRefcount()
 			}
 			zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 		}
@@ -1559,7 +1559,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 			if tmp_name == nil {
 				tmp_name = ZendStringCopy(name)
 			}
-			GC_ADDREF(zobj)
+			zobj.AddRefcount()
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &rv)
 			result = ZendIsTrue(&rv)
@@ -1657,8 +1657,8 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 		if Z_OBJ_HT_P(obj).GetGetDebugInfo() != nil {
 			var is_temp int
 			ht = Z_OBJ_HT_P(obj).GetGetDebugInfo()(obj, &is_temp)
-			if ht != nil && is_temp == 0 && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 {
-				GC_ADDREF(ht)
+			if ht != nil && is_temp == 0 && (ht.GetGcFlags()&GC_IMMUTABLE) == 0 {
+				ht.AddRefcount()
 			}
 			return ht
 		}
@@ -1672,8 +1672,8 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
 		ht = Z_OBJ_HT_P(obj).GetGetProperties()(obj)
-		if ht != nil && (GC_FLAGS(ht)&GC_IMMUTABLE) == 0 {
-			GC_ADDREF(ht)
+		if ht != nil && (ht.GetGcFlags()&GC_IMMUTABLE) == 0 {
+			ht.AddRefcount()
 		}
 		return ht
 	default:

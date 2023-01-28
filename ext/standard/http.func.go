@@ -141,11 +141,11 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 					*(b.PostInc(&p)) = 'B'
 					*p = '0'
 				}
-				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
+				if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 					zend.GC_PROTECT_RECURSION(ht)
 				}
 				PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(zend.IS_OBJECT), zdata, nil), arg_sep, enc_type)
-				if (zend.GC_FLAGS(ht) & zend.GC_IMMUTABLE) == 0 {
+				if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 					zend.GC_UNPROTECT_RECURSION(ht)
 				}
 				zend.Efree(newprefix)

@@ -212,7 +212,7 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTa
 func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arg any) {
 	var ctx *BrowscapParserCtx = arg
 	var bdata *BrowserData = ctx.GetBdata()
-	var persistent int = zend.GC_FLAGS(bdata.GetHtab()) & zend.IS_ARRAY_PERSISTENT
+	var persistent int = bdata.GetHtab().GetGcFlags() & zend.IS_ARRAY_PERSISTENT
 	if arg1 == nil {
 		return
 	}
@@ -514,8 +514,8 @@ func BrowscapZvalCopyCtor(p *zend.Zval) {
 		var str *zend.ZendString
 		zend.ZEND_ASSERT(p.IsType(zend.IS_STRING))
 		str = p.GetStr()
-		if (zend.GC_FLAGS(str) & zend.GC_PERSISTENT) == 0 {
-			zend.GC_ADDREF(str)
+		if (str.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
+			str.AddRefcount()
 		} else {
 			zend.ZVAL_NEW_STR(p, zend.ZendStringInit(str.GetVal(), str.GetLen(), 0))
 		}

@@ -849,8 +849,8 @@ func FunctionAddRef(function *ZendFunction) {
 			op_array.refcount++
 		}
 		if op_array.GetStaticVariables() != nil {
-			if (GC_FLAGS(op_array.GetStaticVariables()) & IS_ARRAY_IMMUTABLE) == 0 {
-				GC_ADDREF(op_array.GetStaticVariables())
+			if (op_array.GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				op_array.GetStaticVariables().AddRefcount()
 			}
 		}
 		if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
