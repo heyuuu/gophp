@@ -37,7 +37,6 @@ const PHP_OS_FAMILY = "Unknown"
 
 /* PHP's DEBUG value must match Zend's ZEND_DEBUG value */
 
-const PHP_DEBUG zend.ZendLong = ZEND_DEBUG
 const PHP_DIR_SEPARATOR = '/'
 const PHP_EOL = "\n"
 

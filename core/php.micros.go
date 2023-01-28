@@ -18,6 +18,8 @@ package core
 
 // # include "zend_API.h"
 
+// #define PHP_DEBUG       ZEND_DEBUG
+
 // #define PHPAPI
 
 // #define THREAD_LS

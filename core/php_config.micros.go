@@ -14,6 +14,8 @@ package core
 
 // #define _GNU_SOURCE       1
 
+// #define ZEND_DEBUG       0
+
 // # include < stdlib . h >
 
 // # include < sys / types . h >

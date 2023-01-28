@@ -1155,8 +1155,6 @@ const __EXTENSIONS__ = 1
 
 /* Define if processor uses big-endian word */
 
-const ZEND_DEBUG = 0
-
 /* Define if double cast to long preserves least significant bits */
 
 const ZEND_MM_ALIGNMENT = 8

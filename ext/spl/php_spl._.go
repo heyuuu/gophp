@@ -254,7 +254,7 @@ var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 var SplModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
 	b.SizeOf("zend_module_entry"),
 	zend.ZEND_MODULE_API_NO,
-	core.ZEND_DEBUG,
+	0,
 	zend.USING_ZTS,
 	nil,
 	nil,

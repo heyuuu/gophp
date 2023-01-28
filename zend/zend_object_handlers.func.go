@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func IS_VALID_PROPERTY_OFFSET(offset uintPtr) bool   { return intptr_t(offset) > 0 }
@@ -1006,7 +1005,7 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *Zval = OBJ_PROP(zobj, property_offset)
 		if slot.GetType() != IS_UNDEF {
-			if Z_ISREF_P(slot) && (core.ZEND_DEBUG != 0 || ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef())) {
+			if Z_ISREF_P(slot) && ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef()) {
 				if prop_info != nil {
 					ZEND_REF_DEL_TYPE_SOURCE(slot.GetRef(), prop_info)
 				}

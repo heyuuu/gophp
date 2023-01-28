@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 // Source: <Zend/zend_builtin_functions.h>
@@ -491,7 +490,7 @@ var BuiltinFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 var ZendBuiltinModule ZendModuleEntry = ZendModuleEntry{
 	b.SizeOf("zend_module_entry"),
 	ZEND_MODULE_API_NO,
-	core.ZEND_DEBUG,
+	0,
 	USING_ZTS,
 	nil,
 	nil,

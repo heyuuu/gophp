@@ -1398,11 +1398,7 @@ func ZendMmShutdown(heap *ZendMmHeap, full int, silent int) {
 			}
 		}
 		if full != 0 {
-			if core.ZEND_DEBUG != 0 && heap.GetUseCustomHeap() == ZEND_MM_CUSTOM_HEAP_DEBUG {
-				heap.GetCustomHeapDebugFree()(heap)
-			} else {
-				heap.GetCustomHeapStdFree()(heap)
-			}
+			heap.GetCustomHeapStdFree()(heap)
 		}
 		return
 	}
@@ -1531,25 +1527,11 @@ func IsZendPtr(ptr any) int {
 	return 0
 }
 func _mallocCustom(size int) any {
-	if core.ZEND_DEBUG != 0 && AG(mm_heap).use_custom_heap == ZEND_MM_CUSTOM_HEAP_DEBUG {
-		return AG(mm_heap).custom_heap.debug._malloc(size)
-	} else {
-		return AG(mm_heap).custom_heap.std._malloc(size)
-	}
+	return AG(mm_heap).custom_heap.std._malloc(size)
 }
-func _efreeCustom(ptr any) {
-	if core.ZEND_DEBUG != 0 && AG(mm_heap).use_custom_heap == ZEND_MM_CUSTOM_HEAP_DEBUG {
-		AG(mm_heap).custom_heap.debug._free(ptr)
-	} else {
-		AG(mm_heap).custom_heap.std._free(ptr)
-	}
-}
+func _efreeCustom(ptr any) { AG(mm_heap).custom_heap.std._free(ptr) }
 func _reallocCustom(ptr any, size int) any {
-	if core.ZEND_DEBUG != 0 && AG(mm_heap).use_custom_heap == ZEND_MM_CUSTOM_HEAP_DEBUG {
-		return AG(mm_heap).custom_heap.debug._realloc(ptr, size)
-	} else {
-		return AG(mm_heap).custom_heap.std._realloc(ptr, size)
-	}
+	return AG(mm_heap).custom_heap.std._realloc(ptr, size)
 }
 func _emalloc(size int) any {
 	if AG(mm_heap).use_custom_heap {

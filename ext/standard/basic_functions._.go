@@ -5259,7 +5259,7 @@ var StandardDeps []zend.ZendModuleDep = []zend.ZendModuleDep{
 var BasicFunctionsModule zend.ZendModuleEntry = zend.ZendModuleEntry{
 	b.SizeOf("zend_module_entry"),
 	zend.ZEND_MODULE_API_NO,
-	core.ZEND_DEBUG,
+	0,
 	zend.USING_ZTS,
 	nil,
 	StandardDeps,

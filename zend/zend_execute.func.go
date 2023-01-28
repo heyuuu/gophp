@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ZEND_REF_TYPE_SOURCES(ref *ZendReference) ZendPropertyInfoSourceList { return ref.GetSources() }
@@ -446,12 +445,7 @@ func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 }
 func _getZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
-		if core.ZEND_DEBUG == 0 || op_type == IS_VAR {
-			return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
-		} else {
-			ZEND_ASSERT(op_type == IS_TMP_VAR)
-			return _getZvalPtrTmp(node.GetVar(), should_free, EXECUTE_DATA_C)
-		}
+		return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	} else {
 		*should_free = nil
 		if op_type == IS_CONST {
@@ -465,12 +459,7 @@ func _getZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, 
 }
 func _getOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
-		if core.ZEND_DEBUG == 0 || op_type == IS_VAR {
-			return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
-		} else {
-			ZEND_ASSERT(op_type == IS_TMP_VAR)
-			return _getZvalPtrTmp(node.GetVar(), should_free, EXECUTE_DATA_C)
-		}
+		return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	} else {
 		*should_free = nil
 		if op_type == IS_CONST {
@@ -522,12 +511,7 @@ func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp,
 }
 func _getZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
-		if core.ZEND_DEBUG == 0 || op_type == IS_VAR {
-			return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
-		} else {
-			ZEND_ASSERT(op_type == IS_TMP_VAR)
-			return _getZvalPtrTmp(node.GetVar(), should_free, EXECUTE_DATA_C)
-		}
+		return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	} else {
 		*should_free = nil
 		if op_type == IS_CONST {
