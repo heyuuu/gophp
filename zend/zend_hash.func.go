@@ -112,10 +112,6 @@ func (this *HashTable) IteratorsUpdate(from HashPosition, to HashPosition) {
 		this._iteratorsUpdate(from, to)
 	}
 }
-func ZEND_INIT_SYMTABLE(ht *HashTable) { ZEND_INIT_SYMTABLE_EX(ht, 8, 0) }
-func ZEND_INIT_SYMTABLE_EX(ht *HashTable, n uint32, persistent ZendBool) {
-	ht.Init(n, nil, ZVAL_PTR_DTOR, persistent)
-}
 func _zendHandleNumericStr(key *byte, length int, idx *ZendUlong) int {
 	var tmp *byte = key
 	if (*tmp) > '9' {
@@ -218,28 +214,12 @@ func ZendSymtableDel(ht *HashTable, key *ZendString) int {
 		return ht.Del(key)
 	}
 }
-func ZendSymtableDelInd(ht *HashTable, key *ZendString) int {
-	var idx ZendUlong
-	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
-		return ht.IndexDel(idx)
-	} else {
-		return ht.DelInd(key)
-	}
-}
 func ZendSymtableFind(ht *HashTable, key *ZendString) *Zval {
 	var idx ZendUlong
 	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
 		return ht.IndexFind(idx)
 	} else {
 		return ht.Find(key)
-	}
-}
-func ZendSymtableFindInd(ht *HashTable, key *ZendString) *Zval {
-	var idx ZendUlong
-	if ZEND_HANDLE_NUMERIC(key, idx) != 0 {
-		return ht.IndexFind(idx)
-	} else {
-		return ht.FindInd(key)
 	}
 }
 func ZendSymtableExists(ht *HashTable, key *ZendString) int {

@@ -91,7 +91,6 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 func Z_FE_ITER_P(zval_p *Zval) uint32                    { return zval_p.GetFeIterIdx() }
 func GC_REFCOUNT(p *HashTable) uint32                    { return p.GetGcRefcount() }
 func GC_SET_REFCOUNT(p ZendRefcounted, rc uint32) uint32 { return p.SetGcRefcount(rc) }
-func GC_DEL_FLAGS(p ZendRefcounted, flags uint32)        { p.DelGcFlags(flags) }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool               { return b.FlagMatch(t, Z_TYPE_FLAGS_MASK) }
 func GC_IS_RECURSIVE(p ZendRefcounted) uint32            { return p.GetGcFlags() & GC_PROTECTED }
 func GC_PROTECT_RECURSION(p *HashTable)                  { p.AddGcFlags(GC_PROTECTED) }
@@ -310,15 +309,6 @@ func ZVAL_MAKE_REF_EX(z *Zval, refcount uint32) {
 	_z.SetRef(_ref)
 	_z.SetTypeInfo(IS_REFERENCE_EX)
 }
-func ZVAL_NEW_PERSISTENT_REF(z *Zval, r *Zval) {
-	var _ref *ZendReference = (*ZendReference)(Malloc(b.SizeOf("zend_reference")))
-	GC_SET_REFCOUNT(_ref, 1)
-	_ref.GetGcTypeInfo() = IS_REFERENCE | GC_PERSISTENT<<GC_FLAGS_SHIFT
-	ZVAL_COPY_VALUE(_ref.GetVal(), r)
-	_ref.GetSources().SetPtr(nil)
-	z.SetRef(_ref)
-	z.SetTypeInfo(IS_REFERENCE_EX)
-}
 func ZVAL_AST(z *Zval, ast *ZendAstRef) {
 	var __z *Zval = z
 	__z.SetAst(ast)
@@ -330,14 +320,6 @@ func ZVAL_INDIRECT(z *Zval, v *Zval) {
 }
 func ZVAL_PTR(z *Zval, p any) {
 	z.SetPtr(p)
-	z.SetTypeInfo(IS_PTR)
-}
-func ZVAL_FUNC(z *Zval, f *ZendFunction) {
-	z.SetFunc(f)
-	z.SetTypeInfo(IS_PTR)
-}
-func ZVAL_CE(z *Zval, c *ZendClassEntry) {
-	z.SetCe(c)
 	z.SetTypeInfo(IS_PTR)
 }
 func ZVAL_ALIAS_PTR(z *Zval, p *ZendClassEntry) {
