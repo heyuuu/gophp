@@ -44,12 +44,21 @@ func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
 	return bucket
 }
 
-func (this *Bucket) GetVal() *Zval            { return &this.val }
-func (this *Bucket) SetVal(value Zval)        { this.val = value }
-func (this *Bucket) GetH() ZendUlong          { return this.h }
-func (this *Bucket) SetH(value ZendUlong)     { this.h = value }
-func (this *Bucket) GetKey() *ZendString      { return this.key }
-func (this *Bucket) SetKey(value *ZendString) { this.key = value }
+func (this *Bucket) GetVal() *Zval        { return &this.val }
+func (this *Bucket) SetVal(value Zval)    { this.val = value }
+func (this *Bucket) GetH() ZendUlong      { return this.h }
+func (this *Bucket) SetH(value ZendUlong) { this.h = value }
+func (this *Bucket) GetKey() *ZendString {
+	if this.key != nil {
+		return ZendStringNew(*this.key, false)
+	} else {
+		return nil
+	}
+}
+func (this *Bucket) SetKey(value *ZendString) {
+	// todo 此方法应被替换
+	ZEND_ASSERT(false)
+}
 
 /**
  * ZendArray
