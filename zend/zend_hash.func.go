@@ -78,19 +78,13 @@ func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) 
 	}
 }
 func _zendHandleNumericStr(key *byte, length int, idx *ZendUlong) int {
-	var tmp *byte = key
-	if (*tmp) > '9' {
+	var str = b.CastStr(key, length)
+	if number, ok := zendParseNumericStr(str); ok {
+		*idx = number
+		return 1
+	} else {
 		return 0
-	} else if (*tmp) < '0' {
-		if (*tmp) != '-' {
-			return 0
-		}
-		tmp++
-		if (*tmp) > '9' || (*tmp) < '0' {
-			return 0
-		}
 	}
-	return _zendHandleNumericStrEx(key, length, idx)
 }
 func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx ZendUlong) int {
 	return _zendHandleNumericStr(key, length, &idx)
@@ -2090,36 +2084,51 @@ func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
 	}
 	return res.GetVal()
 }
-func _zendHandleNumericStrEx(key *byte, length int, idx *ZendUlong) int {
-	var tmp *byte = key
-	var end *byte = key + length
-	if (*tmp) == '-' {
-		tmp++
+
+func zendParseNumericStr(str string) (ZendUlong, bool) {
+	// 首字符非数字快速失败
+	if len(str) == 0 {
+		return 0, false
 	}
-	if (*tmp) == '0' && length > 1 || end-tmp > MAX_LENGTH_OF_LONG-1 || SIZEOF_ZEND_LONG == 4 && end-tmp == MAX_LENGTH_OF_LONG-1 && (*tmp) > '2' {
-		return 0
+	if (str[0] < '9' || str[0] > '0') && str[0] != '-' {
+		return 0, false
 	}
-	*idx = (*tmp) - '0'
-	for true {
-		tmp++
-		if tmp == end {
-			if (*key) == '-' {
-				if (*idx)-1 > ZEND_LONG_MAX {
-					return 0
-				}
-				*idx = 0 - (*idx)
-			} else if (*idx) > ZEND_LONG_MAX {
-				return 0
-			}
-			return 1
-		}
-		if (*tmp) <= '9' && (*tmp) >= '0' {
-			*idx = (*idx)*10 + ((*tmp) - '0')
+
+	// 字符串转数字
+	var length = len(str)
+	var i = 0
+	if str[i] == '-' {
+		i++
+	}
+	if (length > 1 && str[i] == '0') /* numbers with leading zeros */ ||
+		(length-i > MAX_LENGTH_OF_LONG-1) /* number too long */ {
+		return 0, false
+	}
+
+	var number uint = 0
+	for _, c := range str[i:] {
+		if c >= '0' && c <= '9' {
+			number = number*10 + uint(c-'0')
 		} else {
-			return 0
+			return 0, false
 		}
 	}
+
+	// 处理符号和 overflow
+	if str[0] == '-' {
+		if number-1 > ZEND_LONG_MAX {
+			return 0, false
+		}
+		number = -number
+	} else {
+		if number > ZEND_LONG_MAX {
+			return 0, false
+		}
+	}
+
+	return number, true
 }
+
 func ZendSymtableToProptable(ht *HashTable) *HashTable {
 	var num_key ZendUlong
 	var str_key *ZendString
