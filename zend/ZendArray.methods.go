@@ -148,37 +148,40 @@ func (this *ZendArray) Exists(key ZendArrayKey) bool {
 	return false
 }
 
-func (this *ZendArray) _addBucket(strKey string, zv *Zval) *Bucket {
-	var bucket = NewBucketStr(strKey, zv)
-	var idx = len(this.data)
+func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
+	var idx = uint32(len(this.data))
 
 	this.nNumOfElements++
 	this.data = append(this.data, *bucket)
 
-	this.keyMap[strKey] = uint32(idx)
+	if bucket.IsStrKey() {
+		var strKey = bucket.StrKey()
+		this.keyMap[strKey] = idx
+	} else {
+		var indexKey = bucket.IndexKey()
+		this.indexMap[indexKey] = idx
 
-	return &this.data[idx]
-}
-
-func (this *ZendArray) _addBucketIndex(indexKey int, zv *Zval) *Bucket {
-	var bucket = NewBucketIndex(indexKey, zv)
-	var idx = len(this.data)
-
-	this.nNumOfElements++
-	this.data = append(this.data, *bucket)
-
-	this.indexMap[indexKey] = uint32(idx)
-
-	// 更新 nNextFreeElement
-	if indexKey > this.nNextFreeElement {
-		if indexKey < ZEND_LONG_MAX {
-			this.nNextFreeElement = indexKey + 1
-		} else {
-			this.nNextFreeElement = ZEND_LONG_MAX
+		// 更新 nNextFreeElement
+		if indexKey > this.nNextFreeElement {
+			if indexKey < ZEND_LONG_MAX {
+				this.nNextFreeElement = indexKey + 1
+			} else {
+				this.nNextFreeElement = ZEND_LONG_MAX
+			}
 		}
 	}
 
 	return &this.data[idx]
+}
+
+func (this *ZendArray) appendBucketStr(strKey string, zv *Zval) *Bucket {
+	var bucket = NewBucketStr(strKey, zv)
+	return this.appendBucket(bucket)
+}
+
+func (this *ZendArray) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
+	var bucket = NewBucketIndex(indexKey, zv)
+	return this.appendBucket(bucket)
 }
 
 func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zval {
@@ -224,7 +227,7 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	ZEND_HASH_IF_FULL_DO_RESIZE(this)
 
-	var p = this._addBucket(strKey, pData)
+	var p = this.appendBucketStr(strKey, pData)
 	return p.GetVal()
 }
 
@@ -249,7 +252,7 @@ func (this *ZendArray) indexAddOrUpdate(indexKey int, pData *Zval, flag uint32) 
 	}
 	ZEND_HASH_IF_FULL_DO_RESIZE(this)
 
-	var p = this._addBucketIndex(indexKey, pData)
+	var p = this.appendBucketIndex(indexKey, pData)
 
 	return p.GetVal()
 }

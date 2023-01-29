@@ -72,13 +72,26 @@ func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
 	return NewBucket(key, zval)
 }
 
+func NewBucketPtr(key ZendArrayKey, ptr any) *Bucket {
+	var bucket = &Bucket{key: key}
+	ZVAL_PTR(&bucket.val, ptr)
+	return bucket
+}
+
+func NewBucketIndirect(key ZendArrayKey, ptr *Zval) *Bucket {
+	var bucket = &Bucket{key: key}
+	ZVAL_INDIRECT(&bucket.val, ptr)
+	return bucket
+}
+
 func (this *Bucket) GetVal() *Zval       { return &this.val }
 func (this *Bucket) SetVal(zval *Zval)   { ZVAL_COPY_VALUE(&this.val, zval) }
 func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
 func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
 
-func (this *Bucket) GetStrKey() string { return this.key.GetKey() }
-func (this *Bucket) GetIndexKey() int  { return this.key.GetIndex() }
+func (this *Bucket) IsStrKey() bool { return this.key.IsStrKey() }
+func (this *Bucket) StrKey() string { return this.key.GetKey() }
+func (this *Bucket) IndexKey() int  { return this.key.GetIndex() }
 
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove
@@ -140,9 +153,10 @@ var _ IRefcounted = &ZendArray{}
 
 func (this *ZendArray) GetArData() *Bucket      { return this.arData }
 func (this *ZendArray) SetArData(value *Bucket) { this.arData = value }
-func (this *ZendArray) GetNNumUsed() uint32 {
-	return uint32(len(this.data))
-}
+
+func (this *ZendArray) DataSize() uint32 { return uint32(len(this.data)) }
+
+func (this *ZendArray) GetNNumUsed() uint32 { return this.DataSize() }
 func (this *ZendArray) SetNNumUsed(value uint32) {
 	// todo remove
 }

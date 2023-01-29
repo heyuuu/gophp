@@ -358,33 +358,25 @@ func ZVAL_COPY_VALUE_EX(z *Zval, v *Zval, gc *ZendRefcounted, t uint32) {
 	z.SetTypeInfo(t)
 }
 func ZVAL_COPY_VALUE(z *Zval, v *Zval) {
-	var _z1 *Zval = z
-	var _z2 *Zval = v
-	var _gc *ZendRefcounted = _z2.GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
+	// 复制除 u2 外所有数据
+	var temp = z.u2
+	*z = *v
+	z.u2 = temp
 }
 func ZVAL_COPY(z *Zval, v *Zval) {
-	var _z1 *Zval = z
-	var _z2 *Zval = v
-	var _gc *ZendRefcounted = _z2.GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
-	if Z_TYPE_INFO_REFCOUNTED(_t) {
-		_gc.AddRefcount()
+	ZVAL_COPY_VALUE(z, v)
+	// 若支持引用计数，则增加计数；此时 z、v 指向同一个 value，增加哪个都一样
+	if v.IsRefcounted() {
+		z.GetCounted().AddRefcount()
 	}
 }
 func ZVAL_COPY_OR_DUP(z *Zval, v *Zval) {
-	var _z1 *Zval = z
-	var _z2 *Zval = v
-	var _gc *ZendRefcounted = _z2.GetCounted()
-	var _t uint32 = _z2.GetTypeInfo()
-	ZVAL_COPY_VALUE_EX(_z1, _z2, _gc, _t)
-	if Z_TYPE_INFO_REFCOUNTED(_t) {
-		if (_gc.GetGcFlags() & GC_PERSISTENT) == 0 {
-			_gc.AddRefcount()
+	ZVAL_COPY_VALUE(z, v)
+	if v.IsRefcounted() {
+		if v.GetCounted().HasGcFlags(GC_PERSISTENT) {
+			v.GetCounted().AddRefcount()
 		} else {
-			ZvalCopyCtorFunc(_z1)
+			ZvalCopyCtorFunc(z)
 		}
 	}
 }
