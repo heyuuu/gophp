@@ -43,7 +43,7 @@ func SplOffsetConvertToLong(offset *zend.Zval) zend.ZendLong {
 try_again:
 	switch offset.GetType() {
 	case zend.IS_STRING:
-		if zend.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) != 0 {
+		if zend.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) {
 			return idx
 		}
 		break

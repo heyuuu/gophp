@@ -1912,7 +1912,7 @@ try_again:
 	} else if dim.IsType(IS_STRING) {
 		offset_key = dim.GetStr()
 		if ZEND_CONST_COND(dim_type != IS_CONST, 1) {
-			if ZEND_HANDLE_NUMERIC(offset_key, &hval) != 0 {
+			if ZEND_HANDLE_NUMERIC(offset_key, &hval) {
 				goto num_index
 			}
 		}
@@ -2358,7 +2358,7 @@ func ZendArrayKeyExistsFast(ht *HashTable, key *Zval, opline *ZendOp, _ EXECUTE_
 try_again:
 	if key.IsType(IS_STRING) {
 		str = key.GetStr()
-		if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
+		if ZEND_HANDLE_NUMERIC(str, &hval) {
 			goto num_key
 		}
 	str_key:
