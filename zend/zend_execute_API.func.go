@@ -1290,7 +1290,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 		var end **ZendString = str + op_array.GetLastVar()
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
-			var zv *Zval = ZendHashFindEx(ht, *str, 1)
+			var zv *Zval = ht.FindByZendString(*str)
 			if zv != nil {
 				if zv.IsType(IS_INDIRECT) {
 					var val *Zval = zv.GetZv()

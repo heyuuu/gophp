@@ -754,7 +754,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 		for {
 			var p *ZendIniEntry = ExecutorGlobals.GetErrorReportingIniEntry()
 			if p == nil {
-				var zv *Zval = ZendHashFindEx(ExecutorGlobals.GetIniDirectives(), ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING), 1)
+				var zv *Zval = ExecutorGlobals.GetIniDirectives().FindByZendString(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING))
 				if zv != nil {
 					ExecutorGlobals.SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
 					p = ExecutorGlobals.GetErrorReportingIniEntry()

@@ -1917,7 +1917,7 @@ try_again:
 			}
 		}
 	str_index:
-		retval = ZendHashFindEx(ht, offset_key, ZEND_CONST_COND(dim_type == IS_CONST, 0))
+		retval = ht.FindByZendString(offset_key)
 		if retval != nil {
 
 			/* support for $GLOBALS[...] */
@@ -2609,7 +2609,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			ptr = ZendHashFindEx(zobj.GetProperties(), prop_ptr.GetStr(), 1)
+			ptr = zobj.GetProperties().FindByZendString(prop_ptr.GetStr())
 			if ptr != nil {
 				ZVAL_INDIRECT(result, ptr)
 				return
@@ -3890,23 +3890,23 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
-	zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
+	zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
 	if zv != nil {
 		c = (*ZendConstant)(zv.GetPtr())
 	} else {
 		key++
-		zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
+		zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
 		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 			c = (*ZendConstant)(zv.GetPtr())
 		} else {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
+				zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
 				if zv != nil {
 					c = (*ZendConstant)(zv.GetPtr())
 				} else {
 					key++
-					zv = ZendHashFindEx(ExecutorGlobals.GetZendConstants(), key.GetStr(), 1)
+					zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
 					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 						c = (*ZendConstant)(zv.GetPtr())
 					}

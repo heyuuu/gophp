@@ -2792,7 +2792,7 @@ func PhpExtractRefIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) ze
 			if var_name == nil {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -2846,7 +2846,7 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 			if var_name == nil {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -2905,7 +2905,7 @@ func PhpExtractRefOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) z
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -2963,7 +2963,7 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 				zend.ZendThrowError(nil, "Cannot re-assign $this")
 				return -1
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3010,7 +3010,7 @@ func PhpExtractRefPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArr
 			if var_name == nil {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3078,7 +3078,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 			if var_name == nil {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3144,7 +3144,7 @@ func PhpExtractRefPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 			if var_name.GetLen() == 0 {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3230,7 +3230,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 			if var_name.GetLen() == 0 {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3564,7 +3564,7 @@ func PhpExtractRefSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Z
 			if zend.ZendStringEqualsLiteral(var_name, "this") {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -3620,7 +3620,7 @@ func PhpExtractSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Zend
 			if zend.ZendStringEqualsLiteral(var_name, "this") {
 				continue
 			}
-			orig_var = zend.ZendHashFindEx(symbol_table, var_name, 1)
+			orig_var = symbol_table.FindByZendString(var_name)
 			if orig_var != nil {
 				if orig_var.IsType(zend.IS_INDIRECT) {
 					orig_var = orig_var.GetZv()
@@ -5699,7 +5699,7 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 			string_key = _p.GetKey()
 			src_entry = _z
 			if string_key != nil {
-				if b.Assign(&dest_entry, zend.ZendHashFindEx(dest, string_key, 1)) != nil {
+				if b.Assign(&dest_entry, dest.FindByZendString(string_key)) != nil {
 					var src_zval *zend.Zval = src_entry
 					var dest_zval *zend.Zval = dest_entry
 					var thash *zend.HashTable
@@ -5847,7 +5847,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 			src_zval = src_entry
 			zend.ZVAL_DEREF(src_zval)
 			if string_key != nil {
-				if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, zend.ZendHashFindEx(dest, string_key, 1)) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(zend.Z_ISREF_P(dest_entry)) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
+				if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, dest.FindByZendString(string_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(zend.Z_ISREF_P(dest_entry)) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
 					var zv *zend.Zval = zend.ZendHashUpdate(dest, string_key, src_entry)
 					zend.ZvalAddRef(zv)
 					continue

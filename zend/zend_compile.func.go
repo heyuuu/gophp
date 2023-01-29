@@ -869,7 +869,7 @@ func FunctionAddRef(function *ZendFunction) {
 	}
 }
 func DoBindFunctionError(lcname *ZendString, op_array *ZendOpArray, compile_time ZendBool) {
-	var zv *Zval = ZendHashFindEx(b.CondF(compile_time != 0, func() *HashTable { return CompilerGlobals.GetFunctionTable() }, func() *HashTable { return ExecutorGlobals.GetFunctionTable() }), lcname, 1)
+	var zv *Zval = b.CondF(compile_time != 0, func() *HashTable { return CompilerGlobals.GetFunctionTable() }, func() *HashTable { return ExecutorGlobals.GetFunctionTable() }).FindByZendString(lcname)
 	var error_level int = b.Cond(compile_time != 0, E_COMPILE_ERROR, E_ERROR)
 	var old_function *ZendFunction
 	ZEND_ASSERT(zv != nil)
@@ -885,7 +885,7 @@ func DoBindFunction(lcname *Zval) int {
 	var rtd_key *Zval
 	var zv *Zval
 	rtd_key = lcname + 1
-	zv = ZendHashFindEx(ExecutorGlobals.GetFunctionTable(), rtd_key.GetStr(), 1)
+	zv = ExecutorGlobals.GetFunctionTable().FindByZendString(rtd_key.GetStr())
 	if zv == nil {
 		DoBindFunctionError(lcname.GetStr(), nil, 0)
 		return FAILURE
@@ -907,7 +907,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 	var rtd_key *Zval
 	var zv *Zval
 	rtd_key = lcname + 1
-	zv = ZendHashFindEx(ExecutorGlobals.GetClassTable(), rtd_key.GetStr(), 1)
+	zv = ExecutorGlobals.GetClassTable().FindByZendString(rtd_key.GetStr())
 	if zv == nil {
 		ce = ZendHashFindPtr(ExecutorGlobals.GetClassTable(), lcname.GetStr())
 		if ce != nil {
@@ -917,7 +917,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 			for {
 				ZEND_ASSERT(ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetOpArray().IsPreloaded())
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
-					zv = ZendHashFindEx(ExecutorGlobals.GetClassTable(), rtd_key.GetStr(), 1)
+					zv = ExecutorGlobals.GetClassTable().FindByZendString(rtd_key.GetStr())
 					if zv != nil {
 						break
 					}
@@ -1002,7 +1002,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 		for opline_num != uint32-1 {
 			var opline *ZendOp = op_array.GetOpcodes()[opline_num]
 			var lcname *Zval = RT_CONSTANT(opline, opline.GetOp1())
-			var zv *Zval = ZendHashFindEx(ExecutorGlobals.GetClassTable(), (lcname + 1).GetStr(), 1)
+			var zv *Zval = ExecutorGlobals.GetClassTable().FindByZendString((lcname + 1).GetStr())
 			if zv != nil {
 				var ce *ZendClassEntry = zv.GetCe()
 				var lc_parent_name *ZendString = RT_CONSTANT(opline, opline.GetOp2()).GetStr()

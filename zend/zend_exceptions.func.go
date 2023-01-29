@@ -426,14 +426,14 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	SmartStrAppendc(str, '#')
 	SmartStrAppendLong(str, num)
 	SmartStrAppendc(str, ' ')
-	file = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_FILE), 1)
+	file = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_FILE))
 	if file != nil {
 		if file.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
 			SmartStrAppends(str, "[unknown function]")
 		} else {
 			var line ZendLong
-			tmp = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_LINE), 1)
+			tmp = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_LINE))
 			if tmp != nil {
 				if tmp.IsType(IS_LONG) {
 					line = tmp.GetLval()
@@ -456,7 +456,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_TYPE))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_FUNCTION))
 	SmartStrAppendc(str, '(')
-	tmp = ZendHashFindEx(ht, ZSTR_KNOWN(ZEND_STR_ARGS), 1)
+	tmp = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_ARGS))
 	if tmp != nil {
 		if tmp.IsType(IS_ARRAY) {
 			var last_len int = str.GetS().GetLen()
