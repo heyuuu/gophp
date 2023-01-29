@@ -91,7 +91,7 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpDl(filename, zend.MODULE_TEMPORARY, return_value, 0)
 	if return_value.IsType(zend.IS_TRUE) {
-		zend.ExecutorGlobals.SetFullTablesCleanup(1)
+		zend.__EG().SetFullTablesCleanup(1)
 	}
 }
 func PhpLoadShlib(path *byte, errp **byte) any {

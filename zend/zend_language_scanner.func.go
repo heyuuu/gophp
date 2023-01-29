@@ -13,14 +13,14 @@ func HANDLE_NEWLINES(s *byte, l *byte) {
 	var boundary *byte = p + l
 	for p < boundary {
 		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 		}
 		p++
 	}
 }
 func HANDLE_NEWLINE(c byte) {
 	if c == '\n' || c == '\r' {
-		CompilerGlobals.GetZendLineno()++
+		__CG().GetZendLineno()++
 	}
 }
 func SET_DOUBLE_QUOTES_SCANNED_LENGTH(len_ int) __auto__ {
@@ -55,13 +55,13 @@ func StripUnderscores(str *byte, len_ *int) {
 func EncodingFilterScriptToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
 	ZEND_ASSERT(internal_encoding != nil)
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LanguageScannerGlobals.GetScriptEncoding())
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, __INI_SCNG().script_encoding)
 }
 func EncodingFilterScriptToIntermediate(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, LanguageScannerGlobals.GetScriptEncoding())
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, __INI_SCNG().script_encoding)
 }
 func EncodingFilterIntermediateToScript(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, LanguageScannerGlobals.GetScriptEncoding(), ZendMultibyteEncodingUtf8)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, __INI_SCNG().script_encoding, ZendMultibyteEncodingUtf8)
 }
 func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
@@ -69,16 +69,16 @@ func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint
 	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
 }
 func StartupScanner() {
-	CompilerGlobals.SetParseError(0)
-	CompilerGlobals.SetDocComment(nil)
-	CompilerGlobals.SetExtraFnFlags(0)
+	__CG().SetParseError(0)
+	__CG().SetDocComment(nil)
+	__CG().SetExtraFnFlags(0)
 	ZendStackInit(&(SCNG(state_stack)), b.SizeOf("int"))
 	ZendPtrStackInit(&(SCNG(heredoc_label_stack)))
 	SCNG(heredoc_scan_ahead) = 0
 }
 func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { Efree(heredoc_label.GetLabel()) }
 func ShutdownScanner() {
-	CompilerGlobals.SetParseError(0)
+	__CG().SetParseError(0)
 	RESET_DOC_COMMENT()
 	ZendStackDestroy(&(SCNG(state_stack)))
 	ZendPtrStackClean(&(SCNG(heredoc_label_stack)), (func(any))(&HeredocLabelDtor), 1)
@@ -100,7 +100,7 @@ func ZendSaveLexicalState(lex_state *ZendLexState) {
 	lex_state.SetIn(SCNG(yy_in))
 	lex_state.SetYyState(YYSTATE)
 	lex_state.SetFilename(ZendGetCompiledFilename())
-	lex_state.SetLineno(CompilerGlobals.GetZendLineno())
+	lex_state.SetLineno(__CG().GetZendLineno())
 	lex_state.SetScriptOrg(SCNG(script_org))
 	lex_state.SetScriptOrgSize(SCNG(script_org_size))
 	lex_state.SetScriptFiltered(SCNG(script_filtered))
@@ -110,8 +110,8 @@ func ZendSaveLexicalState(lex_state *ZendLexState) {
 	lex_state.SetScriptEncoding(SCNG(script_encoding))
 	lex_state.SetOnEvent(SCNG(on_event))
 	lex_state.SetOnEventContext(SCNG(on_event_context))
-	lex_state.SetAst(CompilerGlobals.GetAst())
-	lex_state.SetAstArena(CompilerGlobals.GetAstArena())
+	lex_state.SetAst(__CG().GetAst())
+	lex_state.SetAstArena(__CG().GetAstArena())
 }
 func ZendRestoreLexicalState(lex_state *ZendLexState) {
 	SCNG(yy_leng) = lex_state.GetYyLeng()
@@ -127,7 +127,7 @@ func ZendRestoreLexicalState(lex_state *ZendLexState) {
 	SCNG(heredoc_label_stack) = lex_state.GetHeredocLabelStack()
 	SCNG(yy_in) = lex_state.GetIn()
 	YYSETCONDITION(lex_state.GetYyState())
-	CompilerGlobals.SetZendLineno(lex_state.GetLineno())
+	__CG().SetZendLineno(lex_state.GetLineno())
 	ZendRestoreCompiledFilename(lex_state.GetFilename())
 	if SCNG(script_filtered) {
 		Efree(SCNG(script_filtered))
@@ -142,12 +142,12 @@ func ZendRestoreLexicalState(lex_state *ZendLexState) {
 	SCNG(script_encoding) = lex_state.GetScriptEncoding()
 	SCNG(on_event) = lex_state.GetOnEvent()
 	SCNG(on_event_context) = lex_state.GetOnEventContext()
-	CompilerGlobals.SetAst(lex_state.GetAst())
-	CompilerGlobals.SetAstArena(lex_state.GetAstArena())
+	__CG().SetAst(lex_state.GetAst())
+	__CG().SetAstArena(lex_state.GetAstArena())
 	RESET_DOC_COMMENT()
 }
 func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
-	ZendLlistDelElement(&(CompilerGlobals.GetOpenFiles()), file_handle, (func(any, any) int)(ZendCompareFileHandles))
+	ZendLlistDelElement(__CG().GetOpenFiles(), file_handle, (func(any, any) int)(ZendCompareFileHandles))
 
 	/* zend_file_handle_dtor() operates on the copy, so we have to NULLify the original here */
 
@@ -229,25 +229,25 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 	var bom_size int
 	var pos1 *uint8
 	var pos2 *uint8
-	if LanguageScannerGlobals.GetScriptOrgSize() < b.SizeOf("BOM_UTF32_LE")-1 {
+	if __INI_SCNG().script_org_size < b.SizeOf("BOM_UTF32_LE")-1 {
 		return nil
 	}
 
 	/* check out BOM */
 
-	if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
+	if !(memcmp(__INI_SCNG().script_org, BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf32be
 		bom_size = b.SizeOf("BOM_UTF32_BE") - 1
-	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
+	} else if !(memcmp(__INI_SCNG().script_org, BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf32le
 		bom_size = b.SizeOf("BOM_UTF32_LE") - 1
-	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
+	} else if !(memcmp(__INI_SCNG().script_org, BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf16be
 		bom_size = b.SizeOf("BOM_UTF16_BE") - 1
-	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
+	} else if !(memcmp(__INI_SCNG().script_org, BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf16le
 		bom_size = b.SizeOf("BOM_UTF16_LE") - 1
-	} else if !(memcmp(LanguageScannerGlobals.GetScriptOrg(), BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
+	} else if !(memcmp(__INI_SCNG().script_org, BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
 		script_encoding = ZendMultibyteEncodingUtf8
 		bom_size = b.SizeOf("BOM_UTF8") - 1
 	}
@@ -255,18 +255,18 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 
 		/* remove BOM */
 
-		LanguageScannerGlobals.SetScriptOrg(LanguageScannerGlobals.GetScriptOrg() + bom_size)
-		LanguageScannerGlobals.SetScriptOrgSize(LanguageScannerGlobals.GetScriptOrgSize() - bom_size)
+		__INI_SCNG().script_org += bom_size
+		__INI_SCNG().script_org_size -= bom_size
 		return script_encoding
 	}
 
 	/* script contains NULL bytes -> auto-detection */
 
-	if b.Assign(&pos1, memchr(LanguageScannerGlobals.GetScriptOrg(), 0, LanguageScannerGlobals.GetScriptOrgSize())) {
+	if b.Assign(&pos1, memchr(__INI_SCNG().script_org, 0, __INI_SCNG().script_org_size)) {
 
 		/* check if the NULL byte is after the __HALT_COMPILER(); */
 
-		pos2 = LanguageScannerGlobals.GetScriptOrg()
+		pos2 = __INI_SCNG().script_org
 		for size_t(pos1-pos2) >= b.SizeOf("\"__HALT_COMPILER();\"")-1 {
 			pos2 = memchr(pos2, '_', pos1-pos2)
 			if pos2 == nil {
@@ -298,7 +298,7 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 
 		/* make best effort if BOM is missing */
 
-		return ZendMultibyteDetectUtfEncoding(LanguageScannerGlobals.GetScriptOrg(), LanguageScannerGlobals.GetScriptOrgSize())
+		return ZendMultibyteDetectUtfEncoding(__INI_SCNG().script_org, __INI_SCNG().script_org_size)
 
 		/* make best effort if BOM is missing */
 
@@ -307,7 +307,7 @@ func ZendMultibyteDetectUnicode() *ZendEncoding {
 }
 func ZendMultibyteFindScriptEncoding() *ZendEncoding {
 	var script_encoding *ZendEncoding
-	if CompilerGlobals.GetDetectUnicode() != 0 {
+	if __CG().GetDetectUnicode() != 0 {
 
 		/* check out bom(byte order mark) and see if containing wchars */
 
@@ -325,16 +325,16 @@ func ZendMultibyteFindScriptEncoding() *ZendEncoding {
 
 	/* if no script_encoding specified, just leave alone */
 
-	if CompilerGlobals.GetScriptEncodingList() == nil || CompilerGlobals.GetScriptEncodingListSize() == 0 {
+	if __CG().GetScriptEncodingList() == nil || __CG().GetScriptEncodingListSize() == 0 {
 		return nil
 	}
 
 	/* if multiple encodings specified, detect automagically */
 
-	if CompilerGlobals.GetScriptEncodingListSize() > 1 {
-		return ZendMultibyteEncodingDetector(LanguageScannerGlobals.GetScriptOrg(), LanguageScannerGlobals.GetScriptOrgSize(), CompilerGlobals.GetScriptEncodingList(), CompilerGlobals.GetScriptEncodingListSize())
+	if __CG().GetScriptEncodingListSize() > 1 {
+		return ZendMultibyteEncodingDetector(__INI_SCNG().script_org, __INI_SCNG().script_org_size, __CG().GetScriptEncodingList(), __CG().GetScriptEncodingListSize())
 	}
-	return CompilerGlobals.GetScriptEncodingList()[0]
+	return __CG().GetScriptEncodingList()[0]
 }
 func ZendMultibyteSetFilter(onetime_encoding *ZendEncoding) int {
 	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
@@ -345,34 +345,34 @@ func ZendMultibyteSetFilter(onetime_encoding *ZendEncoding) int {
 
 	/* judge input/output filter */
 
-	LanguageScannerGlobals.SetScriptEncoding(script_encoding)
-	LanguageScannerGlobals.SetInputFilter(nil)
-	LanguageScannerGlobals.SetOutputFilter(nil)
-	if internal_encoding == nil || LanguageScannerGlobals.GetScriptEncoding() == internal_encoding {
-		if ZendMultibyteCheckLexerCompatibility(LanguageScannerGlobals.GetScriptEncoding()) == 0 {
+	__INI_SCNG().script_encoding = script_encoding
+	__INI_SCNG().input_filter = nil
+	__INI_SCNG().output_filter = nil
+	if internal_encoding == nil || __INI_SCNG().script_encoding == internal_encoding {
+		if ZendMultibyteCheckLexerCompatibility(__INI_SCNG().script_encoding) == 0 {
 
 			/* and if not, work around w/ script_encoding -> utf-8 -> script_encoding conversion */
 
-			LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToIntermediate)
-			LanguageScannerGlobals.SetOutputFilter(EncodingFilterIntermediateToScript)
+			__INI_SCNG().input_filter = EncodingFilterScriptToIntermediate
+			__INI_SCNG().output_filter = EncodingFilterIntermediateToScript
 		} else {
-			LanguageScannerGlobals.SetInputFilter(nil)
-			LanguageScannerGlobals.SetOutputFilter(nil)
+			__INI_SCNG().input_filter = nil
+			__INI_SCNG().output_filter = nil
 		}
 		return SUCCESS
 	}
 	if ZendMultibyteCheckLexerCompatibility(internal_encoding) != 0 {
-		LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToInternal)
-		LanguageScannerGlobals.SetOutputFilter(nil)
-	} else if ZendMultibyteCheckLexerCompatibility(LanguageScannerGlobals.GetScriptEncoding()) != 0 {
-		LanguageScannerGlobals.SetInputFilter(nil)
-		LanguageScannerGlobals.SetOutputFilter(EncodingFilterScriptToInternal)
+		__INI_SCNG().input_filter = EncodingFilterScriptToInternal
+		__INI_SCNG().output_filter = nil
+	} else if ZendMultibyteCheckLexerCompatibility(__INI_SCNG().script_encoding) != 0 {
+		__INI_SCNG().input_filter = nil
+		__INI_SCNG().output_filter = EncodingFilterScriptToInternal
 	} else {
 
 		/* both script and internal encodings are incompatible w/ flex */
 
-		LanguageScannerGlobals.SetInputFilter(EncodingFilterScriptToIntermediate)
-		LanguageScannerGlobals.SetOutputFilter(EncodingFilterIntermediateToInternal)
+		__INI_SCNG().input_filter = EncodingFilterScriptToIntermediate
+		__INI_SCNG().output_filter = EncodingFilterIntermediateToInternal
 	}
 	return 0
 }
@@ -384,13 +384,13 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 
 		/* Still add it to open_files to make destroy_file_handle work */
 
-		ZendLlistAddElement(&(CompilerGlobals.GetOpenFiles()), file_handle)
+		ZendLlistAddElement(__CG().GetOpenFiles(), file_handle)
 		return FAILURE
 	}
-	ZEND_ASSERT(ExecutorGlobals.GetException() == nil && "stream_fixup() should have failed")
-	ZendLlistAddElement(&(CompilerGlobals.GetOpenFiles()), file_handle)
+	ZEND_ASSERT(__EG().GetException() == nil && "stream_fixup() should have failed")
+	ZendLlistAddElement(__CG().GetOpenFiles(), file_handle)
 	if file_handle.GetStream().GetHandle() >= any(file_handle != nil && file_handle.GetStream().GetHandle() <= any(file_handle+1)) {
-		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(&(CompilerGlobals.GetOpenFiles())))
+		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(__CG().GetOpenFiles()))
 		var diff int = (*byte)(file_handle.GetStream().GetHandle() - (*byte)(file_handle))
 		fh.GetStream().SetHandle(any((*byte)(fh) + diff))
 		file_handle.GetStream().SetHandle(fh.GetStream().GetHandle())
@@ -401,14 +401,14 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	SCNG(yy_in) = file_handle
 	SCNG(yy_start) = nil
 	if size != size_t-1 {
-		if CompilerGlobals.GetMultibyte() != 0 {
+		if __CG().GetMultibyte() != 0 {
 			SCNG(script_org) = (*uint8)(buf)
 			SCNG(script_org_size) = size
 			SCNG(script_filtered) = nil
 			ZendMultibyteSetFilter(nil)
 			if SCNG(input_filter) {
 				if size_t-1 == SCNG(input_filter)(&(SCNG(script_filtered)), &(SCNG(script_filtered_size)), SCNG(script_org), SCNG(script_org_size)) {
-					ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
+					ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(__INI_SCNG().script_encoding))
 				}
 				buf = (*byte)(SCNG(script_filtered))
 				size = SCNG(script_filtered_size)
@@ -419,8 +419,8 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	} else {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "zend_stream_mmap() failed")
 	}
-	if CompilerGlobals.GetSkipShebang() != 0 {
-		CompilerGlobals.SetSkipShebang(0)
+	if __CG().GetSkipShebang() != 0 {
+		__CG().SetSkipShebang(0)
 		BEGIN(SHEBANG)
 	} else {
 		BEGIN(INITIAL)
@@ -433,46 +433,46 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	ZendSetCompiledFilename(compiled_filename)
 	ZendStringReleaseEx(compiled_filename, 0)
 	RESET_DOC_COMMENT()
-	CompilerGlobals.SetZendLineno(1)
-	CompilerGlobals.SetIncrementLineno(0)
+	__CG().SetZendLineno(1)
+	__CG().SetIncrementLineno(0)
 	return SUCCESS
 }
 func ZendCompile(type_ int) *ZendOpArray {
 	var op_array *ZendOpArray = nil
-	var original_in_compilation ZendBool = CompilerGlobals.GetInCompilation()
-	CompilerGlobals.SetInCompilation(1)
-	CompilerGlobals.SetAst(nil)
-	CompilerGlobals.SetAstArena(ZendArenaCreate(1024 * 32))
+	var original_in_compilation ZendBool = __CG().GetInCompilation()
+	__CG().SetInCompilation(1)
+	__CG().SetAst(nil)
+	__CG().SetAstArena(ZendArenaCreate(1024 * 32))
 	if Zendparse() == 0 {
-		var last_lineno int = CompilerGlobals.GetZendLineno()
+		var last_lineno int = __CG().GetZendLineno()
 		var original_file_context ZendFileContext
 		var original_oparray_context ZendOparrayContext
-		var original_active_op_array *ZendOpArray = CompilerGlobals.GetActiveOpArray()
+		var original_active_op_array *ZendOpArray = __CG().GetActiveOpArray()
 		op_array = Emalloc(b.SizeOf("zend_op_array"))
 		InitOpArray(op_array, type_, INITIAL_OP_ARRAY_SIZE)
-		CompilerGlobals.SetActiveOpArray(op_array)
+		__CG().SetActiveOpArray(op_array)
 
 		/* Use heap to not waste arena memory */
 
 		op_array.SetIsHeapRtCache(true)
 		if ZendAstProcess != nil {
-			ZendAstProcess(CompilerGlobals.GetAst())
+			ZendAstProcess(__CG().GetAst())
 		}
 		ZendFileContextBegin(&original_file_context)
 		ZendOparrayContextBegin(&original_oparray_context)
-		ZendCompileTopStmt(CompilerGlobals.GetAst())
-		CompilerGlobals.SetZendLineno(last_lineno)
+		ZendCompileTopStmt(__CG().GetAst())
+		__CG().SetZendLineno(last_lineno)
 		ZendEmitFinalReturn(type_ == ZEND_USER_FUNCTION)
 		op_array.SetLineStart(1)
 		op_array.SetLineEnd(last_lineno)
 		PassTwo(op_array)
 		ZendOparrayContextEnd(&original_oparray_context)
 		ZendFileContextEnd(&original_file_context)
-		CompilerGlobals.SetActiveOpArray(original_active_op_array)
+		__CG().SetActiveOpArray(original_active_op_array)
 	}
-	ZendAstDestroy(CompilerGlobals.GetAst())
-	ZendArenaDestroy(CompilerGlobals.GetAstArena())
-	CompilerGlobals.SetInCompilation(original_in_compilation)
+	ZendAstDestroy(__CG().GetAst())
+	ZendArenaDestroy(__CG().GetAstArena())
+	__CG().SetInCompilation(original_in_compilation)
 	return op_array
 }
 func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
@@ -480,7 +480,7 @@ func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
 	var op_array *ZendOpArray = nil
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(file_handle) == FAILURE {
-		if ExecutorGlobals.GetException() == nil {
+		if __EG().GetException() == nil {
 			if type_ == ZEND_REQUIRE {
 				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.GetFilename())
 				ZendBailout()
@@ -510,7 +510,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 			opened_path = filename.GetStr().Copy()
 			file_handle.SetOpenedPath(opened_path)
 		}
-		ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath())
+		ZendHashAddEmptyElement(__EG().GetIncludedFiles(), file_handle.GetOpenedPath())
 		if opened_path != nil {
 			ZendStringReleaseEx(opened_path, 0)
 		}
@@ -537,14 +537,14 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 	SCNG(yy_start) = nil
 	buf = Z_STRVAL_P(str)
 	size = old_len
-	if CompilerGlobals.GetMultibyte() != 0 {
+	if __CG().GetMultibyte() != 0 {
 		SCNG(script_org) = (*uint8)(buf)
 		SCNG(script_org_size) = size
 		SCNG(script_filtered) = nil
 		ZendMultibyteSetFilter(ZendMultibyteGetInternalEncoding())
 		if SCNG(input_filter) {
 			if size_t-1 == SCNG(input_filter)(&(SCNG(script_filtered)), &(SCNG(script_filtered_size)), SCNG(script_org), SCNG(script_org_size)) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(__INI_SCNG().script_encoding))
 			}
 			buf = (*byte)(SCNG(script_filtered))
 			size = SCNG(script_filtered_size)
@@ -554,8 +554,8 @@ func ZendPrepareStringForScanning(str *Zval, filename *byte) int {
 	new_compiled_filename = ZendStringInit(filename, strlen(filename), 0)
 	ZendSetCompiledFilename(new_compiled_filename)
 	ZendStringReleaseEx(new_compiled_filename, 0)
-	CompilerGlobals.SetZendLineno(1)
-	CompilerGlobals.SetIncrementLineno(0)
+	__CG().SetZendLineno(1)
+	__CG().SetIncrementLineno(0)
 	RESET_DOC_COMMENT()
 	return SUCCESS
 }
@@ -666,7 +666,7 @@ func ZendMultibyteYyinputAgain(old_input_filter ZendEncodingFilter, old_encoding
 		new_yy_start = SCNG(script_org)
 	} else {
 		if size_t-1 == SCNG(input_filter)(&new_yy_start, &length, SCNG(script_org), SCNG(script_org_size)) {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(LanguageScannerGlobals.GetScriptEncoding()))
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", ZendMultibyteGetEncodingName(__INI_SCNG().script_encoding))
 		}
 		if SCNG(script_filtered) {
 			Efree(SCNG(script_filtered))
@@ -703,7 +703,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 		} else {
 			var c ZendUchar = zend_uchar * str
 			if c == '\n' || c == '\r' {
-				CompilerGlobals.GetZendLineno()++
+				__CG().GetZendLineno()++
 			}
 			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
 		}
@@ -720,7 +720,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 		}
 		s++
 		if s == end {
@@ -898,7 +898,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 			b.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 		}
 		s++
 	}
@@ -977,12 +977,12 @@ func StripMultilineStringIndentation(zendlval *Zval, indentation int, using_spac
 
 			}
 			if str == end || (*str) != ' ' && (*str) != '\t' {
-				CompilerGlobals.SetZendLineno(CompilerGlobals.GetZendLineno() + newline_count)
+				__CG().SetZendLineno(__CG().GetZendLineno() + newline_count)
 				ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", indentation)
 				goto error
 			}
 			if using_spaces == 0 && (*str) == ' ' || using_spaces != 0 && (*str) == '\t' {
-				CompilerGlobals.SetZendLineno(CompilerGlobals.GetZendLineno() + newline_count)
+				__CG().SetZendLineno(__CG().GetZendLineno() + newline_count)
 				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 				goto error
 			}
@@ -1033,7 +1033,7 @@ func RETURN_OR_SKIP_TOKEN(_token Yytokentype) {
 func LexScan(zendlval *Zval, elem *ZendParserStackElem) int {
 	var token int
 	var offset int
-	var start_line int = CompilerGlobals.GetZendLineno()
+	var start_line int = __CG().GetZendLineno()
 	ZVAL_UNDEF(zendlval)
 restart:
 	SCNG(yy_text) = YYCURSOR
@@ -1416,7 +1416,7 @@ yy6:
 				YYCURSOR++
 			}
 		case '\n':
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 			break
 		case '?':
 			if (*YYCURSOR) == '>' {
@@ -1503,7 +1503,7 @@ yy10:
 		} else {
 			var c ZendUchar = zend_uchar * (Yytext + bprefix + 1)
 			if c == '\n' || c == '\r' {
-				CompilerGlobals.GetZendLineno()++
+				__CG().GetZendLineno()++
 			}
 			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
 		}
@@ -1520,7 +1520,7 @@ yy10:
 			break
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 		}
 		s++
 		if s == end {
@@ -1541,7 +1541,7 @@ yy10:
 			b.PostInc(&(*t)) = *s
 		}
 		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CompilerGlobals.GetZendLineno()++
+			__CG().GetZendLineno()++
 		}
 		s++
 	}
@@ -2769,12 +2769,12 @@ yy89:
 	if YYCURSOR < YYLIMIT {
 		YYCURSOR++
 	} else if !(SCNG(heredoc_scan_ahead)) {
-		ZendError(E_COMPILE_WARNING, "Unterminated comment starting line %d", CompilerGlobals.GetZendLineno())
+		ZendError(E_COMPILE_WARNING, "Unterminated comment starting line %d", __CG().GetZendLineno())
 	}
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	HANDLE_NEWLINES(Yytext, Yyleng)
 	if doc_com != 0 {
-		CompilerGlobals.SetDocComment(ZendStringInit(Yytext, Yyleng, 0))
+		__CG().SetDocComment(ZendStringInit(Yytext, Yyleng, 0))
 		RETURN_OR_SKIP_TOKEN(T_DOC_COMMENT)
 	}
 	RETURN_OR_SKIP_TOKEN(T_COMMENT)
@@ -2909,7 +2909,7 @@ yy106:
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	BEGIN(INITIAL)
 	if Yytext[Yyleng-1] != '>' {
-		CompilerGlobals.SetIncrementLineno(1)
+		__CG().SetIncrementLineno(1)
 	}
 	if PARSER_MODE() {
 		token = ';'
@@ -5419,7 +5419,7 @@ yy334:
 	var indentation int = 0
 	var heredoc_label *zend_heredoc_label = emalloc(b.SizeOf("zend_heredoc_label"))
 	var is_heredoc ZendBool = 1
-	CompilerGlobals.GetZendLineno()++
+	__CG().GetZendLineno()++
 	heredoc_label.SetLength(Yyleng - bprefix - 3 - 1 - b.Cond(Yytext[Yyleng-2] == '\r', 1, 0))
 	s = Yytext + bprefix + 3
 	for (*s) == ' ' || (*s) == '\t' {
@@ -5478,7 +5478,7 @@ yy334:
 	YYCURSOR = saved_cursor
 	if is_heredoc != 0 && !(SCNG(heredoc_scan_ahead)) {
 		var current_state ZendLexState
-		var saved_doc_comment *ZendString = CompilerGlobals.GetDocComment()
+		var saved_doc_comment *ZendString = __CG().GetDocComment()
 		var heredoc_nesting_level int = 1
 		var first_token int = 0
 		var error int = 0
@@ -5486,8 +5486,8 @@ yy334:
 		SCNG(heredoc_scan_ahead) = 1
 		SCNG(heredoc_indentation) = 0
 		SCNG(heredoc_indentation_uses_spaces) = 0
-		LanguageScannerGlobals.SetOnEvent(nil)
-		CompilerGlobals.SetDocComment(nil)
+		__INI_SCNG().on_event = nil
+		__CG().SetDocComment(nil)
 		ZendPtrStackReverseApply(current_state.GetHeredocLabelStack(), CopyHeredocLabelStack)
 		ZendExceptionSave()
 		for heredoc_nesting_level != 0 {
@@ -5496,7 +5496,7 @@ yy334:
 			ZVAL_UNDEF(&zv)
 			retval = LexScan(&zv, nil)
 			ZvalPtrDtorNogc(&zv)
-			if ExecutorGlobals.GetException() != nil {
+			if __EG().GetException() != nil {
 				ZendClearException()
 				break
 			}
@@ -5523,8 +5523,8 @@ yy334:
 		heredoc_label.SetIndentationUsesSpaces(SCNG(heredoc_indentation_uses_spaces))
 		ZendRestoreLexicalState(&current_state)
 		SCNG(heredoc_scan_ahead) = 0
-		CompilerGlobals.SetIncrementLineno(0)
-		CompilerGlobals.SetDocComment(saved_doc_comment)
+		__CG().SetIncrementLineno(0)
+		__CG().SetDocComment(saved_doc_comment)
 		if PARSER_MODE() && error != 0 {
 			token = T_ERROR
 			goto emit_token
@@ -8084,7 +8084,7 @@ yy590:
 				} else {
 					newline = 1
 				}
-				CompilerGlobals.SetIncrementLineno(1)
+				__CG().SetIncrementLineno(1)
 				if SCNG(heredoc_scan_ahead) {
 					SCNG(heredoc_indentation) = indentation
 					SCNG(heredoc_indentation_uses_spaces) = spacing == HEREDOC_USING_SPACES
@@ -8118,7 +8118,7 @@ yy590:
 heredoc_scan_done:
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
-	if !(SCNG(heredoc_scan_ahead)) && ExecutorGlobals.GetException() == nil && PARSER_MODE() {
+	if !(SCNG(heredoc_scan_ahead)) && __EG().GetException() == nil && PARSER_MODE() {
 		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
 		var copy *ZendString = zendlval.GetStr()
 		if StripMultilineStringIndentation(zendlval, heredoc_label.GetIndentation(), heredoc_label.GetIndentationUsesSpaces(), newline_at_start, newline != 0) == 0 {
@@ -8744,7 +8744,7 @@ yy634:
 	}
 	YYCURSOR++
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	CompilerGlobals.GetZendLineno()++
+	__CG().GetZendLineno()++
 	BEGIN(INITIAL)
 	goto restart
 
@@ -8777,7 +8777,7 @@ inline_char_handler:
 			break
 		}
 		if (*YYCURSOR) == '?' {
-			if CompilerGlobals.GetShortTags() != 0 || (*(YYCURSOR + 1)) == '=' || !(strncasecmp((*byte)(YYCURSOR+1), "php", 3)) && (YYCURSOR+4 == YYLIMIT || YYCURSOR[4] == ' ' || YYCURSOR[4] == '\t' || YYCURSOR[4] == '\n' || YYCURSOR[4] == '\r') {
+			if __CG().GetShortTags() != 0 || (*(YYCURSOR + 1)) == '=' || !(strncasecmp((*byte)(YYCURSOR+1), "php", 3)) && (YYCURSOR+4 == YYLIMIT || YYCURSOR[4] == ' ' || YYCURSOR[4] == '\t' || YYCURSOR[4] == '\n' || YYCURSOR[4] == '\r') {
 				YYCURSOR--
 				break
 			}
@@ -8824,7 +8824,7 @@ yy637:
 	}
 yy638:
 	Yyleng = YYCURSOR - SCNG(yy_text)
-	if CompilerGlobals.GetShortTags() != 0 {
+	if __CG().GetShortTags() != 0 {
 		BEGIN(ST_IN_SCRIPTING)
 		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 	} else {
@@ -8888,7 +8888,7 @@ yy644:
 
 	/* Degenerate case: <?phpX is interpreted as <? phpX with short tags. */
 
-	if CompilerGlobals.GetShortTags() != 0 {
+	if __CG().GetShortTags() != 0 {
 		Yyless(2)
 		BEGIN(ST_IN_SCRIPTING)
 		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
@@ -8989,7 +8989,7 @@ yyc_ST_NOWDOC:
 				} else {
 					newline = 1
 				}
-				CompilerGlobals.SetIncrementLineno(1)
+				__CG().SetIncrementLineno(1)
 				YYCURSOR -= indentation
 				heredoc_label.SetIndentation(indentation)
 				BEGIN(ST_END_HEREDOC)
@@ -9002,7 +9002,7 @@ yyc_ST_NOWDOC:
 nowdoc_scan_done:
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	ZVAL_STRINGL(zendlval, Yytext, Yyleng-newline)
-	if ExecutorGlobals.GetException() == nil && spacing != -1 && PARSER_MODE() {
+	if __EG().GetException() == nil && spacing != -1 && PARSER_MODE() {
 		var newline_at_start ZendBool = (*(Yytext - 1)) == '\n' || (*(Yytext - 1)) == '\r'
 		if StripMultilineStringIndentation(zendlval, indentation, spacing == HEREDOC_USING_SPACES, newline_at_start, newline != 0) == 0 {
 			token = T_ERROR
@@ -9029,7 +9029,7 @@ return_whitespace:
 		SCNG(on_event)(ON_TOKEN, T_WHITESPACE, start_line, SCNG(on_event_context))
 	}
 	if PARSER_MODE() {
-		start_line = CompilerGlobals.GetZendLineno()
+		start_line = __CG().GetZendLineno()
 		goto restart
 	} else {
 		return T_WHITESPACE
@@ -9038,6 +9038,6 @@ skip_token:
 	if SCNG(on_event) {
 		SCNG(on_event)(ON_TOKEN, token, start_line, SCNG(on_event_context))
 	}
-	start_line = CompilerGlobals.GetZendLineno()
+	start_line = __CG().GetZendLineno()
 	goto restart
 }

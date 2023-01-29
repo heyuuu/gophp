@@ -24,7 +24,7 @@ func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int,
 		zend.ZVAL_ERROR(rv)
 		return rv
 	} else {
-		return &(zend.ExecutorGlobals.GetUninitializedZval())
+		return zend.__EG().GetUninitializedZval()
 	}
 }
 func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *zend.Zval, cache_slot *any) *zend.Zval {
@@ -33,7 +33,7 @@ func IncompleteClassWriteProperty(object *zend.Zval, member *zend.Zval, value *z
 }
 func IncompleteClassGetPropertyPtrPtr(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any) *zend.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
-	return &(zend.ExecutorGlobals.GetErrorZval())
+	return zend.__EG().GetErrorZval()
 }
 func IncompleteClassUnsetProperty(object *zend.Zval, member *zend.Zval, cache_slot *any) {
 	IncompleteClassMessage(object, zend.E_NOTICE)

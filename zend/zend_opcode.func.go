@@ -562,14 +562,14 @@ func ZendCheckFinallyBreakout(op_array *ZendOpArray, op_num uint32, dst_num uint
 	var i int
 	for i = 0; i < op_array.GetLastTryCatch(); i++ {
 		if (op_num < op_array.GetTryCatchArray()[i].GetFinallyOp() || op_num >= op_array.GetTryCatchArray()[i].GetFinallyEnd()) && (dst_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && dst_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd()) {
-			CompilerGlobals.SetInCompilation(1)
-			CompilerGlobals.SetActiveOpArray(op_array)
-			CompilerGlobals.SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
+			__CG().SetInCompilation(1)
+			__CG().SetActiveOpArray(op_array)
+			__CG().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
 			ZendErrorNoreturn(E_COMPILE_ERROR, "jump into a finally block is disallowed")
 		} else if op_num >= op_array.GetTryCatchArray()[i].GetFinallyOp() && op_num <= op_array.GetTryCatchArray()[i].GetFinallyEnd() && (dst_num > op_array.GetTryCatchArray()[i].GetFinallyEnd() || dst_num < op_array.GetTryCatchArray()[i].GetFinallyOp()) {
-			CompilerGlobals.SetInCompilation(1)
-			CompilerGlobals.SetActiveOpArray(op_array)
-			CompilerGlobals.SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
+			__CG().SetInCompilation(1)
+			__CG().SetActiveOpArray(op_array)
+			__CG().SetZendLineno(op_array.GetOpcodes()[op_num].GetLineno())
 			ZendErrorNoreturn(E_COMPILE_ERROR, "jump out of a finally block is disallowed")
 		}
 	}
@@ -579,7 +579,7 @@ func ZendGetBrkContTarget(op_array *ZendOpArray, opline *ZendOp) uint32 {
 	var array_offset int = opline.GetOp1().GetNum()
 	var jmp_to *ZendBrkContElement
 	for {
-		jmp_to = CompilerGlobals.GetContext().GetBrkContArray()[array_offset]
+		jmp_to = __CG().GetContext().GetBrkContArray()[array_offset]
 		if nest_levels > 1 {
 			array_offset = jmp_to.GetParent()
 		}
@@ -889,17 +889,17 @@ func PassTwo(op_array *ZendOpArray) int {
 	if !(ZEND_USER_CODE(op_array.GetType())) {
 		return 0
 	}
-	if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
+	if (__CG().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) != 0 {
 		ZendUpdateExtendedStmts(op_array)
 	}
-	if (CompilerGlobals.GetCompilerOptions() & ZEND_COMPILE_HANDLE_OP_ARRAY) != 0 {
+	if (__CG().GetCompilerOptions() & ZEND_COMPILE_HANDLE_OP_ARRAY) != 0 {
 		if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER) != 0 {
 			ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayHandler), op_array)
 		}
 	}
-	if CompilerGlobals.GetContext().GetVarsSize() != op_array.GetLastVar() {
+	if __CG().GetContext().GetVarsSize() != op_array.GetLastVar() {
 		op_array.SetVars((**ZendString)(Erealloc(op_array.GetVars(), b.SizeOf("zend_string *")*op_array.GetLastVar())))
-		CompilerGlobals.GetContext().SetVarsSize(op_array.GetLastVar())
+		__CG().GetContext().SetVarsSize(op_array.GetLastVar())
 	}
 	op_array.SetOpcodes((*ZendOp)(Erealloc(op_array.GetOpcodes(), ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)+b.SizeOf("zval")*op_array.GetLastLiteral())))
 	if op_array.GetLiterals() != nil {
@@ -907,8 +907,8 @@ func PassTwo(op_array *ZendOpArray) int {
 		Efree(op_array.GetLiterals())
 		op_array.SetLiterals((*Zval)((*byte)(op_array.GetOpcodes()) + ZEND_MM_ALIGNED_SIZE_EX(b.SizeOf("zend_op")*op_array.GetLast(), 16)))
 	}
-	CompilerGlobals.GetContext().SetOpcodesSize(op_array.GetLast())
-	CompilerGlobals.GetContext().SetLiteralsSize(op_array.GetLastLiteral())
+	__CG().GetContext().SetOpcodesSize(op_array.GetLast())
+	__CG().GetContext().SetLiteralsSize(op_array.GetLastLiteral())
 
 	/* Needs to be set directly after the opcode/literal reallocation, to ensure destruction
 	 * happens correctly if any of the following fixups generate a fatal error. */

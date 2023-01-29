@@ -75,7 +75,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
 
-				if ExecutorGlobals.GetCurrentExecuteData() != nil {
+				if __EG().GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
 						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
@@ -94,7 +94,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a protected function, we're allowed to do so.
 				 */
 
-				if ExecutorGlobals.GetCurrentExecuteData() != nil {
+				if __EG().GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
 						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
@@ -118,16 +118,16 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		 */
 
 		old_exception = nil
-		if ExecutorGlobals.GetException() != nil {
-			if ExecutorGlobals.GetException() == object {
+		if __EG().GetException() != nil {
+			if __EG().GetException() == object {
 				ZendErrorNoreturn(E_CORE_ERROR, "Attempt to destruct pending exception")
 			} else {
-				old_exception = ExecutorGlobals.GetException()
-				ExecutorGlobals.SetException(nil)
+				old_exception = __EG().GetException()
+				__EG().SetException(nil)
 			}
 		}
-		orig_fake_scope = ExecutorGlobals.GetFakeScope()
-		ExecutorGlobals.SetFakeScope(nil)
+		orig_fake_scope = __EG().GetFakeScope()
+		__EG().SetFakeScope(nil)
 		ZVAL_UNDEF(&ret)
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(object)
@@ -142,14 +142,14 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		ZendCallFunction(&fci, &fcic)
 		ZvalPtrDtor(&ret)
 		if old_exception != nil {
-			if ExecutorGlobals.GetException() != nil {
-				ZendExceptionSetPrevious(ExecutorGlobals.GetException(), old_exception)
+			if __EG().GetException() != nil {
+				ZendExceptionSetPrevious(__EG().GetException(), old_exception)
 			} else {
-				ExecutorGlobals.SetException(old_exception)
+				__EG().SetException(old_exception)
 			}
 		}
 		OBJ_RELEASE(object)
-		ExecutorGlobals.SetFakeScope(orig_fake_scope)
+		__EG().SetFakeScope(orig_fake_scope)
 	}
 }
 func ZendObjectsNew(ce *ZendClassEntry) *ZendObject {
@@ -203,7 +203,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			new_object.SetProperties(ZendNewArray(old_object.GetProperties().GetNNumOfElements()))
 			ZendHashRealInitMixed(new_object.GetProperties())
 		} else {
-			ZendHashExtend(new_object.GetProperties(), new_object.GetProperties().GetNNumUsed()+old_object.GetProperties().GetNNumOfElements(), 0)
+			new_object.GetProperties().Extend(new_object.GetProperties().GetNNumUsed() + old_object.GetProperties().GetNNumOfElements())
 		}
 		new_object.GetProperties().GetUFlags() |= old_object.GetProperties().GetUFlags() & HASH_FLAG_HAS_EMPTY_IND
 		for {

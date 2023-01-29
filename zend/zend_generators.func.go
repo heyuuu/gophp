@@ -136,7 +136,7 @@ func ZendGeneratorClose(generator *ZendGenerator, finished_execution ZendBool) {
 		/* A fatal error / die occurred during the generator execution.
 		 * Trying to clean up the stack may not be safe in this case. */
 
-		if CompilerGlobals.GetUncleanShutdown() != 0 {
+		if __CG().GetUncleanShutdown() != 0 {
 			generator.SetExecuteData(nil)
 			return
 		}
@@ -188,7 +188,7 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 			root = next
 		}
 	}
-	if ex == nil || !ex.GetFunc().GetOpArray().IsHasFinallyBlock() || CompilerGlobals.GetUncleanShutdown() != 0 {
+	if ex == nil || !ex.GetFunc().GetOpArray().IsHasFinallyBlock() || __CG().GetUncleanShutdown() != 0 {
 		return
 	}
 
@@ -220,8 +220,8 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 
 			var fast_call *Zval = ZEND_CALL_VAR(ex, ex.GetFunc().GetOpArray().GetOpcodes()[try_catch.GetFinallyEnd()].GetOp1().GetVar())
 			ZendGeneratorCleanupUnfinishedExecution(generator, ex, try_catch.GetFinallyOp())
-			fast_call.SetObj(ExecutorGlobals.GetException())
-			ExecutorGlobals.SetException(nil)
+			fast_call.SetObj(__EG().GetException())
+			__EG().SetException(nil)
 			fast_call.SetOplineNum(uint32 - 1)
 			ex.SetOpline(ex.GetFunc().GetOpArray().GetOpcodes()[try_catch.GetFinallyOp()])
 			generator.SetIsForcedClose(true)
@@ -479,7 +479,7 @@ func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
 	return ptr
 }
 func ZendGeneratorThrowException(generator *ZendGenerator, exception *Zval) {
-	var original_execute_data *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
+	var original_execute_data *ZendExecuteData = __EG().GetCurrentExecuteData()
 
 	/* if we don't stop an array/iterator yield from, the exception will only reach the generator after the values were all iterated over */
 
@@ -491,15 +491,15 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *Zval) {
 	/* Throw the exception in the context of the generator. Decrementing the opline
 	 * to pretend the exception happened during the YIELD opcode. */
 
-	ExecutorGlobals.SetCurrentExecuteData(generator.GetExecuteData())
+	__EG().SetCurrentExecuteData(generator.GetExecuteData())
 	generator.GetExecuteData().GetOpline()--
 	if exception != nil {
 		ZendThrowExceptionObject(exception)
 	} else {
-		ZendRethrowException(ExecutorGlobals.GetCurrentExecuteData())
+		ZendRethrowException(__EG().GetCurrentExecuteData())
 	}
 	generator.GetExecuteData().GetOpline()++
-	ExecutorGlobals.SetCurrentExecuteData(original_execute_data)
+	__EG().SetCurrentExecuteData(original_execute_data)
 }
 func ZendGeneratorGetChild(node *ZendGeneratorNode, leaf *ZendGenerator) *ZendGenerator {
 	if node.GetChildren() == 0 {
@@ -632,15 +632,15 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 	}
 	if root.GetNode().GetParent() != nil {
 		if root.GetNode().GetParent().GetExecuteData() == nil {
-			if ExecutorGlobals.GetException() == nil {
+			if __EG().GetException() == nil {
 				var yield_from *ZendOp = (*ZendOp)(root.GetExecuteData().GetOpline() - 1)
 				if yield_from.GetOpcode() == ZEND_YIELD_FROM {
 					if Z_ISUNDEF(root.GetNode().GetParent().GetRetval()) {
 
 						/* Throw the exception in the context of the generator */
 
-						var original_execute_data *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
-						ExecutorGlobals.SetCurrentExecuteData(root.GetExecuteData())
+						var original_execute_data *ZendExecuteData = __EG().GetCurrentExecuteData()
+						__EG().SetCurrentExecuteData(root.GetExecuteData())
 						if root == generator {
 							root.GetExecuteData().SetPrevExecuteData(original_execute_data)
 						} else {
@@ -649,7 +649,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 						}
 						root.GetExecuteData().GetOpline()--
 						ZendThrowException(zend_ce_ClosedGeneratorException, "Generator yielded from aborted, no return value available", 0)
-						ExecutorGlobals.SetCurrentExecuteData(original_execute_data)
+						__EG().SetCurrentExecuteData(original_execute_data)
 						if (b.Cond(old_root != nil, old_root, generator).flags & ZEND_GENERATOR_CURRENTLY_RUNNING) == 0 {
 							leaf.GetNode().SetRoot(root)
 							root.GetNode().SetParent(nil)
@@ -722,12 +722,12 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		var iter *ZendObjectIterator = (*ZendObjectIterator)(generator.GetValues().GetObj())
 		if b.PostInc(&(iter.GetIndex())) > 0 {
 			iter.GetFuncs().GetMoveForward()(iter)
-			if ExecutorGlobals.GetException() != nil {
+			if __EG().GetException() != nil {
 				goto exception
 			}
 		}
 		if iter.GetFuncs().GetValid()(iter) == FAILURE {
-			if ExecutorGlobals.GetException() != nil {
+			if __EG().GetException() != nil {
 				goto exception
 			}
 
@@ -739,7 +739,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 
 		}
 		value = iter.GetFuncs().GetGetCurrentData()(iter)
-		if ExecutorGlobals.GetException() != nil {
+		if __EG().GetException() != nil {
 			goto exception
 		} else if value == nil {
 			goto failure
@@ -749,7 +749,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		ZvalPtrDtor(generator.GetKey())
 		if iter.GetFuncs().GetGetCurrentKey() != nil {
 			iter.GetFuncs().GetGetCurrentKey()(iter, generator.GetKey())
-			if ExecutorGlobals.GetException() != nil {
+			if __EG().GetException() != nil {
 				ZVAL_UNDEF(generator.GetKey())
 				goto exception
 			}
@@ -798,11 +798,11 @@ try_again:
 
 	/* Backup executor globals */
 
-	var original_execute_data *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData()
+	var original_execute_data *ZendExecuteData = __EG().GetCurrentExecuteData()
 
 	/* Set executor globals */
 
-	ExecutorGlobals.SetCurrentExecuteData(generator.GetExecuteData())
+	__EG().SetCurrentExecuteData(generator.GetExecuteData())
 
 	/* We want the backtrace to look as if the generator function was
 	 * called from whatever method we are current running (e.g. next()).
@@ -846,20 +846,20 @@ try_again:
 
 	/* Restore executor globals */
 
-	ExecutorGlobals.SetCurrentExecuteData(original_execute_data)
+	__EG().SetCurrentExecuteData(original_execute_data)
 
 	/* If an exception was thrown in the generator we have to internally
 	 * rethrow it in the parent scope.
 	 * In case we did yield from, the Exception must be rethrown into
 	 * its calling frame (see above in if (check_yield_from). */
 
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		if generator == orig_generator {
 			ZendGeneratorClose(generator, 0)
-			if ExecutorGlobals.GetCurrentExecuteData() == nil {
+			if __EG().GetCurrentExecuteData() == nil {
 				ZendThrowExceptionInternal(nil)
-			} else if ExecutorGlobals.GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetCommonType()) {
-				ZendRethrowException(ExecutorGlobals.GetCurrentExecuteData())
+			} else if __EG().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(__EG().GetCurrentExecuteData().GetFunc().GetCommonType()) {
+				ZendRethrowException(__EG().GetCurrentExecuteData())
 			}
 		} else {
 			generator = ZendGeneratorGetCurrent(orig_generator)
@@ -1134,7 +1134,7 @@ func zim_Generator_getReturn(execute_data *ZendExecuteData, return_value *Zval) 
 	}
 	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
 	ZendGeneratorEnsureInitialized(generator)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return
 	}
 	if Z_ISUNDEF(generator.GetRetval()) {

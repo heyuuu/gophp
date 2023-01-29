@@ -144,7 +144,7 @@ func IniError(msg *byte) {
 	} else {
 		error_buf = Estrdup("Invalid configuration directive\n")
 	}
-	if CompilerGlobals.GetIniParserUnbufferedErrors() != 0 {
+	if __CG().GetIniParserUnbufferedErrors() != 0 {
 		r.Fprintf(stderr, "PHP:  %s", error_buf)
 	} else {
 		ZendError(E_WARNING, "%s", error_buf)
@@ -156,11 +156,11 @@ func ZendParseIniFile(fh *ZendFileHandle, unbuffered_errors ZendBool, scanner_mo
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
-	CompilerGlobals.SetIniParserParam(&ini_parser_param)
+	__CG().SetIniParserParam(&ini_parser_param)
 	if ZendIniOpenFileForScanning(fh, scanner_mode) == FAILURE {
 		return FAILURE
 	}
-	CompilerGlobals.SetIniParserUnbufferedErrors(unbuffered_errors)
+	__CG().SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	ZendFileHandleDtor(fh)
 	ShutdownIniScanner()
@@ -175,11 +175,11 @@ func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int,
 	var ini_parser_param ZendIniParserParam
 	ini_parser_param.SetIniParserCb(ini_parser_cb)
 	ini_parser_param.SetArg(arg)
-	CompilerGlobals.SetIniParserParam(&ini_parser_param)
+	__CG().SetIniParserParam(&ini_parser_param)
 	if ZendIniPrepareStringForScanning(str, scanner_mode) == FAILURE {
 		return FAILURE
 	}
-	CompilerGlobals.SetIniParserUnbufferedErrors(unbuffered_errors)
+	__CG().SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
 	ShutdownIniScanner()
 	if retval == 0 {

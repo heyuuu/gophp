@@ -15,7 +15,7 @@ func ZEND_CLOSURE_PROPERTY_ERROR() {
 func zim_Closure___invoke(execute_data *ZendExecuteData, return_value *Zval) {
 	var func_ *ZendFunction = EX(func_)
 	var arguments *Zval = ZEND_CALL_ARG(execute_data, 1)
-	if CallUserFunction(CompilerGlobals.GetFunctionTable(), nil, ZEND_THIS, return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
+	if CallUserFunction(__CG().GetFunctionTable(), nil, ZEND_THIS, return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
 		RETVAL_FALSE
 	}
 
@@ -213,7 +213,7 @@ func ZendClosureCallMagic(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	fci.SetObject(ZEND_THIS.GetObj())
 	fcc.SetObject(fci.GetObject())
-	fcc.SetCalledScope(ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData()))
+	fcc.SetCalledScope(ZendGetCalledScope(__EG().GetCurrentExecuteData()))
 	ZendCallFunction(&fci, &fcc)
 	ZvalPtrDtor(fci.GetParams()[1])
 }
@@ -282,9 +282,9 @@ func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval)
 
 	/* create closure as if it were called from parent scope */
 
-	ExecutorGlobals.SetCurrentExecuteData(EX(prev_execute_data))
+	__EG().SetCurrentExecuteData(EX(prev_execute_data))
 	success = ZendCreateClosureFromCallable(return_value, callable, &error)
-	ExecutorGlobals.SetCurrentExecuteData(execute_data)
+	__EG().SetCurrentExecuteData(execute_data)
 	if success == FAILURE || error != nil {
 		if error != nil {
 			ZendTypeError("Failed to create closure from callable: %s", error)
@@ -338,11 +338,11 @@ func ZendClosureGetMethod(object **ZendObject, method *ZendString, key *Zval) *Z
 }
 func ZendClosureReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any, rv *Zval) *Zval {
 	ZEND_CLOSURE_PROPERTY_ERROR()
-	return &(ExecutorGlobals.GetUninitializedZval())
+	return __EG().GetUninitializedZval()
 }
 func ZendClosureWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *any) *Zval {
 	ZEND_CLOSURE_PROPERTY_ERROR()
-	return &(ExecutorGlobals.GetErrorZval())
+	return __EG().GetErrorZval()
 }
 func ZendClosureGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot *any) *Zval {
 	ZEND_CLOSURE_PROPERTY_ERROR()
@@ -547,7 +547,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 					func_.SetScope(scope)
 				}
 				closure.GetFunc().GetOpArray().SetIsHeapRtCache(false)
-				ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), func_.GetOpArray().GetCacheSize())
+				ptr = ZendArenaAlloc(__CG().GetArena(), func_.GetOpArray().GetCacheSize())
 				ZEND_MAP_PTR_SET(func_.GetOpArray().run_time_cache, ptr)
 				ZEND_MAP_PTR_SET(closure.GetFunc().GetOpArray().run_time_cache, ptr)
 			} else {

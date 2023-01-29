@@ -91,7 +91,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 		if object != nil {
 			fcic.SetCalledScope(Z_OBJCE_P(object))
 		} else {
-			var called_scope *ZendClassEntry = ZendGetCalledScope(ExecutorGlobals.GetCurrentExecuteData())
+			var called_scope *ZendClassEntry = ZendGetCalledScope(__EG().GetCurrentExecuteData())
 			if obj_ce != nil && (called_scope == nil || InstanceofFunction(called_scope, obj_ce) == 0) {
 				fcic.SetCalledScope(obj_ce)
 			} else {
@@ -116,7 +116,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 				obj_ce = nil
 			}
 		}
-		if ExecutorGlobals.GetException() == nil {
+		if __EG().GetException() == nil {
 			ZendErrorNoreturn(E_CORE_ERROR, "Couldn't execute method %s%s%s", b.CondF1(obj_ce != nil, func() []byte { return obj_ce.GetName().GetVal() }, ""), b.Cond(obj_ce != nil, "::", ""), function_name)
 		}
 	}
@@ -175,7 +175,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
 	if retval.GetType() != IS_UNDEF {
 		ZVAL_ZVAL(key, &retval, 1, 1)
 	} else {
-		if ExecutorGlobals.GetException() == nil {
+		if __EG().GetException() == nil {
 			ZendError(E_WARNING, "Nothing returned from %s::key()", iter.GetCe().GetName().GetVal())
 		}
 		ZVAL_LONG(key, 0)
@@ -219,7 +219,7 @@ func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 		ce_it = nil
 	}
 	if ce_it == nil || ce_it.GetGetIterator() == nil || ce_it.GetGetIterator() == ZendUserItGetNewIterator && iterator.GetObj() == object.GetObj() {
-		if ExecutorGlobals.GetException() == nil {
+		if __EG().GetException() == nil {
 			ZendThrowExceptionEx(nil, 0, "Objects returned by %s::getIterator() must be traversable or implement interface Iterator", b.CondF(ce != nil, func() []byte { return ce.GetName().GetVal() }, func() []byte { return Z_OBJCE_P(object).GetName().GetVal() }))
 		}
 		ZvalPtrDtor(&iterator)
@@ -296,7 +296,7 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 		funcs_ptr.SetZfNewIterator(ZendHashStrFindPtr(class_type.GetFunctionTable(), "getiterator", b.SizeOf("\"getiterator\"")-1))
 	} else {
 		if funcs_ptr == nil {
-			funcs_ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_iterator_funcs"))
+			funcs_ptr = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 			memset(funcs_ptr, 0, b.SizeOf("zend_class_iterator_funcs"))
 		} else {
@@ -346,7 +346,7 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 		}
 	} else {
 		if funcs_ptr == nil {
-			funcs_ptr = ZendArenaAlloc(&(CompilerGlobals.GetArena()), b.SizeOf("zend_class_iterator_funcs"))
+			funcs_ptr = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_class_iterator_funcs"))
 			class_type.SetIteratorFuncsPtr(funcs_ptr)
 			memset(funcs_ptr, 0, b.SizeOf("zend_class_iterator_funcs"))
 		} else {
@@ -367,7 +367,7 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 	var retval Zval
 	var result int
 	ZendCallMethodWith0Params(object, ce, ce.GetSerializeFunc(), "serialize", &retval)
-	if retval.IsType(IS_UNDEF) || ExecutorGlobals.GetException() != nil {
+	if retval.IsType(IS_UNDEF) || __EG().GetException() != nil {
 		result = FAILURE
 	} else {
 		switch retval.GetType() {
@@ -388,7 +388,7 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 		}
 		ZvalPtrDtor(&retval)
 	}
-	if result == FAILURE && ExecutorGlobals.GetException() == nil {
+	if result == FAILURE && __EG().GetException() == nil {
 		ZendThrowExceptionEx(nil, 0, "%s::serialize() must return a string or NULL", ce.GetName().GetVal())
 	}
 	return result
@@ -401,7 +401,7 @@ func ZendUserUnserialize(object *Zval, ce *ZendClassEntry, buf *uint8, buf_len i
 	ZVAL_STRINGL(&zdata, (*byte)(buf), buf_len)
 	ZendCallMethodWith1Params(object, ce, ce.GetUnserializeFunc(), "unserialize", nil, &zdata)
 	ZvalPtrDtor(&zdata)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return FAILURE
 	} else {
 		return SUCCESS

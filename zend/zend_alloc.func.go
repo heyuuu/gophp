@@ -196,7 +196,7 @@ func ALLOC_HASHTABLE(ht *HashTable) *HashTable {
 	ht = (*HashTable)(Emalloc(b.SizeOf("HashTable")))
 	return ht
 }
-func FREE_HASHTABLE(ht any) { EfreeSize(ht, b.SizeOf("HashTable")) }
+func FREE_HASHTABLE(ht *HashTable) { EfreeSize(ht, b.SizeOf("HashTable")) }
 func ALLOC_HASHTABLE_REL(ht *HashTable) *HashTable {
 	ht = (*HashTable)(EmallocRel(b.SizeOf("HashTable")))
 	return ht
@@ -265,15 +265,15 @@ func ZendMmPanic(message string) {
 }
 func ZendMmSafeError(heap *ZendMmHeap, format string, limit int, size int) {
 	heap.SetOverflow(1)
-	var __orig_bailout *JMP_BUF = ExecutorGlobals.GetBailout()
+	var __orig_bailout *JMP_BUF = __EG().GetBailout()
 	var __bailout JMP_BUF
-	ExecutorGlobals.SetBailout(&__bailout)
+	__EG().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ZendErrorNoreturn(E_ERROR, format, limit, size)
 	} else {
-		ExecutorGlobals.SetBailout(__orig_bailout)
+		__EG().SetBailout(__orig_bailout)
 	}
-	ExecutorGlobals.SetBailout(__orig_bailout)
+	__EG().SetBailout(__orig_bailout)
 	heap.SetOverflow(0)
 	ZendBailout()
 	exit(1)

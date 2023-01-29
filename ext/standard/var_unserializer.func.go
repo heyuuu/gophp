@@ -182,7 +182,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zend.ZVAL_STRINGL(&unserialize_name, "__unserialize", b.SizeOf("\"__unserialize\"")-1)
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(zend.CompilerGlobals.GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
+					if zend.CallUserFunction(zend.__CG().GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
@@ -540,7 +540,7 @@ func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	if elements >= zend_long(zend.HT_MAX_SIZE-ht.GetNNumOfElements()) {
 		return 0
 	}
-	zend.ZendHashExtend(ht, ht.GetNNumOfElements()+elements, ht.GetUFlags()&zend.HASH_FLAG_PACKED)
+	ht.Extend(ht.GetNNumOfElements() + elements)
 	if ProcessNestedData(rval, p, max, var_hash, ht, elements, rval.GetObj()) == 0 {
 		if has_wakeup != 0 {
 			zend.ZVAL_DEREF(rval)
@@ -818,14 +818,14 @@ yy18:
 		ce = zend.ZendLookupClass(class_name)
 		if ce != nil {
 			BG(serialize_lock)--
-			if zend.ExecutorGlobals.GetException() != nil {
+			if zend.__EG().GetException() != nil {
 				zend.ZendStringReleaseEx(class_name, 0)
 				return 0
 			}
 			break
 		}
 		BG(serialize_lock)--
-		if zend.ExecutorGlobals.GetException() != nil {
+		if zend.__EG().GetException() != nil {
 			zend.ZendStringReleaseEx(class_name, 0)
 			return 0
 		}
@@ -845,7 +845,7 @@ yy18:
 		BG(serialize_lock)++
 		if zend.CallUserFunctionEx(nil, nil, &user_func, &retval, 1, args, 0, nil) != zend.SUCCESS {
 			BG(serialize_lock)--
-			if zend.ExecutorGlobals.GetException() != nil {
+			if zend.__EG().GetException() != nil {
 				zend.ZendStringReleaseEx(class_name, 0)
 				zend.ZvalPtrDtor(&user_func)
 				zend.ZvalPtrDtor(&args[0])
@@ -860,7 +860,7 @@ yy18:
 		}
 		BG(serialize_lock)--
 		zend.ZvalPtrDtor(&retval)
-		if zend.ExecutorGlobals.GetException() != nil {
+		if zend.__EG().GetException() != nil {
 			zend.ZendStringReleaseEx(class_name, 0)
 			zend.ZvalPtrDtor(&user_func)
 			zend.ZvalPtrDtor(&args[0])

@@ -10,25 +10,25 @@ import (
 func ZendListInsert(ptr any, type_ int) *Zval {
 	var index int
 	var zv Zval
-	index = ExecutorGlobals.GetRegularList().GetNNextFreeElement()
+	index = __EG().GetRegularList().GetNNextFreeElement()
 	if index == 0 {
 		index = 1
 	} else if index == core.INT_MAX {
 		ZendErrorNoreturn(E_ERROR, "Resource ID space overflow")
 	}
 	ZVAL_NEW_RES(&zv, index, ptr, type_)
-	return ZendHashIndexAddNew(&(ExecutorGlobals.GetRegularList()), index, &zv)
+	return ZendHashIndexAddNew(__EG().GetRegularList(), index, &zv)
 }
 func ZendListDelete(res *ZendResource) int {
 	if res.DelRefcount() <= 0 {
-		return ZendHashIndexDel(&(ExecutorGlobals.GetRegularList()), res.GetHandle())
+		return ZendHashIndexDel(__EG().GetRegularList(), res.GetHandle())
 	} else {
 		return SUCCESS
 	}
 }
 func ZendListFree(res *ZendResource) int {
 	if res.GetRefcount() <= 0 {
-		return ZendHashIndexDel(&(ExecutorGlobals.GetRegularList()), res.GetHandle())
+		return ZendHashIndexDel(__EG().GetRegularList(), res.GetHandle())
 	} else {
 		return SUCCESS
 	}
@@ -149,11 +149,11 @@ func PlistEntryDestructor(zv *Zval) {
 	Free(res)
 }
 func ZendInitRsrcList() int {
-	ZendHashInit(&(ExecutorGlobals.GetRegularList()), 8, nil, ListEntryDestructor, 0)
+	ZendHashInit(__EG().GetRegularList(), 8, nil, ListEntryDestructor, 0)
 	return SUCCESS
 }
 func ZendInitRsrcPlist() int {
-	ZendHashInitEx(&(ExecutorGlobals.GetPersistentList()), 8, nil, PlistEntryDestructor, 1, 0)
+	ZendHashInitEx(__EG().GetPersistentList(), 8, nil, PlistEntryDestructor, 1, 0)
 	return SUCCESS
 }
 func ZendCloseRsrcList(ht *HashTable) {
@@ -187,7 +187,7 @@ func ZendCleanModuleRsrcDtorsCb(zv *Zval, arg any) int {
 	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ld.GetModuleNumber() == module_number {
-		ZendHashApplyWithArgument(&(ExecutorGlobals.GetPersistentList()), CleanModuleResource, any(&(ld.GetResourceId())))
+		ZendHashApplyWithArgument(__EG().GetPersistentList(), CleanModuleResource, any(&(ld.GetResourceId())))
 		return 1
 	} else {
 		return 0
@@ -254,7 +254,7 @@ func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_ty
 	ZVAL_NEW_PERSISTENT_RES(&tmp, -1, rsrc_pointer, rsrc_type)
 	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
-	zv = ZendHashUpdate(&(ExecutorGlobals.GetPersistentList()), key, &tmp)
+	zv = ZendHashUpdate(__EG().GetPersistentList(), key, &tmp)
 	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *ZendResource {

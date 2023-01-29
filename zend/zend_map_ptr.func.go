@@ -4,10 +4,10 @@ package zend
 
 func ZEND_MAP_PTR_IS_OFFSET(ptr __auto__) int { return uintPtr(ptr__ptr) & 1 }
 func ZEND_MAP_PTR_OFFSET2PTR(ptr __auto__) *any {
-	return (*any)((*byte)(CG(map_ptr_base) + uintPtr(ptr__ptr-1)))
+	return (*any)((*byte)(__CG().GetMapPtrBase() + uintPtr(ptr__ptr-1)))
 }
 func ZEND_MAP_PTR_PTR2OFFSET(ptr *any) any {
-	return any(uintPtr((*byte)(ptr)-(*byte)(CG(map_ptr_base))) | 1)
+	return any(uintPtr((*byte)(ptr)-(*byte)(__CG().GetMapPtrBase())) | 1)
 }
 func ZEND_MAP_PTR_GET(ptr __auto__) any {
 	if ZEND_MAP_PTR_IS_OFFSET(ptr) != 0 {

@@ -16,14 +16,12 @@ func ZendWeakrefUnref(zv *Zval) {
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
-	ZendHashInit(&(ExecutorGlobals.GetWeakrefs()), 8, nil, ZendWeakrefUnref, 0)
+	ZendHashInit(__EG().GetWeakrefs(), 8, nil, ZendWeakrefUnref, 0)
 }
 func ZendWeakrefsNotify(object *ZendObject) {
-	ZendHashIndexDel(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(object))
+	ZendHashIndexDel(__EG().GetWeakrefs(), ZendUlong(object))
 }
-func ZendWeakrefsShutdown() {
-	ZendHashDestroy(&(ExecutorGlobals.GetWeakrefs()))
-}
+func ZendWeakrefsShutdown() { ZendHashDestroy(__EG().GetWeakrefs()) }
 func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
 	ZendObjectStdInit(wr.GetStd(), ZendCeWeakref)
@@ -31,7 +29,7 @@ func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	return wr.GetStd()
 }
 func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
-	var wr *ZendWeakref = ZendHashIndexFindPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(referent.GetObj()))
+	var wr *ZendWeakref = ZendHashIndexFindPtr(__EG().GetWeakrefs(), ZendUlong(referent.GetObj()))
 	if wr == nil {
 		return 0
 	}
@@ -44,7 +42,7 @@ func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
 	ObjectInitEx(return_value, ZendCeWeakref)
 	wr = ZendWeakrefFetch(return_value)
 	wr.SetReferent(referent.GetObj())
-	ZendHashIndexAddPtr(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(wr.GetReferent()), wr)
+	ZendHashIndexAddPtr(__EG().GetWeakrefs(), ZendUlong(wr.GetReferent()), wr)
 	wr.GetReferent().AddGcFlags(IS_OBJ_WEAKLY_REFERENCED)
 }
 func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
@@ -57,7 +55,7 @@ func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 func ZendWeakrefFree(zo *ZendObject) {
 	var wr *ZendWeakref = ZendWeakrefFrom(zo)
 	if wr.GetReferent() != nil {
-		ZendHashIndexDel(&(ExecutorGlobals.GetWeakrefs()), ZendUlong(wr.GetReferent()))
+		ZendHashIndexDel(__EG().GetWeakrefs(), ZendUlong(wr.GetReferent()))
 	}
 	ZendObjectStdDtor(wr.GetStd())
 }
@@ -66,13 +64,13 @@ func ZendWeakrefUnsupported(thing string) {
 }
 func ZendWeakrefNoWrite(object *Zval, member *Zval, value *Zval, rtc *any) *Zval {
 	ZendWeakrefUnsupported("properties")
-	return &(ExecutorGlobals.GetUninitializedZval())
+	return __EG().GetUninitializedZval()
 }
 func ZendWeakrefNoRead(object *Zval, member *Zval, type_ int, rtc *any, rv *Zval) *Zval {
-	if ExecutorGlobals.GetException() == nil {
+	if __EG().GetException() == nil {
 		ZendWeakrefUnsupported("properties")
 	}
-	return &(ExecutorGlobals.GetUninitializedZval())
+	return __EG().GetUninitializedZval()
 }
 func ZendWeakrefNoReadPtr(object *Zval, member *Zval, type_ int, rtc *any) *Zval {
 	ZendWeakrefUnsupported("property references")

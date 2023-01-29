@@ -36,8 +36,8 @@ func ZendHtmlPuts(s *byte, len_ int) {
 	var end *uint8 = ptr + len_
 	var filtered *uint8 = nil
 	var filtered_len int
-	if LanguageScannerGlobals.GetOutputFilter() != nil {
-		LanguageScannerGlobals.GetOutputFilter()(&filtered, &filtered_len, ptr, len_)
+	if __INI_SCNG().output_filter {
+		__INI_SCNG().output_filter(&filtered, &filtered_len, ptr, len_)
 		ptr = filtered
 		end = filtered + filtered_len
 	}
@@ -53,7 +53,7 @@ func ZendHtmlPuts(s *byte, len_ int) {
 			ZendHtmlPutc(b.PostInc(&(*ptr)))
 		}
 	}
-	if LanguageScannerGlobals.GetOutputFilter() != nil {
+	if __INI_SCNG().output_filter {
 		Efree(filtered)
 	}
 }
@@ -108,7 +108,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			next_color = syntax_highlighter_ini.GetHighlightString()
 			break
 		case T_WHITESPACE:
-			ZendHtmlPuts((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+			ZendHtmlPuts((*byte)(__INI_SCNG().GetYyText()), __INI_SCNG().GetYyLeng())
 			ZVAL_UNDEF(&token)
 			continue
 			break
@@ -129,7 +129,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 				ZendPrintf("<span style=\"color: %s\">", last_color)
 			}
 		}
-		ZendHtmlPuts((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+		ZendHtmlPuts((*byte)(__INI_SCNG().GetYyText()), __INI_SCNG().GetYyLeng())
 		if token.IsType(IS_STRING) {
 			switch token_type {
 			case T_OPEN_TAG:
@@ -180,19 +180,19 @@ func ZendStrip() {
 			ZVAL_UNDEF(&token)
 			continue
 		case T_END_HEREDOC:
-			ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+			ZendWrite((*byte)(__INI_SCNG().GetYyText()), __INI_SCNG().GetYyLeng())
 
 			/* read the following character, either newline or ; */
 
 			if LexScan(&token, nil) != T_WHITESPACE {
-				ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+				ZendWrite((*byte)(__INI_SCNG().GetYyText()), __INI_SCNG().GetYyLeng())
 			}
 			ZendWrite("\n", b.SizeOf("\"\\n\"")-1)
 			prev_space = 1
 			ZVAL_UNDEF(&token)
 			continue
 		default:
-			ZendWrite((*byte)(LanguageScannerGlobals.GetYyText()), LanguageScannerGlobals.GetYyLeng())
+			ZendWrite((*byte)(__INI_SCNG().GetYyText()), __INI_SCNG().GetYyLeng())
 			break
 		}
 		if token.IsType(IS_STRING) {

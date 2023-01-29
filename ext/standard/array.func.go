@@ -758,7 +758,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if zend.SUCCESS == zend.Z_OBJ_HT(*array).GetCountElements()(array, &(return_value.GetLval())) {
 				return
 			}
-			if zend.ExecutorGlobals.GetException() != nil {
+			if zend.__EG().GetException() != nil {
 				return
 			}
 		}
@@ -2185,7 +2185,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Back up hash position, as it may change */
 
-		zend.ExecutorGlobals.GetHtIterators()[ht_iter].SetPos(pos)
+		zend.__EG().GetHtIterators()[ht_iter].SetPos(pos)
 		if recursive != 0 && zend.Z_REFVAL_P(zv).IsType(zend.IS_ARRAY) {
 			var thash *zend.HashTable
 			var orig_array_walk_fci zend.ZendFcallInfo
@@ -2260,7 +2260,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Reload array and position -- both may have changed */
 
-		if zend.ExecutorGlobals.GetException() != nil {
+		if zend.__EG().GetException() != nil {
 			break
 		}
 	}
@@ -2866,7 +2866,7 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 				}
 				zend.ZVAL_DEREF(entry)
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-				if zend.ExecutorGlobals.GetException() != nil {
+				if zend.__EG().GetException() != nil {
 					return -1
 				}
 				count++
@@ -2973,7 +2973,7 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 				}
 				zend.ZVAL_DEREF(entry)
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-				if zend.ExecutorGlobals.GetException() != nil {
+				if zend.__EG().GetException() != nil {
 					return -1
 				}
 			} else {
@@ -3100,7 +3100,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 								orig_var = orig_var.GetZv()
 							}
 							zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-							if zend.ExecutorGlobals.GetException() != nil {
+							if zend.__EG().GetException() != nil {
 								zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 								return -1
 							}
@@ -3253,7 +3253,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 								orig_var = orig_var.GetZv()
 							}
 							zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-							if zend.ExecutorGlobals.GetException() != nil {
+							if zend.__EG().GetException() != nil {
 								zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 								return -1
 							}
@@ -3385,7 +3385,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 							orig_var = orig_var.GetZv()
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-						if zend.ExecutorGlobals.GetException() != nil {
+						if zend.__EG().GetException() != nil {
 							zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 							return -1
 						}
@@ -3520,7 +3520,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 						orig_var = orig_var.GetZv()
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-					if zend.ExecutorGlobals.GetException() != nil {
+					if zend.__EG().GetException() != nil {
 						zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 						return -1
 					}
@@ -3817,7 +3817,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			zend.Z_TRY_ADDREF_P(value_ptr)
 			zend.ZendHashUpdate(return_value.GetArr(), entry.GetStr(), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(entry.GetStr(), "this") {
-			var object *zend.ZendObject = zend.ZendGetThisObject(zend.ExecutorGlobals.GetCurrentExecuteData())
+			var object *zend.ZendObject = zend.ZendGetThisObject(zend.__EG().GetCurrentExecuteData())
 			if object != nil {
 				object.AddRefcount()
 				zend.ZVAL_OBJ(&data, object)
@@ -4776,7 +4776,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 				zend.ZendHashDelBucket(in_hash, p)
 			} else {
 				zend.ZendHashAddNew(removed, p.GetKey(), entry)
-				if in_hash == &(zend.ExecutorGlobals.GetSymbolTable()) {
+				if in_hash == zend.__EG().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
 					zend.ZendHashDelBucket(in_hash, p)
@@ -4791,7 +4791,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 				continue
 			}
 			pos2++
-			if p.GetKey() != nil && in_hash == &(zend.ExecutorGlobals.GetSymbolTable()) {
+			if p.GetKey() != nil && in_hash == zend.__EG().GetSymbolTable() {
 				zend.ZendDeleteGlobalVariable(p.GetKey())
 			} else {
 				zend.ZendHashDelBucket(in_hash, p)
@@ -5064,7 +5064,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Delete the last value */
 
-	if p.GetKey() != nil && stack.GetArr() == &(zend.ExecutorGlobals.GetSymbolTable()) {
+	if p.GetKey() != nil && stack.GetArr() == zend.__EG().GetSymbolTable() {
 		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(stack.GetArr(), p)
@@ -5168,7 +5168,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	/* Delete the first value */
 
-	if p.GetKey() != nil && stack.GetArr() == &(zend.ExecutorGlobals.GetSymbolTable()) {
+	if p.GetKey() != nil && stack.GetArr() == zend.__EG().GetSymbolTable() {
 		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(stack.GetArr(), p)
@@ -5764,7 +5764,7 @@ func PhpArrayMerge(dest *zend.HashTable, src *zend.HashTable) int {
 	var src_entry *zend.Zval
 	var string_key *zend.ZendString
 	if dest.HasUFlags(zend.HASH_FLAG_PACKED) && src.HasUFlags(zend.HASH_FLAG_PACKED) {
-		zend.ZendHashExtend(dest, dest.GetNNumOfElements()+src.GetNNumOfElements(), 1)
+		dest.Extend(dest.GetNNumOfElements() + src.GetNNumOfElements())
 		for {
 			var __fill_ht *zend.HashTable = dest
 			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
@@ -7810,7 +7810,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			if p.GetKey() == nil {
 				zend.ZendHashIndexDel(return_value.GetArr(), p.GetH())
 			} else {
-				if return_value.GetArr() == &(zend.ExecutorGlobals.GetSymbolTable()) {
+				if return_value.GetArr() == zend.__EG().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
 					zend.ZendHashDel(return_value.GetArr(), p.GetKey())

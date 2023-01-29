@@ -2,6 +2,6 @@
 
 package zend
 
-func ZendInitFpu()       { ExecutorGlobals.SetSavedFpuCwPtr(nil) }
-func ZendShutdownFpu()   { ExecutorGlobals.SetSavedFpuCwPtr(nil) }
+func ZendInitFpu()       { __EG().SetSavedFpuCwPtr(nil) }
+func ZendShutdownFpu()   { __EG().SetSavedFpuCwPtr(nil) }
 func ZendEnsureFpuMode() {}

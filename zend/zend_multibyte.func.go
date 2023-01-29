@@ -85,15 +85,13 @@ func ZendMultibyteParseEncodingList(encoding_list *byte, encoding_list_len int, 
 func ZendMultibyteGetInternalEncoding() *ZendEncoding {
 	return MultibyteFunctions.GetInternalEncodingGetter()()
 }
-func ZendMultibyteGetScriptEncoding() *ZendEncoding {
-	return LanguageScannerGlobals.GetScriptEncoding()
-}
+func ZendMultibyteGetScriptEncoding() *ZendEncoding { return __INI_SCNG().script_encoding }
 func ZendMultibyteSetScriptEncoding(encoding_list **ZendEncoding, encoding_list_size int) int {
-	if CompilerGlobals.GetScriptEncodingList() != nil {
-		Free((*byte)(CompilerGlobals.GetScriptEncodingList()))
+	if __CG().GetScriptEncodingList() != nil {
+		Free((*byte)(__CG().GetScriptEncodingList()))
 	}
-	CompilerGlobals.SetScriptEncodingList(encoding_list)
-	CompilerGlobals.SetScriptEncodingListSize(encoding_list_size)
+	__CG().SetScriptEncodingList(encoding_list)
+	__CG().SetScriptEncodingListSize(encoding_list_size)
 	return SUCCESS
 }
 func ZendMultibyteSetInternalEncoding(encoding *ZendEncoding) int {

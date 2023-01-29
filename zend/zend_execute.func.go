@@ -89,13 +89,13 @@ func ZendVmInitCallFrame(call *ZendExecuteData, call_info uint32, func_ *ZendFun
 	ZEND_CALL_NUM_ARGS(call) = num_args
 }
 func ZendVmStackPushCallFrameEx(used_stack uint32, call_info uint32, func_ *ZendFunction, num_args uint32, object_or_called_scope any) *ZendExecuteData {
-	var call *ZendExecuteData = (*ZendExecuteData)(ExecutorGlobals.GetVmStackTop())
-	if used_stack > size_t((*byte)(ExecutorGlobals.GetVmStackEnd())-(*byte)(call)) {
+	var call *ZendExecuteData = (*ZendExecuteData)(__EG().GetVmStackTop())
+	if used_stack > size_t((*byte)(__EG().GetVmStackEnd())-(*byte)(call)) {
 		call = (*ZendExecuteData)(ZendVmStackExtend(used_stack))
 		ZendVmInitCallFrame(call, call_info|ZEND_CALL_ALLOCATED, func_, num_args, object_or_called_scope)
 		return call
 	} else {
-		ExecutorGlobals.SetVmStackTop((*Zval)((*byte)(call + used_stack)))
+		__EG().SetVmStackTop((*Zval)((*byte)(call + used_stack)))
 		ZendVmInitCallFrame(call, call_info, func_, num_args, object_or_called_scope)
 		return call
 	}
@@ -156,15 +156,15 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 }
 func ZendVmStackFreeCallFrameEx(call_info uint32, call *ZendExecuteData) {
 	if (call_info & ZEND_CALL_ALLOCATED) != 0 {
-		var p ZendVmStack = ExecutorGlobals.GetVmStack()
+		var p ZendVmStack = __EG().GetVmStack()
 		var prev ZendVmStack = p.GetPrev()
-		ZEND_ASSERT(call == (*ZendExecuteData)(ZEND_VM_STACK_ELEMENTS(ExecutorGlobals.GetVmStack())))
-		ExecutorGlobals.SetVmStackTop(prev.GetTop())
-		ExecutorGlobals.SetVmStackEnd(prev.GetEnd())
-		ExecutorGlobals.SetVmStack(prev)
+		ZEND_ASSERT(call == (*ZendExecuteData)(ZEND_VM_STACK_ELEMENTS(__EG().GetVmStack())))
+		__EG().SetVmStackTop(prev.GetTop())
+		__EG().SetVmStackEnd(prev.GetEnd())
+		__EG().SetVmStack(prev)
 		Efree(p)
 	} else {
-		ExecutorGlobals.SetVmStackTop((*Zval)(call))
+		__EG().SetVmStackTop((*Zval)(call))
 	}
 }
 func ZendVmStackFreeCallFrame(call *ZendExecuteData) {
@@ -297,22 +297,22 @@ func ZendVmStackNewPage(size int, prev ZendVmStack) ZendVmStack {
 	return page
 }
 func ZendVmStackInit() {
-	ExecutorGlobals.SetVmStackPageSize(ZEND_VM_STACK_PAGE_SIZE)
-	ExecutorGlobals.SetVmStack(ZendVmStackNewPage(ZEND_VM_STACK_PAGE_SIZE, nil))
-	ExecutorGlobals.SetVmStackTop(ExecutorGlobals.GetVmStack().GetTop())
-	ExecutorGlobals.SetVmStackEnd(ExecutorGlobals.GetVmStack().GetEnd())
+	__EG().SetVmStackPageSize(ZEND_VM_STACK_PAGE_SIZE)
+	__EG().SetVmStack(ZendVmStackNewPage(ZEND_VM_STACK_PAGE_SIZE, nil))
+	__EG().SetVmStackTop(__EG().GetVmStack().GetTop())
+	__EG().SetVmStackEnd(__EG().GetVmStack().GetEnd())
 }
 func ZendVmStackInitEx(page_size int) {
 	/* page_size must be a power of 2 */
 
 	ZEND_ASSERT(page_size > 0 && (page_size&page_size-1) == 0)
-	ExecutorGlobals.SetVmStackPageSize(page_size)
-	ExecutorGlobals.SetVmStack(ZendVmStackNewPage(page_size, nil))
-	ExecutorGlobals.SetVmStackTop(ExecutorGlobals.GetVmStack().GetTop())
-	ExecutorGlobals.SetVmStackEnd(ExecutorGlobals.GetVmStack().GetEnd())
+	__EG().SetVmStackPageSize(page_size)
+	__EG().SetVmStack(ZendVmStackNewPage(page_size, nil))
+	__EG().SetVmStackTop(__EG().GetVmStack().GetTop())
+	__EG().SetVmStackEnd(__EG().GetVmStack().GetEnd())
 }
 func ZendVmStackDestroy() {
-	var stack ZendVmStack = ExecutorGlobals.GetVmStack()
+	var stack ZendVmStack = __EG().GetVmStack()
 	for stack != nil {
 		var p ZendVmStack = stack.GetPrev()
 		Efree(stack)
@@ -322,13 +322,13 @@ func ZendVmStackDestroy() {
 func ZendVmStackExtend(size int) any {
 	var stack ZendVmStack
 	var ptr any
-	stack = ExecutorGlobals.GetVmStack()
-	stack.SetTop(ExecutorGlobals.GetVmStackTop())
-	stack = ZendVmStackNewPage(b.CondF(size < ExecutorGlobals.GetVmStackPageSize()-ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval"), func() int { return ExecutorGlobals.GetVmStackPageSize() }, func() int { return ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size, ExecutorGlobals.GetVmStackPageSize()) }), stack)
-	ExecutorGlobals.SetVmStack(stack)
+	stack = __EG().GetVmStack()
+	stack.SetTop(__EG().GetVmStackTop())
+	stack = ZendVmStackNewPage(b.CondF(size < __EG().GetVmStackPageSize()-ZEND_VM_STACK_HEADER_SLOTS*b.SizeOf("zval"), func() int { return __EG().GetVmStackPageSize() }, func() int { return ZEND_VM_STACK_PAGE_ALIGNED_SIZE(size, __EG().GetVmStackPageSize()) }), stack)
+	__EG().SetVmStack(stack)
 	ptr = stack.GetTop()
-	ExecutorGlobals.SetVmStackTop(any((*byte)(ptr) + size))
-	ExecutorGlobals.SetVmStackEnd(stack.GetEnd())
+	__EG().SetVmStackTop(any((*byte)(ptr) + size))
+	__EG().SetVmStackEnd(stack.GetEnd())
 	return ptr
 }
 func ZendGetCompiledVariableValue(execute_data *ZendExecuteData, var_ uint32) *Zval {
@@ -352,11 +352,11 @@ func _getZvalPtrVarDeref(var_ uint32, should_free *ZendFreeOp, _ EXECUTE_DATA_D)
 	return ret
 }
 func ZvalUndefinedCv(var_ uint32, _ EXECUTE_DATA_D) *Zval {
-	if ExecutorGlobals.GetException() == nil {
+	if __EG().GetException() == nil {
 		var cv *ZendString = CV_DEF_OF(EX_VAR_TO_NUM(var_))
 		ZendError(E_NOTICE, "Undefined variable: %s", cv.GetVal())
 	}
-	return &(ExecutorGlobals.GetUninitializedZval())
+	return __EG().GetUninitializedZval()
 }
 func _zvalUndefinedOp1(EXECUTE_DATA_D) *Zval {
 	return ZvalUndefinedCv(EX(opline).op1.var_, EXECUTE_DATA_C)
@@ -374,7 +374,7 @@ func _getZvalCvLookup(ptr *Zval, var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval
 		ptr = ZvalUndefinedCv(var_, EXECUTE_DATA_C)
 		break
 	case BP_VAR_IS:
-		ptr = &(ExecutorGlobals.GetUninitializedZval())
+		ptr = __EG().GetUninitializedZval()
 		break
 	case BP_VAR_RW:
 		ZvalUndefinedCv(var_, EXECUTE_DATA_C)
@@ -586,7 +586,7 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 }
 func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval, value_ptr *Zval, _ EXECUTE_DATA_D) *Zval {
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, EX_USES_STRICT_TYPES()) == 0 {
-		return &(ExecutorGlobals.GetUninitializedZval())
+		return __EG().GetUninitializedZval()
 	}
 	if Z_ISREF_P(prop) {
 		ZEND_REF_DEL_TYPE_SOURCE(prop.GetRef(), prop_info)
@@ -597,8 +597,8 @@ func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval,
 }
 func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) *Zval {
 	ZendError(E_NOTICE, "Only variables should be assigned by reference")
-	if ExecutorGlobals.GetException() != nil {
-		return &(ExecutorGlobals.GetUninitializedZval())
+	if __EG().GetException() != nil {
+		return __EG().GetUninitializedZval()
 	}
 
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
@@ -757,7 +757,7 @@ func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *Zend
 	}
 }
 func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *ZendClassEntry, value *Zval) {
-	var ptr *ZendExecuteData = ExecutorGlobals.GetCurrentExecuteData().GetPrevExecuteData()
+	var ptr *ZendExecuteData = __EG().GetCurrentExecuteData().GetPrevExecuteData()
 	var fname *byte
 	var fsep *byte
 	var fclass *byte
@@ -766,7 +766,7 @@ func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce
 	var need_or_null *byte
 	var given_msg *byte
 	var given_kind *byte
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 
 		/* The type verification itself might have already thrown an exception
 		 * through a promoted warning. */
@@ -873,7 +873,7 @@ func ZendVerifyPropertyTypeError(info *ZendPropertyInfo, property *Zval) {
 
 	/* we _may_ land here in case reading already errored and runtime cache thus has not been updated (i.e. it contains a valid but unrelated info) */
 
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return
 	}
 
@@ -956,7 +956,7 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zv
 	ZVAL_COPY(&tmp, value)
 	if IZendVerifyPropertyType(info, &tmp, EX_USES_STRICT_TYPES()) == 0 {
 		ZvalPtrDtor(&tmp)
-		return &(ExecutorGlobals.GetUninitializedZval())
+		return __EG().GetUninitializedZval()
 	}
 	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, EX_USES_STRICT_TYPES())
 }
@@ -1057,7 +1057,7 @@ func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
 	for i = 0; i < num_args; i++ {
 		dummy_cache_slot = nil
 		if ZendVerifyArgType(fbc, i+1, p, nil, &dummy_cache_slot) == 0 {
-			ExecutorGlobals.SetCurrentExecuteData(call.GetPrevExecuteData())
+			__EG().SetCurrentExecuteData(call.GetPrevExecuteData())
 			return 0
 		}
 		p++
@@ -1243,7 +1243,7 @@ func ZendWrongStringOffset(EXECUTE_DATA_D) {
 	var opline *ZendOp = EX(opline)
 	var end *ZendOp
 	var var_ uint32
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return
 	}
 	switch opline.GetOpcode() {
@@ -1270,7 +1270,7 @@ func ZendWrongStringOffset(EXECUTE_DATA_D) {
 
 		var_ = opline.GetResult().GetVar()
 		opline++
-		end = ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetOpArray().GetOpcodes() + ExecutorGlobals.GetCurrentExecuteData().GetFunc().GetOpArray().GetLast()
+		end = __EG().GetCurrentExecuteData().GetFunc().GetOpArray().GetOpcodes() + __EG().GetCurrentExecuteData().GetFunc().GetOpArray().GetLast()
 		for opline < end {
 			if opline.GetOp1Type() == IS_VAR && opline.GetOp1().GetVar() == var_ {
 				switch opline.GetOpcode() {
@@ -1394,7 +1394,7 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 	var string_len int
 	var offset ZendLong
 	offset = ZendCheckStringOffset(dim, BP_VAR_W, EXECUTE_DATA_C)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		if RETURN_VALUE_USED(opline) {
 			ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		}
@@ -1640,7 +1640,7 @@ func ZendPostIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *
 	ZVAL_OBJ(&obj, object.GetObj())
 	Z_ADDREF(obj)
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		return
@@ -1673,7 +1673,7 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 	ZVAL_OBJ(&obj, object.GetObj())
 	Z_ADDREF(obj)
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
 			ZVAL_NULL(EX_VAR(opline.GetResult().GetVar()))
@@ -1710,7 +1710,7 @@ func ZendAssignOpOverloadedProperty(object *Zval, property *Zval, cache_slot *an
 	ZVAL_OBJ(&obj, object.GetObj())
 	Z_ADDREF(obj)
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
 		if RETURN_VALUE_USED(opline) {
 			ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
@@ -1753,7 +1753,7 @@ func ZendExtensionFcallEndHandler(extension *ZendExtension, frame *ZendExecuteDa
 func ZendGetTargetSymbolTable(fetch_type int, _ EXECUTE_DATA_D) *HashTable {
 	var ht *HashTable
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {
-		ht = &(ExecutorGlobals.GetSymbolTable())
+		ht = __EG().GetSymbolTable()
 	} else {
 		ZEND_ASSERT((fetch_type & ZEND_FETCH_LOCAL) != 0)
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
@@ -1781,7 +1781,7 @@ func ZendUndefinedOffsetWrite(ht *HashTable, lval ZendLong) int {
 		ZendArrayDestroy(ht)
 		return FAILURE
 	}
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return FAILURE
 	}
 	return SUCCESS
@@ -1798,7 +1798,7 @@ func ZendUndefinedIndexWrite(ht *HashTable, offset *ZendString) int {
 		ZendArrayDestroy(ht)
 		return FAILURE
 	}
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		return FAILURE
 	}
 	return SUCCESS
@@ -1858,7 +1858,7 @@ func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA
 			ZendArrayDestroy(ht)
 			return IS_NULL
 		}
-		if ExecutorGlobals.GetException() != nil {
+		if __EG().GetException() != nil {
 			return IS_NULL
 		}
 	case IS_NULL:
@@ -1899,14 +1899,14 @@ try_again:
 		case BP_VAR_UNSET:
 
 		case BP_VAR_IS:
-			retval = &(ExecutorGlobals.GetUninitializedZval())
+			retval = __EG().GetUninitializedZval()
 			break
 		case BP_VAR_RW:
 			if ZendUndefinedOffsetWrite(ht, hval) == FAILURE {
 				return nil
 			}
 		case BP_VAR_W:
-			retval = ZendHashIndexAddNew(ht, hval, &(ExecutorGlobals.GetUninitializedZval()))
+			retval = ZendHashIndexAddNew(ht, hval, __EG().GetUninitializedZval())
 			break
 		}
 	} else if dim.IsType(IS_STRING) {
@@ -1931,7 +1931,7 @@ try_again:
 					case BP_VAR_UNSET:
 
 					case BP_VAR_IS:
-						retval = &(ExecutorGlobals.GetUninitializedZval())
+						retval = __EG().GetUninitializedZval()
 						break
 					case BP_VAR_RW:
 						if ZendUndefinedIndexWrite(ht, offset_key) != 0 {
@@ -1953,7 +1953,7 @@ try_again:
 			case BP_VAR_UNSET:
 
 			case BP_VAR_IS:
-				retval = &(ExecutorGlobals.GetUninitializedZval())
+				retval = __EG().GetUninitializedZval()
 				break
 			case BP_VAR_RW:
 
@@ -1964,11 +1964,11 @@ try_again:
 					ZendStringRelease(offset_key)
 					return nil
 				}
-				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ZendHashAddNew(ht, offset_key, __EG().GetUninitializedZval())
 				ZendStringRelease(offset_key)
 				break
 			case BP_VAR_W:
-				retval = ZendHashAddNew(ht, offset_key, &(ExecutorGlobals.GetUninitializedZval()))
+				retval = ZendHashAddNew(ht, offset_key, __EG().GetUninitializedZval())
 				break
 			}
 		}
@@ -1988,7 +1988,7 @@ try_again:
 			if type_ == BP_VAR_W || type_ == BP_VAR_RW {
 				retval = nil
 			} else {
-				retval = &(ExecutorGlobals.GetUninitializedZval())
+				retval = __EG().GetUninitializedZval()
 			}
 		}
 	}
@@ -2013,7 +2013,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = ZendHashNextIndexInsert(container.GetArr(), &(ExecutorGlobals.GetUninitializedZval()))
+			retval = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
 			if retval == nil {
 				ZendCannotAddElement()
 				ZVAL_ERROR(result)
@@ -2064,7 +2064,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			dim++
 		}
 		retval = Z_OBJ_HT_P(container).GetReadDimension()(container, dim, type_, result)
-		if retval == &(ExecutorGlobals.GetUninitializedZval()) {
+		if retval == __EG().GetUninitializedZval() {
 			var ce *ZendClassEntry = Z_OBJCE_P(container)
 			ZVAL_NULL(result)
 			ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
@@ -2625,7 +2625,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			}
 			return
 		}
-		if ExecutorGlobals.GetException() != nil {
+		if __EG().GetException() != nil {
 			ZVAL_ERROR(result)
 			return
 		}
@@ -2662,13 +2662,13 @@ func ZendAssignToPropertyReference(container *Zval, container_op_type uint32, pr
 		variable_ptr = variable_ptr.GetZv()
 	}
 	if Z_ISERROR_P(variable_ptr) {
-		variable_ptr = &(ExecutorGlobals.GetUninitializedZval())
+		variable_ptr = __EG().GetUninitializedZval()
 	} else if variable.GetType() != IS_INDIRECT {
 		ZendThrowError(nil, "Cannot assign by reference to overloaded object")
 		ZvalPtrDtor(&variable)
-		variable_ptr = &(ExecutorGlobals.GetUninitializedZval())
+		variable_ptr = __EG().GetUninitializedZval()
 	} else if Z_ISERROR_P(value_ptr) {
-		variable_ptr = &(ExecutorGlobals.GetUninitializedZval())
+		variable_ptr = __EG().GetUninitializedZval()
 	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(Z_ISREF_P(value_ptr)) {
 		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, OPLINE_C, EXECUTE_DATA_C)
 	} else {
@@ -3087,10 +3087,10 @@ func ZendCleanAndCacheSymbolTable(symbol_table *ZendArray) {
 	 * available cache slots, as those may be used by a dtor as well. */
 
 	ZendSymtableClean(symbol_table)
-	if ExecutorGlobals.GetSymtableCachePtr() >= ExecutorGlobals.GetSymtableCacheLimit() {
+	if __EG().GetSymtableCachePtr() >= __EG().GetSymtableCacheLimit() {
 		ZendArrayDestroy(symbol_table)
 	} else {
-		*(b.PostInc(&(ExecutorGlobals.GetSymtableCachePtr()))) = symbol_table
+		*(b.PostInc(&(__EG().GetSymtableCachePtr()))) = symbol_table
 	}
 }
 func IFreeCompiledVariables(execute_data *ZendExecuteData) {
@@ -3112,12 +3112,12 @@ func IFreeCompiledVariables(execute_data *ZendExecuteData) {
 }
 func ZendFreeCompiledVariables(execute_data *ZendExecuteData) { IFreeCompiledVariables(execute_data) }
 func ZEND_VM_INTERRUPT_CHECK() {
-	if ExecutorGlobals.GetVmInterrupt() != 0 {
+	if __EG().GetVmInterrupt() != 0 {
 		ZEND_VM_INTERRUPT()
 	}
 }
 func ZEND_VM_LOOP_INTERRUPT_CHECK() {
-	if ExecutorGlobals.GetVmInterrupt() != 0 {
+	if __EG().GetVmInterrupt() != 0 {
 		ZEND_VM_LOOP_INTERRUPT()
 	}
 }
@@ -3214,18 +3214,18 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 
 	ZendInitCvs(num_args, op_array.GetLastVar(), EXECUTE_DATA_C)
 	EX(run_time_cache) = RUN_TIME_CACHE(op_array)
-	ExecutorGlobals.SetCurrentExecuteData(execute_data)
+	__EG().SetCurrentExecuteData(execute_data)
 }
 func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	var run_time_cache *any
 	ZEND_ASSERT(RUN_TIME_CACHE(op_array) == nil)
-	run_time_cache = ZendArenaAlloc(&(CompilerGlobals.GetArena()), op_array.GetCacheSize())
+	run_time_cache = ZendArenaAlloc(__CG().GetArena(), op_array.GetCacheSize())
 	memset(run_time_cache, 0, op_array.GetCacheSize())
 	ZEND_MAP_PTR_SET(op_array.run_time_cache, run_time_cache)
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *ZendString) *ZendFunction {
-	var zv *Zval = ExecutorGlobals.GetFunctionTable().FindByZendString(name)
+	var zv *Zval = __EG().GetFunctionTable().FindByZendString(name)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3236,7 +3236,7 @@ func ZendFetchFunction(name *ZendString) *ZendFunction {
 	return nil
 }
 func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
-	var zv *Zval = ExecutorGlobals.GetFunctionTable().FindByStrPtr(name, len_)
+	var zv *Zval = __EG().GetFunctionTable().FindByStrPtr(name, len_)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3267,18 +3267,18 @@ func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, 
 		memset(ptr, 0, op_array.GetCacheSize())
 	}
 	EX(run_time_cache) = RUN_TIME_CACHE(op_array)
-	ExecutorGlobals.SetCurrentExecuteData(execute_data)
+	__EG().SetCurrentExecuteData(execute_data)
 }
 func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
 	var execute_data *ZendExecuteData = ex
-	EX(prev_execute_data) = ExecutorGlobals.GetCurrentExecuteData()
+	EX(prev_execute_data) = __EG().GetCurrentExecuteData()
 	if !(RUN_TIME_CACHE(op_array)) {
 		InitFuncRunTimeCache(op_array)
 	}
 	IInitFuncExecuteData(op_array, return_value, 1, EXECUTE_DATA_C)
 }
 func ZendInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
-	EX(prev_execute_data) = ExecutorGlobals.GetCurrentExecuteData()
+	EX(prev_execute_data) = __EG().GetCurrentExecuteData()
 	IInitCodeExecuteData(execute_data, op_array, return_value)
 }
 func ZendInitExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
@@ -3290,7 +3290,7 @@ func ZendInitExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, r
 }
 func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additional_args uint32) *ZendExecuteData {
 	var new_call *ZendExecuteData
-	var used_stack int = ExecutorGlobals.GetVmStackTop() - (*Zval)(call) + additional_args
+	var used_stack int = __EG().GetVmStackTop() - (*Zval)(call) + additional_args
 
 	/* copy call frame into new stack segment */
 
@@ -3313,20 +3313,20 @@ func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additio
 
 	/* delete old call_frame from previous stack segment */
 
-	ExecutorGlobals.GetVmStack().GetPrev().SetTop((*Zval)(call))
+	__EG().GetVmStack().GetPrev().SetTop((*Zval)(call))
 
 	/* delete previous stack segment if it became empty */
 
-	if ExecutorGlobals.GetVmStack().GetPrev().GetTop() == ZEND_VM_STACK_ELEMENTS(ExecutorGlobals.GetVmStack().GetPrev()) {
-		var r ZendVmStack = ExecutorGlobals.GetVmStack().GetPrev()
-		ExecutorGlobals.GetVmStack().SetPrev(r.GetPrev())
+	if __EG().GetVmStack().GetPrev().GetTop() == ZEND_VM_STACK_ELEMENTS(__EG().GetVmStack().GetPrev()) {
+		var r ZendVmStack = __EG().GetVmStack().GetPrev()
+		__EG().GetVmStack().SetPrev(r.GetPrev())
 		Efree(r)
 	}
 	return new_call
 }
 func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, additional_args uint32) {
-	if uint32(ExecutorGlobals.GetVmStackEnd()-ExecutorGlobals.GetVmStackTop()) > additional_args {
-		ExecutorGlobals.SetVmStackTop(ExecutorGlobals.GetVmStackTop() + additional_args)
+	if uint32(__EG().GetVmStackEnd()-__EG().GetVmStackTop()) > additional_args {
+		__EG().SetVmStackTop(__EG().GetVmStackTop() + additional_args)
 	} else {
 		*call = ZendVmStackCopyCallFrame(*call, passed_args, additional_args)
 	}
@@ -3555,8 +3555,8 @@ func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num 
 
 					/* restore previous error_reporting value */
 
-					if ExecutorGlobals.GetErrorReporting() == 0 && var_.GetLval() != 0 {
-						ExecutorGlobals.SetErrorReporting(var_.GetLval())
+					if __EG().GetErrorReporting() == 0 && var_.GetLval() != 0 {
+						__EG().SetErrorReporting(var_.GetLval())
 					}
 
 					/* restore previous error_reporting value */
@@ -3603,7 +3603,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 			fbc = ZendStdGetStaticMethod(called_scope, mname, nil)
 		}
 		if fbc == nil {
-			if ExecutorGlobals.GetException() == nil {
+			if __EG().GetException() == nil {
 				ZendUndefinedMethod(called_scope, mname)
 			}
 			ZendStringReleaseEx(lcname, 0)
@@ -3614,7 +3614,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		ZendStringReleaseEx(mname, 0)
 		if !fbc.IsStatic() {
 			ZendNonStaticMethodCall(fbc)
-			if ExecutorGlobals.GetException() != nil {
+			if __EG().GetException() != nil {
 				return nil
 			}
 		}
@@ -3628,7 +3628,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if b.Assign(&func_, ExecutorGlobals.GetFunctionTable().FindByZendString(lcname)) == nil {
+		if b.Assign(&func_, __EG().GetFunctionTable().FindByZendString(lcname)) == nil {
 			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -3711,14 +3711,14 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 				fbc = ZendStdGetStaticMethod(called_scope, method.GetStr(), nil)
 			}
 			if fbc == nil {
-				if ExecutorGlobals.GetException() == nil {
+				if __EG().GetException() == nil {
 					ZendUndefinedMethod(called_scope, method.GetStr())
 				}
 				return nil
 			}
 			if !fbc.IsStatic() {
 				ZendNonStaticMethodCall(fbc)
-				if ExecutorGlobals.GetException() != nil {
+				if __EG().GetException() != nil {
 					return nil
 				}
 			}
@@ -3727,7 +3727,7 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 			var object *ZendObject = obj.GetObj()
 			fbc = Z_OBJ_HT_P(obj).GetGetMethod()(&object, method.GetStr(), nil)
 			if fbc == nil {
-				if ExecutorGlobals.GetException() == nil {
+				if __EG().GetException() == nil {
 					ZendUndefinedMethod(object.GetCe(), method.GetStr())
 				}
 				return nil
@@ -3769,10 +3769,10 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		var resolved_path *ZendString
 		resolved_path = ZendResolvePath(Z_STRVAL_P(inc_filename), Z_STRLEN_P(inc_filename))
 		if resolved_path != nil {
-			if ZendHashExists(&(ExecutorGlobals.GetIncludedFiles()), resolved_path) != 0 {
+			if ZendHashExists(__EG().GetIncludedFiles(), resolved_path) != 0 {
 				goto already_compiled
 			}
-		} else if ExecutorGlobals.GetException() != nil {
+		} else if __EG().GetException() != nil {
 			break
 		} else if strlen(Z_STRVAL_P(inc_filename)) != Z_STRLEN_P(inc_filename) {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
@@ -3784,7 +3784,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
-			if ZendHashAddEmptyElement(&(ExecutorGlobals.GetIncludedFiles()), file_handle.GetOpenedPath()) != nil {
+			if ZendHashAddEmptyElement(__EG().GetIncludedFiles(), file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
 				ZendStringReleaseEx(resolved_path, 0)
@@ -3842,9 +3842,9 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *Zval) int {
 	}
 	object = call.GetThis().GetObj()
 	ZVAL_NULL(ret)
-	ExecutorGlobals.SetCurrentExecuteData(call)
+	__EG().SetCurrentExecuteData(call)
 	object.GetHandlers().GetCallMethod()(fbc.GetFunctionName(), object, call, ret)
-	ExecutorGlobals.SetCurrentExecuteData(call.GetPrevExecuteData())
+	__EG().SetCurrentExecuteData(call.GetPrevExecuteData())
 	ZendVmStackFreeArgs(call)
 	if fbc.GetType() == ZEND_OVERLOADED_FUNCTION_TEMPORARY {
 		ZendStringReleaseEx(fbc.GetFunctionName(), 0)
@@ -3856,11 +3856,11 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_
 	var ce *ZendClassEntry = Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
 	var is_empty ZendBool
-	if iter == nil || ExecutorGlobals.GetException() != nil {
+	if iter == nil || __EG().GetException() != nil {
 		if iter != nil {
 			OBJ_RELEASE(iter.GetStd())
 		}
-		if ExecutorGlobals.GetException() == nil {
+		if __EG().GetException() == nil {
 			ZendThrowExceptionEx(nil, 0, "Object of type %s did not create an Iterator", ce.GetName().GetVal())
 		}
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
@@ -3869,14 +3869,14 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_
 	iter.SetIndex(0)
 	if iter.GetFuncs().GetRewind() != nil {
 		iter.GetFuncs().GetRewind()(iter)
-		if ExecutorGlobals.GetException() != nil {
+		if __EG().GetException() != nil {
 			OBJ_RELEASE(iter.GetStd())
 			ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 			return 1
 		}
 	}
 	is_empty = iter.GetFuncs().GetValid()(iter) != SUCCESS
-	if ExecutorGlobals.GetException() != nil {
+	if __EG().GetException() != nil {
 		OBJ_RELEASE(iter.GetStd())
 		ZVAL_UNDEF(EX_VAR(opline.GetResult().GetVar()))
 		return 1
@@ -3890,23 +3890,23 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
-	zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
+	zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
 	if zv != nil {
 		c = (*ZendConstant)(zv.GetPtr())
 	} else {
 		key++
-		zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
+		zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
 		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 			c = (*ZendConstant)(zv.GetPtr())
 		} else {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
+				zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
 				if zv != nil {
 					c = (*ZendConstant)(zv.GetPtr())
 				} else {
 					key++
-					zv = ExecutorGlobals.GetZendConstants().FindByZendString(key.GetStr())
+					zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
 					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 						c = (*ZendConstant)(zv.GetPtr())
 					}
@@ -3992,7 +3992,7 @@ func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
 	ZEND_VM_CONTINUE()
 }
 func ZEND_VM_NEXT_OPCODE() {
-	ZEND_ASSERT(ExecutorGlobals.GetException() == nil)
+	ZEND_ASSERT(__EG().GetException() == nil)
 	OPLINE = opline + 1
 	ZEND_VM_CONTINUE()
 }
@@ -4001,7 +4001,7 @@ func ZEND_VM_SET_RELATIVE_OPCODE(opline *ZendOp, offset uint32) {
 	ZEND_VM_INTERRUPT_CHECK()
 }
 func ZEND_VM_JMP_EX(new_op *ZendOp, check_exception int) {
-	if check_exception != 0 && ExecutorGlobals.GetException() != nil {
+	if check_exception != 0 && __EG().GetException() != nil {
 		HANDLE_EXCEPTION()
 	}
 	OPLINE = new_op
@@ -4015,7 +4015,7 @@ func ZEND_VM_INC_OPCODE() int {
 }
 func ZEND_VM_SMART_BRANCH(_result __auto__, _check int) {
 	for {
-		if _check != 0 && ExecutorGlobals.GetException() != nil {
+		if _check != 0 && __EG().GetException() != nil {
 			break
 		}
 		if (opline + 1).opcode == ZEND_JMPZ {
@@ -4041,7 +4041,7 @@ func ZEND_VM_SMART_BRANCH(_result __auto__, _check int) {
 }
 func ZEND_VM_SMART_BRANCH_JMPZ(_result int, _check int) {
 	for {
-		if _check != 0 && ExecutorGlobals.GetException() != nil {
+		if _check != 0 && __EG().GetException() != nil {
 			break
 		}
 		if _result != 0 {
@@ -4056,7 +4056,7 @@ func ZEND_VM_SMART_BRANCH_JMPZ(_result int, _check int) {
 }
 func ZEND_VM_SMART_BRANCH_JMPNZ(_result int, _check int) {
 	for {
-		if _check != 0 && ExecutorGlobals.GetException() != nil {
+		if _check != 0 && __EG().GetException() != nil {
 			break
 		}
 		if _result == 0 {

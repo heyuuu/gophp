@@ -17,7 +17,7 @@ func SAFE_STRING(s *byte) string {
 	}
 }
 func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if zend.ExecutorGlobals.GetCurrentExecuteData() != nil {
+	if zend.__EG().GetCurrentExecuteData() != nil {
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			zend.ZVAL_UNDEF(&(ASSERTG(callback)))
@@ -160,8 +160,8 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
 		myeval = zend.Z_STRVAL_P(assertion)
 		if ASSERTG(quiet_eval) {
-			old_error_reporting = zend.ExecutorGlobals.GetErrorReporting()
-			zend.ExecutorGlobals.SetErrorReporting(0)
+			old_error_reporting = zend.__EG().GetErrorReporting()
+			zend.__EG().SetErrorReporting(0)
 		}
 		compiled_string_description = zend.ZendMakeCompiledStringDescription("assert code")
 		if zend.ZendEvalStringl(myeval, zend.Z_STRLEN_P(assertion), &retval, compiled_string_description) == zend.FAILURE {
@@ -181,7 +181,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		zend.Efree(compiled_string_description)
 		if ASSERTG(quiet_eval) {
-			zend.ExecutorGlobals.SetErrorReporting(old_error_reporting)
+			zend.__EG().SetErrorReporting(old_error_reporting)
 		}
 		zend.ConvertToBoolean(&retval)
 		val = retval.IsType(zend.IS_TRUE)

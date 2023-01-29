@@ -3392,7 +3392,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ConvertToLong(from)
 		}
 	}
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return
 	}
 	if argc > 3 {
@@ -5888,7 +5888,7 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 	} else if replace.GetType() != zend.IS_ARRAY {
 		zend.ConvertToStringEx(replace)
 	}
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return
 	}
 

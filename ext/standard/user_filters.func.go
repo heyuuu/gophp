@@ -100,7 +100,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 
 	/* the userfilter object probably doesn't exist anymore */
 
-	if zend.CompilerGlobals.GetUncleanShutdown() != 0 {
+	if zend.__CG().GetUncleanShutdown() != 0 {
 		return ret
 	}
 

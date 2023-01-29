@@ -17,7 +17,7 @@ func ZEND_CONST_COND(_condition __auto__, _default __auto__) __auto__ { return _
 func DoAlloca(p int, use_heap __auto__) any                           { return Emalloc(p) }
 func FreeAlloca(p any, use_heap __auto__)                             { Efree(p) }
 func SETJMP(a JMP_BUF) __auto__                                       { return sigsetjmp(a, 0) }
-func LONGJMP(a JMP_BUF, b ZEND_RESULT_CODE) __auto__                  { return siglongjmp(a, b) }
+func LONGJMP(a __auto__, b ZEND_RESULT_CODE) __auto__                 { return siglongjmp(a, b) }
 func MAX(a int, b int) int {
 	if a > b {
 		return a

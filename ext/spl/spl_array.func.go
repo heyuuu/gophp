@@ -57,14 +57,14 @@ func SplArrayIsObject(intern *SplArrayObject) zend.ZendBool {
 }
 func SplArrayCreateHtIter(ht *zend.HashTable, intern *SplArrayObject) {
 	intern.SetHtIter(zend.ZendHashIteratorAdd(ht, zend.ZendHashGetCurrentPos(ht)))
-	zend.ZendHashInternalPointerResetEx(ht, zend.ExecutorGlobals.GetHtIterators()[intern.GetHtIter()].GetPos())
+	zend.ZendHashInternalPointerResetEx(ht, zend.__EG().GetHtIterators()[intern.GetHtIter()].GetPos())
 	SplArraySkipProtected(intern, ht)
 }
 func SplArrayGetPosPtr(ht *zend.HashTable, intern *SplArrayObject) *uint32 {
 	if intern.GetHtIter() == uint32-1 {
 		SplArrayCreateHtIter(ht, intern)
 	}
-	return zend.ExecutorGlobals.GetHtIterators()[intern.GetHtIter()].GetPos()
+	return zend.__EG().GetHtIterators()[intern.GetHtIter()].GetPos()
 }
 func SplArrayObjectFreeStorage(object *zend.ZendObject) {
 	var intern *SplArrayObject = SplArrayFromObj(object)
@@ -191,11 +191,11 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 	var offset_key *zend.ZendString
 	var ht *zend.HashTable = SplArrayGetHashTable(intern)
 	if offset == nil || zend.Z_ISUNDEF_P(offset) || ht == nil {
-		return &(zend.ExecutorGlobals.GetUninitializedZval())
+		return zend.__EG().GetUninitializedZval()
 	}
 	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW) && intern.GetNApplyCount() > 0 {
 		zend.ZendError(zend.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
-		return &(zend.ExecutorGlobals.GetErrorZval())
+		return zend.__EG().GetErrorZval()
 	}
 try_again:
 	switch offset.GetType() {
@@ -216,7 +216,7 @@ try_again:
 					case zend.BP_VAR_UNSET:
 
 					case zend.BP_VAR_IS:
-						retval = &(zend.ExecutorGlobals.GetUninitializedZval())
+						retval = zend.__EG().GetUninitializedZval()
 						break
 					case zend.BP_VAR_RW:
 						zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
@@ -232,7 +232,7 @@ try_again:
 			case zend.BP_VAR_UNSET:
 
 			case zend.BP_VAR_IS:
-				retval = &(zend.ExecutorGlobals.GetUninitializedZval())
+				retval = zend.__EG().GetUninitializedZval()
 				break
 			case zend.BP_VAR_RW:
 				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", offset_key.GetVal())
@@ -266,7 +266,7 @@ try_again:
 			case zend.BP_VAR_UNSET:
 
 			case zend.BP_VAR_IS:
-				retval = &(zend.ExecutorGlobals.GetUninitializedZval())
+				retval = zend.__EG().GetUninitializedZval()
 				break
 			case zend.BP_VAR_RW:
 				zend.ZendError(zend.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
@@ -283,9 +283,9 @@ try_again:
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
 		if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
-			return &(zend.ExecutorGlobals.GetErrorZval())
+			return zend.__EG().GetErrorZval()
 		} else {
-			return &(zend.ExecutorGlobals.GetUninitializedZval())
+			return zend.__EG().GetUninitializedZval()
 		}
 	}
 }
@@ -295,7 +295,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 	if check_inherited != 0 && (intern.GetFptrOffsetGet() != nil || type_ == zend.BP_VAR_IS && intern.GetFptrOffsetHas() != nil) {
 		if type_ == zend.BP_VAR_IS {
 			if SplArrayHasDimension(object, offset, 0) == 0 {
-				return &(zend.ExecutorGlobals.GetUninitializedZval())
+				return zend.__EG().GetUninitializedZval()
 			}
 		}
 		if intern.GetFptrOffsetGet() != nil {
@@ -311,7 +311,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 			if !(zend.Z_ISUNDEF_P(rv)) {
 				return rv
 			}
-			return &(zend.ExecutorGlobals.GetUninitializedZval())
+			return zend.__EG().GetUninitializedZval()
 		}
 	}
 	ret = SplArrayGetDimensionPtr(check_inherited, intern, offset, type_)
@@ -321,7 +321,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 	 * by separating (if necessary) and returning as IS_REFERENCE (with refcount == 1)
 	 */
 
-	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(zend.Z_ISREF_P(ret)) && ret != &(zend.ExecutorGlobals.GetUninitializedZval()) {
+	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(zend.Z_ISREF_P(ret)) && ret != zend.__EG().GetUninitializedZval() {
 		zend.ZVAL_NEW_REF(ret, ret)
 	}
 	return ret
@@ -413,7 +413,7 @@ try_again:
 	switch offset.GetType() {
 	case zend.IS_STRING:
 		ht = SplArrayGetHashTable(intern)
-		if ht == &(zend.ExecutorGlobals.GetSymbolTable()) {
+		if ht == zend.__EG().GetSymbolTable() {
 			if zend.ZendDeleteGlobalVariable(offset.GetStr()) != 0 {
 				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
 			}
@@ -1164,7 +1164,7 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 	aht.AddRefcount()
 	if use_arg == 0 {
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.ExecutorGlobals.GetFunctionTable(), nil, &function_name, return_value, 1, params)
+		zend.CallUserFunction(zend.__EG().GetFunctionTable(), nil, &function_name, return_value, 1, params)
 		intern.GetNApplyCount()--
 	} else if use_arg == SPL_ARRAY_METHOD_MAY_USER_ARG {
 		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "|z", &arg) == zend.FAILURE {
@@ -1175,7 +1175,7 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 			zend.ZVAL_COPY_VALUE(&params[1], arg)
 		}
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.ExecutorGlobals.GetFunctionTable(), nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
+		zend.CallUserFunction(zend.__EG().GetFunctionTable(), nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
 		intern.GetNApplyCount()--
 	} else {
 		if zend.ZEND_NUM_ARGS() != 1 || zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "z", &arg) == zend.FAILURE {
@@ -1184,7 +1184,7 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 		}
 		zend.ZVAL_COPY_VALUE(&params[1], arg)
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.ExecutorGlobals.GetFunctionTable(), nil, &function_name, return_value, 2, params)
+		zend.CallUserFunction(zend.__EG().GetFunctionTable(), nil, &function_name, return_value, 2, params)
 		intern.GetNApplyCount()--
 	}
 exit:

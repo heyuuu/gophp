@@ -60,7 +60,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 		module_number = 0
 	}
 	for {
-		var __ht *zend.HashTable = zend.ExecutorGlobals.GetIniDirectives()
+		var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
 		var _p *zend.Bucket = __ht.GetArData()
 		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
 		for ; _p != _end; _p++ {

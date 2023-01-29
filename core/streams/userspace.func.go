@@ -127,19 +127,19 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 	zend.ZVAL_STRING(&args[0], filename)
 	zend.ZVAL_STRING(&args[1], mode)
 	zend.ZVAL_LONG(&args[2], options)
-	zend.ZVAL_NEW_REF(&args[3], &(zend.ExecutorGlobals.GetUninitializedZval()))
+	zend.ZVAL_NEW_REF(&args[3], zend.__EG().GetUninitializedZval())
 	zend.ZVAL_STRING(&zfuncname, USERSTREAM_OPEN)
-	var __orig_bailout *JMP_BUF = zend.ExecutorGlobals.GetBailout()
+	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
 	var __bailout JMP_BUF
-	zend.ExecutorGlobals.SetBailout(&__bailout)
+	zend.__EG().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		call_result = zend.CallUserFunctionEx(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &zfuncname, &zretval, 4, args, 0, nil)
 	} else {
-		zend.ExecutorGlobals.SetBailout(__orig_bailout)
+		zend.__EG().SetBailout(__orig_bailout)
 		standard.FG(user_stream_current_filename) = nil
 		zend.ZendBailout()
 	}
-	zend.ExecutorGlobals.SetBailout(__orig_bailout)
+	zend.__EG().SetBailout(__orig_bailout)
 	if call_result == zend.SUCCESS && zretval.GetType() != zend.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {
 
 		/* the stream is now open! */
@@ -350,7 +350,7 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	call_result = zend.CallUserFunctionEx(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0, nil)
 	zend.ZvalPtrDtor(&args[0])
 	zend.ZvalPtrDtor(&func_name)
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return -1
 	}
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
@@ -387,7 +387,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	call_result = zend.CallUserFunctionEx(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0, nil)
 	zend.ZvalPtrDtor(&args[0])
 	zend.ZvalPtrDtor(&func_name)
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return -1
 	}
 	if call_result == zend.FAILURE {
@@ -416,7 +416,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	zend.ZVAL_STRINGL(&func_name, USERSTREAM_EOF, b.SizeOf("USERSTREAM_EOF")-1)
 	call_result = zend.CallUserFunction(nil, b.CondF2(zend.Z_ISUNDEF(us.GetObject()), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&func_name)
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		stream.SetEof(1)
 		return -1
 	}

@@ -35,7 +35,7 @@ func SplPtrHeapPqueueElemCtor(elem any) {
 func SplPtrHeapCmpCbHelper(object *zend.Zval, heap_object *SplHeapObject, a *zend.Zval, b *zend.Zval, result *zend.ZendLong) int {
 	var zresult zend.Zval
 	zend.ZendCallMethodWith2Params(object, heap_object.GetStd().GetCe(), heap_object.GetFptrCmp(), "compare", &zresult, a, b)
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return zend.FAILURE
 	}
 	*result = zend.ZvalGetLong(&zresult)
@@ -65,7 +65,7 @@ func SplPtrHeapZvalMaxCmp(x any, y any, object *zend.Zval) int {
 	var a *zend.Zval = x
 	var b *zend.Zval = y
 	var result zend.Zval
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return 0
 	}
 	if object != nil {
@@ -91,7 +91,7 @@ func SplPtrHeapZvalMinCmp(x any, y any, object *zend.Zval) int {
 	var a *zend.Zval = x
 	var b *zend.Zval = y
 	var result zend.Zval
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return 0
 	}
 	if object != nil {
@@ -119,7 +119,7 @@ func SplPtrPqueueElemCmp(x any, y any, object *zend.Zval) int {
 	var a_priority_p *zend.Zval = a.GetPriority()
 	var b_priority_p *zend.Zval = b.GetPriority()
 	var result zend.Zval
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 		return 0
 	}
 	if object != nil {
@@ -171,7 +171,7 @@ func SplPtrHeapInsert(heap *SplPtrHeap, elem any, cmp_userdata any) {
 		SplHeapElemCopy(heap, SplHeapElem(heap, i), SplHeapElem(heap, (i-1)/2))
 	}
 	heap.GetCount()++
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 
 		/* exception thrown during comparison */
 
@@ -222,7 +222,7 @@ func SplPtrHeapDeleteTop(heap *SplPtrHeap, elem any, cmp_userdata any) int {
 		/* swap elements between two levels */
 
 	}
-	if zend.ExecutorGlobals.GetException() != nil {
+	if zend.__EG().GetException() != nil {
 
 		/* exception thrown during comparison */
 

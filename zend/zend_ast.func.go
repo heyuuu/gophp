@@ -99,7 +99,7 @@ func ZendAstListRtrim(ast *ZendAst) *ZendAst {
 	return ast
 }
 func ZendAstAlloc(size int) any {
-	return ZendArenaAlloc(&(CompilerGlobals.GetAstArena()), size)
+	return ZendArenaAlloc(__CG().GetAstArena(), size)
 }
 func ZendAstRealloc(old any, old_size int, new_size int) any {
 	var new_ any = ZendAstAlloc(new_size)
@@ -117,7 +117,7 @@ func ZendAstCreateZnode(node *Znode) *ZendAst {
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_znode"))
 	ast.SetKind(ZEND_AST_ZNODE)
 	ast.SetAttr(0)
-	ast.SetLineno(CompilerGlobals.GetZendLineno())
+	ast.SetLineno(__CG().GetZendLineno())
 	ast.SetNode(*node)
 	return (*ZendAst)(ast)
 }
@@ -134,20 +134,20 @@ func ZendAstCreateZvalWithLineno(zv *Zval, lineno uint32) *ZendAst {
 	return ZendAstCreateZvalInt(zv, 0, lineno)
 }
 func ZendAstCreateZvalEx(zv *Zval, attr ZendAstAttr) *ZendAst {
-	return ZendAstCreateZvalInt(zv, attr, CompilerGlobals.GetZendLineno())
+	return ZendAstCreateZvalInt(zv, attr, __CG().GetZendLineno())
 }
 func ZendAstCreateZval(zv *Zval) *ZendAst {
-	return ZendAstCreateZvalInt(zv, 0, CompilerGlobals.GetZendLineno())
+	return ZendAstCreateZvalInt(zv, 0, __CG().GetZendLineno())
 }
 func ZendAstCreateZvalFromStr(str *ZendString) *ZendAst {
 	var zv Zval
 	ZVAL_STR(&zv, str)
-	return ZendAstCreateZvalInt(&zv, 0, CompilerGlobals.GetZendLineno())
+	return ZendAstCreateZvalInt(&zv, 0, __CG().GetZendLineno())
 }
 func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
 	var zv Zval
 	ZVAL_LONG(&zv, lval)
-	return ZendAstCreateZvalInt(&zv, 0, CompilerGlobals.GetZendLineno())
+	return ZendAstCreateZvalInt(&zv, 0, __CG().GetZendLineno())
 }
 func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
 	var ast *ZendAstZval
@@ -155,7 +155,7 @@ func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
 	ast.SetKind(ZEND_AST_CONSTANT)
 	ast.SetAttr(attr)
 	ZVAL_STR(ast.GetVal(), name)
-	ast.GetVal().GetLineno() = CompilerGlobals.GetZendLineno()
+	ast.GetVal().GetLineno() = __CG().GetZendLineno()
 	return (*ZendAst)(ast)
 }
 func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst {
@@ -173,9 +173,9 @@ func ZendAstCreateDecl(kind ZendAstKind, flags uint32, start_lineno uint32, doc_
 	ast.SetKind(kind)
 	ast.SetAttr(0)
 	ast.SetStartLineno(start_lineno)
-	ast.SetEndLineno(CompilerGlobals.GetZendLineno())
+	ast.SetEndLineno(__CG().GetZendLineno())
 	ast.SetFlags(flags)
-	ast.SetLexPos(LanguageScannerGlobals.GetYyText())
+	ast.SetLexPos(__INI_SCNG().GetYyText())
 	ast.SetDocComment(doc_comment)
 	ast.SetName(name)
 	ast.GetChild()[0] = child0
@@ -190,7 +190,7 @@ func ZendAstCreate0(kind ZendAstKind) *ZendAst {
 	ast = ZendAstAlloc(ZendAstSize(0))
 	ast.SetKind(kind)
 	ast.SetAttr(0)
-	ast.SetLineno(CompilerGlobals.GetZendLineno())
+	ast.SetLineno(__CG().GetZendLineno())
 	return ast
 }
 func ZendAstCreate1(kind ZendAstKind, child *ZendAst) *ZendAst {
@@ -204,7 +204,7 @@ func ZendAstCreate1(kind ZendAstKind, child *ZendAst) *ZendAst {
 	if child != nil {
 		lineno = ZendAstGetLineno(child)
 	} else {
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	ast.SetLineno(lineno)
 	ast.SetLineno(lineno)
@@ -224,7 +224,7 @@ func ZendAstCreate2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *ZendAst
 	} else if child2 != nil {
 		lineno = ZendAstGetLineno(child2)
 	} else {
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	ast.SetLineno(lineno)
 	return ast
@@ -246,7 +246,7 @@ func ZendAstCreate3(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *
 	} else if child3 != nil {
 		lineno = ZendAstGetLineno(child3)
 	} else {
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	ast.SetLineno(lineno)
 	return ast
@@ -271,7 +271,7 @@ func ZendAstCreate4(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst, child3 *
 	} else if child4 != nil {
 		lineno = ZendAstGetLineno(child4)
 	} else {
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	ast.SetLineno(lineno)
 	return ast
@@ -283,7 +283,7 @@ func ZendAstCreateList0(kind ZendAstKind) *ZendAst {
 	list = (*ZendAstList)(ast)
 	list.SetKind(kind)
 	list.SetAttr(0)
-	list.SetLineno(CompilerGlobals.GetZendLineno())
+	list.SetLineno(__CG().GetZendLineno())
 	list.SetChildren(0)
 	return ast
 }
@@ -299,11 +299,11 @@ func ZendAstCreateList1(kind ZendAstKind, child *ZendAst) *ZendAst {
 	list.GetChild()[0] = child
 	if child != nil {
 		lineno = ZendAstGetLineno(child)
-		if lineno > CompilerGlobals.GetZendLineno() {
-			lineno = CompilerGlobals.GetZendLineno()
+		if lineno > __CG().GetZendLineno() {
+			lineno = __CG().GetZendLineno()
 		}
 	} else {
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	list.SetLineno(lineno)
 	return ast
@@ -321,17 +321,17 @@ func ZendAstCreateList2(kind ZendAstKind, child1 *ZendAst, child2 *ZendAst) *Zen
 	list.GetChild()[1] = child2
 	if child1 != nil {
 		lineno = ZendAstGetLineno(child1)
-		if lineno > CompilerGlobals.GetZendLineno() {
-			lineno = CompilerGlobals.GetZendLineno()
+		if lineno > __CG().GetZendLineno() {
+			lineno = __CG().GetZendLineno()
 		}
 	} else if child2 != nil {
 		lineno = ZendAstGetLineno(child2)
-		if lineno > CompilerGlobals.GetZendLineno() {
-			lineno = CompilerGlobals.GetZendLineno()
+		if lineno > __CG().GetZendLineno() {
+			lineno = __CG().GetZendLineno()
 		}
 	} else {
 		list.SetChildren(0)
-		lineno = CompilerGlobals.GetZendLineno()
+		lineno = __CG().GetZendLineno()
 	}
 	list.SetLineno(lineno)
 	return ast
@@ -1093,7 +1093,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 		SmartStrAppendLong(str, zv.GetLval())
 		break
 	case IS_DOUBLE:
-		key = ZendStrpprintf(0, "%.*G", int(ExecutorGlobals.GetPrecision()), zv.GetDval())
+		key = ZendStrpprintf(0, "%.*G", int(__EG().GetPrecision()), zv.GetDval())
 		SmartStrAppendl(str, key.GetVal(), key.GetLen())
 		ZendStringReleaseEx(key, 0)
 		break
