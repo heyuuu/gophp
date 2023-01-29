@@ -4790,7 +4790,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -4873,7 +4873,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -6772,7 +6772,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -6857,7 +6857,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExec
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -7634,7 +7634,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -8933,7 +8933,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -9016,7 +9016,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteD
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -12606,7 +12606,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExec
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -13909,7 +13909,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExe
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -15025,7 +15025,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecute
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -16028,7 +16028,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -16457,7 +16457,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -16935,7 +16935,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -17324,7 +17324,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -20765,7 +20765,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -20849,7 +20849,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if IS_CONST != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -22784,7 +22784,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -22870,7 +22870,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -24262,7 +24262,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -26186,7 +26186,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -26270,7 +26270,7 @@ func ZEND_UNSET_DIM_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if IS_CV != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -35815,7 +35815,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -35898,7 +35898,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if IS_CONST != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -36008,7 +36008,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteD
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CONST != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -38893,7 +38893,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -38978,7 +38978,7 @@ func ZEND_UNSET_DIM_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -39092,7 +39092,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecute
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if (IS_TMP_VAR | IS_VAR) != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}
@@ -40394,7 +40394,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_UNUSED != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -43322,7 +43322,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index
 				}
 			}
@@ -43405,7 +43405,7 @@ func ZEND_UNSET_DIM_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if offset.IsType(IS_STRING) {
 				key = offset.GetStr()
 				if IS_CV != IS_CONST {
-					if ZEND_HANDLE_NUMERIC(key, hval) != 0 {
+					if ZEND_HANDLE_NUMERIC(key, &hval) != 0 {
 						goto num_index_dim
 					}
 				}
@@ -43515,7 +43515,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData
 		if offset.IsType(IS_STRING) {
 			str = offset.GetStr()
 			if IS_CV != IS_CONST {
-				if ZEND_HANDLE_NUMERIC(str, hval) != 0 {
+				if ZEND_HANDLE_NUMERIC(str, &hval) != 0 {
 					goto num_index_prop
 				}
 			}

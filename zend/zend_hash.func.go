@@ -85,15 +85,15 @@ func _zendHandleNumericStr(str string, idx *ZendUlong) int {
 		return 0
 	}
 }
-func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx ZendUlong) int {
+func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *ZendUlong) int {
 	// todo idx 必须带指针
 	var str = b.CastStr(key, length)
-	return _zendHandleNumericStr(str, &idx)
+	return _zendHandleNumericStr(str, idx)
 }
-func ZEND_HANDLE_NUMERIC(key *ZendString, idx ZendUlong) int {
+func ZEND_HANDLE_NUMERIC(key *ZendString, idx *ZendUlong) int {
 	// todo idx 必须带指针
 	var str = key.GetStr()
-	return _zendHandleNumericStr(str, &idx)
+	return _zendHandleNumericStr(str, idx)
 }
 func ZendHashFindInd(ht *HashTable, key *ZendString) *Zval {
 	var key_ = NewStrKey(key.GetStr())

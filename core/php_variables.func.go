@@ -240,7 +240,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 
 			if PG(http_globals)[TRACK_VARS_COOKIE].u1.v.type_ != zend.IS_UNDEF && symtable1 == PG(http_globals)[TRACK_VARS_COOKIE].GetArr() && zend.ZendSymtableStrExists(symtable1, index, index_len) != 0 {
 				zend.ZvalPtrDtorNogc(val)
-			} else if zend.ZEND_HANDLE_NUMERIC_STR(index, index_len, idx) != 0 {
+			} else if zend.ZEND_HANDLE_NUMERIC_STR(index, index_len, &idx) != 0 {
 				zend.ZendHashIndexUpdate(symtable1, idx, val)
 			} else {
 				PhpRegisterVariableQuick(index, index_len, val, symtable1)
@@ -511,7 +511,7 @@ func ImportEnvironmentVariable(ht *zend.HashTable, env *byte) {
 	} else {
 		zend.ZVAL_NEW_STR(&val, zend.ZendStringInit(p, len_, 0))
 	}
-	if zend.ZEND_HANDLE_NUMERIC_STR(env, name_len, idx) != 0 {
+	if zend.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) != 0 {
 		zend.ZendHashIndexUpdate(ht, idx, &val)
 	} else {
 		PhpRegisterVariableQuick(env, name_len, &val, ht)
