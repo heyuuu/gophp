@@ -25,23 +25,29 @@ func ZendHashInitEx(ht *HashTable, nSize uint32, pHashFunction any, pDestructor 
 	*ht = *NewZendArrayEx(nSize, pDestructor, persistent != 0)
 }
 func ZendHashFindEx(ht *HashTable, key *ZendString, known_hash ZendBool) *Zval {
-	if known_hash != 0 {
-		return _zendHashFindKnownHash(ht, key)
-	} else {
-		return ZendHashFind(ht, key)
-	}
+	return ZendHashFind(ht, key)
 }
 func ZEND_HASH_INDEX_FIND(_ht *HashTable, _h ZendUlong, _ret *Zval, _not_found __auto__) {
-	_ret = _zendHashIndexFind(_ht, _h)
+	_ret = ZendHashIndexFind(_ht, _h)
 	if _ret == nil {
 		goto _not_found
 	}
 }
-func ZendHashExists(ht *HashTable, key *ZendString) ZendBool { return ZendHashFind(ht, key) != nil }
-func ZendHashStrExists(ht *HashTable, str *byte, len_ int) ZendBool {
-	return ZendHashStrFind(ht, str, len_) != nil
+func ZendHashExists(ht *HashTable, key *ZendString) ZendBool {
+	var key_ = NewStrKey(key.GetStr())
+	var exists = ht.Exists(key_)
+	return intBool(exists)
 }
-func ZendHashIndexExists(ht *HashTable, h ZendUlong) ZendBool { return ZendHashIndexFind(ht, h) != nil }
+func ZendHashStrExists(ht *HashTable, str *byte, len_ int) ZendBool {
+	var key_ = NewStrKey(b.CastStr(str, len_))
+	var exists = ht.Exists(key_)
+	return intBool(exists)
+}
+func ZendHashIndexExists(ht *HashTable, h ZendUlong) ZendBool {
+	var key_ = NewIndexKey(int(h))
+	var exists = ht.Exists(key_)
+	return intBool(exists)
+}
 func ZendHashHasMoreElementsEx(ht *HashTable, pos *HashPosition) ZEND_RESULT_CODE {
 	if ZendHashGetCurrentKeyTypeEx(ht, pos) == HASH_KEY_NON_EXISTENT {
 		return FAILURE
@@ -1823,74 +1829,17 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 		}
 	}
 }
-func ZendHashReplaceCheckerWrapper(target *HashTable, source_data *Zval, p *Bucket, pParam any, merge_checker_func MergeCheckerFuncT) ZendBool {
-	var hash_key ZendHashKey
-	hash_key.SetH(p.GetH())
-	hash_key.SetKey(p.GetKey())
-	return merge_checker_func(target, source_data, &hash_key, pParam)
-}
-func ZendHashMergeEx(target *HashTable, source *HashTable, pCopyConstructor CopyCtorFuncT, pMergeSource MergeCheckerFuncT, pParam any) {
-	var idx uint32
-	var p *Bucket
-	var t *Zval
-	target.assertRc1()
-	for idx = 0; idx < source.GetNNumUsed(); idx++ {
-		p = source.GetArData() + idx
-		if p.GetVal().IsType(IS_UNDEF) {
-			continue
-		}
-		if ZendHashReplaceCheckerWrapper(target, p.GetVal(), p, pParam, pMergeSource) != 0 {
-			t = ZendHashUpdate(target, p.GetKey(), p.GetVal())
-			if pCopyConstructor != nil {
-				pCopyConstructor(t)
-			}
-		}
-	}
-}
 func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
-	var p *Bucket
-	p = ZendHashFindBucket(ht, key)
-	if p != nil {
-		return p.GetVal()
-	} else {
-		return nil
-	}
-}
-func _zendHashFindKnownHash(ht *HashTable, key *ZendString) *Zval {
-	var p *Bucket
-	p = ZendHashFindBucket(ht, key, 1)
-	if p != nil {
-		return p.GetVal()
-	} else {
-		return nil
-	}
+	var key_ = NewStrKey(key.GetStr())
+	return ht.Find(key_)
 }
 func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
-	var p *Bucket
-	p = ZendHashStrFindBucket(ht, str, len_)
-	if p != nil {
-		return p.GetVal()
-	} else {
-		return nil
-	}
+	var key_ = NewStrKey(b.CastStr(str, len_))
+	return ht.Find(key_)
 }
 func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval {
-	var p *Bucket
-	p = ZendHashIndexFindBucket(ht, h)
-	if p != nil {
-		return p.GetVal()
-	} else {
-		return nil
-	}
-}
-func _zendHashIndexFind(ht *HashTable, h ZendUlong) *Zval {
-	var p *Bucket
-	p = ZendHashIndexFindBucket(ht, h)
-	if p != nil {
-		return p.GetVal()
-	} else {
-		return nil
-	}
+	var key_ = NewIndexKey(int(h))
+	return ht.Find(key_)
 }
 func ZendHashInternalPointerResetEx(ht *HashTable, pos *HashPosition) {
 	*pos = _zendHashGetValidPos(ht, 0)

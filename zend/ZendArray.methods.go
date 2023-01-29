@@ -32,6 +32,13 @@ func (this *ZendArray) Find(key ZendArrayKey) *Zval {
 	return nil
 }
 
+func (this *ZendArray) Exists(key ZendArrayKey) bool {
+	if _, ok := this.findPos(key); ok {
+		return ok
+	}
+	return false
+}
+
 func (this *ZendArray) StrFindBucket(key string) *Bucket {
 	if pos, ok := this.keyMap[key]; ok {
 		return &this.data[pos]
