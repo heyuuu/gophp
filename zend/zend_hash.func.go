@@ -494,71 +494,9 @@ func ZendHashToPacked(ht *HashTable) {
 	// todo 此函数不应被调用
 	ZEND_ASSERT(false)
 }
-func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) {
-	ht.assertRc1()
-	if nSize == 0 {
-		return
-	}
-	if nSize > ht.GetNTableSize() {
-		var new_data any
-		var old_data any = HT_GET_DATA_ADDR(ht)
-		var old_buckets *Bucket = ht.GetArData()
-		nSize = ZendHashCheckSize(nSize)
-		ht.SetNTableSize(nSize)
-		new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
-		HT_SET_DATA_ADDR(ht, new_data)
-		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		ht.Rehash()
-	}
-}
-func ZendHashDiscard(ht *HashTable, nNumUsed uint32) {
-	var p *Bucket
-	var end *Bucket
-	var arData *Bucket
-	var nIndex uint32
-	arData = ht.GetArData()
-	p = arData + ht.GetNNumUsed()
-	end = arData + nNumUsed
-	ht.SetNNumUsed(nNumUsed)
-	for p != end {
-		p--
-		if p.GetVal().IsType(IS_UNDEF) {
-			continue
-		}
-		ht.GetNNumOfElements()--
-
-		/* Collision pointers always directed from higher to lower buckets */
-
-		nIndex = p.GetH() | ht.GetNTableMask()
-		HT_HASH_EX(arData, nIndex) = p.GetVal().GetNext()
-	}
-}
-func ZendArrayRecalcElements(ht *HashTable) uint32 {
-	var val *Zval
-	var num uint32 = ht.GetNNumOfElements()
-	for {
-		var __ht *HashTable = ht
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			val = _z
-			if val.IsType(IS_INDIRECT) {
-				if Z_INDIRECT_P(val).IsType(IS_UNDEF) {
-					num--
-				}
-			}
-		}
-		break
-	}
-	return num
-}
+func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) { ht.Extend(nSize) }
+func ZendHashDiscard(ht *HashTable, nNumUsed uint32)              { ht.Discard(nNumUsed) }
+func ZendArrayRecalcElements(ht *HashTable) uint32                { return ht.RecalcElements() }
 func ZendArrayCount(ht *HashTable) uint32 {
 	var num uint32
 	if ht.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {

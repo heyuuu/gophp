@@ -77,7 +77,9 @@ func (this *HashTable) removeHoles() bool {
 		})
 	}
 
+	// 截取数据，记录有效元素数
 	this.data = this.data[:newPos]
+	this.nNumOfElements = newPos
 
 	ZEND_ASSERT(this.IsWithoutHoles())
 
@@ -126,6 +128,55 @@ func (this *HashTable) doResize() {
 	} else {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
 	}
+}
+
+func (this *HashTable) Extend(nSize uint32) {
+	// todo remove 无需手动扩展
+	this.assertRc1()
+	if nSize > this.nTableSize {
+		// 无内存复制，仅扩充尺寸标识
+		this.nTableSize = ZendHashCheckSize(nSize)
+	}
+}
+
+func (this *HashTable) Discard(nNumUsed uint32) {
+	if nNumUsed < this.DataSize() {
+		// 裁剪数据，重新映射
+		this.data = this.data[:nNumUsed]
+		this.Rehash()
+		this.nNumOfElements = this.DataSize()
+	}
+}
+
+// 重新计算有效元素个数(与 nnNumOfElements 不同，它考虑 IS_INDIRECT 元素为 IS_UNDEF 的情况)
+func (this *HashTable) RecalcElements() uint32 {
+	var num uint32 = 0
+	for _, bucket := range this.data {
+		var val = bucket.GetVal()
+		if val.IsType(IS_UNDEF) {
+			continue
+		}
+		if val.IsType(IS_INDIRECT) && val.GetZv().IsType(IS_UNDEF) {
+			continue
+		}
+		num++
+	}
+	return num
+}
+
+func (this *HashTable) Count() uint32 {
+	var num uint32
+	if this.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {
+		num = ZendArrayRecalcElements(this)
+		if this.nNumOfElements == num {
+			this.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
+		}
+	} else if this == &EG().symbol_table {
+		num = ZendArrayRecalcElements(this)
+	} else {
+		num = this.GetNNumOfElements()
+	}
+	return num
 }
 
 // ----
