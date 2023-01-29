@@ -5648,79 +5648,38 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	/* Start at the beginning and go until we hit offset */
 
 	pos = 0
-	if zend.HT_IS_PACKED(input.GetArr()) && (preserve_keys == 0 || offset == 0 && zend.HT_IS_WITHOUT_HOLES(input.GetArr())) {
-		zend.ZendHashRealInitPacked(return_value.GetArr())
-		for {
-			var __fill_ht *zend.HashTable = return_value.GetArr()
-			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
-			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
-			zend.ZEND_ASSERT(__fill_ht.HasUFlags(zend.HASH_FLAG_PACKED))
-			for {
-				var __ht *zend.HashTable = input.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+	for {
+		var __ht *zend.HashTable = input.GetArr()
+		var _p *zend.Bucket = __ht.GetArData()
+		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
+		for ; _p != _end; _p++ {
+			var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					entry = _z
-					pos++
-					if pos <= offset {
-						continue
-					}
-					if pos > offset+length {
-						break
-					}
-					if zend.Z_ISREF_P(entry) && zend.Z_REFCOUNT_P(entry) == 1 {
-						entry = zend.Z_REFVAL_P(entry)
-					}
-					zend.Z_TRY_ADDREF_P(entry)
-					zend.ZEND_HASH_FILL_ADD(entry)
-				}
+			if _z.IsType(zend.IS_UNDEF) {
+				continue
+			}
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
+			entry = _z
+			pos++
+			if pos <= offset {
+				continue
+			}
+			if pos > offset+length {
 				break
 			}
-			__fill_ht.SetNNumUsed(__fill_idx)
-			__fill_ht.SetNNumOfElements(__fill_idx)
-			__fill_ht.SetNNextFreeElement(__fill_idx)
-			__fill_ht.SetNInternalPointer(0)
-			break
-		}
-	} else {
-		for {
-			var __ht *zend.HashTable = input.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				num_key = _p.GetH()
-				string_key = _p.GetKey()
-				entry = _z
-				pos++
-				if pos <= offset {
-					continue
-				}
-				if pos > offset+length {
-					break
-				}
-				if string_key != nil {
-					entry = zend.ZendHashAddNew(return_value.GetArr(), string_key, entry)
+			if string_key != nil {
+				entry = zend.ZendHashAddNew(return_value.GetArr(), string_key, entry)
+			} else {
+				if preserve_keys != 0 {
+					entry = zend.ZendHashIndexAddNew(return_value.GetArr(), num_key, entry)
 				} else {
-					if preserve_keys != 0 {
-						entry = zend.ZendHashIndexAddNew(return_value.GetArr(), num_key, entry)
-					} else {
-						entry = zend.ZendHashNextIndexInsertNew(return_value.GetArr(), entry)
-					}
+					entry = zend.ZendHashNextIndexInsertNew(return_value.GetArr(), entry)
 				}
-				zend.ZvalAddRef(entry)
 			}
-			break
+			zend.ZvalAddRef(entry)
 		}
+		break
 	}
 }
 func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
@@ -6422,47 +6381,36 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var __fill_bkt *zend.Bucket = __fill_ht.GetArData() + __fill_ht.GetNNumUsed()
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			zend.ZEND_ASSERT(__fill_ht.HasUFlags(zend.HASH_FLAG_PACKED))
-			if zend.HT_IS_PACKED(arrval) && zend.HT_IS_WITHOUT_HOLES(arrval) {
 
-				/* Optimistic case: range(0..n-1) for vector-like packed array */
+			/* Go through input array and add keys to the return array */
 
-				var lval zend.ZendUlong = 0
-				for ; lval < elem_count; lval++ {
-					zend.ZEND_HASH_FILL_SET_LONG(lval)
+			for {
+				var __ht *zend.HashTable = input.GetArr()
+				var _p *zend.Bucket = __ht.GetArData()
+				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
+				for ; _p != _end; _p++ {
+					var _z *zend.Zval = _p.GetVal()
+					if _z.IsType(zend.IS_INDIRECT) {
+						_z = _z.GetZv()
+					}
+					if _z.IsType(zend.IS_UNDEF) {
+						continue
+					}
+					num_idx = _p.GetH()
+					str_idx = _p.GetKey()
+					entry = _z
+					if str_idx != nil {
+						zend.ZEND_HASH_FILL_SET_STR_COPY(str_idx)
+					} else {
+						zend.ZEND_HASH_FILL_SET_LONG(num_idx)
+					}
 					zend.ZEND_HASH_FILL_NEXT()
 				}
-			} else {
-
-				/* Go through input array and add keys to the return array */
-
-				for {
-					var __ht *zend.HashTable = input.GetArr()
-					var _p *zend.Bucket = __ht.GetArData()
-					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *zend.Zval = _p.GetVal()
-						if _z.IsType(zend.IS_INDIRECT) {
-							_z = _z.GetZv()
-						}
-						if _z.IsType(zend.IS_UNDEF) {
-							continue
-						}
-						num_idx = _p.GetH()
-						str_idx = _p.GetKey()
-						entry = _z
-						if str_idx != nil {
-							zend.ZEND_HASH_FILL_SET_STR_COPY(str_idx)
-						} else {
-							zend.ZEND_HASH_FILL_SET_LONG(num_idx)
-						}
-						zend.ZEND_HASH_FILL_NEXT()
-					}
-					break
-				}
-
-				/* Go through input array and add keys to the return array */
-
+				break
 			}
+
+			/* Go through input array and add keys to the return array */
+
 			__fill_ht.SetNNumUsed(__fill_idx)
 			__fill_ht.SetNNumOfElements(__fill_idx)
 			__fill_ht.SetNNextFreeElement(__fill_idx)
@@ -6703,11 +6651,6 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 
 	/* Return vector-like packed arrays as-is */
-
-	if zend.HT_IS_PACKED(arrval) && zend.HT_IS_WITHOUT_HOLES(arrval) && arrval.GetNNextFreeElement() == arrlen {
-		zend.RETVAL_ZVAL(input, 1, 0)
-		return
-	}
 
 	/* Initialize return array */
 
