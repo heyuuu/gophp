@@ -6,10 +6,6 @@ import (
 	b "sik/builtin"
 )
 
-func HT_ITERATORS_OVERFLOW(ht *HashTable) bool { return ht.IsIteratorsOverflow() }
-func HT_HAS_ITERATORS(ht *HashTable) bool      { return ht.HasIterators() }
-func HT_INC_ITERATORS_COUNT(ht *HashTable)     { ht.IncNIteratorsCount() }
-func HT_DEC_ITERATORS_COUNT(ht *HashTable)     { ht.DecNIteratorsCount() }
 func ZVAL_EMPTY_ARRAY(z *Zval) {
 	z.SetArr((*ZendArray)(&ZendEmptyArray))
 	z.SetTypeInfo(IS_ARRAY)
@@ -77,7 +73,7 @@ func ZendHashSort(ht *HashTable, compare_func CompareFuncT, renumber ZendBool) i
 }
 func ZendNewArray(size uint32) *HashTable { return NewZendArray(size) }
 func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) {
-	if HT_HAS_ITERATORS(ht) {
+	if ht.HasIterators() {
 		_zendHashIteratorsUpdate(ht, from, to)
 	}
 }
@@ -567,9 +563,9 @@ func ZendHashCheckSize(nSize uint32) uint32 {
 	return nSize + 1
 }
 
-func ZendHashRealInit(ht *HashTable, packed ZendBool) { ht.RealInit() }
-func ZendHashRealInitPacked(ht *HashTable)            { ht.RealInit() }
-func ZendHashRealInitMixed(ht *HashTable)             { ht.RealInit() }
+func ZendHashRealInit(ht *HashTable, packed ZendBool) { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitPacked(ht *HashTable)            { /* ignore simplify */ ht.RealInit() }
+func ZendHashRealInitMixed(ht *HashTable)             { /* ignore simplify */ ht.RealInit() }
 func ZendHashToPacked(ht *HashTable) {
 	// todo 此函数不应被调用
 	ZEND_ASSERT(false)
@@ -667,8 +663,8 @@ func ZendHashIteratorAdd(ht *HashTable, pos HashPosition) uint32 {
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators()
 	var end *HashTableIterator = iter + ExecutorGlobals.GetHtIteratorsCount()
 	var idx uint32
-	if !(HT_ITERATORS_OVERFLOW(ht)) {
-		HT_INC_ITERATORS_COUNT(ht)
+	if !(ht.IsIteratorsOverflow()) {
+		ht.IncNIteratorsCount()
 	}
 	for iter != end {
 		if iter.GetHt() == nil {
@@ -701,11 +697,11 @@ func ZendHashIteratorPos(idx uint32, ht *HashTable) HashPosition {
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators() + idx
 	ZEND_ASSERT(idx != uint32-1)
 	if iter.GetHt() != ht {
-		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(HT_ITERATORS_OVERFLOW(iter.GetHt())) {
-			HT_DEC_ITERATORS_COUNT(iter.GetHt())
+		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
+			iter.GetHt().DecNIteratorsCount()
 		}
-		if !(HT_ITERATORS_OVERFLOW(ht)) {
-			HT_INC_ITERATORS_COUNT(ht)
+		if !(ht.IsIteratorsOverflow()) {
+			ht.IncNIteratorsCount()
 		}
 		iter.SetHt(ht)
 		iter.SetPos(_zendHashGetCurrentPos(ht))
@@ -717,13 +713,13 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators() + idx
 	ZEND_ASSERT(idx != uint32-1)
 	if iter.GetHt() != ht {
-		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(HT_ITERATORS_OVERFLOW(ht)) {
-			HT_DEC_ITERATORS_COUNT(iter.GetHt())
+		if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(ht.IsIteratorsOverflow()) {
+			iter.GetHt().DecNIteratorsCount()
 		}
 		SEPARATE_ARRAY(array)
 		ht = array.GetArr()
-		if !(HT_ITERATORS_OVERFLOW(ht)) {
-			HT_INC_ITERATORS_COUNT(ht)
+		if !(ht.IsIteratorsOverflow()) {
+			ht.IncNIteratorsCount()
 		}
 		iter.SetHt(ht)
 		iter.SetPos(_zendHashGetCurrentPos(ht))
@@ -733,9 +729,9 @@ func ZendHashIteratorPosEx(idx uint32, array *Zval) HashPosition {
 func ZendHashIteratorDel(idx uint32) {
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators() + idx
 	ZEND_ASSERT(idx != uint32-1)
-	if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(HT_ITERATORS_OVERFLOW(iter.GetHt())) {
+	if iter.GetHt() != nil && iter.GetHt() != HT_POISONED_PTR && !(iter.GetHt().IsIteratorsOverflow()) {
 		ZEND_ASSERT(iter.GetHt().GetNIteratorsCount() != 0)
-		HT_DEC_ITERATORS_COUNT(iter.GetHt())
+		iter.GetHt().DecNIteratorsCount()
 	}
 	iter.SetHt(nil)
 	if idx == ExecutorGlobals.GetHtIteratorsUsed()-1 {
@@ -756,7 +752,7 @@ func _zendHashIteratorsRemove(ht *HashTable) {
 	}
 }
 func ZendHashIteratorsRemove(ht *HashTable) {
-	if HT_HAS_ITERATORS(ht) {
+	if ht.HasIterators() {
 		_zendHashIteratorsRemove(ht)
 	}
 }
@@ -978,7 +974,7 @@ func ZendHashRehash(ht *HashTable) int {
 			if p.GetVal().IsType(IS_UNDEF) {
 				var j uint32 = i
 				var q *Bucket = p
-				if !(HT_HAS_ITERATORS(ht)) {
+				if !(ht.HasIterators()) {
 					for b.PreInc(&i) < ht.GetNNumUsed() {
 						p++
 						if p.GetVal().GetTypeInfo() != IS_UNDEF {
@@ -1038,7 +1034,7 @@ func ZendHashRehash(ht *HashTable) int {
 		/* Migrate pointer to one past the end of the array to the new one past the end, so that
 		 * newly inserted elements are picked up correctly. */
 
-		if HT_HAS_ITERATORS(ht) {
+		if ht.HasIterators() {
 			_zendHashIteratorsUpdate(ht, old_num_used, ht.GetNNumUsed())
 		}
 
@@ -1056,7 +1052,7 @@ func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {
 	}
 	idx = HT_HASH_TO_IDX(idx)
 	ht.GetNNumOfElements()--
-	if ht.GetNInternalPointer() == idx || HT_HAS_ITERATORS(ht) {
+	if ht.GetNInternalPointer() == idx || ht.HasIterators() {
 		var new_idx uint32
 		new_idx = idx
 		for true {

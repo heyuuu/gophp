@@ -4555,7 +4555,7 @@ func PhpArrayDataShuffle(array *zend.Zval) {
 	}
 	hash = array.GetArr()
 	n_left = n_elems
-	if !(zend.HT_HAS_ITERATORS(hash)) {
+	if !(hash.HasIterators()) {
 		if hash.GetNNumUsed() != hash.GetNNumOfElements() {
 			j = 0
 			idx = 0
@@ -5178,7 +5178,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	if zend.Z_ARRVAL_P(stack).HasUFlags(zend.HASH_FLAG_PACKED) {
 		var k uint32 = 0
-		if !(zend.HT_HAS_ITERATORS(stack.GetArr())) {
+		if !(stack.GetArr().HasIterators()) {
 			for idx = 0; idx < zend.Z_ARRVAL_P(stack).GetNNumUsed(); idx++ {
 				p = zend.Z_ARRVAL_P(stack).GetArData() + idx
 				if p.GetVal().IsType(zend.IS_UNDEF) {
@@ -5351,7 +5351,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	if zend.HT_HAS_ITERATORS(stack.GetArr()) {
+	if stack.GetArr().HasIterators() {
 		zend.ZendHashIteratorsAdvance(stack.GetArr(), argc)
 		new_hash.SetNIteratorsCount(zend.Z_ARRVAL_P(stack).GetNIteratorsCount())
 		stack.GetArr().SetNIteratorsCount(0)
