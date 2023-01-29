@@ -1,8 +1,117 @@
 package zend
 
-import b "sik/builtin"
+import (
+	b "sik/builtin"
+)
 
-func (this *ZendArray) IsWithoutHoles() bool { return this.nNumUsed == this.nNumOfElements }
+func (this *ZendArray) addHash(key ZendArrayKey, pos uint32) {
+	if key.IsStrKey() {
+		this.keyMap[key.GetKey()] = pos
+	} else {
+		this.indexMap[key.GetIndex()] = pos
+	}
+}
+
+func (this *HashTable) eachBucket(handler func(uint32, *Bucket)) {
+	var size = uint32(len(this.data))
+	for i := uint32(0); i < size; i++ {
+		var p = &this.data[i]
+		handler(i, p)
+	}
+}
+
+func (this *HashTable) eachUsedBucket(handler func(uint32, *Bucket)) {
+	var size = uint32(len(this.data))
+	for i := uint32(0); i < size; i++ {
+		var p = &this.data[i]
+		if p.GetVal().IsType(IS_UNDEF) {
+			continue
+		}
+		handler(i, p)
+	}
+}
+
+// 移动 bucket 到新位置
+func (this *HashTable) _moveBucket(pos uint32, newPos uint32) {
+	ZEND_ASSERT(newPos <= pos)
+	if newPos == pos {
+		return
+	}
+	(&this.data[newPos]).CopyFrom(&this.data[pos])
+	if this.nInternalPointer == pos {
+		this.nInternalPointer = newPos
+	}
+}
+
+// 移除 this.data 数据中的 holes, 返回是否移动 bucket
+func (this *HashTable) removeHoles() bool {
+	var newPos uint32 = 0
+
+	if this.IsWithoutHoles() {
+		return false
+	}
+
+	if this.HasIterators() {
+		var iterPos = ZendHashIteratorsLowerPos(this, 0)
+
+		this.eachUsedBucket(func(pos uint32, p *Bucket) {
+			// 移动 bucket 到新位置
+			this._moveBucket(pos, newPos)
+			if pos != newPos {
+				if pos >= iterPos {
+					for {
+						ZendHashIteratorsUpdate(this, iterPos, newPos)
+						iterPos = ZendHashIteratorsLowerPos(this, iterPos+1)
+						if iterPos >= pos {
+							break
+						}
+					}
+				}
+			}
+			newPos++
+		})
+	} else {
+		this.eachUsedBucket(func(pos uint32, p *Bucket) {
+			this._moveBucket(pos, newPos)
+			newPos++
+		})
+	}
+
+	this.data = this.data[:newPos]
+
+	ZEND_ASSERT(this.IsWithoutHoles())
+
+	return true
+}
+
+func (this *HashTable) rehash() {
+	// 空数组快速清空
+	if this.nNumOfElements == 0 {
+		this.resetHash()
+		this.data = nil
+		return
+	}
+
+	// 移除 data 中的空位
+	var oldNumUsed = this.GetNNumUsed()
+	this.removeHoles()
+
+	// 重建 hash
+	this.resetHash()
+	this.eachBucket(func(pos uint32, p *Bucket) {
+		this.addHash(p.key, pos)
+	})
+
+	/* Migrate pointer to one past the end of the array to the new one past the end, so that
+	 * newly inserted elements are picked up correctly. */
+	if this.HasIterators() {
+		_zendHashIteratorsUpdate(this, oldNumUsed, this.GetNNumUsed())
+	}
+}
+
+// ----
+
+func (this *ZendArray) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
 
 func (this *ZendArray) findPos(key ZendArrayKey) (uint32, bool) {
 	if key.IsStrKey() {
@@ -55,26 +164,24 @@ func (this *ZendArray) IndexFindBucket(key int) *Bucket {
 
 func (this *ZendArray) _addBucket(strKey string, zv *Zval) *Bucket {
 	var bucket = NewBucketStr(strKey, zv)
-	var idx = this.nNumUsed
+	var idx = len(this.data)
 
-	this.nNumUsed++
 	this.nNumOfElements++
 	this.data = append(this.data, *bucket)
 
-	this.keyMap[strKey] = idx
+	this.keyMap[strKey] = uint32(idx)
 
 	return &this.data[idx]
 }
 
 func (this *ZendArray) _addBucketIndex(indexKey int, zv *Zval) *Bucket {
 	var bucket = NewBucketIndex(indexKey, zv)
-	var idx = this.nNumUsed
+	var idx = len(this.data)
 
-	this.nNumUsed++
 	this.nNumOfElements++
 	this.data = append(this.data, *bucket)
 
-	this.indexMap[indexKey] = idx
+	this.indexMap[indexKey] = uint32(idx)
 
 	// 更新 nNextFreeElement
 	if indexKey > this.nNextFreeElement {

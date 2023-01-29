@@ -946,104 +946,7 @@ func ZendHashDoResize(ht *HashTable) {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket")+b.SizeOf("uint32_t"), b.SizeOf("Bucket"))
 	}
 }
-func ZendHashRehash(ht *HashTable) int {
-	var p *Bucket
-	var nIndex uint32
-	var i uint32
-	if ht.GetNNumOfElements() == 0 {
-		ht.SetNNumUsed(0)
-		HT_HASH_RESET(ht)
-		return SUCCESS
-	}
-	HT_HASH_RESET(ht)
-	i = 0
-	p = ht.GetArData()
-	if ht.IsWithoutHoles() {
-		for {
-			nIndex = p.GetH() | ht.GetNTableMask()
-			p.GetVal().GetNext() = HT_HASH(ht, nIndex)
-			HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(i)
-			p++
-			if b.PreInc(&i) >= ht.GetNNumUsed() {
-				break
-			}
-		}
-	} else {
-		var old_num_used uint32 = ht.GetNNumUsed()
-		for {
-			if p.GetVal().IsType(IS_UNDEF) {
-				var j uint32 = i
-				var q *Bucket = p
-				if !(ht.HasIterators()) {
-					for b.PreInc(&i) < ht.GetNNumUsed() {
-						p++
-						if p.GetVal().GetTypeInfo() != IS_UNDEF {
-							ZVAL_COPY_VALUE(q.GetVal(), p.GetVal())
-							q.SetH(p.GetH())
-							nIndex = q.GetH() | ht.GetNTableMask()
-							q.SetKey(p.GetKey())
-							q.GetVal().GetNext() = HT_HASH(ht, nIndex)
-							HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(j)
-							if ht.GetNInternalPointer() == i {
-								ht.SetNInternalPointer(j)
-							}
-							q++
-							j++
-						}
-					}
-				} else {
-					var iter_pos uint32 = ZendHashIteratorsLowerPos(ht, 0)
-					for b.PreInc(&i) < ht.GetNNumUsed() {
-						p++
-						if p.GetVal().GetTypeInfo() != IS_UNDEF {
-							ZVAL_COPY_VALUE(q.GetVal(), p.GetVal())
-							q.SetH(p.GetH())
-							nIndex = q.GetH() | ht.GetNTableMask()
-							q.SetKey(p.GetKey())
-							q.GetVal().GetNext() = HT_HASH(ht, nIndex)
-							HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(j)
-							if ht.GetNInternalPointer() == i {
-								ht.SetNInternalPointer(j)
-							}
-							if i >= iter_pos {
-								for {
-									ZendHashIteratorsUpdate(ht, iter_pos, j)
-									iter_pos = ZendHashIteratorsLowerPos(ht, iter_pos+1)
-									if iter_pos >= i {
-										break
-									}
-								}
-							}
-							q++
-							j++
-						}
-					}
-				}
-				ht.SetNNumUsed(j)
-				break
-			}
-			nIndex = p.GetH() | ht.GetNTableMask()
-			p.GetVal().GetNext() = HT_HASH(ht, nIndex)
-			HT_HASH(ht, nIndex) = HT_IDX_TO_HASH(i)
-			p++
-			if b.PreInc(&i) >= ht.GetNNumUsed() {
-				break
-			}
-		}
-
-		/* Migrate pointer to one past the end of the array to the new one past the end, so that
-		 * newly inserted elements are picked up correctly. */
-
-		if ht.HasIterators() {
-			_zendHashIteratorsUpdate(ht, old_num_used, ht.GetNNumUsed())
-		}
-
-		/* Migrate pointer to one past the end of the array to the new one past the end, so that
-		 * newly inserted elements are picked up correctly. */
-
-	}
-	return SUCCESS
-}
+func ZendHashRehash(ht *HashTable) { ht.rehash() }
 func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {
 	if prev != nil {
 		prev.GetVal().GetNext() = p.GetVal().GetNext()
@@ -1433,7 +1336,7 @@ func ZendHashClean(ht *HashTable) {
 				}
 			}
 		}
-		HT_HASH_RESET(ht)
+		ht.resetHash()
 	}
 	ht.SetNNumUsed(0)
 	ht.SetNNumOfElements(0)
@@ -1477,7 +1380,7 @@ func ZendSymtableClean(ht *HashTable) {
 				}
 			}
 		}
-		HT_HASH_RESET(ht)
+		ht.resetHash()
 	}
 	ht.SetNNumUsed(0)
 	ht.SetNNumOfElements(0)
@@ -1750,7 +1653,7 @@ func ZendArrayDup(source *HashTable) *HashTable {
 		}
 		target.SetNTableSize(source.GetNTableSize())
 		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE(target)))
-		HT_HASH_RESET(target)
+		target.resetHash()
 		if target.IsStaticKeys() {
 			if source.IsWithoutHoles() {
 				idx = ZendArrayDupElements(source, target, 1, 0)

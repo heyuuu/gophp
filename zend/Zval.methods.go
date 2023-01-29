@@ -1,3 +1,3 @@
 package zend
 
-func (this *Zval) IsNotUndef() bool { return this.GetType() != IS_UNDEF }
+func (this *Zval) IsNotUndef() bool { return this.IsType(IS_UNDEF) }

@@ -54,8 +54,6 @@ func (this ZendArrayKey) GetZendStringKey() *ZendString {
 type Bucket struct {
 	val Zval
 	key ZendArrayKey
-	// todo remove
-	h ZendUlong
 }
 
 func NewBucket(key ZendArrayKey, zval *Zval) *Bucket {
@@ -84,11 +82,16 @@ func (this *Bucket) GetIndexKey() int  { return this.key.GetIndex() }
 
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove
-	this.h = value
+	ZEND_ASSERT(false)
 }
 func (this *Bucket) SetKey(value *ZendString) {
 	// todo 此方法应被替换
 	ZEND_ASSERT(false)
+}
+
+func (this *Bucket) CopyFrom(from *Bucket) {
+	ZVAL_COPY_VALUE(this.GetVal(), from.GetVal())
+	this.key = from.key
 }
 
 /**
@@ -135,10 +138,15 @@ type ZendArray struct {
 
 var _ IRefcounted = &ZendArray{}
 
-func (this *ZendArray) GetArData() *Bucket                 { return this.arData }
-func (this *ZendArray) SetArData(value *Bucket)            { this.arData = value }
-func (this *ZendArray) GetNNumUsed() uint32                { return this.nNumUsed }
-func (this *ZendArray) SetNNumUsed(value uint32)           { this.nNumUsed = value }
+func (this *ZendArray) GetArData() *Bucket      { return this.arData }
+func (this *ZendArray) SetArData(value *Bucket) { this.arData = value }
+func (this *ZendArray) GetNNumUsed() uint32 {
+	return uint32(len(this.data))
+}
+func (this *ZendArray) SetNNumUsed(value uint32) {
+	// todo remove
+}
+
 func (this *ZendArray) GetNNumOfElements() uint32          { return this.nNumOfElements }
 func (this *ZendArray) SetNNumOfElements(value uint32)     { this.nNumOfElements = value }
 func (this *ZendArray) GetNTableSize() uint32              { return this.nTableSize }
@@ -212,7 +220,6 @@ func NewZendArray(size uint32) *ZendArray {
 
 func NewZendArrayEx(size uint32, pDestructor DtorFuncT, persistent bool) *ZendArray {
 	var ht = &ZendArray{
-		nNumUsed:         0,
 		nNumOfElements:   0,
 		nTableSize:       ZendHashCheckSize(size),
 		nInternalPointer: 0,
@@ -244,7 +251,6 @@ func (this *ZendArray) assertRc1() {
 func (this *ZendArray) RealInit() {
 	this.assertRc1()
 
-	this.nNumUsed = 0
 	this.nNumOfElements = 0
 	this.data = nil
 	this.indexMap = make(map[int]uint32)
@@ -253,7 +259,7 @@ func (this *ZendArray) RealInit() {
 	this.SetIsStaticKeys()
 }
 
-func (this *ZendArray) hashReset() {
+func (this *ZendArray) resetHash() {
 	this.assertRc1()
 	this.indexMap = make(map[int]uint32)
 	this.keyMap = make(map[string]uint32)

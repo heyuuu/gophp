@@ -32,3 +32,10 @@ func (p *SlicePtr[T]) PostDec() *T {
 	p.index--
 	return ptr
 }
+
+func (p *SlicePtr[T]) Foreach(handler func(int, *T)) {
+	var len_ = len(p.items)
+	for i := 0; i < len_; i++ {
+		handler(i, &p.items[i])
+	}
+}
