@@ -52,14 +52,14 @@ func (this ZendArrayKey) GetZendStringKey() *ZendString {
  * Bucket
  */
 type Bucket struct {
-	val  Zval
-	key_ ZendArrayKey
-	h    ZendUlong
-	key  *string
+	val Zval
+	key ZendArrayKey
+	// todo remove
+	h ZendUlong
 }
 
 func NewBucket(key ZendArrayKey, zval *Zval) *Bucket {
-	var bucket = &Bucket{key_: key}
+	var bucket = &Bucket{key: key}
 	ZVAL_COPY_VALUE(&bucket.val, zval)
 	return bucket
 }
@@ -76,8 +76,11 @@ func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
 
 func (this *Bucket) GetVal() *Zval       { return &this.val }
 func (this *Bucket) SetVal(zval *Zval)   { ZVAL_COPY_VALUE(&this.val, zval) }
-func (this *Bucket) GetH() ZendUlong     { return this.key_.GetH() }
-func (this *Bucket) GetKey() *ZendString { return this.key_.GetZendStringKey() }
+func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
+func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
+
+func (this *Bucket) GetStrKey() string { return this.key.GetKey() }
+func (this *Bucket) GetIndexKey() int  { return this.key.GetIndex() }
 
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove
@@ -132,8 +135,6 @@ type ZendArray struct {
 
 var _ IRefcounted = &ZendArray{}
 
-func (this *ZendArray) GetNIteratorsCount() ZendUchar      { return this.u.v.nIteratorsCount }
-func (this *ZendArray) SetNIteratorsCount(value ZendUchar) { this.u.v.nIteratorsCount = value }
 func (this *ZendArray) GetArData() *Bucket                 { return this.arData }
 func (this *ZendArray) SetArData(value *Bucket)            { this.arData = value }
 func (this *ZendArray) GetNNumUsed() uint32                { return this.nNumUsed }
@@ -193,6 +194,15 @@ func (this *ZendArray) SwitchUFlags(value uint32, cond bool) {
 	}
 }
 
+// nIteratorsCount
+func (this *ZendArray) GetNIteratorsCount() ZendUchar      { return this.u.v.nIteratorsCount }
+func (this *ZendArray) SetNIteratorsCount(value ZendUchar) { this.u.v.nIteratorsCount = value }
+func (this *ZendArray) IncNIteratorsCount()                { this.u.v.nIteratorsCount++ }
+func (this *ZendArray) DecNIteratorsCount()                { this.u.v.nIteratorsCount-- }
+
+func (this *ZendArray) HasIterators() bool        { return this.GetNIteratorsCount() != 0 }
+func (this *ZendArray) IsIteratorsOverflow() bool { return this.GetNIteratorsCount() == 0xff }
+
 /**
  * Constructor && Init
  */
@@ -241,4 +251,10 @@ func (this *ZendArray) RealInit() {
 	this.keyMap = make(map[string]uint32)
 
 	this.SetIsStaticKeys()
+}
+
+func (this *ZendArray) hashReset() {
+	this.assertRc1()
+	this.indexMap = make(map[int]uint32)
+	this.keyMap = make(map[string]uint32)
 }

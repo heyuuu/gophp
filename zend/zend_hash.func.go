@@ -6,14 +6,10 @@ import (
 	b "sik/builtin"
 )
 
-func HT_ITERATORS_OVERFLOW(ht *HashTable) bool { return ht.GetNIteratorsCount() == 0xff }
-func HT_HAS_ITERATORS(ht *HashTable) bool      { return ht.GetNIteratorsCount() != 0 }
-func HT_INC_ITERATORS_COUNT(ht *HashTable) {
-	ht.SetNIteratorsCount(ht.GetNIteratorsCount() + 1)
-}
-func HT_DEC_ITERATORS_COUNT(ht *HashTable) {
-	ht.SetNIteratorsCount(ht.GetNIteratorsCount() - 1)
-}
+func HT_ITERATORS_OVERFLOW(ht *HashTable) bool { return ht.IsIteratorsOverflow() }
+func HT_HAS_ITERATORS(ht *HashTable) bool      { return ht.HasIterators() }
+func HT_INC_ITERATORS_COUNT(ht *HashTable)     { ht.IncNIteratorsCount() }
+func HT_DEC_ITERATORS_COUNT(ht *HashTable)     { ht.DecNIteratorsCount() }
 func ZVAL_EMPTY_ARRAY(z *Zval) {
 	z.SetArr((*ZendArray)(&ZendEmptyArray))
 	z.SetTypeInfo(IS_ARRAY)
