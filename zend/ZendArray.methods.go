@@ -109,6 +109,25 @@ func (this *HashTable) Rehash() {
 	}
 }
 
+func (this *HashTable) ifFullDoResize() {
+	if this.DataSize() >= this.nTableSize {
+		this.doResize()
+	}
+}
+
+func (this *HashTable) doResize() {
+	this.assertRc1()
+
+	if this.DataSize() > this.nNumOfElements+(this.nNumOfElements>>5) {
+		this.Rehash()
+	} else if this.nTableSize < HT_MAX_SIZE {
+		// 无内存复制，仅扩充尺寸标识
+		this.nTableSize *= 2
+	} else {
+		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%d)", this.nTableSize*2)
+	}
+}
+
 // ----
 
 func (this *ZendArray) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
@@ -225,7 +244,7 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	}
 
 	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	ZEND_HASH_IF_FULL_DO_RESIZE(this)
+	this.ifFullDoResize()
 
 	var p = this.appendBucketStr(strKey, pData)
 	return p.GetVal()
@@ -250,7 +269,7 @@ func (this *ZendArray) indexAddOrUpdate(indexKey int, pData *Zval, flag uint32) 
 			return p.GetVal()
 		}
 	}
-	ZEND_HASH_IF_FULL_DO_RESIZE(this)
+	this.ifFullDoResize()
 
 	var p = this.appendBucketIndex(indexKey, pData)
 

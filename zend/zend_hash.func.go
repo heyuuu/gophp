@@ -470,11 +470,6 @@ func _zendHashAppendInd(ht *HashTable, key *ZendString, ptr *Zval) {
 	var bucket = NewBucketIndirect(bucketKey, ptr)
 	ht.appendBucket(bucket)
 }
-func ZEND_HASH_IF_FULL_DO_RESIZE(ht *HashTable) {
-	if ht.GetNNumUsed() >= ht.GetNTableSize() {
-		ZendHashDoResize(ht)
-	}
-}
 func ZendHashCheckSize(nSize uint32) uint32 {
 	/* Use big enough power of 2 */
 
@@ -854,26 +849,6 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 		p.GetVal().GetNext() = idx
 	}
 	return b.GetVal()
-}
-func ZendHashDoResize(ht *HashTable) {
-	ht.assertRc1()
-	if ht.GetNNumUsed() > ht.GetNNumOfElements()+(ht.GetNNumOfElements()>>5) {
-		ht.Rehash()
-	} else if ht.GetNTableSize() < HT_MAX_SIZE {
-		var new_data any
-		var old_data any = HT_GET_DATA_ADDR(ht)
-		var nSize uint32 = ht.GetNTableSize() + ht.GetNTableSize()
-		var old_buckets *Bucket = ht.GetArData()
-		ht.SetNTableSize(nSize)
-		new_data = Pemalloc(HT_SIZE_EX(nSize, HT_SIZE_TO_MASK(nSize)), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		ht.SetNTableMask(HT_SIZE_TO_MASK(ht.GetNTableSize()))
-		HT_SET_DATA_ADDR(ht, new_data)
-		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		ht.Rehash()
-	} else {
-		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket")+b.SizeOf("uint32_t"), b.SizeOf("Bucket"))
-	}
 }
 func ZendHashRehash(ht *HashTable) { ht.Rehash() }
 func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {

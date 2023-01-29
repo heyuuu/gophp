@@ -65,9 +65,6 @@ func HT_SIZE(ht *HashTable) int {
 func HT_USED_SIZE(ht *HashTable) int {
 	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
 }
-func HT_HASH_RESET(ht *HashTable) __auto__ {
-	return memset(&(HT_HASH(ht, ht.GetNTableMask())), HT_INVALID_IDX, HT_HASH_SIZE(ht.GetNTableMask()))
-}
 func HT_HASH_RESET_PACKED(ht *HashTable) {
 	HT_HASH(ht, -2) = HT_INVALID_IDX
 	HT_HASH(ht, -1) = HT_INVALID_IDX
