@@ -84,7 +84,7 @@ func (this *HashTable) removeHoles() bool {
 	return true
 }
 
-func (this *HashTable) rehash() {
+func (this *HashTable) Rehash() {
 	// 空数组快速清空
 	if this.nNumOfElements == 0 {
 		this.resetHash()
@@ -148,20 +148,6 @@ func (this *ZendArray) Exists(key ZendArrayKey) bool {
 	return false
 }
 
-func (this *ZendArray) StrFindBucket(key string) *Bucket {
-	if pos, ok := this.keyMap[key]; ok {
-		return &this.data[pos]
-	}
-	return nil
-}
-
-func (this *ZendArray) IndexFindBucket(key int) *Bucket {
-	if pos, ok := this.indexMap[key]; ok {
-		return &this.data[pos]
-	}
-	return nil
-}
-
 func (this *ZendArray) _addBucket(strKey string, zv *Zval) *Bucket {
 	var bucket = NewBucketStr(strKey, zv)
 	var idx = len(this.data)
@@ -203,7 +189,7 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	var isUpdateIndirect = b.FlagMatch(flag, HASH_UPDATE_INDIRECT)
 
 	if !isAddNew {
-		var p = this.StrFindBucket(strKey)
+		var p = this.FindBucketByStr(strKey)
 		if p != nil {
 			var data *Zval
 			if isAdd {
@@ -249,7 +235,7 @@ func (this *ZendArray) indexAddOrUpdate(indexKey int, pData *Zval, flag uint32) 
 	var isAdd = b.FlagMatch(flag, HASH_ADD)
 
 	if !isAddNew {
-		var p = this.IndexFindBucket(indexKey)
+		var p = this.FindBucketByIndex(indexKey)
 		if p != nil {
 			if isAdd {
 				return nil

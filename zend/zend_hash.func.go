@@ -77,8 +77,7 @@ func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) 
 		_zendHashIteratorsUpdate(ht, from, to)
 	}
 }
-func _zendHandleNumericStr(key *byte, length int, idx *ZendUlong) int {
-	var str = b.CastStr(key, length)
+func _zendHandleNumericStr(str string, idx *ZendUlong) int {
 	if number, ok := zendParseNumericStr(str); ok {
 		*idx = number
 		return 1
@@ -87,14 +86,18 @@ func _zendHandleNumericStr(key *byte, length int, idx *ZendUlong) int {
 	}
 }
 func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx ZendUlong) int {
-	return _zendHandleNumericStr(key, length, &idx)
+	// todo idx 必须带指针
+	var str = b.CastStr(key, length)
+	return _zendHandleNumericStr(str, &idx)
 }
 func ZEND_HANDLE_NUMERIC(key *ZendString, idx ZendUlong) int {
-	return ZEND_HANDLE_NUMERIC_STR(key.GetVal(), key.GetLen(), idx)
+	// todo idx 必须带指针
+	var str = key.GetStr()
+	return _zendHandleNumericStr(str, &idx)
 }
 func ZendHashFindInd(ht *HashTable, key *ZendString) *Zval {
-	var zv *Zval
-	zv = ZendHashFind(ht, key)
+	var key_ = NewStrKey(key.GetStr())
+	var zv = ht.Find(key_)
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
 			return zv.GetZv()
@@ -940,7 +943,7 @@ func ZendHashDoResize(ht *HashTable) {
 		ZendErrorNoreturn(E_ERROR, "Possible integer overflow in memory allocation (%u * %zu + %zu)", ht.GetNTableSize()*2, b.SizeOf("Bucket")+b.SizeOf("uint32_t"), b.SizeOf("Bucket"))
 	}
 }
-func ZendHashRehash(ht *HashTable) { ht.rehash() }
+func ZendHashRehash(ht *HashTable) { ht.Rehash() }
 func _zendHashDelElEx(ht *HashTable, idx uint32, p *Bucket, prev *Bucket) {
 	if prev != nil {
 		prev.GetVal().GetNext() = p.GetVal().GetNext()
@@ -1718,18 +1721,9 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 		}
 	}
 }
-func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
-	var key_ = NewStrKey(key.GetStr())
-	return ht.Find(key_)
-}
-func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
-	var key_ = NewStrKey(b.CastStr(str, len_))
-	return ht.Find(key_)
-}
-func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval {
-	var key_ = NewIndexKey(int(h))
-	return ht.Find(key_)
-}
+func ZendHashFind(ht *HashTable, key *ZendString) *Zval        { return ht.FindByZendString(key) }
+func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval { return ht.FindByStrPtr(str, len_) }
+func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval       { return ht.FindByIndex(int(h)) }
 func ZendHashInternalPointerResetEx(ht *HashTable, pos *HashPosition) {
 	*pos = _zendHashGetValidPos(ht, 0)
 }
@@ -1738,7 +1732,7 @@ func ZendHashInternalPointerEndEx(ht *HashTable, pos *HashPosition) {
 	idx = ht.GetNNumUsed()
 	for idx > 0 {
 		idx--
-		if ht.GetArData()[idx].GetVal().GetType() != IS_UNDEF {
+		if ht.data[idx].GetVal().GetType() != IS_UNDEF {
 			*pos = idx
 			return
 		}
@@ -1755,7 +1749,7 @@ func ZendHashMoveForwardEx(ht *HashTable, pos *HashPosition) int {
 				*pos = ht.GetNNumUsed()
 				return SUCCESS
 			}
-			if ht.GetArData()[idx].GetVal().GetType() != IS_UNDEF {
+			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
 				*pos = idx
 				return SUCCESS
 			}
@@ -1769,7 +1763,7 @@ func ZendHashMoveBackwardsEx(ht *HashTable, pos *HashPosition) int {
 	if idx < ht.GetNNumUsed() {
 		for idx > 0 {
 			idx--
-			if ht.GetArData()[idx].GetVal().GetType() != IS_UNDEF {
+			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
 				*pos = idx
 				return SUCCESS
 			}
