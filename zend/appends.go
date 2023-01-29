@@ -14,14 +14,3 @@ func memcmp(str1 []byte, str2 []byte, len_ int) ZendBool {
 	var str2_ = string(str2[:len_])
 	return intBool(str1_ == str2_)
 }
-
-/**
- * Globals 相关
- */
-var defaultCxt *ZendContext = &ZendContext{}
-
-func Ctx() *ZendContext { return defaultCxt }
-
-type ZendContext struct {
-	GC_G
-}

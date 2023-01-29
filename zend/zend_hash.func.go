@@ -494,29 +494,8 @@ func ZendHashToPacked(ht *HashTable) {
 	// todo 此函数不应被调用
 	ZEND_ASSERT(false)
 }
-func ZendHashExtend(ht *HashTable, nSize uint32, packed ZendBool) { ht.Extend(nSize) }
-func ZendHashDiscard(ht *HashTable, nNumUsed uint32)              { ht.Discard(nNumUsed) }
-func ZendArrayRecalcElements(ht *HashTable) uint32                { return ht.RecalcElements() }
-func ZendArrayCount(ht *HashTable) uint32 {
-	var num uint32
-	if ht.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {
-		num = ZendArrayRecalcElements(ht)
-		if ht.GetNNumOfElements() == num {
-			ht.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
-		}
-	} else if ht == &(ExecutorGlobals.GetSymbolTable()) {
-		num = ZendArrayRecalcElements(ht)
-	} else {
-		num = ht.GetNNumOfElements()
-	}
-	return num
-}
-func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition {
-	for pos < ht.GetNNumUsed() && Z_ISUNDEF(ht.GetArData()[pos].GetVal()) {
-		pos++
-	}
-	return pos
-}
+func ZendArrayCount(ht *HashTable) uint32                               { return ht.Count() }
+func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition { return ht.validPos(pos) }
 func _zendHashGetCurrentPos(ht *HashTable) HashPosition {
 	return _zendHashGetValidPos(ht, ht.GetNInternalPointer())
 }

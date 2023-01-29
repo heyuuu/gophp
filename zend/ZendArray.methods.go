@@ -167,16 +167,26 @@ func (this *HashTable) RecalcElements() uint32 {
 func (this *HashTable) Count() uint32 {
 	var num uint32
 	if this.HasUFlags(HASH_FLAG_HAS_EMPTY_IND) {
-		num = ZendArrayRecalcElements(this)
+		num = this.RecalcElements()
 		if this.nNumOfElements == num {
 			this.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
 		}
-	} else if this == &EG().symbol_table {
-		num = ZendArrayRecalcElements(this)
+	} else if this == __EG().GetSymbolTable() {
+		num = this.RecalcElements()
 	} else {
 		num = this.GetNNumOfElements()
 	}
 	return num
+}
+
+func (this *HashTable) validPos(pos uint32) uint32 {
+	var dataSize = this.DataSize()
+	for ; pos < dataSize; pos++ {
+		if !this.data[pos].GetVal().IsType(IS_UNDEF) {
+			return pos
+		}
+	}
+	return pos // 没有有效pos，此时 pos == this.DataSize()
 }
 
 // ----
