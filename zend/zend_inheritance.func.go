@@ -1707,7 +1707,7 @@ func ZendTraitsCopyFunctions(fnname *ZendString, fn *ZendFunction, ce *ZendClass
 			i++
 		}
 	}
-	if exclude_table == nil || ZendHashFind(exclude_table, fnname) == nil {
+	if exclude_table == nil || exclude_table.FindByZendString(fnname) == nil {
 
 		/* is not in hashtable, thus, function is not to be excluded */
 

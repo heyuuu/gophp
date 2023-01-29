@@ -4385,7 +4385,7 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 			}
 			for len_ >= minlen {
 				if (num_bitset[len_/b.SizeOf("zend_ulong")] & uint64(1) << len_ % b.SizeOf("zend_ulong")) != 0 {
-					entry = zend.ZendHashStrFind(pats, key, len_)
+					entry = pats.FindByStrPtr(key, len_)
 					if entry != nil {
 						var tmp *zend.ZendString
 						var s *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp)

@@ -865,7 +865,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 			lc_name = ZendStringTolower(name)
 		}
 	}
-	zv = ZendHashFind(ExecutorGlobals.GetClassTable(), lc_name)
+	zv = ExecutorGlobals.GetClassTable().FindByZendString(lc_name)
 	if zv != nil {
 		if key == nil {
 			ZendStringReleaseEx(lc_name, 0)

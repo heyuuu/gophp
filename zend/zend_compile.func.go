@@ -335,7 +335,7 @@ func ZendInitCompilerDataStructures() {
 	CompilerGlobals.SetMemoizeMode(0)
 }
 func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
-	var zv *Zval = ZendHashFind(&(FC(seen_symbols)), name)
+	var zv *Zval = FC(seen_symbols).FindByZendString(name)
 	if zv != nil {
 		zv.SetLval(zv.GetLval() | kind)
 	} else {
@@ -345,7 +345,7 @@ func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
 	}
 }
 func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
-	var zv *Zval = ZendHashFind(&(FC(seen_symbols)), name)
+	var zv *Zval = FC(seen_symbols).FindByZendString(name)
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
 func FileHandleDtor(fh *ZendFileHandle) { ZendFileHandleDtor(fh) }
@@ -380,7 +380,7 @@ func ShutdownCompiler() {
 func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
 	var p *Zval
 	var rv Zval
-	if b.Assign(&p, ZendHashFind(&(CompilerGlobals.GetFilenamesTable()), new_compiled_filename)) {
+	if b.Assign(&p, CompilerGlobals.GetFilenamesTable().FindByZendString(new_compiled_filename)) {
 		ZEND_ASSERT(p.IsType(IS_STRING))
 		CompilerGlobals.SetCompiledFilename(p.GetStr())
 		return p.GetStr()
@@ -941,7 +941,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 
 		/* Reload bucket pointer, the hash table may have been reallocated */
 
-		zv = ZendHashFind(ExecutorGlobals.GetClassTable(), lcname.GetStr())
+		zv = ExecutorGlobals.GetClassTable().FindByZendString(lcname.GetStr())
 		ZendHashSetBucketKey(ExecutorGlobals.GetClassTable(), (*Bucket)(zv), rtd_key.GetStr())
 		return FAILURE
 	}

@@ -3225,7 +3225,7 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *ZendString) *ZendFunction {
-	var zv *Zval = ZendHashFind(ExecutorGlobals.GetFunctionTable(), name)
+	var zv *Zval = ExecutorGlobals.GetFunctionTable().FindByZendString(name)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3236,7 +3236,7 @@ func ZendFetchFunction(name *ZendString) *ZendFunction {
 	return nil
 }
 func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
-	var zv *Zval = ZendHashStrFind(ExecutorGlobals.GetFunctionTable(), name, len_)
+	var zv *Zval = ExecutorGlobals.GetFunctionTable().FindByStrPtr(name, len_)
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3628,7 +3628,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if b.Assign(&func_, ZendHashFind(ExecutorGlobals.GetFunctionTable(), lcname)) == nil {
+		if b.Assign(&func_, ExecutorGlobals.GetFunctionTable().FindByZendString(lcname)) == nil {
 			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			ZendStringReleaseEx(lcname, 0)
 			return nil

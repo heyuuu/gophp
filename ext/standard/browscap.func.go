@@ -621,7 +621,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	if agent_name == nil {
 		var http_user_agent *zend.Zval = nil
 		if core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
-			http_user_agent = zend.ZendHashStrFind(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), "HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
+			http_user_agent = core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().FindByStrPtr("HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1)
 		}
 		if http_user_agent == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")

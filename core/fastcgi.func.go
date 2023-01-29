@@ -614,7 +614,7 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		}
 		q = req.GetEnv().GetList()
 		for q != nil {
-			if b.Assign(&value, zend.ZendHashStrFind(&FcgiMgmtVars, q.GetVar(), q.GetVarLen())) == nil {
+			if b.Assign(&value, FcgiMgmtVars.FindByStrPtr(q.GetVar(), q.GetVarLen())) == nil {
 				q = q.GetListNext()
 				continue
 			}

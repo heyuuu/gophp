@@ -1992,16 +1992,16 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *zend.Zval {
 	var wrapperhash *zend.Zval
-	if nil == b.Assign(&wrapperhash, zend.ZendHashStrFind(context.GetOptions().GetArr(), wrappername, strlen(wrappername))) {
+	if nil == b.Assign(&wrapperhash, context.GetOptions().GetArr().FindByStrPtr(wrappername, strlen(wrappername))) {
 		return nil
 	}
-	return zend.ZendHashStrFind(wrapperhash.GetArr(), optionname, strlen(optionname))
+	return wrapperhash.GetArr().FindByStrPtr(optionname, strlen(optionname))
 }
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *zend.Zval) int {
 	var wrapperhash *zend.Zval
 	var category zend.Zval
 	zend.SEPARATE_ARRAY(context.GetOptions())
-	wrapperhash = zend.ZendHashStrFind(context.GetOptions().GetArr(), wrappername, strlen(wrappername))
+	wrapperhash = context.GetOptions().GetArr().FindByStrPtr(wrappername, strlen(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
 		wrapperhash = zend.ZendHashStrUpdate(context.GetOptions().GetArr(), (*byte)(wrappername), strlen(wrappername), &category)

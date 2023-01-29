@@ -5000,7 +5000,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 
 					/* Reload bucket pointer, the hash table may have been reallocated */
 
-					zv = ZendHashFind(ExecutorGlobals.GetClassTable(), lcname.GetStr())
+					zv = ExecutorGlobals.GetClassTable().FindByZendString(lcname.GetStr())
 					ZendHashSetBucketKey(ExecutorGlobals.GetClassTable(), (*Bucket)(zv), (lcname + 1).GetStr())
 					HANDLE_EXCEPTION()
 				}

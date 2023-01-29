@@ -358,7 +358,7 @@ func zim_error_exception_getSeverity(execute_data *ZendExecuteData, return_value
 	ZVAL_COPY(return_value, prop)
 }
 func TRACE_APPEND_KEY(key *ZendString) {
-	tmp = ZendHashFind(ht, key)
+	tmp = ht.FindByZendString(key)
 	if tmp {
 		if tmp.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())

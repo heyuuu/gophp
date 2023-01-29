@@ -272,7 +272,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		PhpUrlFree(url_parts)
 		return zend.SUCCESS
 	}
-	if zend.ZendHashFind(allowed_hosts, url_parts.GetHost()) == nil {
+	if allowed_hosts.FindByZendString(url_parts.GetHost()) == nil {
 		PhpUrlFree(url_parts)
 		return zend.FAILURE
 	}

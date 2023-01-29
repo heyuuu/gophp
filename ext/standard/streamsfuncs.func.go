@@ -1683,7 +1683,7 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 	var ret int = zend.SUCCESS
 	var tmp *zend.Zval
-	if nil != b.Assign(&tmp, zend.ZendHashStrFind(params.GetArr(), "notification", b.SizeOf("\"notification\"")-1)) {
+	if nil != b.Assign(&tmp, params.GetArr().FindByStrPtr("notification", b.SizeOf("\"notification\"")-1)) {
 		if context.GetNotifier() != nil {
 			streams.PhpStreamNotificationFree(context.GetNotifier())
 			context.SetNotifier(nil)
@@ -1693,7 +1693,7 @@ func ParseContextParams(context *core.PhpStreamContext, params *zend.Zval) int {
 		zend.ZVAL_COPY(context.GetNotifier().GetPtr(), tmp)
 		context.GetNotifier().SetDtor(UserSpaceStreamNotifierDtor)
 	}
-	if nil != b.Assign(&tmp, zend.ZendHashStrFind(params.GetArr(), "options", b.SizeOf("\"options\"")-1)) {
+	if nil != b.Assign(&tmp, params.GetArr().FindByStrPtr("options", b.SizeOf("\"options\"")-1)) {
 		if tmp.IsType(zend.IS_ARRAY) {
 			ParseContextOptions(context, tmp)
 		} else {

@@ -371,7 +371,7 @@ func HT_MOVE_TAIL_TO_HEAD(ht *zend.HashTable) {
 	var tmp zend.Bucket = ht.GetArData()[ht.GetNNumUsed()-1]
 	memmove(ht.GetArData()+1, ht.GetArData(), b.SizeOf("Bucket")*(ht.GetNNumUsed()-1))
 	ht.GetArData()[0] = tmp
-	zend.ZendHashRehash(ht)
+	ht.Rehash()
 }
 func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var func_name *zend.ZendString
