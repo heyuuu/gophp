@@ -6,11 +6,8 @@ import (
 	b "sik/builtin"
 )
 
-func HT_IS_PACKED(ht *HashTable) bool            { return false }
-func HT_IS_WITHOUT_HOLES(ht *HashTable) bool     { return ht.IsWithoutHoles() }
-func HT_HAS_STATIC_KEYS_ONLY(ht *HashTable) bool { return ht.IsStaticKeys() }
-func HT_ITERATORS_OVERFLOW(ht *HashTable) bool   { return ht.GetNIteratorsCount() == 0xff }
-func HT_HAS_ITERATORS(ht *HashTable) bool        { return ht.GetNIteratorsCount() != 0 }
+func HT_ITERATORS_OVERFLOW(ht *HashTable) bool { return ht.GetNIteratorsCount() == 0xff }
+func HT_HAS_ITERATORS(ht *HashTable) bool      { return ht.GetNIteratorsCount() != 0 }
 func HT_INC_ITERATORS_COUNT(ht *HashTable) {
 	ht.SetNIteratorsCount(ht.GetNIteratorsCount() + 1)
 }
@@ -963,7 +960,7 @@ func ZendHashRehash(ht *HashTable) int {
 	HT_HASH_RESET(ht)
 	i = 0
 	p = ht.GetArData()
-	if HT_IS_WITHOUT_HOLES(ht) {
+	if ht.IsWithoutHoles() {
 		for {
 			nIndex = p.GetH() | ht.GetNTableMask()
 			p.GetVal().GetNext() = HT_HASH(ht, nIndex)
@@ -1251,8 +1248,8 @@ func ZendHashDestroy(ht *HashTable) {
 		p = ht.GetArData()
 		end = p + ht.GetNNumUsed()
 		if ht.GetPDestructor() != nil {
-			if HT_HAS_STATIC_KEYS_ONLY(ht) {
-				if HT_IS_WITHOUT_HOLES(ht) {
+			if ht.IsStaticKeys() {
+				if ht.IsWithoutHoles() {
 					for {
 						ht.GetPDestructor()(p.GetVal())
 						if b.PreInc(&p) == end {
@@ -1269,7 +1266,7 @@ func ZendHashDestroy(ht *HashTable) {
 						}
 					}
 				}
-			} else if HT_IS_WITHOUT_HOLES(ht) {
+			} else if ht.IsWithoutHoles() {
 				for {
 					ht.GetPDestructor()(p.GetVal())
 					if p.GetKey() != nil {
@@ -1293,7 +1290,7 @@ func ZendHashDestroy(ht *HashTable) {
 				}
 			}
 		} else {
-			if !(HT_HAS_STATIC_KEYS_ONLY(ht)) {
+			if !(ht.IsStaticKeys()) {
 				for {
 					if p.GetVal().GetType() != IS_UNDEF {
 						if p.GetKey() != nil {
@@ -1328,14 +1325,14 @@ func ZendArrayDestroy(ht *HashTable) {
 		}
 		p = ht.GetArData()
 		end = p + ht.GetNNumUsed()
-		if HT_HAS_STATIC_KEYS_ONLY(ht) {
+		if ht.IsStaticKeys() {
 			for {
 				IZvalPtrDtor(p.GetVal())
 				if b.PreInc(&p) == end {
 					break
 				}
 			}
-		} else if HT_IS_WITHOUT_HOLES(ht) {
+		} else if ht.IsWithoutHoles() {
 			for {
 				IZvalPtrDtor(p.GetVal())
 				if p.GetKey() != nil {
@@ -1372,8 +1369,8 @@ func ZendHashClean(ht *HashTable) {
 		p = ht.GetArData()
 		end = p + ht.GetNNumUsed()
 		if ht.GetPDestructor() != nil {
-			if HT_HAS_STATIC_KEYS_ONLY(ht) {
-				if HT_IS_WITHOUT_HOLES(ht) {
+			if ht.IsStaticKeys() {
+				if ht.IsWithoutHoles() {
 					for {
 						ht.GetPDestructor()(p.GetVal())
 						if b.PreInc(&p) == end {
@@ -1390,7 +1387,7 @@ func ZendHashClean(ht *HashTable) {
 						}
 					}
 				}
-			} else if HT_IS_WITHOUT_HOLES(ht) {
+			} else if ht.IsWithoutHoles() {
 				for {
 					ht.GetPDestructor()(p.GetVal())
 					if p.GetKey() != nil {
@@ -1414,8 +1411,8 @@ func ZendHashClean(ht *HashTable) {
 				}
 			}
 		} else {
-			if !(HT_HAS_STATIC_KEYS_ONLY(ht)) {
-				if HT_IS_WITHOUT_HOLES(ht) {
+			if !(ht.IsStaticKeys()) {
+				if ht.IsWithoutHoles() {
 					for {
 						if p.GetKey() != nil {
 							ZendStringRelease(p.GetKey())
@@ -1452,14 +1449,14 @@ func ZendSymtableClean(ht *HashTable) {
 	if ht.GetNNumUsed() != 0 {
 		p = ht.GetArData()
 		end = p + ht.GetNNumUsed()
-		if HT_HAS_STATIC_KEYS_ONLY(ht) {
+		if ht.IsStaticKeys() {
 			for {
 				IZvalPtrDtor(p.GetVal())
 				if b.PreInc(&p) == end {
 					break
 				}
 			}
-		} else if HT_IS_WITHOUT_HOLES(ht) {
+		} else if ht.IsWithoutHoles() {
 			for {
 				IZvalPtrDtor(p.GetVal())
 				if p.GetKey() != nil {
@@ -1756,14 +1753,14 @@ func ZendArrayDup(source *HashTable) *HashTable {
 		target.SetNTableSize(source.GetNTableSize())
 		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE(target)))
 		HT_HASH_RESET(target)
-		if HT_HAS_STATIC_KEYS_ONLY(target) {
-			if HT_IS_WITHOUT_HOLES(source) {
+		if target.IsStaticKeys() {
+			if source.IsWithoutHoles() {
 				idx = ZendArrayDupElements(source, target, 1, 0)
 			} else {
 				idx = ZendArrayDupElements(source, target, 1, 1)
 			}
 		} else {
-			if HT_IS_WITHOUT_HOLES(source) {
+			if source.IsWithoutHoles() {
 				idx = ZendArrayDupElements(source, target, 0, 0)
 			} else {
 				idx = ZendArrayDupElements(source, target, 0, 1)
@@ -1852,7 +1849,7 @@ func ZendHashMergeEx(target *HashTable, source *HashTable, pCopyConstructor Copy
 }
 func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
 	var p *Bucket
-	p = ZendHashFindBucket(ht, key)
+	p = ZendHashFindBucket(ht, key, 0)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -1861,7 +1858,7 @@ func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
 }
 func _zendHashFindKnownHash(ht *HashTable, key *ZendString) *Zval {
 	var p *Bucket
-	p = ZendHashFindBucket(ht, key)
+	p = ZendHashFindBucket(ht, key, 1)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -1872,7 +1869,7 @@ func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
 	var h ZendUlong
 	var p *Bucket
 	h = ZendInlineHashFunc(str, len_)
-	p = ZendHashStrFindBucket(ht, str, len_)
+	p = ZendHashStrFindBucket(ht, str, len_, h)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -2041,7 +2038,7 @@ func ZendHashSortEx(ht *HashTable, sort SortFuncT, compar CompareFuncT, renumber
 	if ht.GetNNumOfElements() <= 1 && !(renumber != 0 && ht.GetNNumOfElements() > 0) {
 		return SUCCESS
 	}
-	if HT_IS_WITHOUT_HOLES(ht) {
+	if ht.IsWithoutHoles() {
 		i = ht.GetNNumUsed()
 	} else {
 		j = 0

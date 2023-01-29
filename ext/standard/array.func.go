@@ -6094,7 +6094,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 		}
 		if ret != nil {
 			if zend.Z_ARRVAL_P(ret).HasUFlags(zend.HASH_FLAG_PACKED) {
-				if zend.HT_IS_WITHOUT_HOLES(ret.GetArr()) {
+				if ret.GetArr().IsWithoutHoles() {
 					zend.ZVAL_COPY(return_value, ret)
 					return
 				}
