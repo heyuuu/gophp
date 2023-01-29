@@ -18,42 +18,70 @@ func (this *ZendHashKey) GetKey() *ZendString      { return this.key }
 func (this *ZendHashKey) SetKey(value *ZendString) { this.key = value }
 
 /**
- * Bucket
+ * ZendArrayKey
+ * 新增类型，表示 ZendArray 的 Key。与原类型 ZendHashKey 作用类似，后续会取代 ZendHashKey。
  */
-type Bucket struct {
-	val Zval
-	h   ZendUlong
-	key *string
+type ZendArrayKey struct {
+	index int
+	key   *string
 }
 
-func NewBucket(strKey string, zval *Zval) *Bucket {
-	var bucket = &Bucket{
-		h:   b.HashStr(strKey),
-		key: &strKey,
+func NewStrKey(str string) ZendArrayKey  { return ZendArrayKey{0, &str} }
+func NewIndexKey(index int) ZendArrayKey { return ZendArrayKey{index, nil} }
+func (this ZendArrayKey) GetIndex() int  { return this.index }
+func (this ZendArrayKey) GetKey() string { return *this.key }
+func (this ZendArrayKey) IsStrKey() bool { return this.key != nil }
+func (this ZendArrayKey) GetH() ZendUlong {
+	// todo remove
+	if this.key != nil {
+		return b.HashStr(*this.key)
+	} else {
+		return uint(this.index)
 	}
-	ZVAL_COPY_VALUE(&bucket.val, zval)
-	return bucket
 }
-
-func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
-	var bucket = &Bucket{
-		h:   uint(indexKey),
-		key: nil,
-	}
-	ZVAL_COPY_VALUE(&bucket.val, zval)
-	return bucket
-}
-
-func (this *Bucket) GetVal() *Zval        { return &this.val }
-func (this *Bucket) SetVal(value Zval)    { this.val = value }
-func (this *Bucket) GetH() ZendUlong      { return this.h }
-func (this *Bucket) SetH(value ZendUlong) { this.h = value }
-func (this *Bucket) GetKey() *ZendString {
+func (this ZendArrayKey) GetZendStringKey() *ZendString {
+	// todo remove
 	if this.key != nil {
 		return ZendStringNew(*this.key, false)
 	} else {
 		return nil
 	}
+}
+
+/**
+ * Bucket
+ */
+type Bucket struct {
+	val  Zval
+	key_ ZendArrayKey
+	h    ZendUlong
+	key  *string
+}
+
+func NewBucket(key ZendArrayKey, zval *Zval) *Bucket {
+	var bucket = &Bucket{key_: key}
+	ZVAL_COPY_VALUE(&bucket.val, zval)
+	return bucket
+}
+
+func NewBucketStr(strKey string, zval *Zval) *Bucket {
+	var key = NewStrKey(strKey)
+	return NewBucket(key, zval)
+}
+
+func NewBucketIndex(indexKey int, zval *Zval) *Bucket {
+	var key = NewIndexKey(indexKey)
+	return NewBucket(key, zval)
+}
+
+func (this *Bucket) GetVal() *Zval       { return &this.val }
+func (this *Bucket) SetVal(zval *Zval)   { ZVAL_COPY_VALUE(&this.val, zval) }
+func (this *Bucket) GetH() ZendUlong     { return this.key_.GetH() }
+func (this *Bucket) GetKey() *ZendString { return this.key_.GetZendStringKey() }
+
+func (this *Bucket) SetH(value ZendUlong) {
+	// todo remove
+	this.h = value
 }
 func (this *Bucket) SetKey(value *ZendString) {
 	// todo 此方法应被替换

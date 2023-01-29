@@ -53,5 +53,5 @@ func (this *ZendString) Copy() *ZendString {
 }
 
 func (this *ZendString) Dup(persistent int) *ZendString {
-	return ZendStringInit(this.GetVal(), this.GetLen(), persistent)
+	return ZendStringNew(this.GetStr(), persistent != 0)
 }

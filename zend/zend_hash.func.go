@@ -793,16 +793,16 @@ func ZendHashIteratorsAdvance(ht *HashTable, step HashPosition) {
 	}
 }
 func ZendHashFindBucket(ht *HashTable, key *ZendString) *Bucket {
-	var strKey = key.GetStr()
-	return ht.FindBucket(strKey)
+	var key_ = NewStrKey(key.GetStr())
+	return ht.FindBucket(key_)
 }
 func ZendHashStrFindBucket(ht *HashTable, str *byte, len_ int) *Bucket {
-	var strKey = b.CastStr(str, len_)
-	return ht.FindBucket(strKey)
+	var key_ = NewStrKey(b.CastStr(str, len_))
+	return ht.FindBucket(key_)
 }
 func ZendHashIndexFindBucket(ht *HashTable, h ZendUlong) *Bucket {
-	var indexKey = int(h)
-	return ht.IndexFindBucket(indexKey)
+	var key_ = NewIndexKey(int(h))
+	return ht.FindBucket(key_)
 }
 func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uint32) *Zval {
 	var strKey = key.GetStr()
@@ -1849,7 +1849,7 @@ func ZendHashMergeEx(target *HashTable, source *HashTable, pCopyConstructor Copy
 }
 func ZendHashFind(ht *HashTable, key *ZendString) *Zval {
 	var p *Bucket
-	p = ZendHashFindBucket(ht, key, 0)
+	p = ZendHashFindBucket(ht, key)
 	if p != nil {
 		return p.GetVal()
 	} else {
@@ -1866,10 +1866,8 @@ func _zendHashFindKnownHash(ht *HashTable, key *ZendString) *Zval {
 	}
 }
 func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval {
-	var h ZendUlong
 	var p *Bucket
-	h = ZendInlineHashFunc(str, len_)
-	p = ZendHashStrFindBucket(ht, str, len_, h)
+	p = ZendHashStrFindBucket(ht, str, len_)
 	if p != nil {
 		return p.GetVal()
 	} else {

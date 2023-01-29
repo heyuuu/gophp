@@ -4,7 +4,35 @@ import b "sik/builtin"
 
 func (this *ZendArray) IsWithoutHoles() bool { return this.nNumUsed == this.nNumOfElements }
 
-func (this *ZendArray) FindBucket(key string) *Bucket {
+func (this *ZendArray) findPos(key ZendArrayKey) (uint32, bool) {
+	if key.IsStrKey() {
+		if pos, ok := this.keyMap[key.GetKey()]; ok {
+			return pos, true
+		}
+	} else {
+		if pos, ok := this.indexMap[key.GetIndex()]; ok {
+			return pos, true
+		}
+	}
+
+	return 0, false
+}
+
+func (this *ZendArray) FindBucket(key ZendArrayKey) *Bucket {
+	if pos, ok := this.findPos(key); ok {
+		return &this.data[pos]
+	}
+	return nil
+}
+
+func (this *ZendArray) Find(key ZendArrayKey) *Zval {
+	if pos, ok := this.findPos(key); ok {
+		return this.data[pos].GetVal()
+	}
+	return nil
+}
+
+func (this *ZendArray) StrFindBucket(key string) *Bucket {
 	if pos, ok := this.keyMap[key]; ok {
 		return &this.data[pos]
 	}
@@ -19,7 +47,7 @@ func (this *ZendArray) IndexFindBucket(key int) *Bucket {
 }
 
 func (this *ZendArray) _addBucket(strKey string, zv *Zval) *Bucket {
-	var bucket = NewBucket(strKey, zv)
+	var bucket = NewBucketStr(strKey, zv)
 	var idx = this.nNumUsed
 
 	this.nNumUsed++
@@ -61,7 +89,7 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	var isUpdateIndirect = b.FlagMatch(flag, HASH_UPDATE_INDIRECT)
 
 	if !isAddNew {
-		var p = this.FindBucket(strKey)
+		var p = this.StrFindBucket(strKey)
 		if p != nil {
 			var data *Zval
 			if isAdd {
