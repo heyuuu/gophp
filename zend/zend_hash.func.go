@@ -491,10 +491,13 @@ func ZendHashToPacked(ht *HashTable) {
 	// todo 此函数不应被调用
 	ZEND_ASSERT(false)
 }
-func ZendArrayCount(ht *HashTable) uint32                               { return ht.Count() }
-func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition { return ht.validPos(pos) }
+func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition {
+	pos, _ = ht.validPos(pos)
+	return pos
+}
 func _zendHashGetCurrentPos(ht *HashTable) HashPosition {
-	return _zendHashGetValidPos(ht, ht.GetNInternalPointer())
+	var pos, _ = ht.currentPos()
+	return pos
 }
 func ZendHashGetCurrentPos(ht *HashTable) HashPosition { return _zendHashGetCurrentPos(ht) }
 func ZendHashIteratorAdd(ht *HashTable, pos HashPosition) uint32 {

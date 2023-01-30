@@ -179,14 +179,19 @@ func (this *HashTable) Count() uint32 {
 	return num
 }
 
-func (this *HashTable) validPos(pos uint32) uint32 {
+func (this *HashTable) currentPos() (uint32, bool) {
+	return this.validPos(this.nInternalPointer)
+}
+
+func (this *HashTable) validPos(pos uint32) (uint32, bool) {
 	var dataSize = this.DataSize()
 	for ; pos < dataSize; pos++ {
 		if !this.data[pos].GetVal().IsType(IS_UNDEF) {
-			return pos
+			return pos, true
 		}
 	}
-	return pos // 没有有效pos，此时 pos == this.DataSize()
+	// 没有有效pos，此时 pos == this.DataSize()
+	return pos, false
 }
 
 // ----
