@@ -512,3 +512,59 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	p = this.appendBucketStr(key, pData)
 	return p.GetVal()
 }
+
+/**
+ * Delete
+ */
+func (this *HashTable) KeyDelete(key string) bool {
+	if idx, ok := this.keyMap[key]; ok {
+		this.deleteBucket(idx)
+		return true
+	}
+	return false
+}
+
+func (this *HashTable) IndexDelete(index int) bool {
+	if idx, ok := this.indexMap[index]; ok {
+		this.deleteBucket(idx)
+		return true
+	}
+	return false
+}
+
+func (this *ZendArray) deleteBucket(pos uint32) {
+	ZEND_ASSERT(pos < this.DataSize())
+
+	var p = &this.data[pos]
+	ZEND_ASSERT(p.IsValid())
+
+	// 移除映射
+	this.deleteHash(p.key)
+
+	// 减少有效元素
+	this.nNumOfElements--
+
+	// 更新内部指针和遍历器指针
+	if this.nInternalPointer == pos || this.HasIterators() {
+		var newIdx = this.validPosVal(pos + 1)
+		if this.nInternalPointer == pos {
+			this.nInternalPointer = newIdx
+		}
+		ZendHashIteratorsUpdate(this, pos, newIdx)
+	}
+
+	// 析构函数
+	if this.pDestructor != nil {
+		var tmp Zval
+		ZVAL_COPY_VALUE(&tmp, p.GetVal())
+		this.GetPDestructor()(&tmp)
+	}
+
+	// 设置数据不可用
+	p.SetInvalid()
+
+	// 若删除队尾元素，尝试清除 data 队尾无用数据
+	if this.DataSize()-1 == pos {
+		this.removeInvalidTail()
+	}
+}

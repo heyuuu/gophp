@@ -39,6 +39,14 @@ func intBool(value bool) ZendBool {
 	}
 }
 
+func resultCode(value bool) ZEND_RESULT_CODE {
+	if value {
+		return SUCCESS
+	} else {
+		return FAILURE
+	}
+}
+
 const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1
