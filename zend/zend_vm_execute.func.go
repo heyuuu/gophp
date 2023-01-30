@@ -1874,7 +1874,11 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 			var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 			ZEND_ASSERT(__fill_ht.HasUFlags(HASH_FLAG_PACKED))
 			for {
-				ZEND_HASH_FILL_ADD(p)
+				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
+				__fill_bkt.SetH(__fill_idx)
+				__fill_bkt.SetKey(nil)
+				__fill_bkt++
+				__fill_idx++
 				p++
 				if p == end {
 					break
@@ -2232,7 +2236,11 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 					if Z_OPT_REFCOUNTED_P(param) {
 						Z_ADDREF_P(param)
 					}
-					ZEND_HASH_FILL_ADD(param)
+					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
+					__fill_bkt.SetH(__fill_idx)
+					__fill_bkt.SetKey(nil)
+					__fill_bkt++
+					__fill_idx++
 					param++
 					if b.PreInc(&arg_num) > arg_count {
 						break
@@ -2243,7 +2251,11 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 					if Z_OPT_REFCOUNTED_P(param) {
 						Z_ADDREF_P(param)
 					}
-					ZEND_HASH_FILL_ADD(param)
+					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
+					__fill_bkt.SetH(__fill_idx)
+					__fill_bkt.SetKey(nil)
+					__fill_bkt++
+					__fill_idx++
 					param++
 					if b.PreInc(&arg_num) > arg_count {
 						break
@@ -8049,11 +8061,14 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData)
 					if Z_OPT_REFCOUNTED_P(q) {
 						Z_ADDREF_P(q)
 					}
-					ZEND_HASH_FILL_SET(q)
+					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
-					ZEND_HASH_FILL_SET_NULL()
+					ZVAL_NULL(__fill_bkt.GetVal())
 				}
-				ZEND_HASH_FILL_NEXT()
+				__fill_bkt.SetH(__fill_idx)
+				__fill_bkt.SetKey(nil)
+				__fill_bkt++
+				__fill_idx++
 				p++
 				i++
 			}
@@ -8071,11 +8086,14 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData)
 				if Z_OPT_REFCOUNTED_P(q) {
 					Z_ADDREF_P(q)
 				}
-				ZEND_HASH_FILL_SET(q)
+				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
-				ZEND_HASH_FILL_SET_NULL()
+				ZVAL_NULL(__fill_bkt.GetVal())
 			}
-			ZEND_HASH_FILL_NEXT()
+			__fill_bkt.SetH(__fill_idx)
+			__fill_bkt.SetKey(nil)
+			__fill_bkt++
+			__fill_idx++
 			p++
 			i++
 		}
@@ -30436,11 +30454,14 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData
 					if Z_OPT_REFCOUNTED_P(q) {
 						Z_ADDREF_P(q)
 					}
-					ZEND_HASH_FILL_SET(q)
+					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
-					ZEND_HASH_FILL_SET_NULL()
+					ZVAL_NULL(__fill_bkt.GetVal())
 				}
-				ZEND_HASH_FILL_NEXT()
+				__fill_bkt.SetH(__fill_idx)
+				__fill_bkt.SetKey(nil)
+				__fill_bkt++
+				__fill_idx++
 				p++
 				i++
 			}
@@ -30458,11 +30479,14 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData
 				if Z_OPT_REFCOUNTED_P(q) {
 					Z_ADDREF_P(q)
 				}
-				ZEND_HASH_FILL_SET(q)
+				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
-				ZEND_HASH_FILL_SET_NULL()
+				ZVAL_NULL(__fill_bkt.GetVal())
 			}
-			ZEND_HASH_FILL_NEXT()
+			__fill_bkt.SetH(__fill_idx)
+			__fill_bkt.SetKey(nil)
+			__fill_bkt++
+			__fill_idx++
 			p++
 			i++
 		}

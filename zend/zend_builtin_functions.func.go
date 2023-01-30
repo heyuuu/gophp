@@ -175,11 +175,14 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 					if Z_OPT_REFCOUNTED_P(q) {
 						Z_ADDREF_P(q)
 					}
-					ZEND_HASH_FILL_SET(q)
+					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
-					ZEND_HASH_FILL_SET_NULL()
+					ZVAL_NULL(__fill_bkt.GetVal())
 				}
-				ZEND_HASH_FILL_NEXT()
+				__fill_bkt.SetH(__fill_idx)
+				__fill_bkt.SetKey(nil)
+				__fill_bkt++
+				__fill_idx++
 				p++
 				i++
 			}
@@ -192,11 +195,14 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 				if Z_OPT_REFCOUNTED_P(q) {
 					Z_ADDREF_P(q)
 				}
-				ZEND_HASH_FILL_SET(q)
+				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
-				ZEND_HASH_FILL_SET_NULL()
+				ZVAL_NULL(__fill_bkt.GetVal())
 			}
-			ZEND_HASH_FILL_NEXT()
+			__fill_bkt.SetH(__fill_idx)
+			__fill_bkt.SetKey(nil)
+			__fill_bkt++
+			__fill_idx++
 			p++
 			i++
 		}
@@ -2506,11 +2512,14 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 						if Z_OPT_REFCOUNTED_P(arg) {
 							Z_ADDREF_P(arg)
 						}
-						ZEND_HASH_FILL_SET(arg)
+						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), arg)
 					} else {
-						ZEND_HASH_FILL_SET_NULL()
+						ZVAL_NULL(__fill_bkt.GetVal())
 					}
-					ZEND_HASH_FILL_NEXT()
+					__fill_bkt.SetH(__fill_idx)
+					__fill_bkt.SetKey(nil)
+					__fill_bkt++
+					__fill_idx++
 					i++
 				}
 			} else {
@@ -2519,11 +2528,14 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 						if Z_OPT_REFCOUNTED_P(p) {
 							Z_ADDREF_P(p)
 						}
-						ZEND_HASH_FILL_SET(p)
+						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 					} else {
-						ZEND_HASH_FILL_SET_NULL()
+						ZVAL_NULL(__fill_bkt.GetVal())
 					}
-					ZEND_HASH_FILL_NEXT()
+					__fill_bkt.SetH(__fill_idx)
+					__fill_bkt.SetKey(nil)
+					__fill_bkt++
+					__fill_idx++
 					p++
 					i++
 				}
@@ -2535,11 +2547,14 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 				if Z_OPT_REFCOUNTED_P(p) {
 					Z_ADDREF_P(p)
 				}
-				ZEND_HASH_FILL_SET(p)
+				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 			} else {
-				ZEND_HASH_FILL_SET_NULL()
+				ZVAL_NULL(__fill_bkt.GetVal())
 			}
-			ZEND_HASH_FILL_NEXT()
+			__fill_bkt.SetH(__fill_idx)
+			__fill_bkt.SetKey(nil)
+			__fill_bkt++
+			__fill_idx++
 			p++
 			i++
 		}
