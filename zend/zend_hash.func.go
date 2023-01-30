@@ -622,115 +622,39 @@ func ZendHashStrAddEmptyElement(ht *HashTable, str *byte, len_ int) *Zval {
 	return ht.KeyAdd(b.CastStr(str, len_), &dummy)
 }
 func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
-	var nIndex uint32
-	var idx uint32
-	var i uint32
-	var p *Bucket
-	var arData *Bucket
-	ht.assertRc1()
-	p = ht.KeyFindBucket(key.GetStr())
-	if p != nil {
-		if p == b {
-			return p.GetVal()
-		} else {
-			return nil
-		}
-	}
-	key.AddRefcount()
-	ht.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	arData = ht.GetArData()
-
-	/* del from hash */
-
-	idx = HT_IDX_TO_HASH(b - arData)
-	nIndex = b.GetH() | ht.GetNTableMask()
-	i = HT_HASH_EX(arData, nIndex)
-	if i == idx {
-		HT_HASH_EX(arData, nIndex) = b.GetVal().GetNext()
-	} else {
-		p = HT_HASH_TO_BUCKET_EX(arData, i)
-		for p.GetVal().GetNext() != idx {
-			i = p.GetVal().GetNext()
-			p = HT_HASH_TO_BUCKET_EX(arData, i)
-		}
-		p.GetVal().GetNext() = b.GetVal().GetNext()
-	}
-	ZendStringRelease(b.GetKey())
-
-	/* add to hash */
-
-	idx = b - arData
-	b.SetKey(key)
-	b.SetH(key.GetH())
-	nIndex = b.GetH() | ht.GetNTableMask()
-	idx = HT_IDX_TO_HASH(idx)
-	i = HT_HASH_EX(arData, nIndex)
-	if i == HT_INVALID_IDX || i < idx {
-		b.GetVal().GetNext() = i
-		HT_HASH_EX(arData, nIndex) = idx
-	} else {
-		p = HT_HASH_TO_BUCKET_EX(arData, i)
-		for p.GetVal().GetNext() != HT_INVALID_IDX && p.GetVal().GetNext() > idx {
-			i = p.GetVal().GetNext()
-			p = HT_HASH_TO_BUCKET_EX(arData, i)
-		}
-		b.GetVal().GetNext() = p.GetVal().GetNext()
-		p.GetVal().GetNext() = idx
-	}
-	return b.GetVal()
+	return ht.SetBucketKey(b, key.GetStr())
 }
 func ZendHashDelBucket(ht *HashTable, p *Bucket) {
 	ht.assertRc1()
-	ht.deleteBucket(HT_IDX_TO_HASH(p - ht.GetArData()))
+	// todo 调整为传入 pos 更合适
+	if pos, ok := ht.posBucket(p); ok {
+		ht.deleteBucket(pos)
+	}
 }
 func ZendHashDel(ht *HashTable, key *ZendString) int {
 	var strKey = key.GetStr()
-	if idx, ok := ht.keyMap[strKey]; ok {
-		ht.deleteBucket(idx)
+	if ht.KeyDelete(strKey) {
 		return SUCCESS
 	}
 	return FAILURE
 }
 func ZendHashDelInd(ht *HashTable, key *ZendString) int {
-	ht.assertRc1()
 	var strKey = key.GetStr()
-	if idx, ok := ht.keyMap[strKey]; ok {
-		var p = &ht.data[idx]
-		p = HT_HASH_TO_BUCKET(ht, idx)
-		if p.GetVal().IsType(IS_INDIRECT) {
-			var data *Zval = p.GetVal().GetZv()
-			if data.IsType(IS_UNDEF) {
-				return FAILURE
-			} else {
-				if ht.GetPDestructor() != nil {
-					var tmp Zval
-					ZVAL_COPY_VALUE(&tmp, data)
-					ZVAL_UNDEF(data)
-					ht.GetPDestructor()(&tmp)
-				} else {
-					ZVAL_UNDEF(data)
-				}
-				ht.AddUFlags(HASH_FLAG_HAS_EMPTY_IND)
-			}
-		} else {
-			ht.deleteBucket(idx)
-		}
+	if ht.KeyDeleteIndirect(strKey) {
 		return SUCCESS
 	}
 	return FAILURE
 }
 func ZendHashStrDel(ht *HashTable, str *byte, len_ int) int {
 	var strKey = b.CastStr(str, len_)
-	if idx, ok := ht.keyMap[strKey]; ok {
-		ht.deleteBucket(idx)
+	if ht.KeyDelete(strKey) {
 		return SUCCESS
 	}
 	return FAILURE
 }
 func ZendHashIndexDel(ht *HashTable, h ZendUlong) int {
 	var index = int(h)
-	if idx, ok := ht.indexMap[index]; ok {
-		ht.deleteBucket(idx)
+	if ht.IndexDelete(index) {
 		return SUCCESS
 	}
 	return FAILURE

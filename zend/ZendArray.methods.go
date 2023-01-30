@@ -4,6 +4,51 @@ import (
 	b "sik/builtin"
 )
 
+func (this *HashTable) posBucket(p *Bucket) (uint32, bool) {
+	if p.IsStrKey() {
+		if pos, ok := this.keyMap[p.StrKey()]; ok {
+			return pos, true
+		}
+		return 0, false
+	} else {
+		if pos, ok := this.indexMap[p.IndexKey()]; ok {
+			return pos, true
+		}
+		return 0, false
+	}
+}
+
+func (this *HashTable) SetBucketKey(b *Bucket, key string) *Zval {
+	this.assertRc1()
+
+	// 若已存在此key，与设置值相同则返回 val；否则返回 nil (设置失败)
+	var p = this.KeyFindBucket(key)
+	if p != nil {
+		if p == b {
+			return p.GetVal()
+		} else {
+			return nil
+		}
+	}
+
+	// 定义 bucket 位置；若 bucket 不在数据内，返回 nil
+	var pos, ok = this.posBucket(b)
+	if !ok {
+		return nil
+	}
+
+	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
+
+	/* del from hash */
+	this.deleteHash(b.key)
+
+	/* add to hash */
+	b.SetStrKey(key)
+	this.addHash(b.key, pos)
+
+	return b.GetVal()
+}
+
 func (this *ZendArray) addHash(key ZendArrayKey, pos uint32) {
 	if key.IsStrKey() {
 		this.keyMap[key.GetKey()] = pos

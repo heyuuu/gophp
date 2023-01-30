@@ -93,6 +93,12 @@ func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
 func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
 func (this *Bucket) StrKey() string   { return this.key.GetKey() }
 func (this *Bucket) IndexKey() int    { return this.key.GetIndex() }
+func (this *Bucket) SetStrKey(key string) {
+	this.key = NewStrKey(key)
+}
+func (this *Bucket) SetIndexKey(index int) {
+	this.key = NewIndexKey(index)
+}
 
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove
@@ -524,6 +530,33 @@ func (this *HashTable) KeyDelete(key string) bool {
 	return false
 }
 
+func (this *HashTable) KeyDeleteIndirect(key string) bool {
+	this.assertRc1()
+	if idx, ok := this.keyMap[key]; ok {
+		var p = &this.data[idx]
+		if p.GetVal().IsType(IS_INDIRECT) {
+			var data *Zval = p.GetVal().GetZv()
+			if data.IsType(IS_UNDEF) {
+				return false
+			} else {
+				if this.GetPDestructor() != nil {
+					var tmp Zval
+					ZVAL_COPY_VALUE(&tmp, data)
+					ZVAL_UNDEF(data)
+					this.GetPDestructor()(&tmp)
+				} else {
+					ZVAL_UNDEF(data)
+				}
+				this.AddUFlags(HASH_FLAG_HAS_EMPTY_IND)
+			}
+		} else {
+			this.deleteBucket(idx)
+		}
+		return true
+	}
+	return false
+}
+
 func (this *HashTable) IndexDelete(index int) bool {
 	if idx, ok := this.indexMap[index]; ok {
 		this.deleteBucket(idx)
@@ -533,6 +566,7 @@ func (this *HashTable) IndexDelete(index int) bool {
 }
 
 func (this *ZendArray) deleteBucket(pos uint32) {
+	ht.assertRc1()
 	ZEND_ASSERT(pos < this.DataSize())
 
 	var p = &this.data[pos]
