@@ -393,7 +393,7 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 	ZVAL_ARR(&globals, __EG().GetSymbolTable())
 	globals.SetTypeFlags(0)
 	ZVAL_NEW_REF(&globals, &globals)
-	ZendHashUpdate(__EG().GetSymbolTable(), name.GetStr(), &globals)
+	__EG().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
 	return 0
 }
 func ZendStartup(utility_functions *ZendUtilityFunctions) int {

@@ -357,9 +357,9 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = zend.ZendHashUpdate(ht, key.GetStr().GetStr(), &d)
+					data = ht.KeyUpdate(key.GetStr().GetStr(), &d)
 				} else {
-					data = zend.ZendHashAddNew(ht, key.GetStr().GetStr(), &d)
+					data = ht.KeyAddNew(key.GetStr().GetStr(), &d)
 				}
 			} else {
 				zend.ZvalPtrDtor(&key)
@@ -407,7 +407,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)
 						VarPushDtor(var_hash, old_data)
-						data = zend.ZendHashUpdateInd(ht, key.GetStr().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.GetStr().GetStr(), &d)
 						if info != nil {
 
 							/* Remember to which property this slot belongs, so we can add a
@@ -421,10 +421,10 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 						}
 					} else {
 						VarPushDtor(var_hash, old_data)
-						data = zend.ZendHashUpdateInd(ht, key.GetStr().GetStr(), &d)
+						data = ht.KeyUpdateIndirect(key.GetStr().GetStr(), &d)
 					}
 				} else {
-					data = zend.ZendHashAddNew(ht, key.GetStr().GetStr(), &d)
+					data = ht.KeyAddNew(key.GetStr().GetStr(), &d)
 				}
 			} else if key.IsType(zend.IS_LONG) {
 

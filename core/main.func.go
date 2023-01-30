@@ -665,7 +665,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.ZendHashStrUpdateInd(zend.__EG().GetSymbolTable(), b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
+			zend.__EG().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
 		}
 	}
 	if replace_buffer != nil {
@@ -950,7 +950,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.ZendHashStrUpdateInd(zend.__EG().GetSymbolTable(), b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
+			zend.__EG().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
 		}
 	}
 	zend.Efree(buffer)

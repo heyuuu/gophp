@@ -670,7 +670,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		entry.GetCounted().AddRefcountEx(2)
 	}
 	return_value.GetArr().IndexAddNewH(1, entry)
-	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_VALUE).GetStr(), entry)
+	return_value.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_VALUE).GetStr(), entry)
 
 	/* add the key elements */
 
@@ -681,7 +681,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		ZVAL_LONG(&tmp, num_key)
 	}
 	return_value.GetArr().IndexAddNewH(0, &tmp)
-	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_KEY).GetStr(), &tmp)
+	return_value.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_KEY).GetStr(), &tmp)
 	ZendHashMoveForward(target_hash)
 }
 func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
@@ -852,7 +852,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 
 		ZVAL_DEREF(val)
 		if key != nil {
-			new_val = ZendHashAddNew(dst.GetArr(), key.GetStr(), val)
+			new_val = dst.GetArr().KeyAddNew(key.GetStr(), val)
 		} else {
 			new_val = dst.GetArr().IndexAddNewH(idx, val)
 		}
@@ -1342,7 +1342,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 				return
 			}
 		}
-		ZendHashAddNew(return_value.GetArr(), key.GetStr(), prop)
+		return_value.GetArr().KeyAddNew(key.GetStr(), prop)
 	}
 }
 func ZifGetClassVars(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1502,7 +1502,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 				 * private, numeric properties. Well, too bad.
 				 */
 
-				ZendHashStrAddNew(return_value.GetArr(), b.CastStr(prop_name, prop_len), value)
+				return_value.GetArr().KeyAddNew(b.CastStr(prop_name, prop_len), value)
 
 				/* We assume here that a mangled property name is never
 				 * numeric. This is probably a safe assumption, but
@@ -2227,8 +2227,8 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 		}
 	}
-	ZendHashStrAddNew(return_value.GetArr(), b.CastStr("internal", b.SizeOf("\"internal\"")-1), &internal)
-	ZendHashStrAddNew(return_value.GetArr(), b.CastStr("user", b.SizeOf("\"user\"")-1), &user)
+	return_value.GetArr().KeyAddNew(b.CastStr("internal", b.SizeOf("\"internal\"")-1), &internal)
+	return_value.GetArr().KeyAddNew(b.CastStr("user", b.SizeOf("\"user\"")-1), &user)
 }
 func ZifGetDefinedVars(execute_data *ZendExecuteData, return_value *Zval) {
 	var symbol_table *ZendArray
@@ -2457,7 +2457,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 				AddAssocZval(return_value, module_names[module_number], &modules[module_number])
 			}
 			ZVAL_COPY_OR_DUP(&const_val, val.GetValue())
-			ZendHashAddNew(modules[module_number].GetArr(), val.GetName().GetStr(), &const_val)
+			modules[module_number].GetArr().KeyAddNew(val.GetName().GetStr(), &const_val)
 		}
 		Efree(module_names)
 		Efree(modules)
@@ -2479,7 +2479,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 
 			}
 			ZVAL_COPY_OR_DUP(&const_val, constant.GetValue())
-			ZendHashAddNew(return_value.GetArr(), constant.GetName().GetStr(), &const_val)
+			return_value.GetArr().KeyAddNew(constant.GetName().GetStr(), &const_val)
 		}
 	}
 }
@@ -2839,9 +2839,9 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				lineno = skip.GetOpline().GetLineno()
 			}
 			ZVAL_STR_COPY(&tmp, filename)
-			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
 			ZVAL_LONG(&tmp, lineno)
-			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
 		} else {
 			var prev_call *ZendExecuteData = skip
 			var prev *ZendExecuteData = skip.GetPrevExecuteData()
@@ -2851,9 +2851,9 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {
 					ZVAL_STR_COPY(&tmp, prev.GetFunc().GetOpArray().GetFilename())
-					ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
 					ZVAL_LONG(&tmp, prev.GetOpline().GetLineno())
-					ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
 					break
 				}
 				prev_call = prev
@@ -2882,7 +2882,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 		}
 		if function_name != nil {
 			ZVAL_STR_COPY(&tmp, function_name)
-			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
 					ZVAL_STR_COPY(&tmp, func_.GetScope().GetName())
@@ -2891,23 +2891,23 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				} else {
 					ZVAL_STR(&tmp, object.GetHandlers().GetGetClassName()(object))
 				}
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
 					ZVAL_OBJ(&tmp, object)
-					ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_OBJECT).GetStr(), &tmp)
+					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_OBJECT).GetStr(), &tmp)
 					Z_ADDREF(tmp)
 				}
 				ZVAL_INTERNED_STR(&tmp, ZSTR_KNOWN(ZEND_STR_OBJECT_OPERATOR))
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
 			} else if func_.GetScope() != nil {
 				ZVAL_STR_COPY(&tmp, func_.GetScope().GetName())
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
 				ZVAL_INTERNED_STR(&tmp, ZSTR_KNOWN(ZEND_STR_PAAMAYIM_NEKUDOTAYIM))
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
 			}
 			if (options&DEBUG_BACKTRACE_IGNORE_ARGS) == 0 && func_.GetType() != ZEND_EVAL_CODE {
 				DebugBacktraceGetArgs(call, &tmp)
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_ARGS).GetStr(), &tmp)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_ARGS).GetStr(), &tmp)
 			}
 		} else {
 
@@ -2959,10 +2959,10 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 
 				ZVAL_STR_COPY(&tmp, include_filename)
 				arg_array.GetArr().NextIndexInsertNew(&tmp)
-				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_ARGS).GetStr(), &arg_array)
+				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_ARGS).GetStr(), &arg_array)
 			}
 			ZVAL_INTERNED_STR(&tmp, pseudo_function_name)
-			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
+			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
 		}
 		return_value.GetArr().NextIndexInsertNew(&stack_frame)
 		include_filename = filename

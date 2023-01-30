@@ -1145,19 +1145,19 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 
 		/* Store string indexes referencing the same zval*/
 
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[0], strlen(stat_sb_names[0])), &stat_dev)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[1], strlen(stat_sb_names[1])), &stat_ino)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[2], strlen(stat_sb_names[2])), &stat_mode)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[3], strlen(stat_sb_names[3])), &stat_nlink)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[4], strlen(stat_sb_names[4])), &stat_uid)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[5], strlen(stat_sb_names[5])), &stat_gid)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[6], strlen(stat_sb_names[6])), &stat_rdev)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[7], strlen(stat_sb_names[7])), &stat_size)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[8], strlen(stat_sb_names[8])), &stat_atime)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[9], strlen(stat_sb_names[9])), &stat_mtime)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[10], strlen(stat_sb_names[10])), &stat_ctime)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[11], strlen(stat_sb_names[11])), &stat_blksize)
-		zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[12], strlen(stat_sb_names[12])), &stat_blocks)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[0], strlen(stat_sb_names[0])), &stat_dev)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[1], strlen(stat_sb_names[1])), &stat_ino)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[2], strlen(stat_sb_names[2])), &stat_mode)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[3], strlen(stat_sb_names[3])), &stat_nlink)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[4], strlen(stat_sb_names[4])), &stat_uid)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[5], strlen(stat_sb_names[5])), &stat_gid)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[6], strlen(stat_sb_names[6])), &stat_rdev)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[7], strlen(stat_sb_names[7])), &stat_size)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[8], strlen(stat_sb_names[8])), &stat_atime)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[9], strlen(stat_sb_names[9])), &stat_mtime)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[10], strlen(stat_sb_names[10])), &stat_ctime)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[11], strlen(stat_sb_names[11])), &stat_blksize)
+		return_value.GetArr().KeyAddNew(b.CastStr(stat_sb_names[12], strlen(stat_sb_names[12])), &stat_blocks)
 		return
 	}
 	core.PhpErrorDocref(nil, zend.E_WARNING, "Didn't understand stat call")
@@ -2490,7 +2490,7 @@ func ZifRealpathCacheGet(execute_data *zend.ZendExecuteData, return_value *zend.
 			zend.AddAssocBoolEx(&entry, "is_dir", b.SizeOf("\"is_dir\"")-1, bucket.GetIsDir())
 			zend.AddAssocStringlEx(&entry, "realpath", b.SizeOf("\"realpath\"")-1, bucket.GetRealpath(), bucket.GetRealpathLen())
 			zend.AddAssocLongEx(&entry, "expires", b.SizeOf("\"expires\"")-1, bucket.GetExpires())
-			zend.ZendHashStrUpdate(return_value.GetArr(), b.CastStr(bucket.GetPath(), bucket.GetPathLen()), &entry)
+			return_value.GetArr().KeyUpdate(b.CastStr(bucket.GetPath(), bucket.GetPathLen()), &entry)
 			bucket = bucket.GetNext()
 		}
 		buckets++

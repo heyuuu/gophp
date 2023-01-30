@@ -55,7 +55,7 @@ func SplAddClassName(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_fl
 		if b.Assign(&tmp, list.GetArr().FindByZendString(pce.GetName())) == nil {
 			var t zend.Zval
 			zend.ZVAL_STR_COPY(&t, pce.GetName())
-			zend.ZendHashAdd(list.GetArr(), pce.GetName().GetStr(), &t)
+			list.GetArr().KeyAdd(pce.GetName().GetStr(), &t)
 		}
 	}
 }

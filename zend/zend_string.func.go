@@ -191,7 +191,7 @@ func ZendAddInternedString(str *ZendString, interned_strings *HashTable, flags u
 	str.SetRefcount(1)
 	str.AddGcFlags(IS_STR_INTERNED | flags)
 	ZVAL_INTERNED_STR(&val, str)
-	ZendHashAddNew(interned_strings, str, &val)
+	interned_strings.KeyAddNew(str.GetStr(), &val)
 	return str
 }
 func ZendNewInternedStringPermanent(str *ZendString) *ZendString {

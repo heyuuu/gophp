@@ -196,16 +196,16 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTa
 	var i uint32
 	var ht *zend.HashTable = zend.ZendNewArray(8)
 	zend.ZVAL_STR(&tmp, BrowscapConvertPattern(entry.GetPattern(), 0))
-	zend.ZendHashStrAdd(ht, b.CastStr("browser_name_regex", b.SizeOf("\"browser_name_regex\"")-1), &tmp)
+	ht.KeyAdd(b.CastStr("browser_name_regex", b.SizeOf("\"browser_name_regex\"")-1), &tmp)
 	zend.ZVAL_STR_COPY(&tmp, entry.GetPattern())
-	zend.ZendHashStrAdd(ht, b.CastStr("browser_name_pattern", b.SizeOf("\"browser_name_pattern\"")-1), &tmp)
+	ht.KeyAdd(b.CastStr("browser_name_pattern", b.SizeOf("\"browser_name_pattern\"")-1), &tmp)
 	if entry.GetParent() != nil {
 		zend.ZVAL_STR_COPY(&tmp, entry.GetParent())
-		zend.ZendHashStrAdd(ht, b.CastStr("parent", b.SizeOf("\"parent\"")-1), &tmp)
+		ht.KeyAdd(b.CastStr("parent", b.SizeOf("\"parent\"")-1), &tmp)
 	}
 	for i = entry.GetKvStart(); i < entry.GetKvEnd(); i++ {
 		zend.ZVAL_STR_COPY(&tmp, bdata.GetKv()[i].GetValue())
-		zend.ZendHashAdd(ht, bdata.GetKv()[i].GetKey().GetStr(), &tmp)
+		ht.KeyAdd(bdata.GetKv()[i].GetKey().GetStr(), &tmp)
 	}
 	return ht
 }

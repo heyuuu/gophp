@@ -2880,7 +2880,7 @@ func PhpExtractRefOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) z
 			} else {
 				zend.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 		}
 		count++
 	}
@@ -2928,7 +2928,7 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 		} else {
 			zend.ZVAL_DEREF(entry)
 			zend.Z_TRY_ADDREF_P(entry)
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 		}
 		count++
 	}
@@ -2987,7 +2987,7 @@ func PhpExtractRefPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArr
 						zend.ZvalPtrDtor(orig_var)
 						zend.ZVAL_REF(orig_var, entry.GetRef())
 					} else {
-						zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+						symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 					}
 					count++
 				}
@@ -3045,7 +3045,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 						}
 					} else {
 						zend.Z_TRY_ADDREF_P(entry)
-						zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+						symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 					}
 					count++
 				}
@@ -3112,7 +3112,7 @@ func PhpExtractRefPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 						zend.ZvalPtrDtor(orig_var)
 						zend.ZVAL_REF(orig_var, entry.GetRef())
 					} else {
-						zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+						symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 					}
 					count++
 				}
@@ -3130,7 +3130,7 @@ func PhpExtractRefPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 			} else {
 				zend.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
 		}
 	}
@@ -3188,7 +3188,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 						}
 					} else {
 						zend.Z_TRY_ADDREF_P(entry)
-						zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+						symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 					}
 					count++
 				}
@@ -3203,7 +3203,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 			}
 			zend.ZVAL_DEREF(entry)
 			zend.Z_TRY_ADDREF_P(entry)
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
 		}
 	}
@@ -3255,7 +3255,7 @@ func PhpExtractRefPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, p
 					zend.ZvalPtrDtor(orig_var)
 					zend.ZVAL_REF(orig_var, entry.GetRef())
 				} else {
-					zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+					symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 				}
 				count++
 			}
@@ -3310,7 +3310,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 					}
 				} else {
 					zend.Z_TRY_ADDREF_P(entry)
-					zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+					symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 				}
 				count++
 			}
@@ -3373,7 +3373,7 @@ func PhpExtractRefPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArra
 				zend.ZvalPtrDtor(orig_var)
 				zend.ZVAL_REF(orig_var, entry.GetRef())
 			} else {
-				zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+				symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 			}
 			count++
 		}
@@ -3435,7 +3435,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 				}
 			} else {
 				zend.Z_TRY_ADDREF_P(entry)
-				zend.ZendHashAddNew(symbol_table, final_name.GetStr().GetStr(), entry)
+				symbol_table.KeyAddNew(final_name.GetStr().GetStr(), entry)
 			}
 			count++
 		}
@@ -3488,7 +3488,7 @@ func PhpExtractRefSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Z
 			} else {
 				zend.ZVAL_MAKE_REF_EX(entry, 2)
 			}
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
 		}
 	}
@@ -3531,7 +3531,7 @@ func PhpExtractSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Zend
 		} else {
 			zend.ZVAL_DEREF(entry)
 			zend.Z_TRY_ADDREF_P(entry)
-			zend.ZendHashAddNew(symbol_table, var_name.GetStr(), entry)
+			symbol_table.KeyAddNew(var_name.GetStr(), entry)
 			count++
 		}
 	}
@@ -3712,13 +3712,13 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 		if b.Assign(&value_ptr, zend.ZendHashFindInd(eg_active_symbol_table, entry.GetStr())) != nil {
 			zend.ZVAL_DEREF(value_ptr)
 			zend.Z_TRY_ADDREF_P(value_ptr)
-			zend.ZendHashUpdate(return_value.GetArr(), entry.GetStr().GetStr(), value_ptr)
+			return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(entry.GetStr(), "this") {
 			var object *zend.ZendObject = zend.ZendGetThisObject(zend.__EG().GetCurrentExecuteData())
 			if object != nil {
 				object.AddRefcount()
 				zend.ZVAL_OBJ(&data, object)
-				zend.ZendHashUpdate(return_value.GetArr(), entry.GetStr().GetStr(), &data)
+				return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), &data)
 			}
 		} else {
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "Undefined variable: %s", zend.Z_STR_P(entry).GetVal())
@@ -4651,7 +4651,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 		if p.GetKey() == nil {
 			out_hash.NextIndexInsertNew(entry)
 		} else {
-			zend.ZendHashAddNew(&out_hash, p.GetKey().GetStr(), entry)
+			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
 		}
 		if idx == iter_pos {
 			if zend.ZendLong(idx != pos) != 0 {
@@ -4677,7 +4677,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 				removed.NextIndexInsertNew(entry)
 				zend.ZendHashDelBucket(in_hash, p)
 			} else {
-				zend.ZendHashAddNew(removed, p.GetKey().GetStr(), entry)
+				removed.KeyAddNew(p.GetKey().GetStr(), entry)
 				if in_hash == zend.__EG().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
@@ -4732,7 +4732,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 		if p.GetKey() == nil {
 			out_hash.NextIndexInsertNew(entry)
 		} else {
-			zend.ZendHashAddNew(&out_hash, p.GetKey().GetStr(), entry)
+			out_hash.KeyAddNew(p.GetKey().GetStr(), entry)
 		}
 		if idx == iter_pos {
 			if zend.ZendLong(idx != pos) != 0 {
@@ -5235,7 +5235,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		key = _p.GetKey()
 		value = _z
 		if key != nil {
-			zend.ZendHashAddNew(&new_hash, key.GetStr(), value)
+			new_hash.KeyAddNew(key.GetStr(), value)
 		} else {
 			new_hash.NextIndexInsertNew(value)
 		}
@@ -5552,7 +5552,7 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			break
 		}
 		if string_key != nil {
-			entry = zend.ZendHashAddNew(return_value.GetArr(), string_key.GetStr(), entry)
+			entry = return_value.GetArr().KeyAddNew(string_key.GetStr(), entry)
 		} else {
 			if preserve_keys != 0 {
 				entry = return_value.GetArr().IndexAddNewH(num_key, entry)
@@ -5623,7 +5623,7 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				}
 				zend.ZvalPtrDtor(&tmp)
 			} else {
-				var zv *zend.Zval = zend.ZendHashAddNew(dest, string_key.GetStr(), src_entry)
+				var zv *zend.Zval = dest.KeyAddNew(string_key.GetStr(), src_entry)
 				zend.ZvalAddRef(zv)
 			}
 		} else {
@@ -5673,7 +5673,7 @@ func PhpArrayMerge(dest *zend.HashTable, src *zend.HashTable) int {
 			}
 			zend.Z_TRY_ADDREF_P(src_entry)
 			if string_key != nil {
-				zend.ZendHashUpdate(dest, string_key.GetStr(), src_entry)
+				dest.KeyUpdate(string_key.GetStr(), src_entry)
 			} else {
 				dest.NextIndexInsertNew(src_entry)
 			}
@@ -5700,7 +5700,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 		zend.ZVAL_DEREF(src_zval)
 		if string_key != nil {
 			if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, dest.FindByZendString(string_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(zend.Z_ISREF_P(dest_entry)) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
-				var zv *zend.Zval = zend.ZendHashUpdate(dest, string_key.GetStr(), src_entry)
+				var zv *zend.Zval = dest.KeyUpdate(string_key.GetStr(), src_entry)
 				zend.ZvalAddRef(zv)
 				continue
 			}
@@ -6806,7 +6806,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 						zend.ZendTmpStringRelease(tmp_key)
 						break
 					case zend.IS_NULL:
-						zend.ZendHashUpdate(return_value.GetArr(), zend.ZSTR_EMPTY_ALLOC().GetStr(), colval)
+						return_value.GetArr().KeyUpdate(zend.ZSTR_EMPTY_ALLOC().GetStr(), colval)
 						break
 					case zend.IS_DOUBLE:
 						return_value.GetArr().IndexUpdateH(zend.ZendDvalToLval(keyval.GetDval()), colval)
@@ -6957,7 +6957,7 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			string_key = _p.GetKey()
 			entry = _z
 			if string_key != nil {
-				entry = zend.ZendHashAddNew(return_value.GetArr(), string_key.GetStr(), entry)
+				entry = return_value.GetArr().KeyAddNew(string_key.GetStr(), entry)
 			} else {
 				if preserve_keys != 0 {
 					entry = return_value.GetArr().IndexAddNewH(num_key, entry)
@@ -7151,7 +7151,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			value = _z
 			zend.Z_TRY_ADDREF_P(value)
 			if key != nil {
-				zend.ZendHashAddNew(return_value.GetArr(), key.GetStr(), value)
+				return_value.GetArr().KeyAddNew(key.GetStr(), value)
 			} else {
 				return_value.GetArr().NextIndexInsertNew(value)
 			}
@@ -7361,7 +7361,7 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 			} else {
 				new_key = PhpStringTolower(string_key)
 			}
-			entry = zend.ZendHashUpdate(return_value.GetArr(), new_key.GetStr(), entry)
+			entry = return_value.GetArr().KeyUpdate(new_key.GetStr(), entry)
 			zend.ZendStringReleaseEx(new_key, 0)
 		}
 		zend.ZvalAddRef(entry)
@@ -7500,7 +7500,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				}
 				zend.Z_TRY_ADDREF_P(val)
 				if str_key != nil {
-					zend.ZendHashAddNew(return_value.GetArr(), str_key.GetStr(), val)
+					return_value.GetArr().KeyAddNew(str_key.GetStr(), val)
 				} else {
 					return_value.GetArr().IndexAddNewH(num_key, val)
 				}
@@ -7664,7 +7664,7 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashUpdate(return_value.GetArr(), p.GetKey().GetStr(), val)
+				return_value.GetArr().KeyUpdate(p.GetKey().GetStr(), val)
 			}
 		}
 	}
@@ -8059,7 +8059,7 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			}
 			if ok != 0 {
 				zend.Z_TRY_ADDREF_P(val)
-				zend.ZendHashUpdate(return_value.GetArr(), p.GetKey().GetStr(), val)
+				return_value.GetArr().KeyUpdate(p.GetKey().GetStr(), val)
 			}
 		}
 	}
@@ -8564,7 +8564,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			value = _z
 			str = zend.ZvalGetTmpString(value, &tmp_str)
-			zend.ZendHashAdd(&exclude, str.GetStr(), &dummy)
+			exclude.KeyAdd(str.GetStr(), &dummy)
 			zend.ZendTmpStringRelease(tmp_str)
 		}
 	}
@@ -8587,7 +8587,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		str = zend.ZvalGetTmpString(value, &tmp_str)
 		if zend.ZendHashExists(&exclude, str) == 0 {
 			if key != nil {
-				value = zend.ZendHashAddNew(return_value.GetArr(), key.GetStr(), value)
+				value = return_value.GetArr().KeyAddNew(key.GetStr(), value)
 			} else {
 				value = return_value.GetArr().IndexAddNewH(idx, value)
 			}
@@ -9622,7 +9622,7 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			continue
 		}
 		if string_key != nil {
-			operand = zend.ZendHashUpdate(return_value.GetArr(), string_key.GetStr(), operand)
+			operand = return_value.GetArr().KeyUpdate(string_key.GetStr(), operand)
 		} else {
 			operand = return_value.GetArr().IndexUpdateH(num_key, operand)
 		}
@@ -10096,7 +10096,7 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 		if preserve_keys != 0 {
 			if str_key != nil {
-				entry = zend.ZendHashUpdate(chunk.GetArr(), str_key.GetStr(), entry)
+				entry = chunk.GetArr().KeyUpdate(str_key.GetStr(), entry)
 			} else {
 				entry = chunk.GetArr().IndexUpdateH(num_key, entry)
 			}

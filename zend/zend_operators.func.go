@@ -1000,7 +1000,7 @@ try_again:
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, op)
 		ObjectInit(op)
-		ZendHashAddNew(Z_OBJPROP_P(op), ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), &tmp)
+		Z_OBJPROP_P(op).KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), &tmp)
 		break
 	}
 }

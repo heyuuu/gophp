@@ -1891,13 +1891,13 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 				ZvalAddRef(slot)
 				if object.GetProperties() != nil {
 					ZVAL_INDIRECT(&tmp, slot)
-					ZendHashUpdate(object.GetProperties(), key.GetStr(), &tmp)
+					object.GetProperties().KeyUpdate(key.GetStr(), &tmp)
 				}
 			} else {
 				if object.GetProperties() == nil {
 					RebuildObjectProperties(object)
 				}
-				prop = ZendHashUpdate(object.GetProperties(), key.GetStr(), prop)
+				prop = object.GetProperties().KeyUpdate(key.GetStr(), prop)
 				ZvalAddRef(prop)
 			}
 		} else {
@@ -3103,7 +3103,7 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 	ZendAssertValidClassName(lcname)
 	lcname = ZendNewInternedString(lcname)
 	ZVAL_ALIAS_PTR(&zv, ce)
-	ret = ZendHashAdd(__CG().GetClassTable(), lcname.GetStr(), &zv)
+	ret = __CG().GetClassTable().KeyAdd(lcname.GetStr(), &zv)
 	ZendStringReleaseEx(lcname, 0)
 	if ret != nil {
 		if !ce.IsImmutable() {
@@ -3125,7 +3125,7 @@ func ZendSetHashSymbol(symbol *Zval, name *byte, name_length int, is_ref ZendBoo
 	va_start(symbol_table_list, num_symbol_tables)
 	for b.PostDec(&num_symbol_tables) > 0 {
 		symbol_table = __va_arg(symbol_table_list, (*HashTable)(_))
-		ZendHashStrUpdate(symbol_table, b.CastStr(name, name_length), symbol)
+		symbol_table.KeyUpdate(b.CastStr(name, name_length), symbol)
 		Z_TRY_ADDREF_P(symbol)
 	}
 	va_end(symbol_table_list)

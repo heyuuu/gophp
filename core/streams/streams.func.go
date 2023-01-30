@@ -1988,12 +1988,12 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	wrapperhash = context.GetOptions().GetArr().FindByStrPtr(wrappername, strlen(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
-		wrapperhash = zend.ZendHashStrUpdate(context.GetOptions().GetArr(), b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
+		wrapperhash = context.GetOptions().GetArr().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
 	}
 	zend.ZVAL_DEREF(optionvalue)
 	zend.Z_TRY_ADDREF_P(optionvalue)
 	zend.SEPARATE_ARRAY(wrapperhash)
-	zend.ZendHashStrUpdate(wrapperhash.GetArr(), b.CastStr(optionname, strlen(optionname)), optionvalue)
+	wrapperhash.GetArr().KeyUpdate(b.CastStr(optionname, strlen(optionname)), optionvalue)
 	return zend.SUCCESS
 }
 func PhpStreamDirentAlphasort(a **zend.ZendString, b **zend.ZendString) int {

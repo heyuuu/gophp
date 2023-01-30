@@ -2949,7 +2949,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			} else if expr.GetType() != IS_NULL {
 				ht = ZendNewArray(1)
 				Z_OBJ_P(result).SetProperties(ht)
-				expr = ZendHashAddNew(ht, ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_CONST == IS_CONST {
 					if Z_OPT_REFCOUNTED_P(expr) {
 						Z_ADDREF_P(expr)
@@ -4775,7 +4775,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -6749,7 +6749,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -7293,13 +7293,13 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, execute_data *Ze
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 		if type_ == BP_VAR_W {
-			retval = ZendHashAddNew(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+			retval = target_symbol_table.KeyAddNew(name.GetStr(), __EG().GetUninitializedZval())
 		} else if type_ == BP_VAR_IS {
 			retval = __EG().GetUninitializedZval()
 		} else {
 			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
-				retval = ZendHashUpdate(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+				retval = target_symbol_table.KeyUpdate(name.GetStr(), __EG().GetUninitializedZval())
 			} else {
 				retval = __EG().GetUninitializedZval()
 			}
@@ -7611,7 +7611,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -8916,7 +8916,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -14086,13 +14086,13 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, execute_data *Z
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 		if type_ == BP_VAR_W {
-			retval = ZendHashAddNew(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+			retval = target_symbol_table.KeyAddNew(name.GetStr(), __EG().GetUninitializedZval())
 		} else if type_ == BP_VAR_IS {
 			retval = __EG().GetUninitializedZval()
 		} else {
 			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
-				retval = ZendHashUpdate(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+				retval = target_symbol_table.KeyUpdate(name.GetStr(), __EG().GetUninitializedZval())
 			} else {
 				retval = __EG().GetUninitializedZval()
 			}
@@ -15450,7 +15450,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			} else if expr.GetType() != IS_NULL {
 				ht = ZendNewArray(1)
 				Z_OBJ_P(result).SetProperties(ht)
-				expr = ZendHashAddNew(ht, ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_TMP_VAR == IS_CONST {
 					if Z_OPT_REFCOUNTED_P(expr) {
 						Z_ADDREF_P(expr)
@@ -16011,7 +16011,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -16432,7 +16432,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -16910,7 +16910,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -17299,7 +17299,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -18259,7 +18259,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			} else if expr.GetType() != IS_NULL {
 				ht = ZendNewArray(1)
 				Z_OBJ_P(result).SetProperties(ht)
-				expr = ZendHashAddNew(ht, ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_VAR == IS_CONST {
 					if Z_OPT_REFCOUNTED_P(expr) {
 						Z_ADDREF_P(expr)
@@ -19591,7 +19591,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -19705,7 +19705,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -19820,7 +19820,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -19934,7 +19934,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -20740,7 +20740,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -21683,7 +21683,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -21799,7 +21799,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -21916,7 +21916,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -22032,7 +22032,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -22751,7 +22751,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -24229,7 +24229,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -25043,7 +25043,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -25157,7 +25157,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -25272,7 +25272,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -25386,7 +25386,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -26153,7 +26153,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -27213,7 +27213,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -27323,7 +27323,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -27434,7 +27434,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -27544,7 +27544,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -28792,7 +28792,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -28904,7 +28904,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -29017,7 +29017,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -29129,7 +29129,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -31023,7 +31023,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -31133,7 +31133,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -31244,7 +31244,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -31354,7 +31354,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -32828,7 +32828,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			} else if expr.GetType() != IS_NULL {
 				ht = ZendNewArray(1)
 				Z_OBJ_P(result).SetProperties(ht)
-				expr = ZendHashAddNew(ht, ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
+				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_CV == IS_CONST {
 					if Z_OPT_REFCOUNTED_P(expr) {
 						Z_ADDREF_P(expr)
@@ -34633,7 +34633,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -34743,7 +34743,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -34854,7 +34854,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -34964,7 +34964,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -35788,7 +35788,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -36302,7 +36302,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		value = __EG().GetSymbolTable().FindByZendString(varname)
 		if value == nil {
-			value = ZendHashAddNew(__EG().GetSymbolTable(), varname.GetStr(), __EG().GetUninitializedZval())
+			value = __EG().GetSymbolTable().KeyAddNew(varname.GetStr(), __EG().GetUninitializedZval())
 			idx = (*byte)(value - (*byte)(__EG().GetSymbolTable().GetArData()))
 
 			/* Store "hash slot index" + 1 (NULL is a mark of uninitialized cache slot) */
@@ -37712,7 +37712,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -37824,7 +37824,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -37937,7 +37937,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -38049,7 +38049,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -38858,7 +38858,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -39780,13 +39780,13 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, execute_data *ZendE
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 		if type_ == BP_VAR_W {
-			retval = ZendHashAddNew(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+			retval = target_symbol_table.KeyAddNew(name.GetStr(), __EG().GetUninitializedZval())
 		} else if type_ == BP_VAR_IS {
 			retval = __EG().GetUninitializedZval()
 		} else {
 			ZendError(E_NOTICE, "Undefined variable: %s", name.GetVal())
 			if type_ == BP_VAR_RW {
-				retval = ZendHashUpdate(target_symbol_table, name.GetStr(), __EG().GetUninitializedZval())
+				retval = target_symbol_table.KeyUpdate(name.GetStr(), __EG().GetUninitializedZval())
 			} else {
 				retval = __EG().GetUninitializedZval()
 			}
@@ -40359,7 +40359,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
@@ -42112,7 +42112,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -42222,7 +42222,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -42333,7 +42333,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -42443,7 +42443,7 @@ assign_object:
 						Z_TRY_ADDREF_P(value)
 					}
 				}
-				ZendHashAddNew(zobj.GetProperties(), property.GetStr().GetStr(), value)
+				zobj.GetProperties().KeyAddNew(property.GetStr().GetStr(), value)
 				if RETURN_VALUE_USED(opline) {
 					ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
 				}
@@ -43287,7 +43287,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 				}
 			}
 		str_index:
-			ZendHashUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), str.GetStr(), expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().KeyUpdate(str.GetStr(), expr_ptr)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:

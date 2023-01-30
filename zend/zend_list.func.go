@@ -236,7 +236,7 @@ func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_ty
 	ZVAL_NEW_PERSISTENT_RES(&tmp, -1, rsrc_pointer, rsrc_type)
 	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
-	zv = ZendHashUpdate(__EG().GetPersistentList(), key.GetStr(), &tmp)
+	zv = __EG().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
 	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *ZendResource {

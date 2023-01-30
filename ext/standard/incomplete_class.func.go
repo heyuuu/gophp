@@ -82,5 +82,5 @@ func PhpLookupClassName(object *zend.Zval) *zend.ZendString {
 func PhpStoreClassName(object *zend.Zval, name *byte, len_ int) {
 	var val zend.Zval
 	zend.ZVAL_STRINGL(&val, name, len_)
-	zend.ZendHashStrUpdate(zend.Z_OBJPROP_P(object), b.CastStr(MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1), &val)
+	zend.Z_OBJPROP_P(object).KeyUpdate(b.CastStr(MAGIC_MEMBER, b.SizeOf("MAGIC_MEMBER")-1), &val)
 }

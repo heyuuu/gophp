@@ -406,7 +406,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 		var var_ *Zval
 		var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 		ZVAL_ARR(&val, ZendArrayDup(static_variables))
-		ZendHashUpdate(debug_info, ZSTR_KNOWN(ZEND_STR_STATIC).GetStr(), &val)
+		debug_info.KeyUpdate(ZSTR_KNOWN(ZEND_STR_STATIC).GetStr(), &val)
 		var __ht *HashTable = val.GetArr()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
@@ -420,7 +420,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 	}
 	if closure.GetThisPtr().GetType() != IS_UNDEF {
 		Z_ADDREF(closure.GetThisPtr())
-		ZendHashUpdate(debug_info, ZSTR_KNOWN(ZEND_STR_THIS).GetStr(), closure.GetThisPtr())
+		debug_info.KeyUpdate(ZSTR_KNOWN(ZEND_STR_THIS).GetStr(), closure.GetThisPtr())
 	}
 	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {
 		var i uint32
@@ -444,11 +444,11 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 				name = ZendStrpprintf(0, "%s$param%d", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), i+1)
 			}
 			ZVAL_NEW_STR(&info, ZendStrpprintf(0, "%s", b.Cond(i >= required, "<optional>", "<required>")))
-			ZendHashUpdate(val.GetArr(), name.GetStr(), &info)
+			val.GetArr().KeyUpdate(name.GetStr(), &info)
 			ZendStringReleaseEx(name, 0)
 			arg_info++
 		}
-		ZendHashStrUpdate(debug_info, b.CastStr("parameter", b.SizeOf("\"parameter\"")-1), &val)
+		debug_info.KeyUpdate(b.CastStr("parameter", b.SizeOf("\"parameter\"")-1), &val)
 	}
 	return debug_info
 }
@@ -606,7 +606,7 @@ func ZendCreateFakeClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry
 func ZendClosureBindVar(closure_zv *Zval, var_name *ZendString, var_ *Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())
 	var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
-	ZendHashUpdate(static_variables, var_name.GetStr(), var_)
+	static_variables.KeyUpdate(var_name.GetStr(), var_)
 }
 func ZendClosureBindVarEx(closure_zv *Zval, offset uint32, val *Zval) {
 	var closure *ZendClosure = (*ZendClosure)(closure_zv.GetObj())

@@ -69,7 +69,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 								zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 							}
 							ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
-							ZendHashAdd(zobj.GetProperties(), prop_info.GetName().GetStr(), &zv)
+							zobj.GetProperties().KeyAdd(prop_info.GetName().GetStr(), &zv)
 						}
 					}
 				}
@@ -799,7 +799,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 			if zobj.GetProperties() == nil {
 				RebuildObjectProperties(zobj)
 			}
-			variable_ptr = ZendHashAddNew(zobj.GetProperties(), name.GetStr(), value)
+			variable_ptr = zobj.GetProperties().KeyAddNew(name.GetStr(), value)
 		}
 	}
 exit:
@@ -955,7 +955,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 			if zobj.GetProperties() == nil {
 				RebuildObjectProperties(zobj)
 			}
-			retval = ZendHashUpdate(zobj.GetProperties(), name.GetStr(), __EG().GetUninitializedZval())
+			retval = zobj.GetProperties().KeyUpdate(name.GetStr(), __EG().GetUninitializedZval())
 
 			/* Notice is thrown after creation of the property, to avoid EG(std_property_info)
 			 * being overwritten in an error handler. */

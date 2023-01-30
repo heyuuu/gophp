@@ -11,7 +11,7 @@ import (
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	var zalgo zend.Zval
 	zend.ZVAL_PTR(&zalgo, (*PhpPasswordAlgo)(algo))
-	if zend.ZendHashStrAdd(&PhpPasswordAlgos, b.CastStr(ident, strlen(ident)), &zalgo) != nil {
+	if PhpPasswordAlgos.KeyAdd(b.CastStr(ident, strlen(ident)), &zalgo) != nil {
 		return zend.SUCCESS
 	}
 	return zend.FAILURE

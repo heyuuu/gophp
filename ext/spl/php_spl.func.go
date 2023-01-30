@@ -185,7 +185,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 		}
 		opened_path = file_handle.GetOpenedPath().Copy()
 		zend.ZVAL_NULL(&dummy)
-		if zend.ZendHashAdd(zend.__EG().GetIncludedFiles(), opened_path.GetStr(), &dummy) != nil {
+		if zend.__EG().GetIncludedFiles().KeyAdd(opened_path.GetStr(), &dummy) != nil {
 			new_op_array = zend.ZendCompileFile(&file_handle, zend.ZEND_REQUIRE)
 			zend.ZendDestroyFileHandle(&file_handle)
 		} else {
