@@ -7956,7 +7956,7 @@ func ZEND_COUNT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	for true {
 		if op1.IsType(IS_ARRAY) {
-			count = ZendArrayCount(op1.GetArr())
+			count = op1.GetArr().Count()
 			break
 		} else if op1.IsType(IS_OBJECT) {
 
@@ -14294,7 +14294,7 @@ func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	op1 = _getZvalPtrVar(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 	for true {
 		if op1.IsType(IS_ARRAY) {
-			count = ZendArrayCount(op1.GetArr())
+			count = op1.GetArr().Count()
 			break
 		} else if op1.IsType(IS_OBJECT) {
 
@@ -40857,7 +40857,7 @@ func ZEND_COUNT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	for true {
 		if op1.IsType(IS_ARRAY) {
-			count = ZendArrayCount(op1.GetArr())
+			count = op1.GetArr().Count()
 			break
 		} else if op1.IsType(IS_OBJECT) {
 

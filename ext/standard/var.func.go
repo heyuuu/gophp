@@ -93,7 +93,7 @@ again:
 			}
 			myht.AddRefcount()
 		}
-		count = zend.ZendArrayCount(myht)
+		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
 		for {
 			var __ht *zend.HashTable = myht
@@ -133,7 +133,7 @@ again:
 		zend.Z_PROTECT_RECURSION_P(struc)
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
-		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return zend.ZendArrayCount(myht) }, 0))
+		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var num zend.ZendUlong
@@ -354,7 +354,7 @@ again:
 			}
 			myht.AddRefcount()
 		}
-		count = zend.ZendArrayCount(myht)
+		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(zend.Z_REFCOUNTED_P(struc), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
 		for {
 			var __ht *zend.HashTable = myht
@@ -397,7 +397,7 @@ again:
 			zend.GC_PROTECT_RECURSION(myht)
 		}
 		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
-		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return zend.ZendArrayCount(myht) }, 0), zend.Z_REFCOUNT_P(struc))
+		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), zend.Z_REFCOUNT_P(struc))
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			for {
@@ -1176,7 +1176,7 @@ again:
 				return
 			}
 			PhpVarSerializeClassName(buf, &obj)
-			zend.SmartStrAppendUnsigned(buf, zend.ZendArrayCount(retval.GetArr()))
+			zend.SmartStrAppendUnsigned(buf, retval.GetArr().Count())
 			zend.SmartStrAppendl(buf, ":{", 2)
 			for {
 				var __ht *zend.HashTable = retval.GetArr()
@@ -1270,7 +1270,7 @@ again:
 		/* count after serializing name, since php_var_serialize_class_name
 		 * changes the count if the variable is incomplete class */
 
-		count = zend.ZendArrayCount(myht)
+		count = myht.Count()
 		if count > 0 && incomplete_class != 0 {
 			count--
 		}
@@ -1280,7 +1280,7 @@ again:
 	case zend.IS_ARRAY:
 		zend.SmartStrAppendl(buf, "a:", 2)
 		myht = struc.GetArr()
-		PhpVarSerializeNestedData(buf, struc, myht, zend.ZendArrayCount(myht), 0, var_hash)
+		PhpVarSerializeNestedData(buf, struc, myht, myht.Count(), 0, var_hash)
 		return
 	case zend.IS_REFERENCE:
 		struc = zend.Z_REFVAL_P(struc)

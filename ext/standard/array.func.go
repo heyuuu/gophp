@@ -635,7 +635,7 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 		}
 		zend.GC_PROTECT_RECURSION(ht)
 	}
-	cnt = zend.ZendArrayCount(ht)
+	cnt = ht.Count()
 	for {
 		var __ht *zend.HashTable = ht
 		var _p *zend.Bucket = __ht.GetArData()
@@ -741,7 +741,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	case zend.IS_ARRAY:
 		if mode != COUNT_RECURSIVE {
-			cnt = zend.ZendArrayCount(array.GetArr())
+			cnt = array.GetArr().Count()
 		} else {
 			cnt = PhpCountRecursive(array.GetArr())
 		}

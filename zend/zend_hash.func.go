@@ -16,9 +16,6 @@ func ZendHashInit(ht *HashTable, nSize uint32, pHashFunction any, pDestructor Dt
 func ZendHashInitEx(ht *HashTable, nSize uint32, pHashFunction any, pDestructor DtorFuncT, persistent ZendBool, bApplyProtection int) {
 	*ht = *NewZendArrayEx(nSize, pDestructor, persistent != 0)
 }
-func ZendHashFindEx(ht *HashTable, key *ZendString, known_hash ZendBool) *Zval {
-	return ht.FindByZendString(key)
-}
 func ZEND_HASH_INDEX_FIND(_ht *HashTable, _h ZendUlong, _ret *Zval, _not_found __auto__) {
 	_ret = ZendHashIndexFind(_ht, _h)
 	if _ret == nil {
