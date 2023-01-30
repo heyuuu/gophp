@@ -649,19 +649,19 @@ func ZendHashStrAddEmptyElement(ht *HashTable, str *byte, len_ int) *Zval {
 	return ZendHashStrAdd(ht, str, len_, &dummy)
 }
 func ZendHashIndexAdd(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return ht.indexAddOrUpdate(int(h), pData, HASH_ADD)
+	return ht.IndexAddH(h, pData)
 }
 func ZendHashIndexAddNew(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return ht.indexAddOrUpdate(int(h), pData, HASH_ADD|HASH_ADD_NEW)
+	return ht.IndexAddNewH(h, pData)
 }
 func ZendHashIndexUpdate(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return ht.indexAddOrUpdate(int(h), pData, HASH_UPDATE)
+	return ht.IndexUpdateH(h, pData)
 }
 func ZendHashNextIndexInsert(ht *HashTable, pData *Zval) *Zval {
-	return ht.indexAddOrUpdate(ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEXT)
+	return ht.NextIndexInsert(pData)
 }
 func ZendHashNextIndexInsertNew(ht *HashTable, pData *Zval) *Zval {
-	return ht.indexAddOrUpdate(ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEW|HASH_ADD_NEXT)
+	return ht.NextIndexInsertNew(pData)
 }
 func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var nIndex uint32
@@ -1464,7 +1464,7 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 				continue
 			}
 			if p.IsStrKey() {
-				t = target.addOrUpdate(p.StrKey(), s, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+				t = target.KeyUpdateIndirect(p.StrKey(), s)
 				if pCopyConstructor != nil {
 					pCopyConstructor(t)
 				}
@@ -1486,7 +1486,7 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 				continue
 			}
 			if p.IsStrKey() {
-				t = target.addOrUpdate(p.StrKey(), s, HASH_ADD|HASH_UPDATE_INDIRECT)
+				t = target.KeyAddIndirect(p.StrKey(), s)
 				if t != nil && pCopyConstructor != nil {
 					pCopyConstructor(t)
 				}

@@ -363,28 +363,3 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	var p = this.appendBucketStr(strKey, pData)
 	return p.GetVal()
 }
-
-func (this *ZendArray) indexAddOrUpdate(indexKey int, pData *Zval, flag uint32) *Zval {
-	this.assertRc1()
-
-	var isAddNew = b.FlagMatch(flag, HASH_ADD_NEW)
-	var isAdd = b.FlagMatch(flag, HASH_ADD)
-
-	if !isAddNew {
-		var p = this.FindBucketByIndex(indexKey)
-		if p != nil {
-			if isAdd {
-				return nil
-			}
-			if this.pDestructor != nil {
-				this.pDestructor(p.GetVal())
-			}
-			ZVAL_COPY_VALUE(p.GetVal(), pData)
-			return p.GetVal()
-		}
-	}
-
-	var p = this.appendBucketIndex(indexKey, pData)
-
-	return p.GetVal()
-}

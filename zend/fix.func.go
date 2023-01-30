@@ -9,3 +9,5 @@ func __INI_SCNG() *ZendIniScannerGlobals             { return &IniScannerGlobals
 func __LANG_SCNG() *ZendPhpScannerGlobals            { return &LanguageScannerGlobals }
 func _zendHashForeach(ht *HashTable) **Bucket        { return ht.foreachData() }
 func _zendHashForeachReverse(ht *HashTable) **Bucket { return ht.foreachDataReserve() }
+
+func _zstrGetStr(zs *ZendString) string { return zs.GetStr() }

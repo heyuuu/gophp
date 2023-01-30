@@ -29,7 +29,7 @@ const HASH_KEY_IS_LONG = 2
 const HASH_KEY_NON_EXISTENT = 3
 const HASH_UPDATE uint32 = 1 << 0
 const HASH_ADD uint32 = 1 << 1
-const HASH_UPDATE_INDIRECT = 1 << 2
+const HASH_UPDATE_INDIRECT uint32 = 1 << 2
 const HASH_ADD_NEW uint32 = 1 << 3
 const HASH_ADD_NEXT = 1 << 4
 
