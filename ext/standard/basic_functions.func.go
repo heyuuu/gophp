@@ -1266,7 +1266,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				}
 				args.GetArr().NextIndexInsert(&val)
 			} else {
-				zend.ZendHashStrAdd(return_value.GetArr(), optname, strlen(optname), &val)
+				zend.ZendHashStrAdd(return_value.GetArr(), b.CastStr(optname, strlen(optname)), &val)
 			}
 
 			/* other strings */
@@ -1674,7 +1674,7 @@ func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, re
 		var tmp zend.Zval
 		zend.ArrayInit(&tmp)
 		AddConfigEntries(entry.GetArr(), &tmp)
-		zend.ZendHashUpdate(retval.GetArr(), key, &tmp)
+		zend.ZendHashUpdate(retval.GetArr(), key.GetStr(), &tmp)
 	}
 }
 func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
@@ -4201,7 +4201,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		} else {
 			if b.Assign(&find_hash, arr.GetArr().FindByZendString(arg1.GetStr())) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = zend.ZendHashAddNew(arr.GetArr(), arg1.GetStr(), &hash)
+				find_hash = zend.ZendHashAddNew(arr.GetArr(), arg1.GetStr().GetStr(), &hash)
 			}
 		}
 		if find_hash.GetType() != zend.IS_ARRAY {

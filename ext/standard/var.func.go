@@ -919,7 +919,7 @@ func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, n
 			return zend.FAILURE
 		}
 	}
-	if zend.ZendHashAdd(ht, name, val) == nil {
+	if zend.ZendHashAdd(ht, name.GetStr(), val) == nil {
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
 		return zend.SUCCESS
 	}
@@ -989,7 +989,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			break
 		}
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-		zend.ZendHashAdd(ht, name, zend.__EG().GetUninitializedZval())
+		zend.ZendHashAdd(ht, name.GetStr(), zend.__EG().GetUninitializedZval())
 		zend.ZendTmpStringRelease(tmp_name)
 	}
 	zend.ZendReleaseProperties(props)

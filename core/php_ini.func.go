@@ -139,7 +139,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* Store in active hash */
 
-			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr(), arg2)
+			entry = zend.ZendHashUpdate(active_hash, arg1.GetStr().GetStr(), arg2)
 			entry.SetStr(entry.GetStr().Dup(1))
 		}
 
@@ -164,7 +164,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		if b.Assign(&find_arr, active_hash.FindByZendString(arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
 			zend.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
-			find_arr = zend.ZendHashUpdate(active_hash, arg1.GetStr(), &option_arr)
+			find_arr = zend.ZendHashUpdate(active_hash, arg1.GetStr().GetStr(), &option_arr)
 		}
 
 		/* arg3 is possible option offset name */
@@ -228,7 +228,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 				var section_arr zend.Zval
 				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
 				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
-				entry = zend.ZendHashStrUpdate(target_hash, key, key_len, &section_arr)
+				entry = zend.ZendHashStrUpdate(target_hash, b.CastStr(key, key_len), &section_arr)
 			}
 			if entry.IsType(zend.IS_ARRAY) {
 				ActiveIniHash = entry.GetArr()
@@ -436,7 +436,7 @@ func PhpInitConfig() int {
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 		var tmp zend.Zval
 		zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
-		zend.ZendHashStrUpdate(&ConfigurationHash, "cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1, &tmp)
+		zend.ZendHashStrUpdate(&ConfigurationHash, b.CastStr("cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1), &tmp)
 		if opened_path != nil {
 			zend.ZendStringReleaseEx(opened_path, 0)
 		} else {

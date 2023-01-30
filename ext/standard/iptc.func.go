@@ -404,7 +404,7 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		if b.Assign(&element, return_value.GetArr().FindByStrPtr(key, strlen(key))) == nil {
 			zend.ArrayInit(&values)
-			element = zend.ZendHashStrUpdate(return_value.GetArr(), key, strlen(key), &values)
+			element = zend.ZendHashStrUpdate(return_value.GetArr(), b.CastStr(key, strlen(key)), &values)
 		}
 		zend.AddNextIndexStringl(element, (*byte)(buffer+inx), len_)
 		inx += len_

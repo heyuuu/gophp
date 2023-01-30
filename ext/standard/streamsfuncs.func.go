@@ -1292,7 +1292,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 				if key == nil {
 					dest_elem = ht.IndexUpdateH(num_ind, elem)
 				} else {
-					dest_elem = zend.ZendHashUpdate(ht, key, elem)
+					dest_elem = zend.ZendHashUpdate(ht, key.GetStr(), elem)
 				}
 				zend.ZvalAddRef(dest_elem)
 				ret++
@@ -1350,7 +1350,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 			if key == nil {
 				dest_elem = ht.IndexUpdateH(num_ind, elem)
 			} else {
-				dest_elem = zend.ZendHashUpdate(ht, key, elem)
+				dest_elem = zend.ZendHashUpdate(ht, key.GetStr(), elem)
 			}
 			zend.ZvalAddRef(dest_elem)
 			ret++

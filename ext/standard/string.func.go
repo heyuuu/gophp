@@ -4328,7 +4328,7 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 
 				}
 			}
-			zend.ZendHashAdd(&str_hash, key_used, entry)
+			zend.ZendHashAdd(&str_hash, key_used.GetStr(), entry)
 			if str_key == nil {
 				zend.ZendStringReleaseEx(key_used, 0)
 			}
@@ -5884,7 +5884,7 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 			/* Add to return array */
 
 			if string_key != nil {
-				zend.ZendHashAddNew(return_value.GetArr(), string_key, &result)
+				zend.ZendHashAddNew(return_value.GetArr(), string_key.GetStr(), &result)
 			} else {
 				return_value.GetArr().IndexAddNewH(num_key, &result)
 			}
@@ -7580,8 +7580,8 @@ func ZifLocaleconv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.AddAssocLong(return_value, "n_sep_by_space", currlocdata.n_sep_by_space)
 	zend.AddAssocLong(return_value, "p_sign_posn", currlocdata.p_sign_posn)
 	zend.AddAssocLong(return_value, "n_sign_posn", currlocdata.n_sign_posn)
-	zend.ZendHashStrUpdate(return_value.GetArr(), "grouping", b.SizeOf("\"grouping\"")-1, &grouping)
-	zend.ZendHashStrUpdate(return_value.GetArr(), "mon_grouping", b.SizeOf("\"mon_grouping\"")-1, &mon_grouping)
+	zend.ZendHashStrUpdate(return_value.GetArr(), b.CastStr("grouping", b.SizeOf("\"grouping\"")-1), &grouping)
+	zend.ZendHashStrUpdate(return_value.GetArr(), b.CastStr("mon_grouping", b.SizeOf("\"mon_grouping\"")-1), &mon_grouping)
 }
 func ZifStrnatcasecmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpStrnatcmp(execute_data, return_value, 1)

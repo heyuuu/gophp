@@ -339,7 +339,7 @@ func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
 	} else {
 		var tmp Zval
 		ZVAL_LONG(&tmp, kind)
-		ZendHashAddNew(&(FC(seen_symbols)), name, &tmp)
+		ZendHashAddNew(&(FC(seen_symbols)), name.GetStr(), &tmp)
 	}
 }
 func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
@@ -385,7 +385,7 @@ func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
 	}
 	new_compiled_filename = ZendNewInternedString(new_compiled_filename.Copy())
 	ZVAL_STR(&rv, new_compiled_filename)
-	ZendHashAddNew(__CG().GetFilenamesTable(), new_compiled_filename, &rv)
+	ZendHashAddNew(__CG().GetFilenamesTable(), new_compiled_filename.GetStr(), &rv)
 	__CG().SetCompiledFilename(new_compiled_filename)
 	return new_compiled_filename
 }
@@ -885,7 +885,7 @@ func DoBindFunction(lcname *Zval) int {
 	}
 	function = (*ZendFunction)(zv.GetPtr())
 	if function.IsPreloaded() && (__CG().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
-		zv = ZendHashAdd(__EG().GetFunctionTable(), lcname.GetStr(), zv)
+		zv = ZendHashAdd(__EG().GetFunctionTable(), lcname.GetStr().GetStr(), zv)
 	} else {
 		zv = ZendHashSetBucketKey(__EG().GetFunctionTable(), (*Bucket)(zv), lcname.GetStr())
 	}
@@ -2974,7 +2974,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 
 				val = _z
 				if val.IsType(IS_STRING) {
-					ZendHashAdd(dst, val.GetStr(), &tmp)
+					ZendHashAdd(dst, val.GetStr().GetStr(), &tmp)
 				} else if val.IsType(IS_LONG) {
 					dst.IndexAddH(val.GetLval(), &tmp)
 				} else {
@@ -2994,7 +2994,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 					ok = 0
 					break
 				}
-				ZendHashAdd(dst, val.GetStr(), &tmp)
+				ZendHashAdd(dst, val.GetStr().GetStr(), &tmp)
 			}
 		}
 		ZendArrayDestroy(src)
@@ -3410,7 +3410,7 @@ func ZendCompileStaticVarCommon(var_name *ZendString, value *Zval, mode uint32) 
 		}
 		__CG().GetActiveOpArray().SetStaticVariables(ZendNewArray(8))
 	}
-	value = ZendHashUpdate(__CG().GetActiveOpArray().GetStaticVariables(), var_name, value)
+	value = ZendHashUpdate(__CG().GetActiveOpArray().GetStaticVariables(), var_name.GetStr(), value)
 	if ZendStringEqualsLiteral(var_name, "this") {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use $this as static variable")
 	}
@@ -4088,7 +4088,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 					jumptable.IndexAddH(cond_zv.GetLval(), &jmp_target)
 				} else {
 					ZEND_ASSERT(cond_zv.IsType(IS_STRING))
-					ZendHashAdd(jumptable, cond_zv.GetStr(), &jmp_target)
+					ZendHashAdd(jumptable, cond_zv.GetStr().GetStr(), &jmp_target)
 				}
 			}
 		} else {
@@ -4641,7 +4641,7 @@ func ZendCompileClosureBinding(closure *Znode, op_array *ZendOpArray, uses_ast *
 		if ZendIsAutoGlobal(var_name) != 0 {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use auto-global as lexical variable")
 		}
-		value = ZendHashAdd(op_array.GetStaticVariables(), var_name, __EG().GetUninitializedZval())
+		value = ZendHashAdd(op_array.GetStaticVariables(), var_name.GetStr(), __EG().GetUninitializedZval())
 		if value == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use variable $%s twice", var_name.GetVal())
 		}
@@ -4748,7 +4748,7 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 		var _z *Zval = _p.GetVal()
 
 		var_name = _p.GetKey()
-		var value *Zval = ZendHashAdd(op_array.GetStaticVariables(), var_name, __EG().GetUninitializedZval())
+		var value *Zval = ZendHashAdd(op_array.GetStaticVariables(), var_name.GetStr(), __EG().GetUninitializedZval())
 		var offset uint32 = uint32((*byte)(value - (*byte)(op_array.GetStaticVariables().GetArData())))
 		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
 		opline.SetOp2Type(IS_CV)
@@ -5997,7 +5997,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 				result.GetArr().IndexUpdateH(1, value)
 				break
 			case IS_NULL:
-				ZendHashUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), value)
+				ZendHashUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC().GetStr(), value)
 				break
 			default:
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal offset type")

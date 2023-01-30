@@ -3275,19 +3275,19 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Store string indexes referencing the same zval*/
 
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[0], strlen(stat_sb_names[0]), &stat_dev)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[1], strlen(stat_sb_names[1]), &stat_ino)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[2], strlen(stat_sb_names[2]), &stat_mode)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[3], strlen(stat_sb_names[3]), &stat_nlink)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[4], strlen(stat_sb_names[4]), &stat_uid)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[5], strlen(stat_sb_names[5]), &stat_gid)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[6], strlen(stat_sb_names[6]), &stat_rdev)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[7], strlen(stat_sb_names[7]), &stat_size)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[8], strlen(stat_sb_names[8]), &stat_atime)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[9], strlen(stat_sb_names[9]), &stat_mtime)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[10], strlen(stat_sb_names[10]), &stat_ctime)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[11], strlen(stat_sb_names[11]), &stat_blksize)
-	zend.ZendHashStrAddNew(return_value.GetArr(), stat_sb_names[12], strlen(stat_sb_names[12]), &stat_blocks)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[0], strlen(stat_sb_names[0])), &stat_dev)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[1], strlen(stat_sb_names[1])), &stat_ino)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[2], strlen(stat_sb_names[2])), &stat_mode)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[3], strlen(stat_sb_names[3])), &stat_nlink)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[4], strlen(stat_sb_names[4])), &stat_uid)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[5], strlen(stat_sb_names[5])), &stat_gid)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[6], strlen(stat_sb_names[6])), &stat_rdev)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[7], strlen(stat_sb_names[7])), &stat_size)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[8], strlen(stat_sb_names[8])), &stat_atime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[9], strlen(stat_sb_names[9])), &stat_mtime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[10], strlen(stat_sb_names[10])), &stat_ctime)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[11], strlen(stat_sb_names[11])), &stat_blksize)
+	zend.ZendHashStrAddNew(return_value.GetArr(), b.CastStr(stat_sb_names[12], strlen(stat_sb_names[12])), &stat_blocks)
 }
 func ZifCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var source *byte

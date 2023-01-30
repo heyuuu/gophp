@@ -1242,7 +1242,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 				}
 			} else {
 				ZVAL_UNDEF(var_)
-				zv = ZendHashAddNew(ht, *str, var_)
+				zv = ZendHashAddNew(ht, str.GetStr(), var_)
 			}
 			ZVAL_INDIRECT(zv, var_)
 			str++
@@ -1270,7 +1270,7 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 			if var_.IsType(IS_UNDEF) {
 				ZendHashDel(ht, *str)
 			} else {
-				ZendHashUpdate(ht, *str, var_)
+				ZendHashUpdate(ht, str.GetStr(), var_)
 				ZVAL_UNDEF(var_)
 			}
 			str++
@@ -1310,12 +1310,12 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 			if force != 0 {
 				var symbol_table *ZendArray = ZendRebuildSymbolTable()
 				if symbol_table != nil {
-					ZendHashUpdate(symbol_table, name, value)
+					ZendHashUpdate(symbol_table, name.GetStr(), value)
 					return SUCCESS
 				}
 			}
 		} else {
-			ZendHashUpdateInd(execute_data.GetSymbolTable(), name, value)
+			ZendHashUpdateInd(execute_data.GetSymbolTable(), name.GetStr(), value)
 			return SUCCESS
 		}
 	}
@@ -1349,12 +1349,12 @@ func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
 			if force != 0 {
 				var symbol_table *ZendArray = ZendRebuildSymbolTable()
 				if symbol_table != nil {
-					ZendHashStrUpdate(symbol_table, name, len_, value)
+					ZendHashStrUpdate(symbol_table, b.CastStr(name, len_), value)
 					return SUCCESS
 				}
 			}
 		} else {
-			ZendHashStrUpdateInd(execute_data.GetSymbolTable(), name, len_, value)
+			ZendHashStrUpdateInd(execute_data.GetSymbolTable(), b.CastStr(name, len_), value)
 			return SUCCESS
 		}
 	}

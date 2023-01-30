@@ -1964,11 +1964,11 @@ try_again:
 					ZendStringRelease(offset_key)
 					return nil
 				}
-				retval = ZendHashAddNew(ht, offset_key, __EG().GetUninitializedZval())
+				retval = ZendHashAddNew(ht, offset_key.GetStr(), __EG().GetUninitializedZval())
 				ZendStringRelease(offset_key)
 				break
 			case BP_VAR_W:
-				retval = ZendHashAddNew(ht, offset_key, __EG().GetUninitializedZval())
+				retval = ZendHashAddNew(ht, offset_key.GetStr(), __EG().GetUninitializedZval())
 				break
 			}
 		}

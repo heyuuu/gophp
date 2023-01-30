@@ -90,13 +90,13 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 		if iface == nil {
 			var newif zend.Zval
 			zend.ArrayInit(&newif)
-			iface = zend.ZendHashStrAdd(return_value.GetArr(), p.ifa_name, strlen(p.ifa_name), &newif)
+			iface = zend.ZendHashStrAdd(return_value.GetArr(), b.CastStr(p.ifa_name, strlen(p.ifa_name)), &newif)
 		}
 		unicast = iface.GetArr().FindByStrPtr("unicast", b.SizeOf("\"unicast\"")-1)
 		if unicast == nil {
 			var newuni zend.Zval
 			zend.ArrayInit(&newuni)
-			unicast = zend.ZendHashStrAdd(iface.GetArr(), "unicast", b.SizeOf("\"unicast\"")-1, &newuni)
+			unicast = zend.ZendHashStrAdd(iface.GetArr(), b.CastStr("unicast", b.SizeOf("\"unicast\"")-1), &newuni)
 		}
 		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
 		status = iface.GetArr().FindByStrPtr("up", b.SizeOf("\"up\"")-1)

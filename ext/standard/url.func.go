@@ -440,35 +440,35 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if resource.GetScheme() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetScheme())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME).GetStr(), &tmp)
 	}
 	if resource.GetHost() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetHost())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_HOST).GetStr(), &tmp)
 	}
 	if has_port != 0 {
 		zend.ZVAL_LONG(&tmp, resource.GetPort())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PORT).GetStr(), &tmp)
 	}
 	if resource.GetUser() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetUser())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_USER), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_USER).GetStr(), &tmp)
 	}
 	if resource.GetPass() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPass())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PASS).GetStr(), &tmp)
 	}
 	if resource.GetPath() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetPath())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_PATH).GetStr(), &tmp)
 	}
 	if resource.GetQuery() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetQuery())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY).GetStr(), &tmp)
 	}
 	if resource.GetFragment() != nil {
 		zend.ZVAL_STR_COPY(&tmp, resource.GetFragment())
-		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT), &tmp)
+		zend.ZendHashAddNew(return_value.GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT).GetStr(), &tmp)
 	}
 done:
 	PhpUrlFree(resource)

@@ -182,7 +182,7 @@ func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
 }
 func INI_DEFAULT(name string, value string) {
 	zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
-	zend.ZendHashStrUpdate(core.ConfigurationHash, name, b.SizeOf("name")-1, &tmp)
+	zend.ZendHashStrUpdate(core.ConfigurationHash, b.CastStr(name, b.SizeOf("name")-1), &tmp)
 }
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
 	var tmp zend.Zval
@@ -584,9 +584,9 @@ func DoCli(argc int, argv **byte) int {
 					input[len_] = '0'
 				}
 				zend.ZVAL_STRINGL(&argn, input, len_+1)
-				zend.ZendHashStrUpdate(zend.__EG().GetSymbolTable(), "argn", b.SizeOf("\"argn\"")-1, &argn)
+				zend.ZendHashStrUpdate(zend.__EG().GetSymbolTable(), b.CastStr("argn", b.SizeOf("\"argn\"")-1), &argn)
 				zend.ZVAL_LONG(&argi, b.PreInc(&index))
-				zend.ZendHashStrUpdate(zend.__EG().GetSymbolTable(), "argi", b.SizeOf("\"argi\"")-1, &argi)
+				zend.ZendHashStrUpdate(zend.__EG().GetSymbolTable(), b.CastStr("argi", b.SizeOf("\"argi\"")-1), &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254

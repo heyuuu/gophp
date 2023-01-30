@@ -607,30 +607,29 @@ func ZendHashIteratorsAdvance(ht *HashTable, step HashPosition) {
 	}
 }
 
-func ZendHashAdd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return ht.addOrUpdateByZendString(key, pData, HASH_ADD)
+func ZendHashAdd(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.addOrUpdate(key, pData, HASH_ADD)
 }
-func ZendHashUpdate(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return ht.addOrUpdateByZendString(key, pData, HASH_UPDATE)
+func ZendHashUpdate(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.addOrUpdate(key, pData, HASH_UPDATE)
 }
-func ZendHashUpdateInd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return ht.addOrUpdateByZendString(key, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+func ZendHashUpdateInd(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.addOrUpdate(key, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 }
-func ZendHashAddNew(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return ht.addOrUpdateByZendString(key, pData, HASH_ADD_NEW)
+func ZendHashAddNew(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.addOrUpdate(key, pData, HASH_ADD_NEW)
 }
-
-func ZendHashStrUpdate(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_UPDATE)
+func ZendHashStrUpdate(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.addOrUpdate(str, pData, HASH_UPDATE)
 }
-func ZendHashStrUpdateInd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+func ZendHashStrUpdateInd(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.addOrUpdate(str, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 }
-func ZendHashStrAdd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_ADD)
+func ZendHashStrAdd(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.addOrUpdate(str, pData, HASH_ADD)
 }
-func ZendHashStrAddNew(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_ADD_NEW)
+func ZendHashStrAddNew(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.addOrUpdate(str, pData, HASH_ADD_NEW)
 }
 
 func ZendHashIndexAddEmptyElement(ht *HashTable, h ZendUlong) *Zval {

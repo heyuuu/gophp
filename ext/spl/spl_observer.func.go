@@ -182,7 +182,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 		zend.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
 		zend.AddAssocZvalEx(&tmp, "obj", b.SizeOf("\"obj\"")-1, element.GetObj())
 		zend.AddAssocZvalEx(&tmp, "inf", b.SizeOf("\"inf\"")-1, element.GetInf())
-		zend.ZendHashUpdate(storage.GetArr(), md5str, &tmp)
+		zend.ZendHashUpdate(storage.GetArr(), md5str.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage", b.SizeOf("\"storage\"")-1)
