@@ -36,62 +36,46 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 
 	/* first, we have to get the size of all the elements in the hash */
 
-	for {
-		var __ht *zend.HashTable = environment.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = environment.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			element = _z
-			str = zend.ZvalGetString(element)
-			if str.GetLen() == 0 {
-				zend.ZendStringReleaseEx(str, 0)
-				continue
-			}
-			sizeenv += str.GetLen() + 1
-			if key != nil && key.GetLen() != 0 {
-				sizeenv += key.GetLen() + 1
-				zend.ZendHashAddPtr(env_hash, key, str)
-			} else {
-				zend.ZendHashNextIndexInsertPtr(env_hash, str)
-			}
+		key = _p.GetKey()
+		element = _z
+		str = zend.ZvalGetString(element)
+		if str.GetLen() == 0 {
+			zend.ZendStringReleaseEx(str, 0)
+			continue
 		}
-		break
+		sizeenv += str.GetLen() + 1
+		if key != nil && key.GetLen() != 0 {
+			sizeenv += key.GetLen() + 1
+			zend.ZendHashAddPtr(env_hash, key, str)
+		} else {
+			zend.ZendHashNextIndexInsertPtr(env_hash, str)
+		}
 	}
 	env.SetEnvarray((**byte)(zend.Pecalloc(cnt+1, b.SizeOf("char *"), is_persistent)))
 	ep = env.GetEnvarray()
 	env.SetEnvp((*byte)(zend.Pecalloc(sizeenv+4, 1, is_persistent)))
 	p = env.GetEnvp()
-	for {
-		var __ht *zend.HashTable = env_hash
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht__1 *zend.HashTable = env_hash
+	for _, _p := range __ht__1.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			str = _z.GetPtr()
-			*ep = p
-			ep++
-			if key != nil {
-				memcpy(p, key.GetVal(), key.GetLen())
-				p += key.GetLen()
-				b.PostInc(&(*p)) = '='
-			}
-			memcpy(p, str.GetVal(), str.GetLen())
-			p += str.GetLen()
-			b.PostInc(&(*p)) = '0'
-			zend.ZendStringReleaseEx(str, 0)
+		key = _p.GetKey()
+		str = _z.GetPtr()
+		*ep = p
+		ep++
+		if key != nil {
+			memcpy(p, key.GetVal(), key.GetLen())
+			p += key.GetLen()
+			b.PostInc(&(*p)) = '='
 		}
-		break
+		memcpy(p, str.GetVal(), str.GetLen())
+		p += str.GetLen()
+		b.PostInc(&(*p)) = '0'
+		zend.ZendStringReleaseEx(str, 0)
 	}
 	r.Assert(uint32(p-env.GetEnvp()) <= sizeenv)
 	zend.ZendHashDestroy(env_hash)
@@ -568,29 +552,21 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		argv = zend.SafeEmalloc(b.SizeOf("char *"), num_elems+1, 0)
 		i = 0
-		for {
-			var __ht *zend.HashTable = command_zv.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = command_zv.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				arg_zv = _z
-				var arg_str *zend.ZendString = GetValidArgString(arg_zv, i+1)
-				if arg_str == nil {
-					argv[i] = nil
-					goto exit_fail
-				}
-				if i == 0 {
-					command = zend.Pestrdup(arg_str.GetVal(), is_persistent)
-				}
-				argv[b.PostInc(&i)] = zend.Estrdup(arg_str.GetVal())
-				zend.ZendStringRelease(arg_str)
+			arg_zv = _z
+			var arg_str *zend.ZendString = GetValidArgString(arg_zv, i+1)
+			if arg_str == nil {
+				argv[i] = nil
+				goto exit_fail
 			}
-			break
+			if i == 0 {
+				command = zend.Pestrdup(arg_str.GetVal(), is_persistent)
+			}
+			argv[b.PostInc(&i)] = zend.Estrdup(arg_str.GetVal())
+			zend.ZendStringRelease(arg_str)
 		}
 		argv[i] = nil
 
@@ -613,174 +589,166 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* walk the descriptor spec and set up files/pipes */
 
-	for {
-		var __ht *zend.HashTable = descriptorspec.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = descriptorspec.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			nindex = _p.GetH()
-			str_index = _p.GetKey()
-			descitem = _z
-			var ztype *zend.Zval
-			if str_index != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "descriptor spec must be an integer indexed array")
+		nindex = _p.GetH()
+		str_index = _p.GetKey()
+		descitem = _z
+		var ztype *zend.Zval
+		if str_index != nil {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "descriptor spec must be an integer indexed array")
+			goto exit_fail
+		}
+		descriptors[ndesc].SetIndex(int(nindex))
+		if descitem.IsType(zend.IS_RESOURCE) {
+
+			/* should be a stream - try and dup the descriptor */
+
+			var stream *core.PhpStream
+			var fd core.PhpSocketT
+			core.PhpStreamFromZval(stream, descitem)
+			if zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
 				goto exit_fail
 			}
-			descriptors[ndesc].SetIndex(int(nindex))
-			if descitem.IsType(zend.IS_RESOURCE) {
-
-				/* should be a stream - try and dup the descriptor */
-
-				var stream *core.PhpStream
-				var fd core.PhpSocketT
-				core.PhpStreamFromZval(stream, descitem)
-				if zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
+			descriptors[ndesc].SetChildend(dup(fd))
+			if descriptors[ndesc].GetChildend() < 0 {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "unable to dup File-Handle for descriptor "+zend.ZEND_ULONG_FMT+" - %s", nindex, strerror(errno))
+				goto exit_fail
+			}
+			descriptors[ndesc].SetMode(DESC_FILE)
+		} else if descitem.GetType() != zend.IS_ARRAY {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Descriptor item must be either an array or a File-Handle")
+			goto exit_fail
+		} else {
+			if b.Assign(&ztype, zend.ZendHashIndexFind(descitem.GetArr(), 0)) != nil {
+				if zend.TryConvertToString(ztype) == 0 {
 					goto exit_fail
 				}
-				descriptors[ndesc].SetChildend(dup(fd))
+			} else {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Missing handle qualifier in array")
+				goto exit_fail
+			}
+			if strcmp(zend.Z_STRVAL_P(ztype), "pipe") == 0 {
+				var newpipe []PhpFileDescriptorT
+				var zmode *zend.Zval
+				if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
+					if zend.TryConvertToString(zmode) == 0 {
+						goto exit_fail
+					}
+				} else {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'pipe'")
+					goto exit_fail
+				}
+				descriptors[ndesc].SetMode(DESC_PIPE)
+				if 0 != pipe(newpipe) {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "unable to create pipe %s", strerror(errno))
+					goto exit_fail
+				}
+				if strncmp(zend.Z_STRVAL_P(zmode), "w", 1) != 0 {
+					descriptors[ndesc].SetParentend(newpipe[1])
+					descriptors[ndesc].SetChildend(newpipe[0])
+					descriptors[ndesc].SetMode(descriptors[ndesc].GetMode() | DESC_PARENT_MODE_WRITE)
+				} else {
+					descriptors[ndesc].SetParentend(newpipe[0])
+					descriptors[ndesc].SetChildend(newpipe[1])
+				}
+				if (descriptors[ndesc].GetMode() & DESC_PARENT_MODE_WRITE) != 0 {
+					descriptors[ndesc].SetModeFlags(O_WRONLY)
+				} else {
+					descriptors[ndesc].SetModeFlags(O_RDONLY)
+				}
+			} else if strcmp(zend.Z_STRVAL_P(ztype), "file") == 0 {
+				var zfile *zend.Zval
+				var zmode *zend.Zval
+				var fd core.PhpSocketT
+				var stream *core.PhpStream
+				descriptors[ndesc].SetMode(DESC_FILE)
+				if b.Assign(&zfile, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
+					if zend.TryConvertToString(zfile) == 0 {
+						goto exit_fail
+					}
+				} else {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing file name parameter for 'file'")
+					goto exit_fail
+				}
+				if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 2)) != nil {
+					if zend.TryConvertToString(zmode) == 0 {
+						goto exit_fail
+					}
+				} else {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'file'")
+					goto exit_fail
+				}
+
+				/* try a wrapper */
+
+				stream = core.PhpStreamOpenWrapper(zend.Z_STRVAL_P(zfile), zend.Z_STRVAL_P(zmode), core.REPORT_ERRORS|core.STREAM_WILL_CAST, nil)
+
+				/* force into an fd */
+
+				if stream == nil || zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_CAST_RELEASE|core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
+					goto exit_fail
+				}
+				descriptors[ndesc].SetChildend(fd)
+			} else if strcmp(zend.Z_STRVAL_P(ztype), "redirect") == 0 {
+				var ztarget *zend.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
+				var target *PhpProcOpenDescriptorItem = nil
+				var childend PhpFileDescriptorT
+				if ztarget == nil {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing redirection target")
+					goto exit_fail
+				}
+				if ztarget.GetType() != zend.IS_LONG {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target must be an integer")
+					goto exit_fail
+				}
+				for i = 0; i < ndesc; i++ {
+					if descriptors[i].GetIndex() == ztarget.GetLval() {
+						target = &descriptors[i]
+						break
+					}
+				}
+				if target != nil {
+					childend = target.GetChildend()
+				} else {
+					if ztarget.GetLval() < 0 || ztarget.GetLval() > 2 {
+						core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", ztarget.GetLval())
+						goto exit_fail
+					}
+
+					/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
+					 * which happens whenever an explicit override is not provided. */
+
+					childend = ztarget.GetLval()
+
+					/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
+					 * which happens whenever an explicit override is not provided. */
+
+				}
+				descriptors[ndesc].SetChildend(dup(childend))
 				if descriptors[ndesc].GetChildend() < 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "unable to dup File-Handle for descriptor "+zend.ZEND_ULONG_FMT+" - %s", nindex, strerror(errno))
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to dup() for descriptor "+zend.ZEND_LONG_FMT+" - %s", nindex, strerror(errno))
+					goto exit_fail
+				}
+				descriptors[ndesc].SetMode(DESC_REDIRECT)
+			} else if strcmp(zend.Z_STRVAL_P(ztype), "null") == 0 {
+				descriptors[ndesc].SetChildend(open("/dev/null", O_RDWR))
+				if descriptors[ndesc].GetChildend() < 0 {
+					core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to open /dev/null - %s", strerror(errno))
 					goto exit_fail
 				}
 				descriptors[ndesc].SetMode(DESC_FILE)
-			} else if descitem.GetType() != zend.IS_ARRAY {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Descriptor item must be either an array or a File-Handle")
+			} else if strcmp(zend.Z_STRVAL_P(ztype), "pty") == 0 {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "pty pseudo terminal not supported on this system")
 				goto exit_fail
 			} else {
-				if b.Assign(&ztype, zend.ZendHashIndexFind(descitem.GetArr(), 0)) != nil {
-					if zend.TryConvertToString(ztype) == 0 {
-						goto exit_fail
-					}
-				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing handle qualifier in array")
-					goto exit_fail
-				}
-				if strcmp(zend.Z_STRVAL_P(ztype), "pipe") == 0 {
-					var newpipe []PhpFileDescriptorT
-					var zmode *zend.Zval
-					if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
-						if zend.TryConvertToString(zmode) == 0 {
-							goto exit_fail
-						}
-					} else {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'pipe'")
-						goto exit_fail
-					}
-					descriptors[ndesc].SetMode(DESC_PIPE)
-					if 0 != pipe(newpipe) {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "unable to create pipe %s", strerror(errno))
-						goto exit_fail
-					}
-					if strncmp(zend.Z_STRVAL_P(zmode), "w", 1) != 0 {
-						descriptors[ndesc].SetParentend(newpipe[1])
-						descriptors[ndesc].SetChildend(newpipe[0])
-						descriptors[ndesc].SetMode(descriptors[ndesc].GetMode() | DESC_PARENT_MODE_WRITE)
-					} else {
-						descriptors[ndesc].SetParentend(newpipe[0])
-						descriptors[ndesc].SetChildend(newpipe[1])
-					}
-					if (descriptors[ndesc].GetMode() & DESC_PARENT_MODE_WRITE) != 0 {
-						descriptors[ndesc].SetModeFlags(O_WRONLY)
-					} else {
-						descriptors[ndesc].SetModeFlags(O_RDONLY)
-					}
-				} else if strcmp(zend.Z_STRVAL_P(ztype), "file") == 0 {
-					var zfile *zend.Zval
-					var zmode *zend.Zval
-					var fd core.PhpSocketT
-					var stream *core.PhpStream
-					descriptors[ndesc].SetMode(DESC_FILE)
-					if b.Assign(&zfile, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
-						if zend.TryConvertToString(zfile) == 0 {
-							goto exit_fail
-						}
-					} else {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Missing file name parameter for 'file'")
-						goto exit_fail
-					}
-					if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 2)) != nil {
-						if zend.TryConvertToString(zmode) == 0 {
-							goto exit_fail
-						}
-					} else {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Missing mode parameter for 'file'")
-						goto exit_fail
-					}
-
-					/* try a wrapper */
-
-					stream = core.PhpStreamOpenWrapper(zend.Z_STRVAL_P(zfile), zend.Z_STRVAL_P(zmode), core.REPORT_ERRORS|core.STREAM_WILL_CAST, nil)
-
-					/* force into an fd */
-
-					if stream == nil || zend.FAILURE == core.PhpStreamCast(stream, core.PHP_STREAM_CAST_RELEASE|core.PHP_STREAM_AS_FD, (*any)(&fd), core.REPORT_ERRORS) {
-						goto exit_fail
-					}
-					descriptors[ndesc].SetChildend(fd)
-				} else if strcmp(zend.Z_STRVAL_P(ztype), "redirect") == 0 {
-					var ztarget *zend.Zval = zend.ZendHashIndexFindDeref(descitem.GetArr(), 1)
-					var target *PhpProcOpenDescriptorItem = nil
-					var childend PhpFileDescriptorT
-					if ztarget == nil {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Missing redirection target")
-						goto exit_fail
-					}
-					if ztarget.GetType() != zend.IS_LONG {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target must be an integer")
-						goto exit_fail
-					}
-					for i = 0; i < ndesc; i++ {
-						if descriptors[i].GetIndex() == ztarget.GetLval() {
-							target = &descriptors[i]
-							break
-						}
-					}
-					if target != nil {
-						childend = target.GetChildend()
-					} else {
-						if ztarget.GetLval() < 0 || ztarget.GetLval() > 2 {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Redirection target "+zend.ZEND_LONG_FMT+" not found", ztarget.GetLval())
-							goto exit_fail
-						}
-
-						/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
-						 * which happens whenever an explicit override is not provided. */
-
-						childend = ztarget.GetLval()
-
-						/* Support referring to a stdin/stdout/stderr pipe adopted from the parent,
-						 * which happens whenever an explicit override is not provided. */
-
-					}
-					descriptors[ndesc].SetChildend(dup(childend))
-					if descriptors[ndesc].GetChildend() < 0 {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to dup() for descriptor "+zend.ZEND_LONG_FMT+" - %s", nindex, strerror(errno))
-						goto exit_fail
-					}
-					descriptors[ndesc].SetMode(DESC_REDIRECT)
-				} else if strcmp(zend.Z_STRVAL_P(ztype), "null") == 0 {
-					descriptors[ndesc].SetChildend(open("/dev/null", O_RDWR))
-					if descriptors[ndesc].GetChildend() < 0 {
-						core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to open /dev/null - %s", strerror(errno))
-						goto exit_fail
-					}
-					descriptors[ndesc].SetMode(DESC_FILE)
-				} else if strcmp(zend.Z_STRVAL_P(ztype), "pty") == 0 {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "pty pseudo terminal not supported on this system")
-					goto exit_fail
-				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "%s is not a valid descriptor spec/mode", zend.Z_STRVAL_P(ztype))
-					goto exit_fail
-				}
+				core.PhpErrorDocref(nil, zend.E_WARNING, "%s is not a valid descriptor spec/mode", zend.Z_STRVAL_P(ztype))
+				goto exit_fail
 			}
-			ndesc++
 		}
-		break
+		ndesc++
 	}
 
 	/* the unix way */

@@ -95,24 +95,19 @@ again:
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) {\n", COMMON, count)
-		for {
-			var __ht *zend.HashTable = myht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = myht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				num = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				PhpArrayElementDump(val, num, key, level)
 			}
-			break
+			num = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			PhpArrayElementDump(val, num, key, level)
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
@@ -139,31 +134,23 @@ again:
 			var num zend.ZendUlong
 			var key *zend.ZendString
 			var val *zend.Zval
-			for {
-				var __ht *zend.HashTable = myht
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = myht
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					num = _p.GetH()
-					key = _p.GetKey()
-					val = _z
-					var prop_info *zend.ZendPropertyInfo = nil
-					if val.IsType(zend.IS_INDIRECT) {
-						val = val.GetZv()
-						if key != nil {
-							prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
-						}
-					}
-					if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
-						PhpObjectPropertyDump(prop_info, val, num, key, level)
+				num = _p.GetH()
+				key = _p.GetKey()
+				val = _z
+				var prop_info *zend.ZendPropertyInfo = nil
+				if val.IsType(zend.IS_INDIRECT) {
+					val = val.GetZv()
+					if key != nil {
+						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 					}
 				}
-				break
+				if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
+					PhpObjectPropertyDump(prop_info, val, num, key, level)
+				}
 			}
 			zend.ZendReleaseProperties(myht)
 		}
@@ -356,24 +343,19 @@ again:
 		}
 		count = myht.Count()
 		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(zend.Z_REFCOUNTED_P(struc), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
-		for {
-			var __ht *zend.HashTable = myht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = myht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				ZvalArrayElementDump(val, index, key, level)
 			}
-			break
+			index = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			ZvalArrayElementDump(val, index, key, level)
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
@@ -400,31 +382,23 @@ again:
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), zend.Z_REFCOUNT_P(struc))
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
-			for {
-				var __ht *zend.HashTable = myht
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = myht
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					index = _p.GetH()
-					key = _p.GetKey()
-					val = _z
-					var prop_info *zend.ZendPropertyInfo = nil
-					if val.IsType(zend.IS_INDIRECT) {
-						val = val.GetZv()
-						if key != nil {
-							prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
-						}
-					}
-					if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
-						ZvalObjectPropertyDump(prop_info, val, index, key, level)
+				index = _p.GetH()
+				key = _p.GetKey()
+				val = _z
+				var prop_info *zend.ZendPropertyInfo = nil
+				if val.IsType(zend.IS_INDIRECT) {
+					val = val.GetZv()
+					if key != nil {
+						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 					}
 				}
-				break
+				if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
+					ZvalObjectPropertyDump(prop_info, val, index, key, level)
+				}
 			}
 			zend.GC_UNPROTECT_RECURSION(myht)
 			zend.ZendReleaseProperties(myht)
@@ -650,24 +624,19 @@ again:
 			BufferAppendSpaces(buf, level-1)
 		}
 		zend.SmartStrAppendl(buf, "array (\n", 8)
-		for {
-			var __ht *zend.HashTable = myht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = myht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				PhpArrayElementExport(val, index, key, level, buf)
 			}
-			break
+			index = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			PhpArrayElementExport(val, index, key, level, buf)
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			zend.GC_UNPROTECT_RECURSION(myht)
@@ -704,24 +673,19 @@ again:
 			zend.SmartStrAppendl(buf, "::__set_state(array(\n", 21)
 		}
 		if myht != nil {
-			for {
-				var __ht *zend.HashTable = myht
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
-					if _z.IsType(zend.IS_INDIRECT) {
-						_z = _z.GetZv()
-					}
+			var __ht *zend.HashTable = myht
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
+				if _z.IsType(zend.IS_INDIRECT) {
+					_z = _z.GetZv()
 					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
-					index = _p.GetH()
-					key = _p.GetKey()
-					val = _z
-					PhpObjectElementExport(val, index, key, level, buf)
 				}
-				break
+				index = _p.GetH()
+				key = _p.GetKey()
+				val = _z
+				PhpObjectElementExport(val, index, key, level, buf)
 			}
 			zend.GC_TRY_UNPROTECT_RECURSION(myht)
 			zend.ZendReleaseProperties(myht)
@@ -972,66 +936,61 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 	/* TODO: Rewrite this by fetching the property info instead of trying out different
 	 * name manglings? */
 
-	for {
-		var __ht *zend.HashTable = sleep_retval
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
-			if _z.IsType(zend.IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *zend.HashTable = sleep_retval
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
+		if _z.IsType(zend.IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
-			name_val = _z
-			var name *zend.ZendString
-			var tmp_name *zend.ZendString
-			var priv_name *zend.ZendString
-			var prot_name *zend.ZendString
-			zend.ZVAL_DEREF(name_val)
-			if name_val.GetType() != zend.IS_STRING {
-				core.PhpErrorDocref(nil, zend.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
-			}
-			name = zend.ZvalGetTmpString(name_val, &tmp_name)
-			if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == zend.SUCCESS {
-				zend.ZendTmpStringRelease(tmp_name)
-				continue
-			}
-			if zend.__EG().GetException() != nil {
-				zend.ZendTmpStringRelease(tmp_name)
-				retval = zend.FAILURE
-				break
-			}
-			priv_name = zend.ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
-			if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == zend.SUCCESS {
-				zend.ZendTmpStringRelease(tmp_name)
-				zend.ZendStringRelease(priv_name)
-				continue
-			}
-			zend.ZendStringRelease(priv_name)
-			if zend.__EG().GetException() != nil {
-				zend.ZendTmpStringRelease(tmp_name)
-				retval = zend.FAILURE
-				break
-			}
-			prot_name = zend.ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
-			if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == zend.SUCCESS {
-				zend.ZendTmpStringRelease(tmp_name)
-				zend.ZendStringRelease(prot_name)
-				continue
-			}
-			zend.ZendStringRelease(prot_name)
-			if zend.__EG().GetException() != nil {
-				zend.ZendTmpStringRelease(tmp_name)
-				retval = zend.FAILURE
-				break
-			}
-			core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-			zend.ZendHashAdd(ht, name, zend.__EG().GetUninitializedZval())
-			zend.ZendTmpStringRelease(tmp_name)
 		}
-		break
+		name_val = _z
+		var name *zend.ZendString
+		var tmp_name *zend.ZendString
+		var priv_name *zend.ZendString
+		var prot_name *zend.ZendString
+		zend.ZVAL_DEREF(name_val)
+		if name_val.GetType() != zend.IS_STRING {
+			core.PhpErrorDocref(nil, zend.E_NOTICE, "__sleep should return an array only containing the names of instance-variables to serialize.")
+		}
+		name = zend.ZvalGetTmpString(name_val, &tmp_name)
+		if PhpVarSerializeTryAddSleepProp(ht, props, name, name, struc) == zend.SUCCESS {
+			zend.ZendTmpStringRelease(tmp_name)
+			continue
+		}
+		if zend.__EG().GetException() != nil {
+			zend.ZendTmpStringRelease(tmp_name)
+			retval = zend.FAILURE
+			break
+		}
+		priv_name = zend.ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
+		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == zend.SUCCESS {
+			zend.ZendTmpStringRelease(tmp_name)
+			zend.ZendStringRelease(priv_name)
+			continue
+		}
+		zend.ZendStringRelease(priv_name)
+		if zend.__EG().GetException() != nil {
+			zend.ZendTmpStringRelease(tmp_name)
+			retval = zend.FAILURE
+			break
+		}
+		prot_name = zend.ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
+		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == zend.SUCCESS {
+			zend.ZendTmpStringRelease(tmp_name)
+			zend.ZendStringRelease(prot_name)
+			continue
+		}
+		zend.ZendStringRelease(prot_name)
+		if zend.__EG().GetException() != nil {
+			zend.ZendTmpStringRelease(tmp_name)
+			retval = zend.FAILURE
+			break
+		}
+		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
+		zend.ZendHashAdd(ht, name, zend.__EG().GetUninitializedZval())
+		zend.ZendTmpStringRelease(tmp_name)
 	}
 	zend.ZendReleaseProperties(props)
 	return retval
@@ -1043,58 +1002,53 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 		var key *zend.ZendString
 		var data *zend.Zval
 		var index zend.ZendUlong
-		for {
-			var __ht *zend.HashTable = ht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				data = _z
-				if incomplete_class != 0 && strcmp(key.GetVal(), MAGIC_MEMBER) == 0 {
-					continue
-				}
-				if key == nil {
-					PhpVarSerializeLong(buf, index)
-				} else {
-					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
-				}
-				if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
-					data = zend.Z_REFVAL_P(data)
-				}
-
-				/* we should still add element even if it's not OK,
-				 * since we already wrote the length of the array before */
-
-				if data.IsType(zend.IS_ARRAY) {
-					if zend.Z_IS_RECURSIVE_P(data) != 0 || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
-						PhpAddVarHash(var_hash, struc)
-						zend.SmartStrAppendl(buf, "N;", 2)
-					} else {
-						if zend.Z_REFCOUNTED_P(data) {
-							zend.Z_PROTECT_RECURSION_P(data)
-						}
-						PhpVarSerializeIntern(buf, data, var_hash)
-						if zend.Z_REFCOUNTED_P(data) {
-							zend.Z_UNPROTECT_RECURSION_P(data)
-						}
-					}
-				} else {
-					PhpVarSerializeIntern(buf, data, var_hash)
-				}
-
-				/* we should still add element even if it's not OK,
-				 * since we already wrote the length of the array before */
-
 			}
-			break
+			index = _p.GetH()
+			key = _p.GetKey()
+			data = _z
+			if incomplete_class != 0 && strcmp(key.GetVal(), MAGIC_MEMBER) == 0 {
+				continue
+			}
+			if key == nil {
+				PhpVarSerializeLong(buf, index)
+			} else {
+				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
+			}
+			if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
+				data = zend.Z_REFVAL_P(data)
+			}
+
+			/* we should still add element even if it's not OK,
+			 * since we already wrote the length of the array before */
+
+			if data.IsType(zend.IS_ARRAY) {
+				if zend.Z_IS_RECURSIVE_P(data) != 0 || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
+					PhpAddVarHash(var_hash, struc)
+					zend.SmartStrAppendl(buf, "N;", 2)
+				} else {
+					if zend.Z_REFCOUNTED_P(data) {
+						zend.Z_PROTECT_RECURSION_P(data)
+					}
+					PhpVarSerializeIntern(buf, data, var_hash)
+					if zend.Z_REFCOUNTED_P(data) {
+						zend.Z_UNPROTECT_RECURSION_P(data)
+					}
+				}
+			} else {
+				PhpVarSerializeIntern(buf, data, var_hash)
+			}
+
+			/* we should still add element even if it's not OK,
+			 * since we already wrote the length of the array before */
+
 		}
 	}
 	zend.SmartStrAppendc(buf, '}')
@@ -1178,32 +1132,27 @@ again:
 			PhpVarSerializeClassName(buf, &obj)
 			zend.SmartStrAppendUnsigned(buf, retval.GetArr().Count())
 			zend.SmartStrAppendl(buf, ":{", 2)
-			for {
-				var __ht *zend.HashTable = retval.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
-					if _z.IsType(zend.IS_INDIRECT) {
-						_z = _z.GetZv()
-					}
+			var __ht *zend.HashTable = retval.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
+				if _z.IsType(zend.IS_INDIRECT) {
+					_z = _z.GetZv()
 					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
-					index = _p.GetH()
-					key = _p.GetKey()
-					data = _z
-					if key == nil {
-						PhpVarSerializeLong(buf, index)
-					} else {
-						PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
-					}
-					if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
-						data = zend.Z_REFVAL_P(data)
-					}
-					PhpVarSerializeIntern(buf, data, var_hash)
 				}
-				break
+				index = _p.GetH()
+				key = _p.GetKey()
+				data = _z
+				if key == nil {
+					PhpVarSerializeLong(buf, index)
+				} else {
+					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
+				}
+				if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
+					data = zend.Z_REFVAL_P(data)
+				}
+				PhpVarSerializeIntern(buf, data, var_hash)
 			}
 			zend.SmartStrAppendc(buf, '}')
 			zend.ZvalPtrDtor(&obj)
@@ -1518,23 +1467,15 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		if class_hash != nil && classes.IsType(zend.IS_ARRAY) {
 			var entry *zend.Zval
 			var lcname *zend.ZendString
-			for {
-				var __ht *zend.HashTable = classes.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = classes.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					entry = _z
-					zend.ConvertToStringEx(entry)
-					lcname = zend.ZendStringTolower(entry.GetStr())
-					zend.ZendHashAddEmptyElement(class_hash, lcname)
-					zend.ZendStringReleaseEx(lcname, 0)
-				}
-				break
+				entry = _z
+				zend.ConvertToStringEx(entry)
+				lcname = zend.ZendStringTolower(entry.GetStr())
+				zend.ZendHashAddEmptyElement(class_hash, lcname)
+				zend.ZendStringReleaseEx(lcname, 0)
 			}
 
 			/* Exception during string conversion. */

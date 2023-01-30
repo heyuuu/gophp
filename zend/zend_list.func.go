@@ -158,24 +158,14 @@ func ZendInitRsrcPlist() int {
 }
 func ZendCloseRsrcList(ht *HashTable) {
 	var res *ZendResource
-	for {
-		var __ht *HashTable = ht
-		var _idx uint32 = __ht.GetNNumUsed()
-		var _p *Bucket = __ht.GetArData() + _idx
-		var _z *Zval
-		for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-			_p--
-			_z = _p.GetVal()
+	var __ht *HashTable = ht
+	for _, _p := range __ht.foreachDataReserve() {
+		var _z Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			res = _z.GetPtr()
-			if res.GetType() >= 0 {
-				ZendResourceDtor(res)
-			}
+		res = _z.GetPtr()
+		if res.GetType() >= 0 {
+			ZendResourceDtor(res)
 		}
-		break
 	}
 }
 func ZendDestroyRsrcList(ht *HashTable) { ZendHashGracefulReverseDestroy(ht) }
@@ -213,22 +203,14 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 }
 func ZendFetchListDtorId(type_name *byte) int {
 	var lde *ZendRsrcListDtorsEntry
-	for {
-		var __ht *HashTable = &ListDestructors
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = &ListDestructors
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			lde = _z.GetPtr()
-			if lde.GetTypeName() != nil && strcmp(type_name, lde.GetTypeName()) == 0 {
-				return lde.GetResourceId()
-			}
+		lde = _z.GetPtr()
+		if lde.GetTypeName() != nil && strcmp(type_name, lde.GetTypeName()) == 0 {
+			return lde.GetResourceId()
 		}
-		break
 	}
 	return 0
 }

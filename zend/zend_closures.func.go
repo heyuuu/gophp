@@ -407,23 +407,15 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 		var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
 		ZVAL_ARR(&val, ZendArrayDup(static_variables))
 		ZendHashUpdate(debug_info, ZSTR_KNOWN(ZEND_STR_STATIC), &val)
-		for {
-			var __ht *HashTable = val.GetArr()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = val.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				var_ = _z
-				if var_.IsType(IS_CONSTANT_AST) {
-					ZvalPtrDtor(var_)
-					ZVAL_STRING(var_, "<constant ast>")
-				}
+			var_ = _z
+			if var_.IsType(IS_CONSTANT_AST) {
+				ZvalPtrDtor(var_)
+				ZVAL_STRING(var_, "<constant ast>")
 			}
-			break
 		}
 	}
 	if closure.GetThisPtr().GetType() != IS_UNDEF {

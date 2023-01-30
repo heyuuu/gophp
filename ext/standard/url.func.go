@@ -974,47 +974,39 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		return
 	}
 	zend.ArrayInit(return_value)
-	for {
-		var __ht *zend.HashTable = stream.GetWrapperdata().GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = stream.GetWrapperdata().GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			hdr = _z
-			if hdr.GetType() != zend.IS_STRING {
-				continue
-			}
-			if format == 0 {
-			no_name_header:
-				zend.AddNextIndexStr(return_value, hdr.GetStr().Copy())
-			} else {
-				var c byte
-				var s *byte
-				var p *byte
-				if b.Assign(&p, strchr(zend.Z_STRVAL_P(hdr), ':')) {
-					c = *p
-					*p = '0'
-					s = p + 1
-					for isspace(int(*((*uint8)(s)))) {
-						s++
-					}
-					if b.Assign(&prev_val, return_value.GetArr().FindByStrPtr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
-						zend.AddAssocStringlEx(return_value, zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
-					} else {
-						zend.ConvertToArray(prev_val)
-						zend.AddNextIndexStringl(prev_val, s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
-					}
-					*p = c
-				} else {
-					goto no_name_header
+		hdr = _z
+		if hdr.GetType() != zend.IS_STRING {
+			continue
+		}
+		if format == 0 {
+		no_name_header:
+			zend.AddNextIndexStr(return_value, hdr.GetStr().Copy())
+		} else {
+			var c byte
+			var s *byte
+			var p *byte
+			if b.Assign(&p, strchr(zend.Z_STRVAL_P(hdr), ':')) {
+				c = *p
+				*p = '0'
+				s = p + 1
+				for isspace(int(*((*uint8)(s)))) {
+					s++
 				}
+				if b.Assign(&prev_val, return_value.GetArr().FindByStrPtr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr))) == nil {
+					zend.AddAssocStringlEx(return_value, zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
+				} else {
+					zend.ConvertToArray(prev_val)
+					zend.AddNextIndexStringl(prev_val, s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
+				}
+				*p = c
+			} else {
+				goto no_name_header
 			}
 		}
-		break
 	}
 	core.PhpStreamClose(stream)
 }

@@ -305,22 +305,14 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 		}
 	}
 	if nil != b.Assign(&rconflicts, zend.ZendHashFindPtr(&PhpOutputHandlerReverseConflicts, handler.GetName())) {
-		for {
-			var __ht *zend.HashTable = rconflicts
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = rconflicts
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				conflict = _z.GetPtr()
-				if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
-					return zend.FAILURE
-				}
+			conflict = _z.GetPtr()
+			if zend.SUCCESS != conflict(handler.GetName().GetVal(), handler.GetName().GetLen()) {
+				return zend.FAILURE
 			}
-			break
 		}
 	}
 

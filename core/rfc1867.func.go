@@ -113,21 +113,13 @@ func FreeFilename(el *zend.Zval) {
 }
 func DestroyUploadedFilesHash() {
 	var el *zend.Zval
-	for {
-		var __ht *zend.HashTable = SG(rfc1867_uploaded_files)
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = SG(rfc1867_uploaded_files)
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			el = _z
-			var filename *zend.ZendString = el.GetStr()
-			zend.VCWD_UNLINK(filename.GetVal())
-		}
-		break
+		el = _z
+		var filename *zend.ZendString = el.GetStr()
+		zend.VCWD_UNLINK(filename.GetVal())
 	}
 	zend.ZendHashDestroy(SG(rfc1867_uploaded_files))
 	zend.FREE_HASHTABLE(SG(rfc1867_uploaded_files))

@@ -538,20 +538,12 @@ func ZendGeneratorAddSingleChild(node *ZendGeneratorNode, child *ZendGenerator, 
 func ZendGeneratorMergeChildNodes(dest *ZendGeneratorNode, src *ZendGeneratorNode, child *ZendGenerator) {
 	var leaf ZendUlong
 	ZEND_ASSERT(src.GetChildren() > 1)
-	for {
-		var __ht *HashTable = src.GetHt()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = src.GetHt()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			leaf = _p.GetH()
-			ZendGeneratorAddSingleChild(dest, child, (*ZendGenerator)(leaf))
-		}
-		break
+		leaf = _p.GetH()
+		ZendGeneratorAddSingleChild(dest, child, (*ZendGenerator)(leaf))
 	}
 }
 func ZendGeneratorAddChild(generator *ZendGenerator, child *ZendGenerator) {

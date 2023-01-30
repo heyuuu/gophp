@@ -387,30 +387,22 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 		var ht *HashTable = expr.GetArr()
 		var val *Zval
 		var key *ZendString
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
+			key = _p.GetKey()
+			val = _z
+			if key != nil {
+				ZendThrowError(nil, "Cannot unpack array with string keys")
+				return FAILURE
+			} else {
+				if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
+					ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
+					break
 				}
-				key = _p.GetKey()
-				val = _z
-				if key != nil {
-					ZendThrowError(nil, "Cannot unpack array with string keys")
-					return FAILURE
-				} else {
-					if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
-						ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
-						break
-					}
-					Z_TRY_ADDREF_P(val)
-				}
+				Z_TRY_ADDREF_P(val)
 			}
-			break
 		}
 		return SUCCESS
 	}
@@ -1105,35 +1097,27 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 	case IS_ARRAY:
 		SmartStrAppendc(str, '[')
 		first = 1
-		for {
-			var __ht *HashTable = zv.GetArr()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = zv.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				idx = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				if first != 0 {
-					first = 0
-				} else {
-					SmartStrAppends(str, ", ")
-				}
-				if key != nil {
-					SmartStrAppendc(str, '\'')
-					ZendAstExportStr(str, key)
-					SmartStrAppends(str, "' => ")
-				} else {
-					SmartStrAppendLong(str, idx)
-					SmartStrAppends(str, " => ")
-				}
-				ZendAstExportZval(str, val, 0, indent)
+			idx = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			if first != 0 {
+				first = 0
+			} else {
+				SmartStrAppends(str, ", ")
 			}
-			break
+			if key != nil {
+				SmartStrAppendc(str, '\'')
+				ZendAstExportStr(str, key)
+				SmartStrAppends(str, "' => ")
+			} else {
+				SmartStrAppendLong(str, idx)
+				SmartStrAppends(str, " => ")
+			}
+			ZendAstExportZval(str, val, 0, indent)
 		}
 		SmartStrAppendc(str, ']')
 		break

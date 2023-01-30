@@ -790,40 +790,35 @@ func ValidateConstantArray(ht *HashTable) int {
 	var ret int = 1
 	var val *Zval
 	GC_PROTECT_RECURSION(ht)
-	for {
-		var __ht *HashTable = ht
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-			if _z.IsType(IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *HashTable = ht
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
+		if _z.IsType(IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(IS_UNDEF) {
 				continue
 			}
-			val = _z
-			ZVAL_DEREF(val)
-			if Z_REFCOUNTED_P(val) {
-				if val.IsType(IS_ARRAY) {
-					if Z_REFCOUNTED_P(val) {
-						if Z_IS_RECURSIVE_P(val) != 0 {
-							ZendError(E_WARNING, "Constants cannot be recursive arrays")
-							ret = 0
-							break
-						} else if ValidateConstantArray(val.GetArr()) == 0 {
-							ret = 0
-							break
-						}
+		}
+		val = _z
+		ZVAL_DEREF(val)
+		if Z_REFCOUNTED_P(val) {
+			if val.IsType(IS_ARRAY) {
+				if Z_REFCOUNTED_P(val) {
+					if Z_IS_RECURSIVE_P(val) != 0 {
+						ZendError(E_WARNING, "Constants cannot be recursive arrays")
+						ret = 0
+						break
+					} else if ValidateConstantArray(val.GetArr()) == 0 {
+						ret = 0
+						break
 					}
-				} else if val.GetType() != IS_STRING && val.GetType() != IS_RESOURCE {
-					ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
-					ret = 0
-					break
 				}
+			} else if val.GetType() != IS_STRING && val.GetType() != IS_RESOURCE {
+				ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
+				ret = 0
+				break
 			}
 		}
-		break
 	}
 	GC_UNPROTECT_RECURSION(ht)
 	return ret
@@ -834,39 +829,34 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 	var new_val *Zval
 	var val *Zval
 	ArrayInitSize(dst, Z_ARRVAL_P(src).GetNNumOfElements())
-	for {
-		var __ht *HashTable = src.GetArr()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-			if _z.IsType(IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *HashTable = src.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
+		if _z.IsType(IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(IS_UNDEF) {
 				continue
 			}
-			idx = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-
-			/* constant arrays can't contain references */
-
-			ZVAL_DEREF(val)
-			if key != nil {
-				new_val = ZendHashAddNew(dst.GetArr(), key, val)
-			} else {
-				new_val = ZendHashIndexAddNew(dst.GetArr(), idx, val)
-			}
-			if val.IsType(IS_ARRAY) {
-				if Z_REFCOUNTED_P(val) {
-					CopyConstantArray(new_val, val)
-				}
-			} else {
-				Z_TRY_ADDREF_P(val)
-			}
 		}
-		break
+		idx = _p.GetH()
+		key = _p.GetKey()
+		val = _z
+
+		/* constant arrays can't contain references */
+
+		ZVAL_DEREF(val)
+		if key != nil {
+			new_val = ZendHashAddNew(dst.GetArr(), key, val)
+		} else {
+			new_val = ZendHashIndexAddNew(dst.GetArr(), idx, val)
+		}
+		if val.IsType(IS_ARRAY) {
+			if Z_REFCOUNTED_P(val) {
+				CopyConstantArray(new_val, val)
+			}
+		} else {
+			Z_TRY_ADDREF_P(val)
+		}
 	}
 }
 func ZifDefine(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1300,61 +1290,53 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 	var prop *Zval
 	var prop_copy Zval
 	var key *ZendString
-	for {
-		var __ht *HashTable = ce.GetPropertiesInfo()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetPropertiesInfo()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			prop_info = _z.GetPtr()
-			if prop_info.IsProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.IsPrivate() && prop_info.GetCe() != scope {
-				continue
-			}
-			prop = nil
-			if statics != 0 && prop_info.IsStatic() {
-				prop = ce.GetDefaultStaticMembersTable()[prop_info.GetOffset()]
-				ZVAL_DEINDIRECT(prop)
-			} else if statics == 0 && !prop_info.IsStatic() {
-				prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
-			}
-			if prop == nil {
-				continue
-			}
-			if Z_ISUNDEF_P(prop) {
-
-				/* Return uninitialized typed properties as a null value */
-
-				ZVAL_NULL(&prop_copy)
-
-				/* Return uninitialized typed properties as a null value */
-
-			} else {
-
-				/* copy: enforce read only access */
-
-				ZVAL_COPY_OR_DUP(&prop_copy, prop)
-
-				/* copy: enforce read only access */
-
-			}
-			prop = &prop_copy
-
-			/* this is necessary to make it able to work with default array
-			 * properties, returned to user */
-
-			if Z_OPT_TYPE_P(prop) == IS_CONSTANT_AST {
-				if ZvalUpdateConstantEx(prop, nil) != SUCCESS {
-					return
-				}
-			}
-			ZendHashAddNew(return_value.GetArr(), key, prop)
+		key = _p.GetKey()
+		prop_info = _z.GetPtr()
+		if prop_info.IsProtected() && ZendCheckProtected(prop_info.GetCe(), scope) == 0 || prop_info.IsPrivate() && prop_info.GetCe() != scope {
+			continue
 		}
-		break
+		prop = nil
+		if statics != 0 && prop_info.IsStatic() {
+			prop = ce.GetDefaultStaticMembersTable()[prop_info.GetOffset()]
+			ZVAL_DEINDIRECT(prop)
+		} else if statics == 0 && !prop_info.IsStatic() {
+			prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
+		}
+		if prop == nil {
+			continue
+		}
+		if Z_ISUNDEF_P(prop) {
+
+			/* Return uninitialized typed properties as a null value */
+
+			ZVAL_NULL(&prop_copy)
+
+			/* Return uninitialized typed properties as a null value */
+
+		} else {
+
+			/* copy: enforce read only access */
+
+			ZVAL_COPY_OR_DUP(&prop_copy, prop)
+
+			/* copy: enforce read only access */
+
+		}
+		prop = &prop_copy
+
+		/* this is necessary to make it able to work with default array
+		 * properties, returned to user */
+
+		if Z_OPT_TYPE_P(prop) == IS_CONSTANT_AST {
+			if ZvalUpdateConstantEx(prop, nil) != SUCCESS {
+				return
+			}
+		}
+		ZendHashAddNew(return_value.GetArr(), key, prop)
 	}
 }
 func ZifGetClassVars(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1472,67 +1454,59 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	} else {
 		ArrayInitSize(return_value, properties.GetNNumOfElements())
-		for {
-			var __ht *HashTable = properties
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = properties
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
+			num_key = _p.GetH()
+			key = _p.GetKey()
+			value = _z
+			var is_dynamic ZendBool = 1
+			if value.IsType(IS_INDIRECT) {
+				value = value.GetZv()
+				if Z_ISUNDEF_P(value) {
 					continue
 				}
-				num_key = _p.GetH()
-				key = _p.GetKey()
-				value = _z
-				var is_dynamic ZendBool = 1
-				if value.IsType(IS_INDIRECT) {
-					value = value.GetZv()
-					if Z_ISUNDEF_P(value) {
-						continue
-					}
-					is_dynamic = 0
-				}
-				if key != nil && ZendCheckPropertyAccess(zobj, key, is_dynamic) == FAILURE {
-					continue
-				}
-				if Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1 {
-					value = Z_REFVAL_P(value)
-				}
-				Z_TRY_ADDREF_P(value)
-				if key == nil {
-
-					/* This case is only possible due to loopholes, e.g. ArrayObject */
-
-					ZendHashIndexAdd(return_value.GetArr(), num_key, value)
-
-					/* This case is only possible due to loopholes, e.g. ArrayObject */
-
-				} else if is_dynamic == 0 && key.GetVal()[0] == 0 {
-					var prop_name *byte
-					var class_name *byte
-					var prop_len int
-					ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_len)
-
-					/* We assume here that a mangled property name is never
-					 * numeric. This is probably a safe assumption, but
-					 * theoretically someone might write an extension with
-					 * private, numeric properties. Well, too bad.
-					 */
-
-					ZendHashStrAddNew(return_value.GetArr(), prop_name, prop_len, value)
-
-					/* We assume here that a mangled property name is never
-					 * numeric. This is probably a safe assumption, but
-					 * theoretically someone might write an extension with
-					 * private, numeric properties. Well, too bad.
-					 */
-
-				} else {
-					ZendSymtableAddNew(return_value.GetArr(), key, value)
-				}
+				is_dynamic = 0
 			}
-			break
+			if key != nil && ZendCheckPropertyAccess(zobj, key, is_dynamic) == FAILURE {
+				continue
+			}
+			if Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1 {
+				value = Z_REFVAL_P(value)
+			}
+			Z_TRY_ADDREF_P(value)
+			if key == nil {
+
+				/* This case is only possible due to loopholes, e.g. ArrayObject */
+
+				ZendHashIndexAdd(return_value.GetArr(), num_key, value)
+
+				/* This case is only possible due to loopholes, e.g. ArrayObject */
+
+			} else if is_dynamic == 0 && key.GetVal()[0] == 0 {
+				var prop_name *byte
+				var class_name *byte
+				var prop_len int
+				ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_len)
+
+				/* We assume here that a mangled property name is never
+				 * numeric. This is probably a safe assumption, but
+				 * theoretically someone might write an extension with
+				 * private, numeric properties. Well, too bad.
+				 */
+
+				ZendHashStrAddNew(return_value.GetArr(), prop_name, prop_len, value)
+
+				/* We assume here that a mangled property name is never
+				 * numeric. This is probably a safe assumption, but
+				 * theoretically someone might write an extension with
+				 * private, numeric properties. Well, too bad.
+				 */
+
+			} else {
+				ZendSymtableAddNew(return_value.GetArr(), key, value)
+			}
 		}
 	}
 }
@@ -1650,29 +1624,21 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ArrayInit(return_value)
 	scope = ZendGetExecutedScope()
-	for {
-		var __ht *HashTable = ce.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			mptr = _z.GetPtr()
-			if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
-				if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
-					ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
-					ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
-				} else {
-					ZVAL_STR_COPY(&method_name, mptr.GetFunctionName())
-					ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
-				}
+		key = _p.GetKey()
+		mptr = _z.GetPtr()
+		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
+			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
+				ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
+				ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
+			} else {
+				ZVAL_STR_COPY(&method_name, mptr.GetFunctionName())
+				ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
 			}
 		}
-		break
 	}
 }
 func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2071,22 +2037,14 @@ func ZifGetIncludedFiles(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	ArrayInit(return_value)
-	for {
-		var __ht *HashTable = __EG().GetIncludedFiles()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __EG().GetIncludedFiles()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			entry = _p.GetKey()
-			if entry != nil {
-				AddNextIndexStr(return_value, entry.Copy())
-			}
+		entry = _p.GetKey()
+		if entry != nil {
+			AddNextIndexStr(return_value, entry.Copy())
 		}
-		break
 	}
 }
 func ZifTriggerError(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2217,23 +2175,15 @@ func GetDeclaredClassImpl(execute_data *ZendExecuteData, return_value *Zval, fla
 		return
 	}
 	ArrayInit(return_value)
-	for {
-		var __ht *HashTable = __EG().GetClassTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __EG().GetClassTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			ce = _z.GetPtr()
-			if key != nil && key.GetVal()[0] != 0 && ce.HasCeFlags(flags) && !ce.HasCeFlags(skip_flags) {
-				CopyClassOrInterfaceName(return_value, key, ce)
-			}
+		key = _p.GetKey()
+		ce = _z.GetPtr()
+		if key != nil && key.GetVal()[0] != 0 && ce.HasCeFlags(flags) && !ce.HasCeFlags(skip_flags) {
+			CopyClassOrInterfaceName(return_value, key, ce)
 		}
-		break
 	}
 }
 func ZifGetDeclaredTraits(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2257,27 +2207,19 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 	ArrayInit(&internal)
 	ArrayInit(&user)
 	ArrayInit(return_value)
-	for {
-		var __ht *HashTable = __EG().GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __EG().GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			func_ = _z.GetPtr()
-			if key != nil && key.GetVal()[0] != 0 {
-				if func_.GetType() == ZEND_INTERNAL_FUNCTION && (exclude_disabled == 0 || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction) {
-					AddNextIndexStr(&internal, key.Copy())
-				} else if func_.GetType() == ZEND_USER_FUNCTION {
-					AddNextIndexStr(&user, key.Copy())
-				}
+		key = _p.GetKey()
+		func_ = _z.GetPtr()
+		if key != nil && key.GetVal()[0] != 0 {
+			if func_.GetType() == ZEND_INTERNAL_FUNCTION && (exclude_disabled == 0 || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction) {
+				AddNextIndexStr(&internal, key.Copy())
+			} else if func_.GetType() == ZEND_USER_FUNCTION {
+				AddNextIndexStr(&user, key.Copy())
 			}
 		}
-		break
 	}
 	ZendHashStrAddNew(return_value.GetArr(), "internal", b.SizeOf("\"internal\"")-1, &internal)
 	ZendHashStrAddNew(return_value.GetArr(), "user", b.SizeOf("\"user\"")-1, &user)
@@ -2379,47 +2321,31 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if type_ == nil {
 		ArrayInit(return_value)
-		for {
-			var __ht *HashTable = __EG().GetRegularList()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __EG().GetRegularList()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				if key == nil {
-					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(return_value.GetArr(), index, val)
-				}
+			index = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			if key == nil {
+				Z_ADDREF_P(val)
+				ZendHashIndexAddNew(return_value.GetArr(), index, val)
 			}
-			break
 		}
 	} else if ZendStringEqualsLiteral(type_, "Unknown") {
 		ArrayInit(return_value)
-		for {
-			var __ht *HashTable = __EG().GetRegularList()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __EG().GetRegularList()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				if key == nil && Z_RES_TYPE_P(val) <= 0 {
-					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(return_value.GetArr(), index, val)
-				}
+			index = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			if key == nil && Z_RES_TYPE_P(val) <= 0 {
+				Z_ADDREF_P(val)
+				ZendHashIndexAddNew(return_value.GetArr(), index, val)
 			}
-			break
 		}
 	} else {
 		var id int = ZendFetchListDtorId(type_.GetVal())
@@ -2429,25 +2355,17 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 		ArrayInit(return_value)
-		for {
-			var __ht *HashTable = __EG().GetRegularList()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __EG().GetRegularList()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				index = _p.GetH()
-				key = _p.GetKey()
-				val = _z
-				if key == nil && Z_RES_TYPE_P(val) == id {
-					Z_ADDREF_P(val)
-					ZendHashIndexAddNew(return_value.GetArr(), index, val)
-				}
+			index = _p.GetH()
+			key = _p.GetKey()
+			val = _z
+			if key == nil && Z_RES_TYPE_P(val) == id {
+				Z_ADDREF_P(val)
+				ZendHashIndexAddNew(return_value.GetArr(), index, val)
 			}
-			break
 		}
 	}
 }
@@ -2466,20 +2384,12 @@ func ZifGetLoadedExtensions(execute_data *ZendExecuteData, return_value *Zval) {
 		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(AddZendextInfo), return_value)
 	} else {
 		var module *ZendModuleEntry
-		for {
-			var __ht *HashTable = &ModuleRegistry
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = &ModuleRegistry
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				module = _z.GetPtr()
-				AddNextIndexString(return_value, module.GetName())
-			}
-			break
+			module = _z.GetPtr()
+			AddNextIndexString(return_value, module.GetName())
 		}
 	}
 }
@@ -2500,94 +2410,70 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 		modules = Ecalloc(ModuleRegistry.GetNNumOfElements()+2, b.SizeOf("zval"))
 		module_names = Emalloc((ModuleRegistry.GetNNumOfElements() + 2) * b.SizeOf("char *"))
 		module_names[0] = "internal"
-		for {
-			var __ht *HashTable = &ModuleRegistry
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = &ModuleRegistry
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				module = _z.GetPtr()
-				module_names[module.GetModuleNumber()] = (*byte)(module.GetName())
-				i++
-			}
-			break
+			module = _z.GetPtr()
+			module_names[module.GetModuleNumber()] = (*byte)(module.GetName())
+			i++
 		}
 		module_names[i] = "user"
-		for {
-			var __ht *HashTable = __EG().GetZendConstants()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht__1 *HashTable = __EG().GetZendConstants()
+		for _, _p := range __ht__1.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				val = _z.GetPtr()
-				if val.GetName() == nil {
+			val = _z.GetPtr()
+			if val.GetName() == nil {
 
-					/* skip special constants */
+				/* skip special constants */
 
-					continue
+				continue
 
-					/* skip special constants */
+				/* skip special constants */
 
-				}
-				if ZEND_CONSTANT_MODULE_NUMBER(val) == PHP_USER_CONSTANT {
-					module_number = i
-				} else if ZEND_CONSTANT_MODULE_NUMBER(val) > i {
-
-					/* should not happen */
-
-					continue
-
-					/* should not happen */
-
-				} else {
-					module_number = ZEND_CONSTANT_MODULE_NUMBER(val)
-				}
-				if modules[module_number].IsType(IS_UNDEF) {
-					ArrayInit(&modules[module_number])
-					AddAssocZval(return_value, module_names[module_number], &modules[module_number])
-				}
-				ZVAL_COPY_OR_DUP(&const_val, val.GetValue())
-				ZendHashAddNew(modules[module_number].GetArr(), val.GetName(), &const_val)
 			}
-			break
+			if ZEND_CONSTANT_MODULE_NUMBER(val) == PHP_USER_CONSTANT {
+				module_number = i
+			} else if ZEND_CONSTANT_MODULE_NUMBER(val) > i {
+
+				/* should not happen */
+
+				continue
+
+				/* should not happen */
+
+			} else {
+				module_number = ZEND_CONSTANT_MODULE_NUMBER(val)
+			}
+			if modules[module_number].IsType(IS_UNDEF) {
+				ArrayInit(&modules[module_number])
+				AddAssocZval(return_value, module_names[module_number], &modules[module_number])
+			}
+			ZVAL_COPY_OR_DUP(&const_val, val.GetValue())
+			ZendHashAddNew(modules[module_number].GetArr(), val.GetName(), &const_val)
 		}
 		Efree(module_names)
 		Efree(modules)
 	} else {
 		var constant *ZendConstant
 		var const_val Zval
-		for {
-			var __ht *HashTable = __EG().GetZendConstants()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __EG().GetZendConstants()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				constant = _z.GetPtr()
-				if constant.GetName() == nil {
+			constant = _z.GetPtr()
+			if constant.GetName() == nil {
 
-					/* skip special constants */
+				/* skip special constants */
 
-					continue
+				continue
 
-					/* skip special constants */
+				/* skip special constants */
 
-				}
-				ZVAL_COPY_OR_DUP(&const_val, constant.GetValue())
-				ZendHashAddNew(return_value.GetArr(), constant.GetName(), &const_val)
 			}
-			break
+			ZVAL_COPY_OR_DUP(&const_val, constant.GetValue())
+			ZendHashAddNew(return_value.GetArr(), constant.GetName(), &const_val)
 		}
 	}
 }
@@ -2669,23 +2555,15 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 func DebugPrintBacktraceArgs(arg_array *Zval) {
 	var tmp *Zval
 	var i int = 0
-	for {
-		var __ht *HashTable = arg_array.GetArr()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = arg_array.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			tmp = _z
-			if b.PostInc(&i) {
-				ZEND_PUTS(", ")
-			}
-			ZendPrintFlatZvalR(tmp)
+		tmp = _z
+		if b.PostInc(&i) {
+			ZEND_PUTS(", ")
 		}
-		break
+		ZendPrintFlatZvalR(tmp)
 	}
 }
 func SkipInternalHandler(skip *ZendExecuteData) ZendBool {
@@ -3128,26 +3006,18 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		array = 0
 	}
-	for {
-		var __ht *HashTable = __CG().GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __CG().GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
+		zif = _z.GetPtr()
+		if zif.GetCommonType() == ZEND_INTERNAL_FUNCTION && zif.GetInternalFunction().GetModule() == module {
+			if array == 0 {
+				ArrayInit(return_value)
+				array = 1
 			}
-			zif = _z.GetPtr()
-			if zif.GetCommonType() == ZEND_INTERNAL_FUNCTION && zif.GetInternalFunction().GetModule() == module {
-				if array == 0 {
-					ArrayInit(return_value)
-					array = 1
-				}
-				AddNextIndexStr(return_value, zif.GetFunctionName().Copy())
-			}
+			AddNextIndexStr(return_value, zif.GetFunctionName().Copy())
 		}
-		break
 	}
 	if array == 0 {
 		RETVAL_FALSE

@@ -25,20 +25,12 @@ func PrintModules() {
 	zend.ZendHashInit(&sorted_registry, 50, nil, nil, 0)
 	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
-	for {
-		var __ht *zend.HashTable = &sorted_registry
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = &sorted_registry
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			module = _z.GetPtr()
-			core.PhpPrintf("%s\n", module.GetName())
-		}
-		break
+		module = _z.GetPtr()
+		core.PhpPrintf("%s\n", module.GetName())
 	}
 	zend.ZendHashDestroy(&sorted_registry)
 }

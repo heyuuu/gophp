@@ -638,22 +638,14 @@ func ZifStreamGetFilters(execute_data *zend.ZendExecuteData, return_value *zend.
 	zend.ArrayInit(return_value)
 	filters_hash = core.PhpGetStreamFiltersHash()
 	if filters_hash != nil {
-		for {
-			var __ht *zend.HashTable = filters_hash
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = filters_hash
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				filter_name = _p.GetKey()
-				if filter_name != nil {
-					zend.AddNextIndexStr(return_value, filter_name.Copy())
-				}
+			filter_name = _p.GetKey()
+			if filter_name != nil {
+				zend.AddNextIndexStr(return_value, filter_name.Copy())
 			}
-			break
 		}
 	}
 }

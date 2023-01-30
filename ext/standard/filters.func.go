@@ -109,23 +109,15 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 		if filterparams.IsType(zend.IS_ARRAY) {
 			var tags_ss zend.SmartStr = zend.SmartStr{0}
 			var tmp *zend.Zval
-			for {
-				var __ht *zend.HashTable = filterparams.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = filterparams.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					tmp = _z
-					zend.ConvertToStringEx(tmp)
-					zend.SmartStrAppendc(&tags_ss, '<')
-					zend.SmartStrAppend(&tags_ss, tmp.GetStr())
-					zend.SmartStrAppendc(&tags_ss, '>')
-				}
-				break
+				tmp = _z
+				zend.ConvertToStringEx(tmp)
+				zend.SmartStrAppendc(&tags_ss, '<')
+				zend.SmartStrAppend(&tags_ss, tmp.GetStr())
+				zend.SmartStrAppendc(&tags_ss, '>')
 			}
 			zend.SmartStr0(&tags_ss)
 			allowed_tags = tags_ss.GetS()

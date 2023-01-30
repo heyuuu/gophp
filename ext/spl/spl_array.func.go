@@ -1099,29 +1099,21 @@ func SplArrayObjectCountElementsHelper(intern *SplArrayObject) zend.ZendLong {
 
 		/* Count public/dynamic properties */
 
-		for {
-			var __ht *zend.HashTable = aht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = aht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
+			key = _p.GetKey()
+			val = _z
+			if val.IsType(zend.IS_INDIRECT) {
+				if zend.Z_INDIRECT_P(val).IsType(zend.IS_UNDEF) {
 					continue
 				}
-				key = _p.GetKey()
-				val = _z
-				if val.IsType(zend.IS_INDIRECT) {
-					if zend.Z_INDIRECT_P(val).IsType(zend.IS_UNDEF) {
-						continue
-					}
-					if key != nil && key.GetVal()[0] == '0' {
-						continue
-					}
+				if key != nil && key.GetVal()[0] == '0' {
+					continue
 				}
-				count++
 			}
-			break
+			count++
 		}
 		return count
 	} else {

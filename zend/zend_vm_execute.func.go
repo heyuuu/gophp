@@ -1097,45 +1097,37 @@ send_again:
 				ht = args.GetArr()
 			}
 		}
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				name = _p.GetKey()
-				arg = _z
-				if name != nil {
-					ZendThrowError(nil, "Cannot unpack array with string keys")
-					FREE_OP(free_op1)
-					HANDLE_EXCEPTION()
-				}
-				top = ZEND_CALL_ARG(EX(call), arg_num)
-				if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
-					if Z_ISREF_P(arg) {
-						Z_ADDREF_P(arg)
-						ZVAL_REF(top, arg.GetRef())
-					} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
-
-						/* array is already separated above */
-
-						ZVAL_MAKE_REF_EX(arg, 2)
-						ZVAL_REF(top, arg.GetRef())
-					} else {
-						Z_TRY_ADDREF_P(arg)
-						ZVAL_NEW_REF(top, arg)
-					}
-				} else {
-					ZVAL_COPY_DEREF(top, arg)
-				}
-				ZEND_CALL_NUM_ARGS(EX(call))++
-				arg_num++
+			name = _p.GetKey()
+			arg = _z
+			if name != nil {
+				ZendThrowError(nil, "Cannot unpack array with string keys")
+				FREE_OP(free_op1)
+				HANDLE_EXCEPTION()
 			}
-			break
+			top = ZEND_CALL_ARG(EX(call), arg_num)
+			if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
+				if Z_ISREF_P(arg) {
+					Z_ADDREF_P(arg)
+					ZVAL_REF(top, arg.GetRef())
+				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
+
+					/* array is already separated above */
+
+					ZVAL_MAKE_REF_EX(arg, 2)
+					ZVAL_REF(top, arg.GetRef())
+				} else {
+					Z_TRY_ADDREF_P(arg)
+					ZVAL_NEW_REF(top, arg)
+				}
+			} else {
+				ZVAL_COPY_DEREF(top, arg)
+			}
+			ZEND_CALL_NUM_ARGS(EX(call))++
+			arg_num++
 		}
 	} else if args.IsType(IS_OBJECT) {
 		var ce *ZendClassEntry = Z_OBJCE_P(args)
@@ -1246,76 +1238,18 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 				ZendVmStackExtendCallFrame(&(EX(call)), 0, len_)
 				arg_num = 1
 				param = ZEND_CALL_ARG(EX(call), 1)
-				for {
-					var __ht *HashTable = ht
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
-
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						arg = _z
-						var must_wrap ZendBool = 0
-						if skip > 0 {
-							skip--
-							continue
-						} else if zend_long(arg_num-1) >= len_ {
-							break
-						} else if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
-							if !(Z_ISREF_P(arg)) {
-								if ARG_MAY_BE_SENT_BY_REF(EX(call).func_, arg_num) == 0 {
-
-									/* By-value send is not allowed -- emit a warning,
-									 * but still perform the call. */
-
-									ZendParamMustBeRef(EX(call).func_, arg_num)
-									must_wrap = 1
-								}
-							}
-						} else {
-							if Z_ISREF_P(arg) && (EX(call).func_.common.fn_flags&ZEND_ACC_CALL_VIA_TRAMPOLINE) == 0 {
-
-								/* don't separate references for __call */
-
-								arg = Z_REFVAL_P(arg)
-
-								/* don't separate references for __call */
-
-							}
-						}
-						if must_wrap == 0 {
-							ZVAL_COPY(param, arg)
-						} else {
-							Z_TRY_ADDREF_P(arg)
-							ZVAL_NEW_REF(param, arg)
-						}
-						ZEND_CALL_NUM_ARGS(EX(call))++
-						arg_num++
-						param++
-					}
-					break
-				}
-			}
-			FREE_OP(free_op2)
-		} else {
-			ZendVmStackExtendCallFrame(&(EX(call)), 0, ht.GetNNumOfElements())
-			arg_num = 1
-			param = ZEND_CALL_ARG(EX(call), 1)
-			for {
 				var __ht *HashTable = ht
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
+				for _, _p := range __ht.foreachData() {
 					var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
 					arg = _z
 					var must_wrap ZendBool = 0
-					if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
+					if skip > 0 {
+						skip--
+						continue
+					} else if zend_long(arg_num-1) >= len_ {
+						break
+					} else if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
 						if !(Z_ISREF_P(arg)) {
 							if ARG_MAY_BE_SENT_BY_REF(EX(call).func_, arg_num) == 0 {
 
@@ -1347,7 +1281,49 @@ func ZEND_SEND_ARRAY_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 					arg_num++
 					param++
 				}
-				break
+			}
+			FREE_OP(free_op2)
+		} else {
+			ZendVmStackExtendCallFrame(&(EX(call)), 0, ht.GetNNumOfElements())
+			arg_num = 1
+			param = ZEND_CALL_ARG(EX(call), 1)
+			var __ht *HashTable = ht
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
+
+				arg = _z
+				var must_wrap ZendBool = 0
+				if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
+					if !(Z_ISREF_P(arg)) {
+						if ARG_MAY_BE_SENT_BY_REF(EX(call).func_, arg_num) == 0 {
+
+							/* By-value send is not allowed -- emit a warning,
+							 * but still perform the call. */
+
+							ZendParamMustBeRef(EX(call).func_, arg_num)
+							must_wrap = 1
+						}
+					}
+				} else {
+					if Z_ISREF_P(arg) && (EX(call).func_.common.fn_flags&ZEND_ACC_CALL_VIA_TRAMPOLINE) == 0 {
+
+						/* don't separate references for __call */
+
+						arg = Z_REFVAL_P(arg)
+
+						/* don't separate references for __call */
+
+					}
+				}
+				if must_wrap == 0 {
+					ZVAL_COPY(param, arg)
+				} else {
+					Z_TRY_ADDREF_P(arg)
+					ZVAL_NEW_REF(param, arg)
+				}
+				ZEND_CALL_NUM_ARGS(EX(call))++
+				arg_num++
+				param++
 			}
 		}
 	}
@@ -1389,35 +1365,27 @@ add_unpack_again:
 		var ht *HashTable = op1.GetArr()
 		var val *Zval
 		var key *ZendString
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
+			key = _p.GetKey()
+			val = _z
+			if key != nil {
+				ZendThrowError(nil, "Cannot unpack array with string keys")
+				FREE_OP(free_op1)
+				HANDLE_EXCEPTION()
+			} else {
+				if Z_ISREF_P(val) && Z_REFCOUNT_P(val) == 1 {
+					val = Z_REFVAL_P(val)
 				}
-				key = _p.GetKey()
-				val = _z
-				if key != nil {
-					ZendThrowError(nil, "Cannot unpack array with string keys")
-					FREE_OP(free_op1)
-					HANDLE_EXCEPTION()
-				} else {
-					if Z_ISREF_P(val) && Z_REFCOUNT_P(val) == 1 {
-						val = Z_REFVAL_P(val)
-					}
-					Z_TRY_ADDREF_P(val)
-					if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), val) == nil {
-						ZendCannotAddElement()
-						ZvalPtrDtorNogc(val)
-						break
-					}
+				Z_TRY_ADDREF_P(val)
+				if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), val) == nil {
+					ZendCannotAddElement()
+					ZvalPtrDtorNogc(val)
+					break
 				}
 			}
-			break
 		}
 	} else if op1.IsType(IS_OBJECT) {
 		var ce *ZendClassEntry = Z_OBJCE_P(op1)
@@ -5284,26 +5252,18 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var result_tmp Zval
 		var val *Zval
 		result = nil
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				val = _z
-				ZVAL_STR(&key_tmp, key)
-				CompareFunction(&result_tmp, op1, &key_tmp)
-				if result_tmp.GetLval() == 0 {
-					result = val
-					break
-				}
+			key = _p.GetKey()
+			val = _z
+			ZVAL_STR(&key_tmp, key)
+			CompareFunction(&result_tmp, op1, &key_tmp)
+			if result_tmp.GetLval() == 0 {
+				result = val
+				break
 			}
-			break
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
@@ -16273,26 +16233,18 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var result_tmp Zval
 		var val *Zval
 		result = nil
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				val = _z
-				ZVAL_STR(&key_tmp, key)
-				CompareFunction(&result_tmp, op1, &key_tmp)
-				if result_tmp.GetLval() == 0 {
-					result = val
-					break
-				}
+			key = _p.GetKey()
+			val = _z
+			ZVAL_STR(&key_tmp, key)
+			CompareFunction(&result_tmp, op1, &key_tmp)
+			if result_tmp.GetLval() == 0 {
+				result = val
+				break
 			}
-			break
 		}
 	}
 	ZvalPtrDtorNogc(free_op1)
@@ -21128,26 +21080,18 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var result_tmp Zval
 		var val *Zval
 		result = nil
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				val = _z
-				ZVAL_STR(&key_tmp, key)
-				CompareFunction(&result_tmp, op1, &key_tmp)
-				if result_tmp.GetLval() == 0 {
-					result = val
-					break
-				}
+			key = _p.GetKey()
+			val = _z
+			ZVAL_STR(&key_tmp, key)
+			CompareFunction(&result_tmp, op1, &key_tmp)
+			if result_tmp.GetLval() == 0 {
+				result = val
+				break
 			}
-			break
 		}
 	}
 	ZvalPtrDtorNogc(free_op1)
@@ -36417,26 +36361,18 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var result_tmp Zval
 		var val *Zval
 		result = nil
-		for {
-			var __ht *HashTable = ht
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ht
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				val = _z
-				ZVAL_STR(&key_tmp, key)
-				CompareFunction(&result_tmp, op1, &key_tmp)
-				if result_tmp.GetLval() == 0 {
-					result = val
-					break
-				}
+			key = _p.GetKey()
+			val = _z
+			ZVAL_STR(&key_tmp, key)
+			CompareFunction(&result_tmp, op1, &key_tmp)
+			if result_tmp.GetLval() == 0 {
+				result = val
+				break
 			}
-			break
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)

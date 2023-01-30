@@ -164,29 +164,21 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 func PhpMailBuildHeadersElems(s *zend.SmartStr, key *zend.ZendString, val *zend.Zval) {
 	var tmp_key *zend.ZendString
 	var tmp_val *zend.Zval
-	for {
-		var __ht *zend.HashTable = val.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = val.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			tmp_key = _p.GetKey()
-			tmp_val = _z
-			if tmp_key != nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
-				continue
-			}
-			if tmp_val.GetType() != zend.IS_STRING {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
-				continue
-			}
-			PhpMailBuildHeadersElem(s, key, tmp_val)
+		tmp_key = _p.GetKey()
+		tmp_val = _z
+		if tmp_key != nil {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header key must be numeric index (%s)", tmp_key.GetVal())
+			continue
 		}
-		break
+		if tmp_val.GetType() != zend.IS_STRING {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Multiple header values must be string (%s)", key.GetVal())
+			continue
+		}
+		PhpMailBuildHeadersElem(s, key, tmp_val)
 	}
 }
 func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
@@ -195,104 +187,96 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var val *zend.Zval
 	var s zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(headers.IsType(zend.IS_ARRAY))
-	for {
-		var __ht *zend.HashTable = headers.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = headers.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			idx = _p.GetH()
-			key = _p.GetKey()
-			val = _z
-			if key == nil {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
-				continue
-			}
-
-			/* https://tools.ietf.org/html/rfc2822#section-3.6 */
-
-			switch key.GetLen() {
-			case b.SizeOf("\"orig-date\"") - 1:
-				if !(strncasecmp("orig-date", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("orig-date", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"from\"") - 1:
-				if !(strncasecmp("from", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("from", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"sender\"") - 1:
-				if !(strncasecmp("sender", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("sender", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"reply-to\"") - 1:
-				if !(strncasecmp("reply-to", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("reply-to", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"to\"") - 1:
-				if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'To' header")
-					continue
-				}
-				if !(strncasecmp("cc", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("cc", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"bcc\"") - 1:
-				if !(strncasecmp("bcc", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("bcc", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"message-id\"") - 1:
-				if !(strncasecmp("message-id", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("message-id", s, key, val)
-				} else if !(strncasecmp("references", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("references", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"in-reply-to\"") - 1:
-				if !(strncasecmp("in-reply-to", key.GetVal(), key.GetLen())) {
-					PHP_MAIL_BUILD_HEADER_CHECK("in-reply-to", s, key, val)
-				} else {
-					PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				}
-				break
-			case b.SizeOf("\"subject\"") - 1:
-				if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'Subject' header")
-					continue
-				}
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-				break
-			default:
-				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			}
-
-			/* https://tools.ietf.org/html/rfc2822#section-3.6 */
-
+		idx = _p.GetH()
+		key = _p.GetKey()
+		val = _z
+		if key == nil {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Found numeric header ("+zend.ZEND_LONG_FMT+")", idx)
+			continue
 		}
-		break
+
+		/* https://tools.ietf.org/html/rfc2822#section-3.6 */
+
+		switch key.GetLen() {
+		case b.SizeOf("\"orig-date\"") - 1:
+			if !(strncasecmp("orig-date", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("orig-date", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"from\"") - 1:
+			if !(strncasecmp("from", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("from", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"sender\"") - 1:
+			if !(strncasecmp("sender", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("sender", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"reply-to\"") - 1:
+			if !(strncasecmp("reply-to", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("reply-to", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"to\"") - 1:
+			if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'To' header")
+				continue
+			}
+			if !(strncasecmp("cc", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("cc", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"bcc\"") - 1:
+			if !(strncasecmp("bcc", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("bcc", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"message-id\"") - 1:
+			if !(strncasecmp("message-id", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("message-id", s, key, val)
+			} else if !(strncasecmp("references", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("references", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"in-reply-to\"") - 1:
+			if !(strncasecmp("in-reply-to", key.GetVal(), key.GetLen())) {
+				PHP_MAIL_BUILD_HEADER_CHECK("in-reply-to", s, key, val)
+			} else {
+				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			}
+			break
+		case b.SizeOf("\"subject\"") - 1:
+			if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'Subject' header")
+				continue
+			}
+			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+			break
+		default:
+			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
+		}
+
+		/* https://tools.ietf.org/html/rfc2822#section-3.6 */
+
 	}
 
 	/* Remove the last \r\n */

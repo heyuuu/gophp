@@ -1339,26 +1339,18 @@ func ZendRegisterAutoGlobal(name *ZendString, jit ZendBool, auto_global_callback
 }
 func ZendActivateAutoGlobals() {
 	var auto_global *ZendAutoGlobal
-	for {
-		var __ht *HashTable = __CG().GetAutoGlobals()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __CG().GetAutoGlobals()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			auto_global = _z.GetPtr()
-			if auto_global.GetJit() != 0 {
-				auto_global.SetArmed(1)
-			} else if auto_global.GetAutoGlobalCallback() != nil {
-				auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
-			} else {
-				auto_global.SetArmed(0)
-			}
+		auto_global = _z.GetPtr()
+		if auto_global.GetJit() != 0 {
+			auto_global.SetArmed(1)
+		} else if auto_global.GetAutoGlobalCallback() != nil {
+			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
+		} else {
+			auto_global.SetArmed(0)
 		}
-		break
 	}
 }
 func Zendlex(elem *ZendParserStackElem) int {
@@ -2976,49 +2968,33 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var dst *HashTable = ZendNewArray(src.GetNNumOfElements())
 		ZVAL_TRUE(&tmp)
 		if strict != 0 {
-			for {
-				var __ht *HashTable = src
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = src
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					val = _z
-					if val.IsType(IS_STRING) {
-						ZendHashAdd(dst, val.GetStr(), &tmp)
-					} else if val.IsType(IS_LONG) {
-						ZendHashIndexAdd(dst, val.GetLval(), &tmp)
-					} else {
-						ZendArrayDestroy(dst)
-						ok = 0
-						break
-					}
+				val = _z
+				if val.IsType(IS_STRING) {
+					ZendHashAdd(dst, val.GetStr(), &tmp)
+				} else if val.IsType(IS_LONG) {
+					ZendHashIndexAdd(dst, val.GetLval(), &tmp)
+				} else {
+					ZendArrayDestroy(dst)
+					ok = 0
+					break
 				}
-				break
 			}
 		} else {
-			for {
-				var __ht *HashTable = src
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = src
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					val = _z
-					if val.GetType() != IS_STRING || IsNumericString(Z_STRVAL_P(val), Z_STRLEN_P(val), nil, nil, 0) != 0 {
-						ZendArrayDestroy(dst)
-						ok = 0
-						break
-					}
-					ZendHashAdd(dst, val.GetStr(), &tmp)
+				val = _z
+				if val.GetType() != IS_STRING || IsNumericString(Z_STRVAL_P(val), Z_STRLEN_P(val), nil, nil, 0) != 0 {
+					ZendArrayDestroy(dst)
+					ok = 0
+					break
 				}
-				break
+				ZendHashAdd(dst, val.GetStr(), &tmp)
 			}
 		}
 		ZendArrayDestroy(src)
@@ -4160,23 +4136,13 @@ func ZendCompileTry(ast *ZendAst) {
 
 	if __CG().GetContext().GetLabels() != nil {
 		var label *ZendLabel
-		for {
-			var __ht *HashTable = __CG().GetContext().GetLabels()
-			var _idx uint32 = __ht.GetNNumUsed()
-			var _p *Bucket = __ht.GetArData() + _idx
-			var _z *Zval
-			for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-				_p--
-				_z = _p.GetVal()
+		var __ht *HashTable = __CG().GetContext().GetLabels()
+		for _, _p := range __ht.foreachDataReserve() {
+			var _z Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				label = _z.GetPtr()
-				if label.GetOplineNum() == GetNextOpNumber() {
-					ZendEmitOp(nil, ZEND_NOP, nil, nil)
-				}
-				break
+			label = _z.GetPtr()
+			if label.GetOplineNum() == GetNextOpNumber() {
+				ZendEmitOp(nil, ZEND_NOP, nil, nil)
 			}
 			break
 		}
@@ -4777,25 +4743,17 @@ func CompileImplicitLexicalBinds(info *ClosureInfo, closure *Znode, op_array *Ze
 	if op_array.GetStaticVariables() == nil {
 		op_array.SetStaticVariables(ZendNewArray(8))
 	}
-	for {
-		var __ht *HashTable = info.GetUses()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = info.GetUses()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			var_name = _p.GetKey()
-			var value *Zval = ZendHashAdd(op_array.GetStaticVariables(), var_name, __EG().GetUninitializedZval())
-			var offset uint32 = uint32((*byte)(value - (*byte)(op_array.GetStaticVariables().GetArData())))
-			opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
-			opline.SetOp2Type(IS_CV)
-			opline.GetOp2().SetVar(LookupCv(var_name))
-			opline.SetExtendedValue(offset | ZEND_BIND_IMPLICIT)
-		}
-		break
+		var_name = _p.GetKey()
+		var value *Zval = ZendHashAdd(op_array.GetStaticVariables(), var_name, __EG().GetUninitializedZval())
+		var offset uint32 = uint32((*byte)(value - (*byte)(op_array.GetStaticVariables().GetArData())))
+		opline = ZendEmitOp(nil, ZEND_BIND_LEXICAL, closure, nil)
+		opline.SetOp2Type(IS_CV)
+		opline.GetOp2().SetVar(LookupCv(var_name))
+		opline.SetExtendedValue(offset | ZEND_BIND_IMPLICIT)
 	}
 }
 func ZendCompileClosureUses(ast *ZendAst) {
@@ -4819,22 +4777,14 @@ func ZendCompileClosureUses(ast *ZendAst) {
 }
 func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 	var var_name *ZendString
-	for {
-		var __ht *HashTable = info.GetUses()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = info.GetUses()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			var_name = _p.GetKey()
-			var zv Zval
-			ZVAL_NULL(&zv)
-			ZendCompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
-		}
-		break
+		var_name = _p.GetKey()
+		var zv Zval
+		ZVAL_NULL(&zv)
+		ZendCompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
 	}
 }
 func ZendBeginMethodDecl(op_array *ZendOpArray, name *ZendString, has_body ZendBool) {
@@ -6006,28 +5956,20 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 				var ht *HashTable = value.GetArr()
 				var val *Zval
 				var key *ZendString
-				for {
-					var __ht *HashTable = ht
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
+				var __ht *HashTable = ht
+				for _, _p := range __ht.foreachData() {
+					var _z *Zval = _p.GetVal()
 
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						key = _p.GetKey()
-						val = _z
-						if key != nil {
-							ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unpack array with string keys")
-						}
-						if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
-							ZvalPtrDtor(result)
-							return 0
-						}
-						Z_TRY_ADDREF_P(val)
+					key = _p.GetKey()
+					val = _z
+					if key != nil {
+						ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
-					break
+					if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
+						ZvalPtrDtor(result)
+						return 0
+					}
+					Z_TRY_ADDREF_P(val)
 				}
 				continue
 			} else {
@@ -6482,23 +6424,15 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	} else {
 		opline.SetResult(result.GetOp())
 	}
-	for {
-		var __ht *HashTable = __CG().GetMemoizedExprs()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __CG().GetMemoizedExprs()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			node = _z.GetPtr()
-			if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
-				need_frees = 1
-				break
-			}
+		node = _z.GetPtr()
+		if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
+			need_frees = 1
+			break
 		}
-		break
 	}
 
 	/* Free DUPed expressions if there are any */
@@ -6506,22 +6440,14 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	if need_frees != 0 {
 		var jump_opnum uint32 = ZendEmitJump(0)
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
-		for {
-			var __ht *HashTable = __CG().GetMemoizedExprs()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __CG().GetMemoizedExprs()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				node = _z.GetPtr()
-				if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
-					ZendEmitOp(nil, ZEND_FREE, node, nil)
-				}
+			node = _z.GetPtr()
+			if node.GetOpType() == IS_TMP_VAR || node.GetOpType() == IS_VAR {
+				ZendEmitOp(nil, ZEND_FREE, node, nil)
 			}
-			break
 		}
 		ZendUpdateJumpTargetToNext(jump_opnum)
 	} else {

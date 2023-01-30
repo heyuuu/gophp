@@ -122,22 +122,14 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 	client = core.SG(server_context)
 	headers = client.GetRequest().GetHeadersOriginalCase()
 	zend.ArrayInitSize(return_value, headers.GetNNumOfElements())
-	for {
-		var __ht *zend.HashTable = headers
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = headers
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			value = _z.GetPtr()
-			zend.ZVAL_STRING(&tmp, value)
-			zend.ZendSymtableUpdate(return_value.GetArr(), key, &tmp)
-		}
-		break
+		key = _p.GetKey()
+		value = _z.GetPtr()
+		zend.ZVAL_STRING(&tmp, value)
+		zend.ZendSymtableUpdate(return_value.GetArr(), key, &tmp)
 	}
 }
 func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {

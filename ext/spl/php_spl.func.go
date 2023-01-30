@@ -658,41 +658,33 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 	if zend.__EG().GetAutoloadFunc() == fptr {
 		var key *zend.ZendString
 		zend.ArrayInit(return_value)
-		for {
-			var __ht *zend.HashTable = SPL_G(autoload_functions)
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = SPL_G(autoload_functions)
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				alfi = _z.GetPtr()
-				if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
-					zend.Z_ADDREF(alfi.GetClosure())
-					zend.AddNextIndexZval(return_value, alfi.GetClosure())
-				} else if alfi.GetFuncPtr().GetScope() != nil {
-					var tmp zend.Zval
-					zend.ArrayInit(&tmp)
-					if !(zend.Z_ISUNDEF(alfi.GetObj())) {
-						zend.Z_ADDREF(alfi.GetObj())
-						zend.AddNextIndexZval(&tmp, alfi.GetObj())
-					} else {
-						zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())
-					}
-					zend.AddNextIndexStr(&tmp, alfi.GetFuncPtr().GetFunctionName().Copy())
-					zend.AddNextIndexZval(return_value, &tmp)
+			key = _p.GetKey()
+			alfi = _z.GetPtr()
+			if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
+				zend.Z_ADDREF(alfi.GetClosure())
+				zend.AddNextIndexZval(return_value, alfi.GetClosure())
+			} else if alfi.GetFuncPtr().GetScope() != nil {
+				var tmp zend.Zval
+				zend.ArrayInit(&tmp)
+				if !(zend.Z_ISUNDEF(alfi.GetObj())) {
+					zend.Z_ADDREF(alfi.GetObj())
+					zend.AddNextIndexZval(&tmp, alfi.GetObj())
 				} else {
-					if strncmp(alfi.GetFuncPtr().GetFunctionName().GetVal(), "__lambda_func", b.SizeOf("\"__lambda_func\"")-1) {
-						zend.AddNextIndexStr(return_value, alfi.GetFuncPtr().GetFunctionName().Copy())
-					} else {
-						zend.AddNextIndexStr(return_value, key.Copy())
-					}
+					zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())
+				}
+				zend.AddNextIndexStr(&tmp, alfi.GetFuncPtr().GetFunctionName().Copy())
+				zend.AddNextIndexZval(return_value, &tmp)
+			} else {
+				if strncmp(alfi.GetFuncPtr().GetFunctionName().GetVal(), "__lambda_func", b.SizeOf("\"__lambda_func\"")-1) {
+					zend.AddNextIndexStr(return_value, alfi.GetFuncPtr().GetFunctionName().Copy())
+				} else {
+					zend.AddNextIndexStr(return_value, key.Copy())
 				}
 			}
-			break
 		}
 		return
 	}
@@ -860,20 +852,12 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, 1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
-	for {
-		var __ht *zend.HashTable = list.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = list.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			zv = _z
-			SplBuildClassListString(zv, &strg)
-		}
-		break
+		zv = _z
+		SplBuildClassListString(zv, &strg)
 	}
 	zend.ZendArrayDestroy(list.GetArr())
 	standard.PhpInfoPrintTableRow(2, "Interfaces", strg+2)
@@ -935,20 +919,12 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 	SplAddClasses(spl_ce_UnderflowException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	SplAddClasses(spl_ce_UnexpectedValueException, &list, 0, -1, zend.ZEND_ACC_INTERFACE)
 	strg = zend.Estrdup("")
-	for {
-		var __ht *zend.HashTable = list.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht__1 *zend.HashTable = list.GetArr()
+	for _, _p := range __ht__1.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			zv = _z
-			SplBuildClassListString(zv, &strg)
-		}
-		break
+		zv = _z
+		SplBuildClassListString(zv, &strg)
 	}
 	zend.ZendArrayDestroy(list.GetArr())
 	standard.PhpInfoPrintTableRow(2, "Classes", strg+2)

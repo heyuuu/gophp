@@ -174,82 +174,54 @@ func ShutdownExecutor() {
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */
 
-		for {
-			var __ht *HashTable = __EG().GetFunctionTable()
-			var _idx uint32 = __ht.GetNNumUsed()
-			var _p *Bucket = __ht.GetArData() + _idx
-			var _z *Zval
-			for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-				_p--
-				_z = _p.GetVal()
+		var __ht *HashTable = __EG().GetFunctionTable()
+		for _, _p := range __ht.foreachDataReserve() {
+			var _z Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				zv = _z
-				var op_array *ZendOpArray = zv.GetPtr()
-				if op_array.GetType() == ZEND_INTERNAL_FUNCTION {
-					break
-				}
-				if op_array.GetStaticVariables() != nil {
-					var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
-					if ht != nil {
-						if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-							ZendArrayDestroy(ht)
-						}
-						ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
+			zv = _z
+			var op_array *ZendOpArray = zv.GetPtr()
+			if op_array.GetType() == ZEND_INTERNAL_FUNCTION {
+				break
+			}
+			if op_array.GetStaticVariables() != nil {
+				var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+				if ht != nil {
+					if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+						ZendArrayDestroy(ht)
 					}
+					ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
 				}
 			}
-			break
 		}
-		for {
-			var __ht *HashTable = __EG().GetClassTable()
-			var _idx uint32 = __ht.GetNNumUsed()
-			var _p *Bucket = __ht.GetArData() + _idx
-			var _z *Zval
-			for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-				_p--
-				_z = _p.GetVal()
+		var __ht__1 *HashTable = __EG().GetClassTable()
+		for _, _p := range __ht__1.foreachDataReserve() {
+			var _z Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				zv = _z
-				var ce *ZendClassEntry = zv.GetPtr()
-				if ce.GetDefaultStaticMembersCount() != 0 {
-					ZendCleanupInternalClassData(ce)
-				}
-				if ce.IsHasStaticInMethods() {
-					var op_array *ZendOpArray
-					for {
-						var __ht *HashTable = ce.GetFunctionTable()
-						var _p *Bucket = __ht.GetArData()
-						var _end *Bucket = _p + __ht.GetNNumUsed()
-						for ; _p != _end; _p++ {
-							var _z *Zval = _p.GetVal()
+			zv = _z
+			var ce *ZendClassEntry = zv.GetPtr()
+			if ce.GetDefaultStaticMembersCount() != 0 {
+				ZendCleanupInternalClassData(ce)
+			}
+			if ce.IsHasStaticInMethods() {
+				var op_array *ZendOpArray
+				var __ht *HashTable = ce.GetFunctionTable()
+				for _, _p := range __ht.foreachData() {
+					var _z *Zval = _p.GetVal()
 
-							if _z.IsType(IS_UNDEF) {
-								continue
-							}
-							op_array = _z.GetPtr()
-							if op_array.GetType() == ZEND_USER_FUNCTION {
-								if op_array.GetStaticVariables() != nil {
-									var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
-									if ht != nil {
-										if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-											ZendArrayDestroy(ht)
-										}
-										ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
-									}
+					op_array = _z.GetPtr()
+					if op_array.GetType() == ZEND_USER_FUNCTION {
+						if op_array.GetStaticVariables() != nil {
+							var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
+							if ht != nil {
+								if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
+									ZendArrayDestroy(ht)
 								}
+								ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
 							}
 						}
-						break
 					}
 				}
 			}
-			break
 		}
 
 		/* Also release error and exception handlers, which may hold objects. */
@@ -294,123 +266,93 @@ func ShutdownExecutor() {
 			ZendHashReverseApply(__EG().GetFunctionTable(), CleanNonPersistentFunctionFull)
 			ZendHashReverseApply(__EG().GetClassTable(), CleanNonPersistentClassFull)
 		} else {
-			for {
-				var __ht *HashTable = __EG().GetZendConstants()
-				var _idx uint32 = __ht.GetNNumUsed()
-				var _p *Bucket = __ht.GetArData() + _idx
-				var _z *Zval
-				for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-					_p--
-					_z = _p.GetVal()
+			var __ht *HashTable = __EG().GetZendConstants()
+			for _, _p := range __ht.foreachDataReserve() {
+				var _z Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					key = _p.GetKey()
-					zv = _z
-					var c *ZendConstant = zv.GetPtr()
-					if _idx == __EG().GetPersistentConstantsCount() {
-						break
-					}
-					ZvalPtrDtorNogc(c.GetValue())
-					if c.GetName() != nil {
-						ZendStringReleaseEx(c.GetName(), 0)
-					}
-					Efree(c)
-					ZendStringReleaseEx(key, 0)
-					__ht.GetNNumOfElements()--
-					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
-					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = HT_HASH(__ht, nIndex)
-					if j != i {
-						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
-						for prev.GetVal().GetNext() != j {
-							i = prev.GetVal().GetNext()
-							prev = HT_HASH_TO_BUCKET(__ht, i)
-						}
-						prev.GetVal().GetNext() = _p.GetVal().GetNext()
-					} else {
-						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
-					}
+				key = _p.GetKey()
+				zv = _z
+				var c *ZendConstant = zv.GetPtr()
+				if _idx == __EG().GetPersistentConstantsCount() {
+					break
 				}
-				__ht.SetNNumUsed(_idx)
-				break
+				ZvalPtrDtorNogc(c.GetValue())
+				if c.GetName() != nil {
+					ZendStringReleaseEx(c.GetName(), 0)
+				}
+				Efree(c)
+				ZendStringReleaseEx(key, 0)
+				__ht.GetNNumOfElements()--
+				var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
+				var i uint32 = HT_HASH(__ht, nIndex)
+				if j != i {
+					var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
+					for prev.GetVal().GetNext() != j {
+						i = prev.GetVal().GetNext()
+						prev = HT_HASH_TO_BUCKET(__ht, i)
+					}
+					prev.GetVal().GetNext() = _p.GetVal().GetNext()
+				} else {
+					HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
+				}
 			}
-			for {
-				var __ht *HashTable = __EG().GetFunctionTable()
-				var _idx uint32 = __ht.GetNNumUsed()
-				var _p *Bucket = __ht.GetArData() + _idx
-				var _z *Zval
-				for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-					_p--
-					_z = _p.GetVal()
+			__ht.SetNNumUsed(_idx)
+			var __ht__1 *HashTable = __EG().GetFunctionTable()
+			for _, _p := range __ht__1.foreachDataReserve() {
+				var _z Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					key = _p.GetKey()
-					zv = _z
-					var func_ *ZendFunction = zv.GetPtr()
-					if _idx == __EG().GetPersistentFunctionsCount() {
-						break
-					}
-					DestroyOpArray(func_.GetOpArray())
-					ZendStringReleaseEx(key, 0)
-					__ht.GetNNumOfElements()--
-					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
-					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = HT_HASH(__ht, nIndex)
-					if j != i {
-						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
-						for prev.GetVal().GetNext() != j {
-							i = prev.GetVal().GetNext()
-							prev = HT_HASH_TO_BUCKET(__ht, i)
-						}
-						prev.GetVal().GetNext() = _p.GetVal().GetNext()
-					} else {
-						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
-					}
+				key = _p.GetKey()
+				zv = _z
+				var func_ *ZendFunction = zv.GetPtr()
+				if _idx == __EG().GetPersistentFunctionsCount() {
+					break
 				}
-				__ht.SetNNumUsed(_idx)
-				break
+				DestroyOpArray(func_.GetOpArray())
+				ZendStringReleaseEx(key, 0)
+				__ht__1.GetNNumOfElements()--
+				var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+				var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
+				var i uint32 = HT_HASH(__ht__1, nIndex)
+				if j != i {
+					var prev *Bucket = HT_HASH_TO_BUCKET(__ht__1, i)
+					for prev.GetVal().GetNext() != j {
+						i = prev.GetVal().GetNext()
+						prev = HT_HASH_TO_BUCKET(__ht__1, i)
+					}
+					prev.GetVal().GetNext() = _p.GetVal().GetNext()
+				} else {
+					HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
+				}
 			}
-			for {
-				var __ht *HashTable = __EG().GetClassTable()
-				var _idx uint32 = __ht.GetNNumUsed()
-				var _p *Bucket = __ht.GetArData() + _idx
-				var _z *Zval
-				for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-					_p--
-					_z = _p.GetVal()
+			__ht__1.SetNNumUsed(_idx)
+			var __ht__2 *HashTable = __EG().GetClassTable()
+			for _, _p := range __ht__2.foreachDataReserve() {
+				var _z Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					key = _p.GetKey()
-					zv = _z
-					if _idx == __EG().GetPersistentClassesCount() {
-						break
-					}
-					DestroyZendClass(zv)
-					ZendStringReleaseEx(key, 0)
-					__ht.GetNNumOfElements()--
-					var j uint32 = HT_IDX_TO_HASH(_idx - 1)
-					var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-					var i uint32 = HT_HASH(__ht, nIndex)
-					if j != i {
-						var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
-						for prev.GetVal().GetNext() != j {
-							i = prev.GetVal().GetNext()
-							prev = HT_HASH_TO_BUCKET(__ht, i)
-						}
-						prev.GetVal().GetNext() = _p.GetVal().GetNext()
-					} else {
-						HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
-					}
+				key = _p.GetKey()
+				zv = _z
+				if _idx == __EG().GetPersistentClassesCount() {
+					break
 				}
-				__ht.SetNNumUsed(_idx)
-				break
+				DestroyZendClass(zv)
+				ZendStringReleaseEx(key, 0)
+				__ht__2.GetNNumOfElements()--
+				var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+				var nIndex uint32 = _p.GetH() | __ht__2.GetNTableMask()
+				var i uint32 = HT_HASH(__ht__2, nIndex)
+				if j != i {
+					var prev *Bucket = HT_HASH_TO_BUCKET(__ht__2, i)
+					for prev.GetVal().GetNext() != j {
+						i = prev.GetVal().GetNext()
+						prev = HT_HASH_TO_BUCKET(__ht__2, i)
+					}
+					prev.GetVal().GetNext() = _p.GetVal().GetNext()
+				} else {
+					HT_HASH(__ht__2, nIndex) = _p.GetVal().GetNext()
+				}
 			}
+			__ht__2.SetNNumUsed(_idx)
 		}
 		for __EG().GetSymtableCachePtr() > __EG().GetSymtableCache() {
 			__EG().GetSymtableCachePtr()--

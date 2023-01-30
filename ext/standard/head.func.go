@@ -279,45 +279,37 @@ func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, 
 	var found int = 0
 	var key *zend.ZendString
 	var value *zend.Zval
-	for {
-		var __ht *zend.HashTable = options.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = options.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			value = _z
-			if key != nil {
-				if zend.ZendStringEqualsLiteralCi(key, "expires") {
-					*expires = zend.ZvalGetLong(value)
-					found++
-				} else if zend.ZendStringEqualsLiteralCi(key, "path") {
-					*path = zend.ZvalGetString(value)
-					found++
-				} else if zend.ZendStringEqualsLiteralCi(key, "domain") {
-					*domain = zend.ZvalGetString(value)
-					found++
-				} else if zend.ZendStringEqualsLiteralCi(key, "secure") {
-					*secure = zend.ZvalIsTrue(value)
-					found++
-				} else if zend.ZendStringEqualsLiteralCi(key, "httponly") {
-					*httponly = zend.ZvalIsTrue(value)
-					found++
-				} else if zend.ZendStringEqualsLiteralCi(key, "samesite") {
-					*samesite = zend.ZvalGetString(value)
-					found++
-				} else {
-					core.PhpErrorDocref(nil, zend.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
-				}
+		key = _p.GetKey()
+		value = _z
+		if key != nil {
+			if zend.ZendStringEqualsLiteralCi(key, "expires") {
+				*expires = zend.ZvalGetLong(value)
+				found++
+			} else if zend.ZendStringEqualsLiteralCi(key, "path") {
+				*path = zend.ZvalGetString(value)
+				found++
+			} else if zend.ZendStringEqualsLiteralCi(key, "domain") {
+				*domain = zend.ZvalGetString(value)
+				found++
+			} else if zend.ZendStringEqualsLiteralCi(key, "secure") {
+				*secure = zend.ZvalIsTrue(value)
+				found++
+			} else if zend.ZendStringEqualsLiteralCi(key, "httponly") {
+				*httponly = zend.ZvalIsTrue(value)
+				found++
+			} else if zend.ZendStringEqualsLiteralCi(key, "samesite") {
+				*samesite = zend.ZvalGetString(value)
+				found++
 			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric key found in the options array")
+				core.PhpErrorDocref(nil, zend.E_WARNING, "Unrecognized key '%s' found in the options array", key.GetVal())
 			}
+		} else {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric key found in the options array")
 		}
-		break
 	}
 
 	/* Array is not empty but no valid keys were found */

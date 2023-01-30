@@ -1094,23 +1094,18 @@ func PhpImplode(glue *zend.ZendString, pieces *zend.Zval, return_value *zend.Zva
 
 		/* loop to search the first not undefined element... */
 
-		for {
-			var __ht *zend.HashTable = pieces.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = pieces.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				tmp = _z
-				zend.RETVAL_STR(zend.ZvalGetString(tmp))
-				return
 			}
-			break
+			tmp = _z
+			zend.RETVAL_STR(zend.ZvalGetString(tmp))
+			return
 		}
 
 		/* loop to search the first not undefined element... */
@@ -1118,44 +1113,39 @@ func PhpImplode(glue *zend.ZendString, pieces *zend.Zval, return_value *zend.Zva
 	}
 	strings = zend.DoAlloca(b.SizeOf("* strings")*numelems, use_heap)
 	ptr = strings
-	for {
-		var __ht *zend.HashTable = pieces.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
-			if _z.IsType(zend.IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *zend.HashTable = pieces.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
+		if _z.IsType(zend.IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(zend.IS_UNDEF) {
 				continue
 			}
-			tmp = _z
-			if tmp.IsType(zend.IS_STRING) {
-				ptr.str = tmp.GetStr()
-				len_ += ptr.str.GetLen()
-				ptr.lval = 0
-				ptr++
-			} else if tmp.IsType(zend.IS_LONG) {
-				var val zend.ZendLong = tmp.GetLval()
-				ptr.str = nil
-				ptr.lval = val
-				ptr++
-				if val <= 0 {
-					len_++
-				}
-				for val != 0 {
-					val /= 10
-					len_++
-				}
-			} else {
-				ptr.str = zend.ZvalGetStringFunc(tmp)
-				len_ += ptr.str.GetLen()
-				ptr.lval = 1
-				ptr++
-			}
 		}
-		break
+		tmp = _z
+		if tmp.IsType(zend.IS_STRING) {
+			ptr.str = tmp.GetStr()
+			len_ += ptr.str.GetLen()
+			ptr.lval = 0
+			ptr++
+		} else if tmp.IsType(zend.IS_LONG) {
+			var val zend.ZendLong = tmp.GetLval()
+			ptr.str = nil
+			ptr.lval = val
+			ptr++
+			if val <= 0 {
+				len_++
+			}
+			for val != 0 {
+				val /= 10
+				len_++
+			}
+		} else {
+			ptr.str = zend.ZvalGetStringFunc(tmp)
+			len_ += ptr.str.GetLen()
+			ptr.lval = 1
+			ptr++
+		}
 	}
 
 	/* numelems can not be 0, we checked above */
@@ -3496,47 +3486,30 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		repl_idx = 0
 		len_idx = repl_idx
 		from_idx = len_idx
-		for {
-			var __ht *zend.HashTable = str.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = str.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				num_index = _p.GetH()
-				str_index = _p.GetKey()
-				tmp_str = _z
-				var tmp_orig_str *zend.ZendString
-				var orig_str *zend.ZendString = zend.ZvalGetTmpString(tmp_str, &tmp_orig_str)
-				if from.IsType(zend.IS_ARRAY) {
-					for from_idx < zend.Z_ARRVAL_P(from).GetNNumUsed() {
-						tmp_from = zend.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
-						if tmp_from.GetType() != zend.IS_UNDEF {
-							break
-						}
-						from_idx++
+			}
+			num_index = _p.GetH()
+			str_index = _p.GetKey()
+			tmp_str = _z
+			var tmp_orig_str *zend.ZendString
+			var orig_str *zend.ZendString = zend.ZvalGetTmpString(tmp_str, &tmp_orig_str)
+			if from.IsType(zend.IS_ARRAY) {
+				for from_idx < zend.Z_ARRVAL_P(from).GetNNumUsed() {
+					tmp_from = zend.Z_ARRVAL_P(from).GetArData()[from_idx].GetVal()
+					if tmp_from.GetType() != zend.IS_UNDEF {
+						break
 					}
-					if from_idx < zend.Z_ARRVAL_P(from).GetNNumUsed() {
-						f = zend.ZvalGetLong(tmp_from)
-						if f < 0 {
-							f = zend.ZendLong(orig_str.GetLen() + f)
-							if f < 0 {
-								f = 0
-							}
-						} else if f > zend.ZendLong(orig_str.GetLen()) {
-							f = orig_str.GetLen()
-						}
-						from_idx++
-					} else {
-						f = 0
-					}
-				} else {
-					f = from.GetLval()
+					from_idx++
+				}
+				if from_idx < zend.Z_ARRVAL_P(from).GetNNumUsed() {
+					f = zend.ZvalGetLong(tmp_from)
 					if f < 0 {
 						f = zend.ZendLong(orig_str.GetLen() + f)
 						if f < 0 {
@@ -3545,79 +3518,91 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					} else if f > zend.ZendLong(orig_str.GetLen()) {
 						f = orig_str.GetLen()
 					}
+					from_idx++
+				} else {
+					f = 0
 				}
-				if argc > 3 && len_.IsType(zend.IS_ARRAY) {
-					for len_idx < zend.Z_ARRVAL_P(len_).GetNNumUsed() {
-						tmp_len = zend.Z_ARRVAL_P(len_).GetArData()[len_idx].GetVal()
-						if tmp_len.GetType() != zend.IS_UNDEF {
-							break
-						}
-						len_idx++
+			} else {
+				f = from.GetLval()
+				if f < 0 {
+					f = zend.ZendLong(orig_str.GetLen() + f)
+					if f < 0 {
+						f = 0
 					}
-					if len_idx < zend.Z_ARRVAL_P(len_).GetNNumUsed() {
-						l = zend.ZvalGetLong(tmp_len)
-						len_idx++
-					} else {
-						l = orig_str.GetLen()
+				} else if f > zend.ZendLong(orig_str.GetLen()) {
+					f = orig_str.GetLen()
+				}
+			}
+			if argc > 3 && len_.IsType(zend.IS_ARRAY) {
+				for len_idx < zend.Z_ARRVAL_P(len_).GetNNumUsed() {
+					tmp_len = zend.Z_ARRVAL_P(len_).GetArData()[len_idx].GetVal()
+					if tmp_len.GetType() != zend.IS_UNDEF {
+						break
 					}
-				} else if argc > 3 {
-					l = len_.GetLval()
+					len_idx++
+				}
+				if len_idx < zend.Z_ARRVAL_P(len_).GetNNumUsed() {
+					l = zend.ZvalGetLong(tmp_len)
+					len_idx++
 				} else {
 					l = orig_str.GetLen()
 				}
+			} else if argc > 3 {
+				l = len_.GetLval()
+			} else {
+				l = orig_str.GetLen()
+			}
+			if l < 0 {
+				l = orig_str.GetLen() - f + l
 				if l < 0 {
-					l = orig_str.GetLen() - f + l
-					if l < 0 {
-						l = 0
-					}
+					l = 0
 				}
-				zend.ZEND_ASSERT(0 <= f && f <= zend.ZEND_LONG_MAX)
-				zend.ZEND_ASSERT(0 <= l && l <= zend.ZEND_LONG_MAX)
-				if int(f+l) > orig_str.GetLen() {
-					l = orig_str.GetLen() - f
+			}
+			zend.ZEND_ASSERT(0 <= f && f <= zend.ZEND_LONG_MAX)
+			zend.ZEND_ASSERT(0 <= l && l <= zend.ZEND_LONG_MAX)
+			if int(f+l) > orig_str.GetLen() {
+				l = orig_str.GetLen() - f
+			}
+			result_len = orig_str.GetLen() - l
+			if repl.IsType(zend.IS_ARRAY) {
+				for repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
+					tmp_repl = zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
+					if tmp_repl.GetType() != zend.IS_UNDEF {
+						break
+					}
+					repl_idx++
 				}
-				result_len = orig_str.GetLen() - l
-				if repl.IsType(zend.IS_ARRAY) {
-					for repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
-						tmp_repl = zend.Z_ARRVAL_P(repl).GetArData()[repl_idx].GetVal()
-						if tmp_repl.GetType() != zend.IS_UNDEF {
-							break
-						}
-						repl_idx++
-					}
-					if repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
-						var tmp_repl_str *zend.ZendString
-						var repl_str *zend.ZendString = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
-						result_len += repl_str.GetLen()
-						repl_idx++
-						result = zend.ZendStringSafeAlloc(1, result_len, 0, 0)
-						memcpy(result.GetVal(), orig_str.GetVal(), f)
-						memcpy(result.GetVal()+f, repl_str.GetVal(), repl_str.GetLen())
-						memcpy(result.GetVal()+f+repl_str.GetLen(), orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
-						zend.ZendTmpStringRelease(tmp_repl_str)
-					} else {
-						result = zend.ZendStringSafeAlloc(1, result_len, 0, 0)
-						memcpy(result.GetVal(), orig_str.GetVal(), f)
-						memcpy(result.GetVal()+f, orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
-					}
-				} else {
-					result_len += zend.Z_STRLEN_P(repl)
+				if repl_idx < zend.Z_ARRVAL_P(repl).GetNNumUsed() {
+					var tmp_repl_str *zend.ZendString
+					var repl_str *zend.ZendString = zend.ZvalGetTmpString(tmp_repl, &tmp_repl_str)
+					result_len += repl_str.GetLen()
+					repl_idx++
 					result = zend.ZendStringSafeAlloc(1, result_len, 0, 0)
 					memcpy(result.GetVal(), orig_str.GetVal(), f)
-					memcpy(result.GetVal()+f, zend.Z_STRVAL_P(repl), zend.Z_STRLEN_P(repl))
-					memcpy(result.GetVal()+f+zend.Z_STRLEN_P(repl), orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
-				}
-				result.GetVal()[result.GetLen()] = '0'
-				if str_index != nil {
-					var tmp zend.Zval
-					zend.ZVAL_NEW_STR(&tmp, result)
-					zend.ZendSymtableUpdate(return_value.GetArr(), str_index, &tmp)
+					memcpy(result.GetVal()+f, repl_str.GetVal(), repl_str.GetLen())
+					memcpy(result.GetVal()+f+repl_str.GetLen(), orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
+					zend.ZendTmpStringRelease(tmp_repl_str)
 				} else {
-					zend.AddIndexStr(return_value, num_index, result)
+					result = zend.ZendStringSafeAlloc(1, result_len, 0, 0)
+					memcpy(result.GetVal(), orig_str.GetVal(), f)
+					memcpy(result.GetVal()+f, orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
 				}
-				zend.ZendTmpStringRelease(tmp_orig_str)
+			} else {
+				result_len += zend.Z_STRLEN_P(repl)
+				result = zend.ZendStringSafeAlloc(1, result_len, 0, 0)
+				memcpy(result.GetVal(), orig_str.GetVal(), f)
+				memcpy(result.GetVal()+f, zend.Z_STRVAL_P(repl), zend.Z_STRLEN_P(repl))
+				memcpy(result.GetVal()+f+zend.Z_STRLEN_P(repl), orig_str.GetVal()+f+l, orig_str.GetLen()-f-l)
 			}
-			break
+			result.GetVal()[result.GetLen()] = '0'
+			if str_index != nil {
+				var tmp zend.Zval
+				zend.ZVAL_NEW_STR(&tmp, result)
+				zend.ZendSymtableUpdate(return_value.GetArr(), str_index, &tmp)
+			} else {
+				zend.AddIndexStr(return_value, num_index, result)
+			}
+			zend.ZendTmpStringRelease(tmp_orig_str)
 		}
 	}
 }
@@ -4256,33 +4241,68 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 
 	/* check if original array has numeric keys */
 
-	for {
-		var __ht *zend.HashTable = pats
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = pats
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+		str_key = _p.GetKey()
+		if str_key == nil {
+			num_keys = 1
+		} else {
+			len_ = str_key.GetLen()
+			if len_ < 1 {
+				zend.Efree(num_bitset)
+				zend.RETVAL_FALSE
+				return
+			} else if len_ > slen {
+
+				/* skip long patterns */
+
 				continue
+
+				/* skip long patterns */
+
 			}
-			str_key = _p.GetKey()
-			if str_key == nil {
-				num_keys = 1
-			} else {
-				len_ = str_key.GetLen()
-				if len_ < 1 {
-					zend.Efree(num_bitset)
-					zend.RETVAL_FALSE
-					return
-				} else if len_ > slen {
+			if len_ > maxlen {
+				maxlen = len_
+			}
+			if len_ < minlen {
+				minlen = len_
+			}
 
-					/* skip long patterns */
+			/* remember possible key length */
 
+			num_bitset[len_/b.SizeOf("zend_ulong")] |= uint64(1) << len_ % b.SizeOf("zend_ulong")
+			bitset[uint8(str_key.GetVal()[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(str_key.GetVal()[0]) % b.SizeOf("zend_ulong")
+		}
+	}
+	if num_keys != 0 {
+		var key_used *zend.ZendString
+
+		/* we have to rebuild HashTable with numeric keys */
+
+		zend.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
+		var __ht *zend.HashTable = pats
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
+				if _z.IsType(zend.IS_UNDEF) {
 					continue
+				}
+			}
+			num_key = _p.GetH()
+			str_key = _p.GetKey()
+			entry = _z
+			if str_key == nil {
+				key_used = zend.ZendLongToStr(num_key)
+				len_ = key_used.GetLen()
+				if len_ > slen {
 
 					/* skip long patterns */
 
+					zend.ZendStringRelease(key_used)
+					continue
 				}
 				if len_ > maxlen {
 					maxlen = len_
@@ -4294,72 +4314,24 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 				/* remember possible key length */
 
 				num_bitset[len_/b.SizeOf("zend_ulong")] |= uint64(1) << len_ % b.SizeOf("zend_ulong")
-				bitset[uint8(str_key.GetVal()[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(str_key.GetVal()[0]) % b.SizeOf("zend_ulong")
-			}
-		}
-		break
-	}
-	if num_keys != 0 {
-		var key_used *zend.ZendString
+				bitset[uint8(key_used.GetVal()[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(key_used.GetVal()[0]) % b.SizeOf("zend_ulong")
+			} else {
+				key_used = str_key
+				len_ = key_used.GetLen()
+				if len_ > slen {
 
-		/* we have to rebuild HashTable with numeric keys */
+					/* skip long patterns */
 
-		zend.ZendHashInit(&str_hash, pats.GetNNumOfElements(), nil, nil, 0)
-		for {
-			var __ht *zend.HashTable = pats
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
-				if _z.IsType(zend.IS_UNDEF) {
 					continue
-				}
-				num_key = _p.GetH()
-				str_key = _p.GetKey()
-				entry = _z
-				if str_key == nil {
-					key_used = zend.ZendLongToStr(num_key)
-					len_ = key_used.GetLen()
-					if len_ > slen {
 
-						/* skip long patterns */
+					/* skip long patterns */
 
-						zend.ZendStringRelease(key_used)
-						continue
-					}
-					if len_ > maxlen {
-						maxlen = len_
-					}
-					if len_ < minlen {
-						minlen = len_
-					}
-
-					/* remember possible key length */
-
-					num_bitset[len_/b.SizeOf("zend_ulong")] |= uint64(1) << len_ % b.SizeOf("zend_ulong")
-					bitset[uint8(key_used.GetVal()[0])/b.SizeOf("zend_ulong")] |= uint64(1) << uint8(key_used.GetVal()[0]) % b.SizeOf("zend_ulong")
-				} else {
-					key_used = str_key
-					len_ = key_used.GetLen()
-					if len_ > slen {
-
-						/* skip long patterns */
-
-						continue
-
-						/* skip long patterns */
-
-					}
-				}
-				zend.ZendHashAdd(&str_hash, key_used, entry)
-				if str_key == nil {
-					zend.ZendStringReleaseEx(key_used, 0)
 				}
 			}
-			break
+			zend.ZendHashAdd(&str_hash, key_used, entry)
+			if str_key == nil {
+				zend.ZendStringReleaseEx(key_used, 0)
+			}
 		}
 		pats = &str_hash
 	}
@@ -4807,40 +4779,35 @@ func ZifStrtr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			var replace *zend.ZendString
 			var tmp_replace *zend.ZendString
 			var entry *zend.Zval
-			for {
-				var __ht *zend.HashTable = pats
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
-					if _z.IsType(zend.IS_INDIRECT) {
-						_z = _z.GetZv()
-					}
+			var __ht *zend.HashTable = pats
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
+				if _z.IsType(zend.IS_INDIRECT) {
+					_z = _z.GetZv()
 					if _z.IsType(zend.IS_UNDEF) {
 						continue
 					}
-					num_key = _p.GetH()
-					str_key = _p.GetKey()
-					entry = _z
-					tmp_str = nil
-					if str_key == nil {
-						tmp_str = zend.ZendLongToStr(num_key)
-						str_key = tmp_str
-					}
-					replace = zend.ZvalGetTmpString(entry, &tmp_replace)
-					if str_key.GetLen() < 1 {
-						zend.RETVAL_STR_COPY(str)
-					} else if str_key.GetLen() == 1 {
-						zend.RETVAL_STR(PhpCharToStrEx(str, str_key.GetVal()[0], replace.GetVal(), replace.GetLen(), 1, nil))
-					} else {
-						var dummy zend.ZendLong
-						zend.RETVAL_STR(PhpStrToStrEx(str, str_key.GetVal(), str_key.GetLen(), replace.GetVal(), replace.GetLen(), &dummy))
-					}
-					zend.ZendTmpStringRelease(tmp_str)
-					zend.ZendTmpStringRelease(tmp_replace)
-					return
 				}
-				break
+				num_key = _p.GetH()
+				str_key = _p.GetKey()
+				entry = _z
+				tmp_str = nil
+				if str_key == nil {
+					tmp_str = zend.ZendLongToStr(num_key)
+					str_key = tmp_str
+				}
+				replace = zend.ZvalGetTmpString(entry, &tmp_replace)
+				if str_key.GetLen() < 1 {
+					zend.RETVAL_STR_COPY(str)
+				} else if str_key.GetLen() == 1 {
+					zend.RETVAL_STR(PhpCharToStrEx(str, str_key.GetVal()[0], replace.GetVal(), replace.GetLen(), 1, nil))
+				} else {
+					var dummy zend.ZendLong
+					zend.RETVAL_STR(PhpStrToStrEx(str, str_key.GetVal(), str_key.GetLen(), replace.GetVal(), replace.GetLen(), &dummy))
+				}
+				zend.ZendTmpStringRelease(tmp_str)
+				zend.ZendTmpStringRelease(tmp_replace)
+				return
 			}
 		} else {
 			PhpStrtrArray(return_value, str, pats)
@@ -5673,105 +5640,100 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 
 		/* For each entry in the search array, get the entry */
 
-		for {
-			var __ht *zend.HashTable = search.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = search.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				search_entry = _z
+			}
+			search_entry = _z
 
-				/* Make sure we're dealing with strings. */
+			/* Make sure we're dealing with strings. */
 
-				var tmp_search_str *zend.ZendString
-				var search_str *zend.ZendString = zend.ZvalGetTmpString(search_entry, &tmp_search_str)
-				var replace_entry_str *zend.ZendString
-				var tmp_replace_entry_str *zend.ZendString = nil
+			var tmp_search_str *zend.ZendString
+			var search_str *zend.ZendString = zend.ZvalGetTmpString(search_entry, &tmp_search_str)
+			var replace_entry_str *zend.ZendString
+			var tmp_replace_entry_str *zend.ZendString = nil
 
-				/* If replace is an array. */
+			/* If replace is an array. */
 
-				if replace.IsType(zend.IS_ARRAY) {
+			if replace.IsType(zend.IS_ARRAY) {
 
-					/* Get current entry */
+				/* Get current entry */
 
-					var replace_entry *zend.Zval = nil
-					for replace_idx < zend.Z_ARRVAL_P(replace).GetNNumUsed() {
-						replace_entry = zend.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
-						if replace_entry.GetType() != zend.IS_UNDEF {
-							break
-						}
-						replace_idx++
+				var replace_entry *zend.Zval = nil
+				for replace_idx < zend.Z_ARRVAL_P(replace).GetNNumUsed() {
+					replace_entry = zend.Z_ARRVAL_P(replace).GetArData()[replace_idx].GetVal()
+					if replace_entry.GetType() != zend.IS_UNDEF {
+						break
 					}
-					if replace_idx < zend.Z_ARRVAL_P(replace).GetNNumUsed() {
-
-						/* Make sure we're dealing with strings. */
-
-						replace_entry_str = zend.ZvalGetTmpString(replace_entry, &tmp_replace_entry_str)
-
-						/* Set replacement value to the one we got from array */
-
-						replace_value = replace_entry_str.GetVal()
-						replace_len = replace_entry_str.GetLen()
-						replace_idx++
-					} else {
-
-						/* We've run out of replacement strings, so use an empty one. */
-
-						replace_value = ""
-						replace_len = 0
-					}
+					replace_idx++
 				}
-				if search_str.GetLen() == 1 {
+				if replace_idx < zend.Z_ARRVAL_P(replace).GetNNumUsed() {
+
+					/* Make sure we're dealing with strings. */
+
+					replace_entry_str = zend.ZvalGetTmpString(replace_entry, &tmp_replace_entry_str)
+
+					/* Set replacement value to the one we got from array */
+
+					replace_value = replace_entry_str.GetVal()
+					replace_len = replace_entry_str.GetLen()
+					replace_idx++
+				} else {
+
+					/* We've run out of replacement strings, so use an empty one. */
+
+					replace_value = ""
+					replace_len = 0
+				}
+			}
+			if search_str.GetLen() == 1 {
+				var old_replace_count zend.ZendLong = replace_count
+				tmp_result = PhpCharToStrEx(subject_str, search_str.GetVal()[0], replace_value, replace_len, case_sensitivity, &replace_count)
+				if lc_subject_str != nil && replace_count != old_replace_count {
+					zend.ZendStringReleaseEx(lc_subject_str, 0)
+					lc_subject_str = nil
+				}
+			} else if search_str.GetLen() > 1 {
+				if case_sensitivity != 0 {
+					tmp_result = PhpStrToStrEx(subject_str, search_str.GetVal(), search_str.GetLen(), replace_value, replace_len, &replace_count)
+				} else {
 					var old_replace_count zend.ZendLong = replace_count
-					tmp_result = PhpCharToStrEx(subject_str, search_str.GetVal()[0], replace_value, replace_len, case_sensitivity, &replace_count)
-					if lc_subject_str != nil && replace_count != old_replace_count {
+					if lc_subject_str == nil {
+						lc_subject_str = PhpStringTolower(subject_str)
+					}
+					tmp_result = PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search_str, replace_value, replace_len, &replace_count)
+					if replace_count != old_replace_count {
 						zend.ZendStringReleaseEx(lc_subject_str, 0)
 						lc_subject_str = nil
 					}
-				} else if search_str.GetLen() > 1 {
-					if case_sensitivity != 0 {
-						tmp_result = PhpStrToStrEx(subject_str, search_str.GetVal(), search_str.GetLen(), replace_value, replace_len, &replace_count)
-					} else {
-						var old_replace_count zend.ZendLong = replace_count
-						if lc_subject_str == nil {
-							lc_subject_str = PhpStringTolower(subject_str)
-						}
-						tmp_result = PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search_str, replace_value, replace_len, &replace_count)
-						if replace_count != old_replace_count {
-							zend.ZendStringReleaseEx(lc_subject_str, 0)
-							lc_subject_str = nil
-						}
-					}
-				} else {
-					zend.ZendTmpStringRelease(tmp_search_str)
-					zend.ZendTmpStringRelease(tmp_replace_entry_str)
-					continue
 				}
+			} else {
 				zend.ZendTmpStringRelease(tmp_search_str)
 				zend.ZendTmpStringRelease(tmp_replace_entry_str)
-				if subject_str == tmp_result {
-					subject_str.DelRefcount()
-				} else {
+				continue
+			}
+			zend.ZendTmpStringRelease(tmp_search_str)
+			zend.ZendTmpStringRelease(tmp_replace_entry_str)
+			if subject_str == tmp_result {
+				subject_str.DelRefcount()
+			} else {
+				zend.ZendStringReleaseEx(subject_str, 0)
+				subject_str = tmp_result
+				if subject_str.GetLen() == 0 {
 					zend.ZendStringReleaseEx(subject_str, 0)
-					subject_str = tmp_result
-					if subject_str.GetLen() == 0 {
-						zend.ZendStringReleaseEx(subject_str, 0)
-						zend.ZVAL_EMPTY_STRING(result)
-						if lc_subject_str != nil {
-							zend.ZendStringReleaseEx(lc_subject_str, 0)
-						}
-						zend.ZendTmpStringRelease(tmp_subject_str)
-						return replace_count
+					zend.ZVAL_EMPTY_STRING(result)
+					if lc_subject_str != nil {
+						zend.ZendStringReleaseEx(lc_subject_str, 0)
 					}
+					zend.ZendTmpStringRelease(tmp_subject_str)
+					return replace_count
 				}
 			}
-			break
 		}
 		zend.ZVAL_STR(result, subject_str)
 		if lc_subject_str != nil {
@@ -5900,40 +5862,35 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 		/* For each subject entry, convert it to string, then perform replacement
 		   and add the result to the return_value array. */
 
-		for {
-			var __ht *zend.HashTable = subject.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
-				if _z.IsType(zend.IS_INDIRECT) {
-					_z = _z.GetZv()
-				}
+		var __ht *zend.HashTable = subject.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
+			if _z.IsType(zend.IS_INDIRECT) {
+				_z = _z.GetZv()
 				if _z.IsType(zend.IS_UNDEF) {
 					continue
 				}
-				num_key = _p.GetH()
-				string_key = _p.GetKey()
-				subject_entry = _z
-				zend.ZVAL_DEREF(subject_entry)
-				if subject_entry.GetType() != zend.IS_ARRAY && subject_entry.GetType() != zend.IS_OBJECT {
-					count += PhpStrReplaceInSubject(search, replace, subject_entry, &result, case_sensitivity)
-				} else {
-					zend.ZVAL_COPY(&result, subject_entry)
-				}
-
-				/* Add to return array */
-
-				if string_key != nil {
-					zend.ZendHashAddNew(return_value.GetArr(), string_key, &result)
-				} else {
-					zend.ZendHashIndexAddNew(return_value.GetArr(), num_key, &result)
-				}
-
-				/* Add to return array */
-
 			}
-			break
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
+			subject_entry = _z
+			zend.ZVAL_DEREF(subject_entry)
+			if subject_entry.GetType() != zend.IS_ARRAY && subject_entry.GetType() != zend.IS_OBJECT {
+				count += PhpStrReplaceInSubject(search, replace, subject_entry, &result, case_sensitivity)
+			} else {
+				zend.ZVAL_COPY(&result, subject_entry)
+			}
+
+			/* Add to return array */
+
+			if string_key != nil {
+				zend.ZendHashAddNew(return_value.GetArr(), string_key, &result)
+			} else {
+				zend.ZendHashIndexAddNew(return_value.GetArr(), num_key, &result)
+			}
+
+			/* Add to return array */
+
 		}
 
 		/* For each subject entry, convert it to string, then perform replacement
@@ -6415,24 +6372,16 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if allow.IsType(zend.IS_ARRAY) {
 			var tmp *zend.Zval
 			var tag *zend.ZendString
-			for {
-				var __ht *zend.HashTable = allow.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = allow.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					tmp = _z
-					tag = zend.ZvalGetString(tmp)
-					zend.SmartStrAppendc(&tags_ss, '<')
-					zend.SmartStrAppend(&tags_ss, tag)
-					zend.SmartStrAppendc(&tags_ss, '>')
-					zend.ZendStringRelease(tag)
-				}
-				break
+				tmp = _z
+				tag = zend.ZvalGetString(tmp)
+				zend.SmartStrAppendc(&tags_ss, '<')
+				zend.SmartStrAppend(&tags_ss, tag)
+				zend.SmartStrAppendc(&tags_ss, '>')
+				zend.ZendStringRelease(tag)
 			}
 			if tags_ss.GetS() != nil {
 				zend.SmartStr0(&tags_ss)

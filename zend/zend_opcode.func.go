@@ -229,22 +229,14 @@ func DestroyZendClass(zv *Zval) {
 			ZendCleanupInternalClassData(ce)
 		}
 		if ce.IsHasStaticInMethods() {
-			for {
-				var __ht *HashTable = ce.GetFunctionTable()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = ce.GetFunctionTable()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					op_array = _z.GetPtr()
-					if op_array.GetType() == ZEND_USER_FUNCTION {
-						DestroyOpArray(op_array)
-					}
+				op_array = _z.GetPtr()
+				if op_array.GetType() == ZEND_USER_FUNCTION {
+					DestroyOpArray(op_array)
 				}
-				break
 			}
 		}
 		return
@@ -301,53 +293,37 @@ func DestroyZendClass(zv *Zval) {
 			}
 			Efree(ce.GetDefaultStaticMembersTable())
 		}
-		for {
-			var __ht *HashTable = ce.GetPropertiesInfo()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ce.GetPropertiesInfo()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
+			prop_info = _z.GetPtr()
+			if prop_info.GetCe() == ce {
+				ZendStringReleaseEx(prop_info.GetName(), 0)
+				if prop_info.GetDocComment() != nil {
+					ZendStringReleaseEx(prop_info.GetDocComment(), 0)
 				}
-				prop_info = _z.GetPtr()
-				if prop_info.GetCe() == ce {
-					ZendStringReleaseEx(prop_info.GetName(), 0)
-					if prop_info.GetDocComment() != nil {
-						ZendStringReleaseEx(prop_info.GetDocComment(), 0)
-					}
-					if prop_info.GetType().IsName() {
-						ZendStringRelease(prop_info.GetType().Name())
-					}
+				if prop_info.GetType().IsName() {
+					ZendStringRelease(prop_info.GetType().Name())
 				}
 			}
-			break
 		}
 		ZendHashDestroy(ce.GetPropertiesInfo())
 		ZendStringReleaseEx(ce.GetName(), 0)
 		ZendHashDestroy(ce.GetFunctionTable())
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
-			for {
-				var __ht *HashTable = ce.GetConstantsTable()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = ce.GetConstantsTable()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					c = _z.GetPtr()
-					if c.GetCe() == ce {
-						ZvalPtrDtorNogc(c.GetValue())
-						if c.GetDocComment() != nil {
-							ZendStringReleaseEx(c.GetDocComment(), 0)
-						}
+				c = _z.GetPtr()
+				if c.GetCe() == ce {
+					ZvalPtrDtorNogc(c.GetValue())
+					if c.GetDocComment() != nil {
+						ZendStringReleaseEx(c.GetDocComment(), 0)
 					}
 				}
-				break
 			}
 		}
 		ZendHashDestroy(ce.GetConstantsTable())
@@ -395,46 +371,30 @@ func DestroyZendClass(zv *Zval) {
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
 
-		for {
-			var __ht *HashTable = ce.GetFunctionTable()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ce.GetFunctionTable()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				fn = _z.GetPtr()
-				if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
-					ZendFreeInternalArgInfo(fn.GetInternalFunction())
-				}
+			fn = _z.GetPtr()
+			if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == ce {
+				ZendFreeInternalArgInfo(fn.GetInternalFunction())
 			}
-			break
 		}
 		ZendHashDestroy(ce.GetFunctionTable())
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
-			for {
-				var __ht *HashTable = ce.GetConstantsTable()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = ce.GetConstantsTable()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
+				c = _z.GetPtr()
+				if c.GetCe() == ce {
+					ZvalInternalPtrDtor(c.GetValue())
+					if c.GetDocComment() != nil {
+						ZendStringReleaseEx(c.GetDocComment(), 1)
 					}
-					c = _z.GetPtr()
-					if c.GetCe() == ce {
-						ZvalInternalPtrDtor(c.GetValue())
-						if c.GetDocComment() != nil {
-							ZendStringReleaseEx(c.GetDocComment(), 1)
-						}
-					}
-					Free(c)
 				}
-				break
+				Free(c)
 			}
 			ZendHashDestroy(ce.GetConstantsTable())
 		}
@@ -1013,20 +973,12 @@ func PassTwo(op_array *ZendOpArray) int {
 
 			var jumptable *HashTable = CT_CONSTANT(opline.GetOp2()).GetArr()
 			var zv *Zval
-			for {
-				var __ht *HashTable = jumptable
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = jumptable
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					zv = _z
-					zv.SetLval(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.GetLval()))
-				}
-				break
+				zv = _z
+				zv.SetLval(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.GetLval()))
 			}
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
 			break

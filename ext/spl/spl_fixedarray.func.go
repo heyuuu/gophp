@@ -411,21 +411,13 @@ func zim_spl_SplFixedArray___wakeup(execute_data *zend.ZendExecuteData, return_v
 		var index int = 0
 		var size int = intern_ht.GetNNumOfElements()
 		SplFixedarrayInit(intern.GetArray(), size)
-		for {
-			var __ht *zend.HashTable = intern_ht
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = intern_ht
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				data = _z
-				zend.ZVAL_COPY(intern.GetArray().GetElements()[index], data)
-				index++
-			}
-			break
+			data = _z
+			zend.ZVAL_COPY(intern.GetArray().GetElements()[index], data)
+			index++
 		}
 
 		/* Remove the unserialised properties, since we now have the elements
@@ -486,27 +478,19 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 		var num_index zend.ZendUlong
 		var max_index zend.ZendUlong = 0
 		var tmp zend.ZendLong
-		for {
-			var __ht *zend.HashTable = data.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = data.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				num_index = _p.GetH()
-				str_index = _p.GetKey()
-				if str_index != nil || zend.ZendLong(num_index < 0) != 0 {
-					zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
-					return
-				}
-				if num_index > max_index {
-					max_index = num_index
-				}
+			num_index = _p.GetH()
+			str_index = _p.GetKey()
+			if str_index != nil || zend.ZendLong(num_index < 0) != 0 {
+				zend.ZendThrowExceptionEx(spl_ce_InvalidArgumentException, 0, "array must contain only positive integer keys")
+				return
 			}
-			break
+			if num_index > max_index {
+				max_index = num_index
+			}
 		}
 		tmp = max_index + 1
 		if tmp <= 0 {
@@ -514,42 +498,26 @@ func zim_spl_SplFixedArray_fromArray(execute_data *zend.ZendExecuteData, return_
 			return
 		}
 		SplFixedarrayInit(&array, tmp)
-		for {
-			var __ht *zend.HashTable = data.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht__1 *zend.HashTable = data.GetArr()
+		for _, _p := range __ht__1.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				num_index = _p.GetH()
-				str_index = _p.GetKey()
-				element = _z
-				zend.ZVAL_COPY_DEREF(array.GetElements()[num_index], element)
-			}
-			break
+			num_index = _p.GetH()
+			str_index = _p.GetKey()
+			element = _z
+			zend.ZVAL_COPY_DEREF(array.GetElements()[num_index], element)
 		}
 	} else if num > 0 && save_indexes == 0 {
 		var element *zend.Zval
 		var i zend.ZendLong = 0
 		SplFixedarrayInit(&array, num)
-		for {
-			var __ht *zend.HashTable = data.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = data.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				element = _z
-				zend.ZVAL_COPY_DEREF(array.GetElements()[i], element)
-				i++
-			}
-			break
+			element = _z
+			zend.ZVAL_COPY_DEREF(array.GetElements()[i], element)
+			i++
 		}
 	} else {
 		SplFixedarrayInit(&array, 0)

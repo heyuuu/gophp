@@ -38,20 +38,12 @@ func ForgetPersistentResourceIdNumbers(el *zend.Zval) int {
 }
 func ZmDeactivateStreams(type_ int, module_number int) int {
 	var el *zend.Zval
-	for {
-		var __ht *zend.HashTable = zend.__EG().GetPersistentList()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = zend.__EG().GetPersistentList()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			el = _z
-			ForgetPersistentResourceIdNumbers(el)
-		}
-		break
+		el = _z
+		ForgetPersistentResourceIdNumbers(el)
 	}
 	return zend.SUCCESS
 }
@@ -73,24 +65,16 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 				 * regular list causes trouble (see bug #54623) */
 
 				*stream = (*core.PhpStream)(le.GetPtr())
-				for {
-					var __ht *zend.HashTable = zend.__EG().GetRegularList()
-					var _p *zend.Bucket = __ht.GetArData()
-					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *zend.Zval = _p.GetVal()
+				var __ht *zend.HashTable = zend.__EG().GetRegularList()
+				for _, _p := range __ht.foreachData() {
+					var _z *zend.Zval = _p.GetVal()
 
-						if _z.IsType(zend.IS_UNDEF) {
-							continue
-						}
-						regentry = _z.GetPtr()
-						if regentry.GetPtr() == le.GetPtr() {
-							regentry.AddRefcount()
-							stream.SetRes(regentry)
-							return core.PHP_STREAM_PERSISTENT_SUCCESS
-						}
+					regentry = _z.GetPtr()
+					if regentry.GetPtr() == le.GetPtr() {
+						regentry.AddRefcount()
+						stream.SetRes(regentry)
+						return core.PHP_STREAM_PERSISTENT_SUCCESS
 					}
-					break
 				}
 				le.AddRefcount()
 				stream.SetRes(zend.ZendRegisterResource(*stream, LePstream))

@@ -634,22 +634,14 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	found_entry = zend.ZendHashFindPtr(bdata.GetHtab(), lookup_browser_name)
 	if found_entry == nil {
 		var entry *BrowscapEntry
-		for {
-			var __ht *zend.HashTable = bdata.GetHtab()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = bdata.GetHtab()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				entry = _z.GetPtr()
-				if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
-					break
-				}
+			entry = _z.GetPtr()
+			if BrowserRegCompare(entry, lookup_browser_name, &found_entry) != 0 {
+				break
 			}
-			break
 		}
 		if found_entry == nil {
 			found_entry = zend.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME, b.SizeOf("DEFAULT_SECTION_NAME")-1)

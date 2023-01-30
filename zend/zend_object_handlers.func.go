@@ -42,51 +42,35 @@ func RebuildObjectProperties(zobj *ZendObject) {
 		zobj.SetProperties(ZendNewArray(ce.GetDefaultPropertiesCount()))
 		if ce.GetDefaultPropertiesCount() != 0 {
 			ZendHashRealInitMixed(zobj.GetProperties())
-			for {
-				var __ht *HashTable = ce.GetPropertiesInfo()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = ce.GetPropertiesInfo()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
+				prop_info = _z.GetPtr()
+				if !prop_info.IsStatic() {
+					flags |= prop_info.GetFlags()
+					if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
+						zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 					}
-					prop_info = _z.GetPtr()
-					if !prop_info.IsStatic() {
-						flags |= prop_info.GetFlags()
-						if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
-							zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
-						}
-						_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
-					}
+					_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
 				}
-				break
 			}
 			if (flags & ZEND_ACC_CHANGED) != 0 {
 				for ce.parent && ce.parent.default_properties_count {
 					ce = ce.parent
-					for {
-						var __ht *HashTable = ce.GetPropertiesInfo()
-						var _p *Bucket = __ht.GetArData()
-						var _end *Bucket = _p + __ht.GetNNumUsed()
-						for ; _p != _end; _p++ {
-							var _z *Zval = _p.GetVal()
+					var __ht *HashTable = ce.GetPropertiesInfo()
+					for _, _p := range __ht.foreachData() {
+						var _z *Zval = _p.GetVal()
 
-							if _z.IsType(IS_UNDEF) {
-								continue
+						prop_info = _z.GetPtr()
+						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
+							var zv Zval
+							if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
+								zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 							}
-							prop_info = _z.GetPtr()
-							if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
-								var zv Zval
-								if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
-									zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
-								}
-								ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
-								ZendHashAdd(zobj.GetProperties(), prop_info.GetName(), &zv)
-							}
+							ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
+							ZendHashAdd(zobj.GetProperties(), prop_info.GetName(), &zv)
 						}
-						break
 					}
 				}
 			}
@@ -1432,45 +1416,37 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 			ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
 		Z_PROTECT_RECURSION_P(o1)
-		for {
-			var __ht *HashTable = zobj1.GetCe().GetPropertiesInfo()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = zobj1.GetCe().GetPropertiesInfo()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				info = _z.GetPtr()
-				var p1 *Zval = OBJ_PROP(zobj1, info.GetOffset())
-				var p2 *Zval = OBJ_PROP(zobj2, info.GetOffset())
-				if info.IsStatic() {
-					continue
-				}
-				if p1.GetType() != IS_UNDEF {
-					if p2.GetType() != IS_UNDEF {
-						var result Zval
-						if CompareFunction(&result, p1, p2) == FAILURE {
-							Z_UNPROTECT_RECURSION_P(o1)
-							return 1
-						}
-						if result.GetLval() != 0 {
-							Z_UNPROTECT_RECURSION_P(o1)
-							return result.GetLval()
-						}
-					} else {
+			info = _z.GetPtr()
+			var p1 *Zval = OBJ_PROP(zobj1, info.GetOffset())
+			var p2 *Zval = OBJ_PROP(zobj2, info.GetOffset())
+			if info.IsStatic() {
+				continue
+			}
+			if p1.GetType() != IS_UNDEF {
+				if p2.GetType() != IS_UNDEF {
+					var result Zval
+					if CompareFunction(&result, p1, p2) == FAILURE {
 						Z_UNPROTECT_RECURSION_P(o1)
 						return 1
+					}
+					if result.GetLval() != 0 {
+						Z_UNPROTECT_RECURSION_P(o1)
+						return result.GetLval()
 					}
 				} else {
-					if p2.GetType() != IS_UNDEF {
-						Z_UNPROTECT_RECURSION_P(o1)
-						return 1
-					}
+					Z_UNPROTECT_RECURSION_P(o1)
+					return 1
+				}
+			} else {
+				if p2.GetType() != IS_UNDEF {
+					Z_UNPROTECT_RECURSION_P(o1)
+					return 1
 				}
 			}
-			break
 		}
 		Z_UNPROTECT_RECURSION_P(o1)
 		return 0

@@ -110,20 +110,12 @@ func SplObjectStorageDetach(intern *spl_SplObjectStorage, this *zend.Zval, obj *
 }
 func SplObjectStorageAddall(intern *spl_SplObjectStorage, this *zend.Zval, other *spl_SplObjectStorage) {
 	var element *spl_SplObjectStorageElement
-	for {
-		var __ht *zend.HashTable = other.GetStorage()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = other.GetStorage()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			element = _z.GetPtr()
-			SplObjectStorageAttach(intern, this, element.GetObj(), element.GetInf())
-		}
-		break
+		element = _z.GetPtr()
+		SplObjectStorageAttach(intern, this, element.GetObj(), element.GetInf())
 	}
 	intern.SetIndex(0)
 }
@@ -176,30 +168,22 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 	debug_info = zend.ZendNewArray(props.GetNNumOfElements() + 1)
 	zend.ZendHashCopy(debug_info, props, zend.CopyCtorFuncT(zend.ZvalAddRef))
 	zend.ArrayInit(&storage)
-	for {
-		var __ht *zend.HashTable = intern.GetStorage()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = intern.GetStorage()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			element = _z.GetPtr()
-			md5str = PhpSplObjectHash(element.GetObj())
-			zend.ArrayInit(&tmp)
+		element = _z.GetPtr()
+		md5str = PhpSplObjectHash(element.GetObj())
+		zend.ArrayInit(&tmp)
 
-			/* Incrementing the refcount of obj and inf would confuse the garbage collector.
-			 * Prefer to null the destructor */
+		/* Incrementing the refcount of obj and inf would confuse the garbage collector.
+		 * Prefer to null the destructor */
 
-			zend.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
-			zend.AddAssocZvalEx(&tmp, "obj", b.SizeOf("\"obj\"")-1, element.GetObj())
-			zend.AddAssocZvalEx(&tmp, "inf", b.SizeOf("\"inf\"")-1, element.GetInf())
-			zend.ZendHashUpdate(storage.GetArr(), md5str, &tmp)
-			zend.ZendStringReleaseEx(md5str, 0)
-		}
-		break
+		zend.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
+		zend.AddAssocZvalEx(&tmp, "obj", b.SizeOf("\"obj\"")-1, element.GetObj())
+		zend.AddAssocZvalEx(&tmp, "inf", b.SizeOf("\"inf\"")-1, element.GetInf())
+		zend.ZendHashUpdate(storage.GetArr(), md5str, &tmp)
+		zend.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage", b.SizeOf("\"storage\"")-1)
 	zend.ZendSymtableUpdate(debug_info, zname, &storage)
@@ -214,21 +198,13 @@ func SplObjectStorageGetGc(obj *zend.Zval, table **zend.Zval, n *int) *zend.Hash
 		intern.SetGcdataNum(intern.GetStorage().GetNNumOfElements() * 2)
 		intern.SetGcdata((*zend.Zval)(zend.Erealloc(intern.GetGcdata(), b.SizeOf("zval")*intern.GetGcdataNum())))
 	}
-	for {
-		var __ht *zend.HashTable = intern.GetStorage()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = intern.GetStorage()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			element = _z.GetPtr()
-			zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetObj())
-			zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetInf())
-		}
-		break
+		element = _z.GetPtr()
+		zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetObj())
+		zend.ZVAL_COPY_VALUE(intern.GetGcdata()[b.PostInc(&i)], element.GetInf())
 	}
 	*table = intern.GetGcdata()
 	*n = i
@@ -356,22 +332,14 @@ func zim_spl_SplObjectStorage_removeAllExcept(execute_data *zend.ZendExecuteData
 		return
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
-	for {
-		var __ht *zend.HashTable = intern.GetStorage()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = intern.GetStorage()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			element = _z.GetPtr()
-			if SplObjectStorageContains(other, zend.ZEND_THIS, element.GetObj()) == 0 {
-				SplObjectStorageDetach(intern, zend.ZEND_THIS, element.GetObj())
-			}
+		element = _z.GetPtr()
+		if SplObjectStorageContains(other, zend.ZEND_THIS, element.GetObj()) == 0 {
+			SplObjectStorageDetach(intern, zend.ZEND_THIS, element.GetObj())
 		}
-		break
 	}
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 	intern.SetIndex(0)
@@ -656,23 +624,15 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 	/* storage */
 
 	zend.ArrayInitSize(&tmp, 2*intern.GetStorage().GetNNumOfElements())
-	for {
-		var __ht *zend.HashTable = intern.GetStorage()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = intern.GetStorage()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			elem = _z.GetPtr()
-			zend.Z_TRY_ADDREF(elem.GetObj())
-			zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetObj())
-			zend.Z_TRY_ADDREF(elem.GetInf())
-			zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetInf())
-		}
-		break
+		elem = _z.GetPtr()
+		zend.Z_TRY_ADDREF(elem.GetObj())
+		zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetObj())
+		zend.Z_TRY_ADDREF(elem.GetInf())
+		zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetInf())
 	}
 	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
 
@@ -703,29 +663,21 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 		return
 	}
 	key = nil
-	for {
-		var __ht *zend.HashTable = storage_zv.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = storage_zv.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
+		val = _z
+		if key != nil {
+			if key.GetType() != zend.IS_OBJECT {
+				zend.ZendThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
+				return
 			}
-			val = _z
-			if key != nil {
-				if key.GetType() != zend.IS_OBJECT {
-					zend.ZendThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
-					return
-				}
-				SplObjectStorageAttach(intern, zend.ZEND_THIS, key, val)
-				key = nil
-			} else {
-				key = val
-			}
+			SplObjectStorageAttach(intern, zend.ZEND_THIS, key, val)
+			key = nil
+		} else {
+			key = val
 		}
-		break
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 }

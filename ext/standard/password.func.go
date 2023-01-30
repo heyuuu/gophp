@@ -728,19 +728,11 @@ func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 	zend.ArrayInit(return_value)
-	for {
-		var __ht *zend.HashTable = &PhpPasswordAlgos
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = &PhpPasswordAlgos
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			algo = _p.GetKey()
-			zend.AddNextIndexStr(return_value, algo.Copy())
-		}
-		break
+		algo = _p.GetKey()
+		zend.AddNextIndexStr(return_value, algo.Copy())
 	}
 }

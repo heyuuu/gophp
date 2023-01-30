@@ -20,15 +20,39 @@ func (this *HashTable) eachBucket(handler func(uint32, *Bucket)) {
 	}
 }
 
-func (this *HashTable) eachUsedBucket(handler func(uint32, *Bucket)) {
+func (this *HashTable) eachValidBucket(handler func(uint32, *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
-		if p.GetVal().IsType(IS_UNDEF) {
+		if p.IsValid() {
 			continue
 		}
 		handler(i, p)
 	}
+}
+
+func (this *HashTable) foreachData() []*Bucket {
+	// todo 逐渐替换为 eachBucket 或其他更高效代码
+	var data = make([]*Bucket, 0)
+	this.eachValidBucket(func(_ uint32, p *Bucket) {
+		data = append(data, p)
+	})
+	return data
+}
+
+func (this *HashTable) foreachDataReserve() []*Bucket {
+	// todo 逐渐替换为 eachBucket 或其他更高效代码
+	var data = make([]*Bucket, 0)
+
+	for i := len(this.data) - 1; i >= 0; i-- {
+		var p = &this.data[i]
+		if p.IsValid() {
+			continue
+		}
+		data = append(data, p)
+	}
+
+	return data
 }
 
 // 移动 bucket 到新位置
@@ -54,7 +78,7 @@ func (this *HashTable) removeHoles() bool {
 	if this.HasIterators() {
 		var iterPos = ZendHashIteratorsLowerPos(this, 0)
 
-		this.eachUsedBucket(func(pos uint32, p *Bucket) {
+		this.eachValidBucket(func(pos uint32, p *Bucket) {
 			// 移动 bucket 到新位置
 			this._moveBucket(pos, newPos)
 			if pos != newPos {
@@ -71,7 +95,7 @@ func (this *HashTable) removeHoles() bool {
 			newPos++
 		})
 	} else {
-		this.eachUsedBucket(func(pos uint32, p *Bucket) {
+		this.eachValidBucket(func(pos uint32, p *Bucket) {
 			this._moveBucket(pos, newPos)
 			newPos++
 		})

@@ -37,194 +37,186 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 		}
 	}
 	arg_sep_len = strlen(arg_sep)
-	for {
-		var __ht *zend.HashTable = ht
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = ht
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
+		idx = _p.GetH()
+		key = _p.GetKey()
+		zdata = _z
+		var is_dynamic zend.ZendBool = 1
+		if zdata.IsType(zend.IS_INDIRECT) {
+			zdata = zdata.GetZv()
+			if zend.Z_ISUNDEF_P(zdata) {
 				continue
 			}
-			idx = _p.GetH()
-			key = _p.GetKey()
-			zdata = _z
-			var is_dynamic zend.ZendBool = 1
-			if zdata.IsType(zend.IS_INDIRECT) {
-				zdata = zdata.GetZv()
-				if zend.Z_ISUNDEF_P(zdata) {
-					continue
-				}
-				is_dynamic = 0
+			is_dynamic = 0
+		}
+
+		/* handling for private & protected object properties */
+
+		if key != nil {
+			prop_name = key.GetVal()
+			prop_len = key.GetLen()
+			if type_ != nil && zend.ZendCheckPropertyAccess(type_.GetObj(), key, is_dynamic) != zend.SUCCESS {
+
+				/* property not visible in this scope */
+
+				continue
+
+				/* property not visible in this scope */
+
 			}
-
-			/* handling for private & protected object properties */
-
-			if key != nil {
+			if key.GetVal()[0] == '0' && type_ != nil {
+				var tmp *byte
+				zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
+			} else {
 				prop_name = key.GetVal()
 				prop_len = key.GetLen()
-				if type_ != nil && zend.ZendCheckPropertyAccess(type_.GetObj(), key, is_dynamic) != zend.SUCCESS {
-
-					/* property not visible in this scope */
-
-					continue
-
-					/* property not visible in this scope */
-
-				}
-				if key.GetVal()[0] == '0' && type_ != nil {
-					var tmp *byte
-					zend.ZendUnmanglePropertyNameEx(key, &tmp, &prop_name, &prop_len)
-				} else {
-					prop_name = key.GetVal()
-					prop_len = key.GetLen()
-				}
-			} else {
-				prop_name = nil
-				prop_len = 0
 			}
-			zend.ZVAL_DEREF(zdata)
-			if zdata.IsType(zend.IS_ARRAY) || zdata.IsType(zend.IS_OBJECT) {
-				if key != nil {
-					var ekey *zend.ZendString
-					if enc_type == PHP_QUERY_RFC3986 {
-						ekey = PhpRawUrlEncode(prop_name, prop_len)
-					} else {
-						ekey = PhpUrlEncode(prop_name, prop_len)
-					}
-					newprefix_len = key_suffix_len + ekey.GetLen() + key_prefix_len + 3
-					newprefix = zend.Emalloc(newprefix_len + 1)
-					p = newprefix
-					if key_prefix != nil {
-						memcpy(p, key_prefix, key_prefix_len)
-						p += key_prefix_len
-					}
-					memcpy(p, ekey.GetVal(), ekey.GetLen())
-					p += ekey.GetLen()
-					zend.ZendStringFree(ekey)
-					if key_suffix {
-						memcpy(p, key_suffix, key_suffix_len)
-						p += key_suffix_len
-					}
-					*(b.PostInc(&p)) = '%'
-					*(b.PostInc(&p)) = '5'
-					*(b.PostInc(&p)) = 'B'
-					*p = '0'
+		} else {
+			prop_name = nil
+			prop_len = 0
+		}
+		zend.ZVAL_DEREF(zdata)
+		if zdata.IsType(zend.IS_ARRAY) || zdata.IsType(zend.IS_OBJECT) {
+			if key != nil {
+				var ekey *zend.ZendString
+				if enc_type == PHP_QUERY_RFC3986 {
+					ekey = PhpRawUrlEncode(prop_name, prop_len)
 				} else {
-					var ekey *byte
-					var ekey_len int
-
-					/* Is an integer key */
-
-					ekey_len = core.Spprintf(&ekey, 0, zend.ZEND_LONG_FMT, idx)
-					newprefix_len = key_prefix_len + num_prefix_len + ekey_len + key_suffix_len + 3
-					newprefix = zend.Emalloc(newprefix_len + 1)
-					p = newprefix
-					if key_prefix != nil {
-						memcpy(p, key_prefix, key_prefix_len)
-						p += key_prefix_len
-					}
-					if num_prefix != nil {
-						memcpy(p, num_prefix, num_prefix_len)
-						p += num_prefix_len
-					}
-					memcpy(p, ekey, ekey_len)
-					p += ekey_len
-					zend.Efree(ekey)
-					if key_suffix {
-						memcpy(p, key_suffix, key_suffix_len)
-						p += key_suffix_len
-					}
-					*(b.PostInc(&p)) = '%'
-					*(b.PostInc(&p)) = '5'
-					*(b.PostInc(&p)) = 'B'
-					*p = '0'
+					ekey = PhpUrlEncode(prop_name, prop_len)
 				}
-				if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-					zend.GC_PROTECT_RECURSION(ht)
-				}
-				PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(zend.IS_OBJECT), zdata, nil), arg_sep, enc_type)
-				if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-					zend.GC_UNPROTECT_RECURSION(ht)
-				}
-				zend.Efree(newprefix)
-			} else if zdata.IsType(zend.IS_NULL) || zdata.IsType(zend.IS_RESOURCE) {
-
-				/* Skip these types */
-
-				continue
-
-				/* Skip these types */
-
-			} else {
-				if formstr.GetS() != nil {
-					zend.SmartStrAppendl(formstr, arg_sep, arg_sep_len)
-				}
-
-				/* Simple key=value */
-
+				newprefix_len = key_suffix_len + ekey.GetLen() + key_prefix_len + 3
+				newprefix = zend.Emalloc(newprefix_len + 1)
+				p = newprefix
 				if key_prefix != nil {
-					zend.SmartStrAppendl(formstr, key_prefix, key_prefix_len)
+					memcpy(p, key_prefix, key_prefix_len)
+					p += key_prefix_len
 				}
-				if key != nil {
-					var ekey *zend.ZendString
-					if enc_type == PHP_QUERY_RFC3986 {
-						ekey = PhpRawUrlEncode(prop_name, prop_len)
-					} else {
-						ekey = PhpUrlEncode(prop_name, prop_len)
-					}
-					zend.SmartStrAppend(formstr, ekey)
-					zend.ZendStringFree(ekey)
-				} else {
-
-					/* Numeric key */
-
-					if num_prefix != nil {
-						zend.SmartStrAppendl(formstr, num_prefix, num_prefix_len)
-					}
-					zend.SmartStrAppendLong(formstr, idx)
-				}
+				memcpy(p, ekey.GetVal(), ekey.GetLen())
+				p += ekey.GetLen()
+				zend.ZendStringFree(ekey)
 				if key_suffix {
-					zend.SmartStrAppendl(formstr, key_suffix, key_suffix_len)
+					memcpy(p, key_suffix, key_suffix_len)
+					p += key_suffix_len
 				}
-				zend.SmartStrAppendl(formstr, "=", 1)
-				switch zdata.GetType() {
-				case zend.IS_STRING:
-					var ekey *zend.ZendString
-					if enc_type == PHP_QUERY_RFC3986 {
-						ekey = PhpRawUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
-					} else {
-						ekey = PhpUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
-					}
-					zend.SmartStrAppend(formstr, ekey)
-					zend.ZendStringFree(ekey)
-					break
-				case zend.IS_LONG:
-					zend.SmartStrAppendLong(formstr, zdata.GetLval())
-					break
-				case zend.IS_FALSE:
-					zend.SmartStrAppendl(formstr, "0", b.SizeOf("\"0\"")-1)
-					break
-				case zend.IS_TRUE:
-					zend.SmartStrAppendl(formstr, "1", b.SizeOf("\"1\"")-1)
-					break
-				default:
-					var ekey *zend.ZendString
-					var tmp *zend.ZendString
-					var str *zend.ZendString = zend.ZvalGetTmpString(zdata, &tmp)
-					if enc_type == PHP_QUERY_RFC3986 {
-						ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
-					} else {
-						ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
-					}
-					zend.SmartStrAppend(formstr, ekey)
-					zend.ZendTmpStringRelease(tmp)
-					zend.ZendStringFree(ekey)
+				*(b.PostInc(&p)) = '%'
+				*(b.PostInc(&p)) = '5'
+				*(b.PostInc(&p)) = 'B'
+				*p = '0'
+			} else {
+				var ekey *byte
+				var ekey_len int
+
+				/* Is an integer key */
+
+				ekey_len = core.Spprintf(&ekey, 0, zend.ZEND_LONG_FMT, idx)
+				newprefix_len = key_prefix_len + num_prefix_len + ekey_len + key_suffix_len + 3
+				newprefix = zend.Emalloc(newprefix_len + 1)
+				p = newprefix
+				if key_prefix != nil {
+					memcpy(p, key_prefix, key_prefix_len)
+					p += key_prefix_len
 				}
+				if num_prefix != nil {
+					memcpy(p, num_prefix, num_prefix_len)
+					p += num_prefix_len
+				}
+				memcpy(p, ekey, ekey_len)
+				p += ekey_len
+				zend.Efree(ekey)
+				if key_suffix {
+					memcpy(p, key_suffix, key_suffix_len)
+					p += key_suffix_len
+				}
+				*(b.PostInc(&p)) = '%'
+				*(b.PostInc(&p)) = '5'
+				*(b.PostInc(&p)) = 'B'
+				*p = '0'
+			}
+			if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
+				zend.GC_PROTECT_RECURSION(ht)
+			}
+			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(zend.IS_OBJECT), zdata, nil), arg_sep, enc_type)
+			if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
+				zend.GC_UNPROTECT_RECURSION(ht)
+			}
+			zend.Efree(newprefix)
+		} else if zdata.IsType(zend.IS_NULL) || zdata.IsType(zend.IS_RESOURCE) {
+
+			/* Skip these types */
+
+			continue
+
+			/* Skip these types */
+
+		} else {
+			if formstr.GetS() != nil {
+				zend.SmartStrAppendl(formstr, arg_sep, arg_sep_len)
+			}
+
+			/* Simple key=value */
+
+			if key_prefix != nil {
+				zend.SmartStrAppendl(formstr, key_prefix, key_prefix_len)
+			}
+			if key != nil {
+				var ekey *zend.ZendString
+				if enc_type == PHP_QUERY_RFC3986 {
+					ekey = PhpRawUrlEncode(prop_name, prop_len)
+				} else {
+					ekey = PhpUrlEncode(prop_name, prop_len)
+				}
+				zend.SmartStrAppend(formstr, ekey)
+				zend.ZendStringFree(ekey)
+			} else {
+
+				/* Numeric key */
+
+				if num_prefix != nil {
+					zend.SmartStrAppendl(formstr, num_prefix, num_prefix_len)
+				}
+				zend.SmartStrAppendLong(formstr, idx)
+			}
+			if key_suffix {
+				zend.SmartStrAppendl(formstr, key_suffix, key_suffix_len)
+			}
+			zend.SmartStrAppendl(formstr, "=", 1)
+			switch zdata.GetType() {
+			case zend.IS_STRING:
+				var ekey *zend.ZendString
+				if enc_type == PHP_QUERY_RFC3986 {
+					ekey = PhpRawUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
+				} else {
+					ekey = PhpUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
+				}
+				zend.SmartStrAppend(formstr, ekey)
+				zend.ZendStringFree(ekey)
+				break
+			case zend.IS_LONG:
+				zend.SmartStrAppendLong(formstr, zdata.GetLval())
+				break
+			case zend.IS_FALSE:
+				zend.SmartStrAppendl(formstr, "0", b.SizeOf("\"0\"")-1)
+				break
+			case zend.IS_TRUE:
+				zend.SmartStrAppendl(formstr, "1", b.SizeOf("\"1\"")-1)
+				break
+			default:
+				var ekey *zend.ZendString
+				var tmp *zend.ZendString
+				var str *zend.ZendString = zend.ZvalGetTmpString(zdata, &tmp)
+				if enc_type == PHP_QUERY_RFC3986 {
+					ekey = PhpRawUrlEncode(str.GetVal(), str.GetLen())
+				} else {
+					ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
+				}
+				zend.SmartStrAppend(formstr, ekey)
+				zend.ZendTmpStringRelease(tmp)
+				zend.ZendStringFree(ekey)
 			}
 		}
-		break
 	}
 	return zend.SUCCESS
 }

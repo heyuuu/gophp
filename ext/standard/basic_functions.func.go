@@ -1123,23 +1123,15 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		for {
-			var __ht *zend.HashTable = args.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = args.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				entry = _z
-				var tmp_arg_str *zend.ZendString
-				var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
-				argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
-				zend.ZendTmpStringRelease(tmp_arg_str)
-			}
-			break
+			entry = _z
+			var tmp_arg_str *zend.ZendString
+			var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			argv[b.PostInc(&pos)] = zend.Estrdup(arg_str.GetVal())
+			zend.ZendTmpStringRelease(tmp_arg_str)
 		}
 
 		/* The C Standard requires argv[argc] to be NULL - this might
@@ -1173,35 +1165,27 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Iterate over the hash to construct the argv array. */
 
-		for {
-			var __ht *zend.HashTable = p_longopts.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = p_longopts.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				entry = _z
-				var tmp_arg_str *zend.ZendString
-				var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
-				opts.SetNeedParam(0)
-				opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
-				len_ = strlen(opts.GetOptName())
-				if len_ > 0 && opts.GetOptName()[len_-1] == ':' {
+			entry = _z
+			var tmp_arg_str *zend.ZendString
+			var arg_str *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_arg_str)
+			opts.SetNeedParam(0)
+			opts.SetOptName(zend.Estrdup(arg_str.GetVal()))
+			len_ = strlen(opts.GetOptName())
+			if len_ > 0 && opts.GetOptName()[len_-1] == ':' {
+				opts.GetNeedParam()++
+				opts.GetOptName()[len_-1] = '0'
+				if len_ > 1 && opts.GetOptName()[len_-2] == ':' {
 					opts.GetNeedParam()++
-					opts.GetOptName()[len_-1] = '0'
-					if len_ > 1 && opts.GetOptName()[len_-2] == ':' {
-						opts.GetNeedParam()++
-						opts.GetOptName()[len_-2] = '0'
-					}
+					opts.GetOptName()[len_-2] = '0'
 				}
-				opts.SetOptChar(0)
-				opts++
-				zend.ZendTmpStringRelease(tmp_arg_str)
 			}
-			break
+			opts.SetOptChar(0)
+			opts++
+			zend.ZendTmpStringRelease(tmp_arg_str)
 		}
 
 		/* Iterate over the hash to construct the argv array. */
@@ -1697,22 +1681,14 @@ func AddConfigEntries(hash *zend.HashTable, return_value *zend.Zval) {
 	var h zend.ZendUlong
 	var key *zend.ZendString
 	var zv *zend.Zval
-	for {
-		var __ht *zend.HashTable = hash
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = hash
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			h = _p.GetH()
-			key = _p.GetKey()
-			zv = _z
-			AddConfigEntry(h, key, zv, return_value)
-		}
-		break
+		h = _p.GetH()
+		key = _p.GetKey()
+		zv = _z
+		AddConfigEntry(h, key, zv, return_value)
 	}
 }
 func ZifGetCfgVar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3031,51 +3007,43 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		module_number = module.GetModuleNumber()
 	}
 	zend.ArrayInit(return_value)
-	for {
-		var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			ini_entry = _z.GetPtr()
-			var option zend.Zval
-			if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
-				continue
-			}
-			if key == nil || key.GetVal()[0] != 0 {
-				if details != 0 {
-					zend.ArrayInit(&option)
-					if ini_entry.GetOrigValue() != nil {
-						zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().Copy())
-					} else if ini_entry.GetValue() != nil {
-						zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().Copy())
-					} else {
-						zend.AddAssocNull(&option, "global_value")
-					}
-					if ini_entry.GetValue() != nil {
-						zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().Copy())
-					} else {
-						zend.AddAssocNull(&option, "local_value")
-					}
-					zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
-					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &option)
+		key = _p.GetKey()
+		ini_entry = _z.GetPtr()
+		var option zend.Zval
+		if module_number != 0 && ini_entry.GetModuleNumber() != module_number {
+			continue
+		}
+		if key == nil || key.GetVal()[0] != 0 {
+			if details != 0 {
+				zend.ArrayInit(&option)
+				if ini_entry.GetOrigValue() != nil {
+					zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().Copy())
+				} else if ini_entry.GetValue() != nil {
+					zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().Copy())
 				} else {
-					if ini_entry.GetValue() != nil {
-						var zv zend.Zval
-						zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
-						zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &zv)
-					} else {
-						zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), zend.__EG().GetUninitializedZval())
-					}
+					zend.AddAssocNull(&option, "global_value")
+				}
+				if ini_entry.GetValue() != nil {
+					zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().Copy())
+				} else {
+					zend.AddAssocNull(&option, "local_value")
+				}
+				zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
+				zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &option)
+			} else {
+				if ini_entry.GetValue() != nil {
+					var zv zend.Zval
+					zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &zv)
+				} else {
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), zend.__EG().GetUninitializedZval())
 				}
 			}
 		}
-		break
 	}
 }
 func PhpIniCheckPath(option_name *byte, option_len int, new_option_name string, new_option_len int) int {

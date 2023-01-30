@@ -59,44 +59,36 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	} else {
 		module_number = 0
 	}
-	for {
-		var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			ini_entry = _z.GetPtr()
-			if ini_entry.GetModuleNumber() != module_number {
-				continue
-			}
-			if first != 0 {
-				standard.PhpInfoPrintTableStart()
-				standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
-				first = 0
-			}
-			if sapi_module.GetPhpinfoAsText() == 0 {
-				PUTS("<tr>")
-				PUTS("<td class=\"e\">")
-				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
-				PUTS("</td><td class=\"v\">")
-				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
-				PUTS("</td><td class=\"v\">")
-				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
-				PUTS("</td></tr>\n")
-			} else {
-				PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
-				PUTS(" => ")
-				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
-				PUTS(" => ")
-				PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
-				PUTS("\n")
-			}
+		ini_entry = _z.GetPtr()
+		if ini_entry.GetModuleNumber() != module_number {
+			continue
 		}
-		break
+		if first != 0 {
+			standard.PhpInfoPrintTableStart()
+			standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
+			first = 0
+		}
+		if sapi_module.GetPhpinfoAsText() == 0 {
+			PUTS("<tr>")
+			PUTS("<td class=\"e\">")
+			PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
+			PUTS("</td><td class=\"v\">")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
+			PUTS("</td><td class=\"v\">")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
+			PUTS("</td></tr>\n")
+		} else {
+			PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
+			PUTS(" => ")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ACTIVE)
+			PUTS(" => ")
+			PhpIniDisplayerCb(ini_entry, zend.ZEND_INI_DISPLAY_ORIG)
+			PUTS("\n")
+		}
 	}
 	if first == 0 {
 		standard.PhpInfoPrintTableEnd()
@@ -630,21 +622,13 @@ func PhpIniActivateConfig(source_hash *zend.HashTable, modify_type int, stage in
 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */
 
-	for {
-		var __ht *zend.HashTable = source_hash
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = source_hash
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			str = _p.GetKey()
-			data = _z
-			zend.ZendAlterIniEntryEx(str, data.GetStr(), modify_type, stage, 0)
-		}
-		break
+		str = _p.GetKey()
+		data = _z
+		zend.ZendAlterIniEntryEx(str, data.GetStr(), modify_type, stage, 0)
 	}
 
 	/* Walk through config hash and alter matching ini entries using the values found in the hash */

@@ -888,20 +888,12 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 		return
 	}
 	intern.SetFlags(int(flags_zv.GetLval()))
-	for {
-		var __ht *zend.HashTable = storage_zv.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = storage_zv.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			elem = _z
-			SplPtrLlistPush(intern.GetLlist(), elem)
-		}
-		break
+		elem = _z
+		SplPtrLlistPush(intern.GetLlist(), elem)
 	}
 	zend.ObjectPropertiesLoad(intern.GetStd(), members_zv.GetArr())
 }

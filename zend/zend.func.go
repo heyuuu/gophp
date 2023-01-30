@@ -147,52 +147,47 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	}
 	SmartStrAppends(buf, "(\n")
 	indent += PRINT_ZVAL_INDENT
-	for {
-		var __ht *HashTable = ht
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-			if _z.IsType(IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *HashTable = ht
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
+		if _z.IsType(IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(IS_UNDEF) {
 				continue
 			}
-			num_key = _p.GetH()
-			string_key = _p.GetKey()
-			tmp = _z
-			for i = 0; i < indent; i++ {
-				SmartStrAppendc(buf, ' ')
-			}
-			SmartStrAppendc(buf, '[')
-			if string_key != nil {
-				if is_object != 0 {
-					var prop_name *byte
-					var class_name *byte
-					var prop_len int
-					var mangled int = ZendUnmanglePropertyNameEx(string_key, &class_name, &prop_name, &prop_len)
-					SmartStrAppendl(buf, prop_name, prop_len)
-					if class_name != nil && mangled == SUCCESS {
-						if class_name[0] == '*' {
-							SmartStrAppends(buf, ":protected")
-						} else {
-							SmartStrAppends(buf, ":")
-							SmartStrAppends(buf, class_name)
-							SmartStrAppends(buf, ":private")
-						}
+		}
+		num_key = _p.GetH()
+		string_key = _p.GetKey()
+		tmp = _z
+		for i = 0; i < indent; i++ {
+			SmartStrAppendc(buf, ' ')
+		}
+		SmartStrAppendc(buf, '[')
+		if string_key != nil {
+			if is_object != 0 {
+				var prop_name *byte
+				var class_name *byte
+				var prop_len int
+				var mangled int = ZendUnmanglePropertyNameEx(string_key, &class_name, &prop_name, &prop_len)
+				SmartStrAppendl(buf, prop_name, prop_len)
+				if class_name != nil && mangled == SUCCESS {
+					if class_name[0] == '*' {
+						SmartStrAppends(buf, ":protected")
+					} else {
+						SmartStrAppends(buf, ":")
+						SmartStrAppends(buf, class_name)
+						SmartStrAppends(buf, ":private")
 					}
-				} else {
-					SmartStrAppend(buf, string_key)
 				}
 			} else {
-				SmartStrAppendLong(buf, num_key)
+				SmartStrAppend(buf, string_key)
 			}
-			SmartStrAppends(buf, "] => ")
-			ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
-			SmartStrAppends(buf, "\n")
+		} else {
+			SmartStrAppendLong(buf, num_key)
 		}
-		break
+		SmartStrAppends(buf, "] => ")
+		ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
+		SmartStrAppends(buf, "\n")
 	}
 	indent -= PRINT_ZVAL_INDENT
 	for i = 0; i < indent; i++ {
@@ -205,34 +200,29 @@ func PrintFlatHash(ht *HashTable) {
 	var string_key *ZendString
 	var num_key ZendUlong
 	var i int = 0
-	for {
-		var __ht *HashTable = ht
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-			if _z.IsType(IS_INDIRECT) {
-				_z = _z.GetZv()
-			}
+	var __ht *HashTable = ht
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
+		if _z.IsType(IS_INDIRECT) {
+			_z = _z.GetZv()
 			if _z.IsType(IS_UNDEF) {
 				continue
 			}
-			num_key = _p.GetH()
-			string_key = _p.GetKey()
-			tmp = _z
-			if b.PostInc(&i) > 0 {
-				ZEND_PUTS(",")
-			}
-			ZEND_PUTS("[")
-			if string_key != nil {
-				ZEND_WRITE(string_key.GetVal(), string_key.GetLen())
-			} else {
-				ZendPrintf(ZEND_ULONG_FMT, num_key)
-			}
-			ZEND_PUTS("] => ")
-			ZendPrintFlatZvalR(tmp)
 		}
-		break
+		num_key = _p.GetH()
+		string_key = _p.GetKey()
+		tmp = _z
+		if b.PostInc(&i) > 0 {
+			ZEND_PUTS(",")
+		}
+		ZEND_PUTS("[")
+		if string_key != nil {
+			ZEND_WRITE(string_key.GetVal(), string_key.GetLen())
+		} else {
+			ZendPrintf(ZEND_ULONG_FMT, num_key)
+		}
+		ZEND_PUTS("] => ")
+		ZendPrintFlatZvalR(tmp)
 	}
 }
 func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
@@ -486,48 +476,32 @@ func ZendRegisterStandardIniEntries() {
 func ZendResolvePropertyTypes() {
 	var ce *ZendClassEntry
 	var prop_info *ZendPropertyInfo
-	for {
-		var __ht *HashTable = __CG().GetClassTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = __CG().GetClassTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			ce = _z.GetPtr()
-			if ce.GetType() != ZEND_INTERNAL_CLASS {
-				continue
-			}
-			if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
-				for {
-					var __ht *HashTable = ce.GetPropertiesInfo()
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
+		ce = _z.GetPtr()
+		if ce.GetType() != ZEND_INTERNAL_CLASS {
+			continue
+		}
+		if ZEND_CLASS_HAS_TYPE_HINTS(ce) {
+			var __ht *HashTable = ce.GetPropertiesInfo()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						prop_info = _z.GetPtr()
-						if prop_info.GetType().IsName() {
-							var type_name *ZendString = prop_info.GetType().Name()
-							var lc_type_name *ZendString = ZendStringTolower(type_name)
-							var prop_ce *ZendClassEntry = ZendHashFindPtr(__CG().GetClassTable(), lc_type_name)
-							ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
-							prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
-							ZendStringRelease(lc_type_name)
-							ZendStringRelease(type_name)
-						}
-					}
-					break
+				prop_info = _z.GetPtr()
+				if prop_info.GetType().IsName() {
+					var type_name *ZendString = prop_info.GetType().Name()
+					var lc_type_name *ZendString = ZendStringTolower(type_name)
+					var prop_ce *ZendClassEntry = ZendHashFindPtr(__CG().GetClassTable(), lc_type_name)
+					ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
+					prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
+					ZendStringRelease(lc_type_name)
+					ZendStringRelease(type_name)
 				}
 			}
-			ce.SetIsPropertyTypesResolved(true)
 		}
-		break
+		ce.SetIsPropertyTypesResolved(true)
 	}
 }
 func ZendPostStartup() int {

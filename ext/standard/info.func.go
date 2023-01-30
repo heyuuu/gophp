@@ -52,31 +52,23 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
 			}
-			for {
-				var __ht *zend.HashTable = ht
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = ht
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
+				key = _p.GetKey()
+				if key != nil {
+					if first != 0 {
+						first = 0
+					} else {
+						PhpInfoPrint(", ")
 					}
-					key = _p.GetKey()
-					if key != nil {
-						if first != 0 {
-							first = 0
-						} else {
-							PhpInfoPrint(", ")
-						}
-						if core.sapi_module.GetPhpinfoAsText() == 0 {
-							PhpInfoPrintHtmlEsc(key.GetVal(), key.GetLen())
-						} else {
-							PhpInfoPrint(key.GetVal())
-						}
+					if core.sapi_module.GetPhpinfoAsText() == 0 {
+						PhpInfoPrintHtmlEsc(key.GetVal(), key.GetLen())
+					} else {
+						PhpInfoPrint(key.GetVal())
 					}
 				}
-				break
 			}
 			if core.sapi_module.GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")
@@ -127,73 +119,65 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 	key = zend.ZendStringInit(name, name_length, 0)
 	zend.ZendIsAutoGlobal(key)
 	if b.Assign(&data, zend.ZendHashFindDeref(zend.__EG().GetSymbolTable(), key)) != nil && data.IsType(zend.IS_ARRAY) {
-		for {
-			var __ht *zend.HashTable = data.GetArr()
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = data.GetArr()
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				num_key = _p.GetH()
-				string_key = _p.GetKey()
-				tmp = _z
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
-					PhpInfoPrint("<tr>")
-					PhpInfoPrint("<td class=\"e\">")
-				}
-				PhpInfoPrint("$")
-				PhpInfoPrint(name)
-				PhpInfoPrint("['")
-				if string_key != nil {
-					if core.sapi_module.GetPhpinfoAsText() == 0 {
-						PhpInfoPrintHtmlEsc(string_key.GetVal(), string_key.GetLen())
-					} else {
-						PhpInfoPrint(string_key.GetVal())
-					}
-				} else {
-					PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
-				}
-				PhpInfoPrint("']")
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
-					PhpInfoPrint("</td><td class=\"v\">")
-				} else {
-					PhpInfoPrint(" => ")
-				}
-				zend.ZVAL_DEREF(tmp)
-				if tmp.IsType(zend.IS_ARRAY) {
-					if core.sapi_module.GetPhpinfoAsText() == 0 {
-						var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
-						PhpInfoPrint("<pre>")
-						PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
-						PhpInfoPrint("</pre>")
-						zend.ZendStringReleaseEx(str, 0)
-					} else {
-						zend.ZendPrintZvalR(tmp, 0)
-					}
-				} else {
-					var tmp2 *zend.ZendString
-					var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
-					if core.sapi_module.GetPhpinfoAsText() == 0 {
-						if str.GetLen() == 0 {
-							PhpInfoPrint("<i>no value</i>")
-						} else {
-							PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
-						}
-					} else {
-						PhpInfoPrint(str.GetVal())
-					}
-					zend.ZendTmpStringRelease(tmp2)
-				}
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
-					PhpInfoPrint("</td></tr>\n")
-				} else {
-					PhpInfoPrint("\n")
-				}
+			num_key = _p.GetH()
+			string_key = _p.GetKey()
+			tmp = _z
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
+				PhpInfoPrint("<tr>")
+				PhpInfoPrint("<td class=\"e\">")
 			}
-			break
+			PhpInfoPrint("$")
+			PhpInfoPrint(name)
+			PhpInfoPrint("['")
+			if string_key != nil {
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
+					PhpInfoPrintHtmlEsc(string_key.GetVal(), string_key.GetLen())
+				} else {
+					PhpInfoPrint(string_key.GetVal())
+				}
+			} else {
+				PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
+			}
+			PhpInfoPrint("']")
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
+				PhpInfoPrint("</td><td class=\"v\">")
+			} else {
+				PhpInfoPrint(" => ")
+			}
+			zend.ZVAL_DEREF(tmp)
+			if tmp.IsType(zend.IS_ARRAY) {
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
+					var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
+					PhpInfoPrint("<pre>")
+					PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
+					PhpInfoPrint("</pre>")
+					zend.ZendStringReleaseEx(str, 0)
+				} else {
+					zend.ZendPrintZvalR(tmp, 0)
+				}
+			} else {
+				var tmp2 *zend.ZendString
+				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
+				if core.sapi_module.GetPhpinfoAsText() == 0 {
+					if str.GetLen() == 0 {
+						PhpInfoPrint("<i>no value</i>")
+					} else {
+						PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
+					}
+				} else {
+					PhpInfoPrint(str.GetVal())
+				}
+				zend.ZendTmpStringRelease(tmp2)
+			}
+			if core.sapi_module.GetPhpinfoAsText() == 0 {
+				PhpInfoPrint("</td></tr>\n")
+			} else {
+				PhpInfoPrint("\n")
+			}
 		}
 	}
 	zend.ZendStringEfree(key)
@@ -357,42 +341,26 @@ func PhpPrintInfo(flag int) {
 		zend.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
 		zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
 		zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
-		for {
-			var __ht *zend.HashTable = &sorted_registry
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = &sorted_registry
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				module = _z.GetPtr()
-				if module.GetInfoFunc() != nil || module.GetVersion() != nil {
-					PhpInfoPrintModule(module)
-				}
+			module = _z.GetPtr()
+			if module.GetInfoFunc() != nil || module.GetVersion() != nil {
+				PhpInfoPrintModule(module)
 			}
-			break
 		}
 		SECTION("Additional Modules")
 		PhpInfoPrintTableStart()
 		PhpInfoPrintTableHeader(1, "Module Name")
-		for {
-			var __ht *zend.HashTable = &sorted_registry
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht__1 *zend.HashTable = &sorted_registry
+		for _, _p := range __ht__1.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				module = _z.GetPtr()
-				if module.GetInfoFunc() == nil && module.GetVersion() == nil {
-					PhpInfoPrintModule(module)
-				}
+			module = _z.GetPtr()
+			if module.GetInfoFunc() == nil && module.GetVersion() == nil {
+				PhpInfoPrintModule(module)
 			}
-			break
 		}
 		PhpInfoPrintTableEnd()
 		zend.ZendHashDestroy(&sorted_registry)

@@ -995,22 +995,14 @@ func ZendBuildPropertiesInfoTable(ce *ZendClassEntry) {
 		/* Child did not add any new properties, we are done */
 
 	}
-	for {
-		var __ht *HashTable = ce.GetPropertiesInfo()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetPropertiesInfo()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			prop = _z.GetPtr()
-			if prop.GetCe() == ce && !prop.IsStatic() {
-				table[OBJ_PROP_TO_NUM(prop.GetOffset())] = prop
-			}
+		prop = _z.GetPtr()
+		if prop.GetCe() == ce && !prop.IsStatic() {
+			table[OBJ_PROP_TO_NUM(prop.GetOffset())] = prop
 		}
-		break
 	}
 }
 func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked ZendBool) {
@@ -1228,101 +1220,61 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			}
 		}
 	}
-	for {
-		var __ht *HashTable = ce.GetPropertiesInfo()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetPropertiesInfo()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			property_info = _z.GetPtr()
-			if property_info.GetCe() == ce {
-				if property_info.IsStatic() {
-					property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultStaticMembersCount())
-				} else {
-					property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultPropertiesCount()*b.SizeOf("zval"))
-				}
+		property_info = _z.GetPtr()
+		if property_info.GetCe() == ce {
+			if property_info.IsStatic() {
+				property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultStaticMembersCount())
+			} else {
+				property_info.SetOffset(property_info.GetOffset() + parent_ce.GetDefaultPropertiesCount()*b.SizeOf("zval"))
 			}
 		}
-		break
 	}
 	if parent_ce.GetPropertiesInfo().GetNNumOfElements() {
 		ce.GetPropertiesInfo().Extend(ce.GetPropertiesInfo().GetNNumOfElements() + parent_ce.GetPropertiesInfo().GetNNumOfElements())
-		for {
-			var __ht *HashTable = parent_ce.GetPropertiesInfo()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = parent_ce.GetPropertiesInfo()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				property_info = _z.GetPtr()
-				DoInheritProperty(property_info, key, ce)
-			}
-			break
+			key = _p.GetKey()
+			property_info = _z.GetPtr()
+			DoInheritProperty(property_info, key, ce)
 		}
 	}
 	if parent_ce.GetConstantsTable().GetNNumOfElements() {
 		var c *ZendClassConstant
 		ce.GetConstantsTable().Extend(ce.GetConstantsTable().GetNNumOfElements() + parent_ce.GetConstantsTable().GetNNumOfElements())
-		for {
-			var __ht *HashTable = parent_ce.GetConstantsTable()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = parent_ce.GetConstantsTable()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				c = _z.GetPtr()
-				DoInheritClassConstant(key, c, ce)
-			}
-			break
+			key = _p.GetKey()
+			c = _z.GetPtr()
+			DoInheritClassConstant(key, c, ce)
 		}
 	}
 	if parent_ce.GetFunctionTable().GetNNumOfElements() {
 		ce.GetFunctionTable().Extend(ce.GetFunctionTable().GetNNumOfElements() + parent_ce.GetFunctionTable().GetNNumOfElements())
 		if checked != 0 {
-			for {
-				var __ht *HashTable = parent_ce.GetFunctionTable()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = parent_ce.GetFunctionTable()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					key = _p.GetKey()
-					func_ = _z.GetPtr()
-					DoInheritMethod(key, func_, ce, 0, 1)
-				}
-				break
+				key = _p.GetKey()
+				func_ = _z.GetPtr()
+				DoInheritMethod(key, func_, ce, 0, 1)
 			}
 		} else {
-			for {
-				var __ht *HashTable = parent_ce.GetFunctionTable()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = parent_ce.GetFunctionTable()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					key = _p.GetKey()
-					func_ = _z.GetPtr()
-					DoInheritMethod(key, func_, ce, 0, 0)
-				}
-				break
+				key = _p.GetKey()
+				func_ = _z.GetPtr()
+				DoInheritMethod(key, func_, ce, 0, 0)
 			}
 		}
 	}
@@ -1364,37 +1316,21 @@ func DoInterfaceImplementation(ce *ZendClassEntry, iface *ZendClassEntry) {
 	var func_ *ZendFunction
 	var key *ZendString
 	var c *ZendClassConstant
-	for {
-		var __ht *HashTable = iface.GetConstantsTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = iface.GetConstantsTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			c = _z.GetPtr()
-			DoInheritIfaceConstant(key, c, ce, iface)
-		}
-		break
+		key = _p.GetKey()
+		c = _z.GetPtr()
+		DoInheritIfaceConstant(key, c, ce, iface)
 	}
-	for {
-		var __ht *HashTable = iface.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht__1 *HashTable = iface.GetFunctionTable()
+	for _, _p := range __ht__1.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			func_ = _z.GetPtr()
-			DoInheritMethod(key, func_, ce, 1, 0)
-		}
-		break
+		key = _p.GetKey()
+		func_ = _z.GetPtr()
+		DoInheritMethod(key, func_, ce, 1, 0)
 	}
 	DoImplementInterface(ce, iface)
 	if iface.GetNumInterfaces() != 0 {
@@ -1425,21 +1361,13 @@ func ZendDoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
 
 		/* Check for attempt to redeclare interface constants */
 
-		for {
-			var __ht *HashTable = ce.GetConstantsTable()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = ce.GetConstantsTable()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				c = _z.GetPtr()
-				DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
-			}
-			break
+			key = _p.GetKey()
+			c = _z.GetPtr()
+			DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
 		}
 
 		/* Check for attempt to redeclare interface constants */
@@ -1484,21 +1412,13 @@ func ZendDoImplementInterfaces(ce *ZendClassEntry, interfaces **ZendClassEntry) 
 
 				/* skip duplications */
 
-				for {
-					var __ht *HashTable = ce.GetConstantsTable()
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
+				var __ht *HashTable = ce.GetConstantsTable()
+				for _, _p := range __ht.foreachData() {
+					var _z *Zval = _p.GetVal()
 
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						key = _p.GetKey()
-						c = _z.GetPtr()
-						DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
-					}
-					break
+					key = _p.GetKey()
+					c = _z.GetPtr()
+					DoInheritConstantCheck(iface.GetConstantsTable(), c, key, iface)
 				}
 				iface = nil
 				break
@@ -1883,21 +1803,13 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 
 				/* copies functions, applies defined aliasing, and excludes unused trait methods */
 
-				for {
-					var __ht *HashTable = traits[i].GetFunctionTable()
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
+				var __ht *HashTable = traits[i].GetFunctionTable()
+				for _, _p := range __ht.foreachData() {
+					var _z *Zval = _p.GetVal()
 
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						key = _p.GetKey()
-						fn = _z.GetPtr()
-						ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
-					}
-					break
+					key = _p.GetKey()
+					fn = _z.GetPtr()
+					ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
 				}
 				if exclude_tables[i] != nil {
 					ZendHashDestroy(exclude_tables[i])
@@ -1909,39 +1821,23 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 	} else {
 		for i = 0; i < ce.GetNumTraits(); i++ {
 			if traits[i] != nil {
-				for {
-					var __ht *HashTable = traits[i].GetFunctionTable()
-					var _p *Bucket = __ht.GetArData()
-					var _end *Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *Zval = _p.GetVal()
+				var __ht *HashTable = traits[i].GetFunctionTable()
+				for _, _p := range __ht.foreachData() {
+					var _z *Zval = _p.GetVal()
 
-						if _z.IsType(IS_UNDEF) {
-							continue
-						}
-						key = _p.GetKey()
-						fn = _z.GetPtr()
-						ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
-					}
-					break
+					key = _p.GetKey()
+					fn = _z.GetPtr()
+					ZendTraitsCopyFunctions(key, fn, ce, &overridden, nil, aliases)
 				}
 			}
 		}
 	}
-	for {
-		var __ht *HashTable = ce.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			fn = _z.GetPtr()
-			ZendFixupTraitMethod(fn, ce)
-		}
-		break
+		fn = _z.GetPtr()
+		ZendFixupTraitMethod(fn, ce)
 	}
 	if overridden != nil {
 		ZendHashDestroy(overridden)
@@ -1980,110 +1876,102 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 		if traits[i] == nil {
 			continue
 		}
-		for {
-			var __ht *HashTable = traits[i].GetPropertiesInfo()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = traits[i].GetPropertiesInfo()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
+			property_info = _z.GetPtr()
+
+			/* first get the unmangeld name if necessary,
+			 * then check whether the property is already there
+			 */
+
+			flags = property_info.GetFlags()
+			if (flags & ZEND_ACC_PUBLIC) != 0 {
+				prop_name = property_info.GetName().Copy()
+			} else {
+				var pname *byte
+				var pname_len int
+
+				/* for private and protected we need to unmangle the names */
+
+				ZendUnmanglePropertyNameEx(property_info.GetName(), &class_name_unused, &pname, &pname_len)
+				prop_name = ZendStringInit(pname, pname_len, 0)
+			}
+
+			/* next: check for conflicts with current class */
+
+			if b.Assign(&coliding_prop, ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name)) != nil {
+				if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
+					ZendHashDel(ce.GetPropertiesInfo(), prop_name)
+					flags |= ZEND_ACC_CHANGED
+				} else {
+					not_compatible = 1
+					if (coliding_prop.GetFlags()&(ZEND_ACC_PPP_MASK|ZEND_ACC_STATIC)) == (flags&(ZEND_ACC_PPP_MASK|ZEND_ACC_STATIC)) && PropertyTypesCompatible(property_info, coliding_prop) == INHERITANCE_SUCCESS {
+
+						/* the flags are identical, thus, the properties may be compatible */
+
+						var op1 *Zval
+						var op2 *Zval
+						var op1_tmp Zval
+						var op2_tmp Zval
+						if (flags & ZEND_ACC_STATIC) != 0 {
+							op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
+							op2 = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
+							ZVAL_DEINDIRECT(op1)
+							ZVAL_DEINDIRECT(op2)
+						} else {
+							op1 = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(coliding_prop.GetOffset())]
+							op2 = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
+						}
+
+						/* if any of the values is a constant, we try to resolve it */
+
+						if op1.IsType(IS_CONSTANT_AST) {
+							ZVAL_COPY_OR_DUP(&op1_tmp, op1)
+							ZvalUpdateConstantEx(&op1_tmp, ce)
+							op1 = &op1_tmp
+						}
+						if op2.IsType(IS_CONSTANT_AST) {
+							ZVAL_COPY_OR_DUP(&op2_tmp, op2)
+							ZvalUpdateConstantEx(&op2_tmp, ce)
+							op2 = &op2_tmp
+						}
+						not_compatible = FastIsNotIdenticalFunction(op1, op2)
+						if op1 == &op1_tmp {
+							ZvalPtrDtorNogc(&op1_tmp)
+						}
+						if op2 == &op2_tmp {
+							ZvalPtrDtorNogc(&op2_tmp)
+						}
+					}
+					if not_compatible != 0 {
+						ZendErrorNoreturn(E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().GetName().GetVal(), prop_name.GetVal(), ce.GetName().GetVal())
+					}
+					ZendStringReleaseEx(prop_name, 0)
 					continue
 				}
-				property_info = _z.GetPtr()
-
-				/* first get the unmangeld name if necessary,
-				 * then check whether the property is already there
-				 */
-
-				flags = property_info.GetFlags()
-				if (flags & ZEND_ACC_PUBLIC) != 0 {
-					prop_name = property_info.GetName().Copy()
-				} else {
-					var pname *byte
-					var pname_len int
-
-					/* for private and protected we need to unmangle the names */
-
-					ZendUnmanglePropertyNameEx(property_info.GetName(), &class_name_unused, &pname, &pname_len)
-					prop_name = ZendStringInit(pname, pname_len, 0)
-				}
-
-				/* next: check for conflicts with current class */
-
-				if b.Assign(&coliding_prop, ZendHashFindPtr(ce.GetPropertiesInfo(), prop_name)) != nil {
-					if coliding_prop.IsPrivate() && coliding_prop.GetCe() != ce {
-						ZendHashDel(ce.GetPropertiesInfo(), prop_name)
-						flags |= ZEND_ACC_CHANGED
-					} else {
-						not_compatible = 1
-						if (coliding_prop.GetFlags()&(ZEND_ACC_PPP_MASK|ZEND_ACC_STATIC)) == (flags&(ZEND_ACC_PPP_MASK|ZEND_ACC_STATIC)) && PropertyTypesCompatible(property_info, coliding_prop) == INHERITANCE_SUCCESS {
-
-							/* the flags are identical, thus, the properties may be compatible */
-
-							var op1 *Zval
-							var op2 *Zval
-							var op1_tmp Zval
-							var op2_tmp Zval
-							if (flags & ZEND_ACC_STATIC) != 0 {
-								op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
-								op2 = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-								ZVAL_DEINDIRECT(op1)
-								ZVAL_DEINDIRECT(op2)
-							} else {
-								op1 = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(coliding_prop.GetOffset())]
-								op2 = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
-							}
-
-							/* if any of the values is a constant, we try to resolve it */
-
-							if op1.IsType(IS_CONSTANT_AST) {
-								ZVAL_COPY_OR_DUP(&op1_tmp, op1)
-								ZvalUpdateConstantEx(&op1_tmp, ce)
-								op1 = &op1_tmp
-							}
-							if op2.IsType(IS_CONSTANT_AST) {
-								ZVAL_COPY_OR_DUP(&op2_tmp, op2)
-								ZvalUpdateConstantEx(&op2_tmp, ce)
-								op2 = &op2_tmp
-							}
-							not_compatible = FastIsNotIdenticalFunction(op1, op2)
-							if op1 == &op1_tmp {
-								ZvalPtrDtorNogc(&op1_tmp)
-							}
-							if op2 == &op2_tmp {
-								ZvalPtrDtorNogc(&op2_tmp)
-							}
-						}
-						if not_compatible != 0 {
-							ZendErrorNoreturn(E_COMPILE_ERROR, "%s and %s define the __special__  same property ($%s) in the composition of %s. However, the definition differs and is considered incompatible. Class was composed", FindFirstDefinition(ce, traits, i, prop_name, coliding_prop.GetCe()).GetName().GetVal(), property_info.GetCe().GetName().GetVal(), prop_name.GetVal(), ce.GetName().GetVal())
-						}
-						ZendStringReleaseEx(prop_name, 0)
-						continue
-					}
-				}
-
-				/* property not found, so lets add it */
-
-				if (flags & ZEND_ACC_STATIC) != 0 {
-					prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-					ZEND_ASSERT(prop_value.GetType() != IS_INDIRECT)
-				} else {
-					prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
-				}
-				Z_TRY_ADDREF_P(prop_value)
-				if property_info.GetDocComment() != nil {
-					doc_comment = property_info.GetDocComment().Copy()
-				} else {
-					doc_comment = nil
-				}
-				if property_info.GetType().IsName() {
-					property_info.GetType().Name().AddRefcount()
-				}
-				ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
-				ZendStringReleaseEx(prop_name, 0)
 			}
-			break
+
+			/* property not found, so lets add it */
+
+			if (flags & ZEND_ACC_STATIC) != 0 {
+				prop_value = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
+				ZEND_ASSERT(prop_value.GetType() != IS_INDIRECT)
+			} else {
+				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
+			}
+			Z_TRY_ADDREF_P(prop_value)
+			if property_info.GetDocComment() != nil {
+				doc_comment = property_info.GetDocComment().Copy()
+			} else {
+				doc_comment = nil
+			}
+			if property_info.GetType().IsName() {
+				property_info.GetType().Name().AddRefcount()
+			}
+			ZendDeclareTypedProperty(ce, prop_name, prop_value, flags, doc_comment, property_info.GetType())
+			ZendStringReleaseEx(prop_name, 0)
 		}
 	}
 
@@ -2243,20 +2131,12 @@ func ZendVerifyAbstractClass(ce *ZendClassEntry) {
 	var ai ZendAbstractInfo
 	ZEND_ASSERT((ce.GetCeFlags() & (ZEND_ACC_IMPLICIT_ABSTRACT_CLASS | ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT | ZEND_ACC_EXPLICIT_ABSTRACT_CLASS)) == ZEND_ACC_IMPLICIT_ABSTRACT_CLASS)
 	memset(&ai, 0, b.SizeOf("ai"))
-	for {
-		var __ht *HashTable = ce.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = ce.GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			func_ = _z.GetPtr()
-			ZendVerifyAbstractClassFunction(func_, &ai)
-		}
-		break
+		func_ = _z.GetPtr()
+		ZendVerifyAbstractClassFunction(func_, &ai)
 	}
 	if ai.GetCnt() != 0 {
 		ZendErrorNoreturn(E_ERROR, "Class %s contains %d abstract method%s and must therefore be declared abstract or implement the remaining methods ("+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+MAX_ABSTRACT_INFO_FMT+")", ce.GetName().GetVal(), ai.GetCnt(), b.Cond(ai.GetCnt() > 1, "s", ""), DISPLAY_ABSTRACT_FN(0), DISPLAY_ABSTRACT_FN(1), DISPLAY_ABSTRACT_FN(2))
@@ -2371,20 +2251,12 @@ func LoadDelayedClasses() {
 	/* Take ownership of this HT, to avoid concurrent modification during autoloading. */
 
 	__CG().SetDelayedAutoloads(nil)
-	for {
-		var __ht *HashTable = delayed_autoloads
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = delayed_autoloads
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			name = _p.GetKey()
-			ZendLookupClass(name)
-		}
-		break
+		name = _p.GetKey()
+		ZendLookupClass(name)
 	}
 	ZendHashDestroy(delayed_autoloads)
 	FREE_HASHTABLE(delayed_autoloads)
@@ -2411,33 +2283,25 @@ func ReportVarianceErrors(ce *ZendClassEntry) {
 	ZEND_ASSERT(all_obligations != nil)
 	obligations = ZendHashIndexFindPtr(all_obligations, num_key)
 	ZEND_ASSERT(obligations != nil)
-	for {
-		var __ht *HashTable = obligations
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = obligations
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			obligation = _z.GetPtr()
-			var status InheritanceStatus
-			var unresolved_class *ZendString
-			if obligation.GetType() == OBLIGATION_COMPATIBILITY {
+		obligation = _z.GetPtr()
+		var status InheritanceStatus
+		var unresolved_class *ZendString
+		if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 
-				/* Just used to fetch the unresolved_class in this case. */
+			/* Just used to fetch the unresolved_class in this case. */
 
-				status = ZendDoPerformImplementationCheck(&unresolved_class, obligation.child_fn, obligation.parent_fn)
-				ZEND_ASSERT(status == INHERITANCE_UNRESOLVED)
-				EmitIncompatibleMethodErrorOrWarning(obligation.child_fn, obligation.parent_fn, status, unresolved_class, obligation.always_error)
-			} else if obligation.GetType() == OBLIGATION_PROPERTY_COMPATIBILITY {
-				EmitIncompatiblePropertyError(obligation.child_prop, obligation.parent_prop)
-			} else {
-				ZendErrorNoreturn(E_CORE_ERROR, "Bug #78647")
-			}
+			status = ZendDoPerformImplementationCheck(&unresolved_class, obligation.child_fn, obligation.parent_fn)
+			ZEND_ASSERT(status == INHERITANCE_UNRESOLVED)
+			EmitIncompatibleMethodErrorOrWarning(obligation.child_fn, obligation.parent_fn, status, unresolved_class, obligation.always_error)
+		} else if obligation.GetType() == OBLIGATION_PROPERTY_COMPATIBILITY {
+			EmitIncompatiblePropertyError(obligation.child_prop, obligation.parent_prop)
+		} else {
+			ZendErrorNoreturn(E_CORE_ERROR, "Bug #78647")
 		}
-		break
 	}
 
 	/* Only warnings were thrown above -- that means that there are incompatibilities, but only
@@ -2538,22 +2402,40 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 	var key *ZendString
 	var parent_func *ZendFunction
 	var parent_info *ZendPropertyInfo
-	for {
-		var __ht *HashTable = parent_ce.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = parent_ce.GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
+		key = _p.GetKey()
+		parent_func = _z.GetPtr()
+		var zv *Zval = ce.GetFunctionTable().FindByZendString(key)
+		if zv != nil {
+			var child_func *ZendFunction = zv.GetFunc()
+			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
+			if status != INHERITANCE_SUCCESS {
+				if status == INHERITANCE_UNRESOLVED {
+					return INHERITANCE_UNRESOLVED
+				}
+				ZEND_ASSERT(status == INHERITANCE_ERROR)
+				ret = INHERITANCE_ERROR
 			}
-			key = _p.GetKey()
-			parent_func = _z.GetPtr()
-			var zv *Zval = ce.GetFunctionTable().FindByZendString(key)
-			if zv != nil {
-				var child_func *ZendFunction = zv.GetFunc()
-				var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
+		}
+	}
+	var __ht__1 *HashTable = parent_ce.GetPropertiesInfo()
+	for _, _p := range __ht__1.foreachData() {
+		var _z *Zval = _p.GetVal()
+
+		key = _p.GetKey()
+		parent_info = _z.GetPtr()
+		var zv *Zval
+		if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
+			continue
+		}
+		zv = ce.GetPropertiesInfo().FindByZendString(key)
+		if zv != nil {
+			var child_info *ZendPropertyInfo = zv.GetPtr()
+			if child_info.GetType().IsSet() {
+				var status InheritanceStatus = PropertyTypesCompatible(parent_info, child_info)
 				if status != INHERITANCE_SUCCESS {
 					if status == INHERITANCE_UNRESOLVED {
 						return INHERITANCE_UNRESOLVED
@@ -2563,40 +2445,6 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 				}
 			}
 		}
-		break
-	}
-	for {
-		var __ht *HashTable = parent_ce.GetPropertiesInfo()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
-
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			parent_info = _z.GetPtr()
-			var zv *Zval
-			if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
-				continue
-			}
-			zv = ce.GetPropertiesInfo().FindByZendString(key)
-			if zv != nil {
-				var child_info *ZendPropertyInfo = zv.GetPtr()
-				if child_info.GetType().IsSet() {
-					var status InheritanceStatus = PropertyTypesCompatible(parent_info, child_info)
-					if status != INHERITANCE_SUCCESS {
-						if status == INHERITANCE_UNRESOLVED {
-							return INHERITANCE_UNRESOLVED
-						}
-						ZEND_ASSERT(status == INHERITANCE_ERROR)
-						ret = INHERITANCE_ERROR
-					}
-				}
-			}
-		}
-		break
 	}
 	return ret
 }

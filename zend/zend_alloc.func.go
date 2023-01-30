@@ -1673,21 +1673,13 @@ func TrackedRealloc(ptr any, new_size int) any {
 func TrackedFreeAll() {
 	var tracked_allocs *HashTable = AG(mm_heap).tracked_allocs
 	var h ZendUlong
-	for {
-		var __ht *HashTable = tracked_allocs
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = tracked_allocs
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			h = _p.GetH()
-			var ptr any = any(uintPtr(h << core.ZEND_MM_ALIGNMENT_LOG2))
-			Free(ptr)
-		}
-		break
+		h = _p.GetH()
+		var ptr any = any(uintPtr(h << core.ZEND_MM_ALIGNMENT_LOG2))
+		Free(ptr)
 	}
 }
 func AllocGlobalsCtor(alloc_globals *ZendAllocGlobals) {

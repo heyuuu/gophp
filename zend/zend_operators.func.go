@@ -2635,7 +2635,7 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					return ret
 				} else if op2.GetType() != IS_OBJECT && Z_OBJ_HT_P(op1).GetCastObject() != nil {
 					ZVAL_UNDEF(&tmp_free)
-					if Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.IsType(IS_FALSE) || op2.IsType(IS_TRUE), _IS_BOOL, func() ZendUchar { return op2.GetType() })) == FAILURE {
+					if Z_OBJ_HT_P(op1).GetCastObject()(op1, &tmp_free, b.CondF2(op2.IsType(IS_FALSE) || op2.IsType(IS_TRUE), _IS_BOOL, func() __auto__ { return op2.GetType() })) == FAILURE {
 						ZVAL_LONG(result, 1)
 						ZendFreeObjGetResult(&tmp_free)
 						return SUCCESS
@@ -2654,7 +2654,7 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					return ret
 				} else if op1.GetType() != IS_OBJECT && Z_OBJ_HT_P(op2).GetCastObject() != nil {
 					ZVAL_UNDEF(&tmp_free)
-					if Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.IsType(IS_FALSE) || op1.IsType(IS_TRUE), _IS_BOOL, func() ZendUchar { return op1.GetType() })) == FAILURE {
+					if Z_OBJ_HT_P(op2).GetCastObject()(op2, &tmp_free, b.CondF2(op1.IsType(IS_FALSE) || op1.IsType(IS_TRUE), _IS_BOOL, func() __auto__ { return op1.GetType() })) == FAILURE {
 						ZVAL_LONG(result, -1)
 						ZendFreeObjGetResult(&tmp_free)
 						return SUCCESS

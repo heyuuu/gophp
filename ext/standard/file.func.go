@@ -742,32 +742,24 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		if zend.Z_ARRVAL_P(data).GetNNumOfElements() {
 			var bytes_written ssize_t
 			var tmp *zend.Zval
-			for {
-				var __ht *zend.HashTable = data.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = data.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
+				tmp = _z
+				var t *zend.ZendString
+				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
+				if str.GetLen() != 0 {
+					numbytes += str.GetLen()
+					bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
+					if bytes_written != str.GetLen() {
+						core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
+						zend.ZendTmpStringRelease(t)
+						numbytes = -1
+						break
 					}
-					tmp = _z
-					var t *zend.ZendString
-					var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
-					if str.GetLen() != 0 {
-						numbytes += str.GetLen()
-						bytes_written = core.PhpStreamWrite(stream, str.GetVal(), str.GetLen())
-						if bytes_written != str.GetLen() {
-							core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to write %zd bytes to %s", str.GetLen(), filename)
-							zend.ZendTmpStringRelease(t)
-							numbytes = -1
-							break
-						}
-					}
-					zend.ZendTmpStringRelease(t)
 				}
-				break
+				zend.ZendTmpStringRelease(t)
 			}
 		}
 		break
@@ -3791,48 +3783,40 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var csvline zend.SmartStr = zend.SmartStr{0}
 	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = zend.Z_ARRVAL_P(fields).GetNNumOfElements()
-	for {
-		var __ht *zend.HashTable = fields.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = fields.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			field_tmp = _z
-			var tmp_field_str *zend.ZendString
-			var field_str *zend.ZendString = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
+		field_tmp = _z
+		var tmp_field_str *zend.ZendString
+		var field_str *zend.ZendString = zend.ZvalGetTmpString(field_tmp, &tmp_field_str)
 
-			/* enclose a field that contains a delimiter, an enclosure character, or a newline */
+		/* enclose a field that contains a delimiter, an enclosure character, or a newline */
 
-			if FPUTCSV_FLD_CHK(delimiter) || FPUTCSV_FLD_CHK(enclosure) || escape_char != PHP_CSV_NO_ESCAPE && FPUTCSV_FLD_CHK(escape_char) || FPUTCSV_FLD_CHK('\n') || FPUTCSV_FLD_CHK('\r') || FPUTCSV_FLD_CHK('\t') || FPUTCSV_FLD_CHK(' ') {
-				var ch *byte = field_str.GetVal()
-				var end *byte = ch + field_str.GetLen()
-				var escaped int = 0
-				zend.SmartStrAppendc(&csvline, enclosure)
-				for ch < end {
-					if escape_char != PHP_CSV_NO_ESCAPE && (*ch) == escape_char {
-						escaped = 1
-					} else if escaped == 0 && (*ch) == enclosure {
-						zend.SmartStrAppendc(&csvline, enclosure)
-					} else {
-						escaped = 0
-					}
-					zend.SmartStrAppendc(&csvline, *ch)
-					ch++
+		if FPUTCSV_FLD_CHK(delimiter) || FPUTCSV_FLD_CHK(enclosure) || escape_char != PHP_CSV_NO_ESCAPE && FPUTCSV_FLD_CHK(escape_char) || FPUTCSV_FLD_CHK('\n') || FPUTCSV_FLD_CHK('\r') || FPUTCSV_FLD_CHK('\t') || FPUTCSV_FLD_CHK(' ') {
+			var ch *byte = field_str.GetVal()
+			var end *byte = ch + field_str.GetLen()
+			var escaped int = 0
+			zend.SmartStrAppendc(&csvline, enclosure)
+			for ch < end {
+				if escape_char != PHP_CSV_NO_ESCAPE && (*ch) == escape_char {
+					escaped = 1
+				} else if escaped == 0 && (*ch) == enclosure {
+					zend.SmartStrAppendc(&csvline, enclosure)
+				} else {
+					escaped = 0
 				}
-				zend.SmartStrAppendc(&csvline, enclosure)
-			} else {
-				zend.SmartStrAppend(&csvline, field_str)
+				zend.SmartStrAppendc(&csvline, *ch)
+				ch++
 			}
-			if b.PreInc(&i) != count {
-				zend.SmartStrAppendl(&csvline, &delimiter, 1)
-			}
-			zend.ZendTmpStringRelease(tmp_field_str)
+			zend.SmartStrAppendc(&csvline, enclosure)
+		} else {
+			zend.SmartStrAppend(&csvline, field_str)
 		}
-		break
+		if b.PreInc(&i) != count {
+			zend.SmartStrAppendl(&csvline, &delimiter, 1)
+		}
+		zend.ZendTmpStringRelease(tmp_field_str)
 	}
 	zend.SmartStrAppendc(&csvline, '\n')
 	zend.SmartStr0(&csvline)

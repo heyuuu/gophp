@@ -461,20 +461,12 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 		if tmp.IsType(IS_ARRAY) {
 			var last_len int = str.GetS().GetLen()
 			var arg *Zval
-			for {
-				var __ht *HashTable = tmp.GetArr()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = tmp.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					arg = _z
-					_buildTraceArgs(arg, str)
-				}
-				break
+				arg = _z
+				_buildTraceArgs(arg, str)
 			}
 			if last_len != str.GetS().GetLen() {
 				str.GetS().GetLen() -= 2
@@ -504,25 +496,17 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 		RETVAL_FALSE
 		return
 	}
-	for {
-		var __ht *HashTable = trace.GetArr()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = trace.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			index = _p.GetH()
-			frame = _z
-			if frame.GetType() != IS_ARRAY {
-				ZendError(E_WARNING, "Expected array for frame "+ZEND_ULONG_FMT, index)
-				continue
-			}
-			_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
+		index = _p.GetH()
+		frame = _z
+		if frame.GetType() != IS_ARRAY {
+			ZendError(E_WARNING, "Expected array for frame "+ZEND_ULONG_FMT, index)
+			continue
 		}
-		break
+		_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
 	}
 	SmartStrAppendc(&str, '#')
 	SmartStrAppendLong(&str, num)

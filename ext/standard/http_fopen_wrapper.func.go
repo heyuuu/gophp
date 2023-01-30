@@ -156,53 +156,45 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 			var p *byte
 			if tmpzval.IsType(zend.IS_ARRAY) {
 				var tmpheader *zend.Zval = nil
-				for {
-					var __ht *zend.HashTable = tmpzval.GetArr()
-					var _p *zend.Bucket = __ht.GetArData()
-					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *zend.Zval = _p.GetVal()
+				var __ht *zend.HashTable = tmpzval.GetArr()
+				for _, _p := range __ht.foreachData() {
+					var _z *zend.Zval = _p.GetVal()
 
-						if _z.IsType(zend.IS_UNDEF) {
-							continue
-						}
-						tmpheader = _z
-						if tmpheader.IsType(zend.IS_STRING) {
-							s = zend.Z_STRVAL_P(tmpheader)
-							for {
-								for (*s) == ' ' || (*s) == '\t' {
-									s++
-								}
-								p = s
-								for (*p) != 0 && (*p) != ':' && (*p) != '\r' && (*p) != '\n' {
-									p++
-								}
-								if (*p) == ':' {
-									p++
-									if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(s, b.SizeOf("\"Proxy-Authorization:\"")-1, "Proxy-Authorization:", b.SizeOf("\"Proxy-Authorization:\"")-1) == 0 {
-										for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
-											p++
-										}
-										zend.SmartStrAppendl(&header, s, p-s)
-										zend.SmartStrAppendl(&header, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
-										goto finish
-									} else {
-										for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
-											p++
-										}
+					tmpheader = _z
+					if tmpheader.IsType(zend.IS_STRING) {
+						s = zend.Z_STRVAL_P(tmpheader)
+						for {
+							for (*s) == ' ' || (*s) == '\t' {
+								s++
+							}
+							p = s
+							for (*p) != 0 && (*p) != ':' && (*p) != '\r' && (*p) != '\n' {
+								p++
+							}
+							if (*p) == ':' {
+								p++
+								if p-s == b.SizeOf("\"Proxy-Authorization:\"")-1 && zend.ZendBinaryStrcasecmp(s, b.SizeOf("\"Proxy-Authorization:\"")-1, "Proxy-Authorization:", b.SizeOf("\"Proxy-Authorization:\"")-1) == 0 {
+									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
+										p++
+									}
+									zend.SmartStrAppendl(&header, s, p-s)
+									zend.SmartStrAppendl(&header, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
+									goto finish
+								} else {
+									for (*p) != 0 && (*p) != '\r' && (*p) != '\n' {
+										p++
 									}
 								}
-								s = p
-								for (*s) == '\r' || (*s) == '\n' {
-									s++
-								}
-								if (*s) == 0 {
-									break
-								}
+							}
+							s = p
+							for (*s) == '\r' || (*s) == '\n' {
+								s++
+							}
+							if (*s) == 0 {
+								break
 							}
 						}
 					}
-					break
 				}
 			} else if tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) != 0 {
 				s = zend.Z_STRVAL_P(tmpzval)
@@ -368,23 +360,15 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		if tmpzval.IsType(zend.IS_ARRAY) {
 			var tmpheader *zend.Zval = nil
 			var tmpstr zend.SmartStr = zend.SmartStr{0}
-			for {
-				var __ht *zend.HashTable = tmpzval.GetArr()
-				var _p *zend.Bucket = __ht.GetArData()
-				var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *zend.Zval = _p.GetVal()
+			var __ht *zend.HashTable = tmpzval.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-					if _z.IsType(zend.IS_UNDEF) {
-						continue
-					}
-					tmpheader = _z
-					if tmpheader.IsType(zend.IS_STRING) {
-						zend.SmartStrAppend(&tmpstr, tmpheader.GetStr())
-						zend.SmartStrAppendl(&tmpstr, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
-					}
+				tmpheader = _z
+				if tmpheader.IsType(zend.IS_STRING) {
+					zend.SmartStrAppend(&tmpstr, tmpheader.GetStr())
+					zend.SmartStrAppendl(&tmpstr, "\r\n", b.SizeOf("\"\\r\\n\"")-1)
 				}
-				break
 			}
 			zend.SmartStr0(&tmpstr)
 

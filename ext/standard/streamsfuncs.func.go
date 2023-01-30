@@ -1170,20 +1170,12 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 	}
 	if b.Assign(&stream_xport_hash, streams.PhpStreamXportGetHash()) {
 		zend.ArrayInit(return_value)
-		for {
-			var __ht *zend.HashTable = stream_xport_hash
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = stream_xport_hash
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				stream_xport = _p.GetKey()
-				zend.AddNextIndexStr(return_value, stream_xport.Copy())
-			}
-			break
+			stream_xport = _p.GetKey()
+			zend.AddNextIndexStr(return_value, stream_xport.Copy())
 		}
 	} else {
 		zend.RETVAL_FALSE
@@ -1198,22 +1190,14 @@ func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend
 	}
 	if b.Assign(&url_stream_wrappers_hash, core.PhpStreamGetUrlStreamWrappersHash()) {
 		zend.ArrayInit(return_value)
-		for {
-			var __ht *zend.HashTable = url_stream_wrappers_hash
-			var _p *zend.Bucket = __ht.GetArData()
-			var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *zend.Zval = _p.GetVal()
+		var __ht *zend.HashTable = url_stream_wrappers_hash
+		for _, _p := range __ht.foreachData() {
+			var _z *zend.Zval = _p.GetVal()
 
-				if _z.IsType(zend.IS_UNDEF) {
-					continue
-				}
-				stream_protocol = _p.GetKey()
-				if stream_protocol != nil {
-					zend.AddNextIndexStr(return_value, stream_protocol.Copy())
-				}
+			stream_protocol = _p.GetKey()
+			if stream_protocol != nil {
+				zend.AddNextIndexStr(return_value, stream_protocol.Copy())
 			}
-			break
 		}
 	} else {
 		zend.RETVAL_FALSE
@@ -1227,51 +1211,43 @@ func StreamArrayToFdSet(stream_array *zend.Zval, fds *fd_set, max_fd *core.PhpSo
 	if stream_array.GetType() != zend.IS_ARRAY {
 		return 0
 	}
-	for {
-		var __ht *zend.HashTable = stream_array.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = stream_array.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			elem = _z
+		elem = _z
 
-			/* Temporary int fd is needed for the STREAM data type on windows, passing this_fd directly to php_stream_cast()
-			   would eventually bring a wrong result on x64. php_stream_cast() casts to int internally, and this will leave
-			   the higher bits of a SOCKET variable uninitialized on systems with little endian. */
+		/* Temporary int fd is needed for the STREAM data type on windows, passing this_fd directly to php_stream_cast()
+		   would eventually bring a wrong result on x64. php_stream_cast() casts to int internally, and this will leave
+		   the higher bits of a SOCKET variable uninitialized on systems with little endian. */
 
-			var this_fd core.PhpSocketT
-			zend.ZVAL_DEREF(elem)
-			core.PhpStreamFromZvalNoVerify(stream, elem)
-			if stream == nil {
-				continue
-			}
-
-			/* get the fd.
-			 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
-			 * when casting.  It is only used here so that the buffered data warning
-			 * is not displayed.
-			 * */
-
-			if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != -1 {
-				core.PHP_SAFE_FD_SET(this_fd, fds)
-				if this_fd > (*max_fd) {
-					*max_fd = this_fd
-				}
-				cnt++
-			}
-
-			/* get the fd.
-			 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
-			 * when casting.  It is only used here so that the buffered data warning
-			 * is not displayed.
-			 * */
-
+		var this_fd core.PhpSocketT
+		zend.ZVAL_DEREF(elem)
+		core.PhpStreamFromZvalNoVerify(stream, elem)
+		if stream == nil {
+			continue
 		}
-		break
+
+		/* get the fd.
+		 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
+		 * when casting.  It is only used here so that the buffered data warning
+		 * is not displayed.
+		 * */
+
+		if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != -1 {
+			core.PHP_SAFE_FD_SET(this_fd, fds)
+			if this_fd > (*max_fd) {
+				*max_fd = this_fd
+			}
+			cnt++
+		}
+
+		/* get the fd.
+		 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
+		 * when casting.  It is only used here so that the buffered data warning
+		 * is not displayed.
+		 * */
+
 	}
 	if cnt != 0 {
 		return 1
@@ -1291,53 +1267,45 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 		return 0
 	}
 	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	for {
-		var __ht *zend.HashTable = stream_array.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = stream_array.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			num_ind = _p.GetH()
-			key = _p.GetKey()
-			elem = _z
-			var this_fd core.PhpSocketT
-			zend.ZVAL_DEREF(elem)
-			core.PhpStreamFromZvalNoVerify(stream, elem)
-			if stream == nil {
-				continue
-			}
-
-			/* get the fd
-			 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
-			 * when casting.  It is only used here so that the buffered data warning
-			 * is not displayed.
-			 */
-
-			if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != core.SOCK_ERR {
-				if core.PHP_SAFE_FD_ISSET(this_fd, fds) {
-					if key == nil {
-						dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
-					} else {
-						dest_elem = zend.ZendHashUpdate(ht, key, elem)
-					}
-					zend.ZvalAddRef(dest_elem)
-					ret++
-					continue
-				}
-			}
-
-			/* get the fd
-			 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
-			 * when casting.  It is only used here so that the buffered data warning
-			 * is not displayed.
-			 */
-
+		num_ind = _p.GetH()
+		key = _p.GetKey()
+		elem = _z
+		var this_fd core.PhpSocketT
+		zend.ZVAL_DEREF(elem)
+		core.PhpStreamFromZvalNoVerify(stream, elem)
+		if stream == nil {
+			continue
 		}
-		break
+
+		/* get the fd
+		 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
+		 * when casting.  It is only used here so that the buffered data warning
+		 * is not displayed.
+		 */
+
+		if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != core.SOCK_ERR {
+			if core.PHP_SAFE_FD_ISSET(this_fd, fds) {
+				if key == nil {
+					dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
+				} else {
+					dest_elem = zend.ZendHashUpdate(ht, key, elem)
+				}
+				zend.ZvalAddRef(dest_elem)
+				ret++
+				continue
+			}
+		}
+
+		/* get the fd
+		 * NB: Most other code will NOT use the PHP_STREAM_CAST_INTERNAL flag
+		 * when casting.  It is only used here so that the buffered data warning
+		 * is not displayed.
+		 */
+
 	}
 
 	/* destroy old array and add new one */
@@ -1358,44 +1326,36 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 		return 0
 	}
 	ht = zend.ZendNewArray(zend.Z_ARRVAL_P(stream_array).GetNNumOfElements())
-	for {
-		var __ht *zend.HashTable = stream_array.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = stream_array.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			num_ind = _p.GetH()
-			key = _p.GetKey()
-			elem = _z
-			zend.ZVAL_DEREF(elem)
-			core.PhpStreamFromZvalNoVerify(stream, elem)
-			if stream == nil {
-				continue
-			}
-			if stream.GetWritepos()-stream.GetReadpos() > 0 {
-
-				/* allow readable non-descriptor based streams to participate in stream_select.
-				 * Non-descriptor streams will only "work" if they have previously buffered the
-				 * data.  Not ideal, but better than nothing.
-				 * This branch of code also allows blocking streams with buffered data to
-				 * operate correctly in stream_select.
-				 * */
-
-				if key == nil {
-					dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
-				} else {
-					dest_elem = zend.ZendHashUpdate(ht, key, elem)
-				}
-				zend.ZvalAddRef(dest_elem)
-				ret++
-				continue
-			}
+		num_ind = _p.GetH()
+		key = _p.GetKey()
+		elem = _z
+		zend.ZVAL_DEREF(elem)
+		core.PhpStreamFromZvalNoVerify(stream, elem)
+		if stream == nil {
+			continue
 		}
-		break
+		if stream.GetWritepos()-stream.GetReadpos() > 0 {
+
+			/* allow readable non-descriptor based streams to participate in stream_select.
+			 * Non-descriptor streams will only "work" if they have previously buffered the
+			 * data.  Not ideal, but better than nothing.
+			 * This branch of code also allows blocking streams with buffered data to
+			 * operate correctly in stream_select.
+			 * */
+
+			if key == nil {
+				dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
+			} else {
+				dest_elem = zend.ZendHashUpdate(ht, key, elem)
+			}
+			zend.ZvalAddRef(dest_elem)
+			ret++
+			continue
+		}
 	}
 	if ret > 0 {
 
@@ -1640,43 +1600,27 @@ func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int
 	var wkey *zend.ZendString
 	var okey *zend.ZendString
 	var ret int = zend.SUCCESS
-	for {
-		var __ht *zend.HashTable = options.GetArr()
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = options.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			wkey = _p.GetKey()
-			wval = _z
-			zend.ZVAL_DEREF(wval)
-			if wkey != nil && wval.IsType(zend.IS_ARRAY) {
-				for {
-					var __ht *zend.HashTable = wval.GetArr()
-					var _p *zend.Bucket = __ht.GetArData()
-					var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-					for ; _p != _end; _p++ {
-						var _z *zend.Zval = _p.GetVal()
+		wkey = _p.GetKey()
+		wval = _z
+		zend.ZVAL_DEREF(wval)
+		if wkey != nil && wval.IsType(zend.IS_ARRAY) {
+			var __ht *zend.HashTable = wval.GetArr()
+			for _, _p := range __ht.foreachData() {
+				var _z *zend.Zval = _p.GetVal()
 
-						if _z.IsType(zend.IS_UNDEF) {
-							continue
-						}
-						okey = _p.GetKey()
-						oval = _z
-						if okey != nil {
-							streams.PhpStreamContextSetOption(context, wkey.GetVal(), okey.GetVal(), oval)
-						}
-					}
-					break
+				okey = _p.GetKey()
+				oval = _z
+				if okey != nil {
+					streams.PhpStreamContextSetOption(context, wkey.GetVal(), okey.GetVal(), oval)
 				}
-			} else {
-				core.PhpErrorDocref(nil, zend.E_WARNING, "options should have the form [\"wrappername\"][\"optionname\"] = $value")
 			}
+		} else {
+			core.PhpErrorDocref(nil, zend.E_WARNING, "options should have the form [\"wrappername\"][\"optionname\"] = $value")
 		}
-		break
 	}
 	return ret
 }

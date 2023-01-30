@@ -119,20 +119,12 @@ func ZendIniGlobalShutdown() int {
 func ZendIniDeactivate() int {
 	if __EG().GetModifiedIniDirectives() != nil {
 		var ini_entry *ZendIniEntry
-		for {
-			var __ht *HashTable = __EG().GetModifiedIniDirectives()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __EG().GetModifiedIniDirectives()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				ini_entry = _z.GetPtr()
-				ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
-			}
-			break
+			ini_entry = _z.GetPtr()
+			ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
 		}
 		ZendHashDestroy(__EG().GetModifiedIniDirectives())
 		FREE_HASHTABLE(__EG().GetModifiedIniDirectives())

@@ -235,7 +235,7 @@ func HASH_OF(p *Zval) __auto__ {
 		}
 	}
 }
-func ZVAL_IS_NULL(z *Zval) bool { return z.IsType(IS_NULL) }
+func ZVAL_IS_NULL(z __auto__) bool { return z.GetType() == IS_NULL }
 func ZEND_GINIT(module __auto__) func(any) {
 	return (func(any))(zm_globals_ctor_module)
 }
@@ -1708,25 +1708,17 @@ func ZendMergeProperties(obj *Zval, properties *HashTable) {
 	var key *ZendString
 	var value *Zval
 	__EG().SetFakeScope(Z_OBJCE_P(obj))
-	for {
-		var __ht *HashTable = properties
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = properties
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			key = _p.GetKey()
-			value = _z
-			if key != nil {
-				var member Zval
-				ZVAL_STR(&member, key)
-				obj_ht.GetWriteProperty()(obj, &member, value, nil)
-			}
+		key = _p.GetKey()
+		value = _z
+		if key != nil {
+			var member Zval
+			ZVAL_STR(&member, key)
+			obj_ht.GetWriteProperty()(obj, &member, value, nil)
 		}
-		break
 	}
 	__EG().SetFakeScope(old_scope)
 }
@@ -1741,25 +1733,17 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 				return FAILURE
 			}
 		}
-		for {
-			var __ht *HashTable = class_type.GetConstantsTable()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = class_type.GetConstantsTable()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				c = _z.GetPtr()
-				val = c.GetValue()
-				if val.IsType(IS_CONSTANT_AST) {
-					if ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS {
-						return FAILURE
-					}
+			c = _z.GetPtr()
+			val = c.GetValue()
+			if val.IsType(IS_CONSTANT_AST) {
+				if ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS {
+					return FAILURE
 				}
 			}
-			break
 		}
 		if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
 			if class_type.GetType() == ZEND_INTERNAL_CLASS || class_type.HasCeFlags(ZEND_ACC_IMMUTABLE|ZEND_ACC_PRELOADED) {
@@ -1768,44 +1752,36 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 		}
 		ce = class_type
 		for ce != nil {
-			for {
-				var __ht *HashTable = ce.GetPropertiesInfo()
-				var _p *Bucket = __ht.GetArData()
-				var _end *Bucket = _p + __ht.GetNNumUsed()
-				for ; _p != _end; _p++ {
-					var _z *Zval = _p.GetVal()
+			var __ht *HashTable = ce.GetPropertiesInfo()
+			for _, _p := range __ht.foreachData() {
+				var _z *Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
+				prop_info = _z.GetPtr()
+				if prop_info.GetCe() == ce {
+					if prop_info.IsStatic() {
+						val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()
+					} else {
+						val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
 					}
-					prop_info = _z.GetPtr()
-					if prop_info.GetCe() == ce {
-						if prop_info.IsStatic() {
-							val = CE_STATIC_MEMBERS(class_type) + prop_info.GetOffset()
-						} else {
-							val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
-						}
-						if val.IsType(IS_CONSTANT_AST) {
-							if prop_info.GetType() != 0 {
-								var tmp Zval
-								ZVAL_COPY(&tmp, val)
-								if ZvalUpdateConstantEx(&tmp, ce) != SUCCESS {
-									ZvalPtrDtor(&tmp)
-									return FAILURE
-								}
-								if ZendVerifyPropertyType(prop_info, &tmp, 1) == 0 {
-									ZvalPtrDtor(&tmp)
-									return FAILURE
-								}
-								ZvalPtrDtor(val)
-								ZVAL_COPY_VALUE(val, &tmp)
-							} else if ZvalUpdateConstantEx(val, ce) != SUCCESS {
+					if val.IsType(IS_CONSTANT_AST) {
+						if prop_info.GetType() != 0 {
+							var tmp Zval
+							ZVAL_COPY(&tmp, val)
+							if ZvalUpdateConstantEx(&tmp, ce) != SUCCESS {
+								ZvalPtrDtor(&tmp)
 								return FAILURE
 							}
+							if ZendVerifyPropertyType(prop_info, &tmp, 1) == 0 {
+								ZvalPtrDtor(&tmp)
+								return FAILURE
+							}
+							ZvalPtrDtor(val)
+							ZVAL_COPY_VALUE(val, &tmp)
+						} else if ZvalUpdateConstantEx(val, ce) != SUCCESS {
+							return FAILURE
 						}
 					}
 				}
-				break
 			}
 			ce = ce.parent
 		}
@@ -1849,35 +1825,27 @@ func ObjectPropertiesInitEx(object *ZendObject, properties *HashTable) {
 		var prop *Zval
 		var key *ZendString
 		var property_info *ZendPropertyInfo
-		for {
-			var __ht *HashTable = properties
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = properties
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				prop = _z
-				property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
-				if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
-					var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
-					if property_info.GetType() != 0 {
-						var tmp Zval
-						ZVAL_COPY_VALUE(&tmp, prop)
-						if ZendVerifyPropertyType(property_info, &tmp, 0) == 0 {
-							continue
-						}
-						ZVAL_COPY_VALUE(slot, &tmp)
-					} else {
-						ZVAL_COPY_VALUE(slot, prop)
+			key = _p.GetKey()
+			prop = _z
+			property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
+			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
+				var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
+				if property_info.GetType() != 0 {
+					var tmp Zval
+					ZVAL_COPY_VALUE(&tmp, prop)
+					if ZendVerifyPropertyType(property_info, &tmp, 0) == 0 {
+						continue
 					}
-					ZVAL_INDIRECT(prop, slot)
+					ZVAL_COPY_VALUE(slot, &tmp)
+				} else {
+					ZVAL_COPY_VALUE(slot, prop)
 				}
+				ZVAL_INDIRECT(prop, slot)
 			}
-			break
 		}
 	}
 }
@@ -1887,66 +1855,58 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 	var key *ZendString
 	var h ZendLong
 	var property_info *ZendPropertyInfo
-	for {
-		var __ht *HashTable = properties
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = properties
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			h = _p.GetH()
-			key = _p.GetKey()
-			prop = _z
-			if key != nil {
-				if key.GetVal()[0] == '0' {
-					var class_name *byte
-					var prop_name *byte
-					var prop_name_len int
-					if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == SUCCESS {
-						var pname *ZendString = ZendStringInit(prop_name, prop_name_len, 0)
-						var prev_scope *ZendClassEntry = __EG().GetFakeScope()
-						if class_name != nil && class_name[0] != '*' {
-							var cname *ZendString = ZendStringInit(class_name, strlen(class_name), 0)
-							__EG().SetFakeScope(ZendLookupClass(cname))
-							ZendStringReleaseEx(cname, 0)
-						}
-						property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
-						ZendStringReleaseEx(pname, 0)
-						__EG().SetFakeScope(prev_scope)
-					} else {
-						property_info = ZEND_WRONG_PROPERTY_INFO
+		h = _p.GetH()
+		key = _p.GetKey()
+		prop = _z
+		if key != nil {
+			if key.GetVal()[0] == '0' {
+				var class_name *byte
+				var prop_name *byte
+				var prop_name_len int
+				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == SUCCESS {
+					var pname *ZendString = ZendStringInit(prop_name, prop_name_len, 0)
+					var prev_scope *ZendClassEntry = __EG().GetFakeScope()
+					if class_name != nil && class_name[0] != '*' {
+						var cname *ZendString = ZendStringInit(class_name, strlen(class_name), 0)
+						__EG().SetFakeScope(ZendLookupClass(cname))
+						ZendStringReleaseEx(cname, 0)
 					}
+					property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
+					ZendStringReleaseEx(pname, 0)
+					__EG().SetFakeScope(prev_scope)
 				} else {
-					property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
+					property_info = ZEND_WRONG_PROPERTY_INFO
 				}
-				if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
-					var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
-					ZvalPtrDtor(slot)
-					ZVAL_COPY_VALUE(slot, prop)
-					ZvalAddRef(slot)
-					if object.GetProperties() != nil {
-						ZVAL_INDIRECT(&tmp, slot)
-						ZendHashUpdate(object.GetProperties(), key, &tmp)
-					}
-				} else {
-					if object.GetProperties() == nil {
-						RebuildObjectProperties(object)
-					}
-					prop = ZendHashUpdate(object.GetProperties(), key, prop)
-					ZvalAddRef(prop)
+			} else {
+				property_info = ZendGetPropertyInfo(object.GetCe(), key, 1)
+			}
+			if property_info != ZEND_WRONG_PROPERTY_INFO && property_info != nil && !property_info.IsStatic() {
+				var slot *Zval = OBJ_PROP(object, property_info.GetOffset())
+				ZvalPtrDtor(slot)
+				ZVAL_COPY_VALUE(slot, prop)
+				ZvalAddRef(slot)
+				if object.GetProperties() != nil {
+					ZVAL_INDIRECT(&tmp, slot)
+					ZendHashUpdate(object.GetProperties(), key, &tmp)
 				}
 			} else {
 				if object.GetProperties() == nil {
 					RebuildObjectProperties(object)
 				}
-				prop = ZendHashIndexUpdate(object.GetProperties(), h, prop)
+				prop = ZendHashUpdate(object.GetProperties(), key, prop)
 				ZvalAddRef(prop)
 			}
+		} else {
+			if object.GetProperties() == nil {
+				RebuildObjectProperties(object)
+			}
+			prop = ZendHashIndexUpdate(object.GetProperties(), h, prop)
+			ZvalAddRef(prop)
 		}
-		break
 	}
 }
 func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties *HashTable) int {
@@ -2356,28 +2316,20 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect extensions with request startup/shutdown handlers */
 
-	for {
-		var __ht *HashTable = &ModuleRegistry
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = &ModuleRegistry
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			module = _z.GetPtr()
-			if module.GetRequestStartupFunc() != nil {
-				startup_count++
-			}
-			if module.GetRequestShutdownFunc() != nil {
-				shutdown_count++
-			}
-			if module.GetPostDeactivateFunc() != nil {
-				post_deactivate_count++
-			}
+		module = _z.GetPtr()
+		if module.GetRequestStartupFunc() != nil {
+			startup_count++
 		}
-		break
+		if module.GetRequestShutdownFunc() != nil {
+			shutdown_count++
+		}
+		if module.GetPostDeactivateFunc() != nil {
+			post_deactivate_count++
+		}
 	}
 	ModuleRequestStartupHandlers = (**ZendModuleEntry)(Malloc(b.SizeOf("zend_module_entry *") * (startup_count + 1 + shutdown_count + 1 + post_deactivate_count + 1)))
 	ModuleRequestStartupHandlers[startup_count] = nil
@@ -2386,68 +2338,44 @@ func ZendCollectModuleHandlers() {
 	ModulePostDeactivateHandlers = ModuleRequestShutdownHandlers + shutdown_count + 1
 	ModulePostDeactivateHandlers[post_deactivate_count] = nil
 	startup_count = 0
-	for {
-		var __ht *HashTable = &ModuleRegistry
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht__1 *HashTable = &ModuleRegistry
+	for _, _p := range __ht__1.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			module = _z.GetPtr()
-			if module.GetRequestStartupFunc() != nil {
-				ModuleRequestStartupHandlers[b.PostInc(&startup_count)] = module
-			}
-			if module.GetRequestShutdownFunc() != nil {
-				ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
-			}
-			if module.GetPostDeactivateFunc() != nil {
-				ModulePostDeactivateHandlers[b.PreDec(&post_deactivate_count)] = module
-			}
+		module = _z.GetPtr()
+		if module.GetRequestStartupFunc() != nil {
+			ModuleRequestStartupHandlers[b.PostInc(&startup_count)] = module
 		}
-		break
+		if module.GetRequestShutdownFunc() != nil {
+			ModuleRequestShutdownHandlers[b.PreDec(&shutdown_count)] = module
+		}
+		if module.GetPostDeactivateFunc() != nil {
+			ModulePostDeactivateHandlers[b.PreDec(&post_deactivate_count)] = module
+		}
 	}
 
 	/* Collect internal classes with static members */
 
-	for {
-		var __ht *HashTable = __CG().GetClassTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht__2 *HashTable = __CG().GetClassTable()
+	for _, _p := range __ht__2.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			ce = _z.GetPtr()
-			if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
-				class_count++
-			}
+		ce = _z.GetPtr()
+		if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+			class_count++
 		}
-		break
 	}
 	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
-		for {
-			var __ht *HashTable = __CG().GetClassTable()
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = __CG().GetClassTable()
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				ce = _z.GetPtr()
-				if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
-					ClassCleanupHandlers[b.PreDec(&class_count)] = ce
-				}
+			ce = _z.GetPtr()
+			if ce.GetType() == ZEND_INTERNAL_CLASS && ce.GetDefaultStaticMembersCount() > 0 {
+				ClassCleanupHandlers[b.PreDec(&class_count)] = ce
 			}
-			break
 		}
 	}
 }
@@ -3031,24 +2959,14 @@ func ZendDeactivateModules() {
 	if SETJMP(__bailout) == 0 {
 		if __EG().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
-			for {
-				var __ht *HashTable = &ModuleRegistry
-				var _idx uint32 = __ht.GetNNumUsed()
-				var _p *Bucket = __ht.GetArData() + _idx
-				var _z *Zval
-				for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-					_p--
-					_z = _p.GetVal()
+			var __ht *HashTable = &ModuleRegistry
+			for _, _p := range __ht.foreachDataReserve() {
+				var _z Zval = _p.GetVal()
 
-					if _z.IsType(IS_UNDEF) {
-						continue
-					}
-					module = _z.GetPtr()
-					if module.GetRequestShutdownFunc() != nil {
-						module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
-					}
+				module = _z.GetPtr()
+				if module.GetRequestShutdownFunc() != nil {
+					module.GetRequestShutdownFunc()(module.GetType(), module.GetModuleNumber())
 				}
-				break
 			}
 		} else {
 			var p **ZendModuleEntry = ModuleRequestShutdownHandlers
@@ -3073,62 +2991,44 @@ func ZendPostDeactivateModules() {
 		var module *ZendModuleEntry
 		var zv *Zval
 		var key *ZendString
-		for {
-			var __ht *HashTable = &ModuleRegistry
-			var _p *Bucket = __ht.GetArData()
-			var _end *Bucket = _p + __ht.GetNNumUsed()
-			for ; _p != _end; _p++ {
-				var _z *Zval = _p.GetVal()
+		var __ht *HashTable = &ModuleRegistry
+		for _, _p := range __ht.foreachData() {
+			var _z *Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				module = _z.GetPtr()
-				if module.GetPostDeactivateFunc() != nil {
-					module.GetPostDeactivateFunc()()
-				}
+			module = _z.GetPtr()
+			if module.GetPostDeactivateFunc() != nil {
+				module.GetPostDeactivateFunc()()
 			}
-			break
 		}
-		for {
-			var __ht *HashTable = &ModuleRegistry
-			var _idx uint32 = __ht.GetNNumUsed()
-			var _p *Bucket = __ht.GetArData() + _idx
-			var _z *Zval
-			for _idx = __ht.GetNNumUsed(); _idx > 0; _idx-- {
-				_p--
-				_z = _p.GetVal()
+		var __ht__1 *HashTable = &ModuleRegistry
+		for _, _p := range __ht__1.foreachDataReserve() {
+			var _z Zval = _p.GetVal()
 
-				if _z.IsType(IS_UNDEF) {
-					continue
-				}
-				key = _p.GetKey()
-				zv = _z
-				module = zv.GetPtr()
-				if module.GetType() != MODULE_TEMPORARY {
-					break
-				}
-				ModuleDestructor(module)
-				Free(module)
-				ZendStringReleaseEx(key, 0)
-				__ht.GetNNumOfElements()--
-				var j uint32 = HT_IDX_TO_HASH(_idx - 1)
-				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
-				var i uint32 = HT_HASH(__ht, nIndex)
-				if j != i {
-					var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
-					for prev.GetVal().GetNext() != j {
-						i = prev.GetVal().GetNext()
-						prev = HT_HASH_TO_BUCKET(__ht, i)
-					}
-					prev.GetVal().GetNext() = _p.GetVal().GetNext()
-				} else {
-					HT_HASH(__ht, nIndex) = _p.GetVal().GetNext()
-				}
+			key = _p.GetKey()
+			zv = _z
+			module = zv.GetPtr()
+			if module.GetType() != MODULE_TEMPORARY {
+				break
 			}
-			__ht.SetNNumUsed(_idx)
-			break
+			ModuleDestructor(module)
+			Free(module)
+			ZendStringReleaseEx(key, 0)
+			__ht__1.GetNNumOfElements()--
+			var j uint32 = HT_IDX_TO_HASH(_idx - 1)
+			var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
+			var i uint32 = HT_HASH(__ht__1, nIndex)
+			if j != i {
+				var prev *Bucket = HT_HASH_TO_BUCKET(__ht__1, i)
+				for prev.GetVal().GetNext() != j {
+					i = prev.GetVal().GetNext()
+					prev = HT_HASH_TO_BUCKET(__ht__1, i)
+				}
+				prev.GetVal().GetNext() = _p.GetVal().GetNext()
+			} else {
+				HT_HASH(__ht__1, nIndex) = _p.GetVal().GetNext()
+			}
 		}
+		__ht__1.SetNNumUsed(_idx)
 	} else {
 		var p **ZendModuleEntry = ModulePostDeactivateHandlers
 		for (*p) != nil {
@@ -3279,22 +3179,14 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	}
 	INIT_CLASS_ENTRY_INIT_METHODS(*disabled_class, DisabledClassNew)
 	disabled_class.create_object = DisplayDisabledClass
-	for {
-		var __ht *HashTable = disabled_class.GetFunctionTable()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = disabled_class.GetFunctionTable()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			fn = _z.GetPtr()
-			if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == disabled_class {
-				ZendFreeInternalArgInfo(fn.GetInternalFunction())
-			}
+		fn = _z.GetPtr()
+		if fn.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && fn.GetScope() == disabled_class {
+			ZendFreeInternalArgInfo(fn.GetInternalFunction())
 		}
-		break
 	}
 	ZendHashClean(disabled_class.GetFunctionTable())
 	return SUCCESS
@@ -3891,27 +3783,19 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 	fci.SetParamCount(Z_ARRVAL_P(args).GetNNumOfElements())
 	params = (*Zval)(Erealloc(fci.GetParams(), fci.GetParamCount()*b.SizeOf("zval")))
 	fci.SetParams(params)
-	for {
-		var __ht *HashTable = args.GetArr()
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = args.GetArr()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
-			}
-			arg = _z
-			if func_ != nil && !(Z_ISREF_P(arg)) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
-				ZVAL_NEW_REF(params, arg)
-				Z_TRY_ADDREF_P(arg)
-			} else {
-				ZVAL_COPY(params, arg)
-			}
-			params++
-			n++
+		arg = _z
+		if func_ != nil && !(Z_ISREF_P(arg)) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
+			ZVAL_NEW_REF(params, arg)
+			Z_TRY_ADDREF_P(arg)
+		} else {
+			ZVAL_COPY(params, arg)
 		}
-		break
+		params++
+		n++
 	}
 	return SUCCESS
 }
@@ -4503,29 +4387,21 @@ func ZendResolveMethodName(ce *ZendClassEntry, f *ZendFunction) *ZendString {
 		return f.GetFunctionName()
 	}
 	function_table = ce.GetFunctionTable()
-	for {
-		var __ht *HashTable = function_table
-		var _p *Bucket = __ht.GetArData()
-		var _end *Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *Zval = _p.GetVal()
+	var __ht *HashTable = function_table
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
 
-			if _z.IsType(IS_UNDEF) {
-				continue
+		name = _p.GetKey()
+		func_ = _z.GetPtr()
+		if func_ == f {
+			if name == nil {
+				return f.GetFunctionName()
 			}
-			name = _p.GetKey()
-			func_ = _z.GetPtr()
-			if func_ == f {
-				if name == nil {
-					return f.GetFunctionName()
-				}
-				if name.GetLen() == f.GetFunctionName().GetLen() && !(strncasecmp(name.GetVal(), f.GetFunctionName().GetVal(), f.GetFunctionName().GetLen())) {
-					return f.GetFunctionName()
-				}
-				return ZendFindAliasName(f.GetScope(), name)
+			if name.GetLen() == f.GetFunctionName().GetLen() && !(strncasecmp(name.GetVal(), f.GetFunctionName().GetVal(), f.GetFunctionName().GetLen())) {
+				return f.GetFunctionName()
 			}
+			return ZendFindAliasName(f.GetScope(), name)
 		}
-		break
 	}
 	return f.GetFunctionName()
 }

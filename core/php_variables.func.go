@@ -636,36 +636,28 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 	var string_key *zend.ZendString
 	var num_key zend.ZendUlong
 	var globals_check int = dest == zend.__EG().GetSymbolTable()
-	for {
-		var __ht *zend.HashTable = src
-		var _p *zend.Bucket = __ht.GetArData()
-		var _end *zend.Bucket = _p + __ht.GetNNumUsed()
-		for ; _p != _end; _p++ {
-			var _z *zend.Zval = _p.GetVal()
+	var __ht *zend.HashTable = src
+	for _, _p := range __ht.foreachData() {
+		var _z *zend.Zval = _p.GetVal()
 
-			if _z.IsType(zend.IS_UNDEF) {
-				continue
-			}
-			num_key = _p.GetH()
-			string_key = _p.GetKey()
-			src_entry = _z
-			if src_entry.GetType() != zend.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.FindByZendString(string_key)) == nil || string_key == nil && b.Assign(&dest_entry, zend.ZendHashIndexFind(dest, num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY {
-				zend.Z_TRY_ADDREF_P(src_entry)
-				if string_key != nil {
-					if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
-						zend.ZendHashUpdate(dest, string_key, src_entry)
-					} else {
-						zend.Z_TRY_DELREF_P(src_entry)
-					}
+		num_key = _p.GetH()
+		string_key = _p.GetKey()
+		src_entry = _z
+		if src_entry.GetType() != zend.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.FindByZendString(string_key)) == nil || string_key == nil && b.Assign(&dest_entry, zend.ZendHashIndexFind(dest, num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY {
+			zend.Z_TRY_ADDREF_P(src_entry)
+			if string_key != nil {
+				if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
+					zend.ZendHashUpdate(dest, string_key, src_entry)
 				} else {
-					zend.ZendHashIndexUpdate(dest, num_key, src_entry)
+					zend.Z_TRY_DELREF_P(src_entry)
 				}
 			} else {
-				zend.SEPARATE_ARRAY(dest_entry)
-				PhpAutoglobalMerge(dest_entry.GetArr(), src_entry.GetArr())
+				zend.ZendHashIndexUpdate(dest, num_key, src_entry)
 			}
+		} else {
+			zend.SEPARATE_ARRAY(dest_entry)
+			PhpAutoglobalMerge(dest_entry.GetArr(), src_entry.GetArr())
 		}
-		break
 	}
 }
 func PhpHashEnvironment() int {
