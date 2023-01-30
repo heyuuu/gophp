@@ -56,7 +56,7 @@ func SplArrayIsObject(intern *SplArrayObject) zend.ZendBool {
 	return intern.IsIsSelf() || intern.GetArray().IsType(zend.IS_OBJECT)
 }
 func SplArrayCreateHtIter(ht *zend.HashTable, intern *SplArrayObject) {
-	intern.SetHtIter(zend.ZendHashIteratorAdd(ht, zend.ZendHashGetCurrentPos(ht)))
+	intern.SetHtIter(zend.ZendHashIteratorAdd(ht, ht.currentPosVal()))
 	zend.ZendHashInternalPointerResetEx(ht, zend.__EG().GetHtIterators()[intern.GetHtIter()].GetPos())
 	SplArraySkipProtected(intern, ht)
 }

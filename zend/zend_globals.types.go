@@ -266,7 +266,7 @@ func (this *ZendExecutorGlobals) GetSymtableCachePtr() **ZendArray { return this
 func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **ZendArray) {
 	this.symtable_cache_ptr = value
 }
-func (this *ZendExecutorGlobals) GetSymbolTable() ZendArray         { return this.symbol_table }
+func (this *ZendExecutorGlobals) GetSymbolTable() *ZendArray        { return &this.symbol_table }
 func (this *ZendExecutorGlobals) SetSymbolTable(value ZendArray)    { this.symbol_table = value }
 func (this *ZendExecutorGlobals) GetIncludedFiles() HashTable       { return this.included_files }
 func (this *ZendExecutorGlobals) SetIncludedFiles(value HashTable)  { this.included_files = value }

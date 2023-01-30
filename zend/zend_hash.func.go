@@ -42,10 +42,10 @@ func ZendHashHasMoreElementsEx(ht *HashTable, pos *HashPosition) ZEND_RESULT_COD
 	}
 }
 func ZendHashMoveForward(ht *HashTable) int {
-	return ZendHashMoveForwardEx(ht, ht.GetNInternalPointer())
+	return ZendHashMoveForwardEx(ht, &ht.nInternalPointer)
 }
 func ZendHashMoveBackwards(ht *HashTable) int {
-	return ZendHashMoveBackwardsEx(ht, ht.GetNInternalPointer())
+	return ZendHashMoveBackwardsEx(ht, &ht.nInternalPointer)
 }
 func ZendHashGetCurrentKey(ht *HashTable, str_index **ZendString, num_index *ZendUlong) int {
 	return ZendHashGetCurrentKeyEx(ht, str_index, num_index, ht.GetNInternalPointer())
@@ -491,15 +491,9 @@ func ZendHashToPacked(ht *HashTable) {
 	// todo 此函数不应被调用
 	ZEND_ASSERT(false)
 }
-func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition {
-	pos, _ = ht.validPos(pos)
-	return pos
-}
-func _zendHashGetCurrentPos(ht *HashTable) HashPosition {
-	var pos, _ = ht.currentPos()
-	return pos
-}
-func ZendHashGetCurrentPos(ht *HashTable) HashPosition { return _zendHashGetCurrentPos(ht) }
+func _zendHashGetValidPos(ht *HashTable, pos HashPosition) HashPosition { return ht.validPosVal(pos) }
+func _zendHashGetCurrentPos(ht *HashTable) HashPosition                 { return ht.currentPosVal() }
+func ZendHashGetCurrentPos(ht *HashTable) HashPosition                  { return ht.currentPosVal() }
 func ZendHashIteratorAdd(ht *HashTable, pos HashPosition) uint32 {
 	var iter *HashTableIterator = ExecutorGlobals.GetHtIterators()
 	var end *HashTableIterator = iter + ExecutorGlobals.GetHtIteratorsCount()
@@ -1562,25 +1556,16 @@ func ZendHashInternalPointerEndEx(ht *HashTable, pos *HashPosition) {
 	}
 	*pos = ht.GetNNumUsed()
 }
+
+// 查找下一个有效位置
 func ZendHashMoveForwardEx(ht *HashTable, pos *HashPosition) int {
-	var idx uint32
-	idx = _zendHashGetValidPos(ht, *pos)
-	if idx < ht.GetNNumUsed() {
-		for true {
-			idx++
-			if idx >= ht.GetNNumUsed() {
-				*pos = ht.GetNNumUsed()
-				return SUCCESS
-			}
-			if ht.data[idx].GetVal().GetType() != IS_UNDEF {
-				*pos = idx
-				return SUCCESS
-			}
-		}
-	} else {
-		return FAILURE
+	if idx, ok := ht.validPos(*pos); ok {
+		*pos, _ = ht.validPos(idx + 1)
+		return SUCCESS
 	}
+	return FAILURE
 }
+
 func ZendHashMoveBackwardsEx(ht *HashTable, pos *HashPosition) int {
 	var idx uint32 = *pos
 	if idx < ht.GetNNumUsed() {
@@ -1593,9 +1578,8 @@ func ZendHashMoveBackwardsEx(ht *HashTable, pos *HashPosition) int {
 		}
 		*pos = ht.GetNNumUsed()
 		return SUCCESS
-	} else {
-		return FAILURE
 	}
+	return FAILURE
 }
 func ZendHashGetCurrentKeyEx(ht *HashTable, str_index **ZendString, num_index *ZendUlong, pos *HashPosition) int {
 	var idx uint32
@@ -1873,20 +1857,11 @@ func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
 	if ht.GetNNumOfElements() == 0 {
 		return nil
 	}
-	idx = 0
-	for true {
-		if idx == ht.GetNNumUsed() {
-			return nil
-		}
-		if ht.GetArData()[idx].GetVal().GetType() != IS_UNDEF {
-			break
-		}
-		idx++
-	}
+	idx = ht.validPosVal(0)
 	res = ht.GetArData() + idx
 	for ; idx < ht.GetNNumUsed(); idx++ {
 		p = ht.GetArData() + idx
-		if p.GetVal().IsType(IS_UNDEF) {
+		if p.IsValid() {
 			continue
 		}
 		if flag != 0 {

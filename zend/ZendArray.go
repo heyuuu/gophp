@@ -107,6 +107,10 @@ func (this *Bucket) CopyFrom(from *Bucket) {
 	this.key = from.key
 }
 
+func (this *Bucket) IsValid() bool {
+	return this.val.IsType(IS_UNDEF)
+}
+
 /**
  * ZendArray
  * HashTable Data Layout

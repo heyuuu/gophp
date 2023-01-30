@@ -183,15 +183,30 @@ func (this *HashTable) currentPos() (uint32, bool) {
 	return this.validPos(this.nInternalPointer)
 }
 
+func (this *HashTable) currentPosVal() uint32 {
+	var pos, _ = this.currentPos()
+	return pos
+}
+
+func (this *HashTable) validPosVal(pos uint32) uint32 {
+	pos, _ = this.validPos(pos)
+	return pos
+}
+
 func (this *HashTable) validPos(pos uint32) (uint32, bool) {
 	var dataSize = this.DataSize()
 	for ; pos < dataSize; pos++ {
-		if !this.data[pos].GetVal().IsType(IS_UNDEF) {
+		if this.IsValidPos(pos) {
 			return pos, true
 		}
 	}
 	// 没有有效pos，此时 pos == this.DataSize()
 	return pos, false
+}
+
+func (this *HashTable) IsValidPos(pos uint32) bool {
+	ZEND_ASSERT(pos < this.DataSize())
+	return !this.data[pos].GetVal().IsType(IS_UNDEF)
 }
 
 // ----
