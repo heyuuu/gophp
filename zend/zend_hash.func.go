@@ -679,11 +679,9 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	}
 	return b.GetVal()
 }
-func _zendHashDelElExNoPrev(ht *HashTable, idx uint32, p *Bucket) { ht.deleteBucket(idx) }
-func _zendHashDelEl(ht *HashTable, idx uint32, p *Bucket)         { ht.deleteBucket(idx) }
 func ZendHashDelBucket(ht *HashTable, p *Bucket) {
 	ht.assertRc1()
-	_zendHashDelEl(ht, p-ht.GetArData(), p)
+	ht.deleteBucket(HT_IDX_TO_HASH(p - ht.GetArData()))
 }
 func ZendHashDel(ht *HashTable, key *ZendString) int {
 	var strKey = key.GetStr()
@@ -994,7 +992,7 @@ func ZendHashGracefulReverseDestroy(ht *HashTable) {
 		if p.GetVal().IsType(IS_UNDEF) {
 			continue
 		}
-		_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
+		ht.deleteBucket(HT_IDX_TO_HASH(idx))
 	}
 }
 func ZendHashApply(ht *HashTable, apply_func ApplyFuncT) {
@@ -1009,7 +1007,7 @@ func ZendHashApply(ht *HashTable, apply_func ApplyFuncT) {
 		result = apply_func(p.GetVal())
 		if (result & ZEND_HASH_APPLY_REMOVE) != 0 {
 			ht.assertRc1()
-			_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
+			ht.deleteBucket(HT_IDX_TO_HASH(idx))
 		}
 		if (result & ZEND_HASH_APPLY_STOP) != 0 {
 			break
@@ -1028,7 +1026,7 @@ func ZendHashApplyWithArgument(ht *HashTable, apply_func ApplyFuncArgT, argument
 		result = apply_func(p.GetVal(), argument)
 		if (result & ZEND_HASH_APPLY_REMOVE) != 0 {
 			ht.assertRc1()
-			_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
+			ht.deleteBucket(HT_IDX_TO_HASH(idx))
 		}
 		if (result & ZEND_HASH_APPLY_STOP) != 0 {
 			break

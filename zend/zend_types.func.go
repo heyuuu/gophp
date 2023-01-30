@@ -44,7 +44,6 @@ func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
 }
 func HT_HASH_TO_BUCKET_EX(data *Bucket, idx uint32) __auto__ { return data + idx }
 func HT_IDX_TO_HASH(idx __auto__) __auto__                   { return idx }
-func HT_HASH_TO_IDX(idx uint32) uint32                       { return idx }
 func HT_HASH_EX(data __auto__, idx __auto__) uint32          { return (*uint32)(data)[int32(idx)] }
 func HT_HASH(ht *HashTable, idx __auto__) uint32             { return HT_HASH_EX(ht.GetArData(), idx) }
 func HT_SIZE_TO_MASK(nTableSize uint32) __auto__ {
