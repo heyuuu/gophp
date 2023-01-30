@@ -5705,7 +5705,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				continue
 			}
 		} else {
-			if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, zend.ZendHashIndexFind(dest, num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(zend.Z_ISREF_P(dest_entry)) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
+			if src_zval.GetType() != zend.IS_ARRAY || b.Assign(&dest_entry, dest.IndexFindH(num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY && (!(zend.Z_ISREF_P(dest_entry)) || zend.Z_REFVAL_P(dest_entry).GetType() != zend.IS_ARRAY) {
 				var zv *zend.Zval = dest.IndexUpdateH(num_key, src_entry)
 				zend.ZvalAddRef(zv)
 				continue
@@ -6584,7 +6584,7 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 		entry = _z
 		zend.ZVAL_DEREF(entry)
 		if entry.IsType(zend.IS_LONG) {
-			if b.Assign(&tmp, zend.ZendHashIndexFind(return_value.GetArr(), entry.GetLval())) == nil {
+			if b.Assign(&tmp, return_value.GetArr().IndexFindH(entry.GetLval())) == nil {
 				var data zend.Zval
 				zend.ZVAL_LONG(&data, 1)
 				return_value.GetArr().IndexUpdateH(entry.GetLval(), &data)
@@ -6649,7 +6649,7 @@ func ArrayColumnFetchProp(data *zend.Zval, name *zend.Zval, rv *zend.Zval) *zend
 		if name.IsType(zend.IS_STRING) {
 			prop = zend.ZendSymtableFind(data.GetArr(), name.GetStr())
 		} else if name.IsType(zend.IS_LONG) {
-			prop = zend.ZendHashIndexFind(data.GetArr(), name.GetLval())
+			prop = data.GetArr().IndexFindH(name.GetLval())
 		}
 		if prop != nil {
 			zend.ZVAL_DEREF(prop)
@@ -7645,7 +7645,7 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 		if p.GetKey() == nil {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashIndexFind(args[i].GetArr(), p.GetH())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
+				if b.Assign(&data, args[i].GetArr().IndexFindH(p.GetH())) == nil || intersect_data_compare_func != nil && intersect_data_compare_func(val, data) != 0 {
 					ok = 0
 					break
 				}
@@ -8040,7 +8040,7 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		if p.GetKey() == nil {
 			ok = 1
 			for i = 1; i < argc; i++ {
-				if b.Assign(&data, zend.ZendHashIndexFind(args[i].GetArr(), p.GetH())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
+				if b.Assign(&data, args[i].GetArr().IndexFindH(p.GetH())) != nil && (diff_data_compare_func == nil || diff_data_compare_func(val, data) == 0) {
 					ok = 0
 					break
 				}

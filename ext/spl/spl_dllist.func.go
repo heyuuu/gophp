@@ -880,9 +880,9 @@ func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteDat
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
 		return
 	}
-	flags_zv = zend.ZendHashIndexFind(data, 0)
-	storage_zv = zend.ZendHashIndexFind(data, 1)
-	members_zv = zend.ZendHashIndexFind(data, 2)
+	flags_zv = data.IndexFindH(0)
+	storage_zv = data.IndexFindH(1)
+	members_zv = data.IndexFindH(2)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != zend.IS_LONG || storage_zv.GetType() != zend.IS_ARRAY || members_zv.GetType() != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return

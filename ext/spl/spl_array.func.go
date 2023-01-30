@@ -259,7 +259,7 @@ try_again:
 	case zend.IS_LONG:
 		index = offset.GetLval()
 	num_index:
-		if b.Assign(&retval, zend.ZendHashIndexFind(ht, index)) == nil {
+		if b.Assign(&retval, ht.IndexFindH(index)) == nil {
 			switch type_ {
 			case zend.BP_VAR_R:
 				zend.ZendError(zend.E_NOTICE, "Undefined offset: "+zend.ZEND_LONG_FMT, index)
@@ -522,7 +522,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 		case zend.IS_LONG:
 			index = offset.GetLval()
 		num_index:
-			if b.Assign(&tmp, zend.ZendHashIndexFind(ht, index)) != nil {
+			if b.Assign(&tmp, ht.IndexFindH(index)) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -1498,10 +1498,10 @@ func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_valu
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
 		return
 	}
-	flags_zv = zend.ZendHashIndexFind(data, 0)
-	storage_zv = zend.ZendHashIndexFind(data, 1)
-	members_zv = zend.ZendHashIndexFind(data, 2)
-	iterator_class_zv = zend.ZendHashIndexFind(data, 3)
+	flags_zv = data.IndexFindH(0)
+	storage_zv = data.IndexFindH(1)
+	members_zv = data.IndexFindH(2)
+	iterator_class_zv = data.IndexFindH(3)
 	if flags_zv == nil || storage_zv == nil || members_zv == nil || flags_zv.GetType() != zend.IS_LONG || members_zv.GetType() != zend.IS_ARRAY || iterator_class_zv != nil && (iterator_class_zv.GetType() != zend.IS_NULL && iterator_class_zv.GetType() != zend.IS_STRING) {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return

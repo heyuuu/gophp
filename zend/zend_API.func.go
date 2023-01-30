@@ -3625,8 +3625,8 @@ again:
 		var method *Zval = nil
 		var obj *Zval = nil
 		if Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
-			obj = ZendHashIndexFind(callable.GetArr(), 0)
-			method = ZendHashIndexFind(callable.GetArr(), 1)
+			obj = callable.GetArr().IndexFindH(0)
+			method = callable.GetArr().IndexFindH(1)
 		}
 		for {
 			if obj == nil || method == nil {

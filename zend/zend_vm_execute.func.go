@@ -4861,7 +4861,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -5189,7 +5189,7 @@ func ZEND_SWITCH_LONG_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 
 		}
 	}
-	jump_zv = ZendHashIndexFind(jumptable, op.GetLval())
+	jump_zv = jumptable.IndexFindH(op.GetLval())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0
@@ -5252,7 +5252,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
-			result = ZendHashIndexFind(ht, op1.GetLval())
+			result = ht.IndexFindH(op1.GetLval())
 		} else {
 			result = nil
 		}
@@ -6837,7 +6837,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExec
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -9002,7 +9002,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteD
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -9797,7 +9797,7 @@ func ZEND_SWITCH_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData)
 
 		}
 	}
-	jump_zv = ZendHashIndexFind(jumptable, op.GetLval())
+	jump_zv = jumptable.IndexFindH(op.GetLval())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0
@@ -12592,7 +12592,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExec
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -13895,7 +13895,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExe
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -15011,7 +15011,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecute
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -16239,7 +16239,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
-			result = ZendHashIndexFind(ht, op1.GetLval())
+			result = ht.IndexFindH(op1.GetLval())
 		} else {
 			result = nil
 		}
@@ -21086,7 +21086,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
-			result = ZendHashIndexFind(ht, op1.GetLval())
+			result = ht.IndexFindH(op1.GetLval())
 		} else {
 			result = nil
 		}
@@ -35984,7 +35984,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteD
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -36373,7 +36373,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
-			result = ZendHashIndexFind(ht, op1.GetLval())
+			result = ht.IndexFindH(op1.GetLval())
 		} else {
 			result = nil
 		}
@@ -39060,7 +39060,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecute
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -43483,7 +43483,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index_prop:
-			value = ZendHashIndexFind(ht, hval)
+			value = ht.IndexFindH(hval)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && Z_ISREF_P(offset) {
 			offset = Z_REFVAL_P(offset)
 			goto isset_again
@@ -47218,7 +47218,7 @@ func ZendSerializeOpcodeHandler(op *ZendOp) {
 	if ZendHandlersTable == nil {
 		InitOpcodeSerialiser()
 	}
-	zv = ZendHashIndexFind(ZendHandlersTable, ZendLong(ZendUintptrT(op.GetHandler())))
+	zv = ZendHandlersTable.IndexFindH(ZendLong(ZendUintptrT(op.GetHandler())))
 	ZEND_ASSERT(zv != nil)
 	op.SetHandler(any(ZendUintptrT(zv.GetLval())))
 }

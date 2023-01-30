@@ -818,7 +818,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	 * the zend_refcounted struct */
 
 	key = zend.ZendUlong(zend.ZendUintptrT(var_.GetCounted()))
-	zv = zend.ZendHashIndexFind(data.GetHt(), key)
+	zv = data.GetHt().IndexFindH(key)
 	if zv != nil {
 
 		/* References are only counted once, undo the data->n increment above */
@@ -1179,7 +1179,7 @@ again:
 
 				/* Mark this value in the var_hash, to avoid creating references to it. */
 
-				var var_idx *zend.Zval = zend.ZendHashIndexFind(var_hash.GetHt(), zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
+				var var_idx *zend.Zval = var_hash.GetHt().IndexFindH(zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
 				zend.ZVAL_LONG(var_idx, -1)
 				zend.SmartStrAppendl(buf, "N;", 2)
 			}

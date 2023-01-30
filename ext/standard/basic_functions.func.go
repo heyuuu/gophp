@@ -1248,7 +1248,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			/* numeric string */
 
 			var optname_int int = atoi(optname)
-			if b.Assign(&args, zend.ZendHashIndexFind(return_value.GetArr(), optname_int)) != nil {
+			if b.Assign(&args, return_value.GetArr().IndexFindH(optname_int)) != nil {
 				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
@@ -2405,7 +2405,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 			var method *zend.Zval
 			if function.IsType(zend.IS_STRING) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s() - function does not exist", zend.Z_STRVAL_P(function))
-			} else if function.IsType(zend.IS_ARRAY) && b.Assign(&obj, zend.ZendHashIndexFind(function.GetArr(), 0)) != nil && b.Assign(&method, zend.ZendHashIndexFind(function.GetArr(), 1)) != nil && obj.IsType(zend.IS_OBJECT) && method.IsType(zend.IS_STRING) {
+			} else if function.IsType(zend.IS_ARRAY) && b.Assign(&obj, function.GetArr().IndexFindH(0)) != nil && b.Assign(&method, function.GetArr().IndexFindH(1)) != nil && obj.IsType(zend.IS_OBJECT) && method.IsType(zend.IS_STRING) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call %s::%s() - function does not exist", zend.Z_OBJCE_P(obj).GetName().GetVal(), zend.Z_STRVAL_P(method))
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to call tick function")
@@ -4194,7 +4194,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		}
 		if !(zend.Z_STRLEN_P(arg1) > 1 && zend.Z_STRVAL_P(arg1)[0] == '0') && zend.IsNumericString(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1), nil, nil, 0) == zend.IS_LONG {
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1)))
-			if b.Assign(&find_hash, zend.ZendHashIndexFind(arr.GetArr(), key)) == nil {
+			if b.Assign(&find_hash, arr.GetArr().IndexFindH(key)) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
 			}

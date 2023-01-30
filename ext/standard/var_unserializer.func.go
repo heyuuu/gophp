@@ -339,7 +339,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 			if key.IsType(zend.IS_LONG) {
 				idx = key.GetLval()
 			numeric_key:
-				if b.Assign(&old_data, zend.ZendHashIndexFind(ht, idx)) != nil {
+				if b.Assign(&old_data, ht.IndexFindH(idx)) != nil {
 
 					//??? update hash
 

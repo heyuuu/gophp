@@ -622,7 +622,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Descriptor item must be either an array or a File-Handle")
 			goto exit_fail
 		} else {
-			if b.Assign(&ztype, zend.ZendHashIndexFind(descitem.GetArr(), 0)) != nil {
+			if b.Assign(&ztype, descitem.GetArr().IndexFindH(0)) != nil {
 				if zend.TryConvertToString(ztype) == 0 {
 					goto exit_fail
 				}
@@ -633,7 +633,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if strcmp(zend.Z_STRVAL_P(ztype), "pipe") == 0 {
 				var newpipe []PhpFileDescriptorT
 				var zmode *zend.Zval
-				if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
+				if b.Assign(&zmode, descitem.GetArr().IndexFindH(1)) != nil {
 					if zend.TryConvertToString(zmode) == 0 {
 						goto exit_fail
 					}
@@ -665,7 +665,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				var fd core.PhpSocketT
 				var stream *core.PhpStream
 				descriptors[ndesc].SetMode(DESC_FILE)
-				if b.Assign(&zfile, zend.ZendHashIndexFind(descitem.GetArr(), 1)) != nil {
+				if b.Assign(&zfile, descitem.GetArr().IndexFindH(1)) != nil {
 					if zend.TryConvertToString(zfile) == 0 {
 						goto exit_fail
 					}
@@ -673,7 +673,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Missing file name parameter for 'file'")
 					goto exit_fail
 				}
-				if b.Assign(&zmode, zend.ZendHashIndexFind(descitem.GetArr(), 2)) != nil {
+				if b.Assign(&zmode, descitem.GetArr().IndexFindH(2)) != nil {
 					if zend.TryConvertToString(zmode) == 0 {
 						goto exit_fail
 					}

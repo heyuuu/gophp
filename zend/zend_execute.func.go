@@ -2257,7 +2257,7 @@ func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 	if offset.IsType(IS_DOUBLE) {
 		hval = ZendDvalToLval(offset.GetDval())
 	num_idx:
-		return ZendHashIndexFind(ht, hval)
+		return ht.IndexFindH(hval)
 	} else if offset.IsType(IS_NULL) {
 	str_idx:
 		return ZendHashFindExInd(ht, ZSTR_EMPTY_ALLOC(), 1)
@@ -2370,7 +2370,7 @@ try_again:
 	} else if key.IsType(IS_LONG) {
 		hval = key.GetLval()
 	num_key:
-		if ZendHashIndexFind(ht, hval) != nil {
+		if ht.IndexFindH(hval) != nil {
 			return IS_TRUE
 		} else {
 			return IS_FALSE
@@ -3684,8 +3684,8 @@ func ZendInitDynamicCallArray(function *ZendArray, num_args uint32) *ZendExecute
 	if function.GetNNumOfElements() == 2 {
 		var obj *Zval
 		var method *Zval
-		obj = ZendHashIndexFind(function, 0)
-		method = ZendHashIndexFind(function, 1)
+		obj = function.IndexFindH(0)
+		method = function.IndexFindH(1)
 		if obj == nil || method == nil {
 			ZendThrowError(nil, "Array callback has to contain indices 0 and 1")
 			return nil

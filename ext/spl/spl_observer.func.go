@@ -652,8 +652,8 @@ func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, 
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "h", &data) == zend.FAILURE {
 		return
 	}
-	storage_zv = zend.ZendHashIndexFind(data, 0)
-	members_zv = zend.ZendHashIndexFind(data, 1)
+	storage_zv = data.IndexFindH(0)
+	members_zv = data.IndexFindH(1)
 	if storage_zv == nil || members_zv == nil || storage_zv.GetType() != zend.IS_ARRAY || members_zv.GetType() != zend.IS_ARRAY {
 		zend.ZendThrowException(spl_ce_UnexpectedValueException, "Incomplete or ill-typed serialization data", 0)
 		return
