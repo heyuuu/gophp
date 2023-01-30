@@ -308,6 +308,16 @@ func (this *ZendArray) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
 	return this.appendBucket(bucket)
 }
 
+func (this *ZendArray) addOrUpdateByZendString(key *ZendString, pData *Zval, flag uint32) *Zval {
+	var strKey = key.GetStr()
+	return this.addOrUpdate(strKey, pData, flag)
+}
+
+func (this *ZendArray) addOrUpdateByStrPtr(str *byte, len_ int, pData *Zval, flag uint32) *Zval {
+	var strKey = b.CastStr(str, len_)
+	return this.addOrUpdate(strKey, pData, flag)
+}
+
 func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zval {
 	this.assertRc1()
 

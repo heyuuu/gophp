@@ -72,7 +72,6 @@ func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) 
 	}
 }
 func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *ZendUlong) bool {
-	// todo idx 必须带指针
 	var str = b.CastStr(key, length)
 	if number, ok := zendParseNumericStr(str); ok {
 		*idx = number
@@ -82,7 +81,6 @@ func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *ZendUlong) bool {
 	}
 }
 func ZEND_HANDLE_NUMERIC(key *ZendString, idx *ZendUlong) bool {
-	// todo idx 必须带指针
 	var str = key.GetStr()
 	if number, ok := zendParseNumericStr(str); ok {
 		*idx = number
@@ -608,51 +606,33 @@ func ZendHashIteratorsAdvance(ht *HashTable, step HashPosition) {
 		iter++
 	}
 }
-func ZendHashFindBucket(ht *HashTable, key *ZendString) *Bucket {
-	var key_ = NewStrKey(key.GetStr())
-	return ht.FindBucket(key_)
-}
-func ZendHashStrFindBucket(ht *HashTable, str *byte, len_ int) *Bucket {
-	var key_ = NewStrKey(b.CastStr(str, len_))
-	return ht.FindBucket(key_)
-}
-func ZendHashIndexFindBucket(ht *HashTable, h ZendUlong) *Bucket {
-	var key_ = NewIndexKey(int(h))
-	return ht.FindBucket(key_)
-}
-func _zendHashAddOrUpdateI(ht *HashTable, key *ZendString, pData *Zval, flag uint32) *Zval {
-	var strKey = key.GetStr()
-	return ht.addOrUpdate(strKey, pData, flag)
-}
 
-func _zendHashStrAddOrUpdateI(ht *HashTable, str *byte, len_ int, pData *Zval, flag uint32) *Zval {
-	var strKey = b.CastStr(str, len_)
-	return ht.addOrUpdate(strKey, pData, flag)
-}
 func ZendHashAdd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return _zendHashAddOrUpdateI(ht, key, pData, HASH_ADD)
+	return ht.addOrUpdateByZendString(key, pData, HASH_ADD)
 }
 func ZendHashUpdate(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return _zendHashAddOrUpdateI(ht, key, pData, HASH_UPDATE)
+	return ht.addOrUpdateByZendString(key, pData, HASH_UPDATE)
 }
 func ZendHashUpdateInd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return _zendHashAddOrUpdateI(ht, key, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+	return ht.addOrUpdateByZendString(key, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 }
 func ZendHashAddNew(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	return _zendHashAddOrUpdateI(ht, key, pData, HASH_ADD_NEW)
+	return ht.addOrUpdateByZendString(key, pData, HASH_ADD_NEW)
 }
-func ZendHashStrUpdate(ht *HashTable, str string, len_ int, pData *Zval) *Zval {
-	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_UPDATE)
+
+func ZendHashStrUpdate(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
+	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_UPDATE)
 }
-func ZendHashStrUpdateInd(ht *HashTable, str string, len_ int, pData *Zval) *Zval {
-	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+func ZendHashStrUpdateInd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
+	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 }
 func ZendHashStrAdd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_ADD)
+	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_ADD)
 }
 func ZendHashStrAddNew(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	return _zendHashStrAddOrUpdateI(ht, str, len_, pData, HASH_ADD_NEW)
+	return ht.addOrUpdateByStrPtr(str, len_, pData, HASH_ADD_NEW)
 }
+
 func ZendHashIndexAddEmptyElement(ht *HashTable, h ZendUlong) *Zval {
 	var dummy Zval
 	ZVAL_NULL(&dummy)
@@ -668,23 +648,20 @@ func ZendHashStrAddEmptyElement(ht *HashTable, str *byte, len_ int) *Zval {
 	ZVAL_NULL(&dummy)
 	return ZendHashStrAdd(ht, str, len_, &dummy)
 }
-func _zendHashIndexAddOrUpdateI(ht *HashTable, h ZendUlong, pData *Zval, flag uint32) *Zval {
-	return ht.indexAddOrUpdate(int(h), pData, flag)
-}
 func ZendHashIndexAdd(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return _zendHashIndexAddOrUpdateI(ht, h, pData, HASH_ADD)
+	return ht.indexAddOrUpdate(int(h), pData, HASH_ADD)
 }
 func ZendHashIndexAddNew(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return _zendHashIndexAddOrUpdateI(ht, h, pData, HASH_ADD|HASH_ADD_NEW)
+	return ht.indexAddOrUpdate(int(h), pData, HASH_ADD|HASH_ADD_NEW)
 }
 func ZendHashIndexUpdate(ht *HashTable, h ZendUlong, pData *Zval) *Zval {
-	return _zendHashIndexAddOrUpdateI(ht, h, pData, HASH_UPDATE)
+	return ht.indexAddOrUpdate(int(h), pData, HASH_UPDATE)
 }
 func ZendHashNextIndexInsert(ht *HashTable, pData *Zval) *Zval {
-	return _zendHashIndexAddOrUpdateI(ht, ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEXT)
+	return ht.indexAddOrUpdate(ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEXT)
 }
 func ZendHashNextIndexInsertNew(ht *HashTable, pData *Zval) *Zval {
-	return _zendHashIndexAddOrUpdateI(ht, ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEW|HASH_ADD_NEXT)
+	return ht.indexAddOrUpdate(ht.GetNNextFreeElement(), pData, HASH_ADD|HASH_ADD_NEW|HASH_ADD_NEXT)
 }
 func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var nIndex uint32
@@ -693,7 +670,7 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var p *Bucket
 	var arData *Bucket
 	ht.assertRc1()
-	p = ZendHashFindBucket(ht, key)
+	p = ht.FindBucketByZendString(key)
 	if p != nil {
 		if p == b {
 			return p.GetVal()
@@ -1486,8 +1463,8 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 			if s.IsType(IS_UNDEF) {
 				continue
 			}
-			if p.GetKey() != nil {
-				t = _zendHashAddOrUpdateI(target, p.GetKey(), s, HASH_UPDATE|HASH_UPDATE_INDIRECT)
+			if p.IsStrKey() {
+				t = target.addOrUpdate(p.StrKey(), s, HASH_UPDATE|HASH_UPDATE_INDIRECT)
 				if pCopyConstructor != nil {
 					pCopyConstructor(t)
 				}
@@ -1508,8 +1485,8 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 			if s.IsType(IS_UNDEF) {
 				continue
 			}
-			if p.GetKey() != nil {
-				t = _zendHashAddOrUpdateI(target, p.GetKey(), s, HASH_ADD|HASH_UPDATE_INDIRECT)
+			if p.IsStrKey() {
+				t = target.addOrUpdate(p.StrKey(), s, HASH_ADD|HASH_UPDATE_INDIRECT)
 				if t != nil && pCopyConstructor != nil {
 					pCopyConstructor(t)
 				}
