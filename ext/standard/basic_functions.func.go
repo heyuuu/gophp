@@ -1260,7 +1260,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			/* other strings */
 
-			if b.Assign(&args, return_value.GetArr().FindByStrPtr(optname, strlen(optname))) != nil {
+			if b.Assign(&args, return_value.GetArr().KeyFind(b.CastStr(optname, strlen(optname)))) != nil {
 				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
@@ -4199,7 +4199,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
 			}
 		} else {
-			if b.Assign(&find_hash, arr.GetArr().FindByZendString(arg1.GetStr())) == nil {
+			if b.Assign(&find_hash, arr.GetArr().KeyFind(arg1.GetStr().GetStr())) == nil {
 				zend.ArrayInit(&hash)
 				find_hash = arr.GetArr().KeyAddNew(arg1.GetStr().GetStr(), &hash)
 			}

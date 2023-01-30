@@ -333,7 +333,7 @@ func ZendInitCompilerDataStructures() {
 	__CG().SetMemoizeMode(0)
 }
 func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
-	var zv *Zval = FC(seen_symbols).FindByZendString(name)
+	var zv *Zval = FC(seen_symbols).KeyFind(name.GetStr())
 	if zv != nil {
 		zv.SetLval(zv.GetLval() | kind)
 	} else {
@@ -343,7 +343,7 @@ func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
 	}
 }
 func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
-	var zv *Zval = FC(seen_symbols).FindByZendString(name)
+	var zv *Zval = FC(seen_symbols).KeyFind(name.GetStr())
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
 func FileHandleDtor(fh *ZendFileHandle) { ZendFileHandleDtor(fh) }
@@ -378,7 +378,7 @@ func ShutdownCompiler() {
 func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
 	var p *Zval
 	var rv Zval
-	if b.Assign(&p, __CG().GetFilenamesTable().FindByZendString(new_compiled_filename)) {
+	if b.Assign(&p, __CG().GetFilenamesTable().KeyFind(new_compiled_filename.GetStr())) {
 		ZEND_ASSERT(p.IsType(IS_STRING))
 		__CG().SetCompiledFilename(p.GetStr())
 		return p.GetStr()
@@ -862,7 +862,7 @@ func FunctionAddRef(function *ZendFunction) {
 	}
 }
 func DoBindFunctionError(lcname *ZendString, op_array *ZendOpArray, compile_time ZendBool) {
-	var zv *Zval = b.CondF(compile_time != 0, func() *HashTable { return __CG().GetFunctionTable() }, func() *HashTable { return __EG().GetFunctionTable() }).FindByZendString(lcname)
+	var zv *Zval = b.CondF(compile_time != 0, func() *HashTable { return __CG().GetFunctionTable() }, func() *HashTable { return __EG().GetFunctionTable() }).KeyFind(lcname.GetStr())
 	var error_level int = b.Cond(compile_time != 0, E_COMPILE_ERROR, E_ERROR)
 	var old_function *ZendFunction
 	ZEND_ASSERT(zv != nil)
@@ -878,7 +878,7 @@ func DoBindFunction(lcname *Zval) int {
 	var rtd_key *Zval
 	var zv *Zval
 	rtd_key = lcname + 1
-	zv = __EG().GetFunctionTable().FindByZendString(rtd_key.GetStr())
+	zv = __EG().GetFunctionTable().KeyFind(rtd_key.GetStr().GetStr())
 	if zv == nil {
 		DoBindFunctionError(lcname.GetStr(), nil, 0)
 		return FAILURE
@@ -900,7 +900,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 	var rtd_key *Zval
 	var zv *Zval
 	rtd_key = lcname + 1
-	zv = __EG().GetClassTable().FindByZendString(rtd_key.GetStr())
+	zv = __EG().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
 	if zv == nil {
 		ce = ZendHashFindPtr(__EG().GetClassTable(), lcname.GetStr())
 		if ce != nil {
@@ -910,7 +910,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 			for {
 				ZEND_ASSERT(__EG().GetCurrentExecuteData().GetFunc().GetOpArray().IsPreloaded())
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(__EG().GetCurrentExecuteData().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
-					zv = __EG().GetClassTable().FindByZendString(rtd_key.GetStr())
+					zv = __EG().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
 					if zv != nil {
 						break
 					}
@@ -934,7 +934,7 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 
 		/* Reload bucket pointer, the hash table may have been reallocated */
 
-		zv = __EG().GetClassTable().FindByZendString(lcname.GetStr())
+		zv = __EG().GetClassTable().KeyFind(lcname.GetStr().GetStr())
 		ZendHashSetBucketKey(__EG().GetClassTable(), (*Bucket)(zv), rtd_key.GetStr())
 		return FAILURE
 	}
@@ -995,7 +995,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 		for opline_num != uint32-1 {
 			var opline *ZendOp = op_array.GetOpcodes()[opline_num]
 			var lcname *Zval = RT_CONSTANT(opline, opline.GetOp1())
-			var zv *Zval = __EG().GetClassTable().FindByZendString((lcname + 1).GetStr())
+			var zv *Zval = __EG().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 			if zv != nil {
 				var ce *ZendClassEntry = zv.GetCe()
 				var lc_parent_name *ZendString = RT_CONSTANT(opline, opline.GetOp2()).GetStr()

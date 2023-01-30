@@ -352,7 +352,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 				if zend.ZEND_HANDLE_NUMERIC(key.GetStr(), &idx) {
 					goto numeric_key
 				}
-				if b.Assign(&old_data, ht.FindByZendString(key.GetStr())) != nil {
+				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
 
 					//??? update hash
 
@@ -402,7 +402,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 						zend.ZendStringReleaseEx(unmangled, 0)
 					}
 				}
-				if b.Assign(&old_data, ht.FindByZendString(key.GetStr())) != nil {
+				if b.Assign(&old_data, ht.KeyFind(key.GetStr().GetStr())) != nil {
 					if old_data.IsType(zend.IS_INDIRECT) {
 						old_data = old_data.GetZv()
 						info = zend.ZendGetTypedPropertyInfoForSlot(obj, old_data)

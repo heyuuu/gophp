@@ -1917,7 +1917,7 @@ try_again:
 			}
 		}
 	str_index:
-		retval = ht.FindByZendString(offset_key)
+		retval = ht.KeyFind(offset_key.GetStr())
 		if retval != nil {
 
 			/* support for $GLOBALS[...] */
@@ -2609,7 +2609,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			ptr = zobj.GetProperties().FindByZendString(prop_ptr.GetStr())
+			ptr = zobj.GetProperties().KeyFind(prop_ptr.GetStr().GetStr())
 			if ptr != nil {
 				ZVAL_INDIRECT(result, ptr)
 				return
@@ -3225,7 +3225,7 @@ func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 }
 func InitFuncRunTimeCache(op_array *ZendOpArray) { InitFuncRunTimeCacheI(op_array) }
 func ZendFetchFunction(name *ZendString) *ZendFunction {
-	var zv *Zval = __EG().GetFunctionTable().FindByZendString(name)
+	var zv *Zval = __EG().GetFunctionTable().KeyFind(name.GetStr())
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3236,7 +3236,7 @@ func ZendFetchFunction(name *ZendString) *ZendFunction {
 	return nil
 }
 func ZendFetchFunctionStr(name string, len_ int) *ZendFunction {
-	var zv *Zval = __EG().GetFunctionTable().FindByStrPtr(name, len_)
+	var zv *Zval = __EG().GetFunctionTable().KeyFind(b.CastStr(name, len_))
 	if zv != nil {
 		var fbc *ZendFunction = zv.GetFunc()
 		if fbc.GetType() == ZEND_USER_FUNCTION && !(RUN_TIME_CACHE(fbc.GetOpArray())) {
@@ -3628,7 +3628,7 @@ func ZendInitDynamicCallString(function *ZendString, num_args uint32) *ZendExecu
 		} else {
 			lcname = ZendStringTolower(function)
 		}
-		if b.Assign(&func_, __EG().GetFunctionTable().FindByZendString(lcname)) == nil {
+		if b.Assign(&func_, __EG().GetFunctionTable().KeyFind(lcname.GetStr())) == nil {
 			ZendThrowError(nil, "Call to undefined function %s()", function.GetVal())
 			ZendStringReleaseEx(lcname, 0)
 			return nil
@@ -3890,23 +3890,23 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
-	zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
+	zv = __EG().GetZendConstants().KeyFind(key.GetStr().GetStr())
 	if zv != nil {
 		c = (*ZendConstant)(zv.GetPtr())
 	} else {
 		key++
-		zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
+		zv = __EG().GetZendConstants().KeyFind(key.GetStr().GetStr())
 		if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 			c = (*ZendConstant)(zv.GetPtr())
 		} else {
 			if (flags & (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED)) == (IS_CONSTANT_IN_NAMESPACE | IS_CONSTANT_UNQUALIFIED) {
 				key++
-				zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
+				zv = __EG().GetZendConstants().KeyFind(key.GetStr().GetStr())
 				if zv != nil {
 					c = (*ZendConstant)(zv.GetPtr())
 				} else {
 					key++
-					zv = __EG().GetZendConstants().FindByZendString(key.GetStr())
+					zv = __EG().GetZendConstants().KeyFind(key.GetStr().GetStr())
 					if zv != nil && (ZEND_CONSTANT_FLAGS((*ZendConstant)(zv.GetPtr()))&CONST_CS) == 0 {
 						c = (*ZendConstant)(zv.GetPtr())
 					}

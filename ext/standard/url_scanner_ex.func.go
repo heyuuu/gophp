@@ -220,7 +220,7 @@ func CheckHttpHost(target *byte) int {
 	var tmp *zend.Zval
 	var host_tmp *zend.ZendString
 	var colon *byte
-	if b.Assign(&tmp, zend.ZendHashStrFind(zend.__EG().GetSymbolTable(), zend.ZEND_STRL("_SERVER"))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, zend.ZendHashStrFind(tmp.GetArr(), zend.ZEND_STRL("HTTP_HOST"))) && host.IsType(zend.IS_STRING) {
+	if b.Assign(&tmp, zend.__EG().GetSymbolTable().KeyFind(b.CastStr(zend.ZEND_STRL("_SERVER")))) && tmp.IsType(zend.IS_ARRAY) && b.Assign(&host, tmp.GetArr().KeyFind(b.CastStr(zend.ZEND_STRL("HTTP_HOST")))) && host.IsType(zend.IS_STRING) {
 		host_tmp = zend.ZendStringInit(zend.Z_STRVAL_P(host), zend.Z_STRLEN_P(host), 0)
 
 		/* HTTP_HOST could be 'localhost:8888' etc. */
@@ -272,7 +272,7 @@ func CheckHostWhitelist(ctx *UrlAdaptStateExT) int {
 		PhpUrlFree(url_parts)
 		return zend.SUCCESS
 	}
-	if allowed_hosts.FindByZendString(url_parts.GetHost()) == nil {
+	if allowed_hosts.KeyFind(url_parts.GetHost().GetStr()) == nil {
 		PhpUrlFree(url_parts)
 		return zend.FAILURE
 	}

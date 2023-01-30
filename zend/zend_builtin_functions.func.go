@@ -760,7 +760,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 		for {
 			var p *ZendIniEntry = __EG().GetErrorReportingIniEntry()
 			if p == nil {
-				var zv *Zval = __EG().GetIniDirectives().FindByZendString(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING))
+				var zv *Zval = __EG().GetIniDirectives().KeyFind(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING).GetStr())
 				if zv != nil {
 					__EG().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
 					p = __EG().GetErrorReportingIniEntry()

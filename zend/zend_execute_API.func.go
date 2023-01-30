@@ -807,7 +807,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 			lc_name = ZendStringTolower(name)
 		}
 	}
-	zv = __EG().GetClassTable().FindByZendString(lc_name)
+	zv = __EG().GetClassTable().KeyFind(lc_name.GetStr())
 	if zv != nil {
 		if key == nil {
 			ZendStringReleaseEx(lc_name, 0)
@@ -1232,7 +1232,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 		var end **ZendString = str + op_array.GetLastVar()
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
-			var zv *Zval = ht.FindByZendString(*str)
+			var zv *Zval = ht.KeyFind(str.GetStr())
 			if zv != nil {
 				if zv.IsType(IS_INDIRECT) {
 					var val *Zval = zv.GetZv()

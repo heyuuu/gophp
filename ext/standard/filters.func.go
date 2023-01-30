@@ -916,7 +916,7 @@ func PhpConvGetStringPropEx(ht *zend.HashTable, pretval **byte, pretval_len *int
 	var tmpval *zend.Zval
 	*pretval = nil
 	*pretval_len = 0
-	if b.Assign(&tmpval, (*zend.HashTable)(ht).FindByStrPtr(field_name, field_name_len-1)) != nil {
+	if b.Assign(&tmpval, (*zend.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))) != nil {
 		var tmp *zend.ZendString
 		var str *zend.ZendString = zend.ZvalGetTmpString(tmpval, &tmp)
 		*pretval = zend.Pemalloc(str.GetLen()+1, persistent)
@@ -929,7 +929,7 @@ func PhpConvGetStringPropEx(ht *zend.HashTable, pretval **byte, pretval_len *int
 	return PHP_CONV_ERR_SUCCESS
 }
 func PhpConvGetUlongPropEx(ht *zend.HashTable, pretval *zend.ZendUlong, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *zend.Zval = (*zend.HashTable)(ht).FindByStrPtr(field_name, field_name_len-1)
+	var tmpval *zend.Zval = (*zend.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		var lval zend.ZendLong = zend.ZvalGetLong(tmpval)
 		if lval < 0 {
@@ -944,7 +944,7 @@ func PhpConvGetUlongPropEx(ht *zend.HashTable, pretval *zend.ZendUlong, field_na
 	}
 }
 func PhpConvGetBoolPropEx(ht *zend.HashTable, pretval *int, field_name string, field_name_len int) PhpConvErrT {
-	var tmpval *zend.Zval = (*zend.HashTable)(ht).FindByStrPtr(field_name, field_name_len-1)
+	var tmpval *zend.Zval = (*zend.HashTable)(ht).KeyFind(b.CastStr(field_name, field_name_len-1))
 	if tmpval != nil {
 		*pretval = zend.ZendIsTrue(tmpval)
 		return PHP_CONV_ERR_SUCCESS

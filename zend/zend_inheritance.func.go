@@ -768,7 +768,7 @@ func DoInheritanceCheckOnMethod(child *ZendFunction, parent *ZendFunction, ce *Z
 	DoInheritanceCheckOnMethodEx(child, parent, ce, child_zv, 0, 0)
 }
 func DoInheritMethod(key *ZendString, parent *ZendFunction, ce *ZendClassEntry, is_interface ZendBool, checked ZendBool) {
-	var child *Zval = ce.GetFunctionTable().FindByZendString(key)
+	var child *Zval = ce.GetFunctionTable().KeyFind(key.GetStr())
 	if child != nil {
 		var func_ *ZendFunction = (*ZendFunction)(child.GetPtr())
 		if is_interface != 0 && func_ == parent {
@@ -849,7 +849,7 @@ func EmitIncompatiblePropertyError(child *ZendPropertyInfo, parent *ZendProperty
 	}, func() *byte { return ZendGetTypeByConst(parent.GetType().Code()) }), parent.GetCe().GetName().GetVal())
 }
 func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendClassEntry) {
-	var child *Zval = ce.GetPropertiesInfo().FindByZendString(key)
+	var child *Zval = ce.GetPropertiesInfo().KeyFind(key.GetStr())
 	var child_info *ZendPropertyInfo
 	if child != nil {
 		child_info = child.GetPtr()
@@ -943,7 +943,7 @@ func ZendDoInheritInterfaces(ce *ZendClassEntry, iface *ZendClassEntry) {
 	/* and now call the implementing handlers */
 }
 func DoInheritClassConstant(name *ZendString, parent_const *ZendClassConstant, ce *ZendClassEntry) {
-	var zv *Zval = ce.GetConstantsTable().FindByZendString(name)
+	var zv *Zval = ce.GetConstantsTable().KeyFind(name.GetStr())
 	var c *ZendClassConstant
 	if zv != nil {
 		c = (*ZendClassConstant)(zv.GetPtr())
@@ -1287,7 +1287,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 	ce.AddCeFlags(parent_ce.GetCeFlags() & (ZEND_HAS_STATIC_IN_METHODS | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_USE_GUARDS))
 }
 func DoInheritConstantCheck(child_constants_table *HashTable, parent_constant *ZendClassConstant, name *ZendString, iface *ZendClassEntry) ZendBool {
-	var zv *Zval = child_constants_table.FindByZendString(name)
+	var zv *Zval = child_constants_table.KeyFind(name.GetStr())
 	var old_constant *ZendClassConstant
 	if zv != nil {
 		old_constant = (*ZendClassConstant)(zv.GetPtr())
@@ -1627,7 +1627,7 @@ func ZendTraitsCopyFunctions(fnname *ZendString, fn *ZendFunction, ce *ZendClass
 			i++
 		}
 	}
-	if exclude_table == nil || exclude_table.FindByZendString(fnname) == nil {
+	if exclude_table == nil || exclude_table.KeyFind(fnname.GetStr()) == nil {
 
 		/* is not in hashtable, thus, function is not to be excluded */
 
@@ -2408,7 +2408,7 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 
 		key = _p.GetKey()
 		parent_func = _z.GetPtr()
-		var zv *Zval = ce.GetFunctionTable().FindByZendString(key)
+		var zv *Zval = ce.GetFunctionTable().KeyFind(key.GetStr())
 		if zv != nil {
 			var child_func *ZendFunction = zv.GetFunc()
 			var status InheritanceStatus = DoInheritanceCheckOnMethodEx(child_func, parent_func, ce, nil, 1, 0)
@@ -2431,7 +2431,7 @@ func ZendCanEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry) Inheritance
 		if parent_info.IsPrivate() || !(parent_info.GetType().IsSet()) {
 			continue
 		}
-		zv = ce.GetPropertiesInfo().FindByZendString(key)
+		zv = ce.GetPropertiesInfo().KeyFind(key.GetStr())
 		if zv != nil {
 			var child_info *ZendPropertyInfo = zv.GetPtr()
 			if child_info.GetType().IsSet() {

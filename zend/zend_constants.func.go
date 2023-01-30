@@ -243,11 +243,11 @@ func ZendGetConstantStr(name *byte, name_len int) *Zval {
 func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 	var zv *Zval
 	var c *ZendConstant
-	zv = __EG().GetZendConstants().FindByZendString(name)
+	zv = __EG().GetZendConstants().KeyFind(name.GetStr())
 	if zv == nil {
 		var lcname *byte = DoAlloca(name.GetLen()+1, use_heap)
 		ZendStrTolowerCopy(lcname, name.GetVal(), name.GetLen())
-		zv = __EG().GetZendConstants().FindByStrPtr(lcname, name.GetLen())
+		zv = __EG().GetZendConstants().KeyFind(b.CastStr(lcname, name.GetLen()))
 		if zv != nil {
 			c = zv.GetPtr()
 			if (ZEND_CONSTANT_FLAGS(c) & CONST_CS) != 0 {

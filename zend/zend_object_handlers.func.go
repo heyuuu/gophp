@@ -270,7 +270,7 @@ func ZendGetParentPrivateProperty(scope *ZendClassEntry, ce *ZendClassEntry, mem
 	var zv *Zval
 	var prop_info *ZendPropertyInfo
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		zv = scope.GetPropertiesInfo().FindByZendString(member)
+		zv = scope.GetPropertiesInfo().KeyFind(member.GetStr())
 		if zv != nil {
 			prop_info = (*ZendPropertyInfo)(zv.GetPtr())
 			if prop_info.IsPrivate() && prop_info.GetCe() == scope {
@@ -296,7 +296,7 @@ func ZendGetPropertyOffset(ce *ZendClassEntry, member *ZendString, silent int, c
 		*info_ptr = CACHED_PTR_EX(cache_slot + 2)
 		return uintPtr(CACHED_PTR_EX(cache_slot + 1))
 	}
-	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().FindByZendString(member)) == nil {
+	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -395,7 +395,7 @@ func ZendGetPropertyInfo(ce *ZendClassEntry, member *ZendString, silent int) *Ze
 	var property_info *ZendPropertyInfo
 	var flags uint32
 	var scope *ZendClassEntry
-	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().FindByZendString(member)) == nil {
+	if ce.GetPropertiesInfo().GetNNumOfElements() == 0 || b.Assign(&zv, ce.GetPropertiesInfo().KeyFind(member.GetStr())) == nil {
 		if member.GetVal()[0] == '0' && member.GetLen() != 0 {
 			if silent == 0 {
 				ZendBadPropertyName()
@@ -540,7 +540,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	} else if zv.IsType(IS_ARRAY) {
 		guards = zv.GetArr()
 		ZEND_ASSERT(guards != nil)
-		zv = guards.FindByZendString(member)
+		zv = guards.KeyFind(member.GetStr())
 		if zv != nil {
 			return (*uint32)(ZendUintptrT(zv.GetPtr()) & ^1)
 		}
@@ -601,7 +601,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 				}
 				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
-			retval = zobj.GetProperties().FindByZendString(name)
+			retval = zobj.GetProperties().KeyFind(name.GetStr())
 			if retval != nil {
 				if cache_slot != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
@@ -747,7 +747,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			if b.Assign(&variable_ptr, zobj.GetProperties().FindByZendString(name)) != nil {
+			if b.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				Z_TRY_ADDREF_P(value)
 				goto found
 			}
@@ -946,7 +946,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 				}
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
-			if b.Assign(&retval, zobj.GetProperties().FindByZendString(name)) != nil {
+			if b.Assign(&retval, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
 				ZendTmpStringRelease(tmp_name)
 				return retval
 			}
@@ -1066,7 +1066,7 @@ func ZendGetParentPrivateMethod(scope *ZendClassEntry, ce *ZendClassEntry, funct
 	var func_ *Zval
 	var fbc *ZendFunction
 	if scope != ce && scope != nil && IsDerivedClass(ce, scope) != 0 {
-		func_ = scope.GetFunctionTable().FindByZendString(function_name)
+		func_ = scope.GetFunctionTable().KeyFind(function_name.GetStr())
 		if func_ != nil {
 			fbc = func_.GetFunc()
 			if fbc.IsPrivate() && fbc.GetScope() == scope {
@@ -1184,7 +1184,7 @@ func ZendStdGetMethod(obj_ptr **ZendObject, method_name *ZendString, key *Zval) 
 		ZSTR_ALLOCA_ALLOC(lc_method_name, method_name.GetLen(), use_heap)
 		ZendStrTolowerCopy(lc_method_name.GetVal(), method_name.GetVal(), method_name.GetLen())
 	}
-	if b.Assign(&func_, zobj.GetCe().GetFunctionTable().FindByZendString(lc_method_name)) == nil {
+	if b.Assign(&func_, zobj.GetCe().GetFunctionTable().KeyFind(lc_method_name.GetStr())) == nil {
 		if key == nil {
 			ZSTR_ALLOCA_FREE(lc_method_name, use_heap)
 		}
@@ -1239,7 +1239,7 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 	} else {
 		lc_function_name = ZendStringTolower(function_name)
 	}
-	var func_ *Zval = ce.GetFunctionTable().FindByZendString(lc_function_name)
+	var func_ *Zval = ce.GetFunctionTable().KeyFind(lc_function_name.GetStr())
 	if func_ != nil {
 		fbc = func_.GetFunc()
 	} else if ce.GetConstructor() != nil && lc_function_name.GetLen() == ce.GetName().GetLen() && ZendBinaryStrncasecmp(lc_function_name.GetVal(), lc_function_name.GetLen(), ce.GetName().GetVal(), lc_function_name.GetLen(), lc_function_name.GetLen()) == 0 && (ce.GetConstructor().GetFunctionName().GetVal()[0] != '_' || ce.GetConstructor().GetFunctionName().GetVal()[1] != '_') {
@@ -1499,7 +1499,7 @@ func ZendStdHasProperty(object *Zval, member *Zval, has_set_exists int, cache_sl
 				}
 				CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 			}
-			value = zobj.GetProperties().FindByZendString(name)
+			value = zobj.GetProperties().KeyFind(name.GetStr())
 			if value != nil {
 				if cache_slot != nil {
 					var idx uintPtr = (*byte)(value - (*byte)(zobj.GetProperties().GetArData()))
@@ -1607,7 +1607,7 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 func ZendStdGetClosure(obj *Zval, ce_ptr **ZendClassEntry, fptr_ptr **ZendFunction, obj_ptr **ZendObject) int {
 	var func_ *Zval
 	var ce *ZendClassEntry = Z_OBJCE_P(obj)
-	if b.Assign(&func_, ce.GetFunctionTable().FindByZendString(ZSTR_KNOWN(ZEND_STR_MAGIC_INVOKE))) == nil {
+	if b.Assign(&func_, ce.GetFunctionTable().KeyFind(ZSTR_KNOWN(ZEND_STR_MAGIC_INVOKE).GetStr())) == nil {
 		return FAILURE
 	}
 	*fptr_ptr = func_.GetFunc()

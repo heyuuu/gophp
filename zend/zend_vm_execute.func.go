@@ -1533,7 +1533,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		for {
 			__EG().SetErrorReporting(0)
 			if __EG().GetErrorReportingIniEntry() == nil {
-				var zv *Zval = __EG().GetIniDirectives().FindByZendString(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING))
+				var zv *Zval = __EG().GetIniDirectives().KeyFind(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING).GetStr())
 				if zv != nil {
 					__EG().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
 				} else {
@@ -1587,12 +1587,12 @@ func ZEND_DECLARE_ANON_CLASS_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
 		var rtd_key *ZendString = RT_CONSTANT(opline, opline.GetOp1()).GetStr()
-		zv = __EG().GetClassTable().FindByZendString(rtd_key)
+		zv = __EG().GetClassTable().KeyFind(rtd_key.GetStr())
 		if zv == nil {
 			for {
 				ZEND_ASSERT((EX(func_).op_array.fn_flags & ZEND_ACC_PRELOADED) != 0)
 				if ZendPreloadAutoload != nil && ZendPreloadAutoload(EX(func_).op_array.filename) == SUCCESS {
-					zv = __EG().GetClassTable().FindByZendString(rtd_key)
+					zv = __EG().GetClassTable().KeyFind(rtd_key.GetStr())
 					if zv != nil {
 						break
 					}
@@ -1995,7 +1995,7 @@ func ZEND_INIT_FCALL_BY_NAME_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) i
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
 		function_name = (*Zval)(RT_CONSTANT(opline, opline.GetOp2()))
-		func_ = __EG().GetFunctionTable().FindByZendString((function_name + 1).GetStr())
+		func_ = __EG().GetFunctionTable().KeyFind((function_name + 1).GetStr().GetStr())
 		if func_ == nil {
 			return zend_undefined_function_helper_SPEC(execute_data)
 		}
@@ -2063,9 +2063,9 @@ func ZEND_INIT_NS_FCALL_BY_NAME_SPEC_CONST_HANDLER(execute_data *ZendExecuteData
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
 		func_name = (*Zval)(RT_CONSTANT(opline, opline.GetOp2()))
-		func_ = __EG().GetFunctionTable().FindByZendString((func_name + 1).GetStr())
+		func_ = __EG().GetFunctionTable().KeyFind((func_name + 1).GetStr().GetStr())
 		if func_ == nil {
-			func_ = __EG().GetFunctionTable().FindByZendString((func_name + 2).GetStr())
+			func_ = __EG().GetFunctionTable().KeyFind((func_name + 2).GetStr().GetStr())
 			if func_ == nil {
 				return zend_undefined_function_helper_SPEC(execute_data)
 			}
@@ -2090,7 +2090,7 @@ func ZEND_INIT_FCALL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	fbc = CACHED_PTR(opline.GetResult().GetNum())
 	if fbc == nil {
 		fname = (*Zval)(RT_CONSTANT(opline, opline.GetOp2()))
-		func_ = __EG().GetFunctionTable().FindByZendString(fname.GetStr())
+		func_ = __EG().GetFunctionTable().KeyFind(fname.GetStr().GetStr())
 		if func_ == nil {
 			return zend_undefined_function_helper_SPEC(execute_data)
 		}
@@ -4107,7 +4107,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) in
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -4191,7 +4191,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -4700,7 +4700,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecut
 				break
 			}
 		}
-		zv = ce.GetConstantsTable().FindByZendString(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+		zv = ce.GetConstantsTable().KeyFind(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetStr())
 		if zv != nil {
 			c = zv.GetPtr()
 			scope = EX(func_).op_array.scope
@@ -4969,7 +4969,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 	ce = CACHED_PTR(opline.GetExtendedValue())
 	if ce == nil {
 		lcname = RT_CONSTANT(opline, opline.GetOp1())
-		zv = __EG().GetClassTable().FindByZendString((lcname + 1).GetStr())
+		zv = __EG().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
 		if zv != nil {
 			ce = zv.GetCe()
 			zv = ZendHashSetBucketKey(__EG().GetClassTable(), (*Bucket)(zv), lcname.GetStr())
@@ -4980,7 +4980,7 @@ func ZEND_DECLARE_CLASS_DELAYED_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 
 					/* Reload bucket pointer, the hash table may have been reallocated */
 
-					zv = __EG().GetClassTable().FindByZendString(lcname.GetStr())
+					zv = __EG().GetClassTable().KeyFind(lcname.GetStr().GetStr())
 					ZendHashSetBucketKey(__EG().GetClassTable(), (*Bucket)(zv), (lcname + 1).GetStr())
 					HANDLE_EXCEPTION()
 				}
@@ -5230,7 +5230,7 @@ func ZEND_SWITCH_STRING_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) 
 			}
 		}
 	}
-	jump_zv = jumptable.FindByZendString(op.GetStr())
+	jump_zv = jumptable.KeyFind(op.GetStr().GetStr())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0
@@ -5249,7 +5249,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var result *Zval
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	if op1.IsType(IS_STRING) {
-		result = ht.FindByZendString(op1.GetStr())
+		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
 			result = ZendHashIndexFind(ht, op1.GetLval())
@@ -5257,7 +5257,7 @@ func ZEND_IN_ARRAY_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			result = nil
 		}
 	} else if op1.GetType() <= IS_FALSE {
-		result = ht.FindByZendString(ZSTR_EMPTY_ALLOC())
+		result = ht.KeyFind(ZSTR_EMPTY_ALLOC().GetStr())
 	} else {
 		var key *ZendString
 		var key_tmp Zval
@@ -6123,7 +6123,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -6209,7 +6209,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -7282,7 +7282,7 @@ func zend_fetch_var_address_helper_SPEC_CONST_UNUSED(type_ int, execute_data *Ze
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	retval = target_symbol_table.FindByZendString(name)
+	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
 		if ZendStringEquals(name, ZSTR_KNOWN(ZEND_STR_THIS)) != 0 {
 		fetch_this:
@@ -7714,7 +7714,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 		name = ZvalGetTmpString(varname, &tmp_name)
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	value = target_symbol_table.FindByZendString(name)
+	value = target_symbol_table.KeyFind(name.GetStr())
 	if IS_CONST != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -7745,7 +7745,7 @@ func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendEx
 	var called_scope *ZendClassEntry
 	func_ = CACHED_PTR(opline.GetExtendedValue())
 	if func_ == nil {
-		zfunc = __EG().GetFunctionTable().FindByZendString(RT_CONSTANT(opline, opline.GetOp1()).GetStr())
+		zfunc = __EG().GetFunctionTable().KeyFind(RT_CONSTANT(opline, opline.GetOp1()).GetStr().GetStr())
 		ZEND_ASSERT(zfunc != nil)
 		func_ = zfunc.GetFunc()
 		ZEND_ASSERT(func_.GetType() == ZEND_USER_FUNCTION)
@@ -8311,7 +8311,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -8395,7 +8395,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -9838,7 +9838,7 @@ func ZEND_SWITCH_STRING_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteDat
 			}
 		}
 	}
-	jump_zv = jumptable.FindByZendString(op.GetStr())
+	jump_zv = jumptable.KeyFind(op.GetStr().GetStr())
 	if jump_zv != nil {
 		ZEND_VM_SET_RELATIVE_OPCODE(opline, jump_zv.GetLval())
 		return 0
@@ -12149,7 +12149,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) i
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -12235,7 +12235,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -13443,7 +13443,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -13531,7 +13531,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -14075,7 +14075,7 @@ func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, execute_data *Z
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	retval = target_symbol_table.FindByZendString(name)
+	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
 		if ZendStringEquals(name, ZSTR_KNOWN(ZEND_STR_THIS)) != 0 {
 		fetch_this:
@@ -14197,7 +14197,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(execute_data *ZendExecute
 		name = ZvalGetTmpString(varname, &tmp_name)
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	value = target_symbol_table.FindByZendString(name)
+	value = target_symbol_table.KeyFind(name.GetStr())
 	if (IS_TMP_VAR | IS_VAR) != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -14571,7 +14571,7 @@ func ZEND_FETCH_OBJ_R_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -14657,7 +14657,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -16236,7 +16236,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var result *Zval
 	op1 = _getZvalPtrTmp(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 	if op1.IsType(IS_STRING) {
-		result = ht.FindByZendString(op1.GetStr())
+		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
 			result = ZendHashIndexFind(ht, op1.GetLval())
@@ -16244,7 +16244,7 @@ func ZEND_IN_ARRAY_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			result = nil
 		}
 	} else if op1.GetType() <= IS_FALSE {
-		result = ht.FindByZendString(ZSTR_EMPTY_ALLOC())
+		result = ht.KeyFind(ZSTR_EMPTY_ALLOC().GetStr())
 	} else {
 		var key *ZendString
 		var key_tmp Zval
@@ -19558,7 +19558,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -19672,7 +19672,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -19787,7 +19787,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -19901,7 +19901,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -20661,7 +20661,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteD
 				break
 			}
 		}
-		zv = ce.GetConstantsTable().FindByZendString(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+		zv = ce.GetConstantsTable().KeyFind(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetStr())
 		if zv != nil {
 			c = zv.GetPtr()
 			scope = EX(func_).op_array.scope
@@ -21083,7 +21083,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var result *Zval
 	op1 = _getZvalPtrVarDeref(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 	if op1.IsType(IS_STRING) {
-		result = ht.FindByZendString(op1.GetStr())
+		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
 			result = ZendHashIndexFind(ht, op1.GetLval())
@@ -21091,7 +21091,7 @@ func ZEND_IN_ARRAY_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			result = nil
 		}
 	} else if op1.GetType() <= IS_FALSE {
-		result = ht.FindByZendString(ZSTR_EMPTY_ALLOC())
+		result = ht.KeyFind(ZSTR_EMPTY_ALLOC().GetStr())
 	} else {
 		var key *ZendString
 		var key_tmp Zval
@@ -21650,7 +21650,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -21766,7 +21766,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -21883,7 +21883,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -21999,7 +21999,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -25010,7 +25010,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -25124,7 +25124,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -25239,7 +25239,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -25353,7 +25353,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -26950,7 +26950,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CONST_INLINE_HANDLER(execute_data *ZendExecute
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -27073,7 +27073,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -27180,7 +27180,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -27290,7 +27290,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -27401,7 +27401,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -27511,7 +27511,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -27992,7 +27992,7 @@ func ZEND_FETCH_CLASS_CONSTANT_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecu
 				break
 			}
 		}
-		zv = ce.GetConstantsTable().FindByZendString(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+		zv = ce.GetConstantsTable().KeyFind(RT_CONSTANT(opline, opline.GetOp2()).GetStr().GetStr())
 		if zv != nil {
 			c = zv.GetPtr()
 			scope = EX(func_).op_array.scope
@@ -28522,7 +28522,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -28648,7 +28648,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData)
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -28759,7 +28759,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -28871,7 +28871,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -28984,7 +28984,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -29096,7 +29096,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -30763,7 +30763,7 @@ func ZEND_FETCH_OBJ_R_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -30883,7 +30883,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -30990,7 +30990,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -31100,7 +31100,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -31211,7 +31211,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -31321,7 +31321,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -34370,7 +34370,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CONST_INLINE_HANDLER(execute_data *ZendExecuteData
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -34493,7 +34493,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -34600,7 +34600,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -34710,7 +34710,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -34821,7 +34821,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -34931,7 +34931,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -36300,7 +36300,7 @@ func ZEND_BIND_GLOBAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				goto check_indirect
 			}
 		}
-		value = __EG().GetSymbolTable().FindByZendString(varname)
+		value = __EG().GetSymbolTable().KeyFind(varname.GetStr())
 		if value == nil {
 			value = __EG().GetSymbolTable().KeyAddNew(varname.GetStr(), __EG().GetUninitializedZval())
 			idx = (*byte)(value - (*byte)(__EG().GetSymbolTable().GetArData()))
@@ -36370,7 +36370,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	var result *Zval
 	op1 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 	if op1.IsType(IS_STRING) {
-		result = ht.FindByZendString(op1.GetStr())
+		result = ht.KeyFind(op1.GetStr().GetStr())
 	} else if opline.GetExtendedValue() != 0 {
 		if op1.IsType(IS_LONG) {
 			result = ZendHashIndexFind(ht, op1.GetLval())
@@ -36378,7 +36378,7 @@ func ZEND_IN_ARRAY_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			result = nil
 		}
 	} else if op1.GetType() <= IS_FALSE {
-		result = ht.FindByZendString(ZSTR_EMPTY_ALLOC())
+		result = ht.KeyFind(ZSTR_EMPTY_ALLOC().GetStr())
 	} else {
 		var key *ZendString
 		var key_tmp Zval
@@ -37442,7 +37442,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int 
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -37568,7 +37568,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -37679,7 +37679,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -37791,7 +37791,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -37904,7 +37904,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -38016,7 +38016,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -39769,7 +39769,7 @@ func zend_fetch_var_address_helper_SPEC_CV_UNUSED(type_ int, execute_data *ZendE
 		}
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	retval = target_symbol_table.FindByZendString(name)
+	retval = target_symbol_table.KeyFind(name.GetStr())
 	if retval == nil {
 		if ZendStringEquals(name, ZSTR_KNOWN(ZEND_STR_THIS)) != 0 {
 		fetch_this:
@@ -40507,7 +40507,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 		name = ZvalGetTmpString(varname, &tmp_name)
 	}
 	target_symbol_table = ZendGetTargetSymbolTable(opline.GetExtendedValue(), EXECUTE_DATA_C)
-	value = target_symbol_table.FindByZendString(name)
+	value = target_symbol_table.KeyFind(name.GetStr())
 	if IS_CV != IS_CONST {
 		ZendTmpStringRelease(tmp_name)
 	}
@@ -41852,7 +41852,7 @@ func ZEND_FETCH_OBJ_R_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -41972,7 +41972,7 @@ func ZEND_FETCH_OBJ_IS_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 					}
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_DYNAMIC_PROPERTY_OFFSET))
 				}
-				retval = zobj.GetProperties().FindByZendString(offset.GetStr())
+				retval = zobj.GetProperties().KeyFind(offset.GetStr().GetStr())
 				if retval != nil {
 					var idx uintPtr = (*byte)(retval - (*byte)(zobj.GetProperties().GetArData()))
 					CACHE_PTR_EX(cache_slot+1, any(ZEND_ENCODE_DYN_PROP_OFFSET(idx)))
@@ -42079,7 +42079,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -42189,7 +42189,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -42300,7 +42300,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}
@@ -42410,7 +42410,7 @@ assign_object:
 					}
 					zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 				}
-				property_val = zobj.GetProperties().FindByZendString(property.GetStr())
+				property_val = zobj.GetProperties().KeyFind(property.GetStr().GetStr())
 				if property_val != nil {
 					goto fast_assign_obj
 				}

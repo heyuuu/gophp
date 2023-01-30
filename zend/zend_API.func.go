@@ -3400,13 +3400,13 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 		if fcc.GetFunctionHandler() != nil {
 			retval = 1
 		}
-	} else if b.Assign(&zv, ftable.FindByZendString(lmname)) != nil {
+	} else if b.Assign(&zv, ftable.KeyFind(lmname.GetStr())) != nil {
 		fcc.SetFunctionHandler(zv.GetPtr())
 		retval = 1
 		if fcc.GetFunctionHandler().GetOpArray().IsChanged() && strict_class == 0 {
 			scope = ZendGetExecutedScope()
 			if scope != nil && InstanceofFunction(fcc.GetFunctionHandler().GetScope(), scope) != 0 {
-				zv = scope.GetFunctionTable().FindByZendString(lmname)
+				zv = scope.GetFunctionTable().KeyFind(lmname.GetStr())
 				if zv != nil {
 					var priv_fbc *ZendFunction = zv.GetPtr()
 					if priv_fbc.IsPrivate() && priv_fbc.GetScope() == scope {

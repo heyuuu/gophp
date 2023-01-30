@@ -905,7 +905,7 @@ func PhpVarSerializeCallMagicSerialize(retval *zend.Zval, obj *zend.Zval) int {
 	return zend.SUCCESS
 }
 func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, name *zend.ZendString, error_name *zend.ZendString, struc *zend.Zval) int {
-	var val *zend.Zval = props.FindByZendString(name)
+	var val *zend.Zval = props.KeyFind(name.GetStr())
 	if val == nil {
 		return zend.FAILURE
 	}

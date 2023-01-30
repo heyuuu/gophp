@@ -161,7 +161,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_POP_ENTRY: %s[%s] = %s\n",Z_STRVAL_P(arg1), Z_STRVAL_P(arg3), Z_STRVAL_P(arg2)); */
 
-		if b.Assign(&find_arr, active_hash.FindByZendString(arg1.GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
+		if b.Assign(&find_arr, active_hash.KeyFind(arg1.GetStr().GetStr())) == nil || find_arr.GetType() != zend.IS_ARRAY {
 			zend.ZVAL_NEW_PERSISTENT_ARR(&option_arr)
 			zend.ZendHashInit(option_arr.GetArr(), 8, nil, ConfigZvalDtor, 1)
 			find_arr = active_hash.KeyUpdate(arg1.GetStr().GetStr(), &option_arr)
@@ -224,7 +224,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 			/* Search for existing entry and if it does not exist create one */
 
-			if b.Assign(&entry, target_hash.FindByStrPtr(key, key_len)) == nil {
+			if b.Assign(&entry, target_hash.KeyFind(b.CastStr(key, key_len))) == nil {
 				var section_arr zend.Zval
 				zend.ZVAL_NEW_PERSISTENT_ARR(&section_arr)
 				zend.ZendHashInit(section_arr.GetArr(), 8, nil, zend.DtorFuncT(ConfigZvalDtor), 1)
@@ -650,7 +650,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, ConfigurationHash.FindByStrPtr(path, strlen(path))) != nil {
+			if b.Assign(&tmp2, ConfigurationHash.KeyFind(b.CastStr(path, strlen(path)))) != nil {
 				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
@@ -667,7 +667,7 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 		/* Search for source array matching the host from configuration_hash */
 
-		if b.Assign(&tmp, ConfigurationHash.FindByStrPtr(host, host_len)) != nil {
+		if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(host, host_len))) != nil {
 			PhpIniActivateConfig(tmp.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
 
@@ -676,14 +676,14 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 	}
 }
 func CfgGetEntryEx(name *zend.ZendString) *zend.Zval {
-	return ConfigurationHash.FindByZendString(name)
+	return ConfigurationHash.KeyFind(name.GetStr())
 }
 func CfgGetEntry(name *byte, name_length int) *zend.Zval {
-	return ConfigurationHash.FindByStrPtr(name, name_length)
+	return ConfigurationHash.KeyFind(b.CastStr(name, name_length))
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.FindByStrPtr(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
 		*result = 0
 		return zend.FAILURE
 	}
@@ -692,7 +692,7 @@ func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 }
 func CfgGetDouble(varname *byte, result *float64) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.FindByStrPtr(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
 		*result = float64(0)
 		return zend.FAILURE
 	}
@@ -701,7 +701,7 @@ func CfgGetDouble(varname *byte, result *float64) int {
 }
 func CfgGetString(varname *byte, result **byte) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.FindByStrPtr(varname, strlen(varname))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
 		*result = nil
 		return zend.FAILURE
 	}

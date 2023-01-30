@@ -358,7 +358,7 @@ func zim_error_exception_getSeverity(execute_data *ZendExecuteData, return_value
 	ZVAL_COPY(return_value, prop)
 }
 func TRACE_APPEND_KEY(key *ZendString) {
-	tmp = ht.FindByZendString(key)
+	tmp = ht.KeyFind(key.GetStr())
 	if tmp {
 		if tmp.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())
@@ -426,14 +426,14 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	SmartStrAppendc(str, '#')
 	SmartStrAppendLong(str, num)
 	SmartStrAppendc(str, ' ')
-	file = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_FILE))
+	file = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_FILE).GetStr())
 	if file != nil {
 		if file.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
 			SmartStrAppends(str, "[unknown function]")
 		} else {
 			var line ZendLong
-			tmp = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_LINE))
+			tmp = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_LINE).GetStr())
 			if tmp != nil {
 				if tmp.IsType(IS_LONG) {
 					line = tmp.GetLval()
@@ -456,7 +456,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_TYPE))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_FUNCTION))
 	SmartStrAppendc(str, '(')
-	tmp = ht.FindByZendString(ZSTR_KNOWN(ZEND_STR_ARGS))
+	tmp = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_ARGS).GetStr())
 	if tmp != nil {
 		if tmp.IsType(IS_ARRAY) {
 			var last_len int = str.GetS().GetLen()
