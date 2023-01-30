@@ -51,7 +51,7 @@ const ZEND_HASH_APPLY_STOP = 1 << 1
 
 type ApplyFuncT func(pDest *Zval) int
 type ApplyFuncArgT func(pDest *Zval, argument any) int
-type ApplyFuncArgsT func(pDest *Zval, num_args int, args ...any, hash_key *ZendHashKey) int
+type ApplyFuncArgsT func(pDest *Zval, num_args int, args []any, hash_key *ZendHashKey) int
 
 /* This function should be used with special care (in other words,
  * it should usually not be used).  When used with the ZEND_HASH_APPLY_STOP

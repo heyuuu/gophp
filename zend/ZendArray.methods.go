@@ -12,6 +12,14 @@ func (this *ZendArray) addHash(key ZendArrayKey, pos uint32) {
 	}
 }
 
+func (this *ZendArray) deleteHash(key ZendArrayKey) {
+	if key.IsStrKey() {
+		delete(this.keyMap, key.GetKey())
+	} else {
+		delete(this.indexMap, key.GetIndex())
+	}
+}
+
 func (this *HashTable) eachBucket(handler func(uint32, *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
@@ -108,6 +116,23 @@ func (this *HashTable) removeHoles() bool {
 	ZEND_ASSERT(this.IsWithoutHoles())
 
 	return true
+}
+
+// 清除 data 队尾无用数据
+func (this *HashTable) removeInvalidTail() {
+	var dataSize = this.DataSize()
+
+	// 从队尾依次判断是否为无效数据，若是则缩短
+	var newDataSize = dataSize
+	for newDataSize > 0 && !this.data[newDataSize-1].IsValid() {
+		newDataSize--
+	}
+
+	// 若长度改变，调整 data
+	if newDataSize < dataSize {
+		this.data = this.data[:newDataSize]
+		this.nInternalPointer = b.Min(this.nInternalPointer, newDataSize)
+	}
 }
 
 func (this *HashTable) Rehash() {
@@ -309,57 +334,39 @@ func (this *ZendArray) appendBucketIndex(indexKey int, zv *Zval) *Bucket {
 	return this.appendBucket(bucket)
 }
 
-func (this *ZendArray) addOrUpdateByZendString(key *ZendString, pData *Zval, flag uint32) *Zval {
-	var strKey = key.GetStr()
-	return this.addOrUpdate(strKey, pData, flag)
-}
+func (this *ZendArray) deleteBucket(pos uint32) {
+	ZEND_ASSERT(pos < this.DataSize())
 
-func (this *ZendArray) addOrUpdateByStrPtr(str *byte, len_ int, pData *Zval, flag uint32) *Zval {
-	var strKey = b.CastStr(str, len_)
-	return this.addOrUpdate(strKey, pData, flag)
-}
+	var p = &this.data[pos]
+	ZEND_ASSERT(p.IsValid())
 
-func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zval {
-	this.assertRc1()
+	// 移除映射
+	this.deleteHash(p.key)
 
-	var isAddNew = b.FlagMatch(flag, HASH_ADD_NEW)
-	var isAdd = b.FlagMatch(flag, HASH_ADD)
-	var isUpdateIndirect = b.FlagMatch(flag, HASH_UPDATE_INDIRECT)
+	// 减少有效元素
+	this.nNumOfElements--
 
-	if !isAddNew {
-		var p = this.FindBucketByStr(strKey)
-		if p != nil {
-			var data *Zval
-			if isAdd {
-				if !isUpdateIndirect {
-					return nil
-				}
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-					if data.GetType() != IS_UNDEF {
-						return nil
-					}
-				} else {
-					return nil
-				}
-			} else {
-				ZEND_ASSERT(p.GetVal() != pData)
-				data = p.GetVal()
-				if isUpdateIndirect && data.IsType(IS_INDIRECT) {
-					data = data.GetZv()
-				}
-			}
-			if this.GetPDestructor() != nil {
-				this.GetPDestructor()(data)
-			}
-			ZVAL_COPY_VALUE(data, pData)
-			return data
+	// 更新内部指针和遍历器指针
+	if this.nInternalPointer == pos || this.HasIterators() {
+		var newIdx = this.validPosVal(pos + 1)
+		if this.nInternalPointer == pos {
+			this.nInternalPointer = newIdx
 		}
+		ZendHashIteratorsUpdate(this, pos, newIdx)
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	var p = this.appendBucketStr(strKey, pData)
-	return p.GetVal()
+	// 析构函数
+	if this.pDestructor != nil {
+		var tmp Zval
+		ZVAL_COPY_VALUE(&tmp, p.GetVal())
+		this.GetPDestructor()(&tmp)
+	}
+
+	// 设置数据不可用
+	p.SetInvalid()
+
+	// 若删除队尾元素，尝试清除 data 队尾无用数据
+	if this.DataSize()-1 == pos {
+		this.removeInvalidTail()
+	}
 }
