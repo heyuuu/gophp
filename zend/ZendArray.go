@@ -566,7 +566,7 @@ func (this *HashTable) IndexDelete(index int) bool {
 }
 
 func (this *ZendArray) deleteBucket(pos uint32) {
-	ht.assertRc1()
+	this.assertRc1()
 	ZEND_ASSERT(pos < this.DataSize())
 
 	var p = &this.data[pos]
