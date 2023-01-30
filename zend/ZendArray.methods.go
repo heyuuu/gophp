@@ -262,41 +262,6 @@ func (this *HashTable) IsValidPos(pos uint32) bool {
 
 func (this *ZendArray) IsWithoutHoles() bool { return this.GetNNumUsed() == this.nNumOfElements }
 
-func (this *ZendArray) findPos(key ZendArrayKey) (uint32, bool) {
-	if key.IsStrKey() {
-		if pos, ok := this.keyMap[key.GetKey()]; ok {
-			return pos, true
-		}
-	} else {
-		if pos, ok := this.indexMap[key.GetIndex()]; ok {
-			return pos, true
-		}
-	}
-
-	return 0, false
-}
-
-func (this *ZendArray) FindBucket(key ZendArrayKey) *Bucket {
-	if pos, ok := this.findPos(key); ok {
-		return &this.data[pos]
-	}
-	return nil
-}
-
-func (this *ZendArray) Find(key ZendArrayKey) *Zval {
-	if pos, ok := this.findPos(key); ok {
-		return this.data[pos].GetVal()
-	}
-	return nil
-}
-
-func (this *ZendArray) Exists(key ZendArrayKey) bool {
-	if _, ok := this.findPos(key); ok {
-		return ok
-	}
-	return false
-}
-
 func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
 	// 尝试 resize
 	this.ifFullDoResize()

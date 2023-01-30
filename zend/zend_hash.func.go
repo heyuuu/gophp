@@ -91,7 +91,7 @@ func ZEND_HANDLE_NUMERIC(key *ZendString, idx *ZendUlong) bool {
 }
 func ZendHashFindInd(ht *HashTable, key *ZendString) *Zval {
 	var zv *Zval
-	zv = ht.FindByZendString(key)
+	zv = ht.KeyFind(key.GetStr())
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
 			return zv.GetZv()
@@ -104,7 +104,7 @@ func ZendHashFindInd(ht *HashTable, key *ZendString) *Zval {
 }
 func ZendHashFindExInd(ht *HashTable, key *ZendString, known_hash ZendBool) *Zval {
 	var zv *Zval
-	zv = ht.FindByZendString(key)
+	zv = ht.KeyFind(key.GetStr())
 	if zv != nil && zv.IsType(IS_INDIRECT) {
 		if Z_INDIRECT_P(zv).GetType() != IS_UNDEF {
 			return zv.GetZv()
@@ -117,12 +117,12 @@ func ZendHashFindExInd(ht *HashTable, key *ZendString, known_hash ZendBool) *Zva
 }
 func ZendHashExistsInd(ht *HashTable, key *ZendString) int {
 	var zv *Zval
-	zv = ht.FindByZendString(key)
+	zv = ht.KeyFind(key.GetStr())
 	return zv != nil && (zv.GetType() != IS_INDIRECT || Z_INDIRECT_P(zv).GetType() != IS_UNDEF)
 }
 func ZendHashStrExistsInd(ht *HashTable, str string, len_ int) int {
 	var zv *Zval
-	zv = ht.FindByStrPtr(str, len_)
+	zv = ht.KeyFind(b.CastStr(str, len_))
 	return zv != nil && (zv.GetType() != IS_INDIRECT || Z_INDIRECT_P(zv).GetType() != IS_UNDEF)
 }
 func ZendSymtableAddNew(ht *HashTable, key *ZendString, pData *Zval) *Zval {
@@ -157,9 +157,7 @@ func ZendSymtableFind(ht *HashTable, key *ZendString) *Zval {
 	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
 		return ZendHashIndexFind(ht, idx)
 	} else {
-
-		return ht.FindByZendString(key)
-
+		return ht.KeyFind(key.GetStr())
 	}
 }
 func ZendSymtableExists(ht *HashTable, key *ZendString) int {
@@ -203,9 +201,9 @@ func ZendSymtableStrDel(ht *HashTable, str *byte, len_ int) int {
 func ZendSymtableStrFind(ht *HashTable, str *byte, len_ int) *Zval {
 	var str_ = b.CastStr(str, len_)
 	if idx, ok := zendParseNumericStr(str_); ok {
-		return ZendHashIndexFind(ht, idx)
+		return ht.IndexFindH(idx)
 	} else {
-		return ht.FindByStrPtr(str, len_)
+		return ht.KeyFind(b.CastStr(str, len_))
 	}
 }
 func ZendSymtableStrExists(ht *HashTable, str *byte, len_ int) int {
@@ -367,7 +365,7 @@ func ZendHashNextIndexInsertMem(ht *HashTable, pData any, size int) any {
 }
 func ZendHashFindPtr(ht *HashTable, key *ZendString) any {
 	var zv *Zval
-	zv = ht.FindByZendString(key)
+	zv = ht.KeyFind(key.GetStr())
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -376,7 +374,7 @@ func ZendHashFindPtr(ht *HashTable, key *ZendString) any {
 }
 func ZendHashFindExPtr(ht *HashTable, key *ZendString, known_hash ZendBool) any {
 	var zv *Zval
-	zv = ht.FindByZendString(key)
+	zv = ht.KeyFind(key.GetStr())
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -385,7 +383,7 @@ func ZendHashFindExPtr(ht *HashTable, key *ZendString, known_hash ZendBool) any 
 }
 func ZendHashStrFindPtr(ht *HashTable, str string, len_ int) any {
 	var zv *Zval
-	zv = ht.FindByStrPtr(str, len_)
+	zv = ht.KeyFind(b.CastStr(str, len_))
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -393,7 +391,8 @@ func ZendHashStrFindPtr(ht *HashTable, str string, len_ int) any {
 	}
 }
 func ZendHashIndexFindPtr(ht *HashTable, h ZendUlong) any {
-	var zv = ht.IndexFind(int(h))
+	var zv *Zval
+	zv = ZendHashIndexFind(ht, h)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -401,21 +400,21 @@ func ZendHashIndexFindPtr(ht *HashTable, h ZendUlong) any {
 	}
 }
 func ZendHashIndexFindDeref(ht *HashTable, h ZendUlong) *Zval {
-	var zv = ht.IndexFind(int(h))
+	var zv = ht.IndexFindH(h)
 	if zv != nil {
 		ZVAL_DEREF(zv)
 	}
 	return zv
 }
 func ZendHashFindDeref(ht *HashTable, str *ZendString) *Zval {
-	var zv *Zval = ht.FindByZendString(str)
+	var zv *Zval = ht.KeyFind(str.GetStr())
 	if zv != nil {
 		ZVAL_DEREF(zv)
 	}
 	return zv
 }
 func ZendHashStrFindDeref(ht *HashTable, str string, len_ int) *Zval {
-	var zv *Zval = ht.FindByStrPtr(str, len_)
+	var zv *Zval = ht.KeyFind(b.CastStr(str, len_))
 	if zv != nil {
 		ZVAL_DEREF(zv)
 	}
@@ -1051,7 +1050,7 @@ func ZendHashApplyWithArguments(ht *HashTable, apply_func ApplyFuncArgsT, num_ar
 		result = apply_func(p.GetVal(), num_args, args, &hash_key)
 		if (result & ZEND_HASH_APPLY_REMOVE) != 0 {
 			ht.assertRc1()
-			_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
+			ht.deleteBucket(HT_IDX_TO_HASH(idx))
 		}
 		if (result & ZEND_HASH_APPLY_STOP) != 0 {
 			break
@@ -1072,7 +1071,7 @@ func ZendHashReverseApply(ht *HashTable, apply_func ApplyFuncT) {
 		result = apply_func(p.GetVal())
 		if (result & ZEND_HASH_APPLY_REMOVE) != 0 {
 			ht.assertRc1()
-			_zendHashDelEl(ht, HT_IDX_TO_HASH(idx), p)
+			ht.deleteBucket(HT_IDX_TO_HASH(idx))
 		}
 		if (result & ZEND_HASH_APPLY_STOP) != 0 {
 			break
@@ -1316,8 +1315,8 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 		}
 	}
 }
-func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval { return ht.FindByStrPtr(str, len_) }
-func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval       { return ht.IndexFind(int(h)) }
+func ZendHashStrFind(ht *HashTable, str string) *Zval    { return ht.KeyFind(str) }
+func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval { return ht.IndexFindH(h) }
 func ZendHashInternalPointerResetEx(ht *HashTable, pos *HashPosition) {
 	*pos = _zendHashGetValidPos(ht, 0)
 }
@@ -1576,7 +1575,7 @@ func ZendHashCompareImpl(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, or
 					return 1
 				}
 			} else {
-				pData2 = ht2.FindByZendString(p1.GetKey())
+				pData2 = ht2.KeyFind(p1.GetKey().GetStr())
 				if pData2 == nil {
 					return 1
 				}

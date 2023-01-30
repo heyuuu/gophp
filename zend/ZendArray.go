@@ -289,7 +289,7 @@ func (this *ZendArray) resetHash() {
 }
 
 /**
- * 读接口
+ * Bucket 相关读接口
  */
 func (this *ZendArray) Bucket(pos uint32) *Bucket { return &this.data[pos] }
 
@@ -307,6 +307,9 @@ func (this *ZendArray) KeyFindBucket(key string) *Bucket {
 	return nil
 }
 
+func (this *ZendArray) IndexFindH(h ZendUlong) *Zval {
+	return this.IndexFind(int(h))
+}
 func (this *ZendArray) IndexFind(index int) *Zval {
 	var p = this.IndexFindBucket(index)
 	if p != nil {
