@@ -289,6 +289,55 @@ func (this *ZendArray) resetHash() {
 }
 
 /**
+ * 读接口
+ */
+func (this *ZendArray) Bucket(pos uint32) *Bucket { return &this.data[pos] }
+
+func (this *ZendArray) IndexFindBucket(index int) *Bucket {
+	if pos, ok := this.indexMap[index]; ok {
+		return &this.data[pos]
+	}
+	return nil
+}
+
+func (this *ZendArray) KeyFindBucket(key string) *Bucket {
+	if pos, ok := this.keyMap[key]; ok {
+		return &this.data[pos]
+	}
+	return nil
+}
+
+func (this *ZendArray) IndexFind(index int) *Zval {
+	var p = this.IndexFindBucket(index)
+	if p != nil {
+		return p.GetVal()
+	}
+	return nil
+}
+
+func (this *ZendArray) KeyFind(key string) *Zval {
+	var p = this.KeyFindBucket(key)
+	if p != nil {
+		return p.GetVal()
+	}
+	return nil
+}
+
+func (this *ZendArray) IndexExists(index int) bool {
+	if _, ok := this.indexMap[index]; ok {
+		return true
+	}
+	return false
+}
+
+func (this *ZendArray) KeyExists(key string) bool {
+	if _, ok := this.keyMap[key]; ok {
+		return true
+	}
+	return false
+}
+
+/**
  * Add / Update by IndexKey
  */
 
@@ -299,7 +348,7 @@ func (this *ZendArray) IndexAddH(h ZendUlong, pData *Zval) *Zval {
 func (this *ZendArray) IndexAdd(index int, pData *Zval) *Zval {
 	this.assertRc1()
 
-	if this.ExistsByIndex(index) {
+	if this.IndexExists(index) {
 		return nil
 	}
 
@@ -327,7 +376,7 @@ func (this *ZendArray) IndexUpdate(index int, pData *Zval) *Zval {
 
 	var p *Bucket
 
-	p = this.FindBucketByIndex(index)
+	p = this.IndexFindBucket(index)
 	if p != nil {
 		if this.pDestructor != nil {
 			this.pDestructor(p.GetVal())
@@ -346,7 +395,7 @@ func (this *ZendArray) NextIndexInsert(pData *Zval) *Zval {
 
 	var index = this.nNextFreeElement
 
-	if this.ExistsByIndex(index) {
+	if this.IndexExists(index) {
 		return nil
 	}
 
@@ -370,7 +419,7 @@ func (this *ZendArray) NextIndexInsertNew(pData *Zval) *Zval {
 // KeyAdd
 func (this *ZendArray) KeyAdd(key string, pData *Zval) *Zval {
 	this.assertRc1()
-	if this.ExistsByStr(key) {
+	if this.KeyExists(key) {
 		return nil
 	}
 
@@ -391,7 +440,7 @@ func (this *ZendArray) KeyAddNew(key string, pData *Zval) *Zval {
 func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 	this.assertRc1()
 
-	var p = this.FindBucketByStr(strKey)
+	var p = this.KeyFindBucket(strKey)
 	if p != nil {
 		var data *Zval
 		ZEND_ASSERT(p.GetVal() != pData)
@@ -420,7 +469,7 @@ func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 func (this *ZendArray) KeyUpdate(key string, pData *Zval) *Zval {
 	this.assertRc1()
 
-	var p = this.FindBucketByStr(key)
+	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		ZEND_ASSERT(p.GetVal() != pData)
@@ -441,7 +490,7 @@ func (this *ZendArray) KeyUpdate(key string, pData *Zval) *Zval {
 func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 	this.assertRc1()
 
-	var p = this.FindBucketByStr(key)
+	var p = this.KeyFindBucket(key)
 	if p != nil {
 		var data *Zval
 		ZEND_ASSERT(p.GetVal() != pData)

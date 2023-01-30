@@ -23,15 +23,15 @@ func ZEND_HASH_INDEX_FIND(_ht *HashTable, _h ZendUlong, _ret *Zval, _not_found _
 	}
 }
 func ZendHashExists(ht *HashTable, key *ZendString) ZendBool {
-	var exists = ht.ExistsByZendString(key)
+	var exists = ht.KeyExists(key.GetStr())
 	return intBool(exists)
 }
 func ZendHashStrExists(ht *HashTable, str *byte, len_ int) ZendBool {
-	var exists = ht.ExistsByStrPtr(str, len_)
+	var exists = ht.KeyExists(b.CastStr(str, len_))
 	return intBool(exists)
 }
 func ZendHashIndexExists(ht *HashTable, h ZendUlong) ZendBool {
-	var exists = ht.ExistsByIndex(int(h))
+	var exists = ht.IndexExists(int(h))
 	return intBool(exists)
 }
 func ZendHashHasMoreElementsEx(ht *HashTable, pos *HashPosition) ZEND_RESULT_CODE {
@@ -393,7 +393,7 @@ func ZendHashStrFindPtr(ht *HashTable, str string, len_ int) any {
 	}
 }
 func ZendHashIndexFindPtr(ht *HashTable, h ZendUlong) any {
-	var zv = ht.FindByIndex(int(h))
+	var zv = ht.IndexFind(int(h))
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -401,7 +401,7 @@ func ZendHashIndexFindPtr(ht *HashTable, h ZendUlong) any {
 	}
 }
 func ZendHashIndexFindDeref(ht *HashTable, h ZendUlong) *Zval {
-	var zv = ht.FindByIndex(int(h))
+	var zv = ht.IndexFind(int(h))
 	if zv != nil {
 		ZVAL_DEREF(zv)
 	}
@@ -629,7 +629,7 @@ func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
 	var p *Bucket
 	var arData *Bucket
 	ht.assertRc1()
-	p = ht.FindBucketByZendString(key)
+	p = ht.KeyFindBucket(key.GetStr())
 	if p != nil {
 		if p == b {
 			return p.GetVal()
@@ -1317,7 +1317,7 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 	}
 }
 func ZendHashStrFind(ht *HashTable, str *byte, len_ int) *Zval { return ht.FindByStrPtr(str, len_) }
-func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval       { return ht.FindByIndex(int(h)) }
+func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval       { return ht.IndexFind(int(h)) }
 func ZendHashInternalPointerResetEx(ht *HashTable, pos *HashPosition) {
 	*pos = _zendHashGetValidPos(ht, 0)
 }
