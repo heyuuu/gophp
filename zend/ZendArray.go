@@ -89,9 +89,10 @@ func (this *Bucket) SetVal(zval *Zval)   { ZVAL_COPY_VALUE(&this.val, zval) }
 func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
 func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
 
-func (this *Bucket) IsStrKey() bool { return this.key.IsStrKey() }
-func (this *Bucket) StrKey() string { return this.key.GetKey() }
-func (this *Bucket) IndexKey() int  { return this.key.GetIndex() }
+func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
+func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
+func (this *Bucket) StrKey() string   { return this.key.GetKey() }
+func (this *Bucket) IndexKey() int    { return this.key.GetIndex() }
 
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove

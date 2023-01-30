@@ -273,18 +273,19 @@ func (this *ZendArray) Exists(key ZendArrayKey) bool {
 }
 
 func (this *ZendArray) appendBucket(bucket *Bucket) *Bucket {
-	var idx = uint32(len(this.data))
+	// 尝试 resize
+	this.ifFullDoResize()
 
+	// 添加到 data
+	var idx = uint32(len(this.data))
 	this.nNumOfElements++
 	this.data = append(this.data, *bucket)
 
-	if bucket.IsStrKey() {
-		var strKey = bucket.StrKey()
-		this.keyMap[strKey] = idx
-	} else {
-		var indexKey = bucket.IndexKey()
-		this.indexMap[indexKey] = idx
+	// 更新 map
+	this.addHash(bucket.key, idx)
 
+	if bucket.IsIndexKey() {
+		var indexKey = bucket.IndexKey()
 		// 更新 nNextFreeElement
 		if indexKey > this.nNextFreeElement {
 			if indexKey < ZEND_LONG_MAX {
@@ -359,8 +360,6 @@ func (this *ZendArray) addOrUpdate(strKey string, pData *Zval, flag uint32) *Zva
 	}
 
 	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-	this.ifFullDoResize()
-
 	var p = this.appendBucketStr(strKey, pData)
 	return p.GetVal()
 }
@@ -384,7 +383,6 @@ func (this *ZendArray) indexAddOrUpdate(indexKey int, pData *Zval, flag uint32) 
 			return p.GetVal()
 		}
 	}
-	this.ifFullDoResize()
 
 	var p = this.appendBucketIndex(indexKey, pData)
 
