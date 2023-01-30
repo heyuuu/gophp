@@ -17,7 +17,7 @@ func ZendListInsert(ptr any, type_ int) *Zval {
 		ZendErrorNoreturn(E_ERROR, "Resource ID space overflow")
 	}
 	ZVAL_NEW_RES(&zv, index, ptr, type_)
-	return ZendHashIndexAddNew(__EG().GetRegularList(), index, &zv)
+	return __EG().GetRegularList().IndexAddNewH(index, &zv)
 }
 func ZendListDelete(res *ZendResource) int {
 	if res.DelRefcount() <= 0 {
@@ -196,7 +196,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 	lde.SetResourceId(ListDestructors.GetNNextFreeElement())
 	lde.SetTypeName(type_name)
 	ZVAL_PTR(&zv, lde)
-	if ZendHashNextIndexInsert(&ListDestructors, &zv) == nil {
+	if ListDestructors.NextIndexInsert(&zv) == nil {
 		return FAILURE
 	}
 	return ListDestructors.GetNNextFreeElement() - 1

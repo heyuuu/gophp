@@ -3259,19 +3259,19 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Store numeric indexes in proper order */
 
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_dev)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_ino)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_mode)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_nlink)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_uid)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_gid)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_rdev)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_size)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_atime)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_mtime)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_ctime)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_blksize)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &stat_blocks)
+	return_value.GetArr().NextIndexInsert(&stat_dev)
+	return_value.GetArr().NextIndexInsert(&stat_ino)
+	return_value.GetArr().NextIndexInsert(&stat_mode)
+	return_value.GetArr().NextIndexInsert(&stat_nlink)
+	return_value.GetArr().NextIndexInsert(&stat_uid)
+	return_value.GetArr().NextIndexInsert(&stat_gid)
+	return_value.GetArr().NextIndexInsert(&stat_rdev)
+	return_value.GetArr().NextIndexInsert(&stat_size)
+	return_value.GetArr().NextIndexInsert(&stat_atime)
+	return_value.GetArr().NextIndexInsert(&stat_mtime)
+	return_value.GetArr().NextIndexInsert(&stat_ctime)
+	return_value.GetArr().NextIndexInsert(&stat_blksize)
+	return_value.GetArr().NextIndexInsert(&stat_blocks)
 
 	/* Store string indexes referencing the same zval*/
 

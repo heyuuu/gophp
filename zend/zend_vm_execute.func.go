@@ -1380,7 +1380,7 @@ add_unpack_again:
 					val = Z_REFVAL_P(val)
 				}
 				Z_TRY_ADDREF_P(val)
-				if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), val) == nil {
+				if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)
 					break
@@ -1427,7 +1427,7 @@ add_unpack_again:
 				}
 				ZVAL_DEREF(val)
 				Z_TRY_ADDREF_P(val)
-				if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), val) == nil {
+				if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(val) == nil {
 					ZendCannotAddElement()
 					ZvalPtrDtorNogc(val)
 				}
@@ -2907,7 +2907,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			if IS_CONST == IS_CONST || expr.GetType() != IS_OBJECT || Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != IS_NULL {
 					ZVAL_ARR(result, ZendNewArray(1))
-					expr = ZendHashIndexAddNew(result.GetArr(), 0, expr)
+					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CONST == IS_CONST {
 						if Z_OPT_REFCOUNTED_P(expr) {
 							Z_ADDREF_P(expr)
@@ -4779,7 +4779,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -4808,7 +4808,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -6753,7 +6753,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -6783,7 +6783,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 		}
 		ZvalPtrDtorNogc(free_op2)
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -7615,7 +7615,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_UNUSED&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -7644,7 +7644,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -8920,7 +8920,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -8949,7 +8949,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -15408,7 +15408,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			if IS_TMP_VAR == IS_CONST || expr.GetType() != IS_OBJECT || Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != IS_NULL {
 					ZVAL_ARR(result, ZendNewArray(1))
-					expr = ZendHashIndexAddNew(result.GetArr(), 0, expr)
+					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_TMP_VAR == IS_CONST {
 						if Z_OPT_REFCOUNTED_P(expr) {
 							Z_ADDREF_P(expr)
@@ -16015,7 +16015,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -16044,7 +16044,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -16436,7 +16436,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -16466,7 +16466,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		}
 		ZvalPtrDtorNogc(free_op2)
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -16914,7 +16914,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_UNUSED&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -16943,7 +16943,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -17303,7 +17303,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -17332,7 +17332,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -18217,7 +18217,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			if IS_VAR == IS_CONST || expr.GetType() != IS_OBJECT || Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != IS_NULL {
 					ZVAL_ARR(result, ZendNewArray(1))
-					expr = ZendHashIndexAddNew(result.GetArr(), 0, expr)
+					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_VAR == IS_CONST {
 						if Z_OPT_REFCOUNTED_P(expr) {
 							Z_ADDREF_P(expr)
@@ -19158,7 +19158,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) in
 	assign_dim_op_new_array:
 		dim = RT_CONSTANT(opline, opline.GetOp2())
 		if IS_CONST == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -19979,7 +19979,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -20086,7 +20086,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -20199,7 +20199,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -20312,7 +20312,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -20744,7 +20744,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -20773,7 +20773,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -21228,7 +21228,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) i
 	assign_dim_op_new_array:
 		dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		if (IS_TMP_VAR | IS_VAR) == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -22079,7 +22079,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(execute_data *ZendExe
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -22187,7 +22187,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(execute_data *ZendExecu
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -22301,7 +22301,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *ZendExecu
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -22415,7 +22415,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(execute_data *ZendExecut
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -22755,7 +22755,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -22785,7 +22785,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 		}
 		ZvalPtrDtorNogc(free_op2)
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -23441,7 +23441,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) i
 	assign_dim_op_new_array:
 		dim = nil
 		if IS_UNUSED == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -23563,7 +23563,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(execute_data *ZendExe
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -23670,7 +23670,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(execute_data *ZendExecu
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -23783,7 +23783,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(execute_data *ZendExecu
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -23896,7 +23896,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(execute_data *ZendExecut
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -24233,7 +24233,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_UNUSED&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -24262,7 +24262,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -24610,7 +24610,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 	assign_dim_op_new_array:
 		dim = EX_VAR(opline.GetOp2().GetVar())
 		if IS_CV == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -25431,7 +25431,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(execute_data *ZendExecute
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -25538,7 +25538,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(execute_data *ZendExecuteDa
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -25651,7 +25651,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(execute_data *ZendExecuteDa
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -25764,7 +25764,7 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(execute_data *ZendExecuteDat
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -26157,7 +26157,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -26186,7 +26186,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -32786,7 +32786,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if IS_CV == IS_CONST || expr.GetType() != IS_OBJECT || Z_OBJCE_P(expr) == ZendCeClosure {
 				if expr.GetType() != IS_NULL {
 					ZVAL_ARR(result, ZendNewArray(1))
-					expr = ZendHashIndexAddNew(result.GetArr(), 0, expr)
+					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CV == IS_CONST {
 						if Z_OPT_REFCOUNTED_P(expr) {
 							Z_ADDREF_P(expr)
@@ -34017,7 +34017,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int
 	assign_dim_op_new_array:
 		dim = RT_CONSTANT(opline, opline.GetOp2())
 		if IS_CONST == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -35005,7 +35005,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(execute_data *ZendExecu
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -35108,7 +35108,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(execute_data *ZendExecute
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -35217,7 +35217,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(execute_data *ZendExecute
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -35326,7 +35326,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(execute_data *ZendExecuteD
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -35792,7 +35792,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CONST&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -35821,7 +35821,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -37071,7 +37071,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) in
 	assign_dim_op_new_array:
 		dim = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		if (IS_TMP_VAR | IS_VAR) == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -38092,7 +38092,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -38196,7 +38196,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -38306,7 +38306,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -38416,7 +38416,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -38862,7 +38862,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if ((IS_TMP_VAR|IS_VAR)&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -38892,7 +38892,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 		}
 		ZvalPtrDtorNogc(free_op2)
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -39682,7 +39682,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) in
 	assign_dim_op_new_array:
 		dim = nil
 		if IS_UNUSED == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -39899,7 +39899,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -40002,7 +40002,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -40111,7 +40111,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -40220,7 +40220,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -40363,7 +40363,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_UNUSED&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -40392,7 +40392,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -41499,7 +41499,7 @@ func ZEND_ASSIGN_DIM_OP_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 	assign_dim_op_new_array:
 		dim = EX_VAR(opline.GetOp2().GetVar())
 		if IS_CV == IS_UNUSED {
-			var_ptr = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			var_ptr = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if var_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_op_ret_null
@@ -42484,7 +42484,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(execute_data *ZendExecuteD
 			if IS_CONST == IS_CV || IS_CONST == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -42587,7 +42587,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(execute_data *ZendExecuteDat
 			if IS_TMP_VAR == IS_CV || IS_TMP_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -42696,7 +42696,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(execute_data *ZendExecuteDat
 			if IS_VAR == IS_CV || IS_VAR == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -42805,7 +42805,7 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(execute_data *ZendExecuteData
 			if IS_CV == IS_CV || IS_CV == IS_VAR {
 				ZVAL_DEREF(value)
 			}
-			variable_ptr = ZendHashNextIndexInsert(object_ptr.GetArr(), value)
+			variable_ptr = object_ptr.GetArr().NextIndexInsert(value)
 			if variable_ptr == nil {
 				ZendCannotAddElement()
 				goto assign_dim_error
@@ -43291,7 +43291,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 		} else if offset.IsType(IS_LONG) {
 			hval = offset.GetLval()
 		num_index:
-			ZendHashIndexUpdate(EX_VAR(opline.GetResult().GetVar()).GetArr(), hval, expr_ptr)
+			EX_VAR(opline.GetResult().GetVar()).GetArr().IndexUpdateH(hval, expr_ptr)
 		} else if (IS_CV&(IS_VAR|IS_CV)) != 0 && offset.IsType(IS_REFERENCE) {
 			offset = Z_REFVAL_P(offset)
 			goto add_again
@@ -43320,7 +43320,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 			ZvalPtrDtorNogc(expr_ptr)
 		}
 	} else {
-		if ZendHashNextIndexInsert(EX_VAR(opline.GetResult().GetVar()).GetArr(), expr_ptr) == nil {
+		if EX_VAR(opline.GetResult().GetVar()).GetArr().NextIndexInsert(expr_ptr) == nil {
 			ZendCannotAddElement()
 			ZvalPtrDtorNogc(expr_ptr)
 		}
@@ -47210,7 +47210,7 @@ func InitOpcodeSerialiser() {
 	tmp.SetTypeInfo(IS_LONG)
 	for i = 0; i < ZendHandlersCount; i++ {
 		tmp.SetLval(i)
-		ZendHashIndexAdd(ZendHandlersTable, ZendLong(ZendUintptrT(ZendOpcodeHandlers[i])), &tmp)
+		ZendHandlersTable.IndexAddH(ZendLong(ZendUintptrT(ZendOpcodeHandlers[i])), &tmp)
 	}
 }
 func ZendSerializeOpcodeHandler(op *ZendOp) {

@@ -921,7 +921,7 @@ func _tryConvertToString(op *Zval) ZendBool {
 }
 func ConvertScalarToArray(op *Zval) {
 	var ht *HashTable = ZendNewArray(1)
-	ZendHashIndexAddNew(ht, 0, op)
+	ht.IndexAddNewH(0, op)
 	ZVAL_ARR(op, ht)
 }
 func ConvertToArray(op *Zval) {

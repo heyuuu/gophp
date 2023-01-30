@@ -648,7 +648,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 			var tmp zend.Zval
 			zend.ArrayInit(return_value)
 			zend.ZVAL_STR_COPY(&tmp, zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))
-			zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
+			return_value.GetArr().NextIndexInsertNew(&tmp)
 			return
 		}
 		zend.RETVAL_FALSE

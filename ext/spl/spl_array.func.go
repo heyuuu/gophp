@@ -273,7 +273,7 @@ try_again:
 			case zend.BP_VAR_W:
 				var value zend.Zval
 				zend.ZVAL_UNDEF(&value)
-				retval = zend.ZendHashIndexUpdate(ht, index, &value)
+				retval = ht.IndexUpdateH(index, &value)
 			}
 		}
 		return retval
@@ -352,7 +352,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *zend.Zval, offset *ze
 	zend.Z_TRY_ADDREF_P(value)
 	if offset == nil {
 		ht = SplArrayGetHashTable(intern)
-		zend.ZendHashNextIndexInsert(ht, value)
+		ht.NextIndexInsert(value)
 		return
 	}
 try_again:
@@ -377,11 +377,11 @@ try_again:
 		index = offset.GetLval()
 	num_index:
 		ht = SplArrayGetHashTable(intern)
-		zend.ZendHashIndexUpdate(ht, index, value)
+		ht.IndexUpdateH(index, value)
 		return
 	case zend.IS_NULL:
 		ht = SplArrayGetHashTable(intern)
-		zend.ZendHashNextIndexInsert(ht, value)
+		ht.NextIndexInsert(value)
 		return
 	case zend.IS_REFERENCE:
 		zend.ZVAL_DEREF(offset)
@@ -1461,7 +1461,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	/* flags */
 
 	zend.ZVAL_LONG(&tmp, intern.GetArFlags()&SPL_ARRAY_CLONE_MASK)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* storage */
 
@@ -1470,13 +1470,13 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	} else {
 		zend.ZVAL_COPY(&tmp, intern.GetArray())
 	}
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* iterator class */
 
@@ -1485,7 +1485,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	} else {
 		zend.ZVAL_STR_COPY(&tmp, intern.GetCeGetIterator().GetName())
 	}
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_Array___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplArrayObject = Z_SPLARRAY_P(zend.ZEND_THIS)

@@ -348,7 +348,7 @@ func ZendAstListAdd(ast *ZendAst, op *ZendAst) *ZendAst {
 func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 	switch offset.GetType() {
 	case IS_UNDEF:
-		if ZendHashNextIndexInsert(result.GetArr(), expr) == nil {
+		if result.GetArr().NextIndexInsert(expr) == nil {
 			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
@@ -361,20 +361,20 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 		ZendSymtableUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), expr)
 		break
 	case IS_LONG:
-		ZendHashIndexUpdate(result.GetArr(), offset.GetLval(), expr)
+		result.GetArr().IndexUpdateH(offset.GetLval(), expr)
 		break
 	case IS_FALSE:
-		ZendHashIndexUpdate(result.GetArr(), 0, expr)
+		result.GetArr().IndexUpdateH(0, expr)
 		break
 	case IS_TRUE:
-		ZendHashIndexUpdate(result.GetArr(), 1, expr)
+		result.GetArr().IndexUpdateH(1, expr)
 		break
 	case IS_DOUBLE:
-		ZendHashIndexUpdate(result.GetArr(), ZendDvalToLval(offset.GetDval()), expr)
+		result.GetArr().IndexUpdateH(ZendDvalToLval(offset.GetDval()), expr)
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
-		ZendHashIndexUpdate(result.GetArr(), Z_RES_HANDLE_P(offset), expr)
+		result.GetArr().IndexUpdateH(Z_RES_HANDLE_P(offset), expr)
 		break
 	default:
 		ZendThrowError(nil, "Illegal offset type")
@@ -397,7 +397,7 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 				ZendThrowError(nil, "Cannot unpack array with string keys")
 				return FAILURE
 			} else {
-				if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
+				if result.GetArr().NextIndexInsert(val) == nil {
 					ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}

@@ -184,7 +184,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 			}
 			if index == nil {
 				zend.ArrayInit(&gpc_element)
-				if b.Assign(&gpc_element_p, zend.ZendHashNextIndexInsert(symtable1, &gpc_element)) == nil {
+				if b.Assign(&gpc_element_p, symtable1.NextIndexInsert(&gpc_element)) == nil {
 					zend.ZendArrayDestroy(gpc_element.GetArr())
 					zend.ZvalPtrDtorNogc(val)
 					zend.FreeAlloca(var_orig, use_heap)
@@ -225,7 +225,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 	} else {
 	plain_var:
 		if index == nil {
-			if zend.ZendHashNextIndexInsert(symtable1, val) == nil {
+			if symtable1.NextIndexInsert(val) == nil {
 				zend.ZvalPtrDtorNogc(val)
 			}
 		} else {
@@ -241,7 +241,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 			if PG(http_globals)[TRACK_VARS_COOKIE].u1.v.type_ != zend.IS_UNDEF && symtable1 == PG(http_globals)[TRACK_VARS_COOKIE].GetArr() && zend.ZendSymtableStrExists(symtable1, index, index_len) != 0 {
 				zend.ZvalPtrDtorNogc(val)
 			} else if zend.ZEND_HANDLE_NUMERIC_STR(index, index_len, &idx) {
-				zend.ZendHashIndexUpdate(symtable1, idx, val)
+				symtable1.IndexUpdateH(idx, val)
 			} else {
 				PhpRegisterVariableQuick(index, index_len, val, symtable1)
 			}
@@ -512,7 +512,7 @@ func ImportEnvironmentVariable(ht *zend.HashTable, env *byte) {
 		zend.ZVAL_NEW_STR(&val, zend.ZendStringInit(p, len_, 0))
 	}
 	if zend.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
-		zend.ZendHashIndexUpdate(ht, idx, &val)
+		ht.IndexUpdateH(idx, &val)
 	} else {
 		PhpRegisterVariableQuick(env, name_len, &val, ht)
 	}
@@ -547,7 +547,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 		var i int
 		for i = 0; i < SG(request_info).argc; i++ {
 			zend.ZVAL_STRING(&tmp, SG(request_info).argv[i])
-			if zend.ZendHashNextIndexInsert(arr.GetArr(), &tmp) == nil {
+			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				zend.ZendStringEfree(tmp.GetStr())
 			}
 		}
@@ -563,7 +563,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 
 			zend.ZVAL_STRING(&tmp, ss)
 			count++
-			if zend.ZendHashNextIndexInsert(arr.GetArr(), &tmp) == nil {
+			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				zend.ZendStringEfree(tmp.GetStr())
 			}
 			if space != nil {
@@ -652,7 +652,7 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 					zend.Z_TRY_DELREF_P(src_entry)
 				}
 			} else {
-				zend.ZendHashIndexUpdate(dest, num_key, src_entry)
+				dest.IndexUpdateH(num_key, src_entry)
 			}
 		} else {
 			zend.SEPARATE_ARRAY(dest_entry)

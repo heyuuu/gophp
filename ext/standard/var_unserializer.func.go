@@ -344,9 +344,9 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 					//??? update hash
 
 					VarPushDtor(var_hash, old_data)
-					data = zend.ZendHashIndexUpdate(ht, idx, &d)
+					data = ht.IndexUpdateH(idx, &d)
 				} else {
-					data = zend.ZendHashIndexAddNew(ht, idx, &d)
+					data = ht.IndexAddNewH(idx, &d)
 				}
 			} else if key.IsType(zend.IS_STRING) {
 				if zend.ZEND_HANDLE_NUMERIC(key.GetStr(), &idx) {

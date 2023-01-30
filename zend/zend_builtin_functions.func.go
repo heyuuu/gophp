@@ -669,7 +669,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	if Z_REFCOUNTED_P(entry) {
 		entry.GetCounted().AddRefcountEx(2)
 	}
-	ZendHashIndexAddNew(return_value.GetArr(), 1, entry)
+	return_value.GetArr().IndexAddNewH(1, entry)
 	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_VALUE), entry)
 
 	/* add the key elements */
@@ -680,7 +680,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		ZVAL_LONG(&tmp, num_key)
 	}
-	ZendHashIndexAddNew(return_value.GetArr(), 0, &tmp)
+	return_value.GetArr().IndexAddNewH(0, &tmp)
 	ZendHashAddNew(return_value.GetArr(), ZSTR_KNOWN(ZEND_STR_KEY), &tmp)
 	ZendHashMoveForward(target_hash)
 }
@@ -854,7 +854,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 		if key != nil {
 			new_val = ZendHashAddNew(dst.GetArr(), key, val)
 		} else {
-			new_val = ZendHashIndexAddNew(dst.GetArr(), idx, val)
+			new_val = dst.GetArr().IndexAddNewH(idx, val)
 		}
 		if val.IsType(IS_ARRAY) {
 			if Z_REFCOUNTED_P(val) {
@@ -1486,7 +1486,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 
-				ZendHashIndexAdd(return_value.GetArr(), num_key, value)
+				return_value.GetArr().IndexAddH(num_key, value)
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
 
@@ -1639,10 +1639,10 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
 			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
 				ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
-				ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
+				return_value.GetArr().NextIndexInsertNew(&method_name)
 			} else {
 				ZVAL_STR_COPY(&method_name, mptr.GetFunctionName())
-				ZendHashNextIndexInsertNew(return_value.GetArr(), &method_name)
+				return_value.GetArr().NextIndexInsertNew(&method_name)
 			}
 		}
 	}
@@ -2336,7 +2336,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			val = _z
 			if key == nil {
 				Z_ADDREF_P(val)
-				ZendHashIndexAddNew(return_value.GetArr(), index, val)
+				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
 	} else if ZendStringEqualsLiteral(type_, "Unknown") {
@@ -2350,7 +2350,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			val = _z
 			if key == nil && Z_RES_TYPE_P(val) <= 0 {
 				Z_ADDREF_P(val)
-				ZendHashIndexAddNew(return_value.GetArr(), index, val)
+				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
 	} else {
@@ -2370,7 +2370,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			val = _z
 			if key == nil && Z_RES_TYPE_P(val) == id {
 				Z_ADDREF_P(val)
-				ZendHashIndexAddNew(return_value.GetArr(), index, val)
+				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
 	}
@@ -2958,13 +2958,13 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				*/
 
 				ZVAL_STR_COPY(&tmp, include_filename)
-				ZendHashNextIndexInsertNew(arg_array.GetArr(), &tmp)
+				arg_array.GetArr().NextIndexInsertNew(&tmp)
 				ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_ARGS), &arg_array)
 			}
 			ZVAL_INTERNED_STR(&tmp, pseudo_function_name)
 			ZendHashAddNew(stack_frame.GetArr(), ZSTR_KNOWN(ZEND_STR_FUNCTION), &tmp)
 		}
-		ZendHashNextIndexInsertNew(return_value.GetArr(), &stack_frame)
+		return_value.GetArr().NextIndexInsertNew(&stack_frame)
 		include_filename = filename
 		call = skip
 		ptr = skip.GetPrevExecuteData()

@@ -630,17 +630,17 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 
 		elem = _z.GetPtr()
 		zend.Z_TRY_ADDREF(elem.GetObj())
-		zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetObj())
+		tmp.GetArr().NextIndexInsert(elem.GetObj())
 		zend.Z_TRY_ADDREF(elem.GetInf())
-		zend.ZendHashNextIndexInsert(tmp.GetArr(), elem.GetInf())
+		tmp.GetArr().NextIndexInsert(elem.GetInf())
 	}
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)

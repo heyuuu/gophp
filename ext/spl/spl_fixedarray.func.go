@@ -88,10 +88,10 @@ func SplFixedarrayObjectGetProperties(obj *zend.Zval) *zend.HashTable {
 		var j zend.ZendLong = ht.GetNNumOfElements()
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
-				zend.ZendHashIndexUpdate(ht, i, intern.GetArray().GetElements()[i])
+				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
-				zend.ZendHashIndexUpdate(ht, i, zend.__EG().GetUninitializedZval())
+				ht.IndexUpdateH(i, zend.__EG().GetUninitializedZval())
 			}
 		}
 		if j > intern.GetArray().GetSize() {
@@ -451,10 +451,10 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 		zend.ArrayInit(return_value)
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
-				zend.ZendHashIndexUpdate(return_value.GetArr(), i, intern.GetArray().GetElements()[i])
+				return_value.GetArr().IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
-				zend.ZendHashIndexUpdate(return_value.GetArr(), i, zend.__EG().GetUninitializedZval())
+				return_value.GetArr().IndexUpdateH(i, zend.__EG().GetUninitializedZval())
 			}
 		}
 	} else {

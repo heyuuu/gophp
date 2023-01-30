@@ -2976,7 +2976,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				if val.IsType(IS_STRING) {
 					ZendHashAdd(dst, val.GetStr(), &tmp)
 				} else if val.IsType(IS_LONG) {
-					ZendHashIndexAdd(dst, val.GetLval(), &tmp)
+					dst.IndexAddH(val.GetLval(), &tmp)
 				} else {
 					ZendArrayDestroy(dst)
 					ok = 0
@@ -4085,7 +4085,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 				ZVAL_LONG(&jmp_target, GetNextOpNumber())
 				ZEND_ASSERT(cond_zv.IsType(jumptable_type))
 				if cond_zv.IsType(IS_LONG) {
-					ZendHashIndexAdd(jumptable, cond_zv.GetLval(), &jmp_target)
+					jumptable.IndexAddH(cond_zv.GetLval(), &jmp_target)
 				} else {
 					ZEND_ASSERT(cond_zv.IsType(IS_STRING))
 					ZendHashAdd(jumptable, cond_zv.GetStr(), &jmp_target)
@@ -5965,7 +5965,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 					if key != nil {
 						ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot unpack array with string keys")
 					}
-					if ZendHashNextIndexInsert(result.GetArr(), val) == nil {
+					if result.GetArr().NextIndexInsert(val) == nil {
 						ZvalPtrDtor(result)
 						return 0
 					}
@@ -5982,19 +5982,19 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 			var key *Zval = ZendAstGetZval(key_ast)
 			switch key.GetType() {
 			case IS_LONG:
-				ZendHashIndexUpdate(result.GetArr(), key.GetLval(), value)
+				result.GetArr().IndexUpdateH(key.GetLval(), value)
 				break
 			case IS_STRING:
 				ZendSymtableUpdate(result.GetArr(), key.GetStr(), value)
 				break
 			case IS_DOUBLE:
-				ZendHashIndexUpdate(result.GetArr(), ZendDvalToLval(key.GetDval()), value)
+				result.GetArr().IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
 				break
 			case IS_FALSE:
-				ZendHashIndexUpdate(result.GetArr(), 0, value)
+				result.GetArr().IndexUpdateH(0, value)
 				break
 			case IS_TRUE:
-				ZendHashIndexUpdate(result.GetArr(), 1, value)
+				result.GetArr().IndexUpdateH(1, value)
 				break
 			case IS_NULL:
 				ZendHashUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), value)
@@ -6004,7 +6004,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 				break
 			}
 		} else {
-			if ZendHashNextIndexInsert(result.GetArr(), value) == nil {
+			if result.GetArr().NextIndexInsert(value) == nil {
 				ZvalPtrDtorNogc(value)
 				ZvalPtrDtor(result)
 				return 0

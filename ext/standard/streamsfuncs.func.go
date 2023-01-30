@@ -1290,7 +1290,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 		if zend.SUCCESS == core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD_FOR_SELECT|core.PHP_STREAM_CAST_INTERNAL, any(&this_fd), 1) && this_fd != core.SOCK_ERR {
 			if core.PHP_SAFE_FD_ISSET(this_fd, fds) {
 				if key == nil {
-					dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
+					dest_elem = ht.IndexUpdateH(num_ind, elem)
 				} else {
 					dest_elem = zend.ZendHashUpdate(ht, key, elem)
 				}
@@ -1348,7 +1348,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 			 * */
 
 			if key == nil {
-				dest_elem = zend.ZendHashIndexUpdate(ht, num_ind, elem)
+				dest_elem = ht.IndexUpdateH(num_ind, elem)
 			} else {
 				dest_elem = zend.ZendHashUpdate(ht, key, elem)
 			}

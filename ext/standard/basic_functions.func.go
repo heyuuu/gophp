@@ -1252,9 +1252,9 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				zend.ZendHashNextIndexInsert(args.GetArr(), &val)
+				args.GetArr().NextIndexInsert(&val)
 			} else {
-				zend.ZendHashIndexUpdate(return_value.GetArr(), optname_int, &val)
+				return_value.GetArr().IndexUpdateH(optname_int, &val)
 			}
 		} else {
 
@@ -1264,7 +1264,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
-				zend.ZendHashNextIndexInsert(args.GetArr(), &val)
+				args.GetArr().NextIndexInsert(&val)
 			} else {
 				zend.ZendHashStrAdd(return_value.GetArr(), optname, strlen(optname), &val)
 			}
@@ -4196,7 +4196,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			var key zend.ZendUlong = zend.ZendUlong(zend.ZendAtol(zend.Z_STRVAL_P(arg1), zend.Z_STRLEN_P(arg1)))
 			if b.Assign(&find_hash, zend.ZendHashIndexFind(arr.GetArr(), key)) == nil {
 				zend.ArrayInit(&hash)
-				find_hash = zend.ZendHashIndexAddNew(arr.GetArr(), key, &hash)
+				find_hash = arr.GetArr().IndexAddNewH(key, &hash)
 			}
 		} else {
 			if b.Assign(&find_hash, arr.GetArr().FindByZendString(arg1.GetStr())) == nil {

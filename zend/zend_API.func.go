@@ -121,14 +121,14 @@ func AddAssocZval(__arg *Zval, __key string, __value *Zval) int {
 	return AddAssocZvalEx(__arg, __key, strlen(__key), __value)
 }
 func AddIndexZval(arg *Zval, index ZendUlong, value *Zval) int {
-	if ZendHashIndexUpdate(arg.GetArr(), index, value) != nil {
+	if arg.GetArr().IndexUpdateH(index, value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
 	}
 }
 func AddNextIndexZval(arg *Zval, value *Zval) int {
-	if ZendHashNextIndexInsert(arg.GetArr(), value) != nil {
+	if arg.GetArr().NextIndexInsert(value) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -861,7 +861,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	}
 	for b.PostDec(&param_count) > 0 {
 		Z_TRY_ADDREF_P(param_ptr)
-		ZendHashNextIndexInsertNew(argument_array.GetArr(), param_ptr)
+		argument_array.GetArr().NextIndexInsertNew(param_ptr)
 		param_ptr++
 	}
 	return SUCCESS
@@ -1904,7 +1904,7 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 			if object.GetProperties() == nil {
 				RebuildObjectProperties(object)
 			}
-			prop = ZendHashIndexUpdate(object.GetProperties(), h, prop)
+			prop = object.GetProperties().IndexUpdateH(h, prop)
 			ZvalAddRef(prop)
 		}
 	}
@@ -2007,55 +2007,55 @@ func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
 func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
 	var tmp Zval
 	ZVAL_LONG(&tmp, n)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexNull(arg *Zval, index ZendUlong) int {
 	var tmp Zval
 	ZVAL_NULL(&tmp)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 	var tmp Zval
 	ZVAL_DOUBLE(&tmp, d)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	ZendHashIndexUpdate(arg.GetArr(), index, &tmp)
+	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
 func AddNextIndexLong(arg *Zval, n ZendLong) int {
 	var tmp Zval
 	ZVAL_LONG(&tmp, n)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2064,7 +2064,7 @@ func AddNextIndexLong(arg *Zval, n ZendLong) int {
 func AddNextIndexNull(arg *Zval) int {
 	var tmp Zval
 	ZVAL_NULL(&tmp)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2073,7 +2073,7 @@ func AddNextIndexNull(arg *Zval) int {
 func AddNextIndexBool(arg *Zval, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2082,7 +2082,7 @@ func AddNextIndexBool(arg *Zval, b int) int {
 func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2091,7 +2091,7 @@ func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 func AddNextIndexDouble(arg *Zval, d float64) int {
 	var tmp Zval
 	ZVAL_DOUBLE(&tmp, d)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2100,7 +2100,7 @@ func AddNextIndexDouble(arg *Zval, d float64) int {
 func AddNextIndexStr(arg *Zval, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2109,7 +2109,7 @@ func AddNextIndexStr(arg *Zval, str *ZendString) int {
 func AddNextIndexString(arg *Zval, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2118,7 +2118,7 @@ func AddNextIndexString(arg *Zval, str *byte) int {
 func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	if ZendHashNextIndexInsert(arg.GetArr(), &tmp) != nil {
+	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2135,19 +2135,19 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(key), Z_RES_HANDLE_P(key))
-		result = ZendHashIndexUpdate(ht, Z_RES_HANDLE_P(key), value)
+		result = ht.IndexUpdateH(Z_RES_HANDLE_P(key), value)
 		break
 	case IS_FALSE:
-		result = ZendHashIndexUpdate(ht, 0, value)
+		result = ht.IndexUpdateH(0, value)
 		break
 	case IS_TRUE:
-		result = ZendHashIndexUpdate(ht, 1, value)
+		result = ht.IndexUpdateH(1, value)
 		break
 	case IS_LONG:
-		result = ZendHashIndexUpdate(ht, key.GetLval(), value)
+		result = ht.IndexUpdateH(key.GetLval(), value)
 		break
 	case IS_DOUBLE:
-		result = ZendHashIndexUpdate(ht, ZendDvalToLval(key.GetDval()), value)
+		result = ht.IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
 		break
 	default:
 		ZendError(E_WARNING, "Illegal offset type")

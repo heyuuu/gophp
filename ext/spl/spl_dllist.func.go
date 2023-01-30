@@ -852,23 +852,23 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 	/* flags */
 
 	zend.ZVAL_LONG(&tmp, intern.GetFlags())
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* elements */
 
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
-		zend.ZendHashNextIndexInsert(tmp.GetArr(), current.GetData())
+		tmp.GetArr().NextIndexInsert(current.GetData())
 		zend.Z_TRY_ADDREF(current.GetData())
 		current = current.GetNext()
 	}
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
 	zend.Z_TRY_ADDREF(tmp)
-	zend.ZendHashNextIndexInsert(return_value.GetArr(), &tmp)
+	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)

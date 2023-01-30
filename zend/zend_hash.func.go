@@ -301,7 +301,7 @@ func ZendHashIndexAddPtr(ht *HashTable, h ZendUlong, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ZendHashIndexAdd(ht, h, &tmp)
+	zv = ht.IndexAddH(h, &tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -312,7 +312,7 @@ func ZendHashIndexAddNewPtr(ht *HashTable, h ZendUlong, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ZendHashIndexAddNew(ht, h, &tmp)
+	zv = ht.IndexAddNewH(h, &tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -323,14 +323,14 @@ func ZendHashIndexUpdatePtr(ht *HashTable, h ZendUlong, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ZendHashIndexUpdate(ht, h, &tmp)
+	zv = ht.IndexUpdateH(h, &tmp)
 	return zv.GetPtr()
 }
 func ZendHashIndexAddMem(ht *HashTable, h ZendUlong, pData any, size int) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ZendHashIndexAdd(ht, h, &tmp)) {
+	if b.Assign(&zv, ht.IndexAddH(h, &tmp)) {
 		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
@@ -341,7 +341,7 @@ func ZendHashNextIndexInsertPtr(ht *HashTable, pData any) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, pData)
-	zv = ZendHashNextIndexInsert(ht, &tmp)
+	zv = ht.NextIndexInsert(&tmp)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -358,7 +358,7 @@ func ZendHashNextIndexInsertMem(ht *HashTable, pData any, size int) any {
 	var tmp Zval
 	var zv *Zval
 	ZVAL_PTR(&tmp, nil)
-	if b.Assign(&zv, ZendHashNextIndexInsert(ht, &tmp)) {
+	if b.Assign(&zv, ht.NextIndexInsert(&tmp)) {
 		zv.SetPtr(Pemalloc(size, ht.GetGcFlags()&IS_ARRAY_PERSISTENT))
 		memcpy(zv.GetPtr(), pData, size)
 		return zv.GetPtr()
@@ -383,9 +383,9 @@ func ZendHashFindExPtr(ht *HashTable, key *ZendString, known_hash ZendBool) any 
 		return nil
 	}
 }
-func ZendHashStrFindPtr(ht *HashTable, str string) any {
+func ZendHashStrFindPtr(ht *HashTable, str string, len_ int) any {
 	var zv *Zval
-	zv = ht.FindByStr(str)
+	zv = ht.FindByStrPtr(str, len_)
 	if zv != nil {
 		return zv.GetPtr()
 	} else {
@@ -1286,7 +1286,7 @@ func ZendHashCopy(target *HashTable, source *HashTable, pCopyConstructor CopyCto
 		if p.GetKey() != nil {
 			new_entry = ZendHashUpdate(target, p.GetKey(), data)
 		} else {
-			new_entry = ZendHashIndexUpdate(target, p.GetH(), data)
+			new_entry = target.IndexUpdateH(p.GetH(), data)
 		}
 		if pCopyConstructor != nil {
 			pCopyConstructor(new_entry)
@@ -1992,7 +1992,7 @@ convert:
 		/* Again, thank ArrayObject for `!str_key ||`. */
 
 		if str_key == nil || ZEND_HANDLE_NUMERIC(str_key, &num_key) {
-			ZendHashIndexUpdate(new_ht, num_key, zv)
+			new_ht.IndexUpdateH(num_key, zv)
 		} else {
 			ZendHashUpdate(new_ht, str_key, zv)
 		}

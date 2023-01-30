@@ -902,7 +902,7 @@ func PhpExplode(delim *zend.ZendString, str *zend.ZendString, return_value *zend
 	var tmp zend.Zval
 	if p2 == nil {
 		zend.ZVAL_STR_COPY(&tmp, str)
-		zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
+		return_value.GetArr().NextIndexInsertNew(&tmp)
 	} else {
 		for {
 			var l int = p2 - p1
@@ -913,7 +913,7 @@ func PhpExplode(delim *zend.ZendString, str *zend.ZendString, return_value *zend
 			} else {
 				zend.ZVAL_STRINGL(&tmp, p1, p2-p1)
 			}
-			zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
+			return_value.GetArr().NextIndexInsertNew(&tmp)
 			p1 = p2 + delim.GetLen()
 			p2 = core.PhpMemnstr(p1, delim.GetVal(), delim.GetLen(), endp)
 			if !(p2 != nil && b.PreDec(&limit) > 1) {
@@ -922,7 +922,7 @@ func PhpExplode(delim *zend.ZendString, str *zend.ZendString, return_value *zend
 		}
 		if p1 <= endp {
 			zend.ZVAL_STRINGL(&tmp, p1, endp-p1)
-			zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
+			return_value.GetArr().NextIndexInsertNew(&tmp)
 		}
 	}
 }
@@ -960,7 +960,7 @@ func PhpExplodeNegativeLimit(delim *zend.ZendString, str *zend.ZendString, retur
 
 		for i = 0; i < to_return; i++ {
 			zend.ZVAL_STRINGL(&tmp, positions[i], positions[i+1]-delim.GetLen()-positions[i])
-			zend.ZendHashNextIndexInsertNew(return_value.GetArr(), &tmp)
+			return_value.GetArr().NextIndexInsertNew(&tmp)
 		}
 		zend.Efree(any(positions))
 	}
@@ -1059,7 +1059,7 @@ func ZifExplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if str.GetLen() == 0 {
 		if limit >= 0 {
 			zend.ZVAL_EMPTY_STRING(&tmp)
-			zend.ZendHashIndexAddNew(return_value.GetArr(), 0, &tmp)
+			return_value.GetArr().IndexAddNewH(0, &tmp)
 		}
 		return
 	}
@@ -1069,7 +1069,7 @@ func ZifExplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		PhpExplodeNegativeLimit(delim, str, return_value, limit)
 	} else {
 		zend.ZVAL_STR_COPY(&tmp, str)
-		zend.ZendHashIndexAddNew(return_value.GetArr(), 0, &tmp)
+		return_value.GetArr().IndexAddNewH(0, &tmp)
 	}
 }
 func PhpImplode(glue *zend.ZendString, pieces *zend.Zval, return_value *zend.Zval) {
@@ -5886,7 +5886,7 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 			if string_key != nil {
 				zend.ZendHashAddNew(return_value.GetArr(), string_key, &result)
 			} else {
-				zend.ZendHashIndexAddNew(return_value.GetArr(), num_key, &result)
+				return_value.GetArr().IndexAddNewH(num_key, &result)
 			}
 
 			/* Add to return array */

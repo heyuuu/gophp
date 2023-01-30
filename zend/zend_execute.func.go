@@ -1906,7 +1906,7 @@ try_again:
 				return nil
 			}
 		case BP_VAR_W:
-			retval = ZendHashIndexAddNew(ht, hval, __EG().GetUninitializedZval())
+			retval = ht.IndexAddNewH(hval, __EG().GetUninitializedZval())
 			break
 		}
 	} else if dim.IsType(IS_STRING) {
@@ -2013,7 +2013,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 		SEPARATE_ARRAY(container)
 	fetch_from_array:
 		if dim == nil {
-			retval = ZendHashNextIndexInsert(container.GetArr(), __EG().GetUninitializedZval())
+			retval = container.GetArr().NextIndexInsert(__EG().GetUninitializedZval())
 			if retval == nil {
 				ZendCannotAddElement()
 				ZVAL_ERROR(result)

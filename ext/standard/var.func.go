@@ -830,14 +830,14 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	} else {
 		var zv_n zend.Zval
 		zend.ZVAL_LONG(&zv_n, data.GetN())
-		zend.ZendHashIndexAddNew(data.GetHt(), key, &zv_n)
+		data.GetHt().IndexAddNewH(key, &zv_n)
 
 		/* Additionally to the index, we also store the variable, to ensure that it is
 		 * not destroyed during serialization and its pointer reused. The variable is
 		 * stored at the numeric value of the pointer + 1, which cannot be the location
 		 * of another zend_refcounted structure. */
 
-		zend.ZendHashIndexAddNew(data.GetHt(), key+1, var_)
+		data.GetHt().IndexAddNewH(key+1, var_)
 		zend.Z_ADDREF_P(var_)
 		return 0
 	}
