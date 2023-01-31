@@ -64,9 +64,7 @@ func HT_SIZE(ht *HashTable) int {
 func HT_USED_SIZE(ht *HashTable) int {
 	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
 }
-func HT_HASH_TO_BUCKET(ht *HashTable, idx uint32) __auto__ {
-	return HT_HASH_TO_BUCKET_EX(ht.GetArData(), idx)
-}
+func HT_HASH_TO_BUCKET(ht *HashTable, idx uint32) *Bucket { return ht.Bucket(idx) }
 func HT_SET_DATA_ADDR(ht *HashTable, ptr __auto__) {
 	ht.SetArData((*Bucket)((*byte)(ptr) + HT_HASH_SIZE(ht.GetNTableMask())))
 }
@@ -88,21 +86,11 @@ func GC_IS_RECURSIVE(p *HashTable) bool   { return p.IsRecursive() }
 func GC_PROTECT_RECURSION(p *HashTable)   { p.ProtectRecursive() }
 func GC_UNPROTECT_RECURSION(p *HashTable) { p.UnprotectRecursive() }
 
-func Z_IS_RECURSIVE_P(zv *Zval) bool              { return zv.GetCounted().IsRecursive() }
-func Z_PROTECT_RECURSION_P(zv *Zval)              { zv.GetCounted().ProtectRecursive() }
-func Z_UNPROTECT_RECURSION_P(zv *Zval)            { zv.GetCounted().UnprotectRecursive() }
-func Z_CONSTANT(zval Zval) bool                   { return zval.IsType(IS_CONSTANT_AST) }
-func Z_REFCOUNTED(zval Zval) bool                 { return zval.IsRefcounted() }
-func Z_REFCOUNTED_P(zval_p *Zval) bool            { return zval_p.IsRefcounted() }
-func Z_COLLECTABLE(zval Zval) bool                { return zval.IsCollectable() }
-func Z_COLLECTABLE_P(zval_p *Zval) bool           { return zval_p.IsCollectable() }
-func Z_OPT_TYPE(zval Zval) ZendUchar              { return zval.GetType() }
-func Z_OPT_TYPE_P(zval_p *Zval) ZendUchar         { return zval_p.GetType() }
-func Z_OPT_CONSTANT(zval Zval) bool               { return zval.IsConstant() }
-func Z_OPT_REFCOUNTED(zval Zval) bool             { return zval.IsRefcounted() }
+func Z_IS_RECURSIVE_P(zv *Zval) bool              { return zv.IsRecursive() }
+func Z_PROTECT_RECURSION_P(zv *Zval)              { zv.ProtectRecursive() }
+func Z_UNPROTECT_RECURSION_P(zv *Zval)            { zv.UnprotectRecursive() }
+func Z_CONSTANT(zval Zval) bool                   { return zval.IsConstant() }
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return zval_p.IsRefcounted() }
-func Z_OPT_ISREF(zval Zval) bool                  { return zval.IsReference() }
-func Z_OPT_ISREF_P(zval_p *Zval) bool             { return zval_p.IsReference() }
 func Z_ISREF_P(zval_p *Zval) bool                 { return zval_p.IsReference() }
 func Z_STR_P(zval_p *Zval) *ZendString            { return zval_p.GetStr() }
 func Z_STRVAL(zval Zval) []byte                   { return zval.GetStr().GetVal() }
@@ -115,7 +103,6 @@ func Z_OBJ(zval Zval) *ZendObject                 { return zval.GetObj() }
 func Z_OBJ_P(zval_p *Zval) *ZendObject            { return zval_p.GetObj() }
 func Z_OBJ_HT(zval Zval) *ZendObjectHandlers      { return Z_OBJ(zval).GetHandlers() }
 func Z_OBJ_HT_P(zval_p *Zval) *ZendObjectHandlers { return Z_OBJ_HT(*zval_p) }
-func Z_OBJ_HANDLE(zval Zval) uint32               { return Z_OBJ(zval).GetHandle() }
 func Z_OBJCE(zval Zval) *ZendClassEntry           { return zval.GetObj().GetCe() }
 func Z_OBJCE_P(zval_p *Zval) *ZendClassEntry      { return zval_p.GetObj().GetCe() }
 func Z_OBJPROP(zval Zval) *HashTable {
@@ -267,27 +254,19 @@ func ZVAL_ALIAS_PTR(z *Zval, p *ZendClassEntry) {
 	z.SetPtr(p)
 	z.SetTypeInfo(IS_ALIAS_PTR)
 }
-func ZVAL_ERROR(z *Zval)                          { z.SetTypeInfo(_IS_ERROR) }
+func ZVAL_ERROR(z *Zval)                          { z.IsError() }
 func Z_REFCOUNT_P(pz *Zval) uint32                { return pz.GetRefcount() }
 func Z_SET_REFCOUNT_P(pz *Zval, rc uint32) uint32 { return pz.SetRefcount(rc) }
 func Z_ADDREF_P(pz *Zval) uint32                  { return pz.AddRefcount() }
 func Z_DELREF_P(pz *Zval) uint32                  { return pz.DelRefcount() }
-func Z_REFCOUNT(z Zval) uint32                    { return Z_REFCOUNT_P(&z) }
-func Z_SET_REFCOUNT(z Zval, rc uint32) uint32     { return Z_SET_REFCOUNT_P(&z, rc) }
-func Z_ADDREF(z Zval) uint32                      { return Z_ADDREF_P(&z) }
-func Z_DELREF(z Zval) uint32                      { return Z_DELREF_P(&z) }
-func Z_TRY_ADDREF_P(pz *Zval) {
-	if pz.IsRefcounted() {
-		Z_ADDREF_P(pz)
-	}
-}
-func Z_TRY_DELREF_P(pz *Zval) {
-	if pz.IsRefcounted() {
-		Z_DELREF_P(pz)
-	}
-}
-func Z_TRY_ADDREF(z Zval)                         { Z_TRY_ADDREF_P(&z) }
-func Z_TRY_DELREF(z Zval)                         { Z_TRY_DELREF_P(&z) }
+func Z_REFCOUNT(z Zval) uint32                    { return z.GetRefcount() }
+func Z_SET_REFCOUNT(z Zval, rc uint32) uint32     { return z.SetRefcount(rc) }
+func Z_ADDREF(z Zval) uint32                      { return z.AddRefcount() }
+func Z_DELREF(z Zval) uint32                      { return z.DelRefcount() }
+func Z_TRY_ADDREF_P(pz *Zval)                     { pz.TryAddRefcount() }
+func Z_TRY_DELREF_P(pz *Zval)                     { pz.TryDelRefcount() }
+func Z_TRY_ADDREF(z Zval)                         { z.TryAddRefcount() }
+func Z_TRY_DELREF(z Zval)                         { z.TryDelRefcount() }
 func GC_MAKE_PERSISTENT_LOCAL(p *ZendString)      {}
 func ZvalRefcountP(pz *Zval) uint32               { return pz.GetRefcount() }
 func ZvalSetRefcountP(pz *Zval, rc uint32) uint32 { return pz.SetRefcount(rc) }
