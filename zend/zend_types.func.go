@@ -64,10 +64,6 @@ func HT_SIZE(ht *HashTable) int {
 func HT_USED_SIZE(ht *HashTable) int {
 	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
 }
-func HT_HASH_RESET_PACKED(ht *HashTable) {
-	HT_HASH(ht, -2) = HT_INVALID_IDX
-	HT_HASH(ht, -1) = HT_INVALID_IDX
-}
 func HT_HASH_TO_BUCKET(ht *HashTable, idx uint32) __auto__ {
 	return HT_HASH_TO_BUCKET_EX(ht.GetArData(), idx)
 }
@@ -87,29 +83,23 @@ func ZEND_SAME_FAKE_TYPE(faketype int, realtype ZendUchar) bool {
 }
 func Z_FE_ITER_P(zval_p *Zval) uint32      { return zval_p.GetFeIterIdx() }
 func Z_TYPE_INFO_REFCOUNTED(t uint32) bool { return (t & Z_TYPE_FLAGS_MASK) != 0 }
-func GC_IS_RECURSIVE(p *HashTable) int     { return p.GetGcFlags() & GC_PROTECTED }
-func GC_PROTECT_RECURSION(p *HashTable)    { p.AddGcFlags(GC_PROTECTED) }
-func GC_UNPROTECT_RECURSION(p *HashTable)  { p.DelGcFlags(GC_PROTECTED) }
+
+func GC_IS_RECURSIVE(p *HashTable) bool   { return p.IsRecursive() }
+func GC_PROTECT_RECURSION(p *HashTable)   { p.ProtectRecursive() }
+func GC_UNPROTECT_RECURSION(p *HashTable) { p.UnprotectRecursive() }
 func GC_TRY_PROTECT_RECURSION(p *HashTable) {
-	if (p.GetGcFlags() & GC_IMMUTABLE) == 0 {
-		GC_PROTECT_RECURSION(p)
-	}
+	p.TryProtectRecursive()
 }
 func GC_TRY_UNPROTECT_RECURSION(p *HashTable) {
-	if (p.GetGcFlags() & GC_IMMUTABLE) == 0 {
-		GC_UNPROTECT_RECURSION(p)
-	}
+	p.TryUnProtectRecursive()
 }
-func Z_IS_RECURSIVE(zval Zval) int {
-	return GC_IS_RECURSIVE(zval.GetCounted())
-}
-func Z_PROTECT_RECURSION(zval Zval) { GC_PROTECT_RECURSION(zval.GetCounted()) }
-func Z_UNPROTECT_RECURSION(zval Zval) {
-	GC_UNPROTECT_RECURSION(zval.GetCounted())
-}
-func Z_IS_RECURSIVE_P(zv *Zval) int    { return Z_IS_RECURSIVE(*zv) }
-func Z_PROTECT_RECURSION_P(zv *Zval)   { Z_PROTECT_RECURSION(*zv) }
-func Z_UNPROTECT_RECURSION_P(zv *Zval) { Z_UNPROTECT_RECURSION(*zv) }
+
+func Z_IS_RECURSIVE(zval Zval) bool    { return zval.GetCounted().IsRecursive() }
+func Z_PROTECT_RECURSION(zval Zval)    { zval.GetCounted().ProtectRecursive() }
+func Z_UNPROTECT_RECURSION(zval Zval)  { zval.GetCounted().UnprotectRecursive() }
+func Z_IS_RECURSIVE_P(zv *Zval) bool   { return zv.GetCounted().IsRecursive() }
+func Z_PROTECT_RECURSION_P(zv *Zval)   { zv.GetCounted().ProtectRecursive() }
+func Z_UNPROTECT_RECURSION_P(zv *Zval) { zv.GetCounted().UnprotectRecursive() }
 func Z_CONSTANT(zval Zval) bool        { return zval.IsType(IS_CONSTANT_AST) }
 func Z_REFCOUNTED(zval Zval) bool      { return zval.GetTypeFlags() != 0 }
 func Z_REFCOUNTED_P(zval_p *Zval) bool { return Z_REFCOUNTED(*zval_p) }

@@ -132,3 +132,17 @@ func (this *ZendRefcounted) HasGcFlags(flags uint32) bool {
 	var gcFlags = this.GetGcFlags()
 	return b.FlagMatch(gcFlags, flags)
 }
+
+func (this *ZendRefcounted) IsRecursive() bool   { return this.HasGcFlags(GC_PROTECTED) }
+func (this *ZendRefcounted) ProtectRecursive()   { this.AddGcFlags(GC_PROTECTED) }
+func (this *ZendRefcounted) UnprotectRecursive() { this.DelGcFlags(GC_PROTECTED) }
+func (this *ZendRefcounted) TryProtectRecursive() {
+	if !this.HasGcFlags(GC_IMMUTABLE) {
+		this.AddGcFlags(GC_PROTECTED)
+	}
+}
+func (this *ZendRefcounted) TryUnProtectRecursive() {
+	if !this.HasGcFlags(GC_IMMUTABLE) {
+		this.DelGcFlags(GC_PROTECTED)
+	}
+}
