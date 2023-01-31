@@ -200,3 +200,35 @@ func (this *Zval) SwitchConstantFlags(value uint32, cond bool) {
 		this.SubConstantFlags(value)
 	}
 }
+
+/**
+ * init
+ */
+func (this *Zval) SetUndef() { this.SetTypeInfo(IS_UNDEF) }
+func (this *Zval) SetNull()  { this.SetTypeInfo(IS_NULL) }
+func (this *Zval) SetFalse() { this.SetTypeInfo(IS_FALSE) }
+func (this *Zval) SetTrue()  { this.SetTypeInfo(IS_TRUE) }
+func (this *Zval) SetBool(b bool) {
+	if b {
+		this.SetTypeInfo(IS_TRUE)
+	} else {
+		this.SetTypeInfo(IS_FALSE)
+	}
+}
+
+func (this *Zval) SetLong(l ZendLong) {
+	this.SetTypeInfo(IS_LONG)
+	this.SetLval(l)
+}
+func (this *Zval) SetDouble(d float64) {
+	this.SetTypeInfo(IS_DOUBLE)
+	this.SetDval(d)
+}
+
+//func (this *Zval) SetString()    { this.SetTypeInfo(IS_STRING) }
+//func (this *Zval) SetArray()     { this.SetTypeInfo(IS_ARRAY) }
+//func (this *Zval) SetObject()    { this.SetTypeInfo(IS_OBJECT) }
+//func (this *Zval) SetResource()  { this.SetTypeInfo(IS_RESOURCE) }
+//func (this *Zval) SetReference() { this.SetTypeInfo(IS_REFERENCE) }
+//func (this *Zval) SetConstant()  { this.SetTypeInfo(IS_CONSTANT_AST) }
+//func (this *Zval) SetIndirect()  { this.SetTypeInfo(IS_INDIRECT) }
