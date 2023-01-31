@@ -189,7 +189,7 @@ func ZendParseIniString(str *byte, unbuffered_errors ZendBool, scanner_mode int,
 	}
 }
 func ZvalIniDtor(zv *Zval) {
-	if zv.IsType(IS_STRING) {
+	if zv.IsString() {
 		ZendStringRelease(zv.GetStr())
 	}
 }

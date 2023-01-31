@@ -88,17 +88,17 @@ func InitExecutor() {
 	EG__().SetActive(1)
 }
 func ZvalCallDestructor(zv *Zval) int {
-	if zv.IsType(IS_INDIRECT) {
+	if zv.IsIndirect() {
 		zv = zv.GetZv()
 	}
-	if zv.IsType(IS_OBJECT) && Z_REFCOUNT_P(zv) == 1 {
+	if zv.IsObject() && Z_REFCOUNT_P(zv) == 1 {
 		return ZEND_HASH_APPLY_REMOVE
 	} else {
 		return ZEND_HASH_APPLY_KEEP
 	}
 }
 func ZendUncleanZvalPtrDtor(zv *Zval) {
-	if zv.IsType(IS_INDIRECT) {
+	if zv.IsIndirect() {
 		zv = zv.GetZv()
 	}
 	IZvalPtrDtor(zv)
@@ -510,7 +510,7 @@ func ZendUseUndefinedConstant(name *ZendString, attr ZendAstAttr, result *Zval) 
 	return SUCCESS
 }
 func ZvalUpdateConstantEx(p *Zval, scope *ZendClassEntry) int {
-	if p.IsType(IS_CONSTANT_AST) {
+	if p.IsConstant() {
 		var ast *ZendAst = Z_ASTVAL_P(p)
 		if ast.GetKind() == ZEND_AST_CONSTANT {
 			var name *ZendString = ZendAstGetConstantName(ast)
@@ -897,7 +897,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 func ZendLookupClass(name *ZendString) *ZendClassEntry { return ZendLookupClassEx(name, nil, 0) }
 func ZendGetCalledScope(ex *ZendExecuteData) *ZendClassEntry {
 	for ex != nil {
-		if ex.GetThis().IsType(IS_OBJECT) {
+		if ex.GetThis().IsObject() {
 			return Z_OBJCE(ex.GetThis())
 		} else if ex.GetThis().GetCe() != nil {
 			return ex.GetThis().GetCe()
@@ -912,7 +912,7 @@ func ZendGetCalledScope(ex *ZendExecuteData) *ZendClassEntry {
 }
 func ZendGetThisObject(ex *ZendExecuteData) *ZendObject {
 	for ex != nil {
-		if ex.GetThis().IsType(IS_OBJECT) {
+		if ex.GetThis().IsObject() {
 			return ex.GetThis().GetObj()
 		} else if ex.GetFunc() != nil {
 			if ex.GetFunc().GetType() != ZEND_INTERNAL_FUNCTION || ex.GetFunc().GetScope() != nil {
@@ -1234,7 +1234,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 		for {
 			var zv *Zval = ht.KeyFind(str.GetStr())
 			if zv != nil {
-				if zv.IsType(IS_INDIRECT) {
+				if zv.IsIndirect() {
 					var val *Zval = zv.GetZv()
 					ZVAL_COPY_VALUE(var_, val)
 				} else {
@@ -1267,7 +1267,7 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 		var end **ZendString = str + op_array.GetLastVar()
 		var var_ *Zval = EX_VAR_NUM(0)
 		for {
-			if var_.IsType(IS_UNDEF) {
+			if var_.IsUndef() {
 				ZendHashDel(ht, *str)
 			} else {
 				ht.KeyUpdate(str.GetStr(), var_)

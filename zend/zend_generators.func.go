@@ -457,7 +457,7 @@ func ZendGeneratorGetConstructor(object *ZendObject) *ZendFunction {
 	return nil
 }
 func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
-	if ptr.GetFunc() == nil && ptr.GetThis().IsType(IS_OBJECT) {
+	if ptr.GetFunc() == nil && ptr.GetThis().IsObject() {
 		if Z_OBJCE(ptr.GetThis()) == ZendCeGenerator {
 			var generator *ZendGenerator = (*ZendGenerator)(ptr.GetThis().GetObj())
 			var root *ZendGenerator = b.CondF2(generator.GetNode().GetChildren() < 1, generator, func() *ZendGenerator { return generator.GetNode().GetPtrLeaf() }).node.ptr.root
@@ -677,7 +677,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 }
 func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 	var value *Zval
-	if generator.GetValues().IsType(IS_ARRAY) {
+	if generator.GetValues().IsArray() {
 		var ht *HashTable = generator.GetValues().GetArr()
 		var pos HashPosition = generator.GetValues().GetFePos()
 		var p *Bucket
@@ -693,7 +693,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 			}
 			p = ht.GetArData()[pos]
 			value = p.GetVal()
-			if value.IsType(IS_INDIRECT) {
+			if value.IsIndirect() {
 				value = value.GetZv()
 			}
 			pos++
@@ -873,7 +873,7 @@ try_again:
 	orig_generator.SetIsDoInit(false)
 }
 func ZendGeneratorEnsureInitialized(generator *ZendGenerator) {
-	if generator.GetValue().IsType(IS_UNDEF) && generator.GetExecuteData() != nil && generator.GetNode().GetParent() == nil {
+	if generator.GetValue().IsUndef() && generator.GetExecuteData() != nil && generator.GetNode().GetParent() == nil {
 		ZendGeneratorResume(generator)
 		generator.SetIsAtFirstYield(true)
 	}

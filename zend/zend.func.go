@@ -150,9 +150,9 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	var __ht *HashTable = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
-		if _z.IsType(IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
-			if _z.IsType(IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
@@ -203,9 +203,9 @@ func PrintFlatHash(ht *HashTable) {
 	var __ht *HashTable = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
-		if _z.IsType(IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
-			if _z.IsType(IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
@@ -226,7 +226,7 @@ func PrintFlatHash(ht *HashTable) {
 	}
 }
 func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
-	if expr.IsType(IS_STRING) {
+	if expr.IsString() {
 		return 0
 	} else {
 		ZVAL_STR(expr_copy, ZvalGetStringFunc(expr))
@@ -710,7 +710,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 	/* if we don't have a user defined error handler */
 
-	if EG__().GetUserErrorHandler().IsType(IS_UNDEF) || (EG__().GetUserErrorHandlerErrorReporting()&type_) == 0 || EG__().GetErrorHandling() != EH_NORMAL {
+	if EG__().GetUserErrorHandler().IsUndef() || (EG__().GetUserErrorHandlerErrorReporting()&type_) == 0 || EG__().GetErrorHandling() != EH_NORMAL {
 		ZendErrorCb(type_, error_filename, error_lineno, format, args)
 	} else {
 		switch type_ {
@@ -773,7 +773,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			EG__().SetFakeScope(nil)
 			if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == SUCCESS {
 				if retval.GetType() != IS_UNDEF {
-					if retval.IsType(IS_FALSE) {
+					if retval.IsFalse() {
 						ZendErrorCb(type_, error_filename, error_lineno, format, args)
 					}
 					ZvalPtrDtor(&retval)
@@ -797,7 +797,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			ZvalPtrDtor(&params[4])
 			ZvalPtrDtor(&params[2])
 			ZvalPtrDtor(&params[1])
-			if EG__().GetUserErrorHandler().IsType(IS_UNDEF) {
+			if EG__().GetUserErrorHandler().IsUndef() {
 				ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {
 				ZvalPtrDtor(&orig_user_error_handler)

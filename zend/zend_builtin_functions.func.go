@@ -651,9 +651,9 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		if entry == nil {
 			RETVAL_FALSE
 			return
-		} else if entry.IsType(IS_INDIRECT) {
+		} else if entry.IsIndirect() {
 			entry = entry.GetZv()
-			if entry.IsType(IS_UNDEF) {
+			if entry.IsUndef() {
 				ZendHashMoveForward(target_hash)
 				continue
 			}
@@ -782,7 +782,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 				ZendStringReleaseEx(p.GetValue(), 0)
 			}
 			p.SetValue(new_val)
-			if err.IsType(IS_LONG) {
+			if err.IsLong() {
 				EG__().SetErrorReporting(err.GetLval())
 			} else {
 				EG__().SetErrorReporting(atoi(p.GetValue().GetVal()))
@@ -799,16 +799,16 @@ func ValidateConstantArray(ht *HashTable) int {
 	var __ht *HashTable = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
-		if _z.IsType(IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
-			if _z.IsType(IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
 		val = _z
 		ZVAL_DEREF(val)
 		if Z_REFCOUNTED_P(val) {
-			if val.IsType(IS_ARRAY) {
+			if val.IsArray() {
 				if Z_REFCOUNTED_P(val) {
 					if Z_IS_RECURSIVE_P(val) {
 						ZendError(E_WARNING, "Constants cannot be recursive arrays")
@@ -838,9 +838,9 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 	var __ht *HashTable = src.GetArr()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
-		if _z.IsType(IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
-			if _z.IsType(IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}
@@ -856,7 +856,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 		} else {
 			new_val = dst.GetArr().IndexAddNewH(idx, val)
 		}
-		if val.IsType(IS_ARRAY) {
+		if val.IsArray() {
 			if Z_REFCOUNTED_P(val) {
 				CopyConstantArray(new_val, val)
 			}
@@ -985,7 +985,7 @@ repeat:
 		}
 		break
 	case IS_OBJECT:
-		if val_free.IsType(IS_UNDEF) {
+		if val_free.IsUndef() {
 			if Z_OBJ_HT_P(val).GetGet() != nil {
 				val = Z_OBJ_HT_P(val).GetGet()(val, &val_free)
 				goto repeat
@@ -1152,9 +1152,9 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 	}
-	if arg.IsType(IS_OBJECT) {
+	if arg.IsObject() {
 		ce = Z_OBJ_P(arg).GetCe()
-	} else if arg.IsType(IS_STRING) {
+	} else if arg.IsString() {
 		ce = ZendLookupClass(arg.GetStr())
 	}
 	if ce != nil && ce.parent {
@@ -1256,13 +1256,13 @@ func IsAImpl(execute_data *ZendExecuteData, return_value *Zval, only_subclass Ze
 	 *   and there is no easy way to deprecate this.
 	 */
 
-	if allow_string != 0 && obj.IsType(IS_STRING) {
+	if allow_string != 0 && obj.IsString() {
 		instance_ce = ZendLookupClass(obj.GetStr())
 		if instance_ce == nil {
 			RETVAL_FALSE
 			return
 		}
-	} else if obj.IsType(IS_OBJECT) {
+	} else if obj.IsObject() {
 		instance_ce = Z_OBJCE_P(obj)
 	} else {
 		RETVAL_FALSE
@@ -1468,7 +1468,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			key = _p.GetKey()
 			value = _z
 			var is_dynamic ZendBool = 1
-			if value.IsType(IS_INDIRECT) {
+			if value.IsIndirect() {
 				value = value.GetZv()
 				if Z_ISUNDEF_P(value) {
 					continue
@@ -1619,9 +1619,9 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParameters(ZEND_NUM_ARGS(), "z", &klass) == FAILURE {
 		return
 	}
-	if klass.IsType(IS_OBJECT) {
+	if klass.IsObject() {
 		ce = Z_OBJCE_P(klass)
-	} else if klass.IsType(IS_STRING) {
+	} else if klass.IsString() {
 		ce = ZendLookupClass(klass.GetStr())
 	}
 	if ce == nil {
@@ -1722,9 +1722,9 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	if klass.IsType(IS_OBJECT) {
+	if klass.IsObject() {
 		ce = Z_OBJCE_P(klass)
-	} else if klass.IsType(IS_STRING) {
+	} else if klass.IsString() {
 		if b.Assign(&ce, ZendLookupClass(klass.GetStr())) == nil {
 			RETVAL_FALSE
 			return
@@ -1742,10 +1742,10 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
 
-		RETVAL_BOOL(klass.IsType(IS_OBJECT) || !func_.IsPrivate() || func_.GetScope() == ce)
+		RETVAL_BOOL(klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
 		return
 	}
-	if klass.IsType(IS_OBJECT) {
+	if klass.IsObject() {
 		var obj *ZendObject = klass.GetObj()
 		func_ = Z_OBJ_HT_P(klass).GetGetMethod()(&obj, method_name, nil)
 		if func_ != nil {
@@ -1778,13 +1778,13 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		RETVAL_FALSE
 		return
 	}
-	if object.IsType(IS_STRING) {
+	if object.IsString() {
 		ce = ZendLookupClass(object.GetStr())
 		if ce == nil {
 			RETVAL_FALSE
 			return
 		}
-	} else if object.IsType(IS_OBJECT) {
+	} else if object.IsObject() {
 		ce = Z_OBJCE_P(object)
 	} else {
 		ZendError(E_WARNING, "First parameter must either be an object or the name of an existing class")
@@ -1797,7 +1797,7 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	ZVAL_STR(&property_z, property)
-	if object.IsType(IS_OBJECT) && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
+	if object.IsObject() && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
 		RETVAL_TRUE
 		return
 	}
@@ -2098,7 +2098,7 @@ func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ZendStackPush(EG__().GetUserErrorHandlersErrorReporting(), EG__().GetUserErrorHandlerErrorReporting())
 	ZendStackPush(EG__().GetUserErrorHandlers(), EG__().GetUserErrorHandler())
-	if error_handler.IsType(IS_NULL) {
+	if error_handler.IsNull() {
 		ZVAL_UNDEF(EG__().GetUserErrorHandler())
 		return
 	}
@@ -2145,7 +2145,7 @@ func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 		ZVAL_COPY(return_value, EG__().GetUserExceptionHandler())
 	}
 	ZendStackPush(EG__().GetUserExceptionHandlers(), EG__().GetUserExceptionHandler())
-	if exception_handler.IsType(IS_NULL) {
+	if exception_handler.IsNull() {
 		ZVAL_UNDEF(EG__().GetUserExceptionHandler())
 		return
 	}
@@ -2452,7 +2452,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 			} else {
 				module_number = ZEND_CONSTANT_MODULE_NUMBER(val)
 			}
-			if modules[module_number].IsType(IS_UNDEF) {
+			if modules[module_number].IsUndef() {
 				ArrayInit(&modules[module_number])
 				AddAssocZval(return_value, module_names[module_number], &modules[module_number])
 			}
@@ -2642,7 +2642,7 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 
 		/* $this may be passed into regular internal functions */
 
-		if call.GetThis().IsType(IS_OBJECT) {
+		if call.GetThis().IsObject() {
 			object = call.GetThis().GetObj()
 		} else {
 			object = nil
@@ -2864,7 +2864,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 
 		/* $this may be passed into regular internal functions */
 
-		if call != nil && call.GetThis().IsType(IS_OBJECT) {
+		if call != nil && call.GetThis().IsObject() {
 			object = call.GetThis().GetObj()
 		} else {
 			object = nil

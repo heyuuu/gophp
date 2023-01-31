@@ -213,7 +213,7 @@ func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 	var new_iterator *ZendObjectIterator
 	var ce_it *ZendClassEntry
 	ZendUserItNewIterator(ce, object, &iterator)
-	if iterator.IsType(IS_OBJECT) {
+	if iterator.IsObject() {
 		ce_it = Z_OBJCE(iterator)
 	} else {
 		ce_it = nil
@@ -367,7 +367,7 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 	var retval Zval
 	var result int
 	ZendCallMethodWith0Params(object, ce, ce.GetSerializeFunc(), "serialize", &retval)
-	if retval.IsType(IS_UNDEF) || EG__().GetException() != nil {
+	if retval.IsUndef() || EG__().GetException() != nil {
 		result = FAILURE
 	} else {
 		switch retval.GetType() {

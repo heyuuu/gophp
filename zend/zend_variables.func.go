@@ -22,7 +22,7 @@ func IZvalPtrDtor(zval_ptr *Zval) {
 	}
 }
 func ZvalCopyCtor(zvalue *Zval) {
-	if zvalue.IsType(IS_ARRAY) {
+	if zvalue.IsArray() {
 		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
 	} else if Z_REFCOUNTED_P(zvalue) {
 		Z_ADDREF_P(zvalue)
@@ -37,7 +37,7 @@ func ZvalOptCopyCtor(zvalue *Zval) {
 }
 func ZvalPtrDtorStr(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) && Z_DELREF_P(zval_ptr) == 0 {
-		ZEND_ASSERT(zval_ptr.IsType(IS_STRING))
+		ZEND_ASSERT(zval_ptr.IsString())
 		ZEND_ASSERT(true)
 		ZEND_ASSERT((zval_ptr.GetStr().GetGcFlags() & IS_STR_PERSISTENT) == 0)
 		Efree(zval_ptr.GetStr())
@@ -60,7 +60,7 @@ func ZvalInternalPtrDtor(zval_ptr *Zval) {
 	if Z_REFCOUNTED_P(zval_ptr) {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
 		if ref.DelRefcount() == 0 {
-			if zval_ptr.IsType(IS_STRING) {
+			if zval_ptr.IsString() {
 				var str *ZendString = (*ZendString)(ref)
 				ZEND_ASSERT(true)
 				ZEND_ASSERT((str.GetGcFlags() & IS_STR_PERSISTENT) != 0)
@@ -81,9 +81,9 @@ func ZvalAddRef(p *Zval) {
 	}
 }
 func ZvalCopyCtorFunc(zvalue *Zval) {
-	if zvalue.IsType(IS_ARRAY) {
+	if zvalue.IsArray() {
 		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
-	} else if zvalue.IsType(IS_STRING) {
+	} else if zvalue.IsString() {
 		ZEND_ASSERT(true)
 		ZVAL_NEW_STR(zvalue, zvalue.GetStr().Dup(0))
 	}

@@ -574,22 +574,22 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 					}
 					if precv != nil && precv.GetOpcode() == ZEND_RECV_INIT && precv.GetOp2Type() != IS_UNUSED {
 						var zv *Zval = RT_CONSTANT(precv, precv.GetOp2())
-						if zv.IsType(IS_FALSE) {
+						if zv.IsFalse() {
 							SmartStrAppends(&str, "false")
-						} else if zv.IsType(IS_TRUE) {
+						} else if zv.IsTrue() {
 							SmartStrAppends(&str, "true")
-						} else if zv.IsType(IS_NULL) {
+						} else if zv.IsNull() {
 							SmartStrAppends(&str, "NULL")
-						} else if zv.IsType(IS_STRING) {
+						} else if zv.IsString() {
 							SmartStrAppendc(&str, '\'')
 							SmartStrAppendl(&str, Z_STRVAL_P(zv), MIN(Z_STRLEN_P(zv), 10))
 							if Z_STRLEN_P(zv) > 10 {
 								SmartStrAppends(&str, "...")
 							}
 							SmartStrAppendc(&str, '\'')
-						} else if zv.IsType(IS_ARRAY) {
+						} else if zv.IsArray() {
 							SmartStrAppends(&str, "Array")
-						} else if zv.IsType(IS_CONSTANT_AST) {
+						} else if zv.IsConstant() {
 							var ast *ZendAst = Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
 								SmartStrAppend(&str, ZendAstGetConstantName(ast))
@@ -951,7 +951,7 @@ func DoInheritClassConstant(name *ZendString, parent_const *ZendClassConstant, c
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.GetName().GetVal(), name.GetVal(), ZendVisibilityString(parent_const.GetValue().GetAccessFlags()), ce.parent.name.GetVal(), b.Cond((parent_const.GetValue().GetAccessFlags()&ZEND_ACC_PUBLIC) != 0, "", " or weaker"))
 		}
 	} else if (parent_const.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) == 0 {
-		if parent_const.GetValue().IsType(IS_CONSTANT_AST) {
+		if parent_const.GetValue().IsConstant() {
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
@@ -1159,7 +1159,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.IsType(IS_INDIRECT) {
+				if src.IsIndirect() {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
@@ -1177,12 +1177,12 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.IsType(IS_INDIRECT) {
+				if src.IsIndirect() {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
 				}
-				if Z_INDIRECT_P(dst).IsType(IS_CONSTANT_AST) {
+				if Z_INDIRECT_P(dst).IsConstant() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				if dst == end {
@@ -1194,7 +1194,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 			for {
 				dst--
 				src--
-				if src.IsType(IS_INDIRECT) {
+				if src.IsIndirect() {
 					ZVAL_INDIRECT(dst, src.GetZv())
 				} else {
 					ZVAL_INDIRECT(dst, src)
@@ -1301,7 +1301,7 @@ func DoInheritConstantCheck(child_constants_table *HashTable, parent_constant *Z
 func DoInheritIfaceConstant(name *ZendString, c *ZendClassConstant, ce *ZendClassEntry, iface *ZendClassEntry) {
 	if DoInheritConstantCheck(ce.GetConstantsTable(), c, name, iface) != 0 {
 		var ct *ZendClassConstant
-		if c.GetValue().IsType(IS_CONSTANT_AST) {
+		if c.GetValue().IsConstant() {
 			ce.SetIsConstantsUpdated(false)
 		}
 		if (ce.GetType() & ZEND_INTERNAL_CLASS) != 0 {
@@ -1927,12 +1927,12 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 
 						/* if any of the values is a constant, we try to resolve it */
 
-						if op1.IsType(IS_CONSTANT_AST) {
+						if op1.IsConstant() {
 							ZVAL_COPY_OR_DUP(&op1_tmp, op1)
 							ZvalUpdateConstantEx(&op1_tmp, ce)
 							op1 = &op1_tmp
 						}
-						if op2.IsType(IS_CONSTANT_AST) {
+						if op2.IsConstant() {
 							ZVAL_COPY_OR_DUP(&op2_tmp, op2)
 							ZvalUpdateConstantEx(&op2_tmp, ce)
 							op2 = &op2_tmp

@@ -880,7 +880,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		switch opline.GetOpcode() {
 		case ZEND_RECV_INIT:
 			var val *Zval = CT_CONSTANT(opline.GetOp2())
-			if val.IsType(IS_CONSTANT_AST) {
+			if val.IsConstant() {
 				var slot uint32 = ZEND_MM_ALIGNED_SIZE_EX(op_array.GetCacheSize(), 8)
 				val.SetCacheSlot(slot)
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))

@@ -79,7 +79,7 @@ func ZendRegisterNsClassAlias(ns string, name string, ce *ZendClassEntry) int {
 	return ZendRegisterClassAliasEx(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, ce, 1)
 }
 func getThis() *Zval {
-	if ZEND_THIS.IsType(IS_OBJECT) {
+	if ZEND_THIS.IsObject() {
 		return ZEND_THIS
 	} else {
 		return nil
@@ -225,10 +225,10 @@ func RETVAL_EMPTY_ARRAY()                      { ZVAL_EMPTY_ARRAY(return_value) 
 func RETVAL_OBJ(r *ZendObject)                 { ZVAL_OBJ(return_value, r) }
 func RETVAL_ZVAL(zv *Zval, copy int, dtor int) { ZVAL_ZVAL(return_value, zv, copy, dtor) }
 func HASH_OF(p *Zval) __auto__ {
-	if p.IsType(IS_ARRAY) {
+	if p.IsArray() {
 		return p.GetArr()
 	} else {
-		if p.IsType(IS_OBJECT) {
+		if p.IsObject() {
 			return Z_OBJ_HT_P(p).GetGetProperties()(p)
 		} else {
 			return nil
@@ -678,11 +678,11 @@ func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null i
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.IsType(IS_TRUE) {
+	if arg.IsTrue() {
 		*dest = 1
-	} else if arg.IsType(IS_FALSE) {
+	} else if arg.IsFalse() {
 		*dest = 0
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*is_null = 1
 		*dest = 0
 	} else {
@@ -694,9 +694,9 @@ func ZendParseArgLong(arg *Zval, dest *ZendLong, is_null *ZendBool, check_null i
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.IsType(IS_LONG) {
+	if arg.IsLong() {
 		*dest = arg.GetLval()
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*is_null = 1
 		*dest = 0
 	} else if cap != 0 {
@@ -710,9 +710,9 @@ func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null 
 	if check_null != 0 {
 		*is_null = 0
 	}
-	if arg.IsType(IS_DOUBLE) {
+	if arg.IsDouble() {
 		*dest = arg.GetDval()
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*is_null = 1
 		*dest = 0.0
 	} else {
@@ -721,9 +721,9 @@ func ZendParseArgDouble(arg *Zval, dest *float64, is_null *ZendBool, check_null 
 	return 1
 }
 func ZendParseArgStr(arg *Zval, dest **ZendString, check_null int) int {
-	if arg.IsType(IS_STRING) {
+	if arg.IsString() {
 		*dest = arg.GetStr()
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		return ZendParseArgStrSlow(arg, dest)
@@ -765,9 +765,9 @@ func ZendParseArgPath(arg *Zval, dest **byte, dest_len *int, check_null int) int
 	return 1
 }
 func ZendParseArgArray(arg *Zval, dest **Zval, check_null int, or_object int) int {
-	if arg.IsType(IS_ARRAY) || or_object != 0 && arg.IsType(IS_OBJECT) {
+	if arg.IsArray() || or_object != 0 && arg.IsObject() {
 		*dest = arg
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		return 0
@@ -775,9 +775,9 @@ func ZendParseArgArray(arg *Zval, dest **Zval, check_null int, or_object int) in
 	return 1
 }
 func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object int, separate int) int {
-	if arg.IsType(IS_ARRAY) {
+	if arg.IsArray() {
 		*dest = arg.GetArr()
-	} else if or_object != 0 && arg.IsType(IS_OBJECT) {
+	} else if or_object != 0 && arg.IsObject() {
 		if separate != 0 && Z_OBJ_P(arg).GetProperties() != nil && Z_OBJ_P(arg).GetProperties().GetRefcount() > 1 {
 			if (Z_OBJ_P(arg).GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
 				Z_OBJ_P(arg).GetProperties().DelRefcount()
@@ -785,7 +785,7 @@ func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object 
 			Z_OBJ_P(arg).SetProperties(ZendArrayDup(Z_OBJ_P(arg).GetProperties()))
 		}
 		*dest = Z_OBJ_HT_P(arg).GetGetProperties()(arg)
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		return 0
@@ -793,9 +793,9 @@ func ZendParseArgArrayHt(arg *Zval, dest **HashTable, check_null int, or_object 
 	return 1
 }
 func ZendParseArgObject(arg *Zval, dest **Zval, ce *ZendClassEntry, check_null int) int {
-	if arg.IsType(IS_OBJECT) && (ce == nil || InstanceofFunction(Z_OBJCE_P(arg), ce) != 0) {
+	if arg.IsObject() && (ce == nil || InstanceofFunction(Z_OBJCE_P(arg), ce) != 0) {
 		*dest = arg
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		return 0
@@ -803,9 +803,9 @@ func ZendParseArgObject(arg *Zval, dest **Zval, ce *ZendClassEntry, check_null i
 	return 1
 }
 func ZendParseArgResource(arg *Zval, dest **Zval, check_null int) int {
-	if arg.IsType(IS_RESOURCE) {
+	if arg.IsResource() {
 		*dest = arg
-	} else if check_null != 0 && arg.IsType(IS_NULL) {
+	} else if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		return 0
@@ -813,7 +813,7 @@ func ZendParseArgResource(arg *Zval, dest **Zval, check_null int) int {
 	return 1
 }
 func ZendParseArgFunc(arg *Zval, dest_fci *ZendFcallInfo, dest_fcc *ZendFcallInfoCache, check_null int, error **byte) int {
-	if check_null != 0 && arg.IsType(IS_NULL) {
+	if check_null != 0 && arg.IsNull() {
 		dest_fci.SetSize(0)
 		dest_fcc.SetFunctionHandler(nil)
 		*error = nil
@@ -823,14 +823,14 @@ func ZendParseArgFunc(arg *Zval, dest_fci *ZendFcallInfo, dest_fcc *ZendFcallInf
 	return 1
 }
 func ZendParseArgZval(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && (arg.IsType(IS_NULL) || Z_ISREF_P(arg) && Z_REFVAL_P(arg).IsType(IS_NULL)) {
+	if check_null != 0 && (arg.IsNull() || Z_ISREF_P(arg) && Z_REFVAL_P(arg).IsNull()) {
 		*dest = nil
 	} else {
 		*dest = arg
 	}
 }
 func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && arg.IsType(IS_NULL) {
+	if check_null != 0 && arg.IsNull() {
 		*dest = nil
 	} else {
 		*dest = arg
@@ -1029,7 +1029,7 @@ func ZendWrongCallbackDeprecated(num int, error *byte) {
 }
 func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int) int {
 	var ce_base *ZendClassEntry = *pce
-	if check_null != 0 && arg.IsType(IS_NULL) {
+	if check_null != 0 && arg.IsNull() {
 		*pce = nil
 		return 1
 	}
@@ -1070,7 +1070,7 @@ func ZendParseArgBoolSlow(arg *Zval, dest *ZendBool) int {
 	return ZendParseArgBoolWeak(arg, dest)
 }
 func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
-	if arg.IsType(IS_DOUBLE) {
+	if arg.IsDouble() {
 		if core.ZendIsnan(arg.GetDval()) {
 			return 0
 		}
@@ -1079,7 +1079,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 		} else {
 			*dest = ZendDvalToLval(arg.GetDval())
 		}
-	} else if arg.IsType(IS_STRING) {
+	} else if arg.IsString() {
 		var d float64
 		var type_ int
 		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), dest, &d)) != IS_LONG {
@@ -1101,7 +1101,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 		}
 	} else if arg.GetType() < IS_TRUE {
 		*dest = 0
-	} else if arg.IsType(IS_TRUE) {
+	} else if arg.IsTrue() {
 		*dest = 1
 	} else {
 		return 0
@@ -1115,12 +1115,12 @@ func ZendParseArgLongSlow(arg *Zval, dest *ZendLong) int {
 	return ZendParseArgLongWeak(arg, dest)
 }
 func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
-	if arg.IsType(IS_DOUBLE) {
+	if arg.IsDouble() {
 		if core.ZendIsnan(arg.GetDval()) {
 			return 0
 		}
 		*dest = ZendDvalToLvalCap(arg.GetDval())
-	} else if arg.IsType(IS_STRING) {
+	} else if arg.IsString() {
 		var d float64
 		var type_ int
 		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), dest, &d)) != IS_LONG {
@@ -1138,7 +1138,7 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 		}
 	} else if arg.GetType() < IS_TRUE {
 		*dest = 0
-	} else if arg.IsType(IS_TRUE) {
+	} else if arg.IsTrue() {
 		*dest = 1
 	} else {
 		return 0
@@ -1152,9 +1152,9 @@ func ZendParseArgLongCapSlow(arg *Zval, dest *ZendLong) int {
 	return ZendParseArgLongCapWeak(arg, dest)
 }
 func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
-	if arg.IsType(IS_LONG) {
+	if arg.IsLong() {
 		*dest = float64(arg.GetLval())
-	} else if arg.IsType(IS_STRING) {
+	} else if arg.IsString() {
 		var l ZendLong
 		var type_ int
 		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), &l, dest)) != IS_DOUBLE {
@@ -1169,7 +1169,7 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 		}
 	} else if arg.GetType() < IS_TRUE {
 		*dest = 0.0
-	} else if arg.IsType(IS_TRUE) {
+	} else if arg.IsTrue() {
 		*dest = 1.0
 	} else {
 		return 0
@@ -1177,7 +1177,7 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 	return 1
 }
 func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
-	if arg.IsType(IS_LONG) {
+	if arg.IsLong() {
 
 		/* SSTH Exception: IS_LONG may be accepted instead as IS_DOUBLE */
 
@@ -1194,7 +1194,7 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 	if arg.GetType() < IS_STRING {
 		ConvertToString(arg)
 		*dest = arg.GetStr()
-	} else if arg.IsType(IS_OBJECT) {
+	} else if arg.IsObject() {
 		if Z_OBJ_HT(*arg).GetCastObject() != nil {
 			var obj Zval
 			if Z_OBJ_HT(*arg).GetCastObject()(arg, &obj, IS_STRING) == SUCCESS {
@@ -1208,7 +1208,7 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 			var z *Zval = Z_OBJ_HT(*arg).GetGet()(arg, &rv)
 			if z.GetType() != IS_OBJECT {
 				ZvalPtrDtor(arg)
-				if z.IsType(IS_STRING) {
+				if z.IsString() {
 					ZVAL_COPY_VALUE(arg, z)
 				} else {
 					ZVAL_STR(arg, ZvalGetStringFunc(z))
@@ -1355,7 +1355,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 		var lookup *ZendClassEntry
 		var pce **ZendClassEntry = __va_arg(*va, (**ZendClassEntry)(_))
 		var ce_base *ZendClassEntry = *pce
-		if check_null != 0 && arg.IsType(IS_NULL) {
+		if check_null != 0 && arg.IsNull() {
 			*pce = nil
 			break
 		}
@@ -1385,7 +1385,7 @@ func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **
 		var fci *ZendFcallInfo = __va_arg(*va, (*ZendFcallInfo)(_))
 		var fcc *ZendFcallInfoCache = __va_arg(*va, (*ZendFcallInfoCache)(_))
 		var is_callable_error *byte = nil
-		if check_null != 0 && arg.IsType(IS_NULL) {
+		if check_null != 0 && arg.IsNull() {
 			fci.SetSize(0)
 			fcc.SetFunctionHandler(0)
 			break
@@ -1739,7 +1739,7 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 
 			c = _z.GetPtr()
 			val = c.GetValue()
-			if val.IsType(IS_CONSTANT_AST) {
+			if val.IsConstant() {
 				if ZvalUpdateConstantEx(val, c.GetCe()) != SUCCESS {
 					return FAILURE
 				}
@@ -1763,7 +1763,7 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 					} else {
 						val = (*Zval)((*byte)(class_type.GetDefaultPropertiesTable() + prop_info.GetOffset() - OBJ_PROP_TO_OFFSET(0)))
 					}
-					if val.IsType(IS_CONSTANT_AST) {
+					if val.IsConstant() {
 						if prop_info.GetType() != 0 {
 							var tmp Zval
 							ZVAL_COPY(&tmp, val)
@@ -3561,9 +3561,9 @@ try_again:
 		if obj == nil || method == nil || method.GetType() != IS_STRING {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
 		}
-		if obj.IsType(IS_STRING) {
+		if obj.IsString() {
 			return ZendCreateMethodString(obj.GetStr(), method.GetStr())
-		} else if obj.IsType(IS_OBJECT) {
+		} else if obj.IsObject() {
 			return ZendCreateMethodString(Z_OBJCE_P(obj).GetName(), method.GetStr())
 		} else {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
@@ -3637,14 +3637,14 @@ again:
 				break
 			}
 			ZVAL_DEREF(obj)
-			if obj.IsType(IS_STRING) {
+			if obj.IsString() {
 				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
 					return 1
 				}
 				if ZendIsCallableCheckClass(obj.GetStr(), ZendGetExecutedScope(), fcc, &strict_class, error) == 0 {
 					return 0
 				}
-			} else if obj.IsType(IS_OBJECT) {
+			} else if obj.IsObject() {
 				fcc.SetCallingScope(Z_OBJCE_P(obj))
 				fcc.SetObject(obj.GetObj())
 				if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) != 0 {
@@ -3719,7 +3719,7 @@ func ZendIsCallable(callable *Zval, check_flags uint32, callable_name **ZendStri
 func ZendMakeCallable(callable *Zval, callable_name **ZendString) ZendBool {
 	var fcc ZendFcallInfoCache
 	if ZendIsCallableEx(callable, nil, IS_CALLABLE_STRICT, callable_name, &fcc, nil) != 0 {
-		if callable.IsType(IS_STRING) && fcc.GetCallingScope() != nil {
+		if callable.IsString() && fcc.GetCallingScope() != nil {
 			ZvalPtrDtorStr(callable)
 			ArrayInit(callable)
 			AddNextIndexStr(callable, fcc.GetCallingScope().GetName().Copy())
@@ -3880,7 +3880,7 @@ func ZendGetModuleVersion(module_name *byte) *byte {
 	}
 }
 func ZvalMakeInternedString(zv *Zval) *ZendString {
-	ZEND_ASSERT(zv.IsType(IS_STRING))
+	ZEND_ASSERT(zv.IsString())
 	zv.SetStr(ZendNewInternedString(zv.GetStr()))
 
 	return zv.GetStr()
@@ -3898,11 +3898,11 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		property_info = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	} else {
 		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
-		if property.IsType(IS_CONSTANT_AST) {
+		if property.IsConstant() {
 			ce.SetIsConstantsUpdated(false)
 		}
 	}
-	if property.IsType(IS_STRING) {
+	if property.IsString() {
 		ZvalMakeInternedString(property)
 	}
 	if (access_type & ZEND_ACC_PPP_MASK) == 0 {
@@ -4125,7 +4125,7 @@ func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zva
 	if ZendStringEqualsLiteralCi(name, "class") {
 		ZendErrorNoreturn(b.Cond(ce.GetType() == ZEND_INTERNAL_CLASS, E_CORE_ERROR, E_COMPILE_ERROR), "A class constant must not be called 'class'; it is reserved for class name fetching")
 	}
-	if value.IsType(IS_STRING) {
+	if value.IsString() {
 		ZvalMakeInternedString(value)
 	}
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
@@ -4137,7 +4137,7 @@ func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zva
 	c.GetValue().GetAccessFlags() = access_type
 	c.SetDocComment(doc_comment)
 	c.SetCe(ce)
-	if value.IsType(IS_CONSTANT_AST) {
+	if value.IsConstant() {
 		ce.SetIsConstantsUpdated(false)
 	}
 	if !(ZendHashAddPtr(ce.GetConstantsTable(), name, c)) {

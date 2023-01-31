@@ -113,7 +113,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			continue
 			break
 		default:
-			if token.IsType(IS_UNDEF) {
+			if token.IsUndef() {
 				next_color = syntax_highlighter_ini.GetHighlightKeyword()
 			} else {
 				next_color = syntax_highlighter_ini.GetHighlightDefault()
@@ -130,7 +130,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			}
 		}
 		ZendHtmlPuts((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
-		if token.IsType(IS_STRING) {
+		if token.IsString() {
 			switch token_type {
 			case T_OPEN_TAG:
 
@@ -195,7 +195,7 @@ func ZendStrip() {
 			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
 			break
 		}
-		if token.IsType(IS_STRING) {
+		if token.IsString() {
 			switch token_type {
 			case T_OPEN_TAG:
 

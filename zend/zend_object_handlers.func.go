@@ -49,7 +49,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 				prop_info = _z.GetPtr()
 				if !prop_info.IsStatic() {
 					flags |= prop_info.GetFlags()
-					if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
+					if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
 						zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 					}
 					_zendHashAppendInd(zobj.GetProperties(), prop_info.GetName(), OBJ_PROP(zobj, prop_info.GetOffset()))
@@ -65,7 +65,7 @@ func RebuildObjectProperties(zobj *ZendObject) {
 						prop_info = _z.GetPtr()
 						if prop_info.GetCe() == ce && !prop_info.IsStatic() && prop_info.IsPrivate() {
 							var zv Zval
-							if OBJ_PROP(zobj, prop_info.GetOffset()).IsType(IS_UNDEF) {
+							if OBJ_PROP(zobj, prop_info.GetOffset()).IsUndef() {
 								zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
 							}
 							ZVAL_INDIRECT(&zv, OBJ_PROP(zobj, prop_info.GetOffset()))
@@ -116,7 +116,7 @@ func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 		return Z_OBJ_HT(*object).GetGetProperties()(object)
 	}
 	ZendCallMethodWith0Params(object, ce, ce.GetDebugInfo(), ZEND_DEBUGINFO_FUNC_NAME, &retval)
-	if retval.IsType(IS_ARRAY) {
+	if retval.IsArray() {
 		if !(Z_REFCOUNTED(retval)) {
 			*is_temp = 1
 			return ZendArrayDup(retval.GetArr())
@@ -129,7 +129,7 @@ func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			ZvalPtrDtor(&retval)
 			return retval.GetArr()
 		}
-	} else if retval.IsType(IS_NULL) {
+	} else if retval.IsNull() {
 		*is_temp = 1
 		ht = ZendNewArray(0)
 		return ht
@@ -519,7 +519,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 	var ptr *uint32
 	ZEND_ASSERT(zobj.GetCe().IsUseGuards())
 	zv = zobj.GetPropertiesTable() + zobj.GetCe().GetDefaultPropertiesCount()
-	if zv.IsType(IS_STRING) {
+	if zv.IsString() {
 		var str *ZendString = zv.GetStr()
 		if str == member || str.GetH() == member.GetHash() && ZendStringEqualContent(str, member) != 0 {
 			return &(zv.GetPropertyGuard())
@@ -537,7 +537,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 			ZvalPtrDtorStr(zv)
 			ZVAL_ARR(zv, guards)
 		}
-	} else if zv.IsType(IS_ARRAY) {
+	} else if zv.IsArray() {
 		guards = zv.GetArr()
 		ZEND_ASSERT(guards != nil)
 		zv = guards.KeyFind(member.GetStr())
@@ -545,7 +545,7 @@ func ZendGetPropertyGuard(zobj *ZendObject, member *ZendString) *uint32 {
 			return (*uint32)(ZendUintptrT(zv.GetPtr()) & ^1)
 		}
 	} else {
-		ZEND_ASSERT(zv.IsType(IS_UNDEF))
+		ZEND_ASSERT(zv.IsUndef())
 		ZVAL_STR_COPY(zv, member)
 		zv.SetPropertyGuard(0)
 		return &(zv.GetPropertyGuard())
@@ -845,7 +845,7 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetget", rv, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)
 		ZvalPtrDtor(&tmp_offset)
-		if rv.IsType(IS_UNDEF) {
+		if rv.IsUndef() {
 			if EG__().GetException() == nil {
 				ZendThrowError(nil, "Undefined offset for object of type %s used as array", ce.GetName().GetVal())
 			}
@@ -917,7 +917,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 	property_offset = ZendGetPropertyOffset(zobj.GetCe(), name, zobj.GetCe().GetGet() != nil, cache_slot, &prop_info)
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		retval = OBJ_PROP(zobj, property_offset)
-		if retval.IsType(IS_UNDEF) {
+		if retval.IsUndef() {
 			if zobj.GetCe().GetGet() == nil || ((*ZendGetPropertyGuard)(zobj, name)&IN_GET) != 0 || prop_info != nil && retval.GetU2Extra() == IS_PROP_UNINIT {
 				if type_ == BP_VAR_RW || type_ == BP_VAR_R {
 					if prop_info != nil {
@@ -1292,7 +1292,7 @@ func ZendClassInitStatics(class_type *ZendClassEntry) {
 		ZEND_MAP_PTR_SET(class_type.static_members_table, Emalloc(b.SizeOf("zval")*class_type.GetDefaultStaticMembersCount()))
 		for i = 0; i < class_type.GetDefaultStaticMembersCount(); i++ {
 			p = class_type.GetDefaultStaticMembersTable()[i]
-			if p.IsType(IS_INDIRECT) {
+			if p.IsIndirect() {
 				var q *Zval = &CE_STATIC_MEMBERS(class_type.parent)[i]
 				ZVAL_DEINDIRECT(q)
 				ZVAL_INDIRECT(&CE_STATIC_MEMBERS(class_type)[i], q)
@@ -1349,7 +1349,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 	}
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
 	ZVAL_DEINDIRECT(ret)
-	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsType(IS_UNDEF) && property_info.GetType() != 0 {
+	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsUndef() && property_info.GetType() != 0 {
 		ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(property_name))
 		return nil
 	}
@@ -1570,7 +1570,7 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 			EG__().SetFakeScope(nil)
 			ZendCallMethodWith0Params(readobj, ce, ce.GetTostring(), "__tostring", &retval)
 			EG__().SetFakeScope(fake_scope)
-			if retval.IsType(IS_STRING) {
+			if retval.IsString() {
 				ZVAL_COPY_VALUE(writeobj, &retval)
 				return SUCCESS
 			}
