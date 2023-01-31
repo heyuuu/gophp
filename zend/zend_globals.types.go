@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendCompilerGlobals
  */
@@ -249,6 +251,18 @@ type ZendExecutorGlobals struct {
 	exception_ignore_args               ZendBool
 	reserved                            []any
 }
+
+/**
+ * 辅助方法
+ */
+func (this *ZendExecutorGlobals) HtIterators() []HashTableIterator {
+	// todo 待调整
+	return b.CastSlice(this.ht_iterators, this.ht_iterators_count)
+}
+
+/**
+ * 以下是自动生成的方法
+ */
 
 func (this *ZendExecutorGlobals) GetUninitializedZval() Zval          { return this.uninitialized_zval }
 func (this *ZendExecutorGlobals) SetUninitializedZval(value Zval)     { this.uninitialized_zval = value }

@@ -24,3 +24,8 @@ func CastStr[I integer](str *byte, len_ I) string {
 
 	return string(bytes)
 }
+
+func CastSlice[T any, I integer](start *T, len_ I) []T {
+	// todo 此段代码仅表意，实际不应依赖此实现
+	return *Cast[[]T](start)
+}

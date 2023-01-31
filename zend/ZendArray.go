@@ -48,6 +48,10 @@ func (this ZendArrayKey) GetZendStringKey() *ZendString {
 	}
 }
 
+func (this ZendArrayKey) GetZendHashKey() ZendHashKey {
+	return ZendHashKey{key: this.GetZendStringKey(), h: this.GetH()}
+}
+
 /**
  * Bucket
  */
@@ -526,6 +530,17 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 }
 
 /**
+ * Add / Update by ZendArrayKey
+ */
+func (this *HashTable) Update(key ZendArrayKey, pData *Zval) *Zval {
+	if key.IsStrKey() {
+		return this.KeyUpdate(key.GetKey(), pData)
+	} else {
+		return this.IndexUpdate(key.GetIndex(), pData)
+	}
+}
+
+/**
  * Delete
  */
 func (this *HashTable) KeyDelete(key string) bool {
@@ -641,4 +656,14 @@ func (this *HashTable) DestroyEx() {
 	this.SetGcTypeInfo(IS_NULL)
 
 	this.Destroy()
+}
+
+func (this *HashTable) GracefulReverseDestroy() {
+	this.assertRc1()
+	for idx := this.DataSize(); idx > 0; idx-- {
+		var p = &this.data[idx-1]
+		if p.IsValid() {
+			this.deleteBucket(idx)
+		}
+	}
 }

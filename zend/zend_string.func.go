@@ -149,7 +149,7 @@ func ZendInternedStringsInit() {
 	}
 }
 func ZendInternedStringsDtor() {
-	ZendHashDestroy(&InternedStringsPermanent)
+	InternedStringsPermanent.Destroy()
 	Free(ZendKnownStrings)
 	ZendKnownStrings = nil
 }
@@ -280,7 +280,7 @@ func ZendInternedStringsActivate() {
 	ZendInitInternedStringsHt(&(CompilerGlobals.GetInternedStrings()), 0)
 }
 func ZendInternedStringsDeactivate() {
-	ZendHashDestroy(&(CompilerGlobals.GetInternedStrings()))
+	__CG().GetInternedStrings().Destroy()
 }
 func ZendInternedStringsSwitchStorage(request ZendBool) {
 	if request != 0 {

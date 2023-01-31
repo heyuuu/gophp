@@ -140,6 +140,59 @@ func (this *HashTable) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 	}
 }
 
+func (this *HashTable) eachValidBucketIndirect(handler func(pos uint32, p *Bucket, data *Zval)) {
+	var size = uint32(len(this.data))
+	for i := uint32(0); i < size; i++ {
+		var p = &this.data[i]
+		if p.IsValid() {
+			continue
+		}
+
+		/* INDIRECT element may point to UNDEF-ined slots */
+		var data = p.GetVal()
+		if data.IsType(IS_INDIRECT) {
+			data = data.GetZv()
+			if data.IsType(IS_UNDEF) {
+				return
+			}
+		}
+
+		handler(i, p, data)
+	}
+}
+
+func (this *HashTable) applyValidBucket(apply_func func(p *Bucket) int) {
+	var size = this.DataSize()
+	for idx := uint32(0); idx < size; idx++ {
+		var p = &this.data[idx]
+		if !p.IsValid() {
+			continue
+		}
+		var result = apply_func(p)
+		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
+			this.deleteBucket(idx)
+		}
+		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
+			break
+		}
+	}
+}
+func (this *HashTable) applyValidBucketReserve(apply_func func(p *Bucket) int) {
+	for idx := this.DataSize(); idx > 0; idx-- {
+		var p = &this.data[idx-1]
+		if !p.IsValid() {
+			continue
+		}
+		var result = apply_func(p)
+		if b.FlagMatch(result, ZEND_HASH_APPLY_REMOVE) {
+			this.deleteBucket(idx - 1)
+		}
+		if b.FlagMatch(result, ZEND_HASH_APPLY_STOP) {
+			break
+		}
+	}
+}
+
 func (this *HashTable) foreachData() []*Bucket {
 	// todo 逐渐替换为 eachBucket 或其他更高效代码
 	var data = make([]*Bucket, 0)
