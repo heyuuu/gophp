@@ -21,7 +21,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 	if ht == nil {
 		return zend.FAILURE
 	}
-	if zend.GC_IS_RECURSIVE(ht) != 0 {
+	if ht.IsRecursive() {
 
 		/* Prevent recursion */
 
@@ -136,11 +136,11 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				*p = '0'
 			}
 			if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-				zend.GC_PROTECT_RECURSION(ht)
+				ht.ProtectRecursive()
 			}
 			PhpUrlEncodeHashEx(zend.HASH_OF(zdata), formstr, nil, 0, newprefix, newprefix_len, "%5D", 3, b.Cond(zdata.IsType(zend.IS_OBJECT), zdata, nil), arg_sep, enc_type)
 			if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-				zend.GC_UNPROTECT_RECURSION(ht)
+				ht.UnprotectRecursive()
 			}
 			zend.Efree(newprefix)
 		} else if zdata.IsType(zend.IS_NULL) || zdata.IsType(zend.IS_RESOURCE) {

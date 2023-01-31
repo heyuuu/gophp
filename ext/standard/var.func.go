@@ -85,11 +85,11 @@ again:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
-				if zend.GC_IS_RECURSIVE(myht) != 0 {
+				if myht.IsRecursive() {
 					core.PUTS("*RECURSION*\n")
 					return
 				}
-				zend.GC_PROTECT_RECURSION(myht)
+				myht.ProtectRecursive()
 			}
 			myht.AddRefcount()
 		}
@@ -111,7 +111,7 @@ again:
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
-				zend.GC_UNPROTECT_RECURSION(myht)
+				myht.UnprotectRecursive()
 			}
 			myht.DelRefcount()
 		}
@@ -121,7 +121,7 @@ again:
 		core.PUTS("}\n")
 		break
 	case zend.IS_OBJECT:
-		if zend.Z_IS_RECURSIVE_P(struc) != 0 {
+		if zend.Z_IS_RECURSIVE_P(struc) {
 			core.PUTS("*RECURSION*\n")
 			return
 		}
@@ -333,11 +333,11 @@ again:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
-				if zend.GC_IS_RECURSIVE(myht) != 0 {
+				if myht.IsRecursive() {
 					core.PUTS("*RECURSION*\n")
 					return
 				}
-				zend.GC_PROTECT_RECURSION(myht)
+				myht.ProtectRecursive()
 			}
 			myht.AddRefcount()
 		}
@@ -359,7 +359,7 @@ again:
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if level > 1 {
-				zend.GC_UNPROTECT_RECURSION(myht)
+				myht.UnprotectRecursive()
 			}
 			myht.DelRefcount()
 		}
@@ -371,12 +371,12 @@ again:
 	case zend.IS_OBJECT:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		if myht != nil {
-			if zend.GC_IS_RECURSIVE(myht) != 0 {
+			if myht.IsRecursive() {
 				core.PUTS("*RECURSION*\n")
 				zend.ZendReleaseProperties(myht)
 				return
 			}
-			zend.GC_PROTECT_RECURSION(myht)
+			myht.ProtectRecursive()
 		}
 		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), zend.Z_REFCOUNT_P(struc))
@@ -400,7 +400,7 @@ again:
 					ZvalObjectPropertyDump(prop_info, val, index, key, level)
 				}
 			}
-			zend.GC_UNPROTECT_RECURSION(myht)
+			myht.UnprotectRecursive()
 			zend.ZendReleaseProperties(myht)
 		}
 		if level > 1 {
@@ -611,13 +611,13 @@ again:
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-			if zend.GC_IS_RECURSIVE(myht) != 0 {
+			if myht.IsRecursive() {
 				zend.SmartStrAppendl(buf, "NULL", 4)
 				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
 				return
 			}
 			myht.AddRefcount()
-			zend.GC_PROTECT_RECURSION(myht)
+			myht.ProtectRecursive()
 		}
 		if level > 1 {
 			zend.SmartStrAppendc(buf, '\n')
@@ -639,7 +639,7 @@ again:
 			PhpArrayElementExport(val, index, key, level, buf)
 		}
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-			zend.GC_UNPROTECT_RECURSION(myht)
+			myht.UnprotectRecursive()
 			myht.DelRefcount()
 		}
 		if level > 1 {
@@ -650,13 +650,13 @@ again:
 	case zend.IS_OBJECT:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_VAR_EXPORT)
 		if myht != nil {
-			if zend.GC_IS_RECURSIVE(myht) != 0 {
+			if myht.IsRecursive() {
 				zend.SmartStrAppendl(buf, "NULL", 4)
 				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
 				zend.ZendReleaseProperties(myht)
 				return
 			} else {
-				zend.GC_TRY_PROTECT_RECURSION(myht)
+				myht.TryProtectRecursive()
 			}
 		}
 		if level > 1 {
@@ -687,7 +687,7 @@ again:
 				val = _z
 				PhpObjectElementExport(val, index, key, level, buf)
 			}
-			zend.GC_TRY_UNPROTECT_RECURSION(myht)
+			myht.TryUnProtectRecursive()
 			zend.ZendReleaseProperties(myht)
 		}
 		if level > 1 {
@@ -1030,7 +1030,7 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			 * since we already wrote the length of the array before */
 
 			if data.IsType(zend.IS_ARRAY) {
-				if zend.Z_IS_RECURSIVE_P(data) != 0 || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
+				if zend.Z_IS_RECURSIVE_P(data) || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
 					PhpAddVarHash(var_hash, struc)
 					zend.SmartStrAppendl(buf, "N;", 2)
 				} else {

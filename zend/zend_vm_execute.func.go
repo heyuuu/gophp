@@ -2926,7 +2926,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 
 					/* fast copy */
 
-					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(obj_ht) != 0))
+					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					ZVAL_EMPTY_ARRAY(result)
@@ -15427,7 +15427,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 
 					/* fast copy */
 
-					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(obj_ht) != 0))
+					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					ZVAL_EMPTY_ARRAY(result)
@@ -18236,7 +18236,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 
 					/* fast copy */
 
-					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(obj_ht) != 0))
+					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					ZVAL_EMPTY_ARRAY(result)
@@ -32805,7 +32805,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 
 					/* fast copy */
 
-					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(obj_ht) != 0))
+					ZVAL_ARR(result, ZendProptableToSymtable(obj_ht, Z_OBJCE_P(expr).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(expr).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive()))
 					ZendReleaseProperties(obj_ht)
 				} else {
 					ZVAL_EMPTY_ARRAY(result)

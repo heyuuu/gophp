@@ -935,7 +935,7 @@ try_again:
 		} else {
 			var obj_ht *HashTable = ZendGetPropertiesFor(op, ZEND_PROP_PURPOSE_ARRAY_CAST)
 			if obj_ht != nil {
-				var new_obj_ht *HashTable = ZendProptableToSymtable(obj_ht, Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(obj_ht) != 0)
+				var new_obj_ht *HashTable = ZendProptableToSymtable(obj_ht, Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
 				ZvalPtrDtor(op)
 				ZVAL_ARR(op, new_obj_ht)
 				ZendReleaseProperties(obj_ht)

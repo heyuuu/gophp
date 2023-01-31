@@ -248,16 +248,16 @@ func ZendPrintFlatZvalR(expr *Zval) {
 	case IS_ARRAY:
 		ZEND_PUTS("Array (")
 		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
+			if expr.GetArr().IsRecursive() {
 				ZEND_PUTS(" *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(expr.GetArr())
+			expr.GetArr().ProtectRecursive()
 		}
 		PrintFlatHash(expr.GetArr())
 		ZEND_PUTS(")")
 		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(expr.GetArr())
+			expr.GetArr().UnprotectRecursive()
 		}
 		break
 	case IS_OBJECT:
@@ -265,15 +265,15 @@ func ZendPrintFlatZvalR(expr *Zval) {
 		var class_name *ZendString = Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
 		ZendPrintf("%s Object (", class_name.GetVal())
 		ZendStringReleaseEx(class_name, 0)
-		if GC_IS_RECURSIVE(expr.GetCounted()) != 0 {
+		if expr.GetCounted().IsRecursive() {
 			ZEND_PUTS(" *RECURSION*")
 			return
 		}
 		properties = Z_OBJPROP_P(expr)
 		if properties != nil {
-			GC_PROTECT_RECURSION(expr.GetObj())
+			expr.GetObj().ProtectRecursive()
 			PrintFlatHash(properties)
-			GC_UNPROTECT_RECURSION(expr.GetObj())
+			expr.GetObj().UnprotectRecursive()
 		}
 		ZEND_PUTS(")")
 		break
@@ -290,15 +290,15 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	case IS_ARRAY:
 		SmartStrAppends(buf, "Array\n")
 		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
-			if GC_IS_RECURSIVE(expr.GetArr()) != 0 {
+			if expr.GetArr().IsRecursive() {
 				SmartStrAppends(buf, " *RECURSION*")
 				return
 			}
-			GC_PROTECT_RECURSION(expr.GetArr())
+			expr.GetArr().ProtectRecursive()
 		}
 		PrintHash(buf, expr.GetArr(), indent, 0)
 		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
-			GC_UNPROTECT_RECURSION(expr.GetArr())
+			expr.GetArr().UnprotectRecursive()
 		}
 		break
 	case IS_OBJECT:
@@ -307,16 +307,16 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 		SmartStrAppends(buf, class_name.GetVal())
 		ZendStringReleaseEx(class_name, 0)
 		SmartStrAppends(buf, " Object\n")
-		if GC_IS_RECURSIVE(expr.GetObj()) != 0 {
+		if expr.GetObj().IsRecursive() {
 			SmartStrAppends(buf, " *RECURSION*")
 			return
 		}
 		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
 			break
 		}
-		GC_PROTECT_RECURSION(expr.GetObj())
+		expr.GetObj().ProtectRecursive()
 		PrintHash(buf, properties, indent, 1)
-		GC_UNPROTECT_RECURSION(expr.GetObj())
+		expr.GetObj().UnprotectRecursive()
 		ZendReleaseProperties(properties)
 		break
 	case IS_LONG:
@@ -518,7 +518,7 @@ func ZendPostStartup() int {
 }
 func ZendShutdown() {
 	ZendVmDtor()
-	ZendDestroyRsrcList(EG__().GetPersistentList())
+	EG__().GetPersistentList().GracefulReverseDestroy()
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
@@ -630,7 +630,7 @@ func ZendDeactivate() {
 		ShutdownCompiler()
 	}
 	EG__().SetBailout(__orig_bailout)
-	ZendDestroyRsrcList(EG__().GetRegularList())
+	EG__().GetRegularList().GracefulReverseDestroy()
 }
 func ZendMessageDispatcher(message ZendLong, data any) {
 	if ZendMessageDispatcherP != nil {

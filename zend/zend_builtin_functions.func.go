@@ -795,7 +795,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 func ValidateConstantArray(ht *HashTable) int {
 	var ret int = 1
 	var val *Zval
-	GC_PROTECT_RECURSION(ht)
+	ht.ProtectRecursive()
 	var __ht *HashTable = ht
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -810,7 +810,7 @@ func ValidateConstantArray(ht *HashTable) int {
 		if Z_REFCOUNTED_P(val) {
 			if val.IsType(IS_ARRAY) {
 				if Z_REFCOUNTED_P(val) {
-					if Z_IS_RECURSIVE_P(val) != 0 {
+					if Z_IS_RECURSIVE_P(val) {
 						ZendError(E_WARNING, "Constants cannot be recursive arrays")
 						ret = 0
 						break
@@ -826,7 +826,7 @@ func ValidateConstantArray(ht *HashTable) int {
 			}
 		}
 	}
-	GC_UNPROTECT_RECURSION(ht)
+	ht.UnprotectRecursive()
 	return ret
 }
 func CopyConstantArray(dst *Zval, src *Zval) {
@@ -1448,7 +1448,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	zobj = obj.GetObj()
-	if zobj.GetCe().GetDefaultPropertiesCount() == 0 && properties == zobj.GetProperties() && GC_IS_RECURSIVE(properties) == 0 {
+	if zobj.GetCe().GetDefaultPropertiesCount() == 0 && properties == zobj.GetProperties() && !(properties.IsRecursive()) {
 
 		/* fast copy */
 
@@ -1591,7 +1591,7 @@ func ZifGetMangledObjectVars(execute_data *ZendExecuteData, return_value *Zval) 
 		ZVAL_EMPTY_ARRAY(return_value)
 		return
 	}
-	properties = ZendProptableToSymtable(properties, Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(obj).GetHandlers() != &StdObjectHandlers || GC_IS_RECURSIVE(properties) != 0)
+	properties = ZendProptableToSymtable(properties, Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(obj).GetHandlers() != &StdObjectHandlers || properties.IsRecursive())
 	RETVAL_ARR(properties)
 	return
 }

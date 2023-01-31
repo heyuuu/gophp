@@ -629,11 +629,11 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 	var cnt zend.ZendLong = 0
 	var element *zend.Zval
 	if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-		if zend.GC_IS_RECURSIVE(ht) != 0 {
+		if ht.IsRecursive() {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 			return 0
 		}
-		zend.GC_PROTECT_RECURSION(ht)
+		ht.ProtectRecursive()
 	}
 	cnt = ht.Count()
 	var __ht *zend.HashTable = ht
@@ -647,7 +647,7 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 		}
 	}
 	if (ht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
-		zend.GC_UNPROTECT_RECURSION(ht)
+		ht.UnprotectRecursive()
 	}
 	return cnt
 }
@@ -2187,7 +2187,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 			zend.ZVAL_DEREF(zv)
 			zend.SEPARATE_ARRAY(zv)
 			thash = zv.GetArr()
-			if zend.GC_IS_RECURSIVE(thash) != 0 {
+			if thash.IsRecursive() {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 				result = zend.FAILURE
 				break
@@ -2198,14 +2198,14 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 			orig_array_walk_fci = BG(array_walk_fci)
 			orig_array_walk_fci_cache = BG(array_walk_fci_cache)
 			zend.Z_ADDREF(ref)
-			zend.GC_PROTECT_RECURSION(thash)
+			thash.ProtectRecursive()
 			result = PhpArrayWalk(zv, userdata, recursive)
 			if zend.Z_REFVAL(ref).IsType(zend.IS_ARRAY) && thash == zend.Z_REFVAL(ref).GetArr() {
 
 				/* If the hashtable changed in the meantime, we'll "leak" this apply count
 				 * increment -- our reference to thash is no longer valid. */
 
-				zend.GC_UNPROTECT_RECURSION(thash)
+				thash.UnprotectRecursive()
 
 				/* If the hashtable changed in the meantime, we'll "leak" this apply count
 				 * increment -- our reference to thash is no longer valid. */
@@ -3725,7 +3725,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 		}
 	} else if entry.IsType(zend.IS_ARRAY) {
 		if zend.Z_REFCOUNTED_P(entry) {
-			if zend.Z_IS_RECURSIVE_P(entry) != 0 {
+			if zend.Z_IS_RECURSIVE_P(entry) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 				return
 			}
@@ -5587,7 +5587,7 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				} else {
 					thash = nil
 				}
-				if thash != nil && zend.GC_IS_RECURSIVE(thash) != 0 || src_entry == dest_entry && zend.Z_ISREF_P(dest_entry) && zend.Z_REFCOUNT_P(dest_entry)%2 != 0 {
+				if thash != nil && thash.IsRecursive() || src_entry == dest_entry && zend.Z_ISREF_P(dest_entry) && zend.Z_REFCOUNT_P(dest_entry)%2 != 0 {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 					return 0
 				}
@@ -5608,11 +5608,11 @@ func PhpArrayMergeRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 				}
 				if src_zval.IsType(zend.IS_ARRAY) {
 					if thash != nil && (thash.GetGcFlags()&zend.GC_IMMUTABLE) == 0 {
-						zend.GC_PROTECT_RECURSION(thash)
+						thash.ProtectRecursive()
 					}
 					ret = PhpArrayMergeRecursive(dest_zval.GetArr(), src_zval.GetArr())
 					if thash != nil && (thash.GetGcFlags()&zend.GC_IMMUTABLE) == 0 {
-						zend.GC_UNPROTECT_RECURSION(thash)
+						thash.UnprotectRecursive()
 					}
 					if ret == 0 {
 						return 0
@@ -5713,7 +5713,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 		}
 		dest_zval = dest_entry
 		zend.ZVAL_DEREF(dest_zval)
-		if zend.Z_IS_RECURSIVE_P(dest_zval) != 0 || zend.Z_IS_RECURSIVE_P(src_zval) != 0 || zend.Z_ISREF_P(src_entry) && zend.Z_ISREF_P(dest_entry) && src_entry.GetRef() == dest_entry.GetRef() && zend.Z_REFCOUNT_P(dest_entry)%2 != 0 {
+		if zend.Z_IS_RECURSIVE_P(dest_zval) || zend.Z_IS_RECURSIVE_P(src_zval) || zend.Z_ISREF_P(src_entry) && zend.Z_ISREF_P(dest_entry) && src_entry.GetRef() == dest_entry.GetRef() && zend.Z_REFCOUNT_P(dest_entry)%2 != 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 			return 0
 		}

@@ -1412,7 +1412,7 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 		 * false recursion detection.
 		 */
 
-		if Z_IS_RECURSIVE_P(o1) != 0 {
+		if Z_IS_RECURSIVE_P(o1) {
 			ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
 		Z_PROTECT_RECURSION_P(o1)

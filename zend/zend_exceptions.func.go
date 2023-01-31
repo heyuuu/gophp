@@ -570,7 +570,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		ZvalPtrDtor(&trace)
 		Z_PROTECT_RECURSION_P(exception)
 		exception = GET_PROPERTY(exception, ZEND_STR_PREVIOUS)
-		if exception != nil && exception.IsType(IS_OBJECT) && Z_IS_RECURSIVE_P(exception) != 0 {
+		if exception != nil && exception.IsType(IS_OBJECT) && Z_IS_RECURSIVE_P(exception) {
 			break
 		}
 	}
@@ -580,7 +580,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 	/* Reset apply counts */
 
 	for exception != nil && exception.IsType(IS_OBJECT) && b.Assign(&base_ce, IGetExceptionBase(exception)) && InstanceofFunction(Z_OBJCE_P(exception), base_ce) != 0 {
-		if Z_IS_RECURSIVE_P(exception) != 0 {
+		if Z_IS_RECURSIVE_P(exception) {
 			Z_UNPROTECT_RECURSION_P(exception)
 		} else {
 			break
