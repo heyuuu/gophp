@@ -88,10 +88,10 @@ func NewBucketIndirect(key ZendArrayKey, ptr *Zval) *Bucket {
 	return bucket
 }
 
-func (this *Bucket) GetVal() *Zval       { return &this.val }
-func (this *Bucket) SetVal(zval *Zval)   { ZVAL_COPY_VALUE(&this.val, zval) }
-func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
-func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
+func (this *Bucket) GetVal() *Zval               { return &this.val }
+func (this *Bucket) SetVal(zval *Zval)           { ZVAL_COPY_VALUE(&this.val, zval) }
+func (this *Bucket) GetZendKey() ZendArrayKey    { return this.key }
+func (this *Bucket) SetZendKey(key ZendArrayKey) { this.key = key }
 
 func (this *Bucket) IsStrKey() bool   { return this.key.IsStrKey() }
 func (this *Bucket) IsIndexKey() bool { return !this.key.IsStrKey() }
@@ -104,6 +104,8 @@ func (this *Bucket) SetIndexKey(index int) {
 	this.key = NewIndexKey(index)
 }
 
+func (this *Bucket) GetH() ZendUlong     { return this.key.GetH() }
+func (this *Bucket) GetKey() *ZendString { return this.key.GetZendStringKey() }
 func (this *Bucket) SetH(value ZendUlong) {
 	// todo remove
 	ZEND_ASSERT(false)
@@ -114,7 +116,7 @@ func (this *Bucket) SetKey(value *ZendString) {
 }
 
 func (this *Bucket) CopyFrom(from *Bucket) {
-	ZVAL_COPY_VALUE(this.GetVal(), from.GetVal())
+	this.SetVal(from.GetVal())
 	this.key = from.key
 }
 
