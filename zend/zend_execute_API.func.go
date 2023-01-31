@@ -287,10 +287,10 @@ func ShutdownExecutor() {
 				var nIndex uint32 = _p.GetH() | __ht.GetNTableMask()
 				var i uint32 = HT_HASH(__ht, nIndex)
 				if j != i {
-					var prev *Bucket = HT_HASH_TO_BUCKET(__ht, i)
+					var prev *Bucket = __ht.Bucket(i)
 					for prev.GetVal().GetNext() != j {
 						i = prev.GetVal().GetNext()
-						prev = HT_HASH_TO_BUCKET(__ht, i)
+						prev = __ht.Bucket(i)
 					}
 					prev.GetVal().GetNext() = _p.GetVal().GetNext()
 				} else {
@@ -315,10 +315,10 @@ func ShutdownExecutor() {
 				var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
 				var i uint32 = HT_HASH(__ht__1, nIndex)
 				if j != i {
-					var prev *Bucket = HT_HASH_TO_BUCKET(__ht__1, i)
+					var prev *Bucket = __ht__1.Bucket(i)
 					for prev.GetVal().GetNext() != j {
 						i = prev.GetVal().GetNext()
-						prev = HT_HASH_TO_BUCKET(__ht__1, i)
+						prev = __ht__1.Bucket(i)
 					}
 					prev.GetVal().GetNext() = _p.GetVal().GetNext()
 				} else {
@@ -342,10 +342,10 @@ func ShutdownExecutor() {
 				var nIndex uint32 = _p.GetH() | __ht__2.GetNTableMask()
 				var i uint32 = HT_HASH(__ht__2, nIndex)
 				if j != i {
-					var prev *Bucket = HT_HASH_TO_BUCKET(__ht__2, i)
+					var prev *Bucket = __ht__2.Bucket(i)
 					for prev.GetVal().GetNext() != j {
 						i = prev.GetVal().GetNext()
-						prev = HT_HASH_TO_BUCKET(__ht__2, i)
+						prev = __ht__2.Bucket(i)
 					}
 					prev.GetVal().GetNext() = _p.GetVal().GetNext()
 				} else {

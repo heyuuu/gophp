@@ -3018,10 +3018,10 @@ func ZendPostDeactivateModules() {
 			var nIndex uint32 = _p.GetH() | __ht__1.GetNTableMask()
 			var i uint32 = HT_HASH(__ht__1, nIndex)
 			if j != i {
-				var prev *Bucket = HT_HASH_TO_BUCKET(__ht__1, i)
+				var prev *Bucket = __ht__1.Bucket(i)
 				for prev.GetVal().GetNext() != j {
 					i = prev.GetVal().GetNext()
-					prev = HT_HASH_TO_BUCKET(__ht__1, i)
+					prev = __ht__1.Bucket(i)
 				}
 				prev.GetVal().GetNext() = _p.GetVal().GetNext()
 			} else {

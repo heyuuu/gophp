@@ -42,24 +42,18 @@ func ZEND_TYPE_ENCODE_CLASS_CONST(class_name string, allow_null int) ZendType {
 	var ptr = b.CastUintptr(&fullClassName)
 	return ZendType(ptr)
 }
-func HT_HASH_TO_BUCKET_EX(data *Bucket, idx uint32) __auto__ { return data + idx }
-func HT_IDX_TO_HASH(idx __auto__) __auto__                   { return idx }
-func HT_HASH_EX(data __auto__, idx __auto__) uint32          { return (*uint32)(data)[int32(idx)] }
-func HT_HASH(ht *HashTable, idx __auto__) uint32             { return HT_HASH_EX(ht.GetArData(), idx) }
-func HT_SIZE_TO_MASK(nTableSize uint32) __auto__ {
-	return uint32(-(nTableSize + nTableSize))
+func HT_IDX_TO_HASH(idx uint32) uint32 { return idx }
+func HT_HASH(ht *HashTable, idx HashPosition) uint32 {
+	// todo 待移除 - 在旧 arData 上返回通过 idx 获取对应的 pos 位置
+	return 0
 }
 func HT_HASH_SIZE(nTableMask uint32) int {
-	return (size_t(uint32) - int32(nTableMask)) * b.SizeOf("uint32_t")
-}
-func HT_DATA_SIZE(nTableSize uint32) int {
-	return size_t(nTableSize) * b.SizeOf("Bucket")
-}
-func HT_SIZE_EX(nTableSize uint32, nTableMask uint32) int {
-	return HT_DATA_SIZE(nTableSize) + HT_HASH_SIZE(nTableMask)
+	// todo 待移除 - 旧 hash 数组内存大小
+	return 0
 }
 func HT_SIZE(ht *HashTable) int {
-	return HT_SIZE_EX(ht.GetNTableSize(), ht.GetNTableMask())
+	// todo 待移除 - 返回 HashTable 中旧 arData 内存大小 (含 hash 内存 + item 内存)
+	return 0
 }
 func HT_USED_SIZE(ht *HashTable) int {
 	return HT_HASH_SIZE(ht.GetNTableMask()) + size_t(ht).nNumUsed*b.SizeOf("Bucket")
@@ -86,10 +80,6 @@ func GC_IS_RECURSIVE(p *HashTable) bool   { return p.IsRecursive() }
 func GC_PROTECT_RECURSION(p *HashTable)   { p.ProtectRecursive() }
 func GC_UNPROTECT_RECURSION(p *HashTable) { p.UnprotectRecursive() }
 
-func Z_IS_RECURSIVE_P(zv *Zval) bool              { return zv.IsRecursive() }
-func Z_PROTECT_RECURSION_P(zv *Zval)              { zv.ProtectRecursive() }
-func Z_UNPROTECT_RECURSION_P(zv *Zval)            { zv.UnprotectRecursive() }
-func Z_CONSTANT(zval Zval) bool                   { return zval.IsConstant() }
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return zval_p.IsRefcounted() }
 func Z_ISREF_P(zval_p *Zval) bool                 { return zval_p.IsReference() }
 func Z_STR_P(zval_p *Zval) *ZendString            { return zval_p.GetStr() }

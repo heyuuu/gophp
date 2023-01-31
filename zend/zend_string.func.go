@@ -160,7 +160,7 @@ func ZendInternedStringHtLookupEx(h ZendUlong, str *byte, size int, interned_str
 	nIndex = h | interned_strings.GetNTableMask()
 	idx = HT_HASH(interned_strings, nIndex)
 	for idx != HT_INVALID_IDX {
-		p = HT_HASH_TO_BUCKET(interned_strings, idx)
+		p = interned_strings.Bucket(idx)
 		if p.GetH() == h && p.GetKey().GetLen() == size {
 			if !(memcmp(p.GetKey().GetVal(), str, size)) {
 				return p.GetKey()
@@ -178,7 +178,7 @@ func ZendInternedStringHtLookup(str *ZendString, interned_strings *HashTable) *Z
 	nIndex = h | interned_strings.GetNTableMask()
 	idx = HT_HASH(interned_strings, nIndex)
 	for idx != HT_INVALID_IDX {
-		p = HT_HASH_TO_BUCKET(interned_strings, idx)
+		p = interned_strings.Bucket(idx)
 		if p.GetH() == h && ZendStringEqualContent(p.GetKey(), str) != 0 {
 			return p.GetKey()
 		}

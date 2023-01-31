@@ -191,7 +191,8 @@ func (this *ZendArray) GetPDestructor() DtorFuncT          { return this.pDestru
 func (this *ZendArray) SetPDestructor(value DtorFuncT)     { this.pDestructor = value }
 
 func (this *ZendArray) GetNTableMask() uint32 {
-	return HT_SIZE_TO_MASK(this.nTableSize)
+	// todo 待移除
+	return uint32(-(this.nTableSize + this.nTableSize))
 }
 func (this *ZendArray) SetNTableMask(value uint32) {
 	ZEND_ASSERT(this.GetNTableMask() == value)
