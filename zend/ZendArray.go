@@ -119,11 +119,11 @@ func (this *Bucket) CopyFrom(from *Bucket) {
 }
 
 func (this *Bucket) IsValid() bool {
-	return this.val.IsType(IS_UNDEF)
+	return !this.val.IsUndef()
 }
 
 func (this *Bucket) SetInvalid() {
-	this.val.SetTypeInfo(IS_UNDEF)
+	this.val.SetUndef()
 }
 
 /**
@@ -464,9 +464,9 @@ func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 		var data *Zval
 		ZEND_ASSERT(p.GetVal() != pData)
 		data = p.GetVal()
-		if data.IsType(IS_INDIRECT) {
+		if data.IsIndirect() {
 			data = data.GetZv()
-			if data.GetType() != IS_UNDEF {
+			if !data.IsUndef() {
 				return nil
 			}
 		} else {
