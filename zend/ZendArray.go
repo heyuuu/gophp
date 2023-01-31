@@ -557,9 +557,33 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 /**
  * Add / Update by ZendArrayKey
  */
+func (this *HashTable) Add(key ZendArrayKey, pData *Zval) *Zval {
+	if key.IsStrKey() {
+		return this.KeyAdd(key.GetKey(), pData)
+	} else {
+		return this.IndexAdd(key.GetIndex(), pData)
+	}
+}
+
+func (this *HashTable) AddIndirect(key ZendArrayKey, pData *Zval) *Zval {
+	if key.IsStrKey() {
+		return this.KeyAddIndirect(key.GetKey(), pData)
+	} else {
+		return this.IndexAdd(key.GetIndex(), pData)
+	}
+}
+
 func (this *HashTable) Update(key ZendArrayKey, pData *Zval) *Zval {
 	if key.IsStrKey() {
 		return this.KeyUpdate(key.GetKey(), pData)
+	} else {
+		return this.IndexUpdate(key.GetIndex(), pData)
+	}
+}
+
+func (this *HashTable) UpdateIndirect(key ZendArrayKey, pData *Zval) *Zval {
+	if key.IsStrKey() {
+		return this.KeyUpdateIndirect(key.GetKey(), pData)
 	} else {
 		return this.IndexUpdate(key.GetIndex(), pData)
 	}

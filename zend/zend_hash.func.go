@@ -749,55 +749,21 @@ func ZendArrayDup(source *HashTable) *HashTable {
 	return target
 }
 func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCtorFuncT, overwrite ZendBool) {
-	var idx uint32
-	var p *Bucket
-	var t *Zval
-	var s *Zval
 	target.assertRc1()
 	if overwrite != 0 {
-		for idx = 0; idx < source.GetNNumUsed(); idx++ {
-			p = source.GetArData() + idx
-			s = p.GetVal()
-			if s.IsType(IS_INDIRECT) {
-				s = s.GetZv()
+		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+			var t = target.UpdateIndirect(p.GetZendKey(), data)
+			if pCopyConstructor != nil {
+				pCopyConstructor(t)
 			}
-			if s.IsType(IS_UNDEF) {
-				continue
-			}
-			if p.IsStrKey() {
-				t = target.KeyUpdateIndirect(p.StrKey(), s)
-				if pCopyConstructor != nil {
-					pCopyConstructor(t)
-				}
-			} else {
-				t = target.IndexUpdateH(p.GetH(), s)
-				if pCopyConstructor != nil {
-					pCopyConstructor(t)
-				}
-			}
-		}
+		})
 	} else {
-		for idx = 0; idx < source.GetNNumUsed(); idx++ {
-			p = source.GetArData() + idx
-			s = p.GetVal()
-			if s.IsType(IS_INDIRECT) {
-				s = s.GetZv()
+		source.eachValidBucketIndirect(func(pos uint32, p *Bucket, s *Zval) {
+			var t = target.AddIndirect(p.GetZendKey(), s)
+			if t != nil && pCopyConstructor != nil {
+				pCopyConstructor(t)
 			}
-			if s.IsType(IS_UNDEF) {
-				continue
-			}
-			if p.IsStrKey() {
-				t = target.KeyAddIndirect(p.StrKey(), s)
-				if t != nil && pCopyConstructor != nil {
-					pCopyConstructor(t)
-				}
-			} else {
-				t = target.IndexAddH(p.GetH(), s)
-				if t != nil && pCopyConstructor != nil {
-					pCopyConstructor(t)
-				}
-			}
-		}
+		})
 	}
 }
 func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval { return ht.IndexFindH(h) }
