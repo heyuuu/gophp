@@ -149,7 +149,6 @@ type ZendArray struct {
 		}
 		flags uint32
 	}
-	nNumUsed         uint32
 	nNumOfElements   uint32
 	nTableSize       uint32
 	nInternalPointer uint32
@@ -277,15 +276,22 @@ func (this *ZendArray) assertRc1() {
 	ZEND_ASSERT(this.GetRefcount() == 1)
 }
 
-func (this *ZendArray) RealInit() {
+func (this *ZendArray) clearData() {
 	this.assertRc1()
 
 	this.nNumOfElements = 0
 	this.data = nil
 	this.indexMap = make(map[int]uint32)
 	this.keyMap = make(map[string]uint32)
+	this.nNextFreeElement = 0
+	this.nInternalPointer = 0
 
+	// todo 确认有多少 flags
 	this.SetIsStaticKeys()
+}
+
+func (this *ZendArray) RealInit() {
+	this.clearData()
 }
 
 func (this *ZendArray) resetHash() {
@@ -601,4 +607,38 @@ func (this *ZendArray) deleteBucket(pos uint32) {
 	if this.DataSize()-1 == pos {
 		this.removeInvalidTail()
 	}
+}
+
+/**
+ * Clean && Destroy
+ */
+func (this *HashTable) Clean() {
+	this.assertRc1()
+	if this.GetNNumUsed() != 0 {
+		if this.pDestructor != nil {
+			this.eachValidBucket(func(pos uint32, p *Bucket) {
+				this.pDestructor(p.GetVal())
+			})
+		}
+	}
+	this.clearData()
+}
+
+func (this *HashTable) Destroy() {
+	if this.DataSize() != 0 {
+		if this.pDestructor != nil {
+			this.eachValidBucket(func(pos uint32, p *Bucket) {
+				this.pDestructor(p.GetVal())
+			})
+		}
+	}
+	ZendHashIteratorsRemove(this)
+}
+
+func (this *HashTable) DestroyEx() {
+	/* break possible cycles */
+	GC_REMOVE_FROM_BUFFER(this)
+	this.SetGcTypeInfo(IS_NULL)
+
+	this.Destroy()
 }

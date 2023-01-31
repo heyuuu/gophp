@@ -65,7 +65,7 @@ func (this *ZendArray) deleteHash(key ZendArrayKey) {
 	}
 }
 
-func (this *HashTable) eachBucket(handler func(uint32, *Bucket)) {
+func (this *HashTable) eachBucket(handler func(pos uint32, p *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
@@ -73,7 +73,7 @@ func (this *HashTable) eachBucket(handler func(uint32, *Bucket)) {
 	}
 }
 
-func (this *HashTable) eachValidBucket(handler func(uint32, *Bucket)) {
+func (this *HashTable) eachValidBucket(handler func(pos uint32, p *Bucket)) {
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
