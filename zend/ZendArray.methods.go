@@ -2,7 +2,63 @@ package zend
 
 import (
 	b "sik/builtin"
+	"sort"
 )
+
+func (this *HashTable) Sort(comparer func(a *Bucket, b *Bucket) bool, renumber bool) {
+	this.assertRc1()
+
+	if this.nNumOfElements == 0 || (this.nNumOfElements == 1 && !renumber) {
+		return
+	}
+
+	this.removeHolesForce()
+	this.SetNInternalPointer(0)
+
+	sort.SliceStable(this.data, func(i, j int) bool {
+		return comparer(&this.data[i], &this.data[i])
+	})
+
+	if renumber {
+		this.eachBucket(func(pos uint32, p *Bucket) {
+			p.SetIndexKey(int(pos))
+		})
+		this.nNextFreeElement = int(this.DataSize())
+	}
+
+	this.Rehash()
+}
+
+func (this *HashTable) SortCompatible(comparer CompareFuncT, renumber ZendBool) int {
+	this.Sort(func(a *Bucket, b *Bucket) bool {
+		var compareResult = comparer(a, b)
+		return compareResult > 0
+	}, renumber != 0)
+	return SUCCESS
+}
+
+func (this *HashTable) SortCompatibleEx(sort_ SortFuncT) int {
+	// todo sort 转 sortFunc 需要订制处理
+	var sortFunc = *b.Cast[func([]Bucket)](&sort_)
+
+	// 正常 sort 逻辑，除 sortFunc 部分外和 this.Sort() 逻辑一致
+	this.assertRc1()
+
+	if this.nNumOfElements <= 1 {
+		return SUCCESS
+	}
+
+	this.removeHolesForce()
+	this.SetNInternalPointer(0)
+
+	sortFunc(this.data)
+
+	this.Rehash()
+
+	return SUCCESS
+}
+
+// ---
 
 func (this *HashTable) posBucket(p *Bucket) (uint32, bool) {
 	if p.IsStrKey() {
@@ -153,6 +209,32 @@ func (this *HashTable) removeHoles() bool {
 			newPos++
 		})
 	}
+
+	// 截取数据，记录有效元素数
+	this.data = this.data[:newPos]
+	this.nNumOfElements = newPos
+
+	ZEND_ASSERT(this.IsWithoutHoles())
+
+	return true
+}
+
+// 移除 data 的 holes, 不考虑 nInternalPointer 和 Iterators 内的 pos 指针
+func (this *HashTable) removeHolesForce() bool {
+	var newPos uint32 = 0
+
+	if this.IsWithoutHoles() {
+		return false
+	}
+
+	this.eachValidBucket(func(pos uint32, p *Bucket) {
+		if newPos != pos {
+			// todo 考虑下实现细节的区别
+			//(&this.data[newPos]).CopyFrom(&this.data[pos])
+			this.data[newPos] = this.data[pos]
+		}
+		newPos++
+	})
 
 	// 截取数据，记录有效元素数
 	this.data = this.data[:newPos]

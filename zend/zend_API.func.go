@@ -2282,6 +2282,7 @@ func ZendSortModules(base any, count int, siz int, compare CompareFuncT, swp Swa
 	var m *ZendModuleEntry
 	var r *ZendModuleEntry
 	for b1 < end {
+
 	try_again:
 		m = (*ZendModuleEntry)(b1.GetVal().GetPtr())
 		if m.GetModuleStarted() == 0 && m.GetDeps() != nil {

@@ -63,7 +63,7 @@ func ZendHashInternalPointerEnd(ht *HashTable) {
 	ZendHashInternalPointerEndEx(ht, ht.GetNInternalPointer())
 }
 func ZendHashSort(ht *HashTable, compare_func CompareFuncT, renumber ZendBool) int {
-	return ZendHashSortEx(ht, ZendSort, compare_func, renumber)
+	return ht.SortCompatible(compare_func, renumber)
 }
 func ZendNewArray(size uint32) *HashTable { return NewZendArray(size) }
 func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) {
@@ -664,50 +664,8 @@ func ZendHashClean(ht *HashTable)    { ht.Clean() }
 func ZendHashDestroy(ht *HashTable)  { ht.Destroy() }
 func ZendArrayDestroy(ht *HashTable) { ht.DestroyEx() }
 
-func ZendSymtableClean(ht *HashTable) {
-	var p *Bucket
-	var end *Bucket
-	ht.assertRc1()
-	if ht.GetNNumUsed() != 0 {
-		p = ht.GetArData()
-		end = p + ht.GetNNumUsed()
-		if ht.IsStaticKeys() {
-			for {
-				IZvalPtrDtor(p.GetVal())
-				if b.PreInc(&p) == end {
-					break
-				}
-			}
-		} else if ht.IsWithoutHoles() {
-			for {
-				IZvalPtrDtor(p.GetVal())
-				if p.GetKey() != nil {
-					ZendStringRelease(p.GetKey())
-				}
-				if b.PreInc(&p) == end {
-					break
-				}
-			}
-		} else {
-			for {
-				if p.GetVal().GetType() != IS_UNDEF {
-					IZvalPtrDtor(p.GetVal())
-					if p.GetKey() != nil {
-						ZendStringRelease(p.GetKey())
-					}
-				}
-				if b.PreInc(&p) == end {
-					break
-				}
-			}
-		}
-		ht.resetHash()
-	}
-	ht.SetNNumUsed(0)
-	ht.SetNNumOfElements(0)
-	ht.SetNNextFreeElement(0)
-	ht.SetNInternalPointer(0)
-}
+func ZendSymtableClean(ht *HashTable) { ht.SymtableClean() }
+
 func ZendHashGracefulReverseDestroy(ht *HashTable) {
 	var idx uint32
 	var p *Bucket
@@ -1153,81 +1111,8 @@ func ZendHashBucketSwap(p *Bucket, q *Bucket) {
 	q.SetH(h)
 	q.SetKey(key)
 }
-func ZendHashBucketRenumSwap(p *Bucket, q *Bucket) {
-	var val Zval
-	ZVAL_COPY_VALUE(&val, p.GetVal())
-	ZVAL_COPY_VALUE(p.GetVal(), q.GetVal())
-	ZVAL_COPY_VALUE(q.GetVal(), &val)
-}
-func ZendHashBucketPackedSwap(p *Bucket, q *Bucket) {
-	var val Zval
-	var h ZendUlong
-	ZVAL_COPY_VALUE(&val, p.GetVal())
-	h = p.GetH()
-	ZVAL_COPY_VALUE(p.GetVal(), q.GetVal())
-	p.SetH(q.GetH())
-	ZVAL_COPY_VALUE(q.GetVal(), &val)
-	q.SetH(h)
-}
 func ZendHashSortEx(ht *HashTable, sort SortFuncT, compar CompareFuncT, renumber ZendBool) int {
-	var p *Bucket
-	var i uint32
-	var j uint32
-	ht.assertRc1()
-	if ht.GetNNumOfElements() <= 1 && !(renumber != 0 && ht.GetNNumOfElements() > 0) {
-		return SUCCESS
-	}
-	if ht.IsWithoutHoles() {
-		i = ht.GetNNumUsed()
-	} else {
-		j = 0
-		i = 0
-		for ; j < ht.GetNNumUsed(); j++ {
-			p = ht.GetArData() + j
-			if p.GetVal().IsType(IS_UNDEF) {
-				continue
-			}
-			if i != j {
-				ht.GetArData()[i] = *p
-			}
-			i++
-		}
-	}
-	sort(any(ht.GetArData()), i, b.SizeOf("Bucket"), compar, swap_func_t(b.CondF2(renumber != 0, ZendHashBucketRenumSwap, func() __auto__ {
-		if ht.HasUFlags(HASH_FLAG_PACKED) {
-			return ZendHashBucketPackedSwap
-		} else {
-			return ZendHashBucketSwap
-		}
-	})))
-	ht.SetNNumUsed(i)
-	ht.SetNInternalPointer(0)
-	if renumber != 0 {
-		for j = 0; j < i; j++ {
-			p = ht.GetArData() + j
-			p.SetH(j)
-			if p.GetKey() != nil {
-				ZendStringRelease(p.GetKey())
-				p.SetKey(nil)
-			}
-		}
-		ht.SetNNextFreeElement(i)
-	}
-	if renumber != 0 {
-		var new_data any
-		var old_data any = HT_GET_DATA_ADDR(ht)
-		var old_buckets *Bucket = ht.GetArData()
-		new_data = Pemalloc(HT_SIZE_EX(ht.GetNTableSize(), HT_MIN_MASK), ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		ht.AddUFlags(HASH_FLAG_PACKED | HASH_FLAG_STATIC_KEYS)
-		ht.SetNTableMask(HT_MIN_MASK)
-		HT_SET_DATA_ADDR(ht, new_data)
-		memcpy(ht.GetArData(), old_buckets, b.SizeOf("Bucket")*ht.GetNNumUsed())
-		Pefree(old_data, ht.GetGcFlags()&IS_ARRAY_PERSISTENT)
-		HT_HASH_RESET_PACKED(ht)
-	} else {
-		ht.Rehash()
-	}
-	return SUCCESS
+	return ht.SortCompatibleEx(sort)
 }
 func ZendHashCompareImpl(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, ordered ZendBool) int {
 	var idx1 uint32
