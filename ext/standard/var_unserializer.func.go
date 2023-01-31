@@ -71,7 +71,7 @@ func VarPush(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
 	var_hash.GetData()[b.PostInc(&(var_hash.GetUsedSlots()))] = rval
 }
 func VarPushDtor(var_hashx *PhpUnserializeDataT, rval *zend.Zval) {
-	if zend.Z_REFCOUNTED_P(rval) {
+	if rval.IsRefcounted() {
 		var tmp_var *zend.Zval = VarTmpVar(var_hashx)
 		if tmp_var == nil {
 			return

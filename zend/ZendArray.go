@@ -563,10 +563,10 @@ func (this *HashTable) KeyDeleteIndirect(key string) bool {
 				if this.GetPDestructor() != nil {
 					var tmp Zval
 					ZVAL_COPY_VALUE(&tmp, data)
-					ZVAL_UNDEF(data)
+					data.SetUndef()
 					this.GetPDestructor()(&tmp)
 				} else {
-					ZVAL_UNDEF(data)
+					data.SetUndef()
 				}
 				this.AddUFlags(HASH_FLAG_HAS_EMPTY_IND)
 			}

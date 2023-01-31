@@ -88,27 +88,21 @@ func GC_IS_RECURSIVE(p *HashTable) bool   { return p.IsRecursive() }
 func GC_PROTECT_RECURSION(p *HashTable)   { p.ProtectRecursive() }
 func GC_UNPROTECT_RECURSION(p *HashTable) { p.UnprotectRecursive() }
 
-func Z_IS_RECURSIVE_P(zv *Zval) bool   { return zv.GetCounted().IsRecursive() }
-func Z_PROTECT_RECURSION_P(zv *Zval)   { zv.GetCounted().ProtectRecursive() }
-func Z_UNPROTECT_RECURSION_P(zv *Zval) { zv.GetCounted().UnprotectRecursive() }
-func Z_CONSTANT(zval Zval) bool        { return zval.IsType(IS_CONSTANT_AST) }
-func Z_REFCOUNTED(zval Zval) bool      { return zval.GetTypeFlags() != 0 }
-func Z_REFCOUNTED_P(zval_p *Zval) bool { return Z_REFCOUNTED(*zval_p) }
-func Z_COLLECTABLE(zval Zval) bool {
-	return zval.HasTypeFlags(IS_TYPE_COLLECTABLE)
-}
-func Z_COLLECTABLE_P(zval_p *Zval) bool { return Z_COLLECTABLE(*zval_p) }
-func Z_OPT_TYPE(zval Zval) int          { return zval.GetTypeInfo() & Z_TYPE_MASK }
-func Z_OPT_TYPE_P(zval_p *Zval) int     { return Z_OPT_TYPE(*zval_p) }
-func Z_OPT_CONSTANT(zval Zval) bool {
-	return Z_OPT_TYPE(zval) == IS_CONSTANT_AST
-}
-func Z_OPT_REFCOUNTED(zval Zval) bool {
-	return Z_TYPE_INFO_REFCOUNTED(zval.GetTypeInfo())
-}
-func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return Z_OPT_REFCOUNTED(*zval_p) }
-func Z_OPT_ISREF(zval Zval) bool                  { return Z_OPT_TYPE(zval) == IS_REFERENCE }
-func Z_OPT_ISREF_P(zval_p *Zval) bool             { return Z_OPT_ISREF(*zval_p) }
+func Z_IS_RECURSIVE_P(zv *Zval) bool              { return zv.GetCounted().IsRecursive() }
+func Z_PROTECT_RECURSION_P(zv *Zval)              { zv.GetCounted().ProtectRecursive() }
+func Z_UNPROTECT_RECURSION_P(zv *Zval)            { zv.GetCounted().UnprotectRecursive() }
+func Z_CONSTANT(zval Zval) bool                   { return zval.IsType(IS_CONSTANT_AST) }
+func Z_REFCOUNTED(zval Zval) bool                 { return zval.IsRefcounted() }
+func Z_REFCOUNTED_P(zval_p *Zval) bool            { return zval_p.IsRefcounted() }
+func Z_COLLECTABLE(zval Zval) bool                { return zval.IsCollectable() }
+func Z_COLLECTABLE_P(zval_p *Zval) bool           { return zval_p.IsCollectable() }
+func Z_OPT_TYPE(zval Zval) ZendUchar              { return zval.GetType() }
+func Z_OPT_TYPE_P(zval_p *Zval) ZendUchar         { return zval_p.GetType() }
+func Z_OPT_CONSTANT(zval Zval) bool               { return zval.IsConstant() }
+func Z_OPT_REFCOUNTED(zval Zval) bool             { return zval.IsRefcounted() }
+func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return zval_p.IsRefcounted() }
+func Z_OPT_ISREF(zval Zval) bool                  { return zval.IsReference() }
+func Z_OPT_ISREF_P(zval_p *Zval) bool             { return zval_p.IsReference() }
 func Z_ISREF_P(zval_p *Zval) bool                 { return zval_p.IsReference() }
 func Z_STR_P(zval_p *Zval) *ZendString            { return zval_p.GetStr() }
 func Z_STRVAL(zval Zval) []byte                   { return zval.GetStr().GetVal() }

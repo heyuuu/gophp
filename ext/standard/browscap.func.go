@@ -510,7 +510,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 	return 0
 }
 func BrowscapZvalCopyCtor(p *zend.Zval) {
-	if zend.Z_REFCOUNTED_P(p) {
+	if p.IsRefcounted() {
 		var str *zend.ZendString
 		zend.ZEND_ASSERT(p.IsType(zend.IS_STRING))
 		str = p.GetStr()

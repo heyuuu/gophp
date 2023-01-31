@@ -31,7 +31,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 	if object.GetCe().GetDefaultPropertiesCount() != 0 {
 		end = p + object.GetCe().GetDefaultPropertiesCount()
 		for {
-			if Z_REFCOUNTED_P(p) {
+			if p.IsRefcounted() {
 				if p.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(p.GetRef()) {
 					var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(object, p)
 					if prop_info.GetType() != 0 {

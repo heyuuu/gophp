@@ -327,7 +327,7 @@ again:
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
 		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
-		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(zend.Z_REFCOUNTED_P(struc), func() uint32 { return zend.Z_REFCOUNT_P(struc) }, 1))
+		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return zend.Z_REFCOUNT_P(struc) }, 1))
 		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
@@ -342,7 +342,7 @@ again:
 			myht.AddRefcount()
 		}
 		count = myht.Count()
-		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(zend.Z_REFCOUNTED_P(struc), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
+		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
 		var __ht *zend.HashTable = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *zend.Zval = _p.GetVal()
@@ -1034,11 +1034,11 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 					PhpAddVarHash(var_hash, struc)
 					zend.SmartStrAppendl(buf, "N;", 2)
 				} else {
-					if zend.Z_REFCOUNTED_P(data) {
+					if data.IsRefcounted() {
 						zend.Z_PROTECT_RECURSION_P(data)
 					}
 					PhpVarSerializeIntern(buf, data, var_hash)
-					if zend.Z_REFCOUNTED_P(data) {
+					if data.IsRefcounted() {
 						zend.Z_UNPROTECT_RECURSION_P(data)
 					}
 				}
@@ -1527,7 +1527,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		zend.RETVAL_FALSE
 	} else if BG(unserialize).level > 1 {
 		zend.ZVAL_COPY(return_value, retval)
-	} else if zend.Z_REFCOUNTED_P(return_value) {
+	} else if return_value.IsRefcounted() {
 		var ref *zend.ZendRefcounted = return_value.GetCounted()
 		zend.GcCheckPossibleRoot(ref)
 	}

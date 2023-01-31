@@ -20,17 +20,17 @@ func ZEND_REF_FIRST_SOURCE(ref *ZendReference) *ZendPropertyInfo {
 func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, ref *ZendRefcounted) {
 	ZVAL_COPY_VALUE(variable_ptr, value)
 	if ZEND_CONST_COND(value_type == IS_CONST, 0) {
-		if Z_OPT_REFCOUNTED_P(variable_ptr) {
+		if variable_ptr.IsRefcounted() {
 			Z_ADDREF_P(variable_ptr)
 		}
 	} else if (value_type & (IS_CONST | IS_CV)) != 0 {
-		if Z_OPT_REFCOUNTED_P(variable_ptr) {
+		if variable_ptr.IsRefcounted() {
 			Z_ADDREF_P(variable_ptr)
 		}
 	} else if ZEND_CONST_COND(value_type == IS_VAR, 1) && ref != nil {
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
-		} else if Z_OPT_REFCOUNTED_P(variable_ptr) {
+		} else if variable_ptr.IsRefcounted() {
 			Z_ADDREF_P(variable_ptr)
 		}
 	}
@@ -42,14 +42,14 @@ func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar,
 		value = Z_REFVAL_P(value)
 	}
 	for {
-		if Z_REFCOUNTED_P(variable_ptr) {
+		if variable_ptr.IsRefcounted() {
 			var garbage *ZendRefcounted
 			if variable_ptr.IsReference() {
 				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.GetRef()) {
 					return ZendAssignToTypedRef(variable_ptr, value, value_type, strict, ref)
 				}
 				variable_ptr = Z_REFVAL_P(variable_ptr)
-				if !(Z_REFCOUNTED_P(variable_ptr)) {
+				if !(variable_ptr.IsRefcounted()) {
 					break
 				}
 			}
@@ -116,7 +116,7 @@ func ZendVmStackFreeExtraArgsEx(call_info uint32, call *ZendExecuteData) {
 		var count uint32 = ZEND_CALL_NUM_ARGS(call) - call.GetFunc().GetOpArray().GetNumArgs()
 		var p *Zval = ZEND_CALL_VAR_NUM(call, call.GetFunc().GetOpArray().GetLastVar()+call.GetFunc().GetOpArray().GetT())
 		for {
-			if Z_REFCOUNTED_P(p) {
+			if p.IsRefcounted() {
 				var r *ZendRefcounted = p.GetCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
@@ -140,7 +140,7 @@ func ZendVmStackFreeArgs(call *ZendExecuteData) {
 	if num_args > 0 {
 		var p *Zval = ZEND_CALL_ARG(call, 1)
 		for {
-			if Z_REFCOUNTED_P(p) {
+			if p.IsRefcounted() {
 				var r *ZendRefcounted = p.GetCounted()
 				if r.DelRefcount() == 0 {
 					p.SetNull()
@@ -259,7 +259,7 @@ func RETURN_VALUE_USED(opline *ZendOp) bool {
 func ZifPass(execute_data *ZendExecuteData, return_value *Zval) {}
 func FREE_VAR_PTR_AND_EXTRACT_RESULT_IF_NECESSARY(free_op *Zval, result *Zval) {
 	var __container_to_free *Zval = free_op
-	if __container_to_free != nil && Z_REFCOUNTED_P(__container_to_free) {
+	if __container_to_free != nil && __container_to_free.IsRefcounted() {
 		var __ref *ZendRefcounted = __container_to_free.GetCounted()
 		if __ref.DelRefcount() == 0 {
 			var __zv *Zval = result
@@ -572,7 +572,7 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	}
 	ref = value_ptr.GetRef()
 	ref.AddRefcount()
-	if Z_REFCOUNTED_P(variable_ptr) {
+	if variable_ptr.IsRefcounted() {
 		var garbage *ZendRefcounted = variable_ptr.GetCounted()
 		if garbage.DelRefcount() == 0 {
 			ZVAL_REF(variable_ptr, ref)
@@ -1449,7 +1449,7 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		ZVAL_NEW_STR(str, ZendStringExtend(str.GetStr(), offset+1, 0))
 		memset(Z_STRVAL_P(str)+old_len, ' ', offset-old_len)
 		Z_STRVAL_P(str)[offset+1] = 0
-	} else if !(Z_REFCOUNTED_P(str)) {
+	} else if !(str.IsRefcounted()) {
 		ZVAL_NEW_STR(str, ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 	} else if Z_REFCOUNT_P(str) > 1 {
 		Z_DELREF_P(str)
@@ -2923,7 +2923,7 @@ func ZendVerifyRefAssignableZval(ref *ZendReference, zv *Zval, strict ZendBool) 
 	return 1
 }
 func IZvalPtrDtorNoref(zval_ptr *Zval) {
-	if Z_REFCOUNTED_P(zval_ptr) {
+	if zval_ptr.IsRefcounted() {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
 		ZEND_ASSERT(zval_ptr.GetType() != IS_REFERENCE)
 		if ref.DelRefcount() == 0 {
@@ -3097,7 +3097,7 @@ func IFreeCompiledVariables(execute_data *ZendExecuteData) {
 	var cv *Zval = EX_VAR_NUM(0)
 	var count int = EX(func_).op_array.last_var
 	for count != 0 {
-		if Z_REFCOUNTED_P(cv) {
+		if cv.IsRefcounted() {
 			var r *ZendRefcounted = cv.GetCounted()
 			if r.DelRefcount() == 0 {
 				cv.SetNull()
@@ -3160,7 +3160,7 @@ func ZendCopyExtraArgs(EXECUTE_DATA_D) {
 		}
 	} else {
 		for {
-			if Z_REFCOUNTED_P(src) {
+			if src.IsRefcounted() {
 				ZEND_ADD_CALL_FLAG(execute_data, ZEND_CALL_FREE_EXTRA_ARGS)
 				break
 			}

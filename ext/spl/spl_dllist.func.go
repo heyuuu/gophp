@@ -39,7 +39,7 @@ func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	}
 }
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
-	if zend.Z_REFCOUNTED(elem.GetData()) {
+	if elem.GetData().IsRefcounted() {
 		zend.Z_ADDREF(elem.GetData())
 	}
 }
@@ -331,7 +331,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 	for current != nil {
 		next = current.GetNext()
 		zend.AddIndexZval(&dllist_array, i, current.GetData())
-		if zend.Z_REFCOUNTED(current.GetData()) {
+		if current.GetData().IsRefcounted() {
 			zend.Z_ADDREF(current.GetData())
 		}
 		i++

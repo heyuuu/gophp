@@ -117,7 +117,7 @@ func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 	}
 	ZendCallMethodWith0Params(object, ce, ce.GetDebugInfo(), ZEND_DEBUGINFO_FUNC_NAME, &retval)
 	if retval.IsArray() {
-		if !(Z_REFCOUNTED(retval)) {
+		if !(retval.IsRefcounted()) {
 			*is_temp = 1
 			return ZendArrayDup(retval.GetArr())
 		} else if Z_REFCOUNT(retval) <= 1 {

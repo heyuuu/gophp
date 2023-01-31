@@ -172,7 +172,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 				q = p
 				if q.GetTypeInfo() != IS_UNDEF {
 					ZVAL_DEREF(q)
-					if Z_OPT_REFCOUNTED_P(q) {
+					if q.IsRefcounted() {
 						Z_ADDREF_P(q)
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
@@ -192,7 +192,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 			q = p
 			if q.GetTypeInfo() != IS_UNDEF {
 				ZVAL_DEREF(q)
-				if Z_OPT_REFCOUNTED_P(q) {
+				if q.IsRefcounted() {
 					Z_ADDREF_P(q)
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
@@ -666,7 +666,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	/* add value elements */
 
 	ZVAL_DEREF(entry)
-	if Z_REFCOUNTED_P(entry) {
+	if entry.IsRefcounted() {
 		entry.GetCounted().AddRefcountEx(2)
 	}
 	return_value.GetArr().IndexAddNewH(1, entry)
@@ -807,9 +807,9 @@ func ValidateConstantArray(ht *HashTable) int {
 		}
 		val = _z
 		ZVAL_DEREF(val)
-		if Z_REFCOUNTED_P(val) {
+		if val.IsRefcounted() {
 			if val.IsArray() {
-				if Z_REFCOUNTED_P(val) {
+				if val.IsRefcounted() {
 					if Z_IS_RECURSIVE_P(val) {
 						ZendError(E_WARNING, "Constants cannot be recursive arrays")
 						ret = 0
@@ -857,7 +857,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 			new_val = dst.GetArr().IndexAddNewH(idx, val)
 		}
 		if val.IsArray() {
-			if Z_REFCOUNTED_P(val) {
+			if val.IsRefcounted() {
 				CopyConstantArray(new_val, val)
 			}
 		} else {
@@ -974,7 +974,7 @@ repeat:
 	case IS_RESOURCE:
 		break
 	case IS_ARRAY:
-		if Z_REFCOUNTED_P(val) {
+		if val.IsRefcounted() {
 			if ValidateConstantArray(val.GetArr()) == 0 {
 				RETVAL_FALSE
 				return
@@ -1337,7 +1337,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 		/* this is necessary to make it able to work with default array
 		 * properties, returned to user */
 
-		if Z_OPT_TYPE_P(prop) == IS_CONSTANT_AST {
+		if prop.IsConstant() {
 			if ZvalUpdateConstantEx(prop, nil) != SUCCESS {
 				return
 			}
@@ -2509,7 +2509,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 					arg_name = call.GetFunc().GetOpArray().GetVars()[i]
 					arg = ZendHashFindExInd(call.GetSymbolTable(), arg_name, 1)
 					if arg != nil {
-						if Z_OPT_REFCOUNTED_P(arg) {
+						if arg.IsRefcounted() {
 							Z_ADDREF_P(arg)
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), arg)
@@ -2525,7 +2525,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 			} else {
 				for i < first_extra_arg {
 					if p.GetTypeInfo() != IS_UNDEF {
-						if Z_OPT_REFCOUNTED_P(p) {
+						if p.IsRefcounted() {
 							Z_ADDREF_P(p)
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
@@ -2544,7 +2544,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 		}
 		for i < num_args {
 			if p.GetTypeInfo() != IS_UNDEF {
-				if Z_OPT_REFCOUNTED_P(p) {
+				if p.IsRefcounted() {
 					Z_ADDREF_P(p)
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)

@@ -1093,7 +1093,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				ZVAL_COPY_OR_DUP_PROP(dst, src)
-				if Z_OPT_TYPE_P(dst) == IS_CONSTANT_AST {
+				if dst.IsConstant() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				continue
@@ -1109,7 +1109,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				ZVAL_COPY_PROP(dst, src)
-				if Z_OPT_TYPE_P(dst) == IS_CONSTANT_AST {
+				if dst.IsConstant() {
 					ce.SetIsConstantsUpdated(false)
 				}
 				continue

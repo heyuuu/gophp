@@ -3724,7 +3724,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "Undefined variable: %s", zend.Z_STR_P(entry).GetVal())
 		}
 	} else if entry.IsType(zend.IS_ARRAY) {
-		if zend.Z_REFCOUNTED_P(entry) {
+		if entry.IsRefcounted() {
 			if zend.Z_IS_RECURSIVE_P(entry) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "recursion detected")
 				return
@@ -3743,7 +3743,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			value_ptr = _z
 			PhpCompactVar(eg_active_symbol_table, return_value, value_ptr)
 		}
-		if zend.Z_REFCOUNTED_P(entry) {
+		if entry.IsRefcounted() {
 			zend.Z_UNPROTECT_RECURSION_P(entry)
 		}
 	}
@@ -3944,7 +3944,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Z_ARRVAL_P(return_value).SetNNumUsed(uint32(start_key + num))
 			zend.Z_ARRVAL_P(return_value).SetNNumOfElements(uint32(num))
 			zend.Z_ARRVAL_P(return_value).SetNNextFreeElement(zend_long(start_key + num))
-			if zend.Z_REFCOUNTED_P(val) {
+			if val.IsRefcounted() {
 				val.GetCounted().AddRefcountEx(uint32(num))
 			}
 			p = zend.Z_ARRVAL_P(return_value).GetArData()
@@ -3966,7 +3966,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			zend.ArrayInitSize(return_value, uint32(num))
 			zend.ZendHashRealInitMixed(return_value.GetArr())
-			if zend.Z_REFCOUNTED_P(val) {
+			if val.IsRefcounted() {
 				val.GetCounted().AddRefcountEx(uint32(num))
 			}
 			return_value.GetArr().IndexAddNewH(start_key, val)
@@ -5720,17 +5720,17 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 		zend.ZEND_ASSERT(!(dest_entry.IsReference()) || zend.Z_REFCOUNT_P(dest_entry) > 1)
 		zend.SEPARATE_ZVAL(dest_entry)
 		dest_zval = dest_entry
-		if zend.Z_REFCOUNTED_P(dest_zval) {
+		if dest_zval.IsRefcounted() {
 			zend.Z_PROTECT_RECURSION_P(dest_zval)
 		}
-		if zend.Z_REFCOUNTED_P(src_zval) {
+		if src_zval.IsRefcounted() {
 			zend.Z_PROTECT_RECURSION_P(src_zval)
 		}
 		ret = PhpArrayReplaceRecursive(dest_zval.GetArr(), src_zval.GetArr())
-		if zend.Z_REFCOUNTED_P(dest_zval) {
+		if dest_zval.IsRefcounted() {
 			zend.Z_UNPROTECT_RECURSION_P(dest_zval)
 		}
-		if zend.Z_REFCOUNTED_P(src_zval) {
+		if src_zval.IsRefcounted() {
 			zend.Z_UNPROTECT_RECURSION_P(src_zval)
 		}
 		if ret == 0 {
@@ -7072,7 +7072,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	num_pads = pad_size_abs - input_size
-	if zend.Z_REFCOUNTED_P(pad_value) {
+	if pad_value.IsRefcounted() {
 		pad_value.GetCounted().AddRefcountEx(num_pads)
 	}
 	zend.ArrayInitSize(return_value, pad_size_abs)

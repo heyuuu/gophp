@@ -99,7 +99,7 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 	if !(memchr(Z_STRVAL_P(name), ':', Z_STRLEN_P(name))) && b.Assign(&c, ZendGetConstant(name.GetStr())) != 0 {
 		if c.GetType() != IS_STRING {
 			ZVAL_COPY_OR_DUP(&tmp, c)
-			if Z_OPT_CONSTANT(tmp) {
+			if tmp.IsConstant() {
 				ZvalUpdateConstantEx(&tmp, nil)
 			}
 			ConvertToString(&tmp)

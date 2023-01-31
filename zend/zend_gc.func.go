@@ -18,7 +18,7 @@ func GC_MAY_LEAK(ref *ZendRefcounted) bool {
 func GcCheckPossibleRoot(ref *ZendRefcounted) {
 	if ref.GetGcTypeInfo() == IS_REFERENCE {
 		var zv *Zval = (*ZendReference)(ref).GetVal()
-		if !(Z_COLLECTABLE_P(zv)) {
+		if !(zv.IsCollectable()) {
 			return
 		}
 		ref = zv.GetCounted()
@@ -384,7 +384,7 @@ tail_call:
 				if n == 0 {
 					goto next
 				}
-				for !(Z_REFCOUNTED_P(b.PreDec(&end))) {
+				for !(b.PreDec(&end).IsRefcounted()) {
 					if zv == end {
 						goto next
 					}
@@ -393,7 +393,7 @@ tail_call:
 				GC_REF_SET_BLACK(ht)
 			}
 			for zv != end {
-				if Z_REFCOUNTED_P(zv) {
+				if zv.IsRefcounted() {
 					ref = zv.GetCounted()
 					ref.AddRefcount()
 					if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
@@ -422,7 +422,7 @@ tail_call:
 			goto next
 		}
 	} else if ref.GetGcType() == IS_REFERENCE {
-		if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
+		if (*ZendReference)(ref).GetVal().IsRefcounted() {
 			ref = (*ZendReference)(ref).GetVal().GetCounted()
 			ref.AddRefcount()
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
@@ -445,7 +445,7 @@ tail_call:
 		if zv.IsIndirect() {
 			zv = zv.GetZv()
 		}
-		if Z_REFCOUNTED_P(zv) {
+		if zv.IsRefcounted() {
 			break
 		}
 		if p == end {
@@ -457,7 +457,7 @@ tail_call:
 		if zv.IsIndirect() {
 			zv = zv.GetZv()
 		}
-		if Z_REFCOUNTED_P(zv) {
+		if zv.IsRefcounted() {
 			ref = zv.GetCounted()
 			ref.AddRefcount()
 			if !(GC_REF_CHECK_COLOR(ref, GC_BLACK)) {
@@ -505,7 +505,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 					if n == 0 {
 						goto next
 					}
-					for !(Z_REFCOUNTED_P(b.PreDec(&end))) {
+					for !(b.PreDec(&end).IsRefcounted()) {
 						if zv == end {
 							goto next
 						}
@@ -514,7 +514,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 					GC_REF_SET_COLOR(ht, GC_GREY)
 				}
 				for zv != end {
-					if Z_REFCOUNTED_P(zv) {
+					if zv.IsRefcounted() {
 						ref = zv.GetCounted()
 						ref.DelRefcount()
 						if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
@@ -544,7 +544,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				ht = (*ZendArray)(ref)
 			}
 		} else if ref.GetGcType() == IS_REFERENCE {
-			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
+			if (*ZendReference)(ref).GetVal().IsRefcounted() {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
 				ref.DelRefcount()
 				if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
@@ -567,7 +567,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				break
 			}
 			if p == end {
@@ -579,7 +579,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				ref = zv.GetCounted()
 				ref.DelRefcount()
 				if !(GC_REF_CHECK_COLOR(ref, GC_GREY)) {
@@ -692,7 +692,7 @@ tail_call:
 						if n == 0 {
 							goto next
 						}
-						for !(Z_REFCOUNTED_P(b.PreDec(&end))) {
+						for !(b.PreDec(&end).IsRefcounted()) {
 							if zv == end {
 								goto next
 							}
@@ -701,7 +701,7 @@ tail_call:
 						GC_REF_SET_COLOR(ht, GC_WHITE)
 					}
 					for zv != end {
-						if Z_REFCOUNTED_P(zv) {
+						if zv.IsRefcounted() {
 							ref = zv.GetCounted()
 							if GC_REF_CHECK_COLOR(ref, GC_GREY) {
 								GC_REF_SET_COLOR(ref, GC_WHITE)
@@ -729,7 +729,7 @@ tail_call:
 					ht = (*ZendArray)(ref)
 				}
 			} else if ref.GetGcType() == IS_REFERENCE {
-				if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
+				if (*ZendReference)(ref).GetVal().IsRefcounted() {
 					ref = (*ZendReference)(ref).GetVal().GetCounted()
 					if GC_REF_CHECK_COLOR(ref, GC_GREY) {
 						GC_REF_SET_COLOR(ref, GC_WHITE)
@@ -751,7 +751,7 @@ tail_call:
 				if zv.IsIndirect() {
 					zv = zv.GetZv()
 				}
-				if Z_REFCOUNTED_P(zv) {
+				if zv.IsRefcounted() {
 					break
 				}
 				if p == end {
@@ -763,7 +763,7 @@ tail_call:
 				if zv.IsIndirect() {
 					zv = zv.GetZv()
 				}
-				if Z_REFCOUNTED_P(zv) {
+				if zv.IsRefcounted() {
 					ref = zv.GetCounted()
 					if GC_REF_CHECK_COLOR(ref, GC_GREY) {
 						GC_REF_SET_COLOR(ref, GC_WHITE)
@@ -860,7 +860,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 					if n == 0 {
 						goto next
 					}
-					for !(Z_REFCOUNTED_P(b.PreDec(&end))) {
+					for !(b.PreDec(&end).IsRefcounted()) {
 						if zv == end {
 							goto next
 						}
@@ -869,7 +869,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 					GC_REF_SET_BLACK(ht)
 				}
 				for zv != end {
-					if Z_REFCOUNTED_P(zv) {
+					if zv.IsRefcounted() {
 						ref = zv.GetCounted()
 						ref.AddRefcount()
 						if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
@@ -900,7 +900,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			}
 			ht = (*ZendArray)(ref)
 		} else if ref.GetGcType() == IS_REFERENCE {
-			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
+			if (*ZendReference)(ref).GetVal().IsRefcounted() {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
 				ref.AddRefcount()
 				if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
@@ -923,7 +923,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				break
 			}
 			if p == end {
@@ -935,7 +935,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				ref = zv.GetCounted()
 				ref.AddRefcount()
 				if GC_REF_CHECK_COLOR(ref, GC_WHITE) {
@@ -1017,7 +1017,7 @@ tail_call:
 			GC_REMOVE_FROM_BUFFER(ref)
 			count++
 		} else if ref.GetGcType() == IS_REFERENCE {
-			if Z_REFCOUNTED((*ZendReference)(ref).GetVal()) {
+			if (*ZendReference)(ref).GetVal().IsRefcounted() {
 				ref = (*ZendReference)(ref).GetVal().GetCounted()
 				goto tail_call
 			}
@@ -1039,14 +1039,14 @@ tail_call:
 					if n == 0 {
 						return count
 					}
-					for !(Z_REFCOUNTED_P(b.PreDec(&end))) {
+					for !(b.PreDec(&end).IsRefcounted()) {
 						if zv == end {
 							return count
 						}
 					}
 				}
 				for zv != end {
-					if Z_REFCOUNTED_P(zv) {
+					if zv.IsRefcounted() {
 						ref = zv.GetCounted()
 						count += GcRemoveNestedDataFromBuffer(ref, nil)
 					}
@@ -1078,7 +1078,7 @@ tail_call:
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				break
 			}
 			if p == end {
@@ -1090,7 +1090,7 @@ tail_call:
 			if zv.IsIndirect() {
 				zv = zv.GetZv()
 			}
-			if Z_REFCOUNTED_P(zv) {
+			if zv.IsRefcounted() {
 				ref = zv.GetCounted()
 				count += GcRemoveNestedDataFromBuffer(ref, nil)
 			}

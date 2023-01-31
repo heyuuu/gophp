@@ -2412,7 +2412,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			}
 			return FAILURE
 		}
-		if result == op1 && Z_REFCOUNTED_P(result) {
+		if result == op1 && result.IsRefcounted() {
 
 			/* special case, perform operations on result */
 
@@ -2509,7 +2509,7 @@ func NumericCompareFunction(op1 *Zval, op2 *Zval) int {
 	return ZEND_NORMALIZE_BOOL(d1 - d2)
 }
 func ZendFreeObjGetResult(op *Zval) {
-	ZEND_ASSERT(!(Z_REFCOUNTED_P(op)) || Z_REFCOUNT_P(op) != 0)
+	ZEND_ASSERT(!(op.IsRefcounted()) || Z_REFCOUNT_P(op) != 0)
 	ZvalPtrDtor(op)
 }
 func ConvertCompareResultToLong(result *Zval) {
@@ -2834,7 +2834,7 @@ func IncrementString(str *Zval) {
 		ZVAL_INTERNED_STR(str, ZSTR_CHAR('1'))
 		return
 	}
-	if !(Z_REFCOUNTED_P(str)) {
+	if !(str.IsRefcounted()) {
 		str.SetStr(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 		str.SetTypeInfo(IS_STRING_EX)
 	} else if Z_REFCOUNT_P(str) > 1 {
