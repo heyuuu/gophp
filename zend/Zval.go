@@ -120,7 +120,6 @@ func (this *Zval) GetW2() uint32                    { return this.value.ww.w2 }
 func (this *Zval) SetW2(value uint32)               { this.value.ww.w2 = value }
 func (this *Zval) GetType() ZendUchar               { return this.u1.v.type_ }
 func (this *Zval) SetType(value ZendUchar)          { this.u1.v.type_ = value }
-func (this *Zval) IsType(value ZendUchar) bool      { return this.u1.v.type_ == value }
 func (this *Zval) GetTypeFlags() ZendUchar          { return this.u1.v.type_flags }
 func (this *Zval) SetTypeFlags(value ZendUchar)     { this.u1.v.type_flags = value }
 func (this *Zval) GetU1VUExtra() uint16             { return this.u1.v.u.extra }
@@ -149,6 +148,22 @@ func (this *Zval) GetConstantFlags() uint32         { return this.u2.constant_fl
 func (this *Zval) SetConstantFlags(value uint32)    { this.u2.constant_flags = value }
 func (this *Zval) GetU2Extra() uint32               { return this.u2.extra }
 func (this *Zval) SetU2Extra(value uint32)          { this.u2.extra = value }
+
+func (this *Zval) IsType(value ZendUchar) bool { return this.u1.v.type_ == value }
+func (this *Zval) IsUndef() bool               { return this.IsType(IS_UNDEF) }
+func (this *Zval) IsNull() bool                { return this.IsType(IS_NULL) }
+func (this *Zval) IsFalse() bool               { return this.IsType(IS_FALSE) }
+func (this *Zval) IsTrue() bool                { return this.IsType(IS_TRUE) }
+func (this *Zval) IsLong() bool                { return this.IsType(IS_LONG) }
+func (this *Zval) IsDouble() bool              { return this.IsType(IS_DOUBLE) }
+func (this *Zval) IsString() bool              { return this.IsType(IS_STRING) }
+func (this *Zval) IsArray() bool               { return this.IsType(IS_ARRAY) }
+func (this *Zval) IsObject() bool              { return this.IsType(IS_OBJECT) }
+func (this *Zval) IsResource() bool            { return this.IsType(IS_RESOURCE) }
+func (this *Zval) IsReference() bool           { return this.IsType(IS_REFERENCE) }
+func (this *Zval) IsConstant() bool            { return this.IsType(IS_CONSTANT_AST) }
+func (this *Zval) IsIndirect() bool            { return this.IsType(IS_INDIRECT) }
+func (this *Zval) IsError() bool               { return this.IsType(_IS_ERROR) }
 
 /* Zval.u1.v.type_flags */
 func (this *Zval) AddTypeFlags(value ZendUchar)      { this.u1.v.type_flags |= value }

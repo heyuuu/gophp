@@ -118,9 +118,9 @@ func Z_OPT_REFCOUNTED(zval Zval) bool {
 func Z_OPT_REFCOUNTED_P(zval_p *Zval) bool        { return Z_OPT_REFCOUNTED(*zval_p) }
 func Z_OPT_ISREF(zval Zval) bool                  { return Z_OPT_TYPE(zval) == IS_REFERENCE }
 func Z_OPT_ISREF_P(zval_p *Zval) bool             { return Z_OPT_ISREF(*zval_p) }
-func Z_ISREF(zval Zval) bool                      { return zval.IsType(IS_REFERENCE) }
+func Z_ISREF(zval Zval) bool                      { return zval.IsReference() }
 func Z_ISREF_P(zval_p *Zval) bool                 { return Z_ISREF(*zval_p) }
-func Z_ISUNDEF(zval Zval) bool                    { return zval.IsType(IS_UNDEF) }
+func Z_ISUNDEF(zval Zval) bool                    { return zval.IsUndef() }
 func Z_ISUNDEF_P(zval_p *Zval) bool               { return Z_ISUNDEF(*zval_p) }
 func Z_ISERROR(zval Zval) bool                    { return zval.IsType(_IS_ERROR) }
 func Z_ISERROR_P(zval_p *Zval) bool               { return Z_ISERROR(*zval_p) }
@@ -372,7 +372,7 @@ func ZVAL_DEREF(z *Zval) {
 	}
 }
 func ZVAL_DEINDIRECT(z *Zval) {
-	if z.IsType(IS_INDIRECT) {
+	if z.IsIndirect() {
 		z = z.GetZv()
 	}
 }
@@ -416,7 +416,7 @@ func SEPARATE_ARRAY(zv *Zval) {
 }
 func SEPARATE_ZVAL_IF_NOT_REF(zv *Zval) {
 	var __zv *Zval = zv
-	if __zv.IsType(IS_ARRAY) {
+	if __zv.IsArray() {
 		if Z_REFCOUNT_P(__zv) > 1 {
 			if Z_REFCOUNTED_P(__zv) {
 				Z_DELREF_P(__zv)
