@@ -281,6 +281,27 @@ func (this *ZendArray) assertRc1() {
 	ZEND_ASSERT(this.GetRefcount() == 1)
 }
 
+func (this *ZendArray) resetDataAndHash(dataSize uint32) {
+	this.data = make([]Bucket, dataSize)
+	this.indexMap = make(map[int]uint32)
+	this.keyMap = make(map[string]uint32)
+}
+
+func (this *ZendArray) copyDataAndHash(source *ZendArray) {
+	this.data = make([]Bucket, len(source.data))
+	copy(this.data, source.data)
+
+	this.indexMap = make(map[int]uint32)
+	for i, pos := range source.indexMap {
+		this.indexMap[i] = pos
+	}
+
+	this.keyMap = make(map[string]uint32)
+	for i, pos := range source.keyMap {
+		this.keyMap[i] = pos
+	}
+}
+
 func (this *ZendArray) clearData() {
 	this.assertRc1()
 

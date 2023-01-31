@@ -759,41 +759,29 @@ func ZendArrayDupElements(source *HashTable, target *HashTable, static_keys int,
 	return idx
 }
 func ZendArrayDup(source *HashTable) *HashTable {
-	var idx uint32
-	var target *HashTable
-	ALLOC_HASHTABLE(target)
-	target.SetRefcount(1)
-	target.GetGcTypeInfo() = IS_ARRAY | GC_COLLECTABLE<<GC_FLAGS_SHIFT
-	target.SetPDestructor(ZVAL_PTR_DTOR)
+	var target *HashTable = NewZendArray(source.nTableSize)
+	target.AddGcFlags(GC_COLLECTABLE)
+	target.nNextFreeElement = source.nNextFreeElement
+
 	if source.GetNNumOfElements() == 0 {
-		target.SetNTableMask(HT_MIN_MASK)
-		target.SetNNumUsed(0)
-		target.SetNNumOfElements(0)
-		target.SetNNextFreeElement(source.GetNNextFreeElement())
-		target.SetNInternalPointer(0)
-		target.SetNTableSize(HT_MIN_SIZE)
-		HT_SET_DATA_ADDR(target, &UninitializedBucket)
-	} else if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
-		target.SetUFlags(source.GetUFlags() & HASH_FLAG_MASK)
+		return target
+	}
+
+	target.SetFlags(source.GetFlags())
+
+	if (source.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 		target.SetNNumUsed(source.GetNNumUsed())
 		target.SetNNumOfElements(source.GetNNumOfElements())
-		target.SetNNextFreeElement(source.GetNNextFreeElement())
-		target.SetNTableSize(source.GetNTableSize())
 		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE(target)))
 		target.SetNInternalPointer(source.GetNInternalPointer())
-		memcpy(HT_GET_DATA_ADDR(target), HT_GET_DATA_ADDR(source), HT_USED_SIZE(source))
+
+		target.copyDataAndHash(source)
 	} else {
-		target.SetUFlags(source.GetUFlags() & HASH_FLAG_MASK)
-		target.SetNTableMask(source.GetNTableMask())
-		target.SetNNextFreeElement(source.GetNNextFreeElement())
-		if source.GetNInternalPointer() < source.GetNNumUsed() {
-			target.SetNInternalPointer(source.GetNInternalPointer())
-		} else {
-			target.SetNInternalPointer(0)
+		if source.nInternalPointer < source.DataSize() {
+			target.nInternalPointer = source.nInternalPointer
 		}
-		target.SetNTableSize(source.GetNTableSize())
-		HT_SET_DATA_ADDR(target, Emalloc(HT_SIZE(target)))
-		target.resetHash()
+		target.resetDataAndHash(source.DataSize())
+		var idx uint32
 		if target.IsStaticKeys() {
 			if source.IsWithoutHoles() {
 				idx = ZendArrayDupElements(source, target, 1, 0)
