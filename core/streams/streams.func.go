@@ -1503,17 +1503,17 @@ func StreamResourcePersistentDtor(rsrc *zend.ZendResource) {
 }
 func PhpShutdownStreamHashes() {
 	if standard.FG(stream_wrappers) {
-		zend.ZendHashDestroy(standard.FG(stream_wrappers))
+		standard.FG(stream_wrappers).Destroy()
 		zend.Efree(standard.FG(stream_wrappers))
 		standard.FG(stream_wrappers) = nil
 	}
 	if standard.FG(stream_filters) {
-		zend.ZendHashDestroy(standard.FG(stream_filters))
+		standard.FG(stream_filters).Destroy()
 		zend.Efree(standard.FG(stream_filters))
 		standard.FG(stream_filters) = nil
 	}
 	if standard.FG(wrapper_errors) {
-		zend.ZendHashDestroy(standard.FG(wrapper_errors))
+		standard.FG(wrapper_errors).Destroy()
 		zend.Efree(standard.FG(wrapper_errors))
 		standard.FG(wrapper_errors) = nil
 	}
@@ -1535,9 +1535,9 @@ func PhpInitStreamWrappers(module_number int) int {
 	}
 }
 func PhpShutdownStreamWrappers(module_number int) int {
-	zend.ZendHashDestroy(&UrlStreamWrappersHash)
-	zend.ZendHashDestroy(PhpGetStreamFiltersHashGlobal())
-	zend.ZendHashDestroy(PhpStreamXportGetHash())
+	UrlStreamWrappersHash.Destroy()
+	PhpGetStreamFiltersHashGlobal().Destroy()
+	PhpStreamXportGetHash().Destroy()
 	return zend.SUCCESS
 }
 func PhpStreamWrapperSchemeValidate(protocol *byte, protocol_len uint) int {

@@ -14,7 +14,7 @@ import (
 
 func UserConfigCacheEntryDtor(el *zend.Zval) {
 	var entry *UserConfigCacheEntry = (*UserConfigCacheEntry)(el.GetPtr())
-	zend.ZendHashDestroy(entry.GetUserConfig())
+	entry.GetUserConfig().Destroy()
 	zend.Free(entry.GetUserConfig())
 	zend.Free(entry)
 }
@@ -35,7 +35,7 @@ func PrintModules() {
 	var module *zend.ZendModuleEntry
 	zend.ZendHashInit(&sorted_registry, 64, nil, nil, 1)
 	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-	zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
+	sorted_registry.SortCompatible(ModuleNameCmp, 0)
 	var __ht *zend.HashTable = &sorted_registry
 	for _, _p := range __ht.foreachData() {
 		var _z *zend.Zval = _p.GetVal()
@@ -43,7 +43,7 @@ func PrintModules() {
 		module = _z.GetPtr()
 		core.PhpPrintf("%s\n", module.GetName())
 	}
-	zend.ZendHashDestroy(&sorted_registry)
+	sorted_registry.Destroy()
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
@@ -278,7 +278,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 			zend.ZendIsAutoGlobalStr("_ENV", b.SizeOf("\"_ENV\"")-1)
 		}
 		if core.PG(http_globals)[core.TRACK_VARS_ENV].u1.v.type_ == zend.IS_ARRAY && array_ptr.GetArr() != core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr() {
-			zend.ZendArrayDestroy(array_ptr.GetArr())
+			array_ptr.GetArr().DestroyEx()
 			array_ptr.SetArr(zend.ZendArrayDup(core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr()))
 			return
 		}
@@ -402,7 +402,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 
 		/* Clear the expired config */
 
-		zend.ZendHashClean(entry.GetUserConfig())
+		entry.GetUserConfig().Clean()
 		if !(zend.IS_ABSOLUTE_PATH(path, path_len)) {
 			var real_path_len int
 			real_path = zend.TsrmRealpath(path, nil)
@@ -922,7 +922,7 @@ func ZmStartupCgi(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
-	zend.ZendHashDestroy(&(CGIG(user_config_cache)))
+	CGIG(user_config_cache).Destroy()
 	zend.UNREGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }

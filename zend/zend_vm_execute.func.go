@@ -47196,7 +47196,7 @@ func ZendVmInit() {
 }
 func ZendVmDtor() {
 	if ZendHandlersTable != nil {
-		ZendHashDestroy(ZendHandlersTable)
+		ZendHandlersTable.Destroy()
 		Free(ZendHandlersTable)
 		ZendHandlersTable = nil
 	}

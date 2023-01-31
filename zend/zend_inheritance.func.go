@@ -1812,7 +1812,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 					ZendTraitsCopyFunctions(key, fn, ce, &overridden, exclude_tables[i], aliases)
 				}
 				if exclude_tables[i] != nil {
-					ZendHashDestroy(exclude_tables[i])
+					exclude_tables[i].Destroy()
 					FREE_HASHTABLE(exclude_tables[i])
 					exclude_tables[i] = nil
 				}
@@ -1840,7 +1840,7 @@ func ZendDoTraitsMethodBinding(ce *ZendClassEntry, traits **ZendClassEntry, excl
 		ZendFixupTraitMethod(fn, ce)
 	}
 	if overridden != nil {
-		ZendHashDestroy(overridden)
+		overridden.Destroy()
 		FREE_HASHTABLE(overridden)
 	}
 }
@@ -2152,7 +2152,7 @@ func ZendVerifyAbstractClass(ce *ZendClassEntry) {
 }
 func VarianceObligationDtor(zv *Zval) { Efree(zv.GetPtr()) }
 func VarianceObligationHtDtor(zv *Zval) {
-	ZendHashDestroy(zv.GetPtr())
+	zv.GetPtr().Destroy()
 	FREE_HASHTABLE(zv.GetPtr())
 }
 func GetOrInitObligationsForClass(ce *ZendClassEntry) *HashTable {
@@ -2258,7 +2258,7 @@ func LoadDelayedClasses() {
 		name = _p.GetKey()
 		ZendLookupClass(name)
 	}
-	ZendHashDestroy(delayed_autoloads)
+	delayed_autoloads.Destroy()
 	FREE_HASHTABLE(delayed_autoloads)
 }
 func ResolveDelayedVarianceObligations(ce *ZendClassEntry) {

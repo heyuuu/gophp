@@ -1130,7 +1130,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		if type_to_fetch != 0 {
 			handle = dns_open(nil)
 			if handle == nil {
-				zend.ZendArrayDestroy(return_value.GetArr())
+				return_value.GetArr().DestroyEx()
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1152,7 +1152,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				default:
 					core.PhpErrorDocref(nil, zend.E_WARNING, "DNS Query failed")
 				}
-				zend.ZendArrayDestroy(return_value.GetArr())
+				return_value.GetArr().DestroyEx()
 				zend.RETVAL_FALSE
 				return
 			}
@@ -1170,7 +1170,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				n = dn_skipname(cp, end)
 				if n < 0 {
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to parse DNS data received")
-					zend.ZendArrayDestroy(return_value.GetArr())
+					return_value.GetArr().DestroyEx()
 					PhpDnsFreeHandle(handle)
 					zend.RETVAL_FALSE
 					return

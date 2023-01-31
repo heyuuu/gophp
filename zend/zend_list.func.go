@@ -220,7 +220,7 @@ func ZendInitRsrcListDtors() int {
 	ListDestructors.SetNNextFreeElement(1)
 	return SUCCESS
 }
-func ZendDestroyRsrcListDtors() { ZendHashDestroy(&ListDestructors) }
+func ZendDestroyRsrcListDtors() { ListDestructors.Destroy() }
 func ZendRsrcListGetRsrcType(res *ZendResource) *byte {
 	var lde *ZendRsrcListDtorsEntry
 	lde = ZendHashIndexFindPtr(&ListDestructors, res.GetType())

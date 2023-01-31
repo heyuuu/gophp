@@ -848,8 +848,8 @@ func PhpCliServerRequestDtor(req *PhpCliServerRequest) {
 	if req.GetQueryString() != nil {
 		zend.Pefree(req.GetQueryString(), 1)
 	}
-	zend.ZendHashDestroy(req.GetHeaders())
-	zend.ZendHashDestroy(req.GetHeadersOriginalCase())
+	req.GetHeaders().Destroy()
+	req.GetHeadersOriginalCase().Destroy()
 	if req.GetContent() != nil {
 		zend.Pefree(req.GetContent(), 1)
 	}
@@ -1609,8 +1609,8 @@ func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerE
 	return zend.SUCCESS
 }
 func PhpCliServerDtor(server *PhpCliServer) {
-	zend.ZendHashDestroy(server.GetClients())
-	zend.ZendHashDestroy(server.GetExtensionMimeTypes())
+	server.GetClients().Destroy()
+	server.GetExtensionMimeTypes().Destroy()
 	if zend.ZEND_VALID_SOCKET(server.GetServerSock()) {
 		core.Closesocket(server.GetServerSock())
 	}

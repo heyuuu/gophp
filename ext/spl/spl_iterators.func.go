@@ -1932,7 +1932,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 }
 func SplCachingItRewind(intern *SplDualItObject) {
 	SplDualItRewind(intern)
-	zend.ZendHashClean(intern.GetZcache().GetArr())
+	intern.GetZcache().GetArr().Clean()
 	SplCachingItNext(intern)
 }
 func zim_spl_CachingIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2160,7 +2160,7 @@ func zim_spl_CachingIterator_setFlags(execute_data *zend.ZendExecuteData, return
 
 		/* clear on (re)enable */
 
-		zend.ZendHashClean(intern.GetZcache().GetArr())
+		intern.GetZcache().GetArr().Clean()
 
 		/* clear on (re)enable */
 

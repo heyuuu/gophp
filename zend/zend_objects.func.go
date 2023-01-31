@@ -23,7 +23,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 	if object.GetProperties() != nil {
 		if (object.GetProperties().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
 			if object.GetProperties().DelRefcount() == 0 && object.GetProperties().GetGcType() != IS_NULL {
-				ZendArrayDestroy(object.GetProperties())
+				object.GetProperties().DestroyEx()
 			}
 		}
 	}
@@ -53,7 +53,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 			var guards *HashTable
 			guards = p.GetArr()
 			ZEND_ASSERT(guards != nil)
-			ZendHashDestroy(guards)
+			guards.Destroy()
 			FREE_HASHTABLE(guards)
 		}
 	}

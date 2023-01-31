@@ -340,7 +340,7 @@ func PhpPrintInfo(flag int) {
 		var module *zend.ZendModuleEntry
 		zend.ZendHashInit(&sorted_registry, zend.ModuleRegistry.GetNNumOfElements(), nil, nil, 1)
 		zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-		zend.ZendHashSort(&sorted_registry, ModuleNameCmp, 0)
+		sorted_registry.SortCompatible(ModuleNameCmp, 0)
 		var __ht *zend.HashTable = &sorted_registry
 		for _, _p := range __ht.foreachData() {
 			var _z *zend.Zval = _p.GetVal()
@@ -363,7 +363,7 @@ func PhpPrintInfo(flag int) {
 			}
 		}
 		PhpInfoPrintTableEnd()
-		zend.ZendHashDestroy(&sorted_registry)
+		sorted_registry.Destroy()
 	}
 	if (flag & PHP_INFO_ENVIRONMENT) != 0 {
 		SECTION("Environment")

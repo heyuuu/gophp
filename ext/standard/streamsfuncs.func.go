@@ -1364,7 +1364,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 		zend.ZvalPtrDtor(stream_array)
 		zend.ZVAL_ARR(stream_array, ht)
 	} else {
-		zend.ZendArrayDestroy(ht)
+		ht.DestroyEx()
 	}
 	return ret
 }

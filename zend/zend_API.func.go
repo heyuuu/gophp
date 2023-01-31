@@ -2282,7 +2282,6 @@ func ZendSortModules(base any, count int, siz int, compare CompareFuncT, swp Swa
 	var m *ZendModuleEntry
 	var r *ZendModuleEntry
 	for b1 < end {
-
 	try_again:
 		m = (*ZendModuleEntry)(b1.GetVal().GetPtr())
 		if m.GetModuleStarted() == 0 && m.GetDeps() != nil {
@@ -2381,7 +2380,7 @@ func ZendCollectModuleHandlers() {
 	}
 }
 func ZendStartupModules() int {
-	ZendHashSortEx(&ModuleRegistry, ZendSortModules, nil, 0)
+	ModuleRegistry.SortCompatibleEx(ZendSortModules)
 	ZendHashApply(&ModuleRegistry, ZendStartupModuleZval)
 	return SUCCESS
 }
@@ -3189,7 +3188,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 			ZendFreeInternalArgInfo(fn.GetInternalFunction())
 		}
 	}
-	ZendHashClean(disabled_class.GetFunctionTable())
+	disabled_class.GetFunctionTable().Clean()
 	return SUCCESS
 }
 func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *ZendFcallInfoCache, strict_class *int, error **byte) int {

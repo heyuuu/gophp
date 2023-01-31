@@ -52,15 +52,15 @@ func BasicGlobalsCtor(basic_globals_p *PhpBasicGlobals) {
 }
 func BasicGlobalsDtor(basic_globals_p *PhpBasicGlobals) {
 	if basic_globals_p.GetUrlAdaptSessionEx().GetTags() != nil {
-		zend.ZendHashDestroy(basic_globals_p.GetUrlAdaptSessionEx().GetTags())
+		basic_globals_p.GetUrlAdaptSessionEx().GetTags().Destroy()
 		zend.Free(basic_globals_p.GetUrlAdaptSessionEx().GetTags())
 	}
 	if basic_globals_p.GetUrlAdaptOutputEx().GetTags() != nil {
-		zend.ZendHashDestroy(basic_globals_p.GetUrlAdaptOutputEx().GetTags())
+		basic_globals_p.GetUrlAdaptOutputEx().GetTags().Destroy()
 		zend.Free(basic_globals_p.GetUrlAdaptOutputEx().GetTags())
 	}
-	zend.ZendHashDestroy(basic_globals_p.GetUrlAdaptSessionHostsHt())
-	zend.ZendHashDestroy(basic_globals_p.GetUrlAdaptOutputHostsHt())
+	basic_globals_p.GetUrlAdaptSessionHostsHt().Destroy()
+	basic_globals_p.GetUrlAdaptOutputHostsHt().Destroy()
 }
 func PhpGetNan() float64 { return zend.ZEND_NAN }
 func PhpGetInf() float64 { return zend.ZEND_INFINITY }
@@ -254,7 +254,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	zend.ZVAL_UNDEF(&(BG(strtok_zval)))
 	BG(strtok_string) = nil
 	tsrm_env_lock()
-	zend.ZendHashDestroy(&(BG(putenv_ht)))
+	BG(putenv_ht).Destroy()
 	tsrm_env_unlock()
 	BG(mt_rand_is_seeded) = 0
 	if BG(umask) != -1 {
@@ -2455,7 +2455,7 @@ func PhpFreeShutdownFunctions() {
 		var __bailout JMP_BUF
 		zend.__EG().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			zend.ZendHashDestroy(BG(user_shutdown_function_names))
+			BG(user_shutdown_function_names).Destroy()
 			zend.FREE_HASHTABLE(BG(user_shutdown_function_names))
 			BG(user_shutdown_function_names) = nil
 		} else {
@@ -4341,7 +4341,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ZendStreamInitFilename(&fh, filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(return_value.GetArr())
+		return_value.GetArr().DestroyEx()
 		zend.RETVAL_FALSE
 		return
 	}
@@ -4454,7 +4454,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	memset(string+str_len, 0, zend.ZEND_MMAP_AHEAD)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
-		zend.ZendArrayDestroy(return_value.GetArr())
+		return_value.GetArr().DestroyEx()
 		zend.RETVAL_FALSE
 	}
 	zend.Efree(string)

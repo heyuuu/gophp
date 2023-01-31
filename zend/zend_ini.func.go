@@ -108,11 +108,11 @@ func ZendIniShutdown() int {
 	return SUCCESS
 }
 func ZendIniDtor(ini_directives *HashTable) {
-	ZendHashDestroy(ini_directives)
+	ini_directives.Destroy()
 	Free(ini_directives)
 }
 func ZendIniGlobalShutdown() int {
-	ZendHashDestroy(RegisteredZendIniDirectives)
+	RegisteredZendIniDirectives.Destroy()
 	Free(RegisteredZendIniDirectives)
 	return SUCCESS
 }
@@ -126,7 +126,7 @@ func ZendIniDeactivate() int {
 			ini_entry = _z.GetPtr()
 			ZendRestoreIniEntryCb(ini_entry, ZEND_INI_STAGE_DEACTIVATE)
 		}
-		ZendHashDestroy(__EG().GetModifiedIniDirectives())
+		__EG().GetModifiedIniDirectives().Destroy()
 		FREE_HASHTABLE(__EG().GetModifiedIniDirectives())
 		__EG().SetModifiedIniDirectives(nil)
 	}
@@ -153,7 +153,7 @@ func IniKeyCompare(a any, b any) int {
 	}
 }
 func ZendIniSortEntries() {
-	ZendHashSort(__EG().GetIniDirectives(), IniKeyCompare, 0)
+	__EG().GetIniDirectives().SortCompatible(IniKeyCompare, 0)
 }
 func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 	var p *ZendIniEntry

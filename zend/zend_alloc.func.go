@@ -1384,9 +1384,9 @@ func ZendMmShutdown(heap *ZendMmHeap, full int, silent int) {
 			if silent != 0 {
 				TrackedFreeAll()
 			}
-			ZendHashClean(heap.GetTrackedAllocs())
+			heap.GetTrackedAllocs().Clean()
 			if full != 0 {
-				ZendHashDestroy(heap.GetTrackedAllocs())
+				heap.GetTrackedAllocs().Destroy()
 				Free(heap.GetTrackedAllocs())
 
 				/* Make sure the heap free below does not use tracked_free(). */

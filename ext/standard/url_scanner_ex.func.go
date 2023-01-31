@@ -21,7 +21,7 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 	}
 	tmp = zend.Estrndup(new_value.GetVal(), new_value.GetLen())
 	if ctx.GetTags() != nil {
-		zend.ZendHashDestroy(ctx.GetTags())
+		ctx.GetTags().Destroy()
 	} else {
 		ctx.SetTags(zend.Malloc(b.SizeOf("HashTable")))
 		if ctx.GetTags() == nil {
@@ -67,7 +67,7 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	} else {
 		hosts = &(BG(url_adapt_output_hosts_ht))
 	}
-	zend.ZendHashClean(hosts)
+	hosts.Clean()
 
 	/* Use user supplied host whitelist */
 

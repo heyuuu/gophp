@@ -423,7 +423,7 @@ func zim_spl_SplFixedArray___wakeup(execute_data *zend.ZendExecuteData, return_v
 		/* Remove the unserialised properties, since we now have the elements
 		 * within the spl_fixedarray_object structure. */
 
-		zend.ZendHashClean(intern_ht)
+		intern_ht.Clean()
 
 		/* Remove the unserialised properties, since we now have the elements
 		 * within the spl_fixedarray_object structure. */

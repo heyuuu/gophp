@@ -46,7 +46,7 @@ func SplArrayGetHashTable(intern *SplArrayObject) *zend.HashTable {
 }
 func SplArrayReplaceHashTable(intern *SplArrayObject, ht *zend.HashTable) {
 	var ht_ptr **zend.HashTable = SplArrayGetHashTablePtr(intern)
-	zend.ZendArrayDestroy(*ht_ptr)
+	ht_ptr.DestroyEx()
 	*ht_ptr = ht
 }
 func SplArrayIsObject(intern *SplArrayObject) zend.ZendBool {

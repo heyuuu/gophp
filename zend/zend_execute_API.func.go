@@ -187,7 +187,7 @@ func ShutdownExecutor() {
 				var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 				if ht != nil {
 					if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-						ZendArrayDestroy(ht)
+						ht.DestroyEx()
 					}
 					ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
 				}
@@ -214,7 +214,7 @@ func ShutdownExecutor() {
 							var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 							if ht != nil {
 								if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-									ZendArrayDestroy(ht)
+									ht.DestroyEx()
 								}
 								ZEND_MAP_PTR_SET(op_array.static_variables_ptr, nil)
 							}
@@ -356,16 +356,16 @@ func ShutdownExecutor() {
 		}
 		for __EG().GetSymtableCachePtr() > __EG().GetSymtableCache() {
 			__EG().GetSymtableCachePtr()--
-			ZendHashDestroy((*__EG)().symtable_cache_ptr)
+			(*__EG)().symtable_cache_ptr.Destroy()
 			FREE_HASHTABLE((*__EG)().symtable_cache_ptr)
 		}
-		ZendHashDestroy(__EG().GetIncludedFiles())
+		__EG().GetIncludedFiles().Destroy()
 		ZendStackDestroy(__EG().GetUserErrorHandlersErrorReporting())
 		ZendStackDestroy(__EG().GetUserErrorHandlers())
 		ZendStackDestroy(__EG().GetUserExceptionHandlers())
 		ZendObjectsStoreDestroy(__EG().GetObjectsStore())
 		if __EG().GetInAutoload() != nil {
-			ZendHashDestroy(__EG().GetInAutoload())
+			__EG().GetInAutoload().Destroy()
 			FREE_HASHTABLE(__EG().GetInAutoload())
 		}
 		if __EG().GetHtIterators() != __EG().GetHtIteratorsSlots() {

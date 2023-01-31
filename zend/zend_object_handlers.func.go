@@ -24,7 +24,7 @@ func ZendGetFunctionRootClass(fbc *ZendFunction) *ZendClassEntry {
 }
 func ZendReleaseProperties(ht *HashTable) {
 	if ht != nil && (ht.GetGcFlags()&GC_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ZendArrayDestroy(ht)
+		ht.DestroyEx()
 	}
 }
 func ZendFreeTrampoline(func_ any) {

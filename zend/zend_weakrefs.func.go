@@ -21,7 +21,7 @@ func ZendWeakrefsInit() {
 func ZendWeakrefsNotify(object *ZendObject) {
 	ZendHashIndexDel(__EG().GetWeakrefs(), ZendUlong(object))
 }
-func ZendWeakrefsShutdown() { ZendHashDestroy(__EG().GetWeakrefs()) }
+func ZendWeakrefsShutdown() { __EG().GetWeakrefs().Destroy() }
 func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
 	ZendObjectStdInit(wr.GetStd(), ZendCeWeakref)

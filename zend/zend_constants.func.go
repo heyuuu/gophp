@@ -142,7 +142,7 @@ func ZendRegisterStandardConstants() {
 	REGISTER_MAIN_NULL_CONSTANT("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
 }
 func ZendShutdownConstants() int {
-	ZendHashDestroy(__EG().GetZendConstants())
+	__EG().GetZendConstants().Destroy()
 	Free(__EG().GetZendConstants())
 	return SUCCESS
 }

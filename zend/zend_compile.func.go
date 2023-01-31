@@ -275,7 +275,7 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 		__CG().GetContext().SetBrkContArray(nil)
 	}
 	if __CG().GetContext().GetLabels() != nil {
-		ZendHashDestroy(__CG().GetContext().GetLabels())
+		__CG().GetContext().GetLabels().Destroy()
 		FREE_HASHTABLE(__CG().GetContext().GetLabels())
 		__CG().GetContext().SetLabels(nil)
 	}
@@ -283,17 +283,17 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 }
 func ZendResetImportTables() {
 	if FC(imports) {
-		ZendHashDestroy(FC(imports))
+		FC(imports).Destroy()
 		Efree(FC(imports))
 		FC(imports) = nil
 	}
 	if FC(imports_function) {
-		ZendHashDestroy(FC(imports_function))
+		FC(imports_function).Destroy()
 		Efree(FC(imports_function))
 		FC(imports_function) = nil
 	}
 	if FC(imports_const) {
-		ZendHashDestroy(FC(imports_const))
+		FC(imports_const).Destroy()
 		Efree(FC(imports_const))
 		FC(imports_const) = nil
 	}
@@ -319,7 +319,7 @@ func ZendFileContextBegin(prev_context *ZendFileContext) {
 }
 func ZendFileContextEnd(prev_context *ZendFileContext) {
 	ZendEndNamespace()
-	ZendHashDestroy(&(FC(seen_symbols)))
+	FC(seen_symbols).Destroy()
 	__CG().SetFileContext(*prev_context)
 }
 func ZendInitCompilerDataStructures() {
@@ -362,15 +362,15 @@ func InitCompiler() {
 func ShutdownCompiler() {
 	ZendStackDestroy(__CG().GetLoopVarStack())
 	ZendStackDestroy(__CG().GetDelayedOplinesStack())
-	ZendHashDestroy(__CG().GetFilenamesTable())
+	__CG().GetFilenamesTable().Destroy()
 	ZendArenaDestroy(__CG().GetArena())
 	if __CG().GetDelayedVarianceObligations() != nil {
-		ZendHashDestroy(__CG().GetDelayedVarianceObligations())
+		__CG().GetDelayedVarianceObligations().Destroy()
 		FREE_HASHTABLE(__CG().GetDelayedVarianceObligations())
 		__CG().SetDelayedVarianceObligations(nil)
 	}
 	if __CG().GetDelayedAutoloads() != nil {
-		ZendHashDestroy(__CG().GetDelayedAutoloads())
+		__CG().GetDelayedAutoloads().Destroy()
 		FREE_HASHTABLE(__CG().GetDelayedAutoloads())
 		__CG().SetDelayedAutoloads(nil)
 	}
@@ -2978,7 +2978,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 				} else if val.IsType(IS_LONG) {
 					dst.IndexAddH(val.GetLval(), &tmp)
 				} else {
-					ZendArrayDestroy(dst)
+					dst.DestroyEx()
 					ok = 0
 					break
 				}
@@ -2990,14 +2990,14 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 
 				val = _z
 				if val.GetType() != IS_STRING || IsNumericString(Z_STRVAL_P(val), Z_STRLEN_P(val), nil, nil, 0) != 0 {
-					ZendArrayDestroy(dst)
+					dst.DestroyEx()
 					ok = 0
 					break
 				}
 				dst.KeyAdd(val.GetStr().GetStr(), &tmp)
 			}
 		}
-		ZendArrayDestroy(src)
+		src.DestroyEx()
 		if ok == 0 {
 			return FAILURE
 		}
@@ -5076,7 +5076,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel ZendBool) {
 	}
 	if decl.GetKind() == ZEND_AST_ARROW_FUNC {
 		ZendCompileImplicitClosureUses(&info)
-		ZendHashDestroy(info.GetUses())
+		info.GetUses().Destroy()
 	} else if uses_ast != nil {
 		ZendCompileClosureUses(uses_ast)
 	}
@@ -6453,7 +6453,7 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	} else {
 		ZendUpdateJumpTargetToNext(coalesce_opnum)
 	}
-	ZendHashDestroy(__CG().GetMemoizedExprs())
+	__CG().GetMemoizedExprs().Destroy()
 	FREE_HASHTABLE(__CG().GetMemoizedExprs())
 	__CG().SetMemoizedExprs(orig_memoized_exprs)
 	__CG().SetMemoizeMode(orig_memoize_mode)

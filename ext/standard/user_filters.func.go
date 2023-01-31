@@ -59,7 +59,7 @@ func ZmStartupUserFilters(type_ int, module_number int) int {
 }
 func ZmDeactivateUserFilters(type_ int, module_number int) int {
 	if BG(user_filter_map) {
-		zend.ZendHashDestroy(BG(user_filter_map))
+		BG(user_filter_map).Destroy()
 		zend.Efree(BG(user_filter_map))
 		BG(user_filter_map) = nil
 	}

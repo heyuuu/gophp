@@ -308,9 +308,9 @@ func DestroyZendClass(zv *Zval) {
 				}
 			}
 		}
-		ZendHashDestroy(ce.GetPropertiesInfo())
+		ce.GetPropertiesInfo().Destroy()
 		ZendStringReleaseEx(ce.GetName(), 0)
-		ZendHashDestroy(ce.GetFunctionTable())
+		ce.GetFunctionTable().Destroy()
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			var __ht *HashTable = ce.GetConstantsTable()
@@ -326,7 +326,7 @@ func DestroyZendClass(zv *Zval) {
 				}
 			}
 		}
-		ZendHashDestroy(ce.GetConstantsTable())
+		ce.GetConstantsTable().Destroy()
 		if ce.GetNumInterfaces() > 0 {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
@@ -366,7 +366,7 @@ func DestroyZendClass(zv *Zval) {
 				ZendCleanupInternalClassData(ce)
 			}
 		}
-		ZendHashDestroy(ce.GetPropertiesInfo())
+		ce.GetPropertiesInfo().Destroy()
 		ZendStringReleaseEx(ce.GetName(), 1)
 
 		/* TODO: eliminate this loop for classes without functions with arg_info */
@@ -380,7 +380,7 @@ func DestroyZendClass(zv *Zval) {
 				ZendFreeInternalArgInfo(fn.GetInternalFunction())
 			}
 		}
-		ZendHashDestroy(ce.GetFunctionTable())
+		ce.GetFunctionTable().Destroy()
 		if ce.GetConstantsTable().GetNNumOfElements() {
 			var c *ZendClassConstant
 			var __ht *HashTable = ce.GetConstantsTable()
@@ -396,7 +396,7 @@ func DestroyZendClass(zv *Zval) {
 				}
 				Free(c)
 			}
-			ZendHashDestroy(ce.GetConstantsTable())
+			ce.GetConstantsTable().Destroy()
 		}
 		if ce.GetIteratorFuncsPtr() != nil {
 			Free(ce.GetIteratorFuncsPtr())
@@ -423,7 +423,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 		var ht *HashTable = ZEND_MAP_PTR_GET(op_array.static_variables_ptr)
 		if ht != nil && (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 {
 			if ht.DelRefcount() == 0 {
-				ZendArrayDestroy(ht)
+				ht.DestroyEx()
 			}
 		}
 	}

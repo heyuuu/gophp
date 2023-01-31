@@ -256,7 +256,7 @@ func ZmStartupPassword(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmShutdownPassword(type_ int, module_number int) int {
-	zend.ZendHashDestroy(&PhpPasswordAlgos)
+	PhpPasswordAlgos.Destroy()
 	return zend.SUCCESS
 }
 func PhpPasswordAlgoDefault() *PhpPasswordAlgo { return &PhpPasswordAlgoBcrypt }

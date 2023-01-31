@@ -1778,7 +1778,7 @@ func ZendUndefinedOffsetWrite(ht *HashTable, lval ZendLong) int {
 	}
 	ZendUndefinedOffset(lval)
 	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ZendArrayDestroy(ht)
+		ht.DestroyEx()
 		return FAILURE
 	}
 	if __EG().GetException() != nil {
@@ -1795,7 +1795,7 @@ func ZendUndefinedIndexWrite(ht *HashTable, offset *ZendString) int {
 	}
 	ZendUndefinedIndex(offset)
 	if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-		ZendArrayDestroy(ht)
+		ht.DestroyEx()
 		return FAILURE
 	}
 	if __EG().GetException() != nil {
@@ -1855,7 +1855,7 @@ func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA
 		}
 		ZVAL_UNDEFINED_OP2()
 		if (ht.GetGcFlags()&IS_ARRAY_IMMUTABLE) == 0 && ht.DelRefcount() == 0 {
-			ZendArrayDestroy(ht)
+			ht.DestroyEx()
 			return IS_NULL
 		}
 		if __EG().GetException() != nil {
@@ -3086,9 +3086,9 @@ func ZendCleanAndCacheSymbolTable(symbol_table *ZendArray) {
 	 * which could use the cached hash. Also do this before the check for
 	 * available cache slots, as those may be used by a dtor as well. */
 
-	ZendSymtableClean(symbol_table)
+	symbol_table.SymtableClean()
 	if __EG().GetSymtableCachePtr() >= __EG().GetSymtableCacheLimit() {
-		ZendArrayDestroy(symbol_table)
+		symbol_table.DestroyEx()
 	} else {
 		*(b.PostInc(&(__EG().GetSymtableCachePtr()))) = symbol_table
 	}

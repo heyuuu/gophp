@@ -121,7 +121,7 @@ func DestroyUploadedFilesHash() {
 		var filename *zend.ZendString = el.GetStr()
 		zend.VCWD_UNLINK(filename.GetVal())
 	}
-	zend.ZendHashDestroy(SG(rfc1867_uploaded_files))
+	SG(rfc1867_uploaded_files).Destroy()
 	zend.FREE_HASHTABLE(SG(rfc1867_uploaded_files))
 }
 func FillBuffer(self *MultipartBuffer) int {
@@ -1120,7 +1120,7 @@ fileupload_done:
 	if array_index != nil {
 		zend.Efree(array_index)
 	}
-	zend.ZendHashDestroy(&(PG(rfc1867_protected_variables)))
+	PG(rfc1867_protected_variables).Destroy()
 	zend.ZendLlistDestroy(&header)
 	if mbuff.GetBoundaryNext() != nil {
 		zend.Efree(mbuff.GetBoundaryNext())

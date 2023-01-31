@@ -205,7 +205,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	zend.ZvalPtrDtorNogc(&wakeup_name)
 	zend.ZvalPtrDtorNogc(&unserialize_name)
 	if var_hashx.GetRefProps() != nil {
-		zend.ZendHashDestroy(var_hashx.GetRefProps())
+		var_hashx.GetRefProps().Destroy()
 		zend.FREE_HASHTABLE(var_hashx.GetRefProps())
 	}
 }

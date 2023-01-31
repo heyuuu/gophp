@@ -1059,7 +1059,7 @@ func PhpVarSerializeClass(buf *zend.SmartStr, struc *zend.Zval, retval_ptr *zend
 		PhpVarSerializeClassName(buf, struc)
 		PhpVarSerializeNestedData(buf, struc, &props, props.GetNNumOfElements(), 0, var_hash)
 	}
-	zend.ZendHashDestroy(&props)
+	props.Destroy()
 }
 func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSerializeDataT) {
 	var var_already zend.ZendLong
@@ -1266,7 +1266,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 	/* fprintf(stderr, "SERIALIZE_DESTROY   == lock: %u, level: %u\n", BG(serialize_lock), BG(serialize).level); */
 
 	if BG(serialize_lock) || BG(serialize).level == 1 {
-		zend.ZendHashDestroy(d.GetHt())
+		d.GetHt().Destroy()
 		zend.Efree(d)
 	}
 	if !(BG(serialize_lock)) && !(b.PreDec(&(BG(serialize).level))) {
@@ -1533,7 +1533,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 cleanup:
 	if class_hash != nil {
-		zend.ZendHashDestroy(class_hash)
+		class_hash.Destroy()
 		zend.FREE_HASHTABLE(class_hash)
 	}
 

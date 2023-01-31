@@ -531,7 +531,7 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetKeyCompareFunc(sort_type, 1)
-	if zend.ZendHashSort(array.GetArr(), cmp, 0) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 0) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -618,7 +618,7 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetKeyCompareFunc(sort_type, 0)
-	if zend.ZendHashSort(array.GetArr(), cmp, 0) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 0) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -849,11 +849,11 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 		break
 	}
 	if fold_case != 0 {
-		if zend.ZendHashSort(array.GetArr(), PhpArrayNaturalCaseCompare, 0) == zend.FAILURE {
+		if array.GetArr().SortCompatible(PhpArrayNaturalCaseCompare, 0) == zend.FAILURE {
 			return
 		}
 	} else {
-		if zend.ZendHashSort(array.GetArr(), PhpArrayNaturalCompare, 0) == zend.FAILURE {
+		if array.GetArr().SortCompatible(PhpArrayNaturalCompare, 0) == zend.FAILURE {
 			return
 		}
 	}
@@ -946,7 +946,7 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetDataCompareFunc(sort_type, 0)
-	if zend.ZendHashSort(array.GetArr(), cmp, 0) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 0) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -1033,7 +1033,7 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetDataCompareFunc(sort_type, 1)
-	if zend.ZendHashSort(array.GetArr(), cmp, 0) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 0) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -1120,7 +1120,7 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetDataCompareFunc(sort_type, 0)
-	if zend.ZendHashSort(array.GetArr(), cmp, 1) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 1) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -1207,7 +1207,7 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	cmp = PhpGetDataCompareFunc(sort_type, 1)
-	if zend.ZendHashSort(array.GetArr(), cmp, 1) == zend.FAILURE {
+	if array.GetArr().SortCompatible(cmp, 1) == zend.FAILURE {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -1356,7 +1356,7 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 	/* Copy array, so the in-place modifications will not be visible to the callback function */
 
 	arr = zend.ZendArrayDup(arr)
-	retval = zend.ZendHashSort(arr, compare_func, renumber) != zend.FAILURE
+	retval = arr.SortCompatible(compare_func, renumber) != zend.FAILURE
 	var garbage zend.Zval
 	zend.ZVAL_COPY_VALUE(&garbage, array)
 	zend.ZVAL_ARR(array, arr)
@@ -4748,7 +4748,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 	out_hash.SetNIteratorsCount(in_hash.GetNIteratorsCount())
 	in_hash.SetNIteratorsCount(0)
 	in_hash.SetPDestructor(nil)
-	zend.ZendHashDestroy(in_hash)
+	in_hash.Destroy()
 	in_hash.SetUFlags(out_hash.GetUFlags())
 	in_hash.SetNTableSize(out_hash.GetNTableSize())
 	in_hash.SetNTableMask(out_hash.GetNTableMask())
@@ -5249,7 +5249,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	/* replace HashTable data */
 
 	zend.Z_ARRVAL_P(stack).SetPDestructor(nil)
-	zend.ZendHashDestroy(stack.GetArr())
+	stack.GetArr().Destroy()
 	zend.Z_ARRVAL_P(stack).SetUFlags(new_hash.GetUFlags())
 	zend.Z_ARRVAL_P(stack).SetNTableSize(new_hash.GetNTableSize())
 	zend.Z_ARRVAL_P(stack).SetNTableMask(new_hash.GetNTableMask())
@@ -7506,7 +7506,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				}
 			}
 		}
-		zend.ZendHashDestroy(&seen)
+		seen.Destroy()
 		return
 	}
 	cmp = PhpGetDataCompareFunc(sort_type, 0)
@@ -8595,7 +8595,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		zend.ZendTmpStringRelease(tmp_str)
 	}
-	zend.ZendHashDestroy(&exclude)
+	exclude.Destroy()
 }
 func ZifArrayUdiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpArrayDiff(execute_data, return_value, DIFF_NORMAL, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_INTERNAL)
@@ -9765,7 +9765,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			ret = zend.ZendCallFunction(&fci, &fci_cache)
 			zend.IZvalPtrDtor(&arg)
 			if ret != zend.SUCCESS || result.IsType(zend.IS_UNDEF) {
-				zend.ZendArrayDestroy(return_value.GetArr())
+				return_value.GetArr().DestroyEx()
 				zend.RETVAL_NULL()
 				return
 			}
@@ -9854,7 +9854,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				fci.SetNoSeparation(0)
 				if zend.ZendCallFunction(&fci, &fci_cache) != zend.SUCCESS || result.IsType(zend.IS_UNDEF) {
 					zend.Efree(array_pos)
-					zend.ZendArrayDestroy(return_value.GetArr())
+					return_value.GetArr().DestroyEx()
 					for i = 0; i < n_arrays; i++ {
 						zend.ZvalPtrDtor(&params[i])
 					}

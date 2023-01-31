@@ -78,7 +78,7 @@ func _phpArrayToEnvp(environment *zend.Zval, is_persistent int) PhpProcessEnvT {
 		zend.ZendStringReleaseEx(str, 0)
 	}
 	r.Assert(uint32(p-env.GetEnvp()) <= sizeenv)
-	zend.ZendHashDestroy(env_hash)
+	env_hash.Destroy()
 	zend.FREE_HASHTABLE(env_hash)
 	return env
 }

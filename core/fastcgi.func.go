@@ -200,7 +200,7 @@ func FcgiIsFastcgi() int {
 }
 func FcgiShutdown() {
 	if IsInitialized != 0 {
-		zend.ZendHashDestroy(&FcgiMgmtVars)
+		FcgiMgmtVars.Destroy()
 	}
 	IsFastcgi = 0
 	if AllowedClients != nil {

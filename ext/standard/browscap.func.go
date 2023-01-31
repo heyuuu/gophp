@@ -313,13 +313,13 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	if ctx.GetCurrentSectionName() != nil {
 		zend.ZendStringRelease(ctx.GetCurrentSectionName())
 	}
-	zend.ZendHashDestroy(ctx.GetStrInterned())
+	ctx.GetStrInterned().Destroy()
 	return zend.SUCCESS
 }
 func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 	if bdata.GetHtab() != nil {
 		var i uint32
-		zend.ZendHashDestroy(bdata.GetHtab())
+		bdata.GetHtab().Destroy()
 		zend.Pefree(bdata.GetHtab(), persistent)
 		bdata.SetHtab(nil)
 		for i = 0; i < bdata.GetKvUsed(); i++ {
@@ -669,7 +669,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		} else {
 			zend.ZendHashMerge(zend.Z_OBJPROP_P(return_value), agent_ht, zend.CopyCtorFuncT(BrowscapZvalCopyCtor), 0)
 		}
-		zend.ZendHashDestroy(agent_ht)
+		agent_ht.Destroy()
 		zend.Efree(agent_ht)
 	}
 	zend.ZendStringReleaseEx(lookup_browser_name, 0)

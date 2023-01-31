@@ -17,7 +17,7 @@ func Z_SPLOBJSTORAGE_P(zv *zend.Zval) *spl_SplObjectStorage {
 func spl_SplObjectStorage_free_storage(object *zend.ZendObject) {
 	var intern *spl_SplObjectStorage = SplObjectStorageFromObj(object)
 	zend.ZendObjectStdDtor(intern.GetStd())
-	zend.ZendHashDestroy(intern.GetStorage())
+	intern.GetStorage().Destroy()
 	if intern.GetGcdata() != nil {
 		zend.Efree(intern.GetGcdata())
 	}

@@ -16,7 +16,7 @@ func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
 	PhpSetupSapiContentTypes()
 }
 func SapiGlobalsDtor(sapi_globals *sapi_globals_struct) {
-	zend.ZendHashDestroy(sapi_globals.GetKnownPostContentTypes())
+	sapi_globals.GetKnownPostContentTypes().Destroy()
 }
 func SapiStartup(sf *sapi_module_struct) {
 	sf.SetIniEntries(nil)

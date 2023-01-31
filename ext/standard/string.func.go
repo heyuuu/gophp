@@ -4340,7 +4340,7 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 		/* return the original string */
 
 		if pats == &str_hash {
-			zend.ZendHashDestroy(&str_hash)
+			str_hash.Destroy()
 		}
 		zend.Efree(num_bitset)
 		zend.RETVAL_STR_COPY(input)
@@ -4383,7 +4383,7 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 		zend.RETVAL_STR_COPY(input)
 	}
 	if pats == &str_hash {
-		zend.ZendHashDestroy(&str_hash)
+		str_hash.Destroy()
 	}
 	zend.Efree(num_bitset)
 }

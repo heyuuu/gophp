@@ -96,7 +96,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 }
 func ConfigZvalDtor(zvalue *zend.Zval) {
 	if zvalue.IsType(zend.IS_ARRAY) {
-		zend.ZendHashDestroy(zvalue.GetArr())
+		zvalue.GetArr().Destroy()
 		zend.Free(zvalue.GetArr())
 	} else if zvalue.IsType(zend.IS_STRING) {
 		zend.ZendStringReleaseEx(zvalue.GetStr(), 1)
@@ -571,7 +571,7 @@ func PhpInitConfig() int {
 	return zend.SUCCESS
 }
 func PhpShutdownConfig() int {
-	zend.ZendHashDestroy(&ConfigurationHash)
+	ConfigurationHash.Destroy()
 	if PhpIniOpenedPath != nil {
 		zend.Free(PhpIniOpenedPath)
 		PhpIniOpenedPath = nil

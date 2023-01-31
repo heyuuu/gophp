@@ -41,7 +41,7 @@ func PhpOutputHeader() {
 }
 func ReverseConflictDtor(zv *zend.Zval) {
 	var ht *zend.HashTable = zv.GetPtr()
-	zend.ZendHashDestroy(ht)
+	ht.Destroy()
 }
 func PhpOutputStartup() {
 	PhpOutputInitGlobals(&OutputGlobals)
@@ -52,9 +52,9 @@ func PhpOutputStartup() {
 }
 func PhpOutputShutdown() {
 	PhpOutputDirect = PhpOutputStderr
-	zend.ZendHashDestroy(&PhpOutputHandlerAliases)
-	zend.ZendHashDestroy(&PhpOutputHandlerConflicts)
-	zend.ZendHashDestroy(&PhpOutputHandlerReverseConflicts)
+	PhpOutputHandlerAliases.Destroy()
+	PhpOutputHandlerConflicts.Destroy()
+	PhpOutputHandlerReverseConflicts.Destroy()
 }
 func PhpOutputActivate() int {
 	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
@@ -375,7 +375,7 @@ func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_fun
 		var str *zend.ZendString
 		zend.ZendHashInit(&rev, 8, nil, nil, 1)
 		if nil == zend.ZendHashNextIndexInsertPtr(&rev, check_func) {
-			zend.ZendHashDestroy(&rev)
+			rev.Destroy()
 			return zend.FAILURE
 		}
 		str = zend.ZendStringInitInterned(name, name_len, 1)

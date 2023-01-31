@@ -603,12 +603,12 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 			/* remove all */
 
 			if !(SPL_G(autoload_running)) {
-				zend.ZendHashDestroy(SPL_G(autoload_functions))
+				SPL_G(autoload_functions).Destroy()
 				zend.FREE_HASHTABLE(SPL_G(autoload_functions))
 				SPL_G(autoload_functions) = nil
 				zend.__EG().SetAutoloadFunc(nil)
 			} else {
-				zend.ZendHashClean(SPL_G(autoload_functions))
+				SPL_G(autoload_functions).Clean()
 			}
 			success = zend.SUCCESS
 		} else {
@@ -859,7 +859,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		zv = _z
 		SplBuildClassListString(zv, &strg)
 	}
-	zend.ZendArrayDestroy(list.GetArr())
+	list.GetArr().DestroyEx()
 	standard.PhpInfoPrintTableRow(2, "Interfaces", strg+2)
 	zend.Efree(strg)
 	zend.ArrayInit(&list)
@@ -926,7 +926,7 @@ func ZmInfoSpl(ZEND_MODULE_INFO_FUNC_ARGS) {
 		zv = _z
 		SplBuildClassListString(zv, &strg)
 	}
-	zend.ZendArrayDestroy(list.GetArr())
+	list.GetArr().DestroyEx()
 	standard.PhpInfoPrintTableRow(2, "Classes", strg+2)
 	zend.Efree(strg)
 	standard.PhpInfoPrintTableEnd()
@@ -957,7 +957,7 @@ func ZmDeactivateSpl(type_ int, module_number int) int {
 		SPL_G(autoload_extensions) = nil
 	}
 	if SPL_G(autoload_functions) {
-		zend.ZendHashDestroy(SPL_G(autoload_functions))
+		SPL_G(autoload_functions).Destroy()
 		zend.FREE_HASHTABLE(SPL_G(autoload_functions))
 		SPL_G(autoload_functions) = nil
 	}

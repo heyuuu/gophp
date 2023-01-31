@@ -273,7 +273,7 @@ func ZendGeneratorFreeStorage(object *ZendObject) {
 		ZvalPtrDtor(generator.GetRetval())
 	}
 	if generator.GetNode().GetChildren() > 1 {
-		ZendHashDestroy(generator.GetNode().GetHt())
+		generator.GetNode().GetHt().Destroy()
 		Efree(generator.GetNode().GetHt())
 	}
 	ZendObjectStdDtor(generator.GetStd())

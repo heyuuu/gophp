@@ -4115,7 +4115,7 @@ func PhpFgetcsv(stream *core.PhpStream, delimiter byte, enclosure byte, escape_c
 							if int(temp_len > size_t(limit-buf)) != 0 {
 								goto quit_loop_2
 							}
-							zend.ZendArrayDestroy(return_value.GetArr())
+							return_value.GetArr().DestroyEx()
 							zend.RETVAL_FALSE
 							goto out
 						}
