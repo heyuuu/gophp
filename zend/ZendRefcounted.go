@@ -45,6 +45,25 @@ type IRefcounted interface {
 	AddGcFlags(flags uint32)
 	DelGcFlags(flags uint32)
 	HasGcFlags(flags uint32) bool
+
+	// flags
+	IsCollectable() bool
+	AddCollectable()
+	DelCollectable()
+
+	IsImmutable() bool
+	AddImmutable()
+	DelImmutable()
+
+	IsPersistent() bool
+	AddPersistent()
+	DelPersistent()
+
+	IsRecursive() bool
+	ProtectRecursive()
+	UnprotectRecursive()
+	TryProtectRecursive()
+	TryUnProtectRecursive()
 }
 
 type ZendRefcounted struct {
@@ -132,6 +151,18 @@ func (this *ZendRefcounted) HasGcFlags(flags uint32) bool {
 	var gcFlags = this.GetGcFlags()
 	return b.FlagMatch(gcFlags, flags)
 }
+
+func (this *ZendRefcounted) IsCollectable() bool { return this.HasGcFlags(GC_COLLECTABLE) }
+func (this *ZendRefcounted) AddCollectable()     { this.AddGcFlags(GC_COLLECTABLE) }
+func (this *ZendRefcounted) DelCollectable()     { this.DelGcFlags(GC_COLLECTABLE) }
+
+func (this *ZendRefcounted) IsImmutable() bool { return this.HasGcFlags(GC_IMMUTABLE) }
+func (this *ZendRefcounted) AddImmutable()     { this.AddGcFlags(GC_IMMUTABLE) }
+func (this *ZendRefcounted) DelImmutable()     { this.DelGcFlags(GC_IMMUTABLE) }
+
+func (this *ZendRefcounted) IsPersistent() bool { return this.HasGcFlags(GC_PERSISTENT) }
+func (this *ZendRefcounted) AddPersistent()     { this.AddGcFlags(GC_PERSISTENT) }
+func (this *ZendRefcounted) DelPersistent()     { this.DelGcFlags(GC_PERSISTENT) }
 
 func (this *ZendRefcounted) IsRecursive() bool   { return this.HasGcFlags(GC_PROTECTED) }
 func (this *ZendRefcounted) ProtectRecursive()   { this.AddGcFlags(GC_PROTECTED) }

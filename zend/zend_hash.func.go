@@ -692,72 +692,33 @@ func ZendHashCopy(target *HashTable, source *HashTable, pCopyConstructor CopyCto
 	})
 }
 
-func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bucket, q *Bucket, packed int, static_keys int, with_holes int) int {
-	var data *Zval = p.GetVal()
-	if data.GetTypeInfo() == IS_INDIRECT {
-		data = data.GetZv()
-	}
-	if data.GetTypeInfo() == IS_UNDEF {
-		return 0
-	}
-
-	for {
-		if data.IsRefcounted() {
-			if data.IsReference() && data.GetRefcount() == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_REFVAL_P(data).GetArr() != source) {
-				data = Z_REFVAL_P(data)
-				if !(data.IsRefcounted()) {
-					break
-				}
-			}
-			data.AddRefcount()
-		}
-		break
-	}
-
-	ZVAL_COPY_VALUE(q.GetVal(), data)
-	q.SetH(p.GetH())
-	var nIndex uint32
-	q.SetKey(p.GetKey())
-	if static_keys == 0 && q.GetKey() != nil {
-		q.GetKey().AddRefcount()
-	}
-	nIndex = q.GetH() | target.GetNTableMask()
-	q.GetVal().GetNext() = HT_HASH(target, nIndex)
-	HT_HASH(target, nIndex) = HT_IDX_TO_HASH(idx)
-	return 1
-}
-func ZendArrayDupElements(source *HashTable, target *HashTable, static_keys int, with_holes int) uint32 {
-	var idx uint32 = 0
-	var p *Bucket = source.GetArData()
-	var q *Bucket = target.GetArData()
-	var end *Bucket = p + source.GetNNumUsed()
-	for {
-		if ZendArrayDupElement(source, target, idx, p, q, 0, static_keys, with_holes) == 0 {
-			var target_idx uint32 = idx
-			idx++
-			p++
-			for p != end {
-				if ZendArrayDupElement(source, target, target_idx, p, q, 0, static_keys, with_holes) != 0 {
-					if source.GetNInternalPointer() == idx {
-						target.SetNInternalPointer(target_idx)
+func ZendArrayDupElements(source *HashTable, target *HashTable) {
+	target.eachValidBucketIndirect(func(pos uint32, p *Bucket, data *Zval) {
+		// 增加引用计数
+		for {
+			if data.IsRefcounted() {
+				if data.IsReference() && data.GetRefcount() == 1 && (!data.GetRef().GetVal().IsArray() || data.GetRef().GetVal().GetArr() != source) {
+					data = data.GetRef().GetVal()
+					if !(data.IsRefcounted()) {
+						break
 					}
-					target_idx++
-					q++
 				}
-				idx++
-				p++
+				data.AddRefcount()
 			}
-			return target_idx
-		}
-		idx++
-		p++
-		q++
-		if p == end {
 			break
 		}
-	}
-	return idx
+
+		// 添加元素到新数组
+		var newBucket = NewBucket(p.GetZendKey(), data)
+		target.appendBucket(newBucket)
+
+		// 更新内部指针
+		if source.nInternalPointer == pos {
+			target.nInternalPointer = target.LastPos()
+		}
+	})
 }
+
 func ZendArrayDup(source *HashTable) *HashTable {
 	var target *HashTable = NewZendArray(source.nTableSize)
 	target.AddGcFlags(GC_COLLECTABLE)
@@ -781,22 +742,9 @@ func ZendArrayDup(source *HashTable) *HashTable {
 			target.nInternalPointer = source.nInternalPointer
 		}
 		target.resetDataAndHash(source.DataSize())
-		var idx uint32
-		if target.IsStaticKeys() {
-			if source.IsWithoutHoles() {
-				idx = ZendArrayDupElements(source, target, 1, 0)
-			} else {
-				idx = ZendArrayDupElements(source, target, 1, 1)
-			}
-		} else {
-			if source.IsWithoutHoles() {
-				idx = ZendArrayDupElements(source, target, 0, 0)
-			} else {
-				idx = ZendArrayDupElements(source, target, 0, 1)
-			}
-		}
-		target.SetNNumUsed(idx)
-		target.SetNNumOfElements(idx)
+
+		ZendArrayDupElements(source, target)
+		target.SetNNumOfElements(target.DataSize())
 	}
 	return target
 }

@@ -107,8 +107,8 @@ func Z_RES_TYPE(zval Zval) int            { return Z_RES(zval).GetType() }
 func Z_RES_TYPE_P(zval_p *Zval) int       { return Z_RES_TYPE(*zval_p) }
 func Z_REF(zval Zval) *ZendReference      { return zval.GetRef() }
 func Z_REF_P(zval_p *Zval) *ZendReference { return zval_p.GetRef() }
-func Z_REFVAL(zval Zval) Zval             { return Z_REF(zval).GetVal() }
-func Z_REFVAL_P(zval_p *Zval) Zval        { return Z_REFVAL(*zval_p) }
+func Z_REFVAL(zval Zval) Zval             { return zval.GetRef().GetVal() }
+func Z_REFVAL_P(zval_p *Zval) Zval        { return zval_p.GetRef().GetVal() }
 func GC_AST(p *ZendAstRef) *ZendAst {
 	return (*ZendAst)((*byte)(p) + b.SizeOf("zend_ast_ref"))
 }

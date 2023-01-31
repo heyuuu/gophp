@@ -175,6 +175,7 @@ func (this *ZendArray) GetArData() *Bucket      { return this.arData }
 func (this *ZendArray) SetArData(value *Bucket) { this.arData = value }
 
 func (this *ZendArray) DataSize() uint32 { return uint32(len(this.data)) }
+func (this *ZendArray) LastPos() uint32  { return this.DataSize() - 1 }
 
 func (this *ZendArray) GetNNumUsed() uint32 { return this.DataSize() }
 func (this *ZendArray) SetNNumUsed(value uint32) {

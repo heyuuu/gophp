@@ -144,17 +144,13 @@ func (this *HashTable) eachValidBucketIndirect(handler func(pos uint32, p *Bucke
 	var size = uint32(len(this.data))
 	for i := uint32(0); i < size; i++ {
 		var p = &this.data[i]
-		if p.IsValid() {
-			continue
-		}
-
-		/* INDIRECT element may point to UNDEF-ined slots */
 		var data = p.GetVal()
-		if data.IsType(IS_INDIRECT) {
+
+		if data.IsIndirect() {
 			data = data.GetZv()
-			if data.IsType(IS_UNDEF) {
-				return
-			}
+		}
+		if data.IsUndef() {
+			return
 		}
 
 		handler(i, p, data)
