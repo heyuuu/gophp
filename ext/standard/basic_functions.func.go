@@ -2054,7 +2054,7 @@ func ZifCallUserFunc(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	fci.SetRetval(&retval)
 	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
-		if zend.Z_ISREF(retval) {
+		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
 		zend.ZVAL_COPY_VALUE(return_value, &retval)
@@ -2148,7 +2148,7 @@ func ZifCallUserFuncArray(execute_data *zend.ZendExecuteData, return_value *zend
 	zend.ZendFcallInfoArgs(&fci, params)
 	fci.SetRetval(&retval)
 	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
-		if zend.Z_ISREF(retval) {
+		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
 		zend.ZVAL_COPY_VALUE(return_value, &retval)
@@ -2254,7 +2254,7 @@ func ZifForwardStaticCall(execute_data *zend.ZendExecuteData, return_value *zend
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
-		if zend.Z_ISREF(retval) {
+		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
 		zend.ZVAL_COPY_VALUE(return_value, &retval)
@@ -2353,7 +2353,7 @@ func ZifForwardStaticCallArray(execute_data *zend.ZendExecuteData, return_value 
 		fci_cache.SetCalledScope(called_scope)
 	}
 	if zend.ZendCallFunction(&fci, &fci_cache) == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
-		if zend.Z_ISREF(retval) {
+		if retval.IsReference() {
 			zend.ZendUnwrapReference(&retval)
 		}
 		zend.ZVAL_COPY_VALUE(return_value, &retval)

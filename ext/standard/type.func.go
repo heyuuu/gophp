@@ -156,7 +156,7 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZEND_ASSERT(zend.Z_ISREF_P(var_))
+	zend.ZEND_ASSERT(var_.IsReference())
 	if zend.ZEND_REF_HAS_TYPE_SOURCES(var_.GetRef()) {
 		zend.ZVAL_COPY(&tmp, zend.Z_REFVAL_P(var_))
 		ptr = &tmp

@@ -46,7 +46,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *Zval, scope *ZendCla
 		} else {
 			ZendError(E_DEPRECATED, "Unbinding $this of a method is deprecated")
 		}
-	} else if is_fake_closure == 0 && !(Z_ISUNDEF(closure.GetThisPtr())) && func_.IsUsesThis() {
+	} else if is_fake_closure == 0 && !(closure.GetThisPtr().IsUndef()) && func_.IsUsesThis() {
 
 		// TODO: Only deprecate if it had $this *originally*?
 
@@ -130,7 +130,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 	fci.SetRetval(&closure_result)
 	fci.SetNoSeparation(1)
 	if ZendCallFunction(&fci, &fci_cache) == SUCCESS && closure_result.GetType() != IS_UNDEF {
-		if Z_ISREF(closure_result) {
+		if closure_result.IsReference() {
 			ZendUnwrapReference(&closure_result)
 		}
 		ZVAL_COPY_VALUE(return_value, &closure_result)

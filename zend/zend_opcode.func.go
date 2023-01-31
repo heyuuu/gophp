@@ -106,7 +106,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 			 * table itself. */
 
 			for p != end {
-				if Z_ISREF_P(p) {
+				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
 						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())
@@ -146,7 +146,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 		} else {
 			ZEND_MAP_PTR_SET(ce.static_members_table, nil)
 			for p != end {
-				if Z_ISREF_P(p) {
+				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
 						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())
@@ -261,7 +261,7 @@ func DestroyZendClass(zv *Zval) {
 			var p *Zval = ce.GetDefaultStaticMembersTable()
 			var end *Zval = p + ce.GetDefaultStaticMembersCount()
 			for p != end {
-				if Z_ISREF_P(p) {
+				if p.IsReference() {
 					var prop_info *ZendPropertyInfo
 					for {
 						var _source_list *ZendPropertyInfoSourceList = &(Z_REF_P(p).GetSources())

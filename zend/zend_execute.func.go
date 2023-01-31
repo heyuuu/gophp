@@ -37,14 +37,14 @@ func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, r
 }
 func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, strict ZendBool) *Zval {
 	var ref *ZendRefcounted = nil
-	if ZEND_CONST_COND(value_type&(IS_VAR|IS_CV), 1) && Z_ISREF_P(value) {
+	if ZEND_CONST_COND(value_type&(IS_VAR|IS_CV), 1) && value.IsReference() {
 		ref = value.GetCounted()
 		value = Z_REFVAL_P(value)
 	}
 	for {
 		if Z_REFCOUNTED_P(variable_ptr) {
 			var garbage *ZendRefcounted
-			if Z_ISREF_P(variable_ptr) {
+			if variable_ptr.IsReference() {
 				if ZEND_REF_HAS_TYPE_SOURCES(variable_ptr.GetRef()) {
 					return ZendAssignToTypedRef(variable_ptr, value, value_type, strict, ref)
 				}
@@ -565,7 +565,7 @@ func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_
 }
 func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	var ref *ZendReference
-	if !(Z_ISREF_P(value_ptr)) {
+	if !(value_ptr.IsReference()) {
 		ZVAL_NEW_REF(value_ptr, value_ptr)
 	} else if variable_ptr == value_ptr {
 		return
@@ -588,7 +588,7 @@ func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval,
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, EX_USES_STRICT_TYPES()) == 0 {
 		return EG__().GetUninitializedZval()
 	}
-	if Z_ISREF_P(prop) {
+	if prop.IsReference() {
 		ZEND_REF_DEL_TYPE_SOURCE(prop.GetRef(), prop_info)
 	}
 	ZendAssignToVariableReference(prop, value_ptr)
@@ -640,12 +640,12 @@ func ZendThrowAccessUninitPropByRefError(prop *ZendPropertyInfo) {
 func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA_D) *Zval {
 	var obj *ZendObject
 	var ref *Zval = nil
-	if Z_ISREF_P(object) {
+	if object.IsReference() {
 		ref = object
 		object = Z_REFVAL_P(object)
 	}
 	if object.GetType() > IS_FALSE && (object.GetType() != IS_STRING || Z_STRLEN_P(object) != 0) {
-		if opline.GetOp1Type() != IS_VAR || !(Z_ISERROR_P(object)) {
+		if opline.GetOp1Type() != IS_VAR || !(object.IsError()) {
 			var tmp_property_name *ZendString
 			var property_name *ZendString = ZvalGetTmpString(property, &tmp_property_name)
 			if opline.GetOpcode() == ZEND_PRE_INC_OBJ || opline.GetOpcode() == ZEND_PRE_DEC_OBJ || opline.GetOpcode() == ZEND_POST_INC_OBJ || opline.GetOpcode() == ZEND_POST_DEC_OBJ {
@@ -917,7 +917,7 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 	return 1
 }
 func IZendCheckPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendBool) ZendBool {
-	ZEND_ASSERT(!(Z_ISREF_P(property)))
+	ZEND_ASSERT(!(property.IsReference()))
 	if info.GetType().IsClass() {
 		if property.GetType() != IS_OBJECT {
 			return property.IsNull() && info.GetType().AllowNull()
@@ -965,7 +965,7 @@ func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *a
 	if !(type_.IsSet()) {
 		return 1
 	}
-	if Z_ISREF_P(arg) {
+	if arg.IsReference() {
 		ref = arg.GetRef()
 		arg = Z_REFVAL_P(arg)
 	}
@@ -1577,7 +1577,7 @@ func ZendPreIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline *
 		}
 	} else {
 		for {
-			if Z_ISREF_P(prop) {
+			if prop.IsReference() {
 				var ref *ZendReference = prop.GetRef()
 				prop = Z_REFVAL_P(prop)
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -1612,7 +1612,7 @@ func ZendPostIncdecPropertyZval(prop *Zval, prop_info *ZendPropertyInfo, opline 
 			ZVAL_LONG(prop, val)
 		}
 	} else {
-		if Z_ISREF_P(prop) {
+		if prop.IsReference() {
 			var ref *ZendReference = prop.GetRef()
 			prop = Z_REFVAL_P(prop)
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
@@ -1839,7 +1839,7 @@ func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, _ EXE
 			ZendCheckStringOffset(dim, BP_VAR_RW, EXECUTE_DATA_C)
 			ZendWrongStringOffset(EXECUTE_DATA_C)
 		}
-	} else if !(Z_ISERROR_P(container)) {
+	} else if !(container.IsError()) {
 		ZendUseScalarAsArray()
 	}
 }
@@ -2069,7 +2069,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			ZVAL_NULL(result)
 			ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 		} else if retval != nil && retval.GetType() != IS_UNDEF {
-			if !(Z_ISREF_P(retval)) {
+			if !(retval.IsReference()) {
 				if result != retval {
 					ZVAL_COPY(result, retval)
 					retval = result
@@ -2105,7 +2105,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 				}
 				ZVAL_NULL(result)
 			}
-		} else if Z_ISERROR_P(container) {
+		} else if container.IsError() {
 			ZVAL_ERROR(result)
 		} else {
 			if type_ == BP_VAR_UNSET {
@@ -2214,7 +2214,7 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 		if retval != nil {
 			if result != retval {
 				ZVAL_COPY_DEREF(result, retval)
-			} else if Z_ISREF_P(retval) {
+			} else if retval.IsReference() {
 				ZendUnwrapReference(result)
 			}
 		} else {
@@ -2375,7 +2375,7 @@ try_again:
 		} else {
 			return IS_FALSE
 		}
-	} else if Z_ISREF_P(key) {
+	} else if key.IsReference() {
 		key = Z_REFVAL_P(key)
 		goto try_again
 	} else if key.GetType() <= IS_NULL {
@@ -2408,7 +2408,7 @@ func ZendArrayKeyExistsSlow(subject *Zval, key *Zval, opline *ZendOp, _ EXECUTE_
 	}
 }
 func PromotesToArray(val *Zval) ZendBool {
-	return val.GetType() <= IS_FALSE || Z_ISREF_P(val) && Z_REFVAL_P(val).GetType() <= IS_FALSE
+	return val.GetType() <= IS_FALSE || val.IsReference() && Z_REFVAL_P(val).GetType() <= IS_FALSE
 }
 func PromotesToObject(val *Zval) ZendBool {
 	ZVAL_DEREF(val)
@@ -2565,7 +2565,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 	var ptr *Zval
 	if container_op_type != IS_UNUSED && container.GetType() != IS_OBJECT {
 		for {
-			if Z_ISREF_P(container) && Z_REFVAL_P(container).IsObject() {
+			if container.IsReference() && Z_REFVAL_P(container).IsObject() {
 				container = Z_REFVAL_P(container)
 				break
 			}
@@ -2620,7 +2620,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 	if nil == ptr {
 		ptr = Z_OBJ_HT_P(container).GetReadProperty()(container, prop_ptr, type_, cache_slot, result)
 		if ptr == result {
-			if Z_ISREF_P(ptr) && Z_REFCOUNT_P(ptr) == 1 {
+			if ptr.IsReference() && Z_REFCOUNT_P(ptr) == 1 {
 				ZVAL_UNREF(ptr)
 			}
 			return
@@ -2629,7 +2629,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			ZVAL_ERROR(result)
 			return
 		}
-	} else if Z_ISERROR_P(ptr) {
+	} else if ptr.IsError() {
 		ZVAL_ERROR(result)
 		return
 	}
@@ -2661,15 +2661,15 @@ func ZendAssignToPropertyReference(container *Zval, container_op_type uint32, pr
 	if variable_ptr.IsIndirect() {
 		variable_ptr = variable_ptr.GetZv()
 	}
-	if Z_ISERROR_P(variable_ptr) {
+	if variable_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if variable.GetType() != IS_INDIRECT {
 		ZendThrowError(nil, "Cannot assign by reference to overloaded object")
 		ZvalPtrDtor(&variable)
 		variable_ptr = EG__().GetUninitializedZval()
-	} else if Z_ISERROR_P(value_ptr) {
+	} else if value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
-	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(Z_ISREF_P(value_ptr)) {
+	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(value_ptr.IsReference()) {
 		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, OPLINE_C, EXECUTE_DATA_C)
 	} else {
 		var prop_info *ZendPropertyInfo = nil
@@ -2959,7 +2959,7 @@ func ZendAssignToTypedRef(variable_ptr *Zval, orig_value *Zval, value_type ZendU
 }
 func ZendVerifyPropAssignableByRef(prop_info *ZendPropertyInfo, orig_val *Zval, strict ZendBool) ZendBool {
 	var val *Zval = orig_val
-	if Z_ISREF_P(val) && ZEND_REF_HAS_TYPE_SOURCES(val.GetRef()) {
+	if val.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(val.GetRef()) {
 		var result int
 		val = Z_REFVAL_P(val)
 		result = IZendVerifyTypeAssignableZval(prop_info.GetType(), prop_info.GetCe(), val, strict)

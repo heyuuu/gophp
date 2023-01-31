@@ -660,7 +660,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 			*guard &= ^IN_GET
 			if rv.GetType() != IS_UNDEF {
 				retval = rv
-				if !(Z_ISREF_P(rv)) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
+				if !(rv.IsReference()) && (type_ == BP_VAR_W || type_ == BP_VAR_RW || type_ == BP_VAR_UNSET) {
 					if rv.GetType() != IS_OBJECT {
 						ZendError(E_NOTICE, "Indirect modification of overloaded property %s::$%s has no effect", zobj.GetCe().GetName().GetVal(), name.GetVal())
 					}
@@ -708,7 +708,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	var tmp Zval
 	var property_offset uintPtr
 	var prop_info *ZendPropertyInfo = nil
-	ZEND_ASSERT(!(Z_ISREF_P(value)))
+	ZEND_ASSERT(!(value.IsReference()))
 	zobj = object.GetObj()
 	name = ZvalTryGetTmpString(member, &tmp_name)
 	if name == nil {
@@ -829,7 +829,7 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 		ZVAL_OBJ(&tmp_object, object.GetObj())
 		if type_ == BP_VAR_IS {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", rv, &tmp_offset)
-			if Z_ISUNDEF_P(rv) {
+			if rv.IsUndef() {
 				ZvalPtrDtor(&tmp_object)
 				ZvalPtrDtor(&tmp_offset)
 				return nil
@@ -989,7 +989,7 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		var slot *Zval = OBJ_PROP(zobj, property_offset)
 		if slot.GetType() != IS_UNDEF {
-			if Z_ISREF_P(slot) && ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef()) {
+			if slot.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(slot.GetRef()) {
 				if prop_info != nil {
 					ZEND_REF_DEL_TYPE_SOURCE(slot.GetRef(), prop_info)
 				}

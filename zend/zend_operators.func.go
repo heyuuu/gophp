@@ -1248,9 +1248,9 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_copy Zval
 	var converted int = 0
 	for true {
-		if Z_ISREF_P(op1) {
+		if op1.IsReference() {
 			op1 = Z_REFVAL_P(op1)
-		} else if Z_ISREF_P(op2) {
+		} else if op2.IsReference() {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
 			if op1.IsObject() && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
@@ -1325,9 +1325,9 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_copy Zval
 	var converted int = 0
 	for true {
-		if Z_ISREF_P(op1) {
+		if op1.IsReference() {
 			op1 = Z_REFVAL_P(op1)
-		} else if Z_ISREF_P(op2) {
+		} else if op2.IsReference() {
 			op2 = Z_REFVAL_P(op2)
 		} else if converted == 0 {
 			if op1.IsObject() && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
@@ -1404,9 +1404,9 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_DOUBLE(result, op1.GetDval()*float64(op2.GetLval()))
 			return SUCCESS
 		} else {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
-			} else if Z_ISREF_P(op2) {
+			} else if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
 				if op1.IsObject() && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
@@ -1507,9 +1507,9 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_DOUBLE(result, pow(op1.GetDval(), float64(op2.GetLval())))
 			return SUCCESS
 		} else {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
-			} else if Z_ISREF_P(op2) {
+			} else if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
 				if op1.IsObject() && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
@@ -1619,9 +1619,9 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_DOUBLE(result, float64(op1.GetLval()/op2.GetDval()))
 			return SUCCESS
 		} else {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
-			} else if Z_ISREF_P(op2) {
+			} else if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 			} else if converted == 0 {
 				if op1.IsObject() && op1 == result && Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
@@ -1669,7 +1669,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_lval ZendLong
 	for {
 		if op1.GetType() != IS_LONG {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				if op1.IsLong() {
 					op1_lval = op1.GetLval()
@@ -1704,7 +1704,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	}
 	for {
 		if op2.GetType() != IS_LONG {
-			if Z_ISREF_P(op2) {
+			if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				if op2.IsLong() {
 					op2_lval = op2.GetLval()
@@ -1762,7 +1762,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if op1.IsTrue() {
 			op1_val = 1
 		} else {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				if op1.IsFalse() {
 					op1_val = 0
@@ -1796,7 +1796,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		} else if op2.IsTrue() {
 			op2_val = 1
 		} else {
-			if Z_ISREF_P(op2) {
+			if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				if op2.IsFalse() {
 					op2_val = 0
@@ -1822,7 +1822,7 @@ func BooleanNotFunction(result *Zval, op1 *Zval) int {
 	} else if op1.IsTrue() {
 		ZVAL_FALSE(result)
 	} else {
-		if Z_ISREF_P(op1) {
+		if op1.IsReference() {
 			op1 = Z_REFVAL_P(op1)
 			if op1.GetType() < IS_TRUE {
 				ZVAL_TRUE(result)
@@ -2135,7 +2135,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_lval ZendLong
 	for {
 		if op1.GetType() != IS_LONG {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				if op1.IsLong() {
 					op1_lval = op1.GetLval()
@@ -2170,7 +2170,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	}
 	for {
 		if op2.GetType() != IS_LONG {
-			if Z_ISREF_P(op2) {
+			if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				if op2.IsLong() {
 					op2_lval = op2.GetLval()
@@ -2228,7 +2228,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	var op2_lval ZendLong
 	for {
 		if op1.GetType() != IS_LONG {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				if op1.IsLong() {
 					op1_lval = op1.GetLval()
@@ -2263,7 +2263,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	}
 	for {
 		if op2.GetType() != IS_LONG {
-			if Z_ISREF_P(op2) {
+			if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				if op2.IsLong() {
 					op2_lval = op2.GetLval()
@@ -2321,7 +2321,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	ZVAL_UNDEF(&op2_copy)
 	for {
 		if op1.GetType() != IS_STRING {
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				if op1.IsString() {
 					break
@@ -2362,7 +2362,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	}
 	for {
 		if op2.GetType() != IS_STRING {
-			if Z_ISREF_P(op2) {
+			if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				if op2.IsString() {
 					break
@@ -2593,10 +2593,10 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_LONG(result, -1)
 			return SUCCESS
 		default:
-			if Z_ISREF_P(op1) {
+			if op1.IsReference() {
 				op1 = Z_REFVAL_P(op1)
 				continue
-			} else if Z_ISREF_P(op2) {
+			} else if op2.IsReference() {
 				op2 = Z_REFVAL_P(op2)
 				continue
 			}

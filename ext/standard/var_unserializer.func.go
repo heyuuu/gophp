@@ -154,11 +154,11 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 
 				if delayed_call_failed == 0 {
 					var retval zend.Zval
-					if zend.Z_ISUNDEF(wakeup_name) {
+					if wakeup_name.IsUndef() {
 						zend.ZVAL_STRINGL(&wakeup_name, "__wakeup", b.SizeOf("\"__wakeup\"")-1)
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
+					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
@@ -178,11 +178,11 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 					var retval zend.Zval
 					var param zend.Zval
 					zend.ZVAL_COPY(&param, var_dtor_hash.GetData()[i+1])
-					if zend.Z_ISUNDEF(unserialize_name) {
+					if unserialize_name.IsUndef() {
 						zend.ZVAL_STRINGL(&unserialize_name, "__unserialize", b.SizeOf("\"__unserialize\"")-1)
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(zend.CG__().GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || zend.Z_ISUNDEF(retval) {
+					if zend.CallUserFunction(zend.CG__().GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
@@ -448,7 +448,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 				zend.ZvalDtor(&key)
 				goto failure
 			}
-			if zend.Z_ISREF_P(data) {
+			if data.IsReference() {
 				zend.ZEND_REF_ADD_TYPE_SOURCE(data.GetRef(), info)
 			}
 		}
@@ -1505,10 +1505,10 @@ yy85:
 	if id == -1 || b.Assign(&rval_ref, VarAccess(var_hash, id)) == nil {
 		return 0
 	}
-	if zend.Z_ISUNDEF_P(rval_ref) || zend.Z_ISREF_P(rval_ref) && zend.Z_ISUNDEF_P(zend.Z_REFVAL_P(rval_ref)) {
+	if rval_ref.IsUndef() || rval_ref.IsReference() && zend.Z_REFVAL_P(rval_ref).IsUndef() {
 		return 0
 	}
-	if !(zend.Z_ISREF_P(rval_ref)) {
+	if !(rval_ref.IsReference()) {
 		var info *zend.ZendPropertyInfo = nil
 		if var_hash.GetRefProps() != nil {
 			info = zend.ZendHashIndexFindPtr(var_hash.GetRefProps(), zend.ZendUintptrT(rval_ref))

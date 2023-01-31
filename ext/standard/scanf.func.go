@@ -472,7 +472,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 	if numVars != 0 {
 		for i = varStart; i < argCount; i++ {
-			if !(zend.Z_ISREF(args[i])) {
+			if !(args[i].IsReference()) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter %d must be passed by reference", i)
 				ScanSetErrorReturn(numVars, return_value)
 				return SCAN_ERROR_VAR_PASSED_BYVAL

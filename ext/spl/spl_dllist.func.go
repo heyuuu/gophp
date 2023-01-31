@@ -33,7 +33,7 @@ func SplDllistFromObj(obj *zend.ZendObject) *SplDllistObject {
 }
 func Z_SPLDLLIST_P(zv *zend.Zval) *SplDllistObject { return SplDllistFromObj(zv.GetObj()) }
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
-	if !(zend.Z_ISUNDEF(elem.GetData())) {
+	if !(elem.GetData().IsUndef()) {
 		zend.ZvalPtrDtor(elem.GetData())
 		zend.ZVAL_UNDEF(elem.GetData())
 	}
@@ -298,7 +298,7 @@ func SplDllistObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
 	if intern.GetFptrCount() != nil {
 		var rv zend.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
-		if !(zend.Z_ISUNDEF(rv)) {
+		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
 			zend.ZvalPtrDtor(&rv)
 			return zend.SUCCESS
@@ -387,7 +387,7 @@ func zim_spl_SplDoublyLinkedList_pop(execute_data *zend.ZendExecuteData, return_
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistPop(intern.GetLlist(), return_value)
-	if zend.Z_ISUNDEF_P(return_value) {
+	if return_value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't pop from an empty datastructure", 0)
 		zend.RETVAL_NULL()
 		return
@@ -400,7 +400,7 @@ func zim_spl_SplDoublyLinkedList_shift(execute_data *zend.ZendExecuteData, retur
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	SplPtrLlistShift(intern.GetLlist(), return_value)
-	if zend.Z_ISUNDEF_P(return_value) {
+	if return_value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't shift from an empty datastructure", 0)
 		zend.RETVAL_NULL()
 		return
@@ -414,7 +414,7 @@ func zim_spl_SplDoublyLinkedList_top(execute_data *zend.ZendExecuteData, return_
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	value = SplPtrLlistLast(intern.GetLlist())
-	if value == nil || zend.Z_ISUNDEF_P(value) {
+	if value == nil || value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
@@ -428,7 +428,7 @@ func zim_spl_SplDoublyLinkedList_bottom(execute_data *zend.ZendExecuteData, retu
 	}
 	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
 	value = SplPtrLlistFirst(intern.GetLlist())
-	if value == nil || zend.Z_ISUNDEF_P(value) {
+	if value == nil || value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
 		return
 	}
@@ -683,7 +683,7 @@ func SplDllistItValid(iter *zend.ZendObjectIterator) int {
 func SplDllistItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
 	var element *SplPtrLlistElement = iterator.GetTraversePointer()
-	if element == nil || zend.Z_ISUNDEF(element.GetData()) {
+	if element == nil || element.GetData().IsUndef() {
 		return nil
 	}
 	return element.GetData()
@@ -741,7 +741,7 @@ func zim_spl_SplDoublyLinkedList_current(execute_data *zend.ZendExecuteData, ret
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	if element == nil || zend.Z_ISUNDEF(element.GetData()) {
+	if element == nil || element.GetData().IsUndef() {
 		zend.RETVAL_NULL()
 		return
 	} else {

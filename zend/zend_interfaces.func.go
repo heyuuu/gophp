@@ -131,7 +131,7 @@ func ZendUserItNewIterator(ce *ZendClassEntry, object *Zval, retval *Zval) {
 }
 func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
-	if !(Z_ISUNDEF(iter.GetValue())) {
+	if !(iter.GetValue().IsUndef()) {
 		ZvalPtrDtor(iter.GetValue())
 		ZVAL_UNDEF(iter.GetValue())
 	}
@@ -162,7 +162,7 @@ func ZendUserItValid(_iter *ZendObjectIterator) int {
 func ZendUserItGetCurrentData(_iter *ZendObjectIterator) *Zval {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
 	var object *Zval = iter.GetIt().GetData()
-	if Z_ISUNDEF(iter.GetValue()) {
+	if iter.GetValue().IsUndef() {
 		ZendCallMethodWith0Params(object, iter.GetCe(), iter.GetCe().GetIteratorFuncsPtr().GetZfCurrent(), "current", iter.GetValue())
 	}
 	return iter.GetValue()

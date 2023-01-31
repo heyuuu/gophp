@@ -87,7 +87,7 @@ func SplFixedarrayObjectGetProperties(obj *zend.Zval) *zend.HashTable {
 	if intern.GetArray().GetSize() > 0 {
 		var j zend.ZendLong = ht.GetNNumOfElements()
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
-			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
+			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
@@ -218,7 +218,7 @@ func SplFixedarrayObjectReadDimensionHelper(intern *SplFixedarrayObject, offset 
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Index invalid or out of range", 0)
 		return nil
-	} else if zend.Z_ISUNDEF(intern.GetArray().GetElements()[index]) {
+	} else if intern.GetArray().GetElements()[index].IsUndef() {
 		return nil
 	} else {
 		return intern.GetArray().GetElements()[index]
@@ -240,7 +240,7 @@ func SplFixedarrayObjectReadDimension(object *zend.Zval, offset *zend.Zval, type
 		}
 		zend.ZendCallMethodWith1Params(object, intern.GetStd().GetCe(), intern.GetFptrOffsetGet(), "offsetGet", rv, offset)
 		zend.ZvalPtrDtor(offset)
-		if !(zend.Z_ISUNDEF_P(rv)) {
+		if !(rv.IsUndef()) {
 			return rv
 		}
 		return zend.EG__().GetUninitializedZval()
@@ -331,7 +331,7 @@ func SplFixedarrayObjectHasDimensionHelper(intern *SplFixedarrayObject, offset *
 	if index < 0 || index >= intern.GetArray().GetSize() {
 		retval = 0
 	} else {
-		if zend.Z_ISUNDEF(intern.GetArray().GetElements()[index]) {
+		if intern.GetArray().GetElements()[index].IsUndef() {
 			retval = 0
 		} else if check_empty != 0 {
 			if zend.ZendIsTrue(intern.GetArray().GetElements()[index]) != 0 {
@@ -366,7 +366,7 @@ func SplFixedarrayObjectCountElements(object *zend.Zval, count *zend.ZendLong) i
 	if intern.GetFptrCount() != nil {
 		var rv zend.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
-		if !(zend.Z_ISUNDEF(rv)) {
+		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
 			zend.ZvalPtrDtor(&rv)
 		} else {
@@ -450,7 +450,7 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 		var i int = 0
 		zend.ArrayInit(return_value)
 		for ; i < intern.GetArray().GetSize(); i++ {
-			if !(zend.Z_ISUNDEF(intern.GetArray().GetElements()[i])) {
+			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				return_value.GetArr().IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {

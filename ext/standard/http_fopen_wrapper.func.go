@@ -595,7 +595,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 	core.PhpStreamWrite(stream, req_buf.GetS().GetVal(), req_buf.GetS().GetLen())
 	location[0] = '0'
-	if zend.Z_ISUNDEF_P(response_header) {
+	if response_header.IsUndef() {
 		zend.ArrayInit(response_header)
 	}
 
@@ -912,7 +912,7 @@ func PhpStreamUrlWrapHttp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte
 	var headers zend.Zval
 	zend.ZVAL_UNDEF(&headers)
 	stream = PhpStreamUrlWrapHttpEx(wrapper, path, mode, options, opened_path, context, PHP_URL_REDIRECT_MAX, HTTP_WRAPPER_HEADER_INIT, &headers)
-	if !(zend.Z_ISUNDEF(headers)) {
+	if !(headers.IsUndef()) {
 		if zend.FAILURE == zend.ZendSetLocalVarStr("http_response_header", b.SizeOf("\"http_response_header\"")-1, &headers, 1) {
 			zend.ZvalPtrDtor(&headers)
 		}

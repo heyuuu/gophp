@@ -136,7 +136,7 @@ func ZifFuncGetArg(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		arg = ZEND_CALL_ARG(ex, requested_offset+1)
 	}
-	if !(Z_ISUNDEF_P(arg)) {
+	if !(arg.IsUndef()) {
 		ZVAL_COPY_DEREF(return_value, arg)
 	}
 }
@@ -1315,7 +1315,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 		if prop == nil {
 			continue
 		}
-		if Z_ISUNDEF_P(prop) {
+		if prop.IsUndef() {
 
 			/* Return uninitialized typed properties as a null value */
 
@@ -1470,7 +1470,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			var is_dynamic ZendBool = 1
 			if value.IsIndirect() {
 				value = value.GetZv()
-				if Z_ISUNDEF_P(value) {
+				if value.IsUndef() {
 					continue
 				}
 				is_dynamic = 0
@@ -1478,7 +1478,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			if key != nil && ZendCheckPropertyAccess(zobj, key, is_dynamic) == FAILURE {
 				continue
 			}
-			if Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1 {
+			if value.IsReference() && Z_REFCOUNT_P(value) == 1 {
 				value = Z_REFVAL_P(value)
 			}
 			Z_TRY_ADDREF_P(value)

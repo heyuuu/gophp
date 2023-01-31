@@ -269,7 +269,7 @@ func ZendGeneratorFreeStorage(object *ZendObject) {
 
 	ZvalPtrDtor(generator.GetValue())
 	ZvalPtrDtor(generator.GetKey())
-	if !(Z_ISUNDEF(generator.GetRetval())) {
+	if !(generator.GetRetval().IsUndef()) {
 		ZvalPtrDtor(generator.GetRetval())
 	}
 	if generator.GetNode().GetChildren() > 1 {
@@ -627,7 +627,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 			if EG__().GetException() == nil {
 				var yield_from *ZendOp = (*ZendOp)(root.GetExecuteData().GetOpline() - 1)
 				if yield_from.GetOpcode() == ZEND_YIELD_FROM {
-					if Z_ISUNDEF(root.GetNode().GetParent().GetRetval()) {
+					if root.GetNode().GetParent().GetRetval().IsUndef() {
 
 						/* Throw the exception in the context of the generator */
 
@@ -697,7 +697,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 				value = value.GetZv()
 			}
 			pos++
-			if !(Z_ISUNDEF_P(value)) {
+			if !(value.IsUndef()) {
 				break
 			}
 		}
@@ -770,14 +770,14 @@ try_again:
 		ZendThrowError(nil, "Cannot resume an already running generator")
 		return
 	}
-	if orig_generator.IsDoInit() && !(Z_ISUNDEF(generator.GetValue())) {
+	if orig_generator.IsDoInit() && !(generator.GetValue().IsUndef()) {
 
 		/* We must not advance Generator if we yield from a Generator being currently run */
 
 		orig_generator.SetIsDoInit(false)
 		return
 	}
-	if !(Z_ISUNDEF(generator.GetValues())) {
+	if !(generator.GetValues().IsUndef()) {
 		if ZendGeneratorGetNextDelegatedValue(generator) == SUCCESS {
 			orig_generator.SetIsDoInit(false)
 			return
@@ -863,7 +863,7 @@ try_again:
 
 	/* yield from was used, try another resume. */
 
-	if generator != orig_generator && !(Z_ISUNDEF(generator.GetRetval())) || generator.GetExecuteData() != nil && (generator.GetExecuteData().GetOpline()-1).opcode == ZEND_YIELD_FROM {
+	if generator != orig_generator && !(generator.GetRetval().IsUndef()) || generator.GetExecuteData() != nil && (generator.GetExecuteData().GetOpline()-1).opcode == ZEND_YIELD_FROM {
 		generator = ZendGeneratorGetCurrent(orig_generator)
 		goto try_again
 	}
@@ -1129,7 +1129,7 @@ func zim_Generator_getReturn(execute_data *ZendExecuteData, return_value *Zval) 
 	if EG__().GetException() != nil {
 		return
 	}
-	if Z_ISUNDEF(generator.GetRetval()) {
+	if generator.GetRetval().IsUndef() {
 
 		/* Generator hasn't returned yet -> error! */
 

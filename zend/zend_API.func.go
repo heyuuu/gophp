@@ -195,7 +195,7 @@ func ZVAL_EMPTY_PSTRING(z *Zval) { ZVAL_PSTRINGL(z, "", 0) }
 func ZVAL_ZVAL(z *Zval, zv *Zval, copy int, dtor int) {
 	var __z *Zval = z
 	var __zv *Zval = zv
-	if !(Z_ISREF_P(__zv)) {
+	if !(__zv.IsReference()) {
 		if copy != 0 && dtor == 0 {
 			ZVAL_COPY(__z, __zv)
 		} else {
@@ -245,7 +245,7 @@ func ZEND_GSHUTDOWN(module __auto__) func(any) {
 func _ZEND_TRY_ASSIGN_NULL(zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefNull(ref)
@@ -260,13 +260,13 @@ func _ZEND_TRY_ASSIGN_NULL(zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_NULL(zv *Zval) { _ZEND_TRY_ASSIGN_NULL(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_NULL(zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_NULL(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_FALSE(zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefBool(ref, 0)
@@ -281,13 +281,13 @@ func _ZEND_TRY_ASSIGN_FALSE(zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_FALSE(zv *Zval) { _ZEND_TRY_ASSIGN_FALSE(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_FALSE(zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_FALSE(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_TRUE(zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefBool(ref, 1)
@@ -302,13 +302,13 @@ func _ZEND_TRY_ASSIGN_TRUE(zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_TRUE(zv *Zval) { _ZEND_TRY_ASSIGN_TRUE(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_TRUE(zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_TRUE(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefBool(ref, 1)
@@ -323,13 +323,13 @@ func _ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__) { _ZEND_TRY_ASSIGN_BOOL(zv, bval, 0) }
 func ZEND_TRY_ASSIGN_REF_BOOL(zv *Zval, bval __auto__) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_BOOL(zv, bval, 1)
 }
 func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefLong(ref, lval)
@@ -344,13 +344,13 @@ func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong) { _ZEND_TRY_ASSIGN_LONG(zv, lval, 0) }
 func ZEND_TRY_ASSIGN_REF_LONG(zv *Zval, lval ZendLong) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_LONG(zv, lval, 1)
 }
 func _ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefDouble(ref, dval)
@@ -365,13 +365,13 @@ func _ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64) { _ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 0) }
 func ZEND_TRY_ASSIGN_REF_DOUBLE(zv *Zval, dval float64) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 1)
 }
 func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefEmptyString(ref)
@@ -386,13 +386,13 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval) { _ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 1)
 }
 func _ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefStr(ref, str)
@@ -407,13 +407,13 @@ func _ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_STR(zv, str, 0) }
 func ZEND_TRY_ASSIGN_REF_STR(zv *Zval, str *ZendString) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STR(zv, str, 1)
 }
 func _ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString, is_str int) {
 	for {
 		var _zv *Zval = zv
-		if is_str != 0 || Z_ISREF_P(_zv) {
+		if is_str != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefStr(ref, str)
@@ -428,13 +428,13 @@ func _ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString, is_str int) {
 }
 func ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_NEW_STR(zv, str, 0) }
 func ZEND_TRY_ASSIGN_REF_NEW_STR(zv *Zval, str *ZendString) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_NEW_STR(zv, str, 1)
 }
 func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefString(ref, string)
@@ -449,13 +449,13 @@ func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte) { _ZEND_TRY_ASSIGN_STRING(zv, string, 0) }
 func ZEND_TRY_ASSIGN_REF_STRING(zv *Zval, string *byte) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRING(zv, string, 1)
 }
 func _ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefStringl(ref, string, len_)
@@ -472,13 +472,13 @@ func ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int) {
 	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 0)
 }
 func ZEND_TRY_ASSIGN_REF_STRINGL(zv *Zval, string *byte, len_ int) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 1)
 }
 func _ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefArr(ref, arr)
@@ -493,13 +493,13 @@ func _ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray) { _ZEND_TRY_ASSIGN_ARR(zv, arr, 0) }
 func ZEND_TRY_ASSIGN_REF_ARR(zv *Zval, arr *ZendArray) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_ARR(zv, arr, 1)
 }
 func _ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefRes(ref, res)
@@ -514,13 +514,13 @@ func _ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource) { _ZEND_TRY_ASSIGN_RES(zv, res, 0) }
 func ZEND_TRY_ASSIGN_REF_RES(zv *Zval, res *ZendResource) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_RES(zv, res, 1)
 }
 func _ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRef(ref, other_zv)
@@ -535,13 +535,13 @@ func _ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_TMP(zv, other_zv, 0) }
 func ZEND_TRY_ASSIGN_REF_TMP(zv *Zval, other_zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_TMP(zv, other_zv, 1)
 }
 func _ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefZval(ref, other_zv)
@@ -556,7 +556,7 @@ func _ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval, is_ref int) {
 }
 func ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 0) }
 func ZEND_TRY_ASSIGN_REF_VALUE(zv *Zval, other_zv *Zval) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 1)
 }
 func ZEND_TRY_ASSIGN_COPY(zv *Zval, other_zv *Zval) {
@@ -570,7 +570,7 @@ func ZEND_TRY_ASSIGN_REF_COPY(zv *Zval, other_zv *Zval) {
 func _ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool, is_ref int) {
 	for {
 		var _zv *Zval = zv
-		if is_ref != 0 || Z_ISREF_P(_zv) {
+		if is_ref != 0 || _zv.IsReference() {
 			var ref *ZendReference = _zv.GetRef()
 			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 				ZendTryAssignTypedRefZvalEx(ref, other_zv, strict)
@@ -587,7 +587,7 @@ func ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 0)
 }
 func ZEND_TRY_ASSIGN_REF_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
-	ZEND_ASSERT(Z_ISREF_P(zv))
+	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 1)
 }
 func ZEND_TRY_ASSIGN_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
@@ -600,7 +600,7 @@ func ZEND_TRY_ASSIGN_REF_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
 }
 func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
 	var arr *ZendArray = ZendNewArray(size)
-	if Z_ISREF_P(zv) {
+	if zv.IsReference() {
 		var ref *ZendReference = zv.GetRef()
 		if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 			if ZendTryAssignTypedRefArr(ref, arr) != SUCCESS {
@@ -627,7 +627,7 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 	_real_arg++
 	_arg = _real_arg
 	if deref != 0 {
-		if Z_ISREF_P(_arg) {
+		if _arg.IsReference() {
 			_arg = Z_REFVAL_P(_arg)
 		}
 	}
@@ -823,7 +823,7 @@ func ZendParseArgFunc(arg *Zval, dest_fci *ZendFcallInfo, dest_fcc *ZendFcallInf
 	return 1
 }
 func ZendParseArgZval(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && (arg.IsNull() || Z_ISREF_P(arg) && Z_REFVAL_P(arg).IsNull()) {
+	if check_null != 0 && (arg.IsNull() || arg.IsReference() && Z_REFVAL_P(arg).IsNull()) {
 		*dest = nil
 	} else {
 		*dest = arg
@@ -3659,7 +3659,7 @@ again:
 			break
 		}
 		if Z_ARRVAL_P(callable).GetNNumOfElements() == 2 {
-			if obj == nil || b.CondF(!(Z_ISREF_P(obj)), func() bool { return obj.GetType() != IS_STRING && obj.GetType() != IS_OBJECT }, func() bool { return Z_REFVAL_P(obj).GetType() != IS_STRING && Z_REFVAL_P(obj).GetType() != IS_OBJECT }) {
+			if obj == nil || b.CondF(!(obj.IsReference()), func() bool { return obj.GetType() != IS_STRING && obj.GetType() != IS_OBJECT }, func() bool { return Z_REFVAL_P(obj).GetType() != IS_STRING && Z_REFVAL_P(obj).GetType() != IS_OBJECT }) {
 				if error != nil {
 					*error = Estrdup("first array member is not a valid class name or object")
 				}
@@ -3788,7 +3788,7 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 		var _z *Zval = _p.GetVal()
 
 		arg = _z
-		if func_ != nil && !(Z_ISREF_P(arg)) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
+		if func_ != nil && !(arg.IsReference()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
 			ZVAL_NEW_REF(params, arg)
 			Z_TRY_ADDREF_P(arg)
 		} else {
@@ -3959,7 +3959,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		}
 		property_default_ptr = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 		ZVAL_COPY_VALUE(property_default_ptr, property)
-		if Z_ISUNDEF_P(property) {
+		if property.IsUndef() {
 			property_default_ptr.SetU2Extra(IS_PROP_UNINIT)
 		} else {
 			property_default_ptr.SetU2Extra(0)
@@ -4264,7 +4264,7 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *
 	if property == nil {
 		return FAILURE
 	}
-	ZEND_ASSERT(!(Z_ISREF_P(value)))
+	ZEND_ASSERT(!(value.IsReference()))
 	Z_TRY_ADDREF_P(value)
 	if prop_info.GetType() != 0 {
 		ZVAL_COPY_VALUE(&tmp, value)

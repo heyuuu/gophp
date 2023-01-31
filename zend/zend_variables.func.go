@@ -73,7 +73,7 @@ func ZvalInternalPtrDtor(zval_ptr *Zval) {
 }
 func ZvalAddRef(p *Zval) {
 	if Z_REFCOUNTED_P(p) {
-		if Z_ISREF_P(p) && Z_REFCOUNT_P(p) == 1 {
+		if p.IsReference() && Z_REFCOUNT_P(p) == 1 {
 			ZVAL_COPY(p, Z_REFVAL_P(p))
 		} else {
 			Z_ADDREF_P(p)

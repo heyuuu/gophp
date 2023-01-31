@@ -26,7 +26,7 @@ func SplObjectStorageGetHash(key *zend.ZendHashKey, intern *spl_SplObjectStorage
 	if intern.GetFptrGetHash() != nil {
 		var rv zend.Zval
 		zend.ZendCallMethodWith1Params(this, intern.GetStd().GetCe(), intern.GetFptrGetHash(), "getHash", &rv, obj)
-		if !(zend.Z_ISUNDEF(rv)) {
+		if !(rv.IsUndef()) {
 			if rv.IsType(zend.IS_STRING) {
 				key.SetKey(rv.GetStr())
 				return zend.SUCCESS
@@ -571,14 +571,14 @@ func zim_spl_SplObjectStorage_unserialize(execute_data *zend.ZendExecuteData, re
 		pelement = SplObjectStorageGet(intern, &key)
 		SplObjectStorageFreeHash(intern, &key)
 		if pelement != nil {
-			if !(zend.Z_ISUNDEF(pelement.GetInf())) {
+			if !(pelement.GetInf().IsUndef()) {
 				standard.VarPushDtor(&var_hash, pelement.GetInf())
 			}
-			if !(zend.Z_ISUNDEF(pelement.GetObj())) {
+			if !(pelement.GetObj().IsUndef()) {
 				standard.VarPushDtor(&var_hash, pelement.GetObj())
 			}
 		}
-		element = SplObjectStorageAttach(intern, zend.ZEND_THIS, &entry, b.Cond(zend.Z_ISUNDEF(inf), nil, &inf))
+		element = SplObjectStorageAttach(intern, zend.ZEND_THIS, &entry, b.Cond(inf.IsUndef(), nil, &inf))
 		standard.VarReplace(&var_hash, &entry, element.GetObj())
 		standard.VarReplace(&var_hash, &inf, element.GetInf())
 		zend.ZvalPtrDtor(&entry)
@@ -791,7 +791,7 @@ func zim_spl_MultipleIterator_valid(execute_data *zend.ZendExecuteData, return_v
 	for b.Assign(&element, zend.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
-		if !(zend.Z_ISUNDEF(retval)) {
+		if !(retval.IsUndef()) {
 			valid = retval.IsType(zend.IS_TRUE)
 			zend.ZvalPtrDtor(&retval)
 		} else {
@@ -822,7 +822,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 	for b.Assign(&element, zend.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), intern.GetPos())) != nil && zend.EG__().GetException() == nil {
 		it = element.GetObj()
 		zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfValid(), "valid", &retval)
-		if !(zend.Z_ISUNDEF(retval)) {
+		if !(retval.IsUndef()) {
 			valid = retval.IsType(zend.IS_TRUE)
 			zend.ZvalPtrDtor(&retval)
 		} else {
@@ -834,7 +834,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 			} else {
 				zend.ZendCallMethodWith0Params(it, zend.Z_OBJCE_P(it), zend.Z_OBJCE_P(it).GetIteratorFuncsPtr().GetZfKey(), "key", &retval)
 			}
-			if zend.Z_ISUNDEF(retval) {
+			if retval.IsUndef() {
 				zend.ZendThrowException(spl_ce_RuntimeException, "Failed to call sub iterator method", 0)
 				return
 			}

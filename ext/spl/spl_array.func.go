@@ -190,7 +190,7 @@ func SplArrayGetDimensionPtr(check_inherited int, intern *SplArrayObject, offset
 	var index zend.ZendLong
 	var offset_key *zend.ZendString
 	var ht *zend.HashTable = SplArrayGetHashTable(intern)
-	if offset == nil || zend.Z_ISUNDEF_P(offset) || ht == nil {
+	if offset == nil || offset.IsUndef() || ht == nil {
 		return zend.EG__().GetUninitializedZval()
 	}
 	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW) && intern.GetNApplyCount() > 0 {
@@ -308,7 +308,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 			}
 			zend.ZendCallMethodWith1Params(object, zend.Z_OBJCE_P(object), intern.GetFptrOffsetGet(), "offsetGet", rv, offset)
 			zend.ZvalPtrDtor(offset)
-			if !(zend.Z_ISUNDEF_P(rv)) {
+			if !(rv.IsUndef()) {
 				return rv
 			}
 			return zend.EG__().GetUninitializedZval()
@@ -321,7 +321,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 	 * by separating (if necessary) and returning as IS_REFERENCE (with refcount == 1)
 	 */
 
-	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(zend.Z_ISREF_P(ret)) && ret != zend.EG__().GetUninitializedZval() {
+	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.EG__().GetUninitializedZval() {
 		zend.ZVAL_NEW_REF(ret, ret)
 	}
 	return ret

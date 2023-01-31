@@ -32,7 +32,7 @@ func ZendObjectStdDtor(object *ZendObject) {
 		end = p + object.GetCe().GetDefaultPropertiesCount()
 		for {
 			if Z_REFCOUNTED_P(p) {
-				if Z_ISREF_P(p) && ZEND_REF_HAS_TYPE_SOURCES(p.GetRef()) {
+				if p.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(p.GetRef()) {
 					var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(object, p)
 					if prop_info.GetType() != 0 {
 						ZEND_REF_DEL_TYPE_SOURCE(p.GetRef(), prop_info)
@@ -167,7 +167,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			IZvalPtrDtor(dst)
 			ZVAL_COPY_VALUE_PROP(dst, src)
 			ZvalAddRef(dst)
-			if Z_ISREF_P(dst) && ZEND_REF_HAS_TYPE_SOURCES(dst.GetRef()) {
+			if dst.IsReference() && ZEND_REF_HAS_TYPE_SOURCES(dst.GetRef()) {
 				var prop_info *ZendPropertyInfo = ZendGetPropertyInfoForSlot(new_object, dst)
 				if prop_info.GetType() != 0 {
 					ZEND_REF_ADD_TYPE_SOURCE(dst.GetRef(), prop_info)

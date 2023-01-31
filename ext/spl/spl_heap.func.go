@@ -335,7 +335,7 @@ func SplHeapObjectCountElements(object *zend.Zval, count *zend.ZendLong) int {
 	if intern.GetFptrCount() != nil {
 		var rv zend.Zval
 		zend.ZendCallMethodWith0Params(object, intern.GetStd().GetCe(), intern.GetFptrCount(), "count", &rv)
-		if !(zend.Z_ISUNDEF(rv)) {
+		if !(rv.IsUndef()) {
 			*count = zend.ZvalGetLong(&rv)
 			zend.ZvalPtrDtor(&rv)
 			return zend.SUCCESS
@@ -627,7 +627,7 @@ func SplPqueueItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	if object.GetHeap().GetCount() == 0 {
 		return nil
 	}
-	if zend.Z_ISUNDEF(user_it.GetValue()) {
+	if user_it.GetValue().IsUndef() {
 		var elem *SplPqueueElem = SplHeapElem(object.GetHeap(), 0)
 		SplPqueueExtractHelper(user_it.GetValue(), elem, object.GetFlags())
 	}

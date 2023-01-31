@@ -1147,7 +1147,7 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.AddAssocBool(return_value, "blocked", 1)
 		zend.AddAssocBool(return_value, "eof", core.PhpStreamEof(stream))
 	}
-	if !(zend.Z_ISUNDEF(stream.GetWrapperdata())) {
+	if !(stream.GetWrapperdata().IsUndef()) {
 		zend.Z_ADDREF_P(stream.GetWrapperdata())
 		zend.AddAssocZval(return_value, "wrapper_data", stream.GetWrapperdata())
 	}

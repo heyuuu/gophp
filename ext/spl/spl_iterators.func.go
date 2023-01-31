@@ -30,7 +30,7 @@ func SplRecursiveItDtor(_iter *zend.ZendObjectIterator) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(iter.GetIntern().GetData())
 	var sub_iter *zend.ZendObjectIterator
 	for object.GetLevel() > 0 {
-		if !(zend.Z_ISUNDEF(object.GetIterators()[object.GetLevel()].GetZobject())) {
+		if !(object.GetIterators()[object.GetLevel()].GetZobject().IsUndef()) {
 			sub_iter = object.GetIterators()[object.GetLevel()].GetIterator()
 			zend.ZendIteratorDtor(sub_iter)
 			zend.ZvalPtrDtor(object.GetIterators()[object.GetLevel()].GetZobject())
@@ -1112,7 +1112,7 @@ func zim_spl_dual_it_getInnerIterator(execute_data *zend.ZendExecuteData, return
 		return
 	}
 	intern = it
-	if !(zend.Z_ISUNDEF(intern.GetZobject())) {
+	if !(intern.GetZobject().IsUndef()) {
 		var value *zend.Zval = intern.GetZobject()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
@@ -1416,7 +1416,7 @@ func zim_spl_CallbackFilterIterator_accept(execute_data *zend.ZendExecuteData, r
 	fci.SetParamCount(3)
 	fci.SetParams(params)
 	fci.SetNoSeparation(0)
-	if zend.ZendCallFunction(fci, fcc) != zend.SUCCESS || zend.Z_ISUNDEF_P(return_value) {
+	if zend.ZendCallFunction(fci, fcc) != zend.SUCCESS || return_value.IsUndef() {
 		zend.RETVAL_FALSE
 		return
 	}
@@ -1689,7 +1689,7 @@ func SplDualItDtor(_object *zend.ZendObject) {
 }
 func SplDualItFreeStorage(_object *zend.ZendObject) {
 	var object *SplDualItObject = SplDualItFromObj(_object)
-	if !(zend.Z_ISUNDEF(object.GetZobject())) {
+	if !(object.GetZobject().IsUndef()) {
 		zend.ZvalPtrDtor(object.GetZobject())
 	}
 	if object.GetDitType() == DIT_AppendIterator {
@@ -2349,7 +2349,7 @@ func zim_spl_EmptyIterator_next(execute_data *zend.ZendExecuteData, return_value
 }
 func SplAppendItNextIterator(intern *SplDualItObject) int {
 	SplDualItFree(intern)
-	if !(zend.Z_ISUNDEF(intern.GetZobject())) {
+	if !(intern.GetZobject().IsUndef()) {
 		zend.ZvalPtrDtor(intern.GetZobject())
 		zend.ZVAL_UNDEF(intern.GetZobject())
 		intern.SetCe(nil)

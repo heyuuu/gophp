@@ -47,7 +47,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 		var is_dynamic zend.ZendBool = 1
 		if zdata.IsType(zend.IS_INDIRECT) {
 			zdata = zdata.GetZv()
-			if zend.Z_ISUNDEF_P(zdata) {
+			if zdata.IsUndef() {
 				continue
 			}
 			is_dynamic = 0

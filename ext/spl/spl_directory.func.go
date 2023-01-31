@@ -44,7 +44,7 @@ func SplFilesystemFileFreeLine(intern *SplFilesystemObject) {
 		zend.Efree(intern.GetCurrentLine())
 		intern.SetCurrentLine(nil)
 	}
-	if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+	if !(intern.GetCurrentZval().IsUndef()) {
 		zend.ZvalPtrDtor(intern.GetCurrentZval())
 		zend.ZVAL_UNDEF(intern.GetCurrentZval())
 	}
@@ -1381,13 +1381,13 @@ func SplFilesystemTreeItCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 	var iterator *SplFilesystemIterator = (*SplFilesystemIterator)(iter)
 	var object *SplFilesystemObject = SplFilesystemIteratorToObject(iterator)
 	if SPL_FILE_DIR_CURRENT(object, SPL_FILE_DIR_CURRENT_AS_PATHNAME) {
-		if zend.Z_ISUNDEF(iterator.GetCurrent()) {
+		if iterator.GetCurrent().IsUndef() {
 			SplFilesystemObjectGetFileName(object)
 			zend.ZVAL_STRINGL(iterator.GetCurrent(), object.GetFileName(), object.GetFileNameLen())
 		}
 		return iterator.GetCurrent()
 	} else if SPL_FILE_DIR_CURRENT(object, SPL_FILE_DIR_CURRENT_AS_FILEINFO) {
-		if zend.Z_ISUNDEF(iterator.GetCurrent()) {
+		if iterator.GetCurrent().IsUndef() {
 			SplFilesystemObjectGetFileName(object)
 			SplFilesystemObjectCreateType(0, object, SPL_FS_INFO, nil, iterator.GetCurrent())
 		}
@@ -1419,7 +1419,7 @@ func SplFilesystemTreeItMoveForward(iter *zend.ZendObjectIterator) {
 		zend.Efree(object.GetFileName())
 		object.SetFileName(nil)
 	}
-	if !(zend.Z_ISUNDEF(iterator.GetCurrent())) {
+	if !(iterator.GetCurrent().IsUndef()) {
 		zend.ZvalPtrDtor(iterator.GetCurrent())
 		zend.ZVAL_UNDEF(iterator.GetCurrent())
 	}
@@ -1437,7 +1437,7 @@ func SplFilesystemTreeItRewind(iter *zend.ZendObjectIterator) {
 			break
 		}
 	}
-	if !(zend.Z_ISUNDEF(iterator.GetCurrent())) {
+	if !(iterator.GetCurrent().IsUndef()) {
 		zend.ZvalPtrDtor(iterator.GetCurrent())
 		zend.ZVAL_UNDEF(iterator.GetCurrent())
 	}
@@ -1482,7 +1482,7 @@ func SplFilesystemObjectCast(readobj *zend.Zval, writeobj *zend.Zval, type_ int)
 func SplFilesystemFileRead(intern *SplFilesystemObject, silent int) int {
 	var buf *byte
 	var line_len int = 0
-	var line_add zend.ZendLong = b.Cond(intern.GetCurrentLine() != nil || !(zend.Z_ISUNDEF(intern.GetCurrentZval())), 1, 0)
+	var line_add zend.ZendLong = b.Cond(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()), 1, 0)
 	SplFilesystemFileFreeLine(intern)
 	if core.PhpStreamEof(intern.GetStream()) != 0 {
 		if silent == 0 {
@@ -1528,7 +1528,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	var retval zend.Zval
 	var result int
 	var num_args int = pass_num_args + b.Cond(arg2 != nil, 2, 1)
-	if zend.Z_ISUNDEF_P(zresource_ptr) {
+	if zresource_ptr.IsUndef() {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return zend.FAILURE
 	}
@@ -1553,7 +1553,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	fcic.SetCalledScope(nil)
 	fcic.SetObject(nil)
 	result = zend.ZendCallFunction(&fci, &fcic)
-	if result == zend.FAILURE || zend.Z_ISUNDEF(retval) {
+	if result == zend.FAILURE || retval.IsUndef() {
 		zend.RETVAL_FALSE
 	} else {
 		zend.ZVAL_ZVAL(return_value, &retval, 0, 0)
@@ -1573,7 +1573,7 @@ func SplFilesystemFileReadCsv(intern *SplFilesystemObject, delimiter byte, enclo
 	if ret == zend.SUCCESS {
 		var buf_len int = intern.GetCurrentLineLen()
 		var buf *byte = zend.Estrndup(intern.GetCurrentLine(), buf_len)
-		if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+		if !(intern.GetCurrentZval().IsUndef()) {
 			zend.ZvalPtrDtor(intern.GetCurrentZval())
 			zend.ZVAL_UNDEF(intern.GetCurrentZval())
 		}
@@ -1603,8 +1603,8 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 			var execute_data *zend.ZendExecuteData = zend.EG__().GetCurrentExecuteData()
 			zend.ZendCallMethodWith0Params(this_ptr, zend.Z_OBJCE_P(zend.ZEND_THIS), intern.GetFuncGetCurr(), "getCurrentLine", &retval)
 		}
-		if !(zend.Z_ISUNDEF(retval)) {
-			if intern.GetCurrentLine() != nil || !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+		if !(retval.IsUndef()) {
+			if intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()) {
 				intern.GetCurrentLineNum()++
 			}
 			SplFilesystemFileFreeLine(intern)
@@ -1629,7 +1629,7 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 	if intern.GetCurrentLine() != nil {
 		return intern.GetCurrentLineLen() == 0
-	} else if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+	} else if !(intern.GetCurrentZval().IsUndef()) {
 		switch intern.GetCurrentZval().GetType() {
 		case zend.IS_STRING:
 			return zend.Z_STRLEN(intern.GetCurrentZval()) == 0
@@ -1637,7 +1637,7 @@ func SplFilesystemFileIsEmptyLine(intern *SplFilesystemObject) int {
 			if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 && zend.Z_ARRVAL(intern.GetCurrentZval()).GetNNumOfElements() == 1 {
 				var idx uint32 = 0
 				var first *zend.Zval
-				for zend.Z_ISUNDEF(zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()) {
+				for zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal().IsUndef() {
 					idx++
 				}
 				first = zend.Z_ARRVAL(intern.GetCurrentZval()).GetArData()[idx].GetVal()
@@ -1766,7 +1766,7 @@ func zim_spl_SplFileObject_valid(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_AHEAD) != 0 {
-		zend.RETVAL_BOOL(intern.GetCurrentLine() != nil || !(zend.Z_ISUNDEF(intern.GetCurrentZval())))
+		zend.RETVAL_BOOL(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()))
 		return
 	} else {
 		if intern.GetStream() == nil {
@@ -1801,13 +1801,13 @@ func zim_spl_SplFileObject_current(execute_data *zend.ZendExecuteData, return_va
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	if intern.GetCurrentLine() == nil && zend.Z_ISUNDEF(intern.GetCurrentZval()) {
+	if intern.GetCurrentLine() == nil && intern.GetCurrentZval().IsUndef() {
 		SplFilesystemFileReadLine(zend.ZEND_THIS, intern, 1)
 	}
-	if intern.GetCurrentLine() != nil && (SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) == 0 || zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+	if intern.GetCurrentLine() != nil && (SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) == 0 || intern.GetCurrentZval().IsUndef()) {
 		zend.RETVAL_STRINGL(intern.GetCurrentLine(), intern.GetCurrentLineLen())
 		return
-	} else if !(zend.Z_ISUNDEF(intern.GetCurrentZval())) {
+	} else if !(intern.GetCurrentZval().IsUndef()) {
 		var value *zend.Zval = intern.GetCurrentZval()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 		return

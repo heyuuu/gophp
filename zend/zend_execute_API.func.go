@@ -648,7 +648,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		var arg *Zval = fci.GetParams()[i]
 		var must_wrap ZendBool = 0
 		if ARG_SHOULD_BE_SENT_BY_REF(func_, i+1) != 0 {
-			if !(Z_ISREF_P(arg)) {
+			if !(arg.IsReference()) {
 				if fci.GetNoSeparation() == 0 {
 
 					/* Separation is enabled -- create a ref */
@@ -676,7 +676,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 				}
 			}
 		} else {
-			if Z_ISREF_P(arg) && !func_.IsCallViaTrampoline() {
+			if arg.IsReference() && !func_.IsCallViaTrampoline() {
 
 				/* don't separate references for __call */
 

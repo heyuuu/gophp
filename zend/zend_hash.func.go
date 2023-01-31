@@ -1013,7 +1013,7 @@ func ZendHashCompareImpl(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, or
 		var pData1 *Zval
 		var pData2 *Zval
 		var result int
-		if p1.GetVal().IsType(IS_UNDEF) {
+		if p1.GetVal().IsUndef() {
 			continue
 		}
 		if ordered != 0 {
@@ -1275,9 +1275,9 @@ convert:
 	var __ht__1 *HashTable = ht
 	for _, _p := range __ht__1.foreachData() {
 		var _z *Zval = _p.GetVal()
-		if _z.IsType(IS_INDIRECT) {
+		if _z.IsIndirect() {
 			_z = _z.GetZv()
-			if _z.IsType(IS_UNDEF) {
+			if _z.IsUndef() {
 				continue
 			}
 		}

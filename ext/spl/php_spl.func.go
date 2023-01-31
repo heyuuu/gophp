@@ -273,14 +273,14 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 }
 func AutoloadFuncInfoDtor(element *zend.Zval) {
 	var alfi *AutoloadFuncInfo = (*AutoloadFuncInfo)(element.GetPtr())
-	if !(zend.Z_ISUNDEF(alfi.GetObj())) {
+	if !(alfi.GetObj().IsUndef()) {
 		zend.ZvalPtrDtor(alfi.GetObj())
 	}
 	if alfi.GetFuncPtr() != nil && alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 		zend.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
 		zend.ZendFreeTrampoline(alfi.GetFuncPtr())
 	}
-	if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
+	if !(alfi.GetClosure().IsUndef()) {
 		zend.ZvalPtrDtor(alfi.GetClosure())
 	}
 	zend.Efree(alfi)
@@ -321,7 +321,7 @@ func ZifSplAutoloadCall(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			zend.ZVAL_UNDEF(&retval)
 			fcic.SetFunctionHandler(func_)
-			if zend.Z_ISUNDEF(alfi.GetObj()) {
+			if alfi.GetObj().IsUndef() {
 				fci.SetObject(nil)
 				fcic.SetObject(nil)
 				if alfi.GetCe() != nil && (called_scope == nil || zend.InstanceofFunction(called_scope, alfi.GetCe()) == 0) {
@@ -473,7 +473,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 		zend.ZendStringReleaseEx(func_name, 0)
 		if SPL_G(autoload_functions) && zend.ZendHashExists(SPL_G(autoload_functions), lc_name) != 0 {
-			if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
+			if !(alfi.GetClosure().IsUndef()) {
 				zend.Z_DELREF_P(alfi.GetClosure())
 			}
 			goto skip
@@ -522,7 +522,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
 				zend.Z_DELREF(alfi.GetObj())
 			}
-			if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
+			if !(alfi.GetClosure().IsUndef()) {
 				zend.Z_DELREF(alfi.GetClosure())
 			}
 			if alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
@@ -664,13 +664,13 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 
 			key = _p.GetKey()
 			alfi = _z.GetPtr()
-			if !(zend.Z_ISUNDEF(alfi.GetClosure())) {
+			if !(alfi.GetClosure().IsUndef()) {
 				zend.Z_ADDREF(alfi.GetClosure())
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
 			} else if alfi.GetFuncPtr().GetScope() != nil {
 				var tmp zend.Zval
 				zend.ArrayInit(&tmp)
-				if !(zend.Z_ISUNDEF(alfi.GetObj())) {
+				if !(alfi.GetObj().IsUndef()) {
 					zend.Z_ADDREF(alfi.GetObj())
 					zend.AddNextIndexZval(&tmp, alfi.GetObj())
 				} else {

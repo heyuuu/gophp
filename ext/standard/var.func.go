@@ -148,7 +148,7 @@ again:
 						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 					}
 				}
-				if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
+				if !(val.IsUndef()) || prop_info != nil {
 					PhpObjectPropertyDump(prop_info, val, num, key, level)
 				}
 			}
@@ -396,7 +396,7 @@ again:
 						prop_info = zend.ZendGetTypedPropertyInfoForSlot(struc.GetObj(), val)
 					}
 				}
-				if !(zend.Z_ISUNDEF_P(val)) || prop_info != nil {
+				if !(val.IsUndef()) || prop_info != nil {
 					ZvalObjectPropertyDump(prop_info, val, index, key, level)
 				}
 			}
@@ -802,7 +802,7 @@ func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	var zv *zend.Zval
 	var key zend.ZendUlong
-	var is_ref zend.ZendBool = zend.Z_ISREF_P(var_)
+	var is_ref zend.ZendBool = var_.IsReference()
 	data.SetN(data.GetN() + 1)
 	if is_ref == 0 && var_.GetType() != zend.IS_OBJECT {
 		return 0
@@ -874,7 +874,7 @@ func PhpVarSerializeCallSleep(retval *zend.Zval, struc *zend.Zval) int {
 	res = zend.CallUserFunction(nil, struc, &fname, retval, 0, 0)
 	BG(serialize_lock)--
 	zend.ZvalPtrDtorStr(&fname)
-	if res == zend.FAILURE || zend.Z_ISUNDEF_P(retval) {
+	if res == zend.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
 		return zend.FAILURE
 	}
@@ -893,7 +893,7 @@ func PhpVarSerializeCallMagicSerialize(retval *zend.Zval, obj *zend.Zval) int {
 	res = zend.CallUserFunction(zend.CG__().GetFunctionTable(), obj, &fname, retval, 0, 0)
 	BG(serialize_lock)--
 	zend.ZvalPtrDtorStr(&fname)
-	if res == zend.FAILURE || zend.Z_ISUNDEF_P(retval) {
+	if res == zend.FAILURE || retval.IsUndef() {
 		zend.ZvalPtrDtor(retval)
 		return zend.FAILURE
 	}
@@ -1022,7 +1022,7 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			} else {
 				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 			}
-			if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
+			if data.IsReference() && zend.Z_REFCOUNT_P(data) == 1 {
 				data = zend.Z_REFVAL_P(data)
 			}
 
@@ -1074,7 +1074,7 @@ func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSer
 
 			zend.SmartStrAppendl(buf, "N;", 2)
 			return
-		} else if zend.Z_ISREF_P(struc) {
+		} else if struc.IsReference() {
 			zend.SmartStrAppendl(buf, "R:", 2)
 			zend.SmartStrAppendLong(buf, var_already)
 			zend.SmartStrAppendc(buf, ';')
@@ -1149,7 +1149,7 @@ again:
 				} else {
 					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 				}
-				if zend.Z_ISREF_P(data) && zend.Z_REFCOUNT_P(data) == 1 {
+				if data.IsReference() && zend.Z_REFCOUNT_P(data) == 1 {
 					data = zend.Z_REFVAL_P(data)
 				}
 				PhpVarSerializeIntern(buf, data, var_hash)
@@ -1548,7 +1548,7 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 
-	if zend.Z_ISREF_P(return_value) {
+	if return_value.IsReference() {
 		zend.ZendUnwrapReference(return_value)
 	}
 
