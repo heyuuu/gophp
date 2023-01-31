@@ -2039,7 +2039,7 @@ func zim_spl_CachingIterator_offsetSet(execute_data *zend.ZendExecuteData, retur
 		return
 	}
 	value.TryAddRefcount()
-	zend.ZendSymtableUpdate(intern.GetZcache().GetArr(), key.GetStr(), value)
+	intern.GetZcache().GetArr().SymtableUpdate(key.GetStr(), value)
 }
 func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2058,7 +2058,7 @@ func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, retur
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	if b.Assign(&value, zend.ZendSymtableFind(intern.GetZcache().GetArr(), key.GetStr())) == nil {
+	if b.Assign(&value, intern.GetZcache().GetArr().SymtableFind(key.GetStr())) == nil {
 		zend.ZendError(zend.E_NOTICE, "Undefined index: %s", key.GetVal())
 		return
 	}
@@ -2080,7 +2080,7 @@ func zim_spl_CachingIterator_offsetUnset(execute_data *zend.ZendExecuteData, ret
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	zend.ZendSymtableDel(intern.GetZcache().GetArr(), key)
+	intern.GetZcache().GetArr().SymtableDel(key.GetStr())
 }
 func zim_spl_CachingIterator_offsetExists(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDualItObject
@@ -2098,7 +2098,7 @@ func zim_spl_CachingIterator_offsetExists(execute_data *zend.ZendExecuteData, re
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &key) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(zend.ZendSymtableExists(intern.GetZcache().GetArr(), key.GetStr()) != 0)
+	zend.RETVAL_BOOL(intern.GetZcache().GetArr().SymtableExists(key.GetStr()))
 	return
 }
 func zim_spl_CachingIterator_getCache(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

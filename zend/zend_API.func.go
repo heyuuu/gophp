@@ -1955,53 +1955,53 @@ func ObjectInit(arg *Zval) int {
 func AddAssocLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
 	var tmp Zval
 	tmp.SetLong(n)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
 	var tmp Zval
 	tmp.SetNull()
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
 	var tmp Zval
 	ZVAL_BOOL(&tmp, b)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
 	ZVAL_RES(&tmp, r)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
 	var tmp Zval
 	tmp.SetDouble(d)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
 	ZVAL_STR(&tmp, str)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocStringEx(arg *Zval, key string, key_len int, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
 func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
-	ZendSymtableStrUpdate(arg.GetArr(), b.CastStr(key, key_len), value)
+	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), value)
 	return SUCCESS
 }
 func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
@@ -2128,10 +2128,10 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 	var result *Zval
 	switch key.GetType() {
 	case IS_STRING:
-		result = ZendSymtableUpdate(ht, key.GetStr().GetStr(), value)
+		result = ht.SymtableUpdate(key.GetStr().GetStr(), value)
 		break
 	case IS_NULL:
-		result = ZendSymtableUpdate(ht, ZSTR_EMPTY_ALLOC().GetStr(), value)
+		result = ht.SymtableUpdate(ZSTR_EMPTY_ALLOC().GetStr(), value)
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(key), Z_RES_HANDLE_P(key))

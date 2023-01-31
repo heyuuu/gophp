@@ -170,7 +170,7 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 		/* arg3 is possible option offset name */
 
 		if arg3 != nil && zend.Z_STRLEN_P(arg3) > 0 {
-			entry = zend.ZendSymtableUpdate(find_arr.GetArr(), arg3.GetStr().GetStr(), arg2)
+			entry = find_arr.GetArr().SymtableUpdate(arg3.GetStr().GetStr(), arg2)
 		} else {
 			entry = find_arr.GetArr().NextIndexInsert(arg2)
 		}

@@ -500,7 +500,7 @@ func SplFilesystemObjectGetDebugInfo(object *zend.Zval) *zend.HashTable {
 	pnstr = SplGenPrivatePropName(spl_ce_SplFileInfo, "pathName", b.SizeOf("\"pathName\"")-1)
 	path = SplFilesystemObjectGetPathname(intern, &path_len)
 	zend.ZVAL_STRINGL(&tmp, b.Cond(path != nil, path, ""), path_len)
-	zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+	rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	if intern.GetFileName() != nil {
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileInfo, "fileName", b.SizeOf("\"fileName\"")-1)
@@ -510,7 +510,7 @@ func SplFilesystemObjectGetDebugInfo(object *zend.Zval) *zend.HashTable {
 		} else {
 			zend.ZVAL_STRINGL(&tmp, intern.GetFileName(), intern.GetFileNameLen())
 		}
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 	}
 	if intern.GetType() == SPL_FS_DIR {
@@ -520,7 +520,7 @@ func SplFilesystemObjectGetDebugInfo(object *zend.Zval) *zend.HashTable {
 		} else {
 			tmp.SetFalse()
 		}
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 		pnstr = SplGenPrivatePropName(spl_ce_RecursiveDirectoryIterator, "subPathName", b.SizeOf("\"subPathName\"")-1)
 		if intern.GetSubPath() != nil {
@@ -528,24 +528,24 @@ func SplFilesystemObjectGetDebugInfo(object *zend.Zval) *zend.HashTable {
 		} else {
 			zend.ZVAL_EMPTY_STRING(&tmp)
 		}
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 	}
 	if intern.GetType() == SPL_FS_FILE {
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "openMode", b.SizeOf("\"openMode\"")-1)
 		zend.ZVAL_STRINGL(&tmp, intern.GetOpenMode(), intern.GetOpenModeLen())
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 		stmp[1] = '0'
 		stmp[0] = intern.GetDelimiter()
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "delimiter", b.SizeOf("\"delimiter\"")-1)
 		zend.ZVAL_STRINGL(&tmp, stmp, 1)
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 		stmp[0] = intern.GetEnclosure()
 		pnstr = SplGenPrivatePropName(spl_ce_SplFileObject, "enclosure", b.SizeOf("\"enclosure\"")-1)
 		zend.ZVAL_STRINGL(&tmp, stmp, 1)
-		zend.ZendSymtableUpdate(rv, pnstr.GetStr(), &tmp)
+		rv.SymtableUpdate(pnstr.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(pnstr, 0)
 	}
 	return rv

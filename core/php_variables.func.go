@@ -145,7 +145,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 
 				if track_vars_array != nil {
 					ht = track_vars_array.GetArr()
-					zend.ZendSymtableStrDel(ht, b.CastStr(var_, var_len))
+					ht.SymtableDel(b.CastStr(var_, var_len))
 				}
 				zend.ZvalPtrDtorNogc(val)
 
@@ -191,11 +191,11 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 					return
 				}
 			} else {
-				gpc_element_p = zend.ZendSymtableStrFind(symtable1, b.CastStr(index, index_len))
+				gpc_element_p = symtable1.SymtableFind(b.CastStr(index, index_len))
 				if gpc_element_p == nil {
 					var tmp zend.Zval
 					zend.ArrayInit(&tmp)
-					gpc_element_p = zend.ZendSymtableStrUpdateInd(symtable1, b.CastStr(index, index_len), &tmp)
+					gpc_element_p = symtable1.SymtableUpdateInd(b.CastStr(index, index_len), &tmp)
 				} else {
 					if gpc_element_p.IsType(zend.IS_INDIRECT) {
 						gpc_element_p = gpc_element_p.GetZv()
@@ -238,7 +238,7 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 			 * more specific cookies with the less specific ones.
 			 */
 
-			if PG(http_globals)[TRACK_VARS_COOKIE].u1.v.type_ != zend.IS_UNDEF && symtable1 == PG(http_globals)[TRACK_VARS_COOKIE].GetArr() && zend.ZendSymtableStrExists(symtable1, b.CastStr(index, index_len)) != 0 {
+			if PG(http_globals)[TRACK_VARS_COOKIE].u1.v.type_ != zend.IS_UNDEF && symtable1 == PG(http_globals)[TRACK_VARS_COOKIE].GetArr() && symtable1.SymtableExists(b.CastStr(index, index_len)) {
 				zend.ZvalPtrDtorNogc(val)
 			} else if zend.ZEND_HANDLE_NUMERIC_STR(index, index_len, &idx) {
 				symtable1.IndexUpdateH(idx, val)

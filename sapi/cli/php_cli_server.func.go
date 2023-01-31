@@ -129,7 +129,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 		key = _p.GetKey()
 		value = _z.GetPtr()
 		zend.ZVAL_STRING(&tmp, value)
-		zend.ZendSymtableUpdate(return_value.GetArr(), key.GetStr(), &tmp)
+		return_value.GetArr().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }
 func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {

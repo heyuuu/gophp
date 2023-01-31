@@ -186,7 +186,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 		zend.ZendStringReleaseEx(md5str, 0)
 	}
 	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage", b.SizeOf("\"storage\"")-1)
-	zend.ZendSymtableUpdate(debug_info, zname.GetStr(), &storage)
+	debug_info.SymtableUpdate(zname.GetStr(), &storage)
 	zend.ZendStringReleaseEx(zname, 0)
 	return debug_info
 }
@@ -854,7 +854,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 				zend.AddIndexZval(return_value, element.GetInf().GetLval(), &retval)
 				break
 			case zend.IS_STRING:
-				zend.ZendSymtableUpdate(return_value.GetArr(), element.GetInf().GetStr().GetStr(), &retval)
+				return_value.GetArr().SymtableUpdate(element.GetInf().GetStr().GetStr(), &retval)
 				break
 			default:
 				zend.ZvalPtrDtor(&retval)

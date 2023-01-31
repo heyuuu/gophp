@@ -205,7 +205,7 @@ try_again:
 	case zend.IS_STRING:
 		offset_key = offset.GetStr()
 	fetch_dim_string:
-		retval = zend.ZendSymtableFind(ht, offset_key.GetStr())
+		retval = ht.SymtableFind(offset_key.GetStr())
 		if retval != nil {
 			if retval.IsType(zend.IS_INDIRECT) {
 				retval = retval.GetZv()
@@ -239,7 +239,7 @@ try_again:
 			case zend.BP_VAR_W:
 				var value zend.Zval
 				value.SetNull()
-				retval = zend.ZendSymtableUpdate(ht, offset_key.GetStr(), &value)
+				retval = ht.SymtableUpdate(offset_key.GetStr(), &value)
 			}
 		}
 		return retval
@@ -359,7 +359,7 @@ try_again:
 	switch offset.GetType() {
 	case zend.IS_STRING:
 		ht = SplArrayGetHashTable(intern)
-		zend.ZendSymtableUpdateInd(ht, offset.GetStr().GetStr(), value)
+		ht.SymtableUpdateInd(offset.GetStr().GetStr(), value)
 		return
 	case zend.IS_DOUBLE:
 		index = zend.ZendLong(offset.GetDval())
@@ -418,7 +418,7 @@ try_again:
 				zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
 			}
 		} else {
-			var data *zend.Zval = zend.ZendSymtableFind(ht, offset.GetStr().GetStr())
+			var data *zend.Zval = ht.SymtableFind(offset.GetStr().GetStr())
 			if data != nil {
 				if data.IsType(zend.IS_INDIRECT) {
 					data = data.GetZv()
@@ -433,7 +433,7 @@ try_again:
 							SplArraySkipProtected(intern, ht)
 						}
 					}
-				} else if zend.ZendSymtableDel(ht, offset.GetStr()) == zend.FAILURE {
+				} else if ht.SymtableDel(offset.GetStr().GetStr()) == zend.FAILURE {
 					zend.ZendError(zend.E_NOTICE, "Undefined index: %s", zend.Z_STRVAL_P(offset))
 				}
 			} else {
@@ -499,7 +499,7 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 	try_again:
 		switch offset.GetType() {
 		case zend.IS_STRING:
-			if b.Assign(&tmp, zend.ZendSymtableFind(ht, offset.GetStr().GetStr())) != nil {
+			if b.Assign(&tmp, ht.SymtableFind(offset.GetStr().GetStr())) != nil {
 				if check_empty == 2 {
 					return 1
 				}
@@ -665,7 +665,7 @@ func SplArrayGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 			base = spl_ce_ArrayObject
 		}
 		zname = SplGenPrivatePropName(base, "storage", b.SizeOf("\"storage\"")-1)
-		zend.ZendSymtableUpdate(debug_info, zname.GetStr(), storage)
+		debug_info.SymtableUpdate(zname.GetStr(), storage)
 		zend.ZendStringReleaseEx(zname, 0)
 		return debug_info
 	}
