@@ -381,6 +381,19 @@ func (this *ZendArray) KeyExists(key string) bool {
 	return false
 }
 
+func (this *ZendArray) KeyExistsInd(key string) bool {
+	var zv = this.KeyFind(key)
+	if zv == nil {
+		return false
+	}
+
+	if zv.IsUndef() && zv.GetZv().IsUndef() {
+		return false
+	}
+
+	return true
+}
+
 /**
  * Add / Update by IndexKey
  */

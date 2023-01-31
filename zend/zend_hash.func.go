@@ -74,7 +74,7 @@ func ZendHashIteratorsUpdate(ht *HashTable, from HashPosition, to HashPosition) 
 func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *ZendUlong) bool {
 	var str = b.CastStr(key, length)
 	if number, ok := zendParseNumericStr(str); ok {
-		*idx = number
+		*idx = ZendUlong(number)
 		return true
 	} else {
 		return false
@@ -83,7 +83,7 @@ func ZEND_HANDLE_NUMERIC_STR(key *byte, length int, idx *ZendUlong) bool {
 func ZEND_HANDLE_NUMERIC(key *ZendString, idx *ZendUlong) bool {
 	var str = key.GetStr()
 	if number, ok := zendParseNumericStr(str); ok {
-		*idx = number
+		*idx = ZendUlong(number)
 		return true
 	} else {
 		return false
@@ -115,104 +115,44 @@ func ZendHashFindExInd(ht *HashTable, key *ZendString, known_hash ZendBool) *Zva
 		return zv
 	}
 }
-func ZendHashExistsInd(ht *HashTable, key *ZendString) int {
-	var zv *Zval
-	zv = ht.KeyFind(key.GetStr())
-	return zv != nil && (zv.GetType() != IS_INDIRECT || Z_INDIRECT_P(zv).GetType() != IS_UNDEF)
+func ZendHashExistsInd(ht *HashTable, key string) bool    { return ht.KeyExistsInd(key) }
+func ZendHashStrExistsInd(ht *HashTable, str string) bool { return ht.KeyExistsInd(str) }
+
+func ZendSymtableAddNew(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.SymtableAddNew(key, pData)
 }
-func ZendHashStrExistsInd(ht *HashTable, str string, len_ int) int {
-	var zv *Zval
-	zv = ht.KeyFind(b.CastStr(str, len_))
-	return zv != nil && (zv.GetType() != IS_INDIRECT || Z_INDIRECT_P(zv).GetType() != IS_UNDEF)
+func ZendSymtableUpdate(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.SymtableUpdate(key, pData)
 }
-func ZendSymtableAddNew(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ht.IndexAddNewH(idx, pData)
-	} else {
-		return ht.KeyAddNew(key.GetStr(), pData)
-	}
+func ZendSymtableUpdateInd(ht *HashTable, key string, pData *Zval) *Zval {
+	return ht.SymtableUpdateInd(key, pData)
 }
-func ZendSymtableUpdate(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ht.IndexUpdateH(idx, pData)
-	} else {
-		return ht.KeyUpdate(key.GetStr(), pData)
-	}
+func ZendSymtableDel(ht *HashTable, key string) int {
+	return ht.SymtableDel(key)
 }
-func ZendSymtableUpdateInd(ht *HashTable, key *ZendString, pData *Zval) *Zval {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ht.IndexUpdateH(idx, pData)
-	} else {
-		return ht.KeyUpdateIndirect(key.GetStr(), pData)
-	}
+func ZendSymtableFind(ht *HashTable, key string) *Zval {
+	return ht.SymtableFind(key)
 }
-func ZendSymtableDel(ht *HashTable, key *ZendString) int {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ZendHashIndexDel(ht, idx)
-	} else {
-		return ZendHashDel(ht, key)
-	}
+func ZendSymtableExists(ht *HashTable, key string) bool {
+	return ht.SymtableExists(key)
 }
-func ZendSymtableFind(ht *HashTable, key *ZendString) *Zval {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ZendHashIndexFind(ht, idx)
-	} else {
-		return ht.KeyFind(key.GetStr())
-	}
+func ZendSymtableExistsInd(ht *HashTable, key string) bool {
+	return ht.SymtableExistsInd(key)
 }
-func ZendSymtableExists(ht *HashTable, key *ZendString) int {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ZendHashIndexExists(ht, idx)
-	} else {
-		return ZendHashExists(ht, key)
-	}
+func ZendSymtableStrUpdate(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.SymtableUpdate(str, pData)
 }
-func ZendSymtableExistsInd(ht *HashTable, key *ZendString) int {
-	if idx, ok := zendParseNumericStr(key.GetStr()); ok {
-		return ZendHashIndexExists(ht, idx)
-	} else {
-		return ZendHashExistsInd(ht, key)
-	}
+func ZendSymtableStrUpdateInd(ht *HashTable, str string, pData *Zval) *Zval {
+	return ht.SymtableUpdateInd(str, pData)
 }
-func ZendSymtableStrUpdate(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	var str_ = b.CastStr(str, len_)
-	if idx, ok := zendParseNumericStr(str_); ok {
-		return ht.IndexUpdateH(idx, pData)
-	} else {
-		return ht.KeyUpdate(b.CastStr(str, len_), pData)
-	}
+func ZendSymtableStrDel(ht *HashTable, str string) int {
+	return ht.SymtableDel(str)
 }
-func ZendSymtableStrUpdateInd(ht *HashTable, str *byte, len_ int, pData *Zval) *Zval {
-	var str_ = b.CastStr(str, len_)
-	if idx, ok := zendParseNumericStr(str_); ok {
-		return ht.IndexUpdateH(idx, pData)
-	} else {
-		return ht.KeyUpdateIndirect(b.CastStr(str, len_), pData)
-	}
+func ZendSymtableStrFind(ht *HashTable, str string) *Zval {
+	return ht.SymtableFind(str)
 }
-func ZendSymtableStrDel(ht *HashTable, str *byte, len_ int) int {
-	var str_ = b.CastStr(str, len_)
-	if idx, ok := zendParseNumericStr(str_); ok {
-		return ZendHashIndexDel(ht, idx)
-	} else {
-		return ZendHashStrDel(ht, str, len_)
-	}
-}
-func ZendSymtableStrFind(ht *HashTable, str *byte, len_ int) *Zval {
-	var str_ = b.CastStr(str, len_)
-	if idx, ok := zendParseNumericStr(str_); ok {
-		return ht.IndexFindH(idx)
-	} else {
-		return ht.KeyFind(b.CastStr(str, len_))
-	}
-}
-func ZendSymtableStrExists(ht *HashTable, str *byte, len_ int) int {
-	var str_ = b.CastStr(str, len_)
-	if idx, ok := zendParseNumericStr(str_); ok {
-		return ZendHashIndexExists(ht, idx)
-	} else {
-		return ZendHashStrExists(ht, str, len_)
-	}
+func ZendSymtableStrExists(ht *HashTable, str string) bool {
+	return ht.SymtableExists(str)
 }
 func ZendHashAddPtr(ht *HashTable, key *ZendString, pData any) any {
 	var tmp Zval
@@ -1030,7 +970,7 @@ func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
 	return res.GetVal()
 }
 
-func zendParseNumericStr(str string) (ZendUlong, bool) {
+func zendParseNumericStr(str string) (int, bool) {
 	// 首字符非数字快速失败
 	if len(str) == 0 {
 		return 0, false
@@ -1050,10 +990,10 @@ func zendParseNumericStr(str string) (ZendUlong, bool) {
 		return 0, false
 	}
 
-	var number uint = 0
+	var number = 0
 	for _, c := range str[i:] {
 		if c >= '0' && c <= '9' {
-			number = number*10 + uint(c-'0')
+			number = number*10 + int(c-'0')
 		} else {
 			return 0, false
 		}
