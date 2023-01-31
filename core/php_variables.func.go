@@ -583,12 +583,12 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 		argc.SetLong(count)
 	}
 	if SG(request_info).argc {
-		zend.Z_ADDREF(arr)
+		arr.AddRefcount()
 		zend.EG__().GetSymbolTable().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV).GetStr(), &arr)
 		zend.EG__().GetSymbolTable().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC).GetStr(), &argc)
 	}
 	if track_vars_array != nil && track_vars_array.IsType(zend.IS_ARRAY) {
-		zend.Z_ADDREF(arr)
+		arr.AddRefcount()
 		track_vars_array.GetArr().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV).GetStr(), &arr)
 		track_vars_array.GetArr().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC).GetStr(), &argc)
 	}
@@ -644,12 +644,12 @@ func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {
 		string_key = _p.GetKey()
 		src_entry = _z
 		if src_entry.GetType() != zend.IS_ARRAY || string_key != nil && b.Assign(&dest_entry, dest.KeyFind(string_key.GetStr())) == nil || string_key == nil && b.Assign(&dest_entry, dest.IndexFindH(num_key)) == nil || dest_entry.GetType() != zend.IS_ARRAY {
-			zend.Z_TRY_ADDREF_P(src_entry)
+			src_entry.TryAddRefcount()
 			if string_key != nil {
 				if globals_check == 0 || string_key.GetLen() != b.SizeOf("\"GLOBALS\"")-1 || memcmp(string_key.GetVal(), "GLOBALS", b.SizeOf("\"GLOBALS\"")-1) {
 					dest.KeyUpdate(string_key.GetStr(), src_entry)
 				} else {
-					zend.Z_TRY_DELREF_P(src_entry)
+					src_entry.TryDelRefcount()
 				}
 			} else {
 				dest.IndexUpdateH(num_key, src_entry)
@@ -676,7 +676,7 @@ func PhpAutoGlobalsCreateGet(name *zend.ZendString) zend.ZendBool {
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_GET])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_GET])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_GET])
+	PG(http_globals)[TRACK_VARS_GET].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreatePost(name *zend.ZendString) zend.ZendBool {
@@ -687,7 +687,7 @@ func PhpAutoGlobalsCreatePost(name *zend.ZendString) zend.ZendBool {
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_POST])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_POST])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_POST])
+	PG(http_globals)[TRACK_VARS_POST].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateCookie(name *zend.ZendString) zend.ZendBool {
@@ -698,7 +698,7 @@ func PhpAutoGlobalsCreateCookie(name *zend.ZendString) zend.ZendBool {
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_COOKIE])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_COOKIE])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_COOKIE])
+	PG(http_globals)[TRACK_VARS_COOKIE].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateFiles(name *zend.ZendString) zend.ZendBool {
@@ -706,7 +706,7 @@ func PhpAutoGlobalsCreateFiles(name *zend.ZendString) zend.ZendBool {
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_FILES])
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_FILES])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_FILES])
+	PG(http_globals)[TRACK_VARS_FILES].AddRefcount()
 	return 0
 }
 func CheckHttpProxy(var_table *zend.HashTable) {
@@ -743,7 +743,7 @@ func PhpAutoGlobalsCreateServer(name *zend.ZendString) zend.ZendBool {
 	}
 	CheckHttpProxy(PG(http_globals)[TRACK_VARS_SERVER].GetArr())
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_SERVER])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_SERVER])
+	PG(http_globals)[TRACK_VARS_SERVER].AddRefcount()
 
 	/* TODO: TRACK_VARS_SERVER is modified in a number of places (e.g. phar) past this point,
 	 * where rc>1 due to the $_SERVER global. Ideally this shouldn't happen, but for now we
@@ -759,7 +759,7 @@ func PhpAutoGlobalsCreateEnv(name *zend.ZendString) zend.ZendBool {
 	}
 	CheckHttpProxy(PG(http_globals)[TRACK_VARS_ENV].GetArr())
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &PG(http_globals)[TRACK_VARS_ENV])
-	zend.Z_ADDREF(PG(http_globals)[TRACK_VARS_ENV])
+	PG(http_globals)[TRACK_VARS_ENV].AddRefcount()
 	return 0
 }
 func PhpAutoGlobalsCreateRequest(name *zend.ZendString) zend.ZendBool {

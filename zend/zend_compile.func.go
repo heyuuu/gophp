@@ -1770,7 +1770,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 			ZendEmitOpTmp(&memoized_result, ZEND_COPY_TMP, result, nil)
 		} else {
 			if result.GetOpType() == IS_CONST {
-				Z_TRY_ADDREF(result.GetConstant())
+				result.GetConstant().TryAddRefcount()
 			}
 			memoized_result = *result
 		}
@@ -1779,7 +1779,7 @@ func ZendCompileMemoizedExpr(result *Znode, expr *ZendAst) {
 		var memoized_result *Znode = ZendHashIndexFindPtr(CG__().GetMemoizedExprs(), uintPtr(expr))
 		*result = *memoized_result
 		if result.GetOpType() == IS_CONST {
-			Z_TRY_ADDREF(result.GetConstant())
+			result.GetConstant().TryAddRefcount()
 		}
 	} else {
 		ZEND_ASSERT(false)
@@ -2221,7 +2221,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 			dim_node.GetConstant().SetLong(i)
 		}
 		if expr_node.GetOpType() == IS_CONST {
-			Z_TRY_ADDREF(expr_node.GetConstant())
+			expr_node.GetConstant().TryAddRefcount()
 		}
 		ZendVerifyListAssignTarget(var_ast, old_style)
 		opline = ZendEmitOp(&fetch_result, b.CondF1(elem_ast.GetAttr() != 0, func() __auto__ {
@@ -4036,7 +4036,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 		ZVAL_ARR(jumptable_op.GetConstant(), jumptable)
 		opline = ZendEmitOp(nil, b.Cond(jumptable_type == IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
 		if opline.GetOp1Type() == IS_CONST {
-			Z_TRY_ADDREF_P(CT_CONSTANT(opline.GetOp1()))
+			CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 		}
 		opnum_switch = opline - CG__().GetActiveOpArray().GetOpcodes()
 	}
@@ -4067,7 +4067,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 				opline.SetResult(case_node.GetOp())
 			}
 			if opline.GetOp1Type() == IS_CONST {
-				Z_TRY_ADDREF_P(CT_CONSTANT(opline.GetOp1()))
+				CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
 			}
 			jmpnz_opnums[i] = ZendEmitCondJump(ZEND_JMPNZ, &case_node, 0)
 		}
@@ -5139,7 +5139,7 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 		}
 		if value_ast != nil {
 			ZendConstExprToZval(&value_zv, value_ast)
-			if type_.IsSet() && !(Z_CONSTANT(value_zv)) {
+			if type_.IsSet() && !(value_zv.IsConstant()) {
 				if value_zv.IsNull() {
 					if !(type_.AllowNull()) {
 						var name *byte = b.CondF(type_.IsClass(), func() []byte { return ZEND_TYPE_NAME(type_).GetVal() }, func() *byte { return ZendGetTypeByConst(type_.Code()) })
@@ -5969,14 +5969,14 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 						ZvalPtrDtor(result)
 						return 0
 					}
-					Z_TRY_ADDREF_P(val)
+					val.TryAddRefcount()
 				}
 				continue
 			} else {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Only arrays and Traversables can be unpacked")
 			}
 		}
-		Z_TRY_ADDREF_P(value)
+		value.TryAddRefcount()
 		key_ast = elem_ast.GetChild()[1]
 		if key_ast != nil {
 			var key *Zval = ZendAstGetZval(key_ast)

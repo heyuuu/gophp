@@ -44,7 +44,7 @@ func CleanNonPersistentClassFull(zv *Zval) int {
 func InitExecutor() {
 	ZendInitFpu()
 	EG__().GetUninitializedZval().SetNull()
-	ZVAL_ERROR(EG__().GetErrorZval())
+	EG__().GetErrorZval().IsError()
 
 	/* destroys stack frame, therefore makes core dumps worthless */
 
@@ -690,7 +690,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		if must_wrap == 0 {
 			ZVAL_COPY(param, arg)
 		} else {
-			Z_TRY_ADDREF_P(arg)
+			arg.TryAddRefcount()
 			ZVAL_NEW_REF(param, arg)
 		}
 	}
@@ -1152,7 +1152,7 @@ func ZendFetchClassByName(class_name *ZendString, key *ZendString, fetch_type in
 				var exception_str *ZendString
 				var exception_zv Zval
 				ZVAL_OBJ(&exception_zv, EG__().GetException())
-				Z_ADDREF(exception_zv)
+				exception_zv.AddRefcount()
 				ZendClearException()
 				exception_str = ZvalGetString(&exception_zv)
 				ZendErrorNoreturn(E_ERROR, "During class fetch: Uncaught %s", exception_str.GetVal())

@@ -1069,7 +1069,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			zend.Efree(cfi)
 			return nil
 		}
-		zend.Z_TRY_ADDREF(cfi.GetFci().GetFunctionName())
+		cfi.GetFci().GetFunctionName().TryAddRefcount()
 		cfi.SetObject(cfi.GetFcc().GetObject())
 		if cfi.GetObject() != nil {
 			cfi.GetObject().AddRefcount()
@@ -1864,7 +1864,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			var key *zend.Zval = intern.GetKey()
 			var data *zend.Zval = intern.GetData()
 			zend.ZVAL_DEREF(data)
-			zend.Z_TRY_ADDREF_P(data)
+			data.TryAddRefcount()
 			zend.ArraySetZvalKey(intern.GetZcache().GetArr(), key, data)
 			zend.ZvalPtrDtor(data)
 		}
@@ -1922,7 +1922,7 @@ func SplCachingItNext(intern *SplDualItObject) {
 			if use_copy != 0 {
 				zend.ZVAL_COPY_VALUE(intern.GetZstr(), &expr_copy)
 			} else {
-				zend.Z_TRY_ADDREF(intern.GetZstr())
+				intern.GetZstr().TryAddRefcount()
 			}
 		}
 		SplDualItNext(intern, 0)
@@ -2038,7 +2038,7 @@ func zim_spl_CachingIterator_offsetSet(execute_data *zend.ZendExecuteData, retur
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "Sz", &key, &value) == zend.FAILURE {
 		return
 	}
-	zend.Z_TRY_ADDREF_P(value)
+	value.TryAddRefcount()
 	zend.ZendSymtableUpdate(intern.GetZcache().GetArr(), key, value)
 }
 func zim_spl_CachingIterator_offsetGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2567,7 +2567,7 @@ func SplIteratorToArrayApply(iter *zend.ZendObjectIterator, puser any) int {
 		zend.ArraySetZvalKey(return_value.GetArr(), &key, data)
 		zend.ZvalPtrDtor(&key)
 	} else {
-		zend.Z_TRY_ADDREF_P(data)
+		data.TryAddRefcount()
 		zend.AddNextIndexZval(return_value, data)
 	}
 	return zend.ZEND_HASH_APPLY_KEEP
@@ -2582,7 +2582,7 @@ func SplIteratorToValuesApply(iter *zend.ZendObjectIterator, puser any) int {
 	if data == nil {
 		return zend.ZEND_HASH_APPLY_STOP
 	}
-	zend.Z_TRY_ADDREF_P(data)
+	data.TryAddRefcount()
 	zend.AddNextIndexZval(return_value, data)
 	return zend.ZEND_HASH_APPLY_KEEP
 }

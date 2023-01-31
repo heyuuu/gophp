@@ -1991,7 +1991,7 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 		wrapperhash = context.GetOptions().GetArr().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
 	}
 	zend.ZVAL_DEREF(optionvalue)
-	zend.Z_TRY_ADDREF_P(optionvalue)
+	optionvalue.TryAddRefcount()
 	zend.SEPARATE_ARRAY(wrapperhash)
 	wrapperhash.GetArr().KeyUpdate(b.CastStr(optionname, strlen(optionname)), optionvalue)
 	return zend.SUCCESS

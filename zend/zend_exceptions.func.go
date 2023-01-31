@@ -158,7 +158,7 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	} else {
 		ArrayInit(&trace)
 	}
-	Z_SET_REFCOUNT(trace, 0)
+	trace.SetRefcount(0)
 	base_ce = IGetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, ZendGetCompiledFilename())) {
 		ZVAL_STRING(&tmp, ZendGetExecutedFilename())
@@ -568,9 +568,9 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		ZendStringReleaseEx(message, 0)
 		ZendStringReleaseEx(file, 0)
 		ZvalPtrDtor(&trace)
-		Z_PROTECT_RECURSION_P(exception)
+		exception.ProtectRecursive()
 		exception = GET_PROPERTY(exception, ZEND_STR_PREVIOUS)
-		if exception != nil && exception.IsObject() && Z_IS_RECURSIVE_P(exception) {
+		if exception != nil && exception.IsObject() && exception.IsRecursive() {
 			break
 		}
 	}
@@ -580,8 +580,8 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 	/* Reset apply counts */
 
 	for exception != nil && exception.IsObject() && b.Assign(&base_ce, IGetExceptionBase(exception)) && InstanceofFunction(Z_OBJCE_P(exception), base_ce) != 0 {
-		if Z_IS_RECURSIVE_P(exception) {
-			Z_UNPROTECT_RECURSION_P(exception)
+		if exception.IsRecursive() {
+			exception.UnprotectRecursive()
 		} else {
 			break
 		}

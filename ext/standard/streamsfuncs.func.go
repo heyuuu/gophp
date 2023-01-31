@@ -2101,10 +2101,10 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 	}
 	zend.ArrayInit(return_value)
 	if context.GetNotifier() != nil && context.GetNotifier().GetPtr().GetType() != zend.IS_UNDEF && context.GetNotifier().GetFunc() == UserSpaceStreamNotifier {
-		zend.Z_TRY_ADDREF(context.GetNotifier().GetPtr())
+		context.GetNotifier().GetPtr().TryAddRefcount()
 		zend.AddAssocZvalEx(return_value, "notification", b.SizeOf("\"notification\"")-1, context.GetNotifier().GetPtr())
 	}
-	zend.Z_TRY_ADDREF(context.GetOptions())
+	context.GetOptions().TryAddRefcount()
 	zend.AddAssocZvalEx(return_value, "options", b.SizeOf("\"options\"")-1, context.GetOptions())
 }
 func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

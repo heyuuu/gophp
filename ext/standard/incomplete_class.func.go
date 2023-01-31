@@ -21,7 +21,7 @@ func IncompleteClassMessage(object *zend.Zval, error_type int) {
 func IncompleteClassGetProperty(object *zend.Zval, member *zend.Zval, type_ int, cache_slot *any, rv *zend.Zval) *zend.Zval {
 	IncompleteClassMessage(object, zend.E_NOTICE)
 	if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
-		zend.ZVAL_ERROR(rv)
+		rv.IsError()
 		return rv
 	} else {
 		return zend.EG__().GetUninitializedZval()

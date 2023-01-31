@@ -120,7 +120,7 @@ func ZendStdGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 		if !(retval.IsRefcounted()) {
 			*is_temp = 1
 			return ZendArrayDup(retval.GetArr())
-		} else if Z_REFCOUNT(retval) <= 1 {
+		} else if retval.GetRefcount() <= 1 {
 			*is_temp = 1
 			ht = retval.GetArr()
 			return ht
@@ -718,11 +718,11 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	if IS_VALID_PROPERTY_OFFSET(property_offset) {
 		variable_ptr = OBJ_PROP(zobj, property_offset)
 		if variable_ptr.GetType() != IS_UNDEF {
-			Z_TRY_ADDREF_P(value)
+			value.TryAddRefcount()
 			if prop_info != nil {
 				ZVAL_COPY_VALUE(&tmp, value)
 				if ZendVerifyPropertyType(prop_info, &tmp, PropertyUsesStrictTypes()) == 0 {
-					Z_TRY_DELREF_P(value)
+					value.TryDelRefcount()
 					variable_ptr = EG__().GetErrorZval()
 					goto exit
 				}
@@ -748,7 +748,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 				zobj.SetProperties(ZendArrayDup(zobj.GetProperties()))
 			}
 			if b.Assign(&variable_ptr, zobj.GetProperties().KeyFind(name.GetStr())) != nil {
-				Z_TRY_ADDREF_P(value)
+				value.TryAddRefcount()
 				goto found
 			}
 		}
@@ -782,7 +782,7 @@ func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *a
 	} else {
 		ZEND_ASSERT(!(IS_WRONG_PROPERTY_OFFSET(property_offset)))
 	write_std_property:
-		Z_TRY_ADDREF_P(value)
+		value.TryAddRefcount()
 		if IS_VALID_PROPERTY_OFFSET(property_offset) {
 			variable_ptr = OBJ_PROP(zobj, property_offset)
 			if prop_info != nil {
@@ -1412,10 +1412,10 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 		 * false recursion detection.
 		 */
 
-		if Z_IS_RECURSIVE_P(o1) {
+		if o1.IsRecursive() {
 			ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 		}
-		Z_PROTECT_RECURSION_P(o1)
+		o1.ProtectRecursive()
 		var __ht *HashTable = zobj1.GetCe().GetPropertiesInfo()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
@@ -1430,25 +1430,25 @@ func ZendStdCompareObjects(o1 *Zval, o2 *Zval) int {
 				if p2.GetType() != IS_UNDEF {
 					var result Zval
 					if CompareFunction(&result, p1, p2) == FAILURE {
-						Z_UNPROTECT_RECURSION_P(o1)
+						o1.UnprotectRecursive()
 						return 1
 					}
 					if result.GetLval() != 0 {
-						Z_UNPROTECT_RECURSION_P(o1)
+						o1.UnprotectRecursive()
 						return result.GetLval()
 					}
 				} else {
-					Z_UNPROTECT_RECURSION_P(o1)
+					o1.UnprotectRecursive()
 					return 1
 				}
 			} else {
 				if p2.GetType() != IS_UNDEF {
-					Z_UNPROTECT_RECURSION_P(o1)
+					o1.UnprotectRecursive()
 					return 1
 				}
 			}
 		}
-		Z_UNPROTECT_RECURSION_P(o1)
+		o1.UnprotectRecursive()
 		return 0
 	} else {
 		if zobj1.GetProperties() == nil {

@@ -21,7 +21,7 @@ func SplHeapElemCopy(heap *SplPtrHeap, to any, from any) {
 	memcpy(to, from, heap.GetElemSize())
 }
 func SplPtrHeapZvalDtor(elem any) { zend.ZvalPtrDtor((*zend.Zval)(elem)) }
-func SplPtrHeapZvalCtor(elem any) { zend.Z_TRY_ADDREF_P((*zend.Zval)(elem)) }
+func SplPtrHeapZvalCtor(elem any) { (*zend.Zval)(elem).TryAddRefcount() }
 func SplPtrHeapPqueueElemDtor(elem any) {
 	var pq_elem *SplPqueueElem = elem
 	zend.ZvalPtrDtor(pq_elem.GetData())
@@ -29,8 +29,8 @@ func SplPtrHeapPqueueElemDtor(elem any) {
 }
 func SplPtrHeapPqueueElemCtor(elem any) {
 	var pq_elem *SplPqueueElem = elem
-	zend.Z_TRY_ADDREF_P(pq_elem.GetData())
-	zend.Z_TRY_ADDREF_P(pq_elem.GetPriority())
+	pq_elem.GetData().TryAddRefcount()
+	pq_elem.GetPriority().TryAddRefcount()
 }
 func SplPtrHeapCmpCbHelper(object *zend.Zval, heap_object *SplHeapObject, a *zend.Zval, b *zend.Zval, result *zend.ZendLong) int {
 	var zresult zend.Zval
@@ -45,9 +45,9 @@ func SplPtrHeapCmpCbHelper(object *zend.Zval, heap_object *SplHeapObject, a *zen
 func SplPqueueExtractHelper(result *zend.Zval, elem *SplPqueueElem, flags int) {
 	if (flags & SPL_PQUEUE_EXTR_BOTH) == SPL_PQUEUE_EXTR_BOTH {
 		zend.ArrayInit(result)
-		zend.Z_TRY_ADDREF(elem.GetData())
+		elem.GetData().TryAddRefcount()
 		zend.AddAssocZvalEx(result, "data", b.SizeOf("\"data\"")-1, elem.GetData())
-		zend.Z_TRY_ADDREF(elem.GetPriority())
+		elem.GetPriority().TryAddRefcount()
 		zend.AddAssocZvalEx(result, "priority", b.SizeOf("\"priority\"")-1, elem.GetPriority())
 		return
 	}
@@ -376,7 +376,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 		} else {
 			var elem *zend.Zval = SplHeapElem(intern.GetHeap(), i)
 			zend.AddIndexZval(&heap_array, i, elem)
-			zend.Z_TRY_ADDREF_P(elem)
+			elem.TryAddRefcount()
 		}
 	}
 	pnstr = SplGenPrivatePropName(ce, "heap", b.SizeOf("\"heap\"")-1)
@@ -428,7 +428,7 @@ func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *ze
 		zend.ZendThrowException(spl_ce_RuntimeException, "Heap is corrupted, heap properties are no longer ensured.", 0)
 		return
 	}
-	zend.Z_TRY_ADDREF_P(value)
+	value.TryAddRefcount()
 	SplPtrHeapInsert(intern.GetHeap(), value, zend.ZEND_THIS)
 	zend.RETVAL_TRUE
 	return

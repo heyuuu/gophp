@@ -40,7 +40,7 @@ func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 }
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
 	if elem.GetData().IsRefcounted() {
-		zend.Z_ADDREF(elem.GetData())
+		elem.GetData().AddRefcount()
 	}
 }
 func SplPtrLlistInit(ctor SplPtrLlistCtorFunc, dtor SplPtrLlistDtorFunc) *SplPtrLlist {
@@ -332,7 +332,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		next = current.GetNext()
 		zend.AddIndexZval(&dllist_array, i, current.GetData())
 		if current.GetData().IsRefcounted() {
-			zend.Z_ADDREF(current.GetData())
+			current.GetData().AddRefcount()
 		}
 		i++
 		current = next
@@ -859,7 +859,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 	zend.ArrayInitSize(&tmp, intern.GetLlist().GetCount())
 	for current != nil {
 		tmp.GetArr().NextIndexInsert(current.GetData())
-		zend.Z_TRY_ADDREF(current.GetData())
+		current.GetData().TryAddRefcount()
 		current = current.GetNext()
 	}
 	return_value.GetArr().NextIndexInsert(&tmp)
@@ -867,7 +867,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
-	zend.Z_TRY_ADDREF(tmp)
+	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -912,7 +912,7 @@ func zim_spl_SplDoublyLinkedList_add(execute_data *zend.ZendExecuteData, return_
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
 		return
 	}
-	zend.Z_TRY_ADDREF_P(value)
+	value.TryAddRefcount()
 	if index == intern.GetLlist().GetCount() {
 
 		/* If index is the last entry+1 then we do a push because we're not inserting before any entry */

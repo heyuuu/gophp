@@ -1961,7 +1961,7 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 			} else {
 				prop_value = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]
 			}
-			Z_TRY_ADDREF_P(prop_value)
+			prop_value.TryAddRefcount()
 			if property_info.GetDocComment() != nil {
 				doc_comment = property_info.GetDocComment().Copy()
 			} else {
@@ -2322,7 +2322,7 @@ func CheckUnrecoverableLoadFailure(ce *ZendClassEntry) {
 		var exception_zv Zval
 		ZEND_ASSERT(EG__().GetException() != nil && "Exception must have been thrown")
 		ZVAL_OBJ(&exception_zv, EG__().GetException())
-		Z_ADDREF(exception_zv)
+		exception_zv.AddRefcount()
 		ZendClearException()
 		exception_str = ZvalGetString(&exception_zv)
 		ZendErrorNoreturn(E_ERROR, "During inheritance of %s with variance dependencies: Uncaught %s", ce.GetName().GetVal(), exception_str.GetVal())

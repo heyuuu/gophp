@@ -114,7 +114,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 		/* Give the userfilter class a hook back to the stream */
 
 		core.PhpStreamToZval(stream, &tmp)
-		zend.Z_ADDREF(tmp)
+		tmp.AddRefcount()
 		zend.AddPropertyZval(obj, "stream", &tmp)
 
 		/* add_property_zval increments the refcount which is unwanted here */

@@ -852,7 +852,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				core.PhpStreamToZval(stream, &retfp)
 				zend.AddIndexZval(pipes, descriptors[i].GetIndex(), &retfp)
 				proc.GetPipes()[i] = retfp.GetRes()
-				zend.Z_ADDREF(retfp)
+				retfp.AddRefcount()
 			}
 			break
 		default:

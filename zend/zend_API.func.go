@@ -560,11 +560,11 @@ func ZEND_TRY_ASSIGN_REF_VALUE(zv *Zval, other_zv *Zval) {
 	_ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 1)
 }
 func ZEND_TRY_ASSIGN_COPY(zv *Zval, other_zv *Zval) {
-	Z_TRY_ADDREF_P(other_zv)
+	other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_VALUE(zv, other_zv)
 }
 func ZEND_TRY_ASSIGN_REF_COPY(zv *Zval, other_zv *Zval) {
-	Z_TRY_ADDREF_P(other_zv)
+	other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_REF_VALUE(zv, other_zv)
 }
 func _ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool, is_ref int) {
@@ -591,11 +591,11 @@ func ZEND_TRY_ASSIGN_REF_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 1)
 }
 func ZEND_TRY_ASSIGN_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
-	Z_TRY_ADDREF_P(other_zv)
+	other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
 }
 func ZEND_TRY_ASSIGN_REF_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
-	Z_TRY_ADDREF_P(other_zv)
+	other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_REF_VALUE_EX(zv, other_zv, strict)
 }
 func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
@@ -860,7 +860,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 		return FAILURE
 	}
 	for b.PostDec(&param_count) > 0 {
-		Z_TRY_ADDREF_P(param_ptr)
+		param_ptr.TryAddRefcount()
 		argument_array.GetArr().NextIndexInsertNew(param_ptr)
 		param_ptr++
 	}
@@ -2154,7 +2154,7 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 		result = nil
 	}
 	if result != nil {
-		Z_TRY_ADDREF_P(result)
+		result.TryAddRefcount()
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -3126,7 +3126,7 @@ func ZendSetHashSymbol(symbol *Zval, name *byte, name_length int, is_ref ZendBoo
 	for b.PostDec(&num_symbol_tables) > 0 {
 		symbol_table = __va_arg(symbol_table_list, (*HashTable)(_))
 		symbol_table.KeyUpdate(b.CastStr(name, name_length), symbol)
-		Z_TRY_ADDREF_P(symbol)
+		symbol.TryAddRefcount()
 	}
 	va_end(symbol_table_list)
 	return SUCCESS
@@ -3790,7 +3790,7 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 		arg = _z
 		if func_ != nil && !(arg.IsReference()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
 			ZVAL_NEW_REF(params, arg)
-			Z_TRY_ADDREF_P(arg)
+			arg.TryAddRefcount()
 		} else {
 			ZVAL_COPY(params, arg)
 		}
@@ -4239,13 +4239,13 @@ func ZendUpdatePropertyStr(scope *ZendClassEntry, object *Zval, name *byte, name
 func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte) {
 	var tmp Zval
 	ZVAL_STRING(&tmp, value)
-	Z_SET_REFCOUNT(tmp, 0)
+	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 func ZendUpdatePropertyStringl(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte, value_len int) {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, value, value_len)
-	Z_SET_REFCOUNT(tmp, 0)
+	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *Zval) int {
@@ -4265,11 +4265,11 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *
 		return FAILURE
 	}
 	ZEND_ASSERT(!(value.IsReference()))
-	Z_TRY_ADDREF_P(value)
+	value.TryAddRefcount()
 	if prop_info.GetType() != 0 {
 		ZVAL_COPY_VALUE(&tmp, value)
 		if ZendVerifyPropertyType(prop_info, &tmp, 0) == 0 {
-			Z_TRY_DELREF_P(value)
+			value.TryDelRefcount()
 			return FAILURE
 		}
 		value = &tmp
@@ -4306,13 +4306,13 @@ func ZendUpdateStaticPropertyDouble(scope *ZendClassEntry, name *byte, name_leng
 func ZendUpdateStaticPropertyString(scope *ZendClassEntry, name *byte, name_length int, value *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, value)
-	Z_SET_REFCOUNT(tmp, 0)
+	tmp.SetRefcount(0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 func ZendUpdateStaticPropertyStringl(scope *ZendClassEntry, name *byte, name_length int, value *byte, value_len int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, value, value_len)
-	Z_SET_REFCOUNT(tmp, 0)
+	tmp.SetRefcount(0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 func ZendReadPropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, silent ZendBool, rv *Zval) *Zval {

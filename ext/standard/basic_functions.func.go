@@ -2497,7 +2497,7 @@ func ZifRegisterShutdownFunction(execute_data *zend.ZendExecuteData, return_valu
 			zend.ZendHashInit(BG(user_shutdown_function_names), 0, nil, UserShutdownFunctionDtor, 0)
 		}
 		for i = 0; i < shutdown_function_entry.GetArgCount(); i++ {
-			zend.Z_TRY_ADDREF(shutdown_function_entry.GetArguments()[i])
+			shutdown_function_entry.GetArguments()[i].TryAddRefcount()
 		}
 		zend.ZendHashNextIndexInsertMem(BG(user_shutdown_function_names), &shutdown_function_entry, b.SizeOf("php_shutdown_function_entry"))
 	}
@@ -3886,7 +3886,7 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 		core.PhpAddTickFunction(RunUserTickFunctions, nil)
 	}
 	for i = 0; i < tick_fe.GetArgCount(); i++ {
-		zend.Z_TRY_ADDREF(tick_fe.GetArguments()[i])
+		tick_fe.GetArguments()[i].TryAddRefcount()
 	}
 	zend.ZendLlistAddElement(BG(user_tick_functions), &tick_fe)
 	zend.RETVAL_TRUE
@@ -4177,7 +4177,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			/* bare string - nothing to do */
 
 		}
-		zend.Z_TRY_ADDREF_P(arg2)
+		arg2.TryAddRefcount()
 		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), arg2)
 		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
@@ -4209,7 +4209,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 			zend.ArrayInit(find_hash)
 		}
 		if arg3 == nil || arg3.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(arg3) == 0 {
-			zend.Z_TRY_ADDREF_P(arg2)
+			arg2.TryAddRefcount()
 			zend.AddNextIndexZval(find_hash, arg2)
 		} else {
 			zend.ArraySetZvalKey(find_hash.GetArr(), arg3, arg2)

@@ -401,7 +401,7 @@ func ZendAstAddUnpackedElement(result *Zval, expr *Zval) int {
 					ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 					break
 				}
-				Z_TRY_ADDREF_P(val)
+				val.TryAddRefcount()
 			}
 		}
 		return SUCCESS

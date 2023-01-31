@@ -419,7 +419,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 		}
 	}
 	if closure.GetThisPtr().GetType() != IS_UNDEF {
-		Z_ADDREF(closure.GetThisPtr())
+		closure.GetThisPtr().AddRefcount()
 		debug_info.KeyUpdate(ZSTR_KNOWN(ZEND_STR_THIS).GetStr(), closure.GetThisPtr())
 	}
 	if arg_info != nil && (closure.GetFunc().GetNumArgs() != 0 || closure.GetFunc().IsVariadic()) {

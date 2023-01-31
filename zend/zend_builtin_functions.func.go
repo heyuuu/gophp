@@ -676,7 +676,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 
 	if ZendHashGetCurrentKey(target_hash, &key, &num_key) == HASH_KEY_IS_STRING {
 		ZVAL_STR_COPY(&tmp, key)
-		Z_TRY_ADDREF(tmp)
+		tmp.TryAddRefcount()
 	} else {
 		tmp.SetLong(num_key)
 	}
@@ -810,7 +810,7 @@ func ValidateConstantArray(ht *HashTable) int {
 		if val.IsRefcounted() {
 			if val.IsArray() {
 				if val.IsRefcounted() {
-					if Z_IS_RECURSIVE_P(val) {
+					if val.IsRecursive() {
 						ZendError(E_WARNING, "Constants cannot be recursive arrays")
 						ret = 0
 						break
@@ -861,7 +861,7 @@ func CopyConstantArray(dst *Zval, src *Zval) {
 				CopyConstantArray(new_val, val)
 			}
 		} else {
-			Z_TRY_ADDREF_P(val)
+			val.TryAddRefcount()
 		}
 	}
 }
@@ -1481,7 +1481,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			if value.IsReference() && value.GetRefcount() == 1 {
 				value = Z_REFVAL_P(value)
 			}
-			Z_TRY_ADDREF_P(value)
+			value.TryAddRefcount()
 			if key == nil {
 
 				/* This case is only possible due to loopholes, e.g. ArrayObject */
@@ -2895,7 +2895,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
 					ZVAL_OBJ(&tmp, object)
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_OBJECT).GetStr(), &tmp)
-					Z_ADDREF(tmp)
+					tmp.AddRefcount()
 				}
 				ZVAL_INTERNED_STR(&tmp, ZSTR_KNOWN(ZEND_STR_OBJECT_OPERATOR))
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)

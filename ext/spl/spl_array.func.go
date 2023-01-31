@@ -349,7 +349,7 @@ func SplArrayWriteDimensionEx(check_inherited int, object *zend.Zval, offset *ze
 		zend.ZendError(zend.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
-	zend.Z_TRY_ADDREF_P(value)
+	value.TryAddRefcount()
 	if offset == nil {
 		ht = SplArrayGetHashTable(intern)
 		ht.NextIndexInsert(value)
@@ -658,7 +658,7 @@ func SplArrayGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 		zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 		storage = intern.GetArray()
-		zend.Z_TRY_ADDREF_P(storage)
+		storage.TryAddRefcount()
 		if zend.Z_OBJ_HT_P(obj) == &spl_handler_ArrayIterator {
 			base = spl_ce_ArrayIterator
 		} else {
@@ -1475,7 +1475,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	/* members */
 
 	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
-	zend.Z_TRY_ADDREF(tmp)
+	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* iterator class */

@@ -486,7 +486,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 			lc_name.GetVal()[lc_name.GetLen()] = '0'
 			zend.ZVAL_OBJ(alfi.GetObj(), obj_ptr)
-			zend.Z_ADDREF(alfi.GetObj())
+			alfi.GetObj().AddRefcount()
 		} else {
 			alfi.GetObj().SetUndef()
 		}
@@ -520,10 +520,10 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 		if zend.ZendHashAddMem(SPL_G(autoload_functions), lc_name, &alfi, b.SizeOf("autoload_func_info")) == nil {
 			if obj_ptr != nil && !alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_STATIC) {
-				zend.Z_DELREF(alfi.GetObj())
+				alfi.GetObj().DelRefcount()
 			}
 			if !(alfi.GetClosure().IsUndef()) {
-				zend.Z_DELREF(alfi.GetClosure())
+				alfi.GetClosure().DelRefcount()
 			}
 			if alfi.GetFuncPtr().HasFnFlags(zend.ZEND_ACC_CALL_VIA_TRAMPOLINE) {
 				zend.ZendStringReleaseEx(alfi.GetFuncPtr().GetFunctionName(), 0)
@@ -665,13 +665,13 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 			key = _p.GetKey()
 			alfi = _z.GetPtr()
 			if !(alfi.GetClosure().IsUndef()) {
-				zend.Z_ADDREF(alfi.GetClosure())
+				alfi.GetClosure().AddRefcount()
 				zend.AddNextIndexZval(return_value, alfi.GetClosure())
 			} else if alfi.GetFuncPtr().GetScope() != nil {
 				var tmp zend.Zval
 				zend.ArrayInit(&tmp)
 				if !(alfi.GetObj().IsUndef()) {
-					zend.Z_ADDREF(alfi.GetObj())
+					alfi.GetObj().AddRefcount()
 					zend.AddNextIndexZval(&tmp, alfi.GetObj())
 				} else {
 					zend.AddNextIndexStr(&tmp, alfi.GetCe().GetName().Copy())

@@ -89,7 +89,7 @@ func SplFixedarrayObjectGetProperties(obj *zend.Zval) *zend.HashTable {
 		for i = 0; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
-				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
+				intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
 				ht.IndexUpdateH(i, zend.EG__().GetUninitializedZval())
 			}
@@ -452,7 +452,7 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 		for ; i < intern.GetArray().GetSize(); i++ {
 			if !(intern.GetArray().GetElements()[i].IsUndef()) {
 				return_value.GetArr().IndexUpdateH(i, intern.GetArray().GetElements()[i])
-				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
+				intern.GetArray().GetElements()[i].TryAddRefcount()
 			} else {
 				return_value.GetArr().IndexUpdateH(i, zend.EG__().GetUninitializedZval())
 			}

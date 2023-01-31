@@ -1095,7 +1095,7 @@ func zim_Generator_throw(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	Z_TRY_ADDREF_P(exception)
+	exception.TryAddRefcount()
 	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	if generator.GetExecuteData() != nil {

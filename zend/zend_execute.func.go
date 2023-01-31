@@ -603,7 +603,7 @@ func ZendWrongAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval, opl
 
 	/* Use IS_TMP_VAR instead of IS_VAR to avoid ISREF check */
 
-	Z_TRY_ADDREF_P(value_ptr)
+	value_ptr.TryAddRefcount()
 	return ZendAssignToVariable(variable_ptr, value_ptr, IS_TMP_VAR, EX_USES_STRICT_TYPES())
 }
 func ZendFormatType(type_ ZendType, part1 **byte, part2 **byte) {
@@ -1638,7 +1638,7 @@ func ZendPostIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *
 	var z *Zval
 	var z_copy Zval
 	ZVAL_OBJ(&obj, object.GetObj())
-	Z_ADDREF(obj)
+	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
@@ -1671,7 +1671,7 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 	var obj Zval
 	var z_copy Zval
 	ZVAL_OBJ(&obj, object.GetObj())
-	Z_ADDREF(obj)
+	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
@@ -1708,7 +1708,7 @@ func ZendAssignOpOverloadedProperty(object *Zval, property *Zval, cache_slot *an
 	var obj Zval
 	var res Zval
 	ZVAL_OBJ(&obj, object.GetObj())
-	Z_ADDREF(obj)
+	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
 		OBJ_RELEASE(obj.GetObj())
@@ -2016,13 +2016,13 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			retval = container.GetArr().NextIndexInsert(EG__().GetUninitializedZval())
 			if retval == nil {
 				ZendCannotAddElement()
-				ZVAL_ERROR(result)
+				result.IsError()
 				return
 			}
 		} else {
 			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
 			if retval == nil {
-				ZVAL_ERROR(result)
+				result.IsError()
 				return
 			}
 		}
@@ -2037,7 +2037,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			if type_ != BP_VAR_UNSET {
 				if ZEND_REF_HAS_TYPE_SOURCES(ref) {
 					if ZendVerifyRefArrayAssignable(ref) == 0 {
-						ZVAL_ERROR(result)
+						result.IsError()
 						return
 					}
 				}
@@ -2055,7 +2055,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 			ZendCheckStringOffset(dim, type_, EXECUTE_DATA_C)
 			ZendWrongStringOffset(EXECUTE_DATA_C)
 		}
-		ZVAL_ERROR(result)
+		result.IsError()
 	} else if container.IsObject() {
 		if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.IsUndef() {
 			dim = ZVAL_UNDEFINED_OP2()
@@ -2085,7 +2085,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 				ZVAL_INDIRECT(result, retval)
 			}
 		} else {
-			ZVAL_ERROR(result)
+			result.IsError()
 		}
 	} else {
 		if container.GetType() <= IS_FALSE {
@@ -2106,14 +2106,14 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 				result.SetNull()
 			}
 		} else if container.IsError() {
-			ZVAL_ERROR(result)
+			result.IsError()
 		} else {
 			if type_ == BP_VAR_UNSET {
 				ZendError(E_WARNING, "Cannot unset offset in a non-array variable")
 				result.SetNull()
 			} else {
 				ZendUseScalarAsArray()
-				ZVAL_ERROR(result)
+				result.IsError()
 			}
 		}
 	}
@@ -2511,7 +2511,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 			if CheckTypeArrayAssignable(prop_info.GetType()) == 0 {
 				ZendThrowAutoInitInPropError(prop_info, "array")
 				if result != nil {
-					ZVAL_ERROR(result)
+					result.IsError()
 				}
 				return 0
 			}
@@ -2528,7 +2528,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 			if check_type_stdClass_assignable(prop_info.GetType()) == 0 {
 				ZendThrowAutoInitInPropError(prop_info, "stdClass")
 				if result != nil {
-					ZVAL_ERROR(result)
+					result.IsError()
 				}
 				return 0
 			}
@@ -2546,7 +2546,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 				if !(prop_info.GetType().AllowNull()) {
 					ZendThrowAccessUninitPropByRefError(prop_info)
 					if result != nil {
-						ZVAL_ERROR(result)
+						result.IsError()
 					}
 					return 0
 				}
@@ -2581,7 +2581,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			}
 			container = MakeRealObject(container, prop_ptr, OPLINE_C, EXECUTE_DATA_C)
 			if container == nil {
-				ZVAL_ERROR(result)
+				result.IsError()
 				return
 			}
 			break
@@ -2626,11 +2626,11 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			return
 		}
 		if EG__().GetException() != nil {
-			ZVAL_ERROR(result)
+			result.IsError()
 			return
 		}
 	} else if ptr.IsError() {
-		ZVAL_ERROR(result)
+		result.IsError()
 		return
 	}
 	ZVAL_INDIRECT(result, ptr)

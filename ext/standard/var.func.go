@@ -121,11 +121,11 @@ again:
 		core.PUTS("}\n")
 		break
 	case zend.IS_OBJECT:
-		if zend.Z_IS_RECURSIVE_P(struc) {
+		if struc.IsRecursive() {
 			core.PUTS("*RECURSION*\n")
 			return
 		}
-		zend.Z_PROTECT_RECURSION_P(struc)
+		struc.ProtectRecursive()
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
 		core.PhpPrintf("%sobject(%s)#%d (%d) {\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0))
@@ -158,7 +158,7 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-		zend.Z_UNPROTECT_RECURSION_P(struc)
+		struc.UnprotectRecursive()
 		break
 	case zend.IS_RESOURCE:
 		var type_name *byte = zend.ZendRsrcListGetRsrcType(struc.GetRes())
@@ -923,7 +923,7 @@ func PhpVarSerializeTryAddSleepProp(ht *zend.HashTable, props *zend.HashTable, n
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" is returned from __sleep multiple times", error_name.GetVal())
 		return zend.SUCCESS
 	}
-	zend.Z_TRY_ADDREF_P(val)
+	val.TryAddRefcount()
 	return zend.SUCCESS
 }
 func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_retval *zend.HashTable) int {
@@ -1030,16 +1030,16 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			 * since we already wrote the length of the array before */
 
 			if data.IsType(zend.IS_ARRAY) {
-				if zend.Z_IS_RECURSIVE_P(data) || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
+				if data.IsRecursive() || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
 					PhpAddVarHash(var_hash, struc)
 					zend.SmartStrAppendl(buf, "N;", 2)
 				} else {
 					if data.IsRefcounted() {
-						zend.Z_PROTECT_RECURSION_P(data)
+						data.ProtectRecursive()
 					}
 					PhpVarSerializeIntern(buf, data, var_hash)
 					if data.IsRefcounted() {
-						zend.Z_UNPROTECT_RECURSION_P(data)
+						data.UnprotectRecursive()
 					}
 				}
 			} else {
