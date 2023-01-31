@@ -743,23 +743,6 @@ func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bu
 	}
 	return 1
 }
-func ZendArrayDupPackedElements(source *HashTable, target *HashTable, with_holes int) {
-	var p *Bucket = source.GetArData()
-	var q *Bucket = target.GetArData()
-	var end *Bucket = p + source.GetNNumUsed()
-	for {
-		if ZendArrayDupElement(source, target, 0, p, q, 1, 1, with_holes) == 0 {
-			if with_holes != 0 {
-				ZVAL_UNDEF(q.GetVal())
-			}
-		}
-		p++
-		q++
-		if p == end {
-			break
-		}
-	}
-}
 func ZendArrayDupElements(source *HashTable, target *HashTable, static_keys int, with_holes int) uint32 {
 	var idx uint32 = 0
 	var p *Bucket = source.GetArData()

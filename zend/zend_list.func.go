@@ -168,7 +168,7 @@ func ZendCloseRsrcList(ht *HashTable) {
 		}
 	}
 }
-func ZendDestroyRsrcList(ht *HashTable) { ZendHashGracefulReverseDestroy(ht) }
+func ZendDestroyRsrcList(ht *HashTable) { ht.GracefulReverseDestroy() }
 func CleanModuleResource(zv *Zval, arg any) int {
 	var resource_id int = *((*int)(arg))
 	return Z_RES_TYPE_P(zv) == resource_id

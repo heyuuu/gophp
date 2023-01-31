@@ -169,7 +169,7 @@ func ShutdownExecutor() {
 
 	__EG().SetActive(0)
 	if fast_shutdown == 0 {
-		ZendHashGracefulReverseDestroy(__EG().GetSymbolTable())
+		__EG().GetSymbolTable().GracefulReverseDestroy()
 
 		/* Release static properties and static variables prior to the final GC run,
 		 * as they may hold GC roots. */

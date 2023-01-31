@@ -2387,7 +2387,7 @@ func ZendStartupModules() int {
 func ZendDestroyModules() {
 	Free(ClassCleanupHandlers)
 	Free(ModuleRequestStartupHandlers)
-	ZendHashGracefulReverseDestroy(&ModuleRegistry)
+	ModuleRegistry.GracefulReverseDestroy()
 }
 func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 	var name_len int
