@@ -379,7 +379,7 @@ func ZifConstant(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 		}
 	} else {
-		if zend.__EG().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
 		}
 		zend.RETVAL_NULL()
@@ -1107,7 +1107,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	 * in order to be on the safe side, even though it is also available
 	 * from the symbol table. */
 
-	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.__EG().GetSymbolTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
+	if (core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0) && (b.Assign(&args, zend.ZendHashFindExInd(core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil || b.Assign(&args, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil) {
 		var pos int = 0
 		var entry *zend.Zval
 		if args.GetType() != zend.IS_ARRAY {
@@ -2440,33 +2440,33 @@ func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTick
 }
 func PhpCallShutdownFunctions() {
 	if BG(user_shutdown_function_names) {
-		var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
-		zend.__EG().SetBailout(&__bailout)
+		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
 			zend.ZendHashApply(BG(user_shutdown_function_names), UserShutdownFunctionCall)
 		}
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 	}
 }
 func PhpFreeShutdownFunctions() {
 	if BG(user_shutdown_function_names) {
-		var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
-		zend.__EG().SetBailout(&__bailout)
+		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
 			BG(user_shutdown_function_names).Destroy()
 			zend.FREE_HASHTABLE(BG(user_shutdown_function_names))
 			BG(user_shutdown_function_names) = nil
 		} else {
-			zend.__EG().SetBailout(__orig_bailout)
+			zend.EG__().SetBailout(__orig_bailout)
 
 			/* maybe shutdown method call exit, we just ignore it */
 
 			zend.FREE_HASHTABLE(BG(user_shutdown_function_names))
 			BG(user_shutdown_function_names) = nil
 		}
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 	}
 }
 func ZifRegisterShutdownFunction(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2730,7 +2730,7 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var syntax_highlighter_ini zend.ZendSyntaxHighlighterIni
 	var hicompiled_string_description *byte
 	var i zend.ZendBool = 0
-	var old_error_reporting int = zend.__EG().GetErrorReporting()
+	var old_error_reporting int = zend.EG__().GetErrorReporting()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -2808,12 +2808,12 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if i != 0 {
 		core.PhpOutputStartDefault()
 	}
-	zend.__EG().SetErrorReporting(zend.E_ERROR)
+	zend.EG__().SetErrorReporting(zend.E_ERROR)
 	PhpGetHighlight(&syntax_highlighter_ini)
 	hicompiled_string_description = zend.ZendMakeCompiledStringDescription("highlighted code")
 	if zend.HighlightString(expr, &syntax_highlighter_ini, hicompiled_string_description) == zend.FAILURE {
 		zend.Efree(hicompiled_string_description)
-		zend.__EG().SetErrorReporting(old_error_reporting)
+		zend.EG__().SetErrorReporting(old_error_reporting)
 		if i != 0 {
 			core.PhpOutputEnd()
 		}
@@ -2821,7 +2821,7 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		return
 	}
 	zend.Efree(hicompiled_string_description)
-	zend.__EG().SetErrorReporting(old_error_reporting)
+	zend.EG__().SetErrorReporting(old_error_reporting)
 	if i != 0 {
 		core.PhpOutputGetContents(return_value)
 		core.PhpOutputDiscard()
@@ -3007,7 +3007,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		module_number = module.GetModuleNumber()
 	}
 	zend.ArrayInit(return_value)
-	var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
+	var __ht *zend.HashTable = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
 		var _z *zend.Zval = _p.GetVal()
 
@@ -3040,7 +3040,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
 					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &zv)
 				} else {
-					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), zend.__EG().GetUninitializedZval())
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), zend.EG__().GetUninitializedZval())
 				}
 			}
 		}

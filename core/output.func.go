@@ -349,7 +349,7 @@ func PhpOutputHandlerConflict(handler_new *byte, handler_new_len int, handler_se
 }
 func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var str *zend.ZendString
-	if zend.__EG().GetCurrentModule() == nil {
+	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler conflict outside of MINIT")
 		return zend.FAILURE
 	}
@@ -361,7 +361,7 @@ func PhpOutputHandlerConflictRegister(name *byte, name_len int, check_func PhpOu
 func PhpOutputHandlerReverseConflictRegister(name *byte, name_len int, check_func PhpOutputHandlerConflictCheckT) int {
 	var rev zend.HashTable
 	var rev_ptr *zend.HashTable = nil
-	if zend.__EG().GetCurrentModule() == nil {
+	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register a reverse output handler conflict outside of MINIT")
 		return zend.FAILURE
 	}
@@ -389,7 +389,7 @@ func PhpOutputHandlerAlias(name *byte, name_len int) PhpOutputHandlerAliasCtorT 
 }
 func PhpOutputHandlerAliasRegister(name *byte, name_len int, func_ PhpOutputHandlerAliasCtorT) int {
 	var str *zend.ZendString
-	if zend.__EG().GetCurrentModule() == nil {
+	if zend.EG__().GetCurrentModule() == nil {
 		zend.ZendError(zend.E_ERROR, "Cannot register an output handler alias outside of MINIT")
 		return zend.FAILURE
 	}

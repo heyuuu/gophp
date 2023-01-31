@@ -8,8 +8,8 @@ import (
 
 func ZendRethrowException(execute_data *ZendExecuteData) {
 	if EX(opline).opcode != ZEND_HANDLE_EXCEPTION {
-		__EG().SetOplineBeforeException(EX(opline))
-		EX(opline) = __EG().GetExceptionOp()
+		EG__().SetOplineBeforeException(EX(opline))
+		EX(opline) = EG__().GetExceptionOp()
 	}
 }
 func ZendImplementThrowable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
@@ -72,46 +72,46 @@ func ZendExceptionSetPrevious(exception *ZendObject, add_previous *ZendObject) {
 	}
 }
 func ZendExceptionSave() {
-	if __EG().GetPrevException() != nil {
-		ZendExceptionSetPrevious(__EG().GetException(), __EG().GetPrevException())
+	if EG__().GetPrevException() != nil {
+		ZendExceptionSetPrevious(EG__().GetException(), EG__().GetPrevException())
 	}
-	if __EG().GetException() != nil {
-		__EG().SetPrevException(__EG().GetException())
+	if EG__().GetException() != nil {
+		EG__().SetPrevException(EG__().GetException())
 	}
-	__EG().SetException(nil)
+	EG__().SetException(nil)
 }
 func ZendExceptionRestore() {
-	if __EG().GetPrevException() != nil {
-		if __EG().GetException() != nil {
-			ZendExceptionSetPrevious(__EG().GetException(), __EG().GetPrevException())
+	if EG__().GetPrevException() != nil {
+		if EG__().GetException() != nil {
+			ZendExceptionSetPrevious(EG__().GetException(), EG__().GetPrevException())
 		} else {
-			__EG().SetException(__EG().GetPrevException())
+			EG__().SetException(EG__().GetPrevException())
 		}
-		__EG().SetPrevException(nil)
+		EG__().SetPrevException(nil)
 	}
 }
 func ZendThrowExceptionInternal(exception *Zval) {
 	if exception != nil {
-		var previous *ZendObject = __EG().GetException()
-		ZendExceptionSetPrevious(exception.GetObj(), __EG().GetException())
-		__EG().SetException(exception.GetObj())
+		var previous *ZendObject = EG__().GetException()
+		ZendExceptionSetPrevious(exception.GetObj(), EG__().GetException())
+		EG__().SetException(exception.GetObj())
 		if previous != nil {
 			return
 		}
 	}
-	if __EG().GetCurrentExecuteData() == nil {
+	if EG__().GetCurrentExecuteData() == nil {
 		if exception != nil && (Z_OBJCE_P(exception) == ZendCeParseError || Z_OBJCE_P(exception) == ZendCeCompileError) {
 			return
 		}
-		if __EG().GetException() != nil {
-			ZendExceptionError(__EG().GetException(), E_ERROR)
+		if EG__().GetException() != nil {
+			ZendExceptionError(EG__().GetException(), E_ERROR)
 		}
 		ZendErrorNoreturn(E_CORE_ERROR, "Exception thrown without a stack frame")
 	}
 	if ZendThrowExceptionHook != nil {
 		ZendThrowExceptionHook(exception)
 	}
-	if __EG().GetCurrentExecuteData().GetFunc() == nil || !(ZEND_USER_CODE(__EG().GetCurrentExecuteData().GetFunc().GetCommonType())) || __EG().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
+	if EG__().GetCurrentExecuteData().GetFunc() == nil || !(ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetCommonType())) || EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
 
 		/* no need to rethrow the exception */
 
@@ -120,26 +120,26 @@ func ZendThrowExceptionInternal(exception *Zval) {
 		/* no need to rethrow the exception */
 
 	}
-	__EG().SetOplineBeforeException(__EG().GetCurrentExecuteData().GetOpline())
-	__EG().GetCurrentExecuteData().SetOpline(__EG().GetExceptionOp())
+	EG__().SetOplineBeforeException(EG__().GetCurrentExecuteData().GetOpline())
+	EG__().GetCurrentExecuteData().SetOpline(EG__().GetExceptionOp())
 }
 func ZendClearException() {
 	var exception *ZendObject
-	if __EG().GetPrevException() != nil {
-		OBJ_RELEASE(__EG().GetPrevException())
-		__EG().SetPrevException(nil)
+	if EG__().GetPrevException() != nil {
+		OBJ_RELEASE(EG__().GetPrevException())
+		EG__().SetPrevException(nil)
 	}
-	if __EG().GetException() == nil {
+	if EG__().GetException() == nil {
 		return
 	}
 
 	/* exception may have destructor */
 
-	exception = __EG().GetException()
-	__EG().SetException(nil)
+	exception = EG__().GetException()
+	EG__().SetException(nil)
 	OBJ_RELEASE(exception)
-	if __EG().GetCurrentExecuteData() != nil {
-		__EG().GetCurrentExecuteData().SetOpline(__EG().GetOplineBeforeException())
+	if EG__().GetCurrentExecuteData() != nil {
+		EG__().GetCurrentExecuteData().SetOpline(EG__().GetOplineBeforeException())
 	}
 }
 func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) *ZendObject {
@@ -153,8 +153,8 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	obj.SetObj(object)
 	Z_OBJ_HT(obj) = &DefaultExceptionHandlers
 	ObjectPropertiesInit(object, class_type)
-	if __EG().GetCurrentExecuteData() != nil {
-		ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(__EG().GetExceptionIgnoreArgs() != 0, DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
+	if EG__().GetCurrentExecuteData() != nil {
+		ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(EG__().GetExceptionIgnoreArgs() != 0, DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
 	} else {
 		ArrayInit(&trace)
 	}
@@ -405,7 +405,7 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		SmartStrAppends(str, ", ")
 		break
 	case IS_DOUBLE:
-		SmartStrAppendPrintf(str, "%.*G", int(__EG().GetPrecision()), arg.GetDval())
+		SmartStrAppendPrintf(str, "%.*G", int(EG__().GetPrecision()), arg.GetDval())
 		SmartStrAppends(str, ", ")
 		break
 	case IS_ARRAY:
@@ -735,7 +735,7 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 	var ce_exception *ZendClassEntry
 	ZVAL_OBJ(&exception, ex)
 	ce_exception = ex.GetCe()
-	__EG().SetException(nil)
+	EG__().SetException(nil)
 	if ce_exception == ZendCeParseError || ce_exception == ZendCeCompileError {
 		var message *ZendString = ZvalGetString(GET_PROPERTY(&exception, ZEND_STR_MESSAGE))
 		var file *ZendString = ZvalGetString(GET_PROPERTY_SILENT(&exception, ZEND_STR_FILE))
@@ -749,7 +749,7 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 		var file *ZendString = nil
 		var line ZendLong = 0
 		ZendCallMethodWith0Params(&exception, ce_exception, ex.GetCe().GetTostring(), "__tostring", &tmp)
-		if __EG().GetException() == nil {
+		if EG__().GetException() == nil {
 			if tmp.GetType() != IS_STRING {
 				ZendError(E_WARNING, "%s::__toString() must return a string", ce_exception.GetName().GetVal())
 			} else {
@@ -757,9 +757,9 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 			}
 		}
 		ZvalPtrDtor(&tmp)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			var zv Zval
-			ZVAL_OBJ(&zv, __EG().GetException())
+			ZVAL_OBJ(&zv, EG__().GetException())
 
 			/* do the best we can to inform about the inner exception */
 

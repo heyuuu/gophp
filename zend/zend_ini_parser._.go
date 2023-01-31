@@ -81,9 +81,9 @@ const IniYynerrs = ini_nerrs
 /* Copy the first part of user declarations.  */
 
 const DEBUG_CFG_PARSER = 0
-const ZEND_INI_PARSER_CB = __CG().GetIniParserParam().GetIniParserCb()
-const ZEND_INI_PARSER_ARG = __CG().GetIniParserParam().GetArg()
-const ZEND_SYSTEM_INI = __CG().GetIniParserUnbufferedErrors()
+const ZEND_INI_PARSER_CB = CG__().GetIniParserParam().GetIniParserCb()
+const ZEND_INI_PARSER_ARG = CG__().GetIniParserParam().GetArg()
+const ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 
 /* {{{ zend_ini_do_op()
  */

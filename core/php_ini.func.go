@@ -59,7 +59,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 	} else {
 		module_number = 0
 	}
-	var __ht *zend.HashTable = zend.__EG().GetIniDirectives()
+	var __ht *zend.HashTable = zend.EG__().GetIniDirectives()
 	for _, _p := range __ht.foreachData() {
 		var _z *zend.Zval = _p.GetVal()
 

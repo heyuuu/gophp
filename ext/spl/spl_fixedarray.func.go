@@ -91,7 +91,7 @@ func SplFixedarrayObjectGetProperties(obj *zend.Zval) *zend.HashTable {
 				ht.IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
-				ht.IndexUpdateH(i, zend.__EG().GetUninitializedZval())
+				ht.IndexUpdateH(i, zend.EG__().GetUninitializedZval())
 			}
 		}
 		if j > intern.GetArray().GetSize() {
@@ -228,7 +228,7 @@ func SplFixedarrayObjectReadDimension(object *zend.Zval, offset *zend.Zval, type
 	var intern *SplFixedarrayObject
 	intern = Z_SPLFIXEDARRAY_P(object)
 	if type_ == zend.BP_VAR_IS && SplFixedarrayObjectHasDimension(object, offset, 0) == 0 {
-		return zend.__EG().GetUninitializedZval()
+		return zend.EG__().GetUninitializedZval()
 	}
 	if intern.GetFptrOffsetGet() != nil {
 		var tmp zend.Zval
@@ -243,7 +243,7 @@ func SplFixedarrayObjectReadDimension(object *zend.Zval, offset *zend.Zval, type
 		if !(zend.Z_ISUNDEF_P(rv)) {
 			return rv
 		}
-		return zend.__EG().GetUninitializedZval()
+		return zend.EG__().GetUninitializedZval()
 	}
 	return SplFixedarrayObjectReadDimensionHelper(intern, offset)
 }
@@ -454,7 +454,7 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 				return_value.GetArr().IndexUpdateH(i, intern.GetArray().GetElements()[i])
 				zend.Z_TRY_ADDREF(intern.GetArray().GetElements()[i])
 			} else {
-				return_value.GetArr().IndexUpdateH(i, zend.__EG().GetUninitializedZval())
+				return_value.GetArr().IndexUpdateH(i, zend.EG__().GetUninitializedZval())
 			}
 		}
 	} else {
@@ -630,7 +630,7 @@ func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 		zend.ZVAL_LONG(&zindex, object.GetCurrent())
 		data = SplFixedarrayObjectReadDimensionHelper(object, &zindex)
 		if data == nil {
-			data = zend.__EG().GetUninitializedZval()
+			data = zend.EG__().GetUninitializedZval()
 		}
 		return data
 	}

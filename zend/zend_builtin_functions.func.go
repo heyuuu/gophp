@@ -19,7 +19,7 @@ func ZmStartupCore(type_ int, module_number int) int {
 func ZendStartupBuiltinFunctions() int {
 	ZendBuiltinModule.SetModuleNumber(0)
 	ZendBuiltinModule.SetType(MODULE_PERSISTENT)
-	if b.Assign(&(__EG().GetCurrentModule()), ZendRegisterModuleEx(&ZendBuiltinModule)) == nil {
+	if b.Assign(&(EG__().GetCurrentModule()), ZendRegisterModuleEx(&ZendBuiltinModule)) == nil {
 		return FAILURE
 	} else {
 		return SUCCESS
@@ -637,9 +637,9 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParameters(ZEND_NUM_ARGS(), "z/", &array) == FAILURE {
 		return
 	}
-	if __EG().GetEachDeprecationThrown() == 0 {
+	if EG__().GetEachDeprecationThrown() == 0 {
 		ZendError(E_DEPRECATED, "The each() function is deprecated. This message will be suppressed on further calls")
-		__EG().SetEachDeprecationThrown(1)
+		EG__().SetEachDeprecationThrown(1)
 	}
 	target_hash = HASH_OF(array)
 	if target_hash == nil {
@@ -751,29 +751,29 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	old_error_reporting = __EG().GetErrorReporting()
+	old_error_reporting = EG__().GetErrorReporting()
 	if ZEND_NUM_ARGS() != 0 {
 		var new_val *ZendString = ZvalTryGetString(err)
 		if new_val == nil {
 			return
 		}
 		for {
-			var p *ZendIniEntry = __EG().GetErrorReportingIniEntry()
+			var p *ZendIniEntry = EG__().GetErrorReportingIniEntry()
 			if p == nil {
-				var zv *Zval = __EG().GetIniDirectives().KeyFind(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING).GetStr())
+				var zv *Zval = EG__().GetIniDirectives().KeyFind(ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING).GetStr())
 				if zv != nil {
-					__EG().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
-					p = __EG().GetErrorReportingIniEntry()
+					EG__().SetErrorReportingIniEntry((*ZendIniEntry)(zv.GetPtr()))
+					p = EG__().GetErrorReportingIniEntry()
 				} else {
 					break
 				}
 			}
 			if p.GetModified() == 0 {
-				if __EG().GetModifiedIniDirectives() == nil {
-					ALLOC_HASHTABLE(__EG().GetModifiedIniDirectives())
-					ZendHashInit(__EG().GetModifiedIniDirectives(), 8, nil, nil, 0)
+				if EG__().GetModifiedIniDirectives() == nil {
+					ALLOC_HASHTABLE(EG__().GetModifiedIniDirectives())
+					ZendHashInit(EG__().GetModifiedIniDirectives(), 8, nil, nil, 0)
 				}
-				if ZendHashAddPtr(__EG().GetModifiedIniDirectives(), ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING), p) != nil {
+				if ZendHashAddPtr(EG__().GetModifiedIniDirectives(), ZSTR_KNOWN(ZEND_STR_ERROR_REPORTING), p) != nil {
 					p.SetOrigValue(p.GetValue())
 					p.SetOrigModifiable(p.GetModifiable())
 					p.SetModified(1)
@@ -783,9 +783,9 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 			p.SetValue(new_val)
 			if err.IsType(IS_LONG) {
-				__EG().SetErrorReporting(err.GetLval())
+				EG__().SetErrorReporting(err.GetLval())
 			} else {
-				__EG().SetErrorReporting(atoi(p.GetValue().GetVal()))
+				EG__().SetErrorReporting(atoi(p.GetValue().GetVal()))
 			}
 			break
 		}
@@ -1893,7 +1893,7 @@ func ClassExistsImpl(execute_data *ZendExecuteData, return_value *Zval, flags in
 		} else {
 			lcname = ZendStringTolower(name)
 		}
-		ce = ZendHashFindPtr(__EG().GetClassTable(), lcname)
+		ce = ZendHashFindPtr(EG__().GetClassTable(), lcname)
 		ZendStringReleaseEx(lcname, 0)
 	} else {
 		ce = ZendLookupClass(name)
@@ -1995,7 +1995,7 @@ func ZifFunctionExists(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		lcname = ZendStringTolower(name)
 	}
-	func_ = ZendHashFindPtr(__EG().GetFunctionTable(), lcname)
+	func_ = ZendHashFindPtr(EG__().GetFunctionTable(), lcname)
 	ZendStringReleaseEx(lcname, 0)
 
 	/*
@@ -2043,7 +2043,7 @@ func ZifGetIncludedFiles(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	ArrayInit(return_value)
-	var __ht *HashTable = __EG().GetIncludedFiles()
+	var __ht *HashTable = EG__().GetIncludedFiles()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
 
@@ -2093,37 +2093,37 @@ func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 	}
-	if __EG().GetUserErrorHandler().GetType() != IS_UNDEF {
-		ZVAL_COPY(return_value, __EG().GetUserErrorHandler())
+	if EG__().GetUserErrorHandler().GetType() != IS_UNDEF {
+		ZVAL_COPY(return_value, EG__().GetUserErrorHandler())
 	}
-	ZendStackPush(__EG().GetUserErrorHandlersErrorReporting(), __EG().GetUserErrorHandlerErrorReporting())
-	ZendStackPush(__EG().GetUserErrorHandlers(), __EG().GetUserErrorHandler())
+	ZendStackPush(EG__().GetUserErrorHandlersErrorReporting(), EG__().GetUserErrorHandlerErrorReporting())
+	ZendStackPush(EG__().GetUserErrorHandlers(), EG__().GetUserErrorHandler())
 	if error_handler.IsType(IS_NULL) {
-		ZVAL_UNDEF(__EG().GetUserErrorHandler())
+		ZVAL_UNDEF(EG__().GetUserErrorHandler())
 		return
 	}
-	ZVAL_COPY(__EG().GetUserErrorHandler(), error_handler)
-	__EG().SetUserErrorHandlerErrorReporting(int(error_type))
+	ZVAL_COPY(EG__().GetUserErrorHandler(), error_handler)
+	EG__().SetUserErrorHandlerErrorReporting(int(error_type))
 }
 func ZifRestoreErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	if __EG().GetUserErrorHandler().GetType() != IS_UNDEF {
+	if EG__().GetUserErrorHandler().GetType() != IS_UNDEF {
 		var zeh Zval
-		ZVAL_COPY_VALUE(&zeh, __EG().GetUserErrorHandler())
-		ZVAL_UNDEF(__EG().GetUserErrorHandler())
+		ZVAL_COPY_VALUE(&zeh, EG__().GetUserErrorHandler())
+		ZVAL_UNDEF(EG__().GetUserErrorHandler())
 		ZvalPtrDtor(&zeh)
 	}
-	if ZendStackIsEmpty(__EG().GetUserErrorHandlers()) != 0 {
-		ZVAL_UNDEF(__EG().GetUserErrorHandler())
+	if ZendStackIsEmpty(EG__().GetUserErrorHandlers()) != 0 {
+		ZVAL_UNDEF(EG__().GetUserErrorHandler())
 	} else {
 		var tmp *Zval
-		__EG().SetUserErrorHandlerErrorReporting(ZendStackIntTop(__EG().GetUserErrorHandlersErrorReporting()))
-		ZendStackDelTop(__EG().GetUserErrorHandlersErrorReporting())
-		tmp = ZendStackTop(__EG().GetUserErrorHandlers())
-		ZVAL_COPY_VALUE(__EG().GetUserErrorHandler(), tmp)
-		ZendStackDelTop(__EG().GetUserErrorHandlers())
+		EG__().SetUserErrorHandlerErrorReporting(ZendStackIntTop(EG__().GetUserErrorHandlersErrorReporting()))
+		ZendStackDelTop(EG__().GetUserErrorHandlersErrorReporting())
+		tmp = ZendStackTop(EG__().GetUserErrorHandlers())
+		ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), tmp)
+		ZendStackDelTop(EG__().GetUserErrorHandlers())
 	}
 	RETVAL_TRUE
 	return
@@ -2141,29 +2141,29 @@ func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 	}
-	if __EG().GetUserExceptionHandler().GetType() != IS_UNDEF {
-		ZVAL_COPY(return_value, __EG().GetUserExceptionHandler())
+	if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
+		ZVAL_COPY(return_value, EG__().GetUserExceptionHandler())
 	}
-	ZendStackPush(__EG().GetUserExceptionHandlers(), __EG().GetUserExceptionHandler())
+	ZendStackPush(EG__().GetUserExceptionHandlers(), EG__().GetUserExceptionHandler())
 	if exception_handler.IsType(IS_NULL) {
-		ZVAL_UNDEF(__EG().GetUserExceptionHandler())
+		ZVAL_UNDEF(EG__().GetUserExceptionHandler())
 		return
 	}
-	ZVAL_COPY(__EG().GetUserExceptionHandler(), exception_handler)
+	ZVAL_COPY(EG__().GetUserExceptionHandler(), exception_handler)
 }
 func ZifRestoreExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	if __EG().GetUserExceptionHandler().GetType() != IS_UNDEF {
-		ZvalPtrDtor(__EG().GetUserExceptionHandler())
+	if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
+		ZvalPtrDtor(EG__().GetUserExceptionHandler())
 	}
-	if ZendStackIsEmpty(__EG().GetUserExceptionHandlers()) != 0 {
-		ZVAL_UNDEF(__EG().GetUserExceptionHandler())
+	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
+		ZVAL_UNDEF(EG__().GetUserExceptionHandler())
 	} else {
-		var tmp *Zval = ZendStackTop(__EG().GetUserExceptionHandlers())
-		ZVAL_COPY_VALUE(__EG().GetUserExceptionHandler(), tmp)
-		ZendStackDelTop(__EG().GetUserExceptionHandlers())
+		var tmp *Zval = ZendStackTop(EG__().GetUserExceptionHandlers())
+		ZVAL_COPY_VALUE(EG__().GetUserExceptionHandler(), tmp)
+		ZendStackDelTop(EG__().GetUserExceptionHandlers())
 	}
 	RETVAL_TRUE
 	return
@@ -2181,7 +2181,7 @@ func GetDeclaredClassImpl(execute_data *ZendExecuteData, return_value *Zval, fla
 		return
 	}
 	ArrayInit(return_value)
-	var __ht *HashTable = __EG().GetClassTable()
+	var __ht *HashTable = EG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
 
@@ -2213,7 +2213,7 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 	ArrayInit(&internal)
 	ArrayInit(&user)
 	ArrayInit(return_value)
-	var __ht *HashTable = __EG().GetFunctionTable()
+	var __ht *HashTable = EG__().GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
 
@@ -2273,7 +2273,7 @@ func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
 	if retval == SUCCESS {
 		var func_ *ZendOpArray
 		var static_variables *HashTable
-		func_ = ZendHashStrFindPtr(__EG().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		func_ = ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		if func_ == nil {
 			ZendErrorNoreturn(E_CORE_ERROR, "Unexpected inconsistency in create_function()")
 			RETVAL_FALSE
@@ -2284,20 +2284,20 @@ func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		static_variables = func_.GetStaticVariables()
 		func_.SetStaticVariables(nil)
-		ZendHashStrDel(__EG().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		func_.SetStaticVariables(static_variables)
 		function_name = ZendStringAlloc(b.SizeOf("\"0lambda_\"")+MAX_LENGTH_OF_LONG, 0)
 		function_name.GetVal()[0] = '0'
 		for {
-			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(__EG().GetLambdaCount()))) + 1)
-			if ZendHashAddPtr(__EG().GetFunctionTable(), function_name, func_) != nil {
+			function_name.SetLen(core.Snprintf(function_name.GetVal()+1, b.SizeOf("\"lambda_\"")+MAX_LENGTH_OF_LONG, "lambda_%d", b.PreInc(&(EG__().GetLambdaCount()))) + 1)
+			if ZendHashAddPtr(EG__().GetFunctionTable(), function_name, func_) != nil {
 				break
 			}
 		}
 		RETVAL_NEW_STR(function_name)
 		return
 	} else {
-		ZendHashStrDel(__EG().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
+		ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		RETVAL_FALSE
 		return
 	}
@@ -2327,7 +2327,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if type_ == nil {
 		ArrayInit(return_value)
-		var __ht *HashTable = __EG().GetRegularList()
+		var __ht *HashTable = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2341,7 +2341,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 	} else if ZendStringEqualsLiteral(type_, "Unknown") {
 		ArrayInit(return_value)
-		var __ht *HashTable = __EG().GetRegularList()
+		var __ht *HashTable = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2361,7 +2361,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			return
 		}
 		ArrayInit(return_value)
-		var __ht *HashTable = __EG().GetRegularList()
+		var __ht *HashTable = EG__().GetRegularList()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2425,7 +2425,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 			i++
 		}
 		module_names[i] = "user"
-		var __ht__1 *HashTable = __EG().GetZendConstants()
+		var __ht__1 *HashTable = EG__().GetZendConstants()
 		for _, _p := range __ht__1.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2464,7 +2464,7 @@ func ZifGetDefinedConstants(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		var constant *ZendConstant
 		var const_val Zval
-		var __ht *HashTable = __EG().GetZendConstants()
+		var __ht *HashTable = EG__().GetZendConstants()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2627,8 +2627,8 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetCommonType()) {
 			filename = skip.GetFunc().GetOpArray().GetFilename().GetVal()
 			if skip.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
-				if __EG().GetOplineBeforeException() != nil {
-					lineno = __EG().GetOplineBeforeException().GetLineno()
+				if EG__().GetOplineBeforeException() != nil {
+					lineno = EG__().GetOplineBeforeException().GetLineno()
 				} else {
 					lineno = skip.GetFunc().GetOpArray().GetLineEnd()
 				}
@@ -2785,7 +2785,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 	var stack_frame Zval
 	var tmp Zval
 	ArrayInit(return_value)
-	if !(b.Assign(&ptr, __EG().GetCurrentExecuteData())) {
+	if !(b.Assign(&ptr, EG__().GetCurrentExecuteData())) {
 		return
 	}
 	if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetCommonType())) {
@@ -2830,8 +2830,8 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 		if skip.GetFunc() != nil && ZEND_USER_CODE(skip.GetFunc().GetCommonType()) {
 			filename = skip.GetFunc().GetOpArray().GetFilename()
 			if skip.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
-				if __EG().GetOplineBeforeException() != nil {
-					lineno = __EG().GetOplineBeforeException().GetLineno()
+				if EG__().GetOplineBeforeException() != nil {
+					lineno = EG__().GetOplineBeforeException().GetLineno()
 				} else {
 					lineno = skip.GetFunc().GetOpArray().GetLineEnd()
 				}
@@ -3021,7 +3021,7 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		array = 0
 	}
-	var __ht *HashTable = __CG().GetFunctionTable()
+	var __ht *HashTable = CG__().GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
 

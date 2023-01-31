@@ -782,7 +782,7 @@ func SapiRegisterPostEntries(post_entries *SapiPostEntry) int {
 func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	var ret int
 	var key *zend.ZendString
-	if SG(sapi_started) && zend.__EG().GetCurrentExecuteData() != nil {
+	if SG(sapi_started) && zend.EG__().GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	key = zend.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
@@ -796,27 +796,27 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	return ret
 }
 func SapiUnregisterPostEntry(post_entry *SapiPostEntry) {
-	if SG(sapi_started) && zend.__EG().GetCurrentExecuteData() != nil {
+	if SG(sapi_started) && zend.EG__().GetCurrentExecuteData() != nil {
 		return
 	}
 	zend.ZendHashStrDel(&(SG(known_post_content_types)), post_entry.GetContentType(), post_entry.GetContentTypeLen())
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
-	if SG(sapi_started) && zend.__EG().GetCurrentExecuteData() != nil {
+	if SG(sapi_started) && zend.EG__().GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetDefaultPostReader(default_post_reader)
 	return zend.SUCCESS
 }
 func SapiRegisterTreatData(treat_data func(arg int, str *byte, destArray *zend.Zval)) int {
-	if SG(sapi_started) && zend.__EG().GetCurrentExecuteData() != nil {
+	if SG(sapi_started) && zend.EG__().GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetTreatData(treat_data)
 	return zend.SUCCESS
 }
 func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, input_filter_init func() uint) int {
-	if SG(sapi_started) && zend.__EG().GetCurrentExecuteData() != nil {
+	if SG(sapi_started) && zend.EG__().GetCurrentExecuteData() != nil {
 		return zend.FAILURE
 	}
 	sapi_module.SetInputFilter(input_filter)

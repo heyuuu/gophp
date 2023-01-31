@@ -30,9 +30,9 @@ func ZEND_PUTC(c byte) int                                  { return ZendWrite(&
 func ZEND_UV(name __auto__) __auto__                        { return ZendUv.name }
 func OnUpdateErrorReporting(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
 	if new_value == nil {
-		__EG().SetErrorReporting(E_ALL & ^E_NOTICE & ^E_STRICT & ^E_DEPRECATED)
+		EG__().SetErrorReporting(E_ALL & ^E_NOTICE & ^E_STRICT & ^E_DEPRECATED)
 	} else {
-		__EG().SetErrorReporting(atoi(new_value.GetVal()))
+		EG__().SetErrorReporting(atoi(new_value.GetVal()))
 	}
 	return SUCCESS
 }
@@ -50,7 +50,7 @@ func ZendGcEnabledDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 	}
 }
 func OnUpdateScriptEncoding(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
-	if __CG().GetMultibyte() == 0 {
+	if CG__().GetMultibyte() == 0 {
 		return FAILURE
 	}
 	if ZendMultibyteGetFunctions() == nil {
@@ -355,23 +355,23 @@ func ZendFopenWrapper(filename *byte, opened_path **ZendString) *r.FILE {
 func ZendSetDefaultCompileTimeValues() {
 	/* default compile-time values */
 
-	__CG().SetShortTags(ShortTagsDefault)
-	__CG().SetCompilerOptions(CompilerOptionsDefault)
-	__CG().SetRtdKeyCounter(0)
+	CG__().SetShortTags(ShortTagsDefault)
+	CG__().SetCompilerOptions(CompilerOptionsDefault)
+	CG__().SetRtdKeyCounter(0)
 }
 func ZendInitExceptionOp() {
-	memset(__EG().GetExceptionOp(), 0, b.SizeOf("EG ( exception_op )"))
-	__EG().GetExceptionOp()[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(__EG().GetExceptionOp())
-	__EG().GetExceptionOp()[1].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(__EG().GetExceptionOp() + 1)
-	__EG().GetExceptionOp()[2].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(__EG().GetExceptionOp() + 2)
+	memset(EG__().GetExceptionOp(), 0, b.SizeOf("EG ( exception_op )"))
+	EG__().GetExceptionOp()[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp())
+	EG__().GetExceptionOp()[1].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp() + 1)
+	EG__().GetExceptionOp()[2].SetOpcode(ZEND_HANDLE_EXCEPTION)
+	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp() + 2)
 }
 func ZendInitCallTrampolineOp() {
-	memset(__EG().GetCallTrampolineOp(), 0, b.SizeOf("EG ( call_trampoline_op )"))
-	__EG().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
-	ZEND_VM_SET_OPCODE_HANDLER(__EG().GetCallTrampolineOp())
+	memset(EG__().GetCallTrampolineOp(), 0, b.SizeOf("EG ( call_trampoline_op )"))
+	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
+	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetCallTrampolineOp())
 }
 func AutoGlobalDtor(zv *Zval) { Free(zv.GetPtr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
@@ -390,10 +390,10 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
-	ZVAL_ARR(&globals, __EG().GetSymbolTable())
+	ZVAL_ARR(&globals, EG__().GetSymbolTable())
 	globals.SetTypeFlags(0)
 	ZVAL_NEW_REF(&globals, &globals)
-	__EG().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
+	EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
 	return 0
 }
 func ZendStartup(utility_functions *ZendUtilityFunctions) int {
@@ -455,10 +455,10 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	/* Map region is going to be created and resized at run-time. */
 
-	__CG().SetMapPtrBase(nil)
-	__CG().SetMapPtrSize(0)
-	__CG().SetMapPtrLast(0)
-	__EG().SetErrorReporting(E_ALL & ^E_NOTICE)
+	CG__().SetMapPtrBase(nil)
+	CG__().SetMapPtrSize(0)
+	CG__().SetMapPtrLast(0)
+	EG__().SetErrorReporting(E_ALL & ^E_NOTICE)
 	ZendInternedStringsInit()
 	ZendStartupBuiltinFunctions()
 	ZendRegisterStandardConstants()
@@ -476,7 +476,7 @@ func ZendRegisterStandardIniEntries() {
 func ZendResolvePropertyTypes() {
 	var ce *ZendClassEntry
 	var prop_info *ZendPropertyInfo
-	var __ht *HashTable = __CG().GetClassTable()
+	var __ht *HashTable = CG__().GetClassTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
 
@@ -493,7 +493,7 @@ func ZendResolvePropertyTypes() {
 				if prop_info.GetType().IsName() {
 					var type_name *ZendString = prop_info.GetType().Name()
 					var lc_type_name *ZendString = ZendStringTolower(type_name)
-					var prop_ce *ZendClassEntry = ZendHashFindPtr(__CG().GetClassTable(), lc_type_name)
+					var prop_ce *ZendClassEntry = ZendHashFindPtr(CG__().GetClassTable(), lc_type_name)
 					ZEND_ASSERT(prop_ce != nil && prop_ce.GetType() == ZEND_INTERNAL_CLASS)
 					prop_info.SetType(ZEND_TYPE_ENCODE_CE(prop_ce, prop_info.GetType().AllowNull()))
 					ZendStringRelease(lc_type_name)
@@ -513,12 +513,12 @@ func ZendPostStartup() int {
 			return FAILURE
 		}
 	}
-	GlobalMapPtrLast = __CG().GetMapPtrLast()
+	GlobalMapPtrLast = CG__().GetMapPtrLast()
 	return SUCCESS
 }
 func ZendShutdown() {
 	ZendVmDtor()
-	ZendDestroyRsrcList(__EG().GetPersistentList())
+	ZendDestroyRsrcList(EG__().GetPersistentList())
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
@@ -533,22 +533,22 @@ func ZendShutdown() {
 	GLOBAL_CONSTANTS_TABLE.Destroy()
 	Free(GLOBAL_CONSTANTS_TABLE)
 	ZendShutdownStrtod()
-	if __CG().GetMapPtrBase() {
-		Free(__CG().GetMapPtrBase())
-		__CG().SetMapPtrBase(nil)
-		__CG().SetMapPtrSize(0)
+	if CG__().GetMapPtrBase() {
+		Free(CG__().GetMapPtrBase())
+		CG__().SetMapPtrBase(nil)
+		CG__().SetMapPtrSize(0)
 	}
-	if __CG().GetScriptEncodingList() != nil {
-		Free(__CG().GetScriptEncodingList())
-		__CG().SetScriptEncodingList(nil)
-		__CG().SetScriptEncodingListSize(0)
+	if CG__().GetScriptEncodingList() != nil {
+		Free(CG__().GetScriptEncodingList())
+		CG__().SetScriptEncodingList(nil)
+		CG__().SetScriptEncodingListSize(0)
 	}
 	ZendDestroyRsrcListDtors()
 }
 func ZendSetUtilityValues(utility_values *ZendUtilityValues) { ZendUv = *utility_values }
 func Zenderror(error *byte) {
-	__CG().SetParseError(0)
-	if __EG().GetException() != nil {
+	CG__().SetParseError(0)
+	if EG__().GetException() != nil {
 
 		/* An exception was thrown in the lexer, don't throw another in the parser. */
 
@@ -560,16 +560,16 @@ func Zenderror(error *byte) {
 	ZendThrowException(ZendCeParseError, error, 0)
 }
 func _zendBailout(filename *byte, lineno uint32) {
-	if __EG().GetBailout() == nil {
+	if EG__().GetBailout() == nil {
 		ZendOutputDebugString(1, "%s(%d) : Bailed out without a bailout address!", filename, lineno)
 		exit(-1)
 	}
 	GcProtect(1)
-	__CG().SetUncleanShutdown(1)
-	__CG().SetActiveClassEntry(nil)
-	__CG().SetInCompilation(0)
-	__EG().SetCurrentExecuteData(nil)
-	LONGJMP((*__EG)().bailout, FAILURE)
+	CG__().SetUncleanShutdown(1)
+	CG__().SetActiveClassEntry(nil)
+	CG__().SetInCompilation(0)
+	EG__().SetCurrentExecuteData(nil)
+	LONGJMP((*EG__)().bailout, FAILURE)
 }
 func ZendAppendVersionInfo(extension *ZendExtension) {
 	var new_info *byte
@@ -588,49 +588,49 @@ func ZendActivate() {
 	InitCompiler()
 	InitExecutor()
 	StartupScanner()
-	if __CG().GetMapPtrLast() != 0 {
-		memset(__CG().GetMapPtrBase(), 0, __CG().GetMapPtrLast()*b.SizeOf("void *"))
+	if CG__().GetMapPtrLast() != 0 {
+		memset(CG__().GetMapPtrBase(), 0, CG__().GetMapPtrLast()*b.SizeOf("void *"))
 	}
 }
 func ZendCallDestructors() {
-	var __orig_bailout *JMP_BUF = __EG().GetBailout()
+	var __orig_bailout *JMP_BUF = EG__().GetBailout()
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ShutdownDestructors()
 	}
-	__EG().SetBailout(__orig_bailout)
+	EG__().SetBailout(__orig_bailout)
 }
 func ZendDeactivate() {
 	/* we're no longer executing anything */
 
-	__EG().SetCurrentExecuteData(nil)
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	EG__().SetCurrentExecuteData(nil)
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ShutdownScanner()
 	}
-	__EG().SetBailout(__orig_bailout)
+	EG__().SetBailout(__orig_bailout)
 
 	/* shutdown_executor() takes care of its own bailout handling */
 
 	ShutdownExecutor()
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ZendIniDeactivate()
 	}
-	__EG().SetBailout(__orig_bailout)
-	var __orig_bailout *JMP_BUF = __EG().GetBailout()
+	EG__().SetBailout(__orig_bailout)
+	var __orig_bailout *JMP_BUF = EG__().GetBailout()
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ShutdownCompiler()
 	}
-	__EG().SetBailout(__orig_bailout)
-	ZendDestroyRsrcList(__EG().GetRegularList())
+	EG__().SetBailout(__orig_bailout)
+	ZendDestroyRsrcList(EG__().GetRegularList())
 }
 func ZendMessageDispatcher(message ZendLong, data any) {
 	if ZendMessageDispatcherP != nil {
@@ -645,19 +645,19 @@ func ZendGetConfigurationDirective(name *ZendString) *Zval {
 	}
 }
 func SAVE_STACK(stack ZendStack) {
-	if __CG().stack.top {
-		memcpy(&stack, __CG().stack, b.SizeOf("zend_stack"))
-		__CG().stack.max = 0
-		__CG().stack.top = __CG().stack.max
-		__CG().stack.elements = nil
+	if CG__().stack.top {
+		memcpy(&stack, CG__().stack, b.SizeOf("zend_stack"))
+		CG__().stack.max = 0
+		CG__().stack.top = CG__().stack.max
+		CG__().stack.elements = nil
 	} else {
 		stack.SetTop(0)
 	}
 }
 func RESTORE_STACK(stack ZendStack) {
 	if stack.GetTop() != 0 {
-		ZendStackDestroy(__CG().stack)
-		memcpy(__CG().stack, &stack, b.SizeOf("zend_stack"))
+		ZendStackDestroy(CG__().stack)
+		memcpy(CG__().stack, &stack, b.SizeOf("zend_stack"))
 	}
 }
 func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
@@ -674,7 +674,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 	/* Report about uncaught exception in case of fatal errors */
 
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		var ex *ZendExecuteData
 		var opline *ZendOp
 		switch type_ {
@@ -689,16 +689,16 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 		case E_COMPILE_ERROR:
 
 		case E_USER_ERROR:
-			ex = __EG().GetCurrentExecuteData()
+			ex = EG__().GetCurrentExecuteData()
 			opline = nil
 			for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 				ex = ex.GetPrevExecuteData()
 			}
-			if ex != nil && ex.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION && __EG().GetOplineBeforeException() != nil {
-				opline = __EG().GetOplineBeforeException()
+			if ex != nil && ex.GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION && EG__().GetOplineBeforeException() != nil {
+				opline = EG__().GetOplineBeforeException()
 			}
-			ZendExceptionError(__EG().GetException(), E_WARNING)
-			__EG().SetException(nil)
+			ZendExceptionError(EG__().GetException(), E_WARNING)
+			EG__().SetException(nil)
 			if opline != nil {
 				ex.SetOpline(opline)
 			}
@@ -710,7 +710,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 	/* if we don't have a user defined error handler */
 
-	if __EG().GetUserErrorHandler().IsType(IS_UNDEF) || (__EG().GetUserErrorHandlerErrorReporting()&type_) == 0 || __EG().GetErrorHandling() != EH_NORMAL {
+	if EG__().GetUserErrorHandler().IsType(IS_UNDEF) || (EG__().GetUserErrorHandlerErrorReporting()&type_) == 0 || EG__().GetErrorHandling() != EH_NORMAL {
 		ZendErrorCb(type_, error_filename, error_lineno, format, args)
 	} else {
 		switch type_ {
@@ -753,32 +753,32 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			} else {
 				ZVAL_ARR(&params[4], ZendArrayDup(symbol_table))
 			}
-			ZVAL_COPY_VALUE(&orig_user_error_handler, __EG().GetUserErrorHandler())
-			ZVAL_UNDEF(__EG().GetUserErrorHandler())
+			ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
+			ZVAL_UNDEF(EG__().GetUserErrorHandler())
 
 			/* User error handler may include() additinal PHP files.
 			 * If an error was generated during comilation PHP will compile
 			 * such scripts recursively, but some CG() variables may be
 			 * inconsistent. */
 
-			in_compilation = __CG().GetInCompilation()
+			in_compilation = CG__().GetInCompilation()
 			if in_compilation != 0 {
-				saved_class_entry = __CG().GetActiveClassEntry()
-				__CG().SetActiveClassEntry(nil)
+				saved_class_entry = CG__().GetActiveClassEntry()
+				CG__().SetActiveClassEntry(nil)
 				SAVE_STACK(loop_var_stack)
 				SAVE_STACK(delayed_oplines_stack)
-				__CG().SetInCompilation(0)
+				CG__().SetInCompilation(0)
 			}
-			orig_fake_scope = __EG().GetFakeScope()
-			__EG().SetFakeScope(nil)
-			if CallUserFunction(__CG().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == SUCCESS {
+			orig_fake_scope = EG__().GetFakeScope()
+			EG__().SetFakeScope(nil)
+			if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_error_handler, &retval, 5, params) == SUCCESS {
 				if retval.GetType() != IS_UNDEF {
 					if retval.IsType(IS_FALSE) {
 						ZendErrorCb(type_, error_filename, error_lineno, format, args)
 					}
 					ZvalPtrDtor(&retval)
 				}
-			} else if __EG().GetException() == nil {
+			} else if EG__().GetException() == nil {
 
 				/* The user error handler failed, use built-in error handler */
 
@@ -787,18 +787,18 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 				/* The user error handler failed, use built-in error handler */
 
 			}
-			__EG().SetFakeScope(orig_fake_scope)
+			EG__().SetFakeScope(orig_fake_scope)
 			if in_compilation != 0 {
-				__CG().SetActiveClassEntry(saved_class_entry)
+				CG__().SetActiveClassEntry(saved_class_entry)
 				RESTORE_STACK(loop_var_stack)
 				RESTORE_STACK(delayed_oplines_stack)
-				__CG().SetInCompilation(1)
+				CG__().SetInCompilation(1)
 			}
 			ZvalPtrDtor(&params[4])
 			ZvalPtrDtor(&params[2])
 			ZvalPtrDtor(&params[1])
-			if __EG().GetUserErrorHandler().IsType(IS_UNDEF) {
-				ZVAL_COPY_VALUE(__EG().GetUserErrorHandler(), &orig_user_error_handler)
+			if EG__().GetUserErrorHandler().IsType(IS_UNDEF) {
+				ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), &orig_user_error_handler)
 			} else {
 				ZvalPtrDtor(&orig_user_error_handler)
 			}
@@ -809,8 +809,8 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 		/* eval() errors do not affect exit_status */
 
-		if !(__EG().GetCurrentExecuteData() != nil && __EG().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(__EG().GetCurrentExecuteData().GetFunc().GetType()) && __EG().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_INCLUDE_OR_EVAL && __EG().GetCurrentExecuteData().GetOpline().GetExtendedValue() == ZEND_EVAL) {
-			__EG().SetExitStatus(255)
+		if !(EG__().GetCurrentExecuteData() != nil && EG__().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetType()) && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_INCLUDE_OR_EVAL && EG__().GetCurrentExecuteData().GetOpline().GetExtendedValue() == ZEND_EVAL) {
+			EG__().SetExitStatus(255)
 		}
 
 		/* eval() errors do not affect exit_status */
@@ -941,7 +941,7 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
 
 	/* Marker used to disable exception generation during preloading. */
 
-	if __EG().GetException() == any(uintPtr-1) {
+	if EG__().GetException() == any(uintPtr-1) {
 		return
 	}
 	va_start(va, format)
@@ -949,7 +949,7 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
 
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
-	if __EG().GetCurrentExecuteData() != nil && __CG().GetInCompilation() == 0 {
+	if EG__().GetCurrentExecuteData() != nil && CG__().GetInCompilation() == 0 {
 		ZendThrowException(exception_ce, message, 0)
 	} else {
 		ZendError(E_ERROR, "%s", message)
@@ -998,19 +998,19 @@ func ZendUserExceptionHandler() {
 	var params []Zval
 	var retval2 Zval
 	var old_exception *ZendObject
-	old_exception = __EG().GetException()
-	__EG().SetException(nil)
+	old_exception = EG__().GetException()
+	EG__().SetException(nil)
 	ZVAL_OBJ(&params[0], old_exception)
-	ZVAL_COPY_VALUE(&orig_user_exception_handler, __EG().GetUserExceptionHandler())
-	if CallUserFunction(__CG().GetFunctionTable(), nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
+	ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
+	if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
 		ZvalPtrDtor(&retval2)
-		if __EG().GetException() != nil {
-			OBJ_RELEASE(__EG().GetException())
-			__EG().SetException(nil)
+		if EG__().GetException() != nil {
+			OBJ_RELEASE(EG__().GetException())
+			EG__().SetException(nil)
 		}
 		OBJ_RELEASE(old_exception)
 	} else {
-		__EG().SetException(old_exception)
+		EG__().SetException(old_exception)
 	}
 }
 func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
@@ -1026,18 +1026,18 @@ func ZendExecuteScripts(type_ int, retval *Zval, file_count int, _ ...any) int {
 		}
 		op_array = ZendCompileFile(file_handle, type_)
 		if file_handle.GetOpenedPath() != nil {
-			ZendHashAddEmptyElement(__EG().GetIncludedFiles(), file_handle.GetOpenedPath())
+			ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath())
 		}
 		ZendDestroyFileHandle(file_handle)
 		if op_array != nil {
 			ZendExecute(op_array, retval)
 			ZendExceptionRestore()
-			if __EG().GetException() != nil {
-				if __EG().GetUserExceptionHandler().GetType() != IS_UNDEF {
+			if EG__().GetException() != nil {
+				if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
 					ZendUserExceptionHandler()
 				}
-				if __EG().GetException() != nil {
-					ZendExceptionError(__EG().GetException(), E_ERROR)
+				if EG__().GetException() != nil {
+					ZendExceptionError(EG__().GetException(), E_ERROR)
 				}
 			}
 			DestroyOpArray(op_array)
@@ -1068,33 +1068,33 @@ func ZendMakeCompiledStringDescription(name string) *byte {
 	return compiled_string_description
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }
-func ZendMapPtrReset()         { __CG().SetMapPtrLast(GlobalMapPtrLast) }
+func ZendMapPtrReset()         { CG__().SetMapPtrLast(GlobalMapPtrLast) }
 func ZendMapPtrNew() any {
 	var ptr *any
-	if __CG().GetMapPtrLast() >= __CG().GetMapPtrSize() {
+	if CG__().GetMapPtrLast() >= CG__().GetMapPtrSize() {
 
 		/* Grow map_ptr table */
 
-		__CG().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(__CG().GetMapPtrLast()+1, 4096))
-		__CG().SetMapPtrBase(Perealloc(__CG().GetMapPtrBase(), __CG().GetMapPtrSize()*b.SizeOf("void *"), 1))
+		CG__().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(CG__().GetMapPtrLast()+1, 4096))
+		CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *"), 1))
 	}
-	ptr = (*any)(__CG().GetMapPtrBase() + __CG().GetMapPtrLast())
+	ptr = (*any)(CG__().GetMapPtrBase() + CG__().GetMapPtrLast())
 	*ptr = nil
-	__CG().GetMapPtrLast()++
+	CG__().GetMapPtrLast()++
 	return ZEND_MAP_PTR_PTR2OFFSET(ptr)
 }
 func ZendMapPtrExtend(last int) {
-	if last > __CG().GetMapPtrLast() {
+	if last > CG__().GetMapPtrLast() {
 		var ptr *any
-		if last >= __CG().GetMapPtrSize() {
+		if last >= CG__().GetMapPtrSize() {
 
 			/* Grow map_ptr table */
 
-			__CG().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(last, 4096))
-			__CG().SetMapPtrBase(Perealloc(__CG().GetMapPtrBase(), __CG().GetMapPtrSize()*b.SizeOf("void *"), 1))
+			CG__().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(last, 4096))
+			CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *"), 1))
 		}
-		ptr = (*any)(__CG().GetMapPtrBase() + __CG().GetMapPtrLast())
-		memset(ptr, 0, (last-__CG().GetMapPtrLast())*b.SizeOf("void *"))
-		__CG().SetMapPtrLast(last)
+		ptr = (*any)(CG__().GetMapPtrBase() + CG__().GetMapPtrLast())
+		memset(ptr, 0, (last-CG__().GetMapPtrLast())*b.SizeOf("void *"))
+		CG__().SetMapPtrLast(last)
 	}
 }

@@ -532,10 +532,10 @@ func ZendYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 	 * 3 => yyres != NULL, yystr is one of the expected tokens
 	 */
 
-	if yyres != nil && __CG().GetParseError() < 2 {
-		__CG().SetParseError(2)
+	if yyres != nil && CG__().GetParseError() < 2 {
+		CG__().SetParseError(2)
 	}
-	if __CG().GetParseError()%2 == 0 {
+	if CG__().GetParseError()%2 == 0 {
 
 		/* The unexpected token */
 
@@ -547,15 +547,15 @@ func ZendYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 		var len_ uint = 0
 		var toklen uint = 0
 		var yystr_len uint
-		__CG().GetParseError()++
-		if __INI_SCNG().GetYyText()[0] == 0 && __INI_SCNG().GetYyLeng() == 1 && strcmp(yystr, "\"end of file\"") == 0 {
+		CG__().GetParseError()++
+		if INI_SCNG__().GetYyText()[0] == 0 && INI_SCNG__().GetYyLeng() == 1 && strcmp(yystr, "\"end of file\"") == 0 {
 			if yyres != nil {
 				yystpcpy(yyres, "end of file")
 			}
 			return b.SizeOf("\"end of file\"") - 1
 		}
-		str = __INI_SCNG().GetYyText()
-		end = memchr(str, '\n', __INI_SCNG().GetYyLeng())
+		str = INI_SCNG__().GetYyText()
+		end = memchr(str, '\n', INI_SCNG__().GetYyLeng())
 		yystr_len = uint(yystrlen(yystr))
 		if b.Assign(&tok1, memchr(yystr, '(', yystr_len)) != nil && b.Assign(&tok2, ZendMemrchr(yystr, ')', yystr_len)) != nil {
 			toklen = tok2 - tok1 + 1
@@ -565,10 +565,10 @@ func ZendYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 			toklen = 0
 		}
 		if end == nil {
-			if __INI_SCNG().GetYyLeng() > 30 {
+			if INI_SCNG__().GetYyLeng() > 30 {
 				len_ = 30
 			} else {
-				len_ = __INI_SCNG().GetYyLeng()
+				len_ = INI_SCNG__().GetYyLeng()
 			}
 		} else {
 			if end-str > 30 {

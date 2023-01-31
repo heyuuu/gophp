@@ -583,7 +583,7 @@ try_again:
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, _IS_NUMBER, ConvertScalarToNumber)
-		if check != 0 && __EG().GetException() != nil {
+		if check != 0 && EG__().GetException() != nil {
 			return
 		}
 		ZvalPtrDtor(op)
@@ -619,7 +619,7 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		return holder
 	case IS_OBJECT:
 		ConvertObjectToType(op, holder, _IS_NUMBER, ConvertScalarToNumber)
-		if __EG().GetException() != nil || holder.GetType() != IS_LONG && holder.GetType() != IS_DOUBLE {
+		if EG__().GetException() != nil || holder.GetType() != IS_LONG && holder.GetType() != IS_DOUBLE {
 			ZVAL_LONG(holder, 1)
 		}
 		return holder
@@ -833,7 +833,7 @@ func _convertToCstring(op *Zval) {
 	if op.IsType(IS_DOUBLE) {
 		var str *ZendString
 		var dval float64 = op.GetDval()
-		str = ZendStrpprintfUnchecked(0, "%.*H", int(__EG().GetPrecision()), dval)
+		str = ZendStrpprintfUnchecked(0, "%.*H", int(EG__().GetPrecision()), dval)
 		ZVAL_NEW_STR(op, str)
 	} else {
 		_convertToString(op)
@@ -865,7 +865,7 @@ try_again:
 	case IS_DOUBLE:
 		var str *ZendString
 		var dval float64 = op.GetDval()
-		str = ZendStrpprintf(0, "%.*G", int(__EG().GetPrecision()), dval)
+		str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
 
@@ -895,7 +895,7 @@ try_again:
 			}
 			ZvalPtrDtor(z)
 		}
-		if __EG().GetException() == nil {
+		if EG__().GetException() == nil {
 			ZendThrowError(nil, "Object of class %s could not be converted to string", Z_OBJCE_P(op).GetName().GetVal())
 		}
 		ZvalPtrDtor(op)
@@ -1162,10 +1162,10 @@ try_again:
 	case IS_LONG:
 		return ZendLongToStr(op.GetLval())
 	case IS_DOUBLE:
-		return ZendStrpprintf(0, "%.*G", int(__EG().GetPrecision()), op.GetDval())
+		return ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), op.GetDval())
 	case IS_ARRAY:
 		ZendError(E_NOTICE, "Array to string conversion")
-		if try != 0 && __EG().GetException() != nil {
+		if try != 0 && EG__().GetException() != nil {
 			return nil
 		} else {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
@@ -1185,7 +1185,7 @@ try_again:
 			}
 			ZvalPtrDtor(z)
 		}
-		if __EG().GetException() == nil {
+		if EG__().GetException() == nil {
 			ZendThrowError(nil, "Object of class %s could not be converted to string", Z_OBJCE_P(op).GetName().GetVal())
 		}
 		if try != 0 {
@@ -1276,7 +1276,7 @@ func AddFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 				op2 = op1
 			}
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1353,7 +1353,7 @@ func SubFunctionSlow(result *Zval, op1 *Zval, op2 *Zval) int {
 				op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 				op2 = op1
 			}
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1432,7 +1432,7 @@ func MulFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = op1
 				}
-				if __EG().GetException() != nil {
+				if EG__().GetException() != nil {
 					if result != op1 {
 						ZVAL_UNDEF(result)
 					}
@@ -1559,7 +1559,7 @@ func PowFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					}
 					op2 = op1
 				}
-				if __EG().GetException() != nil {
+				if EG__().GetException() != nil {
 					if result != op1 {
 						ZVAL_UNDEF(result)
 					}
@@ -1647,7 +1647,7 @@ func DivFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 0)
 					op2 = op1
 				}
-				if __EG().GetException() != nil {
+				if EG__().GetException() != nil {
 					if result != op1 {
 						ZVAL_UNDEF(result)
 					}
@@ -1691,7 +1691,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1715,7 +1715,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -1730,7 +1730,7 @@ func ModFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 
 		/* modulus by zero */
 
-		if __EG().GetCurrentExecuteData() != nil && __CG().GetInCompilation() == 0 {
+		if EG__().GetCurrentExecuteData() != nil && CG__().GetInCompilation() == 0 {
 			ZendThrowExceptionEx(ZendCeDivisionByZeroError, 0, "Modulo by zero")
 		} else {
 			ZendErrorNoreturn(E_ERROR, "Modulo by zero")
@@ -1931,7 +1931,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -1945,7 +1945,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2016,7 +2016,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2030,7 +2030,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2101,7 +2101,7 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			}
 		}
 		op1_lval = _zvalGetLongFuncNoisy(op1)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2115,7 +2115,7 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			return SUCCESS
 		}
 		op2_lval = _zvalGetLongFuncNoisy(op2)
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			if result != op1 {
 				ZVAL_UNDEF(result)
 			}
@@ -2157,7 +2157,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2181,7 +2181,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2203,7 +2203,7 @@ func ShiftLeftFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_LONG(result, 0)
 			return SUCCESS
 		} else {
-			if __EG().GetCurrentExecuteData() != nil && __CG().GetInCompilation() == 0 {
+			if EG__().GetCurrentExecuteData() != nil && CG__().GetInCompilation() == 0 {
 				ZendThrowExceptionEx(ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
 				ZendErrorNoreturn(E_ERROR, "Bit shift by negative number")
@@ -2250,7 +2250,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				}
 			}
 			op1_lval = _zvalGetLongFuncNoisy(op1)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2274,7 +2274,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return SUCCESS
 			}
 			op2_lval = _zvalGetLongFuncNoisy(op2)
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				if result != op1 {
 					ZVAL_UNDEF(result)
 				}
@@ -2296,7 +2296,7 @@ func ShiftRightFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			ZVAL_LONG(result, b.Cond(op1_lval < 0, -1, 0))
 			return SUCCESS
 		} else {
-			if __EG().GetCurrentExecuteData() != nil && __CG().GetInCompilation() == 0 {
+			if EG__().GetCurrentExecuteData() != nil && CG__().GetInCompilation() == 0 {
 				ZendThrowExceptionEx(ZendCeArithmeticError, 0, "Bit shift by negative number")
 			} else {
 				ZendErrorNoreturn(E_ERROR, "Bit shift by negative number")
@@ -2344,7 +2344,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return SUCCESS
 			}
 			ZVAL_STR(&op1_copy, ZvalGetStringFunc(op1))
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				if orig_op1 != result {
 					ZVAL_UNDEF(result)
@@ -2372,7 +2372,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				return SUCCESS
 			}
 			ZVAL_STR(&op2_copy, ZvalGetStringFunc(op2))
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				ZvalPtrDtorStr(&op2_copy)
 				if orig_op1 != result {
@@ -2683,7 +2683,7 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				} else {
 					op1 = ZendiConvertScalarToNumber(op1, &op1_copy, result, 1)
 					op2 = ZendiConvertScalarToNumber(op2, &op2_copy, result, 1)
-					if __EG().GetException() != nil {
+					if EG__().GetException() != nil {
 						if result != op1 {
 							ZVAL_UNDEF(result)
 						}
@@ -3382,7 +3382,7 @@ func ZendCompareObjects(o1 *Zval, o2 *Zval) int {
 }
 func ZendLocaleSprintfDouble(op *Zval) {
 	var str *ZendString
-	str = ZendStrpprintf(0, "%.*G", int(__EG().GetPrecision()), float64(op.GetDval()))
+	str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), float64(op.GetDval()))
 	ZVAL_NEW_STR(op, str)
 }
 func ZendLongToStr(num ZendLong) *ZendString {
@@ -3500,7 +3500,7 @@ func _isNumericStringEx(str *byte, length int, lval *ZendLong, dval *float64, al
 		}
 		if allow_errors == -1 {
 			ZendError(E_NOTICE, "A non well formed numeric value encountered")
-			if __EG().GetException() != nil {
+			if EG__().GetException() != nil {
 				return 0
 			}
 		}

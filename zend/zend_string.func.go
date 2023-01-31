@@ -280,7 +280,7 @@ func ZendInternedStringsActivate() {
 	ZendInitInternedStringsHt(&(CompilerGlobals.GetInternedStrings()), 0)
 }
 func ZendInternedStringsDeactivate() {
-	__CG().GetInternedStrings().Destroy()
+	CG__().GetInternedStrings().Destroy()
 }
 func ZendInternedStringsSwitchStorage(request ZendBool) {
 	if request != 0 {

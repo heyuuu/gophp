@@ -1229,16 +1229,16 @@ func Main(argc int, argv []*byte) int {
 		 */
 
 		if !(getenv("REDIRECT_STATUS")) && !(getenv("HTTP_REDIRECT_STATUS")) && (!(CGIG(redirect_status_env)) || !(getenv(CGIG(redirect_status_env)))) {
-			var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+			var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 			var __bailout JMP_BUF
-			zend.__EG().SetBailout(&__bailout)
+			zend.EG__().SetBailout(&__bailout)
 			if zend.SETJMP(__bailout) == 0 {
 				core.SG(sapi_headers).http_response_code = 400
 				core.PUTS("<b>Security Alert!</b> The PHP CGI cannot be accessed directly.\n\n\n<p>This PHP CGI binary was compiled with force-cgi-redirect enabled.  This\n\nmeans that a page will only be served up if the REDIRECT_STATUS CGI variable is\n\nset, e.g. via an Apache Action directive.</p>\n\n<p>For more information as to <i>why</i> this behaviour exists, see the <a href=\"http://php.net/security.cgi-bin\">\nmanual page for CGI security</a>.</p>\n\n<p>For more information about changing this behaviour or re-enabling this webserver,\n\nconsult the installation file that came with this distribution, or visit \n\n<a href=\"http://php.net/install.windows\">the manual page</a>.</p>\n")
 			} else {
-				zend.__EG().SetBailout(__orig_bailout)
+				zend.EG__().SetBailout(__orig_bailout)
 			}
-			zend.__EG().SetBailout(__orig_bailout)
+			zend.EG__().SetBailout(__orig_bailout)
 			zend.Free(bindpath)
 			return zend.FAILURE
 		}
@@ -1381,10 +1381,10 @@ func Main(argc int, argv []*byte) int {
 			zend.ZendSignalInit()
 		}
 	}
-	zend.__EG().SetBailout(nil)
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	zend.EG__().SetBailout(nil)
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 1, 2)) != -1 {
 			switch c {
@@ -1441,7 +1441,7 @@ func Main(argc int, argv []*byte) int {
 						core.SG(options) |= core.SAPI_OPTION_NO_CHDIR
 						break
 					case 'e':
-						zend.__CG().SetCompilerOptions(zend.__CG().GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
+						zend.CG__().SetCompilerOptions(zend.CG__().GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
 						break
 					case 'f':
 						if script_file != nil {
@@ -1632,9 +1632,9 @@ func Main(argc int, argv []*byte) int {
 
 			if cgi != 0 || fastcgi != 0 || core.SG(request_info).path_translated {
 				if core.PhpFopenPrimaryScript(&file_handle) == zend.FAILURE {
-					var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+					var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 					var __bailout JMP_BUF
-					zend.__EG().SetBailout(&__bailout)
+					zend.EG__().SetBailout(&__bailout)
 					if zend.SETJMP(__bailout) == 0 {
 						if errno == EACCES {
 							core.SG(sapi_headers).http_response_code = 403
@@ -1644,9 +1644,9 @@ func Main(argc int, argv []*byte) int {
 							core.PUTS("No input file specified.\n")
 						}
 					} else {
-						zend.__EG().SetBailout(__orig_bailout)
+						zend.EG__().SetBailout(__orig_bailout)
 					}
-					zend.__EG().SetBailout(__orig_bailout)
+					zend.EG__().SetBailout(__orig_bailout)
 
 					/* we want to serve more requests if this is fastcgi
 					 * so cleanup and continue, request shutdown is
@@ -1672,7 +1672,7 @@ func Main(argc int, argv []*byte) int {
 				}
 			}
 			if CGIG(check_shebang_line) {
-				zend.__CG().SetSkipShebang(1)
+				zend.CG__().SetSkipShebang(1)
 			}
 			switch behavior {
 			case PHP_MODE_STANDARD:
@@ -1716,7 +1716,7 @@ func Main(argc int, argv []*byte) int {
 			}
 			core.PhpRequestShutdown(any(0))
 			if exit_status == 0 {
-				exit_status = zend.__EG().GetExitStatus()
+				exit_status = zend.EG__().GetExitStatus()
 			}
 			if free_query_string != 0 && core.SG(request_info).query_string {
 				zend.Free(core.SG(request_info).query_string)
@@ -1772,10 +1772,10 @@ func Main(argc int, argv []*byte) int {
 			zend.Free(CgiSapiModule.GetIniEntries())
 		}
 	} else {
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 		exit_status = 255
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 out:
 	if benchmark != 0 {
 		var sec int

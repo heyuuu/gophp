@@ -10,25 +10,25 @@ import (
 func ZendListInsert(ptr any, type_ int) *Zval {
 	var index int
 	var zv Zval
-	index = __EG().GetRegularList().GetNNextFreeElement()
+	index = EG__().GetRegularList().GetNNextFreeElement()
 	if index == 0 {
 		index = 1
 	} else if index == core.INT_MAX {
 		ZendErrorNoreturn(E_ERROR, "Resource ID space overflow")
 	}
 	ZVAL_NEW_RES(&zv, index, ptr, type_)
-	return __EG().GetRegularList().IndexAddNewH(index, &zv)
+	return EG__().GetRegularList().IndexAddNewH(index, &zv)
 }
 func ZendListDelete(res *ZendResource) int {
 	if res.DelRefcount() <= 0 {
-		return ZendHashIndexDel(__EG().GetRegularList(), res.GetHandle())
+		return ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
 	} else {
 		return SUCCESS
 	}
 }
 func ZendListFree(res *ZendResource) int {
 	if res.GetRefcount() <= 0 {
-		return ZendHashIndexDel(__EG().GetRegularList(), res.GetHandle())
+		return ZendHashIndexDel(EG__().GetRegularList(), res.GetHandle())
 	} else {
 		return SUCCESS
 	}
@@ -149,11 +149,11 @@ func PlistEntryDestructor(zv *Zval) {
 	Free(res)
 }
 func ZendInitRsrcList() int {
-	ZendHashInit(__EG().GetRegularList(), 8, nil, ListEntryDestructor, 0)
+	ZendHashInit(EG__().GetRegularList(), 8, nil, ListEntryDestructor, 0)
 	return SUCCESS
 }
 func ZendInitRsrcPlist() int {
-	ZendHashInitEx(__EG().GetPersistentList(), 8, nil, PlistEntryDestructor, 1, 0)
+	ZendHashInitEx(EG__().GetPersistentList(), 8, nil, PlistEntryDestructor, 1, 0)
 	return SUCCESS
 }
 func ZendCloseRsrcList(ht *HashTable) {
@@ -177,7 +177,7 @@ func ZendCleanModuleRsrcDtorsCb(zv *Zval, arg any) int {
 	var ld *ZendRsrcListDtorsEntry = (*ZendRsrcListDtorsEntry)(zv.GetPtr())
 	var module_number int = *((*int)(arg))
 	if ld.GetModuleNumber() == module_number {
-		ZendHashApplyWithArgument(__EG().GetPersistentList(), CleanModuleResource, any(&(ld.GetResourceId())))
+		ZendHashApplyWithArgument(EG__().GetPersistentList(), CleanModuleResource, any(&(ld.GetResourceId())))
 		return 1
 	} else {
 		return 0
@@ -236,7 +236,7 @@ func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_ty
 	ZVAL_NEW_PERSISTENT_RES(&tmp, -1, rsrc_pointer, rsrc_type)
 	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
-	zv = __EG().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
+	zv = EG__().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)
 	return zv.GetRes()
 }
 func ZendRegisterPersistentResource(key *byte, key_len int, rsrc_pointer any, rsrc_type int) *ZendResource {

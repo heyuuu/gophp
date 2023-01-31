@@ -44,7 +44,7 @@ func OnSetPrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg
 	var i zend.ZendLong
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
-		zend.__EG().SetPrecision(i)
+		zend.EG__().SetPrecision(i)
 		return zend.SUCCESS
 	} else {
 		return zend.FAILURE
@@ -214,11 +214,11 @@ func OnUpdateTimeout(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 
 		/* Don't set a timeout on startup, only per-request */
 
-		zend.ZEND_ATOL(zend.__EG().GetTimeoutSeconds(), new_value.GetVal())
+		zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
 		return zend.SUCCESS
 	}
 	zend.ZendUnsetTimeout()
-	zend.ZEND_ATOL(zend.__EG().GetTimeoutSeconds(), new_value.GetVal())
+	zend.ZEND_ATOL(zend.EG__().GetTimeoutSeconds(), new_value.GetVal())
 	if stage != PHP_INI_STAGE_DEACTIVATE {
 
 		/*
@@ -228,7 +228,7 @@ func OnUpdateTimeout(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 		 * the timeout, so it's not needed to do so at script end.
 		 */
 
-		zend.ZendSetTimeout(zend.__EG().GetTimeoutSeconds(), 0)
+		zend.ZendSetTimeout(zend.EG__().GetTimeoutSeconds(), 0)
 
 		/*
 		 * If we're restoring INI values, we shouldn't reset the timer.
@@ -525,8 +525,8 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		function = "PHP Startup"
 	} else if PhpDuringModuleShutdown() != 0 {
 		function = "PHP Shutdown"
-	} else if zend.__EG().GetCurrentExecuteData() != nil && zend.__EG().GetCurrentExecuteData().GetFunc() != nil && zend.ZEND_USER_CODE(zend.__EG().GetCurrentExecuteData().GetFunc().GetCommonType()) && zend.__EG().GetCurrentExecuteData().GetOpline() != nil && zend.__EG().GetCurrentExecuteData().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
-		switch zend.__EG().GetCurrentExecuteData().GetOpline().GetExtendedValue() {
+	} else if zend.EG__().GetCurrentExecuteData() != nil && zend.EG__().GetCurrentExecuteData().GetFunc() != nil && zend.ZEND_USER_CODE(zend.EG__().GetCurrentExecuteData().GetFunc().GetCommonType()) && zend.EG__().GetCurrentExecuteData().GetOpline() != nil && zend.EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
+		switch zend.EG__().GetCurrentExecuteData().GetOpline().GetExtendedValue() {
 		case zend.ZEND_EVAL:
 			function = "eval"
 			is_function = 1
@@ -657,15 +657,15 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	if docref_buf != nil {
 		zend.Efree(docref_buf)
 	}
-	if PG(track_errors) && ModuleInitialized != 0 && zend.__EG().GetActive() != 0 && (zend.__EG().GetUserErrorHandler().IsType(zend.IS_UNDEF) || (zend.__EG().GetUserErrorHandlerErrorReporting()&type_) == 0) {
+	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsType(zend.IS_UNDEF) || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp zend.Zval
 		zend.ZVAL_STRINGL(&tmp, buffer, buffer_len)
-		if zend.__EG().GetCurrentExecuteData() != nil {
+		if zend.EG__().GetCurrentExecuteData() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == zend.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.__EG().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
+			zend.EG__().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
 		}
 	}
 	if replace_buffer != nil {
@@ -728,7 +728,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 
 	/* according to error handling mode, throw exception or show it */
 
-	if zend.__EG().GetErrorHandling() == zend.EH_THROW {
+	if zend.EG__().GetErrorHandling() == zend.EH_THROW {
 		switch type_ {
 		case zend.E_ERROR:
 
@@ -765,8 +765,8 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 			 * but DO NOT overwrite a pending exception
 			 */
 
-			if zend.__EG().GetException() == nil {
-				zend.ZendThrowErrorException(zend.__EG().GetExceptionClass(), buffer, 0, type_)
+			if zend.EG__().GetException() == nil {
+				zend.ZendThrowErrorException(zend.EG__().GetExceptionClass(), buffer, 0, type_)
 			}
 			zend.Efree(buffer)
 			return
@@ -797,7 +797,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 
 	/* display/log the error if necessary */
 
-	if display != 0 && ((zend.__EG().GetErrorReporting()&type_) != 0 || (type_&zend.E_CORE) != 0) && (PG(log_errors) || PG(display_errors) || ModuleInitialized == 0) {
+	if display != 0 && ((zend.EG__().GetErrorReporting()&type_) != 0 || (type_&zend.E_CORE) != 0) && (PG(log_errors) || PG(display_errors) || ModuleInitialized == 0) {
 		var error_type_str *byte
 		var syslog_type_int int = LOG_NOTICE
 		switch type_ {
@@ -908,7 +908,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 	case zend.E_COMPILE_ERROR:
 
 	case zend.E_USER_ERROR:
-		zend.__EG().SetExitStatus(255)
+		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
 			if !(PG(display_errors)) && !(SG(headers_sent)) && SG(sapi_headers).http_response_code == 200 {
 				var ctr SapiHeaderLine = SapiHeaderLine{0}
@@ -925,7 +925,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 
 				zend.ZendSetMemoryLimit(PG(memory_limit))
 				zend.Efree(buffer)
-				zend.ZendObjectsStoreMarkDestructed(zend.__EG().GetObjectsStore())
+				zend.ZendObjectsStoreMarkDestructed(zend.EG__().GetObjectsStore())
 				zend.ZendBailout()
 				return
 			}
@@ -942,15 +942,15 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 		zend.Efree(buffer)
 		return
 	}
-	if PG(track_errors) && ModuleInitialized != 0 && zend.__EG().GetActive() != 0 {
+	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
 		var tmp zend.Zval
 		zend.ZVAL_STRINGL(&tmp, buffer, buffer_len)
-		if zend.__EG().GetCurrentExecuteData() != nil {
+		if zend.EG__().GetCurrentExecuteData() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == zend.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}
 		} else {
-			zend.__EG().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
+			zend.EG__().GetSymbolTable().KeyUpdateIndirect(b.CastStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1), &tmp)
 		}
 	}
 	zend.Efree(buffer)
@@ -1106,9 +1106,9 @@ func PhpOnTimeout(seconds int) {
 func PhpRequestStartup() int {
 	var retval int = zend.SUCCESS
 	zend.ZendInternedStringsActivate()
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		PG(in_error_log) = 0
 		PG(during_request_startup) = 1
@@ -1124,7 +1124,7 @@ func PhpRequestStartup() int {
 		SapiActivate()
 		zend.ZendSignalActivate()
 		if PG(max_input_time) == -1 {
-			zend.ZendSetTimeout(zend.__EG().GetTimeoutSeconds(), 1)
+			zend.ZendSetTimeout(zend.EG__().GetTimeoutSeconds(), 1)
 		} else {
 			zend.ZendSetTimeout(PG(max_input_time), 1)
 		}
@@ -1154,55 +1154,55 @@ func PhpRequestStartup() int {
 		zend.ZendActivateModules()
 		PG(modules_activated) = 1
 	} else {
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 		retval = zend.FAILURE
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 	SG(sapi_started) = 1
 	return retval
 }
 func PhpRequestShutdown(dummy any) {
 	var report_memleaks zend.ZendBool
-	zend.__EG().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
+	zend.EG__().AddFlags(zend.EG_FLAGS_IN_SHUTDOWN)
 	report_memleaks = PG(report_memleaks)
 
 	/* EG(current_execute_data) points into nirvana and therefore cannot be safely accessed
 	 * inside zend_executor callback functions.
 	 */
 
-	zend.__EG().SetCurrentExecuteData(nil)
+	zend.EG__().SetCurrentExecuteData(nil)
 	PhpDeactivateTicks()
 
 	/* 1. Call all possible shutdown functions registered with register_shutdown_function() */
 
 	if PG(modules_activated) {
-		var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
-		zend.__EG().SetBailout(&__bailout)
+		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
 			standard.PhpCallShutdownFunctions()
 		}
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 	}
 
 	/* 2. Call all possible __destruct() functions */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		zend.ZendCallDestructors()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 3. Flush all output buffers */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var send_buffer zend.ZendBool = b.Cond(SG(request_info).headers_only, 0, 1)
-		if zend.__CG().GetUncleanShutdown() != 0 && PG(last_error_type) == zend.E_ERROR && int(PG(memory_limit) < zend.ZendMemoryUsage(1)) != 0 {
+		if zend.CG__().GetUncleanShutdown() != 0 && PG(last_error_type) == zend.E_ERROR && int(PG(memory_limit) < zend.ZendMemoryUsage(1)) != 0 {
 			send_buffer = 0
 		}
 		if send_buffer == 0 {
@@ -1211,17 +1211,17 @@ func PhpRequestShutdown(dummy any) {
 			PhpOutputEndAll()
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 4. Reset max_execution_time (no longer executing php code after response sent) */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		zend.ZendUnsetTimeout()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 5. Call all extensions RSHUTDOWN functions */
 
@@ -1231,13 +1231,13 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 6. Shutdown output layer (send the set HTTP headers, cleanup output handlers, etc.) */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		PhpOutputDeactivate()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 7. Free shutdown functions */
 
@@ -1247,16 +1247,16 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 8. Destroy super-globals */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var i int
 		for i = 0; i < NUM_TRACK_VARS; i++ {
 			zend.ZvalPtrDtor(&PG(http_globals)[i])
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 9. free request-bound globals */
 
@@ -1268,23 +1268,23 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 11. Call all extensions post-RSHUTDOWN functions */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		zend.ZendPostDeactivateModules()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 12. SAPI related shutdown (free stuff) */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		SapiDeactivate()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 13. free virtual CWD memory */
 
@@ -1292,24 +1292,24 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 14. Destroy stream hashes */
 
-	var __orig_bailout *JMP_BUF = __EG().bailout
+	var __orig_bailout *JMP_BUF = EG__().bailout
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		PhpShutdownStreamHashes()
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* 15. Free Willy (here be crashes) */
 
 	zend.ZendInternedStringsDeactivate()
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
-		zend.ShutdownMemoryManager(zend.__CG().GetUncleanShutdown() != 0 || report_memleaks == 0, 0)
+		zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown() != 0 || report_memleaks == 0, 0)
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 
 	/* Reset memory limit, as the reset during INI_STAGE_DEACTIVATE may have failed.
 	 * At this point, no memory beyond a single chunk should be in use. */
@@ -1518,9 +1518,9 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 
 	if sapi_module.GetAdditionalFunctions() != nil {
 		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
-			zend.__EG().SetCurrentModule(module)
+			zend.EG__().SetCurrentModule(module)
 			zend.ZendRegisterFunctions(nil, sapi_module.GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
-			zend.__EG().SetCurrentModule(nil)
+			zend.EG__().SetCurrentModule(nil)
 		}
 	}
 
@@ -1559,9 +1559,9 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 		},
 	}
 	var i uint
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 
 		/* 2 = Count of deprecation structs */
@@ -1580,10 +1580,10 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 		/* 2 = Count of deprecation structs */
 
 	} else {
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 		retval = zend.FAILURE
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 	zend.VirtualCwdDeactivate()
 	SapiDeactivate()
 	ModuleStartup = 0
@@ -1620,7 +1620,7 @@ func PhpModuleShutdown() {
 
 	PhpShutdownConfig()
 	zend.ZendIniShutdown()
-	zend.ShutdownMemoryManager(zend.__CG().GetUncleanShutdown(), 1)
+	zend.ShutdownMemoryManager(zend.CG__().GetUncleanShutdown(), 1)
 	PhpOutputShutdown()
 	zend.ZendInternedStringsDtor()
 	if zend.ZendPostShutdownCb != nil {
@@ -1639,13 +1639,13 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	var append_file zend.ZendFileHandle
 	var old_cwd *byte
 	var retval int = 0
-	zend.__EG().SetExitStatus(0)
+	zend.EG__().SetExitStatus(0)
 	const OLD_CWD_SIZE = 4096
 	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
 	old_cwd[0] = '0'
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var realfile []byte
 		PG(during_request_startup) = 0
@@ -1661,7 +1661,7 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		if primary_file.GetFilename() != nil && strcmp("Standard input code", primary_file.GetFilename()) && primary_file.GetOpenedPath() == nil && primary_file.GetType() != zend.ZEND_HANDLE_FILENAME {
 			if ExpandFilepath(primary_file.GetFilename(), realfile) != nil {
 				primary_file.SetOpenedPath(zend.ZendStringInit(realfile, strlen(realfile), 0))
-				zend.ZendHashAddEmptyElement(zend.__EG().GetIncludedFiles(), primary_file.GetOpenedPath())
+				zend.ZendHashAddEmptyElement(zend.EG__().GetIncludedFiles(), primary_file.GetOpenedPath())
 			}
 		}
 		if PG(auto_prepend_file) && PG(auto_prepend_file)[0] {
@@ -1686,10 +1686,10 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		   save it and restore after prepend file been executed.
 		*/
 
-		if zend.__CG().GetSkipShebang() != 0 && prepend_file_p != nil {
-			zend.__CG().SetSkipShebang(0)
+		if zend.CG__().GetSkipShebang() != 0 && prepend_file_p != nil {
+			zend.CG__().SetSkipShebang(0)
 			if zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 1, prepend_file_p) == zend.SUCCESS {
-				zend.__CG().SetSkipShebang(1)
+				zend.CG__().SetSkipShebang(1)
 				retval = zend.ZendExecuteScripts(zend.ZEND_REQUIRE, nil, 2, primary_file, append_file_p) == zend.SUCCESS
 			}
 		} else {
@@ -1703,15 +1703,15 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 		*/
 
 	}
-	zend.__EG().SetBailout(__orig_bailout)
-	if zend.__EG().GetException() != nil {
-		var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	zend.EG__().SetBailout(__orig_bailout)
+	if zend.EG__().GetException() != nil {
+		var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 		var __bailout JMP_BUF
-		zend.__EG().SetBailout(&__bailout)
+		zend.EG__().SetBailout(&__bailout)
 		if zend.SETJMP(__bailout) == 0 {
-			zend.ZendExceptionError(zend.__EG().GetException(), zend.E_ERROR)
+			zend.ZendExceptionError(zend.EG__().GetException(), zend.E_ERROR)
 		}
-		zend.__EG().SetBailout(__orig_bailout)
+		zend.EG__().SetBailout(__orig_bailout)
 	}
 	if old_cwd[0] != '0' {
 		PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
@@ -1721,13 +1721,13 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 }
 func PhpExecuteSimpleScript(primary_file *zend.ZendFileHandle, ret *zend.Zval) int {
 	var old_cwd *byte
-	zend.__EG().SetExitStatus(0)
+	zend.EG__().SetExitStatus(0)
 	const OLD_CWD_SIZE = 4096
 	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
 	old_cwd[0] = '0'
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		PG(during_request_startup) = 0
 		if primary_file.GetFilename() != nil && (SG(options)&SAPI_OPTION_NO_CHDIR) == 0 {
@@ -1736,12 +1736,12 @@ func PhpExecuteSimpleScript(primary_file *zend.ZendFileHandle, ret *zend.Zval) i
 		}
 		zend.ZendExecuteScripts(zend.ZEND_REQUIRE, ret, 1, primary_file)
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 	if old_cwd[0] != '0' {
 		PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
 	}
 	zend.FreeAlloca(old_cwd, use_heap)
-	return zend.__EG().GetExitStatus()
+	return zend.EG__().GetExitStatus()
 }
 func PhpHandleAbortedConnection() {
 	PG(connection_status) = PHP_CONNECTION_ABORTED
@@ -1786,9 +1786,9 @@ func PhpHandleAuthData(auth *byte) int {
 func PhpLintScript(file *zend.ZendFileHandle) int {
 	var op_array *zend.ZendOpArray
 	var retval int = zend.FAILURE
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		op_array = zend.ZendCompileFile(file, zend.ZEND_INCLUDE)
 		zend.ZendDestroyFileHandle(file)
@@ -1798,9 +1798,9 @@ func PhpLintScript(file *zend.ZendFileHandle) int {
 			retval = zend.SUCCESS
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
-	if zend.__EG().GetException() != nil {
-		zend.ZendExceptionError(zend.__EG().GetException(), zend.E_ERROR)
+	zend.EG__().SetBailout(__orig_bailout)
+	if zend.EG__().GetException() != nil {
+		zend.ZendExceptionError(zend.EG__().GetException(), zend.E_ERROR)
 	}
 	return retval
 }

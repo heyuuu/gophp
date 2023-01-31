@@ -457,7 +457,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 					if zend.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
 						return zend.ZendStringInit(trypath, strlen(trypath), 0)
 					}
-					if zend.__EG().GetException() != nil {
+					if zend.EG__().GetException() != nil {
 						return nil
 					}
 				}
@@ -498,7 +498,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 						if zend.SUCCESS == wrapper.GetWops().GetUrlStat()(wrapper, trypath, PHP_STREAM_URL_STAT_QUIET, &ssb, nil) {
 							return zend.ZendStringInit(trypath, strlen(trypath), 0)
 						}
-						if zend.__EG().GetException() != nil {
+						if zend.EG__().GetException() != nil {
 							return nil
 						}
 					}

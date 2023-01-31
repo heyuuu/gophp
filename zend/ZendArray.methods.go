@@ -400,7 +400,7 @@ func (this *HashTable) Count() uint32 {
 		if this.nNumOfElements == num {
 			this.SubUFlags(HASH_FLAG_HAS_EMPTY_IND)
 		}
-	} else if this == __EG().GetSymbolTable() {
+	} else if this == EG__().GetSymbolTable() {
 		num = this.RecalcElements()
 	} else {
 		num = this.GetNNumOfElements()

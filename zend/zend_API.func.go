@@ -168,7 +168,7 @@ func CallUserFunctionEx(function_table __auto__, object *Zval, function_name *Zv
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
 }
 func ZendForbidDynamicCall(func_name string) int {
-	var ex *ZendExecuteData = __EG().GetCurrentExecuteData()
+	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
 	ZEND_ASSERT(ex != nil && ex.GetFunc() != nil)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_DYNAMIC) != 0 {
 		ZendError(E_WARNING, "Cannot call %s dynamically", func_name)
@@ -839,8 +839,8 @@ func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
 func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(__EG().GetCurrentExecuteData(), 1)
-	arg_count = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
+	param_ptr = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
 	if param_count > arg_count {
 		return FAILURE
 	}
@@ -854,8 +854,8 @@ func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(__EG().GetCurrentExecuteData(), 1)
-	arg_count = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
+	param_ptr = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
 	if param_count > arg_count {
 		return FAILURE
 	}
@@ -938,28 +938,28 @@ func ZendZvalGetType(arg *Zval) *ZendString {
 	}
 }
 func ZendWrongParametersNoneError() int {
-	var num_args int = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
-	var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
 	return FAILURE
 }
 func ZendWrongParametersNoneException() int {
-	var num_args int = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
-	var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
 	return FAILURE
 }
 func ZendWrongParametersCountError(min_num_args int, max_num_args int) {
-	var num_args int = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
-	var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 }
 func ZendWrongParametersCountException(min_num_args int, max_num_args int) {
-	var num_args int = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
-	var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 }
@@ -967,7 +967,7 @@ func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Z
 	var space *byte
 	var class_name *byte
 	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -977,7 +977,7 @@ func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, ar
 	var space *byte
 	var class_name *byte
 	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -986,7 +986,7 @@ func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, ar
 func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -995,7 +995,7 @@ func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
 func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -1004,7 +1004,7 @@ func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
 func ZendWrongCallbackError(num int, error *byte) {
 	var space *byte
 	var class_name *byte
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -1014,7 +1014,7 @@ func ZendWrongCallbackError(num int, error *byte) {
 func ZendWrongCallbackException(num int, error *byte) {
 	var space *byte
 	var class_name *byte
-	if __EG().GetException() != nil {
+	if EG__().GetException() != nil {
 		return
 	}
 	class_name = GetActiveClassName(&space)
@@ -1096,7 +1096,7 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 				return 0
 			}
 		}
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			return 0
 		}
 	} else if arg.GetType() < IS_TRUE {
@@ -1133,7 +1133,7 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 				return 0
 			}
 		}
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			return 0
 		}
 	} else if arg.GetType() < IS_TRUE {
@@ -1164,7 +1164,7 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 				return 0
 			}
 		}
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			return 0
 		}
 	} else if arg.GetType() < IS_TRUE {
@@ -1430,7 +1430,7 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 	var severity int = 0
 	expected_type = ZendParseArgImpl(arg_num, arg, va, spec, &error, &severity)
 	if expected_type != nil {
-		if __EG().GetException() != nil {
+		if EG__().GetException() != nil {
 			return FAILURE
 		}
 		if (flags&ZEND_PARSE_PARAMS_QUIET) == 0 && ((*expected_type) || error != nil) {
@@ -1459,7 +1459,7 @@ func ZendParseParameter(flags int, arg_num int, arg *Zval, spec *byte, _ ...any)
 	return ret
 }
 func ZendParseParametersDebugError(msg string) {
-	var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendErrorNoreturn(E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
 }
@@ -1563,14 +1563,14 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 	}
 	if num_args < min_num_args || num_args > max_num_args && max_num_args >= 0 {
 		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-			var active_function *ZendFunction = __EG().GetCurrentExecuteData().GetFunc()
+			var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 			var throw_exception ZendBool = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 		}
 		return FAILURE
 	}
-	arg_count = ZEND_CALL_NUM_ARGS(__EG().GetCurrentExecuteData())
+	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
 	if num_args > arg_count {
 		ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return FAILURE
@@ -1590,7 +1590,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			type_spec++
 			if num_varargs > 0 {
 				*n_varargs = num_varargs
-				*varargs = ZEND_CALL_ARG(__EG().GetCurrentExecuteData(), i+1)
+				*varargs = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), i+1)
 
 				/* adjust how many args we have left and restart loop */
 
@@ -1602,7 +1602,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 				*n_varargs = 0
 			}
 		}
-		arg = ZEND_CALL_ARG(__EG().GetCurrentExecuteData(), i+1)
+		arg = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), i+1)
 		if ZendParseArg(i+1, arg, va, &type_spec, flags) == FAILURE {
 
 			/* clean up varargs array if it was used */
@@ -1655,7 +1655,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _
 	 * In that case EG(This) would still be the $this from the calling code and we'd take the
 	 * wrong branch here. */
 
-	var is_method ZendBool = __EG().GetCurrentExecuteData().GetFunc().GetScope() != nil
+	var is_method ZendBool = EG__().GetCurrentExecuteData().GetFunc().GetScope() != nil
 	if is_method == 0 || this_ptr == nil || this_ptr.GetType() != IS_OBJECT {
 		va_start(va, type_spec)
 		retval = ZendParseVaArgs(num_args, type_spec, &va, flags)
@@ -1704,10 +1704,10 @@ func ZendParseMethodParametersEx(flags int, num_args int, this_ptr *Zval, type_s
 }
 func ZendMergeProperties(obj *Zval, properties *HashTable) {
 	var obj_ht *ZendObjectHandlers = Z_OBJ_HT_P(obj)
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	var key *ZendString
 	var value *Zval
-	__EG().SetFakeScope(Z_OBJCE_P(obj))
+	EG__().SetFakeScope(Z_OBJCE_P(obj))
 	var __ht *HashTable = properties
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -1720,7 +1720,7 @@ func ZendMergeProperties(obj *Zval, properties *HashTable) {
 			obj_ht.GetWriteProperty()(obj, &member, value, nil)
 		}
 	}
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 }
 func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 	if !class_type.IsConstantsUpdated() {
@@ -1869,15 +1869,15 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 				var prop_name_len int
 				if ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len) == SUCCESS {
 					var pname *ZendString = ZendStringInit(prop_name, prop_name_len, 0)
-					var prev_scope *ZendClassEntry = __EG().GetFakeScope()
+					var prev_scope *ZendClassEntry = EG__().GetFakeScope()
 					if class_name != nil && class_name[0] != '*' {
 						var cname *ZendString = ZendStringInit(class_name, strlen(class_name), 0)
-						__EG().SetFakeScope(ZendLookupClass(cname))
+						EG__().SetFakeScope(ZendLookupClass(cname))
 						ZendStringReleaseEx(cname, 0)
 					}
 					property_info = ZendGetPropertyInfo(object.GetCe(), pname, 1)
 					ZendStringReleaseEx(pname, 0)
-					__EG().SetFakeScope(prev_scope)
+					EG__().SetFakeScope(prev_scope)
 				} else {
 					property_info = ZEND_WRONG_PROPERTY_INFO
 				}
@@ -2256,13 +2256,13 @@ func ZendStartupModuleEx(module *ZendModuleEntry) int {
 		}
 	}
 	if module.GetModuleStartupFunc() != nil {
-		__EG().SetCurrentModule(module)
+		EG__().SetCurrentModule(module)
 		if module.GetModuleStartupFunc()(module.GetType(), module.GetModuleNumber()) == FAILURE {
 			ZendErrorNoreturn(E_CORE_ERROR, "Unable to start %s module", module.GetName())
-			__EG().SetCurrentModule(nil)
+			EG__().SetCurrentModule(nil)
 			return FAILURE
 		}
-		__EG().SetCurrentModule(nil)
+		EG__().SetCurrentModule(nil)
 	}
 	return SUCCESS
 }
@@ -2356,7 +2356,7 @@ func ZendCollectModuleHandlers() {
 
 	/* Collect internal classes with static members */
 
-	var __ht__2 *HashTable = __CG().GetClassTable()
+	var __ht__2 *HashTable = CG__().GetClassTable()
 	for _, _p := range __ht__2.foreachData() {
 		var _z *Zval = _p.GetVal()
 
@@ -2368,7 +2368,7 @@ func ZendCollectModuleHandlers() {
 	ClassCleanupHandlers = (**ZendClassEntry)(Malloc(b.SizeOf("zend_class_entry *") * (class_count + 1)))
 	ClassCleanupHandlers[class_count] = nil
 	if class_count != 0 {
-		var __ht *HashTable = __CG().GetClassTable()
+		var __ht *HashTable = CG__().GetClassTable()
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -2429,15 +2429,15 @@ func ZendRegisterModuleEx(module *ZendModuleEntry) *ZendModuleEntry {
 		return nil
 	}
 	module = module_ptr
-	__EG().SetCurrentModule(module)
+	EG__().SetCurrentModule(module)
 	if module.GetFunctions() != nil && ZendRegisterFunctions(nil, module.GetFunctions(), nil, module.GetType()) == FAILURE {
 		ZendHashDel(&ModuleRegistry, lcname)
 		ZendStringRelease(lcname)
-		__EG().SetCurrentModule(nil)
+		EG__().SetCurrentModule(nil)
 		ZendError(E_CORE_WARNING, "%s: Unable to register functions, unable to load", module.GetName())
 		return nil
 	}
-	__EG().SetCurrentModule(nil)
+	EG__().SetCurrentModule(nil)
 	ZendStringRelease(lcname)
 	return module
 }
@@ -2537,10 +2537,10 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		error_type = E_WARNING
 	}
 	if target_function_table == nil {
-		target_function_table = __CG().GetFunctionTable()
+		target_function_table = CG__().GetFunctionTable()
 	}
 	internal_function.SetType(ZEND_INTERNAL_FUNCTION)
-	internal_function.SetModule(__EG().GetCurrentModule())
+	internal_function.SetModule(EG__().GetCurrentModule())
 	memset(internal_function.GetReserved(), 0, ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 	if scope != nil {
 		class_name_len = scope.GetName().GetLen()
@@ -2870,7 +2870,7 @@ func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_t
 	var lowercase_name *ZendString
 	var fname_len int
 	if target_function_table == nil {
-		target_function_table = __CG().GetFunctionTable()
+		target_function_table = CG__().GetFunctionTable()
 	}
 	for ptr.GetFname() != nil {
 		if count != -1 && i >= count {
@@ -2910,7 +2910,7 @@ func CleanModuleClass(el *Zval, arg any) int {
 	}
 }
 func CleanModuleClasses(module_number int) {
-	ZendHashApplyWithArgument(__EG().GetClassTable(), CleanModuleClass, any(&module_number))
+	ZendHashApplyWithArgument(EG__().GetClassTable(), CleanModuleClass, any(&module_number))
 }
 func ModuleDestructor(module *ZendModuleEntry) {
 	if module.GetType() == MODULE_TEMPORARY {
@@ -2952,12 +2952,12 @@ func ZendActivateModules() {
 	}
 }
 func ZendDeactivateModules() {
-	__EG().SetCurrentExecuteData(nil)
-	var __orig_bailout *JMP_BUF = __EG().GetBailout()
+	EG__().SetCurrentExecuteData(nil)
+	var __orig_bailout *JMP_BUF = EG__().GetBailout()
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
-		if __EG().GetFullTablesCleanup() != 0 {
+		if EG__().GetFullTablesCleanup() != 0 {
 			var module *ZendModuleEntry
 			var __ht *HashTable = &ModuleRegistry
 			for _, _p := range __ht.foreachDataReserve() {
@@ -2977,7 +2977,7 @@ func ZendDeactivateModules() {
 			}
 		}
 	}
-	__EG().SetBailout(__orig_bailout)
+	EG__().SetBailout(__orig_bailout)
 }
 func ZendCleanupInternalClasses() {
 	var p **ZendClassEntry = ClassCleanupHandlers
@@ -2987,7 +2987,7 @@ func ZendCleanupInternalClasses() {
 	}
 }
 func ZendPostDeactivateModules() {
-	if __EG().GetFullTablesCleanup() != 0 {
+	if EG__().GetFullTablesCleanup() != 0 {
 		var module *ZendModuleEntry
 		var zv *Zval
 		var key *ZendString
@@ -3048,13 +3048,13 @@ func DoRegisterInternalClass(orig_class_entry *ZendClassEntry, ce_flags uint32) 
 	class_entry.SetType(ZEND_INTERNAL_CLASS)
 	ZendInitializeClassData(class_entry, 0)
 	class_entry.SetCeFlags(ce_flags | ZEND_ACC_CONSTANTS_UPDATED | ZEND_ACC_LINKED | ZEND_ACC_RESOLVED_PARENT | ZEND_ACC_RESOLVED_INTERFACES)
-	class_entry.SetModule(__EG().GetCurrentModule())
+	class_entry.SetModule(EG__().GetCurrentModule())
 	if class_entry.GetBuiltinFunctions() != nil {
-		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), __EG().GetCurrentModule().GetType())
+		ZendRegisterFunctions(class_entry, class_entry.GetBuiltinFunctions(), class_entry.GetFunctionTable(), EG__().GetCurrentModule().GetType())
 	}
-	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), __EG().GetCurrentModule().GetType() == MODULE_PERSISTENT)
+	lowercase_name = ZendStringTolowerEx(orig_class_entry.GetName(), EG__().GetCurrentModule().GetType() == MODULE_PERSISTENT)
 	lowercase_name = ZendNewInternedString(lowercase_name)
-	ZendHashUpdatePtr(__CG().GetClassTable(), lowercase_name, class_entry)
+	ZendHashUpdatePtr(CG__().GetClassTable(), lowercase_name, class_entry)
 	ZendStringReleaseEx(lowercase_name, 1)
 	return class_entry
 }
@@ -3090,7 +3090,7 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 
 	/* TODO: Move this out of here in 7.4. */
 
-	if persistent != 0 && __EG().GetCurrentModule() != nil && __EG().GetCurrentModule().GetType() == MODULE_TEMPORARY {
+	if persistent != 0 && EG__().GetCurrentModule() != nil && EG__().GetCurrentModule().GetType() == MODULE_TEMPORARY {
 		persistent = 0
 	}
 	if name[0] == '\\' {
@@ -3103,7 +3103,7 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 	ZendAssertValidClassName(lcname)
 	lcname = ZendNewInternedString(lcname)
 	ZVAL_ALIAS_PTR(&zv, ce)
-	ret = __CG().GetClassTable().KeyAdd(lcname.GetStr(), &zv)
+	ret = CG__().GetClassTable().KeyAdd(lcname.GetStr(), &zv)
 	ZendStringReleaseEx(lcname, 0)
 	if ret != nil {
 		if !ce.IsImmutable() {
@@ -3136,7 +3136,7 @@ func ZifDisplayDisabledFunction(execute_data *ZendExecuteData, return_value *Zva
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {
 	var func_ *ZendInternalFunction
-	if b.Assign(&func_, ZendHashStrFindPtr(__CG().GetFunctionTable(), function_name, function_name_length)) {
+	if b.Assign(&func_, ZendHashStrFindPtr(CG__().GetFunctionTable(), function_name, function_name_length)) {
 		ZendFreeInternalArgInfo(func_)
 		func_.SubFnFlags(ZEND_ACC_VARIADIC | ZEND_ACC_HAS_TYPE_HINTS | ZEND_ACC_HAS_RETURN_TYPE)
 		func_.SetNumArgs(0)
@@ -3172,7 +3172,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	var fn *ZendFunction
 	key = ZendStringAlloc(class_name_length, 0)
 	ZendStrTolowerCopy(key.GetVal(), class_name, class_name_length)
-	disabled_class = ZendHashFindPtr(__CG().GetClassTable(), key)
+	disabled_class = ZendHashFindPtr(CG__().GetClassTable(), key)
 	ZendStringReleaseEx(key, 0)
 	if disabled_class == nil {
 		return FAILURE
@@ -3205,13 +3205,13 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 				*error = Estrdup("cannot access self:: when no class scope is active")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(__EG().GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
 				fcc.SetCalledScope(scope)
 			}
 			fcc.SetCallingScope(scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(__EG().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
 			}
 			ret = 1
 		}
@@ -3225,19 +3225,19 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 				*error = Estrdup("cannot access parent:: when current class scope has no parent")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(__EG().GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.parent) == 0 {
 				fcc.SetCalledScope(scope.parent)
 			}
 			fcc.SetCallingScope(scope.parent)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(__EG().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
 	} else if ZendStringEqualsLiteral(lcname, "static") {
-		var called_scope *ZendClassEntry = ZendGetCalledScope(__EG().GetCurrentExecuteData())
+		var called_scope *ZendClassEntry = ZendGetCalledScope(EG__().GetCurrentExecuteData())
 		if called_scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access static:: when no class scope is active")
@@ -3246,14 +3246,14 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 			fcc.SetCalledScope(called_scope)
 			fcc.SetCallingScope(called_scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(__EG().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
 	} else if b.Assign(&ce, ZendLookupClass(name)) != nil {
 		var scope *ZendClassEntry
-		var ex *ZendExecuteData = __EG().GetCurrentExecuteData()
+		var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
 		for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 			ex = ex.GetPrevExecuteData()
 		}
@@ -3264,7 +3264,7 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 		}
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
-			var object *ZendObject = ZendGetThisObject(__EG().GetCurrentExecuteData())
+			var object *ZendObject = ZendGetThisObject(EG__().GetCurrentExecuteData())
 			if object != nil && InstanceofFunction(object.GetCe(), scope) != 0 && InstanceofFunction(scope, ce) != 0 {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
@@ -3453,7 +3453,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 				retval = 1
 				call_via_handler = fcc.GetFunctionHandler().IsCallViaTrampoline()
 				if call_via_handler != 0 && fcc.GetObject() == nil {
-					var object *ZendObject = ZendGetThisObject(__EG().GetCurrentExecuteData())
+					var object *ZendObject = ZendGetThisObject(EG__().GetCurrentExecuteData())
 					if object != nil && InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
 						fcc.SetObject(object)
 					}
@@ -3897,7 +3897,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		property_info = Pemalloc(b.SizeOf("zend_property_info"), 1)
 	} else {
-		property_info = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_property_info"))
+		property_info = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_property_info"))
 		if property.IsType(IS_CONSTANT_AST) {
 			ce.SetIsConstantsUpdated(false)
 		}
@@ -3921,7 +3921,7 @@ func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zv
 		ZVAL_COPY_VALUE(ce.GetDefaultStaticMembersTable()[property_info.GetOffset()], property)
 		if ce.GetStaticMembersTablePtr() == nil {
 			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
-			if __EG().GetCurrentExecuteData() == nil {
+			if EG__().GetCurrentExecuteData() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
 
@@ -4131,7 +4131,7 @@ func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zva
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
 		c = Pemalloc(b.SizeOf("zend_class_constant"), 1)
 	} else {
-		c = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_class_constant"))
+		c = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_class_constant"))
 	}
 	ZVAL_COPY_VALUE(c.GetValue(), value)
 	c.GetValue().GetAccessFlags() = access_type
@@ -4187,20 +4187,20 @@ func ZendDeclareClassConstantString(ce *ZendClassEntry, name *byte, name_length 
 }
 func ZendUpdatePropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, value *Zval) {
 	var property Zval
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
-	__EG().SetFakeScope(scope)
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	EG__().SetFakeScope(scope)
 	ZVAL_STR(&property, name)
 	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 }
 func ZendUpdateProperty(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *Zval) {
 	var property Zval
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
-	__EG().SetFakeScope(scope)
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	EG__().SetFakeScope(scope)
 	ZVAL_STRINGL(&property, name, name_length)
 	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
 	ZvalPtrDtor(&property)
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 }
 func ZendUpdatePropertyNull(scope *ZendClassEntry, object *Zval, name *byte, name_length int) {
 	var tmp Zval
@@ -4209,12 +4209,12 @@ func ZendUpdatePropertyNull(scope *ZendClassEntry, object *Zval, name *byte, nam
 }
 func ZendUnsetProperty(scope *ZendClassEntry, object *Zval, name string, name_length int) {
 	var property Zval
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
-	__EG().SetFakeScope(scope)
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	EG__().SetFakeScope(scope)
 	ZVAL_STRINGL(&property, name, name_length)
 	Z_OBJ_HT_P(object).GetUnsetProperty()(object, &property, 0)
 	ZvalPtrDtor(&property)
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 }
 func ZendUpdatePropertyBool(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value ZendLong) {
 	var tmp Zval
@@ -4252,15 +4252,15 @@ func ZendUpdateStaticPropertyEx(scope *ZendClassEntry, name *ZendString, value *
 	var property *Zval
 	var tmp Zval
 	var prop_info *ZendPropertyInfo
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	if !scope.IsConstantsUpdated() {
 		if ZendUpdateClassConstants(scope) != SUCCESS {
 			return FAILURE
 		}
 	}
-	__EG().SetFakeScope(scope)
+	EG__().SetFakeScope(scope)
 	property = ZendStdGetStaticPropertyWithInfo(scope, name, BP_VAR_W, &prop_info)
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 	if property == nil {
 		return FAILURE
 	}
@@ -4318,11 +4318,11 @@ func ZendUpdateStaticPropertyStringl(scope *ZendClassEntry, name *byte, name_len
 func ZendReadPropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, silent ZendBool, rv *Zval) *Zval {
 	var property Zval
 	var value *Zval
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
-	__EG().SetFakeScope(scope)
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	EG__().SetFakeScope(scope)
 	ZVAL_STR(&property, name)
 	value = Z_OBJ_HT_P(object).GetReadProperty()(object, &property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 	return value
 }
 func ZendReadProperty(scope *ZendClassEntry, object *Zval, name string, name_length int, silent ZendBool, rv *Zval) *Zval {
@@ -4335,10 +4335,10 @@ func ZendReadProperty(scope *ZendClassEntry, object *Zval, name string, name_len
 }
 func ZendReadStaticPropertyEx(scope *ZendClassEntry, name *ZendString, silent ZendBool) *Zval {
 	var property *Zval
-	var old_scope *ZendClassEntry = __EG().GetFakeScope()
-	__EG().SetFakeScope(scope)
+	var old_scope *ZendClassEntry = EG__().GetFakeScope()
+	EG__().SetFakeScope(scope)
 	property = ZendStdGetStaticProperty(scope, name, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R))
-	__EG().SetFakeScope(old_scope)
+	EG__().SetFakeScope(old_scope)
 	return property
 }
 func ZendReadStaticProperty(scope *ZendClassEntry, name *byte, name_length int, silent ZendBool) *Zval {
@@ -4348,8 +4348,8 @@ func ZendReadStaticProperty(scope *ZendClassEntry, name *byte, name_length int, 
 	return property
 }
 func ZendSaveErrorHandling(current *ZendErrorHandling) {
-	current.SetHandling(__EG().GetErrorHandling())
-	current.SetException(__EG().GetExceptionClass())
+	current.SetHandling(EG__().GetErrorHandling())
+	current.SetException(EG__().GetExceptionClass())
 	ZVAL_UNDEF(current.GetUserHandler())
 }
 func ZendReplaceErrorHandling(error_handling ZendErrorHandlingT, exception_class *ZendClassEntry, current *ZendErrorHandling) {
@@ -4357,12 +4357,12 @@ func ZendReplaceErrorHandling(error_handling ZendErrorHandlingT, exception_class
 		ZendSaveErrorHandling(current)
 	}
 	ZEND_ASSERT(error_handling == EH_THROW || exception_class == nil)
-	__EG().SetErrorHandling(error_handling)
-	__EG().SetExceptionClass(exception_class)
+	EG__().SetErrorHandling(error_handling)
+	EG__().SetExceptionClass(exception_class)
 }
 func ZendRestoreErrorHandling(saved *ZendErrorHandling) {
-	__EG().SetErrorHandling(saved.GetHandling())
-	__EG().SetExceptionClass(saved.GetException())
+	EG__().SetErrorHandling(saved.GetHandling())
+	EG__().SetExceptionClass(saved.GetException())
 }
 func ZendFindAliasName(ce *ZendClassEntry, name *ZendString) *ZendString {
 	var alias *ZendTraitAlias

@@ -16,12 +16,12 @@ func ZendWeakrefUnref(zv *Zval) {
 	wr.SetReferent(nil)
 }
 func ZendWeakrefsInit() {
-	ZendHashInit(__EG().GetWeakrefs(), 8, nil, ZendWeakrefUnref, 0)
+	ZendHashInit(EG__().GetWeakrefs(), 8, nil, ZendWeakrefUnref, 0)
 }
 func ZendWeakrefsNotify(object *ZendObject) {
-	ZendHashIndexDel(__EG().GetWeakrefs(), ZendUlong(object))
+	ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(object))
 }
-func ZendWeakrefsShutdown() { __EG().GetWeakrefs().Destroy() }
+func ZendWeakrefsShutdown() { EG__().GetWeakrefs().Destroy() }
 func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	var wr *ZendWeakref = ZendObjectAlloc(b.SizeOf("zend_weakref"), ZendCeWeakref)
 	ZendObjectStdInit(wr.GetStd(), ZendCeWeakref)
@@ -29,7 +29,7 @@ func ZendWeakrefNew(ce *ZendClassEntry) *ZendObject {
 	return wr.GetStd()
 }
 func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
-	var wr *ZendWeakref = ZendHashIndexFindPtr(__EG().GetWeakrefs(), ZendUlong(referent.GetObj()))
+	var wr *ZendWeakref = ZendHashIndexFindPtr(EG__().GetWeakrefs(), ZendUlong(referent.GetObj()))
 	if wr == nil {
 		return 0
 	}
@@ -42,7 +42,7 @@ func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
 	ObjectInitEx(return_value, ZendCeWeakref)
 	wr = ZendWeakrefFetch(return_value)
 	wr.SetReferent(referent.GetObj())
-	ZendHashIndexAddPtr(__EG().GetWeakrefs(), ZendUlong(wr.GetReferent()), wr)
+	ZendHashIndexAddPtr(EG__().GetWeakrefs(), ZendUlong(wr.GetReferent()), wr)
 	wr.GetReferent().AddGcFlags(IS_OBJ_WEAKLY_REFERENCED)
 }
 func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
@@ -55,7 +55,7 @@ func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 func ZendWeakrefFree(zo *ZendObject) {
 	var wr *ZendWeakref = ZendWeakrefFrom(zo)
 	if wr.GetReferent() != nil {
-		ZendHashIndexDel(__EG().GetWeakrefs(), ZendUlong(wr.GetReferent()))
+		ZendHashIndexDel(EG__().GetWeakrefs(), ZendUlong(wr.GetReferent()))
 	}
 	ZendObjectStdDtor(wr.GetStd())
 }
@@ -64,13 +64,13 @@ func ZendWeakrefUnsupported(thing string) {
 }
 func ZendWeakrefNoWrite(object *Zval, member *Zval, value *Zval, rtc *any) *Zval {
 	ZendWeakrefUnsupported("properties")
-	return __EG().GetUninitializedZval()
+	return EG__().GetUninitializedZval()
 }
 func ZendWeakrefNoRead(object *Zval, member *Zval, type_ int, rtc *any, rv *Zval) *Zval {
-	if __EG().GetException() == nil {
+	if EG__().GetException() == nil {
 		ZendWeakrefUnsupported("properties")
 	}
-	return __EG().GetUninitializedZval()
+	return EG__().GetUninitializedZval()
 }
 func ZendWeakrefNoReadPtr(object *Zval, member *Zval, type_ int, rtc *any) *Zval {
 	ZendWeakrefUnsupported("property references")

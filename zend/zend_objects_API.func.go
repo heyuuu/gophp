@@ -17,8 +17,8 @@ func SET_OBJ_BUCKET_NUMBER(o *ZendObject, n int) {
 	o = (*ZendObject)(zend_uintptr_t(n)<<1 | OBJ_BUCKET_INVALID)
 }
 func ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST(h int) {
-	SET_OBJ_BUCKET_NUMBER(__EG().GetObjectsStore().GetObjectBuckets()[h], __EG().GetObjectsStore().GetFreeListHead())
-	__EG().GetObjectsStore().SetFreeListHead(h)
+	SET_OBJ_BUCKET_NUMBER(EG__().GetObjectsStore().GetObjectBuckets()[h], EG__().GetObjectsStore().GetFreeListHead())
+	EG__().GetObjectsStore().SetFreeListHead(h)
 }
 func OBJ_RELEASE(obj *ZendObject)               { ZendObjectRelease(obj) }
 func ZendObjectStoreCtorFailed(obj *ZendObject) { obj.AddGcFlags(IS_OBJ_DESTRUCTOR_CALLED) }
@@ -66,7 +66,7 @@ func ZendObjectsStoreDestroy(objects *ZendObjectsStore) {
 	objects.SetObjectBuckets(nil)
 }
 func ZendObjectsStoreCallDestructors(objects *ZendObjectsStore) {
-	__EG().SetIsObjectStoreNoReuse(true)
+	EG__().SetIsObjectStoreNoReuse(true)
 	if objects.GetTop() > 1 {
 		var i uint32
 		for i = 1; i < objects.GetTop(); i++ {
@@ -149,16 +149,16 @@ func ZendObjectsStoreFreeObjectStorage(objects *ZendObjectsStore, fast_shutdown 
 }
 func ZendObjectsStorePutCold(object *ZendObject) {
 	var handle int
-	var new_size uint32 = 2 * __EG().GetObjectsStore().GetSize()
-	__EG().GetObjectsStore().SetObjectBuckets((**ZendObject)(Erealloc(__EG().GetObjectsStore().GetObjectBuckets(), new_size*b.SizeOf("zend_object *"))))
+	var new_size uint32 = 2 * EG__().GetObjectsStore().GetSize()
+	EG__().GetObjectsStore().SetObjectBuckets((**ZendObject)(Erealloc(EG__().GetObjectsStore().GetObjectBuckets(), new_size*b.SizeOf("zend_object *"))))
 
 	/* Assign size after realloc, in case it fails */
 
-	__EG().GetObjectsStore().SetSize(new_size)
-	__EG().GetObjectsStore().GetTop()++
-	handle = __EG().GetObjectsStore().GetTop() - 1
+	EG__().GetObjectsStore().SetSize(new_size)
+	EG__().GetObjectsStore().GetTop()++
+	handle = EG__().GetObjectsStore().GetTop() - 1
 	object.SetHandle(handle)
-	__EG().GetObjectsStore().GetObjectBuckets()[handle] = object
+	EG__().GetObjectsStore().GetObjectBuckets()[handle] = object
 }
 func ZendObjectsStorePut(object *ZendObject) {
 	var handle int
@@ -167,18 +167,18 @@ func ZendObjectsStorePut(object *ZendObject) {
 	 * the dtors for newly created objects are called in zend_objects_store_call_destructors() loop
 	 */
 
-	if __EG().GetObjectsStore().GetFreeListHead() != -1 && !__EG().IsObjectStoreNoReuse() {
-		handle = __EG().GetObjectsStore().GetFreeListHead()
-		__EG().GetObjectsStore().SetFreeListHead(GET_OBJ_BUCKET_NUMBER(__EG().GetObjectsStore().GetObjectBuckets()[handle]))
-	} else if __EG().GetObjectsStore().GetTop() == __EG().GetObjectsStore().GetSize() {
+	if EG__().GetObjectsStore().GetFreeListHead() != -1 && !EG__().IsObjectStoreNoReuse() {
+		handle = EG__().GetObjectsStore().GetFreeListHead()
+		EG__().GetObjectsStore().SetFreeListHead(GET_OBJ_BUCKET_NUMBER(EG__().GetObjectsStore().GetObjectBuckets()[handle]))
+	} else if EG__().GetObjectsStore().GetTop() == EG__().GetObjectsStore().GetSize() {
 		ZendObjectsStorePutCold(object)
 		return
 	} else {
-		__EG().GetObjectsStore().GetTop()++
-		handle = __EG().GetObjectsStore().GetTop() - 1
+		EG__().GetObjectsStore().GetTop()++
+		handle = EG__().GetObjectsStore().GetTop() - 1
 	}
 	object.SetHandle(handle)
-	__EG().GetObjectsStore().GetObjectBuckets()[handle] = object
+	EG__().GetObjectsStore().GetObjectBuckets()[handle] = object
 }
 func ZendObjectsStoreDel(object *ZendObject) {
 	ZEND_ASSERT(object.GetRefcount() == 0)
@@ -205,9 +205,9 @@ func ZendObjectsStoreDel(object *ZendObject) {
 	if object.GetRefcount() == 0 {
 		var handle uint32 = object.GetHandle()
 		var ptr any
-		ZEND_ASSERT(__EG().GetObjectsStore().GetObjectBuckets() != nil)
-		ZEND_ASSERT(IS_OBJ_VALID(__EG().GetObjectsStore().GetObjectBuckets()[handle]))
-		__EG().GetObjectsStore().GetObjectBuckets()[handle] = SET_OBJ_INVALID(object)
+		ZEND_ASSERT(EG__().GetObjectsStore().GetObjectBuckets() != nil)
+		ZEND_ASSERT(IS_OBJ_VALID(EG__().GetObjectsStore().GetObjectBuckets()[handle]))
+		EG__().GetObjectsStore().GetObjectBuckets()[handle] = SET_OBJ_INVALID(object)
 		if (object.GetGcFlags() & IS_OBJ_FREE_CALLED) == 0 {
 			object.AddGcFlags(IS_OBJ_FREE_CALLED)
 			object.SetRefcount(1)

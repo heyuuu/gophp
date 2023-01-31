@@ -265,15 +265,15 @@ func ZendMmPanic(message string) {
 }
 func ZendMmSafeError(heap *ZendMmHeap, format string, limit int, size int) {
 	heap.SetOverflow(1)
-	var __orig_bailout *JMP_BUF = __EG().GetBailout()
+	var __orig_bailout *JMP_BUF = EG__().GetBailout()
 	var __bailout JMP_BUF
-	__EG().SetBailout(&__bailout)
+	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
 		ZendErrorNoreturn(E_ERROR, format, limit, size)
 	} else {
-		__EG().SetBailout(__orig_bailout)
+		EG__().SetBailout(__orig_bailout)
 	}
-	__EG().SetBailout(__orig_bailout)
+	EG__().SetBailout(__orig_bailout)
 	heap.SetOverflow(0)
 	ZendBailout()
 	exit(1)

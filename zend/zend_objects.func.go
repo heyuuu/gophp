@@ -75,7 +75,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
 
-				if __EG().GetCurrentExecuteData() != nil {
+				if EG__().GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
 						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
@@ -94,7 +94,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a protected function, we're allowed to do so.
 				 */
 
-				if __EG().GetCurrentExecuteData() != nil {
+				if EG__().GetCurrentExecuteData() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
 						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
@@ -118,16 +118,16 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		 */
 
 		old_exception = nil
-		if __EG().GetException() != nil {
-			if __EG().GetException() == object {
+		if EG__().GetException() != nil {
+			if EG__().GetException() == object {
 				ZendErrorNoreturn(E_CORE_ERROR, "Attempt to destruct pending exception")
 			} else {
-				old_exception = __EG().GetException()
-				__EG().SetException(nil)
+				old_exception = EG__().GetException()
+				EG__().SetException(nil)
 			}
 		}
-		orig_fake_scope = __EG().GetFakeScope()
-		__EG().SetFakeScope(nil)
+		orig_fake_scope = EG__().GetFakeScope()
+		EG__().SetFakeScope(nil)
 		ZVAL_UNDEF(&ret)
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(object)
@@ -142,14 +142,14 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		ZendCallFunction(&fci, &fcic)
 		ZvalPtrDtor(&ret)
 		if old_exception != nil {
-			if __EG().GetException() != nil {
-				ZendExceptionSetPrevious(__EG().GetException(), old_exception)
+			if EG__().GetException() != nil {
+				ZendExceptionSetPrevious(EG__().GetException(), old_exception)
 			} else {
-				__EG().SetException(old_exception)
+				EG__().SetException(old_exception)
 			}
 		}
 		OBJ_RELEASE(object)
-		__EG().SetFakeScope(orig_fake_scope)
+		EG__().SetFakeScope(orig_fake_scope)
 	}
 }
 func ZendObjectsNew(ce *ZendClassEntry) *ZendObject {

@@ -74,7 +74,7 @@ again:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", COMMON, struc.GetLval())
 		break
 	case zend.IS_DOUBLE:
-		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.__EG().GetPrecision()), struc.GetDval())
+		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
 		break
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
@@ -322,7 +322,7 @@ again:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", COMMON, struc.GetLval())
 		break
 	case zend.IS_DOUBLE:
-		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.__EG().GetPrecision()), struc.GetDval())
+		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
 		break
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
@@ -890,7 +890,7 @@ func PhpVarSerializeCallMagicSerialize(retval *zend.Zval, obj *zend.Zval) int {
 	var res int
 	zend.ZVAL_STRINGL(&fname, "__serialize", b.SizeOf("\"__serialize\"")-1)
 	BG(serialize_lock)++
-	res = zend.CallUserFunction(zend.__CG().GetFunctionTable(), obj, &fname, retval, 0, 0)
+	res = zend.CallUserFunction(zend.CG__().GetFunctionTable(), obj, &fname, retval, 0, 0)
 	BG(serialize_lock)--
 	zend.ZvalPtrDtorStr(&fname)
 	if res == zend.FAILURE || zend.Z_ISUNDEF_P(retval) {
@@ -959,7 +959,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			zend.ZendTmpStringRelease(tmp_name)
 			continue
 		}
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			zend.ZendTmpStringRelease(tmp_name)
 			retval = zend.FAILURE
 			break
@@ -971,7 +971,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			continue
 		}
 		zend.ZendStringRelease(priv_name)
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			zend.ZendTmpStringRelease(tmp_name)
 			retval = zend.FAILURE
 			break
@@ -983,13 +983,13 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			continue
 		}
 		zend.ZendStringRelease(prot_name)
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			zend.ZendTmpStringRelease(tmp_name)
 			retval = zend.FAILURE
 			break
 		}
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "\"%s\" returned as member variable from __sleep() but does not exist", name.GetVal())
-		ht.KeyAdd(name.GetStr(), zend.__EG().GetUninitializedZval())
+		ht.KeyAdd(name.GetStr(), zend.EG__().GetUninitializedZval())
 		zend.ZendTmpStringRelease(tmp_name)
 	}
 	zend.ZendReleaseProperties(props)
@@ -1064,7 +1064,7 @@ func PhpVarSerializeClass(buf *zend.SmartStr, struc *zend.Zval, retval_ptr *zend
 func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSerializeDataT) {
 	var var_already zend.ZendLong
 	var myht *zend.HashTable
-	if zend.__EG().GetException() != nil {
+	if zend.EG__().GetException() != nil {
 		return
 	}
 	if var_hash != nil && b.Assign(&var_already, PhpAddVarHash(var_hash, struc)) {
@@ -1123,7 +1123,7 @@ again:
 			zend.Z_ADDREF_P(struc)
 			zend.ZVAL_OBJ(&obj, struc.GetObj())
 			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == zend.FAILURE {
-				if zend.__EG().GetException() == nil {
+				if zend.EG__().GetException() == nil {
 					zend.SmartStrAppendl(buf, "N;", 2)
 				}
 				zend.ZvalPtrDtor(&obj)
@@ -1194,7 +1194,7 @@ again:
 			zend.Z_ADDREF_P(struc)
 			zend.ZVAL_OBJ(&tmp, struc.GetObj())
 			if PhpVarSerializeCallSleep(&retval, &tmp) == zend.FAILURE {
-				if zend.__EG().GetException() == nil {
+				if zend.EG__().GetException() == nil {
 
 					/* we should still add element even if it's not OK,
 					 * since we already wrote the length of the array before */
@@ -1343,7 +1343,7 @@ func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PHP_VAR_SERIALIZE_INIT(var_hash)
 	PhpVarSerialize(&buf, struc, &var_hash)
 	PHP_VAR_SERIALIZE_DESTROY(var_hash)
-	if zend.__EG().GetException() != nil {
+	if zend.EG__().GetException() != nil {
 		zend.SmartStrFree(&buf)
 		zend.RETVAL_FALSE
 		return
@@ -1480,7 +1480,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 			/* Exception during string conversion. */
 
-			if zend.__EG().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				goto cleanup
 			}
 
@@ -1518,7 +1518,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		retval = return_value
 	}
 	if PhpVarUnserialize(retval, &p, p+buf_len, &var_hash) == 0 {
-		if zend.__EG().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 			core.PhpErrorDocref(nil, zend.E_NOTICE, "Error at offset "+zend.ZEND_LONG_FMT+" of %zd bytes", zend_long((*byte)(p-buf)), buf_len)
 		}
 		if BG(unserialize).level <= 1 {

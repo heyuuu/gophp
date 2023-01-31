@@ -65,8 +65,8 @@ func GC_MAKE_GARBAGE(ptr __auto__) any { return any(uintPtr(ptr) | GC_GARBAGE) }
 func GC_MAKE_DTOR_GARBAGE(ptr *ZendObject) any {
 	return any(uintPtr(ptr) | GC_DTOR_GARBAGE)
 }
-func GC_IDX2PTR(idx *GcRootBuffer) __auto__ { return __GC_G().GetBuf() + idx }
-func GC_PTR2IDX(ptr *GcRootBuffer) int      { return ptr - __GC_G().GetBuf() }
+func GC_IDX2PTR(idx *GcRootBuffer) __auto__ { return GC_G__().GetBuf() + idx }
+func GC_PTR2IDX(ptr *GcRootBuffer) int      { return ptr - GC_G__().GetBuf() }
 func GC_IDX2LIST(idx uint32) any {
 	return any(uintPtr(idx*b.SizeOf("void *") | GC_UNUSED))
 }
@@ -74,15 +74,15 @@ func GC_LIST2IDX(list *ZendRefcounted) int {
 	return uint32(uintPtr)(list) / b.SizeOf("void *")
 }
 func GC_HAS_UNUSED() bool {
-	return __GC_G().GetUnused() != GC_INVALID
+	return GC_G__().GetUnused() != GC_INVALID
 }
 func GC_FETCH_UNUSED() uint32           { return GcFetchUnused() }
 func GC_LINK_UNUSED(root *GcRootBuffer) { GcLinkUnused(root) }
 func GC_HAS_NEXT_UNUSED_UNDER_THRESHOLD() bool {
-	return __GC_G().GetFirstUnused() < __GC_G().GetGcThreshold()
+	return GC_G__().GetFirstUnused() < GC_G__().GetGcThreshold()
 }
 func GC_HAS_NEXT_UNUSED() bool {
-	return __GC_G().GetFirstUnused() != __GC_G().GetBufSize()
+	return GC_G__().GetFirstUnused() != GC_G__().GetBufSize()
 }
 func GC_FETCH_NEXT_UNUSED() uint32 { return GcFetchNextUnused() }
 func GC_STACK_DCL(init *GcStack) {
@@ -141,7 +141,7 @@ func GcDecompress(ref *ZendRefcounted, idx uint32) *GcRootBuffer {
 	}
 	for true {
 		idx += GC_MAX_UNCOMPRESSED
-		ZEND_ASSERT(idx < __GC_G().GetFirstUnused())
+		ZEND_ASSERT(idx < GC_G__().GetFirstUnused())
 		root = GC_IDX2PTR(idx)
 		if GC_GET_PTR(root.GetRef()) == ref {
 			return root
@@ -152,26 +152,26 @@ func GcFetchUnused() uint32 {
 	var idx uint32
 	var root *GcRootBuffer
 	ZEND_ASSERT(GC_HAS_UNUSED())
-	idx = __GC_G().GetUnused()
+	idx = GC_G__().GetUnused()
 	root = GC_IDX2PTR(idx)
 	ZEND_ASSERT(GC_IS_UNUSED(root.GetRef()))
-	__GC_G().SetUnused(GC_LIST2IDX(root.GetRef()))
+	GC_G__().SetUnused(GC_LIST2IDX(root.GetRef()))
 	return idx
 }
 func GcLinkUnused(root *GcRootBuffer) {
-	root.SetRef(GC_IDX2LIST(__GC_G().GetUnused()))
-	__GC_G().SetUnused(GC_PTR2IDX(root))
+	root.SetRef(GC_IDX2LIST(GC_G__().GetUnused()))
+	GC_G__().SetUnused(GC_PTR2IDX(root))
 }
 func GcFetchNextUnused() uint32 {
 	var idx uint32
 	ZEND_ASSERT(GC_HAS_NEXT_UNUSED())
-	idx = __GC_G().GetFirstUnused()
-	__GC_G().SetFirstUnused(__GC_G().GetFirstUnused() + 1)
+	idx = GC_G__().GetFirstUnused()
+	GC_G__().SetFirstUnused(GC_G__().GetFirstUnused() + 1)
 	return idx
 }
 func GcRemoveFromRoots(root *GcRootBuffer) {
 	GC_LINK_UNUSED(root)
-	__GC_G().GetNumRoots()--
+	GC_G__().GetNumRoots()--
 }
 func RootBufferDtor(gc_globals *ZendGcGlobals) {
 	if gc_globals.GetBuf() != nil {
@@ -196,57 +196,57 @@ func GcGlobalsCtorEx(gc_globals *ZendGcGlobals) {
 func GcGlobalsCtor() { GcGlobalsCtorEx(&GcGlobals) }
 func GcGlobalsDtor() { RootBufferDtor(&GcGlobals) }
 func GcReset() {
-	if __GC_G().GetBuf() != nil {
-		__GC_G().SetGcActive(0)
-		__GC_G().SetGcProtected(0)
-		__GC_G().SetGcFull(0)
-		__GC_G().SetUnused(GC_INVALID)
-		__GC_G().SetFirstUnused(GC_FIRST_ROOT)
-		__GC_G().SetNumRoots(0)
-		__GC_G().SetGcRuns(0)
-		__GC_G().SetCollected(0)
+	if GC_G__().GetBuf() != nil {
+		GC_G__().SetGcActive(0)
+		GC_G__().SetGcProtected(0)
+		GC_G__().SetGcFull(0)
+		GC_G__().SetUnused(GC_INVALID)
+		GC_G__().SetFirstUnused(GC_FIRST_ROOT)
+		GC_G__().SetNumRoots(0)
+		GC_G__().SetGcRuns(0)
+		GC_G__().SetCollected(0)
 	}
 }
 func GcEnable(enable ZendBool) ZendBool {
-	var old_enabled ZendBool = __GC_G().GetGcEnabled()
-	__GC_G().SetGcEnabled(enable)
-	if enable != 0 && old_enabled == 0 && __GC_G().GetBuf() == nil {
-		__GC_G().SetBuf((*GcRootBuffer)(Pemalloc(b.SizeOf("gc_root_buffer")*GC_DEFAULT_BUF_SIZE, 1)))
-		__GC_G().GetBuf()[0].SetRef(nil)
-		__GC_G().SetBufSize(GC_DEFAULT_BUF_SIZE)
-		__GC_G().SetGcThreshold(GC_THRESHOLD_DEFAULT + GC_FIRST_ROOT)
+	var old_enabled ZendBool = GC_G__().GetGcEnabled()
+	GC_G__().SetGcEnabled(enable)
+	if enable != 0 && old_enabled == 0 && GC_G__().GetBuf() == nil {
+		GC_G__().SetBuf((*GcRootBuffer)(Pemalloc(b.SizeOf("gc_root_buffer")*GC_DEFAULT_BUF_SIZE, 1)))
+		GC_G__().GetBuf()[0].SetRef(nil)
+		GC_G__().SetBufSize(GC_DEFAULT_BUF_SIZE)
+		GC_G__().SetGcThreshold(GC_THRESHOLD_DEFAULT + GC_FIRST_ROOT)
 		GcReset()
 	}
 	return old_enabled
 }
-func GcEnabled() ZendBool { return __GC_G().GetGcEnabled() }
+func GcEnabled() ZendBool { return GC_G__().GetGcEnabled() }
 func GcProtect(protect ZendBool) ZendBool {
-	var old_protected ZendBool = __GC_G().GetGcProtected()
-	__GC_G().SetGcProtected(protect)
+	var old_protected ZendBool = GC_G__().GetGcProtected()
+	GC_G__().SetGcProtected(protect)
 	return old_protected
 }
-func GcProtected() ZendBool { return __GC_G().GetGcProtected() }
+func GcProtected() ZendBool { return GC_G__().GetGcProtected() }
 func GcGrowRootBuffer() {
 	var new_size int
-	if __GC_G().GetBufSize() >= GC_MAX_BUF_SIZE {
-		if __GC_G().GetGcFull() == 0 {
+	if GC_G__().GetBufSize() >= GC_MAX_BUF_SIZE {
+		if GC_G__().GetGcFull() == 0 {
 			ZendError(E_WARNING, "GC buffer overflow (GC disabled)\n")
-			__GC_G().SetGcActive(1)
-			__GC_G().SetGcProtected(1)
-			__GC_G().SetGcFull(1)
+			GC_G__().SetGcActive(1)
+			GC_G__().SetGcProtected(1)
+			GC_G__().SetGcFull(1)
 			return
 		}
 	}
-	if __GC_G().GetBufSize() < GC_BUF_GROW_STEP {
-		new_size = __GC_G().GetBufSize() * 2
+	if GC_G__().GetBufSize() < GC_BUF_GROW_STEP {
+		new_size = GC_G__().GetBufSize() * 2
 	} else {
-		new_size = __GC_G().GetBufSize() + GC_BUF_GROW_STEP
+		new_size = GC_G__().GetBufSize() + GC_BUF_GROW_STEP
 	}
 	if new_size > GC_MAX_BUF_SIZE {
 		new_size = GC_MAX_BUF_SIZE
 	}
-	__GC_G().SetBuf(Perealloc(__GC_G().GetBuf(), b.SizeOf("gc_root_buffer")*new_size, 1))
-	__GC_G().SetBufSize(new_size)
+	GC_G__().SetBuf(Perealloc(GC_G__().GetBuf(), b.SizeOf("gc_root_buffer")*new_size, 1))
+	GC_G__().SetBufSize(new_size)
 }
 func GcAdjustThreshold(count int) {
 	var new_threshold uint32
@@ -259,27 +259,27 @@ func GcAdjustThreshold(count int) {
 
 		/* increase */
 
-		if __GC_G().GetGcThreshold() < GC_THRESHOLD_MAX {
-			new_threshold = __GC_G().GetGcThreshold() + GC_THRESHOLD_STEP
+		if GC_G__().GetGcThreshold() < GC_THRESHOLD_MAX {
+			new_threshold = GC_G__().GetGcThreshold() + GC_THRESHOLD_STEP
 			if new_threshold > GC_THRESHOLD_MAX {
 				new_threshold = GC_THRESHOLD_MAX
 			}
-			if new_threshold > __GC_G().GetBufSize() {
+			if new_threshold > GC_G__().GetBufSize() {
 				GcGrowRootBuffer()
 			}
-			if new_threshold <= __GC_G().GetBufSize() {
-				__GC_G().SetGcThreshold(new_threshold)
+			if new_threshold <= GC_G__().GetBufSize() {
+				GC_G__().SetGcThreshold(new_threshold)
 			}
 		}
 
 		/* increase */
 
-	} else if __GC_G().GetGcThreshold() > GC_THRESHOLD_DEFAULT {
-		new_threshold = __GC_G().GetGcThreshold() - GC_THRESHOLD_STEP
+	} else if GC_G__().GetGcThreshold() > GC_THRESHOLD_DEFAULT {
+		new_threshold = GC_G__().GetGcThreshold() - GC_THRESHOLD_STEP
 		if new_threshold < GC_THRESHOLD_DEFAULT {
 			new_threshold = GC_THRESHOLD_DEFAULT
 		}
-		__GC_G().SetGcThreshold(new_threshold)
+		GC_G__().SetGcThreshold(new_threshold)
 	}
 
 	/* TODO Very simple heuristic for dynamic GC buffer resizing:
@@ -291,7 +291,7 @@ func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 	var newRoot *GcRootBuffer
 	ZEND_ASSERT(ref.GetGcType() == IS_ARRAY || ref.GetGcType() == IS_OBJECT)
 	ZEND_ASSERT(ref.GetGcInfo() == 0)
-	if __GC_G().GetGcEnabled() != 0 && __GC_G().GetGcActive() == 0 {
+	if GC_G__().GetGcEnabled() != 0 && GC_G__().GetGcActive() == 0 {
 		ref.AddRefcount()
 		GcAdjustThreshold(GcCollectCycles())
 		if ref.DelRefcount() == 0 {
@@ -316,12 +316,12 @@ func GcPossibleRootWhenFull(ref *ZendRefcounted) {
 	newRoot.SetRef(ref)
 	idx = GcCompress(idx)
 	GC_REF_SET_INFO(ref, idx|GC_PURPLE)
-	__GC_G().GetNumRoots()++
+	GC_G__().GetNumRoots()++
 }
 func GcPossibleRoot(ref *ZendRefcounted) {
 	var idx uint32
 	var newRoot *GcRootBuffer
-	if __GC_G().GetGcProtected() != 0 {
+	if GC_G__().GetGcProtected() != 0 {
 		return
 	}
 	if GC_HAS_UNUSED() {
@@ -338,7 +338,7 @@ func GcPossibleRoot(ref *ZendRefcounted) {
 	newRoot.SetRef(ref)
 	idx = GcCompress(idx)
 	GC_REF_SET_INFO(ref, idx|GC_PURPLE)
-	__GC_G().GetNumRoots()++
+	GC_G__().GetNumRoots()++
 }
 func GcRemoveCompressed(ref *ZendRefcounted, idx uint32) {
 	var root *GcRootBuffer = GcDecompress(ref, idx)
@@ -354,7 +354,7 @@ func GcRemoveFromBuffer(ref *ZendRefcounted) {
 
 	/* Perform decompression only in case of large buffers */
 
-	if __GC_G().GetFirstUnused() >= GC_MAX_UNCOMPRESSED {
+	if GC_G__().GetFirstUnused() >= GC_MAX_UNCOMPRESSED {
 		GcRemoveCompressed(ref, idx)
 		return
 	}
@@ -416,7 +416,7 @@ tail_call:
 			goto next
 		}
 	} else if ref.GetGcType() == IS_ARRAY {
-		if (*ZendArray)(ref != __EG().GetSymbolTable()) != nil {
+		if (*ZendArray)(ref != EG__().GetSymbolTable()) != nil {
 			ht = (*ZendArray)(ref)
 		} else {
 			goto next
@@ -537,7 +537,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				goto next
 			}
 		} else if ref.GetGcType() == IS_ARRAY {
-			if (*ZendArray)(ref) == __EG().GetSymbolTable() {
+			if (*ZendArray)(ref) == EG__().GetSymbolTable() {
 				GC_REF_SET_BLACK(ref)
 				goto next
 			} else {
@@ -607,11 +607,11 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 	}
 }
 func GcCompact() {
-	if __GC_G().GetNumRoots()+GC_FIRST_ROOT != __GC_G().GetFirstUnused() {
-		if __GC_G().GetNumRoots() != 0 {
+	if GC_G__().GetNumRoots()+GC_FIRST_ROOT != GC_G__().GetFirstUnused() {
+		if GC_G__().GetNumRoots() != 0 {
 			var free *GcRootBuffer = GC_IDX2PTR(GC_FIRST_ROOT)
-			var scan *GcRootBuffer = GC_IDX2PTR(__GC_G().GetFirstUnused() - 1)
-			var end *GcRootBuffer = GC_IDX2PTR(__GC_G().GetNumRoots())
+			var scan *GcRootBuffer = GC_IDX2PTR(GC_G__().GetFirstUnused() - 1)
+			var end *GcRootBuffer = GC_IDX2PTR(GC_G__().GetNumRoots())
 			var idx uint32
 			var p *ZendRefcounted
 			for free < scan {
@@ -635,8 +635,8 @@ func GcCompact() {
 				}
 			}
 		}
-		__GC_G().SetUnused(GC_INVALID)
-		__GC_G().SetFirstUnused(__GC_G().GetNumRoots() + GC_FIRST_ROOT)
+		GC_G__().SetUnused(GC_INVALID)
+		GC_G__().SetFirstUnused(GC_G__().GetNumRoots() + GC_FIRST_ROOT)
 	}
 }
 func GcMarkRoots(stack *GcStack) {
@@ -644,7 +644,7 @@ func GcMarkRoots(stack *GcStack) {
 	var last *GcRootBuffer
 	GcCompact()
 	current = GC_IDX2PTR(GC_FIRST_ROOT)
-	last = GC_IDX2PTR(__GC_G().GetFirstUnused())
+	last = GC_IDX2PTR(GC_G__().GetFirstUnused())
 	for current != last {
 		if GC_IS_ROOT(current.GetRef()) {
 			if GC_REF_CHECK_COLOR(current.GetRef(), GC_PURPLE) {
@@ -722,7 +722,7 @@ tail_call:
 					goto next
 				}
 			} else if ref.GetGcType() == IS_ARRAY {
-				if (*ZendArray)(ref == __EG().GetSymbolTable()) != nil {
+				if (*ZendArray)(ref == EG__().GetSymbolTable()) != nil {
 					GC_REF_SET_BLACK(ref)
 					goto next
 				} else {
@@ -791,7 +791,7 @@ next:
 }
 func GcScanRoots(stack *GcStack) {
 	var current *GcRootBuffer = GC_IDX2PTR(GC_FIRST_ROOT)
-	var last *GcRootBuffer = GC_IDX2PTR(__GC_G().GetFirstUnused())
+	var last *GcRootBuffer = GC_IDX2PTR(GC_G__().GetFirstUnused())
 	for current != last {
 		if GC_IS_ROOT(current.GetRef()) {
 			if GC_REF_CHECK_COLOR(current.GetRef(), GC_GREY) {
@@ -820,7 +820,7 @@ func GcAddGarbage(ref *ZendRefcounted) {
 	buf.SetRef(GC_MAKE_GARBAGE(ref))
 	idx = GcCompress(idx)
 	GC_REF_SET_INFO(ref, idx|GC_BLACK)
-	__GC_G().GetNumRoots()++
+	GC_G__().GetNumRoots()++
 }
 func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 	var count int = 0
@@ -969,7 +969,7 @@ func GcCollectRoots(flags *uint32, stack *GcStack) int {
 	var ref *ZendRefcounted
 	var count int = 0
 	var current *GcRootBuffer = GC_IDX2PTR(GC_FIRST_ROOT)
-	var last *GcRootBuffer = GC_IDX2PTR(__GC_G().GetFirstUnused())
+	var last *GcRootBuffer = GC_IDX2PTR(GC_G__().GetFirstUnused())
 
 	/* remove non-garbage from the list */
 
@@ -988,7 +988,7 @@ func GcCollectRoots(flags *uint32, stack *GcStack) int {
 	 * make sure to reload pointers. */
 
 	idx = GC_FIRST_ROOT
-	end = __GC_G().GetFirstUnused()
+	end = GC_G__().GetFirstUnused()
 	for idx != end {
 		current = GC_IDX2PTR(idx)
 		ref = current.GetRef()
@@ -1107,7 +1107,7 @@ tail_call:
 }
 func ZendGcCollectCycles() int {
 	var count int = 0
-	if __GC_G().GetNumRoots() != 0 {
+	if GC_G__().GetNumRoots() != 0 {
 		var current *GcRootBuffer
 		var last *GcRootBuffer
 		var p *ZendRefcounted
@@ -1117,23 +1117,23 @@ func ZendGcCollectCycles() int {
 		var stack GcStack
 		stack.SetPrev(nil)
 		stack.SetNext(nil)
-		if __GC_G().GetGcActive() != 0 {
+		if GC_G__().GetGcActive() != 0 {
 			return 0
 		}
-		__GC_G().GetGcRuns()++
-		__GC_G().SetGcActive(1)
+		GC_G__().GetGcRuns()++
+		GC_G__().SetGcActive(1)
 		GcMarkRoots(&stack)
 		GcScanRoots(&stack)
 		count = GcCollectRoots(&gc_flags, &stack)
 		GcStackFree(&stack)
-		if __GC_G().GetNumRoots() == 0 {
+		if GC_G__().GetNumRoots() == 0 {
 
 			/* nothing to free */
 
-			__GC_G().SetGcActive(0)
+			GC_G__().SetGcActive(0)
 			return 0
 		}
-		end = __GC_G().GetFirstUnused()
+		end = GC_G__().GetFirstUnused()
 		if (gc_flags & GC_HAS_DESTRUCTORS) != 0 {
 
 			/* During a destructor call, new externally visible references to nested data may
@@ -1210,7 +1210,7 @@ func ZendGcCollectCycles() int {
 				}
 				idx++
 			}
-			if __GC_G().GetGcProtected() != 0 {
+			if GC_G__().GetGcProtected() != 0 {
 
 				/* something went wrong */
 
@@ -1230,7 +1230,7 @@ func ZendGcCollectCycles() int {
 				p = GC_GET_PTR(current.GetRef())
 				if p.GetGcType() == IS_OBJECT {
 					var obj *ZendObject = (*ZendObject)(p)
-					__EG().GetObjectsStore().GetObjectBuckets()[obj.GetHandle()] = SET_OBJ_INVALID(obj)
+					EG__().GetObjectsStore().GetObjectBuckets()[obj.GetHandle()] = SET_OBJ_INVALID(obj)
 					obj.GetGcTypeInfo() = IS_NULL | obj.GetGcTypeInfo() & ^GC_TYPE_MASK
 
 					/* Modify current before calling free_obj (bug #78811: free_obj() can cause the root buffer (with current) to be reallocated.) */
@@ -1263,20 +1263,20 @@ func ZendGcCollectCycles() int {
 			if GC_IS_GARBAGE(current.GetRef()) {
 				p = GC_GET_PTR(current.GetRef())
 				GC_LINK_UNUSED(current)
-				__GC_G().GetNumRoots()--
+				GC_G__().GetNumRoots()--
 				Efree(p)
 			}
 			current++
 		}
-		__GC_G().SetCollected(__GC_G().GetCollected() + count)
-		__GC_G().SetGcActive(0)
+		GC_G__().SetCollected(GC_G__().GetCollected() + count)
+		GC_G__().SetGcActive(0)
 	}
 	GcCompact()
 	return count
 }
 func ZendGcGetStatus(status *ZendGcStatus) {
-	status.SetRuns(__GC_G().GetGcRuns())
-	status.SetCollected(__GC_G().GetCollected())
-	status.SetThreshold(__GC_G().GetGcThreshold())
-	status.SetNumRoots(__GC_G().GetNumRoots())
+	status.SetRuns(GC_G__().GetGcRuns())
+	status.SetCollected(GC_G__().GetCollected())
+	status.SetThreshold(GC_G__().GetGcThreshold())
+	status.SetNumRoots(GC_G__().GetNumRoots())
 }

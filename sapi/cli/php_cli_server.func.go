@@ -1420,13 +1420,13 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 	}
 	var zfd zend.ZendFileHandle
 	zend.ZendStreamInitFilename(&zfd, core.SG(request_info).path_translated)
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		core.PhpExecuteScript(&zfd)
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 	PhpCliServerLogResponse(client, core.SG(sapi_headers).http_response_code, nil)
 	return zend.SUCCESS
 }
@@ -1521,9 +1521,9 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 	old_cwd[0] = '0'
 	core.PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, core.MAXPATHLEN-1))
 	zend.ZendStreamInitFilename(&zfd, server.GetRouter())
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var retval zend.Zval
 		zend.ZVAL_UNDEF(&retval)
@@ -1536,7 +1536,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 			decline = 1
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 	if old_cwd[0] != '0' {
 		core.PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
 	}

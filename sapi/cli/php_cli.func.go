@@ -92,7 +92,7 @@ func SapiCliUbWrite(str *byte, str_length int) int {
 	for remaining > 0 {
 		ret = SapiCliSingleWrite(ptr, remaining)
 		if ret < 0 {
-			zend.__EG().SetExitStatus(255)
+			zend.EG__().SetExitStatus(255)
 			core.PhpHandleAbortedConnection()
 			break
 		}
@@ -269,11 +269,11 @@ func DoCli(argc int, argv **byte) int {
 	var interactive int = 0
 	var param_error *byte = nil
 	var hide_argv int = 0
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
-		zend.__CG().SetInCompilation(0)
+		zend.CG__().SetInCompilation(0)
 		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
 			switch c {
 			case 'i':
@@ -517,7 +517,7 @@ func DoCli(argc int, argv **byte) int {
 			goto err
 		}
 		request_started = 1
-		zend.__CG().SetSkipShebang(1)
+		zend.CG__().SetSkipShebang(1)
 		zend.ZendRegisterBoolConstant(zend.ZEND_STRL("PHP_CLI_PROCESS_TITLE"), IsPsTitleAvailable() == PS_TITLE_SUCCESS, zend.CONST_CS, 0)
 		*arg_excp = arg_free
 		if hide_argv != 0 {
@@ -537,7 +537,7 @@ func DoCli(argc int, argv **byte) int {
 				exit_status = CliShellCallbacks.GetCliShellRun()()
 			} else {
 				core.PhpExecuteScript(&file_handle)
-				exit_status = zend.__EG().GetExitStatus()
+				exit_status = zend.EG__().GetExitStatus()
 			}
 			break
 		case PHP_MODE_LINT:
@@ -584,9 +584,9 @@ func DoCli(argc int, argv **byte) int {
 					input[len_] = '0'
 				}
 				zend.ZVAL_STRINGL(&argn, input, len_+1)
-				zend.__EG().GetSymbolTable().KeyUpdate(b.CastStr("argn", b.SizeOf("\"argn\"")-1), &argn)
+				zend.EG__().GetSymbolTable().KeyUpdate(b.CastStr("argn", b.SizeOf("\"argn\"")-1), &argn)
 				zend.ZVAL_LONG(&argi, b.PreInc(&index))
-				zend.__EG().GetSymbolTable().KeyUpdate(b.CastStr("argi", b.SizeOf("\"argi\"")-1), &argi)
+				zend.EG__().GetSymbolTable().KeyUpdate(b.CastStr("argi", b.SizeOf("\"argi\"")-1), &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254
@@ -596,9 +596,9 @@ func DoCli(argc int, argv **byte) int {
 						if CliSeekFileBegin(&file_handle, script_file) != zend.SUCCESS {
 							exit_status = 1
 						} else {
-							zend.__CG().SetSkipShebang(1)
+							zend.CG__().SetSkipShebang(1)
 							core.PhpExecuteScript(&file_handle)
-							exit_status = zend.__EG().GetExitStatus()
+							exit_status = zend.EG__().GetExitStatus()
 						}
 					}
 				}
@@ -642,17 +642,17 @@ func DoCli(argc int, argv **byte) int {
 			zend.ZVAL_STRING(&arg, reflection_what)
 			zend.ObjectInitEx(&ref, pce)
 			memset(&execute_data, 0, b.SizeOf("zend_execute_data"))
-			zend.__EG().SetCurrentExecuteData(&execute_data)
+			zend.EG__().SetCurrentExecuteData(&execute_data)
 			zend.ZendCallMethodWith1Params(&ref, pce, pce.GetConstructor(), "__construct", nil, &arg)
-			if zend.__EG().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				var tmp zend.Zval
 				var msg *zend.Zval
 				var rv zend.Zval
-				zend.ZVAL_OBJ(&tmp, zend.__EG().GetException())
+				zend.ZVAL_OBJ(&tmp, zend.EG__().GetException())
 				msg = zend.ZendReadProperty(zend.ZendCeException, &tmp, "message", b.SizeOf("\"message\"")-1, 0, &rv)
 				zend.ZendPrintf("Exception: %s\n", zend.Z_STRVAL_P(msg))
 				zend.ZvalPtrDtor(&tmp)
-				zend.__EG().SetException(nil)
+				zend.EG__().SetException(nil)
 				exit_status = 1
 			} else {
 				zend.ZendPrintZval(&ref, 0)
@@ -685,7 +685,7 @@ func DoCli(argc int, argv **byte) int {
 			break
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 out:
 	if request_started != 0 {
 		core.PhpRequestShutdown(any(0))
@@ -694,7 +694,7 @@ out:
 		zend.Free(translated_path)
 	}
 	if exit_status == 0 {
-		exit_status = zend.__EG().GetExitStatus()
+		exit_status = zend.EG__().GetExitStatus()
 	}
 	return exit_status
 err:
@@ -832,12 +832,12 @@ exit_loop:
 	/* -e option */
 
 	if use_extended_info != 0 {
-		zend.__CG().SetCompilerOptions(zend.__CG().GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
+		zend.CG__().SetCompilerOptions(zend.CG__().GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
 	}
-	zend.__EG().SetBailout(nil)
-	var __orig_bailout *JMP_BUF = zend.__EG().GetBailout()
+	zend.EG__().SetBailout(nil)
+	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
-	zend.__EG().SetBailout(&__bailout)
+	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		if sapi_module == &CliSapiModule {
 			exit_status = DoCli(argc, argv)
@@ -845,7 +845,7 @@ exit_loop:
 			exit_status = DoCliServer(argc, argv)
 		}
 	}
-	zend.__EG().SetBailout(__orig_bailout)
+	zend.EG__().SetBailout(__orig_bailout)
 out:
 	if ini_path_override != nil {
 		zend.Free(ini_path_override)

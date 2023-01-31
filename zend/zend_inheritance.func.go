@@ -27,7 +27,7 @@ func ZendDuplicateInternalFunction(func_ *ZendFunction, ce *ZendClassEntry) *Zen
 		new_function = Pemalloc(b.SizeOf("zend_internal_function"), 1)
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
 	} else {
-		new_function = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_internal_function"))
+		new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_internal_function"))
 		memcpy(new_function, func_, b.SizeOf("zend_internal_function"))
 		new_function.SetIsArenaAllocated(true)
 	}
@@ -38,7 +38,7 @@ func ZendDuplicateInternalFunction(func_ *ZendFunction, ce *ZendClassEntry) *Zen
 }
 func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 	var new_function *ZendFunction
-	new_function = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_op_array"))
+	new_function = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 	memcpy(new_function, func_, b.SizeOf("zend_op_array"))
 	if ZEND_MAP_PTR_GET(func_.GetOpArray().static_variables_ptr) {
 
@@ -52,7 +52,7 @@ func ZendDuplicateUserFunction(func_ *ZendFunction) *ZendFunction {
 	if (new_function.GetOpArray().GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
 		new_function.GetOpArray().GetStaticVariables().AddRefcount()
 	}
-	if (__CG().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
 		ZEND_ASSERT(new_function.GetOpArray().IsPreloaded())
 		ZEND_MAP_PTR_NEW(new_function.GetOpArray().static_variables_ptr)
 	} else {
@@ -177,15 +177,15 @@ func ResolveClassName(scope *ZendClassEntry, name *ZendString) *ZendString {
 }
 func ClassVisible(ce *ZendClassEntry) ZendBool {
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		return !(__CG().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES)
+		return !(CG__().GetCompilerOptions() & ZEND_COMPILE_IGNORE_INTERNAL_CLASSES)
 	} else {
 		ZEND_ASSERT(ce.GetType() == ZEND_USER_CLASS)
-		return (__CG().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || ce.GetFilename() == __CG().GetCompiledFilename()
+		return (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || ce.GetFilename() == CG__().GetCompiledFilename()
 	}
 }
 func LookupClass(scope *ZendClassEntry, name *ZendString) *ZendClassEntry {
 	var ce *ZendClassEntry
-	if __CG().GetInCompilation() == 0 {
+	if CG__().GetInCompilation() == 0 {
 		var flags uint32 = ZEND_FETCH_CLASS_ALLOW_UNLINKED | ZEND_FETCH_CLASS_NO_AUTOLOAD
 		ce = ZendLookupClassEx(name, nil, flags)
 		if ce != nil {
@@ -194,11 +194,11 @@ func LookupClass(scope *ZendClassEntry, name *ZendString) *ZendClassEntry {
 
 		/* We'll autoload this class and process delayed variance obligations later. */
 
-		if __CG().GetDelayedAutoloads() == nil {
-			ALLOC_HASHTABLE(__CG().GetDelayedAutoloads())
-			ZendHashInit(__CG().GetDelayedAutoloads(), 0, nil, nil, 0)
+		if CG__().GetDelayedAutoloads() == nil {
+			ALLOC_HASHTABLE(CG__().GetDelayedAutoloads())
+			ZendHashInit(CG__().GetDelayedAutoloads(), 0, nil, nil, 0)
 		}
-		ZendHashAddEmptyElement(__CG().GetDelayedAutoloads(), name)
+		ZendHashAddEmptyElement(CG__().GetDelayedAutoloads(), name)
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce != nil && ClassVisible(ce) != 0 {
@@ -736,7 +736,7 @@ func DoInheritanceCheckOnMethodEx(child *ZendFunction, parent *ZendFunction, ce 
 
 					/* op_array wasn't duplicated yet */
 
-					var new_function *ZendFunction = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_op_array"))
+					var new_function *ZendFunction = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 					memcpy(new_function, child, b.SizeOf("zend_op_array"))
 					child = new_function
 					child_zv.SetPtr(child)
@@ -972,7 +972,7 @@ func ZendBuildPropertiesInfoTable(ce *ZendClassEntry) {
 	ZEND_ASSERT(ce.GetPropertiesInfoTable() == nil)
 	size = b.SizeOf("zend_property_info *") * ce.GetDefaultPropertiesCount()
 	if ce.GetType() == ZEND_USER_CLASS {
-		table = ZendArenaAlloc(__CG().GetArena(), size)
+		table = ZendArenaAlloc(CG__().GetArena(), size)
 		ce.SetPropertiesInfoTable(table)
 	} else {
 		table = Pemalloc(size, 1)
@@ -1207,7 +1207,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 		ce.SetDefaultStaticMembersCount(ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount())
 		if ce.GetStaticMembersTablePtr() == nil {
 			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
-			if __EG().GetCurrentExecuteData() == nil {
+			if EG__().GetCurrentExecuteData() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
 
@@ -1554,11 +1554,11 @@ func ZendAddTraitMethod(ce *ZendClassEntry, name *byte, key *ZendString, fn *Zen
 		}
 	}
 	if fn.GetType() == ZEND_INTERNAL_FUNCTION {
-		new_fn = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_internal_function"))
+		new_fn = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_internal_function"))
 		memcpy(new_fn, fn, b.SizeOf("zend_internal_function"))
 		new_fn.SetIsArenaAllocated(true)
 	} else {
-		new_fn = ZendArenaAlloc(__CG().GetArena(), b.SizeOf("zend_op_array"))
+		new_fn = ZendArenaAlloc(CG__().GetArena(), b.SizeOf("zend_op_array"))
 		memcpy(new_fn, fn, b.SizeOf("zend_op_array"))
 		new_fn.GetOpArray().SetIsTraitClone(true)
 		new_fn.GetOpArray().SetIsImmutable(false)
@@ -2158,18 +2158,18 @@ func VarianceObligationHtDtor(zv *Zval) {
 func GetOrInitObligationsForClass(ce *ZendClassEntry) *HashTable {
 	var ht *HashTable
 	var key ZendUlong
-	if __CG().GetDelayedVarianceObligations() == nil {
-		ALLOC_HASHTABLE(__CG().GetDelayedVarianceObligations())
-		ZendHashInit(__CG().GetDelayedVarianceObligations(), 0, nil, VarianceObligationHtDtor, 0)
+	if CG__().GetDelayedVarianceObligations() == nil {
+		ALLOC_HASHTABLE(CG__().GetDelayedVarianceObligations())
+		ZendHashInit(CG__().GetDelayedVarianceObligations(), 0, nil, VarianceObligationHtDtor, 0)
 	}
 	key = ZendUlong(uintPtr(ce))
-	ht = ZendHashIndexFindPtr(__CG().GetDelayedVarianceObligations(), key)
+	ht = ZendHashIndexFindPtr(CG__().GetDelayedVarianceObligations(), key)
 	if ht != nil {
 		return ht
 	}
 	ALLOC_HASHTABLE(ht)
 	ZendHashInit(ht, 0, nil, VarianceObligationDtor, 0)
-	ZendHashIndexAddNewPtr(__CG().GetDelayedVarianceObligations(), key, ht)
+	ZendHashIndexAddNewPtr(CG__().GetDelayedVarianceObligations(), key, ht)
 	ce.SetIsUnresolvedVariance(true)
 	return ht
 }
@@ -2242,7 +2242,7 @@ func CheckVarianceObligation(zv *Zval) int {
 	return ZEND_HASH_APPLY_REMOVE
 }
 func LoadDelayedClasses() {
-	var delayed_autoloads *HashTable = __CG().GetDelayedAutoloads()
+	var delayed_autoloads *HashTable = CG__().GetDelayedAutoloads()
 	var name *ZendString
 	if delayed_autoloads == nil {
 		return
@@ -2250,7 +2250,7 @@ func LoadDelayedClasses() {
 
 	/* Take ownership of this HT, to avoid concurrent modification during autoloading. */
 
-	__CG().SetDelayedAutoloads(nil)
+	CG__().SetDelayedAutoloads(nil)
 	var __ht *HashTable = delayed_autoloads
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -2262,7 +2262,7 @@ func LoadDelayedClasses() {
 	FREE_HASHTABLE(delayed_autoloads)
 }
 func ResolveDelayedVarianceObligations(ce *ZendClassEntry) {
-	var all_obligations *HashTable = __CG().GetDelayedVarianceObligations()
+	var all_obligations *HashTable = CG__().GetDelayedVarianceObligations()
 	var obligations *HashTable
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
 	ZEND_ASSERT(all_obligations != nil)
@@ -2276,7 +2276,7 @@ func ResolveDelayedVarianceObligations(ce *ZendClassEntry) {
 	}
 }
 func ReportVarianceErrors(ce *ZendClassEntry) {
-	var all_obligations *HashTable = __CG().GetDelayedVarianceObligations()
+	var all_obligations *HashTable = CG__().GetDelayedVarianceObligations()
 	var obligations *HashTable
 	var obligation *VarianceObligation
 	var num_key ZendUlong = ZendUlong(uintPtr(ce))
@@ -2320,8 +2320,8 @@ func CheckUnrecoverableLoadFailure(ce *ZendClassEntry) {
 	if ce.IsHasUnlinkedUses() {
 		var exception_str *ZendString
 		var exception_zv Zval
-		ZEND_ASSERT(__EG().GetException() != nil && "Exception must have been thrown")
-		ZVAL_OBJ(&exception_zv, __EG().GetException())
+		ZEND_ASSERT(EG__().GetException() != nil && "Exception must have been thrown")
+		ZVAL_OBJ(&exception_zv, EG__().GetException())
 		Z_ADDREF(exception_zv)
 		ZendClearException()
 		exception_str = ZvalGetString(&exception_zv)
@@ -2452,12 +2452,12 @@ func ZendTryEarlyBind(ce *ZendClassEntry, parent_ce *ZendClassEntry, lcname *Zen
 	var status InheritanceStatus = ZendCanEarlyBind(ce, parent_ce)
 	if status != INHERITANCE_UNRESOLVED {
 		if delayed_early_binding != nil {
-			if ZendHashSetBucketKey(__EG().GetClassTable(), (*Bucket)(delayed_early_binding), lcname) == nil {
+			if ZendHashSetBucketKey(EG__().GetClassTable(), (*Bucket)(delayed_early_binding), lcname) == nil {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
 				return 0
 			}
 		} else {
-			if ZendHashAddPtr(__CG().GetClassTable(), lcname, ce) == nil {
+			if ZendHashAddPtr(CG__().GetClassTable(), lcname, ce) == nil {
 				return 0
 			}
 		}

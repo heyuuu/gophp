@@ -197,9 +197,9 @@ func SplFilesystemDirOpen(intern *SplFilesystemObject, path *byte) {
 		intern.SetPath(zend.Estrndup(path, intern.GetPathLen()))
 	}
 	intern.SetIndex(0)
-	if zend.__EG().GetException() != nil || intern.GetDirp() == nil {
+	if zend.EG__().GetException() != nil || intern.GetDirp() == nil {
 		intern.GetEntry().GetDName()[0] = '0'
-		if zend.__EG().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 
 			/* open failed w/out notice (turned to exception due to EH_THROW) */
 
@@ -230,7 +230,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 	intern.SetContext(streams.PhpStreamContextFromZval(intern.GetZcontext(), 0))
 	intern.SetStream(core.PhpStreamOpenWrapperEx(intern.GetFileName(), intern.GetOpenMode(), b.Cond(use_include_path != 0, core.USE_PATH, 0)|core.REPORT_ERRORS, nil, intern.GetContext()))
 	if intern.GetFileNameLen() == 0 || intern.GetStream() == nil {
-		if zend.__EG().GetException() == nil {
+		if zend.EG__().GetException() == nil {
 			zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Cannot open file '%s'", b.CondF1(intern.GetFileNameLen() != 0, func() *byte { return intern.GetFileName() }, ""))
 		}
 		intern.SetFileName(nil)
@@ -1600,7 +1600,7 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 		if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 {
 			return SplFilesystemFileReadCsv(intern, intern.GetDelimiter(), intern.GetEnclosure(), intern.GetEscape(), nil)
 		} else {
-			var execute_data *zend.ZendExecuteData = zend.__EG().GetCurrentExecuteData()
+			var execute_data *zend.ZendExecuteData = zend.EG__().GetCurrentExecuteData()
 			zend.ZendCallMethodWith0Params(this_ptr, zend.Z_OBJCE_P(zend.ZEND_THIS), intern.GetFuncGetCurr(), "getCurrentLine", &retval)
 		}
 		if !(zend.Z_ISUNDEF(retval)) {
@@ -2061,7 +2061,7 @@ func zim_spl_SplFileObject_getCsvControl(execute_data *zend.ZendExecuteData, ret
 func zim_spl_SplFileObject_flock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.__EG().GetFunctionTable(), "flock", b.SizeOf("\"flock\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "flock", b.SizeOf("\"flock\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "flock")
 		return
@@ -2145,7 +2145,7 @@ func zim_spl_SplFileObject_fgetss(execute_data *zend.ZendExecuteData, return_val
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.__EG().GetFunctionTable(), "fgetss", b.SizeOf("\"fgetss\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fgetss", b.SizeOf("\"fgetss\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fgetss")
 		return
@@ -2170,7 +2170,7 @@ func zim_spl_SplFileObject_fscanf(execute_data *zend.ZendExecuteData, return_val
 	SplFilesystemFileFreeLine(intern)
 	intern.GetCurrentLineNum()++
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.__EG().GetFunctionTable(), "fscanf", b.SizeOf("\"fscanf\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fscanf", b.SizeOf("\"fscanf\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fscanf")
 		return
@@ -2242,7 +2242,7 @@ func zim_spl_SplFileObject_fread(execute_data *zend.ZendExecuteData, return_valu
 func zim_spl_SplFileObject_fstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
 	var func_ptr *zend.ZendFunction
-	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.__EG().GetFunctionTable(), "fstat", b.SizeOf("\"fstat\"")-1))
+	func_ptr = (*zend.ZendFunction)(zend.ZendHashStrFindPtr(zend.EG__().GetFunctionTable(), "fstat", b.SizeOf("\"fstat\"")-1))
 	if func_ptr == nil {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Internal error, function '%s' not found. Please report", "fstat")
 		return

@@ -114,10 +114,10 @@ const DEBUG_BACKTRACE_IGNORE_ARGS ZendLong = 1 << 1
 
 var GlobalMapPtrLast int = 0
 
-const GLOBAL_FUNCTION_TABLE *HashTable = __CG().GetFunctionTable()
-const GLOBAL_CLASS_TABLE *HashTable = __CG().GetClassTable()
-const GLOBAL_AUTO_GLOBALS_TABLE *HashTable = __CG().GetAutoGlobals()
-const GLOBAL_CONSTANTS_TABLE *HashTable = __EG().GetZendConstants()
+const GLOBAL_FUNCTION_TABLE *HashTable = CG__().GetFunctionTable()
+const GLOBAL_CLASS_TABLE *HashTable = CG__().GetClassTable()
+const GLOBAL_AUTO_GLOBALS_TABLE *HashTable = CG__().GetAutoGlobals()
+const GLOBAL_CONSTANTS_TABLE *HashTable = EG__().GetZendConstants()
 
 /* version information */
 

@@ -38,7 +38,7 @@ func ForgetPersistentResourceIdNumbers(el *zend.Zval) int {
 }
 func ZmDeactivateStreams(type_ int, module_number int) int {
 	var el *zend.Zval
-	var __ht *zend.HashTable = zend.__EG().GetPersistentList()
+	var __ht *zend.HashTable = zend.EG__().GetPersistentList()
 	for _, _p := range __ht.foreachData() {
 		var _z *zend.Zval = _p.GetVal()
 
@@ -55,7 +55,7 @@ func PhpStreamEncloses(enclosing *core.PhpStream, enclosed *core.PhpStream) *cor
 }
 func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int {
 	var le *zend.ZendResource
-	if b.Assign(&le, zend.ZendHashStrFindPtr(zend.__EG().GetPersistentList(), persistent_id, strlen(persistent_id))) != nil {
+	if b.Assign(&le, zend.ZendHashStrFindPtr(zend.EG__().GetPersistentList(), persistent_id, strlen(persistent_id))) != nil {
 		if le.GetType() == LePstream {
 			if stream != nil {
 				var regentry *zend.ZendResource = nil
@@ -65,7 +65,7 @@ func PhpStreamFromPersistentId(persistent_id *byte, stream **core.PhpStream) int
 				 * regular list causes trouble (see bug #54623) */
 
 				*stream = (*core.PhpStream)(le.GetPtr())
-				var __ht *zend.HashTable = zend.__EG().GetRegularList()
+				var __ht *zend.HashTable = zend.EG__().GetRegularList()
 				for _, _p := range __ht.foreachData() {
 					var _z *zend.Zval = _p.GetVal()
 
@@ -96,7 +96,7 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 	var tmp *byte
 	var msg *byte
 	var free_msg int = 0
-	if zend.__EG().GetException() != nil {
+	if zend.EG__().GetException() != nil {
 
 		/* Don't emit additional warnings if an exception has already been thrown. */
 
@@ -261,7 +261,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 	 * or by freeing an enclosed stream (in which case resource list destruction will not have
 	 * freed it). */
 
-	if zend.__EG().HasFlags(zend.EG_FLAGS_IN_RESOURCE_SHUTDOWN) && (close_options&(core.PHP_STREAM_FREE_RSRC_DTOR|core.PHP_STREAM_FREE_IGNORE_ENCLOSING)) == 0 {
+	if zend.EG__().HasFlags(zend.EG_FLAGS_IN_RESOURCE_SHUTDOWN) && (close_options&(core.PHP_STREAM_FREE_RSRC_DTOR|core.PHP_STREAM_FREE_IGNORE_ENCLOSING)) == 0 {
 		return 1
 	}
 	context = core.PHP_STREAM_CONTEXT(stream)
@@ -407,7 +407,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 
 			/* we don't work with *stream but need its value for comparison */
 
-			zend.ZendHashApplyWithArgument(zend.__EG().GetPersistentList(), _phpStreamFreePersistent, stream)
+			zend.ZendHashApplyWithArgument(zend.EG__().GetPersistentList(), _phpStreamFreePersistent, stream)
 
 			/* we don't work with *stream but need its value for comparison */
 
@@ -1831,7 +1831,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 			options |= core.STREAM_ASSUME_REALPATH
 			options &= ^core.USE_PATH
 		}
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			return nil
 		}
 	}

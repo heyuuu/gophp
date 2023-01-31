@@ -256,7 +256,7 @@ func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte,
 			p = core.PhpStrtokR(nil, "/", &token)
 		}
 		zend.Efree(pathdup)
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			core.PhpStreamClose(stream)
 			return nil
 		}

@@ -750,7 +750,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if zend.SUCCESS == zend.Z_OBJ_HT(*array).GetCountElements()(array, &(return_value.GetLval())) {
 				return
 			}
-			if zend.__EG().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				return
 			}
 		}
@@ -2177,7 +2177,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Back up hash position, as it may change */
 
-		zend.__EG().GetHtIterators()[ht_iter].SetPos(pos)
+		zend.EG__().GetHtIterators()[ht_iter].SetPos(pos)
 		if recursive != 0 && zend.Z_REFVAL_P(zv).IsType(zend.IS_ARRAY) {
 			var thash *zend.HashTable
 			var orig_array_walk_fci zend.ZendFcallInfo
@@ -2252,7 +2252,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 
 		/* Reload array and position -- both may have changed */
 
-		if zend.__EG().GetException() != nil {
+		if zend.EG__().GetException() != nil {
 			break
 		}
 	}
@@ -2825,7 +2825,7 @@ func PhpExtractIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.
 			}
 			zend.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-			if zend.__EG().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				return -1
 			}
 			count++
@@ -2922,7 +2922,7 @@ func PhpExtractOverwrite(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend
 			}
 			zend.ZVAL_DEREF(entry)
 			zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-			if zend.__EG().GetException() != nil {
+			if zend.EG__().GetException() != nil {
 				return -1
 			}
 		} else {
@@ -3039,7 +3039,7 @@ func PhpExtractPrefixIfExists(arr *zend.ZendArray, symbol_table *zend.ZendArray,
 							orig_var = orig_var.GetZv()
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-						if zend.__EG().GetException() != nil {
+						if zend.EG__().GetException() != nil {
 							zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 							return -1
 						}
@@ -3182,7 +3182,7 @@ func PhpExtractPrefixSame(arr *zend.ZendArray, symbol_table *zend.ZendArray, pre
 							orig_var = orig_var.GetZv()
 						}
 						zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-						if zend.__EG().GetException() != nil {
+						if zend.EG__().GetException() != nil {
 							zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 							return -1
 						}
@@ -3304,7 +3304,7 @@ func PhpExtractPrefixAll(arr *zend.ZendArray, symbol_table *zend.ZendArray, pref
 						orig_var = orig_var.GetZv()
 					}
 					zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-					if zend.__EG().GetException() != nil {
+					if zend.EG__().GetException() != nil {
 						zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 						return -1
 					}
@@ -3429,7 +3429,7 @@ func PhpExtractPrefixInvalid(arr *zend.ZendArray, symbol_table *zend.ZendArray, 
 					orig_var = orig_var.GetZv()
 				}
 				zend.ZEND_TRY_ASSIGN_COPY_EX(orig_var, entry, 0)
-				if zend.__EG().GetException() != nil {
+				if zend.EG__().GetException() != nil {
 					zend.ZendStringReleaseEx(final_name.GetStr(), 0)
 					return -1
 				}
@@ -3714,7 +3714,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			zend.Z_TRY_ADDREF_P(value_ptr)
 			return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(entry.GetStr(), "this") {
-			var object *zend.ZendObject = zend.ZendGetThisObject(zend.__EG().GetCurrentExecuteData())
+			var object *zend.ZendObject = zend.ZendGetThisObject(zend.EG__().GetCurrentExecuteData())
 			if object != nil {
 				object.AddRefcount()
 				zend.ZVAL_OBJ(&data, object)
@@ -4678,7 +4678,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 				zend.ZendHashDelBucket(in_hash, p)
 			} else {
 				removed.KeyAddNew(p.GetKey().GetStr(), entry)
-				if in_hash == zend.__EG().GetSymbolTable() {
+				if in_hash == zend.EG__().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
 					zend.ZendHashDelBucket(in_hash, p)
@@ -4693,7 +4693,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 				continue
 			}
 			pos2++
-			if p.GetKey() != nil && in_hash == zend.__EG().GetSymbolTable() {
+			if p.GetKey() != nil && in_hash == zend.EG__().GetSymbolTable() {
 				zend.ZendDeleteGlobalVariable(p.GetKey())
 			} else {
 				zend.ZendHashDelBucket(in_hash, p)
@@ -4961,7 +4961,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Delete the last value */
 
-	if p.GetKey() != nil && stack.GetArr() == zend.__EG().GetSymbolTable() {
+	if p.GetKey() != nil && stack.GetArr() == zend.EG__().GetSymbolTable() {
 		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(stack.GetArr(), p)
@@ -5065,7 +5065,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	/* Delete the first value */
 
-	if p.GetKey() != nil && stack.GetArr() == zend.__EG().GetSymbolTable() {
+	if p.GetKey() != nil && stack.GetArr() == zend.EG__().GetSymbolTable() {
 		zend.ZendDeleteGlobalVariable(p.GetKey())
 	} else {
 		zend.ZendHashDelBucket(stack.GetArr(), p)
@@ -7548,7 +7548,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			if p.GetKey() == nil {
 				zend.ZendHashIndexDel(return_value.GetArr(), p.GetH())
 			} else {
-				if return_value.GetArr() == zend.__EG().GetSymbolTable() {
+				if return_value.GetArr() == zend.EG__().GetSymbolTable() {
 					zend.ZendDeleteGlobalVariable(p.GetKey())
 				} else {
 					zend.ZendHashDel(return_value.GetArr(), p.GetKey())
