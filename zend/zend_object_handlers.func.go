@@ -825,7 +825,7 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 		} else {
 			ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
-		Z_ADDREF_P(object)
+		object.AddRefcount()
 		ZVAL_OBJ(&tmp_object, object.GetObj())
 		if type_ == BP_VAR_IS {
 			ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", rv, &tmp_offset)
@@ -867,7 +867,7 @@ func ZendStdWriteDimension(object *Zval, offset *Zval, value *Zval) {
 		} else {
 			ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
-		Z_ADDREF_P(object)
+		object.AddRefcount()
 		ZVAL_OBJ(&tmp_object, object.GetObj())
 		ZendCallMethodWith2Params(&tmp_object, ce, nil, "offsetset", nil, &tmp_offset, value)
 		ZvalPtrDtor(&tmp_object)
@@ -884,7 +884,7 @@ func ZendStdHasDimension(object *Zval, offset *Zval, check_empty int) int {
 	var result int
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		ZVAL_COPY_DEREF(&tmp_offset, offset)
-		Z_ADDREF_P(object)
+		object.AddRefcount()
 		ZVAL_OBJ(&tmp_object, object.GetObj())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetexists", &retval, &tmp_offset)
 		result = IZendIsTrue(&retval)
@@ -1053,7 +1053,7 @@ func ZendStdUnsetDimension(object *Zval, offset *Zval) {
 	var tmp_object Zval
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		ZVAL_COPY_DEREF(&tmp_offset, offset)
-		Z_ADDREF_P(object)
+		object.AddRefcount()
 		ZVAL_OBJ(&tmp_object, object.GetObj())
 		ZendCallMethodWith1Params(&tmp_object, ce, nil, "offsetunset", nil, &tmp_offset)
 		ZvalPtrDtor(&tmp_object)

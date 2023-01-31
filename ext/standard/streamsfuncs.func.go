@@ -1148,7 +1148,7 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.AddAssocBool(return_value, "eof", core.PhpStreamEof(stream))
 	}
 	if !(stream.GetWrapperdata().IsUndef()) {
-		zend.Z_ADDREF_P(stream.GetWrapperdata())
+		stream.GetWrapperdata().AddRefcount()
 		zend.AddAssocZval(return_value, "wrapper_data", stream.GetWrapperdata())
 	}
 	if stream.GetWrapper() != nil {

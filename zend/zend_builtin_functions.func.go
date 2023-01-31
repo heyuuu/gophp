@@ -173,7 +173,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 				if q.GetTypeInfo() != IS_UNDEF {
 					ZVAL_DEREF(q)
 					if q.IsRefcounted() {
-						Z_ADDREF_P(q)
+						q.AddRefcount()
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
@@ -193,7 +193,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 			if q.GetTypeInfo() != IS_UNDEF {
 				ZVAL_DEREF(q)
 				if q.IsRefcounted() {
-					Z_ADDREF_P(q)
+					q.AddRefcount()
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
@@ -1478,7 +1478,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 			if key != nil && ZendCheckPropertyAccess(zobj, key, is_dynamic) == FAILURE {
 				continue
 			}
-			if value.IsReference() && Z_REFCOUNT_P(value) == 1 {
+			if value.IsReference() && value.GetRefcount() == 1 {
 				value = Z_REFVAL_P(value)
 			}
 			Z_TRY_ADDREF_P(value)
@@ -2335,7 +2335,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			key = _p.GetKey()
 			val = _z
 			if key == nil {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
@@ -2349,7 +2349,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			key = _p.GetKey()
 			val = _z
 			if key == nil && Z_RES_TYPE_P(val) <= 0 {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
@@ -2369,7 +2369,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 			key = _p.GetKey()
 			val = _z
 			if key == nil && Z_RES_TYPE_P(val) == id {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 				return_value.GetArr().IndexAddNewH(index, val)
 			}
 		}
@@ -2510,7 +2510,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 					arg = ZendHashFindExInd(call.GetSymbolTable(), arg_name, 1)
 					if arg != nil {
 						if arg.IsRefcounted() {
-							Z_ADDREF_P(arg)
+							arg.AddRefcount()
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), arg)
 					} else {
@@ -2526,7 +2526,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 				for i < first_extra_arg {
 					if p.GetTypeInfo() != IS_UNDEF {
 						if p.IsRefcounted() {
-							Z_ADDREF_P(p)
+							p.AddRefcount()
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 					} else {
@@ -2545,7 +2545,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 		for i < num_args {
 			if p.GetTypeInfo() != IS_UNDEF {
 				if p.IsRefcounted() {
-					Z_ADDREF_P(p)
+					p.AddRefcount()
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 			} else {

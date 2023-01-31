@@ -723,7 +723,7 @@ func SplHeapGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) 
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit(iterator.GetIntern().GetIt())
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplHeapItFuncs)
 	iterator.GetIntern().SetCe(ce)
@@ -740,7 +740,7 @@ func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_heap_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplPqueueItFuncs)
 	iterator.GetIntern().SetCe(ce)

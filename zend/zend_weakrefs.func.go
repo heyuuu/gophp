@@ -49,7 +49,7 @@ func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 	var wr *ZendWeakref = ZendWeakrefFetch(weakref)
 	if wr.GetReferent() != nil {
 		ZVAL_OBJ(return_value, wr.GetReferent())
-		Z_ADDREF_P(return_value)
+		return_value.AddRefcount()
 	}
 }
 func ZendWeakrefFree(zo *ZendObject) {

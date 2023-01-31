@@ -1196,7 +1196,7 @@ func ZendGeneratorGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 	iterator = generator.GetIterator()
 	ZendIteratorInit(iterator)
 	iterator.SetFuncs(&ZendGeneratorIteratorFunctions)
-	Z_ADDREF_P(object)
+	object.AddRefcount()
 	ZVAL_OBJ(iterator.GetData(), object.GetObj())
 	return iterator
 }

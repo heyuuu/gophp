@@ -729,7 +729,7 @@ func PhpAutoGlobalsCreateServer(name *zend.ZendString) zend.ZendBool {
 				var argc *zend.Zval
 				var argv *zend.Zval
 				if b.Assign(&argc, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC), 1)) != nil && b.Assign(&argv, zend.ZendHashFindExInd(zend.EG__().GetSymbolTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV), 1)) != nil {
-					zend.Z_ADDREF_P(argv)
+					argv.AddRefcount()
 					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGV).GetStr(), argv)
 					PG(http_globals)[TRACK_VARS_SERVER].GetArr().KeyUpdate(zend.ZSTR_KNOWN(zend.ZEND_STR_ARGC).GetStr(), argc)
 				}

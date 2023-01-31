@@ -592,7 +592,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 	if scope != nil {
 		closure.GetFunc().SetIsPublic(true)
 		if this_ptr != nil && this_ptr.IsObject() && !closure.GetFunc().IsStatic() {
-			Z_ADDREF_P(this_ptr)
+			this_ptr.AddRefcount()
 			ZVAL_OBJ(closure.GetThisPtr(), this_ptr.GetObj())
 		}
 	}

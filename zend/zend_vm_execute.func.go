@@ -1080,7 +1080,7 @@ send_again:
 		var top *Zval
 		var name *ZendString
 		ZendVmStackExtendCallFrame(&(EX(call)), arg_num-1, ht.GetNNumOfElements())
-		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && Z_REFCOUNT_P(args) > 1 {
+		if (opline.GetOp1Type()&(IS_VAR|IS_CV)) != 0 && args.GetRefcount() > 1 {
 			var i uint32
 			var separate int = 0
 
@@ -1111,7 +1111,7 @@ send_again:
 			top = ZEND_CALL_ARG(EX(call), arg_num)
 			if ARG_SHOULD_BE_SENT_BY_REF(EX(call).func_, arg_num) != 0 {
 				if arg.IsReference() {
-					Z_ADDREF_P(arg)
+					arg.AddRefcount()
 					ZVAL_REF(top, arg.GetRef())
 				} else if (opline.GetOp1Type() & (IS_VAR | IS_CV)) != 0 {
 
@@ -1376,7 +1376,7 @@ add_unpack_again:
 				FREE_OP(free_op1)
 				HANDLE_EXCEPTION()
 			} else {
-				if val.IsReference() && Z_REFCOUNT_P(val) == 1 {
+				if val.IsReference() && val.GetRefcount() == 1 {
 					val = Z_REFVAL_P(val)
 				}
 				Z_TRY_ADDREF_P(val)
@@ -2234,7 +2234,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				for {
 					ZendVerifyVariadicArgType(EX(func_), arg_num, param, nil, CACHE_ADDR(opline.GetOp2().GetNum()))
 					if param.IsRefcounted() {
-						Z_ADDREF_P(param)
+						param.AddRefcount()
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
 					__fill_bkt.SetH(__fill_idx)
@@ -2249,7 +2249,7 @@ func ZEND_RECV_VARIADIC_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			} else {
 				for {
 					if param.IsRefcounted() {
-						Z_ADDREF_P(param)
+						param.AddRefcount()
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), param)
 					__fill_bkt.SetH(__fill_idx)
@@ -2509,7 +2509,7 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	} else if return_value == nil {
 		if (IS_CONST & (IS_VAR | IS_TMP_VAR)) != 0 {
-			if free_op1.IsRefcounted() && Z_DELREF_P(free_op1) == 0 {
+			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
 				RcDtorFunc(free_op1.GetCounted())
 			}
 		}
@@ -2518,7 +2518,7 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(return_value, retval_ptr)
 			if IS_CONST == IS_CONST {
 				if return_value.IsRefcounted() {
-					Z_ADDREF_P(return_value)
+					return_value.AddRefcount()
 				}
 			}
 		} else if IS_CONST == IS_CV {
@@ -2534,12 +2534,12 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 							retval_ptr.SetNull()
 							break
 						} else {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					} else {
 						retval_ptr = Z_REFVAL_P(retval_ptr)
 						if retval_ptr.IsRefcounted() {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					}
 				}
@@ -2554,7 +2554,7 @@ func ZEND_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				if ref.DelRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if retval_ptr.IsRefcounted() {
-					Z_ADDREF_P(retval_ptr)
+					retval_ptr.AddRefcount()
 				}
 			} else {
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
@@ -2600,7 +2600,7 @@ func ZEND_RETURN_BY_REF_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		if EX(return_value) {
 			if retval_ptr.IsReference() {
-				Z_ADDREF_P(retval_ptr)
+				retval_ptr.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -2635,7 +2635,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if retval.IsRefcounted() {
-				Z_ADDREF_P(retval)
+				retval.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
@@ -2733,7 +2733,7 @@ func ZEND_SEND_VAL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	ZVAL_COPY_VALUE(arg, value)
 	if IS_CONST == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -2752,7 +2752,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	ZVAL_COPY_VALUE(arg, value)
 	if IS_CONST == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -2770,7 +2770,7 @@ func ZEND_SEND_VAL_EX_SPEC_CONST_QUICK_HANDLER(execute_data *ZendExecuteData) in
 	ZVAL_COPY_VALUE(arg, value)
 	if IS_CONST == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -2894,11 +2894,11 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(result, expr)
 			if IS_CONST == IS_CONST {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			} else if IS_CONST != IS_TMP_VAR {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			}
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -2910,11 +2910,11 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CONST == IS_CONST {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					} else {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					}
 				} else {
@@ -2952,11 +2952,11 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_CONST == IS_CONST {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				} else {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				}
 			}
@@ -3024,7 +3024,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result = EX_VAR(opline.GetResult().GetVar())
 		ZVAL_COPY_VALUE(result, array_ptr)
 		if IS_CONST != IS_TMP_VAR && result.IsRefcounted() {
-			Z_ADDREF_P(array_ptr)
+			array_ptr.AddRefcount()
 		}
 		result.SetFePos(0)
 		ZEND_VM_NEXT_OPCODE()
@@ -3041,7 +3041,7 @@ func ZEND_FE_RESET_R_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			result = EX_VAR(opline.GetResult().GetVar())
 			ZVAL_COPY_VALUE(result, array_ptr)
 			if IS_CONST != IS_TMP_VAR {
-				Z_ADDREF_P(array_ptr)
+				array_ptr.AddRefcount()
 			}
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -3086,7 +3086,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_NEW_REF(array_ref, array_ref)
 				array_ptr = Z_REFVAL_P(array_ref)
 			}
-			Z_ADDREF_P(array_ref)
+			array_ref.AddRefcount()
 			ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 		} else {
 			array_ref = EX_VAR(opline.GetResult().GetVar())
@@ -3111,7 +3111,7 @@ func ZEND_FE_RESET_RW_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 					ZVAL_NEW_REF(array_ref, array_ref)
 					array_ptr = Z_REFVAL_P(array_ref)
 				}
-				Z_ADDREF_P(array_ref)
+				array_ref.AddRefcount()
 				ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 			} else {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
@@ -3175,18 +3175,18 @@ func ZEND_JMP_SET_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CONST == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CONST == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CONST == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -3209,18 +3209,18 @@ func ZEND_COALESCE_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CONST == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CONST == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if (IS_CONST&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -3242,10 +3242,10 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_CONST == IS_VAR {
 		if value.IsReference() {
 			ZVAL_COPY_VALUE(result, Z_REFVAL_P(value))
-			if Z_DELREF_P(value) == 0 {
+			if value.DelRefcount() == 0 {
 				EfreeSize(value.GetRef(), b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(result, value)
@@ -3254,7 +3254,7 @@ func ZEND_QM_ASSIGN_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CONST == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 	}
@@ -3278,7 +3278,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	if val.IsArray() {
 		ZVAL_COPY_VALUE(generator.GetValues(), val)
 		if IS_CONST != IS_TMP_VAR && val.IsRefcounted() {
-			Z_ADDREF_P(val)
+			val.AddRefcount()
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_CONST != IS_CONST && val.IsObject() && Z_OBJCE_P(val).GetGetIterator() != nil {
@@ -3286,7 +3286,7 @@ func ZEND_YIELD_FROM_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_CONST != IS_TMP_VAR {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
@@ -4735,7 +4735,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 	if (IS_CONST == IS_VAR || IS_CONST == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -4757,7 +4757,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDa
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -5063,7 +5063,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -5097,7 +5097,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -5135,7 +5135,7 @@ func ZEND_YIELD_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CONST == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -6708,7 +6708,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 	if (IS_CONST == IS_VAR || IS_CONST == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -6730,7 +6730,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteD
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -6992,7 +6992,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -7026,7 +7026,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -7065,7 +7065,7 @@ func ZEND_YIELD_SPEC_CONST_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_TMP_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -7149,7 +7149,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -7183,7 +7183,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -7223,7 +7223,7 @@ func ZEND_YIELD_SPEC_CONST_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -7558,7 +7558,7 @@ func ZEND_NEW_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		/* We are not handling overloaded classes right now */
 
 		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
-		Z_ADDREF_P(result)
+		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(EX(call))
 	EX(call) = call
@@ -7571,7 +7571,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 	if (IS_CONST == IS_VAR || IS_CONST == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -7593,7 +7593,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -7814,7 +7814,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -7848,7 +7848,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -7886,7 +7886,7 @@ func ZEND_YIELD_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_UNUSED == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -8059,7 +8059,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData)
 				if q.GetTypeInfo() != IS_UNDEF {
 					ZVAL_DEREF(q)
 					if q.IsRefcounted() {
-						Z_ADDREF_P(q)
+						q.AddRefcount()
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
@@ -8084,7 +8084,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData)
 			if q.GetTypeInfo() != IS_UNDEF {
 				ZVAL_DEREF(q)
 				if q.IsRefcounted() {
-					Z_ADDREF_P(q)
+					q.AddRefcount()
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
@@ -8876,7 +8876,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 	if (IS_CONST == IS_VAR || IS_CONST == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -8898,7 +8898,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -9151,7 +9151,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -9185,7 +9185,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CONST == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -9223,7 +9223,7 @@ func ZEND_YIELD_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CV == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -11347,7 +11347,7 @@ func ZEND_SEND_VAL_SPEC_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 	ZVAL_COPY_VALUE(arg, value)
 	if (IS_TMP_VAR | IS_VAR) == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -15130,7 +15130,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	} else if return_value == nil {
 		if (IS_TMP_VAR & (IS_VAR | IS_TMP_VAR)) != 0 {
-			if free_op1.IsRefcounted() && Z_DELREF_P(free_op1) == 0 {
+			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
 				RcDtorFunc(free_op1.GetCounted())
 			}
 		}
@@ -15139,7 +15139,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(return_value, retval_ptr)
 			if IS_TMP_VAR == IS_CONST {
 				if return_value.IsRefcounted() {
-					Z_ADDREF_P(return_value)
+					return_value.AddRefcount()
 				}
 			}
 		} else if IS_TMP_VAR == IS_CV {
@@ -15155,12 +15155,12 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 							retval_ptr.SetNull()
 							break
 						} else {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					} else {
 						retval_ptr = Z_REFVAL_P(retval_ptr)
 						if retval_ptr.IsRefcounted() {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					}
 				}
@@ -15175,7 +15175,7 @@ func ZEND_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				if ref.DelRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if retval_ptr.IsRefcounted() {
-					Z_ADDREF_P(retval_ptr)
+					retval_ptr.AddRefcount()
 				}
 			} else {
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
@@ -15222,7 +15222,7 @@ func ZEND_RETURN_BY_REF_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		if EX(return_value) {
 			if retval_ptr.IsReference() {
-				Z_ADDREF_P(retval_ptr)
+				retval_ptr.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -15258,7 +15258,7 @@ func ZEND_GENERATOR_RETURN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if retval.IsRefcounted() {
-				Z_ADDREF_P(retval)
+				retval.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
@@ -15323,7 +15323,7 @@ func ZEND_SEND_VAL_EX_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	ZVAL_COPY_VALUE(arg, value)
 	if IS_TMP_VAR == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -15342,7 +15342,7 @@ func ZEND_SEND_VAL_EX_SPEC_TMP_QUICK_HANDLER(execute_data *ZendExecuteData) int 
 	ZVAL_COPY_VALUE(arg, value)
 	if IS_TMP_VAR == IS_CONST {
 		if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -15395,11 +15395,11 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(result, expr)
 			if IS_TMP_VAR == IS_CONST {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			} else if IS_TMP_VAR != IS_TMP_VAR {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			}
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -15411,11 +15411,11 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_TMP_VAR == IS_CONST {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					} else {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					}
 				} else {
@@ -15453,11 +15453,11 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_TMP_VAR == IS_CONST {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				} else {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				}
 			}
@@ -15476,7 +15476,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		result = EX_VAR(opline.GetResult().GetVar())
 		ZVAL_COPY_VALUE(result, array_ptr)
 		if IS_TMP_VAR != IS_TMP_VAR && result.IsRefcounted() {
-			Z_ADDREF_P(array_ptr)
+			array_ptr.AddRefcount()
 		}
 		result.SetFePos(0)
 		ZEND_VM_NEXT_OPCODE()
@@ -15493,7 +15493,7 @@ func ZEND_FE_RESET_R_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			result = EX_VAR(opline.GetResult().GetVar())
 			ZVAL_COPY_VALUE(result, array_ptr)
 			if IS_TMP_VAR != IS_TMP_VAR {
-				Z_ADDREF_P(array_ptr)
+				array_ptr.AddRefcount()
 			}
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -15541,7 +15541,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_NEW_REF(array_ref, array_ref)
 				array_ptr = Z_REFVAL_P(array_ref)
 			}
-			Z_ADDREF_P(array_ref)
+			array_ref.AddRefcount()
 			ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 		} else {
 			array_ref = EX_VAR(opline.GetResult().GetVar())
@@ -15566,7 +15566,7 @@ func ZEND_FE_RESET_RW_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 					ZVAL_NEW_REF(array_ref, array_ref)
 					array_ptr = Z_REFVAL_P(array_ref)
 				}
-				Z_ADDREF_P(array_ref)
+				array_ref.AddRefcount()
 				ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 			} else {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
@@ -15643,18 +15643,18 @@ func ZEND_JMP_SET_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_TMP_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_TMP_VAR == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_TMP_VAR == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -15679,18 +15679,18 @@ func ZEND_COALESCE_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_TMP_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_TMP_VAR == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if (IS_TMP_VAR&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -15714,10 +15714,10 @@ func ZEND_QM_ASSIGN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_TMP_VAR == IS_VAR {
 		if value.IsReference() {
 			ZVAL_COPY_VALUE(result, Z_REFVAL_P(value))
-			if Z_DELREF_P(value) == 0 {
+			if value.DelRefcount() == 0 {
 				EfreeSize(value.GetRef(), b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(result, value)
@@ -15726,7 +15726,7 @@ func ZEND_QM_ASSIGN_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_TMP_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 	}
@@ -15747,7 +15747,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	if val.IsArray() {
 		ZVAL_COPY_VALUE(generator.GetValues(), val)
 		if IS_TMP_VAR != IS_TMP_VAR && val.IsRefcounted() {
-			Z_ADDREF_P(val)
+			val.AddRefcount()
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_TMP_VAR != IS_CONST && val.IsObject() && Z_OBJCE_P(val).GetGetIterator() != nil {
@@ -15755,7 +15755,7 @@ func ZEND_YIELD_FROM_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_TMP_VAR != IS_TMP_VAR {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
@@ -15892,7 +15892,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
@@ -15925,7 +15925,7 @@ func ZEND_ROPE_END_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
@@ -15971,7 +15971,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 	if (IS_TMP_VAR == IS_VAR || IS_TMP_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -15993,7 +15993,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -16121,7 +16121,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -16155,7 +16155,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -16193,7 +16193,7 @@ func ZEND_YIELD_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CONST == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -16309,7 +16309,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
@@ -16344,7 +16344,7 @@ func ZEND_ROPE_END_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
@@ -16391,7 +16391,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 	if (IS_TMP_VAR == IS_VAR || IS_TMP_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -16413,7 +16413,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -16575,7 +16575,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -16609,7 +16609,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -16648,7 +16648,7 @@ func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_TMP_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -16733,7 +16733,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -16767,7 +16767,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -16807,7 +16807,7 @@ func ZEND_YIELD_SPEC_TMP_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -16870,7 +16870,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 	if (IS_TMP_VAR == IS_VAR || IS_TMP_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -16892,7 +16892,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteDat
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -17020,7 +17020,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -17054,7 +17054,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -17092,7 +17092,7 @@ func ZEND_YIELD_SPEC_TMP_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_UNUSED == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -17180,7 +17180,7 @@ func ZEND_ROPE_ADD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
@@ -17213,7 +17213,7 @@ func ZEND_ROPE_END_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 		rope[opline.GetExtendedValue()] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
@@ -17259,7 +17259,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 	if (IS_TMP_VAR == IS_VAR || IS_TMP_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = nil
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -17281,7 +17281,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) i
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -17409,7 +17409,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -17443,7 +17443,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_TMP_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -17481,7 +17481,7 @@ func ZEND_YIELD_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CV == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -17528,7 +17528,7 @@ func ZEND_BIND_LEXICAL_SPEC_TMP_CV_HANDLER(execute_data *ZendExecuteData) int {
 
 		var_ = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 		if var_.IsReference() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(var_, 2)
 		}
@@ -17764,7 +17764,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	} else if return_value == nil {
 		if (IS_VAR & (IS_VAR | IS_TMP_VAR)) != 0 {
-			if free_op1.IsRefcounted() && Z_DELREF_P(free_op1) == 0 {
+			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
 				RcDtorFunc(free_op1.GetCounted())
 			}
 		}
@@ -17773,7 +17773,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(return_value, retval_ptr)
 			if IS_VAR == IS_CONST {
 				if return_value.IsRefcounted() {
-					Z_ADDREF_P(return_value)
+					return_value.AddRefcount()
 				}
 			}
 		} else if IS_VAR == IS_CV {
@@ -17789,12 +17789,12 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 							retval_ptr.SetNull()
 							break
 						} else {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					} else {
 						retval_ptr = Z_REFVAL_P(retval_ptr)
 						if retval_ptr.IsRefcounted() {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					}
 				}
@@ -17809,7 +17809,7 @@ func ZEND_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				if ref.DelRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if retval_ptr.IsRefcounted() {
-					Z_ADDREF_P(retval_ptr)
+					retval_ptr.AddRefcount()
 				}
 			} else {
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
@@ -17860,7 +17860,7 @@ func ZEND_RETURN_BY_REF_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		if EX(return_value) {
 			if retval_ptr.IsReference() {
-				Z_ADDREF_P(retval_ptr)
+				retval_ptr.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -17899,7 +17899,7 @@ func ZEND_GENERATOR_RETURN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if retval.IsRefcounted() {
-				Z_ADDREF_P(retval)
+				retval.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
@@ -17973,7 +17973,7 @@ func ZEND_SEND_VAR_SPEC_VAR_INLINE_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -18050,7 +18050,7 @@ func ZEND_SEND_REF_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	}
 	if varptr.IsReference() {
-		Z_ADDREF_P(varptr)
+		varptr.AddRefcount()
 	} else {
 		ZVAL_MAKE_REF_EX(varptr, 2)
 	}
@@ -18088,7 +18088,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -18123,7 +18123,7 @@ func ZEND_SEND_VAR_EX_SPEC_VAR_QUICK_HANDLER(execute_data *ZendExecuteData) int 
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -18148,7 +18148,7 @@ func ZEND_SEND_FUNC_ARG_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else if arg.IsRefcounted() {
-			Z_ADDREF_P(arg)
+			arg.AddRefcount()
 		}
 	} else {
 		ZVAL_COPY_VALUE(arg, varptr)
@@ -18203,11 +18203,11 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(result, expr)
 			if IS_VAR == IS_CONST {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			} else if IS_VAR != IS_TMP_VAR {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			}
 			ZvalPtrDtorNogc(free_op1)
@@ -18220,11 +18220,11 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_VAR == IS_CONST {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					} else {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					}
 				} else {
@@ -18262,11 +18262,11 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_VAR == IS_CONST {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				} else {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				}
 			}
@@ -18285,7 +18285,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		result = EX_VAR(opline.GetResult().GetVar())
 		ZVAL_COPY_VALUE(result, array_ptr)
 		if IS_VAR != IS_TMP_VAR && result.IsRefcounted() {
-			Z_ADDREF_P(array_ptr)
+			array_ptr.AddRefcount()
 		}
 		result.SetFePos(0)
 		ZvalPtrDtorNogc(free_op1)
@@ -18303,7 +18303,7 @@ func ZEND_FE_RESET_R_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			result = EX_VAR(opline.GetResult().GetVar())
 			ZVAL_COPY_VALUE(result, array_ptr)
 			if IS_VAR != IS_TMP_VAR {
-				Z_ADDREF_P(array_ptr)
+				array_ptr.AddRefcount()
 			}
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -18353,7 +18353,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_NEW_REF(array_ref, array_ref)
 				array_ptr = Z_REFVAL_P(array_ref)
 			}
-			Z_ADDREF_P(array_ref)
+			array_ref.AddRefcount()
 			ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 		} else {
 			array_ref = EX_VAR(opline.GetResult().GetVar())
@@ -18380,7 +18380,7 @@ func ZEND_FE_RESET_RW_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 					ZVAL_NEW_REF(array_ref, array_ref)
 					array_ptr = Z_REFVAL_P(array_ref)
 				}
-				Z_ADDREF_P(array_ref)
+				array_ref.AddRefcount()
 				ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 			} else {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
@@ -18776,7 +18776,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_REF(variable_ptr, ref)
 		}
 	} else {
-		Z_ADDREF_P(value)
+		value.AddRefcount()
 		ZVAL_REF(EX_VAR(opline.GetOp2().GetVar()), value.GetRef())
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -18805,18 +18805,18 @@ func ZEND_JMP_SET_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_VAR == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_VAR == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -18841,18 +18841,18 @@ func ZEND_COALESCE_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_VAR == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if (IS_VAR&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -18876,10 +18876,10 @@ func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_VAR == IS_VAR {
 		if value.IsReference() {
 			ZVAL_COPY_VALUE(result, Z_REFVAL_P(value))
-			if Z_DELREF_P(value) == 0 {
+			if value.DelRefcount() == 0 {
 				EfreeSize(value.GetRef(), b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(result, value)
@@ -18888,7 +18888,7 @@ func ZEND_QM_ASSIGN_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_VAR == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 	}
@@ -18909,7 +18909,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	if val.IsArray() {
 		ZVAL_COPY_VALUE(generator.GetValues(), val)
 		if IS_VAR != IS_TMP_VAR && val.IsRefcounted() {
-			Z_ADDREF_P(val)
+			val.AddRefcount()
 		}
 		generator.GetValues().GetFePos() = 0
 		ZvalPtrDtorNogc(free_op1)
@@ -18918,7 +18918,7 @@ func ZEND_YIELD_FROM_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_VAR != IS_TMP_VAR {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 			}
 			ZvalPtrDtorNogc(free_op1)
 			if new_gen.GetRetval().IsUndef() {
@@ -19569,7 +19569,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -19683,7 +19683,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -19798,7 +19798,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -19912,7 +19912,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -19985,17 +19985,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -20092,18 +20092,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -20205,18 +20205,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -20318,17 +20318,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CONST_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -20697,7 +20697,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 	if (IS_VAR == IS_VAR || IS_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -20722,7 +20722,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -20968,7 +20968,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -21002,7 +21002,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -21040,7 +21040,7 @@ func ZEND_YIELD_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CONST == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -21661,7 +21661,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -21777,7 +21777,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -21894,7 +21894,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -22010,7 +22010,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -22085,17 +22085,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CONST_HANDLER(execute_data *ZendExe
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -22193,18 +22193,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_TMP_HANDLER(execute_data *ZendExecu
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -22307,18 +22307,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *ZendExecu
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -22421,17 +22421,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_TMPVAR_OP_DATA_CV_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -22707,7 +22707,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 	if (IS_VAR == IS_VAR || IS_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -22732,7 +22732,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_TMPVAR_HANDLER(execute_data *ZendExecuteDat
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -23056,7 +23056,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -23090,7 +23090,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -23129,7 +23129,7 @@ func ZEND_YIELD_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_TMP_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -23317,7 +23317,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -23351,7 +23351,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -23391,7 +23391,7 @@ func ZEND_YIELD_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -23569,17 +23569,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CONST_HANDLER(execute_data *ZendExe
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -23676,18 +23676,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_TMP_HANDLER(execute_data *ZendExecu
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -23789,18 +23789,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_VAR_HANDLER(execute_data *ZendExecu
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -23902,17 +23902,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_UNUSED_OP_DATA_CV_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -24172,7 +24172,7 @@ func ZEND_NEW_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		/* We are not handling overloaded classes right now */
 
 		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
-		Z_ADDREF_P(result)
+		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(EX(call))
 	EX(call) = call
@@ -24186,7 +24186,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 	if (IS_VAR == IS_VAR || IS_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -24211,7 +24211,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteDat
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -24294,7 +24294,7 @@ func ZEND_SEPARATE_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var var_ptr *Zval
 	var_ptr = EX_VAR(opline.GetOp1().GetVar())
 	if var_ptr.IsReference() {
-		if Z_REFCOUNT_P(var_ptr) == 1 {
+		if var_ptr.GetRefcount() == 1 {
 			ZVAL_UNREF(var_ptr)
 		}
 	}
@@ -24350,7 +24350,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -24384,7 +24384,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -24422,7 +24422,7 @@ func ZEND_YIELD_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_UNUSED == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -24463,12 +24463,12 @@ func ZEND_MAKE_REF_SPEC_VAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_VAR == IS_CV {
 		if op1.IsUndef() {
 			ZVAL_NEW_EMPTY_REF(op1)
-			Z_SET_REFCOUNT_P(op1, 2)
+			op1.SetRefcount(2)
 			Z_REFVAL_P(op1).SetNull()
 			ZVAL_REF(EX_VAR(opline.GetResult().GetVar()), op1.GetRef())
 		} else {
 			if op1.IsReference() {
-				Z_ADDREF_P(op1)
+				op1.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(op1, 2)
 			}
@@ -25021,7 +25021,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -25135,7 +25135,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -25250,7 +25250,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -25364,7 +25364,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -25437,17 +25437,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CONST_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -25544,18 +25544,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_TMP_HANDLER(execute_data *ZendExecuteDa
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -25657,18 +25657,18 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_VAR_HANDLER(execute_data *ZendExecuteDa
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -25770,17 +25770,17 @@ func ZEND_ASSIGN_DIM_SPEC_VAR_CV_OP_DATA_CV_HANDLER(execute_data *ZendExecuteDat
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -26110,7 +26110,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 	if (IS_VAR == IS_VAR || IS_VAR == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _getZvalPtrPtrVar(opline.GetOp1().GetVar(), &free_op1, EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -26135,7 +26135,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) i
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -26381,7 +26381,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -26415,7 +26415,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_VAR == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -26453,7 +26453,7 @@ func ZEND_YIELD_SPEC_VAR_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CV == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -27191,7 +27191,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -27301,7 +27301,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -27412,7 +27412,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -27522,7 +27522,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -27637,7 +27637,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
 		rope[0] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = RT_CONSTANT(opline, opline.GetOp2())
@@ -28145,7 +28145,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -28179,7 +28179,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -28217,7 +28217,7 @@ func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CONST == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -28770,7 +28770,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -28882,7 +28882,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -28995,7 +28995,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -29107,7 +29107,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -29228,7 +29228,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendExecuteData) in
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
 		rope[0] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = _getZvalPtrVar(opline.GetOp2().GetVar(), &free_op2, EXECUTE_DATA_C)
@@ -29675,7 +29675,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -29709,7 +29709,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -29748,7 +29748,7 @@ func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_TMP_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -29832,7 +29832,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -29866,7 +29866,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -29906,7 +29906,7 @@ func ZEND_YIELD_SPEC_UNUSED_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -30165,7 +30165,7 @@ func ZEND_NEW_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 		/* We are not handling overloaded classes right now */
 
 		call = ZendVmStackPushCallFrame(ZEND_CALL_FUNCTION|ZEND_CALL_RELEASE_THIS|ZEND_CALL_HAS_THIS, constructor, opline.GetExtendedValue(), result.GetObj())
-		Z_ADDREF_P(result)
+		result.AddRefcount()
 	}
 	call.SetPrevExecuteData(EX(call))
 	EX(call) = call
@@ -30240,7 +30240,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -30274,7 +30274,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -30312,7 +30312,7 @@ func ZEND_YIELD_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_UNUSED == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -30352,7 +30352,7 @@ func ZEND_FETCH_THIS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) i
 	if EX(This).u1.v.type_ == IS_OBJECT {
 		var result *Zval = EX_VAR(opline.GetResult().GetVar())
 		ZVAL_OBJ(result, EX(This).GetObj())
-		Z_ADDREF_P(result)
+		result.AddRefcount()
 		ZEND_VM_NEXT_OPCODE()
 	} else {
 		return zend_this_not_in_object_context_helper_SPEC(execute_data)
@@ -30452,7 +30452,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData
 				if q.GetTypeInfo() != IS_UNDEF {
 					ZVAL_DEREF(q)
 					if q.IsRefcounted() {
-						Z_ADDREF_P(q)
+						q.AddRefcount()
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
@@ -30477,7 +30477,7 @@ func ZEND_FUNC_GET_ARGS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData
 			if q.GetTypeInfo() != IS_UNDEF {
 				ZVAL_DEREF(q)
 				if q.IsRefcounted() {
-					Z_ADDREF_P(q)
+					q.AddRefcount()
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
@@ -31001,7 +31001,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -31111,7 +31111,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -31222,7 +31222,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -31332,7 +31332,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -31447,7 +31447,7 @@ func ZEND_ROPE_INIT_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 		var_ = _get_zval_ptr_cv_BP_VAR_R(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 		rope[0] = var_.GetStr()
 		if var_.IsRefcounted() {
-			Z_ADDREF_P(var_)
+			var_.AddRefcount()
 		}
 	} else {
 		var_ = EX_VAR(opline.GetOp2().GetVar())
@@ -31878,7 +31878,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -31912,7 +31912,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_UNUSED == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -31950,7 +31950,7 @@ func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CV == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -32359,7 +32359,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		}
 	} else if return_value == nil {
 		if (IS_CV & (IS_VAR | IS_TMP_VAR)) != 0 {
-			if free_op1.IsRefcounted() && Z_DELREF_P(free_op1) == 0 {
+			if free_op1.IsRefcounted() && free_op1.DelRefcount() == 0 {
 				RcDtorFunc(free_op1.GetCounted())
 			}
 		}
@@ -32368,7 +32368,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(return_value, retval_ptr)
 			if IS_CV == IS_CONST {
 				if return_value.IsRefcounted() {
-					Z_ADDREF_P(return_value)
+					return_value.AddRefcount()
 				}
 			}
 		} else if IS_CV == IS_CV {
@@ -32384,12 +32384,12 @@ func ZEND_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 							retval_ptr.SetNull()
 							break
 						} else {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					} else {
 						retval_ptr = Z_REFVAL_P(retval_ptr)
 						if retval_ptr.IsRefcounted() {
-							Z_ADDREF_P(retval_ptr)
+							retval_ptr.AddRefcount()
 						}
 					}
 				}
@@ -32404,7 +32404,7 @@ func ZEND_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 				if ref.DelRefcount() == 0 {
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if retval_ptr.IsRefcounted() {
-					Z_ADDREF_P(retval_ptr)
+					retval_ptr.AddRefcount()
 				}
 			} else {
 				ZVAL_COPY_VALUE(return_value, retval_ptr)
@@ -32450,7 +32450,7 @@ func ZEND_RETURN_BY_REF_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		}
 		if EX(return_value) {
 			if retval_ptr.IsReference() {
-				Z_ADDREF_P(retval_ptr)
+				retval_ptr.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(retval_ptr, 2)
 			}
@@ -32485,7 +32485,7 @@ func ZEND_GENERATOR_RETURN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if retval.IsRefcounted() {
-				Z_ADDREF_P(retval)
+				retval.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(generator.GetRetval(), retval)
@@ -32555,7 +32555,7 @@ func ZEND_SEND_VAR_SPEC_CV_INLINE_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -32578,7 +32578,7 @@ func ZEND_SEND_REF_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		ZEND_VM_NEXT_OPCODE()
 	}
 	if varptr.IsReference() {
-		Z_ADDREF_P(varptr)
+		varptr.AddRefcount()
 	} else {
 		ZVAL_MAKE_REF_EX(varptr, 2)
 	}
@@ -32612,7 +32612,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -32646,7 +32646,7 @@ func ZEND_SEND_VAR_EX_SPEC_CV_QUICK_HANDLER(execute_data *ZendExecuteData) int {
 			if ref.DelRefcount() == 0 {
 				EfreeSize(ref, b.SizeOf("zend_reference"))
 			} else if arg.IsRefcounted() {
-				Z_ADDREF_P(arg)
+				arg.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(arg, varptr)
@@ -32773,11 +32773,11 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(result, expr)
 			if IS_CV == IS_CONST {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			} else if IS_CV != IS_TMP_VAR {
 				if result.IsRefcounted() {
-					Z_ADDREF_P(result)
+					result.AddRefcount()
 				}
 			}
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -32789,11 +32789,11 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 					expr = result.GetArr().IndexAddNewH(0, expr)
 					if IS_CV == IS_CONST {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					} else {
 						if expr.IsRefcounted() {
-							Z_ADDREF_P(expr)
+							expr.AddRefcount()
 						}
 					}
 				} else {
@@ -32831,11 +32831,11 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 				expr = ht.KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), expr)
 				if IS_CV == IS_CONST {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				} else {
 					if expr.IsRefcounted() {
-						Z_ADDREF_P(expr)
+						expr.AddRefcount()
 					}
 				}
 			}
@@ -32903,7 +32903,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		result = EX_VAR(opline.GetResult().GetVar())
 		ZVAL_COPY_VALUE(result, array_ptr)
 		if IS_CV != IS_TMP_VAR && result.IsRefcounted() {
-			Z_ADDREF_P(array_ptr)
+			array_ptr.AddRefcount()
 		}
 		result.SetFePos(0)
 		ZEND_VM_NEXT_OPCODE()
@@ -32920,7 +32920,7 @@ func ZEND_FE_RESET_R_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			result = EX_VAR(opline.GetResult().GetVar())
 			ZVAL_COPY_VALUE(result, array_ptr)
 			if IS_CV != IS_TMP_VAR {
-				Z_ADDREF_P(array_ptr)
+				array_ptr.AddRefcount()
 			}
 			if properties.GetNNumOfElements() == 0 {
 				result.SetFeIterIdx(uint32 - 1)
@@ -32965,7 +32965,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_NEW_REF(array_ref, array_ref)
 				array_ptr = Z_REFVAL_P(array_ref)
 			}
-			Z_ADDREF_P(array_ref)
+			array_ref.AddRefcount()
 			ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 		} else {
 			array_ref = EX_VAR(opline.GetResult().GetVar())
@@ -32990,7 +32990,7 @@ func ZEND_FE_RESET_RW_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 					ZVAL_NEW_REF(array_ref, array_ref)
 					array_ptr = Z_REFVAL_P(array_ref)
 				}
-				Z_ADDREF_P(array_ref)
+				array_ref.AddRefcount()
 				ZVAL_COPY_VALUE(EX_VAR(opline.GetResult().GetVar()), array_ref)
 			} else {
 				array_ptr = EX_VAR(opline.GetResult().GetVar())
@@ -33054,18 +33054,18 @@ func ZEND_JMP_SET_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CV == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CV == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CV == IS_VAR && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -33088,18 +33088,18 @@ func ZEND_COALESCE_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CV == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if IS_CV == IS_CV {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else if (IS_CV&IS_VAR) != 0 && ref != nil {
 			var r *ZendReference = ref.GetRef()
 			if r.DelRefcount() == 0 {
 				EfreeSize(r, b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 		ZEND_VM_JMP_EX(OP_JMP_ADDR(opline, opline.GetOp2()), 0)
@@ -33121,10 +33121,10 @@ func ZEND_QM_ASSIGN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	} else if IS_CV == IS_VAR {
 		if value.IsReference() {
 			ZVAL_COPY_VALUE(result, Z_REFVAL_P(value))
-			if Z_DELREF_P(value) == 0 {
+			if value.DelRefcount() == 0 {
 				EfreeSize(value.GetRef(), b.SizeOf("zend_reference"))
 			} else if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		} else {
 			ZVAL_COPY_VALUE(result, value)
@@ -33133,7 +33133,7 @@ func ZEND_QM_ASSIGN_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		ZVAL_COPY_VALUE(result, value)
 		if IS_CV == IS_CONST {
 			if result.IsRefcounted() {
-				Z_ADDREF_P(result)
+				result.AddRefcount()
 			}
 		}
 	}
@@ -33152,7 +33152,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	if val.IsArray() {
 		ZVAL_COPY_VALUE(generator.GetValues(), val)
 		if IS_CV != IS_TMP_VAR && val.IsRefcounted() {
-			Z_ADDREF_P(val)
+			val.AddRefcount()
 		}
 		generator.GetValues().GetFePos() = 0
 	} else if IS_CV != IS_CONST && val.IsObject() && Z_OBJCE_P(val).GetGetIterator() != nil {
@@ -33160,7 +33160,7 @@ func ZEND_YIELD_FROM_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		if ce == ZendCeGenerator {
 			var new_gen *ZendGenerator = (*ZendGenerator)(val.GetObj())
 			if IS_CV != IS_TMP_VAR {
-				Z_ADDREF_P(val)
+				val.AddRefcount()
 			}
 			if new_gen.GetRetval().IsUndef() {
 				if ZendGeneratorGetCurrent(new_gen) == generator {
@@ -34611,7 +34611,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -34721,7 +34721,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -34832,7 +34832,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -34942,7 +34942,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -35011,17 +35011,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CONST_HANDLER(execute_data *ZendExecu
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -35114,18 +35114,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_TMP_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -35223,18 +35223,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_VAR_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -35332,17 +35332,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CONST_OP_DATA_CV_HANDLER(execute_data *ZendExecuteD
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -35748,7 +35748,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 	if (IS_CV == IS_VAR || IS_CV == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -35770,7 +35770,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData)
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -36173,7 +36173,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -36207,7 +36207,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -36245,7 +36245,7 @@ func ZEND_YIELD_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CONST == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -37690,7 +37690,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -37802,7 +37802,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -37915,7 +37915,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -38027,7 +38027,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -38098,17 +38098,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -38202,18 +38202,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -38312,18 +38312,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -38422,17 +38422,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_TMPVAR_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -38817,7 +38817,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 	if (IS_CV == IS_VAR || IS_CV == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -38839,7 +38839,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -39275,7 +39275,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -39309,7 +39309,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -39348,7 +39348,7 @@ func ZEND_YIELD_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_TMP_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -39559,7 +39559,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -39593,7 +39593,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -39633,7 +39633,7 @@ func ZEND_YIELD_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_VAR == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -39905,17 +39905,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CONST_HANDLER(execute_data *ZendExec
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -40008,18 +40008,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_TMP_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -40117,18 +40117,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_VAR_HANDLER(execute_data *ZendExecut
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -40226,17 +40226,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_UNUSED_OP_DATA_CV_HANDLER(execute_data *ZendExecute
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -40319,7 +40319,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 	if (IS_CV == IS_VAR || IS_CV == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -40341,7 +40341,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -40619,7 +40619,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -40653,7 +40653,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -40691,7 +40691,7 @@ func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_UNUSED == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}
@@ -40763,7 +40763,7 @@ func ZEND_BIND_STATIC_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int 
 			value.SetTypeInfo(IS_REFERENCE_EX)
 			ZVAL_REF(variable_ptr, ref)
 		} else {
-			Z_ADDREF_P(value)
+			value.AddRefcount()
 			ZVAL_REF(variable_ptr, value.GetRef())
 		}
 	} else {
@@ -40786,12 +40786,12 @@ func ZEND_MAKE_REF_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	if IS_CV == IS_CV {
 		if op1.IsUndef() {
 			ZVAL_NEW_EMPTY_REF(op1)
-			Z_SET_REFCOUNT_P(op1, 2)
+			op1.SetRefcount(2)
 			Z_REFVAL_P(op1).SetNull()
 			ZVAL_REF(EX_VAR(opline.GetResult().GetVar()), op1.GetRef())
 		} else {
 			if op1.IsReference() {
-				Z_ADDREF_P(op1)
+				op1.AddRefcount()
 			} else {
 				ZVAL_MAKE_REF_EX(op1, 2)
 			}
@@ -42090,7 +42090,7 @@ assign_object:
 				}
 				if IS_CONST == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CONST != IS_TMP_VAR {
 					if value.IsReference() {
@@ -42200,7 +42200,7 @@ assign_object:
 				}
 				if IS_TMP_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_TMP_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -42311,7 +42311,7 @@ assign_object:
 				}
 				if IS_VAR == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_VAR != IS_TMP_VAR {
 					if value.IsReference() {
@@ -42421,7 +42421,7 @@ assign_object:
 				}
 				if IS_CV == IS_CONST {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				} else if IS_CV != IS_TMP_VAR {
 					if value.IsReference() {
@@ -42490,17 +42490,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CONST_HANDLER(execute_data *ZendExecuteD
 				goto assign_dim_error
 			} else if IS_CONST == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CONST == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CONST == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -42593,18 +42593,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_TMP_HANDLER(execute_data *ZendExecuteDat
 				goto assign_dim_error
 			} else if IS_TMP_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_TMP_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_TMP_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -42702,18 +42702,18 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_VAR_HANDLER(execute_data *ZendExecuteDat
 				goto assign_dim_error
 			} else if IS_VAR == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_VAR == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 					ZvalPtrDtorNogc(free_op_data)
 				}
 			} else if IS_VAR == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -42811,17 +42811,17 @@ func ZEND_ASSIGN_DIM_SPEC_CV_CV_OP_DATA_CV_HANDLER(execute_data *ZendExecuteData
 				goto assign_dim_error
 			} else if IS_CV == IS_CV {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			} else if IS_CV == IS_VAR {
 				if value != free_op_data {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			} else if IS_CV == IS_CONST {
 				if value.IsRefcounted() {
-					Z_ADDREF_P(value)
+					value.AddRefcount()
 				}
 			}
 		} else {
@@ -43247,7 +43247,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 	if (IS_CV == IS_VAR || IS_CV == IS_CV) && (opline.GetExtendedValue()&ZEND_ARRAY_ELEMENT_REF) != 0 {
 		expr_ptr = _get_zval_ptr_cv_BP_VAR_W(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
 		if expr_ptr.IsReference() {
-			Z_ADDREF_P(expr_ptr)
+			expr_ptr.AddRefcount()
 		} else {
 			ZVAL_MAKE_REF_EX(expr_ptr, 2)
 		}
@@ -43269,7 +43269,7 @@ func ZEND_ADD_ARRAY_ELEMENT_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) in
 					expr_ptr = &new_expr
 					EfreeSize(ref, b.SizeOf("zend_reference"))
 				} else if expr_ptr.IsRefcounted() {
-					Z_ADDREF_P(expr_ptr)
+					expr_ptr.AddRefcount()
 				}
 			}
 		}
@@ -43632,7 +43632,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 						}
 					}
 					if value_ptr.IsReference() {
-						Z_ADDREF_P(value_ptr)
+						value_ptr.AddRefcount()
 					} else {
 						ZVAL_MAKE_REF_EX(value_ptr, 2)
 					}
@@ -43666,7 +43666,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 				ZVAL_COPY_VALUE(generator.GetValue(), value)
 				if IS_CV == IS_CV {
 					if value.IsRefcounted() {
-						Z_ADDREF_P(value)
+						value.AddRefcount()
 					}
 				}
 			}
@@ -43704,7 +43704,7 @@ func ZEND_YIELD_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZVAL_COPY_VALUE(generator.GetKey(), key)
 			if IS_CV == IS_CV {
 				if key.IsRefcounted() {
-					Z_ADDREF_P(key)
+					key.AddRefcount()
 				}
 			}
 		}

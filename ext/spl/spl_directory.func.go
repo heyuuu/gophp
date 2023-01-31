@@ -647,7 +647,7 @@ func zim_spl_DirectoryIterator_current(execute_data *zend.ZendExecuteData, retur
 		return
 	}
 	zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
-	zend.Z_ADDREF_P(return_value)
+	return_value.AddRefcount()
 }
 func zim_spl_DirectoryIterator_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
@@ -870,7 +870,7 @@ func zim_spl_FilesystemIterator_current(execute_data *zend.ZendExecuteData, retu
 		SplFilesystemObjectCreateType(0, intern, SPL_FS_INFO, nil, return_value)
 	} else {
 		zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
-		zend.Z_ADDREF_P(return_value)
+		return_value.AddRefcount()
 	}
 }
 func zim_spl_DirectoryIterator_isDot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1325,7 +1325,7 @@ func SplFilesystemDirGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_
 	}
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemDirItFuncs)
 
@@ -1451,7 +1451,7 @@ func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by
 	}
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemTreeItFuncs)
 	return iterator.GetIntern()

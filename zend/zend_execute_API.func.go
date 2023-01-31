@@ -91,7 +91,7 @@ func ZvalCallDestructor(zv *Zval) int {
 	if zv.IsIndirect() {
 		zv = zv.GetZv()
 	}
-	if zv.IsObject() && Z_REFCOUNT_P(zv) == 1 {
+	if zv.IsObject() && zv.GetRefcount() == 1 {
 		return ZEND_HASH_APPLY_REMOVE
 	} else {
 		return ZEND_HASH_APPLY_KEEP

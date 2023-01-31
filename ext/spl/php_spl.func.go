@@ -474,7 +474,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 		zend.ZendStringReleaseEx(func_name, 0)
 		if SPL_G(autoload_functions) && zend.ZendHashExists(SPL_G(autoload_functions), lc_name) != 0 {
 			if !(alfi.GetClosure().IsUndef()) {
-				zend.Z_DELREF_P(alfi.GetClosure())
+				alfi.GetClosure().DelRefcount()
 			}
 			goto skip
 		}

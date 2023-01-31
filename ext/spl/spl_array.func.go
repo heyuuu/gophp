@@ -848,7 +848,7 @@ func SplArraySetArray(object *zend.Zval, intern *SplArrayObject, array *zend.Zva
 	}
 	if array.IsType(zend.IS_ARRAY) {
 		zend.ZvalPtrDtor(intern.GetArray())
-		if zend.Z_REFCOUNT_P(array) == 1 {
+		if array.GetRefcount() == 1 {
 			zend.ZVAL_COPY(intern.GetArray(), array)
 		} else {
 
@@ -896,7 +896,7 @@ func SplArrayGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int)
 	}
 	iterator = zend.Emalloc(b.SizeOf("zend_user_iterator"))
 	zend.ZendIteratorInit(iterator.GetIt())
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIt().GetData(), object.GetObj())
 	iterator.GetIt().SetFuncs(&SplArrayItFuncs)
 	iterator.SetCe(ce)
@@ -1298,7 +1298,7 @@ func zim_spl_Array_getChildren(execute_data *zend.ZendExecuteData, return_value 
 		}
 		if zend.InstanceofFunction(zend.Z_OBJCE_P(entry), zend.Z_OBJCE_P(zend.ZEND_THIS)) != 0 {
 			zend.ZVAL_OBJ(return_value, entry.GetObj())
-			zend.Z_ADDREF_P(return_value)
+			return_value.AddRefcount()
 			return
 		}
 	}

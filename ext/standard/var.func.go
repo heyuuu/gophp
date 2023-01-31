@@ -168,7 +168,7 @@ again:
 
 		//??? hide references with refcount==1 (for compatibility)
 
-		if zend.Z_REFCOUNT_P(struc) > 1 {
+		if struc.GetRefcount() > 1 {
 			is_ref = 1
 		}
 		struc = zend.Z_REFVAL_P(struc)
@@ -327,7 +327,7 @@ again:
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
 		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
-		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return zend.Z_REFCOUNT_P(struc) }, 1))
+		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
 		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
@@ -342,7 +342,7 @@ again:
 			myht.AddRefcount()
 		}
 		count = myht.Count()
-		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return zend.Z_REFCOUNT_P(struc) - 1 }, 1))
+		core.PhpPrintf("%sarray(%d) refcount(%u){\n", COMMON, count, b.CondF1(struc.IsRefcounted(), func() int { return struc.GetRefcount() - 1 }, 1))
 		var __ht *zend.HashTable = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *zend.Zval = _p.GetVal()
@@ -379,7 +379,7 @@ again:
 			myht.ProtectRecursive()
 		}
 		class_name = zend.Z_OBJ_HT(*struc).GetGetClassName()(struc.GetObj())
-		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), zend.Z_REFCOUNT_P(struc))
+		core.PhpPrintf("%sobject(%s)#%d (%d) refcount(%u){\n", COMMON, class_name.GetVal(), zend.Z_OBJ_HANDLE_P(struc), b.CondF1(myht != nil, func() uint32 { return myht.Count() }, 0), struc.GetRefcount())
 		zend.ZendStringReleaseEx(class_name, 0)
 		if myht != nil {
 			var __ht *zend.HashTable = myht
@@ -410,13 +410,13 @@ again:
 		break
 	case zend.IS_RESOURCE:
 		var type_name *byte = zend.ZendRsrcListGetRsrcType(struc.GetRes())
-		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, zend.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"), zend.Z_REFCOUNT_P(struc))
+		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, zend.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"), struc.GetRefcount())
 		break
 	case zend.IS_REFERENCE:
 
 		//??? hide references with refcount==1 (for compatibility)
 
-		if zend.Z_REFCOUNT_P(struc) > 1 {
+		if struc.GetRefcount() > 1 {
 			is_ref = 1
 		}
 		struc = zend.Z_REFVAL_P(struc)
@@ -838,7 +838,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 		 * of another zend_refcounted structure. */
 
 		data.GetHt().IndexAddNewH(key+1, var_)
-		zend.Z_ADDREF_P(var_)
+		var_.AddRefcount()
 		return 0
 	}
 }
@@ -1022,7 +1022,7 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			} else {
 				PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 			}
-			if data.IsReference() && zend.Z_REFCOUNT_P(data) == 1 {
+			if data.IsReference() && data.GetRefcount() == 1 {
 				data = zend.Z_REFVAL_P(data)
 			}
 
@@ -1120,7 +1120,7 @@ again:
 			var key *zend.ZendString
 			var data *zend.Zval
 			var index zend.ZendUlong
-			zend.Z_ADDREF_P(struc)
+			struc.AddRefcount()
 			zend.ZVAL_OBJ(&obj, struc.GetObj())
 			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == zend.FAILURE {
 				if zend.EG__().GetException() == nil {
@@ -1149,7 +1149,7 @@ again:
 				} else {
 					PhpVarSerializeString(buf, key.GetVal(), key.GetLen())
 				}
-				if data.IsReference() && zend.Z_REFCOUNT_P(data) == 1 {
+				if data.IsReference() && data.GetRefcount() == 1 {
 					data = zend.Z_REFVAL_P(data)
 				}
 				PhpVarSerializeIntern(buf, data, var_hash)
@@ -1191,7 +1191,7 @@ again:
 		if ce != PHP_IC_ENTRY && zend.ZendHashStrExists(ce.GetFunctionTable(), "__sleep", b.SizeOf("\"__sleep\"")-1) != 0 {
 			var retval zend.Zval
 			var tmp zend.Zval
-			zend.Z_ADDREF_P(struc)
+			struc.AddRefcount()
 			zend.ZVAL_OBJ(&tmp, struc.GetObj())
 			if PhpVarSerializeCallSleep(&retval, &tmp) == zend.FAILURE {
 				if zend.EG__().GetException() == nil {

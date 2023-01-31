@@ -968,7 +968,7 @@ func SplDllistGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	}
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	zend.Z_ADDREF_P(object)
+	object.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplDllistItFuncs)
 	iterator.GetIntern().SetCe(ce)

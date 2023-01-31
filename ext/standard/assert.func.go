@@ -224,7 +224,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if description == nil {
 			zend.ZendThrowException(AssertionErrorCe, nil, zend.E_ERROR)
 		} else if description.IsType(zend.IS_OBJECT) && zend.InstanceofFunction(zend.Z_OBJCE_P(description), zend.ZendCeThrowable) != 0 {
-			zend.Z_ADDREF_P(description)
+			description.AddRefcount()
 			zend.ZendThrowExceptionObject(description)
 		} else {
 			var str *zend.ZendString = zend.ZvalGetString(description)

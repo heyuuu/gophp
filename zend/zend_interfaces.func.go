@@ -201,7 +201,7 @@ func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendOb
 	}
 	iterator = Emalloc(b.SizeOf("zend_user_iterator"))
 	ZendIteratorInit((*ZendObjectIterator)(iterator))
-	Z_ADDREF_P(object)
+	object.AddRefcount()
 	ZVAL_OBJ(iterator.GetIt().GetData(), object.GetObj())
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
 	iterator.SetCe(Z_OBJCE_P(object))

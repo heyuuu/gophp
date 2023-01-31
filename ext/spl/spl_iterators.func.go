@@ -295,7 +295,7 @@ func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *zend.Zval, by_r
 		zend.ZendError(zend.E_ERROR, "The object to be iterated is in an invalid state: "+"the parent constructor has not been called")
 	}
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
-	zend.Z_ADDREF_P(zobject)
+	zobject.AddRefcount()
 	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), zobject.GetObj())
 	iterator.GetIntern().SetFuncs(&SplRecursiveItIteratorFuncs)
 	return (*zend.ZendObjectIterator)(iterator)
@@ -322,7 +322,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
-				zend.Z_ADDREF_P(iterator)
+				iterator.AddRefcount()
 			}
 			if user_caching_it_flags != nil {
 				zend.ZVAL_COPY(&caching_it_flags, user_caching_it_flags)
@@ -347,7 +347,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 				zend.ZendCallMethodWith0Params(iterator, zend.Z_OBJCE_P(iterator), zend.Z_OBJCE_P(iterator).GetIteratorFuncsPtr().GetZfNewIterator(), "getiterator", &aggregate_retval)
 				iterator = &aggregate_retval
 			} else {
-				zend.Z_ADDREF_P(iterator)
+				iterator.AddRefcount()
 			}
 		} else {
 			iterator = nil
@@ -737,7 +737,7 @@ func SplRecursiveTreeIteratorGetEntry(object *SplRecursiveItObject, return_value
 }
 func SplRecursiveTreeIteratorGetPostfix(object *SplRecursiveItObject, return_value *zend.Zval) {
 	zend.RETVAL_STR(object.GetPostfix()[0].GetS())
-	zend.Z_ADDREF_P(return_value)
+	return_value.AddRefcount()
 }
 func zim_spl_RecursiveTreeIterator___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	SplRecursiveItItConstruct(execute_data, return_value, spl_ce_RecursiveTreeIterator, zend.ZendCeIterator, RIT_RecursiveTreeIterator)
@@ -1083,7 +1083,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		break
 	}
 	if inc_refcount != 0 {
-		zend.Z_ADDREF_P(zobject)
+		zobject.AddRefcount()
 	}
 	zend.ZVAL_OBJ(intern.GetZobject(), zobject.GetObj())
 	if dit_type == DIT_IteratorIterator {

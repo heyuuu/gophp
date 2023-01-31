@@ -476,10 +476,10 @@ func ZendPrintLongToBuf(buf *byte, num ZendLong) *byte {
 	}
 }
 func ZendUnwrapReference(op *Zval) {
-	if Z_REFCOUNT_P(op) == 1 {
+	if op.GetRefcount() == 1 {
 		ZVAL_UNREF(op)
 	} else {
-		Z_DELREF_P(op)
+		op.DelRefcount()
 		ZVAL_COPY(op, Z_REFVAL_P(op))
 	}
 }
@@ -2509,7 +2509,7 @@ func NumericCompareFunction(op1 *Zval, op2 *Zval) int {
 	return ZEND_NORMALIZE_BOOL(d1 - d2)
 }
 func ZendFreeObjGetResult(op *Zval) {
-	ZEND_ASSERT(!(op.IsRefcounted()) || Z_REFCOUNT_P(op) != 0)
+	ZEND_ASSERT(!(op.IsRefcounted()) || op.GetRefcount() != 0)
 	ZvalPtrDtor(op)
 }
 func ConvertCompareResultToLong(result *Zval) {
@@ -2837,8 +2837,8 @@ func IncrementString(str *Zval) {
 	if !(str.IsRefcounted()) {
 		str.SetStr(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 		str.SetTypeInfo(IS_STRING_EX)
-	} else if Z_REFCOUNT_P(str) > 1 {
-		Z_DELREF_P(str)
+	} else if str.GetRefcount() > 1 {
+		str.DelRefcount()
 		str.SetStr(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 	} else {
 		ZendStringForgetHashVal(str.GetStr())

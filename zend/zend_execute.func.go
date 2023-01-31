@@ -21,17 +21,17 @@ func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, r
 	ZVAL_COPY_VALUE(variable_ptr, value)
 	if ZEND_CONST_COND(value_type == IS_CONST, 0) {
 		if variable_ptr.IsRefcounted() {
-			Z_ADDREF_P(variable_ptr)
+			variable_ptr.AddRefcount()
 		}
 	} else if (value_type & (IS_CONST | IS_CV)) != 0 {
 		if variable_ptr.IsRefcounted() {
-			Z_ADDREF_P(variable_ptr)
+			variable_ptr.AddRefcount()
 		}
 	} else if ZEND_CONST_COND(value_type == IS_VAR, 1) && ref != nil {
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else if variable_ptr.IsRefcounted() {
-			Z_ADDREF_P(variable_ptr)
+			variable_ptr.AddRefcount()
 		}
 	}
 }
@@ -672,7 +672,7 @@ func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA
 	}
 	ZvalPtrDtorNogc(object)
 	ObjectInit(object)
-	Z_ADDREF_P(object)
+	object.AddRefcount()
 	obj = object.GetObj()
 	ZendError(E_WARNING, "Creating default object from empty value")
 	if obj.GetRefcount() == 1 {
@@ -685,7 +685,7 @@ func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA
 		}
 		return nil
 	}
-	Z_DELREF_P(object)
+	object.DelRefcount()
 	return object
 }
 func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *ZendClassEntry, value *Zval, fname **byte, fsep **byte, fclass **byte, need_msg **byte, need_kind **byte, need_or_null **byte, given_msg **byte, given_kind **byte) {
@@ -1451,8 +1451,8 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		Z_STRVAL_P(str)[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
 		ZVAL_NEW_STR(str, ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
-	} else if Z_REFCOUNT_P(str) > 1 {
-		Z_DELREF_P(str)
+	} else if str.GetRefcount() > 1 {
+		str.DelRefcount()
 		ZVAL_NEW_STR(str, ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 	} else {
 		ZendStringForgetHashVal(str.GetStr())
@@ -2078,7 +2078,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 					var ce *ZendClassEntry = Z_OBJCE_P(container)
 					ZendError(E_NOTICE, "Indirect modification of overloaded element of %s has no effect", ce.GetName().GetVal())
 				}
-			} else if Z_REFCOUNT_P(retval) == 1 {
+			} else if retval.GetRefcount() == 1 {
 				ZVAL_UNREF(retval)
 			}
 			if result != retval {
@@ -2620,7 +2620,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 	if nil == ptr {
 		ptr = Z_OBJ_HT_P(container).GetReadProperty()(container, prop_ptr, type_, cache_slot, result)
 		if ptr == result {
-			if ptr.IsReference() && Z_REFCOUNT_P(ptr) == 1 {
+			if ptr.IsReference() && ptr.GetRefcount() == 1 {
 				ZVAL_UNREF(ptr)
 			}
 			return
@@ -3047,7 +3047,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 	case BP_VAR_R:
 		if EX(This).u1.v.type_ == IS_OBJECT {
 			ZVAL_OBJ(result, EX(This).GetObj())
-			Z_ADDREF_P(result)
+			result.AddRefcount()
 		} else {
 			result.SetNull()
 			ZendError(E_NOTICE, "Undefined variable: this")
@@ -3056,7 +3056,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 	case BP_VAR_IS:
 		if EX(This).u1.v.type_ == IS_OBJECT {
 			ZVAL_OBJ(result, EX(This).GetObj())
-			Z_ADDREF_P(result)
+			result.AddRefcount()
 		} else {
 			result.SetNull()
 		}
