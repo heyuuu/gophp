@@ -354,11 +354,11 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 		}
 		break
 	case IS_STRING:
-		ZendSymtableUpdate(result.GetArr(), offset.GetStr(), expr)
+		ZendSymtableUpdate(result.GetArr(), offset.GetStr().GetStr(), expr)
 		ZvalPtrDtorStr(offset)
 		break
 	case IS_NULL:
-		ZendSymtableUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC(), expr)
+		ZendSymtableUpdate(result.GetArr(), ZSTR_EMPTY_ALLOC().GetStr(), expr)
 		break
 	case IS_LONG:
 		result.GetArr().IndexUpdateH(offset.GetLval(), expr)

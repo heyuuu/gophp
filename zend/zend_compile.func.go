@@ -5985,7 +5985,7 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 				result.GetArr().IndexUpdateH(key.GetLval(), value)
 				break
 			case IS_STRING:
-				ZendSymtableUpdate(result.GetArr(), key.GetStr(), value)
+				ZendSymtableUpdate(result.GetArr(), key.GetStr().GetStr(), value)
 				break
 			case IS_DOUBLE:
 				result.GetArr().IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
@@ -7620,7 +7620,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 					return
 				}
 			} else if dim.IsString() {
-				el = ZendSymtableFind(container.GetArr(), dim.GetStr())
+				el = ZendSymtableFind(container.GetArr(), dim.GetStr().GetStr())
 				if el != nil {
 					ZVAL_COPY(&result, el)
 				} else {

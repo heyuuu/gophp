@@ -3033,14 +3033,14 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					zend.AddAssocNull(&option, "local_value")
 				}
 				zend.AddAssocLong(&option, "access", ini_entry.GetModifiable())
-				zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &option)
+				zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName().GetStr(), &option)
 			} else {
 				if ini_entry.GetValue() != nil {
 					var zv zend.Zval
 					zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
-					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), &zv)
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName().GetStr(), &zv)
 				} else {
-					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName(), zend.EG__().GetUninitializedZval())
+					zend.ZendSymtableUpdate(return_value.GetArr(), ini_entry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
 				}
 			}
 		}
@@ -4178,7 +4178,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 
 		}
 		arg2.TryAddRefcount()
-		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), arg2)
+		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr().GetStr(), arg2)
 		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash zend.Zval
@@ -4222,7 +4222,7 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
 	if callback_type == zend.ZEND_INI_PARSER_SECTION {
 		zend.ArrayInit(&(BG(active_ini_file_section)))
-		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr(), &(BG(active_ini_file_section)))
+		zend.ZendSymtableUpdate(arr.GetArr(), arg1.GetStr().GetStr(), &(BG(active_ini_file_section)))
 	} else if arg2 != nil {
 		var active_arr *zend.Zval
 		if BG(active_ini_file_section).u1.v.type_ != zend.IS_UNDEF {

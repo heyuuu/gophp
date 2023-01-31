@@ -1511,7 +1511,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 				 */
 
 			} else {
-				ZendSymtableAddNew(return_value.GetArr(), key, value)
+				ZendSymtableAddNew(return_value.GetArr(), key.GetStr(), value)
 			}
 		}
 	}

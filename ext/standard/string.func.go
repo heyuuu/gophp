@@ -3598,7 +3598,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			if str_index != nil {
 				var tmp zend.Zval
 				zend.ZVAL_NEW_STR(&tmp, result)
-				zend.ZendSymtableUpdate(return_value.GetArr(), str_index, &tmp)
+				zend.ZendSymtableUpdate(return_value.GetArr(), str_index.GetStr(), &tmp)
 			} else {
 				zend.AddIndexStr(return_value, num_index, result)
 			}

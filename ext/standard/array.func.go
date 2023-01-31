@@ -4073,7 +4073,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		} else {
 			var tmp_key *zend.ZendString
 			var key *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp_key)
-			zend.ZendSymtableUpdate(return_value.GetArr(), key, val)
+			zend.ZendSymtableUpdate(return_value.GetArr(), key.GetStr(), val)
 			zend.ZendTmpStringRelease(tmp_key)
 		}
 	}
@@ -6592,10 +6592,10 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 				tmp.GetLval()++
 			}
 		} else if entry.IsType(zend.IS_STRING) {
-			if b.Assign(&tmp, zend.ZendSymtableFind(return_value.GetArr(), entry.GetStr())) == nil {
+			if b.Assign(&tmp, zend.ZendSymtableFind(return_value.GetArr(), entry.GetStr().GetStr())) == nil {
 				var data zend.Zval
 				data.SetLong(1)
-				zend.ZendSymtableUpdate(return_value.GetArr(), entry.GetStr(), &data)
+				zend.ZendSymtableUpdate(return_value.GetArr(), entry.GetStr().GetStr(), &data)
 			} else {
 				tmp.GetLval()++
 			}
@@ -6647,7 +6647,7 @@ func ArrayColumnFetchProp(data *zend.Zval, name *zend.Zval, rv *zend.Zval) *zend
 
 	} else if data.IsType(zend.IS_ARRAY) {
 		if name.IsType(zend.IS_STRING) {
-			prop = zend.ZendSymtableFind(data.GetArr(), name.GetStr())
+			prop = zend.ZendSymtableFind(data.GetArr(), name.GetStr().GetStr())
 		} else if name.IsType(zend.IS_LONG) {
 			prop = data.GetArr().IndexFindH(name.GetLval())
 		}
@@ -6794,7 +6794,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				if keyval != nil {
 					switch keyval.GetType() {
 					case zend.IS_STRING:
-						zend.ZendSymtableUpdate(return_value.GetArr(), keyval.GetStr(), colval)
+						zend.ZendSymtableUpdate(return_value.GetArr(), keyval.GetStr().GetStr(), colval)
 						break
 					case zend.IS_LONG:
 						return_value.GetArr().IndexUpdateH(keyval.GetLval(), colval)
@@ -6802,7 +6802,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					case zend.IS_OBJECT:
 						var tmp_key *zend.ZendString
 						var key *zend.ZendString = zend.ZvalGetTmpString(keyval, &tmp_key)
-						zend.ZendSymtableUpdate(return_value.GetArr(), key, colval)
+						zend.ZendSymtableUpdate(return_value.GetArr(), key.GetStr(), colval)
 						zend.ZendTmpStringRelease(tmp_key)
 						break
 					case zend.IS_NULL:
@@ -7258,7 +7258,7 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			} else {
 				data.SetLong(num_idx)
 			}
-			zend.ZendSymtableUpdate(return_value.GetArr(), entry.GetStr(), &data)
+			zend.ZendSymtableUpdate(return_value.GetArr(), entry.GetStr().GetStr(), &data)
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Can only flip STRING and INTEGER values!")
 		}
@@ -9955,7 +9955,7 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	switch key.GetType() {
 	case zend.IS_STRING:
-		zend.RETVAL_BOOL(zend.ZendSymtableExistsInd(ht, key.GetStr()) != 0)
+		zend.RETVAL_BOOL(zend.ZendSymtableExistsInd(ht, key.GetStr().GetStr()) != 0)
 		break
 	case zend.IS_LONG:
 		zend.RETVAL_BOOL(zend.ZendHashIndexExists(ht, key.GetLval()) != 0)
@@ -10234,7 +10234,7 @@ func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				} else {
 					var tmp_key *zend.ZendString
 					var key *zend.ZendString = zend.ZvalGetTmpString(entry_keys, &tmp_key)
-					entry_values = zend.ZendSymtableUpdate(return_value.GetArr(), key, entry_values)
+					entry_values = zend.ZendSymtableUpdate(return_value.GetArr(), key.GetStr(), entry_values)
 					zend.ZendTmpStringRelease(tmp_key)
 				}
 				zend.ZvalAddRef(entry_values)
