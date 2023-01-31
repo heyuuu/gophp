@@ -50,7 +50,7 @@ func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunctio
 		ZvalPtrDtor(fci.GetFunctionName())
 	} else {
 		var fcic ZendFcallInfoCache
-		ZVAL_UNDEF(fci.GetFunctionName())
+		fci.GetFunctionName().SetUndef()
 		if obj_ce == nil {
 			if object != nil {
 				obj_ce = Z_OBJCE_P(object)
@@ -133,7 +133,7 @@ func ZendUserItInvalidateCurrent(_iter *ZendObjectIterator) {
 	var iter *ZendUserIterator = (*ZendUserIterator)(_iter)
 	if !(iter.GetValue().IsUndef()) {
 		ZvalPtrDtor(iter.GetValue())
-		ZVAL_UNDEF(iter.GetValue())
+		iter.GetValue().SetUndef()
 	}
 }
 func ZendUserItDtor(_iter *ZendObjectIterator) {
@@ -178,7 +178,7 @@ func ZendUserItGetCurrentKey(_iter *ZendObjectIterator, key *Zval) {
 		if EG__().GetException() == nil {
 			ZendError(E_WARNING, "Nothing returned from %s::key()", iter.GetCe().GetName().GetVal())
 		}
-		ZVAL_LONG(key, 0)
+		key.SetLong(0)
 	}
 }
 func ZendUserItMoveForward(_iter *ZendObjectIterator) {
@@ -205,7 +205,7 @@ func ZendUserItGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendOb
 	ZVAL_OBJ(iterator.GetIt().GetData(), object.GetObj())
 	iterator.GetIt().SetFuncs(&ZendInterfaceIteratorFuncsIterator)
 	iterator.SetCe(Z_OBJCE_P(object))
-	ZVAL_UNDEF(iterator.GetValue())
+	iterator.GetValue().SetUndef()
 	return (*ZendObjectIterator)(iterator)
 }
 func ZendUserItGetNewIterator(ce *ZendClassEntry, object *Zval, by_ref int) *ZendObjectIterator {

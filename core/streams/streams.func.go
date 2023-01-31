@@ -232,7 +232,7 @@ func _phpStreamAlloc(ops *core.PhpStreamOps, abstract any, persistent_id *byte, 
 	strlcpy(ret.GetMode(), mode, b.SizeOf("ret -> mode"))
 	ret.SetWrapper(nil)
 	ret.SetWrapperthis(nil)
-	zend.ZVAL_UNDEF(ret.GetWrapperdata())
+	ret.GetWrapperdata().SetUndef()
 	ret.SetStdiocast(nil)
 	ret.SetOrigPath(nil)
 	ret.SetCtx(nil)
@@ -397,7 +397,7 @@ func _phpStreamFree(stream *core.PhpStream, close_options int) int {
 		}
 		if stream.GetWrapperdata().GetType() != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(stream.GetWrapperdata())
-			zend.ZVAL_UNDEF(stream.GetWrapperdata())
+			stream.GetWrapperdata().SetUndef()
 		}
 		if stream.GetReadbuf() != nil {
 			zend.Pefree(stream.GetReadbuf(), stream.GetIsPersistent())
@@ -1949,7 +1949,7 @@ func PhpStreamNotificationNotify(context *core.PhpStreamContext, notifycode int,
 func PhpStreamContextFree(context *core.PhpStreamContext) {
 	if context.GetOptions().GetType() != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(context.GetOptions())
-		zend.ZVAL_UNDEF(context.GetOptions())
+		context.GetOptions().SetUndef()
 	}
 	if context.GetNotifier() != nil {
 		PhpStreamNotificationFree(context.GetNotifier())

@@ -109,7 +109,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 			break
 		case T_WHITESPACE:
 			ZendHtmlPuts((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
-			ZVAL_UNDEF(&token)
+			token.SetUndef()
 			continue
 			break
 		default:
@@ -149,7 +149,7 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 				break
 			}
 		}
-		ZVAL_UNDEF(&token)
+		token.SetUndef()
 	}
 	if last_color != syntax_highlighter_ini.GetHighlightHtml() {
 		ZendPrintf("</span>\n")
@@ -177,7 +177,7 @@ func ZendStrip() {
 		case T_COMMENT:
 
 		case T_DOC_COMMENT:
-			ZVAL_UNDEF(&token)
+			token.SetUndef()
 			continue
 		case T_END_HEREDOC:
 			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
@@ -189,7 +189,7 @@ func ZendStrip() {
 			}
 			ZendWrite("\n", b.SizeOf("\"\\n\"")-1)
 			prev_space = 1
-			ZVAL_UNDEF(&token)
+			token.SetUndef()
 			continue
 		default:
 			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
@@ -215,7 +215,7 @@ func ZendStrip() {
 			}
 		}
 		prev_space = 0
-		ZVAL_UNDEF(&token)
+		token.SetUndef()
 	}
 
 	/* Discard parse errors thrown during tokenization */

@@ -1526,7 +1526,7 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		var retval zend.Zval
-		zend.ZVAL_UNDEF(&retval)
+		retval.SetUndef()
 		if zend.SUCCESS == zend.ZendExecuteScripts(zend.ZEND_REQUIRE, &retval, 1, &zfd) {
 			if retval.GetType() != zend.IS_UNDEF {
 				decline = retval.IsType(zend.IS_FALSE)

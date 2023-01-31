@@ -189,16 +189,16 @@ func PhpOutputGetContents(p *zend.Zval) int {
 		zend.ZVAL_STRINGL(p, OG(active).buffer.data, OG(active).buffer.used)
 		return zend.SUCCESS
 	} else {
-		zend.ZVAL_NULL(p)
+		p.SetNull()
 		return zend.FAILURE
 	}
 }
 func PhpOutputGetLength(p *zend.Zval) int {
 	if OG(active) {
-		zend.ZVAL_LONG(p, OG(active).buffer.used)
+		p.SetLong(OG(active).buffer.used)
 		return zend.SUCCESS
 	} else {
-		zend.ZVAL_NULL(p)
+		p.SetNull()
 		return zend.FAILURE
 	}
 }
@@ -597,7 +597,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			var ob_data zend.Zval
 			var ob_mode zend.Zval
 			zend.ZVAL_STRINGL(&ob_data, handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed())
-			zend.ZVAL_LONG(&ob_mode, zend.ZendLong(context.GetOp()))
+			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			zend.ZvalPtrDtor(&ob_data)
 			var PHP_OUTPUT_USER_SUCCESS func(retval zend.Zval) bool = func(retval zend.Zval) bool {

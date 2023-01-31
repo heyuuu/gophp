@@ -217,7 +217,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 	memset(&(BG(serialize)), 0, b.SizeOf("BG ( serialize )"))
 	memset(&(BG(unserialize)), 0, b.SizeOf("BG ( unserialize )"))
 	BG(strtok_string) = nil
-	zend.ZVAL_UNDEF(&(BG(strtok_zval)))
+	BG(strtok_zval).SetUndef()
 	BG(strtok_last) = nil
 	BG(locale_string) = nil
 	BG(locale_changed) = 0
@@ -251,7 +251,7 @@ func ZmActivateBasic(type_ int, module_number int) int {
 }
 func ZmDeactivateBasic(type_ int, module_number int) int {
 	zend.ZvalPtrDtor(&(BG(strtok_zval)))
-	zend.ZVAL_UNDEF(&(BG(strtok_zval)))
+	BG(strtok_zval).SetUndef()
 	BG(strtok_string) = nil
 	tsrm_env_lock()
 	BG(putenv_ht).Destroy()
@@ -1237,7 +1237,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			/* keep the arg as binary, since the encoding is not known */
 
 		} else {
-			zend.ZVAL_FALSE(&val)
+			val.SetFalse()
 		}
 
 		/* Add this option / argument pair to the result hash. */
@@ -4330,7 +4330,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	/* Set callback function */
 
 	if process_sections != 0 {
-		zend.ZVAL_UNDEF(&(BG(active_ini_file_section)))
+		BG(active_ini_file_section).SetUndef()
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)
@@ -4441,7 +4441,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	/* Set callback function */
 
 	if process_sections != 0 {
-		zend.ZVAL_UNDEF(&(BG(active_ini_file_section)))
+		BG(active_ini_file_section).SetUndef()
 		ini_parser_cb = zend.ZendIniParserCbT(PhpIniParserCbWithSections)
 	} else {
 		ini_parser_cb = zend.ZendIniParserCbT(PhpSimpleIniParserCb)

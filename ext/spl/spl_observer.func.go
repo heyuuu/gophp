@@ -75,7 +75,7 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *zend.Zval, obj *
 		if inf != nil {
 			zend.ZVAL_COPY(pelement.GetInf(), inf)
 		} else {
-			zend.ZVAL_NULL(pelement.GetInf())
+			pelement.GetInf().SetNull()
 		}
 		SplObjectStorageFreeHash(intern, &key)
 		return pelement
@@ -84,7 +84,7 @@ func SplObjectStorageAttach(intern *spl_SplObjectStorage, this *zend.Zval, obj *
 	if inf != nil {
 		zend.ZVAL_COPY(element.GetInf(), inf)
 	} else {
-		zend.ZVAL_NULL(element.GetInf())
+		element.GetInf().SetNull()
 	}
 	if key.GetKey() != nil {
 		pelement = zend.ZendHashUpdateMem(intern.GetStorage(), key.GetKey(), &element, b.SizeOf("spl_SplObjectStorageElement"))
@@ -458,7 +458,7 @@ func zim_spl_SplObjectStorage_serialize(execute_data *zend.ZendExecuteData, retu
 	/* storage */
 
 	zend.SmartStrAppendl(&buf, "x:", 2)
-	zend.ZVAL_LONG(&flags, intern.GetStorage().GetNNumOfElements())
+	flags.SetLong(intern.GetStorage().GetNNumOfElements())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
 	for zend.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) == zend.SUCCESS {
@@ -531,8 +531,8 @@ func zim_spl_SplObjectStorage_unserialize(execute_data *zend.ZendExecuteData, re
 	if count < 0 {
 		goto outexcept
 	}
-	zend.ZVAL_UNDEF(&entry)
-	zend.ZVAL_UNDEF(&inf)
+	entry.SetUndef()
+	inf.SetUndef()
 	for b.PostDec(&count) > 0 {
 		var pelement *spl_SplObjectStorageElement
 		var key zend.ZendHashKey
@@ -582,9 +582,9 @@ func zim_spl_SplObjectStorage_unserialize(execute_data *zend.ZendExecuteData, re
 		standard.VarReplace(&var_hash, &entry, element.GetObj())
 		standard.VarReplace(&var_hash, &inf, element.GetInf())
 		zend.ZvalPtrDtor(&entry)
-		zend.ZVAL_UNDEF(&entry)
+		entry.SetUndef()
 		zend.ZvalPtrDtor(&inf)
-		zend.ZVAL_UNDEF(&inf)
+		inf.SetUndef()
 	}
 	if (*p) != ';' {
 		goto outexcept
@@ -846,7 +846,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 			}
 			return
 		} else {
-			zend.ZVAL_NULL(&retval)
+			retval.SetNull()
 		}
 		if intern.IsKeysAssoc() {
 			switch element.GetInf().GetType() {

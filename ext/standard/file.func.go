@@ -21,7 +21,7 @@ func FileContextDtor(res *zend.ZendResource) {
 	var context *core.PhpStreamContext = (*core.PhpStreamContext)(res.GetPtr())
 	if context.GetOptions().GetType() != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(context.GetOptions())
-		zend.ZVAL_UNDEF(context.GetOptions())
+		context.GetOptions().SetUndef()
 	}
 	streams.PhpStreamContextFree(context)
 }
@@ -3243,19 +3243,19 @@ func PhpIfFstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZVAL_LONG(&stat_dev, stat_ssb.GetSb().st_dev)
-	zend.ZVAL_LONG(&stat_ino, stat_ssb.GetSb().st_ino)
-	zend.ZVAL_LONG(&stat_mode, stat_ssb.GetSb().st_mode)
-	zend.ZVAL_LONG(&stat_nlink, stat_ssb.GetSb().st_nlink)
-	zend.ZVAL_LONG(&stat_uid, stat_ssb.GetSb().st_uid)
-	zend.ZVAL_LONG(&stat_gid, stat_ssb.GetSb().st_gid)
-	zend.ZVAL_LONG(&stat_rdev, stat_ssb.GetSb().st_rdev)
-	zend.ZVAL_LONG(&stat_size, stat_ssb.GetSb().st_size)
-	zend.ZVAL_LONG(&stat_atime, stat_ssb.GetSb().st_atime)
-	zend.ZVAL_LONG(&stat_mtime, stat_ssb.GetSb().st_mtime)
-	zend.ZVAL_LONG(&stat_ctime, stat_ssb.GetSb().st_ctime)
-	zend.ZVAL_LONG(&stat_blksize, stat_ssb.GetSb().st_blksize)
-	zend.ZVAL_LONG(&stat_blocks, stat_ssb.GetSb().st_blocks)
+	stat_dev.SetLong(stat_ssb.GetSb().st_dev)
+	stat_ino.SetLong(stat_ssb.GetSb().st_ino)
+	stat_mode.SetLong(stat_ssb.GetSb().st_mode)
+	stat_nlink.SetLong(stat_ssb.GetSb().st_nlink)
+	stat_uid.SetLong(stat_ssb.GetSb().st_uid)
+	stat_gid.SetLong(stat_ssb.GetSb().st_gid)
+	stat_rdev.SetLong(stat_ssb.GetSb().st_rdev)
+	stat_size.SetLong(stat_ssb.GetSb().st_size)
+	stat_atime.SetLong(stat_ssb.GetSb().st_atime)
+	stat_mtime.SetLong(stat_ssb.GetSb().st_mtime)
+	stat_ctime.SetLong(stat_ssb.GetSb().st_ctime)
+	stat_blksize.SetLong(stat_ssb.GetSb().st_blksize)
+	stat_blocks.SetLong(stat_ssb.GetSb().st_blocks)
 
 	/* Store numeric indexes in proper order */
 

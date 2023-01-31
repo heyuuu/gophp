@@ -42,10 +42,10 @@ func ConvertToNumber(retval *Zval, str *byte, str_len int) int {
 	var dval float64
 	if b.Assign(&type_, IsNumericStringEx(str, str_len, &lval, &dval, 0, &overflow)) != 0 {
 		if type_ == IS_LONG {
-			ZVAL_LONG(retval, lval)
+			retval.SetLong(lval)
 			return SUCCESS
 		} else if type_ == IS_DOUBLE && overflow == 0 {
-			ZVAL_DOUBLE(retval, dval)
+			retval.SetDouble(dval)
 			return SUCCESS
 		}
 	}
@@ -59,7 +59,7 @@ func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
 		ZVAL_BOOL(retval, type_ == BOOL_TRUE)
 		break
 	case NULL_NULL:
-		ZVAL_NULL(retval)
+		retval.SetNull()
 		break
 	case TC_NUMBER:
 		if ConvertToNumber(retval, str, len_) == SUCCESS {

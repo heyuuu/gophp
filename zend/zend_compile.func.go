@@ -338,7 +338,7 @@ func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
 		zv.SetLval(zv.GetLval() | kind)
 	} else {
 		var tmp Zval
-		ZVAL_LONG(&tmp, kind)
+		tmp.SetLong(kind)
 		FC(seen_symbols).KeyAddNew(name.GetStr(), &tmp)
 	}
 }
@@ -422,7 +422,7 @@ func ZendDelLiteral(op_array *ZendOpArray, n int) {
 	if n+1 == op_array.GetLastLiteral() {
 		op_array.GetLastLiteral()--
 	} else {
-		ZVAL_UNDEF(CT_CONSTANT_EX(op_array, n))
+		CT_CONSTANT_EX(op_array, n).SetUndef()
 	}
 }
 func ZendInsertLiteral(op_array *ZendOpArray, zv *Zval, literal_position int) {
@@ -1849,9 +1849,9 @@ func ZendEmitFinalReturn(return_one int) {
 	}
 	zn.SetOpType(IS_CONST)
 	if return_one != 0 {
-		ZVAL_LONG(zn.GetConstant(), 1)
+		zn.GetConstant().SetLong(1)
 	} else {
-		ZVAL_NULL(zn.GetConstant())
+		zn.GetConstant().SetNull()
 	}
 	ret = ZendEmitOp(nil, b.Cond(returns_reference != 0, ZEND_RETURN_BY_REF, ZEND_RETURN), &zn, nil)
 	ret.SetExtendedValue(-1)
@@ -1885,7 +1885,7 @@ func ZendHandleNumericOp(node *Znode) {
 		var index ZendUlong
 		if ZEND_HANDLE_NUMERIC(node.GetConstant().GetStr(), &index) {
 			ZvalPtrDtor(node.GetConstant())
-			ZVAL_LONG(node.GetConstant(), index)
+			node.GetConstant().SetLong(index)
 		}
 	}
 }
@@ -1900,7 +1900,7 @@ func ZendHandleNumericDim(opline *ZendOp, dim_node *Znode) {
 
 			var c int = ZendAddLiteral(dim_node.GetConstant())
 			ZEND_ASSERT(opline.GetOp2().GetConstant()+1 == c)
-			ZVAL_LONG(CT_CONSTANT(opline.GetOp2()), index)
+			CT_CONSTANT(opline.GetOp2()).SetLong(index)
 			CT_CONSTANT(opline.GetOp2()).GetU2Extra() = ZEND_EXTRA_VALUE
 			return
 		}
@@ -2218,7 +2218,7 @@ func ZendCompileListAssign(result *Znode, ast *ZendAst, expr_node *Znode, old_st
 				ZendError(E_COMPILE_ERROR, "Cannot mix keyed and unkeyed array entries in assignments")
 			}
 			dim_node.SetOpType(IS_CONST)
-			ZVAL_LONG(dim_node.GetConstant(), i)
+			dim_node.GetConstant().SetLong(i)
 		}
 		if expr_node.GetOpType() == IS_CONST {
 			Z_TRY_ADDREF(expr_node.GetConstant())
@@ -2718,7 +2718,7 @@ func ZendCompileFuncStrlen(result *Znode, args *ZendAstList) int {
 	ZendCompileExpr(&arg_node, args.GetChild()[0])
 	if arg_node.GetOpType() == IS_CONST && arg_node.GetConstant().IsString() {
 		result.SetOpType(IS_CONST)
-		ZVAL_LONG(result.GetConstant(), Z_STRLEN(arg_node.GetConstant()))
+		result.GetConstant().SetLong(Z_STRLEN(arg_node.GetConstant()))
 		ZvalPtrDtorStr(arg_node.GetConstant())
 	} else {
 		ZendEmitOpTmp(result, ZEND_STRLEN, &arg_node, nil)
@@ -2765,7 +2765,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 	if ZendTryCtEvalConst(result.GetConstant(), name, 0) != 0 {
 		ZendStringReleaseEx(name, 0)
 		ZvalPtrDtor(result.GetConstant())
-		ZVAL_TRUE(result.GetConstant())
+		result.GetConstant().SetTrue()
 		result.SetOpType(IS_CONST)
 		return SUCCESS
 	}
@@ -2795,7 +2795,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 func ZendCompileFuncOrd(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsString() {
 		result.SetOpType(IS_CONST)
-		ZVAL_LONG(result.GetConstant(), uint8(Z_STRVAL_P(ZendAstGetZval(args.GetChild()[0]))[0]))
+		result.GetConstant().SetLong(uint8(Z_STRVAL_P(ZendAstGetZval(args.GetChild()[0]))[0]))
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2928,7 +2928,7 @@ func ZendCompileAssert(result *Znode, args *ZendAstList, name *ZendString, fbc *
 			ZendStringReleaseEx(name, 0)
 		}
 		result.SetOpType(IS_CONST)
-		ZVAL_TRUE(result.GetConstant())
+		result.GetConstant().SetTrue()
 	}
 }
 func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
@@ -2966,7 +2966,7 @@ func ZendCompileFuncInArray(result *Znode, args *ZendAstList) int {
 		var tmp Zval
 		var src *HashTable = array.GetConstant().GetArr()
 		var dst *HashTable = ZendNewArray(src.GetNNumOfElements())
-		ZVAL_TRUE(&tmp)
+		tmp.SetTrue()
 		if strict != 0 {
 			var __ht *HashTable = src
 			for _, _p := range __ht.foreachData() {
@@ -3086,7 +3086,7 @@ func ZendCompileFuncArraySlice(result *Znode, args *ZendAstList) int {
 		var first Znode
 		if ZendStringEqualsLiteralCi(name, "func_get_args") && list.GetChildren() == 0 && zv.IsLong() && zv.GetLval() >= 0 {
 			first.SetOpType(IS_CONST)
-			ZVAL_LONG(first.GetConstant(), zv.GetLval())
+			first.GetConstant().SetLong(zv.GetLval())
 			ZendEmitOpTmp(result, ZEND_FUNC_GET_ARGS, &first, nil)
 			ZendStringReleaseEx(name, 0)
 			return SUCCESS
@@ -3426,7 +3426,7 @@ func ZendCompileStaticVar(ast *ZendAst) {
 	if value_ast != nil {
 		ZendConstExprToZval(&value_zv, value_ast)
 	} else {
-		ZVAL_NULL(&value_zv)
+		value_zv.SetNull()
 	}
 	ZendCompileStaticVarCommon(ZendAstGetStr(var_ast), &value_zv, ZEND_BIND_REF)
 }
@@ -3571,7 +3571,7 @@ func ZendCompileReturn(ast *ZendAst) {
 	}
 	if expr_ast == nil {
 		expr_node.SetOpType(IS_CONST)
-		ZVAL_NULL(expr_node.GetConstant())
+		expr_node.GetConstant().SetNull()
 	} else if by_ref != 0 && ZendIsVariable(expr_ast) != 0 {
 		ZendCompileVar(&expr_node, expr_ast, BP_VAR_W, 1)
 	} else {
@@ -3678,7 +3678,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "'goto' to undefined label '%s'", Z_STRVAL_P(label))
 	}
 	ZvalPtrDtorStr(label)
-	ZVAL_NULL(label)
+	label.SetNull()
 	current = opline.GetExtendedValue()
 	for ; current != dest.GetBrkCont(); current = CG__().GetContext().GetBrkContArray()[current].GetParent() {
 		if current == -1 {
@@ -3775,7 +3775,7 @@ func ZendCompileExprList(result *Znode, ast *ZendAst) {
 	var list *ZendAstList
 	var i uint32
 	result.SetOpType(IS_CONST)
-	ZVAL_TRUE(result.GetConstant())
+	result.GetConstant().SetTrue()
 	if ast == nil {
 		return
 	}
@@ -4082,7 +4082,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 			if jumptable != nil {
 				var cond_zv *Zval = ZendAstGetZval(cond_ast)
 				var jmp_target Zval
-				ZVAL_LONG(&jmp_target, GetNextOpNumber())
+				jmp_target.SetLong(GetNextOpNumber())
 				ZEND_ASSERT(cond_zv.IsType(jumptable_type))
 				if cond_zv.IsLong() {
 					jumptable.IndexAddH(cond_zv.GetLval(), &jmp_target)
@@ -4764,7 +4764,7 @@ func ZendCompileClosureUses(ast *ZendAst) {
 		var var_ast *ZendAst = list.GetChild()[i]
 		var var_name *ZendString = ZendAstGetStr(var_ast)
 		var zv Zval
-		ZVAL_NULL(&zv)
+		zv.SetNull()
 		var i int
 		for i = 0; i < op_array.GetLastVar(); i++ {
 			if ZendStringEquals(op_array.GetVars()[i], var_name) != 0 {
@@ -4783,7 +4783,7 @@ func ZendCompileImplicitClosureUses(info *ClosureInfo) {
 
 		var_name = _p.GetKey()
 		var zv Zval
-		ZVAL_NULL(&zv)
+		zv.SetNull()
 		ZendCompileStaticVarCommon(var_name, &zv, ZEND_BIND_IMPLICIT)
 	}
 }
@@ -5161,9 +5161,9 @@ func ZendCompilePropDecl(ast *ZendAst, type_ast *ZendAst, flags uint32) {
 				}
 			}
 		} else if !(type_.IsSet()) {
-			ZVAL_NULL(&value_zv)
+			value_zv.SetNull()
 		} else {
-			ZVAL_UNDEF(&value_zv)
+			value_zv.SetUndef()
 		}
 		ZendDeclareTypedProperty(ce, name, &value_zv, flags, doc_comment, type_)
 	}
@@ -5768,7 +5768,7 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 	var ce *ZendClassEntry = CG__().GetActiveClassEntry()
 	switch ast.GetAttr() {
 	case T_LINE:
-		ZVAL_LONG(zv, ast.GetLineno())
+		zv.SetLong(ast.GetLineno())
 		break
 	case T_FILE:
 		ZVAL_STR_COPY(zv, CG__().GetCompiledFilename())
@@ -5895,7 +5895,7 @@ func ZendCtEvalUnaryOp(result *Zval, opcode uint32, op *Zval) {
 }
 func ZendTryCtEvalUnaryPm(result *Zval, kind ZendAstKind, op *Zval) ZendBool {
 	var left Zval
-	ZVAL_LONG(&left, b.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
+	left.SetLong(b.Cond(kind == ZEND_AST_UNARY_PLUS, 1, -1))
 	return ZendTryCtEvalBinaryOp(result, ZEND_MUL, &left, op)
 }
 func ZendCtEvalGreater(result *Zval, kind ZendAstKind, op1 *Zval, op2 *Zval) {
@@ -6148,7 +6148,7 @@ func ZendCompileUnaryPm(result *Znode, ast *ZendAst) {
 		}
 	}
 	lefthand_node.SetOpType(IS_CONST)
-	ZVAL_LONG(lefthand_node.GetConstant(), b.Cond(ast.GetKind() == ZEND_AST_UNARY_PLUS, 1, -1))
+	lefthand_node.GetConstant().SetLong(b.Cond(ast.GetKind() == ZEND_AST_UNARY_PLUS, 1, -1))
 	ZendEmitOpTmp(result, ZEND_MUL, &lefthand_node, &expr_node)
 }
 func ZendCompileShortCircuiting(result *Znode, ast *ZendAst) {
@@ -6466,7 +6466,7 @@ func ZendCompilePrint(result *Znode, ast *ZendAst) {
 	opline = ZendEmitOp(nil, ZEND_ECHO, &expr_node, nil)
 	opline.SetExtendedValue(1)
 	result.SetOpType(IS_CONST)
-	ZVAL_LONG(result.GetConstant(), 1)
+	result.GetConstant().SetLong(1)
 }
 func ZendCompileExit(result *Znode, ast *ZendAst) {
 	var expr_ast *ZendAst = ast.GetChild()[0]
@@ -6527,7 +6527,7 @@ func ZendCompileInstanceof(result *Znode, ast *ZendAst) {
 	if obj_node.GetOpType() == IS_CONST {
 		ZendDoFree(&obj_node)
 		result.SetOpType(IS_CONST)
-		ZVAL_FALSE(result.GetConstant())
+		result.GetConstant().SetFalse()
 		return
 	}
 	ZendCompileClassRef(&class_node, class_ast, ZEND_FETCH_CLASS_NO_AUTOLOAD|ZEND_FETCH_CLASS_EXCEPTION)
@@ -6737,7 +6737,7 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 		}
 		if last != nil && last.GetKind() == ZEND_AST_HALT_COMPILER {
 			result.SetOpType(IS_CONST)
-			ZVAL_LONG(result.GetConstant(), ZendAstGetZval(last.GetChild()[0]).GetLval())
+			result.GetConstant().SetLong(ZendAstGetZval(last.GetChild()[0]).GetLval())
 			ZendStringReleaseEx(resolved_name, 0)
 			return
 		}
@@ -7643,7 +7643,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			c = ZendUchar(Z_STRVAL_P(container)[offset])
 			ZVAL_INTERNED_STR(&result, ZSTR_CHAR(c))
 		} else if container.GetType() <= IS_FALSE {
-			ZVAL_NULL(&result)
+			result.SetNull()
 		} else {
 			return
 		}

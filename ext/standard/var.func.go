@@ -829,7 +829,7 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 		return zv.GetLval()
 	} else {
 		var zv_n zend.Zval
-		zend.ZVAL_LONG(&zv_n, data.GetN())
+		zv_n.SetLong(data.GetN())
 		data.GetHt().IndexAddNewH(key, &zv_n)
 
 		/* Additionally to the index, we also store the variable, to ensure that it is
@@ -1180,7 +1180,7 @@ again:
 				/* Mark this value in the var_hash, to avoid creating references to it. */
 
 				var var_idx *zend.Zval = var_hash.GetHt().IndexFindH(zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
-				zend.ZVAL_LONG(var_idx, -1)
+				var_idx.SetLong(-1)
 				zend.SmartStrAppendl(buf, "N;", 2)
 			}
 			if serialized_data != nil {

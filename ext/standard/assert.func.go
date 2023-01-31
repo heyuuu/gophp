@@ -20,7 +20,7 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 	if zend.EG__().GetCurrentExecuteData() != nil {
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
-			zend.ZVAL_UNDEF(&(ASSERTG(callback)))
+			ASSERTG(callback).SetUndef()
 		}
 		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || new_value.GetLen() != 0) {
 			zend.ZVAL_STR_COPY(&(ASSERTG(callback)), new_value)
@@ -40,7 +40,7 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 	return zend.SUCCESS
 }
 func PhpAssertInitGlobals(assert_globals_p *ZendAssertGlobals) {
-	zend.ZVAL_UNDEF(assert_globals_p.GetCallback())
+	assert_globals_p.GetCallback().SetUndef()
 	assert_globals_p.SetCb(nil)
 }
 func ZmStartupAssert(type_ int, module_number int) int {
@@ -69,7 +69,7 @@ func ZmShutdownAssert(type_ int, module_number int) int {
 func ZmDeactivateAssert(type_ int, module_number int) int {
 	if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(&(ASSERTG(callback)))
-		zend.ZVAL_UNDEF(&(ASSERTG(callback)))
+		ASSERTG(callback).SetUndef()
 	}
 	return zend.SUCCESS
 }
@@ -201,9 +201,9 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var lineno uint32 = zend.ZendGetExecutedLineno()
 		var filename *byte = zend.ZendGetExecutedFilename()
 		zend.ZVAL_STRING(&args[0], SAFE_STRING(filename))
-		zend.ZVAL_LONG(&args[1], lineno)
+		args[1].SetLong(lineno)
 		zend.ZVAL_STRING(&args[2], SAFE_STRING(myeval))
-		zend.ZVAL_FALSE(&retval)
+		retval.SetFalse()
 
 		/* XXX do we want to check for error here? */
 

@@ -318,7 +318,7 @@ func SapiActivate() {
 	SG(sapi_headers).http_status_line = nil
 	SG(sapi_headers).mimetype = nil
 	SG(headers_sent) = 0
-	zend.ZVAL_UNDEF(&(SG(callback_func)))
+	SG(callback_func).SetUndef()
 	SG(read_post_bytes) = 0
 	SG(request_info).request_body = nil
 	SG(request_info).current_user = nil
@@ -726,7 +726,7 @@ func SapiSendHeaders() int {
 	if SG(callback_func).u1.v.type_ != zend.IS_UNDEF {
 		var cb zend.Zval
 		zend.ZVAL_COPY_VALUE(&cb, &(SG(callback_func)))
-		zend.ZVAL_UNDEF(&(SG(callback_func)))
+		SG(callback_func).SetUndef()
 		SapiRunHeaderCallback(&cb)
 		zend.ZvalPtrDtor(&cb)
 	}

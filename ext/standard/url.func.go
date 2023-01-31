@@ -447,7 +447,7 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_HOST).GetStr(), &tmp)
 	}
 	if has_port != 0 {
-		zend.ZVAL_LONG(&tmp, resource.GetPort())
+		tmp.SetLong(resource.GetPort())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PORT).GetStr(), &tmp)
 	}
 	if resource.GetUser() != nil {

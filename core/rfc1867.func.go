@@ -1055,19 +1055,19 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			var error_type zend.Zval
 			var size_overflow int = 0
 			var file_size_buf []byte
-			zend.ZVAL_LONG(&error_type, cancel_upload)
+			error_type.SetLong(cancel_upload)
 
 			/* Add $foo[error] */
 
 			if cancel_upload != 0 {
-				zend.ZVAL_LONG(&file_size, 0)
+				file_size.SetLong(0)
 			} else {
 				if total_bytes > zend.ZEND_LONG_MAX {
 					var __len int = Snprintf(file_size_buf, 65, "%"+"lld", total_bytes)
 					file_size_buf[__len] = '0'
 					size_overflow = 1
 				} else {
-					zend.ZVAL_LONG(&file_size, total_bytes)
+					file_size.SetLong(total_bytes)
 				}
 			}
 			if is_arr_upload != 0 {

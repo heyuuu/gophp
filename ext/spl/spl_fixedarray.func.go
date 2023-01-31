@@ -233,7 +233,7 @@ func SplFixedarrayObjectReadDimension(object *zend.Zval, offset *zend.Zval, type
 	if intern.GetFptrOffsetGet() != nil {
 		var tmp zend.Zval
 		if offset == nil {
-			zend.ZVAL_NULL(&tmp)
+			tmp.SetNull()
 			offset = &tmp
 		} else {
 			zend.SEPARATE_ARG_IF_REF(offset)
@@ -281,7 +281,7 @@ func SplFixedarrayObjectWriteDimension(object *zend.Zval, offset *zend.Zval, val
 	intern = Z_SPLFIXEDARRAY_P(object)
 	if intern.GetFptrOffsetSet() != nil {
 		if offset == nil {
-			zend.ZVAL_NULL(&tmp)
+			tmp.SetNull()
 			offset = &tmp
 		} else {
 			zend.SEPARATE_ARG_IF_REF(offset)
@@ -306,7 +306,7 @@ func SplFixedarrayObjectUnsetDimensionHelper(intern *SplFixedarrayObject, offset
 		return
 	} else {
 		zend.ZvalPtrDtor(&intern.GetArray().GetElements()[index])
-		zend.ZVAL_UNDEF(intern.GetArray().GetElements()[index])
+		intern.GetArray().GetElements()[index].SetUndef()
 	}
 }
 func SplFixedarrayObjectUnsetDimension(object *zend.Zval, offset *zend.Zval) {
@@ -627,7 +627,7 @@ func SplFixedarrayItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 		return zend.ZendUserItGetCurrentData(iter)
 	} else {
 		var data *zend.Zval
-		zend.ZVAL_LONG(&zindex, object.GetCurrent())
+		zindex.SetLong(object.GetCurrent())
 		data = SplFixedarrayObjectReadDimensionHelper(object, &zindex)
 		if data == nil {
 			data = zend.EG__().GetUninitializedZval()
@@ -640,7 +640,7 @@ func SplFixedarrayItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval)
 	if object.IsKey() {
 		zend.ZendUserItGetCurrentKey(iter, key)
 	} else {
-		zend.ZVAL_LONG(key, object.GetCurrent())
+		key.SetLong(object.GetCurrent())
 	}
 }
 func SplFixedarrayItMoveForward(iter *zend.ZendObjectIterator) {
@@ -689,7 +689,7 @@ func zim_spl_SplFixedArray_current(execute_data *zend.ZendExecuteData, return_va
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_LONG(&zindex, intern.GetCurrent())
+	zindex.SetLong(intern.GetCurrent())
 	value = SplFixedarrayObjectReadDimensionHelper(intern, &zindex)
 	if value != nil {
 		zend.ZVAL_COPY_DEREF(return_value, value)
@@ -710,7 +710,7 @@ func SplFixedarrayGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref
 	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplFixedarrayItFuncs)
 	iterator.GetIntern().SetCe(ce)
-	zend.ZVAL_UNDEF(iterator.GetIntern().GetValue())
+	iterator.GetIntern().GetValue().SetUndef()
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplFixedarray(type_ int, module_number int) int {

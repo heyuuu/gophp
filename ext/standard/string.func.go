@@ -7520,7 +7520,7 @@ func StringNaturalCompareFunctionEx(result *zend.Zval, op1 *zend.Zval, op2 *zend
 	var tmp_str2 *zend.ZendString
 	var str1 *zend.ZendString = zend.ZvalGetTmpString(op1, &tmp_str1)
 	var str2 *zend.ZendString = zend.ZvalGetTmpString(op2, &tmp_str2)
-	zend.ZVAL_LONG(result, StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), case_insensitive))
+	result.SetLong(StrnatcmpEx(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen(), case_insensitive))
 	zend.ZendTmpStringRelease(tmp_str1)
 	zend.ZendTmpStringRelease(tmp_str2)
 	return zend.SUCCESS

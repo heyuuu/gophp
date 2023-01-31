@@ -131,9 +131,9 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 	zend.ZVAL_RES(&args[0], zend.ZendRegisterResource(buckets_in, LeBucketBrigade))
 	zend.ZVAL_RES(&args[1], zend.ZendRegisterResource(buckets_out, LeBucketBrigade))
 	if bytes_consumed != nil {
-		zend.ZVAL_LONG(&args[2], *bytes_consumed)
+		args[2].SetLong(*bytes_consumed)
 	} else {
-		zend.ZVAL_NULL(&args[2])
+		args[2].SetNull()
 	}
 	zend.ZVAL_BOOL(&args[3], flags&streams.PSFS_FLAG_FLUSH_CLOSE)
 	call_result = zend.CallUserFunctionEx(nil, obj, &func_name, &retval, 4, args, 0, nil)
@@ -281,7 +281,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 			/* Kill the filter (safely) */
 
-			zend.ZVAL_UNDEF(filter.GetAbstract())
+			filter.GetAbstract().SetUndef()
 			streams.PhpStreamFilterFree(filter)
 
 			/* Kill the object */
@@ -392,7 +392,7 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 		zend.RETVAL_FALSE
 		return
 	}
-	zend.ZVAL_NULL(return_value)
+	return_value.SetNull()
 	if brigade.GetHead() != nil && b.Assign(&bucket, streams.PhpStreamBucketMakeWriteable(brigade.GetHead())) {
 		zend.ZVAL_RES(&zbucket, zend.ZendRegisterResource(bucket, LeBucket))
 		zend.ObjectInit(return_value)

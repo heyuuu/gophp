@@ -1113,19 +1113,19 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 
 	case FS_STAT:
 		zend.ArrayInit(return_value)
-		zend.ZVAL_LONG(&stat_dev, stat_sb.st_dev)
-		zend.ZVAL_LONG(&stat_ino, stat_sb.st_ino)
-		zend.ZVAL_LONG(&stat_mode, stat_sb.st_mode)
-		zend.ZVAL_LONG(&stat_nlink, stat_sb.st_nlink)
-		zend.ZVAL_LONG(&stat_uid, stat_sb.st_uid)
-		zend.ZVAL_LONG(&stat_gid, stat_sb.st_gid)
-		zend.ZVAL_LONG(&stat_rdev, stat_sb.st_rdev)
-		zend.ZVAL_LONG(&stat_size, stat_sb.st_size)
-		zend.ZVAL_LONG(&stat_atime, stat_sb.st_atime)
-		zend.ZVAL_LONG(&stat_mtime, stat_sb.st_mtime)
-		zend.ZVAL_LONG(&stat_ctime, stat_sb.st_ctime)
-		zend.ZVAL_LONG(&stat_blksize, stat_sb.st_blksize)
-		zend.ZVAL_LONG(&stat_blocks, stat_sb.st_blocks)
+		stat_dev.SetLong(stat_sb.st_dev)
+		stat_ino.SetLong(stat_sb.st_ino)
+		stat_mode.SetLong(stat_sb.st_mode)
+		stat_nlink.SetLong(stat_sb.st_nlink)
+		stat_uid.SetLong(stat_sb.st_uid)
+		stat_gid.SetLong(stat_sb.st_gid)
+		stat_rdev.SetLong(stat_sb.st_rdev)
+		stat_size.SetLong(stat_sb.st_size)
+		stat_atime.SetLong(stat_sb.st_atime)
+		stat_mtime.SetLong(stat_sb.st_mtime)
+		stat_ctime.SetLong(stat_sb.st_ctime)
+		stat_blksize.SetLong(stat_sb.st_blksize)
+		stat_blocks.SetLong(stat_sb.st_blocks)
 
 		/* Store numeric indexes in proper order */
 

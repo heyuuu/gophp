@@ -366,7 +366,7 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *zend.Zval) {
 	var free_buffer int = 0
 	var strtok_buf *byte = nil
 	var count zend.ZendLong = 0
-	zend.ZVAL_UNDEF(&array)
+	array.SetUndef()
 	switch arg {
 	case PARSE_POST:
 
@@ -578,9 +578,9 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 	/* prepare argc */
 
 	if SG(request_info).argc {
-		zend.ZVAL_LONG(&argc, SG(request_info).argc)
+		argc.SetLong(SG(request_info).argc)
 	} else {
-		zend.ZVAL_LONG(&argc, count)
+		argc.SetLong(count)
 	}
 	if SG(request_info).argc {
 		zend.Z_ADDREF(arr)
@@ -625,9 +625,9 @@ func PhpRegisterServerVariables() {
 
 	/* store request init time */
 
-	zend.ZVAL_DOUBLE(&tmp, SapiGetRequestTime())
+	tmp.SetDouble(SapiGetRequestTime())
 	PhpRegisterVariableQuick("REQUEST_TIME_FLOAT", b.SizeOf("\"REQUEST_TIME_FLOAT\"")-1, &tmp, ht)
-	zend.ZVAL_LONG(&tmp, zend.ZendDvalToLval(tmp.GetDval()))
+	tmp.SetLong(zend.ZendDvalToLval(tmp.GetDval()))
 	PhpRegisterVariableQuick("REQUEST_TIME", b.SizeOf("\"REQUEST_TIME\"")-1, &tmp, ht)
 }
 func PhpAutoglobalMerge(dest *zend.HashTable, src *zend.HashTable) {

@@ -492,7 +492,7 @@ func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval
 
 		zend.ArrayInit(return_value)
 		for i = 0; i < totalVars; i++ {
-			zend.ZVAL_NULL(&tmp)
+			tmp.SetNull()
 			if zend.AddNextIndexZval(return_value, &tmp) == zend.FAILURE {
 				ScanSetErrorReturn(0, return_value)
 				return zend.FAILURE
@@ -1101,7 +1101,7 @@ done:
 		result = SCAN_ERROR_EOF
 	} else if numVars != 0 {
 		zend.ZvalPtrDtor(return_value)
-		zend.ZVAL_LONG(return_value, nconversions)
+		return_value.SetLong(nconversions)
 	} else if nconversions < totalVars {
 
 	}
@@ -1109,7 +1109,7 @@ done:
 }
 func ScanSetErrorReturn(numVars int, return_value *zend.Zval) {
 	if numVars != 0 {
-		zend.ZVAL_LONG(return_value, SCAN_ERROR_EOF)
+		return_value.SetLong(SCAN_ERROR_EOF)
 	} else {
 
 		/* convert_to_null calls destructor */

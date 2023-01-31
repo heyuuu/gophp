@@ -870,7 +870,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendC
 
 				ZvalPtrDtorNogc(&ce.GetDefaultPropertiesTable()[parent_num])
 				ce.GetDefaultPropertiesTable()[parent_num] = ce.GetDefaultPropertiesTable()[child_num]
-				ZVAL_UNDEF(ce.GetDefaultPropertiesTable()[child_num])
+				ce.GetDefaultPropertiesTable()[child_num].SetUndef()
 				child_info.SetOffset(parent_info.GetOffset())
 			}
 			if parent_info.GetType().IsSet() {

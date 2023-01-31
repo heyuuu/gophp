@@ -43,7 +43,7 @@ func CleanNonPersistentClassFull(zv *Zval) int {
 }
 func InitExecutor() {
 	ZendInitFpu()
-	ZVAL_NULL(EG__().GetUninitializedZval())
+	EG__().GetUninitializedZval().SetNull()
 	ZVAL_ERROR(EG__().GetErrorZval())
 
 	/* destroys stack frame, therefore makes core dumps worthless */
@@ -62,8 +62,8 @@ func InitExecutor() {
 	ZendLlistApply(&ZendExtensions, LlistApplyFuncT(ZendExtensionActivator))
 	ZendHashInit(EG__().GetIncludedFiles(), 8, nil, nil, 0)
 	EG__().SetTicksCount(0)
-	ZVAL_UNDEF(EG__().GetUserErrorHandler())
-	ZVAL_UNDEF(EG__().GetUserExceptionHandler())
+	EG__().GetUserErrorHandler().SetUndef()
+	EG__().GetUserExceptionHandler().SetUndef()
 	EG__().SetCurrentExecuteData(nil)
 	ZendStackInit(EG__().GetUserErrorHandlersErrorReporting(), b.SizeOf("int"))
 	ZendStackInit(EG__().GetUserErrorHandlers(), b.SizeOf("zval"))
@@ -228,11 +228,11 @@ func ShutdownExecutor() {
 
 		if EG__().GetUserErrorHandler().GetType() != IS_UNDEF {
 			ZvalPtrDtor(EG__().GetUserErrorHandler())
-			ZVAL_UNDEF(EG__().GetUserErrorHandler())
+			EG__().GetUserErrorHandler().SetUndef()
 		}
 		if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
 			ZvalPtrDtor(EG__().GetUserExceptionHandler())
-			ZVAL_UNDEF(EG__().GetUserExceptionHandler())
+			EG__().GetUserExceptionHandler().SetUndef()
 		}
 		ZendStackClean(EG__().GetUserErrorHandlersErrorReporting(), nil, 1)
 		ZendStackClean(EG__().GetUserErrorHandlers(), (func(any))(ZVAL_PTR_DTOR), 1)
@@ -557,7 +557,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	var func_ *ZendFunction
 	var call_info uint32
 	var object_or_called_scope any
-	ZVAL_UNDEF(fci.GetRetval())
+	fci.GetRetval().SetUndef()
 	if EG__().GetActive() == 0 {
 		return FAILURE
 	}
@@ -720,7 +720,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		}
 	} else if func_.GetType() == ZEND_INTERNAL_FUNCTION {
 		var call_via_handler int = func_.IsCallViaTrampoline()
-		ZVAL_NULL(fci.GetRetval())
+		fci.GetRetval().SetNull()
 		call.SetPrevExecuteData(EG__().GetCurrentExecuteData())
 		EG__().SetCurrentExecuteData(call)
 		if ZendExecuteInternal == nil {
@@ -738,7 +738,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		ZendVmStackFreeArgs(call)
 		if EG__().GetException() != nil {
 			ZvalPtrDtor(fci.GetRetval())
-			ZVAL_UNDEF(fci.GetRetval())
+			fci.GetRetval().SetUndef()
 		}
 		if call_via_handler != 0 {
 
@@ -750,7 +750,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 		}
 	} else {
-		ZVAL_NULL(fci.GetRetval())
+		fci.GetRetval().SetNull()
 
 		/* Not sure what should be done here if it's a static method */
 
@@ -769,7 +769,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		Efree(func_)
 		if EG__().GetException() != nil {
 			ZvalPtrDtor(fci.GetRetval())
-			ZVAL_UNDEF(fci.GetRetval())
+			fci.GetRetval().SetUndef()
 		}
 	}
 	ZendVmStackFreeCallFrame(call)
@@ -861,7 +861,7 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 		}
 		return nil
 	}
-	ZVAL_UNDEF(&local_retval)
+	local_retval.SetUndef()
 	if name.GetVal()[0] == '\\' {
 		ZVAL_STRINGL(&args[0], name.GetVal()+1, name.GetLen()-1)
 	} else {
@@ -952,7 +952,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *Zval, string_name *byte
 		var __bailout JMP_BUF
 		EG__().SetBailout(&__bailout)
 		if SETJMP(__bailout) == 0 {
-			ZVAL_UNDEF(&local_retval)
+			local_retval.SetUndef()
 			ZendExecute(new_op_array, &local_retval)
 		} else {
 			EG__().SetBailout(__orig_bailout)
@@ -969,7 +969,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *Zval, string_name *byte
 			}
 		} else {
 			if retval_ptr != nil {
-				ZVAL_NULL(retval_ptr)
+				retval_ptr.SetNull()
 			}
 		}
 		EG__().SetNoExtensions(0)
@@ -1241,7 +1241,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 					ZVAL_COPY_VALUE(var_, zv)
 				}
 			} else {
-				ZVAL_UNDEF(var_)
+				var_.SetUndef()
 				zv = ht.KeyAddNew(str.GetStr(), var_)
 			}
 			ZVAL_INDIRECT(zv, var_)
@@ -1271,7 +1271,7 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 				ZendHashDel(ht, *str)
 			} else {
 				ht.KeyUpdate(str.GetStr(), var_)
-				ZVAL_UNDEF(var_)
+				var_.SetUndef()
 			}
 			str++
 			var_++

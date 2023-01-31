@@ -395,7 +395,7 @@ func _phpStreamTempCreateEx(mode int, max_memory_usage int, tmpdir *byte) *core.
 	self = zend.Ecalloc(1, b.SizeOf("* self"))
 	self.SetSmax(max_memory_usage)
 	self.SetMode(mode)
-	zend.ZVAL_UNDEF(self.GetMeta())
+	self.GetMeta().SetUndef()
 	if tmpdir != nil {
 		self.SetTmpdir(zend.Estrdup(tmpdir))
 	}
@@ -439,7 +439,7 @@ func PhpStreamUrlWrapRfc2397(wrapper *core.PhpStreamWrapper, path *byte, mode *b
 	var meta zend.Zval
 	var base64 int = 0
 	var base64_comma *zend.ZendString = nil
-	zend.ZVAL_NULL(&meta)
+	meta.SetNull()
 	if memcmp(path, "data:", 5) {
 		return nil
 	}

@@ -13,7 +13,7 @@ func _zendObjectStdInit(object *ZendObject, ce *ZendClassEntry) {
 	object.SetProperties(nil)
 	ZendObjectsStorePut(object)
 	if ce.IsUseGuards() {
-		ZVAL_UNDEF(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount())
+		(object.GetPropertiesTable() + object.GetCe().GetDefaultPropertiesCount()).SetUndef()
 	}
 }
 func ZendObjectStdInit(object *ZendObject, ce *ZendClassEntry) { _zendObjectStdInit(object, ce) }
@@ -128,14 +128,14 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 		}
 		orig_fake_scope = EG__().GetFakeScope()
 		EG__().SetFakeScope(nil)
-		ZVAL_UNDEF(&ret)
+		ret.SetUndef()
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(object)
 		fci.SetRetval(&ret)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
-		ZVAL_UNDEF(fci.GetFunctionName())
+		fci.GetFunctionName().SetUndef()
 		fcic.SetFunctionHandler(destructor)
 		fcic.SetCalledScope(object.GetCe())
 		fcic.SetObject(object)
@@ -231,14 +231,14 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 		var fcic ZendFcallInfoCache
 		var ret Zval
 		new_object.AddRefcount()
-		ZVAL_UNDEF(&ret)
+		ret.SetUndef()
 		fci.SetSize(b.SizeOf("fci"))
 		fci.SetObject(new_object)
 		fci.SetRetval(&ret)
 		fci.SetParamCount(0)
 		fci.SetParams(nil)
 		fci.SetNoSeparation(1)
-		ZVAL_UNDEF(fci.GetFunctionName())
+		fci.GetFunctionName().SetUndef()
 		fcic.SetFunctionHandler(new_object.GetCe().GetClone())
 		fcic.SetCalledScope(new_object.GetCe())
 		fcic.SetObject(new_object)
@@ -263,7 +263,7 @@ func ZendObjectsCloneObj(zobject *Zval) *ZendObject {
 		var p *Zval = new_object.GetPropertiesTable()
 		var end *Zval = p + new_object.GetCe().GetDefaultPropertiesCount()
 		for {
-			ZVAL_UNDEF(p)
+			p.SetUndef()
 			p++
 			if p == end {
 				break

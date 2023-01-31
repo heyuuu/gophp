@@ -737,24 +737,24 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			VaCopy(usr_copy, args)
 			ZVAL_STR(&params[1], ZendVstrpprintf(0, format, usr_copy))
 			va_end(usr_copy)
-			ZVAL_LONG(&params[0], type_)
+			params[0].SetLong(type_)
 			if error_filename != nil {
 				ZVAL_STRING(&params[2], error_filename)
 			} else {
-				ZVAL_NULL(&params[2])
+				params[2].SetNull()
 			}
-			ZVAL_LONG(&params[3], error_lineno)
+			params[3].SetLong(error_lineno)
 			symbol_table = ZendRebuildSymbolTable()
 
 			/* during shutdown the symbol table table can be still null */
 
 			if symbol_table == nil {
-				ZVAL_NULL(&params[4])
+				params[4].SetNull()
 			} else {
 				ZVAL_ARR(&params[4], ZendArrayDup(symbol_table))
 			}
 			ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
-			ZVAL_UNDEF(EG__().GetUserErrorHandler())
+			EG__().GetUserErrorHandler().SetUndef()
 
 			/* User error handler may include() additinal PHP files.
 			 * If an error was generated during comilation PHP will compile

@@ -175,7 +175,7 @@ func ZendGeneratorDtorStorage(object *ZendObject) {
 
 	if generator.GetValues().GetType() != IS_UNDEF {
 		ZvalPtrDtor(generator.GetValues())
-		ZVAL_UNDEF(generator.GetValues())
+		generator.GetValues().SetUndef()
 	}
 	if generator.GetNode().GetChildren() == 0 {
 		var root *ZendGenerator = generator.GetNode().GetRoot()
@@ -440,8 +440,8 @@ func ZendGeneratorCreate(class_type *ZendClassEntry) *ZendObject {
 	/* The key will be incremented on first use, so it'll start at 0 */
 
 	generator.SetLargestUsedIntegerKey(-1)
-	ZVAL_UNDEF(generator.GetRetval())
-	ZVAL_UNDEF(generator.GetValues())
+	generator.GetRetval().SetUndef()
+	generator.GetValues().SetUndef()
 
 	/* By default we have a tree of only one node */
 
@@ -485,7 +485,7 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *Zval) {
 
 	if generator.GetValues().GetType() != IS_UNDEF {
 		ZvalPtrDtor(generator.GetValues())
-		ZVAL_UNDEF(generator.GetValues())
+		generator.GetValues().SetUndef()
 	}
 
 	/* Throw the exception in the context of the generator. Decrementing the opline
@@ -707,7 +707,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		if p.GetKey() != nil {
 			ZVAL_STR_COPY(generator.GetKey(), p.GetKey())
 		} else {
-			ZVAL_LONG(generator.GetKey(), p.GetH())
+			generator.GetKey().SetLong(p.GetH())
 		}
 		generator.GetValues().GetFePos() = pos
 	} else {
@@ -742,11 +742,11 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		if iter.GetFuncs().GetGetCurrentKey() != nil {
 			iter.GetFuncs().GetGetCurrentKey()(iter, generator.GetKey())
 			if EG__().GetException() != nil {
-				ZVAL_UNDEF(generator.GetKey())
+				generator.GetKey().SetUndef()
 				goto exception
 			}
 		} else {
-			ZVAL_LONG(generator.GetKey(), iter.GetIndex())
+			generator.GetKey().SetLong(iter.GetIndex())
 		}
 	}
 	return SUCCESS
@@ -754,7 +754,7 @@ exception:
 	ZendGeneratorThrowException(generator, nil)
 failure:
 	ZvalPtrDtor(generator.GetValues())
-	ZVAL_UNDEF(generator.GetValues())
+	generator.GetValues().SetUndef()
 	return FAILURE
 }
 func ZendGeneratorResume(orig_generator *ZendGenerator) {
@@ -1169,7 +1169,7 @@ func ZendGeneratorIteratorGetKey(iterator *ZendObjectIterator, key *Zval) {
 		var zv *Zval = root.GetKey()
 		ZVAL_COPY_DEREF(key, zv)
 	} else {
-		ZVAL_NULL(key)
+		key.SetNull()
 	}
 }
 func ZendGeneratorIteratorMoveForward(iterator *ZendObjectIterator) {

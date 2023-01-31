@@ -164,12 +164,12 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 		ZVAL_STRING(&tmp, ZendGetExecutedFilename())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
 		ZvalPtrDtor(&tmp)
-		ZVAL_LONG(&tmp, ZendGetExecutedLineno())
+		tmp.SetLong(ZendGetExecutedLineno())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_LINE), &tmp)
 	} else {
 		ZVAL_STR(&tmp, filename)
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
-		ZVAL_LONG(&tmp, ZendGetCompiledLineno())
+		tmp.SetLong(ZendGetCompiledLineno())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_LINE), &tmp)
 	}
 	ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_TRACE), &trace)
@@ -215,7 +215,7 @@ func ZimExceptionConstruct(execute_data *ZendExecuteData, return_value *Zval) {
 		ZendUpdatePropertyEx(base_ce, object, ZSTR_KNOWN(ZEND_STR_MESSAGE), &tmp)
 	}
 	if code != 0 {
-		ZVAL_LONG(&tmp, code)
+		tmp.SetLong(code)
 		ZendUpdatePropertyEx(base_ce, object, ZSTR_KNOWN(ZEND_STR_CODE), &tmp)
 	}
 	if previous != nil {
@@ -272,13 +272,13 @@ func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zva
 		ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
-		ZVAL_LONG(&tmp, code)
+		tmp.SetLong(code)
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_CODE), &tmp)
 	}
 	if previous != nil {
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_PREVIOUS), previous)
 	}
-	ZVAL_LONG(&tmp, severity)
+	tmp.SetLong(severity)
 	ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_SEVERITY), &tmp)
 	if argc >= 4 {
 		ZVAL_STR_COPY(&tmp, filename)
@@ -287,7 +287,7 @@ func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zva
 		if argc < 5 {
 			lineno = 0
 		}
-		ZVAL_LONG(&tmp, lineno)
+		tmp.SetLong(lineno)
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_LINE), &tmp)
 	}
 }
@@ -552,7 +552,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		ZendCallFunction(&fci, nil)
 		if trace.GetType() != IS_STRING {
 			ZvalPtrDtor(&trace)
-			ZVAL_UNDEF(&trace)
+			trace.SetUndef()
 		}
 		if (Z_OBJCE_P(exception) == ZendCeTypeError || Z_OBJCE_P(exception) == ZendCeArgumentCountError) && strstr(message.GetVal(), ", called in ") {
 			var real_message *ZendString = ZendStrpprintf(0, "%s and defined", message.GetVal())
@@ -691,7 +691,7 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 		ZvalPtrDtor(&tmp)
 	}
 	if code != 0 {
-		ZVAL_LONG(&tmp, code)
+		tmp.SetLong(code)
 		ZendUpdatePropertyEx(exception_ce, &ex, ZSTR_KNOWN(ZEND_STR_CODE), &tmp)
 	}
 	ZendThrowExceptionInternal(&ex)
@@ -713,7 +713,7 @@ func ZendThrowErrorException(exception_ce *ZendClassEntry, message *byte, code Z
 	var tmp Zval
 	var obj *ZendObject = ZendThrowException(exception_ce, message, code)
 	ZVAL_OBJ(&ex, obj)
-	ZVAL_LONG(&tmp, severity)
+	tmp.SetLong(severity)
 	ZendUpdatePropertyEx(ZendCeErrorException, &ex, ZSTR_KNOWN(ZEND_STR_SEVERITY), &tmp)
 	return obj
 }

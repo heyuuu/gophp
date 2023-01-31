@@ -158,7 +158,7 @@ func ZendStdCallGetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) {
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	ZVAL_UNDEF(fci.GetFunctionName())
+	fci.GetFunctionName().SetUndef()
 	fcic.SetFunctionHandler(ce.GetGet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
@@ -181,14 +181,14 @@ func ZendStdCallSetter(zobj *ZendObject, prop_name *ZendString, value *Zval) {
 
 	ZVAL_STR(&args[0], prop_name)
 	ZVAL_COPY_VALUE(&args[1], value)
-	ZVAL_UNDEF(&ret)
+	ret.SetUndef()
 	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(&ret)
 	fci.SetParamCount(2)
 	fci.SetParams(args)
 	fci.SetNoSeparation(1)
-	ZVAL_UNDEF(fci.GetFunctionName())
+	fci.GetFunctionName().SetUndef()
 	fcic.SetFunctionHandler(ce.GetSet())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
@@ -210,14 +210,14 @@ func ZendStdCallUnsetter(zobj *ZendObject, prop_name *ZendString) {
 	*/
 
 	ZVAL_STR(&member, prop_name)
-	ZVAL_UNDEF(&ret)
+	ret.SetUndef()
 	fci.SetSize(b.SizeOf("fci"))
 	fci.SetObject(zobj)
 	fci.SetRetval(&ret)
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	ZVAL_UNDEF(fci.GetFunctionName())
+	fci.GetFunctionName().SetUndef()
 	fcic.SetFunctionHandler(ce.GetUnset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
@@ -246,7 +246,7 @@ func ZendStdCallIssetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) 
 	fci.SetParamCount(1)
 	fci.SetParams(&member)
 	fci.SetNoSeparation(1)
-	ZVAL_UNDEF(fci.GetFunctionName())
+	fci.GetFunctionName().SetUndef()
 	fcic.SetFunctionHandler(ce.GetIsset())
 	fcic.SetCalledScope(ce)
 	fcic.SetObject(zobj)
@@ -625,7 +625,7 @@ func ZendStdReadProperty(object *Zval, member *Zval, type_ int, cache_slot *any,
 				tmp_name = name.Copy()
 			}
 			zobj.AddRefcount()
-			ZVAL_UNDEF(&tmp_result)
+			tmp_result.SetUndef()
 			*guard |= IN_ISSET
 			ZendStdCallIssetter(zobj, name, &tmp_result)
 			*guard &= ^IN_ISSET
@@ -818,7 +818,7 @@ func ZendStdReadDimension(object *Zval, offset *Zval, type_ int, rv *Zval) *Zval
 
 			/* [] construct */
 
-			ZVAL_NULL(&tmp_offset)
+			tmp_offset.SetNull()
 
 			/* [] construct */
 
@@ -863,7 +863,7 @@ func ZendStdWriteDimension(object *Zval, offset *Zval, value *Zval) {
 	var tmp_object Zval
 	if InstanceofFunctionEx(ce, ZendCeArrayaccess, 1) != 0 {
 		if offset == nil {
-			ZVAL_NULL(&tmp_offset)
+			tmp_offset.SetNull()
 		} else {
 			ZVAL_COPY_DEREF(&tmp_offset, offset)
 		}
@@ -924,7 +924,7 @@ func ZendStdGetPropertyPtrPtr(object *Zval, member *Zval, type_ int, cache_slot 
 						ZendThrowError(nil, "Typed property %s::$%s must not be accessed before initialization", prop_info.GetCe().GetName().GetVal(), name.GetVal())
 						retval = EG__().GetErrorZval()
 					} else {
-						ZVAL_NULL(retval)
+						retval.SetNull()
 						ZendError(E_NOTICE, "Undefined property: %s::$%s", zobj.GetCe().GetName().GetVal(), name.GetVal())
 					}
 				}
@@ -996,7 +996,7 @@ func ZendStdUnsetProperty(object *Zval, member *Zval, cache_slot *any) {
 			}
 			var tmp Zval
 			ZVAL_COPY_VALUE(&tmp, slot)
-			ZVAL_UNDEF(slot)
+			slot.SetUndef()
 			ZvalPtrDtor(&tmp)
 			if zobj.GetProperties() != nil {
 				zobj.GetProperties().GetUFlags() |= HASH_FLAG_HAS_EMPTY_IND
@@ -1581,25 +1581,25 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 		}
 		return FAILURE
 	case _IS_BOOL:
-		ZVAL_TRUE(writeobj)
+		writeobj.SetTrue()
 		return SUCCESS
 	case IS_LONG:
 		ce = Z_OBJCE_P(readobj)
 		ZendError(E_NOTICE, "Object of class %s could not be converted to int", ce.GetName().GetVal())
-		ZVAL_LONG(writeobj, 1)
+		writeobj.SetLong(1)
 		return SUCCESS
 	case IS_DOUBLE:
 		ce = Z_OBJCE_P(readobj)
 		ZendError(E_NOTICE, "Object of class %s could not be converted to float", ce.GetName().GetVal())
-		ZVAL_DOUBLE(writeobj, 1)
+		writeobj.SetDouble(1)
 		return SUCCESS
 	case _IS_NUMBER:
 		ce = Z_OBJCE_P(readobj)
 		ZendError(E_NOTICE, "Object of class %s could not be converted to number", ce.GetName().GetVal())
-		ZVAL_LONG(writeobj, 1)
+		writeobj.SetLong(1)
 		return SUCCESS
 	default:
-		ZVAL_NULL(writeobj)
+		writeobj.SetNull()
 		break
 	}
 	return FAILURE

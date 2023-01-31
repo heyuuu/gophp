@@ -829,7 +829,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 				if valid == 0 {
 					ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence", 0)
 					ZvalPtrDtor(zendlval)
-					ZVAL_UNDEF(zendlval)
+					zendlval.SetUndef()
 					return FAILURE
 				}
 				errno = 0
@@ -840,7 +840,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 				if codepoint > 0x10ffff || errno {
 					ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
 					ZvalPtrDtor(zendlval)
-					ZVAL_UNDEF(zendlval)
+					zendlval.SetUndef()
 					return FAILURE
 				}
 
@@ -1003,7 +1003,7 @@ func StripMultilineStringIndentation(zendlval *Zval, indentation int, using_spac
 	return 1
 error:
 	ZvalPtrDtorStr(zendlval)
-	ZVAL_UNDEF(zendlval)
+	zendlval.SetUndef()
 	return 0
 }
 func CopyHeredocLabelStack(void_heredoc_label any) {
@@ -1034,7 +1034,7 @@ func LexScan(zendlval *Zval, elem *ZendParserStackElem) int {
 	var token int
 	var offset int
 	var start_line int = CG__().GetZendLineno()
-	ZVAL_UNDEF(zendlval)
+	zendlval.SetUndef()
 restart:
 	SCNG(yy_text) = YYCURSOR
 	var yych uint8
@@ -1493,7 +1493,7 @@ yy10:
 			 * for ' (unrecognized by parser), instead of old flex fallback to "Unexpected character..."
 			 * rule, which continued in ST_IN_SCRIPTING state after the quote */
 
-			ZVAL_NULL(zendlval)
+			zendlval.SetNull()
 			RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 		}
 	}
@@ -1766,7 +1766,7 @@ yy19:
 					if contains_underscores != 0 {
 						Efree(lnum)
 					}
-					ZVAL_UNDEF(zendlval)
+					zendlval.SetUndef()
 					token = T_ERROR
 					goto emit_token
 				}
@@ -1783,17 +1783,17 @@ yy19:
 
 		/* base must be passed explicitly for correct parse error on Windows */
 
-		ZVAL_LONG(zendlval, ZEND_STRTOL(lnum, &end, b.Cond(is_octal != 0, 8, 10)))
+		zendlval.SetLong(ZEND_STRTOL(lnum, &end, b.Cond(is_octal != 0, 8, 10)))
 		ZEND_ASSERT(end == lnum+len_)
 	} else {
 		errno = 0
-		ZVAL_LONG(zendlval, ZEND_STRTOL(lnum, &end, 0))
+		zendlval.SetLong(ZEND_STRTOL(lnum, &end, 0))
 		if errno == ERANGE {
 			errno = 0
 			if is_octal != 0 {
-				ZVAL_DOUBLE(zendlval, ZendOctStrtod(lnum, (**byte)(&end)))
+				zendlval.SetDouble(ZendOctStrtod(lnum, (**byte)(&end)))
 			} else {
-				ZVAL_DOUBLE(zendlval, ZendStrtod(lnum, (**byte)(&end)))
+				zendlval.SetDouble(ZendStrtod(lnum, (**byte)(&end)))
 			}
 			ZEND_ASSERT(end == lnum+len_)
 			if contains_underscores != 0 {
@@ -2732,7 +2732,7 @@ yy86:
 		dnum = Estrndup(dnum, len_)
 		StripUnderscores(dnum, &len_)
 	}
-	ZVAL_DOUBLE(zendlval, ZendStrtod(dnum, &end))
+	zendlval.SetDouble(ZendStrtod(dnum, &end))
 
 	/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
@@ -3681,10 +3681,10 @@ yy173:
 	}
 	if len_ < SIZEOF_ZEND_LONG*8 {
 		if len_ == 0 {
-			ZVAL_LONG(zendlval, 0)
+			zendlval.SetLong(0)
 		} else {
 			errno = 0
-			ZVAL_LONG(zendlval, ZEND_STRTOL(bin, &end, 2))
+			zendlval.SetLong(ZEND_STRTOL(bin, &end, 2))
 			ZEND_ASSERT(!errno && end == bin+len_)
 		}
 		if contains_underscores != 0 {
@@ -3692,7 +3692,7 @@ yy173:
 		}
 		RETURN_TOKEN_WITH_VAL(T_LNUMBER)
 	} else {
-		ZVAL_DOUBLE(zendlval, ZendBinStrtod(bin, (**byte)(&end)))
+		zendlval.SetDouble(ZendBinStrtod(bin, (**byte)(&end)))
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
@@ -3769,10 +3769,10 @@ yy177:
 	}
 	if len_ < SIZEOF_ZEND_LONG*2 || len_ == SIZEOF_ZEND_LONG*2 && (*hex) <= '7' {
 		if len_ == 0 {
-			ZVAL_LONG(zendlval, 0)
+			zendlval.SetLong(0)
 		} else {
 			errno = 0
-			ZVAL_LONG(zendlval, ZEND_STRTOL(hex, &end, 16))
+			zendlval.SetLong(ZEND_STRTOL(hex, &end, 16))
 			ZEND_ASSERT(!errno && end == hex+len_)
 		}
 		if contains_underscores != 0 {
@@ -3780,7 +3780,7 @@ yy177:
 		}
 		RETURN_TOKEN_WITH_VAL(T_LNUMBER)
 	} else {
-		ZVAL_DOUBLE(zendlval, ZendHexStrtod(hex, (**byte)(&end)))
+		zendlval.SetDouble(ZendHexStrtod(hex, (**byte)(&end)))
 
 		/* errno isn't checked since we allow HUGE_VAL/INF overflow */
 
@@ -5493,7 +5493,7 @@ yy334:
 		for heredoc_nesting_level != 0 {
 			var zv Zval
 			var retval int
-			ZVAL_UNDEF(&zv)
+			zv.SetUndef()
 			retval = LexScan(&zv, nil)
 			ZvalPtrDtorNogc(&zv)
 			if EG__().GetException() != nil {
@@ -8058,7 +8058,7 @@ yy590:
 			if YYCURSOR == YYLIMIT {
 				Yyleng = YYCURSOR - SCNG(yy_text)
 				HANDLE_NEWLINES(Yytext, Yyleng)
-				ZVAL_NULL(zendlval)
+				zendlval.SetNull()
 				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 
@@ -8461,7 +8461,7 @@ yy612:
 
 	Yyless(0)
 	YyPopState()
-	ZVAL_NULL(zendlval)
+	zendlval.SetNull()
 	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 yy613:
 	YYCURSOR++
@@ -8538,7 +8538,7 @@ yy617:
 	if Yyleng < MAX_LENGTH_OF_LONG-1 || Yyleng == MAX_LENGTH_OF_LONG-1 && strcmp(Yytext, LongMinDigits) < 0 {
 		var end *byte
 		errno = 0
-		ZVAL_LONG(zendlval, ZEND_STRTOL(Yytext, &end, 10))
+		zendlval.SetLong(ZEND_STRTOL(Yytext, &end, 10))
 		if errno == ERANGE {
 			goto string
 		}
@@ -8963,7 +8963,7 @@ yyc_ST_NOWDOC:
 			if YYCURSOR == YYLIMIT {
 				Yyleng = YYCURSOR - SCNG(yy_text)
 				HANDLE_NEWLINES(Yytext, Yyleng)
-				ZVAL_NULL(zendlval)
+				zendlval.SetNull()
 				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 

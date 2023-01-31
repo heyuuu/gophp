@@ -2559,9 +2559,9 @@ func _phpMathBasetozval(arg *zend.Zval, base int, ret *zend.Zval) int {
 		zend.ZendError(zend.E_DEPRECATED, "Invalid characters passed for attempted conversion, these have been ignored")
 	}
 	if mode == 1 {
-		zend.ZVAL_DOUBLE(ret, fnum)
+		ret.SetDouble(fnum)
 	} else {
-		zend.ZVAL_LONG(ret, num)
+		ret.SetLong(num)
 	}
 	return zend.SUCCESS
 }

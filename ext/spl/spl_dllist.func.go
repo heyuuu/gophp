@@ -35,7 +35,7 @@ func Z_SPLDLLIST_P(zv *zend.Zval) *SplDllistObject { return SplDllistFromObj(zv.
 func SplPtrLlistZvalDtor(elem *SplPtrLlistElement) {
 	if !(elem.GetData().IsUndef()) {
 		zend.ZvalPtrDtor(elem.GetData())
-		zend.ZVAL_UNDEF(elem.GetData())
+		elem.GetData().SetUndef()
 	}
 }
 func SplPtrLlistZvalCtor(elem *SplPtrLlistElement) {
@@ -122,7 +122,7 @@ func SplPtrLlistPush(llist *SplPtrLlist, data *zend.Zval) {
 func SplPtrLlistPop(llist *SplPtrLlist, ret *zend.Zval) {
 	var tail *SplPtrLlistElement = llist.GetTail()
 	if tail == nil {
-		zend.ZVAL_UNDEF(ret)
+		ret.SetUndef()
 		return
 	}
 	if tail.GetPrev() != nil {
@@ -137,7 +137,7 @@ func SplPtrLlistPop(llist *SplPtrLlist, ret *zend.Zval) {
 	if llist.GetDtor() != nil {
 		llist.GetDtor()(tail)
 	}
-	zend.ZVAL_UNDEF(tail.GetData())
+	tail.GetData().SetUndef()
 	SPL_LLIST_DELREF(tail)
 }
 func SplPtrLlistLast(llist *SplPtrLlist) *zend.Zval {
@@ -159,7 +159,7 @@ func SplPtrLlistFirst(llist *SplPtrLlist) *zend.Zval {
 func SplPtrLlistShift(llist *SplPtrLlist, ret *zend.Zval) {
 	var head *SplPtrLlistElement = llist.GetHead()
 	if head == nil {
-		zend.ZVAL_UNDEF(ret)
+		ret.SetUndef()
 		return
 	}
 	if head.GetNext() != nil {
@@ -174,7 +174,7 @@ func SplPtrLlistShift(llist *SplPtrLlist, ret *zend.Zval) {
 	if llist.GetDtor() != nil {
 		llist.GetDtor()(head)
 	}
-	zend.ZVAL_UNDEF(head.GetData())
+	head.GetData().SetUndef()
 	SPL_LLIST_DELREF(head)
 }
 func SplPtrLlistCopy(from *SplPtrLlist, to *SplPtrLlist) {
@@ -324,7 +324,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 	debug_info = zend.ZendNewArray(1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags", b.SizeOf("\"flags\"")-1)
-	zend.ZVAL_LONG(&tmp, intern.GetFlags())
+	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyAdd(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&dllist_array)
@@ -616,7 +616,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(execute_data *zend.ZendExecuteData,
 			intern.SetTraversePointer(nil)
 		}
 		zend.ZvalPtrDtor(element.GetData())
-		zend.ZVAL_UNDEF(element.GetData())
+		element.GetData().SetUndef()
 		SPL_LLIST_DELREF(element)
 	} else {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid", 0)
@@ -690,7 +690,7 @@ func SplDllistItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 }
 func SplDllistItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
-	zend.ZVAL_LONG(key, iterator.GetTraversePosition())
+	key.SetLong(iterator.GetTraversePosition())
 }
 func SplDllistItMoveForward(iter *zend.ZendObjectIterator) {
 	var iterator *SplDllistIt = (*SplDllistIt)(iter)
@@ -763,7 +763,7 @@ func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, r
 
 	/* flags */
 
-	zend.ZVAL_LONG(&flags, intern.GetFlags())
+	flags.SetLong(intern.GetFlags())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 
 	/* elements */
@@ -851,7 +851,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 
 	/* flags */
 
-	zend.ZVAL_LONG(&tmp, intern.GetFlags())
+	tmp.SetLong(intern.GetFlags())
 	return_value.GetArr().NextIndexInsert(&tmp)
 
 	/* elements */
@@ -975,7 +975,7 @@ func SplDllistGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator.SetTraversePosition(dllist_object.GetTraversePosition())
 	iterator.SetTraversePointer(dllist_object.GetTraversePointer())
 	iterator.SetFlags(dllist_object.GetFlags() & SPL_DLLIST_IT_MASK)
-	zend.ZVAL_UNDEF(iterator.GetIntern().GetValue())
+	iterator.GetIntern().GetValue().SetUndef()
 	SPL_LLIST_CHECK_ADDREF(iterator.GetTraversePointer())
 	return iterator.GetIntern().GetIt()
 }

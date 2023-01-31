@@ -469,7 +469,7 @@ func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, st
 	var name []byte
 	var have_v6_break int = 0
 	var in_v6_break int = 0
-	zend.ZVAL_UNDEF(subarray)
+	subarray.SetUndef()
 	n = dn_expand(answer.GetQb2(), end, cp, name, b.SizeOf("name")-2)
 	if n < 0 {
 		return nil
@@ -857,7 +857,7 @@ func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, st
 		break
 	default:
 		zend.ZvalPtrDtor(subarray)
-		zend.ZVAL_UNDEF(subarray)
+		subarray.SetUndef()
 		cp += dlen
 		break
 	}

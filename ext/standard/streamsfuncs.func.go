@@ -1570,16 +1570,16 @@ func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, sev
 	var retval zend.Zval
 	var zvs []zend.Zval
 	var i int
-	zend.ZVAL_LONG(&zvs[0], notifycode)
-	zend.ZVAL_LONG(&zvs[1], severity)
+	zvs[0].SetLong(notifycode)
+	zvs[1].SetLong(severity)
 	if xmsg != nil {
 		zend.ZVAL_STRING(&zvs[2], xmsg)
 	} else {
-		zend.ZVAL_NULL(&zvs[2])
+		zvs[2].SetNull()
 	}
-	zend.ZVAL_LONG(&zvs[3], xcode)
-	zend.ZVAL_LONG(&zvs[4], bytes_sofar)
-	zend.ZVAL_LONG(&zvs[5], bytes_max)
+	zvs[3].SetLong(xcode)
+	zvs[4].SetLong(bytes_sofar)
+	zvs[5].SetLong(bytes_max)
 	if zend.FAILURE == zend.CallUserFunctionEx(nil, nil, callback, &retval, 6, zvs, 0, nil) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call user notifier")
 	}
@@ -1591,7 +1591,7 @@ func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, sev
 func UserSpaceStreamNotifierDtor(notifier *streams.PhpStreamNotifier) {
 	if notifier != nil && notifier.GetPtr().GetType() != zend.IS_UNDEF {
 		zend.ZvalPtrDtor(notifier.GetPtr())
-		zend.ZVAL_UNDEF(notifier.GetPtr())
+		notifier.GetPtr().SetUndef()
 	}
 }
 func ParseContextOptions(context *core.PhpStreamContext, options *zend.Zval) int {

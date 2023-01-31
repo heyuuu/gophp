@@ -146,7 +146,7 @@ func ZendAstCreateZvalFromStr(str *ZendString) *ZendAst {
 }
 func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
 	var zv Zval
-	ZVAL_LONG(&zv, lval)
+	zv.SetLong(lval)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
 func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
@@ -465,7 +465,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		var name *ZendString = ZendAstGetConstantName(ast)
 		var zv *Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
 		if zv == nil {
-			ZVAL_UNDEF(result)
+			result.SetUndef()
 			ret = ZendUseUndefinedConstant(name, ast.GetAttr(), result)
 			break
 		}
@@ -509,7 +509,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZVAL_BOOL(result, ZendIsTrue(&op2))
 			ZvalPtrDtorNogc(&op2)
 		} else {
-			ZVAL_FALSE(result)
+			result.SetFalse()
 		}
 		ZvalPtrDtorNogc(&op1)
 		break
@@ -519,7 +519,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			break
 		}
 		if ZendIsTrue(&op1) != 0 {
-			ZVAL_TRUE(result)
+			result.SetTrue()
 		} else {
 			if ZendAstEvaluate(&op2, ast.GetChild()[1], scope) != SUCCESS {
 				ZvalPtrDtorNogc(&op1)
@@ -576,7 +576,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
 		} else {
-			ZVAL_LONG(&op1, 0)
+			op1.SetLong(0)
 			ret = AddFunction(result, &op1, &op2)
 			ZvalPtrDtorNogc(&op2)
 		}
@@ -585,7 +585,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
 		} else {
-			ZVAL_LONG(&op1, 0)
+			op1.SetLong(0)
 			ret = SubFunction(result, &op1, &op2)
 			ZvalPtrDtorNogc(&op2)
 		}
@@ -619,7 +619,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 					return FAILURE
 				}
 			} else {
-				ZVAL_UNDEF(&op1)
+				op1.SetUndef()
 			}
 			if ZendAstEvaluate(&op2, elem.GetChild()[0], scope) != SUCCESS {
 				ZvalPtrDtorNogc(&op1)

@@ -359,7 +359,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
 	pnstr = SplGenPrivatePropName(ce, "flags", b.SizeOf("\"flags\"")-1)
-	zend.ZVAL_LONG(&tmp, intern.GetFlags())
+	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	pnstr = SplGenPrivatePropName(ce, "isCorrupted", b.SizeOf("\"isCorrupted\"")-1)
@@ -635,7 +635,7 @@ func SplPqueueItGetCurrentData(iter *zend.ZendObjectIterator) *zend.Zval {
 }
 func SplHeapItGetCurrentKey(iter *zend.ZendObjectIterator, key *zend.Zval) {
 	var object *SplHeapObject = Z_SPLHEAP_P(iter.GetData())
-	zend.ZVAL_LONG(key, object.GetHeap().GetCount()-1)
+	key.SetLong(object.GetHeap().GetCount() - 1)
 }
 func SplHeapItMoveForward(iter *zend.ZendObjectIterator) {
 	var object *SplHeapObject = Z_SPLHEAP_P(iter.GetData())
@@ -728,7 +728,7 @@ func SplHeapGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) 
 	iterator.GetIntern().GetIt().SetFuncs(&SplHeapItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())
-	zend.ZVAL_UNDEF(iterator.GetIntern().GetValue())
+	iterator.GetIntern().GetValue().SetUndef()
 	return iterator.GetIntern().GetIt()
 }
 func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) *zend.ZendObjectIterator {
@@ -745,7 +745,7 @@ func SplPqueueGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator.GetIntern().GetIt().SetFuncs(&SplPqueueItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetFlags(heap_object.GetFlags())
-	zend.ZVAL_UNDEF(iterator.GetIntern().GetValue())
+	iterator.GetIntern().GetValue().SetUndef()
 	return iterator.GetIntern().GetIt()
 }
 func ZmStartupSplHeap(type_ int, module_number int) int {

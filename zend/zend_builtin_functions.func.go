@@ -177,7 +177,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 					}
 					ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 				} else {
-					ZVAL_NULL(__fill_bkt.GetVal())
+					__fill_bkt.GetVal().SetNull()
 				}
 				__fill_bkt.SetH(__fill_idx)
 				__fill_bkt.SetKey(nil)
@@ -197,7 +197,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), q)
 			} else {
-				ZVAL_NULL(__fill_bkt.GetVal())
+				__fill_bkt.GetVal().SetNull()
 			}
 			__fill_bkt.SetH(__fill_idx)
 			__fill_bkt.SetKey(nil)
@@ -678,7 +678,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 		ZVAL_STR_COPY(&tmp, key)
 		Z_TRY_ADDREF(tmp)
 	} else {
-		ZVAL_LONG(&tmp, num_key)
+		tmp.SetLong(num_key)
 	}
 	return_value.GetArr().IndexAddNewH(0, &tmp)
 	return_value.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_KEY).GetStr(), &tmp)
@@ -956,7 +956,7 @@ func ZifDefine(execute_data *ZendExecuteData, return_value *Zval) {
 		RETVAL_FALSE
 		return
 	}
-	ZVAL_UNDEF(&val_free)
+	val_free.SetUndef()
 repeat:
 	switch val.GetType() {
 	case IS_LONG:
@@ -1319,7 +1319,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 
 			/* Return uninitialized typed properties as a null value */
 
-			ZVAL_NULL(&prop_copy)
+			prop_copy.SetNull()
 
 			/* Return uninitialized typed properties as a null value */
 
@@ -2099,7 +2099,7 @@ func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	ZendStackPush(EG__().GetUserErrorHandlersErrorReporting(), EG__().GetUserErrorHandlerErrorReporting())
 	ZendStackPush(EG__().GetUserErrorHandlers(), EG__().GetUserErrorHandler())
 	if error_handler.IsNull() {
-		ZVAL_UNDEF(EG__().GetUserErrorHandler())
+		EG__().GetUserErrorHandler().SetUndef()
 		return
 	}
 	ZVAL_COPY(EG__().GetUserErrorHandler(), error_handler)
@@ -2112,11 +2112,11 @@ func ZifRestoreErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	if EG__().GetUserErrorHandler().GetType() != IS_UNDEF {
 		var zeh Zval
 		ZVAL_COPY_VALUE(&zeh, EG__().GetUserErrorHandler())
-		ZVAL_UNDEF(EG__().GetUserErrorHandler())
+		EG__().GetUserErrorHandler().SetUndef()
 		ZvalPtrDtor(&zeh)
 	}
 	if ZendStackIsEmpty(EG__().GetUserErrorHandlers()) != 0 {
-		ZVAL_UNDEF(EG__().GetUserErrorHandler())
+		EG__().GetUserErrorHandler().SetUndef()
 	} else {
 		var tmp *Zval
 		EG__().SetUserErrorHandlerErrorReporting(ZendStackIntTop(EG__().GetUserErrorHandlersErrorReporting()))
@@ -2146,7 +2146,7 @@ func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ZendStackPush(EG__().GetUserExceptionHandlers(), EG__().GetUserExceptionHandler())
 	if exception_handler.IsNull() {
-		ZVAL_UNDEF(EG__().GetUserExceptionHandler())
+		EG__().GetUserExceptionHandler().SetUndef()
 		return
 	}
 	ZVAL_COPY(EG__().GetUserExceptionHandler(), exception_handler)
@@ -2159,7 +2159,7 @@ func ZifRestoreExceptionHandler(execute_data *ZendExecuteData, return_value *Zva
 		ZvalPtrDtor(EG__().GetUserExceptionHandler())
 	}
 	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
-		ZVAL_UNDEF(EG__().GetUserExceptionHandler())
+		EG__().GetUserExceptionHandler().SetUndef()
 	} else {
 		var tmp *Zval = ZendStackTop(EG__().GetUserExceptionHandlers())
 		ZVAL_COPY_VALUE(EG__().GetUserExceptionHandler(), tmp)
@@ -2514,7 +2514,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), arg)
 					} else {
-						ZVAL_NULL(__fill_bkt.GetVal())
+						__fill_bkt.GetVal().SetNull()
 					}
 					__fill_bkt.SetH(__fill_idx)
 					__fill_bkt.SetKey(nil)
@@ -2530,7 +2530,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 						}
 						ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 					} else {
-						ZVAL_NULL(__fill_bkt.GetVal())
+						__fill_bkt.GetVal().SetNull()
 					}
 					__fill_bkt.SetH(__fill_idx)
 					__fill_bkt.SetKey(nil)
@@ -2549,7 +2549,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 				}
 				ZVAL_COPY_VALUE(__fill_bkt.GetVal(), p)
 			} else {
-				ZVAL_NULL(__fill_bkt.GetVal())
+				__fill_bkt.GetVal().SetNull()
 			}
 			__fill_bkt.SetH(__fill_idx)
 			__fill_bkt.SetKey(nil)
@@ -2604,7 +2604,7 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParameters(ZEND_NUM_ARGS(), "|ll", &options, &limit) == FAILURE {
 		return
 	}
-	ZVAL_UNDEF(&arg_array)
+	arg_array.SetUndef()
 	ptr = EX(prev_execute_data)
 
 	/* skip debug_backtrace() */
@@ -2615,7 +2615,7 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 		frameno++
 		class_name = nil
 		call_type = nil
-		ZVAL_UNDEF(&arg_array)
+		arg_array.SetUndef()
 		ptr = ZendGeneratorCheckPlaceholderFrame(ptr)
 		skip = ptr
 
@@ -2840,7 +2840,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 			}
 			ZVAL_STR_COPY(&tmp, filename)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
-			ZVAL_LONG(&tmp, lineno)
+			tmp.SetLong(lineno)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
 		} else {
 			var prev_call *ZendExecuteData = skip
@@ -2852,7 +2852,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {
 					ZVAL_STR_COPY(&tmp, prev.GetFunc().GetOpArray().GetFilename())
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
-					ZVAL_LONG(&tmp, prev.GetOpline().GetLineno())
+					tmp.SetLong(prev.GetOpline().GetLineno())
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
 					break
 				}

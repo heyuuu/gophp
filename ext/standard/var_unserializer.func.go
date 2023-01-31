@@ -98,7 +98,7 @@ func TmpVar(var_hashx *PhpUnserializeDataT, num zend.ZendLong) *zend.Zval {
 		var_hashx.SetLastDtor(var_hash)
 	}
 	for used_slots = var_hash.GetUsedSlots(); var_hash.GetUsedSlots() < used_slots+num; var_hash.GetUsedSlots()++ {
-		zend.ZVAL_UNDEF(var_hash.GetData()[var_hash.GetUsedSlots()])
+		var_hash.GetData()[var_hash.GetUsedSlots()].SetUndef()
 		var_hash.GetData()[var_hash.GetUsedSlots()].GetU2Extra() = 0
 	}
 	return var_hash.GetData()[used_slots]
@@ -138,8 +138,8 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 	var delayed_call_failed zend.ZendBool = 0
 	var wakeup_name zend.Zval
 	var unserialize_name zend.Zval
-	zend.ZVAL_UNDEF(&wakeup_name)
-	zend.ZVAL_UNDEF(&unserialize_name)
+	wakeup_name.SetUndef()
+	unserialize_name.SetUndef()
 	for var_hash != nil {
 		next = var_hash.GetNext()
 		zend.EfreeSize(var_hash, b.SizeOf("var_entries"))
@@ -328,13 +328,13 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 		var old_data *zend.Zval
 		var idx zend.ZendUlong
 		var info *zend.ZendPropertyInfo = nil
-		zend.ZVAL_UNDEF(&key)
+		key.SetUndef()
 		if PhpVarUnserializeInternal(&key, p, max, nil, 1) == 0 {
 			zend.ZvalPtrDtor(&key)
 			goto failure
 		}
 		data = nil
-		zend.ZVAL_UNDEF(&d)
+		d.SetUndef()
 		if obj == nil {
 			if key.IsType(zend.IS_LONG) {
 				idx = key.GetLval()
@@ -444,7 +444,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 		if info != nil {
 			if zend.ZendVerifyPropAssignableByRef(info, data, 1) == 0 {
 				zend.ZvalPtrDtor(data)
-				zend.ZVAL_UNDEF(data)
+				data.SetUndef()
 				zend.ZvalDtor(&key)
 				goto failure
 			}
@@ -1246,7 +1246,7 @@ yy49:
 yy51:
 	YYCURSOR++
 	*p = YYCURSOR
-	zend.ZVAL_DOUBLE(rval, zend.ZendStrtod((*byte)(start+2), nil))
+	rval.SetDouble(zend.ZendStrtod((*byte)(start+2), nil))
 	return 1
 yy53:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -1333,13 +1333,13 @@ yy60:
 	YYCURSOR++
 	*p = YYCURSOR
 	if !(strncmp((*byte)(start+2), "NAN", 3)) {
-		zend.ZVAL_DOUBLE(rval, zend.ZEND_NAN)
+		rval.SetDouble(zend.ZEND_NAN)
 	} else if !(strncmp((*byte)(start+2), "INF", 3)) {
-		zend.ZVAL_DOUBLE(rval, zend.ZEND_INFINITY)
+		rval.SetDouble(zend.ZEND_INFINITY)
 	} else if !(strncmp((*byte)(start+2), "-INF", 4)) {
-		zend.ZVAL_DOUBLE(rval, -zend.ZEND_INFINITY)
+		rval.SetDouble(-zend.ZEND_INFINITY)
 	} else {
-		zend.ZVAL_NULL(rval)
+		rval.SetNull()
 	}
 	return 1
 yy63:
@@ -1391,7 +1391,7 @@ yy66:
 	}
 	YYCURSOR++
 	*p = YYCURSOR
-	zend.ZVAL_LONG(rval, ParseIv(start+2))
+	rval.SetLong(ParseIv(start + 2))
 	return 1
 yy70:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -1418,17 +1418,17 @@ yy72:
 	}
 	YYCURSOR++
 	*p = YYCURSOR
-	zend.ZVAL_TRUE(rval)
+	rval.SetTrue()
 	return 1
 yy75:
 	YYCURSOR++
 	*p = YYCURSOR
-	zend.ZVAL_FALSE(rval)
+	rval.SetFalse()
 	return 1
 yy77:
 	YYCURSOR++
 	*p = YYCURSOR
-	zend.ZVAL_NULL(rval)
+	rval.SetNull()
 	return 1
 yy79:
 	yych = *(b.PreInc(&YYCURSOR))

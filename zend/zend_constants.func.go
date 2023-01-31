@@ -148,7 +148,7 @@ func ZendShutdownConstants() int {
 }
 func ZendRegisterNullConstant(name *byte, name_len int, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_NULL(c.GetValue())
+	c.GetValue().SetNull()
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
@@ -162,14 +162,14 @@ func ZendRegisterBoolConstant(name *byte, name_len int, bval ZendBool, flags int
 }
 func ZendRegisterLongConstant(name *byte, name_len int, lval ZendLong, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_LONG(c.GetValue(), lval)
+	c.GetValue().SetLong(lval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
 func ZendRegisterDoubleConstant(name *byte, name_len int, dval float64, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_DOUBLE(c.GetValue(), dval)
+	c.GetValue().SetDouble(dval)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)

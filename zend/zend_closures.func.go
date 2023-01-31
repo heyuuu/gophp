@@ -582,7 +582,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 			scope = nil
 		}
 	}
-	ZVAL_UNDEF(closure.GetThisPtr())
+	closure.GetThisPtr().SetUndef()
 
 	/* Invariant:
 	 * If the closure is unscoped or static, it has no bound object. */

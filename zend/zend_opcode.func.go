@@ -134,7 +134,7 @@ func ZendCleanupInternalClassData(ce *ZendClassEntry) {
 					}
 				}
 				IZvalPtrDtor(p)
-				ZVAL_UNDEF(p)
+				p.SetUndef()
 				p++
 			}
 

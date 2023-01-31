@@ -127,7 +127,7 @@ func ZendFetchResource2Ex(res *Zval, resource_type_name string, resource_type1 i
 }
 func ListEntryDestructor(zv *Zval) {
 	var res *ZendResource = zv.GetRes()
-	ZVAL_UNDEF(zv)
+	zv.SetUndef()
 	if res.GetType() >= 0 {
 		ZendResourceDtor(res)
 	}
