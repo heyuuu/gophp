@@ -108,7 +108,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 
 	var orig_no_fclose uint32 = stream.GetFlags() & core.PHP_STREAM_FLAG_NO_FCLOSE
 	stream.AddFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
-	if !(zend.Z_OBJPROP_P(obj).KeyExistsInd(b.CastStr("stream", b.SizeOf("\"stream\"")-1))) {
+	if !(zend.Z_OBJPROP_P(obj).KeyExistsInd("stream")) {
 		var tmp zend.Zval
 
 		/* Give the userfilter class a hook back to the stream */

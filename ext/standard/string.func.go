@@ -7580,8 +7580,8 @@ func ZifLocaleconv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.AddAssocLong(return_value, "n_sep_by_space", currlocdata.n_sep_by_space)
 	zend.AddAssocLong(return_value, "p_sign_posn", currlocdata.p_sign_posn)
 	zend.AddAssocLong(return_value, "n_sign_posn", currlocdata.n_sign_posn)
-	return_value.GetArr().KeyUpdate(b.CastStr("grouping", b.SizeOf("\"grouping\"")-1), &grouping)
-	return_value.GetArr().KeyUpdate(b.CastStr("mon_grouping", b.SizeOf("\"mon_grouping\"")-1), &mon_grouping)
+	return_value.GetArr().KeyUpdate("grouping", &grouping)
+	return_value.GetArr().KeyUpdate("mon_grouping", &mon_grouping)
 }
 func ZifStrnatcasecmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpStrnatcmp(execute_data, return_value, 1)

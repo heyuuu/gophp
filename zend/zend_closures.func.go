@@ -448,7 +448,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			ZendStringReleaseEx(name, 0)
 			arg_info++
 		}
-		debug_info.KeyUpdate(b.CastStr("parameter", b.SizeOf("\"parameter\"")-1), &val)
+		debug_info.KeyUpdate("parameter", &val)
 	}
 	return debug_info
 }

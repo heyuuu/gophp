@@ -82,7 +82,7 @@ func PhpPasswordMakeSalt(length int) *zend.ZendString {
 func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend.HashTable) *zend.ZendString {
 	var buffer *zend.ZendString
 	var option_buffer *zend.Zval
-	if options == nil || !(b.Assign(&option_buffer, options.KeyFind(b.CastStr("salt", b.SizeOf("\"salt\"")-1)))) {
+	if options == nil || !(b.Assign(&option_buffer, options.KeyFind("salt"))) {
 		return PhpPasswordMakeSalt(required_salt_len)
 	}
 	core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Use of the 'salt' option to password_hash is deprecated")
@@ -179,7 +179,7 @@ func PhpPasswordBcryptNeedsRehash(hash *zend.ZendString, options *zend.ZendArray
 
 	}
 	sscanf(hash.GetVal(), "$2y$"+zend.ZEND_LONG_FMT+"$", &old_cost)
-	if options != nil && b.Assign(&znew_cost, options.KeyFind(b.CastStr("cost", b.SizeOf("\"cost\"")-1))) != nil {
+	if options != nil && b.Assign(&znew_cost, options.KeyFind("cost")) != nil {
 		new_cost = zend.ZvalGetLong(znew_cost)
 	}
 	return old_cost != new_cost
@@ -215,7 +215,7 @@ func PhpPasswordBcryptHash(password *zend.ZendString, options *zend.ZendArray) *
 	var salt *zend.ZendString
 	var zcost *zend.Zval
 	var cost zend.ZendLong = PHP_PASSWORD_BCRYPT_COST
-	if options != nil && b.Assign(&zcost, options.KeyFind(b.CastStr("cost", b.SizeOf("\"cost\"")-1))) != nil {
+	if options != nil && b.Assign(&zcost, options.KeyFind("cost")) != nil {
 		cost = zend.ZvalGetLong(zcost)
 	}
 	if cost < 4 || cost > 31 {

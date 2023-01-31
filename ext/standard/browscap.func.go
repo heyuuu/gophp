@@ -196,12 +196,12 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTa
 	var i uint32
 	var ht *zend.HashTable = zend.ZendNewArray(8)
 	zend.ZVAL_STR(&tmp, BrowscapConvertPattern(entry.GetPattern(), 0))
-	ht.KeyAdd(b.CastStr("browser_name_regex", b.SizeOf("\"browser_name_regex\"")-1), &tmp)
+	ht.KeyAdd("browser_name_regex", &tmp)
 	zend.ZVAL_STR_COPY(&tmp, entry.GetPattern())
-	ht.KeyAdd(b.CastStr("browser_name_pattern", b.SizeOf("\"browser_name_pattern\"")-1), &tmp)
+	ht.KeyAdd("browser_name_pattern", &tmp)
 	if entry.GetParent() != nil {
 		zend.ZVAL_STR_COPY(&tmp, entry.GetParent())
-		ht.KeyAdd(b.CastStr("parent", b.SizeOf("\"parent\"")-1), &tmp)
+		ht.KeyAdd("parent", &tmp)
 	}
 	for i = entry.GetKvStart(); i < entry.GetKvEnd(); i++ {
 		zend.ZVAL_STR_COPY(&tmp, bdata.GetKv()[i].GetValue())
@@ -621,7 +621,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	if agent_name == nil {
 		var http_user_agent *zend.Zval = nil
 		if core.PG(http_globals)[core.TRACK_VARS_SERVER].u1.v.type_ == zend.IS_ARRAY || zend.ZendIsAutoGlobalStr(zend.ZEND_STRL("_SERVER")) != 0 {
-			http_user_agent = core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().KeyFind(b.CastStr("HTTP_USER_AGENT", b.SizeOf("\"HTTP_USER_AGENT\"")-1))
+			http_user_agent = core.PG(http_globals)[core.TRACK_VARS_SERVER].GetArr().KeyFind("HTTP_USER_AGENT")
 		}
 		if http_user_agent == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")

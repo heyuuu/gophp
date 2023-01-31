@@ -584,9 +584,9 @@ func DoCli(argc int, argv **byte) int {
 					input[len_] = '0'
 				}
 				zend.ZVAL_STRINGL(&argn, input, len_+1)
-				zend.EG__().GetSymbolTable().KeyUpdate(b.CastStr("argn", b.SizeOf("\"argn\"")-1), &argn)
+				zend.EG__().GetSymbolTable().KeyUpdate("argn", &argn)
 				argi.SetLong(b.PreInc(&index))
-				zend.EG__().GetSymbolTable().KeyUpdate(b.CastStr("argi", b.SizeOf("\"argi\"")-1), &argi)
+				zend.EG__().GetSymbolTable().KeyUpdate("argi", &argi)
 				if exec_run != nil {
 					if zend.ZendEvalStringEx(exec_run, nil, "Command line run code", 1) == zend.FAILURE {
 						exit_status = 254

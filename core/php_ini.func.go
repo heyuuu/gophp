@@ -436,7 +436,7 @@ func PhpInitConfig() int {
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 		var tmp zend.Zval
 		zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
-		ConfigurationHash.KeyUpdate(b.CastStr("cfg_file_path", b.SizeOf("\"cfg_file_path\"")-1), &tmp)
+		ConfigurationHash.KeyUpdate("cfg_file_path", &tmp)
 		if opened_path != nil {
 			zend.ZendStringReleaseEx(opened_path, 0)
 		} else {

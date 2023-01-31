@@ -2227,8 +2227,8 @@ func ZifGetDefinedFunctions(execute_data *ZendExecuteData, return_value *Zval) {
 			}
 		}
 	}
-	return_value.GetArr().KeyAddNew(b.CastStr("internal", b.SizeOf("\"internal\"")-1), &internal)
-	return_value.GetArr().KeyAddNew(b.CastStr("user", b.SizeOf("\"user\"")-1), &user)
+	return_value.GetArr().KeyAddNew("internal", &internal)
+	return_value.GetArr().KeyAddNew("user", &user)
 }
 func ZifGetDefinedVars(execute_data *ZendExecuteData, return_value *Zval) {
 	var symbol_table *ZendArray

@@ -717,7 +717,7 @@ func CheckHttpProxy(var_table *zend.HashTable) {
 		} else {
 			var local_zval zend.Zval
 			zend.ZVAL_STRING(&local_zval, local_proxy)
-			var_table.KeyUpdate(b.CastStr("HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1), &local_zval)
+			var_table.KeyUpdate("HTTP_PROXY", &local_zval)
 		}
 	}
 }

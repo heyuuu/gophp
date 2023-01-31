@@ -92,14 +92,14 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 			zend.ArrayInit(&newif)
 			iface = return_value.GetArr().KeyAdd(b.CastStr(p.ifa_name, strlen(p.ifa_name)), &newif)
 		}
-		unicast = iface.GetArr().KeyFind(b.CastStr("unicast", b.SizeOf("\"unicast\"")-1))
+		unicast = iface.GetArr().KeyFind("unicast")
 		if unicast == nil {
 			var newuni zend.Zval
 			zend.ArrayInit(&newuni)
-			unicast = iface.GetArr().KeyAdd(b.CastStr("unicast", b.SizeOf("\"unicast\"")-1), &newuni)
+			unicast = iface.GetArr().KeyAdd("unicast", &newuni)
 		}
 		IfaceAppendUnicast(unicast, p.ifa_flags, p.ifa_addr, p.ifa_netmask, b.CondF1((p.ifa_flags&IFF_BROADCAST) != 0, func() __auto__ { return p.ifa_broadaddr }, nil), b.CondF1((p.ifa_flags&IFF_POINTOPOINT) != 0, func() __auto__ { return p.ifa_dstaddr }, nil))
-		status = iface.GetArr().KeyFind(b.CastStr("up", b.SizeOf("\"up\"")-1))
+		status = iface.GetArr().KeyFind("up")
 		if status == nil {
 			zend.AddAssocBool(iface, "up", (p.ifa_flags&IFF_UP) != 0)
 		}
