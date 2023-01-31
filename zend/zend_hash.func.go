@@ -606,17 +606,17 @@ func ZendHashIteratorsAdvance(ht *HashTable, step HashPosition) {
 
 func ZendHashIndexAddEmptyElement(ht *HashTable, h ZendUlong) *Zval {
 	var dummy Zval
-	ZVAL_NULL(&dummy)
+	(&dummy).SetUndef()
 	return ht.IndexAddH(h, &dummy)
 }
 func ZendHashAddEmptyElement(ht *HashTable, key *ZendString) *Zval {
 	var dummy Zval
-	ZVAL_NULL(&dummy)
+	(&dummy).SetUndef()
 	return ht.KeyAdd(key.GetStr(), &dummy)
 }
 func ZendHashStrAddEmptyElement(ht *HashTable, str *byte, len_ int) *Zval {
 	var dummy Zval
-	ZVAL_NULL(&dummy)
+	(&dummy).SetUndef()
 	return ht.KeyAdd(b.CastStr(str, len_), &dummy)
 }
 func ZendHashSetBucketKey(ht *HashTable, b *Bucket, key *ZendString) *Zval {
@@ -694,53 +694,36 @@ func ZendHashCopy(target *HashTable, source *HashTable, pCopyConstructor CopyCto
 
 func ZendArrayDupElement(source *HashTable, target *HashTable, idx uint32, p *Bucket, q *Bucket, packed int, static_keys int, with_holes int) int {
 	var data *Zval = p.GetVal()
-	if with_holes != 0 {
-		if packed == 0 && data.GetTypeInfo() == IS_INDIRECT {
-			data = data.GetZv()
-		}
-		if data.GetTypeInfo() == IS_UNDEF {
-			return 0
-		}
-	} else if packed == 0 {
-
-		/* INDIRECT element may point to UNDEF-ined slots */
-
-		if data.GetTypeInfo() == IS_INDIRECT {
-			data = data.GetZv()
-			if data.GetTypeInfo() == IS_UNDEF {
-				return 0
-			}
-		}
-
-		/* INDIRECT element may point to UNDEF-ined slots */
-
+	if data.GetTypeInfo() == IS_INDIRECT {
+		data = data.GetZv()
 	}
+	if data.GetTypeInfo() == IS_UNDEF {
+		return 0
+	}
+
 	for {
-		if Z_OPT_REFCOUNTED_P(data) {
-			if Z_ISREF_P(data) && Z_REFCOUNT_P(data) == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_REFVAL_P(data).GetArr() != source) {
+		if data.IsRefcounted() {
+			if data.IsReference() && data.GetRefcount() == 1 && (Z_REFVAL_P(data).GetType() != IS_ARRAY || Z_REFVAL_P(data).GetArr() != source) {
 				data = Z_REFVAL_P(data)
-				if !(Z_OPT_REFCOUNTED_P(data)) {
+				if !(data.IsRefcounted()) {
 					break
 				}
 			}
-			Z_ADDREF_P(data)
+			data.AddRefcount()
 		}
 		break
 	}
+
 	ZVAL_COPY_VALUE(q.GetVal(), data)
 	q.SetH(p.GetH())
-	if packed != 0 {
-		q.SetKey(nil)
-	} else {
-		var nIndex uint32
-		q.SetKey(p.GetKey())
-		if static_keys == 0 && q.GetKey() != nil {
-			q.GetKey().AddRefcount()
-		}
-		nIndex = q.GetH() | target.GetNTableMask()
-		q.GetVal().GetNext() = HT_HASH(target, nIndex)
-		HT_HASH(target, nIndex) = HT_IDX_TO_HASH(idx)
+	var nIndex uint32
+	q.SetKey(p.GetKey())
+	if static_keys == 0 && q.GetKey() != nil {
+		q.GetKey().AddRefcount()
 	}
+	nIndex = q.GetH() | target.GetNTableMask()
+	q.GetVal().GetNext() = HT_HASH(target, nIndex)
+	HT_HASH(target, nIndex) = HT_IDX_TO_HASH(idx)
 	return 1
 }
 func ZendArrayDupElements(source *HashTable, target *HashTable, static_keys int, with_holes int) uint32 {
