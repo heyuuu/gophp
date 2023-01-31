@@ -115,45 +115,7 @@ func ZendHashFindExInd(ht *HashTable, key *ZendString, known_hash ZendBool) *Zva
 		return zv
 	}
 }
-func ZendHashExistsInd(ht *HashTable, key string) bool    { return ht.KeyExistsInd(key) }
-func ZendHashStrExistsInd(ht *HashTable, str string) bool { return ht.KeyExistsInd(str) }
 
-func ZendSymtableAddNew(ht *HashTable, key string, pData *Zval) *Zval {
-	return ht.SymtableAddNew(key, pData)
-}
-func ZendSymtableUpdate(ht *HashTable, key string, pData *Zval) *Zval {
-	return ht.SymtableUpdate(key, pData)
-}
-func ZendSymtableUpdateInd(ht *HashTable, key string, pData *Zval) *Zval {
-	return ht.SymtableUpdateInd(key, pData)
-}
-func ZendSymtableDel(ht *HashTable, key string) int {
-	return ht.SymtableDel(key)
-}
-func ZendSymtableFind(ht *HashTable, key string) *Zval {
-	return ht.SymtableFind(key)
-}
-func ZendSymtableExists(ht *HashTable, key string) bool {
-	return ht.SymtableExists(key)
-}
-func ZendSymtableExistsInd(ht *HashTable, key string) bool {
-	return ht.SymtableExistsInd(key)
-}
-func ZendSymtableStrUpdate(ht *HashTable, str string, pData *Zval) *Zval {
-	return ht.SymtableUpdate(str, pData)
-}
-func ZendSymtableStrUpdateInd(ht *HashTable, str string, pData *Zval) *Zval {
-	return ht.SymtableUpdateInd(str, pData)
-}
-func ZendSymtableStrDel(ht *HashTable, str string) int {
-	return ht.SymtableDel(str)
-}
-func ZendSymtableStrFind(ht *HashTable, str string) *Zval {
-	return ht.SymtableFind(str)
-}
-func ZendSymtableStrExists(ht *HashTable, str string) bool {
-	return ht.SymtableExists(str)
-}
 func ZendHashAddPtr(ht *HashTable, key *ZendString, pData any) any {
 	var tmp Zval
 	var zv *Zval
@@ -706,7 +668,6 @@ func ZendHashMerge(target *HashTable, source *HashTable, pCopyConstructor CopyCt
 		})
 	}
 }
-func ZendHashIndexFind(ht *HashTable, h ZendUlong) *Zval { return ht.IndexFindH(h) }
 func ZendHashInternalPointerResetEx(ht *HashTable, pos *HashPosition) {
 	*pos = ht.validPosVal(0)
 }
@@ -816,9 +777,6 @@ func ZendHashBucketSwap(p *Bucket, q *Bucket) {
 	ZVAL_COPY_VALUE(q.GetVal(), &val)
 	q.SetH(h)
 	q.SetKey(key)
-}
-func ZendHashSortEx(ht *HashTable, sort SortFuncT, compar CompareFuncT, renumber ZendBool) int {
-	return ht.SortCompatibleEx(sort)
 }
 func ZendHashCompareImpl(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, ordered ZendBool) int {
 	var idx1 uint32
@@ -931,32 +889,25 @@ func ZendHashCompare(ht1 *HashTable, ht2 *HashTable, compar CompareFuncT, ordere
 	 * false recursion detection.
 	 */
 
-	if GC_IS_RECURSIVE(ht1) != 0 {
+	if GC_IS_RECURSIVE(ht1) {
 		ZendErrorNoreturn(E_ERROR, "Nesting level too deep - recursive dependency?")
 	}
-	if (ht1.GetGcFlags() & GC_IMMUTABLE) == 0 {
-		GC_PROTECT_RECURSION(ht1)
-	}
+
+	ht1.TryProtectRecursive()
+
 	result = ZendHashCompareImpl(ht1, ht2, compar, ordered)
-	if (ht1.GetGcFlags() & GC_IMMUTABLE) == 0 {
-		GC_UNPROTECT_RECURSION(ht1)
-	}
+
+	ht1.TryUnProtectRecursive()
+
 	return result
 }
 func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
-	var idx uint32
-	var p *Bucket
 	var res *Bucket
 	if ht.GetNNumOfElements() == 0 {
 		return nil
 	}
-	idx = ht.validPosVal(0)
-	res = ht.GetArData() + idx
-	for ; idx < ht.GetNNumUsed(); idx++ {
-		p = ht.GetArData() + idx
-		if p.IsValid() {
-			continue
-		}
+
+	ht.eachValidBucket(func(pos uint32, p *Bucket) {
 		if flag != 0 {
 			if compar(res, p) < 0 {
 				res = p
@@ -966,7 +917,8 @@ func ZendHashMinmax(ht *HashTable, compar CompareFuncT, flag uint32) *Zval {
 				res = p
 			}
 		}
-	}
+	})
+
 	return res.GetVal()
 }
 
