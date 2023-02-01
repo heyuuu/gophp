@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 // Source: <Zend/zend_variables.h>
 
 /*
@@ -26,11 +28,7 @@ package zend
 
 /* Kept for compatibility */
 
-const ZvalDtorFunc = RcDtorFunc
-const ZvalPtrDtorWrapper = ZvalPtrDtor
-const ZvalInternalPtrDtorWrapper = ZvalInternalPtrDtor
-const ZVAL_PTR_DTOR DtorFuncT = ZvalPtrDtor
-const ZVAL_INTERNAL_PTR_DTOR = ZvalInternalPtrDtor
+var ZVAL_PTR_DTOR DtorFuncT = ZvalPtrDtor
 
 // Source: <Zend/zend_variables.c>
 
@@ -54,8 +52,33 @@ const ZVAL_INTERNAL_PTR_DTOR = ZvalInternalPtrDtor
    +----------------------------------------------------------------------+
 */
 
-const ZendStringDestroy = _efree
+var ZendStringDestroy = func(ptr *any) { b.Free(ptr) }
 
 type ZendRcDtorFuncT func(p *ZendRefcounted)
 
-var ZendRcDtorFunc []ZendRcDtorFuncT = []ZendRcDtorFuncT{ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendEmptyDestroy), ZendRcDtorFuncT(ZendStringDestroy), ZendRcDtorFuncT(ZendArrayDestroy), ZendRcDtorFuncT(ZendObjectsStoreDel), ZendRcDtorFuncT(ZendListFree), ZendRcDtorFuncT(ZendReferenceDestroy), ZendRcDtorFuncT(ZendAstRefDestroy)}
+func __ZendRcDtorFuncTWrapper[T any](fun func(ptr *T)) ZendRcDtorFuncT {
+	return func(p *ZendRefcounted) {
+		fun(b.Cast[T](p))
+	}
+}
+
+func __ZendRcDtorFuncTWrapper2[T any, R any](fun func(ptr *T) R) ZendRcDtorFuncT {
+	return func(p *ZendRefcounted) {
+		fun(b.Cast[T](p))
+	}
+}
+
+var ZendRcDtorFunc []ZendRcDtorFuncT = []ZendRcDtorFuncT{
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_UNDEF = 0
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_NULL = 1
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_FALSE = 2
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_TRUE = 3
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_LONG = 4
+	__ZendRcDtorFuncTWrapper(ZendEmptyDestroy),     // IS_DOUBLE = 5
+	__ZendRcDtorFuncTWrapper(ZendStringDestroy),    // IS_STRING = 6
+	__ZendRcDtorFuncTWrapper(ZendArrayDestroy),     // IS_ARRAY = 7
+	__ZendRcDtorFuncTWrapper(ZendObjectsStoreDel),  // IS_OBJECT = 8
+	__ZendRcDtorFuncTWrapper2(ZendListFree),        // IS_RESOURCE = 9
+	__ZendRcDtorFuncTWrapper(ZendReferenceDestroy), // IS_REFERENCE = 10
+	__ZendRcDtorFuncTWrapper(ZendAstRefDestroy),    // IS_CONSTANT_AST = 11
+}

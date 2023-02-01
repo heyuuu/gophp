@@ -20,10 +20,6 @@ func HashBytes(bytes []byte) uint {
 	return hash | -0x8000000000000000
 }
 
-func Free(ptr any) {
-	// todo 单纯作为内存失败的标识
-}
-
 func EmptyString(len_ int) string {
 	return string(make([]byte, len_))
 }
