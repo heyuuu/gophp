@@ -7,7 +7,210 @@ import (
 	r "sik/runtime"
 )
 
+// Source: <Zend/zend_language_scanner.h>
+
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   +----------------------------------------------------------------------+
+*/
+
+// #define ZEND_SCANNER_H
+
+/**
+ * ZendLexState
+ */
+type ZendLexState struct {
+	yy_leng              uint
+	yy_start             *uint8
+	yy_text              *uint8
+	yy_cursor            *uint8
+	yy_marker            *uint8
+	yy_limit             *uint8
+	yy_state             int
+	state_stack          ZendStack
+	heredoc_label_stack  ZendPtrStack
+	in                   *ZendFileHandle
+	lineno               uint32
+	filename             *ZendString
+	script_org           *uint8
+	script_org_size      int
+	script_filtered      *uint8
+	script_filtered_size int
+	input_filter         ZendEncodingFilter
+	output_filter        ZendEncodingFilter
+	script_encoding      *ZendEncoding
+	on_event             func(event ZendPhpScannerEvent, token int, line int, context any)
+	on_event_context     any
+	ast                  *ZendAst
+	ast_arena            *ZendArena
+}
+
+func (this *ZendLexState) GetYyLeng() uint                          { return this.yy_leng }
+func (this *ZendLexState) SetYyLeng(value uint)                     { this.yy_leng = value }
+func (this *ZendLexState) GetYyStart() *uint8                       { return this.yy_start }
+func (this *ZendLexState) SetYyStart(value *uint8)                  { this.yy_start = value }
+func (this *ZendLexState) GetYyText() *uint8                        { return this.yy_text }
+func (this *ZendLexState) SetYyText(value *uint8)                   { this.yy_text = value }
+func (this *ZendLexState) GetYyCursor() *uint8                      { return this.yy_cursor }
+func (this *ZendLexState) SetYyCursor(value *uint8)                 { this.yy_cursor = value }
+func (this *ZendLexState) GetYyMarker() *uint8                      { return this.yy_marker }
+func (this *ZendLexState) SetYyMarker(value *uint8)                 { this.yy_marker = value }
+func (this *ZendLexState) GetYyLimit() *uint8                       { return this.yy_limit }
+func (this *ZendLexState) SetYyLimit(value *uint8)                  { this.yy_limit = value }
+func (this *ZendLexState) GetYyState() int                          { return this.yy_state }
+func (this *ZendLexState) SetYyState(value int)                     { this.yy_state = value }
+func (this *ZendLexState) GetStateStack() ZendStack                 { return this.state_stack }
+func (this *ZendLexState) SetStateStack(value ZendStack)            { this.state_stack = value }
+func (this *ZendLexState) GetHeredocLabelStack() ZendPtrStack       { return this.heredoc_label_stack }
+func (this *ZendLexState) SetHeredocLabelStack(value ZendPtrStack)  { this.heredoc_label_stack = value }
+func (this *ZendLexState) GetIn() *ZendFileHandle                   { return this.in }
+func (this *ZendLexState) SetIn(value *ZendFileHandle)              { this.in = value }
+func (this *ZendLexState) GetLineno() uint32                        { return this.lineno }
+func (this *ZendLexState) SetLineno(value uint32)                   { this.lineno = value }
+func (this *ZendLexState) GetFilename() *ZendString                 { return this.filename }
+func (this *ZendLexState) SetFilename(value *ZendString)            { this.filename = value }
+func (this *ZendLexState) GetScriptOrg() *uint8                     { return this.script_org }
+func (this *ZendLexState) SetScriptOrg(value *uint8)                { this.script_org = value }
+func (this *ZendLexState) GetScriptOrgSize() int                    { return this.script_org_size }
+func (this *ZendLexState) SetScriptOrgSize(value int)               { this.script_org_size = value }
+func (this *ZendLexState) GetScriptFiltered() *uint8                { return this.script_filtered }
+func (this *ZendLexState) SetScriptFiltered(value *uint8)           { this.script_filtered = value }
+func (this *ZendLexState) GetScriptFilteredSize() int               { return this.script_filtered_size }
+func (this *ZendLexState) SetScriptFilteredSize(value int)          { this.script_filtered_size = value }
+func (this *ZendLexState) GetInputFilter() ZendEncodingFilter       { return this.input_filter }
+func (this *ZendLexState) SetInputFilter(value ZendEncodingFilter)  { this.input_filter = value }
+func (this *ZendLexState) GetOutputFilter() ZendEncodingFilter      { return this.output_filter }
+func (this *ZendLexState) SetOutputFilter(value ZendEncodingFilter) { this.output_filter = value }
+func (this *ZendLexState) GetScriptEncoding() *ZendEncoding         { return this.script_encoding }
+func (this *ZendLexState) SetScriptEncoding(value *ZendEncoding)    { this.script_encoding = value }
+func (this *ZendLexState) GetOnEvent() func(event ZendPhpScannerEvent, token int, line int, context any) {
+	return this.on_event
+}
+func (this *ZendLexState) SetOnEvent(value func(event ZendPhpScannerEvent, token int, line int, context any)) {
+	this.on_event = value
+}
+func (this *ZendLexState) GetOnEventContext() any       { return this.on_event_context }
+func (this *ZendLexState) SetOnEventContext(value any)  { this.on_event_context = value }
+func (this *ZendLexState) GetAst() *ZendAst             { return this.ast }
+func (this *ZendLexState) SetAst(value *ZendAst)        { this.ast = value }
+func (this *ZendLexState) GetAstArena() *ZendArena      { return this.ast_arena }
+func (this *ZendLexState) SetAstArena(value *ZendArena) { this.ast_arena = value }
+
+/**
+ * ZendHeredocLabel
+ */
+type ZendHeredocLabel struct {
+	label                   *byte
+	length                  int
+	indentation             int
+	indentation_uses_spaces ZendBool
+}
+
+func (this *ZendHeredocLabel) GetLabel() *byte          { return this.label }
+func (this *ZendHeredocLabel) SetLabel(value *byte)     { this.label = value }
+func (this *ZendHeredocLabel) GetLength() int           { return this.length }
+func (this *ZendHeredocLabel) SetLength(value int)      { this.length = value }
+func (this *ZendHeredocLabel) GetIndentation() int      { return this.indentation }
+func (this *ZendHeredocLabel) SetIndentation(value int) { this.indentation = value }
+func (this *ZendHeredocLabel) GetIndentationUsesSpaces() ZendBool {
+	return this.indentation_uses_spaces
+}
+func (this *ZendHeredocLabel) SetIndentationUsesSpaces(value ZendBool) {
+	this.indentation_uses_spaces = value
+}
+
+// Source: <Zend/zend_language_scanner.c>
+
+/* Generated by re2c 3.0 */
+
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Marcus Boerger <helly@php.net>                              |
+   |          Nuno Lopes <nlopess@php.net>                                |
+   |          Scott MacVicar <scottmac@php.net>                           |
+   | Flex version authors:                                                |
+   |          Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   +----------------------------------------------------------------------+
+*/
+
+// #define YYDEBUG(s,c)
+
+// # include "zend_language_scanner_defs.h"
+
+// # include < errno . h >
+
+// # include "zend.h"
+
+// # include "zend_alloc.h"
+
+// # include < zend_language_parser . h >
+
+// # include "zend_compile.h"
+
+// # include "zend_language_scanner.h"
+
+// # include "zend_highlight.h"
+
+// # include "zend_constants.h"
+
+// # include "zend_variables.h"
+
+// # include "zend_operators.h"
+
+// # include "zend_API.h"
+
+// # include "zend_strtod.h"
+
+// # include "zend_exceptions.h"
+
+// # include "zend_virtual_cwd.h"
+
+// #define YYCTYPE       unsigned char
+
+// #define YYFILL(n) { if ( ( YYCURSOR + n ) >= ( YYLIMIT + ZEND_MMAP_AHEAD ) ) { return 0 ; } }
+
+// #define STATE(name) yyc ## name
+
+/* emulate flex constructs */
+
 func Yymore() { goto yymore_restart }
+
+/* perform sanity check. If this message is triggered you should
+   increase the ZEND_MMAP_AHEAD value in the zend_streams.h file */
+
+// # include < stdarg . h >
+
+// # include < unistd . h >
+
+/* Globals Macros */
+
 func HANDLE_NEWLINES(s *byte, l *byte) {
 	var p *byte = s
 	var boundary *byte = p + l
@@ -23,6 +226,9 @@ func HANDLE_NEWLINE(c byte) {
 		CG__().GetZendLineno()++
 	}
 }
+
+/* To save initial string length after scanning to first variable */
+
 func SET_DOUBLE_QUOTES_SCANNED_LENGTH(len_ int) __auto__ {
 	SCNG(scanned_string_len) = len_
 	return SCNG(scanned_string_len)
@@ -68,6 +274,9 @@ func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint
 	ZEND_ASSERT(internal_encoding != nil)
 	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
 }
+
+// #define yy_push_state(state_and_tsrm) _yy_push_state ( yyc ## state_and_tsrm )
+
 func StartupScanner() {
 	CG__().SetParseError(0)
 	CG__().SetDocComment(nil)
@@ -162,6 +371,13 @@ func ZendLexTstring(zv *Zval) {
 	}
 	ZVAL_STRINGL(zv, (*byte)(SCNG(yy_text)), SCNG(yy_leng))
 }
+
+const BOM_UTF32_BE = "x00x00xfexff"
+const BOM_UTF32_LE = "xffxfex00x00"
+const BOM_UTF16_BE = "xfexff"
+const BOM_UTF16_LE = "xffxfe"
+const BOM_UTF8 = "xefxbbxbf"
+
 func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncoding {
 	var p *uint8
 	var wchar_size int = 2
@@ -680,6 +896,9 @@ func ZendMultibyteYyinputAgain(old_input_filter ZendEncodingFilter, old_encoding
 	SCNG(yy_limit) = new_yy_start + length
 	SCNG(yy_start) = new_yy_start
 }
+
+// TODO: avoid reallocation ???
+
 func ZendCopyValue(zendlval *Zval, yytext *byte, yyleng int) {
 	if SCNG(output_filter) {
 		var sz int = 0
@@ -919,6 +1138,10 @@ skip_escape_conversion:
 	}
 	return SUCCESS
 }
+
+const HEREDOC_USING_SPACES = 1
+const HEREDOC_USING_TABS = 2
+
 func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	for ; str < end; str++ {
 		if (*str) == '\r' {
@@ -1014,6 +1237,9 @@ func CopyHeredocLabelStack(void_heredoc_label any) {
 	ZendPtrStackPush(&(SCNG(heredoc_label_stack)), any(new_heredoc_label))
 }
 func PARSER_MODE() bool { return elem != nil }
+
+// #define RETURN_TOKEN(_token) do { token = _token ; goto emit_token ; } while ( 0 )
+
 func RETURN_TOKEN_WITH_VAL(_token Yytokentype) {
 	token = _token
 	goto emit_token_with_val
