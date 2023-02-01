@@ -3811,10 +3811,10 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 			}
 			zend.SmartStrAppendc(&csvline, enclosure)
 		} else {
-			zend.SmartStrAppend(&csvline, field_str)
+			zend.SmartStrAppend(&csvline, field_str.GetStr())
 		}
 		if b.PreInc(&i) != count {
-			zend.SmartStrAppendl(&csvline, &delimiter, 1)
+			zend.SmartStrAppendl(&csvline, b.CastStr(&delimiter, 1))
 		}
 		zend.ZendTmpStringRelease(tmp_field_str)
 	}

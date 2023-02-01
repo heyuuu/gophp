@@ -9,9 +9,9 @@ import (
 
 func INS_STRING(xbuf any, str *byte, len_ int, is_char zend.ZendBool) {
 	if is_char != 0 {
-		zend.SmartStringAppendl((*zend.SmartString)(xbuf), str, len_)
+		zend.SmartStringAppendl((*zend.SmartString)(xbuf), b.CastStr(str, len_))
 	} else {
-		zend.SmartStrAppendl((*zend.SmartStr)(xbuf), str, len_)
+		zend.SmartStrAppendl((*zend.SmartStr)(xbuf), b.CastStr(str, len_))
 	}
 }
 func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {

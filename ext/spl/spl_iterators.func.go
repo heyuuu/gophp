@@ -666,13 +666,13 @@ func spl_RecursiveIteratorIterator_new_ex(class_type *zend.ZendClassEntry, init_
 	var intern *SplRecursiveItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_recursive_it_object"), class_type)
 	if init_prefix != 0 {
-		zend.SmartStrAppendl(intern.GetPrefix()[0], "", 0)
-		zend.SmartStrAppendl(intern.GetPrefix()[1], "| ", 2)
-		zend.SmartStrAppendl(intern.GetPrefix()[2], "  ", 2)
-		zend.SmartStrAppendl(intern.GetPrefix()[3], "|-", 2)
-		zend.SmartStrAppendl(intern.GetPrefix()[4], "\\-", 2)
-		zend.SmartStrAppendl(intern.GetPrefix()[5], "", 0)
-		zend.SmartStrAppendl(intern.GetPostfix()[0], "", 0)
+		zend.SmartStrAppendl(intern.GetPrefix()[0], b.CastStr("", 0))
+		zend.SmartStrAppendl(intern.GetPrefix()[1], b.CastStr("| ", 2))
+		zend.SmartStrAppendl(intern.GetPrefix()[2], b.CastStr("  ", 2))
+		zend.SmartStrAppendl(intern.GetPrefix()[3], b.CastStr("|-", 2))
+		zend.SmartStrAppendl(intern.GetPrefix()[4], b.CastStr("\\-", 2))
+		zend.SmartStrAppendl(intern.GetPrefix()[5], b.CastStr("", 0))
+		zend.SmartStrAppendl(intern.GetPostfix()[0], b.CastStr("", 0))
 	}
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
 	zend.ObjectPropertiesInit(intern.GetStd(), class_type)
@@ -689,14 +689,14 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	var str zend.SmartStr = zend.SmartStr{0}
 	var has_next zend.Zval
 	var level int
-	zend.SmartStrAppendl(&str, object.GetPrefix()[0].GetS().GetVal(), object.GetPrefix()[0].GetS().GetLen())
+	zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[0].GetS().GetVal(), object.GetPrefix()[0].GetS().GetLen()))
 	for level = 0; level < object.GetLevel(); level++ {
 		zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 		if has_next.GetType() != zend.IS_UNDEF {
 			if has_next.IsType(zend.IS_TRUE) {
-				zend.SmartStrAppendl(&str, object.GetPrefix()[1].GetS().GetVal(), object.GetPrefix()[1].GetS().GetLen())
+				zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[1].GetS().GetVal(), object.GetPrefix()[1].GetS().GetLen()))
 			} else {
-				zend.SmartStrAppendl(&str, object.GetPrefix()[2].GetS().GetVal(), object.GetPrefix()[2].GetS().GetLen())
+				zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[2].GetS().GetVal(), object.GetPrefix()[2].GetS().GetLen()))
 			}
 			zend.ZvalPtrDtor(&has_next)
 		}
@@ -704,13 +704,13 @@ func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_valu
 	zend.ZendCallMethodWith0Params(object.GetIterators()[level].GetZobject(), object.GetIterators()[level].GetCe(), nil, "hasnext", &has_next)
 	if has_next.GetType() != zend.IS_UNDEF {
 		if has_next.IsType(zend.IS_TRUE) {
-			zend.SmartStrAppendl(&str, object.GetPrefix()[3].GetS().GetVal(), object.GetPrefix()[3].GetS().GetLen())
+			zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[3].GetS().GetVal(), object.GetPrefix()[3].GetS().GetLen()))
 		} else {
-			zend.SmartStrAppendl(&str, object.GetPrefix()[4].GetS().GetVal(), object.GetPrefix()[4].GetS().GetLen())
+			zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[4].GetS().GetVal(), object.GetPrefix()[4].GetS().GetLen()))
 		}
 		zend.ZvalPtrDtor(&has_next)
 	}
-	zend.SmartStrAppendl(&str, object.GetPrefix()[5].GetS().GetVal(), object.GetPrefix()[5].GetS().GetLen())
+	zend.SmartStrAppendl(&str, b.CastStr(object.GetPrefix()[5].GetS().GetVal(), object.GetPrefix()[5].GetS().GetLen()))
 	zend.SmartStr0(&str)
 	zend.RETVAL_NEW_STR(str.GetS())
 	return
@@ -755,7 +755,7 @@ func zim_spl_RecursiveTreeIterator_setPrefixPart(execute_data *zend.ZendExecuteD
 		return
 	}
 	zend.SmartStrFree(object.GetPrefix()[part])
-	zend.SmartStrAppendl(object.GetPrefix()[part], prefix, prefix_len)
+	zend.SmartStrAppendl(object.GetPrefix()[part], b.CastStr(prefix, prefix_len))
 }
 func zim_spl_RecursiveTreeIterator_getPrefix(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS)
@@ -776,7 +776,7 @@ func zim_spl_RecursiveTreeIterator_setPostfix(execute_data *zend.ZendExecuteData
 		return
 	}
 	zend.SmartStrFree(object.GetPostfix()[0])
-	zend.SmartStrAppendl(object.GetPostfix()[0], postfix, postfix_len)
+	zend.SmartStrAppendl(object.GetPostfix()[0], b.CastStr(postfix, postfix_len))
 }
 func zim_spl_RecursiveTreeIterator_getEntry(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *SplRecursiveItObject = Z_SPLRECURSIVE_IT_P(zend.ZEND_THIS)

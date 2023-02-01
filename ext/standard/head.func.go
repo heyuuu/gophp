@@ -209,27 +209,27 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 		 */
 
 		dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, 1, 0)
-		zend.SmartStrAppends(&buf, "Set-Cookie: ")
-		zend.SmartStrAppend(&buf, name)
-		zend.SmartStrAppends(&buf, "=deleted; expires=")
-		zend.SmartStrAppend(&buf, dt)
-		zend.SmartStrAppends(&buf, "; Max-Age=0")
+		zend.SmartStrAppends(&buf, b.CastStrAuto("Set-Cookie: "))
+		zend.SmartStrAppend(&buf, name.GetStr())
+		zend.SmartStrAppends(&buf, b.CastStrAuto("=deleted; expires="))
+		zend.SmartStrAppend(&buf, dt.GetStr())
+		zend.SmartStrAppends(&buf, b.CastStrAuto("; Max-Age=0"))
 		zend.ZendStringFree(dt)
 	} else {
-		zend.SmartStrAppends(&buf, "Set-Cookie: ")
-		zend.SmartStrAppend(&buf, name)
+		zend.SmartStrAppends(&buf, b.CastStrAuto("Set-Cookie: "))
+		zend.SmartStrAppend(&buf, name.GetStr())
 		zend.SmartStrAppendc(&buf, '=')
 		if url_encode != 0 {
 			var encoded_value *zend.ZendString = PhpRawUrlEncode(value.GetVal(), value.GetLen())
-			zend.SmartStrAppend(&buf, encoded_value)
+			zend.SmartStrAppend(&buf, encoded_value.GetStr())
 			zend.ZendStringReleaseEx(encoded_value, 0)
 		} else {
-			zend.SmartStrAppend(&buf, value)
+			zend.SmartStrAppend(&buf, value.GetStr())
 		}
 		if expires > 0 {
 			var p *byte
 			var diff float64
-			zend.SmartStrAppends(&buf, COOKIE_EXPIRES)
+			zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_EXPIRES))
 			dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, expires, 0)
 
 			/* check to make sure that the year does not exceed 4 digits in length */
@@ -241,33 +241,33 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 				zend.ZendError(zend.E_WARNING, "Expiry date cannot have a year greater than 9999")
 				return zend.FAILURE
 			}
-			zend.SmartStrAppend(&buf, dt)
+			zend.SmartStrAppend(&buf, dt.GetStr())
 			zend.ZendStringFree(dt)
 			diff = difftime(expires, php_time())
 			if diff < 0 {
 				diff = 0
 			}
-			zend.SmartStrAppends(&buf, COOKIE_MAX_AGE)
+			zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_MAX_AGE))
 			zend.SmartStrAppendLong(&buf, zend.ZendLong(diff))
 		}
 	}
 	if path != nil && path.GetLen() != 0 {
-		zend.SmartStrAppends(&buf, COOKIE_PATH)
-		zend.SmartStrAppend(&buf, path)
+		zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_PATH))
+		zend.SmartStrAppend(&buf, path.GetStr())
 	}
 	if domain != nil && domain.GetLen() != 0 {
-		zend.SmartStrAppends(&buf, COOKIE_DOMAIN)
-		zend.SmartStrAppend(&buf, domain)
+		zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_DOMAIN))
+		zend.SmartStrAppend(&buf, domain.GetStr())
 	}
 	if secure != 0 {
-		zend.SmartStrAppends(&buf, COOKIE_SECURE)
+		zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_SECURE))
 	}
 	if httponly != 0 {
-		zend.SmartStrAppends(&buf, COOKIE_HTTPONLY)
+		zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_HTTPONLY))
 	}
 	if samesite != nil && samesite.GetLen() != 0 {
-		zend.SmartStrAppends(&buf, COOKIE_SAMESITE)
-		zend.SmartStrAppend(&buf, samesite)
+		zend.SmartStrAppends(&buf, b.CastStrAuto(COOKIE_SAMESITE))
+		zend.SmartStrAppend(&buf, samesite.GetStr())
 	}
 	ctr.SetLine(buf.GetS().GetVal())
 	ctr.SetLineLen(uint32(buf.GetS().GetLen()))

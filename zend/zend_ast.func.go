@@ -818,25 +818,25 @@ func ZendAstExportQstr(str *SmartStr, quote byte, s *ZendString) {
 		if c < ' ' {
 			switch c {
 			case '\n':
-				SmartStrAppends(str, "\\n")
+				SmartStrAppends(str, b.CastStrAuto("\\n"))
 				break
 			case '\r':
-				SmartStrAppends(str, "\\r")
+				SmartStrAppends(str, b.CastStrAuto("\\r"))
 				break
 			case '\t':
-				SmartStrAppends(str, "\\t")
+				SmartStrAppends(str, b.CastStrAuto("\\t"))
 				break
 			case 'f':
-				SmartStrAppends(str, "\\f")
+				SmartStrAppends(str, b.CastStrAuto("\\f"))
 				break
 			case 'v':
-				SmartStrAppends(str, "\\v")
+				SmartStrAppends(str, b.CastStrAuto("\\v"))
 				break
 			case 'e':
-				SmartStrAppends(str, "\\e")
+				SmartStrAppends(str, b.CastStrAuto("\\e"))
 				break
 			default:
-				SmartStrAppends(str, "\\0")
+				SmartStrAppends(str, b.CastStrAuto("\\0"))
 				SmartStrAppendc(str, '0'+c/8)
 				SmartStrAppendc(str, '0'+c%8)
 				break
@@ -851,7 +851,7 @@ func ZendAstExportQstr(str *SmartStr, quote byte, s *ZendString) {
 }
 func ZendAstExportIndent(str *SmartStr, indent int) {
 	for indent > 0 {
-		SmartStrAppends(str, "    ")
+		SmartStrAppends(str, b.CastStrAuto("    "))
 		indent--
 	}
 }
@@ -859,7 +859,7 @@ func ZendAstExportName(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
 		if zv.IsString() {
-			SmartStrAppend(str, zv.GetStr())
+			SmartStrAppend(str, zv.GetStr().GetStr())
 			return
 		}
 	}
@@ -872,9 +872,9 @@ func ZendAstExportNsName(str *SmartStr, ast *ZendAst, priority int, indent int) 
 			if ast.GetAttr() == ZEND_NAME_FQ {
 				SmartStrAppendc(str, '\\')
 			} else if ast.GetAttr() == ZEND_NAME_RELATIVE {
-				SmartStrAppends(str, "namespace\\")
+				SmartStrAppends(str, b.CastStrAuto("namespace\\"))
 			}
-			SmartStrAppend(str, zv.GetStr())
+			SmartStrAppend(str, zv.GetStr().GetStr())
 			return
 		}
 	}
@@ -912,7 +912,7 @@ func ZendAstExportVar(str *SmartStr, ast *ZendAst, priority int, indent int) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		var zv *Zval = ZendAstGetZval(ast)
 		if zv.IsString() && ZendAstValidVarName(Z_STRVAL_P(zv), Z_STRLEN_P(zv)) != 0 {
-			SmartStrAppend(str, zv.GetStr())
+			SmartStrAppend(str, zv.GetStr().GetStr())
 			return
 		}
 	} else if ast.GetKind() == ZEND_AST_VAR {
@@ -927,7 +927,7 @@ func ZendAstExportList(str *SmartStr, list *ZendAstList, separator int, priority
 	var i uint32 = 0
 	for i < list.GetChildren() {
 		if i != 0 && separator != 0 {
-			SmartStrAppends(str, ", ")
+			SmartStrAppends(str, b.CastStrAuto(", "))
 		}
 		ZendAstExportEx(str, list.GetChild()[i], priority, indent)
 		i++
@@ -956,7 +956,7 @@ func ZendAstExportNameListEx(str *SmartStr, list *ZendAstList, indent int, separ
 	var i uint32 = 0
 	for i < list.GetChildren() {
 		if i != 0 {
-			SmartStrAppends(str, separator)
+			SmartStrAppends(str, b.CastStrAuto(separator))
 		}
 		ZendAstExportName(str, list.GetChild()[i], 0, indent)
 		i++
@@ -972,7 +972,7 @@ func ZendAstExportVarList(str *SmartStr, list *ZendAstList, indent int) {
 	var i uint32 = 0
 	for i < list.GetChildren() {
 		if i != 0 {
-			SmartStrAppends(str, ", ")
+			SmartStrAppends(str, b.CastStrAuto(", "))
 		}
 		if (list.GetChild()[i].GetAttr() & ZEND_BIND_REF) != 0 {
 			SmartStrAppendc(str, '&')
@@ -1041,22 +1041,22 @@ tail_call:
 		ZEND_ASSERT(ast.GetKind() == ZEND_AST_IF_ELEM)
 		if ast.GetChild()[0] != nil {
 			if i == 0 {
-				SmartStrAppends(str, "if (")
+				SmartStrAppends(str, b.CastStrAuto("if ("))
 			} else {
 				ZendAstExportIndent(str, indent)
-				SmartStrAppends(str, "} elseif (")
+				SmartStrAppends(str, b.CastStrAuto("} elseif ("))
 			}
 			ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-			SmartStrAppends(str, ") {\n")
+			SmartStrAppends(str, b.CastStrAuto(") {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		} else {
 			ZendAstExportIndent(str, indent)
-			SmartStrAppends(str, "} else ")
+			SmartStrAppends(str, b.CastStrAuto("} else "))
 			if ast.GetChild()[1] != nil && ast.GetChild()[1].GetKind() == ZEND_AST_IF {
 				list = (*ZendAstList)(ast.GetChild()[1])
 				goto tail_call
 			} else {
-				SmartStrAppends(str, "{\n")
+				SmartStrAppends(str, b.CastStrAuto("{\n"))
 				ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 			}
 		}
@@ -1073,20 +1073,20 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 	ZVAL_DEREF(zv)
 	switch zv.GetType() {
 	case IS_NULL:
-		SmartStrAppends(str, "null")
+		SmartStrAppends(str, b.CastStrAuto("null"))
 		break
 	case IS_FALSE:
-		SmartStrAppends(str, "false")
+		SmartStrAppends(str, b.CastStrAuto("false"))
 		break
 	case IS_TRUE:
-		SmartStrAppends(str, "true")
+		SmartStrAppends(str, b.CastStrAuto("true"))
 		break
 	case IS_LONG:
 		SmartStrAppendLong(str, zv.GetLval())
 		break
 	case IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
-		SmartStrAppendl(str, key.GetVal(), key.GetLen())
+		SmartStrAppendl(str, b.CastStr(key.GetVal(), key.GetLen()))
 		ZendStringReleaseEx(key, 0)
 		break
 	case IS_STRING:
@@ -1107,15 +1107,15 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 			if first != 0 {
 				first = 0
 			} else {
-				SmartStrAppends(str, ", ")
+				SmartStrAppends(str, b.CastStrAuto(", "))
 			}
 			if key != nil {
 				SmartStrAppendc(str, '\'')
 				ZendAstExportStr(str, key)
-				SmartStrAppends(str, "' => ")
+				SmartStrAppends(str, b.CastStrAuto("' => "))
 			} else {
 				SmartStrAppendLong(str, idx)
-				SmartStrAppends(str, " => ")
+				SmartStrAppends(str, b.CastStrAuto(" => "))
 			}
 			ZendAstExportZval(str, val, 0, indent)
 		}
@@ -1130,17 +1130,17 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 }
 func ZendAstExportClassNoHeader(str *SmartStr, decl *ZendAstDecl, indent int) {
 	if decl.GetChild()[0] != nil {
-		SmartStrAppends(str, " extends ")
+		SmartStrAppends(str, b.CastStrAuto(" extends "))
 		ZendAstExportNsName(str, decl.GetChild()[0], 0, indent)
 	}
 	if decl.GetChild()[1] != nil {
-		SmartStrAppends(str, " implements ")
+		SmartStrAppends(str, b.CastStrAuto(" implements "))
 		ZendAstExportEx(str, decl.GetChild()[1], 0, indent)
 	}
-	SmartStrAppends(str, " {\n")
+	SmartStrAppends(str, b.CastStrAuto(" {\n"))
 	ZendAstExportStmt(str, decl.GetChild()[2], indent+1)
 	ZendAstExportIndent(str, indent)
-	SmartStrAppends(str, "}")
+	SmartStrAppends(str, b.CastStrAuto("}"))
 }
 func BINARY_OP(_op string, _p int, _pl int, _pr int) {
 	op = _op
@@ -1193,10 +1193,10 @@ tail_call:
 		break
 	case ZEND_AST_CONSTANT:
 		var name *ZendString = ZendAstGetConstantName(ast)
-		SmartStrAppendl(str, name.GetVal(), name.GetLen())
+		SmartStrAppendl(str, b.CastStr(name.GetVal(), name.GetLen()))
 		break
 	case ZEND_AST_CONSTANT_CLASS:
-		SmartStrAppendl(str, "__CLASS__", b.SizeOf("\"__CLASS__\"")-1)
+		SmartStrAppendl(str, "__CLASS__")
 		break
 	case ZEND_AST_ZNODE:
 
@@ -1213,38 +1213,38 @@ tail_call:
 	case ZEND_AST_METHOD:
 		decl = (*ZendAstDecl)(ast)
 		if decl.IsPublic() {
-			SmartStrAppends(str, "public ")
+			SmartStrAppends(str, b.CastStrAuto("public "))
 		} else if decl.IsProtected() {
-			SmartStrAppends(str, "protected ")
+			SmartStrAppends(str, b.CastStrAuto("protected "))
 		} else if decl.IsPrivate() {
-			SmartStrAppends(str, "private ")
+			SmartStrAppends(str, b.CastStrAuto("private "))
 		}
 		if decl.IsStatic() {
-			SmartStrAppends(str, "static ")
+			SmartStrAppends(str, b.CastStrAuto("static "))
 		}
 		if decl.IsAbstract() {
-			SmartStrAppends(str, "abstract ")
+			SmartStrAppends(str, b.CastStrAuto("abstract "))
 		}
 		if decl.IsFinal() {
-			SmartStrAppends(str, "final ")
+			SmartStrAppends(str, b.CastStrAuto("final "))
 		}
 		if decl.GetKind() == ZEND_AST_ARROW_FUNC {
-			SmartStrAppends(str, "fn")
+			SmartStrAppends(str, b.CastStrAuto("fn"))
 		} else {
-			SmartStrAppends(str, "function ")
+			SmartStrAppends(str, b.CastStrAuto("function "))
 		}
 		if decl.IsReturnReference() {
 			SmartStrAppendc(str, '&')
 		}
 		if ast.GetKind() != ZEND_AST_CLOSURE && ast.GetKind() != ZEND_AST_ARROW_FUNC {
-			SmartStrAppendl(str, decl.GetName().GetVal(), decl.GetName().GetLen())
+			SmartStrAppendl(str, b.CastStr(decl.GetName().GetVal(), decl.GetName().GetLen()))
 		}
 		SmartStrAppendc(str, '(')
 		ZendAstExportEx(str, decl.GetChild()[0], 0, indent)
 		SmartStrAppendc(str, ')')
 		ZendAstExportEx(str, decl.GetChild()[1], 0, indent)
 		if decl.GetChild()[3] != nil {
-			SmartStrAppends(str, ": ")
+			SmartStrAppends(str, b.CastStrAuto(": "))
 			if (decl.GetChild()[3].GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
 				SmartStrAppendc(str, '?')
 			}
@@ -1253,11 +1253,11 @@ tail_call:
 		if decl.GetChild()[2] != nil {
 			if decl.GetKind() == ZEND_AST_ARROW_FUNC {
 				ZEND_ASSERT(decl.GetChild()[2].GetKind() == ZEND_AST_RETURN)
-				SmartStrAppends(str, " => ")
+				SmartStrAppends(str, b.CastStrAuto(" => "))
 				ZendAstExportEx(str, decl.GetChild()[2].GetChild()[0], 0, indent)
 				break
 			}
-			SmartStrAppends(str, " {\n")
+			SmartStrAppends(str, b.CastStrAuto(" {\n"))
 			ZendAstExportStmt(str, decl.GetChild()[2], indent+1)
 			ZendAstExportIndent(str, indent)
 			SmartStrAppendc(str, '}')
@@ -1265,25 +1265,25 @@ tail_call:
 				SmartStrAppendc(str, '\n')
 			}
 		} else {
-			SmartStrAppends(str, ";\n")
+			SmartStrAppends(str, b.CastStrAuto(";\n"))
 		}
 		break
 	case ZEND_AST_CLASS:
 		decl = (*ZendAstDecl)(ast)
 		if decl.IsInterface() {
-			SmartStrAppends(str, "interface ")
+			SmartStrAppends(str, b.CastStrAuto("interface "))
 		} else if decl.IsTrait() {
-			SmartStrAppends(str, "trait ")
+			SmartStrAppends(str, b.CastStrAuto("trait "))
 		} else {
 			if decl.IsExplicitAbstractClass() {
-				SmartStrAppends(str, "abstract ")
+				SmartStrAppends(str, b.CastStrAuto("abstract "))
 			}
 			if decl.IsFinal() {
-				SmartStrAppends(str, "final ")
+				SmartStrAppends(str, b.CastStrAuto("final "))
 			}
-			SmartStrAppends(str, "class ")
+			SmartStrAppends(str, b.CastStrAuto("class "))
 		}
-		SmartStrAppendl(str, decl.GetName().GetVal(), decl.GetName().GetLen())
+		SmartStrAppendl(str, b.CastStr(decl.GetName().GetVal(), decl.GetName().GetLen()))
 		ZendAstExportClassNoHeader(str, decl, indent)
 		SmartStrAppendc(str, '\n')
 		break
@@ -1319,7 +1319,7 @@ tail_call:
 		ZendAstExportList(str, (*ZendAstList)(ast), 0, 0, indent)
 		break
 	case ZEND_AST_CLOSURE_USES:
-		SmartStrAppends(str, " use(")
+		SmartStrAppends(str, b.CastStrAuto(" use("))
 		ZendAstExportVarList(str, (*ZendAstList)(ast), indent)
 		SmartStrAppendc(str, ')')
 		break
@@ -1327,14 +1327,14 @@ tail_call:
 		var type_ast *ZendAst = ast.GetChild()[0]
 		var prop_ast *ZendAst = ast.GetChild()[1]
 		if (ast.GetAttr() & ZEND_ACC_PUBLIC) != 0 {
-			SmartStrAppends(str, "public ")
+			SmartStrAppends(str, b.CastStrAuto("public "))
 		} else if (ast.GetAttr() & ZEND_ACC_PROTECTED) != 0 {
-			SmartStrAppends(str, "protected ")
+			SmartStrAppends(str, b.CastStrAuto("protected "))
 		} else if (ast.GetAttr() & ZEND_ACC_PRIVATE) != 0 {
-			SmartStrAppends(str, "private ")
+			SmartStrAppends(str, b.CastStrAuto("private "))
 		}
 		if (ast.GetAttr() & ZEND_ACC_STATIC) != 0 {
-			SmartStrAppends(str, "static ")
+			SmartStrAppends(str, b.CastStrAuto("static "))
 		}
 		if type_ast != nil {
 			if (type_ast.GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
@@ -1348,17 +1348,17 @@ tail_call:
 	case ZEND_AST_CONST_DECL:
 
 	case ZEND_AST_CLASS_CONST_DECL:
-		SmartStrAppends(str, "const ")
+		SmartStrAppends(str, b.CastStrAuto("const "))
 		goto simple_list
 	case ZEND_AST_NAME_LIST:
 		ZendAstExportNameList(str, (*ZendAstList)(ast), indent)
 		break
 	case ZEND_AST_USE:
-		SmartStrAppends(str, "use ")
+		SmartStrAppends(str, b.CastStrAuto("use "))
 		if ast.GetAttr() == T_FUNCTION {
-			SmartStrAppends(str, "function ")
+			SmartStrAppends(str, b.CastStrAuto("function "))
 		} else if ast.GetAttr() == T_CONST {
-			SmartStrAppends(str, "const ")
+			SmartStrAppends(str, b.CastStrAuto("const "))
 		}
 		goto simple_list
 	case ZEND_AST_MAGIC_CONST:
@@ -1401,7 +1401,7 @@ tail_call:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		break
 	case ZEND_AST_UNPACK:
-		SmartStrAppends(str, "...")
+		SmartStrAppends(str, b.CastStrAuto("..."))
 		ast = ast.GetChild()[0]
 		goto tail_call
 	case ZEND_AST_UNARY_PLUS:
@@ -1513,7 +1513,7 @@ tail_call:
 	case ZEND_AST_THROW:
 		APPEND_NODE_1("throw")
 	case ZEND_AST_GOTO:
-		SmartStrAppends(str, "goto ")
+		SmartStrAppends(str, b.CastStrAuto("goto "))
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		break
 	case ZEND_AST_BREAK:
@@ -1530,12 +1530,12 @@ tail_call:
 		break
 	case ZEND_AST_PROP:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "->")
+		SmartStrAppends(str, b.CastStrAuto("->"))
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_STATIC_PROP:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "::$")
+		SmartStrAppends(str, b.CastStrAuto("::$"))
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_CALL:
@@ -1546,12 +1546,12 @@ tail_call:
 		break
 	case ZEND_AST_CLASS_CONST:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "::")
+		SmartStrAppends(str, b.CastStrAuto("::"))
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_CLASS_NAME:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "::class")
+		SmartStrAppends(str, b.CastStrAuto("::class"))
 		break
 	case ZEND_AST_ASSIGN:
 		BINARY_OP(" = ", 90, 91, 90)
@@ -1648,7 +1648,7 @@ tail_call:
 	case ZEND_AST_ARRAY_ELEM:
 		if ast.GetChild()[1] != nil {
 			ZendAstExportEx(str, ast.GetChild()[1], 80, indent)
-			SmartStrAppends(str, " => ")
+			SmartStrAppends(str, b.CastStrAuto(" => "))
 		}
 		if ast.GetAttr() != 0 {
 			SmartStrAppendc(str, '&')
@@ -1656,9 +1656,9 @@ tail_call:
 		ZendAstExportEx(str, ast.GetChild()[0], 80, indent)
 		break
 	case ZEND_AST_NEW:
-		SmartStrAppends(str, "new ")
+		SmartStrAppends(str, b.CastStrAuto("new "))
 		if ast.GetChild()[0].GetKind() == ZEND_AST_CLASS {
-			SmartStrAppends(str, "class")
+			SmartStrAppends(str, b.CastStrAuto("class"))
 			if ZendAstGetList(ast.GetChild()[1]).GetChildren() != 0 {
 				SmartStrAppendc(str, '(')
 				ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
@@ -1674,18 +1674,18 @@ tail_call:
 		break
 	case ZEND_AST_INSTANCEOF:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, " instanceof ")
+		SmartStrAppends(str, b.CastStrAuto(" instanceof "))
 		ZendAstExportNsName(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_YIELD:
 		if priority > 70 {
 			SmartStrAppendc(str, '(')
 		}
-		SmartStrAppends(str, "yield ")
+		SmartStrAppends(str, b.CastStrAuto("yield "))
 		if ast.GetChild()[0] != nil {
 			if ast.GetChild()[1] != nil {
 				ZendAstExportEx(str, ast.GetChild()[1], 70, indent)
-				SmartStrAppends(str, " => ")
+				SmartStrAppends(str, b.CastStrAuto(" => "))
 			}
 			ZendAstExportEx(str, ast.GetChild()[0], 70, indent)
 		}
@@ -1698,42 +1698,42 @@ tail_call:
 	case ZEND_AST_COALESCE:
 		BINARY_OP(" ?? ", 110, 111, 110)
 	case ZEND_AST_STATIC:
-		SmartStrAppends(str, "static $")
+		SmartStrAppends(str, b.CastStrAuto("static $"))
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		APPEND_DEFAULT_VALUE(1)
 	case ZEND_AST_WHILE:
-		SmartStrAppends(str, "while (")
+		SmartStrAppends(str, b.CastStrAuto("while ("))
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, ") {\n")
+		SmartStrAppends(str, b.CastStrAuto(") {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		ZendAstExportIndent(str, indent)
 		SmartStrAppendc(str, '}')
 		break
 	case ZEND_AST_DO_WHILE:
-		SmartStrAppends(str, "do {\n")
+		SmartStrAppends(str, b.CastStrAuto("do {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[0], indent+1)
 		ZendAstExportIndent(str, indent)
-		SmartStrAppends(str, "} while (")
+		SmartStrAppends(str, b.CastStrAuto("} while ("))
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		SmartStrAppendc(str, ')')
 		break
 	case ZEND_AST_IF_ELEM:
 		if ast.GetChild()[0] != nil {
-			SmartStrAppends(str, "if (")
+			SmartStrAppends(str, b.CastStrAuto("if ("))
 			ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-			SmartStrAppends(str, ") {\n")
+			SmartStrAppends(str, b.CastStrAuto(") {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		} else {
-			SmartStrAppends(str, "else {\n")
+			SmartStrAppends(str, b.CastStrAuto("else {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		}
 		ZendAstExportIndent(str, indent)
 		SmartStrAppendc(str, '}')
 		break
 	case ZEND_AST_SWITCH:
-		SmartStrAppends(str, "switch (")
+		SmartStrAppends(str, b.CastStrAuto("switch ("))
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, ") {\n")
+		SmartStrAppends(str, b.CastStrAuto(") {\n"))
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent+1)
 		ZendAstExportIndent(str, indent)
 		SmartStrAppendc(str, '}')
@@ -1741,21 +1741,21 @@ tail_call:
 	case ZEND_AST_SWITCH_CASE:
 		ZendAstExportIndent(str, indent)
 		if ast.GetChild()[0] != nil {
-			SmartStrAppends(str, "case ")
+			SmartStrAppends(str, b.CastStrAuto("case "))
 			ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-			SmartStrAppends(str, ":\n")
+			SmartStrAppends(str, b.CastStrAuto(":\n"))
 		} else {
-			SmartStrAppends(str, "default:\n")
+			SmartStrAppends(str, b.CastStrAuto("default:\n"))
 		}
 		ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		break
 	case ZEND_AST_DECLARE:
-		SmartStrAppends(str, "declare(")
+		SmartStrAppends(str, b.CastStrAuto("declare("))
 		ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_CONST_DECL)
 		ZendAstExportList(str, (*ZendAstList)(ast.GetChild()[0]), 1, 0, indent)
 		SmartStrAppendc(str, ')')
 		if ast.GetChild()[1] != nil {
-			SmartStrAppends(str, " {\n")
+			SmartStrAppends(str, b.CastStrAuto(" {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 			ZendAstExportIndent(str, indent)
 			SmartStrAppendc(str, '}')
@@ -1769,40 +1769,40 @@ tail_call:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		APPEND_DEFAULT_VALUE(1)
 	case ZEND_AST_USE_TRAIT:
-		SmartStrAppends(str, "use ")
+		SmartStrAppends(str, b.CastStrAuto("use "))
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		if ast.GetChild()[1] != nil {
-			SmartStrAppends(str, " {\n")
+			SmartStrAppends(str, b.CastStrAuto(" {\n"))
 			ZendAstExportEx(str, ast.GetChild()[1], 0, indent+1)
 			ZendAstExportIndent(str, indent)
-			SmartStrAppends(str, "}")
+			SmartStrAppends(str, b.CastStrAuto("}"))
 		} else {
-			SmartStrAppends(str, ";")
+			SmartStrAppends(str, b.CastStrAuto(";"))
 		}
 		break
 	case ZEND_AST_TRAIT_PRECEDENCE:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, " insteadof ")
+		SmartStrAppends(str, b.CastStrAuto(" insteadof "))
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_METHOD_REFERENCE:
 		if ast.GetChild()[0] != nil {
 			ZendAstExportName(str, ast.GetChild()[0], 0, indent)
-			SmartStrAppends(str, "::")
+			SmartStrAppends(str, b.CastStrAuto("::"))
 		}
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
 		break
 	case ZEND_AST_NAMESPACE:
-		SmartStrAppends(str, "namespace")
+		SmartStrAppends(str, b.CastStrAuto("namespace"))
 		if ast.GetChild()[0] != nil {
 			SmartStrAppendc(str, ' ')
 			ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		}
 		if ast.GetChild()[1] != nil {
-			SmartStrAppends(str, " {\n")
+			SmartStrAppends(str, b.CastStrAuto(" {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 			ZendAstExportIndent(str, indent)
-			SmartStrAppends(str, "}\n")
+			SmartStrAppends(str, b.CastStrAuto("}\n"))
 		} else {
 			SmartStrAppendc(str, ';')
 		}
@@ -1812,13 +1812,13 @@ tail_call:
 	case ZEND_AST_TRAIT_ALIAS:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		if (ast.GetAttr() & ZEND_ACC_PUBLIC) != 0 {
-			SmartStrAppends(str, " as public")
+			SmartStrAppends(str, b.CastStrAuto(" as public"))
 		} else if (ast.GetAttr() & ZEND_ACC_PROTECTED) != 0 {
-			SmartStrAppends(str, " as protected")
+			SmartStrAppends(str, b.CastStrAuto(" as protected"))
 		} else if (ast.GetAttr() & ZEND_ACC_PRIVATE) != 0 {
-			SmartStrAppends(str, " as private")
+			SmartStrAppends(str, b.CastStrAuto(" as private"))
 		} else if ast.GetChild()[1] != nil {
-			SmartStrAppends(str, " as")
+			SmartStrAppends(str, b.CastStrAuto(" as"))
 		}
 		if ast.GetChild()[1] != nil {
 			SmartStrAppendc(str, ' ')
@@ -1827,7 +1827,7 @@ tail_call:
 		break
 	case ZEND_AST_METHOD_CALL:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "->")
+		SmartStrAppends(str, b.CastStrAuto("->"))
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
 		SmartStrAppendc(str, '(')
 		ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
@@ -1835,7 +1835,7 @@ tail_call:
 		break
 	case ZEND_AST_STATIC_CALL:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, "::")
+		SmartStrAppends(str, b.CastStrAuto("::"))
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
 		SmartStrAppendc(str, '(')
 		ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
@@ -1847,11 +1847,11 @@ tail_call:
 		}
 		ZendAstExportEx(str, ast.GetChild()[0], 100, indent)
 		if ast.GetChild()[1] != nil {
-			SmartStrAppends(str, " ? ")
+			SmartStrAppends(str, b.CastStrAuto(" ? "))
 			ZendAstExportEx(str, ast.GetChild()[1], 101, indent)
-			SmartStrAppends(str, " : ")
+			SmartStrAppends(str, b.CastStrAuto(" : "))
 		} else {
-			SmartStrAppends(str, " ?: ")
+			SmartStrAppends(str, b.CastStrAuto(" ?: "))
 		}
 		ZendAstExportEx(str, ast.GetChild()[2], 101, indent)
 		if priority > 100 {
@@ -1859,23 +1859,23 @@ tail_call:
 		}
 		break
 	case ZEND_AST_TRY:
-		SmartStrAppends(str, "try {\n")
+		SmartStrAppends(str, b.CastStrAuto("try {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[0], indent+1)
 		ZendAstExportIndent(str, indent)
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		if ast.GetChild()[2] != nil {
-			SmartStrAppends(str, "} finally {\n")
+			SmartStrAppends(str, b.CastStrAuto("} finally {\n"))
 			ZendAstExportStmt(str, ast.GetChild()[2], indent+1)
 			ZendAstExportIndent(str, indent)
 		}
 		SmartStrAppendc(str, '}')
 		break
 	case ZEND_AST_CATCH:
-		SmartStrAppends(str, "} catch (")
+		SmartStrAppends(str, b.CastStrAuto("} catch ("))
 		ZendAstExportCatchNameList(str, ZendAstGetList(ast.GetChild()[0]), indent)
-		SmartStrAppends(str, " $")
+		SmartStrAppends(str, b.CastStrAuto(" $"))
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
-		SmartStrAppends(str, ") {\n")
+		SmartStrAppends(str, b.CastStrAuto(") {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[2], indent+1)
 		ZendAstExportIndent(str, indent)
 		break
@@ -1891,13 +1891,13 @@ tail_call:
 			SmartStrAppendc(str, '&')
 		}
 		if (ast.GetAttr() & ZEND_PARAM_VARIADIC) != 0 {
-			SmartStrAppends(str, "...")
+			SmartStrAppends(str, b.CastStrAuto("..."))
 		}
 		SmartStrAppendc(str, '$')
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
 		APPEND_DEFAULT_VALUE(2)
 	case ZEND_AST_FOR:
-		SmartStrAppends(str, "for (")
+		SmartStrAppends(str, b.CastStrAuto("for ("))
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		SmartStrAppendc(str, ';')
 		if ast.GetChild()[1] != nil {
@@ -1909,21 +1909,21 @@ tail_call:
 			SmartStrAppendc(str, ' ')
 			ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
 		}
-		SmartStrAppends(str, ") {\n")
+		SmartStrAppends(str, b.CastStrAuto(") {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[3], indent+1)
 		ZendAstExportIndent(str, indent)
 		SmartStrAppendc(str, '}')
 		break
 	case ZEND_AST_FOREACH:
-		SmartStrAppends(str, "foreach (")
+		SmartStrAppends(str, b.CastStrAuto("foreach ("))
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
-		SmartStrAppends(str, " as ")
+		SmartStrAppends(str, b.CastStrAuto(" as "))
 		if ast.GetChild()[2] != nil {
 			ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
-			SmartStrAppends(str, " => ")
+			SmartStrAppends(str, b.CastStrAuto(" => "))
 		}
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
-		SmartStrAppends(str, ") {\n")
+		SmartStrAppends(str, b.CastStrAuto(") {\n"))
 		ZendAstExportStmt(str, ast.GetChild()[3], indent+1)
 		ZendAstExportIndent(str, indent)
 		SmartStrAppendc(str, '}')
@@ -1937,7 +1937,7 @@ binary_op:
 		SmartStrAppendc(str, '(')
 	}
 	ZendAstExportEx(str, ast.GetChild()[0], pl, indent)
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	ZendAstExportEx(str, ast.GetChild()[1], pr, indent)
 	if priority > p {
 		SmartStrAppendc(str, ')')
@@ -1947,7 +1947,7 @@ prefix_op:
 	if priority > p {
 		SmartStrAppendc(str, '(')
 	}
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	ZendAstExportEx(str, ast.GetChild()[0], pl, indent)
 	if priority > p {
 		SmartStrAppendc(str, ')')
@@ -1958,19 +1958,19 @@ postfix_op:
 		SmartStrAppendc(str, '(')
 	}
 	ZendAstExportEx(str, ast.GetChild()[0], pl, indent)
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	if priority > p {
 		SmartStrAppendc(str, ')')
 	}
 	return
 func_op:
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	SmartStrAppendc(str, '(')
 	ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 	SmartStrAppendc(str, ')')
 	return
 append_node_1:
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	if ast.GetChild()[0] != nil {
 		SmartStrAppendc(str, ' ')
 		ast = ast.GetChild()[0]
@@ -1978,11 +1978,11 @@ append_node_1:
 	}
 	return
 append_str:
-	SmartStrAppends(str, op)
+	SmartStrAppends(str, b.CastStrAuto(op))
 	return
 append_default_value:
 	if ast.GetChild()[p] != nil {
-		SmartStrAppends(str, " = ")
+		SmartStrAppends(str, b.CastStrAuto(" = "))
 		ast = ast.GetChild()[p]
 		goto tail_call
 	}
@@ -1990,9 +1990,9 @@ append_default_value:
 }
 func ZendAstExport(prefix string, ast *ZendAst, suffix string) *ZendString {
 	var str SmartStr = SmartStr{0}
-	SmartStrAppends(&str, prefix)
+	SmartStrAppends(&str, b.CastStrAuto(prefix))
 	ZendAstExportEx(&str, ast, 0, 0)
-	SmartStrAppends(&str, suffix)
+	SmartStrAppends(&str, b.CastStrAuto(suffix))
 	SmartStr0(&str)
 	return str.GetS()
 }

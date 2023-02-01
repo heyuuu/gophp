@@ -116,7 +116,7 @@ func StrfilterStripTagsCreate(filtername *byte, filterparams *zend.Zval, persist
 				tmp = _z
 				zend.ConvertToStringEx(tmp)
 				zend.SmartStrAppendc(&tags_ss, '<')
-				zend.SmartStrAppend(&tags_ss, tmp.GetStr())
+				zend.SmartStrAppend(&tags_ss, tmp.GetStr().GetStr())
 				zend.SmartStrAppendc(&tags_ss, '>')
 			}
 			zend.SmartStr0(&tags_ss)

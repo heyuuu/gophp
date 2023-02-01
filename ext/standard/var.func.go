@@ -509,22 +509,22 @@ func BufferAppendSpaces(buf *zend.SmartStr, num_spaces int) {
 	var tmp_spaces *byte
 	var tmp_spaces_len int
 	tmp_spaces_len = core.Spprintf(&tmp_spaces, 0, "%*c", num_spaces, ' ')
-	zend.SmartStrAppendl(buf, tmp_spaces, tmp_spaces_len)
+	zend.SmartStrAppendl(buf, b.CastStr(tmp_spaces, tmp_spaces_len))
 	zend.Efree(tmp_spaces)
 }
 func PhpArrayElementExport(zv *zend.Zval, index zend.ZendUlong, key *zend.ZendString, level int, buf *zend.SmartStr) {
 	if key == nil {
 		BufferAppendSpaces(buf, level+1)
 		zend.SmartStrAppendLong(buf, zend.ZendLong(index))
-		zend.SmartStrAppendl(buf, " => ", 4)
+		zend.SmartStrAppendl(buf, b.CastStr(" => ", 4))
 	} else {
 		var tmp_str *zend.ZendString
 		var ckey *zend.ZendString = PhpAddcslashes(key, "'\\", 2)
 		tmp_str = PhpStrToStr(ckey.GetVal(), ckey.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
 		BufferAppendSpaces(buf, level+1)
 		zend.SmartStrAppendc(buf, '\'')
-		zend.SmartStrAppend(buf, tmp_str)
-		zend.SmartStrAppendl(buf, "' => ", 5)
+		zend.SmartStrAppend(buf, tmp_str.GetStr())
+		zend.SmartStrAppendl(buf, b.CastStr("' => ", 5))
 		zend.ZendStringFree(ckey)
 		zend.ZendStringFree(tmp_str)
 	}
@@ -542,13 +542,13 @@ func PhpObjectElementExport(zv *zend.Zval, index zend.ZendUlong, key *zend.ZendS
 		zend.ZendUnmanglePropertyNameEx(key, &class_name, &prop_name, &prop_name_len)
 		pname_esc = PhpAddcslashesStr(prop_name, prop_name_len, "'\\", 2)
 		zend.SmartStrAppendc(buf, '\'')
-		zend.SmartStrAppend(buf, pname_esc)
+		zend.SmartStrAppend(buf, pname_esc.GetStr())
 		zend.SmartStrAppendc(buf, '\'')
 		zend.ZendStringReleaseEx(pname_esc, 0)
 	} else {
 		zend.SmartStrAppendLong(buf, zend.ZendLong(index))
 	}
-	zend.SmartStrAppendl(buf, " => ", 4)
+	zend.SmartStrAppendl(buf, b.CastStr(" => ", 4))
 	PhpVarExportEx(zv, level+2, buf)
 	zend.SmartStrAppendc(buf, ',')
 	zend.SmartStrAppendc(buf, '\n')
@@ -564,13 +564,13 @@ func PhpVarExportEx(struc *zend.Zval, level int, buf *zend.SmartStr) {
 again:
 	switch struc.GetType() {
 	case zend.IS_FALSE:
-		zend.SmartStrAppendl(buf, "false", 5)
+		zend.SmartStrAppendl(buf, b.CastStr("false", 5))
 		break
 	case zend.IS_TRUE:
-		zend.SmartStrAppendl(buf, "true", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("true", 4))
 		break
 	case zend.IS_NULL:
-		zend.SmartStrAppendl(buf, "NULL", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("NULL", 4))
 		break
 	case zend.IS_LONG:
 
@@ -579,14 +579,14 @@ again:
 
 		if struc.GetLval() == zend.ZEND_LONG_MIN {
 			zend.SmartStrAppendLong(buf, zend.ZEND_LONG_MIN+1)
-			zend.SmartStrAppends(buf, "-1")
+			zend.SmartStrAppends(buf, b.CastStrAuto("-1"))
 			break
 		}
 		zend.SmartStrAppendLong(buf, struc.GetLval())
 		break
 	case zend.IS_DOUBLE:
 		core.PhpGcvt(struc.GetDval(), int(core.PG(serialize_precision)), '.', 'E', tmp_str)
-		zend.SmartStrAppends(buf, tmp_str)
+		zend.SmartStrAppends(buf, b.CastStrAuto(tmp_str))
 
 		/* Without a decimal point, PHP treats a number literal as an int.
 		 * This check even works for scientific notation, because the
@@ -596,14 +596,14 @@ again:
 		 */
 
 		if core.ZendFinite(struc.GetDval()) && nil == strchr(tmp_str, '.') {
-			zend.SmartStrAppendl(buf, ".0", 2)
+			zend.SmartStrAppendl(buf, b.CastStr(".0", 2))
 		}
 		break
 	case zend.IS_STRING:
 		ztmp = PhpAddcslashes(struc.GetStr(), "'\\", 2)
 		ztmp2 = PhpStrToStr(ztmp.GetVal(), ztmp.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
 		zend.SmartStrAppendc(buf, '\'')
-		zend.SmartStrAppend(buf, ztmp2)
+		zend.SmartStrAppend(buf, ztmp2.GetStr())
 		zend.SmartStrAppendc(buf, '\'')
 		zend.ZendStringFree(ztmp)
 		zend.ZendStringFree(ztmp2)
@@ -612,7 +612,7 @@ again:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
 			if myht.IsRecursive() {
-				zend.SmartStrAppendl(buf, "NULL", 4)
+				zend.SmartStrAppendl(buf, b.CastStr("NULL", 4))
 				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
 				return
 			}
@@ -623,7 +623,7 @@ again:
 			zend.SmartStrAppendc(buf, '\n')
 			BufferAppendSpaces(buf, level-1)
 		}
-		zend.SmartStrAppendl(buf, "array (\n", 8)
+		zend.SmartStrAppendl(buf, b.CastStr("array (\n", 8))
 		var __ht *zend.HashTable = myht
 		for _, _p := range __ht.foreachData() {
 			var _z *zend.Zval = _p.GetVal()
@@ -651,7 +651,7 @@ again:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_VAR_EXPORT)
 		if myht != nil {
 			if myht.IsRecursive() {
-				zend.SmartStrAppendl(buf, "NULL", 4)
+				zend.SmartStrAppendl(buf, b.CastStr("NULL", 4))
 				zend.ZendError(zend.E_WARNING, "var_export does not handle circular references")
 				zend.ZendReleaseProperties(myht)
 				return
@@ -667,10 +667,10 @@ again:
 		/* stdClass has no __set_state method, but can be casted to */
 
 		if zend.Z_OBJCE_P(struc) == zend.ZendStandardClassDef {
-			zend.SmartStrAppendl(buf, "(object) array(\n", 16)
+			zend.SmartStrAppendl(buf, b.CastStr("(object) array(\n", 16))
 		} else {
-			zend.SmartStrAppend(buf, zend.Z_OBJCE_P(struc).GetName())
-			zend.SmartStrAppendl(buf, "::__set_state(array(\n", 21)
+			zend.SmartStrAppend(buf, zend.Z_OBJCE_P(struc).GetName().GetStr())
+			zend.SmartStrAppendl(buf, b.CastStr("::__set_state(array(\n", 21))
 		}
 		if myht != nil {
 			var __ht *zend.HashTable = myht
@@ -696,7 +696,7 @@ again:
 		if zend.Z_OBJCE_P(struc) == zend.ZendStandardClassDef {
 			zend.SmartStrAppendc(buf, ')')
 		} else {
-			zend.SmartStrAppendl(buf, "))", 2)
+			zend.SmartStrAppendl(buf, b.CastStr("))", 2))
 		}
 		break
 	case zend.IS_REFERENCE:
@@ -704,7 +704,7 @@ again:
 		goto again
 		break
 	default:
-		zend.SmartStrAppendl(buf, "NULL", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("NULL", 4))
 		break
 	}
 }
@@ -843,26 +843,26 @@ func PhpAddVarHash(data PhpSerializeDataT, var_ *zend.Zval) zend.ZendLong {
 	}
 }
 func PhpVarSerializeLong(buf *zend.SmartStr, val zend.ZendLong) {
-	zend.SmartStrAppendl(buf, "i:", 2)
+	zend.SmartStrAppendl(buf, b.CastStr("i:", 2))
 	zend.SmartStrAppendLong(buf, val)
 	zend.SmartStrAppendc(buf, ';')
 }
 func PhpVarSerializeString(buf *zend.SmartStr, str *byte, len_ int) {
-	zend.SmartStrAppendl(buf, "s:", 2)
+	zend.SmartStrAppendl(buf, b.CastStr("s:", 2))
 	zend.SmartStrAppendUnsigned(buf, len_)
-	zend.SmartStrAppendl(buf, ":\"", 2)
-	zend.SmartStrAppendl(buf, str, len_)
-	zend.SmartStrAppendl(buf, "\";", 2)
+	zend.SmartStrAppendl(buf, b.CastStr(":\"", 2))
+	zend.SmartStrAppendl(buf, b.CastStr(str, len_))
+	zend.SmartStrAppendl(buf, b.CastStr("\";", 2))
 }
 func PhpVarSerializeClassName(buf *zend.SmartStr, struc *zend.Zval) zend.ZendBool {
 	var class_name *zend.ZendString
 	var incomplete_class zend.ZendBool = 0
 	PHP_SET_CLASS_ATTRIBUTES(struc)
-	zend.SmartStrAppendl(buf, "O:", 2)
+	zend.SmartStrAppendl(buf, b.CastStr("O:", 2))
 	zend.SmartStrAppendUnsigned(buf, class_name.GetLen())
-	zend.SmartStrAppendl(buf, ":\"", 2)
-	zend.SmartStrAppend(buf, class_name)
-	zend.SmartStrAppendl(buf, "\":", 2)
+	zend.SmartStrAppendl(buf, b.CastStr(":\"", 2))
+	zend.SmartStrAppend(buf, class_name.GetStr())
+	zend.SmartStrAppendl(buf, b.CastStr("\":", 2))
 	PHP_CLEANUP_CLASS_ATTRIBUTES()
 	return incomplete_class
 }
@@ -997,7 +997,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 }
 func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.HashTable, count uint32, incomplete_class zend.ZendBool, var_hash PhpSerializeDataT) {
 	zend.SmartStrAppendUnsigned(buf, count)
-	zend.SmartStrAppendl(buf, ":{", 2)
+	zend.SmartStrAppendl(buf, b.CastStr(":{", 2))
 	if count > 0 {
 		var key *zend.ZendString
 		var data *zend.Zval
@@ -1032,7 +1032,7 @@ func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.Ha
 			if data.IsType(zend.IS_ARRAY) {
 				if data.IsRecursive() || struc.IsType(zend.IS_ARRAY) && data.GetArr() == struc.GetArr() {
 					PhpAddVarHash(var_hash, struc)
-					zend.SmartStrAppendl(buf, "N;", 2)
+					zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 				} else {
 					if data.IsRefcounted() {
 						data.ProtectRecursive()
@@ -1072,15 +1072,15 @@ func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSer
 
 			/* Reference to an object that failed to serialize, replace with null. */
 
-			zend.SmartStrAppendl(buf, "N;", 2)
+			zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 			return
 		} else if struc.IsReference() {
-			zend.SmartStrAppendl(buf, "R:", 2)
+			zend.SmartStrAppendl(buf, b.CastStr("R:", 2))
 			zend.SmartStrAppendLong(buf, var_already)
 			zend.SmartStrAppendc(buf, ';')
 			return
 		} else if struc.IsType(zend.IS_OBJECT) {
-			zend.SmartStrAppendl(buf, "r:", 2)
+			zend.SmartStrAppendl(buf, b.CastStr("r:", 2))
 			zend.SmartStrAppendLong(buf, var_already)
 			zend.SmartStrAppendc(buf, ';')
 			return
@@ -1089,22 +1089,22 @@ func PhpVarSerializeIntern(buf *zend.SmartStr, struc *zend.Zval, var_hash PhpSer
 again:
 	switch struc.GetType() {
 	case zend.IS_FALSE:
-		zend.SmartStrAppendl(buf, "b:0;", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("b:0;", 4))
 		return
 	case zend.IS_TRUE:
-		zend.SmartStrAppendl(buf, "b:1;", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("b:1;", 4))
 		return
 	case zend.IS_NULL:
-		zend.SmartStrAppendl(buf, "N;", 2)
+		zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 		return
 	case zend.IS_LONG:
 		PhpVarSerializeLong(buf, struc.GetLval())
 		return
 	case zend.IS_DOUBLE:
 		var tmp_str []byte
-		zend.SmartStrAppendl(buf, "d:", 2)
+		zend.SmartStrAppendl(buf, b.CastStr("d:", 2))
 		core.PhpGcvt(struc.GetDval(), int(core.PG(serialize_precision)), '.', 'E', tmp_str)
-		zend.SmartStrAppends(buf, tmp_str)
+		zend.SmartStrAppends(buf, b.CastStrAuto(tmp_str))
 		zend.SmartStrAppendc(buf, ';')
 		return
 	case zend.IS_STRING:
@@ -1124,14 +1124,14 @@ again:
 			zend.ZVAL_OBJ(&obj, struc.GetObj())
 			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == zend.FAILURE {
 				if zend.EG__().GetException() == nil {
-					zend.SmartStrAppendl(buf, "N;", 2)
+					zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 				}
 				zend.ZvalPtrDtor(&obj)
 				return
 			}
 			PhpVarSerializeClassName(buf, &obj)
 			zend.SmartStrAppendUnsigned(buf, retval.GetArr().Count())
-			zend.SmartStrAppendl(buf, ":{", 2)
+			zend.SmartStrAppendl(buf, b.CastStr(":{", 2))
 			var __ht *zend.HashTable = retval.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *zend.Zval = _p.GetVal()
@@ -1166,14 +1166,14 @@ again:
 			var serialized_data *uint8 = nil
 			var serialized_length int
 			if ce.GetSerialize()(struc, &serialized_data, &serialized_length, (*zend.ZendSerializeData)(var_hash)) == zend.SUCCESS {
-				zend.SmartStrAppendl(buf, "C:", 2)
+				zend.SmartStrAppendl(buf, b.CastStr("C:", 2))
 				zend.SmartStrAppendUnsigned(buf, zend.Z_OBJCE_P(struc).GetName().GetLen())
-				zend.SmartStrAppendl(buf, ":\"", 2)
-				zend.SmartStrAppend(buf, zend.Z_OBJCE_P(struc).GetName())
-				zend.SmartStrAppendl(buf, "\":", 2)
+				zend.SmartStrAppendl(buf, b.CastStr(":\"", 2))
+				zend.SmartStrAppend(buf, zend.Z_OBJCE_P(struc).GetName().GetStr())
+				zend.SmartStrAppendl(buf, b.CastStr("\":", 2))
 				zend.SmartStrAppendUnsigned(buf, serialized_length)
-				zend.SmartStrAppendl(buf, ":{", 2)
-				zend.SmartStrAppendl(buf, (*byte)(serialized_data), serialized_length)
+				zend.SmartStrAppendl(buf, b.CastStr(":{", 2))
+				zend.SmartStrAppendl(buf, b.CastStr((*byte)(serialized_data), serialized_length))
 				zend.SmartStrAppendc(buf, '}')
 			} else {
 
@@ -1181,7 +1181,7 @@ again:
 
 				var var_idx *zend.Zval = var_hash.GetHt().IndexFindH(zend.ZendUlong(zend.ZendUintptrT(struc.GetCounted())))
 				var_idx.SetLong(-1)
-				zend.SmartStrAppendl(buf, "N;", 2)
+				zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 			}
 			if serialized_data != nil {
 				zend.Efree(serialized_data)
@@ -1199,7 +1199,7 @@ again:
 					/* we should still add element even if it's not OK,
 					 * since we already wrote the length of the array before */
 
-					zend.SmartStrAppendl(buf, "N;", 2)
+					zend.SmartStrAppendl(buf, b.CastStr("N;", 2))
 
 					/* we should still add element even if it's not OK,
 					 * since we already wrote the length of the array before */
@@ -1227,7 +1227,7 @@ again:
 		zend.ZendReleaseProperties(myht)
 		return
 	case zend.IS_ARRAY:
-		zend.SmartStrAppendl(buf, "a:", 2)
+		zend.SmartStrAppendl(buf, b.CastStr("a:", 2))
 		myht = struc.GetArr()
 		PhpVarSerializeNestedData(buf, struc, myht, myht.Count(), 0, var_hash)
 		return
@@ -1235,7 +1235,7 @@ again:
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
 	default:
-		zend.SmartStrAppendl(buf, "i:0;", 4)
+		zend.SmartStrAppendl(buf, b.CastStr("i:0;", 4))
 		return
 	}
 }

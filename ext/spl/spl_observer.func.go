@@ -457,7 +457,7 @@ func zim_spl_SplObjectStorage_serialize(execute_data *zend.ZendExecuteData, retu
 
 	/* storage */
 
-	zend.SmartStrAppendl(&buf, "x:", 2)
+	zend.SmartStrAppendl(&buf, b.CastStr("x:", 2))
 	flags.SetLong(intern.GetStorage().GetNNumOfElements())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
@@ -477,7 +477,7 @@ func zim_spl_SplObjectStorage_serialize(execute_data *zend.ZendExecuteData, retu
 
 	/* members */
 
-	zend.SmartStrAppendl(&buf, "m:", 2)
+	zend.SmartStrAppendl(&buf, b.CastStr("m:", 2))
 	zend.ZVAL_ARR(&members, zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS)))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 	zend.ZvalPtrDtor(&members)

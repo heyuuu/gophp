@@ -149,10 +149,10 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), zend.Z_STRVAL_P(val))
 			return
 		}
-		zend.SmartStrAppend(s, key)
-		zend.SmartStrAppendl(s, ": ", 2)
-		zend.SmartStrAppends(s, zend.Z_STRVAL_P(val))
-		zend.SmartStrAppendl(s, "\r\n", 2)
+		zend.SmartStrAppend(s, key.GetStr())
+		zend.SmartStrAppendl(s, b.CastStr(": ", 2))
+		zend.SmartStrAppends(s, b.CastStrAuto(zend.Z_STRVAL_P(val)))
+		zend.SmartStrAppendl(s, b.CastStr("\r\n", 2))
 		break
 	case zend.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)

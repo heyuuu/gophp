@@ -308,9 +308,9 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 				}
 			}
 			key = zend.Estrdup(line)
-			zend.SmartStringAppends(&buf_value, value)
+			zend.SmartStringAppends(&buf_value, b.CastStrAuto(value))
 		} else if buf_value.GetC() != nil {
-			zend.SmartStringAppends(&buf_value, line)
+			zend.SmartStringAppends(&buf_value, b.CastStrAuto(line))
 		} else {
 			continue
 		}
