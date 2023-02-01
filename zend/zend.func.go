@@ -183,7 +183,7 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 				buf.AppendString(string_key.GetStr())
 			}
 		} else {
-			SmartStrAppendLong(buf, num_key)
+			buf.AppendLong(num_key)
 		}
 		buf.AppendString("] => ")
 		ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
@@ -320,7 +320,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 		ZendReleaseProperties(properties)
 		break
 	case IS_LONG:
-		SmartStrAppendLong(buf, expr.GetLval())
+		buf.AppendLong(expr.GetLval())
 		break
 	case IS_REFERENCE:
 		ZendPrintZvalRToBuf(buf, Z_REFVAL_P(expr), indent)

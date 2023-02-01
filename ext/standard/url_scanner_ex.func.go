@@ -103,14 +103,14 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	/* Ignore malformed URLs */
 
 	if url_parts == nil {
-		zend.SmartStrAppendSmartStr(dest, url)
+		dest.AppendSmartStr(url)
 		return
 	}
 
 	/* Don't modify URLs of the format "#mark" */
 
 	if url_parts.GetFragment() != nil && '#' == url.GetS().GetVal()[0] {
-		zend.SmartStrAppendSmartStr(dest, url)
+		dest.AppendSmartStr(url)
 		PhpUrlFree(url_parts)
 		return
 	}
@@ -118,7 +118,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	/* Check protocol. Only http/https is allowed. */
 
 	if url_parts.GetScheme() != nil && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "http")) && !(zend.ZendStringEqualsLiteralCi(url_parts.GetScheme(), "https")) {
-		zend.SmartStrAppendSmartStr(dest, url)
+		dest.AppendSmartStr(url)
 		PhpUrlFree(url_parts)
 		return
 	}
@@ -129,7 +129,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 		var tmp *zend.ZendString = zend.ZendStringTolower(url_parts.GetHost())
 		if zend.ZendHashExists(&(BG(url_adapt_session_hosts_ht)), tmp) == 0 {
 			zend.ZendStringReleaseEx(tmp, 0)
-			zend.SmartStrAppendSmartStr(dest, url)
+			dest.AppendSmartStr(url)
 			PhpUrlFree(url_parts)
 			return
 		}
@@ -145,10 +145,10 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 
 		/* URL is http://php.net or like */
 
-		zend.SmartStrAppendSmartStr(dest, url)
+		dest.AppendSmartStr(url)
 		dest.AppendByte('/')
 		dest.AppendByte('?')
-		zend.SmartStrAppendSmartStr(dest, url_app)
+		dest.AppendSmartStr(url_app)
 		PhpUrlFree(url_parts)
 		return
 	}
@@ -171,7 +171,7 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	}
 	if url_parts.GetPort() != 0 {
 		dest.AppendByte(':')
-		zend.SmartStrAppendUnsigned(dest, long(url_parts.GetPort()))
+		dest.AppendUlong(long(url_parts.GetPort()))
 	}
 	if url_parts.GetPath() != nil {
 		dest.AppendString(b.CastStrAuto(url_parts.GetPath().GetVal()))
@@ -180,9 +180,9 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	if url_parts.GetQuery() != nil {
 		dest.AppendString(b.CastStrAuto(url_parts.GetQuery().GetVal()))
 		dest.AppendString(b.CastStrAuto(separator))
-		zend.SmartStrAppendSmartStr(dest, url_app)
+		dest.AppendSmartStr(url_app)
 	} else {
-		zend.SmartStrAppendSmartStr(dest, url_app)
+		dest.AppendSmartStr(url_app)
 	}
 	if url_parts.GetFragment() != nil {
 		dest.AppendByte('#')
@@ -206,7 +206,7 @@ func TagArg(ctx *UrlAdaptStateExT, quotes byte, type_ byte) {
 	if f {
 		AppendModifiedUrl(ctx.GetVal(), ctx.GetResult(), ctx.GetUrlApp(), core.PG(arg_separator).output)
 	} else {
-		zend.SmartStrAppendSmartStr(ctx.GetResult(), ctx.GetVal())
+		ctx.GetResult().AppendSmartStr(ctx.GetVal())
 	}
 	if quotes {
 		ctx.GetResult().AppendByte(type_)
@@ -291,7 +291,7 @@ func HandleForm(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
 		}
 	}
 	if doit != 0 {
-		zend.SmartStrAppendSmartStr(ctx.GetResult(), ctx.GetFormApp())
+		ctx.GetResult().AppendSmartStr(ctx.GetFormApp())
 	}
 }
 func HandleTag(ctx *UrlAdaptStateExT, start *byte, YYCURSOR *byte) {
@@ -926,13 +926,13 @@ func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len in
 		hname.AppendString(b.CastStr(name, name_len))
 		hvalue.AppendString(b.CastStr(value, value_len))
 	}
-	zend.SmartStrAppendSmartStr(url_state.GetUrlApp(), &sname)
+	url_state.GetUrlApp().AppendSmartStr(&sname)
 	url_state.GetUrlApp().AppendByte('=')
-	zend.SmartStrAppendSmartStr(url_state.GetUrlApp(), &svalue)
+	url_state.GetUrlApp().AppendSmartStr(&svalue)
 	url_state.GetFormApp().AppendString("<input type=\"hidden\" name=\"")
-	zend.SmartStrAppendSmartStr(url_state.GetFormApp(), &hname)
+	url_state.GetFormApp().AppendSmartStr(&hname)
 	url_state.GetFormApp().AppendString("\" value=\"")
-	zend.SmartStrAppendSmartStr(url_state.GetFormApp(), &hvalue)
+	url_state.GetFormApp().AppendSmartStr(&hvalue)
 	url_state.GetFormApp().AppendString("\" />")
 	sname.Free()
 	svalue.Free()
@@ -1005,11 +1005,11 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	}
 	sname.ZeroTail()
 	hname.ZeroTail()
-	zend.SmartStrAppendSmartStr(&url_app, &sname)
+	url_app.AppendSmartStr(&sname)
 	url_app.AppendByte('=')
 	url_app.ZeroTail()
 	form_app.AppendString("<input type=\"hidden\" name=\"")
-	zend.SmartStrAppendSmartStr(&form_app, &hname)
+	form_app.AppendSmartStr(&hname)
 	form_app.AppendString("\" value=\"")
 	form_app.ZeroTail()
 

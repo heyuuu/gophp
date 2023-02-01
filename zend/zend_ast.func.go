@@ -1082,7 +1082,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 		str.AppendString("true")
 		break
 	case IS_LONG:
-		SmartStrAppendLong(str, zv.GetLval())
+		str.AppendLong(zv.GetLval())
 		break
 	case IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
@@ -1114,7 +1114,7 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 				ZendAstExportStr(str, key)
 				str.AppendString("' => ")
 			} else {
-				SmartStrAppendLong(str, idx)
+				str.AppendLong(idx)
 				str.AppendString(" => ")
 			}
 			ZendAstExportZval(str, val, 0, indent)

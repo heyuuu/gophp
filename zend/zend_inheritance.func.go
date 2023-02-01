@@ -556,7 +556,7 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 				}
 			} else {
 				str.AppendString("param")
-				SmartStrAppendUnsigned(&str, i)
+				str.AppendUlong(i)
 			}
 			if i >= required && arg_info.GetIsVariadic() == 0 {
 				str.AppendString(" = ")

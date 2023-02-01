@@ -146,7 +146,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		header.AppendString("CONNECT ")
 		header.AppendString(b.CastStrAuto(resource.GetHost().GetVal()))
 		header.AppendByte(':')
-		zend.SmartStrAppendUnsigned(&header, resource.GetPort())
+		header.AppendUlong(resource.GetPort())
 		header.AppendString(" HTTP/1.0\r\n")
 
 		/* check if we have Proxy-Authorization header */
@@ -514,7 +514,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		req_buf.AppendString(b.CastStrAuto(resource.GetHost().GetVal()))
 		if use_ssl != 0 && resource.GetPort() != 443 && resource.GetPort() != 0 || use_ssl == 0 && resource.GetPort() != 80 && resource.GetPort() != 0 {
 			req_buf.AppendByte(':')
-			zend.SmartStrAppendUnsigned(&req_buf, resource.GetPort())
+			req_buf.AppendUlong(resource.GetPort())
 		}
 		req_buf.AppendString("\r\n")
 	}
@@ -564,7 +564,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 
 		if header_init != 0 && context != nil && (have_header&HTTP_HEADER_CONTENT_LENGTH) == 0 && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
 			req_buf.AppendString("Content-Length: ")
-			zend.SmartStrAppendUnsigned(&req_buf, zend.Z_STRLEN_P(tmpzval))
+			req_buf.AppendUlong(zend.Z_STRLEN_P(tmpzval))
 			req_buf.AppendString("\r\n")
 			have_header |= HTTP_HEADER_CONTENT_LENGTH
 		}
@@ -578,7 +578,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	if header_init != 0 && context != nil && b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "http", "content")) != nil && tmpzval.IsType(zend.IS_STRING) && zend.Z_STRLEN_P(tmpzval) > 0 {
 		if (have_header & HTTP_HEADER_CONTENT_LENGTH) == 0 {
 			req_buf.AppendString("Content-Length: ")
-			zend.SmartStrAppendUnsigned(&req_buf, zend.Z_STRLEN_P(tmpzval))
+			req_buf.AppendUlong(zend.Z_STRLEN_P(tmpzval))
 			req_buf.AppendString("\r\n")
 		}
 		if (have_header & HTTP_HEADER_TYPE) == 0 {

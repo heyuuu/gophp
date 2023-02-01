@@ -397,11 +397,11 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		break
 	case IS_RESOURCE:
 		str.AppendString("Resource id #")
-		SmartStrAppendLong(str, Z_RES_HANDLE_P(arg))
+		str.AppendLong(Z_RES_HANDLE_P(arg))
 		str.AppendString(", ")
 		break
 	case IS_LONG:
-		SmartStrAppendLong(str, arg.GetLval())
+		str.AppendLong(arg.GetLval())
 		str.AppendString(", ")
 		break
 	case IS_DOUBLE:
@@ -424,7 +424,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	var file *Zval
 	var tmp *Zval
 	str.AppendByte('#')
-	SmartStrAppendLong(str, num)
+	str.AppendLong(num)
 	str.AppendByte(' ')
 	file = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_FILE).GetStr())
 	if file != nil {
@@ -446,7 +446,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			}
 			str.AppendString(file.GetStr().GetStr())
 			str.AppendByte('(')
-			SmartStrAppendLong(str, line)
+			str.AppendLong(line)
 			str.AppendString("): ")
 		}
 	} else {
@@ -509,7 +509,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 		_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
 	}
 	str.AppendByte('#')
-	SmartStrAppendLong(&str, num)
+	str.AppendLong(num)
 	str.AppendString(" {main}")
 	str.ZeroTail()
 	RETVAL_NEW_STR(str.GetS())

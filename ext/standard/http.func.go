@@ -177,7 +177,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				if num_prefix != nil {
 					formstr.AppendString(b.CastStr(num_prefix, num_prefix_len))
 				}
-				zend.SmartStrAppendLong(formstr, idx)
+				formstr.AppendLong(idx)
 			}
 			if key_suffix {
 				formstr.AppendString(b.CastStr(key_suffix, key_suffix_len))
@@ -195,7 +195,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				zend.ZendStringFree(ekey)
 				break
 			case zend.IS_LONG:
-				zend.SmartStrAppendLong(formstr, zdata.GetLval())
+				formstr.AppendLong(zdata.GetLval())
 				break
 			case zend.IS_FALSE:
 				formstr.AppendString("0")

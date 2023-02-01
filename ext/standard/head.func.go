@@ -248,7 +248,7 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 				diff = 0
 			}
 			buf.AppendString(b.CastStrAuto(COOKIE_MAX_AGE))
-			zend.SmartStrAppendLong(&buf, zend.ZendLong(diff))
+			buf.AppendLong(zend.ZendLong(diff))
 		}
 	}
 	if path != nil && path.GetLen() != 0 {
