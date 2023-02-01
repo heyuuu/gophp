@@ -25,6 +25,17 @@ func CastStr[I integer](str *byte, len_ I) string {
 	return string(bytes)
 }
 
+func CastStrAuto(str *byte) string {
+	// todo 此段代码仅做占位，后续应替换代码
+	return CastStr(str, StrPtrlen(str))
+}
+
+func StrPtrlen(str *byte) int {
+	// todo 此段代码仅做占位，后续应替换代码
+	// C 中通过 *byte 获取字符串长度
+	return 0
+}
+
 func CastStrPtr(str string) *byte {
 	// todo 此段代码仅做占位，表示获取字符串头部指针，后续应替换代码
 	return nil

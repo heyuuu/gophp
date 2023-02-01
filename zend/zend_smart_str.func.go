@@ -10,12 +10,10 @@ func SmartStrAppendsEx(dest *SmartStr, src *byte, what ZendBool) {
 	SmartStrAppendlEx(dest, src, strlen(src), what)
 }
 func SmartStrAppends(dest *SmartStr, src *byte)            { SmartStrAppendl(dest, src, strlen(src)) }
-func SmartStrExtend(dest *SmartStr, len_ int) *byte        { return SmartStrExtendEx(dest, len_, 0) }
 func SmartStrAppendc(dest *SmartStr, c byte)               { SmartStrAppendcEx(dest, c, 0) }
 func SmartStrAppendl(dest *SmartStr, src *byte, len_ int)  { SmartStrAppendlEx(dest, src, len_, 0) }
 func SmartStrAppend(dest *SmartStr, src *ZendString)       { SmartStrAppendEx(dest, src, 0) }
 func SmartStrAppendSmartStr(dest *SmartStr, src *SmartStr) { SmartStrAppendSmartStrEx(dest, src, 0) }
-func SmartStrSets(dest *SmartStr, src *byte)               { SmartStrSetl(dest, src, strlen(src)) }
 func SmartStrAppendLong(dest *SmartStr, val ZendLong)      { SmartStrAppendLongEx(dest, val, 0) }
 func SmartStrAppendUnsigned(dest *SmartStr, val ZendUlong) { SmartStrAppendUnsignedEx(dest, val, 0) }
 func SmartStrFree(dest *SmartStr)                          { SmartStrFreeEx(dest, 0) }
@@ -35,12 +33,6 @@ func SmartStrAlloc(str *SmartStr, len_ int, persistent ZendBool) int {
 	}
 	return len_
 }
-func SmartStrExtendEx(dest *SmartStr, len_ int, persistent ZendBool) *byte {
-	var new_len int = SmartStrAlloc(dest, len_, persistent)
-	var ret *byte = dest.GetS().GetVal() + dest.GetS().GetLen()
-	dest.GetS().GetLen() = new_len
-	return ret
-}
 func SmartStrFreeEx(str *SmartStr, persistent ZendBool) {
 	if str.GetS() != nil {
 		ZendStringReleaseEx(str.GetS(), persistent)
@@ -51,24 +43,6 @@ func SmartStrFreeEx(str *SmartStr, persistent ZendBool) {
 func SmartStr0(str *SmartStr) {
 	if str.GetS() != nil {
 		str.GetS().GetVal()[str.GetS().GetLen()] = '0'
-	}
-}
-func SmartStrGetLen(str *SmartStr) int {
-	if str.GetS() != nil {
-		return str.GetS().GetLen()
-	} else {
-		return 0
-	}
-}
-func SmartStrExtract(str *SmartStr) *ZendString {
-	if str.GetS() != nil {
-		var res *ZendString
-		SmartStr0(str)
-		res = str.GetS()
-		str.SetS(nil)
-		return res
-	} else {
-		return ZSTR_EMPTY_ALLOC()
 	}
 }
 func SmartStrAppendcEx(dest *SmartStr, ch byte, persistent ZendBool) {
@@ -203,51 +177,4 @@ func SmartStrAppendPrintf(dest *SmartStr, format string, _ ...any) {
 	va_start(arg, format)
 	ZendPrintfToSmartStr(dest, format, arg)
 	va_end(arg)
-}
-func _smartStringAllocPersistent(str *SmartString, len_ int) {
-	if str.GetC() == nil {
-		str.SetLen(0)
-		if len_ <= SMART_STRING_START_LEN {
-			str.SetA(SMART_STRING_START_LEN)
-		} else {
-			str.SetA(ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STRING_OVERHEAD, SMART_STRING_PAGE) - SMART_STRING_OVERHEAD)
-		}
-		str.SetC(Pemalloc(str.GetA()+1, 1))
-	} else {
-		if int(len_ > SIZE_MAX-str.GetLen()) != 0 {
-			ZendError(E_ERROR, "String size overflow")
-		}
-		len_ += str.GetLen()
-		str.SetA(ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STRING_OVERHEAD, SMART_STRING_PAGE) - SMART_STRING_OVERHEAD)
-		str.SetC(Perealloc(str.GetC(), str.GetA()+1, 1))
-	}
-}
-func _smartStringAlloc(str *SmartString, len_ int) {
-	if str.GetC() == nil {
-		str.SetLen(0)
-		if len_ <= SMART_STRING_START_LEN {
-			str.SetA(SMART_STRING_START_LEN)
-			str.SetC(Emalloc(SMART_STRING_START_LEN + 1))
-		} else {
-			str.SetA(ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STRING_OVERHEAD, SMART_STRING_PAGE) - SMART_STRING_OVERHEAD)
-			if str.GetA() < ZEND_MM_CHUNK_SIZE-SMART_STRING_OVERHEAD {
-				str.SetC(EmallocLarge(str.GetA() + 1))
-			} else {
-
-				/* allocate a huge chunk */
-
-				str.SetC(Emalloc(str.GetA() + 1))
-
-				/* allocate a huge chunk */
-
-			}
-		}
-	} else {
-		if int(len_ > SIZE_MAX-str.GetLen()) != 0 {
-			ZendError(E_ERROR, "String size overflow")
-		}
-		len_ += str.GetLen()
-		str.SetA(ZEND_MM_ALIGNED_SIZE_EX(len_+SMART_STRING_OVERHEAD, SMART_STRING_PAGE) - SMART_STRING_OVERHEAD)
-		str.SetC(Erealloc2(str.GetC(), str.GetA()+1, str.GetLen()))
-	}
 }
