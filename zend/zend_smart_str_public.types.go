@@ -55,6 +55,11 @@ func (this *SmartStr) AppendSmartStr(str *SmartStr) {
 	this.buffer.WriteString(str.GetStr())
 }
 
+func (this *SmartStr) SetString(str string) {
+	this.Reset()
+	this.buffer.WriteString(str)
+}
+
 func (this *SmartStr) Reset() {
 	this.buffer.Reset()
 }

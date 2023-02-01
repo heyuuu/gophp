@@ -7,11 +7,11 @@ import (
 	"strconv"
 )
 
-func SmartStrAppendsEx(dest *SmartStr, src *byte, what ZendBool) { dest.AppendS(src) }
-func SmartStrAppends(dest *SmartStr, src *byte)                  { dest.AppendS(src) }
-func SmartStrAppendc(dest *SmartStr, c byte)                     { dest.AppendC(c) }
-func SmartStrAppendl(dest *SmartStr, src *byte, len_ int)        { dest.AppendL(src, len_) }
-func SmartStrAppend(dest *SmartStr, src *ZendString)             { dest.AppendString(src.GetStr()) }
+func SmartStrAppendsEx(dest *SmartStr, src string, what ZendBool) { dest.AppendString(src) }
+func SmartStrAppends(dest *SmartStr, src string)                  { dest.AppendString(src) }
+func SmartStrAppendc(dest *SmartStr, c byte)                      { dest.AppendC(c) }
+func SmartStrAppendl(dest *SmartStr, src string)                  { dest.AppendString(src) }
+func SmartStrAppend(dest *SmartStr, src string)                   { dest.AppendString(src) }
 
 func SmartStrAppendSmartStr(dest *SmartStr, src *SmartStr) {
 	dest.AppendString(src.GetStr())
@@ -23,8 +23,8 @@ func SmartStrAlloc(str *SmartStr, len_ int, persistent ZendBool) int { return st
 func SmartStrFreeEx(str *SmartStr, persistent ZendBool)              { str.Free() }
 func SmartStr0(str *SmartStr)                                        { str.ZeroTail() }
 func SmartStrAppendcEx(dest *SmartStr, ch byte, persistent ZendBool) { dest.AppendC(ch) }
-func SmartStrAppendlEx(dest *SmartStr, str *byte, len_ int, persistent ZendBool) {
-	dest.AppendL(str, len_)
+func SmartStrAppendlEx(dest *SmartStr, str string, persistent ZendBool) {
+	dest.AppendString(str)
 }
 func SmartStrAppendLongEx(dest *SmartStr, num ZendLong, persistent ZendBool) {
 	var str = strconv.FormatInt(int64(num), 10)
@@ -34,10 +34,7 @@ func SmartStrAppendUnsignedEx(dest *SmartStr, num ZendUlong, persistent ZendBool
 	var str = strconv.FormatUint(uint64(num), 10)
 	dest.AppendString(str)
 }
-func SmartStrSetl(dest *SmartStr, src *byte, len_ int) {
-	dest.Free()
-	dest.AppendL(src, len_)
-}
+func SmartStrSetl(dest *SmartStr, src string) { dest.SetString(src) }
 func ZendComputeEscapedStringLen(s *byte, l int) int {
 	var i int
 	var len_ int = l

@@ -3,7 +3,6 @@
 package zend
 
 import (
-	b "sik/builtin"
 	"strings"
 )
 
@@ -31,17 +30,11 @@ func (this *SmartString) Alloc(len_ int) int {
 	return this.buffer.Len() + len_
 }
 
-func (this *SmartString) AppendS(src *byte) {
-	var str = b.CastStrAuto(src)
+func (this *SmartString) AppendString(str string) {
 	this.buffer.WriteString(str)
 }
 
-func (this *SmartString) AppendL(src *byte, len_ int) {
-	var str = b.CastStr(src, len_)
-	this.buffer.WriteString(str)
-}
-
-func (this *SmartString) AppendC(c byte) {
+func (this *SmartString) AppendByte(c byte) {
 	this.buffer.WriteByte(c)
 }
 
