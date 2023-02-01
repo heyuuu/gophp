@@ -74,33 +74,33 @@ func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_
 	if response_code == 0 {
 		response_code = 200
 	}
-	zend.SmartStrAppendlEx(buffer, "HTTP", persistent)
-	zend.SmartStrAppendcEx(buffer, '/', persistent)
+	buffer.AppendString("HTTP")
+	buffer.AppendByte('/')
 	zend.SmartStrAppendLongEx(buffer, protocol_version/100, persistent)
-	zend.SmartStrAppendcEx(buffer, '.', persistent)
+	buffer.AppendByte('.')
 	zend.SmartStrAppendLongEx(buffer, protocol_version%100, persistent)
-	zend.SmartStrAppendcEx(buffer, ' ', persistent)
+	buffer.AppendByte(' ')
 	zend.SmartStrAppendLongEx(buffer, response_code, persistent)
-	zend.SmartStrAppendcEx(buffer, ' ', persistent)
-	zend.SmartStrAppendsEx(buffer, b.CastStrAuto(GetStatusString(response_code)), persistent)
-	zend.SmartStrAppendlEx(buffer, "\r\n", persistent)
+	buffer.AppendByte(' ')
+	buffer.AppendString(b.CastStrAuto(GetStatusString(response_code)))
+	buffer.AppendString("\r\n")
 }
 func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, persistent int) {
 	var val *byte
 	var tv __struct__timeval = __struct__timeval{0}
 	if nil != b.Assign(&val, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "host", b.SizeOf("\"host\"")-1)) {
-		zend.SmartStrAppendsEx(buffer, "Host: ", persistent)
-		zend.SmartStrAppendsEx(buffer, b.CastStrAuto(val), persistent)
-		zend.SmartStrAppendsEx(buffer, "\r\n", persistent)
+		buffer.AppendString("Host: ")
+		buffer.AppendString(b.CastStrAuto(val))
+		buffer.AppendString("\r\n")
 	}
 	if !(gettimeofday(&tv, nil)) {
 		var dt *zend.ZendString = php_format_date("D, d M Y H:i:s", b.SizeOf("\"D, d M Y H:i:s\"")-1, tv.tv_sec, 0)
-		zend.SmartStrAppendsEx(buffer, "Date: ", persistent)
-		zend.SmartStrAppendsEx(buffer, b.CastStrAuto(dt.GetVal()), persistent)
-		zend.SmartStrAppendsEx(buffer, " GMT\r\n", persistent)
+		buffer.AppendString("Date: ")
+		buffer.AppendString(b.CastStrAuto(dt.GetVal()))
+		buffer.AppendString(" GMT\r\n")
 		zend.ZendStringReleaseEx(dt, 0)
 	}
-	zend.SmartStrAppendlEx(buffer, "Connection: close\r\n", persistent)
+	buffer.AppendString("Connection: close\r\n")
 }
 func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 	var ret *byte
@@ -220,8 +220,8 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
 	if core.SG(sapi_headers).http_status_line {
-		zend.SmartStrAppends(&buffer, b.CastStrAuto(core.SG(sapi_headers).http_status_line))
-		zend.SmartStrAppendl(&buffer, "\r\n")
+		buffer.AppendString(b.CastStrAuto(core.SG(sapi_headers).http_status_line))
+		buffer.AppendString("\r\n")
 	} else {
 		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG(sapi_headers).http_response_code, 0)
 	}
@@ -229,14 +229,14 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
 	for h != nil {
 		if h.GetHeaderLen() != 0 {
-			zend.SmartStrAppendl(&buffer, b.CastStr(h.GetHeader(), h.GetHeaderLen()))
-			zend.SmartStrAppendl(&buffer, "\r\n")
+			buffer.AppendString(b.CastStr(h.GetHeader(), h.GetHeaderLen()))
+			buffer.AppendString("\r\n")
 		}
 		h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 	}
-	zend.SmartStrAppendl(&buffer, "\r\n")
+	buffer.AppendString("\r\n")
 	PhpCliServerClientSendThrough(client, buffer.GetS().GetVal(), buffer.GetS().GetLen())
-	zend.SmartStrFree(&buffer)
+	buffer.Free()
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
 func SapiCliServerReadCookies() *byte {
@@ -1383,14 +1383,14 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 
 	}
 	AppendEssentialHeaders(&buffer, client, 1)
-	zend.SmartStrAppendsEx(&buffer, "Content-Type: text/html; charset=UTF-8\r\n", 1)
-	zend.SmartStrAppendsEx(&buffer, "Content-Length: ", 1)
+	buffer.AppendString("Content-Type: text/html; charset=UTF-8\r\n")
+	buffer.AppendString("Content-Length: ")
 	zend.SmartStrAppendUnsignedEx(&buffer, PhpCliServerBufferSize(client.GetContentSender().GetBuffer()), 1)
-	zend.SmartStrAppendlEx(&buffer, "\r\n", 1)
-	zend.SmartStrAppendlEx(&buffer, "\r\n", 1)
+	buffer.AppendString("\r\n")
+	buffer.AppendString("\r\n")
 	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	if chunk == nil {
-		zend.SmartStrFreeEx(&buffer, 1)
+		buffer.Free()
 		goto fail
 	}
 	PhpCliServerBufferPrepend(client.GetContentSender().GetBuffer(), chunk)
@@ -1466,20 +1466,20 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	}
 	AppendEssentialHeaders(&buffer, client, 1)
 	if mime_type != nil {
-		zend.SmartStrAppendlEx(&buffer, "Content-Type: ", 1)
-		zend.SmartStrAppendsEx(&buffer, b.CastStrAuto(mime_type), 1)
+		buffer.AppendString("Content-Type: ")
+		buffer.AppendString(b.CastStrAuto(mime_type))
 		if strncmp(mime_type, "text/", 5) == 0 {
-			zend.SmartStrAppendsEx(&buffer, "; charset=UTF-8", 1)
+			buffer.AppendString("; charset=UTF-8")
 		}
-		zend.SmartStrAppendlEx(&buffer, "\r\n", 1)
+		buffer.AppendString("\r\n")
 	}
-	zend.SmartStrAppendsEx(&buffer, "Content-Length: ", 1)
+	buffer.AppendString("Content-Length: ")
 	zend.SmartStrAppendUnsignedEx(&buffer, client.GetRequest().GetSb().st_size, 1)
-	zend.SmartStrAppendlEx(&buffer, "\r\n", 1)
-	zend.SmartStrAppendlEx(&buffer, "\r\n", 1)
+	buffer.AppendString("\r\n")
+	buffer.AppendString("\r\n")
 	chunk = PhpCliServerChunkHeapNew(buffer.GetS(), buffer.GetS().GetVal(), buffer.GetS().GetLen())
 	if chunk == nil {
-		zend.SmartStrFreeEx(&buffer, 1)
+		buffer.Free()
 		PhpCliServerLogResponse(client, 500, nil)
 		return zend.FAILURE
 	}

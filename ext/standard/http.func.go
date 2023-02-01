@@ -153,13 +153,13 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 
 		} else {
 			if formstr.GetS() != nil {
-				zend.SmartStrAppendl(formstr, b.CastStr(arg_sep, arg_sep_len))
+				formstr.AppendString(b.CastStr(arg_sep, arg_sep_len))
 			}
 
 			/* Simple key=value */
 
 			if key_prefix != nil {
-				zend.SmartStrAppendl(formstr, b.CastStr(key_prefix, key_prefix_len))
+				formstr.AppendString(b.CastStr(key_prefix, key_prefix_len))
 			}
 			if key != nil {
 				var ekey *zend.ZendString
@@ -168,21 +168,21 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				} else {
 					ekey = PhpUrlEncode(prop_name, prop_len)
 				}
-				zend.SmartStrAppend(formstr, ekey.GetStr())
+				formstr.AppendString(ekey.GetStr())
 				zend.ZendStringFree(ekey)
 			} else {
 
 				/* Numeric key */
 
 				if num_prefix != nil {
-					zend.SmartStrAppendl(formstr, b.CastStr(num_prefix, num_prefix_len))
+					formstr.AppendString(b.CastStr(num_prefix, num_prefix_len))
 				}
 				zend.SmartStrAppendLong(formstr, idx)
 			}
 			if key_suffix {
-				zend.SmartStrAppendl(formstr, b.CastStr(key_suffix, key_suffix_len))
+				formstr.AppendString(b.CastStr(key_suffix, key_suffix_len))
 			}
-			zend.SmartStrAppendl(formstr, "=")
+			formstr.AppendString("=")
 			switch zdata.GetType() {
 			case zend.IS_STRING:
 				var ekey *zend.ZendString
@@ -191,17 +191,17 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				} else {
 					ekey = PhpUrlEncode(zend.Z_STRVAL_P(zdata), zend.Z_STRLEN_P(zdata))
 				}
-				zend.SmartStrAppend(formstr, ekey.GetStr())
+				formstr.AppendString(ekey.GetStr())
 				zend.ZendStringFree(ekey)
 				break
 			case zend.IS_LONG:
 				zend.SmartStrAppendLong(formstr, zdata.GetLval())
 				break
 			case zend.IS_FALSE:
-				zend.SmartStrAppendl(formstr, "0")
+				formstr.AppendString("0")
 				break
 			case zend.IS_TRUE:
-				zend.SmartStrAppendl(formstr, "1")
+				formstr.AppendString("1")
 				break
 			default:
 				var ekey *zend.ZendString
@@ -212,7 +212,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 				} else {
 					ekey = PhpUrlEncode(str.GetVal(), str.GetLen())
 				}
-				zend.SmartStrAppend(formstr, ekey.GetStr())
+				formstr.AppendString(ekey.GetStr())
 				zend.ZendTmpStringRelease(tmp)
 				zend.ZendStringFree(ekey)
 			}
@@ -317,7 +317,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	if PhpUrlEncodeHashEx(zend.HASH_OF(formdata), &formstr, prefix, prefix_len, nil, 0, nil, 0, b.Cond(formdata.IsType(zend.IS_OBJECT), formdata, nil), arg_sep, int(enc_type)) == zend.FAILURE {
 		if formstr.GetS() != nil {
-			zend.SmartStrFree(&formstr)
+			formstr.Free()
 		}
 		zend.RETVAL_FALSE
 		return
@@ -326,7 +326,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		zend.RETVAL_EMPTY_STRING()
 		return
 	}
-	zend.SmartStr0(&formstr)
+	formstr.ZeroTail()
 	zend.RETVAL_NEW_STR(formstr.GetS())
 	return
 }

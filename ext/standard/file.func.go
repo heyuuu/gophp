@@ -3797,31 +3797,31 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 			var ch *byte = field_str.GetVal()
 			var end *byte = ch + field_str.GetLen()
 			var escaped int = 0
-			zend.SmartStrAppendc(&csvline, enclosure)
+			csvline.AppendByte(enclosure)
 			for ch < end {
 				if escape_char != PHP_CSV_NO_ESCAPE && (*ch) == escape_char {
 					escaped = 1
 				} else if escaped == 0 && (*ch) == enclosure {
-					zend.SmartStrAppendc(&csvline, enclosure)
+					csvline.AppendByte(enclosure)
 				} else {
 					escaped = 0
 				}
-				zend.SmartStrAppendc(&csvline, *ch)
+				csvline.AppendByte(*ch)
 				ch++
 			}
-			zend.SmartStrAppendc(&csvline, enclosure)
+			csvline.AppendByte(enclosure)
 		} else {
-			zend.SmartStrAppend(&csvline, field_str.GetStr())
+			csvline.AppendString(field_str.GetStr())
 		}
 		if b.PreInc(&i) != count {
-			zend.SmartStrAppendl(&csvline, b.CastStr(&delimiter, 1))
+			csvline.AppendString(b.CastStr(&delimiter, 1))
 		}
 		zend.ZendTmpStringRelease(tmp_field_str)
 	}
-	zend.SmartStrAppendc(&csvline, '\n')
-	zend.SmartStr0(&csvline)
+	csvline.AppendByte('\n')
+	csvline.ZeroTail()
 	ret = core.PhpStreamWrite(stream, csvline.GetS().GetVal(), csvline.GetS().GetLen())
-	zend.SmartStrFree(&csvline)
+	csvline.Free()
 	return ret
 }
 func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

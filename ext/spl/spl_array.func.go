@@ -1320,16 +1320,16 @@ func zim_spl_Array_serialize(execute_data *zend.ZendExecuteData, return_value *z
 
 	/* storage */
 
-	zend.SmartStrAppendl(&buf, "x:")
+	buf.AppendString("x:")
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	if !intern.IsIsSelf() {
 		standard.PhpVarSerialize(&buf, intern.GetArray(), &var_hash)
-		zend.SmartStrAppendc(&buf, ';')
+		buf.AppendByte(';')
 	}
 
 	/* members */
 
-	zend.SmartStrAppendl(&buf, "m:")
+	buf.AppendString("m:")
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}

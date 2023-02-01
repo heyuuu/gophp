@@ -9,18 +9,18 @@ import (
 
 func INS_STRING(xbuf any, str *byte, len_ int, is_char zend.ZendBool) {
 	if is_char != 0 {
-		zend.SmartStringAppendl((*zend.SmartString)(xbuf), b.CastStr(str, len_))
+		(*zend.SmartString)(xbuf).AppendString(b.CastStr(str, len_))
 	} else {
-		zend.SmartStrAppendl((*zend.SmartStr)(xbuf), b.CastStr(str, len_))
+		(*zend.SmartStr)(xbuf).AppendString(b.CastStr(str, len_))
 	}
 }
 func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {
 	if is_char != 0 {
-		zend.SmartStringAlloc((*zend.SmartString)(xbuf), count, 0)
+		(*zend.SmartString)(xbuf).Alloc(count)
 		memset((*zend.SmartString)(xbuf).GetC()+(*zend.SmartString)(xbuf).GetLen(), ch, count)
 		(*zend.SmartString)(xbuf).SetLen((*zend.SmartString)(xbuf).GetLen() + count)
 	} else {
-		zend.SmartStrAlloc((*zend.SmartStr)(xbuf), count, 0)
+		(*zend.SmartStr)(xbuf).Alloc(count)
 		memset((*zend.SmartStr)(xbuf).GetS().GetVal()+(*zend.SmartStr)(xbuf).GetS().GetLen(), ch, count)
 		(*zend.SmartStr)(xbuf).GetS().GetLen() += count
 	}
@@ -57,9 +57,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 	for *fmt {
 		if (*fmt) != '%' {
 			if is_char != 0 {
-				zend.SmartStringAppendc((*zend.SmartString)(xbuf), *fmt)
+				(*zend.SmartString)(xbuf).AppendByte(*fmt)
 			} else {
-				zend.SmartStrAppendc((*zend.SmartStr)(xbuf), *fmt)
+				(*zend.SmartStr)(xbuf).AppendByte(*fmt)
 			}
 		} else {
 
@@ -553,9 +553,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 			if adjust_width != 0 && adjust == RIGHT && int(min_width > s_len) != 0 {
 				if pad_char == '0' && prefix_char != NUL {
 					if is_char != 0 {
-						zend.SmartStringAppendc((*zend.SmartString)(xbuf), *s)
+						(*zend.SmartString)(xbuf).AppendByte(*s)
 					} else {
-						zend.SmartStrAppendc((*zend.SmartStr)(xbuf), *s)
+						(*zend.SmartStr)(xbuf).AppendByte(*s)
 					}
 					s++
 					s_len--

@@ -149,10 +149,10 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Header field value (%s => %s) contains invalid chars or format", key.GetVal(), zend.Z_STRVAL_P(val))
 			return
 		}
-		zend.SmartStrAppend(s, key.GetStr())
-		zend.SmartStrAppendl(s, ": ")
-		zend.SmartStrAppends(s, b.CastStrAuto(zend.Z_STRVAL_P(val)))
-		zend.SmartStrAppendl(s, "\r\n")
+		s.AppendString(key.GetStr())
+		s.AppendString(": ")
+		s.AppendString(b.CastStrAuto(zend.Z_STRVAL_P(val)))
+		s.AppendString("\r\n")
 		break
 	case zend.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
@@ -284,7 +284,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	if s.GetS() != nil {
 		s.GetS().SetLen(s.GetS().GetLen() - 2)
 	}
-	zend.SmartStr0(&s)
+	s.ZeroTail()
 	return s.GetS()
 }
 func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

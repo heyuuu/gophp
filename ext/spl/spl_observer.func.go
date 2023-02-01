@@ -457,27 +457,27 @@ func zim_spl_SplObjectStorage_serialize(execute_data *zend.ZendExecuteData, retu
 
 	/* storage */
 
-	zend.SmartStrAppendl(&buf, "x:")
+	buf.AppendString("x:")
 	flags.SetLong(intern.GetStorage().GetNNumOfElements())
 	standard.PhpVarSerialize(&buf, &flags, &var_hash)
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), &pos)
 	for zend.ZendHashHasMoreElementsEx(intern.GetStorage(), &pos) == zend.SUCCESS {
 		if b.Assign(&element, zend.ZendHashGetCurrentDataPtrEx(intern.GetStorage(), &pos)) == nil {
-			zend.SmartStrFree(&buf)
+			buf.Free()
 			standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
 			zend.RETVAL_NULL()
 			return
 		}
 		standard.PhpVarSerialize(&buf, element.GetObj(), &var_hash)
-		zend.SmartStrAppendc(&buf, ',')
+		buf.AppendByte(',')
 		standard.PhpVarSerialize(&buf, element.GetInf(), &var_hash)
-		zend.SmartStrAppendc(&buf, ';')
+		buf.AppendByte(';')
 		zend.ZendHashMoveForwardEx(intern.GetStorage(), &pos)
 	}
 
 	/* members */
 
-	zend.SmartStrAppendl(&buf, "m:")
+	buf.AppendString("m:")
 	zend.ZVAL_ARR(&members, zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS)))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 	zend.ZvalPtrDtor(&members)

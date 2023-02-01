@@ -84,7 +84,7 @@ func ZendVspprintf(pbuf **byte, max_len int, format *byte, ap ...any) int {
 	if max_len != 0 && buf.GetLen() > max_len {
 		buf.SetLen(max_len)
 	}
-	SmartString0(&buf)
+	buf.ZeroTail()
 	if buf.GetC() != nil {
 		*pbuf = buf.GetC()
 		return buf.GetLen()
@@ -118,7 +118,7 @@ func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
 	if max_len != 0 && buf.GetS().GetLen() > max_len {
 		buf.GetS().GetLen() = max_len
 	}
-	SmartStr0(&buf)
+	buf.ZeroTail()
 	return buf.GetS()
 }
 func ZendStrpprintf(max_len int, format string, _ ...any) *ZendString {
@@ -143,9 +143,9 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	var num_key ZendUlong
 	var i int
 	for i = 0; i < indent; i++ {
-		SmartStrAppendc(buf, ' ')
+		buf.AppendByte(' ')
 	}
-	SmartStrAppends(buf, "(\n")
+	buf.AppendString("(\n")
 	indent += PRINT_ZVAL_INDENT
 	var __ht *HashTable = ht
 	for _, _p := range __ht.foreachData() {
@@ -160,40 +160,40 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 		string_key = _p.GetKey()
 		tmp = _z
 		for i = 0; i < indent; i++ {
-			SmartStrAppendc(buf, ' ')
+			buf.AppendByte(' ')
 		}
-		SmartStrAppendc(buf, '[')
+		buf.AppendByte('[')
 		if string_key != nil {
 			if is_object != 0 {
 				var prop_name *byte
 				var class_name *byte
 				var prop_len int
 				var mangled int = ZendUnmanglePropertyNameEx(string_key, &class_name, &prop_name, &prop_len)
-				SmartStrAppendl(buf, b.CastStr(prop_name, prop_len))
+				buf.AppendString(b.CastStr(prop_name, prop_len))
 				if class_name != nil && mangled == SUCCESS {
 					if class_name[0] == '*' {
-						SmartStrAppends(buf, ":protected")
+						buf.AppendString(":protected")
 					} else {
-						SmartStrAppends(buf, ":")
-						SmartStrAppends(buf, b.CastStrAuto(class_name))
-						SmartStrAppends(buf, ":private")
+						buf.AppendString(":")
+						buf.AppendString(b.CastStrAuto(class_name))
+						buf.AppendString(":private")
 					}
 				}
 			} else {
-				SmartStrAppend(buf, string_key.GetStr())
+				buf.AppendString(string_key.GetStr())
 			}
 		} else {
 			SmartStrAppendLong(buf, num_key)
 		}
-		SmartStrAppends(buf, "] => ")
+		buf.AppendString("] => ")
 		ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
-		SmartStrAppends(buf, "\n")
+		buf.AppendString("\n")
 	}
 	indent -= PRINT_ZVAL_INDENT
 	for i = 0; i < indent; i++ {
-		SmartStrAppendc(buf, ' ')
+		buf.AppendByte(' ')
 	}
-	SmartStrAppends(buf, ")\n")
+	buf.AppendString(")\n")
 }
 func PrintFlatHash(ht *HashTable) {
 	var tmp *Zval
@@ -288,10 +288,10 @@ func ZendPrintFlatZvalR(expr *Zval) {
 func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	switch expr.GetType() {
 	case IS_ARRAY:
-		SmartStrAppends(buf, "Array\n")
+		buf.AppendString("Array\n")
 		if (expr.GetArr().GetGcFlags() & GC_IMMUTABLE) == 0 {
 			if expr.GetArr().IsRecursive() {
-				SmartStrAppends(buf, " *RECURSION*")
+				buf.AppendString(" *RECURSION*")
 				return
 			}
 			expr.GetArr().ProtectRecursive()
@@ -304,11 +304,11 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	case IS_OBJECT:
 		var properties *HashTable
 		var class_name *ZendString = Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
-		SmartStrAppends(buf, b.CastStrAuto(class_name.GetVal()))
+		buf.AppendString(b.CastStrAuto(class_name.GetVal()))
 		ZendStringReleaseEx(class_name, 0)
-		SmartStrAppends(buf, " Object\n")
+		buf.AppendString(" Object\n")
 		if expr.GetObj().IsRecursive() {
-			SmartStrAppends(buf, " *RECURSION*")
+			buf.AppendString(" *RECURSION*")
 			return
 		}
 		if b.Assign(&properties, ZendGetPropertiesFor(expr, ZEND_PROP_PURPOSE_DEBUG)) == nil {
@@ -326,11 +326,11 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 		ZendPrintZvalRToBuf(buf, Z_REFVAL_P(expr), indent)
 		break
 	case IS_STRING:
-		SmartStrAppend(buf, expr.GetStr().GetStr())
+		buf.AppendString(expr.GetStr().GetStr())
 		break
 	default:
 		var str *ZendString = ZvalGetStringFunc(expr)
-		SmartStrAppend(buf, str.GetStr())
+		buf.AppendString(str.GetStr())
 		ZendStringReleaseEx(str, 0)
 		break
 	}
@@ -338,7 +338,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 func ZendPrintZvalRToStr(expr *Zval, indent int) *ZendString {
 	var buf SmartStr = SmartStr{0}
 	ZendPrintZvalRToBuf(&buf, expr, indent)
-	SmartStr0(&buf)
+	buf.ZeroTail()
 	return buf.GetS()
 }
 func ZendPrintZvalR(expr *Zval, indent int) {

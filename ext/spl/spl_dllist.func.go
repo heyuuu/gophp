@@ -769,12 +769,12 @@ func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, r
 	/* elements */
 
 	for current != nil {
-		zend.SmartStrAppendc(&buf, ':')
+		buf.AppendByte(':')
 		next = current.GetNext()
 		standard.PhpVarSerialize(&buf, current.GetData(), &var_hash)
 		current = next
 	}
-	zend.SmartStr0(&buf)
+	buf.ZeroTail()
 
 	/* done */
 

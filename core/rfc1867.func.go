@@ -293,7 +293,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 
 				/* new entry, add the old one to the list */
 
-				zend.SmartString0(&buf_value)
+				buf_value.ZeroTail()
 				entry.SetKey(key)
 				entry.SetValue(buf_value.GetC())
 				zend.ZendLlistAddElement(header, &entry)
@@ -308,9 +308,9 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 				}
 			}
 			key = zend.Estrdup(line)
-			zend.SmartStringAppends(&buf_value, b.CastStrAuto(value))
+			buf_value.AppendString(b.CastStrAuto(value))
 		} else if buf_value.GetC() != nil {
-			zend.SmartStringAppends(&buf_value, b.CastStrAuto(line))
+			buf_value.AppendString(b.CastStrAuto(line))
 		} else {
 			continue
 		}
@@ -319,7 +319,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 
 		/* add the last one to the list */
 
-		zend.SmartString0(&buf_value)
+		buf_value.ZeroTail()
 		entry.SetKey(key)
 		entry.SetValue(buf_value.GetC())
 		zend.ZendLlistAddElement(header, &entry)

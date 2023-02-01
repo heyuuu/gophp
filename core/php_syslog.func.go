@@ -24,14 +24,14 @@ func PhpSyslog(priority int, format string, _ ...any) {
 	}
 	va_start(args, format)
 	zend.ZendPrintfToSmartString(&fbuf, format, args)
-	zend.SmartString0(&fbuf)
+	fbuf.ZeroTail()
 	va_end(args)
 	if PG(syslog_filter) == PHP_SYSLOG_FILTER_RAW {
 
 		/* Just send it directly to the syslog */
 
 		syslog(priority, "%.*s", int(fbuf.GetLen()), fbuf.GetC())
-		zend.SmartStringFree(&fbuf)
+		fbuf.Free()
 		return
 	}
 	for ptr = fbuf.GetC(); ; ptr++ {
@@ -44,25 +44,25 @@ func PhpSyslog(priority int, format string, _ ...any) {
 		/* check for NVT ASCII only unless test disabled */
 
 		if 0x20 <= c && c <= 0x7e {
-			zend.SmartStringAppendc(&sbuf, c)
+			sbuf.AppendByte(c)
 		} else if c >= 0x80 && PG(syslog_filter) != PHP_SYSLOG_FILTER_ASCII {
-			zend.SmartStringAppendc(&sbuf, c)
+			sbuf.AppendByte(c)
 		} else if c == '\n' {
 			syslog(priority, "%.*s", int(sbuf.GetLen()), sbuf.GetC())
-			zend.SmartStringReset(&sbuf)
+			sbuf.Reset()
 		} else if c < 0x20 && PG(syslog_filter) == PHP_SYSLOG_FILTER_ALL {
-			zend.SmartStringAppendc(&sbuf, c)
+			sbuf.AppendByte(c)
 		} else {
 			var xdigits []byte = "0123456789abcdef"
-			zend.SmartStringAppendl(&sbuf, "\\x")
-			zend.SmartStringAppendc(&sbuf, xdigits[c/0x10])
+			sbuf.AppendString("\\x")
+			sbuf.AppendByte(xdigits[c/0x10])
 			c &= 0xf
-			zend.SmartStringAppendc(&sbuf, xdigits[c])
+			sbuf.AppendByte(xdigits[c])
 		}
 
 		/* check for NVT ASCII only unless test disabled */
 
 	}
-	zend.SmartStringFree(&fbuf)
-	zend.SmartStringFree(&sbuf)
+	fbuf.Free()
+	sbuf.Free()
 }

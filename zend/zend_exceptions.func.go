@@ -362,9 +362,9 @@ func TRACE_APPEND_KEY(key *ZendString) {
 	if tmp {
 		if tmp.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())
-			SmartStrAppends(str, "[unknown]")
+			str.AppendString("[unknown]")
 		} else {
-			SmartStrAppends(str, b.CastStrAuto(Z_STRVAL_P(tmp)))
+			str.AppendString(b.CastStrAuto(Z_STRVAL_P(tmp)))
 		}
 	}
 }
@@ -378,44 +378,44 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 	ZVAL_DEREF(arg)
 	switch arg.GetType() {
 	case IS_NULL:
-		SmartStrAppends(str, "NULL, ")
+		str.AppendString("NULL, ")
 		break
 	case IS_STRING:
-		SmartStrAppendc(str, '\'')
+		str.AppendByte('\'')
 		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), MIN(Z_STRLEN_P(arg), 15))
 		if Z_STRLEN_P(arg) > 15 {
-			SmartStrAppends(str, "...', ")
+			str.AppendString("...', ")
 		} else {
-			SmartStrAppends(str, "', ")
+			str.AppendString("', ")
 		}
 		break
 	case IS_FALSE:
-		SmartStrAppends(str, "false, ")
+		str.AppendString("false, ")
 		break
 	case IS_TRUE:
-		SmartStrAppends(str, "true, ")
+		str.AppendString("true, ")
 		break
 	case IS_RESOURCE:
-		SmartStrAppends(str, "Resource id #")
+		str.AppendString("Resource id #")
 		SmartStrAppendLong(str, Z_RES_HANDLE_P(arg))
-		SmartStrAppends(str, ", ")
+		str.AppendString(", ")
 		break
 	case IS_LONG:
 		SmartStrAppendLong(str, arg.GetLval())
-		SmartStrAppends(str, ", ")
+		str.AppendString(", ")
 		break
 	case IS_DOUBLE:
 		SmartStrAppendPrintf(str, "%.*G", int(EG__().GetPrecision()), arg.GetDval())
-		SmartStrAppends(str, ", ")
+		str.AppendString(", ")
 		break
 	case IS_ARRAY:
-		SmartStrAppends(str, "Array, ")
+		str.AppendString("Array, ")
 		break
 	case IS_OBJECT:
 		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(arg.GetObj())
-		SmartStrAppends(str, "Object(")
-		SmartStrAppends(str, b.CastStrAuto(class_name.GetVal()))
-		SmartStrAppends(str, "), ")
+		str.AppendString("Object(")
+		str.AppendString(b.CastStrAuto(class_name.GetVal()))
+		str.AppendString("), ")
 		ZendStringReleaseEx(class_name, 0)
 		break
 	}
@@ -423,14 +423,14 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	var file *Zval
 	var tmp *Zval
-	SmartStrAppendc(str, '#')
+	str.AppendByte('#')
 	SmartStrAppendLong(str, num)
-	SmartStrAppendc(str, ' ')
+	str.AppendByte(' ')
 	file = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_FILE).GetStr())
 	if file != nil {
 		if file.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
-			SmartStrAppends(str, "[unknown function]")
+			str.AppendString("[unknown function]")
 		} else {
 			var line ZendLong
 			tmp = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_LINE).GetStr())
@@ -444,18 +444,18 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			} else {
 				line = 0
 			}
-			SmartStrAppend(str, file.GetStr().GetStr())
-			SmartStrAppendc(str, '(')
+			str.AppendString(file.GetStr().GetStr())
+			str.AppendByte('(')
 			SmartStrAppendLong(str, line)
-			SmartStrAppends(str, "): ")
+			str.AppendString("): ")
 		}
 	} else {
-		SmartStrAppends(str, "[internal function]: ")
+		str.AppendString("[internal function]: ")
 	}
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_CLASS))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_TYPE))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_FUNCTION))
-	SmartStrAppendc(str, '(')
+	str.AppendByte('(')
 	tmp = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_ARGS).GetStr())
 	if tmp != nil {
 		if tmp.IsArray() {
@@ -475,7 +475,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			ZendError(E_WARNING, "args element is no array")
 		}
 	}
-	SmartStrAppends(str, ")\n")
+	str.AppendString(")\n")
 }
 func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value *Zval) {
 	var trace *Zval
@@ -508,10 +508,10 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 		}
 		_buildTraceString(&str, frame.GetArr(), b.PostInc(&num))
 	}
-	SmartStrAppendc(&str, '#')
+	str.AppendByte('#')
 	SmartStrAppendLong(&str, num)
-	SmartStrAppends(&str, " {main}")
-	SmartStr0(&str)
+	str.AppendString(" {main}")
+	str.ZeroTail()
 	RETVAL_NEW_STR(str.GetS())
 	return
 }

@@ -4361,8 +4361,8 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 					if entry != nil {
 						var tmp *zend.ZendString
 						var s *zend.ZendString = zend.ZvalGetTmpString(entry, &tmp)
-						zend.SmartStrAppendl(&result, b.CastStr(str+old_pos, pos-old_pos))
-						zend.SmartStrAppend(&result, s.GetStr())
+						result.AppendString(b.CastStr(str+old_pos, pos-old_pos))
+						result.AppendString(s.GetStr())
 						old_pos = pos + len_
 						pos = old_pos - 1
 						zend.ZendTmpStringRelease(tmp)
@@ -4375,11 +4375,11 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 		pos++
 	}
 	if result.GetS() != nil {
-		zend.SmartStrAppendl(&result, b.CastStr(str+old_pos, slen-old_pos))
-		zend.SmartStr0(&result)
+		result.AppendString(b.CastStr(str+old_pos, slen-old_pos))
+		result.ZeroTail()
 		zend.RETVAL_NEW_STR(result.GetS())
 	} else {
-		zend.SmartStrFree(&result)
+		result.Free()
 		zend.RETVAL_STR_COPY(input)
 	}
 	if pats == &str_hash {
@@ -6378,13 +6378,13 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 				tmp = _z
 				tag = zend.ZvalGetString(tmp)
-				zend.SmartStrAppendc(&tags_ss, '<')
-				zend.SmartStrAppend(&tags_ss, tag.GetStr())
-				zend.SmartStrAppendc(&tags_ss, '>')
+				tags_ss.AppendByte('<')
+				tags_ss.AppendString(tag.GetStr())
+				tags_ss.AppendByte('>')
 				zend.ZendStringRelease(tag)
 			}
 			if tags_ss.GetS() != nil {
-				zend.SmartStr0(&tags_ss)
+				tags_ss.ZeroTail()
 				allowed_tags = tags_ss.GetS().GetVal()
 				allowed_tags_len = tags_ss.GetS().GetLen()
 			}
@@ -6399,7 +6399,7 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	buf = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 	buf.SetLen(PhpStripTagsEx(buf.GetVal(), str.GetLen(), nil, allowed_tags, allowed_tags_len, 0))
-	zend.SmartStrFree(&tags_ss)
+	tags_ss.Free()
 	zend.RETVAL_NEW_STR(buf)
 	return
 }
