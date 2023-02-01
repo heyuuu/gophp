@@ -402,9 +402,9 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if tagsfound == 0 {
 			zend.ArrayInit(return_value)
 		}
-		if b.Assign(&element, return_value.GetArr().KeyFind(b.CastStr(key, strlen(key)))) == nil {
+		if b.Assign(&element, return_value.GetArr().KeyFind(b.CastStrAuto(key))) == nil {
 			zend.ArrayInit(&values)
-			element = return_value.GetArr().KeyUpdate(b.CastStr(key, strlen(key)), &values)
+			element = return_value.GetArr().KeyUpdate(b.CastStrAuto(key), &values)
 		}
 		zend.AddNextIndexStringl(element, (*byte)(buffer+inx), len_)
 		inx += len_

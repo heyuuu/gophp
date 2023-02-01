@@ -150,9 +150,9 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 			return
 		}
 		zend.SmartStrAppend(s, key.GetStr())
-		zend.SmartStrAppendl(s, b.CastStr(": ", 2))
+		zend.SmartStrAppendl(s, ": ")
 		zend.SmartStrAppends(s, b.CastStrAuto(zend.Z_STRVAL_P(val)))
-		zend.SmartStrAppendl(s, b.CastStr("\r\n", 2))
+		zend.SmartStrAppendl(s, "\r\n")
 		break
 	case zend.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)

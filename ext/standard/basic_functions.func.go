@@ -1260,13 +1260,13 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			/* other strings */
 
-			if b.Assign(&args, return_value.GetArr().KeyFind(b.CastStr(optname, strlen(optname)))) != nil {
+			if b.Assign(&args, return_value.GetArr().KeyFind(b.CastStrAuto(optname))) != nil {
 				if args.GetType() != zend.IS_ARRAY {
 					zend.ConvertToArrayEx(args)
 				}
 				args.GetArr().NextIndexInsert(&val)
 			} else {
-				return_value.GetArr().KeyAdd(b.CastStr(optname, strlen(optname)), &val)
+				return_value.GetArr().KeyAdd(b.CastStrAuto(optname), &val)
 			}
 
 			/* other strings */

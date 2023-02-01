@@ -650,7 +650,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, ConfigurationHash.KeyFind(b.CastStr(path, strlen(path)))) != nil {
+			if b.Assign(&tmp2, ConfigurationHash.KeyFind(b.CastStrAuto(path))) != nil {
 				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
@@ -683,7 +683,7 @@ func CfgGetEntry(name *byte, name_length int) *zend.Zval {
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = 0
 		return zend.FAILURE
 	}
@@ -692,7 +692,7 @@ func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 }
 func CfgGetDouble(varname *byte, result *float64) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = float64(0)
 		return zend.FAILURE
 	}
@@ -701,7 +701,7 @@ func CfgGetDouble(varname *byte, result *float64) int {
 }
 func CfgGetString(varname *byte, result **byte) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(varname, strlen(varname)))) == nil {
+	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = nil
 		return zend.FAILURE
 	}

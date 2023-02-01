@@ -9,7 +9,7 @@ import (
 
 func SmartStrAppendsEx(dest *SmartStr, src string, what ZendBool) { dest.AppendString(src) }
 func SmartStrAppends(dest *SmartStr, src string)                  { dest.AppendString(src) }
-func SmartStrAppendc(dest *SmartStr, c byte)                      { dest.AppendC(c) }
+func SmartStrAppendc(dest *SmartStr, c byte)                      { dest.AppendByte(c) }
 func SmartStrAppendl(dest *SmartStr, src string)                  { dest.AppendString(src) }
 func SmartStrAppend(dest *SmartStr, src string)                   { dest.AppendString(src) }
 
@@ -22,7 +22,7 @@ func SmartStrFree(dest *SmartStr)                                    { dest.Free
 func SmartStrAlloc(str *SmartStr, len_ int, persistent ZendBool) int { return str.Alloc(len_) }
 func SmartStrFreeEx(str *SmartStr, persistent ZendBool)              { str.Free() }
 func SmartStr0(str *SmartStr)                                        { str.ZeroTail() }
-func SmartStrAppendcEx(dest *SmartStr, ch byte, persistent ZendBool) { dest.AppendC(ch) }
+func SmartStrAppendcEx(dest *SmartStr, ch byte, persistent ZendBool) { dest.AppendByte(ch) }
 func SmartStrAppendlEx(dest *SmartStr, str string, persistent ZendBool) {
 	dest.AppendString(str)
 }

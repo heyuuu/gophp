@@ -209,14 +209,14 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 		 */
 
 		dt = php_format_date("D, d-M-Y H:i:s T", b.SizeOf("\"D, d-M-Y H:i:s T\"")-1, 1, 0)
-		zend.SmartStrAppends(&buf, b.CastStrAuto("Set-Cookie: "))
+		zend.SmartStrAppends(&buf, "Set-Cookie: ")
 		zend.SmartStrAppend(&buf, name.GetStr())
-		zend.SmartStrAppends(&buf, b.CastStrAuto("=deleted; expires="))
+		zend.SmartStrAppends(&buf, "=deleted; expires=")
 		zend.SmartStrAppend(&buf, dt.GetStr())
-		zend.SmartStrAppends(&buf, b.CastStrAuto("; Max-Age=0"))
+		zend.SmartStrAppends(&buf, "; Max-Age=0")
 		zend.ZendStringFree(dt)
 	} else {
-		zend.SmartStrAppends(&buf, b.CastStrAuto("Set-Cookie: "))
+		zend.SmartStrAppends(&buf, "Set-Cookie: ")
 		zend.SmartStrAppend(&buf, name.GetStr())
 		zend.SmartStrAppendc(&buf, '=')
 		if url_encode != 0 {

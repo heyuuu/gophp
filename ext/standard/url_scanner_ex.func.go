@@ -154,9 +154,9 @@ func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.Sm
 	}
 	if url_parts.GetScheme() != nil {
 		zend.SmartStrAppends(dest, b.CastStrAuto(url_parts.GetScheme().GetVal()))
-		zend.SmartStrAppends(dest, b.CastStrAuto("://"))
+		zend.SmartStrAppends(dest, "://")
 	} else if (*(url.GetS().GetVal())) == '/' && (*(url.GetS().GetVal() + 1)) == '/' {
-		zend.SmartStrAppends(dest, b.CastStrAuto("//"))
+		zend.SmartStrAppends(dest, "//")
 	}
 	if url_parts.GetUser() != nil {
 		zend.SmartStrAppends(dest, b.CastStrAuto(url_parts.GetUser().GetVal()))
@@ -805,7 +805,7 @@ func UrlAdaptExt(src *byte, srclen int, newlen *int, do_flush zend.ZendBool, ctx
 	var retval *byte
 	XxMainloop(ctx, src, srclen)
 	if ctx.GetResult().GetS() == nil {
-		zend.SmartStrAppendl(ctx.GetResult(), b.CastStr("", 0))
+		zend.SmartStrAppendl(ctx.GetResult(), "")
 		*newlen = 0
 	} else {
 		*newlen = ctx.GetResult().GetS().GetLen()
@@ -929,11 +929,11 @@ func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len in
 	zend.SmartStrAppendSmartStr(url_state.GetUrlApp(), &sname)
 	zend.SmartStrAppendc(url_state.GetUrlApp(), '=')
 	zend.SmartStrAppendSmartStr(url_state.GetUrlApp(), &svalue)
-	zend.SmartStrAppends(url_state.GetFormApp(), b.CastStrAuto("<input type=\"hidden\" name=\""))
+	zend.SmartStrAppends(url_state.GetFormApp(), "<input type=\"hidden\" name=\"")
 	zend.SmartStrAppendSmartStr(url_state.GetFormApp(), &hname)
-	zend.SmartStrAppends(url_state.GetFormApp(), b.CastStrAuto("\" value=\""))
+	zend.SmartStrAppends(url_state.GetFormApp(), "\" value=\"")
 	zend.SmartStrAppendSmartStr(url_state.GetFormApp(), &hvalue)
-	zend.SmartStrAppends(url_state.GetFormApp(), b.CastStrAuto("\" />"))
+	zend.SmartStrAppends(url_state.GetFormApp(), "\" />")
 	zend.SmartStrFree(&sname)
 	zend.SmartStrFree(&svalue)
 	zend.SmartStrFree(&hname)
@@ -1008,9 +1008,9 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	zend.SmartStrAppendSmartStr(&url_app, &sname)
 	zend.SmartStrAppendc(&url_app, '=')
 	zend.SmartStr0(&url_app)
-	zend.SmartStrAppends(&form_app, b.CastStrAuto("<input type=\"hidden\" name=\""))
+	zend.SmartStrAppends(&form_app, "<input type=\"hidden\" name=\"")
 	zend.SmartStrAppendSmartStr(&form_app, &hname)
-	zend.SmartStrAppends(&form_app, b.CastStrAuto("\" value=\""))
+	zend.SmartStrAppends(&form_app, "\" value=\"")
 	zend.SmartStr0(&form_app)
 
 	/* Short circuit check. Only check url_app. */

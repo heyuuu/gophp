@@ -182,7 +182,7 @@ func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
 }
 func INI_DEFAULT(name string, value string) {
 	zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
-	core.ConfigurationHash.KeyUpdate(b.CastStr(name, b.SizeOf("name")-1), &tmp)
+	core.ConfigurationHash.KeyUpdate(b.CastStrAuto(name), &tmp)
 }
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
 	var tmp zend.Zval

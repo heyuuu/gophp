@@ -84,13 +84,13 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	zend.ArrayInit(return_value)
 	for p = addrs; p != nil; p = p.ifa_next {
-		var iface *zend.Zval = return_value.GetArr().KeyFind(b.CastStr(p.ifa_name, strlen(p.ifa_name)))
+		var iface *zend.Zval = return_value.GetArr().KeyFind(b.CastStrAuto(p.ifa_name))
 		var unicast *zend.Zval
 		var status *zend.Zval
 		if iface == nil {
 			var newif zend.Zval
 			zend.ArrayInit(&newif)
-			iface = return_value.GetArr().KeyAdd(b.CastStr(p.ifa_name, strlen(p.ifa_name)), &newif)
+			iface = return_value.GetArr().KeyAdd(b.CastStrAuto(p.ifa_name), &newif)
 		}
 		unicast = iface.GetArr().KeyFind("unicast")
 		if unicast == nil {

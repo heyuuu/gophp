@@ -666,13 +666,13 @@ func spl_RecursiveIteratorIterator_new_ex(class_type *zend.ZendClassEntry, init_
 	var intern *SplRecursiveItObject
 	intern = zend.ZendObjectAlloc(b.SizeOf("spl_recursive_it_object"), class_type)
 	if init_prefix != 0 {
-		zend.SmartStrAppendl(intern.GetPrefix()[0], b.CastStr("", 0))
-		zend.SmartStrAppendl(intern.GetPrefix()[1], b.CastStr("| ", 2))
-		zend.SmartStrAppendl(intern.GetPrefix()[2], b.CastStr("  ", 2))
-		zend.SmartStrAppendl(intern.GetPrefix()[3], b.CastStr("|-", 2))
-		zend.SmartStrAppendl(intern.GetPrefix()[4], b.CastStr("\\-", 2))
-		zend.SmartStrAppendl(intern.GetPrefix()[5], b.CastStr("", 0))
-		zend.SmartStrAppendl(intern.GetPostfix()[0], b.CastStr("", 0))
+		zend.SmartStrAppendl(intern.GetPrefix()[0], "")
+		zend.SmartStrAppendl(intern.GetPrefix()[1], "| ")
+		zend.SmartStrAppendl(intern.GetPrefix()[2], "  ")
+		zend.SmartStrAppendl(intern.GetPrefix()[3], "|-")
+		zend.SmartStrAppendl(intern.GetPrefix()[4], "\\-")
+		zend.SmartStrAppendl(intern.GetPrefix()[5], "")
+		zend.SmartStrAppendl(intern.GetPostfix()[0], "")
 	}
 	zend.ZendObjectStdInit(intern.GetStd(), class_type)
 	zend.ObjectPropertiesInit(intern.GetStd(), class_type)

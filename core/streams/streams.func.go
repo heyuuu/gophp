@@ -1976,16 +1976,16 @@ func PhpStreamNotificationFree(notifier *PhpStreamNotifier) {
 }
 func PhpStreamContextGetOption(context *core.PhpStreamContext, wrappername string, optionname string) *zend.Zval {
 	var wrapperhash *zend.Zval
-	if nil == b.Assign(&wrapperhash, context.GetOptions().GetArr().KeyFind(b.CastStr(wrappername, strlen(wrappername)))) {
+	if nil == b.Assign(&wrapperhash, context.GetOptions().GetArr().KeyFind(b.CastStrAuto(wrappername))) {
 		return nil
 	}
-	return wrapperhash.GetArr().KeyFind(b.CastStr(optionname, strlen(optionname)))
+	return wrapperhash.GetArr().KeyFind(b.CastStrAuto(optionname))
 }
 func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte, optionname *byte, optionvalue *zend.Zval) int {
 	var wrapperhash *zend.Zval
 	var category zend.Zval
 	zend.SEPARATE_ARRAY(context.GetOptions())
-	wrapperhash = context.GetOptions().GetArr().KeyFind(b.CastStr(wrappername, strlen(wrappername)))
+	wrapperhash = context.GetOptions().GetArr().KeyFind(b.CastStrAuto(wrappername))
 	if nil == wrapperhash {
 		zend.ArrayInit(&category)
 		wrapperhash = context.GetOptions().GetArr().KeyUpdate(b.CastStr((*byte)(wrappername), strlen(wrappername)), &category)
@@ -1993,7 +1993,7 @@ func PhpStreamContextSetOption(context *core.PhpStreamContext, wrappername *byte
 	zend.ZVAL_DEREF(optionvalue)
 	optionvalue.TryAddRefcount()
 	zend.SEPARATE_ARRAY(wrapperhash)
-	wrapperhash.GetArr().KeyUpdate(b.CastStr(optionname, strlen(optionname)), optionvalue)
+	wrapperhash.GetArr().KeyUpdate(b.CastStrAuto(optionname), optionvalue)
 	return zend.SUCCESS
 }
 func PhpStreamDirentAlphasort(a **zend.ZendString, b **zend.ZendString) int {

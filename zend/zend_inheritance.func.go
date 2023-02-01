@@ -518,14 +518,14 @@ func ZendAppendTypeHint(str *SmartStr, fptr *ZendFunction, arg_info *ZendArgInfo
 func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 	var str SmartStr = SmartStr{0}
 	if fptr.GetOpArray().IsReturnReference() {
-		SmartStrAppends(&str, b.CastStrAuto("& "))
+		SmartStrAppends(&str, "& ")
 	}
 	if fptr.GetScope() != nil {
 
 		/* cut off on NULL byte ... class@anonymous */
 
 		SmartStrAppendl(&str, b.CastStr(fptr.GetScope().GetName().GetVal(), strlen(fptr.GetScope().GetName().GetVal())))
-		SmartStrAppends(&str, b.CastStrAuto("::"))
+		SmartStrAppends(&str, "::")
 	}
 	SmartStrAppend(&str, fptr.GetFunctionName().GetStr())
 	SmartStrAppendc(&str, '(')
@@ -545,7 +545,7 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 				SmartStrAppendc(&str, '&')
 			}
 			if arg_info.GetIsVariadic() != 0 {
-				SmartStrAppends(&str, b.CastStrAuto("..."))
+				SmartStrAppends(&str, "...")
 			}
 			SmartStrAppendc(&str, '$')
 			if arg_info.GetName() != nil {
@@ -555,11 +555,11 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 					SmartStrAppendl(&str, b.CastStr(arg_info.GetName().GetVal(), arg_info.GetName().GetLen()))
 				}
 			} else {
-				SmartStrAppends(&str, b.CastStrAuto("param"))
+				SmartStrAppends(&str, "param")
 				SmartStrAppendUnsigned(&str, i)
 			}
 			if i >= required && arg_info.GetIsVariadic() == 0 {
-				SmartStrAppends(&str, b.CastStrAuto(" = "))
+				SmartStrAppends(&str, " = ")
 				if fptr.GetType() == ZEND_USER_FUNCTION {
 					var precv *ZendOp = nil
 					var idx uint32 = i
@@ -575,26 +575,26 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 					if precv != nil && precv.GetOpcode() == ZEND_RECV_INIT && precv.GetOp2Type() != IS_UNUSED {
 						var zv *Zval = RT_CONSTANT(precv, precv.GetOp2())
 						if zv.IsFalse() {
-							SmartStrAppends(&str, b.CastStrAuto("false"))
+							SmartStrAppends(&str, "false")
 						} else if zv.IsTrue() {
-							SmartStrAppends(&str, b.CastStrAuto("true"))
+							SmartStrAppends(&str, "true")
 						} else if zv.IsNull() {
-							SmartStrAppends(&str, b.CastStrAuto("NULL"))
+							SmartStrAppends(&str, "NULL")
 						} else if zv.IsString() {
 							SmartStrAppendc(&str, '\'')
 							SmartStrAppendl(&str, b.CastStr(Z_STRVAL_P(zv), MIN(Z_STRLEN_P(zv), 10)))
 							if Z_STRLEN_P(zv) > 10 {
-								SmartStrAppends(&str, b.CastStrAuto("..."))
+								SmartStrAppends(&str, "...")
 							}
 							SmartStrAppendc(&str, '\'')
 						} else if zv.IsArray() {
-							SmartStrAppends(&str, b.CastStrAuto("Array"))
+							SmartStrAppends(&str, "Array")
 						} else if zv.IsConstant() {
 							var ast *ZendAst = Z_ASTVAL_P(zv)
 							if ast.GetKind() == ZEND_AST_CONSTANT {
 								SmartStrAppend(&str, ZendAstGetConstantName(ast).GetStr())
 							} else {
-								SmartStrAppends(&str, b.CastStrAuto("<expression>"))
+								SmartStrAppends(&str, "<expression>")
 							}
 						} else {
 							var tmp_zv_str *ZendString
@@ -604,18 +604,18 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 						}
 					}
 				} else {
-					SmartStrAppends(&str, b.CastStrAuto("NULL"))
+					SmartStrAppends(&str, "NULL")
 				}
 			}
 			if b.PreInc(&i) < num_args {
-				SmartStrAppends(&str, b.CastStrAuto(", "))
+				SmartStrAppends(&str, ", ")
 			}
 			arg_info++
 		}
 	}
 	SmartStrAppendc(&str, ')')
 	if fptr.IsHasReturnType() {
-		SmartStrAppends(&str, b.CastStrAuto(": "))
+		SmartStrAppends(&str, ": ")
 		ZendAppendTypeHint(&str, fptr, fptr.GetArgInfo()-1, 1)
 	}
 	SmartStr0(&str)

@@ -3,7 +3,6 @@
 package core
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -55,7 +54,7 @@ func PhpSyslog(priority int, format string, _ ...any) {
 			zend.SmartStringAppendc(&sbuf, c)
 		} else {
 			var xdigits []byte = "0123456789abcdef"
-			zend.SmartStringAppendl(&sbuf, b.CastStr("\\x", 2))
+			zend.SmartStringAppendl(&sbuf, "\\x")
 			zend.SmartStringAppendc(&sbuf, xdigits[c/0x10])
 			c &= 0xf
 			zend.SmartStringAppendc(&sbuf, xdigits[c])

@@ -182,7 +182,7 @@ func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *
 			if key_suffix {
 				zend.SmartStrAppendl(formstr, b.CastStr(key_suffix, key_suffix_len))
 			}
-			zend.SmartStrAppendl(formstr, b.CastStr("=", 1))
+			zend.SmartStrAppendl(formstr, "=")
 			switch zdata.GetType() {
 			case zend.IS_STRING:
 				var ekey *zend.ZendString

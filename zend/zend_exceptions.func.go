@@ -362,7 +362,7 @@ func TRACE_APPEND_KEY(key *ZendString) {
 	if tmp {
 		if tmp.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Value for %s is no string", key.GetVal())
-			SmartStrAppends(str, b.CastStrAuto("[unknown]"))
+			SmartStrAppends(str, "[unknown]")
 		} else {
 			SmartStrAppends(str, b.CastStrAuto(Z_STRVAL_P(tmp)))
 		}
@@ -378,44 +378,44 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 	ZVAL_DEREF(arg)
 	switch arg.GetType() {
 	case IS_NULL:
-		SmartStrAppends(str, b.CastStrAuto("NULL, "))
+		SmartStrAppends(str, "NULL, ")
 		break
 	case IS_STRING:
 		SmartStrAppendc(str, '\'')
 		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), MIN(Z_STRLEN_P(arg), 15))
 		if Z_STRLEN_P(arg) > 15 {
-			SmartStrAppends(str, b.CastStrAuto("...', "))
+			SmartStrAppends(str, "...', ")
 		} else {
-			SmartStrAppends(str, b.CastStrAuto("', "))
+			SmartStrAppends(str, "', ")
 		}
 		break
 	case IS_FALSE:
-		SmartStrAppends(str, b.CastStrAuto("false, "))
+		SmartStrAppends(str, "false, ")
 		break
 	case IS_TRUE:
-		SmartStrAppends(str, b.CastStrAuto("true, "))
+		SmartStrAppends(str, "true, ")
 		break
 	case IS_RESOURCE:
-		SmartStrAppends(str, b.CastStrAuto("Resource id #"))
+		SmartStrAppends(str, "Resource id #")
 		SmartStrAppendLong(str, Z_RES_HANDLE_P(arg))
-		SmartStrAppends(str, b.CastStrAuto(", "))
+		SmartStrAppends(str, ", ")
 		break
 	case IS_LONG:
 		SmartStrAppendLong(str, arg.GetLval())
-		SmartStrAppends(str, b.CastStrAuto(", "))
+		SmartStrAppends(str, ", ")
 		break
 	case IS_DOUBLE:
 		SmartStrAppendPrintf(str, "%.*G", int(EG__().GetPrecision()), arg.GetDval())
-		SmartStrAppends(str, b.CastStrAuto(", "))
+		SmartStrAppends(str, ", ")
 		break
 	case IS_ARRAY:
-		SmartStrAppends(str, b.CastStrAuto("Array, "))
+		SmartStrAppends(str, "Array, ")
 		break
 	case IS_OBJECT:
 		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(arg.GetObj())
-		SmartStrAppends(str, b.CastStrAuto("Object("))
+		SmartStrAppends(str, "Object(")
 		SmartStrAppends(str, b.CastStrAuto(class_name.GetVal()))
-		SmartStrAppends(str, b.CastStrAuto("), "))
+		SmartStrAppends(str, "), ")
 		ZendStringReleaseEx(class_name, 0)
 		break
 	}
@@ -430,7 +430,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	if file != nil {
 		if file.GetType() != IS_STRING {
 			ZendError(E_WARNING, "Function name is no string")
-			SmartStrAppends(str, b.CastStrAuto("[unknown function]"))
+			SmartStrAppends(str, "[unknown function]")
 		} else {
 			var line ZendLong
 			tmp = ht.KeyFind(ZSTR_KNOWN(ZEND_STR_LINE).GetStr())
@@ -447,10 +447,10 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			SmartStrAppend(str, file.GetStr().GetStr())
 			SmartStrAppendc(str, '(')
 			SmartStrAppendLong(str, line)
-			SmartStrAppends(str, b.CastStrAuto("): "))
+			SmartStrAppends(str, "): ")
 		}
 	} else {
-		SmartStrAppends(str, b.CastStrAuto("[internal function]: "))
+		SmartStrAppends(str, "[internal function]: ")
 	}
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_CLASS))
 	TRACE_APPEND_KEY(ZSTR_KNOWN(ZEND_STR_TYPE))
@@ -475,7 +475,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 			ZendError(E_WARNING, "args element is no array")
 		}
 	}
-	SmartStrAppends(str, b.CastStrAuto(")\n"))
+	SmartStrAppends(str, ")\n")
 }
 func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value *Zval) {
 	var trace *Zval
@@ -510,7 +510,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 	}
 	SmartStrAppendc(&str, '#')
 	SmartStrAppendLong(&str, num)
-	SmartStrAppends(&str, b.CastStrAuto(" {main}"))
+	SmartStrAppends(&str, " {main}")
 	SmartStr0(&str)
 	RETVAL_NEW_STR(str.GetS())
 	return
