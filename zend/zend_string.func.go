@@ -30,7 +30,7 @@ func ZendStringForgetHashVal(s *ZendString) {
 
 func ZendStringAlloc(len_ int, persistent int) *ZendString {
 	var str_ = b.EmptyString(len_)
-	return ZendStringNew(str_, persistent != 0)
+	return NewZendStringPersistent(str_, persistent != 0)
 }
 func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 	// todo 不太明白参数作用，仅从纯代码功能重构
@@ -39,21 +39,21 @@ func ZendStringSafeAlloc(n int, m int, l int, persistent int) *ZendString {
 }
 func ZendStringInit(str *byte, len_ int, persistent int) *ZendString {
 	var str_ = b.CastStr(str, len_)
-	return ZendStringNew(str_, persistent != 0)
+	return NewZendStringPersistent(str_, persistent != 0)
 }
 func ZendStringExtend(s *ZendString, len_ int, persistent int) *ZendString {
 	ZEND_ASSERT(len_ >= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr + b.EmptyString(len_-len(oldStr))
 	s.DelRefcount()
-	return ZendStringNew(newStr, persistent != 0)
+	return NewZendStringPersistent(newStr, persistent != 0)
 }
 func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 	ZEND_ASSERT(len_ <= s.GetLen())
 	var oldStr = s.GetStr()
 	var newStr = oldStr[:len_]
 	s.DelRefcount()
-	return ZendStringNew(newStr, persistent != 0)
+	return NewZendStringPersistent(newStr, persistent != 0)
 }
 func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString

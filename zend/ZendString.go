@@ -16,15 +16,20 @@ type ZendString struct {
 
 var _ IRefcounted = &ZendString{}
 
-func ZendStringNew(str string, persistent bool) *ZendString {
+func NewZendString(str string) *ZendString {
 	var zs = &ZendString{val: []byte(str), len_: len(str)}
 
 	zs.SetRefcount(1)
 	zs.SetGcTypeInfo(IS_STRING)
+
+	return zs
+}
+
+func NewZendStringPersistent(str string, persistent bool) *ZendString {
+	var zs = NewZendString(str)
 	if persistent {
 		zs.AddGcFlags(IS_STR_PERSISTENT)
 	}
-
 	return zs
 }
 
@@ -53,5 +58,5 @@ func (this *ZendString) Copy() *ZendString {
 }
 
 func (this *ZendString) Dup(persistent int) *ZendString {
-	return ZendStringNew(this.GetStr(), persistent != 0)
+	return NewZendStringPersistent(this.GetStr(), persistent != 0)
 }

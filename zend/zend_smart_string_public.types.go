@@ -3,8 +3,8 @@
 package zend
 
 import (
-	"bytes"
 	b "sik/builtin"
+	"strings"
 )
 
 /**
@@ -13,22 +13,22 @@ import (
 type SmartString struct {
 	c    *byte
 	len_ int
-	a    int // cap ?
+	//a    int // cap ?
 
-	buffer bytes.Buffer
+	buffer strings.Builder
 }
 
-func (this *SmartString) GetC() *byte      { return this.c }
-func (this *SmartString) SetC(value *byte) { this.c = value }
-func (this *SmartString) GetLen() int      { return this.buffer.Len() }
-func (this *SmartString) SetLen(value int) { this.len_ = value }
-func (this *SmartString) GetA() int        { return this.a }
-func (this *SmartString) SetA(value int)   { this.a = value }
+func (this *SmartString) SetC(value *byte) { this.c = value /* todo delete */ }
+func (this *SmartString) SetLen(value int) { this.len_ = value /* todo delete */ }
+
+func (this *SmartString) GetC() *byte { return this.c /* todo 待修改 */ }
+func (this *SmartString) GetLen() int { return this.buffer.Len() }
+func (this *SmartString) GetA() int   { return this.buffer.Cap() }
 
 // 分配内存，确认至少有 len_ 的未使用内存
-func (this *SmartString) alloc(len_ int) int {
-	// 当前实现无需手动扩展内存
-	return this.len_ + len_
+func (this *SmartString) Alloc(len_ int) int {
+	this.buffer.Grow(len_)
+	return this.buffer.Len() + len_
 }
 
 func (this *SmartString) AppendS(src *byte) {

@@ -42,7 +42,7 @@ func (this ZendArrayKey) GetH() ZendUlong {
 func (this ZendArrayKey) GetZendStringKey() *ZendString {
 	// todo remove
 	if this.key != nil {
-		return ZendStringNew(*this.key, false)
+		return NewZendString(*this.key)
 	} else {
 		return nil
 	}
