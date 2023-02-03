@@ -399,7 +399,7 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	var ini_scanner_globals ZendIniScannerGlobals
 	var language_scanner_globals ZendPhpScannerGlobals
-	ZendCpuStartup()
+	//ZendCpuStartup()
 	StartMemoryManager()
 	VirtualCwdStartup()
 	ZendStartupStrtod()
