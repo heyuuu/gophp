@@ -13,16 +13,16 @@ var ZendEmptyString *ZendString = nil
 func STR_EMPTY_ALLOC() *ZendString  { return ZendEmptyString }
 func ZSTR_EMPTY_ALLOC() *ZendString { return ZendEmptyString }
 
-func ZSTR_CHAR(c int) *ZendString                  { return ZendOneCharString[c] }
-func ZSTR_KNOWN(idx ZendKnownStringId) *ZendString { return ZendKnownStrings[idx] }
-
-func _ZSTR_STRUCT_SIZE(len_ int) int { return _ZSTR_HEADER_SIZE + len_ + 1 }
+func ZSTR_CHAR(c int) *ZendString { return ZendOneCharString[c] }
+func ZSTR_KNOWN(str string) *ZendString {
+	return NewZendStringPersistent(str, true)
+}
 
 func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap any) {
 	*str = *ZendStringAlloc(_len, 0)
 }
 
-func ZSTR_ALLOCA_FREE(str any, use_heap any) { b.Free(str) }
+func ZSTR_ALLOCA_FREE(str *ZendString, use_heap any) { str.Free() }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	s.DelGcFlags(IS_STR_VALID_UTF8)
@@ -57,12 +57,12 @@ func ZendStringTruncate(s *ZendString, len_ int, persistent int) *ZendString {
 }
 func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *ZendString {
 	var ret *ZendString
-	if s.GetRefcount() == 1 {
-		ret = (*ZendString)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
-		ret.SetLen(n*m + l)
-		ZendStringForgetHashVal(ret)
-		return ret
-	}
+	//if s.GetRefcount() == 1 {
+	//	ret = (*ZendString)(SafePerealloc(s, n, m, ZEND_MM_ALIGNED_SIZE(_ZSTR_STRUCT_SIZE(l)), persistent))
+	//	ret.SetLen(n*m + l)
+	//	ZendStringForgetHashVal(ret)
+	//	return ret
+	//}
 	ret = ZendStringSafeAlloc(n, m, l, persistent)
 	memcpy(ret.GetVal(), s.GetVal(), MIN(n*m+l, s.GetLen())+1)
 	s.DelRefcount()
@@ -119,12 +119,10 @@ func ZendInitInternedStringsHt(interned_strings *HashTable, permanent int) {
 }
 func ZendInternedStringsInit() {
 	var s []byte
-	var i uint
 	var str *ZendString
 	InternedStringRequestHandler = ZendNewInternedStringRequest
 	InternedStringInitRequestHandler = ZendStringInitInternedRequest
 	ZendEmptyString = nil
-	ZendKnownStrings = nil
 	ZendInitInternedStringsHt(&InternedStringsPermanent, 1)
 	ZendNewInternedString = ZendNewInternedStringPermanent
 	ZendStringInitInterned = ZendStringInitInternedPermanent
@@ -135,23 +133,13 @@ func ZendInternedStringsInit() {
 	str.GetVal()[0] = '0'
 	ZendEmptyString = ZendNewInternedStringPermanent(str)
 	s[1] = 0
-	for i = 0; i < 256; i++ {
-		s[0] = i
+	for i := 0; i < 256; i++ {
+		s[0] = byte(i)
 		ZendOneCharString[i] = ZendNewInternedStringPermanent(ZendStringInit(s, 1, 1))
-	}
-
-	/* known strings */
-
-	ZendKnownStrings = Pemalloc(b.SizeOf("zend_string *")*(b.SizeOf("known_strings")/b.SizeOf("known_strings [ 0 ]")-1), 1)
-	for i = 0; i < b.SizeOf("known_strings")/b.SizeOf("known_strings [ 0 ]")-1; i++ {
-		str = ZendStringInit(KnownStrings[i], strlen(KnownStrings[i]), 1)
-		ZendKnownStrings[i] = ZendNewInternedStringPermanent(str)
 	}
 }
 func ZendInternedStringsDtor() {
 	InternedStringsPermanent.Destroy()
-	Free(ZendKnownStrings)
-	ZendKnownStrings = nil
 }
 func ZendInternedStringHtLookupEx(h ZendUlong, str *byte, size int, interned_strings *HashTable) *ZendString {
 	var nIndex uint32

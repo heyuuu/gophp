@@ -51,10 +51,10 @@ const (
 	SUCCESS                  = 0
 	FAILURE ZEND_RESULT_CODE = -1
 )
-const ZEND_SIZE_MAX = SIZE_MAX
+const ZEND_SIZE_MAX = math.MaxUint
 
-type ZendIntptrT = intPtr
-type ZendUintptrT = uintPtr
+type ZendIntptrT = uintptr
+type ZendUintptrT = uintptr
 
 type CompareFuncT func(any, any) int
 type SwapFuncT func(any, any)
@@ -62,28 +62,7 @@ type SortFuncT func(any, int, int, CompareFuncT, SwapFuncT)
 type DtorFuncT func(pDest *Zval)
 type CopyCtorFuncT func(pElement *Zval)
 
-/*
- * zend_type - is an abstraction layer to represent information about type hint.
- * It shouldn't be used directly. Only through ZEND_TYPE_* macros.
- *
- * ZEND_TYPE_IS_SET()     - checks if type-hint exists
- * ZEND_TYPE_IS_CODE()    - checks if type-hint refer to standard type
- * ZEND_TYPE_IS_CLASS()   - checks if type-hint refer to some class
- * ZEND_TYPE_IS_CE()      - checks if type-hint refer to some class by zend_class_entry *
- * ZEND_TYPE_IS_NAME()    - checks if type-hint refer to some class by zend_string *
- *
- * ZEND_TYPE_NAME()       - returns referenced class name
- * ZEND_TYPE_CE()         - returns referenced class entry
- * ZEND_TYPE_CODE()       - returns standard type code (e.g. IS_LONG, _IS_BOOL)
- *
- * ZEND_TYPE_ALLOW_NULL() - checks if NULL is allowed
- *
- * ZEND_TYPE_ENCODE() and ZEND_TYPE_ENCODE_CLASS() should be used for
- * construction.
- */
-
-const HT_INVALID_IDX uint32 = math.MaxUint32  // uint32(-1)
-const HT_MIN_MASK uint32 = math.MaxUint32 - 1 // uint32(-2)
+const HT_INVALID_IDX uint32 = math.MaxUint32 // uint32(-1)
 const HT_MIN_SIZE = 8
 const HT_MAX_SIZE = 0x80000000
 

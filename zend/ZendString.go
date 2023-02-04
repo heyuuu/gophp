@@ -60,3 +60,7 @@ func (this *ZendString) Copy() *ZendString {
 func (this *ZendString) Dup(persistent int) *ZendString {
 	return NewZendStringPersistent(this.GetStr(), persistent != 0)
 }
+
+func (this *ZendString) Free() {
+	b.Free(this)
+}
