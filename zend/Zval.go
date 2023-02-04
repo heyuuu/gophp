@@ -225,10 +225,71 @@ func (this *Zval) SetDouble(d float64) {
 	this.SetDval(d)
 }
 
-//func (this *Zval) SetString()    { this.SetTypeInfo(IS_STRING) }
-//func (this *Zval) SetArray()     { this.SetTypeInfo(IS_ARRAY) }
-//func (this *Zval) SetObject()    { this.SetTypeInfo(IS_OBJECT) }
-//func (this *Zval) SetResource()  { this.SetTypeInfo(IS_RESOURCE) }
-//func (this *Zval) SetReference() { this.SetTypeInfo(IS_REFERENCE) }
-//func (this *Zval) SetConstant()  { this.SetTypeInfo(IS_CONSTANT_AST) }
-//func (this *Zval) SetIndirect()  { this.SetTypeInfo(IS_INDIRECT) }
+func (this *Zval) SetString(s *ZendString) {
+	this.SetStr(s)
+	this.SetTypeInfo(IS_STRING_EX)
+}
+func (this *Zval) SetInternedString(s *ZendString) {
+	this.SetStr(s)
+	this.SetTypeInfo(IS_INTERNED_STRING_EX)
+}
+func (this *Zval) SetStringCopy(s *ZendString) {
+	s.AddRefcount()
+	this.SetString(s)
+}
+
+func (this *Zval) SetArray(arr *ZendArray) {
+	this.SetArr(arr)
+	this.SetTypeInfo(IS_ARRAY_EX)
+}
+
+func (this *Zval) SetObject(obj *ZendObject) {
+	this.SetObj(obj)
+	this.SetTypeInfo(IS_OBJECT_EX)
+}
+
+func (this *Zval) SetResource(res *ZendResource) {
+	this.SetRes(res)
+	this.SetTypeInfo(IS_RESOURCE_EX)
+}
+func (this *Zval) SetNewResource(handle int, ptr any, type_ int) {
+	var res = NewZendResource(handle, ptr, type_)
+	this.SetResource(res)
+}
+func (this *Zval) SetNewResourcePersistent(handle int, ptr any, type_ int) {
+	var res = NewZendResourcePersistent(handle, ptr, type_, true)
+	this.SetResource(res)
+}
+
+func (this *Zval) SetReference(ref *ZendReference) {
+	this.SetRef(ref)
+	this.SetTypeInfo(IS_REFERENCE_EX)
+}
+func (this *Zval) SetNewEmptyRef() {
+	var ref *ZendReference = NewZendReference(nil)
+	this.SetReference(ref)
+}
+func (this *Zval) SetNewRef(val *Zval) {
+	var ref *ZendReference = NewZendReference(val)
+	this.SetReference(ref)
+}
+
+func (this *Zval) SetConstantAst(ast *ZendAstRef) {
+	this.SetAst(ast)
+	this.SetTypeInfo(IS_CONSTANT_AST_EX)
+}
+
+func (this *Zval) SetIndirect(v *Zval) {
+	this.SetZv(v)
+	this.SetTypeInfo(IS_INDIRECT)
+}
+
+func (this *Zval) SetAsPtr(ptr any) {
+	this.SetPtr(ptr)
+	this.SetTypeInfo(IS_PTR)
+}
+
+func (this *Zval) SetAliasPtr(ptr any) {
+	this.SetPtr(ptr)
+	this.SetTypeInfo(IS_ALIAS_PTR)
+}

@@ -75,6 +75,25 @@ type ZendResource struct {
 
 var _ IRefcounted = &ZendResource{}
 
+func NewZendResource(handle int, ptr any, type_ int) *ZendResource {
+	return NewZendResourcePersistent(handle, ptr, type_, false)
+}
+func NewZendResourcePersistent(handle int, ptr any, type_ int, persistent bool) *ZendResource {
+	var res = &ZendResource{
+		handle: handle,
+		type_:  type_,
+		ptr:    ptr,
+	}
+
+	res.SetRefcount(1)
+	res.SetGcTypeInfo(IS_RESOURCE)
+	if persistent {
+		res.SetPersistent()
+	}
+
+	return res
+}
+
 func (this *ZendResource) GetHandle() int      { return this.handle }
 func (this *ZendResource) SetHandle(value int) { this.handle = value }
 func (this *ZendResource) GetType() int        { return this.type_ }
@@ -121,6 +140,18 @@ type ZendReference struct {
 }
 
 var _ IRefcounted = &ZendReference{}
+
+func NewZendReference(val *Zval) *ZendReference {
+	var ref = &ZendReference{}
+
+	ZVAL_COPY_VALUE(ref.GetVal(), val)
+	ref.sources.SetPtr(nil)
+
+	ref.SetRefcount(1)
+	ref.SetGcTypeInfo(IS_REFERENCE)
+
+	return ref
+}
 
 func (this *ZendReference) GetVal() *Zval                               { return &this.val }
 func (this *ZendReference) SetVal(value Zval)                           { this.val = value }

@@ -729,13 +729,13 @@ func ZendHashGetCurrentKeyZvalEx(ht *HashTable, key *Zval, pos *HashPosition) {
 	var p *Bucket
 	idx = ht.validPosVal(*pos)
 	if idx >= ht.GetNNumUsed() {
-		ZVAL_NULL(key)
+		key.SetNull()
 	} else {
 		p = ht.GetArData() + idx
 		if p.GetKey() != nil {
 			ZVAL_STR_COPY(key, p.GetKey())
 		} else {
-			ZVAL_LONG(key, p.GetH())
+			key.SetLong(p.IndexKey())
 		}
 	}
 }
