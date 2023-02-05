@@ -216,12 +216,9 @@ func (this *ZendArray) SwitchFlags(value ZendUchar, cond bool) {
 }
 
 const HASH_FLAG_PACKED = 1 << 2
-const HASH_FLAG_STATIC_KEYS = 1 << 4
 const HASH_FLAG_HAS_EMPTY_IND = 1 << 5
 
-func (this *ZendArray) IsStaticKeys() bool  { return this.HasFlags(HASH_FLAG_STATIC_KEYS) }
 func (this *ZendArray) IsHasEmptyInd() bool { return this.HasFlags(HASH_FLAG_HAS_EMPTY_IND) }
-func (this *ZendArray) SetIsStaticKeys()    { this.AddFlags(HASH_FLAG_STATIC_KEYS) }
 func (this *ZendArray) SetIsHasEmptyInd()   { this.AddFlags(HASH_FLAG_HAS_EMPTY_IND) }
 
 /* ZendArray.u.flags */
@@ -314,9 +311,6 @@ func (this *ZendArray) clearData() {
 	this.keyMap = make(map[string]uint32)
 	this.nNextFreeElement = 0
 	this.nInternalPointer = 0
-
-	// todo 确认有多少 flags
-	this.SetIsStaticKeys()
 }
 
 func (this *ZendArray) RealInit() {
@@ -480,7 +474,6 @@ func (this *ZendArray) KeyAdd(key string, pData *Zval) *Zval {
 		return nil
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	var p = this.appendBucketStr(key, pData)
 	return p.GetVal()
 }
@@ -489,7 +482,6 @@ func (this *ZendArray) KeyAdd(key string, pData *Zval) *Zval {
 func (this *ZendArray) KeyAddNew(key string, pData *Zval) *Zval {
 	this.assertRc1()
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	var p = this.appendBucketStr(key, pData)
 	return p.GetVal()
 }
@@ -517,7 +509,6 @@ func (this *ZendArray) KeyAddIndirect(strKey string, pData *Zval) *Zval {
 		return data
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	p = this.appendBucketStr(strKey, pData)
 	return p.GetVal()
 }
@@ -538,7 +529,6 @@ func (this *ZendArray) KeyUpdate(key string, pData *Zval) *Zval {
 		return data
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	p = this.appendBucketStr(key, pData)
 	return p.GetVal()
 }
@@ -562,7 +552,6 @@ func (this *ZendArray) KeyUpdateIndirect(key string, pData *Zval) *Zval {
 		return data
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
 	p = this.appendBucketStr(key, pData)
 	return p.GetVal()
 }

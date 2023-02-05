@@ -93,8 +93,6 @@ func (this *HashTable) SetBucketKey(b *Bucket, key string) *Zval {
 		return nil
 	}
 
-	this.SubUFlags(HASH_FLAG_STATIC_KEYS)
-
 	/* del from hash */
 	this.deleteHash(b.key)
 
