@@ -92,7 +92,7 @@ func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clone
 			if other.IsIsSelf() {
 				intern.GetArray().SetUndef()
 			} else if zend.Z_OBJ_HT_P(orig) == &spl_handler_ArrayObject {
-				zend.ZVAL_ARR(intern.GetArray(), zend.ZendArrayDup(SplArrayGetHashTable(other)))
+				intern.GetArray().SetArray(zend.ZendArrayDup(SplArrayGetHashTable(other)))
 			} else {
 				zend.ZEND_ASSERT(zend.Z_OBJ_HT_P(orig) == &spl_handler_ArrayIterator)
 				zend.ZVAL_COPY(intern.GetArray(), orig)
@@ -322,7 +322,7 @@ func SplArrayReadDimensionEx(check_inherited int, object *zend.Zval, offset *zen
 	 */
 
 	if (type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW || type_ == zend.BP_VAR_UNSET) && !(ret.IsReference()) && ret != zend.EG__().GetUninitializedZval() {
-		zend.ZVAL_NEW_REF(ret, ret)
+		ret.SetNewRef(ret)
 	}
 	return ret
 }
@@ -854,7 +854,7 @@ func SplArraySetArray(object *zend.Zval, intern *SplArrayObject, array *zend.Zva
 
 			//??? TODO: try to avoid array duplication
 
-			zend.ZVAL_ARR(intern.GetArray(), zend.ZendArrayDup(array.GetArr()))
+			intern.GetArray().SetArray(zend.ZendArrayDup(array.GetArr()))
 
 			//??? TODO: try to avoid array duplication
 
@@ -897,7 +897,7 @@ func SplArrayGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int)
 	iterator = zend.Emalloc(b.SizeOf("zend_user_iterator"))
 	zend.ZendIteratorInit(iterator.GetIt())
 	object.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIt().GetData(), object.GetObj())
+	iterator.GetIt().GetData().SetObject(object.GetObj())
 	iterator.GetIt().SetFuncs(&SplArrayItFuncs)
 	iterator.SetCe(ce)
 	iterator.GetValue().SetUndef()
@@ -1057,7 +1057,7 @@ func zim_spl_Array_getIterator(execute_data *zend.ZendExecuteData, return_value 
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_OBJ(return_value, SplArrayObjectNewEx(intern.GetCeGetIterator(), object, 0))
+	return_value.SetObject(SplArrayObjectNewEx(intern.GetCeGetIterator(), object, 0))
 }
 func zim_spl_Array_rewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *zend.Zval = zend.ZEND_THIS
@@ -1151,8 +1151,8 @@ func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 	var params []zend.Zval
 	var arg *zend.Zval = nil
 	zend.ZVAL_STRINGL(&function_name, fname, fname_len)
-	zend.ZVAL_NEW_EMPTY_REF(&params[0])
-	zend.ZVAL_ARR(zend.Z_REFVAL(params[0]), aht)
+	params[0].SetNewEmptyRef()
+	zend.Z_REFVAL(params[0]).SetArray(aht)
 	aht.AddRefcount()
 	if use_arg == 0 {
 		intern.GetNApplyCount()++
@@ -1297,7 +1297,7 @@ func zim_spl_Array_getChildren(execute_data *zend.ZendExecuteData, return_value 
 			return
 		}
 		if zend.InstanceofFunction(zend.Z_OBJCE_P(entry), zend.Z_OBJCE_P(zend.ZEND_THIS)) != 0 {
-			zend.ZVAL_OBJ(return_value, entry.GetObj())
+			return_value.SetObject(entry.GetObj())
 			return_value.AddRefcount()
 			return
 		}
@@ -1333,7 +1333,7 @@ func zim_spl_Array_serialize(execute_data *zend.ZendExecuteData, return_value *z
 	if intern.GetStd().GetProperties() == nil {
 		zend.RebuildObjectProperties(intern.GetStd())
 	}
-	zend.ZVAL_ARR(&members, intern.GetStd().GetProperties())
+	members.SetArray(intern.GetStd().GetProperties())
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 
 	/* done */
@@ -1474,7 +1474,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 
 	/* members */
 
-	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
+	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS))
 	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 
@@ -1483,7 +1483,7 @@ func zim_spl_Array___serialize(execute_data *zend.ZendExecuteData, return_value 
 	if intern.GetCeGetIterator() == spl_ce_ArrayIterator {
 		tmp.SetNull()
 	} else {
-		zend.ZVAL_STR_COPY(&tmp, intern.GetCeGetIterator().GetName())
+		tmp.SetStringCopy(intern.GetCeGetIterator().GetName())
 	}
 	return_value.GetArr().NextIndexInsert(&tmp)
 }

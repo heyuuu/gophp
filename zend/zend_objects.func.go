@@ -214,7 +214,7 @@ func ZendObjectsCloneMembers(new_object *ZendObject, old_object *ZendObject) {
 			key = _p.GetKey()
 			prop = _z
 			if prop.IsIndirect() {
-				ZVAL_INDIRECT(&new_prop, new_object.GetPropertiesTable()+(prop.GetZv()-old_object.GetPropertiesTable()))
+				new_prop.SetIndirect(new_object.GetPropertiesTable() + (prop.GetZv() - old_object.GetPropertiesTable()))
 			} else {
 				ZVAL_COPY_VALUE(&new_prop, prop)
 				ZvalAddRef(&new_prop)

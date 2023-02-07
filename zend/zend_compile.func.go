@@ -384,7 +384,7 @@ func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
 		return p.GetStr()
 	}
 	new_compiled_filename = ZendNewInternedString(new_compiled_filename.Copy())
-	ZVAL_STR(&rv, new_compiled_filename)
+	rv.SetString(new_compiled_filename)
 	CG__().GetFilenamesTable().KeyAddNew(new_compiled_filename.GetStr(), &rv)
 	CG__().SetCompiledFilename(new_compiled_filename)
 	return new_compiled_filename
@@ -449,7 +449,7 @@ func ZendAddLiteral(zv *Zval) int {
 func ZendAddLiteralString(str **ZendString) int {
 	var ret int
 	var zv Zval
-	ZVAL_STR(&zv, *str)
+	zv.SetString(*str)
 	ret = ZendAddLiteral(&zv)
 	*str = zv.GetStr()
 	return ret
@@ -540,7 +540,7 @@ func ZendAddConstNameLiteral(name *ZendString, unqualified ZendBool) int {
 }
 func LITERAL_STR(op ZnodeOp, str *ZendString) {
 	var _c Zval
-	ZVAL_STR(&_c, str)
+	_c.SetString(str)
 	op.SetConstant(ZendAddLiteral(&_c))
 }
 func ZendStopLexing() {
@@ -704,7 +704,7 @@ func ZendHashFindPtrLc(ht *HashTable, str *byte, len_ int) any {
 	ZSTR_ALLOCA_ALLOC(lcname, len_, use_heap)
 	ZendStrTolowerCopy(lcname.GetVal(), str, len_)
 	result = ZendHashFindPtr(ht, lcname)
-	ZSTR_ALLOCA_FREE(lcname, use_heap)
+	lcname.Free()
 	return result
 }
 func ZendResolveNonClassName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool, case_sensitive ZendBool, current_import_sub *HashTable) *ZendString {
@@ -1184,20 +1184,20 @@ func ZendTryCompileConstExprResolveClassName(zv *Zval, class_ast *ZendAst) ZendB
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
 		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
-			ZVAL_STR_COPY(zv, CG__().GetActiveClassEntry().GetName())
+			zv.SetStringCopy(CG__().GetActiveClassEntry().GetName())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
 		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() && ZendIsScopeKnown() != 0 {
-			ZVAL_STR_COPY(zv, CG__().GetActiveClassEntry().GetParentName())
+			zv.SetStringCopy(CG__().GetActiveClassEntry().GetParentName())
 			return 1
 		}
 		return 0
 	case ZEND_FETCH_CLASS_STATIC:
 		return 0
 	case ZEND_FETCH_CLASS_DEFAULT:
-		ZVAL_STR(zv, ZendResolveClassNameAst(class_ast))
+		zv.SetString(ZendResolveClassNameAst(class_ast))
 		return 1
 	default:
 		break
@@ -1434,14 +1434,14 @@ func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {
 	memcpy(&result.GetVal()[left_len+1], right.GetVal(), right.GetLen())
 	result.GetVal()[len_] = '0'
 	ZendStringReleaseEx(right, 0)
-	ZVAL_STR(left_zv, result)
+	left_zv.SetString(result)
 	return left_ast
 }
 func ZendNegateNumString(ast *ZendAst) *ZendAst {
 	var zv *Zval = ZendAstGetZval(ast)
 	if zv.IsLong() {
 		if zv.GetLval() == 0 {
-			ZVAL_NEW_STR(zv, ZendStringInit("-0", b.SizeOf("\"-0\"")-1, 0))
+			zv.SetString(ZendStringInit("-0", b.SizeOf("\"-0\"")-1, 0))
 		} else {
 			ZEND_ASSERT(zv.GetLval() > 0)
 			zv.SetLval(zv.GetLval() * -1)
@@ -1933,7 +1933,7 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 			fetch_type = ZendGetClassFetchType(name)
 			if fetch_type == ZEND_FETCH_CLASS_DEFAULT {
 				result.SetOpType(IS_CONST)
-				ZVAL_STR(result.GetConstant(), ZendResolveClassName(name, ZEND_NAME_FQ))
+				result.GetConstant().SetString(ZendResolveClassName(name, ZEND_NAME_FQ))
 			} else {
 				ZendEnsureValidClassFetchType(fetch_type)
 				result.SetOpType(IS_UNUSED)
@@ -1951,13 +1951,13 @@ func ZendCompileClassRef(result *Znode, name_ast *ZendAst, fetch_flags uint32) {
 
 	if name_ast.GetAttr() == ZEND_NAME_FQ {
 		result.SetOpType(IS_CONST)
-		ZVAL_STR(result.GetConstant(), ZendResolveClassNameAst(name_ast))
+		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 		return
 	}
 	fetch_type = ZendGetClassFetchType(ZendAstGetStr(name_ast))
 	if ZEND_FETCH_CLASS_DEFAULT == fetch_type {
 		result.SetOpType(IS_CONST)
-		ZVAL_STR(result.GetConstant(), ZendResolveClassNameAst(name_ast))
+		result.GetConstant().SetString(ZendResolveClassNameAst(name_ast))
 	} else {
 		ZendEnsureValidClassFetchType(fetch_type)
 		result.SetOpType(IS_UNUSED)
@@ -2660,7 +2660,7 @@ func ZendCompileFunctionName(name_node *Znode, name_ast *ZendAst) ZendBool {
 	var orig_name *ZendString = ZendAstGetStr(name_ast)
 	var is_fully_qualified ZendBool
 	name_node.SetOpType(IS_CONST)
-	ZVAL_STR(name_node.GetConstant(), ZendResolveFunctionName(orig_name, name_ast.GetAttr(), &is_fully_qualified))
+	name_node.GetConstant().SetString(ZendResolveFunctionName(orig_name, name_ast.GetAttr(), &is_fully_qualified))
 	return is_fully_qualified == 0 && FC(current_namespace)
 }
 func ZendCompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
@@ -2778,7 +2778,7 @@ func ZendCompileFuncDefined(result *Znode, args *ZendAstList) int {
 
 	var c Zval
 	var lcname *ZendString = ZendStringTolower(name)
-	ZVAL_NEW_STR(&c, lcname)
+	c.SetString(lcname)
 	ZendAddLiteral(&c)
 	return SUCCESS
 }
@@ -2786,7 +2786,7 @@ func ZendCompileFuncChr(result *Znode, args *ZendAstList) int {
 	if args.GetChildren() == 1 && args.GetChild()[0].GetKind() == ZEND_AST_ZVAL && ZendAstGetZval(args.GetChild()[0]).IsLong() {
 		var c ZendLong = ZendAstGetZval(args.GetChild()[0]).GetLval() & 0xff
 		result.SetOpType(IS_CONST)
-		ZVAL_INTERNED_STR(result.GetConstant(), ZSTR_CHAR(c))
+		result.GetConstant().SetInternedString(ZSTR_CHAR(c))
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -2897,7 +2897,7 @@ func ZendCompileAssert(result *Znode, args *ZendAstList, name *ZendString, fbc *
 		ZendEmitOp(nil, ZEND_ASSERT_CHECK, nil, nil)
 		if fbc != nil && FbcIsFinalized(fbc) != 0 {
 			name_node.SetOpType(IS_CONST)
-			ZVAL_STR_COPY(name_node.GetConstant(), name)
+			name_node.GetConstant().SetStringCopy(name)
 			opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 		} else {
 			opline = ZendEmitOp(nil, ZEND_INIT_NS_FCALL_BY_NAME, nil, nil)
@@ -3207,7 +3207,7 @@ func ZendCompileCall(result *Znode, ast *ZendAst, type_ uint32) {
 		return
 	}
 	ZvalPtrDtor(name_node.GetConstant())
-	ZVAL_NEW_STR(name_node.GetConstant(), lcname)
+	name_node.GetConstant().SetString(lcname)
 	opline = ZendEmitOp(nil, ZEND_INIT_FCALL, nil, &name_node)
 	opline.GetResult().SetNum(ZendAllocCacheSlot())
 	ZendCompileCallCommon(result, args_ast, fbc)
@@ -4033,7 +4033,7 @@ func ZendCompileSwitch(ast *ZendAst) {
 		ALLOC_HASHTABLE(jumptable)
 		ZendHashInit(jumptable, cases.GetChildren(), nil, nil, 0)
 		jumptable_op.SetOpType(IS_CONST)
-		ZVAL_ARR(jumptable_op.GetConstant(), jumptable)
+		jumptable_op.GetConstant().SetArray(jumptable)
 		opline = ZendEmitOp(nil, b.Cond(jumptable_type == IS_LONG, ZEND_SWITCH_LONG, ZEND_SWITCH_STRING), &expr_node, &jumptable_op)
 		if opline.GetOp1Type() == IS_CONST {
 			CT_CONSTANT(opline.GetOp1()).TryAddRefcount()
@@ -5641,7 +5641,7 @@ func ZendCompileGroupUse(ast *ZendAst) {
 		var name *ZendString = name_zval.GetStr()
 		var compound_ns *ZendString = ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
 		ZendStringReleaseEx(name, 0)
-		ZVAL_STR(name_zval, compound_ns)
+		name_zval.SetString(compound_ns)
 		inline_use = ZendAstCreateList(1, ZEND_AST_USE, use)
 		if ast.GetAttr() != 0 {
 			inline_use.SetAttr(ast.GetAttr())
@@ -5677,7 +5677,7 @@ func ZendCompileConstDecl(ast *ZendAst) {
 			}
 		}
 		name_node.SetOpType(IS_CONST)
-		ZVAL_STR(name_node.GetConstant(), name)
+		name_node.GetConstant().SetString(name)
 		ZendEmitOp(nil, ZEND_DECLARE_CONST, &name_node, &value_node)
 		ZendRegisterSeenSymbol(name, ZEND_SYMBOL_CONST)
 	}
@@ -5771,7 +5771,7 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		zv.SetLong(ast.GetLineno())
 		break
 	case T_FILE:
-		ZVAL_STR_COPY(zv, CG__().GetCompiledFilename())
+		zv.SetStringCopy(CG__().GetCompiledFilename())
 		break
 	case T_DIR:
 		var filename *ZendString = CG__().GetCompiledFilename()
@@ -5782,11 +5782,11 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 			ZEND_IGNORE_VALUE(VCWD_GETCWD(dirname.GetVal(), MAXPATHLEN))
 			dirname.SetLen(strlen(dirname.GetVal()))
 		}
-		ZVAL_STR(zv, dirname)
+		zv.SetString(dirname)
 		break
 	case T_FUNC_C:
 		if op_array != nil && op_array.GetFunctionName() != nil {
-			ZVAL_STR_COPY(zv, op_array.GetFunctionName())
+			zv.SetStringCopy(op_array.GetFunctionName())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
@@ -5801,9 +5801,9 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		}
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			if op_array.GetScope() != nil {
-				ZVAL_NEW_STR(zv, ZendConcat3(op_array.GetScope().GetName().GetVal(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
+				zv.SetString(ZendConcat3(op_array.GetScope().GetName().GetVal(), op_array.GetScope().GetName().GetLen(), "::", 2, op_array.GetFunctionName().GetVal(), op_array.GetFunctionName().GetLen()))
 			} else {
-				ZVAL_STR_COPY(zv, op_array.GetFunctionName())
+				zv.SetStringCopy(op_array.GetFunctionName())
 			}
 		} else {
 			ZVAL_EMPTY_STRING(zv)
@@ -5814,7 +5814,7 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 			if ce.IsTrait() {
 				return 0
 			} else {
-				ZVAL_STR_COPY(zv, ce.GetName())
+				zv.SetStringCopy(ce.GetName())
 			}
 		} else {
 			ZVAL_EMPTY_STRING(zv)
@@ -5822,14 +5822,14 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		break
 	case T_TRAIT_C:
 		if ce != nil && ce.IsTrait() {
-			ZVAL_STR_COPY(zv, ce.GetName())
+			zv.SetStringCopy(ce.GetName())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
 		break
 	case T_NS_C:
 		if FC(current_namespace) {
-			ZVAL_STR_COPY(zv, FC(current_namespace))
+			zv.SetStringCopy(FC(current_namespace))
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
@@ -7117,7 +7117,7 @@ func ZendConstExprToZval(result *Zval, ast *ZendAst) {
 	if ast.GetKind() == ZEND_AST_ZVAL {
 		ZVAL_COPY_VALUE(result, ZendAstGetZval(ast))
 	} else {
-		ZVAL_AST(result, ZendAstCopy(ast))
+		result.SetConstantAst(ZendAstCopy(ast))
 
 		/* destroy the ast here, it might have been replaced */
 
@@ -7641,7 +7641,7 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 				return
 			}
 			c = ZendUchar(Z_STRVAL_P(container)[offset])
-			ZVAL_INTERNED_STR(&result, ZSTR_CHAR(c))
+			result.SetInternedString(ZSTR_CHAR(c))
 		} else if container.GetType() <= IS_FALSE {
 			result.SetNull()
 		} else {

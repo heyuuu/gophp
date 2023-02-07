@@ -91,8 +91,8 @@ func WRONG_PARAM_COUNT_WITH_RETVAL(ret ZEND_RESULT_CODE) __auto__ {
 }
 func ARG_COUNT(dummy __auto__) uint32      { return EX_NUM_ARGS() }
 func ZEND_NUM_ARGS() uint32                { return EX_NUM_ARGS() }
-func ArrayInit(arg *Zval)                  { ZVAL_ARR(arg, ZendNewArray(0)) }
-func ArrayInitSize(arg *Zval, size uint32) { ZVAL_ARR(arg, ZendNewArray(size)) }
+func ArrayInit(arg *Zval)                  { arg.SetArray(ZendNewArray(0)) }
+func ArrayInitSize(arg *Zval, size uint32) { arg.SetArray(ZendNewArray(size)) }
 func AddAssocLong(__arg *Zval, __key string, __n ZendLong) int {
 	return AddAssocLongEx(__arg, __key, strlen(__key), __n)
 }
@@ -180,13 +180,13 @@ func CHECK_ZVAL_NULL_PATH(p *Zval) bool {
 	return Z_STRLEN_P(p) != strlen(Z_STRVAL_P(p))
 }
 func CHECK_NULL_PATH(p []byte, l int) bool { return strlen(p) != size_t(l) }
-func ZVAL_STRINGL(z *Zval, s *byte, l int) { ZVAL_NEW_STR(z, ZendStringInit(s, l, 0)) }
+func ZVAL_STRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 0)) }
 func ZVAL_STRING(z *Zval, s *byte) {
 	var _s *byte = s
 	ZVAL_STRINGL(z, _s, strlen(_s))
 }
-func ZVAL_EMPTY_STRING(z *Zval)             { ZVAL_INTERNED_STR(z, ZSTR_EMPTY_ALLOC()) }
-func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { ZVAL_NEW_STR(z, ZendStringInit(s, l, 1)) }
+func ZVAL_EMPTY_STRING(z *Zval)             { z.SetInternedString(ZSTR_EMPTY_ALLOC()) }
+func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 1)) }
 func ZVAL_PSTRING(z *Zval, s *byte) {
 	var _s *byte = s
 	ZVAL_PSTRINGL(z, _s, strlen(_s))
@@ -212,17 +212,17 @@ func RETVAL_BOOL(b bool)                       { ZVAL_BOOL(return_value, b) }
 func RETVAL_NULL()                             { return_value.SetNull() }
 func RETVAL_LONG(l int)                        { return_value.SetLong(l) }
 func RETVAL_DOUBLE(d float64)                  { return_value.SetDouble(d) }
-func RETVAL_STR(s *ZendString)                 { ZVAL_STR(return_value, s) }
-func RETVAL_INTERNED_STR(s *ZendString)        { ZVAL_INTERNED_STR(return_value, s) }
-func RETVAL_NEW_STR(s *ZendString)             { ZVAL_NEW_STR(return_value, s) }
-func RETVAL_STR_COPY(s *ZendString)            { ZVAL_STR_COPY(return_value, s) }
+func RETVAL_STR(s *ZendString)                 { return_value.SetString(s) }
+func RETVAL_INTERNED_STR(s *ZendString)        { return_value.SetInternedString(s) }
+func RETVAL_NEW_STR(s *ZendString)             { return_value.SetString(s) }
+func RETVAL_STR_COPY(s *ZendString)            { return_value.SetStringCopy(s) }
 func RETVAL_STRING(s *byte)                    { ZVAL_STRING(return_value, s) }
 func RETVAL_STRINGL(s string, l int)           { ZVAL_STRINGL(return_value, s, l) }
 func RETVAL_EMPTY_STRING()                     { ZVAL_EMPTY_STRING(return_value) }
-func RETVAL_RES(r *ZendResource)               { ZVAL_RES(return_value, r) }
-func RETVAL_ARR(r *HashTable)                  { ZVAL_ARR(return_value, r) }
+func RETVAL_RES(r *ZendResource)               { return_value.SetResource(r) }
+func RETVAL_ARR(r *HashTable)                  { return_value.SetArray(r) }
 func RETVAL_EMPTY_ARRAY()                      { ZVAL_EMPTY_ARRAY(return_value) }
-func RETVAL_OBJ(r *ZendObject)                 { ZVAL_OBJ(return_value, r) }
+func RETVAL_OBJ(r *ZendObject)                 { return_value.SetObject(r) }
 func RETVAL_ZVAL(zv *Zval, copy int, dtor int) { ZVAL_ZVAL(return_value, zv, copy, dtor) }
 func HASH_OF(p *Zval) __auto__ {
 	if p.IsArray() {
@@ -401,7 +401,7 @@ func _ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_STR(_zv, str)
+		_zv.SetString(str)
 		break
 	}
 }
@@ -422,7 +422,7 @@ func _ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString, is_str int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_NEW_STR(_zv, str)
+		_zv.SetString(str)
 		break
 	}
 }
@@ -487,7 +487,7 @@ func _ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_ARR(_zv, arr)
+		_zv.SetArray(arr)
 		break
 	}
 }
@@ -508,7 +508,7 @@ func _ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_RES(_zv, res)
+		_zv.SetResource(res)
 		break
 	}
 }
@@ -611,7 +611,7 @@ func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
 		zv = ref.GetVal()
 	}
 	ZvalPtrDtor(zv)
-	ZVAL_ARR(zv, arr)
+	zv.SetArray(arr)
 	return zv
 }
 func ZendTryArrayInit(zv *Zval) *Zval { return ZendTryArrayInitSize(zv, 0) }
@@ -1211,7 +1211,7 @@ func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 				if z.IsString() {
 					ZVAL_COPY_VALUE(arg, z)
 				} else {
-					ZVAL_STR(arg, ZvalGetStringFunc(z))
+					arg.SetString(ZvalGetStringFunc(z))
 					ZvalPtrDtor(z)
 				}
 				*dest = arg.GetStr()
@@ -1716,7 +1716,7 @@ func ZendMergeProperties(obj *Zval, properties *HashTable) {
 		value = _z
 		if key != nil {
 			var member Zval
-			ZVAL_STR(&member, key)
+			member.SetString(key)
 			obj_ht.GetWriteProperty()(obj, &member, value, nil)
 		}
 	}
@@ -1844,7 +1844,7 @@ func ObjectPropertiesInitEx(object *ZendObject, properties *HashTable) {
 				} else {
 					ZVAL_COPY_VALUE(slot, prop)
 				}
-				ZVAL_INDIRECT(prop, slot)
+				prop.SetIndirect(slot)
 			}
 		}
 	}
@@ -1890,7 +1890,7 @@ func ObjectPropertiesLoad(object *ZendObject, properties *HashTable) {
 				ZVAL_COPY_VALUE(slot, prop)
 				ZvalAddRef(slot)
 				if object.GetProperties() != nil {
-					ZVAL_INDIRECT(&tmp, slot)
+					tmp.SetIndirect(slot)
 					object.GetProperties().KeyUpdate(key.GetStr(), &tmp)
 				}
 			} else {
@@ -1931,14 +1931,14 @@ func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties 
 	}
 	if class_type.GetCreateObject() == nil {
 		var obj *ZendObject = ZendObjectsNew(class_type)
-		ZVAL_OBJ(arg, obj)
+		arg.SetObject(obj)
 		if properties != nil {
 			ObjectPropertiesInitEx(obj, properties)
 		} else {
 			_objectPropertiesInit(obj, class_type)
 		}
 	} else {
-		ZVAL_OBJ(arg, class_type.GetCreateObject()(class_type))
+		arg.SetObject(class_type.GetCreateObject()(class_type))
 	}
 	return SUCCESS
 }
@@ -1949,7 +1949,7 @@ func ObjectInitEx(arg *Zval, class_type *ZendClassEntry) int {
 	return _objectAndPropertiesInit(arg, class_type, nil)
 }
 func ObjectInit(arg *Zval) int {
-	ZVAL_OBJ(arg, ZendObjectsNew(ZendStandardClassDef))
+	arg.SetObject(ZendObjectsNew(ZendStandardClassDef))
 	return SUCCESS
 }
 func AddAssocLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
@@ -1972,7 +1972,7 @@ func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
 }
 func AddAssocResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
-	ZVAL_RES(&tmp, r)
+	tmp.SetResource(r)
 	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
@@ -1984,7 +1984,7 @@ func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
 }
 func AddAssocStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
@@ -2024,7 +2024,7 @@ func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 }
 func AddIndexResource(arg *Zval, index ZendUlong, r *ZendResource) int {
 	var tmp Zval
-	ZVAL_RES(&tmp, r)
+	tmp.SetResource(r)
 	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
@@ -2036,7 +2036,7 @@ func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 }
 func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
 	var tmp Zval
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
@@ -2081,7 +2081,7 @@ func AddNextIndexBool(arg *Zval, b int) int {
 }
 func AddNextIndexResource(arg *Zval, r *ZendResource) int {
 	var tmp Zval
-	ZVAL_RES(&tmp, r)
+	tmp.SetResource(r)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
@@ -2099,7 +2099,7 @@ func AddNextIndexDouble(arg *Zval, d float64) int {
 }
 func AddNextIndexStr(arg *Zval, str *ZendString) int {
 	var tmp Zval
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
@@ -2177,7 +2177,7 @@ func AddPropertyNullEx(arg *Zval, key *byte, key_len int) int {
 }
 func AddPropertyResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
 	var tmp Zval
-	ZVAL_RES(&tmp, r)
+	tmp.SetResource(r)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -2189,7 +2189,7 @@ func AddPropertyDoubleEx(arg *Zval, key *byte, key_len int, d float64) int {
 }
 func AddPropertyStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
 	var tmp Zval
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	AddPropertyZvalEx(arg, key, key_len, &tmp)
 	ZvalPtrDtor(&tmp)
 	return SUCCESS
@@ -3285,7 +3285,7 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 			ZendSpprintf(error, 0, "class '%.*s' not found", int(name_len), name.GetVal())
 		}
 	}
-	ZSTR_ALLOCA_FREE(lcname, use_heap)
+	lcname.Free()
 	return ret
 }
 func ZendReleaseFcallInfoCache(fcc *ZendFcallInfoCache) {
@@ -3324,7 +3324,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 			ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable)-1, use_heap)
 			ZendStrTolowerCopy(lmname.GetVal(), Z_STRVAL_P(callable)+1, Z_STRLEN_P(callable)-1)
 			func_ = ZendFetchFunction(lmname)
-			ZSTR_ALLOCA_FREE(lmname, use_heap)
+			lmname.Free()
 		} else {
 			lmname = callable.GetStr()
 			func_ = ZendFetchFunction(lmname)
@@ -3332,7 +3332,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 				ZSTR_ALLOCA_ALLOC(lmname, Z_STRLEN_P(callable), use_heap)
 				ZendStrTolowerCopy(lmname.GetVal(), Z_STRVAL_P(callable), Z_STRLEN_P(callable))
 				func_ = ZendFetchFunction(lmname)
-				ZSTR_ALLOCA_FREE(lmname, use_heap)
+				lmname.Free()
 			}
 		}
 		if func_ != nil {
@@ -3789,7 +3789,7 @@ func ZendFcallInfoArgsEx(fci *ZendFcallInfo, func_ *ZendFunction, args *Zval) in
 
 		arg = _z
 		if func_ != nil && !(arg.IsReference()) && ARG_SHOULD_BE_SENT_BY_REF(func_, n) != 0 {
-			ZVAL_NEW_REF(params, arg)
+			params.SetNewRef(arg)
 			arg.TryAddRefcount()
 		} else {
 			ZVAL_COPY(params, arg)
@@ -4043,7 +4043,7 @@ func ZendTryAssignTypedRefEmptyString(ref *ZendReference) int {
 }
 func ZendTryAssignTypedRefStr(ref *ZendReference, str *ZendString) int {
 	var tmp Zval
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefString(ref *ZendReference, string *byte) int {
@@ -4058,12 +4058,12 @@ func ZendTryAssignTypedRefStringl(ref *ZendReference, string *byte, len_ int) in
 }
 func ZendTryAssignTypedRefArr(ref *ZendReference, arr *ZendArray) int {
 	var tmp Zval
-	ZVAL_ARR(&tmp, arr)
+	tmp.SetArray(arr)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefRes(ref *ZendReference, res *ZendResource) int {
 	var tmp Zval
-	ZVAL_RES(&tmp, res)
+	tmp.SetResource(res)
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefZval(ref *ZendReference, zv *Zval) int {
@@ -4107,12 +4107,12 @@ func ZendDeclarePropertyDouble(ce *ZendClassEntry, name *byte, name_length int, 
 }
 func ZendDeclarePropertyString(ce *ZendClassEntry, name string, name_length int, value string, access_type int) int {
 	var property Zval
-	ZVAL_NEW_STR(&property, ZendStringInit(value, strlen(value), ce.GetType()&ZEND_INTERNAL_CLASS))
+	property.SetString(ZendStringInit(value, strlen(value), ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclarePropertyStringl(ce *ZendClassEntry, name *byte, name_length int, value *byte, value_len int, access_type int) int {
 	var property Zval
-	ZVAL_NEW_STR(&property, ZendStringInit(value, value_len, ce.GetType()&ZEND_INTERNAL_CLASS))
+	property.SetString(ZendStringInit(value, value_len, ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
 func ZendDeclareClassConstantEx(ce *ZendClassEntry, name *ZendString, value *Zval, access_type int, doc_comment *ZendString) int {
@@ -4179,7 +4179,7 @@ func ZendDeclareClassConstantDouble(ce *ZendClassEntry, name *byte, name_length 
 }
 func ZendDeclareClassConstantStringl(ce *ZendClassEntry, name *byte, name_length int, value *byte, value_length int) int {
 	var constant Zval
-	ZVAL_NEW_STR(&constant, ZendStringInit(value, value_length, ce.GetType()&ZEND_INTERNAL_CLASS))
+	constant.SetString(ZendStringInit(value, value_length, ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareClassConstant(ce, name, name_length, &constant)
 }
 func ZendDeclareClassConstantString(ce *ZendClassEntry, name *byte, name_length int, value *byte) int {
@@ -4189,7 +4189,7 @@ func ZendUpdatePropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString,
 	var property Zval
 	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	ZVAL_STR(&property, name)
+	property.SetString(name)
 	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
 	EG__().SetFakeScope(old_scope)
 }
@@ -4233,7 +4233,7 @@ func ZendUpdatePropertyDouble(scope *ZendClassEntry, object *Zval, name *byte, n
 }
 func ZendUpdatePropertyStr(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *ZendString) {
 	var tmp Zval
-	ZVAL_STR(&tmp, value)
+	tmp.SetString(value)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
 func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte) {
@@ -4320,7 +4320,7 @@ func ZendReadPropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, s
 	var value *Zval
 	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	ZVAL_STR(&property, name)
+	property.SetString(name)
 	value = Z_OBJ_HT_P(object).GetReadProperty()(object, &property, b.Cond(silent != 0, BP_VAR_IS, BP_VAR_R), nil, rv)
 	EG__().SetFakeScope(old_scope)
 	return value

@@ -139,7 +139,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		/* Set peer_name or name verification will try to use the proxy server name */
 
 		if context == nil || b.Assign(&tmpzval, streams.PhpStreamContextGetOption(context, "ssl", "peer_name")) == nil {
-			zend.ZVAL_STR_COPY(&ssl_proxy_peer_name, resource.GetHost())
+			ssl_proxy_peer_name.SetStringCopy(resource.GetHost())
 			streams.PhpStreamContextSetOption(core.PHP_STREAM_CONTEXT(stream), "ssl", "peer_name", &ssl_proxy_peer_name)
 			zend.ZvalPtrDtor(&ssl_proxy_peer_name)
 		}

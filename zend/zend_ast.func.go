@@ -141,7 +141,7 @@ func ZendAstCreateZval(zv *Zval) *ZendAst {
 }
 func ZendAstCreateZvalFromStr(str *ZendString) *ZendAst {
 	var zv Zval
-	ZVAL_STR(&zv, str)
+	zv.SetString(str)
 	return ZendAstCreateZvalInt(&zv, 0, CG__().GetZendLineno())
 }
 func ZendAstCreateZvalFromLong(lval ZendLong) *ZendAst {
@@ -154,7 +154,7 @@ func ZendAstCreateConstant(name *ZendString, attr ZendAstAttr) *ZendAst {
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_zval"))
 	ast.SetKind(ZEND_AST_CONSTANT)
 	ast.SetAttr(attr)
-	ZVAL_STR(ast.GetVal(), name)
+	ast.GetVal().SetString(name)
 	ast.GetVal().GetLineno() = CG__().GetZendLineno()
 	return (*ZendAst)(ast)
 }
@@ -473,7 +473,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		break
 	case ZEND_AST_CONSTANT_CLASS:
 		if scope != nil {
-			ZVAL_STR_COPY(result, scope.GetName())
+			result.SetStringCopy(scope.GetName())
 		} else {
 			ZVAL_EMPTY_STRING(result)
 		}
@@ -484,13 +484,13 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			return FAILURE
 		}
 		if ast.GetAttr() == ZEND_FETCH_CLASS_SELF {
-			ZVAL_STR_COPY(result, scope.GetName())
+			result.SetStringCopy(scope.GetName())
 		} else if ast.GetAttr() == ZEND_FETCH_CLASS_PARENT {
 			if !(scope.GetParent()) {
 				ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 				return FAILURE
 			}
-			ZVAL_STR_COPY(result, scope.GetParent().name)
+			result.SetStringCopy(scope.GetParent().name)
 		} else {
 			ZEND_ASSERT(false)
 		}
@@ -691,7 +691,7 @@ func ZendAstTreeCopy(ast *ZendAst, buf any) any {
 		var new_ *ZendAstZval = (*ZendAstZval)(buf)
 		new_.SetKind(ZEND_AST_CONSTANT)
 		new_.SetAttr(ast.GetAttr())
-		ZVAL_STR_COPY(new_.GetVal(), ZendAstGetConstantName(ast))
+		new_.GetVal().SetStringCopy(ZendAstGetConstantName(ast))
 		buf = any((*byte)(buf + b.SizeOf("zend_ast_zval")))
 	} else if ZendAstIsList(ast) != 0 {
 		var list *ZendAstList = ZendAstGetList(ast)

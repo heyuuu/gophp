@@ -34,7 +34,7 @@ func ZendWeakrefFind(referent *Zval, return_value *Zval) ZendBool {
 		return 0
 	}
 	wr.GetStd().AddRefcount()
-	ZVAL_OBJ(return_value, wr.GetStd())
+	return_value.SetObject(wr.GetStd())
 	return 1
 }
 func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
@@ -48,7 +48,7 @@ func ZendWeakrefCreate(referent *Zval, return_value *Zval) {
 func ZendWeakrefGet(weakref *Zval, return_value *Zval) {
 	var wr *ZendWeakref = ZendWeakrefFetch(weakref)
 	if wr.GetReferent() != nil {
-		ZVAL_OBJ(return_value, wr.GetReferent())
+		return_value.SetObject(wr.GetReferent())
 		return_value.AddRefcount()
 	}
 }

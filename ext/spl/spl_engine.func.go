@@ -26,7 +26,7 @@ func SplInstantiateArgN(pce *zend.ZendClassEntry, retval *zend.Zval, argc int, a
 	var dummy zend.Zval
 	SplInstantiate(pce, retval)
 	fci.SetSize(b.SizeOf("zend_fcall_info"))
-	zend.ZVAL_STR(fci.GetFunctionName(), func_.GetFunctionName())
+	fci.GetFunctionName().SetString(func_.GetFunctionName())
 	fci.SetObject(retval.GetObj())
 	fci.SetRetval(&dummy)
 	fci.SetParamCount(argc)

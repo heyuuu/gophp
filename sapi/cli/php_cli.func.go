@@ -181,7 +181,7 @@ func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
 	return zend.SUCCESS
 }
 func INI_DEFAULT(name string, value string) {
-	zend.ZVAL_NEW_STR(&tmp, zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
+	tmp.SetString(zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
 	core.ConfigurationHash.KeyUpdate(b.CastStrAuto(name), &tmp)
 }
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
@@ -648,7 +648,7 @@ func DoCli(argc int, argv **byte) int {
 				var tmp zend.Zval
 				var msg *zend.Zval
 				var rv zend.Zval
-				zend.ZVAL_OBJ(&tmp, zend.EG__().GetException())
+				tmp.SetObject(zend.EG__().GetException())
 				msg = zend.ZendReadProperty(zend.ZendCeException, &tmp, "message", b.SizeOf("\"message\"")-1, 0, &rv)
 				zend.ZendPrintf("Exception: %s\n", zend.Z_STRVAL_P(msg))
 				zend.ZvalPtrDtor(&tmp)

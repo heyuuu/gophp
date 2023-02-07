@@ -978,7 +978,7 @@ func FcgiLoadenv(req *FcgiRequest, func_ FcgiApplyFunc, array *zend.Zval) {
 func FcgiSetMgmtVar(name string, name_len int, value string, value_len int) {
 	var zvalue zend.Zval
 	var key *zend.ZendString = zend.ZendStringInit(name, name_len, 1)
-	zend.ZVAL_NEW_STR(&zvalue, zend.ZendStringInit(value, value_len, 1))
+	zvalue.SetString(zend.ZendStringInit(value, value_len, 1))
 	zend.GC_MAKE_PERSISTENT_LOCAL(key)
 	zend.GC_MAKE_PERSISTENT_LOCAL(zvalue.GetStr())
 	FcgiMgmtVars.KeyAdd(key.GetStr(), &zvalue)

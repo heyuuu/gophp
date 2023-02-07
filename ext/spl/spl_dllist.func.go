@@ -866,7 +866,7 @@ func zim_spl_SplDoublyLinkedList___serialize(execute_data *zend.ZendExecuteData,
 
 	/* members */
 
-	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
+	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS))
 	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 }
@@ -969,7 +969,7 @@ func SplDllistGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int
 	iterator = zend.Emalloc(b.SizeOf("spl_dllist_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	object.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
+	iterator.GetIntern().GetIt().GetData().SetObject(object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplDllistItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.SetTraversePosition(dllist_object.GetTraversePosition())

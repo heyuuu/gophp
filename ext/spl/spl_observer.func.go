@@ -478,7 +478,7 @@ func zim_spl_SplObjectStorage_serialize(execute_data *zend.ZendExecuteData, retu
 	/* members */
 
 	buf.AppendString("m:")
-	zend.ZVAL_ARR(&members, zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS)))
+	members.SetArray(zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS)))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 	zend.ZvalPtrDtor(&members)
 
@@ -638,7 +638,7 @@ func zim_spl_SplObjectStorage___serialize(execute_data *zend.ZendExecuteData, re
 
 	/* members */
 
-	zend.ZVAL_ARR(&tmp, zend.ZendStdGetProperties(zend.ZEND_THIS))
+	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS))
 	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 }

@@ -397,10 +397,10 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 		}
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_RELEASE_THIS) != 0 {
-		ZVAL_OBJ(b.PostInc(&gc_buffer), execute_data.GetThis().GetObj())
+		b.PostInc(&gc_buffer).SetObject(execute_data.GetThis().GetObj())
 	}
 	if (EX_CALL_INFO() & ZEND_CALL_CLOSURE) != 0 {
-		ZVAL_OBJ(b.PostInc(&gc_buffer), ZEND_CLOSURE_OBJECT(EX(func_)))
+		b.PostInc(&gc_buffer).SetObject(ZEND_CLOSURE_OBJECT(EX(func_)))
 	}
 	if execute_data.GetOpline() != op_array.GetOpcodes() {
 		var i uint32
@@ -422,7 +422,7 @@ func ZendGeneratorGetGc(object *Zval, table **Zval, n *int) *HashTable {
 	if generator.GetNode().GetChildren() == 0 {
 		var root *ZendGenerator = generator.GetNode().GetRoot()
 		for root != generator {
-			ZVAL_OBJ(b.PostInc(&gc_buffer), root.GetStd())
+			b.PostInc(&gc_buffer).SetObject(root.GetStd())
 			root = ZendGeneratorGetChild(root.GetNode(), generator)
 		}
 	}
@@ -705,7 +705,7 @@ func ZendGeneratorGetNextDelegatedValue(generator *ZendGenerator) int {
 		ZVAL_COPY(generator.GetValue(), value)
 		ZvalPtrDtor(generator.GetKey())
 		if p.GetKey() != nil {
-			ZVAL_STR_COPY(generator.GetKey(), p.GetKey())
+			generator.GetKey().SetStringCopy(p.GetKey())
 		} else {
 			generator.GetKey().SetLong(p.GetH())
 		}
@@ -1197,7 +1197,7 @@ func ZendGeneratorGetIterator(ce *ZendClassEntry, object *Zval, by_ref int) *Zen
 	ZendIteratorInit(iterator)
 	iterator.SetFuncs(&ZendGeneratorIteratorFunctions)
 	object.AddRefcount()
-	ZVAL_OBJ(iterator.GetData(), object.GetObj())
+	iterator.GetData().SetObject(object.GetObj())
 	return iterator
 }
 func ZendRegisterGeneratorCe() {

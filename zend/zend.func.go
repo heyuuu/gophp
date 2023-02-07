@@ -229,7 +229,7 @@ func ZendMakePrintableZval(expr *Zval, expr_copy *Zval) int {
 	if expr.IsString() {
 		return 0
 	} else {
-		ZVAL_STR(expr_copy, ZvalGetStringFunc(expr))
+		expr_copy.SetString(ZvalGetStringFunc(expr))
 		return 1
 	}
 }
@@ -390,9 +390,9 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 
 	/* IS_ARRAY, but with ref-counter 1 and not IS_TYPE_REFCOUNTED */
 
-	ZVAL_ARR(&globals, EG__().GetSymbolTable())
+	globals.SetArray(EG__().GetSymbolTable())
 	globals.SetTypeFlags(0)
-	ZVAL_NEW_REF(&globals, &globals)
+	globals.SetNewRef(&globals)
 	EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &globals)
 	return 0
 }
@@ -735,7 +735,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			/* Handle the error in user space */
 
 			VaCopy(usr_copy, args)
-			ZVAL_STR(&params[1], ZendVstrpprintf(0, format, usr_copy))
+			params[1].SetString(ZendVstrpprintf(0, format, usr_copy))
 			va_end(usr_copy)
 			params[0].SetLong(type_)
 			if error_filename != nil {
@@ -751,7 +751,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			if symbol_table == nil {
 				params[4].SetNull()
 			} else {
-				ZVAL_ARR(&params[4], ZendArrayDup(symbol_table))
+				params[4].SetArray(ZendArrayDup(symbol_table))
 			}
 			ZVAL_COPY_VALUE(&orig_user_error_handler, EG__().GetUserErrorHandler())
 			EG__().GetUserErrorHandler().SetUndef()
@@ -1000,7 +1000,7 @@ func ZendUserExceptionHandler() {
 	var old_exception *ZendObject
 	old_exception = EG__().GetException()
 	EG__().SetException(nil)
-	ZVAL_OBJ(&params[0], old_exception)
+	params[0].SetObject(old_exception)
 	ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
 	if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
 		ZvalPtrDtor(&retval2)

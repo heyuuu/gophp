@@ -16,7 +16,7 @@ func ZendListInsert(ptr any, type_ int) *Zval {
 	} else if index == core.INT_MAX {
 		ZendErrorNoreturn(E_ERROR, "Resource ID space overflow")
 	}
-	ZVAL_NEW_RES(&zv, index, ptr, type_)
+	zv.SetNewResource(index, ptr, type_)
 	return EG__().GetRegularList().IndexAddNewH(index, &zv)
 }
 func ZendListDelete(res *ZendResource) int {
@@ -195,7 +195,7 @@ func ZendRegisterListDestructorsEx(ld RsrcDtorFuncT, pld RsrcDtorFuncT, type_nam
 	lde.SetModuleNumber(module_number)
 	lde.SetResourceId(ListDestructors.GetNNextFreeElement())
 	lde.SetTypeName(type_name)
-	ZVAL_PTR(&zv, lde)
+	zv.SetAsPtr(lde)
 	if ListDestructors.NextIndexInsert(&zv) == nil {
 		return FAILURE
 	}
@@ -233,7 +233,7 @@ func ZendRsrcListGetRsrcType(res *ZendResource) *byte {
 func ZendRegisterPersistentResourceEx(key *ZendString, rsrc_pointer any, rsrc_type int) *ZendResource {
 	var zv *Zval
 	var tmp Zval
-	ZVAL_NEW_PERSISTENT_RES(&tmp, -1, rsrc_pointer, rsrc_type)
+	tmp.SetNewResourcePersistent(-1, rsrc_pointer, rsrc_type)
 	GC_MAKE_PERSISTENT_LOCAL(tmp.GetCounted())
 	GC_MAKE_PERSISTENT_LOCAL(key)
 	zv = EG__().GetPersistentList().KeyUpdate(key.GetStr(), &tmp)

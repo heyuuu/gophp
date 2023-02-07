@@ -376,7 +376,7 @@ tail_call:
 			var zv *Zval
 			var end *Zval
 			var tmp Zval
-			ZVAL_OBJ(&tmp, obj)
+			tmp.SetObject(obj)
 			ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 			end = zv + n
 			if ht == nil || GC_REF_CHECK_COLOR(ht, GC_BLACK) {
@@ -497,7 +497,7 @@ func GcMarkGrey(ref *ZendRefcounted, stack *GcStack) {
 				var zv *Zval
 				var end *Zval
 				var tmp Zval
-				ZVAL_OBJ(&tmp, obj)
+				tmp.SetObject(obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
 				if ht == nil || GC_REF_CHECK_COLOR(ht, GC_GREY) {
@@ -684,7 +684,7 @@ tail_call:
 					var zv *Zval
 					var end *Zval
 					var tmp Zval
-					ZVAL_OBJ(&tmp, obj)
+					tmp.SetObject(obj)
 					ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 					end = zv + n
 					if ht == nil || !(GC_REF_CHECK_COLOR(ht, GC_GREY)) {
@@ -852,7 +852,7 @@ func GcCollectWhite(ref *ZendRefcounted, flags *uint32, stack *GcStack) int {
 				if (obj.GetGcFlags()&IS_OBJ_DESTRUCTOR_CALLED) == 0 && (obj.GetHandlers().GetDtorObj() != ZendObjectsDestroyObject || obj.GetCe().GetDestructor() != nil) {
 					*flags |= GC_HAS_DESTRUCTORS
 				}
-				ZVAL_OBJ(&tmp, obj)
+				tmp.SetObject(obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
 				if ht == nil || GC_REF_CHECK_COLOR(ht, GC_BLACK) {
@@ -1032,7 +1032,7 @@ tail_call:
 				var zv *Zval
 				var end *Zval
 				var tmp Zval
-				ZVAL_OBJ(&tmp, obj)
+				tmp.SetObject(obj)
 				ht = obj.GetHandlers().GetGetGc()(&tmp, &zv, &n)
 				end = zv + n
 				if ht == nil {

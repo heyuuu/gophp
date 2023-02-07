@@ -485,7 +485,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 			lc_name = zend.ZendStringExtend(lc_name, lc_name.GetLen()+b.SizeOf("uint32_t"), 0)
 			memcpy(lc_name.GetVal()+lc_name.GetLen()-b.SizeOf("uint32_t"), obj_ptr.GetHandle(), b.SizeOf("uint32_t"))
 			lc_name.GetVal()[lc_name.GetLen()] = '0'
-			zend.ZVAL_OBJ(alfi.GetObj(), obj_ptr)
+			alfi.GetObj().SetObject(obj_ptr)
 			alfi.GetObj().AddRefcount()
 		} else {
 			alfi.GetObj().SetUndef()
@@ -647,7 +647,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 		if b.Assign(&fptr, zend.ZendHashFindPtr(zend.EG__().GetFunctionTable(), zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))) {
 			var tmp zend.Zval
 			zend.ArrayInit(return_value)
-			zend.ZVAL_STR_COPY(&tmp, zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))
+			tmp.SetStringCopy(zend.ZSTR_KNOWN(zend.ZEND_STR_MAGIC_AUTOLOAD))
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 			return
 		}

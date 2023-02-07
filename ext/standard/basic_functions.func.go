@@ -2910,9 +2910,9 @@ func ZifIniGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else if val.GetLen() == 1 {
 		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 	} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
-		zend.ZVAL_NEW_STR(return_value, val.Copy())
+		return_value.SetString(val.Copy())
 	} else {
-		zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+		return_value.SetString(zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 	}
 }
 func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3037,7 +3037,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			} else {
 				if ini_entry.GetValue() != nil {
 					var zv zend.Zval
-					zend.ZVAL_STR_COPY(&zv, ini_entry.GetValue())
+					zv.SetStringCopy(ini_entry.GetValue())
 					return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), &zv)
 				} else {
 					return_value.GetArr().SymtableUpdate(ini_entry.GetName().GetStr(), zend.EG__().GetUninitializedZval())
@@ -3139,9 +3139,9 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else if val.GetLen() == 1 {
 			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 		} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
-			zend.ZVAL_NEW_STR(return_value, val.Copy())
+			return_value.SetString(val.Copy())
 		} else {
-			zend.ZVAL_NEW_STR(return_value, zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
+			return_value.SetString(zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 		}
 	} else {
 		zend.RETVAL_FALSE

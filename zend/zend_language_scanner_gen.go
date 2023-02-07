@@ -590,7 +590,7 @@ func CompileFilename(type_ int, filename *Zval) *ZendOpArray {
 	var retval *ZendOpArray
 	var opened_path *ZendString = nil
 	if filename.GetType() != IS_STRING {
-		ZVAL_STR(&tmp, ZvalGetString(filename))
+		tmp.SetString(ZvalGetString(filename))
 		filename = &tmp
 	}
 	ZendStreamInitFilename(&file_handle, Z_STRVAL_P(filename))
@@ -677,7 +677,7 @@ func CompileString(source_string *Zval, filename *byte) *ZendOpArray {
 	var op_array *ZendOpArray = nil
 	var tmp Zval
 	if source_string.GetType() != IS_STRING {
-		ZVAL_STR(&tmp, ZvalGetStringFunc(source_string))
+		tmp.SetString(ZvalGetStringFunc(source_string))
 	} else {
 		ZVAL_COPY(&tmp, source_string)
 	}
@@ -717,7 +717,7 @@ func HighlightString(str *Zval, syntax_highlighter_ini *ZendSyntaxHighlighterIni
 	var original_lex_state ZendLexState
 	var tmp Zval
 	if str.GetType() != IS_STRING {
-		ZVAL_STR(&tmp, ZvalGetStringFunc(str))
+		tmp.SetString(ZvalGetStringFunc(str))
 		str = &tmp
 	}
 	ZendSaveLexicalState(&original_lex_state)
@@ -781,7 +781,7 @@ func ZendCopyValue(zendlval *Zval, yytext *byte, yyleng int) {
 		ZVAL_STRINGL(zendlval, s, sz)
 		Efree(s)
 	} else if yyleng == 1 {
-		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*yytext))
+		zendlval.SetInternedString(ZSTR_CHAR(zend_uchar * yytext))
 	} else {
 		ZVAL_STRINGL(zendlval, yytext, yyleng)
 	}
@@ -798,7 +798,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 			if c == '\n' || c == '\r' {
 				CG__().GetZendLineno()++
 			}
-			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
+			zendlval.SetInternedString(ZSTR_CHAR(c))
 		}
 		goto skip_escape_conversion
 	}
@@ -1605,7 +1605,7 @@ yy10:
 			if c == '\n' || c == '\r' {
 				CG__().GetZendLineno()++
 			}
-			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
+			zendlval.SetInternedString(ZSTR_CHAR(c))
 		}
 		goto skip_escape_conversion
 	}
@@ -1662,7 +1662,7 @@ skip_escape_conversion:
 			Efree(str)
 		}
 		ZendStringReleaseEx(zendlval.GetStr(), 0)
-		ZVAL_STR(zendlval, new_str)
+		zendlval.SetString(new_str)
 	}
 	RETURN_TOKEN_WITH_VAL(T_CONSTANT_ENCAPSED_STRING)
 yy11:
@@ -8736,7 +8736,7 @@ yy623:
 yy624:
 	Yyleng = YYCURSOR - SCNG(yy_text)
 	if Yyleng == 1 {
-		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*Yytext))
+		zendlval.SetInternedString(ZSTR_CHAR(zend_uchar * Yytext))
 	} else {
 		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}
@@ -8898,7 +8898,7 @@ inline_char_handler:
 			Yyless(readsize)
 		}
 	} else if Yyleng == 1 {
-		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*Yytext))
+		zendlval.SetInternedString(ZSTR_CHAR(zend_uchar * Yytext))
 	} else {
 		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}

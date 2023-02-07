@@ -1160,9 +1160,9 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.IsIndirect() {
-					ZVAL_INDIRECT(dst, src.GetZv())
+					dst.SetIndirect(src.GetZv())
 				} else {
-					ZVAL_INDIRECT(dst, src)
+					dst.SetIndirect(src)
 				}
 				if dst == end {
 					break
@@ -1178,9 +1178,9 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.IsIndirect() {
-					ZVAL_INDIRECT(dst, src.GetZv())
+					dst.SetIndirect(src.GetZv())
 				} else {
-					ZVAL_INDIRECT(dst, src)
+					dst.SetIndirect(src)
 				}
 				if Z_INDIRECT_P(dst).IsConstant() {
 					ce.SetIsConstantsUpdated(false)
@@ -1195,9 +1195,9 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 				dst--
 				src--
 				if src.IsIndirect() {
-					ZVAL_INDIRECT(dst, src.GetZv())
+					dst.SetIndirect(src.GetZv())
 				} else {
-					ZVAL_INDIRECT(dst, src)
+					dst.SetIndirect(src)
 				}
 				if dst == end {
 					break
@@ -2321,7 +2321,7 @@ func CheckUnrecoverableLoadFailure(ce *ZendClassEntry) {
 		var exception_str *ZendString
 		var exception_zv Zval
 		ZEND_ASSERT(EG__().GetException() != nil && "Exception must have been thrown")
-		ZVAL_OBJ(&exception_zv, EG__().GetException())
+		exception_zv.SetObject(EG__().GetException())
 		exception_zv.AddRefcount()
 		ZendClearException()
 		exception_str = ZvalGetString(&exception_zv)

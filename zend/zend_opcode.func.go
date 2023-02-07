@@ -54,7 +54,7 @@ func InitOpArray(op_array *ZendOpArray, type_ ZendUchar, initial_ops_size int) {
 }
 func DestroyZendFunction(function *ZendFunction) {
 	var tmp Zval
-	ZVAL_PTR(&tmp, function)
+	tmp.SetAsPtr(function)
 	ZendFunctionDtor(&tmp)
 }
 func ZendFreeInternalArgInfo(function *ZendInternalFunction) {

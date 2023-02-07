@@ -675,7 +675,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	/* add the key elements */
 
 	if ZendHashGetCurrentKey(target_hash, &key, &num_key) == HASH_KEY_IS_STRING {
-		ZVAL_STR_COPY(&tmp, key)
+		tmp.SetStringCopy(key)
 		tmp.TryAddRefcount()
 	} else {
 		tmp.SetLong(num_key)
@@ -1638,10 +1638,10 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 		mptr = _z.GetPtr()
 		if mptr.IsPublic() || scope != nil && (mptr.IsProtected() && ZendCheckProtected(mptr.GetScope(), scope) != 0 || mptr.IsPrivate() && scope == mptr.GetScope()) {
 			if mptr.GetType() == ZEND_USER_FUNCTION && (mptr.GetOpArray().GetRefcount() == nil || mptr.op_array.refcount > 1) && key != nil && SameName(key, mptr.GetFunctionName()) == 0 {
-				ZVAL_STR_COPY(&method_name, ZendFindAliasName(mptr.GetScope(), key))
+				method_name.SetStringCopy(ZendFindAliasName(mptr.GetScope(), key))
 				return_value.GetArr().NextIndexInsertNew(&method_name)
 			} else {
-				ZVAL_STR_COPY(&method_name, mptr.GetFunctionName())
+				method_name.SetStringCopy(mptr.GetFunctionName())
 				return_value.GetArr().NextIndexInsertNew(&method_name)
 			}
 		}
@@ -1796,7 +1796,7 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		RETVAL_TRUE
 		return
 	}
-	ZVAL_STR(&property_z, property)
+	property_z.SetString(property)
 	if object.IsObject() && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
 		RETVAL_TRUE
 		return
@@ -2838,7 +2838,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 			} else {
 				lineno = skip.GetOpline().GetLineno()
 			}
-			ZVAL_STR_COPY(&tmp, filename)
+			tmp.SetStringCopy(filename)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
 			tmp.SetLong(lineno)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
@@ -2850,7 +2850,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 					break
 				}
 				if prev.GetFunc() != nil && ZEND_USER_CODE(prev.GetFunc().GetCommonType()) {
-					ZVAL_STR_COPY(&tmp, prev.GetFunc().GetOpArray().GetFilename())
+					tmp.SetStringCopy(prev.GetFunc().GetOpArray().GetFilename())
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FILE).GetStr(), &tmp)
 					tmp.SetLong(prev.GetOpline().GetLineno())
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_LINE).GetStr(), &tmp)
@@ -2881,28 +2881,28 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 			function_name = nil
 		}
 		if function_name != nil {
-			ZVAL_STR_COPY(&tmp, function_name)
+			tmp.SetStringCopy(function_name)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
 			if object != nil {
 				if func_.GetScope() != nil {
-					ZVAL_STR_COPY(&tmp, func_.GetScope().GetName())
+					tmp.SetStringCopy(func_.GetScope().GetName())
 				} else if object.GetHandlers().GetGetClassName() == ZendStdGetClassName {
-					ZVAL_STR_COPY(&tmp, object.GetCe().GetName())
+					tmp.SetStringCopy(object.GetCe().GetName())
 				} else {
-					ZVAL_STR(&tmp, object.GetHandlers().GetGetClassName()(object))
+					tmp.SetString(object.GetHandlers().GetGetClassName()(object))
 				}
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
 				if (options & DEBUG_BACKTRACE_PROVIDE_OBJECT) != 0 {
-					ZVAL_OBJ(&tmp, object)
+					tmp.SetObject(object)
 					stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_OBJECT).GetStr(), &tmp)
 					tmp.AddRefcount()
 				}
-				ZVAL_INTERNED_STR(&tmp, ZSTR_KNOWN(ZEND_STR_OBJECT_OPERATOR))
+				tmp.SetInternedString(ZSTR_KNOWN(ZEND_STR_OBJECT_OPERATOR))
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
 			} else if func_.GetScope() != nil {
-				ZVAL_STR_COPY(&tmp, func_.GetScope().GetName())
+				tmp.SetStringCopy(func_.GetScope().GetName())
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_CLASS).GetStr(), &tmp)
-				ZVAL_INTERNED_STR(&tmp, ZSTR_KNOWN(ZEND_STR_PAAMAYIM_NEKUDOTAYIM))
+				tmp.SetInternedString(ZSTR_KNOWN(ZEND_STR_PAAMAYIM_NEKUDOTAYIM))
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_TYPE).GetStr(), &tmp)
 			}
 			if (options&DEBUG_BACKTRACE_IGNORE_ARGS) == 0 && func_.GetType() != ZEND_EVAL_CODE {
@@ -2957,11 +2957,11 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				   if we have called include in the frame above - this is the file we have included.
 				*/
 
-				ZVAL_STR_COPY(&tmp, include_filename)
+				tmp.SetStringCopy(include_filename)
 				arg_array.GetArr().NextIndexInsertNew(&tmp)
 				stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_ARGS).GetStr(), &arg_array)
 			}
-			ZVAL_INTERNED_STR(&tmp, pseudo_function_name)
+			tmp.SetInternedString(pseudo_function_name)
 			stack_frame.GetArr().KeyAddNew(ZSTR_KNOWN(ZEND_STR_FUNCTION).GetStr(), &tmp)
 		}
 		return_value.GetArr().NextIndexInsertNew(&stack_frame)

@@ -23,14 +23,14 @@ func IZvalPtrDtor(zval_ptr *Zval) {
 }
 func ZvalCopyCtor(zvalue *Zval) {
 	if zvalue.IsArray() {
-		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
+		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsRefcounted() {
 		zvalue.AddRefcount()
 	}
 }
 func ZvalOptCopyCtor(zvalue *Zval) {
 	if zvalue.IsArray() {
-		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
+		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsRefcounted() {
 		zvalue.AddRefcount()
 	}
@@ -82,9 +82,9 @@ func ZvalAddRef(p *Zval) {
 }
 func ZvalCopyCtorFunc(zvalue *Zval) {
 	if zvalue.IsArray() {
-		ZVAL_ARR(zvalue, ZendArrayDup(zvalue.GetArr()))
+		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
 	} else if zvalue.IsString() {
 		ZEND_ASSERT(true)
-		ZVAL_NEW_STR(zvalue, zvalue.GetStr().Dup(0))
+		zvalue.SetString(zvalue.GetStr().Dup(0))
 	}
 }

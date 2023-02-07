@@ -261,7 +261,7 @@ func UnserializeAllowedClass(class_name *zend.ZendString, var_hashx *PhpUnserial
 	zend.ZSTR_ALLOCA_ALLOC(lcname, class_name.GetLen(), use_heap)
 	zend.ZendStrTolowerCopy(lcname.GetVal(), class_name.GetVal(), class_name.GetLen())
 	res = zend.ZendHashExists(classes, lcname)
-	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
+	lcname.Free()
 	return res
 }
 func ParseIv2(p *uint8, q **uint8) zend.ZendLong {
@@ -397,7 +397,7 @@ func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnse
 							new_key = unmangled
 						}
 						zend.ZvalPtrDtorStr(&key)
-						zend.ZVAL_STR(&key, new_key)
+						key.SetString(new_key)
 					} else {
 						zend.ZendStringReleaseEx(unmangled, 0)
 					}
@@ -841,7 +841,7 @@ yy18:
 		/* Call unserialize callback */
 
 		zend.ZVAL_STRING(&user_func, core.PG(unserialize_callback_func))
-		zend.ZVAL_STR_COPY(&args[0], class_name)
+		args[0].SetStringCopy(class_name)
 		BG(serialize_lock)++
 		if zend.CallUserFunctionEx(nil, nil, &user_func, &retval, 1, args, 0, nil) != zend.SUCCESS {
 			BG(serialize_lock)--
@@ -1039,7 +1039,7 @@ yy30:
 	}
 	YYCURSOR += 2
 	*p = YYCURSOR
-	zend.ZVAL_STR(rval, str)
+	rval.SetString(str)
 	return 1
 yy35:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -1093,9 +1093,9 @@ yy36:
 	if len_ == 0 {
 		zend.ZVAL_EMPTY_STRING(rval)
 	} else if len_ == 1 {
-		zend.ZVAL_INTERNED_STR(rval, zend.ZSTR_CHAR(zend_uchar*str))
+		rval.SetInternedString(zend.ZSTR_CHAR(zend_uchar * str))
 	} else if as_key != 0 {
-		zend.ZVAL_STR(rval, zend.ZendStringInitInterned(str, len_, 0))
+		rval.SetString(zend.ZendStringInitInterned(str, len_, 0))
 	} else {
 		zend.ZVAL_STRINGL(rval, str, len_)
 	}
@@ -1513,7 +1513,7 @@ yy85:
 		if var_hash.GetRefProps() != nil {
 			info = zend.ZendHashIndexFindPtr(var_hash.GetRefProps(), zend.ZendUintptrT(rval_ref))
 		}
-		zend.ZVAL_NEW_REF(rval_ref, rval_ref)
+		rval_ref.SetNewRef(rval_ref)
 		if info != nil {
 			zend.ZEND_REF_ADD_TYPE_SOURCE(rval_ref.GetRef(), info)
 		}

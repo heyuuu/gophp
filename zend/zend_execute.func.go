@@ -566,7 +566,7 @@ func _getObjZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_
 func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	var ref *ZendReference
 	if !(value_ptr.IsReference()) {
-		ZVAL_NEW_REF(value_ptr, value_ptr)
+		value_ptr.SetNewRef(value_ptr)
 	} else if variable_ptr == value_ptr {
 		return
 	}
@@ -575,14 +575,14 @@ func ZendAssignToVariableReference(variable_ptr *Zval, value_ptr *Zval) {
 	if variable_ptr.IsRefcounted() {
 		var garbage *ZendRefcounted = variable_ptr.GetCounted()
 		if garbage.DelRefcount() == 0 {
-			ZVAL_REF(variable_ptr, ref)
+			variable_ptr.SetReference(ref)
 			RcDtorFunc(garbage)
 			return
 		} else {
 			GcCheckPossibleRoot(garbage)
 		}
 	}
-	ZVAL_REF(variable_ptr, ref)
+	variable_ptr.SetReference(ref)
 }
 func ZendAssignToTypedPropertyReference(prop_info *ZendPropertyInfo, prop *Zval, value_ptr *Zval, _ EXECUTE_DATA_D) *Zval {
 	if ZendVerifyPropAssignableByRef(prop_info, value_ptr, EX_USES_STRICT_TYPES()) == 0 {
@@ -1446,14 +1446,14 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 		/* Extend string if needed */
 
 		var old_len ZendLong = Z_STRLEN_P(str)
-		ZVAL_NEW_STR(str, ZendStringExtend(str.GetStr(), offset+1, 0))
+		str.SetString(ZendStringExtend(str.GetStr(), offset+1, 0))
 		memset(Z_STRVAL_P(str)+old_len, ' ', offset-old_len)
 		Z_STRVAL_P(str)[offset+1] = 0
 	} else if !(str.IsRefcounted()) {
-		ZVAL_NEW_STR(str, ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
+		str.SetString(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 	} else if str.GetRefcount() > 1 {
 		str.DelRefcount()
-		ZVAL_NEW_STR(str, ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
+		str.SetString(ZendStringInit(Z_STRVAL_P(str), Z_STRLEN_P(str), 0))
 	} else {
 		ZendStringForgetHashVal(str.GetStr())
 	}
@@ -1462,7 +1462,7 @@ func ZendAssignToStringOffset(str *Zval, dim *Zval, value *Zval, opline *ZendOp,
 
 		/* Return the new character */
 
-		ZVAL_INTERNED_STR(EX_VAR(opline.GetResult().GetVar()), ZSTR_CHAR(c))
+		EX_VAR(opline.GetResult().GetVar()).SetInternedString(ZSTR_CHAR(c))
 
 		/* Return the new character */
 
@@ -1637,7 +1637,7 @@ func ZendPostIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *
 	var obj Zval
 	var z *Zval
 	var z_copy Zval
-	ZVAL_OBJ(&obj, object.GetObj())
+	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
@@ -1670,7 +1670,7 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 	var z *Zval
 	var obj Zval
 	var z_copy Zval
-	ZVAL_OBJ(&obj, object.GetObj())
+	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
@@ -1707,7 +1707,7 @@ func ZendAssignOpOverloadedProperty(object *Zval, property *Zval, cache_slot *an
 	var rv Zval
 	var obj Zval
 	var res Zval
-	ZVAL_OBJ(&obj, object.GetObj())
+	obj.SetObject(object.GetObj())
 	obj.AddRefcount()
 	z = Z_OBJ_HT(obj).GetReadProperty()(&obj, property, BP_VAR_R, cache_slot, &rv)
 	if EG__().GetException() != nil {
@@ -2026,7 +2026,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 				return
 			}
 		}
-		ZVAL_INDIRECT(result, retval)
+		result.SetIndirect(retval)
 		return
 	} else if container.IsReference() {
 		var ref *ZendReference = container.GetRef()
@@ -2082,7 +2082,7 @@ func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_typ
 				ZVAL_UNREF(retval)
 			}
 			if result != retval {
-				ZVAL_INDIRECT(result, retval)
+				result.SetIndirect(retval)
 			}
 		} else {
 			result.IsError()
@@ -2200,7 +2200,7 @@ func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim
 				real_offset = offset
 			}
 			c = ZendUchar(Z_STRVAL_P(container)[real_offset])
-			ZVAL_INTERNED_STR(result, ZSTR_CHAR(c))
+			result.SetInternedString(ZSTR_CHAR(c))
 		}
 	} else if container.IsObject() {
 		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.IsUndef() {
@@ -2552,7 +2552,7 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 				}
 				ptr.SetNull()
 			}
-			ZVAL_NEW_REF(ptr, ptr)
+			ptr.SetNewRef(ptr)
 			ZEND_REF_ADD_TYPE_SOURCE(ptr.GetRef(), prop_info)
 		}
 		break
@@ -2593,7 +2593,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 		if IS_VALID_PROPERTY_OFFSET(prop_offset) {
 			ptr = OBJ_PROP(zobj, prop_offset)
 			if ptr.GetType() != IS_UNDEF {
-				ZVAL_INDIRECT(result, ptr)
+				result.SetIndirect(ptr)
 				if flags != 0 {
 					var prop_info *ZendPropertyInfo = CACHED_PTR_EX(cache_slot + 2)
 					if prop_info != nil {
@@ -2611,7 +2611,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 			}
 			ptr = zobj.GetProperties().KeyFind(prop_ptr.GetStr().GetStr())
 			if ptr != nil {
-				ZVAL_INDIRECT(result, ptr)
+				result.SetIndirect(ptr)
 				return
 			}
 		}
@@ -2633,7 +2633,7 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 		result.IsError()
 		return
 	}
-	ZVAL_INDIRECT(result, ptr)
+	result.SetIndirect(ptr)
 	if flags != 0 {
 		var prop_info *ZendPropertyInfo
 		if prop_op_type == IS_CONST {
@@ -3046,7 +3046,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 	switch type_ {
 	case BP_VAR_R:
 		if EX(This).u1.v.type_ == IS_OBJECT {
-			ZVAL_OBJ(result, EX(This).GetObj())
+			result.SetObject(EX(This).GetObj())
 			result.AddRefcount()
 		} else {
 			result.SetNull()
@@ -3055,7 +3055,7 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 		break
 	case BP_VAR_IS:
 		if EX(This).u1.v.type_ == IS_OBJECT {
-			ZVAL_OBJ(result, EX(This).GetObj())
+			result.SetObject(EX(This).GetObj())
 			result.AddRefcount()
 		} else {
 			result.SetNull()
@@ -3758,7 +3758,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		if tmp == nil {
 			return nil
 		}
-		ZVAL_STR(&tmp_inc_filename, tmp)
+		tmp_inc_filename.SetString(tmp)
 		inc_filename = &tmp_inc_filename
 	}
 	switch type_ {
@@ -3882,7 +3882,7 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_
 		return 1
 	}
 	iter.SetIndex(-1)
-	ZVAL_OBJ(EX_VAR(opline.GetResult().GetVar()), iter.GetStd())
+	EX_VAR(opline.GetResult().GetVar()).SetObject(iter.GetStd())
 	EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
@@ -3919,7 +3919,7 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 			if (opline.GetOp1().GetNum() & IS_CONSTANT_UNQUALIFIED) != 0 {
 				var actual *byte = (*byte)(ZendMemrchr(Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())), '\\', Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))))
 				if actual == nil {
-					ZVAL_STR_COPY(EX_VAR(opline.GetResult().GetVar()), RT_CONSTANT(opline, opline.GetOp2()).GetStr())
+					EX_VAR(opline.GetResult().GetVar()).SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
 				} else {
 					actual++
 					ZVAL_STRINGL(EX_VAR(opline.GetResult().GetVar()), actual, Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))-(actual-Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2()))))

@@ -1121,7 +1121,7 @@ again:
 			var data *zend.Zval
 			var index zend.ZendUlong
 			struc.AddRefcount()
-			zend.ZVAL_OBJ(&obj, struc.GetObj())
+			obj.SetObject(struc.GetObj())
 			if PhpVarSerializeCallMagicSerialize(&retval, &obj) == zend.FAILURE {
 				if zend.EG__().GetException() == nil {
 					buf.AppendString("N;")
@@ -1192,7 +1192,7 @@ again:
 			var retval zend.Zval
 			var tmp zend.Zval
 			struc.AddRefcount()
-			zend.ZVAL_OBJ(&tmp, struc.GetObj())
+			tmp.SetObject(struc.GetObj())
 			if PhpVarSerializeCallSleep(&retval, &tmp) == zend.FAILURE {
 				if zend.EG__().GetException() == nil {
 

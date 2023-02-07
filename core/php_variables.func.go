@@ -22,9 +22,9 @@ func PhpRegisterVariableSafe(var_ *byte, strval *byte, str_len int, track_vars_a
 	if str_len == 0 {
 		zend.ZVAL_EMPTY_STRING(&new_entry)
 	} else if str_len == 1 {
-		zend.ZVAL_INTERNED_STR(&new_entry, zend.ZSTR_CHAR(zend_uchar*strval))
+		new_entry.SetInternedString(zend.ZSTR_CHAR(zend_uchar * strval))
 	} else {
-		zend.ZVAL_NEW_STR(&new_entry, zend.ZendStringInit(strval, str_len, 0))
+		new_entry.SetString(zend.ZendStringInit(strval, str_len, 0))
 	}
 	PhpRegisterVariableEx(var_, &new_entry, track_vars_array)
 }
@@ -507,9 +507,9 @@ func ImportEnvironmentVariable(ht *zend.HashTable, env *byte) {
 	if len_ == 0 {
 		zend.ZVAL_EMPTY_STRING(&val)
 	} else if len_ == 1 {
-		zend.ZVAL_INTERNED_STR(&val, zend.ZSTR_CHAR(zend_uchar*p))
+		val.SetInternedString(zend.ZSTR_CHAR(zend_uchar * p))
 	} else {
-		zend.ZVAL_NEW_STR(&val, zend.ZendStringInit(p, len_, 0))
+		val.SetString(zend.ZendStringInit(p, len_, 0))
 	}
 	if zend.ZEND_HANDLE_NUMERIC_STR(env, name_len, &idx) {
 		ht.IndexUpdateH(idx, &val)

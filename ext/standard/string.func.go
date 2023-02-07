@@ -659,7 +659,7 @@ func PhpDoTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 		}
 		break
 	}
-	zend.ZVAL_STR(return_value, PhpTrimInt(str, b.CondF1(what != nil, func() []byte { return what.GetVal() }, nil), b.CondF1(what != nil, func() int { return what.GetLen() }, 0), mode))
+	return_value.SetString(PhpTrimInt(str, b.CondF1(what != nil, func() []byte { return what.GetVal() }, nil), b.CondF1(what != nil, func() int { return what.GetLen() }, 0), mode))
 }
 func ZifTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpDoTrim(execute_data, return_value, 3)
@@ -901,7 +901,7 @@ func PhpExplode(delim *zend.ZendString, str *zend.ZendString, return_value *zend
 	var p2 *byte = core.PhpMemnstr(str.GetVal(), delim.GetVal(), delim.GetLen(), endp)
 	var tmp zend.Zval
 	if p2 == nil {
-		zend.ZVAL_STR_COPY(&tmp, str)
+		tmp.SetStringCopy(str)
 		return_value.GetArr().NextIndexInsertNew(&tmp)
 	} else {
 		for {
@@ -909,7 +909,7 @@ func PhpExplode(delim *zend.ZendString, str *zend.ZendString, return_value *zend
 			if l == 0 {
 				zend.ZVAL_EMPTY_STRING(&tmp)
 			} else if l == 1 {
-				zend.ZVAL_INTERNED_STR(&tmp, zend.ZSTR_CHAR(zend_uchar(*p1)))
+				tmp.SetInternedString(zend.ZSTR_CHAR(zend_uchar(*p1)))
 			} else {
 				zend.ZVAL_STRINGL(&tmp, p1, p2-p1)
 			}
@@ -1068,7 +1068,7 @@ func ZifExplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else if limit < 0 {
 		PhpExplodeNegativeLimit(delim, str, return_value, limit)
 	} else {
-		zend.ZVAL_STR_COPY(&tmp, str)
+		tmp.SetStringCopy(str)
 		return_value.GetArr().IndexAddNewH(0, &tmp)
 	}
 }
@@ -2777,7 +2777,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		needle = zneedle.GetStr()
 	} else {
 		if PhpNeedleChar(zneedle, ord_needle.GetVal()) != zend.SUCCESS {
-			zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+			ord_needle.Free()
 			zend.RETVAL_FALSE
 			return
 		}
@@ -2786,7 +2786,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		needle = ord_needle
 	}
 	if haystack.GetLen() == 0 || needle.GetLen() == 0 {
-		zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+		ord_needle.Free()
 		zend.RETVAL_FALSE
 		return
 	}
@@ -2797,7 +2797,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		if offset >= 0 {
 			if int(offset > haystack.GetLen()) != 0 {
-				zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+				ord_needle.Free()
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
 				zend.RETVAL_FALSE
 				return
@@ -2807,7 +2807,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else {
 			p = haystack.GetVal()
 			if offset < -core.INT_MAX || size_t(-offset) > haystack.GetLen() {
-				zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+				ord_needle.Free()
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
 				zend.RETVAL_FALSE
 				return
@@ -2820,13 +2820,13 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		(*zend.ZSTR_VAL)(ord_needle) = tolower((*zend.ZSTR_VAL)(needle))
 		for e >= p {
 			if tolower(*e) == (*zend.ZSTR_VAL)(ord_needle) {
-				zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+				ord_needle.Free()
 				zend.RETVAL_LONG(e - p + b.Cond(offset > 0, offset, 0))
 				return
 			}
 			e--
 		}
-		zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+		ord_needle.Free()
 		zend.RETVAL_FALSE
 		return
 	}
@@ -2834,7 +2834,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if offset >= 0 {
 		if int(offset > haystack.GetLen()) != 0 {
 			zend.ZendStringReleaseEx(haystack_dup, 0)
-			zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+			ord_needle.Free()
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
 			zend.RETVAL_FALSE
 			return
@@ -2844,7 +2844,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else {
 		if offset < -core.INT_MAX || size_t(-offset) > haystack.GetLen() {
 			zend.ZendStringReleaseEx(haystack_dup, 0)
-			zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+			ord_needle.Free()
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Offset is greater than the length of haystack string")
 			zend.RETVAL_FALSE
 			return
@@ -2861,11 +2861,11 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.RETVAL_LONG(found - haystack_dup.GetVal())
 		zend.ZendStringReleaseEx(needle_dup, 0)
 		zend.ZendStringReleaseEx(haystack_dup, 0)
-		zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+		ord_needle.Free()
 	} else {
 		zend.ZendStringReleaseEx(needle_dup, 0)
 		zend.ZendStringReleaseEx(haystack_dup, 0)
-		zend.ZSTR_ALLOCA_FREE(ord_needle, use_heap)
+		ord_needle.Free()
 		zend.RETVAL_FALSE
 		return
 	}
@@ -3597,7 +3597,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			result.GetVal()[result.GetLen()] = '0'
 			if str_index != nil {
 				var tmp zend.Zval
-				zend.ZVAL_NEW_STR(&tmp, result)
+				tmp.SetString(result)
 				return_value.GetArr().SymtableUpdate(str_index.GetStr(), &tmp)
 			} else {
 				zend.AddIndexStr(return_value, num_index, result)
@@ -3863,7 +3863,7 @@ func ZifChr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	c &= 0xff
-	zend.ZVAL_INTERNED_STR(return_value, zend.ZSTR_CHAR(c))
+	return_value.SetInternedString(zend.ZSTR_CHAR(c))
 }
 func PhpUcfirst(str *zend.ZendString) *zend.ZendString {
 	var ch uint8 = str.GetVal()[0]
@@ -5735,24 +5735,24 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 				}
 			}
 		}
-		zend.ZVAL_STR(result, subject_str)
+		result.SetString(subject_str)
 		if lc_subject_str != nil {
 			zend.ZendStringReleaseEx(lc_subject_str, 0)
 		}
 	} else {
 		zend.ZEND_ASSERT(search.IsType(zend.IS_STRING))
 		if zend.Z_STRLEN_P(search) == 1 {
-			zend.ZVAL_STR(result, PhpCharToStrEx(subject_str, zend.Z_STRVAL_P(search)[0], zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), case_sensitivity, &replace_count))
+			result.SetString(PhpCharToStrEx(subject_str, zend.Z_STRVAL_P(search)[0], zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), case_sensitivity, &replace_count))
 		} else if zend.Z_STRLEN_P(search) > 1 {
 			if case_sensitivity != 0 {
-				zend.ZVAL_STR(result, PhpStrToStrEx(subject_str, zend.Z_STRVAL_P(search), zend.Z_STRLEN_P(search), zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), &replace_count))
+				result.SetString(PhpStrToStrEx(subject_str, zend.Z_STRVAL_P(search), zend.Z_STRLEN_P(search), zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), &replace_count))
 			} else {
 				lc_subject_str = PhpStringTolower(subject_str)
-				zend.ZVAL_STR(result, PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search.GetStr(), zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), &replace_count))
+				result.SetString(PhpStrToStrIEx(subject_str, lc_subject_str.GetVal(), search.GetStr(), zend.Z_STRVAL_P(replace), zend.Z_STRLEN_P(replace), &replace_count))
 				zend.ZendStringReleaseEx(lc_subject_str, 0)
 			}
 		} else {
-			zend.ZVAL_STR_COPY(result, subject_str)
+			result.SetStringCopy(subject_str)
 		}
 	}
 	zend.ZendTmpStringRelease(tmp_subject_str)
@@ -6649,7 +6649,7 @@ func ZifParseStr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
 		symbol_table = zend.ZendRebuildSymbolTable()
-		zend.ZVAL_ARR(&tmp, symbol_table)
+		tmp.SetArray(symbol_table)
 		core.sapi_module.GetTreatData()(core.PARSE_STRING, res, &tmp)
 		if zend.ZendHashDel(symbol_table, zend.ZSTR_KNOWN(zend.ZEND_STR_THIS)) == zend.SUCCESS {
 			zend.ZendThrowError(nil, "Cannot re-assign $this")

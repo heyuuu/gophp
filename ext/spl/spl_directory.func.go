@@ -254,7 +254,7 @@ func SplFilesystemFileOpen(intern *SplFilesystemObject, use_include_path int, si
 
 	/* avoid reference counting in debug mode, thus do it manually */
 
-	zend.ZVAL_RES(intern.GetZresource(), intern.GetStream().GetRes())
+	intern.GetZresource().SetResource(intern.GetStream().GetRes())
 
 	/*!!! TODO: maybe bug?
 	  Z_SET_REFCOUNT(intern->u.file.zresource, 1);
@@ -362,7 +362,7 @@ func SplFilesystemObjectCreateInfo(source *SplFilesystemObject, file_path *byte,
 	}
 	zend.ZendUpdateClassConstants(ce)
 	intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-	zend.ZVAL_OBJ(return_value, intern.GetStd())
+	return_value.SetObject(intern.GetStd())
 	if ce.GetConstructor().GetScope() != spl_ce_SplFileInfo {
 		zend.ZVAL_STRINGL(&arg1, file_path, file_path_len)
 		zend.ZendCallMethodWith1Params(return_value, ce, ce.GetConstructor(), "__construct", nil, &arg1)
@@ -403,7 +403,7 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 			break
 		}
 		intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-		zend.ZVAL_OBJ(return_value, intern.GetStd())
+		return_value.SetObject(intern.GetStd())
 		SplFilesystemObjectGetFileName(source)
 		if ce.GetConstructor().GetScope() != spl_ce_SplFileInfo {
 			zend.ZVAL_STRINGL(&arg1, source.GetFileName(), source.GetFileNameLen())
@@ -426,7 +426,7 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 			break
 		}
 		intern = SplFilesystemFromObj(SplFilesystemObjectNewEx(ce))
-		zend.ZVAL_OBJ(return_value, intern.GetStd())
+		return_value.SetObject(intern.GetStd())
 		SplFilesystemObjectGetFileName(source)
 		if ce.GetConstructor().GetScope() != spl_ce_SplFileObject {
 			zend.ZVAL_STRINGL(&arg1, source.GetFileName(), source.GetFileNameLen())
@@ -646,7 +646,7 @@ func zim_spl_DirectoryIterator_current(execute_data *zend.ZendExecuteData, retur
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
+	return_value.SetObject(zend.ZEND_THIS.GetObj())
 	return_value.AddRefcount()
 }
 func zim_spl_DirectoryIterator_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -869,7 +869,7 @@ func zim_spl_FilesystemIterator_current(execute_data *zend.ZendExecuteData, retu
 		SplFilesystemObjectGetFileName(intern)
 		SplFilesystemObjectCreateType(0, intern, SPL_FS_INFO, nil, return_value)
 	} else {
-		zend.ZVAL_OBJ(return_value, zend.ZEND_THIS.GetObj())
+		return_value.SetObject(zend.ZEND_THIS.GetObj())
 		return_value.AddRefcount()
 	}
 }
@@ -1326,7 +1326,7 @@ func SplFilesystemDirGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	object.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
+	iterator.GetIntern().GetData().SetObject(object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemDirItFuncs)
 
 	/* ->current must be initialized; rewind doesn't set it and valid
@@ -1452,7 +1452,7 @@ func SplFilesystemTreeGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by
 	dir_object = Z_SPLFILESYSTEM_P(object)
 	iterator = SplFilesystemObjectToIterator(dir_object)
 	object.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), object.GetObj())
+	iterator.GetIntern().GetData().SetObject(object.GetObj())
 	iterator.GetIntern().SetFuncs(&SplFilesystemTreeItFuncs)
 	return iterator.GetIntern()
 }
@@ -1548,7 +1548,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	fci.SetParamCount(num_args)
 	fci.SetParams(params)
 	fci.SetNoSeparation(1)
-	zend.ZVAL_STR(fci.GetFunctionName(), func_ptr.GetFunctionName())
+	fci.GetFunctionName().SetString(func_ptr.GetFunctionName())
 	fcic.SetFunctionHandler(func_ptr)
 	fcic.SetCalledScope(nil)
 	fcic.SetObject(nil)

@@ -179,7 +179,7 @@ func BrowscapInternStrCi(ctx *BrowscapParserCtx, str *zend.ZendString, persisten
 		}
 		zend.ZendHashAddNewPtr(ctx.GetStrInterned(), interned, interned)
 	}
-	zend.ZSTR_ALLOCA_FREE(lcname, use_heap)
+	lcname.Free()
 	return interned
 }
 func BrowscapAddKv(bdata *BrowserData, key *zend.ZendString, value *zend.ZendString, persistent zend.ZendBool) {
@@ -195,16 +195,16 @@ func BrowscapEntryToArray(bdata *BrowserData, entry *BrowscapEntry) *zend.HashTa
 	var tmp zend.Zval
 	var i uint32
 	var ht *zend.HashTable = zend.ZendNewArray(8)
-	zend.ZVAL_STR(&tmp, BrowscapConvertPattern(entry.GetPattern(), 0))
+	tmp.SetString(BrowscapConvertPattern(entry.GetPattern(), 0))
 	ht.KeyAdd("browser_name_regex", &tmp)
-	zend.ZVAL_STR_COPY(&tmp, entry.GetPattern())
+	tmp.SetStringCopy(entry.GetPattern())
 	ht.KeyAdd("browser_name_pattern", &tmp)
 	if entry.GetParent() != nil {
-		zend.ZVAL_STR_COPY(&tmp, entry.GetParent())
+		tmp.SetStringCopy(entry.GetParent())
 		ht.KeyAdd("parent", &tmp)
 	}
 	for i = entry.GetKvStart(); i < entry.GetKvEnd(); i++ {
-		zend.ZVAL_STR_COPY(&tmp, bdata.GetKv()[i].GetValue())
+		tmp.SetStringCopy(bdata.GetKv()[i].GetValue())
 		ht.KeyAdd(bdata.GetKv()[i].GetKey().GetStr(), &tmp)
 	}
 	return ht
@@ -418,7 +418,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 		if entry.GetContainsLen()[i] != 0 {
 			cur = zend.ZendMemnstr(cur, pattern_lc.GetVal()+entry.GetContainsStart()[i], entry.GetContainsLen()[i], agent_name.GetVal()+agent_name.GetLen())
 			if cur == nil {
-				zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
+				pattern_lc.Free()
 				return 0
 			}
 			cur += entry.GetContainsLen()[i]
@@ -429,19 +429,19 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 
 	if zend.ZendStringEquals(agent_name, pattern_lc) != 0 {
 		*found_entry_ptr = entry
-		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
+		pattern_lc.Free()
 		return 1
 	}
 	regex = BrowscapConvertPattern(entry.GetPattern(), 0)
 	re = pcre_get_compiled_regex(regex, &capture_count)
 	if re == nil {
-		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
+		pattern_lc.Free()
 		zend.ZendStringRelease(regex)
 		return 0
 	}
 	match_data = php_pcre_create_match_data(capture_count, re)
 	if match_data == nil {
-		zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
+		pattern_lc.Free()
 		zend.ZendStringRelease(regex)
 		return 0
 	}
@@ -505,7 +505,7 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 		   the previous match found and the current match. */
 
 	}
-	zend.ZSTR_ALLOCA_FREE(pattern_lc, use_heap)
+	pattern_lc.Free()
 	zend.ZendStringRelease(regex)
 	return 0
 }
@@ -517,7 +517,7 @@ func BrowscapZvalCopyCtor(p *zend.Zval) {
 		if (str.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
 			str.AddRefcount()
 		} else {
-			zend.ZVAL_NEW_STR(p, zend.ZendStringInit(str.GetVal(), str.GetLen(), 0))
+			p.SetString(zend.ZendStringInit(str.GetVal(), str.GetLen(), 0))
 		}
 	}
 }

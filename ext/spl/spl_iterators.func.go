@@ -296,7 +296,7 @@ func SplRecursiveItGetIterator(ce *zend.ZendClassEntry, zobject *zend.Zval, by_r
 	}
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	zobject.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIntern().GetData(), zobject.GetObj())
+	iterator.GetIntern().GetData().SetObject(zobject.GetObj())
 	iterator.GetIntern().SetFuncs(&SplRecursiveItIteratorFuncs)
 	return (*zend.ZendObjectIterator)(iterator)
 }
@@ -400,7 +400,7 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 	}
 	ce_iterator = zend.Z_OBJCE_P(iterator)
 	intern.GetIterators()[0].SetIterator(ce_iterator.GetGetIterator()(ce_iterator, iterator, 0))
-	zend.ZVAL_OBJ(intern.GetIterators()[0].GetZobject(), iterator.GetObj())
+	intern.GetIterators()[0].GetZobject().SetObject(iterator.GetObj())
 	intern.GetIterators()[0].SetCe(ce_iterator)
 	intern.GetIterators()[0].SetState(RS_START)
 	zend.ZendRestoreErrorHandling(&error_handling)
@@ -1085,7 +1085,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if inc_refcount != 0 {
 		zobject.AddRefcount()
 	}
-	zend.ZVAL_OBJ(intern.GetZobject(), zobject.GetObj())
+	intern.GetZobject().SetObject(zobject.GetObj())
 	if dit_type == DIT_IteratorIterator {
 		intern.SetCe(ce)
 	} else {
@@ -1506,10 +1506,10 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		result = php_pcre_replace_impl(intern.GetPce(), subject, subject.GetVal(), subject.GetLen(), replacement_str, -1, &count)
 		if intern.IsUseKey() {
 			zend.ZvalPtrDtor(intern.GetKey())
-			zend.ZVAL_STR(intern.GetKey(), result)
+			intern.GetKey().SetString(result)
 		} else {
 			zend.ZvalPtrDtor(intern.GetData())
-			zend.ZVAL_STR(intern.GetData(), result)
+			intern.GetData().SetString(result)
 		}
 		zend.ZendStringRelease(replacement_str)
 		zend.RETVAL_BOOL(count > 0)
@@ -1646,7 +1646,7 @@ func zim_spl_RecursiveRegexIterator_getChildren(execute_data *zend.ZendExecuteDa
 	if zend.EG__().GetException() == nil {
 		var args []zend.Zval
 		zend.ZVAL_COPY(&args[0], &retval)
-		zend.ZVAL_STR_COPY(&args[1], intern.GetURegexRegex())
+		args[1].SetStringCopy(intern.GetURegexRegex())
 		args[2].SetLong(intern.GetMode())
 		args[3].SetLong(intern.GetURegexFlags())
 		args[4].SetLong(intern.GetPregFlags())

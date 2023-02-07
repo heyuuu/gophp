@@ -834,7 +834,7 @@ func _convertToCstring(op *Zval) {
 		var str *ZendString
 		var dval float64 = op.GetDval()
 		str = ZendStrpprintfUnchecked(0, "%.*H", int(EG__().GetPrecision()), dval)
-		ZVAL_NEW_STR(op, str)
+		op.SetString(str)
 	} else {
 		_convertToString(op)
 	}
@@ -850,17 +850,17 @@ try_again:
 		ZVAL_EMPTY_STRING(op)
 		break
 	case IS_TRUE:
-		ZVAL_INTERNED_STR(op, ZSTR_CHAR('1'))
+		op.SetInternedString(ZSTR_CHAR('1'))
 		break
 	case IS_STRING:
 		break
 	case IS_RESOURCE:
 		var str *ZendString = ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(Z_RES_HANDLE_P(op)))
 		ZvalPtrDtor(op)
-		ZVAL_NEW_STR(op, str)
+		op.SetString(str)
 		break
 	case IS_LONG:
-		ZVAL_STR(op, ZendLongToStr(op.GetLval()))
+		op.SetString(ZendLongToStr(op.GetLval()))
 		break
 	case IS_DOUBLE:
 		var str *ZendString
@@ -869,12 +869,12 @@ try_again:
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
 
-		ZVAL_NEW_STR(op, str)
+		op.SetString(str)
 		break
 	case IS_ARRAY:
 		ZendError(E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
-		ZVAL_INTERNED_STR(op, ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED))
+		op.SetInternedString(ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED))
 		break
 	case IS_OBJECT:
 		var tmp Zval
@@ -890,7 +890,7 @@ try_again:
 				var str *ZendString = ZvalGetString(z)
 				ZvalPtrDtor(z)
 				ZvalPtrDtor(op)
-				ZVAL_STR(op, str)
+				op.SetString(str)
 				return
 			}
 			ZvalPtrDtor(z)
@@ -916,13 +916,13 @@ func _tryConvertToString(op *Zval) ZendBool {
 		return 0
 	}
 	ZvalPtrDtor(op)
-	ZVAL_STR(op, str)
+	op.SetString(str)
 	return 1
 }
 func ConvertScalarToArray(op *Zval) {
 	var ht *HashTable = ZendNewArray(1)
 	ht.IndexAddNewH(0, op)
-	ZVAL_ARR(op, ht)
+	op.SetArray(ht)
 }
 func ConvertToArray(op *Zval) {
 try_again:
@@ -937,7 +937,7 @@ try_again:
 			if obj_ht != nil {
 				var new_obj_ht *HashTable = ZendProptableToSymtable(obj_ht, Z_OBJCE_P(op).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(op).GetHandlers() != &StdObjectHandlers || obj_ht.IsRecursive())
 				ZvalPtrDtor(op)
-				ZVAL_ARR(op, new_obj_ht)
+				op.SetArray(new_obj_ht)
 				ZendReleaseProperties(obj_ht)
 			} else {
 				ZvalPtrDtor(op)
@@ -986,7 +986,7 @@ try_again:
 		}
 		obj = ZendObjectsNew(ZendStandardClassDef)
 		obj.SetProperties(ht)
-		ZVAL_OBJ(op, obj)
+		op.SetObject(obj)
 		break
 	case IS_OBJECT:
 		break
@@ -1216,7 +1216,7 @@ func AddFunctionArray(result *Zval, op1 *Zval, op2 *Zval) {
 
 	}
 	if result != op1 {
-		ZVAL_ARR(result, ZendArrayDup(op1.GetArr()))
+		result.SetArray(ZendArrayDup(op1.GetArr()))
 	} else {
 		SEPARATE_ARRAY(result)
 	}
@@ -1852,9 +1852,9 @@ try_again:
 		var i int
 		if Z_STRLEN_P(op1) == 1 {
 			var not ZendUchar = ZendUchar(^((*Z_STRVAL_P)(op1)))
-			ZVAL_INTERNED_STR(result, ZSTR_CHAR(not))
+			result.SetInternedString(ZSTR_CHAR(not))
 		} else {
-			ZVAL_NEW_STR(result, ZendStringAlloc(Z_STRLEN_P(op1), 0))
+			result.SetString(ZendStringAlloc(Z_STRLEN_P(op1), 0))
 			for i = 0; i < Z_STRLEN_P(op1); i++ {
 				Z_STRVAL_P(result)[i] = ^(Z_STRVAL_P(op1)[i])
 			}
@@ -1895,7 +1895,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				if result == op1 {
 					ZvalPtrDtorStr(result)
 				}
-				ZVAL_INTERNED_STR(result, ZSTR_CHAR(or))
+				result.SetInternedString(ZSTR_CHAR(or))
 				return SUCCESS
 			}
 			longer = op1
@@ -1912,7 +1912,7 @@ func BitwiseOrFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
-		ZVAL_NEW_STR(result, str)
+		result.SetString(str)
 		return SUCCESS
 	}
 	if op1.GetType() != IS_LONG {
@@ -1980,7 +1980,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				if result == op1 {
 					ZvalPtrDtorStr(result)
 				}
-				ZVAL_INTERNED_STR(result, ZSTR_CHAR(and))
+				result.SetInternedString(ZSTR_CHAR(and))
 				return SUCCESS
 			}
 			longer = op1
@@ -1997,7 +1997,7 @@ func BitwiseAndFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
-		ZVAL_NEW_STR(result, str)
+		result.SetString(str)
 		return SUCCESS
 	}
 	if op1.GetType() != IS_LONG {
@@ -2065,7 +2065,7 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 				if result == op1 {
 					ZvalPtrDtorStr(result)
 				}
-				ZVAL_INTERNED_STR(result, ZSTR_CHAR(xor))
+				result.SetInternedString(ZSTR_CHAR(xor))
 				return SUCCESS
 			}
 			longer = op1
@@ -2082,7 +2082,7 @@ func BitwiseXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		if result == op1 {
 			ZvalPtrDtorStr(result)
 		}
-		ZVAL_NEW_STR(result, str)
+		result.SetString(str)
 		return SUCCESS
 	}
 	if op1.GetType() != IS_LONG {
@@ -2343,7 +2343,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			} else if op2.IsObject() && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
-			ZVAL_STR(&op1_copy, ZvalGetStringFunc(op1))
+			op1_copy.SetString(ZvalGetStringFunc(op1))
 			if EG__().GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				if orig_op1 != result {
@@ -2371,7 +2371,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			if op2.IsObject() && Z_OBJ_HT(*op2).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op2).GetDoOperation()(ZEND_CONCAT, result, op1, op2) {
 				return SUCCESS
 			}
-			ZVAL_STR(&op2_copy, ZvalGetStringFunc(op2))
+			op2_copy.SetString(ZvalGetStringFunc(op2))
 			if EG__().GetException() != nil {
 				ZvalPtrDtorStr(&op1_copy)
 				ZvalPtrDtorStr(&op2_copy)
@@ -2432,7 +2432,7 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		 * the realloc is done. In this case this line will also update Z_STRVAL_P(op2) to
 		 * point to the new string. The first op2_len bytes of result will still be the same. */
 
-		ZVAL_NEW_STR(result, result_str)
+		result.SetString(result_str)
 		memcpy(result_str.GetVal()+op1_len, Z_STRVAL_P(op2), op2_len)
 		result_str.GetVal()[result_len] = '0'
 	}
@@ -2831,7 +2831,7 @@ func IncrementString(str *Zval) {
 	var ch int
 	if Z_STRLEN_P(str) == 0 {
 		ZvalPtrDtorStr(str)
-		ZVAL_INTERNED_STR(str, ZSTR_CHAR('1'))
+		str.SetInternedString(ZSTR_CHAR('1'))
 		return
 	}
 	if !(str.IsRefcounted()) {
@@ -2900,7 +2900,7 @@ func IncrementString(str *Zval) {
 			break
 		}
 		ZendStringFree(str.GetStr())
-		ZVAL_NEW_STR(str, t)
+		str.SetString(t)
 	}
 }
 func IncrementFunction(op1 *Zval) int {
@@ -3383,7 +3383,7 @@ func ZendCompareObjects(o1 *Zval, o2 *Zval) int {
 func ZendLocaleSprintfDouble(op *Zval) {
 	var str *ZendString
 	str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), float64(op.GetDval()))
-	ZVAL_NEW_STR(op, str)
+	op.SetString(str)
 }
 func ZendLongToStr(num ZendLong) *ZendString {
 	if ZendUlong(num <= 9) != 0 {

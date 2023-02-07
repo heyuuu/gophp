@@ -868,7 +868,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.Efree(argv)
 	}
 	zend.Efree(descriptors)
-	zend.ZVAL_RES(return_value, zend.ZendRegisterResource(proc, LeProcOpen))
+	return_value.SetResource(zend.ZendRegisterResource(proc, LeProcOpen))
 	return
 exit_fail:
 	if descriptors != nil {

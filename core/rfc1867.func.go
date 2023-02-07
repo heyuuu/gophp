@@ -1030,7 +1030,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 
 			if is_anonymous == 0 {
 				if temp_filename != nil {
-					zend.ZVAL_STR_COPY(&zfilename, temp_filename)
+					zfilename.SetStringCopy(temp_filename)
 				} else {
 					zend.ZVAL_EMPTY_STRING(&zfilename)
 				}
@@ -1046,7 +1046,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			}
 			AddProtectedVariable(lbuf)
 			if temp_filename != nil {
-				zend.ZVAL_STR_COPY(&zfilename, temp_filename)
+				zfilename.SetStringCopy(temp_filename)
 			} else {
 				zend.ZVAL_EMPTY_STRING(&zfilename)
 			}

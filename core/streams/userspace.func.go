@@ -127,7 +127,7 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 	zend.ZVAL_STRING(&args[0], filename)
 	zend.ZVAL_STRING(&args[1], mode)
 	args[2].SetLong(options)
-	zend.ZVAL_NEW_REF(&args[3], zend.EG__().GetUninitializedZval())
+	args[3].SetNewRef(zend.EG__().GetUninitializedZval())
 	zend.ZVAL_STRING(&zfuncname, USERSTREAM_OPEN)
 	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF

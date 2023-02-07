@@ -707,7 +707,7 @@ func SplFixedarrayGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref
 	iterator = zend.Emalloc(b.SizeOf("spl_fixedarray_it"))
 	zend.ZendIteratorInit((*zend.ZendObjectIterator)(iterator))
 	object.AddRefcount()
-	zend.ZVAL_OBJ(iterator.GetIntern().GetIt().GetData(), object.GetObj())
+	iterator.GetIntern().GetIt().GetData().SetObject(object.GetObj())
 	iterator.GetIntern().GetIt().SetFuncs(&SplFixedarrayItFuncs)
 	iterator.GetIntern().SetCe(ce)
 	iterator.GetIntern().GetValue().SetUndef()

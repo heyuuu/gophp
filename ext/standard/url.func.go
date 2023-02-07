@@ -439,11 +439,11 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* add the various elements to the array */
 
 	if resource.GetScheme() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetScheme())
+		tmp.SetStringCopy(resource.GetScheme())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_SCHEME).GetStr(), &tmp)
 	}
 	if resource.GetHost() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetHost())
+		tmp.SetStringCopy(resource.GetHost())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_HOST).GetStr(), &tmp)
 	}
 	if has_port != 0 {
@@ -451,23 +451,23 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PORT).GetStr(), &tmp)
 	}
 	if resource.GetUser() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetUser())
+		tmp.SetStringCopy(resource.GetUser())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_USER).GetStr(), &tmp)
 	}
 	if resource.GetPass() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetPass())
+		tmp.SetStringCopy(resource.GetPass())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PASS).GetStr(), &tmp)
 	}
 	if resource.GetPath() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetPath())
+		tmp.SetStringCopy(resource.GetPath())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_PATH).GetStr(), &tmp)
 	}
 	if resource.GetQuery() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetQuery())
+		tmp.SetStringCopy(resource.GetQuery())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_QUERY).GetStr(), &tmp)
 	}
 	if resource.GetFragment() != nil {
-		zend.ZVAL_STR_COPY(&tmp, resource.GetFragment())
+		tmp.SetStringCopy(resource.GetFragment())
 		return_value.GetArr().KeyAddNew(zend.ZSTR_KNOWN(zend.ZEND_STR_FRAGMENT).GetStr(), &tmp)
 	}
 done:

@@ -126,7 +126,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 	fci.SetObject(newobj)
 	fci_cache.SetObject(fci.GetObject())
 	fci.SetSize(b.SizeOf("fci"))
-	ZVAL_OBJ(fci.GetFunctionName(), closure.GetStd())
+	fci.GetFunctionName().SetObject(closure.GetStd())
 	fci.SetRetval(&closure_result)
 	fci.SetNoSeparation(1)
 	if ZendCallFunction(&fci, &fci_cache) == SUCCESS && closure_result.GetType() != IS_UNDEF {
@@ -204,7 +204,7 @@ func ZendClosureCallMagic(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	fci.SetParams(params)
 	fci.SetParamCount(2)
-	ZVAL_STR(fci.GetParams()[0], EX(func_).common.function_name)
+	fci.GetParams()[0].SetString(EX(func_).common.function_name)
 	if ZEND_NUM_ARGS() != 0 {
 		ArrayInitSize(fci.GetParams()[1], ZEND_NUM_ARGS())
 		ZendCopyParametersArray(ZEND_NUM_ARGS(), fci.GetParams()[1])
@@ -231,7 +231,7 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 		/* For Closure::fromCallable([$closure, "__invoke"]) return $closure. */
 
 		if fcc.GetObject() != nil && fcc.GetObject().GetCe() == ZendCeClosure && ZendStringEqualsLiteral(mptr.GetFunctionName(), "__invoke") {
-			ZVAL_OBJ(return_value, fcc.GetObject())
+			return_value.SetObject(fcc.GetObject())
 			fcc.GetObject().AddRefcount()
 			ZendFreeTrampoline(mptr)
 			return SUCCESS
@@ -258,7 +258,7 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 		mptr = (*ZendFunction)(&call)
 	}
 	if fcc.GetObject() != nil {
-		ZVAL_OBJ(&instance, fcc.GetObject())
+		instance.SetObject(fcc.GetObject())
 		ZendCreateFakeClosure(return_value, mptr, mptr.GetScope(), fcc.GetCalledScope(), &instance)
 	} else {
 		ZendCreateFakeClosure(return_value, mptr, mptr.GetScope(), fcc.GetCalledScope(), nil)
@@ -405,7 +405,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 	if closure.GetFunc().GetType() == ZEND_USER_FUNCTION && closure.GetFunc().GetOpArray().GetStaticVariables() != nil {
 		var var_ *Zval
 		var static_variables *HashTable = ZEND_MAP_PTR_GET(closure.GetFunc().GetOpArray().static_variables_ptr)
-		ZVAL_ARR(&val, ZendArrayDup(static_variables))
+		val.SetArray(ZendArrayDup(static_variables))
 		debug_info.KeyUpdate(ZSTR_KNOWN(ZEND_STR_STATIC).GetStr(), &val)
 		var __ht *HashTable = val.GetArr()
 		for _, _p := range __ht.foreachData() {
@@ -443,7 +443,7 @@ func ZendClosureGetDebugInfo(object *Zval, is_temp *int) *HashTable {
 			} else {
 				name = ZendStrpprintf(0, "%s$param%d", b.Cond(arg_info.GetPassByReference() != 0, "&", ""), i+1)
 			}
-			ZVAL_NEW_STR(&info, ZendStrpprintf(0, "%s", b.Cond(i >= required, "<optional>", "<required>")))
+			info.SetString(ZendStrpprintf(0, "%s", b.Cond(i >= required, "<optional>", "<required>")))
 			val.GetArr().KeyUpdate(name.GetStr(), &info)
 			ZendStringReleaseEx(name, 0)
 			arg_info++
@@ -593,7 +593,7 @@ func ZendCreateClosure(res *Zval, func_ *ZendFunction, scope *ZendClassEntry, ca
 		closure.GetFunc().SetIsPublic(true)
 		if this_ptr != nil && this_ptr.IsObject() && !closure.GetFunc().IsStatic() {
 			this_ptr.AddRefcount()
-			ZVAL_OBJ(closure.GetThisPtr(), this_ptr.GetObj())
+			closure.GetThisPtr().SetObject(this_ptr.GetObj())
 		}
 	}
 }

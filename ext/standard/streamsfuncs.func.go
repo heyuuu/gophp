@@ -1311,7 +1311,7 @@ func StreamArrayFromFdSet(stream_array *zend.Zval, fds *fd_set) int {
 	/* destroy old array and add new one */
 
 	zend.ZvalPtrDtor(stream_array)
-	zend.ZVAL_ARR(stream_array, ht)
+	stream_array.SetArray(ht)
 	return ret
 }
 func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
@@ -1362,7 +1362,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 		/* destroy old array and add new one */
 
 		zend.ZvalPtrDtor(stream_array)
-		zend.ZVAL_ARR(stream_array, ht)
+		stream_array.SetArray(ht)
 	} else {
 		ht.DestroyEx()
 	}

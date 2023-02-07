@@ -158,7 +158,7 @@ func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
 		break
 	}
 	str_len = sprintf(str_result, "%d", i_result)
-	ZVAL_NEW_STR(result, ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
+	result.SetString(ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
 }
 
 /* }}} */
@@ -186,7 +186,7 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 			ZVAL_PSTRINGL(op1, str.GetVal(), str.GetLen())
 			ZendTmpStringRelease(tmp_str)
 		} else {
-			ZVAL_STR(op1, ZvalGetStringFunc(op1))
+			op1.SetString(ZvalGetStringFunc(op1))
 		}
 
 		/* ZEND_ASSERT(!Z_REFCOUNTED_P(op1)); */
@@ -197,7 +197,7 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 		ConvertToString(op2)
 	}
 	length = op1_len + int(Z_STRLEN_P(op2))
-	ZVAL_NEW_STR(result, ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
+	result.SetString(ZendStringExtend(op1.GetStr(), length, ZEND_SYSTEM_INI))
 	memcpy(Z_STRVAL_P(result)+op1_len, Z_STRVAL_P(op2), Z_STRLEN_P(op2)+1)
 }
 
@@ -218,7 +218,7 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 			ConvertToString(&tmp)
 			c = &tmp
 		}
-		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(c), Z_STRLEN_P(c), ZEND_SYSTEM_INI))
+		result.SetString(ZendStringInit(Z_STRVAL_P(c), Z_STRLEN_P(c), ZEND_SYSTEM_INI))
 		if c == &tmp {
 			ZendStringRelease(tmp.GetStr())
 		}
@@ -239,9 +239,9 @@ func ZendIniGetVar(result *Zval, name *Zval) {
 	/* Fetch configuration option value */
 
 	if b.Assign(&curval, ZendGetConfigurationDirective(name.GetStr())) != nil {
-		ZVAL_NEW_STR(result, ZendStringInit(Z_STRVAL_P(curval), Z_STRLEN_P(curval), ZEND_SYSTEM_INI))
+		result.SetString(ZendStringInit(Z_STRVAL_P(curval), Z_STRLEN_P(curval), ZEND_SYSTEM_INI))
 	} else if b.Assign(&envvar, ZendGetenv(Z_STRVAL_P(name), Z_STRLEN_P(name))) != nil || b.Assign(&envvar, getenv(Z_STRVAL_P(name))) != nil {
-		ZVAL_NEW_STR(result, ZendStringInit(envvar, strlen(envvar), ZEND_SYSTEM_INI))
+		result.SetString(ZendStringInit(envvar, strlen(envvar), ZEND_SYSTEM_INI))
 	} else {
 		ZendIniInitString(result)
 	}

@@ -23,7 +23,7 @@ func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 			ASSERTG(callback).SetUndef()
 		}
 		if new_value != nil && (ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF || new_value.GetLen() != 0) {
-			zend.ZVAL_STR_COPY(&(ASSERTG(callback)), new_value)
+			ASSERTG(callback).SetStringCopy(new_value)
 		}
 	} else {
 		if ASSERTG(cb) {
@@ -212,7 +212,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.ZvalPtrDtor(&args[2])
 			zend.ZvalPtrDtor(&args[0])
 		} else {
-			zend.ZVAL_STR(&args[3], zend.ZvalGetString(description))
+			args[3].SetString(zend.ZvalGetString(description))
 			zend.CallUserFunction(nil, nil, &(ASSERTG(callback)), &retval, 4, args)
 			zend.ZvalPtrDtor(&args[3])
 			zend.ZvalPtrDtor(&args[2])

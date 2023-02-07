@@ -128,8 +128,8 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 
 	/* Setup calling arguments */
 
-	zend.ZVAL_RES(&args[0], zend.ZendRegisterResource(buckets_in, LeBucketBrigade))
-	zend.ZVAL_RES(&args[1], zend.ZendRegisterResource(buckets_out, LeBucketBrigade))
+	args[0].SetResource(zend.ZendRegisterResource(buckets_in, LeBucketBrigade))
+	args[1].SetResource(zend.ZendRegisterResource(buckets_out, LeBucketBrigade))
 	if bytes_consumed != nil {
 		args[2].SetLong(*bytes_consumed)
 	} else {
@@ -301,8 +301,8 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 	/* set the filter property, this will be used during cleanup */
 
-	zend.ZVAL_RES(&zfilter, zend.ZendRegisterResource(filter, LeUserfilters))
-	zend.ZVAL_OBJ(filter.GetAbstract(), obj.GetObj())
+	zfilter.SetResource(zend.ZendRegisterResource(filter, LeUserfilters))
+	filter.GetAbstract().SetObject(obj.GetObj())
 	zend.AddPropertyZval(&obj, "filter", &zfilter)
 
 	/* add_property_zval increments the refcount which is unwanted here */
@@ -394,7 +394,7 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 	}
 	return_value.SetNull()
 	if brigade.GetHead() != nil && b.Assign(&bucket, streams.PhpStreamBucketMakeWriteable(brigade.GetHead())) {
-		zend.ZVAL_RES(&zbucket, zend.ZendRegisterResource(bucket, LeBucket))
+		zbucket.SetResource(zend.ZendRegisterResource(bucket, LeBucket))
 		zend.ObjectInit(return_value)
 		zend.AddPropertyZval(return_value, "bucket", &zbucket)
 
@@ -619,7 +619,7 @@ func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.RETVAL_FALSE
 		return
 	}
-	zend.ZVAL_RES(&zbucket, zend.ZendRegisterResource(bucket, LeBucket))
+	zbucket.SetResource(zend.ZendRegisterResource(bucket, LeBucket))
 	zend.ObjectInit(return_value)
 	zend.AddPropertyZval(return_value, "bucket", &zbucket)
 

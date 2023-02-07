@@ -504,7 +504,7 @@ func ZendUseUndefinedConstant(name *ZendString, attr ZendAstAttr, result *Zval) 
 		} else {
 			var result_str *ZendString = ZendStringInit(actual, actual_len, 0)
 			ZvalPtrDtorNogc(result)
-			ZVAL_NEW_STR(result, result_str)
+			result.SetString(result_str)
 		}
 	}
 	return SUCCESS
@@ -653,7 +653,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 					/* Separation is enabled -- create a ref */
 
-					ZVAL_NEW_REF(arg, arg)
+					arg.SetNewRef(arg)
 
 					/* Separation is enabled -- create a ref */
 
@@ -691,7 +691,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 			ZVAL_COPY(param, arg)
 		} else {
 			arg.TryAddRefcount()
-			ZVAL_NEW_REF(param, arg)
+			param.SetNewRef(arg)
 		}
 	}
 	if func_.GetOpArray().IsClosure() {
@@ -865,10 +865,10 @@ func ZendLookupClassEx(name *ZendString, key *ZendString, flags uint32) *ZendCla
 	if name.GetVal()[0] == '\\' {
 		ZVAL_STRINGL(&args[0], name.GetVal()+1, name.GetLen()-1)
 	} else {
-		ZVAL_STR_COPY(&args[0], name)
+		args[0].SetStringCopy(name)
 	}
 	fcall_info.SetSize(b.SizeOf("fcall_info"))
-	ZVAL_STR_COPY(fcall_info.GetFunctionName(), EG__().GetAutoloadFunc().GetFunctionName())
+	fcall_info.GetFunctionName().SetStringCopy(EG__().GetAutoloadFunc().GetFunctionName())
 	fcall_info.SetRetval(&local_retval)
 	fcall_info.SetParamCount(1)
 	fcall_info.SetParams(args)
@@ -929,7 +929,7 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *Zval, string_name *byte
 	var original_compiler_options uint32
 	var retval int
 	if retval_ptr != nil {
-		ZVAL_NEW_STR(&pv, ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
+		pv.SetString(ZendStringAlloc(str_len+b.SizeOf("\"return ;\"")-1, 0))
 		memcpy(Z_STRVAL(pv), "return ", b.SizeOf("\"return \"")-1)
 		memcpy(Z_STRVAL(pv)+b.SizeOf("\"return \"")-1, str, str_len)
 		Z_STRVAL(pv)[Z_STRLEN(pv)-1] = ';'
@@ -1151,7 +1151,7 @@ func ZendFetchClassByName(class_name *ZendString, key *ZendString, fetch_type in
 			if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) == 0 {
 				var exception_str *ZendString
 				var exception_zv Zval
-				ZVAL_OBJ(&exception_zv, EG__().GetException())
+				exception_zv.SetObject(EG__().GetException())
 				exception_zv.AddRefcount()
 				ZendClearException()
 				exception_str = ZvalGetString(&exception_zv)
@@ -1244,7 +1244,7 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 				var_.SetUndef()
 				zv = ht.KeyAddNew(str.GetStr(), var_)
 			}
-			ZVAL_INDIRECT(zv, var_)
+			zv.SetIndirect(var_)
 			str++
 			var_++
 			if str == end {

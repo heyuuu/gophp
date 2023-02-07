@@ -53,7 +53,7 @@ func PhpStreamGetResourceId(stream __auto__) int {
 }
 func PhpStreamAutoCleanup(stream *PhpStream) { stream.SetExposed(1) }
 func PhpStreamToZval(stream *PhpStream, zval *zend.Zval) {
-	zend.ZVAL_RES(zval, stream.GetRes())
+	zval.SetResource(stream.GetRes())
 	stream.SetExposed(1)
 }
 func PhpStreamFromZval(xstr *PhpStream, pzval *zend.Zval) {

@@ -42,12 +42,12 @@ func ZendExceptionSetPrevious(exception *ZendObject, add_previous *ZendObject) {
 		OBJ_RELEASE(add_previous)
 		return
 	}
-	ZVAL_OBJ(&pv, add_previous)
+	pv.SetObject(add_previous)
 	if InstanceofFunction(Z_OBJCE(pv), ZendCeThrowable) == 0 {
 		ZendErrorNoreturn(E_CORE_ERROR, "Previous exception must implement Throwable")
 		return
 	}
-	ZVAL_OBJ(&zv, exception)
+	zv.SetObject(exception)
 	ex = &zv
 	for {
 		ancestor = ZendReadPropertyEx(IGetExceptionBase(&pv), &pv, ZSTR_KNOWN(ZEND_STR_PREVIOUS), 1, &rv)
@@ -167,7 +167,7 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 		tmp.SetLong(ZendGetExecutedLineno())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_LINE), &tmp)
 	} else {
-		ZVAL_STR(&tmp, filename)
+		tmp.SetString(filename)
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
 		tmp.SetLong(ZendGetCompiledLineno())
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_LINE), &tmp)
@@ -211,7 +211,7 @@ func ZimExceptionConstruct(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	if message != nil {
-		ZVAL_STR(&tmp, message)
+		tmp.SetString(message)
 		ZendUpdatePropertyEx(base_ce, object, ZSTR_KNOWN(ZEND_STR_MESSAGE), &tmp)
 	}
 	if code != 0 {
@@ -267,7 +267,7 @@ func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zva
 	}
 	object = ZEND_THIS
 	if message != nil {
-		ZVAL_STR_COPY(&tmp, message)
+		tmp.SetStringCopy(message)
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_MESSAGE), &tmp)
 		ZvalPtrDtor(&tmp)
 	}
@@ -281,7 +281,7 @@ func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zva
 	tmp.SetLong(severity)
 	ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_SEVERITY), &tmp)
 	if argc >= 4 {
-		ZVAL_STR_COPY(&tmp, filename)
+		tmp.SetStringCopy(filename)
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
 		ZvalPtrDtor(&tmp)
 		if argc < 5 {
@@ -543,7 +543,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 		var file *ZendString = ZvalGetString(GET_PROPERTY(exception, ZEND_STR_FILE))
 		var line ZendLong = ZvalGetLong(GET_PROPERTY(exception, ZEND_STR_LINE))
 		fci.SetSize(b.SizeOf("fci"))
-		ZVAL_STR(fci.GetFunctionName(), fname)
+		fci.GetFunctionName().SetString(fname)
 		fci.SetObject(exception.GetObj())
 		fci.SetRetval(&trace)
 		fci.SetParamCount(0)
@@ -593,7 +593,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 	/* We store the result in the private property string so we can access
 	 * the result in uncaught exception handlers without memleaks. */
 
-	ZVAL_STR(&tmp, str)
+	tmp.SetString(str)
 	ZendUpdatePropertyEx(base_ce, exception, ZSTR_KNOWN(ZEND_STR_STRING), &tmp)
 	RETVAL_STR(str)
 	return
@@ -712,7 +712,7 @@ func ZendThrowErrorException(exception_ce *ZendClassEntry, message *byte, code Z
 	var ex Zval
 	var tmp Zval
 	var obj *ZendObject = ZendThrowException(exception_ce, message, code)
-	ZVAL_OBJ(&ex, obj)
+	ex.SetObject(obj)
 	tmp.SetLong(severity)
 	ZendUpdatePropertyEx(ZendCeErrorException, &ex, ZSTR_KNOWN(ZEND_STR_SEVERITY), &tmp)
 	return obj
@@ -733,7 +733,7 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 	var exception Zval
 	var rv Zval
 	var ce_exception *ZendClassEntry
-	ZVAL_OBJ(&exception, ex)
+	exception.SetObject(ex)
 	ce_exception = ex.GetCe()
 	EG__().SetException(nil)
 	if ce_exception == ZendCeParseError || ce_exception == ZendCeCompileError {
@@ -759,7 +759,7 @@ func ZendExceptionError(ex *ZendObject, severity int) {
 		ZvalPtrDtor(&tmp)
 		if EG__().GetException() != nil {
 			var zv Zval
-			ZVAL_OBJ(&zv, EG__().GetException())
+			zv.SetObject(EG__().GetException())
 
 			/* do the best we can to inform about the inner exception */
 

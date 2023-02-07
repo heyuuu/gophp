@@ -10,7 +10,7 @@ import (
 
 func PhpPasswordAlgoRegister(ident string, algo *PhpPasswordAlgo) int {
 	var zalgo zend.Zval
-	zend.ZVAL_PTR(&zalgo, (*PhpPasswordAlgo)(algo))
+	zalgo.SetAsPtr((*PhpPasswordAlgo)(algo))
 	if PhpPasswordAlgos.KeyAdd(b.CastStrAuto(ident), &zalgo) != nil {
 		return zend.SUCCESS
 	}

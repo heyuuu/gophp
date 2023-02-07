@@ -44,7 +44,7 @@ func IncompleteClassHasProperty(object *zend.Zval, member *zend.Zval, check_empt
 }
 func IncompleteClassGetMethod(object **zend.ZendObject, method *zend.ZendString, key *zend.Zval) *zend.ZendFunction {
 	var zobject zend.Zval
-	zend.ZVAL_OBJ(&zobject, *object)
+	zobject.SetObject(*object)
 	IncompleteClassMessage(&zobject, zend.E_ERROR)
 	return nil
 }
