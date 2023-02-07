@@ -179,7 +179,6 @@ func ZEND_IS_INCREMENT(opcode ZendUchar) bool { return (opcode & 1) == 0 }
 func ZEND_IS_BINARY_ASSIGN_OP_OPCODE(opcode __auto__) bool {
 	return opcode >= ZEND_ADD && opcode <= ZEND_POW
 }
-func FC(member __auto__) __auto__ { return CG__().GetFileContext().member }
 func ZendAllocCacheSlots(count unsigned) uint32 {
 	var op_array *ZendOpArray = CG__().GetActiveOpArray()
 	var ret uint32 = op_array.GetCacheSize()
@@ -282,44 +281,44 @@ func ZendOparrayContextEnd(prev_context *ZendOparrayContext) {
 	CG__().SetContext(*prev_context)
 }
 func ZendResetImportTables() {
-	if FC(imports) {
-		FC(imports).Destroy()
-		Efree(FC(imports))
-		FC(imports) = nil
+	if FC__().GetImports() != nil {
+		FC__().GetImports().Destroy()
+		Efree(FC__().GetImports())
+		FC__().SetImports(nil)
 	}
-	if FC(imports_function) {
-		FC(imports_function).Destroy()
-		Efree(FC(imports_function))
-		FC(imports_function) = nil
+	if FC__().GetImportsFunction() != nil {
+		FC__().GetImportsFunction().Destroy()
+		Efree(FC__().GetImportsFunction())
+		FC__().SetImportsFunction(nil)
 	}
-	if FC(imports_const) {
-		FC(imports_const).Destroy()
-		Efree(FC(imports_const))
-		FC(imports_const) = nil
+	if FC__().GetImportsConst() != nil {
+		FC__().GetImportsConst().Destroy()
+		Efree(FC__().GetImportsConst())
+		FC__().SetImportsConst(nil)
 	}
 }
 func ZendEndNamespace() {
-	FC(in_namespace) = 0
+	FC__().SetInNamespace(0)
 	ZendResetImportTables()
-	if FC(current_namespace) {
-		ZendStringReleaseEx(FC(current_namespace), 0)
-		FC(current_namespace) = nil
+	if FC__().GetCurrentNamespace() != nil {
+		ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
+		FC__().SetCurrentNamespace(nil)
 	}
 }
 func ZendFileContextBegin(prev_context *ZendFileContext) {
 	*prev_context = CG__().GetFileContext()
-	FC(imports) = nil
-	FC(imports_function) = nil
-	FC(imports_const) = nil
-	FC(current_namespace) = nil
-	FC(in_namespace) = 0
-	FC(has_bracketed_namespaces) = 0
-	FC(declarables).ticks = 0
-	ZendHashInit(&(FC(seen_symbols)), 8, nil, nil, 0)
+	FC__().SetImports(nil)
+	FC__().SetImportsFunction(nil)
+	FC__().SetImportsConst(nil)
+	FC__().SetCurrentNamespace(nil)
+	FC__().SetInNamespace(0)
+	FC__().SetHasBracketedNamespaces(0)
+	FC__().GetDeclarables().SetTicks(0)
+	ZendHashInit(&(FC__().GetSeenSymbols()), 8, nil, nil, 0)
 }
 func ZendFileContextEnd(prev_context *ZendFileContext) {
 	ZendEndNamespace()
-	FC(seen_symbols).Destroy()
+	FC__().GetSeenSymbols().Destroy()
 	CG__().SetFileContext(*prev_context)
 }
 func ZendInitCompilerDataStructures() {
@@ -333,17 +332,17 @@ func ZendInitCompilerDataStructures() {
 	CG__().SetMemoizeMode(0)
 }
 func ZendRegisterSeenSymbol(name *ZendString, kind uint32) {
-	var zv *Zval = FC(seen_symbols).KeyFind(name.GetStr())
+	var zv *Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	if zv != nil {
 		zv.SetLval(zv.GetLval() | kind)
 	} else {
 		var tmp Zval
 		tmp.SetLong(kind)
-		FC(seen_symbols).KeyAddNew(name.GetStr(), &tmp)
+		FC__().GetSeenSymbols().KeyAddNew(name.GetStr(), &tmp)
 	}
 }
 func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
-	var zv *Zval = FC(seen_symbols).KeyFind(name.GetStr())
+	var zv *Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
 func FileHandleDtor(fh *ZendFileHandle) { ZendFileHandleDtor(fh) }
@@ -691,8 +690,8 @@ func ZendConcatNames(name1 *byte, name1_len int, name2 *byte, name2_len int) *Ze
 	return ZendConcat3(name1, name1_len, "\\", 1, name2, name2_len)
 }
 func ZendPrefixWithNs(name *ZendString) *ZendString {
-	if FC(current_namespace) {
-		var ns *ZendString = FC(current_namespace)
+	if FC__().GetCurrentNamespace() != nil {
+		var ns *ZendString = FC__().GetCurrentNamespace()
 		return ZendConcatNames(ns.GetVal(), ns.GetLen(), name.GetVal(), name.GetLen())
 	} else {
 		return name.Copy()
@@ -744,12 +743,12 @@ func ZendResolveNonClassName(name *ZendString, type_ uint32, is_fully_qualified 
 	if compound != nil {
 		*is_fully_qualified = 1
 	}
-	if compound != nil && FC(imports) {
+	if compound != nil && FC__().GetImports() != nil {
 
 		/* If the first part of a qualified name is an alias, substitute it. */
 
 		var len_ int = compound - name.GetVal()
-		var import_name *ZendString = ZendHashFindPtrLc(FC(imports), name.GetVal(), len_)
+		var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
 		if import_name != nil {
 			return ZendConcatNames(import_name.GetVal(), import_name.GetLen(), name.GetVal()+len_+1, name.GetLen()-len_-1)
 		}
@@ -757,10 +756,10 @@ func ZendResolveNonClassName(name *ZendString, type_ uint32, is_fully_qualified 
 	return ZendPrefixWithNs(name)
 }
 func ZendResolveFunctionName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool) *ZendString {
-	return ZendResolveNonClassName(name, type_, is_fully_qualified, 0, FC(imports_function))
+	return ZendResolveNonClassName(name, type_, is_fully_qualified, 0, FC__().GetImportsFunction())
 }
 func ZendResolveConstName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool) *ZendString {
-	return ZendResolveNonClassName(name, type_, is_fully_qualified, 1, FC(imports_const))
+	return ZendResolveNonClassName(name, type_, is_fully_qualified, 1, FC__().GetImportsConst())
 }
 func ZendResolveClassName(name *ZendString, type_ uint32) *ZendString {
 	var compound *byte
@@ -784,14 +783,14 @@ func ZendResolveClassName(name *ZendString, type_ uint32) *ZendString {
 		}
 		return name
 	}
-	if FC(imports) {
+	if FC__().GetImports() != nil {
 		compound = memchr(name.GetVal(), '\\', name.GetLen())
 		if compound != nil {
 
 			/* If the first part of a qualified name is an alias, substitute it. */
 
 			var len_ int = compound - name.GetVal()
-			var import_name *ZendString = ZendHashFindPtrLc(FC(imports), name.GetVal(), len_)
+			var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
 			if import_name != nil {
 				return ZendConcatNames(import_name.GetVal(), import_name.GetLen(), name.GetVal()+len_+1, name.GetLen()-len_-1)
 			}
@@ -799,7 +798,7 @@ func ZendResolveClassName(name *ZendString, type_ uint32) *ZendString {
 
 			/* If an unqualified name is an alias, replace it. */
 
-			var import_name *ZendString = ZendHashFindPtrLc(FC(imports), name.GetVal(), name.GetLen())
+			var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), name.GetLen())
 			if import_name != nil {
 				return import_name.Copy()
 			}
@@ -1457,7 +1456,7 @@ func ZendNegateNumString(ast *ZendAst) *ZendAst {
 	return ast
 }
 func ZendVerifyNamespace() {
-	if FC(has_bracketed_namespaces) && !(FC(in_namespace)) {
+	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "No code may exist outside of namespace {}")
 	}
 }
@@ -1621,7 +1620,7 @@ func ZendEmitTick() {
 	}
 	opline = GetNextOp()
 	opline.SetOpcode(ZEND_TICKS)
-	opline.SetExtendedValue(FC(declarables).ticks)
+	opline.SetExtendedValue(FC__().GetDeclarables().GetTicks())
 }
 func ZendEmitOpData(value *Znode) *ZendOp {
 	return ZendEmitOp(nil, ZEND_OP_DATA, value, nil)
@@ -2661,7 +2660,7 @@ func ZendCompileFunctionName(name_node *Znode, name_ast *ZendAst) ZendBool {
 	var is_fully_qualified ZendBool
 	name_node.SetOpType(IS_CONST)
 	name_node.GetConstant().SetString(ZendResolveFunctionName(orig_name, name_ast.GetAttr(), &is_fully_qualified))
-	return is_fully_qualified == 0 && FC(current_namespace)
+	return is_fully_qualified == 0 && FC__().GetCurrentNamespace() != nil
 }
 func ZendCompileNsCall(result *Znode, name_node *Znode, args_ast *ZendAst) {
 	var opline *ZendOp = GetNextOp()
@@ -4341,7 +4340,7 @@ func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 func ZendCompileDeclare(ast *ZendAst) {
 	var declares *ZendAstList = ZendAstGetList(ast.GetChild()[0])
 	var stmt_ast *ZendAst = ast.GetChild()[1]
-	var orig_declarables ZendDeclarables = FC(declarables)
+	var orig_declarables ZendDeclarables = FC__().GetDeclarables()
 	var i uint32
 	for i = 0; i < declares.GetChildren(); i++ {
 		var declare_ast *ZendAst = declares.GetChild()[i]
@@ -4354,7 +4353,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 		if ZendStringEqualsLiteralCi(name, "ticks") {
 			var value_zv Zval
 			ZendConstExprToZval(&value_zv, value_ast)
-			FC(declarables).ticks = ZvalGetLong(&value_zv)
+			FC__().GetDeclarables().SetTicks(ZvalGetLong(&value_zv))
 			ZvalPtrDtorNogc(&value_zv)
 		} else if ZendStringEqualsLiteralCi(name, "encoding") {
 			if FAILURE == ZendDeclareIsFirstStatement(ast) {
@@ -4381,7 +4380,7 @@ func ZendCompileDeclare(ast *ZendAst) {
 	}
 	if stmt_ast != nil {
 		ZendCompileStmt(stmt_ast)
-		FC(declarables) = orig_declarables
+		FC__().SetDeclarables(orig_declarables)
 	}
 }
 func ZendCompileStmtList(ast *ZendAst) {
@@ -4948,8 +4947,8 @@ func ZendBeginFuncDecl(result *Znode, op_array *ZendOpArray, decl *ZendAstDecl, 
 	name = ZendPrefixWithNs(unqualified_name)
 	op_array.SetFunctionName(name)
 	lcname = ZendStringTolower(name)
-	if FC(imports_function) {
-		var import_name *ZendString = ZendHashFindPtrLc(FC(imports_function), unqualified_name.GetVal(), unqualified_name.GetLen())
+	if FC__().GetImportsFunction() != nil {
+		var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImportsFunction(), unqualified_name.GetVal(), unqualified_name.GetLen())
 		if import_name != nil && !(ZendStringEqualsCi(lcname, import_name)) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare function %s "+"because the name is already in use", name.GetVal())
 		}
@@ -5335,8 +5334,8 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel ZendBool) *ZendOp {
 		name = ZendPrefixWithNs(unqualified_name)
 		name = ZendNewInternedString(name)
 		lcname = ZendStringTolower(name)
-		if FC(imports) {
-			var import_name *ZendString = ZendHashFindPtrLc(FC(imports), unqualified_name.GetVal(), unqualified_name.GetLen())
+		if FC__().GetImports() != nil {
+			var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), unqualified_name.GetVal(), unqualified_name.GetLen())
 			if import_name != nil && !(ZendStringEqualsCi(lcname, import_name)) {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare class %s "+"because the name is already in use", name.GetVal())
 			}
@@ -5521,23 +5520,23 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel ZendBool) *ZendOp {
 func ZendGetImportHt(type_ uint32) *HashTable {
 	switch type_ {
 	case ZEND_SYMBOL_CLASS:
-		if !(FC(imports)) {
-			FC(imports) = Emalloc(b.SizeOf("HashTable"))
-			ZendHashInit(FC(imports), 8, nil, StrDtor, 0)
+		if FC__().GetImports() == nil {
+			FC__().SetImports(Emalloc(b.SizeOf("HashTable")))
+			ZendHashInit(FC__().GetImports(), 8, nil, StrDtor, 0)
 		}
-		return FC(imports)
+		return FC__().GetImports()
 	case ZEND_SYMBOL_FUNCTION:
-		if !(FC(imports_function)) {
-			FC(imports_function) = Emalloc(b.SizeOf("HashTable"))
-			ZendHashInit(FC(imports_function), 8, nil, StrDtor, 0)
+		if FC__().GetImportsFunction() == nil {
+			FC__().SetImportsFunction(Emalloc(b.SizeOf("HashTable")))
+			ZendHashInit(FC__().GetImportsFunction(), 8, nil, StrDtor, 0)
 		}
-		return FC(imports_function)
+		return FC__().GetImportsFunction()
 	case ZEND_SYMBOL_CONST:
-		if !(FC(imports_const)) {
-			FC(imports_const) = Emalloc(b.SizeOf("HashTable"))
-			ZendHashInit(FC(imports_const), 8, nil, StrDtor, 0)
+		if FC__().GetImportsConst() == nil {
+			FC__().SetImportsConst(Emalloc(b.SizeOf("HashTable")))
+			ZendHashInit(FC__().GetImportsConst(), 8, nil, StrDtor, 0)
 		}
-		return FC(imports_const)
+		return FC__().GetImportsConst()
 	default:
 		break
 	}
@@ -5565,7 +5564,7 @@ func ZendCheckAlreadyInUse(type_ uint32, old_name *ZendString, new_name *ZendStr
 func ZendCompileUse(ast *ZendAst) {
 	var list *ZendAstList = ZendAstGetList(ast)
 	var i uint32
-	var current_ns *ZendString = FC(current_namespace)
+	var current_ns *ZendString = FC__().GetCurrentNamespace()
 	var type_ uint32 = ast.GetAttr()
 	var current_import *HashTable = ZendGetImportHt(type_)
 	var case_sensitive ZendBool = type_ == ZEND_SYMBOL_CONST
@@ -5670,8 +5669,8 @@ func ZendCompileConstDecl(ast *ZendAst) {
 		}
 		name = ZendPrefixWithNs(unqualified_name)
 		name = ZendNewInternedString(name)
-		if FC(imports_const) {
-			var import_name *ZendString = ZendHashFindPtr(FC(imports_const), unqualified_name)
+		if FC__().GetImportsConst() != nil {
+			var import_name *ZendString = ZendHashFindPtr(FC__().GetImportsConst(), unqualified_name)
 			if import_name != nil && ZendStringEquals(import_name, name) == 0 {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare const %s because "+"the name is already in use", name.GetVal())
 			}
@@ -5690,8 +5689,8 @@ func ZendCompileNamespace(ast *ZendAst) {
 
 	/* handle mixed syntax declaration or nested namespaces */
 
-	if !(FC(has_bracketed_namespaces)) {
-		if FC(current_namespace) {
+	if FC__().GetHasBracketedNamespaces() == 0 {
+		if FC__().GetCurrentNamespace() != nil {
 
 			/* previous namespace declarations were unbracketed */
 
@@ -5708,14 +5707,14 @@ func ZendCompileNamespace(ast *ZendAst) {
 
 		if with_bracket == 0 {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot mix bracketed namespace declarations "+"with unbracketed namespace declarations")
-		} else if FC(current_namespace) || FC(in_namespace) {
+		} else if FC__().GetCurrentNamespace() != nil || FC__().GetInNamespace() != 0 {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Namespace declarations cannot be nested")
 		}
 
 		/* previous namespace declarations were bracketed */
 
 	}
-	if (with_bracket == 0 && !(FC(current_namespace)) || with_bracket != 0 && !(FC(has_bracketed_namespaces))) && CG__().GetActiveOpArray().GetLast() > 0 {
+	if (with_bracket == 0 && FC__().GetCurrentNamespace() == nil || with_bracket != 0 && FC__().GetHasBracketedNamespaces() == 0) && CG__().GetActiveOpArray().GetLast() > 0 {
 
 		/* ignore ZEND_EXT_STMT and ZEND_TICKS */
 
@@ -5727,22 +5726,22 @@ func ZendCompileNamespace(ast *ZendAst) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Namespace declaration statement has to be "+"the very first statement or after any declare call in the script")
 		}
 	}
-	if FC(current_namespace) {
-		ZendStringReleaseEx(FC(current_namespace), 0)
+	if FC__().GetCurrentNamespace() != nil {
+		ZendStringReleaseEx(FC__().GetCurrentNamespace(), 0)
 	}
 	if name_ast != nil {
 		name = ZendAstGetStr(name_ast)
 		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use '%s' as namespace name", name.GetVal())
 		}
-		FC(current_namespace) = name.Copy()
+		FC__().SetCurrentNamespace(name.Copy())
 	} else {
-		FC(current_namespace) = nil
+		FC__().SetCurrentNamespace(nil)
 	}
 	ZendResetImportTables()
-	FC(in_namespace) = 1
+	FC__().SetInNamespace(1)
 	if with_bracket != 0 {
-		FC(has_bracketed_namespaces) = 1
+		FC__().SetHasBracketedNamespaces(1)
 	}
 	if stmt_ast != nil {
 		ZendCompileTopStmt(stmt_ast)
@@ -5755,7 +5754,7 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	var filename *ZendString
 	var name *ZendString
 	var const_name []byte = "__COMPILER_HALT_OFFSET__"
-	if FC(has_bracketed_namespaces) && FC(in_namespace) {
+	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
 	filename = ZendGetCompiledFilename()
@@ -5828,8 +5827,8 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		}
 		break
 	case T_NS_C:
-		if FC(current_namespace) {
-			zv.SetStringCopy(FC(current_namespace))
+		if FC__().GetCurrentNamespace() != nil {
+			zv.SetStringCopy(FC__().GetCurrentNamespace())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
@@ -6753,7 +6752,7 @@ func ZendCompileConst(result *Znode, ast *ZendAst) {
 		opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 0))
 	} else {
 		opline.GetOp1().SetNum(IS_CONSTANT_UNQUALIFIED)
-		if FC(current_namespace) {
+		if FC__().GetCurrentNamespace() != nil {
 			opline.GetOp1().SetNum(opline.GetOp1().GetNum() | IS_CONSTANT_IN_NAMESPACE)
 			opline.GetOp2().SetConstant(ZendAddConstNameLiteral(resolved_name, 1))
 		} else {
@@ -7266,7 +7265,7 @@ func ZendCompileStmt(ast *ZendAst) {
 		ZendCompileExpr(&result, ast)
 		ZendDoFree(&result)
 	}
-	if FC(declarables).ticks && ZendIsUntickedStmt(ast) == 0 {
+	if FC__().GetDeclarables().GetTicks() != 0 && ZendIsUntickedStmt(ast) == 0 {
 		ZendEmitTick()
 	}
 }

@@ -47,3 +47,5 @@ package zend
 // #define SET_NODE(target,src) do { target ## _type = ( src ) -> op_type ; if ( ( src ) -> op_type == IS_CONST ) { target . constant = zend_add_literal ( & ( src ) -> u . constant ) ; } else { target = ( src ) -> u . op ; } } while ( 0 )
 
 // #define GET_NODE(target,src) do { ( target ) -> op_type = src ## _type ; if ( ( target ) -> op_type == IS_CONST ) { ZVAL_COPY_VALUE ( & ( target ) -> u . constant , CT_CONSTANT ( src ) ) ; } else { ( target ) -> u . op = src ; } } while ( 0 )
+
+// #define FC(member) ( CG ( file_context ) . member )
