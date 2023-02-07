@@ -22,7 +22,6 @@ func ZSTR_ALLOCA_ALLOC(str *ZendString, _len int, use_heap any) {
 	*str = *ZendStringAlloc(_len, 0)
 }
 
-func ZSTR_ALLOCA_FREE(str *ZendString, use_heap any) { str.Free() }
 func ZendStringForgetHashVal(s *ZendString) {
 	s.SetH(0)
 	s.DelGcFlags(IS_STR_VALID_UTF8)

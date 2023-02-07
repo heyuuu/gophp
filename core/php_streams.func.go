@@ -94,7 +94,7 @@ func PhpStreamRewind(stream *PhpStream) int {
 func PhpStreamSeek(stream *PhpStream, offset zend.ZendLong, whence int) int {
 	return _phpStreamSeek(stream, offset, whence)
 }
-func PhpStreamTell(stream *PhpStream) zend.ZendOffT { return _phpStreamTell(stream) }
+func PhpStreamTell(stream *PhpStream) zend.ZendOffT { return stream.GetPosition() }
 func PhpStreamRead(stream *PhpStream, buf *byte, count int) ssize_t {
 	return _phpStreamRead(stream, buf, count)
 }

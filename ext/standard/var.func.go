@@ -1448,9 +1448,9 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	p = (*uint8)(buf)
 	PHP_VAR_UNSERIALIZE_INIT(var_hash)
-	prev_class_hash = PhpVarUnserializeGetAllowedClasses(var_hash)
-	prev_max_depth = PhpVarUnserializeGetMaxDepth(var_hash)
-	prev_cur_depth = PhpVarUnserializeGetCurDepth(var_hash)
+	prev_class_hash = var_hash.GetAllowedClasses()
+	prev_max_depth = var_hash.GetMaxDepth()
+	prev_cur_depth = var_hash.GetCurDepth()
 	if options != nil {
 		var classes *zend.Zval
 		var max_depth *zend.Zval
@@ -1487,7 +1487,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			/* Exception during string conversion. */
 
 		}
-		PhpVarUnserializeSetAllowedClasses(var_hash, class_hash)
+		var_hash.SetAllowedClasses(class_hash)
 		max_depth = zend.ZendHashStrFindDeref(options.GetArr(), "max_depth", b.SizeOf("\"max_depth\"")-1)
 		if max_depth != nil {
 			if max_depth.GetType() != zend.IS_LONG {
@@ -1500,12 +1500,12 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				zend.RETVAL_FALSE
 				goto cleanup
 			}
-			PhpVarUnserializeSetMaxDepth(var_hash, max_depth.GetLval())
+			var_hash.SetMaxDepth(max_depth.GetLval())
 
 			/* If the max_depth for a nested unserialize() call has been overridden,
 			 * start counting from zero again (for the nested call only). */
 
-			PhpVarUnserializeSetCurDepth(var_hash, 0)
+			var_hash.SetCurDepth(0)
 
 			/* If the max_depth for a nested unserialize() call has been overridden,
 			 * start counting from zero again (for the nested call only). */
@@ -1539,9 +1539,9 @@ cleanup:
 
 	/* Reset to previous options in case this is a nested call */
 
-	PhpVarUnserializeSetAllowedClasses(var_hash, prev_class_hash)
-	PhpVarUnserializeSetMaxDepth(var_hash, prev_max_depth)
-	PhpVarUnserializeSetCurDepth(var_hash, prev_cur_depth)
+	var_hash.SetAllowedClasses(prev_class_hash)
+	var_hash.SetMaxDepth(prev_max_depth)
+	var_hash.SetCurDepth(prev_cur_depth)
 	PHP_VAR_UNSERIALIZE_DESTROY(var_hash)
 
 	/* Per calling convention we must not return a reference here, so unwrap. We're doing this at
