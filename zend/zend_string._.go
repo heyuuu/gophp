@@ -67,6 +67,6 @@ const (
 	ZEND_STR_ARRAY_CAPITALIZED                    = "Array"
 )
 
-var InternedStringsPermanent HashTable
+var InternedStringsPermanent *InternedStrings = NewInternedStrings()
 var InternedStringRequestHandler ZendNewInternedStringFuncT = ZendNewInternedStringRequest
 var InternedStringInitRequestHandler ZendStringInitInternedFuncT = ZendStringInitInternedRequest

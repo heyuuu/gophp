@@ -32,7 +32,9 @@ type ZendCompilerGlobals struct {
 	context                      ZendOparrayContext
 	file_context                 ZendFileContext
 	arena                        *ZendArena
-	interned_strings             HashTable
+
+	InternedStrings *InternedStrings /* request 专用内部字符串 */
+
 	script_encoding_list         **ZendEncoding
 	script_encoding_list_size    int
 	multibyte                    ZendBool
@@ -113,8 +115,6 @@ func (this *ZendCompilerGlobals) GetFileContext() ZendFileContext      { return 
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
 func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return this.arena }
 func (this *ZendCompilerGlobals) SetArena(value *ZendArena)            { this.arena = value }
-func (this *ZendCompilerGlobals) GetInternedStrings() HashTable        { return this.interned_strings }
-func (this *ZendCompilerGlobals) SetInternedStrings(value HashTable)   { this.interned_strings = value }
 func (this *ZendCompilerGlobals) GetScriptEncodingList() **ZendEncoding {
 	return this.script_encoding_list
 }

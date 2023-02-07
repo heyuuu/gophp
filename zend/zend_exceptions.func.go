@@ -599,7 +599,6 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 	return
 }
 func ZendRegisterDefaultException() {
-	var ce zend_class_entry
 	var ce ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Throwable", b.SizeOf("\"Throwable\"")-1, 1))
