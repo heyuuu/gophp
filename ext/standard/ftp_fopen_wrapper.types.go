@@ -15,6 +15,20 @@ type PhpFtpDirstreamData struct {
 	dirstream     *core.PhpStream
 }
 
+// func NewPhpFtpDirstreamData(datastream *core.PhpStream, controlstream *core.PhpStream, dirstream *core.PhpStream) *PhpFtpDirstreamData {
+//     return &PhpFtpDirstreamData{
+//         datastream:datastream,
+//         controlstream:controlstream,
+//         dirstream:dirstream,
+//     }
+// }
+// func MakePhpFtpDirstreamData(datastream *core.PhpStream, controlstream *core.PhpStream, dirstream *core.PhpStream) PhpFtpDirstreamData {
+//     return PhpFtpDirstreamData{
+//         datastream:datastream,
+//         controlstream:controlstream,
+//         dirstream:dirstream,
+//     }
+// }
 func (this *PhpFtpDirstreamData) GetDatastream() *core.PhpStream         { return this.datastream }
 func (this *PhpFtpDirstreamData) SetDatastream(value *core.PhpStream)    { this.datastream = value }
 func (this *PhpFtpDirstreamData) GetControlstream() *core.PhpStream      { return this.controlstream }

@@ -14,6 +14,18 @@ type ZendClassName struct {
 	lc_name *ZendString
 }
 
+// func NewZendClassName(name *ZendString, lc_name *ZendString) *ZendClassName {
+//     return &ZendClassName{
+//         name:name,
+//         lc_name:lc_name,
+//     }
+// }
+// func MakeZendClassName(name *ZendString, lc_name *ZendString) ZendClassName {
+//     return ZendClassName{
+//         name:name,
+//         lc_name:lc_name,
+//     }
+// }
 func (this *ZendClassName) GetName() *ZendString        { return this.name }
 func (this *ZendClassName) SetName(value *ZendString)   { this.name = value }
 func (this *ZendClassName) GetLcName() *ZendString      { return this.lc_name }
@@ -27,6 +39,18 @@ type ZendTraitMethodReference struct {
 	class_name  *ZendString
 }
 
+// func NewZendTraitMethodReference(method_name *ZendString, class_name *ZendString) *ZendTraitMethodReference {
+//     return &ZendTraitMethodReference{
+//         method_name:method_name,
+//         class_name:class_name,
+//     }
+// }
+// func MakeZendTraitMethodReference(method_name *ZendString, class_name *ZendString) ZendTraitMethodReference {
+//     return ZendTraitMethodReference{
+//         method_name:method_name,
+//         class_name:class_name,
+//     }
+// }
 func (this *ZendTraitMethodReference) GetMethodName() *ZendString      { return this.method_name }
 func (this *ZendTraitMethodReference) SetMethodName(value *ZendString) { this.method_name = value }
 func (this *ZendTraitMethodReference) GetClassName() *ZendString       { return this.class_name }
@@ -41,18 +65,30 @@ type ZendTraitPrecedence struct {
 	exclude_class_names []*ZendString
 }
 
+// func NewZendTraitPrecedence(trait_method ZendTraitMethodReference, num_excludes uint32, exclude_class_names []*ZendString) *ZendTraitPrecedence {
+//     return &ZendTraitPrecedence{
+//         trait_method:trait_method,
+//         num_excludes:num_excludes,
+//         exclude_class_names:exclude_class_names,
+//     }
+// }
+// func MakeZendTraitPrecedence(trait_method ZendTraitMethodReference, num_excludes uint32, exclude_class_names []*ZendString) ZendTraitPrecedence {
+//     return ZendTraitPrecedence{
+//         trait_method:trait_method,
+//         num_excludes:num_excludes,
+//         exclude_class_names:exclude_class_names,
+//     }
+// }
 func (this *ZendTraitPrecedence) GetTraitMethod() ZendTraitMethodReference { return this.trait_method }
-func (this *ZendTraitPrecedence) SetTraitMethod(value ZendTraitMethodReference) {
-	this.trait_method = value
-}
+
+// func (this *ZendTraitPrecedence) SetTraitMethod(value ZendTraitMethodReference) { this.trait_method = value }
 func (this *ZendTraitPrecedence) GetNumExcludes() uint32      { return this.num_excludes }
 func (this *ZendTraitPrecedence) SetNumExcludes(value uint32) { this.num_excludes = value }
 func (this *ZendTraitPrecedence) GetExcludeClassNames() []*ZendString {
 	return this.exclude_class_names
 }
-func (this *ZendTraitPrecedence) SetExcludeClassNames(value []*ZendString) {
-	this.exclude_class_names = value
-}
+
+// func (this *ZendTraitPrecedence) SetExcludeClassNames(value []*ZendString) { this.exclude_class_names = value }
 
 /**
  * ZendTraitAlias
@@ -63,12 +99,27 @@ type ZendTraitAlias struct {
 	modifiers    uint32
 }
 
-func (this *ZendTraitAlias) GetTraitMethod() ZendTraitMethodReference      { return this.trait_method }
-func (this *ZendTraitAlias) SetTraitMethod(value ZendTraitMethodReference) { this.trait_method = value }
-func (this *ZendTraitAlias) GetAlias() *ZendString                         { return this.alias }
-func (this *ZendTraitAlias) SetAlias(value *ZendString)                    { this.alias = value }
-func (this *ZendTraitAlias) GetModifiers() uint32                          { return this.modifiers }
-func (this *ZendTraitAlias) SetModifiers(value uint32)                     { this.modifiers = value }
+// func NewZendTraitAlias(trait_method ZendTraitMethodReference, alias *ZendString, modifiers uint32) *ZendTraitAlias {
+//     return &ZendTraitAlias{
+//         trait_method:trait_method,
+//         alias:alias,
+//         modifiers:modifiers,
+//     }
+// }
+// func MakeZendTraitAlias(trait_method ZendTraitMethodReference, alias *ZendString, modifiers uint32) ZendTraitAlias {
+//     return ZendTraitAlias{
+//         trait_method:trait_method,
+//         alias:alias,
+//         modifiers:modifiers,
+//     }
+// }
+func (this *ZendTraitAlias) GetTraitMethod() ZendTraitMethodReference { return this.trait_method }
+
+// func (this *ZendTraitAlias) SetTraitMethod(value ZendTraitMethodReference) { this.trait_method = value }
+func (this *ZendTraitAlias) GetAlias() *ZendString      { return this.alias }
+func (this *ZendTraitAlias) SetAlias(value *ZendString) { this.alias = value }
+func (this *ZendTraitAlias) GetModifiers() uint32       { return this.modifiers }
+func (this *ZendTraitAlias) SetModifiers(value uint32)  { this.modifiers = value }
 
 /**
  * ZendClassEntry
@@ -169,15 +220,17 @@ func (this *ZendClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 	this.default_static_members_table = value
 }
 func (this *ZendClassEntry) GetStaticMembersTablePtr() **Zval { return this.static_members_table__ptr }
-func (this *ZendClassEntry) SetStaticMembersTablePtr(value **Zval) {
-	this.static_members_table__ptr = value
-}
-func (this *ZendClassEntry) GetFunctionTable() HashTable       { return this.function_table }
-func (this *ZendClassEntry) SetFunctionTable(value HashTable)  { this.function_table = value }
-func (this *ZendClassEntry) GetPropertiesInfo() HashTable      { return this.properties_info }
-func (this *ZendClassEntry) SetPropertiesInfo(value HashTable) { this.properties_info = value }
-func (this *ZendClassEntry) GetConstantsTable() HashTable      { return this.constants_table }
-func (this *ZendClassEntry) SetConstantsTable(value HashTable) { this.constants_table = value }
+
+// func (this *ZendClassEntry) SetStaticMembersTablePtr(value **Zval) { this.static_members_table__ptr = value }
+func (this *ZendClassEntry) GetFunctionTable() HashTable { return this.function_table }
+
+// func (this *ZendClassEntry) SetFunctionTable(value HashTable) { this.function_table = value }
+func (this *ZendClassEntry) GetPropertiesInfo() HashTable { return this.properties_info }
+
+// func (this *ZendClassEntry) SetPropertiesInfo(value HashTable) { this.properties_info = value }
+func (this *ZendClassEntry) GetConstantsTable() HashTable { return this.constants_table }
+
+// func (this *ZendClassEntry) SetConstantsTable(value HashTable) { this.constants_table = value }
 func (this *ZendClassEntry) GetPropertiesInfoTable() **ZendPropertyInfo {
 	return this.properties_info_table
 }
@@ -270,11 +323,13 @@ func (this *ZendClassEntry) GetTraitPrecedences() **ZendTraitPrecedence {
 func (this *ZendClassEntry) SetTraitPrecedences(value **ZendTraitPrecedence) {
 	this.trait_precedences = value
 }
-func (this *ZendClassEntry) GetFilename() *ZendString        { return this.info.user.filename }
-func (this *ZendClassEntry) SetFilename(value *ZendString)   { this.info.user.filename = value }
-func (this *ZendClassEntry) GetLineStart() uint32            { return this.info.user.line_start }
-func (this *ZendClassEntry) SetLineStart(value uint32)       { this.info.user.line_start = value }
-func (this *ZendClassEntry) GetLineEnd() uint32              { return this.info.user.line_end }
+func (this *ZendClassEntry) GetFilename() *ZendString      { return this.info.user.filename }
+func (this *ZendClassEntry) SetFilename(value *ZendString) { this.info.user.filename = value }
+
+// func (this *ZendClassEntry)  GetLineStart() uint32      { return this.info.user.line_start }
+func (this *ZendClassEntry) SetLineStart(value uint32) { this.info.user.line_start = value }
+
+// func (this *ZendClassEntry)  GetLineEnd() uint32      { return this.info.user.line_end }
 func (this *ZendClassEntry) SetLineEnd(value uint32)         { this.info.user.line_end = value }
 func (this *ZendClassEntry) GetDocComment() *ZendString      { return this.info.user.doc_comment }
 func (this *ZendClassEntry) SetDocComment(value *ZendString) { this.info.user.doc_comment = value }
@@ -414,6 +469,40 @@ type ZendUtilityFunctions struct {
 	resolve_path_function           func(filename *byte, filename_len int) *ZendString
 }
 
+// func NewZendUtilityFunctions(error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any), printf_function func(format *byte, _ ...any) int, write_function func(str *byte, str_length int) int, fopen_function func(filename *byte, opened_path **ZendString) *r.FILE, message_handler func(message ZendLong, data any), get_configuration_directive func(name *ZendString) *Zval, ticks_function func(ticks int), on_timeout func(seconds int), stream_open_function func(filename *byte, handle *ZendFileHandle) int, printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any), printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any), getenv_function func(name *byte, name_len int) *byte, resolve_path_function func(filename *byte, filename_len int) *ZendString) *ZendUtilityFunctions {
+//     return &ZendUtilityFunctions{
+//         error_function:error_function,
+//         printf_function:printf_function,
+//         write_function:write_function,
+//         fopen_function:fopen_function,
+//         message_handler:message_handler,
+//         get_configuration_directive:get_configuration_directive,
+//         ticks_function:ticks_function,
+//         on_timeout:on_timeout,
+//         stream_open_function:stream_open_function,
+//         printf_to_smart_string_function:printf_to_smart_string_function,
+//         printf_to_smart_str_function:printf_to_smart_str_function,
+//         getenv_function:getenv_function,
+//         resolve_path_function:resolve_path_function,
+//     }
+// }
+// func MakeZendUtilityFunctions(error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any), printf_function func(format *byte, _ ...any) int, write_function func(str *byte, str_length int) int, fopen_function func(filename *byte, opened_path **ZendString) *r.FILE, message_handler func(message ZendLong, data any), get_configuration_directive func(name *ZendString) *Zval, ticks_function func(ticks int), on_timeout func(seconds int), stream_open_function func(filename *byte, handle *ZendFileHandle) int, printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any), printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any), getenv_function func(name *byte, name_len int) *byte, resolve_path_function func(filename *byte, filename_len int) *ZendString) ZendUtilityFunctions {
+//     return ZendUtilityFunctions{
+//         error_function:error_function,
+//         printf_function:printf_function,
+//         write_function:write_function,
+//         fopen_function:fopen_function,
+//         message_handler:message_handler,
+//         get_configuration_directive:get_configuration_directive,
+//         ticks_function:ticks_function,
+//         on_timeout:on_timeout,
+//         stream_open_function:stream_open_function,
+//         printf_to_smart_string_function:printf_to_smart_string_function,
+//         printf_to_smart_str_function:printf_to_smart_str_function,
+//         getenv_function:getenv_function,
+//         resolve_path_function:resolve_path_function,
+//     }
+// }
 func (this *ZendUtilityFunctions) GetErrorFunction() func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
 	return this.error_function
 }
@@ -494,6 +583,16 @@ type ZendUtilityValues struct {
 	html_errors ZendBool
 }
 
+// func NewZendUtilityValues(html_errors ZendBool) *ZendUtilityValues {
+//     return &ZendUtilityValues{
+//         html_errors:html_errors,
+//     }
+// }
+// func MakeZendUtilityValues(html_errors ZendBool) ZendUtilityValues {
+//     return ZendUtilityValues{
+//         html_errors:html_errors,
+//     }
+// }
 func (this *ZendUtilityValues) GetHtmlErrors() ZendBool      { return this.html_errors }
 func (this *ZendUtilityValues) SetHtmlErrors(value ZendBool) { this.html_errors = value }
 
@@ -506,9 +605,24 @@ type ZendErrorHandling struct {
 	user_handler Zval
 }
 
+// func NewZendErrorHandling(handling ZendErrorHandlingT, exception *ZendClassEntry, user_handler Zval) *ZendErrorHandling {
+//     return &ZendErrorHandling{
+//         handling:handling,
+//         exception:exception,
+//         user_handler:user_handler,
+//     }
+// }
+// func MakeZendErrorHandling(handling ZendErrorHandlingT, exception *ZendClassEntry, user_handler Zval) ZendErrorHandling {
+//     return ZendErrorHandling{
+//         handling:handling,
+//         exception:exception,
+//         user_handler:user_handler,
+//     }
+// }
 func (this *ZendErrorHandling) GetHandling() ZendErrorHandlingT      { return this.handling }
 func (this *ZendErrorHandling) SetHandling(value ZendErrorHandlingT) { this.handling = value }
 func (this *ZendErrorHandling) GetException() *ZendClassEntry        { return this.exception }
 func (this *ZendErrorHandling) SetException(value *ZendClassEntry)   { this.exception = value }
 func (this *ZendErrorHandling) GetUserHandler() Zval                 { return this.user_handler }
-func (this *ZendErrorHandling) SetUserHandler(value Zval)            { this.user_handler = value }
+
+// func (this *ZendErrorHandling) SetUserHandler(value Zval) { this.user_handler = value }

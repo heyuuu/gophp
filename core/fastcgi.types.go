@@ -16,6 +16,30 @@ type FcgiHeader struct {
 	reserved        uint8
 }
 
+// func NewFcgiHeader(version uint8, type_ uint8, requestIdB1 uint8, requestIdB0 uint8, contentLengthB1 uint8, contentLengthB0 uint8, paddingLength uint8, reserved uint8) *FcgiHeader {
+//     return &FcgiHeader{
+//         version:version,
+//         type_:type_,
+//         requestIdB1:requestIdB1,
+//         requestIdB0:requestIdB0,
+//         contentLengthB1:contentLengthB1,
+//         contentLengthB0:contentLengthB0,
+//         paddingLength:paddingLength,
+//         reserved:reserved,
+//     }
+// }
+// func MakeFcgiHeader(version uint8, type_ uint8, requestIdB1 uint8, requestIdB0 uint8, contentLengthB1 uint8, contentLengthB0 uint8, paddingLength uint8, reserved uint8) FcgiHeader {
+//     return FcgiHeader{
+//         version:version,
+//         type_:type_,
+//         requestIdB1:requestIdB1,
+//         requestIdB0:requestIdB0,
+//         contentLengthB1:contentLengthB1,
+//         contentLengthB0:contentLengthB0,
+//         paddingLength:paddingLength,
+//         reserved:reserved,
+//     }
+// }
 func (this *FcgiHeader) GetVersion() uint8              { return this.version }
 func (this *FcgiHeader) SetVersion(value uint8)         { this.version = value }
 func (this *FcgiHeader) GetType() uint8                 { return this.type_ }
@@ -30,8 +54,9 @@ func (this *FcgiHeader) GetContentLengthB0() uint8      { return this.contentLen
 func (this *FcgiHeader) SetContentLengthB0(value uint8) { this.contentLengthB0 = value }
 func (this *FcgiHeader) GetPaddingLength() uint8        { return this.paddingLength }
 func (this *FcgiHeader) SetPaddingLength(value uint8)   { this.paddingLength = value }
-func (this *FcgiHeader) GetReserved() uint8             { return this.reserved }
-func (this *FcgiHeader) SetReserved(value uint8)        { this.reserved = value }
+
+// func (this *FcgiHeader)  GetReserved() uint8      { return this.reserved }
+func (this *FcgiHeader) SetReserved(value uint8) { this.reserved = value }
 
 /**
  * FcgiBeginRequest
@@ -43,14 +68,33 @@ type FcgiBeginRequest struct {
 	reserved []uint8
 }
 
-func (this *FcgiBeginRequest) GetRoleB1() uint8          { return this.roleB1 }
-func (this *FcgiBeginRequest) SetRoleB1(value uint8)     { this.roleB1 = value }
-func (this *FcgiBeginRequest) GetRoleB0() uint8          { return this.roleB0 }
-func (this *FcgiBeginRequest) SetRoleB0(value uint8)     { this.roleB0 = value }
-func (this *FcgiBeginRequest) GetFlags() uint8           { return this.flags }
-func (this *FcgiBeginRequest) SetFlags(value uint8)      { this.flags = value }
-func (this *FcgiBeginRequest) GetReserved() []uint8      { return this.reserved }
-func (this *FcgiBeginRequest) SetReserved(value []uint8) { this.reserved = value }
+// func NewFcgiBeginRequest(roleB1 uint8, roleB0 uint8, flags uint8, reserved []uint8) *FcgiBeginRequest {
+//     return &FcgiBeginRequest{
+//         roleB1:roleB1,
+//         roleB0:roleB0,
+//         flags:flags,
+//         reserved:reserved,
+//     }
+// }
+// func MakeFcgiBeginRequest(roleB1 uint8, roleB0 uint8, flags uint8, reserved []uint8) FcgiBeginRequest {
+//     return FcgiBeginRequest{
+//         roleB1:roleB1,
+//         roleB0:roleB0,
+//         flags:flags,
+//         reserved:reserved,
+//     }
+// }
+func (this *FcgiBeginRequest) GetRoleB1() uint8 { return this.roleB1 }
+
+// func (this *FcgiBeginRequest) SetRoleB1(value uint8) { this.roleB1 = value }
+func (this *FcgiBeginRequest) GetRoleB0() uint8 { return this.roleB0 }
+
+// func (this *FcgiBeginRequest) SetRoleB0(value uint8) { this.roleB0 = value }
+func (this *FcgiBeginRequest) GetFlags() uint8 { return this.flags }
+
+// func (this *FcgiBeginRequest) SetFlags(value uint8) { this.flags = value }
+// func (this *FcgiBeginRequest)  GetReserved() []uint8      { return this.reserved }
+// func (this *FcgiBeginRequest) SetReserved(value []uint8) { this.reserved = value }
 
 /* FcgiBeginRequest.flags */
 func (this *FcgiBeginRequest) AddFlags(value uint8)      { this.flags |= value }
@@ -72,10 +116,22 @@ type FcgiBeginRequestRec struct {
 	body FcgiBeginRequest
 }
 
-func (this *FcgiBeginRequestRec) GetHdr() FcgiHeader             { return this.hdr }
-func (this *FcgiBeginRequestRec) SetHdr(value FcgiHeader)        { this.hdr = value }
-func (this *FcgiBeginRequestRec) GetBody() FcgiBeginRequest      { return this.body }
-func (this *FcgiBeginRequestRec) SetBody(value FcgiBeginRequest) { this.body = value }
+// func NewFcgiBeginRequestRec(hdr FcgiHeader, body FcgiBeginRequest) *FcgiBeginRequestRec {
+//     return &FcgiBeginRequestRec{
+//         hdr:hdr,
+//         body:body,
+//     }
+// }
+// func MakeFcgiBeginRequestRec(hdr FcgiHeader, body FcgiBeginRequest) FcgiBeginRequestRec {
+//     return FcgiBeginRequestRec{
+//         hdr:hdr,
+//         body:body,
+//     }
+// }
+// func (this *FcgiBeginRequestRec)  GetHdr() FcgiHeader      { return this.hdr }
+// func (this *FcgiBeginRequestRec) SetHdr(value FcgiHeader) { this.hdr = value }
+// func (this *FcgiBeginRequestRec)  GetBody() FcgiBeginRequest      { return this.body }
+// func (this *FcgiBeginRequestRec) SetBody(value FcgiBeginRequest) { this.body = value }
 
 /**
  * FcgiEndRequest
@@ -89,18 +145,43 @@ type FcgiEndRequest struct {
 	reserved       []uint8
 }
 
-func (this *FcgiEndRequest) GetAppStatusB3() uint8         { return this.appStatusB3 }
-func (this *FcgiEndRequest) SetAppStatusB3(value uint8)    { this.appStatusB3 = value }
-func (this *FcgiEndRequest) GetAppStatusB2() uint8         { return this.appStatusB2 }
-func (this *FcgiEndRequest) SetAppStatusB2(value uint8)    { this.appStatusB2 = value }
-func (this *FcgiEndRequest) GetAppStatusB1() uint8         { return this.appStatusB1 }
-func (this *FcgiEndRequest) SetAppStatusB1(value uint8)    { this.appStatusB1 = value }
-func (this *FcgiEndRequest) GetAppStatusB0() uint8         { return this.appStatusB0 }
-func (this *FcgiEndRequest) SetAppStatusB0(value uint8)    { this.appStatusB0 = value }
-func (this *FcgiEndRequest) GetProtocolStatus() uint8      { return this.protocolStatus }
+// func NewFcgiEndRequest(appStatusB3 uint8, appStatusB2 uint8, appStatusB1 uint8, appStatusB0 uint8, protocolStatus uint8, reserved []uint8) *FcgiEndRequest {
+//     return &FcgiEndRequest{
+//         appStatusB3:appStatusB3,
+//         appStatusB2:appStatusB2,
+//         appStatusB1:appStatusB1,
+//         appStatusB0:appStatusB0,
+//         protocolStatus:protocolStatus,
+//         reserved:reserved,
+//     }
+// }
+// func MakeFcgiEndRequest(appStatusB3 uint8, appStatusB2 uint8, appStatusB1 uint8, appStatusB0 uint8, protocolStatus uint8, reserved []uint8) FcgiEndRequest {
+//     return FcgiEndRequest{
+//         appStatusB3:appStatusB3,
+//         appStatusB2:appStatusB2,
+//         appStatusB1:appStatusB1,
+//         appStatusB0:appStatusB0,
+//         protocolStatus:protocolStatus,
+//         reserved:reserved,
+//     }
+// }
+// func (this *FcgiEndRequest)  GetAppStatusB3() uint8      { return this.appStatusB3 }
+func (this *FcgiEndRequest) SetAppStatusB3(value uint8) { this.appStatusB3 = value }
+
+// func (this *FcgiEndRequest)  GetAppStatusB2() uint8      { return this.appStatusB2 }
+func (this *FcgiEndRequest) SetAppStatusB2(value uint8) { this.appStatusB2 = value }
+
+// func (this *FcgiEndRequest)  GetAppStatusB1() uint8      { return this.appStatusB1 }
+func (this *FcgiEndRequest) SetAppStatusB1(value uint8) { this.appStatusB1 = value }
+
+// func (this *FcgiEndRequest)  GetAppStatusB0() uint8      { return this.appStatusB0 }
+func (this *FcgiEndRequest) SetAppStatusB0(value uint8) { this.appStatusB0 = value }
+
+// func (this *FcgiEndRequest)  GetProtocolStatus() uint8      { return this.protocolStatus }
 func (this *FcgiEndRequest) SetProtocolStatus(value uint8) { this.protocolStatus = value }
-func (this *FcgiEndRequest) GetReserved() []uint8          { return this.reserved }
-func (this *FcgiEndRequest) SetReserved(value []uint8)     { this.reserved = value }
+
+// func (this *FcgiEndRequest)  GetReserved() []uint8      { return this.reserved }
+// func (this *FcgiEndRequest) SetReserved(value []uint8) { this.reserved = value }
 
 /**
  * FcgiEndRequestRec
@@ -110,10 +191,24 @@ type FcgiEndRequestRec struct {
 	body FcgiEndRequest
 }
 
-func (this *FcgiEndRequestRec) GetHdr() FcgiHeader           { return this.hdr }
-func (this *FcgiEndRequestRec) SetHdr(value FcgiHeader)      { this.hdr = value }
-func (this *FcgiEndRequestRec) GetBody() FcgiEndRequest      { return this.body }
-func (this *FcgiEndRequestRec) SetBody(value FcgiEndRequest) { this.body = value }
+// func NewFcgiEndRequestRec(hdr FcgiHeader, body FcgiEndRequest) *FcgiEndRequestRec {
+//     return &FcgiEndRequestRec{
+//         hdr:hdr,
+//         body:body,
+//     }
+// }
+// func MakeFcgiEndRequestRec(hdr FcgiHeader, body FcgiEndRequest) FcgiEndRequestRec {
+//     return FcgiEndRequestRec{
+//         hdr:hdr,
+//         body:body,
+//     }
+// }
+func (this *FcgiEndRequestRec) GetHdr() FcgiHeader { return this.hdr }
+
+// func (this *FcgiEndRequestRec) SetHdr(value FcgiHeader) { this.hdr = value }
+func (this *FcgiEndRequestRec) GetBody() FcgiEndRequest { return this.body }
+
+// func (this *FcgiEndRequestRec) SetBody(value FcgiEndRequest) { this.body = value }
 
 /**
  * FcgiHashBucket
@@ -128,6 +223,28 @@ type FcgiHashBucket struct {
 	list_next  *FcgiHashBucket
 }
 
+// func NewFcgiHashBucket(hash_value uint, var_len uint, var_ *byte, val_len uint, val *byte, next *FcgiHashBucket, list_next *FcgiHashBucket) *FcgiHashBucket {
+//     return &FcgiHashBucket{
+//         hash_value:hash_value,
+//         var_len:var_len,
+//         var_:var_,
+//         val_len:val_len,
+//         val:val,
+//         next:next,
+//         list_next:list_next,
+//     }
+// }
+// func MakeFcgiHashBucket(hash_value uint, var_len uint, var_ *byte, val_len uint, val *byte, next *FcgiHashBucket, list_next *FcgiHashBucket) FcgiHashBucket {
+//     return FcgiHashBucket{
+//         hash_value:hash_value,
+//         var_len:var_len,
+//         var_:var_,
+//         val_len:val_len,
+//         val:val,
+//         next:next,
+//         list_next:list_next,
+//     }
+// }
 func (this *FcgiHashBucket) GetHashValue() uint                { return this.hash_value }
 func (this *FcgiHashBucket) SetHashValue(value uint)           { this.hash_value = value }
 func (this *FcgiHashBucket) GetVarLen() uint                   { return this.var_len }
@@ -152,12 +269,27 @@ type FcgiHashBuckets struct {
 	data []FcgiHashBucket
 }
 
+// func NewFcgiHashBuckets(idx uint, next *FcgiHashBuckets, data []FcgiHashBucket) *FcgiHashBuckets {
+//     return &FcgiHashBuckets{
+//         idx:idx,
+//         next:next,
+//         data:data,
+//     }
+// }
+// func MakeFcgiHashBuckets(idx uint, next *FcgiHashBuckets, data []FcgiHashBucket) FcgiHashBuckets {
+//     return FcgiHashBuckets{
+//         idx:idx,
+//         next:next,
+//         data:data,
+//     }
+// }
 func (this *FcgiHashBuckets) GetIdx() uint                   { return this.idx }
 func (this *FcgiHashBuckets) SetIdx(value uint)              { this.idx = value }
 func (this *FcgiHashBuckets) GetNext() *FcgiHashBuckets      { return this.next }
 func (this *FcgiHashBuckets) SetNext(value *FcgiHashBuckets) { this.next = value }
 func (this *FcgiHashBuckets) GetData() []FcgiHashBucket      { return this.data }
-func (this *FcgiHashBuckets) SetData(value []FcgiHashBucket) { this.data = value }
+
+// func (this *FcgiHashBuckets) SetData(value []FcgiHashBucket) { this.data = value }
 
 /**
  * FcgiDataSeg
@@ -169,6 +301,22 @@ type FcgiDataSeg struct {
 	data []byte
 }
 
+// func NewFcgiDataSeg(pos *byte, end *byte, next *FcgiDataSeg, data []byte) *FcgiDataSeg {
+//     return &FcgiDataSeg{
+//         pos:pos,
+//         end:end,
+//         next:next,
+//         data:data,
+//     }
+// }
+// func MakeFcgiDataSeg(pos *byte, end *byte, next *FcgiDataSeg, data []byte) FcgiDataSeg {
+//     return FcgiDataSeg{
+//         pos:pos,
+//         end:end,
+//         next:next,
+//         data:data,
+//     }
+// }
 func (this *FcgiDataSeg) GetPos() *byte              { return this.pos }
 func (this *FcgiDataSeg) SetPos(value *byte)         { this.pos = value }
 func (this *FcgiDataSeg) GetEnd() *byte              { return this.end }
@@ -176,7 +324,8 @@ func (this *FcgiDataSeg) SetEnd(value *byte)         { this.end = value }
 func (this *FcgiDataSeg) GetNext() *FcgiDataSeg      { return this.next }
 func (this *FcgiDataSeg) SetNext(value *FcgiDataSeg) { this.next = value }
 func (this *FcgiDataSeg) GetData() []byte            { return this.data }
-func (this *FcgiDataSeg) SetData(value []byte)       { this.data = value }
+
+// func (this *FcgiDataSeg) SetData(value []byte) { this.data = value }
 
 /**
  * FcgiHash
@@ -188,14 +337,31 @@ type FcgiHash struct {
 	data       *FcgiDataSeg
 }
 
-func (this *FcgiHash) GetHashTable() []*FcgiHashBucket      { return this.hash_table }
-func (this *FcgiHash) SetHashTable(value []*FcgiHashBucket) { this.hash_table = value }
-func (this *FcgiHash) GetList() *FcgiHashBucket             { return this.list }
-func (this *FcgiHash) SetList(value *FcgiHashBucket)        { this.list = value }
-func (this *FcgiHash) GetBuckets() *FcgiHashBuckets         { return this.buckets }
-func (this *FcgiHash) SetBuckets(value *FcgiHashBuckets)    { this.buckets = value }
-func (this *FcgiHash) GetData() *FcgiDataSeg                { return this.data }
-func (this *FcgiHash) SetData(value *FcgiDataSeg)           { this.data = value }
+// func NewFcgiHash(hash_table []*FcgiHashBucket, list *FcgiHashBucket, buckets *FcgiHashBuckets, data *FcgiDataSeg) *FcgiHash {
+//     return &FcgiHash{
+//         hash_table:hash_table,
+//         list:list,
+//         buckets:buckets,
+//         data:data,
+//     }
+// }
+// func MakeFcgiHash(hash_table []*FcgiHashBucket, list *FcgiHashBucket, buckets *FcgiHashBuckets, data *FcgiDataSeg) FcgiHash {
+//     return FcgiHash{
+//         hash_table:hash_table,
+//         list:list,
+//         buckets:buckets,
+//         data:data,
+//     }
+// }
+func (this *FcgiHash) GetHashTable() []*FcgiHashBucket { return this.hash_table }
+
+// func (this *FcgiHash) SetHashTable(value []*FcgiHashBucket) { this.hash_table = value }
+func (this *FcgiHash) GetList() *FcgiHashBucket          { return this.list }
+func (this *FcgiHash) SetList(value *FcgiHashBucket)     { this.list = value }
+func (this *FcgiHash) GetBuckets() *FcgiHashBuckets      { return this.buckets }
+func (this *FcgiHash) SetBuckets(value *FcgiHashBuckets) { this.buckets = value }
+func (this *FcgiHash) GetData() *FcgiDataSeg             { return this.data }
+func (this *FcgiHash) SetData(value *FcgiDataSeg)        { this.data = value }
 
 /**
  * FcgiReqHook
@@ -206,6 +372,20 @@ type FcgiReqHook struct {
 	on_close  func()
 }
 
+// func NewFcgiReqHook(on_accept func(), on_read func(), on_close func()) *FcgiReqHook {
+//     return &FcgiReqHook{
+//         on_accept:on_accept,
+//         on_read:on_read,
+//         on_close:on_close,
+//     }
+// }
+// func MakeFcgiReqHook(on_accept func(), on_read func(), on_close func()) FcgiReqHook {
+//     return FcgiReqHook{
+//         on_accept:on_accept,
+//         on_read:on_read,
+//         on_close:on_close,
+//     }
+// }
 func (this *FcgiReqHook) GetOnAccept() func()      { return this.on_accept }
 func (this *FcgiReqHook) SetOnAccept(value func()) { this.on_accept = value }
 func (this *FcgiReqHook) GetOnRead() func()        { return this.on_read }
@@ -234,10 +414,49 @@ type FcgiRequest struct {
 	env           FcgiHash
 }
 
-func (this *FcgiRequest) GetListenSocket() int        { return this.listen_socket }
-func (this *FcgiRequest) SetListenSocket(value int)   { this.listen_socket = value }
-func (this *FcgiRequest) GetTcp() int                 { return this.tcp }
-func (this *FcgiRequest) SetTcp(value int)            { this.tcp = value }
+// func NewFcgiRequest(listen_socket int, tcp int, fd int, id int, keep int, ended int, in_len int, in_pad int, out_hdr *FcgiHeader, out_pos *uint8, out_buf []uint8, reserved []uint8, hook FcgiReqHook, has_env int, env FcgiHash) *FcgiRequest {
+//     return &FcgiRequest{
+//         listen_socket:listen_socket,
+//         tcp:tcp,
+//         fd:fd,
+//         id:id,
+//         keep:keep,
+//         ended:ended,
+//         in_len:in_len,
+//         in_pad:in_pad,
+//         out_hdr:out_hdr,
+//         out_pos:out_pos,
+//         out_buf:out_buf,
+//         reserved:reserved,
+//         hook:hook,
+//         has_env:has_env,
+//         env:env,
+//     }
+// }
+// func MakeFcgiRequest(listen_socket int, tcp int, fd int, id int, keep int, ended int, in_len int, in_pad int, out_hdr *FcgiHeader, out_pos *uint8, out_buf []uint8, reserved []uint8, hook FcgiReqHook, has_env int, env FcgiHash) FcgiRequest {
+//     return FcgiRequest{
+//         listen_socket:listen_socket,
+//         tcp:tcp,
+//         fd:fd,
+//         id:id,
+//         keep:keep,
+//         ended:ended,
+//         in_len:in_len,
+//         in_pad:in_pad,
+//         out_hdr:out_hdr,
+//         out_pos:out_pos,
+//         out_buf:out_buf,
+//         reserved:reserved,
+//         hook:hook,
+//         has_env:has_env,
+//         env:env,
+//     }
+// }
+func (this *FcgiRequest) GetListenSocket() int      { return this.listen_socket }
+func (this *FcgiRequest) SetListenSocket(value int) { this.listen_socket = value }
+
+// func (this *FcgiRequest)  GetTcp() int      { return this.tcp }
+// func (this *FcgiRequest) SetTcp(value int) { this.tcp = value }
 func (this *FcgiRequest) GetFd() int                  { return this.fd }
 func (this *FcgiRequest) SetFd(value int)             { this.fd = value }
 func (this *FcgiRequest) GetId() int                  { return this.id }
@@ -255,15 +474,18 @@ func (this *FcgiRequest) SetOutHdr(value *FcgiHeader) { this.out_hdr = value }
 func (this *FcgiRequest) GetOutPos() *uint8           { return this.out_pos }
 func (this *FcgiRequest) SetOutPos(value *uint8)      { this.out_pos = value }
 func (this *FcgiRequest) GetOutBuf() []uint8          { return this.out_buf }
-func (this *FcgiRequest) SetOutBuf(value []uint8)     { this.out_buf = value }
-func (this *FcgiRequest) GetReserved() []uint8        { return this.reserved }
-func (this *FcgiRequest) SetReserved(value []uint8)   { this.reserved = value }
-func (this *FcgiRequest) GetHook() FcgiReqHook        { return this.hook }
-func (this *FcgiRequest) SetHook(value FcgiReqHook)   { this.hook = value }
-func (this *FcgiRequest) GetHasEnv() int              { return this.has_env }
-func (this *FcgiRequest) SetHasEnv(value int)         { this.has_env = value }
-func (this *FcgiRequest) GetEnv() FcgiHash            { return this.env }
-func (this *FcgiRequest) SetEnv(value FcgiHash)       { this.env = value }
+
+// func (this *FcgiRequest) SetOutBuf(value []uint8) { this.out_buf = value }
+// func (this *FcgiRequest)  GetReserved() []uint8      { return this.reserved }
+// func (this *FcgiRequest) SetReserved(value []uint8) { this.reserved = value }
+func (this *FcgiRequest) GetHook() FcgiReqHook { return this.hook }
+
+// func (this *FcgiRequest) SetHook(value FcgiReqHook) { this.hook = value }
+func (this *FcgiRequest) GetHasEnv() int      { return this.has_env }
+func (this *FcgiRequest) SetHasEnv(value int) { this.has_env = value }
+func (this *FcgiRequest) GetEnv() FcgiHash    { return this.env }
+
+// func (this *FcgiRequest) SetEnv(value FcgiHash) { this.env = value }
 
 /**
  * SaT
@@ -275,11 +497,31 @@ type SaT struct /* union */ {
 	sa_inet6 __struct__sockaddr_in6
 }
 
-func (this *SaT) GetSa() __struct__sockaddr               { return this.sa }
-func (this *SaT) SetSa(value __struct__sockaddr)          { this.sa = value }
-func (this *SaT) GetSaUnix() __struct__sockaddr_un        { return this.sa_unix }
-func (this *SaT) SetSaUnix(value __struct__sockaddr_un)   { this.sa_unix = value }
-func (this *SaT) GetSaInet() __struct__sockaddr_in        { return this.sa_inet }
-func (this *SaT) SetSaInet(value __struct__sockaddr_in)   { this.sa_inet = value }
-func (this *SaT) GetSaInet6() __struct__sockaddr_in6      { return this.sa_inet6 }
-func (this *SaT) SetSaInet6(value __struct__sockaddr_in6) { this.sa_inet6 = value }
+// func NewSaT(sa __struct__sockaddr, sa_unix __struct__sockaddr_un, sa_inet __struct__sockaddr_in, sa_inet6 __struct__sockaddr_in6) *SaT {
+//     return &SaT{
+//         sa:sa,
+//         sa_unix:sa_unix,
+//         sa_inet:sa_inet,
+//         sa_inet6:sa_inet6,
+//     }
+// }
+// func MakeSaT(sa __struct__sockaddr, sa_unix __struct__sockaddr_un, sa_inet __struct__sockaddr_in, sa_inet6 __struct__sockaddr_in6) SaT {
+//     return SaT{
+//         sa:sa,
+//         sa_unix:sa_unix,
+//         sa_inet:sa_inet,
+//         sa_inet6:sa_inet6,
+//     }
+// }
+func (this *SaT) GetSa() __struct__sockaddr { return this.sa }
+
+// func (this *SaT) SetSa(value __struct__sockaddr) { this.sa = value }
+func (this *SaT) GetSaUnix() __struct__sockaddr_un { return this.sa_unix }
+
+// func (this *SaT) SetSaUnix(value __struct__sockaddr_un) { this.sa_unix = value }
+func (this *SaT) GetSaInet() __struct__sockaddr_in { return this.sa_inet }
+
+// func (this *SaT) SetSaInet(value __struct__sockaddr_in) { this.sa_inet = value }
+func (this *SaT) GetSaInet6() __struct__sockaddr_in6 { return this.sa_inet6 }
+
+// func (this *SaT) SetSaInet6(value __struct__sockaddr_in6) { this.sa_inet6 = value }

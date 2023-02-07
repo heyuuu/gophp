@@ -11,9 +11,23 @@ type PhpLcgGlobals struct {
 	seeded int
 }
 
-func (this *PhpLcgGlobals) GetS1() int32        { return this.s1 }
-func (this *PhpLcgGlobals) SetS1(value int32)   { this.s1 = value }
-func (this *PhpLcgGlobals) GetS2() int32        { return this.s2 }
-func (this *PhpLcgGlobals) SetS2(value int32)   { this.s2 = value }
-func (this *PhpLcgGlobals) GetSeeded() int      { return this.seeded }
-func (this *PhpLcgGlobals) SetSeeded(value int) { this.seeded = value }
+// func NewPhpLcgGlobals(s1 int32, s2 int32, seeded int) *PhpLcgGlobals {
+//     return &PhpLcgGlobals{
+//         s1:s1,
+//         s2:s2,
+//         seeded:seeded,
+//     }
+// }
+// func MakePhpLcgGlobals(s1 int32, s2 int32, seeded int) PhpLcgGlobals {
+//     return PhpLcgGlobals{
+//         s1:s1,
+//         s2:s2,
+//         seeded:seeded,
+//     }
+// }
+// func (this *PhpLcgGlobals)  GetS1() int32      { return this.s1 }
+// func (this *PhpLcgGlobals) SetS1(value int32) { this.s1 = value }
+// func (this *PhpLcgGlobals)  GetS2() int32      { return this.s2 }
+// func (this *PhpLcgGlobals) SetS2(value int32) { this.s2 = value }
+// func (this *PhpLcgGlobals)  GetSeeded() int      { return this.seeded }
+// func (this *PhpLcgGlobals) SetSeeded(value int) { this.seeded = value }

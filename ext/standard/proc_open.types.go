@@ -14,6 +14,18 @@ type PhpProcessEnvT struct {
 	envarray **byte
 }
 
+// func NewPhpProcessEnvT(envp *byte, envarray **byte) *PhpProcessEnvT {
+//     return &PhpProcessEnvT{
+//         envp:envp,
+//         envarray:envarray,
+//     }
+// }
+// func MakePhpProcessEnvT(envp *byte, envarray **byte) PhpProcessEnvT {
+//     return PhpProcessEnvT{
+//         envp:envp,
+//         envarray:envarray,
+//     }
+// }
 func (this *PhpProcessEnvT) GetEnvp() *byte           { return this.envp }
 func (this *PhpProcessEnvT) SetEnvp(value *byte)      { this.envp = value }
 func (this *PhpProcessEnvT) GetEnvarray() **byte      { return this.envarray }
@@ -31,6 +43,26 @@ type PhpProcessHandle struct {
 	env           PhpProcessEnvT
 }
 
+// func NewPhpProcessHandle(child PhpProcessIdT, npipes int, pipes **zend.ZendResource, command *byte, is_persistent int, env PhpProcessEnvT) *PhpProcessHandle {
+//     return &PhpProcessHandle{
+//         child:child,
+//         npipes:npipes,
+//         pipes:pipes,
+//         command:command,
+//         is_persistent:is_persistent,
+//         env:env,
+//     }
+// }
+// func MakePhpProcessHandle(child PhpProcessIdT, npipes int, pipes **zend.ZendResource, command *byte, is_persistent int, env PhpProcessEnvT) PhpProcessHandle {
+//     return PhpProcessHandle{
+//         child:child,
+//         npipes:npipes,
+//         pipes:pipes,
+//         command:command,
+//         is_persistent:is_persistent,
+//         env:env,
+//     }
+// }
 func (this *PhpProcessHandle) GetChild() PhpProcessIdT            { return this.child }
 func (this *PhpProcessHandle) SetChild(value PhpProcessIdT)       { this.child = value }
 func (this *PhpProcessHandle) GetNpipes() int                     { return this.npipes }
@@ -55,6 +87,24 @@ type PhpProcOpenDescriptorItem struct {
 	mode_flags int
 }
 
+// func NewPhpProcOpenDescriptorItem(index int, parentend PhpFileDescriptorT, childend PhpFileDescriptorT, mode int, mode_flags int) *PhpProcOpenDescriptorItem {
+//     return &PhpProcOpenDescriptorItem{
+//         index:index,
+//         parentend:parentend,
+//         childend:childend,
+//         mode:mode,
+//         mode_flags:mode_flags,
+//     }
+// }
+// func MakePhpProcOpenDescriptorItem(index int, parentend PhpFileDescriptorT, childend PhpFileDescriptorT, mode int, mode_flags int) PhpProcOpenDescriptorItem {
+//     return PhpProcOpenDescriptorItem{
+//         index:index,
+//         parentend:parentend,
+//         childend:childend,
+//         mode:mode,
+//         mode_flags:mode_flags,
+//     }
+// }
 func (this *PhpProcOpenDescriptorItem) GetIndex() int                         { return this.index }
 func (this *PhpProcOpenDescriptorItem) SetIndex(value int)                    { this.index = value }
 func (this *PhpProcOpenDescriptorItem) GetParentend() PhpFileDescriptorT      { return this.parentend }

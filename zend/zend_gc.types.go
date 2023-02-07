@@ -12,6 +12,22 @@ type ZendGcStatus struct {
 	num_roots uint32
 }
 
+// func NewZendGcStatus(runs uint32, collected uint32, threshold uint32, num_roots uint32) *ZendGcStatus {
+//     return &ZendGcStatus{
+//         runs:runs,
+//         collected:collected,
+//         threshold:threshold,
+//         num_roots:num_roots,
+//     }
+// }
+// func MakeZendGcStatus(runs uint32, collected uint32, threshold uint32, num_roots uint32) ZendGcStatus {
+//     return ZendGcStatus{
+//         runs:runs,
+//         collected:collected,
+//         threshold:threshold,
+//         num_roots:num_roots,
+//     }
+// }
 func (this *ZendGcStatus) GetRuns() uint32           { return this.runs }
 func (this *ZendGcStatus) SetRuns(value uint32)      { this.runs = value }
 func (this *ZendGcStatus) GetCollected() uint32      { return this.collected }
@@ -28,6 +44,16 @@ type GcRootBuffer struct {
 	ref *ZendRefcounted
 }
 
+// func NewGcRootBuffer(ref *ZendRefcounted) *GcRootBuffer {
+//     return &GcRootBuffer{
+//         ref:ref,
+//     }
+// }
+// func MakeGcRootBuffer(ref *ZendRefcounted) GcRootBuffer {
+//     return GcRootBuffer{
+//         ref:ref,
+//     }
+// }
 func (this *GcRootBuffer) GetRef() *ZendRefcounted      { return this.ref }
 func (this *GcRootBuffer) SetRef(value *ZendRefcounted) { this.ref = value }
 
@@ -49,6 +75,38 @@ type ZendGcGlobals struct {
 	collected    uint32
 }
 
+// func NewZendGcGlobals(buf *GcRootBuffer, gc_enabled ZendBool, gc_active ZendBool, gc_protected ZendBool, gc_full ZendBool, unused uint32, first_unused uint32, gc_threshold uint32, buf_size uint32, num_roots uint32, gc_runs uint32, collected uint32) *ZendGcGlobals {
+//     return &ZendGcGlobals{
+//         buf:buf,
+//         gc_enabled:gc_enabled,
+//         gc_active:gc_active,
+//         gc_protected:gc_protected,
+//         gc_full:gc_full,
+//         unused:unused,
+//         first_unused:first_unused,
+//         gc_threshold:gc_threshold,
+//         buf_size:buf_size,
+//         num_roots:num_roots,
+//         gc_runs:gc_runs,
+//         collected:collected,
+//     }
+// }
+// func MakeZendGcGlobals(buf *GcRootBuffer, gc_enabled ZendBool, gc_active ZendBool, gc_protected ZendBool, gc_full ZendBool, unused uint32, first_unused uint32, gc_threshold uint32, buf_size uint32, num_roots uint32, gc_runs uint32, collected uint32) ZendGcGlobals {
+//     return ZendGcGlobals{
+//         buf:buf,
+//         gc_enabled:gc_enabled,
+//         gc_active:gc_active,
+//         gc_protected:gc_protected,
+//         gc_full:gc_full,
+//         unused:unused,
+//         first_unused:first_unused,
+//         gc_threshold:gc_threshold,
+//         buf_size:buf_size,
+//         num_roots:num_roots,
+//         gc_runs:gc_runs,
+//         collected:collected,
+//     }
+// }
 func (this *ZendGcGlobals) GetBuf() *GcRootBuffer         { return this.buf }
 func (this *ZendGcGlobals) SetBuf(value *GcRootBuffer)    { this.buf = value }
 func (this *ZendGcGlobals) GetGcEnabled() ZendBool        { return this.gc_enabled }
@@ -83,9 +141,24 @@ type GcStack struct {
 	data []*ZendRefcounted
 }
 
-func (this *GcStack) GetPrev() *GcStack               { return this.prev }
-func (this *GcStack) SetPrev(value *GcStack)          { this.prev = value }
-func (this *GcStack) GetNext() *GcStack               { return this.next }
-func (this *GcStack) SetNext(value *GcStack)          { this.next = value }
-func (this *GcStack) GetData() []*ZendRefcounted      { return this.data }
-func (this *GcStack) SetData(value []*ZendRefcounted) { this.data = value }
+// func NewGcStack(prev *GcStack, next *GcStack, data []*ZendRefcounted) *GcStack {
+//     return &GcStack{
+//         prev:prev,
+//         next:next,
+//         data:data,
+//     }
+// }
+// func MakeGcStack(prev *GcStack, next *GcStack, data []*ZendRefcounted) GcStack {
+//     return GcStack{
+//         prev:prev,
+//         next:next,
+//         data:data,
+//     }
+// }
+func (this *GcStack) GetPrev() *GcStack          { return this.prev }
+func (this *GcStack) SetPrev(value *GcStack)     { this.prev = value }
+func (this *GcStack) GetNext() *GcStack          { return this.next }
+func (this *GcStack) SetNext(value *GcStack)     { this.next = value }
+func (this *GcStack) GetData() []*ZendRefcounted { return this.data }
+
+// func (this *GcStack) SetData(value []*ZendRefcounted) { this.data = value }

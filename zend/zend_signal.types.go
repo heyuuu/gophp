@@ -10,7 +10,19 @@ type ZendSignalEntryT struct {
 	handler any
 }
 
-func (this *ZendSignalEntryT) GetFlags() int        { return this.flags }
+// func NewZendSignalEntryT(flags int, handler any) *ZendSignalEntryT {
+//     return &ZendSignalEntryT{
+//         flags:flags,
+//         handler:handler,
+//     }
+// }
+// func MakeZendSignalEntryT(flags int, handler any) ZendSignalEntryT {
+//     return ZendSignalEntryT{
+//         flags:flags,
+//         handler:handler,
+//     }
+// }
+// func (this *ZendSignalEntryT)  GetFlags() int      { return this.flags }
 func (this *ZendSignalEntryT) SetFlags(value int)   { this.flags = value }
 func (this *ZendSignalEntryT) GetHandler() any      { return this.handler }
 func (this *ZendSignalEntryT) SetHandler(value any) { this.handler = value }
@@ -40,6 +52,20 @@ type ZendSignalT struct {
 	context any
 }
 
+// func NewZendSignalT(signo int, siginfo *siginfo_t, context any) *ZendSignalT {
+//     return &ZendSignalT{
+//         signo:signo,
+//         siginfo:siginfo,
+//         context:context,
+//     }
+// }
+// func MakeZendSignalT(signo int, siginfo *siginfo_t, context any) ZendSignalT {
+//     return ZendSignalT{
+//         signo:signo,
+//         siginfo:siginfo,
+//         context:context,
+//     }
+// }
 func (this *ZendSignalT) GetSigno() int               { return this.signo }
 func (this *ZendSignalT) SetSigno(value int)          { this.signo = value }
 func (this *ZendSignalT) GetSiginfo() *siginfo_t      { return this.siginfo }
@@ -55,8 +81,21 @@ type ZendSignalQueueT struct {
 	next        *ZendSignalQueueT
 }
 
-func (this *ZendSignalQueueT) GetZendSignal() ZendSignalT      { return this.zend_signal }
-func (this *ZendSignalQueueT) SetZendSignal(value ZendSignalT) { this.zend_signal = value }
+// func NewZendSignalQueueT(zend_signal ZendSignalT, next *ZendSignalQueueT) *ZendSignalQueueT {
+//     return &ZendSignalQueueT{
+//         zend_signal:zend_signal,
+//         next:next,
+//     }
+// }
+// func MakeZendSignalQueueT(zend_signal ZendSignalT, next *ZendSignalQueueT) ZendSignalQueueT {
+//     return ZendSignalQueueT{
+//         zend_signal:zend_signal,
+//         next:next,
+//     }
+// }
+func (this *ZendSignalQueueT) GetZendSignal() ZendSignalT { return this.zend_signal }
+
+// func (this *ZendSignalQueueT) SetZendSignal(value ZendSignalT) { this.zend_signal = value }
 func (this *ZendSignalQueueT) GetNext() *ZendSignalQueueT      { return this.next }
 func (this *ZendSignalQueueT) SetNext(value *ZendSignalQueueT) { this.next = value }
 
@@ -77,25 +116,58 @@ type ZendSignalGlobalsT struct {
 	pavail   *ZendSignalQueueT
 }
 
-func (this *ZendSignalGlobalsT) GetDepth() int                        { return this.depth }
-func (this *ZendSignalGlobalsT) SetDepth(value int)                   { this.depth = value }
-func (this *ZendSignalGlobalsT) GetBlocked() int                      { return this.blocked }
-func (this *ZendSignalGlobalsT) SetBlocked(value int)                 { this.blocked = value }
-func (this *ZendSignalGlobalsT) GetRunning() int                      { return this.running }
-func (this *ZendSignalGlobalsT) SetRunning(value int)                 { this.running = value }
-func (this *ZendSignalGlobalsT) GetActive() int                       { return this.active }
-func (this *ZendSignalGlobalsT) SetActive(value int)                  { this.active = value }
-func (this *ZendSignalGlobalsT) GetCheck() ZendBool                   { return this.check }
-func (this *ZendSignalGlobalsT) SetCheck(value ZendBool)              { this.check = value }
-func (this *ZendSignalGlobalsT) GetReset() ZendBool                   { return this.reset }
-func (this *ZendSignalGlobalsT) SetReset(value ZendBool)              { this.reset = value }
-func (this *ZendSignalGlobalsT) GetHandlers() []ZendSignalEntryT      { return this.handlers }
-func (this *ZendSignalGlobalsT) SetHandlers(value []ZendSignalEntryT) { this.handlers = value }
-func (this *ZendSignalGlobalsT) GetPstorage() []ZendSignalQueueT      { return this.pstorage }
-func (this *ZendSignalGlobalsT) SetPstorage(value []ZendSignalQueueT) { this.pstorage = value }
-func (this *ZendSignalGlobalsT) GetPhead() *ZendSignalQueueT          { return this.phead }
-func (this *ZendSignalGlobalsT) SetPhead(value *ZendSignalQueueT)     { this.phead = value }
-func (this *ZendSignalGlobalsT) GetPtail() *ZendSignalQueueT          { return this.ptail }
-func (this *ZendSignalGlobalsT) SetPtail(value *ZendSignalQueueT)     { this.ptail = value }
-func (this *ZendSignalGlobalsT) GetPavail() *ZendSignalQueueT         { return this.pavail }
-func (this *ZendSignalGlobalsT) SetPavail(value *ZendSignalQueueT)    { this.pavail = value }
+// func NewZendSignalGlobalsT(depth int, blocked int, running int, active int, check ZendBool, reset ZendBool, handlers []ZendSignalEntryT, pstorage []ZendSignalQueueT, phead *ZendSignalQueueT, ptail *ZendSignalQueueT, pavail *ZendSignalQueueT) *ZendSignalGlobalsT {
+//     return &ZendSignalGlobalsT{
+//         depth:depth,
+//         blocked:blocked,
+//         running:running,
+//         active:active,
+//         check:check,
+//         reset:reset,
+//         handlers:handlers,
+//         pstorage:pstorage,
+//         phead:phead,
+//         ptail:ptail,
+//         pavail:pavail,
+//     }
+// }
+// func MakeZendSignalGlobalsT(depth int, blocked int, running int, active int, check ZendBool, reset ZendBool, handlers []ZendSignalEntryT, pstorage []ZendSignalQueueT, phead *ZendSignalQueueT, ptail *ZendSignalQueueT, pavail *ZendSignalQueueT) ZendSignalGlobalsT {
+//     return ZendSignalGlobalsT{
+//         depth:depth,
+//         blocked:blocked,
+//         running:running,
+//         active:active,
+//         check:check,
+//         reset:reset,
+//         handlers:handlers,
+//         pstorage:pstorage,
+//         phead:phead,
+//         ptail:ptail,
+//         pavail:pavail,
+//     }
+// }
+// func (this *ZendSignalGlobalsT)  GetDepth() int      { return this.depth }
+// func (this *ZendSignalGlobalsT) SetDepth(value int) { this.depth = value }
+// func (this *ZendSignalGlobalsT)  GetBlocked() int      { return this.blocked }
+// func (this *ZendSignalGlobalsT) SetBlocked(value int) { this.blocked = value }
+// func (this *ZendSignalGlobalsT)  GetRunning() int      { return this.running }
+// func (this *ZendSignalGlobalsT) SetRunning(value int) { this.running = value }
+// func (this *ZendSignalGlobalsT)  GetActive() int      { return this.active }
+// func (this *ZendSignalGlobalsT) SetActive(value int) { this.active = value }
+func (this *ZendSignalGlobalsT) GetCheck() ZendBool { return this.check }
+
+// func (this *ZendSignalGlobalsT) SetCheck(value ZendBool) { this.check = value }
+// func (this *ZendSignalGlobalsT)  GetReset() ZendBool      { return this.reset }
+func (this *ZendSignalGlobalsT) SetReset(value ZendBool) { this.reset = value }
+
+// func (this *ZendSignalGlobalsT)  GetHandlers() []ZendSignalEntryT      { return this.handlers }
+// func (this *ZendSignalGlobalsT) SetHandlers(value []ZendSignalEntryT) { this.handlers = value }
+func (this *ZendSignalGlobalsT) GetPstorage() []ZendSignalQueueT { return this.pstorage }
+
+// func (this *ZendSignalGlobalsT) SetPstorage(value []ZendSignalQueueT) { this.pstorage = value }
+// func (this *ZendSignalGlobalsT)  GetPhead() *ZendSignalQueueT      { return this.phead }
+// func (this *ZendSignalGlobalsT) SetPhead(value *ZendSignalQueueT) { this.phead = value }
+// func (this *ZendSignalGlobalsT)  GetPtail() *ZendSignalQueueT      { return this.ptail }
+// func (this *ZendSignalGlobalsT) SetPtail(value *ZendSignalQueueT) { this.ptail = value }
+func (this *ZendSignalGlobalsT) GetPavail() *ZendSignalQueueT      { return this.pavail }
+func (this *ZendSignalGlobalsT) SetPavail(value *ZendSignalQueueT) { this.pavail = value }

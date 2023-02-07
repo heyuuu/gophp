@@ -15,12 +15,27 @@ type VarEntries struct {
 	data       []*zend.Zval
 }
 
+// func NewVarEntries(used_slots zend.ZendLong, next any, data []*zend.Zval) *VarEntries {
+//     return &VarEntries{
+//         used_slots:used_slots,
+//         next:next,
+//         data:data,
+//     }
+// }
+// func MakeVarEntries(used_slots zend.ZendLong, next any, data []*zend.Zval) VarEntries {
+//     return VarEntries{
+//         used_slots:used_slots,
+//         next:next,
+//         data:data,
+//     }
+// }
 func (this *VarEntries) GetUsedSlots() zend.ZendLong      { return this.used_slots }
 func (this *VarEntries) SetUsedSlots(value zend.ZendLong) { this.used_slots = value }
 func (this *VarEntries) GetNext() any                     { return this.next }
 func (this *VarEntries) SetNext(value any)                { this.next = value }
 func (this *VarEntries) GetData() []*zend.Zval            { return this.data }
-func (this *VarEntries) SetData(value []*zend.Zval)       { this.data = value }
+
+// func (this *VarEntries) SetData(value []*zend.Zval) { this.data = value }
 
 /**
  * VarDtorEntries
@@ -31,12 +46,27 @@ type VarDtorEntries struct {
 	data       []zend.Zval
 }
 
+// func NewVarDtorEntries(used_slots zend.ZendLong, next any, data []zend.Zval) *VarDtorEntries {
+//     return &VarDtorEntries{
+//         used_slots:used_slots,
+//         next:next,
+//         data:data,
+//     }
+// }
+// func MakeVarDtorEntries(used_slots zend.ZendLong, next any, data []zend.Zval) VarDtorEntries {
+//     return VarDtorEntries{
+//         used_slots:used_slots,
+//         next:next,
+//         data:data,
+//     }
+// }
 func (this *VarDtorEntries) GetUsedSlots() zend.ZendLong      { return this.used_slots }
 func (this *VarDtorEntries) SetUsedSlots(value zend.ZendLong) { this.used_slots = value }
 func (this *VarDtorEntries) GetNext() any                     { return this.next }
 func (this *VarDtorEntries) SetNext(value any)                { this.next = value }
 func (this *VarDtorEntries) GetData() []zend.Zval             { return this.data }
-func (this *VarDtorEntries) SetData(value []zend.Zval)        { this.data = value }
+
+// func (this *VarDtorEntries) SetData(value []zend.Zval) { this.data = value }
 
 /**
  * PhpUnserializeData
@@ -52,6 +82,30 @@ type PhpUnserializeData struct {
 	entries         VarEntries
 }
 
+// func NewPhpUnserializeData(last *VarEntries, first_dtor *VarDtorEntries, last_dtor *VarDtorEntries, allowed_classes *zend.HashTable, ref_props *zend.HashTable, cur_depth zend.ZendLong, max_depth zend.ZendLong, entries VarEntries) *PhpUnserializeData {
+//     return &PhpUnserializeData{
+//         last:last,
+//         first_dtor:first_dtor,
+//         last_dtor:last_dtor,
+//         allowed_classes:allowed_classes,
+//         ref_props:ref_props,
+//         cur_depth:cur_depth,
+//         max_depth:max_depth,
+//         entries:entries,
+//     }
+// }
+// func MakePhpUnserializeData(last *VarEntries, first_dtor *VarDtorEntries, last_dtor *VarDtorEntries, allowed_classes *zend.HashTable, ref_props *zend.HashTable, cur_depth zend.ZendLong, max_depth zend.ZendLong, entries VarEntries) PhpUnserializeData {
+//     return PhpUnserializeData{
+//         last:last,
+//         first_dtor:first_dtor,
+//         last_dtor:last_dtor,
+//         allowed_classes:allowed_classes,
+//         ref_props:ref_props,
+//         cur_depth:cur_depth,
+//         max_depth:max_depth,
+//         entries:entries,
+//     }
+// }
 func (this *PhpUnserializeData) GetLast() *VarEntries               { return this.last }
 func (this *PhpUnserializeData) SetLast(value *VarEntries)          { this.last = value }
 func (this *PhpUnserializeData) GetFirstDtor() *VarDtorEntries      { return this.first_dtor }
@@ -69,4 +123,5 @@ func (this *PhpUnserializeData) SetCurDepth(value zend.ZendLong)   { this.cur_de
 func (this *PhpUnserializeData) GetMaxDepth() zend.ZendLong        { return this.max_depth }
 func (this *PhpUnserializeData) SetMaxDepth(value zend.ZendLong)   { this.max_depth = value }
 func (this *PhpUnserializeData) GetEntries() VarEntries            { return this.entries }
-func (this *PhpUnserializeData) SetEntries(value VarEntries)       { this.entries = value }
+
+// func (this *PhpUnserializeData) SetEntries(value VarEntries) { this.entries = value }

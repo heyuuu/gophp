@@ -12,6 +12,22 @@ type Gfxinfo struct {
 	channels uint
 }
 
+// func NewGfxinfo(width uint, height uint, bits uint, channels uint) *Gfxinfo {
+//     return &Gfxinfo{
+//         width:width,
+//         height:height,
+//         bits:bits,
+//         channels:channels,
+//     }
+// }
+// func MakeGfxinfo(width uint, height uint, bits uint, channels uint) Gfxinfo {
+//     return Gfxinfo{
+//         width:width,
+//         height:height,
+//         bits:bits,
+//         channels:channels,
+//     }
+// }
 func (this *Gfxinfo) GetWidth() uint         { return this.width }
 func (this *Gfxinfo) SetWidth(value uint)    { this.width = value }
 func (this *Gfxinfo) GetHeight() uint        { return this.height }

@@ -61,8 +61,47 @@ type ZendGenerator struct {
 	gc_buffer_size           uint32
 }
 
-func (this *ZendGenerator) GetStd() ZendObject                        { return this.std }
-func (this *ZendGenerator) SetStd(value ZendObject)                   { this.std = value }
+// func NewZendGenerator(std ZendObject, iterator *ZendObjectIterator, execute_data *ZendExecuteData, frozen_call_stack *ZendExecuteData, value Zval, key Zval, retval Zval, send_target *Zval, largest_used_integer_key ZendLong, values Zval, node ZendGeneratorNode, execute_fake ZendExecuteData, flags ZendUchar, gc_buffer *Zval, gc_buffer_size uint32) *ZendGenerator {
+//     return &ZendGenerator{
+//         std:std,
+//         iterator:iterator,
+//         execute_data:execute_data,
+//         frozen_call_stack:frozen_call_stack,
+//         value:value,
+//         key:key,
+//         retval:retval,
+//         send_target:send_target,
+//         largest_used_integer_key:largest_used_integer_key,
+//         values:values,
+//         node:node,
+//         execute_fake:execute_fake,
+//         flags:flags,
+//         gc_buffer:gc_buffer,
+//         gc_buffer_size:gc_buffer_size,
+//     }
+// }
+// func MakeZendGenerator(std ZendObject, iterator *ZendObjectIterator, execute_data *ZendExecuteData, frozen_call_stack *ZendExecuteData, value Zval, key Zval, retval Zval, send_target *Zval, largest_used_integer_key ZendLong, values Zval, node ZendGeneratorNode, execute_fake ZendExecuteData, flags ZendUchar, gc_buffer *Zval, gc_buffer_size uint32) ZendGenerator {
+//     return ZendGenerator{
+//         std:std,
+//         iterator:iterator,
+//         execute_data:execute_data,
+//         frozen_call_stack:frozen_call_stack,
+//         value:value,
+//         key:key,
+//         retval:retval,
+//         send_target:send_target,
+//         largest_used_integer_key:largest_used_integer_key,
+//         values:values,
+//         node:node,
+//         execute_fake:execute_fake,
+//         flags:flags,
+//         gc_buffer:gc_buffer,
+//         gc_buffer_size:gc_buffer_size,
+//     }
+// }
+func (this *ZendGenerator) GetStd() ZendObject { return this.std }
+
+// func (this *ZendGenerator) SetStd(value ZendObject) { this.std = value }
 func (this *ZendGenerator) GetIterator() *ZendObjectIterator          { return this.iterator }
 func (this *ZendGenerator) SetIterator(value *ZendObjectIterator)     { this.iterator = value }
 func (this *ZendGenerator) GetExecuteData() *ZendExecuteData          { return this.execute_data }
@@ -70,29 +109,35 @@ func (this *ZendGenerator) SetExecuteData(value *ZendExecuteData)     { this.exe
 func (this *ZendGenerator) GetFrozenCallStack() *ZendExecuteData      { return this.frozen_call_stack }
 func (this *ZendGenerator) SetFrozenCallStack(value *ZendExecuteData) { this.frozen_call_stack = value }
 func (this *ZendGenerator) GetValue() Zval                            { return this.value }
-func (this *ZendGenerator) SetValue(value Zval)                       { this.value = value }
-func (this *ZendGenerator) GetKey() Zval                              { return this.key }
-func (this *ZendGenerator) SetKey(value Zval)                         { this.key = value }
-func (this *ZendGenerator) GetRetval() Zval                           { return this.retval }
-func (this *ZendGenerator) SetRetval(value Zval)                      { this.retval = value }
-func (this *ZendGenerator) GetSendTarget() *Zval                      { return this.send_target }
-func (this *ZendGenerator) SetSendTarget(value *Zval)                 { this.send_target = value }
-func (this *ZendGenerator) GetLargestUsedIntegerKey() ZendLong        { return this.largest_used_integer_key }
+
+// func (this *ZendGenerator) SetValue(value Zval) { this.value = value }
+func (this *ZendGenerator) GetKey() Zval { return this.key }
+
+// func (this *ZendGenerator) SetKey(value Zval) { this.key = value }
+func (this *ZendGenerator) GetRetval() Zval { return this.retval }
+
+// func (this *ZendGenerator) SetRetval(value Zval) { this.retval = value }
+func (this *ZendGenerator) GetSendTarget() *Zval               { return this.send_target }
+func (this *ZendGenerator) SetSendTarget(value *Zval)          { this.send_target = value }
+func (this *ZendGenerator) GetLargestUsedIntegerKey() ZendLong { return this.largest_used_integer_key }
 func (this *ZendGenerator) SetLargestUsedIntegerKey(value ZendLong) {
 	this.largest_used_integer_key = value
 }
-func (this *ZendGenerator) GetValues() Zval                      { return this.values }
-func (this *ZendGenerator) SetValues(value Zval)                 { this.values = value }
-func (this *ZendGenerator) GetNode() ZendGeneratorNode           { return this.node }
-func (this *ZendGenerator) SetNode(value ZendGeneratorNode)      { this.node = value }
-func (this *ZendGenerator) GetExecuteFake() ZendExecuteData      { return this.execute_fake }
-func (this *ZendGenerator) SetExecuteFake(value ZendExecuteData) { this.execute_fake = value }
-func (this *ZendGenerator) GetFlags() ZendUchar                  { return this.flags }
-func (this *ZendGenerator) SetFlags(value ZendUchar)             { this.flags = value }
-func (this *ZendGenerator) GetGcBuffer() *Zval                   { return this.gc_buffer }
-func (this *ZendGenerator) SetGcBuffer(value *Zval)              { this.gc_buffer = value }
-func (this *ZendGenerator) GetGcBufferSize() uint32              { return this.gc_buffer_size }
-func (this *ZendGenerator) SetGcBufferSize(value uint32)         { this.gc_buffer_size = value }
+func (this *ZendGenerator) GetValues() Zval { return this.values }
+
+// func (this *ZendGenerator) SetValues(value Zval) { this.values = value }
+func (this *ZendGenerator) GetNode() ZendGeneratorNode { return this.node }
+
+// func (this *ZendGenerator) SetNode(value ZendGeneratorNode) { this.node = value }
+func (this *ZendGenerator) GetExecuteFake() ZendExecuteData { return this.execute_fake }
+
+// func (this *ZendGenerator) SetExecuteFake(value ZendExecuteData) { this.execute_fake = value }
+// func (this *ZendGenerator)  GetFlags() ZendUchar      { return this.flags }
+// func (this *ZendGenerator) SetFlags(value ZendUchar) { this.flags = value }
+func (this *ZendGenerator) GetGcBuffer() *Zval           { return this.gc_buffer }
+func (this *ZendGenerator) SetGcBuffer(value *Zval)      { this.gc_buffer = value }
+func (this *ZendGenerator) GetGcBufferSize() uint32      { return this.gc_buffer_size }
+func (this *ZendGenerator) SetGcBufferSize(value uint32) { this.gc_buffer_size = value }
 
 /* ZendGenerator.flags */
 func (this *ZendGenerator) AddFlags(value ZendUchar)      { this.flags |= value }

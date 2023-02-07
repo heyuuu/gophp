@@ -419,10 +419,22 @@ type IniUnionYyalloc struct /* union */ {
 	yyvs_alloc Zval
 }
 
-func (this *IniUnionYyalloc) GetYyssAlloc() yytype_int16      { return this.yyss_alloc }
-func (this *IniUnionYyalloc) SetYyssAlloc(value yytype_int16) { this.yyss_alloc = value }
-func (this *IniUnionYyalloc) GetYyvsAlloc() Zval              { return this.yyvs_alloc }
-func (this *IniUnionYyalloc) SetYyvsAlloc(value Zval)         { this.yyvs_alloc = value }
+// func NewIniUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc Zval) *IniUnionYyalloc {
+//     return &IniUnionYyalloc{
+//         yyss_alloc:yyss_alloc,
+//         yyvs_alloc:yyvs_alloc,
+//     }
+// }
+// func MakeIniUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc Zval) IniUnionYyalloc {
+//     return IniUnionYyalloc{
+//         yyss_alloc:yyss_alloc,
+//         yyvs_alloc:yyvs_alloc,
+//     }
+// }
+// func (this *IniUnionYyalloc)  GetYyssAlloc() yytype_int16      { return this.yyss_alloc }
+// func (this *IniUnionYyalloc) SetYyssAlloc(value yytype_int16) { this.yyss_alloc = value }
+// func (this *IniUnionYyalloc)  GetYyvsAlloc() Zval      { return this.yyvs_alloc }
+// func (this *IniUnionYyalloc) SetYyvsAlloc(value Zval) { this.yyvs_alloc = value }
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 

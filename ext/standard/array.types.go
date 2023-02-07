@@ -14,6 +14,18 @@ type Bucketindex struct {
 	i uint
 }
 
+// func NewBucketindex(b zend.Bucket, i uint) *Bucketindex {
+//     return &Bucketindex{
+//         b:b,
+//         i:i,
+//     }
+// }
+// func MakeBucketindex(b zend.Bucket, i uint) Bucketindex {
+//     return Bucketindex{
+//         b:b,
+//         i:i,
+//     }
+// }
 func (this *Bucketindex) GetB() zend.Bucket      { return this.b }
 func (this *Bucketindex) SetB(value zend.Bucket) { this.b = value }
 func (this *Bucketindex) GetI() uint             { return this.i }

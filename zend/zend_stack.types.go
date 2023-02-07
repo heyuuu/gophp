@@ -12,6 +12,22 @@ type ZendStack struct {
 	elements any
 }
 
+// func NewZendStack(size int, top int, max int, elements any) *ZendStack {
+//     return &ZendStack{
+//         size:size,
+//         top:top,
+//         max:max,
+//         elements:elements,
+//     }
+// }
+// func MakeZendStack(size int, top int, max int, elements any) ZendStack {
+//     return ZendStack{
+//         size:size,
+//         top:top,
+//         max:max,
+//         elements:elements,
+//     }
+// }
 func (this *ZendStack) GetSize() int          { return this.size }
 func (this *ZendStack) SetSize(value int)     { this.size = value }
 func (this *ZendStack) GetTop() int           { return this.top }

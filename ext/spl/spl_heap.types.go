@@ -20,6 +20,30 @@ type SplPtrHeap struct {
 	elem_size int
 }
 
+// func NewSplPtrHeap(elements any, ctor SplPtrHeapCtorFunc, dtor SplPtrHeapDtorFunc, cmp SplPtrHeapCmpFunc, count int, flags int, max_size int, elem_size int) *SplPtrHeap {
+//     return &SplPtrHeap{
+//         elements:elements,
+//         ctor:ctor,
+//         dtor:dtor,
+//         cmp:cmp,
+//         count:count,
+//         flags:flags,
+//         max_size:max_size,
+//         elem_size:elem_size,
+//     }
+// }
+// func MakeSplPtrHeap(elements any, ctor SplPtrHeapCtorFunc, dtor SplPtrHeapDtorFunc, cmp SplPtrHeapCmpFunc, count int, flags int, max_size int, elem_size int) SplPtrHeap {
+//     return SplPtrHeap{
+//         elements:elements,
+//         ctor:ctor,
+//         dtor:dtor,
+//         cmp:cmp,
+//         count:count,
+//         flags:flags,
+//         max_size:max_size,
+//         elem_size:elem_size,
+//     }
+// }
 func (this *SplPtrHeap) GetElements() any                 { return this.elements }
 func (this *SplPtrHeap) SetElements(value any)            { this.elements = value }
 func (this *SplPtrHeap) GetCtor() SplPtrHeapCtorFunc      { return this.ctor }
@@ -63,6 +87,26 @@ type SplHeapObject struct {
 	std             zend.ZendObject
 }
 
+// func NewSplHeapObject(heap *SplPtrHeap, flags int, ce_get_iterator *zend.ZendClassEntry, fptr_cmp *zend.ZendFunction, fptr_count *zend.ZendFunction, std zend.ZendObject) *SplHeapObject {
+//     return &SplHeapObject{
+//         heap:heap,
+//         flags:flags,
+//         ce_get_iterator:ce_get_iterator,
+//         fptr_cmp:fptr_cmp,
+//         fptr_count:fptr_count,
+//         std:std,
+//     }
+// }
+// func MakeSplHeapObject(heap *SplPtrHeap, flags int, ce_get_iterator *zend.ZendClassEntry, fptr_cmp *zend.ZendFunction, fptr_count *zend.ZendFunction, std zend.ZendObject) SplHeapObject {
+//     return SplHeapObject{
+//         heap:heap,
+//         flags:flags,
+//         ce_get_iterator:ce_get_iterator,
+//         fptr_cmp:fptr_cmp,
+//         fptr_count:fptr_count,
+//         std:std,
+//     }
+// }
 func (this *SplHeapObject) GetHeap() *SplPtrHeap                        { return this.heap }
 func (this *SplHeapObject) SetHeap(value *SplPtrHeap)                   { this.heap = value }
 func (this *SplHeapObject) GetFlags() int                               { return this.flags }
@@ -74,7 +118,8 @@ func (this *SplHeapObject) SetFptrCmp(value *zend.ZendFunction)         { this.f
 func (this *SplHeapObject) GetFptrCount() *zend.ZendFunction            { return this.fptr_count }
 func (this *SplHeapObject) SetFptrCount(value *zend.ZendFunction)       { this.fptr_count = value }
 func (this *SplHeapObject) GetStd() zend.ZendObject                     { return this.std }
-func (this *SplHeapObject) SetStd(value zend.ZendObject)                { this.std = value }
+
+// func (this *SplHeapObject) SetStd(value zend.ZendObject) { this.std = value }
 
 /* SplHeapObject.flags */
 func (this *SplHeapObject) AddFlags(value int)      { this.flags |= value }
@@ -96,10 +141,23 @@ type SplHeapIt struct {
 	flags  int
 }
 
-func (this *SplHeapIt) GetIntern() zend.ZendUserIterator      { return this.intern }
-func (this *SplHeapIt) SetIntern(value zend.ZendUserIterator) { this.intern = value }
-func (this *SplHeapIt) GetFlags() int                         { return this.flags }
-func (this *SplHeapIt) SetFlags(value int)                    { this.flags = value }
+// func NewSplHeapIt(intern zend.ZendUserIterator, flags int) *SplHeapIt {
+//     return &SplHeapIt{
+//         intern:intern,
+//         flags:flags,
+//     }
+// }
+// func MakeSplHeapIt(intern zend.ZendUserIterator, flags int) SplHeapIt {
+//     return SplHeapIt{
+//         intern:intern,
+//         flags:flags,
+//     }
+// }
+func (this *SplHeapIt) GetIntern() zend.ZendUserIterator { return this.intern }
+
+// func (this *SplHeapIt) SetIntern(value zend.ZendUserIterator) { this.intern = value }
+// func (this *SplHeapIt)  GetFlags() int      { return this.flags }
+func (this *SplHeapIt) SetFlags(value int) { this.flags = value }
 
 /* SplHeapIt.flags */
 func (this *SplHeapIt) AddFlags(value int)      { this.flags |= value }
@@ -121,7 +179,21 @@ type SplPqueueElem struct {
 	priority zend.Zval
 }
 
-func (this *SplPqueueElem) GetData() zend.Zval          { return this.data }
-func (this *SplPqueueElem) SetData(value zend.Zval)     { this.data = value }
-func (this *SplPqueueElem) GetPriority() zend.Zval      { return this.priority }
-func (this *SplPqueueElem) SetPriority(value zend.Zval) { this.priority = value }
+// func NewSplPqueueElem(data zend.Zval, priority zend.Zval) *SplPqueueElem {
+//     return &SplPqueueElem{
+//         data:data,
+//         priority:priority,
+//     }
+// }
+// func MakeSplPqueueElem(data zend.Zval, priority zend.Zval) SplPqueueElem {
+//     return SplPqueueElem{
+//         data:data,
+//         priority:priority,
+//     }
+// }
+func (this *SplPqueueElem) GetData() zend.Zval { return this.data }
+
+// func (this *SplPqueueElem) SetData(value zend.Zval) { this.data = value }
+func (this *SplPqueueElem) GetPriority() zend.Zval { return this.priority }
+
+// func (this *SplPqueueElem) SetPriority(value zend.Zval) { this.priority = value }

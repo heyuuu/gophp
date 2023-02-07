@@ -16,6 +16,22 @@ type SplPtrLlistElement struct {
 	data zend.Zval
 }
 
+// func NewSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) *SplPtrLlistElement {
+//     return &SplPtrLlistElement{
+//         prev:prev,
+//         next:next,
+//         rc:rc,
+//         data:data,
+//     }
+// }
+// func MakeSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) SplPtrLlistElement {
+//     return SplPtrLlistElement{
+//         prev:prev,
+//         next:next,
+//         rc:rc,
+//         data:data,
+//     }
+// }
 func (this *SplPtrLlistElement) GetPrev() *SplPtrLlistElement      { return this.prev }
 func (this *SplPtrLlistElement) SetPrev(value *SplPtrLlistElement) { this.prev = value }
 func (this *SplPtrLlistElement) GetNext() *SplPtrLlistElement      { return this.next }
@@ -23,7 +39,8 @@ func (this *SplPtrLlistElement) SetNext(value *SplPtrLlistElement) { this.next =
 func (this *SplPtrLlistElement) GetRc() int                        { return this.rc }
 func (this *SplPtrLlistElement) SetRc(value int)                   { this.rc = value }
 func (this *SplPtrLlistElement) GetData() zend.Zval                { return this.data }
-func (this *SplPtrLlistElement) SetData(value zend.Zval)           { this.data = value }
+
+// func (this *SplPtrLlistElement) SetData(value zend.Zval) { this.data = value }
 
 /**
  * SplPtrLlist
@@ -36,6 +53,24 @@ type SplPtrLlist struct {
 	count int
 }
 
+// func NewSplPtrLlist(head *SplPtrLlistElement, tail *SplPtrLlistElement, dtor SplPtrLlistDtorFunc, ctor SplPtrLlistCtorFunc, count int) *SplPtrLlist {
+//     return &SplPtrLlist{
+//         head:head,
+//         tail:tail,
+//         dtor:dtor,
+//         ctor:ctor,
+//         count:count,
+//     }
+// }
+// func MakeSplPtrLlist(head *SplPtrLlistElement, tail *SplPtrLlistElement, dtor SplPtrLlistDtorFunc, ctor SplPtrLlistCtorFunc, count int) SplPtrLlist {
+//     return SplPtrLlist{
+//         head:head,
+//         tail:tail,
+//         dtor:dtor,
+//         ctor:ctor,
+//         count:count,
+//     }
+// }
 func (this *SplPtrLlist) GetHead() *SplPtrLlistElement      { return this.head }
 func (this *SplPtrLlist) SetHead(value *SplPtrLlistElement) { this.head = value }
 func (this *SplPtrLlist) GetTail() *SplPtrLlistElement      { return this.tail }
@@ -66,6 +101,40 @@ type SplDllistObject struct {
 	std               zend.ZendObject
 }
 
+// func NewSplDllistObject(llist *SplPtrLlist, traverse_position int, traverse_pointer *SplPtrLlistElement, flags int, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, gc_data *zend.Zval, gc_data_count int, std zend.ZendObject) *SplDllistObject {
+//     return &SplDllistObject{
+//         llist:llist,
+//         traverse_position:traverse_position,
+//         traverse_pointer:traverse_pointer,
+//         flags:flags,
+//         fptr_offset_get:fptr_offset_get,
+//         fptr_offset_set:fptr_offset_set,
+//         fptr_offset_has:fptr_offset_has,
+//         fptr_offset_del:fptr_offset_del,
+//         fptr_count:fptr_count,
+//         ce_get_iterator:ce_get_iterator,
+//         gc_data:gc_data,
+//         gc_data_count:gc_data_count,
+//         std:std,
+//     }
+// }
+// func MakeSplDllistObject(llist *SplPtrLlist, traverse_position int, traverse_pointer *SplPtrLlistElement, flags int, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, gc_data *zend.Zval, gc_data_count int, std zend.ZendObject) SplDllistObject {
+//     return SplDllistObject{
+//         llist:llist,
+//         traverse_position:traverse_position,
+//         traverse_pointer:traverse_pointer,
+//         flags:flags,
+//         fptr_offset_get:fptr_offset_get,
+//         fptr_offset_set:fptr_offset_set,
+//         fptr_offset_has:fptr_offset_has,
+//         fptr_offset_del:fptr_offset_del,
+//         fptr_count:fptr_count,
+//         ce_get_iterator:ce_get_iterator,
+//         gc_data:gc_data,
+//         gc_data_count:gc_data_count,
+//         std:std,
+//     }
+// }
 func (this *SplDllistObject) GetLlist() *SplPtrLlist                  { return this.llist }
 func (this *SplDllistObject) SetLlist(value *SplPtrLlist)             { this.llist = value }
 func (this *SplDllistObject) GetTraversePosition() int                { return this.traverse_position }
@@ -90,12 +159,13 @@ func (this *SplDllistObject) GetCeGetIterator() *zend.ZendClassEntry    { return
 func (this *SplDllistObject) SetCeGetIterator(value *zend.ZendClassEntry) {
 	this.ce_get_iterator = value
 }
-func (this *SplDllistObject) GetGcData() *zend.Zval        { return this.gc_data }
-func (this *SplDllistObject) SetGcData(value *zend.Zval)   { this.gc_data = value }
-func (this *SplDllistObject) GetGcDataCount() int          { return this.gc_data_count }
-func (this *SplDllistObject) SetGcDataCount(value int)     { this.gc_data_count = value }
-func (this *SplDllistObject) GetStd() zend.ZendObject      { return this.std }
-func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
+func (this *SplDllistObject) GetGcData() *zend.Zval      { return this.gc_data }
+func (this *SplDllistObject) SetGcData(value *zend.Zval) { this.gc_data = value }
+func (this *SplDllistObject) GetGcDataCount() int        { return this.gc_data_count }
+func (this *SplDllistObject) SetGcDataCount(value int)   { this.gc_data_count = value }
+func (this *SplDllistObject) GetStd() zend.ZendObject    { return this.std }
+
+// func (this *SplDllistObject) SetStd(value zend.ZendObject) { this.std = value }
 
 /* SplDllistObject.flags */
 func (this *SplDllistObject) AddFlags(value int)      { this.flags |= value }
@@ -121,14 +191,32 @@ type SplDllistIt struct {
 	flags             int
 }
 
-func (this *SplDllistIt) GetIntern() zend.ZendUserIterator             { return this.intern }
-func (this *SplDllistIt) SetIntern(value zend.ZendUserIterator)        { this.intern = value }
+// func NewSplDllistIt(intern zend.ZendUserIterator, traverse_pointer *SplPtrLlistElement, traverse_position int, flags int) *SplDllistIt {
+//     return &SplDllistIt{
+//         intern:intern,
+//         traverse_pointer:traverse_pointer,
+//         traverse_position:traverse_position,
+//         flags:flags,
+//     }
+// }
+// func MakeSplDllistIt(intern zend.ZendUserIterator, traverse_pointer *SplPtrLlistElement, traverse_position int, flags int) SplDllistIt {
+//     return SplDllistIt{
+//         intern:intern,
+//         traverse_pointer:traverse_pointer,
+//         traverse_position:traverse_position,
+//         flags:flags,
+//     }
+// }
+func (this *SplDllistIt) GetIntern() zend.ZendUserIterator { return this.intern }
+
+// func (this *SplDllistIt) SetIntern(value zend.ZendUserIterator) { this.intern = value }
 func (this *SplDllistIt) GetTraversePointer() *SplPtrLlistElement      { return this.traverse_pointer }
 func (this *SplDllistIt) SetTraversePointer(value *SplPtrLlistElement) { this.traverse_pointer = value }
 func (this *SplDllistIt) GetTraversePosition() int                     { return this.traverse_position }
 func (this *SplDllistIt) SetTraversePosition(value int)                { this.traverse_position = value }
-func (this *SplDllistIt) GetFlags() int                                { return this.flags }
-func (this *SplDllistIt) SetFlags(value int)                           { this.flags = value }
+
+// func (this *SplDllistIt)  GetFlags() int      { return this.flags }
+func (this *SplDllistIt) SetFlags(value int) { this.flags = value }
 
 /* SplDllistIt.flags */
 func (this *SplDllistIt) AddFlags(value int)      { this.flags |= value }
