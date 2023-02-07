@@ -53,10 +53,10 @@ func ZifClassParents(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		ce = zend.Z_OBJCE_P(obj)
 	}
 	zend.ArrayInit(return_value)
-	parent_class = ce.parent
+	parent_class = ce.GetParent()
 	for parent_class != nil {
 		SplAddClassName(return_value, parent_class, 0, 0)
-		parent_class = parent_class.parent
+		parent_class = parent_class.GetParent()
 	}
 }
 func ZifClassImplements(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

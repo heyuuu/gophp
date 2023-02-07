@@ -136,7 +136,7 @@ func SplFixedarrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, 
 			intern.GetStd().SetHandlers(&spl_handler_SplFixedArray)
 			break
 		}
-		parent = parent.parent
+		parent = parent.GetParent()
 		inherited = 1
 	}
 	if parent == nil {

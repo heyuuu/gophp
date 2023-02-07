@@ -233,13 +233,13 @@ func ZendImplementTraversable(interface_ *ZendClassEntry, class_type *ZendClassE
 	/* check that class_type is traversable at c-level or implements at least one of 'aggregate' and 'Iterator' */
 
 	var i uint32
-	if class_type.GetGetIterator() != nil || class_type.parent && class_type.parent.get_iterator {
+	if class_type.GetGetIterator() != nil || class_type.GetParent() && class_type.GetParent().get_iterator {
 		return SUCCESS
 	}
 	if class_type.GetNumInterfaces() != 0 {
 		ZEND_ASSERT(class_type.IsResolvedInterfaces())
 		for i = 0; i < class_type.GetNumInterfaces(); i++ {
-			if class_type.interfaces[i] == ZendCeAggregate || class_type.interfaces[i] == ZendCeIterator {
+			if class_type.GetInterfaces()[i] == ZendCeAggregate || class_type.GetInterfaces()[i] == ZendCeIterator {
 				return SUCCESS
 			}
 		}
@@ -267,11 +267,11 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			if class_type.GetNumInterfaces() != 0 {
 				ZEND_ASSERT(class_type.IsResolvedInterfaces())
 				for i = 0; i < class_type.GetNumInterfaces(); i++ {
-					if class_type.interfaces[i] == ZendCeIterator {
+					if class_type.GetInterfaces()[i] == ZendCeIterator {
 						ZendErrorNoreturn(E_ERROR, "Class %s cannot implement both %s and %s at the same time", class_type.GetName().GetVal(), interface_.GetName().GetVal(), ZendCeIterator.GetName().GetVal())
 						return FAILURE
 					}
-					if class_type.interfaces[i] == ZendCeTraversable {
+					if class_type.GetInterfaces()[i] == ZendCeTraversable {
 						t = i
 					}
 				}
@@ -281,8 +281,8 @@ func ZendImplementAggregate(interface_ *ZendClassEntry, class_type *ZendClassEnt
 			}
 		}
 	}
-	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
-		class_type.SetGetIterator(class_type.parent.get_iterator)
+	if class_type.GetParent() && (class_type.GetParent().ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
+		class_type.SetGetIterator(class_type.GetParent().get_iterator)
 		class_type.SetIsReuseGetIterator(true)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetNewIterator)
@@ -326,8 +326,8 @@ func ZendImplementIterator(interface_ *ZendClassEntry, class_type *ZendClassEntr
 			return FAILURE
 		}
 	}
-	if class_type.parent && (class_type.parent.ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
-		class_type.SetGetIterator(class_type.parent.get_iterator)
+	if class_type.GetParent() && (class_type.GetParent().ce_flags&ZEND_ACC_REUSE_GET_ITERATOR) != 0 {
+		class_type.SetGetIterator(class_type.GetParent().get_iterator)
 		class_type.SetIsReuseGetIterator(true)
 	} else {
 		class_type.SetGetIterator(ZendUserItGetIterator)
@@ -417,7 +417,7 @@ func ZendClassUnserializeDeny(object *Zval, ce *ZendClassEntry, buf *uint8, buf_
 	return FAILURE
 }
 func ZendImplementSerializable(interface_ *ZendClassEntry, class_type *ZendClassEntry) int {
-	if class_type.parent && (class_type.parent.serialize || class_type.parent.unserialize) && InstanceofFunctionEx(class_type.parent, ZendCeSerializable, 1) == 0 {
+	if class_type.GetParent() && (class_type.GetParent().serialize || class_type.GetParent().unserialize) && InstanceofFunctionEx(class_type.GetParent(), ZendCeSerializable, 1) == 0 {
 		return FAILURE
 	}
 	if class_type.GetSerialize() == nil {
@@ -437,37 +437,37 @@ func ZendRegisterInterfaces() {
 	ce.SetName(ZendStringInitInterned("Traversable", b.SizeOf("\"Traversable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsTraversable)
 	ZendCeTraversable = ZendRegisterInternalInterface(&ce)
-	ZendCeTraversable.interface_gets_implemented = ZendImplementTraversable
+	ZendCeTraversable.SetInterfaceGetsImplemented(ZendImplementTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("IteratorAggregate", b.SizeOf("\"IteratorAggregate\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsAggregate)
 	ZendCeAggregate = ZendRegisterInternalInterface(&ce)
-	ZendCeAggregate.interface_gets_implemented = ZendImplementAggregate
+	ZendCeAggregate.SetInterfaceGetsImplemented(ZendImplementAggregate)
 	ZendClassImplements(ZendCeAggregate, 1, ZendCeTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Iterator", b.SizeOf("\"Iterator\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsIterator)
 	ZendCeIterator = ZendRegisterInternalInterface(&ce)
-	ZendCeIterator.interface_gets_implemented = ZendImplementIterator
+	ZendCeIterator.SetInterfaceGetsImplemented(ZendImplementIterator)
 	ZendClassImplements(ZendCeIterator, 1, ZendCeTraversable)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("ArrayAccess", b.SizeOf("\"ArrayAccess\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsArrayaccess)
 	ZendCeArrayaccess = ZendRegisterInternalInterface(&ce)
-	ZendCeArrayaccess.interface_gets_implemented = ZendImplementArrayaccess
+	ZendCeArrayaccess.SetInterfaceGetsImplemented(ZendImplementArrayaccess)
 	var ce zend_class_entry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Serializable", b.SizeOf("\"Serializable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsSerializable)
 	ZendCeSerializable = ZendRegisterInternalInterface(&ce)
-	ZendCeSerializable.interface_gets_implemented = ZendImplementSerializable
+	ZendCeSerializable.SetInterfaceGetsImplemented(ZendImplementSerializable)
 	var ce ZendClassEntry
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Countable", b.SizeOf("\"Countable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsCountable)
 	ZendCeCountable = ZendRegisterInternalInterface(&ce)
-	ZendCeCountable.interface_gets_implemented = ZendImplementCountable
+	ZendCeCountable.SetInterfaceGetsImplemented(ZendImplementCountable)
 }

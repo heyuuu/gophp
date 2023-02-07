@@ -1144,8 +1144,8 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if ZEND_NUM_ARGS() == 0 {
 		ce = ZendGetExecutedScope()
-		if ce != nil && ce.parent {
-			RETVAL_STR_COPY(ce.parent.name)
+		if ce != nil && ce.GetParent() {
+			RETVAL_STR_COPY(ce.GetParent().name)
 			return
 		} else {
 			RETVAL_FALSE
@@ -1157,8 +1157,8 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 	} else if arg.IsString() {
 		ce = ZendLookupClass(arg.GetStr())
 	}
-	if ce != nil && ce.parent {
-		RETVAL_STR_COPY(ce.parent.name)
+	if ce != nil && ce.GetParent() {
+		RETVAL_STR_COPY(ce.GetParent().name)
 		return
 	} else {
 		RETVAL_FALSE

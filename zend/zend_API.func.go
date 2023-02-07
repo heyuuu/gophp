@@ -17,7 +17,7 @@ func INIT_CLASS_ENTRY_INIT_METHODS(class_container ZendClassEntry, functions []Z
 	class_container.SetClone(nil)
 	class_container.SetSerialize(nil)
 	class_container.SetUnserialize(nil)
-	class_container.create_object = nil
+	class_container.SetCreateObject(nil)
 	class_container.SetGetStaticMethod(nil)
 	class_container.SetCall(nil)
 	class_container.SetCallstatic(nil)
@@ -29,13 +29,13 @@ func INIT_CLASS_ENTRY_INIT_METHODS(class_container ZendClassEntry, functions []Z
 	class_container.SetDebugInfo(nil)
 	class_container.SetSerializeFunc(nil)
 	class_container.SetUnserializeFunc(nil)
-	class_container.parent = nil
+	class_container.SetParent(nil)
 	class_container.SetNumInterfaces(0)
 	class_container.SetTraitNames(nil)
 	class_container.SetNumTraits(0)
 	class_container.SetTraitAliases(nil)
 	class_container.SetTraitPrecedences(nil)
-	class_container.interfaces = nil
+	class_container.SetInterfaces(nil)
 	class_container.SetGetIterator(nil)
 	class_container.SetIteratorFuncsPtr(nil)
 	class_container.SetModule(nil)
@@ -1728,8 +1728,8 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 		var c *ZendClassConstant
 		var val *Zval
 		var prop_info *ZendPropertyInfo
-		if class_type.parent {
-			if ZendUpdateClassConstants(class_type.parent) != SUCCESS {
+		if class_type.GetParent() {
+			if ZendUpdateClassConstants(class_type.GetParent()) != SUCCESS {
 				return FAILURE
 			}
 		}
@@ -1783,7 +1783,7 @@ func ZendUpdateClassConstants(class_type *ZendClassEntry) int {
 					}
 				}
 			}
-			ce = ce.parent
+			ce = ce.GetParent()
 		}
 		class_type.SetIsConstantsUpdated(true)
 	}
@@ -1929,7 +1929,7 @@ func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties 
 			return FAILURE
 		}
 	}
-	if class_type.create_object == nil {
+	if class_type.GetCreateObject() == nil {
 		var obj *ZendObject = ZendObjectsNew(class_type)
 		ZVAL_OBJ(arg, obj)
 		if properties != nil {
@@ -1938,7 +1938,7 @@ func _objectAndPropertiesInit(arg *Zval, class_type *ZendClassEntry, properties 
 			_objectPropertiesInit(obj, class_type)
 		}
 	} else {
-		ZVAL_OBJ(arg, class_type.create_object(class_type))
+		ZVAL_OBJ(arg, class_type.GetCreateObject()(class_type))
 	}
 	return SUCCESS
 }
@@ -3178,7 +3178,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 		return FAILURE
 	}
 	INIT_CLASS_ENTRY_INIT_METHODS(*disabled_class, DisabledClassNew)
-	disabled_class.create_object = DisplayDisabledClass
+	disabled_class.SetCreateObject(DisplayDisabledClass)
 	var __ht *HashTable = disabled_class.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {
 		var _z *Zval = _p.GetVal()
@@ -3220,16 +3220,16 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 			if error != nil {
 				*error = Estrdup("cannot access parent:: when no class scope is active")
 			}
-		} else if !(scope.parent) {
+		} else if !(scope.GetParent()) {
 			if error != nil {
 				*error = Estrdup("cannot access parent:: when current class scope has no parent")
 			}
 		} else {
 			fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
-			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.parent) == 0 {
-				fcc.SetCalledScope(scope.parent)
+			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) == 0 {
+				fcc.SetCalledScope(scope.GetParent())
 			}
-			fcc.SetCallingScope(scope.parent)
+			fcc.SetCallingScope(scope.GetParent())
 			if fcc.GetObject() == nil {
 				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
 			}

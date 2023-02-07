@@ -80,12 +80,12 @@ func ZendDuplicateFunction(func_ *ZendFunction, ce *ZendClassEntry, is_interface
 	}
 }
 func DoInheritParentConstructor(ce *ZendClassEntry) {
-	var parent *ZendClassEntry = ce.parent
+	var parent *ZendClassEntry = ce.GetParent()
 	ZEND_ASSERT(parent != nil)
 
 	/* You cannot change create_object */
 
-	ce.create_object = parent.create_object
+	ce.SetCreateObject(parent.GetCreateObject())
 
 	/* Inherit special functions if needed */
 
@@ -163,11 +163,11 @@ func ZendVisibilityString(fn_flags uint32) *byte {
 }
 func ResolveClassName(scope *ZendClassEntry, name *ZendString) *ZendString {
 	ZEND_ASSERT(scope != nil)
-	if ZendStringEqualsLiteralCi(name, "parent") && scope.parent {
+	if ZendStringEqualsLiteralCi(name, "parent") && scope.GetParent() {
 		if scope.IsResolvedParent() {
-			return scope.parent.name
+			return scope.GetParent().name
 		} else {
-			return scope.parent_name
+			return scope.GetParentName()
 		}
 	} else if ZendStringEqualsLiteralCi(name, "self") {
 		return scope.GetName()
@@ -223,12 +223,12 @@ func UnlinkedInstanceof(ce1 *ZendClassEntry, ce2 *ZendClassEntry) ZendBool {
 	if ce1.IsLinked() {
 		return InstanceofFunction(ce1, ce2)
 	}
-	if ce1.parent {
+	if ce1.GetParent() {
 		var parent_ce *ZendClassEntry
 		if ce1.IsResolvedParent() {
-			parent_ce = ce1.parent
+			parent_ce = ce1.GetParent()
 		} else {
-			parent_ce = ZendLookupClassEx(ce1.parent_name, nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			parent_ce = ZendLookupClassEx(ce1.GetParentName(), nil, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		}
 
 		/* It's not sufficient to only check the parent chain itself, as need to do a full
@@ -250,7 +250,7 @@ func UnlinkedInstanceof(ce1 *ZendClassEntry, ce2 *ZendClassEntry) ZendBool {
 			 * check here, as the parent interfaces might not have been fully copied yet. */
 
 			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				if UnlinkedInstanceof(ce1.interfaces[i], ce2) != 0 {
+				if UnlinkedInstanceof(ce1.GetInterfaces()[i], ce2) != 0 {
 					return 1
 				}
 			}
@@ -260,7 +260,7 @@ func UnlinkedInstanceof(ce1 *ZendClassEntry, ce2 *ZendClassEntry) ZendBool {
 
 		} else {
 			for i = 0; i < ce1.GetNumInterfaces(); i++ {
-				var ce *ZendClassEntry = ZendLookupClassEx(ce1.interface_names[i].name, ce1.interface_names[i].lc_name, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
+				var ce *ZendClassEntry = ZendLookupClassEx(ce1.GetInterfaceNames()[i].name, ce1.GetInterfaceNames()[i].lc_name, ZEND_FETCH_CLASS_ALLOW_UNLINKED|ZEND_FETCH_CLASS_NO_AUTOLOAD)
 				if ce != nil && UnlinkedInstanceof(ce, ce2) != 0 {
 					return 1
 				}
@@ -499,9 +499,9 @@ func ZendAppendTypeHint(str *SmartStr, fptr *ZendFunction, arg_info *ZendArgInfo
 		if !(strcasecmp(class_name, "self")) && fptr.GetScope() != nil {
 			class_name = fptr.GetScope().GetName().GetVal()
 			class_name_len = fptr.GetScope().GetName().GetLen()
-		} else if !(strcasecmp(class_name, "parent")) && fptr.GetScope() != nil && fptr.GetScope().parent {
-			class_name = fptr.GetScope().parent.name.GetVal()
-			class_name_len = fptr.GetScope().parent.name.GetLen()
+		} else if !(strcasecmp(class_name, "parent")) && fptr.GetScope() != nil && fptr.GetScope().GetParent() {
+			class_name = fptr.GetScope().GetParent().name.GetVal()
+			class_name_len = fptr.GetScope().GetParent().name.GetLen()
 		}
 		str.AppendString(b.CastStr(class_name, class_name_len))
 		if return_hint == 0 {
@@ -858,10 +858,10 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendC
 		}
 		if !parent_info.IsPrivate() {
 			if (parent_info.GetFlags() & ZEND_ACC_STATIC) != (child_info.GetFlags() & ZEND_ACC_STATIC) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.parent.name.GetVal(), key.GetVal(), b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key.GetVal())
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot redeclare %s%s::$%s as %s%s::$%s", b.Cond(parent_info.IsStatic(), "static ", "non static "), ce.GetParent().name.GetVal(), key.GetVal(), b.Cond(child_info.IsStatic(), "static ", "non static "), ce.GetName().GetVal(), key.GetVal())
 			}
 			if (child_info.GetFlags() & ZEND_ACC_PPP_MASK) > (parent_info.GetFlags() & ZEND_ACC_PPP_MASK) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key.GetVal(), ZendVisibilityString(parent_info.GetFlags()), ce.parent.name.GetVal(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::$%s must be %s (as in class %s)%s", ce.GetName().GetVal(), key.GetVal(), ZendVisibilityString(parent_info.GetFlags()), ce.GetParent().name.GetVal(), b.Cond(parent_info.IsPublic(), "", " or weaker"))
 			} else if !child_info.IsStatic() {
 				var parent_num int = OBJ_PROP_TO_NUM(parent_info.GetOffset())
 				var child_num int = OBJ_PROP_TO_NUM(child_info.GetOffset())
@@ -882,7 +882,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendC
 					AddPropertyCompatibilityObligation(ce, child_info, parent_info)
 				}
 			} else if child_info.GetType().IsSet() && !(parent_info.GetType().IsSet()) {
-				ZendErrorNoreturn(E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.GetName().GetVal(), key.GetVal(), ce.parent.name.GetVal())
+				ZendErrorNoreturn(E_COMPILE_ERROR, "Type of %s::$%s must not be defined (as in class %s)", ce.GetName().GetVal(), key.GetVal(), ce.GetParent().name.GetVal())
 			}
 		}
 	} else {
@@ -895,7 +895,7 @@ func DoInheritProperty(parent_info *ZendPropertyInfo, key *ZendString, ce *ZendC
 	}
 }
 func DoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
-	if !ce.IsInterface() && iface.interface_gets_implemented && iface.interface_gets_implemented(iface, ce) == FAILURE {
+	if !ce.IsInterface() && iface.GetInterfaceGetsImplemented() && iface.GetInterfaceGetsImplemented()(iface, ce) == FAILURE {
 		ZendErrorNoreturn(E_CORE_ERROR, "Class %s could not implement interface %s", ce.GetName().GetVal(), iface.GetName().GetVal())
 	}
 
@@ -914,22 +914,22 @@ func ZendDoInheritInterfaces(ce *ZendClassEntry, iface *ZendClassEntry) {
 	var entry *ZendClassEntry
 	ce_num = ce.GetNumInterfaces()
 	if ce.GetType() == ZEND_INTERNAL_CLASS {
-		ce.interfaces = (**ZendClassEntry)(realloc(ce.interfaces, b.SizeOf("zend_class_entry *")*(ce_num+if_num)))
+		ce.SetInterfaces((**ZendClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
 	} else {
-		ce.interfaces = (**ZendClassEntry)(Erealloc(ce.interfaces, b.SizeOf("zend_class_entry *")*(ce_num+if_num)))
+		ce.SetInterfaces((**ZendClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*(ce_num+if_num))))
 	}
 
 	/* Inherit the interfaces, only if they're not already inherited by the class */
 
 	for b.PostDec(&if_num) {
-		entry = iface.interfaces[if_num]
+		entry = iface.GetInterfaces()[if_num]
 		for i = 0; i < ce_num; i++ {
-			if ce.interfaces[i] == entry {
+			if ce.GetInterfaces()[i] == entry {
 				break
 			}
 		}
 		if i == ce_num {
-			ce.interfaces[b.PostInc(&(ce.GetNumInterfaces()))] = entry
+			ce.GetInterfaces()[b.PostInc(&(ce.GetNumInterfaces()))] = entry
 		}
 	}
 	ce.SetIsResolvedInterfaces(true)
@@ -937,7 +937,7 @@ func ZendDoInheritInterfaces(ce *ZendClassEntry, iface *ZendClassEntry) {
 	/* and now call the implementing handlers */
 
 	for ce_num < ce.GetNumInterfaces() {
-		DoImplementInterface(ce, ce.interfaces[b.PostInc(&ce_num)])
+		DoImplementInterface(ce, ce.GetInterfaces()[b.PostInc(&ce_num)])
 	}
 
 	/* and now call the implementing handlers */
@@ -948,7 +948,7 @@ func DoInheritClassConstant(name *ZendString, parent_const *ZendClassConstant, c
 	if zv != nil {
 		c = (*ZendClassConstant)(zv.GetPtr())
 		if (c.GetValue().GetAccessFlags() & ZEND_ACC_PPP_MASK) > (parent_const.GetValue().GetAccessFlags() & ZEND_ACC_PPP_MASK) {
-			ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.GetName().GetVal(), name.GetVal(), ZendVisibilityString(parent_const.GetValue().GetAccessFlags()), ce.parent.name.GetVal(), b.Cond((parent_const.GetValue().GetAccessFlags()&ZEND_ACC_PUBLIC) != 0, "", " or weaker"))
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Access level to %s::%s must be %s (as in class %s)%s", ce.GetName().GetVal(), name.GetVal(), ZendVisibilityString(parent_const.GetValue().GetAccessFlags()), ce.GetParent().name.GetVal(), b.Cond((parent_const.GetValue().GetAccessFlags()&ZEND_ACC_PUBLIC) != 0, "", " or weaker"))
 		}
 	} else if (parent_const.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) == 0 {
 		if parent_const.GetValue().IsConstant() {
@@ -982,13 +982,13 @@ func ZendBuildPropertiesInfoTable(ce *ZendClassEntry) {
 	/* Dead slots may be left behind during inheritance. Make sure these are NULLed out. */
 
 	memset(table, 0, size)
-	if ce.parent && ce.parent.default_properties_count != 0 {
-		var parent_table **ZendPropertyInfo = ce.parent.properties_info_table
-		memcpy(table, parent_table, b.SizeOf("zend_property_info *")*ce.parent.default_properties_count)
+	if ce.GetParent() && ce.GetParent().default_properties_count != 0 {
+		var parent_table **ZendPropertyInfo = ce.GetParent().properties_info_table
+		memcpy(table, parent_table, b.SizeOf("zend_property_info *")*ce.GetParent().default_properties_count)
 
 		/* Child did not add any new properties, we are done */
 
-		if ce.GetDefaultPropertiesCount() == ce.parent.default_properties_count {
+		if ce.GetDefaultPropertiesCount() == ce.GetParent().default_properties_count {
 			return
 		}
 
@@ -1038,10 +1038,10 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 		/* Class must not extend a final class */
 
 	}
-	if ce.parent_name {
-		ZendStringReleaseEx(ce.parent_name, 0)
+	if ce.GetParentName() {
+		ZendStringReleaseEx(ce.GetParentName(), 0)
 	}
-	ce.parent = parent_ce
+	ce.SetParent(parent_ce)
 	ce.SetIsResolvedParent(true)
 
 	/* Inherit interfaces */
@@ -1052,7 +1052,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 		} else {
 			var i uint32
 			for i = 0; i < parent_ce.GetNumInterfaces(); i++ {
-				DoImplementInterface(ce, parent_ce.interfaces[i])
+				DoImplementInterface(ce, parent_ce.GetInterfaces()[i])
 			}
 		}
 	}
@@ -1341,15 +1341,15 @@ func ZendDoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
 	var i uint32
 	var ignore uint32 = 0
 	var current_iface_num uint32 = ce.GetNumInterfaces()
-	var parent_iface_num uint32 = b.CondF1(ce.parent, func() __auto__ { return ce.parent.num_interfaces }, 0)
+	var parent_iface_num uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
 	var key *ZendString
 	var c *ZendClassConstant
 	ZEND_ASSERT(ce.IsLinked())
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
-		if ce.interfaces[i] == nil {
-			memmove(ce.interfaces+i, ce.interfaces+i+1, b.SizeOf("zend_class_entry *")*(b.PreDec(&(ce.GetNumInterfaces()))-i))
+		if ce.GetInterfaces()[i] == nil {
+			memmove(ce.GetInterfaces()+i, ce.GetInterfaces()+i+1, b.SizeOf("zend_class_entry *")*(b.PreDec(&(ce.GetNumInterfaces()))-i))
 			i--
-		} else if ce.interfaces[i] == iface {
+		} else if ce.GetInterfaces()[i] == iface {
 			if i < parent_iface_num {
 				ignore = 1
 			} else {
@@ -1375,18 +1375,18 @@ func ZendDoImplementInterface(ce *ZendClassEntry, iface *ZendClassEntry) {
 	} else {
 		if ce.GetNumInterfaces() >= current_iface_num {
 			if ce.GetType() == ZEND_INTERNAL_CLASS {
-				ce.interfaces = (**ZendClassEntry)(realloc(ce.interfaces, b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num)))
+				ce.SetInterfaces((**ZendClassEntry)(realloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
 			} else {
-				ce.interfaces = (**ZendClassEntry)(Erealloc(ce.interfaces, b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num)))
+				ce.SetInterfaces((**ZendClassEntry)(Erealloc(ce.GetInterfaces(), b.SizeOf("zend_class_entry *")*b.PreInc(&current_iface_num))))
 			}
 		}
-		ce.interfaces[b.PostInc(&(ce.GetNumInterfaces()))] = iface
+		ce.GetInterfaces()[b.PostInc(&(ce.GetNumInterfaces()))] = iface
 		DoInterfaceImplementation(ce, iface)
 	}
 }
 func ZendDoImplementInterfaces(ce *ZendClassEntry, interfaces **ZendClassEntry) {
 	var iface *ZendClassEntry
-	var num_parent_interfaces uint32 = b.CondF1(ce.parent, func() __auto__ { return ce.parent.num_interfaces }, 0)
+	var num_parent_interfaces uint32 = b.CondF1(ce.GetParent(), func() __auto__ { return ce.GetParent().num_interfaces }, 0)
 	var num_interfaces uint32 = num_parent_interfaces
 	var key *ZendString
 	var c *ZendClassConstant
@@ -1430,16 +1430,16 @@ func ZendDoImplementInterfaces(ce *ZendClassEntry, interfaces **ZendClassEntry) 
 		}
 	}
 	for i = 0; i < ce.GetNumInterfaces(); i++ {
-		ZendStringReleaseEx(ce.interface_names[i].name, 0)
-		ZendStringReleaseEx(ce.interface_names[i].lc_name, 0)
+		ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
+		ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
 	}
-	Efree(ce.interface_names)
+	Efree(ce.GetInterfaceNames())
 	ce.SetNumInterfaces(num_interfaces)
-	ce.interfaces = interfaces
+	ce.SetInterfaces(interfaces)
 	ce.SetIsResolvedInterfaces(true)
 	i = num_parent_interfaces
 	for ; i < ce.GetNumInterfaces(); i++ {
-		DoInterfaceImplementation(ce, ce.interfaces[i])
+		DoInterfaceImplementation(ce, ce.GetInterfaces()[i])
 	}
 }
 func ZendAddMagicMethods(ce *ZendClassEntry, mname *ZendString, fe *ZendFunction) {
@@ -1452,7 +1452,7 @@ func ZendAddMagicMethods(ce *ZendClassEntry, mname *ZendString, fe *ZendFunction
 	} else if ZendStringEqualsLiteral(mname, ZEND_CLONE_FUNC_NAME) {
 		ce.SetClone(fe)
 	} else if ZendStringEqualsLiteral(mname, ZEND_CONSTRUCTOR_FUNC_NAME) {
-		if ce.GetConstructor() != nil && (!(ce.parent) || ce.GetConstructor() != ce.parent.constructor) {
+		if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())
 		}
 		ce.SetConstructor(fe)
@@ -1482,7 +1482,7 @@ func ZendAddMagicMethods(ce *ZendClassEntry, mname *ZendString, fe *ZendFunction
 		var lowercase_name *ZendString = ZendStringTolower(ce.GetName())
 		lowercase_name = ZendNewInternedString(lowercase_name)
 		if !(memcmp(mname.GetVal(), lowercase_name.GetVal(), mname.GetLen())) {
-			if ce.GetConstructor() != nil && (!(ce.parent) || ce.GetConstructor() != ce.parent.constructor) {
+			if ce.GetConstructor() != nil && (!(ce.GetParent()) || ce.GetConstructor() != ce.GetParent().constructor) {
 				ZendErrorNoreturn(E_COMPILE_ERROR, "%s has colliding constructor definitions coming from traits", ce.GetName().GetVal())
 			}
 			ce.SetConstructor(fe)
@@ -2177,7 +2177,7 @@ func AddDependencyObligation(ce *ZendClassEntry, dependency_ce *ZendClassEntry) 
 	var obligations *HashTable = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_DEPENDENCY)
-	obligation.dependency_ce = dependency_ce
+	obligation.SetDependencyCe(dependency_ce)
 	ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddCompatibilityObligation(ce *ZendClassEntry, child_fn *ZendFunction, parent_fn *ZendFunction, always_error ZendBool) {
@@ -2188,30 +2188,30 @@ func AddCompatibilityObligation(ce *ZendClassEntry, child_fn *ZendFunction, pare
 	/* Copy functions, because they may be stack-allocated in the case of traits. */
 
 	if child_fn.GetCommonType() == ZEND_INTERNAL_FUNCTION {
-		memcpy(obligation.child_fn, child_fn, b.SizeOf("zend_internal_function"))
+		memcpy(obligation.GetChildFn(), child_fn, b.SizeOf("zend_internal_function"))
 	} else {
-		memcpy(obligation.child_fn, child_fn, b.SizeOf("zend_op_array"))
+		memcpy(obligation.GetChildFn(), child_fn, b.SizeOf("zend_op_array"))
 	}
 	if parent_fn.GetCommonType() == ZEND_INTERNAL_FUNCTION {
-		memcpy(obligation.parent_fn, parent_fn, b.SizeOf("zend_internal_function"))
+		memcpy(obligation.GetParentFn(), parent_fn, b.SizeOf("zend_internal_function"))
 	} else {
-		memcpy(obligation.parent_fn, parent_fn, b.SizeOf("zend_op_array"))
+		memcpy(obligation.GetParentFn(), parent_fn, b.SizeOf("zend_op_array"))
 	}
-	obligation.always_error = always_error
+	obligation.SetAlwaysError(always_error)
 	ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func AddPropertyCompatibilityObligation(ce *ZendClassEntry, child_prop *ZendPropertyInfo, parent_prop *ZendPropertyInfo) {
 	var obligations *HashTable = GetOrInitObligationsForClass(ce)
 	var obligation *VarianceObligation = Emalloc(b.SizeOf("variance_obligation"))
 	obligation.SetType(OBLIGATION_PROPERTY_COMPATIBILITY)
-	obligation.child_prop = child_prop
-	obligation.parent_prop = parent_prop
+	obligation.SetChildProp(child_prop)
+	obligation.SetParentProp(parent_prop)
 	ZendHashNextIndexInsertPtr(obligations, obligation)
 }
 func CheckVarianceObligation(zv *Zval) int {
 	var obligation *VarianceObligation = zv.GetPtr()
 	if obligation.GetType() == OBLIGATION_DEPENDENCY {
-		var dependency_ce *ZendClassEntry = obligation.dependency_ce
+		var dependency_ce *ZendClassEntry = obligation.GetDependencyCe()
 		if dependency_ce.IsUnresolvedVariance() {
 			ResolveDelayedVarianceObligations(dependency_ce)
 		}
@@ -2220,23 +2220,23 @@ func CheckVarianceObligation(zv *Zval) int {
 		}
 	} else if obligation.GetType() == OBLIGATION_COMPATIBILITY {
 		var unresolved_class *ZendString
-		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.child_fn, obligation.parent_fn)
+		var status InheritanceStatus = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
 				return ZEND_HASH_APPLY_KEEP
 			}
 			ZEND_ASSERT(status == INHERITANCE_ERROR)
-			EmitIncompatibleMethodErrorOrWarning(obligation.child_fn, obligation.parent_fn, status, unresolved_class, obligation.always_error)
+			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
 		}
 	} else {
 		ZEND_ASSERT(obligation.GetType() == OBLIGATION_PROPERTY_COMPATIBILITY)
-		var status InheritanceStatus = PropertyTypesCompatible(obligation.parent_prop, obligation.child_prop)
+		var status InheritanceStatus = PropertyTypesCompatible(obligation.GetParentProp(), obligation.GetChildProp())
 		if status != INHERITANCE_SUCCESS {
 			if status == INHERITANCE_UNRESOLVED {
 				return ZEND_HASH_APPLY_KEEP
 			}
 			ZEND_ASSERT(status == INHERITANCE_ERROR)
-			EmitIncompatiblePropertyError(obligation.child_prop, obligation.parent_prop)
+			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		}
 	}
 	return ZEND_HASH_APPLY_REMOVE
@@ -2294,11 +2294,11 @@ func ReportVarianceErrors(ce *ZendClassEntry) {
 
 			/* Just used to fetch the unresolved_class in this case. */
 
-			status = ZendDoPerformImplementationCheck(&unresolved_class, obligation.child_fn, obligation.parent_fn)
+			status = ZendDoPerformImplementationCheck(&unresolved_class, obligation.GetChildFn(), obligation.GetParentFn())
 			ZEND_ASSERT(status == INHERITANCE_UNRESOLVED)
-			EmitIncompatibleMethodErrorOrWarning(obligation.child_fn, obligation.parent_fn, status, unresolved_class, obligation.always_error)
+			EmitIncompatibleMethodErrorOrWarning(obligation.GetChildFn(), obligation.GetParentFn(), status, unresolved_class, obligation.GetAlwaysError())
 		} else if obligation.GetType() == OBLIGATION_PROPERTY_COMPATIBILITY {
-			EmitIncompatiblePropertyError(obligation.child_prop, obligation.parent_prop)
+			EmitIncompatiblePropertyError(obligation.GetChildProp(), obligation.GetParentProp())
 		} else {
 			ZendErrorNoreturn(E_CORE_ERROR, "Bug #78647")
 		}
@@ -2340,8 +2340,8 @@ func ZendDoLinkClass(ce *ZendClassEntry, lc_parent_name *ZendString) int {
 
 	var parent *ZendClassEntry = nil
 	var interfaces **ZendClassEntry = nil
-	if ce.parent_name {
-		parent = ZendFetchClassByName(ce.parent_name, lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+	if ce.GetParentName() {
+		parent = ZendFetchClassByName(ce.GetParentName(), lc_parent_name, ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 		if parent == nil {
 			CheckUnrecoverableLoadFailure(ce)
 			return FAILURE
@@ -2355,10 +2355,10 @@ func ZendDoLinkClass(ce *ZendClassEntry, lc_parent_name *ZendString) int {
 		var num_parent_interfaces uint32 = b.CondF1(parent != nil, func() uint32 { return parent.GetNumInterfaces() }, 0)
 		interfaces = Emalloc(b.SizeOf("zend_class_entry *") * (ce.GetNumInterfaces() + num_parent_interfaces))
 		if num_parent_interfaces != 0 {
-			memcpy(interfaces, parent.interfaces, b.SizeOf("zend_class_entry *")*num_parent_interfaces)
+			memcpy(interfaces, parent.GetInterfaces(), b.SizeOf("zend_class_entry *")*num_parent_interfaces)
 		}
 		for i = 0; i < ce.GetNumInterfaces(); i++ {
-			var iface *ZendClassEntry = ZendFetchClassByName(ce.interface_names[i].name, ce.interface_names[i].lc_name, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
+			var iface *ZendClassEntry = ZendFetchClassByName(ce.GetInterfaceNames()[i].name, ce.GetInterfaceNames()[i].lc_name, ZEND_FETCH_CLASS_INTERFACE|ZEND_FETCH_CLASS_ALLOW_NEARLY_LINKED|ZEND_FETCH_CLASS_EXCEPTION)
 			if iface == nil {
 				CheckUnrecoverableLoadFailure(ce)
 				Efree(interfaces)

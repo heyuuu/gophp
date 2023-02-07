@@ -24,7 +24,7 @@ func SplRegisterStdClass(ppce **zend.ZendClassEntry, class_name string, obj_ctor
 	/* entries changed by initialize */
 
 	if obj_ctor {
-		ppce.create_object = obj_ctor
+		ppce.SetCreateObject(obj_ctor)
 	}
 
 	/* entries changed by initialize */
@@ -39,9 +39,9 @@ func SplRegisterSubClass(ppce **zend.ZendClassEntry, parent_ce *zend.ZendClassEn
 	/* entries changed by initialize */
 
 	if obj_ctor {
-		ppce.create_object = obj_ctor
+		ppce.SetCreateObject(obj_ctor)
 	} else {
-		ppce.create_object = parent_ce.create_object
+		ppce.SetCreateObject(parent_ce.GetCreateObject())
 	}
 
 	/* entries changed by initialize */
@@ -64,7 +64,7 @@ func SplAddInterfaces(list *zend.Zval, pce *zend.ZendClassEntry, allow int, ce_f
 	if pce.GetNumInterfaces() != 0 {
 		zend.ZEND_ASSERT(pce.HasCeFlags(zend.ZEND_ACC_LINKED))
 		for num_interfaces = 0; num_interfaces < pce.GetNumInterfaces(); num_interfaces++ {
-			SplAddClassName(list, pce.interfaces[num_interfaces], allow, ce_flags)
+			SplAddClassName(list, pce.GetInterfaces()[num_interfaces], allow, ce_flags)
 		}
 	}
 }
@@ -84,8 +84,8 @@ func SplAddClasses(pce *zend.ZendClassEntry, list *zend.Zval, sub int, allow int
 	SplAddClassName(list, pce, allow, ce_flags)
 	if sub != 0 {
 		SplAddInterfaces(list, pce, allow, ce_flags)
-		for pce.parent {
-			pce = pce.parent
+		for pce.GetParent() {
+			pce = pce.GetParent()
 			SplAddClasses(pce, list, sub, allow, ce_flags)
 		}
 	}

@@ -113,7 +113,7 @@ func SplArrayObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clone
 			intern.GetStd().SetHandlers(&spl_handler_ArrayObject)
 			break
 		}
-		parent = parent.parent
+		parent = parent.GetParent()
 		inherited = 1
 	}
 	if parent == nil {

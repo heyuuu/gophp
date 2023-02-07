@@ -2787,7 +2787,7 @@ func InstanceofClass(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBool {
 		if instance_ce == ce {
 			return 1
 		}
-		instance_ce = instance_ce.parent
+		instance_ce = instance_ce.GetParent()
 		if instance_ce == nil {
 			break
 		}
@@ -2799,7 +2799,7 @@ func InstanceofInterface(instance_ce *ZendClassEntry, ce *ZendClassEntry) ZendBo
 	if instance_ce.GetNumInterfaces() != 0 {
 		ZEND_ASSERT(instance_ce.IsResolvedInterfaces())
 		for i = 0; i < instance_ce.GetNumInterfaces(); i++ {
-			if instance_ce.interfaces[i] == ce {
+			if instance_ce.GetInterfaces()[i] == ce {
 				return 1
 			}
 		}

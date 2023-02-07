@@ -605,14 +605,14 @@ func ZendRegisterDefaultException() {
 	ce.SetName(ZendStringInitInterned("Throwable", b.SizeOf("\"Throwable\"")-1, 1))
 	ce.SetBuiltinFunctions(ZendFuncsThrowable)
 	ZendCeThrowable = ZendRegisterInternalInterface(&ce)
-	ZendCeThrowable.interface_gets_implemented = ZendImplementThrowable
+	ZendCeThrowable.SetInterfaceGetsImplemented(ZendImplementThrowable)
 	memcpy(&DefaultExceptionHandlers, &StdObjectHandlers, b.SizeOf("zend_object_handlers"))
 	DefaultExceptionHandlers.SetCloneObj(nil)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Exception", b.SizeOf("\"Exception\"")-1, 1))
 	ce.SetBuiltinFunctions(DefaultExceptionFunctions)
 	ZendCeException = ZendRegisterInternalClassEx(&ce, nil)
-	ZendCeException.create_object = ZendDefaultExceptionNew
+	ZendCeException.SetCreateObject(ZendDefaultExceptionNew)
 	ZendClassImplements(ZendCeException, 1, ZendCeThrowable)
 	ZendDeclarePropertyString(ZendCeException, "message", b.SizeOf("\"message\"")-1, "", ZEND_ACC_PROTECTED)
 	ZendDeclarePropertyString(ZendCeException, "string", b.SizeOf("\"string\"")-1, "", ZEND_ACC_PRIVATE)
@@ -625,13 +625,13 @@ func ZendRegisterDefaultException() {
 	ce.SetName(ZendStringInitInterned("ErrorException", b.SizeOf("\"ErrorException\"")-1, 1))
 	ce.SetBuiltinFunctions(ErrorExceptionFunctions)
 	ZendCeErrorException = ZendRegisterInternalClassEx(&ce, ZendCeException)
-	ZendCeErrorException.create_object = ZendErrorExceptionNew
+	ZendCeErrorException.SetCreateObject(ZendErrorExceptionNew)
 	ZendDeclarePropertyLong(ZendCeErrorException, "severity", b.SizeOf("\"severity\"")-1, E_ERROR, ZEND_ACC_PROTECTED)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("Error", b.SizeOf("\"Error\"")-1, 1))
 	ce.SetBuiltinFunctions(DefaultExceptionFunctions)
 	ZendCeError = ZendRegisterInternalClassEx(&ce, nil)
-	ZendCeError.create_object = ZendDefaultExceptionNew
+	ZendCeError.SetCreateObject(ZendDefaultExceptionNew)
 	ZendClassImplements(ZendCeError, 1, ZendCeThrowable)
 	ZendDeclarePropertyString(ZendCeError, "message", b.SizeOf("\"message\"")-1, "", ZEND_ACC_PROTECTED)
 	ZendDeclarePropertyString(ZendCeError, "string", b.SizeOf("\"string\"")-1, "", ZEND_ACC_PRIVATE)
@@ -644,32 +644,32 @@ func ZendRegisterDefaultException() {
 	ce.SetName(ZendStringInitInterned("CompileError", b.SizeOf("\"CompileError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeCompileError = ZendRegisterInternalClassEx(&ce, ZendCeError)
-	ZendCeCompileError.create_object = ZendDefaultExceptionNew
+	ZendCeCompileError.SetCreateObject(ZendDefaultExceptionNew)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("ParseError", b.SizeOf("\"ParseError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeParseError = ZendRegisterInternalClassEx(&ce, ZendCeCompileError)
-	ZendCeParseError.create_object = ZendDefaultExceptionNew
+	ZendCeParseError.SetCreateObject(ZendDefaultExceptionNew)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("TypeError", b.SizeOf("\"TypeError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeTypeError = ZendRegisterInternalClassEx(&ce, ZendCeError)
-	ZendCeTypeError.create_object = ZendDefaultExceptionNew
+	ZendCeTypeError.SetCreateObject(ZendDefaultExceptionNew)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("ArgumentCountError", b.SizeOf("\"ArgumentCountError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeArgumentCountError = ZendRegisterInternalClassEx(&ce, ZendCeTypeError)
-	ZendCeArgumentCountError.create_object = ZendDefaultExceptionNew
+	ZendCeArgumentCountError.SetCreateObject(ZendDefaultExceptionNew)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("ArithmeticError", b.SizeOf("\"ArithmeticError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeArithmeticError = ZendRegisterInternalClassEx(&ce, ZendCeError)
-	ZendCeArithmeticError.create_object = ZendDefaultExceptionNew
+	ZendCeArithmeticError.SetCreateObject(ZendDefaultExceptionNew)
 	memset(&ce, 0, b.SizeOf("zend_class_entry"))
 	ce.SetName(ZendStringInitInterned("DivisionByZeroError", b.SizeOf("\"DivisionByZeroError\"")-1, 1))
 	ce.SetBuiltinFunctions(nil)
 	ZendCeDivisionByZeroError = ZendRegisterInternalClassEx(&ce, ZendCeArithmeticError)
-	ZendCeDivisionByZeroError.create_object = ZendDefaultExceptionNew
+	ZendCeDivisionByZeroError.SetCreateObject(ZendDefaultExceptionNew)
 }
 func ZendExceptionGetDefault() *ZendClassEntry { return ZendCeException }
 func ZendGetErrorException() *ZendClassEntry   { return ZendCeErrorException }

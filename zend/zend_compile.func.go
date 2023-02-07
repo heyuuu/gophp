@@ -1164,7 +1164,7 @@ func ZendEnsureValidClassFetchType(fetch_type uint32) {
 		var ce *ZendClassEntry = CG__().GetActiveClassEntry()
 		if ce == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
-		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.parent_name) {
+		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.GetParentName()) {
 			ZendError(E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
 		}
 	}
@@ -1189,8 +1189,8 @@ func ZendTryCompileConstExprResolveClassName(zv *Zval, class_ast *ZendAst) ZendB
 		}
 		return 0
 	case ZEND_FETCH_CLASS_PARENT:
-		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().parent_name && ZendIsScopeKnown() != 0 {
-			ZVAL_STR_COPY(zv, CG__().GetActiveClassEntry().parent_name)
+		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() && ZendIsScopeKnown() != 0 {
+			ZVAL_STR_COPY(zv, CG__().GetActiveClassEntry().GetParentName())
 			return 1
 		}
 		return 0
@@ -1214,13 +1214,13 @@ func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *ZendClassEntry) ZendBo
 			if ce == scope {
 				return 1
 			}
-			if !(ce.parent) {
+			if !(ce.GetParent()) {
 				break
 			}
 			if ce.IsResolvedParent() {
-				ce = ce.parent
+				ce = ce.GetParent()
 			} else {
-				ce = ZendHashFindPtrLc(CG__().GetClassTable(), ce.parent_name.GetVal(), ce.parent_name.GetLen())
+				ce = ZendHashFindPtrLc(CG__().GetClassTable(), ce.GetParentName().GetVal(), ce.GetParentName().GetLen())
 				if ce == nil {
 					break
 				}
@@ -1396,14 +1396,14 @@ func ZendInitializeClassData(ce *ZendClassEntry, nullify_handlers ZendBool) {
 		ce.SetCall(nil)
 		ce.SetCallstatic(nil)
 		ce.SetTostring(nil)
-		ce.create_object = nil
+		ce.SetCreateObject(nil)
 		ce.SetGetIterator(nil)
 		ce.SetIteratorFuncsPtr(nil)
 		ce.SetGetStaticMethod(nil)
-		ce.parent = nil
-		ce.parent_name = nil
+		ce.SetParent(nil)
+		ce.SetParentName(nil)
 		ce.SetNumInterfaces(0)
-		ce.interfaces = nil
+		ce.SetInterfaces(nil)
 		ce.SetNumTraits(0)
 		ce.SetTraitNames(nil)
 		ce.SetTraitAliases(nil)
@@ -5309,7 +5309,7 @@ func ZendCompileImplements(ast *ZendAst) {
 	}
 	ce.SetIsImplementInterfaces(true)
 	ce.SetNumInterfaces(list.GetChildren())
-	ce.interface_names = interface_names
+	ce.SetInterfaceNames(interface_names)
 }
 func ZendGenerateAnonClassName(start_lineno uint32) *ZendString {
 	var filename *ZendString = CG__().GetActiveOpArray().GetFilename()
@@ -5392,7 +5392,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel ZendBool) *ZendOp {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal class name")
 		}
 		extends_name = extends_node.GetConstant().GetStr()
-		ce.parent_name = ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ))
+		ce.SetParentName(ZendResolveClassName(extends_name, b.CondF1(extends_ast.GetKind() == ZEND_AST_ZVAL, func() ZendAstAttr { return extends_ast.GetAttr() }, ZEND_NAME_FQ)))
 		ZendStringReleaseEx(extends_name, 0)
 		ce.SetIsInherited(true)
 	}
@@ -5447,7 +5447,7 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel ZendBool) *ZendOp {
 	}
 	if toplevel != 0 && !ce.HasCeFlags(ZEND_ACC_IMPLEMENT_INTERFACES|ZEND_ACC_IMPLEMENT_TRAITS) && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
 		if extends_ast != nil {
-			var parent_ce *ZendClassEntry = ZendLookupClassEx(ce.parent_name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
+			var parent_ce *ZendClassEntry = ZendLookupClassEx(ce.GetParentName(), nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 			if parent_ce != nil && (parent_ce.GetType() != ZEND_INTERNAL_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_INTERNAL_CLASSES) == 0) && (parent_ce.GetType() != ZEND_USER_CLASS || (CG__().GetCompilerOptions()&ZEND_COMPILE_IGNORE_OTHER_FILES) == 0 || parent_ce.GetFilename() == ce.GetFilename()) {
 				CG__().SetZendLineno(decl.GetEndLineno())
 				if ZendTryEarlyBind(ce, parent_ce, lcname, nil) != 0 {
@@ -5467,11 +5467,11 @@ func ZendCompileClassDecl(ast *ZendAst, toplevel ZendBool) *ZendOp {
 		}
 	}
 	opline = GetNextOp()
-	if ce.parent_name {
+	if ce.GetParentName() {
 
 		/* Lowercased parent name */
 
-		var lc_parent_name *ZendString = ZendStringTolower(ce.parent_name)
+		var lc_parent_name *ZendString = ZendStringTolower(ce.GetParentName())
 		opline.SetOp2Type(IS_CONST)
 		LITERAL_STR(opline.GetOp2(), lc_parent_name)
 	}

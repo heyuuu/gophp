@@ -139,7 +139,7 @@ func SplObjectStorageNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval) *ze
 			}
 			break
 		}
-		parent = parent.parent
+		parent = parent.GetParent()
 	}
 	if orig != nil {
 		var other *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(orig)

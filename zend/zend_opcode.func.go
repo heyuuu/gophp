@@ -245,8 +245,8 @@ func DestroyZendClass(zv *Zval) {
 	}
 	switch ce.GetType() {
 	case ZEND_USER_CLASS:
-		if ce.parent_name && !ce.IsResolvedParent() {
-			ZendStringReleaseEx(ce.parent_name, 0)
+		if ce.GetParentName() && !ce.IsResolvedParent() {
+			ZendStringReleaseEx(ce.GetParentName(), 0)
 		}
 		if ce.GetDefaultPropertiesTable() != nil {
 			var p *Zval = ce.GetDefaultPropertiesTable()
@@ -331,11 +331,11 @@ func DestroyZendClass(zv *Zval) {
 			if !ce.IsResolvedInterfaces() {
 				var i uint32
 				for i = 0; i < ce.GetNumInterfaces(); i++ {
-					ZendStringReleaseEx(ce.interface_names[i].name, 0)
-					ZendStringReleaseEx(ce.interface_names[i].lc_name, 0)
+					ZendStringReleaseEx(ce.GetInterfaceNames()[i].name, 0)
+					ZendStringReleaseEx(ce.GetInterfaceNames()[i].lc_name, 0)
 				}
 			}
-			Efree(ce.interfaces)
+			Efree(ce.GetInterfaces())
 		}
 		if ce.GetDocComment() != nil {
 			ZendStringReleaseEx(ce.GetDocComment(), 0)
@@ -402,7 +402,7 @@ func DestroyZendClass(zv *Zval) {
 			Free(ce.GetIteratorFuncsPtr())
 		}
 		if ce.GetNumInterfaces() > 0 {
-			Free(ce.interfaces)
+			Free(ce.GetInterfaces())
 		}
 		if ce.GetPropertiesInfoTable() != nil {
 			Free(ce.GetPropertiesInfoTable())

@@ -320,11 +320,11 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 			if scope == nil {
 				ZendThrowError(nil, "Cannot access parent:: when no class scope is active")
 				goto failure
-			} else if !(scope.parent) {
+			} else if !(scope.GetParent()) {
 				ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 				goto failure
 			} else {
-				ce = scope.parent
+				ce = scope.GetParent()
 			}
 		} else if ZendStringEqualsLiteralCi(class_name, "static") {
 			ce = ZendGetCalledScope(EG__().GetCurrentExecuteData())

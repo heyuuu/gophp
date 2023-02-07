@@ -252,7 +252,7 @@ func SplDllistObjectNewEx(class_type *zend.ZendClassEntry, orig *zend.Zval, clon
 			intern.GetStd().SetHandlers(&spl_handler_SplDoublyLinkedList)
 			break
 		}
-		parent = parent.parent
+		parent = parent.GetParent()
 		inherited = 1
 	}
 	if parent == nil {

@@ -1105,10 +1105,10 @@ check_fetch_type:
 			ZendThrowOrError(fetch_type, nil, "Cannot access parent:: when no class scope is active")
 			return nil
 		}
-		if !(scope.parent) {
+		if !(scope.GetParent()) {
 			ZendThrowOrError(fetch_type, nil, "Cannot access parent:: when current class scope has no parent")
 		}
-		return scope.parent
+		return scope.GetParent()
 	case ZEND_FETCH_CLASS_STATIC:
 		ce = ZendGetCalledScope(EG__().GetCurrentExecuteData())
 		if ce == nil {

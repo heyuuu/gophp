@@ -486,11 +486,11 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		if ast.GetAttr() == ZEND_FETCH_CLASS_SELF {
 			ZVAL_STR_COPY(result, scope.GetName())
 		} else if ast.GetAttr() == ZEND_FETCH_CLASS_PARENT {
-			if !(scope.parent) {
+			if !(scope.GetParent()) {
 				ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 				return FAILURE
 			}
-			ZVAL_STR_COPY(result, scope.parent.name)
+			ZVAL_STR_COPY(result, scope.GetParent().name)
 		} else {
 			ZEND_ASSERT(false)
 		}

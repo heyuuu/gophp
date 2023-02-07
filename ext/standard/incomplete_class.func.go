@@ -60,7 +60,7 @@ func PhpCreateIncompleteClass() *zend.ZendClassEntry {
 	memset(&incomplete_class, 0, b.SizeOf("zend_class_entry"))
 	incomplete_class.SetName(zend.ZendStringInitInterned(INCOMPLETE_CLASS, b.SizeOf("INCOMPLETE_CLASS")-1, 1))
 	incomplete_class.SetBuiltinFunctions(nil)
-	incomplete_class.create_object = PhpCreateIncompleteObject
+	incomplete_class.SetCreateObject(PhpCreateIncompleteObject)
 	memcpy(&PhpIncompleteObjectHandlers, &zend.StdObjectHandlers, b.SizeOf("zend_object_handlers"))
 	PhpIncompleteObjectHandlers.SetReadProperty(IncompleteClassGetProperty)
 	PhpIncompleteObjectHandlers.SetHasProperty(IncompleteClassHasProperty)

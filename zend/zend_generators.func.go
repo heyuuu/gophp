@@ -1207,7 +1207,7 @@ func ZendRegisterGeneratorCe() {
 	ce.SetBuiltinFunctions(GeneratorFunctions)
 	ZendCeGenerator = ZendRegisterInternalClass(&ce)
 	ZendCeGenerator.SetIsFinal(true)
-	ZendCeGenerator.create_object = ZendGeneratorCreate
+	ZendCeGenerator.SetCreateObject(ZendGeneratorCreate)
 	ZendCeGenerator.SetSerialize(ZendClassSerializeDeny)
 	ZendCeGenerator.SetUnserialize(ZendClassUnserializeDeny)
 

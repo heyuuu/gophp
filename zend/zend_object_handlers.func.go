@@ -56,8 +56,8 @@ func RebuildObjectProperties(zobj *ZendObject) {
 				}
 			}
 			if (flags & ZEND_ACC_CHANGED) != 0 {
-				for ce.parent && ce.parent.default_properties_count {
-					ce = ce.parent
+				for ce.GetParent() && ce.GetParent().default_properties_count {
+					ce = ce.GetParent()
 					var __ht *HashTable = ce.GetPropertiesInfo()
 					for _, _p := range __ht.foreachData() {
 						var _z *Zval = _p.GetVal()
@@ -254,12 +254,12 @@ func ZendStdCallIssetter(zobj *ZendObject, prop_name *ZendString, retval *Zval) 
 	EG__().SetFakeScope(orig_fake_scope)
 }
 func IsDerivedClass(child_class *ZendClassEntry, parent_class *ZendClassEntry) ZendBool {
-	child_class = child_class.parent
+	child_class = child_class.GetParent()
 	for child_class != nil {
 		if child_class == parent_class {
 			return 1
 		}
-		child_class = child_class.parent
+		child_class = child_class.GetParent()
 	}
 	return 0
 }
@@ -1087,7 +1087,7 @@ func ZendCheckProtected(ce *ZendClassEntry, scope *ZendClassEntry) int {
 		if fbc_scope == scope {
 			return 1
 		}
-		fbc_scope = fbc_scope.parent
+		fbc_scope = fbc_scope.GetParent()
 	}
 
 	/* Is the function's scope the same as our current object context,
@@ -1098,7 +1098,7 @@ func ZendCheckProtected(ce *ZendClassEntry, scope *ZendClassEntry) int {
 		if scope == ce {
 			return 1
 		}
-		scope = scope.parent
+		scope = scope.GetParent()
 	}
 	return 0
 }
@@ -1255,7 +1255,7 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 
 			var call_ce *ZendClassEntry = object.GetCe()
 			for call_ce.GetCall() == nil {
-				call_ce = call_ce.parent
+				call_ce = call_ce.GetParent()
 			}
 			return ZendGetUserCallFunction(call_ce, function_name)
 		} else if ce.GetCallstatic() != nil {
@@ -1286,14 +1286,14 @@ func ZendClassInitStatics(class_type *ZendClassEntry) {
 	var i int
 	var p *Zval
 	if class_type.GetDefaultStaticMembersCount() != 0 && CE_STATIC_MEMBERS(class_type) == nil {
-		if class_type.parent {
-			ZendClassInitStatics(class_type.parent)
+		if class_type.GetParent() {
+			ZendClassInitStatics(class_type.GetParent())
 		}
 		ZEND_MAP_PTR_SET(class_type.static_members_table, Emalloc(b.SizeOf("zval")*class_type.GetDefaultStaticMembersCount()))
 		for i = 0; i < class_type.GetDefaultStaticMembersCount(); i++ {
 			p = class_type.GetDefaultStaticMembersTable()[i]
 			if p.IsIndirect() {
-				var q *Zval = &CE_STATIC_MEMBERS(class_type.parent)[i]
+				var q *Zval = &CE_STATIC_MEMBERS(class_type.GetParent())[i]
 				ZVAL_DEINDIRECT(q)
 				ZVAL_INDIRECT(&CE_STATIC_MEMBERS(class_type)[i], q)
 			} else {

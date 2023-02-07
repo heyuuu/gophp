@@ -480,7 +480,7 @@ func ZendRegisterClosureCe() {
 	ce.SetBuiltinFunctions(ClosureFunctions)
 	ZendCeClosure = ZendRegisterInternalClass(&ce)
 	ZendCeClosure.SetIsFinal(true)
-	ZendCeClosure.create_object = ZendClosureNew
+	ZendCeClosure.SetCreateObject(ZendClosureNew)
 	ZendCeClosure.SetSerialize(ZendClassSerializeDeny)
 	ZendCeClosure.SetUnserialize(ZendClassUnserializeDeny)
 	memcpy(&ClosureHandlers, &StdObjectHandlers, b.SizeOf("zend_object_handlers"))

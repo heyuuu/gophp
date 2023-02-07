@@ -26667,12 +26667,12 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) in
 		ZVAL_STR_COPY(EX_VAR(opline.GetResult().GetVar()), scope.GetName())
 		break
 	case ZEND_FETCH_CLASS_PARENT:
-		if scope.parent == nil {
+		if scope.GetParent() == nil {
 			ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
 			EX_VAR(opline.GetResult().GetVar()).SetUndef()
 			HANDLE_EXCEPTION()
 		}
-		ZVAL_STR_COPY(EX_VAR(opline.GetResult().GetVar()), scope.parent.name)
+		ZVAL_STR_COPY(EX_VAR(opline.GetResult().GetVar()), scope.GetParent().name)
 		break
 	case ZEND_FETCH_CLASS_STATIC:
 		if EX(This).u1.v.type_ == IS_OBJECT {

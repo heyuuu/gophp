@@ -901,11 +901,11 @@ func ZendResolveClassType(type_ *ZendType, self_ce *ZendClassEntry) ZendBool {
 		}
 		ce = self_ce
 	} else if ZendStringEqualsLiteralCi(name, "parent") {
-		if !(self_ce.parent) {
+		if !(self_ce.GetParent()) {
 			ZendThrowError(nil, "Cannot access parent:: when current class scope has no parent")
 			return 0
 		}
-		ce = self_ce.parent
+		ce = self_ce.GetParent()
 	} else {
 		ce = ZendLookupClassEx(name, nil, ZEND_FETCH_CLASS_NO_AUTOLOAD)
 		if ce == nil {

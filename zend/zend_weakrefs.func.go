@@ -231,7 +231,7 @@ func ZendRegisterWeakrefCe() {
 	ce.SetBuiltinFunctions(ZendWeakrefMethods)
 	ZendCeWeakref = ZendRegisterInternalClass(&ce)
 	ZendCeWeakref.SetIsFinal(true)
-	ZendCeWeakref.create_object = ZendWeakrefNew
+	ZendCeWeakref.SetCreateObject(ZendWeakrefNew)
 	ZendCeWeakref.SetSerialize(ZendClassSerializeDeny)
 	ZendCeWeakref.SetUnserialize(ZendClassUnserializeDeny)
 	memcpy(&ZendWeakrefHandlers, ZendGetStdObjectHandlers(), b.SizeOf("zend_object_handlers"))
