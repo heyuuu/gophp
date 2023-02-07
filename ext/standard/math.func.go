@@ -248,18 +248,18 @@ func ZifAbs(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(zend.IS_DOUBLE) {
-		zend.RETVAL_DOUBLE(fabs(value.GetDval()))
+		return_value.SetDouble(fabs(value.GetDval()))
 		return
 	} else if value.IsType(zend.IS_LONG) {
 		if value.GetLval() == zend.ZEND_LONG_MIN {
-			zend.RETVAL_DOUBLE(-float64(zend.ZEND_LONG_MIN))
+			return_value.SetDouble(-float64(zend.ZEND_LONG_MIN))
 			return
 		} else {
-			zend.RETVAL_LONG(b.CondF(value.GetLval() < 0, func() int { return -(value.GetLval()) }, func() zend.ZendLong { return value.GetLval() }))
+			return_value.SetLong(b.CondF(value.GetLval() < 0, func() int { return -(value.GetLval()) }, func() zend.ZendLong { return value.GetLval() }))
 			return
 		}
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifCeil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -329,13 +329,13 @@ func ZifCeil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(zend.IS_DOUBLE) {
-		zend.RETVAL_DOUBLE(ceil(value.GetDval()))
+		return_value.SetDouble(ceil(value.GetDval()))
 		return
 	} else if value.IsType(zend.IS_LONG) {
-		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
+		return_value.SetDouble(zend.ZvalGetDouble(value))
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifFloor(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -405,13 +405,13 @@ func ZifFloor(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertScalarToNumberEx(value)
 	if value.IsType(zend.IS_DOUBLE) {
-		zend.RETVAL_DOUBLE(floor(value.GetDval()))
+		return_value.SetDouble(floor(value.GetDval()))
 		return
 	} else if value.IsType(zend.IS_LONG) {
-		zend.RETVAL_DOUBLE(zend.ZvalGetDouble(value))
+		return_value.SetDouble(zend.ZvalGetDouble(value))
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -518,7 +518,7 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Simple case - long that doesn't need to be rounded. */
 
 		if places >= 0 {
-			zend.RETVAL_DOUBLE(float64(value.GetLval()))
+			return_value.SetDouble(float64(value.GetLval()))
 			return
 		}
 	case zend.IS_DOUBLE:
@@ -528,11 +528,11 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return_val = value.GetDval()
 		}
 		return_val = _phpMathRound(return_val, int(places), int(mode))
-		zend.RETVAL_DOUBLE(return_val)
+		return_value.SetDouble(return_val)
 		return
 		break
 	default:
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 		break
 	}
@@ -606,7 +606,7 @@ func ZifSin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(sin(num))
+	return_value.SetDouble(sin(num))
 	return
 }
 func ZifCos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -678,7 +678,7 @@ func ZifCos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(cos(num))
+	return_value.SetDouble(cos(num))
 	return
 }
 func ZifTan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -750,7 +750,7 @@ func ZifTan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(tan(num))
+	return_value.SetDouble(tan(num))
 	return
 }
 func ZifAsin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -822,7 +822,7 @@ func ZifAsin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(asin(num))
+	return_value.SetDouble(asin(num))
 	return
 }
 func ZifAcos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -894,7 +894,7 @@ func ZifAcos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(acos(num))
+	return_value.SetDouble(acos(num))
 	return
 }
 func ZifAtan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -966,7 +966,7 @@ func ZifAtan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(atan(num))
+	return_value.SetDouble(atan(num))
 	return
 }
 func ZifAtan2(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1045,7 +1045,7 @@ func ZifAtan2(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(atan2(num1, num2))
+	return_value.SetDouble(atan2(num1, num2))
 	return
 }
 func ZifSinh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1117,7 +1117,7 @@ func ZifSinh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(sinh(num))
+	return_value.SetDouble(sinh(num))
 	return
 }
 func ZifCosh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1189,7 +1189,7 @@ func ZifCosh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(cosh(num))
+	return_value.SetDouble(cosh(num))
 	return
 }
 func ZifTanh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1261,7 +1261,7 @@ func ZifTanh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(tanh(num))
+	return_value.SetDouble(tanh(num))
 	return
 }
 func ZifAsinh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1333,7 +1333,7 @@ func ZifAsinh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(PhpAsinh(num))
+	return_value.SetDouble(PhpAsinh(num))
 	return
 }
 func ZifAcosh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1405,7 +1405,7 @@ func ZifAcosh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(PhpAcosh(num))
+	return_value.SetDouble(PhpAcosh(num))
 	return
 }
 func ZifAtanh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1477,11 +1477,11 @@ func ZifAtanh(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(PhpAtanh(num))
+	return_value.SetDouble(PhpAtanh(num))
 	return
 }
 func ZifPi(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	zend.RETVAL_DOUBLE(M_PI)
+	return_value.SetDouble(M_PI)
 	return
 }
 func ZifIsFinite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1553,7 +1553,7 @@ func ZifIsFinite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_BOOL(core.ZendFinite(dval))
+	zend.ZVAL_BOOL(return_value, core.ZendFinite(dval))
 	return
 }
 func ZifIsInfinite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1625,7 +1625,7 @@ func ZifIsInfinite(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	zend.RETVAL_BOOL(core.ZendIsinf(dval))
+	zend.ZVAL_BOOL(return_value, core.ZendIsinf(dval))
 	return
 }
 func ZifIsNan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1697,7 +1697,7 @@ func ZifIsNan(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_BOOL(core.ZendIsnan(dval))
+	zend.ZVAL_BOOL(return_value, core.ZendIsnan(dval))
 	return
 }
 func ZifPow(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1839,7 +1839,7 @@ func ZifExp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(exp(num))
+	return_value.SetDouble(exp(num))
 	return
 }
 func ZifExpm1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1911,7 +1911,7 @@ func ZifExpm1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(PhpExpm1(num))
+	return_value.SetDouble(PhpExpm1(num))
 	return
 }
 func ZifLog1p(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1983,7 +1983,7 @@ func ZifLog1p(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(PhpLog1p(num))
+	return_value.SetDouble(PhpLog1p(num))
 	return
 }
 func ZifLog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2064,23 +2064,23 @@ func ZifLog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if zend.ZEND_NUM_ARGS() == 1 {
-		zend.RETVAL_DOUBLE(log(num))
+		return_value.SetDouble(log(num))
 		return
 	}
 	if base == 10.0 {
-		zend.RETVAL_DOUBLE(log10(num))
+		return_value.SetDouble(log10(num))
 		return
 	}
 	if base == 1.0 {
-		zend.RETVAL_DOUBLE(zend.ZEND_NAN)
+		return_value.SetDouble(zend.ZEND_NAN)
 		return
 	}
 	if base <= 0.0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "base must be greater than 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_DOUBLE(log(num) / log(base))
+	return_value.SetDouble(log(num) / log(base))
 	return
 }
 func ZifLog10(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2152,7 +2152,7 @@ func ZifLog10(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(log10(num))
+	return_value.SetDouble(log10(num))
 	return
 }
 func ZifSqrt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2224,7 +2224,7 @@ func ZifSqrt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(sqrt(num))
+	return_value.SetDouble(sqrt(num))
 	return
 }
 func ZifHypot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2303,7 +2303,7 @@ func ZifHypot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(hypot(num1, num2))
+	return_value.SetDouble(hypot(num1, num2))
 	return
 }
 func ZifDeg2rad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2375,7 +2375,7 @@ func ZifDeg2rad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(deg / 180.0 * M_PI)
+	return_value.SetDouble(deg / 180.0 * M_PI)
 	return
 }
 func ZifRad2deg(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2447,7 +2447,7 @@ func ZifRad2deg(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(rad / M_PI * 180)
+	return_value.SetDouble(rad / M_PI * 180)
 	return
 }
 func _phpMathBasetolong(arg *zend.Zval, base int) zend.ZendLong {
@@ -2686,7 +2686,7 @@ func ZifBindec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertToStringEx(arg)
 	if _phpMathBasetozval(arg, 2, return_value) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2757,7 +2757,7 @@ func ZifHexdec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertToStringEx(arg)
 	if _phpMathBasetozval(arg, 16, return_value) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2828,7 +2828,7 @@ func ZifOctdec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ConvertToStringEx(arg)
 	if _phpMathBasetozval(arg, 8, return_value) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2902,7 +2902,7 @@ func ZifDecbin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 2)
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 	return
 }
 func ZifDecoct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2975,7 +2975,7 @@ func ZifDecoct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 8)
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 	return
 }
 func ZifDechex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3048,7 +3048,7 @@ func ZifDechex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ConvertToLong(arg)
 	}
 	result = _phpMathLongtobase(arg, 16)
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 	return
 }
 func ZifBaseConvert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3137,20 +3137,20 @@ func ZifBaseConvert(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if frombase < 2 || frombase > 36 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid `from base' ("+zend.ZEND_LONG_FMT+")", frombase)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if tobase < 2 || tobase > 36 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid `to base' ("+zend.ZEND_LONG_FMT+")", tobase)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if _phpMathBasetozval(number, int(frombase), &temp) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	result = _phpMathZvaltobase(&temp, int(tobase))
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 }
 func _phpMathNumberFormat(d float64, dec int, dec_point byte, thousand_sep byte) *zend.ZendString {
 	return _phpMathNumberFormatEx(d, dec, &dec_point, 1, &thousand_sep, 1)
@@ -3383,11 +3383,11 @@ func ZifNumberFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	switch zend.ZEND_NUM_ARGS() {
 	case 1:
-		zend.RETVAL_STR(_phpMathNumberFormat(num, 0, dec_point_chr, thousand_sep_chr))
+		return_value.SetString(_phpMathNumberFormat(num, 0, dec_point_chr, thousand_sep_chr))
 		return
 		break
 	case 2:
-		zend.RETVAL_STR(_phpMathNumberFormat(num, int(dec), dec_point_chr, thousand_sep_chr))
+		return_value.SetString(_phpMathNumberFormat(num, int(dec), dec_point_chr, thousand_sep_chr))
 		return
 		break
 	case 4:
@@ -3399,7 +3399,7 @@ func ZifNumberFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			thousand_sep = &thousand_sep_chr
 			thousand_sep_len = 1
 		}
-		zend.RETVAL_STR(_phpMathNumberFormatEx(num, int(dec), dec_point, dec_point_len, thousand_sep, thousand_sep_len))
+		return_value.SetString(_phpMathNumberFormatEx(num, int(dec), dec_point, dec_point_len, thousand_sep, thousand_sep_len))
 		break
 	default:
 		zend.WRONG_PARAM_COUNT
@@ -3481,7 +3481,7 @@ func ZifFmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(fmod(num1, num2))
+	return_value.SetDouble(fmod(num1, num2))
 	return
 }
 func ZifIntdiv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3571,6 +3571,6 @@ func ZifIntdiv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendThrowExceptionEx(zend.ZendCeArithmeticError, 0, "Division of PHP_INT_MIN by -1 is not an integer")
 		return
 	}
-	zend.RETVAL_LONG(dividend / divisor)
+	return_value.SetLong(dividend / divisor)
 	return
 }

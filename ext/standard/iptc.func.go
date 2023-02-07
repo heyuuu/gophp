@@ -184,22 +184,22 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if core.PhpCheckOpenBasedir(jpeg_file) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if iptcdata_len >= SIZE_MAX-b.SizeOf("psheader")-1025 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "IPTC data too large")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&fp, zend.VCWD_FOPEN(jpeg_file, "rb")) == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to open %s", jpeg_file)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if spool < 2 {
 		if zend.ZendFstat(fileno(fp), &sb) != 0 {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		spoolbuf = zend.ZendStringSafeAlloc(1, iptcdata_len+b.SizeOf("psheader")+1024+1, sb.st_size, 0)
@@ -211,7 +211,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if spoolbuf != nil {
 			zend.ZendStringEfree(spoolbuf)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if PhpIptcGet1(fp, spool, b.Cond(poi != nil, &poi, 0)) != 0xd8 {
@@ -219,7 +219,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if spoolbuf != nil {
 			zend.ZendStringEfree(spoolbuf)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	for done == 0 {
@@ -282,10 +282,10 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	r.Fclose(fp)
 	if spool < 2 {
 		spoolbuf = zend.ZendStringTruncate(spoolbuf, poi-(*uint8)(spoolbuf.GetVal()), 0)
-		zend.RETVAL_NEW_STR(spoolbuf)
+		return_value.SetString(spoolbuf)
 		return
 	} else {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
@@ -411,7 +411,7 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		tagsfound++
 	}
 	if tagsfound == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

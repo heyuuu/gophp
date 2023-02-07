@@ -103,12 +103,12 @@ func PhpExec(type_ int, cmd *byte, array *zend.Zval, return_value *zend.Zval) in
 
 			/* Return last line from the shell command */
 
-			zend.RETVAL_STRINGL(buf, bufl)
+			zend.ZVAL_STRINGL(return_value, buf, bufl)
 
 			/* Return last line from the shell command */
 
 		} else {
-			zend.RETVAL_EMPTY_STRING()
+			zend.ZVAL_EMPTY_STRING(return_value)
 		}
 	} else {
 		var read ssize_t
@@ -203,19 +203,19 @@ func PhpExecEx(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if cmd_len == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot execute a blank command")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if strlen(cmd) != cmd_len {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "NULL byte detected. Possible attack")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if ret_array == nil {
@@ -487,9 +487,9 @@ func ZifEscapeshellcmd(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			core.PhpErrorDocref(nil, zend.E_ERROR, "Input string contains NULL bytes")
 			return
 		}
-		zend.RETVAL_STR(PhpEscapeShellCmd(command))
+		return_value.SetString(PhpEscapeShellCmd(command))
 	} else {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 	}
 }
 func ZifEscapeshellarg(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -567,7 +567,7 @@ func ZifEscapeshellarg(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			core.PhpErrorDocref(nil, zend.E_ERROR, "Input string contains NULL bytes")
 			return
 		}
-		zend.RETVAL_STR(PhpEscapeShellArg(argument))
+		return_value.SetString(PhpEscapeShellArg(argument))
 	}
 }
 func ZifShellExec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -645,24 +645,24 @@ func ZifShellExec(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if command_len == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot execute a blank command")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if strlen(command) != command_len {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "NULL byte detected. Possible attack")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&in, zend.VCWD_POPEN(command, "r")) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to execute '%s'", command)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	stream = streams.PhpStreamFopenFromPipe(in, "rb")
 	ret = core.PhpStreamCopyToMem(stream, core.PHP_STREAM_COPY_ALL, 0)
 	core.PhpStreamClose(stream)
 	if ret != nil && ret.GetLen() > 0 {
-		zend.RETVAL_STR(ret)
+		return_value.SetString(ret)
 	}
 }
 func ZifProcNice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -730,7 +730,7 @@ func ZifProcNice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -739,9 +739,9 @@ func ZifProcNice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	core.PhpIgnoreValue(nice(pri))
 	if errno {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Only a super user may attempt to increase the priority of a process")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }

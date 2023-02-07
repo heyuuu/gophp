@@ -437,7 +437,7 @@ func zim_spl_SplFixedArray_count(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
-	zend.RETVAL_LONG(intern.GetArray().GetSize())
+	return_value.SetLong(intern.GetArray().GetSize())
 	return
 }
 func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -458,7 +458,7 @@ func zim_spl_SplFixedArray_toArray(execute_data *zend.ZendExecuteData, return_va
 			}
 		}
 	} else {
-		zend.RETVAL_EMPTY_ARRAY()
+		zend.ZVAL_EMPTY_ARRAY(return_value)
 		return
 	}
 }
@@ -533,7 +533,7 @@ func zim_spl_SplFixedArray_getSize(execute_data *zend.ZendExecuteData, return_va
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
-	zend.RETVAL_LONG(intern.GetArray().GetSize())
+	return_value.SetLong(intern.GetArray().GetSize())
 	return
 }
 func zim_spl_SplFixedArray_setSize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -549,7 +549,7 @@ func zim_spl_SplFixedArray_setSize(execute_data *zend.ZendExecuteData, return_va
 	}
 	intern = Z_SPLFIXEDARRAY_P(object)
 	SplFixedarrayResize(intern.GetArray(), size)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func zim_spl_SplFixedArray_offsetExists(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -559,7 +559,7 @@ func zim_spl_SplFixedArray_offsetExists(execute_data *zend.ZendExecuteData, retu
 		return
 	}
 	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
-	zend.RETVAL_BOOL(SplFixedarrayObjectHasDimensionHelper(intern, zindex, 0) != 0)
+	zend.ZVAL_BOOL(return_value, SplFixedarrayObjectHasDimensionHelper(intern, zindex, 0) != 0)
 	return
 }
 func zim_spl_SplFixedArray_offsetGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -574,7 +574,7 @@ func zim_spl_SplFixedArray_offsetGet(execute_data *zend.ZendExecuteData, return_
 	if value != nil {
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 }
@@ -657,7 +657,7 @@ func zim_spl_SplFixedArray_key(execute_data *zend.ZendExecuteData, return_value 
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(intern.GetCurrent())
+	return_value.SetLong(intern.GetCurrent())
 	return
 }
 func zim_spl_SplFixedArray_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -672,7 +672,7 @@ func zim_spl_SplFixedArray_valid(execute_data *zend.ZendExecuteData, return_valu
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.GetCurrent() >= 0 && intern.GetCurrent() < intern.GetArray().GetSize())
+	zend.ZVAL_BOOL(return_value, intern.GetCurrent() >= 0 && intern.GetCurrent() < intern.GetArray().GetSize())
 	return
 }
 func zim_spl_SplFixedArray_rewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -694,7 +694,7 @@ func zim_spl_SplFixedArray_current(execute_data *zend.ZendExecuteData, return_va
 	if value != nil {
 		zend.ZVAL_COPY_DEREF(return_value, value)
 	} else {
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 }

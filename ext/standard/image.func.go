@@ -1028,7 +1028,7 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -1087,10 +1087,10 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 		break
 	}
 	if imgext != nil {
-		zend.RETVAL_STRING(&imgext[!inc_dot])
+		zend.ZVAL_STRING(return_value, &imgext[!inc_dot])
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func PhpGetimagetype(stream *core.PhpStream, filetype *byte) int {
@@ -1187,7 +1187,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 	var itype int = 0
 	var result *Gfxinfo = nil
 	if stream == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	itype = PhpGetimagetype(stream, nil)
@@ -1266,7 +1266,7 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 		zend.AddAssocString(return_value, "mime", (*byte)(PhpImageTypeToMimeType(itype)))
 		zend.Efree(result)
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1362,7 +1362,7 @@ func PhpGetimagesizeFromAny(execute_data *zend.ZendExecuteData, return_value *ze
 		stream = core.PhpStreamMemoryOpen(core.TEMP_STREAM_READONLY, input, input_len)
 	}
 	if stream == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	PhpGetimagesizeFromStream(stream, info, execute_data, return_value)

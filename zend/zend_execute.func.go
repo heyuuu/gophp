@@ -814,7 +814,7 @@ func ZendVerifyWeakScalarTypeHint(type_hint ZendUchar, arg *Zval) ZendBool {
 			return 0
 		}
 		ZvalPtrDtor(arg)
-		ZVAL_BOOL(arg, dest)
+		ZVAL_BOOL(arg, dest != 0)
 		return 1
 	case IS_LONG:
 		var dest ZendLong

@@ -155,7 +155,7 @@ func ZendRegisterNullConstant(name *byte, name_len int, flags int, module_number
 }
 func ZendRegisterBoolConstant(name *byte, name_len int, bval ZendBool, flags int, module_number int) {
 	var c ZendConstant
-	ZVAL_BOOL(c.GetValue(), bval)
+	ZVAL_BOOL(c.GetValue(), bval != 0)
 	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)

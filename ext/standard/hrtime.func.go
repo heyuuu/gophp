@@ -22,11 +22,11 @@ func ZmStartupHrtime(type_ int, module_number int) int {
 }
 func _timerCurrent() PhpHrtimeT { return 0 }
 func PHP_RETURN_HRTIME(t __auto__) {
-	zend.RETVAL_LONG(zend.ZendLong(t))
+	return_value.SetLong(zend.ZendLong(t))
 	return
 }
 func ZifHrtime(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func PhpHrtimeCurrent() PhpHrtimeT { return _timerCurrent() }

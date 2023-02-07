@@ -380,54 +380,54 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* @todo Find a method to determine why php_url_parse_ex() failed */
 
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if key > -1 {
 		switch key {
 		case PHP_URL_SCHEME:
 			if resource.GetScheme() != nil {
-				zend.RETVAL_STR_COPY(resource.GetScheme())
+				return_value.SetStringCopy(resource.GetScheme())
 			}
 			break
 		case PHP_URL_HOST:
 			if resource.GetHost() != nil {
-				zend.RETVAL_STR_COPY(resource.GetHost())
+				return_value.SetStringCopy(resource.GetHost())
 			}
 			break
 		case PHP_URL_PORT:
 			if has_port != 0 {
-				zend.RETVAL_LONG(resource.GetPort())
+				return_value.SetLong(resource.GetPort())
 			}
 			break
 		case PHP_URL_USER:
 			if resource.GetUser() != nil {
-				zend.RETVAL_STR_COPY(resource.GetUser())
+				return_value.SetStringCopy(resource.GetUser())
 			}
 			break
 		case PHP_URL_PASS:
 			if resource.GetPass() != nil {
-				zend.RETVAL_STR_COPY(resource.GetPass())
+				return_value.SetStringCopy(resource.GetPass())
 			}
 			break
 		case PHP_URL_PATH:
 			if resource.GetPath() != nil {
-				zend.RETVAL_STR_COPY(resource.GetPath())
+				return_value.SetStringCopy(resource.GetPath())
 			}
 			break
 		case PHP_URL_QUERY:
 			if resource.GetQuery() != nil {
-				zend.RETVAL_STR_COPY(resource.GetQuery())
+				return_value.SetStringCopy(resource.GetQuery())
 			}
 			break
 		case PHP_URL_FRAGMENT:
 			if resource.GetFragment() != nil {
-				zend.RETVAL_STR_COPY(resource.GetFragment())
+				return_value.SetStringCopy(resource.GetFragment())
 			}
 			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 		}
 		goto done
 	}
@@ -589,7 +589,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_STR(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
+	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
 func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -664,7 +664,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
 	out_str.SetLen(PhpUrlDecode(out_str.GetVal(), out_str.GetLen()))
-	zend.RETVAL_NEW_STR(out_str)
+	return_value.SetString(out_str)
 	return
 }
 func PhpUrlDecode(str *byte, len_ int) int {
@@ -779,7 +779,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 		break
 	}
-	zend.RETVAL_STR(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
+	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
 func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -854,7 +854,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	out_str = zend.ZendStringInit(in_str.GetVal(), in_str.GetLen(), 0)
 	out_str.SetLen(PhpRawUrlDecode(out_str.GetVal(), out_str.GetLen()))
-	zend.RETVAL_NEW_STR(out_str)
+	return_value.SetString(out_str)
 	return
 }
 func PhpRawUrlDecode(str *byte, len_ int) int {
@@ -965,12 +965,12 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
 	if !(b.Assign(&stream, core.PhpStreamOpenWrapperEx(url, "r", core.REPORT_ERRORS|core.STREAM_USE_URL|core.STREAM_ONLY_GET_HEADERS, nil, context))) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if stream.GetWrapperdata().GetType() != zend.IS_ARRAY {
 		core.PhpStreamClose(stream)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)

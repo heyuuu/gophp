@@ -15,10 +15,10 @@ func ZifGethostname(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if gethostname(buf, b.SizeOf("buf")) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to fetch host [%d]: %s", errno, strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRING(buf)
+	zend.ZVAL_STRING(return_value, buf)
 	return
 }
 func ZifGethostbyaddr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -95,9 +95,9 @@ func ZifGethostbyaddr(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	hostname = PhpGethostbyaddr(addr)
 	if hostname == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Address is not a valid IPv4 or IPv6 address")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
-		zend.RETVAL_STR(hostname)
+		return_value.SetString(hostname)
 	}
 }
 func PhpGethostbyaddr(ip *byte) *zend.ZendString {
@@ -191,10 +191,10 @@ func ZifGethostbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		/* name too long, protect from CVE-2015-0235 */
 
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
-		zend.RETVAL_STRINGL(hostname, hostname_len)
+		zend.ZVAL_STRINGL(return_value, hostname, hostname_len)
 		return
 	}
-	zend.RETVAL_STR(PhpGethostbyname(hostname))
+	return_value.SetString(PhpGethostbyname(hostname))
 	return
 }
 func ZifGethostbynamel(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -275,12 +275,12 @@ func ZifGethostbynamel(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		/* name too long, protect from CVE-2015-0235 */
 
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	hp = core.PhpNetworkGethostbyname(hostname)
 	if hp == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -405,7 +405,7 @@ func ZifDnsCheckRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	if hostname_len == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Host cannot be empty")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if rectype != nil {
@@ -437,23 +437,23 @@ func ZifDnsCheckRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			type_ = DNS_T_A6
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Type '%s' not supported", rectype)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	handle = dns_open(nil)
 	if handle == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	i = PhpDnsSearch(handle, hostname, C_IN, type_, answer.GetQb2(), b.SizeOf(answer))
 	PhpDnsFreeHandle(handle)
 	if i < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	hp = (*HEADER)(&answer)
-	zend.RETVAL_BOOL(ntohs(hp.ancount) != 0)
+	zend.ZVAL_BOOL(return_value, ntohs(hp.ancount) != 0)
 	return
 }
 func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, store int, raw int, subarray *zend.Zval) *u_char {
@@ -986,13 +986,13 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	if raw == 0 {
 		if (type_param & ^PHP_DNS_ALL) != 0 && type_param != PHP_DNS_ANY {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Type '"+zend.ZEND_LONG_FMT+"' not supported", type_param)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
 		if type_param < 1 || type_param > 0xffff {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Numeric DNS record type must be between 1 and 65535, '"+zend.ZEND_LONG_FMT+"' given", type_param)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -1131,7 +1131,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			handle = dns_open(nil)
 			if handle == nil {
 				return_value.GetArr().DestroyEx()
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			n = PhpDnsSearch(handle, hostname, C_IN, type_to_fetch, answer.GetQb2(), b.SizeOf(answer))
@@ -1153,7 +1153,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 					core.PhpErrorDocref(nil, zend.E_WARNING, "DNS Query failed")
 				}
 				return_value.GetArr().DestroyEx()
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			cp = answer.GetQb2() + HFIXEDSZ
@@ -1172,7 +1172,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 					core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to parse DNS data received")
 					return_value.GetArr().DestroyEx()
 					PhpDnsFreeHandle(handle)
-					zend.RETVAL_FALSE
+					return_value.SetFalse()
 					return
 				}
 				cp += n + QFIXEDSZ
@@ -1327,13 +1327,13 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	handle = dns_open(nil)
 	if handle == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	i = PhpDnsSearch(handle, hostname, C_IN, DNS_T_MX, answer.GetQb2(), b.SizeOf(answer))
 	if i < 0 {
 		PhpDnsFreeHandle(handle)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	hp = (*HEADER)(&answer)
@@ -1342,7 +1342,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	for qdc = ntohs(uint16(hp.qdcount)); b.PostDec(&qdc); cp += i + QFIXEDSZ {
 		if b.Assign(&i, dn_skipname(cp, end)) < 0 {
 			PhpDnsFreeHandle(handle)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -1350,7 +1350,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	for b.PreDec(&count) >= 0 && cp < end {
 		if b.Assign(&i, dn_skipname(cp, end)) < 0 {
 			PhpDnsFreeHandle(handle)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		cp += i
@@ -1364,7 +1364,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		GETSHORT(weight, cp)
 		if b.Assign(&i, dn_expand(answer.GetQb2(), end, cp, buf, b.SizeOf("buf")-1)) < 0 {
 			PhpDnsFreeHandle(handle)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		cp += i
@@ -1374,7 +1374,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 	PhpDnsFreeHandle(handle)
-	zend.RETVAL_BOOL(zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
+	zend.ZVAL_BOOL(return_value, zend.Z_ARRVAL_P(mx_list).GetNNumOfElements() != 0)
 	return
 }
 func ZmStartupDns(type_ int, module_number int) int {

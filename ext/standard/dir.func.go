@@ -142,7 +142,7 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 	context = streams.PhpStreamContextFromZval(zcontext, 0)
 	dirp = core.PhpStreamOpendir(dirname, core.REPORT_ERRORS, context)
 	if dirp == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	dirp.AddFlags(core.PHP_STREAM_FLAG_NO_FCLOSE)
@@ -241,28 +241,28 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
 		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	res = dirp.GetRes()
@@ -338,7 +338,7 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -346,17 +346,17 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	ret = chroot(str)
 	if ret != 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	PhpClearStatCache(1, nil, 0)
 	ret = chdir("/")
 	if ret != 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -426,19 +426,19 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if core.PhpCheckOpenBasedir(str) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = zend.VCWD_CHDIR(str)
 	if ret != 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s (errno %d)", strerror(errno), errno)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if BG(CurrentStatFile) && !(zend.IS_ABSOLUTE_PATH(BG(CurrentStatFile), strlen(BG(CurrentStatFile)))) {
@@ -449,7 +449,7 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.Efree(BG(CurrentLStatFile))
 		BG(CurrentLStatFile) = nil
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifGetcwd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -460,10 +460,10 @@ func ZifGetcwd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	ret = zend.VCWD_GETCWD(path, core.MAXPATHLEN)
 	if ret != nil {
-		zend.RETVAL_STRING(path)
+		zend.ZVAL_STRING(return_value, path)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -545,28 +545,28 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
 		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamRewinddir(dirp)
@@ -650,35 +650,35 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if myself != nil {
 			if b.Assign(&tmp, zend.Z_OBJPROP_P(myself).KeyFind("handle")) == nil {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find my handle property")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResourceEx(tmp, "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			if !(DIRG(default_dir)) || b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(DIRG(default_dir), "Directory", streams.PhpFileLeStream()))) == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
 		if b.Assign(&dirp, (*core.PhpStream)(zend.ZendFetchResource(id.GetRes(), "Directory", streams.PhpFileLeStream()))) == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if !dirp.HasFlags(core.PHP_STREAM_FLAG_IS_DIR) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%d is not a valid Directory resource", dirp.GetRes().GetHandle())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpStreamReaddir(dirp, &entry) != nil {
-		zend.RETVAL_STRINGL(entry.GetDName(), strlen(entry.GetDName()))
+		zend.ZVAL_STRINGL(return_value, entry.GetDName(), strlen(entry.GetDName()))
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -766,18 +766,18 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if pattern_len >= core.MAXPATHLEN {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Pattern exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if (GLOB_AVAILABLE_FLAGS & flags) != flags {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "At least one of the passed flags is invalid or not supported on this platform")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	memset(&globbuf, 0, b.SizeOf("glob_t"))
 	globbuf.gl_offs = 0
 	if 0 != b.Assign(&ret, glob(pattern, flags&streams.GLOB_FLAGMASK, nil, &globbuf)) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -793,7 +793,7 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		if core.PG(open_basedir) && (*core.PG)(open_basedir) {
 			if core.PhpCheckOpenBasedirEx(pattern, 0) != 0 {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
@@ -832,7 +832,7 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	globfree(&globbuf)
 	if basedir_limit != 0 && !(zend.Z_ARRVAL_P(return_value).GetNNumOfElements()) {
 		return_value.GetArr().DestroyEx()
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -927,7 +927,7 @@ func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if dirn_len < 1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Directory name cannot be empty")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if zcontext != nil {
@@ -942,7 +942,7 @@ func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if n < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "(errno %d): %s", errno, strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)

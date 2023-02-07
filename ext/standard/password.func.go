@@ -432,7 +432,7 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	if algo.GetGetInfo() != nil && zend.FAILURE == algo.GetGetInfo()(&options, hash) {
 		zend.ZvalDtor(&options)
 		zend.ZvalDtor(return_value)
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 	zend.AddAssocZval(return_value, "options", &options)
@@ -524,7 +524,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 
 		/* Unknown new algorithm, never prompt to rehash. */
 
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	old_algo = PhpPasswordAlgoIdentifyEx(hash, nil)
@@ -532,10 +532,10 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 
 		/* Different algorithm preferred, always rehash. */
 
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
-	zend.RETVAL_BOOL(old_algo.GetNeedsRehash()(hash, options) != 0)
+	zend.ZVAL_BOOL(return_value, old_algo.GetNeedsRehash()(hash, options) != 0)
 	return
 }
 func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -611,13 +611,13 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	algo = PhpPasswordAlgoIdentify(hash)
-	zend.RETVAL_BOOL(algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
+	zend.ZVAL_BOOL(return_value, algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
 	return
 }
 func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -707,7 +707,7 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		var algostr *zend.ZendString = zend.ZvalGetString(zalgo)
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown password hashing algorithm: %s", algostr.GetVal())
 		zend.ZendStringRelease(algostr)
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 	digest = algo.GetHash()(password, options)
@@ -715,10 +715,10 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 		/* algo->hash should have raised an error. */
 
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
-	zend.RETVAL_NEW_STR(digest)
+	return_value.SetString(digest)
 	return
 }
 func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

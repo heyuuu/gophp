@@ -86,12 +86,12 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if Metaphone((*uint8)(str.GetVal()), str.GetLen(), phones, &result, 1) == 0 {
-		zend.RETVAL_STR(result)
+		return_value.SetString(result)
 	} else {
 		if result != nil {
 			zend.ZendStringFree(result)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

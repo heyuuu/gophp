@@ -82,20 +82,20 @@ func ZifReadlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if core.PhpCheckOpenBasedir(link) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = zend.PhpSysReadlink(link, buff, core.MAXPATHLEN-1)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
 	/* Append NULL to the end of the string */
 
 	buff[ret] = '0'
-	zend.RETVAL_STRINGL(buff, ret)
+	zend.ZVAL_STRINGL(return_value, buff, ret)
 	return
 }
 func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -175,18 +175,18 @@ func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpDirname(dirname, link_len)
 	if core.PhpCheckOpenBasedir(dirname) != 0 {
 		zend.Efree(dirname)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = zend.VCWD_LSTAT(link, &sb)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
 		zend.Efree(dirname)
-		zend.RETVAL_LONG(int64(-1))
+		return_value.SetLong(int64(-1))
 		return
 	}
 	zend.Efree(dirname)
-	zend.RETVAL_LONG(zend.ZendLong(sb.st_dev))
+	return_value.SetLong(zend.ZendLong(sb.st_dev))
 	return
 }
 func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -274,27 +274,27 @@ func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if core.ExpandFilepath(frompath, source_p) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No such file or directory")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	memcpy(dirname, source_p, b.SizeOf("source_p"))
 	len_ = PhpDirname(dirname, strlen(dirname))
 	if core.ExpandFilepathEx(topath, dest_p, dirname, len_) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No such file or directory")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if streams.PhpStreamLocateUrlWrapper(source_p, nil, core.STREAM_LOCATE_WRAPPERS_ONLY) != nil || streams.PhpStreamLocateUrlWrapper(dest_p, nil, core.STREAM_LOCATE_WRAPPERS_ONLY) != nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to symlink to a URL")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(dest_p) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(source_p) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -305,10 +305,10 @@ func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	ret = zend.PhpSysSymlink(topath, source_p)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifLink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -394,28 +394,28 @@ func ZifLink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if core.ExpandFilepath(frompath, source_p) == nil || core.ExpandFilepath(topath, dest_p) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No such file or directory")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if streams.PhpStreamLocateUrlWrapper(source_p, nil, core.STREAM_LOCATE_WRAPPERS_ONLY) != nil || streams.PhpStreamLocateUrlWrapper(dest_p, nil, core.STREAM_LOCATE_WRAPPERS_ONLY) != nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to link to a URL")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(dest_p) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(source_p) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = zend.PhpSysLink(topath, frompath)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }

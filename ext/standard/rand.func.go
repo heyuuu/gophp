@@ -13,7 +13,7 @@ func ZifRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var max zend.ZendLong
 	var argc int = zend.ZEND_NUM_ARGS()
 	if argc == 0 {
-		zend.RETVAL_LONG(PhpMtRand() >> 1)
+		return_value.SetLong(PhpMtRand() >> 1)
 		return
 	}
 	for {
@@ -90,9 +90,9 @@ func ZifRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if max < min {
-		zend.RETVAL_LONG(PhpMtRandCommon(max, min))
+		return_value.SetLong(PhpMtRandCommon(max, min))
 		return
 	}
-	zend.RETVAL_LONG(PhpMtRandCommon(min, max))
+	return_value.SetLong(PhpMtRandCommon(min, max))
 	return
 }

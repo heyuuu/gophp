@@ -434,7 +434,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			PhpHeadParseCookieOptionsArray(expires_or_options, &expires, &path, &domain, &secure, &httponly, &samesite)
@@ -444,9 +444,9 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if zend.EG__().GetException() == nil {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 1) == zend.SUCCESS {
-			zend.RETVAL_TRUE
+			return_value.SetTrue()
 		} else {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 		}
 	}
 	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
@@ -575,7 +575,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		if expires_or_options.IsType(zend.IS_ARRAY) {
 			if zend.ZEND_NUM_ARGS() > 3 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Cannot pass arguments after the options array")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			PhpHeadParseCookieOptionsArray(expires_or_options, &expires, &path, &domain, &secure, &httponly, &samesite)
@@ -585,9 +585,9 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	if zend.EG__().GetException() == nil {
 		if PhpSetcookie(name, value, expires, path, domain, secure, httponly, samesite, 0) == zend.SUCCESS {
-			zend.RETVAL_TRUE
+			return_value.SetTrue()
 		} else {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 		}
 	}
 	if expires_or_options != nil && expires_or_options.IsType(zend.IS_ARRAY) {
@@ -689,10 +689,10 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		break
 	}
 	if core.SG(headers_sent) {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -784,16 +784,16 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 		old_response_code = core.SG(sapi_headers).http_response_code
 		core.SG(sapi_headers).http_response_code = int(response_code)
 		if old_response_code != 0 {
-			zend.RETVAL_LONG(old_response_code)
+			return_value.SetLong(old_response_code)
 			return
 		}
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 	if !(core.SG(sapi_headers).http_response_code) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(core.SG(sapi_headers).http_response_code)
+	return_value.SetLong(core.SG(sapi_headers).http_response_code)
 	return
 }

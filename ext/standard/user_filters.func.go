@@ -135,7 +135,7 @@ func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, 
 	} else {
 		args[2].SetNull()
 	}
-	zend.ZVAL_BOOL(&args[3], flags&streams.PSFS_FLAG_FLUSH_CLOSE)
+	zend.ZVAL_BOOL(&args[3], (flags&streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
 	call_result = zend.CallUserFunctionEx(nil, obj, &func_name, &retval, 4, args, 0, nil)
 	zend.ZvalPtrDtor(&func_name)
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
@@ -383,13 +383,13 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	return_value.SetNull()
@@ -481,22 +481,22 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if nil == b.Assign(&pzbucket, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "bucket", b.SizeOf("\"bucket\"")-1)) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Object has no bucket property")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&brigade, (*streams.PhpStreamBucketBrigade)(zend.ZendFetchResource(zbrigade.GetRes(), PHP_STREAM_BRIGADE_RES_NAME, LeBucketBrigade))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&bucket, (*streams.PhpStreamBucket)(zend.ZendFetchResourceEx(pzbucket, PHP_STREAM_BUCKET_RES_NAME, LeBucket))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if nil != b.Assign(&pzdata, zend.ZendHashStrFindDeref(zend.Z_OBJPROP_P(zobject), "data", b.SizeOf("\"data\"")-1)) && pzdata.IsType(zend.IS_STRING) {
@@ -606,7 +606,7 @@ func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -616,7 +616,7 @@ func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	memcpy(pbuffer, buffer, buffer_len)
 	bucket = streams.PhpStreamBucketNew(stream, pbuffer, buffer_len, 1, stream.GetIsPersistent())
 	if bucket == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zbucket.SetResource(zend.ZendRegisterResource(bucket, LeBucket))
@@ -722,12 +722,12 @@ func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	if filtername.GetLen() == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Filter name cannot be empty")
 		return
@@ -743,7 +743,7 @@ func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *z
 	fdat = zend.Ecalloc(1, b.SizeOf("struct php_user_filter_data"))
 	fdat.SetClassname(classname.Copy())
 	if zend.ZendHashAddPtr(BG(user_filter_map), filtername, fdat) != nil && streams.PhpStreamFilterRegisterFactoryVolatile(filtername, &UserFilterFactory) == zend.SUCCESS {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 	} else {
 		zend.ZendStringReleaseEx(classname, 0)
 		zend.Efree(fdat)

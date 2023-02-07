@@ -150,11 +150,11 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	BG(syslog_device) = zend.ZendStrndup(ident, ident_len)
 	if BG(syslog_device) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	PhpOpenlog(BG(syslog_device), option, facility)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifCloselog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -166,7 +166,7 @@ func ZifCloselog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.Free(BG(syslog_device))
 		BG(syslog_device) = nil
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -247,6 +247,6 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	core.PhpSyslog(priority, "%s", message)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }

@@ -29,28 +29,28 @@ func ZifZendVersion(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	RETVAL_STRINGL(ZEND_VERSION, b.SizeOf("ZEND_VERSION")-1)
+	ZVAL_STRINGL(return_value, ZEND_VERSION, b.SizeOf("ZEND_VERSION")-1)
 	return
 }
 func ZifGcMemCaches(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	RETVAL_LONG(ZendMmGc(ZendMmGetHeap()))
+	return_value.SetLong(ZendMmGc(ZendMmGetHeap()))
 	return
 }
 func ZifGcCollectCycles(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	RETVAL_LONG(GcCollectCycles())
+	return_value.SetLong(GcCollectCycles())
 	return
 }
 func ZifGcEnabled(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	RETVAL_BOOL(GcEnabled() != 0)
+	ZVAL_BOOL(return_value, GcEnabled() != 0)
 	return
 }
 func ZifGcEnable(execute_data *ZendExecuteData, return_value *Zval) {
@@ -90,14 +90,14 @@ func ZifFuncNumArgs(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		ZendError(E_WARNING, "func_num_args():  Called from the global scope - no function context")
-		RETVAL_LONG(-1)
+		return_value.SetLong(-1)
 		return
 	}
 	if ZendForbidDynamicCall("func_num_args()") == FAILURE {
-		RETVAL_LONG(-1)
+		return_value.SetLong(-1)
 		return
 	}
-	RETVAL_LONG(ZEND_CALL_NUM_ARGS(ex))
+	return_value.SetLong(ZEND_CALL_NUM_ARGS(ex))
 	return
 }
 func ZifFuncGetArg(execute_data *ZendExecuteData, return_value *Zval) {
@@ -111,23 +111,23 @@ func ZifFuncGetArg(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if requested_offset < 0 {
 		ZendError(E_WARNING, "func_get_arg():  The argument number should be >= 0")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ex = EX(prev_execute_data)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		ZendError(E_WARNING, "func_get_arg():  Called from the global scope - no function context")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if ZendForbidDynamicCall("func_get_arg()") == FAILURE {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	arg_count = ZEND_CALL_NUM_ARGS(ex)
 	if ZendUlong(requested_offset >= arg_count) != 0 {
 		ZendError(E_WARNING, "func_get_arg():  Argument "+ZEND_LONG_FMT+" not passed to function", requested_offset)
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	first_extra_arg = ex.GetFunc().GetOpArray().GetNumArgs()
@@ -149,11 +149,11 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 	var ex *ZendExecuteData = EX(prev_execute_data)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_CODE) != 0 {
 		ZendError(E_WARNING, "func_get_args():  Called from the global scope - no function context")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if ZendForbidDynamicCall("func_get_args()") == FAILURE {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	arg_count = ZEND_CALL_NUM_ARGS(ex)
@@ -212,7 +212,7 @@ func ZifFuncGetArgs(execute_data *ZendExecuteData, return_value *Zval) {
 		__fill_ht.SetNInternalPointer(0)
 		Z_ARRVAL_P(return_value).SetNNumOfElements(arg_count)
 	} else {
-		RETVAL_EMPTY_ARRAY()
+		ZVAL_EMPTY_ARRAY(return_value)
 		return
 	}
 }
@@ -285,7 +285,7 @@ func ZifStrlen(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	RETVAL_LONG(s.GetLen())
+	return_value.SetLong(s.GetLen())
 }
 func ZifStrcmp(execute_data *ZendExecuteData, return_value *Zval) {
 	var s1 *ZendString
@@ -363,7 +363,7 @@ func ZifStrcmp(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	RETVAL_LONG(ZendBinaryStrcmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
+	return_value.SetLong(ZendBinaryStrcmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
 	return
 }
 func ZifStrncmp(execute_data *ZendExecuteData, return_value *Zval) {
@@ -451,10 +451,10 @@ func ZifStrncmp(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if len_ < 0 {
 		ZendError(E_WARNING, "Length must be greater than or equal to 0")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	RETVAL_LONG(ZendBinaryStrncmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
+	return_value.SetLong(ZendBinaryStrncmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
 	return
 }
 func ZifStrcasecmp(execute_data *ZendExecuteData, return_value *Zval) {
@@ -533,7 +533,7 @@ func ZifStrcasecmp(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	RETVAL_LONG(ZendBinaryStrcasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
+	return_value.SetLong(ZendBinaryStrcasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen()))
 	return
 }
 func ZifStrncasecmp(execute_data *ZendExecuteData, return_value *Zval) {
@@ -621,10 +621,10 @@ func ZifStrncasecmp(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if len_ < 0 {
 		ZendError(E_WARNING, "Length must be greater than or equal to 0")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	RETVAL_LONG(ZendBinaryStrncasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
+	return_value.SetLong(ZendBinaryStrncasecmp(s1.GetVal(), s1.GetLen(), s2.GetVal(), s2.GetLen(), len_))
 	return
 }
 func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
@@ -649,7 +649,7 @@ func ZifEach(execute_data *ZendExecuteData, return_value *Zval) {
 	for true {
 		entry = ZendHashGetCurrentData(target_hash)
 		if entry == nil {
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		} else if entry.IsIndirect() {
 			entry = entry.GetZv()
@@ -790,7 +790,7 @@ func ZifErrorReporting(execute_data *ZendExecuteData, return_value *Zval) {
 			break
 		}
 	}
-	RETVAL_LONG(old_error_reporting)
+	return_value.SetLong(old_error_reporting)
 }
 func ValidateConstantArray(ht *HashTable) int {
 	var ret int = 1
@@ -953,7 +953,7 @@ func ZifDefine(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	if ZendMemnstr(name.GetVal(), "::", b.SizeOf("\"::\"")-1, name.GetVal()+name.GetLen()) != nil {
 		ZendError(E_WARNING, "Class constants cannot be defined or redefined")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	val_free.SetUndef()
@@ -976,7 +976,7 @@ repeat:
 	case IS_ARRAY:
 		if val.IsRefcounted() {
 			if ValidateConstantArray(val.GetArr()) == 0 {
-				RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			} else {
 				CopyConstantArray(c.GetValue(), val)
@@ -999,7 +999,7 @@ repeat:
 	default:
 		ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 		ZvalPtrDtor(&val_free)
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ZVAL_COPY(c.GetValue(), val)
@@ -1014,10 +1014,10 @@ register_constant:
 	ZEND_CONSTANT_SET_FLAGS(&c, case_sensitive, PHP_USER_CONSTANT)
 	c.SetName(name.Copy())
 	if ZendRegisterConstant(&c) == SUCCESS {
-		RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1091,31 +1091,31 @@ func ZifDefined(execute_data *ZendExecuteData, return_value *Zval) {
 		break
 	}
 	if ZendGetConstantEx(name, ZendGetExecutedScope(), ZEND_FETCH_CLASS_SILENT|ZEND_GET_CONSTANT_NO_DEPRECATION_CHECK) != nil {
-		RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
 func ZifGetClass(execute_data *ZendExecuteData, return_value *Zval) {
 	var obj *Zval = nil
 	if ZendParseParameters(ZEND_NUM_ARGS(), "|o", &obj) == FAILURE {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj == nil {
 		var scope *ZendClassEntry = ZendGetExecutedScope()
 		if scope != nil {
-			RETVAL_STR_COPY(scope.GetName())
+			return_value.SetStringCopy(scope.GetName())
 			return
 		} else {
 			ZendError(E_WARNING, "get_class() called without object from outside a class")
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
-	RETVAL_STR_COPY(Z_OBJCE_P(obj).GetName())
+	return_value.SetStringCopy(Z_OBJCE_P(obj).GetName())
 	return
 }
 func ZifGetCalledClass(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1125,7 +1125,7 @@ func ZifGetCalledClass(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	called_scope = ZendGetCalledScope(execute_data)
 	if called_scope != nil {
-		RETVAL_STR_COPY(called_scope.GetName())
+		return_value.SetStringCopy(called_scope.GetName())
 		return
 	} else {
 		var scope *ZendClassEntry = ZendGetExecutedScope()
@@ -1133,7 +1133,7 @@ func ZifGetCalledClass(execute_data *ZendExecuteData, return_value *Zval) {
 			ZendError(E_WARNING, "get_called_class() called from outside a class")
 		}
 	}
-	RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1145,10 +1145,10 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZEND_NUM_ARGS() == 0 {
 		ce = ZendGetExecutedScope()
 		if ce != nil && ce.GetParent() {
-			RETVAL_STR_COPY(ce.GetParent().name)
+			return_value.SetStringCopy(ce.GetParent().name)
 			return
 		} else {
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -1158,10 +1158,10 @@ func ZifGetParentClass(execute_data *ZendExecuteData, return_value *Zval) {
 		ce = ZendLookupClass(arg.GetStr())
 	}
 	if ce != nil && ce.GetParent() {
-		RETVAL_STR_COPY(ce.GetParent().name)
+		return_value.SetStringCopy(ce.GetParent().name)
 		return
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1259,13 +1259,13 @@ func IsAImpl(execute_data *ZendExecuteData, return_value *Zval, only_subclass Ze
 	if allow_string != 0 && obj.IsString() {
 		instance_ce = ZendLookupClass(obj.GetStr())
 		if instance_ce == nil {
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else if obj.IsObject() {
 		instance_ce = Z_OBJCE_P(obj)
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if only_subclass == 0 && ZendStringEquals(instance_ce.GetName(), class_name) != 0 {
@@ -1282,7 +1282,7 @@ func IsAImpl(execute_data *ZendExecuteData, return_value *Zval, only_subclass Ze
 			}
 		}
 	}
-	RETVAL_BOOL(retval != 0)
+	ZVAL_BOOL(return_value, retval != 0)
 	return
 }
 func ZifIsSubclassOf(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1354,7 +1354,7 @@ func ZifGetClassVars(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ce = ZendLookupClass(class_name)
 	if ce == nil {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
 		ArrayInit(return_value)
@@ -1444,7 +1444,7 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	properties = Z_OBJ_HT_P(obj).GetGetProperties()(obj)
 	if properties == nil {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zobj = obj.GetObj()
@@ -1453,10 +1453,10 @@ func ZifGetObjectVars(execute_data *ZendExecuteData, return_value *Zval) {
 		/* fast copy */
 
 		if zobj.GetHandlers() == &StdObjectHandlers {
-			RETVAL_ARR(ZendProptableToSymtable(properties, 0))
+			return_value.SetArray(ZendProptableToSymtable(properties, 0))
 			return
 		}
-		RETVAL_ARR(ZendProptableToSymtable(properties, 1))
+		return_value.SetArray(ZendProptableToSymtable(properties, 1))
 		return
 	} else {
 		ArrayInitSize(return_value, properties.GetNNumOfElements())
@@ -1592,7 +1592,7 @@ func ZifGetMangledObjectVars(execute_data *ZendExecuteData, return_value *Zval) 
 		return
 	}
 	properties = ZendProptableToSymtable(properties, Z_OBJCE_P(obj).GetDefaultPropertiesCount() != 0 || Z_OBJ_P(obj).GetHandlers() != &StdObjectHandlers || properties.IsRecursive())
-	RETVAL_ARR(properties)
+	return_value.SetArray(properties)
 	return
 }
 func SameName(key *ZendString, name *ZendString) int {
@@ -1625,7 +1625,7 @@ func ZifGetClassMethods(execute_data *ZendExecuteData, return_value *Zval) {
 		ce = ZendLookupClass(klass.GetStr())
 	}
 	if ce == nil {
-		RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 	ArrayInit(return_value)
@@ -1726,11 +1726,11 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		ce = Z_OBJCE_P(klass)
 	} else if klass.IsString() {
 		if b.Assign(&ce, ZendLookupClass(klass.GetStr())) == nil {
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	lcname = ZendStringTolower(method_name)
@@ -1742,7 +1742,7 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 		 * them when checking an object, as method_exists() generally ignores visibility.
 		 * TODO: Should we use EG(scope) for the object case instead? */
 
-		RETVAL_BOOL(klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
+		ZVAL_BOOL(return_value, klass.IsObject() || !func_.IsPrivate() || func_.GetScope() == ce)
 		return
 	}
 	if klass.IsObject() {
@@ -1753,16 +1753,16 @@ func ZifMethodExists(execute_data *ZendExecuteData, return_value *Zval) {
 
 				/* Returns true to the fake Closure's __invoke */
 
-				RETVAL_BOOL(func_.GetScope() == ZendCeClosure && ZendStringEqualsLiteral(method_name, ZEND_INVOKE_FUNC_NAME))
+				ZVAL_BOOL(return_value, func_.GetScope() == ZendCeClosure && ZendStringEqualsLiteral(method_name, ZEND_INVOKE_FUNC_NAME))
 				ZendStringReleaseEx(func_.GetFunctionName(), 0)
 				ZendFreeTrampoline(func_)
 				return
 			}
-			RETVAL_TRUE
+			return_value.SetTrue()
 			return
 		}
 	}
-	RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
@@ -1775,33 +1775,33 @@ func ZifPropertyExists(execute_data *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	if property == nil {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if object.IsString() {
 		ce = ZendLookupClass(object.GetStr())
 		if ce == nil {
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else if object.IsObject() {
 		ce = Z_OBJCE_P(object)
 	} else {
 		ZendError(E_WARNING, "First parameter must either be an object or the name of an existing class")
-		RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 	property_info = ZendHashFindPtr(ce.GetPropertiesInfo(), property)
 	if property_info != nil && (!property_info.IsPrivate() || property_info.GetCe() == ce) {
-		RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 	property_z.SetString(property)
 	if object.IsObject() && Z_OBJ_HT(*object).GetHasProperty()(object, &property_z, 2, nil) != 0 {
-		RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
-	RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ClassExistsImpl(execute_data *ZendExecuteData, return_value *Zval, flags int, skip_flags int) {
@@ -1899,10 +1899,10 @@ func ClassExistsImpl(execute_data *ZendExecuteData, return_value *Zval, flags in
 		ce = ZendLookupClass(name)
 	}
 	if ce != nil {
-		RETVAL_BOOL((ce.GetCeFlags()&flags) == flags && !ce.HasCeFlags(skip_flags))
+		ZVAL_BOOL(return_value, (ce.GetCeFlags()&flags) == flags && !ce.HasCeFlags(skip_flags))
 		return
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2003,7 +2003,7 @@ func ZifFunctionExists(execute_data *ZendExecuteData, return_value *Zval) {
 	 * is actually one that displays "function is disabled" message.
 	 */
 
-	RETVAL_BOOL(func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction))
+	ZVAL_BOOL(return_value, func_ != nil && (func_.GetType() != ZEND_INTERNAL_FUNCTION || func_.GetInternalFunction().GetHandler() != ZifDisplayDisabledFunction))
 	return
 }
 func ZifClassAlias(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2019,21 +2019,21 @@ func ZifClassAlias(execute_data *ZendExecuteData, return_value *Zval) {
 	if ce != nil {
 		if ce.GetType() == ZEND_USER_CLASS {
 			if ZendRegisterClassAliasEx(alias_name, alias_name_len, ce, 0) == SUCCESS {
-				RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
 				ZendError(E_WARNING, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), alias_name)
-				RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			ZendError(E_WARNING, "First argument of class_alias() must be a name of user defined class")
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
 		ZendError(E_WARNING, "Class '%s' not found", class_name.GetVal())
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2071,12 +2071,12 @@ func ZifTriggerError(execute_data *ZendExecuteData, return_value *Zval) {
 		break
 	default:
 		ZendError(E_WARNING, "Invalid error type specified")
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 		break
 	}
 	ZendError(int(error_type), "%s", message)
-	RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2125,7 +2125,7 @@ func ZifRestoreErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 		ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), tmp)
 		ZendStackDelTop(EG__().GetUserErrorHandlers())
 	}
-	RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2165,7 +2165,7 @@ func ZifRestoreExceptionHandler(execute_data *ZendExecuteData, return_value *Zva
 		ZVAL_COPY_VALUE(EG__().GetUserExceptionHandler(), tmp)
 		ZendStackDelTop(EG__().GetUserExceptionHandlers())
 	}
-	RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func CopyClassOrInterfaceName(array *Zval, key *ZendString, ce *ZendClassEntry) {
@@ -2239,7 +2239,7 @@ func ZifGetDefinedVars(execute_data *ZendExecuteData, return_value *Zval) {
 	if symbol_table == nil {
 		return
 	}
-	RETVAL_ARR(ZendArrayDup(symbol_table))
+	return_value.SetArray(ZendArrayDup(symbol_table))
 	return
 }
 func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
@@ -2276,7 +2276,7 @@ func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
 		func_ = ZendHashStrFindPtr(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
 		if func_ == nil {
 			ZendErrorNoreturn(E_CORE_ERROR, "Unexpected inconsistency in create_function()")
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		if func_.GetRefcount() != nil {
@@ -2294,11 +2294,11 @@ func ZifCreateFunction(execute_data *ZendExecuteData, return_value *Zval) {
 				break
 			}
 		}
-		RETVAL_NEW_STR(function_name)
+		return_value.SetString(function_name)
 		return
 	} else {
 		ZendHashStrDel(EG__().GetFunctionTable(), LAMBDA_TEMP_FUNCNAME, b.SizeOf("LAMBDA_TEMP_FUNCNAME")-1)
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2310,10 +2310,10 @@ func ZifGetResourceType(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	resource_type = ZendRsrcListGetRsrcType(z_resource_type.GetRes())
 	if resource_type != nil {
-		RETVAL_STRING(resource_type)
+		ZVAL_STRING(return_value, resource_type)
 		return
 	} else {
-		RETVAL_STRING("Unknown")
+		ZVAL_STRING(return_value, "Unknown")
 		return
 	}
 }
@@ -2357,7 +2357,7 @@ func ZifGetResources(execute_data *ZendExecuteData, return_value *Zval) {
 		var id int = ZendFetchListDtorId(type_.GetVal())
 		if id <= 0 {
 			ZendError(E_WARNING, "get_resources():  Unknown resource type '%s'", type_.GetVal())
-			RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		ArrayInit(return_value)
@@ -2986,9 +2986,9 @@ func ZifExtensionLoaded(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	lcname = ZendStringTolower(extension_name)
 	if ZendHashExists(&ModuleRegistry, lcname) != 0 {
-		RETVAL_TRUE
+		return_value.SetTrue()
 	} else {
-		RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	ZendStringReleaseEx(lcname, 0)
 }
@@ -3009,7 +3009,7 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 		module = ZendHashStrFindPtr(&ModuleRegistry, "core", b.SizeOf("\"core\"")-1)
 	}
 	if module == nil {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if module.GetFunctions() != nil {
@@ -3035,7 +3035,7 @@ func ZifGetExtensionFuncs(execute_data *ZendExecuteData, return_value *Zval) {
 		}
 	}
 	if array == 0 {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

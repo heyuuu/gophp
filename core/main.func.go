@@ -989,9 +989,9 @@ func ZifSetTimeLimit(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	new_timeout_strlen = int(zend.ZendSpprintf(&new_timeout_str, 0, zend.ZEND_LONG_FMT, new_timeout))
 	key = zend.ZendStringInit("max_execution_time", b.SizeOf("\"max_execution_time\"")-1, 0)
 	if zend.ZendAlterIniEntryCharsEx(key, new_timeout_str, new_timeout_strlen, PHP_INI_USER, PHP_INI_STAGE_RUNTIME, 0) == zend.SUCCESS {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	zend.ZendStringReleaseEx(key, 0)
 	zend.Efree(new_timeout_str)

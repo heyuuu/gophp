@@ -213,7 +213,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		break
 	}
 	result = PhpBase64Encode((*uint8)(str), str_len)
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 	return
 }
 func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -297,10 +297,10 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	result = PhpBase64DecodeEx((*uint8)(str), str_len, strict)
 	if result != nil {
-		zend.RETVAL_STR(result)
+		return_value.SetString(result)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

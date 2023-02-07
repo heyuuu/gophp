@@ -792,7 +792,7 @@ func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpVarExportEx(var_, 1, &buf)
 	buf.ZeroTail()
 	if return_output != 0 {
-		zend.RETVAL_NEW_STR(buf.GetS())
+		return_value.SetString(buf.GetS())
 		return
 	} else {
 		core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
@@ -1345,14 +1345,14 @@ func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PHP_VAR_SERIALIZE_DESTROY(var_hash)
 	if zend.EG__().GetException() != nil {
 		buf.Free()
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if buf.GetS() != nil {
-		zend.RETVAL_NEW_STR(buf.GetS())
+		return_value.SetString(buf.GetS())
 		return
 	} else {
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 }
@@ -1437,13 +1437,13 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if buf_len == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	p = (*uint8)(buf)
@@ -1457,7 +1457,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		classes = zend.ZendHashStrFindDeref(options.GetArr(), "allowed_classes", b.SizeOf("\"allowed_classes\"")-1)
 		if classes != nil && classes.GetType() != zend.IS_ARRAY && classes.GetType() != zend.IS_TRUE && classes.GetType() != zend.IS_FALSE {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "allowed_classes option should be array or boolean")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			goto cleanup
 		}
 		if classes != nil && (classes.IsType(zend.IS_ARRAY) || zend.ZendIsTrue(classes) == 0) {
@@ -1492,12 +1492,12 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		if max_depth != nil {
 			if max_depth.GetType() != zend.IS_LONG {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth should be int")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				goto cleanup
 			}
 			if max_depth.GetLval() < 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "max_depth cannot be negative")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				goto cleanup
 			}
 			var_hash.SetMaxDepth(max_depth.GetLval())
@@ -1524,7 +1524,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		if BG(unserialize).level <= 1 {
 			zend.ZvalPtrDtor(return_value)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else if BG(unserialize).level > 1 {
 		zend.ZVAL_COPY(return_value, retval)
 	} else if return_value.IsRefcounted() {
@@ -1622,12 +1622,12 @@ func ZifMemoryGetUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
-	zend.RETVAL_LONG(zend.ZendMemoryUsage(real_usage))
+	return_value.SetLong(zend.ZendMemoryUsage(real_usage))
 	return
 }
 func ZifMemoryGetPeakUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1696,12 +1696,12 @@ func ZifMemoryGetPeakUsage(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
-	zend.RETVAL_LONG(zend.ZendMemoryPeakUsage(real_usage))
+	return_value.SetLong(zend.ZendMemoryPeakUsage(real_usage))
 	return
 }
 func ZmStartupVar(type_ int, module_number int) int {

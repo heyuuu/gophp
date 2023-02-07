@@ -114,18 +114,18 @@ func ZifDiskTotalSpace(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		break
 	}
 	if core.ExpandFilepath(path, fullpath) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(fullpath) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if PhpDiskTotalSpace(fullpath, &bytestotal) == zend.SUCCESS {
-		zend.RETVAL_DOUBLE(bytestotal)
+		return_value.SetDouble(bytestotal)
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func PhpDiskFreeSpace(path *byte, space *float64) int {
@@ -216,18 +216,18 @@ func ZifDiskFreeSpace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		break
 	}
 	if core.ExpandFilepath(path, fullpath) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(fullpath) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if PhpDiskFreeSpace(fullpath, &bytesfree) == zend.SUCCESS {
-		zend.RETVAL_DOUBLE(bytesfree)
+		return_value.SetDouble(bytesfree)
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func PhpGetGidByName(name *byte, gid *gid_t) int {
@@ -310,7 +310,7 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -328,14 +328,14 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 				value = zend.Z_STRVAL_P(group)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if wrapper.GetWops().GetStreamMetadata()(wrapper, filename, option, value, nil) != 0 {
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
@@ -343,7 +343,7 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			/* On Windows, we expect regular chgrp to fail silently by default */
 
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chgrp() for a non-standard stream")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -352,19 +352,19 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 	} else if group.IsType(zend.IS_STRING) {
 		if PhpGetGidByName(zend.Z_STRVAL_P(group), &gid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find gid for %s", zend.Z_STRVAL_P(group))
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(group))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
 	/* Check the basedir */
 
 	if core.PhpCheckOpenBasedir(filename) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if do_lchgrp != 0 {
@@ -374,10 +374,10 @@ func PhpDoChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 	}
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifChgrp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -483,14 +483,14 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 				value = zend.Z_STRVAL_P(user)
 			} else {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if wrapper.GetWops().GetStreamMetadata()(wrapper, filename, option, value, nil) != 0 {
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
@@ -498,7 +498,7 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 			/* On Windows, we expect regular chown to fail silently by default */
 
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chown() for a non-standard stream")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -507,19 +507,19 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 	} else if user.IsType(zend.IS_STRING) {
 		if PhpGetUidByName(zend.Z_STRVAL_P(user), &uid) != zend.SUCCESS {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find uid for %s", zend.Z_STRVAL_P(user))
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "parameter 2 should be string or int, %s given", zend.ZendZvalTypeName(user))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
 	/* Check the basedir */
 
 	if core.PhpCheckOpenBasedir(filename) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if do_lchown != 0 {
@@ -529,17 +529,17 @@ func PhpDoChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval, do_
 	}
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifChown(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PhpDoChown(execute_data, return_value, 0)
 }
 func ZifLchown(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	PhpDoChown(execute_data, return_value, 1)
 }
 func ZifChmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -626,15 +626,15 @@ func ZifChmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if wrapper != &PhpPlainFilesWrapper || strncasecmp("file://", filename, 7) == 0 {
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			if wrapper.GetWops().GetStreamMetadata()(wrapper, filename, core.PHP_STREAM_META_ACCESS, &mode, nil) != 0 {
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call chmod() for a non-standard stream")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -642,17 +642,17 @@ func ZifChmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* Check the basedir */
 
 	if core.PhpCheckOpenBasedir(filename) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	imode = mode_t(mode)
 	ret = zend.VCWD_CHMOD(filename, imode)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -747,7 +747,7 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if filename_len == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	switch argc {
@@ -772,26 +772,26 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if wrapper != &PhpPlainFilesWrapper || strncasecmp("file://", filename, 7) == 0 {
 		if wrapper != nil && wrapper.GetWops().GetStreamMetadata() != nil {
 			if wrapper.GetWops().GetStreamMetadata()(wrapper, filename, core.PHP_STREAM_META_TOUCH, newtime, nil) != 0 {
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else {
 			var stream *core.PhpStream
 			if argc > 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Can not call touch() for a non-standard stream")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			stream = core.PhpStreamOpenWrapperEx(filename, "c", core.REPORT_ERRORS, nil, nil)
 			if stream != nil {
 				core.PhpStreamClose(stream)
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			} else {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
@@ -800,7 +800,7 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* Check the basedir */
 
 	if core.PhpCheckOpenBasedir(filename) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -810,7 +810,7 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		file = zend.VCWD_FOPEN(filename, "w")
 		if file == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to create file %s because %s", filename, strerror(errno))
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		r.Fclose(file)
@@ -818,10 +818,10 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	ret = zend.VCWD_UTIME(filename, newtime)
 	if ret == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Utime failed: %s", strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func PhpClearStatCache(clear_realpath_cache zend.ZendBool, filename *byte, filename_len int) {
@@ -961,11 +961,11 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 	var local *byte
 	var wrapper *core.PhpStreamWrapper
 	if filename_length == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&wrapper, streams.PhpStreamLocateUrlWrapper(filename, &local, 0)) == &PhpPlainFilesWrapper && core.PhpCheckOpenBasedir(local) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if IS_ACCESS_CHECK(type_) {
@@ -988,7 +988,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 		if !(IS_EXISTS_CHECK(type_)) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "%sstat failed for %s", b.Cond(IS_LINK_OPERATION(type_), "L", ""), filename)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	stat_sb = ssb.GetSb()
@@ -1030,7 +1030,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 			if type_ == FS_IS_X {
 				xmask = zend.S_IXROOT
 			} else {
-				zend.RETVAL_TRUE
+				return_value.SetTrue()
 				return
 			}
 		}
@@ -1040,74 +1040,74 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 	}
 	switch type_ {
 	case FS_PERMS:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_mode))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_mode))
 		return
 	case FS_INODE:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_ino))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_ino))
 		return
 	case FS_SIZE:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_size))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_size))
 		return
 	case FS_OWNER:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_uid))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_uid))
 		return
 	case FS_GROUP:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_gid))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_gid))
 		return
 	case FS_ATIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_atime))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_atime))
 		return
 	case FS_MTIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_mtime))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_mtime))
 		return
 	case FS_CTIME:
-		zend.RETVAL_LONG(zend.ZendLong(ssb.GetSb().st_ctime))
+		return_value.SetLong(zend.ZendLong(ssb.GetSb().st_ctime))
 		return
 	case FS_TYPE:
 		if zend.S_ISLNK(ssb.GetSb().st_mode) {
-			zend.RETVAL_STRING("link")
+			zend.ZVAL_STRING(return_value, "link")
 			return
 		}
 		switch ssb.GetSb().st_mode & S_IFMT {
 		case zend.S_IFIFO:
-			zend.RETVAL_STRING("fifo")
+			zend.ZVAL_STRING(return_value, "fifo")
 			return
 		case S_IFCHR:
-			zend.RETVAL_STRING("char")
+			zend.ZVAL_STRING(return_value, "char")
 			return
 		case S_IFDIR:
-			zend.RETVAL_STRING("dir")
+			zend.ZVAL_STRING(return_value, "dir")
 			return
 		case zend.S_IFBLK:
-			zend.RETVAL_STRING("block")
+			zend.ZVAL_STRING(return_value, "block")
 			return
 		case S_IFREG:
-			zend.RETVAL_STRING("file")
+			zend.ZVAL_STRING(return_value, "file")
 			return
 		}
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "Unknown file type (%d)", ssb.GetSb().st_mode&S_IFMT)
-		zend.RETVAL_STRING("unknown")
+		zend.ZVAL_STRING(return_value, "unknown")
 		return
 	case FS_IS_W:
-		zend.RETVAL_BOOL((ssb.GetSb().st_mode & wmask) != 0)
+		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&wmask) != 0)
 		return
 	case FS_IS_R:
-		zend.RETVAL_BOOL((ssb.GetSb().st_mode & rmask) != 0)
+		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&rmask) != 0)
 		return
 	case FS_IS_X:
-		zend.RETVAL_BOOL((ssb.GetSb().st_mode & xmask) != 0)
+		zend.ZVAL_BOOL(return_value, (ssb.GetSb().st_mode&xmask) != 0)
 		return
 	case FS_IS_FILE:
-		zend.RETVAL_BOOL(zend.S_ISREG(ssb.GetSb().st_mode))
+		zend.ZVAL_BOOL(return_value, zend.S_ISREG(ssb.GetSb().st_mode))
 		return
 	case FS_IS_DIR:
-		zend.RETVAL_BOOL(zend.S_ISDIR(ssb.GetSb().st_mode))
+		zend.ZVAL_BOOL(return_value, zend.S_ISDIR(ssb.GetSb().st_mode))
 		return
 	case FS_IS_LINK:
-		zend.RETVAL_BOOL(zend.S_ISLNK(ssb.GetSb().st_mode))
+		zend.ZVAL_BOOL(return_value, zend.S_ISLNK(ssb.GetSb().st_mode))
 		return
 	case FS_EXISTS:
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	case FS_LSTAT:
 
@@ -1161,7 +1161,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 		return
 	}
 	core.PhpErrorDocref(nil, zend.E_WARNING, "Didn't understand stat call")
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifFileperms(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2464,7 +2464,7 @@ func ZifRealpathCacheSize(execute_data *zend.ZendExecuteData, return_value *zend
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(zend.RealpathCacheSize())
+	return_value.SetLong(zend.RealpathCacheSize())
 	return
 }
 func ZifRealpathCacheGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

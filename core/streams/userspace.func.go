@@ -247,7 +247,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 	var rsrc *zend.ZendResource
 	var flags zend.ZendLong = 0
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "SS|l", &protocol, &classname, &flags) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	uwrap = (*PhpUserStreamWrapper)(zend.Ecalloc(1, b.SizeOf("* uwrap")))
@@ -259,7 +259,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 	rsrc = zend.ZendRegisterResource(uwrap, LeProtocols)
 	if b.Assign(&(uwrap.GetCe()), zend.ZendLookupClass(classname)) != nil {
 		if PhpRegisterUrlStreamWrapperVolatile(protocol, uwrap.GetWrapper()) == zend.SUCCESS {
-			zend.RETVAL_TRUE
+			return_value.SetTrue()
 			return
 		} else {
 
@@ -284,13 +284,13 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 		core.PhpErrorDocref(nil, zend.E_WARNING, "class '%s' is undefined", classname.GetVal())
 	}
 	zend.ZendListDelete(rsrc)
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var protocol *zend.ZendString
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &protocol) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if PhpUnregisterUrlStreamWrapperVolatile(protocol) == zend.FAILURE {
@@ -298,10 +298,10 @@ func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value
 		/* We failed */
 
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to unregister protocol %s://", protocol.GetVal())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -310,19 +310,19 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 	var global_wrapper_hash *zend.HashTable
 	var wrapper_hash *zend.HashTable
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &protocol) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	global_wrapper_hash = PhpStreamGetUrlStreamWrappersHashGlobal()
 	if b.Assign(&wrapper, zend.ZendHashFindPtr(global_wrapper_hash, protocol)) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "%s:// never existed, nothing to restore", protocol.GetVal())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	wrapper_hash = core.PhpStreamGetUrlStreamWrappersHash()
 	if wrapper_hash == global_wrapper_hash || zend.ZendHashFindPtr(wrapper_hash, protocol) == wrapper {
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "%s:// was never changed, nothing to restore", protocol.GetVal())
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 
@@ -331,10 +331,10 @@ func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *z
 	PhpUnregisterUrlStreamWrapperVolatile(protocol)
 	if PhpRegisterUrlStreamWrapperVolatile(protocol, wrapper) == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to restore original %s:// wrapper", protocol.GetVal())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {

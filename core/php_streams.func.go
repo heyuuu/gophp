@@ -58,13 +58,13 @@ func PhpStreamToZval(stream *PhpStream, zval *zend.Zval) {
 }
 func PhpStreamFromZval(xstr *PhpStream, pzval *zend.Zval) {
 	if b.Assign(&xstr, (*PhpStream)(zend.ZendFetchResource2Ex(pzval, "stream", PhpFileLeStream(), PhpFileLePstream()))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
 func PhpStreamFromRes(xstr *PhpStream, res *zend.ZendResource) {
 	if b.Assign(&xstr, (*PhpStream)(zend.ZendFetchResource2(res, "stream", PhpFileLeStream(), PhpFileLePstream()))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

@@ -493,7 +493,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 	base_ce = IGetExceptionBase(object)
 	trace = ZendReadPropertyEx(base_ce, object, ZSTR_KNOWN(ZEND_STR_TRACE), 1, &rv)
 	if trace.GetType() != IS_ARRAY {
-		RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	var __ht *HashTable = trace.GetArr()
@@ -512,7 +512,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 	str.AppendLong(num)
 	str.AppendString(" {main}")
 	str.ZeroTail()
-	RETVAL_NEW_STR(str.GetS())
+	return_value.SetString(str.GetS())
 	return
 }
 func zim_exception_getPrevious(execute_data *ZendExecuteData, return_value *Zval) {
@@ -595,7 +595,7 @@ func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval)
 
 	tmp.SetString(str)
 	ZendUpdatePropertyEx(base_ce, exception, ZSTR_KNOWN(ZEND_STR_STRING), &tmp)
-	RETVAL_STR(str)
+	return_value.SetString(str)
 	return
 }
 func ZendRegisterDefaultException() {

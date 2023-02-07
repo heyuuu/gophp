@@ -75,10 +75,10 @@ func ZifGettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	type_ = zend.ZendZvalGetType(arg)
 	if type_ != nil {
-		zend.RETVAL_INTERNED_STR(type_)
+		return_value.SetInternedString(type_)
 		return
 	} else {
-		zend.RETVAL_STRING("unknown type")
+		zend.ZVAL_STRING(return_value, "unknown type")
 		return
 	}
 }
@@ -192,13 +192,13 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid type")
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if ptr == &tmp {
 		zend.ZendTryAssignTypedRef(var_.GetRef(), &tmp)
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 }
 func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
@@ -274,7 +274,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if num.GetType() != zend.IS_STRING || base == 10 {
-		zend.RETVAL_LONG(zend.ZvalGetLong(num))
+		return_value.SetLong(zend.ZvalGetLong(num))
 		return
 	}
 	if base == 0 || base == 2 {
@@ -307,7 +307,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 				memcpy(tmpval+offset, strval+offset+2, strlen-offset)
 				tmpval[strlen] = 0
-				zend.RETVAL_LONG(zend.ZEND_STRTOL(tmpval, nil, 2))
+				return_value.SetLong(zend.ZEND_STRTOL(tmpval, nil, 2))
 				zend.Efree(tmpval)
 				return
 			}
@@ -316,7 +316,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* Length of 3+ covers "0b#" and "-0b" (which results in 0) */
 
 	}
-	zend.RETVAL_LONG(zend.ZEND_STRTOL(zend.Z_STRVAL_P(num), nil, base))
+	return_value.SetLong(zend.ZEND_STRTOL(zend.Z_STRVAL_P(num), nil, base))
 }
 func ZifFloatval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
@@ -383,7 +383,7 @@ func ZifFloatval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_DOUBLE(zend.ZvalGetDouble(num))
+	return_value.SetDouble(zend.ZvalGetDouble(num))
 	return
 }
 func ZifBoolval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -451,7 +451,7 @@ func ZifBoolval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_BOOL(zend.ZendIsTrue(val) != 0)
+	zend.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
 	return
 }
 func ZifStrval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -519,7 +519,7 @@ func ZifStrval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_STR(zend.ZvalGetString(num))
+	return_value.SetString(zend.ZvalGetString(num))
 }
 func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type_ int) {
 	var arg *zend.Zval
@@ -582,7 +582,7 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -591,14 +591,14 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 		if type_ == zend.IS_RESOURCE {
 			var type_name *byte = zend.ZendRsrcListGetRsrcType(arg.GetRes())
 			if type_name == nil {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -669,12 +669,12 @@ func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
-	zend.RETVAL_BOOL(arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
+	zend.ZVAL_BOOL(return_value, arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
 	return
 }
 func ZifIsInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -761,20 +761,20 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	case zend.IS_LONG:
 
 	case zend.IS_DOUBLE:
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 		break
 	case zend.IS_STRING:
 		if zend.IsNumericString(zend.Z_STRVAL_P(arg), zend.Z_STRLEN_P(arg), nil, nil, 0) != 0 {
-			zend.RETVAL_TRUE
+			return_value.SetTrue()
 			return
 		} else {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	default:
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 		break
 	}
@@ -854,11 +854,11 @@ func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	case zend.IS_LONG:
 
 	case zend.IS_STRING:
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 		break
 	default:
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 		break
 	}
@@ -961,7 +961,7 @@ func ZifIsCallable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		/* ignore errors */
 
 	}
-	zend.RETVAL_BOOL(retval != 0)
+	zend.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
 func ZifIsIterable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1029,7 +1029,7 @@ func ZifIsIterable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		break
 	}
-	zend.RETVAL_BOOL(zend.ZendIsIterable(var_) != 0)
+	zend.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
 	return
 }
 func ZifIsCountable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1097,6 +1097,6 @@ func ZifIsCountable(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	zend.RETVAL_BOOL(zend.ZendIsCountable(var_) != 0)
+	zend.ZVAL_BOOL(return_value, zend.ZendIsCountable(var_) != 0)
 	return
 }

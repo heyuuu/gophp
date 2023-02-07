@@ -105,7 +105,7 @@ func ZifStrptime(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	memset(&parsed_time, 0, b.SizeOf("parsed_time"))
 	unparsed_part = strptime(ts, format, &parsed_time)
 	if unparsed_part == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)

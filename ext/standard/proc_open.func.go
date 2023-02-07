@@ -206,20 +206,20 @@ func ZifProcTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if kill(proc.GetChild(), sig_no) == 0 {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -289,19 +289,19 @@ func ZifProcClose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	FG(pclose_wait) = 1
 	zend.ZendListClose(zproc.GetRes())
 	FG(pclose_wait) = 0
-	zend.RETVAL_LONG(FG(pclose_ret))
+	return_value.SetLong(FG(pclose_ret))
 	return
 }
 func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -378,13 +378,13 @@ func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if b.Assign(&proc, (*PhpProcessHandle)(zend.ZendFetchResource(zproc.GetRes(), "process", LeProcOpen))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -536,7 +536,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -547,7 +547,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var num_elems uint32 = zend.Z_ARRVAL_P(command_zv).GetNNumOfElements()
 		if num_elems == 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Command array must have at least one element")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		argv = zend.SafeEmalloc(b.SizeOf("char *"), num_elems+1, 0)
@@ -886,6 +886,6 @@ exit_fail:
 		}
 		zend.Efree(argv)
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }

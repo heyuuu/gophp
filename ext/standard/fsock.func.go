@@ -24,7 +24,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var hostname *byte = nil
 	var hostname_len int
 	var errstr *zend.ZendString = nil
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -105,7 +105,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -146,7 +146,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				zend.ZendStringRelease(errstr)
 			}
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if zerrno != nil {

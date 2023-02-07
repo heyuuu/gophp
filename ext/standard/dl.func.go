@@ -81,12 +81,12 @@ func ZifDl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if !(core.PG(enable_dl)) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Dynamically loaded extensions aren't enabled")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if filename_len >= core.MAXPATHLEN {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "File name exceeds the maximum allowed length of %d characters", core.MAXPATHLEN)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	PhpDl(filename, zend.MODULE_TEMPORARY, return_value, 0)
@@ -231,9 +231,9 @@ func PhpDl(file *byte, type_ int, return_value *zend.Zval, start_now int) {
 	/* Load extension */
 
 	if PhpLoadExtension(file, type_, start_now) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 	}
 
 	/* Load extension */

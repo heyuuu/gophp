@@ -81,7 +81,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var myeval *byte = nil
 	var compiled_string_description *byte
 	if !(ASSERTG(active)) {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 	for {
@@ -154,7 +154,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var retval zend.Zval
 		var old_error_reporting int = 0
 		if zend.ZendForbidDynamicCall("assert() with string argument") == zend.FAILURE {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling assert() with a string argument is deprecated")
@@ -176,7 +176,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if ASSERTG(bail) {
 				zend.ZendBailout()
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		zend.Efree(compiled_string_description)
@@ -189,7 +189,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		val = zend.ZendIsTrue(assertion)
 	}
 	if val != 0 {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 	if ASSERTG(callback).u1.v.type_ == zend.IS_UNDEF && ASSERTG(cb) {
@@ -251,7 +251,7 @@ func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if ASSERTG(bail) {
 		zend.ZendBailout()
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -343,7 +343,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendStringReleaseEx(key, 0)
 			zend.ZendStringReleaseEx(value_str, 0)
 		}
-		zend.RETVAL_LONG(oldint)
+		return_value.SetLong(oldint)
 		return
 		break
 	case ASSERT_BAIL:
@@ -358,7 +358,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendStringReleaseEx(key, 0)
 			zend.ZendStringReleaseEx(value_str, 0)
 		}
-		zend.RETVAL_LONG(oldint)
+		return_value.SetLong(oldint)
 		return
 		break
 	case ASSERT_QUIET_EVAL:
@@ -373,7 +373,7 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendStringReleaseEx(key, 0)
 			zend.ZendStringReleaseEx(value_str, 0)
 		}
-		zend.RETVAL_LONG(oldint)
+		return_value.SetLong(oldint)
 		return
 		break
 	case ASSERT_WARNING:
@@ -388,16 +388,16 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendStringReleaseEx(key, 0)
 			zend.ZendStringReleaseEx(value_str, 0)
 		}
-		zend.RETVAL_LONG(oldint)
+		return_value.SetLong(oldint)
 		return
 		break
 	case ASSERT_CALLBACK:
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZVAL_COPY(return_value, &(ASSERTG(callback)))
 		} else if ASSERTG(cb) {
-			zend.RETVAL_STRING(ASSERTG(cb))
+			zend.ZVAL_STRING(return_value, ASSERTG(cb))
 		} else {
-			zend.RETVAL_NULL()
+			return_value.SetNull()
 		}
 		if ac == 2 {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
@@ -416,13 +416,13 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 			zend.ZendStringReleaseEx(val, 0)
 			zend.ZendStringReleaseEx(key, 0)
 		}
-		zend.RETVAL_LONG(oldint)
+		return_value.SetLong(oldint)
 		return
 		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
 		break
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }

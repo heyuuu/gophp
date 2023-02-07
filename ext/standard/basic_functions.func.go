@@ -382,7 +382,7 @@ func ZifConstant(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if zend.EG__().GetException() == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Couldn't find constant %s", const_name.GetVal())
 		}
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	}
 }
@@ -454,7 +454,7 @@ func ZifInetNtop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -462,14 +462,14 @@ func ZifInetNtop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if address_len == 16 {
 		af = AF_INET6
 	} else if address_len != 4 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if !(inet_ntop(af, address, buffer, b.SizeOf("buffer"))) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRING(buffer)
+	zend.ZVAL_STRING(return_value, buffer)
 	return
 }
 func PhpInetPton(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -541,7 +541,7 @@ func PhpInetPton(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -550,15 +550,15 @@ func PhpInetPton(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if strchr(address, ':') {
 		af = AF_INET6
 	} else if !(strchr(address, '.')) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = inet_pton(af, address, buffer)
 	if ret <= 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRINGL(buffer, b.Cond(af == AF_INET, 4, 16))
+	zend.ZVAL_STRINGL(return_value, buffer, b.Cond(af == AF_INET, 4, 16))
 	return
 }
 func ZifIp2long(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -633,10 +633,10 @@ func ZifIp2long(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if addr_len == 0 || inet_pton(AF_INET, addr, &ip) != 1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(ntohl(ip.s_addr))
+	return_value.SetLong(ntohl(ip.s_addr))
 	return
 }
 func ZifLong2ip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -717,10 +717,10 @@ func ZifLong2ip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	ip = zend.ZendUlong(sip)
 	myaddr.s_addr = htonl(ip)
 	if inet_ntop(AF_INET, &myaddr, str, b.SizeOf("str")) {
-		zend.RETVAL_STRING(str)
+		zend.ZVAL_STRING(return_value, str)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -799,7 +799,7 @@ func ZifGetenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -818,7 +818,7 @@ func ZifGetenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			// TODO: avoid realocation ???
 
-			zend.RETVAL_STRING(ptr)
+			zend.ZVAL_STRING(return_value, ptr)
 			zend.Efree(ptr)
 			return
 		}
@@ -829,13 +829,13 @@ func ZifGetenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	ptr = getenv(str)
 	if ptr != nil {
-		zend.RETVAL_STRING(ptr)
+		zend.ZVAL_STRING(return_value, ptr)
 	}
 	tsrm_env_unlock()
 	if ptr != nil {
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifPutenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -913,7 +913,7 @@ func ZifPutenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if setting_len == 0 || setting[0] == '=' {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid parameter syntax")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	pe.SetPutenvString(zend.Estrndup(setting, setting_len))
@@ -943,12 +943,12 @@ func ZifPutenv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			tzset()
 		}
 		tsrm_env_unlock()
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
 		zend.Efree(pe.GetPutenvString())
 		zend.Efree(pe.GetKey())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1091,7 +1091,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -1111,7 +1111,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var pos int = 0
 		var entry *zend.Zval
 		if args.GetType() != zend.IS_ARRAY {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		argc = zend.Z_ARRVAL_P(args).GetNNumOfElements()
@@ -1146,7 +1146,7 @@ func ZifGetopt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Return false if we can't find argv. */
 
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	len_ = ParseOpts(options, &opts)
@@ -1355,17 +1355,17 @@ func ZifSleep(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if num < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Number of seconds must be greater than or equal to 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(core.PhpSleep(uint(num)))
+	return_value.SetLong(core.PhpSleep(uint(num)))
 	return
 }
 func ZifUsleep(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1439,7 +1439,7 @@ func ZifUsleep(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if num < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Number of microseconds must be greater than or equal to 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	usleep(uint(num))
@@ -1524,18 +1524,18 @@ func ZifTimeNanosleep(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	}
 	if tv_sec < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The seconds value must be greater than 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if tv_nsec < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The nanoseconds value must be greater than 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	php_req.tv_sec = int64(tv_sec)
 	php_req.tv_nsec = long(tv_nsec)
 	if !(nanosleep(&php_req, &php_rem)) {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else if errno == EINTR {
 		zend.ArrayInit(return_value)
@@ -1545,7 +1545,7 @@ func ZifTimeNanosleep(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	} else if errno == EINVAL {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "nanoseconds was not in the range 0 to 999 999 999 or seconds was negative")
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifTimeSleepUntil(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1625,14 +1625,14 @@ func ZifTimeSleepUntil(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		break
 	}
 	if gettimeofday((*__struct__timeval)(&tm), nil) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	target_ns = uint64(target_secs * ns_per_sec)
 	current_ns = uint64(tm.tv_sec)*ns_per_sec + uint64(tm.tv_usec)*1000
 	if target_ns < current_ns {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Sleep until to time is less than current time")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	diff_ns = target_ns - current_ns
@@ -1643,18 +1643,18 @@ func ZifTimeSleepUntil(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 			php_req.tv_sec = php_rem.tv_sec
 			php_req.tv_nsec = php_rem.tv_nsec
 		} else {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifGetCurrentUser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_STRING(core.PhpGetCurrentUser())
+	zend.ZVAL_STRING(return_value, core.PhpGetCurrentUser())
 	return
 }
 func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
@@ -1769,11 +1769,11 @@ func ZifGetCfgVar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			AddConfigEntries(retval.GetArr(), return_value)
 			return
 		} else {
-			zend.RETVAL_STRING(zend.Z_STRVAL_P(retval))
+			zend.ZVAL_STRING(return_value, zend.Z_STRVAL_P(retval))
 			return
 		}
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1781,14 +1781,14 @@ func ZifGetMagicQuotesRuntime(execute_data *zend.ZendExecuteData, return_value *
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifGetMagicQuotesGpc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifErrorLog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1891,10 +1891,10 @@ func ZifErrorLog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		opt_err = int(erropt)
 	}
 	if _phpErrorLogEx(opt_err, message, message_len, opt, headers) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func _phpErrorLog(opt_err int, message *byte, opt *byte, headers *byte) int {
@@ -2479,7 +2479,7 @@ func ZifRegisterShutdownFunction(execute_data *zend.ZendExecuteData, return_valu
 	shutdown_function_entry.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
 	if zend.ZendGetParametersArray(zend.ZEND_NUM_ARGS(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == zend.FAILURE {
 		zend.Efree(shutdown_function_entry.GetArguments())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -2490,7 +2490,7 @@ func ZifRegisterShutdownFunction(execute_data *zend.ZendExecuteData, return_valu
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid shutdown callback '%s' passed", callback_name.GetVal())
 		zend.Efree(shutdown_function_entry.GetArguments())
 		zend.ZendStringReleaseEx(callback_name, 0)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
 		if !(BG(user_shutdown_function_names)) {
 			zend.ALLOC_HASHTABLE(BG(user_shutdown_function_names))
@@ -2608,13 +2608,13 @@ func ZifHighlightFile(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if core.PhpCheckOpenBasedir(filename) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if i != 0 {
@@ -2626,14 +2626,14 @@ func ZifHighlightFile(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		if i != 0 {
 			core.PhpOutputEnd()
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if i != 0 {
 		core.PhpOutputGetContents(return_value)
 		core.PhpOutputDiscard()
 	} else {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
@@ -2705,7 +2705,7 @@ func ZifPhpStripWhitespace(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2716,7 +2716,7 @@ func ZifPhpStripWhitespace(execute_data *zend.ZendExecuteData, return_value *zen
 	if zend.OpenFileForScanning(&file_handle) == zend.FAILURE {
 		zend.ZendRestoreLexicalState(&original_lex_state)
 		core.PhpOutputEnd()
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 	zend.ZendStrip()
@@ -2797,7 +2797,7 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2817,7 +2817,7 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		if i != 0 {
 			core.PhpOutputEnd()
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.Efree(hicompiled_string_description)
@@ -2826,7 +2826,7 @@ func ZifHighlightString(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		core.PhpOutputGetContents(return_value)
 		core.PhpOutputDiscard()
 	} else {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
@@ -2902,13 +2902,13 @@ func ZifIniGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	val = zend.ZendIniGetValue(varname)
 	if val == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if val.GetLen() == 0 {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 	} else if val.GetLen() == 1 {
-		zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
+		return_value.SetInternedString(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 	} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
 		return_value.SetString(val.Copy())
 	} else {
@@ -3001,7 +3001,7 @@ func ZifIniGetAll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if extname != nil {
 		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, extname, extname_len)) == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to find extension '%s'", extname)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		module_number = module.GetModuleNumber()
@@ -3135,16 +3135,16 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	if val != nil {
 		if val.GetLen() == 0 {
-			zend.RETVAL_EMPTY_STRING()
+			zend.ZVAL_EMPTY_STRING(return_value)
 		} else if val.GetLen() == 1 {
-			zend.RETVAL_INTERNED_STR(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
+			return_value.SetInternedString(zend.ZSTR_CHAR(zend.ZendUchar(val.GetVal()[0])))
 		} else if (val.GetGcFlags() & zend.GC_PERSISTENT) == 0 {
 			return_value.SetString(val.Copy())
 		} else {
 			return_value.SetString(zend.ZendStringInit(val.GetVal(), val.GetLen(), 0))
 		}
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 
 	// #define _CHECK_PATH(var,var_len,ini) php_ini_check_path ( var , var_len , ini , sizeof ( ini ) )
@@ -3155,14 +3155,14 @@ func ZifIniSet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		if PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "error_log", b.SizeOf("\"error_log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.class.path", b.SizeOf("\"java.class.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.home", b.SizeOf("\"java.home\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "mail.log", b.SizeOf("\"mail.log\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "java.library.path", b.SizeOf("\"java.library.path\"")) != 0 || PhpIniCheckPath(varname.GetVal(), varname.GetLen(), "vpopmail.directory", b.SizeOf("\"vpopmail.directory\"")) != 0 {
 			if core.PhpCheckOpenBasedir(new_value.GetVal()) != 0 {
 				zend.ZvalPtrDtorStr(return_value)
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	}
 	if zend.ZendAlterIniEntryEx(varname, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == zend.FAILURE {
 		zend.ZvalPtrDtorStr(return_value)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -3313,15 +3313,15 @@ func ZifSetIncludePath(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	/* copy to return here, because alter might free it! */
 
 	if old_value != nil {
-		zend.RETVAL_STRING(old_value)
+		zend.ZVAL_STRING(return_value, old_value)
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	key = zend.ZendStringInit("include_path", b.SizeOf("\"include_path\"")-1, 0)
 	if zend.ZendAlterIniEntryEx(key, new_value, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME, 0) == zend.FAILURE {
 		zend.ZendStringReleaseEx(key, 0)
 		zend.ZvalPtrDtorStr(return_value)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ZendStringReleaseEx(key, 0)
@@ -3333,10 +3333,10 @@ func ZifGetIncludePath(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	str = zend.ZendIniString("include_path", b.SizeOf("\"include_path\"")-1, 0)
 	if str == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRING(str)
+	zend.ZVAL_STRING(return_value, str)
 	return
 }
 func ZifRestoreIncludePath(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3417,26 +3417,26 @@ func ZifPrintR(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if do_return != 0 {
-		zend.RETVAL_STR(zend.ZendPrintZvalRToStr(var_, 0))
+		return_value.SetString(zend.ZendPrintZvalRToStr(var_, 0))
 		return
 	} else {
 		zend.ZendPrintZvalR(var_, 0)
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
 func ZifConnectionAborted(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	zend.RETVAL_LONG(core.PG(connection_status) & core.PHP_CONNECTION_ABORTED)
+	return_value.SetLong(core.PG(connection_status) & core.PHP_CONNECTION_ABORTED)
 	return
 }
 func ZifConnectionStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	zend.RETVAL_LONG(core.PG(connection_status))
+	return_value.SetLong(core.PG(connection_status))
 	return
 }
 func ZifIgnoreUserAbort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3516,7 +3516,7 @@ func ZifIgnoreUserAbort(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.ZendAlterIniEntryChars(key, b.Cond(arg != 0, "1", "0"), 1, core.PHP_INI_USER, core.PHP_INI_STAGE_RUNTIME)
 		zend.ZendStringReleaseEx(key, 0)
 	}
-	zend.RETVAL_LONG(old_setting)
+	return_value.SetLong(old_setting)
 	return
 }
 func ZifGetservbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3604,10 +3604,10 @@ func ZifGetservbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 
 	serv = getservbyname(name, proto)
 	if serv == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(ntohs(serv.s_port))
+	return_value.SetLong(ntohs(serv.s_port))
 	return
 }
 func ZifGetservbyport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3690,10 +3690,10 @@ func ZifGetservbyport(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	}
 	serv = getservbyport(htons(uint16(port)), proto)
 	if serv == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRING(serv.s_name)
+	zend.ZVAL_STRING(return_value, serv.s_name)
 	return
 }
 func ZifGetprotobyname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3769,10 +3769,10 @@ func ZifGetprotobyname(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	ent = getprotobyname(name)
 	if ent == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(ent.p_proto)
+	return_value.SetLong(ent.p_proto)
 	return
 }
 func ZifGetprotobynumber(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3847,10 +3847,10 @@ func ZifGetprotobynumber(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	ent = getprotobynumber(int(proto))
 	if ent == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRING(ent.p_name)
+	zend.ZVAL_STRING(return_value, ent.p_name)
 	return
 }
 func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3865,14 +3865,14 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 	tick_fe.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), tick_fe.GetArgCount(), 0)))
 	if zend.ZendGetParametersArray(zend.ZEND_NUM_ARGS(), tick_fe.GetArgCount(), tick_fe.GetArguments()) == zend.FAILURE {
 		zend.Efree(tick_fe.GetArguments())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if zend.ZendIsCallable(tick_fe.GetArguments()[0], 0, &function_name) == 0 {
 		zend.Efree(tick_fe.GetArguments())
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid tick callback '%s' passed", function_name.GetVal())
 		zend.ZendStringReleaseEx(function_name, 0)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else if function_name != nil {
 		zend.ZendStringReleaseEx(function_name, 0)
@@ -3889,7 +3889,7 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 		tick_fe.GetArguments()[i].TryAddRefcount()
 	}
 	zend.ZendLlistAddElement(BG(user_tick_functions), &tick_fe)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifUnregisterTickFunction(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3974,7 +3974,7 @@ func ZifIsUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	var path *byte
 	var path_len int
 	if !(core.SG(rfc1867_uploaded_files)) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	for {
@@ -4045,10 +4045,10 @@ func ZifIsUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		break
 	}
 	if zend.ZendHashStrExists(core.SG(rfc1867_uploaded_files), path, path_len) != 0 {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -4061,7 +4061,7 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 	var oldmask int
 	var ret int
 	if !(core.SG(rfc1867_uploaded_files)) {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	for {
@@ -4138,11 +4138,11 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 		break
 	}
 	if zend.ZendHashStrExists(core.SG(rfc1867_uploaded_files), path, path_len) == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if core.PhpCheckOpenBasedir(new_path) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if zend.VCWD_RENAME(path, new_path) == 0 {
@@ -4162,7 +4162,7 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}
-	zend.RETVAL_BOOL(successful != 0)
+	zend.ZVAL_BOOL(return_value, successful != 0)
 	return
 }
 func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {
@@ -4316,14 +4316,14 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if filename_len == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Filename cannot be empty!")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -4342,7 +4342,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
 		return_value.GetArr().DestroyEx()
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -4429,13 +4429,13 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if core.INT_MAX-str_len < zend.ZEND_MMAP_AHEAD {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 
 	/* Set callback function */
@@ -4455,7 +4455,7 @@ func ZifParseIniString(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniString(string, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
 		return_value.GetArr().DestroyEx()
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	zend.Efree(string)
 }
@@ -4465,7 +4465,7 @@ func ZifSysGetloadavg(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 	if getloadavg(load, 3) == -1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
 		zend.ArrayInit(return_value)

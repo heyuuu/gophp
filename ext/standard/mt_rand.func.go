@@ -237,7 +237,7 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		// genrand_int31 in mt19937ar.c performs a right shift
 
-		zend.RETVAL_LONG(PhpMtRand() >> 1)
+		return_value.SetLong(PhpMtRand() >> 1)
 		return
 	}
 	for {
@@ -315,10 +315,10 @@ func ZifMtRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if max < min {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "max("+zend.ZEND_LONG_FMT+") is smaller than min("+zend.ZEND_LONG_FMT+")", max, min)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(PhpMtRandCommon(min, max))
+	return_value.SetLong(PhpMtRandCommon(min, max))
 	return
 }
 func ZifMtGetrandmax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -331,7 +331,7 @@ func ZifMtGetrandmax(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	 * compatibility with the previous php_rand
 	 */
 
-	zend.RETVAL_LONG(PHP_MT_RAND_MAX)
+	return_value.SetLong(PHP_MT_RAND_MAX)
 	return
 }
 func ZmStartupMtRand(type_ int, module_number int) int {

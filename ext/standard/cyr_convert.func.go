@@ -162,5 +162,5 @@ func ZifConvertCyrString(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	str = zend.ZendStringInit(input, input_len, 0)
 	PhpConvertCyrString((*uint8)(str.GetVal()), str.GetLen(), fr_cs[0], to_cs[0])
-	zend.RETVAL_NEW_STR(str)
+	return_value.SetString(str)
 }

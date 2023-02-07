@@ -84,7 +84,7 @@ func ZifSoundex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	if str_len == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -126,6 +126,6 @@ func ZifSoundex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		soundex[b.PostInc(&_small)] = '0'
 	}
 	soundex[_small] = '0'
-	zend.RETVAL_STRINGL(soundex, _small)
+	zend.ZVAL_STRINGL(return_value, soundex, _small)
 	return
 }

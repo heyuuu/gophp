@@ -222,7 +222,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 
 		/* shortcut */
 
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 	str_in = arg1.GetVal()
@@ -279,7 +279,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 	}
 	str_out.GetVal()[j] = '0'
 	str_out.SetLen(j)
-	zend.RETVAL_NEW_STR(str_out)
+	return_value.SetString(str_out)
 }
 func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
@@ -352,10 +352,10 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 		break
 	}
 	if str.GetLen() == 0 {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 	new_str = PhpQuotPrintEncode((*uint8)(str.GetVal()), str.GetLen())
-	zend.RETVAL_STR(new_str)
+	return_value.SetString(new_str)
 	return
 }

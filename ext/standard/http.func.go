@@ -310,7 +310,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -319,14 +319,14 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		if formstr.GetS() != nil {
 			formstr.Free()
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if formstr.GetS() == nil {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 	formstr.ZeroTail()
-	zend.RETVAL_NEW_STR(formstr.GetS())
+	return_value.SetString(formstr.GetS())
 	return
 }

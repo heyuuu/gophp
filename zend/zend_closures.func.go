@@ -16,7 +16,7 @@ func zim_Closure___invoke(execute_data *ZendExecuteData, return_value *Zval) {
 	var func_ *ZendFunction = EX(func_)
 	var arguments *Zval = ZEND_CALL_ARG(execute_data, 1)
 	if CallUserFunction(CG__().GetFunctionTable(), nil, ZEND_THIS, return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
-		RETVAL_FALSE
+		return_value.SetFalse()
 	}
 
 	/* destruct the function also, then - we have allocated it in get_method */
@@ -171,7 +171,7 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 			} else if b.Assign(&ce, ZendLookupClass(class_name)) == nil {
 				ZendError(E_WARNING, "Class '%s' not found", class_name.GetVal())
 				ZendTmpStringRelease(tmp_class_name)
-				RETVAL_NULL()
+				return_value.SetNull()
 				return
 			}
 			ZendTmpStringRelease(tmp_class_name)
@@ -276,7 +276,7 @@ func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval)
 
 		/* It's already a closure */
 
-		RETVAL_ZVAL(callable, 1, 0)
+		ZVAL_ZVAL(return_value, callable, 1, 0)
 		return
 	}
 

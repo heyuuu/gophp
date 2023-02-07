@@ -88,22 +88,22 @@ func ZifFtok(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if pathname_len == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Pathname is invalid")
-		zend.RETVAL_LONG(-1)
+		return_value.SetLong(-1)
 		return
 	}
 	if proj_len != 1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Project identifier is invalid")
-		zend.RETVAL_LONG(-1)
+		return_value.SetLong(-1)
 		return
 	}
 	if core.PhpCheckOpenBasedir(pathname) != 0 {
-		zend.RETVAL_LONG(-1)
+		return_value.SetLong(-1)
 		return
 	}
 	k = ftok(pathname, proj[0])
 	if k == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "ftok() failed - %s", strerror(errno))
 	}
-	zend.RETVAL_LONG(k)
+	return_value.SetLong(k)
 	return
 }

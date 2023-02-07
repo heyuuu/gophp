@@ -101,10 +101,10 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	PHP_MD5Update(&context, arg.GetVal(), arg.GetLen())
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
-		zend.RETVAL_STRINGL((*byte)(digest), 16)
+		zend.ZVAL_STRINGL(return_value, (*byte)(digest), 16)
 		return
 	} else {
-		zend.RETVAL_NEW_STR(zend.ZendStringAlloc(32, 0))
+		return_value.SetString(zend.ZendStringAlloc(32, 0))
 		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 16)
 	}
 }
@@ -193,7 +193,7 @@ func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	stream = core.PhpStreamOpenWrapper(arg, "rb", core.REPORT_ERRORS, nil)
 	if stream == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	PHP_MD5Init(&context)
@@ -206,16 +206,16 @@ func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if core.PhpStreamEof(stream) == 0 {
 		core.PhpStreamClose(stream)
 		PHP_MD5Final(digest, &context)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamClose(stream)
 	PHP_MD5Final(digest, &context)
 	if raw_output != 0 {
-		zend.RETVAL_STRINGL((*byte)(digest), 16)
+		zend.ZVAL_STRINGL(return_value, (*byte)(digest), 16)
 		return
 	} else {
-		zend.RETVAL_NEW_STR(zend.ZendStringAlloc(32, 0))
+		return_value.SetString(zend.ZendStringAlloc(32, 0))
 		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 16)
 	}
 }

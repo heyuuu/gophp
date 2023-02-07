@@ -79,7 +79,7 @@ func ZifNetGetInterfaces(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	if getifaddrs(&addrs) {
 		core.PhpError(zend.E_WARNING, "getifaddrs() failed %d: %s", errno, strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)

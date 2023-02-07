@@ -36,17 +36,17 @@ func ZifClassParents(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	var ce *zend.ZendClassEntry
 	var autoload zend.ZendBool = 1
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.IsType(zend.IS_STRING) {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
@@ -64,17 +64,17 @@ func ZifClassImplements(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	var autoload zend.ZendBool = 1
 	var ce *zend.ZendClassEntry
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.IsType(zend.IS_STRING) {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
@@ -88,17 +88,17 @@ func ZifClassUses(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var autoload zend.ZendBool = 1
 	var ce *zend.ZendClassEntry
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.GetType() != zend.IS_OBJECT && obj.GetType() != zend.IS_STRING {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "object or string expected")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if obj.IsType(zend.IS_STRING) {
 		if nil == b.Assign(&ce, SplFindCeByName(obj.GetStr(), autoload)) {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	} else {
@@ -217,7 +217,7 @@ func ZifSplAutoload(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	var lc_name *zend.ZendString
 	var file_exts *zend.ZendString = SPL_G(autoload_extensions)
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S|S", &class_name, &file_exts) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if file_exts == nil {
@@ -263,11 +263,11 @@ func ZifSplAutoloadExtensions(execute_data *zend.ZendExecuteData, return_value *
 		SPL_G(autoload_extensions) = file_exts.Copy()
 	}
 	if SPL_G(autoload_extensions) == nil {
-		zend.RETVAL_STRINGL(SPL_DEFAULT_FILE_EXTENSIONS, b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS")-1)
+		zend.ZVAL_STRINGL(return_value, SPL_DEFAULT_FILE_EXTENSIONS, b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS")-1)
 		return
 	} else {
 		SPL_G(autoload_extensions).AddRefcount()
-		zend.RETVAL_STR(SPL_G(autoload_extensions))
+		return_value.SetString(SPL_G(autoload_extensions))
 		return
 	}
 }
@@ -401,7 +401,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 						zend.Efree(error)
 					}
 					zend.ZendStringReleaseEx(func_name, 0)
-					zend.RETVAL_FALSE
+					return_value.SetFalse()
 					return
 				} else if do_throw != 0 {
 					zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Passed array does not specify %s %smethod (%s)", b.Cond(alfi.GetFuncPtr() != nil, "a callable", "an existing"), b.Cond(obj_ptr == nil, "static ", ""), error)
@@ -410,7 +410,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 					zend.Efree(error)
 				}
 				zend.ZendStringReleaseEx(func_name, 0)
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			} else if zcallable.IsType(zend.IS_STRING) {
 				if do_throw != 0 {
@@ -420,7 +420,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 					zend.Efree(error)
 				}
 				zend.ZendStringReleaseEx(func_name, 0)
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			} else {
 				if do_throw != 0 {
@@ -430,7 +430,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 					zend.Efree(error)
 				}
 				zend.ZendStringReleaseEx(func_name, 0)
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		} else if fcc.GetFunctionHandler().GetType() == zend.ZEND_INTERNAL_FUNCTION && fcc.GetFunctionHandler().GetInternalFunction().GetHandler() == ZifSplAutoloadCall {
@@ -441,7 +441,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 				zend.Efree(error)
 			}
 			zend.ZendStringReleaseEx(func_name, 0)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		alfi.SetCe(fcc.GetCallingScope())
@@ -547,7 +547,7 @@ func ZifSplAutoloadRegister(execute_data *zend.ZendExecuteData, return_value *ze
 	} else {
 		zend.EG__().SetAutoloadFunc(SplAutoloadFn)
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -570,7 +570,7 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 		if func_name != nil {
 			zend.ZendStringReleaseEx(func_name, 0)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	obj_ptr = fcc.GetObject()
@@ -634,7 +634,7 @@ func ZifSplAutoloadUnregister(execute_data *zend.ZendExecuteData, return_value *
 		}
 	}
 	zend.ZendStringReleaseEx(lc_name, 0)
-	zend.RETVAL_BOOL(success == zend.SUCCESS)
+	zend.ZVAL_BOOL(return_value, success == zend.SUCCESS)
 	return
 }
 func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -651,7 +651,7 @@ func ZifSplAutoloadFunctions(execute_data *zend.ZendExecuteData, return_value *z
 			return_value.GetArr().NextIndexInsertNew(&tmp)
 			return
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	fptr = SplAutoloadCallFn
@@ -696,7 +696,7 @@ func ZifSplObjectHash(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o", &obj) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_NEW_STR(PhpSplObjectHash(obj))
+	return_value.SetString(PhpSplObjectHash(obj))
 	return
 }
 func ZifSplObjectId(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -768,7 +768,7 @@ func ZifSplObjectId(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	zend.RETVAL_LONG(zend.ZendLong(zend.Z_OBJ_HANDLE_P(obj)))
+	return_value.SetLong(zend.ZendLong(zend.Z_OBJ_HANDLE_P(obj)))
 	return
 }
 func PhpSplObjectHash(obj *zend.Zval) *zend.ZendString {

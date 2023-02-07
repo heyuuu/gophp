@@ -673,7 +673,7 @@ func ZifPhpinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	core.PhpOutputStartDefault()
 	PhpPrintInfo(int(flag))
 	core.PhpOutputEnd()
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -748,16 +748,16 @@ func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		break
 	}
 	if ext_name == nil {
-		zend.RETVAL_STRING(core.PHP_VERSION)
+		zend.ZVAL_STRING(return_value, core.PHP_VERSION)
 		return
 	} else {
 		var version *byte
 		version = zend.ZendGetModuleVersion(ext_name)
 		if version == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
-		zend.RETVAL_STRING(version)
+		zend.ZVAL_STRING(return_value, version)
 		return
 	}
 }
@@ -832,7 +832,7 @@ func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		break
 	}
 	PhpPrintCredits(int(flag))
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifPhpSapiName(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -840,10 +840,10 @@ func ZifPhpSapiName(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	if core.sapi_module.GetName() != nil {
-		zend.RETVAL_STRING(core.sapi_module.GetName())
+		zend.ZVAL_STRING(return_value, core.sapi_module.GetName())
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -918,7 +918,7 @@ func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.RETVAL_STR(PhpGetUname(*mode))
+	return_value.SetString(PhpGetUname(*mode))
 	return
 }
 func ZifPhpIniScannedFiles(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -926,10 +926,10 @@ func ZifPhpIniScannedFiles(execute_data *zend.ZendExecuteData, return_value *zen
 		return
 	}
 	if PhpIniScannedFiles != nil {
-		zend.RETVAL_STRING(PhpIniScannedFiles)
+		zend.ZVAL_STRING(return_value, PhpIniScannedFiles)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -938,10 +938,10 @@ func ZifPhpIniLoadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 		return
 	}
 	if PhpIniOpenedPath != nil {
-		zend.RETVAL_STRING(PhpIniOpenedPath)
+		zend.ZVAL_STRING(return_value, PhpIniOpenedPath)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }

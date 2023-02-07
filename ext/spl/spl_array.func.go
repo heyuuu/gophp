@@ -557,7 +557,7 @@ func zim_spl_Array_offsetExists(execute_data *zend.ZendExecuteData, return_value
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &index) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(SplArrayHasDimensionEx(0, zend.ZEND_THIS, index, 2) != 0)
+	zend.ZVAL_BOOL(return_value, SplArrayHasDimensionEx(0, zend.ZEND_THIS, index, 2) != 0)
 	return
 }
 func zim_spl_Array_offsetGet(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -604,7 +604,7 @@ func zim_spl_Array_offsetUnset(execute_data *zend.ZendExecuteData, return_value 
 func zim_spl_Array_getArrayCopy(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var object *zend.Zval = zend.ZEND_THIS
 	var intern *SplArrayObject = Z_SPLARRAY_P(object)
-	zend.RETVAL_ARR(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
+	return_value.SetArray(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
 	return
 }
 func SplArrayGetPropertiesFor(object *zend.Zval, purpose zend.ZendPropPurpose) *zend.HashTable {
@@ -1016,7 +1016,7 @@ func zim_spl_Array_getIteratorClass(execute_data *zend.ZendExecuteData, return_v
 		return
 	}
 	intern.GetCeGetIterator().GetName().AddRefcount()
-	zend.RETVAL_STR(intern.GetCeGetIterator().GetName())
+	return_value.SetString(intern.GetCeGetIterator().GetName())
 	return
 }
 func zim_spl_Array_getFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1025,7 +1025,7 @@ func zim_spl_Array_getFlags(execute_data *zend.ZendExecuteData, return_value *ze
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(intern.GetArFlags() & ^SPL_ARRAY_INT_MASK)
+	return_value.SetLong(intern.GetArFlags() & ^SPL_ARRAY_INT_MASK)
 	return
 }
 func zim_spl_Array_setFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1048,7 +1048,7 @@ func zim_spl_Array_exchangeArray(execute_data *zend.ZendExecuteData, return_valu
 		zend.ZendError(zend.E_WARNING, "Modification of ArrayObject during sorting is prohibited")
 		return
 	}
-	zend.RETVAL_ARR(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
+	return_value.SetArray(zend.ZendArrayDup(SplArrayGetHashTable(intern)))
 	SplArraySetArray(object, intern, array, 0, 1)
 }
 func zim_spl_Array_getIterator(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1141,7 +1141,7 @@ func zim_spl_Array_count(execute_data *zend.ZendExecuteData, return_value *zend.
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(SplArrayObjectCountElementsHelper(intern))
+	return_value.SetLong(SplArrayObjectCountElementsHelper(intern))
 	return
 }
 func SplArrayMethod(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fname string, fname_len int, use_arg int) {
@@ -1254,7 +1254,7 @@ func zim_spl_Array_valid(execute_data *zend.ZendExecuteData, return_value *zend.
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(zend.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == zend.SUCCESS)
+	zend.ZVAL_BOOL(return_value, zend.ZendHashHasMoreElementsEx(aht, SplArrayGetPosPtr(aht, intern)) == zend.SUCCESS)
 	return
 }
 func zim_spl_Array_hasChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1266,14 +1266,14 @@ func zim_spl_Array_hasChildren(execute_data *zend.ZendExecuteData, return_value 
 		return
 	}
 	if b.Assign(&entry, zend.ZendHashGetCurrentDataEx(aht, SplArrayGetPosPtr(aht, intern))) == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if entry.IsType(zend.IS_INDIRECT) {
 		entry = entry.GetZv()
 	}
 	zend.ZVAL_DEREF(entry)
-	zend.RETVAL_BOOL(entry.IsType(zend.IS_ARRAY) || entry.IsType(zend.IS_OBJECT) && !intern.IsChildArraysOnly())
+	zend.ZVAL_BOOL(return_value, entry.IsType(zend.IS_ARRAY) || entry.IsType(zend.IS_OBJECT) && !intern.IsChildArraysOnly())
 	return
 }
 func zim_spl_Array_getChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1340,10 +1340,10 @@ func zim_spl_Array_serialize(execute_data *zend.ZendExecuteData, return_value *z
 
 	standard.PHP_VAR_SERIALIZE_DESTROY(var_hash)
 	if buf.GetS() != nil {
-		zend.RETVAL_NEW_STR(buf.GetS())
+		return_value.SetString(buf.GetS())
 		return
 	}
-	zend.RETVAL_NULL()
+	return_value.SetNull()
 	return
 }
 func zim_spl_Array_unserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1533,7 +1533,7 @@ func zim_spl_Array___debugInfo(execute_data *zend.ZendExecuteData, return_value 
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_ARR(SplArrayGetDebugInfo(zend.getThis()))
+	return_value.SetArray(SplArrayGetDebugInfo(zend.getThis()))
 	return
 }
 func ZmStartupSplArray(type_ int, module_number int) int {

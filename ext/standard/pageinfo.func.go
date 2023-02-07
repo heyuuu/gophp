@@ -37,10 +37,10 @@ func ZifGetmyuid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	uid = PhpGetuid()
 	if uid < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(uid)
+		return_value.SetLong(uid)
 		return
 	}
 }
@@ -51,10 +51,10 @@ func ZifGetmygid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	gid = PhpGetgid()
 	if gid < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(gid)
+		return_value.SetLong(gid)
 		return
 	}
 }
@@ -65,10 +65,10 @@ func ZifGetmypid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	pid = getpid()
 	if pid < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(pid)
+		return_value.SetLong(pid)
 		return
 	}
 }
@@ -78,10 +78,10 @@ func ZifGetmyinode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	PhpStatpage()
 	if BG(page_inode) < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(BG(page_inode))
+		return_value.SetLong(BG(page_inode))
 		return
 	}
 }
@@ -96,10 +96,10 @@ func ZifGetlastmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	lm = PhpGetlastmod()
 	if lm < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(lm)
+		return_value.SetLong(lm)
 		return
 	}
 }

@@ -219,16 +219,16 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if src.GetLen() < 1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(PhpUuencode(src.GetVal(), src.GetLen()))
+	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
 func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -297,20 +297,20 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if src.GetLen() < 1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if b.Assign(&dest, PhpUudecode(src.GetVal(), src.GetLen())) == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The given parameter is not a valid uuencoded string")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(dest)
+	return_value.SetString(dest)
 	return
 }

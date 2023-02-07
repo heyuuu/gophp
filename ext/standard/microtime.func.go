@@ -82,7 +82,7 @@ func _phpGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		zend.ZEND_ASSERT(false)
 	}
 	if get_as_float != 0 {
-		zend.RETVAL_DOUBLE(float64(tp.tv_sec + tp.tv_usec/MICRO_IN_SEC))
+		return_value.SetDouble(float64(tp.tv_sec + tp.tv_usec/MICRO_IN_SEC))
 		return
 	}
 	if mode != 0 {
@@ -95,7 +95,7 @@ func _phpGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		zend.AddAssocLong(return_value, "dsttime", offset.is_dst)
 		timelib_time_offset_dtor(offset)
 	} else {
-		zend.RETVAL_NEW_STR(zend.ZendStrpprintf(0, "%.8F %ld", tp.tv_usec/MICRO_IN_SEC, long(tp.tv_sec)))
+		return_value.SetString(zend.ZendStrpprintf(0, "%.8F %ld", tp.tv_usec/MICRO_IN_SEC, long(tp.tv_sec)))
 		return
 	}
 }
@@ -182,7 +182,7 @@ func ZifGetrusage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	memset(&usg, 0, b.SizeOf("struct rusage"))
 	if getrusage(who, &usg) == -1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)

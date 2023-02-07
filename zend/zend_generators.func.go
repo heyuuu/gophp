@@ -900,7 +900,7 @@ func zim_Generator_valid(execute_data *ZendExecuteData, return_value *Zval) {
 	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	ZendGeneratorGetCurrent(generator)
-	RETVAL_BOOL(generator.GetExecuteData() != nil)
+	ZVAL_BOOL(return_value, generator.GetExecuteData() != nil)
 	return
 }
 func zim_Generator_current(execute_data *ZendExecuteData, return_value *Zval) {

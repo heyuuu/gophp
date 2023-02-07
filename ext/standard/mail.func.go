@@ -101,7 +101,7 @@ func ZifEzmlmHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		h = h + (h << 5) ^ zend.ZendUlong(uint8(tolower(str[j])))
 	}
 	h = h % 53
-	zend.RETVAL_LONG(zend.ZendLong(h))
+	return_value.SetLong(zend.ZendLong(h))
 	return
 }
 func PhpMailBuildHeadersCheckFieldValue(val *zend.Zval) zend.ZendBool {
@@ -411,7 +411,7 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "headers parameter must be string or array")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
@@ -464,9 +464,9 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		extra_cmd = PhpEscapeShellCmd(extra_cmd.GetVal())
 	}
 	if PhpMail(to_r, subject_r, message, b.CondF1(str_headers != nil && str_headers.GetLen() != 0, func() []byte { return str_headers.GetVal() }, nil), b.CondF1(extra_cmd != nil, func() []byte { return extra_cmd.GetVal() }, nil)) != 0 {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	if str_headers != nil {
 		zend.ZendStringReleaseEx(str_headers, 0)

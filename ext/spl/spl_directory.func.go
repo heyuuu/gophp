@@ -635,10 +635,10 @@ func zim_spl_DirectoryIterator_key(execute_data *zend.ZendExecuteData, return_va
 		return
 	}
 	if intern.GetDirp() != nil {
-		zend.RETVAL_LONG(intern.GetIndex())
+		return_value.SetLong(intern.GetIndex())
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -700,7 +700,7 @@ func zim_spl_DirectoryIterator_valid(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.GetEntry().GetDName()[0] != '0')
+	zend.ZVAL_BOOL(return_value, intern.GetEntry().GetDName()[0] != '0')
 	return
 }
 func zim_spl_SplFileInfo_getPath(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -712,10 +712,10 @@ func zim_spl_SplFileInfo_getPath(execute_data *zend.ZendExecuteData, return_valu
 	}
 	path = SplFilesystemObjectGetPath(intern, &path_len)
 	if path != nil {
-		zend.RETVAL_STRINGL(path, path_len)
+		zend.ZVAL_STRINGL(return_value, path, path_len)
 		return
 	} else {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 }
@@ -727,10 +727,10 @@ func zim_spl_SplFileInfo_getFilename(execute_data *zend.ZendExecuteData, return_
 	}
 	SplFilesystemObjectGetPath(intern, &path_len)
 	if path_len != 0 && path_len < intern.GetFileNameLen() {
-		zend.RETVAL_STRINGL(intern.GetFileName()+path_len+1, intern.GetFileNameLen()-(path_len+1))
+		zend.ZVAL_STRINGL(return_value, intern.GetFileName()+path_len+1, intern.GetFileNameLen()-(path_len+1))
 		return
 	} else {
-		zend.RETVAL_STRINGL(intern.GetFileName(), intern.GetFileNameLen())
+		zend.ZVAL_STRINGL(return_value, intern.GetFileName(), intern.GetFileNameLen())
 		return
 	}
 }
@@ -739,7 +739,7 @@ func zim_spl_DirectoryIterator_getFilename(execute_data *zend.ZendExecuteData, r
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_STRING(intern.GetEntry().GetDName())
+	zend.ZVAL_STRING(return_value, intern.GetEntry().GetDName())
 	return
 }
 func zim_spl_SplFileInfo_getExtension(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -765,12 +765,12 @@ func zim_spl_SplFileInfo_getExtension(execute_data *zend.ZendExecuteData, return
 	p = zend.ZendMemrchr(ret.GetVal(), '.', ret.GetLen())
 	if p != nil {
 		idx = p - ret.GetVal()
-		zend.RETVAL_STRINGL(ret.GetVal()+idx+1, ret.GetLen()-idx-1)
+		zend.ZVAL_STRINGL(return_value, ret.GetVal()+idx+1, ret.GetLen()-idx-1)
 		zend.ZendStringReleaseEx(ret, 0)
 		return
 	} else {
 		zend.ZendStringReleaseEx(ret, 0)
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 }
@@ -786,11 +786,11 @@ func zim_spl_DirectoryIterator_getExtension(execute_data *zend.ZendExecuteData, 
 	p = zend.ZendMemrchr(fname.GetVal(), '.', fname.GetLen())
 	if p != nil {
 		idx = p - fname.GetVal()
-		zend.RETVAL_STRINGL(fname.GetVal()+idx+1, fname.GetLen()-idx-1)
+		zend.ZVAL_STRINGL(return_value, fname.GetVal()+idx+1, fname.GetLen()-idx-1)
 		zend.ZendStringReleaseEx(fname, 0)
 	} else {
 		zend.ZendStringReleaseEx(fname, 0)
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 }
@@ -812,7 +812,7 @@ func zim_spl_SplFileInfo_getBasename(execute_data *zend.ZendExecuteData, return_
 		fname = intern.GetFileName()
 		flen = intern.GetFileNameLen()
 	}
-	zend.RETVAL_STR(standard.PhpBasename(fname, flen, suffix, slen))
+	return_value.SetString(standard.PhpBasename(fname, flen, suffix, slen))
 	return
 }
 func zim_spl_DirectoryIterator_getBasename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -824,7 +824,7 @@ func zim_spl_DirectoryIterator_getBasename(execute_data *zend.ZendExecuteData, r
 		return
 	}
 	fname = standard.PhpBasename(intern.GetEntry().GetDName(), strlen(intern.GetEntry().GetDName()), suffix, slen)
-	zend.RETVAL_STR(fname)
+	return_value.SetString(fname)
 }
 func zim_spl_SplFileInfo_getPathname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplFilesystemObject = Z_SPLFILESYSTEM_P(zend.ZEND_THIS)
@@ -835,10 +835,10 @@ func zim_spl_SplFileInfo_getPathname(execute_data *zend.ZendExecuteData, return_
 	}
 	path = SplFilesystemObjectGetPathname(intern, &path_len)
 	if path != nil {
-		zend.RETVAL_STRINGL(path, path_len)
+		zend.ZVAL_STRINGL(return_value, path, path_len)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -848,11 +848,11 @@ func zim_spl_FilesystemIterator_key(execute_data *zend.ZendExecuteData, return_v
 		return
 	}
 	if SPL_FILE_DIR_KEY(intern, SPL_FILE_DIR_KEY_AS_FILENAME) {
-		zend.RETVAL_STRING(intern.GetEntry().GetDName())
+		zend.ZVAL_STRING(return_value, intern.GetEntry().GetDName())
 		return
 	} else {
 		SplFilesystemObjectGetFileName(intern)
-		zend.RETVAL_STRINGL(intern.GetFileName(), intern.GetFileNameLen())
+		zend.ZVAL_STRINGL(return_value, intern.GetFileName(), intern.GetFileNameLen())
 		return
 	}
 }
@@ -863,7 +863,7 @@ func zim_spl_FilesystemIterator_current(execute_data *zend.ZendExecuteData, retu
 	}
 	if SPL_FILE_DIR_CURRENT(intern, SPL_FILE_DIR_CURRENT_AS_PATHNAME) {
 		SplFilesystemObjectGetFileName(intern)
-		zend.RETVAL_STRINGL(intern.GetFileName(), intern.GetFileNameLen())
+		zend.ZVAL_STRINGL(return_value, intern.GetFileName(), intern.GetFileNameLen())
 		return
 	} else if SPL_FILE_DIR_CURRENT(intern, SPL_FILE_DIR_CURRENT_AS_FILEINFO) {
 		SplFilesystemObjectGetFileName(intern)
@@ -878,7 +878,7 @@ func zim_spl_DirectoryIterator_isDot(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0)
+	zend.ZVAL_BOOL(return_value, SplFilesystemIsDot(intern.GetEntry().GetDName()) != 0)
 	return
 }
 func zim_spl_SplFileInfo___construct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1070,13 +1070,13 @@ func zim_spl_SplFileInfo_getLinkTarget(execute_data *zend.ZendExecuteData, retur
 	}
 	if intern.GetFileName() == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Empty filename")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else if !(zend.IS_ABSOLUTE_PATH(intern.GetFileName(), intern.GetFileNameLen())) {
 		var expanded_path []byte
 		if core.ExpandFilepathWithMode(intern.GetFileName(), expanded_path, nil, 0, zend.CWD_EXPAND) == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "No such file or directory")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		ret = zend.PhpSysReadlink(expanded_path, buff, core.MAXPATHLEN-1)
@@ -1085,13 +1085,13 @@ func zim_spl_SplFileInfo_getLinkTarget(execute_data *zend.ZendExecuteData, retur
 	}
 	if ret == -1 {
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Unable to read link %s, error: %s", intern.GetFileName(), strerror(errno))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
 
 		/* Append NULL to the end of the string */
 
 		buff[ret] = '0'
-		zend.RETVAL_STRINGL(buff, ret)
+		zend.ZVAL_STRINGL(return_value, buff, ret)
 	}
 	zend.ZendRestoreErrorHandling(&error_handling)
 }
@@ -1113,9 +1113,9 @@ func zim_spl_SplFileInfo_getRealPath(execute_data *zend.ZendExecuteData, return_
 		filename = intern.GetFileName()
 	}
 	if filename != nil && zend.VCWD_REALPATH(filename, buff) != nil {
-		zend.RETVAL_STRING(buff)
+		zend.ZVAL_STRING(return_value, buff)
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	zend.ZendRestoreErrorHandling(&error_handling)
 }
@@ -1174,7 +1174,7 @@ func zim_spl_SplFileInfo___debugInfo(execute_data *zend.ZendExecuteData, return_
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_ARR(SplFilesystemObjectGetDebugInfo(zend.getThis()))
+	return_value.SetArray(SplFilesystemObjectGetDebugInfo(zend.getThis()))
 	return
 }
 func zim_spl_SplFileInfo__bad_state_ex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1205,7 +1205,7 @@ func zim_spl_FilesystemIterator_getFlags(execute_data *zend.ZendExecuteData, ret
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(intern.GetFlags() & (SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK))
+	return_value.SetLong(intern.GetFlags() & (SPL_FILE_DIR_KEY_MODE_MASK | SPL_FILE_DIR_CURRENT_MODE_MASK | SPL_FILE_DIR_OTHERS_MASK))
 	return
 }
 func zim_spl_FilesystemIterator_setFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1224,14 +1224,14 @@ func zim_spl_RecursiveDirectoryIterator_hasChildren(execute_data *zend.ZendExecu
 		return
 	}
 	if SplFilesystemIsInvalidOrDot(intern.GetEntry().GetDName()) != 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
 		SplFilesystemObjectGetFileName(intern)
 		if allow_links == 0 && !intern.IsDirFollowSymlinks() {
 			standard.PhpStat(intern.GetFileName(), intern.GetFileNameLen(), standard.FS_IS_LINK, return_value)
 			if zend.ZendIsTrue(return_value) != 0 {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
@@ -1271,10 +1271,10 @@ func zim_spl_RecursiveDirectoryIterator_getSubPath(execute_data *zend.ZendExecut
 		return
 	}
 	if intern.GetSubPath() != nil {
-		zend.RETVAL_STRINGL(intern.GetSubPath(), intern.GetSubPathLen())
+		zend.ZVAL_STRINGL(return_value, intern.GetSubPath(), intern.GetSubPathLen())
 		return
 	} else {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 }
@@ -1285,10 +1285,10 @@ func zim_spl_RecursiveDirectoryIterator_getSubPathname(execute_data *zend.ZendEx
 		return
 	}
 	if intern.GetSubPath() != nil {
-		zend.RETVAL_NEW_STR(core.Strpprintf(0, "%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
+		return_value.SetString(core.Strpprintf(0, "%s%c%s", intern.GetSubPath(), slash, intern.GetEntry().GetDName()))
 		return
 	} else {
-		zend.RETVAL_STRING(intern.GetEntry().GetDName())
+		zend.ZVAL_STRING(return_value, intern.GetEntry().GetDName())
 		return
 	}
 }
@@ -1304,7 +1304,7 @@ func zim_spl_GlobIterator_count(execute_data *zend.ZendExecuteData, return_value
 		return
 	}
 	if intern.GetDirp() != nil && core.PhpStreamIs(intern.GetDirp(), &streams.PhpGlobStreamOps) {
-		zend.RETVAL_LONG(streams.PhpGlobStreamGetCount(intern.GetDirp(), nil))
+		return_value.SetLong(streams.PhpGlobStreamGetCount(intern.GetDirp(), nil))
 		return
 	} else {
 
@@ -1554,7 +1554,7 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	fcic.SetObject(nil)
 	result = zend.ZendCallFunction(&fci, &fcic)
 	if result == zend.FAILURE || retval.IsUndef() {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
 		zend.ZVAL_ZVAL(return_value, &retval, 0, 0)
 	}
@@ -1757,7 +1757,7 @@ func zim_spl_SplFileObject_eof(execute_data *zend.ZendExecuteData, return_value 
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	zend.RETVAL_BOOL(core.PhpStreamEof(intern.GetStream()) != 0)
+	zend.ZVAL_BOOL(return_value, core.PhpStreamEof(intern.GetStream()) != 0)
 	return
 }
 func zim_spl_SplFileObject_valid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1766,14 +1766,14 @@ func zim_spl_SplFileObject_valid(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_AHEAD) != 0 {
-		zend.RETVAL_BOOL(intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()))
+		zend.ZVAL_BOOL(return_value, intern.GetCurrentLine() != nil || !(intern.GetCurrentZval().IsUndef()))
 		return
 	} else {
 		if intern.GetStream() == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
-		zend.RETVAL_BOOL(core.PhpStreamEof(intern.GetStream()) == 0)
+		zend.ZVAL_BOOL(return_value, core.PhpStreamEof(intern.GetStream()) == 0)
 	}
 }
 func zim_spl_SplFileObject_fgets(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1786,10 +1786,10 @@ func zim_spl_SplFileObject_fgets(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	if SplFilesystemFileRead(intern, 0) == zend.FAILURE {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STRINGL(intern.GetCurrentLine(), intern.GetCurrentLineLen())
+	zend.ZVAL_STRINGL(return_value, intern.GetCurrentLine(), intern.GetCurrentLineLen())
 	return
 }
 func zim_spl_SplFileObject_current(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1805,14 +1805,14 @@ func zim_spl_SplFileObject_current(execute_data *zend.ZendExecuteData, return_va
 		SplFilesystemFileReadLine(zend.ZEND_THIS, intern, 1)
 	}
 	if intern.GetCurrentLine() != nil && (SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) == 0 || intern.GetCurrentZval().IsUndef()) {
-		zend.RETVAL_STRINGL(intern.GetCurrentLine(), intern.GetCurrentLineLen())
+		zend.ZVAL_STRINGL(return_value, intern.GetCurrentLine(), intern.GetCurrentLineLen())
 		return
 	} else if !(intern.GetCurrentZval().IsUndef()) {
 		var value *zend.Zval = intern.GetCurrentZval()
 		zend.ZVAL_COPY_DEREF(return_value, value)
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func zim_spl_SplFileObject_key(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1826,7 +1826,7 @@ func zim_spl_SplFileObject_key(execute_data *zend.ZendExecuteData, return_value 
 	          spl_filesystem_file_read_line(ZEND_THIS, intern, 1);
 	      } */
 
-	zend.RETVAL_LONG(intern.GetCurrentLineNum())
+	return_value.SetLong(intern.GetCurrentLineNum())
 	return
 }
 func zim_spl_SplFileObject_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1851,7 +1851,7 @@ func zim_spl_SplFileObject_getFlags(execute_data *zend.ZendExecuteData, return_v
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(intern.GetFlags() & SPL_FILE_OBJECT_MASK)
+	return_value.SetLong(intern.GetFlags() & SPL_FILE_OBJECT_MASK)
 	return
 }
 func zim_spl_SplFileObject_setMaxLineLen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1871,14 +1871,14 @@ func zim_spl_SplFileObject_getMaxLineLen(execute_data *zend.ZendExecuteData, ret
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(zend.ZendLong(intern.GetMaxLineLen()))
+	return_value.SetLong(zend.ZendLong(intern.GetMaxLineLen()))
 	return
 }
 func zim_spl_SplFileObject_hasChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func zim_spl_SplFileObject_getChildren(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1906,7 +1906,7 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 		case 3:
 			if esc_len > 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "escape must be empty or a single character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			if esc_len == 0 {
@@ -1917,14 +1917,14 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 		case 2:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			enclosure = enclo[0]
 		case 1:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			delimiter = delim[0]
@@ -1959,20 +1959,20 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 				break
 			default:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "escape must be empty or a single character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		case 3:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			enclosure = enclo[0]
 		case 2:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			delimiter = delim[0]
@@ -1983,10 +1983,10 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 		}
 		ret = standard.PhpFputcsv(intern.GetStream(), fields, delimiter, enclosure, escape)
 		if ret < 0 {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
-		zend.RETVAL_LONG(ret)
+		return_value.SetLong(ret)
 		return
 	}
 }
@@ -2013,20 +2013,20 @@ func zim_spl_SplFileObject_setCsvControl(execute_data *zend.ZendExecuteData, ret
 				break
 			default:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "escape must be empty or a single character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		case 2:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			enclosure = enclo[0]
 		case 1:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			delimiter = delim[0]
@@ -2074,7 +2074,7 @@ func zim_spl_SplFileObject_fflush(execute_data *zend.ZendExecuteData, return_val
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	zend.RETVAL_BOOL(core.PhpStreamFlush(intern.GetStream()) == 0)
+	zend.ZVAL_BOOL(return_value, core.PhpStreamFlush(intern.GetStream()) == 0)
 	return
 }
 func zim_spl_SplFileObject_ftell(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2086,10 +2086,10 @@ func zim_spl_SplFileObject_ftell(execute_data *zend.ZendExecuteData, return_valu
 	}
 	ret = core.PhpStreamTell(intern.GetStream())
 	if ret == -1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
-		zend.RETVAL_LONG(ret)
+		return_value.SetLong(ret)
 		return
 	}
 }
@@ -2105,7 +2105,7 @@ func zim_spl_SplFileObject_fseek(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	SplFilesystemFileFreeLine(intern)
-	zend.RETVAL_LONG(core.PhpStreamSeek(intern.GetStream(), pos, int(whence)))
+	return_value.SetLong(core.PhpStreamSeek(intern.GetStream(), pos, int(whence)))
 	return
 }
 func zim_spl_SplFileObject_fgetc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2119,14 +2119,14 @@ func zim_spl_SplFileObject_fgetc(execute_data *zend.ZendExecuteData, return_valu
 	SplFilesystemFileFreeLine(intern)
 	result = core.PhpStreamGetc(intern.GetStream())
 	if result == r.EOF {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	} else {
 		if result == '\n' {
 			intern.GetCurrentLineNum()++
 		}
 		buf[0] = result
 		buf[1] = '0'
-		zend.RETVAL_STRINGL(buf, 1)
+		zend.ZVAL_STRINGL(return_value, buf, 1)
 		return
 	}
 }
@@ -2158,7 +2158,7 @@ func zim_spl_SplFileObject_fpassthru(execute_data *zend.ZendExecuteData, return_
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	zend.RETVAL_LONG(core.PhpStreamPassthru(intern.GetStream()))
+	return_value.SetLong(core.PhpStreamPassthru(intern.GetStream()))
 	return
 }
 func zim_spl_SplFileObject_fscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2204,15 +2204,15 @@ func zim_spl_SplFileObject_fwrite(execute_data *zend.ZendExecuteData, return_val
 		}
 	}
 	if str_len == 0 {
-		zend.RETVAL_LONG(0)
+		return_value.SetLong(0)
 		return
 	}
 	written = core.PhpStreamWrite(intern.GetStream(), str, str_len)
 	if written < 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(written)
+	return_value.SetLong(written)
 	return
 }
 func zim_spl_SplFileObject_fread(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2228,15 +2228,15 @@ func zim_spl_SplFileObject_fread(execute_data *zend.ZendExecuteData, return_valu
 	}
 	if length <= 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	str = streams.PhpStreamReadToStr(intern.GetStream(), length)
 	if str == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(str)
+	return_value.SetString(str)
 	return
 }
 func zim_spl_SplFileObject_fstat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2261,10 +2261,10 @@ func zim_spl_SplFileObject_ftruncate(execute_data *zend.ZendExecuteData, return_
 	}
 	if core.PhpStreamTruncateSupported(intern.GetStream()) == 0 {
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Can't truncate file %s", intern.GetFileName())
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_BOOL(0 == core.PhpStreamTruncateSetSize(intern.GetStream(), size))
+	zend.ZVAL_BOOL(return_value, 0 == core.PhpStreamTruncateSetSize(intern.GetStream(), size))
 	return
 }
 func zim_spl_SplFileObject_seek(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2279,7 +2279,7 @@ func zim_spl_SplFileObject_seek(execute_data *zend.ZendExecuteData, return_value
 	}
 	if line_pos < 0 {
 		zend.ZendThrowExceptionEx(spl_ce_LogicException, 0, "Can't seek file %s to negative line "+zend.ZEND_LONG_FMT, intern.GetFileName(), line_pos)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	SplFilesystemFileRewind(zend.ZEND_THIS, intern)

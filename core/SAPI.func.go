@@ -31,7 +31,7 @@ func ZifHeaderRegisterCallback(execute_data *zend.ZendExecuteData, return_value 
 		return
 	}
 	if zend.ZendIsCallable(callback_func, 0, nil) == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if SG(callback_func).u1.v.type_ != zend.IS_UNDEF {
@@ -39,7 +39,7 @@ func ZifHeaderRegisterCallback(execute_data *zend.ZendExecuteData, return_value 
 		SG(fci_cache) = zend.EmptyFcallInfoCache
 	}
 	zend.ZVAL_COPY(&(SG(callback_func)), callback_func)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func SapiRunHeaderCallback(callback *zend.Zval) {

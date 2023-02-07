@@ -540,17 +540,17 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 }
 func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
@@ -619,7 +619,7 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -628,10 +628,10 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	result = PhpFormattedPrint(format, args, argc)
 	zend.Efree(args)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(result)
+	return_value.SetString(result)
 }
 func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
@@ -708,19 +708,19 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
 	zend.ZendStringEfree(result)
-	zend.RETVAL_LONG(rlen)
+	return_value.SetLong(rlen)
 	return
 }
 func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -791,7 +791,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -800,12 +800,12 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	result = PhpFormattedPrint(format, args, argc)
 	zend.Efree(args)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	rlen = core.PHPWRITE(result.GetVal(), result.GetLen())
 	zend.ZendStringEfree(result)
-	zend.RETVAL_LONG(rlen)
+	return_value.SetLong(rlen)
 	return
 }
 func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -893,7 +893,7 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -901,11 +901,11 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	core.PhpStreamFromZval(stream, arg1)
 	result = PhpFormattedPrint(format, args, argc)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
-	zend.RETVAL_LONG(result.GetLen())
+	return_value.SetLong(result.GetLen())
 	zend.ZendStringEfree(result)
 }
 func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -986,7 +986,7 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -996,10 +996,10 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	result = PhpFormattedPrint(format, args, argc)
 	zend.Efree(args)
 	if result == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamWrite(stream, result.GetVal(), result.GetLen())
-	zend.RETVAL_LONG(result.GetLen())
+	return_value.SetLong(result.GetLen())
 	zend.ZendStringEfree(result)
 }

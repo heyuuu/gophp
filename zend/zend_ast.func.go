@@ -506,7 +506,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 				ret = FAILURE
 				break
 			}
-			ZVAL_BOOL(result, ZendIsTrue(&op2))
+			ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		} else {
 			result.SetFalse()
@@ -526,7 +526,7 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 				ret = FAILURE
 				break
 			}
-			ZVAL_BOOL(result, ZendIsTrue(&op2))
+			ZVAL_BOOL(result, ZendIsTrue(&op2) != 0)
 			ZvalPtrDtorNogc(&op2)
 		}
 		ZvalPtrDtorNogc(&op1)

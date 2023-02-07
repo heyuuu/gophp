@@ -162,6 +162,42 @@ package zend
 
 // #define CHECK_ZVAL_STRING_REL(z)
 
+// #define RETVAL_BOOL(b) ZVAL_BOOL ( return_value , b )
+
+// #define RETVAL_NULL() ZVAL_NULL ( return_value )
+
+// #define RETVAL_LONG(l) ZVAL_LONG ( return_value , l )
+
+// #define RETVAL_DOUBLE(d) ZVAL_DOUBLE ( return_value , d )
+
+// #define RETVAL_STR(s) ZVAL_STR ( return_value , s )
+
+// #define RETVAL_INTERNED_STR(s) ZVAL_INTERNED_STR ( return_value , s )
+
+// #define RETVAL_NEW_STR(s) ZVAL_NEW_STR ( return_value , s )
+
+// #define RETVAL_STR_COPY(s) ZVAL_STR_COPY ( return_value , s )
+
+// #define RETVAL_STRING(s) ZVAL_STRING ( return_value , s )
+
+// #define RETVAL_STRINGL(s,l) ZVAL_STRINGL ( return_value , s , l )
+
+// #define RETVAL_EMPTY_STRING() ZVAL_EMPTY_STRING ( return_value )
+
+// #define RETVAL_RES(r) ZVAL_RES ( return_value , r )
+
+// #define RETVAL_ARR(r) ZVAL_ARR ( return_value , r )
+
+// #define RETVAL_EMPTY_ARRAY() ZVAL_EMPTY_ARRAY ( return_value )
+
+// #define RETVAL_OBJ(r) ZVAL_OBJ ( return_value , r )
+
+// #define RETVAL_ZVAL(zv,copy,dtor) ZVAL_ZVAL ( return_value , zv , copy , dtor )
+
+// #define RETVAL_FALSE       ZVAL_FALSE ( return_value )
+
+// #define RETVAL_TRUE       ZVAL_TRUE ( return_value )
+
 // #define RETURN_BOOL(b) { RETVAL_BOOL ( b ) ; return ; }
 
 // #define RETURN_NULL() { RETVAL_NULL ( ) ; return ; }

@@ -786,7 +786,7 @@ try_again:
 	case IS_RESOURCE:
 		var l ZendLong = b.Cond(Z_RES_HANDLE_P(op) != 0, 1, 0)
 		ZvalPtrDtor(op)
-		ZVAL_BOOL(op, l)
+		ZVAL_BOOL(op, l != 0)
 		break
 	case IS_LONG:
 		ZVAL_BOOL(op, b.Cond(op.GetLval() != 0, 1, 0))
@@ -810,7 +810,7 @@ try_again:
 			tmp = 0
 		}
 		ZvalPtrDtor(op)
-		ZVAL_BOOL(op, tmp)
+		ZVAL_BOOL(op, tmp != 0)
 		break
 	case IS_OBJECT:
 		var dst Zval
@@ -1813,7 +1813,7 @@ func BooleanXorFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 		}
 		break
 	}
-	ZVAL_BOOL(result, op1_val^op2_val)
+	ZVAL_BOOL(result, (op1_val^op2_val) != 0)
 	return SUCCESS
 }
 func BooleanNotFunction(result *Zval, op1 *Zval) int {
@@ -1835,7 +1835,7 @@ func BooleanNotFunction(result *Zval, op1 *Zval) int {
 		if op1.IsObject() && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BOOL_NOT, result, op1, nil) {
 			return SUCCESS
 		}
-		ZVAL_BOOL(result, !(ZvalIsTrue(op1)))
+		ZVAL_BOOL(result, ZvalIsTrue(op1) == 0)
 	}
 	return SUCCESS
 }
@@ -2747,11 +2747,11 @@ func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {
 	}
 }
 func IsIdenticalFunction(result *Zval, op1 *Zval, op2 *Zval) int {
-	ZVAL_BOOL(result, ZendIsIdentical(op1, op2))
+	ZVAL_BOOL(result, ZendIsIdentical(op1, op2) != 0)
 	return SUCCESS
 }
 func IsNotIdenticalFunction(result *Zval, op1 *Zval, op2 *Zval) int {
-	ZVAL_BOOL(result, !(ZendIsIdentical(op1, op2)))
+	ZVAL_BOOL(result, ZendIsIdentical(op1, op2) == 0)
 	return SUCCESS
 }
 func IsEqualFunction(result *Zval, op1 *Zval, op2 *Zval) int {

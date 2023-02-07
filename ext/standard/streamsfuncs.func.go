@@ -98,7 +98,7 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -106,7 +106,7 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 	if 0 != socketpair(int(domain), int(type_), int(protocol), pair) {
 		var errbuf []byte
 		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to create sockets: [%d]: %s", core.PhpSocketErrno(), core.PhpSocketStrerror(core.PhpSocketErrno(), errbuf, b.SizeOf("errbuf")))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -135,7 +135,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	var flags zend.ZendLong = PHP_STREAM_CLIENT_CONNECT
 	var errstr *zend.ZendString = nil
 	var context *core.PhpStreamContext = nil
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -222,7 +222,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -264,7 +264,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 		} else if errstr != nil {
 			zend.ZendStringReleaseEx(errstr, 0)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
@@ -283,7 +283,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	var flags zend.ZendLong = streams.STREAM_XPORT_BIND | streams.STREAM_XPORT_LISTEN
 	var errstr *zend.ZendString = nil
 	var context *core.PhpStreamContext = nil
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -364,7 +364,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -392,7 +392,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 		} else if errstr != nil {
 			zend.ZendStringReleaseEx(errstr, 0)
 		}
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if errstr != nil {
@@ -482,7 +482,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -504,7 +504,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 			zend.ZendStringRelease(peername)
 		}
 		core.PhpErrorDocref(nil, zend.E_WARNING, "accept failed: %s", b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "Unknown error"))
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 	}
 	if errstr != nil {
 		zend.ZendStringReleaseEx(errstr, 0)
@@ -584,22 +584,22 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	if 0 != streams.PhpStreamXportGetName(stream, want_peer, &name, nil, nil) || name == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if name.GetLen() == 0 || name.GetVal()[0] == 0 {
 		zend.ZendStringReleaseEx(name, 0)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_STR(name)
+	return_value.SetString(name)
 }
 func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
@@ -693,7 +693,7 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -705,14 +705,14 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 
 		if zend.FAILURE == core.PhpNetworkParseNetworkAddressWithPort(target_addr, target_addr_len, (*__struct__sockaddr)(&sa), &sl) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to parse `%s' into a valid network address", target_addr)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 
 		/* parse the address */
 
 	}
-	zend.RETVAL_LONG(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
+	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
 func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -802,7 +802,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -813,7 +813,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	if to_read <= 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Length parameter must be greater than 0")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	read_buf = zend.ZendStringAlloc(to_read, 0)
@@ -824,11 +824,11 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 		}
 		read_buf.GetVal()[recvd] = '0'
 		read_buf.SetLen(recvd)
-		zend.RETVAL_NEW_STR(read_buf)
+		return_value.SetString(read_buf)
 		return
 	}
 	zend.ZendStringEfree(read_buf)
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -913,14 +913,14 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if maxlen < 0 && maxlen != ssize_t(core.PHP_STREAM_COPY_ALL) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Length must be greater than or equal to zero, or -1")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamFromZval(stream, zsrc)
@@ -947,15 +947,15 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 		}
 		if seek_res != 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", desiredpos)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if b.Assign(&contents, core.PhpStreamCopyToMem(stream, maxlen, 0)) {
-		zend.RETVAL_STR(contents)
+		return_value.SetString(contents)
 		return
 	} else {
-		zend.RETVAL_EMPTY_STRING()
+		zend.ZVAL_EMPTY_STRING(return_value)
 		return
 	}
 }
@@ -1050,7 +1050,7 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -1059,15 +1059,15 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 	core.PhpStreamFromZval(dest, zdest)
 	if pos > 0 && core.PhpStreamSeek(src, pos, r.SEEK_SET) < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Failed to seek to position "+zend.ZEND_LONG_FMT+" in the stream", pos)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	ret = core.PhpStreamCopyToStreamEx(src, dest, maxlen, &len_)
 	if ret != zend.SUCCESS {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_LONG(len_)
+	return_value.SetLong(len_)
 	return
 }
 func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -1178,7 +1178,7 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 			zend.AddNextIndexStr(return_value, stream_xport.Copy())
 		}
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1200,7 +1200,7 @@ func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend
 			}
 		}
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -1503,7 +1503,7 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	if sets == 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "No stream arrays were passed")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PHP_SAFE_MAX_FD(max_fd, max_set_count)
@@ -1513,11 +1513,11 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	if secnull == 0 {
 		if sec < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "The seconds parameter must be greater than 0")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		} else if usec < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "The microseconds parameter must be greater than 0")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 
@@ -1543,14 +1543,14 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				zend.ZvalPtrDtor(e_array)
 				zend.ZVAL_EMPTY_ARRAY(e_array)
 			}
-			zend.RETVAL_LONG(retval)
+			return_value.SetLong(retval)
 			return
 		}
 	}
 	retval = PhpSelect(max_fd+1, &rfds, &wfds, &efds, tv_p)
 	if retval == -1 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "unable to select [%d]: %s (max_fd=%d)", errno, strerror(errno), max_fd)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if r_array != nil {
@@ -1562,7 +1562,7 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	if e_array != nil {
 		StreamArrayFromFdSet(e_array, &efds)
 	}
-	zend.RETVAL_LONG(retval)
+	return_value.SetLong(retval)
 	return
 }
 func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any) {
@@ -1734,7 +1734,7 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -1742,7 +1742,7 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 	context = DecodeContextParam(zcontext)
 	if context == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ZVAL_COPY(return_value, context.GetOptions())
@@ -1821,7 +1821,7 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 						}
 					}
 				}
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			break
@@ -1831,10 +1831,10 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 
 		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
-		zend.RETVAL_BOOL(ParseContextOptions(context, options) == zend.SUCCESS)
+		zend.ZVAL_BOOL(return_value, ParseContextOptions(context, options) == zend.SUCCESS)
 		return
 	} else {
 		var zvalue *zend.Zval
@@ -1919,7 +1919,7 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 						}
 					}
 				}
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			break
@@ -1929,10 +1929,10 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 
 		if !(b.Assign(&context, DecodeContextParam(zcontext))) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
-		zend.RETVAL_BOOL(streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == zend.SUCCESS)
+		zend.ZVAL_BOOL(return_value, streams.PhpStreamContextSetOption(context, wrappername, optionname, zvalue) == zend.SUCCESS)
 		return
 	}
 }
@@ -2009,7 +2009,7 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2017,10 +2017,10 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 	context = DecodeContextParam(zcontext)
 	if context == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_BOOL(ParseContextParams(context, params) == zend.SUCCESS)
+	zend.ZVAL_BOOL(return_value, ParseContextParams(context, params) == zend.SUCCESS)
 }
 func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval
@@ -2088,7 +2088,7 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2096,7 +2096,7 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 	context = DecodeContextParam(zcontext)
 	if context == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid stream/context parameter")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	zend.ArrayInit(return_value)
@@ -2174,7 +2174,7 @@ func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2339,7 +2339,7 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2351,7 +2351,7 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 	if params != nil {
 		ParseContextParams(context, params)
 	}
-	zend.RETVAL_RES(context.GetRes())
+	return_value.SetResource(context.GetRes())
 	return
 }
 func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2441,7 +2441,7 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2465,7 +2465,7 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 	if (read_write & streams.PHP_STREAM_FILTER_READ) != 0 {
 		filter = streams.PhpStreamFilterCreate(filtername, filterparams, stream.GetIsPersistent())
 		if filter == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		if append != 0 {
@@ -2475,14 +2475,14 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 		}
 		if ret != zend.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if (read_write & streams.PHP_STREAM_FILTER_WRITE) != 0 {
 		filter = streams.PhpStreamFilterCreate(filtername, filterparams, stream.GetIsPersistent())
 		if filter == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		if append != 0 {
@@ -2492,17 +2492,17 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 		}
 		if ret != zend.SUCCESS {
 			streams.PhpStreamFilterRemove(filter, 1)
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	if filter != nil {
 		filter.SetRes(zend.ZendRegisterResource(filter, streams.PhpFileLeStreamFilter()))
 		filter.GetRes().AddRefcount()
-		zend.RETVAL_RES(filter.GetRes())
+		return_value.SetResource(filter.GetRes())
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2578,7 +2578,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2586,21 +2586,21 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 	filter = zend.ZendFetchResource(zfilter.GetRes(), nil, streams.PhpFileLeStreamFilter())
 	if filter == nil {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid resource given, not a stream filter")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if streams.PhpStreamFilterFlush(filter, 1) == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to flush filter, not removing")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if zend.ZendListClose(zfilter.GetRes()) == zend.FAILURE {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Could not invalidate filter, not removing")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	} else {
 		streams.PhpStreamFilterRemove(filter, 1)
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
@@ -2687,14 +2687,14 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if max_length < 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The maximum allowed length must be greater than or equal to zero")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	if max_length == 0 {
@@ -2702,10 +2702,10 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	if b.Assign(&buf, streams.PhpStreamGetRecord(stream, max_length, str, str_len)) {
-		zend.RETVAL_STR(buf)
+		return_value.SetString(buf)
 		return
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 }
@@ -2788,10 +2788,10 @@ func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	if core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_BLOCKING, block, nil) == -1 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2890,10 +2890,10 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 		t.tv_usec = 0
 	}
 	if core.PHP_STREAM_OPTION_RETURN_OK == core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_TIMEOUT, 0, &t) {
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2971,7 +2971,7 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -2986,7 +2986,7 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 	} else {
 		ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_WRITE_BUFFER, core.PHP_STREAM_BUFFER_FULL, &buff)
 	}
-	zend.RETVAL_LONG(b.Cond(ret == 0, 0, r.EOF))
+	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
 func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3063,14 +3063,14 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if csize <= 0 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The chunk size must be a positive integer, given "+zend.ZEND_LONG_FMT, csize)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
@@ -3081,12 +3081,12 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 
 	if csize > core.INT_MAX {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The chunk size cannot be larger than %d", core.INT_MAX)
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamFromZval(stream, zstream)
 	ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_SET_CHUNK_SIZE, int(csize), nil)
-	zend.RETVAL_LONG(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
+	return_value.SetLong(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
 	return
 }
 func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3164,7 +3164,7 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -3179,7 +3179,7 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 	} else {
 		ret = core.PhpStreamSetOption(stream, core.PHP_STREAM_OPTION_READ_BUFFER, core.PHP_STREAM_BUFFER_FULL, &buff)
 	}
-	zend.RETVAL_LONG(b.Cond(ret == 0, 0, r.EOF))
+	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
 func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3273,7 +3273,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -3284,7 +3284,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 			var val *zend.Zval
 			if !(GET_CTX_OPT(stream, "ssl", "crypto_method", val)) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "When enabling encryption you must specify the crypto type")
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 			cryptokind = val.GetLval()
@@ -3293,20 +3293,20 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 			core.PhpStreamFromZval(sessstream, zsessstream)
 		}
 		if streams.PhpStreamXportCryptoSetup(stream, cryptokind, sessstream) < 0 {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 	}
 	ret = streams.PhpStreamXportCryptoEnable(stream, enable)
 	switch ret {
 	case -1:
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	case 0:
-		zend.RETVAL_LONG(0)
+		return_value.SetLong(0)
 		return
 	default:
-		zend.RETVAL_TRUE
+		return_value.SetTrue()
 		return
 	}
 }
@@ -3383,10 +3383,10 @@ func ZifStreamResolveIncludePath(execute_data *zend.ZendExecuteData, return_valu
 	}
 	resolved_path = zend.ZendResolvePath(filename, filename_len)
 	if resolved_path != nil {
-		zend.RETVAL_STR(resolved_path)
+		return_value.SetString(resolved_path)
 		return
 	}
-	zend.RETVAL_FALSE
+	return_value.SetFalse()
 	return
 }
 func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3452,7 +3452,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -3460,7 +3460,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	if zstream.IsType(zend.IS_RESOURCE) {
 		core.PhpStreamFromZval(stream, zstream)
 		if stream == nil {
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		wrapper = stream.GetWrapper()
@@ -3471,10 +3471,10 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		wrapper = streams.PhpStreamLocateUrlWrapper(zend.Z_STRVAL_P(zstream), nil, 0)
 	}
 	if wrapper == nil {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_BOOL(wrapper.GetIsUrl() == 0)
+	zend.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
 	return
 }
 func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3543,17 +3543,17 @@ func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zen
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	core.PhpStreamFromZval(stream, zsrc)
 	if core.PhpStreamSupportsLock(stream) == 0 {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3623,7 +3623,7 @@ func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
@@ -3634,13 +3634,13 @@ func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	} else if core.PhpStreamCanCast(stream, core.PHP_STREAM_AS_FD) == zend.SUCCESS {
 		core.PhpStreamCast(stream, core.PHP_STREAM_AS_FD, any(&fileno), 0)
 	} else {
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 
 	/* Check if the file descriptor identifier is a terminal */
 
-	zend.RETVAL_BOOL(zend.Isatty(fileno) != 0)
+	zend.ZVAL_BOOL(return_value, zend.Isatty(fileno) != 0)
 
 	/* Check if the file descriptor identifier is a terminal */
 }
@@ -3717,17 +3717,17 @@ func ZifStreamSocketShutdown(execute_data *zend.ZendExecuteData, return_value *z
 					}
 				}
 			}
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		break
 	}
 	if how != streams.STREAM_SHUT_RD && how != streams.STREAM_SHUT_WR && how != streams.STREAM_SHUT_RDWR {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Second parameter $how needs to be one of STREAM_SHUT_RD, STREAM_SHUT_WR or STREAM_SHUT_RDWR")
-		zend.RETVAL_FALSE
+		return_value.SetFalse()
 		return
 	}
 	core.PhpStreamFromZval(stream, zstream)
-	zend.RETVAL_BOOL(streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
+	zend.ZVAL_BOOL(return_value, streams.PhpStreamXportShutdown(stream, streams.StreamShutdownT(how)) == 0)
 	return
 }

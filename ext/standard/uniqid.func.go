@@ -116,6 +116,6 @@ func ZifUniqid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	} else {
 		uniqid = core.Strpprintf(0, "%s%08x%05x", prefix, sec, usec)
 	}
-	zend.RETVAL_STR(uniqid)
+	return_value.SetString(uniqid)
 	return
 }

@@ -363,7 +363,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	pnstr = SplGenPrivatePropName(ce, "isCorrupted", b.SizeOf("\"isCorrupted\"")-1)
-	zend.ZVAL_BOOL(&tmp, intern.GetHeap().GetFlags()&SPL_HEAP_CORRUPTED)
+	zend.ZVAL_BOOL(&tmp, intern.GetHeap().IsHeapCorrupted())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	zend.ArrayInit(&heap_array)
@@ -406,7 +406,7 @@ func zim_spl_SplHeap_count(execute_data *zend.ZendExecuteData, return_value *zen
 		return
 	}
 	count = intern.GetHeap().GetCount()
-	zend.RETVAL_LONG(count)
+	return_value.SetLong(count)
 	return
 }
 func zim_spl_SplHeap_isEmpty(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -414,7 +414,7 @@ func zim_spl_SplHeap_isEmpty(execute_data *zend.ZendExecuteData, return_value *z
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.GetHeap().GetCount() == 0)
+	zend.ZVAL_BOOL(return_value, intern.GetHeap().GetCount() == 0)
 	return
 }
 func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -430,7 +430,7 @@ func zim_spl_SplHeap_insert(execute_data *zend.ZendExecuteData, return_value *ze
 	}
 	value.TryAddRefcount()
 	SplPtrHeapInsert(intern.GetHeap(), value, zend.ZEND_THIS)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func zim_spl_SplHeap_extract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -464,7 +464,7 @@ func zim_spl_SplPriorityQueue_insert(execute_data *zend.ZendExecuteData, return_
 	zend.ZVAL_COPY(elem.GetData(), data)
 	zend.ZVAL_COPY(elem.GetPriority(), priority)
 	SplPtrHeapInsert(intern.GetHeap(), &elem, zend.ZEND_THIS)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func zim_spl_SplPriorityQueue_extract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -516,7 +516,7 @@ func zim_spl_SplPriorityQueue_setExtractFlags(execute_data *zend.ZendExecuteData
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
 	intern.SetFlags(value)
-	zend.RETVAL_LONG(intern.GetFlags())
+	return_value.SetLong(intern.GetFlags())
 	return
 }
 func zim_spl_SplPriorityQueue_getExtractFlags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -525,7 +525,7 @@ func zim_spl_SplPriorityQueue_getExtractFlags(execute_data *zend.ZendExecuteData
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	zend.RETVAL_LONG(intern.GetFlags())
+	return_value.SetLong(intern.GetFlags())
 	return
 }
 func zim_spl_SplHeap_recoverFromCorruption(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -535,7 +535,7 @@ func zim_spl_SplHeap_recoverFromCorruption(execute_data *zend.ZendExecuteData, r
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
 	intern.GetHeap().SetFlags(intern.GetHeap().GetFlags() & ^SPL_HEAP_CORRUPTED)
-	zend.RETVAL_TRUE
+	return_value.SetTrue()
 	return
 }
 func zim_spl_SplHeap_isCorrupted(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -544,7 +544,7 @@ func zim_spl_SplHeap_isCorrupted(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 	intern = Z_SPLHEAP_P(zend.ZEND_THIS)
-	zend.RETVAL_BOOL(intern.GetHeap().IsHeapCorrupted())
+	zend.ZVAL_BOOL(return_value, intern.GetHeap().IsHeapCorrupted())
 	return
 }
 func zim_spl_SplPriorityQueue_compare(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -553,7 +553,7 @@ func zim_spl_SplPriorityQueue_compare(execute_data *zend.ZendExecuteData, return
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(SplPtrHeapZvalMaxCmp(a, b, nil))
+	return_value.SetLong(SplPtrHeapZvalMaxCmp(a, b, nil))
 	return
 }
 func zim_spl_SplHeap_top(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -580,7 +580,7 @@ func zim_spl_SplMinHeap_compare(execute_data *zend.ZendExecuteData, return_value
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(SplPtrHeapZvalMinCmp(a, b, nil))
+	return_value.SetLong(SplPtrHeapZvalMinCmp(a, b, nil))
 	return
 }
 func zim_spl_SplMaxHeap_compare(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -589,7 +589,7 @@ func zim_spl_SplMaxHeap_compare(execute_data *zend.ZendExecuteData, return_value
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &a, &b) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(SplPtrHeapZvalMaxCmp(a, b, nil))
+	return_value.SetLong(SplPtrHeapZvalMaxCmp(a, b, nil))
 	return
 }
 func SplHeapItDtor(iter *zend.ZendObjectIterator) {
@@ -651,7 +651,7 @@ func zim_spl_SplHeap_key(execute_data *zend.ZendExecuteData, return_value *zend.
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(intern.GetHeap().GetCount() - 1)
+	return_value.SetLong(intern.GetHeap().GetCount() - 1)
 	return
 }
 func zim_spl_SplHeap_next(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -666,7 +666,7 @@ func zim_spl_SplHeap_valid(execute_data *zend.ZendExecuteData, return_value *zen
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_BOOL(intern.GetHeap().GetCount() != 0)
+	zend.ZVAL_BOOL(return_value, intern.GetHeap().GetCount() != 0)
 	return
 }
 func zim_spl_SplHeap_rewind(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -680,7 +680,7 @@ func zim_spl_SplHeap_current(execute_data *zend.ZendExecuteData, return_value *z
 		return
 	}
 	if intern.GetHeap().GetCount() == 0 {
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	} else {
 		var element *zend.Zval = SplHeapElem(intern.GetHeap(), 0)
@@ -693,7 +693,7 @@ func zim_spl_SplPriorityQueue_current(execute_data *zend.ZendExecuteData, return
 		return
 	}
 	if intern.GetHeap().GetCount() == 0 {
-		zend.RETVAL_NULL()
+		return_value.SetNull()
 		return
 	} else {
 		var elem *SplPqueueElem = SplHeapElem(intern.GetHeap(), 0)
@@ -704,14 +704,14 @@ func zim_spl_SplHeap___debugInfo(execute_data *zend.ZendExecuteData, return_valu
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_ARR(SplHeapObjectGetDebugInfo(spl_ce_SplHeap, zend.getThis()))
+	return_value.SetArray(SplHeapObjectGetDebugInfo(spl_ce_SplHeap, zend.getThis()))
 	return
 }
 func zim_spl_SplPriorityQueue___debugInfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_ARR(SplHeapObjectGetDebugInfo(spl_ce_SplPriorityQueue, zend.getThis()))
+	return_value.SetArray(SplHeapObjectGetDebugInfo(spl_ce_SplPriorityQueue, zend.getThis()))
 	return
 }
 func SplHeapGetIterator(ce *zend.ZendClassEntry, object *zend.Zval, by_ref int) *zend.ZendObjectIterator {

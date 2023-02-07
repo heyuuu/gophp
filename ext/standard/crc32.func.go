@@ -117,12 +117,12 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	crc = crcinit ^ 0xffffffff
 	if HasCrc32Insn() != 0 {
 		crc = Crc32Aarch64(crc, p, nr)
-		zend.RETVAL_LONG(crc ^ 0xffffffff)
+		return_value.SetLong(crc ^ 0xffffffff)
 		return
 	}
 	for ; b.PostDec(&nr); p++ {
 		crc = crc>>8&0xffffff ^ Crc32tab[(crc^(*p))&0xff]
 	}
-	zend.RETVAL_LONG(crc ^ 0xffffffff)
+	return_value.SetLong(crc ^ 0xffffffff)
 	return
 }

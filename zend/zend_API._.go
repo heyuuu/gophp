@@ -90,9 +90,6 @@ const WRONG_PARAM_COUNT = ZEND_WRONG_PARAM_COUNT()
  * If args is given then those replace the argument info in fci is temporarily.
  */
 
-const RETVAL_FALSE = return_value.SetFalse()
-const RETVAL_TRUE = return_value.SetTrue()
-
 /* For compatibility */
 
 const ZEND_MINIT = ZEND_MODULE_STARTUP_N

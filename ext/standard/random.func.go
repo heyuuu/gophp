@@ -143,7 +143,7 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	bytes.GetVal()[size] = '0'
-	zend.RETVAL_STR(bytes)
+	return_value.SetString(bytes)
 	return
 }
 func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, should_throw zend.ZendBool) int {
@@ -275,6 +275,6 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if PhpRandomIntThrow(min, max, &result) == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_LONG(result)
+	return_value.SetLong(result)
 	return
 }

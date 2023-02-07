@@ -532,14 +532,14 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		bdata = &(BROWSCAP_G(activation_bdata))
 		if bdata.GetHtab() == nil {
 			if BrowscapReadFile(bdata.GetFilename(), bdata, 0) == zend.FAILURE {
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	} else {
 		if GlobalBdata.GetHtab() == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "browscap ini directive not set")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		bdata = &GlobalBdata
@@ -625,7 +625,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		if http_user_agent == nil {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "HTTP_USER_AGENT variable is not set, cannot determine user agent name")
-			zend.RETVAL_FALSE
+			return_value.SetFalse()
 			return
 		}
 		agent_name = http_user_agent.GetStr()
@@ -647,14 +647,14 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 			found_entry = zend.ZendHashStrFindPtr(bdata.GetHtab(), DEFAULT_SECTION_NAME, b.SizeOf("DEFAULT_SECTION_NAME")-1)
 			if found_entry == nil {
 				zend.ZendStringRelease(lookup_browser_name)
-				zend.RETVAL_FALSE
+				return_value.SetFalse()
 				return
 			}
 		}
 	}
 	agent_ht = BrowscapEntryToArray(bdata, found_entry)
 	if return_array != 0 {
-		zend.RETVAL_ARR(agent_ht)
+		return_value.SetArray(agent_ht)
 	} else {
 		zend.ObjectAndPropertiesInit(return_value, zend.ZendStandardClassDef, agent_ht)
 	}

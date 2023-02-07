@@ -52,6 +52,6 @@ func ZifLcgValue(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.RETVAL_DOUBLE(PhpCombinedLcg())
+	return_value.SetDouble(PhpCombinedLcg())
 	return
 }

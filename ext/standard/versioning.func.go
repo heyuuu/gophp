@@ -264,33 +264,33 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	compare = PhpVersionCompare(v1, v2)
 	if op == nil {
-		zend.RETVAL_LONG(compare)
+		return_value.SetLong(compare)
 		return
 	}
 	if !(strncmp(op, "<", op_len)) || !(strncmp(op, "lt", op_len)) {
-		zend.RETVAL_BOOL(compare == -1)
+		zend.ZVAL_BOOL(return_value, compare == -1)
 		return
 	}
 	if !(strncmp(op, "<=", op_len)) || !(strncmp(op, "le", op_len)) {
-		zend.RETVAL_BOOL(compare != 1)
+		zend.ZVAL_BOOL(return_value, compare != 1)
 		return
 	}
 	if !(strncmp(op, ">", op_len)) || !(strncmp(op, "gt", op_len)) {
-		zend.RETVAL_BOOL(compare == 1)
+		zend.ZVAL_BOOL(return_value, compare == 1)
 		return
 	}
 	if !(strncmp(op, ">=", op_len)) || !(strncmp(op, "ge", op_len)) {
-		zend.RETVAL_BOOL(compare != -1)
+		zend.ZVAL_BOOL(return_value, compare != -1)
 		return
 	}
 	if !(strncmp(op, "==", op_len)) || !(strncmp(op, "=", op_len)) || !(strncmp(op, "eq", op_len)) {
-		zend.RETVAL_BOOL(compare == 0)
+		zend.ZVAL_BOOL(return_value, compare == 0)
 		return
 	}
 	if !(strncmp(op, "!=", op_len)) || !(strncmp(op, "<>", op_len)) || !(strncmp(op, "ne", op_len)) {
-		zend.RETVAL_BOOL(compare != 0)
+		zend.ZVAL_BOOL(return_value, compare != 0)
 		return
 	}
-	zend.RETVAL_NULL()
+	return_value.SetNull()
 	return
 }

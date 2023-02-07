@@ -1498,7 +1498,7 @@ func ZEND_ISSET_ISEMPTY_STATIC_PROP_SPEC_HANDLER(execute_data *ZendExecuteData) 
 		result = result != SUCCESS || IZendIsTrue(value) == 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_EXIT_SPEC_HANDLER(execute_data *ZendExecuteData) int {
@@ -2348,7 +2348,7 @@ func ZEND_BOOL_NOT_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), !(IZendIsTrue(val)))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) == 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -2804,7 +2804,7 @@ func ZEND_BOOL_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) != 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -2872,7 +2872,7 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 		result.SetNull()
 		break
 	case _IS_BOOL:
-		ZVAL_BOOL(result, ZendIsTrue(expr))
+		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -3421,11 +3421,11 @@ func ZEND_TYPE_CHECK_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	}
 	if (IS_CONST & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZEND_VM_SMART_BRANCH(result, 1)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else {
 		ZEND_VM_SMART_BRANCH(result, 0)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -3701,7 +3701,7 @@ func ZEND_IS_IDENTICAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) i
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = FastIsIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -3713,7 +3713,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteDat
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_EQUAL_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -4882,7 +4882,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -4905,7 +4905,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecu
 	}
 isset_dim_obj_exit:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -4933,7 +4933,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CONST_HANDLER(execute_data *ZendExec
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -5730,7 +5730,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteD
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5742,7 +5742,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExe
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5754,7 +5754,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendEx
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -5765,7 +5765,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecut
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5777,7 +5777,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendE
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5789,7 +5789,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *Zend
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -5800,7 +5800,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_HANDLER(execute_data *Zen
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5812,7 +5812,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5824,7 +5824,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_dat
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -5835,7 +5835,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_HANDLER(execute_data *Z
 	op1 = RT_CONSTANT(opline, opline.GetOp1())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5847,7 +5847,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPZ_HANDLER(execute_da
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -5859,7 +5859,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_CONST_TMPVARCV_JMPNZ_HANDLER(execute_d
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_FETCH_DIM_R_INDEX_SPEC_CONST_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -6859,7 +6859,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExec
 
 				ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -6883,7 +6883,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExec
 isset_dim_obj_exit:
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -6913,7 +6913,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExe
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -7734,7 +7734,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteD
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_DECLARE_LAMBDA_FUNCTION_SPEC_CONST_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -9023,7 +9023,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteD
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -9046,7 +9046,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteD
 	}
 isset_dim_obj_exit:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -9074,7 +9074,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CONST_CV_HANDLER(execute_data *ZendExecute
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CONST_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -9963,7 +9963,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteDat
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() == op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -9975,7 +9975,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecu
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() == op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -9987,7 +9987,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExec
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() == op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -9998,7 +9998,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteD
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() == op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10010,7 +10010,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExe
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() == op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10022,7 +10022,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendEx
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() == op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10033,7 +10033,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecut
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() != op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10045,7 +10045,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendE
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() != op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10057,7 +10057,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *Zend
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() != op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10068,7 +10068,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExec
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() != op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10080,7 +10080,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *Zen
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() != op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10092,7 +10092,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *Ze
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() != op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10103,7 +10103,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteD
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() < op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10115,7 +10115,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExe
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10127,7 +10127,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendEx
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10138,7 +10138,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecut
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() < op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10150,7 +10150,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendE
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10162,7 +10162,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *Zend
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10173,7 +10173,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_HANDLER(execute_data *Zen
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() <= op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10185,7 +10185,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10197,7 +10197,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_dat
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -10208,7 +10208,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_HANDLER(execute_data *Z
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() <= op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10220,7 +10220,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPZ_HANDLER(execute_da
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10232,7 +10232,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_CONST_JMPNZ_HANDLER(execute_d
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_ADD_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -10840,7 +10840,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecute
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() == op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10852,7 +10852,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendEx
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() == op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10864,7 +10864,7 @@ func ZEND_IS_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendE
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() == op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -10875,7 +10875,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecu
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() == op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10887,7 +10887,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *Zend
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() == op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10899,7 +10899,7 @@ func ZEND_IS_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *Zen
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() == op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -10910,7 +10910,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExe
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() != op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10922,7 +10922,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *Ze
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() != op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10934,7 +10934,7 @@ func ZEND_IS_NOT_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *Z
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() != op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -10945,7 +10945,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendE
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() != op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10957,7 +10957,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() != op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10969,7 +10969,7 @@ func ZEND_IS_NOT_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data 
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() != op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -10980,7 +10980,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecu
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -10992,7 +10992,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *Zend
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11004,7 +11004,7 @@ func ZEND_IS_SMALLER_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *Zen
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() < op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -11015,7 +11015,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExe
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11027,7 +11027,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *Ze
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11039,7 +11039,7 @@ func ZEND_IS_SMALLER_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *Z
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() < op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -11050,7 +11050,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11062,7 +11062,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_d
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11074,7 +11074,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_LONG_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetLval() <= op2.GetLval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data *ZendExecuteData) int {
@@ -11085,7 +11085,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_HANDLER(execute_data
 	op1 = EX_VAR(opline.GetOp1().GetVar())
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11097,7 +11097,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPZ_HANDLER(execute
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execute_data *ZendExecuteData) int {
@@ -11109,7 +11109,7 @@ func ZEND_IS_SMALLER_OR_EQUAL_DOUBLE_SPEC_TMPVARCV_TMPVARCV_JMPNZ_HANDLER(execut
 	op2 = EX_VAR(opline.GetOp2().GetVar())
 	result = op1.GetDval() <= op2.GetDval()
 	ZEND_VM_SMART_BRANCH_JMPNZ(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_FETCH_LIST_R_SPEC_TMPVARCV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -11162,7 +11162,7 @@ func ZEND_BOOL_NOT_SPEC_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), !(IZendIsTrue(val)))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) == 0)
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
@@ -11370,7 +11370,7 @@ func ZEND_BOOL_SPEC_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) != 0)
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
@@ -11558,11 +11558,11 @@ func ZEND_TYPE_CHECK_SPEC_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
 	if ((IS_TMP_VAR | IS_VAR) & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZvalPtrDtorNogc(free_op1)
 		ZEND_VM_SMART_BRANCH(result, 1)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else {
 		ZEND_VM_SMART_BRANCH(result, 0)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -12613,7 +12613,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExec
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -12637,7 +12637,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExec
 isset_dim_obj_exit:
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -12667,7 +12667,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExe
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -12737,7 +12737,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_FETCH_DIM_R_INDEX_SPEC_TMPVAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -13917,7 +13917,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExe
 
 				ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -13942,7 +13942,7 @@ isset_dim_obj_exit:
 	ZvalPtrDtorNogc(free_op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -13974,7 +13974,7 @@ isset_object_finish:
 	ZvalPtrDtorNogc(free_op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -14046,7 +14046,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func zend_fetch_var_address_helper_SPEC_TMPVAR_UNUSED(type_ int, execute_data *ZendExecuteData) int {
@@ -14218,7 +14218,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_TMPVAR_UNUSED_HANDLER(execute_data *ZendExecute
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_INSTANCEOF_SPEC_TMPVAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -14261,7 +14261,7 @@ try_instanceof:
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_COUNT_SPEC_TMPVAR_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -15032,7 +15032,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecute
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -15056,7 +15056,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecute
 isset_dim_obj_exit:
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -15086,7 +15086,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecut
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_TMPVAR_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -15373,7 +15373,7 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 		result.SetNull()
 		break
 	case _IS_BOOL:
-		ZVAL_BOOL(result, ZendIsTrue(expr))
+		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -15837,7 +15837,7 @@ func ZEND_IS_IDENTICAL_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int
 	result = FastIsIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -15851,7 +15851,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData)
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_FETCH_DIM_FUNC_ARG_SPEC_TMP_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -16506,7 +16506,7 @@ func ZEND_IS_IDENTICAL_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
@@ -16522,7 +16522,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) i
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_TMP_TMP_HANDLER(execute_data *ZendExecuteData) int {
@@ -18181,7 +18181,7 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 		result.SetNull()
 		break
 	case _IS_BOOL:
-		ZVAL_BOOL(result, ZendIsTrue(expr))
+		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -19033,7 +19033,7 @@ func ZEND_IS_IDENTICAL_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int
 	result = FastIsIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -19047,7 +19047,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData)
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_OBJ_OP_SPEC_VAR_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -22947,7 +22947,7 @@ func ZEND_IS_IDENTICAL_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) int {
@@ -22963,7 +22963,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_TMP_HANDLER(execute_data *ZendExecuteData) i
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_SPEC_VAR_TMP_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -23177,7 +23177,7 @@ func ZEND_IS_IDENTICAL_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -23193,7 +23193,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_VAR_VAR_HANDLER(execute_data *ZendExecuteData) i
 	ZvalPtrDtorNogc(free_op1)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_SPEC_VAR_VAR_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -28093,7 +28093,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExe
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_UNUSED_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -29623,7 +29623,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_TMPVAR_HANDLER(execute_data *ZendEx
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_UNUSED_TMP_HANDLER(execute_data *ZendExecuteData) int {
@@ -30360,7 +30360,7 @@ func ZEND_FETCH_THIS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) i
 }
 func ZEND_ISSET_ISEMPTY_THIS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), opline.GetExtendedValue()&ZEND_ISEMPTY^EX(This).u1.v.type_ == IS_OBJECT)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), (opline.GetExtendedValue()&ZEND_ISEMPTY^EX(This).u1.v.type_ == IS_OBJECT) != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_GET_CLASS_SPEC_UNUSED_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -31826,7 +31826,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecut
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_UNUSED_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -32016,7 +32016,7 @@ func ZEND_BOOL_NOT_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), !(IZendIsTrue(val)))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) == 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -32683,7 +32683,7 @@ func ZEND_BOOL_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 			ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 		}
 	} else {
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val))
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), IZendIsTrue(val) != 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -32751,7 +32751,7 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 		result.SetNull()
 		break
 	case _IS_BOOL:
-		ZVAL_BOOL(result, ZendIsTrue(expr))
+		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
 		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
@@ -33295,11 +33295,11 @@ func ZEND_TYPE_CHECK_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	}
 	if (IS_CV & (IS_TMP_VAR | IS_VAR)) != 0 {
 		ZEND_VM_SMART_BRANCH(result, 1)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	} else {
 		ZEND_VM_SMART_BRANCH(result, 0)
-		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+		ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 		ZEND_VM_NEXT_OPCODE()
 	}
 }
@@ -33519,7 +33519,7 @@ func ZEND_IS_IDENTICAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int 
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = FastIsIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -33531,7 +33531,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) 
 	op2 = RT_CONSTANT(opline, opline.GetOp2())
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_EQUAL_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -36005,7 +36005,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteD
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -36028,7 +36028,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteD
 	}
 isset_dim_obj_exit:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -36056,7 +36056,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CONST_HANDLER(execute_data *ZendExecute
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CONST == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -36121,7 +36121,7 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_CV_CONST_HANDLER(execute_data *ZendExecuteData) int {
@@ -39082,7 +39082,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecute
 
 				ZvalPtrDtorNogc(free_op2)
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -39106,7 +39106,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecute
 isset_dim_obj_exit:
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -39136,7 +39136,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecut
 isset_object_finish:
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_TMPVAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -39177,7 +39177,7 @@ func ZEND_IS_IDENTICAL_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	result = FastIsIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) int {
@@ -39191,7 +39191,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CV_TMP_HANDLER(execute_data *ZendExecuteData) in
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_SPEC_CV_TMP_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -39394,7 +39394,7 @@ func ZEND_IS_IDENTICAL_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	result = FastIsIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -39408,7 +39408,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) in
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZvalPtrDtorNogc(free_op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ASSIGN_SPEC_CV_VAR_RETVAL_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -39507,7 +39507,7 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_CV_VAR_HANDLER(execute_data *ZendExecuteData) int {
@@ -40489,7 +40489,7 @@ func ZEND_ISSET_ISEMPTY_CV_SPEC_CV_UNUSED_EMPTY_HANDLER(execute_data *ZendExecut
 		HANDLE_EXCEPTION()
 	}
 	ZEND_VM_SMART_BRANCH(result, 0)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE()
 }
 func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -40527,7 +40527,7 @@ func ZEND_ISSET_ISEMPTY_VAR_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData
 		}
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_INSTANCEOF_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -40567,7 +40567,7 @@ try_instanceof:
 		result = 0
 	}
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_YIELD_SPEC_CV_UNUSED_HANDLER(execute_data *ZendExecuteData) int {
@@ -41001,7 +41001,7 @@ func ZEND_IS_IDENTICAL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
 	op2 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 	result = FastIsIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_NOT_IDENTICAL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -41013,7 +41013,7 @@ func ZEND_IS_NOT_IDENTICAL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int
 	op2 = _get_zval_ptr_cv_deref_BP_VAR_R(opline.GetOp2().GetVar(), EXECUTE_DATA_C)
 	result = FastIsNotIdenticalFunction(op1, op2)
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_IS_EQUAL_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -43504,7 +43504,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData
 				/* avoid exception check */
 
 				ZEND_VM_SMART_BRANCH(result, 0)
-				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+				ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 				ZEND_VM_NEXT_OPCODE()
 			}
 		} else {
@@ -43527,7 +43527,7 @@ func ZEND_ISSET_ISEMPTY_DIM_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData
 	}
 isset_dim_obj_exit:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
@@ -43555,7 +43555,7 @@ func ZEND_ISSET_ISEMPTY_PROP_OBJ_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteDat
 	result = opline.GetExtendedValue()&ZEND_ISEMPTY ^ Z_OBJ_HT_P(container).GetHasProperty()(container, offset, opline.GetExtendedValue()&ZEND_ISEMPTY, b.CondF1(IS_CV == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_ISEMPTY) }, nil))
 isset_object_finish:
 	ZEND_VM_SMART_BRANCH(result, 1)
-	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result)
+	ZVAL_BOOL(EX_VAR(opline.GetResult().GetVar()), result != 0)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
 func ZEND_ARRAY_KEY_EXISTS_SPEC_CV_CV_HANDLER(execute_data *ZendExecuteData) int {
