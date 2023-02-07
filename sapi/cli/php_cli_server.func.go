@@ -8,6 +8,7 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"strings"
 )
 
 func CLI_SERVER_G(v int) __auto__ { return CliServerGlobals.v }
@@ -103,12 +104,12 @@ func AppendEssentialHeaders(buffer *zend.SmartStr, client *PhpCliServerClient, p
 	buffer.AppendString("Connection: close\r\n")
 }
 func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
-	var ret *byte
-	var ext_lower *byte = zend.DoAlloca(ext_len+1, use_heap)
-	zend.ZendStrTolowerCopy(ext_lower, ext, ext_len)
-	ret = zend.ZendHashStrFindPtr(server.GetExtensionMimeTypes(), ext_lower, ext_len)
-	zend.FreeAlloca(ext_lower, use_heap)
-	return (*byte)(ret)
+	var s = b.CastStr(ext, ext_len)
+	var sLower = strings.ToLower(s)
+	if mimeType, ok := MimeTypeMap[sLower]; ok {
+		return b.CastStrPtr(mimeType)
+	}
+	return nil
 }
 func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var client *PhpCliServerClient
@@ -1599,18 +1600,9 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	DestroyRequestInfo(&(core.SG(request_info)))
 	return zend.SUCCESS
 }
-func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerExtMimeTypePair) int {
-	var pair *PhpCliServerExtMimeTypePair
-	zend.ZendHashInit(server.GetExtensionMimeTypes(), 0, nil, nil, 1)
-	for pair = mime_type_map; pair.GetExt() != nil; pair++ {
-		var ext_len int = strlen(pair.GetExt())
-		zend.ZendHashStrAddPtr(server.GetExtensionMimeTypes(), pair.GetExt(), ext_len, any(pair.GetMimeType()))
-	}
-	return zend.SUCCESS
-}
 func PhpCliServerDtor(server *PhpCliServer) {
 	server.GetClients().Destroy()
-	server.GetExtensionMimeTypes().Destroy()
+	//server.GetExtensionMimeTypes().Destroy()
 	if zend.ZEND_VALID_SOCKET(server.GetServerSock()) {
 		core.Closesocket(server.GetServerSock())
 	}
@@ -1737,10 +1729,6 @@ func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, rou
 	} else {
 		server.SetRouter(nil)
 		server.SetRouterLen(0)
-	}
-	if PhpCliServerMimeTypeCtor(server, MimeTypeMap) == zend.FAILURE {
-		retval = zend.FAILURE
-		goto out
 	}
 	server.SetIsRunning(1)
 out:
@@ -1884,7 +1872,6 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
-func PhpCliServerSigintHandler(sig int) { Server.SetIsRunning(0) }
 func DoCliServer(argc int, argv **byte) int {
 	var php_optarg *byte = nil
 	var php_optind int = 1
