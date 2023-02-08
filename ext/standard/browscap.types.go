@@ -103,15 +103,15 @@ type BrowserData struct {
 //         filename:filename,
 //     }
 // }
-// func MakeBrowserData(htab *zend.HashTable, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
-//     return BrowserData{
-//         htab:htab,
-//         kv:kv,
-//         kv_used:kv_used,
-//         kv_size:kv_size,
-//         filename:filename,
-//     }
-// }
+func MakeBrowserData(htab *zend.HashTable, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
+	return BrowserData{
+		htab:     htab,
+		kv:       kv,
+		kv_used:  kv_used,
+		kv_size:  kv_size,
+		filename: filename,
+	}
+}
 func (this *BrowserData) GetHtab() *zend.HashTable      { return this.htab }
 func (this *BrowserData) SetHtab(value *zend.HashTable) { this.htab = value }
 func (this *BrowserData) GetKv() *BrowscapKv            { return this.kv }
@@ -162,14 +162,14 @@ type BrowscapParserCtx struct {
 //         str_interned:str_interned,
 //     }
 // }
-// func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *zend.ZendString, str_interned zend.HashTable) BrowscapParserCtx {
-//     return BrowscapParserCtx{
-//         bdata:bdata,
-//         current_entry:current_entry,
-//         current_section_name:current_section_name,
-//         str_interned:str_interned,
-//     }
-// }
+func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *zend.ZendString, str_interned zend.HashTable) BrowscapParserCtx {
+	return BrowscapParserCtx{
+		bdata:                bdata,
+		current_entry:        current_entry,
+		current_section_name: current_section_name,
+		str_interned:         str_interned,
+	}
+}
 func (this *BrowscapParserCtx) GetBdata() *BrowserData               { return this.bdata }
 func (this *BrowscapParserCtx) SetBdata(value *BrowserData)          { this.bdata = value }
 func (this *BrowscapParserCtx) GetCurrentEntry() *BrowscapEntry      { return this.current_entry }

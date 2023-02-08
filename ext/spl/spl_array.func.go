@@ -1311,7 +1311,7 @@ func zim_spl_Array_serialize(execute_data *zend.ZendExecuteData, return_value *z
 	var members zend.Zval
 	var flags zend.Zval
 	var var_hash standard.PhpSerializeDataT
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

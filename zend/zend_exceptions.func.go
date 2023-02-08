@@ -484,7 +484,7 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 	var index ZendUlong
 	var object *Zval
 	var base_ce *ZendClassEntry
-	var str SmartStr = SmartStr{0}
+	var str SmartStr = MakeSmartStr(0)
 	var num uint32 = 0
 	if ZendParseParametersNone() == FAILURE {
 		return

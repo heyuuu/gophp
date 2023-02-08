@@ -22,15 +22,15 @@ type ZendFunctionEntry struct {
 //         flags:flags,
 //     }
 // }
-// func MakeZendFunctionEntry(fname *byte, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
-//     return ZendFunctionEntry{
-//         fname:fname,
-//         handler:handler,
-//         arg_info:arg_info,
-//         num_args:num_args,
-//         flags:flags,
-//     }
-// }
+func MakeZendFunctionEntry(fname *byte, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
+	return ZendFunctionEntry{
+		fname:    fname,
+		handler:  handler,
+		arg_info: arg_info,
+		num_args: num_args,
+		flags:    flags,
+	}
+}
 func (this *ZendFunctionEntry) GetFname() *byte { return this.fname }
 
 // func (this *ZendFunctionEntry) SetFname(value *byte) { this.fname = value }
@@ -89,17 +89,17 @@ type ZendFcallInfo struct {
 //         param_count:param_count,
 //     }
 // }
-// func MakeZendFcallInfo(size int, function_name Zval, retval *Zval, params *Zval, object *ZendObject, no_separation ZendBool, param_count uint32) ZendFcallInfo {
-//     return ZendFcallInfo{
-//         size:size,
-//         function_name:function_name,
-//         retval:retval,
-//         params:params,
-//         object:object,
-//         no_separation:no_separation,
-//         param_count:param_count,
-//     }
-// }
+func MakeZendFcallInfo(size int, function_name Zval, retval *Zval, params *Zval, object *ZendObject, no_separation ZendBool, param_count uint32) ZendFcallInfo {
+	return ZendFcallInfo{
+		size:          size,
+		function_name: function_name,
+		retval:        retval,
+		params:        params,
+		object:        object,
+		no_separation: no_separation,
+		param_count:   param_count,
+	}
+}
 func (this *ZendFcallInfo) GetSize() int          { return this.size }
 func (this *ZendFcallInfo) SetSize(value int)     { this.size = value }
 func (this *ZendFcallInfo) GetFunctionName() Zval { return this.function_name }
@@ -134,14 +134,14 @@ type ZendFcallInfoCache struct {
 //         object:object,
 //     }
 // }
-// func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ZendClassEntry, called_scope *ZendClassEntry, object *ZendObject) ZendFcallInfoCache {
-//     return ZendFcallInfoCache{
-//         function_handler:function_handler,
-//         calling_scope:calling_scope,
-//         called_scope:called_scope,
-//         object:object,
-//     }
-// }
+func MakeZendFcallInfoCache(function_handler *ZendFunction, calling_scope *ZendClassEntry, called_scope *ZendClassEntry, object *ZendObject) ZendFcallInfoCache {
+	return ZendFcallInfoCache{
+		function_handler: function_handler,
+		calling_scope:    calling_scope,
+		called_scope:     called_scope,
+		object:           object,
+	}
+}
 func (this *ZendFcallInfoCache) GetFunctionHandler() *ZendFunction { return this.function_handler }
 func (this *ZendFcallInfoCache) SetFunctionHandler(value *ZendFunction) {
 	this.function_handler = value

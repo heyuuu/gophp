@@ -27,11 +27,11 @@ import (
 */
 
 var ArginfoCliSetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"title", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("title", 0, 0, 0),
 }
 var ArginfoCliGetProcessTitle []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 
 // Source: <sapi/cli/php_cli_process_title.c>

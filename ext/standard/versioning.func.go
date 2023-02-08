@@ -59,7 +59,19 @@ func PhpCanonicalizeVersion(version *byte) *byte {
 func CompareSpecialVersionForms(form1 *byte, form2 *byte) int {
 	var found1 int = -1
 	var found2 int = -1
-	var special_forms []SpecialFormsT = []SpecialFormsT{{"dev", 0}, {"alpha", 1}, {"a", 1}, {"beta", 2}, {"b", 2}, {"RC", 3}, {"rc", 3}, {"#", 4}, {"pl", 5}, {"p", 5}, {nil, 0}}
+	var special_forms []SpecialFormsT = []SpecialFormsT{
+		MakeSpecialFormsT("dev", 0),
+		MakeSpecialFormsT("alpha", 1),
+		MakeSpecialFormsT("a", 1),
+		MakeSpecialFormsT("beta", 2),
+		MakeSpecialFormsT("b", 2),
+		MakeSpecialFormsT("RC", 3),
+		MakeSpecialFormsT("rc", 3),
+		MakeSpecialFormsT("#", 4),
+		MakeSpecialFormsT("pl", 5),
+		MakeSpecialFormsT("p", 5),
+		MakeSpecialFormsT(nil, 0),
+	}
 	var pp *SpecialFormsT
 	for pp = special_forms; pp != nil && pp.GetName() != nil; pp++ {
 		if strncmp(form1, pp.GetName(), strlen(pp.GetName())) == 0 {

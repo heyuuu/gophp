@@ -69,68 +69,26 @@ var ZendGeneratorHandlers ZendObjectHandlers
 /* Pay attention so that the root of each subtree of the Generators tree is referenced
  * once per leaf */
 
-var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = ZendObjectIteratorFuncs{ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil}
+var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
 var ArginfoGeneratorVoid []ZendInternalArgInfo = []ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0},
+	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 }
-var ArginfoGeneratorSend []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"value", 0, 0, 0}}
-var ArginfoGeneratorThrow []ZendInternalArgInfo = []ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"exception", 0, 0, 0}}
+var ArginfoGeneratorSend []ZendInternalArgInfo = []ZendInternalArgInfo{
+	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	MakeZendInternalArgInfo("value", 0, 0, 0),
+}
+var ArginfoGeneratorThrow []ZendInternalArgInfo = []ZendInternalArgInfo{
+	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	MakeZendInternalArgInfo("exception", 0, 0, 0),
+}
 var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	{
-		"rewind",
-		zim_Generator_rewind,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"valid",
-		zim_Generator_valid,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"current",
-		zim_Generator_current,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"key",
-		zim_Generator_key,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"next",
-		zim_Generator_next,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"send",
-		zim_Generator_send,
-		ArginfoGeneratorSend,
-		uint32(b.SizeOf("arginfo_generator_send")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"throw",
-		zim_Generator_throw,
-		ArginfoGeneratorThrow,
-		uint32(b.SizeOf("arginfo_generator_throw")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{
-		"getReturn",
-		zim_Generator_getReturn,
-		ArginfoGeneratorVoid,
-		uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	MakeZendFunctionEntry("rewind", zim_Generator_rewind, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("valid", zim_Generator_valid, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("current", zim_Generator_current, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("key", zim_Generator_key, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("next", zim_Generator_next, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("send", zim_Generator_send, ArginfoGeneratorSend, uint32(b.SizeOf("arginfo_generator_send")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("throw", zim_Generator_throw, ArginfoGeneratorThrow, uint32(b.SizeOf("arginfo_generator_throw")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry("getReturn", zim_Generator_getReturn, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
+	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }

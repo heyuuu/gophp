@@ -911,7 +911,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
 			if !(PG(display_errors)) && !(SG(headers_sent)) && SG(sapi_headers).http_response_code == 200 {
-				var ctr SapiHeaderLine = SapiHeaderLine{0}
+				var ctr SapiHeaderLine = MakeSapiHeaderLine(0)
 				ctr.SetLine("HTTP/1.0 500 Internal Server Error")
 				ctr.SetLineLen(b.SizeOf("\"HTTP/1.0 500 Internal Server Error\"") - 1)
 				SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
@@ -1551,7 +1551,11 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 		phrase      *byte
 		directives  []*byte
 	}{
-		{zend.E_DEPRECATED, "Directive '%s' is deprecated", {"track_errors", "allow_url_include", nil}},
+		{
+			zend.E_DEPRECATED,
+			"Directive '%s' is deprecated",
+			{"track_errors", "allow_url_include", nil},
+		},
 		{
 			zend.E_CORE_ERROR,
 			"Directive '%s' is no longer available in PHP",

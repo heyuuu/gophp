@@ -2,7 +2,11 @@
 
 package zend
 
+
+
+
 // Source: <Zend/zend_execute_API.c>
+
 
 /*
    +----------------------------------------------------------------------+
@@ -24,10 +28,17 @@ package zend
    +----------------------------------------------------------------------+
 */
 
+
 /* true globals */
 
-var EmptyFcallInfo ZendFcallInfo = ZendFcallInfo{0, {{0}, {{0}}, {0}}, nil, nil, nil, 0, 0}
-var EmptyFcallInfoCache ZendFcallInfoCache = ZendFcallInfoCache{nil, nil, nil, nil}
+var EmptyFcallInfo ZendFcallInfo = MakeZendFcallInfo(0, {
+{0},
+{
+{0},
+},
+{0},
+}, nil, nil, nil, 0, 0)
+var EmptyFcallInfoCache ZendFcallInfoCache = MakeZendFcallInfoCache(nil, nil, nil, nil)
 
 /* This one doesn't exists on QNX */
 

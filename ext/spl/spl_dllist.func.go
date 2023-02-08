@@ -751,7 +751,7 @@ func zim_spl_SplDoublyLinkedList_current(execute_data *zend.ZendExecuteData, ret
 }
 func zim_spl_SplDoublyLinkedList_serialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
 	var flags zend.Zval

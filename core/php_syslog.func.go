@@ -9,8 +9,8 @@ import (
 func PhpSyslog(priority int, format string, _ ...any) {
 	var ptr *byte
 	var c uint8
-	var fbuf zend.SmartString = zend.SmartString{0}
-	var sbuf zend.SmartString = zend.SmartString{0}
+	var fbuf zend.SmartString = zend.MakeSmartString(0)
+	var sbuf zend.SmartString = zend.MakeSmartString(0)
 	var args va_list
 
 	/*

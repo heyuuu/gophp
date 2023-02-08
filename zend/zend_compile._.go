@@ -553,9 +553,33 @@ const ZEND_COMPILE_DEFAULT_FOR_EVAL = 0
 
 var CompilerGlobals ZendCompilerGlobals
 var ExecutorGlobals ZendExecutorGlobals
-var ReservedClassNames []ReservedClassName = []ReservedClassName{{ZEND_STRL("bool")}, {ZEND_STRL("false")}, {ZEND_STRL("float")}, {ZEND_STRL("int")}, {ZEND_STRL("null")}, {ZEND_STRL("parent")}, {ZEND_STRL("self")}, {ZEND_STRL("static")}, {ZEND_STRL("string")}, {ZEND_STRL("true")}, {ZEND_STRL("void")}, {ZEND_STRL("iterable")}, {ZEND_STRL("object")}, {nil, 0}}
+var ReservedClassNames []ReservedClassName = []ReservedClassName{
+	MakeReservedClassName(ZEND_STRL("bool")),
+	MakeReservedClassName(ZEND_STRL("false")),
+	MakeReservedClassName(ZEND_STRL("float")),
+	MakeReservedClassName(ZEND_STRL("int")),
+	MakeReservedClassName(ZEND_STRL("null")),
+	MakeReservedClassName(ZEND_STRL("parent")),
+	MakeReservedClassName(ZEND_STRL("self")),
+	MakeReservedClassName(ZEND_STRL("static")),
+	MakeReservedClassName(ZEND_STRL("string")),
+	MakeReservedClassName(ZEND_STRL("true")),
+	MakeReservedClassName(ZEND_STRL("void")),
+	MakeReservedClassName(ZEND_STRL("iterable")),
+	MakeReservedClassName(ZEND_STRL("object")),
+	MakeReservedClassName(nil, 0),
+}
 
-var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{{ZEND_STRL("int"), IS_LONG}, {ZEND_STRL("float"), IS_DOUBLE}, {ZEND_STRL("string"), IS_STRING}, {ZEND_STRL("bool"), _IS_BOOL}, {ZEND_STRL("void"), IS_VOID}, {ZEND_STRL("iterable"), IS_ITERABLE}, {ZEND_STRL("object"), IS_OBJECT}, {nil, 0, IS_UNDEF}}
+var BuiltinTypes []BuiltinTypeInfo = []BuiltinTypeInfo{
+	MakeBuiltinTypeInfo(ZEND_STRL("int"), IS_LONG),
+	MakeBuiltinTypeInfo(ZEND_STRL("float"), IS_DOUBLE),
+	MakeBuiltinTypeInfo(ZEND_STRL("string"), IS_STRING),
+	MakeBuiltinTypeInfo(ZEND_STRL("bool"), _IS_BOOL),
+	MakeBuiltinTypeInfo(ZEND_STRL("void"), IS_VOID),
+	MakeBuiltinTypeInfo(ZEND_STRL("iterable"), IS_ITERABLE),
+	MakeBuiltinTypeInfo(ZEND_STRL("object"), IS_OBJECT),
+	MakeBuiltinTypeInfo(nil, 0, IS_UNDEF),
+}
 
 /* Common part of zend_add_literal and zend_append_individual_literal */
 

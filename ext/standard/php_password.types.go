@@ -28,16 +28,16 @@ type PhpPasswordAlgo struct {
 //         valid:valid,
 //     }
 // }
-// func MakePhpPasswordAlgo(name *byte, hash func(password *zend.ZendString, options *zend.ZendArray) *zend.ZendString, verify func(password *zend.ZendString, hash *zend.ZendString) zend.ZendBool, needs_rehash func(password *zend.ZendString, options *zend.ZendArray) zend.ZendBool, get_info func(return_value *zend.Zval, hash *zend.ZendString) int, valid func(hash *zend.ZendString) zend.ZendBool) PhpPasswordAlgo {
-//     return PhpPasswordAlgo{
-//         name:name,
-//         hash:hash,
-//         verify:verify,
-//         needs_rehash:needs_rehash,
-//         get_info:get_info,
-//         valid:valid,
-//     }
-// }
+func MakePhpPasswordAlgo(name *byte, hash func(password *zend.ZendString, options *zend.ZendArray) *zend.ZendString, verify func(password *zend.ZendString, hash *zend.ZendString) zend.ZendBool, needs_rehash func(password *zend.ZendString, options *zend.ZendArray) zend.ZendBool, get_info func(return_value *zend.Zval, hash *zend.ZendString) int, valid func(hash *zend.ZendString) zend.ZendBool) PhpPasswordAlgo {
+	return PhpPasswordAlgo{
+		name:         name,
+		hash:         hash,
+		verify:       verify,
+		needs_rehash: needs_rehash,
+		get_info:     get_info,
+		valid:        valid,
+	}
+}
 func (this *PhpPasswordAlgo) GetName() *byte { return this.name }
 
 // func (this *PhpPasswordAlgo) SetName(value *byte) { this.name = value }

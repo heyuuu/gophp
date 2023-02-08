@@ -551,7 +551,7 @@ func ZendStopLexing() {
 func ZendBeginLoop(free_opcode ZendUchar, loop_var *Znode, is_switch ZendBool) {
 	var brk_cont_element *ZendBrkContElement
 	var parent int = CG__().GetContext().GetCurrentBrkCont()
-	var info ZendLoopVar = ZendLoopVar{0}
+	var info ZendLoopVar = MakeZendLoopVar(0)
 	CG__().GetContext().SetCurrentBrkCont(CG__().GetContext().GetLastBrkCont())
 	brk_cont_element = GetNextBrkContElement()
 	brk_cont_element.SetParent(parent)

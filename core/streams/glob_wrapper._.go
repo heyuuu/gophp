@@ -31,9 +31,9 @@ const GLOB_FLAGMASK = ^GLOB_ONLYDIR
 
 /* {{{ */
 
-var PhpGlobStreamOps core.PhpStreamOps = core.PhpStreamOps{nil, PhpGlobStreamRead, PhpGlobStreamClose, nil, "glob", PhpGlobStreamRewind, nil, nil, nil}
+var PhpGlobStreamOps core.PhpStreamOps = core.MakePhpStreamOps(nil, PhpGlobStreamRead, PhpGlobStreamClose, nil, "glob", PhpGlobStreamRewind, nil, nil, nil)
 
 /* {{{ php_glob_stream_opener */
 
-var PhpGlobStreamWrapperOps core.PhpStreamWrapperOps = core.PhpStreamWrapperOps{nil, nil, nil, nil, PhpGlobStreamOpener, "glob", nil, nil, nil, nil, nil}
-var PhpGlobStreamWrapper core.PhpStreamWrapper = core.PhpStreamWrapper{&PhpGlobStreamWrapperOps, nil, 0}
+var PhpGlobStreamWrapperOps core.PhpStreamWrapperOps = core.MakePhpStreamWrapperOps(nil, nil, nil, nil, PhpGlobStreamOpener, "glob", nil, nil, nil, nil, nil)
+var PhpGlobStreamWrapper core.PhpStreamWrapper = core.MakePhpStreamWrapper(&PhpGlobStreamWrapperOps, nil, 0)

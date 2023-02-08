@@ -16,12 +16,12 @@ type SpecialFormsT struct {
 //         order:order,
 //     }
 // }
-// func MakeSpecialFormsT(name *byte, order int) SpecialFormsT {
-//     return SpecialFormsT{
-//         name:name,
-//         order:order,
-//     }
-// }
+func MakeSpecialFormsT(name *byte, order int) SpecialFormsT {
+	return SpecialFormsT{
+		name:  name,
+		order: order,
+	}
+}
 func (this *SpecialFormsT) GetName() *byte { return this.name }
 
 // func (this *SpecialFormsT) SetName(value *byte) { this.name = value }

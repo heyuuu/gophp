@@ -686,7 +686,7 @@ func spl_RecursiveTreeIterator_new(class_type *zend.ZendClassEntry) *zend.ZendOb
 	return spl_RecursiveIteratorIterator_new_ex(class_type, 1)
 }
 func SplRecursiveTreeIteratorGetPrefix(object *SplRecursiveItObject, return_value *zend.Zval) {
-	var str zend.SmartStr = zend.SmartStr{0}
+	var str zend.SmartStr = zend.MakeSmartStr(0)
 	var has_next zend.Zval
 	var level int
 	str.AppendString(b.CastStr(object.GetPrefix()[0].GetS().GetVal(), object.GetPrefix()[0].GetS().GetLen()))

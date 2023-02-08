@@ -142,20 +142,20 @@ type PhpHttpParserSettings struct {
 //         on_message_complete:on_message_complete,
 //     }
 // }
-// func MakePhpHttpParserSettings(on_message_begin PhpHttpCb, on_path PhpHttpDataCb, on_query_string PhpHttpDataCb, on_url PhpHttpDataCb, on_fragment PhpHttpDataCb, on_header_field PhpHttpDataCb, on_header_value PhpHttpDataCb, on_headers_complete PhpHttpCb, on_body PhpHttpDataCb, on_message_complete PhpHttpCb) PhpHttpParserSettings {
-//     return PhpHttpParserSettings{
-//         on_message_begin:on_message_begin,
-//         on_path:on_path,
-//         on_query_string:on_query_string,
-//         on_url:on_url,
-//         on_fragment:on_fragment,
-//         on_header_field:on_header_field,
-//         on_header_value:on_header_value,
-//         on_headers_complete:on_headers_complete,
-//         on_body:on_body,
-//         on_message_complete:on_message_complete,
-//     }
-// }
+func MakePhpHttpParserSettings(on_message_begin PhpHttpCb, on_path PhpHttpDataCb, on_query_string PhpHttpDataCb, on_url PhpHttpDataCb, on_fragment PhpHttpDataCb, on_header_field PhpHttpDataCb, on_header_value PhpHttpDataCb, on_headers_complete PhpHttpCb, on_body PhpHttpDataCb, on_message_complete PhpHttpCb) PhpHttpParserSettings {
+	return PhpHttpParserSettings{
+		on_message_begin:    on_message_begin,
+		on_path:             on_path,
+		on_query_string:     on_query_string,
+		on_url:              on_url,
+		on_fragment:         on_fragment,
+		on_header_field:     on_header_field,
+		on_header_value:     on_header_value,
+		on_headers_complete: on_headers_complete,
+		on_body:             on_body,
+		on_message_complete: on_message_complete,
+	}
+}
 func (this *PhpHttpParserSettings) GetOnMessageBegin() PhpHttpCb { return this.on_message_begin }
 
 // func (this *PhpHttpParserSettings) SetOnMessageBegin(value PhpHttpCb) { this.on_message_begin = value }

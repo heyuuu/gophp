@@ -65,7 +65,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	var follow_location zend.ZendBool = 1
 	var transfer_encoding *core.PhpStreamFilter = nil
 	var response_code int
-	var req_buf zend.SmartStr = zend.SmartStr{0}
+	var req_buf zend.SmartStr = zend.MakeSmartStr(0)
 	var custom_request_method zend.ZendBool
 	tmp_line[0] = '0'
 	if redirect_max < 1 {
@@ -134,7 +134,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 	}
 	zend.Efree(transport_string)
 	if stream != nil && use_proxy != 0 && use_ssl != 0 {
-		var header zend.SmartStr = zend.SmartStr{0}
+		var header zend.SmartStr = zend.MakeSmartStr(0)
 
 		/* Set peer_name or name verification will try to use the proxy server name */
 
@@ -359,7 +359,7 @@ func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *by
 		tmp = nil
 		if tmpzval.IsType(zend.IS_ARRAY) {
 			var tmpheader *zend.Zval = nil
-			var tmpstr zend.SmartStr = zend.SmartStr{0}
+			var tmpstr zend.SmartStr = zend.MakeSmartStr(0)
 			var __ht *zend.HashTable = tmpzval.GetArr()
 			for _, _p := range __ht.foreachData() {
 				var _z *zend.Zval = _p.GetVal()

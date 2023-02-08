@@ -483,7 +483,7 @@ func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 	}
 }
 func SapiAddHeaderEx(header_line *byte, header_line_len int, duplicate zend.ZendBool, replace zend.ZendBool) int {
-	var ctr SapiHeaderLine = SapiHeaderLine{0}
+	var ctr SapiHeaderLine = MakeSapiHeaderLine(0)
 	var r int
 	ctr.SetLine(header_line)
 	ctr.SetLineLen(header_line_len)

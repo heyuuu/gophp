@@ -226,7 +226,7 @@ func ZifHttpBuildQuery(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	var arg_sep *byte = nil
 	var arg_sep_len int = 0
 	var prefix_len int = 0
-	var formstr zend.SmartStr = zend.SmartStr{0}
+	var formstr zend.SmartStr = zend.MakeSmartStr(0)
 	var enc_type zend.ZendLong = PHP_QUERY_RFC1738
 	for {
 		var _flags int = 0

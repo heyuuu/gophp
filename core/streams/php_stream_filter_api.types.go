@@ -76,12 +76,12 @@ type PhpStreamBucketBrigade struct {
 //         tail:tail,
 //     }
 // }
-// func MakePhpStreamBucketBrigade(head *PhpStreamBucket, tail **PhpStreamBucket) PhpStreamBucketBrigade {
-//     return PhpStreamBucketBrigade{
-//         head:head,
-//         tail:tail,
-//     }
-// }
+func MakePhpStreamBucketBrigade(head *PhpStreamBucket, tail **PhpStreamBucket) PhpStreamBucketBrigade {
+	return PhpStreamBucketBrigade{
+		head: head,
+		tail: tail,
+	}
+}
 func (this *PhpStreamBucketBrigade) GetHead() *PhpStreamBucket       { return this.head }
 func (this *PhpStreamBucketBrigade) SetHead(value *PhpStreamBucket)  { this.head = value }
 func (this *PhpStreamBucketBrigade) GetTail() **PhpStreamBucket      { return this.tail }
@@ -103,13 +103,13 @@ type PhpStreamFilterOps struct {
 //         label:label,
 //     }
 // }
-// func MakePhpStreamFilterOps(filter func(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *PhpStreamBucketBrigade, buckets_out *PhpStreamBucketBrigade, bytes_consumed *int, flags int) PhpStreamFilterStatusT, dtor func(thisfilter *core.PhpStreamFilter), label *byte) PhpStreamFilterOps {
-//     return PhpStreamFilterOps{
-//         filter:filter,
-//         dtor:dtor,
-//         label:label,
-//     }
-// }
+func MakePhpStreamFilterOps(filter func(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *PhpStreamBucketBrigade, buckets_out *PhpStreamBucketBrigade, bytes_consumed *int, flags int) PhpStreamFilterStatusT, dtor func(thisfilter *core.PhpStreamFilter), label *byte) PhpStreamFilterOps {
+	return PhpStreamFilterOps{
+		filter: filter,
+		dtor:   dtor,
+		label:  label,
+	}
+}
 func (this *PhpStreamFilterOps) GetFilter() func(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *PhpStreamBucketBrigade, buckets_out *PhpStreamBucketBrigade, bytes_consumed *int, flags int) PhpStreamFilterStatusT {
 	return this.filter
 }
@@ -221,11 +221,11 @@ type PhpStreamFilterFactory struct {
 //         create_filter:create_filter,
 //     }
 // }
-// func MakePhpStreamFilterFactory(create_filter func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter) PhpStreamFilterFactory {
-//     return PhpStreamFilterFactory{
-//         create_filter:create_filter,
-//     }
-// }
+func MakePhpStreamFilterFactory(create_filter func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter) PhpStreamFilterFactory {
+	return PhpStreamFilterFactory{
+		create_filter: create_filter,
+	}
+}
 func (this *PhpStreamFilterFactory) GetCreateFilter() func(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
 	return this.create_filter
 }

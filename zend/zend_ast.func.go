@@ -1989,7 +1989,7 @@ append_default_value:
 	return
 }
 func ZendAstExport(prefix string, ast *ZendAst, suffix string) *ZendString {
-	var str SmartStr = SmartStr{0}
+	var str SmartStr = MakeSmartStr(0)
 	str.AppendString(b.CastStrAuto(prefix))
 	ZendAstExportEx(&str, ast, 0, 0)
 	str.AppendString(b.CastStrAuto(suffix))

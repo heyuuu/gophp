@@ -35,17 +35,17 @@ import (
 
 var Rot13From []byte = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 var Rot13To []byte = "nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM"
-var StrfilterRot13Ops streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{StrfilterRot13Filter, nil, "string.rot13"}
-var StrfilterRot13Factory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{StrfilterRot13Create}
+var StrfilterRot13Ops streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(StrfilterRot13Filter, nil, "string.rot13")
+var StrfilterRot13Factory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(StrfilterRot13Create)
 var Lowercase []byte = "abcdefghijklmnopqrstuvwxyz"
 var Uppercase []byte = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-var StrfilterToupperOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{StrfilterToupperFilter, nil, "string.toupper"}
-var StrfilterTolowerOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{StrfilterTolowerFilter, nil, "string.tolower"}
-var StrfilterToupperFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{StrfilterToupperCreate}
-var StrfilterTolowerFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{StrfilterTolowerCreate}
+var StrfilterToupperOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(StrfilterToupperFilter, nil, "string.toupper")
+var StrfilterTolowerOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(StrfilterTolowerFilter, nil, "string.tolower")
+var StrfilterToupperFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(StrfilterToupperCreate)
+var StrfilterTolowerFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(StrfilterTolowerCreate)
 
-var StrfilterStripTagsOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{StrfilterStripTagsFilter, StrfilterStripTagsDtor, "string.strip_tags"}
-var StrfilterStripTagsFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{StrfilterStripTagsCreate}
+var StrfilterStripTagsOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(StrfilterStripTagsFilter, StrfilterStripTagsDtor, "string.strip_tags")
+var StrfilterStripTagsFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(StrfilterStripTagsCreate)
 
 type PhpConvErrT = int
 
@@ -82,11 +82,11 @@ const PHP_CONV_QPRINT_DECODE = 4
 
 /* {{{ strfilter_convert_append_bucket */
 
-var StrfilterConvertOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{StrfilterConvertFilter, StrfilterConvertDtor, "convert.*"}
-var StrfilterConvertFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{StrfilterConvertCreate}
+var StrfilterConvertOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(StrfilterConvertFilter, StrfilterConvertDtor, "convert.*")
+var StrfilterConvertFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(StrfilterConvertCreate)
 
-var ConsumedFilterOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{ConsumedFilterFilter, ConsumedFilterDtor, "consumed"}
-var ConsumedFilterFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{ConsumedFilterCreate}
+var ConsumedFilterOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(ConsumedFilterFilter, ConsumedFilterDtor, "consumed")
+var ConsumedFilterFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(ConsumedFilterCreate)
 
 type PhpChunkedFilterState = int
 
@@ -103,8 +103,8 @@ const (
 	CHUNK_ERROR
 )
 
-var ChunkedFilterOps streams.PhpStreamFilterOps = streams.PhpStreamFilterOps{PhpChunkedFilter, PhpChunkedDtor, "dechunk"}
-var ChunkedFilterFactory streams.PhpStreamFilterFactory = streams.PhpStreamFilterFactory{ChunkedFilterCreate}
+var ChunkedFilterOps streams.PhpStreamFilterOps = streams.MakePhpStreamFilterOps(PhpChunkedFilter, PhpChunkedDtor, "dechunk")
+var ChunkedFilterFactory streams.PhpStreamFilterFactory = streams.MakePhpStreamFilterFactory(ChunkedFilterCreate)
 var StandardFilters []struct {
 	ops     *streams.PhpStreamFilterOps
 	factory *streams.PhpStreamFilterFactory

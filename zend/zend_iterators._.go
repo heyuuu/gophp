@@ -49,4 +49,4 @@ package zend
 */
 
 var ZendIteratorClassEntry ZendClassEntry
-var IteratorObjectHandlers ZendObjectHandlers = ZendObjectHandlers{0, IterWrapperFree, IterWrapperDtor, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, IterWrapperGetGc, nil, nil}
+var IteratorObjectHandlers ZendObjectHandlers = MakeZendObjectHandlers(0, IterWrapperFree, IterWrapperDtor, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, IterWrapperGetGc, nil, nil)

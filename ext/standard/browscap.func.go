@@ -285,7 +285,7 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zv.GetStr()) }
 func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int {
 	var fh zend.ZendFileHandle
-	var ctx BrowscapParserCtx = BrowscapParserCtx{0}
+	var ctx BrowscapParserCtx = MakeBrowscapParserCtx(0)
 	if filename == nil || filename[0] == '0' {
 		return zend.FAILURE
 	}

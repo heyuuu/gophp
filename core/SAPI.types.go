@@ -326,13 +326,13 @@ type SapiHeaderLine struct {
 //         response_code:response_code,
 //     }
 // }
-// func MakeSapiHeaderLine(line *byte, line_len int, response_code zend.ZendLong) SapiHeaderLine {
-//     return SapiHeaderLine{
-//         line:line,
-//         line_len:line_len,
-//         response_code:response_code,
-//     }
-// }
+func MakeSapiHeaderLine(line *byte, line_len int, response_code zend.ZendLong) SapiHeaderLine {
+	return SapiHeaderLine{
+		line:          line,
+		line_len:      line_len,
+		response_code: response_code,
+	}
+}
 func (this *SapiHeaderLine) GetLine() *byte                 { return this.line }
 func (this *SapiHeaderLine) SetLine(value *byte)            { this.line = value }
 func (this *SapiHeaderLine) GetLineLen() int                { return this.line_len }
@@ -423,46 +423,46 @@ type _sapiModule struct {
 //         input_filter_init:input_filter_init,
 //     }
 // }
-// func Make_sapiModule(name *byte, pretty_name *byte, startup func(sapi_module *_sapiModule) int, shutdown func(sapi_module *_sapiModule) int, activate func() int, deactivate func() int, ub_write func(str *byte, str_length int) int, flush func(server_context any), get_stat func() *zend.ZendStatT, getenv func(name *byte, name_len int) *byte, sapi_error func(type_ int, error_msg *byte, _ ...any), header_handler func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int, send_headers func(sapi_headers *SapiHeaders) int, send_header func(sapi_header *SapiHeader, server_context any), read_post func(buffer *byte, count_bytes int) int, read_cookies func() *byte, register_server_variables func(track_vars_array *zend.Zval), log_message func(message *byte, syslog_type_int int), get_request_time func() float64, terminate_process func(), php_ini_path_override *byte, default_post_reader func(), treat_data func(arg int, str *byte, destArray *zend.Zval), executable_location *byte, php_ini_ignore int, php_ini_ignore_cwd int, get_fd func(fd *int) int, force_http_10 func() int, get_target_uid func(*uid_t) int, get_target_gid func(*gid_t) int, input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, ini_defaults func(configuration_hash *zend.HashTable), phpinfo_as_text int, ini_entries *byte, additional_functions *zend.ZendFunctionEntry, input_filter_init func() uint) _sapiModule {
-//     return _sapiModule{
-//         name:name,
-//         pretty_name:pretty_name,
-//         startup:startup,
-//         shutdown:shutdown,
-//         activate:activate,
-//         deactivate:deactivate,
-//         ub_write:ub_write,
-//         flush:flush,
-//         get_stat:get_stat,
-//         getenv:getenv,
-//         sapi_error:sapi_error,
-//         header_handler:header_handler,
-//         send_headers:send_headers,
-//         send_header:send_header,
-//         read_post:read_post,
-//         read_cookies:read_cookies,
-//         register_server_variables:register_server_variables,
-//         log_message:log_message,
-//         get_request_time:get_request_time,
-//         terminate_process:terminate_process,
-//         php_ini_path_override:php_ini_path_override,
-//         default_post_reader:default_post_reader,
-//         treat_data:treat_data,
-//         executable_location:executable_location,
-//         php_ini_ignore:php_ini_ignore,
-//         php_ini_ignore_cwd:php_ini_ignore_cwd,
-//         get_fd:get_fd,
-//         force_http_10:force_http_10,
-//         get_target_uid:get_target_uid,
-//         get_target_gid:get_target_gid,
-//         input_filter:input_filter,
-//         ini_defaults:ini_defaults,
-//         phpinfo_as_text:phpinfo_as_text,
-//         ini_entries:ini_entries,
-//         additional_functions:additional_functions,
-//         input_filter_init:input_filter_init,
-//     }
-// }
+func Make_sapiModule(name *byte, pretty_name *byte, startup func(sapi_module *_sapiModule) int, shutdown func(sapi_module *_sapiModule) int, activate func() int, deactivate func() int, ub_write func(str *byte, str_length int) int, flush func(server_context any), get_stat func() *zend.ZendStatT, getenv func(name *byte, name_len int) *byte, sapi_error func(type_ int, error_msg *byte, _ ...any), header_handler func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int, send_headers func(sapi_headers *SapiHeaders) int, send_header func(sapi_header *SapiHeader, server_context any), read_post func(buffer *byte, count_bytes int) int, read_cookies func() *byte, register_server_variables func(track_vars_array *zend.Zval), log_message func(message *byte, syslog_type_int int), get_request_time func() float64, terminate_process func(), php_ini_path_override *byte, default_post_reader func(), treat_data func(arg int, str *byte, destArray *zend.Zval), executable_location *byte, php_ini_ignore int, php_ini_ignore_cwd int, get_fd func(fd *int) int, force_http_10 func() int, get_target_uid func(*uid_t) int, get_target_gid func(*gid_t) int, input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, ini_defaults func(configuration_hash *zend.HashTable), phpinfo_as_text int, ini_entries *byte, additional_functions *zend.ZendFunctionEntry, input_filter_init func() uint) _sapiModule {
+	return _sapiModule{
+		name:                      name,
+		pretty_name:               pretty_name,
+		startup:                   startup,
+		shutdown:                  shutdown,
+		activate:                  activate,
+		deactivate:                deactivate,
+		ub_write:                  ub_write,
+		flush:                     flush,
+		get_stat:                  get_stat,
+		getenv:                    getenv,
+		sapi_error:                sapi_error,
+		header_handler:            header_handler,
+		send_headers:              send_headers,
+		send_header:               send_header,
+		read_post:                 read_post,
+		read_cookies:              read_cookies,
+		register_server_variables: register_server_variables,
+		log_message:               log_message,
+		get_request_time:          get_request_time,
+		terminate_process:         terminate_process,
+		php_ini_path_override:     php_ini_path_override,
+		default_post_reader:       default_post_reader,
+		treat_data:                treat_data,
+		executable_location:       executable_location,
+		php_ini_ignore:            php_ini_ignore,
+		php_ini_ignore_cwd:        php_ini_ignore_cwd,
+		get_fd:                    get_fd,
+		force_http_10:             force_http_10,
+		get_target_uid:            get_target_uid,
+		get_target_gid:            get_target_gid,
+		input_filter:              input_filter,
+		ini_defaults:              ini_defaults,
+		phpinfo_as_text:           phpinfo_as_text,
+		ini_entries:               ini_entries,
+		additional_functions:      additional_functions,
+		input_filter_init:         input_filter_init,
+	}
+}
 func (this *_sapiModule) GetName() *byte { return this.name }
 
 // func (this *_sapiModule) SetName(value *byte) { this.name = value }
@@ -603,14 +603,14 @@ type SapiPostEntry struct {
 //         post_handler:post_handler,
 //     }
 // }
-// func MakeSapiPostEntry(content_type *byte, content_type_len uint32, post_reader func(), post_handler func(content_type_dup *byte, arg any)) SapiPostEntry {
-//     return SapiPostEntry{
-//         content_type:content_type,
-//         content_type_len:content_type_len,
-//         post_reader:post_reader,
-//         post_handler:post_handler,
-//     }
-// }
+func MakeSapiPostEntry(content_type *byte, content_type_len uint32, post_reader func(), post_handler func(content_type_dup *byte, arg any)) SapiPostEntry {
+	return SapiPostEntry{
+		content_type:     content_type,
+		content_type_len: content_type_len,
+		post_reader:      post_reader,
+		post_handler:     post_handler,
+	}
+}
 func (this *SapiPostEntry) GetContentType() *byte { return this.content_type }
 
 // func (this *SapiPostEntry) SetContentType(value *byte) { this.content_type = value }

@@ -72,7 +72,7 @@ func OnUpdateAssertions(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any,
 	return SUCCESS
 }
 func ZendVspprintf(pbuf **byte, max_len int, format *byte, ap ...any) int {
-	var buf SmartString = SmartString{0}
+	var buf SmartString = MakeSmartString(0)
 
 	/* since there are places where (v)spprintf called without checking for null,
 	   a bit of defensive coding here */
@@ -110,7 +110,7 @@ func ZendSpprintfUnchecked(message **byte, max_len int, format *byte, _ ...any) 
 	return len_
 }
 func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
-	var buf SmartStr = SmartStr{0}
+	var buf SmartStr = MakeSmartStr(0)
 	ZendPrintfToSmartStr(&buf, format, ap)
 	if buf.GetS() == nil {
 		return ZSTR_EMPTY_ALLOC()
@@ -336,7 +336,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	}
 }
 func ZendPrintZvalRToStr(expr *Zval, indent int) *ZendString {
-	var buf SmartStr = SmartStr{0}
+	var buf SmartStr = MakeSmartStr(0)
 	ZendPrintZvalRToBuf(&buf, expr, indent)
 	buf.ZeroTail()
 	return buf.GetS()

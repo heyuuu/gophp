@@ -287,12 +287,12 @@ type MimeHeaderEntry struct {
 //         value:value,
 //     }
 // }
-// func MakeMimeHeaderEntry(key *byte, value *byte) MimeHeaderEntry {
-//     return MimeHeaderEntry{
-//         key:key,
-//         value:value,
-//     }
-// }
+func MakeMimeHeaderEntry(key *byte, value *byte) MimeHeaderEntry {
+	return MimeHeaderEntry{
+		key:   key,
+		value: value,
+	}
+}
 func (this *MimeHeaderEntry) GetKey() *byte        { return this.key }
 func (this *MimeHeaderEntry) SetKey(value *byte)   { this.key = value }
 func (this *MimeHeaderEntry) GetValue() *byte      { return this.value }

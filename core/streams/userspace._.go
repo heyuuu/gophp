@@ -28,7 +28,7 @@ import (
 */
 
 var LeProtocols int
-var UserStreamWops core.PhpStreamWrapperOps = core.PhpStreamWrapperOps{UserWrapperOpener, nil, nil, UserWrapperStatUrl, UserWrapperOpendir, "user-space", UserWrapperUnlink, UserWrapperRename, UserWrapperMkdir, UserWrapperRmdir, UserWrapperMetadata}
+var UserStreamWops core.PhpStreamWrapperOps = core.MakePhpStreamWrapperOps(UserWrapperOpener, nil, nil, UserWrapperStatUrl, UserWrapperOpendir, "user-space", UserWrapperUnlink, UserWrapperRename, UserWrapperMkdir, UserWrapperRmdir, UserWrapperMetadata)
 
 type PhpUserstreamDataT = _phpUserstreamData
 
@@ -196,5 +196,5 @@ const USERSTREAM_METADATA = "stream_metadata"
 /* parse the return value from one of the stat functions and store the
  * relevant fields into the statbuf provided */
 
-var PhpStreamUserspaceOps core.PhpStreamOps = core.PhpStreamOps{PhpUserstreamopWrite, PhpUserstreamopRead, PhpUserstreamopClose, PhpUserstreamopFlush, "user-space", PhpUserstreamopSeek, PhpUserstreamopCast, PhpUserstreamopStat, PhpUserstreamopSetOption}
-var PhpStreamUserspaceDirOps core.PhpStreamOps = core.PhpStreamOps{nil, PhpUserstreamopReaddir, PhpUserstreamopClosedir, nil, "user-space-dir", PhpUserstreamopRewinddir, nil, nil, nil}
+var PhpStreamUserspaceOps core.PhpStreamOps = core.MakePhpStreamOps(PhpUserstreamopWrite, PhpUserstreamopRead, PhpUserstreamopClose, PhpUserstreamopFlush, "user-space", PhpUserstreamopSeek, PhpUserstreamopCast, PhpUserstreamopStat, PhpUserstreamopSetOption)
+var PhpStreamUserspaceDirOps core.PhpStreamOps = core.MakePhpStreamOps(nil, PhpUserstreamopReaddir, PhpUserstreamopClosedir, nil, "user-space-dir", PhpUserstreamopRewinddir, nil, nil, nil)

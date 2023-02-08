@@ -591,14 +591,14 @@ type ZendInternalArgInfo struct {
 //         is_variadic:is_variadic,
 //     }
 // }
-// func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendInternalArgInfo {
-//     return ZendInternalArgInfo{
-//         name:name,
-//         type_:type_,
-//         pass_by_reference:pass_by_reference,
-//         is_variadic:is_variadic,
-//     }
-// }
+func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendInternalArgInfo {
+	return ZendInternalArgInfo{
+		name:              name,
+		type_:             type_,
+		pass_by_reference: pass_by_reference,
+		is_variadic:       is_variadic,
+	}
+}
 func (this *ZendInternalArgInfo) GetName() *byte { return this.name }
 
 // func (this *ZendInternalArgInfo) SetName(value *byte) { this.name = value }
@@ -966,22 +966,23 @@ type ZendInternalFunction struct {
 //         reserved:reserved,
 //     }
 // }
-// func MakeZendInternalFunction(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendInternalArgInfo, handler ZifHandler, module *ZendModuleEntry, reserved []any) ZendInternalFunction {
-//     return ZendInternalFunction{
-//         type_:type_,
-//         arg_flags:arg_flags,
-//         fn_flags:fn_flags,
-//         function_name:function_name,
-//         scope:scope,
-//         prototype:prototype,
-//         num_args:num_args,
-//         required_num_args:required_num_args,
-//         arg_info:arg_info,
-//         handler:handler,
-//         module:module,
-//         reserved:reserved,
-//     }
-// }
+func MakeZendInternalFunction(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendInternalArgInfo, handler ZifHandler, module *ZendModuleEntry, reserved []any) ZendInternalFunction {
+	return ZendInternalFunction{
+		type_:             type_,
+		arg_flags:         arg_flags,
+		fn_flags:          fn_flags,
+		function_name:     function_name,
+		scope:             scope,
+		prototype:         prototype,
+		num_args:          num_args,
+		required_num_args: required_num_args,
+		arg_info:          arg_info,
+		handler:           handler,
+		module:            module,
+		reserved:          reserved,
+	}
+}
+
 // func (this *ZendInternalFunction)  GetType() ZendUchar      { return this.type_ }
 func (this *ZendInternalFunction) SetType(value ZendUchar) { this.type_ = value }
 
@@ -1318,14 +1319,14 @@ type ZendLoopVar struct {
 //         try_catch_offset:try_catch_offset,
 //     }
 // }
-// func MakeZendLoopVar(opcode ZendUchar, var_type ZendUchar, var_num uint32, try_catch_offset uint32) ZendLoopVar {
-//     return ZendLoopVar{
-//         opcode:opcode,
-//         var_type:var_type,
-//         var_num:var_num,
-//         try_catch_offset:try_catch_offset,
-//     }
-// }
+func MakeZendLoopVar(opcode ZendUchar, var_type ZendUchar, var_num uint32, try_catch_offset uint32) ZendLoopVar {
+	return ZendLoopVar{
+		opcode:           opcode,
+		var_type:         var_type,
+		var_num:          var_num,
+		try_catch_offset: try_catch_offset,
+	}
+}
 func (this *ZendLoopVar) GetOpcode() ZendUchar           { return this.opcode }
 func (this *ZendLoopVar) SetOpcode(value ZendUchar)      { this.opcode = value }
 func (this *ZendLoopVar) GetVarType() ZendUchar          { return this.var_type }
@@ -1349,12 +1350,12 @@ type ReservedClassName struct {
 //         len_:len_,
 //     }
 // }
-// func MakeReservedClassName(name *byte, len_ int) ReservedClassName {
-//     return ReservedClassName{
-//         name:name,
-//         len_:len_,
-//     }
-// }
+func MakeReservedClassName(name *byte, len_ int) ReservedClassName {
+	return ReservedClassName{
+		name: name,
+		len_: len_,
+	}
+}
 func (this *ReservedClassName) GetName() *byte { return this.name }
 
 // func (this *ReservedClassName) SetName(value *byte) { this.name = value }
@@ -1378,13 +1379,13 @@ type BuiltinTypeInfo struct {
 //         type_:type_,
 //     }
 // }
-// func MakeBuiltinTypeInfo(name *byte, name_len int, type_ ZendUchar) BuiltinTypeInfo {
-//     return BuiltinTypeInfo{
-//         name:name,
-//         name_len:name_len,
-//         type_:type_,
-//     }
-// }
+func MakeBuiltinTypeInfo(name *byte, name_len int, type_ ZendUchar) BuiltinTypeInfo {
+	return BuiltinTypeInfo{
+		name:     name,
+		name_len: name_len,
+		type_:    type_,
+	}
+}
 func (this *BuiltinTypeInfo) GetName() *byte { return this.name }
 
 // func (this *BuiltinTypeInfo) SetName(value *byte) { this.name = value }

@@ -26,17 +26,17 @@ type ZendObjectIteratorFuncs struct {
 //         invalidate_current:invalidate_current,
 //     }
 // }
-// func MakeZendObjectIteratorFuncs(dtor func(iter *ZendObjectIterator), valid func(iter *ZendObjectIterator) int, get_current_data func(iter *ZendObjectIterator) *Zval, get_current_key func(iter *ZendObjectIterator, key *Zval), move_forward func(iter *ZendObjectIterator), rewind func(iter *ZendObjectIterator), invalidate_current func(iter *ZendObjectIterator)) ZendObjectIteratorFuncs {
-//     return ZendObjectIteratorFuncs{
-//         dtor:dtor,
-//         valid:valid,
-//         get_current_data:get_current_data,
-//         get_current_key:get_current_key,
-//         move_forward:move_forward,
-//         rewind:rewind,
-//         invalidate_current:invalidate_current,
-//     }
-// }
+func MakeZendObjectIteratorFuncs(dtor func(iter *ZendObjectIterator), valid func(iter *ZendObjectIterator) int, get_current_data func(iter *ZendObjectIterator) *Zval, get_current_key func(iter *ZendObjectIterator, key *Zval), move_forward func(iter *ZendObjectIterator), rewind func(iter *ZendObjectIterator), invalidate_current func(iter *ZendObjectIterator)) ZendObjectIteratorFuncs {
+	return ZendObjectIteratorFuncs{
+		dtor:               dtor,
+		valid:              valid,
+		get_current_data:   get_current_data,
+		get_current_key:    get_current_key,
+		move_forward:       move_forward,
+		rewind:             rewind,
+		invalidate_current: invalidate_current,
+	}
+}
 func (this *ZendObjectIteratorFuncs) GetDtor() func(iter *ZendObjectIterator) { return this.dtor }
 
 // func (this *ZendObjectIteratorFuncs) SetDtor(value func(iter *ZendObjectIterator)) { this.dtor = value }

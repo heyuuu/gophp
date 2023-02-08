@@ -4230,7 +4230,7 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 	var str_hash zend.HashTable
 	var entry *zend.Zval
 	var key *byte
-	var result zend.SmartStr = zend.SmartStr{0}
+	var result zend.SmartStr = zend.MakeSmartStr(0)
 	var bitset []zend.ZendUlong
 	var num_bitset *zend.ZendUlong
 
@@ -6297,7 +6297,7 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var allow *zend.Zval = nil
 	var allowed_tags *byte = nil
 	var allowed_tags_len int = 0
-	var tags_ss zend.SmartStr = zend.SmartStr{0}
+	var tags_ss zend.SmartStr = zend.MakeSmartStr(0)
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

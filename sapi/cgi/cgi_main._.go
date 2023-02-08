@@ -73,7 +73,29 @@ const PHP_MODE_STRIP = 5
 
 var PhpOptarg *byte = nil
 var PhpOptind int = 1
-var OPTIONS []core.Opt = []core.Opt{{'a', 0, "interactive"}, {'b', 1, "bindpath"}, {'C', 0, "no-chdir"}, {'c', 1, "php-ini"}, {'d', 1, "define"}, {'e', 0, "profile-info"}, {'f', 1, "file"}, {'h', 0, "help"}, {'i', 0, "info"}, {'l', 0, "syntax-check"}, {'m', 0, "modules"}, {'n', 0, "no-php-ini"}, {'q', 0, "no-header"}, {'s', 0, "syntax-highlight"}, {'s', 0, "syntax-highlighting"}, {'w', 0, "strip"}, {'?', 0, "usage"}, {'v', 0, "version"}, {'z', 1, "zend-extension"}, {'T', 1, "timing"}, {'-', 0, nil}}
+var OPTIONS []core.Opt = []core.Opt{
+	core.MakeOpt('a', 0, "interactive"),
+	core.MakeOpt('b', 1, "bindpath"),
+	core.MakeOpt('C', 0, "no-chdir"),
+	core.MakeOpt('c', 1, "php-ini"),
+	core.MakeOpt('d', 1, "define"),
+	core.MakeOpt('e', 0, "profile-info"),
+	core.MakeOpt('f', 1, "file"),
+	core.MakeOpt('h', 0, "help"),
+	core.MakeOpt('i', 0, "info"),
+	core.MakeOpt('l', 0, "syntax-check"),
+	core.MakeOpt('m', 0, "modules"),
+	core.MakeOpt('n', 0, "no-php-ini"),
+	core.MakeOpt('q', 0, "no-header"),
+	core.MakeOpt('s', 0, "syntax-highlight"),
+	core.MakeOpt('s', 0, "syntax-highlighting"),
+	core.MakeOpt('w', 0, "strip"),
+	core.MakeOpt('?', 0, "usage"),
+	core.MakeOpt('v', 0, "version"),
+	core.MakeOpt('z', 1, "zend-extension"),
+	core.MakeOpt('T', 1, "timing"),
+	core.MakeOpt('-', 0, nil),
+}
 
 type _phpCgiGlobals = php_cgi_globals_struct
 
@@ -99,20 +121,14 @@ const STDIN_FILENO = 0
 /* {{{ sapi_module_struct cgi_sapi_module
  */
 
-var CgiSapiModule core.sapi_module_struct = core.sapi_module_struct{"cgi-fcgi", "CGI/FastCGI", PhpCgiStartup, core.PhpModuleShutdownWrapper, SapiCgiActivate, SapiCgiDeactivate, SapiCgiUbWrite, SapiCgiFlush, nil, SapiCgiGetenv, core.PhpError, nil, SapiCgiSendHeaders, nil, SapiCgiReadPost, SapiCgiReadCookies, SapiCgiRegisterVariables, SapiCgiLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
+var CgiSapiModule core.sapi_module_struct = core.Make_sapiModule("cgi-fcgi", "CGI/FastCGI", PhpCgiStartup, core.PhpModuleShutdownWrapper, SapiCgiActivate, SapiCgiDeactivate, SapiCgiUbWrite, SapiCgiFlush, nil, SapiCgiGetenv, core.PhpError, nil, SapiCgiSendHeaders, nil, SapiCgiReadPost, SapiCgiReadCookies, SapiCgiRegisterVariables, SapiCgiLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
 var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"extension_filename", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),
 }
 var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"dl",
-		standard.ZifDl,
-		ArginfoDl,
-		uint32(b.SizeOf("arginfo_dl")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("dl", standard.ZifDl, ArginfoDl, uint32(b.SizeOf("arginfo_dl")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
 /* {{{ php_cgi_usage
@@ -190,168 +206,31 @@ Comments in the code below refer to using the above URL in a request
  */
 
 var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
-	{
-		"cgi.rfc2616_headers",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRfc2616Headers())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"0",
-		nil,
-		b.SizeOf("\"0\"") - 1,
-		b.SizeOf("\"cgi.rfc2616_headers\"") - 1,
-		core.PHP_INI_ALL,
-	},
-	{
-		"cgi.nph",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetNph())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"0",
-		nil,
-		b.SizeOf("\"0\"") - 1,
-		b.SizeOf("\"cgi.nph\"") - 1,
-		core.PHP_INI_ALL,
-	},
-	{
-		"cgi.check_shebang_line",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetCheckShebangLine())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"1",
-		nil,
-		b.SizeOf("\"1\"") - 1,
-		b.SizeOf("\"cgi.check_shebang_line\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{
-		"cgi.force_redirect",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetForceRedirect())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"1",
-		nil,
-		b.SizeOf("\"1\"") - 1,
-		b.SizeOf("\"cgi.force_redirect\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{
-		"cgi.redirect_status_env",
-		zend.OnUpdateString,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRedirectStatusEnv())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		nil,
-		nil,
-		b.SizeOf("NULL") - 1,
-		b.SizeOf("\"cgi.redirect_status_env\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{
-		"cgi.fix_pathinfo",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFixPathinfo())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"1",
-		nil,
-		b.SizeOf("\"1\"") - 1,
-		b.SizeOf("\"cgi.fix_pathinfo\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{
-		"cgi.discard_path",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetDiscardPath())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"0",
-		nil,
-		b.SizeOf("\"0\"") - 1,
-		b.SizeOf("\"cgi.discard_path\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{
-		"fastcgi.logging",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFcgiLogging())) - (*byte)(nil))),
-		any(&php_cgi_globals),
-		nil,
-		"1",
-		nil,
-		b.SizeOf("\"1\"") - 1,
-		b.SizeOf("\"fastcgi.logging\"") - 1,
-		core.PHP_INI_SYSTEM,
-	},
-	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+	zend.MakeZendIniEntryDef("cgi.rfc2616_headers", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRfc2616Headers()))-(*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, b.SizeOf("\"0\"")-1, b.SizeOf("\"cgi.rfc2616_headers\"")-1, core.PHP_INI_ALL),
+	zend.MakeZendIniEntryDef("cgi.nph", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetNph()))-(*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, b.SizeOf("\"0\"")-1, b.SizeOf("\"cgi.nph\"")-1, core.PHP_INI_ALL),
+	zend.MakeZendIniEntryDef("cgi.check_shebang_line", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetCheckShebangLine()))-(*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, b.SizeOf("\"1\"")-1, b.SizeOf("\"cgi.check_shebang_line\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef("cgi.force_redirect", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetForceRedirect()))-(*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, b.SizeOf("\"1\"")-1, b.SizeOf("\"cgi.force_redirect\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef("cgi.redirect_status_env", zend.OnUpdateString, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetRedirectStatusEnv()))-(*byte)(nil))), any(&php_cgi_globals), nil, nil, nil, b.SizeOf("NULL")-1, b.SizeOf("\"cgi.redirect_status_env\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef("cgi.fix_pathinfo", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFixPathinfo()))-(*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, b.SizeOf("\"1\"")-1, b.SizeOf("\"cgi.fix_pathinfo\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef("cgi.discard_path", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetDiscardPath()))-(*byte)(nil))), any(&php_cgi_globals), nil, "0", nil, b.SizeOf("\"0\"")-1, b.SizeOf("\"cgi.discard_path\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef("fastcgi.logging", zend.OnUpdateBool, any(zend_long((*byte)(&((*php_cgi_globals_struct)(nil).GetFcgiLogging()))-(*byte)(nil))), any(&php_cgi_globals), nil, "1", nil, b.SizeOf("\"1\"")-1, b.SizeOf("\"fastcgi.logging\"")-1, core.PHP_INI_SYSTEM),
+	zend.MakeZendIniEntryDef(nil, nil, nil, nil, nil, nil, nil, 0, 0, 0),
 }
 
 /* {{{ php_cgi_globals_ctor
  */
 
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var CgiFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"apache_child_terminate",
-		ZifApacheChildTerminate,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"apache_request_headers",
-		ZifApacheRequestHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"apache_response_headers",
-		ZifApacheResponseHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"getallheaders",
-		ZifApacheRequestHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("apache_child_terminate", ZifApacheChildTerminate, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var CgiModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
-	b.SizeOf("zend_module_entry"),
-	zend.ZEND_MODULE_API_NO,
-	0,
-	zend.USING_ZTS,
-	nil,
-	nil,
-	"cgi-fcgi",
-	CgiFunctions,
-	ZmStartupCgi,
-	ZmShutdownCgi,
-	nil,
-	nil,
-	ZmInfoCgi,
-	core.PHP_VERSION,
-	0,
-	nil,
-	nil,
-	nil,
-	nil,
-	0,
-	0,
-	nil,
-	0,
-	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
-}
+var CgiModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 
 /* {{{ main
  */

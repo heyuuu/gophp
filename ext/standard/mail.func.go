@@ -185,7 +185,7 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 	var idx zend.ZendUlong
 	var key *zend.ZendString
 	var val *zend.Zval
-	var s zend.SmartStr = zend.SmartStr{0}
+	var s zend.SmartStr = zend.MakeSmartStr(0)
 	zend.ZEND_ASSERT(headers.IsType(zend.IS_ARRAY))
 	var __ht *zend.HashTable = headers.GetArr()
 	for _, _p := range __ht.foreachData() {

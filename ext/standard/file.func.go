@@ -3780,7 +3780,7 @@ func PhpFputcsv(stream *core.PhpStream, fields *zend.Zval, delimiter byte, enclo
 	var i int = 0
 	var ret int
 	var field_tmp *zend.Zval
-	var csvline zend.SmartStr = zend.SmartStr{0}
+	var csvline zend.SmartStr = zend.MakeSmartStr(0)
 	zend.ZEND_ASSERT(escape_char >= 0 && escape_char <= UCHAR_MAX || escape_char == PHP_CSV_NO_ESCAPE)
 	count = zend.Z_ARRVAL_P(fields).GetNNumOfElements()
 	var __ht *zend.HashTable = fields.GetArr()

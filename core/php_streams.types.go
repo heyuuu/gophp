@@ -78,19 +78,19 @@ type PhpStreamOps struct {
 //         set_option:set_option,
 //     }
 // }
-// func MakePhpStreamOps(write func(stream *PhpStream, buf *byte, count int) ssize_t, read func(stream *PhpStream, buf *byte, count int) ssize_t, close func(stream *PhpStream, close_handle int) int, flush func(stream *PhpStream) int, label *byte, seek func(stream *PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int, cast func(stream *PhpStream, castas int, ret *any) int, stat func(stream *PhpStream, ssb *PhpStreamStatbuf) int, set_option func(stream *PhpStream, option int, value int, ptrparam any) int) PhpStreamOps {
-//     return PhpStreamOps{
-//         write:write,
-//         read:read,
-//         close:close,
-//         flush:flush,
-//         label:label,
-//         seek:seek,
-//         cast:cast,
-//         stat:stat,
-//         set_option:set_option,
-//     }
-// }
+func MakePhpStreamOps(write func(stream *PhpStream, buf *byte, count int) ssize_t, read func(stream *PhpStream, buf *byte, count int) ssize_t, close func(stream *PhpStream, close_handle int) int, flush func(stream *PhpStream) int, label *byte, seek func(stream *PhpStream, offset zend.ZendOffT, whence int, newoffset *zend.ZendOffT) int, cast func(stream *PhpStream, castas int, ret *any) int, stat func(stream *PhpStream, ssb *PhpStreamStatbuf) int, set_option func(stream *PhpStream, option int, value int, ptrparam any) int) PhpStreamOps {
+	return PhpStreamOps{
+		write:      write,
+		read:       read,
+		close:      close,
+		flush:      flush,
+		label:      label,
+		seek:       seek,
+		cast:       cast,
+		stat:       stat,
+		set_option: set_option,
+	}
+}
 func (this *PhpStreamOps) GetWrite() func(stream *PhpStream, buf *byte, count int) ssize_t {
 	return this.write
 }
@@ -163,21 +163,21 @@ type PhpStreamWrapperOps struct {
 //         stream_metadata:stream_metadata,
 //     }
 // }
-// func MakePhpStreamWrapperOps(stream_opener func(wrapper *PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *PhpStreamContext) *PhpStream, stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int, stream_stat func(wrapper *PhpStreamWrapper, stream *PhpStream, ssb *PhpStreamStatbuf) int, url_stat func(wrapper *PhpStreamWrapper, url *byte, flags int, ssb *PhpStreamStatbuf, context *PhpStreamContext) int, dir_opener func(wrapper *PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *PhpStreamContext) *PhpStream, label *byte, unlink func(wrapper *PhpStreamWrapper, url *byte, options int, context *PhpStreamContext) int, rename func(wrapper *PhpStreamWrapper, url_from *byte, url_to *byte, options int, context *PhpStreamContext) int, stream_mkdir func(wrapper *PhpStreamWrapper, url *byte, mode int, options int, context *PhpStreamContext) int, stream_rmdir func(wrapper *PhpStreamWrapper, url *byte, options int, context *PhpStreamContext) int, stream_metadata func(wrapper *PhpStreamWrapper, url *byte, options int, value any, context *PhpStreamContext) int) PhpStreamWrapperOps {
-//     return PhpStreamWrapperOps{
-//         stream_opener:stream_opener,
-//         stream_closer:stream_closer,
-//         stream_stat:stream_stat,
-//         url_stat:url_stat,
-//         dir_opener:dir_opener,
-//         label:label,
-//         unlink:unlink,
-//         rename:rename,
-//         stream_mkdir:stream_mkdir,
-//         stream_rmdir:stream_rmdir,
-//         stream_metadata:stream_metadata,
-//     }
-// }
+func MakePhpStreamWrapperOps(stream_opener func(wrapper *PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *PhpStreamContext) *PhpStream, stream_closer func(wrapper *PhpStreamWrapper, stream *PhpStream) int, stream_stat func(wrapper *PhpStreamWrapper, stream *PhpStream, ssb *PhpStreamStatbuf) int, url_stat func(wrapper *PhpStreamWrapper, url *byte, flags int, ssb *PhpStreamStatbuf, context *PhpStreamContext) int, dir_opener func(wrapper *PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *PhpStreamContext) *PhpStream, label *byte, unlink func(wrapper *PhpStreamWrapper, url *byte, options int, context *PhpStreamContext) int, rename func(wrapper *PhpStreamWrapper, url_from *byte, url_to *byte, options int, context *PhpStreamContext) int, stream_mkdir func(wrapper *PhpStreamWrapper, url *byte, mode int, options int, context *PhpStreamContext) int, stream_rmdir func(wrapper *PhpStreamWrapper, url *byte, options int, context *PhpStreamContext) int, stream_metadata func(wrapper *PhpStreamWrapper, url *byte, options int, value any, context *PhpStreamContext) int) PhpStreamWrapperOps {
+	return PhpStreamWrapperOps{
+		stream_opener:   stream_opener,
+		stream_closer:   stream_closer,
+		stream_stat:     stream_stat,
+		url_stat:        url_stat,
+		dir_opener:      dir_opener,
+		label:           label,
+		unlink:          unlink,
+		rename:          rename,
+		stream_mkdir:    stream_mkdir,
+		stream_rmdir:    stream_rmdir,
+		stream_metadata: stream_metadata,
+	}
+}
 func (this *PhpStreamWrapperOps) GetStreamOpener() func(wrapper *PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *PhpStreamContext) *PhpStream {
 	return this.stream_opener
 }
@@ -248,13 +248,13 @@ type PhpStreamWrapper struct {
 //         is_url:is_url,
 //     }
 // }
-// func MakePhpStreamWrapper(wops *PhpStreamWrapperOps, abstract any, is_url int) PhpStreamWrapper {
-//     return PhpStreamWrapper{
-//         wops:wops,
-//         abstract:abstract,
-//         is_url:is_url,
-//     }
-// }
+func MakePhpStreamWrapper(wops *PhpStreamWrapperOps, abstract any, is_url int) PhpStreamWrapper {
+	return PhpStreamWrapper{
+		wops:     wops,
+		abstract: abstract,
+		is_url:   is_url,
+	}
+}
 func (this *PhpStreamWrapper) GetWops() *PhpStreamWrapperOps      { return this.wops }
 func (this *PhpStreamWrapper) SetWops(value *PhpStreamWrapperOps) { this.wops = value }
 func (this *PhpStreamWrapper) GetAbstract() any                   { return this.abstract }

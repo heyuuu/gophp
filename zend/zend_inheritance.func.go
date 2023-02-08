@@ -516,7 +516,7 @@ func ZendAppendTypeHint(str *SmartStr, fptr *ZendFunction, arg_info *ZendArgInfo
 	}
 }
 func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
-	var str SmartStr = SmartStr{0}
+	var str SmartStr = MakeSmartStr(0)
 	if fptr.GetOpArray().IsReturnReference() {
 		str.AppendString("& ")
 	}

@@ -33,28 +33,10 @@ var DirClassEntryPtr *zend.ZendClassEntry
 /* {{{ arginfo */
 
 var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"close",
-		ZifClosedir,
-		ArginfoDir,
-		uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"rewind",
-		ZifRewinddir,
-		ArginfoDir,
-		uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"read",
-		PhpIfReaddir,
-		ArginfoDir,
-		uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("close", ZifClosedir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("rewind", ZifRewinddir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("read", PhpIfReaddir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
 /* {{{ proto bool chroot(string directory)

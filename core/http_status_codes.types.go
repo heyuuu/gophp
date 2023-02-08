@@ -16,12 +16,12 @@ type HttpResponseStatusCodePair struct {
 //         str:str,
 //     }
 // }
-// func MakeHttpResponseStatusCodePair(code int, str *byte) HttpResponseStatusCodePair {
-//     return HttpResponseStatusCodePair{
-//         code:code,
-//         str:str,
-//     }
-// }
+func MakeHttpResponseStatusCodePair(code int, str *byte) HttpResponseStatusCodePair {
+	return HttpResponseStatusCodePair{
+		code: code,
+		str:  str,
+	}
+}
 func (this *HttpResponseStatusCodePair) GetCode() int { return this.code }
 
 // func (this *HttpResponseStatusCodePair) SetCode(value int) { this.code = value }

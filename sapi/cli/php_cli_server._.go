@@ -65,22 +65,10 @@ var PhpCliServerWorkers *pid_t
 var PhpCliServerWorkersMax zend.ZendLong
 
 var TemplateMap []PhpCliServerHttpResponseStatusCodePair = []PhpCliServerHttpResponseStatusCodePair{
-	{
-		400,
-		"<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>",
-	},
-	{
-		404,
-		"<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>",
-	},
-	{
-		500,
-		"<h1>%s</h1><p>The server is temporarily unavailable.</p>",
-	},
-	{
-		501,
-		"<h1>%s</h1><p>Request method not supported.</p>",
-	},
+	MakePhpCliServerHttpResponseStatusCodePair(400, "<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>"),
+	MakePhpCliServerHttpResponseStatusCodePair(404, "<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>"),
+	MakePhpCliServerHttpResponseStatusCodePair(500, "<h1>%s</h1><p>The server is temporarily unavailable.</p>"),
+	MakePhpCliServerHttpResponseStatusCodePair(501, "<h1>%s</h1><p>Request method not supported.</p>"),
 }
 
 const PHP_CLI_SERVER_LOG_PROCESS = 1
@@ -98,92 +86,26 @@ var CliServerGlobals ZendCliServerGlobals
 
 var PhpCliServerCss []byte = "<style>\n" + "body { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\n" + "h1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\n" + "h1, p { padding-left: 10px; }\n" + "code.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n" + "</style>\n"
 var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
-	{
-		"cli_server.color",
-		zend.OnUpdateBool,
-		any(zend_long((*byte)(&((*ZendCliServerGlobals)(nil).GetColor())) - (*byte)(nil))),
-		any(&CliServerGlobals),
-		nil,
-		"0",
-		zend.ZendIniBooleanDisplayerCb,
-		b.SizeOf("\"0\"") - 1,
-		b.SizeOf("\"cli_server.color\"") - 1,
-		core.PHP_INI_ALL,
-	},
-	{nil, nil, nil, nil, nil, nil, nil, 0, 0, 0},
+	zend.MakeZendIniEntryDef("cli_server.color", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendCliServerGlobals)(nil).GetColor()))-(*byte)(nil))), any(&CliServerGlobals), nil, "0", zend.ZendIniBooleanDisplayerCb, b.SizeOf("\"0\"")-1, b.SizeOf("\"cli_server.color\"")-1, core.PHP_INI_ALL),
+	zend.MakeZendIniEntryDef(nil, nil, nil, nil, nil, nil, nil, 0, 0, 0),
 }
-var CliServerModuleEntry zend.ZendModuleEntry = zend.ZendModuleEntry{
-	b.SizeOf("zend_module_entry"),
-	zend.ZEND_MODULE_API_NO,
-	0,
-	zend.USING_ZTS,
-	nil,
-	nil,
-	"cli_server",
-	nil,
-	ZmStartupCliServer,
-	ZmShutdownCliServer,
-	nil,
-	nil,
-	ZmInfoCliServer,
-	core.PHP_VERSION,
-	0,
-	nil,
-	nil,
-	nil,
-	nil,
-	0,
-	0,
-	nil,
-	0,
-	"API" + "ZEND_MODULE_API_NO" + zend.ZEND_BUILD_TS,
-}
+var CliServerModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var ServerAdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"cli_set_process_title",
-		ZifCliSetProcessTitle,
-		ArginfoCliSetProcessTitle,
-		uint32(b.SizeOf("arginfo_cli_set_process_title")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"cli_get_process_title",
-		ZifCliGetProcessTitle,
-		ArginfoCliGetProcessTitle,
-		uint32(b.SizeOf("arginfo_cli_get_process_title")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"apache_request_headers",
-		ZifApacheRequestHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"apache_response_headers",
-		ZifApacheResponseHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{
-		"getallheaders",
-		ZifApacheRequestHeaders,
-		ArginfoNoArgs,
-		uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		0,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("cli_set_process_title", ZifCliSetProcessTitle, ArginfoCliSetProcessTitle, uint32(b.SizeOf("arginfo_cli_set_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("cli_get_process_title", ZifCliGetProcessTitle, ArginfoCliGetProcessTitle, uint32(b.SizeOf("arginfo_cli_get_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry("getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
 /* {{{ sapi_module_struct cli_server_sapi_module
  */
 
-var CliServerSapiModule core.sapi_module_struct = core.sapi_module_struct{"cli-server", "Built-in HTTP server", SapiCliServerStartup, core.PhpModuleShutdownWrapper, nil, nil, SapiCliServerUbWrite, SapiCliServerFlush, nil, nil, core.PhpError, nil, SapiCliServerSendHeaders, nil, SapiCliServerReadPost, SapiCliServerReadCookies, SapiCliServerRegisterVariables, SapiCliServerLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil}
+var CliServerSapiModule core.sapi_module_struct = core.Make_sapiModule("cli-server", "Built-in HTTP server", SapiCliServerStartup, core.PhpModuleShutdownWrapper, nil, nil, SapiCliServerUbWrite, SapiCliServerFlush, nil, nil, core.PhpError, nil, SapiCliServerSendHeaders, nil, SapiCliServerReadPost, SapiCliServerReadCookies, SapiCliServerRegisterVariables, SapiCliServerLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
 
 /* {{{ php_cli_server_client_read_request */
 

@@ -709,7 +709,7 @@ again:
 	}
 }
 func PhpVarExport(struc *zend.Zval, level int) {
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	PhpVarExportEx(struc, level, &buf)
 	buf.ZeroTail()
 	core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
@@ -718,7 +718,7 @@ func PhpVarExport(struc *zend.Zval, level int) {
 func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	var return_output zend.ZendBool = 0
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -1276,7 +1276,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var struc *zend.Zval
 	var var_hash PhpSerializeDataT
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1

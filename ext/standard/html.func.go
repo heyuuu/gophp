@@ -969,7 +969,7 @@ func UnescapeInverseMap(all int, flags int) *EntityHt {
 	}
 }
 func DetermineEntityTable(all int, doctype int) EntityTableOpt {
-	var retval EntityTableOpt = EntityTableOpt{nil}
+	var retval EntityTableOpt = MakeEntityTableOpt(nil)
 	r.Assert(!(doctype == ENT_HTML_DOC_XML1 && all != 0))
 	if all != 0 {
 		if doctype == ENT_HTML_DOC_HTML5 {

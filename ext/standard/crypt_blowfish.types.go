@@ -16,12 +16,12 @@ type BF_ctx struct {
 //         P:P,
 //     }
 // }
-// func MakeBF_ctx(S [][]BF_word, P BF_key) BF_ctx {
-//     return BF_ctx{
-//         S:S,
-//         P:P,
-//     }
-// }
+func MakeBF_ctx(S [][]BF_word, P BF_key) BF_ctx {
+	return BF_ctx{
+		S: S,
+		P: P,
+	}
+}
 func (this *BF_ctx) GetS() [][]BF_word { return this.S }
 
 // func (this *BF_ctx) SetS(value [][]BF_word) { this.S = value }

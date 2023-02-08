@@ -10,7 +10,7 @@ import (
 
 func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var rep zend.ZendBool = 1
-	var ctr core.SapiHeaderLine = core.SapiHeaderLine{0}
+	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int
 	for {
 		var _flags int = 0
@@ -96,7 +96,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	core.SapiHeaderOp(b.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
 }
 func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var ctr core.SapiHeaderLine = core.SapiHeaderLine{0}
+	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int = 0
 	for {
 		var _flags int = 0
@@ -178,9 +178,9 @@ func PhpHeader() int {
 }
 func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, path *zend.ZendString, domain *zend.ZendString, secure int, httponly int, samesite *zend.ZendString, url_encode int) int {
 	var dt *zend.ZendString
-	var ctr core.SapiHeaderLine = core.SapiHeaderLine{0}
+	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var result int
-	var buf zend.SmartStr = zend.SmartStr{0}
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	if name.GetLen() == 0 {
 		zend.ZendError(zend.E_WARNING, "Cookie names must not be empty")
 		return zend.FAILURE

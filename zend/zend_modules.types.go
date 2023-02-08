@@ -60,34 +60,35 @@ type ZendModuleEntry struct {
 //         build_id:build_id,
 //     }
 // }
-// func MakeZendModuleEntry(size uint16, zend_api uint, zend_debug uint8, zts uint8, ini_entry *ZendIniEntry, deps *ZendModuleDep, name *byte, functions *ZendFunctionEntry, module_startup_func func(type_ int, module_number int) int, module_shutdown_func func(type_ int, module_number int) int, request_startup_func func(type_ int, module_number int) int, request_shutdown_func func(type_ int, module_number int) int, info_func func(ZEND_MODULE_INFO_FUNC_ARGS), version *byte, globals_size int, globals_ptr any, globals_ctor func(global any), globals_dtor func(global any), post_deactivate_func func() int, module_started int, type_ uint8, handle any, module_number int, build_id *byte) ZendModuleEntry {
-//     return ZendModuleEntry{
-//         size:size,
-//         zend_api:zend_api,
-//         zend_debug:zend_debug,
-//         zts:zts,
-//         ini_entry:ini_entry,
-//         deps:deps,
-//         name:name,
-//         functions:functions,
-//         module_startup_func:module_startup_func,
-//         module_shutdown_func:module_shutdown_func,
-//         request_startup_func:request_startup_func,
-//         request_shutdown_func:request_shutdown_func,
-//         info_func:info_func,
-//         version:version,
-//         globals_size:globals_size,
-//         globals_ptr:globals_ptr,
-//         globals_ctor:globals_ctor,
-//         globals_dtor:globals_dtor,
-//         post_deactivate_func:post_deactivate_func,
-//         module_started:module_started,
-//         type_:type_,
-//         handle:handle,
-//         module_number:module_number,
-//         build_id:build_id,
-//     }
-// }
+func MakeZendModuleEntry(size uint16, zend_api uint, zend_debug uint8, zts uint8, ini_entry *ZendIniEntry, deps *ZendModuleDep, name *byte, functions *ZendFunctionEntry, module_startup_func func(type_ int, module_number int) int, module_shutdown_func func(type_ int, module_number int) int, request_startup_func func(type_ int, module_number int) int, request_shutdown_func func(type_ int, module_number int) int, info_func func(ZEND_MODULE_INFO_FUNC_ARGS), version *byte, globals_size int, globals_ptr any, globals_ctor func(global any), globals_dtor func(global any), post_deactivate_func func() int, module_started int, type_ uint8, handle any, module_number int, build_id *byte) ZendModuleEntry {
+	return ZendModuleEntry{
+		size:                  size,
+		zend_api:              zend_api,
+		zend_debug:            zend_debug,
+		zts:                   zts,
+		ini_entry:             ini_entry,
+		deps:                  deps,
+		name:                  name,
+		functions:             functions,
+		module_startup_func:   module_startup_func,
+		module_shutdown_func:  module_shutdown_func,
+		request_startup_func:  request_startup_func,
+		request_shutdown_func: request_shutdown_func,
+		info_func:             info_func,
+		version:               version,
+		globals_size:          globals_size,
+		globals_ptr:           globals_ptr,
+		globals_ctor:          globals_ctor,
+		globals_dtor:          globals_dtor,
+		post_deactivate_func:  post_deactivate_func,
+		module_started:        module_started,
+		type_:                 type_,
+		handle:                handle,
+		module_number:         module_number,
+		build_id:              build_id,
+	}
+}
+
 // func (this *ZendModuleEntry)  GetSize() uint16      { return this.size }
 // func (this *ZendModuleEntry) SetSize(value uint16) { this.size = value }
 func (this *ZendModuleEntry) GetZendApi() uint { return this.zend_api }
@@ -179,14 +180,14 @@ type ZendModuleDep struct {
 //         type_:type_,
 //     }
 // }
-// func MakeZendModuleDep(name *byte, rel *byte, version *byte, type_ uint8) ZendModuleDep {
-//     return ZendModuleDep{
-//         name:name,
-//         rel:rel,
-//         version:version,
-//         type_:type_,
-//     }
-// }
+func MakeZendModuleDep(name *byte, rel *byte, version *byte, type_ uint8) ZendModuleDep {
+	return ZendModuleDep{
+		name:    name,
+		rel:     rel,
+		version: version,
+		type_:   type_,
+	}
+}
 func (this *ZendModuleDep) GetName() *byte { return this.name }
 
 // func (this *ZendModuleDep) SetName(value *byte) { this.name = value }

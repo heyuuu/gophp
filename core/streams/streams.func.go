@@ -429,8 +429,8 @@ func _phpStreamFillReadBuffer(stream *core.PhpStream, size int) int {
 	if stream.GetReadfilters().GetHead() != nil {
 		var to_read_now int = cli.MIN(size, stream.GetChunkSize())
 		var chunk_buf *byte
-		var brig_in PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
-		var brig_out PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
+		var brig_in PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
+		var brig_out PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
 		var brig_inp *PhpStreamBucketBrigade = &brig_in
 		var brig_outp *PhpStreamBucketBrigade = &brig_out
 		var brig_swap *PhpStreamBucketBrigade
@@ -1026,8 +1026,8 @@ func _phpStreamWriteBuffer(stream *core.PhpStream, buf *byte, count int) ssize_t
 func _phpStreamWriteFiltered(stream *core.PhpStream, buf *byte, count int, flags int) ssize_t {
 	var consumed int = 0
 	var bucket *PhpStreamBucket
-	var brig_in PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
-	var brig_out PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
+	var brig_in PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
+	var brig_out PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
 	var brig_inp *PhpStreamBucketBrigade = &brig_in
 	var brig_outp *PhpStreamBucketBrigade = &brig_out
 	var brig_swap *PhpStreamBucketBrigade

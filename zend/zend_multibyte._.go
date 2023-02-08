@@ -62,7 +62,7 @@ type ZendEncodingInternalEncodingSetter func(encoding *ZendEncoding) int
 */
 
 var MultibyteFunctionsDummy ZendMultibyteFunctions
-var MultibyteFunctions ZendMultibyteFunctions = ZendMultibyteFunctions{nil, DummyEncodingFetcher, DummyEncodingNameGetter, DummyEncodingLexerCompatibilityChecker, DummyEncodingDetector, DummyEncodingConverter, DummyEncodingListParser, DummyInternalEncodingGetter, DummyInternalEncodingSetter}
+var MultibyteFunctions ZendMultibyteFunctions = MakeZendMultibyteFunctions(nil, DummyEncodingFetcher, DummyEncodingNameGetter, DummyEncodingLexerCompatibilityChecker, DummyEncodingDetector, DummyEncodingConverter, DummyEncodingListParser, DummyInternalEncodingGetter, DummyInternalEncodingSetter)
 var ZendMultibyteEncodingUtf32be *ZendEncoding = (*ZendEncoding)("UTF-32BE")
 var ZendMultibyteEncodingUtf32le *ZendEncoding = (*ZendEncoding)("UTF-32LE")
 var ZendMultibyteEncodingUtf16be *ZendEncoding = (*ZendEncoding)("UTF-16BE")

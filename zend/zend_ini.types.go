@@ -32,20 +32,20 @@ type ZendIniEntryDef struct {
 //         modifiable:modifiable,
 //     }
 // }
-// func MakeZendIniEntryDef(name *byte, on_modify func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int, mh_arg1 any, mh_arg2 any, mh_arg3 any, value *byte, displayer func(ini_entry *ZendIniEntry, type_ int), value_length uint32, name_length uint16, modifiable uint8) ZendIniEntryDef {
-//     return ZendIniEntryDef{
-//         name:name,
-//         on_modify:on_modify,
-//         mh_arg1:mh_arg1,
-//         mh_arg2:mh_arg2,
-//         mh_arg3:mh_arg3,
-//         value:value,
-//         displayer:displayer,
-//         value_length:value_length,
-//         name_length:name_length,
-//         modifiable:modifiable,
-//     }
-// }
+func MakeZendIniEntryDef(name *byte, on_modify func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int, mh_arg1 any, mh_arg2 any, mh_arg3 any, value *byte, displayer func(ini_entry *ZendIniEntry, type_ int), value_length uint32, name_length uint16, modifiable uint8) ZendIniEntryDef {
+	return ZendIniEntryDef{
+		name:         name,
+		on_modify:    on_modify,
+		mh_arg1:      mh_arg1,
+		mh_arg2:      mh_arg2,
+		mh_arg3:      mh_arg3,
+		value:        value,
+		displayer:    displayer,
+		value_length: value_length,
+		name_length:  name_length,
+		modifiable:   modifiable,
+	}
+}
 func (this *ZendIniEntryDef) GetName() *byte { return this.name }
 
 // func (this *ZendIniEntryDef) SetName(value *byte) { this.name = value }

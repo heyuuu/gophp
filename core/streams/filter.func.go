@@ -236,8 +236,8 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 
 		/* Let's going ahead and wind anything in the buffer through this filter */
 
-		var brig_in PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
-		var brig_out PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
+		var brig_in PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
+		var brig_out PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
 		var brig_inp *PhpStreamBucketBrigade = &brig_in
 		var brig_outp *PhpStreamBucketBrigade = &brig_out
 		var status PhpStreamFilterStatusT
@@ -317,8 +317,8 @@ func _phpStreamFilterAppend(chain *PhpStreamFilterChain, filter *core.PhpStreamF
 	}
 }
 func _phpStreamFilterFlush(filter *core.PhpStreamFilter, finish int) int {
-	var brig_a PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
-	var brig_b PhpStreamBucketBrigade = PhpStreamBucketBrigade{nil, nil}
+	var brig_a PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
+	var brig_b PhpStreamBucketBrigade = MakePhpStreamBucketBrigade(nil, nil)
 	var inp *PhpStreamBucketBrigade = &brig_a
 	var outp *PhpStreamBucketBrigade = &brig_b
 	var brig_temp *PhpStreamBucketBrigade

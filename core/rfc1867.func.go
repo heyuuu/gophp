@@ -262,8 +262,8 @@ func FindBoundary(self *MultipartBuffer, boundary *byte) int {
 }
 func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 	var line *byte
-	var entry MimeHeaderEntry = MimeHeaderEntry{0}
-	var buf_value zend.SmartString = zend.SmartString{0}
+	var entry MimeHeaderEntry = MakeMimeHeaderEntry(0)
+	var buf_value zend.SmartString = zend.MakeSmartString(0)
 	var key *byte = nil
 
 	/* didn't find boundary, abort */

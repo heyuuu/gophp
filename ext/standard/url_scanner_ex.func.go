@@ -771,9 +771,9 @@ stop:
 }
 func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte, newlen *int, encode int) *byte {
 	var result *byte
-	var surl zend.SmartStr = zend.SmartStr{0}
-	var buf zend.SmartStr = zend.SmartStr{0}
-	var url_app zend.SmartStr = zend.SmartStr{0}
+	var surl zend.SmartStr = zend.MakeSmartStr(0)
+	var buf zend.SmartStr = zend.MakeSmartStr(0)
+	var url_app zend.SmartStr = zend.MakeSmartStr(0)
 	var encoded *zend.ZendString
 	surl.AppendString(b.CastStr(url, urllen))
 	if encode != 0 {
@@ -885,10 +885,10 @@ func PhpUrlScannerOutputHandler(output *byte, output_len int, handled_output **b
 	PhpUrlScannerSessionHandlerImpl(output, output_len, handled_output, handled_output_len, mode, 0)
 }
 func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len int, encode int, type_ int) int {
-	var sname zend.SmartStr = zend.SmartStr{0}
-	var svalue zend.SmartStr = zend.SmartStr{0}
-	var hname zend.SmartStr = zend.SmartStr{0}
-	var hvalue zend.SmartStr = zend.SmartStr{0}
+	var sname zend.SmartStr = zend.MakeSmartStr(0)
+	var svalue zend.SmartStr = zend.MakeSmartStr(0)
+	var hname zend.SmartStr = zend.MakeSmartStr(0)
+	var hvalue zend.SmartStr = zend.MakeSmartStr(0)
 	var encoded *zend.ZendString
 	var url_state *UrlAdaptStateExT
 	var handler core.PhpOutputHandlerFuncT
@@ -973,10 +973,10 @@ func PhpUrlScannerResetVarImpl(name *zend.ZendString, encode int, type_ int) int
 	var end *byte
 	var limit *byte
 	var separator_len int
-	var sname zend.SmartStr = zend.SmartStr{0}
-	var hname zend.SmartStr = zend.SmartStr{0}
-	var url_app zend.SmartStr = zend.SmartStr{0}
-	var form_app zend.SmartStr = zend.SmartStr{0}
+	var sname zend.SmartStr = zend.MakeSmartStr(0)
+	var hname zend.SmartStr = zend.MakeSmartStr(0)
+	var url_app zend.SmartStr = zend.MakeSmartStr(0)
+	var form_app zend.SmartStr = zend.MakeSmartStr(0)
 	var encoded *zend.ZendString
 	var ret int = zend.SUCCESS
 	var sep_removed zend.ZendBool = 0

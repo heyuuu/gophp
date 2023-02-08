@@ -14,11 +14,11 @@ type EncToUniStage2 struct {
 //         uni_cp:uni_cp,
 //     }
 // }
-// func MakeEncToUniStage2(uni_cp []uint16) EncToUniStage2 {
-//     return EncToUniStage2{
-//         uni_cp:uni_cp,
-//     }
-// }
+func MakeEncToUniStage2(uni_cp []uint16) EncToUniStage2 {
+	return EncToUniStage2{
+		uni_cp: uni_cp,
+	}
+}
 func (this *EncToUniStage2) GetUniCp() []uint16 { return this.uni_cp }
 
 // func (this *EncToUniStage2) SetUniCp(value []uint16) { this.uni_cp = value }
@@ -35,11 +35,11 @@ type EncToUni struct {
 //         inner:inner,
 //     }
 // }
-// func MakeEncToUni(inner []*EncToUniStage2) EncToUni {
-//     return EncToUni{
-//         inner:inner,
-//     }
-// }
+func MakeEncToUni(inner []*EncToUniStage2) EncToUni {
+	return EncToUni{
+		inner: inner,
+	}
+}
 func (this *EncToUni) GetInner() []*EncToUniStage2 { return this.inner }
 
 // func (this *EncToUni) SetInner(value []*EncToUniStage2) { this.inner = value }
@@ -58,12 +58,12 @@ type UniToEnc struct {
 //         cs_code:cs_code,
 //     }
 // }
-// func MakeUniToEnc(un_code_point uint16, cs_code uint8) UniToEnc {
-//     return UniToEnc{
-//         un_code_point:un_code_point,
-//         cs_code:cs_code,
-//     }
-// }
+func MakeUniToEnc(un_code_point uint16, cs_code uint8) UniToEnc {
+	return UniToEnc{
+		un_code_point: un_code_point,
+		cs_code:       cs_code,
+	}
+}
 func (this *UniToEnc) GetUnCodePoint() uint16 { return this.un_code_point }
 
 // func (this *UniToEnc) SetUnCodePoint(value uint16) { this.un_code_point = value }
@@ -153,12 +153,12 @@ type EntityTableOpt struct {
 //         table:table,
 //     }
 // }
-// func MakeEntityTableOpt(ms_table *EntityStage1Row, table *EntityStage3Row) EntityTableOpt {
-//     return EntityTableOpt{
-//         ms_table:ms_table,
-//         table:table,
-//     }
-// }
+func MakeEntityTableOpt(ms_table *EntityStage1Row, table *EntityStage3Row) EntityTableOpt {
+	return EntityTableOpt{
+		ms_table: ms_table,
+		table:    table,
+	}
+}
 func (this *EntityTableOpt) GetMsTable() *EntityStage1Row      { return this.ms_table }
 func (this *EntityTableOpt) SetMsTable(value *EntityStage1Row) { this.ms_table = value }
 func (this *EntityTableOpt) GetTable() *EntityStage3Row        { return this.table }
@@ -182,14 +182,14 @@ type EntityCpMap struct {
 //         codepoint2:codepoint2,
 //     }
 // }
-// func MakeEntityCpMap(entity *byte, entity_len uint16, codepoint1 uint, codepoint2 uint) EntityCpMap {
-//     return EntityCpMap{
-//         entity:entity,
-//         entity_len:entity_len,
-//         codepoint1:codepoint1,
-//         codepoint2:codepoint2,
-//     }
-// }
+func MakeEntityCpMap(entity *byte, entity_len uint16, codepoint1 uint, codepoint2 uint) EntityCpMap {
+	return EntityCpMap{
+		entity:     entity,
+		entity_len: entity_len,
+		codepoint1: codepoint1,
+		codepoint2: codepoint2,
+	}
+}
 func (this *EntityCpMap) GetEntity() *byte { return this.entity }
 
 // func (this *EntityCpMap) SetEntity(value *byte) { this.entity = value }
@@ -217,12 +217,12 @@ type EntityHt struct {
 //         buckets:buckets,
 //     }
 // }
-// func MakeEntityHt(num_elems unsigned, buckets *EntityHtBucket) EntityHt {
-//     return EntityHt{
-//         num_elems:num_elems,
-//         buckets:buckets,
-//     }
-// }
+func MakeEntityHt(num_elems unsigned, buckets *EntityHtBucket) EntityHt {
+	return EntityHt{
+		num_elems: num_elems,
+		buckets:   buckets,
+	}
+}
 func (this *EntityHt) GetNumElems() unsigned { return this.num_elems }
 
 // func (this *EntityHt) SetNumElems(value unsigned) { this.num_elems = value }

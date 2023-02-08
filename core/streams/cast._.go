@@ -35,4 +35,4 @@ const PHP_STREAM_COOKIE_FUNCTIONS *COOKIE_IO_FUNCTIONS_T = &StreamCookieFunction
 
 /* use our fopencookie emulation */
 
-var StreamCookieFunctions COOKIE_IO_FUNCTIONS_T = COOKIE_IO_FUNCTIONS_T{StreamCookieReader, StreamCookieWriter, StreamCookieSeeker, StreamCookieCloser}
+var StreamCookieFunctions COOKIE_IO_FUNCTIONS_T = MakeCOOKIE_IO_FUNCTIONS_T(StreamCookieReader, StreamCookieWriter, StreamCookieSeeker, StreamCookieCloser)

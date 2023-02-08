@@ -130,448 +130,127 @@ Cronstructs a new dir iterator from a glob expression (no glob:// needed). */
 
 /* iterator handler table */
 
-var SplFilesystemDirItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplFilesystemDirItDtor, SplFilesystemDirItValid, SplFilesystemDirItCurrentData, SplFilesystemDirItCurrentKey, SplFilesystemDirItMoveForward, SplFilesystemDirItRewind, nil}
-var SplFilesystemTreeItFuncs zend.ZendObjectIteratorFuncs = zend.ZendObjectIteratorFuncs{SplFilesystemTreeItDtor, SplFilesystemDirItValid, SplFilesystemTreeItCurrentData, SplFilesystemTreeItCurrentKey, SplFilesystemTreeItMoveForward, SplFilesystemTreeItRewind, nil}
+var SplFilesystemDirItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemDirItDtor, SplFilesystemDirItValid, SplFilesystemDirItCurrentData, SplFilesystemDirItCurrentKey, SplFilesystemDirItMoveForward, SplFilesystemDirItRewind, nil)
+var SplFilesystemTreeItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemTreeItDtor, SplFilesystemDirItValid, SplFilesystemTreeItCurrentData, SplFilesystemTreeItCurrentKey, SplFilesystemTreeItMoveForward, SplFilesystemTreeItRewind, nil)
 var ArginfoInfoConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"file_name", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
 }
-var arginfo_info_openFile []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"open_mode", 0, 0, 0}, {"use_include_path", 0, 0, 0}, {"context", 0, 0, 0}}
-var arginfo_info_optinalFileClass []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"class_name", 0, 0, 0}}
-var arginfo_optinalSuffix []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"suffix", 0, 0, 0}}
+var arginfo_info_openFile []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("open_mode", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+}
+var arginfo_info_optinalFileClass []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
+}
+var arginfo_optinalSuffix []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("suffix", 0, 0, 0),
+}
 var ArginfoSplfileinfoVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 
 /* the method table */
 
 var spl_SplFileInfo_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_SplFileInfo___construct,
-		ArginfoInfoConstruct,
-		uint32(b.SizeOf("arginfo_info___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getPath",
-		zim_spl_SplFileInfo_getPath,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getFilename",
-		zim_spl_SplFileInfo_getFilename,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getExtension",
-		zim_spl_SplFileInfo_getExtension,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getBasename",
-		zim_spl_SplFileInfo_getBasename,
-		arginfo_optinalSuffix,
-		uint32(b.SizeOf("arginfo_optinalSuffix")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getPathname",
-		zim_spl_SplFileInfo_getPathname,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getPerms",
-		zim_spl_SplFileInfo_getPerms,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getInode",
-		zim_spl_SplFileInfo_getInode,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getSize",
-		zim_spl_SplFileInfo_getSize,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getOwner",
-		zim_spl_SplFileInfo_getOwner,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getGroup",
-		zim_spl_SplFileInfo_getGroup,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getATime",
-		zim_spl_SplFileInfo_getATime,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getMTime",
-		zim_spl_SplFileInfo_getMTime,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getCTime",
-		zim_spl_SplFileInfo_getCTime,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getType",
-		zim_spl_SplFileInfo_getType,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isWritable",
-		zim_spl_SplFileInfo_isWritable,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isReadable",
-		zim_spl_SplFileInfo_isReadable,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isExecutable",
-		zim_spl_SplFileInfo_isExecutable,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isFile",
-		zim_spl_SplFileInfo_isFile,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isDir",
-		zim_spl_SplFileInfo_isDir,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isLink",
-		zim_spl_SplFileInfo_isLink,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getLinkTarget",
-		zim_spl_SplFileInfo_getLinkTarget,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getRealPath",
-		zim_spl_SplFileInfo_getRealPath,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getFileInfo",
-		zim_spl_SplFileInfo_getFileInfo,
-		arginfo_info_optinalFileClass,
-		uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getPathInfo",
-		zim_spl_SplFileInfo_getPathInfo,
-		arginfo_info_optinalFileClass,
-		uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"openFile",
-		zim_spl_SplFileInfo_openFile,
-		arginfo_info_openFile,
-		uint32(b.SizeOf("arginfo_info_openFile")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setFileClass",
-		zim_spl_SplFileInfo_setFileClass,
-		arginfo_info_optinalFileClass,
-		uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setInfoClass",
-		zim_spl_SplFileInfo_setInfoClass,
-		arginfo_info_optinalFileClass,
-		uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"__debugInfo",
-		zim_spl_SplFileInfo___debugInfo,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"_bad_state_ex",
-		zim_spl_SplFileInfo__bad_state_ex,
-		nil,
-		uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC | zend.ZEND_ACC_FINAL,
-	},
-	{
-		"__toString",
-		zim_spl_SplFileInfo_getPathname,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_SplFileInfo___construct, ArginfoInfoConstruct, uint32(b.SizeOf("arginfo_info___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getPath", zim_spl_SplFileInfo_getPath, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getFilename", zim_spl_SplFileInfo_getFilename, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getExtension", zim_spl_SplFileInfo_getExtension, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getBasename", zim_spl_SplFileInfo_getBasename, arginfo_optinalSuffix, uint32(b.SizeOf("arginfo_optinalSuffix")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getPathname", zim_spl_SplFileInfo_getPathname, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getPerms", zim_spl_SplFileInfo_getPerms, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getInode", zim_spl_SplFileInfo_getInode, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getSize", zim_spl_SplFileInfo_getSize, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getOwner", zim_spl_SplFileInfo_getOwner, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getGroup", zim_spl_SplFileInfo_getGroup, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getATime", zim_spl_SplFileInfo_getATime, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getMTime", zim_spl_SplFileInfo_getMTime, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getCTime", zim_spl_SplFileInfo_getCTime, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getType", zim_spl_SplFileInfo_getType, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isWritable", zim_spl_SplFileInfo_isWritable, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isReadable", zim_spl_SplFileInfo_isReadable, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isExecutable", zim_spl_SplFileInfo_isExecutable, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isFile", zim_spl_SplFileInfo_isFile, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isDir", zim_spl_SplFileInfo_isDir, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isLink", zim_spl_SplFileInfo_isLink, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getLinkTarget", zim_spl_SplFileInfo_getLinkTarget, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getRealPath", zim_spl_SplFileInfo_getRealPath, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getFileInfo", zim_spl_SplFileInfo_getFileInfo, arginfo_info_optinalFileClass, uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getPathInfo", zim_spl_SplFileInfo_getPathInfo, arginfo_info_optinalFileClass, uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("openFile", zim_spl_SplFileInfo_openFile, arginfo_info_openFile, uint32(b.SizeOf("arginfo_info_openFile")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setFileClass", zim_spl_SplFileInfo_setFileClass, arginfo_info_optinalFileClass, uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setInfoClass", zim_spl_SplFileInfo_setInfoClass, arginfo_info_optinalFileClass, uint32(b.SizeOf("arginfo_info_optinalFileClass")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplFileInfo___debugInfo, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("_bad_state_ex", zim_spl_SplFileInfo__bad_state_ex, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_FINAL),
+	zend.MakeZendFunctionEntry("__toString", zim_spl_SplFileInfo_getPathname, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoDirConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"path", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
 }
 var ArginfoDirItSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"position", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("position", 0, 0, 0),
 }
 
 /* the method table */
 
 var spl_DirectoryIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_DirectoryIterator___construct,
-		ArginfoDirConstruct,
-		uint32(b.SizeOf("arginfo_dir___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getFilename",
-		zim_spl_DirectoryIterator_getFilename,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getExtension",
-		zim_spl_DirectoryIterator_getExtension,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getBasename",
-		zim_spl_DirectoryIterator_getBasename,
-		arginfo_optinalSuffix,
-		uint32(b.SizeOf("arginfo_optinalSuffix")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"isDot",
-		zim_spl_DirectoryIterator_isDot,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"rewind",
-		zim_spl_DirectoryIterator_rewind,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"valid",
-		zim_spl_DirectoryIterator_valid,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"key",
-		zim_spl_DirectoryIterator_key,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"current",
-		zim_spl_DirectoryIterator_current,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"next",
-		zim_spl_DirectoryIterator_next,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"seek",
-		zim_spl_DirectoryIterator_seek,
-		ArginfoDirItSeek,
-		uint32(b.SizeOf("arginfo_dir_it_seek")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"__toString",
-		zim_spl_DirectoryIterator_getFilename,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_DirectoryIterator___construct, ArginfoDirConstruct, uint32(b.SizeOf("arginfo_dir___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getFilename", zim_spl_DirectoryIterator_getFilename, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getExtension", zim_spl_DirectoryIterator_getExtension, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getBasename", zim_spl_DirectoryIterator_getBasename, arginfo_optinalSuffix, uint32(b.SizeOf("arginfo_optinalSuffix")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("isDot", zim_spl_DirectoryIterator_isDot, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("rewind", zim_spl_DirectoryIterator_rewind, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("valid", zim_spl_DirectoryIterator_valid, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("key", zim_spl_DirectoryIterator_key, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("current", zim_spl_DirectoryIterator_current, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("next", zim_spl_DirectoryIterator_next, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("seek", zim_spl_DirectoryIterator_seek, ArginfoDirItSeek, uint32(b.SizeOf("arginfo_dir_it_seek")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("__toString", zim_spl_DirectoryIterator_getFilename, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoRDirConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"path", 0, 0, 0}, {"flags", 0, 0, 0}}
-var arginfo_r_dir_hasChildren []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"allow_links", 0, 0, 0}}
-var arginfo_r_dir_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"flags", 0, 0, 0}}
+var ArginfoRDirConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+}
+var arginfo_r_dir_hasChildren []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("allow_links", 0, 0, 0),
+}
+var arginfo_r_dir_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+}
 var spl_FilesystemIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_FilesystemIterator___construct,
-		ArginfoRDirConstruct,
-		uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"rewind",
-		zim_spl_FilesystemIterator_rewind,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"next",
-		zim_spl_DirectoryIterator_next,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"key",
-		zim_spl_FilesystemIterator_key,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"current",
-		zim_spl_FilesystemIterator_current,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getFlags",
-		zim_spl_FilesystemIterator_getFlags,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setFlags",
-		zim_spl_FilesystemIterator_setFlags,
-		arginfo_r_dir_setFlags,
-		uint32(b.SizeOf("arginfo_r_dir_setFlags")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_FilesystemIterator___construct, ArginfoRDirConstruct, uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("rewind", zim_spl_FilesystemIterator_rewind, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("next", zim_spl_DirectoryIterator_next, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("key", zim_spl_FilesystemIterator_key, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("current", zim_spl_FilesystemIterator_current, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getFlags", zim_spl_FilesystemIterator_getFlags, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setFlags", zim_spl_FilesystemIterator_setFlags, arginfo_r_dir_setFlags, uint32(b.SizeOf("arginfo_r_dir_setFlags")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var spl_RecursiveDirectoryIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_RecursiveDirectoryIterator___construct,
-		ArginfoRDirConstruct,
-		uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"hasChildren",
-		zim_spl_RecursiveDirectoryIterator_hasChildren,
-		arginfo_r_dir_hasChildren,
-		uint32(b.SizeOf("arginfo_r_dir_hasChildren")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getChildren",
-		zim_spl_RecursiveDirectoryIterator_getChildren,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getSubPath",
-		zim_spl_RecursiveDirectoryIterator_getSubPath,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getSubPathname",
-		zim_spl_RecursiveDirectoryIterator_getSubPathname,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveDirectoryIterator___construct, ArginfoRDirConstruct, uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("hasChildren", zim_spl_RecursiveDirectoryIterator_hasChildren, arginfo_r_dir_hasChildren, uint32(b.SizeOf("arginfo_r_dir_hasChildren")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getChildren", zim_spl_RecursiveDirectoryIterator_getChildren, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getSubPath", zim_spl_RecursiveDirectoryIterator_getSubPath, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getSubPathname", zim_spl_RecursiveDirectoryIterator_getSubPathname, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_GlobIterator___construct,
-		ArginfoRDirConstruct,
-		uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"count",
-		zim_spl_GlobIterator_count,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_GlobIterator___construct, ArginfoRDirConstruct, uint32(b.SizeOf("arginfo_r_dir___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("count", zim_spl_GlobIterator_count, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
 /* {{{ proto SplFileObject::__construct(string filename [, string mode = 'r' [, bool use_include_path  [, resource context]]]])
@@ -647,267 +326,111 @@ var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 
 /* {{{ Function/Class/Method definitions */
 
-var ArginfoFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"file_name", 0, 0, 0}, {"open_mode", 0, 0, 0}, {"use_include_path", 0, 0, 0}, {"context", 0, 0, 0}}
+var ArginfoFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("open_mode", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+}
 var arginfo_file_object_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"flags", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
 var arginfo_file_object_setMaxLineLen []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
-	{(*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0},
-	{"max_len", 0, 0, 0},
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeZendInternalArgInfo("max_len", 0, 0, 0),
 }
-var ArginfoFileObjectFgetcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"delimiter", 0, 0, 0}, {"enclosure", 0, 0, 0}, {"escape", 0, 0, 0}}
-var ArginfoFileObjectFputcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"fields", 0, 0, 0}, {"delimiter", 0, 0, 0}, {"enclosure", 0, 0, 0}, {"escape", 0, 0, 0}}
-var ArginfoFileObjectFlock []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"operation", 0, 0, 0}, {"wouldblock", 0, 1, 0}}
-var ArginfoFileObjectFseek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"pos", 0, 0, 0}, {"whence", 0, 0, 0}}
-var ArginfoFileObjectFgetss []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"allowable_tags", 0, 0, 0}}
-var ArginfoFileObjectFscanf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"format", 0, 0, 0}, {"vars", 0, 1, 1}}
-var ArginfoFileObjectFwrite []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"str", 0, 0, 0}, {"length", 0, 0, 0}}
-var ArginfoFileObjectFread []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"length", 0, 0, 0}}
-var ArginfoFileObjectFtruncate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"size", 0, 0, 0}}
-var ArginfoFileObjectSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(1)), 0, 0, 0}, {"line_pos", 0, 0, 0}}
+var ArginfoFileObjectFgetcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
+}
+var ArginfoFileObjectFputcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("fields", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
+}
+var ArginfoFileObjectFlock []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("operation", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("wouldblock", 0, 1, 0),
+}
+var ArginfoFileObjectFseek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("pos", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("whence", 0, 0, 0),
+}
+var ArginfoFileObjectFgetss []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("allowable_tags", 0, 0, 0),
+}
+var ArginfoFileObjectFscanf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("vars", 0, 1, 1),
+}
+var ArginfoFileObjectFwrite []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+}
+var ArginfoFileObjectFread []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+}
+var ArginfoFileObjectFtruncate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
+}
+var ArginfoFileObjectSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("line_pos", 0, 0, 0),
+}
 var spl_SplFileObject_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_SplFileObject___construct,
-		ArginfoFileObjectConstruct,
-		uint32(b.SizeOf("arginfo_file_object___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"rewind",
-		zim_spl_SplFileObject_rewind,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"eof",
-		zim_spl_SplFileObject_eof,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"valid",
-		zim_spl_SplFileObject_valid,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fgets",
-		zim_spl_SplFileObject_fgets,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fgetcsv",
-		zim_spl_SplFileObject_fgetcsv,
-		ArginfoFileObjectFgetcsv,
-		uint32(b.SizeOf("arginfo_file_object_fgetcsv")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fputcsv",
-		zim_spl_SplFileObject_fputcsv,
-		ArginfoFileObjectFputcsv,
-		uint32(b.SizeOf("arginfo_file_object_fputcsv")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setCsvControl",
-		zim_spl_SplFileObject_setCsvControl,
-		ArginfoFileObjectFgetcsv,
-		uint32(b.SizeOf("arginfo_file_object_fgetcsv")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getCsvControl",
-		zim_spl_SplFileObject_getCsvControl,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"flock",
-		zim_spl_SplFileObject_flock,
-		ArginfoFileObjectFlock,
-		uint32(b.SizeOf("arginfo_file_object_flock")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fflush",
-		zim_spl_SplFileObject_fflush,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"ftell",
-		zim_spl_SplFileObject_ftell,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fseek",
-		zim_spl_SplFileObject_fseek,
-		ArginfoFileObjectFseek,
-		uint32(b.SizeOf("arginfo_file_object_fseek")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fgetc",
-		zim_spl_SplFileObject_fgetc,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fpassthru",
-		zim_spl_SplFileObject_fpassthru,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fgetss",
-		zim_spl_SplFileObject_fgetss,
-		ArginfoFileObjectFgetss,
-		uint32(b.SizeOf("arginfo_file_object_fgetss")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fscanf",
-		zim_spl_SplFileObject_fscanf,
-		ArginfoFileObjectFscanf,
-		uint32(b.SizeOf("arginfo_file_object_fscanf")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fwrite",
-		zim_spl_SplFileObject_fwrite,
-		ArginfoFileObjectFwrite,
-		uint32(b.SizeOf("arginfo_file_object_fwrite")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fread",
-		zim_spl_SplFileObject_fread,
-		ArginfoFileObjectFread,
-		uint32(b.SizeOf("arginfo_file_object_fread")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"fstat",
-		zim_spl_SplFileObject_fstat,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"ftruncate",
-		zim_spl_SplFileObject_ftruncate,
-		ArginfoFileObjectFtruncate,
-		uint32(b.SizeOf("arginfo_file_object_ftruncate")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"current",
-		zim_spl_SplFileObject_current,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"key",
-		zim_spl_SplFileObject_key,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"next",
-		zim_spl_SplFileObject_next,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setFlags",
-		zim_spl_SplFileObject_setFlags,
-		arginfo_file_object_setFlags,
-		uint32(b.SizeOf("arginfo_file_object_setFlags")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getFlags",
-		zim_spl_SplFileObject_getFlags,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"setMaxLineLen",
-		zim_spl_SplFileObject_setMaxLineLen,
-		arginfo_file_object_setMaxLineLen,
-		uint32(b.SizeOf("arginfo_file_object_setMaxLineLen")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getMaxLineLen",
-		zim_spl_SplFileObject_getMaxLineLen,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"hasChildren",
-		zim_spl_SplFileObject_hasChildren,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getChildren",
-		zim_spl_SplFileObject_getChildren,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"seek",
-		zim_spl_SplFileObject_seek,
-		ArginfoFileObjectSeek,
-		uint32(b.SizeOf("arginfo_file_object_seek")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"getCurrentLine",
-		zim_spl_SplFileObject_fgets,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{
-		"__toString",
-		zim_spl_SplFileObject_fgets,
-		ArginfoSplfileinfoVoid,
-		uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_SplFileObject___construct, ArginfoFileObjectConstruct, uint32(b.SizeOf("arginfo_file_object___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("rewind", zim_spl_SplFileObject_rewind, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("eof", zim_spl_SplFileObject_eof, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("valid", zim_spl_SplFileObject_valid, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fgets", zim_spl_SplFileObject_fgets, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fgetcsv", zim_spl_SplFileObject_fgetcsv, ArginfoFileObjectFgetcsv, uint32(b.SizeOf("arginfo_file_object_fgetcsv")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fputcsv", zim_spl_SplFileObject_fputcsv, ArginfoFileObjectFputcsv, uint32(b.SizeOf("arginfo_file_object_fputcsv")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setCsvControl", zim_spl_SplFileObject_setCsvControl, ArginfoFileObjectFgetcsv, uint32(b.SizeOf("arginfo_file_object_fgetcsv")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getCsvControl", zim_spl_SplFileObject_getCsvControl, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("flock", zim_spl_SplFileObject_flock, ArginfoFileObjectFlock, uint32(b.SizeOf("arginfo_file_object_flock")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fflush", zim_spl_SplFileObject_fflush, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("ftell", zim_spl_SplFileObject_ftell, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fseek", zim_spl_SplFileObject_fseek, ArginfoFileObjectFseek, uint32(b.SizeOf("arginfo_file_object_fseek")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fgetc", zim_spl_SplFileObject_fgetc, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fpassthru", zim_spl_SplFileObject_fpassthru, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fgetss", zim_spl_SplFileObject_fgetss, ArginfoFileObjectFgetss, uint32(b.SizeOf("arginfo_file_object_fgetss")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fscanf", zim_spl_SplFileObject_fscanf, ArginfoFileObjectFscanf, uint32(b.SizeOf("arginfo_file_object_fscanf")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fwrite", zim_spl_SplFileObject_fwrite, ArginfoFileObjectFwrite, uint32(b.SizeOf("arginfo_file_object_fwrite")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fread", zim_spl_SplFileObject_fread, ArginfoFileObjectFread, uint32(b.SizeOf("arginfo_file_object_fread")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("fstat", zim_spl_SplFileObject_fstat, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("ftruncate", zim_spl_SplFileObject_ftruncate, ArginfoFileObjectFtruncate, uint32(b.SizeOf("arginfo_file_object_ftruncate")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("current", zim_spl_SplFileObject_current, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("key", zim_spl_SplFileObject_key, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("next", zim_spl_SplFileObject_next, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setFlags", zim_spl_SplFileObject_setFlags, arginfo_file_object_setFlags, uint32(b.SizeOf("arginfo_file_object_setFlags")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getFlags", zim_spl_SplFileObject_getFlags, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("setMaxLineLen", zim_spl_SplFileObject_setMaxLineLen, arginfo_file_object_setMaxLineLen, uint32(b.SizeOf("arginfo_file_object_setMaxLineLen")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getMaxLineLen", zim_spl_SplFileObject_getMaxLineLen, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("hasChildren", zim_spl_SplFileObject_hasChildren, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getChildren", zim_spl_SplFileObject_getChildren, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("seek", zim_spl_SplFileObject_seek, ArginfoFileObjectSeek, uint32(b.SizeOf("arginfo_file_object_seek")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("getCurrentLine", zim_spl_SplFileObject_fgets, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry("__toString", zim_spl_SplFileObject_fgets, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoTempFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{{(*byte)(zend_uintptr_t(0)), 0, 0, 0}, {"max_memory", 0, 0, 0}}
+var ArginfoTempFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeZendInternalArgInfo("max_memory", 0, 0, 0),
+}
 var spl_SplTempFileObject_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	{
-		"__construct",
-		zim_spl_SplTempFileObject___construct,
-		ArginfoTempFileObjectConstruct,
-		uint32(b.SizeOf("arginfo_temp_file_object___construct")/b.SizeOf("struct _zend_internal_arg_info") - 1),
-		zend.ZEND_ACC_PUBLIC,
-	},
-	{nil, nil, nil, 0, 0},
+	zend.MakeZendFunctionEntry("__construct", zim_spl_SplTempFileObject___construct, ArginfoTempFileObjectConstruct, uint32(b.SizeOf("arginfo_temp_file_object___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
+	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
