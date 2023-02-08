@@ -13,26 +13,12 @@ func ZvalPtrDtorNogc(zval_ptr *Zval) {
 }
 func IZvalPtrDtor(zval_ptr *Zval) {
 	if zval_ptr.IsRefcounted() {
-		var ref *ZendRefcounted = zval_ptr.GetCounted()
+		var ref = zval_ptr.GetCounted()
 		if ref.DelRefcount() == 0 {
 			RcDtorFunc(ref)
 		} else {
 			GcCheckPossibleRoot(ref)
 		}
-	}
-}
-func ZvalCopyCtor(zvalue *Zval) {
-	if zvalue.IsArray() {
-		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
-	} else if zvalue.IsRefcounted() {
-		zvalue.AddRefcount()
-	}
-}
-func ZvalOptCopyCtor(zvalue *Zval) {
-	if zvalue.IsArray() {
-		zvalue.SetArray(ZendArrayDup(zvalue.GetArr()))
-	} else if zvalue.IsRefcounted() {
-		zvalue.AddRefcount()
 	}
 }
 func ZvalPtrDtorStr(zval_ptr *Zval) {
@@ -43,19 +29,20 @@ func ZvalPtrDtorStr(zval_ptr *Zval) {
 		Efree(zval_ptr.GetStr())
 	}
 }
-func ZvalDtor(zvalue *Zval)         { ZvalPtrDtorNogc(zvalue) }
-func ZvalInternalDtor(zvalue *Zval) { ZvalInternalPtrDtor(zvalue) }
+func ZvalDtor(zvalue *Zval) { ZvalPtrDtorNogc(zvalue) }
 func RcDtorFunc(p *ZendRefcounted) {
 	ZEND_ASSERT(p.GetGcType() <= IS_CONSTANT_AST)
-	ZendRcDtorFunc[p.GetGcType()](p)
+	if dtor, ok := ZendRcDtorFuncMap[p.GetGcType()]; ok {
+		dtor(p)
+	}
 }
+
 func ZendReferenceDestroy(ref *ZendReference) {
 	ZEND_ASSERT(!(ZEND_REF_HAS_TYPE_SOURCES(ref)))
 	IZvalPtrDtor(ref.GetVal())
 	EfreeSize(ref, b.SizeOf("zend_reference"))
 }
-func ZendEmptyDestroy(ref *ZendReference) {}
-func ZvalPtrDtor(zval_ptr *Zval)          { IZvalPtrDtor(zval_ptr) }
+func ZvalPtrDtor(zval_ptr *Zval) { IZvalPtrDtor(zval_ptr) }
 func ZvalInternalPtrDtor(zval_ptr *Zval) {
 	if zval_ptr.IsRefcounted() {
 		var ref *ZendRefcounted = zval_ptr.GetCounted()
