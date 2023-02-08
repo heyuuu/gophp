@@ -214,7 +214,7 @@ func SapiCliServerDiscardHeaders(sapi_headers *core.SapiHeaders) int {
 }
 func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var client *PhpCliServerClient = core.SG(server_context)
-	var buffer zend.SmartStr = zend.SmartStr{0}
+	var buffer zend.SmartStr = zend.MakeSmartStr(0)
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
 	if client == nil || core.SG(request_info).no_headers {
@@ -1178,18 +1178,7 @@ func PhpCliServerClientReadRequestOnMessageComplete(parser *PhpHttpParser) int {
 }
 func PhpCliServerClientReadRequest(client *PhpCliServerClient, errstr **byte) int {
 	var buf []byte
-	var settings PhpHttpParserSettings = PhpHttpParserSettings{
-		PhpCliServerClientReadRequestOnMessageBegin,
-		PhpCliServerClientReadRequestOnPath,
-		PhpCliServerClientReadRequestOnQueryString,
-		PhpCliServerClientReadRequestOnUrl,
-		PhpCliServerClientReadRequestOnFragment,
-		PhpCliServerClientReadRequestOnHeaderField,
-		PhpCliServerClientReadRequestOnHeaderValue,
-		PhpCliServerClientReadRequestOnHeadersComplete,
-		PhpCliServerClientReadRequestOnBody,
-		PhpCliServerClientReadRequestOnMessageComplete,
-	}
+	var settings PhpHttpParserSettings = MakePhpHttpParserSettings(PhpCliServerClientReadRequestOnMessageBegin, PhpCliServerClientReadRequestOnPath, PhpCliServerClientReadRequestOnQueryString, PhpCliServerClientReadRequestOnUrl, PhpCliServerClientReadRequestOnFragment, PhpCliServerClientReadRequestOnHeaderField, PhpCliServerClientReadRequestOnHeaderValue, PhpCliServerClientReadRequestOnHeadersComplete, PhpCliServerClientReadRequestOnBody, PhpCliServerClientReadRequestOnMessageComplete)
 	var nbytes_consumed int
 	var nbytes_read int
 	if client.GetRequestRead() != 0 {
@@ -1372,7 +1361,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	}
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
 	var chunk *PhpCliServerChunk
-	var buffer zend.SmartStr = zend.SmartStr{0}
+	var buffer zend.SmartStr = zend.MakeSmartStr(0)
 	AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), status, 1)
 	if buffer.GetS() == nil {
 
@@ -1455,7 +1444,7 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 	client.SetContentSenderInitialized(1)
 	client.SetFileFd(fd)
 	var chunk *PhpCliServerChunk
-	var buffer zend.SmartStr = zend.SmartStr{0}
+	var buffer zend.SmartStr = zend.MakeSmartStr(0)
 	var mime_type *byte = GetMimeType(server, client.GetRequest().GetExt(), client.GetRequest().GetExtLen())
 	AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), status, 1)
 	if buffer.GetS() == nil {
@@ -1598,6 +1587,15 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	}
 	core.SG(server_context) = nil
 	DestroyRequestInfo(&(core.SG(request_info)))
+	return zend.SUCCESS
+}
+func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerExtMimeTypePair) int {
+	var pair *PhpCliServerExtMimeTypePair
+	zend.ZendHashInit(server.GetExtensionMimeTypes(), 0, nil, nil, 1)
+	for pair = mime_type_map; pair.GetExt() != nil; pair++ {
+		var ext_len int = strlen(pair.GetExt())
+		zend.ZendHashStrAddPtr(server.GetExtensionMimeTypes(), pair.GetExt(), ext_len, any(pair.GetMimeType()))
+	}
 	return zend.SUCCESS
 }
 func PhpCliServerDtor(server *PhpCliServer) {
@@ -1844,7 +1842,7 @@ func PhpCliServerDoEventForEachFdCallback(_params any, fd core.PhpSocketT, event
 	return zend.SUCCESS
 }
 func PhpCliServerDoEventForEachFd(server *PhpCliServer, rhandler func(*PhpCliServer, *PhpCliServerClient) int, whandler func(*PhpCliServer, *PhpCliServerClient) int) {
-	var params PhpCliServerDoEventForEachFdCallbackParams = PhpCliServerDoEventForEachFdCallbackParams{server, rhandler, whandler}
+	var params PhpCliServerDoEventForEachFdCallbackParams = MakePhpCliServerDoEventForEachFdCallbackParams(server, rhandler, whandler)
 	PhpCliServerPollerIterOnActive(server.GetPoller(), &params, PhpCliServerDoEventForEachFdCallback)
 }
 func PhpCliServerDoEventLoop(server *PhpCliServer) int {
@@ -1872,6 +1870,7 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
+func PhpCliServerSigintHandler(sig int) { Server.SetIsRunning(0) }
 func DoCliServer(argc int, argv **byte) int {
 	var php_optarg *byte = nil
 	var php_optind int = 1
