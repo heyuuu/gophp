@@ -13,11 +13,6 @@ type ZendArrayGlobals struct {
 	multisort_func *zend.CompareFuncT
 }
 
-// func NewZendArrayGlobals(multisort_func *zend.CompareFuncT) *ZendArrayGlobals {
-//     return &ZendArrayGlobals{
-//         multisort_func:multisort_func,
-//     }
-// }
 // func MakeZendArrayGlobals(multisort_func *zend.CompareFuncT) ZendArrayGlobals {
 //     return ZendArrayGlobals{
 //         multisort_func:multisort_func,

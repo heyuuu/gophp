@@ -10,12 +10,6 @@ type ZendWeakref struct {
 	std      ZendObject
 }
 
-// func NewZendWeakref(referent *ZendObject, std ZendObject) *ZendWeakref {
-//     return &ZendWeakref{
-//         referent:referent,
-//         std:std,
-//     }
-// }
 // func MakeZendWeakref(referent *ZendObject, std ZendObject) ZendWeakref {
 //     return ZendWeakref{
 //         referent:referent,

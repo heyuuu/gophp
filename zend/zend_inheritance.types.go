@@ -11,13 +11,6 @@ type ZendAbstractInfo struct {
 	ctor int
 }
 
-// func NewZendAbstractInfo(afn []*ZendFunction, cnt int, ctor int) *ZendAbstractInfo {
-//     return &ZendAbstractInfo{
-//         afn:afn,
-//         cnt:cnt,
-//         ctor:ctor,
-//     }
-// }
 // func MakeZendAbstractInfo(afn []*ZendFunction, cnt int, ctor int) ZendAbstractInfo {
 //     return ZendAbstractInfo{
 //         afn:afn,

@@ -17,15 +17,6 @@ type ZendStream struct {
 	closer ZendStreamCloserT
 }
 
-// func NewZendStream(handle any, isatty int, reader ZendStreamReaderT, fsizer ZendStreamFsizerT, closer ZendStreamCloserT) *ZendStream {
-//     return &ZendStream{
-//         handle:handle,
-//         isatty:isatty,
-//         reader:reader,
-//         fsizer:fsizer,
-//         closer:closer,
-//     }
-// }
 // func MakeZendStream(handle any, isatty int, reader ZendStreamReaderT, fsizer ZendStreamFsizerT, closer ZendStreamCloserT) ZendStream {
 //     return ZendStream{
 //         handle:handle,

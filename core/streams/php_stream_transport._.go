@@ -26,7 +26,17 @@ import (
   +----------------------------------------------------------------------+
 */
 
-type PhpStreamTransportFactoryFunc func(proto *byte, protolen int, resourcename *byte, resourcenamelen int, persistent_id *byte, options int, flags int, timeout *__struct__timeval, context *core.PhpStreamContext) *core.PhpStream
+type PhpStreamTransportFactoryFunc func(
+	proto *byte,
+	protolen int,
+	resourcename *byte,
+	resourcenamelen int,
+	persistent_id *byte,
+	options int,
+	flags int,
+	timeout *__struct__timeval,
+	context *core.PhpStreamContext,
+) *core.PhpStream
 type PhpStreamTransportFactory *PhpStreamTransportFactoryFunc
 
 const STREAM_XPORT_CLIENT = 0

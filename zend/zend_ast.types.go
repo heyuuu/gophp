@@ -12,14 +12,6 @@ type ZendAst struct {
 	child  []*ZendAst
 }
 
-// func NewZendAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, child []*ZendAst) *ZendAst {
-//     return &ZendAst{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         child:child,
-//     }
-// }
 // func MakeZendAst(kind ZendAstKind, attr ZendAstAttr, lineno uint32, child []*ZendAst) ZendAst {
 //     return ZendAst{
 //         kind:kind,
@@ -49,15 +41,6 @@ type ZendAstList struct {
 	child    []*ZendAst
 }
 
-// func NewZendAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children uint32, child []*ZendAst) *ZendAstList {
-//     return &ZendAstList{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         children:children,
-//         child:child,
-//     }
-// }
 // func MakeZendAstList(kind ZendAstKind, attr ZendAstAttr, lineno uint32, children uint32, child []*ZendAst) ZendAstList {
 //     return ZendAstList{
 //         kind:kind,
@@ -89,13 +72,6 @@ type ZendAstZval struct {
 	val  Zval
 }
 
-// func NewZendAstZval(kind ZendAstKind, attr ZendAstAttr, val Zval) *ZendAstZval {
-//     return &ZendAstZval{
-//         kind:kind,
-//         attr:attr,
-//         val:val,
-//     }
-// }
 // func MakeZendAstZval(kind ZendAstKind, attr ZendAstAttr, val Zval) ZendAstZval {
 //     return ZendAstZval{
 //         kind:kind,
@@ -127,32 +103,29 @@ type ZendAstDecl struct {
 	child        []*ZendAst
 }
 
-// func NewZendAstDecl(kind ZendAstKind, attr ZendAstAttr, start_lineno uint32, end_lineno uint32, flags uint32, lex_pos *uint8, doc_comment *ZendString, name *ZendString, child []*ZendAst) *ZendAstDecl {
-//     return &ZendAstDecl{
-//         kind:kind,
-//         attr:attr,
-//         start_lineno:start_lineno,
-//         end_lineno:end_lineno,
-//         flags:flags,
-//         lex_pos:lex_pos,
-//         doc_comment:doc_comment,
-//         name:name,
-//         child:child,
-//     }
-// }
-// func MakeZendAstDecl(kind ZendAstKind, attr ZendAstAttr, start_lineno uint32, end_lineno uint32, flags uint32, lex_pos *uint8, doc_comment *ZendString, name *ZendString, child []*ZendAst) ZendAstDecl {
-//     return ZendAstDecl{
-//         kind:kind,
-//         attr:attr,
-//         start_lineno:start_lineno,
-//         end_lineno:end_lineno,
-//         flags:flags,
-//         lex_pos:lex_pos,
-//         doc_comment:doc_comment,
-//         name:name,
-//         child:child,
-//     }
-// }
+//             func MakeZendAstDecl(
+// kind ZendAstKind,
+// attr ZendAstAttr,
+// start_lineno uint32,
+// end_lineno uint32,
+// flags uint32,
+// lex_pos *uint8,
+// doc_comment *ZendString,
+// name *ZendString,
+// child []*ZendAst,
+// ) ZendAstDecl {
+//                 return ZendAstDecl{
+//                     kind:kind,
+//                     attr:attr,
+//                     start_lineno:start_lineno,
+//                     end_lineno:end_lineno,
+//                     flags:flags,
+//                     lex_pos:lex_pos,
+//                     doc_comment:doc_comment,
+//                     name:name,
+//                     child:child,
+//                 }
+//             }
 func (this *ZendAstDecl) GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAstDecl) SetKind(value ZendAstKind) { this.kind = value }
 

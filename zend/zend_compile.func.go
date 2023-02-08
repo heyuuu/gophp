@@ -677,7 +677,14 @@ func ZendAddMemberModifier(flags uint32, new_flag uint32) uint32 {
 	}
 	return new_flags
 }
-func ZendConcat3(str1 *byte, str1_len int, str2 string, str2_len int, str3 *byte, str3_len int) *ZendString {
+func ZendConcat3(
+	str1 *byte,
+	str1_len int,
+	str2 string,
+	str2_len int,
+	str3 *byte,
+	str3_len int,
+) *ZendString {
 	var len_ int = str1_len + str2_len + str3_len
 	var res *ZendString = ZendStringAlloc(len_, 0)
 	memcpy(res.GetVal(), str1, str1_len)

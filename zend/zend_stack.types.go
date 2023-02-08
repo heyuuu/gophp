@@ -12,14 +12,6 @@ type ZendStack struct {
 	elements any
 }
 
-// func NewZendStack(size int, top int, max int, elements any) *ZendStack {
-//     return &ZendStack{
-//         size:size,
-//         top:top,
-//         max:max,
-//         elements:elements,
-//     }
-// }
 // func MakeZendStack(size int, top int, max int, elements any) ZendStack {
 //     return ZendStack{
 //         size:size,

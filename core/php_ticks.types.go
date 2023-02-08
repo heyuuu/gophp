@@ -10,12 +10,6 @@ type StTickFunction struct {
 	arg   any
 }
 
-// func NewStTickFunction(func_ func(int, any), arg any) *StTickFunction {
-//     return &StTickFunction{
-//         func_:func_,
-//         arg:arg,
-//     }
-// }
 func MakeStTickFunction(func_ func(int, any), arg any) StTickFunction {
 	return StTickFunction{
 		func_: func_,

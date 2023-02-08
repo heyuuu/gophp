@@ -10,12 +10,6 @@ type Querybuf struct /* union */ {
 	qb2 []u_char
 }
 
-// func NewQuerybuf(qb1 HEADER, qb2 []u_char) *Querybuf {
-//     return &Querybuf{
-//         qb1:qb1,
-//         qb2:qb2,
-//     }
-// }
 // func MakeQuerybuf(qb1 HEADER, qb2 []u_char) Querybuf {
 //     return Querybuf{
 //         qb1:qb1,

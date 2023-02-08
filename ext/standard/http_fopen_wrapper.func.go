@@ -35,7 +35,17 @@ func CheckHasHeader(headers *byte, header string) zend.ZendBool {
 	}
 	return 0
 }
-func PhpStreamUrlWrapHttpEx(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext, redirect_max int, flags int, response_header *zend.Zval) *core.PhpStream {
+func PhpStreamUrlWrapHttpEx(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+	redirect_max int,
+	flags int,
+	response_header *zend.Zval,
+) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var resource *PhpUrl = nil
 	var use_ssl int
@@ -907,7 +917,14 @@ out:
 	}
 	return stream
 }
-func PhpStreamUrlWrapHttp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamUrlWrapHttp(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var stream *core.PhpStream
 	var headers zend.Zval
 	headers.SetUndef()

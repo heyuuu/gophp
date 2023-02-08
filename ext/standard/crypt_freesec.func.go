@@ -258,7 +258,14 @@ func DesSetkey(key *byte, data *PhpCryptExtendedData) int {
 	}
 	return 0
 }
-func DoDes(l_in uint32, r_in uint32, l_out *uint32, r_out *uint32, count int, data *PhpCryptExtendedData) int {
+func DoDes(
+	l_in uint32,
+	r_in uint32,
+	l_out *uint32,
+	r_out *uint32,
+	count int,
+	data *PhpCryptExtendedData,
+) int {
 	/*
 	 *    l_in, r_in, l_out, and r_out are in pseudo-"big-endian" format.
 	 */

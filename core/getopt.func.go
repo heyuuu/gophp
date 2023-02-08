@@ -7,7 +7,14 @@ import (
 	r "sik/runtime"
 )
 
-func PhpOptError(argc int, argv **byte, oint int, optchr int, err int, show_err int) int {
+func PhpOptError(
+	argc int,
+	argv **byte,
+	oint int,
+	optchr int,
+	err int,
+	show_err int,
+) int {
 	if show_err != 0 {
 		r.Fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1)
 		switch err {
@@ -27,7 +34,15 @@ func PhpOptError(argc int, argv **byte, oint int, optchr int, err int, show_err 
 	}
 	return PHP_GETOPT_INVALID_ARG
 }
-func PhpGetopt(argc int, argv **byte, opts []Opt, optarg **byte, optind *int, show_err int, arg_start int) int {
+func PhpGetopt(
+	argc int,
+	argv **byte,
+	opts []Opt,
+	optarg **byte,
+	optind *int,
+	show_err int,
+	arg_start int,
+) int {
 	var optchr int = 0
 	var dash int = 0
 	var prev_optarg **byte = nil

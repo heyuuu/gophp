@@ -11,13 +11,6 @@ type ZendLlistElement struct {
 	data []byte
 }
 
-// func NewZendLlistElement(next *ZendLlistElement, prev *ZendLlistElement, data []byte) *ZendLlistElement {
-//     return &ZendLlistElement{
-//         next:next,
-//         prev:prev,
-//         data:data,
-//     }
-// }
 // func MakeZendLlistElement(next *ZendLlistElement, prev *ZendLlistElement, data []byte) ZendLlistElement {
 //     return ZendLlistElement{
 //         next:next,
@@ -46,28 +39,25 @@ type ZendLlist struct {
 	traverse_ptr *ZendLlistElement
 }
 
-// func NewZendLlist(head *ZendLlistElement, tail *ZendLlistElement, count int, size int, dtor LlistDtorFuncT, persistent uint8, traverse_ptr *ZendLlistElement) *ZendLlist {
-//     return &ZendLlist{
-//         head:head,
-//         tail:tail,
-//         count:count,
-//         size:size,
-//         dtor:dtor,
-//         persistent:persistent,
-//         traverse_ptr:traverse_ptr,
-//     }
-// }
-// func MakeZendLlist(head *ZendLlistElement, tail *ZendLlistElement, count int, size int, dtor LlistDtorFuncT, persistent uint8, traverse_ptr *ZendLlistElement) ZendLlist {
-//     return ZendLlist{
-//         head:head,
-//         tail:tail,
-//         count:count,
-//         size:size,
-//         dtor:dtor,
-//         persistent:persistent,
-//         traverse_ptr:traverse_ptr,
-//     }
-// }
+//             func MakeZendLlist(
+// head *ZendLlistElement,
+// tail *ZendLlistElement,
+// count int,
+// size int,
+// dtor LlistDtorFuncT,
+// persistent uint8,
+// traverse_ptr *ZendLlistElement,
+// ) ZendLlist {
+//                 return ZendLlist{
+//                     head:head,
+//                     tail:tail,
+//                     count:count,
+//                     size:size,
+//                     dtor:dtor,
+//                     persistent:persistent,
+//                     traverse_ptr:traverse_ptr,
+//                 }
+//             }
 func (this *ZendLlist) GetHead() *ZendLlistElement        { return this.head }
 func (this *ZendLlist) SetHead(value *ZendLlistElement)   { this.head = value }
 func (this *ZendLlist) GetTail() *ZendLlistElement        { return this.tail }

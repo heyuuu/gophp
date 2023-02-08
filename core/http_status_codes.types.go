@@ -10,12 +10,6 @@ type HttpResponseStatusCodePair struct {
 	str  *byte
 }
 
-// func NewHttpResponseStatusCodePair(code int, str *byte) *HttpResponseStatusCodePair {
-//     return &HttpResponseStatusCodePair{
-//         code:code,
-//         str:str,
-//     }
-// }
 func MakeHttpResponseStatusCodePair(code int, str *byte) HttpResponseStatusCodePair {
 	return HttpResponseStatusCodePair{
 		code: code,

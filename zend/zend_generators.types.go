@@ -61,44 +61,41 @@ type ZendGenerator struct {
 	gc_buffer_size           uint32
 }
 
-// func NewZendGenerator(std ZendObject, iterator *ZendObjectIterator, execute_data *ZendExecuteData, frozen_call_stack *ZendExecuteData, value Zval, key Zval, retval Zval, send_target *Zval, largest_used_integer_key ZendLong, values Zval, node ZendGeneratorNode, execute_fake ZendExecuteData, flags ZendUchar, gc_buffer *Zval, gc_buffer_size uint32) *ZendGenerator {
-//     return &ZendGenerator{
-//         std:std,
-//         iterator:iterator,
-//         execute_data:execute_data,
-//         frozen_call_stack:frozen_call_stack,
-//         value:value,
-//         key:key,
-//         retval:retval,
-//         send_target:send_target,
-//         largest_used_integer_key:largest_used_integer_key,
-//         values:values,
-//         node:node,
-//         execute_fake:execute_fake,
-//         flags:flags,
-//         gc_buffer:gc_buffer,
-//         gc_buffer_size:gc_buffer_size,
-//     }
-// }
-// func MakeZendGenerator(std ZendObject, iterator *ZendObjectIterator, execute_data *ZendExecuteData, frozen_call_stack *ZendExecuteData, value Zval, key Zval, retval Zval, send_target *Zval, largest_used_integer_key ZendLong, values Zval, node ZendGeneratorNode, execute_fake ZendExecuteData, flags ZendUchar, gc_buffer *Zval, gc_buffer_size uint32) ZendGenerator {
-//     return ZendGenerator{
-//         std:std,
-//         iterator:iterator,
-//         execute_data:execute_data,
-//         frozen_call_stack:frozen_call_stack,
-//         value:value,
-//         key:key,
-//         retval:retval,
-//         send_target:send_target,
-//         largest_used_integer_key:largest_used_integer_key,
-//         values:values,
-//         node:node,
-//         execute_fake:execute_fake,
-//         flags:flags,
-//         gc_buffer:gc_buffer,
-//         gc_buffer_size:gc_buffer_size,
-//     }
-// }
+//             func MakeZendGenerator(
+// std ZendObject,
+// iterator *ZendObjectIterator,
+// execute_data *ZendExecuteData,
+// frozen_call_stack *ZendExecuteData,
+// value Zval,
+// key Zval,
+// retval Zval,
+// send_target *Zval,
+// largest_used_integer_key ZendLong,
+// values Zval,
+// node ZendGeneratorNode,
+// execute_fake ZendExecuteData,
+// flags ZendUchar,
+// gc_buffer *Zval,
+// gc_buffer_size uint32,
+// ) ZendGenerator {
+//                 return ZendGenerator{
+//                     std:std,
+//                     iterator:iterator,
+//                     execute_data:execute_data,
+//                     frozen_call_stack:frozen_call_stack,
+//                     value:value,
+//                     key:key,
+//                     retval:retval,
+//                     send_target:send_target,
+//                     largest_used_integer_key:largest_used_integer_key,
+//                     values:values,
+//                     node:node,
+//                     execute_fake:execute_fake,
+//                     flags:flags,
+//                     gc_buffer:gc_buffer,
+//                     gc_buffer_size:gc_buffer_size,
+//                 }
+//             }
 func (this *ZendGenerator) GetStd() ZendObject { return this.std }
 
 // func (this *ZendGenerator) SetStd(value ZendObject) { this.std = value }

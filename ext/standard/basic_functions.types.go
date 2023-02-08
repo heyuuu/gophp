@@ -173,14 +173,6 @@ type PutenvEntry struct {
 	key_len        int
 }
 
-// func NewPutenvEntry(putenv_string *byte, previous_value *byte, key *byte, key_len int) *PutenvEntry {
-//     return &PutenvEntry{
-//         putenv_string:putenv_string,
-//         previous_value:previous_value,
-//         key:key,
-//         key_len:key_len,
-//     }
-// }
 // func MakePutenvEntry(putenv_string *byte, previous_value *byte, key *byte, key_len int) PutenvEntry {
 //     return PutenvEntry{
 //         putenv_string:putenv_string,
@@ -206,12 +198,6 @@ type PhpShutdownFunctionEntry struct {
 	arg_count int
 }
 
-// func NewPhpShutdownFunctionEntry(arguments *zend.Zval, arg_count int) *PhpShutdownFunctionEntry {
-//     return &PhpShutdownFunctionEntry{
-//         arguments:arguments,
-//         arg_count:arg_count,
-//     }
-// }
 // func MakePhpShutdownFunctionEntry(arguments *zend.Zval, arg_count int) PhpShutdownFunctionEntry {
 //     return PhpShutdownFunctionEntry{
 //         arguments:arguments,
@@ -232,13 +218,6 @@ type UserTickFunctionEntry struct {
 	calling   int
 }
 
-// func NewUserTickFunctionEntry(arguments *zend.Zval, arg_count int, calling int) *UserTickFunctionEntry {
-//     return &UserTickFunctionEntry{
-//         arguments:arguments,
-//         arg_count:arg_count,
-//         calling:calling,
-//     }
-// }
 // func MakeUserTickFunctionEntry(arguments *zend.Zval, arg_count int, calling int) UserTickFunctionEntry {
 //     return UserTickFunctionEntry{
 //         arguments:arguments,

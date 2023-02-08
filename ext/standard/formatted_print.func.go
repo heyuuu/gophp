@@ -29,7 +29,19 @@ func PhpSprintfAppendchars(buffer **zend.ZendString, pos *int, add *byte, len_ i
 	memcpy(buffer.GetVal()+(*pos), add, len_)
 	*pos += len_
 }
-func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_width int, max_width int, padding byte, alignment int, len_ int, neg int, expprec int, always_sign int) {
+func PhpSprintfAppendstring(
+	buffer **zend.ZendString,
+	pos *int,
+	add *byte,
+	min_width int,
+	max_width int,
+	padding byte,
+	alignment int,
+	len_ int,
+	neg int,
+	expprec int,
+	always_sign int,
+) {
 	var npad int
 	var req_size int
 	var copy_len int
@@ -82,7 +94,15 @@ func PhpSprintfAppendstring(buffer **zend.ZendString, pos *int, add *byte, min_w
 		}
 	}
 }
-func PhpSprintfAppendint(buffer **zend.ZendString, pos *int, number zend.ZendLong, width int, padding byte, alignment int, always_sign int) {
+func PhpSprintfAppendint(
+	buffer **zend.ZendString,
+	pos *int,
+	number zend.ZendLong,
+	width int,
+	padding byte,
+	alignment int,
+	always_sign int,
+) {
 	var numbuf []byte
 	var magn zend.ZendUlong
 	var nmagn zend.ZendUlong
@@ -116,7 +136,14 @@ func PhpSprintfAppendint(buffer **zend.ZendString, pos *int, number zend.ZendLon
 	}
 	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, neg, 0, always_sign)
 }
-func PhpSprintfAppenduint(buffer **zend.ZendString, pos *int, number zend.ZendUlong, width int, padding byte, alignment int) {
+func PhpSprintfAppenduint(
+	buffer **zend.ZendString,
+	pos *int,
+	number zend.ZendUlong,
+	width int,
+	padding byte,
+	alignment int,
+) {
 	var numbuf []byte
 	var magn zend.ZendUlong
 	var nmagn zend.ZendUlong
@@ -139,7 +166,18 @@ func PhpSprintfAppenduint(buffer **zend.ZendString, pos *int, number zend.ZendUl
 	}
 	PhpSprintfAppendstring(buffer, pos, &numbuf[i], width, 0, padding, alignment, NUM_BUF_SIZE-1-i, 0, 0, 0)
 }
-func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, width int, padding byte, alignment int, precision int, adjust int, fmt byte, always_sign int) {
+func PhpSprintfAppenddouble(
+	buffer **zend.ZendString,
+	pos *int,
+	number float64,
+	width int,
+	padding byte,
+	alignment int,
+	precision int,
+	adjust int,
+	fmt byte,
+	always_sign int,
+) {
 	var num_buf []byte
 	var s *byte = nil
 	var s_len int = 0
@@ -207,7 +245,17 @@ func PhpSprintfAppenddouble(buffer **zend.ZendString, pos *int, number float64, 
 	}
 	PhpSprintfAppendstring(buffer, pos, s, width, 0, padding, alignment, s_len, is_negative, 0, always_sign)
 }
-func PhpSprintfAppend2n(buffer **zend.ZendString, pos *int, number zend.ZendLong, width int, padding byte, alignment int, n int, chartable *byte, expprec int) {
+func PhpSprintfAppend2n(
+	buffer **zend.ZendString,
+	pos *int,
+	number zend.ZendLong,
+	width int,
+	padding byte,
+	alignment int,
+	n int,
+	chartable *byte,
+	expprec int,
+) {
 	var numbuf []byte
 	var num zend.ZendUlong
 	var i zend.ZendUlong = NUM_BUF_SIZE - 1

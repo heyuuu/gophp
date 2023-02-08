@@ -28,44 +28,41 @@ type PhpStdioStreamData struct {
 	sb               zend.ZendStatT
 }
 
-// func NewPhpStdioStreamData(file *r.FILE, fd int, is_process_pipe unsigned, is_pipe unsigned, cached_fstat unsigned, is_pipe_blocking unsigned, no_forced_fstat unsigned, is_seekable unsigned, _reserved unsigned, lock_flag int, temp_name *zend.ZendString, last_op byte, last_mapped_addr *byte, last_mapped_len int, sb zend.ZendStatT) *PhpStdioStreamData {
-//     return &PhpStdioStreamData{
-//         file:file,
-//         fd:fd,
-//         is_process_pipe:is_process_pipe,
-//         is_pipe:is_pipe,
-//         cached_fstat:cached_fstat,
-//         is_pipe_blocking:is_pipe_blocking,
-//         no_forced_fstat:no_forced_fstat,
-//         is_seekable:is_seekable,
-//         _reserved:_reserved,
-//         lock_flag:lock_flag,
-//         temp_name:temp_name,
-//         last_op:last_op,
-//         last_mapped_addr:last_mapped_addr,
-//         last_mapped_len:last_mapped_len,
-//         sb:sb,
-//     }
-// }
-// func MakePhpStdioStreamData(file *r.FILE, fd int, is_process_pipe unsigned, is_pipe unsigned, cached_fstat unsigned, is_pipe_blocking unsigned, no_forced_fstat unsigned, is_seekable unsigned, _reserved unsigned, lock_flag int, temp_name *zend.ZendString, last_op byte, last_mapped_addr *byte, last_mapped_len int, sb zend.ZendStatT) PhpStdioStreamData {
-//     return PhpStdioStreamData{
-//         file:file,
-//         fd:fd,
-//         is_process_pipe:is_process_pipe,
-//         is_pipe:is_pipe,
-//         cached_fstat:cached_fstat,
-//         is_pipe_blocking:is_pipe_blocking,
-//         no_forced_fstat:no_forced_fstat,
-//         is_seekable:is_seekable,
-//         _reserved:_reserved,
-//         lock_flag:lock_flag,
-//         temp_name:temp_name,
-//         last_op:last_op,
-//         last_mapped_addr:last_mapped_addr,
-//         last_mapped_len:last_mapped_len,
-//         sb:sb,
-//     }
-// }
+//             func MakePhpStdioStreamData(
+// file *r.FILE,
+// fd int,
+// is_process_pipe unsigned,
+// is_pipe unsigned,
+// cached_fstat unsigned,
+// is_pipe_blocking unsigned,
+// no_forced_fstat unsigned,
+// is_seekable unsigned,
+// _reserved unsigned,
+// lock_flag int,
+// temp_name *zend.ZendString,
+// last_op byte,
+// last_mapped_addr *byte,
+// last_mapped_len int,
+// sb zend.ZendStatT,
+// ) PhpStdioStreamData {
+//                 return PhpStdioStreamData{
+//                     file:file,
+//                     fd:fd,
+//                     is_process_pipe:is_process_pipe,
+//                     is_pipe:is_pipe,
+//                     cached_fstat:cached_fstat,
+//                     is_pipe_blocking:is_pipe_blocking,
+//                     no_forced_fstat:no_forced_fstat,
+//                     is_seekable:is_seekable,
+//                     _reserved:_reserved,
+//                     lock_flag:lock_flag,
+//                     temp_name:temp_name,
+//                     last_op:last_op,
+//                     last_mapped_addr:last_mapped_addr,
+//                     last_mapped_len:last_mapped_len,
+//                     sb:sb,
+//                 }
+//             }
 func (this *PhpStdioStreamData) GetFile() *r.FILE                { return this.file }
 func (this *PhpStdioStreamData) SetFile(value *r.FILE)           { this.file = value }
 func (this *PhpStdioStreamData) GetFd() int                      { return this.fd }

@@ -9,11 +9,6 @@ type PhpRandomGlobals struct {
 	fd int
 }
 
-// func NewPhpRandomGlobals(fd int) *PhpRandomGlobals {
-//     return &PhpRandomGlobals{
-//         fd:fd,
-//     }
-// }
 // func MakePhpRandomGlobals(fd int) PhpRandomGlobals {
 //     return PhpRandomGlobals{
 //         fd:fd,

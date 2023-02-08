@@ -456,7 +456,15 @@ func ZifDnsCheckRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	zend.ZVAL_BOOL(return_value, ntohs(hp.ancount) != 0)
 	return
 }
-func PhpParserr(cp *u_char, end *u_char, answer *Querybuf, type_to_fetch int, store int, raw int, subarray *zend.Zval) *u_char {
+func PhpParserr(
+	cp *u_char,
+	end *u_char,
+	answer *Querybuf,
+	type_to_fetch int,
+	store int,
+	raw int,
+	subarray *zend.Zval,
+) *u_char {
 	var type_ u_short
 	var class u_short
 	var dlen u_short

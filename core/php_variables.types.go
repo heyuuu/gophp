@@ -17,15 +17,6 @@ type PostVarDataT struct {
 	already_scanned int
 }
 
-// func NewPostVarDataT(str zend.SmartStr, ptr *byte, end *byte, cnt uint64, already_scanned int) *PostVarDataT {
-//     return &PostVarDataT{
-//         str:str,
-//         ptr:ptr,
-//         end:end,
-//         cnt:cnt,
-//         already_scanned:already_scanned,
-//     }
-// }
 // func MakePostVarDataT(str zend.SmartStr, ptr *byte, end *byte, cnt uint64, already_scanned int) PostVarDataT {
 //     return PostVarDataT{
 //         str:str,

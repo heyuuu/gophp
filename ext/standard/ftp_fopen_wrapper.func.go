@@ -52,7 +52,18 @@ func PhpStreamFtpStreamClose(wrapper *core.PhpStreamWrapper, stream *core.PhpStr
 	}
 	return ret
 }
-func PhpFtpFopenConnect(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext, preuseid **core.PhpStream, presource **PhpUrl, puse_ssl *int, puse_ssl_on_data *int) *core.PhpStream {
+func PhpFtpFopenConnect(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+	preuseid **core.PhpStream,
+	presource **PhpUrl,
+	puse_ssl *int,
+	puse_ssl_on_data *int,
+) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var reuseid *core.PhpStream = nil
 	var resource *PhpUrl = nil
@@ -364,7 +375,14 @@ func PhpFopenDoPasv(stream *core.PhpStream, ip *byte, ip_size int, phoststart **
 	}
 	return portno
 }
-func PhpStreamUrlWrapFtp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamUrlWrapFtp(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var datastream *core.PhpStream = nil
 	var resource *PhpUrl = nil
@@ -638,7 +656,14 @@ func PhpFtpDirstreamClose(stream *core.PhpStream, close_handle int) int {
 	stream.SetAbstract(nil)
 	return 0
 }
-func PhpStreamFtpOpendir(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamFtpOpendir(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var stream *core.PhpStream
 	var reuseid *core.PhpStream
 	var datastream *core.PhpStream = nil

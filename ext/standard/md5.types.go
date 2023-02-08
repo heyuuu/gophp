@@ -16,30 +16,27 @@ type PHP_MD5_CTX struct {
 	block  []uint32
 }
 
-// func NewPHP_MD5_CTX(lo uint32, hi uint32, a uint32, b uint32, c uint32, d uint32, buffer []uint8, block []uint32) *PHP_MD5_CTX {
-//     return &PHP_MD5_CTX{
-//         lo:lo,
-//         hi:hi,
-//         a:a,
-//         b:b,
-//         c:c,
-//         d:d,
-//         buffer:buffer,
-//         block:block,
-//     }
-// }
-// func MakePHP_MD5_CTX(lo uint32, hi uint32, a uint32, b uint32, c uint32, d uint32, buffer []uint8, block []uint32) PHP_MD5_CTX {
-//     return PHP_MD5_CTX{
-//         lo:lo,
-//         hi:hi,
-//         a:a,
-//         b:b,
-//         c:c,
-//         d:d,
-//         buffer:buffer,
-//         block:block,
-//     }
-// }
+//             func MakePHP_MD5_CTX(
+// lo uint32,
+// hi uint32,
+// a uint32,
+// b uint32,
+// c uint32,
+// d uint32,
+// buffer []uint8,
+// block []uint32,
+// ) PHP_MD5_CTX {
+//                 return PHP_MD5_CTX{
+//                     lo:lo,
+//                     hi:hi,
+//                     a:a,
+//                     b:b,
+//                     c:c,
+//                     d:d,
+//                     buffer:buffer,
+//                     block:block,
+//                 }
+//             }
 func (this *PHP_MD5_CTX) GetLo() uint32      { return this.lo }
 func (this *PHP_MD5_CTX) SetLo(value uint32) { this.lo = value }
 func (this *PHP_MD5_CTX) GetHi() uint32      { return this.hi }

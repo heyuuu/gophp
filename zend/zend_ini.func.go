@@ -210,7 +210,14 @@ func ZendAlterIniEntryChars(name *ZendString, value string, value_length int, mo
 	ZendStringRelease(new_value)
 	return ret
 }
-func ZendAlterIniEntryCharsEx(name *ZendString, value *byte, value_length int, modify_type int, stage int, force_change int) int {
+func ZendAlterIniEntryCharsEx(
+	name *ZendString,
+	value *byte,
+	value_length int,
+	modify_type int,
+	stage int,
+	force_change int,
+) int {
 	var ret int
 	var new_value *ZendString
 	new_value = ZendStringInit(value, value_length, !(stage & ZEND_INI_STAGE_IN_REQUEST))
@@ -436,21 +443,42 @@ func DisplayLinkNumbers(ini_entry *ZendIniEntry, type_ int) {
 		}
 	}
 }
-func OnUpdateBool(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateBool(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p *ZendBool
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendBool)(base + int(mh_arg1))
 	*p = ZendIniParseBool(new_value)
 	return SUCCESS
 }
-func OnUpdateLong(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateLong(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p *ZendLong
 	var base *byte = (*byte)(mh_arg2)
 	p = (*ZendLong)(base + int(mh_arg1))
 	*p = ZendAtol(new_value.GetVal(), new_value.GetLen())
 	return SUCCESS
 }
-func OnUpdateLongGEZero(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateLongGEZero(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p *ZendLong
 	var tmp ZendLong
 	var base *byte = (*byte)(mh_arg2)
@@ -462,14 +490,28 @@ func OnUpdateLongGEZero(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any,
 	*p = tmp
 	return SUCCESS
 }
-func OnUpdateReal(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateReal(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p *float64
 	var base *byte = (*byte)(mh_arg2)
 	p = (*float64)(base + int(mh_arg1))
 	*p = ZendStrtod(new_value.GetVal(), nil)
 	return SUCCESS
 }
-func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateString(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
 	p = (**byte)(base + int(mh_arg1))
@@ -480,7 +522,14 @@ func OnUpdateString(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_
 	}
 	return SUCCESS
 }
-func OnUpdateStringUnempty(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateStringUnempty(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p **byte
 	var base *byte = (*byte)(mh_arg2)
 	if new_value != nil && !(new_value.GetVal()[0]) {

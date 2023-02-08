@@ -9,13 +9,38 @@ import (
 func ZendCallMethodWith0Params(obj *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, retval *Zval) *Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 0, nil, nil)
 }
-func ZendCallMethodWith1Params(obj *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, retval *Zval, arg1 *Zval) *Zval {
+func ZendCallMethodWith1Params(
+	obj *Zval,
+	obj_ce *ZendClassEntry,
+	fn_proxy **ZendFunction,
+	function_name string,
+	retval *Zval,
+	arg1 *Zval,
+) *Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 1, arg1, nil)
 }
-func ZendCallMethodWith2Params(obj *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, retval *Zval, arg1 *Zval, arg2 *Zval) *Zval {
+func ZendCallMethodWith2Params(
+	obj *Zval,
+	obj_ce *ZendClassEntry,
+	fn_proxy **ZendFunction,
+	function_name string,
+	retval *Zval,
+	arg1 *Zval,
+	arg2 *Zval,
+) *Zval {
 	return ZendCallMethod(obj, obj_ce, fn_proxy, function_name, b.SizeOf("function_name")-1, retval, 2, arg1, arg2)
 }
-func ZendCallMethod(object *Zval, obj_ce *ZendClassEntry, fn_proxy **ZendFunction, function_name string, function_name_len int, retval_ptr *Zval, param_count int, arg1 *Zval, arg2 *Zval) *Zval {
+func ZendCallMethod(
+	object *Zval,
+	obj_ce *ZendClassEntry,
+	fn_proxy **ZendFunction,
+	function_name string,
+	function_name_len int,
+	retval_ptr *Zval,
+	param_count int,
+	arg1 *Zval,
+	arg2 *Zval,
+) *Zval {
 	var result int
 	var fci ZendFcallInfo
 	var retval Zval

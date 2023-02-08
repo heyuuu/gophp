@@ -20,28 +20,25 @@ type PhpMetaTagsData struct {
 	in_meta      int
 }
 
-// func NewPhpMetaTagsData(stream *core.PhpStream, ulc int, lc int, input_buffer *byte, token_data *byte, token_len int, in_meta int) *PhpMetaTagsData {
-//     return &PhpMetaTagsData{
-//         stream:stream,
-//         ulc:ulc,
-//         lc:lc,
-//         input_buffer:input_buffer,
-//         token_data:token_data,
-//         token_len:token_len,
-//         in_meta:in_meta,
-//     }
-// }
-// func MakePhpMetaTagsData(stream *core.PhpStream, ulc int, lc int, input_buffer *byte, token_data *byte, token_len int, in_meta int) PhpMetaTagsData {
-//     return PhpMetaTagsData{
-//         stream:stream,
-//         ulc:ulc,
-//         lc:lc,
-//         input_buffer:input_buffer,
-//         token_data:token_data,
-//         token_len:token_len,
-//         in_meta:in_meta,
-//     }
-// }
+//             func MakePhpMetaTagsData(
+// stream *core.PhpStream,
+// ulc int,
+// lc int,
+// input_buffer *byte,
+// token_data *byte,
+// token_len int,
+// in_meta int,
+// ) PhpMetaTagsData {
+//                 return PhpMetaTagsData{
+//                     stream:stream,
+//                     ulc:ulc,
+//                     lc:lc,
+//                     input_buffer:input_buffer,
+//                     token_data:token_data,
+//                     token_len:token_len,
+//                     in_meta:in_meta,
+//                 }
+//             }
 func (this *PhpMetaTagsData) GetStream() *core.PhpStream      { return this.stream }
 func (this *PhpMetaTagsData) SetStream(value *core.PhpStream) { this.stream = value }
 func (this *PhpMetaTagsData) GetUlc() int                     { return this.ulc }
@@ -76,38 +73,35 @@ type PhpFileGlobals struct {
 	pclose_wait                  int
 }
 
-// func NewPhpFileGlobals(pclose_ret int, def_chunk_size int, auto_detect_line_endings zend.ZendBool, default_socket_timeout zend.ZendLong, user_agent *byte, from_address *byte, user_stream_current_filename *byte, default_context *core.PhpStreamContext, stream_wrappers *zend.HashTable, stream_filters *zend.HashTable, wrapper_errors *zend.HashTable, pclose_wait int) *PhpFileGlobals {
-//     return &PhpFileGlobals{
-//         pclose_ret:pclose_ret,
-//         def_chunk_size:def_chunk_size,
-//         auto_detect_line_endings:auto_detect_line_endings,
-//         default_socket_timeout:default_socket_timeout,
-//         user_agent:user_agent,
-//         from_address:from_address,
-//         user_stream_current_filename:user_stream_current_filename,
-//         default_context:default_context,
-//         stream_wrappers:stream_wrappers,
-//         stream_filters:stream_filters,
-//         wrapper_errors:wrapper_errors,
-//         pclose_wait:pclose_wait,
-//     }
-// }
-// func MakePhpFileGlobals(pclose_ret int, def_chunk_size int, auto_detect_line_endings zend.ZendBool, default_socket_timeout zend.ZendLong, user_agent *byte, from_address *byte, user_stream_current_filename *byte, default_context *core.PhpStreamContext, stream_wrappers *zend.HashTable, stream_filters *zend.HashTable, wrapper_errors *zend.HashTable, pclose_wait int) PhpFileGlobals {
-//     return PhpFileGlobals{
-//         pclose_ret:pclose_ret,
-//         def_chunk_size:def_chunk_size,
-//         auto_detect_line_endings:auto_detect_line_endings,
-//         default_socket_timeout:default_socket_timeout,
-//         user_agent:user_agent,
-//         from_address:from_address,
-//         user_stream_current_filename:user_stream_current_filename,
-//         default_context:default_context,
-//         stream_wrappers:stream_wrappers,
-//         stream_filters:stream_filters,
-//         wrapper_errors:wrapper_errors,
-//         pclose_wait:pclose_wait,
-//     }
-// }
+//             func MakePhpFileGlobals(
+// pclose_ret int,
+// def_chunk_size int,
+// auto_detect_line_endings zend.ZendBool,
+// default_socket_timeout zend.ZendLong,
+// user_agent *byte,
+// from_address *byte,
+// user_stream_current_filename *byte,
+// default_context *core.PhpStreamContext,
+// stream_wrappers *zend.HashTable,
+// stream_filters *zend.HashTable,
+// wrapper_errors *zend.HashTable,
+// pclose_wait int,
+// ) PhpFileGlobals {
+//                 return PhpFileGlobals{
+//                     pclose_ret:pclose_ret,
+//                     def_chunk_size:def_chunk_size,
+//                     auto_detect_line_endings:auto_detect_line_endings,
+//                     default_socket_timeout:default_socket_timeout,
+//                     user_agent:user_agent,
+//                     from_address:from_address,
+//                     user_stream_current_filename:user_stream_current_filename,
+//                     default_context:default_context,
+//                     stream_wrappers:stream_wrappers,
+//                     stream_filters:stream_filters,
+//                     wrapper_errors:wrapper_errors,
+//                     pclose_wait:pclose_wait,
+//                 }
+//             }
 // func (this *PhpFileGlobals)  GetPcloseRet() int      { return this.pclose_ret }
 // func (this *PhpFileGlobals) SetPcloseRet(value int) { this.pclose_ret = value }
 // func (this *PhpFileGlobals)  GetDefChunkSize() int      { return this.def_chunk_size }

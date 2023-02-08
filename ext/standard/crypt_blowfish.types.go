@@ -10,12 +10,6 @@ type BF_ctx struct {
 	P BF_key
 }
 
-// func NewBF_ctx(S [][]BF_word, P BF_key) *BF_ctx {
-//     return &BF_ctx{
-//         S:S,
-//         P:P,
-//     }
-// }
 func MakeBF_ctx(S [][]BF_word, P BF_key) BF_ctx {
 	return BF_ctx{
 		S: S,

@@ -20,30 +20,27 @@ type spl_SplObjectStorage struct {
 	std           zend.ZendObject
 }
 
-// func Newspl_SplObjectStorage(storage zend.HashTable, index zend.ZendLong, pos zend.HashPosition, flags zend.ZendLong, fptr_get_hash *zend.ZendFunction, gcdata *zend.Zval, gcdata_num int, std zend.ZendObject) *spl_SplObjectStorage {
-//     return &spl_SplObjectStorage{
-//         storage:storage,
-//         index:index,
-//         pos:pos,
-//         flags:flags,
-//         fptr_get_hash:fptr_get_hash,
-//         gcdata:gcdata,
-//         gcdata_num:gcdata_num,
-//         std:std,
-//     }
-// }
-// func Makespl_SplObjectStorage(storage zend.HashTable, index zend.ZendLong, pos zend.HashPosition, flags zend.ZendLong, fptr_get_hash *zend.ZendFunction, gcdata *zend.Zval, gcdata_num int, std zend.ZendObject) spl_SplObjectStorage {
-//     return spl_SplObjectStorage{
-//         storage:storage,
-//         index:index,
-//         pos:pos,
-//         flags:flags,
-//         fptr_get_hash:fptr_get_hash,
-//         gcdata:gcdata,
-//         gcdata_num:gcdata_num,
-//         std:std,
-//     }
-// }
+//             func Makespl_SplObjectStorage(
+// storage zend.HashTable,
+// index zend.ZendLong,
+// pos zend.HashPosition,
+// flags zend.ZendLong,
+// fptr_get_hash *zend.ZendFunction,
+// gcdata *zend.Zval,
+// gcdata_num int,
+// std zend.ZendObject,
+// ) spl_SplObjectStorage {
+//                 return spl_SplObjectStorage{
+//                     storage:storage,
+//                     index:index,
+//                     pos:pos,
+//                     flags:flags,
+//                     fptr_get_hash:fptr_get_hash,
+//                     gcdata:gcdata,
+//                     gcdata_num:gcdata_num,
+//                     std:std,
+//                 }
+//             }
 func (this *spl_SplObjectStorage) GetStorage() zend.HashTable { return this.storage }
 
 // func (this *spl_SplObjectStorage) SetStorage(value zend.HashTable) { this.storage = value }
@@ -89,12 +86,6 @@ type spl_SplObjectStorageElement struct {
 	inf zend.Zval
 }
 
-// func Newspl_SplObjectStorageElement(obj zend.Zval, inf zend.Zval) *spl_SplObjectStorageElement {
-//     return &spl_SplObjectStorageElement{
-//         obj:obj,
-//         inf:inf,
-//     }
-// }
 // func Makespl_SplObjectStorageElement(obj zend.Zval, inf zend.Zval) spl_SplObjectStorageElement {
 //     return spl_SplObjectStorageElement{
 //         obj:obj,

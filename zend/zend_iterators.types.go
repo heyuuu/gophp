@@ -15,18 +15,15 @@ type ZendObjectIteratorFuncs struct {
 	invalidate_current func(iter *ZendObjectIterator)
 }
 
-// func NewZendObjectIteratorFuncs(dtor func(iter *ZendObjectIterator), valid func(iter *ZendObjectIterator) int, get_current_data func(iter *ZendObjectIterator) *Zval, get_current_key func(iter *ZendObjectIterator, key *Zval), move_forward func(iter *ZendObjectIterator), rewind func(iter *ZendObjectIterator), invalidate_current func(iter *ZendObjectIterator)) *ZendObjectIteratorFuncs {
-//     return &ZendObjectIteratorFuncs{
-//         dtor:dtor,
-//         valid:valid,
-//         get_current_data:get_current_data,
-//         get_current_key:get_current_key,
-//         move_forward:move_forward,
-//         rewind:rewind,
-//         invalidate_current:invalidate_current,
-//     }
-// }
-func MakeZendObjectIteratorFuncs(dtor func(iter *ZendObjectIterator), valid func(iter *ZendObjectIterator) int, get_current_data func(iter *ZendObjectIterator) *Zval, get_current_key func(iter *ZendObjectIterator, key *Zval), move_forward func(iter *ZendObjectIterator), rewind func(iter *ZendObjectIterator), invalidate_current func(iter *ZendObjectIterator)) ZendObjectIteratorFuncs {
+func MakeZendObjectIteratorFuncs(
+	dtor func(iter *ZendObjectIterator),
+	valid func(iter *ZendObjectIterator) int,
+	get_current_data func(iter *ZendObjectIterator) *Zval,
+	get_current_key func(iter *ZendObjectIterator, key *Zval),
+	move_forward func(iter *ZendObjectIterator),
+	rewind func(iter *ZendObjectIterator),
+	invalidate_current func(iter *ZendObjectIterator),
+) ZendObjectIteratorFuncs {
 	return ZendObjectIteratorFuncs{
 		dtor:               dtor,
 		valid:              valid,
@@ -77,14 +74,6 @@ type ZendObjectIterator struct {
 	index ZendUlong
 }
 
-// func NewZendObjectIterator(std ZendObject, data Zval, funcs *ZendObjectIteratorFuncs, index ZendUlong) *ZendObjectIterator {
-//     return &ZendObjectIterator{
-//         std:std,
-//         data:data,
-//         funcs:funcs,
-//         index:index,
-//     }
-// }
 // func MakeZendObjectIterator(std ZendObject, data Zval, funcs *ZendObjectIteratorFuncs, index ZendUlong) ZendObjectIterator {
 //     return ZendObjectIterator{
 //         std:std,
@@ -116,26 +105,23 @@ type ZendClassIteratorFuncs struct {
 	zf_rewind       *ZendFunction
 }
 
-// func NewZendClassIteratorFuncs(zf_new_iterator *ZendFunction, zf_valid *ZendFunction, zf_current *ZendFunction, zf_key *ZendFunction, zf_next *ZendFunction, zf_rewind *ZendFunction) *ZendClassIteratorFuncs {
-//     return &ZendClassIteratorFuncs{
-//         zf_new_iterator:zf_new_iterator,
-//         zf_valid:zf_valid,
-//         zf_current:zf_current,
-//         zf_key:zf_key,
-//         zf_next:zf_next,
-//         zf_rewind:zf_rewind,
-//     }
-// }
-// func MakeZendClassIteratorFuncs(zf_new_iterator *ZendFunction, zf_valid *ZendFunction, zf_current *ZendFunction, zf_key *ZendFunction, zf_next *ZendFunction, zf_rewind *ZendFunction) ZendClassIteratorFuncs {
-//     return ZendClassIteratorFuncs{
-//         zf_new_iterator:zf_new_iterator,
-//         zf_valid:zf_valid,
-//         zf_current:zf_current,
-//         zf_key:zf_key,
-//         zf_next:zf_next,
-//         zf_rewind:zf_rewind,
-//     }
-// }
+//             func MakeZendClassIteratorFuncs(
+// zf_new_iterator *ZendFunction,
+// zf_valid *ZendFunction,
+// zf_current *ZendFunction,
+// zf_key *ZendFunction,
+// zf_next *ZendFunction,
+// zf_rewind *ZendFunction,
+// ) ZendClassIteratorFuncs {
+//                 return ZendClassIteratorFuncs{
+//                     zf_new_iterator:zf_new_iterator,
+//                     zf_valid:zf_valid,
+//                     zf_current:zf_current,
+//                     zf_key:zf_key,
+//                     zf_next:zf_next,
+//                     zf_rewind:zf_rewind,
+//                 }
+//             }
 func (this *ZendClassIteratorFuncs) GetZfNewIterator() *ZendFunction { return this.zf_new_iterator }
 func (this *ZendClassIteratorFuncs) SetZfNewIterator(value *ZendFunction) {
 	this.zf_new_iterator = value

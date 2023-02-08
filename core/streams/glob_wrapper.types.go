@@ -15,28 +15,25 @@ type GlobST struct {
 	pattern_len int
 }
 
-// func NewGlobST(glob glob_t, index int, flags int, path *byte, path_len int, pattern *byte, pattern_len int) *GlobST {
-//     return &GlobST{
-//         glob:glob,
-//         index:index,
-//         flags:flags,
-//         path:path,
-//         path_len:path_len,
-//         pattern:pattern,
-//         pattern_len:pattern_len,
-//     }
-// }
-// func MakeGlobST(glob glob_t, index int, flags int, path *byte, path_len int, pattern *byte, pattern_len int) GlobST {
-//     return GlobST{
-//         glob:glob,
-//         index:index,
-//         flags:flags,
-//         path:path,
-//         path_len:path_len,
-//         pattern:pattern,
-//         pattern_len:pattern_len,
-//     }
-// }
+//             func MakeGlobST(
+// glob glob_t,
+// index int,
+// flags int,
+// path *byte,
+// path_len int,
+// pattern *byte,
+// pattern_len int,
+// ) GlobST {
+//                 return GlobST{
+//                     glob:glob,
+//                     index:index,
+//                     flags:flags,
+//                     path:path,
+//                     path_len:path_len,
+//                     pattern:pattern,
+//                     pattern_len:pattern_len,
+//                 }
+//             }
 func (this *GlobST) GetGlob() glob_t { return this.glob }
 
 // func (this *GlobST) SetGlob(value glob_t) { this.glob = value }

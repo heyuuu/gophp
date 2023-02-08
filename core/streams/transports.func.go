@@ -37,7 +37,17 @@ func ERR_RETURN(out_err **zend.ZendString, local_err *zend.ZendString, fmt strin
 		}
 	}
 }
-func _phpStreamXportCreate(name *byte, namelen int, options int, flags int, persistent_id *byte, timeout *__struct__timeval, context *core.PhpStreamContext, error_string **zend.ZendString, error_code *int) *core.PhpStream {
+func _phpStreamXportCreate(
+	name *byte,
+	namelen int,
+	options int,
+	flags int,
+	persistent_id *byte,
+	timeout *__struct__timeval,
+	context *core.PhpStreamContext,
+	error_string **zend.ZendString,
+	error_code *int,
+) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var factory PhpStreamTransportFactory = nil
 	var p *byte
@@ -180,7 +190,15 @@ func PhpStreamXportBind(stream *core.PhpStream, name *byte, namelen int, error_t
 	}
 	return ret
 }
-func PhpStreamXportConnect(stream *core.PhpStream, name *byte, namelen int, asynchronous int, timeout *__struct__timeval, error_text **zend.ZendString, error_code *int) int {
+func PhpStreamXportConnect(
+	stream *core.PhpStream,
+	name *byte,
+	namelen int,
+	asynchronous int,
+	timeout *__struct__timeval,
+	error_text **zend.ZendString,
+	error_code *int,
+) int {
 	var param PhpStreamXportParam
 	var ret int
 	memset(&param, 0, b.SizeOf("param"))
@@ -229,7 +247,15 @@ func PhpStreamXportListen(stream *core.PhpStream, backlog int, error_text **zend
 	}
 	return ret
 }
-func PhpStreamXportAccept(stream *core.PhpStream, client **core.PhpStream, textaddr **zend.ZendString, addr *any, addrlen *socklen_t, timeout *__struct__timeval, error_text **zend.ZendString) int {
+func PhpStreamXportAccept(
+	stream *core.PhpStream,
+	client **core.PhpStream,
+	textaddr **zend.ZendString,
+	addr *any,
+	addrlen *socklen_t,
+	timeout *__struct__timeval,
+	error_text **zend.ZendString,
+) int {
 	var param PhpStreamXportParam
 	var ret int
 	memset(&param, 0, b.SizeOf("param"))
@@ -326,7 +352,15 @@ func PhpStreamXportCryptoEnable(stream *core.PhpStream, activate int) int {
 	core.PhpErrorDocref("streams.crypto", zend.E_WARNING, "this stream does not support SSL/crypto")
 	return ret
 }
-func PhpStreamXportRecvfrom(stream *core.PhpStream, buf *byte, buflen int, flags int, addr *any, addrlen *socklen_t, textaddr **zend.ZendString) int {
+func PhpStreamXportRecvfrom(
+	stream *core.PhpStream,
+	buf *byte,
+	buflen int,
+	flags int,
+	addr *any,
+	addrlen *socklen_t,
+	textaddr **zend.ZendString,
+) int {
 	var param PhpStreamXportParam
 	var ret int = 0
 	var recvd_len int = 0
@@ -365,7 +399,14 @@ func PhpStreamXportRecvfrom(stream *core.PhpStream, buf *byte, buflen int, flags
 		return -1
 	}
 }
-func PhpStreamXportSendto(stream *core.PhpStream, buf *byte, buflen int, flags int, addr any, addrlen socklen_t) int {
+func PhpStreamXportSendto(
+	stream *core.PhpStream,
+	buf *byte,
+	buflen int,
+	flags int,
+	addr any,
+	addrlen socklen_t,
+) int {
 	var param PhpStreamXportParam
 	var ret int = 0
 	var oob int

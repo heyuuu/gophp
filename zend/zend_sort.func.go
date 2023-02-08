@@ -83,7 +83,14 @@ func ZendSort3(a any, b any, c any, cmp CompareFuncT, swp SwapFuncT) {
 		swp(b, c)
 	}
 }
-func ZendSort4(a any, b any, c any, d any, cmp CompareFuncT, swp SwapFuncT) {
+func ZendSort4(
+	a any,
+	b any,
+	c any,
+	d any,
+	cmp CompareFuncT,
+	swp SwapFuncT,
+) {
 	ZendSort3(a, b, c, cmp, swp)
 	if cmp(c, d) > 0 {
 		swp(c, d)
@@ -95,7 +102,15 @@ func ZendSort4(a any, b any, c any, d any, cmp CompareFuncT, swp SwapFuncT) {
 		}
 	}
 }
-func ZendSort5(a any, b any, c any, d any, e any, cmp CompareFuncT, swp SwapFuncT) {
+func ZendSort5(
+	a any,
+	b any,
+	c any,
+	d any,
+	e any,
+	cmp CompareFuncT,
+	swp SwapFuncT,
+) {
 	ZendSort4(a, b, c, d, cmp, swp)
 	if cmp(d, e) > 0 {
 		swp(d, e)

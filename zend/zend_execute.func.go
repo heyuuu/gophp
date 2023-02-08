@@ -443,7 +443,14 @@ func _get_zval_ptr_cv_BP_VAR_W(var_ uint32, _ EXECUTE_DATA_D) *Zval {
 	}
 	return ret
 }
-func _getZvalPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
+func _getZvalPtr(
+	op_type int,
+	node ZnodeOp,
+	should_free *ZendFreeOp,
+	type_ int,
+	_ EXECUTE_DATA_D,
+	opline *ZendOp,
+) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	} else {
@@ -471,7 +478,14 @@ func _getOpDataZvalPtrR(op_type int, node ZnodeOp, should_free *ZendFreeOp, _ EX
 		}
 	}
 }
-func _getZvalPtrDeref(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
+func _getZvalPtrDeref(
+	op_type int,
+	node ZnodeOp,
+	should_free *ZendFreeOp,
+	type_ int,
+	_ EXECUTE_DATA_D,
+	opline *ZendOp,
+) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		if op_type == IS_TMP_VAR {
 			return _getZvalPtrTmp(node.GetVar(), should_free, EXECUTE_DATA_C)
@@ -509,7 +523,14 @@ func _getOpDataZvalPtrDerefR(op_type int, node ZnodeOp, should_free *ZendFreeOp,
 		}
 	}
 }
-func _getZvalPtrUndef(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
+func _getZvalPtrUndef(
+	op_type int,
+	node ZnodeOp,
+	should_free *ZendFreeOp,
+	type_ int,
+	_ EXECUTE_DATA_D,
+	opline *ZendOp,
+) *Zval {
 	if (op_type & (IS_TMP_VAR | IS_VAR)) != 0 {
 		return _getZvalPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	} else {
@@ -542,14 +563,28 @@ func _getZvalPtrPtr(op_type int, node ZnodeOp, should_free *ZendFreeOp, type_ in
 		return _getZvalPtrPtrVar(node.GetVar(), should_free, EXECUTE_DATA_C)
 	}
 }
-func _getObjZvalPtr(op_type int, op ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
+func _getObjZvalPtr(
+	op_type int,
+	op ZnodeOp,
+	should_free *ZendFreeOp,
+	type_ int,
+	_ EXECUTE_DATA_D,
+	opline *ZendOp,
+) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
 		return &(EX(This))
 	}
 	return GetZvalPtr(op_type, op, should_free, type_)
 }
-func _getObjZvalPtrUndef(op_type int, op ZnodeOp, should_free *ZendFreeOp, type_ int, _ EXECUTE_DATA_D, opline *ZendOp) *Zval {
+func _getObjZvalPtrUndef(
+	op_type int,
+	op ZnodeOp,
+	should_free *ZendFreeOp,
+	type_ int,
+	_ EXECUTE_DATA_D,
+	opline *ZendOp,
+) *Zval {
 	if op_type == IS_UNUSED {
 		*should_free = nil
 		return &(EX(This))
@@ -688,7 +723,20 @@ func MakeRealObject(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA
 	object.DelRefcount()
 	return object
 }
-func ZendVerifyTypeErrorCommon(zf *ZendFunction, arg_info *ZendArgInfo, ce *ZendClassEntry, value *Zval, fname **byte, fsep **byte, fclass **byte, need_msg **byte, need_kind **byte, need_or_null **byte, given_msg **byte, given_kind **byte) {
+func ZendVerifyTypeErrorCommon(
+	zf *ZendFunction,
+	arg_info *ZendArgInfo,
+	ce *ZendClassEntry,
+	value *Zval,
+	fname **byte,
+	fsep **byte,
+	fclass **byte,
+	need_msg **byte,
+	need_kind **byte,
+	need_or_null **byte,
+	given_msg **byte,
+	given_kind **byte,
+) {
 	var is_interface ZendBool = 0
 	*fname = zf.GetFunctionName().GetVal()
 	if zf.GetScope() != nil {
@@ -960,7 +1008,15 @@ func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zv
 	}
 	return ZendAssignToVariable(property_val, &tmp, IS_TMP_VAR, EX_USES_STRICT_TYPES())
 }
-func ZendCheckType(type_ ZendType, arg *Zval, ce **ZendClassEntry, cache_slot *any, default_value *Zval, scope *ZendClassEntry, is_return_type ZendBool) ZendBool {
+func ZendCheckType(
+	type_ ZendType,
+	arg *Zval,
+	ce **ZendClassEntry,
+	cache_slot *any,
+	default_value *Zval,
+	scope *ZendClassEntry,
+	is_return_type ZendBool,
+) ZendBool {
 	var ref *ZendReference = nil
 	if !(type_.IsSet()) {
 		return 1
@@ -1702,7 +1758,14 @@ func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *a
 	ZvalPtrDtor(&z_copy)
 	ZvalPtrDtor(z)
 }
-func ZendAssignOpOverloadedProperty(object *Zval, property *Zval, cache_slot *any, value *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendAssignOpOverloadedProperty(
+	object *Zval,
+	property *Zval,
+	cache_slot *any,
+	value *Zval,
+	opline *ZendOp,
+	_ EXECUTE_DATA_D,
+) {
 	var z *Zval
 	var rv Zval
 	var obj Zval
@@ -2006,7 +2069,14 @@ func zend_fetch_dimension_address_inner_RW(ht *HashTable, dim *Zval, _ EXECUTE_D
 func zend_fetch_dimension_address_inner_RW_CONST(ht *HashTable, dim *Zval, _ EXECUTE_DATA_D) *Zval {
 	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_RW, EXECUTE_DATA_C)
 }
-func ZendFetchDimensionAddress(result *Zval, container *Zval, dim *Zval, dim_type int, type_ int, _ EXECUTE_DATA_D) {
+func ZendFetchDimensionAddress(
+	result *Zval,
+	container *Zval,
+	dim *Zval,
+	dim_type int,
+	type_ int,
+	_ EXECUTE_DATA_D,
+) {
 	var retval *Zval
 	if container.IsArray() {
 	try_array:
@@ -2130,7 +2200,16 @@ func zend_fetch_dimension_address_UNSET(container_ptr *Zval, dim *Zval, dim_type
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
 	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, EXECUTE_DATA_C)
 }
-func ZendFetchDimensionAddressRead(result *Zval, container *Zval, dim *Zval, dim_type int, type_ int, is_list int, slow int, _ EXECUTE_DATA_D) {
+func ZendFetchDimensionAddressRead(
+	result *Zval,
+	container *Zval,
+	dim *Zval,
+	dim_type int,
+	type_ int,
+	is_list int,
+	slow int,
+	_ EXECUTE_DATA_D,
+) {
 	var retval *Zval
 	if slow == 0 {
 		if container.IsArray() {
@@ -2561,7 +2640,19 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 	}
 	return 1
 }
-func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type uint32, prop_ptr *Zval, prop_op_type uint32, cache_slot *any, type_ int, flags uint32, init_undef ZendBool, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendFetchPropertyAddress(
+	result *Zval,
+	container *Zval,
+	container_op_type uint32,
+	prop_ptr *Zval,
+	prop_op_type uint32,
+	cache_slot *any,
+	type_ int,
+	flags uint32,
+	init_undef ZendBool,
+	opline *ZendOp,
+	_ EXECUTE_DATA_D,
+) {
 	var ptr *Zval
 	if container_op_type != IS_UNUSED && container.GetType() != IS_OBJECT {
 		for {
@@ -2653,7 +2744,15 @@ func ZendFetchPropertyAddress(result *Zval, container *Zval, container_op_type u
 		ptr.SetNull()
 	}
 }
-func ZendAssignToPropertyReference(container *Zval, container_op_type uint32, prop_ptr *Zval, prop_op_type uint32, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendAssignToPropertyReference(
+	container *Zval,
+	container_op_type uint32,
+	prop_ptr *Zval,
+	prop_op_type uint32,
+	value_ptr *Zval,
+	opline *ZendOp,
+	_ EXECUTE_DATA_D,
+) {
 	var variable Zval
 	var variable_ptr *Zval = &variable
 	var cache_addr *any = b.CondF1(prop_op_type == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION) }, nil)
@@ -2701,7 +2800,14 @@ func ZendAssignToPropertyReferenceThisVar(container *Zval, prop_ptr *Zval, value
 func ZendAssignToPropertyReferenceVarVar(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
 	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_VAR, value_ptr, OPLINE_C, EXECUTE_DATA_C)
 }
-func ZendFetchStaticPropertyAddressEx(retval **Zval, prop_info **ZendPropertyInfo, cache_slot uint32, fetch_type int, opline *ZendOp, _ EXECUTE_DATA_D) int {
+func ZendFetchStaticPropertyAddressEx(
+	retval **Zval,
+	prop_info **ZendPropertyInfo,
+	cache_slot uint32,
+	fetch_type int,
+	opline *ZendOp,
+	_ EXECUTE_DATA_D,
+) int {
 	var free_op1 ZendFreeOp
 	var name *ZendString
 	var tmp_name *ZendString
@@ -2769,7 +2875,15 @@ func ZendFetchStaticPropertyAddressEx(retval **Zval, prop_info **ZendPropertyInf
 	}
 	return SUCCESS
 }
-func ZendFetchStaticPropertyAddress(retval **Zval, prop_info **ZendPropertyInfo, cache_slot uint32, fetch_type int, flags int, opline *ZendOp, _ EXECUTE_DATA_D) int {
+func ZendFetchStaticPropertyAddress(
+	retval **Zval,
+	prop_info **ZendPropertyInfo,
+	cache_slot uint32,
+	fetch_type int,
+	flags int,
+	opline *ZendOp,
+	_ EXECUTE_DATA_D,
+) int {
 	var success int
 	var property_info *ZendPropertyInfo
 	if opline.GetOp1Type() == IS_CONST && (opline.GetOp2Type() == IS_CONST || opline.GetOp2Type() == IS_UNUSED && (opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_SELF || opline.GetOp2().GetNum() == ZEND_FETCH_CLASS_PARENT)) && CACHED_PTR(cache_slot) != nil {
@@ -4133,7 +4247,14 @@ func ZendSetUserOpcodeHandler(opcode ZendUchar, handler UserOpcodeHandlerT) int 
 func ZendGetUserOpcodeHandler(opcode ZendUchar) UserOpcodeHandlerT {
 	return ZendUserOpcodeHandlers[opcode]
 }
-func ZendGetZvalPtr(opline *ZendOp, op_type int, node *ZnodeOp, execute_data *ZendExecuteData, should_free *ZendFreeOp, type_ int) *Zval {
+func ZendGetZvalPtr(
+	opline *ZendOp,
+	op_type int,
+	node *ZnodeOp,
+	execute_data *ZendExecuteData,
+	should_free *ZendFreeOp,
+	type_ int,
+) *Zval {
 	var ret *Zval
 	switch op_type {
 	case IS_CONST:

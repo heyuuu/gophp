@@ -342,7 +342,14 @@ func SplFilesystemInfoSetFilename(intern *SplFilesystemObject, path *byte, len_ 
 	}
 	intern.SetPath(zend.Estrndup(path, intern.GetPathLen()))
 }
-func SplFilesystemObjectCreateInfo(source *SplFilesystemObject, file_path *byte, file_path_len int, use_copy int, ce *zend.ZendClassEntry, return_value *zend.Zval) *SplFilesystemObject {
+func SplFilesystemObjectCreateInfo(
+	source *SplFilesystemObject,
+	file_path *byte,
+	file_path_len int,
+	use_copy int,
+	ce *zend.ZendClassEntry,
+	return_value *zend.Zval,
+) *SplFilesystemObject {
 	var intern *SplFilesystemObject
 	var arg1 zend.Zval
 	var error_handling zend.ZendErrorHandling

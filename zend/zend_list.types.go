@@ -13,15 +13,6 @@ type ZendRsrcListDtorsEntry struct {
 	resource_id   int
 }
 
-// func NewZendRsrcListDtorsEntry(list_dtor_ex RsrcDtorFuncT, plist_dtor_ex RsrcDtorFuncT, type_name *byte, module_number int, resource_id int) *ZendRsrcListDtorsEntry {
-//     return &ZendRsrcListDtorsEntry{
-//         list_dtor_ex:list_dtor_ex,
-//         plist_dtor_ex:plist_dtor_ex,
-//         type_name:type_name,
-//         module_number:module_number,
-//         resource_id:resource_id,
-//     }
-// }
 // func MakeZendRsrcListDtorsEntry(list_dtor_ex RsrcDtorFuncT, plist_dtor_ex RsrcDtorFuncT, type_name *byte, module_number int, resource_id int) ZendRsrcListDtorsEntry {
 //     return ZendRsrcListDtorsEntry{
 //         list_dtor_ex:list_dtor_ex,

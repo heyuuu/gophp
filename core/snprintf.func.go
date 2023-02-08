@@ -7,7 +7,14 @@ import (
 	"sik/zend"
 )
 
-func __cvt(value float64, ndigit int, decpt *int, sign *int, fmode int, pad int) *byte {
+func __cvt(
+	value float64,
+	ndigit int,
+	decpt *int,
+	sign *int,
+	fmode int,
+	pad int,
+) *byte {
 	var s *byte = nil
 	var p *byte
 	var rve *byte
@@ -250,7 +257,16 @@ func ApPhpConv10(num WideInt, is_unsigned BoolInt, is_negative *BoolInt, buf_end
 	*len_ = buf_end - p
 	return p
 }
-func PhpConvFp(format byte, num float64, add_dp BooleanE, precision int, dec_point byte, is_negative *BoolInt, buf *byte, len_ *int) *byte {
+func PhpConvFp(
+	format byte,
+	num float64,
+	add_dp BooleanE,
+	precision int,
+	dec_point byte,
+	is_negative *BoolInt,
+	buf *byte,
+	len_ *int,
+) *byte {
 	var s *byte = buf
 	var p *byte
 	var p_orig *byte

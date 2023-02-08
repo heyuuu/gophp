@@ -16,18 +16,6 @@ type CharSet struct {
 	}
 }
 
-//             func NewCharSet(exclude int, nchars int, chars *byte, nranges int, ranges *struct {
-// start byte
-// end byte
-// }) *CharSet {
-//                 return &CharSet{
-//                     exclude:exclude,
-//                     nchars:nchars,
-//                     chars:chars,
-//                     nranges:nranges,
-//                     ranges:ranges,
-//                 }
-//             }
 //             func MakeCharSet(exclude int, nchars int, chars *byte, nranges int, ranges *struct {
 // start byte
 // end byte

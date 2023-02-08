@@ -15,13 +15,6 @@ type _spl_cbfilter_it_intern struct {
 	object *zend.ZendObject
 }
 
-// func New_spl_cbfilter_it_intern(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, object *zend.ZendObject) *_spl_cbfilter_it_intern {
-//     return &_spl_cbfilter_it_intern{
-//         fci:fci,
-//         fcc:fcc,
-//         object:object,
-//     }
-// }
 // func Make_spl_cbfilter_it_intern(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, object *zend.ZendObject) _spl_cbfilter_it_intern {
 //     return _spl_cbfilter_it_intern{
 //         fci:fci,
@@ -246,14 +239,6 @@ type SplSubIterator struct {
 	state    RecursiveIteratorState
 }
 
-// func NewSplSubIterator(iterator *zend.ZendObjectIterator, zobject zend.Zval, ce *zend.ZendClassEntry, state RecursiveIteratorState) *SplSubIterator {
-//     return &SplSubIterator{
-//         iterator:iterator,
-//         zobject:zobject,
-//         ce:ce,
-//         state:state,
-//     }
-// }
 // func MakeSplSubIterator(iterator *zend.ZendObjectIterator, zobject zend.Zval, ce *zend.ZendClassEntry, state RecursiveIteratorState) SplSubIterator {
 //     return SplSubIterator{
 //         iterator:iterator,
@@ -295,48 +280,45 @@ type SplRecursiveItObject struct {
 	std             zend.ZendObject
 }
 
-// func NewSplRecursiveItObject(iterators *SplSubIterator, level int, mode RecursiveIteratorMode, flags int, max_depth int, in_iteration zend.ZendBool, beginIteration *zend.ZendFunction, endIteration *zend.ZendFunction, callHasChildren *zend.ZendFunction, callGetChildren *zend.ZendFunction, beginChildren *zend.ZendFunction, endChildren *zend.ZendFunction, nextElement *zend.ZendFunction, ce *zend.ZendClassEntry, prefix []zend.SmartStr, postfix []zend.SmartStr, std zend.ZendObject) *SplRecursiveItObject {
-//     return &SplRecursiveItObject{
-//         iterators:iterators,
-//         level:level,
-//         mode:mode,
-//         flags:flags,
-//         max_depth:max_depth,
-//         in_iteration:in_iteration,
-//         beginIteration:beginIteration,
-//         endIteration:endIteration,
-//         callHasChildren:callHasChildren,
-//         callGetChildren:callGetChildren,
-//         beginChildren:beginChildren,
-//         endChildren:endChildren,
-//         nextElement:nextElement,
-//         ce:ce,
-//         prefix:prefix,
-//         postfix:postfix,
-//         std:std,
-//     }
-// }
-// func MakeSplRecursiveItObject(iterators *SplSubIterator, level int, mode RecursiveIteratorMode, flags int, max_depth int, in_iteration zend.ZendBool, beginIteration *zend.ZendFunction, endIteration *zend.ZendFunction, callHasChildren *zend.ZendFunction, callGetChildren *zend.ZendFunction, beginChildren *zend.ZendFunction, endChildren *zend.ZendFunction, nextElement *zend.ZendFunction, ce *zend.ZendClassEntry, prefix []zend.SmartStr, postfix []zend.SmartStr, std zend.ZendObject) SplRecursiveItObject {
-//     return SplRecursiveItObject{
-//         iterators:iterators,
-//         level:level,
-//         mode:mode,
-//         flags:flags,
-//         max_depth:max_depth,
-//         in_iteration:in_iteration,
-//         beginIteration:beginIteration,
-//         endIteration:endIteration,
-//         callHasChildren:callHasChildren,
-//         callGetChildren:callGetChildren,
-//         beginChildren:beginChildren,
-//         endChildren:endChildren,
-//         nextElement:nextElement,
-//         ce:ce,
-//         prefix:prefix,
-//         postfix:postfix,
-//         std:std,
-//     }
-// }
+//             func MakeSplRecursiveItObject(
+// iterators *SplSubIterator,
+// level int,
+// mode RecursiveIteratorMode,
+// flags int,
+// max_depth int,
+// in_iteration zend.ZendBool,
+// beginIteration *zend.ZendFunction,
+// endIteration *zend.ZendFunction,
+// callHasChildren *zend.ZendFunction,
+// callGetChildren *zend.ZendFunction,
+// beginChildren *zend.ZendFunction,
+// endChildren *zend.ZendFunction,
+// nextElement *zend.ZendFunction,
+// ce *zend.ZendClassEntry,
+// prefix []zend.SmartStr,
+// postfix []zend.SmartStr,
+// std zend.ZendObject,
+// ) SplRecursiveItObject {
+//                 return SplRecursiveItObject{
+//                     iterators:iterators,
+//                     level:level,
+//                     mode:mode,
+//                     flags:flags,
+//                     max_depth:max_depth,
+//                     in_iteration:in_iteration,
+//                     beginIteration:beginIteration,
+//                     endIteration:endIteration,
+//                     callHasChildren:callHasChildren,
+//                     callGetChildren:callGetChildren,
+//                     beginChildren:beginChildren,
+//                     endChildren:endChildren,
+//                     nextElement:nextElement,
+//                     ce:ce,
+//                     prefix:prefix,
+//                     postfix:postfix,
+//                     std:std,
+//                 }
+//             }
 func (this *SplRecursiveItObject) GetIterators() *SplSubIterator       { return this.iterators }
 func (this *SplRecursiveItObject) SetIterators(value *SplSubIterator)  { this.iterators = value }
 func (this *SplRecursiveItObject) GetLevel() int                       { return this.level }
@@ -423,11 +405,6 @@ type SplRecursiveItIterator struct {
 	intern zend.ZendObjectIterator
 }
 
-// func NewSplRecursiveItIterator(intern zend.ZendObjectIterator) *SplRecursiveItIterator {
-//     return &SplRecursiveItIterator{
-//         intern:intern,
-//     }
-// }
 // func MakeSplRecursiveItIterator(intern zend.ZendObjectIterator) SplRecursiveItIterator {
 //     return SplRecursiveItIterator{
 //         intern:intern,
@@ -448,15 +425,6 @@ type SplIteratorApplyInfo struct {
 	fcc   zend.ZendFcallInfoCache
 }
 
-// func NewSplIteratorApplyInfo(obj *zend.Zval, args *zend.Zval, count zend.ZendLong, fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) *SplIteratorApplyInfo {
-//     return &SplIteratorApplyInfo{
-//         obj:obj,
-//         args:args,
-//         count:count,
-//         fci:fci,
-//         fcc:fcc,
-//     }
-// }
 // func MakeSplIteratorApplyInfo(obj *zend.Zval, args *zend.Zval, count zend.ZendLong, fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache) SplIteratorApplyInfo {
 //     return SplIteratorApplyInfo{
 //         obj:obj,

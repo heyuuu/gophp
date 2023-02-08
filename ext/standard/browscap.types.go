@@ -14,12 +14,6 @@ type BrowscapKv struct {
 	value *zend.ZendString
 }
 
-// func NewBrowscapKv(key *zend.ZendString, value *zend.ZendString) *BrowscapKv {
-//     return &BrowscapKv{
-//         key:key,
-//         value:value,
-//     }
-// }
 // func MakeBrowscapKv(key *zend.ZendString, value *zend.ZendString) BrowscapKv {
 //     return BrowscapKv{
 //         key:key,
@@ -44,28 +38,25 @@ type BrowscapEntry struct {
 	prefix_len     uint8
 }
 
-// func NewBrowscapEntry(pattern *zend.ZendString, parent *zend.ZendString, kv_start uint32, kv_end uint32, contains_start []uint16, contains_len []uint8, prefix_len uint8) *BrowscapEntry {
-//     return &BrowscapEntry{
-//         pattern:pattern,
-//         parent:parent,
-//         kv_start:kv_start,
-//         kv_end:kv_end,
-//         contains_start:contains_start,
-//         contains_len:contains_len,
-//         prefix_len:prefix_len,
-//     }
-// }
-// func MakeBrowscapEntry(pattern *zend.ZendString, parent *zend.ZendString, kv_start uint32, kv_end uint32, contains_start []uint16, contains_len []uint8, prefix_len uint8) BrowscapEntry {
-//     return BrowscapEntry{
-//         pattern:pattern,
-//         parent:parent,
-//         kv_start:kv_start,
-//         kv_end:kv_end,
-//         contains_start:contains_start,
-//         contains_len:contains_len,
-//         prefix_len:prefix_len,
-//     }
-// }
+//             func MakeBrowscapEntry(
+// pattern *zend.ZendString,
+// parent *zend.ZendString,
+// kv_start uint32,
+// kv_end uint32,
+// contains_start []uint16,
+// contains_len []uint8,
+// prefix_len uint8,
+// ) BrowscapEntry {
+//                 return BrowscapEntry{
+//                     pattern:pattern,
+//                     parent:parent,
+//                     kv_start:kv_start,
+//                     kv_end:kv_end,
+//                     contains_start:contains_start,
+//                     contains_len:contains_len,
+//                     prefix_len:prefix_len,
+//                 }
+//             }
 func (this *BrowscapEntry) GetPattern() *zend.ZendString      { return this.pattern }
 func (this *BrowscapEntry) SetPattern(value *zend.ZendString) { this.pattern = value }
 func (this *BrowscapEntry) GetParent() *zend.ZendString       { return this.parent }
@@ -94,15 +85,6 @@ type BrowserData struct {
 	filename []byte
 }
 
-// func NewBrowserData(htab *zend.HashTable, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) *BrowserData {
-//     return &BrowserData{
-//         htab:htab,
-//         kv:kv,
-//         kv_used:kv_used,
-//         kv_size:kv_size,
-//         filename:filename,
-//     }
-// }
 func MakeBrowserData(htab *zend.HashTable, kv *BrowscapKv, kv_used uint32, kv_size uint32, filename []byte) BrowserData {
 	return BrowserData{
 		htab:     htab,
@@ -131,11 +113,6 @@ type ZendBrowscapGlobals struct {
 	activation_bdata BrowserData
 }
 
-// func NewZendBrowscapGlobals(activation_bdata BrowserData) *ZendBrowscapGlobals {
-//     return &ZendBrowscapGlobals{
-//         activation_bdata:activation_bdata,
-//     }
-// }
 // func MakeZendBrowscapGlobals(activation_bdata BrowserData) ZendBrowscapGlobals {
 //     return ZendBrowscapGlobals{
 //         activation_bdata:activation_bdata,
@@ -154,14 +131,6 @@ type BrowscapParserCtx struct {
 	str_interned         zend.HashTable
 }
 
-// func NewBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *zend.ZendString, str_interned zend.HashTable) *BrowscapParserCtx {
-//     return &BrowscapParserCtx{
-//         bdata:bdata,
-//         current_entry:current_entry,
-//         current_section_name:current_section_name,
-//         str_interned:str_interned,
-//     }
-// }
 func MakeBrowscapParserCtx(bdata *BrowserData, current_entry *BrowscapEntry, current_section_name *zend.ZendString, str_interned zend.HashTable) BrowscapParserCtx {
 	return BrowscapParserCtx{
 		bdata:                bdata,

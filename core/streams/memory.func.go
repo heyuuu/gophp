@@ -424,7 +424,14 @@ func _phpStreamTempOpen(mode int, max_memory_usage int, buf *byte, length int) *
 	}
 	return stream
 }
-func PhpStreamUrlWrapRfc2397(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamUrlWrapRfc2397(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var stream *core.PhpStream
 	var ts *PhpStreamTempData
 	var comma *byte

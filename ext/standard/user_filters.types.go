@@ -14,12 +14,6 @@ type PhpUserFilterData struct {
 	classname *zend.ZendString
 }
 
-// func NewPhpUserFilterData(ce *zend.ZendClassEntry, classname *zend.ZendString) *PhpUserFilterData {
-//     return &PhpUserFilterData{
-//         ce:ce,
-//         classname:classname,
-//     }
-// }
 // func MakePhpUserFilterData(ce *zend.ZendClassEntry, classname *zend.ZendString) PhpUserFilterData {
 //     return PhpUserFilterData{
 //         ce:ce,

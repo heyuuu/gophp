@@ -13,15 +13,6 @@ type ZnodeOp struct /* union */ {
 	jmp_offset uint32
 }
 
-// func NewZnodeOp(constant uint32, var_ uint32, num uint32, opline_num uint32, jmp_offset uint32) *ZnodeOp {
-//     return &ZnodeOp{
-//         constant:constant,
-//         var_:var_,
-//         num:num,
-//         opline_num:opline_num,
-//         jmp_offset:jmp_offset,
-//     }
-// }
 // func MakeZnodeOp(constant uint32, var_ uint32, num uint32, opline_num uint32, jmp_offset uint32) ZnodeOp {
 //     return ZnodeOp{
 //         constant:constant,
@@ -75,14 +66,6 @@ type ZendAstZnode struct {
 	node   Znode
 }
 
-// func NewZendAstZnode(kind ZendAstKind, attr ZendAstAttr, lineno uint32, node Znode) *ZendAstZnode {
-//     return &ZendAstZnode{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         node:node,
-//     }
-// }
 // func MakeZendAstZnode(kind ZendAstKind, attr ZendAstAttr, lineno uint32, node Znode) ZendAstZnode {
 //     return ZendAstZnode{
 //         kind:kind,
@@ -109,11 +92,6 @@ type ZendDeclarables struct {
 	ticks ZendLong
 }
 
-// func NewZendDeclarables(ticks ZendLong) *ZendDeclarables {
-//     return &ZendDeclarables{
-//         ticks:ticks,
-//     }
-// }
 // func MakeZendDeclarables(ticks ZendLong) ZendDeclarables {
 //     return ZendDeclarables{
 //         ticks:ticks,
@@ -136,30 +114,27 @@ type ZendFileContext struct {
 	seen_symbols             HashTable
 }
 
-// func NewZendFileContext(declarables ZendDeclarables, current_namespace *ZendString, in_namespace ZendBool, has_bracketed_namespaces ZendBool, imports *HashTable, imports_function *HashTable, imports_const *HashTable, seen_symbols HashTable) *ZendFileContext {
-//     return &ZendFileContext{
-//         declarables:declarables,
-//         current_namespace:current_namespace,
-//         in_namespace:in_namespace,
-//         has_bracketed_namespaces:has_bracketed_namespaces,
-//         imports:imports,
-//         imports_function:imports_function,
-//         imports_const:imports_const,
-//         seen_symbols:seen_symbols,
-//     }
-// }
-// func MakeZendFileContext(declarables ZendDeclarables, current_namespace *ZendString, in_namespace ZendBool, has_bracketed_namespaces ZendBool, imports *HashTable, imports_function *HashTable, imports_const *HashTable, seen_symbols HashTable) ZendFileContext {
-//     return ZendFileContext{
-//         declarables:declarables,
-//         current_namespace:current_namespace,
-//         in_namespace:in_namespace,
-//         has_bracketed_namespaces:has_bracketed_namespaces,
-//         imports:imports,
-//         imports_function:imports_function,
-//         imports_const:imports_const,
-//         seen_symbols:seen_symbols,
-//     }
-// }
+//             func MakeZendFileContext(
+// declarables ZendDeclarables,
+// current_namespace *ZendString,
+// in_namespace ZendBool,
+// has_bracketed_namespaces ZendBool,
+// imports *HashTable,
+// imports_function *HashTable,
+// imports_const *HashTable,
+// seen_symbols HashTable,
+// ) ZendFileContext {
+//                 return ZendFileContext{
+//                     declarables:declarables,
+//                     current_namespace:current_namespace,
+//                     in_namespace:in_namespace,
+//                     has_bracketed_namespaces:has_bracketed_namespaces,
+//                     imports:imports,
+//                     imports_function:imports_function,
+//                     imports_const:imports_const,
+//                     seen_symbols:seen_symbols,
+//                 }
+//             }
 func (this *ZendFileContext) GetDeclarables() ZendDeclarables       { return this.declarables }
 func (this *ZendFileContext) SetDeclarables(value ZendDeclarables)  { this.declarables = value }
 func (this *ZendFileContext) GetCurrentNamespace() *ZendString      { return this.current_namespace }
@@ -192,14 +167,6 @@ type ZendParserStackElem struct /* union */ {
 	ptr *uint8
 }
 
-// func NewZendParserStackElem(ast *ZendAst, str *ZendString, num ZendUlong, ptr *uint8) *ZendParserStackElem {
-//     return &ZendParserStackElem{
-//         ast:ast,
-//         str:str,
-//         num:num,
-//         ptr:ptr,
-//     }
-// }
 // func MakeZendParserStackElem(ast *ZendAst, str *ZendString, num ZendUlong, ptr *uint8) ZendParserStackElem {
 //     return ZendParserStackElem{
 //         ast:ast,
@@ -234,34 +201,31 @@ type ZendOp struct {
 	result_type    ZendUchar
 }
 
-// func NewZendOp(handler any, op1 ZnodeOp, op2 ZnodeOp, result ZnodeOp, extended_value uint32, lineno uint32, opcode ZendUchar, op1_type ZendUchar, op2_type ZendUchar, result_type ZendUchar) *ZendOp {
-//     return &ZendOp{
-//         handler:handler,
-//         op1:op1,
-//         op2:op2,
-//         result:result,
-//         extended_value:extended_value,
-//         lineno:lineno,
-//         opcode:opcode,
-//         op1_type:op1_type,
-//         op2_type:op2_type,
-//         result_type:result_type,
-//     }
-// }
-// func MakeZendOp(handler any, op1 ZnodeOp, op2 ZnodeOp, result ZnodeOp, extended_value uint32, lineno uint32, opcode ZendUchar, op1_type ZendUchar, op2_type ZendUchar, result_type ZendUchar) ZendOp {
-//     return ZendOp{
-//         handler:handler,
-//         op1:op1,
-//         op2:op2,
-//         result:result,
-//         extended_value:extended_value,
-//         lineno:lineno,
-//         opcode:opcode,
-//         op1_type:op1_type,
-//         op2_type:op2_type,
-//         result_type:result_type,
-//     }
-// }
+//             func MakeZendOp(
+// handler any,
+// op1 ZnodeOp,
+// op2 ZnodeOp,
+// result ZnodeOp,
+// extended_value uint32,
+// lineno uint32,
+// opcode ZendUchar,
+// op1_type ZendUchar,
+// op2_type ZendUchar,
+// result_type ZendUchar,
+// ) ZendOp {
+//                 return ZendOp{
+//                     handler:handler,
+//                     op1:op1,
+//                     op2:op2,
+//                     result:result,
+//                     extended_value:extended_value,
+//                     lineno:lineno,
+//                     opcode:opcode,
+//                     op1_type:op1_type,
+//                     op2_type:op2_type,
+//                     result_type:result_type,
+//                 }
+//             }
 func (this *ZendOp) GetHandler() any               { return this.handler }
 func (this *ZendOp) SetHandler(value any)          { this.handler = value }
 func (this *ZendOp) GetOp1() ZnodeOp               { return this.op1 }
@@ -294,15 +258,6 @@ type ZendBrkContElement struct {
 	is_switch ZendBool
 }
 
-// func NewZendBrkContElement(start int, cont int, brk int, parent int, is_switch ZendBool) *ZendBrkContElement {
-//     return &ZendBrkContElement{
-//         start:start,
-//         cont:cont,
-//         brk:brk,
-//         parent:parent,
-//         is_switch:is_switch,
-//     }
-// }
 // func MakeZendBrkContElement(start int, cont int, brk int, parent int, is_switch ZendBool) ZendBrkContElement {
 //     return ZendBrkContElement{
 //         start:start,
@@ -331,12 +286,6 @@ type ZendLabel struct {
 	opline_num uint32
 }
 
-// func NewZendLabel(brk_cont int, opline_num uint32) *ZendLabel {
-//     return &ZendLabel{
-//         brk_cont:brk_cont,
-//         opline_num:opline_num,
-//     }
-// }
 // func MakeZendLabel(brk_cont int, opline_num uint32) ZendLabel {
 //     return ZendLabel{
 //         brk_cont:brk_cont,
@@ -358,14 +307,6 @@ type ZendTryCatchElement struct {
 	finally_end uint32
 }
 
-// func NewZendTryCatchElement(try_op uint32, catch_op uint32, finally_op uint32, finally_end uint32) *ZendTryCatchElement {
-//     return &ZendTryCatchElement{
-//         try_op:try_op,
-//         catch_op:catch_op,
-//         finally_op:finally_op,
-//         finally_end:finally_end,
-//     }
-// }
 // func MakeZendTryCatchElement(try_op uint32, catch_op uint32, finally_op uint32, finally_end uint32) ZendTryCatchElement {
 //     return ZendTryCatchElement{
 //         try_op:try_op,
@@ -392,13 +333,6 @@ type ZendLiveRange struct {
 	end   uint32
 }
 
-// func NewZendLiveRange(var_ uint32, start uint32, end uint32) *ZendLiveRange {
-//     return &ZendLiveRange{
-//         var_:var_,
-//         start:start,
-//         end:end,
-//     }
-// }
 // func MakeZendLiveRange(var_ uint32, start uint32, end uint32) ZendLiveRange {
 //     return ZendLiveRange{
 //         var_:var_,
@@ -428,32 +362,29 @@ type ZendOparrayContext struct {
 	labels           *HashTable
 }
 
-// func NewZendOparrayContext(opcodes_size uint32, vars_size int, literals_size int, fast_call_var uint32, try_catch_offset uint32, current_brk_cont int, last_brk_cont int, brk_cont_array *ZendBrkContElement, labels *HashTable) *ZendOparrayContext {
-//     return &ZendOparrayContext{
-//         opcodes_size:opcodes_size,
-//         vars_size:vars_size,
-//         literals_size:literals_size,
-//         fast_call_var:fast_call_var,
-//         try_catch_offset:try_catch_offset,
-//         current_brk_cont:current_brk_cont,
-//         last_brk_cont:last_brk_cont,
-//         brk_cont_array:brk_cont_array,
-//         labels:labels,
-//     }
-// }
-// func MakeZendOparrayContext(opcodes_size uint32, vars_size int, literals_size int, fast_call_var uint32, try_catch_offset uint32, current_brk_cont int, last_brk_cont int, brk_cont_array *ZendBrkContElement, labels *HashTable) ZendOparrayContext {
-//     return ZendOparrayContext{
-//         opcodes_size:opcodes_size,
-//         vars_size:vars_size,
-//         literals_size:literals_size,
-//         fast_call_var:fast_call_var,
-//         try_catch_offset:try_catch_offset,
-//         current_brk_cont:current_brk_cont,
-//         last_brk_cont:last_brk_cont,
-//         brk_cont_array:brk_cont_array,
-//         labels:labels,
-//     }
-// }
+//             func MakeZendOparrayContext(
+// opcodes_size uint32,
+// vars_size int,
+// literals_size int,
+// fast_call_var uint32,
+// try_catch_offset uint32,
+// current_brk_cont int,
+// last_brk_cont int,
+// brk_cont_array *ZendBrkContElement,
+// labels *HashTable,
+// ) ZendOparrayContext {
+//                 return ZendOparrayContext{
+//                     opcodes_size:opcodes_size,
+//                     vars_size:vars_size,
+//                     literals_size:literals_size,
+//                     fast_call_var:fast_call_var,
+//                     try_catch_offset:try_catch_offset,
+//                     current_brk_cont:current_brk_cont,
+//                     last_brk_cont:last_brk_cont,
+//                     brk_cont_array:brk_cont_array,
+//                     labels:labels,
+//                 }
+//             }
 func (this *ZendOparrayContext) GetOpcodesSize() uint32               { return this.opcodes_size }
 func (this *ZendOparrayContext) SetOpcodesSize(value uint32)          { this.opcodes_size = value }
 func (this *ZendOparrayContext) GetVarsSize() int                     { return this.vars_size }
@@ -487,26 +418,23 @@ type ZendPropertyInfo struct {
 	type_       ZendType
 }
 
-// func NewZendPropertyInfo(offset uint32, flags uint32, name *ZendString, doc_comment *ZendString, ce *ZendClassEntry, type_ ZendType) *ZendPropertyInfo {
-//     return &ZendPropertyInfo{
-//         offset:offset,
-//         flags:flags,
-//         name:name,
-//         doc_comment:doc_comment,
-//         ce:ce,
-//         type_:type_,
-//     }
-// }
-// func MakeZendPropertyInfo(offset uint32, flags uint32, name *ZendString, doc_comment *ZendString, ce *ZendClassEntry, type_ ZendType) ZendPropertyInfo {
-//     return ZendPropertyInfo{
-//         offset:offset,
-//         flags:flags,
-//         name:name,
-//         doc_comment:doc_comment,
-//         ce:ce,
-//         type_:type_,
-//     }
-// }
+//             func MakeZendPropertyInfo(
+// offset uint32,
+// flags uint32,
+// name *ZendString,
+// doc_comment *ZendString,
+// ce *ZendClassEntry,
+// type_ ZendType,
+// ) ZendPropertyInfo {
+//                 return ZendPropertyInfo{
+//                     offset:offset,
+//                     flags:flags,
+//                     name:name,
+//                     doc_comment:doc_comment,
+//                     ce:ce,
+//                     type_:type_,
+//                 }
+//             }
 func (this *ZendPropertyInfo) GetOffset() uint32               { return this.offset }
 func (this *ZendPropertyInfo) SetOffset(value uint32)          { this.offset = value }
 func (this *ZendPropertyInfo) GetFlags() uint32                { return this.flags }
@@ -551,13 +479,6 @@ type ZendClassConstant struct {
 	ce          *ZendClassEntry
 }
 
-// func NewZendClassConstant(value Zval, doc_comment *ZendString, ce *ZendClassEntry) *ZendClassConstant {
-//     return &ZendClassConstant{
-//         value:value,
-//         doc_comment:doc_comment,
-//         ce:ce,
-//     }
-// }
 // func MakeZendClassConstant(value Zval, doc_comment *ZendString, ce *ZendClassEntry) ZendClassConstant {
 //     return ZendClassConstant{
 //         value:value,
@@ -583,14 +504,6 @@ type ZendInternalArgInfo struct {
 	is_variadic       ZendBool
 }
 
-// func NewZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) *ZendInternalArgInfo {
-//     return &ZendInternalArgInfo{
-//         name:name,
-//         type_:type_,
-//         pass_by_reference:pass_by_reference,
-//         is_variadic:is_variadic,
-//     }
-// }
 func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendInternalArgInfo {
 	return ZendInternalArgInfo{
 		name:              name,
@@ -621,14 +534,6 @@ type ZendArgInfo struct {
 	is_variadic       ZendBool
 }
 
-// func NewZendArgInfo(name *ZendString, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) *ZendArgInfo {
-//     return &ZendArgInfo{
-//         name:name,
-//         type_:type_,
-//         pass_by_reference:pass_by_reference,
-//         is_variadic:is_variadic,
-//     }
-// }
 // func MakeZendArgInfo(name *ZendString, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendArgInfo {
 //     return ZendArgInfo{
 //         name:name,
@@ -656,14 +561,6 @@ type ZendInternalFunctionInfo struct {
 	_is_variadic      ZendBool
 }
 
-// func NewZendInternalFunctionInfo(required_num_args ZendUintptrT, type_ ZendType, return_reference ZendBool, _is_variadic ZendBool) *ZendInternalFunctionInfo {
-//     return &ZendInternalFunctionInfo{
-//         required_num_args:required_num_args,
-//         type_:type_,
-//         return_reference:return_reference,
-//         _is_variadic:_is_variadic,
-//     }
-// }
 // func MakeZendInternalFunctionInfo(required_num_args ZendUintptrT, type_ ZendType, return_reference ZendBool, _is_variadic ZendBool) ZendInternalFunctionInfo {
 //     return ZendInternalFunctionInfo{
 //         required_num_args:required_num_args,
@@ -722,74 +619,71 @@ type ZendOpArray struct {
 	reserved                  []any
 }
 
-// func NewZendOpArray(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendArgInfo, cache_size int, last_var int, T uint32, last uint32, opcodes *ZendOp, run_time_cache__ptr **any, static_variables_ptr__ptr **HashTable, static_variables *HashTable, vars **ZendString, refcount *uint32, last_live_range int, last_try_catch int, live_range *ZendLiveRange, try_catch_array *ZendTryCatchElement, filename *ZendString, line_start uint32, line_end uint32, doc_comment *ZendString, last_literal int, literals *Zval, reserved []any) *ZendOpArray {
-//     return &ZendOpArray{
-//         type_:type_,
-//         arg_flags:arg_flags,
-//         fn_flags:fn_flags,
-//         function_name:function_name,
-//         scope:scope,
-//         prototype:prototype,
-//         num_args:num_args,
-//         required_num_args:required_num_args,
-//         arg_info:arg_info,
-//         cache_size:cache_size,
-//         last_var:last_var,
-//         T:T,
-//         last:last,
-//         opcodes:opcodes,
-//         run_time_cache__ptr:run_time_cache__ptr,
-//         static_variables_ptr__ptr:static_variables_ptr__ptr,
-//         static_variables:static_variables,
-//         vars:vars,
-//         refcount:refcount,
-//         last_live_range:last_live_range,
-//         last_try_catch:last_try_catch,
-//         live_range:live_range,
-//         try_catch_array:try_catch_array,
-//         filename:filename,
-//         line_start:line_start,
-//         line_end:line_end,
-//         doc_comment:doc_comment,
-//         last_literal:last_literal,
-//         literals:literals,
-//         reserved:reserved,
-//     }
-// }
-// func MakeZendOpArray(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendArgInfo, cache_size int, last_var int, T uint32, last uint32, opcodes *ZendOp, run_time_cache__ptr **any, static_variables_ptr__ptr **HashTable, static_variables *HashTable, vars **ZendString, refcount *uint32, last_live_range int, last_try_catch int, live_range *ZendLiveRange, try_catch_array *ZendTryCatchElement, filename *ZendString, line_start uint32, line_end uint32, doc_comment *ZendString, last_literal int, literals *Zval, reserved []any) ZendOpArray {
-//     return ZendOpArray{
-//         type_:type_,
-//         arg_flags:arg_flags,
-//         fn_flags:fn_flags,
-//         function_name:function_name,
-//         scope:scope,
-//         prototype:prototype,
-//         num_args:num_args,
-//         required_num_args:required_num_args,
-//         arg_info:arg_info,
-//         cache_size:cache_size,
-//         last_var:last_var,
-//         T:T,
-//         last:last,
-//         opcodes:opcodes,
-//         run_time_cache__ptr:run_time_cache__ptr,
-//         static_variables_ptr__ptr:static_variables_ptr__ptr,
-//         static_variables:static_variables,
-//         vars:vars,
-//         refcount:refcount,
-//         last_live_range:last_live_range,
-//         last_try_catch:last_try_catch,
-//         live_range:live_range,
-//         try_catch_array:try_catch_array,
-//         filename:filename,
-//         line_start:line_start,
-//         line_end:line_end,
-//         doc_comment:doc_comment,
-//         last_literal:last_literal,
-//         literals:literals,
-//         reserved:reserved,
-//     }
-// }
+//             func MakeZendOpArray(
+// type_ ZendUchar,
+// arg_flags []ZendUchar,
+// fn_flags uint32,
+// function_name *ZendString,
+// scope *ZendClassEntry,
+// prototype *ZendFunction,
+// num_args uint32,
+// required_num_args uint32,
+// arg_info *ZendArgInfo,
+// cache_size int,
+// last_var int,
+// T uint32,
+// last uint32,
+// opcodes *ZendOp,
+// run_time_cache__ptr **any,
+// static_variables_ptr__ptr **HashTable,
+// static_variables *HashTable,
+// vars **ZendString,
+// refcount *uint32,
+// last_live_range int,
+// last_try_catch int,
+// live_range *ZendLiveRange,
+// try_catch_array *ZendTryCatchElement,
+// filename *ZendString,
+// line_start uint32,
+// line_end uint32,
+// doc_comment *ZendString,
+// last_literal int,
+// literals *Zval,
+// reserved []any,
+// ) ZendOpArray {
+//                 return ZendOpArray{
+//                     type_:type_,
+//                     arg_flags:arg_flags,
+//                     fn_flags:fn_flags,
+//                     function_name:function_name,
+//                     scope:scope,
+//                     prototype:prototype,
+//                     num_args:num_args,
+//                     required_num_args:required_num_args,
+//                     arg_info:arg_info,
+//                     cache_size:cache_size,
+//                     last_var:last_var,
+//                     T:T,
+//                     last:last,
+//                     opcodes:opcodes,
+//                     run_time_cache__ptr:run_time_cache__ptr,
+//                     static_variables_ptr__ptr:static_variables_ptr__ptr,
+//                     static_variables:static_variables,
+//                     vars:vars,
+//                     refcount:refcount,
+//                     last_live_range:last_live_range,
+//                     last_try_catch:last_try_catch,
+//                     live_range:live_range,
+//                     try_catch_array:try_catch_array,
+//                     filename:filename,
+//                     line_start:line_start,
+//                     line_end:line_end,
+//                     doc_comment:doc_comment,
+//                     last_literal:last_literal,
+//                     literals:literals,
+//                     reserved:reserved,
+//                 }
+//             }
 func (this *ZendOpArray) GetType() ZendUchar       { return this.type_ }
 func (this *ZendOpArray) SetType(value ZendUchar)  { this.type_ = value }
 func (this *ZendOpArray) GetArgFlags() []ZendUchar { return this.arg_flags }
@@ -950,23 +844,20 @@ type ZendInternalFunction struct {
 	reserved          []any
 }
 
-// func NewZendInternalFunction(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendInternalArgInfo, handler ZifHandler, module *ZendModuleEntry, reserved []any) *ZendInternalFunction {
-//     return &ZendInternalFunction{
-//         type_:type_,
-//         arg_flags:arg_flags,
-//         fn_flags:fn_flags,
-//         function_name:function_name,
-//         scope:scope,
-//         prototype:prototype,
-//         num_args:num_args,
-//         required_num_args:required_num_args,
-//         arg_info:arg_info,
-//         handler:handler,
-//         module:module,
-//         reserved:reserved,
-//     }
-// }
-func MakeZendInternalFunction(type_ ZendUchar, arg_flags []ZendUchar, fn_flags uint32, function_name *ZendString, scope *ZendClassEntry, prototype *ZendFunction, num_args uint32, required_num_args uint32, arg_info *ZendInternalArgInfo, handler ZifHandler, module *ZendModuleEntry, reserved []any) ZendInternalFunction {
+func MakeZendInternalFunction(
+	type_ ZendUchar,
+	arg_flags []ZendUchar,
+	fn_flags uint32,
+	function_name *ZendString,
+	scope *ZendClassEntry,
+	prototype *ZendFunction,
+	num_args uint32,
+	required_num_args uint32,
+	arg_info *ZendInternalArgInfo,
+	handler ZifHandler,
+	module *ZendModuleEntry,
+	reserved []any,
+) ZendInternalFunction {
 	return ZendInternalFunction{
 		type_:             type_,
 		arg_flags:         arg_flags,
@@ -1216,30 +1107,27 @@ type ZendExecuteData struct {
 	run_time_cache    *any
 }
 
-// func NewZendExecuteData(opline *ZendOp, call *ZendExecuteData, return_value *Zval, func_ *ZendFunction, This Zval, prev_execute_data *ZendExecuteData, symbol_table *ZendArray, run_time_cache *any) *ZendExecuteData {
-//     return &ZendExecuteData{
-//         opline:opline,
-//         call:call,
-//         return_value:return_value,
-//         func_:func_,
-//         This:This,
-//         prev_execute_data:prev_execute_data,
-//         symbol_table:symbol_table,
-//         run_time_cache:run_time_cache,
-//     }
-// }
-// func MakeZendExecuteData(opline *ZendOp, call *ZendExecuteData, return_value *Zval, func_ *ZendFunction, This Zval, prev_execute_data *ZendExecuteData, symbol_table *ZendArray, run_time_cache *any) ZendExecuteData {
-//     return ZendExecuteData{
-//         opline:opline,
-//         call:call,
-//         return_value:return_value,
-//         func_:func_,
-//         This:This,
-//         prev_execute_data:prev_execute_data,
-//         symbol_table:symbol_table,
-//         run_time_cache:run_time_cache,
-//     }
-// }
+//             func MakeZendExecuteData(
+// opline *ZendOp,
+// call *ZendExecuteData,
+// return_value *Zval,
+// func_ *ZendFunction,
+// This Zval,
+// prev_execute_data *ZendExecuteData,
+// symbol_table *ZendArray,
+// run_time_cache *any,
+// ) ZendExecuteData {
+//                 return ZendExecuteData{
+//                     opline:opline,
+//                     call:call,
+//                     return_value:return_value,
+//                     func_:func_,
+//                     This:This,
+//                     prev_execute_data:prev_execute_data,
+//                     symbol_table:symbol_table,
+//                     run_time_cache:run_time_cache,
+//                 }
+//             }
 func (this *ZendExecuteData) GetOpline() *ZendOp             { return this.opline }
 func (this *ZendExecuteData) SetOpline(value *ZendOp)        { this.opline = value }
 func (this *ZendExecuteData) GetCall() *ZendExecuteData      { return this.call }
@@ -1272,14 +1160,6 @@ type ZendAutoGlobal struct {
 	armed                ZendBool
 }
 
-// func NewZendAutoGlobal(name *ZendString, auto_global_callback ZendAutoGlobalCallback, jit ZendBool, armed ZendBool) *ZendAutoGlobal {
-//     return &ZendAutoGlobal{
-//         name:name,
-//         auto_global_callback:auto_global_callback,
-//         jit:jit,
-//         armed:armed,
-//     }
-// }
 // func MakeZendAutoGlobal(name *ZendString, auto_global_callback ZendAutoGlobalCallback, jit ZendBool, armed ZendBool) ZendAutoGlobal {
 //     return ZendAutoGlobal{
 //         name:name,
@@ -1311,14 +1191,6 @@ type ZendLoopVar struct {
 	try_catch_offset uint32
 }
 
-// func NewZendLoopVar(opcode ZendUchar, var_type ZendUchar, var_num uint32, try_catch_offset uint32) *ZendLoopVar {
-//     return &ZendLoopVar{
-//         opcode:opcode,
-//         var_type:var_type,
-//         var_num:var_num,
-//         try_catch_offset:try_catch_offset,
-//     }
-// }
 func MakeZendLoopVar(opcode ZendUchar, var_type ZendUchar, var_num uint32, try_catch_offset uint32) ZendLoopVar {
 	return ZendLoopVar{
 		opcode:           opcode,
@@ -1344,12 +1216,6 @@ type ReservedClassName struct {
 	len_ int
 }
 
-// func NewReservedClassName(name *byte, len_ int) *ReservedClassName {
-//     return &ReservedClassName{
-//         name:name,
-//         len_:len_,
-//     }
-// }
 func MakeReservedClassName(name *byte, len_ int) ReservedClassName {
 	return ReservedClassName{
 		name: name,
@@ -1372,13 +1238,6 @@ type BuiltinTypeInfo struct {
 	type_    ZendUchar
 }
 
-// func NewBuiltinTypeInfo(name *byte, name_len int, type_ ZendUchar) *BuiltinTypeInfo {
-//     return &BuiltinTypeInfo{
-//         name:name,
-//         name_len:name_len,
-//         type_:type_,
-//     }
-// }
 func MakeBuiltinTypeInfo(name *byte, name_len int, type_ ZendUchar) BuiltinTypeInfo {
 	return BuiltinTypeInfo{
 		name:     name,
@@ -1404,12 +1263,6 @@ type ClosureInfo struct {
 	varvars_used ZendBool
 }
 
-// func NewClosureInfo(uses HashTable, varvars_used ZendBool) *ClosureInfo {
-//     return &ClosureInfo{
-//         uses:uses,
-//         varvars_used:varvars_used,
-//     }
-// }
 // func MakeClosureInfo(uses HashTable, varvars_used ZendBool) ClosureInfo {
 //     return ClosureInfo{
 //         uses:uses,

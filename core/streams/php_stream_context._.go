@@ -26,7 +26,16 @@ import (
    +----------------------------------------------------------------------+
 */
 
-type PhpStreamNotificationFunc func(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any)
+type PhpStreamNotificationFunc func(
+	context *core.PhpStreamContext,
+	notifycode int,
+	severity int,
+	xmsg *byte,
+	xcode int,
+	bytes_sofar int,
+	bytes_max int,
+	ptr any,
+)
 
 const PHP_STREAM_NOTIFIER_PROGRESS = 1
 

@@ -8,7 +8,15 @@ import (
 	"sik/zend"
 )
 
-func ReferenceLevdist(s1 *byte, l1 int, s2 *byte, l2 int, cost_ins zend.ZendLong, cost_rep zend.ZendLong, cost_del zend.ZendLong) zend.ZendLong {
+func ReferenceLevdist(
+	s1 *byte,
+	l1 int,
+	s2 *byte,
+	l2 int,
+	cost_ins zend.ZendLong,
+	cost_rep zend.ZendLong,
+	cost_del zend.ZendLong,
+) zend.ZendLong {
 	var p1 *zend.ZendLong
 	var p2 *zend.ZendLong
 	var tmp *zend.ZendLong

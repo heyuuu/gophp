@@ -11,13 +11,6 @@ type PHP_SHA1_CTX struct {
 	buffer []uint8
 }
 
-// func NewPHP_SHA1_CTX(state []uint32, count []uint32, buffer []uint8) *PHP_SHA1_CTX {
-//     return &PHP_SHA1_CTX{
-//         state:state,
-//         count:count,
-//         buffer:buffer,
-//     }
-// }
 // func MakePHP_SHA1_CTX(state []uint32, count []uint32, buffer []uint8) PHP_SHA1_CTX {
 //     return PHP_SHA1_CTX{
 //         state:state,

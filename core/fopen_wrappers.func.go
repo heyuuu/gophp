@@ -10,7 +10,14 @@ import (
 )
 
 func OPENBASEDIR_CHECKPATH(filename *byte) int { return PhpCheckOpenBasedir(filename) }
-func OnUpdateBaseDir(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateBaseDir(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p **byte
 	var pathbuf **byte
 	var ptr **byte

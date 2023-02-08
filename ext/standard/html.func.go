@@ -833,7 +833,15 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 	/* code is not necessarily a unicode code point */
 }
 func TRAVERSE_FOR_ENTITIES_EXPAND_SIZE(oldlen int) int { return oldlen + oldlen/5 + 2 }
-func TraverseForEntities(old *byte, oldlen int, ret *zend.ZendString, all int, flags int, inv_map *EntityHt, charset EntityCharset) {
+func TraverseForEntities(
+	old *byte,
+	oldlen int,
+	ret *zend.ZendString,
+	all int,
+	flags int,
+	inv_map *EntityHt,
+	charset EntityCharset,
+) {
 	var p *byte
 	var lim *byte
 	var q *byte
@@ -1023,7 +1031,16 @@ func PhpUnescapeHtmlEntities(str *zend.ZendString, all int, flags int, hint_char
 func PhpEscapeHtmlEntities(old *uint8, oldlen int, all int, flags int, hint_charset string) *zend.ZendString {
 	return PhpEscapeHtmlEntitiesEx(old, oldlen, all, flags, hint_charset, 1)
 }
-func FindEntityForChar(k uint, charset EntityCharset, table *EntityStage1Row, entity **uint8, entity_len *int, old *uint8, oldlen int, cursor *int) {
+func FindEntityForChar(
+	k uint,
+	charset EntityCharset,
+	table *EntityStage1Row,
+	entity **uint8,
+	entity_len *int,
+	old *uint8,
+	oldlen int,
+	cursor *int,
+) {
 	var stage1_idx unsigned = ENT_STAGE1_INDEX(k)
 	var c *EntityStage3Row
 	if stage1_idx > 0x1d {
@@ -1083,7 +1100,14 @@ func FindEntityForCharBasic(k uint, table *EntityStage3Row, entity **uint8, enti
 	*entity = (*uint8)(table[k].GetEntity())
 	*entity_len = table[k].GetEntityLen()
 }
-func PhpEscapeHtmlEntitiesEx(old *uint8, oldlen int, all int, flags int, hint_charset string, double_encode zend.ZendBool) *zend.ZendString {
+func PhpEscapeHtmlEntitiesEx(
+	old *uint8,
+	oldlen int,
+	all int,
+	flags int,
+	hint_charset string,
+	double_encode zend.ZendBool,
+) *zend.ZendString {
 	var cursor int
 	var maxlen int
 	var len_ int

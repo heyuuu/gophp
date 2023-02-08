@@ -13,6 +13,7 @@ import (
 func PhpSelect(m core.PhpSocketT, r fd_set, w __auto__, e __auto__, t *__struct__timeval) __auto__ {
 	return select_(m, r, w, e, t)
 }
+func PhpCliGetShellCallbacks() *CliShellCallbacksT { return &CliShellCallbacks }
 func ModuleNameCmp(a any, b any) int {
 	var f *zend.Bucket = (*zend.Bucket)(a)
 	var s *zend.Bucket = (*zend.Bucket)(b)
@@ -63,6 +64,9 @@ func SapiCliSelect(fd core.PhpSocketT) int {
 }
 func SapiCliSingleWrite(str *byte, str_length int) ssize_t {
 	var ret ssize_t
+	if CliShellCallbacks.GetCliShellWrite() != nil {
+		CliShellCallbacks.GetCliShellWrite()(str, str_length)
+	}
 	for {
 		ret = write(STDOUT_FILENO, str, str_length)
 		if !(ret <= 0 && errno == EAGAIN && SapiCliSelect(STDOUT_FILENO) != 0) {
@@ -77,6 +81,13 @@ func SapiCliUbWrite(str *byte, str_length int) int {
 	var ret ssize_t
 	if str_length == 0 {
 		return 0
+	}
+	if CliShellCallbacks.GetCliShellUbWrite() != nil {
+		var ub_wrote int
+		ub_wrote = CliShellCallbacks.GetCliShellUbWrite()(str, str_length)
+		if ub_wrote != size_t-1 {
+			return ub_wrote
+		}
 	}
 	for remaining > 0 {
 		ret = SapiCliSingleWrite(ptr, remaining)
@@ -522,8 +533,12 @@ func DoCli(argc int, argv **byte) int {
 			if strcmp(file_handle.GetFilename(), "Standard input code") {
 				CliRegisterFileHandles()
 			}
-			core.PhpExecuteScript(&file_handle)
-			exit_status = zend.EG__().GetExitStatus()
+			if interactive != 0 && CliShellCallbacks.GetCliShellRun() != nil {
+				exit_status = CliShellCallbacks.GetCliShellRun()()
+			} else {
+				core.PhpExecuteScript(&file_handle)
+				exit_status = zend.EG__().GetExitStatus()
+			}
 			break
 		case PHP_MODE_LINT:
 			exit_status = core.PhpLintScript(&file_handle)

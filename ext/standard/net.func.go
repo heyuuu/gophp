@@ -48,7 +48,14 @@ func PhpInetNtop(addr *__struct__sockaddr) *zend.ZendString {
 	}
 	return nil
 }
-func IfaceAppendUnicast(unicast *zend.Zval, flags zend.ZendLong, addr *__struct__sockaddr, netmask *__struct__sockaddr, broadcast *__struct__sockaddr, ptp *__struct__sockaddr) {
+func IfaceAppendUnicast(
+	unicast *zend.Zval,
+	flags zend.ZendLong,
+	addr *__struct__sockaddr,
+	netmask *__struct__sockaddr,
+	broadcast *__struct__sockaddr,
+	ptp *__struct__sockaddr,
+) {
 	var host *zend.ZendString
 	var u zend.Zval
 	zend.ArrayInit(&u)

@@ -4004,7 +4004,15 @@ func ZifFgetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpFgetcsv(stream, delimiter, enclosure, escape, buf_len, buf, return_value)
 }
-func PhpFgetcsv(stream *core.PhpStream, delimiter byte, enclosure byte, escape_char int, buf_len int, buf *byte, return_value *zend.Zval) {
+func PhpFgetcsv(
+	stream *core.PhpStream,
+	delimiter byte,
+	enclosure byte,
+	escape_char int,
+	buf_len int,
+	buf *byte,
+	return_value *zend.Zval,
+) {
 	var temp *byte
 	var tptr *byte
 	var bptr *byte

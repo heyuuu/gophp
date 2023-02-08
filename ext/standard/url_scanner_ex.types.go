@@ -27,44 +27,41 @@ type UrlAdaptStateExT struct {
 	tags        *zend.HashTable
 }
 
-// func NewUrlAdaptStateExT(tag zend.SmartStr, arg zend.SmartStr, val zend.SmartStr, buf zend.SmartStr, result zend.SmartStr, form_app zend.SmartStr, url_app zend.SmartStr, active int, lookup_data *byte, state int, type_ int, attr_val zend.SmartStr, tag_type int, attr_type int, tags *zend.HashTable) *UrlAdaptStateExT {
-//     return &UrlAdaptStateExT{
-//         tag:tag,
-//         arg:arg,
-//         val:val,
-//         buf:buf,
-//         result:result,
-//         form_app:form_app,
-//         url_app:url_app,
-//         active:active,
-//         lookup_data:lookup_data,
-//         state:state,
-//         type_:type_,
-//         attr_val:attr_val,
-//         tag_type:tag_type,
-//         attr_type:attr_type,
-//         tags:tags,
-//     }
-// }
-// func MakeUrlAdaptStateExT(tag zend.SmartStr, arg zend.SmartStr, val zend.SmartStr, buf zend.SmartStr, result zend.SmartStr, form_app zend.SmartStr, url_app zend.SmartStr, active int, lookup_data *byte, state int, type_ int, attr_val zend.SmartStr, tag_type int, attr_type int, tags *zend.HashTable) UrlAdaptStateExT {
-//     return UrlAdaptStateExT{
-//         tag:tag,
-//         arg:arg,
-//         val:val,
-//         buf:buf,
-//         result:result,
-//         form_app:form_app,
-//         url_app:url_app,
-//         active:active,
-//         lookup_data:lookup_data,
-//         state:state,
-//         type_:type_,
-//         attr_val:attr_val,
-//         tag_type:tag_type,
-//         attr_type:attr_type,
-//         tags:tags,
-//     }
-// }
+//             func MakeUrlAdaptStateExT(
+// tag zend.SmartStr,
+// arg zend.SmartStr,
+// val zend.SmartStr,
+// buf zend.SmartStr,
+// result zend.SmartStr,
+// form_app zend.SmartStr,
+// url_app zend.SmartStr,
+// active int,
+// lookup_data *byte,
+// state int,
+// type_ int,
+// attr_val zend.SmartStr,
+// tag_type int,
+// attr_type int,
+// tags *zend.HashTable,
+// ) UrlAdaptStateExT {
+//                 return UrlAdaptStateExT{
+//                     tag:tag,
+//                     arg:arg,
+//                     val:val,
+//                     buf:buf,
+//                     result:result,
+//                     form_app:form_app,
+//                     url_app:url_app,
+//                     active:active,
+//                     lookup_data:lookup_data,
+//                     state:state,
+//                     type_:type_,
+//                     attr_val:attr_val,
+//                     tag_type:tag_type,
+//                     attr_type:attr_type,
+//                     tags:tags,
+//                 }
+//             }
 func (this *UrlAdaptStateExT) GetTag() zend.SmartStr { return this.tag }
 
 // func (this *UrlAdaptStateExT) SetTag(value zend.SmartStr) { this.tag = value }

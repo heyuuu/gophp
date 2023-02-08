@@ -19,28 +19,25 @@ type ZendAssertGlobals struct {
 	exception  zend.ZendBool
 }
 
-// func NewZendAssertGlobals(callback zend.Zval, cb *byte, active zend.ZendBool, bail zend.ZendBool, warning zend.ZendBool, quiet_eval zend.ZendBool, exception zend.ZendBool) *ZendAssertGlobals {
-//     return &ZendAssertGlobals{
-//         callback:callback,
-//         cb:cb,
-//         active:active,
-//         bail:bail,
-//         warning:warning,
-//         quiet_eval:quiet_eval,
-//         exception:exception,
-//     }
-// }
-// func MakeZendAssertGlobals(callback zend.Zval, cb *byte, active zend.ZendBool, bail zend.ZendBool, warning zend.ZendBool, quiet_eval zend.ZendBool, exception zend.ZendBool) ZendAssertGlobals {
-//     return ZendAssertGlobals{
-//         callback:callback,
-//         cb:cb,
-//         active:active,
-//         bail:bail,
-//         warning:warning,
-//         quiet_eval:quiet_eval,
-//         exception:exception,
-//     }
-// }
+//             func MakeZendAssertGlobals(
+// callback zend.Zval,
+// cb *byte,
+// active zend.ZendBool,
+// bail zend.ZendBool,
+// warning zend.ZendBool,
+// quiet_eval zend.ZendBool,
+// exception zend.ZendBool,
+// ) ZendAssertGlobals {
+//                 return ZendAssertGlobals{
+//                     callback:callback,
+//                     cb:cb,
+//                     active:active,
+//                     bail:bail,
+//                     warning:warning,
+//                     quiet_eval:quiet_eval,
+//                     exception:exception,
+//                 }
+//             }
 func (this *ZendAssertGlobals) GetCallback() zend.Zval { return this.callback }
 
 // func (this *ZendAssertGlobals) SetCallback(value zend.Zval) { this.callback = value }

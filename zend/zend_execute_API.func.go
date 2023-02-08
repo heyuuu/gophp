@@ -534,7 +534,14 @@ func ZvalUpdateConstantEx(p *Zval, scope *ZendClassEntry) int {
 func ZvalUpdateConstant(pp *Zval) int {
 	return ZvalUpdateConstantEx(pp, b.CondF(EG__().GetCurrentExecuteData() != nil, func() *ZendClassEntry { return ZendGetExecutedScope() }, func() *ZendClassEntry { return CG__().GetActiveClassEntry() }))
 }
-func _callUserFunctionEx(object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval, no_separation int) int {
+func _callUserFunctionEx(
+	object *Zval,
+	function_name *Zval,
+	retval_ptr *Zval,
+	param_count uint32,
+	params []Zval,
+	no_separation int,
+) int {
 	var fci ZendFcallInfo
 	fci.SetSize(b.SizeOf("fci"))
 	if object != nil {

@@ -1579,7 +1579,14 @@ func ZendFreedtoa(s *byte) {
 		DtoaResult = 0
 	}
 }
-func ZendDtoa(dd float64, mode int, ndigits int, decpt *int, sign *int, rve **byte) *byte {
+func ZendDtoa(
+	dd float64,
+	mode int,
+	ndigits int,
+	decpt *int,
+	sign *int,
+	rve **byte,
+) *byte {
 	/*    Arguments ndigits, decpt, sign are similar to those
 	      of ecvt and fcvt; trailing zeros are suppressed from
 	      the returned string.  If not null, *rve is set to point

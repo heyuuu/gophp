@@ -29,7 +29,14 @@ type ZendEncodingFetcher func(encoding_name *byte) *ZendEncoding
 type ZendEncodingNameGetter func(encoding *ZendEncoding) *byte
 type ZendEncodingLexerCompatibilityChecker func(encoding *ZendEncoding) int
 type ZendEncodingDetector func(string *uint8, length int, list **ZendEncoding, list_size int) *ZendEncoding
-type ZendEncodingConverter func(to **uint8, to_length *int, from *uint8, from_length int, encoding_to *ZendEncoding, encoding_from *ZendEncoding) int
+type ZendEncodingConverter func(
+	to **uint8,
+	to_length *int,
+	from *uint8,
+	from_length int,
+	encoding_to *ZendEncoding,
+	encoding_from *ZendEncoding,
+) int
 type ZendEncodingListParser func(encoding_list *byte, encoding_list_len int, return_list ***ZendEncoding, return_size *int, persistent int) int
 type ZendEncodingInternalEncodingGetter func() *ZendEncoding
 type ZendEncodingInternalEncodingSetter func(encoding *ZendEncoding) int

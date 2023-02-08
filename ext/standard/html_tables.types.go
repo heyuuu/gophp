@@ -9,11 +9,6 @@ type EncToUniStage2 struct {
 	uni_cp []uint16
 }
 
-// func NewEncToUniStage2(uni_cp []uint16) *EncToUniStage2 {
-//     return &EncToUniStage2{
-//         uni_cp:uni_cp,
-//     }
-// }
 func MakeEncToUniStage2(uni_cp []uint16) EncToUniStage2 {
 	return EncToUniStage2{
 		uni_cp: uni_cp,
@@ -30,11 +25,6 @@ type EncToUni struct {
 	inner []*EncToUniStage2
 }
 
-// func NewEncToUni(inner []*EncToUniStage2) *EncToUni {
-//     return &EncToUni{
-//         inner:inner,
-//     }
-// }
 func MakeEncToUni(inner []*EncToUniStage2) EncToUni {
 	return EncToUni{
 		inner: inner,
@@ -52,12 +42,6 @@ type UniToEnc struct {
 	cs_code       uint8
 }
 
-// func NewUniToEnc(un_code_point uint16, cs_code uint8) *UniToEnc {
-//     return &UniToEnc{
-//         un_code_point:un_code_point,
-//         cs_code:cs_code,
-//     }
-// }
 func MakeUniToEnc(un_code_point uint16, cs_code uint8) UniToEnc {
 	return UniToEnc{
 		un_code_point: un_code_point,
@@ -147,12 +131,6 @@ type EntityTableOpt struct {
 	table    *EntityStage3Row
 }
 
-// func NewEntityTableOpt(ms_table *EntityStage1Row, table *EntityStage3Row) *EntityTableOpt {
-//     return &EntityTableOpt{
-//         ms_table:ms_table,
-//         table:table,
-//     }
-// }
 func MakeEntityTableOpt(ms_table *EntityStage1Row, table *EntityStage3Row) EntityTableOpt {
 	return EntityTableOpt{
 		ms_table: ms_table,
@@ -174,14 +152,6 @@ type EntityCpMap struct {
 	codepoint2 uint
 }
 
-// func NewEntityCpMap(entity *byte, entity_len uint16, codepoint1 uint, codepoint2 uint) *EntityCpMap {
-//     return &EntityCpMap{
-//         entity:entity,
-//         entity_len:entity_len,
-//         codepoint1:codepoint1,
-//         codepoint2:codepoint2,
-//     }
-// }
 func MakeEntityCpMap(entity *byte, entity_len uint16, codepoint1 uint, codepoint2 uint) EntityCpMap {
 	return EntityCpMap{
 		entity:     entity,
@@ -211,12 +181,6 @@ type EntityHt struct {
 	buckets   *EntityHtBucket
 }
 
-// func NewEntityHt(num_elems unsigned, buckets *EntityHtBucket) *EntityHt {
-//     return &EntityHt{
-//         num_elems:num_elems,
-//         buckets:buckets,
-//     }
-// }
 func MakeEntityHt(num_elems unsigned, buckets *EntityHtBucket) EntityHt {
 	return EntityHt{
 		num_elems: num_elems,

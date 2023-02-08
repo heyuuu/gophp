@@ -35,7 +35,14 @@ func ZEND_IS_DIGIT(c byte) bool { return c >= '0' && c <= '9' }
 func ZEND_IS_XDIGIT(c __auto__) bool {
 	return c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f'
 }
-func IsNumericStringEx(str *byte, length int, lval *ZendLong, dval *float64, allow_errors int, oflow_info *int) ZendUchar {
+func IsNumericStringEx(
+	str *byte,
+	length int,
+	lval *ZendLong,
+	dval *float64,
+	allow_errors int,
+	oflow_info *int,
+) ZendUchar {
 	if (*str) > '9' {
 		return 0
 	}
@@ -3397,7 +3404,14 @@ func ZendLongToStr(num ZendLong) *ZendString {
 func IsNumericStrFunction(str *ZendString, lval *ZendLong, dval *float64) ZendUchar {
 	return IsNumericStringEx(str.GetVal(), str.GetLen(), lval, dval, -1, nil)
 }
-func _isNumericStringEx(str *byte, length int, lval *ZendLong, dval *float64, allow_errors int, oflow_info *int) ZendUchar {
+func _isNumericStringEx(
+	str *byte,
+	length int,
+	lval *ZendLong,
+	dval *float64,
+	allow_errors int,
+	oflow_info *int,
+) ZendUchar {
 	var ptr *byte
 	var digits int = 0
 	var dp_or_e int = 0

@@ -14,12 +14,6 @@ type SplFixedarray struct {
 	elements *zend.Zval
 }
 
-// func NewSplFixedarray(size zend.ZendLong, elements *zend.Zval) *SplFixedarray {
-//     return &SplFixedarray{
-//         size:size,
-//         elements:elements,
-//     }
-// }
 // func MakeSplFixedarray(size zend.ZendLong, elements *zend.Zval) SplFixedarray {
 //     return SplFixedarray{
 //         size:size,
@@ -47,34 +41,31 @@ type SplFixedarrayObject struct {
 	std             zend.ZendObject
 }
 
-// func NewSplFixedarrayObject(array SplFixedarray, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, current int, flags int, ce_get_iterator *zend.ZendClassEntry, std zend.ZendObject) *SplFixedarrayObject {
-//     return &SplFixedarrayObject{
-//         array:array,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         current:current,
-//         flags:flags,
-//         ce_get_iterator:ce_get_iterator,
-//         std:std,
-//     }
-// }
-// func MakeSplFixedarrayObject(array SplFixedarray, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, current int, flags int, ce_get_iterator *zend.ZendClassEntry, std zend.ZendObject) SplFixedarrayObject {
-//     return SplFixedarrayObject{
-//         array:array,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         current:current,
-//         flags:flags,
-//         ce_get_iterator:ce_get_iterator,
-//         std:std,
-//     }
-// }
+//             func MakeSplFixedarrayObject(
+// array SplFixedarray,
+// fptr_offset_get *zend.ZendFunction,
+// fptr_offset_set *zend.ZendFunction,
+// fptr_offset_has *zend.ZendFunction,
+// fptr_offset_del *zend.ZendFunction,
+// fptr_count *zend.ZendFunction,
+// current int,
+// flags int,
+// ce_get_iterator *zend.ZendClassEntry,
+// std zend.ZendObject,
+// ) SplFixedarrayObject {
+//                 return SplFixedarrayObject{
+//                     array:array,
+//                     fptr_offset_get:fptr_offset_get,
+//                     fptr_offset_set:fptr_offset_set,
+//                     fptr_offset_has:fptr_offset_has,
+//                     fptr_offset_del:fptr_offset_del,
+//                     fptr_count:fptr_count,
+//                     current:current,
+//                     flags:flags,
+//                     ce_get_iterator:ce_get_iterator,
+//                     std:std,
+//                 }
+//             }
 func (this *SplFixedarrayObject) GetArray() SplFixedarray              { return this.array }
 func (this *SplFixedarrayObject) SetArray(value SplFixedarray)         { this.array = value }
 func (this *SplFixedarrayObject) GetFptrOffsetGet() *zend.ZendFunction { return this.fptr_offset_get }
@@ -151,11 +142,6 @@ type SplFixedarrayIt struct {
 	intern zend.ZendUserIterator
 }
 
-// func NewSplFixedarrayIt(intern zend.ZendUserIterator) *SplFixedarrayIt {
-//     return &SplFixedarrayIt{
-//         intern:intern,
-//     }
-// }
 // func MakeSplFixedarrayIt(intern zend.ZendUserIterator) SplFixedarrayIt {
 //     return SplFixedarrayIt{
 //         intern:intern,

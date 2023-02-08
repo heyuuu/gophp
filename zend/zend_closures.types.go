@@ -13,15 +13,6 @@ type ZendClosure struct {
 	orig_internal_handler ZifHandler
 }
 
-// func NewZendClosure(std ZendObject, func_ ZendFunction, this_ptr Zval, called_scope *ZendClassEntry, orig_internal_handler ZifHandler) *ZendClosure {
-//     return &ZendClosure{
-//         std:std,
-//         func_:func_,
-//         this_ptr:this_ptr,
-//         called_scope:called_scope,
-//         orig_internal_handler:orig_internal_handler,
-//     }
-// }
 // func MakeZendClosure(std ZendObject, func_ ZendFunction, this_ptr Zval, called_scope *ZendClassEntry, orig_internal_handler ZifHandler) ZendClosure {
 //     return ZendClosure{
 //         std:std,

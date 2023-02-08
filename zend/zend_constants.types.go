@@ -10,12 +10,6 @@ type ZendConstant struct {
 	name  *ZendString
 }
 
-// func NewZendConstant(value Zval, name *ZendString) *ZendConstant {
-//     return &ZendConstant{
-//         value:value,
-//         name:name,
-//     }
-// }
 // func MakeZendConstant(value Zval, name *ZendString) ZendConstant {
 //     return ZendConstant{
 //         value:value,

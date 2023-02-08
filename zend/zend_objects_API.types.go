@@ -12,14 +12,6 @@ type ZendObjectsStore struct {
 	free_list_head int
 }
 
-// func NewZendObjectsStore(object_buckets **ZendObject, top uint32, size uint32, free_list_head int) *ZendObjectsStore {
-//     return &ZendObjectsStore{
-//         object_buckets:object_buckets,
-//         top:top,
-//         size:size,
-//         free_list_head:free_list_head,
-//     }
-// }
 // func MakeZendObjectsStore(object_buckets **ZendObject, top uint32, size uint32, free_list_head int) ZendObjectsStore {
 //     return ZendObjectsStore{
 //         object_buckets:object_buckets,

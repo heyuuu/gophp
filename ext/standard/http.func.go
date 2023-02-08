@@ -8,7 +8,19 @@ import (
 	"sik/zend"
 )
 
-func PhpUrlEncodeHashEx(ht *zend.HashTable, formstr *zend.SmartStr, num_prefix *byte, num_prefix_len int, key_prefix *byte, key_prefix_len int, key_suffix string, key_suffix_len int, type_ *zend.Zval, arg_sep *byte, enc_type int) int {
+func PhpUrlEncodeHashEx(
+	ht *zend.HashTable,
+	formstr *zend.SmartStr,
+	num_prefix *byte,
+	num_prefix_len int,
+	key_prefix *byte,
+	key_prefix_len int,
+	key_suffix string,
+	key_suffix_len int,
+	type_ *zend.Zval,
+	arg_sep *byte,
+	enc_type int,
+) int {
 	var key *zend.ZendString = nil
 	var newprefix *byte
 	var p *byte

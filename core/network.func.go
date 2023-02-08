@@ -111,7 +111,15 @@ func SET_SOCKET_BLOCKING_MODE(sock PhpSocketT, save PhpNonBlockingFlagsT) {
 func RESTORE_SOCKET_BLOCKING_MODE(sock PhpSocketT, save PhpNonBlockingFlagsT) __auto__ {
 	return fcntl(sock, F_SETFL, save)
 }
-func PhpNetworkConnectSocket(sockfd PhpSocketT, addr *__struct__sockaddr, addrlen socklen_t, asynchronous int, timeout *__struct__timeval, error_string **zend.ZendString, error_code *int) int {
+func PhpNetworkConnectSocket(
+	sockfd PhpSocketT,
+	addr *__struct__sockaddr,
+	addrlen socklen_t,
+	asynchronous int,
+	timeout *__struct__timeval,
+	error_string **zend.ZendString,
+	error_code *int,
+) int {
 	var orig_flags PhpNonBlockingFlagsT
 	var n int
 	var error int = 0
@@ -204,7 +212,14 @@ func SubTimes(a __struct__timeval, b __struct__timeval, result *__struct__timeva
 		result.tv_usec -= 1000000
 	}
 }
-func PhpNetworkBindSocketToLocalAddr(host *byte, port unsigned, socktype int, sockopts long, error_string **zend.ZendString, error_code *int) PhpSocketT {
+func PhpNetworkBindSocketToLocalAddr(
+	host *byte,
+	port unsigned,
+	socktype int,
+	sockopts long,
+	error_string **zend.ZendString,
+	error_code *int,
+) PhpSocketT {
 	var num_addrs int
 	var n int
 	var err int = 0
@@ -398,7 +413,16 @@ func PhpNetworkGetSockName(sock PhpSocketT, textaddr **zend.ZendString, addr **_
 	}
 	return -1
 }
-func PhpNetworkAcceptIncoming(srvsock PhpSocketT, textaddr **zend.ZendString, addr **__struct__sockaddr, addrlen *socklen_t, timeout *__struct__timeval, error_string **zend.ZendString, error_code *int, tcp_nodelay int) PhpSocketT {
+func PhpNetworkAcceptIncoming(
+	srvsock PhpSocketT,
+	textaddr **zend.ZendString,
+	addr **__struct__sockaddr,
+	addrlen *socklen_t,
+	timeout *__struct__timeval,
+	error_string **zend.ZendString,
+	error_code *int,
+	tcp_nodelay int,
+) PhpSocketT {
 	var clisock PhpSocketT = -1
 	var error int = 0
 	var n int
@@ -429,7 +453,18 @@ func PhpNetworkAcceptIncoming(srvsock PhpSocketT, textaddr **zend.ZendString, ad
 	}
 	return clisock
 }
-func PhpNetworkConnectSocketToHost(host *byte, port uint16, socktype int, asynchronous int, timeout *__struct__timeval, error_string **zend.ZendString, error_code *int, bindto *byte, bindport uint16, sockopts long) PhpSocketT {
+func PhpNetworkConnectSocketToHost(
+	host *byte,
+	port uint16,
+	socktype int,
+	asynchronous int,
+	timeout *__struct__timeval,
+	error_string **zend.ZendString,
+	error_code *int,
+	bindto *byte,
+	bindport uint16,
+	sockopts long,
+) PhpSocketT {
 	var num_addrs int
 	var n int
 	var fatal int = 0

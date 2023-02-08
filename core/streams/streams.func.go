@@ -1941,7 +1941,16 @@ func PhpStreamContextSet(stream *core.PhpStream, context *core.PhpStreamContext)
 	}
 	return oldcontext
 }
-func PhpStreamNotificationNotify(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any) {
+func PhpStreamNotificationNotify(
+	context *core.PhpStreamContext,
+	notifycode int,
+	severity int,
+	xmsg *byte,
+	xcode int,
+	bytes_sofar int,
+	bytes_max int,
+	ptr any,
+) {
 	if context != nil && context.GetNotifier() != nil {
 		context.GetNotifier().GetFunc()(context, notifycode, severity, xmsg, xcode, bytes_sofar, bytes_max, ptr)
 	}

@@ -15,12 +15,6 @@ type SplOtherHandler struct {
 	clone SplForeignCloneT
 }
 
-// func NewSplOtherHandler(dtor SplForeignDtorT, clone SplForeignCloneT) *SplOtherHandler {
-//     return &SplOtherHandler{
-//         dtor:dtor,
-//         clone:clone,
-//     }
-// }
 // func MakeSplOtherHandler(dtor SplForeignDtorT, clone SplForeignCloneT) SplOtherHandler {
 //     return SplOtherHandler{
 //         dtor:dtor,
@@ -43,13 +37,6 @@ type SplFilesystemIterator struct {
 	object  any
 }
 
-// func NewSplFilesystemIterator(intern zend.ZendObjectIterator, current zend.Zval, object any) *SplFilesystemIterator {
-//     return &SplFilesystemIterator{
-//         intern:intern,
-//         current:current,
-//         object:object,
-//     }
-// }
 // func MakeSplFilesystemIterator(intern zend.ZendObjectIterator, current zend.Zval, object any) SplFilesystemIterator {
 //     return SplFilesystemIterator{
 //         intern:intern,

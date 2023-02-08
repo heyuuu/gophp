@@ -18,26 +18,23 @@ type PhpStreamNotifier struct {
 	progress_max int
 }
 
-// func NewPhpStreamNotifier(func_ PhpStreamNotificationFunc, dtor func(notifier *PhpStreamNotifier), ptr zend.Zval, mask int, progress int, progress_max int) *PhpStreamNotifier {
-//     return &PhpStreamNotifier{
-//         func_:func_,
-//         dtor:dtor,
-//         ptr:ptr,
-//         mask:mask,
-//         progress:progress,
-//         progress_max:progress_max,
-//     }
-// }
-// func MakePhpStreamNotifier(func_ PhpStreamNotificationFunc, dtor func(notifier *PhpStreamNotifier), ptr zend.Zval, mask int, progress int, progress_max int) PhpStreamNotifier {
-//     return PhpStreamNotifier{
-//         func_:func_,
-//         dtor:dtor,
-//         ptr:ptr,
-//         mask:mask,
-//         progress:progress,
-//         progress_max:progress_max,
-//     }
-// }
+//             func MakePhpStreamNotifier(
+// func_ PhpStreamNotificationFunc,
+// dtor func(notifier *PhpStreamNotifier),
+// ptr zend.Zval,
+// mask int,
+// progress int,
+// progress_max int,
+// ) PhpStreamNotifier {
+//                 return PhpStreamNotifier{
+//                     func_:func_,
+//                     dtor:dtor,
+//                     ptr:ptr,
+//                     mask:mask,
+//                     progress:progress,
+//                     progress_max:progress_max,
+//                 }
+//             }
 func (this *PhpStreamNotifier) GetFunc() PhpStreamNotificationFunc              { return this.func_ }
 func (this *PhpStreamNotifier) SetFunc(value PhpStreamNotificationFunc)         { this.func_ = value }
 func (this *PhpStreamNotifier) GetDtor() func(notifier *PhpStreamNotifier)      { return this.dtor }
@@ -61,13 +58,6 @@ type PhpStreamContext struct {
 	res      *zend.ZendResource
 }
 
-// func NewPhpStreamContext(notifier *PhpStreamNotifier, options zend.Zval, res *zend.ZendResource) *PhpStreamContext {
-//     return &PhpStreamContext{
-//         notifier:notifier,
-//         options:options,
-//         res:res,
-//     }
-// }
 // func MakePhpStreamContext(notifier *PhpStreamNotifier, options zend.Zval, res *zend.ZendResource) PhpStreamContext {
 //     return PhpStreamContext{
 //         notifier:notifier,

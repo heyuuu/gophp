@@ -54,60 +54,57 @@ type ZendLexState struct {
 	ast_arena            *ZendArena
 }
 
-// func NewZendLexState(yy_leng uint, yy_start *uint8, yy_text *uint8, yy_cursor *uint8, yy_marker *uint8, yy_limit *uint8, yy_state int, state_stack ZendStack, heredoc_label_stack ZendPtrStack, in *ZendFileHandle, lineno uint32, filename *ZendString, script_org *uint8, script_org_size int, script_filtered *uint8, script_filtered_size int, input_filter ZendEncodingFilter, output_filter ZendEncodingFilter, script_encoding *ZendEncoding, on_event func(event ZendPhpScannerEvent, token int, line int, context any), on_event_context any, ast *ZendAst, ast_arena *ZendArena) *ZendLexState {
-//     return &ZendLexState{
-//         yy_leng:yy_leng,
-//         yy_start:yy_start,
-//         yy_text:yy_text,
-//         yy_cursor:yy_cursor,
-//         yy_marker:yy_marker,
-//         yy_limit:yy_limit,
-//         yy_state:yy_state,
-//         state_stack:state_stack,
-//         heredoc_label_stack:heredoc_label_stack,
-//         in:in,
-//         lineno:lineno,
-//         filename:filename,
-//         script_org:script_org,
-//         script_org_size:script_org_size,
-//         script_filtered:script_filtered,
-//         script_filtered_size:script_filtered_size,
-//         input_filter:input_filter,
-//         output_filter:output_filter,
-//         script_encoding:script_encoding,
-//         on_event:on_event,
-//         on_event_context:on_event_context,
-//         ast:ast,
-//         ast_arena:ast_arena,
-//     }
-// }
-// func MakeZendLexState(yy_leng uint, yy_start *uint8, yy_text *uint8, yy_cursor *uint8, yy_marker *uint8, yy_limit *uint8, yy_state int, state_stack ZendStack, heredoc_label_stack ZendPtrStack, in *ZendFileHandle, lineno uint32, filename *ZendString, script_org *uint8, script_org_size int, script_filtered *uint8, script_filtered_size int, input_filter ZendEncodingFilter, output_filter ZendEncodingFilter, script_encoding *ZendEncoding, on_event func(event ZendPhpScannerEvent, token int, line int, context any), on_event_context any, ast *ZendAst, ast_arena *ZendArena) ZendLexState {
-//     return ZendLexState{
-//         yy_leng:yy_leng,
-//         yy_start:yy_start,
-//         yy_text:yy_text,
-//         yy_cursor:yy_cursor,
-//         yy_marker:yy_marker,
-//         yy_limit:yy_limit,
-//         yy_state:yy_state,
-//         state_stack:state_stack,
-//         heredoc_label_stack:heredoc_label_stack,
-//         in:in,
-//         lineno:lineno,
-//         filename:filename,
-//         script_org:script_org,
-//         script_org_size:script_org_size,
-//         script_filtered:script_filtered,
-//         script_filtered_size:script_filtered_size,
-//         input_filter:input_filter,
-//         output_filter:output_filter,
-//         script_encoding:script_encoding,
-//         on_event:on_event,
-//         on_event_context:on_event_context,
-//         ast:ast,
-//         ast_arena:ast_arena,
-//     }
-// }
+//             func MakeZendLexState(
+// yy_leng uint,
+// yy_start *uint8,
+// yy_text *uint8,
+// yy_cursor *uint8,
+// yy_marker *uint8,
+// yy_limit *uint8,
+// yy_state int,
+// state_stack ZendStack,
+// heredoc_label_stack ZendPtrStack,
+// in *ZendFileHandle,
+// lineno uint32,
+// filename *ZendString,
+// script_org *uint8,
+// script_org_size int,
+// script_filtered *uint8,
+// script_filtered_size int,
+// input_filter ZendEncodingFilter,
+// output_filter ZendEncodingFilter,
+// script_encoding *ZendEncoding,
+// on_event func(event ZendPhpScannerEvent, token int, line int, context any),
+// on_event_context any,
+// ast *ZendAst,
+// ast_arena *ZendArena,
+// ) ZendLexState {
+//                 return ZendLexState{
+//                     yy_leng:yy_leng,
+//                     yy_start:yy_start,
+//                     yy_text:yy_text,
+//                     yy_cursor:yy_cursor,
+//                     yy_marker:yy_marker,
+//                     yy_limit:yy_limit,
+//                     yy_state:yy_state,
+//                     state_stack:state_stack,
+//                     heredoc_label_stack:heredoc_label_stack,
+//                     in:in,
+//                     lineno:lineno,
+//                     filename:filename,
+//                     script_org:script_org,
+//                     script_org_size:script_org_size,
+//                     script_filtered:script_filtered,
+//                     script_filtered_size:script_filtered_size,
+//                     input_filter:input_filter,
+//                     output_filter:output_filter,
+//                     script_encoding:script_encoding,
+//                     on_event:on_event,
+//                     on_event_context:on_event_context,
+//                     ast:ast,
+//                     ast_arena:ast_arena,
+//                 }
+//             }
 func (this *ZendLexState) GetYyLeng() uint                          { return this.yy_leng }
 func (this *ZendLexState) SetYyLeng(value uint)                     { this.yy_leng = value }
 func (this *ZendLexState) GetYyStart() *uint8                       { return this.yy_start }
@@ -169,14 +166,6 @@ type ZendHeredocLabel struct {
 	indentation_uses_spaces ZendBool
 }
 
-// func NewZendHeredocLabel(label *byte, length int, indentation int, indentation_uses_spaces ZendBool) *ZendHeredocLabel {
-//     return &ZendHeredocLabel{
-//         label:label,
-//         length:length,
-//         indentation:indentation,
-//         indentation_uses_spaces:indentation_uses_spaces,
-//     }
-// }
 // func MakeZendHeredocLabel(label *byte, length int, indentation int, indentation_uses_spaces ZendBool) ZendHeredocLabel {
 //     return ZendHeredocLabel{
 //         label:label,

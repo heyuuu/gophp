@@ -21,40 +21,37 @@ type PhpHttpParser struct {
 	data           any
 }
 
-// func NewPhpHttpParser(type_ uint8, flags uint8, state uint8, header_state uint8, index uint8, nread uint32, content_length ssize_t, http_major uint16, http_minor uint16, status_code uint16, method uint8, upgrade byte, data any) *PhpHttpParser {
-//     return &PhpHttpParser{
-//         type_:type_,
-//         flags:flags,
-//         state:state,
-//         header_state:header_state,
-//         index:index,
-//         nread:nread,
-//         content_length:content_length,
-//         http_major:http_major,
-//         http_minor:http_minor,
-//         status_code:status_code,
-//         method:method,
-//         upgrade:upgrade,
-//         data:data,
-//     }
-// }
-// func MakePhpHttpParser(type_ uint8, flags uint8, state uint8, header_state uint8, index uint8, nread uint32, content_length ssize_t, http_major uint16, http_minor uint16, status_code uint16, method uint8, upgrade byte, data any) PhpHttpParser {
-//     return PhpHttpParser{
-//         type_:type_,
-//         flags:flags,
-//         state:state,
-//         header_state:header_state,
-//         index:index,
-//         nread:nread,
-//         content_length:content_length,
-//         http_major:http_major,
-//         http_minor:http_minor,
-//         status_code:status_code,
-//         method:method,
-//         upgrade:upgrade,
-//         data:data,
-//     }
-// }
+//             func MakePhpHttpParser(
+// type_ uint8,
+// flags uint8,
+// state uint8,
+// header_state uint8,
+// index uint8,
+// nread uint32,
+// content_length ssize_t,
+// http_major uint16,
+// http_minor uint16,
+// status_code uint16,
+// method uint8,
+// upgrade byte,
+// data any,
+// ) PhpHttpParser {
+//                 return PhpHttpParser{
+//                     type_:type_,
+//                     flags:flags,
+//                     state:state,
+//                     header_state:header_state,
+//                     index:index,
+//                     nread:nread,
+//                     content_length:content_length,
+//                     http_major:http_major,
+//                     http_minor:http_minor,
+//                     status_code:status_code,
+//                     method:method,
+//                     upgrade:upgrade,
+//                     data:data,
+//                 }
+//             }
 func (this *PhpHttpParser) GetType() uint8      { return this.type_ }
 func (this *PhpHttpParser) SetType(value uint8) { this.type_ = value }
 
@@ -128,21 +125,18 @@ type PhpHttpParserSettings struct {
 	on_message_complete PhpHttpCb
 }
 
-// func NewPhpHttpParserSettings(on_message_begin PhpHttpCb, on_path PhpHttpDataCb, on_query_string PhpHttpDataCb, on_url PhpHttpDataCb, on_fragment PhpHttpDataCb, on_header_field PhpHttpDataCb, on_header_value PhpHttpDataCb, on_headers_complete PhpHttpCb, on_body PhpHttpDataCb, on_message_complete PhpHttpCb) *PhpHttpParserSettings {
-//     return &PhpHttpParserSettings{
-//         on_message_begin:on_message_begin,
-//         on_path:on_path,
-//         on_query_string:on_query_string,
-//         on_url:on_url,
-//         on_fragment:on_fragment,
-//         on_header_field:on_header_field,
-//         on_header_value:on_header_value,
-//         on_headers_complete:on_headers_complete,
-//         on_body:on_body,
-//         on_message_complete:on_message_complete,
-//     }
-// }
-func MakePhpHttpParserSettings(on_message_begin PhpHttpCb, on_path PhpHttpDataCb, on_query_string PhpHttpDataCb, on_url PhpHttpDataCb, on_fragment PhpHttpDataCb, on_header_field PhpHttpDataCb, on_header_value PhpHttpDataCb, on_headers_complete PhpHttpCb, on_body PhpHttpDataCb, on_message_complete PhpHttpCb) PhpHttpParserSettings {
+func MakePhpHttpParserSettings(
+	on_message_begin PhpHttpCb,
+	on_path PhpHttpDataCb,
+	on_query_string PhpHttpDataCb,
+	on_url PhpHttpDataCb,
+	on_fragment PhpHttpDataCb,
+	on_header_field PhpHttpDataCb,
+	on_header_value PhpHttpDataCb,
+	on_headers_complete PhpHttpCb,
+	on_body PhpHttpDataCb,
+	on_message_complete PhpHttpCb,
+) PhpHttpParserSettings {
 	return PhpHttpParserSettings{
 		on_message_begin:    on_message_begin,
 		on_path:             on_path,

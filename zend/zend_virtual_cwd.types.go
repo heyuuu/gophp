@@ -10,12 +10,6 @@ type CwdState struct {
 	cwd_length int
 }
 
-// func NewCwdState(cwd *byte, cwd_length int) *CwdState {
-//     return &CwdState{
-//         cwd:cwd,
-//         cwd_length:cwd_length,
-//     }
-// }
 // func MakeCwdState(cwd *byte, cwd_length int) CwdState {
 //     return CwdState{
 //         cwd:cwd,
@@ -41,30 +35,27 @@ type RealpathCacheBucket struct {
 	is_dir       uint8
 }
 
-// func NewRealpathCacheBucket(key ZendUlong, path *byte, realpath *byte, next *RealpathCacheBucket, expires int64, path_len uint16, realpath_len uint16, is_dir uint8) *RealpathCacheBucket {
-//     return &RealpathCacheBucket{
-//         key:key,
-//         path:path,
-//         realpath:realpath,
-//         next:next,
-//         expires:expires,
-//         path_len:path_len,
-//         realpath_len:realpath_len,
-//         is_dir:is_dir,
-//     }
-// }
-// func MakeRealpathCacheBucket(key ZendUlong, path *byte, realpath *byte, next *RealpathCacheBucket, expires int64, path_len uint16, realpath_len uint16, is_dir uint8) RealpathCacheBucket {
-//     return RealpathCacheBucket{
-//         key:key,
-//         path:path,
-//         realpath:realpath,
-//         next:next,
-//         expires:expires,
-//         path_len:path_len,
-//         realpath_len:realpath_len,
-//         is_dir:is_dir,
-//     }
-// }
+//             func MakeRealpathCacheBucket(
+// key ZendUlong,
+// path *byte,
+// realpath *byte,
+// next *RealpathCacheBucket,
+// expires int64,
+// path_len uint16,
+// realpath_len uint16,
+// is_dir uint8,
+// ) RealpathCacheBucket {
+//                 return RealpathCacheBucket{
+//                     key:key,
+//                     path:path,
+//                     realpath:realpath,
+//                     next:next,
+//                     expires:expires,
+//                     path_len:path_len,
+//                     realpath_len:realpath_len,
+//                     is_dir:is_dir,
+//                 }
+//             }
 func (this *RealpathCacheBucket) GetKey() ZendUlong                  { return this.key }
 func (this *RealpathCacheBucket) SetKey(value ZendUlong)             { this.key = value }
 func (this *RealpathCacheBucket) GetPath() *byte                     { return this.path }
@@ -93,15 +84,6 @@ type VirtualCwdGlobals struct {
 	realpath_cache            []*RealpathCacheBucket
 }
 
-// func NewVirtualCwdGlobals(cwd CwdState, realpath_cache_size ZendLong, realpath_cache_size_limit ZendLong, realpath_cache_ttl ZendLong, realpath_cache []*RealpathCacheBucket) *VirtualCwdGlobals {
-//     return &VirtualCwdGlobals{
-//         cwd:cwd,
-//         realpath_cache_size:realpath_cache_size,
-//         realpath_cache_size_limit:realpath_cache_size_limit,
-//         realpath_cache_ttl:realpath_cache_ttl,
-//         realpath_cache:realpath_cache,
-//     }
-// }
 // func MakeVirtualCwdGlobals(cwd CwdState, realpath_cache_size ZendLong, realpath_cache_size_limit ZendLong, realpath_cache_ttl ZendLong, realpath_cache []*RealpathCacheBucket) VirtualCwdGlobals {
 //     return VirtualCwdGlobals{
 //         cwd:cwd,

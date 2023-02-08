@@ -18,15 +18,6 @@ type PhpStreamMemoryData struct {
 	mode  int
 }
 
-// func NewPhpStreamMemoryData(data *byte, fpos int, fsize int, smax int, mode int) *PhpStreamMemoryData {
-//     return &PhpStreamMemoryData{
-//         data:data,
-//         fpos:fpos,
-//         fsize:fsize,
-//         smax:smax,
-//         mode:mode,
-//     }
-// }
 // func MakePhpStreamMemoryData(data *byte, fpos int, fsize int, smax int, mode int) PhpStreamMemoryData {
 //     return PhpStreamMemoryData{
 //         data:data,
@@ -59,15 +50,6 @@ type PhpStreamTempData struct {
 	tmpdir      *byte
 }
 
-// func NewPhpStreamTempData(innerstream *core.PhpStream, smax int, mode int, meta zend.Zval, tmpdir *byte) *PhpStreamTempData {
-//     return &PhpStreamTempData{
-//         innerstream:innerstream,
-//         smax:smax,
-//         mode:mode,
-//         meta:meta,
-//         tmpdir:tmpdir,
-//     }
-// }
 // func MakePhpStreamTempData(innerstream *core.PhpStream, smax int, mode int, meta zend.Zval, tmpdir *byte) PhpStreamTempData {
 //     return PhpStreamTempData{
 //         innerstream:innerstream,

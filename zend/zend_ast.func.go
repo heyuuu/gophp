@@ -32,7 +32,14 @@ func ZendAstCreateEx3(kind ZendAstKind, attr ZendAstAttr, child1 *ZendAst, child
 	ast.SetAttr(attr)
 	return ast
 }
-func ZendAstCreateEx4(kind ZendAstKind, attr ZendAstAttr, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst, child4 *ZendAst) *ZendAst {
+func ZendAstCreateEx4(
+	kind ZendAstKind,
+	attr ZendAstAttr,
+	child1 *ZendAst,
+	child2 *ZendAst,
+	child3 *ZendAst,
+	child4 *ZendAst,
+) *ZendAst {
 	var ast *ZendAst = ZendAstCreate4(kind, child1, child2, child3, child4)
 	ast.SetAttr(attr)
 	return ast
@@ -167,7 +174,17 @@ func ZendAstCreateClassConstOrName(class_name *ZendAst, name *ZendAst) *ZendAst 
 		return ZendAstCreate(ZEND_AST_CLASS_CONST, class_name, name)
 	}
 }
-func ZendAstCreateDecl(kind ZendAstKind, flags uint32, start_lineno uint32, doc_comment *ZendString, name *ZendString, child0 *ZendAst, child1 *ZendAst, child2 *ZendAst, child3 *ZendAst) *ZendAst {
+func ZendAstCreateDecl(
+	kind ZendAstKind,
+	flags uint32,
+	start_lineno uint32,
+	doc_comment *ZendString,
+	name *ZendString,
+	child0 *ZendAst,
+	child1 *ZendAst,
+	child2 *ZendAst,
+	child3 *ZendAst,
+) *ZendAst {
 	var ast *ZendAstDecl
 	ast = ZendAstAlloc(b.SizeOf("zend_ast_decl"))
 	ast.SetKind(kind)

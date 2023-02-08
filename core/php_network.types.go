@@ -13,15 +13,6 @@ type PhpNetstreamDataT struct {
 	ownsize       int
 }
 
-// func NewPhpNetstreamDataT(socket PhpSocketT, is_blocked byte, timeout __struct__timeval, timeout_event byte, ownsize int) *PhpNetstreamDataT {
-//     return &PhpNetstreamDataT{
-//         socket:socket,
-//         is_blocked:is_blocked,
-//         timeout:timeout,
-//         timeout_event:timeout_event,
-//         ownsize:ownsize,
-//     }
-// }
 // func MakePhpNetstreamDataT(socket PhpSocketT, is_blocked byte, timeout __struct__timeval, timeout_event byte, ownsize int) PhpNetstreamDataT {
 //     return PhpNetstreamDataT{
 //         socket:socket,

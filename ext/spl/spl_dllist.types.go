@@ -16,14 +16,6 @@ type SplPtrLlistElement struct {
 	data zend.Zval
 }
 
-// func NewSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) *SplPtrLlistElement {
-//     return &SplPtrLlistElement{
-//         prev:prev,
-//         next:next,
-//         rc:rc,
-//         data:data,
-//     }
-// }
 // func MakeSplPtrLlistElement(prev *SplPtrLlistElement, next *SplPtrLlistElement, rc int, data zend.Zval) SplPtrLlistElement {
 //     return SplPtrLlistElement{
 //         prev:prev,
@@ -53,15 +45,6 @@ type SplPtrLlist struct {
 	count int
 }
 
-// func NewSplPtrLlist(head *SplPtrLlistElement, tail *SplPtrLlistElement, dtor SplPtrLlistDtorFunc, ctor SplPtrLlistCtorFunc, count int) *SplPtrLlist {
-//     return &SplPtrLlist{
-//         head:head,
-//         tail:tail,
-//         dtor:dtor,
-//         ctor:ctor,
-//         count:count,
-//     }
-// }
 // func MakeSplPtrLlist(head *SplPtrLlistElement, tail *SplPtrLlistElement, dtor SplPtrLlistDtorFunc, ctor SplPtrLlistCtorFunc, count int) SplPtrLlist {
 //     return SplPtrLlist{
 //         head:head,
@@ -101,40 +84,37 @@ type SplDllistObject struct {
 	std               zend.ZendObject
 }
 
-// func NewSplDllistObject(llist *SplPtrLlist, traverse_position int, traverse_pointer *SplPtrLlistElement, flags int, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, gc_data *zend.Zval, gc_data_count int, std zend.ZendObject) *SplDllistObject {
-//     return &SplDllistObject{
-//         llist:llist,
-//         traverse_position:traverse_position,
-//         traverse_pointer:traverse_pointer,
-//         flags:flags,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         ce_get_iterator:ce_get_iterator,
-//         gc_data:gc_data,
-//         gc_data_count:gc_data_count,
-//         std:std,
-//     }
-// }
-// func MakeSplDllistObject(llist *SplPtrLlist, traverse_position int, traverse_pointer *SplPtrLlistElement, flags int, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, gc_data *zend.Zval, gc_data_count int, std zend.ZendObject) SplDllistObject {
-//     return SplDllistObject{
-//         llist:llist,
-//         traverse_position:traverse_position,
-//         traverse_pointer:traverse_pointer,
-//         flags:flags,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         ce_get_iterator:ce_get_iterator,
-//         gc_data:gc_data,
-//         gc_data_count:gc_data_count,
-//         std:std,
-//     }
-// }
+//             func MakeSplDllistObject(
+// llist *SplPtrLlist,
+// traverse_position int,
+// traverse_pointer *SplPtrLlistElement,
+// flags int,
+// fptr_offset_get *zend.ZendFunction,
+// fptr_offset_set *zend.ZendFunction,
+// fptr_offset_has *zend.ZendFunction,
+// fptr_offset_del *zend.ZendFunction,
+// fptr_count *zend.ZendFunction,
+// ce_get_iterator *zend.ZendClassEntry,
+// gc_data *zend.Zval,
+// gc_data_count int,
+// std zend.ZendObject,
+// ) SplDllistObject {
+//                 return SplDllistObject{
+//                     llist:llist,
+//                     traverse_position:traverse_position,
+//                     traverse_pointer:traverse_pointer,
+//                     flags:flags,
+//                     fptr_offset_get:fptr_offset_get,
+//                     fptr_offset_set:fptr_offset_set,
+//                     fptr_offset_has:fptr_offset_has,
+//                     fptr_offset_del:fptr_offset_del,
+//                     fptr_count:fptr_count,
+//                     ce_get_iterator:ce_get_iterator,
+//                     gc_data:gc_data,
+//                     gc_data_count:gc_data_count,
+//                     std:std,
+//                 }
+//             }
 func (this *SplDllistObject) GetLlist() *SplPtrLlist                  { return this.llist }
 func (this *SplDllistObject) SetLlist(value *SplPtrLlist)             { this.llist = value }
 func (this *SplDllistObject) GetTraversePosition() int                { return this.traverse_position }
@@ -191,14 +171,6 @@ type SplDllistIt struct {
 	flags             int
 }
 
-// func NewSplDllistIt(intern zend.ZendUserIterator, traverse_pointer *SplPtrLlistElement, traverse_position int, flags int) *SplDllistIt {
-//     return &SplDllistIt{
-//         intern:intern,
-//         traverse_pointer:traverse_pointer,
-//         traverse_position:traverse_position,
-//         flags:flags,
-//     }
-// }
 // func MakeSplDllistIt(intern zend.ZendUserIterator, traverse_pointer *SplPtrLlistElement, traverse_position int, flags int) SplDllistIt {
 //     return SplDllistIt{
 //         intern:intern,

@@ -176,7 +176,17 @@ func PhpHeader() int {
 		return 1
 	}
 }
-func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, path *zend.ZendString, domain *zend.ZendString, secure int, httponly int, samesite *zend.ZendString, url_encode int) int {
+func PhpSetcookie(
+	name *zend.ZendString,
+	value *zend.ZendString,
+	expires int64,
+	path *zend.ZendString,
+	domain *zend.ZendString,
+	secure int,
+	httponly int,
+	samesite *zend.ZendString,
+	url_encode int,
+) int {
 	var dt *zend.ZendString
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var result int
@@ -275,7 +285,15 @@ func PhpSetcookie(name *zend.ZendString, value *zend.ZendString, expires int64, 
 	zend.ZendStringRelease(buf.GetS())
 	return result
 }
-func PhpHeadParseCookieOptionsArray(options *zend.Zval, expires *zend.ZendLong, path **zend.ZendString, domain **zend.ZendString, secure *zend.ZendBool, httponly *zend.ZendBool, samesite **zend.ZendString) {
+func PhpHeadParseCookieOptionsArray(
+	options *zend.Zval,
+	expires *zend.ZendLong,
+	path **zend.ZendString,
+	domain **zend.ZendString,
+	secure *zend.ZendBool,
+	httponly *zend.ZendBool,
+	samesite **zend.ZendString,
+) {
 	var found int = 0
 	var key *zend.ZendString
 	var value *zend.Zval

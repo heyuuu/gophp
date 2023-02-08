@@ -161,10 +161,26 @@ func AddPropertyStringl(__arg *Zval, __key string, __str *byte, __length int) in
 func AddPropertyZval(__arg *Zval, __key string, __value *Zval) int {
 	return AddPropertyZvalEx(__arg, __key, strlen(__key), __value)
 }
-func CallUserFunction(function_table *HashTable, object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval) int {
+func CallUserFunction(
+	function_table *HashTable,
+	object *Zval,
+	function_name *Zval,
+	retval_ptr *Zval,
+	param_count uint32,
+	params []Zval,
+) int {
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
 }
-func CallUserFunctionEx(function_table __auto__, object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval, no_separation int, symbol_table __auto__) int {
+func CallUserFunctionEx(
+	function_table __auto__,
+	object *Zval,
+	function_name *Zval,
+	retval_ptr *Zval,
+	param_count uint32,
+	params []Zval,
+	no_separation int,
+	symbol_table __auto__,
+) int {
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
 }
 func ZendForbidDynamicCall(func_name string) int {
@@ -1215,7 +1231,14 @@ func ZendParseArgStrSlow(arg *Zval, dest **ZendString) int {
 	}
 	return ZendParseArgStrWeak(arg, dest)
 }
-func ZendParseArgImpl(arg_num int, arg *Zval, va *va_list, spec **byte, error **byte, severity *int) *byte {
+func ZendParseArgImpl(
+	arg_num int,
+	arg *Zval,
+	va *va_list,
+	spec **byte,
+	error **byte,
+	severity *int,
+) *byte {
 	var spec_walk *byte = *spec
 	var c byte = b.PostInc(&(*spec_walk))
 	var check_null int = 0
@@ -3097,7 +3120,14 @@ func ZendRegisterClassAliasEx(name *byte, name_len int, ce *ZendClassEntry, pers
 	}
 	return FAILURE
 }
-func ZendSetHashSymbol(symbol *Zval, name *byte, name_length int, is_ref ZendBool, num_symbol_tables int, _ ...any) int {
+func ZendSetHashSymbol(
+	symbol *Zval,
+	name *byte,
+	name_length int,
+	is_ref ZendBool,
+	num_symbol_tables int,
+	_ ...any,
+) int {
 	var symbol_table *HashTable
 	var symbol_table_list va_list
 	if num_symbol_tables <= 0 {
@@ -3690,7 +3720,14 @@ again:
 		return 0
 	}
 }
-func ZendIsCallableEx(callable *Zval, object *ZendObject, check_flags uint32, callable_name **ZendString, fcc *ZendFcallInfoCache, error **byte) ZendBool {
+func ZendIsCallableEx(
+	callable *Zval,
+	object *ZendObject,
+	check_flags uint32,
+	callable_name **ZendString,
+	fcc *ZendFcallInfoCache,
+	error **byte,
+) ZendBool {
 	var ret ZendBool = ZendIsCallableImpl(callable, object, check_flags, fcc, error)
 	if callable_name != nil {
 		*callable_name = ZendGetCallableNameEx(callable, object)
@@ -3714,7 +3751,14 @@ func ZendMakeCallable(callable *Zval, callable_name **ZendString) ZendBool {
 	}
 	return 0
 }
-func ZendFcallInfoInit(callable *Zval, check_flags uint32, fci *ZendFcallInfo, fcc *ZendFcallInfoCache, callable_name **ZendString, error **byte) int {
+func ZendFcallInfoInit(
+	callable *Zval,
+	check_flags uint32,
+	fci *ZendFcallInfo,
+	fcc *ZendFcallInfoCache,
+	callable_name **ZendString,
+	error **byte,
+) int {
 	if ZendIsCallableEx(callable, nil, check_flags, callable_name, fcc, error) == 0 {
 		return FAILURE
 	}
@@ -3872,7 +3916,14 @@ func ZvalMakeInternedString(zv *Zval) *ZendString {
 func IsPersistentClass(ce *ZendClassEntry) ZendBool {
 	return (ce.GetType()&ZEND_INTERNAL_CLASS) != 0 && ce.GetModule().GetType() == MODULE_PERSISTENT
 }
-func ZendDeclareTypedProperty(ce *ZendClassEntry, name *ZendString, property *Zval, access_type int, doc_comment *ZendString, type_ ZendType) int {
+func ZendDeclareTypedProperty(
+	ce *ZendClassEntry,
+	name *ZendString,
+	property *Zval,
+	access_type int,
+	doc_comment *ZendString,
+	type_ ZendType,
+) int {
 	var property_info *ZendPropertyInfo
 	var property_info_ptr *ZendPropertyInfo
 	if type_.IsSet() {
@@ -4094,7 +4145,14 @@ func ZendDeclarePropertyString(ce *ZendClassEntry, name string, name_length int,
 	property.SetString(ZendStringInit(value, strlen(value), ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
 }
-func ZendDeclarePropertyStringl(ce *ZendClassEntry, name *byte, name_length int, value *byte, value_len int, access_type int) int {
+func ZendDeclarePropertyStringl(
+	ce *ZendClassEntry,
+	name *byte,
+	name_length int,
+	value *byte,
+	value_len int,
+	access_type int,
+) int {
 	var property Zval
 	property.SetString(ZendStringInit(value, value_len, ce.GetType()&ZEND_INTERNAL_CLASS))
 	return ZendDeclareProperty(ce, name, name_length, &property, access_type)
@@ -4226,7 +4284,14 @@ func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, n
 	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
-func ZendUpdatePropertyStringl(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte, value_len int) {
+func ZendUpdatePropertyStringl(
+	scope *ZendClassEntry,
+	object *Zval,
+	name *byte,
+	name_length int,
+	value *byte,
+	value_len int,
+) {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, value, value_len)
 	tmp.SetRefcount(0)
@@ -4309,7 +4374,14 @@ func ZendReadPropertyEx(scope *ZendClassEntry, object *Zval, name *ZendString, s
 	EG__().SetFakeScope(old_scope)
 	return value
 }
-func ZendReadProperty(scope *ZendClassEntry, object *Zval, name string, name_length int, silent ZendBool, rv *Zval) *Zval {
+func ZendReadProperty(
+	scope *ZendClassEntry,
+	object *Zval,
+	name string,
+	name_length int,
+	silent ZendBool,
+	rv *Zval,
+) *Zval {
 	var value *Zval
 	var str *ZendString
 	str = ZendStringInit(name, name_length, 0)

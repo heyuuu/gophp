@@ -4387,7 +4387,14 @@ func PhpStrtrArray(return_value *zend.Zval, input *zend.ZendString, pats *zend.H
 	}
 	zend.Efree(num_bitset)
 }
-func PhpCharToStrEx(str *zend.ZendString, from byte, to *byte, to_len int, case_sensitivity int, replace_count *zend.ZendLong) *zend.ZendString {
+func PhpCharToStrEx(
+	str *zend.ZendString,
+	from byte,
+	to *byte,
+	to_len int,
+	case_sensitivity int,
+	replace_count *zend.ZendLong,
+) *zend.ZendString {
 	var result *zend.ZendString
 	var char_count int = 0
 	var lc_from int = 0
@@ -4454,7 +4461,14 @@ func PhpCharToStrEx(str *zend.ZendString, from byte, to *byte, to_len int, case_
 	*target = 0
 	return result
 }
-func PhpStrToStrEx(haystack *zend.ZendString, needle *byte, needle_len int, str *byte, str_len int, replace_count *zend.ZendLong) *zend.ZendString {
+func PhpStrToStrEx(
+	haystack *zend.ZendString,
+	needle *byte,
+	needle_len int,
+	str *byte,
+	str_len int,
+	replace_count *zend.ZendLong,
+) *zend.ZendString {
 	var new_str *zend.ZendString
 	if needle_len < haystack.GetLen() {
 		var end *byte
@@ -4529,7 +4543,14 @@ func PhpStrToStrEx(haystack *zend.ZendString, needle *byte, needle_len int, str 
 		return new_str
 	}
 }
-func PhpStrToStrIEx(haystack *zend.ZendString, lc_haystack *byte, needle *zend.ZendString, str *byte, str_len int, replace_count *zend.ZendLong) *zend.ZendString {
+func PhpStrToStrIEx(
+	haystack *zend.ZendString,
+	lc_haystack *byte,
+	needle *zend.ZendString,
+	str *byte,
+	str_len int,
+	replace_count *zend.ZendLong,
+) *zend.ZendString {
 	var new_str *zend.ZendString = nil
 	var lc_needle *zend.ZendString
 	if needle.GetLen() < haystack.GetLen() {
@@ -4607,7 +4628,14 @@ func PhpStrToStrIEx(haystack *zend.ZendString, lc_haystack *byte, needle *zend.Z
 		return new_str
 	}
 }
-func PhpStrToStr(haystack *byte, length int, needle string, needle_len int, str string, str_len int) *zend.ZendString {
+func PhpStrToStr(
+	haystack *byte,
+	length int,
+	needle string,
+	needle_len int,
+	str string,
+	str_len int,
+) *zend.ZendString {
 	var new_str *zend.ZendString
 	if needle_len < length {
 		var end *byte
@@ -4905,7 +4933,16 @@ func ZifStrrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	*p = '0'
 	return_value.SetString(n)
 }
-func PhpSimilarStr(txt1 *byte, len1 int, txt2 *byte, len2 int, pos1 *int, pos2 *int, max *int, count *int) {
+func PhpSimilarStr(
+	txt1 *byte,
+	len1 int,
+	txt2 *byte,
+	len2 int,
+	pos1 *int,
+	pos2 *int,
+	max *int,
+	count *int,
+) {
 	var p *byte
 	var q *byte
 	var end1 *byte = (*byte)(txt1 + len1)
@@ -6722,7 +6759,14 @@ func PhpTagFind(tag *byte, len_ int, set *byte) int {
 func PhpStripTags(rbuf *byte, len_ int, stateptr *uint8, allow *byte, allow_len int) int {
 	return PhpStripTagsEx(rbuf, len_, stateptr, allow, allow_len, 0)
 }
-func PhpStripTagsEx(rbuf *byte, len_ int, stateptr *uint8, allow *byte, allow_len int, allow_tag_spaces zend.ZendBool) int {
+func PhpStripTagsEx(
+	rbuf *byte,
+	len_ int,
+	stateptr *uint8,
+	allow *byte,
+	allow_len int,
+	allow_tag_spaces zend.ZendBool,
+) int {
 	var tbuf *byte
 	var tp *byte
 	var rp *byte

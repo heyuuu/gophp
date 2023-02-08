@@ -36,11 +36,25 @@ func GetSafeCharsetHint() *byte {
 	}
 	return lastCodeset
 }
-func OnSetFacility(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnSetFacility(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var facility *byte = new_value.GetVal()
 	return zend.FAILURE
 }
-func OnSetPrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnSetPrecision(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var i zend.ZendLong
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
@@ -50,7 +64,14 @@ func OnSetPrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg
 		return zend.FAILURE
 	}
 }
-func OnSetSerializePrecision(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnSetSerializePrecision(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var i zend.ZendLong
 	zend.ZEND_ATOL(i, new_value.GetVal())
 	if i >= -1 {
@@ -60,7 +81,14 @@ func OnSetSerializePrecision(entry *zend.ZendIniEntry, new_value *zend.ZendStrin
 		return zend.FAILURE
 	}
 }
-func OnChangeMemoryLimit(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnChangeMemoryLimit(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var value int
 	if new_value != nil {
 		value = zend.ZendAtol(new_value.GetVal(), new_value.GetLen())
@@ -88,7 +116,14 @@ func OnChangeMemoryLimit(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	PG(memory_limit) = value
 	return zend.SUCCESS
 }
-func OnSetLogFilter(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnSetLogFilter(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var filter *byte = new_value.GetVal()
 	if !(strcmp(filter, "all")) {
 		PG(syslog_filter) = PHP_SYSLOG_FILTER_ALL
@@ -209,7 +244,14 @@ func PhpBinaryInit() {
 	}
 	PG(php_binary) = binary_location
 }
-func OnUpdateTimeout(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateTimeout(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if stage == PHP_INI_STAGE_STARTUP {
 
 		/* Don't set a timeout on startup, only per-request */
@@ -263,7 +305,14 @@ func PhpGetDisplayErrorsMode(value *byte, value_length int) int {
 	}
 	return mode
 }
-func OnUpdateDisplayErrors(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateDisplayErrors(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	PG(display_errors) = zend.ZendBool(PhpGetDisplayErrorsMode(new_value.GetVal(), new_value.GetLen()))
 	return zend.SUCCESS
 }
@@ -339,7 +388,14 @@ func PhpGetOutputEncoding() *byte {
 	}
 	return ""
 }
-func OnUpdateDefaultCharset(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateDefaultCharset(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
 		return zend.FAILURE
 	}
@@ -352,13 +408,27 @@ func OnUpdateDefaultCharset(entry *zend.ZendIniEntry, new_value *zend.ZendString
 	}
 	return zend.SUCCESS
 }
-func OnUpdateDefaultMimeTye(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateDefaultMimeTye(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if memchr(new_value.GetVal(), '0', new_value.GetLen()) || strpbrk(new_value.GetVal(), "\r\n") {
 		return zend.FAILURE
 	}
 	return zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 }
-func OnUpdateInternalEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateInternalEncoding(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	if PhpInternalEncodingChanged != nil {
 		PhpInternalEncodingChanged()
@@ -368,7 +438,14 @@ func OnUpdateInternalEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendStri
 	}
 	return zend.SUCCESS
 }
-func OnUpdateInputEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateInputEncoding(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	if PhpInternalEncodingChanged != nil {
 		PhpInternalEncodingChanged()
@@ -378,7 +455,14 @@ func OnUpdateInputEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString,
 	}
 	return zend.SUCCESS
 }
-func OnUpdateOutputEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateOutputEncoding(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	if PhpInternalEncodingChanged != nil {
 		PhpInternalEncodingChanged()
@@ -388,7 +472,14 @@ func OnUpdateOutputEncoding(entry *zend.ZendIniEntry, new_value *zend.ZendString
 	}
 	return zend.SUCCESS
 }
-func OnUpdateErrorLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateErrorLog(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil && strcmp(new_value.GetVal(), "syslog") {
@@ -399,7 +490,14 @@ func OnUpdateErrorLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_a
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	return zend.SUCCESS
 }
-func OnUpdateMailLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateMailLog(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	/* Only do the safemode/open_basedir check at runtime */
 
 	if (stage == PHP_INI_STAGE_RUNTIME || stage == PHP_INI_STAGE_HTACCESS) && new_value != nil {
@@ -410,7 +508,14 @@ func OnUpdateMailLog(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_ar
 	zend.OnUpdateString(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage)
 	return zend.SUCCESS
 }
-func OnChangeMailForceExtra(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnChangeMailForceExtra(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	/* Don't allow changing it in htaccess */
 
 	if stage == PHP_INI_STAGE_HTACCESS {
@@ -688,7 +793,14 @@ func PhpErrorDocref1(docref *byte, param1 *byte, type_ int, format string, _ ...
 	PhpVerror(docref, param1, type_, format, args)
 	va_end(args)
 }
-func PhpErrorDocref2(docref *byte, param1 *byte, param2 *byte, type_ int, format string, _ ...any) {
+func PhpErrorDocref2(
+	docref *byte,
+	param1 *byte,
+	param2 *byte,
+	type_ int,
+	format string,
+	_ ...any,
+) {
 	var params *byte
 	var args va_list
 	Spprintf(&params, 0, "%s,%s", param1, param2)

@@ -407,12 +407,6 @@ type LangUnionYyalloc struct /* union */ {
 	yyvs_alloc ZendParserStackElem
 }
 
-// func NewLangUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc ZendParserStackElem) *LangUnionYyalloc {
-//     return &LangUnionYyalloc{
-//         yyss_alloc:yyss_alloc,
-//         yyvs_alloc:yyvs_alloc,
-//     }
-// }
 // func MakeLangUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc ZendParserStackElem) LangUnionYyalloc {
 //     return LangUnionYyalloc{
 //         yyss_alloc:yyss_alloc,

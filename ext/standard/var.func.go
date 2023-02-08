@@ -995,7 +995,14 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 	zend.ZendReleaseProperties(props)
 	return retval
 }
-func PhpVarSerializeNestedData(buf *zend.SmartStr, struc *zend.Zval, ht *zend.HashTable, count uint32, incomplete_class zend.ZendBool, var_hash PhpSerializeDataT) {
+func PhpVarSerializeNestedData(
+	buf *zend.SmartStr,
+	struc *zend.Zval,
+	ht *zend.HashTable,
+	count uint32,
+	incomplete_class zend.ZendBool,
+	var_hash PhpSerializeDataT,
+) {
 	buf.AppendUlong(count)
 	buf.AppendString(":{")
 	if count > 0 {

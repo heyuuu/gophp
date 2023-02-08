@@ -17,14 +17,6 @@ type PhpUserStreamWrapper struct {
 	wrapper   core.PhpStreamWrapper
 }
 
-// func NewPhpUserStreamWrapper(protoname *byte, classname *byte, ce *zend.ZendClassEntry, wrapper core.PhpStreamWrapper) *PhpUserStreamWrapper {
-//     return &PhpUserStreamWrapper{
-//         protoname:protoname,
-//         classname:classname,
-//         ce:ce,
-//         wrapper:wrapper,
-//     }
-// }
 // func MakePhpUserStreamWrapper(protoname *byte, classname *byte, ce *zend.ZendClassEntry, wrapper core.PhpStreamWrapper) PhpUserStreamWrapper {
 //     return PhpUserStreamWrapper{
 //         protoname:protoname,
@@ -52,12 +44,6 @@ type _phpUserstreamData struct {
 	object  zend.Zval
 }
 
-// func New_phpUserstreamData(wrapper *PhpUserStreamWrapper, object zend.Zval) *_phpUserstreamData {
-//     return &_phpUserstreamData{
-//         wrapper:wrapper,
-//         object:object,
-//     }
-// }
 // func Make_phpUserstreamData(wrapper *PhpUserStreamWrapper, object zend.Zval) _phpUserstreamData {
 //     return _phpUserstreamData{
 //         wrapper:wrapper,

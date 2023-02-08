@@ -10,7 +10,14 @@ import (
 	"sik/zend"
 )
 
-func StrfilterRot13Filter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func StrfilterRot13Filter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
@@ -27,7 +34,14 @@ func StrfilterRot13Filter(stream *core.PhpStream, thisfilter *core.PhpStreamFilt
 func StrfilterRot13Create(filtername *byte, filterparams *zend.Zval, persistent uint8) *core.PhpStreamFilter {
 	return streams.PhpStreamFilterAlloc(&StrfilterRot13Ops, nil, persistent)
 }
-func StrfilterToupperFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func StrfilterToupperFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
@@ -41,7 +55,14 @@ func StrfilterToupperFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFi
 	}
 	return streams.PSFS_PASS_ON
 }
-func StrfilterTolowerFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func StrfilterTolowerFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	for buckets_in.GetHead() != nil {
@@ -80,7 +101,14 @@ func PhpStripTagsFilterDtor(inst *PhpStripTagsFilter) {
 		zend.Pefree(any(inst.GetAllowedTags()), inst.GetPersistent())
 	}
 }
-func StrfilterStripTagsFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func StrfilterStripTagsFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	var inst *PhpStripTagsFilter = (*PhpStripTagsFilter)(thisfilter.GetAbstract().GetPtr())
@@ -152,7 +180,14 @@ func PhpConvConvert(a *PhpConv, b **byte, c *int, d **byte, e *int) PhpConvErrT 
 	return (*PhpConv)(a).GetConvertOp()((*PhpConv)(a), b, c, d, e)
 }
 func PhpConvDtor(a *PhpConv) { (*PhpConv)(a).GetDtor()(a) }
-func PhpConvBase64EncodeCtor(inst *PhpConvBase64Encode, line_len uint, lbchars *byte, lbchars_len int, lbchars_dup int, persistent int) PhpConvErrT {
+func PhpConvBase64EncodeCtor(
+	inst *PhpConvBase64Encode,
+	line_len uint,
+	lbchars *byte,
+	lbchars_len int,
+	lbchars_dup int,
+	persistent int,
+) PhpConvErrT {
 	inst.GetSuper().SetConvertOp(PhpConvConvertFunc(PhpConvBase64EncodeConvert))
 	inst.GetSuper().SetDtor(PhpConvDtorFunc(PhpConvBase64EncodeDtor))
 	inst.SetEremLen(0)
@@ -680,7 +715,15 @@ func PhpConvQprintEncodeConvert(inst *PhpConvQprintEncode, in_pp **byte, in_left
 	inst.SetLbCnt(lb_cnt)
 	return err
 }
-func PhpConvQprintEncodeCtor(inst *PhpConvQprintEncode, line_len uint, lbchars *byte, lbchars_len int, lbchars_dup int, opts int, persistent int) PhpConvErrT {
+func PhpConvQprintEncodeCtor(
+	inst *PhpConvQprintEncode,
+	line_len uint,
+	lbchars *byte,
+	lbchars_len int,
+	lbchars_dup int,
+	opts int,
+	persistent int,
+) PhpConvErrT {
 	if line_len < 4 && lbchars != nil {
 		return PHP_CONV_ERR_TOO_BIG
 	}
@@ -912,7 +955,14 @@ func PhpConvQprintDecodeCtor(inst *PhpConvQprintDecode, lbchars *byte, lbchars_l
 	inst.SetPersistent(persistent)
 	return PHP_CONV_ERR_SUCCESS
 }
-func PhpConvGetStringPropEx(ht *zend.HashTable, pretval **byte, pretval_len *int, field_name string, field_name_len int, persistent int) PhpConvErrT {
+func PhpConvGetStringPropEx(
+	ht *zend.HashTable,
+	pretval **byte,
+	pretval_len *int,
+	field_name string,
+	field_name_len int,
+	persistent int,
+) PhpConvErrT {
 	var tmpval *zend.Zval
 	*pretval = nil
 	*pretval_len = 0
@@ -1118,7 +1168,16 @@ func PhpConvertFilterDtor(inst *PhpConvertFilter) {
 		zend.Pefree(inst.GetFiltername(), inst.GetPersistent())
 	}
 }
-func StrfilterConvertAppendBucket(inst *PhpConvertFilter, stream *core.PhpStream, filter *core.PhpStreamFilter, buckets_out *streams.PhpStreamBucketBrigade, ps *byte, buf_len int, consumed *int, persistent int) int {
+func StrfilterConvertAppendBucket(
+	inst *PhpConvertFilter,
+	stream *core.PhpStream,
+	filter *core.PhpStreamFilter,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	ps *byte,
+	buf_len int,
+	consumed *int,
+	persistent int,
+) int {
 	var err PhpConvErrT
 	var new_bucket *streams.PhpStreamBucket
 	var out_buf *byte = nil
@@ -1276,7 +1335,14 @@ out_failure:
 	zend.Pefree(out_buf, persistent)
 	return zend.FAILURE
 }
-func StrfilterConvertFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func StrfilterConvertFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket = nil
 	var consumed int = 0
 	var inst *PhpConvertFilter = (*PhpConvertFilter)(thisfilter.GetAbstract().GetPtr())
@@ -1341,7 +1407,14 @@ out:
 	}
 	return retval
 }
-func ConsumedFilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func ConsumedFilterFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var data *PhpConsumedFilterData = (*PhpConsumedFilterData)(thisfilter.GetAbstract().GetPtr())
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
@@ -1505,7 +1578,14 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 	}
 	return out_len
 }
-func PhpChunkedFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func PhpChunkedFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	var data *PhpChunkedFilterData = (*PhpChunkedFilterData)(thisfilter.GetAbstract().GetPtr())

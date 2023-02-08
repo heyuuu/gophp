@@ -18,34 +18,31 @@ type PhpCryptExtendedData struct {
 	output      []byte
 }
 
-// func NewPhpCryptExtendedData(initialized int, saltbits uint32, old_salt uint32, en_keysl []uint32, en_keysr []uint32, de_keysl []uint32, de_keysr []uint32, old_rawkey0 uint32, old_rawkey1 uint32, output []byte) *PhpCryptExtendedData {
-//     return &PhpCryptExtendedData{
-//         initialized:initialized,
-//         saltbits:saltbits,
-//         old_salt:old_salt,
-//         en_keysl:en_keysl,
-//         en_keysr:en_keysr,
-//         de_keysl:de_keysl,
-//         de_keysr:de_keysr,
-//         old_rawkey0:old_rawkey0,
-//         old_rawkey1:old_rawkey1,
-//         output:output,
-//     }
-// }
-// func MakePhpCryptExtendedData(initialized int, saltbits uint32, old_salt uint32, en_keysl []uint32, en_keysr []uint32, de_keysl []uint32, de_keysr []uint32, old_rawkey0 uint32, old_rawkey1 uint32, output []byte) PhpCryptExtendedData {
-//     return PhpCryptExtendedData{
-//         initialized:initialized,
-//         saltbits:saltbits,
-//         old_salt:old_salt,
-//         en_keysl:en_keysl,
-//         en_keysr:en_keysr,
-//         de_keysl:de_keysl,
-//         de_keysr:de_keysr,
-//         old_rawkey0:old_rawkey0,
-//         old_rawkey1:old_rawkey1,
-//         output:output,
-//     }
-// }
+//             func MakePhpCryptExtendedData(
+// initialized int,
+// saltbits uint32,
+// old_salt uint32,
+// en_keysl []uint32,
+// en_keysr []uint32,
+// de_keysl []uint32,
+// de_keysr []uint32,
+// old_rawkey0 uint32,
+// old_rawkey1 uint32,
+// output []byte,
+// ) PhpCryptExtendedData {
+//                 return PhpCryptExtendedData{
+//                     initialized:initialized,
+//                     saltbits:saltbits,
+//                     old_salt:old_salt,
+//                     en_keysl:en_keysl,
+//                     en_keysr:en_keysr,
+//                     de_keysl:de_keysl,
+//                     de_keysr:de_keysr,
+//                     old_rawkey0:old_rawkey0,
+//                     old_rawkey1:old_rawkey1,
+//                     output:output,
+//                 }
+//             }
 func (this *PhpCryptExtendedData) GetInitialized() int      { return this.initialized }
 func (this *PhpCryptExtendedData) SetInitialized(value int) { this.initialized = value }
 func (this *PhpCryptExtendedData) GetSaltbits() uint32      { return this.saltbits }

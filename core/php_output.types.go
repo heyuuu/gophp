@@ -17,15 +17,6 @@ type PhpOutputBuffer struct {
 	_reserved uint32
 }
 
-// func NewPhpOutputBuffer(data *byte, size int, used int, free uint32, _reserved uint32) *PhpOutputBuffer {
-//     return &PhpOutputBuffer{
-//         data:data,
-//         size:size,
-//         used:used,
-//         free:free,
-//         _reserved:_reserved,
-//     }
-// }
 // func MakePhpOutputBuffer(data *byte, size int, used int, free uint32, _reserved uint32) PhpOutputBuffer {
 //     return PhpOutputBuffer{
 //         data:data,
@@ -56,13 +47,6 @@ type PhpOutputContext struct {
 	out PhpOutputBuffer
 }
 
-// func NewPhpOutputContext(op int, in PhpOutputBuffer, out PhpOutputBuffer) *PhpOutputContext {
-//     return &PhpOutputContext{
-//         op:op,
-//         in:in,
-//         out:out,
-//     }
-// }
 // func MakePhpOutputContext(op int, in PhpOutputBuffer, out PhpOutputBuffer) PhpOutputContext {
 //     return PhpOutputContext{
 //         op:op,
@@ -88,13 +72,6 @@ type PhpOutputHandlerUserFuncT struct {
 	zoh zend.Zval
 }
 
-// func NewPhpOutputHandlerUserFuncT(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, zoh zend.Zval) *PhpOutputHandlerUserFuncT {
-//     return &PhpOutputHandlerUserFuncT{
-//         fci:fci,
-//         fcc:fcc,
-//         zoh:zoh,
-//     }
-// }
 // func MakePhpOutputHandlerUserFuncT(fci zend.ZendFcallInfo, fcc zend.ZendFcallInfoCache, zoh zend.Zval) PhpOutputHandlerUserFuncT {
 //     return PhpOutputHandlerUserFuncT{
 //         fci:fci,
@@ -189,26 +166,23 @@ type ZendOutputGlobals struct {
 	flags                 int
 }
 
-// func NewZendOutputGlobals(handlers zend.ZendStack, active *PhpOutputHandler, running *PhpOutputHandler, output_start_filename *byte, output_start_lineno int, flags int) *ZendOutputGlobals {
-//     return &ZendOutputGlobals{
-//         handlers:handlers,
-//         active:active,
-//         running:running,
-//         output_start_filename:output_start_filename,
-//         output_start_lineno:output_start_lineno,
-//         flags:flags,
-//     }
-// }
-// func MakeZendOutputGlobals(handlers zend.ZendStack, active *PhpOutputHandler, running *PhpOutputHandler, output_start_filename *byte, output_start_lineno int, flags int) ZendOutputGlobals {
-//     return ZendOutputGlobals{
-//         handlers:handlers,
-//         active:active,
-//         running:running,
-//         output_start_filename:output_start_filename,
-//         output_start_lineno:output_start_lineno,
-//         flags:flags,
-//     }
-// }
+//             func MakeZendOutputGlobals(
+// handlers zend.ZendStack,
+// active *PhpOutputHandler,
+// running *PhpOutputHandler,
+// output_start_filename *byte,
+// output_start_lineno int,
+// flags int,
+// ) ZendOutputGlobals {
+//                 return ZendOutputGlobals{
+//                     handlers:handlers,
+//                     active:active,
+//                     running:running,
+//                     output_start_filename:output_start_filename,
+//                     output_start_lineno:output_start_lineno,
+//                     flags:flags,
+//                 }
+//             }
 // func (this *ZendOutputGlobals)  GetHandlers() zend.ZendStack      { return this.handlers }
 // func (this *ZendOutputGlobals) SetHandlers(value zend.ZendStack) { this.handlers = value }
 // func (this *ZendOutputGlobals)  GetActive() *PhpOutputHandler      { return this.active }

@@ -16,7 +16,14 @@ func SAFE_STRING(s *byte) string {
 		return ""
 	}
 }
-func OnChangeCallback(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnChangeCallback(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if zend.EG__().GetCurrentExecuteData() != nil {
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))

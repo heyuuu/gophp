@@ -87,7 +87,14 @@ func UserStreamCreateObject(uwrap *PhpUserStreamWrapper, context *core.PhpStream
 		}
 	}
 }
-func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func UserWrapperOpener(
+	wrapper *core.PhpStreamWrapper,
+	filename *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var uwrap *PhpUserStreamWrapper = (*PhpUserStreamWrapper)(wrapper.GetAbstract())
 	var us *PhpUserstreamDataT
 	var zretval zend.Zval
@@ -179,7 +186,14 @@ func UserWrapperOpener(wrapper *core.PhpStreamWrapper, filename *byte, mode *byt
 	core.PG(in_user_include) = old_in_user_include
 	return stream
 }
-func UserWrapperOpendir(wrapper *core.PhpStreamWrapper, filename *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func UserWrapperOpendir(
+	wrapper *core.PhpStreamWrapper,
+	filename *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var uwrap *PhpUserStreamWrapper = (*PhpUserStreamWrapper)(wrapper.GetAbstract())
 	var us *PhpUserstreamDataT
 	var zretval zend.Zval

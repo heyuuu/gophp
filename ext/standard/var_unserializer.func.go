@@ -313,7 +313,15 @@ func ParseUiv(p *uint8) int {
 	}
 	return result
 }
-func ProcessNestedData(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, ht *zend.HashTable, elements zend.ZendLong, obj *zend.ZendObject) int {
+func ProcessNestedData(
+	rval *zend.Zval,
+	p **uint8,
+	max *uint8,
+	var_hash *PhpUnserializeDataT,
+	ht *zend.HashTable,
+	elements zend.ZendLong,
+	obj *zend.ZendObject,
+) int {
 	if var_hash != nil {
 		if var_hash.GetMaxDepth() > 0 && var_hash.GetCurDepth() >= var_hash.GetMaxDepth() {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Maximum depth of "+zend.ZEND_LONG_FMT+" exceeded. "+"The depth limit can be changed using the max_depth unserialize() option "+"or the unserialize_max_depth ini setting", var_hash.GetMaxDepth())
@@ -503,7 +511,14 @@ func ObjectCustom(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnseriali
 	*p += datalen + 1
 	return 1
 }
-func ObjectCommon(rval *zend.Zval, p **uint8, max *uint8, var_hash *PhpUnserializeDataT, elements zend.ZendLong, has_unserialize zend.ZendBool) int {
+func ObjectCommon(
+	rval *zend.Zval,
+	p **uint8,
+	max *uint8,
+	var_hash *PhpUnserializeDataT,
+	elements zend.ZendLong,
+	has_unserialize zend.ZendBool,
+) int {
 	var ht *zend.HashTable
 	var has_wakeup zend.ZendBool
 	if has_unserialize != 0 {

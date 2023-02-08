@@ -628,7 +628,14 @@ func FuncLineno(fn *ZendFunction) uint32 {
 		return 0
 	}
 }
-func EmitIncompatibleMethodError(error_level int, error_verb *byte, child *ZendFunction, parent *ZendFunction, status InheritanceStatus, unresolved_class *ZendString) {
+func EmitIncompatibleMethodError(
+	error_level int,
+	error_verb *byte,
+	child *ZendFunction,
+	parent *ZendFunction,
+	status InheritanceStatus,
+	unresolved_class *ZendString,
+) {
 	var parent_prototype *ZendString = ZendGetFunctionDeclaration(parent)
 	var child_prototype *ZendString = ZendGetFunctionDeclaration(child)
 	if status == INHERITANCE_UNRESOLVED {
@@ -667,7 +674,14 @@ func PerformDelayableImplementationCheck(ce *ZendClassEntry, fe *ZendFunction, p
 		}
 	}
 }
-func DoInheritanceCheckOnMethodEx(child *ZendFunction, parent *ZendFunction, ce *ZendClassEntry, child_zv *Zval, check_only ZendBool, checked ZendBool) InheritanceStatus {
+func DoInheritanceCheckOnMethodEx(
+	child *ZendFunction,
+	parent *ZendFunction,
+	ce *ZendClassEntry,
+	child_zv *Zval,
+	check_only ZendBool,
+	checked ZendBool,
+) InheritanceStatus {
 	var child_flags uint32
 	var parent_flags uint32 = parent.GetFnFlags()
 	var proto *ZendFunction
@@ -1578,7 +1592,14 @@ func ZendFixupTraitMethod(fn *ZendFunction, ce *ZendClassEntry) {
 		}
 	}
 }
-func ZendTraitsCopyFunctions(fnname *ZendString, fn *ZendFunction, ce *ZendClassEntry, overridden **HashTable, exclude_table *HashTable, aliases **ZendClassEntry) {
+func ZendTraitsCopyFunctions(
+	fnname *ZendString,
+	fn *ZendFunction,
+	ce *ZendClassEntry,
+	overridden **HashTable,
+	exclude_table *HashTable,
+	aliases **ZendClassEntry,
+) {
 	var alias *ZendTraitAlias
 	var alias_ptr **ZendTraitAlias
 	var lcname *ZendString

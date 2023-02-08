@@ -14,12 +14,6 @@ type PhpSerializeData struct {
 	n  uint32
 }
 
-// func NewPhpSerializeData(ht zend.HashTable, n uint32) *PhpSerializeData {
-//     return &PhpSerializeData{
-//         ht:ht,
-//         n:n,
-//     }
-// }
 // func MakePhpSerializeData(ht zend.HashTable, n uint32) PhpSerializeData {
 //     return PhpSerializeData{
 //         ht:ht,

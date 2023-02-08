@@ -115,7 +115,14 @@ func PhpGlobStreamRewind(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	}
 	return 0
 }
-func PhpGlobStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpGlobStreamOpener(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var pglob *GlobST
 	var ret int
 	var tmp *byte

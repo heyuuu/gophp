@@ -42,7 +42,14 @@ var PhpInternalEncodingChanged func() = nil
 /* {{{ PHP_INI_MH
  */
 
-var OnChangeBrowscap func(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int
+var OnChangeBrowscap func(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int
 
 /* Need to be read from the environment (?):
  * PHP_AUTO_PREPEND_FILE

@@ -207,22 +207,50 @@ func W(i int) __auto__ {
 	x[i&15] = ROTATE_LEFT(tmp, 1)
 	return x[i&15]
 }
-func FF(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+func FF(
+	a uint32,
+	b uint32,
+	c uint32,
+	d uint32,
+	e __auto__,
+	w int,
+) {
 	e += F(b, c, d) + w + uint32(0x5a827999)
 	e += ROTATE_LEFT(a, 5)
 	b = ROTATE_LEFT(b, 30)
 }
-func GG(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+func GG(
+	a uint32,
+	b uint32,
+	c uint32,
+	d uint32,
+	e __auto__,
+	w int,
+) {
 	e += G(b, c, d) + w + uint32(0x6ed9eba1)
 	e += ROTATE_LEFT(a, 5)
 	b = ROTATE_LEFT(b, 30)
 }
-func HH(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+func HH(
+	a uint32,
+	b uint32,
+	c uint32,
+	d uint32,
+	e __auto__,
+	w int,
+) {
 	e += H(b, c, d) + w + uint32(0x8f1bbcdc)
 	e += ROTATE_LEFT(a, 5)
 	b = ROTATE_LEFT(b, 30)
 }
-func II(a uint32, b uint32, c uint32, d uint32, e __auto__, w int) {
+func II(
+	a uint32,
+	b uint32,
+	c uint32,
+	d uint32,
+	e __auto__,
+	w int,
+) {
 	e += I(b, c, d) + w + uint32(0xca62c1d6)
 	e += ROTATE_LEFT(a, 5)
 	b = ROTATE_LEFT(b, 30)

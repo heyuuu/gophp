@@ -559,7 +559,14 @@ func PhpPlainFilesDirstreamRewind(stream *core.PhpStream, offset zend.ZendOffT, 
 	rewinddir((*DIR)(stream.GetAbstract()))
 	return 0
 }
-func PhpPlainFilesDirOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpPlainFilesDirOpener(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var dir *DIR = nil
 	var stream *core.PhpStream = nil
 	if (options & core.STREAM_USE_GLOB_DIR_OPEN) != 0 {
@@ -669,7 +676,14 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 	}
 	return nil
 }
-func PhpPlainFilesStreamOpener(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpPlainFilesStreamOpener(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	if (options&core.STREAM_DISABLE_OPEN_BASEDIR) == 0 && core.PhpCheckOpenBasedir(path) != 0 {
 		return nil
 	}

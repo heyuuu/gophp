@@ -12,7 +12,14 @@ func DummyEncodingLexerCompatibilityChecker(encoding *ZendEncoding) int { return
 func DummyEncodingDetector(string *uint8, length int, list **ZendEncoding, list_size int) *ZendEncoding {
 	return nil
 }
-func DummyEncodingConverter(to **uint8, to_length *int, from *uint8, from_length int, encoding_to *ZendEncoding, encoding_from *ZendEncoding) int {
+func DummyEncodingConverter(
+	to **uint8,
+	to_length *int,
+	from *uint8,
+	from_length int,
+	encoding_to *ZendEncoding,
+	encoding_from *ZendEncoding,
+) int {
 	return size_t - 1
 }
 func DummyEncodingListParser(encoding_list *byte, encoding_list_len int, return_list ***ZendEncoding, return_size *int, persistent int) int {
@@ -76,7 +83,14 @@ func ZendMultibyteCheckLexerCompatibility(encoding *ZendEncoding) int {
 func ZendMultibyteEncodingDetector(string *uint8, length int, list **ZendEncoding, list_size int) *ZendEncoding {
 	return MultibyteFunctions.GetEncodingDetector()(string, length, list, list_size)
 }
-func ZendMultibyteEncodingConverter(to **uint8, to_length *int, from *uint8, from_length int, encoding_to *ZendEncoding, encoding_from *ZendEncoding) int {
+func ZendMultibyteEncodingConverter(
+	to **uint8,
+	to_length *int,
+	from *uint8,
+	from_length int,
+	encoding_to *ZendEncoding,
+	encoding_from *ZendEncoding,
+) int {
 	return MultibyteFunctions.GetEncodingConverter()(to, to_length, from, from_length, encoding_to, encoding_from)
 }
 func ZendMultibyteParseEncodingList(encoding_list *byte, encoding_list_len int, return_list ***ZendEncoding, return_size *int, persistent int) int {

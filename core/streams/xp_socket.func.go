@@ -146,7 +146,14 @@ func PhpSockopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int {
 	var sock *core.PhpNetstreamDataT = (*core.PhpNetstreamDataT)(stream.GetAbstract())
 	return zend.ZendFstat(sock.GetSocket(), ssb.GetSb())
 }
-func SockSendto(sock *core.PhpNetstreamDataT, buf *byte, buflen int, flags int, addr *__struct__sockaddr, addrlen socklen_t) int {
+func SockSendto(
+	sock *core.PhpNetstreamDataT,
+	buf *byte,
+	buflen int,
+	flags int,
+	addr *__struct__sockaddr,
+	addrlen socklen_t,
+) int {
 	var ret int
 	if addr != nil {
 		ret = sendto(sock.GetSocket(), buf, XP_SOCK_BUF_SIZE(buflen), flags, addr, XP_SOCK_BUF_SIZE(addrlen))
@@ -162,7 +169,15 @@ func SockSendto(sock *core.PhpNetstreamDataT, buf *byte, buflen int, flags int, 
 		return ret
 	}
 }
-func SockRecvfrom(sock *core.PhpNetstreamDataT, buf *byte, buflen int, flags int, textaddr **zend.ZendString, addr **__struct__sockaddr, addrlen *socklen_t) int {
+func SockRecvfrom(
+	sock *core.PhpNetstreamDataT,
+	buf *byte,
+	buflen int,
+	flags int,
+	textaddr **zend.ZendString,
+	addr **__struct__sockaddr,
+	addrlen *socklen_t,
+) int {
 	var ret int
 	var want_addr int = textaddr != nil || addr != nil
 	if want_addr != 0 {
@@ -493,7 +508,17 @@ func PhpTcpSockopSetOption(stream *core.PhpStream, option int, value int, ptrpar
 	}
 	return PhpSockopSetOption(stream, option, value, ptrparam)
 }
-func PhpStreamGenericSocketFactory(proto *byte, protolen int, resourcename *byte, resourcenamelen int, persistent_id *byte, options int, flags int, timeout *__struct__timeval, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamGenericSocketFactory(
+	proto *byte,
+	protolen int,
+	resourcename *byte,
+	resourcenamelen int,
+	persistent_id *byte,
+	options int,
+	flags int,
+	timeout *__struct__timeval,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var stream *core.PhpStream = nil
 	var sock *core.PhpNetstreamDataT
 	var ops *core.PhpStreamOps

@@ -89,7 +89,14 @@ func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
 
 	/* kill the object */
 }
-func UserfilterFilter(stream *core.PhpStream, thisfilter *core.PhpStreamFilter, buckets_in *streams.PhpStreamBucketBrigade, buckets_out *streams.PhpStreamBucketBrigade, bytes_consumed *int, flags int) streams.PhpStreamFilterStatusT {
+func UserfilterFilter(
+	stream *core.PhpStream,
+	thisfilter *core.PhpStreamFilter,
+	buckets_in *streams.PhpStreamBucketBrigade,
+	buckets_out *streams.PhpStreamBucketBrigade,
+	bytes_consumed *int,
+	flags int,
+) streams.PhpStreamFilterStatusT {
 	var ret int = streams.PSFS_ERR_FATAL
 	var obj *zend.Zval = thisfilter.GetAbstract()
 	var func_name zend.Zval

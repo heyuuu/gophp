@@ -14,12 +14,6 @@ type ZendClassName struct {
 	lc_name *ZendString
 }
 
-// func NewZendClassName(name *ZendString, lc_name *ZendString) *ZendClassName {
-//     return &ZendClassName{
-//         name:name,
-//         lc_name:lc_name,
-//     }
-// }
 // func MakeZendClassName(name *ZendString, lc_name *ZendString) ZendClassName {
 //     return ZendClassName{
 //         name:name,
@@ -39,12 +33,6 @@ type ZendTraitMethodReference struct {
 	class_name  *ZendString
 }
 
-// func NewZendTraitMethodReference(method_name *ZendString, class_name *ZendString) *ZendTraitMethodReference {
-//     return &ZendTraitMethodReference{
-//         method_name:method_name,
-//         class_name:class_name,
-//     }
-// }
 // func MakeZendTraitMethodReference(method_name *ZendString, class_name *ZendString) ZendTraitMethodReference {
 //     return ZendTraitMethodReference{
 //         method_name:method_name,
@@ -65,13 +53,6 @@ type ZendTraitPrecedence struct {
 	exclude_class_names []*ZendString
 }
 
-// func NewZendTraitPrecedence(trait_method ZendTraitMethodReference, num_excludes uint32, exclude_class_names []*ZendString) *ZendTraitPrecedence {
-//     return &ZendTraitPrecedence{
-//         trait_method:trait_method,
-//         num_excludes:num_excludes,
-//         exclude_class_names:exclude_class_names,
-//     }
-// }
 // func MakeZendTraitPrecedence(trait_method ZendTraitMethodReference, num_excludes uint32, exclude_class_names []*ZendString) ZendTraitPrecedence {
 //     return ZendTraitPrecedence{
 //         trait_method:trait_method,
@@ -99,13 +80,6 @@ type ZendTraitAlias struct {
 	modifiers    uint32
 }
 
-// func NewZendTraitAlias(trait_method ZendTraitMethodReference, alias *ZendString, modifiers uint32) *ZendTraitAlias {
-//     return &ZendTraitAlias{
-//         trait_method:trait_method,
-//         alias:alias,
-//         modifiers:modifiers,
-//     }
-// }
 // func MakeZendTraitAlias(trait_method ZendTraitMethodReference, alias *ZendString, modifiers uint32) ZendTraitAlias {
 //     return ZendTraitAlias{
 //         trait_method:trait_method,
@@ -469,40 +443,37 @@ type ZendUtilityFunctions struct {
 	resolve_path_function           func(filename *byte, filename_len int) *ZendString
 }
 
-// func NewZendUtilityFunctions(error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any), printf_function func(format *byte, _ ...any) int, write_function func(str *byte, str_length int) int, fopen_function func(filename *byte, opened_path **ZendString) *r.FILE, message_handler func(message ZendLong, data any), get_configuration_directive func(name *ZendString) *Zval, ticks_function func(ticks int), on_timeout func(seconds int), stream_open_function func(filename *byte, handle *ZendFileHandle) int, printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any), printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any), getenv_function func(name *byte, name_len int) *byte, resolve_path_function func(filename *byte, filename_len int) *ZendString) *ZendUtilityFunctions {
-//     return &ZendUtilityFunctions{
-//         error_function:error_function,
-//         printf_function:printf_function,
-//         write_function:write_function,
-//         fopen_function:fopen_function,
-//         message_handler:message_handler,
-//         get_configuration_directive:get_configuration_directive,
-//         ticks_function:ticks_function,
-//         on_timeout:on_timeout,
-//         stream_open_function:stream_open_function,
-//         printf_to_smart_string_function:printf_to_smart_string_function,
-//         printf_to_smart_str_function:printf_to_smart_str_function,
-//         getenv_function:getenv_function,
-//         resolve_path_function:resolve_path_function,
-//     }
-// }
-// func MakeZendUtilityFunctions(error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any), printf_function func(format *byte, _ ...any) int, write_function func(str *byte, str_length int) int, fopen_function func(filename *byte, opened_path **ZendString) *r.FILE, message_handler func(message ZendLong, data any), get_configuration_directive func(name *ZendString) *Zval, ticks_function func(ticks int), on_timeout func(seconds int), stream_open_function func(filename *byte, handle *ZendFileHandle) int, printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any), printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any), getenv_function func(name *byte, name_len int) *byte, resolve_path_function func(filename *byte, filename_len int) *ZendString) ZendUtilityFunctions {
-//     return ZendUtilityFunctions{
-//         error_function:error_function,
-//         printf_function:printf_function,
-//         write_function:write_function,
-//         fopen_function:fopen_function,
-//         message_handler:message_handler,
-//         get_configuration_directive:get_configuration_directive,
-//         ticks_function:ticks_function,
-//         on_timeout:on_timeout,
-//         stream_open_function:stream_open_function,
-//         printf_to_smart_string_function:printf_to_smart_string_function,
-//         printf_to_smart_str_function:printf_to_smart_str_function,
-//         getenv_function:getenv_function,
-//         resolve_path_function:resolve_path_function,
-//     }
-// }
+//             func MakeZendUtilityFunctions(
+// error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any),
+// printf_function func(format *byte, _ ...any) int,
+// write_function func(str *byte, str_length int) int,
+// fopen_function func(filename *byte, opened_path **ZendString) *r.FILE,
+// message_handler func(message ZendLong, data any),
+// get_configuration_directive func(name *ZendString) *Zval,
+// ticks_function func(ticks int),
+// on_timeout func(seconds int),
+// stream_open_function func(filename *byte, handle *ZendFileHandle) int,
+// printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any),
+// printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any),
+// getenv_function func(name *byte, name_len int) *byte,
+// resolve_path_function func(filename *byte, filename_len int) *ZendString,
+// ) ZendUtilityFunctions {
+//                 return ZendUtilityFunctions{
+//                     error_function:error_function,
+//                     printf_function:printf_function,
+//                     write_function:write_function,
+//                     fopen_function:fopen_function,
+//                     message_handler:message_handler,
+//                     get_configuration_directive:get_configuration_directive,
+//                     ticks_function:ticks_function,
+//                     on_timeout:on_timeout,
+//                     stream_open_function:stream_open_function,
+//                     printf_to_smart_string_function:printf_to_smart_string_function,
+//                     printf_to_smart_str_function:printf_to_smart_str_function,
+//                     getenv_function:getenv_function,
+//                     resolve_path_function:resolve_path_function,
+//                 }
+//             }
 func (this *ZendUtilityFunctions) GetErrorFunction() func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
 	return this.error_function
 }
@@ -583,11 +554,6 @@ type ZendUtilityValues struct {
 	html_errors ZendBool
 }
 
-// func NewZendUtilityValues(html_errors ZendBool) *ZendUtilityValues {
-//     return &ZendUtilityValues{
-//         html_errors:html_errors,
-//     }
-// }
 // func MakeZendUtilityValues(html_errors ZendBool) ZendUtilityValues {
 //     return ZendUtilityValues{
 //         html_errors:html_errors,
@@ -605,13 +571,6 @@ type ZendErrorHandling struct {
 	user_handler Zval
 }
 
-// func NewZendErrorHandling(handling ZendErrorHandlingT, exception *ZendClassEntry, user_handler Zval) *ZendErrorHandling {
-//     return &ZendErrorHandling{
-//         handling:handling,
-//         exception:exception,
-//         user_handler:user_handler,
-//     }
-// }
 // func MakeZendErrorHandling(handling ZendErrorHandlingT, exception *ZendClassEntry, user_handler Zval) ZendErrorHandling {
 //     return ZendErrorHandling{
 //         handling:handling,

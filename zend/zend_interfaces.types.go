@@ -11,13 +11,6 @@ type ZendUserIterator struct {
 	value Zval
 }
 
-// func NewZendUserIterator(it ZendObjectIterator, ce *ZendClassEntry, value Zval) *ZendUserIterator {
-//     return &ZendUserIterator{
-//         it:it,
-//         ce:ce,
-//         value:value,
-//     }
-// }
 // func MakeZendUserIterator(it ZendObjectIterator, ce *ZendClassEntry, value Zval) ZendUserIterator {
 //     return ZendUserIterator{
 //         it:it,

@@ -10,12 +10,6 @@ type U struct /* union */ {
 	L []ULong
 }
 
-// func NewU(d float64, L []ULong) *U {
-//     return &U{
-//         d:d,
-//         L:L,
-//     }
-// }
 // func MakeU(d float64, L []ULong) U {
 //     return U{
 //         d:d,
@@ -45,36 +39,33 @@ type BCinfo struct {
 	uflchk   int
 }
 
-// func NewBCinfo(dp0 int, dp1 int, dplen int, dsign int, e0 int, inexact int, nd int, nd0 int, rounding int, scale int, uflchk int) *BCinfo {
-//     return &BCinfo{
-//         dp0:dp0,
-//         dp1:dp1,
-//         dplen:dplen,
-//         dsign:dsign,
-//         e0:e0,
-//         inexact:inexact,
-//         nd:nd,
-//         nd0:nd0,
-//         rounding:rounding,
-//         scale:scale,
-//         uflchk:uflchk,
-//     }
-// }
-// func MakeBCinfo(dp0 int, dp1 int, dplen int, dsign int, e0 int, inexact int, nd int, nd0 int, rounding int, scale int, uflchk int) BCinfo {
-//     return BCinfo{
-//         dp0:dp0,
-//         dp1:dp1,
-//         dplen:dplen,
-//         dsign:dsign,
-//         e0:e0,
-//         inexact:inexact,
-//         nd:nd,
-//         nd0:nd0,
-//         rounding:rounding,
-//         scale:scale,
-//         uflchk:uflchk,
-//     }
-// }
+//             func MakeBCinfo(
+// dp0 int,
+// dp1 int,
+// dplen int,
+// dsign int,
+// e0 int,
+// inexact int,
+// nd int,
+// nd0 int,
+// rounding int,
+// scale int,
+// uflchk int,
+// ) BCinfo {
+//                 return BCinfo{
+//                     dp0:dp0,
+//                     dp1:dp1,
+//                     dplen:dplen,
+//                     dsign:dsign,
+//                     e0:e0,
+//                     inexact:inexact,
+//                     nd:nd,
+//                     nd0:nd0,
+//                     rounding:rounding,
+//                     scale:scale,
+//                     uflchk:uflchk,
+//                 }
+//             }
 func (this *BCinfo) GetDp0() int        { return this.dp0 }
 func (this *BCinfo) SetDp0(value int)   { this.dp0 = value }
 func (this *BCinfo) GetDp1() int        { return this.dp1 }
@@ -112,26 +103,23 @@ type Bigint struct {
 	x      []ULong
 }
 
-// func NewBigint(next *Bigint, k int, maxwds int, sign int, wds int, x []ULong) *Bigint {
-//     return &Bigint{
-//         next:next,
-//         k:k,
-//         maxwds:maxwds,
-//         sign:sign,
-//         wds:wds,
-//         x:x,
-//     }
-// }
-// func MakeBigint(next *Bigint, k int, maxwds int, sign int, wds int, x []ULong) Bigint {
-//     return Bigint{
-//         next:next,
-//         k:k,
-//         maxwds:maxwds,
-//         sign:sign,
-//         wds:wds,
-//         x:x,
-//     }
-// }
+//             func MakeBigint(
+// next *Bigint,
+// k int,
+// maxwds int,
+// sign int,
+// wds int,
+// x []ULong,
+// ) Bigint {
+//                 return Bigint{
+//                     next:next,
+//                     k:k,
+//                     maxwds:maxwds,
+//                     sign:sign,
+//                     wds:wds,
+//                     x:x,
+//                 }
+//             }
 func (this *Bigint) GetNext() *Bigint      { return this.next }
 func (this *Bigint) SetNext(value *Bigint) { this.next = value }
 func (this *Bigint) GetK() int             { return this.k }

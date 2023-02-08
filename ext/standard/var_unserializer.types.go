@@ -15,13 +15,6 @@ type VarEntries struct {
 	data       []*zend.Zval
 }
 
-// func NewVarEntries(used_slots zend.ZendLong, next any, data []*zend.Zval) *VarEntries {
-//     return &VarEntries{
-//         used_slots:used_slots,
-//         next:next,
-//         data:data,
-//     }
-// }
 // func MakeVarEntries(used_slots zend.ZendLong, next any, data []*zend.Zval) VarEntries {
 //     return VarEntries{
 //         used_slots:used_slots,
@@ -46,13 +39,6 @@ type VarDtorEntries struct {
 	data       []zend.Zval
 }
 
-// func NewVarDtorEntries(used_slots zend.ZendLong, next any, data []zend.Zval) *VarDtorEntries {
-//     return &VarDtorEntries{
-//         used_slots:used_slots,
-//         next:next,
-//         data:data,
-//     }
-// }
 // func MakeVarDtorEntries(used_slots zend.ZendLong, next any, data []zend.Zval) VarDtorEntries {
 //     return VarDtorEntries{
 //         used_slots:used_slots,
@@ -82,30 +68,27 @@ type PhpUnserializeData struct {
 	entries         VarEntries
 }
 
-// func NewPhpUnserializeData(last *VarEntries, first_dtor *VarDtorEntries, last_dtor *VarDtorEntries, allowed_classes *zend.HashTable, ref_props *zend.HashTable, cur_depth zend.ZendLong, max_depth zend.ZendLong, entries VarEntries) *PhpUnserializeData {
-//     return &PhpUnserializeData{
-//         last:last,
-//         first_dtor:first_dtor,
-//         last_dtor:last_dtor,
-//         allowed_classes:allowed_classes,
-//         ref_props:ref_props,
-//         cur_depth:cur_depth,
-//         max_depth:max_depth,
-//         entries:entries,
-//     }
-// }
-// func MakePhpUnserializeData(last *VarEntries, first_dtor *VarDtorEntries, last_dtor *VarDtorEntries, allowed_classes *zend.HashTable, ref_props *zend.HashTable, cur_depth zend.ZendLong, max_depth zend.ZendLong, entries VarEntries) PhpUnserializeData {
-//     return PhpUnserializeData{
-//         last:last,
-//         first_dtor:first_dtor,
-//         last_dtor:last_dtor,
-//         allowed_classes:allowed_classes,
-//         ref_props:ref_props,
-//         cur_depth:cur_depth,
-//         max_depth:max_depth,
-//         entries:entries,
-//     }
-// }
+//             func MakePhpUnserializeData(
+// last *VarEntries,
+// first_dtor *VarDtorEntries,
+// last_dtor *VarDtorEntries,
+// allowed_classes *zend.HashTable,
+// ref_props *zend.HashTable,
+// cur_depth zend.ZendLong,
+// max_depth zend.ZendLong,
+// entries VarEntries,
+// ) PhpUnserializeData {
+//                 return PhpUnserializeData{
+//                     last:last,
+//                     first_dtor:first_dtor,
+//                     last_dtor:last_dtor,
+//                     allowed_classes:allowed_classes,
+//                     ref_props:ref_props,
+//                     cur_depth:cur_depth,
+//                     max_depth:max_depth,
+//                     entries:entries,
+//                 }
+//             }
 func (this *PhpUnserializeData) GetLast() *VarEntries               { return this.last }
 func (this *PhpUnserializeData) SetLast(value *VarEntries)          { this.last = value }
 func (this *PhpUnserializeData) GetFirstDtor() *VarDtorEntries      { return this.first_dtor }

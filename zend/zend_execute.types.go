@@ -11,13 +11,6 @@ type _zendVmStack struct {
 	prev ZendVmStack
 }
 
-// func New_zendVmStack(top *Zval, end *Zval, prev ZendVmStack) *_zendVmStack {
-//     return &_zendVmStack{
-//         top:top,
-//         end:end,
-//         prev:prev,
-//     }
-// }
 // func Make_zendVmStack(top *Zval, end *Zval, prev ZendVmStack) _zendVmStack {
 //     return _zendVmStack{
 //         top:top,

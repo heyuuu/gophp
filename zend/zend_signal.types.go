@@ -10,12 +10,6 @@ type ZendSignalEntryT struct {
 	handler any
 }
 
-// func NewZendSignalEntryT(flags int, handler any) *ZendSignalEntryT {
-//     return &ZendSignalEntryT{
-//         flags:flags,
-//         handler:handler,
-//     }
-// }
 // func MakeZendSignalEntryT(flags int, handler any) ZendSignalEntryT {
 //     return ZendSignalEntryT{
 //         flags:flags,
@@ -52,13 +46,6 @@ type ZendSignalT struct {
 	context any
 }
 
-// func NewZendSignalT(signo int, siginfo *siginfo_t, context any) *ZendSignalT {
-//     return &ZendSignalT{
-//         signo:signo,
-//         siginfo:siginfo,
-//         context:context,
-//     }
-// }
 // func MakeZendSignalT(signo int, siginfo *siginfo_t, context any) ZendSignalT {
 //     return ZendSignalT{
 //         signo:signo,
@@ -81,12 +68,6 @@ type ZendSignalQueueT struct {
 	next        *ZendSignalQueueT
 }
 
-// func NewZendSignalQueueT(zend_signal ZendSignalT, next *ZendSignalQueueT) *ZendSignalQueueT {
-//     return &ZendSignalQueueT{
-//         zend_signal:zend_signal,
-//         next:next,
-//     }
-// }
 // func MakeZendSignalQueueT(zend_signal ZendSignalT, next *ZendSignalQueueT) ZendSignalQueueT {
 //     return ZendSignalQueueT{
 //         zend_signal:zend_signal,
@@ -116,36 +97,33 @@ type ZendSignalGlobalsT struct {
 	pavail   *ZendSignalQueueT
 }
 
-// func NewZendSignalGlobalsT(depth int, blocked int, running int, active int, check ZendBool, reset ZendBool, handlers []ZendSignalEntryT, pstorage []ZendSignalQueueT, phead *ZendSignalQueueT, ptail *ZendSignalQueueT, pavail *ZendSignalQueueT) *ZendSignalGlobalsT {
-//     return &ZendSignalGlobalsT{
-//         depth:depth,
-//         blocked:blocked,
-//         running:running,
-//         active:active,
-//         check:check,
-//         reset:reset,
-//         handlers:handlers,
-//         pstorage:pstorage,
-//         phead:phead,
-//         ptail:ptail,
-//         pavail:pavail,
-//     }
-// }
-// func MakeZendSignalGlobalsT(depth int, blocked int, running int, active int, check ZendBool, reset ZendBool, handlers []ZendSignalEntryT, pstorage []ZendSignalQueueT, phead *ZendSignalQueueT, ptail *ZendSignalQueueT, pavail *ZendSignalQueueT) ZendSignalGlobalsT {
-//     return ZendSignalGlobalsT{
-//         depth:depth,
-//         blocked:blocked,
-//         running:running,
-//         active:active,
-//         check:check,
-//         reset:reset,
-//         handlers:handlers,
-//         pstorage:pstorage,
-//         phead:phead,
-//         ptail:ptail,
-//         pavail:pavail,
-//     }
-// }
+//             func MakeZendSignalGlobalsT(
+// depth int,
+// blocked int,
+// running int,
+// active int,
+// check ZendBool,
+// reset ZendBool,
+// handlers []ZendSignalEntryT,
+// pstorage []ZendSignalQueueT,
+// phead *ZendSignalQueueT,
+// ptail *ZendSignalQueueT,
+// pavail *ZendSignalQueueT,
+// ) ZendSignalGlobalsT {
+//                 return ZendSignalGlobalsT{
+//                     depth:depth,
+//                     blocked:blocked,
+//                     running:running,
+//                     active:active,
+//                     check:check,
+//                     reset:reset,
+//                     handlers:handlers,
+//                     pstorage:pstorage,
+//                     phead:phead,
+//                     ptail:ptail,
+//                     pavail:pavail,
+//                 }
+//             }
 // func (this *ZendSignalGlobalsT)  GetDepth() int      { return this.depth }
 // func (this *ZendSignalGlobalsT) SetDepth(value int) { this.depth = value }
 // func (this *ZendSignalGlobalsT)  GetBlocked() int      { return this.blocked }

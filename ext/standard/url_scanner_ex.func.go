@@ -9,7 +9,15 @@ import (
 )
 
 func TagDtor(zv *zend.Zval) { zend.Free(zv.GetPtr()) }
-func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int, type_ int) int {
+func PhpIniOnUpdateTags(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+	type_ int,
+) int {
 	var ctx *UrlAdaptStateExT
 	var key *byte
 	var tmp *byte
@@ -51,13 +59,35 @@ func PhpIniOnUpdateTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh
 	zend.Efree(tmp)
 	return zend.SUCCESS
 }
-func OnUpdateSessionTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateSessionTags(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	return PhpIniOnUpdateTags(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 1)
 }
-func OnUpdateOutputTags(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateOutputTags(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	return PhpIniOnUpdateTags(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 0)
 }
-func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int, type_ int) int {
+func PhpIniOnUpdateHosts(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+	type_ int,
+) int {
 	var hosts *zend.HashTable
 	var key *byte
 	var tmp *byte
@@ -89,10 +119,24 @@ func PhpIniOnUpdateHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, m
 	zend.Efree(tmp)
 	return zend.SUCCESS
 }
-func OnUpdateSessionHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateSessionHosts(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	return PhpIniOnUpdateHosts(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 1)
 }
-func OnUpdateOutputHosts(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateOutputHosts(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	return PhpIniOnUpdateHosts(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage, 0)
 }
 func AppendModifiedUrl(url *zend.SmartStr, dest *zend.SmartStr, url_app *zend.SmartStr, separator *byte) {
@@ -769,7 +813,14 @@ stop:
 	}
 	ctx.GetBuf().GetS().GetLen() = rest
 }
-func PhpUrlScannerAdaptSingleUrl(url *byte, urllen int, name *byte, value *byte, newlen *int, encode int) *byte {
+func PhpUrlScannerAdaptSingleUrl(
+	url *byte,
+	urllen int,
+	name *byte,
+	value *byte,
+	newlen *int,
+	encode int,
+) *byte {
 	var result *byte
 	var surl zend.SmartStr = zend.MakeSmartStr(0)
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -846,7 +897,14 @@ func PhpUrlScannerExDeactivate(type_ int) int {
 	ctx.GetAttrVal().Free()
 	return zend.SUCCESS
 }
-func PhpUrlScannerSessionHandlerImpl(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int, type_ int) {
+func PhpUrlScannerSessionHandlerImpl(
+	output *byte,
+	output_len int,
+	handled_output **byte,
+	handled_output_len *int,
+	mode int,
+	type_ int,
+) {
 	var len_ int
 	var url_state *UrlAdaptStateExT
 	if type_ != 0 {
@@ -884,7 +942,14 @@ func PhpUrlScannerSessionHandler(output *byte, output_len int, handled_output **
 func PhpUrlScannerOutputHandler(output *byte, output_len int, handled_output **byte, handled_output_len *int, mode int) {
 	PhpUrlScannerSessionHandlerImpl(output, output_len, handled_output, handled_output_len, mode, 0)
 }
-func PhpUrlScannerAddVarImpl(name *byte, name_len int, value *byte, value_len int, encode int, type_ int) int {
+func PhpUrlScannerAddVarImpl(
+	name *byte,
+	name_len int,
+	value *byte,
+	value_len int,
+	encode int,
+	type_ int,
+) int {
 	var sname zend.SmartStr = zend.MakeSmartStr(0)
 	var svalue zend.SmartStr = zend.MakeSmartStr(0)
 	var hname zend.SmartStr = zend.MakeSmartStr(0)

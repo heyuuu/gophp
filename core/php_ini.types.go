@@ -14,12 +14,6 @@ type PhpExtensionLists struct {
 	functions zend.ZendLlist
 }
 
-// func NewPhpExtensionLists(engine zend.ZendLlist, functions zend.ZendLlist) *PhpExtensionLists {
-//     return &PhpExtensionLists{
-//         engine:engine,
-//         functions:functions,
-//     }
-// }
 // func MakePhpExtensionLists(engine zend.ZendLlist, functions zend.ZendLlist) PhpExtensionLists {
 //     return PhpExtensionLists{
 //         engine:engine,

@@ -10,12 +10,6 @@ type SpecialFormsT struct {
 	order int
 }
 
-// func NewSpecialFormsT(name *byte, order int) *SpecialFormsT {
-//     return &SpecialFormsT{
-//         name:name,
-//         order:order,
-//     }
-// }
 func MakeSpecialFormsT(name *byte, order int) SpecialFormsT {
 	return SpecialFormsT{
 		name:  name,

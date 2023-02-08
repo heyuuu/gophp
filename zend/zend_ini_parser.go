@@ -419,12 +419,6 @@ type IniUnionYyalloc struct /* union */ {
 	yyvs_alloc Zval
 }
 
-// func NewIniUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc Zval) *IniUnionYyalloc {
-//     return &IniUnionYyalloc{
-//         yyss_alloc:yyss_alloc,
-//         yyvs_alloc:yyvs_alloc,
-//     }
-// }
 // func MakeIniUnionYyalloc(yyss_alloc yytype_int16, yyvs_alloc Zval) IniUnionYyalloc {
 //     return IniUnionYyalloc{
 //         yyss_alloc:yyss_alloc,

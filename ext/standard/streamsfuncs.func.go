@@ -1565,7 +1565,16 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetLong(retval)
 	return
 }
-func UserSpaceStreamNotifier(context *core.PhpStreamContext, notifycode int, severity int, xmsg *byte, xcode int, bytes_sofar int, bytes_max int, ptr any) {
+func UserSpaceStreamNotifier(
+	context *core.PhpStreamContext,
+	notifycode int,
+	severity int,
+	xmsg *byte,
+	xcode int,
+	bytes_sofar int,
+	bytes_max int,
+	ptr any,
+) {
 	var callback *zend.Zval = context.GetNotifier().GetPtr()
 	var retval zend.Zval
 	var zvs []zend.Zval

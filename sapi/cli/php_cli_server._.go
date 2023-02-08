@@ -8,6 +8,47 @@ import (
 	"sik/zend"
 )
 
+// Source: <sapi/cli/php_cli_server.h>
+
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Moriyoshi Koizumi <moriyoshi@php.net>                        |
+   +----------------------------------------------------------------------+
+*/
+
+// Source: <sapi/cli/php_cli_server.c>
+
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Moriyoshi Koizumi <moriyoshi@php.net>                        |
+   |         Xinchen Hui       <laruence@php.net>                         |
+   +----------------------------------------------------------------------+
+*/
+
 const SOCK_EINVAL = EINVAL
 const SOCK_EAGAIN = EAGAIN
 const SOCK_EINTR = EINTR
@@ -23,7 +64,7 @@ var PhpCliServerMaster pid_t
 var PhpCliServerWorkers *pid_t
 var PhpCliServerWorkersMax zend.ZendLong
 
-var TemplateMap = []PhpCliServerHttpResponseStatusCodePair{
+var TemplateMap []PhpCliServerHttpResponseStatusCodePair = []PhpCliServerHttpResponseStatusCodePair{
 	MakePhpCliServerHttpResponseStatusCodePair(400, "<h1>%s</h1><p>Your browser sent a request that this server could not understand.</p>"),
 	MakePhpCliServerHttpResponseStatusCodePair(404, "<h1>%s</h1><p>The requested resource <code class=\"url\">%s</code> was not found on this server.</p>"),
 	MakePhpCliServerHttpResponseStatusCodePair(500, "<h1>%s</h1><p>The server is temporarily unavailable.</p>"),
@@ -39,6 +80,15 @@ var PhpCliOutputIsTty int = OUTPUT_NOT_CHECKED
 var PhpCliServerRequestErrorUnexpectedEof []byte = "Unexpected EOF"
 var CliServerGlobals ZendCliServerGlobals
 
+/* {{{ static char php_cli_server_css[]
+ * copied from ext/standard/info.c
+ */
+
+var PhpCliServerCss []byte = "<style>\n" + "body { background-color: #fcfcfc; color: #333333; margin: 0; padding:0; }\n" + "h1 { font-size: 1.5em; font-weight: normal; background-color: #9999cc; min-height:2em; line-height:2em; border-bottom: 1px inset black; margin: 0; }\n" + "h1, p { padding-left: 10px; }\n" + "code.url { background-color: #eeeeee; font-family:monospace; padding:0 2px;}\n" + "</style>\n"
+var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
+	zend.MakeZendIniEntryDef("cli_server.color", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendCliServerGlobals)(nil).GetColor()))-(*byte)(nil))), any(&CliServerGlobals), nil, "0", zend.ZendIniBooleanDisplayerCb, b.SizeOf("\"0\"")-1, b.SizeOf("\"cli_server.color\"")-1, core.PHP_INI_ALL),
+	zend.MakeZendIniEntryDef(nil, nil, nil, nil, nil, nil, nil, 0, 0, 0),
+}
 var CliServerModuleEntry zend.ZendModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 var ArginfoNoArgs []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
@@ -52,6 +102,11 @@ var ServerAdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntr
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
-var CliServerSapiModule core.sapi_module_struct = core.MakeSapiModule("cli-server", "Built-in HTTP server", SapiCliServerStartup, core.PhpModuleShutdownWrapper, nil, nil, SapiCliServerUbWrite, SapiCliServerFlush, nil, nil, core.PhpError, nil, SapiCliServerSendHeaders, nil, SapiCliServerReadPost, SapiCliServerReadCookies, SapiCliServerRegisterVariables, SapiCliServerLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
+/* {{{ sapi_module_struct cli_server_sapi_module
+ */
+
+var CliServerSapiModule core.sapi_module_struct = core.Make_sapiModule("cli-server", "Built-in HTTP server", SapiCliServerStartup, core.PhpModuleShutdownWrapper, nil, nil, SapiCliServerUbWrite, SapiCliServerFlush, nil, nil, core.PhpError, nil, SapiCliServerSendHeaders, nil, SapiCliServerReadPost, SapiCliServerReadCookies, SapiCliServerRegisterVariables, SapiCliServerLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
+
+/* {{{ php_cli_server_client_read_request */
 
 var Server PhpCliServer

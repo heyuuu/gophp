@@ -3155,7 +3155,14 @@ func ZifBaseConvert(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 func _phpMathNumberFormat(d float64, dec int, dec_point byte, thousand_sep byte) *zend.ZendString {
 	return _phpMathNumberFormatEx(d, dec, &dec_point, 1, &thousand_sep, 1)
 }
-func _phpMathNumberFormatEx(d float64, dec int, dec_point *byte, dec_point_len int, thousand_sep *byte, thousand_sep_len int) *zend.ZendString {
+func _phpMathNumberFormatEx(
+	d float64,
+	dec int,
+	dec_point *byte,
+	dec_point_len int,
+	thousand_sep *byte,
+	thousand_sep_len int,
+) *zend.ZendString {
 	var res *zend.ZendString
 	var tmpbuf *zend.ZendString
 	var s *byte

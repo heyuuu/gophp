@@ -85,7 +85,14 @@ func FcgiHashStrndup(h *FcgiHash, str *byte, str_len uint) *byte {
 	h.GetData().SetPos(h.GetData().GetPos() + str_len + 1)
 	return ret
 }
-func FcgiHashSet(h *FcgiHash, hash_value uint, var_ *byte, var_len uint, val *byte, val_len uint) *byte {
+func FcgiHashSet(
+	h *FcgiHash,
+	hash_value uint,
+	var_ *byte,
+	var_len uint,
+	val *byte,
+	val_len uint,
+) *byte {
 	var idx uint = hash_value & FCGI_HASH_TABLE_MASK
 	var p *FcgiHashBucket = h.GetHashTable()[idx]
 	for p != nil {

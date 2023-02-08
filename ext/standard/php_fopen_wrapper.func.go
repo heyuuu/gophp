@@ -94,7 +94,14 @@ func PhpStreamApplyFilterList(stream *core.PhpStream, filterlist *byte, read_cha
 		p = core.PhpStrtokR(nil, "|", &token)
 	}
 }
-func PhpStreamUrlWrapPhp(wrapper *core.PhpStreamWrapper, path *byte, mode *byte, options int, opened_path **zend.ZendString, context *core.PhpStreamContext) *core.PhpStream {
+func PhpStreamUrlWrapPhp(
+	wrapper *core.PhpStreamWrapper,
+	path *byte,
+	mode *byte,
+	options int,
+	opened_path **zend.ZendString,
+	context *core.PhpStreamContext,
+) *core.PhpStream {
 	var fd int = -1
 	var mode_rw int = 0
 	var stream *core.PhpStream = nil

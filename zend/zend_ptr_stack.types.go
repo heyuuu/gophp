@@ -13,15 +13,6 @@ type ZendPtrStack struct {
 	persistent  ZendBool
 }
 
-// func NewZendPtrStack(top int, max int, elements *any, top_element *any, persistent ZendBool) *ZendPtrStack {
-//     return &ZendPtrStack{
-//         top:top,
-//         max:max,
-//         elements:elements,
-//         top_element:top_element,
-//         persistent:persistent,
-//     }
-// }
 // func MakeZendPtrStack(top int, max int, elements *any, top_element *any, persistent ZendBool) ZendPtrStack {
 //     return ZendPtrStack{
 //         top:top,

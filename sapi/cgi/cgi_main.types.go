@@ -21,32 +21,29 @@ type php_cgi_globals_struct struct {
 	fcgi_logging        zend.ZendBool
 }
 
-// func Newphp_cgi_globals_struct(user_config_cache zend.HashTable, redirect_status_env *byte, rfc2616_headers zend.ZendBool, nph zend.ZendBool, check_shebang_line zend.ZendBool, fix_pathinfo zend.ZendBool, force_redirect zend.ZendBool, discard_path zend.ZendBool, fcgi_logging zend.ZendBool) *php_cgi_globals_struct {
-//     return &php_cgi_globals_struct{
-//         user_config_cache:user_config_cache,
-//         redirect_status_env:redirect_status_env,
-//         rfc2616_headers:rfc2616_headers,
-//         nph:nph,
-//         check_shebang_line:check_shebang_line,
-//         fix_pathinfo:fix_pathinfo,
-//         force_redirect:force_redirect,
-//         discard_path:discard_path,
-//         fcgi_logging:fcgi_logging,
-//     }
-// }
-// func Makephp_cgi_globals_struct(user_config_cache zend.HashTable, redirect_status_env *byte, rfc2616_headers zend.ZendBool, nph zend.ZendBool, check_shebang_line zend.ZendBool, fix_pathinfo zend.ZendBool, force_redirect zend.ZendBool, discard_path zend.ZendBool, fcgi_logging zend.ZendBool) php_cgi_globals_struct {
-//     return php_cgi_globals_struct{
-//         user_config_cache:user_config_cache,
-//         redirect_status_env:redirect_status_env,
-//         rfc2616_headers:rfc2616_headers,
-//         nph:nph,
-//         check_shebang_line:check_shebang_line,
-//         fix_pathinfo:fix_pathinfo,
-//         force_redirect:force_redirect,
-//         discard_path:discard_path,
-//         fcgi_logging:fcgi_logging,
-//     }
-// }
+//             func Makephp_cgi_globals_struct(
+// user_config_cache zend.HashTable,
+// redirect_status_env *byte,
+// rfc2616_headers zend.ZendBool,
+// nph zend.ZendBool,
+// check_shebang_line zend.ZendBool,
+// fix_pathinfo zend.ZendBool,
+// force_redirect zend.ZendBool,
+// discard_path zend.ZendBool,
+// fcgi_logging zend.ZendBool,
+// ) php_cgi_globals_struct {
+//                 return php_cgi_globals_struct{
+//                     user_config_cache:user_config_cache,
+//                     redirect_status_env:redirect_status_env,
+//                     rfc2616_headers:rfc2616_headers,
+//                     nph:nph,
+//                     check_shebang_line:check_shebang_line,
+//                     fix_pathinfo:fix_pathinfo,
+//                     force_redirect:force_redirect,
+//                     discard_path:discard_path,
+//                     fcgi_logging:fcgi_logging,
+//                 }
+//             }
 func (this *php_cgi_globals_struct) GetUserConfigCache() zend.HashTable {
 	return this.user_config_cache
 }
@@ -87,12 +84,6 @@ type UserConfigCacheEntry struct {
 	user_config *zend.HashTable
 }
 
-// func NewUserConfigCacheEntry(expires int64, user_config *zend.HashTable) *UserConfigCacheEntry {
-//     return &UserConfigCacheEntry{
-//         expires:expires,
-//         user_config:user_config,
-//     }
-// }
 // func MakeUserConfigCacheEntry(expires int64, user_config *zend.HashTable) UserConfigCacheEntry {
 //     return UserConfigCacheEntry{
 //         expires:expires,

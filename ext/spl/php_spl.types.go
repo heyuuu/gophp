@@ -18,26 +18,23 @@ type ZendSplGlobals struct {
 	autoload_running    int
 }
 
-// func NewZendSplGlobals(autoload_extensions *zend.ZendString, autoload_functions *zend.HashTable, hash_mask_handle intPtr, hash_mask_handlers intPtr, hash_mask_init int, autoload_running int) *ZendSplGlobals {
-//     return &ZendSplGlobals{
-//         autoload_extensions:autoload_extensions,
-//         autoload_functions:autoload_functions,
-//         hash_mask_handle:hash_mask_handle,
-//         hash_mask_handlers:hash_mask_handlers,
-//         hash_mask_init:hash_mask_init,
-//         autoload_running:autoload_running,
-//     }
-// }
-// func MakeZendSplGlobals(autoload_extensions *zend.ZendString, autoload_functions *zend.HashTable, hash_mask_handle intPtr, hash_mask_handlers intPtr, hash_mask_init int, autoload_running int) ZendSplGlobals {
-//     return ZendSplGlobals{
-//         autoload_extensions:autoload_extensions,
-//         autoload_functions:autoload_functions,
-//         hash_mask_handle:hash_mask_handle,
-//         hash_mask_handlers:hash_mask_handlers,
-//         hash_mask_init:hash_mask_init,
-//         autoload_running:autoload_running,
-//     }
-// }
+//             func MakeZendSplGlobals(
+// autoload_extensions *zend.ZendString,
+// autoload_functions *zend.HashTable,
+// hash_mask_handle intPtr,
+// hash_mask_handlers intPtr,
+// hash_mask_init int,
+// autoload_running int,
+// ) ZendSplGlobals {
+//                 return ZendSplGlobals{
+//                     autoload_extensions:autoload_extensions,
+//                     autoload_functions:autoload_functions,
+//                     hash_mask_handle:hash_mask_handle,
+//                     hash_mask_handlers:hash_mask_handlers,
+//                     hash_mask_init:hash_mask_init,
+//                     autoload_running:autoload_running,
+//                 }
+//             }
 // func (this *ZendSplGlobals)  GetAutoloadExtensions() *zend.ZendString      { return this.autoload_extensions }
 func (this *ZendSplGlobals) SetAutoloadExtensions(value *zend.ZendString) {
 	this.autoload_extensions = value
@@ -67,14 +64,6 @@ type AutoloadFuncInfo struct {
 	ce       *zend.ZendClassEntry
 }
 
-// func NewAutoloadFuncInfo(func_ptr *zend.ZendFunction, obj zend.Zval, closure zend.Zval, ce *zend.ZendClassEntry) *AutoloadFuncInfo {
-//     return &AutoloadFuncInfo{
-//         func_ptr:func_ptr,
-//         obj:obj,
-//         closure:closure,
-//         ce:ce,
-//     }
-// }
 // func MakeAutoloadFuncInfo(func_ptr *zend.ZendFunction, obj zend.Zval, closure zend.Zval, ce *zend.ZendClassEntry) AutoloadFuncInfo {
 //     return AutoloadFuncInfo{
 //         func_ptr:func_ptr,

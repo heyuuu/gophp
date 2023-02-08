@@ -12,14 +12,6 @@ type PhpStreamMmapRange struct {
 	mapped *byte
 }
 
-// func NewPhpStreamMmapRange(offset int, length int, mode PhpStreamMmapAccessT, mapped *byte) *PhpStreamMmapRange {
-//     return &PhpStreamMmapRange{
-//         offset:offset,
-//         length:length,
-//         mode:mode,
-//         mapped:mapped,
-//     }
-// }
 // func MakePhpStreamMmapRange(offset int, length int, mode PhpStreamMmapAccessT, mapped *byte) PhpStreamMmapRange {
 //     return PhpStreamMmapRange{
 //         offset:offset,

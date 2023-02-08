@@ -12,14 +12,6 @@ type COOKIE_IO_FUNCTIONS_T struct {
 	closer func(any) int
 }
 
-// func NewCOOKIE_IO_FUNCTIONS_T(reader func(any, *byte, int) int, writer func(any, *byte, int) int, seeker func(any, PHP_FPOS_T, int) PHP_FPOS_T, closer func(any) int) *COOKIE_IO_FUNCTIONS_T {
-//     return &COOKIE_IO_FUNCTIONS_T{
-//         reader:reader,
-//         writer:writer,
-//         seeker:seeker,
-//         closer:closer,
-//     }
-// }
 func MakeCOOKIE_IO_FUNCTIONS_T(reader func(any, *byte, int) int, writer func(any, *byte, int) int, seeker func(any, PHP_FPOS_T, int) PHP_FPOS_T, closer func(any) int) COOKIE_IO_FUNCTIONS_T {
 	return COOKIE_IO_FUNCTIONS_T{
 		reader: reader,

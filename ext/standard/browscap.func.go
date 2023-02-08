@@ -331,7 +331,14 @@ func BrowscapBdataDtor(bdata *BrowserData, persistent int) {
 	}
 	bdata.GetFilename()[0] = '0'
 }
-func OnChangeBrowscap(entry *zend.ZendIniEntry, new_value *zend.ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnChangeBrowscap(
+	entry *zend.ZendIniEntry,
+	new_value *zend.ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if stage == core.PHP_INI_STAGE_STARTUP {
 
 		/* value handled in browscap.c's MINIT */

@@ -11,13 +11,6 @@ type PhpLcgGlobals struct {
 	seeded int
 }
 
-// func NewPhpLcgGlobals(s1 int32, s2 int32, seeded int) *PhpLcgGlobals {
-//     return &PhpLcgGlobals{
-//         s1:s1,
-//         s2:s2,
-//         seeded:seeded,
-//     }
-// }
 // func MakePhpLcgGlobals(s1 int32, s2 int32, seeded int) PhpLcgGlobals {
 //     return PhpLcgGlobals{
 //         s1:s1,

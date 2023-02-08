@@ -12,14 +12,6 @@ type Sha512Ctx struct {
 	buffer []byte
 }
 
-// func NewSha512Ctx(H []uint64, total []uint64, buflen uint64, buffer []byte) *Sha512Ctx {
-//     return &Sha512Ctx{
-//         H:H,
-//         total:total,
-//         buflen:buflen,
-//         buffer:buffer,
-//     }
-// }
 // func MakeSha512Ctx(H []uint64, total []uint64, buflen uint64, buffer []byte) Sha512Ctx {
 //     return Sha512Ctx{
 //         H:H,

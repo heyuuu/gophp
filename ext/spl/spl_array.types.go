@@ -23,36 +23,33 @@ type SplArrayObject struct {
 	std             zend.ZendObject
 }
 
-// func NewSplArrayObject(array zend.Zval, ht_iter uint32, ar_flags int, nApplyCount uint8, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, std zend.ZendObject) *SplArrayObject {
-//     return &SplArrayObject{
-//         array:array,
-//         ht_iter:ht_iter,
-//         ar_flags:ar_flags,
-//         nApplyCount:nApplyCount,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         ce_get_iterator:ce_get_iterator,
-//         std:std,
-//     }
-// }
-// func MakeSplArrayObject(array zend.Zval, ht_iter uint32, ar_flags int, nApplyCount uint8, fptr_offset_get *zend.ZendFunction, fptr_offset_set *zend.ZendFunction, fptr_offset_has *zend.ZendFunction, fptr_offset_del *zend.ZendFunction, fptr_count *zend.ZendFunction, ce_get_iterator *zend.ZendClassEntry, std zend.ZendObject) SplArrayObject {
-//     return SplArrayObject{
-//         array:array,
-//         ht_iter:ht_iter,
-//         ar_flags:ar_flags,
-//         nApplyCount:nApplyCount,
-//         fptr_offset_get:fptr_offset_get,
-//         fptr_offset_set:fptr_offset_set,
-//         fptr_offset_has:fptr_offset_has,
-//         fptr_offset_del:fptr_offset_del,
-//         fptr_count:fptr_count,
-//         ce_get_iterator:ce_get_iterator,
-//         std:std,
-//     }
-// }
+//             func MakeSplArrayObject(
+// array zend.Zval,
+// ht_iter uint32,
+// ar_flags int,
+// nApplyCount uint8,
+// fptr_offset_get *zend.ZendFunction,
+// fptr_offset_set *zend.ZendFunction,
+// fptr_offset_has *zend.ZendFunction,
+// fptr_offset_del *zend.ZendFunction,
+// fptr_count *zend.ZendFunction,
+// ce_get_iterator *zend.ZendClassEntry,
+// std zend.ZendObject,
+// ) SplArrayObject {
+//                 return SplArrayObject{
+//                     array:array,
+//                     ht_iter:ht_iter,
+//                     ar_flags:ar_flags,
+//                     nApplyCount:nApplyCount,
+//                     fptr_offset_get:fptr_offset_get,
+//                     fptr_offset_set:fptr_offset_set,
+//                     fptr_offset_has:fptr_offset_has,
+//                     fptr_offset_del:fptr_offset_del,
+//                     fptr_count:fptr_count,
+//                     ce_get_iterator:ce_get_iterator,
+//                     std:std,
+//                 }
+//             }
 func (this *SplArrayObject) GetArray() zend.Zval { return this.array }
 
 // func (this *SplArrayObject) SetArray(value zend.Zval) { this.array = value }

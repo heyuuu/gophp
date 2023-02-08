@@ -10,12 +10,6 @@ type ZendExtensionVersionInfo struct {
 	build_id              *byte
 }
 
-// func NewZendExtensionVersionInfo(zend_extension_api_no int, build_id *byte) *ZendExtensionVersionInfo {
-//     return &ZendExtensionVersionInfo{
-//         zend_extension_api_no:zend_extension_api_no,
-//         build_id:build_id,
-//     }
-// }
 // func MakeZendExtensionVersionInfo(zend_extension_api_no int, build_id *byte) ZendExtensionVersionInfo {
 //     return ZendExtensionVersionInfo{
 //         zend_extension_api_no:zend_extension_api_no,
@@ -61,66 +55,63 @@ type ZendExtension struct {
 	resource_number       int
 }
 
-// func NewZendExtension(name *byte, version *byte, author *byte, URL *byte, copyright *byte, startup StartupFuncT, shutdown ShutdownFuncT, activate ActivateFuncT, deactivate DeactivateFuncT, message_handler MessageHandlerFuncT, op_array_handler OpArrayHandlerFuncT, statement_handler StatementHandlerFuncT, fcall_begin_handler FcallBeginHandlerFuncT, fcall_end_handler FcallEndHandlerFuncT, op_array_ctor OpArrayCtorFuncT, op_array_dtor OpArrayDtorFuncT, api_no_check func(api_no int) int, build_id_check func(build_id *byte) int, op_array_persist_calc OpArrayPersistCalcFuncT, op_array_persist OpArrayPersistFuncT, reserved5 any, reserved6 any, reserved7 any, reserved8 any, handle any, resource_number int) *ZendExtension {
-//     return &ZendExtension{
-//         name:name,
-//         version:version,
-//         author:author,
-//         URL:URL,
-//         copyright:copyright,
-//         startup:startup,
-//         shutdown:shutdown,
-//         activate:activate,
-//         deactivate:deactivate,
-//         message_handler:message_handler,
-//         op_array_handler:op_array_handler,
-//         statement_handler:statement_handler,
-//         fcall_begin_handler:fcall_begin_handler,
-//         fcall_end_handler:fcall_end_handler,
-//         op_array_ctor:op_array_ctor,
-//         op_array_dtor:op_array_dtor,
-//         api_no_check:api_no_check,
-//         build_id_check:build_id_check,
-//         op_array_persist_calc:op_array_persist_calc,
-//         op_array_persist:op_array_persist,
-//         reserved5:reserved5,
-//         reserved6:reserved6,
-//         reserved7:reserved7,
-//         reserved8:reserved8,
-//         handle:handle,
-//         resource_number:resource_number,
-//     }
-// }
-// func MakeZendExtension(name *byte, version *byte, author *byte, URL *byte, copyright *byte, startup StartupFuncT, shutdown ShutdownFuncT, activate ActivateFuncT, deactivate DeactivateFuncT, message_handler MessageHandlerFuncT, op_array_handler OpArrayHandlerFuncT, statement_handler StatementHandlerFuncT, fcall_begin_handler FcallBeginHandlerFuncT, fcall_end_handler FcallEndHandlerFuncT, op_array_ctor OpArrayCtorFuncT, op_array_dtor OpArrayDtorFuncT, api_no_check func(api_no int) int, build_id_check func(build_id *byte) int, op_array_persist_calc OpArrayPersistCalcFuncT, op_array_persist OpArrayPersistFuncT, reserved5 any, reserved6 any, reserved7 any, reserved8 any, handle any, resource_number int) ZendExtension {
-//     return ZendExtension{
-//         name:name,
-//         version:version,
-//         author:author,
-//         URL:URL,
-//         copyright:copyright,
-//         startup:startup,
-//         shutdown:shutdown,
-//         activate:activate,
-//         deactivate:deactivate,
-//         message_handler:message_handler,
-//         op_array_handler:op_array_handler,
-//         statement_handler:statement_handler,
-//         fcall_begin_handler:fcall_begin_handler,
-//         fcall_end_handler:fcall_end_handler,
-//         op_array_ctor:op_array_ctor,
-//         op_array_dtor:op_array_dtor,
-//         api_no_check:api_no_check,
-//         build_id_check:build_id_check,
-//         op_array_persist_calc:op_array_persist_calc,
-//         op_array_persist:op_array_persist,
-//         reserved5:reserved5,
-//         reserved6:reserved6,
-//         reserved7:reserved7,
-//         reserved8:reserved8,
-//         handle:handle,
-//         resource_number:resource_number,
-//     }
-// }
+//             func MakeZendExtension(
+// name *byte,
+// version *byte,
+// author *byte,
+// URL *byte,
+// copyright *byte,
+// startup StartupFuncT,
+// shutdown ShutdownFuncT,
+// activate ActivateFuncT,
+// deactivate DeactivateFuncT,
+// message_handler MessageHandlerFuncT,
+// op_array_handler OpArrayHandlerFuncT,
+// statement_handler StatementHandlerFuncT,
+// fcall_begin_handler FcallBeginHandlerFuncT,
+// fcall_end_handler FcallEndHandlerFuncT,
+// op_array_ctor OpArrayCtorFuncT,
+// op_array_dtor OpArrayDtorFuncT,
+// api_no_check func(api_no int) int,
+// build_id_check func(build_id *byte) int,
+// op_array_persist_calc OpArrayPersistCalcFuncT,
+// op_array_persist OpArrayPersistFuncT,
+// reserved5 any,
+// reserved6 any,
+// reserved7 any,
+// reserved8 any,
+// handle any,
+// resource_number int,
+// ) ZendExtension {
+//                 return ZendExtension{
+//                     name:name,
+//                     version:version,
+//                     author:author,
+//                     URL:URL,
+//                     copyright:copyright,
+//                     startup:startup,
+//                     shutdown:shutdown,
+//                     activate:activate,
+//                     deactivate:deactivate,
+//                     message_handler:message_handler,
+//                     op_array_handler:op_array_handler,
+//                     statement_handler:statement_handler,
+//                     fcall_begin_handler:fcall_begin_handler,
+//                     fcall_end_handler:fcall_end_handler,
+//                     op_array_ctor:op_array_ctor,
+//                     op_array_dtor:op_array_dtor,
+//                     api_no_check:api_no_check,
+//                     build_id_check:build_id_check,
+//                     op_array_persist_calc:op_array_persist_calc,
+//                     op_array_persist:op_array_persist,
+//                     reserved5:reserved5,
+//                     reserved6:reserved6,
+//                     reserved7:reserved7,
+//                     reserved8:reserved8,
+//                     handle:handle,
+//                     resource_number:resource_number,
+//                 }
+//             }
 func (this *ZendExtension) GetName() *byte { return this.name }
 
 // func (this *ZendExtension) SetName(value *byte) { this.name = value }
@@ -208,13 +199,6 @@ type ZendExtensionPersistData struct {
 	mem      *byte
 }
 
-// func NewZendExtensionPersistData(op_array *ZendOpArray, size int, mem *byte) *ZendExtensionPersistData {
-//     return &ZendExtensionPersistData{
-//         op_array:op_array,
-//         size:size,
-//         mem:mem,
-//     }
-// }
 // func MakeZendExtensionPersistData(op_array *ZendOpArray, size int, mem *byte) ZendExtensionPersistData {
 //     return ZendExtensionPersistData{
 //         op_array:op_array,

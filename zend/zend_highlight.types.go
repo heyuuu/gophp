@@ -13,15 +13,6 @@ type ZendSyntaxHighlighterIni struct {
 	highlight_keyword *byte
 }
 
-// func NewZendSyntaxHighlighterIni(highlight_html *byte, highlight_comment *byte, highlight_default *byte, highlight_string *byte, highlight_keyword *byte) *ZendSyntaxHighlighterIni {
-//     return &ZendSyntaxHighlighterIni{
-//         highlight_html:highlight_html,
-//         highlight_comment:highlight_comment,
-//         highlight_default:highlight_default,
-//         highlight_string:highlight_string,
-//         highlight_keyword:highlight_keyword,
-//     }
-// }
 // func MakeZendSyntaxHighlighterIni(highlight_html *byte, highlight_comment *byte, highlight_default *byte, highlight_string *byte, highlight_keyword *byte) ZendSyntaxHighlighterIni {
 //     return ZendSyntaxHighlighterIni{
 //         highlight_html:highlight_html,

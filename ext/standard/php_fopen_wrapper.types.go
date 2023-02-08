@@ -15,12 +15,6 @@ type PhpStreamInputT struct {
 	position zend.ZendOffT
 }
 
-// func NewPhpStreamInputT(body *core.PhpStream, position zend.ZendOffT) *PhpStreamInputT {
-//     return &PhpStreamInputT{
-//         body:body,
-//         position:position,
-//     }
-// }
 // func MakePhpStreamInputT(body *core.PhpStream, position zend.ZendOffT) PhpStreamInputT {
 //     return PhpStreamInputT{
 //         body:body,

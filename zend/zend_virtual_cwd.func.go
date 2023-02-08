@@ -198,7 +198,14 @@ func RealpathCacheDel(path *byte, path_len int) {
 		}
 	}
 }
-func RealpathCacheAdd(path *byte, path_len int, realpath *byte, realpath_len int, is_dir int, t int64) {
+func RealpathCacheAdd(
+	path *byte,
+	path_len int,
+	realpath *byte,
+	realpath_len int,
+	is_dir int,
+	t int64,
+) {
 	var size ZendLong = b.SizeOf("realpath_cache_bucket") + path_len + 1
 	var same int = 1
 	if realpath_len != path_len || memcmp(path, realpath, path_len) != 0 {
@@ -263,7 +270,16 @@ func RealpathCacheMaxBuckets() ZendLong {
 	return b.SizeOf("CWDG ( realpath_cache )") / b.SizeOf("CWDG ( realpath_cache ) [ 0 ]")
 }
 func RealpathCacheGetBuckets() **RealpathCacheBucket { return CWDG(realpath_cache) }
-func TsrmRealpathR(path *byte, start int, len_ int, ll *int, t *int64, use_realpath int, is_dir int, link_is_dir *int) int {
+func TsrmRealpathR(
+	path *byte,
+	start int,
+	len_ int,
+	ll *int,
+	t *int64,
+	use_realpath int,
+	is_dir int,
+	link_is_dir *int,
+) int {
 	var i int
 	var j int
 	var directory int = 0

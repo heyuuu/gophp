@@ -421,7 +421,14 @@ error:
 	}
 	return SCAN_ERROR_INVALID_FORMAT
 }
-func PhpSscanfInternal(string *byte, format *byte, argCount int, args *zend.Zval, varStart int, return_value *zend.Zval) int {
+func PhpSscanfInternal(
+	string *byte,
+	format *byte,
+	argCount int,
+	args *zend.Zval,
+	varStart int,
+	return_value *zend.Zval,
+) int {
 	var numVars int
 	var nconversions int
 	var totalVars int = -1

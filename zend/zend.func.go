@@ -28,7 +28,14 @@ func ZEND_PUTS(str string) int                              { return ZendWrite(s
 func ZEND_PUTS_EX(str __auto__) __auto__                    { return write_func(str, strlen(str)) }
 func ZEND_PUTC(c byte) int                                  { return ZendWrite(&c, 1) }
 func ZEND_UV(name __auto__) __auto__                        { return ZendUv.name }
-func OnUpdateErrorReporting(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateErrorReporting(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if new_value == nil {
 		EG__().SetErrorReporting(E_ALL & ^E_NOTICE & ^E_STRICT & ^E_DEPRECATED)
 	} else {
@@ -36,7 +43,14 @@ func OnUpdateErrorReporting(entry *ZendIniEntry, new_value *ZendString, mh_arg1 
 	}
 	return SUCCESS
 }
-func OnUpdateGCEnabled(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateGCEnabled(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var val ZendBool
 	val = ZendIniParseBool(new_value)
 	GcEnable(val)
@@ -49,7 +63,14 @@ func ZendGcEnabledDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		ZEND_PUTS("Off")
 	}
 }
-func OnUpdateScriptEncoding(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateScriptEncoding(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	if CG__().GetMultibyte() == 0 {
 		return FAILURE
 	}
@@ -58,7 +79,14 @@ func OnUpdateScriptEncoding(entry *ZendIniEntry, new_value *ZendString, mh_arg1 
 	}
 	return ZendMultibyteSetScriptEncodingByString(b.CondF1(new_value != nil, func() []byte { return new_value.GetVal() }, nil), b.CondF1(new_value != nil, func() int { return new_value.GetLen() }, 0))
 }
-func OnUpdateAssertions(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int {
+func OnUpdateAssertions(
+	entry *ZendIniEntry,
+	new_value *ZendString,
+	mh_arg1 any,
+	mh_arg2 any,
+	mh_arg3 any,
+	stage int,
+) int {
 	var p *ZendLong
 	var val ZendLong
 	var base *byte = (*byte)(mh_arg2)

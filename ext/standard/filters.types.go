@@ -16,14 +16,6 @@ type PhpStripTagsFilter struct {
 	persistent       uint8
 }
 
-// func NewPhpStripTagsFilter(allowed_tags *byte, allowed_tags_len int, state uint8, persistent uint8) *PhpStripTagsFilter {
-//     return &PhpStripTagsFilter{
-//         allowed_tags:allowed_tags,
-//         allowed_tags_len:allowed_tags_len,
-//         state:state,
-//         persistent:persistent,
-//     }
-// }
 // func MakePhpStripTagsFilter(allowed_tags *byte, allowed_tags_len int, state uint8, persistent uint8) PhpStripTagsFilter {
 //     return PhpStripTagsFilter{
 //         allowed_tags:allowed_tags,
@@ -49,12 +41,6 @@ type PhpConv struct {
 	dtor       PhpConvDtorFunc
 }
 
-// func NewPhpConv(convert_op PhpConvConvertFunc, dtor PhpConvDtorFunc) *PhpConv {
-//     return &PhpConv{
-//         convert_op:convert_op,
-//         dtor:dtor,
-//     }
-// }
 // func MakePhpConv(convert_op PhpConvConvertFunc, dtor PhpConvDtorFunc) PhpConv {
 //     return PhpConv{
 //         convert_op:convert_op,
@@ -81,32 +67,29 @@ type PhpConvBase64Encode struct {
 	erem        []uint8
 }
 
-// func NewPhpConvBase64Encode(_super PhpConv, lbchars *byte, lbchars_len int, erem_len int, line_ccnt uint, line_len uint, lbchars_dup int, persistent int, erem []uint8) *PhpConvBase64Encode {
-//     return &PhpConvBase64Encode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         erem_len:erem_len,
-//         line_ccnt:line_ccnt,
-//         line_len:line_len,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         erem:erem,
-//     }
-// }
-// func MakePhpConvBase64Encode(_super PhpConv, lbchars *byte, lbchars_len int, erem_len int, line_ccnt uint, line_len uint, lbchars_dup int, persistent int, erem []uint8) PhpConvBase64Encode {
-//     return PhpConvBase64Encode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         erem_len:erem_len,
-//         line_ccnt:line_ccnt,
-//         line_len:line_len,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         erem:erem,
-//     }
-// }
+//             func MakePhpConvBase64Encode(
+// _super PhpConv,
+// lbchars *byte,
+// lbchars_len int,
+// erem_len int,
+// line_ccnt uint,
+// line_len uint,
+// lbchars_dup int,
+// persistent int,
+// erem []uint8,
+// ) PhpConvBase64Encode {
+//                 return PhpConvBase64Encode{
+//                     _super:_super,
+//                     lbchars:lbchars,
+//                     lbchars_len:lbchars_len,
+//                     erem_len:erem_len,
+//                     line_ccnt:line_ccnt,
+//                     line_len:line_len,
+//                     lbchars_dup:lbchars_dup,
+//                     persistent:persistent,
+//                     erem:erem,
+//                 }
+//             }
 func (this *PhpConvBase64Encode) GetSuper() PhpConv { return this._super }
 
 // func (this *PhpConvBase64Encode) SetSuper(value PhpConv) { this._super = value }
@@ -139,15 +122,6 @@ type PhpConvBase64Decode struct {
 	eos        int
 }
 
-// func NewPhpConvBase64Decode(_super PhpConv, urem uint, urem_nbits uint, ustat uint, eos int) *PhpConvBase64Decode {
-//     return &PhpConvBase64Decode{
-//         _super:_super,
-//         urem:urem,
-//         urem_nbits:urem_nbits,
-//         ustat:ustat,
-//         eos:eos,
-//     }
-// }
 // func MakePhpConvBase64Decode(_super PhpConv, urem uint, urem_nbits uint, ustat uint, eos int) PhpConvBase64Decode {
 //     return PhpConvBase64Decode{
 //         _super:_super,
@@ -185,34 +159,31 @@ type PhpConvQprintEncode struct {
 	lb_cnt      uint
 }
 
-// func NewPhpConvQprintEncode(_super PhpConv, lbchars *byte, lbchars_len int, opts int, line_ccnt uint, line_len uint, lbchars_dup int, persistent int, lb_ptr uint, lb_cnt uint) *PhpConvQprintEncode {
-//     return &PhpConvQprintEncode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         opts:opts,
-//         line_ccnt:line_ccnt,
-//         line_len:line_len,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         lb_ptr:lb_ptr,
-//         lb_cnt:lb_cnt,
-//     }
-// }
-// func MakePhpConvQprintEncode(_super PhpConv, lbchars *byte, lbchars_len int, opts int, line_ccnt uint, line_len uint, lbchars_dup int, persistent int, lb_ptr uint, lb_cnt uint) PhpConvQprintEncode {
-//     return PhpConvQprintEncode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         opts:opts,
-//         line_ccnt:line_ccnt,
-//         line_len:line_len,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         lb_ptr:lb_ptr,
-//         lb_cnt:lb_cnt,
-//     }
-// }
+//             func MakePhpConvQprintEncode(
+// _super PhpConv,
+// lbchars *byte,
+// lbchars_len int,
+// opts int,
+// line_ccnt uint,
+// line_len uint,
+// lbchars_dup int,
+// persistent int,
+// lb_ptr uint,
+// lb_cnt uint,
+// ) PhpConvQprintEncode {
+//                 return PhpConvQprintEncode{
+//                     _super:_super,
+//                     lbchars:lbchars,
+//                     lbchars_len:lbchars_len,
+//                     opts:opts,
+//                     line_ccnt:line_ccnt,
+//                     line_len:line_len,
+//                     lbchars_dup:lbchars_dup,
+//                     persistent:persistent,
+//                     lb_ptr:lb_ptr,
+//                     lb_cnt:lb_cnt,
+//                 }
+//             }
 func (this *PhpConvQprintEncode) GetSuper() PhpConv { return this._super }
 
 // func (this *PhpConvQprintEncode) SetSuper(value PhpConv) { this._super = value }
@@ -250,32 +221,29 @@ type PhpConvQprintDecode struct {
 	lb_cnt      uint
 }
 
-// func NewPhpConvQprintDecode(_super PhpConv, lbchars *byte, lbchars_len int, scan_stat int, next_char uint, lbchars_dup int, persistent int, lb_ptr uint, lb_cnt uint) *PhpConvQprintDecode {
-//     return &PhpConvQprintDecode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         scan_stat:scan_stat,
-//         next_char:next_char,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         lb_ptr:lb_ptr,
-//         lb_cnt:lb_cnt,
-//     }
-// }
-// func MakePhpConvQprintDecode(_super PhpConv, lbchars *byte, lbchars_len int, scan_stat int, next_char uint, lbchars_dup int, persistent int, lb_ptr uint, lb_cnt uint) PhpConvQprintDecode {
-//     return PhpConvQprintDecode{
-//         _super:_super,
-//         lbchars:lbchars,
-//         lbchars_len:lbchars_len,
-//         scan_stat:scan_stat,
-//         next_char:next_char,
-//         lbchars_dup:lbchars_dup,
-//         persistent:persistent,
-//         lb_ptr:lb_ptr,
-//         lb_cnt:lb_cnt,
-//     }
-// }
+//             func MakePhpConvQprintDecode(
+// _super PhpConv,
+// lbchars *byte,
+// lbchars_len int,
+// scan_stat int,
+// next_char uint,
+// lbchars_dup int,
+// persistent int,
+// lb_ptr uint,
+// lb_cnt uint,
+// ) PhpConvQprintDecode {
+//                 return PhpConvQprintDecode{
+//                     _super:_super,
+//                     lbchars:lbchars,
+//                     lbchars_len:lbchars_len,
+//                     scan_stat:scan_stat,
+//                     next_char:next_char,
+//                     lbchars_dup:lbchars_dup,
+//                     persistent:persistent,
+//                     lb_ptr:lb_ptr,
+//                     lb_cnt:lb_cnt,
+//                 }
+//             }
 func (this *PhpConvQprintDecode) GetSuper() PhpConv { return this._super }
 
 // func (this *PhpConvQprintDecode) SetSuper(value PhpConv) { this._super = value }
@@ -307,15 +275,6 @@ type PhpConvertFilter struct {
 	stub_len   int
 }
 
-// func NewPhpConvertFilter(cd *PhpConv, persistent int, filtername *byte, stub []byte, stub_len int) *PhpConvertFilter {
-//     return &PhpConvertFilter{
-//         cd:cd,
-//         persistent:persistent,
-//         filtername:filtername,
-//         stub:stub,
-//         stub_len:stub_len,
-//     }
-// }
 // func MakePhpConvertFilter(cd *PhpConv, persistent int, filtername *byte, stub []byte, stub_len int) PhpConvertFilter {
 //     return PhpConvertFilter{
 //         cd:cd,
@@ -347,13 +306,6 @@ type PhpConsumedFilterData struct {
 	persistent uint8
 }
 
-// func NewPhpConsumedFilterData(consumed int, offset zend.ZendOffT, persistent uint8) *PhpConsumedFilterData {
-//     return &PhpConsumedFilterData{
-//         consumed:consumed,
-//         offset:offset,
-//         persistent:persistent,
-//     }
-// }
 // func MakePhpConsumedFilterData(consumed int, offset zend.ZendOffT, persistent uint8) PhpConsumedFilterData {
 //     return PhpConsumedFilterData{
 //         consumed:consumed,
@@ -377,13 +329,6 @@ type PhpChunkedFilterData struct {
 	persistent int
 }
 
-// func NewPhpChunkedFilterData(chunk_size int, state PhpChunkedFilterState, persistent int) *PhpChunkedFilterData {
-//     return &PhpChunkedFilterData{
-//         chunk_size:chunk_size,
-//         state:state,
-//         persistent:persistent,
-//     }
-// }
 // func MakePhpChunkedFilterData(chunk_size int, state PhpChunkedFilterState, persistent int) PhpChunkedFilterData {
 //     return PhpChunkedFilterData{
 //         chunk_size:chunk_size,

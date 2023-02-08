@@ -13,11 +13,6 @@ type MultipartEventStart struct {
 	content_length int
 }
 
-// func NewMultipartEventStart(content_length int) *MultipartEventStart {
-//     return &MultipartEventStart{
-//         content_length:content_length,
-//     }
-// }
 // func MakeMultipartEventStart(content_length int) MultipartEventStart {
 //     return MultipartEventStart{
 //         content_length:content_length,
@@ -37,15 +32,6 @@ type MultipartEventFormdata struct {
 	newlength            *int
 }
 
-// func NewMultipartEventFormdata(post_bytes_processed int, name *byte, value **byte, length int, newlength *int) *MultipartEventFormdata {
-//     return &MultipartEventFormdata{
-//         post_bytes_processed:post_bytes_processed,
-//         name:name,
-//         value:value,
-//         length:length,
-//         newlength:newlength,
-//     }
-// }
 // func MakeMultipartEventFormdata(post_bytes_processed int, name *byte, value **byte, length int, newlength *int) MultipartEventFormdata {
 //     return MultipartEventFormdata{
 //         post_bytes_processed:post_bytes_processed,
@@ -81,13 +67,6 @@ type MultipartEventFileStart struct {
 	filename             **byte
 }
 
-// func NewMultipartEventFileStart(post_bytes_processed int, name *byte, filename **byte) *MultipartEventFileStart {
-//     return &MultipartEventFileStart{
-//         post_bytes_processed:post_bytes_processed,
-//         name:name,
-//         filename:filename,
-//     }
-// }
 // func MakeMultipartEventFileStart(post_bytes_processed int, name *byte, filename **byte) MultipartEventFileStart {
 //     return MultipartEventFileStart{
 //         post_bytes_processed:post_bytes_processed,
@@ -117,15 +96,6 @@ type MultipartEventFileData struct {
 	newlength            *int
 }
 
-// func NewMultipartEventFileData(post_bytes_processed int, offset zend.ZendOffT, data *byte, length int, newlength *int) *MultipartEventFileData {
-//     return &MultipartEventFileData{
-//         post_bytes_processed:post_bytes_processed,
-//         offset:offset,
-//         data:data,
-//         length:length,
-//         newlength:newlength,
-//     }
-// }
 // func MakeMultipartEventFileData(post_bytes_processed int, offset zend.ZendOffT, data *byte, length int, newlength *int) MultipartEventFileData {
 //     return MultipartEventFileData{
 //         post_bytes_processed:post_bytes_processed,
@@ -161,13 +131,6 @@ type MultipartEventFileEnd struct {
 	cancel_upload        int
 }
 
-// func NewMultipartEventFileEnd(post_bytes_processed int, temp_filename *byte, cancel_upload int) *MultipartEventFileEnd {
-//     return &MultipartEventFileEnd{
-//         post_bytes_processed:post_bytes_processed,
-//         temp_filename:temp_filename,
-//         cancel_upload:cancel_upload,
-//     }
-// }
 // func MakeMultipartEventFileEnd(post_bytes_processed int, temp_filename *byte, cancel_upload int) MultipartEventFileEnd {
 //     return MultipartEventFileEnd{
 //         post_bytes_processed:post_bytes_processed,
@@ -193,11 +156,6 @@ type MultipartEventEnd struct {
 	post_bytes_processed int
 }
 
-// func NewMultipartEventEnd(post_bytes_processed int) *MultipartEventEnd {
-//     return &MultipartEventEnd{
-//         post_bytes_processed:post_bytes_processed,
-//     }
-// }
 // func MakeMultipartEventEnd(post_bytes_processed int) MultipartEventEnd {
 //     return MultipartEventEnd{
 //         post_bytes_processed:post_bytes_processed,
@@ -222,34 +180,31 @@ type MultipartBuffer struct {
 	detect_order_size int
 }
 
-// func NewMultipartBuffer(buffer *byte, buf_begin *byte, bufsize int, bytes_in_buffer int, boundary *byte, boundary_next *byte, boundary_next_len int, input_encoding *zend.ZendEncoding, detect_order **zend.ZendEncoding, detect_order_size int) *MultipartBuffer {
-//     return &MultipartBuffer{
-//         buffer:buffer,
-//         buf_begin:buf_begin,
-//         bufsize:bufsize,
-//         bytes_in_buffer:bytes_in_buffer,
-//         boundary:boundary,
-//         boundary_next:boundary_next,
-//         boundary_next_len:boundary_next_len,
-//         input_encoding:input_encoding,
-//         detect_order:detect_order,
-//         detect_order_size:detect_order_size,
-//     }
-// }
-// func MakeMultipartBuffer(buffer *byte, buf_begin *byte, bufsize int, bytes_in_buffer int, boundary *byte, boundary_next *byte, boundary_next_len int, input_encoding *zend.ZendEncoding, detect_order **zend.ZendEncoding, detect_order_size int) MultipartBuffer {
-//     return MultipartBuffer{
-//         buffer:buffer,
-//         buf_begin:buf_begin,
-//         bufsize:bufsize,
-//         bytes_in_buffer:bytes_in_buffer,
-//         boundary:boundary,
-//         boundary_next:boundary_next,
-//         boundary_next_len:boundary_next_len,
-//         input_encoding:input_encoding,
-//         detect_order:detect_order,
-//         detect_order_size:detect_order_size,
-//     }
-// }
+//             func MakeMultipartBuffer(
+// buffer *byte,
+// buf_begin *byte,
+// bufsize int,
+// bytes_in_buffer int,
+// boundary *byte,
+// boundary_next *byte,
+// boundary_next_len int,
+// input_encoding *zend.ZendEncoding,
+// detect_order **zend.ZendEncoding,
+// detect_order_size int,
+// ) MultipartBuffer {
+//                 return MultipartBuffer{
+//                     buffer:buffer,
+//                     buf_begin:buf_begin,
+//                     bufsize:bufsize,
+//                     bytes_in_buffer:bytes_in_buffer,
+//                     boundary:boundary,
+//                     boundary_next:boundary_next,
+//                     boundary_next_len:boundary_next_len,
+//                     input_encoding:input_encoding,
+//                     detect_order:detect_order,
+//                     detect_order_size:detect_order_size,
+//                 }
+//             }
 func (this *MultipartBuffer) GetBuffer() *byte           { return this.buffer }
 func (this *MultipartBuffer) SetBuffer(value *byte)      { this.buffer = value }
 func (this *MultipartBuffer) GetBufBegin() *byte         { return this.buf_begin }
@@ -281,12 +236,6 @@ type MimeHeaderEntry struct {
 	value *byte
 }
 
-// func NewMimeHeaderEntry(key *byte, value *byte) *MimeHeaderEntry {
-//     return &MimeHeaderEntry{
-//         key:key,
-//         value:value,
-//     }
-// }
 func MakeMimeHeaderEntry(key *byte, value *byte) MimeHeaderEntry {
 	return MimeHeaderEntry{
 		key:   key,

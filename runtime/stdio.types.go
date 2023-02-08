@@ -28,54 +28,51 @@ type FILE struct {
 	_offset  fpos_t
 }
 
-// func NewFILE(_p *uint8, _r int, _w int, _flags short, _file short, _bf __struct____sbuf, _lbfsize int, _cookie any, _close func(any) int, _read func(any, *byte, int) int, _seek func(any, fpos_t, int) fpos_t, _write func(any, *byte, int) int, _ub __struct____sbuf, _extra *__struct____sFILEX, _ur int, _ubuf []uint8, _nbuf []uint8, _lb __struct____sbuf, _blksize int, _offset fpos_t) *FILE {
-//     return &FILE{
-//         _p:_p,
-//         _r:_r,
-//         _w:_w,
-//         _flags:_flags,
-//         _file:_file,
-//         _bf:_bf,
-//         _lbfsize:_lbfsize,
-//         _cookie:_cookie,
-//         _close:_close,
-//         _read:_read,
-//         _seek:_seek,
-//         _write:_write,
-//         _ub:_ub,
-//         _extra:_extra,
-//         _ur:_ur,
-//         _ubuf:_ubuf,
-//         _nbuf:_nbuf,
-//         _lb:_lb,
-//         _blksize:_blksize,
-//         _offset:_offset,
-//     }
-// }
-// func MakeFILE(_p *uint8, _r int, _w int, _flags short, _file short, _bf __struct____sbuf, _lbfsize int, _cookie any, _close func(any) int, _read func(any, *byte, int) int, _seek func(any, fpos_t, int) fpos_t, _write func(any, *byte, int) int, _ub __struct____sbuf, _extra *__struct____sFILEX, _ur int, _ubuf []uint8, _nbuf []uint8, _lb __struct____sbuf, _blksize int, _offset fpos_t) FILE {
-//     return FILE{
-//         _p:_p,
-//         _r:_r,
-//         _w:_w,
-//         _flags:_flags,
-//         _file:_file,
-//         _bf:_bf,
-//         _lbfsize:_lbfsize,
-//         _cookie:_cookie,
-//         _close:_close,
-//         _read:_read,
-//         _seek:_seek,
-//         _write:_write,
-//         _ub:_ub,
-//         _extra:_extra,
-//         _ur:_ur,
-//         _ubuf:_ubuf,
-//         _nbuf:_nbuf,
-//         _lb:_lb,
-//         _blksize:_blksize,
-//         _offset:_offset,
-//     }
-// }
+//             func MakeFILE(
+// _p *uint8,
+// _r int,
+// _w int,
+// _flags short,
+// _file short,
+// _bf __struct____sbuf,
+// _lbfsize int,
+// _cookie any,
+// _close func(any) int,
+// _read func(any, *byte, int) int,
+// _seek func(any, fpos_t, int) fpos_t,
+// _write func(any, *byte, int) int,
+// _ub __struct____sbuf,
+// _extra *__struct____sFILEX,
+// _ur int,
+// _ubuf []uint8,
+// _nbuf []uint8,
+// _lb __struct____sbuf,
+// _blksize int,
+// _offset fpos_t,
+// ) FILE {
+//                 return FILE{
+//                     _p:_p,
+//                     _r:_r,
+//                     _w:_w,
+//                     _flags:_flags,
+//                     _file:_file,
+//                     _bf:_bf,
+//                     _lbfsize:_lbfsize,
+//                     _cookie:_cookie,
+//                     _close:_close,
+//                     _read:_read,
+//                     _seek:_seek,
+//                     _write:_write,
+//                     _ub:_ub,
+//                     _extra:_extra,
+//                     _ur:_ur,
+//                     _ubuf:_ubuf,
+//                     _nbuf:_nbuf,
+//                     _lb:_lb,
+//                     _blksize:_blksize,
+//                     _offset:_offset,
+//                 }
+//             }
 // func (this *FILE)  GetP() *uint8      { return this._p }
 // func (this *FILE) SetP(value *uint8) { this._p = value }
 // func (this *FILE)  GetR() int      { return this._r }
