@@ -53,9 +53,8 @@ const PHP_MODE_REFLECTION_EXT_INFO = 11
 const PHP_MODE_REFLECTION_ZEND_EXTENSION = 12
 const PHP_MODE_SHOW_INI_CONFIG = 13
 
-var CliShellCallbacks CliShellCallbacksT = MakeCliShellCallbacksT(nil, nil, nil)
-var HARDCODED_INI []byte = "html_errors=0\n" + "register_argc_argv=1\n" + "implicit_flush=1\n" + "output_buffering=0\n" + "max_execution_time=0\n" + "max_input_time=-1\n0"
-var OPTIONS []core.Opt = []core.Opt{
+var HARDCODED_INI = "html_errors=0\n" + "register_argc_argv=1\n" + "implicit_flush=1\n" + "output_buffering=0\n" + "max_execution_time=0\n" + "max_input_time=-1\n0"
+var OPTIONS = []core.Opt{
 	core.MakeOpt('a', 0, "interactive"),
 	core.MakeOpt('B', 1, "process-begin"),
 	core.MakeOpt('C', 0, "no-chdir"),
@@ -99,27 +98,19 @@ var OPTIONS []core.Opt = []core.Opt{
 const STDOUT_FILENO = 1
 const STDERR_FILENO = 2
 
-var PhpSelf *byte = ""
-var ScriptFilename *byte = ""
-var CliSapiModule core.sapi_module_struct = core.Make_sapiModule("cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, core.PhpError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
-var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var PhpSelf = ""
+var ScriptFilename = ""
+var CliSapiModule = core.MakeSapiModule("cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage)
+var ArginfoDl = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),
 }
-var AdditionalFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
+var AdditionalFunctions = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("dl", standard.ZifDl, ArginfoDl, uint32(b.SizeOf("arginfo_dl")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("cli_set_process_title", ZifCliSetProcessTitle, ArginfoCliSetProcessTitle, uint32(b.SizeOf("arginfo_cli_set_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("cli_get_process_title", ZifCliGetProcessTitle, ArginfoCliGetProcessTitle, uint32(b.SizeOf("arginfo_cli_get_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
-/* {{{ php_cli_usage
- */
-
 var SInProcess *core.PhpStream = nil
-var ParamModeConflict *byte = "Either execute direct code, process stdin or use a file.\n"
-
-/* {{{ cli_seek_file_begin
- */
-
-/*}}}*/
+var ParamModeConflict = "Either execute direct code, process stdin or use a file.\n"
