@@ -996,7 +996,7 @@ func PassTwo(op_array *ZendOpArray) int {
 		if (opline.GetResultType() & (IS_VAR | IS_TMP_VAR)) != 0 {
 			opline.GetResult().SetVar(uint32(ZendIntptrT(ZEND_CALL_VAR_NUM(nil, op_array.GetLastVar()+opline.GetResult().GetVar()))))
 		}
-		ZEND_VM_SET_OPCODE_HANDLER(opline)
+		ZendVmSetOpcodeHandler(opline)
 		opline++
 	}
 	ZendCalcLiveRanges(op_array, nil)

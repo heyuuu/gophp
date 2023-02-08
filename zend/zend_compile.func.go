@@ -3716,7 +3716,7 @@ func ZendResolveGotoLabel(op_array *ZendOpArray, opline *ZendOp) {
 	for b.PostDec(&remove_oplines) {
 		opline--
 		MAKE_NOP(opline)
-		ZEND_VM_SET_OPCODE_HANDLER(opline)
+		ZendVmSetOpcodeHandler(opline)
 	}
 }
 func ZendCompileGoto(ast *ZendAst) {

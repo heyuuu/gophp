@@ -369,16 +369,16 @@ func ZendSetDefaultCompileTimeValues() {
 func ZendInitExceptionOp() {
 	memset(EG__().GetExceptionOp(), 0, b.SizeOf("EG ( exception_op )"))
 	EG__().GetExceptionOp()[0].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp())
+	ZendVmSetOpcodeHandler(EG__().GetExceptionOp())
 	EG__().GetExceptionOp()[1].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp() + 1)
+	ZendVmSetOpcodeHandler(EG__().GetExceptionOp() + 1)
 	EG__().GetExceptionOp()[2].SetOpcode(ZEND_HANDLE_EXCEPTION)
-	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetExceptionOp() + 2)
+	ZendVmSetOpcodeHandler(EG__().GetExceptionOp() + 2)
 }
 func ZendInitCallTrampolineOp() {
 	memset(EG__().GetCallTrampolineOp(), 0, b.SizeOf("EG ( call_trampoline_op )"))
 	EG__().GetCallTrampolineOp().SetOpcode(ZEND_CALL_TRAMPOLINE)
-	ZEND_VM_SET_OPCODE_HANDLER(EG__().GetCallTrampolineOp())
+	ZendVmSetOpcodeHandler(EG__().GetCallTrampolineOp())
 }
 func AutoGlobalDtor(zv *Zval) { Free(zv.GetPtr()) }
 func IniScannerGlobalsCtor(scanner_globals_p *ZendIniScannerGlobals) {
