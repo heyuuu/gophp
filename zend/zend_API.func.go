@@ -8,46 +8,8 @@ import (
 )
 
 func ZEND_NS_NAME(ns string, name string) string { return ns + "\\" + name }
-func ZEND_MODULE_POST_ZEND_DEACTIVATE_D(module __auto__) {
-	var zm_post_zend_deactivate_module func() int
-}
-func INIT_CLASS_ENTRY_INIT_METHODS(class_container ZendClassEntry, functions []ZendFunctionEntry) {
-	class_container.SetConstructor(nil)
-	class_container.SetDestructor(nil)
-	class_container.SetClone(nil)
-	class_container.SetSerialize(nil)
-	class_container.SetUnserialize(nil)
-	class_container.SetCreateObject(nil)
-	class_container.SetGetStaticMethod(nil)
-	class_container.SetCall(nil)
-	class_container.SetCallstatic(nil)
-	class_container.SetTostring(nil)
-	class_container.SetGet(nil)
-	class_container.SetSet(nil)
-	class_container.SetUnset(nil)
-	class_container.SetIsset(nil)
-	class_container.SetDebugInfo(nil)
-	class_container.SetSerializeFunc(nil)
-	class_container.SetUnserializeFunc(nil)
-	class_container.SetParent(nil)
-	class_container.SetNumInterfaces(0)
-	class_container.SetTraitNames(nil)
-	class_container.SetNumTraits(0)
-	class_container.SetTraitAliases(nil)
-	class_container.SetTraitPrecedences(nil)
-	class_container.SetInterfaces(nil)
-	class_container.SetGetIterator(nil)
-	class_container.SetIteratorFuncsPtr(nil)
-	class_container.SetModule(nil)
-	class_container.SetBuiltinFunctions(functions)
-}
-func INIT_NS_CLASS_ENTRY(class_container __auto__, ns string, class_name string, functions __auto__) {
-	memset(&class_container, 0, b.SizeOf("zend_class_entry"))
-	class_container.name = ZendStringInitInterned(ZEND_NS_NAME(ns, class_name), b.SizeOf("ZEND_NS_NAME ( ns , class_name )")-1, 1)
-	class_container.info.internal.builtin_functions = functions
-}
 func CE_STATIC_MEMBERS(ce *ZendClassEntry) *Zval {
-	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table))
+	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table__ptr))
 }
 func ZEND_FCI_INITIALIZED(fci ZendFcallInfo) bool { return fci.GetSize() != 0 }
 func ZendGetParametersArray(ht uint32, param_count int, argument_array *Zval) int {
@@ -3191,7 +3153,7 @@ func ZendDisableClass(class_name *byte, class_name_length int) int {
 	if disabled_class == nil {
 		return FAILURE
 	}
-	INIT_CLASS_ENTRY_INIT_METHODS(*disabled_class, DisabledClassNew)
+	disabled_class.InitMethods(DisabledClassNew)
 	disabled_class.SetCreateObject(DisplayDisabledClass)
 	var __ht *HashTable = disabled_class.GetFunctionTable()
 	for _, _p := range __ht.foreachData() {

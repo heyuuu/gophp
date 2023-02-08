@@ -68,6 +68,40 @@ type ZendClassEntry struct {
 	}
 }
 
+func (this *ZendClassEntry) InitMethods(functions []ZendFunctionEntry) {
+	this.SetConstructor(nil)
+	this.SetDestructor(nil)
+	this.SetClone(nil)
+	this.SetSerialize(nil)
+	this.SetUnserialize(nil)
+	this.SetCreateObject(nil)
+	this.SetGetStaticMethod(nil)
+	this.SetCall(nil)
+	this.SetCallstatic(nil)
+	this.SetTostring(nil)
+	this.SetGet(nil)
+	this.SetSet(nil)
+	this.SetUnset(nil)
+	this.SetIsset(nil)
+	this.SetDebugInfo(nil)
+	this.SetSerializeFunc(nil)
+	this.SetUnserializeFunc(nil)
+	this.SetParent(nil)
+	this.SetNumInterfaces(0)
+	this.SetTraitNames(nil)
+	this.SetNumTraits(0)
+	this.SetTraitAliases(nil)
+	this.SetTraitPrecedences(nil)
+	this.SetInterfaces(nil)
+	this.SetGetIterator(nil)
+	this.SetIteratorFuncsPtr(nil)
+	this.SetModule(nil)
+	this.SetBuiltinFunctions(functions)
+}
+
+/**
+ * Getter / Setter
+ */
 func (this *ZendClassEntry) GetType() byte                   { return this.type_ }
 func (this *ZendClassEntry) SetType(value byte)              { this.type_ = value }
 func (this *ZendClassEntry) GetName() *ZendString            { return this.name }
@@ -101,17 +135,9 @@ func (this *ZendClassEntry) SetDefaultStaticMembersTable(value *Zval) {
 	this.default_static_members_table = value
 }
 func (this *ZendClassEntry) GetStaticMembersTablePtr() **Zval { return this.static_members_table__ptr }
-
-// func (this *ZendClassEntry) SetStaticMembersTablePtr(value **Zval) { this.static_members_table__ptr = value }
-func (this *ZendClassEntry) GetFunctionTable() HashTable { return this.function_table }
-
-// func (this *ZendClassEntry) SetFunctionTable(value HashTable) { this.function_table = value }
-func (this *ZendClassEntry) GetPropertiesInfo() HashTable { return this.properties_info }
-
-// func (this *ZendClassEntry) SetPropertiesInfo(value HashTable) { this.properties_info = value }
-func (this *ZendClassEntry) GetConstantsTable() HashTable { return this.constants_table }
-
-// func (this *ZendClassEntry) SetConstantsTable(value HashTable) { this.constants_table = value }
+func (this *ZendClassEntry) GetFunctionTable() HashTable      { return this.function_table }
+func (this *ZendClassEntry) GetPropertiesInfo() HashTable     { return this.properties_info }
+func (this *ZendClassEntry) GetConstantsTable() HashTable     { return this.constants_table }
 func (this *ZendClassEntry) GetPropertiesInfoTable() **ZendPropertyInfo {
 	return this.properties_info_table
 }
