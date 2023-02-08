@@ -1453,7 +1453,7 @@ func CoreGlobalsDtor(core_globals *PhpCoreGlobals) {
 	}
 	PhpShutdownTicks()
 }
-func ZmInfoPhpCore(ZEND_MODULE_INFO_FUNC_ARGS) {
+func ZmInfoPhpCore(zend_module *zend.ZendModuleEntry) {
 	standard.PhpInfoPrintTableStart()
 	standard.PhpInfoPrintTableRow(2, "PHP Version", PHP_VERSION)
 	standard.PhpInfoPrintTableEnd()

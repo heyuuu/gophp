@@ -665,7 +665,7 @@ func PhpMail(to *byte, subject *byte, message *byte, headers *byte, extra_cmd *b
 	}
 	return 1
 }
-func ZmInfoMail(ZEND_MODULE_INFO_FUNC_ARGS) {
+func ZmInfoMail(zend_module *zend.ZendModuleEntry) {
 	var sendmail_path *byte = zend.INI_STR("sendmail_path")
 	PhpInfoPrintTableRow(2, "Path to sendmail", sendmail_path)
 }

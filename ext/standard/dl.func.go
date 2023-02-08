@@ -238,6 +238,6 @@ func PhpDl(file *byte, type_ int, return_value *zend.Zval, start_now int) {
 
 	/* Load extension */
 }
-func ZmInfoDl(ZEND_MODULE_INFO_FUNC_ARGS) {
+func ZmInfoDl(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableRow(2, "Dynamic Library Support", "enabled")
 }

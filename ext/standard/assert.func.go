@@ -80,7 +80,7 @@ func ZmDeactivateAssert(type_ int, module_number int) int {
 	}
 	return zend.SUCCESS
 }
-func ZmInfoAssert(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }
+func ZmInfoAssert(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifAssert(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var assertion *zend.Zval
 	var description *zend.Zval = nil

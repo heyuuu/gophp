@@ -18,6 +18,10 @@ package zend
 
 // #define SHUTDOWN_FUNC_ARGS_PASSTHRU       type , module_number
 
+// #define ZEND_MODULE_INFO_FUNC_ARGS       zend_module_entry * zend_module
+
+// #define ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU       zend_module
+
 // #define STANDARD_MODULE_HEADER_EX       sizeof ( zend_module_entry ) , ZEND_MODULE_API_NO , ZEND_DEBUG , USING_ZTS
 
 // #define STANDARD_MODULE_HEADER       STANDARD_MODULE_HEADER_EX , NULL , NULL

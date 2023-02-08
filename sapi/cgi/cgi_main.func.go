@@ -926,7 +926,7 @@ func ZmShutdownCgi(type_ int, module_number int) int {
 	zend.UNREGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }
-func ZmInfoCgi(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }
+func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
 func ZifApacheChildTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() != 0 {
 		return

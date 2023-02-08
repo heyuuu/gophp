@@ -291,12 +291,12 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	BG(page_gid) = -1
 	return zend.SUCCESS
 }
-func ZmInfoBasic(ZEND_MODULE_INFO_FUNC_ARGS) {
+func ZmInfoBasic(zend_module *zend.ZendModuleEntry) {
 	PhpInfoPrintTableStart()
-	ZmInfoDl(zend.ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU)
-	ZmInfoMail(zend.ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU)
+	ZmInfoDl(zend_module)
+	ZmInfoMail(zend_module)
 	PhpInfoPrintTableEnd()
-	ZmInfoAssert(zend.ZEND_MODULE_INFO_FUNC_ARGS_PASSTHRU)
+	ZmInfoAssert(zend_module)
 }
 func ZifConstant(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var const_name *zend.ZendString
