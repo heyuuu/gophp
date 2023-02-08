@@ -11,7 +11,7 @@ func ZendWeakrefFrom(o *ZendObject) *ZendWeakref {
 }
 func ZendWeakrefFetch(z *Zval) *ZendWeakref { return ZendWeakrefFrom(z.GetObj()) }
 func ZendWeakrefUnref(zv *Zval) {
-	var wr *ZendWeakref = (*ZendWeakref)(zv.GetPtr())
+	var wr = (*ZendWeakref)(zv.GetPtr())
 	wr.GetReferent().DelGcFlags(IS_OBJ_WEAKLY_REFERENCED)
 	wr.SetReferent(nil)
 }
