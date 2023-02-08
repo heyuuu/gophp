@@ -2,6 +2,8 @@
 
 package core
 
+import b "sik/builtin"
+
 /**
  * Opt
  */
@@ -11,11 +13,11 @@ type Opt struct {
 	opt_name   *byte
 }
 
-func MakeOpt(opt_char byte, need_param int, opt_name *byte) Opt {
+func MakeOpt(opt_char byte, need_param int, opt_name string) Opt {
 	return Opt{
 		opt_char:   opt_char,
 		need_param: need_param,
-		opt_name:   opt_name,
+		opt_name:   b.CastStrPtr(opt_name),
 	}
 }
 func (this *Opt) GetOptChar() byte       { return this.opt_char }

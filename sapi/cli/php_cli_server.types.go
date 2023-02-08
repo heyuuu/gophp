@@ -264,52 +264,6 @@ type PhpCliServerClient struct {
 	file_fd                       int
 }
 
-// func NewPhpCliServerClient(server *PhpCliServer, sock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t, addr_str *byte, addr_str_len int, parser PhpHttpParser, request_read uint, current_header_name *byte, current_header_name_len int, current_header_name_allocated uint, current_header_value *byte, current_header_value_len int, last_header_element int, post_read_offset int, request PhpCliServerRequest, content_sender_initialized uint, content_sender PhpCliServerContentSender, file_fd int) *PhpCliServerClient {
-//     return &PhpCliServerClient{
-//         server:server,
-//         sock:sock,
-//         addr:addr,
-//         addr_len:addr_len,
-//         addr_str:addr_str,
-//         addr_str_len:addr_str_len,
-//         parser:parser,
-//         request_read:request_read,
-//         current_header_name:current_header_name,
-//         current_header_name_len:current_header_name_len,
-//         current_header_name_allocated:current_header_name_allocated,
-//         current_header_value:current_header_value,
-//         current_header_value_len:current_header_value_len,
-//         last_header_element:last_header_element,
-//         post_read_offset:post_read_offset,
-//         request:request,
-//         content_sender_initialized:content_sender_initialized,
-//         content_sender:content_sender,
-//         file_fd:file_fd,
-//     }
-// }
-// func MakePhpCliServerClient(server *PhpCliServer, sock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t, addr_str *byte, addr_str_len int, parser PhpHttpParser, request_read uint, current_header_name *byte, current_header_name_len int, current_header_name_allocated uint, current_header_value *byte, current_header_value_len int, last_header_element int, post_read_offset int, request PhpCliServerRequest, content_sender_initialized uint, content_sender PhpCliServerContentSender, file_fd int) PhpCliServerClient {
-//     return PhpCliServerClient{
-//         server:server,
-//         sock:sock,
-//         addr:addr,
-//         addr_len:addr_len,
-//         addr_str:addr_str,
-//         addr_str_len:addr_str_len,
-//         parser:parser,
-//         request_read:request_read,
-//         current_header_name:current_header_name,
-//         current_header_name_len:current_header_name_len,
-//         current_header_name_allocated:current_header_name_allocated,
-//         current_header_value:current_header_value,
-//         current_header_value_len:current_header_value_len,
-//         last_header_element:last_header_element,
-//         post_read_offset:post_read_offset,
-//         request:request,
-//         content_sender_initialized:content_sender_initialized,
-//         content_sender:content_sender,
-//         file_fd:file_fd,
-//     }
-// }
 func (this *PhpCliServerClient) GetServer() *PhpCliServer          { return this.server }
 func (this *PhpCliServerClient) SetServer(value *PhpCliServer)     { this.server = value }
 func (this *PhpCliServerClient) GetSock() core.PhpSocketT          { return this.sock }
@@ -352,8 +306,6 @@ func (this *PhpCliServerClient) SetLastHeaderElement(value int)  { this.last_hea
 func (this *PhpCliServerClient) GetPostReadOffset() int          { return this.post_read_offset }
 func (this *PhpCliServerClient) SetPostReadOffset(value int)     { this.post_read_offset = value }
 func (this *PhpCliServerClient) GetRequest() PhpCliServerRequest { return this.request }
-
-// func (this *PhpCliServerClient) SetRequest(value PhpCliServerRequest) { this.request = value }
 func (this *PhpCliServerClient) GetContentSenderInitialized() uint {
 	return this.content_sender_initialized
 }
@@ -363,8 +315,6 @@ func (this *PhpCliServerClient) SetContentSenderInitialized(value uint) {
 func (this *PhpCliServerClient) GetContentSender() PhpCliServerContentSender {
 	return this.content_sender
 }
-
-// func (this *PhpCliServerClient) SetContentSender(value PhpCliServerContentSender) { this.content_sender = value }
 func (this *PhpCliServerClient) GetFileFd() int      { return this.file_fd }
 func (this *PhpCliServerClient) SetFileFd(value int) { this.file_fd = value }
 
@@ -386,69 +336,25 @@ type PhpCliServer struct {
 	clients           zend.HashTable
 }
 
-// func NewPhpCliServer(server_sock core.PhpSocketT, poller PhpCliServerPoller, is_running int, host *byte, port int, address_family int, document_root *byte, document_root_len int, router *byte, router_len int, socklen socklen_t, clients zend.HashTable, extension_mime_types zend.HashTable) *PhpCliServer {
-//     return &PhpCliServer{
-//         server_sock:server_sock,
-//         poller:poller,
-//         is_running:is_running,
-//         host:host,
-//         port:port,
-//         address_family:address_family,
-//         document_root:document_root,
-//         document_root_len:document_root_len,
-//         router:router,
-//         router_len:router_len,
-//         socklen:socklen,
-//         clients:clients,
-//         extension_mime_types:extension_mime_types,
-//     }
-// }
-// func MakePhpCliServer(server_sock core.PhpSocketT, poller PhpCliServerPoller, is_running int, host *byte, port int, address_family int, document_root *byte, document_root_len int, router *byte, router_len int, socklen socklen_t, clients zend.HashTable, extension_mime_types zend.HashTable) PhpCliServer {
-//     return PhpCliServer{
-//         server_sock:server_sock,
-//         poller:poller,
-//         is_running:is_running,
-//         host:host,
-//         port:port,
-//         address_family:address_family,
-//         document_root:document_root,
-//         document_root_len:document_root_len,
-//         router:router,
-//         router_len:router_len,
-//         socklen:socklen,
-//         clients:clients,
-//         extension_mime_types:extension_mime_types,
-//     }
-// }
 func (this *PhpCliServer) GetServerSock() core.PhpSocketT      { return this.server_sock }
 func (this *PhpCliServer) SetServerSock(value core.PhpSocketT) { this.server_sock = value }
 func (this *PhpCliServer) GetPoller() PhpCliServerPoller       { return this.poller }
-
-// func (this *PhpCliServer) SetPoller(value PhpCliServerPoller) { this.poller = value }
-func (this *PhpCliServer) GetIsRunning() int      { return this.is_running }
-func (this *PhpCliServer) SetIsRunning(value int) { this.is_running = value }
-func (this *PhpCliServer) GetHost() *byte         { return this.host }
-func (this *PhpCliServer) SetHost(value *byte)    { this.host = value }
-func (this *PhpCliServer) GetPort() int           { return this.port }
-func (this *PhpCliServer) SetPort(value int)      { this.port = value }
-func (this *PhpCliServer) GetAddressFamily() int  { return this.address_family }
-
-// func (this *PhpCliServer) SetAddressFamily(value int) { this.address_family = value }
-func (this *PhpCliServer) GetDocumentRoot() *byte       { return this.document_root }
-func (this *PhpCliServer) SetDocumentRoot(value *byte)  { this.document_root = value }
-func (this *PhpCliServer) GetDocumentRootLen() int      { return this.document_root_len }
-func (this *PhpCliServer) SetDocumentRootLen(value int) { this.document_root_len = value }
-func (this *PhpCliServer) GetRouter() *byte             { return this.router }
-func (this *PhpCliServer) SetRouter(value *byte)        { this.router = value }
-
-// func (this *PhpCliServer)  GetRouterLen() int      { return this.router_len }
-func (this *PhpCliServer) SetRouterLen(value int) { this.router_len = value }
-func (this *PhpCliServer) GetSocklen() socklen_t  { return this.socklen }
-
-// func (this *PhpCliServer) SetSocklen(value socklen_t) { this.socklen = value }
-func (this *PhpCliServer) GetClients() zend.HashTable { return this.clients }
-
-// func (this *PhpCliServer) SetClients(value zend.HashTable) { this.clients = value }
+func (this *PhpCliServer) GetIsRunning() int                   { return this.is_running }
+func (this *PhpCliServer) SetIsRunning(value int)              { this.is_running = value }
+func (this *PhpCliServer) GetHost() *byte                      { return this.host }
+func (this *PhpCliServer) SetHost(value *byte)                 { this.host = value }
+func (this *PhpCliServer) GetPort() int                        { return this.port }
+func (this *PhpCliServer) SetPort(value int)                   { this.port = value }
+func (this *PhpCliServer) GetAddressFamily() int               { return this.address_family }
+func (this *PhpCliServer) GetDocumentRoot() *byte              { return this.document_root }
+func (this *PhpCliServer) SetDocumentRoot(value *byte)         { this.document_root = value }
+func (this *PhpCliServer) GetDocumentRootLen() int             { return this.document_root_len }
+func (this *PhpCliServer) SetDocumentRootLen(value int)        { this.document_root_len = value }
+func (this *PhpCliServer) GetRouter() *byte                    { return this.router }
+func (this *PhpCliServer) SetRouter(value *byte)               { this.router = value }
+func (this *PhpCliServer) SetRouterLen(value int)              { this.router_len = value }
+func (this *PhpCliServer) GetSocklen() socklen_t               { return this.socklen }
+func (this *PhpCliServer) GetClients() zend.HashTable          { return this.clients }
 
 /**
  * PhpCliServerHttpResponseStatusCodePair
@@ -476,13 +382,6 @@ type PhpCliServerDoEventForEachFdCallbackParams struct {
 	whandler func(*PhpCliServer, *PhpCliServerClient) int
 }
 
-// func NewPhpCliServerDoEventForEachFdCallbackParams(server *PhpCliServer, rhandler func(*PhpCliServer, *PhpCliServerClient) int, whandler func(*PhpCliServer, *PhpCliServerClient) int) *PhpCliServerDoEventForEachFdCallbackParams {
-//     return &PhpCliServerDoEventForEachFdCallbackParams{
-//         server:server,
-//         rhandler:rhandler,
-//         whandler:whandler,
-//     }
-// }
 func MakePhpCliServerDoEventForEachFdCallbackParams(server *PhpCliServer, rhandler func(*PhpCliServer, *PhpCliServerClient) int, whandler func(*PhpCliServer, *PhpCliServerClient) int) PhpCliServerDoEventForEachFdCallbackParams {
 	return PhpCliServerDoEventForEachFdCallbackParams{
 		server:   server,
@@ -491,15 +390,9 @@ func MakePhpCliServerDoEventForEachFdCallbackParams(server *PhpCliServer, rhandl
 	}
 }
 func (this *PhpCliServerDoEventForEachFdCallbackParams) GetServer() *PhpCliServer { return this.server }
-
-// func (this *PhpCliServerDoEventForEachFdCallbackParams) SetServer(value *PhpCliServer) { this.server = value }
 func (this *PhpCliServerDoEventForEachFdCallbackParams) GetRhandler() func(*PhpCliServer, *PhpCliServerClient) int {
 	return this.rhandler
 }
-
-// func (this *PhpCliServerDoEventForEachFdCallbackParams) SetRhandler(value func(*PhpCliServer, *PhpCliServerClient) int) { this.rhandler = value }
 func (this *PhpCliServerDoEventForEachFdCallbackParams) GetWhandler() func(*PhpCliServer, *PhpCliServerClient) int {
 	return this.whandler
 }
-
-// func (this *PhpCliServerDoEventForEachFdCallbackParams) SetWhandler(value func(*PhpCliServer, *PhpCliServerClient) int) { this.whandler = value }
