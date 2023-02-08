@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendFunctionEntry
  */
@@ -13,30 +15,20 @@ type ZendFunctionEntry struct {
 	flags    uint32
 }
 
-func MakeZendFunctionEntry(fname *byte, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
+func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
 	return ZendFunctionEntry{
-		fname:    fname,
+		fname:    b.CastStrPtr(fname),
 		handler:  handler,
 		arg_info: arg_info,
 		num_args: num_args,
 		flags:    flags,
 	}
 }
-func (this *ZendFunctionEntry) GetFname() *byte { return this.fname }
-
-// func (this *ZendFunctionEntry) SetFname(value *byte) { this.fname = value }
-func (this *ZendFunctionEntry) GetHandler() ZifHandler { return this.handler }
-
-// func (this *ZendFunctionEntry) SetHandler(value ZifHandler) { this.handler = value }
+func (this *ZendFunctionEntry) GetFname() *byte                  { return this.fname }
+func (this *ZendFunctionEntry) GetHandler() ZifHandler           { return this.handler }
 func (this *ZendFunctionEntry) GetArgInfo() *ZendInternalArgInfo { return this.arg_info }
-
-// func (this *ZendFunctionEntry) SetArgInfo(value *ZendInternalArgInfo) { this.arg_info = value }
-func (this *ZendFunctionEntry) GetNumArgs() uint32 { return this.num_args }
-
-// func (this *ZendFunctionEntry) SetNumArgs(value uint32) { this.num_args = value }
-func (this *ZendFunctionEntry) GetFlags() uint32 { return this.flags }
-
-// func (this *ZendFunctionEntry) SetFlags(value uint32) { this.flags = value }
+func (this *ZendFunctionEntry) GetNumArgs() uint32               { return this.num_args }
+func (this *ZendFunctionEntry) GetFlags() uint32                 { return this.flags }
 
 /* ZendFunctionEntry.flags */
 func (this *ZendFunctionEntry) AddFlags(value uint32)      { this.flags |= value }

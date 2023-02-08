@@ -8,26 +8,13 @@ import (
 	r "sik/runtime"
 )
 
-func HANDLE_BLOCK_INTERRUPTIONS() int {
-	SIGG(depth)++
-	return SIGG(depth) - 1
-}
-func HANDLE_UNBLOCK_INTERRUPTIONS() {
-	if b.PostDec(&(SIGG(depth))) == SIGG(blocked) {
-		ZendSignalHandlerUnblock()
-	}
-}
 func USED_RET() bool {
 	return !(EX(prev_execute_data)) || !(ZEND_USER_CODE(EX(prev_execute_data).func_.common.type_)) || EX(prev_execute_data).opline.result_type != IS_UNUSED
 }
-func ZendBailout()                                          { _zendBailout(__FILE__, __LINE__) }
-func ZendPrintVariable(var_ *Zval) int                      { return ZendPrintZval(var_, 0) }
-func ZEND_WRITE(str *byte, str_len int) int                 { return ZendWrite(str, str_len) }
-func ZEND_WRITE_EX(str __auto__, str_len __auto__) __auto__ { return write_func(str, str_len) }
-func ZEND_PUTS(str string) int                              { return ZendWrite(str, strlen(str)) }
-func ZEND_PUTS_EX(str __auto__) __auto__                    { return write_func(str, strlen(str)) }
-func ZEND_PUTC(c byte) int                                  { return ZendWrite(&c, 1) }
-func ZEND_UV(name __auto__) __auto__                        { return ZendUv.name }
+func ZendBailout()                          { _zendBailout(__FILE__, __LINE__) }
+func ZEND_WRITE(str *byte, str_len int) int { return ZendWrite(str, str_len) }
+func ZEND_PUTS(str string) int              { return ZendWrite(str, strlen(str)) }
+func ZEND_PUTC(c byte) int                  { return ZendWrite(&c, 1) }
 func OnUpdateErrorReporting(
 	entry *ZendIniEntry,
 	new_value *ZendString,
@@ -122,14 +109,6 @@ func ZendVspprintf(pbuf **byte, max_len int, format *byte, ap ...any) int {
 	}
 }
 func ZendSpprintf(message **byte, max_len int, format string, _ ...any) int {
-	var arg va_list
-	var len_ int
-	va_start(arg, format)
-	len_ = ZendVspprintf(message, max_len, format, arg)
-	va_end(arg)
-	return len_
-}
-func ZendSpprintfUnchecked(message **byte, max_len int, format *byte, _ ...any) int {
 	var arg va_list
 	var len_ int
 	va_start(arg, format)
@@ -1096,7 +1075,6 @@ func ZendMakeCompiledStringDescription(name string) *byte {
 	return compiled_string_description
 }
 func FreeEstring(str_p **byte) { Efree(*str_p) }
-func ZendMapPtrReset()         { CG__().SetMapPtrLast(GlobalMapPtrLast) }
 func ZendMapPtrNew() any {
 	var ptr *any
 	if CG__().GetMapPtrLast() >= CG__().GetMapPtrSize() {
@@ -1110,19 +1088,4 @@ func ZendMapPtrNew() any {
 	*ptr = nil
 	CG__().GetMapPtrLast()++
 	return ZEND_MAP_PTR_PTR2OFFSET(ptr)
-}
-func ZendMapPtrExtend(last int) {
-	if last > CG__().GetMapPtrLast() {
-		var ptr *any
-		if last >= CG__().GetMapPtrSize() {
-
-			/* Grow map_ptr table */
-
-			CG__().SetMapPtrSize(ZEND_MM_ALIGNED_SIZE_EX(last, 4096))
-			CG__().SetMapPtrBase(Perealloc(CG__().GetMapPtrBase(), CG__().GetMapPtrSize()*b.SizeOf("void *"), 1))
-		}
-		ptr = (*any)(CG__().GetMapPtrBase() + CG__().GetMapPtrLast())
-		memset(ptr, 0, (last-CG__().GetMapPtrLast())*b.SizeOf("void *"))
-		CG__().SetMapPtrLast(last)
-	}
 }

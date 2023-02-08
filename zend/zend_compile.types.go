@@ -512,17 +512,9 @@ func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendU
 		is_variadic:       is_variadic,
 	}
 }
-func (this *ZendInternalArgInfo) GetName() *byte { return this.name }
-
-// func (this *ZendInternalArgInfo) SetName(value *byte) { this.name = value }
-func (this *ZendInternalArgInfo) GetType() ZendType { return this.type_ }
-
-// func (this *ZendInternalArgInfo) SetType(value ZendType) { this.type_ = value }
-// func (this *ZendInternalArgInfo)  GetPassByReference() ZendUchar      { return this.pass_by_reference }
-// func (this *ZendInternalArgInfo) SetPassByReference(value ZendUchar) { this.pass_by_reference = value }
+func (this *ZendInternalArgInfo) GetName() *byte          { return this.name }
+func (this *ZendInternalArgInfo) GetType() ZendType       { return this.type_ }
 func (this *ZendInternalArgInfo) GetIsVariadic() ZendBool { return this.is_variadic }
-
-// func (this *ZendInternalArgInfo) SetIsVariadic(value ZendBool) { this.is_variadic = value }
 
 /**
  * ZendArgInfo
@@ -573,15 +565,8 @@ func (this *ZendInternalFunctionInfo) GetRequiredNumArgs() ZendUintptrT {
 	return this.required_num_args
 }
 
-// func (this *ZendInternalFunctionInfo) SetRequiredNumArgs(value ZendUintptrT) { this.required_num_args = value }
-func (this *ZendInternalFunctionInfo) GetType() ZendType { return this.type_ }
-
-// func (this *ZendInternalFunctionInfo) SetType(value ZendType) { this.type_ = value }
+func (this *ZendInternalFunctionInfo) GetType() ZendType            { return this.type_ }
 func (this *ZendInternalFunctionInfo) GetReturnReference() ZendBool { return this.return_reference }
-
-// func (this *ZendInternalFunctionInfo) SetReturnReference(value ZendBool) { this.return_reference = value }
-// func (this *ZendInternalFunctionInfo)  GetIsVariadic() ZendBool      { return this._is_variadic }
-// func (this *ZendInternalFunctionInfo) SetIsVariadic(value ZendBool) { this._is_variadic = value }
 
 /**
  * ZendOpArray
@@ -899,11 +884,7 @@ func MakeReservedClassName(name *byte, len_ int) ReservedClassName {
 	}
 }
 func (this *ReservedClassName) GetName() *byte { return this.name }
-
-// func (this *ReservedClassName) SetName(value *byte) { this.name = value }
-func (this *ReservedClassName) GetLen() int { return this.len_ }
-
-// func (this *ReservedClassName) SetLen(value int) { this.len_ = value }
+func (this *ReservedClassName) GetLen() int    { return this.len_ }
 
 /**
  * BuiltinTypeInfo
