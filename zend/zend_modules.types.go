@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 /**
  * ZendModuleEntry
  */
@@ -100,7 +102,8 @@ func (this *ZendModuleEntry) GetZendApi() uint { return this.zend_api }
 func (this *ZendModuleEntry) GetDeps() *ZendModuleDep { return this.deps }
 
 // func (this *ZendModuleEntry) SetDeps(value *ZendModuleDep) { this.deps = value }
-func (this *ZendModuleEntry) GetName() *byte { return this.name }
+func (this *ZendModuleEntry) GetName() *byte     { return this.name }
+func (this *ZendModuleEntry) GetNameStr() string { return b.CastStrAuto(this.name) }
 
 // func (this *ZendModuleEntry) SetName(value *byte) { this.name = value }
 func (this *ZendModuleEntry) GetFunctions() *ZendFunctionEntry { return this.functions }

@@ -8,30 +8,20 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"sort"
 )
 
 func PhpSelect(m core.PhpSocketT, r fd_set, w __auto__, e __auto__, t *__struct__timeval) __auto__ {
 	return select_(m, r, w, e, t)
 }
-func ModuleNameCmp(a any, b any) int {
-	var f *zend.Bucket = (*zend.Bucket)(a)
-	var s *zend.Bucket = (*zend.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.GetVal())).GetName(), (*zend.ZendModuleEntry)(zend.Z_PTR(s.GetVal())).GetName())
-}
 func PrintModules() {
-	var sorted_registry zend.HashTable
-	var module *zend.ZendModuleEntry
-	zend.ZendHashInit(&sorted_registry, 50, nil, nil, 0)
-	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-	sorted_registry.SortCompatible(ModuleNameCmp, 0)
-	var __ht *zend.HashTable = &sorted_registry
-	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
-
-		module = _z.GetPtr()
+	var modules = zend.CopyRegistryModules()
+	sort.Slice(modules, func(i, j int) bool {
+		return b.StrCaseCompare(modules[i].GetNameStr(), modules[j].GetNameStr())
+	})
+	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
-	sorted_registry.Destroy()
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
