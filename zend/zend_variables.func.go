@@ -30,10 +30,24 @@ func ZvalPtrDtorStr(zval_ptr *Zval) {
 	}
 }
 func ZvalDtor(zvalue *Zval) { ZvalPtrDtorNogc(zvalue) }
-func RcDtorFunc(p *ZendRefcounted) {
+func RcDtorFunc(p IRefcounted) {
 	ZEND_ASSERT(p.GetGcType() <= IS_CONSTANT_AST)
-	if dtor, ok := ZendRcDtorFuncMap[p.GetGcType()]; ok {
-		dtor(p)
+	switch p.(type) {
+	case *ZendArray:
+		arr := p.(*ZendArray)
+		arr.DestroyEx()
+	case *ZendObject:
+		obj := p.(*ZendObject)
+		ZendObjectsStoreDel(obj)
+	case *ZendResource:
+		res := p.(*ZendResource)
+		ZendListFree(res)
+	case *ZendReference:
+		ref := p.(*ZendReference)
+		ZendReferenceDestroy(ref)
+	case *ZendAstRef:
+		ast := p.(*ZendAstRef)
+		ZendAstRefDestroy(ast)
 	}
 }
 

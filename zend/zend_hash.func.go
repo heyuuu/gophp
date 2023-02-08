@@ -560,9 +560,6 @@ func ZendHashIndexDel(ht *HashTable, h ZendUlong) int {
 	return FAILURE
 }
 
-func ZendArrayDestroy(ht *HashTable)               { ht.DestroyEx() }
-func ZendHashGracefulReverseDestroy(ht *HashTable) { ht.GracefulReverseDestroy() }
-
 func ZendHashApply(ht *HashTable, apply_func ApplyFuncT) {
 	ht.applyValidBucket(func(p *Bucket) int {
 		return apply_func(p.GetVal())
