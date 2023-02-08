@@ -53,8 +53,7 @@ const PHP_MODE_REFLECTION_EXT_INFO = 11
 const PHP_MODE_REFLECTION_ZEND_EXTENSION = 12
 const PHP_MODE_SHOW_INI_CONFIG = 13
 
-var CliShellCallbacks CliShellCallbacksT = MakeCliShellCallbacksT(nil, nil, nil)
-var HARDCODED_INI []byte = "html_errors=0\n" + "register_argc_argv=1\n" + "implicit_flush=1\n" + "output_buffering=0\n" + "max_execution_time=0\n" + "max_input_time=-1\n0"
+var HARDCODED_INI string = "html_errors=0\n" + "register_argc_argv=1\n" + "implicit_flush=1\n" + "output_buffering=0\n" + "max_execution_time=0\n" + "max_input_time=-1\n0"
 var OPTIONS []core.Opt = []core.Opt{
 	core.MakeOpt('a', 0, "interactive"),
 	core.MakeOpt('B', 1, "process-begin"),
@@ -93,7 +92,6 @@ var OPTIONS []core.Opt = []core.Opt{
 	core.MakeOpt(14, 1, "ri"),
 	core.MakeOpt(14, 1, "rextinfo"),
 	core.MakeOpt(15, 0, "ini"),
-	core.MakeOpt('-', 0, nil),
 }
 
 const STDOUT_FILENO = 1
@@ -101,7 +99,7 @@ const STDERR_FILENO = 2
 
 var PhpSelf *byte = ""
 var ScriptFilename *byte = ""
-var CliSapiModule core.sapi_module_struct = core.Make_sapiModule("cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, core.PhpError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
+var CliSapiModule core.sapi_module_struct = core.MakeSapiModule("cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, nil, core.PhpError, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage, nil, nil, nil, nil, nil, nil, 0, 0, nil, nil, nil, nil, nil, nil, 0, nil, nil, nil)
 var ArginfoDl []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),

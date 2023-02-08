@@ -11,19 +11,9 @@ import (
  * ZendCliServerGlobals
  */
 type ZendCliServerGlobals struct {
-	color short
+	color uint16
 }
 
-// func NewZendCliServerGlobals(color short) *ZendCliServerGlobals {
-//     return &ZendCliServerGlobals{
-//         color:color,
-//     }
-// }
-// func MakeZendCliServerGlobals(color short) ZendCliServerGlobals {
-//     return ZendCliServerGlobals{
-//         color:color,
-//     }
-// }
 func (this *ZendCliServerGlobals) GetColor() short      { return this.color }
 func (this *ZendCliServerGlobals) SetColor(value short) { this.color = value }
 
@@ -468,24 +458,14 @@ type PhpCliServerHttpResponseStatusCodePair struct {
 	str  *byte
 }
 
-// func NewPhpCliServerHttpResponseStatusCodePair(code int, str *byte) *PhpCliServerHttpResponseStatusCodePair {
-//     return &PhpCliServerHttpResponseStatusCodePair{
-//         code:code,
-//         str:str,
-//     }
-// }
 func MakePhpCliServerHttpResponseStatusCodePair(code int, str *byte) PhpCliServerHttpResponseStatusCodePair {
 	return PhpCliServerHttpResponseStatusCodePair{
 		code: code,
 		str:  str,
 	}
 }
-func (this *PhpCliServerHttpResponseStatusCodePair) GetCode() int { return this.code }
-
-// func (this *PhpCliServerHttpResponseStatusCodePair) SetCode(value int) { this.code = value }
+func (this *PhpCliServerHttpResponseStatusCodePair) GetCode() int  { return this.code }
 func (this *PhpCliServerHttpResponseStatusCodePair) GetStr() *byte { return this.str }
-
-// func (this *PhpCliServerHttpResponseStatusCodePair) SetStr(value *byte) { this.str = value }
 
 /**
  * PhpCliServerDoEventForEachFdCallbackParams
