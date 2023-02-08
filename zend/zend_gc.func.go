@@ -45,9 +45,6 @@ func GC_REF_SET_COLOR(ref __auto__, c __auto__) {
 func GC_REF_SET_BLACK(ref __auto__) {
 	ref.GetGcTypeInfo() &= ^(GC_COLOR << GC_INFO_SHIFT)
 }
-func GC_REF_SET_PURPLE(ref __auto__) {
-	ref.GetGcTypeInfo() |= GC_COLOR << GC_INFO_SHIFT
-}
 func GC_GET_PTR(ptr *ZendRefcounted) any { return any(uintPtr(ptr) & ^GC_BITS) }
 func GC_IS_ROOT(ptr *ZendRefcounted) bool {
 	return (uintPtr(ptr) & GC_BITS) == GC_ROOT
@@ -225,7 +222,6 @@ func GcProtect(protect ZendBool) ZendBool {
 	GC_G__().SetGcProtected(protect)
 	return old_protected
 }
-func GcProtected() ZendBool { return GC_G__().GetGcProtected() }
 func GcGrowRootBuffer() {
 	var new_size int
 	if GC_G__().GetBufSize() >= GC_MAX_BUF_SIZE {
