@@ -520,14 +520,12 @@ func _phpStreamFillReadBuffer(stream *core.PhpStream, size int) int {
 					PhpStreamBucketUnlink(bucket)
 					PhpStreamBucketDelref(bucket)
 				}
-				break
 			case PSFS_FEED_ME:
 
 				/* when a filter needs feeding, there is no brig_out to deal with.
 				 * we simply continue the loop; if the caller needs more data,
 				 * we will read again, otherwise out job is done here */
 
-				break
 			case PSFS_ERR_FATAL:
 
 				/* some fatal error. Theoretically, the stream is borked, so all
@@ -1076,12 +1074,10 @@ func _phpStreamWriteFiltered(stream *core.PhpStream, buf *byte, count int, flags
 			PhpStreamBucketUnlink(bucket)
 			PhpStreamBucketDelref(bucket)
 		}
-		break
 	case PSFS_FEED_ME:
 
 		/* need more data before we can push data through to the stream */
 
-		break
 	case PSFS_ERR_FATAL:
 
 		/* some fatal error.  Theoretically, the stream is borked, so all
@@ -1159,7 +1155,6 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 				stream.SetEof(0)
 				return 0
 			}
-			break
 		case r.SEEK_SET:
 			if offset > stream.GetPosition() && offset <= stream.GetPosition()+stream.GetWritepos()-stream.GetReadpos() {
 				stream.SetReadpos(stream.GetReadpos() + offset - stream.GetPosition())
@@ -1167,7 +1162,6 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 				stream.SetEof(0)
 				return 0
 			}
-			break
 		}
 	}
 	if stream.GetOps().GetSeek() != nil && !stream.HasFlags(core.PHP_STREAM_FLAG_NO_SEEK) {
@@ -1179,7 +1173,6 @@ func _phpStreamSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int) in
 		case r.SEEK_CUR:
 			offset = stream.GetPosition() + offset
 			whence = r.SEEK_SET
-			break
 		}
 		ret = stream.GetOps().GetSeek()(stream, offset, whence, stream.GetPosition())
 		if !stream.HasFlags(core.PHP_STREAM_FLAG_NO_SEEK) || ret == 0 {
@@ -1240,7 +1233,6 @@ func _phpStreamSetOption(stream *core.PhpStream, option int, value int, ptrparam
 				stream.SetFlags(stream.GetFlags() ^ core.PHP_STREAM_FLAG_NO_BUFFER)
 			}
 			ret = core.PHP_STREAM_OPTION_RETURN_OK
-			break
 		default:
 
 		}

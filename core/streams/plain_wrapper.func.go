@@ -28,19 +28,14 @@ func PhpStreamParseFopenModes(mode *byte, open_flags *int) int {
 	switch mode[0] {
 	case 'r':
 		flags = 0
-		break
 	case 'w':
 		flags = O_TRUNC | O_CREAT
-		break
 	case 'a':
 		flags = O_CREAT | O_APPEND
-		break
 	case 'x':
 		flags = O_CREAT | O_EXCL
-		break
 	case 'c':
 		flags = O_CREAT
-		break
 	default:
 
 		/* unknown mode */
@@ -431,7 +426,6 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		default:
 			return -1
 		}
-		break
 	case core.PHP_STREAM_OPTION_LOCKING:
 		if fd == -1 {
 			return -1
@@ -445,7 +439,6 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		} else {
 			return -1
 		}
-		break
 	case core.PHP_STREAM_OPTION_MMAP_API:
 		var range_ *PhpStreamMmapRange = (*PhpStreamMmapRange)(ptrparam)
 		var prot int
@@ -457,6 +450,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			} else {
 				return core.PHP_STREAM_OPTION_RETURN_OK
 			}
+			fallthrough
 		case PHP_STREAM_MMAP_MAP_RANGE:
 			if DoFstat(data, 1) != 0 {
 				return core.PHP_STREAM_OPTION_RETURN_ERR
@@ -471,19 +465,15 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			case PHP_STREAM_MAP_MODE_READONLY:
 				prot = PROT_READ
 				flags = MAP_PRIVATE
-				break
 			case PHP_STREAM_MAP_MODE_READWRITE:
 				prot = PROT_READ | PROT_WRITE
 				flags = MAP_PRIVATE
-				break
 			case PHP_STREAM_MAP_MODE_SHARED_READONLY:
 				prot = PROT_READ
 				flags = MAP_SHARED
-				break
 			case PHP_STREAM_MAP_MODE_SHARED_READWRITE:
 				prot = PROT_READ | PROT_WRITE
 				flags = MAP_SHARED
-				break
 			default:
 				return core.PHP_STREAM_OPTION_RETURN_ERR
 			}
@@ -515,6 +505,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 			} else {
 				return core.PHP_STREAM_OPTION_RETURN_OK
 			}
+			fallthrough
 		case core.PHP_STREAM_TRUNCATE_SET_SIZE:
 			var new_size ptrdiff_t = *((*ptrdiff_t)(ptrparam))
 			if new_size < 0 {
@@ -526,6 +517,7 @@ func PhpStdiopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 				return core.PHP_STREAM_OPTION_RETURN_ERR
 			}
 		}
+		fallthrough
 	case core.PHP_STREAM_OPTION_META_DATA_API:
 		if fd == -1 {
 			return -1
@@ -615,6 +607,7 @@ func _phpStreamFopen(filename *byte, mode *byte, opened_path **zend.ZendString, 
 				//TODO: avoid reallocation???
 
 			}
+			fallthrough
 		case core.PHP_STREAM_PERSISTENT_FAILURE:
 			zend.Efree(persistent_id)
 			return ret
@@ -888,9 +881,8 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 			r.Fclose(file)
 		}
 		ret = zend.VCWD_UTIME(url, newtime)
-		break
 	case core.PHP_STREAM_META_OWNER_NAME:
-
+		fallthrough
 	case core.PHP_STREAM_META_OWNER:
 		if option == core.PHP_STREAM_META_OWNER_NAME {
 			if PhpGetUidByName((*byte)(value), &uid) != zend.SUCCESS {
@@ -901,9 +893,8 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 			uid = uid_t * (*long)(value)
 		}
 		ret = zend.VCWD_CHOWN(url, uid, -1)
-		break
 	case core.PHP_STREAM_META_GROUP:
-
+		fallthrough
 	case core.PHP_STREAM_META_GROUP_NAME:
 		if option == core.PHP_STREAM_META_GROUP_NAME {
 			if PhpGetGidByName((*byte)(value), &gid) != zend.SUCCESS {
@@ -914,11 +905,9 @@ func PhpPlainFilesMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int
 			gid = gid_t * (*long)(value)
 		}
 		ret = zend.VCWD_CHOWN(url, -1, gid)
-		break
 	case core.PHP_STREAM_META_ACCESS:
 		mode = mode_t * (*zend.ZendLong)(value)
 		ret = zend.VCWD_CHMOD(url, mode)
-		break
 	default:
 		core.PhpErrorDocref1(nil, url, zend.E_WARNING, "Unknown option %d for stream_metadata", option)
 		return 0

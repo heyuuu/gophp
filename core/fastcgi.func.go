@@ -572,13 +572,10 @@ func FcgiReadRequest(req *FcgiRequest) int {
 		switch (b.GetRoleB1() << 8) + b.GetRoleB0() {
 		case FCGI_RESPONDER:
 			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "RESPONDER", b.SizeOf("\"RESPONDER\"")-1)
-			break
 		case FCGI_AUTHORIZER:
 			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "AUTHORIZER", b.SizeOf("\"AUTHORIZER\"")-1)
-			break
 		case FCGI_FILTER:
 			FcgiHashSet(req.GetEnv(), FCGI_HASH_FUNC("FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1), "FCGI_ROLE", b.SizeOf("\"FCGI_ROLE\"")-1, "FILTER", b.SizeOf("\"FILTER\"")-1)
-			break
 		default:
 			return 0
 		}

@@ -46,7 +46,6 @@ try_again:
 		if zend.ZEND_HANDLE_NUMERIC(offset.GetStr(), &idx) {
 			return idx
 		}
-		break
 	case zend.IS_DOUBLE:
 		return zend.ZendLong(offset.GetDval())
 	case zend.IS_LONG:
@@ -58,6 +57,7 @@ try_again:
 	case zend.IS_REFERENCE:
 		offset = zend.Z_REFVAL_P(offset)
 		goto try_again
+		fallthrough
 	case zend.IS_RESOURCE:
 		return zend.Z_RES_HANDLE_P(offset)
 	}

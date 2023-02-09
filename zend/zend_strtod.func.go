@@ -858,22 +858,25 @@ func ZendStrtod(s00 *byte, se **byte) float64 {
 		switch *s {
 		case '-':
 			sign = 1
+			fallthrough
 		case '+':
 			if *(b.PreInc(&s)) {
 				goto break2
 			}
+			fallthrough
 		case 0:
 			goto ret0
+			fallthrough
 		case '\t':
-
+			fallthrough
 		case '\n':
-
+			fallthrough
 		case 'v':
-
+			fallthrough
 		case 'f':
-
+			fallthrough
 		case '\r':
-
+			fallthrough
 		case ' ':
 			continue
 		default:
@@ -979,6 +982,7 @@ dig_done:
 		switch b.Assign(&c, *(b.PreInc(&s))) {
 		case '-':
 			esign = 1
+			fallthrough
 		case '+':
 			c = *(b.PreInc(&s))
 		}
@@ -1777,13 +1781,13 @@ func ZendDtoa(
 
 	switch mode {
 	case 0:
-
+		fallthrough
 	case 1:
 		i = 18
 		ndigits = 0
-		break
 	case 2:
 		leftright = 0
+		fallthrough
 	case 4:
 		if ndigits <= 0 {
 			ndigits = 1
@@ -1791,9 +1795,9 @@ func ZendDtoa(
 		i = ndigits
 		ilim1 = i
 		ilim = ilim1
-		break
 	case 3:
 		leftright = 0
+		fallthrough
 	case 5:
 		i = ndigits + k + 1
 		ilim = i

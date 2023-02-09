@@ -201,11 +201,11 @@ func PhpSprintfAppenddouble(
 	}
 	switch fmt {
 	case 'e':
-
+		fallthrough
 	case 'E':
-
+		fallthrough
 	case 'f':
-
+		fallthrough
 	case 'F':
 		lconv = localeconv()
 		s = core.PhpConvFp(b.Cond(fmt == 'f', 'F', fmt), number, 0, precision, b.Cond(fmt == 'f', LCONV_DECIMAL_POINT, '.'), &is_negative, &num_buf[1], &s_len)
@@ -218,9 +218,8 @@ func PhpSprintfAppenddouble(
 			s = num_buf
 			s_len++
 		}
-		break
 	case 'g':
-
+		fallthrough
 	case 'G':
 		if precision == 0 {
 			precision = 1
@@ -241,7 +240,6 @@ func PhpSprintfAppenddouble(
 			s = num_buf
 		}
 		s_len = strlen(s)
-		break
 	}
 	PhpSprintfAppendstring(buffer, pos, s, width, 0, padding, alignment, s_len, is_negative, 0, always_sign)
 }
@@ -435,51 +433,40 @@ func PhpFormattedPrint(z_format *zend.Zval, args *zend.Zval, argc int) *zend.Zen
 				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &t)
 				PhpSprintfAppendstring(&result, &outpos, str.GetVal(), width, precision, padding, alignment, str.GetLen(), 0, expprec, 0)
 				zend.ZendTmpStringRelease(t)
-				break
 			case 'd':
 				PhpSprintfAppendint(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, always_sign)
-				break
 			case 'u':
 				PhpSprintfAppenduint(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment)
-				break
 			case 'g':
-
+				fallthrough
 			case 'G':
-
+				fallthrough
 			case 'e':
-
+				fallthrough
 			case 'E':
-
+				fallthrough
 			case 'f':
-
+				fallthrough
 			case 'F':
 				PhpSprintfAppenddouble(&result, &outpos, zend.ZvalGetDouble(tmp), width, padding, alignment, precision, adjusting, *format, always_sign)
-				break
 			case 'c':
 				PhpSprintfAppendchar(&result, &outpos, byte(zend.ZvalGetLong(tmp)))
-				break
 			case 'o':
 				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 3, Hexchars, expprec)
-				break
 			case 'x':
 				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 4, Hexchars, expprec)
-				break
 			case 'X':
 				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 4, HEXCHARS, expprec)
-				break
 			case 'b':
 				PhpSprintfAppend2n(&result, &outpos, zend.ZvalGetLong(tmp), width, padding, alignment, 1, Hexchars, expprec)
-				break
 			case '%':
 				PhpSprintfAppendchar(&result, &outpos, '%')
-				break
 			case '0':
 				if format_len == 0 {
 					goto exit
 				}
-				break
 			default:
-				break
+
 			}
 			format++
 			format_len--

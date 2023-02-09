@@ -89,19 +89,16 @@ func ZifLevenshtein(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			return
 		}
 		distance = ReferenceLevdist(str1, str1_len, str2, str2_len, 1, 1, 1)
-		break
 	case 5:
 		if zend.ZendParseParameters(5, "sslll", &str1, &str1_len, &str2, &str2_len, &cost_ins, &cost_rep, &cost_del) == zend.FAILURE {
 			return
 		}
 		distance = ReferenceLevdist(str1, str1_len, str2, str2_len, cost_ins, cost_rep, cost_del)
-		break
 	case 3:
 		if zend.ZendParseParameters(3, "sss", &str1, &str1_len, &str2, &str2_len, &callback_name, &callback_len) == zend.FAILURE {
 			return
 		}
 		distance = CustomLevdist(str1, str2, callback_name)
-		break
 	default:
 		zend.WRONG_PARAM_COUNT
 	}

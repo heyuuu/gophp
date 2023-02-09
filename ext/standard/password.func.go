@@ -89,27 +89,25 @@ func PhpPasswordGetSalt(unused_ *zend.Zval, required_salt_len int, options *zend
 	switch option_buffer.GetType() {
 	case zend.IS_STRING:
 		buffer = option_buffer.GetStr().Copy()
-		break
 	case zend.IS_LONG:
-
+		fallthrough
 	case zend.IS_DOUBLE:
-
+		fallthrough
 	case zend.IS_OBJECT:
 		buffer = zend.ZvalTryGetString(option_buffer)
 		if buffer == nil {
 			return nil
 		}
-		break
 	case zend.IS_FALSE:
-
+		fallthrough
 	case zend.IS_TRUE:
-
+		fallthrough
 	case zend.IS_NULL:
-
+		fallthrough
 	case zend.IS_RESOURCE:
-
+		fallthrough
 	case zend.IS_ARRAY:
-
+		fallthrough
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Non-string salt parameter supplied")
 		return nil

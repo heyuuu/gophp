@@ -279,36 +279,35 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 
 		switch *ch {
 		case 'n':
-
+			fallthrough
 		case 'd':
-
+			fallthrough
 		case 'D':
-
+			fallthrough
 		case 'i':
-
+			fallthrough
 		case 'o':
-
+			fallthrough
 		case 'x':
-
+			fallthrough
 		case 'X':
-
+			fallthrough
 		case 'u':
-
+			fallthrough
 		case 'f':
-
+			fallthrough
 		case 'e':
-
+			fallthrough
 		case 'E':
-
+			fallthrough
 		case 'g':
-
+			fallthrough
 		case 's':
-			break
+
 		case 'c':
 
 			/* we differ here with the TCL implementation in allowing for */
 
-			break
 		case '[':
 			if (*format) == '0' {
 				goto badSet
@@ -336,10 +335,6 @@ func ValidateFormat(format *byte, numVars int, totalSubs *int) int {
 				format++
 				ch = format - 1
 			}
-			break
-		badSet:
-			core.PhpErrorDocref(nil, zend.E_WARNING, "Unmatched [ in format string")
-			goto error
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Bad scan conversion character \"%c\"", *ch)
 			goto error
@@ -617,47 +612,40 @@ func PhpSscanfInternal(
 			nconversions++
 			continue
 		case 'd':
-
+			fallthrough
 		case 'D':
 			op = 'i'
 			base = 10
 			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
-			break
 		case 'i':
 			op = 'i'
 			base = 0
 			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
-			break
 		case 'o':
 			op = 'i'
 			base = 8
 			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
-			break
 		case 'x':
-
+			fallthrough
 		case 'X':
 			op = 'i'
 			base = 16
 			fn = (func() zend.ZendLong)(zend.ZEND_STRTOL_PTR)
-			break
 		case 'u':
 			op = 'i'
 			base = 10
 			flags |= SCAN_UNSIGNED
 			fn = (func() zend.ZendLong)(zend.ZEND_STRTOUL_PTR)
-			break
 		case 'f':
-
+			fallthrough
 		case 'e':
-
+			fallthrough
 		case 'E':
-
+			fallthrough
 		case 'g':
 			op = 'f'
-			break
 		case 's':
 			op = 's'
-			break
 		case 'c':
 			op = 's'
 			flags |= SCAN_NOSKIP
@@ -670,11 +658,9 @@ func PhpSscanfInternal(
 
 			/*-cc-*/
 
-			break
 		case '[':
 			op = '['
 			flags |= SCAN_NOSKIP
-			break
 		}
 
 		/*
@@ -712,7 +698,7 @@ func PhpSscanfInternal(
 
 		switch op {
 		case 'c':
-
+			fallthrough
 		case 's':
 
 			/*
@@ -744,7 +730,6 @@ func PhpSscanfInternal(
 				}
 			}
 			string = end
-			break
 		case '[':
 			var cset CharSet
 			if width == 0 {
@@ -787,7 +772,6 @@ func PhpSscanfInternal(
 				}
 			}
 			string = end
-			break
 		case 'i':
 
 			/*
@@ -824,26 +808,28 @@ func PhpSscanfInternal(
 						flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					}
 					goto addToInt
+					fallthrough
 				case '1':
-
+					fallthrough
 				case '2':
-
+					fallthrough
 				case '3':
-
+					fallthrough
 				case '4':
-
+					fallthrough
 				case '5':
-
+					fallthrough
 				case '6':
-
+					fallthrough
 				case '7':
 					if base == 0 {
 						base = 10
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
+					fallthrough
 				case '8':
-
+					fallthrough
 				case '9':
 					if base == 0 {
 						base = 10
@@ -853,51 +839,51 @@ func PhpSscanfInternal(
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
+					fallthrough
 				case 'A':
-
+					fallthrough
 				case 'B':
-
+					fallthrough
 				case 'C':
-
+					fallthrough
 				case 'D':
-
+					fallthrough
 				case 'E':
-
+					fallthrough
 				case 'F':
-
+					fallthrough
 				case 'a':
-
+					fallthrough
 				case 'b':
-
+					fallthrough
 				case 'c':
-
+					fallthrough
 				case 'd':
-
+					fallthrough
 				case 'e':
-
+					fallthrough
 				case 'f':
 					if base <= 10 {
 						break
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
+					fallthrough
 				case '+':
-
+					fallthrough
 				case '-':
 					if (flags & SCAN_SIGNOK) != 0 {
 						flags &= ^SCAN_SIGNOK
 						goto addToInt
 					}
-					break
 				case 'x':
-
+					fallthrough
 				case 'X':
 					if (flags&SCAN_XOK) != 0 && end == buf+1 {
 						base = 16
 						flags &= ^SCAN_XOK
 						goto addToInt
 					}
-					break
 				}
 
 				/*
@@ -966,7 +952,6 @@ func PhpSscanfInternal(
 					}
 				}
 			}
-			break
 		case 'f':
 
 			/*
@@ -981,42 +966,41 @@ func PhpSscanfInternal(
 			for end = buf; width > 0; width-- {
 				switch *string {
 				case '0':
-
+					fallthrough
 				case '1':
-
+					fallthrough
 				case '2':
-
+					fallthrough
 				case '3':
-
+					fallthrough
 				case '4':
-
+					fallthrough
 				case '5':
-
+					fallthrough
 				case '6':
-
+					fallthrough
 				case '7':
-
+					fallthrough
 				case '8':
-
+					fallthrough
 				case '9':
 					flags &= ^(SCAN_SIGNOK | SCAN_NODIGITS)
 					goto addToFloat
+					fallthrough
 				case '+':
-
+					fallthrough
 				case '-':
 					if (flags & SCAN_SIGNOK) != 0 {
 						flags &= ^SCAN_SIGNOK
 						goto addToFloat
 					}
-					break
 				case '.':
 					if (flags & SCAN_PTOK) != 0 {
 						flags &= ^(SCAN_SIGNOK | SCAN_PTOK)
 						goto addToFloat
 					}
-					break
 				case 'e':
-
+					fallthrough
 				case 'E':
 
 					/*
@@ -1028,7 +1012,6 @@ func PhpSscanfInternal(
 						flags = flags & ^(SCAN_EXPOK|SCAN_PTOK) | SCAN_SIGNOK | SCAN_NODIGITS
 						goto addToFloat
 					}
-					break
 				}
 
 				/*
@@ -1097,7 +1080,6 @@ func PhpSscanfInternal(
 					zend.AddIndexDouble(return_value, b.PostInc(&objIndex), dvalue)
 				}
 			}
-			break
 		}
 		nconversions++
 	}

@@ -253,12 +253,12 @@ func PhpOutputHandlerCreateUser(output_handler *zend.Zval, chunk_size int, flags
 	switch output_handler.GetType() {
 	case zend.IS_NULL:
 		handler = PhpOutputHandlerCreateInternal(zend.ZEND_STRL(PhpOutputDefaultHandlerName), PhpOutputHandlerDefaultFunc, chunk_size, flags)
-		break
 	case zend.IS_STRING:
 		if zend.Z_STRLEN_P(output_handler) != 0 && b.Assign(&alias, PhpOutputHandlerAlias(zend.Z_STRVAL_P(output_handler), zend.Z_STRLEN_P(output_handler))) {
 			handler = alias(zend.Z_STRVAL_P(output_handler), zend.Z_STRLEN_P(output_handler), chunk_size, flags)
 			break
 		}
+		fallthrough
 	default:
 		user = zend.Ecalloc(1, b.SizeOf("php_output_handler_user_func_t"))
 		if zend.SUCCESS == zend.ZendFcallInfoInit(output_handler, 0, user.GetFci(), user.GetFcc(), &handler_name, &error) {
@@ -417,7 +417,7 @@ func PhpOutputHandlerHook(type_ PhpOutputHandlerHookT, arg any) int {
 			OG(running).flags |= PHP_OUTPUT_HANDLER_DISABLED
 			return zend.SUCCESS
 		default:
-			break
+
 		}
 	}
 	return zend.FAILURE
@@ -664,19 +664,18 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 		handler.GetBuffer().SetData(nil)
 		handler.GetBuffer().SetUsed(0)
 		handler.GetBuffer().SetSize(0)
-		break
 	case PHP_OUTPUT_HANDLER_NO_DATA:
 
 		/* handler ate all */
 
 		PhpOutputContextReset(context)
+		fallthrough
 	case PHP_OUTPUT_HANDLER_SUCCESS:
 
 		/* no more buffered data */
 
 		handler.GetBuffer().SetUsed(0)
 		handler.SetIsProcessed(true)
-		break
 	}
 	context.SetOp(original_op)
 	return status
@@ -750,7 +749,7 @@ func PhpOutputStackApplyOp(h any, c any) int {
 		}
 		return 0
 	case PHP_OUTPUT_HANDLER_FAILURE:
-
+		fallthrough
 	default:
 		if was_disabled != 0 {
 

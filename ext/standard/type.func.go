@@ -759,11 +759,10 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	switch arg.GetType() {
 	case zend.IS_LONG:
-
+		fallthrough
 	case zend.IS_DOUBLE:
 		return_value.SetTrue()
 		return
-		break
 	case zend.IS_STRING:
 		if zend.IsNumericString(zend.Z_STRVAL_P(arg), zend.Z_STRLEN_P(arg), nil, nil, 0) != 0 {
 			return_value.SetTrue()
@@ -772,11 +771,9 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return_value.SetFalse()
 			return
 		}
-		break
 	default:
 		return_value.SetFalse()
 		return
-		break
 	}
 }
 func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -846,21 +843,19 @@ func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	switch arg.GetType() {
 	case zend.IS_FALSE:
-
+		fallthrough
 	case zend.IS_TRUE:
-
+		fallthrough
 	case zend.IS_DOUBLE:
-
+		fallthrough
 	case zend.IS_LONG:
-
+		fallthrough
 	case zend.IS_STRING:
 		return_value.SetTrue()
 		return
-		break
 	default:
 		return_value.SetFalse()
 		return
-		break
 	}
 }
 func ZifIsCallable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {

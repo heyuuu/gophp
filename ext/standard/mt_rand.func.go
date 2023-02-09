@@ -174,7 +174,6 @@ func ZifMtSrand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	switch mode {
 	case MT_RAND_PHP:
 		BG(mt_rand_mode) = MT_RAND_PHP
-		break
 	default:
 		BG(mt_rand_mode) = MT_RAND_MT19937
 	}

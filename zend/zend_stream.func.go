@@ -150,20 +150,17 @@ func ZendFileHandleDtor(fh *ZendFileHandle) {
 	switch fh.GetType() {
 	case ZEND_HANDLE_FP:
 		r.Fclose(fh.GetFp())
-		break
 	case ZEND_HANDLE_STREAM:
 		if fh.GetStream().GetCloser() != nil && fh.GetStream().GetHandle() {
 			fh.GetStream().GetCloser()(fh.GetStream().GetHandle())
 		}
 		fh.GetStream().SetHandle(nil)
-		break
 	case ZEND_HANDLE_FILENAME:
 
 		/* We're only supposed to get here when destructing the used_files hash,
 		 * which doesn't really contain open files, but references to their names/paths
 		 */
 
-		break
 	}
 	if fh.GetOpenedPath() != nil {
 		ZendStringReleaseEx(fh.GetOpenedPath(), 0)

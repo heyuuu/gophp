@@ -369,29 +369,24 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *zend.Zval) {
 	array.SetUndef()
 	switch arg {
 	case PARSE_POST:
-
+		fallthrough
 	case PARSE_GET:
-
+		fallthrough
 	case PARSE_COOKIE:
 		zend.ArrayInit(&array)
 		switch arg {
 		case PARSE_POST:
 			zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_POST])
 			zend.ZVAL_COPY_VALUE(&PG(http_globals)[TRACK_VARS_POST], &array)
-			break
 		case PARSE_GET:
 			zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_GET])
 			zend.ZVAL_COPY_VALUE(&PG(http_globals)[TRACK_VARS_GET], &array)
-			break
 		case PARSE_COOKIE:
 			zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_COOKIE])
 			zend.ZVAL_COPY_VALUE(&PG(http_globals)[TRACK_VARS_COOKIE], &array)
-			break
 		}
-		break
 	default:
 		zend.ZVAL_COPY_VALUE(&array, destArray)
-		break
 	}
 	if arg == PARSE_POST {
 		SapiHandlePost(&array)
@@ -422,13 +417,11 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *zend.Zval) {
 	}
 	switch arg {
 	case PARSE_GET:
-
+		fallthrough
 	case PARSE_STRING:
 		separator = PG(arg_separator).input
-		break
 	case PARSE_COOKIE:
 		separator = ";0"
-		break
 	}
 	var_ = PhpStrtokR(res, separator, &strtok_buf)
 	for var_ != nil {
@@ -775,29 +768,26 @@ func PhpAutoGlobalsCreateRequest(name *zend.ZendString) zend.ZendBool {
 	for ; p != nil && (*p); p++ {
 		switch *p {
 		case 'g':
-
+			fallthrough
 		case 'G':
 			if _gpc_flags[0] == 0 {
 				PhpAutoglobalMerge(form_variables.GetArr(), PG(http_globals)[TRACK_VARS_GET].GetArr())
 				_gpc_flags[0] = 1
 			}
-			break
 		case 'p':
-
+			fallthrough
 		case 'P':
 			if _gpc_flags[1] == 0 {
 				PhpAutoglobalMerge(form_variables.GetArr(), PG(http_globals)[TRACK_VARS_POST].GetArr())
 				_gpc_flags[1] = 1
 			}
-			break
 		case 'c':
-
+			fallthrough
 		case 'C':
 			if _gpc_flags[2] == 0 {
 				PhpAutoglobalMerge(form_variables.GetArr(), PG(http_globals)[TRACK_VARS_COOKIE].GetArr())
 				_gpc_flags[2] = 1
 			}
-			break
 		}
 	}
 	zend.EG__().GetSymbolTable().KeyUpdate(name.GetStr(), &form_variables)

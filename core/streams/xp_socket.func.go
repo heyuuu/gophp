@@ -250,6 +250,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		} else {
 			return core.PHP_STREAM_OPTION_RETURN_ERR
 		}
+		fallthrough
 	case core.PHP_STREAM_OPTION_BLOCKING:
 		oldmode = sock.GetIsBlocked()
 		if zend.SUCCESS == core.PhpSetSockBlocking(sock.GetSocket(), value) {
@@ -311,6 +312,7 @@ func PhpSockopSetOption(stream *core.PhpStream, option int, value int, ptrparam 
 		default:
 			return core.PHP_STREAM_OPTION_RETURN_NOTIMPL
 		}
+		fallthrough
 	default:
 		return core.PHP_STREAM_OPTION_RETURN_NOTIMPL
 	}
@@ -331,9 +333,9 @@ func PhpSockopCast(stream *core.PhpStream, castas int, ret *any) int {
 		}
 		return zend.SUCCESS
 	case core.PHP_STREAM_AS_FD_FOR_SELECT:
-
+		fallthrough
 	case core.PHP_STREAM_AS_FD:
-
+		fallthrough
 	case core.PHP_STREAM_AS_SOCKETD:
 		if ret != nil {
 			*((*core.PhpSocketT)(ret)) = sock.GetSocket()
@@ -490,7 +492,7 @@ func PhpTcpSockopSetOption(stream *core.PhpStream, option int, value int, ptrpar
 		xparam = (*PhpStreamXportParam)(ptrparam)
 		switch xparam.GetOp() {
 		case STREAM_XPORT_OP_CONNECT:
-
+			fallthrough
 		case STREAM_XPORT_OP_CONNECT_ASYNC:
 			xparam.SetReturncode(PhpTcpSockopConnect(stream, sock, xparam))
 			return core.PHP_STREAM_OPTION_RETURN_OK

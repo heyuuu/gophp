@@ -153,10 +153,8 @@ func PhpMailBuildHeadersElem(s *zend.SmartStr, key *zend.ZendString, val *zend.Z
 		s.AppendString(": ")
 		s.AppendString(b.CastStrAuto(zend.Z_STRVAL_P(val)))
 		s.AppendString("\r\n")
-		break
 	case zend.IS_ARRAY:
 		PhpMailBuildHeadersElems(s, key, val)
-		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "headers array elements must be string or array (%s)", key.GetVal())
 	}
@@ -208,28 +206,24 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"from\"") - 1:
 			if !(strncasecmp("from", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("from", s, key, val)
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"sender\"") - 1:
 			if !(strncasecmp("sender", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("sender", s, key, val)
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"reply-to\"") - 1:
 			if !(strncasecmp("reply-to", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("reply-to", s, key, val)
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"to\"") - 1:
 			if !(strncasecmp("to", key.GetVal(), key.GetLen())) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'To' header")
@@ -240,14 +234,12 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"bcc\"") - 1:
 			if !(strncasecmp("bcc", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("bcc", s, key, val)
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"message-id\"") - 1:
 			if !(strncasecmp("message-id", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("message-id", s, key, val)
@@ -256,21 +248,18 @@ func PhpMailBuildHeaders(headers *zend.Zval) *zend.ZendString {
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"in-reply-to\"") - 1:
 			if !(strncasecmp("in-reply-to", key.GetVal(), key.GetLen())) {
 				PHP_MAIL_BUILD_HEADER_CHECK("in-reply-to", s, key, val)
 			} else {
 				PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 			}
-			break
 		case b.SizeOf("\"subject\"") - 1:
 			if !(strncasecmp("subject", key.GetVal(), key.GetLen())) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Extra header cannot contain 'Subject' header")
 				continue
 			}
 			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
-			break
 		default:
 			PHP_MAIL_BUILD_HEADER_DEFAULT(s, key, val)
 		}
@@ -405,10 +394,8 @@ func ZifMail(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			MAIL_ASCIIZ_CHECK(tmp_headers.GetVal(), tmp_headers.GetLen())
 			str_headers = PhpTrim(tmp_headers, nil, 0, 2)
 			zend.ZendStringReleaseEx(tmp_headers, 0)
-			break
 		case zend.IS_ARRAY:
 			str_headers = PhpMailBuildHeaders(headers)
-			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "headers parameter must be string or array")
 			return_value.SetFalse()

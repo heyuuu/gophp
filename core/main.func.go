@@ -157,19 +157,17 @@ func PhpDisableFunctions() {
 	for *e {
 		switch *e {
 		case ' ':
-
+			fallthrough
 		case ',':
 			if s != nil {
 				*e = '0'
 				zend.ZendDisableFunction(s, e-s)
 				s = nil
 			}
-			break
 		default:
 			if s == nil {
 				s = e
 			}
-			break
 		}
 		e++
 	}
@@ -188,19 +186,17 @@ func PhpDisableClasses() {
 	for *e {
 		switch *e {
 		case ' ':
-
+			fallthrough
 		case ',':
 			if s != nil {
 				*e = '0'
 				zend.ZendDisableClass(s, e-s)
 				s = nil
 			}
-			break
 		default:
 			if s == nil {
 				s = e
 			}
-			break
 		}
 		e++
 	}
@@ -351,17 +347,14 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 		} else {
 			PUTS("On")
 		}
-		break
 	case PHP_DISPLAY_ERRORS_STDOUT:
 		if cgi_or_cli != 0 {
 			PUTS("STDOUT")
 		} else {
 			PUTS("On")
 		}
-		break
 	default:
 		PUTS("Off")
-		break
 	}
 }
 func PhpGetInternalEncoding() *byte {
@@ -635,23 +628,18 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		case zend.ZEND_EVAL:
 			function = "eval"
 			is_function = 1
-			break
 		case zend.ZEND_INCLUDE:
 			function = "include"
 			is_function = 1
-			break
 		case zend.ZEND_INCLUDE_ONCE:
 			function = "include_once"
 			is_function = 1
-			break
 		case zend.ZEND_REQUIRE:
 			function = "require"
 			is_function = 1
-			break
 		case zend.ZEND_REQUIRE_ONCE:
 			function = "require_once"
 			is_function = 1
-			break
 		default:
 			function = "Unknown"
 		}
@@ -843,34 +831,31 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 	if zend.EG__().GetErrorHandling() == zend.EH_THROW {
 		switch type_ {
 		case zend.E_ERROR:
-
+			fallthrough
 		case zend.E_CORE_ERROR:
-
+			fallthrough
 		case zend.E_COMPILE_ERROR:
-
+			fallthrough
 		case zend.E_USER_ERROR:
-
+			fallthrough
 		case zend.E_PARSE:
 
-			/* fatal errors are real errors and cannot be made exceptions */
+		/* fatal errors are real errors and cannot be made exceptions */
 
-			break
 		case zend.E_STRICT:
-
+			fallthrough
 		case zend.E_DEPRECATED:
-
+			fallthrough
 		case zend.E_USER_DEPRECATED:
 
-			/* for the sake of BC to old damaged code */
+		/* for the sake of BC to old damaged code */
 
-			break
 		case zend.E_NOTICE:
-
+			fallthrough
 		case zend.E_USER_NOTICE:
 
 			/* notices are no errors and are not treated as such like E_WARNINGS */
 
-			break
 		default:
 
 			/* throw an exception if we are in EH_THROW mode
@@ -914,52 +899,44 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 		var syslog_type_int int = LOG_NOTICE
 		switch type_ {
 		case zend.E_ERROR:
-
+			fallthrough
 		case zend.E_CORE_ERROR:
-
+			fallthrough
 		case zend.E_COMPILE_ERROR:
-
+			fallthrough
 		case zend.E_USER_ERROR:
 			error_type_str = "Fatal error"
 			syslog_type_int = LOG_ERR
-			break
 		case zend.E_RECOVERABLE_ERROR:
 			error_type_str = "Recoverable fatal error"
 			syslog_type_int = LOG_ERR
-			break
 		case zend.E_WARNING:
-
+			fallthrough
 		case zend.E_CORE_WARNING:
-
+			fallthrough
 		case zend.E_COMPILE_WARNING:
-
+			fallthrough
 		case zend.E_USER_WARNING:
 			error_type_str = "Warning"
 			syslog_type_int = LOG_WARNING
-			break
 		case zend.E_PARSE:
 			error_type_str = "Parse error"
 			syslog_type_int = LOG_ERR
-			break
 		case zend.E_NOTICE:
-
+			fallthrough
 		case zend.E_USER_NOTICE:
 			error_type_str = "Notice"
 			syslog_type_int = LOG_NOTICE
-			break
 		case zend.E_STRICT:
 			error_type_str = "Strict Standards"
 			syslog_type_int = LOG_INFO
-			break
 		case zend.E_DEPRECATED:
-
+			fallthrough
 		case zend.E_USER_DEPRECATED:
 			error_type_str = "Deprecated"
 			syslog_type_int = LOG_INFO
-			break
 		default:
 			error_type_str = "Unknown error"
-			break
 		}
 		if ModuleInitialized == 0 || PG(log_errors) {
 			var log_buffer *byte
@@ -1011,14 +988,15 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 			/* bad error in module startup - no way we can live with this */
 
 		}
+		fallthrough
 	case zend.E_ERROR:
-
+		fallthrough
 	case zend.E_RECOVERABLE_ERROR:
-
+		fallthrough
 	case zend.E_PARSE:
-
+		fallthrough
 	case zend.E_COMPILE_ERROR:
-
+		fallthrough
 	case zend.E_USER_ERROR:
 		zend.EG__().SetExitStatus(255)
 		if ModuleInitialized != 0 {
@@ -1045,7 +1023,6 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 			/* the parser would return 1 (failure), we can bail out nicely */
 
 		}
-		break
 	}
 
 	/* Log if necessary */
@@ -1179,19 +1156,16 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 	switch message {
 	case zend.ZMSG_FAILED_INCLUDE_FOPEN:
 		PhpErrorDocref("function.include", zend.E_WARNING, "Failed opening '%s' for inclusion (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG(include_path)))
-		break
 	case zend.ZMSG_FAILED_REQUIRE_FOPEN:
 		PhpErrorDocref("function.require", zend.E_COMPILE_ERROR, "Failed opening required '%s' (include_path='%s')", PhpStripUrlPasswd((*byte)(data)), STR_PRINT(PG(include_path)))
-		break
 	case zend.ZMSG_FAILED_HIGHLIGHT_FOPEN:
 		PhpErrorDocref(nil, zend.E_WARNING, "Failed opening '%s' for highlighting", PhpStripUrlPasswd((*byte)(data)))
-		break
 	case zend.ZMSG_MEMORY_LEAK_DETECTED:
-
+		fallthrough
 	case zend.ZMSG_MEMORY_LEAK_REPEATED:
-		break
+
 	case zend.ZMSG_MEMORY_LEAKS_GRAND_TOTAL:
-		break
+
 	case zend.ZMSG_LOG_SCRIPT_NAME:
 		var ta *__struct__tm
 		var tmbuf __struct__tm
@@ -1209,7 +1183,6 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG(request_info).path_translated))
 		}
 		r.Fprintf(stderr, "%s", memory_leak_buf)
-		break
 	}
 }
 func PhpOnTimeout(seconds int) {

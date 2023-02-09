@@ -952,22 +952,16 @@ func LangYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16,
 	switch yycount {
 	case 0:
 		yyformat = YY_("syntax error")
-		break
 	case 1:
 		yyformat = YY_("syntax error, unexpected %s")
-		break
 	case 2:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s")
-		break
 	case 3:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s")
-		break
 	case 4:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s")
-		break
 	case 5:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s")
-		break
 	}
 	var yysize1 YYSIZE_T = yysize + yystrlen(yyformat)
 	if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
@@ -1012,371 +1006,250 @@ func LangYydestruct(yymsg *byte, yytype int, yyvaluep *ZendParserStackElem) {
 	switch yytype {
 	case 71:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 72:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 73:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 74:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 75:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 76:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 77:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 78:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 79:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 174:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 175:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 176:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 177:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 178:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 182:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 183:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 185:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 186:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 187:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 188:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 189:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 190:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 191:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 192:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 193:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 194:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 196:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 197:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 198:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 199:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 200:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 201:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 204:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 209:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 211:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 213:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 214:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 215:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 216:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 217:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 218:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 219:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 220:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 221:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 223:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 224:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 225:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 226:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 227:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 228:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 229:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 230:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 231:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 232:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 233:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 234:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 235:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 236:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 237:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 238:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 239:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 240:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 241:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 242:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 243:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 244:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 245:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 246:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 247:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 248:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 249:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 250:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 251:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 252:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 257:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 258:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 259:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 260:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 261:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 262:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 263:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 264:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 265:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 266:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 268:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 269:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 270:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 273:
 		if yyvaluep.GetStr() != nil {
 			ZendStringReleaseEx(yyvaluep.GetStr(), 0)
 		}
-		break
 	case 277:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 278:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 279:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 280:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 281:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 282:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 283:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 284:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 285:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 286:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 287:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 288:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 289:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 290:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 291:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 292:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 293:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 294:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 295:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 296:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 297:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 298:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 299:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 300:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 301:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 302:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 303:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 304:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 305:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 306:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 307:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 308:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	case 309:
 		ZendAstDestroy(yyvaluep.GetAst())
-		break
 	default:
-		break
+
 	}
 }
 

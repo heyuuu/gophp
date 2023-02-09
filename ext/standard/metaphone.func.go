@@ -193,17 +193,15 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			Phonize('A')
 			w_idx++
 		}
-		break
 	case 'G':
-
+		fallthrough
 	case 'K':
-
+		fallthrough
 	case 'P':
 		if Next_Letter == 'N' {
 			Phonize('N')
 			w_idx += 2
 		}
-		break
 	case 'W':
 		if Next_Letter == 'R' {
 			Phonize(Next_Letter)
@@ -215,26 +213,22 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 
 		/* else ignore */
 
-		break
 	case 'X':
 		Phonize('S')
 		w_idx++
-		break
 	case 'E':
-
+		fallthrough
 	case 'I':
-
+		fallthrough
 	case 'O':
-
+		fallthrough
 	case 'U':
 		Phonize(Curr_Letter)
 		w_idx++
-		break
 	default:
 
 		/* do nothing */
 
-		break
 	}
 
 	/* On to the metaphoning */
@@ -267,7 +261,6 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			if Prev_Letter != 'M' {
 				Phonize('B')
 			}
-			break
 		case 'C':
 			if MAKESOFT(Next_Letter) != 0 {
 				if After_Next_Letter == 'A' && Next_Letter == 'I' {
@@ -287,7 +280,6 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			} else {
 				Phonize('K')
 			}
-			break
 		case 'D':
 			if Next_Letter == 'G' && MAKESOFT(After_Next_Letter) != 0 {
 				Phonize('J')
@@ -295,7 +287,6 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			} else {
 				Phonize('T')
 			}
-			break
 		case 'G':
 			if Next_Letter == 'H' {
 				if !(NOGHTOF(Look_Back_Letter(3)) != 0 || Look_Back_Letter(4) == 'H') {
@@ -313,27 +304,22 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			} else {
 				Phonize('K')
 			}
-			break
 		case 'H':
 			if Isvowel(Next_Letter) != 0 && AFFECTH(Prev_Letter) == 0 {
 				Phonize('H')
 			}
-			break
 		case 'K':
 			if Prev_Letter != 'C' {
 				Phonize('K')
 			}
-			break
 		case 'P':
 			if Next_Letter == 'H' {
 				Phonize('F')
 			} else {
 				Phonize('P')
 			}
-			break
 		case 'Q':
 			Phonize('K')
-			break
 		case 'S':
 			if Next_Letter == 'I' && (After_Next_Letter == 'O' || After_Next_Letter == 'A') {
 				Phonize(SH)
@@ -346,7 +332,6 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			} else {
 				Phonize('S')
 			}
-			break
 		case 'T':
 			if Next_Letter == 'I' && (After_Next_Letter == 'O' || After_Next_Letter == 'A') {
 				Phonize(SH)
@@ -356,45 +341,37 @@ func Metaphone(word *uint8, word_len int, max_phonemes zend.ZendLong, phoned_wor
 			} else if !(Next_Letter == 'C' && After_Next_Letter == 'H') {
 				Phonize('T')
 			}
-			break
 		case 'V':
 			Phonize('F')
-			break
 		case 'W':
 			if Isvowel(Next_Letter) != 0 {
 				Phonize('W')
 			}
-			break
 		case 'X':
 			Phonize('K')
 			Phonize('S')
-			break
 		case 'Y':
 			if Isvowel(Next_Letter) != 0 {
 				Phonize('Y')
 			}
-			break
 		case 'Z':
 			Phonize('S')
-			break
 		case 'F':
-
+			fallthrough
 		case 'J':
-
+			fallthrough
 		case 'L':
-
+			fallthrough
 		case 'M':
-
+			fallthrough
 		case 'N':
-
+			fallthrough
 		case 'R':
 			Phonize(Curr_Letter)
-			break
 		default:
 
 			/* nothing */
 
-			break
 		}
 		w_idx += skip_letter
 	}

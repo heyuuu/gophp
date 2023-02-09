@@ -831,37 +831,31 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 			switch *s {
 			case 'n':
 				b.PostInc(&(*t)) = '\n'
-				break
 			case 'r':
 				b.PostInc(&(*t)) = '\r'
-				break
 			case 't':
 				b.PostInc(&(*t)) = '\t'
-				break
 			case 'f':
 				b.PostInc(&(*t)) = 'f'
-				break
 			case 'v':
 				b.PostInc(&(*t)) = 'v'
-				break
 			case 'e':
 				b.PostInc(&(*t)) = 'e'
-				break
 			case '"':
-
+				fallthrough
 			case '`':
 				if (*s) != quote_type {
 					b.PostInc(&(*t)) = '\\'
 					b.PostInc(&(*t)) = *s
 					break
 				}
+				fallthrough
 			case '\\':
-
+				fallthrough
 			case '$':
 				b.PostInc(&(*t)) = *s
-				break
 			case 'x':
-
+				fallthrough
 			case 'X':
 				if ZEND_IS_HEX(*(s + 1)) {
 					var hex_buf []byte = []byte{0, 0, 0}
@@ -874,7 +868,6 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 					b.PostInc(&(*t)) = '\\'
 					b.PostInc(&(*t)) = *s
 				}
-				break
 			case 'u':
 
 				/* cache where we started so we can parse after validating */
@@ -957,7 +950,6 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 
 				/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
 
-				break
 			default:
 
 				/* check for an octal */
@@ -985,7 +977,6 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 					b.PostInc(&(*t)) = '\\'
 					b.PostInc(&(*t)) = *s
 				}
-				break
 			}
 		} else {
 			b.PostInc(&(*t)) = *s
@@ -1194,237 +1185,286 @@ yyc_ST_IN_SCRIPTING:
 	}
 	switch yych {
 	case 0x0:
-
+		fallthrough
 	case 0x1:
-
+		fallthrough
 	case 0x2:
-
+		fallthrough
 	case 0x3:
-
+		fallthrough
 	case 0x4:
-
+		fallthrough
 	case 0x5:
-
+		fallthrough
 	case 0x6:
-
+		fallthrough
 	case 0x7:
-
+		fallthrough
 	case 0x8:
-
+		fallthrough
 	case '\t':
-
+		fallthrough
 	case '\n':
-
+		fallthrough
 	case 'v':
-
+		fallthrough
 	case 'f':
-
+		fallthrough
 	case '\r':
-
+		fallthrough
 	case 0xe:
-
+		fallthrough
 	case 0xf:
-
+		fallthrough
 	case 0x10:
-
+		fallthrough
 	case 0x11:
-
+		fallthrough
 	case 0x12:
-
+		fallthrough
 	case 0x13:
-
+		fallthrough
 	case 0x14:
-
+		fallthrough
 	case 0x15:
-
+		fallthrough
 	case 0x16:
-
+		fallthrough
 	case 0x17:
-
+		fallthrough
 	case 0x18:
-
+		fallthrough
 	case 0x19:
-
+		fallthrough
 	case 0x1a:
-
+		fallthrough
 	case 0x1b:
-
+		fallthrough
 	case 0x1c:
-
+		fallthrough
 	case 0x1d:
-
+		fallthrough
 	case 0x1e:
-
+		fallthrough
 	case 0x1f:
-
+		fallthrough
 	case 0x7f:
 		goto yy1
+		fallthrough
 	case ' ':
-
+		fallthrough
 	case '!':
 		goto yy3
+		fallthrough
 	case '"':
 		goto yy5
+		fallthrough
 	case '#':
 		goto yy6
+		fallthrough
 	case '$':
 		goto yy7
+		fallthrough
 	case '%':
 		goto yy8
+		fallthrough
 	case '&':
 		goto yy9
+		fallthrough
 	case '\'':
 		goto yy10
+		fallthrough
 	case '(':
 		goto yy11
+		fallthrough
 	case ')':
-
+		fallthrough
 	case ',':
-
+		fallthrough
 	case ';':
-
+		fallthrough
 	case '@':
-
+		fallthrough
 	case '[':
-
+		fallthrough
 	case ']':
-
+		fallthrough
 	case '~':
 		goto yy12
+		fallthrough
 	case '*':
 		goto yy13
+		fallthrough
 	case '+':
 		goto yy14
+		fallthrough
 	case '-':
 		goto yy15
+		fallthrough
 	case '.':
 		goto yy16
+		fallthrough
 	case '/':
 		goto yy17
+		fallthrough
 	case '0':
 		goto yy18
+		fallthrough
 	case '1':
-
+		fallthrough
 	case '2':
-
+		fallthrough
 	case '3':
-
+		fallthrough
 	case '4':
-
+		fallthrough
 	case '5':
-
+		fallthrough
 	case '6':
-
+		fallthrough
 	case '7':
-
+		fallthrough
 	case '8':
-
+		fallthrough
 	case '9':
 		goto yy20
+		fallthrough
 	case ':':
 		goto yy22
+		fallthrough
 	case '<':
 		goto yy23
+		fallthrough
 	case '=':
 		goto yy24
+		fallthrough
 	case '>':
 		goto yy25
+		fallthrough
 	case '?':
 		goto yy26
+		fallthrough
 	case 'A':
-
+		fallthrough
 	case 'a':
 		goto yy27
+		fallthrough
 	case 'B':
-
+		fallthrough
 	case 'b':
 		goto yy29
+		fallthrough
 	case 'C':
-
+		fallthrough
 	case 'c':
 		goto yy30
+		fallthrough
 	case 'D':
-
+		fallthrough
 	case 'd':
 		goto yy31
+		fallthrough
 	case 'E':
-
+		fallthrough
 	case 'e':
 		goto yy32
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy33
+		fallthrough
 	case 'G':
-
+		fallthrough
 	case 'g':
 		goto yy34
+		fallthrough
 	case 'I':
-
+		fallthrough
 	case 'i':
 		goto yy37
+		fallthrough
 	case 'L':
-
+		fallthrough
 	case 'l':
 		goto yy38
+		fallthrough
 	case 'N':
-
+		fallthrough
 	case 'n':
 		goto yy39
+		fallthrough
 	case 'O':
-
+		fallthrough
 	case 'o':
 		goto yy40
+		fallthrough
 	case 'P':
-
+		fallthrough
 	case 'p':
 		goto yy41
+		fallthrough
 	case 'R':
-
+		fallthrough
 	case 'r':
 		goto yy42
+		fallthrough
 	case 'S':
-
+		fallthrough
 	case 's':
 		goto yy43
+		fallthrough
 	case 'T':
-
+		fallthrough
 	case 't':
 		goto yy44
+		fallthrough
 	case 'U':
-
+		fallthrough
 	case 'u':
 		goto yy45
+		fallthrough
 	case 'V':
-
+		fallthrough
 	case 'v':
 		goto yy46
+		fallthrough
 	case 'W':
-
+		fallthrough
 	case 'w':
 		goto yy47
+		fallthrough
 	case 'X':
-
+		fallthrough
 	case 'x':
 		goto yy48
+		fallthrough
 	case 'Y':
-
+		fallthrough
 	case 'y':
 		goto yy49
+		fallthrough
 	case '\\':
 		goto yy50
+		fallthrough
 	case '^':
 		goto yy51
+		fallthrough
 	case '_':
 		goto yy52
+		fallthrough
 	case '`':
 		goto yy53
+		fallthrough
 	case '{':
 		goto yy54
+		fallthrough
 	case '|':
 		goto yy55
+		fallthrough
 	case '}':
 		goto yy56
+		fallthrough
 	default:
 		goto yy35
 	}
@@ -1478,6 +1518,7 @@ yy5:
 				token = T_ERROR
 				goto emit_token
 			}
+			fallthrough
 		case '$':
 			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
@@ -1492,6 +1533,7 @@ yy5:
 			if YYCURSOR < YYLIMIT {
 				YYCURSOR++
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -1515,14 +1557,15 @@ yy6:
 			if (*YYCURSOR) == '\n' {
 				YYCURSOR++
 			}
+			fallthrough
 		case '\n':
 			CG__().GetZendLineno()++
-			break
 		case '?':
 			if (*YYCURSOR) == '>' {
 				YYCURSOR--
 				break
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -2144,29 +2187,35 @@ yy32:
 	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'C':
-
+		fallthrough
 	case 'c':
 		goto yy120
+		fallthrough
 	case 'L':
-
+		fallthrough
 	case 'l':
 		goto yy121
+		fallthrough
 	case 'M':
-
+		fallthrough
 	case 'm':
 		goto yy122
+		fallthrough
 	case 'N':
-
+		fallthrough
 	case 'n':
 		goto yy123
+		fallthrough
 	case 'V':
-
+		fallthrough
 	case 'v':
 		goto yy124
+		fallthrough
 	case 'X':
-
+		fallthrough
 	case 'x':
 		goto yy125
+		fallthrough
 	default:
 		goto yy36
 	}
@@ -2579,41 +2628,50 @@ yy65:
 	}
 	switch yych {
 	case 'A':
-
+		fallthrough
 	case 'a':
 		goto yy67
+		fallthrough
 	case 'B':
-
+		fallthrough
 	case 'b':
 		goto yy68
+		fallthrough
 	case 'D':
-
+		fallthrough
 	case 'd':
 		goto yy69
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy70
+		fallthrough
 	case 'I':
-
+		fallthrough
 	case 'i':
 		goto yy71
+		fallthrough
 	case 'O':
-
+		fallthrough
 	case 'o':
 		goto yy72
+		fallthrough
 	case 'R':
-
+		fallthrough
 	case 'r':
 		goto yy73
+		fallthrough
 	case 'S':
-
+		fallthrough
 	case 's':
 		goto yy74
+		fallthrough
 	case 'U':
-
+		fallthrough
 	case 'u':
 		goto yy75
+		fallthrough
 	default:
 		goto yy66
 	}
@@ -3563,37 +3621,45 @@ yy154:
 	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'C':
-
+		fallthrough
 	case 'c':
 		goto yy237
+		fallthrough
 	case 'D':
-
+		fallthrough
 	case 'd':
 		goto yy238
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy239
+		fallthrough
 	case 'H':
-
+		fallthrough
 	case 'h':
 		goto yy240
+		fallthrough
 	case 'L':
-
+		fallthrough
 	case 'l':
 		goto yy241
+		fallthrough
 	case 'M':
-
+		fallthrough
 	case 'm':
 		goto yy242
+		fallthrough
 	case 'N':
-
+		fallthrough
 	case 'n':
 		goto yy243
+		fallthrough
 	case 'T':
-
+		fallthrough
 	case 't':
 		goto yy244
+		fallthrough
 	default:
 		goto yy36
 	}
@@ -4138,25 +4204,30 @@ yy203:
 	yych = *(b.PreInc(&YYCURSOR))
 	switch yych {
 	case 'D':
-
+		fallthrough
 	case 'd':
 		goto yy275
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy276
+		fallthrough
 	case 'I':
-
+		fallthrough
 	case 'i':
 		goto yy277
+		fallthrough
 	case 'S':
-
+		fallthrough
 	case 's':
 		goto yy278
+		fallthrough
 	case 'W':
-
+		fallthrough
 	case 'w':
 		goto yy279
+		fallthrough
 	default:
 		goto yy36
 	}
@@ -5606,10 +5677,8 @@ yy334:
 			switch retval {
 			case T_START_HEREDOC:
 				heredoc_nesting_level++
-				break
 			case T_END_HEREDOC:
 				heredoc_nesting_level--
-				break
 			case END:
 				heredoc_nesting_level = 0
 			}
@@ -7776,7 +7845,7 @@ yy562:
 	for YYCURSOR < YYLIMIT {
 		switch b.PostInc(&(*YYCURSOR)) {
 		case '`':
-			break
+
 		case '$':
 			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
@@ -7791,6 +7860,7 @@ yy562:
 			if YYCURSOR < YYLIMIT {
 				YYCURSOR++
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -7962,7 +8032,7 @@ yy576:
 	for YYCURSOR < YYLIMIT {
 		switch b.PostInc(&(*YYCURSOR)) {
 		case '"':
-			break
+
 		case '$':
 			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
@@ -7977,6 +8047,7 @@ yy576:
 			if YYCURSOR < YYLIMIT {
 				YYCURSOR++
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -8143,6 +8214,7 @@ yy590:
 			if (*YYCURSOR) == '\n' {
 				YYCURSOR++
 			}
+			fallthrough
 		case '\n':
 			spacing = 0
 			indentation = spacing
@@ -8209,6 +8281,7 @@ yy590:
 			if YYCURSOR < YYLIMIT && (*YYCURSOR) != '\n' && (*YYCURSOR) != '\r' {
 				YYCURSOR++
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -9048,6 +9121,7 @@ yyc_ST_NOWDOC:
 			if (*YYCURSOR) == '\n' {
 				YYCURSOR++
 			}
+			fallthrough
 		case '\n':
 			spacing = 0
 			indentation = spacing
@@ -9095,6 +9169,7 @@ yyc_ST_NOWDOC:
 				BEGIN(ST_END_HEREDOC)
 				goto nowdoc_scan_done
 			}
+			fallthrough
 		default:
 			continue
 		}

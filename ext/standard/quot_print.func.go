@@ -272,7 +272,6 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 					str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 				}
 			}
-			break
 		default:
 			str_out.GetVal()[b.PostInc(&j)] = str_in[b.PostInc(&i)]
 		}

@@ -657,7 +657,6 @@ func PhpStreamUrlWrapHttpEx(
 			switch response_code {
 			case 403:
 				streams.PhpStreamNotifyError(context, streams.PHP_STREAM_NOTIFY_AUTH_RESULT, tmp_line, response_code)
-				break
 			default:
 
 				/* safety net in the event tmp_line == NULL */

@@ -204,23 +204,22 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		switch int(code) {
 		case 'x':
-
+			fallthrough
 		case 'X':
-
+			fallthrough
 		case '@':
 			if arg < 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: '*' ignored", code)
 				arg = 1
 			}
-			break
 		case 'a':
-
+			fallthrough
 		case 'A':
-
+			fallthrough
 		case 'Z':
-
+			fallthrough
 		case 'h':
-
+			fallthrough
 		case 'H':
 			if currentarg >= num_args {
 				zend.Efree(formatcodes)
@@ -251,49 +250,48 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				}
 			}
 			currentarg++
-			break
 		case 'q':
-
+			fallthrough
 		case 'Q':
-
+			fallthrough
 		case 'J':
-
+			fallthrough
 		case 'P':
-
+			fallthrough
 		case 'c':
-
+			fallthrough
 		case 'C':
-
+			fallthrough
 		case 's':
-
+			fallthrough
 		case 'S':
-
+			fallthrough
 		case 'i':
-
+			fallthrough
 		case 'I':
-
+			fallthrough
 		case 'l':
-
+			fallthrough
 		case 'L':
-
+			fallthrough
 		case 'n':
-
+			fallthrough
 		case 'N':
-
+			fallthrough
 		case 'v':
-
+			fallthrough
 		case 'V':
-
+			fallthrough
 		case 'f':
-
+			fallthrough
 		case 'g':
-
+			fallthrough
 		case 'G':
-
+			fallthrough
 		case 'd':
-
+			fallthrough
 		case 'e':
-
+			fallthrough
 		case 'E':
 			if arg < 0 {
 				arg = num_args - currentarg
@@ -310,7 +308,6 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return_value.SetFalse()
 				return
 			}
-			break
 		default:
 			zend.Efree(formatcodes)
 			zend.Efree(formatargs)
@@ -332,7 +329,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var arg int = formatargs[i]
 		switch int(code) {
 		case 'h':
-
+			fallthrough
 		case 'H':
 			if (arg+arg%2)/2 < 0 || (core.INT_MAX-outputpos)/int(1) < (arg+arg%2)/2 {
 				zend.Efree(formatcodes)
@@ -342,17 +339,16 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += (arg + arg%2) / 2 * 1
-			break
 		case 'a':
-
+			fallthrough
 		case 'A':
-
+			fallthrough
 		case 'Z':
-
+			fallthrough
 		case 'c':
-
+			fallthrough
 		case 'C':
-
+			fallthrough
 		case 'x':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(1) < arg {
 				zend.Efree(formatcodes)
@@ -362,13 +358,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * 1
-			break
 		case 's':
-
+			fallthrough
 		case 'S':
-
+			fallthrough
 		case 'n':
-
+			fallthrough
 		case 'v':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(2) < arg {
 				zend.Efree(formatcodes)
@@ -378,9 +373,8 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * 2
-			break
 		case 'i':
-
+			fallthrough
 		case 'I':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("int")) < arg {
 				zend.Efree(formatcodes)
@@ -390,13 +384,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * b.SizeOf("int")
-			break
 		case 'l':
-
+			fallthrough
 		case 'L':
-
+			fallthrough
 		case 'N':
-
+			fallthrough
 		case 'V':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(4) < arg {
 				zend.Efree(formatcodes)
@@ -406,13 +399,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * 4
-			break
 		case 'q':
-
+			fallthrough
 		case 'Q':
-
+			fallthrough
 		case 'J':
-
+			fallthrough
 		case 'P':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(8) < arg {
 				zend.Efree(formatcodes)
@@ -422,11 +414,10 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * 8
-			break
 		case 'f':
-
+			fallthrough
 		case 'g':
-
+			fallthrough
 		case 'G':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("float")) < arg {
 				zend.Efree(formatcodes)
@@ -436,11 +427,10 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * b.SizeOf("float")
-			break
 		case 'd':
-
+			fallthrough
 		case 'e':
-
+			fallthrough
 		case 'E':
 			if arg < 0 || (core.INT_MAX-outputpos)/int(b.SizeOf("double")) < arg {
 				zend.Efree(formatcodes)
@@ -450,17 +440,14 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				return
 			}
 			outputpos += arg * b.SizeOf("double")
-			break
 		case 'X':
 			outputpos -= arg
 			if outputpos < 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", code)
 				outputpos = 0
 			}
-			break
 		case '@':
 			outputpos = arg
-			break
 		}
 		if outputsize < outputpos {
 			outputsize = outputpos
@@ -477,9 +464,9 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		var arg int = formatargs[i]
 		switch int(code) {
 		case 'a':
-
+			fallthrough
 		case 'A':
-
+			fallthrough
 		case 'Z':
 			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return zend.MAX(0, arg-1) })
 			var tmp_str *zend.ZendString
@@ -488,15 +475,14 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			memcpy(&output.GetVal()[outputpos], str.GetVal(), b.CondF1(str.GetLen() < arg_cp, func() int { return str.GetLen() }, arg_cp))
 			outputpos += arg
 			zend.ZendTmpStringRelease(tmp_str)
-			break
 		case 'h':
-
+			fallthrough
 		case 'H':
 			var nibbleshift int = b.Cond(code == 'h', 0, 4)
 			var first int = 1
 			var tmp_str *zend.ZendString
 			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
-			var v *byte = str.GetVal()
+			var v *byte = zend.ZSTR_VAL(str)
 			outputpos--
 			if int(arg > str.GetLen()) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: not enough characters in string", code)
@@ -524,21 +510,19 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			}
 			outputpos++
 			zend.ZendTmpStringRelease(tmp_str)
-			break
 		case 'c':
-
+			fallthrough
 		case 'C':
 			for b.PostDec(&arg) > 0 {
 				PhpPack(&argv[b.PostInc(&currentarg)], 1, ByteMap, &output.GetVal()[outputpos])
 				outputpos++
 			}
-			break
 		case 's':
-
+			fallthrough
 		case 'S':
-
+			fallthrough
 		case 'n':
-
+			fallthrough
 		case 'v':
 			var map_ *int = MachineEndianShortMap
 			if code == 'n' {
@@ -550,21 +534,19 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPack(&argv[b.PostInc(&currentarg)], 2, map_, &output.GetVal()[outputpos])
 				outputpos += 2
 			}
-			break
 		case 'i':
-
+			fallthrough
 		case 'I':
 			for b.PostDec(&arg) > 0 {
 				PhpPack(&argv[b.PostInc(&currentarg)], b.SizeOf("int"), IntMap, &output.GetVal()[outputpos])
 				outputpos += b.SizeOf("int")
 			}
-			break
 		case 'l':
-
+			fallthrough
 		case 'L':
-
+			fallthrough
 		case 'N':
-
+			fallthrough
 		case 'V':
 			var map_ *int = MachineEndianLongMap
 			if code == 'N' {
@@ -576,13 +558,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPack(&argv[b.PostInc(&currentarg)], 4, map_, &output.GetVal()[outputpos])
 				outputpos += 4
 			}
-			break
 		case 'q':
-
+			fallthrough
 		case 'Q':
-
+			fallthrough
 		case 'J':
-
+			fallthrough
 		case 'P':
 			var map_ *int = MachineEndianLonglongMap
 			if code == 'J' {
@@ -594,14 +575,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPack(&argv[b.PostInc(&currentarg)], 8, map_, &output.GetVal()[outputpos])
 				outputpos += 8
 			}
-			break
 		case 'f':
 			for b.PostDec(&arg) > 0 {
 				var v float = float(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'g':
 
 			/* pack little endian float */
@@ -611,7 +590,6 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPackCopyFloat(1, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'G':
 
 			/* pack big endian float */
@@ -621,14 +599,12 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPackCopyFloat(0, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'd':
 			for b.PostDec(&arg) > 0 {
 				var v float64 = float64(zend.ZvalGetDouble(&argv[b.PostInc(&currentarg)]))
 				memcpy(&output.GetVal()[outputpos], &v, b.SizeOf("v"))
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'e':
 
 			/* pack little endian double */
@@ -638,7 +614,6 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPackCopyDouble(1, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'E':
 
 			/* pack big endian double */
@@ -648,23 +623,19 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				PhpPackCopyDouble(0, &output.GetVal()[outputpos], v)
 				outputpos += b.SizeOf("v")
 			}
-			break
 		case 'x':
 			memset(&output.GetVal()[outputpos], '0', arg)
 			outputpos += arg
-			break
 		case 'X':
 			outputpos -= arg
 			if outputpos < 0 {
 				outputpos = 0
 			}
-			break
 		case '@':
 			if arg > outputpos {
 				memset(&output.GetVal()[outputpos], '0', arg-outputpos)
 			}
 			outputpos = arg
-			break
 		}
 	}
 	zend.Efree(formatcodes)
@@ -837,20 +808,17 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: '*' ignored", type_)
 				arg = 1
 			}
-			break
 		case '@':
 			size = 0
-			break
 		case 'a':
-
+			fallthrough
 		case 'A':
-
+			fallthrough
 		case 'Z':
 			size = arg
 			arg = 1
-			break
 		case 'h':
-
+			fallthrough
 		case 'H':
 			if arg > 0 {
 				size = (arg + arg%2) / 2
@@ -858,66 +826,57 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				size = arg
 			}
 			arg = 1
-			break
 		case 'c':
-
+			fallthrough
 		case 'C':
-
+			fallthrough
 		case 'x':
 			size = 1
-			break
 		case 's':
-
+			fallthrough
 		case 'S':
-
+			fallthrough
 		case 'n':
-
+			fallthrough
 		case 'v':
 			size = 2
-			break
 		case 'i':
-
+			fallthrough
 		case 'I':
 			size = b.SizeOf("int")
-			break
 		case 'l':
-
+			fallthrough
 		case 'L':
-
+			fallthrough
 		case 'N':
-
+			fallthrough
 		case 'V':
 			size = 4
-			break
 		case 'q':
-
+			fallthrough
 		case 'Q':
-
+			fallthrough
 		case 'J':
-
+			fallthrough
 		case 'P':
 			size = 8
-			break
 		case 'f':
-
+			fallthrough
 		case 'g':
-
+			fallthrough
 		case 'G':
 			size = b.SizeOf("float")
-			break
 		case 'd':
-
+			fallthrough
 		case 'e':
-
+			fallthrough
 		case 'E':
 			size = b.SizeOf("double")
-			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format type %c", type_)
 			return_value.GetArr().DestroyEx()
 			return_value.SetFalse()
 			return
-			break
 		}
 		if size != 0 && size != -1 && size < 0 {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: integer overflow", type_)
@@ -971,7 +930,6 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 					size = len_
 					zend.AddAssocStringl(return_value, n, &input[inputpos], len_)
-					break
 				case 'A':
 
 					/* A will strip any trailing whitespace */
@@ -998,7 +956,6 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						}
 					}
 					zend.AddAssocStringl(return_value, n, &input[inputpos], len_+1)
-					break
 				case 'Z':
 
 					/* Z will strip everything after the first null character */
@@ -1023,9 +980,8 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 					len_ = s
 					zend.AddAssocStringl(return_value, n, &input[inputpos], len_)
-					break
 				case 'h':
-
+					fallthrough
 				case 'H':
 					var len_ zend.ZendLong = (inputlen - inputpos) * 2
 					var nibbleshift int = b.Cond(type_ == 'h', 0, 4)
@@ -1061,20 +1017,18 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 					buf.GetVal()[len_] = '0'
 					zend.AddAssocStr(return_value, n, buf)
-					break
 				case 'c':
-
+					fallthrough
 				case 'C':
 					var issigned int = b.CondF1(type_ == 'c', func() int { return input[inputpos] & 0x80 }, 0)
 					var v zend.ZendLong = PhpUnpack(&input[inputpos], 1, issigned, ByteMap)
 					zend.AddAssocLong(return_value, n, v)
-					break
 				case 's':
-
+					fallthrough
 				case 'S':
-
+					fallthrough
 				case 'n':
-
+					fallthrough
 				case 'v':
 					var v zend.ZendLong
 					var issigned int = 0
@@ -1088,9 +1042,8 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 					v = PhpUnpack(&input[inputpos], 2, issigned, map_)
 					zend.AddAssocLong(return_value, n, v)
-					break
 				case 'i':
-
+					fallthrough
 				case 'I':
 					var v zend.ZendLong
 					var issigned int = 0
@@ -1099,13 +1052,12 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 					}
 					v = PhpUnpack(&input[inputpos], b.SizeOf("int"), issigned, IntMap)
 					zend.AddAssocLong(return_value, n, v)
-					break
 				case 'l':
-
+					fallthrough
 				case 'L':
-
+					fallthrough
 				case 'N':
-
+					fallthrough
 				case 'V':
 					var issigned int = 0
 					var map_ *int = MachineEndianLongMap
@@ -1131,13 +1083,12 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						}
 					}
 					zend.AddAssocLong(return_value, n, v)
-					break
 				case 'q':
-
+					fallthrough
 				case 'Q':
-
+					fallthrough
 				case 'J':
-
+					fallthrough
 				case 'P':
 					var issigned int = 0
 					var map_ *int = MachineEndianLonglongMap
@@ -1158,11 +1109,10 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						v = zend.ZendUlong(v)
 					}
 					zend.AddAssocLong(return_value, n, v)
-					break
 				case 'f':
-
+					fallthrough
 				case 'g':
-
+					fallthrough
 				case 'G':
 					var v float
 					if type_ == 'g' {
@@ -1173,11 +1123,10 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						memcpy(&v, &input[inputpos], b.SizeOf("float"))
 					}
 					zend.AddAssocDouble(return_value, n, float64(v))
-					break
 				case 'd':
-
+					fallthrough
 				case 'e':
-
+					fallthrough
 				case 'E':
 					var v float64
 					if type_ == 'e' {
@@ -1188,12 +1137,10 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						memcpy(&v, &input[inputpos], b.SizeOf("double"))
 					}
 					zend.AddAssocDouble(return_value, n, v)
-					break
 				case 'x':
 
 					/* Do nothing with input, just skip it */
 
-					break
 				case 'X':
 					if inputpos < size {
 						inputpos = -size
@@ -1202,7 +1149,6 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 							core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", type_)
 						}
 					}
-					break
 				case '@':
 					if arg <= inputlen {
 						inputpos = arg
@@ -1210,7 +1156,6 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 						core.PhpErrorDocref(nil, zend.E_WARNING, "Type %c: outside of string", type_)
 					}
 					i = arg - 1
-					break
 				}
 				inputpos += size
 				if inputpos < 0 {

@@ -1908,11 +1908,9 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 		if PhpMail(opt, "PHP error_log message", message, headers, nil) == 0 {
 			return zend.FAILURE
 		}
-		break
 	case 2:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "TCP/IP option not available!")
 		return zend.FAILURE
-		break
 	case 3:
 		stream = core.PhpStreamOpenWrapper(opt, "a", core.IGNORE_URL_WIN|core.REPORT_ERRORS, nil)
 		if stream == nil {
@@ -1923,17 +1921,14 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 		if nbytes != message_len {
 			return zend.FAILURE
 		}
-		break
 	case 4:
 		if core.sapi_module.GetLogMessage() != nil {
 			core.sapi_module.GetLogMessage()(message, -1)
 		} else {
 			return zend.FAILURE
 		}
-		break
 	default:
 		core.PhpLogErrWithSeverity(message, LOG_NOTICE)
-		break
 	}
 	return zend.SUCCESS
 }
@@ -4179,7 +4174,6 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		}
 		arg2.TryAddRefcount()
 		arr.GetArr().SymtableUpdate(arg1.GetStr().GetStr(), arg2)
-		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var hash zend.Zval
 		var find_hash *zend.Zval
@@ -4214,9 +4208,8 @@ func PhpSimpleIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, cal
 		} else {
 			zend.ArraySetZvalKey(find_hash.GetArr(), arg3, arg2)
 		}
-		break
 	case zend.ZEND_INI_PARSER_SECTION:
-		break
+
 	}
 }
 func PhpIniParserCbWithSections(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_type int, arr *zend.Zval) {

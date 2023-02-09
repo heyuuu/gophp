@@ -277,7 +277,7 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 		}
 		switch str[x] {
 		case '"':
-
+			fallthrough
 		case '\'':
 			if p == nil && b.Assign(&p, memchr(str+x+1, str[x], l-x-1)) {
 
@@ -287,49 +287,49 @@ func PhpEscapeShellCmd(str *byte) *zend.ZendString {
 				cmd.GetVal()[b.PostInc(&y)] = '\\'
 			}
 			cmd.GetVal()[b.PostInc(&y)] = str[x]
-			break
 		case '#':
-
+			fallthrough
 		case '&':
-
+			fallthrough
 		case ';':
-
+			fallthrough
 		case '`':
-
+			fallthrough
 		case '|':
-
+			fallthrough
 		case '*':
-
+			fallthrough
 		case '?':
-
+			fallthrough
 		case '~':
-
+			fallthrough
 		case '<':
-
+			fallthrough
 		case '>':
-
+			fallthrough
 		case '^':
-
+			fallthrough
 		case '(':
-
+			fallthrough
 		case ')':
-
+			fallthrough
 		case '[':
-
+			fallthrough
 		case ']':
-
+			fallthrough
 		case '{':
-
+			fallthrough
 		case '}':
-
+			fallthrough
 		case '$':
-
+			fallthrough
 		case '\\':
-
+			fallthrough
 		case 'x':
-
+			fallthrough
 		case 'x':
 			cmd.GetVal()[b.PostInc(&y)] = '\\'
+			fallthrough
 		default:
 			cmd.GetVal()[b.PostInc(&y)] = str[x]
 		}
@@ -387,6 +387,7 @@ func PhpEscapeShellArg(str *byte) *zend.ZendString {
 			cmd.GetVal()[b.PostInc(&y)] = '\''
 			cmd.GetVal()[b.PostInc(&y)] = '\\'
 			cmd.GetVal()[b.PostInc(&y)] = '\''
+			fallthrough
 		default:
 			cmd.GetVal()[b.PostInc(&y)] = str[x]
 		}

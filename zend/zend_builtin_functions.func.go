@@ -960,19 +960,19 @@ func ZifDefine(execute_data *ZendExecuteData, return_value *Zval) {
 repeat:
 	switch val.GetType() {
 	case IS_LONG:
-
+		fallthrough
 	case IS_DOUBLE:
-
+		fallthrough
 	case IS_STRING:
-
+		fallthrough
 	case IS_FALSE:
-
+		fallthrough
 	case IS_TRUE:
-
+		fallthrough
 	case IS_NULL:
-
+		fallthrough
 	case IS_RESOURCE:
-		break
+
 	case IS_ARRAY:
 		if val.IsRefcounted() {
 			if ValidateConstantArray(val.GetArr()) == 0 {
@@ -983,7 +983,6 @@ repeat:
 				goto register_constant
 			}
 		}
-		break
 	case IS_OBJECT:
 		if val_free.IsUndef() {
 			if Z_OBJ_HT_P(val).GetGet() != nil {
@@ -996,6 +995,7 @@ repeat:
 				}
 			}
 		}
+		fallthrough
 	default:
 		ZendError(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources")
 		ZvalPtrDtor(&val_free)
@@ -2062,18 +2062,17 @@ func ZifTriggerError(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	switch error_type {
 	case E_USER_ERROR:
-
+		fallthrough
 	case E_USER_WARNING:
-
+		fallthrough
 	case E_USER_NOTICE:
-
+		fallthrough
 	case E_USER_DEPRECATED:
-		break
+
 	default:
 		ZendError(E_WARNING, "Invalid error type specified")
 		return_value.SetFalse()
 		return
-		break
 	}
 	ZendError(int(error_type), "%s", message)
 	return_value.SetTrue()
@@ -2702,19 +2701,14 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 				case ZEND_EVAL:
 					function_name = "eval"
 					build_filename_arg = 0
-					break
 				case ZEND_INCLUDE:
 					function_name = "include"
-					break
 				case ZEND_REQUIRE:
 					function_name = "require"
-					break
 				case ZEND_INCLUDE_ONCE:
 					function_name = "include_once"
-					break
 				case ZEND_REQUIRE_ONCE:
 					function_name = "require_once"
-					break
 				default:
 
 					/* this can actually happen if you use debug_backtrace() in your error_handler and
@@ -2722,7 +2716,6 @@ func ZifDebugPrintBacktrace(execute_data *ZendExecuteData, return_value *Zval) {
 
 					function_name = "unknown"
 					build_filename_arg = 0
-					break
 				}
 			}
 			if build_filename_arg != 0 && include_filename != nil {
@@ -2926,19 +2919,14 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 				case ZEND_EVAL:
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_EVAL)
 					build_filename_arg = 0
-					break
 				case ZEND_INCLUDE:
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_INCLUDE)
-					break
 				case ZEND_REQUIRE:
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_REQUIRE)
-					break
 				case ZEND_INCLUDE_ONCE:
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_INCLUDE_ONCE)
-					break
 				case ZEND_REQUIRE_ONCE:
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_REQUIRE_ONCE)
-					break
 				default:
 
 					/* this can actually happen if you use debug_backtrace() in your error_handler and
@@ -2946,7 +2934,6 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 
 					pseudo_function_name = ZSTR_KNOWN(ZEND_STR_UNKNOWN)
 					build_filename_arg = 0
-					break
 				}
 			}
 			if build_filename_arg != 0 && include_filename != nil {

@@ -352,7 +352,6 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		return_value.SetLong(oldint)
 		return
-		break
 	case ASSERT_BAIL:
 		oldint = ASSERTG(bail)
 		if ac == 2 {
@@ -367,7 +366,6 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		return_value.SetLong(oldint)
 		return
-		break
 	case ASSERT_QUIET_EVAL:
 		oldint = ASSERTG(quiet_eval)
 		if ac == 2 {
@@ -382,7 +380,6 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		return_value.SetLong(oldint)
 		return
-		break
 	case ASSERT_WARNING:
 		oldint = ASSERTG(warning)
 		if ac == 2 {
@@ -397,7 +394,6 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		return_value.SetLong(oldint)
 		return
-		break
 	case ASSERT_CALLBACK:
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZVAL_COPY(return_value, &(ASSERTG(callback)))
@@ -425,10 +421,8 @@ func ZifAssertOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 		return_value.SetLong(oldint)
 		return
-		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown value "+zend.ZEND_LONG_FMT, what)
-		break
 	}
 	return_value.SetFalse()
 	return

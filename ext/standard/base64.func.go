@@ -87,18 +87,14 @@ func PhpBase64DecodeImpl(in *uint8, inl int, out *uint8, outl *int, strict zend.
 		switch i % 4 {
 		case 0:
 			out[j] = ch << 2
-			break
 		case 1:
 			out[b.PostInc(&j)] |= ch >> 4
 			out[j] = (ch & 0xf) << 4
-			break
 		case 2:
 			out[b.PostInc(&j)] |= ch >> 2
 			out[j] = (ch & 0x3) << 6
-			break
 		case 3:
 			out[b.PostInc(&j)] |= ch
-			break
 		}
 		i++
 	}

@@ -1600,7 +1600,6 @@ func ZendStdCastObjectTostring(readobj *Zval, writeobj *Zval, type_ int) int {
 		return SUCCESS
 	default:
 		writeobj.SetNull()
-		break
 	}
 	return FAILURE
 }
@@ -1635,14 +1634,15 @@ func ZendStdGetPropertiesFor(obj *Zval, purpose ZendPropPurpose) *HashTable {
 			}
 			return ht
 		}
+		fallthrough
 	case ZEND_PROP_PURPOSE_ARRAY_CAST:
-
+		fallthrough
 	case ZEND_PROP_PURPOSE_SERIALIZE:
-
+		fallthrough
 	case ZEND_PROP_PURPOSE_VAR_EXPORT:
-
+		fallthrough
 	case ZEND_PROP_PURPOSE_JSON:
-
+		fallthrough
 	case _ZEND_PROP_PURPOSE_ARRAY_KEY_EXISTS:
 		ht = Z_OBJ_HT_P(obj).GetGetProperties()(obj)
 		if ht != nil && (ht.GetGcFlags()&GC_IMMUTABLE) == 0 {

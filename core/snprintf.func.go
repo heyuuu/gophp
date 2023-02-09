@@ -564,7 +564,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 			case 'L':
 				fmt++
 				modifier = LM_LONG_DOUBLE
-				break
 			case 'I':
 				fmt++
 				if (*fmt) == '6' && (*(fmt + 1)) == '4' {
@@ -576,7 +575,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				} else {
 					modifier = LM_LONG
 				}
-				break
 			case 'l':
 				fmt++
 				if (*fmt) == 'l' {
@@ -585,31 +583,26 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				} else {
 					modifier = LM_LONG
 				}
-				break
 			case 'z':
 				fmt++
 				modifier = LM_SIZE_T
-				break
 			case 'j':
 				fmt++
 				modifier = LM_INTMAX_T
-				break
 			case 't':
 				fmt++
 				modifier = LM_PTRDIFF_T
-				break
 			case 'p':
 				fmt++
 				modifier = LM_PHP_INT_T
-				break
 			case 'h':
 				fmt++
 				if (*fmt) == 'h' {
 					fmt++
 				}
+				fallthrough
 			default:
 				modifier = LM_STD
-				break
 			}
 
 			/*
@@ -636,35 +629,29 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if adjust_precision != 0 && int(precision < s_len) != 0 {
 					s_len = precision
 				}
-				break
 			case 'u':
 				switch modifier {
 				default:
 					i_num = WideInt(__va_arg(ap, uint(_)))
-					break
 				case LM_LONG_DOUBLE:
 					goto fmt_error
+					fallthrough
 				case LM_LONG:
 					i_num = WideInt(__va_arg(ap, unsigned__long__int(_)))
-					break
 				case LM_SIZE_T:
 					i_num = WideInt(__va_arg(ap, int(_)))
-					break
 				case LM_LONG_LONG:
 					i_num = WideInt(__va_arg(ap, UWideInt(_)))
-					break
 				case LM_INTMAX_T:
 					i_num = WideInt(__va_arg(ap, uintmax_t(_)))
-					break
 				case LM_PTRDIFF_T:
 					i_num = WideInt(__va_arg(ap, ptrdiff_t(_)))
-					break
 				case LM_PHP_INT_T:
 					i_num = WideInt(__va_arg(ap, zend.ZendUlong(_)))
-					break
 				}
+				fallthrough
 			case 'd':
-
+				fallthrough
 			case 'i':
 
 				/*
@@ -675,27 +662,21 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					switch modifier {
 					default:
 						i_num = WideInt(__va_arg(ap, int(_)))
-						break
 					case LM_LONG_DOUBLE:
 						goto fmt_error
+						fallthrough
 					case LM_LONG:
 						i_num = WideInt(__va_arg(ap, long__int(_)))
-						break
 					case LM_SIZE_T:
 						i_num = WideInt(__va_arg(ap, ssize_t(_)))
-						break
 					case LM_LONG_LONG:
 						i_num = WideInt(__va_arg(ap, WideInt(_)))
-						break
 					case LM_INTMAX_T:
 						i_num = WideInt(__va_arg(ap, intmax_t(_)))
-						break
 					case LM_PTRDIFF_T:
 						i_num = WideInt(__va_arg(ap, ptrdiff_t(_)))
-						break
 					case LM_PHP_INT_T:
 						i_num = WideInt(__va_arg(ap, zend.ZendLong(_)))
-						break
 					}
 				}
 				s = ApPhpConv10(i_num, (*fmt) == 'u', &is_negative, &num_buf[NUM_BUF_SIZE], &s_len)
@@ -709,32 +690,25 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 						prefix_char = ' '
 					}
 				}
-				break
 			case 'o':
 				switch modifier {
 				default:
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
-					break
 				case LM_LONG_DOUBLE:
 					goto fmt_error
+					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
-					break
 				case LM_SIZE_T:
 					ui_num = UWideInt(__va_arg(ap, int(_)))
-					break
 				case LM_LONG_LONG:
 					ui_num = UWideInt(__va_arg(ap, UWideInt(_)))
-					break
 				case LM_INTMAX_T:
 					ui_num = UWideInt(__va_arg(ap, uintmax_t(_)))
-					break
 				case LM_PTRDIFF_T:
 					ui_num = UWideInt(__va_arg(ap, ptrdiff_t(_)))
-					break
 				case LM_PHP_INT_T:
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
-					break
 				}
 				s = ApPhpConvP2(ui_num, 3, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
 				FIX_PRECISION(adjust_precision, precision, s, s_len)
@@ -742,34 +716,27 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					*(b.PreDec(&s)) = '0'
 					s_len++
 				}
-				break
 			case 'x':
-
+				fallthrough
 			case 'X':
 				switch modifier {
 				default:
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
-					break
 				case LM_LONG_DOUBLE:
 					goto fmt_error
+					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
-					break
 				case LM_SIZE_T:
 					ui_num = UWideInt(__va_arg(ap, int(_)))
-					break
 				case LM_LONG_LONG:
 					ui_num = UWideInt(__va_arg(ap, UWideInt(_)))
-					break
 				case LM_INTMAX_T:
 					ui_num = UWideInt(__va_arg(ap, uintmax_t(_)))
-					break
 				case LM_PTRDIFF_T:
 					ui_num = UWideInt(__va_arg(ap, ptrdiff_t(_)))
-					break
 				case LM_PHP_INT_T:
 					ui_num = UWideInt(__va_arg(ap, zend.ZendUlong(_)))
-					break
 				}
 				s = ApPhpConvP2(ui_num, 4, *fmt, &num_buf[NUM_BUF_SIZE], &s_len)
 				FIX_PRECISION(adjust_precision, precision, s, s_len)
@@ -778,9 +745,8 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					*(b.PreDec(&s)) = '0'
 					s_len += 2
 				}
-				break
 			case 's':
-
+				fallthrough
 			case 'v':
 				s = __va_arg(ap, (*byte)(_))
 				if s != nil {
@@ -793,21 +759,18 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					s_len = S_NULL_LEN
 				}
 				pad_char = ' '
-				break
 			case 'f':
-
+				fallthrough
 			case 'F':
-
+				fallthrough
 			case 'e':
-
+				fallthrough
 			case 'E':
 				switch modifier {
 				case LM_LONG_DOUBLE:
 					fp_num = float64(__va_arg(ap, long__double(_)))
-					break
 				case LM_STD:
 					fp_num = __va_arg(ap, float64(_))
-					break
 				default:
 					goto fmt_error
 				}
@@ -830,21 +793,18 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 						prefix_char = ' '
 					}
 				}
-				break
 			case 'g':
-
+				fallthrough
 			case 'k':
-
+				fallthrough
 			case 'G':
-
+				fallthrough
 			case 'H':
 				switch modifier {
 				case LM_LONG_DOUBLE:
 					fp_num = float64(__va_arg(ap, long__double(_)))
-					break
 				case LM_STD:
 					fp_num = __va_arg(ap, float64(_))
-					break
 				default:
 					goto fmt_error
 				}
@@ -888,22 +848,20 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if alternate_form != 0 && strchr(s, '.') == nil {
 					s[b.PostInc(&s_len)] = '.'
 				}
-				break
 			case 'c':
 				char_buf[0] = byte(__va_arg(ap, int(_)))
 				s = &char_buf[0]
 				s_len = 1
 				pad_char = ' '
-				break
 			case '%':
 				char_buf[0] = '%'
 				s = &char_buf[0]
 				s_len = 1
 				pad_char = ' '
-				break
 			case 'n':
 				*(__va_arg(ap, (*int)(_))) = cc
 				goto skip_output
+				fallthrough
 			case 'p':
 				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))
@@ -918,7 +876,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					s_len = 2
 				}
 				pad_char = ' '
-				break
 			case NUL:
 
 				/*
@@ -935,7 +892,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				s = char_buf
 				s_len = 2
 				pad_char = ' '
-				break
 			}
 			if prefix_char != NUL {
 				*(b.PreDec(&s)) = prefix_char

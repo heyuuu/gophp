@@ -277,7 +277,6 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 
 			stream.SetReadpos(0)
 			stream.SetWritepos(0)
-			break
 		case PSFS_PASS_ON:
 
 			/* If any data is consumed, we cannot rely upon the existing read buffer,
@@ -300,7 +299,6 @@ func PhpStreamFilterAppendEx(chain *PhpStreamFilterChain, filter *core.PhpStream
 				PhpStreamBucketUnlink(bucket)
 				PhpStreamBucketDelref(bucket)
 			}
-			break
 		}
 	}
 	return zend.SUCCESS

@@ -369,30 +369,22 @@ func ZendAstAddArrayElement(result *Zval, offset *Zval, expr *Zval) int {
 			ZendError(E_WARNING, "Cannot add element to the array as the next element is already occupied")
 			ZvalPtrDtorNogc(expr)
 		}
-		break
 	case IS_STRING:
 		result.GetArr().SymtableUpdate(offset.GetStr().GetStr(), expr)
 		ZvalPtrDtorStr(offset)
-		break
 	case IS_NULL:
 		result.GetArr().SymtableUpdate(ZSTR_EMPTY_ALLOC().GetStr(), expr)
-		break
 	case IS_LONG:
 		result.GetArr().IndexUpdateH(offset.GetLval(), expr)
-		break
 	case IS_FALSE:
 		result.GetArr().IndexUpdateH(0, expr)
-		break
 	case IS_TRUE:
 		result.GetArr().IndexUpdateH(1, expr)
-		break
 	case IS_DOUBLE:
 		result.GetArr().IndexUpdateH(ZendDvalToLval(offset.GetDval()), expr)
-		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(offset), Z_RES_HANDLE_P(offset))
 		result.GetArr().IndexUpdateH(Z_RES_HANDLE_P(offset), expr)
-		break
 	default:
 		ZendThrowError(nil, "Illegal offset type")
 		return FAILURE
@@ -446,9 +438,8 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZvalPtrDtorNogc(&op1)
 			ZvalPtrDtorNogc(&op2)
 		}
-		break
 	case ZEND_AST_GREATER:
-
+		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -464,7 +455,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZvalPtrDtorNogc(&op1)
 			ZvalPtrDtorNogc(&op2)
 		}
-		break
 	case ZEND_AST_UNARY_OP:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -473,11 +463,9 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ret = op(result, &op1)
 			ZvalPtrDtorNogc(&op1)
 		}
-		break
 	case ZEND_AST_ZVAL:
 		var zv *Zval = ZendAstGetZval(ast)
 		ZVAL_COPY(result, zv)
-		break
 	case ZEND_AST_CONSTANT:
 		var name *ZendString = ZendAstGetConstantName(ast)
 		var zv *Zval = ZendGetConstantEx(name, scope, ast.GetAttr())
@@ -487,14 +475,12 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			break
 		}
 		ZVAL_COPY_OR_DUP(result, zv)
-		break
 	case ZEND_AST_CONSTANT_CLASS:
 		if scope != nil {
 			result.SetStringCopy(scope.GetName())
 		} else {
 			ZVAL_EMPTY_STRING(result)
 		}
-		break
 	case ZEND_AST_CLASS_NAME:
 		if scope == nil {
 			ZendThrowError(nil, "Cannot use \"self\" when no class scope is active")
@@ -511,7 +497,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 		} else {
 			ZEND_ASSERT(false)
 		}
-		break
 	case ZEND_AST_AND:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -529,7 +514,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			result.SetFalse()
 		}
 		ZvalPtrDtorNogc(&op1)
-		break
 	case ZEND_AST_OR:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -547,7 +531,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZvalPtrDtorNogc(&op2)
 		}
 		ZvalPtrDtorNogc(&op1)
-		break
 	case ZEND_AST_CONDITIONAL:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -572,7 +555,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			}
 			ZvalPtrDtorNogc(&op1)
 		}
-		break
 	case ZEND_AST_COALESCE:
 		if ZendAstEvaluate(&op1, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -588,7 +570,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			}
 			ZvalPtrDtorNogc(&op1)
 		}
-		break
 	case ZEND_AST_UNARY_PLUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -597,7 +578,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ret = AddFunction(result, &op1, &op2)
 			ZvalPtrDtorNogc(&op2)
 		}
-		break
 	case ZEND_AST_UNARY_MINUS:
 		if ZendAstEvaluate(&op2, ast.GetChild()[0], scope) != SUCCESS {
 			ret = FAILURE
@@ -606,7 +586,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ret = SubFunction(result, &op1, &op2)
 			ZvalPtrDtorNogc(&op2)
 		}
-		break
 	case ZEND_AST_ARRAY:
 		var i uint32
 		var list *ZendAstList = ZendAstGetList(ast)
@@ -650,7 +629,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 				return FAILURE
 			}
 		}
-		break
 	case ZEND_AST_DIM:
 		if ast.GetChild()[1] == nil {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use [] for reading")
@@ -665,7 +643,6 @@ func ZendAstEvaluate(result *Zval, ast *ZendAst, scope *ZendClassEntry) int {
 			ZvalPtrDtorNogc(&op1)
 			ZvalPtrDtorNogc(&op2)
 		}
-		break
 	default:
 		ZendThrowError(nil, "Unsupported constant expression")
 		ret = FAILURE
@@ -836,27 +813,20 @@ func ZendAstExportQstr(str *SmartStr, quote byte, s *ZendString) {
 			switch c {
 			case '\n':
 				str.AppendString("\\n")
-				break
 			case '\r':
 				str.AppendString("\\r")
-				break
 			case '\t':
 				str.AppendString("\\t")
-				break
 			case 'f':
 				str.AppendString("\\f")
-				break
 			case 'v':
 				str.AppendString("\\v")
-				break
 			case 'e':
 				str.AppendString("\\e")
-				break
 			default:
 				str.AppendString("\\0")
 				str.AppendByte('0' + c/8)
 				str.AppendByte('0' + c%8)
-				break
 			}
 		} else {
 			if c == quote || c == '$' || c == '\\' {
@@ -1016,34 +986,33 @@ func ZendAstExportStmt(str *SmartStr, ast *ZendAst, indent int) {
 		ZendAstExportEx(str, ast, 0, indent)
 		switch ast.GetKind() {
 		case ZEND_AST_LABEL:
-
+			fallthrough
 		case ZEND_AST_IF:
-
+			fallthrough
 		case ZEND_AST_SWITCH:
-
+			fallthrough
 		case ZEND_AST_WHILE:
-
+			fallthrough
 		case ZEND_AST_TRY:
-
+			fallthrough
 		case ZEND_AST_FOR:
-
+			fallthrough
 		case ZEND_AST_FOREACH:
-
+			fallthrough
 		case ZEND_AST_FUNC_DECL:
-
+			fallthrough
 		case ZEND_AST_METHOD:
-
+			fallthrough
 		case ZEND_AST_CLASS:
-
+			fallthrough
 		case ZEND_AST_USE_TRAIT:
-
+			fallthrough
 		case ZEND_AST_NAMESPACE:
-
+			fallthrough
 		case ZEND_AST_DECLARE:
-			break
+
 		default:
 			str.AppendByte(';')
-			break
 		}
 		str.AppendByte('\n')
 	}
@@ -1091,30 +1060,24 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 	switch zv.GetType() {
 	case IS_NULL:
 		str.AppendString("null")
-		break
 	case IS_FALSE:
 		str.AppendString("false")
-		break
 	case IS_TRUE:
 		str.AppendString("true")
-		break
 	case IS_LONG:
 		str.AppendLong(zv.GetLval())
-		break
 	case IS_DOUBLE:
 		key = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), zv.GetDval())
 		str.AppendString(b.CastStr(key.GetVal(), key.GetLen()))
 		ZendStringReleaseEx(key, 0)
-		break
 	case IS_STRING:
 		str.AppendByte('\'')
 		ZendAstExportStr(str, zv.GetStr())
 		str.AppendByte('\'')
-		break
 	case IS_ARRAY:
 		str.AppendByte('[')
 		first = 1
-		var __ht *HashTable = zv.GetArr()
+		var __ht *HashTable = Z_ARRVAL_P(zv)
 		for _, _p := range __ht.foreachData() {
 			var _z *Zval = _p.GetVal()
 
@@ -1137,12 +1100,10 @@ func ZendAstExportZval(str *SmartStr, zv *Zval, priority int, indent int) {
 			ZendAstExportZval(str, val, 0, indent)
 		}
 		str.AppendByte(']')
-		break
 	case IS_CONSTANT_AST:
 		ZendAstExportEx(str, Z_ASTVAL_P(zv), priority, indent)
-		break
 	default:
-		break
+
 	}
 }
 func ZendAstExportClassNoHeader(str *SmartStr, decl *ZendAstDecl, indent int) {
@@ -1207,26 +1168,22 @@ tail_call:
 	switch ast.GetKind() {
 	case ZEND_AST_ZVAL:
 		ZendAstExportZval(str, ZendAstGetZval(ast), priority, indent)
-		break
 	case ZEND_AST_CONSTANT:
 		var name *ZendString = ZendAstGetConstantName(ast)
 		str.AppendString(b.CastStr(name.GetVal(), name.GetLen()))
-		break
 	case ZEND_AST_CONSTANT_CLASS:
 		str.AppendString("__CLASS__")
-		break
 	case ZEND_AST_ZNODE:
 
 		/* This AST kind is only used for temporary nodes during compilation */
 
 		ZEND_ASSERT(false)
-		break
 	case ZEND_AST_FUNC_DECL:
-
+		fallthrough
 	case ZEND_AST_CLOSURE:
-
+		fallthrough
 	case ZEND_AST_ARROW_FUNC:
-
+		fallthrough
 	case ZEND_AST_METHOD:
 		decl = (*ZendAstDecl)(ast)
 		if decl.IsPublic() {
@@ -1284,7 +1241,6 @@ tail_call:
 		} else {
 			str.AppendString(";\n")
 		}
-		break
 	case ZEND_AST_CLASS:
 		decl = (*ZendAstDecl)(ast)
 		if decl.IsInterface() {
@@ -1303,43 +1259,35 @@ tail_call:
 		str.AppendString(b.CastStr(decl.GetName().GetVal(), decl.GetName().GetLen()))
 		ZendAstExportClassNoHeader(str, decl, indent)
 		str.AppendByte('\n')
-		break
 	case ZEND_AST_ARG_LIST:
-
+		fallthrough
 	case ZEND_AST_EXPR_LIST:
-
+		fallthrough
 	case ZEND_AST_PARAM_LIST:
 	simple_list:
 		ZendAstExportList(str, (*ZendAstList)(ast), 1, 20, indent)
-		break
 	case ZEND_AST_ARRAY:
 		str.AppendByte('[')
 		ZendAstExportList(str, (*ZendAstList)(ast), 1, 20, indent)
 		str.AppendByte(']')
-		break
 	case ZEND_AST_ENCAPS_LIST:
 		str.AppendByte('"')
 		ZendAstExportEncapsList(str, '"', (*ZendAstList)(ast), indent)
 		str.AppendByte('"')
-		break
 	case ZEND_AST_STMT_LIST:
-
+		fallthrough
 	case ZEND_AST_TRAIT_ADAPTATIONS:
 		ZendAstExportStmt(str, ast, indent)
-		break
 	case ZEND_AST_IF:
 		ZendAstExportIfStmt(str, (*ZendAstList)(ast), indent)
-		break
 	case ZEND_AST_SWITCH_LIST:
-
+		fallthrough
 	case ZEND_AST_CATCH_LIST:
 		ZendAstExportList(str, (*ZendAstList)(ast), 0, 0, indent)
-		break
 	case ZEND_AST_CLOSURE_USES:
 		str.AppendString(" use(")
 		ZendAstExportVarList(str, (*ZendAstList)(ast), indent)
 		str.AppendByte(')')
-		break
 	case ZEND_AST_PROP_GROUP:
 		var type_ast *ZendAst = ast.GetChild()[0]
 		var prop_ast *ZendAst = ast.GetChild()[1]
@@ -1362,14 +1310,15 @@ tail_call:
 		}
 		ast = prop_ast
 		goto simple_list
+		fallthrough
 	case ZEND_AST_CONST_DECL:
-
+		fallthrough
 	case ZEND_AST_CLASS_CONST_DECL:
 		str.AppendString("const ")
 		goto simple_list
+		fallthrough
 	case ZEND_AST_NAME_LIST:
 		ZendAstExportNameList(str, (*ZendAstList)(ast), indent)
-		break
 	case ZEND_AST_USE:
 		str.AppendString("use ")
 		if ast.GetAttr() == T_FUNCTION {
@@ -1378,79 +1327,98 @@ tail_call:
 			str.AppendString("const ")
 		}
 		goto simple_list
+		fallthrough
 	case ZEND_AST_MAGIC_CONST:
 		switch ast.GetAttr() {
 		case T_LINE:
 			APPEND_STR("__LINE__")
+			fallthrough
 		case T_FILE:
 			APPEND_STR("__FILE__")
+			fallthrough
 		case T_DIR:
 			APPEND_STR("__DIR__")
+			fallthrough
 		case T_TRAIT_C:
 			APPEND_STR("__TRAIT__")
+			fallthrough
 		case T_METHOD_C:
 			APPEND_STR("__METHOD__")
+			fallthrough
 		case T_FUNC_C:
 			APPEND_STR("__FUNCTION__")
+			fallthrough
 		case T_NS_C:
 			APPEND_STR("__NAMESPACE__")
+			fallthrough
 		case T_CLASS_C:
 			APPEND_STR("__CLASS__")
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_TYPE:
 		switch ast.GetAttr() & ^ZEND_TYPE_NULLABLE {
 		case IS_ARRAY:
 			APPEND_STR("array")
+			fallthrough
 		case IS_CALLABLE:
 			APPEND_STR("callable")
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_VAR:
 		str.AppendByte('$')
 		ZendAstExportVar(str, ast.GetChild()[0], 0, indent)
-		break
 	case ZEND_AST_CONST:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
-		break
 	case ZEND_AST_UNPACK:
 		str.AppendString("...")
 		ast = ast.GetChild()[0]
 		goto tail_call
+		fallthrough
 	case ZEND_AST_UNARY_PLUS:
 		PREFIX_OP("+", 240, 241)
+		fallthrough
 	case ZEND_AST_UNARY_MINUS:
 		PREFIX_OP("-", 240, 241)
+		fallthrough
 	case ZEND_AST_CAST:
 		switch ast.GetAttr() {
 		case IS_NULL:
 			PREFIX_OP("(unset)", 240, 241)
+			fallthrough
 		case _IS_BOOL:
 			PREFIX_OP("(bool)", 240, 241)
+			fallthrough
 		case IS_LONG:
 			PREFIX_OP("(int)", 240, 241)
+			fallthrough
 		case IS_DOUBLE:
 			PREFIX_OP("(double)", 240, 241)
+			fallthrough
 		case IS_STRING:
 			PREFIX_OP("(string)", 240, 241)
+			fallthrough
 		case IS_ARRAY:
 			PREFIX_OP("(array)", 240, 241)
+			fallthrough
 		case IS_OBJECT:
 			PREFIX_OP("(object)", 240, 241)
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_EMPTY:
 		FUNC_OP("empty")
+		fallthrough
 	case ZEND_AST_ISSET:
 		FUNC_OP("isset")
+		fallthrough
 	case ZEND_AST_SILENCE:
 		PREFIX_OP("@", 240, 241)
+		fallthrough
 	case ZEND_AST_SHELL_EXEC:
 		str.AppendByte('`')
 		if ast.GetChild()[0].GetKind() == ZEND_AST_ENCAPS_LIST {
@@ -1463,80 +1431,96 @@ tail_call:
 			ZendAstExportQstr(str, '`', zv.GetStr())
 		}
 		str.AppendByte('`')
-		break
 	case ZEND_AST_CLONE:
 		PREFIX_OP("clone ", 270, 271)
+		fallthrough
 	case ZEND_AST_EXIT:
 		if ast.GetChild()[0] != nil {
 			FUNC_OP("exit")
 		} else {
 			APPEND_STR("exit")
 		}
-		break
 	case ZEND_AST_PRINT:
 		PREFIX_OP("print ", 60, 61)
+		fallthrough
 	case ZEND_AST_INCLUDE_OR_EVAL:
 		switch ast.GetAttr() {
 		case ZEND_INCLUDE_ONCE:
 			FUNC_OP("include_once")
+			fallthrough
 		case ZEND_INCLUDE:
 			FUNC_OP("include")
+			fallthrough
 		case ZEND_REQUIRE_ONCE:
 			FUNC_OP("require_once")
+			fallthrough
 		case ZEND_REQUIRE:
 			FUNC_OP("require")
+			fallthrough
 		case ZEND_EVAL:
 			FUNC_OP("eval")
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_UNARY_OP:
 		switch ast.GetAttr() {
 		case ZEND_BW_NOT:
 			PREFIX_OP("~", 240, 241)
+			fallthrough
 		case ZEND_BOOL_NOT:
 			PREFIX_OP("!", 240, 241)
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_PRE_INC:
 		PREFIX_OP("++", 240, 241)
+		fallthrough
 	case ZEND_AST_PRE_DEC:
 		PREFIX_OP("--", 240, 241)
+		fallthrough
 	case ZEND_AST_POST_INC:
 		POSTFIX_OP("++", 240, 241)
+		fallthrough
 	case ZEND_AST_POST_DEC:
 		POSTFIX_OP("--", 240, 241)
+		fallthrough
 	case ZEND_AST_GLOBAL:
 		APPEND_NODE_1("global")
+		fallthrough
 	case ZEND_AST_UNSET:
 		FUNC_OP("unset")
+		fallthrough
 	case ZEND_AST_RETURN:
 		APPEND_NODE_1("return")
+		fallthrough
 	case ZEND_AST_LABEL:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		str.AppendByte(':')
-		break
 	case ZEND_AST_REF:
 		str.AppendByte('&')
 		ast = ast.GetChild()[0]
 		goto tail_call
+		fallthrough
 	case ZEND_AST_HALT_COMPILER:
 		APPEND_STR("__HALT_COMPILER()")
+		fallthrough
 	case ZEND_AST_ECHO:
 		APPEND_NODE_1("echo")
+		fallthrough
 	case ZEND_AST_THROW:
 		APPEND_NODE_1("throw")
+		fallthrough
 	case ZEND_AST_GOTO:
 		str.AppendString("goto ")
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
-		break
 	case ZEND_AST_BREAK:
 		APPEND_NODE_1("break")
+		fallthrough
 	case ZEND_AST_CONTINUE:
 		APPEND_NODE_1("continue")
+		fallthrough
 	case ZEND_AST_DIM:
 		ZendAstExportEx(str, ast.GetChild()[0], 260, indent)
 		str.AppendByte('[')
@@ -1544,124 +1528,155 @@ tail_call:
 			ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		}
 		str.AppendByte(']')
-		break
 	case ZEND_AST_PROP:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("->")
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_STATIC_PROP:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("::$")
 		ZendAstExportVar(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_CALL:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		str.AppendByte('(')
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		str.AppendByte(')')
-		break
 	case ZEND_AST_CLASS_CONST:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("::")
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_CLASS_NAME:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("::class")
-		break
 	case ZEND_AST_ASSIGN:
 		BINARY_OP(" = ", 90, 91, 90)
+		fallthrough
 	case ZEND_AST_ASSIGN_REF:
 		BINARY_OP(" =& ", 90, 91, 90)
+		fallthrough
 	case ZEND_AST_ASSIGN_OP:
 		switch ast.GetAttr() {
 		case ZEND_ADD:
 			BINARY_OP(" += ", 90, 91, 90)
+			fallthrough
 		case ZEND_SUB:
 			BINARY_OP(" -= ", 90, 91, 90)
+			fallthrough
 		case ZEND_MUL:
 			BINARY_OP(" *= ", 90, 91, 90)
+			fallthrough
 		case ZEND_DIV:
 			BINARY_OP(" /= ", 90, 91, 90)
+			fallthrough
 		case ZEND_MOD:
 			BINARY_OP(" %= ", 90, 91, 90)
+			fallthrough
 		case ZEND_SL:
 			BINARY_OP(" <<= ", 90, 91, 90)
+			fallthrough
 		case ZEND_SR:
 			BINARY_OP(" >>= ", 90, 91, 90)
+			fallthrough
 		case ZEND_CONCAT:
 			BINARY_OP(" .= ", 90, 91, 90)
+			fallthrough
 		case ZEND_BW_OR:
 			BINARY_OP(" |= ", 90, 91, 90)
+			fallthrough
 		case ZEND_BW_AND:
 			BINARY_OP(" &= ", 90, 91, 90)
+			fallthrough
 		case ZEND_BW_XOR:
 			BINARY_OP(" ^= ", 90, 91, 90)
+			fallthrough
 		case ZEND_POW:
 			BINARY_OP(" **= ", 90, 91, 90)
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_ASSIGN_COALESCE:
 		BINARY_OP(" ??= ", 90, 91, 90)
+		fallthrough
 	case ZEND_AST_BINARY_OP:
 		switch ast.GetAttr() {
 		case ZEND_ADD:
 			BINARY_OP(" + ", 200, 200, 201)
+			fallthrough
 		case ZEND_SUB:
 			BINARY_OP(" - ", 200, 200, 201)
+			fallthrough
 		case ZEND_MUL:
 			BINARY_OP(" * ", 210, 210, 211)
+			fallthrough
 		case ZEND_DIV:
 			BINARY_OP(" / ", 210, 210, 211)
+			fallthrough
 		case ZEND_MOD:
 			BINARY_OP(" % ", 210, 210, 211)
+			fallthrough
 		case ZEND_SL:
 			BINARY_OP(" << ", 190, 190, 191)
+			fallthrough
 		case ZEND_SR:
 			BINARY_OP(" >> ", 190, 190, 191)
+			fallthrough
 		case ZEND_PARENTHESIZED_CONCAT:
-
+			fallthrough
 		case ZEND_CONCAT:
 			BINARY_OP(" . ", 200, 200, 201)
+			fallthrough
 		case ZEND_BW_OR:
 			BINARY_OP(" | ", 140, 140, 141)
+			fallthrough
 		case ZEND_BW_AND:
 			BINARY_OP(" & ", 160, 160, 161)
+			fallthrough
 		case ZEND_BW_XOR:
 			BINARY_OP(" ^ ", 150, 150, 151)
+			fallthrough
 		case ZEND_IS_IDENTICAL:
 			BINARY_OP(" === ", 170, 171, 171)
+			fallthrough
 		case ZEND_IS_NOT_IDENTICAL:
 			BINARY_OP(" !== ", 170, 171, 171)
+			fallthrough
 		case ZEND_IS_EQUAL:
 			BINARY_OP(" == ", 170, 171, 171)
+			fallthrough
 		case ZEND_IS_NOT_EQUAL:
 			BINARY_OP(" != ", 170, 171, 171)
+			fallthrough
 		case ZEND_IS_SMALLER:
 			BINARY_OP(" < ", 180, 181, 181)
+			fallthrough
 		case ZEND_IS_SMALLER_OR_EQUAL:
 			BINARY_OP(" <= ", 180, 181, 181)
+			fallthrough
 		case ZEND_POW:
 			BINARY_OP(" ** ", 250, 251, 250)
+			fallthrough
 		case ZEND_BOOL_XOR:
 			BINARY_OP(" xor ", 40, 40, 41)
+			fallthrough
 		case ZEND_SPACESHIP:
 			BINARY_OP(" <=> ", 180, 181, 181)
+			fallthrough
 		default:
-			break
+
 		}
-		break
 	case ZEND_AST_GREATER:
 		BINARY_OP(" > ", 180, 181, 181)
+		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
 		BINARY_OP(" >= ", 180, 181, 181)
+		fallthrough
 	case ZEND_AST_AND:
 		BINARY_OP(" && ", 130, 130, 131)
+		fallthrough
 	case ZEND_AST_OR:
 		BINARY_OP(" || ", 120, 120, 121)
+		fallthrough
 	case ZEND_AST_ARRAY_ELEM:
 		if ast.GetChild()[1] != nil {
 			ZendAstExportEx(str, ast.GetChild()[1], 80, indent)
@@ -1671,7 +1686,6 @@ tail_call:
 			str.AppendByte('&')
 		}
 		ZendAstExportEx(str, ast.GetChild()[0], 80, indent)
-		break
 	case ZEND_AST_NEW:
 		str.AppendString("new ")
 		if ast.GetChild()[0].GetKind() == ZEND_AST_CLASS {
@@ -1688,12 +1702,10 @@ tail_call:
 			ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 			str.AppendByte(')')
 		}
-		break
 	case ZEND_AST_INSTANCEOF:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		str.AppendString(" instanceof ")
 		ZendAstExportNsName(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_YIELD:
 		if priority > 70 {
 			str.AppendByte('(')
@@ -1709,15 +1721,17 @@ tail_call:
 		if priority > 70 {
 			str.AppendByte(')')
 		}
-		break
 	case ZEND_AST_YIELD_FROM:
 		PREFIX_OP("yield from ", 85, 86)
+		fallthrough
 	case ZEND_AST_COALESCE:
 		BINARY_OP(" ?? ", 110, 111, 110)
+		fallthrough
 	case ZEND_AST_STATIC:
 		str.AppendString("static $")
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		APPEND_DEFAULT_VALUE(1)
+		fallthrough
 	case ZEND_AST_WHILE:
 		str.AppendString("while (")
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
@@ -1725,7 +1739,6 @@ tail_call:
 		ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
 		ZendAstExportIndent(str, indent)
 		str.AppendByte('}')
-		break
 	case ZEND_AST_DO_WHILE:
 		str.AppendString("do {\n")
 		ZendAstExportStmt(str, ast.GetChild()[0], indent+1)
@@ -1733,7 +1746,6 @@ tail_call:
 		str.AppendString("} while (")
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
 		str.AppendByte(')')
-		break
 	case ZEND_AST_IF_ELEM:
 		if ast.GetChild()[0] != nil {
 			str.AppendString("if (")
@@ -1746,7 +1758,6 @@ tail_call:
 		}
 		ZendAstExportIndent(str, indent)
 		str.AppendByte('}')
-		break
 	case ZEND_AST_SWITCH:
 		str.AppendString("switch (")
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
@@ -1754,7 +1765,6 @@ tail_call:
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent+1)
 		ZendAstExportIndent(str, indent)
 		str.AppendByte('}')
-		break
 	case ZEND_AST_SWITCH_CASE:
 		ZendAstExportIndent(str, indent)
 		if ast.GetChild()[0] != nil {
@@ -1765,7 +1775,6 @@ tail_call:
 			str.AppendString("default:\n")
 		}
 		ZendAstExportStmt(str, ast.GetChild()[1], indent+1)
-		break
 	case ZEND_AST_DECLARE:
 		str.AppendString("declare(")
 		ZEND_ASSERT(ast.GetChild()[0].GetKind() == ZEND_AST_CONST_DECL)
@@ -1779,12 +1788,13 @@ tail_call:
 		} else {
 			str.AppendByte(';')
 		}
-		break
 	case ZEND_AST_PROP_ELEM:
 		str.AppendByte('$')
+		fallthrough
 	case ZEND_AST_CONST_ELEM:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		APPEND_DEFAULT_VALUE(1)
+		fallthrough
 	case ZEND_AST_USE_TRAIT:
 		str.AppendString("use ")
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
@@ -1796,19 +1806,16 @@ tail_call:
 		} else {
 			str.AppendString(";")
 		}
-		break
 	case ZEND_AST_TRAIT_PRECEDENCE:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		str.AppendString(" insteadof ")
 		ZendAstExportEx(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_METHOD_REFERENCE:
 		if ast.GetChild()[0] != nil {
 			ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 			str.AppendString("::")
 		}
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
-		break
 	case ZEND_AST_NAMESPACE:
 		str.AppendString("namespace")
 		if ast.GetChild()[0] != nil {
@@ -1823,9 +1830,8 @@ tail_call:
 		} else {
 			str.AppendByte(';')
 		}
-		break
 	case ZEND_AST_USE_ELEM:
-
+		fallthrough
 	case ZEND_AST_TRAIT_ALIAS:
 		ZendAstExportName(str, ast.GetChild()[0], 0, indent)
 		if (ast.GetAttr() & ZEND_ACC_PUBLIC) != 0 {
@@ -1841,7 +1847,6 @@ tail_call:
 			str.AppendByte(' ')
 			ZendAstExportName(str, ast.GetChild()[1], 0, indent)
 		}
-		break
 	case ZEND_AST_METHOD_CALL:
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("->")
@@ -1849,7 +1854,6 @@ tail_call:
 		str.AppendByte('(')
 		ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
 		str.AppendByte(')')
-		break
 	case ZEND_AST_STATIC_CALL:
 		ZendAstExportNsName(str, ast.GetChild()[0], 0, indent)
 		str.AppendString("::")
@@ -1857,7 +1861,6 @@ tail_call:
 		str.AppendByte('(')
 		ZendAstExportEx(str, ast.GetChild()[2], 0, indent)
 		str.AppendByte(')')
-		break
 	case ZEND_AST_CONDITIONAL:
 		if priority > 100 {
 			str.AppendByte('(')
@@ -1874,7 +1877,6 @@ tail_call:
 		if priority > 100 {
 			str.AppendByte(')')
 		}
-		break
 	case ZEND_AST_TRY:
 		str.AppendString("try {\n")
 		ZendAstExportStmt(str, ast.GetChild()[0], indent+1)
@@ -1886,7 +1888,6 @@ tail_call:
 			ZendAstExportIndent(str, indent)
 		}
 		str.AppendByte('}')
-		break
 	case ZEND_AST_CATCH:
 		str.AppendString("} catch (")
 		ZendAstExportCatchNameList(str, ZendAstGetList(ast.GetChild()[0]), indent)
@@ -1895,7 +1896,6 @@ tail_call:
 		str.AppendString(") {\n")
 		ZendAstExportStmt(str, ast.GetChild()[2], indent+1)
 		ZendAstExportIndent(str, indent)
-		break
 	case ZEND_AST_PARAM:
 		if ast.GetChild()[0] != nil {
 			if (ast.GetChild()[0].GetAttr() & ZEND_TYPE_NULLABLE) != 0 {
@@ -1913,6 +1913,7 @@ tail_call:
 		str.AppendByte('$')
 		ZendAstExportName(str, ast.GetChild()[1], 0, indent)
 		APPEND_DEFAULT_VALUE(2)
+		fallthrough
 	case ZEND_AST_FOR:
 		str.AppendString("for (")
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
@@ -1930,7 +1931,6 @@ tail_call:
 		ZendAstExportStmt(str, ast.GetChild()[3], indent+1)
 		ZendAstExportIndent(str, indent)
 		str.AppendByte('}')
-		break
 	case ZEND_AST_FOREACH:
 		str.AppendString("foreach (")
 		ZendAstExportEx(str, ast.GetChild()[0], 0, indent)
@@ -1944,9 +1944,8 @@ tail_call:
 		ZendAstExportStmt(str, ast.GetChild()[3], indent+1)
 		ZendAstExportIndent(str, indent)
 		str.AppendByte('}')
-		break
 	default:
-		break
+
 	}
 	return
 binary_op:

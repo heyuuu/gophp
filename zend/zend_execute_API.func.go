@@ -386,7 +386,7 @@ func GetActiveClassName(space **byte) *byte {
 	func_ = EG__().GetCurrentExecuteData().GetFunc()
 	switch func_.GetType() {
 	case ZEND_USER_FUNCTION:
-
+		fallthrough
 	case ZEND_INTERNAL_FUNCTION:
 		var ce *ZendClassEntry = func_.GetScope()
 		if space != nil {
@@ -401,6 +401,7 @@ func GetActiveClassName(space **byte) *byte {
 		} else {
 			return ""
 		}
+		fallthrough
 	default:
 		if space != nil {
 			*space = ""
@@ -422,10 +423,8 @@ func GetActiveFunctionName() *byte {
 		} else {
 			return "main"
 		}
-		break
 	case ZEND_INTERNAL_FUNCTION:
 		return func_.GetFunctionName().GetVal()
-		break
 	default:
 		return nil
 	}
@@ -1128,7 +1127,6 @@ check_fetch_type:
 		if fetch_sub_type != ZEND_FETCH_CLASS_DEFAULT {
 			goto check_fetch_type
 		}
-		break
 	}
 	if (fetch_type & ZEND_FETCH_CLASS_NO_AUTOLOAD) != 0 {
 		return ZendLookupClassEx(class_name, nil, fetch_type)

@@ -343,7 +343,6 @@ func DestroyZendClass(zv *Zval) {
 		if ce.GetNumTraits() > 0 {
 			_destroyZendClassTraitsInfo(ce)
 		}
-		break
 	case ZEND_INTERNAL_CLASS:
 		if ce.GetDefaultPropertiesTable() != nil {
 			var p *Zval = ce.GetDefaultPropertiesTable()
@@ -408,7 +407,6 @@ func DestroyZendClass(zv *Zval) {
 			Free(ce.GetPropertiesInfoTable())
 		}
 		Free(ce)
-		break
 	}
 }
 func ZendClassAddRef(zv *Zval) {
@@ -571,43 +569,40 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 	var kind uint32
 	switch def_opline.GetOpcode() {
 	case ZEND_ADD_ARRAY_ELEMENT:
-
+		fallthrough
 	case ZEND_ADD_ARRAY_UNPACK:
-
+		fallthrough
 	case ZEND_ROPE_ADD:
 		ZEND_ASSERT(false)
 		return
 	case ZEND_JMPZ_EX:
-
+		fallthrough
 	case ZEND_JMPNZ_EX:
-
+		fallthrough
 	case ZEND_BOOL:
-
+		fallthrough
 	case ZEND_BOOL_NOT:
-
+		fallthrough
 	case ZEND_FETCH_CLASS:
-
+		fallthrough
 	case ZEND_DECLARE_ANON_CLASS:
-
+		fallthrough
 	case ZEND_FAST_CALL:
 		return
 	case ZEND_BEGIN_SILENCE:
 		kind = ZEND_LIVE_SILENCE
 		start++
-		break
 	case ZEND_ROPE_INIT:
 		kind = ZEND_LIVE_ROPE
 
 		/* ROPE live ranges include the generating opcode. */
 
 		def_opline--
-		break
 	case ZEND_FE_RESET_R:
-
+		fallthrough
 	case ZEND_FE_RESET_RW:
 		kind = ZEND_LIVE_LOOP
 		start++
-		break
 	case ZEND_NEW:
 		var level int = 0
 		var orig_start uint32 = start
@@ -622,29 +617,27 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 			} else {
 				switch def_opline.GetOpcode() {
 				case ZEND_INIT_FCALL:
-
+					fallthrough
 				case ZEND_INIT_FCALL_BY_NAME:
-
+					fallthrough
 				case ZEND_INIT_NS_FCALL_BY_NAME:
-
+					fallthrough
 				case ZEND_INIT_DYNAMIC_CALL:
-
+					fallthrough
 				case ZEND_INIT_USER_CALL:
-
+					fallthrough
 				case ZEND_INIT_METHOD_CALL:
-
+					fallthrough
 				case ZEND_INIT_STATIC_METHOD_CALL:
-
+					fallthrough
 				case ZEND_NEW:
 					level++
-					break
 				case ZEND_DO_ICALL:
-
+					fallthrough
 				case ZEND_DO_UCALL:
-
+					fallthrough
 				case ZEND_DO_FCALL_BY_NAME:
 					level--
-					break
 				}
 			}
 		}
@@ -658,6 +651,7 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 			/* Trivial live-range, no need to store it. */
 
 		}
+		fallthrough
 	default:
 		start++
 		kind = ZEND_LIVE_TMPVAR
@@ -668,7 +662,6 @@ func EmitLiveRange(op_array *ZendOpArray, var_num uint32, start uint32, end uint
 		if needs_live_range != nil && needs_live_range(op_array, orig_def_opline) == 0 {
 			return
 		}
-		break
 	case ZEND_COPY_TMP:
 
 		/* COPY_TMP has a split live-range: One from the definition until the use in
@@ -885,13 +878,11 @@ func PassTwo(op_array *ZendOpArray) int {
 				val.SetCacheSlot(slot)
 				op_array.SetCacheSize(op_array.GetCacheSize() + b.SizeOf("zval"))
 			}
-			break
 		case ZEND_FAST_CALL:
 			opline.GetOp1().SetOplineNum(op_array.GetTryCatchArray()[opline.GetOp1().GetNum()].GetFinallyOp())
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp1())
-			break
 		case ZEND_BRK:
-
+			fallthrough
 		case ZEND_CONT:
 			var jmp_target uint32 = ZendGetBrkContTarget(op_array, opline)
 			if op_array.IsHasFinallyBlock() {
@@ -901,37 +892,36 @@ func PassTwo(op_array *ZendOpArray) int {
 			opline.GetOp1().SetOplineNum(jmp_target)
 			opline.GetOp2().SetNum(0)
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp1())
-			break
 		case ZEND_GOTO:
 			ZendResolveGotoLabel(op_array, opline)
 			if op_array.IsHasFinallyBlock() {
 				ZendCheckFinallyBreakout(op_array, opline-op_array.GetOpcodes(), opline.GetOp1().GetOplineNum())
 			}
+			fallthrough
 		case ZEND_JMP:
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp1())
-			break
 		case ZEND_JMPZNZ:
 
 			/* absolute index to relative offset */
 
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
+			fallthrough
 		case ZEND_JMPZ:
-
+			fallthrough
 		case ZEND_JMPNZ:
-
+			fallthrough
 		case ZEND_JMPZ_EX:
-
+			fallthrough
 		case ZEND_JMPNZ_EX:
-
+			fallthrough
 		case ZEND_JMP_SET:
-
+			fallthrough
 		case ZEND_COALESCE:
-
+			fallthrough
 		case ZEND_FE_RESET_R:
-
+			fallthrough
 		case ZEND_FE_RESET_RW:
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp2())
-			break
 		case ZEND_ASSERT_CHECK:
 
 			/* If result of assert is unused, result of check is unused as well */
@@ -944,34 +934,30 @@ func PassTwo(op_array *ZendOpArray) int {
 				opline.SetResultType(IS_UNUSED)
 			}
 			ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp2())
-			break
 		case ZEND_FE_FETCH_R:
-
+			fallthrough
 		case ZEND_FE_FETCH_RW:
 
 			/* absolute index to relative offset */
 
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
-			break
 		case ZEND_CATCH:
 			if (opline.GetExtendedValue() & ZEND_LAST_CATCH) == 0 {
 				ZEND_PASS_TWO_UPDATE_JMP_TARGET(op_array, opline, opline.GetOp2())
 			}
-			break
 		case ZEND_RETURN:
-
+			fallthrough
 		case ZEND_RETURN_BY_REF:
 			if op_array.IsGenerator() {
 				opline.SetOpcode(ZEND_GENERATOR_RETURN)
 			}
-			break
 		case ZEND_SWITCH_LONG:
-
+			fallthrough
 		case ZEND_SWITCH_STRING:
 
 			/* absolute indexes to relative offsets */
 
-			var jumptable *HashTable = CT_CONSTANT(opline.GetOp2()).GetArr()
+			var jumptable *HashTable = Z_ARRVAL_P(CT_CONSTANT(opline.GetOp2()))
 			var zv *Zval
 			var __ht *HashTable = jumptable
 			for _, _p := range __ht.foreachData() {
@@ -981,7 +967,6 @@ func PassTwo(op_array *ZendOpArray) int {
 				zv.SetLval(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, zv.GetLval()))
 			}
 			opline.SetExtendedValue(ZEND_OPLINE_NUM_TO_OFFSET(op_array, opline, opline.GetExtendedValue()))
-			break
 		}
 		if opline.GetOp1Type() == IS_CONST {
 			ZEND_PASS_TWO_UPDATE_CONSTANT(op_array, opline, opline.GetOp1())
@@ -1031,9 +1016,9 @@ func GetBinaryOp(opcode int) BinaryOpType {
 	case ZEND_SR:
 		return BinaryOpType(ShiftRightFunction)
 	case ZEND_PARENTHESIZED_CONCAT:
-
+		fallthrough
 	case ZEND_FAST_CONCAT:
-
+		fallthrough
 	case ZEND_CONCAT:
 		return BinaryOpType(ConcatFunction)
 	case ZEND_IS_IDENTICAL:
@@ -1041,7 +1026,7 @@ func GetBinaryOp(opcode int) BinaryOpType {
 	case ZEND_IS_NOT_IDENTICAL:
 		return BinaryOpType(IsNotIdenticalFunction)
 	case ZEND_IS_EQUAL:
-
+		fallthrough
 	case ZEND_CASE:
 		return BinaryOpType(IsEqualFunction)
 	case ZEND_IS_NOT_EQUAL:

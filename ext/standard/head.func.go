@@ -698,13 +698,13 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	switch zend.ZEND_NUM_ARGS() {
 	case 2:
 		zend.ZEND_TRY_ASSIGN_REF_LONG(arg2, line)
+		fallthrough
 	case 1:
 		if file != nil {
 			zend.ZEND_TRY_ASSIGN_REF_STRING(arg1, file)
 		} else {
 			zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(arg1)
 		}
-		break
 	}
 	if core.SG(headers_sent) {
 		return_value.SetTrue()

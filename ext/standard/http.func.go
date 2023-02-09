@@ -205,16 +205,12 @@ func PhpUrlEncodeHashEx(
 				}
 				formstr.AppendString(ekey.GetStr())
 				zend.ZendStringFree(ekey)
-				break
 			case zend.IS_LONG:
 				formstr.AppendLong(zdata.GetLval())
-				break
 			case zend.IS_FALSE:
 				formstr.AppendString("0")
-				break
 			case zend.IS_TRUE:
 				formstr.AppendString("1")
-				break
 			default:
 				var ekey *zend.ZendString
 				var tmp *zend.ZendString

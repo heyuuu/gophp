@@ -238,9 +238,8 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			r.Fgetc(fp)
 			PhpIptcReadRemaining(fp, spool, b.Cond(poi != nil, &poi, 0))
 			done = 1
-			break
 		case M_APP0:
-
+			fallthrough
 		case M_APP1:
 			if written != 0 {
 
@@ -266,17 +265,14 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			for inx = 0; inx < iptcdata_len; inx++ {
 				PhpIptcPut1(fp, spool, iptcdata[inx], b.Cond(poi != nil, &poi, 0))
 			}
-			break
 		case M_SOS:
 
 			/* we hit data, no more marker-inserting can be done! */
 
 			PhpIptcReadRemaining(fp, spool, b.Cond(poi != nil, &poi, 0))
 			done = 1
-			break
 		default:
 			PhpIptcSkipVariable(fp, spool, b.Cond(poi != nil, &poi, 0))
-			break
 		}
 	}
 	r.Fclose(fp)

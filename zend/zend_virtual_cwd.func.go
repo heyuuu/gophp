@@ -885,6 +885,7 @@ func VirtualPopen(command *byte, type_ *byte) *r.FILE {
 				b.PostInc(&(*ptr)) = '\''
 				b.PostInc(&(*ptr)) = '\\'
 				b.PostInc(&(*ptr)) = '\''
+				fallthrough
 			default:
 				b.PostInc(&(*ptr)) = *dir
 			}

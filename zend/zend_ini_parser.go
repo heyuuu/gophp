@@ -118,7 +118,7 @@ func GetIntVal(op *Zval) int {
 		ZendStringFree(op.GetStr())
 		return val
 	default:
-		break
+
 	}
 }
 
@@ -140,22 +140,16 @@ func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
 	switch type_ {
 	case '|':
 		i_result = i_op1 | i_op2
-		break
 	case '&':
 		i_result = i_op1 & i_op2
-		break
 	case '^':
 		i_result = i_op1 ^ i_op2
-		break
 	case '~':
 		i_result = ^i_op1
-		break
 	case '!':
 		i_result = !i_op1
-		break
 	default:
 		i_result = 0
-		break
 	}
 	str_len = sprintf(str_result, "%d", i_result)
 	result.SetString(ZendStringInit(str_result, str_len, ZEND_SYSTEM_INI))
@@ -642,19 +636,20 @@ func IniYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 		for {
 			switch *(b.PreInc(&yyp)) {
 			case '\'':
-
+				fallthrough
 			case ',':
 				goto do_not_strip_quotes
+				fallthrough
 			case '\\':
 				if (*(b.PreInc(&yyp))) != '\\' {
 					goto do_not_strip_quotes
 				}
+				fallthrough
 			default:
 				if yyres != nil {
 					yyres[yyn] = *yyp
 				}
 				yyn++
-				break
 			case '"':
 				if yyres != nil {
 					yyres[yyn] = '0'
@@ -757,22 +752,16 @@ func IniYysyntaxError(yymsg_alloc *YYSIZE_T, yymsg **byte, yyssp *yytype_int16, 
 	switch yycount {
 	case 0:
 		yyformat = YY_("syntax error")
-		break
 	case 1:
 		yyformat = YY_("syntax error, unexpected %s")
-		break
 	case 2:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s")
-		break
 	case 3:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s")
-		break
 	case 4:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s")
-		break
 	case 5:
 		yyformat = YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s")
-		break
 	}
 	var yysize1 YYSIZE_T = yysize + yystrlen(yyformat)
 	if !(yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM) {
@@ -817,69 +806,48 @@ func IniYydestruct(yymsg *byte, yytype int, yyvaluep *Zval) {
 	switch yytype {
 	case 4:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 5:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 6:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 7:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 8:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 9:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 10:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 12:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 14:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 15:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 16:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 47:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 48:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 49:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 50:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 51:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 52:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 53:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 54:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 55:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	case 56:
 		ZvalIniDtor(&(*yyvaluep))
-		break
 	default:
-		break
+
 	}
 }
 

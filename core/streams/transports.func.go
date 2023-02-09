@@ -78,8 +78,9 @@ func _phpStreamXportCreate(
 
 			core.PhpStreamPclose(stream)
 			stream = nil
+			fallthrough
 		case core.PHP_STREAM_PERSISTENT_FAILURE:
-
+			fallthrough
 		default:
 
 			/* failed; get a new one */

@@ -226,7 +226,6 @@ func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p
 
 		/* do nothing */
 
-		break
 	case 1:
 		if line_ccnt < 4 && inst.GetLbchars() != nil {
 			if ocnt < inst.GetLbcharsLen() {
@@ -248,7 +247,6 @@ func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p
 		inst.SetEremLen(0)
 		ocnt -= 4
 		line_ccnt -= 4
-		break
 	case 2:
 		if line_ccnt < 4 && inst.GetLbchars() != nil {
 			if ocnt < inst.GetLbcharsLen() {
@@ -270,13 +268,11 @@ func PhpConvBase64EncodeFlush(inst *PhpConvBase64Encode, in_pp **byte, in_left_p
 		inst.SetEremLen(0)
 		ocnt -= 4
 		line_ccnt -= 4
-		break
 	default:
 
 		/* should not happen... */
 
 		err = PHP_CONV_ERR_UNKNOWN
-		break
 	}
 out:
 	*out_pp = (*byte)(pd)
@@ -328,7 +324,6 @@ func PhpConvBase64EncodeConvert(inst *PhpConvBase64Encode, in_pp **byte, in_left
 			inst.SetEremLen(0)
 			line_ccnt -= 4
 		}
-		break
 	case 2:
 		if icnt >= 1 {
 			if inst.GetLineCcnt() < 4 && inst.GetLbchars() != nil {
@@ -354,7 +349,6 @@ func PhpConvBase64EncodeConvert(inst *PhpConvBase64Encode, in_pp **byte, in_left
 			inst.SetEremLen(0)
 			line_ccnt -= 4
 		}
-		break
 	}
 	for icnt >= 3 {
 		if line_ccnt < 4 && inst.GetLbchars() != nil {
@@ -796,7 +790,6 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 			}
 			ps++
 			icnt--
-			break
 		case 1:
 			if icnt == 0 {
 				goto out
@@ -832,6 +825,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 				icnt--
 				break
 			}
+			fallthrough
 		case 2:
 			if icnt == 0 {
 				goto out
@@ -847,6 +841,7 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 			if scan_stat != 3 {
 				break
 			}
+			fallthrough
 		case 3:
 			if ocnt < 1 {
 				err = PHP_CONV_ERR_TOO_BIG
@@ -855,7 +850,6 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 			*(b.PostInc(&pd)) = next_char
 			ocnt--
 			scan_stat = 0
-			break
 		case 4:
 			if icnt == 0 {
 				goto out
@@ -869,7 +863,6 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 			}
 			ps++
 			icnt--
-			break
 		case 5:
 			if inst.GetLbchars() == nil && lb_cnt == 1 && (*ps) == '\n' {
 
@@ -905,7 +898,6 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 			} else {
 				goto out
 			}
-			break
 		case 6:
 			if lb_ptr < lb_cnt {
 				if ocnt < 1 {
@@ -919,7 +911,6 @@ func PhpConvQprintDecodeConvert(inst *PhpConvQprintDecode, in_pp **byte, in_left
 				lb_ptr = 0
 				lb_cnt = lb_ptr
 			}
-			break
 		}
 	}
 out:
@@ -1051,13 +1042,11 @@ func PhpConvOpen(conv_mode int, options *zend.HashTable, persistent int) *PhpCon
 				goto out_failure
 			}
 		}
-		break
 	case PHP_CONV_BASE64_DECODE:
 		retval = zend.Pemalloc(b.SizeOf("php_conv_base64_decode"), persistent)
 		if PhpConvBase64DecodeCtor((*PhpConvBase64Decode)(retval)) != 0 {
 			goto out_failure
 		}
-		break
 	case PHP_CONV_QPRINT_ENCODE:
 		var line_len uint = 0
 		var lbchars *byte = nil
@@ -1104,7 +1093,6 @@ func PhpConvOpen(conv_mode int, options *zend.HashTable, persistent int) *PhpCon
 				goto out_failure
 			}
 		}
-		break
 	case PHP_CONV_QPRINT_DECODE:
 		var lbchars *byte = nil
 		var lbchars_len int
@@ -1129,10 +1117,8 @@ func PhpConvOpen(conv_mode int, options *zend.HashTable, persistent int) *PhpCon
 				goto out_failure
 			}
 		}
-		break
 	default:
 		retval = nil
-		break
 	}
 	return retval
 out_failure:
@@ -1208,6 +1194,7 @@ func StrfilterConvertAppendBucket(
 			case PHP_CONV_ERR_INVALID_SEQ:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 				goto out_failure
+				fallthrough
 			case PHP_CONV_ERR_MORE:
 				if ps != nil {
 					if icnt > 0 {
@@ -1224,10 +1211,10 @@ func StrfilterConvertAppendBucket(
 						break
 					}
 				}
-				break
 			case PHP_CONV_ERR_UNEXPECTED_EOS:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unexpected end of stream", inst.GetFiltername())
 				goto out_failure
+				fallthrough
 			case PHP_CONV_ERR_TOO_BIG:
 				var new_out_buf *byte
 				var new_out_buf_size int
@@ -1251,12 +1238,12 @@ func StrfilterConvertAppendBucket(
 					out_buf = new_out_buf
 					out_buf_size = new_out_buf_size
 				}
-				break
 			case PHP_CONV_ERR_UNKNOWN:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 				goto out_failure
+				fallthrough
 			default:
-				break
+
 			}
 		}
 		memmove(inst.GetStub(), pt, tcnt)
@@ -1272,6 +1259,7 @@ func StrfilterConvertAppendBucket(
 		case PHP_CONV_ERR_INVALID_SEQ:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 			goto out_failure
+			fallthrough
 		case PHP_CONV_ERR_MORE:
 			if ps != nil {
 				if icnt > b.SizeOf("inst -> stub") {
@@ -1286,7 +1274,6 @@ func StrfilterConvertAppendBucket(
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unexpected octet values", inst.GetFiltername())
 				goto out_failure
 			}
-			break
 		case PHP_CONV_ERR_TOO_BIG:
 			var new_out_buf *byte
 			var new_out_buf_size int
@@ -1310,15 +1297,14 @@ func StrfilterConvertAppendBucket(
 				out_buf = new_out_buf
 				out_buf_size = new_out_buf_size
 			}
-			break
 		case PHP_CONV_ERR_UNKNOWN:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 			goto out_failure
+			fallthrough
 		default:
 			if ps == nil {
 				icnt = 0
 			}
-			break
 		}
 	}
 	if out_buf_size > ocnt {
@@ -1466,6 +1452,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 		switch data.GetState() {
 		case CHUNK_SIZE_START:
 			data.SetChunkSize(0)
+			fallthrough
 		case CHUNK_SIZE:
 			for p < end {
 				if (*p) >= '0' && (*p) <= '9' {
@@ -1489,6 +1476,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 			} else if p == end {
 				return out_len
 			}
+			fallthrough
 		case CHUNK_SIZE_EXT:
 
 			/* skip extension */
@@ -1499,6 +1487,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 			if p == end {
 				return out_len
 			}
+			fallthrough
 		case CHUNK_SIZE_CR:
 			if (*p) == '\r' {
 				p++
@@ -1507,6 +1496,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 					return out_len
 				}
 			}
+			fallthrough
 		case CHUNK_SIZE_LF:
 			if (*p) == '\n' {
 				p++
@@ -1524,6 +1514,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 				data.SetState(CHUNK_ERROR)
 				continue
 			}
+			fallthrough
 		case CHUNK_BODY:
 			if size_t(end-p) >= data.GetChunkSize() {
 				if p != out {
@@ -1545,6 +1536,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 				out_len += end - p
 				return out_len
 			}
+			fallthrough
 		case CHUNK_BODY_CR:
 			if (*p) == '\r' {
 				p++
@@ -1553,6 +1545,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 					return out_len
 				}
 			}
+			fallthrough
 		case CHUNK_BODY_LF:
 			if (*p) == '\n' {
 				p++
@@ -1562,6 +1555,7 @@ func PhpDechunk(buf *byte, len_ int, data *PhpChunkedFilterData) int {
 				data.SetState(CHUNK_ERROR)
 				continue
 			}
+			fallthrough
 		case CHUNK_TRAILER:
 
 			/* ignore trailer */

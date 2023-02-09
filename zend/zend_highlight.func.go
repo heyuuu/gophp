@@ -10,25 +10,18 @@ func ZendHtmlPutc(c byte) {
 	switch c {
 	case '\n':
 		ZEND_PUTS("<br />")
-		break
 	case '<':
 		ZEND_PUTS("&lt;")
-		break
 	case '>':
 		ZEND_PUTS("&gt;")
-		break
 	case '&':
 		ZEND_PUTS("&amp;")
-		break
 	case ' ':
 		ZEND_PUTS("&nbsp;")
-		break
 	case '\t':
 		ZEND_PUTS("&nbsp;&nbsp;&nbsp;&nbsp;")
-		break
 	default:
 		ZEND_PUTC(c)
-		break
 	}
 }
 func ZendHtmlPuts(s *byte, len_ int) {
@@ -71,54 +64,48 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 		switch token_type {
 		case T_INLINE_HTML:
 			next_color = syntax_highlighter_ini.GetHighlightHtml()
-			break
 		case T_COMMENT:
-
+			fallthrough
 		case T_DOC_COMMENT:
 			next_color = syntax_highlighter_ini.GetHighlightComment()
-			break
 		case T_OPEN_TAG:
-
+			fallthrough
 		case T_OPEN_TAG_WITH_ECHO:
-
+			fallthrough
 		case T_CLOSE_TAG:
-
+			fallthrough
 		case T_LINE:
-
+			fallthrough
 		case T_FILE:
-
+			fallthrough
 		case T_DIR:
-
+			fallthrough
 		case T_TRAIT_C:
-
+			fallthrough
 		case T_METHOD_C:
-
+			fallthrough
 		case T_FUNC_C:
-
+			fallthrough
 		case T_NS_C:
-
+			fallthrough
 		case T_CLASS_C:
 			next_color = syntax_highlighter_ini.GetHighlightDefault()
-			break
 		case '"':
-
+			fallthrough
 		case T_ENCAPSED_AND_WHITESPACE:
-
+			fallthrough
 		case T_CONSTANT_ENCAPSED_STRING:
 			next_color = syntax_highlighter_ini.GetHighlightString()
-			break
 		case T_WHITESPACE:
 			ZendHtmlPuts((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
 			token.SetUndef()
 			continue
-			break
 		default:
 			if token.IsUndef() {
 				next_color = syntax_highlighter_ini.GetHighlightKeyword()
 			} else {
 				next_color = syntax_highlighter_ini.GetHighlightDefault()
 			}
-			break
 		}
 		if last_color != next_color {
 			if last_color != syntax_highlighter_ini.GetHighlightHtml() {
@@ -133,20 +120,19 @@ func ZendHighlight(syntax_highlighter_ini *ZendSyntaxHighlighterIni) {
 		if token.IsString() {
 			switch token_type {
 			case T_OPEN_TAG:
-
+				fallthrough
 			case T_OPEN_TAG_WITH_ECHO:
-
+				fallthrough
 			case T_CLOSE_TAG:
-
+				fallthrough
 			case T_WHITESPACE:
-
+				fallthrough
 			case T_COMMENT:
-
+				fallthrough
 			case T_DOC_COMMENT:
-				break
+
 			default:
 				ZvalPtrDtorStr(&token)
-				break
 			}
 		}
 		token.SetUndef()
@@ -174,8 +160,9 @@ func ZendStrip() {
 				ZendWrite(" ", b.SizeOf("\" \"")-1)
 				prev_space = 1
 			}
+			fallthrough
 		case T_COMMENT:
-
+			fallthrough
 		case T_DOC_COMMENT:
 			token.SetUndef()
 			continue
@@ -193,25 +180,23 @@ func ZendStrip() {
 			continue
 		default:
 			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
-			break
 		}
 		if token.IsString() {
 			switch token_type {
 			case T_OPEN_TAG:
-
+				fallthrough
 			case T_OPEN_TAG_WITH_ECHO:
-
+				fallthrough
 			case T_CLOSE_TAG:
-
+				fallthrough
 			case T_WHITESPACE:
-
+				fallthrough
 			case T_COMMENT:
-
+				fallthrough
 			case T_DOC_COMMENT:
-				break
+
 			default:
 				ZvalPtrDtorStr(&token)
-				break
 			}
 		}
 		prev_space = 0

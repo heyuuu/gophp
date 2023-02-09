@@ -253,12 +253,10 @@ func PhpNetworkBindSocketToLocalAddr(
 			(*__struct__sockaddr_in6)(sa).sin6_family = sa.sa_family
 			(*__struct__sockaddr_in6)(sa).sin6_port = htons(port)
 			socklen = b.SizeOf("struct sockaddr_in6")
-			break
 		case AF_INET:
 			(*__struct__sockaddr_in)(sa).sin_family = sa.sa_family
 			(*__struct__sockaddr_in)(sa).sin_port = htons(port)
 			socklen = b.SizeOf("struct sockaddr_in")
-			break
 		default:
 
 			/* Unknown family */
@@ -352,13 +350,11 @@ func PhpNetworkParseNetworkAddressWithPort(addr *byte, addrlen zend.ZendLong, sa
 		in6.sin6_port = htons(port)
 		*sl = b.SizeOf("struct sockaddr_in6")
 		ret = zend.SUCCESS
-		break
 	case AF_INET:
 		*in4 = *(*((**__struct__sockaddr_in)(psal)))
 		in4.sin_port = htons(port)
 		*sl = b.SizeOf("struct sockaddr_in")
 		ret = zend.SUCCESS
-		break
 	}
 	PhpNetworkFreeaddresses(psal)
 out:
@@ -383,13 +379,11 @@ func PhpNetworkPopulateNameFromSockaddr(sa *__struct__sockaddr, sl socklen_t, te
 			if buf != nil {
 				*textaddr = Strpprintf(0, "%s:%d", buf, ntohs((*__struct__sockaddr_in)(sa).sin_port))
 			}
-			break
 		case AF_INET6:
 			buf = (*byte)(inet_ntop(sa.sa_family, (*__struct__sockaddr_in6)(sa).sin6_addr, (*byte)(&abuf), b.SizeOf("abuf")))
 			if buf != nil {
 				*textaddr = Strpprintf(0, "[%s]:%d", buf, ntohs((*__struct__sockaddr_in6)(sa).sin6_port))
 			}
-			break
 		}
 	}
 }
@@ -515,12 +509,10 @@ func PhpNetworkConnectSocketToHost(
 				socklen = 0
 				sa = nil
 			}
-			break
 		case AF_INET:
 			(*__struct__sockaddr_in)(sa).sin_family = sa.sa_family
 			(*__struct__sockaddr_in)(sa).sin_port = htons(port)
 			socklen = b.SizeOf("struct sockaddr_in")
-			break
 		default:
 
 			/* Unknown family */
@@ -621,13 +613,11 @@ func PhpAnyAddr(family int, addr *PhpSockaddrStorage, port uint16) {
 		sin6.sin6_family = AF_INET6
 		sin6.sin6_port = htons(port)
 		sin6.sin6_addr = in6addr_any
-		break
 	case AF_INET:
 		var sin *__struct__sockaddr_in = (*__struct__sockaddr_in)(addr)
 		sin.sin_family = AF_INET
 		sin.sin_port = htons(port)
 		sin.sin_addr.s_addr = htonl(INADDR_ANY)
-		break
 	}
 }
 func PhpSockaddrSize(addr *PhpSockaddrStorage) int {

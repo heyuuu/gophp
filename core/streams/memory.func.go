@@ -101,6 +101,7 @@ func PhpStreamMemorySeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 				return 0
 			}
 		}
+		fallthrough
 	case r.SEEK_SET:
 		if ms.GetFsize() < size_t(offset) {
 			ms.SetFpos(ms.GetFsize())
@@ -112,6 +113,7 @@ func PhpStreamMemorySeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 			stream.SetEof(0)
 			return 0
 		}
+		fallthrough
 	case r.SEEK_END:
 		if offset > 0 {
 			ms.SetFpos(ms.GetFsize())
@@ -127,6 +129,7 @@ func PhpStreamMemorySeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 			stream.SetEof(0)
 			return 0
 		}
+		fallthrough
 	default:
 		*newoffs = ms.GetFpos()
 		return -1
@@ -190,6 +193,7 @@ func PhpStreamMemorySetOption(stream *core.PhpStream, option int, value int, ptr
 			ms.SetFsize(newsize)
 			return core.PHP_STREAM_OPTION_RETURN_OK
 		}
+		fallthrough
 	default:
 		return core.PHP_STREAM_OPTION_RETURN_NOTIMPL
 	}

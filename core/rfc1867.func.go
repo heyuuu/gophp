@@ -39,10 +39,9 @@ func NormalizeProtectedVariable(varname *byte) {
 	for p = varname; (*p) && (*p) != '['; p++ {
 		switch *p {
 		case ' ':
-
+			fallthrough
 		case '.':
 			*p = '_'
-			break
 		}
 	}
 

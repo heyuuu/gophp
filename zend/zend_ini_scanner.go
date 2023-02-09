@@ -162,17 +162,16 @@ func ConvertToNumber(retval *Zval, str *byte, str_len int) int {
 func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
 	switch type_ {
 	case BOOL_FALSE:
-
+		fallthrough
 	case BOOL_TRUE:
 		ZVAL_BOOL(retval, type_ == BOOL_TRUE)
-		break
 	case NULL_NULL:
 		retval.SetNull()
-		break
 	case TC_NUMBER:
 		if ConvertToNumber(retval, str, len_) == SUCCESS {
 			break
 		}
+		fallthrough
 	default:
 		ZendIniCopyValue(retval, str, len_)
 	}
@@ -297,16 +296,15 @@ func ZendIniEscapeString(lval *Zval, str *byte, len_ int, quote_type byte) {
 					b.PostInc(&(*t)) = *s
 					break
 				}
+				fallthrough
 			case '\\':
-
+				fallthrough
 			case '$':
 				b.PostInc(&(*t)) = *s
 				Z_STRLEN_P(lval)--
-				break
 			default:
 				b.PostInc(&(*t)) = '\\'
 				b.PostInc(&(*t)) = *s
-				break
 			}
 		} else {
 			b.PostInc(&(*t)) = *s
@@ -386,88 +384,102 @@ yyc_INITIAL:
 	switch yych {
 	case '\t':
 		goto yy4
+		fallthrough
 	case '\n':
 		goto yy6
+		fallthrough
 	case '\r':
 		goto yy8
+		fallthrough
 	case ' ':
 		goto yy9
+		fallthrough
 	case '!':
-
+		fallthrough
 	case '"':
-
+		fallthrough
 	case '$':
-
+		fallthrough
 	case '&':
-
+		fallthrough
 	case '(':
-
+		fallthrough
 	case ')':
-
+		fallthrough
 	case '^':
-
+		fallthrough
 	case '{':
-
+		fallthrough
 	case '|':
-
+		fallthrough
 	case '}':
-
+		fallthrough
 	case '~':
 		goto yy10
+		fallthrough
 	case '%':
-
+		fallthrough
 	case '\'':
-
+		fallthrough
 	case '*':
-
+		fallthrough
 	case '+':
-
+		fallthrough
 	case ',':
-
+		fallthrough
 	case '-':
-
+		fallthrough
 	case '.':
-
+		fallthrough
 	case '/':
-
+		fallthrough
 	case ':':
-
+		fallthrough
 	case '<':
-
+		fallthrough
 	case '>':
-
+		fallthrough
 	case '?':
-
+		fallthrough
 	case '@':
-
+		fallthrough
 	case ']':
 		goto yy12
+		fallthrough
 	case ';':
 		goto yy13
+		fallthrough
 	case '=':
 		goto yy15
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy17
+		fallthrough
 	case 'N':
-
+		fallthrough
 	case 'n':
 		goto yy18
+		fallthrough
 	case 'O':
-
+		fallthrough
 	case 'o':
 		goto yy19
+		fallthrough
 	case 'T':
-
+		fallthrough
 	case 't':
 		goto yy20
+		fallthrough
 	case 'Y':
-
+		fallthrough
 	case 'y':
 		goto yy21
+		fallthrough
 	case '[':
 		goto yy22
+		fallthrough
 	default:
 		goto yy2
 	}
@@ -1319,7 +1331,6 @@ yy71:
 			if YYCURSOR < YYLIMIT && YYCURSOR[-2] == '\\' && (*YYCURSOR) != '\r' && (*YYCURSOR) != '\n' {
 				continue
 			}
-			break
 		case '$':
 			if (*YYCURSOR) == '{' {
 				break
@@ -1329,6 +1340,7 @@ yy71:
 			if YYCURSOR < YYLIMIT && (*YYCURSOR) != '"' {
 				YYCURSOR++
 			}
+			fallthrough
 		default:
 			continue
 		}
@@ -2165,25 +2177,21 @@ yy135:
 	for YYCURSOR < YYLIMIT {
 		switch *YYCURSOR {
 		case '\n':
-
+			fallthrough
 		case '\r':
 			goto end_raw_value_chars
-			break
 		case ';':
 			if sc == nil {
 				sc = YYCURSOR
 			}
 			YYCURSOR++
-			break
 		case '"':
 			if Yytext[0] == '"' {
 				sc = nil
 			}
 			YYCURSOR++
-			break
 		default:
 			YYCURSOR++
-			break
 		}
 	}
 end_raw_value_chars:
@@ -3202,168 +3210,187 @@ yyc_ST_VALUE:
 	switch yych {
 	case 0x0:
 		goto yy221
+		fallthrough
 	case '\t':
-
+		fallthrough
 	case ' ':
 		goto yy225
+		fallthrough
 	case '\n':
 		goto yy227
+		fallthrough
 	case '\r':
 		goto yy229
+		fallthrough
 	case '!':
-
+		fallthrough
 	case '&':
-
+		fallthrough
 	case '(':
-
+		fallthrough
 	case ')':
-
+		fallthrough
 	case '^':
-
+		fallthrough
 	case '|':
-
+		fallthrough
 	case '~':
 		goto yy230
+		fallthrough
 	case '"':
 		goto yy232
+		fallthrough
 	case '$':
 		goto yy234
+		fallthrough
 	case '\'':
 		goto yy235
+		fallthrough
 	case '-':
 		goto yy236
+		fallthrough
 	case '.':
 		goto yy237
+		fallthrough
 	case '0':
-
+		fallthrough
 	case '1':
-
+		fallthrough
 	case '2':
-
+		fallthrough
 	case '3':
-
+		fallthrough
 	case '4':
-
+		fallthrough
 	case '5':
-
+		fallthrough
 	case '6':
-
+		fallthrough
 	case '7':
-
+		fallthrough
 	case '8':
-
+		fallthrough
 	case '9':
 		goto yy238
+		fallthrough
 	case ';':
 		goto yy240
+		fallthrough
 	case '=':
 		goto yy241
+		fallthrough
 	case 'A':
-
+		fallthrough
 	case 'B':
-
+		fallthrough
 	case 'C':
-
+		fallthrough
 	case 'D':
-
+		fallthrough
 	case 'E':
-
+		fallthrough
 	case 'G':
-
+		fallthrough
 	case 'H':
-
+		fallthrough
 	case 'I':
-
+		fallthrough
 	case 'J':
-
+		fallthrough
 	case 'K':
-
+		fallthrough
 	case 'L':
-
+		fallthrough
 	case 'M':
-
+		fallthrough
 	case 'P':
-
+		fallthrough
 	case 'Q':
-
+		fallthrough
 	case 'R':
-
+		fallthrough
 	case 'S':
-
+		fallthrough
 	case 'U':
-
+		fallthrough
 	case 'V':
-
+		fallthrough
 	case 'W':
-
+		fallthrough
 	case 'X':
-
+		fallthrough
 	case 'Z':
-
+		fallthrough
 	case '_':
-
+		fallthrough
 	case 'a':
-
+		fallthrough
 	case 'b':
-
+		fallthrough
 	case 'c':
-
+		fallthrough
 	case 'd':
-
+		fallthrough
 	case 'e':
-
+		fallthrough
 	case 'g':
-
+		fallthrough
 	case 'h':
-
+		fallthrough
 	case 'i':
-
+		fallthrough
 	case 'j':
-
+		fallthrough
 	case 'k':
-
+		fallthrough
 	case 'l':
-
+		fallthrough
 	case 'm':
-
+		fallthrough
 	case 'p':
-
+		fallthrough
 	case 'q':
-
+		fallthrough
 	case 'r':
-
+		fallthrough
 	case 's':
-
+		fallthrough
 	case 'u':
-
+		fallthrough
 	case 'v':
-
+		fallthrough
 	case 'w':
-
+		fallthrough
 	case 'x':
-
+		fallthrough
 	case 'z':
 		goto yy243
+		fallthrough
 	case 'F':
-
+		fallthrough
 	case 'f':
 		goto yy245
+		fallthrough
 	case 'N':
-
+		fallthrough
 	case 'n':
 		goto yy246
+		fallthrough
 	case 'O':
-
+		fallthrough
 	case 'o':
 		goto yy247
+		fallthrough
 	case 'T':
-
+		fallthrough
 	case 't':
 		goto yy248
+		fallthrough
 	case 'Y':
-
+		fallthrough
 	case 'y':
 		goto yy249
+		fallthrough
 	default:
 		goto yy223
 	}

@@ -141,7 +141,6 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			*status = zend.FAILURE
 			return 0
 		}
-		break
 	case CsBig5:
 
 		/* reference http://demo.icu-project.org/icu-bin/convexp?conv=big5 */
@@ -167,7 +166,6 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			this_char = c
 			pos += 1
 		}
-		break
 	case CsBig5hkscs:
 		var c uint8 = str[pos]
 		if c >= 0x81 && c <= 0xfe {
@@ -194,7 +192,6 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			this_char = c
 			pos += 1
 		}
-		break
 	case CsGb2312:
 		var c uint8 = str[pos]
 		if c >= 0xa1 && c <= 0xfe {
@@ -225,7 +222,6 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			*status = zend.FAILURE
 			return 0
 		}
-		break
 	case CsSjis:
 		var c uint8 = str[pos]
 		if c >= 0x81 && c <= 0x9f || c >= 0xe0 && c <= 0xfc {
@@ -256,7 +252,6 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			*status = zend.FAILURE
 			return 0
 		}
-		break
 	case CsEucjp:
 		var c uint8 = str[pos]
 		if c >= 0xa1 && c <= 0xfe {
@@ -340,13 +335,11 @@ func GetNextChar(charset EntityCharset, str *uint8, str_len int, cursor *int, st
 			*status = zend.FAILURE
 			return 0
 		}
-		break
 	default:
 
 		/* single-byte charsets */
 
 		this_char = str[b.PostInc(&pos)]
-		break
 	}
 	*cursor = pos
 	return this_char
@@ -504,7 +497,6 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 			return zend.FAILURE
 		}
 		*res = code
-		break
 	case Cs88595:
 		if code <= 0xa0 || code == 0xad {
 			*res = code
@@ -520,7 +512,6 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		} else {
 			return zend.FAILURE
 		}
-		break
 	case Cs885915:
 		if code < 0xa4 || code > 0xbe && code <= 0xff {
 			*res = code
@@ -532,7 +523,6 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 				return zend.FAILURE
 			}
 		}
-		break
 	case CsCp1252:
 		if code <= 0x7f || code >= 0xa0 && code <= 0xff {
 			*res = code
@@ -544,7 +534,6 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 				return zend.FAILURE
 			}
 		}
-		break
 	case CsMacroman:
 		if code == 0x7f {
 			return zend.FAILURE
@@ -552,14 +541,17 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		table = UnimapMacroman
 		table_size = b.SizeOf("unimap_macroman") / b.SizeOf("* unimap_macroman")
 		goto table_over_7F
+		fallthrough
 	case CsCp1251:
 		table = UnimapWin1251
 		table_size = b.SizeOf("unimap_win1251") / b.SizeOf("* unimap_win1251")
 		goto table_over_7F
+		fallthrough
 	case CsKoi8r:
 		table = UnimapKoi8r
 		table_size = b.SizeOf("unimap_koi8r") / b.SizeOf("* unimap_koi8r")
 		goto table_over_7F
+		fallthrough
 	case CsCp866:
 		table = UnimapCp866
 		table_size = b.SizeOf("unimap_cp866") / b.SizeOf("* unimap_cp866")
@@ -574,9 +566,8 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 				return zend.FAILURE
 			}
 		}
-		break
 	case CsSjis:
-
+		fallthrough
 	case CsEucjp:
 
 		/* we interpret 0x5C as the Yen symbol. This is not universal.
@@ -590,18 +581,16 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		} else {
 			return zend.FAILURE
 		}
-		break
 	case CsBig5:
-
+		fallthrough
 	case CsBig5hkscs:
-
+		fallthrough
 	case CsGb2312:
 		if code >= 0x20 && code <= 0x7d {
 			*res = code
 		} else {
 			return zend.FAILURE
 		}
-		break
 	default:
 		return zend.FAILURE
 	}
@@ -645,7 +634,7 @@ func UnicodeCpIsAllowed(uni_cp unsigned, document_type int) int {
 	case ENT_HTML_DOC_HTML5:
 		return uni_cp >= 0x20 && uni_cp <= 0x7e || uni_cp >= 0x9 && uni_cp <= 0xd && uni_cp != 0xb || uni_cp >= 0xa0 && uni_cp <= 0xd7ff || uni_cp >= 0xe000 && uni_cp <= 0x10ffff && (uni_cp&0xffff) < 0xfffe && (uni_cp < 0xfdd0 || uni_cp > 0xfdef)
 	case ENT_HTML_DOC_XHTML:
-
+		fallthrough
 	case ENT_HTML_DOC_XML1:
 		return uni_cp >= 0x20 && uni_cp <= 0xd7ff || (uni_cp == 0xa || uni_cp == 0x9 || uni_cp == 0xd) || uni_cp >= 0xe000 && uni_cp <= 0x10ffff && uni_cp != 0xfffe && uni_cp != 0xffff
 	default:
@@ -695,7 +684,7 @@ func NumericEntityIsAllowed(uni_cp unsigned, document_type int) int {
 
 		return uni_cp >= 0x20 && uni_cp <= 0x7e || uni_cp >= 0x9 && uni_cp <= 0xc && uni_cp != 0xb || uni_cp >= 0xa0 && uni_cp <= 0x10ffff && (uni_cp&0xffff) < 0xfffe && (uni_cp < 0xfdd0 || uni_cp > 0xfdef)
 	case ENT_HTML_DOC_XHTML:
-
+		fallthrough
 	case ENT_HTML_DOC_XML1:
 
 		/* OTOH, XML 1.0 requires "character references to match the production for Char
@@ -789,19 +778,19 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 	case CsUtf8:
 		return PhpUtf32Utf8(buf, code)
 	case Cs88591:
-
+		fallthrough
 	case CsCp1252:
-
+		fallthrough
 	case Cs885915:
-
+		fallthrough
 	case CsKoi8r:
-
+		fallthrough
 	case CsCp1251:
-
+		fallthrough
 	case Cs88595:
-
+		fallthrough
 	case CsCp866:
-
+		fallthrough
 	case CsMacroman:
 
 		/* single byte stuff */
@@ -809,11 +798,11 @@ func WriteOctetSequence(buf *uint8, charset EntityCharset, code unsigned) int {
 		*buf = code
 		return 1
 	case CsBig5:
-
+		fallthrough
 	case CsBig5hkscs:
-
+		fallthrough
 	case CsSjis:
-
+		fallthrough
 	case CsGb2312:
 
 		/* we don't have complete unicode mappings for these yet in entity_decode,
@@ -959,7 +948,7 @@ func UnescapeInverseMap(all int, flags int) *EntityHt {
 	if all != 0 {
 		switch document_type {
 		case ENT_HTML_DOC_HTML401:
-
+			fallthrough
 		case ENT_HTML_DOC_XHTML:
 			return &EntHtHtml4
 		case ENT_HTML_DOC_HTML5:

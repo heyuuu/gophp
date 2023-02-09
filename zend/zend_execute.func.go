@@ -369,18 +369,16 @@ func ZVAL_UNDEFINED_OP2() *Zval { return _zvalUndefinedOp2(EXECUTE_DATA_C) }
 func _getZvalCvLookup(ptr *Zval, var_ uint32, type_ int, _ EXECUTE_DATA_D) *Zval {
 	switch type_ {
 	case BP_VAR_R:
-
+		fallthrough
 	case BP_VAR_UNSET:
 		ptr = ZvalUndefinedCv(var_, EXECUTE_DATA_C)
-		break
 	case BP_VAR_IS:
 		ptr = EG__().GetUninitializedZval()
-		break
 	case BP_VAR_RW:
 		ZvalUndefinedCv(var_, EXECUTE_DATA_C)
+		fallthrough
 	case BP_VAR_W:
 		ptr.SetNull()
-		break
 	}
 	return ptr
 }
@@ -767,19 +765,15 @@ func ZendVerifyTypeErrorCommon(
 		case IS_OBJECT:
 			*need_msg = "be an "
 			*need_kind = "object"
-			break
 		case IS_CALLABLE:
 			*need_msg = "be callable"
 			*need_kind = ""
-			break
 		case IS_ITERABLE:
 			*need_msg = "be iterable"
 			*need_kind = ""
-			break
 		default:
 			*need_msg = "be of the type "
 			*need_kind = ZendGetTypeByConst(arg_info.GetType().Code())
-			break
 		}
 	}
 	if arg_info.GetType().AllowNull() {
@@ -1269,24 +1263,23 @@ try_again:
 			if type_ != BP_VAR_UNSET {
 				ZendError(E_WARNING, "Illegal string offset '%s'", Z_STRVAL_P(dim))
 			}
-			break
 		case IS_UNDEF:
 			ZVAL_UNDEFINED_OP2()
+			fallthrough
 		case IS_DOUBLE:
-
+			fallthrough
 		case IS_NULL:
-
+			fallthrough
 		case IS_FALSE:
-
+			fallthrough
 		case IS_TRUE:
 			ZendError(E_NOTICE, "String offset cast occurred")
-			break
 		case IS_REFERENCE:
 			dim = Z_REFVAL_P(dim)
 			goto try_again
+			fallthrough
 		default:
 			ZendIllegalOffset()
-			break
 		}
 		offset = ZvalGetLongFunc(dim)
 	} else {
@@ -1304,22 +1297,21 @@ func ZendWrongStringOffset(EXECUTE_DATA_D) {
 	}
 	switch opline.GetOpcode() {
 	case ZEND_ASSIGN_OP:
-
+		fallthrough
 	case ZEND_ASSIGN_DIM_OP:
-
+		fallthrough
 	case ZEND_ASSIGN_OBJ_OP:
-
+		fallthrough
 	case ZEND_ASSIGN_STATIC_PROP_OP:
 		msg = "Cannot use assign-op operators with string offsets"
-		break
 	case ZEND_FETCH_DIM_W:
-
+		fallthrough
 	case ZEND_FETCH_DIM_RW:
-
+		fallthrough
 	case ZEND_FETCH_DIM_FUNC_ARG:
-
+		fallthrough
 	case ZEND_FETCH_DIM_UNSET:
-
+		fallthrough
 	case ZEND_FETCH_LIST_W:
 
 		/* TODO: Encode the "reason" into opline->extended_value??? */
@@ -1331,91 +1323,81 @@ func ZendWrongStringOffset(EXECUTE_DATA_D) {
 			if opline.GetOp1Type() == IS_VAR && opline.GetOp1().GetVar() == var_ {
 				switch opline.GetOpcode() {
 				case ZEND_FETCH_OBJ_W:
-
+					fallthrough
 				case ZEND_FETCH_OBJ_RW:
-
+					fallthrough
 				case ZEND_FETCH_OBJ_FUNC_ARG:
-
+					fallthrough
 				case ZEND_FETCH_OBJ_UNSET:
-
+					fallthrough
 				case ZEND_ASSIGN_OBJ:
-
+					fallthrough
 				case ZEND_ASSIGN_OBJ_OP:
-
+					fallthrough
 				case ZEND_ASSIGN_OBJ_REF:
 					msg = "Cannot use string offset as an object"
-					break
 				case ZEND_FETCH_DIM_W:
-
+					fallthrough
 				case ZEND_FETCH_DIM_RW:
-
+					fallthrough
 				case ZEND_FETCH_DIM_FUNC_ARG:
-
+					fallthrough
 				case ZEND_FETCH_DIM_UNSET:
-
+					fallthrough
 				case ZEND_FETCH_LIST_W:
-
+					fallthrough
 				case ZEND_ASSIGN_DIM:
-
+					fallthrough
 				case ZEND_ASSIGN_DIM_OP:
 					msg = "Cannot use string offset as an array"
-					break
 				case ZEND_ASSIGN_STATIC_PROP_OP:
-
+					fallthrough
 				case ZEND_ASSIGN_OP:
 					msg = "Cannot use assign-op operators with string offsets"
-					break
 				case ZEND_PRE_INC_OBJ:
-
+					fallthrough
 				case ZEND_PRE_DEC_OBJ:
-
+					fallthrough
 				case ZEND_POST_INC_OBJ:
-
+					fallthrough
 				case ZEND_POST_DEC_OBJ:
-
+					fallthrough
 				case ZEND_PRE_INC:
-
+					fallthrough
 				case ZEND_PRE_DEC:
-
+					fallthrough
 				case ZEND_POST_INC:
-
+					fallthrough
 				case ZEND_POST_DEC:
 					msg = "Cannot increment/decrement string offsets"
-					break
 				case ZEND_ASSIGN_REF:
-
+					fallthrough
 				case ZEND_ADD_ARRAY_ELEMENT:
-
+					fallthrough
 				case ZEND_INIT_ARRAY:
-
+					fallthrough
 				case ZEND_MAKE_REF:
 					msg = "Cannot create references to/from string offsets"
-					break
 				case ZEND_RETURN_BY_REF:
-
+					fallthrough
 				case ZEND_VERIFY_RETURN_TYPE:
 					msg = "Cannot return string offsets by reference"
-					break
 				case ZEND_UNSET_DIM:
-
+					fallthrough
 				case ZEND_UNSET_OBJ:
 					msg = "Cannot unset string offsets"
-					break
 				case ZEND_YIELD:
 					msg = "Cannot yield string offsets by reference"
-					break
 				case ZEND_SEND_REF:
-
+					fallthrough
 				case ZEND_SEND_VAR_EX:
-
+					fallthrough
 				case ZEND_SEND_FUNC_ARG:
 					msg = "Only variables can be passed by reference"
-					break
 				case ZEND_FE_RESET_RW:
 					msg = "Cannot iterate on string offsets by reference"
-					break
 				default:
-					break
+
 				}
 				break
 			}
@@ -1426,9 +1408,8 @@ func ZendWrongStringOffset(EXECUTE_DATA_D) {
 			}
 			opline++
 		}
-		break
 	default:
-		break
+
 	}
 	ZEND_ASSERT(msg != nil)
 	ZendThrowError(nil, "%s", msg)
@@ -1924,6 +1905,7 @@ func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA
 		if EG__().GetException() != nil {
 			return IS_NULL
 		}
+		fallthrough
 	case IS_NULL:
 		value.SetStr(ZSTR_EMPTY_ALLOC())
 		return IS_STRING
@@ -1959,18 +1941,18 @@ try_again:
 		switch type_ {
 		case BP_VAR_R:
 			ZendUndefinedOffset(hval)
+			fallthrough
 		case BP_VAR_UNSET:
-
+			fallthrough
 		case BP_VAR_IS:
 			retval = EG__().GetUninitializedZval()
-			break
 		case BP_VAR_RW:
 			if ZendUndefinedOffsetWrite(ht, hval) == FAILURE {
 				return nil
 			}
+			fallthrough
 		case BP_VAR_W:
 			retval = ht.IndexAddNewH(hval, EG__().GetUninitializedZval())
-			break
 		}
 	} else if dim.IsString() {
 		offset_key = dim.GetStr()
@@ -1991,18 +1973,18 @@ try_again:
 					switch type_ {
 					case BP_VAR_R:
 						ZendUndefinedIndex(offset_key)
+						fallthrough
 					case BP_VAR_UNSET:
-
+						fallthrough
 					case BP_VAR_IS:
 						retval = EG__().GetUninitializedZval()
-						break
 					case BP_VAR_RW:
 						if ZendUndefinedIndexWrite(ht, offset_key) != 0 {
 							return nil
 						}
+						fallthrough
 					case BP_VAR_W:
 						retval.SetNull()
-						break
 					}
 				}
 			}
@@ -2013,11 +1995,11 @@ try_again:
 			switch type_ {
 			case BP_VAR_R:
 				ZendUndefinedIndex(offset_key)
+				fallthrough
 			case BP_VAR_UNSET:
-
+				fallthrough
 			case BP_VAR_IS:
 				retval = EG__().GetUninitializedZval()
-				break
 			case BP_VAR_RW:
 
 				/* Key may be released while throwing the undefined index warning. */
@@ -2029,10 +2011,8 @@ try_again:
 				}
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
 				ZendStringRelease(offset_key)
-				break
 			case BP_VAR_W:
 				retval = ht.KeyAddNew(offset_key.GetStr(), EG__().GetUninitializedZval())
-				break
 			}
 		}
 	} else if dim.IsReference() {
@@ -2238,26 +2218,25 @@ func ZendFetchDimensionAddressRead(
 					return
 				}
 				ZendError(E_WARNING, "Illegal string offset '%s'", Z_STRVAL_P(dim))
-				break
 			case IS_UNDEF:
 				ZVAL_UNDEFINED_OP2()
+				fallthrough
 			case IS_DOUBLE:
-
+				fallthrough
 			case IS_NULL:
-
+				fallthrough
 			case IS_FALSE:
-
+				fallthrough
 			case IS_TRUE:
 				if type_ != BP_VAR_IS {
 					ZendError(E_NOTICE, "String offset cast occurred")
 				}
-				break
 			case IS_REFERENCE:
 				dim = Z_REFVAL_P(dim)
 				goto try_string_offset
+				fallthrough
 			default:
 				ZendIllegalOffset()
-				break
 			}
 			offset = ZvalGetLongFunc(dim)
 		} else {
@@ -2595,7 +2574,6 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 				return 0
 			}
 		}
-		break
 	case ZEND_FETCH_OBJ_WRITE:
 		if PromotesToObject(ptr) != 0 {
 			if prop_info == nil {
@@ -2612,7 +2590,6 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 				return 0
 			}
 		}
-		break
 	case ZEND_FETCH_REF:
 		if ptr.GetType() != IS_REFERENCE {
 			if prop_info == nil {
@@ -2634,9 +2611,8 @@ func ZendHandleFetchObjFlags(result *Zval, ptr *Zval, obj *ZendObject, prop_info
 			ptr.SetNewRef(ptr)
 			ZEND_REF_ADD_TYPE_SOURCE(ptr.GetRef(), prop_info)
 		}
-		break
 	default:
-		break
+
 	}
 	return 1
 }
@@ -3166,7 +3142,6 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 			result.SetNull()
 			ZendError(E_NOTICE, "Undefined variable: this")
 		}
-		break
 	case BP_VAR_IS:
 		if EX(This).u1.v.type_ == IS_OBJECT {
 			result.SetObject(EX(This).GetObj())
@@ -3174,19 +3149,16 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 		} else {
 			result.SetNull()
 		}
-		break
 	case BP_VAR_RW:
-
+		fallthrough
 	case BP_VAR_W:
 		result.SetUndef()
 		ZendThrowError(nil, "Cannot re-assign $this")
-		break
 	case BP_VAR_UNSET:
 		result.SetUndef()
 		ZendThrowError(nil, "Cannot unset $this")
-		break
 	default:
-		break
+
 	}
 }
 func ZendWrongCloneCall(clone *ZendFunction, scope *ZendClassEntry) {
@@ -3478,64 +3450,60 @@ func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
 			for {
 				switch opline.GetOpcode() {
 				case ZEND_DO_FCALL:
-
+					fallthrough
 				case ZEND_DO_ICALL:
-
+					fallthrough
 				case ZEND_DO_UCALL:
-
+					fallthrough
 				case ZEND_DO_FCALL_BY_NAME:
 					level++
-					break
 				case ZEND_INIT_FCALL:
-
+					fallthrough
 				case ZEND_INIT_FCALL_BY_NAME:
-
+					fallthrough
 				case ZEND_INIT_NS_FCALL_BY_NAME:
-
+					fallthrough
 				case ZEND_INIT_DYNAMIC_CALL:
-
+					fallthrough
 				case ZEND_INIT_USER_CALL:
-
+					fallthrough
 				case ZEND_INIT_METHOD_CALL:
-
+					fallthrough
 				case ZEND_INIT_STATIC_METHOD_CALL:
-
+					fallthrough
 				case ZEND_NEW:
 					if level == 0 {
 						ZEND_CALL_NUM_ARGS(call) = 0
 						do_exit = 1
 					}
 					level--
-					break
 				case ZEND_SEND_VAL:
-
+					fallthrough
 				case ZEND_SEND_VAL_EX:
-
+					fallthrough
 				case ZEND_SEND_VAR:
-
+					fallthrough
 				case ZEND_SEND_VAR_EX:
-
+					fallthrough
 				case ZEND_SEND_FUNC_ARG:
-
+					fallthrough
 				case ZEND_SEND_REF:
-
+					fallthrough
 				case ZEND_SEND_VAR_NO_REF:
-
+					fallthrough
 				case ZEND_SEND_VAR_NO_REF_EX:
-
+					fallthrough
 				case ZEND_SEND_USER:
 					if level == 0 {
 						ZEND_CALL_NUM_ARGS(call) = opline.GetOp2().GetNum()
 						do_exit = 1
 					}
-					break
 				case ZEND_SEND_ARRAY:
-
+					fallthrough
 				case ZEND_SEND_UNPACK:
 					if level == 0 {
 						do_exit = 1
 					}
-					break
 				}
 				if do_exit == 0 {
 					opline--
@@ -3553,34 +3521,32 @@ func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
 				for {
 					switch opline.GetOpcode() {
 					case ZEND_DO_FCALL:
-
+						fallthrough
 					case ZEND_DO_ICALL:
-
+						fallthrough
 					case ZEND_DO_UCALL:
-
+						fallthrough
 					case ZEND_DO_FCALL_BY_NAME:
 						level++
-						break
 					case ZEND_INIT_FCALL:
-
+						fallthrough
 					case ZEND_INIT_FCALL_BY_NAME:
-
+						fallthrough
 					case ZEND_INIT_NS_FCALL_BY_NAME:
-
+						fallthrough
 					case ZEND_INIT_DYNAMIC_CALL:
-
+						fallthrough
 					case ZEND_INIT_USER_CALL:
-
+						fallthrough
 					case ZEND_INIT_METHOD_CALL:
-
+						fallthrough
 					case ZEND_INIT_STATIC_METHOD_CALL:
-
+						fallthrough
 					case ZEND_NEW:
 						if level == 0 {
 							do_exit = 1
 						}
 						level--
-						break
 					}
 					opline--
 					if do_exit != 0 {
@@ -3877,7 +3843,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 	}
 	switch type_ {
 	case ZEND_INCLUDE_ONCE:
-
+		fallthrough
 	case ZEND_REQUIRE_ONCE:
 		var file_handle ZendFileHandle
 		var resolved_path *ZendString
@@ -3915,23 +3881,20 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
 		}
 		ZendStringReleaseEx(resolved_path, 0)
-		break
 	case ZEND_INCLUDE:
-
+		fallthrough
 	case ZEND_REQUIRE:
 		if strlen(Z_STRVAL_P(inc_filename)) != Z_STRLEN_P(inc_filename) {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
 			break
 		}
 		new_op_array = CompileFilename(type_, inc_filename)
-		break
 	case ZEND_EVAL:
 		var eval_desc *byte = ZendMakeCompiledStringDescription("eval()'d code")
 		new_op_array = ZendCompileString(inc_filename, eval_desc)
 		Efree(eval_desc)
-		break
 	default:
-		break
+
 	}
 	if tmp_inc_filename.GetType() != IS_UNDEF {
 		ZvalPtrDtorStr(&tmp_inc_filename)
@@ -4260,21 +4223,17 @@ func ZendGetZvalPtr(
 	case IS_CONST:
 		ret = RT_CONSTANT(opline, *node)
 		*should_free = nil
-		break
 	case IS_TMP_VAR:
-
+		fallthrough
 	case IS_VAR:
 		ret = EX_VAR(node.GetVar())
 		*should_free = ret
-		break
 	case IS_CV:
 		ret = EX_VAR(node.GetVar())
 		*should_free = nil
-		break
 	default:
 		ret = nil
 		*should_free = ret
-		break
 	}
 	return ret
 }

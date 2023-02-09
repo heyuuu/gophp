@@ -74,20 +74,19 @@ func BrowscapComputeRegexLen(pattern *zend.ZendString) int {
 	for i = 0; i < pattern.GetLen(); i++ {
 		switch pattern.GetVal()[i] {
 		case '*':
-
+			fallthrough
 		case '.':
-
+			fallthrough
 		case '\\':
-
+			fallthrough
 		case '(':
-
+			fallthrough
 		case ')':
-
+			fallthrough
 		case '~':
-
+			fallthrough
 		case '+':
 			len_++
-			break
 		}
 	}
 	return len_ + b.SizeOf("\"~^$~\"") - 1
@@ -108,38 +107,29 @@ func BrowscapConvertPattern(pattern *zend.ZendString, persistent int) *zend.Zend
 		switch lc_pattern[i] {
 		case '?':
 			t[j] = '.'
-			break
 		case '*':
 			t[b.PostInc(&j)] = '.'
 			t[j] = '*'
-			break
 		case '.':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = '.'
-			break
 		case '\\':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = '\\'
-			break
 		case '(':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = '('
-			break
 		case ')':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = ')'
-			break
 		case '~':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = '~'
-			break
 		case '+':
 			t[b.PostInc(&j)] = '\\'
 			t[j] = '+'
-			break
 		default:
 			t[j] = lc_pattern[i]
-			break
 		}
 		i++
 		j++
@@ -249,10 +239,9 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 				ctx.GetCurrentEntry().SetKvEnd(bdata.GetKvUsed())
 			}
 		}
-		break
 	case zend.ZEND_INI_PARSER_SECTION:
 		var entry *BrowscapEntry
-		var pattern *zend.ZendString = arg1.GetStr()
+		var pattern *zend.ZendString = zend.Z_STR_P(arg1)
 		var pos int
 		var i int
 		if pattern.GetLen() > UINT16_MAX {
@@ -279,7 +268,6 @@ func PhpBrowscapParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, call
 		for i = 0; i < BROWSCAP_NUM_CONTAINS; i++ {
 			pos = BrowscapComputeContains(pattern, pos, entry.GetContainsStart()[i], entry.GetContainsLen()[i])
 		}
-		break
 	}
 }
 func StrInternedDtor(zv *zend.Zval) { zend.ZendStringRelease(zv.GetStr()) }
@@ -469,12 +457,11 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 			for i = 0; i < previous_match.GetLen(); i++ {
 				switch previous_match.GetVal()[i] {
 				case '?':
-
+					fallthrough
 				case '*':
 
-					/* do nothing, ignore these characters in the count */
+				/* do nothing, ignore these characters in the count */
 
-					break
 				default:
 					prev_len++
 				}
@@ -482,12 +469,11 @@ func BrowserRegCompare(entry *BrowscapEntry, agent_name *zend.ZendString, found_
 			for i = 0; i < current_match.GetLen(); i++ {
 				switch current_match.GetVal()[i] {
 				case '?':
-
+					fallthrough
 				case '*':
 
-					/* do nothing, ignore these characters in the count */
+				/* do nothing, ignore these characters in the count */
 
-					break
 				default:
 					curr_len++
 				}

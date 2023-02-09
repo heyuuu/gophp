@@ -753,15 +753,12 @@ func ZifTouch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	switch argc {
 	case 1:
 		newtime = nil
-		break
 	case 2:
 		newtime.actime = filetime
 		newtime.modtime = newtime.actime
-		break
 	case 3:
 		newtime.modtime = filetime
 		newtime.actime = fileatime
-		break
 	default:
 
 		/* Never reached */
@@ -1110,7 +1107,7 @@ func PhpStat(filename *byte, filename_length int, type_ int, return_value *zend.
 		return_value.SetTrue()
 		return
 	case FS_LSTAT:
-
+		fallthrough
 	case FS_STAT:
 		zend.ArrayInit(return_value)
 		stat_dev.SetLong(stat_sb.st_dev)

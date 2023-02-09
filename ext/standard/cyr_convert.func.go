@@ -17,44 +17,34 @@ func PhpConvertCyrString(str *uint8, length int, from byte, to byte) *byte {
 	switch toupper(int(uint8(from))) {
 	case 'W':
 		from_table = _cyrWin1251
-		break
 	case 'A':
-
+		fallthrough
 	case 'D':
 		from_table = _cyrCp866
-		break
 	case 'I':
 		from_table = _cyrIso88595
-		break
 	case 'M':
 		from_table = _cyrMac
-		break
 	case 'K':
-		break
+
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown source charset: %c", from)
-		break
 	}
 	switch toupper(int(uint8(to))) {
 	case 'W':
 		to_table = _cyrWin1251
-		break
 	case 'A':
-
+		fallthrough
 	case 'D':
 		to_table = _cyrCp866
-		break
 	case 'I':
 		to_table = _cyrIso88595
-		break
 	case 'M':
 		to_table = _cyrMac
-		break
 	case 'K':
-		break
+
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown destination charset: %c", to)
-		break
 	}
 	if str == nil {
 		return (*byte)(str)

@@ -766,7 +766,6 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			switch descriptors[i].GetMode() & ^DESC_PARENT_MODE_WRITE {
 			case DESC_PIPE:
 				close(descriptors[i].GetParentend())
-				break
 			}
 			if dup2(descriptors[i].GetChildend(), descriptors[i].GetIndex()) < 0 {
 				r.Perror("dup2")
@@ -834,13 +833,10 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			switch descriptors[i].GetModeFlags() {
 			case O_WRONLY:
 				mode_string = "w"
-				break
 			case O_RDONLY:
 				mode_string = "r"
-				break
 			case O_RDWR:
 				mode_string = "r+"
-				break
 			}
 			stream = streams.PhpStreamFopenFromFd(descriptors[i].GetParentend(), mode_string, nil)
 			if stream != nil {
@@ -854,7 +850,6 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				proc.GetPipes()[i] = retfp.GetRes()
 				retfp.AddRefcount()
 			}
-			break
 		default:
 			proc.GetPipes()[i] = nil
 		}

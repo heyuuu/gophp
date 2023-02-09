@@ -1743,17 +1743,17 @@ func ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	if (throw_op.GetResultType() & (IS_VAR | IS_TMP_VAR)) != 0 {
 		switch throw_op.GetOpcode() {
 		case ZEND_ADD_ARRAY_ELEMENT:
-
+			fallthrough
 		case ZEND_ADD_ARRAY_UNPACK:
-
+			fallthrough
 		case ZEND_ROPE_INIT:
-
+			fallthrough
 		case ZEND_ROPE_ADD:
-			break
-		case ZEND_FETCH_CLASS:
 
+		case ZEND_FETCH_CLASS:
+			fallthrough
 		case ZEND_DECLARE_ANON_CLASS:
-			break
+
 		default:
 			ZvalPtrDtorNogc(EX_VAR(throw_op.GetResult().GetVar()))
 		}
@@ -1776,12 +1776,14 @@ func ZEND_USER_OPCODE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 		} else {
 			return zend_leave_helper_SPEC(execute_data)
 		}
+		fallthrough
 	case ZEND_USER_OPCODE_ENTER:
 		return 1
 	case ZEND_USER_OPCODE_LEAVE:
 		return 2
 	case ZEND_USER_OPCODE_DISPATCH:
 		ZEND_VM_DISPATCH(opline.GetOpcode(), opline)
+		fallthrough
 	default:
 		ZEND_VM_DISPATCH(zend_uchar(ret&0xff), opline)
 	}
@@ -2870,19 +2872,14 @@ func ZEND_CAST_SPEC_CONST_HANDLER(execute_data *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case IS_NULL:
 		result.SetNull()
-		break
 	case _IS_BOOL:
 		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
-		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
-		break
 	case IS_DOUBLE:
 		result.SetDouble(ZvalGetDouble(expr))
-		break
 	case IS_STRING:
 		result.SetString(ZvalGetString(expr))
-		break
 	default:
 		if (IS_CONST & (IS_VAR | IS_CV)) != 0 {
 			ZVAL_DEREF(expr)
@@ -15371,19 +15368,14 @@ func ZEND_CAST_SPEC_TMP_HANDLER(execute_data *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case IS_NULL:
 		result.SetNull()
-		break
 	case _IS_BOOL:
 		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
-		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
-		break
 	case IS_DOUBLE:
 		result.SetDouble(ZvalGetDouble(expr))
-		break
 	case IS_STRING:
 		result.SetString(ZvalGetString(expr))
-		break
 	default:
 		if (IS_TMP_VAR & (IS_VAR | IS_CV)) != 0 {
 			ZVAL_DEREF(expr)
@@ -18179,19 +18171,14 @@ func ZEND_CAST_SPEC_VAR_HANDLER(execute_data *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case IS_NULL:
 		result.SetNull()
-		break
 	case _IS_BOOL:
 		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
-		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
-		break
 	case IS_DOUBLE:
 		result.SetDouble(ZvalGetDouble(expr))
-		break
 	case IS_STRING:
 		result.SetString(ZvalGetString(expr))
-		break
 	default:
 		if (IS_VAR & (IS_VAR | IS_CV)) != 0 {
 			ZVAL_DEREF(expr)
@@ -26665,7 +26652,6 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) in
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetName())
-		break
 	case ZEND_FETCH_CLASS_PARENT:
 		if scope.GetParent() == nil {
 			ZendThrowError(nil, "Cannot use \"parent\" when current class scope has no parent")
@@ -26673,7 +26659,6 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) in
 			HANDLE_EXCEPTION()
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(scope.GetParent().name)
-		break
 	case ZEND_FETCH_CLASS_STATIC:
 		if EX(This).u1.v.type_ == IS_OBJECT {
 			called_scope = Z_OBJCE(EX(This))
@@ -26681,9 +26666,8 @@ func ZEND_FETCH_CLASS_NAME_SPEC_UNUSED_HANDLER(execute_data *ZendExecuteData) in
 			called_scope = EX(This).GetCe()
 		}
 		EX_VAR(opline.GetResult().GetVar()).SetStringCopy(called_scope.GetName())
-		break
 	default:
-		break
+
 	}
 	ZEND_VM_NEXT_OPCODE()
 }
@@ -32749,19 +32733,14 @@ func ZEND_CAST_SPEC_CV_HANDLER(execute_data *ZendExecuteData) int {
 	switch opline.GetExtendedValue() {
 	case IS_NULL:
 		result.SetNull()
-		break
 	case _IS_BOOL:
 		ZVAL_BOOL(result, ZendIsTrue(expr) != 0)
-		break
 	case IS_LONG:
 		result.SetLong(ZvalGetLong(expr))
-		break
 	case IS_DOUBLE:
 		result.SetDouble(ZvalGetDouble(expr))
-		break
 	case IS_STRING:
 		result.SetString(ZvalGetString(expr))
-		break
 	default:
 		if (IS_CV & (IS_VAR | IS_CV)) != 0 {
 			ZVAL_DEREF(expr)
@@ -47299,7 +47278,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 				ZendSwapOperands(op)
 			}
 		}
-		break
 	case ZEND_SUB:
 		if res_info == MAY_BE_LONG && op1_info == MAY_BE_LONG && op2_info == MAY_BE_LONG {
 			if op.GetOp1Type() == IS_CONST && op.GetOp2Type() == IS_CONST {
@@ -47317,7 +47295,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 2437 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 		}
-		break
 	case ZEND_MUL:
 		if op.GetOp1Type() < op.GetOp2Type() {
 			ZendSwapOperands(op)
@@ -47338,7 +47315,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 2512 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_COMMUTATIVE
 		}
-		break
 	case ZEND_IS_EQUAL:
 		if op.GetOp1Type() < op.GetOp2Type() {
 			ZendSwapOperands(op)
@@ -47354,7 +47330,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 2612 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
 		}
-		break
 	case ZEND_IS_NOT_EQUAL:
 		if op.GetOp1Type() < op.GetOp2Type() {
 			ZendSwapOperands(op)
@@ -47370,7 +47345,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 2762 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH | SPEC_RULE_COMMUTATIVE
 		}
-		break
 	case ZEND_IS_SMALLER:
 		if op1_info == MAY_BE_LONG && op2_info == MAY_BE_LONG {
 			if op.GetOp1Type() == IS_CONST && op.GetOp2Type() == IS_CONST {
@@ -47383,7 +47357,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 2912 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH
 		}
-		break
 	case ZEND_IS_SMALLER_OR_EQUAL:
 		if op1_info == MAY_BE_LONG && op2_info == MAY_BE_LONG {
 			if op.GetOp1Type() == IS_CONST && op.GetOp2Type() == IS_CONST {
@@ -47396,7 +47369,6 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 3062 | SPEC_RULE_OP1 | SPEC_RULE_OP2 | SPEC_RULE_SMART_BRANCH
 		}
-		break
 	case ZEND_QM_ASSIGN:
 		if op1_info == MAY_BE_LONG {
 			spec = 3149 | SPEC_RULE_OP1
@@ -47405,55 +47377,46 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 		} else if b.CondF1(op.GetOp1Type() == IS_CONST, func() bool { return !(RT_CONSTANT(op, op.GetOp1()).IsRefcounted()) }, !(op1_info&(MAY_BE_ANY|MAY_BE_UNDEF) - (MAY_BE_NULL | MAY_BE_FALSE | MAY_BE_TRUE | MAY_BE_LONG | MAY_BE_DOUBLE))) {
 			spec = 3159 | SPEC_RULE_OP1
 		}
-		break
 	case ZEND_PRE_INC:
 		if res_info == MAY_BE_LONG && op1_info == MAY_BE_LONG {
 			spec = 3137 | SPEC_RULE_RETVAL
 		} else if op1_info == MAY_BE_LONG {
 			spec = 3139 | SPEC_RULE_RETVAL
 		}
-		break
 	case ZEND_PRE_DEC:
 		if res_info == MAY_BE_LONG && op1_info == MAY_BE_LONG {
 			spec = 3141 | SPEC_RULE_RETVAL
 		} else if op1_info == MAY_BE_LONG {
 			spec = 3143 | SPEC_RULE_RETVAL
 		}
-		break
 	case ZEND_POST_INC:
 		if res_info == MAY_BE_LONG && op1_info == MAY_BE_LONG {
 			spec = 3145
 		} else if op1_info == MAY_BE_LONG {
 			spec = 3146
 		}
-		break
 	case ZEND_POST_DEC:
 		if res_info == MAY_BE_LONG && op1_info == MAY_BE_LONG {
 			spec = 3147
 		} else if op1_info == MAY_BE_LONG {
 			spec = 3148
 		}
-		break
 	case ZEND_JMP:
 		if OP_JMP_ADDR(op, op.GetOp1()) > op {
 			spec = 2311
 		}
-		break
 	case ZEND_SEND_VAL:
 		if op.GetOp1Type() == IS_CONST && !(RT_CONSTANT(op, op.GetOp1()).IsRefcounted()) {
 			spec = 3199
 		}
-		break
 	case ZEND_SEND_VAR_EX:
 		if op.GetOp2().GetNum() <= MAX_ARG_FLAG_NUM && (op1_info&(MAY_BE_UNDEF|MAY_BE_REF)) == 0 {
 			spec = 3194 | SPEC_RULE_OP1
 		}
-		break
 	case ZEND_FE_FETCH_R:
 		if op.GetOp2Type() == IS_CV && (op1_info&(MAY_BE_UNDEF|MAY_BE_ANY|MAY_BE_REF)) == MAY_BE_ARRAY {
 			spec = 3201 | SPEC_RULE_RETVAL
 		}
-		break
 	case ZEND_FETCH_DIM_R:
 		if (op2_info & (MAY_BE_UNDEF | MAY_BE_NULL | MAY_BE_STRING | MAY_BE_ARRAY | MAY_BE_OBJECT | MAY_BE_RESOURCE | MAY_BE_REF)) == 0 {
 			if op.GetOp1Type() == IS_CONST && op.GetOp2Type() == IS_CONST {
@@ -47461,41 +47424,36 @@ func ZendVmSetOpcodeHandlerEx(op *ZendOp, op1_info uint32, op2_info uint32, res_
 			}
 			spec = 3164 | SPEC_RULE_OP1 | SPEC_RULE_OP2
 		}
-		break
 	case ZEND_SEND_VAL_EX:
 		if op.GetOp2().GetNum() <= MAX_ARG_FLAG_NUM && op.GetOp1Type() == IS_CONST && !(RT_CONSTANT(op, op.GetOp1()).IsRefcounted()) {
 			spec = 3200
 		}
-		break
 	case ZEND_SEND_VAR:
 		if (op1_info & (MAY_BE_UNDEF | MAY_BE_REF)) == 0 {
 			spec = 3189 | SPEC_RULE_OP1
 		}
-		break
 	case ZEND_BW_OR:
-
+		fallthrough
 	case ZEND_BW_AND:
-
+		fallthrough
 	case ZEND_BW_XOR:
-
+		fallthrough
 	case ZEND_BOOL_XOR:
-
+		fallthrough
 	case ZEND_IS_IDENTICAL:
-
+		fallthrough
 	case ZEND_IS_NOT_IDENTICAL:
 		if op.GetOp1Type() < op.GetOp2Type() {
 			ZendSwapOperands(op)
 		}
-		break
 	case ZEND_USER_OPCODE:
 		if (ZendSpecHandlers[op.GetOpcode()] & SPEC_RULE_COMMUTATIVE) != 0 {
 			if op.GetOp1Type() < op.GetOp2Type() {
 				ZendSwapOperands(op)
 			}
 		}
-		break
 	default:
-		break
+
 	}
 	op.SetHandler(ZendVmGetOpcodeHandlerEx(spec, op))
 }

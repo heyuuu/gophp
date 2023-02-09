@@ -1652,13 +1652,13 @@ func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *zend.ZendString 
 		}
 		switch inc_len {
 		case -2:
-
+			fallthrough
 		case -1:
 			inc_len = 1
 			core.PhpIgnoreValue(mblen(nil, 0))
-			break
 		case 0:
 			goto quit_loop
+			fallthrough
 		case 1:
 			if (*c) == '/' {
 				if state == 1 {
@@ -1671,13 +1671,11 @@ func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *zend.ZendString 
 					state = 1
 				}
 			}
-			break
 		default:
 			if state == 0 {
 				comp = c
 				state = 1
 			}
-			break
 		}
 		c += inc_len
 		cnt -= inc_len
@@ -2066,7 +2064,7 @@ func PhpNeedleChar(needle *zend.Zval, target *byte) int {
 		*target = byte(needle.GetLval())
 		return zend.SUCCESS
 	case zend.IS_NULL:
-
+		fallthrough
 	case zend.IS_FALSE:
 		*target = '0'
 		return zend.SUCCESS
@@ -2074,7 +2072,7 @@ func PhpNeedleChar(needle *zend.Zval, target *byte) int {
 		*target = '1'
 		return zend.SUCCESS
 	case zend.IS_DOUBLE:
-
+		fallthrough
 	case zend.IS_OBJECT:
 		*target = byte(zend.ZvalGetLong(needle))
 		return zend.SUCCESS
@@ -3692,27 +3690,28 @@ func ZifQuotemeta(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		c = *p
 		switch c {
 		case '.':
-
+			fallthrough
 		case '\\':
-
+			fallthrough
 		case '+':
-
+			fallthrough
 		case '*':
-
+			fallthrough
 		case '?':
-
+			fallthrough
 		case '[':
-
+			fallthrough
 		case '^':
-
+			fallthrough
 		case ']':
-
+			fallthrough
 		case '$':
-
+			fallthrough
 		case '(':
-
+			fallthrough
 		case ')':
 			b.PostInc(&(*q)) = '\\'
+			fallthrough
 		default:
 			b.PostInc(&(*q)) = c
 		}
@@ -5401,35 +5400,27 @@ func PhpStripcslashes(str *zend.ZendString) {
 			case 'n':
 				b.PostInc(&(*target)) = '\n'
 				nlen--
-				break
 			case 'r':
 				b.PostInc(&(*target)) = '\r'
 				nlen--
-				break
 			case 'a':
 				b.PostInc(&(*target)) = 'a'
 				nlen--
-				break
 			case 't':
 				b.PostInc(&(*target)) = '\t'
 				nlen--
-				break
 			case 'v':
 				b.PostInc(&(*target)) = 'v'
 				nlen--
-				break
 			case 'b':
 				b.PostInc(&(*target)) = 'b'
 				nlen--
-				break
 			case 'f':
 				b.PostInc(&(*target)) = 'f'
 				nlen--
-				break
 			case '\\':
 				b.PostInc(&(*target)) = '\\'
 				nlen--
-				break
 			case 'x':
 				if source+1 < end && isxdigit(int(*(source + 1))) {
 					numtmp[0] = *(b.PreInc(&source))
@@ -5444,6 +5435,7 @@ func PhpStripcslashes(str *zend.ZendString) {
 					b.PostInc(&(*target)) = byte(strtol(numtmp, nil, 16))
 					break
 				}
+				fallthrough
 			default:
 				i = 0
 				for source < end && (*source) >= '0' && (*source) <= '7' && i < 3 {
@@ -5489,25 +5481,18 @@ func PhpAddcslashesStr(str *byte, len_ int, what *byte, wlength int) *zend.ZendS
 				switch c {
 				case '\n':
 					b.PostInc(&(*target)) = 'n'
-					break
 				case '\t':
 					b.PostInc(&(*target)) = 't'
-					break
 				case '\r':
 					b.PostInc(&(*target)) = 'r'
-					break
 				case 'a':
 					b.PostInc(&(*target)) = 'a'
-					break
 				case 'v':
 					b.PostInc(&(*target)) = 'v'
-					break
 				case 'b':
 					b.PostInc(&(*target)) = 'b'
-					break
 				case 'f':
 					b.PostInc(&(*target)) = 'f'
-					break
 				default:
 					target += sprintf(target, "%03o", uint8(c))
 				}
@@ -5543,16 +5528,16 @@ func PhpAddslashes(str *zend.ZendString) *zend.ZendString {
 	for source < end {
 		switch *source {
 		case '0':
-
+			fallthrough
 		case '\'':
-
+			fallthrough
 		case '"':
-
+			fallthrough
 		case '\\':
 			goto do_escape
+			fallthrough
 		default:
 			source++
-			break
 		}
 	}
 	return str.Copy()
@@ -5566,16 +5551,15 @@ do_escape:
 		case '0':
 			b.PostInc(&(*target)) = '\\'
 			b.PostInc(&(*target)) = '0'
-			break
 		case '\'':
-
+			fallthrough
 		case '"':
-
+			fallthrough
 		case '\\':
 			b.PostInc(&(*target)) = '\\'
+			fallthrough
 		default:
 			b.PostInc(&(*target)) = *source
-			break
 		}
 		source++
 	}
@@ -6066,36 +6050,26 @@ func PhpHebrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval, conv
 				switch *target {
 				case '(':
 					*target = ')'
-					break
 				case ')':
 					*target = '('
-					break
 				case '[':
 					*target = ']'
-					break
 				case ']':
 					*target = '['
-					break
 				case '{':
 					*target = '}'
-					break
 				case '}':
 					*target = '{'
-					break
 				case '<':
 					*target = '>'
-					break
 				case '>':
 					*target = '<'
-					break
 				case '\\':
 					*target = '/'
-					break
 				case '/':
 					*target = '\\'
-					break
 				default:
-					break
+
 				}
 				target--
 			}
@@ -6305,7 +6279,7 @@ func ZifNl2br(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	for tmp < end {
 		switch *tmp {
 		case '\r':
-
+			fallthrough
 		case '\n':
 			b.PostInc(&(*target)) = '<'
 			b.PostInc(&(*target)) = 'b'
@@ -6319,6 +6293,7 @@ func ZifNl2br(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				*tmp++
 				b.PostInc(&(*target)) = (*tmp) - 1
 			}
+			fallthrough
 		default:
 			b.PostInc(&(*target)) = *tmp
 		}
@@ -6725,10 +6700,8 @@ func PhpTagFind(tag *byte, len_ int, set *byte) int {
 		switch c {
 		case '<':
 			*(b.PostInc(&n)) = c
-			break
 		case '>':
 			done = 1
-			break
 		default:
 			if !(isspace(int(c))) {
 				if state == 0 {
@@ -6742,7 +6715,6 @@ func PhpTagFind(tag *byte, len_ int, set *byte) int {
 					done = 1
 				}
 			}
-			break
 		}
 		c = tolower(*(b.PreInc(&t)))
 	}
@@ -6806,14 +6778,18 @@ func PhpStripTagsEx(
 		switch state {
 		case 1:
 			goto state_1
+			fallthrough
 		case 2:
 			goto state_2
+			fallthrough
 		case 3:
 			goto state_3
+			fallthrough
 		case 4:
 			goto state_4
+			fallthrough
 		default:
-			break
+
 		}
 	}
 state_0:
@@ -6823,7 +6799,7 @@ state_0:
 	c = *p
 	switch c {
 	case '0':
-		break
+
 	case '<':
 		if in_q != 0 {
 			break
@@ -6844,6 +6820,7 @@ state_0:
 		}
 		p++
 		goto state_1
+		fallthrough
 	case '>':
 		if depth != 0 {
 			depth--
@@ -6853,10 +6830,8 @@ state_0:
 			break
 		}
 		*(b.PostInc(&rp)) = c
-		break
 	default:
 		*(b.PostInc(&rp)) = c
-		break
 	}
 	p++
 	goto state_0
@@ -6867,7 +6842,7 @@ state_1:
 	c = *p
 	switch c {
 	case '0':
-		break
+
 	case '<':
 		if in_q != 0 {
 			break
@@ -6876,7 +6851,6 @@ state_1:
 			goto reg_char_1
 		}
 		depth++
-		break
 	case '>':
 		if depth != 0 {
 			depth--
@@ -6908,8 +6882,9 @@ state_1:
 		}
 		p++
 		goto state_0
+		fallthrough
 	case '"':
-
+		fallthrough
 	case '\'':
 		if p != buf && (in_q == 0 || (*p) == in_q) {
 			if in_q != 0 {
@@ -6919,6 +6894,7 @@ state_1:
 			}
 		}
 		goto reg_char_1
+		fallthrough
 	case '!':
 
 		/* JavaScript & Other HTML scripting languages */
@@ -6931,7 +6907,6 @@ state_1:
 		} else {
 			goto reg_char_1
 		}
-		break
 	case '?':
 		if p >= buf+1 && (*(p - 1)) == '<' {
 			br = 0
@@ -6941,7 +6916,6 @@ state_1:
 		} else {
 			goto reg_char_1
 		}
-		break
 	default:
 	reg_char_1:
 		if allow != nil {
@@ -6952,7 +6926,6 @@ state_1:
 			}
 			*(b.PostInc(&tp)) = c
 		}
-		break
 	}
 	p++
 	goto state_1
@@ -6967,13 +6940,11 @@ state_2:
 			lc = '('
 			br++
 		}
-		break
 	case ')':
 		if lc != '"' && lc != '\'' {
 			lc = ')'
 			br--
 		}
-		break
 	case '>':
 		if depth != 0 {
 			depth--
@@ -6989,9 +6960,8 @@ state_2:
 			p++
 			goto state_0
 		}
-		break
 	case '"':
-
+		fallthrough
 	case '\'':
 		if p >= buf+1 && (*(p - 1)) != '\\' {
 			if lc == c {
@@ -7007,9 +6977,8 @@ state_2:
 				}
 			}
 		}
-		break
 	case 'l':
-
+		fallthrough
 	case 'L':
 
 		/* swm: If we encounter '<?xml' then we shouldn't be in
@@ -7022,9 +6991,8 @@ state_2:
 			p++
 			goto state_1
 		}
-		break
 	default:
-		break
+
 	}
 	p++
 	goto state_2
@@ -7047,8 +7015,9 @@ state_3:
 		tp = tbuf
 		p++
 		goto state_0
+		fallthrough
 	case '"':
-
+		fallthrough
 	case '\'':
 		if p != buf && (*(p - 1)) != '\\' && (in_q == 0 || (*p) == in_q) {
 			if in_q != 0 {
@@ -7057,16 +7026,14 @@ state_3:
 				in_q = *p
 			}
 		}
-		break
 	case '-':
 		if p >= buf+2 && (*(p - 1)) == '-' && (*(p - 2)) == '!' {
 			state = 4
 			p++
 			goto state_4
 		}
-		break
 	case 'E':
-
+		fallthrough
 	case 'e':
 
 		/* !DOCTYPE exception */
@@ -7076,9 +7043,8 @@ state_3:
 			p++
 			goto state_1
 		}
-		break
 	default:
-		break
+
 	}
 	p++
 	goto state_3
@@ -7452,27 +7418,22 @@ func ZifCountChars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		switch mymode {
 		case 0:
 			zend.AddIndexLong(return_value, inx, chars[inx])
-			break
 		case 1:
 			if chars[inx] != 0 {
 				zend.AddIndexLong(return_value, inx, chars[inx])
 			}
-			break
 		case 2:
 			if chars[inx] == 0 {
 				zend.AddIndexLong(return_value, inx, chars[inx])
 			}
-			break
 		case 3:
 			if chars[inx] != 0 {
 				retstr[b.PostInc(&retlen)] = inx
 			}
-			break
 		case 4:
 			if chars[inx] == 0 {
 				retstr[b.PostInc(&retlen)] = inx
 			}
-			break
 		}
 	}
 	if mymode >= 3 && mymode <= 4 {
@@ -7902,15 +7863,12 @@ func ZifStrPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	case STR_PAD_RIGHT:
 		left_pad = 0
 		right_pad = num_pad_chars
-		break
 	case STR_PAD_LEFT:
 		left_pad = num_pad_chars
 		right_pad = 0
-		break
 	case STR_PAD_BOTH:
 		left_pad = num_pad_chars / 2
 		right_pad = num_pad_chars - left_pad
-		break
 	}
 
 	/* First we pad on the left. */
@@ -8314,13 +8272,12 @@ func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	}
 	switch type_ {
 	case 1:
-
+		fallthrough
 	case 2:
 		zend.ArrayInit(return_value)
 		if str.GetLen() == 0 {
 			return
 		}
-		break
 	case 0:
 		if str.GetLen() == 0 {
 			return_value.SetLong(0)
@@ -8329,7 +8286,6 @@ func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 		/* nothing to be done */
 
-		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid format value "+zend.ZEND_LONG_FMT, type_)
 		return_value.SetFalse()
@@ -8361,13 +8317,10 @@ func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			switch type_ {
 			case 1:
 				zend.AddNextIndexStringl(return_value, s, p-s)
-				break
 			case 2:
 				zend.AddIndexStringl(return_value, s-str.GetVal(), s, p-s)
-				break
 			default:
 				word_count++
-				break
 			}
 		}
 		p++

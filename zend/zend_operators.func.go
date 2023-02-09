@@ -216,45 +216,37 @@ again:
 	switch op.GetType() {
 	case IS_TRUE:
 		result = 1
-		break
 	case IS_LONG:
 		if op.GetLval() != 0 {
 			result = 1
 		}
-		break
 	case IS_DOUBLE:
 		if op.GetDval() {
 			result = 1
 		}
-		break
 	case IS_STRING:
 		if Z_STRLEN_P(op) > 1 || Z_STRLEN_P(op) != 0 && Z_STRVAL_P(op)[0] != '0' {
 			result = 1
 		}
-		break
 	case IS_ARRAY:
 		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			result = 1
 		}
-		break
 	case IS_OBJECT:
 		if Z_OBJ_HT_P(op).GetCastObject() == ZendStdCastObjectTostring {
 			result = 1
 		} else {
 			result = ZendObjectIsTrue(op)
 		}
-		break
 	case IS_RESOURCE:
 		if Z_RES_HANDLE_P(op) != 0 {
 			result = 1
 		}
-		break
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto again
-		break
 	default:
-		break
+
 	}
 	return result
 }
@@ -264,28 +256,20 @@ func ConvertToExplicitType(pzv *Zval, type_ __auto__) {
 		switch type_ {
 		case IS_NULL:
 			ConvertToNull(pzv)
-			break
 		case IS_LONG:
 			ConvertToLong(pzv)
-			break
 		case IS_DOUBLE:
 			ConvertToDouble(pzv)
-			break
 		case _IS_BOOL:
 			ConvertToBoolean(pzv)
-			break
 		case IS_ARRAY:
 			ConvertToArray(pzv)
-			break
 		case IS_OBJECT:
 			ConvertToObject(pzv)
-			break
 		case IS_STRING:
 			ConvertToString(pzv)
-			break
 		default:
 			r.Assert(false)
-			break
 		}
 		break
 	}
@@ -502,18 +486,19 @@ func ZendAtoi(str *byte, str_len int) int {
 	if str_len > 0 {
 		switch str[str_len-1] {
 		case 'g':
-
+			fallthrough
 		case 'G':
 			retval *= 1024
+			fallthrough
 		case 'm':
-
+			fallthrough
 		case 'M':
 			retval *= 1024
+			fallthrough
 		case 'k':
-
+			fallthrough
 		case 'K':
 			retval *= 1024
-			break
 		}
 	}
 	return retval
@@ -527,18 +512,19 @@ func ZendAtol(str *byte, str_len int) ZendLong {
 	if str_len > 0 {
 		switch str[str_len-1] {
 		case 'g':
-
+			fallthrough
 		case 'G':
 			retval *= 1024
+			fallthrough
 		case 'm':
-
+			fallthrough
 		case 'M':
 			retval *= 1024
+			fallthrough
 		case 'k':
-
+			fallthrough
 		case 'K':
 			retval *= 1024
-			break
 		}
 	}
 	return retval
@@ -563,6 +549,7 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	case IS_STRING:
 		var str *ZendString
 		str = op.GetStr()
@@ -573,20 +560,16 @@ try_again:
 			}
 		}
 		ZendStringReleaseEx(str, 0)
-		break
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		op.SetLong(0)
-		break
 	case IS_TRUE:
 		op.SetLong(1)
-		break
 	case IS_RESOURCE:
 		var l ZendLong = Z_RES_HANDLE_P(op)
 		ZvalPtrDtor(op)
 		op.SetLong(l)
-		break
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, _IS_NUMBER, ConvertScalarToNumber)
@@ -599,14 +582,13 @@ try_again:
 		} else {
 			op.SetLong(1)
 		}
-		break
 	}
 }
 func ConvertScalarToNumber(op *Zval) { _convertScalarToNumber(op, 1, 0) }
 func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zval {
 	switch op.GetType() {
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		holder.SetLong(0)
 		return holder
@@ -631,9 +613,9 @@ func _zendiConvertScalarToNumberEx(op *Zval, holder *Zval, silent ZendBool) *Zva
 		}
 		return holder
 	case IS_LONG:
-
+		fallthrough
 	case IS_DOUBLE:
-
+		fallthrough
 	default:
 		return op
 	}
@@ -670,32 +652,27 @@ func ConvertToLongBase(op *Zval, base int) {
 try_again:
 	switch op.GetType() {
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		op.SetLong(0)
-		break
 	case IS_TRUE:
 		op.SetLong(1)
-		break
 	case IS_RESOURCE:
 		tmp = Z_RES_HANDLE_P(op)
 		ZvalPtrDtor(op)
 		op.SetLong(tmp)
-		break
 	case IS_LONG:
-		break
+
 	case IS_DOUBLE:
 		op.SetLong(ZendDvalToLval(op.GetDval()))
-		break
 	case IS_STRING:
-		var str *ZendString = op.GetStr()
+		var str *ZendString = Z_STR_P(op)
 		if base == 10 {
 			op.SetLong(ZvalGetLong(op))
 		} else {
 			op.SetLong(ZEND_STRTOL(str.GetVal(), nil, base))
 		}
 		ZendStringReleaseEx(str, 0)
-		break
 	case IS_ARRAY:
 		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
@@ -704,7 +681,6 @@ try_again:
 		}
 		ZvalPtrDtor(op)
 		op.SetLong(tmp)
-		break
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
@@ -718,8 +694,9 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 }
 func ConvertToDouble(op *Zval) {
@@ -727,28 +704,23 @@ func ConvertToDouble(op *Zval) {
 try_again:
 	switch op.GetType() {
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		op.SetDouble(0.0)
-		break
 	case IS_TRUE:
 		op.SetDouble(1.0)
-		break
 	case IS_RESOURCE:
 		var d float64 = float64(Z_RES_HANDLE_P(op))
 		ZvalPtrDtor(op)
 		op.SetDouble(d)
-		break
 	case IS_LONG:
 		op.SetDouble(float64(op.GetLval()))
-		break
 	case IS_DOUBLE:
-		break
+
 	case IS_STRING:
-		var str *ZendString = op.GetStr()
+		var str *ZendString = Z_STR_P(op)
 		op.SetDouble(ZendStrtod(str.GetVal(), nil))
 		ZendStringReleaseEx(str, 0)
-		break
 	case IS_ARRAY:
 		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
@@ -757,7 +729,6 @@ try_again:
 		}
 		ZvalPtrDtor(op)
 		op.SetDouble(tmp)
-		break
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
@@ -767,12 +738,12 @@ try_again:
 		} else {
 			op.SetDouble(1.0)
 		}
-		break
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 }
 func ConvertToNull(op *Zval) {
@@ -784,32 +755,27 @@ func ConvertToBoolean(op *Zval) {
 try_again:
 	switch op.GetType() {
 	case IS_FALSE:
-
+		fallthrough
 	case IS_TRUE:
-		break
+
 	case IS_NULL:
 		op.SetFalse()
-		break
 	case IS_RESOURCE:
 		var l ZendLong = b.Cond(Z_RES_HANDLE_P(op) != 0, 1, 0)
 		ZvalPtrDtor(op)
 		ZVAL_BOOL(op, l != 0)
-		break
 	case IS_LONG:
 		ZVAL_BOOL(op, b.Cond(op.GetLval() != 0, 1, 0))
-		break
 	case IS_DOUBLE:
 		ZVAL_BOOL(op, b.Cond(op.GetDval(), 1, 0))
-		break
 	case IS_STRING:
-		var str *ZendString = op.GetStr()
+		var str *ZendString = Z_STR_P(op)
 		if str.GetLen() == 0 || str.GetLen() == 1 && str.GetVal()[0] == '0' {
 			op.SetFalse()
 		} else {
 			op.SetTrue()
 		}
 		ZendStringReleaseEx(str, 0)
-		break
 	case IS_ARRAY:
 		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			tmp = 1
@@ -818,7 +784,6 @@ try_again:
 		}
 		ZvalPtrDtor(op)
 		ZVAL_BOOL(op, tmp != 0)
-		break
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, _IS_BOOL, ConvertToBoolean)
@@ -828,12 +793,12 @@ try_again:
 		} else {
 			op.SetTrue()
 		}
-		break
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 }
 func _convertToCstring(op *Zval) {
@@ -850,39 +815,33 @@ func _convertToString(op *Zval) {
 try_again:
 	switch op.GetType() {
 	case IS_UNDEF:
-
+		fallthrough
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		ZVAL_EMPTY_STRING(op)
-		break
 	case IS_TRUE:
 		op.SetInternedString(ZSTR_CHAR('1'))
-		break
 	case IS_STRING:
-		break
+
 	case IS_RESOURCE:
 		var str *ZendString = ZendStrpprintf(0, "Resource id #"+ZEND_LONG_FMT, ZendLong(Z_RES_HANDLE_P(op)))
 		ZvalPtrDtor(op)
 		op.SetString(str)
-		break
 	case IS_LONG:
 		op.SetString(ZendLongToStr(op.GetLval()))
-		break
 	case IS_DOUBLE:
 		var str *ZendString
-		var dval float64 = op.GetDval()
+		var dval float64 = Z_DVAL_P(op)
 		str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), dval)
 
 		/* %G already handles removing trailing zeros from the fractional part, yay */
 
 		op.SetString(str)
-		break
 	case IS_ARRAY:
 		ZendError(E_NOTICE, "Array to string conversion")
 		ZvalPtrDtor(op)
 		op.SetInternedString(ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED))
-		break
 	case IS_OBJECT:
 		var tmp Zval
 		if Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -907,12 +866,12 @@ try_again:
 		}
 		ZvalPtrDtor(op)
 		ZVAL_EMPTY_STRING(op)
-		break
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 }
 func _tryConvertToString(op *Zval) ZendBool {
@@ -935,7 +894,7 @@ func ConvertToArray(op *Zval) {
 try_again:
 	switch op.GetType() {
 	case IS_ARRAY:
-		break
+
 	case IS_OBJECT:
 		if Z_OBJCE_P(op) == ZendCeClosure {
 			ConvertScalarToArray(op)
@@ -957,26 +916,24 @@ try_again:
 
 			}
 		}
-		break
 	case IS_NULL:
 
 		/*ZVAL_EMPTY_ARRAY(op);*/
 
 		ArrayInit(op)
-		break
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
 		ConvertScalarToArray(op)
-		break
 	}
 }
 func ConvertToObject(op *Zval) {
 try_again:
 	switch op.GetType() {
 	case IS_ARRAY:
-		var ht *HashTable = ZendSymtableToProptable(op.GetArr())
+		var ht *HashTable = ZendSymtableToProptable(Z_ARR_P(op))
 		var obj *ZendObject
 		if (ht.GetGcFlags() & IS_ARRAY_IMMUTABLE) != 0 {
 
@@ -994,21 +951,19 @@ try_again:
 		obj = ZendObjectsNew(ZendStandardClassDef)
 		obj.SetProperties(ht)
 		op.SetObject(obj)
-		break
 	case IS_OBJECT:
-		break
+
 	case IS_NULL:
 		ObjectInit(op)
-		break
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
+		fallthrough
 	default:
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, op)
 		ObjectInit(op)
 		Z_OBJPROP_P(op).KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), &tmp)
-		break
 	}
 }
 func MultiConvertToLongEx(argc int, _ ...any) {
@@ -1049,9 +1004,9 @@ func _zvalGetLongFuncEx(op *Zval, silent ZendBool) ZendLong {
 try_again:
 	switch op.GetType() {
 	case IS_UNDEF:
-
+		fallthrough
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		return 0
 	case IS_TRUE:
@@ -1090,12 +1045,14 @@ try_again:
 			 */
 
 		}
+		fallthrough
 	case IS_ARRAY:
 		if Z_ARRVAL_P(op).GetNNumOfElements() {
 			return 1
 		} else {
 			return 0
 		}
+		fallthrough
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_LONG, ConvertToLong)
@@ -1104,11 +1061,13 @@ try_again:
 		} else {
 			return 1
 		}
+		fallthrough
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 	return 0
 }
@@ -1118,7 +1077,7 @@ func ZvalGetDoubleFunc(op *Zval) float64 {
 try_again:
 	switch op.GetType() {
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		return 0.0
 	case IS_TRUE:
@@ -1137,6 +1096,7 @@ try_again:
 		} else {
 			return 0.0
 		}
+		fallthrough
 	case IS_OBJECT:
 		var dst Zval
 		ConvertObjectToType(op, &dst, IS_DOUBLE, ConvertToDouble)
@@ -1145,11 +1105,13 @@ try_again:
 		} else {
 			return 1.0
 		}
+		fallthrough
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
+		fallthrough
 	default:
-		break
+
 	}
 	return 0.0
 }
@@ -1157,9 +1119,9 @@ func __zvalGetStringFunc(op *Zval, try ZendBool) *ZendString {
 try_again:
 	switch op.GetType() {
 	case IS_UNDEF:
-
+		fallthrough
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
 		return ZSTR_EMPTY_ALLOC()
 	case IS_TRUE:
@@ -1177,6 +1139,7 @@ try_again:
 		} else {
 			return ZSTR_KNOWN(ZEND_STR_ARRAY_CAPITALIZED)
 		}
+		fallthrough
 	case IS_OBJECT:
 		var tmp Zval
 		if Z_OBJ_HT_P(op).GetCastObject() != nil {
@@ -1200,13 +1163,15 @@ try_again:
 		} else {
 			return ZSTR_EMPTY_ALLOC()
 		}
+		fallthrough
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
+		fallthrough
 	case IS_STRING:
 		return op.GetStr().Copy()
 	default:
-		break
+
 	}
 	return nil
 }
@@ -1871,6 +1836,7 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
+		fallthrough
 	default:
 		if op1.IsObject() && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_NOT, result, op1, nil) {
 			return SUCCESS
@@ -2564,13 +2530,13 @@ func CompareFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 			result.SetLong(ZendCompareArrays(op1, op2))
 			return SUCCESS
 		case TYPE_PAIR(IS_NULL, IS_NULL):
-
+			fallthrough
 		case TYPE_PAIR(IS_NULL, IS_FALSE):
-
+			fallthrough
 		case TYPE_PAIR(IS_FALSE, IS_NULL):
-
+			fallthrough
 		case TYPE_PAIR(IS_FALSE, IS_FALSE):
-
+			fallthrough
 		case TYPE_PAIR(IS_TRUE, IS_TRUE):
 			result.SetLong(0)
 			return SUCCESS
@@ -2732,9 +2698,9 @@ func ZendIsIdentical(op1 *Zval, op2 *Zval) ZendBool {
 	}
 	switch op1.GetType() {
 	case IS_NULL:
-
+		fallthrough
 	case IS_FALSE:
-
+		fallthrough
 	case IS_TRUE:
 		return 1
 	case IS_LONG:
@@ -2898,13 +2864,10 @@ func IncrementString(str *Zval) {
 		switch last {
 		case NUMERIC:
 			t.GetVal()[0] = '1'
-			break
 		case UPPER_CASE:
 			t.GetVal()[0] = 'A'
-			break
 		case LOWER_CASE:
 			t.GetVal()[0] = 'a'
-			break
 		}
 		ZendStringFree(str.GetStr())
 		str.SetString(t)
@@ -2915,13 +2878,10 @@ try_again:
 	switch op1.GetType() {
 	case IS_LONG:
 		FastLongIncrementFunction(op1)
-		break
 	case IS_DOUBLE:
 		op1.SetDval(op1.GetDval() + 1)
-		break
 	case IS_NULL:
 		op1.SetLong(1)
-		break
 	case IS_STRING:
 		var lval ZendLong
 		var dval float64
@@ -2937,19 +2897,15 @@ try_again:
 			} else {
 				op1.SetLong(lval + 1)
 			}
-			break
 		case IS_DOUBLE:
 			ZvalPtrDtorStr(op1)
 			op1.SetDouble(dval + 1)
-			break
 		default:
 
 			/* Perl style string increment */
 
 			IncrementString(op1)
-			break
 		}
-		break
 	case IS_OBJECT:
 		if Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 
@@ -2973,6 +2929,7 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
+		fallthrough
 	default:
 		return FAILURE
 	}
@@ -2985,10 +2942,8 @@ try_again:
 	switch op1.GetType() {
 	case IS_LONG:
 		FastLongDecrementFunction(op1)
-		break
 	case IS_DOUBLE:
 		op1.SetDval(op1.GetDval() - 1)
-		break
 	case IS_STRING:
 		if Z_STRLEN_P(op1) == 0 {
 			ZvalPtrDtorStr(op1)
@@ -3004,13 +2959,10 @@ try_again:
 			} else {
 				op1.SetLong(lval - 1)
 			}
-			break
 		case IS_DOUBLE:
 			ZvalPtrDtorStr(op1)
 			op1.SetDouble(dval - 1)
-			break
 		}
-		break
 	case IS_OBJECT:
 		if Z_OBJ_HT(*op1).GetGet() != nil && Z_OBJ_HT(*op1).GetSet() != nil {
 
@@ -3034,6 +2986,7 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
+		fallthrough
 	default:
 		return FAILURE
 	}

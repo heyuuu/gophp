@@ -406,10 +406,8 @@ func ZendUserSerialize(object *Zval, buffer **uint8, buf_len *int, data *ZendSer
 			*buffer = (*uint8)(Estrndup(Z_STRVAL(retval), Z_STRLEN(retval)))
 			*buf_len = Z_STRLEN(retval)
 			result = SUCCESS
-			break
 		default:
 			result = FAILURE
-			break
 		}
 		ZvalPtrDtor(&retval)
 	}

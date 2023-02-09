@@ -63,24 +63,18 @@ again:
 	switch struc.GetType() {
 	case zend.IS_FALSE:
 		core.PhpPrintf("%sbool(false)\n", COMMON)
-		break
 	case zend.IS_TRUE:
 		core.PhpPrintf("%sbool(true)\n", COMMON)
-		break
 	case zend.IS_NULL:
 		core.PhpPrintf("%sNULL\n", COMMON)
-		break
 	case zend.IS_LONG:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", COMMON, struc.GetLval())
-		break
 	case zend.IS_DOUBLE:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
-		break
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
 		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
 		core.PUTS("\"\n")
-		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
@@ -119,7 +113,6 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-		break
 	case zend.IS_OBJECT:
 		if struc.IsRecursive() {
 			core.PUTS("*RECURSION*\n")
@@ -159,11 +152,9 @@ again:
 		}
 		core.PUTS("}\n")
 		struc.UnprotectRecursive()
-		break
 	case zend.IS_RESOURCE:
-		var type_name *byte = zend.ZendRsrcListGetRsrcType(struc.GetRes())
+		var type_name *byte = zend.ZendRsrcListGetRsrcType(zend.Z_RES_P(struc))
 		core.PhpPrintf("%sresource(%d) of type (%s)\n", COMMON, zend.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"))
-		break
 	case zend.IS_REFERENCE:
 
 		//??? hide references with refcount==1 (for compatibility)
@@ -173,10 +164,8 @@ again:
 		}
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
-		break
 	default:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
-		break
 	}
 }
 func ZifVarDump(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -311,24 +300,18 @@ again:
 	switch struc.GetType() {
 	case zend.IS_FALSE:
 		core.PhpPrintf("%sbool(false)\n", COMMON)
-		break
 	case zend.IS_TRUE:
 		core.PhpPrintf("%sbool(true)\n", COMMON)
-		break
 	case zend.IS_NULL:
 		core.PhpPrintf("%sNULL\n", COMMON)
-		break
 	case zend.IS_LONG:
 		core.PhpPrintf("%sint("+zend.ZEND_LONG_FMT+")\n", COMMON, struc.GetLval())
-		break
 	case zend.IS_DOUBLE:
 		core.PhpPrintf("%sfloat(%.*G)\n", COMMON, int(zend.EG__().GetPrecision()), struc.GetDval())
-		break
 	case zend.IS_STRING:
 		core.PhpPrintf("%sstring(%zd) \"", COMMON, zend.Z_STRLEN_P(struc))
 		core.PHPWRITE(zend.Z_STRVAL_P(struc), zend.Z_STRLEN_P(struc))
 		core.PhpPrintf("\" refcount(%u)\n", b.CondF1(struc.IsRefcounted(), func() uint32 { return struc.GetRefcount() }, 1))
-		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
@@ -367,7 +350,6 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-		break
 	case zend.IS_OBJECT:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_DEBUG)
 		if myht != nil {
@@ -407,11 +389,9 @@ again:
 			core.PhpPrintf("%*c", level-1, ' ')
 		}
 		core.PUTS("}\n")
-		break
 	case zend.IS_RESOURCE:
-		var type_name *byte = zend.ZendRsrcListGetRsrcType(struc.GetRes())
+		var type_name *byte = zend.ZendRsrcListGetRsrcType(zend.Z_RES_P(struc))
 		core.PhpPrintf("%sresource(%d) of type (%s) refcount(%u)\n", COMMON, zend.Z_RES_P(struc).GetHandle(), b.Cond(type_name != nil, type_name, "Unknown"), struc.GetRefcount())
-		break
 	case zend.IS_REFERENCE:
 
 		//??? hide references with refcount==1 (for compatibility)
@@ -421,9 +401,9 @@ again:
 		}
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
+		fallthrough
 	default:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
-		break
 	}
 }
 func ZifDebugZvalDump(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -565,13 +545,10 @@ again:
 	switch struc.GetType() {
 	case zend.IS_FALSE:
 		buf.AppendString("false")
-		break
 	case zend.IS_TRUE:
 		buf.AppendString("true")
-		break
 	case zend.IS_NULL:
 		buf.AppendString("NULL")
-		break
 	case zend.IS_LONG:
 
 		/* INT_MIN as a literal will be parsed as a float. Emit something like
@@ -583,7 +560,6 @@ again:
 			break
 		}
 		buf.AppendLong(struc.GetLval())
-		break
 	case zend.IS_DOUBLE:
 		core.PhpGcvt(struc.GetDval(), int(core.PG(serialize_precision)), '.', 'E', tmp_str)
 		buf.AppendString(b.CastStrAuto(tmp_str))
@@ -598,7 +574,6 @@ again:
 		if core.ZendFinite(struc.GetDval()) && nil == strchr(tmp_str, '.') {
 			buf.AppendString(".0")
 		}
-		break
 	case zend.IS_STRING:
 		ztmp = PhpAddcslashes(struc.GetStr(), "'\\", 2)
 		ztmp2 = PhpStrToStr(ztmp.GetVal(), ztmp.GetLen(), "0", 1, "' . \"\\0\" . '", 12)
@@ -607,7 +582,6 @@ again:
 		buf.AppendByte('\'')
 		zend.ZendStringFree(ztmp)
 		zend.ZendStringFree(ztmp2)
-		break
 	case zend.IS_ARRAY:
 		myht = struc.GetArr()
 		if (myht.GetGcFlags() & zend.GC_IMMUTABLE) == 0 {
@@ -646,7 +620,6 @@ again:
 			BufferAppendSpaces(buf, level-1)
 		}
 		buf.AppendByte(')')
-		break
 	case zend.IS_OBJECT:
 		myht = zend.ZendGetPropertiesFor(struc, zend.ZEND_PROP_PURPOSE_VAR_EXPORT)
 		if myht != nil {
@@ -698,14 +671,11 @@ again:
 		} else {
 			buf.AppendString("))")
 		}
-		break
 	case zend.IS_REFERENCE:
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
-		break
 	default:
 		buf.AppendString("NULL")
-		break
 	}
 }
 func PhpVarExport(struc *zend.Zval, level int) {
@@ -1241,6 +1211,7 @@ again:
 	case zend.IS_REFERENCE:
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
+		fallthrough
 	default:
 		buf.AppendString("i:0;")
 		return

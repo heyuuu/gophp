@@ -343,7 +343,6 @@ func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFunc
 		} else {
 			return PhpArrayKeyCompareNumeric
 		}
-		break
 	case PHP_SORT_STRING:
 		if (sort_type & PHP_SORT_FLAG_CASE) != 0 {
 			if reverse != 0 {
@@ -358,7 +357,6 @@ func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFunc
 				return PhpArrayKeyCompareString
 			}
 		}
-		break
 	case PHP_SORT_NATURAL:
 		if (sort_type & PHP_SORT_FLAG_CASE) != 0 {
 			if reverse != 0 {
@@ -373,23 +371,20 @@ func PhpGetKeyCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFunc
 				return PhpArrayKeyCompareStringNatural
 			}
 		}
-		break
 	case PHP_SORT_LOCALE_STRING:
 		if reverse != 0 {
 			return PhpArrayReverseKeyCompareStringLocale
 		} else {
 			return PhpArrayKeyCompareStringLocale
 		}
-		break
 	case PHP_SORT_REGULAR:
-
+		fallthrough
 	default:
 		if reverse != 0 {
 			return PhpArrayReverseKeyCompare
 		} else {
 			return PhpArrayKeyCompare
 		}
-		break
 	}
 	return nil
 }
@@ -401,7 +396,6 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFun
 		} else {
 			return PhpArrayDataCompareNumeric
 		}
-		break
 	case PHP_SORT_STRING:
 		if (sort_type & PHP_SORT_FLAG_CASE) != 0 {
 			if reverse != 0 {
@@ -416,7 +410,6 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFun
 				return PhpArrayDataCompareString
 			}
 		}
-		break
 	case PHP_SORT_NATURAL:
 		if (sort_type & PHP_SORT_FLAG_CASE) != 0 {
 			if reverse != 0 {
@@ -431,23 +424,20 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFun
 				return PhpArrayNaturalCompare
 			}
 		}
-		break
 	case PHP_SORT_LOCALE_STRING:
 		if reverse != 0 {
 			return PhpArrayReverseDataCompareStringLocale
 		} else {
 			return PhpArrayDataCompareStringLocale
 		}
-		break
 	case PHP_SORT_REGULAR:
-
+		fallthrough
 	default:
 		if reverse != 0 {
 			return PhpArrayReverseDataCompare
 		} else {
 			return PhpArrayDataCompare
 		}
-		break
 	}
 	return nil
 }
@@ -730,7 +720,6 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(0)
 		return
-		break
 	case zend.IS_ARRAY:
 		if mode != COUNT_RECURSIVE {
 			cnt = array.GetArr().Count()
@@ -739,7 +728,6 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		return_value.SetLong(cnt)
 		return
-		break
 	case zend.IS_OBJECT:
 		var retval zend.Zval
 
@@ -771,12 +759,10 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(1)
 		return
-		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Parameter must be an array or an object that implements Countable")
 		return_value.SetLong(1)
 		return
-		break
 	}
 }
 func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fold_case int) {
@@ -3650,25 +3636,18 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		switch extract_type {
 		case EXTR_IF_EXISTS:
 			count = PhpExtractRefIfExists(var_array_param.GetArr(), symbol_table)
-			break
 		case EXTR_OVERWRITE:
 			count = PhpExtractRefOverwrite(var_array_param.GetArr(), symbol_table)
-			break
 		case EXTR_PREFIX_IF_EXISTS:
 			count = PhpExtractRefPrefixIfExists(var_array_param.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_SAME:
 			count = PhpExtractRefPrefixSame(var_array_param.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_ALL:
 			count = PhpExtractRefPrefixAll(var_array_param.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_INVALID:
 			count = PhpExtractRefPrefixInvalid(var_array_param.GetArr(), symbol_table, prefix)
-			break
 		default:
 			count = PhpExtractRefSkip(var_array_param.GetArr(), symbol_table)
-			break
 		}
 	} else {
 
@@ -3679,25 +3658,18 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		switch extract_type {
 		case EXTR_IF_EXISTS:
 			count = PhpExtractIfExists(array_copy.GetArr(), symbol_table)
-			break
 		case EXTR_OVERWRITE:
 			count = PhpExtractOverwrite(array_copy.GetArr(), symbol_table)
-			break
 		case EXTR_PREFIX_IF_EXISTS:
 			count = PhpExtractPrefixIfExists(array_copy.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_SAME:
 			count = PhpExtractPrefixSame(array_copy.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_ALL:
 			count = PhpExtractPrefixAll(array_copy.GetArr(), symbol_table, prefix)
-			break
 		case EXTR_PREFIX_INVALID:
 			count = PhpExtractPrefixInvalid(array_copy.GetArr(), symbol_table, prefix)
-			break
 		default:
 			count = PhpExtractSkip(array_copy.GetArr(), symbol_table)
-			break
 		}
 		zend.ZvalPtrDtor(&array_copy)
 	}
@@ -6610,12 +6582,14 @@ func ArrayColumnParamHelper(param *zend.Zval, name string) zend.ZendBool {
 		if param.GetType() != zend.IS_LONG {
 			zend.ConvertToLong(param)
 		}
+		fallthrough
 	case zend.IS_LONG:
 		return 1
 	case zend.IS_OBJECT:
 		if zend.TryConvertToString(param) == 0 {
 			return 0
 		}
+		fallthrough
 	case zend.IS_STRING:
 		return 1
 	default:
@@ -6795,34 +6769,25 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 					switch keyval.GetType() {
 					case zend.IS_STRING:
 						return_value.GetArr().SymtableUpdate(keyval.GetStr().GetStr(), colval)
-						break
 					case zend.IS_LONG:
 						return_value.GetArr().IndexUpdateH(keyval.GetLval(), colval)
-						break
 					case zend.IS_OBJECT:
 						var tmp_key *zend.ZendString
 						var key *zend.ZendString = zend.ZvalGetTmpString(keyval, &tmp_key)
 						return_value.GetArr().SymtableUpdate(key.GetStr(), colval)
 						zend.ZendTmpStringRelease(tmp_key)
-						break
 					case zend.IS_NULL:
 						return_value.GetArr().KeyUpdate(zend.ZSTR_EMPTY_ALLOC().GetStr(), colval)
-						break
 					case zend.IS_DOUBLE:
 						return_value.GetArr().IndexUpdateH(zend.ZendDvalToLval(keyval.GetDval()), colval)
-						break
 					case zend.IS_TRUE:
 						return_value.GetArr().IndexUpdateH(1, colval)
-						break
 					case zend.IS_FALSE:
 						return_value.GetArr().IndexUpdateH(0, colval)
-						break
 					case zend.IS_RESOURCE:
 						return_value.GetArr().IndexUpdateH(zend.Z_RES_HANDLE_P(keyval), colval)
-						break
 					default:
 						return_value.GetArr().NextIndexInsert(colval)
-						break
 					}
 					zend.ZvalPtrDtor(keyval)
 				} else {
@@ -8773,7 +8738,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		} else if arg.IsType(zend.IS_LONG) {
 			switch arg.GetLval() & ^PHP_SORT_FLAG_CASE {
 			case PHP_SORT_ASC:
-
+				fallthrough
 			case PHP_SORT_DESC:
 
 				/* flag allowed here */
@@ -8795,15 +8760,14 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					return_value.SetFalse()
 					return
 				}
-				break
 			case PHP_SORT_REGULAR:
-
+				fallthrough
 			case PHP_SORT_NUMERIC:
-
+				fallthrough
 			case PHP_SORT_STRING:
-
+				fallthrough
 			case PHP_SORT_NATURAL:
-
+				fallthrough
 			case PHP_SORT_LOCALE_STRING:
 
 				/* flag allowed here */
@@ -8821,14 +8785,12 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 					return_value.SetFalse()
 					return
 				}
-				break
 			default:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is an unknown sort flag", i+1)
 				zend.Efree(func_)
 				zend.Efree(arrays)
 				return_value.SetFalse()
 				return
-				break
 			}
 		} else {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Argument #%d is expected to be an array or a sort flag", i+1)
@@ -9956,13 +9918,10 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	switch key.GetType() {
 	case zend.IS_STRING:
 		zend.ZVAL_BOOL(return_value, ht.SymtableExistsInd(key.GetStr().GetStr()))
-		break
 	case zend.IS_LONG:
 		zend.ZVAL_BOOL(return_value, zend.ZendHashIndexExists(ht, key.GetLval()) != 0)
-		break
 	case zend.IS_NULL:
 		zend.ZVAL_BOOL(return_value, ht.KeyExistsInd(zend.ZSTR_EMPTY_ALLOC().GetStr()))
-		break
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "The first argument should be either a string or an integer")
 		return_value.SetFalse()

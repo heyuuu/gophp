@@ -58,7 +58,6 @@ func SplFilesystemObjectDestroyObject(object *zend.ZendObject) {
 			core.PhpStreamClose(intern.GetDirp())
 			intern.SetDirp(nil)
 		}
-		break
 	case SPL_FS_FILE:
 		if intern.GetStream() != nil {
 
@@ -76,9 +75,8 @@ func SplFilesystemObjectDestroyObject(object *zend.ZendObject) {
 			intern.SetStream(nil)
 			intern.GetZresource().SetUndef()
 		}
-		break
 	default:
-		break
+
 	}
 }
 func SplFilesystemObjectFreeStorage(object *zend.ZendObject) {
@@ -95,12 +93,11 @@ func SplFilesystemObjectFreeStorage(object *zend.ZendObject) {
 	}
 	switch intern.GetType() {
 	case SPL_FS_INFO:
-		break
+
 	case SPL_FS_DIR:
 		if intern.GetSubPath() != nil {
 			zend.Efree(intern.GetSubPath())
 		}
-		break
 	case SPL_FS_FILE:
 		if intern.GetOpenMode() != nil {
 			zend.Efree(intern.GetOpenMode())
@@ -109,7 +106,6 @@ func SplFilesystemObjectFreeStorage(object *zend.ZendObject) {
 			zend.Efree(intern.GetOrigPath())
 		}
 		SplFilesystemFileFreeLine(intern)
-		break
 	}
 }
 func SplFilesystemObjectNewEx(class_type *zend.ZendClassEntry) *zend.ZendObject {
@@ -148,12 +144,11 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 	var slash byte = b.Cond(SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_DIR_UNIXPATHS) != 0, '/', zend.DEFAULT_SLASH)
 	switch intern.GetType() {
 	case SPL_FS_INFO:
-
+		fallthrough
 	case SPL_FS_FILE:
 		if intern.GetFileName() == nil {
 			core.PhpErrorDocref(nil, zend.E_ERROR, "Object not initialized")
 		}
-		break
 	case SPL_FS_DIR:
 		var path_len int = 0
 		var path *byte = SplFilesystemObjectGetPath(intern, &path_len)
@@ -171,7 +166,6 @@ func SplFilesystemObjectGetFileName(intern *SplFilesystemObject) {
 
 		/* if there is parent path, ammend it, otherwise just use the given path as is */
 
-		break
 	}
 }
 func SplFilesystemDirRead(intern *SplFilesystemObject) int {
@@ -284,7 +278,6 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 		intern.SetPath(zend.Estrndup(source.GetPath(), source.GetPathLen()))
 		intern.SetFileNameLen(source.GetFileNameLen())
 		intern.SetFileName(zend.Estrndup(source.GetFileName(), intern.GetFileNameLen()))
-		break
 	case SPL_FS_DIR:
 		SplFilesystemDirOpen(intern, source.GetPath())
 
@@ -300,7 +293,6 @@ func SplFilesystemObjectClone(zobject *zend.Zval) *zend.ZendObject {
 			}
 		}
 		intern.SetIndex(index)
-		break
 	case SPL_FS_FILE:
 		zend.ZEND_ASSERT(false)
 	}
@@ -389,9 +381,9 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 	zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_RuntimeException, &error_handling)
 	switch source.GetType() {
 	case SPL_FS_INFO:
-
+		fallthrough
 	case SPL_FS_FILE:
-		break
+
 	case SPL_FS_DIR:
 		if !(source.GetEntry().GetDName()[0]) {
 			zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Could not open file")
@@ -422,7 +414,6 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 			intern.SetPath(SplFilesystemObjectGetPath(source, intern.GetPathLen()))
 			intern.SetPath(zend.Estrndup(intern.GetPath(), intern.GetPathLen()))
 		}
-		break
 	case SPL_FS_FILE:
 		if ce != nil {
 			ce = ce
@@ -463,7 +454,6 @@ func SplFilesystemObjectCreateType(ht int, source *SplFilesystemObject, type_ in
 				return nil
 			}
 		}
-		break
 	case SPL_FS_DIR:
 		zend.ZendRestoreErrorHandling(&error_handling)
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Operation not supported")
@@ -478,7 +468,7 @@ func SplFilesystemIsInvalidOrDot(d_name *byte) int {
 func SplFilesystemObjectGetPathname(intern *SplFilesystemObject, len_ *int) *byte {
 	switch intern.GetType() {
 	case SPL_FS_INFO:
-
+		fallthrough
 	case SPL_FS_FILE:
 		*len_ = intern.GetFileNameLen()
 		return intern.GetFileName()
@@ -1471,7 +1461,7 @@ func SplFilesystemObjectCast(readobj *zend.Zval, writeobj *zend.Zval, type_ int)
 		}
 		switch intern.GetType() {
 		case SPL_FS_INFO:
-
+			fallthrough
 		case SPL_FS_FILE:
 			zend.ZVAL_STRINGL(writeobj, intern.GetFileName(), intern.GetFileNameLen())
 			return zend.SUCCESS
@@ -1921,6 +1911,7 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 			} else {
 				escape = uint8(esc[0])
 			}
+			fallthrough
 		case 2:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
@@ -1928,6 +1919,7 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 				return
 			}
 			enclosure = enclo[0]
+			fallthrough
 		case 1:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
@@ -1935,8 +1927,9 @@ func zim_spl_SplFileObject_fgetcsv(execute_data *zend.ZendExecuteData, return_va
 				return
 			}
 			delimiter = delim[0]
+			fallthrough
 		case 0:
-			break
+
 		}
 		SplFilesystemFileReadCsv(intern, delimiter, enclosure, escape, return_value)
 	}
@@ -1960,15 +1953,14 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 			switch esc_len {
 			case 0:
 				escape = standard.PHP_CSV_NO_ESCAPE
-				break
 			case 1:
 				escape = uint8(esc[0])
-				break
 			default:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "escape must be empty or a single character")
 				return_value.SetFalse()
 				return
 			}
+			fallthrough
 		case 3:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
@@ -1976,6 +1968,7 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 				return
 			}
 			enclosure = enclo[0]
+			fallthrough
 		case 2:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
@@ -1983,10 +1976,11 @@ func zim_spl_SplFileObject_fputcsv(execute_data *zend.ZendExecuteData, return_va
 				return
 			}
 			delimiter = delim[0]
+			fallthrough
 		case 1:
-
+			fallthrough
 		case 0:
-			break
+
 		}
 		ret = standard.PhpFputcsv(intern.GetStream(), fields, delimiter, enclosure, escape)
 		if ret < 0 {
@@ -2014,15 +2008,14 @@ func zim_spl_SplFileObject_setCsvControl(execute_data *zend.ZendExecuteData, ret
 			switch esc_len {
 			case 0:
 				escape = standard.PHP_CSV_NO_ESCAPE
-				break
 			case 1:
 				escape = uint8(esc[0])
-				break
 			default:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "escape must be empty or a single character")
 				return_value.SetFalse()
 				return
 			}
+			fallthrough
 		case 2:
 			if e_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "enclosure must be a character")
@@ -2030,6 +2023,7 @@ func zim_spl_SplFileObject_setCsvControl(execute_data *zend.ZendExecuteData, ret
 				return
 			}
 			enclosure = enclo[0]
+			fallthrough
 		case 1:
 			if d_len != 1 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "delimiter must be a character")
@@ -2037,8 +2031,9 @@ func zim_spl_SplFileObject_setCsvControl(execute_data *zend.ZendExecuteData, ret
 				return
 			}
 			delimiter = delim[0]
+			fallthrough
 		case 0:
-			break
+
 		}
 		intern.SetDelimiter(delimiter)
 		intern.SetEnclosure(enclosure)

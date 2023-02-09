@@ -99,11 +99,13 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 					zend.ZendClearException()
 				}
 			}
+			fallthrough
 		case RS_START:
 			if iterator.GetFuncs().GetValid()(iterator) == zend.FAILURE {
 				break
 			}
 			object.GetIterators()[object.GetLevel()].SetState(RS_TEST)
+			fallthrough
 		case RS_TEST:
 			ce = object.GetIterators()[object.GetLevel()].GetCe()
 			zobject = object.GetIterators()[object.GetLevel()].GetZobject()
@@ -127,10 +129,11 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 					if object.GetMaxDepth() == -1 || object.GetMaxDepth() > object.GetLevel() {
 						switch object.GetMode() {
 						case RIT_LEAVES_ONLY:
-
+							fallthrough
 						case RIT_CHILD_FIRST:
 							object.GetIterators()[object.GetLevel()].SetState(RS_CHILD)
 							goto next_step
+							fallthrough
 						case RIT_SELF_FIRST:
 							object.GetIterators()[object.GetLevel()].SetState(RS_SELF)
 							goto next_step
@@ -336,9 +339,8 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 		} else {
 			iterator = nil
 		}
-		break
 	case RIT_RecursiveIteratorIterator:
-
+		fallthrough
 	default:
 		mode = RIT_LEAVES_ONLY
 		flags = 0
@@ -352,7 +354,6 @@ func SplRecursiveItItConstruct(execute_data *zend.ZendExecuteData, return_value 
 		} else {
 			iterator = nil
 		}
-		break
 	}
 	if iterator == nil || zend.InstanceofFunction(zend.Z_OBJCE_P(iterator), spl_ce_RecursiveIterator) == 0 {
 		if iterator != nil {
@@ -976,9 +977,8 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			zend.ZendThrowException(spl_ce_OutOfRangeException, "Parameter count must either be -1 or a value greater than or equal 0", 0)
 			return nil
 		}
-		break
 	case DIT_CachingIterator:
-
+		fallthrough
 	case DIT_RecursiveCachingIterator:
 		var flags zend.ZendLong = CIT_CALL_TOSTRING
 		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O|l", &zobject, ce_inner, &flags) == zend.FAILURE {
@@ -990,7 +990,6 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		}
 		intern.AddUCachingFlags(flags & CIT_PUBLIC)
 		zend.ArrayInit(intern.GetZcache())
-		break
 	case DIT_IteratorIterator:
 		var ce_cast *zend.ZendClassEntry
 		var class_name *zend.ZendString
@@ -1021,7 +1020,6 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				inc_refcount = 0
 			}
 		}
-		break
 	case DIT_AppendIterator:
 		zend.ZendReplaceErrorHandling(zend.EH_THROW, spl_ce_InvalidArgumentException, &error_handling)
 		SplInstantiate(spl_ce_ArrayIterator, intern.GetZarrayit())
@@ -1030,7 +1028,7 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 		zend.ZendRestoreErrorHandling(&error_handling)
 		return intern
 	case DIT_RegexIterator:
-
+		fallthrough
 	case DIT_RecursiveRegexIterator:
 		var regex *zend.ZendString
 		var mode zend.ZendLong = REGIT_MODE_MATCH
@@ -1059,9 +1057,8 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 
 		}
 		php_pcre_pce_incref(intern.GetPce())
-		break
 	case DIT_CallbackFilterIterator:
-
+		fallthrough
 	case DIT_RecursiveCallbackFilterIterator:
 		var cfi *_spl_cbfilter_it_intern = zend.Emalloc(b.SizeOf("* cfi"))
 		cfi.GetFci().SetObject(nil)
@@ -1075,12 +1072,10 @@ func SplDualItConstruct(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			cfi.GetObject().AddRefcount()
 		}
 		intern.SetCbfilter(cfi)
-		break
 	default:
 		if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "O", &zobject, ce_inner) == zend.FAILURE {
 			return nil
 		}
-		break
 	}
 	if inc_refcount != 0 {
 		zobject.AddRefcount()
@@ -1470,7 +1465,7 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 	}
 	switch intern.GetMode() {
 	case REGIT_MODE_MAX:
-
+		fallthrough
 	case REGIT_MODE_MATCH:
 		re = php_pcre_pce_re(intern.GetPce())
 		match_data = php_pcre_create_match_data(0, re)
@@ -1481,22 +1476,19 @@ func zim_spl_RegexIterator_accept(execute_data *zend.ZendExecuteData, return_val
 		rc = pcre2_match(re, PCRE2_SPTR(subject.GetVal()), subject.GetLen(), 0, 0, match_data, php_pcre_mctx())
 		zend.ZVAL_BOOL(return_value, rc >= 0)
 		php_pcre_free_match_data(match_data)
-		break
 	case REGIT_MODE_ALL_MATCHES:
-
+		fallthrough
 	case REGIT_MODE_GET_MATCH:
 		zend.ZvalPtrDtor(intern.GetData())
 		intern.GetData().SetUndef()
 		php_pcre_match_impl(intern.GetPce(), subject, &zcount, intern.GetData(), intern.GetMode() == REGIT_MODE_ALL_MATCHES, intern.GetUseFlags(), intern.GetPregFlags(), 0)
 		zend.ZVAL_BOOL(return_value, zcount.GetLval() > 0)
-		break
 	case REGIT_MODE_SPLIT:
 		zend.ZvalPtrDtor(intern.GetData())
 		intern.GetData().SetUndef()
 		php_pcre_split_impl(intern.GetPce(), subject, intern.GetData(), -1, intern.GetPregFlags())
 		count = zend.Z_ARRVAL(intern.GetData()).GetNNumOfElements()
 		zend.ZVAL_BOOL(return_value, count > 1)
-		break
 	case REGIT_MODE_REPLACE:
 		var replacement *zend.Zval = zend.ZendReadProperty(intern.GetStd().GetCe(), zend.ZEND_THIS, "replacement", b.SizeOf("\"replacement\"")-1, 1, &rv)
 		var replacement_str *zend.ZendString = zend.ZvalTryGetString(replacement)

@@ -521,6 +521,7 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			return_value.SetDouble(float64(value.GetLval()))
 			return
 		}
+		fallthrough
 	case zend.IS_DOUBLE:
 		if value.IsType(zend.IS_LONG) {
 			return_val = float64(value.GetLval())
@@ -530,11 +531,9 @@ func ZifRound(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_val = _phpMathRound(return_val, int(places), int(mode))
 		return_value.SetDouble(return_val)
 		return
-		break
 	default:
 		return_value.SetFalse()
 		return
-		break
 	}
 }
 func ZifSin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2551,6 +2550,7 @@ func _phpMathBasetozval(arg *zend.Zval, base int, ret *zend.Zval) int {
 				fnum = float64(num)
 				mode = 1
 			}
+			fallthrough
 		case 1:
 			fnum = fnum*base + c
 		}
@@ -3392,11 +3392,9 @@ func ZifNumberFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	case 1:
 		return_value.SetString(_phpMathNumberFormat(num, 0, dec_point_chr, thousand_sep_chr))
 		return
-		break
 	case 2:
 		return_value.SetString(_phpMathNumberFormat(num, int(dec), dec_point_chr, thousand_sep_chr))
 		return
-		break
 	case 4:
 		if dec_point == nil {
 			dec_point = &dec_point_chr
@@ -3407,7 +3405,6 @@ func ZifNumberFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			thousand_sep_len = 1
 		}
 		return_value.SetString(_phpMathNumberFormatEx(num, int(dec), dec_point, dec_point_len, thousand_sep, thousand_sep_len))
-		break
 	default:
 		zend.WRONG_PARAM_COUNT
 	}

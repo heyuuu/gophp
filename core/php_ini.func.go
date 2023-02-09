@@ -145,7 +145,6 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		/* PHP and Zend extensions are not added into configuration hash! */
 
-		break
 	case zend.ZEND_INI_PARSER_POP_ENTRY:
 		var option_arr zend.Zval
 		var find_arr *zend.Zval
@@ -175,7 +174,6 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 			entry = find_arr.GetArr().NextIndexInsert(arg2)
 		}
 		entry.SetStr(entry.GetStr().Dup(1))
-		break
 	case zend.ZEND_INI_PARSER_SECTION:
 
 		/* fprintf(stdout, "ZEND_INI_PARSER_SECTION: %s\n",Z_STRVAL_P(arg1)); */
@@ -234,7 +232,6 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 				ActiveIniHash = entry.GetArr()
 			}
 		}
-		break
 	}
 }
 func PhpLoadPhpExtensionCb(arg any) {

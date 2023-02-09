@@ -718,17 +718,17 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 			}
 			numbytes = len_
 		}
-		break
 	case zend.IS_NULL:
-
+		fallthrough
 	case zend.IS_LONG:
-
+		fallthrough
 	case zend.IS_DOUBLE:
-
+		fallthrough
 	case zend.IS_FALSE:
-
+		fallthrough
 	case zend.IS_TRUE:
 		zend.ConvertToStringEx(data)
+		fallthrough
 	case zend.IS_STRING:
 		if zend.Z_STRLEN_P(data) != 0 {
 			numbytes = core.PhpStreamWrite(stream, zend.Z_STRVAL_P(data), zend.Z_STRLEN_P(data))
@@ -737,7 +737,6 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				numbytes = -1
 			}
 		}
-		break
 	case zend.IS_ARRAY:
 		if zend.Z_ARRVAL_P(data).GetNNumOfElements() {
 			var bytes_written ssize_t
@@ -762,7 +761,6 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				zend.ZendTmpStringRelease(t)
 			}
 		}
-		break
 	case zend.IS_OBJECT:
 		if zend.Z_OBJ_HT_P(data) != nil {
 			var out zend.Zval
@@ -776,9 +774,9 @@ func ZifFilePutContents(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				break
 			}
 		}
+		fallthrough
 	default:
 		numbytes = -1
-		break
 	}
 	core.PhpStreamClose(stream)
 	if numbytes < 0 {
@@ -3405,9 +3403,8 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 		/* non-statable stream */
 
 		goto safe_to_copy
-		break
 	case 0:
-		break
+
 	default:
 		return ret
 	}
@@ -3421,9 +3418,8 @@ func PhpCopyFileCtx(src *byte, dest *byte, src_flg int, ctx *core.PhpStreamConte
 		/* non-statable stream */
 
 		goto safe_to_copy
-		break
 	case 0:
-		break
+
 	default:
 		return ret
 	}
@@ -3578,19 +3574,18 @@ func PhpFgetcsvLookupTrailingSpaces(ptr *byte, len_ int, delimiter byte) *byte {
 		}
 		switch inc_len {
 		case -2:
-
+			fallthrough
 		case -1:
 			inc_len = 1
 			core.PhpIgnoreValue(mblen(nil, 0))
-			break
 		case 0:
 			goto quit_loop
+			fallthrough
 		case 1:
-
+			fallthrough
 		default:
 			last_chars[0] = last_chars[1]
 			last_chars[1] = *ptr
-			break
 		}
 		ptr += inc_len
 		len_ -= inc_len
@@ -3601,6 +3596,7 @@ quit_loop:
 		if last_chars[0] == '\r' {
 			return ptr - 2
 		}
+		fallthrough
 	case '\r':
 		return ptr - 1
 	}
@@ -4093,10 +4089,12 @@ func PhpFgetcsv(
 						tptr += bptr - hunk_begin - 1
 						hunk_begin = bptr
 						goto quit_loop_2
+						fallthrough
 					case 1:
 						memcpy(tptr, hunk_begin, bptr-hunk_begin)
 						tptr += bptr - hunk_begin
 						hunk_begin = bptr
+						fallthrough
 					case 0:
 						var new_buf *byte
 						var new_len int
@@ -4140,13 +4138,12 @@ func PhpFgetcsv(
 						line_end = limit
 						line_end_len = buf_len - size_t(limit-buf)
 						state = 0
-						break
 					}
-					break
 				case -2:
-
+					fallthrough
 				case -1:
 					core.PhpIgnoreValue(mblen(nil, 0))
+					fallthrough
 				case 1:
 
 					/* we need to determine if the enclosure is
@@ -4156,7 +4153,6 @@ func PhpFgetcsv(
 					case 1:
 						bptr++
 						state = 0
-						break
 					case 2:
 						if (*bptr) != enclosure {
 
@@ -4172,7 +4168,6 @@ func PhpFgetcsv(
 						bptr++
 						hunk_begin = bptr
 						state = 0
-						break
 					default:
 						if (*bptr) == enclosure {
 							state = 2
@@ -4180,9 +4175,7 @@ func PhpFgetcsv(
 							state = 1
 						}
 						bptr++
-						break
 					}
-					break
 				default:
 					switch state {
 					case 2:
@@ -4193,18 +4186,16 @@ func PhpFgetcsv(
 						tptr += bptr - hunk_begin - 1
 						hunk_begin = bptr
 						goto quit_loop_2
+						fallthrough
 					case 1:
 						bptr += inc_len
 						memcpy(tptr, hunk_begin, bptr-hunk_begin)
 						tptr += bptr - hunk_begin
 						hunk_begin = bptr
 						state = 0
-						break
 					default:
 						bptr += inc_len
-						break
 					}
-					break
 				}
 				if bptr < limit {
 					if (*bptr) == '0' {
@@ -4224,18 +4215,19 @@ func PhpFgetcsv(
 				switch inc_len {
 				case 0:
 					goto quit_loop_3
+					fallthrough
 				case -2:
-
+					fallthrough
 				case -1:
 					inc_len = 1
 					core.PhpIgnoreValue(mblen(nil, 0))
+					fallthrough
 				case 1:
 					if (*bptr) == delimiter {
 						goto quit_loop_3
 					}
-					break
 				default:
-					break
+
 				}
 				bptr += inc_len
 				if bptr < limit {
@@ -4262,18 +4254,19 @@ func PhpFgetcsv(
 				switch inc_len {
 				case 0:
 					goto quit_loop_4
+					fallthrough
 				case -2:
-
+					fallthrough
 				case -1:
 					inc_len = 1
 					core.PhpIgnoreValue(mblen(nil, 0))
+					fallthrough
 				case 1:
 					if (*bptr) == delimiter {
 						goto quit_loop_4
 					}
-					break
 				default:
-					break
+
 				}
 				bptr += inc_len
 				if bptr < limit {
@@ -4408,18 +4401,14 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 		switch ch {
 		case '<':
 			return TOK_OPENTAG
-			break
 		case '>':
 			return TOK_CLOSETAG
-			break
 		case '=':
 			return TOK_EQUAL
-			break
 		case '/':
 			return TOK_SLASH
-			break
 		case '\'':
-
+			fallthrough
 		case '"':
 			compliment = ch
 			md.SetTokenLen(0)
@@ -4444,16 +4433,14 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 				memcpy(md.GetTokenData(), buff, md.GetTokenLen()+1)
 			}
 			return TOK_STRING
-			break
 		case '\n':
-
+			fallthrough
 		case '\r':
-
+			fallthrough
 		case '\t':
-			break
+
 		case ' ':
 			return TOK_SPACE
-			break
 		default:
 			if isalnum(ch) {
 				md.SetTokenLen(0)
@@ -4477,7 +4464,6 @@ func PhpNextMetaToken(md *PhpMetaTagsData) PhpMetaTagsToken {
 			} else {
 				return TOK_OTHER
 			}
-			break
 		}
 	}
 	return TOK_EOF

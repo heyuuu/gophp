@@ -86,17 +86,15 @@ func SapiReadPostData() {
 	for p = content_type; p < content_type+content_type_length; p++ {
 		switch *p {
 		case ';':
-
+			fallthrough
 		case ',':
-
+			fallthrough
 		case ' ':
 			content_type_length = p - content_type
 			oldchar = *p
 			*p = 0
-			break
 		default:
 			*p = tolower(*p)
-			break
 		}
 	}
 
@@ -530,9 +528,9 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		SapiUpdateResponseCode(int(zend.ZendIntptrT(arg)))
 		return zend.SUCCESS
 	case SAPI_HEADER_ADD:
-
+		fallthrough
 	case SAPI_HEADER_REPLACE:
-
+		fallthrough
 	case SAPI_HEADER_DELETE:
 		var p *SapiHeaderLine = arg
 		if p.GetLine() == nil || p.GetLineLen() == 0 {
@@ -541,7 +539,6 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		header_line = p.GetLine()
 		header_line_len = p.GetLineLen()
 		http_response_code = p.GetResponseCode()
-		break
 	case SAPI_HEADER_DELETE_ALL:
 		if sapi_module.GetHeaderHandler() != nil {
 			sapi_module.GetHeaderHandler()(&sapi_header, op, &(SG(sapi_headers)))
@@ -739,7 +736,6 @@ func SapiSendHeaders() int {
 	switch retval {
 	case SAPI_HEADER_SENT_SUCCESSFULLY:
 		ret = zend.SUCCESS
-		break
 	case SAPI_HEADER_DO_SEND:
 		var http_status_line SapiHeader
 		var buf []byte
@@ -760,11 +756,9 @@ func SapiSendHeaders() int {
 		}
 		sapi_module.GetSendHeader()(nil, SG(server_context))
 		ret = zend.SUCCESS
-		break
 	case SAPI_HEADER_SEND_FAILED:
 		SG(headers_sent) = 0
 		ret = zend.FAILURE
-		break
 	}
 	SapiSendHeadersFree()
 	return ret

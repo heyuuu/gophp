@@ -389,42 +389,34 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			if resource.GetScheme() != nil {
 				return_value.SetStringCopy(resource.GetScheme())
 			}
-			break
 		case PHP_URL_HOST:
 			if resource.GetHost() != nil {
 				return_value.SetStringCopy(resource.GetHost())
 			}
-			break
 		case PHP_URL_PORT:
 			if has_port != 0 {
 				return_value.SetLong(resource.GetPort())
 			}
-			break
 		case PHP_URL_USER:
 			if resource.GetUser() != nil {
 				return_value.SetStringCopy(resource.GetUser())
 			}
-			break
 		case PHP_URL_PASS:
 			if resource.GetPass() != nil {
 				return_value.SetStringCopy(resource.GetPass())
 			}
-			break
 		case PHP_URL_PATH:
 			if resource.GetPath() != nil {
 				return_value.SetStringCopy(resource.GetPath())
 			}
-			break
 		case PHP_URL_QUERY:
 			if resource.GetQuery() != nil {
 				return_value.SetStringCopy(resource.GetQuery())
 			}
-			break
 		case PHP_URL_FRAGMENT:
 			if resource.GetFragment() != nil {
 				return_value.SetStringCopy(resource.GetFragment())
 			}
-			break
 		default:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid URL component identifier "+zend.ZEND_LONG_FMT, key)
 			return_value.SetFalse()

@@ -530,7 +530,6 @@ func PhpParserr(
 		core.Snprintf(name, b.SizeOf("name"), "%d.%d.%d.%d", cp[0], cp[1], cp[2], cp[3])
 		zend.AddAssocString(subarray, "ip", name)
 		cp += dlen
-		break
 	case DNS_T_MX:
 		if cp+2 > end {
 			return nil
@@ -538,14 +537,17 @@ func PhpParserr(
 		zend.AddAssocString(subarray, "type", "MX")
 		GETSHORT(n, cp)
 		zend.AddAssocLong(subarray, "pri", n)
+		fallthrough
 	case DNS_T_CNAME:
 		if type_ == DNS_T_CNAME {
 			zend.AddAssocString(subarray, "type", "CNAME")
 		}
+		fallthrough
 	case DNS_T_NS:
 		if type_ == DNS_T_NS {
 			zend.AddAssocString(subarray, "type", "NS")
 		}
+		fallthrough
 	case DNS_T_PTR:
 		if type_ == DNS_T_PTR {
 			zend.AddAssocString(subarray, "type", "PTR")
@@ -556,7 +558,6 @@ func PhpParserr(
 		}
 		cp += n
 		zend.AddAssocString(subarray, "target", name)
-		break
 	case DNS_T_HINFO:
 
 		/* See RFC 1010 for values */
@@ -582,7 +583,6 @@ func PhpParserr(
 		}
 		zend.AddAssocStringl(subarray, "os", (*byte)(cp), n)
 		cp += n
-		break
 	case DNS_T_CAA:
 
 		/* See RFC 6844 for values https://tools.ietf.org/html/rfc6844 */
@@ -619,7 +619,6 @@ func PhpParserr(
 		}
 		zend.AddAssocStringl(subarray, "value", (*byte)(cp), n)
 		cp += n
-		break
 	case DNS_T_TXT:
 		var l1 int = 0
 		var l2 int = 0
@@ -651,7 +650,6 @@ func PhpParserr(
 		cp += dlen
 		zend.AddAssocStr(subarray, "txt", tp)
 		zend.AddAssocZval(subarray, "entries", &entries)
-		break
 	case DNS_T_SOA:
 		zend.AddAssocString(subarray, "type", "SOA")
 		n = dn_expand(answer.GetQb2(), end, cp, name, b.SizeOf(name)-2)
@@ -679,7 +677,6 @@ func PhpParserr(
 		zend.AddAssocLong(subarray, "expire", n)
 		GETLONG(n, cp)
 		zend.AddAssocLong(subarray, "minimum-ttl", n)
-		break
 	case DNS_T_AAAA:
 		tp = (*u_char)(name)
 		if cp+8*2 > end {
@@ -715,7 +712,6 @@ func PhpParserr(
 		tp[0] = '0'
 		zend.AddAssocString(subarray, "type", "AAAA")
 		zend.AddAssocString(subarray, "ipv6", name)
-		break
 	case DNS_T_A6:
 		p = cp
 		zend.AddAssocString(subarray, "type", "A6")
@@ -798,7 +794,6 @@ func PhpParserr(
 			cp += n
 			zend.AddAssocString(subarray, "chain", name)
 		}
-		break
 	case DNS_T_SRV:
 		if cp+3*2 > end {
 			return nil
@@ -816,7 +811,6 @@ func PhpParserr(
 		}
 		cp += n
 		zend.AddAssocString(subarray, "target", name)
-		break
 	case DNS_T_NAPTR:
 		if cp+2*2 > end {
 			return nil
@@ -862,12 +856,10 @@ func PhpParserr(
 		}
 		cp += n
 		zend.AddAssocString(subarray, "replacement", name)
-		break
 	default:
 		zend.ZvalPtrDtor(subarray)
 		subarray.SetUndef()
 		cp += dlen
-		break
 	}
 	return cp
 }
@@ -1034,106 +1026,91 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 			/* skip over the rest and go directly to additional records */
 
 			type_ = PHP_DNS_NUM_TYPES - 1
-			break
 		case 0:
 			if (type_param & PHP_DNS_A) != 0 {
 				type_to_fetch = DNS_T_A
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 1:
 			if (type_param & PHP_DNS_NS) != 0 {
 				type_to_fetch = DNS_T_NS
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 2:
 			if (type_param & PHP_DNS_CNAME) != 0 {
 				type_to_fetch = DNS_T_CNAME
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 3:
 			if (type_param & PHP_DNS_SOA) != 0 {
 				type_to_fetch = DNS_T_SOA
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 4:
 			if (type_param & PHP_DNS_PTR) != 0 {
 				type_to_fetch = DNS_T_PTR
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 5:
 			if (type_param & PHP_DNS_HINFO) != 0 {
 				type_to_fetch = DNS_T_HINFO
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 6:
 			if (type_param & PHP_DNS_MX) != 0 {
 				type_to_fetch = DNS_T_MX
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 7:
 			if (type_param & PHP_DNS_TXT) != 0 {
 				type_to_fetch = DNS_T_TXT
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 8:
 			if (type_param & PHP_DNS_AAAA) != 0 {
 				type_to_fetch = DNS_T_AAAA
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 9:
 			if (type_param & PHP_DNS_SRV) != 0 {
 				type_to_fetch = DNS_T_SRV
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 10:
 			if (type_param & PHP_DNS_NAPTR) != 0 {
 				type_to_fetch = DNS_T_NAPTR
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 11:
 			if (type_param & PHP_DNS_A6) != 0 {
 				type_to_fetch = DNS_T_A6
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case 12:
 			if (type_param & PHP_DNS_CAA) != 0 {
 				type_to_fetch = DNS_T_CAA
 			} else {
 				type_to_fetch = 0
 			}
-			break
 		case PHP_DNS_NUM_TYPES:
 			store_results = 0
 			continue
 		default:
-
+			fallthrough
 		case PHP_DNS_NUM_TYPES + 1:
 			type_to_fetch = DNS_T_ANY
-			break
 		}
 		if type_to_fetch != 0 {
 			handle = dns_open(nil)
@@ -1148,15 +1125,13 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				PhpDnsFreeHandle(handle)
 				switch dns_errno {
 				case NO_DATA:
-
+					fallthrough
 				case HOST_NOT_FOUND:
 					continue
 				case NO_RECOVERY:
 					core.PhpErrorDocref(nil, zend.E_WARNING, "An unexpected server failure occurred.")
-					break
 				case TRY_AGAIN:
 					core.PhpErrorDocref(nil, zend.E_WARNING, "A temporary server error occurred.")
-					break
 				default:
 					core.PhpErrorDocref(nil, zend.E_WARNING, "DNS Query failed")
 				}

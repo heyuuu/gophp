@@ -379,7 +379,6 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 	switch arg.GetType() {
 	case IS_NULL:
 		str.AppendString("NULL, ")
-		break
 	case IS_STRING:
 		str.AppendByte('\'')
 		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), MIN(Z_STRLEN_P(arg), 15))
@@ -388,36 +387,28 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		} else {
 			str.AppendString("', ")
 		}
-		break
 	case IS_FALSE:
 		str.AppendString("false, ")
-		break
 	case IS_TRUE:
 		str.AppendString("true, ")
-		break
 	case IS_RESOURCE:
 		str.AppendString("Resource id #")
 		str.AppendLong(Z_RES_HANDLE_P(arg))
 		str.AppendString(", ")
-		break
 	case IS_LONG:
 		str.AppendLong(arg.GetLval())
 		str.AppendString(", ")
-		break
 	case IS_DOUBLE:
 		SmartStrAppendPrintf(str, "%.*G", int(EG__().GetPrecision()), arg.GetDval())
 		str.AppendString(", ")
-		break
 	case IS_ARRAY:
 		str.AppendString("Array, ")
-		break
 	case IS_OBJECT:
-		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(arg.GetObj())
+		var class_name *ZendString = Z_OBJ_HT(*arg).GetGetClassName()(Z_OBJ_P(arg))
 		str.AppendString("Object(")
 		str.AppendString(b.CastStrAuto(class_name.GetVal()))
 		str.AppendString("), ")
 		ZendStringReleaseEx(class_name, 0)
-		break
 	}
 }
 func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {

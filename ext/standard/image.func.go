@@ -234,29 +234,29 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 		ff_read = 0
 		switch marker {
 		case M_SOF0:
-
+			fallthrough
 		case M_SOF1:
-
+			fallthrough
 		case M_SOF2:
-
+			fallthrough
 		case M_SOF3:
-
+			fallthrough
 		case M_SOF5:
-
+			fallthrough
 		case M_SOF6:
-
+			fallthrough
 		case M_SOF7:
-
+			fallthrough
 		case M_SOF9:
-
+			fallthrough
 		case M_SOF10:
-
+			fallthrough
 		case M_SOF11:
-
+			fallthrough
 		case M_SOF13:
-
+			fallthrough
 		case M_SOF14:
-
+			fallthrough
 		case M_SOF15:
 			if result == nil {
 
@@ -279,37 +279,36 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 					return result
 				}
 			}
-			break
 		case M_APP0:
-
+			fallthrough
 		case M_APP1:
-
+			fallthrough
 		case M_APP2:
-
+			fallthrough
 		case M_APP3:
-
+			fallthrough
 		case M_APP4:
-
+			fallthrough
 		case M_APP5:
-
+			fallthrough
 		case M_APP6:
-
+			fallthrough
 		case M_APP7:
-
+			fallthrough
 		case M_APP8:
-
+			fallthrough
 		case M_APP9:
-
+			fallthrough
 		case M_APP10:
-
+			fallthrough
 		case M_APP11:
-
+			fallthrough
 		case M_APP12:
-
+			fallthrough
 		case M_APP13:
-
+			fallthrough
 		case M_APP14:
-
+			fallthrough
 		case M_APP15:
 			if info != nil {
 				if php_read_APP(stream, marker, info) == 0 {
@@ -320,16 +319,14 @@ func PhpHandleJpeg(stream *core.PhpStream, info *zend.Zval) *Gfxinfo {
 					return result
 				}
 			}
-			break
 		case M_SOS:
-
+			fallthrough
 		case M_EOI:
 			return result
 		default:
 			if PhpSkipVariable(stream) == 0 {
 				return result
 			}
-			break
 		}
 	}
 	return result
@@ -529,36 +526,29 @@ func PhpHandleTiff(stream *core.PhpStream, info *zend.Zval, motorola_intel int) 
 		entry_type = PhpIfdGet16u(dir_entry+2, motorola_intel)
 		switch entry_type {
 		case TAG_FMT_BYTE:
-
+			fallthrough
 		case TAG_FMT_SBYTE:
 			entry_value = size_t(dir_entry[8])
-			break
 		case TAG_FMT_USHORT:
 			entry_value = PhpIfdGet16u(dir_entry+8, motorola_intel)
-			break
 		case TAG_FMT_SSHORT:
 			entry_value = PhpIfdGet16s(dir_entry+8, motorola_intel)
-			break
 		case TAG_FMT_ULONG:
 			entry_value = PhpIfdGet32u(dir_entry+8, motorola_intel)
-			break
 		case TAG_FMT_SLONG:
 			entry_value = PhpIfdGet32s(dir_entry+8, motorola_intel)
-			break
 		default:
 			continue
 		}
 		switch entry_tag {
 		case TAG_IMAGEWIDTH:
-
+			fallthrough
 		case TAG_COMP_IMAGEWIDTH:
 			width = entry_value
-			break
 		case TAG_IMAGEHEIGHT:
-
+			fallthrough
 		case TAG_COMP_IMAGEHEIGHT:
 			height = entry_value
-			break
 		}
 	}
 	zend.Efree(ifd_data)
@@ -816,12 +806,11 @@ func PhpHandleWebp(stream *core.PhpStream) *Gfxinfo {
 	}
 	switch buf[3] {
 	case ' ':
-
+		fallthrough
 	case 'L':
-
+		fallthrough
 	case 'X':
 		format = buf[3]
-		break
 	default:
 		return nil
 	}
@@ -830,15 +819,12 @@ func PhpHandleWebp(stream *core.PhpStream) *Gfxinfo {
 	case ' ':
 		result.SetWidth(buf[14] + ((buf[15] & 0x3f) << 8))
 		result.SetHeight(buf[16] + ((buf[17] & 0x3f) << 8))
-		break
 	case 'L':
 		result.SetWidth(buf[9] + ((buf[10] & 0x3f) << 8) + 1)
 		result.SetHeight((buf[10] >> 6) + (buf[11] << 2) + ((buf[12] & 0xf) << 10) + 1)
-		break
 	case 'X':
 		result.SetWidth(buf[12] + (buf[13] << 8) + (buf[14] << 16) + 1)
 		result.SetHeight(buf[15] + (buf[16] << 8) + (buf[17] << 16) + 1)
-		break
 	}
 	result.SetBits(8)
 	return result
@@ -852,7 +838,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 	case IMAGE_FILETYPE_PNG:
 		return "image/png"
 	case IMAGE_FILETYPE_SWF:
-
+		fallthrough
 	case IMAGE_FILETYPE_SWC:
 		return "application/x-shockwave-flash"
 	case IMAGE_FILETYPE_PSD:
@@ -860,7 +846,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 	case IMAGE_FILETYPE_BMP:
 		return "image/bmp"
 	case IMAGE_FILETYPE_TIFF_II:
-
+		fallthrough
 	case IMAGE_FILETYPE_TIFF_MM:
 		return "image/tiff"
 	case IMAGE_FILETYPE_IFF:
@@ -878,7 +864,7 @@ func PhpImageTypeToMimeType(image_type int) *byte {
 	case IMAGE_FILETYPE_WEBP:
 		return "image/webp"
 	default:
-
+		fallthrough
 	case IMAGE_FILETYPE_UNKNOWN:
 		return "application/octet-stream"
 	}
@@ -1036,55 +1022,40 @@ func ZifImageTypeToExtension(execute_data *zend.ZendExecuteData, return_value *z
 	switch image_type {
 	case IMAGE_FILETYPE_GIF:
 		imgext = ".gif"
-		break
 	case IMAGE_FILETYPE_JPEG:
 		imgext = ".jpeg"
-		break
 	case IMAGE_FILETYPE_PNG:
 		imgext = ".png"
-		break
 	case IMAGE_FILETYPE_SWF:
-
+		fallthrough
 	case IMAGE_FILETYPE_SWC:
 		imgext = ".swf"
-		break
 	case IMAGE_FILETYPE_PSD:
 		imgext = ".psd"
-		break
 	case IMAGE_FILETYPE_BMP:
-
+		fallthrough
 	case IMAGE_FILETYPE_WBMP:
 		imgext = ".bmp"
-		break
 	case IMAGE_FILETYPE_TIFF_II:
-
+		fallthrough
 	case IMAGE_FILETYPE_TIFF_MM:
 		imgext = ".tiff"
-		break
 	case IMAGE_FILETYPE_IFF:
 		imgext = ".iff"
-		break
 	case IMAGE_FILETYPE_JPC:
 		imgext = ".jpc"
-		break
 	case IMAGE_FILETYPE_JP2:
 		imgext = ".jp2"
-		break
 	case IMAGE_FILETYPE_JPX:
 		imgext = ".jpx"
-		break
 	case IMAGE_FILETYPE_JB2:
 		imgext = ".jb2"
-		break
 	case IMAGE_FILETYPE_XBM:
 		imgext = ".xbm"
-		break
 	case IMAGE_FILETYPE_ICO:
 		imgext = ".ico"
-		break
 	case IMAGE_FILETYPE_WEBP:
 		imgext = ".webp"
-		break
 	}
 	if imgext != nil {
 		zend.ZVAL_STRING(return_value, &imgext[!inc_dot])
@@ -1194,60 +1165,44 @@ func PhpGetimagesizeFromStream(stream *core.PhpStream, info *zend.Zval, execute_
 	switch itype {
 	case IMAGE_FILETYPE_GIF:
 		result = PhpHandleGif(stream)
-		break
 	case IMAGE_FILETYPE_JPEG:
 		if info != nil {
 			result = PhpHandleJpeg(stream, info)
 		} else {
 			result = PhpHandleJpeg(stream, nil)
 		}
-		break
 	case IMAGE_FILETYPE_PNG:
 		result = PhpHandlePng(stream)
-		break
 	case IMAGE_FILETYPE_SWF:
 		result = PhpHandleSwf(stream)
-		break
 	case IMAGE_FILETYPE_SWC:
 		core.PhpErrorDocref(nil, zend.E_NOTICE, "The image is a compressed SWF file, but you do not have a static version of the zlib extension enabled")
-		break
 	case IMAGE_FILETYPE_PSD:
 		result = PhpHandlePsd(stream)
-		break
 	case IMAGE_FILETYPE_BMP:
 		result = PhpHandleBmp(stream)
-		break
 	case IMAGE_FILETYPE_TIFF_II:
 		result = PhpHandleTiff(stream, nil, 0)
-		break
 	case IMAGE_FILETYPE_TIFF_MM:
 		result = PhpHandleTiff(stream, nil, 1)
-		break
 	case IMAGE_FILETYPE_JPC:
 		result = PhpHandleJpc(stream)
-		break
 	case IMAGE_FILETYPE_JP2:
 		result = PhpHandleJp2(stream)
-		break
 	case IMAGE_FILETYPE_IFF:
 		result = PhpHandleIff(stream)
-		break
 	case IMAGE_FILETYPE_WBMP:
 		result = PhpHandleWbmp(stream)
-		break
 	case IMAGE_FILETYPE_XBM:
 		result = PhpHandleXbm(stream)
-		break
 	case IMAGE_FILETYPE_ICO:
 		result = PhpHandleIco(stream)
-		break
 	case IMAGE_FILETYPE_WEBP:
 		result = PhpHandleWebp(stream)
-		break
 	default:
-
+		fallthrough
 	case IMAGE_FILETYPE_UNKNOWN:
-		break
+
 	}
 	if result != nil {
 		var temp []byte

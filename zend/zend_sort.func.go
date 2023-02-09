@@ -128,23 +128,19 @@ func ZendSort5(
 func ZendInsertSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
 	switch nmemb {
 	case 0:
-
+		fallthrough
 	case 1:
-		break
+
 	case 2:
 		ZendSort2(base, (*byte)(base+siz), cmp, swp)
-		break
 	case 3:
 		ZendSort3(base, (*byte)(base+siz), (*byte)(base+siz+siz), cmp, swp)
-		break
 	case 4:
 		var siz2 int = siz + siz
 		ZendSort4(base, (*byte)(base+siz), (*byte)(base+siz2), (*byte)(base+siz+siz2), cmp, swp)
-		break
 	case 5:
 		var siz2 int = siz + siz
 		ZendSort5(base, (*byte)(base+siz), (*byte)(base+siz2), (*byte)(base+siz+siz2), (*byte)(base+siz2+siz2), cmp, swp)
-		break
 	default:
 		var i *byte
 		var j *byte
@@ -199,7 +195,6 @@ func ZendInsertSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFunc
 				swp(k, k-siz)
 			}
 		}
-		break
 	}
 }
 func ZendSort(base any, nmemb int, siz int, cmp CompareFuncT, swp SwapFuncT) {
