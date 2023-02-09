@@ -5,40 +5,55 @@ import (
 	r "sik/runtime"
 )
 
-type LangScanner struct{}
+type ctype = byte
+type LangScanner struct {
+	lineno           int // CG__().zend_lineno
+	scannedStringLen int // LANG_SCNG__().scanned_string_len
 
-func (sc *LangScanner) HANDLE_NEWLINES(s *byte, l *byte) {
-	var p *byte = s
+	yyLen    uint  // LANG_SCNG__().yy_leng
+	yyStart  *byte // LANG_SCNG__().yy_start
+	yyText   *byte // LANG_SCNG__().yy_text
+	yyCursor *byte // LANG_SCNG__().yy_cursor
+	yyMarker *byte // LANG_SCNG__().yy_marker
+	yyLimit  *byte // LANG_SCNG__().yy_limit
+	yyState  int   // LANG_SCNG__().yy_state
+}
+
+func (sc *LangScanner) handleNewlines(l *byte) {
+	var p = sc.yyText
 	var boundary *byte = p + l
 	for p < boundary {
 		if (*p) == '\n' || (*p) == '\r' && (*(p + 1)) != '\n' {
-			CG__().GetZendLineno()++
+			sc.lineno++
 		}
 		p++
 	}
+	LANG_SCNG__()
 }
-func (sc *LangScanner) HANDLE_NEWLINE(c byte) {
+func (sc *LangScanner) handleNewline(c byte) {
 	if c == '\n' || c == '\r' {
-		CG__().GetZendLineno()++
+		sc.lineno++
 	}
 }
 
-func SET_DOUBLE_QUOTES_SCANNED_LENGTH(len_ int) __auto__ {
-	LANG_SCNG__().scanned_string_len = len_
-	return LANG_SCNG__().scanned_string_len
+func (sc *LangScanner) SetDoubleQuotesScannedLength(len_ int) int {
+	sc.scannedStringLen = len_
+	return sc.scannedStringLen
 }
-func GET_DOUBLE_QUOTES_SCANNED_LENGTH() __auto__ { return LANG_SCNG__().scanned_string_len }
-func IS_LABEL_START(c __auto__) bool {
+func (sc *LangScanner) GetDoubleQuotesScannedLength() int {
+	return sc.scannedStringLen
+}
+func (sc *LangScanner) LabelStart(c ctype) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_' || c >= 0x80
 }
-func IS_LABEL_SUCCESSOR(c __auto__) bool {
+func (sc *LangScanner) IsLabelSuccessor(c ctype) bool {
 	return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_' || c >= 0x80
 }
-func ZEND_IS_OCT(c byte) bool { return c >= '0' && c <= '7' }
-func ZEND_IS_HEX(c byte) bool {
+func (sc *LangScanner) IsOct(c ctype) bool { return c >= '0' && c <= '7' }
+func (sc *LangScanner) IsHex(c ctype) bool {
 	return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F'
 }
-func StripUnderscores(str *byte, len_ *int) {
+func (sc *LangScanner) StripUnderscores(str *byte, len_ *int) {
 	var src *byte = str
 	var dest *byte = str
 	for (*src) != '0' {
@@ -773,10 +788,10 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 			case 'x':
 				fallthrough
 			case 'X':
-				if ZEND_IS_HEX(*(s + 1)) {
+				if sc.ZEND_IS_HEX(*(s + 1)) {
 					var hex_buf []byte = []byte{0, 0, 0}
 					hex_buf[0] = *(b.PreInc(&s))
-					if ZEND_IS_HEX(*(s + 1)) {
+					if sc.ZEND_IS_HEX(*(s + 1)) {
 						hex_buf[1] = *(b.PreInc(&s))
 					}
 					b.PostInc(&(*t)) = byte(ZEND_STRTOL(hex_buf, nil, 16))
@@ -809,7 +824,7 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 					len_++
 					s++
 					for (*s) != '}' {
-						if !(ZEND_IS_HEX(*s)) {
+						if !(sc.ZEND_IS_HEX(*s)) {
 							valid = 0
 							break
 						} else {
@@ -870,12 +885,12 @@ func ZendScanEscapeString(zendlval *Zval, str *byte, len_ int, quote_type byte) 
 
 				/* check for an octal */
 
-				if ZEND_IS_OCT(*s) {
+				if sc.ZEND_IS_OCT(*s) {
 					var octal_buf []byte = []byte{0, 0, 0, 0}
 					octal_buf[0] = *s
-					if ZEND_IS_OCT(*(s + 1)) {
+					if sc.ZEND_IS_OCT(*(s + 1)) {
 						octal_buf[1] = *(b.PreInc(&s))
-						if ZEND_IS_OCT(*(s + 1)) {
+						if sc.ZEND_IS_OCT(*(s + 1)) {
 							octal_buf[2] = *(b.PreInc(&s))
 						}
 					}
@@ -1436,7 +1451,7 @@ yy5:
 			}
 			fallthrough
 		case '$':
-			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
+			if sc.LabelStart(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
@@ -1459,7 +1474,7 @@ yy5:
 
 	/* Remember how much was scanned to save rescanning */
 
-	SET_DOUBLE_QUOTES_SCANNED_LENGTH(YYCURSOR - LANG_SCNG__().yy_text - Yyleng)
+	sc.SetDoubleQuotesScannedLength(YYCURSOR - LANG_SCNG__().yy_text - Yyleng)
 	YYCURSOR = LANG_SCNG__().yy_text + Yyleng
 	BEGIN(ST_DOUBLE_QUOTES)
 	token = '"'
@@ -1811,7 +1826,7 @@ yy19:
 	var contains_underscores zend_bool = memchr(lnum, '_', len) != nil
 	if contains_underscores != 0 {
 		lnum = Estrndup(lnum, len_)
-		StripUnderscores(lnum, &len_)
+		sc.StripUnderscores(lnum, &len_)
 	}
 
 	/* Digits 8 and 9 are illegal in octal literals. */
@@ -2804,7 +2819,7 @@ yy86:
 	var contains_underscores zend_bool = memchr(dnum, '_', len) != nil
 	if contains_underscores != 0 {
 		dnum = Estrndup(dnum, len_)
-		StripUnderscores(dnum, &len_)
+		sc.StripUnderscores(dnum, &len_)
 	}
 	zendlval.SetDouble(ZendStrtod(dnum, &end))
 
@@ -2846,7 +2861,7 @@ yy89:
 		ZendError(E_COMPILE_WARNING, "Unterminated comment starting line %d", CG__().GetZendLineno())
 	}
 	Yyleng = YYCURSOR - LANG_SCNG__().yy_text
-	sc.HANDLE_NEWLINES(Yytext, Yyleng)
+	sc.handleNewlines(Yyleng)
 	if doc_com != 0 {
 		CG__().SetDocComment(ZendStringInit(Yytext, Yyleng, 0))
 		RETURN_OR_SKIP_TOKEN(T_DOC_COMMENT)
@@ -3759,7 +3774,7 @@ yy173:
 	contains_underscores = memchr(bin, '_', len_) != nil
 	if contains_underscores != 0 {
 		bin = Estrndup(bin, len_)
-		StripUnderscores(bin, &len_)
+		sc.StripUnderscores(bin, &len_)
 	}
 	if len_ < SIZEOF_ZEND_LONG*8 {
 		if len_ == 0 {
@@ -3847,7 +3862,7 @@ yy177:
 	contains_underscores = memchr(hex, '_', len_) != nil
 	if contains_underscores != 0 {
 		hex = Estrndup(hex, len_)
-		StripUnderscores(hex, &len_)
+		sc.StripUnderscores(hex, &len_)
 	}
 	if len_ < SIZEOF_ZEND_LONG*2 || len_ == SIZEOF_ZEND_LONG*2 && (*hex) <= '7' {
 		if len_ == 0 {
@@ -5547,7 +5562,7 @@ yy334:
 	/* Check for ending label on the next line */
 
 	if heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, s, heredoc_label.GetLength())) {
-		if !(IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()])) {
+		if !(sc.IsLabelSuccessor(YYCURSOR[heredoc_label.GetLength()])) {
 			if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
 				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 				if PARSER_MODE() {
@@ -7551,7 +7566,7 @@ yy541:
 	YYCURSOR++
 	Yyleng = YYCURSOR - LANG_SCNG__().yy_text
 	Yyless(Yyleng - 1)
-	sc.HANDLE_NEWLINES(Yytext, Yyleng)
+	sc.handleNewlines(Yyleng)
 	token = T_YIELD_FROM
 	goto emit_token
 yy542:
@@ -7763,7 +7778,7 @@ yy562:
 		case '`':
 
 		case '$':
-			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
+			if sc.LabelStart(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
@@ -7933,9 +7948,9 @@ yyc_ST_DOUBLE_QUOTES:
 	YYCURSOR++
 yy576:
 	Yyleng = YYCURSOR - LANG_SCNG__().yy_text
-	if GET_DOUBLE_QUOTES_SCANNED_LENGTH() {
-		YYCURSOR += GET_DOUBLE_QUOTES_SCANNED_LENGTH() - 1
-		SET_DOUBLE_QUOTES_SCANNED_LENGTH(0)
+	if sc.GetDoubleQuotesScannedLength() {
+		YYCURSOR += sc.GetDoubleQuotesScannedLength() - 1
+		sc.SetDoubleQuotesScannedLength(0)
 		goto double_quotes_scan_done
 	}
 	if YYCURSOR > YYLIMIT {
@@ -7950,7 +7965,7 @@ yy576:
 		case '"':
 
 		case '$':
-			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
+			if sc.LabelStart(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
@@ -8145,15 +8160,15 @@ yy590:
 			}
 			if YYCURSOR == YYLIMIT {
 				Yyleng = YYCURSOR - LANG_SCNG__().yy_text
-				sc.HANDLE_NEWLINES(Yytext, Yyleng)
+				sc.handleNewlines(Yyleng)
 				zendlval.SetNull()
 				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 
 			/* Check for ending label on the next line */
 
-			if IS_LABEL_START(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
-				if IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()]) {
+			if sc.LabelStart(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
+				if sc.IsLabelSuccessor(YYCURSOR[heredoc_label.GetLength()]) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
@@ -8184,7 +8199,7 @@ yy590:
 			}
 			continue
 		case '$':
-			if IS_LABEL_START(*YYCURSOR) || (*YYCURSOR) == '{' {
+			if sc.LabelStart(*YYCURSOR) || (*YYCURSOR) == '{' {
 				break
 			}
 			continue
@@ -8221,7 +8236,7 @@ heredoc_scan_done:
 		}
 		ZendStringEfree(copy)
 	} else {
-		sc.HANDLE_NEWLINES(Yytext, Yyleng-newline)
+		sc.handleNewlines(Yyleng - newline)
 	}
 	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 yy591:
@@ -8891,7 +8906,7 @@ inline_char_handler:
 	} else {
 		ZVAL_STRINGL(zendlval, Yytext, Yyleng)
 	}
-	sc.HANDLE_NEWLINES(Yytext, Yyleng)
+	sc.handleNewlines(Yyleng)
 	RETURN_TOKEN_WITH_VAL(T_INLINE_HTML)
 yy637:
 	yych = *(b.PreInc(&YYCURSOR))
@@ -8987,7 +9002,7 @@ yy645:
 	YYCURSOR++
 yy646:
 	Yyleng = YYCURSOR - LANG_SCNG__().yy_text
-	sc.HANDLE_NEWLINE(Yytext[Yyleng-1])
+	sc.handleNewline(Yytext[Yyleng-1])
 	BEGIN(ST_IN_SCRIPTING)
 	RETURN_OR_SKIP_TOKEN(T_OPEN_TAG)
 yy647:
@@ -9052,15 +9067,15 @@ yyc_ST_NOWDOC:
 			}
 			if YYCURSOR == YYLIMIT {
 				Yyleng = YYCURSOR - LANG_SCNG__().yy_text
-				sc.HANDLE_NEWLINES(Yytext, Yyleng)
+				sc.handleNewlines(Yyleng)
 				zendlval.SetNull()
 				RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 			}
 
 			/* Check for ending label on the next line */
 
-			if IS_LABEL_START(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
-				if IS_LABEL_SUCCESSOR(YYCURSOR[heredoc_label.GetLength()]) {
+			if sc.LabelStart(*YYCURSOR) && heredoc_label.GetLength() < YYLIMIT-YYCURSOR && !(memcmp(YYCURSOR, heredoc_label.GetLabel(), heredoc_label.GetLength())) {
+				if sc.IsLabelSuccessor(YYCURSOR[heredoc_label.GetLength()]) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
@@ -9100,7 +9115,7 @@ nowdoc_scan_done:
 			goto emit_token
 		}
 	}
-	sc.HANDLE_NEWLINES(Yytext, Yyleng-newline)
+	sc.handleNewlines(Yyleng - newline)
 	RETURN_TOKEN_WITH_VAL(T_ENCAPSED_AND_WHITESPACE)
 emit_token_with_str:
 	ZendCopyValue(zendlval, Yytext+offset, Yyleng-offset)
@@ -9115,7 +9130,7 @@ emit_token:
 	}
 	return token
 return_whitespace:
-	sc.HANDLE_NEWLINES(Yytext, Yyleng)
+	sc.handleNewlines(Yyleng)
 	if LANG_SCNG__().on_event {
 		LANG_SCNG__().on_event(ON_TOKEN, T_WHITESPACE, start_line, LANG_SCNG__().on_event_context)
 	}
