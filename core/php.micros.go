@@ -112,6 +112,10 @@ package core
 
 // #define PHP_MINFO       ZEND_MODULE_INFO_N
 
+// #define PHP_GINIT       ZEND_GINIT
+
+// #define PHP_GSHUTDOWN       ZEND_GSHUTDOWN
+
 // #define PHP_MINIT_FUNCTION       ZEND_MODULE_STARTUP_D
 
 // #define PHP_MSHUTDOWN_FUNCTION       ZEND_MODULE_SHUTDOWN_D
@@ -123,6 +127,8 @@ package core
 // #define PHP_MINFO_FUNCTION       ZEND_MODULE_INFO_D
 
 // #define PHP_GINIT_FUNCTION       ZEND_GINIT_FUNCTION
+
+// #define PHP_GSHUTDOWN_FUNCTION       ZEND_GSHUTDOWN_FUNCTION
 
 // # include "main/php_output.h"
 

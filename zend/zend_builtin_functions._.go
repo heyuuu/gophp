@@ -259,7 +259,7 @@ var BuiltinFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("gc_status", ZifGcStatus, ArginfoZendVoid, uint32(b.SizeOf("arginfo_zend__void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ZendBuiltinModule ZendModuleEntry = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZEND_MINIT(core), nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
+var ZendBuiltinModule ZendModuleEntry = MakeZendModuleEntry(b.SizeOf("zend_module_entry"), ZEND_MODULE_API_NO, 0, USING_ZTS, nil, nil, "Core", BuiltinFunctions, ZmStartupCore, nil, nil, nil, nil, ZEND_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+ZEND_BUILD_TS)
 
 /* {{{ */
 

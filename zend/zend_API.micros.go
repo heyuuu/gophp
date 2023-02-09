@@ -234,9 +234,33 @@ package zend
 
 // #define RETURN_TRUE       { RETVAL_TRUE ; return ; }
 
+// #define ZEND_MINIT       ZEND_MODULE_STARTUP_N
+
+// #define ZEND_MSHUTDOWN       ZEND_MODULE_SHUTDOWN_N
+
+// #define ZEND_RINIT       ZEND_MODULE_ACTIVATE_N
+
+// #define ZEND_RSHUTDOWN       ZEND_MODULE_DEACTIVATE_N
+
+// #define ZEND_MINFO       ZEND_MODULE_INFO_N
+
+// #define ZEND_GINIT(module) ( ( void ( * ) ( void * ) ) ( ZEND_MODULE_GLOBALS_CTOR_N ( module ) ) )
+
+// #define ZEND_GSHUTDOWN(module) ( ( void ( * ) ( void * ) ) ( ZEND_MODULE_GLOBALS_DTOR_N ( module ) ) )
+
 // #define ZEND_MINIT_FUNCTION       ZEND_MODULE_STARTUP_D
 
+// #define ZEND_MSHUTDOWN_FUNCTION       ZEND_MODULE_SHUTDOWN_D
+
+// #define ZEND_RINIT_FUNCTION       ZEND_MODULE_ACTIVATE_D
+
+// #define ZEND_RSHUTDOWN_FUNCTION       ZEND_MODULE_DEACTIVATE_D
+
+// #define ZEND_MINFO_FUNCTION       ZEND_MODULE_INFO_D
+
 // #define ZEND_GINIT_FUNCTION       ZEND_MODULE_GLOBALS_CTOR_D
+
+// #define ZEND_GSHUTDOWN_FUNCTION       ZEND_MODULE_GLOBALS_DTOR_D
 
 // #define Z_EXPECTED_TYPES(_) _ ( Z_EXPECTED_LONG , "int" ) _ ( Z_EXPECTED_BOOL , "bool" ) _ ( Z_EXPECTED_STRING , "string" ) _ ( Z_EXPECTED_ARRAY , "array" ) _ ( Z_EXPECTED_FUNC , "valid callback" ) _ ( Z_EXPECTED_RESOURCE , "resource" ) _ ( Z_EXPECTED_PATH , "a valid path" ) _ ( Z_EXPECTED_OBJECT , "object" ) _ ( Z_EXPECTED_DOUBLE , "float" )
 
