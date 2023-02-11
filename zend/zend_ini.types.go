@@ -7,21 +7,16 @@ import b "sik/builtin"
 /**
  * ZendIniEntryDef
  */
+type ZendIniEntryModifier = func(entry *ZendIniEntry, new_value *ZendString, mh_arg1 any, mh_arg2 any, mh_arg3 any, stage int) int
+type ZendIniEntryDisplayer = func(ini_entry *ZendIniEntry, type_ int)
 type ZendIniEntryDef struct {
-	name      *byte
-	on_modify func(
-		entry *ZendIniEntry,
-		new_value *ZendString,
-		mh_arg1 any,
-		mh_arg2 any,
-		mh_arg3 any,
-		stage int,
-	) int
+	name         *byte
+	on_modify    ZendIniEntryModifier
 	mh_arg1      any
 	mh_arg2      any
 	mh_arg3      any
 	value        *byte
-	displayer    func(ini_entry *ZendIniEntry, type_ int)
+	displayer    ZendIniEntryDisplayer
 	value_length uint32
 	name_length  uint16
 	modifiable   uint8
@@ -29,19 +24,12 @@ type ZendIniEntryDef struct {
 
 func MakeZendIniEntryDef(
 	name string,
-	on_modify func(
-		entry *ZendIniEntry,
-		new_value *ZendString,
-		mh_arg1 any,
-		mh_arg2 any,
-		mh_arg3 any,
-		stage int,
-	) int,
+	on_modify ZendIniEntryModifier,
 	mh_arg1 any,
 	mh_arg2 any,
 	mh_arg3 any,
 	value *byte,
-	displayer func(ini_entry *ZendIniEntry, type_ int),
+	displayer ZendIniEntryDisplayer,
 	value_length uint32,
 	name_length uint16,
 	modifiable uint8,
@@ -55,7 +43,7 @@ func MakeZendIniEntryDef(
 		value:        value,
 		displayer:    displayer,
 		value_length: value_length,
-		name_length:  name_length,
+		name_length:  uint16(len(name)),
 		modifiable:   modifiable,
 	}
 }
