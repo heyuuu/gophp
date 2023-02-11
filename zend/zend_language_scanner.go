@@ -40,7 +40,7 @@ type ZendLexState struct {
 	state             int  // LANG_SCNG__().yy_state
 	stateStack        b.Stack[int]
 	heredocLabelStack b.Stack[*ZendHeredocLabel]
-	
+
 	in                   *ZendFileHandle
 	lineno               uint32
 	filename             *ZendString
@@ -61,9 +61,8 @@ type ZendLexState struct {
  * ZendHeredocLabel
  */
 type ZendHeredocLabel struct {
-	label                 *byte
-	length                int
-	indentation           int
+	label                 string
+	indentation           uint
 	indentationUsesSpaces bool
 }
 
@@ -74,7 +73,8 @@ func NewHeredocLabel(label string) *ZendHeredocLabel {
 	}
 }
 
-func (l *ZendHeredocLabel) GetLabel() string { return "" } // todo
+func (l *ZendHeredocLabel) Label() string { return l.label }
+func (l *ZendHeredocLabel) Length() uint  { return uint(len(l.label)) }
 func (l *ZendHeredocLabel) Copy() *ZendHeredocLabel {
 	newLabel := *l
 	return &newLabel

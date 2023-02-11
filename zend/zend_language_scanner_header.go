@@ -69,7 +69,6 @@ func StartupScanner() {
 	sc.heredocLabelStack.Clean()
 	sc.heredocScanAhead = false
 }
-func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { efree(heredoc_label.label) }
 func ShutdownScanner() {
 	var sc *LangScanner
 	CG__().parse_error = 0

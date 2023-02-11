@@ -400,10 +400,8 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 }
 func (sc *LangScanner) lexerRule22() (int, bool) {
 	var heredocLabel = sc.heredocLabelStack.Pop()
-	sc.len_ = heredocLabel.indentation + heredocLabel.length
-	sc.yyCursor += sc.len_ - 1
-	HeredocLabelDtor(heredocLabel)
-	efree(heredocLabel)
+	sc.len_ = heredocLabel.indentation + heredocLabel.Length()
+	sc.cursor += sc.len_ - 1
 	sc.begin(yycST_IN_SCRIPTING)
 	return sc.token(T_END_HEREDOC)
 }
@@ -527,8 +525,8 @@ func (sc *LangScanner) lexerRule25() (int, bool) {
 
 			/* Check for ending label on the next line */
 
-			if isLabelStart(sc.peek()) && heredocLabel.length < sc.yyLimit-sc.yyCursor && !(memcmp(sc.yyCursor, heredocLabel.label, heredocLabel.length)) {
-				if isLabelSuccessor(sc.yyCursor[heredocLabel.length]) {
+			if isLabelStart(sc.peek()) && sc.peekStrIs(heredocLabel.Label()) {
+				if isLabelSuccessor(sc.yyCursor[heredocLabel.Length()]) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
@@ -635,8 +633,8 @@ func (sc *LangScanner) lexerRule26() (int, bool) {
 
 			/* Check for ending label on the next line */
 
-			if isLabelStart(sc.peek()) && sc.HasPrefix(heredocLabel.GetLabel()) {
-				if isLabelSuccessor(sc.yyCursor[heredocLabel.length]) {
+			if isLabelStart(sc.peek()) && sc.HasPrefix(heredocLabel.Label()) {
+				if isLabelSuccessor(sc.yyCursor[heredocLabel.Length()]) {
 					continue
 				}
 				if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
