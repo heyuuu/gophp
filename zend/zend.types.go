@@ -118,7 +118,7 @@ type ZendUtilityFunctions struct {
 // error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any),
 // printf_function func(format *byte, _ ...any) int,
 // write_function func(str *byte, str_length int) int,
-// fopen_function func(filename *byte, opened_path **ZendString) *r.FILE,
+// fopen_function func(filename *byte, openedPath **ZendString) *r.FILE,
 // message_handler func(message ZendLong, data any),
 // get_configuration_directive func(name *ZendString) *Zval,
 // ticks_function func(ticks int),

@@ -15,7 +15,7 @@ const ZEND_MMAP_AHEAD = 32
 type ZendStreamType = int
 
 const (
-	ZEND_HANDLE_FILENAME = iota
+	ZEND_HANDLE_FILENAME = iota + 1
 	ZEND_HANDLE_FP
 	ZEND_HANDLE_STREAM
 )

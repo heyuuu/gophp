@@ -1115,11 +1115,13 @@ func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode in
 		handle.SetType(zend.ZEND_HANDLE_STREAM)
 		handle.SetFilename((*byte)(filename))
 		handle.SetOpenedPath(opened_path)
-		handle.GetStream().SetHandle(stream)
-		handle.GetStream().SetReader(zend.ZendStreamReaderT(_phpStreamRead))
-		handle.GetStream().SetFsizer(PhpZendStreamFsizer)
-		handle.GetStream().SetIsatty(0)
-		handle.GetStream().SetCloser(PhpZendStreamCloser)
+		handle.SetStream(zend.MakeZendStream(
+			stream,
+			0,
+			zend.ZendStreamReaderT(_phpStreamRead),
+			PhpZendStreamFsizer,
+			PhpZendStreamCloser,
+		))
 
 		/* suppress warning if this stream is not explicitly closed */
 

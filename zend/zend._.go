@@ -46,11 +46,13 @@ type ZendWriteFuncT func(str *byte, str_length int) int
 var ZendPrintf func(format *byte, _ ...any) int
 var ZendWrite ZendWriteFuncT
 var ZendFopen func(filename *byte, opened_path **ZendString) *r.FILE
+var ZendFopenEx func(filename string, opened_path *string) *r.FILE
 var ZendTicksFunction func(ticks int)
 var ZendInterruptFunction func(execute_data *ZendExecuteData)
 var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 var ZendOnTimeout func(seconds int)
-var ZendStreamOpenFunction func(filename *byte, handle *ZendFileHandle) int
+var ZendStreamOpenFunction func(filename string, handle *ZendFileHandle) int
+var ZendStreamOpenFunctionEx func(filename string, handle *ZendFileHandle) bool
 var ZendPrintfToSmartString func(buf *SmartString, format *byte, ap ...any)
 var ZendPrintfToSmartStr func(buf *SmartStr, format *byte, ap ...any)
 var ZendGetenv func(name *byte, name_len int) *byte

@@ -90,12 +90,8 @@ func ZendRestoreLexicalState(lexState *ZendLexState) {
 func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
 	ZendLlistDelElement(CG__().open_files, file_handle, (func(any, any) int)(ZendCompareFileHandles))
 
-	/* zend_file_handle_dtor() operates on the copy, so we have to NULLify the original here */
-
-	file_handle.opened_path = nil
-	if file_handle.free_filename {
-		file_handle.filename = nil
-	}
+	file_handle.openedPath = ""
+	file_handle.filename = ""
 }
 
 const BOM_UTF32_BE = "x00x00xfexff"
@@ -318,31 +314,33 @@ func ZendMultibyteSetFilter(onetime_encoding *zend_encoding) int {
 	}
 	return 0
 }
-func OpenFileForScanning(file_handle *ZendFileHandle) int {
-	var buf *byte
-	var size int
-	var compiled_filename *zend_string
-	if zend_stream_fixup(file_handle, &buf, &size) == FAILURE {
-
+func OpenFileForScanning(fileHandle *ZendFileHandle) int {
+	buf, ok := fileHandle.Fixup()
+	if !ok {
 		/* Still add it to open_files to make destroy_file_handle work */
-
-		zend_llist_add_element(CG__().open_files, file_handle)
+		ZendLlistAddElement(CG__().open_files, fileHandle)
 		return FAILURE
 	}
+	size := len(buf)
+
+	var compiled_filename *ZendString
 	ZEND_ASSERT(!(EG__().exception) && "stream_fixup() should have failed")
-	zend_llist_add_element(CG__().open_files, file_handle)
-	if file_handle.handle.stream.handle >= any(file_handle != nil && file_handle.handle.stream.handle <= any(file_handle+1)) {
-		var fh *zend_file_handle = (*zend_file_handle)(zend_llist_get_last(CG__().open_files))
-		var diff int = (*byte)(file_handle.handle.stream.handle - (*byte)(file_handle))
-		fh.handle.stream.handle = any((*byte)(fh) + diff)
-		file_handle.handle.stream.handle = fh.handle.stream.handle
+
+	ZendLlistAddElement(CG__().open_files, fileHandle)
+
+	// todo 没看懂
+	if fileHandle.stream.handle >= (any)(fileHandle) && fileHandle.stream.handle <= (any)(fileHandle+1)) {
+		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(CG__().open_files))
+		var diff int = (*byte)(fileHandle.stream.handle - (*byte)(fileHandle))
+		fh.stream.handle = any((*byte)(fh) + diff)
+		fileHandle.stream.handle = fh.stream.handle
 	}
 
 	/* Reset the scanner for scanning the new file */
 
-	LANG_SCNG__().yy_in = file_handle
+	LANG_SCNG__().yy_in = fileHandle
 	LANG_SCNG__().yy_start = nil
-	if size != size_t-1 {
+	if size != -1 {
 		if CG__().multibyte {
 			LANG_SCNG__().script_org = (*uint8)(buf)
 			LANG_SCNG__().script_org_size = size
@@ -367,10 +365,10 @@ func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	} else {
 		BEGIN(INITIAL)
 	}
-	if file_handle.opened_path {
-		compiled_filename = zend_string_copy(file_handle.opened_path)
+	if fileHandle.openedPath {
+		compiled_filename = zend_string_copy(fileHandle.openedPath)
 	} else {
-		compiled_filename = zend_string_init(file_handle.filename, strlen(file_handle.filename), 0)
+		compiled_filename = zend_string_init(fileHandle.filename, strlen(fileHandle.filename), 0)
 	}
 	zend_set_compiled_filename(compiled_filename)
 	zend_string_release_ex(compiled_filename, 0)
