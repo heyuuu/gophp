@@ -585,13 +585,7 @@ func (this *ZendPhpScannerGlobals) GetYyState() int                { return this
 func (this *ZendPhpScannerGlobals) SetYyState(value int)           { this.yy_state = value }
 func (this *ZendPhpScannerGlobals) GetStateStack() ZendStack       { return this.state_stack }
 func (this *ZendPhpScannerGlobals) SetStateStack(value ZendStack)  { this.state_stack = value }
-func (this *ZendPhpScannerGlobals) GetHeredocLabelStack() ZendPtrStack {
-	return this.heredoc_label_stack
-}
-func (this *ZendPhpScannerGlobals) SetHeredocLabelStack(value ZendPtrStack) {
-	this.heredoc_label_stack = value
-}
-func (this *ZendPhpScannerGlobals) GetHeredocScanAhead() ZendBool { return this.heredoc_scan_ahead }
+func (this *ZendPhpScannerGlobals) GetHeredocScanAhead() ZendBool  { return this.heredoc_scan_ahead }
 func (this *ZendPhpScannerGlobals) SetHeredocScanAhead(value ZendBool) {
 	this.heredoc_scan_ahead = value
 }
