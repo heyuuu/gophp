@@ -14,20 +14,8 @@ func ZendLlistAddElement(l *ZendLlist, element any) {
 func ZendLlistDelElement(l *ZendLlist, element any, compare func(element1 any, element2 any) int) {
 	l.DelElementByData(element, compare)
 }
-func ZendLlistDestroy(l *ZendLlist) {
-	l.Destroy()
-}
-func ZendLlistCopy(dst *ZendLlist, src *ZendLlist) {
-	dst.CopyFrom(src)
-}
 func ZendLlistApplyWithDel(l *ZendLlist, func_ func(data any) int) {
 	l.ApplyWithDel(func_)
-}
-func ZendLlistApply(l *ZendLlist, func_ LlistApplyFuncT) {
-	l.Apply(func_)
-}
-func ZendLlistSort(l *ZendLlist, comp_func LlistCompareFuncT) {
-	l.Sort(comp_func)
 }
 func ZendLlistApplyWithArgument(l *ZendLlist, func_ LlistApplyWithArgFuncT, arg any) {
 	l.ApplyWithArgument(func_, arg)

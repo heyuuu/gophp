@@ -2,15 +2,13 @@
 
 package zend
 
-import "sort"
-
 /**
  * ZendLlistElement
  */
 type ZendLlistElement struct {
 	next *ZendLlistElement
 	prev *ZendLlistElement
-	data []byte
+	data any
 }
 
 func NewZendLlistElement(data []byte) *ZendLlistElement {
@@ -25,7 +23,7 @@ func (this *ZendLlistElement) GetNext() *ZendLlistElement      { return this.nex
 func (this *ZendLlistElement) SetNext(value *ZendLlistElement) { this.next = value }
 func (this *ZendLlistElement) GetPrev() *ZendLlistElement      { return this.prev }
 func (this *ZendLlistElement) SetPrev(value *ZendLlistElement) { this.prev = value }
-func (this *ZendLlistElement) GetData() []byte                 { return this.data }
+func (this *ZendLlistElement) GetData() any                    { return this.data }
 
 // func (this *ZendLlistElement) SetData(value []byte) { this.data = value }
 
@@ -205,54 +203,19 @@ func (l *ZendLlist) ApplyWithArgument(f func(data any, arg any), arg any) {
 	}
 }
 
-func (l *ZendLlist) ApplyWithArguments(f func(data any, args ...any), args ...any) {
-	for element := l.head; element != nil; element = element.next {
-		f(element.data, args)
-	}
-}
-
-func (l *ZendLlist) GetFirst() {
-
-}
-
-func (l *ZendLlist) toSlice() []*ZendLlistElement {
+func (l *ZendLlist) ElementsData() []any {
 	if l.count == 0 {
 		return nil
 	}
 
-	elements := make([]*ZendLlistElement, 0, l.count)
+	elements := make([]any, 0, l.count)
 	for element := l.head; element != nil; element = element.next {
-		elements = append(elements, element)
+		elements = append(elements, element.data)
 	}
 	return elements
 }
 
-func (l *ZendLlist) Sort(compFunc LlistCompareFuncT) {
-	if l.count == 0 {
-		return
-	}
-
-	// 排序
-	elements := l.toSlice()
-	sort.Slice(elements, func(i, j int) bool {
-		p := &elements[i]
-		q := &elements[j]
-		// todo 确认正负号
-		return compFunc(p, q) > 0
-	})
-
-	// 重新链接
-	for i := 1; i < l.count; i++ {
-		elements[i].prev = elements[i-1]
-		elements[i-1].next = elements[i]
-	}
-	l.head = elements[0]
-	l.head.prev = nil
-	l.tail = elements[len(elements)-1]
-	l.tail.next = nil
-}
-
-func (l *ZendLlist) GetFirstEx(pos *ZendLlistPosition) []byte {
+func (l *ZendLlist) GetFirstEx(pos *ZendLlistPosition) any {
 	var current = pos
 	if pos == nil {
 		current = &l.traverse_ptr
@@ -260,7 +223,7 @@ func (l *ZendLlist) GetFirstEx(pos *ZendLlistPosition) []byte {
 
 	*current = l.head
 	if (*current) != nil {
-		return current.data
+		return (*current).data
 	} else {
 		return nil
 	}
@@ -272,7 +235,7 @@ func (l *ZendLlist) GetLastEx(pos *ZendLlistPosition) any {
 	}
 	*current = l.tail
 	if (*current) != nil {
-		return current.data
+		return (*current).data
 	} else {
 		return nil
 	}
@@ -283,9 +246,9 @@ func (l *ZendLlist) GetNextEx(pos *ZendLlistPosition) any {
 		current = &l.traverse_ptr
 	}
 	if (*current) != nil {
-		*current = current.next
+		*current = (*current).next
 		if (*current) != nil {
-			return current.data
+			return (*current).data
 		}
 	}
 	return nil

@@ -27,18 +27,18 @@ func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
 	return zend.ZEND_HASH_APPLY_KEEP
 }
-func ExtensionNameCmp(f **zend.ZendLlistElement, s **zend.ZendLlistElement) int {
-	var fe *zend.ZendExtension = (*zend.ZendExtension)(f.GetData())
-	var se *zend.ZendExtension = (*zend.ZendExtension)(s.GetData())
-	return strcmp(fe.GetName(), se.GetName())
-}
 func PrintExtensions() {
-	var sorted_exts zend.ZendLlist
-	zend.ZendLlistCopy(&sorted_exts, &zend.ZendExtensions)
-	sorted_exts.SetDtor(nil)
-	zend.ZendLlistSort(&sorted_exts, ExtensionNameCmp)
-	zend.ZendLlistApply(&sorted_exts, zend.LlistApplyFuncT(PrintExtensionInfo))
-	zend.ZendLlistDestroy(&sorted_exts)
+	elements := zend.ZendExtensions.ElementsData()
+	sort.Slice(elements, func(i, j int) bool {
+		ext1 := elements[i].(*zend.ZendExtension)
+		ext2 := elements[j].(*zend.ZendExtension)
+		return ext1.GetName() < ext2.GetName()
+	})
+
+	for _, element := range elements {
+		ext := element.(*zend.ZendExtension)
+		PrintExtensionInfo(ext, nil)
+	}
 }
 func SapiCliSelect(fd core.PhpSocketT) int {
 	var wfd fd_set
