@@ -46,5 +46,4 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 	zend.MakeZendIniEntryDef("assert.callback", OnChangeCallback, nil, nil, nil, nil, nil, core.PHP_INI_ALL),
 	zend.MakeZendIniEntryDef("assert.quiet_eval", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetQuietEval()))-(*byte)(nil))), any(&AssertGlobals), nil, "0", nil, core.PHP_INI_ALL),
 	zend.MakeZendIniEntryDef("assert.exception", zend.OnUpdateBool, any(zend_long((*byte)(&((*ZendAssertGlobals)(nil).GetException()))-(*byte)(nil))), any(&AssertGlobals), nil, "0", nil, core.PHP_INI_ALL),
-	zend.MakeZendIniEntryDef(nil, nil, nil, nil, nil, nil, nil, 0),
 }
