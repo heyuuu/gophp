@@ -166,23 +166,4 @@ type ZendHeredocLabel struct {
 	indentation_uses_spaces ZendBool
 }
 
-// func MakeZendHeredocLabel(label *byte, length int, indentation int, indentation_uses_spaces ZendBool) ZendHeredocLabel {
-//     return ZendHeredocLabel{
-//         label:label,
-//         length:length,
-//         indentation:indentation,
-//         indentation_uses_spaces:indentation_uses_spaces,
-//     }
-// }
-func (this *ZendHeredocLabel) GetLabel() *byte          { return this.label }
-func (this *ZendHeredocLabel) SetLabel(value *byte)     { this.label = value }
-func (this *ZendHeredocLabel) GetLength() int           { return this.length }
-func (this *ZendHeredocLabel) SetLength(value int)      { this.length = value }
-func (this *ZendHeredocLabel) GetIndentation() int      { return this.indentation }
-func (this *ZendHeredocLabel) SetIndentation(value int) { this.indentation = value }
-func (this *ZendHeredocLabel) GetIndentationUsesSpaces() ZendBool {
-	return this.indentation_uses_spaces
-}
-func (this *ZendHeredocLabel) SetIndentationUsesSpaces(value ZendBool) {
-	this.indentation_uses_spaces = value
-}
+func (l *ZendHeredocLabel) GetLabel() string { return "" } // todo

@@ -28,7 +28,18 @@ func (this *ZendStack[T]) Push(element T) int {
 	return len(this.elements)
 }
 
-func (this *ZendStack[T]) Top() any {
+func (this *ZendStack[T]) Pop() T {
+	var top = this.Top()
+
+	var len_ = len(this.elements)
+	if len_ > 0 {
+		this.elements = this.elements[:len_-1]
+	}
+
+	return top
+}
+
+func (this *ZendStack[T]) Top() T {
 	var lastIndex = len(this.elements) - 1
 	if lastIndex >= 0 {
 		return this.elements[lastIndex]
@@ -37,10 +48,7 @@ func (this *ZendStack[T]) Top() any {
 }
 
 func (this *ZendStack[T]) DelTop() {
-	var len_ = len(this.elements)
-	if len_ > 0 {
-		this.elements = this.elements[:len_-1]
-	}
+	this.Pop()
 }
 
 func (this *ZendStack[T]) Size() int {

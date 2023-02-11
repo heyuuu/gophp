@@ -225,6 +225,10 @@ func (this *Zval) SetDouble(d float64) {
 	this.SetDval(d)
 }
 
+func (this *Zval) SetRawString(s string) {
+	this.SetString(NewZendString(s))
+}
+
 func (this *Zval) SetString(s *ZendString) {
 	this.SetStr(s)
 	this.SetTypeInfo(IS_STRING_EX)
