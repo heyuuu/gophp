@@ -190,7 +190,7 @@ func SplAutoload(class_name *zend.ZendString, lc_name *zend.ZendString, ext *byt
 			zend.ZendDestroyFileHandle(&file_handle)
 		} else {
 			new_op_array = nil
-			zend.ZendFileHandleDtor(&file_handle)
+			file_handle.Destroy()
 		}
 		zend.ZendStringReleaseEx(opened_path, 0)
 		if new_op_array != nil {

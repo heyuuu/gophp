@@ -541,17 +541,14 @@ func MapFromUnicode(code unsigned, charset EntityCharset, res *unsigned) int {
 		table = UnimapMacroman
 		table_size = b.SizeOf("unimap_macroman") / b.SizeOf("* unimap_macroman")
 		goto table_over_7F
-		fallthrough
 	case CsCp1251:
 		table = UnimapWin1251
 		table_size = b.SizeOf("unimap_win1251") / b.SizeOf("* unimap_win1251")
 		goto table_over_7F
-		fallthrough
 	case CsKoi8r:
 		table = UnimapKoi8r
 		table_size = b.SizeOf("unimap_koi8r") / b.SizeOf("* unimap_koi8r")
 		goto table_over_7F
-		fallthrough
 	case CsCp866:
 		table = UnimapCp866
 		table_size = b.SizeOf("unimap_cp866") / b.SizeOf("* unimap_cp866")

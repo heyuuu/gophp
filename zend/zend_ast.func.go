@@ -1310,13 +1310,11 @@ tail_call:
 		}
 		ast = prop_ast
 		goto simple_list
-		fallthrough
 	case ZEND_AST_CONST_DECL:
 		fallthrough
 	case ZEND_AST_CLASS_CONST_DECL:
 		str.AppendString("const ")
 		goto simple_list
-		fallthrough
 	case ZEND_AST_NAME_LIST:
 		ZendAstExportNameList(str, (*ZendAstList)(ast), indent)
 	case ZEND_AST_USE:
@@ -1327,7 +1325,6 @@ tail_call:
 			str.AppendString("const ")
 		}
 		goto simple_list
-		fallthrough
 	case ZEND_AST_MAGIC_CONST:
 		switch ast.GetAttr() {
 		case T_LINE:
@@ -1377,7 +1374,6 @@ tail_call:
 		str.AppendString("...")
 		ast = ast.GetChild()[0]
 		goto tail_call
-		fallthrough
 	case ZEND_AST_UNARY_PLUS:
 		PREFIX_OP("+", 240, 241)
 		fallthrough
@@ -1502,7 +1498,6 @@ tail_call:
 		str.AppendByte('&')
 		ast = ast.GetChild()[0]
 		goto tail_call
-		fallthrough
 	case ZEND_AST_HALT_COMPILER:
 		APPEND_STR("__HALT_COMPILER()")
 		fallthrough

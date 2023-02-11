@@ -1249,7 +1249,7 @@ func _phpStreamPassthru(stream *core.PhpStream) ssize_t {
 	if PhpStreamMmapPossible(stream) {
 		var p *byte
 		var mapped int
-		p = _phpStreamMmapRange(stream, core.PhpStreamTell(stream), PHP_STREAM_MMAP_ALL, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped)
+		p = _phpStreamMmapRange(stream, stream.GetPosition(), PHP_STREAM_MMAP_ALL, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped)
 		if p != nil {
 			for {
 
@@ -1392,7 +1392,7 @@ func _phpStreamCopyToStreamEx(src *core.PhpStream, dest *core.PhpStream, maxlen 
 		for {
 			var chunk_size int = b.Cond(maxlen == 0 || maxlen > PHP_STREAM_MMAP_MAX, PHP_STREAM_MMAP_MAX, maxlen)
 			var mapped int
-			p = _phpStreamMmapRange(src, core.PhpStreamTell(src), chunk_size, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped)
+			p = _phpStreamMmapRange(src, src.GetPosition(), chunk_size, PHP_STREAM_MAP_MODE_SHARED_READONLY, &mapped)
 			if p != nil {
 				var didwrite ssize_t
 				if core.PhpStreamSeek(src, mapped, r.SEEK_CUR) != 0 {

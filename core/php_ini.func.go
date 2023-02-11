@@ -428,7 +428,7 @@ func PhpInitConfig() int {
 	PG(open_basedir) = open_basedir
 	if fp != nil {
 		var fh zend.ZendFileHandle
-		zend.ZendStreamInitFp(&fh, fp, filename)
+		fh.InitFp(fp, filename)
 		RESET_ACTIVE_INI_HASH()
 		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 		var tmp zend.Zval
@@ -513,7 +513,7 @@ func PhpInitConfig() int {
 					if zend.VCWD_STAT(ini_file, &sb) == 0 {
 						if zend.S_ISREG(sb.st_mode) {
 							var fh zend.ZendFileHandle
-							zend.ZendStreamInitFp(&fh, zend.VCWD_FOPEN(ini_file, "r"), ini_file)
+							fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
 							if fh.GetFp() != nil {
 								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash) == zend.SUCCESS {
 
@@ -592,7 +592,7 @@ func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.Ha
 	if zend.VCWD_STAT(ini_file, &sb) == 0 {
 		if zend.S_ISREG(sb.st_mode) {
 			var fh zend.ZendFileHandle
-			zend.ZendStreamInitFp(&fh, zend.VCWD_FOPEN(ini_file, "r"), ini_file)
+			fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
 			if fh.GetFp() != nil {
 
 				/* Reset active ini section */

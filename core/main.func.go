@@ -1756,13 +1756,13 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 			}
 		}
 		if PG(auto_prepend_file) && PG(auto_prepend_file)[0] {
-			zend.ZendStreamInitFilename(&prepend_file, PG(auto_prepend_file))
+			prepend_file.InitFilename(PG(auto_prepend_file))
 			prepend_file_p = &prepend_file
 		} else {
 			prepend_file_p = nil
 		}
 		if PG(auto_append_file) && PG(auto_append_file)[0] {
-			zend.ZendStreamInitFilename(&append_file, PG(auto_append_file))
+			append_file.InitFilename(PG(auto_append_file))
 			append_file_p = &append_file
 		} else {
 			append_file_p = nil

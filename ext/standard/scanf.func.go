@@ -808,7 +808,6 @@ func PhpSscanfInternal(
 						flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					}
 					goto addToInt
-					fallthrough
 				case '1':
 					fallthrough
 				case '2':
@@ -827,7 +826,6 @@ func PhpSscanfInternal(
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
-					fallthrough
 				case '8':
 					fallthrough
 				case '9':
@@ -839,7 +837,6 @@ func PhpSscanfInternal(
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
-					fallthrough
 				case 'A':
 					fallthrough
 				case 'B':
@@ -868,7 +865,6 @@ func PhpSscanfInternal(
 					}
 					flags &= ^(SCAN_SIGNOK | SCAN_XOK | SCAN_NODIGITS)
 					goto addToInt
-					fallthrough
 				case '+':
 					fallthrough
 				case '-':
@@ -986,7 +982,6 @@ func PhpSscanfInternal(
 				case '9':
 					flags &= ^(SCAN_SIGNOK | SCAN_NODIGITS)
 					goto addToFloat
-					fallthrough
 				case '+':
 					fallthrough
 				case '-':

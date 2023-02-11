@@ -2706,7 +2706,7 @@ func ZifPhpStripWhitespace(execute_data *zend.ZendExecuteData, return_value *zen
 		break
 	}
 	core.PhpOutputStartDefault()
-	zend.ZendStreamInitFilename(&file_handle, filename)
+	file_handle.InitFilename(filename)
 	zend.ZendSaveLexicalState(&original_lex_state)
 	if zend.OpenFileForScanning(&file_handle) == zend.FAILURE {
 		zend.ZendRestoreLexicalState(&original_lex_state)
@@ -4331,7 +4331,7 @@ func ZifParseIniFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 	/* Setup filehandle */
 
-	zend.ZendStreamInitFilename(&fh, filename)
+	fh.InitFilename(filename)
 	zend.ArrayInit(return_value)
 	if zend.ZendParseIniFile(&fh, 0, int(scanner_mode), ini_parser_cb, return_value) == zend.FAILURE {
 		return_value.GetArr().DestroyEx()

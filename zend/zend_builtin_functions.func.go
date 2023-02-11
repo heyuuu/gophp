@@ -2095,8 +2095,8 @@ func ZifSetErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	if EG__().GetUserErrorHandler().GetType() != IS_UNDEF {
 		ZVAL_COPY(return_value, EG__().GetUserErrorHandler())
 	}
-	ZendStackPush(EG__().GetUserErrorHandlersErrorReporting(), EG__().GetUserErrorHandlerErrorReporting())
-	ZendStackPush(EG__().GetUserErrorHandlers(), EG__().GetUserErrorHandler())
+	EG__().GetUserErrorHandlersErrorReporting().Push(EG__().GetUserErrorHandlerErrorReporting())
+	EG__().GetUserErrorHandlers().Push(EG__().GetUserErrorHandler())
 	if error_handler.IsNull() {
 		EG__().GetUserErrorHandler().SetUndef()
 		return
@@ -2119,10 +2119,10 @@ func ZifRestoreErrorHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	} else {
 		var tmp *Zval
 		EG__().SetUserErrorHandlerErrorReporting(ZendStackIntTop(EG__().GetUserErrorHandlersErrorReporting()))
-		ZendStackDelTop(EG__().GetUserErrorHandlersErrorReporting())
-		tmp = ZendStackTop(EG__().GetUserErrorHandlers())
+		EG__().GetUserErrorHandlersErrorReporting().DelTop()
+		tmp = EG__().GetUserErrorHandlers().Top()
 		ZVAL_COPY_VALUE(EG__().GetUserErrorHandler(), tmp)
-		ZendStackDelTop(EG__().GetUserErrorHandlers())
+		EG__().GetUserErrorHandlers().DelTop()
 	}
 	return_value.SetTrue()
 	return
@@ -2143,7 +2143,7 @@ func ZifSetExceptionHandler(execute_data *ZendExecuteData, return_value *Zval) {
 	if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
 		ZVAL_COPY(return_value, EG__().GetUserExceptionHandler())
 	}
-	ZendStackPush(EG__().GetUserExceptionHandlers(), EG__().GetUserExceptionHandler())
+	EG__().GetUserExceptionHandlers().Push(EG__().GetUserExceptionHandler())
 	if exception_handler.IsNull() {
 		EG__().GetUserExceptionHandler().SetUndef()
 		return
@@ -2160,9 +2160,9 @@ func ZifRestoreExceptionHandler(execute_data *ZendExecuteData, return_value *Zva
 	if ZendStackIsEmpty(EG__().GetUserExceptionHandlers()) != 0 {
 		EG__().GetUserExceptionHandler().SetUndef()
 	} else {
-		var tmp *Zval = ZendStackTop(EG__().GetUserExceptionHandlers())
+		var tmp *Zval = EG__().GetUserExceptionHandlers().Top()
 		ZVAL_COPY_VALUE(EG__().GetUserExceptionHandler(), tmp)
-		ZendStackDelTop(EG__().GetUserExceptionHandlers())
+		EG__().GetUserExceptionHandlers().DelTop()
 	}
 	return_value.SetTrue()
 	return

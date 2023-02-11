@@ -2086,7 +2086,7 @@ func zim_spl_SplFileObject_ftell(execute_data *zend.ZendExecuteData, return_valu
 		zend.ZendThrowExceptionEx(spl_ce_RuntimeException, 0, "Object not initialized")
 		return
 	}
-	ret = core.PhpStreamTell(intern.GetStream())
+	ret = intern.GetStream().GetPosition()
 	if ret == -1 {
 		return_value.SetFalse()
 		return

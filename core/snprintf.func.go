@@ -635,7 +635,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					i_num = WideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					i_num = WideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -664,7 +663,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 						i_num = WideInt(__va_arg(ap, int(_)))
 					case LM_LONG_DOUBLE:
 						goto fmt_error
-						fallthrough
 					case LM_LONG:
 						i_num = WideInt(__va_arg(ap, long__int(_)))
 					case LM_SIZE_T:
@@ -696,7 +694,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -724,7 +721,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -861,7 +857,6 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 			case 'n':
 				*(__va_arg(ap, (*int)(_))) = cc
 				goto skip_output
-				fallthrough
 			case 'p':
 				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))

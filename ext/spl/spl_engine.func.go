@@ -57,7 +57,6 @@ try_again:
 	case zend.IS_REFERENCE:
 		offset = zend.Z_REFVAL_P(offset)
 		goto try_again
-		fallthrough
 	case zend.IS_RESOURCE:
 		return zend.Z_RES_HANDLE_P(offset)
 	}

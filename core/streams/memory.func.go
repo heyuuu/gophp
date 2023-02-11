@@ -322,7 +322,7 @@ func PhpStreamTempSeek(stream *core.PhpStream, offset zend.ZendOffT, whence int,
 		return -1
 	}
 	ret = core.PhpStreamSeek(ts.GetInnerstream(), offset, whence)
-	*newoffs = core.PhpStreamTell(ts.GetInnerstream())
+	*newoffs = ts.GetInnerstream().GetPosition()
 	stream.SetEof(ts.GetInnerstream().GetEof())
 	return ret
 }
@@ -364,7 +364,7 @@ func PhpStreamTempCast(stream *core.PhpStream, castas int, ret *any) int {
 
 	membuf = core.PhpStreamMemoryGetBuffer(ts.GetInnerstream(), &memsize)
 	core.PhpStreamWrite(file, membuf, memsize)
-	pos = core.PhpStreamTell(ts.GetInnerstream())
+	pos = ts.GetInnerstream().GetPosition()
 	core.PhpStreamFreeEnclosed(ts.GetInnerstream(), core.PHP_STREAM_FREE_CLOSE)
 	ts.SetInnerstream(file)
 	PhpStreamEncloses(stream, ts.GetInnerstream())

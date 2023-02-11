@@ -202,7 +202,6 @@ try_again:
 	case zend.IS_NULL:
 		offset_key = zend.ZSTR_EMPTY_ALLOC()
 		goto fetch_dim_string
-		fallthrough
 	case zend.IS_STRING:
 		offset_key = offset.GetStr()
 	fetch_dim_string:
@@ -250,19 +249,15 @@ try_again:
 		zend.ZendError(zend.E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", zend.Z_RES_P(offset).GetHandle(), zend.Z_RES_P(offset).GetHandle())
 		index = zend.Z_RES_P(offset).GetHandle()
 		goto num_index
-		fallthrough
 	case zend.IS_DOUBLE:
 		index = zend.ZendLong(offset.GetDval())
 		goto num_index
-		fallthrough
 	case zend.IS_FALSE:
 		index = 0
 		goto num_index
-		fallthrough
 	case zend.IS_TRUE:
 		index = 1
 		goto num_index
-		fallthrough
 	case zend.IS_LONG:
 		index = offset.GetLval()
 	num_index:
@@ -288,7 +283,6 @@ try_again:
 	case zend.IS_REFERENCE:
 		zend.ZVAL_DEREF(offset)
 		goto try_again
-		fallthrough
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
 		if type_ == zend.BP_VAR_W || type_ == zend.BP_VAR_RW {
@@ -373,19 +367,15 @@ try_again:
 	case zend.IS_DOUBLE:
 		index = zend.ZendLong(offset.GetDval())
 		goto num_index
-		fallthrough
 	case zend.IS_RESOURCE:
 		index = zend.Z_RES_HANDLE_P(offset)
 		goto num_index
-		fallthrough
 	case zend.IS_FALSE:
 		index = 0
 		goto num_index
-		fallthrough
 	case zend.IS_TRUE:
 		index = 1
 		goto num_index
-		fallthrough
 	case zend.IS_LONG:
 		index = offset.GetLval()
 	num_index:
@@ -399,7 +389,6 @@ try_again:
 	case zend.IS_REFERENCE:
 		zend.ZVAL_DEREF(offset)
 		goto try_again
-		fallthrough
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
 		zend.ZvalPtrDtor(value)
@@ -457,19 +446,15 @@ try_again:
 	case zend.IS_DOUBLE:
 		index = zend.ZendLong(offset.GetDval())
 		goto num_index
-		fallthrough
 	case zend.IS_RESOURCE:
 		index = zend.Z_RES_HANDLE_P(offset)
 		goto num_index
-		fallthrough
 	case zend.IS_FALSE:
 		index = 0
 		goto num_index
-		fallthrough
 	case zend.IS_TRUE:
 		index = 1
 		goto num_index
-		fallthrough
 	case zend.IS_LONG:
 		index = offset.GetLval()
 	num_index:
@@ -480,7 +465,6 @@ try_again:
 	case zend.IS_REFERENCE:
 		zend.ZVAL_DEREF(offset)
 		goto try_again
-		fallthrough
 	default:
 		zend.ZendError(zend.E_WARNING, "Illegal offset type")
 		return
@@ -526,19 +510,15 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 		case zend.IS_DOUBLE:
 			index = zend.ZendLong(offset.GetDval())
 			goto num_index
-			fallthrough
 		case zend.IS_RESOURCE:
 			index = zend.Z_RES_HANDLE_P(offset)
 			goto num_index
-			fallthrough
 		case zend.IS_FALSE:
 			index = 0
 			goto num_index
-			fallthrough
 		case zend.IS_TRUE:
 			index = 1
 			goto num_index
-			fallthrough
 		case zend.IS_LONG:
 			index = offset.GetLval()
 		num_index:
@@ -552,7 +532,6 @@ func SplArrayHasDimensionEx(check_inherited int, object *zend.Zval, offset *zend
 		case zend.IS_REFERENCE:
 			zend.ZVAL_DEREF(offset)
 			goto try_again
-			fallthrough
 		default:
 			zend.ZendError(zend.E_WARNING, "Illegal offset type")
 			return 0

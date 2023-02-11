@@ -9,4 +9,3 @@ type IStream interface {
 	Isatty() bool
 	FileSize() int
 }
-

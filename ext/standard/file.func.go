@@ -2298,7 +2298,7 @@ func ZifFtell(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		break
 	}
 	PHP_STREAM_TO_ZVAL(stream, res)
-	ret = core.PhpStreamTell(stream)
+	ret = stream.GetPosition()
 	if ret == -1 {
 		return_value.SetFalse()
 		return
@@ -3580,7 +3580,6 @@ func PhpFgetcsvLookupTrailingSpaces(ptr *byte, len_ int, delimiter byte) *byte {
 			core.PhpIgnoreValue(mblen(nil, 0))
 		case 0:
 			goto quit_loop
-			fallthrough
 		case 1:
 			fallthrough
 		default:
@@ -4089,7 +4088,6 @@ func PhpFgetcsv(
 						tptr += bptr - hunk_begin - 1
 						hunk_begin = bptr
 						goto quit_loop_2
-						fallthrough
 					case 1:
 						memcpy(tptr, hunk_begin, bptr-hunk_begin)
 						tptr += bptr - hunk_begin
@@ -4186,7 +4184,6 @@ func PhpFgetcsv(
 						tptr += bptr - hunk_begin - 1
 						hunk_begin = bptr
 						goto quit_loop_2
-						fallthrough
 					case 1:
 						bptr += inc_len
 						memcpy(tptr, hunk_begin, bptr-hunk_begin)
@@ -4215,7 +4212,6 @@ func PhpFgetcsv(
 				switch inc_len {
 				case 0:
 					goto quit_loop_3
-					fallthrough
 				case -2:
 					fallthrough
 				case -1:
@@ -4254,7 +4250,6 @@ func PhpFgetcsv(
 				switch inc_len {
 				case 0:
 					goto quit_loop_4
-					fallthrough
 				case -2:
 					fallthrough
 				case -1:

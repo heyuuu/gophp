@@ -133,7 +133,6 @@ func SplRecursiveItMoveForwardEx(object *SplRecursiveItObject, zthis *zend.Zval)
 						case RIT_CHILD_FIRST:
 							object.GetIterators()[object.GetLevel()].SetState(RS_CHILD)
 							goto next_step
-							fallthrough
 						case RIT_SELF_FIRST:
 							object.GetIterators()[object.GetLevel()].SetState(RS_SELF)
 							goto next_step

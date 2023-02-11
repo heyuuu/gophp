@@ -278,7 +278,7 @@ func ZendParseIniFile(fh *ZendFileHandle, unbuffered_errors ZendBool, scanner_mo
 	}
 	CG__().SetIniParserUnbufferedErrors(unbuffered_errors)
 	retval = IniParse()
-	ZendFileHandleDtor(fh)
+	fh.Destroy()
 	ShutdownIniScanner()
 	if retval == 0 {
 		return SUCCESS
@@ -639,7 +639,6 @@ func IniYytnamerr(yyres *byte, yystr *byte) YYSIZE_T {
 				fallthrough
 			case ',':
 				goto do_not_strip_quotes
-				fallthrough
 			case '\\':
 				if (*(b.PreInc(&yyp))) != '\\' {
 					goto do_not_strip_quotes

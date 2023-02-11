@@ -119,7 +119,7 @@ func _phpStreamCast(stream *core.PhpStream, castas int, ret *any, show_err int) 
 			/* If the stream position is not at the start, we need to force
 			 * the stdio layer to believe it's real location. */
 
-			pos = core.PhpStreamTell(stream)
+			pos = stream.GetPosition()
 			if pos > 0 {
 				zend.ZendFseek(*ret, pos, r.SEEK_SET)
 			}

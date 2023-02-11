@@ -58,7 +58,7 @@ func PhpOutputShutdown() {
 }
 func PhpOutputActivate() int {
 	memset(&OutputGlobals, 0, b.SizeOf("zend_output_globals"))
-	zend.ZendStackInit(&(OG(handlers)), b.SizeOf("php_output_handler *"))
+	OG(handlers).Init()
 	OG(flags) |= PHP_OUTPUT_ACTIVATED
 	return zend.SUCCESS
 }
@@ -73,12 +73,12 @@ func PhpOutputDeactivate() {
 		/* release all output handlers */
 
 		if OG(handlers).elements {
-			for b.Assign(&handler, zend.ZendStackTop(&(OG(handlers)))) {
+			for b.Assign(&handler, OG(handlers).Top()) {
 				PhpOutputHandlerFree(handler)
-				zend.ZendStackDelTop(&(OG(handlers)))
+				OG(handlers).DelTop()
 			}
 		}
-		zend.ZendStackDestroy(&(OG(handlers)))
+		OG(handlers).Destroy()
 	}
 }
 func PhpOutputRegisterConstants() {
@@ -124,9 +124,9 @@ func PhpOutputFlush() int {
 		PhpOutputContextInit(&context, PHP_OUTPUT_HANDLER_FLUSH)
 		PhpOutputHandlerOp(OG(active), &context)
 		if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 {
-			zend.ZendStackDelTop(&(OG(handlers)))
+			OG(handlers).DelTop()
 			PhpOutputWrite(context.GetOut().GetData(), context.GetOut().GetUsed())
-			zend.ZendStackPush(&(OG(handlers)), &(OG(active)))
+			OG(handlers).Push(&(OG(active)))
 		}
 		PhpOutputContextDtor(&context)
 		return zend.SUCCESS
@@ -318,7 +318,7 @@ func PhpOutputHandlerStart(handler *PhpOutputHandler) int {
 
 	/* zend_stack_push returns stack level */
 
-	handler.SetLevel(zend.ZendStackPush(&(OG(handlers)), &handler))
+	handler.SetLevel(OG(handlers).Push(&handler))
 	OG(active) = handler
 	return zend.SUCCESS
 }
@@ -700,7 +700,7 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 		context.GetIn().SetUsed(len_)
 		if obh_cnt > 1 {
 			zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_TOPDOWN, PhpOutputStackApplyOp, &context)
-		} else if b.Assign(&active, zend.ZendStackTop(&(OG(handlers)))) && !active.IsDisabled() {
+		} else if b.Assign(&active, OG(handlers).Top()) && !active.IsDisabled() {
 			PhpOutputHandlerOp(*active, &context)
 		} else {
 			PhpOutputContextPass(&context)
@@ -850,8 +850,8 @@ func PhpOutputStackPop(flags int) int {
 
 		/* pop it off the stack */
 
-		zend.ZendStackDelTop(&(OG(handlers)))
-		if b.Assign(&current, zend.ZendStackTop(&(OG(handlers)))) {
+		OG(handlers).DelTop()
+		if b.Assign(&current, OG(handlers).Top()) {
 			OG(active) = *current
 		} else {
 			OG(active) = nil

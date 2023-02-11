@@ -866,7 +866,6 @@ func ZendStrtod(s00 *byte, se **byte) float64 {
 			fallthrough
 		case 0:
 			goto ret0
-			fallthrough
 		case '\t':
 			fallthrough
 		case '\n':

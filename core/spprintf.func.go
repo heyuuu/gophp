@@ -239,7 +239,6 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					i_num = WideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					i_num = WideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -268,7 +267,6 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 						i_num = WideInt(__va_arg(ap, int(_)))
 					case LM_LONG_DOUBLE:
 						goto fmt_error
-						fallthrough
 					case LM_LONG:
 						i_num = WideInt(__va_arg(ap, long__int(_)))
 					case LM_SIZE_T:
@@ -300,7 +298,6 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -328,7 +325,6 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					ui_num = UWideInt(__va_arg(ap, uint(_)))
 				case LM_LONG_DOUBLE:
 					goto fmt_error
-					fallthrough
 				case LM_LONG:
 					ui_num = UWideInt(__va_arg(ap, unsigned__long__int(_)))
 				case LM_SIZE_T:
@@ -470,7 +466,6 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartStr)(xbuf).GetS().GetLen())
 				}
 				goto skip_output
-				fallthrough
 			case 'p':
 				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
 					ui_num = u_wide_int(int(__va_arg(ap, (*byte)(_))))

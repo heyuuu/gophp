@@ -1658,7 +1658,6 @@ func PhpBasename(s *byte, len_ int, suffix *byte, sufflen int) *zend.ZendString 
 			core.PhpIgnoreValue(mblen(nil, 0))
 		case 0:
 			goto quit_loop
-			fallthrough
 		case 1:
 			if (*c) == '/' {
 				if state == 1 {
@@ -5535,7 +5534,6 @@ func PhpAddslashes(str *zend.ZendString) *zend.ZendString {
 			fallthrough
 		case '\\':
 			goto do_escape
-			fallthrough
 		default:
 			source++
 		}
@@ -6778,16 +6776,12 @@ func PhpStripTagsEx(
 		switch state {
 		case 1:
 			goto state_1
-			fallthrough
 		case 2:
 			goto state_2
-			fallthrough
 		case 3:
 			goto state_3
-			fallthrough
 		case 4:
 			goto state_4
-			fallthrough
 		default:
 
 		}
@@ -6820,7 +6814,6 @@ state_0:
 		}
 		p++
 		goto state_1
-		fallthrough
 	case '>':
 		if depth != 0 {
 			depth--
@@ -6882,7 +6875,6 @@ state_1:
 		}
 		p++
 		goto state_0
-		fallthrough
 	case '"':
 		fallthrough
 	case '\'':
@@ -6894,7 +6886,6 @@ state_1:
 			}
 		}
 		goto reg_char_1
-		fallthrough
 	case '!':
 
 		/* JavaScript & Other HTML scripting languages */
@@ -7015,7 +7006,6 @@ state_3:
 		tp = tbuf
 		p++
 		goto state_0
-		fallthrough
 	case '"':
 		fallthrough
 	case '\'':

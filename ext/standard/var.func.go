@@ -401,7 +401,6 @@ again:
 		}
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
-		fallthrough
 	default:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
@@ -1211,7 +1210,6 @@ again:
 	case zend.IS_REFERENCE:
 		struc = zend.Z_REFVAL_P(struc)
 		goto again
-		fallthrough
 	default:
 		buf.AppendString("i:0;")
 		return

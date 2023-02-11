@@ -1277,7 +1277,6 @@ try_again:
 		case IS_REFERENCE:
 			dim = Z_REFVAL_P(dim)
 			goto try_again
-			fallthrough
 		default:
 			ZendIllegalOffset()
 		}
@@ -2234,7 +2233,6 @@ func ZendFetchDimensionAddressRead(
 			case IS_REFERENCE:
 				dim = Z_REFVAL_P(dim)
 				goto try_string_offset
-				fallthrough
 			default:
 				ZendIllegalOffset()
 			}
@@ -3873,7 +3871,7 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 				}
 				return op_array
 			} else {
-				ZendFileHandleDtor(&file_handle)
+				file_handle.Destroy()
 			already_compiled:
 				new_op_array = ZEND_FAKE_OP_ARRAY
 			}

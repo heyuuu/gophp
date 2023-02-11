@@ -927,7 +927,7 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 	if desiredpos >= 0 {
 		var seek_res int = 0
 		var position zend.ZendOffT
-		position = core.PhpStreamTell(stream)
+		position = stream.GetPosition()
 		if position >= 0 && desiredpos > position {
 
 			/* use SEEK_CUR to allow emulation in streams that don't support seeking */

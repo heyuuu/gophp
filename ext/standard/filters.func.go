@@ -1194,7 +1194,6 @@ func StrfilterConvertAppendBucket(
 			case PHP_CONV_ERR_INVALID_SEQ:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 				goto out_failure
-				fallthrough
 			case PHP_CONV_ERR_MORE:
 				if ps != nil {
 					if icnt > 0 {
@@ -1214,7 +1213,6 @@ func StrfilterConvertAppendBucket(
 			case PHP_CONV_ERR_UNEXPECTED_EOS:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unexpected end of stream", inst.GetFiltername())
 				goto out_failure
-				fallthrough
 			case PHP_CONV_ERR_TOO_BIG:
 				var new_out_buf *byte
 				var new_out_buf_size int
@@ -1241,7 +1239,6 @@ func StrfilterConvertAppendBucket(
 			case PHP_CONV_ERR_UNKNOWN:
 				core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 				goto out_failure
-				fallthrough
 			default:
 
 			}
@@ -1259,7 +1256,6 @@ func StrfilterConvertAppendBucket(
 		case PHP_CONV_ERR_INVALID_SEQ:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): invalid byte sequence", inst.GetFiltername())
 			goto out_failure
-			fallthrough
 		case PHP_CONV_ERR_MORE:
 			if ps != nil {
 				if icnt > b.SizeOf("inst -> stub") {
@@ -1300,7 +1296,6 @@ func StrfilterConvertAppendBucket(
 		case PHP_CONV_ERR_UNKNOWN:
 			core.PhpErrorDocref(nil, zend.E_WARNING, "stream filter (%s): unknown error", inst.GetFiltername())
 			goto out_failure
-			fallthrough
 		default:
 			if ps == nil {
 				icnt = 0
@@ -1405,7 +1400,7 @@ func ConsumedFilterFilter(
 	var bucket *streams.PhpStreamBucket
 	var consumed int = 0
 	if data.GetOffset() == ^0 {
-		data.SetOffset(core.PhpStreamTell(stream))
+		data.SetOffset(stream.GetPosition())
 	}
 	for b.Assign(&bucket, buckets_in.GetHead()) != nil {
 		streams.PhpStreamBucketUnlink(bucket)

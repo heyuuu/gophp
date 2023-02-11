@@ -177,16 +177,16 @@ func ZendIniCopyTypedValue(retval *Zval, type_ int, str *byte, len_ int) {
 	}
 }
 func _yyPushState(new_state int) {
-	ZendStackPush(&(SCNG(state_stack)), any(&(YYGETCONDITION())))
+	SCNG(state_stack).Push(any(&(YYGETCONDITION())))
 	YYSETCONDITION(new_state)
 }
 
 // #define yy_push_state(state_and_tsrm) _yy_push_state ( yyc ## state_and_tsrm )
 
 func YyPopState() {
-	var stack_state *int = ZendStackTop(&(SCNG(state_stack)))
+	var stack_state *int = SCNG(state_stack).Top()
 	YYSETCONDITION(*stack_state)
-	ZendStackDelTop(&(SCNG(state_stack)))
+	SCNG(state_stack).DelTop()
 }
 func YyScanBuffer(str *byte, len_ uint) {
 	YYCURSOR = (*uint8)(str)
@@ -214,7 +214,7 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 	} else {
 		IniFilename = nil
 	}
-	ZendStackInit(&(SCNG(state_stack)), b.SizeOf("int"))
+	SCNG(state_stack).Init()
 	BEGIN(INITIAL)
 	return SUCCESS
 }
@@ -222,7 +222,7 @@ func InitIniScanner(scanner_mode int, fh *ZendFileHandle) int {
 /* }}} */
 
 func ShutdownIniScanner() {
-	ZendStackDestroy(&(SCNG(state_stack)))
+	SCNG(state_stack).Destroy()
 	if IniFilename {
 		Free(IniFilename)
 	}
@@ -251,7 +251,7 @@ func ZendIniOpenFileForScanning(fh *ZendFileHandle, scanner_mode int) int {
 		return FAILURE
 	}
 	if InitIniScanner(scanner_mode, fh) == FAILURE {
-		ZendFileHandleDtor(fh)
+		fh.Destroy()
 		return FAILURE
 	}
 	YyScanBuffer(buf, uint(size))
@@ -384,16 +384,12 @@ yyc_INITIAL:
 	switch yych {
 	case '\t':
 		goto yy4
-		fallthrough
 	case '\n':
 		goto yy6
-		fallthrough
 	case '\r':
 		goto yy8
-		fallthrough
 	case ' ':
 		goto yy9
-		fallthrough
 	case '!':
 		fallthrough
 	case '"':
@@ -416,7 +412,6 @@ yyc_INITIAL:
 		fallthrough
 	case '~':
 		goto yy10
-		fallthrough
 	case '%':
 		fallthrough
 	case '\'':
@@ -445,41 +440,32 @@ yyc_INITIAL:
 		fallthrough
 	case ']':
 		goto yy12
-		fallthrough
 	case ';':
 		goto yy13
-		fallthrough
 	case '=':
 		goto yy15
-		fallthrough
 	case 'F':
 		fallthrough
 	case 'f':
 		goto yy17
-		fallthrough
 	case 'N':
 		fallthrough
 	case 'n':
 		goto yy18
-		fallthrough
 	case 'O':
 		fallthrough
 	case 'o':
 		goto yy19
-		fallthrough
 	case 'T':
 		fallthrough
 	case 't':
 		goto yy20
-		fallthrough
 	case 'Y':
 		fallthrough
 	case 'y':
 		goto yy21
-		fallthrough
 	case '[':
 		goto yy22
-		fallthrough
 	default:
 		goto yy2
 	}
@@ -3210,18 +3196,14 @@ yyc_ST_VALUE:
 	switch yych {
 	case 0x0:
 		goto yy221
-		fallthrough
 	case '\t':
 		fallthrough
 	case ' ':
 		goto yy225
-		fallthrough
 	case '\n':
 		goto yy227
-		fallthrough
 	case '\r':
 		goto yy229
-		fallthrough
 	case '!':
 		fallthrough
 	case '&':
@@ -3236,22 +3218,16 @@ yyc_ST_VALUE:
 		fallthrough
 	case '~':
 		goto yy230
-		fallthrough
 	case '"':
 		goto yy232
-		fallthrough
 	case '$':
 		goto yy234
-		fallthrough
 	case '\'':
 		goto yy235
-		fallthrough
 	case '-':
 		goto yy236
-		fallthrough
 	case '.':
 		goto yy237
-		fallthrough
 	case '0':
 		fallthrough
 	case '1':
@@ -3272,13 +3248,10 @@ yyc_ST_VALUE:
 		fallthrough
 	case '9':
 		goto yy238
-		fallthrough
 	case ';':
 		goto yy240
-		fallthrough
 	case '=':
 		goto yy241
-		fallthrough
 	case 'A':
 		fallthrough
 	case 'B':
@@ -3365,32 +3338,26 @@ yyc_ST_VALUE:
 		fallthrough
 	case 'z':
 		goto yy243
-		fallthrough
 	case 'F':
 		fallthrough
 	case 'f':
 		goto yy245
-		fallthrough
 	case 'N':
 		fallthrough
 	case 'n':
 		goto yy246
-		fallthrough
 	case 'O':
 		fallthrough
 	case 'o':
 		goto yy247
-		fallthrough
 	case 'T':
 		fallthrough
 	case 't':
 		goto yy248
-		fallthrough
 	case 'Y':
 		fallthrough
 	case 'y':
 		goto yy249
-		fallthrough
 	default:
 		goto yy223
 	}

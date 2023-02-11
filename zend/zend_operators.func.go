@@ -549,7 +549,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	case IS_STRING:
 		var str *ZendString
 		str = op.GetStr()
@@ -694,7 +693,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -741,7 +739,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -796,7 +793,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -869,7 +865,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -924,7 +919,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 		ConvertScalarToArray(op)
 	}
@@ -958,7 +952,6 @@ try_again:
 	case IS_REFERENCE:
 		ZendUnwrapReference(op)
 		goto try_again
-		fallthrough
 	default:
 		var tmp Zval
 		ZVAL_COPY_VALUE(&tmp, op)
@@ -1065,7 +1058,6 @@ try_again:
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -1109,7 +1101,6 @@ try_again:
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
-		fallthrough
 	default:
 
 	}
@@ -1167,7 +1158,6 @@ try_again:
 	case IS_REFERENCE:
 		op = Z_REFVAL_P(op)
 		goto try_again
-		fallthrough
 	case IS_STRING:
 		return op.GetStr().Copy()
 	default:
@@ -1836,7 +1826,6 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
-		fallthrough
 	default:
 		if op1.IsObject() && Z_OBJ_HT(*op1).GetDoOperation() != nil && SUCCESS == Z_OBJ_HT(*op1).GetDoOperation()(ZEND_BW_NOT, result, op1, nil) {
 			return SUCCESS
@@ -2929,7 +2918,6 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
-		fallthrough
 	default:
 		return FAILURE
 	}
@@ -2986,7 +2974,6 @@ try_again:
 	case IS_REFERENCE:
 		op1 = Z_REFVAL_P(op1)
 		goto try_again
-		fallthrough
 	default:
 		return FAILURE
 	}

@@ -277,7 +277,7 @@ func BrowscapReadFile(filename *byte, browdata *BrowserData, persistent int) int
 	if filename == nil || filename[0] == '0' {
 		return zend.FAILURE
 	}
-	zend.ZendStreamInitFp(&fh, zend.VCWD_FOPEN(filename, "r"), filename)
+	fh.InitFp(zend.VCWD_FOPEN(filename, "r"), filename)
 	if fh.GetFp() == nil {
 		zend.ZendError(zend.E_CORE_WARNING, "Cannot open '%s' for reading", filename)
 		return zend.FAILURE

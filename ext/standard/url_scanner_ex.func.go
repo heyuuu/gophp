@@ -394,19 +394,14 @@ func XxMainloop(ctx *UrlAdaptStateExT, newdata *byte, newlen int) {
 	switch ctx.GetState() {
 	case STATE_PLAIN:
 		goto state_plain
-		fallthrough
 	case STATE_TAG:
 		goto state_tag
-		fallthrough
 	case STATE_NEXT_ARG:
 		goto state_next_arg
-		fallthrough
 	case STATE_ARG:
 		goto state_arg
-		fallthrough
 	case STATE_BEFORE_VAL:
 		goto state_before_val
-		fallthrough
 	case STATE_VAL:
 		goto state_val
 	}
