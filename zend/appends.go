@@ -31,3 +31,17 @@ func strToD(str string) float64 {
 	}
 	return value
 }
+
+func castZendStringPtr(str *string) *ZendString {
+	if str != nil {
+		return NewZendString(*str)
+	}
+	return nil
+}
+func castStrPtr(str *ZendString) *string {
+	if str != nil {
+		var s = str.GetStr()
+		return &s
+	}
+	return nil
+}

@@ -43,9 +43,9 @@ func ZendRemoveIniEntries(el *Zval, arg any) int {
 	return ini_entry.GetModuleNumber() == module_number
 }
 func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
-	var result int = FAILURE
+	var result = false
 	if ini_entry.GetModified() != 0 {
-		if ini_entry.GetOnModify() != nil {
+		if ini_entry.HasOnModify() {
 			var __orig_bailout *JMP_BUF = EG__().GetBailout()
 			var __bailout JMP_BUF
 			EG__().SetBailout(&__bailout)
@@ -55,7 +55,7 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 				   since there can be allocated variables that would be freed on MM shutdown
 				   and would lead to memory corruption later ini entry is modified again */
 
-				result = ini_entry.GetOnModify()(ini_entry, ini_entry.GetOrigValue(), ini_entry.GetMhArg1(), ini_entry.GetMhArg2(), ini_entry.GetMhArg3(), stage)
+				result = ini_entry.EmitOnModify(ini_entry.GetOrigValue(), stage)
 
 				/* even if on_modify bails out, we have to continue on with restoring,
 				   since there can be allocated variables that would be freed on MM shutdown
@@ -64,14 +64,9 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 			}
 			EG__().SetBailout(__orig_bailout)
 		}
-		if stage == ZEND_INI_STAGE_RUNTIME && result == FAILURE {
-
+		if stage == ZEND_INI_STAGE_RUNTIME && result == false {
 			/* runtime failure is OK */
-
 			return 1
-
-			/* runtime failure is OK */
-
 		}
 		if ini_entry.GetValue() != ini_entry.GetOrigValue() {
 			ZendStringRelease(ini_entry.GetValue())
@@ -86,7 +81,6 @@ func ZendRestoreIniEntryCb(ini_entry *ZendIniEntry, stage int) int {
 }
 func FreeIniEntry(zv *Zval) {
 	var entry *ZendIniEntry = (*ZendIniEntry)(zv.GetPtr())
-	ZendStringReleaseEx(entry.GetName(), 1)
 	if entry.GetValue() != nil {
 		ZendStringRelease(entry.GetValue())
 	}
@@ -160,19 +154,7 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 	var default_value *Zval
 	var directives *HashTable = RegisteredZendIniDirectives
 	for ini_entry.GetName() != nil {
-		p = Pemalloc(b.SizeOf("zend_ini_entry"), 1)
-		p.SetName(ZendStringInitInterned(ini_entry.GetName(), ini_entry.GetNameLength(), 1))
-		p.SetOnModify(ini_entry.GetOnModify())
-		p.SetMhArg1(ini_entry.GetMhArg1())
-		p.SetMhArg2(ini_entry.GetMhArg2())
-		p.SetMhArg3(ini_entry.GetMhArg3())
-		p.SetValue(nil)
-		p.SetOrigValue(nil)
-		p.SetDisplayer(ini_entry.GetDisplayer())
-		p.SetModifiable(ini_entry.GetModifiable())
-		p.SetOrigModifiable(0)
-		p.SetModified(0)
-		p.SetModuleNumber(module_number)
+		p = NewZendIniEntry(ini_entry, module_number)
 		if ZendHashAddPtr(directives, p.GetName(), any(p)) == nil {
 			if p.GetName() != nil {
 				ZendStringReleaseEx(p.GetName(), 1)
@@ -180,17 +162,11 @@ func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
 			ZendUnregisterIniEntries(module_number)
 			return FAILURE
 		}
-		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && (p.GetOnModify() == nil || p.GetOnModify()(p, default_value.GetStr(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP) == SUCCESS) {
+		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && p.EmitOnModify(default_value.GetStr(), ZEND_INI_STAGE_STARTUP) {
 			p.SetValue(ZendNewInternedString(default_value.GetStr().Copy()))
 		} else {
-			if ini_entry.GetValue() != nil {
-				p.SetValue(ZendStringInitInterned(ini_entry.GetValue(), ini_entry.GetValueLength(), 1))
-			} else {
-				p.SetValue(nil)
-			}
-			if p.GetOnModify() != nil {
-				p.GetOnModify()(p, p.GetValue(), p.GetMhArg1(), p.GetMhArg2(), p.GetMhArg3(), ZEND_INI_STAGE_STARTUP)
-			}
+			p.SetValueStr(ini_entry.GetValueStr())
+			p.EmitOnModifyCurrValue(ZEND_INI_STAGE_STARTUP)
 		}
 		ini_entry++
 	}
@@ -254,7 +230,7 @@ func ZendAlterIniEntryEx(name *ZendString, new_value *ZendString, modify_type in
 		ZendHashAddPtr(EG__().GetModifiedIniDirectives(), ini_entry.GetName(), ini_entry)
 	}
 	duplicate = new_value.Copy()
-	if ini_entry.GetOnModify() == nil || ini_entry.GetOnModify()(ini_entry, duplicate, ini_entry.GetMhArg1(), ini_entry.GetMhArg2(), ini_entry.GetMhArg3(), stage) == SUCCESS {
+	if ini_entry.EmitOnModify(duplicate, stage) {
 		if modified != 0 && ini_entry.GetOrigValue() != ini_entry.GetValue() {
 			ZendStringRelease(ini_entry.GetValue())
 		}

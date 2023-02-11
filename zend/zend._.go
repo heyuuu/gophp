@@ -3,7 +3,6 @@
 package zend
 
 import (
-	b "sik/builtin"
 	r "sik/runtime"
 )
 
@@ -140,16 +139,15 @@ var ZendGetConfigurationDirectiveP func(name *ZendString) *Zval
 
 const SIGNAL_CHECK_DEFAULT = "0"
 
-var IniEntries []ZendIniEntryDef = []ZendIniEntryDef{
-	MakeZendIniEntryDef("error_reporting", OnUpdateErrorReporting, nil, nil, nil, nil, nil, b.SizeOf("NULL")-1, b.SizeOf("\"error_reporting\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.assertions", OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "1", nil, b.SizeOf("\"1\"")-1, b.SizeOf("\"zend.assertions\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.enable_gc", OnUpdateGCEnabled, nil, nil, nil, "1", ZendGcEnabledDisplayerCb, b.SizeOf("\"1\"")-1, b.SizeOf("\"zend.enable_gc\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.multibyte", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte()))-(*byte)(nil))), any(&CompilerGlobals), nil, "0", ZendIniBooleanDisplayerCb, b.SizeOf("\"0\"")-1, b.SizeOf("\"zend.multibyte\"")-1, ZEND_INI_PERDIR),
-	MakeZendIniEntryDef("zend.script_encoding", OnUpdateScriptEncoding, nil, nil, nil, nil, nil, b.SizeOf("NULL")-1, b.SizeOf("\"zend.script_encoding\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.detect_unicode", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode()))-(*byte)(nil))), any(&CompilerGlobals), nil, "1", ZendIniBooleanDisplayerCb, b.SizeOf("\"1\"")-1, b.SizeOf("\"zend.detect_unicode\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.signal_check", OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck()))-(*byte)(nil))), any(&ZendSignalGlobals), nil, SIGNAL_CHECK_DEFAULT, ZendIniBooleanDisplayerCb, b.SizeOf("SIGNAL_CHECK_DEFAULT")-1, b.SizeOf("\"zend.signal_check\"")-1, ZEND_INI_SYSTEM),
-	MakeZendIniEntryDef("zend.exception_ignore_args", OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "0", ZendIniBooleanDisplayerCb, b.SizeOf("\"0\"")-1, b.SizeOf("\"zend.exception_ignore_args\"")-1, ZEND_INI_ALL),
-	MakeZendIniEntryDef(nil, nil, nil, nil, nil, nil, nil, 0, 0, 0),
+var IniEntries = []ZendIniEntryDef{
+	MakeZendIniEntryDef("error_reporting", OnUpdateErrorReporting, nil, nil, nil, nil, nil, ZEND_INI_ALL),
+	MakeZendIniEntryDef("zend.assertions", OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "1", nil, ZEND_INI_ALL),
+	MakeZendIniEntryDef("zend.enable_gc", OnUpdateGCEnabled, nil, nil, nil, "1", ZendGcEnabledDisplayerCb, ZEND_INI_ALL),
+	MakeZendIniEntryDef("zend.multibyte", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte()))-(*byte)(nil))), any(&CompilerGlobals), nil, "0", ZendIniBooleanDisplayerCb, ZEND_INI_PERDIR),
+	MakeZendIniEntryDef("zend.script_encoding", OnUpdateScriptEncoding, nil, nil, nil, nil, nil, ZEND_INI_ALL),
+	MakeZendIniEntryDef("zend.detect_unicode", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode()))-(*byte)(nil))), any(&CompilerGlobals), nil, "1", ZendIniBooleanDisplayerCb, ZEND_INI_ALL),
+	MakeZendIniEntryDef("zend.signal_check", OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck()))-(*byte)(nil))), any(&ZendSignalGlobals), nil, SIGNAL_CHECK_DEFAULT, ZendIniBooleanDisplayerCb, ZEND_INI_SYSTEM),
+	MakeZendIniEntryDef("zend.exception_ignore_args", OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "0", ZendIniBooleanDisplayerCb, ZEND_INI_ALL),
 }
 
 const ShortTagsDefault = 1
