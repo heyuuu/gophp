@@ -281,7 +281,7 @@ func ZmDeactivateBasic(type_ int, module_number int) int {
 	ZmDeactivateUrlScannerEx(type_, module_number)
 	streams.ZmDeactivateStreams(type_, module_number)
 	if BG(user_tick_functions) {
-		zend.ZendLlistDestroy(BG(user_tick_functions))
+		BG(user_tick_functions).Destroy()
 		zend.Efree(BG(user_tick_functions))
 		BG(user_tick_functions) = nil
 	}
@@ -2412,7 +2412,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 	/* Prevent reentrant calls to the same user ticks function */
 }
 func RunUserTickFunctions(tick_count int, arg any) {
-	zend.ZendLlistApply(BG(user_tick_functions), zend.LlistApplyFuncT(UserTickFunctionCall))
+	BG(user_tick_functions).Apply(zend.LlistApplyFuncT(UserTickFunctionCall))
 }
 func UserTickFunctionCompare(tick_fe1 *UserTickFunctionEntry, tick_fe2 *UserTickFunctionEntry) int {
 	var func1 *zend.Zval = tick_fe1.GetArguments()[0]
@@ -3877,13 +3877,13 @@ func ZifRegisterTickFunction(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	if !(BG(user_tick_functions)) {
 		BG(user_tick_functions) = (*zend.ZendLlist)(zend.Emalloc(b.SizeOf("zend_llist")))
-		zend.ZendLlistInit(BG(user_tick_functions), b.SizeOf("user_tick_function_entry"), zend.LlistDtorFuncT(UserTickFunctionDtor), 0)
+		BG(user_tick_functions).Init(b.SizeOf("user_tick_function_entry"), zend.LlistDtorFuncT(UserTickFunctionDtor), 0)
 		core.PhpAddTickFunction(RunUserTickFunctions, nil)
 	}
 	for i = 0; i < tick_fe.GetArgCount(); i++ {
 		tick_fe.GetArguments()[i].TryAddRefcount()
 	}
-	zend.ZendLlistAddElement(BG(user_tick_functions), &tick_fe)
+	BG(user_tick_functions).AddElement(&tick_fe)
 	return_value.SetTrue()
 	return
 }

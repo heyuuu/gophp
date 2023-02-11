@@ -49,7 +49,7 @@ func InitOpArray(op_array *ZendOpArray, type_ ZendUchar, initial_ops_size int) {
 	op_array.SetCacheSize(ZendOpArrayExtensionHandles * b.SizeOf("void *"))
 	memset(op_array.GetReserved(), 0, ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR) != 0 {
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayCtorHandler), op_array)
 	}
 }
 func DestroyZendFunction(function *ZendFunction) {
@@ -466,7 +466,7 @@ func DestroyOpArray(op_array *ZendOpArray) {
 	}
 	if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_DTOR) != 0 {
 		if op_array.IsDonePassTwo() {
-			ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayDtorHandler), op_array)
+			ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayDtorHandler), op_array)
 		}
 	}
 	if op_array.GetArgInfo() != nil {
@@ -847,7 +847,7 @@ func PassTwo(op_array *ZendOpArray) int {
 	}
 	if (CG__().GetCompilerOptions() & ZEND_COMPILE_HANDLE_OP_ARRAY) != 0 {
 		if (ZendExtensionFlags & ZEND_EXTENSIONS_HAVE_OP_ARRAY_HANDLER) != 0 {
-			ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayHandler), op_array)
+			ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayHandler), op_array)
 		}
 	}
 	if CG__().GetContext().GetVarsSize() != op_array.GetLastVar() {

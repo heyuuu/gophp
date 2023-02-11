@@ -1559,7 +1559,7 @@ func ZEND_BEGIN_SILENCE_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_EXT_STMT_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	if EG__().GetNoExtensions() == 0 {
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionStatementHandler), execute_data)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionStatementHandler), execute_data)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -1567,7 +1567,7 @@ func ZEND_EXT_STMT_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_EXT_FCALL_BEGIN_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	if EG__().GetNoExtensions() == 0 {
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionFcallBeginHandler), execute_data)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionFcallBeginHandler), execute_data)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()
@@ -1575,7 +1575,7 @@ func ZEND_EXT_FCALL_BEGIN_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 func ZEND_EXT_FCALL_END_SPEC_HANDLER(execute_data *ZendExecuteData) int {
 	var opline *ZendOp = EX(opline)
 	if EG__().GetNoExtensions() == 0 {
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionFcallEndHandler), execute_data)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionFcallEndHandler), execute_data)
 		ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 	}
 	ZEND_VM_NEXT_OPCODE()

@@ -295,7 +295,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 				buf_value.ZeroTail()
 				entry.SetKey(key)
 				entry.SetValue(buf_value.GetC())
-				zend.ZendLlistAddElement(header, &entry)
+				header.AddElement(&entry)
 				buf_value.SetC(nil)
 				key = nil
 			}
@@ -321,7 +321,7 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 		buf_value.ZeroTail()
 		entry.SetKey(key)
 		entry.SetValue(buf_value.GetC())
-		zend.ZendLlistAddElement(header, &entry)
+		header.AddElement(&entry)
 	}
 	return 1
 }
@@ -622,7 +622,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		/* php_auto_globals_create_files() might have already done that */
 
 	}
-	zend.ZendLlistInit(&header, b.SizeOf("mime_header_entry"), zend.LlistDtorFuncT(PhpFreeHdrEntry), 0)
+	header.Init(b.SizeOf("mime_header_entry"), zend.LlistDtorFuncT(PhpFreeHdrEntry), 0)
 	if PhpRfc1867Callback != nil {
 		var event_start MultipartEventStart
 		event_start.SetContentLength(SG(request_info).content_length)
@@ -639,7 +639,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		var blen int = 0
 		var wlen int = 0
 		var offset zend.ZendOffT
-		zend.ZendLlistClean(&header)
+		header.Clean()
 		if MultipartBufferHeaders(mbuff, &header) == 0 {
 			goto fileupload_done
 		}
@@ -1120,7 +1120,7 @@ fileupload_done:
 		zend.Efree(array_index)
 	}
 	PG(rfc1867_protected_variables).Destroy()
-	zend.ZendLlistDestroy(&header)
+	header.Destroy()
 	if mbuff.GetBoundaryNext() != nil {
 		zend.Efree(mbuff.GetBoundaryNext())
 	}

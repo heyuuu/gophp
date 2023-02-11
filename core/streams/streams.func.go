@@ -123,26 +123,26 @@ func PhpStreamDisplayWrapperErrors(wrapper *core.PhpStreamWrapper, path *byte, c
 				brlen = 1
 				br = "\n"
 			}
-			err_buf_p = zend.ZendLlistGetFirstEx(err_list, &pos)
+			err_buf_p = err_list.GetFirstEx(&pos)
 			i = 0
 			for err_buf_p != nil {
 				l += strlen(*err_buf_p)
 				if i < count-1 {
 					l += brlen
 				}
-				err_buf_p = zend.ZendLlistGetNextEx(err_list, &pos)
+				err_buf_p = err_list.GetNextEx(&pos)
 				i++
 			}
 			msg = zend.Emalloc(l + 1)
 			msg[0] = '0'
-			err_buf_p = zend.ZendLlistGetFirstEx(err_list, &pos)
+			err_buf_p = err_list.GetFirstEx(&pos)
 			i = 0
 			for err_buf_p != nil {
 				strcat(msg, *err_buf_p)
 				if i < count-1 {
 					strcat(msg, br)
 				}
-				err_buf_p = zend.ZendLlistGetNextEx(err_list, &pos)
+				err_buf_p = err_list.GetNextEx(&pos)
 				i++
 			}
 			free_msg = 1
@@ -171,7 +171,7 @@ func PhpStreamTidyWrapperErrorLog(wrapper *core.PhpStreamWrapper) {
 func WrapperErrorDtor(error any) { zend.Efree(*((**byte)(error))) }
 func WrapperListDtor(item *zend.Zval) {
 	var list *zend.ZendLlist = (*zend.ZendLlist)(item.GetPtr())
-	zend.ZendLlistDestroy(list)
+	list.Destroy()
 	zend.Efree(list)
 }
 func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt string, _ ...any) {
@@ -193,13 +193,13 @@ func PhpStreamWrapperLogError(wrapper *core.PhpStreamWrapper, options int, fmt s
 		}
 		if list == nil {
 			var new_list zend.ZendLlist
-			zend.ZendLlistInit(&new_list, b.SizeOf("buffer"), WrapperErrorDtor, 0)
+			new_list.Init(b.SizeOf("buffer"), WrapperErrorDtor, 0)
 			list = zend.ZendHashStrUpdateMem(standard.FG(wrapper_errors), (*byte)(&wrapper), b.SizeOf("wrapper"), &new_list, b.SizeOf("new_list"))
 		}
 
 		/* append to linked list */
 
-		zend.ZendLlistAddElement(list, &buffer)
+		list.AddElement(&buffer)
 
 		/* append to linked list */
 

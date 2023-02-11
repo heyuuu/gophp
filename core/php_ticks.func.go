@@ -8,15 +8,11 @@ import (
 )
 
 func PhpStartupTicks() int {
-	zend.ZendLlistInit(&(PG(tick_functions)), b.SizeOf("struct st_tick_function"), nil, 1)
+	PG(tick_functions).Init(b.SizeOf("struct st_tick_function"), nil, 1)
 	return zend.SUCCESS
 }
-func PhpDeactivateTicks() {
-	zend.ZendLlistClean(&(PG(tick_functions)))
-}
-func PhpShutdownTicks() {
-	zend.ZendLlistDestroy(&(PG(tick_functions)))
-}
+func PhpDeactivateTicks() { PG(tick_functions).Clean() }
+func PhpShutdownTicks()   { PG(tick_functions).Destroy() }
 func PhpCompareTickFunctions(elem1 any, elem2 any) int {
 	var e1 *StTickFunction = (*StTickFunction)(elem1)
 	var e2 *StTickFunction = (*StTickFunction)(elem2)
@@ -24,7 +20,7 @@ func PhpCompareTickFunctions(elem1 any, elem2 any) int {
 }
 func PhpAddTickFunction(func_ func(int, any), arg any) {
 	var tmp StTickFunction = MakeStTickFunction(func_, arg)
-	zend.ZendLlistAddElement(&(PG(tick_functions)), any(&tmp))
+	PG(tick_functions).AddElement(any(&tmp))
 }
 func PhpRemoveTickFunction(func_ func(int, any), arg any) {
 	var tmp StTickFunction = MakeStTickFunction(func_, arg)
@@ -35,5 +31,5 @@ func PhpTickIterator(d any, arg any) {
 	data.GetFunc()(*((*int)(arg)), data.GetArg())
 }
 func PhpRunTicks(count int) {
-	zend.ZendLlistApplyWithArgument(&(PG(tick_functions)), zend.LlistApplyWithArgFuncT(PhpTickIterator), &count)
+	PG(tick_functions).ApplyWithArgument(zend.LlistApplyWithArgFuncT(PhpTickIterator), &count)
 }

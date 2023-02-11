@@ -131,10 +131,10 @@ func PhpIniParserCb(arg1 *zend.Zval, arg2 *zend.Zval, arg3 *zend.Zval, callback_
 
 		if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), PHP_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
-			zend.ZendLlistAddElement(ExtensionLists.GetFunctions(), &extension_name)
+			ExtensionLists.GetFunctions().AddElement(&extension_name)
 		} else if IsSpecialSection == 0 && !(strcasecmp(zend.Z_STRVAL_P(arg1), ZEND_EXTENSION_TOKEN)) {
 			extension_name = zend.Estrndup(zend.Z_STRVAL_P(arg2), zend.Z_STRLEN_P(arg2))
-			zend.ZendLlistAddElement(ExtensionLists.GetEngine(), &extension_name)
+			ExtensionLists.GetEngine().AddElement(&extension_name)
 		} else {
 
 			/* Store in active hash */
@@ -301,8 +301,8 @@ func PhpInitConfig() int {
 	if sapi_module.GetIniDefaults() != nil {
 		sapi_module.GetIniDefaults()(&ConfigurationHash)
 	}
-	zend.ZendLlistInit(ExtensionLists.GetEngine(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
-	zend.ZendLlistInit(ExtensionLists.GetFunctions(), b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+	ExtensionLists.GetEngine().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+	ExtensionLists.GetFunctions().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	open_basedir = PG(open_basedir)
 	if sapi_module.GetPhpIniPathOverride() != nil {
 		php_ini_file_name = sapi_module.GetPhpIniPathOverride()
@@ -473,7 +473,7 @@ func PhpInitConfig() int {
 		var debpath *byte
 		var endpath *byte
 		var lenpath int
-		zend.ZendLlistInit(&scanned_ini_list, b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
+		scanned_ini_list.Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 		bufpath = zend.Estrdup(PhpIniScannedPath)
 		for debpath = bufpath; debpath != nil; debpath = endpath {
 			endpath = strchr(debpath, zend.DEFAULT_DIR_SEPARATOR)
@@ -522,7 +522,7 @@ func PhpInitConfig() int {
 									l = int(strlen(ini_file))
 									total_l += l + 2
 									p = zend.Estrndup(ini_file, l)
-									zend.ZendLlistAddElement(&scanned_ini_list, &p)
+									scanned_ini_list.AddElement(&p)
 								}
 							}
 						}
@@ -548,7 +548,7 @@ func PhpInitConfig() int {
 				strlcat(PhpIniScannedFiles, b.Cond(element.GetNext() != nil, ",\n", "\n"), total_l)
 			}
 		}
-		zend.ZendLlistDestroy(&scanned_ini_list)
+		scanned_ini_list.Destroy()
 	} else {
 
 		/* Make sure an empty php_ini_scanned_path ends up as NULL */
@@ -580,10 +580,10 @@ func PhpShutdownConfig() int {
 	return zend.SUCCESS
 }
 func PhpIniRegisterExtensions() {
-	zend.ZendLlistApply(ExtensionLists.GetEngine(), PhpLoadZendExtensionCb)
-	zend.ZendLlistApply(ExtensionLists.GetFunctions(), PhpLoadPhpExtensionCb)
-	zend.ZendLlistDestroy(ExtensionLists.GetEngine())
-	zend.ZendLlistDestroy(ExtensionLists.GetFunctions())
+	ExtensionLists.GetEngine().Apply(PhpLoadZendExtensionCb)
+	ExtensionLists.GetFunctions().Apply(PhpLoadPhpExtensionCb)
+	ExtensionLists.GetEngine().Destroy()
+	ExtensionLists.GetFunctions().Destroy()
 }
 func PhpParseUserIniFile(dirname *byte, ini_filename *byte, target_hash *zend.HashTable) int {
 	var sb zend.ZendStatT

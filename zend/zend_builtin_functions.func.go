@@ -2386,7 +2386,7 @@ func ZifGetLoadedExtensions(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ArrayInit(return_value)
 	if zendext != 0 {
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(AddZendextInfo), return_value)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(AddZendextInfo), return_value)
 	} else {
 		var module *ZendModuleEntry
 		var __ht *HashTable = &ModuleRegistry

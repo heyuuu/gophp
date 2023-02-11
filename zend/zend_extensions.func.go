@@ -76,7 +76,7 @@ func ZendRegisterExtension(new_extension *ZendExtension, handle any) int {
 	extension = *new_extension
 	extension.SetHandle(handle)
 	ZendExtensionDispatchMessage(ZEND_EXTMSG_NEW_EXTENSION, &extension)
-	ZendLlistAddElement(&ZendExtensions, &extension)
+	ZendExtensions.AddElement(&extension)
 	if extension.GetOpArrayCtor() != nil {
 		ZendExtensionFlags |= ZEND_EXTENSIONS_HAVE_OP_ARRAY_CTOR
 	}
@@ -116,7 +116,7 @@ func ZendExtensionStartup(extension *ZendExtension) int {
 func ZendStartupExtensionsMechanism() int {
 	/* Startup extensions mechanism */
 
-	ZendLlistInit(&ZendExtensions, b.SizeOf("zend_extension"), (func(any))(ZendExtensionDtor), 1)
+	ZendExtensions.Init(b.SizeOf("zend_extension"), (func(any))(ZendExtensionDtor), 1)
 	ZendOpArrayExtensionHandles = 0
 	LastResourceNumber = 0
 	return SUCCESS
@@ -126,8 +126,8 @@ func ZendStartupExtensions() int {
 	return SUCCESS
 }
 func ZendShutdownExtensions() {
-	ZendLlistApply(&ZendExtensions, LlistApplyFuncT(ZendExtensionShutdown))
-	ZendLlistDestroy(&ZendExtensions)
+	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionShutdown))
+	ZendExtensions.Destroy()
 }
 func ZendExtensionDtor(extension *ZendExtension) {
 	if extension.GetHandle() && !(getenv("ZEND_DONT_UNLOAD_MODULES")) {
@@ -145,10 +145,7 @@ func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args
 	extension.GetMessageHandler()(message, arg)
 }
 func ZendExtensionDispatchMessage(message int, arg any) {
-	ZendExtensions.ApplyWithArguments(
-		LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher),
-		message, arg,
-	)
+	ZendLlistApplyWithArguments(&ZendExtensions, LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher), 2, message, arg)
 }
 func ZendGetResourceHandle(extension *ZendExtension) int {
 	if LastResourceNumber < ZEND_MAX_RESERVED_RESOURCES {
@@ -193,7 +190,7 @@ func ZendExtensionsOpArrayPersistCalc(op_array *ZendOpArray) int {
 		data.SetOpArray(op_array)
 		data.SetSize(0)
 		data.SetMem(nil)
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistCalcHandler), &data)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistCalcHandler), &data)
 		return data.GetSize()
 	}
 	return 0
@@ -204,7 +201,7 @@ func ZendExtensionsOpArrayPersist(op_array *ZendOpArray, mem any) int {
 		data.SetOpArray(op_array)
 		data.SetSize(0)
 		data.SetMem(mem)
-		ZendLlistApplyWithArgument(&ZendExtensions, LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistHandler), &data)
+		ZendExtensions.ApplyWithArgument(LlistApplyWithArgFuncT(ZendExtensionOpArrayPersistHandler), &data)
 		return data.GetSize()
 	}
 	return 0

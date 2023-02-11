@@ -270,7 +270,7 @@ func SapiActivateHeadersOnly() {
 		return
 	}
 	SG(request_info).headers_read = 1
-	zend.ZendLlistInit(SG(sapi_headers).headers, b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
+	SG(sapi_headers).headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
 	SG(sapi_headers).send_default_content_type = 1
 
 	/* SG(sapi_headers).http_response_code = 200; */
@@ -306,7 +306,7 @@ func SapiActivateHeadersOnly() {
 	}
 }
 func SapiActivate() {
-	zend.ZendLlistInit(SG(sapi_headers).headers, b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
+	SG(sapi_headers).headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
 	SG(sapi_headers).send_default_content_type = 1
 
 	/*
@@ -374,7 +374,7 @@ func SapiSendHeadersFree() {
 	}
 }
 func SapiDeactivate() {
-	zend.ZendLlistDestroy(SG(sapi_headers).headers)
+	SG(sapi_headers).headers.Destroy()
 	if SG(request_info).request_body {
 		SG(request_info).request_body = nil
 	} else if SG(server_context) {
@@ -502,7 +502,7 @@ func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 				*colon_offset = sav
 			}
 		}
-		zend.ZendLlistAddElement(SG(sapi_headers).headers, any(sapi_header))
+		SG(sapi_headers).headers.AddElement(any(sapi_header))
 	} else {
 		SapiFreeHeader(sapi_header)
 	}
@@ -543,7 +543,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		if sapi_module.GetHeaderHandler() != nil {
 			sapi_module.GetHeaderHandler()(&sapi_header, op, &(SG(sapi_headers)))
 		}
-		zend.ZendLlistClean(SG(sapi_headers).headers)
+		SG(sapi_headers).headers.Clean()
 		return zend.SUCCESS
 	default:
 		return zend.FAILURE
@@ -747,7 +747,7 @@ func SapiSendHeaders() int {
 			http_status_line.SetHeaderLen(Slprintf(buf, b.SizeOf("buf"), "HTTP/1.0 %d X", SG(sapi_headers).http_response_code))
 		}
 		sapi_module.GetSendHeader()(&http_status_line, SG(server_context))
-		zend.ZendLlistApplyWithArgument(SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(sapi_module.GetSendHeader()), SG(server_context))
+		SG(sapi_headers).headers.ApplyWithArgument(zend.LlistApplyWithArgFuncT(sapi_module.GetSendHeader()), SG(server_context))
 		if SG(sapi_headers).send_default_content_type {
 			var default_header SapiHeader
 			SapiGetDefaultContentTypeHeader(&default_header)

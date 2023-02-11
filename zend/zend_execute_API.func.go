@@ -59,7 +59,7 @@ func InitExecutor() {
 	EG__().SetFlags(EG_FLAGS_INITIAL)
 	ZendVmStackInit()
 	ZendHashInit(EG__().GetSymbolTable(), 64, nil, ZVAL_PTR_DTOR, 0)
-	ZendLlistApply(&ZendExtensions, LlistApplyFuncT(ZendExtensionActivator))
+	ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionActivator))
 	ZendHashInit(EG__().GetIncludedFiles(), 8, nil, nil, 0)
 	EG__().SetTicksCount(0)
 	EG__().GetUserErrorHandler().SetUndef()
@@ -153,7 +153,7 @@ func ShutdownExecutor() {
 	var __bailout JMP_BUF
 	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
-		ZendLlistDestroy(CG__().GetOpenFiles())
+		CG__().GetOpenFiles().Destroy()
 	}
 	EG__().SetBailout(__orig_bailout)
 	EG__().SetIsInResourceShutdown(true)
@@ -244,7 +244,7 @@ func ShutdownExecutor() {
 	var __bailout JMP_BUF
 	EG__().SetBailout(&__bailout)
 	if SETJMP(__bailout) == 0 {
-		ZendLlistApply(&ZendExtensions, LlistApplyFuncT(ZendExtensionDeactivator))
+		ZendExtensions.Apply(LlistApplyFuncT(ZendExtensionDeactivator))
 	}
 	EG__().SetBailout(__orig_bailout)
 	if fast_shutdown != 0 {
