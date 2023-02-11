@@ -33,6 +33,20 @@ func (s *Stack[T]) Clean() {
 	s.elements = nil
 }
 
+func (s *Stack[T]) Apply(func_ func(T)) {
+	s.RangeTopDown(func(elem T) bool {
+		func_(elem)
+		return false
+	})
+}
+
+func (s *Stack[T]) ApplyReverse(func_ func(T)) {
+	s.RangeBottomUp(func(elem T) bool {
+		func_(elem)
+		return false
+	})
+}
+
 func (s *Stack[T]) RangeTopDown(f func(element T) bool) {
 	for i := len(s.elements) - 1; i >= 0; i-- {
 		element := s.elements[i]

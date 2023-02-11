@@ -361,7 +361,7 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 		sc.heredocIndentationUsesSpaces = false
 		sc.onEvent = nil
 		CG__().doc_comment = nil
-		zend_ptr_stack_reverse_apply(currentState.heredocLabelStack, CopyHeredocLabelStack)
+		currentState.heredocLabelStack.ApplyReverse(CopyHeredocLabelStack)
 		ZendExceptionSave()
 		for heredocNestingLevel != 0 {
 			retval, _ := sc.LexScan(nil)
