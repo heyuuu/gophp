@@ -2,10 +2,6 @@
 
 package zend
 
-import (
-	b "sik/builtin"
-)
-
 func DummyEncodingFetcher(encoding_name *byte) *ZendEncoding            { return nil }
 func DummyEncodingNameGetter(encoding *ZendEncoding) *byte              { return (*byte)(encoding) }
 func DummyEncodingLexerCompatibilityChecker(encoding *ZendEncoding) int { return 0 }
@@ -20,7 +16,7 @@ func DummyEncodingConverter(
 	encoding_to *ZendEncoding,
 	encoding_from *ZendEncoding,
 ) int {
-	return size_t - 1
+	return -1
 }
 func DummyEncodingListParser(encoding_list *byte, encoding_list_len int, return_list ***ZendEncoding, return_size *int, persistent int) int {
 	*return_list = Pemalloc(0, persistent)
@@ -29,41 +25,6 @@ func DummyEncodingListParser(encoding_list *byte, encoding_list_len int, return_
 }
 func DummyInternalEncodingGetter() *ZendEncoding             { return nil }
 func DummyInternalEncodingSetter(encoding *ZendEncoding) int { return FAILURE }
-func ZendMultibyteSetFunctions(functions *ZendMultibyteFunctions) int {
-	ZendMultibyteEncodingUtf32be = functions.GetEncodingFetcher()("UTF-32BE")
-	if ZendMultibyteEncodingUtf32be == nil {
-		return FAILURE
-	}
-	ZendMultibyteEncodingUtf32le = functions.GetEncodingFetcher()("UTF-32LE")
-	if ZendMultibyteEncodingUtf32le == nil {
-		return FAILURE
-	}
-	ZendMultibyteEncodingUtf16be = functions.GetEncodingFetcher()("UTF-16BE")
-	if ZendMultibyteEncodingUtf16be == nil {
-		return FAILURE
-	}
-	ZendMultibyteEncodingUtf16le = functions.GetEncodingFetcher()("UTF-16LE")
-	if ZendMultibyteEncodingUtf16le == nil {
-		return FAILURE
-	}
-	ZendMultibyteEncodingUtf8 = functions.GetEncodingFetcher()("UTF-8")
-	if ZendMultibyteEncodingUtf8 == nil {
-		return FAILURE
-	}
-	MultibyteFunctionsDummy = MultibyteFunctions
-	MultibyteFunctions = *functions
-
-	/* As zend_multibyte_set_functions() gets called after ini settings were
-	 * populated, we need to reinitialize script_encoding here.
-	 */
-
-	var value *byte = ZendIniString("zend.script_encoding", b.SizeOf("\"zend.script_encoding\"")-1, 0)
-	ZendMultibyteSetScriptEncodingByString(value, strlen(value))
-	return SUCCESS
-}
-func ZendMultibyteRestoreFunctions() {
-	MultibyteFunctions = MultibyteFunctionsDummy
-}
 func ZendMultibyteGetFunctions() *ZendMultibyteFunctions {
 	if MultibyteFunctions.GetProviderName() != nil {
 		return &MultibyteFunctions
@@ -76,9 +37,6 @@ func ZendMultibyteFetchEncoding(name *byte) *ZendEncoding {
 }
 func ZendMultibyteGetEncodingName(encoding *ZendEncoding) *byte {
 	return MultibyteFunctions.GetEncodingNameGetter()(encoding)
-}
-func ZendMultibyteCheckLexerCompatibility(encoding *ZendEncoding) int {
-	return MultibyteFunctions.GetLexerCompatibilityChecker()(encoding)
 }
 func ZendMultibyteEncodingDetector(string *uint8, length int, list **ZendEncoding, list_size int) *ZendEncoding {
 	return MultibyteFunctions.GetEncodingDetector()(string, length, list, list_size)
@@ -99,7 +57,6 @@ func ZendMultibyteParseEncodingList(encoding_list *byte, encoding_list_len int, 
 func ZendMultibyteGetInternalEncoding() *ZendEncoding {
 	return MultibyteFunctions.GetInternalEncodingGetter()()
 }
-func ZendMultibyteGetScriptEncoding() *ZendEncoding { return INI_SCNG__().script_encoding }
 func ZendMultibyteSetScriptEncoding(encoding_list **ZendEncoding, encoding_list_size int) int {
 	if CG__().GetScriptEncodingList() != nil {
 		Free((*byte)(CG__().GetScriptEncodingList()))
@@ -107,9 +64,6 @@ func ZendMultibyteSetScriptEncoding(encoding_list **ZendEncoding, encoding_list_
 	CG__().SetScriptEncodingList(encoding_list)
 	CG__().SetScriptEncodingListSize(encoding_list_size)
 	return SUCCESS
-}
-func ZendMultibyteSetInternalEncoding(encoding *ZendEncoding) int {
-	return MultibyteFunctions.GetInternalEncodingSetter()(encoding)
 }
 func ZendMultibyteSetScriptEncodingByString(new_value *byte, new_value_length int) int {
 	var list **ZendEncoding = 0
