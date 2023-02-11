@@ -16,6 +16,27 @@ type ZendIniEntryDef struct {
 	displayer  ZendIniEntryDisplayer
 }
 
+func NewZendIniEntryDef(name string, modifiable uint8) *ZendIniEntryDef {
+	return &ZendIniEntryDef{name: name, modifiable: modifiable}
+}
+func (this *ZendIniEntryDef) Value(value string) *ZendIniEntryDef {
+	this.value = &value
+	return this
+}
+func (this *ZendIniEntryDef) OnModify(onModify ZendIniEntryModifierEx) *ZendIniEntryDef {
+	this.onModify = onModify
+	return this
+}
+func (this *ZendIniEntryDef) OnModifyArgs(onModify ZendIniEntryModifier, args ...any) *ZendIniEntryDef {
+	args = append(args, nil, nil, nil)
+	this.onModify = _buildOnModify(onModify, args[0], args[1], args[2])
+	return this
+}
+func (this *ZendIniEntryDef) Display(displayer ZendIniEntryDisplayer) *ZendIniEntryDef {
+	this.displayer = displayer
+	return this
+}
+
 func _buildOnModify(onModify ZendIniEntryModifier, mh_arg1 any, mh_arg2 any, mh_arg3 any) ZendIniEntryModifierEx {
 	if onModify == nil {
 		return nil
