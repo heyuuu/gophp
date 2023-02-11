@@ -145,7 +145,10 @@ func ZendExtensionMessageDispatcher(extension *ZendExtension, num_args int, args
 	extension.GetMessageHandler()(message, arg)
 }
 func ZendExtensionDispatchMessage(message int, arg any) {
-	ZendLlistApplyWithArguments(&ZendExtensions, LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher), 2, message, arg)
+	ZendExtensions.ApplyWithArguments(
+		LlistApplyWithArgsFuncT(ZendExtensionMessageDispatcher),
+		message, arg,
+	)
 }
 func ZendGetResourceHandle(extension *ZendExtension) int {
 	if LastResourceNumber < ZEND_MAX_RESERVED_RESOURCES {

@@ -20,6 +20,16 @@ func EqualsAny[T comparable](value T, expected ...T) bool {
 	return false
 }
 
+func CopySlice[T any](src []T) []T {
+	if len(src) == 0 {
+		return nil
+	}
+
+	dst := make([]T, len(src))
+	copy(dst, src)
+	return dst
+}
+
 /*
  * DJBX33A (Daniel J. Bernstein, Times 33 with Addition)
  *
