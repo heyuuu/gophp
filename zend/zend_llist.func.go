@@ -11,23 +11,11 @@ func ZendLlistInit(l *ZendLlist, size int, dtor LlistDtorFuncT, persistent uint8
 func ZendLlistAddElement(l *ZendLlist, element any) {
 	l.AddElement(element)
 }
-func ZendLlistPrependElement(l *ZendLlist, element any) {
-	l.PrependElement(element)
-}
-func DEL_LLIST_ELEMENT(current *ZendLlistElement, l *ZendLlist) {
-	l.DelElement(current)
-}
 func ZendLlistDelElement(l *ZendLlist, element any, compare func(element1 any, element2 any) int) {
 	l.DelElementByData(element, compare)
 }
 func ZendLlistDestroy(l *ZendLlist) {
 	l.Destroy()
-}
-func ZendLlistClean(l *ZendLlist) {
-	l.Clean()
-}
-func ZendLlistRemoveTail(l *ZendLlist) {
-	l.RemoveTail()
 }
 func ZendLlistCopy(dst *ZendLlist, src *ZendLlist) {
 	dst.CopyFrom(src)
