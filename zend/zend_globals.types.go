@@ -548,8 +548,8 @@ type ZendPhpScannerGlobals struct {
 	yy_marker                       *uint8
 	yy_limit                        *uint8
 	yy_state                        int
-	state_stack                     ZendStack
-	heredoc_label_stack             ZendPtrStack
+	state_stack                     b.Stack[int]
+	heredoc_label_stack             b.Stack[*ZendHeredocLabel]
 	heredoc_scan_ahead              ZendBool
 	heredoc_indentation             int
 	heredoc_indentation_uses_spaces ZendBool

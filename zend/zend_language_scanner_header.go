@@ -11,7 +11,6 @@ const YYCURSOR *uint8 = LANG_SCNG__().yy_cursor
 const YYLIMIT *uint8 = LANG_SCNG__().yy_limit
 const YYMARKER = LANG_SCNG__().yy_marker
 
-func YYGETCONDITION() __auto__ { return LANG_SCNG__().yy_state }
 func YYSETCONDITION(s int) __auto__ {
 	LANG_SCNG__().yy_state = s
 	return LANG_SCNG__().yy_state
@@ -22,15 +21,6 @@ func YYSETCONDITION(s int) __auto__ {
 /* emulate flex constructs */
 
 func BEGIN(state __auto__) __auto__ { return YYSETCONDITION(yycstate) }
-
-const YYSTATE = YYGETCONDITION()
-
-/* perform sanity check. If this message is triggered you should
-   increase the ZEND_MMAP_AHEAD value in the zend_streams.h file */
-
-// # include < stdarg . h >
-
-/* Globals Macros */
 
 var LanguageScannerGlobals ZendPhpScannerGlobals
 
@@ -47,20 +37,20 @@ func zendIsHex(c byte) bool {
 	return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F'
 }
 func EncodingFilterScriptToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
-	var internal_encoding *zend_encoding = zend_multibyte_get_internal_encoding()
-	ZEND_ASSERT(internal_encoding)
-	return zend_multibyte_encoding_converter(to, to_length, from, from_length, internal_encoding, INI_SCNG__().script_encoding)
+	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
+	ZEND_ASSERT(internal_encoding != nil)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LANG_SCNG__().script_encoding)
 }
 func EncodingFilterScriptToIntermediate(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return zend_multibyte_encoding_converter(to, to_length, from, from_length, zend_multibyte_encoding_utf8, INI_SCNG__().script_encoding)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, LANG_SCNG__().script_encoding)
 }
 func EncodingFilterIntermediateToScript(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return zend_multibyte_encoding_converter(to, to_length, from, from_length, INI_SCNG__().script_encoding, zend_multibyte_encoding_utf8)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, LANG_SCNG__().script_encoding, ZendMultibyteEncodingUtf8)
 }
 func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
-	var internal_encoding *zend_encoding = zend_multibyte_get_internal_encoding()
-	ZEND_ASSERT(internal_encoding)
-	return zend_multibyte_encoding_converter(to, to_length, from, from_length, internal_encoding, zend_multibyte_encoding_utf8)
+	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
+	ZEND_ASSERT(internal_encoding != nil)
+	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
 }
 
 func YyScanBuffer(str *byte, len_ int) {
@@ -71,85 +61,34 @@ func YyScanBuffer(str *byte, len_ int) {
 	}
 }
 func StartupScanner() {
+	var sc *LangScanner
 	CG__().parse_error = 0
 	CG__().doc_comment = nil
 	CG__().extra_fn_flags = 0
-	zend_stack_init(&(LANG_SCNG__().state_stack), b.SizeOf("int"))
-	zend_ptr_stack_init(&(LANG_SCNG__().heredoc_label_stack))
-	LANG_SCNG__().heredoc_scan_ahead = 0
+	sc.stateStack.Clean()
+	sc.heredocLabelStack.Clean()
+	sc.heredocScanAhead = false
 }
 func HeredocLabelDtor(heredoc_label *ZendHeredocLabel) { efree(heredoc_label.label) }
 func ShutdownScanner() {
+	var sc *LangScanner
 	CG__().parse_error = 0
 	RESET_DOC_COMMENT()
-	zend_stack_destroy(&(LANG_SCNG__().state_stack))
-	zend_ptr_stack_clean(&(LANG_SCNG__().heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
-	zend_ptr_stack_destroy(&(LANG_SCNG__().heredoc_label_stack))
-	LANG_SCNG__().heredoc_scan_ahead = 0
-	LANG_SCNG__().on_event = nil
+	sc.stateStack.Clean()
+	sc.heredocLabelStack.Clean()
+	sc.heredocScanAhead = false
+	sc.onEvent = nil
 }
-func ZendSaveLexicalState(lex_state *zend_lex_state) {
-	lex_state.yy_leng = LANG_SCNG__().yy_leng
-	lex_state.yy_start = LANG_SCNG__().yy_start
-	lex_state.yy_text = LANG_SCNG__().yy_text
-	lex_state.yy_cursor = LANG_SCNG__().yy_cursor
-	lex_state.yy_marker = LANG_SCNG__().yy_marker
-	lex_state.yy_limit = LANG_SCNG__().yy_limit
-	lex_state.state_stack = LANG_SCNG__().state_stack
-	zend_stack_init(&(LANG_SCNG__().state_stack), b.SizeOf("int"))
-	lex_state.heredoc_label_stack = LANG_SCNG__().heredoc_label_stack
-	zend_ptr_stack_init(&(LANG_SCNG__().heredoc_label_stack))
-	lex_state.in = LANG_SCNG__().yy_in
-	lex_state.yy_state = YYSTATE
-	lex_state.filename = zend_get_compiled_filename()
-	lex_state.lineno = CG__().zend_lineno
-	lex_state.script_org = LANG_SCNG__().script_org
-	lex_state.script_org_size = LANG_SCNG__().script_org_size
-	lex_state.script_filtered = LANG_SCNG__().script_filtered
-	lex_state.script_filtered_size = LANG_SCNG__().script_filtered_size
-	lex_state.input_filter = LANG_SCNG__().input_filter
-	lex_state.output_filter = LANG_SCNG__().output_filter
-	lex_state.script_encoding = LANG_SCNG__().script_encoding
-	lex_state.on_event = LANG_SCNG__().on_event
-	lex_state.on_event_context = LANG_SCNG__().on_event_context
-	lex_state.ast = CG__().ast
-	lex_state.ast_arena = CG__().ast_arena
+func ZendSaveLexicalState(lexState *ZendLexState) {
+	var sc *LangScanner
+	*lexState = *sc.saveLexState()
 }
-func ZendRestoreLexicalState(lex_state *zend_lex_state) {
-	LANG_SCNG__().yy_leng = lex_state.yy_leng
-	LANG_SCNG__().yy_start = lex_state.yy_start
-	LANG_SCNG__().yy_text = lex_state.yy_text
-	LANG_SCNG__().yy_cursor = lex_state.yy_cursor
-	LANG_SCNG__().yy_marker = lex_state.yy_marker
-	LANG_SCNG__().yy_limit = lex_state.yy_limit
-	zend_stack_destroy(&(LANG_SCNG__().state_stack))
-	LANG_SCNG__().state_stack = lex_state.state_stack
-	zend_ptr_stack_clean(&(LANG_SCNG__().heredoc_label_stack), (func(any))(&HeredocLabelDtor), 1)
-	zend_ptr_stack_destroy(&(LANG_SCNG__().heredoc_label_stack))
-	LANG_SCNG__().heredoc_label_stack = lex_state.heredoc_label_stack
-	LANG_SCNG__().yy_in = lex_state.in
-	YYSETCONDITION(lex_state.yy_state)
-	CG__().zend_lineno = lex_state.lineno
-	zend_restore_compiled_filename(lex_state.filename)
-	if LANG_SCNG__().script_filtered {
-		efree(LANG_SCNG__().script_filtered)
-		LANG_SCNG__().script_filtered = nil
-	}
-	LANG_SCNG__().script_org = lex_state.script_org
-	LANG_SCNG__().script_org_size = lex_state.script_org_size
-	LANG_SCNG__().script_filtered = lex_state.script_filtered
-	LANG_SCNG__().script_filtered_size = lex_state.script_filtered_size
-	LANG_SCNG__().input_filter = lex_state.input_filter
-	LANG_SCNG__().output_filter = lex_state.output_filter
-	LANG_SCNG__().script_encoding = lex_state.script_encoding
-	LANG_SCNG__().on_event = lex_state.on_event
-	LANG_SCNG__().on_event_context = lex_state.on_event_context
-	CG__().ast = lex_state.ast
-	CG__().ast_arena = lex_state.ast_arena
-	RESET_DOC_COMMENT()
+func ZendRestoreLexicalState(lexState *ZendLexState) {
+	var sc *LangScanner
+	sc.restoreLexState(lexState)
 }
-func ZendDestroyFileHandle(file_handle *zend_file_handle) {
-	zend_llist_del_element(CG__().open_files, file_handle, (func(any, any) int)(zend_compare_file_handles))
+func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
+	ZendLlistDelElement(CG__().open_files, file_handle, (func(any, any) int)(ZendCompareFileHandles))
 
 	/* zend_file_handle_dtor() operates on the copy, so we have to NULLify the original here */
 
@@ -165,7 +104,7 @@ const BOM_UTF16_BE = "xfexff"
 const BOM_UTF16_LE = "xffxfe"
 const BOM_UTF8 = "xefxbbxbf"
 
-func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *zend_encoding {
+func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncoding {
 	var p *uint8
 	var wchar_size int = 2
 	var le int = 0
@@ -173,7 +112,7 @@ func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *zend_encodi
 	/* utf-16 or utf-32? */
 
 	p = script
-	assert(p >= script)
+	ZEND_ASSERT(p >= script)
 	for size_t(p-script) < script_size {
 		p = memchr(p, 0, script_size-(p-script)-2)
 		if p == nil {
@@ -227,49 +166,49 @@ func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *zend_encodi
 	}
 	return nil
 }
-func ZendMultibyteDetectUnicode() *zend_encoding {
-	var script_encoding *zend_encoding = nil
+func ZendMultibyteDetectUnicode() *ZendEncoding {
+	var script_encoding *ZendEncoding = nil
 	var bom_size int
 	var pos1 *uint8
 	var pos2 *uint8
-	if INI_SCNG__().script_org_size < b.SizeOf("BOM_UTF32_LE")-1 {
+	if LANG_SCNG__().script_org_size < b.SizeOf("BOM_UTF32_LE")-1 {
 		return nil
 	}
 
 	/* check out BOM */
 
-	if !(memcmp(INI_SCNG__().script_org, BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
-		script_encoding = zend_multibyte_encoding_utf32be
+	if !(memcmp(LANG_SCNG__().script_org, BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
+		script_encoding = ZendMultibyteEncodingUtf32be
 		bom_size = b.SizeOf("BOM_UTF32_BE") - 1
-	} else if !(memcmp(INI_SCNG__().script_org, BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
-		script_encoding = zend_multibyte_encoding_utf32le
+	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
+		script_encoding = ZendMultibyteEncodingUtf32le
 		bom_size = b.SizeOf("BOM_UTF32_LE") - 1
-	} else if !(memcmp(INI_SCNG__().script_org, BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
-		script_encoding = zend_multibyte_encoding_utf16be
+	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
+		script_encoding = ZendMultibyteEncodingUtf16be
 		bom_size = b.SizeOf("BOM_UTF16_BE") - 1
-	} else if !(memcmp(INI_SCNG__().script_org, BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
-		script_encoding = zend_multibyte_encoding_utf16le
+	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
+		script_encoding = ZendMultibyteEncodingUtf16le
 		bom_size = b.SizeOf("BOM_UTF16_LE") - 1
-	} else if !(memcmp(INI_SCNG__().script_org, BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
-		script_encoding = zend_multibyte_encoding_utf8
+	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
+		script_encoding = ZendMultibyteEncodingUtf8
 		bom_size = b.SizeOf("BOM_UTF8") - 1
 	}
 	if script_encoding != nil {
 
 		/* remove BOM */
 
-		INI_SCNG__().script_org += bom_size
-		INI_SCNG__().script_org_size -= bom_size
+		LANG_SCNG__().script_org += bom_size
+		LANG_SCNG__().script_org_size -= bom_size
 		return script_encoding
 	}
 
 	/* script contains NULL bytes -> auto-detection */
 
-	if b.Assign(&pos1, memchr(INI_SCNG__().script_org, 0, INI_SCNG__().script_org_size)) {
+	if b.Assign(&pos1, memchr(LANG_SCNG__().script_org, 0, LANG_SCNG__().script_org_size)) {
 
 		/* check if the NULL byte is after the __HALT_COMPILER(); */
 
-		pos2 = INI_SCNG__().script_org
+		pos2 = LANG_SCNG__().script_org
 		for size_t(pos1-pos2) >= b.SizeOf("\"__HALT_COMPILER();\"")-1 {
 			pos2 = memchr(pos2, '_', pos1-pos2)
 			if pos2 == nil {
@@ -301,7 +240,7 @@ func ZendMultibyteDetectUnicode() *zend_encoding {
 
 		/* make best effort if BOM is missing */
 
-		return ZendMultibyteDetectUtfEncoding(INI_SCNG__().script_org, INI_SCNG__().script_org_size)
+		return ZendMultibyteDetectUtfEncoding(LANG_SCNG__().script_org, LANG_SCNG__().script_org_size)
 
 		/* make best effort if BOM is missing */
 
@@ -335,7 +274,7 @@ func ZendMultibyteFindScriptEncoding() *zend_encoding {
 	/* if multiple encodings specified, detect automagically */
 
 	if CG__().script_encoding_list_size > 1 {
-		return zend_multibyte_encoding_detector(INI_SCNG__().script_org, INI_SCNG__().script_org_size, CG__().script_encoding_list, CG__().script_encoding_list_size)
+		return zend_multibyte_encoding_detector(LANG_SCNG__().script_org, LANG_SCNG__().script_org_size, CG__().script_encoding_list, CG__().script_encoding_list_size)
 	}
 	return CG__().script_encoding_list[0]
 }
@@ -348,38 +287,38 @@ func ZendMultibyteSetFilter(onetime_encoding *zend_encoding) int {
 
 	/* judge input/output filter */
 
-	INI_SCNG__().script_encoding = script_encoding
-	INI_SCNG__().input_filter = nil
-	INI_SCNG__().output_filter = nil
-	if internal_encoding == nil || INI_SCNG__().script_encoding == internal_encoding {
-		if !(zend_multibyte_check_lexer_compatibility(INI_SCNG__().script_encoding)) {
+	LANG_SCNG__().script_encoding = script_encoding
+	LANG_SCNG__().input_filter = nil
+	LANG_SCNG__().output_filter = nil
+	if internal_encoding == nil || LANG_SCNG__().script_encoding == internal_encoding {
+		if !(zend_multibyte_check_lexer_compatibility(LANG_SCNG__().script_encoding)) {
 
 			/* and if not, work around w/ script_encoding -> utf-8 -> script_encoding conversion */
 
-			INI_SCNG__().input_filter = EncodingFilterScriptToIntermediate
-			INI_SCNG__().output_filter = EncodingFilterIntermediateToScript
+			LANG_SCNG__().input_filter = EncodingFilterScriptToIntermediate
+			LANG_SCNG__().output_filter = EncodingFilterIntermediateToScript
 		} else {
-			INI_SCNG__().input_filter = nil
-			INI_SCNG__().output_filter = nil
+			LANG_SCNG__().input_filter = nil
+			LANG_SCNG__().output_filter = nil
 		}
 		return SUCCESS
 	}
 	if zend_multibyte_check_lexer_compatibility(internal_encoding) {
-		INI_SCNG__().input_filter = EncodingFilterScriptToInternal
-		INI_SCNG__().output_filter = nil
-	} else if zend_multibyte_check_lexer_compatibility(INI_SCNG__().script_encoding) {
-		INI_SCNG__().input_filter = nil
-		INI_SCNG__().output_filter = EncodingFilterScriptToInternal
+		LANG_SCNG__().input_filter = EncodingFilterScriptToInternal
+		LANG_SCNG__().output_filter = nil
+	} else if zend_multibyte_check_lexer_compatibility(LANG_SCNG__().script_encoding) {
+		LANG_SCNG__().input_filter = nil
+		LANG_SCNG__().output_filter = EncodingFilterScriptToInternal
 	} else {
 
 		/* both script and internal encodings are incompatible w/ flex */
 
-		INI_SCNG__().input_filter = EncodingFilterScriptToIntermediate
-		INI_SCNG__().output_filter = EncodingFilterIntermediateToInternal
+		LANG_SCNG__().input_filter = EncodingFilterScriptToIntermediate
+		LANG_SCNG__().output_filter = EncodingFilterIntermediateToInternal
 	}
 	return 0
 }
-func OpenFileForScanning(file_handle *zend_file_handle) int {
+func OpenFileForScanning(file_handle *ZendFileHandle) int {
 	var buf *byte
 	var size int
 	var compiled_filename *zend_string
@@ -411,7 +350,7 @@ func OpenFileForScanning(file_handle *zend_file_handle) int {
 			ZendMultibyteSetFilter(nil)
 			if LANG_SCNG__().input_filter {
 				if size_t-1 == LANG_SCNG__().input_filter(&(LANG_SCNG__().script_filtered), &(LANG_SCNG__().script_filtered_size), LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-					zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(INI_SCNG__().script_encoding))
+					zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
 				}
 				buf = (*byte)(LANG_SCNG__().script_filtered)
 				size = LANG_SCNG__().script_filtered_size
@@ -479,7 +418,7 @@ func ZendCompile(type_ int) *zend_op_array {
 	return op_array
 }
 func CompileFile(file_handle *zend_file_handle, type_ int) *zend_op_array {
-	var original_lex_state zend_lex_state
+	var original_lex_state ZendLexState
 	var op_array *zend_op_array = nil
 	ZendSaveLexicalState(&original_lex_state)
 	if OpenFileForScanning(file_handle) == FAILURE {
@@ -547,7 +486,7 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 		ZendMultibyteSetFilter(zend_multibyte_get_internal_encoding())
 		if LANG_SCNG__().input_filter {
 			if size_t-1 == LANG_SCNG__().input_filter(&(LANG_SCNG__().script_filtered), &(LANG_SCNG__().script_filtered_size), LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-				zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(INI_SCNG__().script_encoding))
+				zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
 			}
 			buf = (*byte)(LANG_SCNG__().script_filtered)
 			size = LANG_SCNG__().script_filtered_size
@@ -562,31 +501,8 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 	RESET_DOC_COMMENT()
 	return SUCCESS
 }
-func ZendGetScannedFileOffset() int {
-	var offset int = LANG_SCNG__().yy_cursor - LANG_SCNG__().yy_start
-	if LANG_SCNG__().input_filter {
-		var original_offset int = offset
-		var length int = 0
-		for {
-			var p *uint8 = nil
-			if size_t-1 == LANG_SCNG__().input_filter(&p, &length, LANG_SCNG__().script_org, offset) {
-				return size_t - 1
-			}
-			efree(p)
-			if length > original_offset {
-				offset--
-			} else if length < original_offset {
-				offset++
-			}
-			if original_offset == length {
-				break
-			}
-		}
-	}
-	return offset
-}
 func CompileString(source_string *zval, filename *byte) *zend_op_array {
-	var original_lex_state zend_lex_state
+	var original_lex_state ZendLexState
 	var op_array *zend_op_array = nil
 	var tmp zval
 	if Z_TYPE_P(source_string) != IS_STRING {
@@ -608,7 +524,7 @@ func CompileString(source_string *zval, filename *byte) *zend_op_array {
 	return op_array
 }
 func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlighter_ini) int {
-	var original_lex_state zend_lex_state
+	var original_lex_state ZendLexState
 	var file_handle zend_file_handle
 	zend_stream_init_filename(&file_handle, filename)
 	ZendSaveLexicalState(&original_lex_state)
@@ -627,7 +543,7 @@ func HighlightFile(filename *byte, syntax_highlighter_ini *zend_syntax_highlight
 	return SUCCESS
 }
 func HighlightString(str *zval, syntax_highlighter_ini *zend_syntax_highlighter_ini, str_name *byte) int {
-	var original_lex_state zend_lex_state
+	var original_lex_state ZendLexState
 	var tmp zval
 	if Z_TYPE_P(str) != IS_STRING {
 		ZVAL_STR(&tmp, zval_get_string_func(str))
@@ -669,7 +585,7 @@ func ZendMultibyteYyinputAgain(old_input_filter zend_encoding_filter, old_encodi
 		new_yy_start = LANG_SCNG__().script_org
 	} else {
 		if size_t-1 == LANG_SCNG__().input_filter(&new_yy_start, &length, LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-			zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(INI_SCNG__().script_encoding))
+			zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
 		}
 		if LANG_SCNG__().script_filtered {
 			efree(LANG_SCNG__().script_filtered)
@@ -1061,11 +977,7 @@ error:
 	ZVAL_UNDEF(zendlval)
 	return 0
 }
-func CopyHeredocLabelStack(void_heredoc_label any) {
-	var heredoc_label *ZendHeredocLabel = void_heredoc_label
-	var new_heredoc_label *ZendHeredocLabel = emalloc(b.SizeOf("ZendHeredocLabel"))
-	*new_heredoc_label = *heredoc_label
-	new_heredoc_label.label = estrndup(heredoc_label.label, heredoc_label.length)
-	zend_ptr_stack_push(&(LANG_SCNG__().heredoc_label_stack), any(new_heredoc_label))
+func CopyHeredocLabelStack(heredocLabel *ZendHeredocLabel) {
+	newHeredocLabel := heredocLabel.Copy()
+	LANG_SCNG__().heredoc_label_stack.Push(newHeredocLabel)
 }
-func PARSER_MODE() bool { return elem != nil }

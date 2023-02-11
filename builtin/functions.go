@@ -11,6 +11,15 @@ func HashStr(str string) uint {
 	return HashBytes([]byte(str))
 }
 
+func EqualsAny[T comparable](value T, expected ...T) bool {
+	for _, v := range expected {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
+
 /*
  * DJBX33A (Daniel J. Bernstein, Times 33 with Addition)
  *

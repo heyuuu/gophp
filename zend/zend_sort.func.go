@@ -2,62 +2,6 @@
 
 package zend
 
-import (
-	b "sik/builtin"
-)
-
-func ZendQsort(base any, nmemb int, siz int, compare CompareFuncT, swp SwapFuncT) {
-	var begin_stack []any
-	var end_stack []any
-	var begin *byte
-	var end *byte
-	var seg1 *byte
-	var seg2 *byte
-	var seg2p *byte
-	var loop int
-	var offset int
-	begin_stack[0] = (*byte)(base)
-	end_stack[0] = (*byte)(base + (nmemb-1)*siz)
-	for loop = 0; loop >= 0; loop-- {
-		begin = begin_stack[loop]
-		end = end_stack[loop]
-		for begin < end {
-			offset = end - begin>>int64(1)
-			swp(begin, begin+(offset-offset%siz))
-			seg1 = begin + siz
-			seg2 = end
-			for true {
-				for ; seg1 < seg2 && compare(begin, seg1) > 0; seg1 += siz {
-
-				}
-				for ; seg2 >= seg1 && compare(seg2, begin) > 0; seg2 -= siz {
-
-				}
-				if seg1 >= seg2 {
-					break
-				}
-				swp(seg1, seg2)
-				seg1 += siz
-				seg2 -= siz
-			}
-			swp(begin, seg2)
-			seg2p = seg2
-			if seg2p-begin <= end-seg2p {
-				if seg2p+siz < end {
-					begin_stack[loop] = seg2p + siz
-					end_stack[b.PostInc(&loop)] = end
-				}
-				end = seg2p - siz
-			} else {
-				if seg2p-siz > begin {
-					begin_stack[loop] = begin
-					end_stack[b.PostInc(&loop)] = seg2p - siz
-				}
-				begin = seg2p + siz
-			}
-		}
-	}
-}
 func ZendSort2(a any, b any, cmp CompareFuncT, swp SwapFuncT) {
 	if cmp(a, b) > 0 {
 		swp(a, b)

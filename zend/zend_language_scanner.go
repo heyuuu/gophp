@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 // Source: <Zend/zend_language_scanner.h>
 
 /*
@@ -29,15 +31,16 @@ package zend
  * ZendLexState
  */
 type ZendLexState struct {
-	yy_leng              uint
-	yy_start             *uint8
-	yy_text              *uint8
-	yy_cursor            *uint8
-	yy_marker            *uint8
-	yy_limit             *uint8
-	yy_state             int
-	state_stack          ZendStack
-	heredoc_label_stack  ZendPtrStack
+	len_              uint // LANG_SCNG__().yy_leng
+	start             uint // LANG_SCNG__().yy_start *byte
+	text              uint // LANG_SCNG__().yy_text *byte
+	cursor            uint // LANG_SCNG__().yy_cursor *byte
+	marker            uint // LANG_SCNG__().yy_marker *byte
+	limit             uint // LANG_SCNG__().yy_limit *byte
+	state             int  // LANG_SCNG__().yy_state
+	stateStack        b.Stack[int]
+	heredocLabelStack b.Stack[*ZendHeredocLabel]
+	
 	in                   *ZendFileHandle
 	lineno               uint32
 	filename             *ZendString
@@ -54,116 +57,25 @@ type ZendLexState struct {
 	ast_arena            *ZendArena
 }
 
-//             func MakeZendLexState(
-// yy_leng uint,
-// yy_start *uint8,
-// yy_text *uint8,
-// yy_cursor *uint8,
-// yy_marker *uint8,
-// yy_limit *uint8,
-// yy_state int,
-// state_stack ZendStack,
-// heredoc_label_stack ZendPtrStack,
-// in *ZendFileHandle,
-// lineno uint32,
-// filename *ZendString,
-// script_org *uint8,
-// script_org_size int,
-// script_filtered *uint8,
-// script_filtered_size int,
-// input_filter ZendEncodingFilter,
-// output_filter ZendEncodingFilter,
-// script_encoding *ZendEncoding,
-// on_event func(event ZendPhpScannerEvent, token int, line int, context any),
-// on_event_context any,
-// ast *ZendAst,
-// ast_arena *ZendArena,
-// ) ZendLexState {
-//                 return ZendLexState{
-//                     yy_leng:yy_leng,
-//                     yy_start:yy_start,
-//                     yy_text:yy_text,
-//                     yy_cursor:yy_cursor,
-//                     yy_marker:yy_marker,
-//                     yy_limit:yy_limit,
-//                     yy_state:yy_state,
-//                     state_stack:state_stack,
-//                     heredoc_label_stack:heredoc_label_stack,
-//                     in:in,
-//                     lineno:lineno,
-//                     filename:filename,
-//                     script_org:script_org,
-//                     script_org_size:script_org_size,
-//                     script_filtered:script_filtered,
-//                     script_filtered_size:script_filtered_size,
-//                     input_filter:input_filter,
-//                     output_filter:output_filter,
-//                     script_encoding:script_encoding,
-//                     on_event:on_event,
-//                     on_event_context:on_event_context,
-//                     ast:ast,
-//                     ast_arena:ast_arena,
-//                 }
-//             }
-func (this *ZendLexState) GetYyLeng() uint                          { return this.yy_leng }
-func (this *ZendLexState) SetYyLeng(value uint)                     { this.yy_leng = value }
-func (this *ZendLexState) GetYyStart() *uint8                       { return this.yy_start }
-func (this *ZendLexState) SetYyStart(value *uint8)                  { this.yy_start = value }
-func (this *ZendLexState) GetYyText() *uint8                        { return this.yy_text }
-func (this *ZendLexState) SetYyText(value *uint8)                   { this.yy_text = value }
-func (this *ZendLexState) GetYyCursor() *uint8                      { return this.yy_cursor }
-func (this *ZendLexState) SetYyCursor(value *uint8)                 { this.yy_cursor = value }
-func (this *ZendLexState) GetYyMarker() *uint8                      { return this.yy_marker }
-func (this *ZendLexState) SetYyMarker(value *uint8)                 { this.yy_marker = value }
-func (this *ZendLexState) GetYyLimit() *uint8                       { return this.yy_limit }
-func (this *ZendLexState) SetYyLimit(value *uint8)                  { this.yy_limit = value }
-func (this *ZendLexState) GetYyState() int                          { return this.yy_state }
-func (this *ZendLexState) SetYyState(value int)                     { this.yy_state = value }
-func (this *ZendLexState) GetStateStack() ZendStack                 { return this.state_stack }
-func (this *ZendLexState) SetStateStack(value ZendStack)            { this.state_stack = value }
-func (this *ZendLexState) GetHeredocLabelStack() ZendPtrStack       { return this.heredoc_label_stack }
-func (this *ZendLexState) SetHeredocLabelStack(value ZendPtrStack)  { this.heredoc_label_stack = value }
-func (this *ZendLexState) GetIn() *ZendFileHandle                   { return this.in }
-func (this *ZendLexState) SetIn(value *ZendFileHandle)              { this.in = value }
-func (this *ZendLexState) GetLineno() uint32                        { return this.lineno }
-func (this *ZendLexState) SetLineno(value uint32)                   { this.lineno = value }
-func (this *ZendLexState) GetFilename() *ZendString                 { return this.filename }
-func (this *ZendLexState) SetFilename(value *ZendString)            { this.filename = value }
-func (this *ZendLexState) GetScriptOrg() *uint8                     { return this.script_org }
-func (this *ZendLexState) SetScriptOrg(value *uint8)                { this.script_org = value }
-func (this *ZendLexState) GetScriptOrgSize() int                    { return this.script_org_size }
-func (this *ZendLexState) SetScriptOrgSize(value int)               { this.script_org_size = value }
-func (this *ZendLexState) GetScriptFiltered() *uint8                { return this.script_filtered }
-func (this *ZendLexState) SetScriptFiltered(value *uint8)           { this.script_filtered = value }
-func (this *ZendLexState) GetScriptFilteredSize() int               { return this.script_filtered_size }
-func (this *ZendLexState) SetScriptFilteredSize(value int)          { this.script_filtered_size = value }
-func (this *ZendLexState) GetInputFilter() ZendEncodingFilter       { return this.input_filter }
-func (this *ZendLexState) SetInputFilter(value ZendEncodingFilter)  { this.input_filter = value }
-func (this *ZendLexState) GetOutputFilter() ZendEncodingFilter      { return this.output_filter }
-func (this *ZendLexState) SetOutputFilter(value ZendEncodingFilter) { this.output_filter = value }
-func (this *ZendLexState) GetScriptEncoding() *ZendEncoding         { return this.script_encoding }
-func (this *ZendLexState) SetScriptEncoding(value *ZendEncoding)    { this.script_encoding = value }
-func (this *ZendLexState) GetOnEvent() func(event ZendPhpScannerEvent, token int, line int, context any) {
-	return this.on_event
-}
-func (this *ZendLexState) SetOnEvent(value func(event ZendPhpScannerEvent, token int, line int, context any)) {
-	this.on_event = value
-}
-func (this *ZendLexState) GetOnEventContext() any       { return this.on_event_context }
-func (this *ZendLexState) SetOnEventContext(value any)  { this.on_event_context = value }
-func (this *ZendLexState) GetAst() *ZendAst             { return this.ast }
-func (this *ZendLexState) SetAst(value *ZendAst)        { this.ast = value }
-func (this *ZendLexState) GetAstArena() *ZendArena      { return this.ast_arena }
-func (this *ZendLexState) SetAstArena(value *ZendArena) { this.ast_arena = value }
-
 /**
  * ZendHeredocLabel
  */
 type ZendHeredocLabel struct {
-	label                   *byte
-	length                  int
-	indentation             int
-	indentation_uses_spaces ZendBool
+	label                 *byte
+	length                int
+	indentation           int
+	indentationUsesSpaces bool
+}
+
+func NewHeredocLabel(label string) *ZendHeredocLabel {
+	return &ZendHeredocLabel{
+		label:       label,
+		indentation: 0,
+	}
 }
 
 func (l *ZendHeredocLabel) GetLabel() string { return "" } // todo
+func (l *ZendHeredocLabel) Copy() *ZendHeredocLabel {
+	newLabel := *l
+	return &newLabel
+}

@@ -1,12 +1,15 @@
 package zend
 
-import "strings"
+import (
+	b "sik/builtin"
+	"strings"
+)
 
 type ctype = byte
 type LangScanner struct {
 	code string // 代码原文
 
-	lineno    int // CG__().zend_lineno
+	lineno    uint32 // CG__().zend_lineno
 	startLine int
 	shortTags bool // CG__().short_tags
 
@@ -30,10 +33,10 @@ type LangScanner struct {
 	yyLimit  *byte // LANG_SCNG__().yy_limit
 	yyState  int   // LANG_SCNG__().yy_state
 
-	heredocLabelStack            ZendStack[*ZendHeredocLabel] // LANG_SCNG__().heredoc_label_stack
-	heredocScanAhead             bool                         // LANG_SCNG__().heredoc_scan_ahead
-	heredocIndentation           int                          // LANG_SCNG__().heredoc_indentation
-	heredocIndentationUsesSpaces bool                         // LANG_SCNG__().heredoc_indentation_uses_spaces
+	heredocLabelStack            b.Stack[*ZendHeredocLabel] // LANG_SCNG__().heredocLabelStack
+	heredocScanAhead             bool                       // LANG_SCNG__().heredoc_scan_ahead
+	heredocIndentation           int                        // LANG_SCNG__().heredoc_indentation
+	heredocIndentationUsesSpaces bool                       // LANG_SCNG__().heredoc_indentation_uses_spaces
 
 	onEvent    func(event ZendPhpScannerEvent, token int, line int, context any) // LANG_SCNG__().on_event
 	onEventCxt any                                                               // LANG_SCNG__().on_event_context
@@ -41,12 +44,19 @@ type LangScanner struct {
 	inputFilter  func(string) string // LANG_SCNG__().input_filter  函数参数类型有差异
 	outputFilter func(string) string // LANG_SCNG__().output_filter 函数参数类型有差异
 
-	stateStack ZendStack[int] // LANG_SCNG__().state_stack
+	stateStack b.Stack[int] // LANG_SCNG__().stateStack
 
 	docComment string // CG__().doc_comment *ZendString
 }
 
-func (sc *LangScanner) LexScan(zendlval *Zval, elem *ZendParserStackElem) int {
+func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
+	var zv Zval
+	zv.SetUndef()
+	token := sc.LexScanEx(&zv, elem)
+	return token, &zv
+}
+
+func (sc *LangScanner) LexScanEx(zendlval *Zval, elem *ZendParserStackElem) int {
 	sc.limit = uint(len(sc.code)) - 1
 
 	// 第一次执行
@@ -262,4 +272,69 @@ func (sc *LangScanner) setDoubleQuotesScannedLength(len_ uint) uint {
 
 func (sc *LangScanner) getDoubleQuotesScannedLength() uint {
 	return sc.scannedStringLen
+}
+
+func (sc *LangScanner) saveLexState() *ZendLexState {
+	lexState := ZendLexState{}
+	lexState.len_ = sc.len_
+	lexState.start = sc.start
+	lexState.text = sc.text
+	lexState.cursor = sc.cursor
+	lexState.marker = sc.marker
+	lexState.limit = sc.limit
+	lexState.state = sc.state
+	lexState.stateStack = sc.stateStack.Copy()
+	lexState.heredocLabelStack = sc.heredocLabelStack.Copy()
+
+	lexState.in = LANG_SCNG__().yy_in
+	lexState.filename = ZendGetCompiledFilename()
+	lexState.lineno = sc.lineno
+	lexState.script_org = LANG_SCNG__().script_org
+	lexState.script_org_size = LANG_SCNG__().script_org_size
+	lexState.script_filtered = LANG_SCNG__().script_filtered
+	lexState.script_filtered_size = LANG_SCNG__().script_filtered_size
+	lexState.input_filter = LANG_SCNG__().input_filter
+	lexState.output_filter = LANG_SCNG__().output_filter
+	lexState.script_encoding = LANG_SCNG__().script_encoding
+	lexState.on_event = LANG_SCNG__().on_event
+	lexState.on_event_context = LANG_SCNG__().on_event_context
+	lexState.ast = CG__().ast
+	lexState.ast_arena = CG__().ast_arena
+
+	sc.stateStack.Clean()
+	sc.heredocLabelStack.Clean()
+
+	return &lexState
+}
+
+func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
+	sc.len_ = lexState.len_
+	sc.start = lexState.start
+	sc.text = lexState.text
+	sc.cursor = lexState.cursor
+	sc.marker = lexState.marker
+	sc.limit = lexState.limit
+	sc.state = lexState.state
+	sc.stateStack = lexState.stateStack
+	sc.heredocLabelStack = lexState.heredocLabelStack
+
+	LANG_SCNG__().yy_in = lexState.in
+	sc.lineno = lexState.lineno
+	ZendRestoreCompiledFilename(lexState.filename)
+	if LANG_SCNG__().script_filtered {
+		efree(LANG_SCNG__().script_filtered)
+		LANG_SCNG__().script_filtered = nil
+	}
+	LANG_SCNG__().script_org = lexState.script_org
+	LANG_SCNG__().script_org_size = lexState.script_org_size
+	LANG_SCNG__().script_filtered = lexState.script_filtered
+	LANG_SCNG__().script_filtered_size = lexState.script_filtered_size
+	LANG_SCNG__().input_filter = lexState.input_filter
+	LANG_SCNG__().output_filter = lexState.output_filter
+	LANG_SCNG__().script_encoding = lexState.script_encoding
+	LANG_SCNG__().on_event = lexState.on_event
+	LANG_SCNG__().on_event_context = lexState.on_event_context
+	CG__().ast = lexState.ast
+	CG__().ast_arena = lexState.ast_arena
+	RESET_DOC_COMMENT()
 }

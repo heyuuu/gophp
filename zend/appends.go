@@ -1,6 +1,10 @@
 package zend
 
-import "strings"
+import (
+	"log"
+	"strconv"
+	"strings"
+)
 
 func strCaseEquals(str1 string, str2 string) bool {
 	if str1 == str2 {
@@ -18,4 +22,12 @@ func strCaseEquals(str1 string, str2 string) bool {
 func strEscape(str string) string {
 	var replacer = strings.NewReplacer("\\\\", "\\", "\\'", "'")
 	return replacer.Replace(str)
+}
+
+func strToD(str string) float64 {
+	value, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return value
 }

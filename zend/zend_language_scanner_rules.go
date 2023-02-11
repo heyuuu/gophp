@@ -84,7 +84,7 @@ func (sc *LangScanner) lexerOffsetNum() (int, bool) {
 func (sc *LangScanner) lexerDNum() (int, bool) {
 	str := sc.seg()
 	str = strings.ReplaceAll(str, "_", "")
-	dVal := ZendStrtod(str)
+	dVal := strToD(str)
 	sc.zendlval.SetDouble(dVal)
 	return sc.tokenWithVal(T_DNUMBER)
 }
@@ -293,38 +293,32 @@ func (sc *LangScanner) lexerRule20() (int, bool) {
 	sc.begin(yycST_DOUBLE_QUOTES)
 	return sc.token('"')
 }
+
 func (sc *LangScanner) lexerRule21() (int, bool) {
-	var s *byte
-	var savedCursor *uint8
-	var bprefix int = b.Cond(sc.yyText0() != '<', 1, 0)
-	var spacing int = 0
-	var indentation int = 0
-	var heredocLabel = &ZendHeredocLabel{}
-	var isHeredoc zend_bool = 1
+	// 去除前缀 b?<<<，去除后缀 \r\n|\n, 去除空格和\t
+	label := strings.Trim(sc.seg()[1:], "<\r\n \t")
+	// 记录换行行号
 	sc.lineno++
-	heredocLabel.length = sc.len_ - bprefix - 3 - 1 - b.Cond(sc.yyText[sc.len_-2] == '\r', 1, 0)
-	s = sc.yyText + bprefix + 3
-	for (*s) == ' ' || (*s) == '\t' {
-		s++
-		heredocLabel.length--
-	}
-	if (*s) == '\'' {
-		s++
-		heredocLabel.length -= 2
-		isHeredoc = 0
+
+	isHeredoc := true
+	if label[0] == '\'' {
+		label = label[1 : len(label)-1]
+		isHeredoc = false
 		sc.begin(yycST_NOWDOC)
 	} else {
-		if (*s) == '"' {
-			s++
-			heredocLabel.length -= 2
+		if label[0] == '"' {
+			label = label[1 : len(label)-1]
 		}
 		sc.begin(yycST_HEREDOC)
 	}
-	heredocLabel.label = estrndup(s, heredocLabel.length)
-	heredocLabel.indentation = 0
-	savedCursor = sc.yyCursor
+
+	heredocLabel := NewHeredocLabel(label)
+	savedCursor := sc.cursor
 	sc.heredocLabelStack.Push(heredocLabel)
-	for sc.canRead() && (sc.peek() == ' ' || sc.peek() == '\t') {
+
+	spacing := 0
+	indentation := 0
+	for sc.canRead() && sc.peekIs(' ', '\t') {
 		if sc.peek() == '\t' {
 			spacing |= HEREDOC_USING_TABS
 		} else {
@@ -333,76 +327,72 @@ func (sc *LangScanner) lexerRule21() (int, bool) {
 		sc.skip()
 		indentation++
 	}
-	if sc.yyCursor == sc.yyLimit {
-		sc.yyCursor = savedCursor
+	if sc.cursor == sc.limit {
+		sc.cursor = savedCursor
 		return sc.token(T_START_HEREDOC)
 	}
 
 	/* Check for ending label on the next line */
-
-	if heredocLabel.length < sc.yyLimit-sc.yyCursor && !(memcmp(sc.yyCursor, s, heredocLabel.length)) {
-		if !(isLabelSuccessor(sc.yyCursor[heredocLabel.length])) {
+	if sc.peekStrIs(label) {
+		if !(isLabelSuccessor(sc.peekOffset(len(label)))) {
 			if spacing == (HEREDOC_USING_SPACES | HEREDOC_USING_TABS) {
 				ZendThrowException(ZendCeParseError, "Invalid indentation - tabs and spaces cannot be mixed", 0)
 				if sc.isParserMode() {
 					return sc.token(T_ERROR)
 				}
 			}
-			sc.yyCursor = savedCursor
+			sc.cursor = savedCursor
 			heredocLabel.indentation = indentation
 			sc.begin(yycST_END_HEREDOC)
 			return sc.token(T_START_HEREDOC)
 		}
 	}
-	sc.yyCursor = savedCursor
+
+	sc.cursor = savedCursor
 	if isHeredoc && !sc.heredocScanAhead {
-		var current_state zend_lex_state
-		var saved_doc_comment *zend_string = CG__().doc_comment
-		var heredoc_nesting_level int = 1
-		var first_token int = 0
-		var error int = 0
-		ZendSaveLexicalState(&current_state)
-		sc.heredocScanAhead = 1
+		var currentState ZendLexState
+		var savedDocComment *ZendString = CG__().doc_comment
+		heredocNestingLevel := 1
+		firstToken := 0
+		errno := 0
+		ZendSaveLexicalState(&currentState)
+		sc.heredocScanAhead = true
 		sc.heredocIndentation = 0
-		sc.heredocIndentationUsesSpaces = 0
+		sc.heredocIndentationUsesSpaces = false
 		sc.onEvent = nil
 		CG__().doc_comment = nil
-		zend_ptr_stack_reverse_apply(current_state.heredoc_label_stack, CopyHeredocLabelStack)
-		zend_exception_save()
-		for heredoc_nesting_level != 0 {
-			var zv zval
-			var retval int
-			ZVAL_UNDEF(&zv)
-			retval = lex_scan(&zv, nil)
-			zval_ptr_dtor_nogc(&zv)
-			if EG__().exception {
-				zend_clear_exception()
+		zend_ptr_stack_reverse_apply(currentState.heredocLabelStack, CopyHeredocLabelStack)
+		ZendExceptionSave()
+		for heredocNestingLevel != 0 {
+			retval, _ := sc.LexScan(nil)
+			if EG__().exception != nil {
+				ZendClearException()
 				break
 			}
-			if first_token == 0 {
-				first_token = retval
+			if firstToken == 0 {
+				firstToken = retval
 			}
 			switch retval {
 			case T_START_HEREDOC:
-				heredoc_nesting_level++
+				heredocNestingLevel++
 			case T_END_HEREDOC:
-				heredoc_nesting_level--
+				heredocNestingLevel--
 			case END:
-				heredoc_nesting_level = 0
+				heredocNestingLevel = 0
 			}
 		}
-		zend_exception_restore()
-		if (first_token == T_VARIABLE || first_token == T_DOLLAR_OPEN_CURLY_BRACES || first_token == T_CURLY_OPEN) && sc.heredocIndentation {
+		ZendExceptionRestore()
+		if b.EqualsAny(firstToken, T_VARIABLE, T_DOLLAR_OPEN_CURLY_BRACES, T_CURLY_OPEN) && sc.heredocIndentation != 0 {
 			ZendThrowExceptionEx(ZendCeParseError, 0, "Invalid body indentation level (expecting an indentation level of at least %d)", sc.heredocIndentation)
-			error = 1
+			errno = 1
 		}
 		heredocLabel.indentation = sc.heredocIndentation
-		heredocLabel.indentation_uses_spaces = sc.heredocIndentationUsesSpaces
-		ZendRestoreLexicalState(&current_state)
+		heredocLabel.indentationUsesSpaces = sc.heredocIndentationUsesSpaces
+		ZendRestoreLexicalState(&currentState)
 		sc.heredocScanAhead = false
 		CG__().increment_lineno = 0
-		CG__().doc_comment = saved_doc_comment
-		if sc.isParserMode() && error != 0 {
+		CG__().doc_comment = savedDocComment
+		if sc.isParserMode() && errno != 0 {
 			return sc.token(T_ERROR)
 		}
 	}
@@ -594,7 +584,7 @@ heredoc_scan_done:
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
 		var newline_at_start zend_bool = (*(sc.yyText - 1)) == '\n' || (*(sc.yyText - 1)) == '\r'
 		var copy *zend_string = Z_STR_P(zendlval)
-		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentation_uses_spaces, newline_at_start, newline != 0)) {
+		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newline_at_start, newline != 0)) {
 			return sc.token(T_ERROR)
 		}
 		if ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS {
