@@ -406,10 +406,10 @@ func PhpAutoGlobalsCreateGlobals(name *ZendString) ZendBool {
 func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	var ini_scanner_globals ZendIniScannerGlobals
 	var language_scanner_globals ZendPhpScannerGlobals
-	ZendCpuStartup()
+	//ZendCpuStartup()
 	StartMemoryManager()
 	VirtualCwdStartup()
-	ZendStartupStrtod()
+	//ZendStartupStrtod()
 	ZendStartupExtensionsMechanism()
 
 	/* Set up utility functions and values */
@@ -539,7 +539,7 @@ func ZendShutdown() {
 	Free(GLOBAL_CLASS_TABLE)
 	GLOBAL_CONSTANTS_TABLE.Destroy()
 	Free(GLOBAL_CONSTANTS_TABLE)
-	ZendShutdownStrtod()
+	//ZendShutdownStrtod()
 	if CG__().GetMapPtrBase() {
 		Free(CG__().GetMapPtrBase())
 		CG__().SetMapPtrBase(nil)
