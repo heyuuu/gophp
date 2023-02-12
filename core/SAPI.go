@@ -12,7 +12,7 @@ type ISapiModule interface {
 	Shutdown() bool
 	Activate()
 	Deactivate()
-	UbWrite(str string)
+	UbWrite(str string) int
 }
 
 func MakeSapiModule(
