@@ -29,16 +29,6 @@ type sapi_module_struct = _sapiModule
 
 var sapi_module sapi_module_struct
 
-/* Some values in this structure needs to be filled in before
- * calling sapi_activate(). We WILL change the `char *' entries,
- * so make sure that you allocate a separate buffer for them
- * and that you free them after sapi_deactivate().
- */
-
-type _sapiGlobals = sapi_globals_struct
-
-var sapi_globals sapi_globals_struct
-
 /*
  * This is the preferred and maintained API for
  * operating on HTTP headers.

@@ -25,7 +25,7 @@ func PhpStreamInputWrite(stream *core.PhpStream, buf *byte, count int) ssize_t {
 func PhpStreamInputRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var input *PhpStreamInputT = stream.GetAbstract()
 	var read ssize_t
-	if !(core.SG(post_read)) && core.SG(read_post_bytes) < int64(input.GetPosition()+count) {
+	if !(core.SG__().post_read) && core.SG__().read_post_bytes < int64(input.GetPosition()+count) {
 
 		/* read requested data from SAPI */
 
@@ -143,11 +143,11 @@ func PhpStreamUrlWrapPhp(
 			return nil
 		}
 		input = zend.Ecalloc(1, b.SizeOf("* input"))
-		if b.Assign(&(input.GetBody()), core.SG(request_info).request_body) {
+		if b.Assign(&(input.GetBody()), core.SG__().request_info.request_body) {
 			core.PhpStreamRewind(input.GetBody())
 		} else {
 			input.SetBody(core.PhpStreamTempCreateEx(core.TEMP_STREAM_DEFAULT, core.SAPI_POST_BLOCK_SIZE, core.PG(upload_tmp_dir)))
-			core.SG(request_info).request_body = input.GetBody()
+			core.SG__().request_info.request_body = input.GetBody()
 		}
 		return core.PhpStreamAlloc(&PhpStreamInputOps, input, 0, "rb")
 	}

@@ -30,8 +30,8 @@ func SjisTrail(c uint8) bool {
 func GetDefaultCharset() *byte {
 	if core.PG(internal_encoding) && core.PG(internal_encoding)[0] {
 		return core.PG(internal_encoding)
-	} else if core.SG(default_charset) && core.SG(default_charset)[0] {
-		return core.SG(default_charset)
+	} else if core.SG__().default_charset && core.SG__().default_charset[0] {
+		return core.SG__().default_charset
 	}
 	return nil
 }
@@ -373,7 +373,7 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 			}
 		}
 	}
-	charset_hint = core.SG(default_charset)
+	charset_hint = core.SG__().default_charset
 	if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
 	}

@@ -24,7 +24,7 @@ func PhpOutputStderr(str *byte, str_len int) int {
 	/* See http://support.microsoft.com/kb/190351 */
 }
 func PhpOutputHeader() {
-	if !(SG(headers_sent)) {
+	if !(SG__().headers_sent) {
 		if !(OG(output_start_filename)) {
 			if zend.ZendIsCompiling() != 0 {
 				OG(output_start_filename) = zend.ZendGetCompiledFilename().GetVal()

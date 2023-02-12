@@ -7,8 +7,8 @@ import (
 )
 
 func PhpDefaultPostReader() {
-	if !(strcmp(SG(request_info).request_method, "POST")) {
-		if nil == SG(request_info).post_entry {
+	if !(strcmp(SG__().request_info.request_method, "POST")) {
+		if nil == SG__().request_info.post_entry {
 
 			/* no post handler registered, so we just swallow the data */
 

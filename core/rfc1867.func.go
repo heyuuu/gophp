@@ -112,7 +112,7 @@ func FreeFilename(el *zend.Zval) {
 }
 func DestroyUploadedFilesHash() {
 	var el *zend.Zval
-	var __ht *zend.HashTable = SG(rfc1867_uploaded_files)
+	var __ht *zend.HashTable = SG__().rfc1867_uploaded_files
 	for _, _p := range __ht.foreachData() {
 		var _z *zend.Zval = _p.GetVal()
 
@@ -120,8 +120,8 @@ func DestroyUploadedFilesHash() {
 		var filename *zend.ZendString = el.GetStr()
 		zend.VCWD_UNLINK(filename.GetVal())
 	}
-	SG(rfc1867_uploaded_files).Destroy()
-	zend.FREE_HASHTABLE(SG(rfc1867_uploaded_files))
+	SG__().rfc1867_uploaded_files.Destroy()
+	zend.FREE_HASHTABLE(SG__().rfc1867_uploaded_files)
 }
 func FillBuffer(self *MultipartBuffer) int {
 	var bytes_to_read int
@@ -149,7 +149,7 @@ func FillBuffer(self *MultipartBuffer) int {
 
 		if actual_read > 0 {
 			self.SetBytesInBuffer(self.GetBytesInBuffer() + actual_read)
-			SG(read_post_bytes) += actual_read
+			SG__().read_post_bytes += actual_read
 			total_read += actual_read
 			bytes_to_read -= actual_read
 		} else {
@@ -555,8 +555,8 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		getword_conf = PhpApGetwordConf
 		_basename = PhpApBasename
 	}
-	if SG(post_max_size) > 0 && SG(request_info).content_length > SG(post_max_size) {
-		sapi_module.GetSapiError()(zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG(request_info).content_length, SG(post_max_size))
+	if SG__().post_max_size > 0 && SG__().request_info.content_length > SG__().post_max_size {
+		sapi_module.GetSapiError()(zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
 		return
 	}
 
@@ -612,7 +612,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	zend.ZendHashInit(&(PG(rfc1867_protected_variables)), 8, nil, nil, 0)
 	zend.ALLOC_HASHTABLE(uploaded_files)
 	zend.ZendHashInit(uploaded_files, 8, nil, FreeFilename, 0)
-	SG(rfc1867_uploaded_files) = uploaded_files
+	SG__().rfc1867_uploaded_files = uploaded_files
 	if PG(http_globals)[TRACK_VARS_FILES].u1.v.type_ != zend.IS_ARRAY {
 
 		/* php_auto_globals_create_files() might have already done that */
@@ -625,7 +625,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	header.Init(b.SizeOf("mime_header_entry"), zend.LlistDtorFuncT(PhpFreeHdrEntry), 0)
 	if PhpRfc1867Callback != nil {
 		var event_start MultipartEventStart
-		event_start.SetContentLength(SG(request_info).content_length)
+		event_start.SetContentLength(SG__().request_info.content_length)
 		if PhpRfc1867Callback(MULTIPART_EVENT_START, &event_start, &event_extra_data) == zend.FAILURE {
 			goto fileupload_done
 		}
@@ -714,7 +714,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 					if PhpRfc1867Callback != nil {
 						var event_formdata MultipartEventFormdata
 						var newlength int = new_val_len
-						event_formdata.SetPostBytesProcessed(SG(read_post_bytes))
+						event_formdata.SetPostBytesProcessed(SG__().read_post_bytes)
 						event_formdata.SetName(param)
 						event_formdata.SetValue(&value)
 						event_formdata.SetLength(new_val_len)
@@ -733,7 +733,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 					}
 					if PhpRfc1867Callback != nil {
 						var event_formdata MultipartEventFormdata
-						event_formdata.SetPostBytesProcessed(SG(read_post_bytes))
+						event_formdata.SetPostBytesProcessed(SG__().read_post_bytes)
 						event_formdata.SetName(param)
 						event_formdata.SetValue(&value)
 						event_formdata.SetLength(value_len)
@@ -809,7 +809,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			fd = -1
 			if skip_upload == 0 && PhpRfc1867Callback != nil {
 				var event_file_start MultipartEventFileStart
-				event_file_start.SetPostBytesProcessed(SG(read_post_bytes))
+				event_file_start.SetPostBytesProcessed(SG__().read_post_bytes)
 				event_file_start.SetName(param)
 				event_file_start.SetFilename(&filename)
 				if PhpRfc1867Callback(MULTIPART_EVENT_FILE_START, &event_file_start, &event_extra_data) == zend.FAILURE {
@@ -850,7 +850,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			for cancel_upload == 0 && blen > 0 {
 				if PhpRfc1867Callback != nil {
 					var event_file_data MultipartEventFileData
-					event_file_data.SetPostBytesProcessed(SG(read_post_bytes))
+					event_file_data.SetPostBytesProcessed(SG__().read_post_bytes)
 					event_file_data.SetOffset(offset)
 					event_file_data.SetData(buff)
 					event_file_data.SetLength(blen)
@@ -897,7 +897,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			}
 			if PhpRfc1867Callback != nil {
 				var event_file_end MultipartEventFileEnd
-				event_file_end.SetPostBytesProcessed(SG(read_post_bytes))
+				event_file_end.SetPostBytesProcessed(SG__().read_post_bytes)
 				if temp_filename != nil {
 					event_file_end.SetTempFilename(temp_filename.GetVal())
 				} else {
@@ -917,7 +917,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				}
 				temp_filename = nil
 			} else {
-				zend.ZendHashAddPtr(SG(rfc1867_uploaded_files), temp_filename, temp_filename)
+				zend.ZendHashAddPtr(SG__().rfc1867_uploaded_files, temp_filename, temp_filename)
 			}
 
 			/* is_arr_upload is true when name of file upload field
@@ -1107,7 +1107,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 fileupload_done:
 	if PhpRfc1867Callback != nil {
 		var event_end MultipartEventEnd
-		event_end.SetPostBytesProcessed(SG(read_post_bytes))
+		event_end.SetPostBytesProcessed(SG__().read_post_bytes)
 		PhpRfc1867Callback(MULTIPART_EVENT_END, &event_end, &event_extra_data)
 	}
 	if lbuf != nil {

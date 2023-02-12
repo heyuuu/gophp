@@ -120,7 +120,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	client = core.SG(server_context)
+	client = core.SG__().server_context
 	headers = client.GetRequest().GetHeadersOriginalCase()
 	zend.ArrayInitSize(return_value, headers.GetNNumOfElements())
 	var __ht *zend.HashTable = headers
@@ -165,7 +165,7 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
 func CliServerInitGlobals(cg *ZendCliServerGlobals) { cg.SetColor(0) }
 func ZmStartupCliServer(type_ int, module_number int) int {
@@ -189,7 +189,7 @@ func SapiCliServerStartup(sapi_module *core.sapi_module_struct) int {
 	return zend.SUCCESS
 }
 func SapiCliServerUbWrite(str *byte, str_length int) int {
-	var client *PhpCliServerClient = core.SG(server_context)
+	var client *PhpCliServerClient = core.SG__().server_context
 	if client == nil {
 		return 0
 	}
@@ -204,27 +204,27 @@ func SapiCliServerFlush(server_context any) {
 		core.PhpHandleAbortedConnection()
 		return
 	}
-	if !(core.SG(headers_sent)) {
+	if !(core.SG__().headers_sent) {
 		core.SapiSendHeaders()
-		core.SG(headers_sent) = 1
+		core.SG__().headers_sent = 1
 	}
 }
 func SapiCliServerDiscardHeaders(sapi_headers *core.SapiHeaders) int {
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
 func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
-	var client *PhpCliServerClient = core.SG(server_context)
+	var client *PhpCliServerClient = core.SG__().server_context
 	var buffer zend.SmartStr = zend.MakeSmartStr(0)
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
-	if client == nil || core.SG(request_info).no_headers {
+	if client == nil || core.SG__().request_info.no_headers {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
-	if core.SG(sapi_headers).http_status_line {
-		buffer.AppendString(b.CastStrAuto(core.SG(sapi_headers).http_status_line))
+	if core.SG__().sapi_headers.http_status_line {
+		buffer.AppendString(b.CastStrAuto(core.SG__().sapi_headers.http_status_line))
 		buffer.AppendString("\r\n")
 	} else {
-		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG(sapi_headers).http_response_code, 0)
+		AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), core.SG__().sapi_headers.http_response_code, 0)
 	}
 	AppendEssentialHeaders(&buffer, client, 0)
 	h = (*core.SapiHeader)(zend.ZendLlistGetFirstEx(sapi_headers.GetHeaders(), &pos))
@@ -241,7 +241,7 @@ func SapiCliServerSendHeaders(sapi_headers *core.SapiHeaders) int {
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
 func SapiCliServerReadCookies() *byte {
-	var client *PhpCliServerClient = core.SG(server_context)
+	var client *PhpCliServerClient = core.SG__().server_context
 	var val *byte
 	if nil == b.Assign(&val, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "cookie", b.SizeOf("\"cookie\"")-1)) {
 		return nil
@@ -249,7 +249,7 @@ func SapiCliServerReadCookies() *byte {
 	return val
 }
 func SapiCliServerReadPost(buf *byte, count_bytes int) int {
-	var client *PhpCliServerClient = core.SG(server_context)
+	var client *PhpCliServerClient = core.SG__().server_context
 	if client.GetRequest().GetContent() != nil {
 		var content_len int = client.GetRequest().GetContentLen()
 		var nbytes_copied int = MIN(client.GetPostReadOffset()+count_bytes, content_len) - client.GetPostReadOffset()
@@ -294,7 +294,7 @@ func SapiCliServerRegisterEntryCb(entry **byte, num_args int, args ...any, hash_
 	return zend.ZEND_HASH_APPLY_KEEP
 }
 func SapiCliServerRegisterVariables(track_vars_array *zend.Zval) {
-	var client *PhpCliServerClient = core.SG(server_context)
+	var client *PhpCliServerClient = core.SG__().server_context
 	SapiCliServerRegisterVariable(track_vars_array, "DOCUMENT_ROOT", client.GetServer().GetDocumentRoot())
 	var tmp *byte
 	if b.Assign(&tmp, strrchr(client.GetAddrStr(), ':')) {
@@ -331,10 +331,10 @@ func SapiCliServerRegisterVariables(track_vars_array *zend.Zval) {
 	SapiCliServerRegisterVariable(track_vars_array, "SERVER_PORT", tmp)
 	zend.Efree(tmp)
 	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_URI", client.GetRequest().GetRequestUri())
-	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_METHOD", core.SG(request_info).request_method)
+	SapiCliServerRegisterVariable(track_vars_array, "REQUEST_METHOD", core.SG__().request_info.request_method)
 	SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_NAME", client.GetRequest().GetVpath())
-	if core.SG(request_info).path_translated {
-		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", core.SG(request_info).path_translated)
+	if core.SG__().request_info.path_translated {
+		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", core.SG__().request_info.path_translated)
 	} else if client.GetServer().GetRouter() != nil {
 		SapiCliServerRegisterVariable(track_vars_array, "SCRIPT_FILENAME", client.GetServer().GetRouter())
 	}
@@ -666,7 +666,7 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 
 	/* basic */
 
-	core.Spprintf(&basic_buf, 0, "%s [%d]: %s %s", client.GetAddrStr(), status, core.SG(request_info).request_method, client.GetRequest().GetRequestUri())
+	core.Spprintf(&basic_buf, 0, "%s [%d]: %s %s", client.GetAddrStr(), status, core.SG__().request_info.request_method, client.GetRequest().GetRequestUri())
 	if basic_buf == nil {
 		return
 	}
@@ -1409,7 +1409,7 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 
 	}
 	var zfd zend.ZendFileHandle
-	zend.ZendStreamInitFilename(&zfd, core.SG(request_info).path_translated)
+	zend.ZendStreamInitFilename(&zfd, core.SG__().request_info.path_translated)
 	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
 	zend.EG__().SetBailout(&__bailout)
@@ -1417,7 +1417,7 @@ func PhpCliServerDispatchScript(server *PhpCliServer, client *PhpCliServerClient
 		core.PhpExecuteScript(&zfd)
 	}
 	zend.EG__().SetBailout(__orig_bailout)
-	PhpCliServerLogResponse(client, core.SG(sapi_headers).http_response_code, nil)
+	PhpCliServerLogResponse(client, core.SG__().sapi_headers.http_response_code, nil)
 	return zend.SUCCESS
 }
 func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClient) int {
@@ -1480,16 +1480,16 @@ func PhpCliServerBeginSendStatic(server *PhpCliServer, client *PhpCliServerClien
 }
 func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient) int {
 	var auth *byte
-	PhpCliServerClientPopulateRequestInfo(client, &(core.SG(request_info)))
+	PhpCliServerClientPopulateRequestInfo(client, &(core.SG__().request_info))
 	if nil != b.Assign(&auth, zend.ZendHashStrFindPtr(client.GetRequest().GetHeaders(), "authorization", b.SizeOf("\"authorization\"")-1)) {
 		core.PhpHandleAuthData(auth)
 	}
-	core.SG(sapi_headers).http_response_code = 200
+	core.SG__().sapi_headers.http_response_code = 200
 	if zend.FAILURE == core.PhpRequestStartup() {
 
 		/* should never be happen */
 
-		DestroyRequestInfo(&(core.SG(request_info)))
+		DestroyRequestInfo(&(core.SG__().request_info))
 		return zend.FAILURE
 	}
 	core.PG(during_request_startup) = 0
@@ -1498,9 +1498,9 @@ func PhpCliServerRequestStartup(server *PhpCliServer, client *PhpCliServerClient
 func PhpCliServerRequestShutdown(server *PhpCliServer, client *PhpCliServerClient) int {
 	core.PhpRequestShutdown(0)
 	PhpCliServerCloseConnection(server, client)
-	DestroyRequestInfo(&(core.SG(request_info)))
-	core.SG(server_context) = nil
-	core.SG(rfc1867_uploaded_files) = nil
+	DestroyRequestInfo(&(core.SG__().request_info))
+	core.SG__().server_context = nil
+	core.SG__().rfc1867_uploaded_files = nil
 	return zend.SUCCESS
 }
 func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient) int {
@@ -1536,15 +1536,15 @@ func PhpCliServerDispatchRouter(server *PhpCliServer, client *PhpCliServerClient
 func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int {
 	var is_static_file int = 0
 	var ext *byte = client.GetRequest().GetExt()
-	core.SG(server_context) = client
+	core.SG__().server_context = client
 	if client.GetRequest().GetExtLen() != 3 || ext[0] != 'p' && ext[0] != 'P' || ext[1] != 'h' && ext[1] != 'H' || ext[2] != 'p' && ext[2] != 'P' || client.GetRequest().GetPathTranslated() == nil {
 		is_static_file = 1
 	}
 	if server.GetRouter() != nil || is_static_file == 0 {
 		if zend.FAILURE == PhpCliServerRequestStartup(server, client) {
-			core.SG(server_context) = nil
+			core.SG__().server_context = nil
 			PhpCliServerCloseConnection(server, client)
-			DestroyRequestInfo(&(core.SG(request_info)))
+			DestroyRequestInfo(&(core.SG__().request_info))
 			return zend.SUCCESS
 		}
 	}
@@ -1556,8 +1556,8 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	}
 	if is_static_file == 0 {
 		if zend.SUCCESS == PhpCliServerDispatchScript(server, client) || zend.SUCCESS != PhpCliServerSendErrorPage(server, client, 500) {
-			if core.SG(sapi_headers).http_response_code == 304 {
-				core.SG(sapi_headers).send_default_content_type = 0
+			if core.SG__().sapi_headers.http_response_code == 304 {
+				core.SG__().sapi_headers.send_default_content_type = 0
 			}
 			PhpCliServerRequestShutdown(server, client)
 			return zend.SUCCESS
@@ -1569,24 +1569,24 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 
 			/* do not generate default content type header */
 
-			core.SG(sapi_headers).send_default_content_type = 0
+			core.SG__().sapi_headers.send_default_content_type = 0
 
 			/* we don't want headers to be sent */
 
 			core.sapi_module.SetSendHeaders(SapiCliServerDiscardHeaders)
 			core.PhpRequestShutdown(0)
 			core.sapi_module.SetSendHeaders(send_header_func)
-			core.SG(sapi_headers).send_default_content_type = 1
-			core.SG(rfc1867_uploaded_files) = nil
+			core.SG__().sapi_headers.send_default_content_type = 1
+			core.SG__().rfc1867_uploaded_files = nil
 		}
 		if zend.SUCCESS != PhpCliServerBeginSendStatic(server, client) {
 			PhpCliServerCloseConnection(server, client)
 		}
-		core.SG(server_context) = nil
+		core.SG__().server_context = nil
 		return zend.SUCCESS
 	}
-	core.SG(server_context) = nil
-	DestroyRequestInfo(&(core.SG(request_info)))
+	core.SG__().server_context = nil
+	DestroyRequestInfo(&(core.SG__().request_info))
 	return zend.SUCCESS
 }
 func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerExtMimeTypePair) int {

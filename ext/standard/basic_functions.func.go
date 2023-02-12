@@ -3968,7 +3968,7 @@ func ZifUnregisterTickFunction(execute_data *zend.ZendExecuteData, return_value 
 func ZifIsUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var path *byte
 	var path_len int
-	if !(core.SG(rfc1867_uploaded_files)) {
+	if !(core.SG__().rfc1867_uploaded_files) {
 		return_value.SetFalse()
 		return
 	}
@@ -4039,7 +4039,7 @@ func ZifIsUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		}
 		break
 	}
-	if zend.ZendHashStrExists(core.SG(rfc1867_uploaded_files), path, path_len) != 0 {
+	if zend.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) != 0 {
 		return_value.SetTrue()
 		return
 	} else {
@@ -4055,7 +4055,7 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 	var successful zend.ZendBool = 0
 	var oldmask int
 	var ret int
-	if !(core.SG(rfc1867_uploaded_files)) {
+	if !(core.SG__().rfc1867_uploaded_files) {
 		return_value.SetFalse()
 		return
 	}
@@ -4132,7 +4132,7 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 		}
 		break
 	}
-	if zend.ZendHashStrExists(core.SG(rfc1867_uploaded_files), path, path_len) == 0 {
+	if zend.ZendHashStrExists(core.SG__().rfc1867_uploaded_files, path, path_len) == 0 {
 		return_value.SetFalse()
 		return
 	}
@@ -4153,7 +4153,7 @@ func ZifMoveUploadedFile(execute_data *zend.ZendExecuteData, return_value *zend.
 		successful = 1
 	}
 	if successful != 0 {
-		zend.ZendHashStrDel(core.SG(rfc1867_uploaded_files), path, path_len)
+		zend.ZendHashStrDel(core.SG__().rfc1867_uploaded_files, path, path_len)
 	} else {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unable to move '%s' to '%s'", path, new_path)
 	}

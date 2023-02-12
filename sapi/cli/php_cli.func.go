@@ -129,9 +129,9 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 func SapiCliLogMessage(message *byte, syslog_type_int int) { r.Fprintf(stderr, "%s\n", message) }
 func SapiCliDeactivate() int {
 	r.Fflush(stdout)
-	if core.SG(request_info).argv0 {
-		zend.Free(core.SG(request_info).argv0)
-		core.SG(request_info).argv0 = nil
+	if core.SG__().request_info.argv0 {
+		zend.Free(core.SG__().request_info.argv0)
+		core.SG__().request_info.argv0 = nil
 	}
 	return zend.SUCCESS
 }
@@ -284,7 +284,7 @@ func DoCli(argc int, argv **byte) int {
 
 		/* Set some CLI defaults */
 
-		core.SG(options) |= core.SAPI_OPTION_NO_CHDIR
+		core.SG__().options |= core.SAPI_OPTION_NO_CHDIR
 		php_optind = orig_optind
 		php_optarg = orig_optarg
 		for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
@@ -475,16 +475,16 @@ func DoCli(argc int, argv **byte) int {
 
 		/* before registering argv to module exchange the *new* argv[0] */
 
-		core.SG(request_info).argc = argc - php_optind + 1
+		core.SG__().request_info.argc = argc - php_optind + 1
 		arg_excp = argv + php_optind - 1
 		arg_free = argv[php_optind-1]
 		if translated_path != nil {
-			core.SG(request_info).path_translated = translated_path
+			core.SG__().request_info.path_translated = translated_path
 		} else {
-			core.SG(request_info).path_translated = (*byte)(file_handle.GetFilename())
+			core.SG__().request_info.path_translated = (*byte)(file_handle.GetFilename())
 		}
 		argv[php_optind-1] = (*byte)(file_handle.GetFilename())
-		core.SG(request_info).argv = argv + php_optind - 1
+		core.SG__().request_info.argv = argv + php_optind - 1
 		if core.PhpRequestStartup() == zend.FAILURE {
 			*arg_excp = arg_free
 			r.Fclose(file_handle.GetFp())

@@ -8,6 +8,13 @@ type App struct {
 	sapiGlobals SapiGlobals
 }
 
+var currentApp *App
+
+func CurrentApp() *App {
+	// todo 获取当前 App，后续需替换掉
+	return currentApp
+}
+
 func NewApp() *App {
 	return &App{}
 }
@@ -16,12 +23,14 @@ func (app *App) Startup(module ISapiModule) {
 	sf := module.(*SapiModule)
 	sf.SetIniEntries(nil)
 	sapi_module = *sf
-	SapiGlobalsCtor(&sapi_globals)
+	SapiGlobalsCtor(app.SG())
 }
 
 func (app *App) Shutdown() {
-	SapiGlobalsDtor(&sapi_globals)
+	SapiGlobalsDtor(app.SG())
 }
+
+func (app *App) SG() *SapiGlobals { return &app.sapiGlobals }
 
 /**
  * Context 单个PHP请求上下文

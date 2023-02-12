@@ -90,7 +90,7 @@ func SapiCgiUbWrite(str *byte, str_length int) int {
 func SapiFcgiUbWrite(str *byte, str_length int) int {
 	var ptr *byte = str
 	var remaining int = str_length
-	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 	for remaining > 0 {
 		var to_write int = b.CondF2(remaining > core.INT_MAX, core.INT_MAX, func() int { return int(remaining) })
 		var ret int = core.FcgiWrite(request, core.FCGI_STDOUT, ptr, to_write)
@@ -118,18 +118,18 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 	var h *core.SapiHeader
 	var pos zend.ZendLlistPosition
 	var ignore_status zend.ZendBool = 0
-	var response_status int = core.SG(sapi_headers).http_response_code
-	if core.SG(request_info).no_headers == 1 {
+	var response_status int = core.SG__().sapi_headers.http_response_code
+	if core.SG__().request_info.no_headers == 1 {
 		return core.SAPI_HEADER_SENT_SUCCESSFULLY
 	}
-	if CGIG(nph) || core.SG(sapi_headers).http_response_code != 200 {
+	if CGIG(nph) || core.SG__().sapi_headers.http_response_code != 200 {
 		var len_ int
 		var has_status zend.ZendBool = 0
 		var buf []byte
-		if CGIG(rfc2616_headers) && core.SG(sapi_headers).http_status_line {
+		if CGIG(rfc2616_headers) && core.SG__().sapi_headers.http_status_line {
 			var s *byte
-			len_ = core.Slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", core.SG(sapi_headers).http_status_line)
-			if b.Assign(&s, strchr(core.SG(sapi_headers).http_status_line, ' ')) {
+			len_ = core.Slprintf(buf, SAPI_CGI_MAX_HEADER_LENGTH, "%s", core.SG__().sapi_headers.http_status_line)
+			if b.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) {
 				response_status = atoi(s + 1)
 			}
 			if len_ > SAPI_CGI_MAX_HEADER_LENGTH {
@@ -137,7 +137,7 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 			}
 		} else {
 			var s *byte
-			if core.SG(sapi_headers).http_status_line && b.Assign(&s, strchr(core.SG(sapi_headers).http_status_line, ' ')) != 0 && s-core.SG(sapi_headers).http_status_line >= 5 && strncasecmp(core.SG(sapi_headers).http_status_line, "HTTP/", 5) == 0 {
+			if core.SG__().sapi_headers.http_status_line && b.Assign(&s, strchr(core.SG__().sapi_headers.http_status_line, ' ')) != 0 && s-core.SG__().sapi_headers.http_status_line >= 5 && strncasecmp(core.SG__().sapi_headers.http_status_line, "HTTP/", 5) == 0 {
 				len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status:%s", s)
 				response_status = atoi(s + 1)
 			} else {
@@ -152,15 +152,15 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 				if has_status == 0 {
 					var err *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(core.HttpStatusMap)
 					for err.GetCode() != 0 {
-						if err.GetCode() == core.SG(sapi_headers).http_response_code {
+						if err.GetCode() == core.SG__().sapi_headers.http_response_code {
 							break
 						}
 						err++
 					}
 					if err.GetStr() != nil {
-						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", core.SG(sapi_headers).http_response_code, err.GetStr())
+						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", core.SG__().sapi_headers.http_response_code, err.GetStr())
 					} else {
-						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d", core.SG(sapi_headers).http_response_code)
+						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d", core.SG__().sapi_headers.http_response_code)
 					}
 				}
 			}
@@ -200,8 +200,8 @@ func SapiCgiReadPost(buffer *byte, count_bytes int) int {
 	var read_bytes int = 0
 	var tmp_read_bytes int
 	var remaining_bytes int
-	r.Assert(core.SG(request_info).content_length >= core.SG(read_post_bytes))
-	remaining_bytes = size_t(core.SG(request_info).content_length - core.SG(read_post_bytes))
+	r.Assert(core.SG__().request_info.content_length >= core.SG__().read_post_bytes)
+	remaining_bytes = size_t(core.SG__().request_info.content_length - core.SG__().read_post_bytes)
 	count_bytes = cli.MIN(count_bytes, remaining_bytes)
 	for read_bytes < count_bytes {
 		tmp_read_bytes = read(STDIN_FILENO, buffer+read_bytes, count_bytes-read_bytes)
@@ -215,8 +215,8 @@ func SapiCgiReadPost(buffer *byte, count_bytes int) int {
 func SapiFcgiReadPost(buffer *byte, count_bytes int) int {
 	var read_bytes int = 0
 	var tmp_read_bytes int
-	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
-	var remaining int = core.SG(request_info).content_length - core.SG(read_post_bytes)
+	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
+	var remaining int = core.SG__().request_info.content_length - core.SG__().read_post_bytes
 	if remaining < count_bytes {
 		count_bytes = remaining
 	}
@@ -238,7 +238,7 @@ func SapiFcgiGetenv(name *byte, name_len int) *byte {
 	 * of a request.  So we have to do our own lookup to get env
 	 * vars.  This could probably be faster somehow.  */
 
-	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 	var ret *byte = core.FcgiGetenv(request, name, int(name_len))
 	if ret != nil {
 		return ret
@@ -263,7 +263,7 @@ func _sapiCgiPutenv(name string, name_len int, value *byte) *byte {
 }
 func SapiCgiReadCookies() *byte { return getenv("HTTP_COOKIE") }
 func SapiFcgiReadCookies() *byte {
-	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+	var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 	return core.FCGI_GETENV(request, "HTTP_COOKIE")
 }
 func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
@@ -290,7 +290,7 @@ func CgiPhpImportEnvironmentVariables(array_ptr *zend.Zval) {
 
 	PhpPhpImportEnvironmentVariables(array_ptr)
 	if core.FcgiIsFastcgi() != 0 {
-		var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+		var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 		core.FcgiLoadenv(request, CgiPhpLoadEnvVar, array_ptr)
 	}
 }
@@ -304,11 +304,11 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 
 	core.PhpImportEnvironmentVariables(track_vars_array)
 	if CGIG(fix_pathinfo) {
-		var script_name *byte = core.SG(request_info).request_uri
+		var script_name *byte = core.SG__().request_info.request_uri
 		var path_info *byte
 		var free_php_self int
 		if core.FcgiIsFastcgi() != 0 {
-			var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+			var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 			path_info = core.FCGI_GETENV(request, "PATH_INFO")
 		} else {
 			path_info = getenv("PATH_INFO")
@@ -346,8 +346,8 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 			zend.FreeAlloca(php_self, use_heap)
 		}
 	} else {
-		if core.SG(request_info).request_uri {
-			php_self = core.SG(request_info).request_uri
+		if core.SG__().request_info.request_uri {
+			php_self = core.SG__().request_info.request_uri
 		} else {
 			php_self = ""
 		}
@@ -360,7 +360,7 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 func SapiCgiLogMessage(message *byte, syslog_type_int int) {
 	if core.FcgiIsFastcgi() != 0 && CGIG(fcgi_logging) {
 		var request *core.FcgiRequest
-		request = (*core.FcgiRequest)(core.SG(server_context))
+		request = (*core.FcgiRequest)(core.SG__().server_context)
 		if request != nil {
 			var ret int
 			var len_ int = int(strlen(message))
@@ -456,7 +456,7 @@ func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_r
 func SapiCgiActivate() int {
 	/* PATH_TRANSLATED should be defined at this stage but better safe than sorry :) */
 
-	if !(core.SG(request_info).path_translated) {
+	if !(core.SG__().request_info.path_translated) {
 		return zend.FAILURE
 	}
 	if core.PhpIniHasPerHostConfig() != 0 {
@@ -465,7 +465,7 @@ func SapiCgiActivate() int {
 		/* Activate per-host-system-configuration defined in php.ini and stored into configuration_hash during startup */
 
 		if core.FcgiIsFastcgi() != 0 {
-			var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+			var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 			server_name = core.FCGI_GETENV(request, "SERVER_NAME")
 		} else {
 			server_name = getenv("SERVER_NAME")
@@ -490,17 +490,17 @@ func SapiCgiActivate() int {
 
 		/* Prepare search path */
 
-		path_len = strlen(core.SG(request_info).path_translated)
+		path_len = strlen(core.SG__().request_info.path_translated)
 
 		/* Make sure we have trailing slash! */
 
-		if !(zend.IS_SLASH(core.SG(request_info).path_translated[path_len])) {
+		if !(zend.IS_SLASH(core.SG__().request_info.path_translated[path_len])) {
 			path = zend.Emalloc(path_len + 2)
-			memcpy(path, core.SG(request_info).path_translated, path_len+1)
+			memcpy(path, core.SG__().request_info.path_translated, path_len+1)
 			path_len = zend.ZendDirname(path, path_len)
 			path[b.PostInc(&path_len)] = zend.DEFAULT_SLASH
 		} else {
-			path = zend.Estrndup(core.SG(request_info).path_translated, path_len)
+			path = zend.Estrndup(core.SG__().request_info.path_translated, path_len)
 			path_len = zend.ZendDirname(path, path_len)
 		}
 		path[path_len] = 0
@@ -514,7 +514,7 @@ func SapiCgiActivate() int {
 		if core.PG(user_ini_filename) && (*core.PG)(user_ini_filename) {
 			var doc_root *byte
 			if core.FcgiIsFastcgi() != 0 {
-				var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+				var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 				doc_root = core.FCGI_GETENV(request, "DOCUMENT_ROOT")
 			} else {
 				doc_root = getenv("DOCUMENT_ROOT")
@@ -543,13 +543,13 @@ func SapiCgiDeactivate() int {
 	   2. When the first call occurs and the request is not set up, flush fails on FastCGI.
 	*/
 
-	if core.SG(sapi_started) {
+	if core.SG__().sapi_started {
 		if core.FcgiIsFastcgi() != 0 {
-			if Parent == 0 && core.FcgiFinishRequest((*core.FcgiRequest)(core.SG(server_context)), 0) == 0 {
+			if Parent == 0 && core.FcgiFinishRequest((*core.FcgiRequest)(core.SG__().server_context), 0) == 0 {
 				core.PhpHandleAbortedConnection()
 			}
 		} else {
-			SapiCgiFlush(core.SG(server_context))
+			SapiCgiFlush(core.SG__().server_context)
 		}
 	}
 	return zend.SUCCESS
@@ -625,14 +625,14 @@ func InitRequestInfo(request *core.FcgiRequest) {
 
 	/* initialize the defaults */
 
-	core.SG(request_info).path_translated = nil
-	core.SG(request_info).request_method = nil
-	core.SG(request_info).proto_num = 1000
-	core.SG(request_info).query_string = nil
-	core.SG(request_info).request_uri = nil
-	core.SG(request_info).content_type = nil
-	core.SG(request_info).content_length = 0
-	core.SG(sapi_headers).http_response_code = 200
+	core.SG__().request_info.path_translated = nil
+	core.SG__().request_info.request_method = nil
+	core.SG__().request_info.proto_num = 1000
+	core.SG__().request_info.query_string = nil
+	core.SG__().request_info.request_uri = nil
+	core.SG__().request_info.content_type = nil
+	core.SG__().request_info.content_length = 0
+	core.SG__().sapi_headers.http_response_code = 200
 
 	/* script_path_translated being set is a good indication that
 	 * we are running in a cgi environment, since it is always
@@ -724,9 +724,9 @@ func InitRequestInfo(request *core.FcgiRequest) {
 									if orig_script_name != nil {
 										CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 									}
-									core.SG(request_info).request_uri = CGI_PUTENV("SCRIPT_NAME", env_path_info)
+									core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_path_info)
 								} else {
-									core.SG(request_info).request_uri = orig_script_name
+									core.SG__().request_info.request_uri = orig_script_name
 								}
 								path_info[0] = old
 							}
@@ -801,16 +801,16 @@ func InitRequestInfo(request *core.FcgiRequest) {
 						CGI_PUTENV("ORIG_SCRIPT_FILENAME", orig_script_filename)
 					}
 					script_path_translated = CGI_PUTENV("SCRIPT_FILENAME", nil)
-					core.SG(sapi_headers).http_response_code = 404
+					core.SG__().sapi_headers.http_response_code = 404
 				}
-				if !(core.SG(request_info).request_uri) {
+				if !(core.SG__().request_info.request_uri) {
 					if orig_script_name == nil || strcmp(orig_script_name, env_script_name) != 0 {
 						if orig_script_name != nil {
 							CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 						}
-						core.SG(request_info).request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
+						core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
 					} else {
-						core.SG(request_info).request_uri = orig_script_name
+						core.SG__().request_info.request_uri = orig_script_name
 					}
 				}
 				if pt != nil {
@@ -840,9 +840,9 @@ func InitRequestInfo(request *core.FcgiRequest) {
 					if orig_script_name != nil {
 						CGI_PUTENV("ORIG_SCRIPT_NAME", orig_script_name)
 					}
-					core.SG(request_info).request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
+					core.SG__().request_info.request_uri = CGI_PUTENV("SCRIPT_NAME", env_script_name)
 				} else {
-					core.SG(request_info).request_uri = env_script_name
+					core.SG__().request_info.request_uri = env_script_name
 				}
 				zend.Efree(real_path)
 			}
@@ -858,31 +858,31 @@ func InitRequestInfo(request *core.FcgiRequest) {
 			/* pre 4.3 behaviour, shouldn't be used but provides BC */
 
 			if env_path_info != nil {
-				core.SG(request_info).request_uri = env_path_info
+				core.SG__().request_info.request_uri = env_path_info
 			} else {
-				core.SG(request_info).request_uri = env_script_name
+				core.SG__().request_info.request_uri = env_script_name
 			}
 			if !(CGIG(discard_path)) && env_path_translated != nil {
 				script_path_translated = env_path_translated
 			}
 		}
 		if IsValidPath(script_path_translated) != 0 {
-			core.SG(request_info).path_translated = zend.Estrdup(script_path_translated)
+			core.SG__().request_info.path_translated = zend.Estrdup(script_path_translated)
 		}
-		core.SG(request_info).request_method = CGI_GETENV("REQUEST_METHOD")
+		core.SG__().request_info.request_method = CGI_GETENV("REQUEST_METHOD")
 
 		/* FIXME - Work out proto_num here */
 
-		core.SG(request_info).query_string = CGI_GETENV("QUERY_STRING")
+		core.SG__().request_info.query_string = CGI_GETENV("QUERY_STRING")
 		if content_type != nil {
-			core.SG(request_info).content_type = content_type
+			core.SG__().request_info.content_type = content_type
 		} else {
-			core.SG(request_info).content_type = ""
+			core.SG__().request_info.content_type = ""
 		}
 		if content_length != nil {
-			core.SG(request_info).content_length = atol(content_length)
+			core.SG__().request_info.content_length = atol(content_length)
 		} else {
-			core.SG(request_info).content_length = 0
+			core.SG__().request_info.content_length = 0
 		}
 
 		/* The CGI RFC allows servers to pass on unvalidated Authorization data */
@@ -943,7 +943,7 @@ func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *z
 	}
 	zend.ArrayInit(return_value)
 	if core.FcgiIsFastcgi() != 0 {
-		var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG(server_context))
+		var request *core.FcgiRequest = (*core.FcgiRequest)(core.SG__().server_context)
 		core.FcgiLoadenv(request, core.SapiAddRequestHeader, return_value)
 	} else {
 		var buf []byte
@@ -1072,7 +1072,7 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 		return
 	}
 	zend.ArrayInit(return_value)
-	zend.ZendLlistApplyWithArgument(core.SG(sapi_headers).headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
+	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
 func Main(argc int, argv []*byte) int {
 	var free_query_string int = 0
@@ -1238,7 +1238,7 @@ func Main(argc int, argv []*byte) int {
 			var __bailout JMP_BUF
 			zend.EG__().SetBailout(&__bailout)
 			if zend.SETJMP(__bailout) == 0 {
-				core.SG(sapi_headers).http_response_code = 400
+				core.SG__().sapi_headers.http_response_code = 400
 				core.PUTS("<b>Security Alert!</b> The PHP CGI cannot be accessed directly.\n\n\n<p>This PHP CGI binary was compiled with force-cgi-redirect enabled.  This\n\nmeans that a page will only be served up if the REDIRECT_STATUS CGI variable is\n\nset, e.g. via an Apache Action directive.</p>\n\n<p>For more information as to <i>why</i> this behaviour exists, see the <a href=\"http://php.net/security.cgi-bin\">\nmanual page for CGI security</a>.</p>\n\n<p>For more information about changing this behaviour or re-enabling this webserver,\n\nconsult the installation file that came with this distribution, or visit \n\n<a href=\"http://php.net/install.windows\">the manual page</a>.</p>\n")
 			} else {
 				zend.EG__().SetBailout(__orig_bailout)
@@ -1414,7 +1414,7 @@ func Main(argc int, argv []*byte) int {
 				}
 				core.FcgiShutdown()
 				no_headers = 1
-				core.SG(headers_sent) = 1
+				core.SG__().headers_sent = 1
 				PhpCgiUsage(argv[0])
 				core.PhpOutputEndAll()
 				exit_status = 0
@@ -1431,9 +1431,9 @@ func Main(argc int, argv []*byte) int {
 
 		for fastcgi == 0 || core.FcgiAcceptRequest(request) >= 0 {
 			if fastcgi != 0 {
-				core.SG(server_context) = any(request)
+				core.SG__().server_context = any(request)
 			} else {
-				core.SG(server_context) = any(1)
+				core.SG__().server_context = any(1)
 			}
 			InitRequestInfo(request)
 			if cgi == 0 && fastcgi == 0 {
@@ -1443,7 +1443,7 @@ func Main(argc int, argv []*byte) int {
 						r.Printf("Interactive mode enabled\n\n")
 						break
 					case 'C':
-						core.SG(options) |= core.SAPI_OPTION_NO_CHDIR
+						core.SG__().options |= core.SAPI_OPTION_NO_CHDIR
 						break
 					case 'e':
 						zend.CG__().SetCompilerOptions(zend.CG__().GetCompilerOptions() | zend.ZEND_COMPILE_EXTENDED_INFO)
@@ -1460,14 +1460,14 @@ func Main(argc int, argv []*byte) int {
 							zend.Efree(script_file)
 						}
 						if core.PhpRequestStartup() == zend.FAILURE {
-							core.SG(server_context) = nil
+							core.SG__().server_context = nil
 							core.PhpModuleShutdown()
 							zend.Free(bindpath)
 							return zend.FAILURE
 						}
 						if no_headers != 0 {
-							core.SG(headers_sent) = 1
-							core.SG(request_info).no_headers = 1
+							core.SG__().headers_sent = 1
+							core.SG__().request_info.no_headers = 1
 						}
 						standard.PhpPrintInfo(0xffffffff)
 						core.PhpRequestShutdown(any(0))
@@ -1482,7 +1482,7 @@ func Main(argc int, argv []*byte) int {
 						if script_file != nil {
 							zend.Efree(script_file)
 						}
-						core.SG(headers_sent) = 1
+						core.SG__().headers_sent = 1
 						core.PhpPrintf("[PHP Modules]\n")
 						PrintModules()
 						core.PhpPrintf("\n[Zend Modules]\n")
@@ -1501,13 +1501,13 @@ func Main(argc int, argv []*byte) int {
 						}
 						no_headers = 1
 						if core.PhpRequestStartup() == zend.FAILURE {
-							core.SG(server_context) = nil
+							core.SG__().server_context = nil
 							core.PhpModuleShutdown()
 							zend.Free(bindpath)
 							return zend.FAILURE
 						}
-						core.SG(headers_sent) = 1
-						core.SG(request_info).no_headers = 1
+						core.SG__().headers_sent = 1
+						core.SG__().request_info.no_headers = 1
 						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.sapi_module.GetName(), __DATE__, __TIME__, zend.GetZendVersion())
 						core.PhpRequestShutdown(any(0))
 						core.FcgiShutdown()
@@ -1527,33 +1527,33 @@ func Main(argc int, argv []*byte) int {
 
 					/* override path_translated if -f on command line */
 
-					if core.SG(request_info).path_translated {
-						zend.Efree(core.SG(request_info).path_translated)
+					if core.SG__().request_info.path_translated {
+						zend.Efree(core.SG__().request_info.path_translated)
 					}
-					core.SG(request_info).path_translated = script_file
+					core.SG__().request_info.path_translated = script_file
 
 					/* before registering argv to module exchange the *new* argv[0] */
 
-					core.SG(request_info).argc = argc - (PhpOptind - 1)
-					core.SG(request_info).argv = &argv[PhpOptind-1]
-					core.SG(request_info).argv[0] = script_file
+					core.SG__().request_info.argc = argc - (PhpOptind - 1)
+					core.SG__().request_info.argv = &argv[PhpOptind-1]
+					core.SG__().request_info.argv[0] = script_file
 				} else if argc > PhpOptind {
 
 					/* file is on command line, but not in -f opt */
 
-					if core.SG(request_info).path_translated {
-						zend.Efree(core.SG(request_info).path_translated)
+					if core.SG__().request_info.path_translated {
+						zend.Efree(core.SG__().request_info.path_translated)
 					}
-					core.SG(request_info).path_translated = zend.Estrdup(argv[PhpOptind])
+					core.SG__().request_info.path_translated = zend.Estrdup(argv[PhpOptind])
 
 					/* arguments after the file are considered script args */
 
-					core.SG(request_info).argc = argc - PhpOptind
-					core.SG(request_info).argv = &argv[PhpOptind]
+					core.SG__().request_info.argc = argc - PhpOptind
+					core.SG__().request_info.argv = &argv[PhpOptind]
 				}
 				if no_headers != 0 {
-					core.SG(headers_sent) = 1
-					core.SG(request_info).no_headers = 1
+					core.SG__().headers_sent = 1
+					core.SG__().request_info.no_headers = 1
 				}
 
 				/* all remaining arguments are part of the query string
@@ -1566,7 +1566,7 @@ func Main(argc int, argv []*byte) int {
 				 *  test.php v1=test "v2=hello world!"
 				 */
 
-				if !(core.SG(request_info).query_string) && argc > PhpOptind {
+				if !(core.SG__().request_info.query_string) && argc > PhpOptind {
 					var slen int = strlen(core.PG(arg_separator).input)
 					len_ = 0
 					for i = PhpOptind; i < argc; i++ {
@@ -1585,7 +1585,7 @@ func Main(argc int, argv []*byte) int {
 							strlcat(s, core.PG(arg_separator).input, len_)
 						}
 					}
-					core.SG(request_info).query_string = s
+					core.SG__().request_info.query_string = s
 					free_query_string = 1
 				}
 
@@ -1607,8 +1607,8 @@ func Main(argc int, argv []*byte) int {
 			   we need in the environment.
 			*/
 
-			if core.SG(request_info).path_translated || cgi != 0 || fastcgi != 0 {
-				zend.ZendStreamInitFilename(&file_handle, core.SG(request_info).path_translated)
+			if core.SG__().request_info.path_translated || cgi != 0 || fastcgi != 0 {
+				zend.ZendStreamInitFilename(&file_handle, core.SG__().request_info.path_translated)
 			} else {
 				zend.ZendStreamInitFp(&file_handle, stdin, "Standard input code")
 			}
@@ -1620,13 +1620,13 @@ func Main(argc int, argv []*byte) int {
 				if fastcgi != 0 {
 					core.FcgiFinishRequest(request, 1)
 				}
-				core.SG(server_context) = nil
+				core.SG__().server_context = nil
 				core.PhpModuleShutdown()
 				return zend.FAILURE
 			}
 			if no_headers != 0 {
-				core.SG(headers_sent) = 1
-				core.SG(request_info).no_headers = 1
+				core.SG__().headers_sent = 1
+				core.SG__().request_info.no_headers = 1
 			}
 
 			/*
@@ -1635,17 +1635,17 @@ func Main(argc int, argv []*byte) int {
 			   2. we are running as cgi or fastcgi
 			*/
 
-			if cgi != 0 || fastcgi != 0 || core.SG(request_info).path_translated {
+			if cgi != 0 || fastcgi != 0 || core.SG__().request_info.path_translated {
 				if core.PhpFopenPrimaryScript(&file_handle) == zend.FAILURE {
 					var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 					var __bailout JMP_BUF
 					zend.EG__().SetBailout(&__bailout)
 					if zend.SETJMP(__bailout) == 0 {
 						if errno == EACCES {
-							core.SG(sapi_headers).http_response_code = 403
+							core.SG__().sapi_headers.http_response_code = 403
 							core.PUTS("Access denied.\n")
 						} else {
-							core.SG(sapi_headers).http_response_code = 404
+							core.SG__().sapi_headers.http_response_code = 404
 							core.PUTS("No input file specified.\n")
 						}
 					} else {
@@ -1660,16 +1660,16 @@ func Main(argc int, argv []*byte) int {
 					if fastcgi != 0 {
 						goto fastcgi_request_done
 					}
-					if core.SG(request_info).path_translated {
-						zend.Efree(core.SG(request_info).path_translated)
-						core.SG(request_info).path_translated = nil
+					if core.SG__().request_info.path_translated {
+						zend.Efree(core.SG__().request_info.path_translated)
+						core.SG__().request_info.path_translated = nil
 					}
-					if free_query_string != 0 && core.SG(request_info).query_string {
-						zend.Free(core.SG(request_info).query_string)
-						core.SG(request_info).query_string = nil
+					if free_query_string != 0 && core.SG__().request_info.query_string {
+						zend.Free(core.SG__().request_info.query_string)
+						core.SG__().request_info.query_string = nil
 					}
 					core.PhpRequestShutdown(any(0))
-					core.SG(server_context) = nil
+					core.SG__().server_context = nil
 					core.PhpModuleShutdown()
 					app.Shutdown()
 					zend.Free(bindpath)
@@ -1715,17 +1715,17 @@ func Main(argc int, argv []*byte) int {
 				break
 			}
 		fastcgi_request_done:
-			if core.SG(request_info).path_translated {
-				zend.Efree(core.SG(request_info).path_translated)
-				core.SG(request_info).path_translated = nil
+			if core.SG__().request_info.path_translated {
+				zend.Efree(core.SG__().request_info.path_translated)
+				core.SG__().request_info.path_translated = nil
 			}
 			core.PhpRequestShutdown(any(0))
 			if exit_status == 0 {
 				exit_status = zend.EG__().GetExitStatus()
 			}
-			if free_query_string != 0 && core.SG(request_info).query_string {
-				zend.Free(core.SG(request_info).query_string)
-				core.SG(request_info).query_string = nil
+			if free_query_string != 0 && core.SG__().request_info.query_string {
+				zend.Free(core.SG__().request_info.query_string)
+				core.SG__().request_info.query_string = nil
 			}
 			if fastcgi == 0 {
 				if benchmark != 0 {
@@ -1796,7 +1796,7 @@ out:
 		r.Fprintf(stderr, "\nElapsed time: %d.%06d sec\n", sec, usec)
 	}
 parent_out:
-	core.SG(server_context) = nil
+	core.SG__().server_context = nil
 	core.PhpModuleShutdown()
 	app.Shutdown()
 	return exit_status

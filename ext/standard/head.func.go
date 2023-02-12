@@ -170,7 +170,7 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	core.SapiHeaderOp(b.Cond(zend.ZEND_NUM_ARGS() == 0, core.SAPI_HEADER_DELETE_ALL, core.SAPI_HEADER_DELETE), &ctr)
 }
 func PhpHeader() int {
-	if core.SapiSendHeaders() == zend.FAILURE || core.SG(request_info).headers_only {
+	if core.SapiSendHeaders() == zend.FAILURE || core.SG__().request_info.headers_only {
 		return 0
 	} else {
 		return 1
@@ -691,7 +691,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		break
 	}
-	if core.SG(headers_sent) {
+	if core.SG__().headers_sent {
 		line = core.PhpOutputGetStartLineno()
 		file = core.PhpOutputGetStartFilename()
 	}
@@ -706,7 +706,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 			zend.ZEND_TRY_ASSIGN_REF_EMPTY_STRING(arg1)
 		}
 	}
-	if core.SG(headers_sent) {
+	if core.SG__().headers_sent {
 		return_value.SetTrue()
 		return
 	} else {
@@ -725,7 +725,7 @@ func ZifHeadersList(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 	zend.ArrayInit(return_value)
-	core.SG(sapi_headers).headers.ApplyWithArgument(PhpHeadApplyHeaderListToHash, return_value)
+	core.SG__().sapi_headers.headers.ApplyWithArgument(PhpHeadApplyHeaderListToHash, return_value)
 }
 func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var response_code zend.ZendLong = 0
@@ -799,8 +799,8 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 	}
 	if response_code != 0 {
 		var old_response_code zend.ZendLong
-		old_response_code = core.SG(sapi_headers).http_response_code
-		core.SG(sapi_headers).http_response_code = int(response_code)
+		old_response_code = core.SG__().sapi_headers.http_response_code
+		core.SG__().sapi_headers.http_response_code = int(response_code)
 		if old_response_code != 0 {
 			return_value.SetLong(old_response_code)
 			return
@@ -808,10 +808,10 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 		return_value.SetTrue()
 		return
 	}
-	if !(core.SG(sapi_headers).http_response_code) {
+	if !(core.SG__().sapi_headers.http_response_code) {
 		return_value.SetFalse()
 		return
 	}
-	return_value.SetLong(core.SG(sapi_headers).http_response_code)
+	return_value.SetLong(core.SG__().sapi_headers.http_response_code)
 	return
 }

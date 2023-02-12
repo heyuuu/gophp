@@ -217,11 +217,11 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 		),
 	*zend.NewZendIniEntryDef("default_charset", PHP_INI_ALL).Value(PHP_DEFAULT_CHARSET).
 		OnModifyArgs(
-			OnUpdateDefaultCharset, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetDefaultCharset()))-(*byte)(nil))), any(&sapi_globals), nil,
+			OnUpdateDefaultCharset, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetDefaultCharset()))-(*byte)(nil))), any(SG__()), nil,
 		),
 	*zend.NewZendIniEntryDef("default_mimetype", PHP_INI_ALL).Value(SAPI_DEFAULT_MIMETYPE).
 		OnModifyArgs(
-			OnUpdateDefaultMimeTye, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetDefaultMimetype()))-(*byte)(nil))), any(&sapi_globals), nil,
+			OnUpdateDefaultMimeTye, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetDefaultMimetype()))-(*byte)(nil))), any(SG__()), nil,
 		),
 	*zend.NewZendIniEntryDef("internal_encoding", PHP_INI_ALL).
 		OnModifyArgs(
@@ -270,7 +270,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 		),
 	*zend.NewZendIniEntryDef("post_max_size", PHP_INI_SYSTEM|PHP_INI_PERDIR).Value("8M").
 		OnModifyArgs(
-			zend.OnUpdateLong, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetPostMaxSize()))-(*byte)(nil))), any(&sapi_globals), nil,
+			zend.OnUpdateLong, any(zend_long((*byte)(&((*sapi_globals_struct)(nil).GetPostMaxSize()))-(*byte)(nil))), any(SG__()), nil,
 		),
 	*zend.NewZendIniEntryDef("upload_tmp_dir", PHP_INI_SYSTEM).
 		OnModifyArgs(
