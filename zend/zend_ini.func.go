@@ -149,26 +149,26 @@ func IniKeyCompare(a any, b any) int {
 func ZendIniSortEntries() {
 	EG__().GetIniDirectives().SortCompatible(IniKeyCompare, 0)
 }
-func ZendRegisterIniEntries(ini_entry *ZendIniEntryDef, module_number int) int {
-	var p *ZendIniEntry
-	var default_value *Zval
+func ZendRegisterIniEntries(iniEntryDefs []ZendIniEntryDef, moduleNumber int) int {
 	var directives *HashTable = RegisteredZendIniDirectives
-	for ini_entry.GetName() != nil {
-		p = NewZendIniEntry(ini_entry, module_number)
+	for i := range iniEntryDefs {
+		iniEntryDef := &iniEntryDefs[i]
+		p := NewZendIniEntry(iniEntryDef, moduleNumber)
 		if ZendHashAddPtr(directives, p.GetName(), any(p)) == nil {
 			if p.GetName() != nil {
 				ZendStringReleaseEx(p.GetName(), 1)
 			}
-			ZendUnregisterIniEntries(module_number)
+			ZendUnregisterIniEntries(moduleNumber)
 			return FAILURE
 		}
-		if b.Assign(&default_value, ZendGetConfigurationDirective(p.GetName())) != nil && p.EmitOnModify(default_value.GetStr(), ZEND_INI_STAGE_STARTUP) {
-			p.SetValue(ZendNewInternedString(default_value.GetStr().Copy()))
+
+		var defaultValue *Zval = ZendGetConfigurationDirective(p.GetName())
+		if defaultValue != nil && p.EmitOnModify(defaultValue.GetStr(), ZEND_INI_STAGE_STARTUP) {
+			p.SetValue(ZendNewInternedString(defaultValue.GetStr().Copy()))
 		} else {
-			p.SetValueStr(ini_entry.GetValueStr())
-			p.EmitOnModifyCurrValue(ZEND_INI_STAGE_STARTUP)
+			p.SetValueStr(iniEntryDef.GetValueStr())
+			p.EmitOnModify(p.GetValue(), ZEND_INI_STAGE_STARTUP)
 		}
-		ini_entry++
 	}
 	return SUCCESS
 }

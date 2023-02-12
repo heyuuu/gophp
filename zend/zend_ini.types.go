@@ -48,21 +48,6 @@ func _buildOnModify(onModify ZendIniEntryModifier, mh_arg1 any, mh_arg2 any, mh_
 	}
 }
 
-func MakeZendIniEntryDef(name string, onModify ZendIniEntryModifier, arg1 any, arg2 any, arg3 any, value any, displayer ZendIniEntryDisplayer, modifiable uint8) ZendIniEntryDef {
-	var valuePtr *string
-	if s, ok := value.(string); ok {
-		valuePtr = &s
-	}
-
-	return ZendIniEntryDef{
-		name:       name,
-		onModify:   _buildOnModify(onModify, arg1, arg2, arg3),
-		value:      valuePtr,
-		displayer:  displayer,
-		modifiable: modifiable,
-	}
-}
-
 func (this *ZendIniEntryDef) GetValueStr() *string { return this.value }
 func (this *ZendIniEntryDef) GetName() *byte       { return this.name }
 
