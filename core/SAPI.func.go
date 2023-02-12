@@ -10,7 +10,6 @@ func SapiAddHeader(str string) int {
 	ctr := MakeSapiHeaderLineEx(str)
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
-func _typeDtor(zv *zend.Zval)                { zend.Free(zv.GetPtr()) }
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
 func SapiRunHeaderCallback(callback *zend.Zval) {
 	var error int
@@ -202,10 +201,6 @@ func GetDefaultContentType(prefix_len uint32, len_ *uint32) *byte {
 	}
 	return content_type
 }
-func SapiGetDefaultContentType() *byte {
-	var len_ uint32
-	return GetDefaultContentType(0, &len_)
-}
 func SapiGetDefaultContentTypeHeader(default_header *SapiHeader) {
 	var len_ uint32
 	default_header.SetHeader(GetDefaultContentType(b.SizeOf("\"Content-type: \"")-1, &len_))
@@ -234,46 +229,6 @@ func SapiApplyDefaultCharset(mimetype **byte, len_ int) int {
 		}
 	}
 	return 0
-}
-func SapiActivateHeadersOnly() {
-	if SG__().request_info.headers_read == 1 {
-		return
-	}
-	SG__().request_info.headers_read = 1
-	SG__().sapi_headers.headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
-	SG__().sapi_headers.send_default_content_type = 1
-
-	/* SG__().sapi_headers.http_response_code = 200; */
-
-	SG__().sapi_headers.http_status_line = nil
-	SG__().sapi_headers.mimetype = nil
-	SG__().read_post_bytes = 0
-	SG__().request_info.request_body = nil
-	SG__().request_info.current_user = nil
-	SG__().request_info.current_user_length = 0
-	SG__().request_info.no_headers = 0
-	SG__().request_info.post_entry = nil
-	SG__().global_request_time = 0
-
-	/*
-	 * It's possible to override this general case in the activate() callback,
-	 * if necessary.
-	 */
-
-	if SG__().request_info.request_method && !(strcmp(SG__().request_info.request_method, "HEAD")) {
-		SG__().request_info.headers_only = 1
-	} else {
-		SG__().request_info.headers_only = 0
-	}
-	if SG__().server_context {
-		SG__().request_info.cookie_data = sapi_module.GetReadCookies()()
-		if sapi_module.GetActivate() != nil {
-			sapi_module.GetActivate()()
-		}
-	}
-	if sapi_module.GetInputFilterInit() != nil {
-		sapi_module.GetInputFilterInit()()
-	}
 }
 func SapiActivate() {
 	SG__().sapi_headers.headers.Init(b.SizeOf("sapi_header_struct"), (func(any))(SapiFreeHeader), 0)
@@ -449,11 +404,6 @@ func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 		}
 		current = next
 	}
-}
-func SapiAddHeaderEx(header_line *byte, header_line_len int) int {
-	headerLineStr := b.CastStr(header_line, header_line_len)
-	ctr := MakeSapiHeaderLineEx(headerLineStr)
-	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	if sapi_module.GetHeaderHandler() == nil || (SAPI_HEADER_ADD&sapi_module.GetHeaderHandler()(sapi_header, op, &(SG__().sapi_headers))) != 0 {
@@ -753,12 +703,6 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	zend.ZendStringReleaseEx(key, 1)
 	return ret
 }
-func SapiUnregisterPostEntry(post_entry *SapiPostEntry) {
-	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
-		return
-	}
-	zend.ZendHashStrDel(&(SG__().known_post_content_types), post_entry.GetContentType(), post_entry.GetContentTypeLen())
-}
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
 	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
 		return zend.FAILURE
@@ -824,34 +768,6 @@ func SapiGetenv(name *byte, name_len int) *byte {
 	}
 	return nil
 }
-func SapiGetFd(fd *int) int {
-	if sapi_module.GetGetFd() != nil {
-		return sapi_module.GetGetFd()(fd)
-	} else {
-		return zend.FAILURE
-	}
-}
-func SapiForceHttp10() int {
-	if sapi_module.GetForceHttp10() != nil {
-		return sapi_module.GetForceHttp10()()
-	} else {
-		return zend.FAILURE
-	}
-}
-func SapiGetTargetUid(obj *uid_t) int {
-	if sapi_module.GetGetTargetUid() != nil {
-		return sapi_module.GetGetTargetUid()(obj)
-	} else {
-		return zend.FAILURE
-	}
-}
-func SapiGetTargetGid(obj *gid_t) int {
-	if sapi_module.GetGetTargetGid() != nil {
-		return sapi_module.GetGetTargetGid()(obj)
-	} else {
-		return zend.FAILURE
-	}
-}
 func SapiGetRequestTime() float64 {
 	if SG__().global_request_time {
 		return SG__().global_request_time
@@ -867,11 +783,6 @@ func SapiGetRequestTime() float64 {
 		}
 	}
 	return SG__().global_request_time
-}
-func SapiTerminateProcess() {
-	if sapi_module.GetTerminateProcess() != nil {
-		sapi_module.GetTerminateProcess()()
-	}
 }
 func SapiAddRequestHeader(var_ *byte, var_len uint, val *byte, val_len uint, arg any) {
 	var return_value *zend.Zval = (*zend.Zval)(arg)

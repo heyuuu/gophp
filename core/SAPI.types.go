@@ -210,7 +210,7 @@ type SapiGlobals struct {
 }
 
 func (this *SapiGlobals) Init() {
-	this.known_post_content_types = *zend.NewZendArrayEx(8, _typeDtor, true)
+	this.known_post_content_types = *zend.NewZendArrayEx(8, nil, true)
 	PhpSetupSapiContentTypes()
 }
 
