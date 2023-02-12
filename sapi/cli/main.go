@@ -6,7 +6,7 @@ import (
 	"sik/zend"
 )
 
-func Main(argc int, argv []*byte) int {
+func main(argc int, argv []*byte) int {
 	var c int
 	var exit_status int = zend.SUCCESS
 	var module_started int = 0
