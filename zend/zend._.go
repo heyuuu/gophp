@@ -6,39 +6,12 @@ import (
 	r "sik/runtime"
 )
 
-// Source: <Zend/zend.h>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
-
 const ZEND_VERSION = "3.4.0"
-const ZendSprintf = sprintf
-const ZEND_TSRMG = TSRMG
-const ZEND_TSRMG_FAST = TSRMG_FAST
 
 type ZendSerializeData = __struct___zend_serialize_data
 type ZendUnserializeData = __struct___zend_unserialize_data
 
 type ZendWriteFuncT func(str *byte, str_length int) int
-
-/* Same as zend_spprintf and zend_strpprintf, without checking of format validity.
- * For use with custom printf specifiers such as %H. */
 
 /* output support */
 
@@ -57,21 +30,7 @@ var ZendPrintfToSmartStr func(buf *SmartStr, format *byte, ap ...any)
 var ZendGetenv func(name *byte, name_len int) *byte
 var ZendResolvePath func(filename *byte, filename_len int) *ZendString
 
-/* These two callbacks are especially for opcache */
-
-/* Callback for loading of not preloaded part of the script */
-
-/* If filename is NULL the default filename is used. */
-
-/* The following #define is __special__  used for code duality in PHP for Engine 1 & 2 */
-
-const ZEND_STANDARD_CLASS_DEF_PTR = ZendStandardClassDef
-
 var ZendUv ZendUtilityValues
-
-/* If DTrace is available and enabled */
-
-var ZendDtraceEnabled ZendBool
 
 /* Messages for applications of Zend */
 
@@ -92,29 +51,6 @@ const (
 const DEBUG_BACKTRACE_PROVIDE_OBJECT ZendLong = 1 << 0
 const DEBUG_BACKTRACE_IGNORE_ARGS ZendLong = 1 << 1
 
-// Source: <Zend/zend.c>
-
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   +----------------------------------------------------------------------+
-*/
-
-var GlobalMapPtrLast int = 0
-
 const GLOBAL_FUNCTION_TABLE *HashTable = CG__().GetFunctionTable()
 const GLOBAL_CLASS_TABLE *HashTable = CG__().GetClassTable()
 const GLOBAL_AUTO_GLOBALS_TABLE *HashTable = CG__().GetAutoGlobals()
@@ -122,8 +58,7 @@ const GLOBAL_CONSTANTS_TABLE *HashTable = EG__().GetZendConstants()
 
 /* version information */
 
-var ZendVersionInfo *byte
-var ZendVersionInfoLength uint32
+var ZendVersionInfo string
 
 const ZEND_CORE_VERSION_INFO = "Zend Engine v" + ZEND_VERSION + ", Copyright (c) Zend Technologies\n"
 const PRINT_ZVAL_INDENT = 4

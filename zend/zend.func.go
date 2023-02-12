@@ -3,8 +3,8 @@
 package zend
 
 import (
+	"fmt"
 	b "sik/builtin"
-	"sik/core"
 	r "sik/runtime"
 )
 
@@ -444,8 +444,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	/* set up version */
 
-	ZendVersionInfo = strdup(ZEND_CORE_VERSION_INFO)
-	ZendVersionInfoLength = b.SizeOf("ZEND_CORE_VERSION_INFO") - 1
+	ZendVersionInfo = ZEND_CORE_VERSION_INFO
 	GLOBAL_FUNCTION_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
 	GLOBAL_CLASS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
 	GLOBAL_AUTO_GLOBALS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
@@ -534,7 +533,7 @@ func ZendShutdown() {
 	GLOBAL_AUTO_GLOBALS_TABLE.Destroy()
 	Free(GLOBAL_AUTO_GLOBALS_TABLE)
 	ZendShutdownExtensions()
-	Free(ZendVersionInfo)
+	//Free(ZendVersionInfo)
 	Free(GLOBAL_FUNCTION_TABLE)
 	Free(GLOBAL_CLASS_TABLE)
 	GLOBAL_CONSTANTS_TABLE.Destroy()
@@ -579,17 +578,9 @@ func _zendBailout(filename *byte, lineno uint32) {
 	LONGJMP((*EG__)().bailout, FAILURE)
 }
 func ZendAppendVersionInfo(extension *ZendExtension) {
-	var new_info *byte
-	var new_info_length uint32
-	new_info_length = uint32(b.SizeOf("\"    with  v, , by \\n\"") + strlen(extension.GetName()) + strlen(extension.GetVersion()) + strlen(extension.GetCopyright()) + strlen(extension.GetAuthor()))
-	new_info = (*byte)(Malloc(new_info_length + 1))
-	core.Snprintf(new_info, new_info_length, "    with %s v%s, %s, by %s\n", extension.GetName(), extension.GetVersion(), extension.GetCopyright(), extension.GetAuthor())
-	ZendVersionInfo = (*byte)(realloc(ZendVersionInfo, ZendVersionInfoLength+new_info_length+1))
-	strncat(ZendVersionInfo, new_info, new_info_length)
-	ZendVersionInfoLength += new_info_length
-	Free(new_info)
+	ZendVersionInfo += fmt.Sprintf("    with %s v%s, %s, by %s\n", extension.GetNameStr(), extension.GetVersionStr(), extension.GetCopyrightStr(), extension.GetAuthorStr())
 }
-func GetZendVersion() *byte { return ZendVersionInfo }
+func GetZendVersion() string { return ZendVersionInfo }
 func ZendActivate() {
 	GcReset()
 	InitCompiler()
