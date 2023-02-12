@@ -27,12 +27,6 @@ package zend
 
 var Zendparse func() int
 
-/* Executor */
-
-/* Language Scanner */
-
-var LanguageScannerGlobals ZendPhpScannerGlobals
-
 /* INI Scanner */
 
 var IniScannerGlobals ZendIniScannerGlobals
