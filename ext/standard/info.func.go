@@ -837,13 +837,8 @@ func ZifPhpSapiName(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	if core.sapi_module.GetName() != nil {
-		zend.ZVAL_STRING(return_value, core.sapi_module.GetName())
-		return
-	} else {
-		return_value.SetFalse()
-		return
-	}
+	return_value.SetRawString(core.SM__().Name())
+	return
 }
 func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var mode *byte = "a"

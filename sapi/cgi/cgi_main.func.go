@@ -1508,7 +1508,7 @@ func Main(argc int, argv []*byte) int {
 						}
 						core.SG__().headers_sent = 1
 						core.SG__().request_info.no_headers = 1
-						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.sapi_module.GetName(), __DATE__, __TIME__, zend.GetZendVersion())
+						core.PhpPrintf("PHP %s (%s) (built: %s %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, core.SM__().Name(), __DATE__, __TIME__, zend.GetZendVersion())
 						core.PhpRequestShutdown(any(0))
 						core.FcgiShutdown()
 						exit_status = 0

@@ -335,22 +335,52 @@ func (this *SapiModule) Flush(serverContext any) {
 	}
 }
 
+func (this *SapiModule) GetStat() bool {
+	if this.get_stat != nil {
+		this.get_stat()
+		return true
+	}
+	return false
+}
+
+func (this *SapiModule) GetEnv(name string) (string, bool) {
+	if this.getenv != nil {
+		p := this.getenv(name, len(name))
+		if p == nil {
+			return "", false
+		}
+		return p, true
+	}
+	return "", false
+}
+
+func (this *SapiModule) InputFilter(arg int, name string, value string) string {
+	if this.input_filter != nil {
+		this.input_filter(arg, name, &value, len(value), nil)
+		return value
+	}
+	return value
+}
+
+func (this *SapiModule) SapiError(type_ int, error_msg string, args ...any) {
+	this.sapi_error(type_, error_msg, args...)
+}
+
+func (this *SapiModule) HeaderHandler(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int {
+	if this.header_handler == nil {
+		return 0
+	}
+
+	return this.header_handler(sapi_header, op, sapi_headers)
+}
+
 /**
  * generate
  */
-func (this *SapiModule) GetName() *byte                                       { return this.name }
 func (this *SapiModule) SetUbWrite(value func(str *byte, str_length int) int) { this.ub_write = value }
-func (this *SapiModule) GetFlush() func(server_context any)                   { return this.flush }
 func (this *SapiModule) SetFlush(value func(server_context any))              { this.flush = value }
-func (this *SapiModule) GetGetStat() func() *zend.ZendStatT                   { return this.get_stat }
-func (this *SapiModule) GetGetenv() func(name *byte, name_len int) *byte      { return this.getenv }
 func (this *SapiModule) SetGetenv(value func(name *byte, name_len int) *byte) { this.getenv = value }
-func (this *SapiModule) GetSapiError() func(type_ int, error_msg *byte, _ ...any) {
-	return this.sapi_error
-}
-func (this *SapiModule) GetHeaderHandler() func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int {
-	return this.header_handler
-}
+
 func (this *SapiModule) GetSendHeaders() func(sapi_headers *SapiHeaders) int {
 	return this.send_headers
 }

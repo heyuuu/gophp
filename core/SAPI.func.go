@@ -3,6 +3,7 @@ package core
 import (
 	b "sik/builtin"
 	"sik/zend"
+	"strings"
 )
 
 func SG__() *SapiGlobals { return CurrentApp().SG() }
@@ -86,7 +87,7 @@ func SapiReadPostData() {
 			/* no default reader ? */
 
 			SG__().request_info.content_type_dup = nil
-			sapi_module.GetSapiError()(zend.E_WARNING, "Unsupported content type:  '%s'", content_type)
+			sapi_module.SapiError(zend.E_WARNING, "Unsupported content type:  '%s'", content_type)
 			return
 		}
 	}
@@ -401,7 +402,8 @@ func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 	}
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
-	if sapi_module.GetHeaderHandler() == nil || (SAPI_HEADER_ADD&sapi_module.GetHeaderHandler()(sapi_header, op, &(SG__().sapi_headers))) != 0 {
+	result := sapi_module.HeaderHandler(sapi_header, op, &(SG__().sapi_headers))
+	if (SAPI_HEADER_ADD & result) != 0 {
 		if op == SAPI_HEADER_REPLACE {
 			var colon_offset *byte = strchr(sapi_header.GetHeader(), ':')
 			if colon_offset != nil {
@@ -426,9 +428,9 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		var output_start_filename *byte = PhpOutputGetStartFilename()
 		var output_start_lineno int = PhpOutputGetStartLineno()
 		if output_start_filename != nil {
-			sapi_module.GetSapiError()(zend.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
+			sapi_module.SapiError(zend.E_WARNING, "Cannot modify header information - headers already sent by (output started at %s:%d)", output_start_filename, output_start_lineno)
 		} else {
-			sapi_module.GetSapiError()(zend.E_WARNING, "Cannot modify header information - headers already sent")
+			sapi_module.SapiError(zend.E_WARNING, "Cannot modify header information - headers already sent")
 		}
 		return zend.FAILURE
 	}
@@ -449,9 +451,7 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 		header_line_len = p.GetLineLen()
 		http_response_code = p.GetResponseCode()
 	case SAPI_HEADER_DELETE_ALL:
-		if sapi_module.GetHeaderHandler() != nil {
-			sapi_module.GetHeaderHandler()(&sapi_header, op, &(SG__().sapi_headers))
-		}
+		sapi_module.HeaderHandler(&sapi_header, op, &(SG__().sapi_headers))
 		SG__().sapi_headers.headers.Clean()
 		return zend.SUCCESS
 	default:
@@ -473,14 +473,13 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 	if op == SAPI_HEADER_DELETE {
 		if strchr(header_line, ':') {
 			zend.Efree(header_line)
-			sapi_module.GetSapiError()(zend.E_WARNING, "Header to delete may not contain colon.")
+			sapi_module.SapiError(zend.E_WARNING, "Header to delete may not contain colon.")
 			return zend.FAILURE
 		}
-		if sapi_module.GetHeaderHandler() != nil {
-			sapi_header.SetHeader(header_line)
-			sapi_header.SetHeaderLen(header_line_len)
-			sapi_module.GetHeaderHandler()(&sapi_header, op, &(SG__().sapi_headers))
-		}
+
+		sapi_header.SetHeader(header_line)
+		sapi_header.SetHeaderLen(header_line_len)
+		sapi_module.HeaderHandler(&sapi_header, op, &(SG__().sapi_headers))
 		SapiRemoveHeader(SG__().sapi_headers.headers, header_line, header_line_len)
 		zend.Efree(header_line)
 		return zend.SUCCESS
@@ -495,12 +494,12 @@ func SapiHeaderOp(op SapiHeaderOpEnum, arg any) int {
 
 			if header_line[i] == '\n' || header_line[i] == '\r' {
 				zend.Efree(header_line)
-				sapi_module.GetSapiError()(zend.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
+				sapi_module.SapiError(zend.E_WARNING, "Header may not contain "+"more than a single header, new line detected")
 				return zend.FAILURE
 			}
 			if header_line[i] == '0' {
 				zend.Efree(header_line)
-				sapi_module.GetSapiError()(zend.E_WARNING, "Header may not contain NUL bytes")
+				sapi_module.SapiError(zend.E_WARNING, "Header may not contain NUL bytes")
 				return zend.FAILURE
 			}
 		}
@@ -724,8 +723,8 @@ func SapiFlush() {
 	sapi_module.Flush(SG__().server_context)
 }
 func SapiGetStat() *zend.ZendStatT {
-	if sapi_module.GetGetStat() != nil {
-		return sapi_module.GetGetStat()()
+	if sapi_module.GetStat() {
+		return
 	} else {
 		if !(SG__().request_info.path_translated) || zend.VCWD_STAT(SG__().request_info.path_translated, &(SG__().global_stat)) == -1 {
 			return nil
@@ -733,29 +732,18 @@ func SapiGetStat() *zend.ZendStatT {
 		return &(SG__().global_stat)
 	}
 }
-func SapiGetenv(name *byte, name_len int) *byte {
-	if !(strncasecmp(name, "HTTP_PROXY", name_len)) {
+func SapiGetenv(name_ptr *byte, name_len int) *string {
+	var name = b.CastStr(name_ptr, name_len)
 
+	if strings.EqualFold(name, "HTTP_PROXY") {
 		/* Ugly fix for HTTP_PROXY issue, see bug #72573 */
-
 		return nil
-
-		/* Ugly fix for HTTP_PROXY issue, see bug #72573 */
-
 	}
-	if sapi_module.GetGetenv() != nil {
-		var value *byte
-		var tmp *byte = sapi_module.GetGetenv()(name, name_len)
-		if tmp != nil {
-			value = zend.Estrdup(tmp)
-		} else {
-			return nil
-		}
-		if sapi_module.GetInputFilter() != nil {
-			sapi_module.GetInputFilter()(PARSE_STRING, name, &value, strlen(value), nil)
-		}
-		return value
+	if value, ok := sapi_module.GetEnv(name); ok {
+		value = sapi_module.InputFilter(PARSE_STRING, name, value)
+		return &value
 	}
+
 	return nil
 }
 func SapiGetRequestTime() float64 {

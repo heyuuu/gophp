@@ -158,7 +158,7 @@ func PhpStreamUrlWrapPhp(
 			}
 			return nil
 		}
-		if !(strcmp(core.sapi_module.GetName(), "cli")) {
+		if core.SM__().Name() == "cli" {
 			var cli_in int = 0
 			fd = cgi.STDIN_FILENO
 			if cli_in != 0 {
@@ -171,7 +171,7 @@ func PhpStreamUrlWrapPhp(
 			fd = dup(cgi.STDIN_FILENO)
 		}
 	} else if !(strcasecmp(path, "stdout")) {
-		if !(strcmp(core.sapi_module.GetName(), "cli")) {
+		if core.SM__().Name() == "cli" {
 			var cli_out int = 0
 			fd = cli.STDOUT_FILENO
 			if b.PostInc(&cli_out) {
@@ -184,7 +184,7 @@ func PhpStreamUrlWrapPhp(
 			fd = dup(cli.STDOUT_FILENO)
 		}
 	} else if !(strcasecmp(path, "stderr")) {
-		if !(strcmp(core.sapi_module.GetName(), "cli")) {
+		if core.SM__().Name() == "cli" {
 			var cli_err int = 0
 			fd = cli.STDERR_FILENO
 			if b.PostInc(&cli_err) {
@@ -201,7 +201,7 @@ func PhpStreamUrlWrapPhp(
 		var end *byte
 		var fildes_ori zend.ZendLong
 		var dtablesize int
-		if strcmp(core.sapi_module.GetName(), "cli") {
+		if core.SM__().Name() != "cli" {
 			if (options & core.REPORT_ERRORS) != 0 {
 				core.PhpErrorDocref(nil, zend.E_WARNING, "Direct access to file descriptors is only available from command-line PHP")
 			}

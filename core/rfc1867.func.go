@@ -556,7 +556,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		_basename = PhpApBasename
 	}
 	if SG__().post_max_size > 0 && SG__().request_info.content_length > SG__().post_max_size {
-		sapi_module.GetSapiError()(zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
+		sapi_module.SapiError(zend.E_WARNING, "POST Content-Length of "+zend.ZEND_LONG_FMT+" bytes exceeds the limit of "+zend.ZEND_LONG_FMT+" bytes", SG__().request_info.content_length, SG__().post_max_size)
 		return
 	}
 
@@ -574,7 +574,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		zend.Efree(content_type_lcase)
 	}
 	if boundary == nil || !(b.Assign(&boundary, strchr(boundary, '='))) {
-		sapi_module.GetSapiError()(zend.E_WARNING, "Missing boundary in multipart/form-data POST data")
+		sapi_module.SapiError(zend.E_WARNING, "Missing boundary in multipart/form-data POST data")
 		return
 	}
 	boundary++
@@ -583,7 +583,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 		boundary++
 		boundary_end = strchr(boundary, '"')
 		if boundary_end == nil {
-			sapi_module.GetSapiError()(zend.E_WARNING, "Invalid boundary in multipart/form-data POST data")
+			sapi_module.SapiError(zend.E_WARNING, "Invalid boundary in multipart/form-data POST data")
 			return
 		}
 	} else {
@@ -603,7 +603,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	/* Initialize the buffer */
 
 	if !(b.Assign(&mbuff, MultipartBufferNew(boundary, boundary_len))) {
-		sapi_module.GetSapiError()(zend.E_WARNING, "Unable to initialize the input buffer")
+		sapi_module.SapiError(zend.E_WARNING, "Unable to initialize the input buffer")
 		return
 	}
 
@@ -755,13 +755,13 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				skip_upload = 1
 			} else if upload_cnt <= 0 {
 				skip_upload = 1
-				sapi_module.GetSapiError()(zend.E_WARNING, "Maximum number of allowable file uploads has been exceeded")
+				sapi_module.SapiError(zend.E_WARNING, "Maximum number of allowable file uploads has been exceeded")
 			}
 
 			/* Return with an error if the posted data is garbled */
 
 			if param == nil && filename == nil {
-				sapi_module.GetSapiError()(zend.E_WARNING, "File Upload Mime headers garbled")
+				sapi_module.SapiError(zend.E_WARNING, "File Upload Mime headers garbled")
 				goto fileupload_done
 			}
 			if param == nil {
@@ -840,7 +840,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				fd = PhpOpenTemporaryFdEx(PG(upload_tmp_dir), "php", &temp_filename, PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_FALLBACK)
 				upload_cnt--
 				if fd == -1 {
-					sapi_module.GetSapiError()(zend.E_WARNING, "File upload error - unable to create a temporary file")
+					sapi_module.SapiError(zend.E_WARNING, "File upload error - unable to create a temporary file")
 					cancel_upload = UPLOAD_ERROR_E
 				}
 

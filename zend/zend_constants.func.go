@@ -15,12 +15,6 @@ func ZEND_CONSTANT_MODULE_NUMBER(c *ZendConstant) int {
 func ZEND_CONSTANT_SET_FLAGS(c *ZendConstant, _flags int, _module_number int) {
 	c.GetValue().GetConstantFlags() = _flags&0xff | _module_number<<8
 }
-func REGISTER_NULL_CONSTANT(name *byte, flags int) {
-	ZendRegisterNullConstant(name, b.SizeOf("name")-1, flags, module_number)
-}
-func REGISTER_BOOL_CONSTANT(name *byte, bval ZendBool, flags int) {
-	ZendRegisterBoolConstant(name, b.SizeOf("name")-1, bval, flags, module_number)
-}
 func REGISTER_LONG_CONSTANT(name string, lval ZendLong, flags int) {
 	ZendRegisterLongConstant(name, b.SizeOf("name")-1, lval, flags, module_number)
 }
@@ -29,27 +23,6 @@ func REGISTER_DOUBLE_CONSTANT(name string, dval float64, flags int) {
 }
 func REGISTER_STRING_CONSTANT(name string, str *byte, flags int) {
 	ZendRegisterStringConstant(name, b.SizeOf("name")-1, str, flags, module_number)
-}
-func REGISTER_STRINGL_CONSTANT(name *byte, str *byte, len_ int, flags int) {
-	ZendRegisterStringlConstant(name, b.SizeOf("name")-1, str, len_, flags, module_number)
-}
-func REGISTER_NS_NULL_CONSTANT(ns string, name string, flags int) {
-	ZendRegisterNullConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, flags, module_number)
-}
-func REGISTER_NS_BOOL_CONSTANT(ns string, name string, bval ZendBool, flags int) {
-	ZendRegisterBoolConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, bval, flags, module_number)
-}
-func REGISTER_NS_LONG_CONSTANT(ns string, name string, lval ZendLong, flags int) {
-	ZendRegisterLongConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, lval, flags, module_number)
-}
-func REGISTER_NS_DOUBLE_CONSTANT(ns string, name string, dval float64, flags int) {
-	ZendRegisterDoubleConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, dval, flags, module_number)
-}
-func REGISTER_NS_STRING_CONSTANT(ns string, name string, str *byte, flags int) {
-	ZendRegisterStringConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, str, flags, module_number)
-}
-func REGISTER_NS_STRINGL_CONSTANT(ns string, name string, str *byte, len_ int, flags int) {
-	ZendRegisterStringlConstant(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, str, len_, flags, module_number)
 }
 func REGISTER_MAIN_NULL_CONSTANT(name string, flags int) {
 	ZendRegisterNullConstant(name, b.SizeOf("name")-1, flags, 0)
@@ -63,11 +36,8 @@ func REGISTER_MAIN_LONG_CONSTANT(name string, lval ZendLong, flags int) {
 func REGISTER_MAIN_DOUBLE_CONSTANT(name string, dval float64, flags int) {
 	ZendRegisterDoubleConstant(name, b.SizeOf("name")-1, dval, flags, 0)
 }
-func REGISTER_MAIN_STRING_CONSTANT(name *byte, str *byte, flags int) {
-	ZendRegisterStringConstant(name, b.SizeOf("name")-1, str, flags, 0)
-}
-func REGISTER_MAIN_STRINGL_CONSTANT(name string, str *byte, len_ int, flags int) {
-	ZendRegisterStringlConstant(name, b.SizeOf("name")-1, str, len_, flags, 0)
+func REGISTER_MAIN_STRINGL_CONSTANT(name string, str string, flags int) {
+	ZendRegisterStringlConstant(name, str, flags, 0)
 }
 func IS_CONSTANT_VISITED(zv *Zval) int {
 	return zv.GetAccessFlags() & IS_CONSTANT_VISITED_MARK
@@ -108,11 +78,6 @@ func CleanModuleConstant(el *Zval, arg any) int {
 func CleanModuleConstants(module_number int) {
 	ZendHashApplyWithArgument(EG__().GetZendConstants(), CleanModuleConstant, any(&module_number))
 }
-func ZendStartupConstants() int {
-	EG__().SetZendConstants((*HashTable)(Malloc(b.SizeOf("HashTable"))))
-	ZendHashInit(EG__().GetZendConstants(), 128, nil, ZEND_CONSTANT_DTOR, 1)
-	return SUCCESS
-}
 func ZendRegisterStandardConstants() {
 	REGISTER_MAIN_LONG_CONSTANT("E_ERROR", E_ERROR, CONST_PERSISTENT|CONST_CS)
 	REGISTER_MAIN_LONG_CONSTANT("E_RECOVERABLE_ERROR", E_RECOVERABLE_ERROR, CONST_PERSISTENT|CONST_CS)
@@ -140,11 +105,6 @@ func ZendRegisterStandardConstants() {
 	REGISTER_MAIN_BOOL_CONSTANT("ZEND_THREAD_SAFE", ZTS_V, CONST_PERSISTENT|CONST_CS)
 	REGISTER_MAIN_BOOL_CONSTANT("ZEND_DEBUG_BUILD", 0, CONST_PERSISTENT|CONST_CS)
 	REGISTER_MAIN_NULL_CONSTANT("NULL", CONST_PERSISTENT|CONST_CT_SUBST)
-}
-func ZendShutdownConstants() int {
-	EG__().GetZendConstants().Destroy()
-	Free(EG__().GetZendConstants())
-	return SUCCESS
 }
 func ZendRegisterNullConstant(name *byte, name_len int, flags int, module_number int) {
 	var c ZendConstant
@@ -174,22 +134,15 @@ func ZendRegisterDoubleConstant(name *byte, name_len int, dval float64, flags in
 	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
 	ZendRegisterConstant(&c)
 }
-func ZendRegisterStringlConstant(
-	name *byte,
-	name_len int,
-	strval *byte,
-	strlen int,
-	flags int,
-	module_number int,
-) {
-	var c ZendConstant
-	c.GetValue().SetString(ZendStringInitInterned(strval, strlen, flags&CONST_PERSISTENT))
-	ZEND_CONSTANT_SET_FLAGS(&c, flags, module_number)
-	c.SetName(ZendStringInitInterned(name, name_len, flags&CONST_PERSISTENT))
-	ZendRegisterConstant(&c)
+func ZendRegisterStringlConstant(name string, str string, flags int, module_number int) {
+	c := NewZendConstant(name)
+	c.Value().SetRawString(str)
+
+	ZEND_CONSTANT_SET_FLAGS(c, flags, module_number)
+	ZendRegisterConstant(c)
 }
 func ZendRegisterStringConstant(name *byte, name_len int, strval *byte, flags int, module_number int) {
-	ZendRegisterStringlConstant(name, name_len, strval, strlen(strval), flags, module_number)
+	ZendRegisterStringlConstant(name, strval, flags, module_number)
 }
 func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 	var c *ZendConstant
@@ -238,14 +191,6 @@ func ZendGetConstantStrImpl(name *byte, name_len int) *ZendConstant {
 		FreeAlloca(lcname, use_heap)
 	}
 	return c
-}
-func ZendGetConstantStr(name *byte, name_len int) *Zval {
-	var c *ZendConstant = ZendGetConstantStrImpl(name, name_len)
-	if c != nil {
-		return c.GetValue()
-	} else {
-		return nil
-	}
 }
 func ZendGetConstantImpl(name *ZendString) *ZendConstant {
 	var zv *Zval

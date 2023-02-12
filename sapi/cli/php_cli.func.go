@@ -261,7 +261,7 @@ func DoCli(argc int, argv **byte) int {
 				exit_status = c == '?' && argc > 1 && !(strchr(argv[1], c))
 				goto out
 			case 'v':
-				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, CliSapiModule.GetName(), __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
+				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, CliSapiModule.Name(), __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
 				core.SapiDeactivate()
 				goto out
 			case 'm':
