@@ -96,11 +96,14 @@ func main(argc int, argv []*byte) int {
 		}
 	}
 exit_loop:
+	app := core.NewApp()
+
 	sapi_module.SetIniDefaults(SapiCliIniDefaults)
 	sapi_module.SetPhpIniPathOverride(ini_path_override)
 	sapi_module.SetPhpinfoAsText(1)
 	sapi_module.SetPhpIniIgnoreCwd(1)
-	core.SapiStartup(sapi_module)
+
+	app.Startup(sapi_module)
 	sapi_started = 1
 	sapi_module.SetPhpIniIgnore(ini_ignore)
 	sapi_module.SetExecutableLocation(argv[0])

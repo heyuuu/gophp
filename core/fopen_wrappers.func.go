@@ -9,7 +9,6 @@ import (
 	"sik/zend"
 )
 
-func OPENBASEDIR_CHECKPATH(filename *byte) int { return PhpCheckOpenBasedir(filename) }
 func OnUpdateBaseDir(
 	entry *zend.ZendIniEntry,
 	new_value *zend.ZendString,

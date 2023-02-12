@@ -7,6 +7,9 @@ import (
 
 type SapiModule = _sapiModule
 
+type ISapiModule interface {
+}
+
 func MakeSapiModule(
 	name string,
 	pretty_name string,

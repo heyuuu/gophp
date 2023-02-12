@@ -1110,9 +1110,12 @@ func Main(argc int, argv []*byte) int {
 	var query_string *byte
 	var decoded_query_string *byte
 	var skip_getopt int = 0
+
+	app := core.NewApp()
+
 	zend.ZendSignalStartup()
 	PhpCgiGlobalsCtor(&php_cgi_globals)
-	core.SapiStartup(&CgiSapiModule)
+	app.Startup(&CgiSapiModule)
 	fastcgi = core.FcgiIsFastcgi()
 	CgiSapiModule.SetPhpIniPathOverride(nil)
 	if fastcgi == 0 {
