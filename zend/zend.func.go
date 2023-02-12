@@ -15,41 +15,16 @@ func ZendBailout()                          { _zendBailout(__FILE__, __LINE__) }
 func ZEND_WRITE(str *byte, str_len int) int { return ZendWrite(str, str_len) }
 func ZEND_PUTS(str string) int              { return ZendWrite(str, strlen(str)) }
 func ZEND_PUTC(c byte) int                  { return ZendWrite(&c, 1) }
-func OnUpdateErrorReporting(
-	entry *ZendIniEntry,
-	new_value *ZendString,
-	mh_arg1 any,
-	mh_arg2 any,
-	mh_arg3 any,
-	stage int,
-) int {
-	if new_value == nil {
+
+func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) bool {
+	if newValue == nil {
 		EG__().SetErrorReporting(E_ALL & ^E_NOTICE & ^E_STRICT & ^E_DEPRECATED)
 	} else {
-		EG__().SetErrorReporting(atoi(new_value.GetVal()))
+		EG__().SetErrorReporting(b.Atoi(*newValue))
 	}
-	return SUCCESS
+	return true
 }
-func OnUpdateGCEnabled(
-	entry *ZendIniEntry,
-	new_value *ZendString,
-	mh_arg1 any,
-	mh_arg2 any,
-	mh_arg3 any,
-	stage int,
-) int {
-	var val ZendBool
-	val = ZendIniParseBool(new_value)
-	GcEnable(val)
-	return SUCCESS
-}
-func ZendGcEnabledDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
-	if GcEnabled() != 0 {
-		ZEND_PUTS("On")
-	} else {
-		ZEND_PUTS("Off")
-	}
-}
+
 func OnUpdateScriptEncoding(
 	entry *ZendIniEntry,
 	new_value *ZendString,
@@ -439,7 +414,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	/* Set up the default garbage collection implementation. */
 
-	GcCollectCycles = ZendGcCollectCycles
+	//GcCollectCycles = ZendGcCollectCycles
 	ZendVmInit()
 
 	/* set up version */
@@ -582,7 +557,7 @@ func ZendAppendVersionInfo(extension *ZendExtension) {
 }
 func GetZendVersion() string { return ZendVersionInfo }
 func ZendActivate() {
-	GcReset()
+	//GcReset()
 	InitCompiler()
 	InitExecutor()
 	StartupScanner()

@@ -2,7 +2,6 @@
 
 package zend
 
-func GC_G__() *ZendGcGlobals                         { return &GcGlobals }
 func CG__() *ZendCompilerGlobals                     { return &CompilerGlobals }
 func EG__() *ZendExecutorGlobals                     { return &ExecutorGlobals }
 func INI_SCNG__() *ZendIniScannerGlobals             { return &IniScannerGlobals }

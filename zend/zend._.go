@@ -75,18 +75,10 @@ var ZendGetConfigurationDirectiveP func(name *ZendString) *Zval
 const SIGNAL_CHECK_DEFAULT = "0"
 
 var IniEntries = []ZendIniEntryDef{
-	*NewZendIniEntryDef("error_reporting", ZEND_INI_ALL).
-		OnModifyArgs(
-			OnUpdateErrorReporting, nil, nil, nil,
-		),
+	*NewZendIniEntryDef("error_reporting", ZEND_INI_ALL).OnModify(OnUpdateErrorReportingEx),
 	*NewZendIniEntryDef("zend.assertions", ZEND_INI_ALL).Value("1").
 		OnModifyArgs(
 			OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
-		),
-	*NewZendIniEntryDef("zend.enable_gc", ZEND_INI_ALL).Value("1").
-		Displayer(ZendGcEnabledDisplayerCb).
-		OnModifyArgs(
-			OnUpdateGCEnabled, nil, nil, nil,
 		),
 	*NewZendIniEntryDef("zend.multibyte", ZEND_INI_PERDIR).Value("0").
 		Displayer(ZendIniBooleanDisplayerCb).

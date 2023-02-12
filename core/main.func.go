@@ -1473,7 +1473,7 @@ func PhpModuleStartup(sf *sapi_module_struct, additional_modules *zend.ZendModul
 	PhpOutputStartup()
 	memset(&CoreGlobals, 0, b.SizeOf("core_globals"))
 	PhpStartupTicks()
-	zend.GcGlobalsCtor()
+	//zend.GcGlobalsCtor()
 	zuf.SetErrorFunction(PhpErrorCb)
 	zuf.SetPrintfFunction(PhpPrintf)
 	zuf.SetWriteFunction(PhpOutputWrite)
@@ -1721,7 +1721,7 @@ func PhpModuleShutdown() {
 	}
 	ModuleInitialized = 0
 	CoreGlobalsDtor(&CoreGlobals)
-	zend.GcGlobalsDtor()
+	//zend.GcGlobalsDtor()
 }
 func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	var prepend_file_p *zend.ZendFileHandle

@@ -347,6 +347,13 @@ func ZendIniGetValue(name *ZendString) *ZendString {
 		return nil
 	}
 }
+func ZendIniStringParseBool(str string) bool {
+	if str == "true" || str == "yes" || str == "on" {
+		return true
+	} else {
+		return b.Atoi(str) != 0
+	}
+}
 func ZendIniParseBool(str *ZendString) ZendBool {
 	if str.GetLen() == 4 && strcasecmp(str.GetVal(), "true") == 0 || str.GetLen() == 3 && strcasecmp(str.GetVal(), "yes") == 0 || str.GetLen() == 2 && strcasecmp(str.GetVal(), "on") == 0 {
 		return 1

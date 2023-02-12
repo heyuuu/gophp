@@ -43,14 +43,14 @@ func ZifGcCollectCycles(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	return_value.SetLong(GcCollectCycles())
+	return_value.SetLong(0)
 	return
 }
 func ZifGcEnabled(execute_data *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	ZVAL_BOOL(return_value, GcEnabled() != 0)
+	return_value.SetTrue()
 	return
 }
 func ZifGcEnable(execute_data *ZendExecuteData, return_value *Zval) {
@@ -72,16 +72,14 @@ func ZifGcDisable(execute_data *ZendExecuteData, return_value *Zval) {
 	ZendStringReleaseEx(key, 0)
 }
 func ZifGcStatus(execute_data *ZendExecuteData, return_value *Zval) {
-	var status ZendGcStatus
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	ZendGcGetStatus(&status)
 	ArrayInitSize(return_value, 3)
-	AddAssocLongEx(return_value, "runs", b.SizeOf("\"runs\"")-1, long(status.GetRuns()))
-	AddAssocLongEx(return_value, "collected", b.SizeOf("\"collected\"")-1, long(status.GetCollected()))
-	AddAssocLongEx(return_value, "threshold", b.SizeOf("\"threshold\"")-1, long(status.GetThreshold()))
-	AddAssocLongEx(return_value, "roots", b.SizeOf("\"roots\"")-1, long(status.GetNumRoots()))
+	AddAssocLongEx(return_value, "runs", b.SizeOf("\"runs\"")-1, 0)
+	AddAssocLongEx(return_value, "collected", b.SizeOf("\"collected\"")-1, 0)
+	AddAssocLongEx(return_value, "threshold", b.SizeOf("\"threshold\"")-1, 0)
+	AddAssocLongEx(return_value, "roots", b.SizeOf("\"roots\"")-1, 0)
 }
 func ZifFuncNumArgs(execute_data *ZendExecuteData, return_value *Zval) {
 	var ex *ZendExecuteData = EX(prev_execute_data)

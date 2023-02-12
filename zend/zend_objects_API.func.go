@@ -214,7 +214,7 @@ func ZendObjectsStoreDel(object *ZendObject) {
 			object.GetHandlers().GetFreeObj()(object)
 		}
 		ptr = (*byte)(object) - object.GetHandlers().GetOffset()
-		GC_REMOVE_FROM_BUFFER(object)
+		//GC_REMOVE_FROM_BUFFER(object)
 		Efree(ptr)
 		ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST(handle)
 	}

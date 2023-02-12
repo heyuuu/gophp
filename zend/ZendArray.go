@@ -703,7 +703,7 @@ func (this *HashTable) Destroy() {
 
 func (this *HashTable) DestroyEx() {
 	/* break possible cycles */
-	GC_REMOVE_FROM_BUFFER(this)
+	//GC_REMOVE_FROM_BUFFER(this)
 	this.SetGcTypeInfo(IS_NULL)
 
 	this.Destroy()
