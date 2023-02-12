@@ -1,7 +1,6 @@
 package core
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -33,10 +32,9 @@ func MakeSapiModule(
 	register_server_variables func(track_vars_array *zend.Zval),
 	log_message func(message *byte, syslog_type_int int),
 ) SapiModule {
-	var sapi_error = PhpError
 	return SapiModule{
-		name:                      b.CastStrPtr(name),
-		pretty_name:               b.CastStrPtr(pretty_name),
+		name:                      name,
+		pretty_name:               pretty_name,
 		startup:                   startup,
 		shutdown:                  shutdown,
 		activate:                  activate,
@@ -44,7 +42,6 @@ func MakeSapiModule(
 		ub_write:                  ub_write,
 		flush:                     flush,
 		getenv:                    getenv,
-		sapi_error:                sapi_error,
 		header_handler:            header_handler,
 		send_headers:              send_headers,
 		send_header:               send_header,

@@ -259,8 +259,8 @@ func (this *SapiHeaderLine) GetResponseCode() zend.ZendLong { return this.respon
  * SapiModule
  */
 type SapiModule struct {
-	name                      *byte
-	pretty_name               *byte
+	name                      string
+	pretty_name               string
 	startup                   func(sapi_module *SapiModule) int
 	shutdown                  func(sapi_module *SapiModule) int
 	activate                  func() int
@@ -269,7 +269,6 @@ type SapiModule struct {
 	flush                     func(server_context any)
 	get_stat                  func() *zend.ZendStatT
 	getenv                    func(name *byte, name_len int) *byte
-	sapi_error                func(type_ int, error_msg *byte, _ ...any)
 	header_handler            func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int
 	send_headers              func(sapi_headers *SapiHeaders) int
 	send_header               func(sapi_header *SapiHeader, server_context any)
@@ -299,8 +298,8 @@ type SapiModule struct {
 
 var _ ISapiModule = (*SapiModule)(nil)
 
-func (this *SapiModule) Name() string       { return b.CastStrAuto(this.name) }
-func (this *SapiModule) PrettyName() string { return b.CastStrAuto(this.pretty_name) }
+func (this *SapiModule) Name() string       { return this.name }
+func (this *SapiModule) PrettyName() string { return this.pretty_name }
 func (this *SapiModule) Startup() bool {
 	resultCode := this.startup(this)
 	return resultCode != zend.FAILURE
@@ -363,7 +362,7 @@ func (this *SapiModule) InputFilter(arg int, name string, value string) string {
 }
 
 func (this *SapiModule) SapiError(type_ int, error_msg string, args ...any) {
-	this.sapi_error(type_, error_msg, args...)
+	PhpError(type_, error_msg, args...)
 }
 
 func (this *SapiModule) HeaderHandler(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int {

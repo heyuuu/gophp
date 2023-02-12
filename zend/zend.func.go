@@ -633,7 +633,7 @@ func RESTORE_STACK(stack ZendStack) {
 		memcpy(CG__().stack, &stack, b.SizeOf("zend_stack"))
 	}
 }
-func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
+func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, format string, args ...any) {
 	var usr_copy va_list
 	var params []Zval
 	var retval Zval
@@ -860,14 +860,11 @@ func ZendErrorAt(type_ int, filename *byte, lineno uint32, format string, _ ...a
 	ZendErrorVaList(type_, filename, lineno, format, args)
 	va_end(args)
 }
-func ZendError(type_ int, format string, _ ...any) {
+func ZendError(type_ int, format string, args ...any) {
 	var filename *byte
 	var lineno uint32
-	var args va_list
 	GetFilenameLineno(type_, &filename, &lineno)
-	va_start(args, format)
 	ZendErrorVaList(type_, filename, lineno, format, args)
-	va_end(args)
 }
 func ZendErrorAtNoreturn(type_ int, filename *byte, lineno uint32, format string, _ ...any) {
 	var args va_list
