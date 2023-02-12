@@ -276,24 +276,21 @@ type SapiModule struct {
 	read_cookies              func() *byte
 	register_server_variables func(track_vars_array *zend.Zval)
 	log_message               func(message *byte, syslog_type_int int)
-	get_request_time          func() float64
-	terminate_process         func()
-	php_ini_path_override     *byte
-	default_post_reader       func()
-	treat_data                func(arg int, str *byte, destArray *zend.Zval)
-	executable_location       *byte
-	php_ini_ignore            int
-	php_ini_ignore_cwd        int
-	get_fd                    func(fd *int) int
-	force_http_10             func() int
-	get_target_uid            func(*uid_t) int
-	get_target_gid            func(*gid_t) int
-	input_filter              func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
-	ini_defaults              func(configuration_hash *zend.HashTable)
-	phpinfo_as_text           int
-	ini_entries               *byte
-	additional_functions      *zend.ZendFunctionEntry
-	input_filter_init         func() uint
+
+	php_ini_path_override *byte
+	default_post_reader   func()
+	treat_data            func(arg int, str *byte, destArray *zend.Zval)
+	executable_location   *byte
+	php_ini_ignore        int
+	php_ini_ignore_cwd    int
+	get_fd                func(fd *int) int
+	force_http_10         func() int
+	input_filter          func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
+	ini_defaults          func(configuration_hash *zend.HashTable)
+	phpinfo_as_text       int
+	ini_entries           *byte
+	additional_functions  *zend.ZendFunctionEntry
+	input_filter_init     func() uint
 }
 
 var _ ISapiModule = (*SapiModule)(nil)
@@ -401,8 +398,6 @@ func (this *SapiModule) GetRegisterServerVariables() func(track_vars_array *zend
 func (this *SapiModule) GetLogMessage() func(message *byte, syslog_type_int int) {
 	return this.log_message
 }
-func (this *SapiModule) GetGetRequestTime() func() float64 { return this.get_request_time }
-func (this *SapiModule) GetTerminateProcess() func()       { return this.terminate_process }
 func (this *SapiModule) GetPhpIniPathOverride() *byte      { return this.php_ini_path_override }
 func (this *SapiModule) SetPhpIniPathOverride(value *byte) { this.php_ini_path_override = value }
 func (this *SapiModule) GetDefaultPostReader() func()      { return this.default_post_reader }
@@ -421,8 +416,6 @@ func (this *SapiModule) GetPhpIniIgnoreCwd() int           { return this.php_ini
 func (this *SapiModule) SetPhpIniIgnoreCwd(value int)      { this.php_ini_ignore_cwd = value }
 func (this *SapiModule) GetGetFd() func(fd *int) int       { return this.get_fd }
 func (this *SapiModule) GetForceHttp10() func() int        { return this.force_http_10 }
-func (this *SapiModule) GetGetTargetUid() func(*uid_t) int { return this.get_target_uid }
-func (this *SapiModule) GetGetTargetGid() func(*gid_t) int { return this.get_target_gid }
 func (this *SapiModule) GetInputFilter() func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint {
 	return this.input_filter
 }

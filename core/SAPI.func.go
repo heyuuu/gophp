@@ -750,15 +750,11 @@ func SapiGetRequestTime() float64 {
 	if SG__().global_request_time {
 		return SG__().global_request_time
 	}
-	if sapi_module.GetGetRequestTime() != nil && SG__().server_context {
-		SG__().global_request_time = sapi_module.GetGetRequestTime()()
+	var tp __struct__timeval = __struct__timeval{0}
+	if !(gettimeofday(&tp, nil)) {
+		SG__().global_request_time = float64(tp.tv_sec + tp.tv_usec/1000000.0)
 	} else {
-		var tp __struct__timeval = __struct__timeval{0}
-		if !(gettimeofday(&tp, nil)) {
-			SG__().global_request_time = float64(tp.tv_sec + tp.tv_usec/1000000.0)
-		} else {
-			SG__().global_request_time = float64(time(0))
-		}
+		SG__().global_request_time = float64(time(0))
 	}
 	return SG__().global_request_time
 }
