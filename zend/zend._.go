@@ -140,14 +140,43 @@ var ZendGetConfigurationDirectiveP func(name *ZendString) *Zval
 const SIGNAL_CHECK_DEFAULT = "0"
 
 var IniEntries = []ZendIniEntryDef{
-	MakeZendIniEntryDef("error_reporting", OnUpdateErrorReporting, nil, nil, nil, nil, nil, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.assertions", OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "1", nil, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.enable_gc", OnUpdateGCEnabled, nil, nil, nil, "1", ZendGcEnabledDisplayerCb, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.multibyte", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte()))-(*byte)(nil))), any(&CompilerGlobals), nil, "0", ZendIniBooleanDisplayerCb, ZEND_INI_PERDIR),
-	MakeZendIniEntryDef("zend.script_encoding", OnUpdateScriptEncoding, nil, nil, nil, nil, nil, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.detect_unicode", OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode()))-(*byte)(nil))), any(&CompilerGlobals), nil, "1", ZendIniBooleanDisplayerCb, ZEND_INI_ALL),
-	MakeZendIniEntryDef("zend.signal_check", OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck()))-(*byte)(nil))), any(&ZendSignalGlobals), nil, SIGNAL_CHECK_DEFAULT, ZendIniBooleanDisplayerCb, ZEND_INI_SYSTEM),
-	MakeZendIniEntryDef("zend.exception_ignore_args", OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs()))-(*byte)(nil))), any(&ExecutorGlobals), nil, "0", ZendIniBooleanDisplayerCb, ZEND_INI_ALL),
+	*NewZendIniEntryDef("error_reporting", ZEND_INI_ALL).
+		OnModifyArgs(
+			OnUpdateErrorReporting, nil, nil, nil,
+		),
+	*NewZendIniEntryDef("zend.assertions", ZEND_INI_ALL).Value("1").
+		OnModifyArgs(
+			OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
+		),
+	*NewZendIniEntryDef("zend.enable_gc", ZEND_INI_ALL).Value("1").
+		Displayer(ZendGcEnabledDisplayerCb).
+		OnModifyArgs(
+			OnUpdateGCEnabled, nil, nil, nil,
+		),
+	*NewZendIniEntryDef("zend.multibyte", ZEND_INI_PERDIR).Value("0").
+		Displayer(ZendIniBooleanDisplayerCb).
+		OnModifyArgs(
+			OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte()))-(*byte)(nil))), any(&CompilerGlobals), nil,
+		),
+	*NewZendIniEntryDef("zend.script_encoding", ZEND_INI_ALL).
+		OnModifyArgs(
+			OnUpdateScriptEncoding, nil, nil, nil,
+		),
+	*NewZendIniEntryDef("zend.detect_unicode", ZEND_INI_ALL).Value("1").
+		Displayer(ZendIniBooleanDisplayerCb).
+		OnModifyArgs(
+			OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode()))-(*byte)(nil))), any(&CompilerGlobals), nil,
+		),
+	*NewZendIniEntryDef("zend.signal_check", ZEND_INI_SYSTEM).Value(SIGNAL_CHECK_DEFAULT).
+		Displayer(ZendIniBooleanDisplayerCb).
+		OnModifyArgs(
+			OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck()))-(*byte)(nil))), any(&ZendSignalGlobals), nil,
+		),
+	*NewZendIniEntryDef("zend.exception_ignore_args", ZEND_INI_ALL).Value("0").
+		Displayer(ZendIniBooleanDisplayerCb).
+		OnModifyArgs(
+			OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
+		),
 }
 
 const ShortTagsDefault = 1
