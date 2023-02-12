@@ -473,15 +473,14 @@ func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 	}
 }
 func SapiAddHeaderEx(header_line *byte, header_line_len int, duplicate zend.ZendBool, replace zend.ZendBool) int {
-	var ctr SapiHeaderLine = MakeSapiHeaderLine(0)
-	var r int
-	ctr.SetLine(header_line)
-	ctr.SetLineLen(header_line_len)
-	r = SapiHeaderOp(b.Cond(replace != 0, SAPI_HEADER_REPLACE, SAPI_HEADER_ADD), &ctr)
-	if duplicate == 0 {
-		zend.Efree(header_line)
+	headerLineStr := b.CastStr(header_line, header_line_len)
+	ctr := MakeSapiHeaderLineEx(headerLineStr)
+
+	if replace != 0 {
+		return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
+	} else {
+		return SapiHeaderOp(SAPI_HEADER_ADD, &ctr)
 	}
-	return r
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	if sapi_module.GetHeaderHandler() == nil || (SAPI_HEADER_ADD&sapi_module.GetHeaderHandler()(sapi_header, op, &(SG__().sapi_headers))) != 0 {

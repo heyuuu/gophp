@@ -225,6 +225,10 @@ type SapiHeaderLine struct {
 	response_code zend.ZendLong
 }
 
+func MakeSapiHeaderLineEx(line string) SapiHeaderLine {
+	return SapiHeaderLine{}
+}
+
 func MakeSapiHeaderLine(line *byte, line_len int, response_code zend.ZendLong) SapiHeaderLine {
 	return SapiHeaderLine{
 		line:          line,
@@ -280,6 +284,11 @@ type SapiModule struct {
 	input_filter_init         func() uint
 }
 
+var _ ISapiModule = (*SapiModule)(nil)
+
+/**
+ * generate
+ */
 func (this *SapiModule) GetName() *byte                                       { return this.name }
 func (this *SapiModule) GetPrettyName() *byte                                 { return this.pretty_name }
 func (this *SapiModule) GetStartup() func(sapi_module *SapiModule) int        { return this.startup }
