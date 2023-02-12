@@ -209,6 +209,18 @@ type SapiGlobals struct {
 	fci_cache                zend.ZendFcallInfoCache
 }
 
+func (this *SapiGlobals) Init() {
+	this.known_post_content_types = *zend.NewZendArrayEx(8, _typeDtor, true)
+	PhpSetupSapiContentTypes()
+}
+
+func (this *SapiGlobals) Destroy() {
+	this.known_post_content_types.Destroy()
+}
+
+/**
+ * generate
+ */
 func (this *SapiGlobals) GetDefaultMimetype() *byte     { return this.default_mimetype }
 func (this *SapiGlobals) GetDefaultCharset() *byte      { return this.default_charset }
 func (this *SapiGlobals) GetPostMaxSize() zend.ZendLong { return this.post_max_size }

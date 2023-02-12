@@ -1222,7 +1222,7 @@ func PhpRequestStartup() int {
 			zend.CWDG(realpath_cache_size_limit) = 0
 		}
 		if PG(expose_php) {
-			SapiAddHeader(SAPI_PHP_VERSION_HEADER, b.SizeOf("SAPI_PHP_VERSION_HEADER")-1, 1)
+			SapiAddHeader(SAPI_PHP_VERSION_HEADER)
 		}
 		if PG(output_handler) && PG(output_handler)[0] {
 			var oh zend.Zval

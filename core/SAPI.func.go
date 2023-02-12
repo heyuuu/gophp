@@ -5,35 +5,13 @@ import (
 	"sik/zend"
 )
 
-func SG__() *SapiGlobals                                { return CurrentApp().SG() }
-func SapiAddHeader(a *byte, b int, c zend.ZendBool) int { return SapiAddHeaderEx(a, b, c, 1) }
-func _typeDtor(zv *zend.Zval)                           { zend.Free(zv.GetPtr()) }
-func SapiGlobalsCtor(sapi_globals *SapiGlobals) {
-	memset(sapi_globals, 0, b.SizeOf("* sapi_globals"))
-	zend.ZendHashInitEx(sapi_globals.GetKnownPostContentTypes(), 8, nil, _typeDtor, 1, 0)
-	PhpSetupSapiContentTypes()
+func SG__() *SapiGlobals { return CurrentApp().SG() }
+func SapiAddHeader(str string) int {
+	ctr := MakeSapiHeaderLineEx(str)
+	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
-func SapiGlobalsDtor(sapi_globals *SapiGlobals) {
-	sapi_globals.GetKnownPostContentTypes().Destroy()
-}
+func _typeDtor(zv *zend.Zval)                { zend.Free(zv.GetPtr()) }
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
-func ZifHeaderRegisterCallback(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var callback_func *zend.Zval
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &callback_func) == zend.FAILURE {
-		return
-	}
-	if zend.ZendIsCallable(callback_func, 0, nil) == 0 {
-		return_value.SetFalse()
-		return
-	}
-	if SG__().callback_func.u1.v.type_ != zend.IS_UNDEF {
-		zend.ZvalPtrDtor(&(SG__().callback_func))
-		SG__().fci_cache = zend.EmptyFcallInfoCache
-	}
-	zend.ZVAL_COPY(&(SG__().callback_func), callback_func)
-	return_value.SetTrue()
-	return
-}
 func SapiRunHeaderCallback(callback *zend.Zval) {
 	var error int
 	var fci zend.ZendFcallInfo
@@ -472,15 +450,10 @@ func SapiRemoveHeader(l *zend.ZendLlist, name *byte, len_ int) {
 		current = next
 	}
 }
-func SapiAddHeaderEx(header_line *byte, header_line_len int, duplicate zend.ZendBool, replace zend.ZendBool) int {
+func SapiAddHeaderEx(header_line *byte, header_line_len int) int {
 	headerLineStr := b.CastStr(header_line, header_line_len)
 	ctr := MakeSapiHeaderLineEx(headerLineStr)
-
-	if replace != 0 {
-		return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
-	} else {
-		return SapiHeaderOp(SAPI_HEADER_ADD, &ctr)
-	}
+	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
 }
 func SapiHeaderAddOp(op SapiHeaderOpEnum, sapi_header *SapiHeader) {
 	if sapi_module.GetHeaderHandler() == nil || (SAPI_HEADER_ADD&sapi_module.GetHeaderHandler()(sapi_header, op, &(SG__().sapi_headers))) != 0 {

@@ -23,11 +23,11 @@ func (app *App) Startup(module ISapiModule) {
 	sf := module.(*SapiModule)
 	sf.SetIniEntries(nil)
 	sapi_module = *sf
-	SapiGlobalsCtor(app.SG())
+	app.SG().Init()
 }
 
 func (app *App) Shutdown() {
-	SapiGlobalsDtor(app.SG())
+	app.SG().Destroy()
 }
 
 func (app *App) SG() *SapiGlobals { return &app.sapiGlobals }
