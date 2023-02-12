@@ -3,6 +3,7 @@
 package core
 
 import (
+	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -298,15 +299,46 @@ type SapiModule struct {
 
 var _ ISapiModule = (*SapiModule)(nil)
 
+func (this *SapiModule) Name() string       { return b.CastStrAuto(this.name) }
+func (this *SapiModule) PrettyName() string { return b.CastStrAuto(this.pretty_name) }
+func (this *SapiModule) Startup() bool {
+	resultCode := this.startup(this)
+	return resultCode != zend.FAILURE
+}
+func (this *SapiModule) Shutdown() bool {
+	resultCode := this.startup(this)
+	return resultCode != zend.FAILURE
+}
+func (this *SapiModule) Activate() {
+	if this.activate != nil {
+		this.activate()
+	}
+}
+func (this *SapiModule) Deactivate() {
+	if this.deactivate != nil {
+		this.deactivate()
+	}
+}
+func (this *SapiModule) InputFilterInit() {
+	if this.input_filter_init != nil {
+		this.input_filter_init()
+	}
+}
+
+func (this *SapiModule) UbWrite(str string) int {
+	return this.ub_write(b.CastStrPtr(str), len(str))
+}
+
+func (this *SapiModule) Flush(serverContext any) {
+	if this.flush != nil {
+		this.flush(serverContext)
+	}
+}
+
 /**
  * generate
  */
 func (this *SapiModule) GetName() *byte                                       { return this.name }
-func (this *SapiModule) GetPrettyName() *byte                                 { return this.pretty_name }
-func (this *SapiModule) GetStartup() func(sapi_module *SapiModule) int        { return this.startup }
-func (this *SapiModule) GetActivate() func() int                              { return this.activate }
-func (this *SapiModule) GetDeactivate() func() int                            { return this.deactivate }
-func (this *SapiModule) GetUbWrite() func(str *byte, str_length int) int      { return this.ub_write }
 func (this *SapiModule) SetUbWrite(value func(str *byte, str_length int) int) { this.ub_write = value }
 func (this *SapiModule) GetFlush() func(server_context any)                   { return this.flush }
 func (this *SapiModule) SetFlush(value func(server_context any))              { this.flush = value }

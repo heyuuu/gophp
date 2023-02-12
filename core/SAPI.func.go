@@ -6,6 +6,7 @@ import (
 )
 
 func SG__() *SapiGlobals { return CurrentApp().SG() }
+func SM__() ISapiModule  { return CurrentApp().sapiModule }
 func SapiAddHeader(str string) int {
 	ctr := MakeSapiHeaderLineEx(str)
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
@@ -285,12 +286,8 @@ func SapiActivate() {
 		/* Cookies */
 
 	}
-	if sapi_module.GetActivate() != nil {
-		sapi_module.GetActivate()()
-	}
-	if sapi_module.GetInputFilterInit() != nil {
-		sapi_module.GetInputFilterInit()()
-	}
+	sapi_module.Activate()
+	sapi_module.InputFilterInit()
 }
 func SapiSendHeadersFree() {
 	if SG__().sapi_headers.http_status_line {
@@ -332,9 +329,7 @@ func SapiDeactivate() {
 	if SG__().request_info.current_user {
 		zend.Efree(SG__().request_info.current_user)
 	}
-	if sapi_module.GetDeactivate() != nil {
-		sapi_module.GetDeactivate()()
-	}
+	sapi_module.Deactivate()
 	if SG__().rfc1867_uploaded_files {
 		DestroyUploadedFilesHash()
 	}
@@ -725,13 +720,8 @@ func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, 
 	sapi_module.SetInputFilterInit(input_filter_init)
 	return zend.SUCCESS
 }
-func SapiFlush() int {
-	if sapi_module.GetFlush() != nil {
-		sapi_module.GetFlush()(SG__().server_context)
-		return zend.SUCCESS
-	} else {
-		return zend.FAILURE
-	}
+func SapiFlush() {
+	sapi_module.Flush(SG__().server_context)
 }
 func SapiGetStat() *zend.ZendStatT {
 	if sapi_module.GetGetStat() != nil {

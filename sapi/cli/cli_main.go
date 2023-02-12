@@ -122,7 +122,7 @@ exit_loop:
 
 	/* startup after we get the above ini override se we get things right */
 
-	if sapi_module.GetStartup()(sapi_module) == zend.FAILURE {
+	if !sapi_module.Startup() {
 
 		/* there is no way to see if we must call zend_ini_deactivate()
 		 * since we cannot check if EG(ini_directives) has been initialised

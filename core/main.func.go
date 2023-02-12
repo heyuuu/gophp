@@ -314,7 +314,7 @@ func OnUpdateDisplayErrors(
 }
 func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 	var mode int
-	var cgi_or_cli int
+	var cgi_or_cli bool
 	var tmp_value_length int
 	var tmp_value *byte
 	if type_ == zend.ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
@@ -339,16 +339,16 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 
 	/* Display 'On' for other SAPIs instead of STDOUT or STDERR */
 
-	cgi_or_cli = !(strcmp(sapi_module.GetName(), "cli")) || !(strcmp(sapi_module.GetName(), "cgi")) || !(strcmp(sapi_module.GetName(), "phpdbg"))
+	cgi_or_cli = sapi_module.Name() == "cli" || sapi_module.Name() == "cgi" || sapi_module.Name() == "phpdbg"
 	switch mode {
 	case PHP_DISPLAY_ERRORS_STDERR:
-		if cgi_or_cli != 0 {
+		if true {
 			PUTS("STDERR")
 		} else {
 			PUTS("On")
 		}
 	case PHP_DISPLAY_ERRORS_STDOUT:
-		if cgi_or_cli != 0 {
+		if true {
 			PUTS("STDOUT")
 		} else {
 			PUTS("On")
@@ -356,30 +356,6 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 	default:
 		PUTS("Off")
 	}
-}
-func PhpGetInternalEncoding() *byte {
-	if PG(internal_encoding) && PG(internal_encoding)[0] {
-		return PG(internal_encoding)
-	} else if SG__().default_charset {
-		return SG__().default_charset
-	}
-	return ""
-}
-func PhpGetInputEncoding() *byte {
-	if PG(input_encoding) && PG(input_encoding)[0] {
-		return PG(input_encoding)
-	} else if SG__().default_charset {
-		return SG__().default_charset
-	}
-	return ""
-}
-func PhpGetOutputEncoding() *byte {
-	if PG(output_encoding) && PG(output_encoding)[0] {
-		return PG(output_encoding)
-	} else if SG__().default_charset {
-		return SG__().default_charset
-	}
-	return ""
 }
 func OnUpdateDefaultCharset(
 	entry *zend.ZendIniEntry,
@@ -962,7 +938,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
 
-					if (!(strcmp(sapi_module.GetName(), "cli")) || !(strcmp(sapi_module.GetName(), "cgi")) || !(strcmp(sapi_module.GetName(), "phpdbg"))) && PG(display_errors) == PHP_DISPLAY_ERRORS_STDERR {
+					if PG(display_errors) == PHP_DISPLAY_ERRORS_STDERR {
 						r.Fprintf(stderr, "%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
 					} else {
 						PhpPrintf("%s\n%s: %s in %s on line %"+"u"+"\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))

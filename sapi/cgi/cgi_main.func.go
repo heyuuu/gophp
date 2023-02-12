@@ -1217,7 +1217,7 @@ func Main(argc int, argv []*byte) int {
 
 	/* startup after we get the above ini override se we get things right */
 
-	if CgiSapiModule.GetStartup()(&CgiSapiModule) == zend.FAILURE {
+	if !CgiSapiModule.Startup() {
 		zend.Free(bindpath)
 		return zend.FAILURE
 	}

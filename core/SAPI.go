@@ -6,6 +6,13 @@ import (
 )
 
 type ISapiModule interface {
+	Name() string
+	PrettyName() string
+	Startup() bool
+	Shutdown() bool
+	Activate()
+	Deactivate()
+	UbWrite(str string)
 }
 
 func MakeSapiModule(

@@ -47,21 +47,10 @@ type PhpOutputContext struct {
 	out PhpOutputBuffer
 }
 
-// func MakePhpOutputContext(op int, in PhpOutputBuffer, out PhpOutputBuffer) PhpOutputContext {
-//     return PhpOutputContext{
-//         op:op,
-//         in:in,
-//         out:out,
-//     }
-// }
-func (this *PhpOutputContext) GetOp() int             { return this.op }
-func (this *PhpOutputContext) SetOp(value int)        { this.op = value }
-func (this *PhpOutputContext) GetIn() PhpOutputBuffer { return this.in }
-
-// func (this *PhpOutputContext) SetIn(value PhpOutputBuffer) { this.in = value }
-func (this *PhpOutputContext) GetOut() PhpOutputBuffer { return this.out }
-
-// func (this *PhpOutputContext) SetOut(value PhpOutputBuffer) { this.out = value }
+func (this *PhpOutputContext) GetOp() int               { return this.op }
+func (this *PhpOutputContext) SetOp(value int)          { this.op = value }
+func (this *PhpOutputContext) GetIn() PhpOutputBuffer   { return this.in }
+func (this *PhpOutputContext) GetOut() *PhpOutputBuffer { return &this.out }
 
 /**
  * PhpOutputHandlerUserFuncT

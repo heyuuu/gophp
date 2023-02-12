@@ -31,6 +31,7 @@ func (app *App) Shutdown() {
 }
 
 func (app *App) SG() *SapiGlobals { return &app.sapiGlobals }
+func (app *App) SM() ISapiModule  { return &app.sapiModule }
 
 /**
  * Context 单个PHP请求上下文

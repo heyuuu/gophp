@@ -269,9 +269,7 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableRow(2, "System", php_uname.GetVal())
 		PhpInfoPrintTableRow(2, "Build Date", __DATE__+" "+__TIME__)
 		PhpInfoPrintTableRow(2, "Configure Command", core.CONFIGURE_COMMAND)
-		if core.sapi_module.GetPrettyName() != nil {
-			PhpInfoPrintTableRow(2, "Server API", core.sapi_module.GetPrettyName())
-		}
+		PhpInfoPrintTableRow(2, "Server API", core.SM__().PrettyName())
 		PhpInfoPrintTableRow(2, "Virtual Directory Support", "disabled")
 		PhpInfoPrintTableRow(2, "Configuration File (php.ini) Path", core.PHP_CONFIG_FILE_PATH)
 		PhpInfoPrintTableRow(2, "Loaded Configuration File", b.Cond(PhpIniOpenedPath != nil, PhpIniOpenedPath, "(none)"))
