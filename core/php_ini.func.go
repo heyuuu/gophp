@@ -20,9 +20,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 			if ini_entry.GetOrigValue() != nil && ini_entry.GetOrigValue().GetVal()[0] {
 				display_string = ini_entry.GetOrigValue().GetVal()
 				display_string_length = ini_entry.GetOrigValue().GetLen()
-				esc_html = !(sapi_module.GetPhpinfoAsText())
+				esc_html = !(SM__().GetPhpinfoAsText())
 			} else {
-				if sapi_module.GetPhpinfoAsText() == 0 {
+				if SM__().GetPhpinfoAsText() == 0 {
 					display_string = "<i>no value</i>"
 					display_string_length = b.SizeOf("\"<i>no value</i>\"") - 1
 				} else {
@@ -33,9 +33,9 @@ func PhpIniDisplayerCb(ini_entry *zend.ZendIniEntry, type_ int) {
 		} else if ini_entry.GetValue() != nil && ini_entry.GetValue().GetVal()[0] {
 			display_string = ini_entry.GetValue().GetVal()
 			display_string_length = ini_entry.GetValue().GetLen()
-			esc_html = !(sapi_module.GetPhpinfoAsText())
+			esc_html = !(SM__().GetPhpinfoAsText())
 		} else {
-			if sapi_module.GetPhpinfoAsText() == 0 {
+			if SM__().GetPhpinfoAsText() == 0 {
 				display_string = "<i>no value</i>"
 				display_string_length = b.SizeOf("\"<i>no value</i>\"") - 1
 			} else {
@@ -72,7 +72,7 @@ func DisplayIniEntries(module *zend.ZendModuleEntry) {
 			standard.PhpInfoPrintTableHeader(3, "Directive", "Local Value", "Master Value")
 			first = 0
 		}
-		if sapi_module.GetPhpinfoAsText() == 0 {
+		if SM__().GetPhpinfoAsText() == 0 {
 			PUTS("<tr>")
 			PUTS("<td class=\"e\">")
 			PHPWRITE(ini_entry.GetName().GetVal(), ini_entry.GetName().GetLen())
@@ -298,17 +298,17 @@ func PhpInitConfig() int {
 	var fp *r.FILE
 	var filename *byte
 	zend.ZendHashInit(&ConfigurationHash, 8, nil, ConfigZvalDtor, 1)
-	if sapi_module.GetIniDefaults() != nil {
-		sapi_module.GetIniDefaults()(&ConfigurationHash)
+	if SM__().GetIniDefaults() != nil {
+		SM__().GetIniDefaults()(&ConfigurationHash)
 	}
 	ExtensionLists.GetEngine().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	ExtensionLists.GetFunctions().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	open_basedir = PG(open_basedir)
-	if sapi_module.GetPhpIniPathOverride() != nil {
-		php_ini_file_name = sapi_module.GetPhpIniPathOverride()
-		php_ini_search_path = sapi_module.GetPhpIniPathOverride()
+	if SM__().GetPhpIniPathOverride() != nil {
+		php_ini_file_name = SM__().GetPhpIniPathOverride()
+		php_ini_search_path = SM__().GetPhpIniPathOverride()
 		free_ini_search_path = 0
-	} else if sapi_module.GetPhpIniIgnore() == 0 {
+	} else if SM__().GetPhpIniIgnore() == 0 {
 		var search_path_size int
 		var default_location *byte
 		var env_location *byte
@@ -339,7 +339,7 @@ func PhpInitConfig() int {
 
 		/* Add cwd (not with CLI) */
 
-		if sapi_module.GetPhpIniIgnoreCwd() == 0 {
+		if SM__().GetPhpIniIgnoreCwd() == 0 {
 			if *php_ini_search_path {
 				strlcat(php_ini_search_path, paths_separator, search_path_size)
 			}
@@ -381,7 +381,7 @@ func PhpInitConfig() int {
 	 * This allows disabling scanning for ini files in the PHP_CONFIG_FILE_SCAN_DIR but still
 	 * load an optional ini file. */
 
-	if sapi_module.GetPhpIniIgnore() == 0 || sapi_module.GetPhpIniPathOverride() != nil {
+	if SM__().GetPhpIniIgnore() == 0 || SM__().GetPhpIniPathOverride() != nil {
 
 		/* Check if php_ini_file_name is a file and can be opened */
 
@@ -402,7 +402,7 @@ func PhpInitConfig() int {
 		if fp == nil {
 			var fmt *byte = "php-%s.ini"
 			var ini_fname *byte
-			Spprintf(&ini_fname, 0, fmt, sapi_module.Name())
+			Spprintf(&ini_fname, 0, fmt, SM__().Name())
 			fp = PhpFopenWithPath(ini_fname, "r", php_ini_search_path, &opened_path)
 			zend.Efree(ini_fname)
 			if fp != nil {
@@ -458,7 +458,7 @@ func PhpInitConfig() int {
 
 	/* Scan and parse any .ini files found in scan path if path not empty. */
 
-	if sapi_module.GetPhpIniIgnore() == 0 && php_ini_scanned_path_len != 0 {
+	if SM__().GetPhpIniIgnore() == 0 && php_ini_scanned_path_len != 0 {
 		var namelist **__struct__dirent
 		var ndir int
 		var i int
@@ -558,12 +558,12 @@ func PhpInitConfig() int {
 		/* Make sure an empty php_ini_scanned_path ends up as NULL */
 
 	}
-	if sapi_module.GetIniEntries() != nil {
+	if SM__().GetIniEntries() != nil {
 
 		/* Reset active ini section */
 
 		RESET_ACTIVE_INI_HASH()
-		zend.ZendParseIniString(sapi_module.GetIniEntries(), 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
+		zend.ZendParseIniString(SM__().GetIniEntries(), 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
 	}
 	return zend.SUCCESS
 }

@@ -299,7 +299,7 @@ func AddPostVar(arr *zend.Zval, var_ *PostVarDataT, eof zend.ZendBool) zend.Zend
 	if vlen != 0 {
 		vlen = streams.PhpUrlDecode(val, vlen)
 	}
-	if sapi_module.GetInputFilter()(PARSE_POST, var_.GetPtr(), &val, vlen, &new_vlen) != 0 {
+	if SM__().GetInputFilter()(PARSE_POST, var_.GetPtr(), &val, vlen, &new_vlen) != 0 {
 		PhpRegisterVariableSafe(var_.GetPtr(), val, new_vlen, arr)
 	}
 	zend.Efree(val)
@@ -458,7 +458,7 @@ func PhpDefaultTreatData(arg int, str *byte, destArray *zend.Zval) {
 		if arg != PARSE_COOKIE {
 			streams.PhpUrlDecode(var_, strlen(var_))
 		}
-		if sapi_module.GetInputFilter()(arg, var_, &val, val_len, &new_val_len) != 0 {
+		if SM__().GetInputFilter()(arg, var_, &val, val_len, &new_val_len) != 0 {
 			PhpRegisterVariableSafe(var_, val, new_val_len, &array)
 		}
 		zend.Efree(val)
@@ -596,8 +596,8 @@ func PhpRegisterServerVariables() {
 
 	/* Server variables */
 
-	if sapi_module.GetRegisterServerVariables() != nil {
-		sapi_module.GetRegisterServerVariables()(arr)
+	if SM__().GetRegisterServerVariables() != nil {
+		SM__().GetRegisterServerVariables()(arr)
 	}
 	ht = arr.GetArr()
 
@@ -663,7 +663,7 @@ func PhpHashEnvironment() int {
 }
 func PhpAutoGlobalsCreateGet(name *zend.ZendString) zend.ZendBool {
 	if PG(variables_order) && (strchr(PG(variables_order), 'G') || strchr(PG(variables_order), 'g')) {
-		sapi_module.GetTreatData()(PARSE_GET, nil, nil)
+		SM__().GetTreatData()(PARSE_GET, nil, nil)
 	} else {
 		zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_GET])
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_GET])
@@ -674,7 +674,7 @@ func PhpAutoGlobalsCreateGet(name *zend.ZendString) zend.ZendBool {
 }
 func PhpAutoGlobalsCreatePost(name *zend.ZendString) zend.ZendBool {
 	if PG(variables_order) && (strchr(PG(variables_order), 'P') || strchr(PG(variables_order), 'p')) && !(SG__().headers_sent) && SG__().request_info.request_method && !(strcasecmp(SG__().request_info.request_method, "POST")) {
-		sapi_module.GetTreatData()(PARSE_POST, nil, nil)
+		SM__().GetTreatData()(PARSE_POST, nil, nil)
 	} else {
 		zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_POST])
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_POST])
@@ -685,7 +685,7 @@ func PhpAutoGlobalsCreatePost(name *zend.ZendString) zend.ZendBool {
 }
 func PhpAutoGlobalsCreateCookie(name *zend.ZendString) zend.ZendBool {
 	if PG(variables_order) && (strchr(PG(variables_order), 'C') || strchr(PG(variables_order), 'c')) {
-		sapi_module.GetTreatData()(PARSE_COOKIE, nil, nil)
+		SM__().GetTreatData()(PARSE_COOKIE, nil, nil)
 	} else {
 		zend.ZvalPtrDtorNogc(&PG(http_globals)[TRACK_VARS_COOKIE])
 		zend.ArrayInit(&PG(http_globals)[TRACK_VARS_COOKIE])

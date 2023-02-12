@@ -105,7 +105,7 @@ func PhpOutputGetStatus() int {
 func PhpOutputWriteUnbuffered(str *byte, len_ int) int {
 	if (OG(flags) & PHP_OUTPUT_ACTIVATED) != 0 {
 		s := b.CastStr(str, len_)
-		return sapi_module.UbWrite(s)
+		return SM__().UbWrite(s)
 	}
 	return PhpOutputDirect(str, len_)
 }
@@ -713,7 +713,7 @@ func PhpOutputOp(op int, str *byte, len_ int) {
 	if context.GetOut().GetData() != nil && context.GetOut().GetUsed() != 0 {
 		PhpOutputHeader()
 		if (OG(flags) & PHP_OUTPUT_DISABLED) == 0 {
-			sapi_module.UbWrite(
+			SM__().UbWrite(
 				b.CastStr(context.GetOut().GetData(), context.GetOut().GetUsed()),
 			)
 			if (OG(flags) & PHP_OUTPUT_IMPLICITFLUSH) != 0 {

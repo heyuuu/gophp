@@ -206,9 +206,9 @@ func PhpDisableClasses() {
 }
 func PhpBinaryInit() {
 	var binary_location *byte = nil
-	if sapi_module.GetExecutableLocation() != nil {
+	if SM__().GetExecutableLocation() != nil {
 		binary_location = (*byte)(zend.Malloc(MAXPATHLEN))
-		if binary_location != nil && !(strchr(sapi_module.GetExecutableLocation(), '/')) {
+		if binary_location != nil && !(strchr(SM__().GetExecutableLocation(), '/')) {
 			var envpath *byte
 			var path *byte
 			var found int = 0
@@ -220,7 +220,7 @@ func PhpBinaryInit() {
 				path = zend.Estrdup(envpath)
 				search_dir = PhpStrtokR(path, ":", &last)
 				for search_dir != nil {
-					Snprintf(search_path, MAXPATHLEN, "%s/%s", search_dir, sapi_module.GetExecutableLocation())
+					Snprintf(search_path, MAXPATHLEN, "%s/%s", search_dir, SM__().GetExecutableLocation())
 					if zend.VCWD_REALPATH(search_path, binary_location) != nil && !(zend.VCWD_ACCESS(binary_location, X_OK)) && zend.VCWD_STAT(binary_location, &s) == 0 && zend.S_ISREG(s.st_mode) {
 						found = 1
 						break
@@ -233,7 +233,7 @@ func PhpBinaryInit() {
 				zend.Free(binary_location)
 				binary_location = nil
 			}
-		} else if zend.VCWD_REALPATH(sapi_module.GetExecutableLocation(), binary_location) == nil || zend.VCWD_ACCESS(binary_location, X_OK) {
+		} else if zend.VCWD_REALPATH(SM__().GetExecutableLocation(), binary_location) == nil || zend.VCWD_ACCESS(binary_location, X_OK) {
 			zend.Free(binary_location)
 			binary_location = nil
 		}
@@ -339,7 +339,7 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 
 	/* Display 'On' for other SAPIs instead of STDOUT or STDERR */
 
-	cgi_or_cli = sapi_module.Name() == "cli" || sapi_module.Name() == "cgi" || sapi_module.Name() == "phpdbg"
+	cgi_or_cli = SM__().Name() == "cli" || SM__().Name() == "cgi" || SM__().Name() == "phpdbg"
 	switch mode {
 	case PHP_DISPLAY_ERRORS_STDERR:
 		if true {
@@ -536,8 +536,8 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 
 	/* Otherwise fall back to the default logging location, if we have one */
 
-	if sapi_module.GetLogMessage() != nil {
-		sapi_module.GetLogMessage()(log_message, syslog_type_int)
+	if SM__().GetLogMessage() != nil {
+		SM__().GetLogMessage()(log_message, syslog_type_int)
 	}
 	PG(in_error_log) = 0
 }
@@ -1444,7 +1444,7 @@ func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, 
 	if ModuleInitialized != 0 {
 		return zend.SUCCESS
 	}
-	sapi_module = *sf
+	SetSM__(sf)
 	PhpOutputStartup()
 	memset(&CoreGlobals, 0, b.SizeOf("core_globals"))
 	PhpStartupTicks()
@@ -1479,7 +1479,7 @@ func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, 
 	zend.REGISTER_MAIN_LONG_CONSTANT("PHP_DEBUG", 0, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_OS", php_os, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_OS_FAMILY", PHP_OS_FAMILY, zend.CONST_PERSISTENT|zend.CONST_CS)
-	zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_SAPI", sapi_module.Name(), zend.CONST_PERSISTENT|zend.CONST_CS|zend.CONST_NO_FILE_CACHE)
+	zend.REGISTER_MAIN_STRINGL_CONSTANT("PHP_SAPI", SM__().Name(), zend.CONST_PERSISTENT|zend.CONST_CS|zend.CONST_NO_FILE_CACHE)
 	zend.REGISTER_MAIN_STRINGL_CONSTANT("DEFAULT_INCLUDE_PATH", PHP_INCLUDE_PATH, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_MAIN_STRINGL_CONSTANT("PEAR_INSTALL_DIR", PEAR_INSTALLDIR, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_MAIN_STRINGL_CONSTANT("PEAR_EXTENSION_DIR", PHP_EXTENSION_DIR, zend.CONST_PERSISTENT|zend.CONST_CS)
@@ -1578,10 +1578,10 @@ func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* register additional functions */
 
-	if sapi_module.GetAdditionalFunctions() != nil {
+	if SM__().GetAdditionalFunctions() != nil {
 		if b.Assign(&module, zend.ZendHashStrFindPtr(&zend.ModuleRegistry, "standard", b.SizeOf("\"standard\"")-1)) != nil {
 			zend.EG__().SetCurrentModule(module)
-			zend.ZendRegisterFunctions(nil, sapi_module.GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
+			zend.ZendRegisterFunctions(nil, SM__().GetAdditionalFunctions(), nil, zend.MODULE_PERSISTENT)
 			zend.EG__().SetCurrentModule(nil)
 		}
 	}
