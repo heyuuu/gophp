@@ -8,10 +8,12 @@ import (
 )
 
 func replaceMakeIniEntryDef(code string) string {
-	rule := regexp.MustCompile(`MakeZendIniEntryDef\((.*)\)`)
+	rule := regexp.MustCompile(`(zend\.)?MakeZendIniEntryDef\((.*)\)`)
 
 	result := util.RegexReplaceAll(rule, code, func(matches []string) string {
-		args := splitArgs(matches[1], 8)
+		pkgPrefix := matches[1]
+
+		args := splitArgs(matches[2], 8)
 		name := args[0]
 		onModify := args[1]
 		arg1 := args[2]
@@ -21,7 +23,7 @@ func replaceMakeIniEntryDef(code string) string {
 		displayer := args[6]
 		modifiable := args[7]
 
-		str := fmt.Sprintf(`*NewZendIniEntryDef(%s, %s)`, name, modifiable)
+		str := fmt.Sprintf(`*%sNewZendIniEntryDef(%s, %s)`, pkgPrefix, name, modifiable)
 		if value != "nil" {
 			str += ".Value(" + value + ")"
 		}
