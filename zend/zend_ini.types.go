@@ -32,7 +32,7 @@ func (this *ZendIniEntryDef) OnModifyArgs(onModify ZendIniEntryModifier, args ..
 	this.onModify = _buildOnModify(onModify, args[0], args[1], args[2])
 	return this
 }
-func (this *ZendIniEntryDef) Display(displayer ZendIniEntryDisplayer) *ZendIniEntryDef {
+func (this *ZendIniEntryDef) Displayer(displayer ZendIniEntryDisplayer) *ZendIniEntryDef {
 	this.displayer = displayer
 	return this
 }
