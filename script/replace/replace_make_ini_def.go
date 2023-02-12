@@ -28,10 +28,10 @@ func replaceMakeIniEntryDef(code string) string {
 			str += ".Value(" + value + ")"
 		}
 		if displayer != "nil" {
-			str += ".Displayer(" + displayer + ")"
+			str += ".\nDisplayer(" + displayer + ")"
 		}
 		if onModify != "nil" {
-			str += fmt.Sprintf(".OnModifyArgs(\n%s, %s, %s, %s,\n)", onModify, arg1, arg2, arg3)
+			str += fmt.Sprintf(".\nOnModifyArgs(\n%s, %s, %s, %s,\n)", onModify, arg1, arg2, arg3)
 		}
 		return str
 	})

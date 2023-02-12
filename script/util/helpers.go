@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -31,12 +30,6 @@ func RegexReplaceAll(rule *regexp.Regexp, src string, repl func(matches []string
 	for _, indexes := range allIndexes {
 		start := indexes[0]
 		end := indexes[1]
-
-		for _, index := range indexes {
-			if index < 0 {
-				fmt.Println(indexes)
-			}
-		}
 
 		// 计算匹配组
 		matches := make([]string, len(indexes)/2)
