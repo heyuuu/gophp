@@ -187,10 +187,9 @@ func (this *SapiRequestInfo) SetAuthDigest(value *byte)   { this.auth_digest = v
 func (this *SapiRequestInfo) SetProtoNum(value int) { this.proto_num = value }
 
 /**
- * sapi_globals_struct
+ * SapiGlobals
  */
-type SapiGlobals = sapi_globals_struct
-type sapi_globals_struct struct {
+type SapiGlobals struct {
 	server_context           any
 	request_info             SapiRequestInfo
 	sapi_headers             SapiHeaders
@@ -210,85 +209,12 @@ type sapi_globals_struct struct {
 	fci_cache                zend.ZendFcallInfoCache
 }
 
-//             func Makesapi_globals_struct(
-// server_context any,
-// request_info SapiRequestInfo,
-// sapi_headers SapiHeaders,
-// read_post_bytes int64,
-// post_read uint8,
-// headers_sent uint8,
-// global_stat zend.ZendStatT,
-// default_mimetype *byte,
-// default_charset *byte,
-// rfc1867_uploaded_files *zend.HashTable,
-// post_max_size zend.ZendLong,
-// options int,
-// sapi_started zend.ZendBool,
-// global_request_time float64,
-// known_post_content_types zend.HashTable,
-// callback_func zend.Zval,
-// fci_cache zend.ZendFcallInfoCache,
-// ) sapi_globals_struct {
-//                 return sapi_globals_struct{
-//                     server_context:server_context,
-//                     request_info:request_info,
-//                     sapi_headers:sapi_headers,
-//                     read_post_bytes:read_post_bytes,
-//                     post_read:post_read,
-//                     headers_sent:headers_sent,
-//                     global_stat:global_stat,
-//                     default_mimetype:default_mimetype,
-//                     default_charset:default_charset,
-//                     rfc1867_uploaded_files:rfc1867_uploaded_files,
-//                     post_max_size:post_max_size,
-//                     options:options,
-//                     sapi_started:sapi_started,
-//                     global_request_time:global_request_time,
-//                     known_post_content_types:known_post_content_types,
-//                     callback_func:callback_func,
-//                     fci_cache:fci_cache,
-//                 }
-//             }
-// func (this *sapi_globals_struct)  GetServerContext() any      { return this.server_context }
-// func (this *sapi_globals_struct) SetServerContext(value any) { this.server_context = value }
-// func (this *sapi_globals_struct)  GetRequestInfo() SapiRequestInfo      { return this.request_info }
-// func (this *sapi_globals_struct) SetRequestInfo(value SapiRequestInfo) { this.request_info = value }
-// func (this *sapi_globals_struct)  GetSapiHeaders() SapiHeaders      { return this.sapi_headers }
-// func (this *sapi_globals_struct) SetSapiHeaders(value SapiHeaders) { this.sapi_headers = value }
-// func (this *sapi_globals_struct)  GetReadPostBytes() int64      { return this.read_post_bytes }
-// func (this *sapi_globals_struct) SetReadPostBytes(value int64) { this.read_post_bytes = value }
-// func (this *sapi_globals_struct)  GetPostRead() uint8      { return this.post_read }
-// func (this *sapi_globals_struct) SetPostRead(value uint8) { this.post_read = value }
-// func (this *sapi_globals_struct)  GetHeadersSent() uint8      { return this.headers_sent }
-// func (this *sapi_globals_struct) SetHeadersSent(value uint8) { this.headers_sent = value }
-// func (this *sapi_globals_struct)  GetGlobalStat() zend.ZendStatT      { return this.global_stat }
-// func (this *sapi_globals_struct) SetGlobalStat(value zend.ZendStatT) { this.global_stat = value }
-func (this *sapi_globals_struct) GetDefaultMimetype() *byte { return this.default_mimetype }
-
-// func (this *sapi_globals_struct) SetDefaultMimetype(value *byte) { this.default_mimetype = value }
-func (this *sapi_globals_struct) GetDefaultCharset() *byte { return this.default_charset }
-
-// func (this *sapi_globals_struct) SetDefaultCharset(value *byte) { this.default_charset = value }
-// func (this *sapi_globals_struct)  GetRfc1867UploadedFiles() *zend.HashTable      { return this.rfc1867_uploaded_files }
-// func (this *sapi_globals_struct) SetRfc1867UploadedFiles(value *zend.HashTable) { this.rfc1867_uploaded_files = value }
-func (this *sapi_globals_struct) GetPostMaxSize() zend.ZendLong { return this.post_max_size }
-
-// func (this *sapi_globals_struct) SetPostMaxSize(value zend.ZendLong) { this.post_max_size = value }
-// func (this *sapi_globals_struct)  GetOptions() int      { return this.options }
-// func (this *sapi_globals_struct) SetOptions(value int) { this.options = value }
-// func (this *sapi_globals_struct)  GetSapiStarted() zend.ZendBool      { return this.sapi_started }
-// func (this *sapi_globals_struct) SetSapiStarted(value zend.ZendBool) { this.sapi_started = value }
-// func (this *sapi_globals_struct)  GetGlobalRequestTime() float64      { return this.global_request_time }
-// func (this *sapi_globals_struct) SetGlobalRequestTime(value float64) { this.global_request_time = value }
-func (this *sapi_globals_struct) GetKnownPostContentTypes() zend.HashTable {
+func (this *SapiGlobals) GetDefaultMimetype() *byte     { return this.default_mimetype }
+func (this *SapiGlobals) GetDefaultCharset() *byte      { return this.default_charset }
+func (this *SapiGlobals) GetPostMaxSize() zend.ZendLong { return this.post_max_size }
+func (this *SapiGlobals) GetKnownPostContentTypes() zend.HashTable {
 	return this.known_post_content_types
 }
-
-// func (this *sapi_globals_struct) SetKnownPostContentTypes(value zend.HashTable) { this.known_post_content_types = value }
-// func (this *sapi_globals_struct)  GetCallbackFunc() zend.Zval      { return this.callback_func }
-// func (this *sapi_globals_struct) SetCallbackFunc(value zend.Zval) { this.callback_func = value }
-// func (this *sapi_globals_struct)  GetFciCache() zend.ZendFcallInfoCache      { return this.fci_cache }
-// func (this *sapi_globals_struct) SetFciCache(value zend.ZendFcallInfoCache) { this.fci_cache = value }
 
 /**
  * SapiHeaderLine
@@ -312,16 +238,14 @@ func (this *SapiHeaderLine) GetLineLen() int                { return this.line_l
 func (this *SapiHeaderLine) SetLineLen(value int)           { this.line_len = value }
 func (this *SapiHeaderLine) GetResponseCode() zend.ZendLong { return this.response_code }
 
-// func (this *SapiHeaderLine) SetResponseCode(value zend.ZendLong) { this.response_code = value }
-
 /**
- * _sapiModule
+ * SapiModule
  */
-type _sapiModule struct {
+type SapiModule struct {
 	name                      *byte
 	pretty_name               *byte
-	startup                   func(sapi_module *_sapiModule) int
-	shutdown                  func(sapi_module *_sapiModule) int
+	startup                   func(sapi_module *SapiModule) int
+	shutdown                  func(sapi_module *SapiModule) int
 	activate                  func() int
 	deactivate                func() int
 	ub_write                  func(str *byte, str_length int) int
@@ -356,91 +280,91 @@ type _sapiModule struct {
 	input_filter_init         func() uint
 }
 
-func (this *_sapiModule) GetName() *byte                                       { return this.name }
-func (this *_sapiModule) GetPrettyName() *byte                                 { return this.pretty_name }
-func (this *_sapiModule) GetStartup() func(sapi_module *_sapiModule) int       { return this.startup }
-func (this *_sapiModule) GetActivate() func() int                              { return this.activate }
-func (this *_sapiModule) GetDeactivate() func() int                            { return this.deactivate }
-func (this *_sapiModule) GetUbWrite() func(str *byte, str_length int) int      { return this.ub_write }
-func (this *_sapiModule) SetUbWrite(value func(str *byte, str_length int) int) { this.ub_write = value }
-func (this *_sapiModule) GetFlush() func(server_context any)                   { return this.flush }
-func (this *_sapiModule) SetFlush(value func(server_context any))              { this.flush = value }
-func (this *_sapiModule) GetGetStat() func() *zend.ZendStatT                   { return this.get_stat }
-func (this *_sapiModule) GetGetenv() func(name *byte, name_len int) *byte      { return this.getenv }
-func (this *_sapiModule) SetGetenv(value func(name *byte, name_len int) *byte) { this.getenv = value }
-func (this *_sapiModule) GetSapiError() func(type_ int, error_msg *byte, _ ...any) {
+func (this *SapiModule) GetName() *byte                                       { return this.name }
+func (this *SapiModule) GetPrettyName() *byte                                 { return this.pretty_name }
+func (this *SapiModule) GetStartup() func(sapi_module *SapiModule) int        { return this.startup }
+func (this *SapiModule) GetActivate() func() int                              { return this.activate }
+func (this *SapiModule) GetDeactivate() func() int                            { return this.deactivate }
+func (this *SapiModule) GetUbWrite() func(str *byte, str_length int) int      { return this.ub_write }
+func (this *SapiModule) SetUbWrite(value func(str *byte, str_length int) int) { this.ub_write = value }
+func (this *SapiModule) GetFlush() func(server_context any)                   { return this.flush }
+func (this *SapiModule) SetFlush(value func(server_context any))              { this.flush = value }
+func (this *SapiModule) GetGetStat() func() *zend.ZendStatT                   { return this.get_stat }
+func (this *SapiModule) GetGetenv() func(name *byte, name_len int) *byte      { return this.getenv }
+func (this *SapiModule) SetGetenv(value func(name *byte, name_len int) *byte) { this.getenv = value }
+func (this *SapiModule) GetSapiError() func(type_ int, error_msg *byte, _ ...any) {
 	return this.sapi_error
 }
-func (this *_sapiModule) GetHeaderHandler() func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int {
+func (this *SapiModule) GetHeaderHandler() func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int {
 	return this.header_handler
 }
-func (this *_sapiModule) GetSendHeaders() func(sapi_headers *SapiHeaders) int {
+func (this *SapiModule) GetSendHeaders() func(sapi_headers *SapiHeaders) int {
 	return this.send_headers
 }
-func (this *_sapiModule) SetSendHeaders(value func(sapi_headers *SapiHeaders) int) {
+func (this *SapiModule) SetSendHeaders(value func(sapi_headers *SapiHeaders) int) {
 	this.send_headers = value
 }
-func (this *_sapiModule) GetSendHeader() func(sapi_header *SapiHeader, server_context any) {
+func (this *SapiModule) GetSendHeader() func(sapi_header *SapiHeader, server_context any) {
 	return this.send_header
 }
-func (this *_sapiModule) GetReadPost() func(buffer *byte, count_bytes int) int { return this.read_post }
-func (this *_sapiModule) SetReadPost(value func(buffer *byte, count_bytes int) int) {
+func (this *SapiModule) GetReadPost() func(buffer *byte, count_bytes int) int { return this.read_post }
+func (this *SapiModule) SetReadPost(value func(buffer *byte, count_bytes int) int) {
 	this.read_post = value
 }
-func (this *_sapiModule) GetReadCookies() func() *byte      { return this.read_cookies }
-func (this *_sapiModule) SetReadCookies(value func() *byte) { this.read_cookies = value }
-func (this *_sapiModule) GetRegisterServerVariables() func(track_vars_array *zend.Zval) {
+func (this *SapiModule) GetReadCookies() func() *byte      { return this.read_cookies }
+func (this *SapiModule) SetReadCookies(value func() *byte) { this.read_cookies = value }
+func (this *SapiModule) GetRegisterServerVariables() func(track_vars_array *zend.Zval) {
 	return this.register_server_variables
 }
-func (this *_sapiModule) GetLogMessage() func(message *byte, syslog_type_int int) {
+func (this *SapiModule) GetLogMessage() func(message *byte, syslog_type_int int) {
 	return this.log_message
 }
-func (this *_sapiModule) GetGetRequestTime() func() float64 { return this.get_request_time }
-func (this *_sapiModule) GetTerminateProcess() func()       { return this.terminate_process }
-func (this *_sapiModule) GetPhpIniPathOverride() *byte      { return this.php_ini_path_override }
-func (this *_sapiModule) SetPhpIniPathOverride(value *byte) { this.php_ini_path_override = value }
-func (this *_sapiModule) GetDefaultPostReader() func()      { return this.default_post_reader }
-func (this *_sapiModule) SetDefaultPostReader(value func()) { this.default_post_reader = value }
-func (this *_sapiModule) GetTreatData() func(arg int, str *byte, destArray *zend.Zval) {
+func (this *SapiModule) GetGetRequestTime() func() float64 { return this.get_request_time }
+func (this *SapiModule) GetTerminateProcess() func()       { return this.terminate_process }
+func (this *SapiModule) GetPhpIniPathOverride() *byte      { return this.php_ini_path_override }
+func (this *SapiModule) SetPhpIniPathOverride(value *byte) { this.php_ini_path_override = value }
+func (this *SapiModule) GetDefaultPostReader() func()      { return this.default_post_reader }
+func (this *SapiModule) SetDefaultPostReader(value func()) { this.default_post_reader = value }
+func (this *SapiModule) GetTreatData() func(arg int, str *byte, destArray *zend.Zval) {
 	return this.treat_data
 }
-func (this *_sapiModule) SetTreatData(value func(arg int, str *byte, destArray *zend.Zval)) {
+func (this *SapiModule) SetTreatData(value func(arg int, str *byte, destArray *zend.Zval)) {
 	this.treat_data = value
 }
-func (this *_sapiModule) GetExecutableLocation() *byte      { return this.executable_location }
-func (this *_sapiModule) SetExecutableLocation(value *byte) { this.executable_location = value }
-func (this *_sapiModule) GetPhpIniIgnore() int              { return this.php_ini_ignore }
-func (this *_sapiModule) SetPhpIniIgnore(value int)         { this.php_ini_ignore = value }
-func (this *_sapiModule) GetPhpIniIgnoreCwd() int           { return this.php_ini_ignore_cwd }
-func (this *_sapiModule) SetPhpIniIgnoreCwd(value int)      { this.php_ini_ignore_cwd = value }
-func (this *_sapiModule) GetGetFd() func(fd *int) int       { return this.get_fd }
-func (this *_sapiModule) GetForceHttp10() func() int        { return this.force_http_10 }
-func (this *_sapiModule) GetGetTargetUid() func(*uid_t) int { return this.get_target_uid }
-func (this *_sapiModule) GetGetTargetGid() func(*gid_t) int { return this.get_target_gid }
-func (this *_sapiModule) GetInputFilter() func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint {
+func (this *SapiModule) GetExecutableLocation() *byte      { return this.executable_location }
+func (this *SapiModule) SetExecutableLocation(value *byte) { this.executable_location = value }
+func (this *SapiModule) GetPhpIniIgnore() int              { return this.php_ini_ignore }
+func (this *SapiModule) SetPhpIniIgnore(value int)         { this.php_ini_ignore = value }
+func (this *SapiModule) GetPhpIniIgnoreCwd() int           { return this.php_ini_ignore_cwd }
+func (this *SapiModule) SetPhpIniIgnoreCwd(value int)      { this.php_ini_ignore_cwd = value }
+func (this *SapiModule) GetGetFd() func(fd *int) int       { return this.get_fd }
+func (this *SapiModule) GetForceHttp10() func() int        { return this.force_http_10 }
+func (this *SapiModule) GetGetTargetUid() func(*uid_t) int { return this.get_target_uid }
+func (this *SapiModule) GetGetTargetGid() func(*gid_t) int { return this.get_target_gid }
+func (this *SapiModule) GetInputFilter() func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint {
 	return this.input_filter
 }
-func (this *_sapiModule) SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint) {
+func (this *SapiModule) SetInputFilter(value func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint) {
 	this.input_filter = value
 }
-func (this *_sapiModule) GetIniDefaults() func(configuration_hash *zend.HashTable) {
+func (this *SapiModule) GetIniDefaults() func(configuration_hash *zend.HashTable) {
 	return this.ini_defaults
 }
-func (this *_sapiModule) SetIniDefaults(value func(configuration_hash *zend.HashTable)) {
+func (this *SapiModule) SetIniDefaults(value func(configuration_hash *zend.HashTable)) {
 	this.ini_defaults = value
 }
-func (this *_sapiModule) GetPhpinfoAsText() int      { return this.phpinfo_as_text }
-func (this *_sapiModule) SetPhpinfoAsText(value int) { this.phpinfo_as_text = value }
-func (this *_sapiModule) GetIniEntries() *byte       { return this.ini_entries }
-func (this *_sapiModule) SetIniEntries(value *byte)  { this.ini_entries = value }
-func (this *_sapiModule) GetAdditionalFunctions() *zend.ZendFunctionEntry {
+func (this *SapiModule) GetPhpinfoAsText() int      { return this.phpinfo_as_text }
+func (this *SapiModule) SetPhpinfoAsText(value int) { this.phpinfo_as_text = value }
+func (this *SapiModule) GetIniEntries() *byte       { return this.ini_entries }
+func (this *SapiModule) SetIniEntries(value *byte)  { this.ini_entries = value }
+func (this *SapiModule) GetAdditionalFunctions() *zend.ZendFunctionEntry {
 	return this.additional_functions
 }
-func (this *_sapiModule) SetAdditionalFunctions(value *zend.ZendFunctionEntry) {
+func (this *SapiModule) SetAdditionalFunctions(value *zend.ZendFunctionEntry) {
 	this.additional_functions = value
 }
-func (this *_sapiModule) GetInputFilterInit() func() uint      { return this.input_filter_init }
-func (this *_sapiModule) SetInputFilterInit(value func() uint) { this.input_filter_init = value }
+func (this *SapiModule) GetInputFilterInit() func() uint      { return this.input_filter_init }
+func (this *SapiModule) SetInputFilterInit(value func() uint) { this.input_filter_init = value }
 
 /**
  * SapiPostEntry

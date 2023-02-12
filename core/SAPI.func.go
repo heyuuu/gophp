@@ -8,12 +8,12 @@ import (
 func SG__() *SapiGlobals                                { return CurrentApp().SG() }
 func SapiAddHeader(a *byte, b int, c zend.ZendBool) int { return SapiAddHeaderEx(a, b, c, 1) }
 func _typeDtor(zv *zend.Zval)                           { zend.Free(zv.GetPtr()) }
-func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
+func SapiGlobalsCtor(sapi_globals *SapiGlobals) {
 	memset(sapi_globals, 0, b.SizeOf("* sapi_globals"))
 	zend.ZendHashInitEx(sapi_globals.GetKnownPostContentTypes(), 8, nil, _typeDtor, 1, 0)
 	PhpSetupSapiContentTypes()
 }
-func SapiGlobalsDtor(sapi_globals *sapi_globals_struct) {
+func SapiGlobalsDtor(sapi_globals *SapiGlobals) {
 	sapi_globals.GetKnownPostContentTypes().Destroy()
 }
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }

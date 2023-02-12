@@ -1688,7 +1688,7 @@ func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* we're done */
 }
-func PhpModuleShutdownWrapper(sapi_globals *sapi_module_struct) int {
+func PhpModuleShutdownWrapper(sapi_globals *SapiModule) int {
 	PhpModuleShutdown()
 	return zend.SUCCESS
 }

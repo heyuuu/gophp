@@ -5,8 +5,6 @@ import (
 	"sik/zend"
 )
 
-type SapiModule = _sapiModule
-
 type ISapiModule interface {
 }
 
