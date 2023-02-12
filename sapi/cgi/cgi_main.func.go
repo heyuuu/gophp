@@ -1671,7 +1671,7 @@ func Main(argc int, argv []*byte) int {
 					core.PhpRequestShutdown(any(0))
 					core.SG(server_context) = nil
 					core.PhpModuleShutdown()
-					core.SapiShutdown()
+					app.Shutdown()
 					zend.Free(bindpath)
 					return zend.FAILURE
 				}
@@ -1798,6 +1798,6 @@ out:
 parent_out:
 	core.SG(server_context) = nil
 	core.PhpModuleShutdown()
-	core.SapiShutdown()
+	app.Shutdown()
 	return exit_status
 }

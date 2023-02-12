@@ -4,7 +4,8 @@ package core
  * App PHP应用服务实体，全局唯一
  */
 type App struct {
-	sapiModule ISapiModule
+	sapiModule  ISapiModule
+	sapiGlobals SapiGlobals
 }
 
 func NewApp() *App {
@@ -19,7 +20,7 @@ func (app *App) Startup(module ISapiModule) {
 }
 
 func (app *App) Shutdown() {
-	SapiShutdown()
+	SapiGlobalsDtor(&sapi_globals)
 }
 
 /**

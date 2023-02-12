@@ -1,5 +1,3 @@
-// <<generate>>
-
 package core
 
 import (
@@ -18,12 +16,6 @@ func SapiGlobalsCtor(sapi_globals *sapi_globals_struct) {
 func SapiGlobalsDtor(sapi_globals *sapi_globals_struct) {
 	sapi_globals.GetKnownPostContentTypes().Destroy()
 }
-func SapiStartup(sf *sapi_module_struct) {
-	sf.SetIniEntries(nil)
-	sapi_module = *sf
-	SapiGlobalsCtor(&sapi_globals)
-}
-func SapiShutdown()                          { SapiGlobalsDtor(&sapi_globals) }
 func SapiFreeHeader(sapi_header *SapiHeader) { zend.Efree(sapi_header.GetHeader()) }
 func ZifHeaderRegisterCallback(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	var callback_func *zend.Zval

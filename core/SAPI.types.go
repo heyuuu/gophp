@@ -189,6 +189,7 @@ func (this *SapiRequestInfo) SetProtoNum(value int) { this.proto_num = value }
 /**
  * sapi_globals_struct
  */
+type SapiGlobals = sapi_globals_struct
 type sapi_globals_struct struct {
 	server_context           any
 	request_info             SapiRequestInfo

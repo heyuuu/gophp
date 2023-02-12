@@ -163,7 +163,7 @@ out:
 		core.PhpModuleShutdown()
 	}
 	if sapi_started != 0 {
-		core.SapiShutdown()
+		app.Shutdown()
 	}
 
 	/*
