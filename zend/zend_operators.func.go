@@ -6,6 +6,7 @@ import (
 	b "sik/builtin"
 	"sik/core"
 	r "sik/runtime"
+	"strings"
 )
 
 func ZEND_DOUBLE_FITS_LONG(d float64) bool {
@@ -52,39 +53,12 @@ func IsNumericString(str *byte, length int, lval *ZendLong, dval *float64, allow
 	return IsNumericStringEx(str, length, lval, dval, allow_errors, nil)
 }
 func ZendMemnstr(haystack *byte, needle string, needle_len int, end *byte) *byte {
-	var p *byte = haystack
-	var ne byte = needle[needle_len-1]
-	var off_p ptrdiff_t
-	var off_s int
-	if needle_len == 1 {
-		return (*byte)(memchr(p, *needle, end-p))
-	}
-	off_p = end - haystack
-	if off_p > 0 {
-		off_s = int(off_p)
-	} else {
-		off_s = 0
-	}
-	if needle_len > off_s {
+	// todo 替换
+	pos := strings.Index(b.CastStr(haystack, end-haystack), b.CastStr(needle))
+	if pos < 0 {
 		return nil
 	}
-	if off_s < 1024 || needle_len < 9 {
-		end -= needle_len
-		for p <= end {
-			if b.Assign(&p, (*byte)(memchr(p, *needle, end-p+1))) && ne == p[needle_len-1] {
-				if !(memcmp(needle+1, p+1, needle_len-2)) {
-					return p
-				}
-			}
-			if p == nil {
-				return nil
-			}
-			p++
-		}
-		return nil
-	} else {
-		return ZendMemnstrEx(haystack, needle, needle_len, end)
-	}
+	return haystack + pos
 }
 func ZendMemrchr(s any, c int, n int) any {
 	var e *uint8
