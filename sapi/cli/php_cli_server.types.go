@@ -4,6 +4,7 @@ package cli
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"sik/core"
 	"sik/zend"
@@ -35,57 +36,71 @@ func (this *PhpCliServerPoller) SetMaxFd(value core.PhpSocketT) { this.max_fd = 
 type PhpCliServerRequest struct {
 	request_method        PhpHttpMethod
 	protocol_version      int
-	request_uri           *byte
-	request_uri_len       int
-	vpath                 *byte
-	vpath_len             int
-	path_translated       *byte
-	path_translated_len   int
-	path_info             *byte
-	path_info_len         int
-	query_string          *byte
-	query_string_len      int
+	request_uri           string
+	vpath                 string
+	path_translated       string
+	path_info             string
+	query_string          string
 	headers               zend.HashTable
 	headers_original_case zend.HashTable
-	content               *byte
-	content_len           int
-	ext                   *byte
-	ext_len               int
+	content               string
+	ext                   string
 	sb                    zend.ZendStatT
 }
 
-func (this *PhpCliServerRequest) GetRequestMethod() PhpHttpMethod      { return this.request_method }
-func (this *PhpCliServerRequest) SetRequestMethod(value PhpHttpMethod) { this.request_method = value }
-func (this *PhpCliServerRequest) GetProtocolVersion() int              { return this.protocol_version }
-func (this *PhpCliServerRequest) SetProtocolVersion(value int)         { this.protocol_version = value }
-func (this *PhpCliServerRequest) GetRequestUri() *byte                 { return this.request_uri }
-func (this *PhpCliServerRequest) SetRequestUri(value *byte)            { this.request_uri = value }
-func (this *PhpCliServerRequest) GetRequestUriLen() int                { return this.request_uri_len }
-func (this *PhpCliServerRequest) SetRequestUriLen(value int)           { this.request_uri_len = value }
-func (this *PhpCliServerRequest) GetVpath() *byte                      { return this.vpath }
-func (this *PhpCliServerRequest) SetVpath(value *byte)                 { this.vpath = value }
-func (this *PhpCliServerRequest) GetVpathLen() int                     { return this.vpath_len }
-func (this *PhpCliServerRequest) SetVpathLen(value int)                { this.vpath_len = value }
-func (this *PhpCliServerRequest) GetPathTranslated() *byte             { return this.path_translated }
-func (this *PhpCliServerRequest) SetPathTranslated(value *byte)        { this.path_translated = value }
-func (this *PhpCliServerRequest) GetPathTranslatedLen() int            { return this.path_translated_len }
-func (this *PhpCliServerRequest) SetPathTranslatedLen(value int)       { this.path_translated_len = value }
-func (this *PhpCliServerRequest) GetPathInfo() *byte                   { return this.path_info }
-func (this *PhpCliServerRequest) SetPathInfo(value *byte)              { this.path_info = value }
-func (this *PhpCliServerRequest) GetPathInfoLen() int                  { return this.path_info_len }
-func (this *PhpCliServerRequest) SetPathInfoLen(value int)             { this.path_info_len = value }
-func (this *PhpCliServerRequest) GetQueryString() *byte                { return this.query_string }
-func (this *PhpCliServerRequest) SetQueryString(value *byte)           { this.query_string = value }
-func (this *PhpCliServerRequest) GetQueryStringLen() int               { return this.query_string_len }
-func (this *PhpCliServerRequest) SetQueryStringLen(value int)          { this.query_string_len = value }
-func (this *PhpCliServerRequest) GetHeaders() zend.HashTable           { return this.headers }
+func (this *PhpCliServerRequest) Ctor() {
+	//this.request_method = PHP_HTTP_GET
+	this.protocol_version = 0
+	this.request_uri = ""
+	this.vpath = ""
+	this.path_translated = ""
+	this.path_info = ""
+	this.query_string = ""
+	this.headers.Clean()
+	this.headers_original_case.Clean()
+	this.content = ""
+	this.ext = ""
+	//this.sb = 0
+}
 
-// func (this *PhpCliServerRequest) SetHeaders(value zend.HashTable) { this.headers = value }
+func (this *PhpCliServerRequest) ReadRequest(req *http.Request) {
+	this.request_method = req.Method // todo 字符串转数字
+	this.protocol_version = req.ProtoMajor*100 + req.ProtoMinor
+	this.request_uri = req.RequestURI
+	this.vpath = "" // todo vpath 是什么？
+	this.path_info = req.URL.Path
+	this.path_translated = "" // todo
+	this.query_string = req.URL.RawQuery
+	this.headers = req.Header
+	this.headers_original_case = req.Header
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		this.content = string(body)
+	}
+}
+
+func (this *PhpCliServerRequest) GetRequestMethod() PhpHttpMethod { return this.request_method }
+func (this *PhpCliServerRequest) GetProtocolVersion() int         { return this.protocol_version }
+func (this *PhpCliServerRequest) GetRequestUri() *byte            { return this.request_uri }
+func (this *PhpCliServerRequest) GetRequestUriLen() int           { return this.request_uri_len }
+func (this *PhpCliServerRequest) GetVpath() *byte                 { return this.vpath }
+func (this *PhpCliServerRequest) SetVpath(value *byte)            { this.vpath = value }
+func (this *PhpCliServerRequest) GetVpathLen() int                { return this.vpath_len }
+func (this *PhpCliServerRequest) SetVpathLen(value int)           { this.vpath_len = value }
+func (this *PhpCliServerRequest) GetPathTranslated() *byte        { return this.path_translated }
+func (this *PhpCliServerRequest) SetPathTranslated(value *byte)   { this.path_translated = value }
+func (this *PhpCliServerRequest) GetPathTranslatedLen() int       { return this.path_translated_len }
+func (this *PhpCliServerRequest) SetPathTranslatedLen(value int)  { this.path_translated_len = value }
+func (this *PhpCliServerRequest) GetPathInfo() *byte              { return this.path_info }
+func (this *PhpCliServerRequest) SetPathInfo(value *byte)         { this.path_info = value }
+func (this *PhpCliServerRequest) GetPathInfoLen() int             { return this.path_info_len }
+func (this *PhpCliServerRequest) SetPathInfoLen(value int)        { this.path_info_len = value }
+func (this *PhpCliServerRequest) GetQueryString() *byte           { return this.query_string }
+func (this *PhpCliServerRequest) GetQueryStringLen() int          { return this.query_string_len }
+func (this *PhpCliServerRequest) GetHeaders() zend.HashTable      { return this.headers }
 func (this *PhpCliServerRequest) GetHeadersOriginalCase() zend.HashTable {
 	return this.headers_original_case
 }
-
-// func (this *PhpCliServerRequest) SetHeadersOriginalCase(value zend.HashTable) { this.headers_original_case = value }
 func (this *PhpCliServerRequest) GetContent() *byte          { return this.content }
 func (this *PhpCliServerRequest) SetContent(value *byte)     { this.content = value }
 func (this *PhpCliServerRequest) GetContentLen() int         { return this.content_len }
@@ -190,12 +205,12 @@ type PhpCliServerClient struct {
 	file_fd                       int
 }
 
-func NewPhpCliServerClient(server *PhpCliServer, clientSock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t) *PhpCliServerClient {
+func NewPhpCliServerClient(server *PhpCliServer) *PhpCliServerClient {
 	client := &PhpCliServerClient{
-		server:   server,
-		sock:     clientSock,
-		addr:     addr,
-		addr_len: addr_len,
+		server: server,
+		//sock:     clientSock,
+		//addr:     addr,
+		//addr_len: addr_len,
 	}
 
 	return client
@@ -277,13 +292,16 @@ func (this *PhpCliServer) Serve() error {
 }
 
 func (this *PhpCliServer) handler(writer http.ResponseWriter, request *http.Request) {
-	// todo
+	client := this.NewClient(nil)
+	PhpCliServerRecvEventReadRequest(this, client, request)
+	PhpCliServerSendEvent(this, client)
 }
 
-func (this *PhpCliServer) NewClient(clientSock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t) {
-	client := NewPhpCliServerClient(this, clientSock, sa, socklen)
-	PhpCliServerClientCtor(client, this, clientSock, sa, socklen)
+func (this *PhpCliServer) NewClient() *PhpCliServerClient {
+	client := NewPhpCliServerClient(this)
+	PhpCliServerClientCtor(client, this)
 	zend.ZendHashIndexUpdatePtr(&this.clients, 0, client)
+	return client
 }
 
 func (this *PhpCliServer) SetHostStr(value string)         { this.host = value }

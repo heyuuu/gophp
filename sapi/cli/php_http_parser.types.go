@@ -21,41 +21,8 @@ type PhpHttpParser struct {
 	data           any
 }
 
-//             func MakePhpHttpParser(
-// type_ uint8,
-// flags uint8,
-// state uint8,
-// header_state uint8,
-// index uint8,
-// nread uint32,
-// content_length ssize_t,
-// http_major uint16,
-// http_minor uint16,
-// status_code uint16,
-// method uint8,
-// upgrade byte,
-// data any,
-// ) PhpHttpParser {
-//                 return PhpHttpParser{
-//                     type_:type_,
-//                     flags:flags,
-//                     state:state,
-//                     header_state:header_state,
-//                     index:index,
-//                     nread:nread,
-//                     content_length:content_length,
-//                     http_major:http_major,
-//                     http_minor:http_minor,
-//                     status_code:status_code,
-//                     method:method,
-//                     upgrade:upgrade,
-//                     data:data,
-//                 }
-//             }
-func (this *PhpHttpParser) GetType() uint8      { return this.type_ }
-func (this *PhpHttpParser) SetType(value uint8) { this.type_ = value }
-
-// func (this *PhpHttpParser)  GetFlags() uint8      { return this.flags }
+func (this *PhpHttpParser) GetType() uint8                 { return this.type_ }
+func (this *PhpHttpParser) SetType(value uint8)            { this.type_ = value }
 func (this *PhpHttpParser) SetFlags(value uint8)           { this.flags = value }
 func (this *PhpHttpParser) GetState() uint8                { return this.state }
 func (this *PhpHttpParser) SetState(value uint8)           { this.state = value }
@@ -113,7 +80,6 @@ func (this *PhpHttpParser) SetIsConnectionKeepAlive(cond bool) {
  * PhpHttpParserSettings
  */
 type PhpHttpParserSettings struct {
-	on_message_begin    PhpHttpCb
 	on_path             PhpHttpDataCb
 	on_query_string     PhpHttpDataCb
 	on_url              PhpHttpDataCb
@@ -125,58 +91,12 @@ type PhpHttpParserSettings struct {
 	on_message_complete PhpHttpCb
 }
 
-func MakePhpHttpParserSettings(
-	on_message_begin PhpHttpCb,
-	on_path PhpHttpDataCb,
-	on_query_string PhpHttpDataCb,
-	on_url PhpHttpDataCb,
-	on_fragment PhpHttpDataCb,
-	on_header_field PhpHttpDataCb,
-	on_header_value PhpHttpDataCb,
-	on_headers_complete PhpHttpCb,
-	on_body PhpHttpDataCb,
-	on_message_complete PhpHttpCb,
-) PhpHttpParserSettings {
-	return PhpHttpParserSettings{
-		on_message_begin:    on_message_begin,
-		on_path:             on_path,
-		on_query_string:     on_query_string,
-		on_url:              on_url,
-		on_fragment:         on_fragment,
-		on_header_field:     on_header_field,
-		on_header_value:     on_header_value,
-		on_headers_complete: on_headers_complete,
-		on_body:             on_body,
-		on_message_complete: on_message_complete,
-	}
-}
-func (this *PhpHttpParserSettings) GetOnMessageBegin() PhpHttpCb { return this.on_message_begin }
-
-// func (this *PhpHttpParserSettings) SetOnMessageBegin(value PhpHttpCb) { this.on_message_begin = value }
-func (this *PhpHttpParserSettings) GetOnPath() PhpHttpDataCb { return this.on_path }
-
-// func (this *PhpHttpParserSettings) SetOnPath(value PhpHttpDataCb) { this.on_path = value }
+func (this *PhpHttpParserSettings) GetOnPath() PhpHttpDataCb        { return this.on_path }
 func (this *PhpHttpParserSettings) GetOnQueryString() PhpHttpDataCb { return this.on_query_string }
-
-// func (this *PhpHttpParserSettings) SetOnQueryString(value PhpHttpDataCb) { this.on_query_string = value }
-func (this *PhpHttpParserSettings) GetOnUrl() PhpHttpDataCb { return this.on_url }
-
-// func (this *PhpHttpParserSettings) SetOnUrl(value PhpHttpDataCb) { this.on_url = value }
-func (this *PhpHttpParserSettings) GetOnFragment() PhpHttpDataCb { return this.on_fragment }
-
-// func (this *PhpHttpParserSettings) SetOnFragment(value PhpHttpDataCb) { this.on_fragment = value }
+func (this *PhpHttpParserSettings) GetOnUrl() PhpHttpDataCb         { return this.on_url }
+func (this *PhpHttpParserSettings) GetOnFragment() PhpHttpDataCb    { return this.on_fragment }
 func (this *PhpHttpParserSettings) GetOnHeaderField() PhpHttpDataCb { return this.on_header_field }
-
-// func (this *PhpHttpParserSettings) SetOnHeaderField(value PhpHttpDataCb) { this.on_header_field = value }
 func (this *PhpHttpParserSettings) GetOnHeaderValue() PhpHttpDataCb { return this.on_header_value }
-
-// func (this *PhpHttpParserSettings) SetOnHeaderValue(value PhpHttpDataCb) { this.on_header_value = value }
 func (this *PhpHttpParserSettings) GetOnHeadersComplete() PhpHttpCb { return this.on_headers_complete }
-
-// func (this *PhpHttpParserSettings) SetOnHeadersComplete(value PhpHttpCb) { this.on_headers_complete = value }
-func (this *PhpHttpParserSettings) GetOnBody() PhpHttpDataCb { return this.on_body }
-
-// func (this *PhpHttpParserSettings) SetOnBody(value PhpHttpDataCb) { this.on_body = value }
+func (this *PhpHttpParserSettings) GetOnBody() PhpHttpDataCb        { return this.on_body }
 func (this *PhpHttpParserSettings) GetOnMessageComplete() PhpHttpCb { return this.on_message_complete }
-
-// func (this *PhpHttpParserSettings) SetOnMessageComplete(value PhpHttpCb) { this.on_message_complete = value }

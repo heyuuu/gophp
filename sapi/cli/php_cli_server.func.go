@@ -5,6 +5,7 @@ package cli
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	b "sik/builtin"
 	"sik/core"
@@ -26,8 +27,7 @@ func PhpCliServerGetSystemTime(buf *byte) int {
 	core.PhpAsctimeR(&tm, buf)
 	return 0
 }
-func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zv.GetPtr(), 1) }
-func GetLastError() *byte        { return zend.Pestrdup(strerror(errno), 1) }
+func GetLastError() *byte { return zend.Pestrdup(strerror(errno), 1) }
 func GetStatusString(code int) string {
 	if result, ok := core.HttpStatusMap[code]; ok {
 		return result
@@ -332,46 +332,6 @@ func PhpCliServerPollerAdd(poller *PhpCliServerPoller, mode int, fd core.PhpSock
 	if fd > poller.GetMaxFd() {
 		poller.SetMaxFd(fd)
 	}
-}
-func PhpCliServerPollerRemove(poller *PhpCliServerPoller, mode int, fd core.PhpSocketT) {
-	if (mode & POLLIN) != 0 {
-		core.PHP_SAFE_FD_CLR(fd, poller.GetRfds())
-	}
-	if (mode & POLLOUT) != 0 {
-		core.PHP_SAFE_FD_CLR(fd, poller.GetWfds())
-	}
-	if fd == poller.GetMaxFd() {
-		for fd > 0 {
-			fd--
-			if core.PHP_SAFE_FD_ISSET(fd, poller.GetRfds()) || core.PHP_SAFE_FD_ISSET(fd, poller.GetWfds()) {
-				break
-			}
-		}
-		poller.SetMaxFd(fd)
-	}
-}
-func PhpCliServerPollerPoll(poller *PhpCliServerPoller, tv *__struct__timeval) int {
-	memmove(poller.GetActiveRfds(), poller.GetRfds(), b.SizeOf("poller -> rfds"))
-	memmove(poller.GetActiveWfds(), poller.GetWfds(), b.SizeOf("poller -> wfds"))
-	return PhpSelect(poller.GetMaxFd()+1, poller.GetActiveRfds(), poller.GetActiveWfds(), nil, tv)
-}
-func PhpCliServerPollerIterOnActive(poller *PhpCliServerPoller, callback func(fd core.PhpSocketT, events int) int) int {
-	var retval int = zend.SUCCESS
-	var fd core.PhpSocketT
-	var max_fd core.PhpSocketT = poller.GetMaxFd()
-	for fd = 0; fd <= max_fd; fd++ {
-		if core.PHP_SAFE_FD_ISSET(fd, poller.GetActiveRfds()) {
-			if zend.SUCCESS != callback(fd, POLLIN) {
-				retval = zend.FAILURE
-			}
-		}
-		if core.PHP_SAFE_FD_ISSET(fd, poller.GetActiveWfds()) {
-			if zend.SUCCESS != callback(fd, POLLOUT) {
-				retval = zend.FAILURE
-			}
-		}
-	}
-	return retval
 }
 func PhpCliServerChunkSize(chunk *PhpCliServerChunk) int {
 	switch chunk.GetType() {
@@ -710,25 +670,6 @@ out:
 	}
 	return retval
 }
-func PhpCliServerRequestCtor(req *PhpCliServerRequest) {
-	req.SetProtocolVersion(0)
-	req.SetRequestUri(nil)
-	req.SetRequestUriLen(0)
-	req.SetVpath(nil)
-	req.SetVpathLen(0)
-	req.SetPathTranslated(nil)
-	req.SetPathTranslatedLen(0)
-	req.SetPathInfo(nil)
-	req.SetPathInfoLen(0)
-	req.SetQueryString(nil)
-	req.SetQueryStringLen(0)
-	zend.ZendHashInit(req.GetHeaders(), 0, nil, CharPtrDtorP, 1)
-	zend.ZendHashInit(req.GetHeadersOriginalCase(), 0, nil, nil, 1)
-	req.SetContent(nil)
-	req.SetContentLen(0)
-	req.SetExt(nil)
-	req.SetExtLen(0)
-}
 func PhpCliServerRequestDtor(req *PhpCliServerRequest) {
 	if req.GetRequestUri() != nil {
 		zend.Pefree(req.GetRequestUri(), 1)
@@ -751,374 +692,9 @@ func PhpCliServerRequestDtor(req *PhpCliServerRequest) {
 		zend.Pefree(req.GetContent(), 1)
 	}
 }
-func PhpCliServerRequestTranslateVpath(request *PhpCliServerRequest, document_root *byte, document_root_len int) {
-	var sb zend.ZendStatT
-	var index_files []*byte = []*byte{"index.php", "index.html", nil}
-	var buf *byte = zend.SafePemalloc(1, request.GetVpathLen(), 1+document_root_len+1+b.SizeOf("\"index.html\""), 1)
-	var p *byte = buf
-	var prev_path *byte = nil
-	var q *byte
-	var vpath *byte
-	var prev_path_len int = 0
-	var is_static_file int = 0
-	memmove(p, document_root, document_root_len)
-	p += document_root_len
-	vpath = p
-	if request.GetVpathLen() > 0 && request.GetVpath()[0] != '/' {
-		b.PostInc(&(*p)) = zend.DEFAULT_SLASH
-	}
-	q = request.GetVpath() + request.GetVpathLen()
-	for q > request.GetVpath() {
-		if b.PostDec(&(*q)) == '.' {
-			is_static_file = 1
-			break
-		}
-	}
-	memmove(p, request.GetVpath(), request.GetVpathLen())
-	p += request.GetVpathLen()
-	*p = '0'
-	q = p
-	for q > buf {
-		if !(zend.PhpSysStat(buf, &sb)) {
-			if (sb.st_mode & S_IFDIR) != 0 {
-				var file **byte = index_files
-				if q[-1] != zend.DEFAULT_SLASH {
-					b.PostInc(&(*q)) = zend.DEFAULT_SLASH
-				}
-				for (*file) != nil {
-					var l int = strlen(*file)
-					memmove(q, *file, l+1)
-					if !(zend.PhpSysStat(buf, &sb)) && (sb.st_mode&S_IFREG) != 0 {
-						q += l
-						break
-					}
-					file++
-				}
-				if (*file) == nil || is_static_file != 0 {
-					if prev_path != nil {
-						zend.Pefree(prev_path, 1)
-					}
-					zend.Pefree(buf, 1)
-					return
-				}
-			}
-			break
-		}
-		if prev_path != nil {
-			zend.Pefree(prev_path, 1)
-			*q = zend.DEFAULT_SLASH
-		}
-		for q > buf && (*(b.PreDec(&q))) != zend.DEFAULT_SLASH {
+func PhpCliServerClientReadRequest(client *PhpCliServerClient, request *http.Request) int {
+	client.request.ReadRequest(request)
 
-		}
-		prev_path_len = p - q
-		prev_path = zend.Pestrndup(q, prev_path_len, 1)
-		*q = '0'
-	}
-	if prev_path != nil {
-		request.SetPathInfoLen(prev_path_len)
-		request.SetPathInfo(prev_path)
-		zend.Pefree(request.GetVpath(), 1)
-		request.SetVpath(zend.Pestrndup(vpath, q-vpath, 1))
-		request.SetVpathLen(q - vpath)
-		request.SetPathTranslated(buf)
-		request.SetPathTranslatedLen(q - buf)
-	} else {
-		zend.Pefree(request.GetVpath(), 1)
-		request.SetVpath(zend.Pestrndup(vpath, q-vpath, 1))
-		request.SetVpathLen(q - vpath)
-		request.SetPathTranslated(buf)
-		request.SetPathTranslatedLen(q - buf)
-	}
-	request.SetSb(sb)
-}
-func NormalizeVpath(retval **byte, retval_len *int, vpath *byte, vpath_len int, persistent int) {
-	var decoded_vpath *byte = nil
-	var decoded_vpath_end *byte
-	var p *byte
-	*retval = nil
-	*retval_len = 0
-	decoded_vpath = zend.Pestrndup(vpath, vpath_len, persistent)
-	if decoded_vpath == nil {
-		return
-	}
-	decoded_vpath_end = decoded_vpath + standard.PhpRawUrlDecode(decoded_vpath, int(vpath_len))
-	p = decoded_vpath
-	if p < decoded_vpath_end && (*p) == '/' {
-		var n *byte = p
-		for n < decoded_vpath_end && (*n) == '/' {
-			n++
-		}
-		memmove(b.PreInc(&p), n, decoded_vpath_end-n)
-		decoded_vpath_end -= n - p
-	}
-	for p < decoded_vpath_end {
-		var n *byte = p
-		for n < decoded_vpath_end && (*n) != '/' {
-			n++
-		}
-		if n-p == 2 && p[0] == '.' && p[1] == '.' {
-			if p > decoded_vpath {
-				p--
-				for {
-					if p == decoded_vpath {
-						if (*p) == '/' {
-							p++
-						}
-						break
-					}
-					if (*(b.PreDec(&p))) == '/' {
-						p++
-						break
-					}
-				}
-			}
-			for n < decoded_vpath_end && (*n) == '/' {
-				n++
-			}
-			memmove(p, n, decoded_vpath_end-n)
-			decoded_vpath_end -= n - p
-		} else if n-p == 1 && p[0] == '.' {
-			for n < decoded_vpath_end && (*n) == '/' {
-				n++
-			}
-			memmove(p, n, decoded_vpath_end-n)
-			decoded_vpath_end -= n - p
-		} else {
-			if n < decoded_vpath_end {
-				var nn *byte = n
-				for nn < decoded_vpath_end && (*nn) == '/' {
-					nn++
-				}
-				p = n + 1
-				memmove(p, nn, decoded_vpath_end-nn)
-				decoded_vpath_end -= nn - p
-			} else {
-				p = n
-			}
-		}
-	}
-	*decoded_vpath_end = '0'
-	*retval = decoded_vpath
-	*retval_len = decoded_vpath_end - decoded_vpath
-}
-func PhpCliServerClientReadRequestOnMessageBegin(parser *PhpHttpParser) int { return 0 }
-func PhpCliServerClientReadRequestOnPath(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	var vpath *byte
-	var vpath_len int
-	if client.GetRequest().GetVpath() != nil {
-		return 1
-	}
-	NormalizeVpath(&vpath, &vpath_len, at, length, 1)
-	client.GetRequest().SetVpath(vpath)
-	client.GetRequest().SetVpathLen(vpath_len)
-	return 0
-}
-func PhpCliServerClientReadRequestOnQueryString(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	if client.GetRequest().GetQueryString() == nil {
-		client.GetRequest().SetQueryString(zend.Pestrndup(at, length, 1))
-		client.GetRequest().SetQueryStringLen(length)
-	} else {
-		zend.ZEND_ASSERT(length <= PHP_HTTP_MAX_HEADER_SIZE && PHP_HTTP_MAX_HEADER_SIZE-length >= client.GetRequest().GetQueryStringLen())
-		client.GetRequest().SetQueryString(zend.Perealloc(client.GetRequest().GetQueryString(), client.GetRequest().GetQueryStringLen()+length+1, 1))
-		memcpy(client.GetRequest().GetQueryString()+client.GetRequest().GetQueryStringLen(), at, length)
-		client.GetRequest().SetQueryStringLen(client.GetRequest().GetQueryStringLen() + length)
-		client.GetRequest().GetQueryString()[client.GetRequest().GetQueryStringLen()] = '0'
-	}
-	return 0
-}
-func PhpCliServerClientReadRequestOnUrl(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	if client.GetRequest().GetRequestUri() == nil {
-		client.GetRequest().SetRequestMethod(parser.GetMethod())
-		client.GetRequest().SetRequestUri(zend.Pestrndup(at, length, 1))
-		client.GetRequest().SetRequestUriLen(length)
-	} else {
-		zend.ZEND_ASSERT(client.GetRequest().GetRequestMethod() == parser.GetMethod())
-		zend.ZEND_ASSERT(length <= PHP_HTTP_MAX_HEADER_SIZE && PHP_HTTP_MAX_HEADER_SIZE-length >= client.GetRequest().GetQueryStringLen())
-		client.GetRequest().SetRequestUri(zend.Perealloc(client.GetRequest().GetRequestUri(), client.GetRequest().GetRequestUriLen()+length+1, 1))
-		memcpy(client.GetRequest().GetRequestUri()+client.GetRequest().GetRequestUriLen(), at, length)
-		client.GetRequest().SetRequestUriLen(client.GetRequest().GetRequestUriLen() + length)
-		client.GetRequest().GetRequestUri()[client.GetRequest().GetRequestUriLen()] = '0'
-	}
-	return 0
-}
-func PhpCliServerClientReadRequestOnFragment(parser *PhpHttpParser, at *byte, length int) int {
-	return 0
-}
-func PhpCliServerClientSaveHeader(client *PhpCliServerClient) {
-	/* strip off the colon */
-
-	var orig_header_name *zend.ZendString = zend.ZendStringInit(client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen(), 1)
-	var lc_header_name *zend.ZendString = zend.ZendStringAlloc(client.GetCurrentHeaderNameLen(), 1)
-	zend.ZendStrTolowerCopy(lc_header_name.GetVal(), client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen())
-	zend.GC_MAKE_PERSISTENT_LOCAL(orig_header_name)
-	zend.GC_MAKE_PERSISTENT_LOCAL(lc_header_name)
-	zend.ZendHashAddPtr(client.GetRequest().GetHeaders(), lc_header_name, client.GetCurrentHeaderValue())
-	zend.ZendHashAddPtr(client.GetRequest().GetHeadersOriginalCase(), orig_header_name, client.GetCurrentHeaderValue())
-	zend.ZendStringReleaseEx(lc_header_name, 1)
-	zend.ZendStringReleaseEx(orig_header_name, 1)
-	if client.GetCurrentHeaderNameAllocated() != 0 {
-		zend.Pefree(client.GetCurrentHeaderName(), 1)
-		client.SetCurrentHeaderNameAllocated(0)
-	}
-	client.SetCurrentHeaderName(nil)
-	client.SetCurrentHeaderNameLen(0)
-	client.SetCurrentHeaderValue(nil)
-	client.SetCurrentHeaderValueLen(0)
-}
-func PhpCliServerClientReadRequestOnHeaderField(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	switch client.GetLastHeaderElement() {
-	case HEADER_VALUE:
-		PhpCliServerClientSaveHeader(client)
-	case HEADER_NONE:
-		client.SetCurrentHeaderName((*byte)(at))
-		client.SetCurrentHeaderNameLen(length)
-		break
-	case HEADER_FIELD:
-		if client.GetCurrentHeaderNameAllocated() != 0 {
-			var new_length int = client.GetCurrentHeaderNameLen() + length
-			client.SetCurrentHeaderName(zend.Perealloc(client.GetCurrentHeaderName(), new_length+1, 1))
-			memcpy(client.GetCurrentHeaderName()+client.GetCurrentHeaderNameLen(), at, length)
-			client.GetCurrentHeaderName()[new_length] = '0'
-			client.SetCurrentHeaderNameLen(new_length)
-		} else {
-			var new_length int = client.GetCurrentHeaderNameLen() + length
-			var field *byte = zend.Pemalloc(new_length+1, 1)
-			memcpy(field, client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen())
-			memcpy(field+client.GetCurrentHeaderNameLen(), at, length)
-			field[new_length] = '0'
-			client.SetCurrentHeaderName(field)
-			client.SetCurrentHeaderNameLen(new_length)
-			client.SetCurrentHeaderNameAllocated(1)
-		}
-		break
-	}
-	client.SetLastHeaderElement(HEADER_FIELD)
-	return 0
-}
-func PhpCliServerClientReadRequestOnHeaderValue(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	switch client.GetLastHeaderElement() {
-	case HEADER_FIELD:
-		client.SetCurrentHeaderValue(zend.Pestrndup(at, length, 1))
-		client.SetCurrentHeaderValueLen(length)
-		break
-	case HEADER_VALUE:
-		var new_length int = client.GetCurrentHeaderValueLen() + length
-		client.SetCurrentHeaderValue(zend.Perealloc(client.GetCurrentHeaderValue(), new_length+1, 1))
-		memcpy(client.GetCurrentHeaderValue()+client.GetCurrentHeaderValueLen(), at, length)
-		client.GetCurrentHeaderValue()[new_length] = '0'
-		client.SetCurrentHeaderValueLen(new_length)
-		break
-	case HEADER_NONE:
-
-		// can't happen
-
-		r.Assert(false)
-		break
-	}
-	client.SetLastHeaderElement(HEADER_VALUE)
-	return 0
-}
-func PhpCliServerClientReadRequestOnHeadersComplete(parser *PhpHttpParser) int {
-	var client *PhpCliServerClient = parser.GetData()
-	switch client.GetLastHeaderElement() {
-	case HEADER_NONE:
-		break
-	case HEADER_FIELD:
-		client.SetCurrentHeaderValue(zend.Pemalloc(1, 1))
-		client.current_header_value = '0'
-		client.SetCurrentHeaderValueLen(0)
-	case HEADER_VALUE:
-		PhpCliServerClientSaveHeader(client)
-		break
-	}
-	client.SetLastHeaderElement(HEADER_NONE)
-	return 0
-}
-func PhpCliServerClientReadRequestOnBody(parser *PhpHttpParser, at *byte, length int) int {
-	var client *PhpCliServerClient = parser.GetData()
-	if client.GetRequest().GetContent() == nil {
-		client.GetRequest().SetContent(zend.Pemalloc(parser.GetContentLength(), 1))
-		client.GetRequest().SetContentLen(0)
-	}
-	client.GetRequest().SetContent(zend.Perealloc(client.GetRequest().GetContent(), client.GetRequest().GetContentLen()+length, 1))
-	memmove(client.GetRequest().GetContent()+client.GetRequest().GetContentLen(), at, length)
-	client.GetRequest().SetContentLen(client.GetRequest().GetContentLen() + length)
-	return 0
-}
-func PhpCliServerClientReadRequestOnMessageComplete(parser *PhpHttpParser) int {
-	var client *PhpCliServerClient = parser.GetData()
-	client.GetRequest().SetProtocolVersion(parser.GetHttpMajor()*100 + parser.GetHttpMinor())
-	PhpCliServerRequestTranslateVpath(client.GetRequest(), client.GetServer().GetDocumentRoot(), client.GetServer().GetDocumentRootLen())
-	var vpath *byte = client.GetRequest().GetVpath()
-	var end *byte = vpath + client.GetRequest().GetVpathLen()
-	var p *byte = end
-	client.GetRequest().SetExt(end)
-	client.GetRequest().SetExtLen(0)
-	for p > vpath {
-		p--
-		if (*p) == '.' {
-			p++
-			client.GetRequest().SetExt(p)
-			client.GetRequest().SetExtLen(end - p)
-			break
-		}
-	}
-	client.SetRequestRead(1)
-	return 0
-}
-func PhpCliServerClientReadRequest(client *PhpCliServerClient, errstr **byte) int {
-	var buf []byte
-	var settings PhpHttpParserSettings = MakePhpHttpParserSettings(PhpCliServerClientReadRequestOnMessageBegin, PhpCliServerClientReadRequestOnPath, PhpCliServerClientReadRequestOnQueryString, PhpCliServerClientReadRequestOnUrl, PhpCliServerClientReadRequestOnFragment, PhpCliServerClientReadRequestOnHeaderField, PhpCliServerClientReadRequestOnHeaderValue, PhpCliServerClientReadRequestOnHeadersComplete, PhpCliServerClientReadRequestOnBody, PhpCliServerClientReadRequestOnMessageComplete)
-	var nbytes_consumed int
-	var nbytes_read int
-	if client.GetRequestRead() != 0 {
-		return 1
-	}
-	nbytes_read = recv(client.GetSock(), buf, b.SizeOf("buf")-1, 0)
-	if nbytes_read < 0 {
-		var err int = core.PhpSocketErrno()
-		if err == SOCK_EAGAIN {
-			return 0
-		}
-		if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-			*errstr = core.PhpSocketStrerror(err, nil, 0)
-		}
-		return -1
-	} else if nbytes_read == 0 {
-		if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-			*errstr = zend.Estrdup(PhpCliServerRequestErrorUnexpectedEof)
-		}
-		return -1
-	}
-	client.GetParser().SetData(client)
-	nbytes_consumed = PhpHttpParserExecute(client.GetParser(), &settings, buf, nbytes_read)
-	if nbytes_consumed != int(nbytes_read) {
-		if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-			if (buf[0]&0x80) != 0 || buf[0] == 0x16 {
-				*errstr = zend.Estrdup("Unsupported SSL request")
-			} else {
-				*errstr = zend.Estrdup("Malformed HTTP request")
-			}
-		}
-		return -1
-	}
-	if client.GetCurrentHeaderName() != nil {
-		var header_name *byte = zend.SafePemalloc(client.GetCurrentHeaderNameLen(), 1, 1, 1)
-		memmove(header_name, client.GetCurrentHeaderName(), client.GetCurrentHeaderNameLen())
-		client.SetCurrentHeaderName(header_name)
-		client.SetCurrentHeaderNameAllocated(1)
-	}
-	if client.GetRequestRead() != 0 {
-		return 1
-	} else {
-		return 0
-	}
 }
 func PhpCliServerClientSendThrough(client *PhpCliServerClient, str *byte, str_len int) int {
 	var tv __struct__timeval = __struct__timeval{10, 0}
@@ -1192,7 +768,7 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetCurrentHeaderValue(nil)
 	client.SetCurrentHeaderValueLen(0)
 	client.SetPostReadOffset(0)
-	PhpCliServerRequestCtor(&client.request)
+	client.request.Ctor()
 	client.SetContentSenderInitialized(0)
 	client.SetFileFd(-1)
 }
@@ -1430,7 +1006,9 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	var is_static_file int = 0
 	var ext *byte = client.GetRequest().GetExt()
 	core.SG__().server_context = client
-	if client.GetRequest().GetExtLen() != 3 || ext[0] != 'p' && ext[0] != 'P' || ext[1] != 'h' && ext[1] != 'H' || ext[2] != 'p' && ext[2] != 'P' || client.GetRequest().GetPathTranslated() == nil {
+	var request = client.request
+
+	if strings.ToLower(request.ext) != "php" || request.path_translated == "" {
 		is_static_file = 1
 	}
 	if server.GetRouter() != nil || is_static_file == 0 {
@@ -1522,7 +1100,6 @@ func PhpCliServerClientDtorWrapper(zv *zend.Zval) {
 	var p *PhpCliServerClient = zv.GetPtr()
 	shutdown(p.GetSock(), core.SHUT_RDWR)
 	core.Closesocket(p.GetSock())
-	PhpCliServerPollerRemove(p.GetServer().GetPoller(), POLLIN|POLLOUT, p.GetSock())
 	PhpCliServerClientDtor(p)
 	zend.Pefree(p, 1)
 }
@@ -1603,27 +1180,12 @@ out:
 	}
 	return retval == zend.SUCCESS
 }
-func PhpCliServerRecvEventReadRequest(server *PhpCliServer, client *PhpCliServerClient) int {
-	var errstr *byte = nil
-	var status int = PhpCliServerClientReadRequest(client, &errstr)
-	if status < 0 {
-		if errstr != nil {
-			if strcmp(errstr, PhpCliServerRequestErrorUnexpectedEof) == 0 && client.GetParser().GetState() == SStartReq {
-				PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Closed without sending a request; it was probably just an unused speculative preconnection", client.GetAddrStr())
-			} else {
-				PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "%s Invalid request (%s)", client.GetAddrStr(), errstr)
-			}
-			zend.Efree(errstr)
-		}
-		PhpCliServerCloseConnection(server, client)
-		return zend.FAILURE
-	} else if status == 1 && client.GetRequest().GetRequestMethod() == PHP_HTTP_NOT_IMPLEMENTED {
+func PhpCliServerRecvEventReadRequest(server *PhpCliServer, client *PhpCliServerClient, request *http.Request) int {
+	var status int = PhpCliServerClientReadRequest(client, request)
+	if status == 1 && client.GetRequest().GetRequestMethod() == PHP_HTTP_NOT_IMPLEMENTED {
 		return PhpCliServerSendErrorPage(server, client, 501)
 	} else if status == 1 {
-		PhpCliServerPollerRemove(server.GetPoller(), POLLIN, client.GetSock())
 		PhpCliServerDispatch(server, client)
-	} else {
-		PhpCliServerPollerAdd(server.GetPoller(), POLLIN, client.GetSock())
 	}
 	return zend.SUCCESS
 }
@@ -1651,62 +1213,6 @@ func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int
 		}
 	}
 	return zend.SUCCESS
-}
-func PhpCliServerDoEventForEachFdCallback(params *PhpCliServerDoEventForEachFdCallbackParams, fd core.PhpSocketT, event int) int {
-	var server = params.GetServer()
-	if server.GetServerSock() == fd {
-		var client_sock core.PhpSocketT
-		var socklen socklen_t = server.GetSocklen()
-		var sa *__struct__sockaddr = zend.Pemalloc(server.GetSocklen(), 1)
-		var client *PhpCliServerClient = server.NewClient(client_sock, sa, socklen)
-		PhpCliServerPollerAdd(server.GetPoller(), POLLIN, client.GetSock())
-	} else {
-		var client *PhpCliServerClient
-		if nil != b.Assign(&client, zend.ZendHashIndexFindPtr(server.GetClients(), fd)) {
-			if (event & POLLIN) != 0 {
-				params.GetRhandler()(server, client)
-			}
-			if (event & POLLOUT) != 0 {
-				params.GetWhandler()(server, client)
-			}
-		}
-	}
-	return zend.SUCCESS
-}
-func PhpCliServerDoEventForEachFd(server *PhpCliServer) {
-	var params = PhpCliServerDoEventForEachFdCallbackParams{
-		Server:       server,
-		ReadHandler:  PhpCliServerRecvEventReadRequest,
-		WriteHandler: PhpCliServerSendEvent,
-	}
-	PhpCliServerPollerIterOnActive(server.GetPoller(), func(fd core.PhpSocketT, events int) int {
-		return PhpCliServerDoEventForEachFdCallback(&params, fd, events)
-	})
-}
-func PhpCliServerDoEventLoop(server *PhpCliServer) error {
-	var retval int = zend.SUCCESS
-	for server.GetIsRunning() != 0 {
-		var tv __struct__timeval = __struct__timeval{1, 0}
-		var n int = PhpCliServerPollerPoll(server.GetPoller(), &tv)
-		if n > 0 {
-			PhpCliServerDoEventForEachFd(server)
-		} else if n == 0 {
-
-		} else {
-			var err int = core.PhpSocketErrno()
-			if err != SOCK_EINTR {
-				if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-					var errstr *byte = core.PhpSocketStrerror(err, nil, 0)
-					PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "%s", errstr)
-					zend.Efree(errstr)
-				}
-				retval = zend.FAILURE
-				goto out
-			}
-		}
-	}
-out:
-	return retval
 }
 func DoCliServer(optArgs core.OptArgs) int {
 	var server_bind_address string
@@ -1757,7 +1263,11 @@ func DoCliServer(optArgs core.OptArgs) int {
 	core.SM__().SetPhpinfoAsText(0)
 	PhpCliServerLogf(PHP_CLI_SERVER_LOG_PROCESS, "PHP %s Development Server (http://%s) started", core.PHP_VERSION, server_bind_address)
 	zend.ZendSignalInit()
-	PhpCliServerDoEventLoop(&Server)
+
+	err := Server.Serve()
+	if err != nil {
+		log.Print(err)
+	}
 	PhpCliServerDtor(&Server)
 	return 0
 }

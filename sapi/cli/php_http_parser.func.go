@@ -31,10 +31,6 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 	var index uint32 = parser.GetIndex()
 	var nread uint32 = parser.GetNread()
 
-	/* technically we could combine all of these (except for url_mark) into one
-	   variable, saving stack space, but it seems more clear to have them
-	   separated. */
-
 	var header_field_mark *byte = 0
 	var header_value_mark *byte = 0
 	var fragment_mark *byte = 0
@@ -99,11 +95,6 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			parser.SetFlags(0)
 			parser.SetContentLength(-1)
-			if settings.GetOnMessageBegin() != nil {
-				if 0 != settings.GetOnMessageBegin()(parser) {
-					return p - data
-				}
-			}
 			if ch == 'H' {
 				state = s_res_or_resp_H
 			} else {
@@ -128,11 +119,6 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 		case SStartRes:
 			parser.SetFlags(0)
 			parser.SetContentLength(-1)
-			if settings.GetOnMessageBegin() != nil {
-				if 0 != settings.GetOnMessageBegin()(parser) {
-					return p - data
-				}
-			}
 			switch ch {
 			case 'H':
 				state = s_res_H
@@ -255,11 +241,6 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			}
 			parser.SetFlags(0)
 			parser.SetContentLength(-1)
-			if settings.GetOnMessageBegin() != nil {
-				if 0 != settings.GetOnMessageBegin()(parser) {
-					return p - data
-				}
-			}
 			if ch < 'A' || 'Z' < ch {
 				goto error
 			}
