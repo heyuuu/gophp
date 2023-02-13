@@ -40,55 +40,6 @@ func PrintExtensions() {
 		PrintExtensionInfo(ext, nil)
 	}
 }
-func SapiCliSelect(fd core.PhpSocketT) int {
-	var wfd fd_set
-	var tv __struct__timeval
-	var ret int
-	FD_ZERO(&wfd)
-	core.PHP_SAFE_FD_SET(fd, &wfd)
-	tv.tv_sec = long(standard.FG(default_socket_timeout))
-	tv.tv_usec = 0
-	ret = PhpSelect(fd+1, nil, &wfd, nil, &tv)
-	return ret != -1
-}
-func SapiCliSingleWrite(str *byte, str_length int) ssize_t {
-	var ret ssize_t
-	for {
-		ret = write(STDOUT_FILENO, str, str_length)
-		if !(ret <= 0 && errno == EAGAIN && SapiCliSelect(STDOUT_FILENO) != 0) {
-			break
-		}
-	}
-	return ret
-}
-func SapiCliUbWrite(str *byte, str_length int) int {
-	var ptr *byte = str
-	var remaining int = str_length
-	var ret ssize_t
-	if str_length == 0 {
-		return 0
-	}
-	for remaining > 0 {
-		ret = SapiCliSingleWrite(ptr, remaining)
-		if ret < 0 {
-			zend.EG__().SetExitStatus(255)
-			core.PhpHandleAbortedConnection()
-			break
-		}
-		ptr += ret
-		remaining -= ret
-	}
-	return ptr - str
-}
-func SapiCliFlush(server_context any) {
-	/* Ignore EBADF here, it's caused by the fact that STDIN/STDOUT/STDERR streams
-	 * are/could be closed before fflush() is called.
-	 */
-
-	if r.Fflush(stdout) == r.EOF && errno != EBADF {
-		core.PhpHandleAbortedConnection()
-	}
-}
 func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 	var len_ int
 	var docroot *byte = ""
@@ -125,35 +76,6 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
 	}
-}
-func SapiCliLogMessage(message *byte, syslog_type_int int) { r.Fprintf(stderr, "%s\n", message) }
-func SapiCliDeactivate() int {
-	r.Fflush(stdout)
-	if core.SG__().request_info.argv0 {
-		zend.Free(core.SG__().request_info.argv0)
-		core.SG__().request_info.argv0 = nil
-	}
-	return zend.SUCCESS
-}
-func SapiCliReadCookies() *byte { return nil }
-func SapiCliHeaderHandler(h *core.SapiHeader, op core.SapiHeaderOpEnum, s *core.SapiHeaders) int {
-	return 0
-}
-func SapiCliSendHeaders(sapi_headers *core.SapiHeaders) int {
-	/* We do nothing here, this function is needed to prevent that the fallback
-	 * header handling is called. */
-
-	return core.SAPI_HEADER_SENT_SUCCESSFULLY
-
-	/* We do nothing here, this function is needed to prevent that the fallback
-	 * header handling is called. */
-}
-func SapiCliSendHeader(sapi_header *core.SapiHeader, server_context any) {}
-func PhpCliStartup(sapi_module *core.sapi_module_struct) int {
-	if core.PhpModuleStartup(sapi_module, nil, 0) == zend.FAILURE {
-		return zend.FAILURE
-	}
-	return zend.SUCCESS
 }
 func INI_DEFAULT(name string, value string) {
 	tmp.SetString(zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
@@ -261,7 +183,7 @@ func DoCli(argc int, argv **byte) int {
 				exit_status = c == '?' && argc > 1 && !(strchr(argv[1], c))
 				goto out
 			case 'v':
-				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, CliSapiModule.Name(), __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
+				core.PhpPrintf("PHP %s (%s) (built: %s %s) ( %s)\nCopyright (c) The PHP Group\n%s", core.PHP_VERSION, CliModule.Name(), __DATE__, __TIME__, "NTS ", zend.GetZendVersion())
 				core.SapiDeactivate()
 				goto out
 			case 'm':

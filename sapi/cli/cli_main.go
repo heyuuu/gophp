@@ -18,7 +18,7 @@ func main(argc int, argv []*byte) int {
 	var ini_entries *byte = nil
 	var ini_entries_len int = 0
 	var ini_ignore int = 0
-	var sapi_module *core.SapiModule = &CliSapiModule
+	var sapi_module = CliModule
 
 	/*
 	 * Do not move this initialization. It needs to happen before argv is used
@@ -26,7 +26,7 @@ func main(argc int, argv []*byte) int {
 	 */
 
 	argv = SavePsArgs(argc, argv)
-	CliSapiModule.SetAdditionalFunctions(AdditionalFunctions)
+	CliModule.SetAdditionalFunctions(AdditionalFunctions)
 	zend.ZendSignalStartup()
 	for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
 		switch c {
@@ -88,7 +88,7 @@ func main(argc int, argv []*byte) int {
 		case 'v':
 
 		case 'm':
-			sapi_module = &CliSapiModule
+			sapi_module = CliModule
 			goto exit_loop
 		case 'e':
 			use_extended_info = 1
@@ -107,7 +107,7 @@ exit_loop:
 	sapi_started = 1
 	sapi_module.SetPhpIniIgnore(ini_ignore)
 	sapi_module.SetExecutableLocation(argv[0])
-	if sapi_module == &CliSapiModule {
+	if sapi_module == CliModule {
 		if ini_entries != nil {
 			ini_entries = realloc(ini_entries, ini_entries_len+b.SizeOf("HARDCODED_INI"))
 			memmove(ini_entries+b.SizeOf("HARDCODED_INI")-2, ini_entries, ini_entries_len+1)
@@ -145,7 +145,7 @@ exit_loop:
 	var __bailout JMP_BUF
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
-		if sapi_module == &CliSapiModule {
+		if sapi_module == CliModule {
 			exit_status = DoCli(argc, argv)
 		} else {
 			exit_status = DoCliServer(argc, argv)

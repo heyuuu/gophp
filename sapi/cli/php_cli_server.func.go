@@ -1870,7 +1870,6 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
-func PhpCliServerSigintHandler(sig int) { Server.SetIsRunning(0) }
 func DoCliServer(argc int, argv **byte) int {
 	var php_optarg *byte = nil
 	var php_optind int = 1

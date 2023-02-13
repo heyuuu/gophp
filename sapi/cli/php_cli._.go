@@ -100,7 +100,6 @@ const STDERR_FILENO = 2
 
 var PhpSelf = ""
 var ScriptFilename = ""
-var CliSapiModule = core.MakeSapiModule("cli", "Command Line Interface", PhpCliStartup, core.PhpModuleShutdownWrapper, nil, SapiCliDeactivate, SapiCliUbWrite, SapiCliFlush, nil, SapiCliHeaderHandler, SapiCliSendHeaders, SapiCliSendHeader, nil, SapiCliReadCookies, SapiCliRegisterVariables, SapiCliLogMessage)
 var ArginfoDl = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),

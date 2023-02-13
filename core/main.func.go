@@ -1430,6 +1430,11 @@ func PhpRegisterExtensionsBc(ptr *zend.ZendModuleEntry, count int) int {
 	}
 	return zend.SUCCESS
 }
+
+func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ZendModuleEntry) bool {
+	retval := PhpModuleStartup(sf, additional_modules, len(additional_modules))
+	return retval != zend.FAILURE
+}
 func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
 	var zuf zend.ZendUtilityFunctions
 	var zuv zend.ZendUtilityValues
