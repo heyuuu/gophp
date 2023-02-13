@@ -115,7 +115,23 @@ const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
-var CgiSapiModule = core.MakeSapiModule("cgi-fcgi", "CGI/FastCGI", PhpCgiStartup, core.PhpModuleShutdownWrapper, SapiCgiActivate, SapiCgiDeactivate, SapiCgiUbWrite, SapiCgiFlush, SapiCgiGetenv, nil, SapiCgiSendHeaders, nil, SapiCgiReadPost, SapiCgiReadCookies, SapiCgiRegisterVariables, SapiCgiLogMessage)
+var CgiSapiModule = core.MakeSapiModule(
+	"cgi-fcgi",
+	"CGI/FastCGI",
+	PhpCgiStartup,
+	core.PhpModuleShutdownWrapper,
+	SapiCgiActivate,
+	SapiCgiDeactivate,
+	SapiCgiUbWrite,
+	SapiCgiFlush,
+	SapiCgiGetenv,
+	nil,
+	SapiCgiSendHeaders,
+	nil,
+	SapiCgiReadPost,
+	SapiCgiReadCookies,
+	SapiCgiRegisterVariables,
+	SapiCgiLogMessage)
 var ArginfoDl = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),

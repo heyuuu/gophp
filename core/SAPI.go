@@ -66,18 +66,97 @@ type ISapiModule interface {
 	SetInputFilterInit(value func() uint)
 }
 
+/**
+ * BaseSapiModule
+ */
 type BaseSapiModule struct {
+	name                      string
+	pretty_name               string
+	startup                   func(sapi_module ISapiModule) int
+	shutdown                  func(sapi_module ISapiModule) int
+	activate                  func() int
+	deactivate                func() int
+	ub_write                  func(str *byte, str_length int) int
+	flush                     func(server_context any)
+	get_stat                  func() *zend.ZendStatT
+	getenv                    func(name *byte, name_len int) *byte
+	header_handler            func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int
+	send_headers              func(sapi_headers *SapiHeaders) int
+	send_header               func(sapi_header *SapiHeader, server_context any)
+	read_post                 func(buffer *byte, count_bytes int) int
+	read_cookies              func() *byte
+	register_server_variables func(track_vars_array *zend.Zval)
+	log_message               func(message *byte, syslog_type_int int)
+
+	php_ini_path_override *byte
+	default_post_reader   func()
+	treat_data            func(arg int, str *byte, destArray *zend.Zval)
+	executable_location   *byte
+	php_ini_ignore        int
+	php_ini_ignore_cwd    int
+	get_fd                func(fd *int) int
+	force_http_10         func() int
+	input_filter          func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint
+	ini_defaults          func(configuration_hash *zend.HashTable)
+	phpinfo_as_text       int
+	ini_entries           *byte
+	additional_functions  *zend.ZendFunctionEntry
+	input_filter_init     func() uint
+}
+
+var _ ISapiModule = (*BaseSapiModule)(nil)
+
+func (this *BaseSapiModule) Name() string                      { panic("implement me") }
+func (this *BaseSapiModule) PrettyName() string                { panic("implement me") }
+func (this *BaseSapiModule) Startup() bool                     { panic("implement me") }
+func (this *BaseSapiModule) Shutdown() bool                    { panic("implement me") }
+func (this *BaseSapiModule) Activate()                         { panic("implement me") }
+func (this *BaseSapiModule) Deactivate()                       { panic("implement me") }
+func (this *BaseSapiModule) UbWrite(str string) (int, error)   { panic("implement me") }
+func (this *BaseSapiModule) Flush(serverContext any)           {}
+func (this *BaseSapiModule) GetStat() bool                     { return false }
+func (this *BaseSapiModule) GetEnv(name string) (string, bool) { return "", false }
+func (this *BaseSapiModule) HeaderHandler(header *SapiHeader, op SapiHeaderOpEnum, headers *SapiHeaders) int {
+	return 0
+}
+func (this *BaseSapiModule) SendHeaders(headers *SapiHeaders) int {
+	panic("implement me")
+}
+
+func (this *BaseSapiModule) SendHeader(header *SapiHeader, serverContext any) {}
+
+func (this *BaseSapiModule) ReadPost(buffer *byte, count_bytes int) int {
+	panic("implement me")
+}
+
+func (this *BaseSapiModule) ReadCookies() (string, bool) {
+	panic("implement me")
+}
+
+func (this *BaseSapiModule) RegisterServerVariables(trackVarsArray []zend.Zval) {
+	panic("implement me")
+}
+
+func (this *BaseSapiModule) LogMessage(message string, syslogType int) {
+	panic("implement me")
 }
 
 func (this *BaseSapiModule) InputFilter(arg int, name string, value string) string {
-	//TODO implement me
-	panic("implement me")
+	if this.input_filter != nil {
+		this.input_filter(arg, name, &value, len(value), nil)
+		return value
+	}
+	return value
 }
 
-func (this *BaseSapiModule) GetStat() bool {
+func (this *BaseSapiModule) SapiError(type_ int, error_msg string, args ...any) {
+	PhpError(type_, error_msg, args...)
+}
 
-	//TODO implement me
-	panic("implement me")
+func (this *BaseSapiModule) InputFilterInit() {
+	if this.input_filter_init != nil {
+		this.input_filter_init()
+	}
 }
 
 /**
@@ -174,23 +253,6 @@ func MakeSapiModule(
 	read_cookies func() *byte,
 	register_server_variables func(track_vars_array *zend.Zval),
 	log_message func(message *byte, syslog_type_int int),
-) SapiModule {
-	return SapiModule{
-		name:                      name,
-		pretty_name:               pretty_name,
-		startup:                   startup,
-		shutdown:                  shutdown,
-		activate:                  activate,
-		deactivate:                deactivate,
-		ub_write:                  ub_write,
-		flush:                     flush,
-		getenv:                    getenv,
-		header_handler:            header_handler,
-		send_headers:              send_headers,
-		send_header:               send_header,
-		read_post:                 read_post,
-		read_cookies:              read_cookies,
-		register_server_variables: register_server_variables,
-		log_message:               log_message,
-	}
+) ISapiModule {
+	return &BaseSapiModule{}
 }
