@@ -187,9 +187,6 @@ func PhpInfoPrintStyle() {
 	PhpInfoPrintCss()
 	PhpInfoPrintf("</style>\n")
 }
-func PhpInfoHtmlEsc(string *byte) *zend.ZendString {
-	return PhpEscapeHtmlEntities((*uint8)(string), strlen(string), 0, ENT_QUOTES, nil)
-}
 func PhpGetUname(mode byte) *zend.ZendString {
 	var php_uname *byte
 	var tmp_uname []byte
@@ -569,12 +566,6 @@ func PhpInfoPrintTableRow(num_cols int, _ ...any) {
 	var row_elements va_list
 	va_start(row_elements, num_cols)
 	PhpInfoPrintTableRowInternal(num_cols, "v", row_elements)
-	va_end(row_elements)
-}
-func PhpInfoPrintTableRowEx(num_cols int, value_class *byte, _ ...any) {
-	var row_elements va_list
-	va_start(row_elements, value_class)
-	PhpInfoPrintTableRowInternal(num_cols, value_class, row_elements)
 	va_end(row_elements)
 }
 func RegisterPhpinfoConstants(type_ int, module_number int) {
