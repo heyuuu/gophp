@@ -1,8 +1,6 @@
 package cli
 
 import (
-	"fmt"
-	"os"
 	"sik/core"
 	"sik/zend"
 )
@@ -23,7 +21,7 @@ func (c *CliServerModuleType) Startup() bool {
 	}
 	var workers = getenv("PHP_CLI_SERVER_WORKERS")
 	if workers == "" {
-		_, _ = fmt.Fprintf(os.Stderr, "platform does not support SO_REUSEPORT, cannot create workers\n")
+		_, _ = log.Printf("platform does not support SO_REUSEPORT, cannot create workers\n")
 	}
 	return true
 }

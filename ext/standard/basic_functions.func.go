@@ -1922,8 +1922,8 @@ func _phpErrorLogEx(opt_err int, message *byte, message_len int, opt *byte, head
 			return zend.FAILURE
 		}
 	case 4:
-		if core.sapi_module.GetLogMessage() != nil {
-			core.sapi_module.GetLogMessage()(message, -1)
+		if core.SM__().GetLogMessage() != nil {
+			core.SM__().GetLogMessage()(message, -1)
 		} else {
 			return zend.FAILURE
 		}

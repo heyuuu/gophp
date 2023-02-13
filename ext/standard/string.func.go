@@ -6660,7 +6660,7 @@ func ZifParseStr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		core.PhpErrorDocref(nil, zend.E_DEPRECATED, "Calling parse_str() without the result argument is deprecated")
 		symbol_table = zend.ZendRebuildSymbolTable()
 		tmp.SetArray(symbol_table)
-		core.sapi_module.GetTreatData()(core.PARSE_STRING, res, &tmp)
+		core.SM__().GetTreatData()(core.PARSE_STRING, res, &tmp)
 		if zend.ZendHashDel(symbol_table, zend.ZSTR_KNOWN(zend.ZEND_STR_THIS)) == zend.SUCCESS {
 			zend.ZendThrowError(nil, "Cannot re-assign $this")
 		}
@@ -6670,7 +6670,7 @@ func ZifParseStr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 			zend.Efree(res)
 			return
 		}
-		core.sapi_module.GetTreatData()(core.PARSE_STRING, res, arrayArg)
+		core.SM__().GetTreatData()(core.PARSE_STRING, res, arrayArg)
 	}
 }
 func PhpTagFind(tag *byte, len_ int, set *byte) int {

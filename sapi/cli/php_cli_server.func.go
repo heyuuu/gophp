@@ -4,6 +4,8 @@ package cli
 
 import (
 	"fmt"
+	"log"
+	"os"
 	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
@@ -12,7 +14,6 @@ import (
 	"strings"
 )
 
-func CLI_SERVER_G(v int) __auto__ { return CliServerGlobals.v }
 func PhpCliServerGetSystemTime(buf *byte) int {
 	var tv __struct__timeval
 	var tm __struct__tm
@@ -139,9 +140,7 @@ func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *
 	zend.ArrayInit(return_value)
 	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
-func CliServerInitGlobals(cg *ZendCliServerGlobals) { cg.SetColor(0) }
 func ZmStartupCliServer(type_ int, module_number int) int {
-	CliServerInitGlobals(&CliServerGlobals)
 	zend.REGISTER_INI_ENTRIES()
 	return zend.SUCCESS
 }
@@ -206,7 +205,7 @@ func SapiCliServerRegisterVariable(track_vars_array *zend.Zval, key *byte, val *
 	if nil == val {
 		return
 	}
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, (*byte)(key), &new_val, strlen(val), &new_val_len) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, (*byte)(key), &new_val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe((*byte)(key), new_val, new_val_len, track_vars_array)
 	}
 }
@@ -311,9 +310,9 @@ func SapiCliServerLogWrite(type_ int, msg *byte) {
 		}
 	}
 	if PhpCliServerWorkersMax > 1 {
-		r.Fprintf(stderr, "[%ld] [%s] %s\n", long(getpid()), buf, msg)
+		log.Printf("[%ld] [%s] %s\n", long(getpid()), buf, msg)
 	} else {
-		r.Fprintf(stderr, "[%s] %s\n", buf, msg)
+		log.Printf("[%s] %s\n", buf, msg)
 	}
 }
 func PhpCliServerPollerCtor(poller *PhpCliServerPoller) int {
@@ -529,12 +528,6 @@ func PhpCliServerContentSenderPull(sender *PhpCliServerContentSender, fd int, nb
 	*nbytes_read = _nbytes_read
 	return 0
 }
-func PhpCliIsOutputTty() int {
-	if PhpCliOutputIsTty == OUTPUT_NOT_CHECKED {
-		PhpCliOutputIsTty = zend.Isatty(STDOUT_FILENO)
-	}
-	return PhpCliOutputIsTty
-}
 func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *byte) {
 	var color int = 0
 	var effective_status int = status
@@ -564,33 +557,6 @@ func PhpCliServerLogResponse(client *PhpCliServerClient, status int, message *by
 			}
 			append_error_message = 1
 			break
-		}
-	}
-	if CLI_SERVER_G(color) && PhpCliIsOutputTty() == OUTPUT_IS_TTY {
-		if effective_status >= 500 {
-
-			/* server error: red */
-
-			color = 1
-
-			/* server error: red */
-
-		} else if effective_status >= 400 {
-
-			/* client error: yellow */
-
-			color = 3
-
-			/* client error: yellow */
-
-		} else if effective_status >= 200 {
-
-			/* success: green */
-
-			color = 2
-
-			/* success: green */
-
 		}
 	}
 
@@ -1291,7 +1257,7 @@ func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient,
 	}
 	PhpCliServerBufferAppend(client.GetContentSender().GetBuffer(), chunk)
 	var chunk *PhpCliServerChunk
-	var buffer zend.SmartStr = zend.MakeSmartStr(0)
+	var buffer zend.SmartStr
 	AppendHttpStatusLine(&buffer, client.GetRequest().GetProtocolVersion(), status, 1)
 	if buffer.GetS() == nil {
 
@@ -1495,7 +1461,7 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	} else {
 		if server.GetRouter() != nil {
 			var send_header_func func(*core.SapiHeaders) int
-			send_header_func = core.sapi_module.GetSendHeaders()
+			send_header_func = core.SM__().GetSendHeaders()
 
 			/* do not generate default content type header */
 
@@ -1503,9 +1469,9 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 
 			/* we don't want headers to be sent */
 
-			core.sapi_module.SetSendHeaders(SapiCliServerDiscardHeaders)
+			core.SM__().SetSendHeaders(SapiCliServerDiscardHeaders)
 			core.PhpRequestShutdown(0)
-			core.sapi_module.SetSendHeaders(send_header_func)
+			core.SM__().SetSendHeaders(send_header_func)
 			core.SG__().sapi_headers.send_default_content_type = 1
 			core.SG__().rfc1867_uploaded_files = nil
 		}
@@ -1606,7 +1572,7 @@ func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, rou
 		}
 	}
 	if p == nil {
-		r.Fprintf(stderr, "Invalid address: %s\n", addr)
+		log.Printf("Invalid address: %s\n", addr)
 		retval = zend.FAILURE
 		goto out
 	}
@@ -1791,22 +1757,20 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
-func DoCliServer(argc int, argv **byte, args []string) int {
-	var php_optarg *byte = nil
+func DoCliServer(argc int, argv **byte, args []string, optArgs []core.OptArg) int {
 	var php_optind int = 1
-	var c int
 	var server_bind_address *byte = nil
-	var OPTIONS []core.Opt
-	var document_root *byte = nil
+	var document_root string
 	var router *byte = nil
 	var document_root_buf []byte
-	for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 0, 2)) != -1 {
-		switch c {
+
+	for _, optArg := range optArgs {
+		switch optArg.Char {
 		case 'S':
-			server_bind_address = php_optarg
+			server_bind_address = optArg.Value
 			break
 		case 't':
-			document_root = php_optarg
+			document_root = optArg.Value
 			break
 		case 'q':
 			if PhpCliServerLogLevel > 1 {
@@ -1815,18 +1779,15 @@ func DoCliServer(argc int, argv **byte, args []string) int {
 			break
 		}
 	}
-	if document_root != nil {
-		var sb zend.ZendStatT
-		if zend.PhpSysStat(document_root, &sb) {
-			r.Fprintf(stderr, "Directory %s does not exist.\n", document_root)
+	if document_root != "" {
+		sb, err := os.Stat(document_root)
+		if err != nil {
+			log.Printf("Directory %s does not exist.\n", document_root)
 			return 1
 		}
-		if !(zend.S_ISDIR(sb.st_mode)) {
-			r.Fprintf(stderr, "%s is not a directory.\n", document_root)
+		if !sb.IsDir() {
+			log.Printf("%s is not a directory.\n", document_root)
 			return 1
-		}
-		if zend.VCWD_REALPATH(document_root, document_root_buf) != nil {
-			document_root = document_root_buf
 		}
 	} else {
 		var ret *byte = nil
@@ -1843,7 +1804,7 @@ func DoCliServer(argc int, argv **byte, args []string) int {
 	if zend.FAILURE == PhpCliServerCtor(&Server, server_bind_address, document_root, router) {
 		return 1
 	}
-	core.sapi_module.SetPhpinfoAsText(0)
+	core.SM__().SetPhpinfoAsText(0)
 	PhpCliServerLogf(PHP_CLI_SERVER_LOG_PROCESS, "PHP %s Development Server (http://%s) started", core.PHP_VERSION, server_bind_address)
 	zend.ZendSignalInit()
 	PhpCliServerDoEventLoop(&Server)

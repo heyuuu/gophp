@@ -22,20 +22,13 @@ type ISapiModule interface {
 	ReadCookies() (string, bool)
 	RegisterServerVariables(trackVarsArray []zend.Zval)
 	LogMessage(message string, syslogType int)
-
 	InputFilter(arg int, name string, value string) string
 
 	// getter/setter
-	SetUbWrite(value func(str *byte, str_length int) int)
-	SetFlush(value func(server_context any))
-	SetGetenv(value func(name *byte, name_len int) *byte)
 	GetSendHeaders() func(sapi_headers *SapiHeaders) int
-	SetSendHeaders(value func(sapi_headers *SapiHeaders) int)
 	GetSendHeader() func(sapi_header *SapiHeader, server_context any)
 	GetReadPost() func(buffer *byte, count_bytes int) int
-	SetReadPost(value func(buffer *byte, count_bytes int) int)
 	GetReadCookies() func() *byte
-	SetReadCookies(value func() *byte)
 	GetRegisterServerVariables() func(track_vars_array *zend.Zval)
 	GetLogMessage() func(message *byte, syslog_type_int int)
 	GetPhpIniPathOverride() *byte
@@ -70,12 +63,6 @@ type ISapiModule interface {
  * BaseSapiModule
  */
 type BaseSapiModule struct {
-	name                      string
-	pretty_name               string
-	startup                   func(sapi_module ISapiModule) int
-	shutdown                  func(sapi_module ISapiModule) int
-	activate                  func() int
-	deactivate                func() int
 	ub_write                  func(str *byte, str_length int) int
 	flush                     func(server_context any)
 	get_stat                  func() *zend.ZendStatT
@@ -162,28 +149,15 @@ func (this *BaseSapiModule) InputFilterInit() {
 /**
  * generate
  */
-func (this *BaseSapiModule) SetUbWrite(value func(str *byte, str_length int) int) {
-	this.ub_write = value
-}
-func (this *BaseSapiModule) SetFlush(value func(server_context any)) { this.flush = value }
-func (this *BaseSapiModule) SetGetenv(value func(name *byte, name_len int) *byte) {
-	this.getenv = value
-}
 
 func (this *BaseSapiModule) GetSendHeaders() func(sapi_headers *SapiHeaders) int {
 	return this.send_headers
-}
-func (this *BaseSapiModule) SetSendHeaders(value func(sapi_headers *SapiHeaders) int) {
-	this.send_headers = value
 }
 func (this *BaseSapiModule) GetSendHeader() func(sapi_header *SapiHeader, server_context any) {
 	return this.send_header
 }
 func (this *BaseSapiModule) GetReadPost() func(buffer *byte, count_bytes int) int {
 	return this.read_post
-}
-func (this *BaseSapiModule) SetReadPost(value func(buffer *byte, count_bytes int) int) {
-	this.read_post = value
 }
 func (this *BaseSapiModule) GetReadCookies() func() *byte      { return this.read_cookies }
 func (this *BaseSapiModule) SetReadCookies(value func() *byte) { this.read_cookies = value }
@@ -235,24 +209,3 @@ func (this *BaseSapiModule) SetAdditionalFunctions(value *zend.ZendFunctionEntry
 }
 func (this *BaseSapiModule) GetInputFilterInit() func() uint      { return this.input_filter_init }
 func (this *BaseSapiModule) SetInputFilterInit(value func() uint) { this.input_filter_init = value }
-
-func MakeSapiModule(
-	name string,
-	pretty_name string,
-	startup func(sapi_module ISapiModule) int,
-	shutdown func(sapi_module ISapiModule) int,
-	activate func() int,
-	deactivate func() int,
-	ub_write func(str *byte, str_length int) int,
-	flush func(server_context any),
-	getenv func(name *byte, name_len int) *byte,
-	header_handler func(sapi_header *SapiHeader, op SapiHeaderOpEnum, sapi_headers *SapiHeaders) int,
-	send_headers func(sapi_headers *SapiHeaders) int,
-	send_header func(sapi_header *SapiHeader, server_context any),
-	read_post func(buffer *byte, count_bytes int) int,
-	read_cookies func() *byte,
-	register_server_variables func(track_vars_array *zend.Zval),
-	log_message func(message *byte, syslog_type_int int),
-) ISapiModule {
-	return &BaseSapiModule{}
-}

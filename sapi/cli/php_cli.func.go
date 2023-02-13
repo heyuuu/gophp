@@ -98,27 +98,27 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 	/* Build the special-case PHP_SELF variable for the CLI version */
 
 	len_ = strlen(PhpSelf)
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &PhpSelf, len_, &len_) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &PhpSelf, len_, &len_) != 0 {
 		core.PhpRegisterVariable("PHP_SELF", PhpSelf, track_vars_array)
 	}
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "SCRIPT_NAME", &PhpSelf, len_, &len_) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "SCRIPT_NAME", &PhpSelf, len_, &len_) != 0 {
 		core.PhpRegisterVariable("SCRIPT_NAME", PhpSelf, track_vars_array)
 	}
 
 	/* filenames are empty for stdin */
 
 	len_ = strlen(ScriptFilename)
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "SCRIPT_FILENAME", &ScriptFilename, len_, &len_) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "SCRIPT_FILENAME", &ScriptFilename, len_, &len_) != 0 {
 		core.PhpRegisterVariable("SCRIPT_FILENAME", ScriptFilename, track_vars_array)
 	}
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PATH_TRANSLATED", &ScriptFilename, len_, &len_) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PATH_TRANSLATED", &ScriptFilename, len_, &len_) != 0 {
 		core.PhpRegisterVariable("PATH_TRANSLATED", ScriptFilename, track_vars_array)
 	}
 
 	/* just make it available */
 
 	len_ = 0
-	if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
+	if core.SM__().GetInputFilter()(core.PARSE_SERVER, "DOCUMENT_ROOT", &docroot, len_, &len_) != 0 {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
 	}
 }

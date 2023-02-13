@@ -939,7 +939,7 @@ func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *by
 					/* Write CLI/CGI errors to stderr if display_errors = "stderr" */
 
 					if PG(display_errors) == PHP_DISPLAY_ERRORS_STDERR {
-						r.Fprintf(stderr, "%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
+						log.Printf("%s: %s in %s on line %"+"u"+"\n", error_type_str, buffer, error_filename, error_lineno)
 					} else {
 						PhpPrintf("%s\n%s: %s in %s on line %"+"u"+"\n%s", STR_PRINT(prepend_string), error_type_str, buffer, error_filename, error_lineno, STR_PRINT(append_string))
 					}
@@ -1160,7 +1160,7 @@ func PhpMessageHandlerForZend(message zend.ZendLong, data any) {
 		} else {
 			Snprintf(memory_leak_buf, b.SizeOf("memory_leak_buf"), "[null]  Script:  '%s'\n", SAFE_FILENAME(SG__().request_info.path_translated))
 		}
-		r.Fprintf(stderr, "%s", memory_leak_buf)
+		log.Printf("%s", memory_leak_buf)
 	}
 }
 func PhpOnTimeout(seconds int) {

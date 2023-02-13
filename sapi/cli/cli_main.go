@@ -111,6 +111,6 @@ loop:
 	if sapiModule == CliModule {
 		return DoCli(nil, nil, args)
 	} else {
-		return DoCliServer(nil, nil, args)
+		return DoCliServer(nil, nil, args, optArgs)
 	}
 }

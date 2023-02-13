@@ -16,16 +16,16 @@ func PhpOptError(
 	show_err int,
 ) int {
 	if show_err != 0 {
-		r.Fprintf(stderr, "Error in argument %d, char %d: ", oint, optchr+1)
+		log.Printf("Error in argument %d, char %d: ", oint, optchr+1)
 		switch err {
 		case OPTERRCOLON:
-			r.Fprintf(stderr, ": in flags\n")
+			log.Printf(": in flags\n")
 		case OPTERRNF:
-			r.Fprintf(stderr, "option not found %c\n", argv[oint][optchr])
+			log.Printf("option not found %c\n", argv[oint][optchr])
 		case OPTERRARG:
-			r.Fprintf(stderr, "no argument for option %c\n", argv[oint][optchr])
+			log.Printf("no argument for option %c\n", argv[oint][optchr])
 		default:
-			r.Fprintf(stderr, "unknown\n")
+			log.Printf("unknown\n")
 		}
 	}
 	return PHP_GETOPT_INVALID_ARG

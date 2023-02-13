@@ -11,6 +11,7 @@ var CgiModule = &CgiModuleType{}
 
 type CgiModuleType struct {
 	core.BaseSapiModule
+	IsFastCgi bool
 }
 
 func (c *CgiModuleType) Name() string       { return "cgi-fcgi" }
@@ -34,16 +35,28 @@ func (c *CgiModuleType) Deactivate() {
 
 func (c *CgiModuleType) UbWrite(str string) (int, error) {
 	// todo
-	l := SapiCgiUbWrite(str, len(str))
-	return l, nil
+	if c.IsFastCgi {
+		l := SapiFcgiUbWrite(str, len(str))
+		return l, nil
+	} else {
+		l := SapiCgiUbWrite(str, len(str))
+		return l, nil
+	}
 }
 
 func (c *CgiModuleType) Flush(serverContext any) {
-	// SapiCgiFlush
-	SapiCgiFlush(serverContext)
+	if c.IsFastCgi {
+		SapiFcgiFlush(serverContext)
+	} else {
+		SapiCgiFlush(serverContext)
+	}
 }
 
 func (c *CgiModuleType) GetEnv(name string) (string, bool) {
+	if c.IsFastCgi {
+		return SapiFcgiGetenv(name)
+	}
+
 	// SapiCgiGetenv()
 	return getenv(name)
 }
@@ -53,10 +66,18 @@ func (c *CgiModuleType) SendHeaders(headers *core.SapiHeaders) int {
 }
 
 func (c *CgiModuleType) ReadPost(buffer *byte, count_bytes int) int {
+	if c.IsFastCgi {
+		return SapiFcgiReadPost(buffer, count_bytes)
+	}
+
 	return SapiCgiReadPost(buffer, count_bytes)
 }
 
 func (c *CgiModuleType) ReadCookies() (string, bool) {
+	if c.IsFastCgi {
+		return SapiFcgiReadCookies()
+	}
+
 	// SapiCgiReadCookies()
 	return getenv("HTTP_COOKIE")
 }

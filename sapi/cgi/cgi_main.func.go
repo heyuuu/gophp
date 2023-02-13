@@ -24,25 +24,14 @@ func FcgiLog(type_ int, format *byte, _ ...any) {
 	vfprintf(stderr, format, ap)
 	va_end(ap)
 }
-func ModuleNameCmp(a any, b any) int {
-	var f *zend.Bucket = (*zend.Bucket)(a)
-	var s *zend.Bucket = (*zend.Bucket)(b)
-	return strcasecmp((*zend.ZendModuleEntry)(zend.Z_PTR(f.GetVal())).GetName(), (*zend.ZendModuleEntry)(zend.Z_PTR(s.GetVal())).GetName())
-}
 func PrintModules() {
-	var sorted_registry zend.HashTable
-	var module *zend.ZendModuleEntry
-	zend.ZendHashInit(&sorted_registry, 64, nil, nil, 1)
-	zend.ZendHashCopy(&sorted_registry, &zend.ModuleRegistry, nil)
-	sorted_registry.SortCompatible(ModuleNameCmp, 0)
-	var __ht *zend.HashTable = &sorted_registry
-	for _, _p := range __ht.foreachData() {
-		var _z *zend.Zval = _p.GetVal()
-
-		module = _z.GetPtr()
+	var modules = zend.CopyRegistryModules()
+	sort.Slice(modules, func(i, j int) bool {
+		return b.StrCaseCompare(modules[i].GetNameStr(), modules[j].GetNameStr())
+	})
+	for _, module := range modules {
 		core.PhpPrintf("%s\n", module.GetName())
 	}
-	sorted_registry.Destroy()
 }
 func PrintExtensionInfo(ext *zend.ZendExtension, arg any) int {
 	core.PhpPrintf("%s\n", ext.GetName())
@@ -262,7 +251,7 @@ func CgiPhpLoadEnvVar(var_ *byte, var_len uint, val *byte, val_len uint, arg any
 	var array_ptr *zend.Zval = (*zend.Zval)(arg)
 	var filter_arg int = b.Cond(array_ptr.GetArr() == core.PG(http_globals)[core.TRACK_VARS_ENV].GetArr(), core.PARSE_ENV, core.PARSE_SERVER)
 	var new_val_len int
-	if core.sapi_module.GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
+	if core.SM__().GetInputFilter()(filter_arg, var_, &val, strlen(val), &new_val_len) != 0 {
 		core.PhpRegisterVariableSafe(var_, val, new_val_len, array_ptr)
 	}
 }
@@ -331,7 +320,7 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 
 		/* Build the special-case PHP_SELF variable for the CGI version */
 
-		if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
+		if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
 			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
 		}
 		if free_php_self != 0 {
@@ -344,7 +333,7 @@ func SapiCgiRegisterVariables(track_vars_array *zend.Zval) {
 			php_self = ""
 		}
 		php_self_len = strlen(php_self)
-		if core.sapi_module.GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
+		if core.SM__().GetInputFilter()(core.PARSE_SERVER, "PHP_SELF", &php_self, php_self_len, &php_self_len) != 0 {
 			core.PhpRegisterVariableSafe("PHP_SELF", php_self, php_self_len, track_vars_array)
 		}
 	}
@@ -365,10 +354,10 @@ func SapiCgiLogMessage(message *byte, syslog_type_int int) {
 				core.PhpHandleAbortedConnection()
 			}
 		} else {
-			r.Fprintf(stderr, "%s\n", message)
+			log.Printf("%s\n", message)
 		}
 	} else {
-		r.Fprintf(stderr, "%s\n", message)
+		log.Printf("%s\n", message)
 	}
 }
 func PhpCgiIniActivateUserConfig(path *byte, path_len int, doc_root *byte, doc_root_len int) {

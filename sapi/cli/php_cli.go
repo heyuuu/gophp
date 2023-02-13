@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"sik/core"
@@ -88,5 +87,5 @@ func (c *CliModuleType) RegisterServerVariables(trackVarsArray []zend.Zval) {
 }
 
 func (c *CliModuleType) LogMessage(message string, syslogType int) {
-	fmt.Fprintf(os.Stderr, "%s\n", message)
+	log.Printf("%s\n", message)
 }

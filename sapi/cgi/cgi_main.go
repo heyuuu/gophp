@@ -131,14 +131,8 @@ func main(argc int, argv []*byte) int {
 	PhpOptind = orig_optind
 	PhpOptarg = orig_optarg
 	if fastcgi != 0 || bindpath != nil {
-
 		/* Override SAPI callbacks */
-
-		CgiModule.SetUbWrite(SapiFcgiUbWrite)
-		CgiModule.SetFlush(SapiFcgiFlush)
-		CgiModule.SetReadPost(SapiFcgiReadPost)
-		CgiModule.SetGetenv(SapiFcgiGetenv)
-		CgiModule.SetReadCookies(SapiFcgiReadCookies)
+		CgiModule.IsFastCgi = true
 	}
 	CgiModule.SetExecutableLocation(argv[0])
 	if cgi == 0 && fastcgi == 0 && bindpath == nil {
@@ -194,7 +188,7 @@ func main(argc int, argv []*byte) int {
 		}
 		fcgi_fd = core.FcgiListen(bindpath, backlog)
 		if fcgi_fd < 0 {
-			r.Fprintf(stderr, "Couldn't create FastCGI listen socket on port %s\n", bindpath)
+			log.Printf("Couldn't create FastCGI listen socket on port %s\n", bindpath)
 			return zend.FAILURE
 		}
 		fastcgi = core.FcgiIsFastcgi()
@@ -211,7 +205,7 @@ func main(argc int, argv []*byte) int {
 		if getenv("PHP_FCGI_MAX_REQUESTS") {
 			max_requests = atoi(getenv("PHP_FCGI_MAX_REQUESTS"))
 			if max_requests < 0 {
-				r.Fprintf(stderr, "PHP_FCGI_MAX_REQUESTS is not valid\n")
+				log.Printf("PHP_FCGI_MAX_REQUESTS is not valid\n")
 				return zend.FAILURE
 			}
 		}
@@ -226,7 +220,7 @@ func main(argc int, argv []*byte) int {
 			var children_str *byte = getenv("PHP_FCGI_CHILDREN")
 			Children = atoi(children_str)
 			if Children < 0 {
-				r.Fprintf(stderr, "PHP_FCGI_CHILDREN is not valid\n")
+				log.Printf("PHP_FCGI_CHILDREN is not valid\n")
 				return zend.FAILURE
 			}
 			core.FcgiSetMgmtVar("FCGI_MAX_CONNS", b.SizeOf("\"FCGI_MAX_CONNS\"")-1, children_str, strlen(children_str))
@@ -723,7 +717,7 @@ out:
 			sec -= 1
 			usec = int(end.tv_usec + 1000000 - start.tv_usec)
 		}
-		r.Fprintf(stderr, "\nElapsed time: %d.%06d sec\n", sec, usec)
+		log.Printf("\nElapsed time: %d.%06d sec\n", sec, usec)
 	}
 parent_out:
 	core.SG__().server_context = nil

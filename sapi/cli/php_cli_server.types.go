@@ -8,16 +8,6 @@ import (
 )
 
 /**
- * ZendCliServerGlobals
- */
-type ZendCliServerGlobals struct {
-	color uint16
-}
-
-func (this *ZendCliServerGlobals) GetColor() short      { return this.color }
-func (this *ZendCliServerGlobals) SetColor(value short) { this.color = value }
-
-/**
  * PhpCliServerPoller
  */
 type PhpCliServerPoller struct {
@@ -30,18 +20,10 @@ type PhpCliServerPoller struct {
 	max_fd core.PhpSocketT
 }
 
-func (this *PhpCliServerPoller) GetRfds() fd_set { return this.rfds }
-
-// func (this *PhpCliServerPoller) SetRfds(value fd_set) { this.rfds = value }
-func (this *PhpCliServerPoller) GetWfds() fd_set { return this.wfds }
-
-// func (this *PhpCliServerPoller) SetWfds(value fd_set) { this.wfds = value }
-func (this *PhpCliServerPoller) GetActiveRfds() fd_set { return this.active.rfds }
-
-// func (this *PhpCliServerPoller) SetActiveRfds(value fd_set) { this.active.rfds = value }
-func (this *PhpCliServerPoller) GetActiveWfds() fd_set { return this.active.wfds }
-
-// func (this *PhpCliServerPoller) SetActiveWfds(value fd_set) { this.active.wfds = value }
+func (this *PhpCliServerPoller) GetRfds() fd_set                { return this.rfds }
+func (this *PhpCliServerPoller) GetWfds() fd_set                { return this.wfds }
+func (this *PhpCliServerPoller) GetActiveRfds() fd_set          { return this.active.rfds }
+func (this *PhpCliServerPoller) GetActiveWfds() fd_set          { return this.active.wfds }
 func (this *PhpCliServerPoller) GetMaxFd() core.PhpSocketT      { return this.max_fd }
 func (this *PhpCliServerPoller) SetMaxFd(value core.PhpSocketT) { this.max_fd = value }
 
@@ -70,52 +52,6 @@ type PhpCliServerRequest struct {
 	sb                    zend.ZendStatT
 }
 
-// func NewPhpCliServerRequest(request_method PhpHttpMethod, protocol_version int, request_uri *byte, request_uri_len int, vpath *byte, vpath_len int, path_translated *byte, path_translated_len int, path_info *byte, path_info_len int, query_string *byte, query_string_len int, headers zend.HashTable, headers_original_case zend.HashTable, content *byte, content_len int, ext *byte, ext_len int, sb zend.ZendStatT) *PhpCliServerRequest {
-//     return &PhpCliServerRequest{
-//         request_method:request_method,
-//         protocol_version:protocol_version,
-//         request_uri:request_uri,
-//         request_uri_len:request_uri_len,
-//         vpath:vpath,
-//         vpath_len:vpath_len,
-//         path_translated:path_translated,
-//         path_translated_len:path_translated_len,
-//         path_info:path_info,
-//         path_info_len:path_info_len,
-//         query_string:query_string,
-//         query_string_len:query_string_len,
-//         headers:headers,
-//         headers_original_case:headers_original_case,
-//         content:content,
-//         content_len:content_len,
-//         ext:ext,
-//         ext_len:ext_len,
-//         sb:sb,
-//     }
-// }
-// func MakePhpCliServerRequest(request_method PhpHttpMethod, protocol_version int, request_uri *byte, request_uri_len int, vpath *byte, vpath_len int, path_translated *byte, path_translated_len int, path_info *byte, path_info_len int, query_string *byte, query_string_len int, headers zend.HashTable, headers_original_case zend.HashTable, content *byte, content_len int, ext *byte, ext_len int, sb zend.ZendStatT) PhpCliServerRequest {
-//     return PhpCliServerRequest{
-//         request_method:request_method,
-//         protocol_version:protocol_version,
-//         request_uri:request_uri,
-//         request_uri_len:request_uri_len,
-//         vpath:vpath,
-//         vpath_len:vpath_len,
-//         path_translated:path_translated,
-//         path_translated_len:path_translated_len,
-//         path_info:path_info,
-//         path_info_len:path_info_len,
-//         query_string:query_string,
-//         query_string_len:query_string_len,
-//         headers:headers,
-//         headers_original_case:headers_original_case,
-//         content:content,
-//         content_len:content_len,
-//         ext:ext,
-//         ext_len:ext_len,
-//         sb:sb,
-//     }
-// }
 func (this *PhpCliServerRequest) GetRequestMethod() PhpHttpMethod      { return this.request_method }
 func (this *PhpCliServerRequest) SetRequestMethod(value PhpHttpMethod) { this.request_method = value }
 func (this *PhpCliServerRequest) GetProtocolVersion() int              { return this.protocol_version }
@@ -225,19 +161,7 @@ type PhpCliServerContentSender struct {
 	buffer PhpCliServerBuffer
 }
 
-// func NewPhpCliServerContentSender(buffer PhpCliServerBuffer) *PhpCliServerContentSender {
-//     return &PhpCliServerContentSender{
-//         buffer:buffer,
-//     }
-// }
-// func MakePhpCliServerContentSender(buffer PhpCliServerBuffer) PhpCliServerContentSender {
-//     return PhpCliServerContentSender{
-//         buffer:buffer,
-//     }
-// }
 func (this *PhpCliServerContentSender) GetBuffer() PhpCliServerBuffer { return this.buffer }
-
-// func (this *PhpCliServerContentSender) SetBuffer(value PhpCliServerBuffer) { this.buffer = value }
 
 /**
  * PhpCliServerClient
@@ -270,15 +194,11 @@ func (this *PhpCliServerClient) GetSock() core.PhpSocketT          { return this
 func (this *PhpCliServerClient) SetSock(value core.PhpSocketT)     { this.sock = value }
 func (this *PhpCliServerClient) GetAddr() *__struct__sockaddr      { return this.addr }
 func (this *PhpCliServerClient) SetAddr(value *__struct__sockaddr) { this.addr = value }
-
-// func (this *PhpCliServerClient)  GetAddrLen() socklen_t      { return this.addr_len }
-func (this *PhpCliServerClient) SetAddrLen(value socklen_t) { this.addr_len = value }
-func (this *PhpCliServerClient) GetAddrStr() *byte          { return this.addr_str }
-func (this *PhpCliServerClient) SetAddrStr(value *byte)     { this.addr_str = value }
-
-// func (this *PhpCliServerClient)  GetAddrStrLen() int      { return this.addr_str_len }
-func (this *PhpCliServerClient) SetAddrStrLen(value int)  { this.addr_str_len = value }
-func (this *PhpCliServerClient) GetParser() PhpHttpParser { return this.parser }
+func (this *PhpCliServerClient) SetAddrLen(value socklen_t)        { this.addr_len = value }
+func (this *PhpCliServerClient) GetAddrStr() *byte                 { return this.addr_str }
+func (this *PhpCliServerClient) SetAddrStr(value *byte)            { this.addr_str = value }
+func (this *PhpCliServerClient) SetAddrStrLen(value int)           { this.addr_str_len = value }
+func (this *PhpCliServerClient) GetParser() PhpHttpParser          { return this.parser }
 
 // func (this *PhpCliServerClient) SetParser(value PhpHttpParser) { this.parser = value }
 func (this *PhpCliServerClient) GetRequestRead() uint             { return this.request_read }

@@ -13,10 +13,6 @@ const SOCK_EAGAIN = EAGAIN
 const SOCK_EINTR = EINTR
 const SOCK_EADDRINUSE = EADDRINUSE
 
-const OUTPUT_NOT_CHECKED = -1
-const OUTPUT_IS_TTY = 1
-const OUTPUT_NOT_TTY = 0
-
 var PhpCliServerMaster pid_t
 var PhpCliServerWorkers *pid_t
 var PhpCliServerWorkersMax zend.ZendLong
@@ -33,16 +29,33 @@ const PHP_CLI_SERVER_LOG_ERROR = 2
 const PHP_CLI_SERVER_LOG_MESSAGE = 3
 
 var PhpCliServerLogLevel int = 3
-var PhpCliOutputIsTty int = OUTPUT_NOT_CHECKED
 var PhpCliServerRequestErrorUnexpectedEof = "Unexpected EOF"
-var CliServerGlobals ZendCliServerGlobals
-
-/* {{{ static char php_cli_server_css[]
- * copied from ext/standard/info.c
- */
 
 var CliServerModuleEntry = zend.MakeZendModuleEntry(
-	b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+	b.SizeOf("zend_module_entry"),
+	zend.ZEND_MODULE_API_NO,
+	0, zend.USING_ZTS,
+	nil,
+	nil,
+	"cli_server",
+	nil,
+	ZmStartupCliServer,
+	ZmShutdownCliServer,
+	nil,
+	nil,
+	ZmInfoCliServer,
+	core.PHP_VERSION,
+	0,
+	nil,
+	nil,
+	nil,
+	nil,
+	0,
+	0,
+	nil,
+	0,
+	"API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS,
+)
 
 var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, nil),

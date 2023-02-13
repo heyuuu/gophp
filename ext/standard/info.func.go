@@ -11,7 +11,7 @@ import (
 )
 
 func SECTION(name string) {
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<h2>" + name + "</h2>\n")
 	} else {
 		PhpInfoPrintTableStart()
@@ -47,7 +47,7 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 	if ht != nil {
 		if ht.GetNNumOfElements() {
 			var first int = 1
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrintf("<tr><td class=\"e\">Registered %s</td><td class=\"v\">", name)
 			} else {
 				PhpInfoPrintf("\nRegistered %s => ", name)
@@ -63,14 +63,14 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 					} else {
 						PhpInfoPrint(", ")
 					}
-					if core.sapi_module.GetPhpinfoAsText() == 0 {
+					if core.SM__().GetPhpinfoAsText() == 0 {
 						PhpInfoPrintHtmlEsc(key.GetVal(), key.GetLen())
 					} else {
 						PhpInfoPrint(key.GetVal())
 					}
 				}
 			}
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")
 			}
 		} else {
@@ -84,7 +84,7 @@ func PhpInfoPrintStreamHash(name string, ht *zend.HashTable) {
 }
 func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
 	if zend_module.GetInfoFunc() != nil || zend_module.GetVersion() != nil {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			var url_name *zend.ZendString = PhpUrlEncode(zend_module.GetName(), strlen(zend_module.GetName()))
 			PhpStrtolower(url_name.GetVal(), url_name.GetLen())
 			PhpInfoPrintf("<h2><a name=\"module_%s\">%s</a></h2>\n", url_name.GetVal(), zend_module.GetName())
@@ -103,7 +103,7 @@ func PhpInfoPrintModule(zend_module *zend.ZendModuleEntry) {
 			zend.DISPLAY_INI_ENTRIES()
 		}
 	} else {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrintf("<tr><td class=\"v\">%s</td></tr>\n", zend_module.GetName())
 		} else {
 			PhpInfoPrintf("%s\n", zend_module.GetName())
@@ -126,7 +126,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 			num_key = _p.GetH()
 			string_key = _p.GetKey()
 			tmp = _z
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("<tr>")
 				PhpInfoPrint("<td class=\"e\">")
 			}
@@ -134,7 +134,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 			PhpInfoPrint(name)
 			PhpInfoPrint("['")
 			if string_key != nil {
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
+				if core.SM__().GetPhpinfoAsText() == 0 {
 					PhpInfoPrintHtmlEsc(string_key.GetVal(), string_key.GetLen())
 				} else {
 					PhpInfoPrint(string_key.GetVal())
@@ -143,14 +143,14 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 				PhpInfoPrintf(zend.ZEND_ULONG_FMT, num_key)
 			}
 			PhpInfoPrint("']")
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td><td class=\"v\">")
 			} else {
 				PhpInfoPrint(" => ")
 			}
 			zend.ZVAL_DEREF(tmp)
 			if tmp.IsType(zend.IS_ARRAY) {
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
+				if core.SM__().GetPhpinfoAsText() == 0 {
 					var str *zend.ZendString = zend.ZendPrintZvalRToStr(tmp, 0)
 					PhpInfoPrint("<pre>")
 					PhpInfoPrintHtmlEsc(str.GetVal(), str.GetLen())
@@ -162,7 +162,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 			} else {
 				var tmp2 *zend.ZendString
 				var str *zend.ZendString = zend.ZvalGetTmpString(tmp, &tmp2)
-				if core.sapi_module.GetPhpinfoAsText() == 0 {
+				if core.SM__().GetPhpinfoAsText() == 0 {
 					if str.GetLen() == 0 {
 						PhpInfoPrint("<i>no value</i>")
 					} else {
@@ -173,7 +173,7 @@ func PhpPrintGpcseArray(name *byte, name_length uint32) {
 				}
 				zend.ZendTmpStringRelease(tmp2)
 			}
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("</td></tr>\n")
 			} else {
 				PhpInfoPrint("\n")
@@ -231,7 +231,7 @@ func PhpPrintInfo(flag int) {
 	var tmp1 **byte
 	var tmp2 **byte
 	var php_uname *zend.ZendString
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpPrintInfoHtmlhead()
 	} else {
 		PhpInfoPrint("phpinfo()\n")
@@ -240,10 +240,10 @@ func PhpPrintInfo(flag int) {
 		var zend_version *byte = zend.GetZendVersion()
 		var temp_api []byte
 		php_uname = PhpGetUname('a')
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrintBoxStart(1)
 		}
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			var the_time int64
 			var ta *__struct__tm
 			var tmbuf __struct__tm
@@ -256,7 +256,7 @@ func PhpPrintInfo(flag int) {
 				PhpInfoPrint(PHP_LOGO_DATA_URI + "\" alt=\"PHP logo\" /></a>")
 			}
 		}
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrintf("<h1 class=\"p\">PHP Version %s</h1>\n", core.PHP_VERSION)
 		} else {
 			PhpInfoPrintTableRow(2, "PHP Version", core.PHP_VERSION)
@@ -303,13 +303,13 @@ func PhpPrintInfo(flag int) {
 		/* Zend Engine */
 
 		PhpInfoPrintBoxStart(0)
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<a href=\"http://www.zend.com/\"><img border=\"0\" src=\"")
 			PhpInfoPrint(ZEND_LOGO_DATA_URI + "\" alt=\"Zend logo\" /></a>\n")
 		}
 		PhpInfoPrint("This program makes use of the Zend Scripting Language Engine:")
-		PhpInfoPrint(b.Cond(core.sapi_module.GetPhpinfoAsText() == 0, "<br />", "\n"))
-		if core.sapi_module.GetPhpinfoAsText() != 0 {
+		PhpInfoPrint(b.Cond(core.SM__().GetPhpinfoAsText() == 0, "<br />", "\n"))
+		if core.SM__().GetPhpinfoAsText() != 0 {
 			PhpInfoPrint(zend_version)
 		} else {
 			zend.ZendHtmlPuts(zend_version, strlen(zend_version))
@@ -320,7 +320,7 @@ func PhpPrintInfo(flag int) {
 	zend.ZendIniSortEntries()
 	if (flag & PHP_INFO_CONFIGURATION) != 0 {
 		PhpInfoPrintHr()
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<h1>Configuration</h1>\n")
 		} else {
 			SECTION("Configuration")
@@ -410,7 +410,7 @@ func PhpPrintInfo(flag int) {
 		PhpPrintCredits(PHP_CREDITS_ALL & ^PHP_CREDITS_FULLPAGE)
 	}
 	if (flag & PHP_INFO_LICENSE) != 0 {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			SECTION("PHP License")
 			PhpInfoPrintBoxStart(0)
 			PhpInfoPrint("<p>\n")
@@ -442,30 +442,30 @@ func PhpPrintInfo(flag int) {
 			PhpInfoPrint("questions about PHP licensing, please contact license@php.net.\n")
 		}
 	}
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</div></body></html>")
 	}
 }
 func PhpInfoPrintTableStart() {
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<table>\n")
 	} else {
 		PhpInfoPrint("\n")
 	}
 }
 func PhpInfoPrintTableEnd() {
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</table>\n")
 	}
 }
 func PhpInfoPrintBoxStart(flag int) {
 	PhpInfoPrintTableStart()
 	if flag != 0 {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<tr class=\"h\"><td>\n")
 		}
 	} else {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<tr class=\"v\"><td>\n")
 		} else {
 			PhpInfoPrint("\n")
@@ -473,13 +473,13 @@ func PhpInfoPrintBoxStart(flag int) {
 	}
 }
 func PhpInfoPrintBoxEnd() {
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</td></tr>\n")
 	}
 	PhpInfoPrintTableEnd()
 }
 func PhpInfoPrintHr() {
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<hr />\n")
 	} else {
 		PhpInfoPrint("\n\n _______________________________________________________________________\n\n")
@@ -487,7 +487,7 @@ func PhpInfoPrintHr() {
 }
 func PhpInfoPrintTableColspanHeader(num_cols int, header string) {
 	var spaces int
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrintf("<tr class=\"h\"><th colspan=\"%d\">%s</th></tr>\n", num_cols, header)
 	} else {
 		spaces = int(74 - strlen(header))
@@ -499,7 +499,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 	var row_elements va_list
 	var row_element *byte
 	va_start(row_elements, num_cols)
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<tr class=\"h\">")
 	}
 	for i = 0; i < num_cols; i++ {
@@ -507,7 +507,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 		if row_element == nil || !(*row_element) {
 			row_element = " "
 		}
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint("<th>")
 			PhpInfoPrint(row_element)
 			PhpInfoPrint("</th>")
@@ -520,7 +520,7 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 			}
 		}
 	}
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</tr>\n")
 	}
 	va_end(row_elements)
@@ -528,22 +528,22 @@ func PhpInfoPrintTableHeader(num_cols int, _ ...any) {
 func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements ...any) {
 	var i int
 	var row_element *byte
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("<tr>")
 	}
 	for i = 0; i < num_cols; i++ {
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrintf("<td class=\"%s\">", b.Cond(i == 0, "e", value_class))
 		}
 		row_element = __va_arg(row_elements, (*byte)(_))
 		if row_element == nil || !(*row_element) {
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrint("<i>no value</i>")
 			} else {
 				PhpInfoPrint(" ")
 			}
 		} else {
-			if core.sapi_module.GetPhpinfoAsText() == 0 {
+			if core.SM__().GetPhpinfoAsText() == 0 {
 				PhpInfoPrintHtmlEsc(row_element, strlen(row_element))
 			} else {
 				PhpInfoPrint(row_element)
@@ -552,13 +552,13 @@ func PhpInfoPrintTableRowInternal(num_cols int, value_class *byte, row_elements 
 				}
 			}
 		}
-		if core.sapi_module.GetPhpinfoAsText() == 0 {
+		if core.SM__().GetPhpinfoAsText() == 0 {
 			PhpInfoPrint(" </td>")
 		} else if i == num_cols-1 {
 			PhpInfoPrint("\n")
 		}
 	}
-	if core.sapi_module.GetPhpinfoAsText() == 0 {
+	if core.SM__().GetPhpinfoAsText() == 0 {
 		PhpInfoPrint("</tr>\n")
 	}
 }
