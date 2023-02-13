@@ -11,6 +11,7 @@ import (
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
+	"strconv"
 	"strings"
 )
 
@@ -354,18 +355,18 @@ func PhpCliServerPollerPoll(poller *PhpCliServerPoller, tv *__struct__timeval) i
 	memmove(poller.GetActiveWfds(), poller.GetWfds(), b.SizeOf("poller -> wfds"))
 	return PhpSelect(poller.GetMaxFd()+1, poller.GetActiveRfds(), poller.GetActiveWfds(), nil, tv)
 }
-func PhpCliServerPollerIterOnActive(poller *PhpCliServerPoller, opaque any, callback func(_ any, fd core.PhpSocketT, events int) int) int {
+func PhpCliServerPollerIterOnActive(poller *PhpCliServerPoller, callback func(fd core.PhpSocketT, events int) int) int {
 	var retval int = zend.SUCCESS
 	var fd core.PhpSocketT
 	var max_fd core.PhpSocketT = poller.GetMaxFd()
 	for fd = 0; fd <= max_fd; fd++ {
 		if core.PHP_SAFE_FD_ISSET(fd, poller.GetActiveRfds()) {
-			if zend.SUCCESS != callback(opaque, fd, POLLIN) {
+			if zend.SUCCESS != callback(fd, POLLIN) {
 				retval = zend.FAILURE
 			}
 		}
 		if core.PHP_SAFE_FD_ISSET(fd, poller.GetActiveWfds()) {
-			if zend.SUCCESS != callback(opaque, fd, POLLOUT) {
+			if zend.SUCCESS != callback(fd, POLLOUT) {
 				retval = zend.FAILURE
 			}
 		}
@@ -709,7 +710,7 @@ out:
 	}
 	return retval
 }
-func PhpCliServerRequestCtor(req *PhpCliServerRequest) int {
+func PhpCliServerRequestCtor(req *PhpCliServerRequest) {
 	req.SetProtocolVersion(0)
 	req.SetRequestUri(nil)
 	req.SetRequestUriLen(0)
@@ -727,7 +728,6 @@ func PhpCliServerRequestCtor(req *PhpCliServerRequest) int {
 	req.SetContentLen(0)
 	req.SetExt(nil)
 	req.SetExtLen(0)
-	return zend.SUCCESS
 }
 func PhpCliServerRequestDtor(req *PhpCliServerRequest) {
 	if req.GetRequestUri() != nil {
@@ -1173,7 +1173,7 @@ func PhpCliServerClientPopulateRequestInfo(client *PhpCliServerClient, request_i
 	}
 }
 func DestroyRequestInfo(request_info *core.SapiRequestInfo) {}
-func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, client_sock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t) int {
+func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, client_sock core.PhpSocketT, addr *__struct__sockaddr, addr_len socklen_t) {
 	client.SetServer(server)
 	client.SetSock(client_sock)
 	client.SetAddr(addr)
@@ -1192,12 +1192,9 @@ func PhpCliServerClientCtor(client *PhpCliServerClient, server *PhpCliServer, cl
 	client.SetCurrentHeaderValue(nil)
 	client.SetCurrentHeaderValueLen(0)
 	client.SetPostReadOffset(0)
-	if zend.FAILURE == PhpCliServerRequestCtor(client.GetRequest()) {
-		return zend.FAILURE
-	}
+	PhpCliServerRequestCtor(&client.request)
 	client.SetContentSenderInitialized(0)
 	client.SetFileFd(-1)
-	return zend.SUCCESS
 }
 func PhpCliServerClientDtor(client *PhpCliServerClient) {
 	PhpCliServerRequestDtor(client.GetRequest())
@@ -1487,7 +1484,6 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 }
 func PhpCliServerDtor(server *PhpCliServer) {
 	server.GetClients().Destroy()
-	//server.GetExtensionMimeTypes().Destroy()
 	if zend.ZEND_VALID_SOCKET(server.GetServerSock()) {
 		core.Closesocket(server.GetServerSock())
 	}
@@ -1530,52 +1526,54 @@ func PhpCliServerClientDtorWrapper(zv *zend.Zval) {
 	PhpCliServerClientDtor(p)
 	zend.Pefree(p, 1)
 }
-func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, router *byte) int {
+
+// 解析域名地址为 host + port
+func parseServerAddr(addr string) (host string, port int, ok bool) {
+	addrPair := strings.SplitN(addr, ":", 2)
+	if len(addrPair) != 2 {
+		return
+	}
+
+	// 检查 host
+	host = addrPair[0]
+	if len(host) == 0 {
+		return
+	}
+	if host[0] == '[' { // 去除 [host] 模式的括号
+		if host[len(host)-1] != ']' || len(host) <= 2 {
+			return
+		}
+		host = host[1 : len(host)-1]
+	}
+
+	// 检查 port
+	port, err := strconv.Atoi(addrPair[1])
+	if err != nil {
+		return
+	}
+	if port <= 0 || port > 65535 {
+		return
+	}
+
+	// 解析成功
+	return host, port, true
+}
+
+func PhpCliServerCtor(server *PhpCliServer, addr string, document_root string, router string) bool {
 	var retval int = zend.SUCCESS
-	var host *byte = nil
 	var errstr *zend.ZendString = nil
-	var _document_root *byte = nil
 	var _router *byte = nil
 	var err int = 0
-	var port int = 3000
 	var server_sock core.PhpSocketT = core.SOCK_ERR
-	var p *byte = nil
-	if addr[0] == '[' {
-		host = zend.Pestrdup(addr+1, 1)
-		if host == nil {
-			return zend.FAILURE
-		}
-		p = strchr(host, ']')
-		if p != nil {
-			b.PostInc(&(*p)) = '0'
-			if (*p) == ':' {
-				port = strtol(p+1, &p, 10)
-				if port <= 0 || port > 65535 {
-					p = nil
-				}
-			} else if (*p) != '0' {
-				p = nil
-			}
-		}
-	} else {
-		host = zend.Pestrdup(addr, 1)
-		if host == nil {
-			return zend.FAILURE
-		}
-		p = strchr(host, ':')
-		if p != nil {
-			b.PostInc(&(*p)) = '0'
-			port = strtol(p, &p, 10)
-			if port <= 0 || port > 65535 {
-				p = nil
-			}
-		}
-	}
-	if p == nil {
+
+	// 从 addr 解析 host + port
+	host, port, ok := parseServerAddr(addr)
+	if !ok {
 		log.Printf("Invalid address: %s\n", addr)
 		retval = zend.FAILURE
 		goto out
 	}
+
 	server_sock = PhpNetworkListenSocket(host, &port, SOCK_STREAM, server.GetAddressFamily(), server.GetSocklen(), &errstr)
 	if server_sock == core.SOCK_ERR {
 		PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to listen on %s:%d (reason: %s)", host, port, b.CondF1(errstr != nil, func() []byte { return errstr.GetVal() }, "?"))
@@ -1591,47 +1589,19 @@ func PhpCliServerCtor(server *PhpCliServer, addr *byte, document_root *byte, rou
 		goto out
 	}
 	PhpCliServerPollerAdd(server.GetPoller(), POLLIN, server_sock)
-	server.SetHost(host)
+	server.SetHostStr(host)
 	server.SetPort(port)
-	zend.ZendHashInit(server.GetClients(), 0, nil, PhpCliServerClientDtorWrapper, 1)
-	var document_root_len int = strlen(document_root)
-	_document_root = zend.Pestrndup(document_root, document_root_len, 1)
-	if _document_root == nil {
-		retval = zend.FAILURE
-		goto out
-	}
-	server.SetDocumentRoot(_document_root)
-	server.SetDocumentRootLen(document_root_len)
-	if router != nil {
-		var router_len int = strlen(router)
-		_router = zend.Pestrndup(router, router_len, 1)
-		if _router == nil {
-			retval = zend.FAILURE
-			goto out
-		}
-		server.SetRouter(_router)
-		server.SetRouterLen(router_len)
-	} else {
-		server.SetRouter(nil)
-		server.SetRouterLen(0)
-	}
+	server.clients = *zend.NewZendArrayEx(0, PhpCliServerClientDtorWrapper, true)
+	server.SetDocumentRootStr(document_root)
+	server.SetRouterStr(router)
 	server.SetIsRunning(1)
 out:
 	if retval != zend.SUCCESS {
-		if host != nil {
-			zend.Pefree(host, 1)
-		}
-		if _document_root != nil {
-			zend.Pefree(_document_root, 1)
-		}
-		if _router != nil {
-			zend.Pefree(_router, 1)
-		}
 		if server_sock > -1 {
 			core.Closesocket(server_sock)
 		}
 	}
-	return retval
+	return retval == zend.SUCCESS
 }
 func PhpCliServerRecvEventReadRequest(server *PhpCliServer, client *PhpCliServerClient) int {
 	var errstr *byte = nil
@@ -1682,38 +1652,13 @@ func PhpCliServerSendEvent(server *PhpCliServer, client *PhpCliServerClient) int
 	}
 	return zend.SUCCESS
 }
-func PhpCliServerDoEventForEachFdCallback(_params any, fd core.PhpSocketT, event int) int {
-	var params *PhpCliServerDoEventForEachFdCallbackParams = _params
-	var server *PhpCliServer = params.GetServer()
+func PhpCliServerDoEventForEachFdCallback(params *PhpCliServerDoEventForEachFdCallbackParams, fd core.PhpSocketT, event int) int {
+	var server = params.GetServer()
 	if server.GetServerSock() == fd {
-		var client *PhpCliServerClient = nil
 		var client_sock core.PhpSocketT
 		var socklen socklen_t = server.GetSocklen()
 		var sa *__struct__sockaddr = zend.Pemalloc(server.GetSocklen(), 1)
-		client_sock = accept(server.GetServerSock(), sa, &socklen)
-		if !(zend.ZEND_VALID_SOCKET(client_sock)) {
-			if PhpCliServerLogLevel >= PHP_CLI_SERVER_LOG_ERROR {
-				var errstr *byte = core.PhpSocketStrerror(core.PhpSocketErrno(), nil, 0)
-				PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to accept a client (reason: %s)", errstr)
-				zend.Efree(errstr)
-			}
-			zend.Pefree(sa, 1)
-			return zend.SUCCESS
-		}
-		if zend.SUCCESS != core.PhpSetSockBlocking(client_sock, 0) {
-			zend.Pefree(sa, 1)
-			core.Closesocket(client_sock)
-			return zend.SUCCESS
-		}
-		client = zend.Pemalloc(b.SizeOf("php_cli_server_client"), 1)
-		if zend.FAILURE == PhpCliServerClientCtor(client, server, client_sock, sa, socklen) {
-			PhpCliServerLogf(PHP_CLI_SERVER_LOG_ERROR, "Failed to create a new request object")
-			zend.Pefree(sa, 1)
-			core.Closesocket(client_sock)
-			return zend.SUCCESS
-		}
-		PhpCliServerLogf(PHP_CLI_SERVER_LOG_MESSAGE, "%s Accepted", client.GetAddrStr())
-		zend.ZendHashIndexUpdatePtr(server.GetClients(), client_sock, client)
+		var client *PhpCliServerClient = server.NewClient(client_sock, sa, socklen)
 		PhpCliServerPollerAdd(server.GetPoller(), POLLIN, client.GetSock())
 	} else {
 		var client *PhpCliServerClient
@@ -1728,17 +1673,23 @@ func PhpCliServerDoEventForEachFdCallback(_params any, fd core.PhpSocketT, event
 	}
 	return zend.SUCCESS
 }
-func PhpCliServerDoEventForEachFd(server *PhpCliServer, rhandler func(*PhpCliServer, *PhpCliServerClient) int, whandler func(*PhpCliServer, *PhpCliServerClient) int) {
-	var params PhpCliServerDoEventForEachFdCallbackParams = MakePhpCliServerDoEventForEachFdCallbackParams(server, rhandler, whandler)
-	PhpCliServerPollerIterOnActive(server.GetPoller(), &params, PhpCliServerDoEventForEachFdCallback)
+func PhpCliServerDoEventForEachFd(server *PhpCliServer) {
+	var params = PhpCliServerDoEventForEachFdCallbackParams{
+		Server:       server,
+		ReadHandler:  PhpCliServerRecvEventReadRequest,
+		WriteHandler: PhpCliServerSendEvent,
+	}
+	PhpCliServerPollerIterOnActive(server.GetPoller(), func(fd core.PhpSocketT, events int) int {
+		return PhpCliServerDoEventForEachFdCallback(&params, fd, events)
+	})
 }
-func PhpCliServerDoEventLoop(server *PhpCliServer) int {
+func PhpCliServerDoEventLoop(server *PhpCliServer) error {
 	var retval int = zend.SUCCESS
 	for server.GetIsRunning() != 0 {
 		var tv __struct__timeval = __struct__timeval{1, 0}
 		var n int = PhpCliServerPollerPoll(server.GetPoller(), &tv)
 		if n > 0 {
-			PhpCliServerDoEventForEachFd(server, PhpCliServerRecvEventReadRequest, PhpCliServerSendEvent)
+			PhpCliServerDoEventForEachFd(server)
 		} else if n == 0 {
 
 		} else {
@@ -1757,14 +1708,11 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
-func DoCliServer(argc int, argv **byte, args []string, optArgs []core.OptArg) int {
-	var php_optind int = 1
-	var server_bind_address *byte = nil
+func DoCliServer(optArgs core.OptArgs) int {
+	var server_bind_address string
 	var document_root string
-	var router *byte = nil
-	var document_root_buf []byte
 
-	for _, optArg := range optArgs {
+	for _, optArg := range optArgs.OptionValues {
 		switch optArg.Char {
 		case 'S':
 			server_bind_address = optArg.Value
@@ -1796,12 +1744,14 @@ func DoCliServer(argc int, argv **byte, args []string, optArgs []core.OptArg) in
 			document_root = "."
 		}
 	}
-	if argc > php_optind {
-		router = argv[php_optind]
+
+	var router string
+	if len(optArgs.Arguments) > 0 {
+		router = optArgs.Arguments[0]
 	}
 
 	var Server PhpCliServer
-	if zend.FAILURE == PhpCliServerCtor(&Server, server_bind_address, document_root, router) {
+	if !PhpCliServerCtor(&Server, server_bind_address, document_root, router) {
 		return 1
 	}
 	core.SM__().SetPhpinfoAsText(0)

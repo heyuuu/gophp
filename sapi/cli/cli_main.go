@@ -31,25 +31,25 @@ func main() int {
 	}
 
 loop:
-	for _, optArg := range optArgs {
+	for _, optVal := range optArgs.OptionValues {
 		//for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
-		switch optArg.Char {
+		switch optVal.Char {
 		case 'c':
-			ini_path_override = optArg.Value
+			ini_path_override = optVal.Value
 		case 'n':
 			ini_ignore = 1
 		case 'd':
 			/* define ini __special__  entries on command line */
-			if pos := strings.IndexByte(optArg.Value, '='); pos >= 0 {
-				defName := optArg.Value[0:pos]
-				defValue := optArg.Value[pos+1:]
+			if pos := strings.IndexByte(optVal.Value, '='); pos >= 0 {
+				defName := optVal.Value[0:pos]
+				defValue := optVal.Value[pos+1:]
 				if len(defValue) > 0 && !isAlphaNum(defValue[0]) && defValue[0] != '"' && defValue[0] != '\'' {
 					ini_entries += defName + "\"" + defValue + "\"\n"
 				} else {
-					ini_entries += optArg.Value + "\n"
+					ini_entries += optVal.Value + "\n"
 				}
 			} else {
-				ini_entries += optArg.Value + "=1\n"
+				ini_entries += optVal.Value + "=1\n"
 			}
 		case 'S':
 			sapiModule = CliServerModule
@@ -85,7 +85,6 @@ loop:
 	/* startup after we get the above ini override se we get things right */
 
 	if !sapiModule.Startup() {
-
 		/* there is no way to see if we must call zend_ini_deactivate()
 		 * since we cannot check if EG(ini_directives) has been initialised
 		 * because the executor's constructor does not set initialize it.
@@ -111,6 +110,6 @@ loop:
 	if sapiModule == CliModule {
 		return DoCli(nil, nil, args)
 	} else {
-		return DoCliServer(nil, nil, args, optArgs)
+		return DoCliServer(optArgs)
 	}
 }
