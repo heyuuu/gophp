@@ -36,7 +36,7 @@ const PHP_CLI_SERVER_LOG_MESSAGE = 3
 
 var PhpCliServerLogLevel int = 3
 var PhpCliOutputIsTty int = OUTPUT_NOT_CHECKED
-var PhpCliServerRequestErrorUnexpectedEof []byte = "Unexpected EOF"
+var PhpCliServerRequestErrorUnexpectedEof = "Unexpected EOF"
 var CliServerGlobals ZendCliServerGlobals
 
 /* {{{ static char php_cli_server_css[]
@@ -45,35 +45,11 @@ var CliServerGlobals ZendCliServerGlobals
 
 var CliServerModuleEntry = zend.MakeZendModuleEntry(
 	b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
-var ArginfoNoArgs = []zend.ZendInternalArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-}
-var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("cli_set_process_title", ZifCliSetProcessTitle, ArginfoCliSetProcessTitle, uint32(b.SizeOf("arginfo_cli_set_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("cli_get_process_title", ZifCliGetProcessTitle, ArginfoCliGetProcessTitle, uint32(b.SizeOf("arginfo_cli_get_process_title")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
-}
 
-var CliServerSapiModule = core.MakeSapiModule(
-	"cli-server",
-	"Built-in HTTP server",
-	SapiCliServerStartup,
-	core.PhpModuleShutdownWrapper,
-	nil,
-	nil,
-	SapiCliServerUbWrite,
-	SapiCliServerFlush,
-	nil,
-	nil,
-	SapiCliServerSendHeaders,
-	nil,
-	SapiCliServerReadPost,
-	SapiCliServerReadCookies,
-	SapiCliServerRegisterVariables,
-	SapiCliServerLogMessage,
-)
+var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
+	zend.MakeZendFunctionEntryEx("apache_request_headers", 0, ZifApacheRequestHeaders, nil),
+	zend.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, nil),
+	zend.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, nil),
+}
 
 var Server PhpCliServer

@@ -123,7 +123,7 @@ func PhpGetopt(
 		arg_start = 1 + optchr
 	}
 	if PhpOptidx < 0 {
-		for true {
+		for {
 			PhpOptidx++
 			if opts[PhpOptidx].GetOptChar() == '-' {
 				var errind int = *optind
@@ -187,6 +187,4 @@ func PhpGetopt(
 		}
 		return opts[PhpOptidx].GetOptChar()
 	}
-	r.Assert(false)
-	return 0
 }

@@ -3,13 +3,58 @@
 package cli
 
 import (
+	"fmt"
 	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/zend"
 	"sort"
+	"strings"
 )
+
+const usage string = `Usage: %s [options] [-f] <file> [--] [args...]
+   %s [options] -r <code> [--] [args...]
+   %s [options] [-B <begin_code>] -R <code> [-E <end_code>] [--] [args...]
+   %s [options] [-B <begin_code>] -F <file> [-E <end_code>] [--] [args...]
+   %s [options] -S <addr>:<port> [-t docroot] [router]
+   %s [options] -- [args...]
+   %s [options] -a
+
+  -a               Run interactively
+  -c <path>|<file> Look for php.ini file in this directory
+  -n               No configuration (ini) files will be used
+  -d foo[=bar]     Define INI entry foo with value 'bar'
+  -e               Generate extended information for debugger/profiler
+  -f <file>        Parse and execute <file>.
+  -h               This help
+  -i               PHP information
+  -l               Syntax check only (lint)
+  -m               Show compiled in modules
+  -r <code>        Run PHP <code> without using script tags <?..?>
+  -B <begin_code>  Run PHP <begin_code> before processing input lines
+  -R <code>        Run PHP <code> for every input line
+  -F <file>        Parse and execute <file> for every input line
+  -E <end_code>    Run PHP <end_code> after processing all input lines
+  -H               Hide any passed arguments from external tools.
+  -S <addr>:<port> Run with built-in web server.
+  -t <docroot>     Specify document root <docroot> for built-in web server.
+  -s               Output HTML syntax highlighted source.
+  -v               Version number
+  -w               Output source with stripped comments and whitespace.
+  -z <file>        Load Zend extension <file>.
+
+  args...          Arguments passed to script. Use -- args when first argument
+                   starts with - or script is read from stdin
+
+  --ini            Show configuration file names
+
+  --rf <name>      Show information about function <name>.
+  --rc <name>      Show information about class <name>.
+  --re <name>      Show information about extension <name>.
+  --rz <name>      Show information about Zend extension <name>.
+  --ri <name>      Show configuration for extension <name>.
+`
 
 func PhpSelect(m core.PhpSocketT, r fd_set, w __auto__, e __auto__, t *__struct__timeval) __auto__ {
 	return select_(m, r, w, e, t)
@@ -78,23 +123,20 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 	}
 }
 func INI_DEFAULT(name string, value string) {
-	tmp.SetString(zend.ZendStringInit(value, b.SizeOf("value")-1, 1))
-	core.ConfigurationHash.KeyUpdate(b.CastStrAuto(name), &tmp)
+	var tmp zend.Zval
+	tmp.SetRawString(value)
+	core.ConfigurationHash.KeyUpdate(name, &tmp)
 }
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
-	var tmp zend.Zval
 	INI_DEFAULT("report_zend_debug", "0")
 	INI_DEFAULT("display_errors", "1")
 }
-func PhpCliUsage(argv0 *byte) {
-	var prog *byte
-	prog = strrchr(argv0, '/')
-	if prog != nil {
-		prog++
-	} else {
-		prog = "php"
+func PhpCliUsage(argv0 string) {
+	bin := "php"
+	if pos := strings.LastIndexByte(argv0, '/'); pos >= 0 {
+		bin = argv0[pos+1:]
 	}
-	r.Printf("Usage: %s [options] [-f] <file> [--] [args...]\n"+"   %s [options] -r <code> [--] [args...]\n"+"   %s [options] [-B <begin_code>] -R <code> [-E <end_code>] [--] [args...]\n"+"   %s [options] [-B <begin_code>] -F <file> [-E <end_code>] [--] [args...]\n"+"   %s [options] -S <addr>:<port> [-t docroot] [router]\n"+"   %s [options] -- [args...]\n"+"   %s [options] -a\n"+"\n"+"  -a               Run interactively\n"+"  -c <path>|<file> Look for php.ini file in this directory\n"+"  -n               No configuration (ini) files will be used\n"+"  -d foo[=bar]     Define INI entry foo with value 'bar'\n"+"  -e               Generate extended information for debugger/profiler\n"+"  -f <file>        Parse and execute <file>.\n"+"  -h               This help\n"+"  -i               PHP information\n"+"  -l               Syntax check only (lint)\n"+"  -m               Show compiled in modules\n"+"  -r <code>        Run PHP <code> without using script tags <?..?>\n"+"  -B <begin_code>  Run PHP <begin_code> before processing input lines\n"+"  -R <code>        Run PHP <code> for every input line\n"+"  -F <file>        Parse and execute <file> for every input line\n"+"  -E <end_code>    Run PHP <end_code> after processing all input lines\n"+"  -H               Hide any passed arguments from external tools.\n"+"  -S <addr>:<port> Run with built-in web server.\n"+"  -t <docroot>     Specify document root <docroot> for built-in web server.\n"+"  -s               Output HTML syntax highlighted source.\n"+"  -v               Version number\n"+"  -w               Output source with stripped comments and whitespace.\n"+"  -z <file>        Load Zend extension <file>.\n"+"\n"+"  args...          Arguments passed to script. Use -- args when first argument\n"+"                   starts with - or script is read from stdin\n"+"\n"+"  --ini            Show configuration file names\n"+"\n"+"  --rf <name>      Show information about function <name>.\n"+"  --rc <name>      Show information about class <name>.\n"+"  --re <name>      Show information about extension <name>.\n"+"  --rz <name>      Show information about Zend extension <name>.\n"+"  --ri <name>      Show configuration for extension <name>.\n"+"\n", prog, prog, prog, prog, prog, prog, prog)
+	fmt.Print(strings.ReplaceAll(usage, "%s", bin))
 }
 func CliRegisterFileHandles() {
 	var s_in *core.PhpStream
@@ -144,7 +186,7 @@ func CliSeekFileBegin(file_handle *zend.ZendFileHandle, script_file *byte) int {
 	zend.ZendStreamInitFp(file_handle, fp, script_file)
 	return zend.SUCCESS
 }
-func DoCli(argc int, argv **byte) int {
+func DoCli(argc int, argv **byte, args []string) int {
 	var c int
 	var file_handle zend.ZendFileHandle
 	var behavior int = PHP_MODE_STANDARD
@@ -415,7 +457,7 @@ func DoCli(argc int, argv **byte) int {
 		}
 		request_started = 1
 		zend.CG__().SetSkipShebang(1)
-		zend.ZendRegisterBoolConstant(zend.ZEND_STRL("PHP_CLI_PROCESS_TITLE"), IsPsTitleAvailable() == PS_TITLE_SUCCESS, zend.CONST_CS, 0)
+		zend.ZendRegisterBoolConstant("PHP_CLI_PROCESS_TITLE", 0, false, zend.CONST_CS, 0)
 		*arg_excp = arg_free
 		if hide_argv != 0 {
 			var i int

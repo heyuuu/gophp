@@ -929,14 +929,6 @@ func ZmShutdownCgi(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
-func ZifApacheChildTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	if zend.ZendParseParametersNone() != 0 {
-		return
-	}
-	if core.FcgiIsFastcgi() != 0 {
-		core.FcgiTerminate()
-	}
-}
 func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() != 0 {
 		return

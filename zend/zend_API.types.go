@@ -15,6 +15,16 @@ type ZendFunctionEntry struct {
 	flags    uint32
 }
 
+func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ZendInternalArgInfo) ZendFunctionEntry {
+	return ZendFunctionEntry{
+		fname:    b.CastStrPtr(fname),
+		handler:  handler,
+		arg_info: arg_info,
+		num_args: uint32(len(arg_info)),
+		flags:    flags,
+	}
+}
+
 func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
 	return ZendFunctionEntry{
 		fname:    b.CastStrPtr(fname),

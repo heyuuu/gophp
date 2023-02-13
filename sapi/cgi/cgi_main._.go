@@ -129,10 +129,8 @@ var ArginfoNoArgs = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var CgiFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("apache_child_terminate", ZifApacheChildTerminate, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("apache_request_headers", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("apache_response_headers", ZifApacheResponseHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("getallheaders", ZifApacheRequestHeaders, ArginfoNoArgs, uint32(b.SizeOf("arginfo_no_args")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var CgiModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cgi-fcgi", CgiFunctions, ZmStartupCgi, ZmShutdownCgi, nil, nil, ZmInfoCgi, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)

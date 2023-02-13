@@ -387,24 +387,3 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 var ModuleInitialized int = 0
 var ModuleStartup int = 1
 var ModuleShutdown int = 0
-
-/* {{{ php_during_module_startup */
-
-/* {{{ php_html_puts */
-
-/* {{{ php_request_startup
- */
-
-/* {{{ core_globals_dtor
- */
-
-/* A very long time ago php_module_startup() was refactored in a way
- * which broke calling it with more than one additional module.
- * This alternative to php_register_extensions() works around that
- * by walking the shallower structure.
- *
- * See algo: https://bugs.php.net/bug.php?id=63159
- */
-
-/* {{{ php_module_startup
- */

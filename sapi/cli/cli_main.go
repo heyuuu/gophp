@@ -1,18 +1,20 @@
 package cli
 
 import (
+	"fmt"
+	"os"
 	b "sik/builtin"
 	"sik/core"
 	"sik/zend"
 )
 
 func main(argc int, argv []*byte) int {
-	var c int
+	args := os.Args
+
 	var exit_status int = zend.SUCCESS
 	var module_started int = 0
 	var sapi_started int = 0
 	var php_optarg *byte = nil
-	var php_optind int = 1
 	var use_extended_info int = 0
 	var ini_path_override *byte = nil
 	var ini_entries *byte = nil
@@ -20,21 +22,20 @@ func main(argc int, argv []*byte) int {
 	var ini_ignore int = 0
 	var sapi_module ICliSapiModule = CliModule
 
-	/*
-	 * Do not move this initialization. It needs to happen before argv is used
-	 * in any way.
-	 */
-
-	argv = SavePsArgs(argc, argv)
-	CliModule.SetAdditionalFunctions(AdditionalFunctions)
 	zend.ZendSignalStartup()
-	for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
-		switch c {
+
+	optArgs, err := core.GetOpts(args[1:], OPTIONS)
+	if err != nil {
+		fmt.Fprint(os.Stderr, err.Error()+"\n")
+		PhpCliUsage(args[0])
+		goto out
+	}
+
+	for _, optArg := range optArgs {
+		//for b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &php_optarg, &php_optind, 1, 2)) != -1 {
+		switch optArg.Char {
 		case 'c':
-			if ini_path_override != nil {
-				zend.Free(ini_path_override)
-			}
-			ini_path_override = strdup(php_optarg)
+			ini_path_override = optArg.Value
 			break
 		case 'n':
 			ini_ignore = 1
@@ -72,22 +73,12 @@ func main(argc int, argv []*byte) int {
 			break
 		case 'S':
 			sapi_module = CliServerModule
-			CliServerSapiModule.SetAdditionalFunctions(ServerAdditionalFunctions)
+			CliServerModule.SetAdditionalFunctions(ServerAdditionalFunctions)
 			break
-		case 'h':
-
-		case '?':
-			PhpCliUsage(argv[0])
+		case 'h', '?':
+			PhpCliUsage(args[0])
 			goto out
-		case core.PHP_GETOPT_INVALID_ARG:
-			PhpCliUsage(argv[0])
-			exit_status = 1
-			goto out
-		case 'i':
-
-		case 'v':
-
-		case 'm':
+		case 'i', 'v', 'm':
 			sapi_module = CliModule
 			goto exit_loop
 		case 'e':
@@ -106,7 +97,8 @@ exit_loop:
 	app.Startup(sapi_module)
 	sapi_started = 1
 	sapi_module.SetPhpIniIgnore(ini_ignore)
-	sapi_module.SetExecutableLocation(argv[0])
+	sapi_module.SetExecutableLocation(args[0])
+
 	if sapi_module == CliModule {
 		if ini_entries != nil {
 			ini_entries = realloc(ini_entries, ini_entries_len+b.SizeOf("HARDCODED_INI"))
@@ -146,19 +138,13 @@ exit_loop:
 	zend.EG__().SetBailout(&__bailout)
 	if zend.SETJMP(__bailout) == 0 {
 		if sapi_module == CliModule {
-			exit_status = DoCli(argc, argv)
+			exit_status = DoCli(nil, nil, args)
 		} else {
-			exit_status = DoCliServer(argc, argv)
+			exit_status = DoCliServer(nil, nil, args)
 		}
 	}
 	zend.EG__().SetBailout(__orig_bailout)
 out:
-	if ini_path_override != nil {
-		zend.Free(ini_path_override)
-	}
-	if ini_entries != nil {
-		zend.Free(ini_entries)
-	}
 	if module_started != 0 {
 		core.PhpModuleShutdown()
 	}
@@ -166,11 +152,5 @@ out:
 		app.Shutdown()
 	}
 
-	/*
-	 * Do not move this de-initialization. It needs to happen right before
-	 * exiting.
-	 */
-
-	CleanupPsArgs(argv)
-	exit(exit_status)
+	return exit_status
 }

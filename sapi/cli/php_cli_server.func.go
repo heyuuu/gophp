@@ -178,37 +178,6 @@ func ZmShutdownCliServer(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmInfoCliServer(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }
-func SapiCliServerStartup(sapi_module core.ISapiModule) int {
-	var workers *byte
-	if core.PhpModuleStartup(sapi_module, &CliServerModuleEntry, 1) == zend.FAILURE {
-		return zend.FAILURE
-	}
-	if b.Assign(&workers, getenv("PHP_CLI_SERVER_WORKERS")) {
-		r.Fprintf(stderr, "platform does not support SO_REUSEPORT, cannot create workers\n")
-	}
-	return zend.SUCCESS
-}
-func SapiCliServerUbWrite(str *byte, str_length int) int {
-	var client *PhpCliServerClient = core.SG__().server_context
-	if client == nil {
-		return 0
-	}
-	return PhpCliServerClientSendThrough(client, str, str_length)
-}
-func SapiCliServerFlush(server_context any) {
-	var client *PhpCliServerClient = server_context
-	if client == nil {
-		return
-	}
-	if !(zend.ZEND_VALID_SOCKET(client.GetSock())) {
-		core.PhpHandleAbortedConnection()
-		return
-	}
-	if !(core.SG__().headers_sent) {
-		core.SapiSendHeaders()
-		core.SG__().headers_sent = 1
-	}
-}
 func SapiCliServerDiscardHeaders(sapi_headers *core.SapiHeaders) int {
 	return core.SAPI_HEADER_SENT_SUCCESSFULLY
 }
@@ -375,9 +344,6 @@ func SapiCliServerLogWrite(type_ int, msg *byte) {
 		r.Fprintf(stderr, "[%s] %s\n", buf, msg)
 	}
 }
-func SapiCliServerLogMessage(msg *byte, syslog_type_int int) {
-	SapiCliServerLogWrite(PHP_CLI_SERVER_LOG_MESSAGE, msg)
-}
 func PhpCliServerPollerCtor(poller *PhpCliServerPoller) int {
 	FD_ZERO(poller.GetRfds())
 	FD_ZERO(poller.GetWfds())
@@ -498,14 +464,6 @@ func PhpCliServerBufferSize(buffer *PhpCliServerBuffer) int {
 		retval += PhpCliServerChunkSize(chunk)
 	}
 	return retval
-}
-func PhpCliServerChunkImmortalNew(buf *byte, len_ int) *PhpCliServerChunk {
-	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk"), 1)
-	chunk.SetType(PHP_CLI_SERVER_CHUNK_IMMORTAL)
-	chunk.SetNext(nil)
-	chunk.SetDataImmortalP(buf)
-	chunk.SetDataImmortalLen(len_)
-	return chunk
 }
 func PhpCliServerChunkHeapNew(block any, buf *byte, len_ int) *PhpCliServerChunk {
 	var chunk *PhpCliServerChunk = zend.Pemalloc(b.SizeOf("php_cli_server_chunk"), 1)
@@ -1589,15 +1547,6 @@ func PhpCliServerDispatch(server *PhpCliServer, client *PhpCliServerClient) int 
 	DestroyRequestInfo(&(core.SG__().request_info))
 	return zend.SUCCESS
 }
-func PhpCliServerMimeTypeCtor(server *PhpCliServer, mime_type_map *PhpCliServerExtMimeTypePair) int {
-	var pair *PhpCliServerExtMimeTypePair
-	zend.ZendHashInit(server.GetExtensionMimeTypes(), 0, nil, nil, 1)
-	for pair = mime_type_map; pair.GetExt() != nil; pair++ {
-		var ext_len int = strlen(pair.GetExt())
-		zend.ZendHashStrAddPtr(server.GetExtensionMimeTypes(), pair.GetExt(), ext_len, any(pair.GetMimeType()))
-	}
-	return zend.SUCCESS
-}
 func PhpCliServerDtor(server *PhpCliServer) {
 	server.GetClients().Destroy()
 	//server.GetExtensionMimeTypes().Destroy()
@@ -1870,7 +1819,7 @@ func PhpCliServerDoEventLoop(server *PhpCliServer) int {
 out:
 	return retval
 }
-func DoCliServer(argc int, argv **byte) int {
+func DoCliServer(argc int, argv **byte, args []string) int {
 	var php_optarg *byte = nil
 	var php_optind int = 1
 	var c int
