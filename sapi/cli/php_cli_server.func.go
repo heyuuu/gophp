@@ -178,7 +178,7 @@ func ZmShutdownCliServer(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmInfoCliServer(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }
-func SapiCliServerStartup(sapi_module *core.sapi_module_struct) int {
+func SapiCliServerStartup(sapi_module core.ISapiModule) int {
 	var workers *byte
 	if core.PhpModuleStartup(sapi_module, &CliServerModuleEntry, 1) == zend.FAILURE {
 		return zend.FAILURE

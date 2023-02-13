@@ -12,7 +12,7 @@ import (
 
 var CliModule = &CliModuleType{}
 
-var _ core.ISapiModule = (*CliModuleType)(nil)
+var _ ICliSapiModule = (*CliModuleType)(nil)
 
 type CliModuleType struct {
 	core.BaseSapiModule
@@ -89,15 +89,4 @@ func (c *CliModuleType) RegisterServerVariables(trackVarsArray []zend.Zval) {
 
 func (c *CliModuleType) LogMessage(message string, syslogType int) {
 	fmt.Fprintf(os.Stderr, "%s\n", message)
-}
-
-func (c *CliModuleType) InputFilter(arg int, name string, value string) string {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c *CliModuleType) GetStat() bool {
-
-	//TODO implement me
-	panic("implement me")
 }

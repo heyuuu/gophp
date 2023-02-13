@@ -18,7 +18,7 @@ func main(argc int, argv []*byte) int {
 	var ini_entries *byte = nil
 	var ini_entries_len int = 0
 	var ini_ignore int = 0
-	var sapi_module = CliModule
+	var sapi_module ICliSapiModule = CliModule
 
 	/*
 	 * Do not move this initialization. It needs to happen before argv is used
@@ -71,7 +71,7 @@ func main(argc int, argv []*byte) int {
 			}
 			break
 		case 'S':
-			sapi_module = &CliServerSapiModule
+			sapi_module = CliServerModule
 			CliServerSapiModule.SetAdditionalFunctions(ServerAdditionalFunctions)
 			break
 		case 'h':

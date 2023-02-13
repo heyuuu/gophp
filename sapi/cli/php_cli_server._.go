@@ -43,7 +43,8 @@ var CliServerGlobals ZendCliServerGlobals
  * copied from ext/standard/info.c
  */
 
-var CliServerModuleEntry = zend.MakeZendModuleEntry(b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
+var CliServerModuleEntry = zend.MakeZendModuleEntry(
+	b.SizeOf("zend_module_entry"), zend.ZEND_MODULE_API_NO, 0, zend.USING_ZTS, nil, nil, "cli_server", nil, ZmStartupCliServer, ZmShutdownCliServer, nil, nil, ZmInfoCliServer, core.PHP_VERSION, 0, nil, nil, nil, nil, 0, 0, nil, 0, "API"+"ZEND_MODULE_API_NO"+zend.ZEND_BUILD_TS)
 var ArginfoNoArgs = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
@@ -56,6 +57,23 @@ var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 
-var CliServerSapiModule = core.MakeSapiModule("cli-server", "Built-in HTTP server", SapiCliServerStartup, core.PhpModuleShutdownWrapper, nil, nil, SapiCliServerUbWrite, SapiCliServerFlush, nil, nil, SapiCliServerSendHeaders, nil, SapiCliServerReadPost, SapiCliServerReadCookies, SapiCliServerRegisterVariables, SapiCliServerLogMessage)
+var CliServerSapiModule = core.MakeSapiModule(
+	"cli-server",
+	"Built-in HTTP server",
+	SapiCliServerStartup,
+	core.PhpModuleShutdownWrapper,
+	nil,
+	nil,
+	SapiCliServerUbWrite,
+	SapiCliServerFlush,
+	nil,
+	nil,
+	SapiCliServerSendHeaders,
+	nil,
+	SapiCliServerReadPost,
+	SapiCliServerReadCookies,
+	SapiCliServerRegisterVariables,
+	SapiCliServerLogMessage,
+)
 
 var Server PhpCliServer

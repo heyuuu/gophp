@@ -69,6 +69,17 @@ type ISapiModule interface {
 type BaseSapiModule struct {
 }
 
+func (this *BaseSapiModule) InputFilter(arg int, name string, value string) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (this *BaseSapiModule) GetStat() bool {
+
+	//TODO implement me
+	panic("implement me")
+}
+
 /**
  * generate
  */
