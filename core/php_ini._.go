@@ -76,7 +76,6 @@ const PhpIniString = zend.ZendIniString
 
 var IsSpecialSection int = 0
 var ActiveIniHash *zend.HashTable
-var ConfigurationHash zend.HashTable
 var HasPerDirConfig int = 0
 var HasPerHostConfig int = 0
 var PhpIniOpenedPath *byte = nil

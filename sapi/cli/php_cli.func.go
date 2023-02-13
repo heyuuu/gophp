@@ -122,14 +122,9 @@ func SapiCliRegisterVariables(track_vars_array *zend.Zval) {
 		core.PhpRegisterVariable("DOCUMENT_ROOT", docroot, track_vars_array)
 	}
 }
-func INI_DEFAULT(name string, value string) {
-	var tmp zend.Zval
-	tmp.SetRawString(value)
-	core.ConfigurationHash.KeyUpdate(name, &tmp)
-}
 func SapiCliIniDefaults(configuration_hash *zend.HashTable) {
-	INI_DEFAULT("report_zend_debug", "0")
-	INI_DEFAULT("display_errors", "1")
+	core.Config().Set("report_zend_debug", "0")
+	core.Config().Set("display_errors", "1")
 }
 func PhpCliUsage(argv0 string) {
 	bin := "php"

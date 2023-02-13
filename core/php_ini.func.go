@@ -297,9 +297,9 @@ func PhpInitConfig() int {
 	var opened_path *zend.ZendString = nil
 	var fp *r.FILE
 	var filename *byte
-	zend.ZendHashInit(&ConfigurationHash, 8, nil, ConfigZvalDtor, 1)
+	Config().Init()
 	if SM__().GetIniDefaults() != nil {
-		SM__().GetIniDefaults()(&ConfigurationHash)
+		SM__().GetIniDefaults()(Config().GetHash())
 	}
 	ExtensionLists.GetEngine().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
 	ExtensionLists.GetFunctions().Init(b.SizeOf("char *"), zend.LlistDtorFuncT(zend.FreeEstring), 1)
@@ -430,10 +430,10 @@ func PhpInitConfig() int {
 		var fh zend.ZendFileHandle
 		fh.InitFp(fp, filename)
 		RESET_ACTIVE_INI_HASH()
-		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
+		zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 		var tmp zend.Zval
 		tmp.SetString(zend.ZendStringInit(fh.GetFilename(), strlen(fh.GetFilename()), 1))
-		ConfigurationHash.KeyUpdate("cfg_file_path", &tmp)
+		Config().Set("cfg_file_path", fh.GetFilenameStr())
 		if opened_path != nil {
 			zend.ZendStringReleaseEx(opened_path, 0)
 		} else {
@@ -515,7 +515,7 @@ func PhpInitConfig() int {
 							var fh zend.ZendFileHandle
 							fh.InitFp(zend.VCWD_FOPEN(ini_file, "r"), ini_file)
 							if fh.GetFp() != nil {
-								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash) == zend.SUCCESS {
+								if zend.ZendParseIniFile(&fh, 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash()) == zend.SUCCESS {
 
 									/* Here, add it to the list of ini files read */
 
@@ -563,12 +563,12 @@ func PhpInitConfig() int {
 		/* Reset active ini section */
 
 		RESET_ACTIVE_INI_HASH()
-		zend.ZendParseIniString(SM__().GetIniEntries(), 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), &ConfigurationHash)
+		zend.ZendParseIniString(SM__().GetIniEntries(), 1, zend.ZEND_INI_SCANNER_NORMAL, zend.ZendIniParserCbT(PhpIniParserCb), Config().GetHash())
 	}
 	return zend.SUCCESS
 }
 func PhpShutdownConfig() int {
-	ConfigurationHash.Destroy()
+	Config().Destroy()
 	if PhpIniOpenedPath != nil {
 		zend.Free(PhpIniOpenedPath)
 		PhpIniOpenedPath = nil
@@ -647,7 +647,7 @@ func PhpIniActivatePerDirConfig(path *byte, path_len int) {
 
 			/* Search for source array matching the path from configuration_hash */
 
-			if b.Assign(&tmp2, ConfigurationHash.KeyFind(b.CastStrAuto(path))) != nil {
+			if b.Assign(&tmp2, Config().KeyFind(b.CastStrAuto(path))) != nil {
 				PhpIniActivateConfig(tmp2.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 			}
 			*ptr = '/'
@@ -664,7 +664,7 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 		/* Search for source array matching the host from configuration_hash */
 
-		if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStr(host, host_len))) != nil {
+		if b.Assign(&tmp, Config().KeyFind(b.CastStr(host, host_len))) != nil {
 			PhpIniActivateConfig(tmp.GetArr(), PHP_INI_SYSTEM, PHP_INI_STAGE_ACTIVATE)
 		}
 
@@ -673,14 +673,14 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 	}
 }
 func CfgGetEntryEx(name *zend.ZendString) *zend.Zval {
-	return ConfigurationHash.KeyFind(name.GetStr())
+	return Config().KeyFind(name.GetStr())
 }
 func CfgGetEntry(name *byte, name_length int) *zend.Zval {
-	return ConfigurationHash.KeyFind(b.CastStr(name, name_length))
+	return Config().KeyFind(b.CastStr(name, name_length))
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
+	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = 0
 		return zend.FAILURE
 	}
@@ -689,7 +689,7 @@ func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 }
 func CfgGetDouble(varname *byte, result *float64) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
+	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = float64(0)
 		return zend.FAILURE
 	}
@@ -698,11 +698,10 @@ func CfgGetDouble(varname *byte, result *float64) int {
 }
 func CfgGetString(varname *byte, result **byte) int {
 	var tmp *zend.Zval
-	if b.Assign(&tmp, ConfigurationHash.KeyFind(b.CastStrAuto(varname))) == nil {
+	if b.Assign(&tmp, Config().KeyFind(b.CastStrAuto(varname))) == nil {
 		*result = nil
 		return zend.FAILURE
 	}
 	*result = zend.Z_STRVAL_P(tmp)
 	return zend.SUCCESS
 }
-func PhpIniGetConfigurationHash() *zend.HashTable { return &ConfigurationHash }

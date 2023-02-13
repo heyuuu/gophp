@@ -4,6 +4,7 @@ package zend
 
 import (
 	"bytes"
+	b "sik/builtin"
 	r "sik/runtime"
 )
 
@@ -230,6 +231,8 @@ func (this *ZendFileHandle) GetStream() IStream { return &this.stream }
 func (this *ZendFileHandle) SetStream(stream ZendStream) {
 	this.stream = stream
 }
+
+func (this *ZendFileHandle) GetFilenameStr() string { return b.CastStrAuto(this.filename) }
 
 func (this *ZendFileHandle) GetFilename() *byte              { return this.filename }
 func (this *ZendFileHandle) SetFilename(value *byte)         { this.filename = value }

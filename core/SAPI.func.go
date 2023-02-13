@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-func SG__() *SapiGlobals     { return CurrentApp().SG() }
-func SM__() ISapiModule      { return CurrentApp().sapiModule }
-func SetSM__(sf ISapiModule) { CurrentApp().sapiModule = sf }
+func SG__() *SapiGlobals     { return App().SG() }
+func SM__() ISapiModule      { return App().sapiModule }
+func SetSM__(sf ISapiModule) { App().sapiModule = sf }
 func SapiAddHeader(str string) int {
 	ctr := MakeSapiHeaderLineEx(str)
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)
