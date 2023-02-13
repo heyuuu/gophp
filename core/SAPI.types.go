@@ -15,12 +15,6 @@ type SapiHeader struct {
 	header_len int
 }
 
-// func MakeSapiHeader(header *byte, header_len int) SapiHeader {
-//     return SapiHeader{
-//         header:header,
-//         header_len:header_len,
-//     }
-// }
 func (this *SapiHeader) GetHeader() *byte       { return this.header }
 func (this *SapiHeader) SetHeader(value *byte)  { this.header = value }
 func (this *SapiHeader) GetHeaderLen() int      { return this.header_len }
@@ -37,26 +31,7 @@ type SapiHeaders struct {
 	http_status_line          *byte
 }
 
-// func MakeSapiHeaders(headers zend.ZendLlist, http_response_code int, send_default_content_type uint8, mimetype *byte, http_status_line *byte) SapiHeaders {
-//     return SapiHeaders{
-//         headers:headers,
-//         http_response_code:http_response_code,
-//         send_default_content_type:send_default_content_type,
-//         mimetype:mimetype,
-//         http_status_line:http_status_line,
-//     }
-// }
 func (this *SapiHeaders) GetHeaders() zend.ZendLlist { return this.headers }
-
-// func (this *SapiHeaders) SetHeaders(value zend.ZendLlist) { this.headers = value }
-// func (this *SapiHeaders)  GetHttpResponseCode() int      { return this.http_response_code }
-// func (this *SapiHeaders) SetHttpResponseCode(value int) { this.http_response_code = value }
-// func (this *SapiHeaders)  GetSendDefaultContentType() uint8      { return this.send_default_content_type }
-// func (this *SapiHeaders) SetSendDefaultContentType(value uint8) { this.send_default_content_type = value }
-// func (this *SapiHeaders)  GetMimetype() *byte      { return this.mimetype }
-// func (this *SapiHeaders) SetMimetype(value *byte) { this.mimetype = value }
-// func (this *SapiHeaders)  GetHttpStatusLine() *byte      { return this.http_status_line }
-// func (this *SapiHeaders) SetHttpStatusLine(value *byte) { this.http_status_line = value }
 
 /**
  * SapiRequestInfo
@@ -86,106 +61,18 @@ type SapiRequestInfo struct {
 	proto_num           int
 }
 
-//             func MakeSapiRequestInfo(
-// request_method *byte,
-// query_string *byte,
-// cookie_data *byte,
-// content_length zend.ZendLong,
-// path_translated *byte,
-// request_uri *byte,
-// request_body *PhpStream,
-// content_type *byte,
-// headers_only zend.ZendBool,
-// no_headers zend.ZendBool,
-// headers_read zend.ZendBool,
-// post_entry *SapiPostEntry,
-// content_type_dup *byte,
-// auth_user *byte,
-// auth_password *byte,
-// auth_digest *byte,
-// argv0 *byte,
-// current_user *byte,
-// current_user_length int,
-// argc int,
-// argv **byte,
-// proto_num int,
-// ) SapiRequestInfo {
-//                 return SapiRequestInfo{
-//                     request_method:request_method,
-//                     query_string:query_string,
-//                     cookie_data:cookie_data,
-//                     content_length:content_length,
-//                     path_translated:path_translated,
-//                     request_uri:request_uri,
-//                     request_body:request_body,
-//                     content_type:content_type,
-//                     headers_only:headers_only,
-//                     no_headers:no_headers,
-//                     headers_read:headers_read,
-//                     post_entry:post_entry,
-//                     content_type_dup:content_type_dup,
-//                     auth_user:auth_user,
-//                     auth_password:auth_password,
-//                     auth_digest:auth_digest,
-//                     argv0:argv0,
-//                     current_user:current_user,
-//                     current_user_length:current_user_length,
-//                     argc:argc,
-//                     argv:argv,
-//                     proto_num:proto_num,
-//                 }
-//             }
-// func (this *SapiRequestInfo)  GetRequestMethod() *byte      { return this.request_method }
-func (this *SapiRequestInfo) SetRequestMethod(value *byte) { this.request_method = value }
-
-// func (this *SapiRequestInfo)  GetQueryString() *byte      { return this.query_string }
-func (this *SapiRequestInfo) SetQueryString(value *byte) { this.query_string = value }
-
-// func (this *SapiRequestInfo)  GetCookieData() *byte      { return this.cookie_data }
-// func (this *SapiRequestInfo) SetCookieData(value *byte) { this.cookie_data = value }
-// func (this *SapiRequestInfo)  GetContentLength() zend.ZendLong      { return this.content_length }
+func (this *SapiRequestInfo) SetRequestMethod(value *byte)         { this.request_method = value }
+func (this *SapiRequestInfo) SetQueryString(value *byte)           { this.query_string = value }
 func (this *SapiRequestInfo) SetContentLength(value zend.ZendLong) { this.content_length = value }
-
-// func (this *SapiRequestInfo)  GetPathTranslated() *byte      { return this.path_translated }
-func (this *SapiRequestInfo) SetPathTranslated(value *byte) { this.path_translated = value }
-
-// func (this *SapiRequestInfo)  GetRequestUri() *byte      { return this.request_uri }
-func (this *SapiRequestInfo) SetRequestUri(value *byte) { this.request_uri = value }
-
-// func (this *SapiRequestInfo)  GetRequestBody() *PhpStream      { return this.request_body }
-// func (this *SapiRequestInfo) SetRequestBody(value *PhpStream) { this.request_body = value }
-// func (this *SapiRequestInfo)  GetContentType() *byte      { return this.content_type }
-func (this *SapiRequestInfo) SetContentType(value *byte) { this.content_type = value }
-
-// func (this *SapiRequestInfo)  GetHeadersOnly() zend.ZendBool      { return this.headers_only }
-// func (this *SapiRequestInfo) SetHeadersOnly(value zend.ZendBool) { this.headers_only = value }
-// func (this *SapiRequestInfo)  GetNoHeaders() zend.ZendBool      { return this.no_headers }
-// func (this *SapiRequestInfo) SetNoHeaders(value zend.ZendBool) { this.no_headers = value }
-// func (this *SapiRequestInfo)  GetHeadersRead() zend.ZendBool      { return this.headers_read }
-// func (this *SapiRequestInfo) SetHeadersRead(value zend.ZendBool) { this.headers_read = value }
-// func (this *SapiRequestInfo)  GetPostEntry() *SapiPostEntry      { return this.post_entry }
-// func (this *SapiRequestInfo) SetPostEntry(value *SapiPostEntry) { this.post_entry = value }
-// func (this *SapiRequestInfo)  GetContentTypeDup() *byte      { return this.content_type_dup }
-// func (this *SapiRequestInfo) SetContentTypeDup(value *byte) { this.content_type_dup = value }
-// func (this *SapiRequestInfo)  GetAuthUser() *byte      { return this.auth_user }
-func (this *SapiRequestInfo) SetAuthUser(value *byte)     { this.auth_user = value }
-func (this *SapiRequestInfo) GetAuthPassword() *byte      { return this.auth_password }
-func (this *SapiRequestInfo) SetAuthPassword(value *byte) { this.auth_password = value }
-func (this *SapiRequestInfo) GetAuthDigest() *byte        { return this.auth_digest }
-func (this *SapiRequestInfo) SetAuthDigest(value *byte)   { this.auth_digest = value }
-
-// func (this *SapiRequestInfo)  GetArgv0() *byte      { return this.argv0 }
-// func (this *SapiRequestInfo) SetArgv0(value *byte) { this.argv0 = value }
-// func (this *SapiRequestInfo)  GetCurrentUser() *byte      { return this.current_user }
-// func (this *SapiRequestInfo) SetCurrentUser(value *byte) { this.current_user = value }
-// func (this *SapiRequestInfo)  GetCurrentUserLength() int      { return this.current_user_length }
-// func (this *SapiRequestInfo) SetCurrentUserLength(value int) { this.current_user_length = value }
-// func (this *SapiRequestInfo)  GetArgc() int      { return this.argc }
-// func (this *SapiRequestInfo) SetArgc(value int) { this.argc = value }
-// func (this *SapiRequestInfo)  GetArgv() **byte      { return this.argv }
-// func (this *SapiRequestInfo) SetArgv(value **byte) { this.argv = value }
-// func (this *SapiRequestInfo)  GetProtoNum() int      { return this.proto_num }
-func (this *SapiRequestInfo) SetProtoNum(value int) { this.proto_num = value }
+func (this *SapiRequestInfo) SetPathTranslated(value *byte)        { this.path_translated = value }
+func (this *SapiRequestInfo) SetRequestUri(value *byte)            { this.request_uri = value }
+func (this *SapiRequestInfo) SetContentType(value *byte)           { this.content_type = value }
+func (this *SapiRequestInfo) SetAuthUser(value *byte)              { this.auth_user = value }
+func (this *SapiRequestInfo) GetAuthPassword() *byte               { return this.auth_password }
+func (this *SapiRequestInfo) SetAuthPassword(value *byte)          { this.auth_password = value }
+func (this *SapiRequestInfo) GetAuthDigest() *byte                 { return this.auth_digest }
+func (this *SapiRequestInfo) SetAuthDigest(value *byte)            { this.auth_digest = value }
+func (this *SapiRequestInfo) SetProtoNum(value int)                { this.proto_num = value }
 
 /**
  * SapiGlobals

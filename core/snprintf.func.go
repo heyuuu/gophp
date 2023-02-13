@@ -416,11 +416,6 @@ func PAD(width int, len_ int, ch byte) {
 		}
 	}
 }
-func PREFIX(str __auto__, length __auto__, ch __auto__) {
-	*(b.PreDec(&str)) = ch
-	length++
-	has_prefix = YES
-}
 func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 	var sp *byte
 	var bep *byte
@@ -971,50 +966,11 @@ func ApPhpSlprintf(buf *byte, len_ int, format *byte, _ ...any) int {
 	}
 	return cc
 }
-func ApPhpVslprintf(buf *byte, len_ int, format *byte, ap ...any) int {
-	var cc int
-	StrxPrintv(&cc, buf, len_, format, ap)
-	if int(cc >= len_) != 0 {
-		cc = int(len_ - 1)
-		buf[cc] = '0'
-	}
-	return cc
-}
 func ApPhpSnprintf(buf *byte, len_ int, format *byte, _ ...any) int {
 	var cc int
 	var ap va_list
 	va_start(ap, format)
 	StrxPrintv(&cc, buf, len_, format, ap)
-	va_end(ap)
-	return cc
-}
-func ApPhpVsnprintf(buf *byte, len_ int, format *byte, ap ...any) int {
-	var cc int
-	StrxPrintv(&cc, buf, len_, format, ap)
-	return cc
-}
-func ApPhpVasprintf(buf **byte, format *byte, ap ...any) int {
-	var ap2 va_list
-	var cc int
-	zend.VaCopy(ap2, ap)
-	cc = ApPhpVsnprintf(nil, 0, format, ap2)
-	va_end(ap2)
-	*buf = nil
-	if cc >= 0 {
-		if b.Assign(&(*buf), zend.Malloc(b.PreInc(&cc))) != nil {
-			if b.Assign(&cc, ApPhpVsnprintf(*buf, cc, format, ap)) < 0 {
-				zend.Free(*buf)
-				*buf = nil
-			}
-		}
-	}
-	return cc
-}
-func ApPhpAsprintf(buf **byte, format *byte, _ ...any) int {
-	var cc int
-	var ap va_list
-	va_start(ap, format)
-	cc = vasprintf(buf, format, ap)
 	va_end(ap)
 	return cc
 }

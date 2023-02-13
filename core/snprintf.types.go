@@ -10,12 +10,6 @@ type BufArea struct {
 	nextb   *byte
 }
 
-// func MakeBufArea(buf_end *byte, nextb *byte) BufArea {
-//     return BufArea{
-//         buf_end:buf_end,
-//         nextb:nextb,
-//     }
-// }
 func (this *BufArea) GetBufEnd() *byte      { return this.buf_end }
 func (this *BufArea) SetBufEnd(value *byte) { this.buf_end = value }
 func (this *BufArea) GetNextb() *byte       { return this.nextb }
