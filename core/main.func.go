@@ -1410,17 +1410,13 @@ func ZmInfoPhpCore(zend_module *zend.ZendModuleEntry) {
 	standard.PhpInfoPrintTableEnd()
 	zend.DISPLAY_INI_ENTRIES()
 }
-func PhpRegisterExtensions(ptr **zend.ZendModuleEntry, count int) int {
-	var end **zend.ZendModuleEntry = ptr + count
-	for ptr < end {
-		if (*ptr) != nil {
-			if zend.ZendRegisterInternalModule(*ptr) == nil {
-				return zend.FAILURE
-			}
+func PhpRegisterExtensions(ptrs []*zend.ZendModuleEntry) bool {
+	for _, ptr := range ptrs {
+		if zend.ZendRegisterInternalModule(ptr) == nil {
+			return false
 		}
-		ptr++
 	}
-	return zend.SUCCESS
+	return true
 }
 func PhpRegisterExtensionsBc(ptr *zend.ZendModuleEntry, count int) int {
 	for b.PostDec(&count) {
@@ -1556,7 +1552,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* startup extensions statically compiled in */
 
-	if PhpRegisterInternalExtensionsFunc() == zend.FAILURE {
+	if PhpRegisterInternalExtensions() == false {
 		PhpPrintf("Unable to start builtin modules\n")
 		return zend.FAILURE
 	}
