@@ -49,14 +49,6 @@ func ZEND_NORMALIZE_BOOL(n ZendLong) int {
 		return 0
 	}
 }
-func ZEND_TRUTH(x __auto__) int {
-	if x {
-		return 1
-	} else {
-		return 0
-	}
-}
-func ZEND_LOG_XOR(a __auto__, b __auto__) int                { return ZEND_TRUTH(a) ^ ZEND_TRUTH(b) }
 func ZEND_SECURE_ZERO(var_ __auto__, size __auto__) __auto__ { return core.ExplicitBzero(var_, size) }
 func ZEND_VALID_SOCKET(sock core.PhpSocketT) bool            { return sock >= 0 }
 func VaCopy(dest ...any, src ...any) __auto__ {
@@ -64,8 +56,5 @@ func VaCopy(dest ...any, src ...any) __auto__ {
 }
 func ZEND_SLIDE_TO_ALIGNED(alignment int, ptr __auto__) int {
 	return zend_uintptr_t(ptr) + (alignment-1) & ^(alignment-1)
-}
-func ZEND_SLIDE_TO_ALIGNED16(ptr __auto__) int {
-	return ZEND_SLIDE_TO_ALIGNED(uint64(16), ptr)
 }
 func ZEND_EXPAND_VA(code __auto__) __auto__ { return code }

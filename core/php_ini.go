@@ -24,10 +24,6 @@ func (this *Configuration) KeyFind(key string) *zend.Zval {
 	return this.hash.KeyFind(key)
 }
 
-func (this *Configuration) KeyUpdate(key string, pData *zend.Zval) *zend.Zval {
-
-}
-
 func (this *Configuration) GetHash() *zend.HashTable {
 	return &this.hash
 }
