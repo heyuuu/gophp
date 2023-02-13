@@ -357,23 +357,6 @@ func (this *PhpCliServer) GetSocklen() socklen_t               { return this.soc
 func (this *PhpCliServer) GetClients() zend.HashTable          { return this.clients }
 
 /**
- * PhpCliServerHttpResponseStatusCodePair
- */
-type PhpCliServerHttpResponseStatusCodePair struct {
-	code int
-	str  *byte
-}
-
-func MakePhpCliServerHttpResponseStatusCodePair(code int, str *byte) PhpCliServerHttpResponseStatusCodePair {
-	return PhpCliServerHttpResponseStatusCodePair{
-		code: code,
-		str:  str,
-	}
-}
-func (this *PhpCliServerHttpResponseStatusCodePair) GetCode() int  { return this.code }
-func (this *PhpCliServerHttpResponseStatusCodePair) GetStr() *byte { return this.str }
-
-/**
  * PhpCliServerDoEventForEachFdCallbackParams
  */
 type PhpCliServerDoEventForEachFdCallbackParams struct {

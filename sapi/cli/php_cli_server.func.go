@@ -3,6 +3,7 @@
 package cli
 
 import (
+	"fmt"
 	b "sik/builtin"
 	"sik/core"
 	"sik/ext/standard"
@@ -25,51 +26,22 @@ func PhpCliServerGetSystemTime(buf *byte) int {
 }
 func CharPtrDtorP(zv *zend.Zval) { zend.Pefree(zv.GetPtr(), 1) }
 func GetLastError() *byte        { return zend.Pestrdup(strerror(errno), 1) }
-func StatusComp(a any, b any) int {
-	var pa *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(a)
-	var pb *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(b)
-	if pa.GetCode() < pb.GetCode() {
-		return -1
-	} else if pa.GetCode() > pb.GetCode() {
-		return 1
-	}
-	return 0
-}
-func GetStatusString(code int) *byte {
-	var needle core.HttpResponseStatusCodePair = core.HttpResponseStatusCodePair{code, nil}
-	var result *core.HttpResponseStatusCodePair = nil
-	result = bsearch(&needle, core.HttpStatusMap, core.HttpStatusMapLen, b.SizeOf("needle"), StatusComp)
-	if result != nil {
-		return result.GetStr()
+func GetStatusString(code int) string {
+	if result, ok := core.HttpStatusMap[code]; ok {
+		return result
 	}
 
 	/* Returning NULL would require complicating append_http_status_line() to
 	 * not segfault in that case, so let's just return a placeholder, since RFC
 	 * 2616 requires a reason phrase. This is basically what a lot of other Web
 	 * servers do in this case anyway. */
-
 	return "Unknown Status Code"
-
-	/* Returning NULL would require complicating append_http_status_line() to
-	 * not segfault in that case, so let's just return a placeholder, since RFC
-	 * 2616 requires a reason phrase. This is basically what a lot of other Web
-	 * servers do in this case anyway. */
 }
-func GetTemplateString(code int) *byte {
-	var e int = b.SizeOf("template_map") / b.SizeOf("php_cli_server_http_response_status_code_pair")
-	var s int = 0
-	for e != s {
-		var c int = MIN((e+s+1)/2, e-1)
-		var d int = TemplateMap[c].GetCode()
-		if d > code {
-			e = c
-		} else if d < code {
-			s = c
-		} else {
-			return TemplateMap[c].GetStr()
-		}
+func GetTemplateString(code int) string {
+	if val, ok := TemplateMap[code]; ok {
+		return val
 	}
-	return nil
+	panic(fmt.Sprintf("Template for code:%d is not found", code))
 }
 func AppendHttpStatusLine(buffer *zend.SmartStr, protocol_version int, response_code int, persistent int) {
 	if response_code == 0 {
@@ -1280,9 +1252,9 @@ func PhpCliServerCloseConnection(server *PhpCliServer, client *PhpCliServerClien
 func PhpCliServerSendErrorPage(server *PhpCliServer, client *PhpCliServerClient, status int) int {
 	var escaped_request_uri *zend.ZendString = nil
 	var status_string *byte = GetStatusString(status)
-	var content_template *byte = GetTemplateString(status)
+	var content_template string = GetTemplateString(status)
 	var errstr *byte = GetLastError()
-	r.Assert(status_string != nil && content_template != nil)
+	r.Assert(status_string != nil)
 	PhpCliServerContentSenderCtor(client.GetContentSender())
 	client.SetContentSenderInitialized(1)
 	escaped_request_uri = standard.PhpEscapeHtmlEntitiesEx((*uint8)(client.GetRequest().GetRequestUri()), client.GetRequest().GetRequestUriLen(), 0, standard.ENT_QUOTES, nil, 0)

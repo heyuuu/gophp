@@ -174,11 +174,8 @@ func FcgiSetupSignals() {
 		sigaction(SIGPIPE, &new_sa, nil)
 	}
 }
-func FcgiSetInShutdown(new_value int)                    { InShutdown = new_value }
-func FcgiInShutdown() int                                { return InShutdown }
-func FcgiTerminate()                                     { InShutdown = 1 }
-func FcgiRequestSetKeep(req *FcgiRequest, new_value int) { req.SetKeep(new_value) }
-func FcgiSetLogger(lg FcgiLogger)                        { FcgiLog = lg }
+func FcgiInShutdown() int         { return InShutdown }
+func FcgiSetLogger(lg FcgiLogger) { FcgiLog = lg }
 func FcgiInit() int {
 	if IsInitialized == 0 {
 		var sa SaT

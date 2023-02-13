@@ -5,8 +5,6 @@ package cgi
 import (
 	b "sik/builtin"
 	"sik/core"
-	"sik/core/streams"
-	"sik/ext/standard"
 	r "sik/runtime"
 	"sik/sapi/cli"
 	"sik/zend"
@@ -150,17 +148,11 @@ func SapiCgiSendHeaders(sapi_headers *core.SapiHeaders) int {
 					h = (*core.SapiHeader)(zend.ZendLlistGetNextEx(sapi_headers.GetHeaders(), &pos))
 				}
 				if has_status == 0 {
-					var err *core.HttpResponseStatusCodePair = (*core.HttpResponseStatusCodePair)(core.HttpStatusMap)
-					for err.GetCode() != 0 {
-						if err.GetCode() == core.SG__().sapi_headers.http_response_code {
-							break
-						}
-						err++
-					}
-					if err.GetStr() != nil {
-						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", core.SG__().sapi_headers.http_response_code, err.GetStr())
+					code := core.SG__().sapi_headers.http_response_code
+					if codeStr, ok := core.HttpStatusMap[code]; ok {
+						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d %s", code, codeStr)
 					} else {
-						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d", core.SG__().sapi_headers.http_response_code)
+						len_ = core.Slprintf(buf, b.SizeOf("buf"), "Status: %d", code)
 					}
 				}
 			}
