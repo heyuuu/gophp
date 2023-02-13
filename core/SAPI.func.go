@@ -7,8 +7,8 @@ import (
 )
 
 func SG__() *SapiGlobals     { return CurrentApp().SG() }
-func SM__() *SapiModule      { return CurrentApp().sapiModule }
-func SetSM__(sf *SapiModule) { CurrentApp().sapiModule = sf }
+func SM__() ISapiModule      { return CurrentApp().sapiModule }
+func SetSM__(sf ISapiModule) { CurrentApp().sapiModule = sf }
 func SapiAddHeader(str string) int {
 	ctr := MakeSapiHeaderLineEx(str)
 	return SapiHeaderOp(SAPI_HEADER_REPLACE, &ctr)

@@ -1430,7 +1430,7 @@ func PhpRegisterExtensionsBc(ptr *zend.ZendModuleEntry, count int) int {
 	}
 	return zend.SUCCESS
 }
-func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
+func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
 	var zuf zend.ZendUtilityFunctions
 	var zuv zend.ZendUtilityValues
 	var retval int = zend.SUCCESS
@@ -1663,7 +1663,7 @@ func PhpModuleStartup(sf *SapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* we're done */
 }
-func PhpModuleShutdownWrapper(sapi_globals *SapiModule) int {
+func PhpModuleShutdownWrapper(sapi_globals ISapiModule) int {
 	PhpModuleShutdown()
 	return zend.SUCCESS
 }

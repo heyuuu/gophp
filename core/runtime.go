@@ -4,7 +4,7 @@ package core
  * App PHP应用服务实体，全局唯一
  */
 type App struct {
-	sapiModule  *SapiModule
+	sapiModule  ISapiModule
 	sapiGlobals SapiGlobals
 }
 
@@ -19,7 +19,7 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (app *App) Startup(module *SapiModule) {
+func (app *App) Startup(module ISapiModule) {
 	module.SetIniEntries(nil)
 	app.sapiModule = module
 	app.sapiGlobals.Init()
@@ -30,7 +30,7 @@ func (app *App) Shutdown() {
 }
 
 func (app *App) SG() *SapiGlobals { return &app.sapiGlobals }
-func (app *App) SM() *SapiModule  { return app.sapiModule }
+func (app *App) SM() ISapiModule  { return app.sapiModule }
 
 /**
  * Context 单个PHP请求上下文

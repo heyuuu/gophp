@@ -261,8 +261,8 @@ func (this *SapiHeaderLine) GetResponseCode() zend.ZendLong { return this.respon
 type SapiModule struct {
 	name                      string
 	pretty_name               string
-	startup                   func(sapi_module *SapiModule) int
-	shutdown                  func(sapi_module *SapiModule) int
+	startup                   func(sapi_module ISapiModule) int
+	shutdown                  func(sapi_module ISapiModule) int
 	activate                  func() int
 	deactivate                func() int
 	ub_write                  func(str *byte, str_length int) int
@@ -459,14 +459,6 @@ func MakeSapiPostEntry(content_type *byte, content_type_len uint32, post_reader 
 		post_handler:     post_handler,
 	}
 }
-func (this *SapiPostEntry) GetContentType() *byte { return this.content_type }
-
-// func (this *SapiPostEntry) SetContentType(value *byte) { this.content_type = value }
+func (this *SapiPostEntry) GetContentType() *byte     { return this.content_type }
 func (this *SapiPostEntry) GetContentTypeLen() uint32 { return this.content_type_len }
-
-// func (this *SapiPostEntry) SetContentTypeLen(value uint32) { this.content_type_len = value }
-func (this *SapiPostEntry) GetPostReader() func() { return this.post_reader }
-
-// func (this *SapiPostEntry) SetPostReader(value func()) { this.post_reader = value }
-// func (this *SapiPostEntry)  GetPostHandler() func(content_type_dup *byte, arg any)      { return this.post_handler }
-// func (this *SapiPostEntry) SetPostHandler(value func(content_type_dup *byte, arg any)) { this.post_handler = value }
+func (this *SapiPostEntry) GetPostReader() func()     { return this.post_reader }

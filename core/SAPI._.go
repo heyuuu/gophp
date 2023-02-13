@@ -3,8 +3,6 @@ package core
 const SAPI_OPTION_NO_CHDIR = 1
 const SAPI_POST_BLOCK_SIZE = 0x4000
 
-var sapi_module SapiModule
-
 type SapiHeaderOpEnum = int
 
 const (
