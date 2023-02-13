@@ -2542,7 +2542,6 @@ var BasicFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("getimagesizefromstring", ZifGetimagesizefromstring, ArginfoGetimagesize, uint32(b.SizeOf("arginfo_getimagesize")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("image_type_to_mime_type", ZifImageTypeToMimeType, ArginfoImageTypeToMimeType, uint32(b.SizeOf("arginfo_image_type_to_mime_type")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("image_type_to_extension", ZifImageTypeToExtension, ArginfoImageTypeToExtension, uint32(b.SizeOf("arginfo_image_type_to_extension")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("phpinfo", ZifPhpinfo, ArginfoPhpinfo, uint32(b.SizeOf("arginfo_phpinfo")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("phpversion", ZifPhpversion, ArginfoPhpversion, uint32(b.SizeOf("arginfo_phpversion")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("phpcredits", ZifPhpcredits, ArginfoPhpcredits, uint32(b.SizeOf("arginfo_phpcredits")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 	zend.MakeZendFunctionEntry("php_sapi_name", ZifPhpSapiName, ArginfoPhpSapiName, uint32(b.SizeOf("arginfo_php_sapi_name")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),

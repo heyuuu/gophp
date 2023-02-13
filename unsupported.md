@@ -8,3 +8,4 @@
 - `cli_set_process_title`
 - `cli_get_process_title`
 - `apache_child_terminate`
+- `phpinfo`
