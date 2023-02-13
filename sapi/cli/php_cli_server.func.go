@@ -1790,10 +1790,8 @@ func DoCliServer(argc int, argv **byte, args []string, optArgs []core.OptArg) in
 			return 1
 		}
 	} else {
-		var ret *byte = nil
-		ret = zend.VCWD_GETCWD(document_root_buf, core.MAXPATHLEN)
-		if ret != nil {
-			document_root = document_root_buf
+		if ret, err := os.Getwd(); err == nil {
+			document_root = ret
 		} else {
 			document_root = "."
 		}
@@ -1801,6 +1799,8 @@ func DoCliServer(argc int, argv **byte, args []string, optArgs []core.OptArg) in
 	if argc > php_optind {
 		router = argv[php_optind]
 	}
+
+	var Server PhpCliServer
 	if zend.FAILURE == PhpCliServerCtor(&Server, server_bind_address, document_root, router) {
 		return 1
 	}

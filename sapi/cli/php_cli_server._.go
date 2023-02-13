@@ -62,5 +62,3 @@ var ServerAdditionalFunctions = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntryEx("apache_response_headers", 0, ZifApacheResponseHeaders, nil),
 	zend.MakeZendFunctionEntryEx("getallheaders", 0, ZifApacheRequestHeaders, nil),
 }
-
-var Server PhpCliServer
