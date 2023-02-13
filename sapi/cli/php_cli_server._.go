@@ -13,8 +13,6 @@ const SOCK_EAGAIN = EAGAIN
 const SOCK_EINTR = EINTR
 const SOCK_EADDRINUSE = EADDRINUSE
 
-// failed # include "ext/date/php_date.h"
-
 const OUTPUT_NOT_CHECKED = -1
 const OUTPUT_IS_TTY = 1
 const OUTPUT_NOT_TTY = 0

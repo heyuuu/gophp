@@ -52,7 +52,7 @@ func main(argc int, argv []*byte) int {
 	PhpCgiGlobalsCtor(&php_cgi_globals)
 	app.Startup(CgiModule)
 	fastcgi = core.FcgiIsFastcgi()
-	CgiSapiModule.SetPhpIniPathOverride(nil)
+	CgiModule.SetPhpIniPathOverride(nil)
 	if fastcgi == 0 {
 
 		/* Make sure we detect we are a cgi - a bit redundancy here,
@@ -79,13 +79,13 @@ func main(argc int, argv []*byte) int {
 	for skip_getopt == 0 && b.Assign(&c, core.PhpGetopt(argc, argv, OPTIONS, &PhpOptarg, &PhpOptind, 0, 2)) != -1 {
 		switch c {
 		case 'c':
-			if CgiSapiModule.GetPhpIniPathOverride() != nil {
-				zend.Free(CgiSapiModule.GetPhpIniPathOverride())
+			if CgiModule.GetPhpIniPathOverride() != nil {
+				zend.Free(CgiModule.GetPhpIniPathOverride())
 			}
-			CgiSapiModule.SetPhpIniPathOverride(strdup(PhpOptarg))
+			CgiModule.SetPhpIniPathOverride(strdup(PhpOptarg))
 			break
 		case 'n':
-			CgiSapiModule.SetPhpIniIgnore(1)
+			CgiModule.SetPhpIniIgnore(1)
 			break
 		case 'd':
 
@@ -96,25 +96,25 @@ func main(argc int, argv []*byte) int {
 			if b.Assign(&val, strchr(PhpOptarg, '=')) {
 				val++
 				if !(isalnum(*val)) && (*val) != '"' && (*val) != '\'' && (*val) != '0' {
-					CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\"")))
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, val-PhpOptarg)
+					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\\"\\\"\\n\\0\"")))
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, val-PhpOptarg)
 					ini_entries_len += val - PhpOptarg
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, "\"", 1)
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, "\"", 1)
 					ini_entries_len++
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, val, len_-(val-PhpOptarg))
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, val, len_-(val-PhpOptarg))
 					ini_entries_len += len_ - (val - PhpOptarg)
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, "\"\n0", b.SizeOf("\"\\\"\\n\\0\""))
 					ini_entries_len += b.SizeOf("\"\\n\\0\\\"\"") - 2
 				} else {
-					CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\n\\0\"")))
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
-					memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len+len_, "\n0", b.SizeOf("\"\\n\\0\""))
+					CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"\\n\\0\"")))
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
+					memcpy(CgiModule.GetIniEntries()+ini_entries_len+len_, "\n0", b.SizeOf("\"\\n\\0\""))
 					ini_entries_len += len_ + b.SizeOf("\"\\n\\0\"") - 2
 				}
 			} else {
-				CgiSapiModule.SetIniEntries(realloc(CgiSapiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"=1\\n\\0\"")))
-				memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
-				memcpy(CgiSapiModule.GetIniEntries()+ini_entries_len+len_, "=1\n0", b.SizeOf("\"=1\\n\\0\""))
+				CgiModule.SetIniEntries(realloc(CgiModule.GetIniEntries(), ini_entries_len+len_+b.SizeOf("\"=1\\n\\0\"")))
+				memcpy(CgiModule.GetIniEntries()+ini_entries_len, PhpOptarg, len_)
+				memcpy(CgiModule.GetIniEntries()+ini_entries_len+len_, "=1\n0", b.SizeOf("\"=1\\n\\0\""))
 				ini_entries_len += len_ + b.SizeOf("\"=1\\n\\0\"") - 2
 			}
 			break
@@ -134,20 +134,20 @@ func main(argc int, argv []*byte) int {
 
 		/* Override SAPI callbacks */
 
-		CgiSapiModule.SetUbWrite(SapiFcgiUbWrite)
-		CgiSapiModule.SetFlush(SapiFcgiFlush)
-		CgiSapiModule.SetReadPost(SapiFcgiReadPost)
-		CgiSapiModule.SetGetenv(SapiFcgiGetenv)
-		CgiSapiModule.SetReadCookies(SapiFcgiReadCookies)
+		CgiModule.SetUbWrite(SapiFcgiUbWrite)
+		CgiModule.SetFlush(SapiFcgiFlush)
+		CgiModule.SetReadPost(SapiFcgiReadPost)
+		CgiModule.SetGetenv(SapiFcgiGetenv)
+		CgiModule.SetReadCookies(SapiFcgiReadCookies)
 	}
-	CgiSapiModule.SetExecutableLocation(argv[0])
+	CgiModule.SetExecutableLocation(argv[0])
 	if cgi == 0 && fastcgi == 0 && bindpath == nil {
-		CgiSapiModule.SetAdditionalFunctions(AdditionalFunctions)
+		CgiModule.SetAdditionalFunctions(AdditionalFunctions)
 	}
 
 	/* startup after we get the above ini override se we get things right */
 
-	if !CgiSapiModule.Startup() {
+	if !CgiModule.Startup() {
 		zend.Free(bindpath)
 		return zend.FAILURE
 	}
@@ -700,11 +700,11 @@ func main(argc int, argv []*byte) int {
 			core.FcgiDestroyRequest(request)
 		}
 		core.FcgiShutdown()
-		if CgiSapiModule.GetPhpIniPathOverride() != nil {
-			zend.Free(CgiSapiModule.GetPhpIniPathOverride())
+		if CgiModule.GetPhpIniPathOverride() != nil {
+			zend.Free(CgiModule.GetPhpIniPathOverride())
 		}
-		if CgiSapiModule.GetIniEntries() != nil {
-			zend.Free(CgiSapiModule.GetIniEntries())
+		if CgiModule.GetIniEntries() != nil {
+			zend.Free(CgiModule.GetIniEntries())
 		}
 	} else {
 		zend.EG__().SetBailout(__orig_bailout)
