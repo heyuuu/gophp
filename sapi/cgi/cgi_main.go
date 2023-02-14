@@ -1,6 +1,7 @@
 package cgi
 
 import (
+	"log"
 	b "sik/builtin"
 	"sik/core"
 	"sik/core/streams"
@@ -135,9 +136,6 @@ func main(argc int, argv []*byte) int {
 		CgiModule.IsFastCgi = true
 	}
 	CgiModule.SetExecutableLocation(argv[0])
-	if cgi == 0 && fastcgi == 0 && bindpath == nil {
-		CgiModule.SetAdditionalFunctions(AdditionalFunctions)
-	}
 
 	/* startup after we get the above ini override se we get things right */
 

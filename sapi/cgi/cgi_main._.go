@@ -5,7 +5,6 @@ package cgi
 import (
 	b "sik/builtin"
 	"sik/core"
-	"sik/ext/standard"
 	"sik/zend"
 )
 
@@ -87,15 +86,6 @@ var php_cgi_globals php_cgi_globals_struct
 const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
-
-var ArginfoDl = []zend.ZendInternalArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("extension_filename", 0, 0, 0),
-}
-var AdditionalFunctions = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("dl", standard.ZifDl, ArginfoDl, uint32(b.SizeOf("arginfo_dl")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
-}
 
 var ArginfoNoArgs = []zend.ZendInternalArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
