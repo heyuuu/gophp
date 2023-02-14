@@ -1,17 +1,15 @@
 package zend
 
-import b "sik/builtin"
-
 type ArgInfoOpt func(*ArgInfo)
 
 func ArgInfoType(typ ZendType) ArgInfoOpt {
-	return func(info *ArgInfo) { info.type_ = typ }
+	return func(info *ArgInfo) { info.typ = typ }
 }
 func ArgInfoByRef(byRef ZendUchar) ArgInfoOpt {
-	return func(info *ArgInfo) { info.pass_by_reference = byRef }
+	return func(info *ArgInfo) { info.passByReference = byRef }
 }
 func ArgInfoVariadic() ArgInfoOpt {
-	return func(info *ArgInfo) { info.is_variadic = 1 }
+	return func(info *ArgInfo) { info.isVariadic = true }
 }
 
 /**
@@ -19,17 +17,17 @@ func ArgInfoVariadic() ArgInfoOpt {
  * 用于代替 ArgInfo / ZendArgInfo
  */
 type ArgInfo struct {
+	name            string
+	typ             ZendType
+	passByReference ZendUchar
+	isVariadic      bool
 	// 为 returnArg 临时使用，后续需替换
 	requiredArgs int // -1 表示需要所有参数
-	//
-	name              *byte
-	type_             ZendType
-	pass_by_reference ZendUchar
-	is_variadic       ZendBool
 }
 
+func (this *ArgInfo) Name() string      { return this.name }
+func (this *ArgInfo) Type() ZendType    { return this.typ }
 func (this *ArgInfo) RequiredArgs() int { return this.requiredArgs }
-func (this *ArgInfo) Name() string      { return b.CastStrAuto(this.name) }
 
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	argInfo := ArgInfo{name: name}
@@ -39,18 +37,9 @@ func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	return argInfo
 }
 func MakeReturnArgInfo(requiredArgs int, opts ...ArgInfoOpt) ArgInfo {
-	argInfo := ArgInfo{requiredArgs: -1, name: ""}
+	argInfo := ArgInfo{requiredArgs: requiredArgs}
 	for _, opt := range opts {
 		opt(&argInfo)
 	}
 	return argInfo
-}
-
-func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ArgInfo {
-	return ArgInfo{
-		name:              name,
-		type_:             type_,
-		pass_by_reference: pass_by_reference,
-		is_variadic:       is_variadic,
-	}
 }
