@@ -27,7 +27,7 @@ import "math"
    +----------------------------------------------------------------------+
 */
 
-type ZendBool = uint8
+type ZendBool = int
 type ZendUchar = uint8
 type ZEND_RESULT_CODE = int
 

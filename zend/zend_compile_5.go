@@ -500,28 +500,6 @@ func ZendCompileStmtList(ast *ZendAst) {
 		ZendCompileStmt(list.GetChild()[i])
 	}
 }
-func ZendSetFunctionArgFlags(func_ *ZendFunction) {
-	var i uint32
-	var n uint32
-	func_.GetArgFlags()[0] = 0
-	func_.GetArgFlags()[1] = 0
-	func_.GetArgFlags()[2] = 0
-	if func_.GetArgInfo() != nil {
-		n = MIN(func_.GetNumArgs(), MAX_ARG_FLAG_NUM)
-		i = 0
-		for i < n {
-			ZEND_SET_ARG_FLAG(func_, i+1, func_.GetArgInfo()[i].GetPassByReference())
-			i++
-		}
-		if func_.IsVariadic() && func_.GetArgInfo()[i].GetPassByReference() != 0 {
-			var pass_by_reference uint32 = func_.GetArgInfo()[i].GetPassByReference()
-			for i < MAX_ARG_FLAG_NUM {
-				ZEND_SET_ARG_FLAG(func_, i+1, pass_by_reference)
-				i++
-			}
-		}
-	}
-}
 func ZendCompileTypename(ast *ZendAst, force_allow_null ZendBool) ZendType {
 	var allow_null ZendBool = force_allow_null
 	var orig_ast_attr ZendAstAttr = ast.GetAttr()
@@ -723,5 +701,4 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 	if op_array.IsVariadic() {
 		op_array.GetNumArgs()--
 	}
-	ZendSetFunctionArgFlags((*ZendFunction)(op_array))
 }

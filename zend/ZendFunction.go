@@ -4,13 +4,21 @@ package zend
 
 type functionHeader struct {
 	// type(8) + argFlags(24) 的组合数据
-	typeArgFlags uint32
+	typ             uint8
+	fnFlags         uint32
+	functionName    string
+	scope           *ZendClassEntry
+	prototype       *ZendFunction
+	requiredNumArgs uint32
+	argInfos        []ArgInfo
 }
 
-func (this *functionHeader) GetType() uint8 { return uint8(this.typeArgFlags | 0xff) }
-func (this *functionHeader) SetType(typ uint8) {
-	this.typeArgFlags = (this.typeArgFlags & 0x00ffffff) | uint32(typ)
-}
+func (this *functionHeader) GetType() uint8             { return this.typ }
+func (this *functionHeader) SetType(typ uint8)          { this.typ = typ }
+func (this *functionHeader) GetFnFlags() uint32         { return this.fnFlags }
+func (this *functionHeader) SetFnFlags(flags uint32)    { this.fnFlags = flags }
+func (this *functionHeader) GetNumArgs() uint32         { return uint32(len(this.argInfos)) }
+func (this *functionHeader) GetRequiredNumArgs() uint32 { return this.requiredNumArgs }
 
 /**
  * ZendFunction
@@ -20,52 +28,54 @@ type ZendFunction struct /* union */ {
 	type_           ZendUchar
 	quick_arg_flags uint32
 	common          struct {
-		type_             ZendUchar
-		arg_flags         [3]ZendUchar
-		fn_flags          uint32
-		function_name     *ZendString
-		scope             *ZendClassEntry
-		prototype         *ZendFunction
-		num_args          uint32
-		required_num_args uint32
-		arg_info          *ZendArgInfo
+		//type_ ZendUchar
+		//arg_flags         [3]ZendUchar
+		//fn_flags          uint32
+		function_name *ZendString
+		scope         *ZendClassEntry
+		prototype     *ZendFunction
+		//num_args          uint32
+		//required_num_args uint32
+		arg_info *ZendArgInfo
 	}
 	op_array          ZendOpArray
 	internal_function ZendInternalFunction
 }
 
-func (this *ZendFunction) ArgInfos() []ZendArgInfo {} // todo
+func (this *ZendFunction) ZEND_CHECK_ARG_FLAG(argNum1 uint32, mask uint8) bool {
+	return this.CheckArgSendType(argNum1, mask)
+}
 
-func (this *ZendFunction) GetQuickArgFlags() uint32                  { return this.quick_arg_flags }
-func (this *ZendFunction) GetCommonType() ZendUchar                  { return this.common.type_ }
-func (this *ZendFunction) GetArgFlags() []ZendUchar                  { return this.common.arg_flags }
-func (this *ZendFunction) GetFnFlags() uint32                        { return this.common.fn_flags }
-func (this *ZendFunction) SetFnFlags(value uint32)                   { this.common.fn_flags = value }
+func (this *ZendFunction) CheckArgSendType(argNum1 uint32, mask uint8) bool {
+	argNum := int(argNum1 - 1) // 传入参数从 1 开始计数
+	if argNum >= len(this.argInfos) {
+		if !this.IsVariadic() {
+			return false
+		}
+		argNum = len(this.argInfos) - 1
+	}
+	return this.argInfos[argNum].PassByReference()&mask != 0
+}
+
+func (this *ZendFunction) GetCommonType() ZendUchar                  { return this.GetType() }
 func (this *ZendFunction) GetFunctionName() *ZendString              { return this.common.function_name }
 func (this *ZendFunction) SetFunctionName(value *ZendString)         { this.common.function_name = value }
 func (this *ZendFunction) GetScope() *ZendClassEntry                 { return this.common.scope }
 func (this *ZendFunction) SetScope(value *ZendClassEntry)            { this.common.scope = value }
 func (this *ZendFunction) GetPrototype() *ZendFunction               { return this.common.prototype }
 func (this *ZendFunction) SetPrototype(value *ZendFunction)          { this.common.prototype = value }
-func (this *ZendFunction) GetNumArgs() uint32                        { return this.common.num_args }
-func (this *ZendFunction) GetRequiredNumArgs() uint32                { return this.common.required_num_args }
 func (this *ZendFunction) GetArgInfo() *ZendArgInfo                  { return this.common.arg_info }
 func (this *ZendFunction) SetArgInfo(value *ZendArgInfo)             { this.common.arg_info = value }
 func (this *ZendFunction) GetOpArray() ZendOpArray                   { return this.op_array }
 func (this *ZendFunction) GetInternalFunction() ZendInternalFunction { return this.internal_function }
 
-/* ZendFunction.quick_arg_flags */
-func (this *ZendFunction) AddQuickArgFlags(value uint32) { this.quick_arg_flags |= value }
-
 /* ZendFunction.common.fn_flags */
-func (this *ZendFunction) AddFnFlags(value uint32)      { this.common.fn_flags |= value }
-func (this *ZendFunction) SubFnFlags(value uint32)      { this.common.fn_flags &^= value }
-func (this *ZendFunction) HasFnFlags(value uint32) bool { return this.common.fn_flags&value != 0 }
+func (this *ZendFunction) HasFnFlags(value uint32) bool { return this.GetFnFlags()&value != 0 }
 func (this *ZendFunction) SwitchFnFlags(value uint32, cond bool) {
 	if cond {
-		this.AddFnFlags(value)
+		this.SetFnFlags(this.GetFnFlags() | value)
 	} else {
-		this.SubFnFlags(value)
+		this.SetFnFlags(this.GetFnFlags() &^ value)
 	}
 }
 func (this ZendFunction) IsVariadic() bool      { return this.HasFnFlags(ZEND_ACC_VARIADIC) }

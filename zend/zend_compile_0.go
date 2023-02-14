@@ -142,14 +142,7 @@ func ZendGetUnmangledPropertyName(mangled_prop *ZendString) *byte {
 }
 func ZEND_USER_CODE(type_ ZendUchar) bool { return (type_ & 1) == 0 }
 func ZendCheckArgSendType(zf *ZendFunction, arg_num uint32, mask uint32) int {
-	arg_num--
-	if arg_num >= zf.GetNumArgs() {
-		if !zf.IsVariadic() {
-			return 0
-		}
-		arg_num = zf.GetNumArgs()
-	}
-	return (zf.GetArgInfo()[arg_num].GetPassByReference() & mask) != 0
+	return intBool(zf.CheckArgSendType(arg_num, uint8(mask)))
 }
 func ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_BY_REF)
@@ -160,11 +153,9 @@ func ARG_SHOULD_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
 func ARG_MAY_BE_SENT_BY_REF(zf *ZendFunction, arg_num uint32) int {
 	return ZendCheckArgSendType(zf, arg_num, ZEND_SEND_PREFER_REF)
 }
-func ZEND_SET_ARG_FLAG(zf *ZendFunction, arg_num uint32, mask __auto__) {
-	zf.AddQuickArgFlags(mask << 6 << arg_num * 2)
-}
-func ZEND_CHECK_ARG_FLAG(zf *ZendFunction, arg_num int, mask __auto__) int {
-	return zf.GetQuickArgFlags() >> (arg_num + 3) * 2 & mask
+
+func ZEND_CHECK_ARG_FLAG(zf *ZendFunction, arg_num uint32, mask uint8) int {
+	return intBool(zf.CheckArgSendType(arg_num, mask))
 }
 func QUICK_ARG_MUST_BE_SENT_BY_REF(zf *ZendFunction, arg_num int) int {
 	return ZEND_CHECK_ARG_FLAG(zf, arg_num, ZEND_SEND_BY_REF)

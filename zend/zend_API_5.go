@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ZendStartupModuleZval(zv *Zval) int {
@@ -353,7 +352,6 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 			internal_function.SetNumArgs(0)
 			internal_function.SetRequiredNumArgs(0)
 		}
-		ZendSetFunctionArgFlags((*ZendFunction)(internal_function))
 		if ptr.IsAbstract() {
 			if scope != nil {
 
