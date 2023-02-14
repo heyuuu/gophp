@@ -59,24 +59,24 @@ const ZEND_CLOSURE_PRINT_NAME = "Closure object"
 
 var ClosureHandlers ZendObjectHandlers
 var ArginfoClosureBindto []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("newthis", 0, 0, 0),
-	MakeZendInternalArgInfo("newscope", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("newthis"),
+	MakeArgInfo("newscope"),
 }
 var ArginfoClosureBind []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	MakeZendInternalArgInfo("closure", 0, 0, 0),
-	MakeZendInternalArgInfo("newthis", 0, 0, 0),
-	MakeZendInternalArgInfo("newscope", 0, 0, 0),
+	MakeReturnArgInfo(2),
+	MakeArgInfo("closure"),
+	MakeArgInfo("newthis"),
+	MakeArgInfo("newscope"),
 }
 var ArginfoClosureCall []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("newthis", 0, 0, 0),
-	MakeZendInternalArgInfo("parameters", 0, 0, 1),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("newthis"),
+	MakeArgInfo("parameters",ArgInfoVariadic()),
 }
 var ArginfoClosureFromcallable []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("callable", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("callable"),
 }
 var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__construct", zim_Closure___construct, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PRIVATE),

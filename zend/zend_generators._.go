@@ -71,15 +71,15 @@ var ZendGeneratorHandlers ZendObjectHandlers
 
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
 var ArginfoGeneratorVoid []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
+	MakeReturnArgInfo(-1),
 }
 var ArginfoGeneratorSend []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("value", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("value"),
 }
 var ArginfoGeneratorThrow []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("exception", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("exception"),
 }
 var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("rewind", zim_Generator_rewind, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),

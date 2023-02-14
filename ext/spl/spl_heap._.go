@@ -75,25 +75,25 @@ type SplPtrHeapCmpFunc func(any, any, *zend.Zval) int
 var SplHeapItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplHeapItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
 var SplPqueueItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplPqueueItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
 var ArginfoHeapInsert []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoHeapCompare []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value2", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value1"),
+	zend.MakeArgInfo("value2"),
 }
 var ArginfoPqueueInsert []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("priority", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
+	zend.MakeArgInfo("priority"),
 }
 var ArginfoPqueueSetflags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoSplheapVoid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_SplMinHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("compare", zim_spl_SplMinHeap_compare, ArginfoHeapCompare, uint32(b.SizeOf("arginfo_heap_compare")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PROTECTED),

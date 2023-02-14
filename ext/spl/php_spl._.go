@@ -94,71 +94,71 @@ Return hash id for given object */
  */
 
 var ArginfoIteratorToArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("use_keys", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("use_keys"),
 }
 var ArginfoIterator []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 }
 var ArginfoIteratorApply []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("function", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1), 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("function"),
+	zend.MakeArgInfo("args",ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1))),
 }
 var ArginfoClassParents []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("instance", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("instance"),
+	zend.MakeArgInfo("autoload"),
 }
 var ArginfoClassImplements []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("what"),
+	zend.MakeArgInfo("autoload"),
 }
 var ArginfoClassUses []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("what"),
+	zend.MakeArgInfo("autoload"),
 }
 var ArginfoSplClasses []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoSplAutoloadFunctions []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoSplAutoload []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("file_extensions", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("class_name"),
+	zend.MakeArgInfo("file_extensions"),
 }
 var ArginfoSplAutoloadExtensions []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("file_extensions", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("file_extensions"),
 }
 var ArginfoSplAutoloadCall []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("class_name"),
 }
 var ArginfoSplAutoloadRegister []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("autoload_function", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("throw", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("prepend", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("autoload_function"),
+	zend.MakeArgInfo("throw"),
+	zend.MakeArgInfo("prepend"),
 }
 var ArginfoSplAutoloadUnregister []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("autoload_function", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("autoload_function"),
 }
 var ArginfoSplObjectHash []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("obj", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("obj"),
 }
 var ArginfoSplObjectId []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("obj", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("obj"),
 }
 var SplFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("spl_classes", ZifSplClasses, ArginfoSplClasses, uint32(b.SizeOf("arginfo_spl_classes")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),

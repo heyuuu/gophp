@@ -43,17 +43,17 @@ var LeBucket int
 /* define the __special__  base filter class */
 
 var ArginfoPhpUserFilterFilter []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("in", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("out", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("consumed", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("closing", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("in"),
+	zend.MakeArgInfo("out"),
+	zend.MakeArgInfo("consumed",ArgInfoByRef(1)),
+	zend.MakeArgInfo("closing"),
 }
 var arginfo_php_user_filter_onCreate []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var arginfo_php_user_filter_onClose []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("filter", ZifUserFilterNop, ArginfoPhpUserFilterFilter, uint32(b.SizeOf("arginfo_php_user_filter_filter")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),

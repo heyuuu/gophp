@@ -83,2437 +83,2437 @@ var IncompleteClassEntry *zend.ZendClassEntry = nil
 /* {{{ arginfo */
 
 var ArginfoSetTimeLimit []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("seconds", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("seconds"),
 }
 var ArginfoHeaderRegisterCallback []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("callback"),
 }
 var ArginfoObStart []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("user_function", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("chunk_size", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("user_function"),
+	zend.MakeArgInfo("chunk_size"),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoObFlush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObClean []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObEndFlush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObEndClean []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetFlush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetClean []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetContents []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetLevel []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetLength []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObListHandlers []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoObGetStatus []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("full_status", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("full_status"),
 }
 var ArginfoObImplicitFlush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flag", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("flag"),
 }
 var ArginfoOutputResetRewriteVars []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoOutputAddRewriteVar []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("name"),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoStreamWrapperRegister []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("classname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("protocol"),
+	zend.MakeArgInfo("classname"),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoStreamWrapperUnregister []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("protocol"),
 }
 var ArginfoStreamWrapperRestore []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("protocol"),
 }
 var ArginfoKrsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoKsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoCount []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoNatsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoNatcasesort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoAsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoArsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoSort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoRsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("sort_flags"),
 }
 var ArginfoUsort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("cmp_function", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("cmp_function"),
 }
 var ArginfoUasort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("cmp_function", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("cmp_function"),
 }
 var ArginfoUksort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("cmp_function", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("cmp_function"),
 }
 var ArginfoEnd []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoPrev []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoNext []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoReset []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoCurrent []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoKey []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoMin []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoMax []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoArrayWalk []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("funcname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("userdata", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("input",ArgInfoByRef(1)),
+	zend.MakeArgInfo("funcname"),
+	zend.MakeArgInfo("userdata"),
 }
 var ArginfoArrayWalkRecursive []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("funcname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("userdata", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("input",ArgInfoByRef(1)),
+	zend.MakeArgInfo("funcname"),
+	zend.MakeArgInfo("userdata"),
 }
 var ArginfoInArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("strict", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("strict"),
 }
 var ArginfoArraySearch []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("strict", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("strict"),
 }
 var ArginfoExtract []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, zend.ZEND_SEND_PREFER_REF, 0),
-	zend.MakeZendInternalArgInfo("extract_type", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("prefix", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
+	zend.MakeArgInfo("extract_type"),
+	zend.MakeArgInfo("prefix"),
 }
 var ArginfoCompact []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var_names", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var_names",ArgInfoVariadic()),
 }
 var ArginfoArrayFill []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("start_key", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("num", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("val", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("start_key"),
+	zend.MakeArgInfo("num"),
+	zend.MakeArgInfo("val"),
 }
 var ArginfoArrayFillKeys []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("keys", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("val", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("keys"),
+	zend.MakeArgInfo("val"),
 }
 var ArginfoRange []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("low", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("high", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("step", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("low"),
+	zend.MakeArgInfo("high"),
+	zend.MakeArgInfo("step"),
 }
 var ArginfoShuffle []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
 }
 var ArginfoArrayPush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stack", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("stack",ArgInfoByRef(1)),
+	zend.MakeArgInfo("vars",ArgInfoVariadic()),
 }
 var ArginfoArrayPop []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stack", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stack",ArgInfoByRef(1)),
 }
 var ArginfoArrayShift []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stack", 0, 1, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stack",ArgInfoByRef(1)),
 }
 var ArginfoArrayUnshift []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stack", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("stack",ArgInfoByRef(1)),
+	zend.MakeArgInfo("vars",ArgInfoVariadic()),
 }
 var ArginfoArraySplice []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replacement", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arg",ArgInfoByRef(1)),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("length"),
+	zend.MakeArgInfo("replacement"),
 }
 var ArginfoArraySlice []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preserve_keys", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("length"),
+	zend.MakeArgInfo("preserve_keys"),
 }
 var ArginfoArrayMerge []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayMergeRecursive []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayReplace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayReplaceRecursive []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayKeys []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("search_value", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("strict", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("search_value"),
+	zend.MakeArgInfo("strict"),
 }
 var ArginfoArrayKeyFirst []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayKeyLast []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayValues []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayCountValues []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayColumn []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("column_key", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("index_key", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("column_key"),
+	zend.MakeArgInfo("index_key"),
 }
 var ArginfoArrayReverse []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preserve_keys", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("preserve_keys"),
 }
 var ArginfoArrayPad []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pad_size", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pad_value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("pad_size"),
+	zend.MakeArgInfo("pad_value"),
 }
 var ArginfoArrayFlip []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayChangeKeyCase []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("case", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("case"),
 }
 var ArginfoArrayUnique []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoArrayIntersectKey []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayIntersectUkey []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_compare_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_key_compare_func"),
 }
 var ArginfoArrayIntersect []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayUintersect []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_compare_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_compare_func"),
 }
 var ArginfoArrayIntersectAssoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayUintersectAssoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_compare_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_compare_func"),
 }
 var ArginfoArrayIntersectUassoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_compare_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_key_compare_func"),
 }
 var ArginfoArrayUintersectUassoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_compare_func", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_compare_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_compare_func"),
+	zend.MakeArgInfo("callback_key_compare_func"),
 }
 var ArginfoArrayDiffKey []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayDiffUkey []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_comp_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_key_comp_func"),
 }
 var ArginfoArrayDiff []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayUdiff []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_comp_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_comp_func"),
 }
 var ArginfoArrayDiffAssoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayDiffUassoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_comp_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_comp_func"),
 }
 var ArginfoArrayUdiffAssoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_comp_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_key_comp_func"),
 }
 var ArginfoArrayUdiffUassoc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_data_comp_func", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback_key_comp_func", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arr1"),
+	zend.MakeArgInfo("arr2"),
+	zend.MakeArgInfo("callback_data_comp_func"),
+	zend.MakeArgInfo("callback_key_comp_func"),
 }
 var ArginfoArrayMultisort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arr1", 0, zend.ZEND_SEND_PREFER_REF, 0),
-	zend.MakeZendInternalArgInfo("sort_order", 0, zend.ZEND_SEND_PREFER_REF, 0),
-	zend.MakeZendInternalArgInfo("sort_flags", 0, zend.ZEND_SEND_PREFER_REF, 0),
-	zend.MakeZendInternalArgInfo("arr2", 0, zend.ZEND_SEND_PREFER_REF, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arr1",ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
+	zend.MakeArgInfo("sort_order",ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
+	zend.MakeArgInfo("sort_flags",ArgInfoByRef(zend.ZEND_SEND_PREFER_REF)),
+	zend.MakeArgInfo("arr2",ArgInfoByRef(zend.ZEND_SEND_PREFER_REF),ArgInfoVariadic()),
 }
 var ArginfoArrayRand []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("num_req", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("num_req"),
 }
 var ArginfoArraySum []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayProduct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoArrayReduce []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("initial", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("callback"),
+	zend.MakeArgInfo("initial"),
 }
 var ArginfoArrayFilter []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("use_keys", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("callback"),
+	zend.MakeArgInfo("use_keys"),
 }
 var ArginfoArrayMap []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arrays", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("callback"),
+	zend.MakeArgInfo("arrays",ArgInfoVariadic()),
 }
 var ArginfoArrayKeyExists []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("key", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("search", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("key"),
+	zend.MakeArgInfo("search"),
 }
 var ArginfoArrayChunk []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preserve_keys", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("arg"),
+	zend.MakeArgInfo("size"),
+	zend.MakeArgInfo("preserve_keys"),
 }
 var ArginfoArrayCombine []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("keys", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("values", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("keys"),
+	zend.MakeArgInfo("values"),
 }
 var ArginfoGetMagicQuotesGpc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetMagicQuotesRuntime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoConstant []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("const_name", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("const_name"),
 }
 var ArginfoInetNtop []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("in_addr", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("in_addr"),
 }
 var ArginfoInetPton []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("ip_address", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("ip_address"),
 }
 var ArginfoIp2long []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("ip_address", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("ip_address"),
 }
 var ArginfoLong2ip []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("proper_address", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("proper_address"),
 }
 var ArginfoGetenv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("varname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("local_only", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("varname"),
+	zend.MakeArgInfo("local_only"),
 }
 var ArginfoPutenv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("setting", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("setting"),
 }
 var ArginfoGetopt []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("opts", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("optind", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("options"),
+	zend.MakeArgInfo("opts"),
+	zend.MakeArgInfo("optind",ArgInfoByRef(1)),
 }
 var ArginfoFlush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoSleep []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("seconds", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("seconds"),
 }
 var ArginfoUsleep []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("micro_seconds", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("micro_seconds"),
 }
 var ArginfoTimeNanosleep []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("seconds", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("nanoseconds", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("seconds"),
+	zend.MakeArgInfo("nanoseconds"),
 }
 var ArginfoTimeSleepUntil []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("timestamp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("timestamp"),
 }
 var ArginfoGetCurrentUser []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetCfgVar []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("option_name", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("option_name"),
 }
 var ArginfoErrorLog []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("message", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("message_type", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("destination", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("extra_headers", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("message"),
+	zend.MakeArgInfo("message_type"),
+	zend.MakeArgInfo("destination"),
+	zend.MakeArgInfo("extra_headers"),
 }
 var ArginfoErrorGetLast []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
 }
 var ArginfoErrorClearLast []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
 }
 var ArginfoCallUserFunc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters",ArgInfoVariadic()),
 }
 var ArginfoCallUserFuncArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters"),
 }
 var ArginfoForwardStaticCall []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters",ArgInfoVariadic()),
 }
 var ArginfoForwardStaticCallArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters"),
 }
 var ArginfoRegisterShutdownFunction []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters",ArgInfoVariadic()),
 }
 var ArginfoHighlightFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("file_name"),
+	zend.MakeArgInfo("return"),
 }
 var ArginfoPhpStripWhitespace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("file_name"),
 }
 var ArginfoHighlightString []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("return"),
 }
 var ArginfoIniGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("varname", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("varname"),
 }
 var ArginfoIniGetAll []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("extension", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("details", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("extension"),
+	zend.MakeArgInfo("details"),
 }
 var ArginfoIniSet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("varname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("newvalue", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("varname"),
+	zend.MakeArgInfo("newvalue"),
 }
 var ArginfoIniRestore []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("varname", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("varname"),
 }
 var ArginfoSetIncludePath []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("new_include_path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("new_include_path"),
 }
 var ArginfoGetIncludePath []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoRestoreIncludePath []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoPrintR []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
+	zend.MakeArgInfo("return"),
 }
 var ArginfoConnectionAborted []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoConnectionStatus []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoIgnoreUserAbort []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoGetservbyname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("service", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("service"),
+	zend.MakeArgInfo("protocol"),
 }
 var ArginfoGetservbyport []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("port", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("port"),
+	zend.MakeArgInfo("protocol"),
 }
 var ArginfoGetprotobyname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("name", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("name"),
 }
 var ArginfoGetprotobynumber []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("proto", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("proto"),
 }
 var ArginfoRegisterTickFunction []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("parameters", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("function_name"),
+	zend.MakeArgInfo("parameters",ArgInfoVariadic()),
 }
 var ArginfoUnregisterTickFunction []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("function_name", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("function_name"),
 }
 var ArginfoIsUploadedFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("path"),
 }
 var ArginfoMoveUploadedFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("new_path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("new_path"),
 }
 var ArginfoParseIniFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("process_sections", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("scanner_mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("process_sections"),
+	zend.MakeArgInfo("scanner_mode"),
 }
 var ArginfoParseIniString []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("ini_string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("process_sections", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("scanner_mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("ini_string"),
+	zend.MakeArgInfo("process_sections"),
+	zend.MakeArgInfo("scanner_mode"),
 }
 var ArginfoSysGetloadavg []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoAssert []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("assertion", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("description", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("assertion"),
+	zend.MakeArgInfo("description"),
 }
 var ArginfoAssertOptions []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("what"),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoBase64Encode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoBase64Decode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("strict", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("strict"),
 }
 var ArginfoGetBrowser []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("browser_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return_array", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("browser_name"),
+	zend.MakeArgInfo("return_array"),
 }
 var ArginfoCrc32 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoCrypt []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("salt", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("salt"),
 }
 var ArginfoConvertCyrString []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("from", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("to", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("from"),
+	zend.MakeArgInfo("to"),
 }
 var ArginfoStrptime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("timestamp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("timestamp"),
+	zend.MakeArgInfo("format"),
 }
 var ArginfoOpendir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoDir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("directory", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("directory"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoClosedir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dir_handle", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("dir_handle"),
 }
 var ArginfoChroot []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("directory", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("directory"),
 }
 var ArginfoChdir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("directory", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("directory"),
 }
 var ArginfoGetcwd []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoRewinddir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dir_handle", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("dir_handle"),
 }
 var ArginfoReaddir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dir_handle", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("dir_handle"),
 }
 var ArginfoGlob []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pattern", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("pattern"),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoScandir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dir", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("sorting_order", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("dir"),
+	zend.MakeArgInfo("sorting_order"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoGethostbyaddr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("ip_address", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("ip_address"),
 }
 var ArginfoGethostbyname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("hostname"),
 }
 var ArginfoGethostbynamel []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("hostname"),
 }
 var ArginfoGethostname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoNetGetInterfaces []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoDnsCheckRecord []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("host", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("type", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("host"),
+	zend.MakeArgInfo("type"),
 }
 var ArginfoDnsGetRecord []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("type", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("authns", zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1), 1, 0),
-	zend.MakeZendInternalArgInfo("addtl", zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1), 1, 0),
-	zend.MakeZendInternalArgInfo("raw", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("hostname"),
+	zend.MakeArgInfo("type"),
+	zend.MakeArgInfo("authns",ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1)),ArgInfoByRef(1)),
+	zend.MakeArgInfo("addtl",ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1)),ArgInfoByRef(1)),
+	zend.MakeArgInfo("raw"),
 }
 var ArginfoDnsGetMx []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mxhosts", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("weight", 0, 1, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("hostname"),
+	zend.MakeArgInfo("mxhosts",ArgInfoByRef(1)),
+	zend.MakeArgInfo("weight",ArgInfoByRef(1)),
 }
 var ArginfoExec []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("output", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("return_value", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("command"),
+	zend.MakeArgInfo("output",ArgInfoByRef(1)),
+	zend.MakeArgInfo("return_value",ArgInfoByRef(1)),
 }
 var ArginfoSystem []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return_value", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("command"),
+	zend.MakeArgInfo("return_value",ArgInfoByRef(1)),
 }
 var ArginfoPassthru []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return_value", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("command"),
+	zend.MakeArgInfo("return_value",ArgInfoByRef(1)),
 }
 var ArginfoEscapeshellcmd []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("command"),
 }
 var ArginfoEscapeshellarg []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("arg", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("arg"),
 }
 var ArginfoShellExec []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("cmd", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("cmd"),
 }
 var ArginfoProcNice []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("priority", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("priority"),
 }
 var ArginfoFlock []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("operation", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("wouldblock", 0, 1, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("operation"),
+	zend.MakeArgInfo("wouldblock",ArgInfoByRef(1)),
 }
 var ArginfoGetMetaTags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("use_include_path"),
 }
 var ArginfoFileGetContents []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("maxlen", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("maxlen"),
 }
 var ArginfoFilePutContents []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("data"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoTempnam []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("dir", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("prefix", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("dir"),
+	zend.MakeArgInfo("prefix"),
 }
 var ArginfoTmpfile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoFopen []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("mode"),
+	zend.MakeArgInfo("use_include_path"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoFclose []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoPopen []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("command"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoPclose []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoFeof []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoFgets []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoFgetc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoFgetss []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("allowable_tags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("length"),
+	zend.MakeArgInfo("allowable_tags"),
 }
 var ArginfoFscanf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 1, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("vars",ArgInfoByRef(1),ArgInfoVariadic()),
 }
 var ArginfoFwrite []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoFflush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoRewind []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoFtell []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoFseek []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("whence", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("whence"),
 }
 var ArginfoMkdir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pathname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("recursive", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("pathname"),
+	zend.MakeArgInfo("mode"),
+	zend.MakeArgInfo("recursive"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoRmdir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dirname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("dirname"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoReadfile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoUmask []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mask", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("mask"),
 }
 var ArginfoFpassthru []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoRename []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("old_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("new_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("old_name"),
+	zend.MakeArgInfo("new_name"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoUnlink []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoFtruncate []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("size"),
 }
 var ArginfoFstat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoCopy []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("source_file", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("destination_file", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("source_file"),
+	zend.MakeArgInfo("destination_file"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoFread []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoFputcsv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fields", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("escape_char", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("fields"),
+	zend.MakeArgInfo("delimiter"),
+	zend.MakeArgInfo("enclosure"),
+	zend.MakeArgInfo("escape_char"),
 }
 var ArginfoFgetcsv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("length"),
+	zend.MakeArgInfo("delimiter"),
+	zend.MakeArgInfo("enclosure"),
+	zend.MakeArgInfo("escape"),
 }
 var ArginfoRealpath []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("path"),
 }
 var ArginfoFnmatch []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pattern", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("pattern"),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoSysGetTempDir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoDiskTotalSpace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("path"),
 }
 var ArginfoDiskFreeSpace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("path"),
 }
 var ArginfoChgrp []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("group", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("group"),
 }
 var ArginfoChown []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("user", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("user"),
 }
 var ArginfoLchgrp []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("group", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("group"),
 }
 var ArginfoLchown []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("user", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("user"),
 }
 var ArginfoChmod []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoTouch []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("time", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("atime", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("time"),
+	zend.MakeArgInfo("atime"),
 }
 var ArginfoClearstatcache []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("clear_realpath_cache", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("clear_realpath_cache"),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoRealpathCacheSize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoRealpathCacheGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoFileperms []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFileinode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFilesize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFileowner []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFilegroup []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFileatime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFilemtime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFilectime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFiletype []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsWritable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsReadable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsExecutable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsDir []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoIsLink []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoFileExists []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoLstat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoStat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoSprintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoVsprintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args"),
 }
 var ArginfoPrintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoVprintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args"),
 }
 var ArginfoFprintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoVfprintf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args"),
 }
 var ArginfoFsockopen []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("port", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("errno", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("errstr", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("timeout", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("hostname"),
+	zend.MakeArgInfo("port"),
+	zend.MakeArgInfo("errno",ArgInfoByRef(1)),
+	zend.MakeArgInfo("errstr",ArgInfoByRef(1)),
+	zend.MakeArgInfo("timeout"),
 }
 var ArginfoPfsockopen []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hostname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("port", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("errno", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("errstr", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("timeout", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("hostname"),
+	zend.MakeArgInfo("port"),
+	zend.MakeArgInfo("errno",ArgInfoByRef(1)),
+	zend.MakeArgInfo("errstr",ArgInfoByRef(1)),
+	zend.MakeArgInfo("timeout"),
 }
 var ArginfoFtok []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("pathname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("proj", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("pathname"),
+	zend.MakeArgInfo("proj"),
 }
 var ArginfoHeader []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("header", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("http_response_code", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("header"),
+	zend.MakeArgInfo("replace"),
+	zend.MakeArgInfo("http_response_code"),
 }
 var ArginfoHeaderRemove []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("name", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("name"),
 }
 var ArginfoSetcookie []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("expires_or_options", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("domain", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("secure", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("httponly", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("name"),
+	zend.MakeArgInfo("value"),
+	zend.MakeArgInfo("expires_or_options"),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("domain"),
+	zend.MakeArgInfo("secure"),
+	zend.MakeArgInfo("httponly"),
 }
 var ArginfoSetrawcookie []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("expires_or_options", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("domain", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("secure", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("httponly", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("name"),
+	zend.MakeArgInfo("value"),
+	zend.MakeArgInfo("expires_or_options"),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("domain"),
+	zend.MakeArgInfo("secure"),
+	zend.MakeArgInfo("httponly"),
 }
 var ArginfoHeadersSent []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("file", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("line", 0, 1, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("file",ArgInfoByRef(1)),
+	zend.MakeArgInfo("line",ArgInfoByRef(1)),
 }
 var ArginfoHeadersList []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoHttpResponseCode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("response_code", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("response_code"),
 }
 var ArginfoHrtime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("get_as_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("get_as_number"),
 }
 var ArginfoHtmlspecialchars []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("quote_style", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("encoding", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("double_encode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("quote_style"),
+	zend.MakeArgInfo("encoding"),
+	zend.MakeArgInfo("double_encode"),
 }
 var ArginfoHtmlspecialcharsDecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("quote_style", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("quote_style"),
 }
 var ArginfoHtmlEntityDecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("quote_style", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("encoding", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("quote_style"),
+	zend.MakeArgInfo("encoding"),
 }
 var ArginfoHtmlentities []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("quote_style", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("encoding", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("double_encode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("quote_style"),
+	zend.MakeArgInfo("encoding"),
+	zend.MakeArgInfo("double_encode"),
 }
 var ArginfoGetHtmlTranslationTable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("table", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("quote_style", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("encoding", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("table"),
+	zend.MakeArgInfo("quote_style"),
+	zend.MakeArgInfo("encoding"),
 }
 var ArginfoHttpBuildQuery []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("formdata", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("prefix", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("arg_separator", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("enc_type", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("formdata"),
+	zend.MakeArgInfo("prefix"),
+	zend.MakeArgInfo("arg_separator"),
+	zend.MakeArgInfo("enc_type"),
 }
 var ArginfoImageTypeToMimeType []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("imagetype", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("imagetype"),
 }
 var ArginfoImageTypeToExtension []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("imagetype", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("include_dot", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("imagetype"),
+	zend.MakeArgInfo("include_dot"),
 }
 var ArginfoGetimagesize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("imagefile", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("info", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("imagefile"),
+	zend.MakeArgInfo("info",ArgInfoByRef(1)),
 }
 var ArginfoPhpinfo []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("what"),
 }
 var ArginfoPhpversion []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("extension", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("extension"),
 }
 var ArginfoPhpcredits []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flag", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("flag"),
 }
 var ArginfoPhpSapiName []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoPhpUname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoPhpIniScannedFiles []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoPhpIniLoadedFile []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoIptcembed []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iptcdata", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("jpeg_file_name", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("spool", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("iptcdata"),
+	zend.MakeArgInfo("jpeg_file_name"),
+	zend.MakeArgInfo("spool"),
 }
 var ArginfoIptcparse []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iptcdata", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iptcdata"),
 }
 var ArginfoLcgValue []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoLevenshtein []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("cost_ins", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("cost_rep", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("cost_del", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str1"),
+	zend.MakeArgInfo("str2"),
+	zend.MakeArgInfo("cost_ins"),
+	zend.MakeArgInfo("cost_rep"),
+	zend.MakeArgInfo("cost_del"),
 }
 var ArginfoReadlink []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoLinkinfo []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoSymlink []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("target", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("link", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("target"),
+	zend.MakeArgInfo("link"),
 }
 var ArginfoLink []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("target", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("link", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("target"),
+	zend.MakeArgInfo("link"),
 }
 var ArginfoEzmlmHash []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("addr", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("addr"),
 }
 var ArginfoMail []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("to", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("subject", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("message", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("additional_headers", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("additional_parameters", 0, 0, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("to"),
+	zend.MakeArgInfo("subject"),
+	zend.MakeArgInfo("message"),
+	zend.MakeArgInfo("additional_headers"),
+	zend.MakeArgInfo("additional_parameters"),
 }
 var ArginfoAbs []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoCeil []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoFloor []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoRound []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("precision", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("number"),
+	zend.MakeArgInfo("precision"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoSin []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoCos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoTan []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAsin []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAcos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAtan []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAtan2 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("y", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("x", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("y"),
+	zend.MakeArgInfo("x"),
 }
 var ArginfoSinh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoCosh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoTanh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAsinh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAcosh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoAtanh []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoPi []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoIsFinite []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("val", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("val"),
 }
 var ArginfoIsInfinite []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("val", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("val"),
 }
 var ArginfoIsNan []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("val", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("val"),
 }
 var ArginfoPow []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("base", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("exponent", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("base"),
+	zend.MakeArgInfo("exponent"),
 }
 var ArginfoExp []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoExpm1 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoLog1p []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoLog []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("base", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("number"),
+	zend.MakeArgInfo("base"),
 }
 var ArginfoLog10 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoSqrt []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoHypot []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("num1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("num2", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("num1"),
+	zend.MakeArgInfo("num2"),
 }
 var ArginfoDeg2rad []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoRad2deg []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
 }
 var ArginfoBindec []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("binary_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("binary_number"),
 }
 var ArginfoHexdec []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("hexadecimal_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("hexadecimal_number"),
 }
 var ArginfoOctdec []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("octal_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("octal_number"),
 }
 var ArginfoDecbin []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("decimal_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("decimal_number"),
 }
 var ArginfoDecoct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("decimal_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("decimal_number"),
 }
 var ArginfoDechex []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("decimal_number", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("decimal_number"),
 }
 var ArginfoBaseConvert []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("frombase", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("tobase", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("number"),
+	zend.MakeArgInfo("frombase"),
+	zend.MakeArgInfo("tobase"),
 }
 var ArginfoNumberFormat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("number", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("num_decimal_places", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dec_separator", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("thousands_separator", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("number"),
+	zend.MakeArgInfo("num_decimal_places"),
+	zend.MakeArgInfo("dec_separator"),
+	zend.MakeArgInfo("thousands_separator"),
 }
 var ArginfoFmod []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("x", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("y", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("x"),
+	zend.MakeArgInfo("y"),
 }
 var ArginfoIntdiv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("dividend", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("divisor", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("dividend"),
+	zend.MakeArgInfo("divisor"),
 }
 var ArginfoMd5 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("raw_output", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("raw_output"),
 }
 var ArginfoMd5File []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("raw_output", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("raw_output"),
 }
 var ArginfoMetaphone []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("text", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("phones", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("text"),
+	zend.MakeArgInfo("phones"),
 }
 var ArginfoMicrotime []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("get_as_float", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("get_as_float"),
 }
 var ArginfoGettimeofday []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("get_as_float", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("get_as_float"),
 }
 var ArginfoGetrusage []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("who", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("who"),
 }
 var ArginfoPack []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("args", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("args",ArgInfoVariadic()),
 }
 var ArginfoUnpack []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoGetmyuid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetmygid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetmypid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetmyinode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoGetlastmod []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoPasswordHash []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("password", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("algo", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("password"),
+	zend.MakeArgInfo("algo"),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoPasswordGetInfo []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hash", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("hash"),
 }
 var ArginfoPasswordNeedsRehash []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hash", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("algo", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("hash"),
+	zend.MakeArgInfo("algo"),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoPasswordVerify []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("password", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("hash", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("password"),
+	zend.MakeArgInfo("hash"),
 }
 var ArginfoPasswordAlgos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoProcTerminate []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("process", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("signal", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("process"),
+	zend.MakeArgInfo("signal"),
 }
 var ArginfoProcClose []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("process", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("process"),
 }
 var ArginfoProcGetStatus []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("process", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("process"),
 }
 var ArginfoProcOpen []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("command", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("descriptorspec", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pipes", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("cwd", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("env", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("other_options", 0, 0, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("command"),
+	zend.MakeArgInfo("descriptorspec"),
+	zend.MakeArgInfo("pipes",ArgInfoByRef(1)),
+	zend.MakeArgInfo("cwd"),
+	zend.MakeArgInfo("env"),
+	zend.MakeArgInfo("other_options"),
 }
 var ArginfoQuotedPrintableDecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoQuotedPrintableEncode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoMtSrand []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("seed", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("seed"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoMtRand []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("min", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("max", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("min"),
+	zend.MakeArgInfo("max"),
 }
 var ArginfoMtGetrandmax []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoRandomBytes []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoRandomInt []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("min", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("max", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("min"),
+	zend.MakeArgInfo("max"),
 }
 var ArginfoSha1 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("raw_output", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("raw_output"),
 }
 var ArginfoSha1File []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("raw_output", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("filename"),
+	zend.MakeArgInfo("raw_output"),
 }
 var ArginfoSoundex []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStreamSocketPair []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("domain", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("type", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("protocol", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("domain"),
+	zend.MakeArgInfo("type"),
+	zend.MakeArgInfo("protocol"),
 }
 var ArginfoStreamSocketClient []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("remoteaddress", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("errcode", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("errstring", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("timeout", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("remoteaddress"),
+	zend.MakeArgInfo("errcode",ArgInfoByRef(1)),
+	zend.MakeArgInfo("errstring",ArgInfoByRef(1)),
+	zend.MakeArgInfo("timeout"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoStreamSocketServer []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("localaddress", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("errcode", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("errstring", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("localaddress"),
+	zend.MakeArgInfo("errcode",ArgInfoByRef(1)),
+	zend.MakeArgInfo("errstring",ArgInfoByRef(1)),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoStreamSocketAccept []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("serverstream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("timeout", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("peername", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("serverstream"),
+	zend.MakeArgInfo("timeout"),
+	zend.MakeArgInfo("peername",ArgInfoByRef(1)),
 }
 var ArginfoStreamSocketGetName []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("want_peer", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("want_peer"),
 }
 var ArginfoStreamSocketSendto []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("target_addr", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("data"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("target_addr"),
 }
 var ArginfoStreamSocketRecvfrom []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("amount", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("remote_addr", 0, 1, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("amount"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("remote_addr",ArgInfoByRef(1)),
 }
 var ArginfoStreamGetContents []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("source", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("maxlen", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("source"),
+	zend.MakeArgInfo("maxlen"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoStreamCopyToStream []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("source", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("dest", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("maxlen", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pos", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("source"),
+	zend.MakeArgInfo("dest"),
+	zend.MakeArgInfo("maxlen"),
+	zend.MakeArgInfo("pos"),
 }
 var ArginfoStreamGetMetaData []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
 }
 var ArginfoStreamGetTransports []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoStreamGetWrappers []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoStreamResolveIncludePath []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filename", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filename"),
 }
 var ArginfoStreamIsLocal []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream"),
 }
 var ArginfoStreamSupportsLock []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("stream"),
 }
 var ArginfoStreamIsatty []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("stream"),
 }
 var ArginfoStreamSelect []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(4)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("read_streams", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("write_streams", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("except_streams", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("tv_sec", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("tv_usec", 0, 0, 0),
+	zend.MakeReturnArgInfo(4),
+	zend.MakeArgInfo("read_streams",ArgInfoByRef(1)),
+	zend.MakeArgInfo("write_streams",ArgInfoByRef(1)),
+	zend.MakeArgInfo("except_streams",ArgInfoByRef(1)),
+	zend.MakeArgInfo("tv_sec"),
+	zend.MakeArgInfo("tv_usec"),
 }
 var ArginfoStreamContextGetOptions []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream_or_context", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream_or_context"),
 }
 var ArginfoStreamContextSetOption []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream_or_context", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("wrappername", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("optionname", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream_or_context"),
+	zend.MakeArgInfo("wrappername"),
+	zend.MakeArgInfo("optionname"),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoStreamContextSetParams []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream_or_context", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream_or_context"),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoStreamContextGetParams []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream_or_context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("stream_or_context"),
 }
 var ArginfoStreamContextGetDefault []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoStreamContextSetDefault []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoStreamContextCreate []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("params", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("options"),
+	zend.MakeArgInfo("params"),
 }
 var ArginfoStreamFilterPrepend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filtername", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("read_write", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filterparams", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("filtername"),
+	zend.MakeArgInfo("read_write"),
+	zend.MakeArgInfo("filterparams"),
 }
 var ArginfoStreamFilterAppend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filtername", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("read_write", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("filterparams", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("filtername"),
+	zend.MakeArgInfo("read_write"),
+	zend.MakeArgInfo("filterparams"),
 }
 var ArginfoStreamFilterRemove []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream_filter", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream_filter"),
 }
 var ArginfoStreamGetLine []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("maxlen", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("ending", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("maxlen"),
+	zend.MakeArgInfo("ending"),
 }
 var ArginfoStreamSetBlocking []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("socket", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("socket"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoStreamSetTimeout []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("seconds", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("microseconds", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("seconds"),
+	zend.MakeArgInfo("microseconds"),
 }
 var ArginfoStreamSetReadBuffer []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("buffer", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("buffer"),
 }
 var ArginfoStreamSetWriteBuffer []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("buffer", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("buffer"),
 }
 var ArginfoStreamSetChunkSize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("fp", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("chunk_size", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("fp"),
+	zend.MakeArgInfo("chunk_size"),
 }
 var ArginfoStreamSocketEnableCrypto []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("enable", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("cryptokind", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("sessionstream", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("enable"),
+	zend.MakeArgInfo("cryptokind"),
+	zend.MakeArgInfo("sessionstream"),
 }
 var ArginfoStreamSocketShutdown []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("how", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("how"),
 }
 var ArginfoBin2hex []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoHex2bin []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoStrspn []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mask", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("start", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("len", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("mask"),
+	zend.MakeArgInfo("start"),
+	zend.MakeArgInfo("len"),
 }
 var ArginfoStrcspn []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mask", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("start", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("len", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("mask"),
+	zend.MakeArgInfo("start"),
+	zend.MakeArgInfo("len"),
 }
 var ArginfoStrcoll []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str2", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str1"),
+	zend.MakeArgInfo("str2"),
 }
 var ArginfoTrim []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("character_mask", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("character_mask"),
 }
 var ArginfoRtrim []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("character_mask", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("character_mask"),
 }
 var ArginfoLtrim []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("character_mask", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("character_mask"),
 }
 var ArginfoWordwrap []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("width", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("break", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("cut", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("width"),
+	zend.MakeArgInfo("break"),
+	zend.MakeArgInfo("cut"),
 }
 var ArginfoExplode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("separator", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("limit", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("separator"),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("limit"),
 }
 var ArginfoImplode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("glue", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pieces", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("glue"),
+	zend.MakeArgInfo("pieces"),
 }
 var ArginfoStrtok []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("token", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("token"),
 }
 var ArginfoStrtoupper []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStrtolower []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoBasename []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("suffix", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("suffix"),
 }
 var ArginfoDirname []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("levels", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("levels"),
 }
 var ArginfoPathinfo []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("options", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("path"),
+	zend.MakeArgInfo("options"),
 }
 var ArginfoStristr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("part", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("part"),
 }
 var ArginfoStrstr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("part", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("part"),
 }
 var ArginfoStrpos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoStripos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoStrrpos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoStrripos []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("offset"),
 }
 var ArginfoStrrchr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
 }
 var ArginfoChunkSplit []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("chunklen", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("ending", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("chunklen"),
+	zend.MakeArgInfo("ending"),
 }
 var ArginfoSubstr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("start", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("start"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoSubstrReplace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("start", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("replace"),
+	zend.MakeArgInfo("start"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoQuotemeta []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoOrd []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("character", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("character"),
 }
 var ArginfoChr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("codepoint", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("codepoint"),
 }
 var ArginfoUcfirst []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoLcfirst []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoUcwords []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("delimiters", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("delimiters"),
 }
 var ArginfoStrtr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("from", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("to", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("from"),
+	zend.MakeArgInfo("to"),
 }
 var ArginfoStrrev []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoSimilarText []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("percent", 0, 1, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str1"),
+	zend.MakeArgInfo("str2"),
+	zend.MakeArgInfo("percent",ArgInfoByRef(1)),
 }
 var ArginfoAddcslashes []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("charlist", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("charlist"),
 }
 var ArginfoAddslashes []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStripcslashes []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStripslashes []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStrReplace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("search", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("subject", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace_count", 0, 1, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("search"),
+	zend.MakeArgInfo("replace"),
+	zend.MakeArgInfo("subject"),
+	zend.MakeArgInfo("replace_count",ArgInfoByRef(1)),
 }
 var ArginfoStrIreplace []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("search", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("subject", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("replace_count", 0, 1, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("search"),
+	zend.MakeArgInfo("replace"),
+	zend.MakeArgInfo("subject"),
+	zend.MakeArgInfo("replace_count",ArgInfoByRef(1)),
 }
 var ArginfoHebrev []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("max_chars_per_line", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("max_chars_per_line"),
 }
 var ArginfoHebrevc []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("max_chars_per_line", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("max_chars_per_line"),
 }
 var ArginfoNl2br []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("is_xhtml", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("is_xhtml"),
 }
 var ArginfoStripTags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("allowable_tags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("allowable_tags"),
 }
 var ArginfoSetlocale []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("category", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("locales", 0, 0, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("category"),
+	zend.MakeArgInfo("locales",ArgInfoVariadic()),
 }
 var ArginfoParseStr []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("encoded_string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("result", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("encoded_string"),
+	zend.MakeArgInfo("result",ArgInfoByRef(1)),
 }
 var ArginfoStrGetcsv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("string"),
+	zend.MakeArgInfo("delimiter"),
+	zend.MakeArgInfo("enclosure"),
+	zend.MakeArgInfo("escape"),
 }
 var ArginfoStrRepeat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mult", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("mult"),
 }
 var ArginfoCountChars []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoStrnatcmp []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("s1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("s2", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("s1"),
+	zend.MakeArgInfo("s2"),
 }
 var ArginfoLocaleconv []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoStrnatcasecmp []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("s1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("s2", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("s1"),
+	zend.MakeArgInfo("s2"),
 }
 var ArginfoSubstrCount []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("needle", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("needle"),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("length"),
 }
 var ArginfoStrPad []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pad_length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pad_string", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("pad_type", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("input"),
+	zend.MakeArgInfo("pad_length"),
+	zend.MakeArgInfo("pad_string"),
+	zend.MakeArgInfo("pad_type"),
 }
 var ArginfoSscanf []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 1, 1),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("vars",ArgInfoByRef(1),ArgInfoVariadic()),
 }
 var ArginfoStrRot13 []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStrShuffle []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoStrWordCount []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("charlist", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("charlist"),
 }
 var ArginfoMoneyFormat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoStrSplit []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("split_length", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("split_length"),
 }
 var ArginfoStrpbrk []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("haystack", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("char_list", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("haystack"),
+	zend.MakeArgInfo("char_list"),
 }
 var ArginfoSubstrCompare []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("main_str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("case_sensitivity", 0, 0, 0),
+	zend.MakeReturnArgInfo(3),
+	zend.MakeArgInfo("main_str"),
+	zend.MakeArgInfo("str"),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("length"),
+	zend.MakeArgInfo("case_sensitivity"),
 }
 var ArginfoUtf8Encode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoUtf8Decode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoOpenlog []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("ident", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("option", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("facility", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("ident"),
+	zend.MakeArgInfo("option"),
+	zend.MakeArgInfo("facility"),
 }
 var ArginfoCloselog []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoSyslog []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("priority", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("message", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("priority"),
+	zend.MakeArgInfo("message"),
 }
 var ArginfoGettype []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoSettype []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 1, 0),
-	zend.MakeZendInternalArgInfo("type", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var",ArgInfoByRef(1)),
+	zend.MakeArgInfo("type"),
 }
 var ArginfoIntval []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("base", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
+	zend.MakeArgInfo("base"),
 }
 var ArginfoFloatval []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoStrval []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoBoolval []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsNull []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsResource []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsBool []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsInt []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsFloat []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsString []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsObject []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsNumeric []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoIsScalar []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
 }
 var ArginfoIsCallable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("syntax_only", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("callable_name", 0, 1, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
+	zend.MakeArgInfo("syntax_only"),
+	zend.MakeArgInfo("callable_name",ArgInfoByRef(1)),
 }
 var ArginfoIsIterable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoIsCountable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoUniqid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("prefix", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("more_entropy", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("prefix"),
+	zend.MakeArgInfo("more_entropy"),
 }
 var ArginfoParseUrl []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("url", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("component", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("url"),
+	zend.MakeArgInfo("component"),
 }
 var ArginfoUrlencode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoUrldecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoRawurlencode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoRawurldecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("str"),
 }
 var ArginfoGetHeaders []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("url", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("url"),
+	zend.MakeArgInfo("format"),
+	zend.MakeArgInfo("context"),
 }
 var ArginfoStreamBucketMakeWriteable []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("brigade", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("brigade"),
 }
 var ArginfoStreamBucketPrepend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("brigade", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("bucket", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("brigade"),
+	zend.MakeArgInfo("bucket"),
 }
 var ArginfoStreamBucketAppend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("brigade", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("bucket", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("brigade"),
+	zend.MakeArgInfo("bucket"),
 }
 var ArginfoStreamBucketNew []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("stream", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("buffer", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("stream"),
+	zend.MakeArgInfo("buffer"),
 }
 var ArginfoStreamGetFilters []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoStreamFilterRegister []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("filtername", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("classname", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("filtername"),
+	zend.MakeArgInfo("classname"),
 }
 var ArginfoConvertUuencode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoConvertUudecode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("data"),
 }
 var ArginfoVarDump []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("vars",ArgInfoVariadic()),
 }
 var ArginfoDebugZvalDump []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("vars", 0, 0, 1),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("vars",ArgInfoVariadic()),
 }
 var ArginfoVarExport []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("return", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("var"),
+	zend.MakeArgInfo("return"),
 }
 var ArginfoSerialize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("var", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("var"),
 }
 var ArginfoUnserialize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("variable_representation", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("allowed_classes", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("variable_representation"),
+	zend.MakeArgInfo("allowed_classes"),
 }
 var ArginfoMemoryGetUsage []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("real_usage", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("real_usage"),
 }
 var ArginfoMemoryGetPeakUsage []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("real_usage", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("real_usage"),
 }
 var ArginfoVersionCompare []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("ver1", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("ver2", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("oper", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("ver1"),
+	zend.MakeArgInfo("ver2"),
+	zend.MakeArgInfo("oper"),
 }
 var BasicFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("constant", ZifConstant, ArginfoConstant, uint32(b.SizeOf("arginfo_constant")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),

@@ -74,29 +74,29 @@ Unsets the value at the specified $index. */
 
 var SplFixedarrayItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFixedarrayItDtor, SplFixedarrayItValid, SplFixedarrayItGetCurrentData, SplFixedarrayItGetCurrentKey, SplFixedarrayItMoveForward, SplFixedarrayItRewind, nil)
 var ArginfoSplfixedarrayConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("size"),
 }
 var arginfo_fixedarray_offsetGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("index"),
 }
 var arginfo_fixedarray_offsetSet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("index"),
+	zend.MakeArgInfo("newval"),
 }
 var arginfo_fixedarray_setSize []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
 }
 var arginfo_fixedarray_fromArray []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("array", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("save_indexes", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("array"),
+	zend.MakeArgInfo("save_indexes"),
 }
 var ArginfoSplfixedarrayVoid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_SplFixedArray___construct, ArginfoSplfixedarrayConstruct, uint32(b.SizeOf("arginfo_splfixedarray_construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),

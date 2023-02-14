@@ -92,28 +92,28 @@ Inserts a new entry before the specified $index consisting of $newval. */
 
 var SplDllistItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplDllistItDtor, SplDllistItValid, SplDllistItGetCurrentData, SplDllistItGetCurrentKey, SplDllistItMoveForward, SplDllistItRewind, nil)
 var ArginfoDllistSetiteratormode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoDllistPush []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("value"),
 }
 var arginfo_dllist_offsetGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("index"),
 }
 var arginfo_dllist_offsetSet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("index"),
+	zend.MakeArgInfo("newval"),
 }
 var ArginfoDllistVoid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var ArginfoDllistSerialized []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("serialized", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("serialized"),
 }
 var spl_funcs_SplQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("enqueue", zim_spl_SplDoublyLinkedList_push, ArginfoDllistPush, uint32(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),

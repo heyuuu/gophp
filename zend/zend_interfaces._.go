@@ -80,17 +80,17 @@ var ZendFuncsIterator []ZendFunctionEntry = []ZendFunctionEntry{
 }
 var ZendFuncsTraversable *ZendFunctionEntry = nil
 var ArginfoArrayaccessOffset []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("offset", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("offset"),
 }
 var ArginfoArrayaccessOffsetGet []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	MakeZendInternalArgInfo("offset", 0, 0, 0),
+	MakeReturnArgInfo(1),
+	MakeArgInfo("offset"),
 }
 var ArginfoArrayaccessOffsetValue []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	MakeZendInternalArgInfo("offset", 0, 0, 0),
-	MakeZendInternalArgInfo("value", 0, 0, 0),
+	MakeReturnArgInfo(2),
+	MakeArgInfo("offset"),
+	MakeArgInfo("value"),
 }
 var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("offsetExists", nil, ArginfoArrayaccessOffset, uint32(b.SizeOf("arginfo_arrayaccess_offset")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
@@ -100,8 +100,8 @@ var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoSerializableSerialize []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
-	MakeZendInternalArgInfo("serialized", 0, 0, 0),
+	MakeReturnArgInfo(-1),
+	MakeArgInfo("serialized"),
 }
 var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("serialize", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
@@ -109,7 +109,7 @@ var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoCountableCount []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
+	MakeReturnArgInfo(-1),
 }
 var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("count", nil, ArginfoCountableCount, uint32(b.SizeOf("arginfo_countable_count")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),

@@ -138,7 +138,7 @@ type SplIteratorApplyFuncT func(iter *zend.ZendObjectIterator, puser any) int
 */
 
 var ArginfoRecursiveItVoid []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
+	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_RecursiveIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("hasChildren", nil, ArginfoRecursiveItVoid, uint32(b.SizeOf("arginfo_recursive_it_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
@@ -233,18 +233,18 @@ var SplRecursiveItIteratorFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObje
 /* {{{ spl_RecursiveIteratorIterator_dtor */
 
 var ArginfoRecursiveItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("mode"),
+	zend.MakeArgInfo("flags"),
 }
 var arginfo_recursive_it_getSubIterator []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("level", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("level"),
 }
 var arginfo_recursive_it_setMaxDepth []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("max_depth", 0, 0, 0),
+	zend.MakeReturnArgInfo(0),
+	zend.MakeArgInfo("max_depth"),
 }
 var spl_funcs_RecursiveIteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveIteratorIterator___construct, ArginfoRecursiveItConstruct, uint32(b.SizeOf("arginfo_recursive_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -293,20 +293,20 @@ var spl_funcs_RecursiveIteratorIterator []zend.ZendFunctionEntry = []zend.ZendFu
    Returns the current key prefixed and postfixed */
 
 var ArginfoRecursiveTreeItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("caching_it_flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("caching_it_flags"),
+	zend.MakeArgInfo("mode"),
 }
 var arginfo_recursive_tree_it_setPrefixPart []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("part", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("part"),
+	zend.MakeArgInfo("value"),
 }
 var arginfo_recursive_tree_it_setPostfix []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("postfix", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("postfix"),
 }
 var spl_funcs_RecursiveTreeIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveTreeIterator___construct, ArginfoRecursiveTreeItConstruct, uint32(b.SizeOf("arginfo_recursive_tree_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -435,8 +435,8 @@ Move the iterator forward */
 /* {{{ spl_dual_it_dtor */
 
 var ArginfoFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var spl_funcs_FilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_FilterIterator___construct, ArginfoFilterItConstruct, uint32(b.SizeOf("arginfo_filter_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -450,9 +450,9 @@ var spl_funcs_FilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoCallbackFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("callback"),
 }
 var spl_funcs_CallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_CallbackFilterIterator___construct, ArginfoCallbackFilterItConstruct, uint32(b.SizeOf("arginfo_callback_filter_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -460,9 +460,9 @@ var spl_funcs_CallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunct
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoRecursiveCallbackFilterItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("callback", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+	zend.MakeArgInfo("callback"),
 }
 var spl_funcs_RecursiveCallbackFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveCallbackFilterIterator___construct, ArginfoRecursiveCallbackFilterItConstruct, uint32(b.SizeOf("arginfo_recursive_callback_filter_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -471,8 +471,8 @@ var spl_funcs_RecursiveCallbackFilterIterator []zend.ZendFunctionEntry = []zend.
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoParentItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
 }
 var spl_funcs_RecursiveFilterIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveFilterIterator___construct, ArginfoParentItConstruct, uint32(b.SizeOf("arginfo_parent_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -486,24 +486,24 @@ var spl_funcs_ParentIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoRegexItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("regex", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preg_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("regex"),
+	zend.MakeArgInfo("mode"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("preg_flags"),
 }
 var ArginfoRegexItSetMode []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("mode"),
 }
 var ArginfoRegexItSetFlags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("flags"),
 }
 var ArginfoRegexItSetPregFlags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preg_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("preg_flags"),
 }
 var spl_funcs_RegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RegexIterator___construct, ArginfoRegexItConstruct, uint32(b.SizeOf("arginfo_regex_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -518,12 +518,12 @@ var spl_funcs_RegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoRecRegexItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("regex", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("preg_flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(2),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("RecursiveIterator", 0))),
+	zend.MakeArgInfo("regex"),
+	zend.MakeArgInfo("mode"),
+	zend.MakeArgInfo("flags"),
+	zend.MakeArgInfo("preg_flags"),
 }
 var spl_funcs_RecursiveRegexIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveRegexIterator___construct, ArginfoRecRegexItConstruct, uint32(b.SizeOf("arginfo_rec_regex_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -552,22 +552,22 @@ var spl_funcs_RecursiveRegexIterator []zend.ZendFunctionEntry = []zend.ZendFunct
    Return the current position */
 
 var ArginfoSeekableItSeek []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("position", zend.ZEND_TYPE_ENCODE(zend.IS_LONG, 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("position",ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_LONG, 0))),
 }
 var spl_funcs_SeekableIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("seek", nil, ArginfoSeekableItSeek, uint32(b.SizeOf("arginfo_seekable_it_seek")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ArginfoLimitItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("offset", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("count", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("offset"),
+	zend.MakeArgInfo("count"),
 }
 var ArginfoLimitItSeek []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("position", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("position"),
 }
 var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_LimitIterator___construct, ArginfoLimitItConstruct, uint32(b.SizeOf("arginfo_limit_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -604,22 +604,22 @@ var spl_funcs_LimitIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
    Set given index in cache */
 
 var ArginfoCachingItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("flags"),
 }
 var arginfo_caching_it_setFlags []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("flags"),
 }
 var arginfo_caching_it_offsetGet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("index"),
 }
 var arginfo_caching_it_offsetSet []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
-	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("index"),
+	zend.MakeArgInfo("newval"),
 }
 var spl_funcs_CachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_CachingIterator___construct, ArginfoCachingItConstruct, uint32(b.SizeOf("arginfo_caching_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -652,9 +652,9 @@ var spl_funcs_CachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntr
 Return the inner iterator's children as a RecursiveCachingIterator */
 
 var ArginfoCachingRecItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
-	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
+	zend.MakeReturnArgInfo(1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("flags"),
 }
 var spl_funcs_RecursiveCachingIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_RecursiveCachingIterator___construct, ArginfoCachingRecItConstruct, uint32(b.SizeOf("arginfo_caching_rec_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -667,8 +667,8 @@ var spl_funcs_RecursiveCachingIterator []zend.ZendFunctionEntry = []zend.ZendFun
    Create an iterator from anything that is traversable */
 
 var ArginfoIteratorItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 }
 var spl_funcs_IteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_IteratorIterator___construct, ArginfoIteratorItConstruct, uint32(b.SizeOf("arginfo_iterator_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -700,8 +700,8 @@ var spl_funcs_IteratorIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
    Return inner iterators next() */
 
 var ArginfoNorewindItConstruct []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var spl_funcs_NoRewindIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_NoRewindIterator___construct, ArginfoNorewindItConstruct, uint32(b.SizeOf("arginfo_norewind_it___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
@@ -775,8 +775,8 @@ var spl_funcs_EmptyIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
    Get access to inner ArrayIterator */
 
 var ArginfoAppendItAppend []zend.ArgInfo = []zend.ArgInfo{
-	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
-	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
+	zend.MakeReturnArgInfo(-1),
+	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var spl_funcs_AppendIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("__construct", zim_spl_AppendIterator___construct, ArginfoRecursiveItVoid, uint32(b.SizeOf("arginfo_recursive_it_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),

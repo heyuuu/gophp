@@ -31,10 +31,10 @@ var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__toString", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
 }
 var ArginfoExceptionConstruct []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	MakeZendInternalArgInfo("message", 0, 0, 0),
-	MakeZendInternalArgInfo("code", 0, 0, 0),
-	MakeZendInternalArgInfo("previous", 0, 0, 0),
+	MakeReturnArgInfo(0),
+	MakeArgInfo("message"),
+	MakeArgInfo("code"),
+	MakeArgInfo("previous"),
 }
 var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__clone", ZimExceptionClone, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PRIVATE|ZEND_ACC_FINAL),
@@ -50,13 +50,13 @@ var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__toString", zim_exception___toString, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 }
 var ArginfoErrorExceptionConstruct []ArgInfo = []ArgInfo{
-	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
-	MakeZendInternalArgInfo("message", 0, 0, 0),
-	MakeZendInternalArgInfo("code", 0, 0, 0),
-	MakeZendInternalArgInfo("severity", 0, 0, 0),
-	MakeZendInternalArgInfo("filename", 0, 0, 0),
-	MakeZendInternalArgInfo("lineno", 0, 0, 0),
-	MakeZendInternalArgInfo("previous", 0, 0, 0),
+	MakeReturnArgInfo(0),
+	MakeArgInfo("message"),
+	MakeArgInfo("code"),
+	MakeArgInfo("severity"),
+	MakeArgInfo("filename"),
+	MakeArgInfo("lineno"),
+	MakeArgInfo("previous"),
 }
 var ErrorExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__construct", ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct, uint32(b.SizeOf("arginfo_error_exception___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
