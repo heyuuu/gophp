@@ -3,12 +3,10 @@
 package zend
 
 import (
-    b "sik/builtin"
+	b "sik/builtin"
 )
 
-
 // Source: <Zend/zend_execute.h>
-
 
 /*
    +----------------------------------------------------------------------+
@@ -35,7 +33,6 @@ var ZendExecuteInternal func(execute_data *ZendExecuteData, return_value *Zval)
 
 /* export zend_pass_function to allow comparisons against it */
 
-
 /* dedicated Zend executor functions - do not use! */
 
 const ZEND_VM_STACK_HEADER_SLOTS *Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct _zend_vm_stack")) + ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval")) - 1) / ZEND_MM_ALIGNED_SIZE(b.SizeOf("zval"))
@@ -47,7 +44,6 @@ const ZEND_VM_STACK_HEADER_SLOTS *Zval = (ZEND_MM_ALIGNED_SIZE(b.SizeOf("struct 
  * common header. This made a degradation for the fast path.
  * The following "#if ZEND_DEBUG" eliminates it.
  */
-
 
 /* services */
 
@@ -61,10 +57,10 @@ const ZEND_USER_OPCODE_DISPATCH_TO = 0x100
 /* former zend_execute_locks.h */
 
 type ZendFreeOp *Zval
+
 const CACHE_SPECIAL = 1 << 0
 
 // Source: <Zend/zend_execute.c>
-
 
 /*
    +----------------------------------------------------------------------+
@@ -98,27 +94,25 @@ const _TMP_CODE = 1
 const _VAR_CODE = 2
 const _UNUSED_CODE = 3
 const _CV_CODE = 4
+
 type IncdecT func(*Zval) int
-var ZendPassFunction ZendInternalFunction = MakeZendInternalFunction(ZEND_INTERNAL_FUNCTION, {0,0,0}, 0, nil, nil, nil, 0, 0, nil, ZifPass, nil, {nil,nil,nil,nil})
+
+var ZendPassFunction ZendInternalFunction = MakeZendInternalFunction(ZEND_INTERNAL_FUNCTION, []ZendUchar{0, 0, 0}, 0, nil, nil, nil, 0, 0, nil, ZifPass, nil, []any{nil, nil, nil, nil})
+
 const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
 const ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
 
 /* this should modify object only if it's empty */
 
-
 /* Utility Functions for Extensions */
-
 
 /* Checks whether an array can be assigned to the reference. Returns conflicting property if
  * assignment is not possible, NULL otherwise. */
 
-
 /* Checks whether an stdClass can be assigned to the reference. Returns conflicting property if
  * assignment is not possible, NULL otherwise. */
 
-
 /* 1: valid, 0: invalid, -1: may be valid after type coercion */
-
 
 /*
  * Stack Frame Layout (the whole stack frame is allocated at once)

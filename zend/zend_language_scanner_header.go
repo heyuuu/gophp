@@ -328,7 +328,7 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	ZendLlistAddElement(CG__().open_files, fileHandle)
 
 	// todo 没看懂
-	if fileHandle.stream.handle >= (any)(fileHandle) && fileHandle.stream.handle <= (any)(fileHandle+1)) {
+	if fileHandle.stream.handle >= (any)(fileHandle) && fileHandle.stream.handle <= (any)(fileHandle+1) {
 		var fh *ZendFileHandle = (*ZendFileHandle)(ZendLlistGetLast(CG__().open_files))
 		var diff int = (*byte)(fileHandle.stream.handle - (*byte)(fileHandle))
 		fh.stream.handle = any((*byte)(fh) + diff)

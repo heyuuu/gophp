@@ -1,1 +1,795 @@
+// <<generate>>
+
 package zend
+
+import (
+	b "sik/builtin"
+)
+
+func ZendResolveFunctionName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool) *ZendString {
+	return ZendResolveNonClassName(name, type_, is_fully_qualified, 0, FC__().GetImportsFunction())
+}
+func ZendResolveConstName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool) *ZendString {
+	return ZendResolveNonClassName(name, type_, is_fully_qualified, 1, FC__().GetImportsConst())
+}
+func ZendResolveClassName(name *ZendString, type_ uint32) *ZendString {
+	var compound *byte
+	if type_ == ZEND_NAME_RELATIVE {
+		return ZendPrefixWithNs(name)
+	}
+	if type_ == ZEND_NAME_FQ || name.GetVal()[0] == '\\' {
+
+		/* Remove \ prefix (only relevant if this is a string rather than a label) */
+
+		if name.GetVal()[0] == '\\' {
+			name = ZendStringInit(name.GetVal()+1, name.GetLen()-1, 0)
+		} else {
+			name.AddRefcount()
+		}
+
+		/* Ensure that \self, \parent and \static are not used */
+
+		if ZEND_FETCH_CLASS_DEFAULT != ZendGetClassFetchType(name) {
+			ZendErrorNoreturn(E_COMPILE_ERROR, "'\\%s' is an invalid class name", name.GetVal())
+		}
+		return name
+	}
+	if FC__().GetImports() != nil {
+		compound = memchr(name.GetVal(), '\\', name.GetLen())
+		if compound != nil {
+
+			/* If the first part of a qualified name is an alias, substitute it. */
+
+			var len_ int = compound - name.GetVal()
+			var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), len_)
+			if import_name != nil {
+				return ZendConcatNames(import_name.GetVal(), import_name.GetLen(), name.GetVal()+len_+1, name.GetLen()-len_-1)
+			}
+		} else {
+
+			/* If an unqualified name is an alias, replace it. */
+
+			var import_name *ZendString = ZendHashFindPtrLc(FC__().GetImports(), name.GetVal(), name.GetLen())
+			if import_name != nil {
+				return import_name.Copy()
+			}
+		}
+	}
+
+	/* If not fully qualified and not an alias, prepend the current namespace */
+
+	return ZendPrefixWithNs(name)
+
+	/* If not fully qualified and not an alias, prepend the current namespace */
+}
+func ZendResolveClassNameAst(ast *ZendAst) *ZendString {
+	var class_name *Zval = ZendAstGetZval(ast)
+	if class_name.GetType() != IS_STRING {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal class name")
+	}
+	return ZendResolveClassName(class_name.GetStr(), ast.GetAttr())
+}
+func LabelPtrDtor(zv *Zval) {
+	EfreeSize(zv.GetPtr(), b.SizeOf("zend_label"))
+}
+func StrDtor(zv *Zval) { ZendStringReleaseEx(zv.GetStr(), 0) }
+func ZendAddTryElement(try_op uint32) uint32 {
+	var op_array *ZendOpArray = CG__().GetActiveOpArray()
+	var try_catch_offset uint32 = b.PostInc(&(op_array.GetLastTryCatch()))
+	var elem *ZendTryCatchElement
+	op_array.SetTryCatchArray(SafeErealloc(op_array.GetTryCatchArray(), b.SizeOf("zend_try_catch_element"), op_array.GetLastTryCatch(), 0))
+	elem = op_array.GetTryCatchArray()[try_catch_offset]
+	elem.SetTryOp(try_op)
+	elem.SetCatchOp(0)
+	elem.SetFinallyOp(0)
+	elem.SetFinallyEnd(0)
+	return try_catch_offset
+}
+func FunctionAddRef(function *ZendFunction) {
+	if function.GetType() == ZEND_USER_FUNCTION {
+		var op_array *ZendOpArray = function.GetOpArray()
+		if op_array.GetRefcount() != nil {
+			op_array.refcount++
+		}
+		if op_array.GetStaticVariables() != nil {
+			if (op_array.GetStaticVariables().GetGcFlags() & IS_ARRAY_IMMUTABLE) == 0 {
+				op_array.GetStaticVariables().AddRefcount()
+			}
+		}
+		if (CG__().GetCompilerOptions() & ZEND_COMPILE_PRELOAD) != 0 {
+			ZEND_ASSERT(op_array.IsPreloaded())
+			ZEND_MAP_PTR_NEW(op_array.run_time_cache)
+			ZEND_MAP_PTR_NEW(op_array.static_variables_ptr)
+		} else {
+			ZEND_MAP_PTR_INIT(op_array.static_variables_ptr, op_array.GetStaticVariables())
+			ZEND_MAP_PTR_INIT(op_array.run_time_cache, ZendArenaAlloc(CG__().GetArena(), b.SizeOf("void *")))
+			ZEND_MAP_PTR_SET(op_array.run_time_cache, nil)
+		}
+	} else if function.GetType() == ZEND_INTERNAL_FUNCTION {
+		if function.GetFunctionName() != nil {
+			function.GetFunctionName().AddRefcount()
+		}
+	}
+}
+func DoBindFunctionError(lcname *ZendString, op_array *ZendOpArray, compile_time ZendBool) {
+	var zv *Zval = b.CondF(compile_time != 0, func() *HashTable { return CG__().GetFunctionTable() }, func() *HashTable { return EG__().GetFunctionTable() }).KeyFind(lcname.GetStr())
+	var error_level int = b.Cond(compile_time != 0, E_COMPILE_ERROR, E_ERROR)
+	var old_function *ZendFunction
+	ZEND_ASSERT(zv != nil)
+	old_function = (*ZendFunction)(zv.GetPtr())
+	if old_function.GetType() == ZEND_USER_FUNCTION && old_function.GetOpArray().GetLast() > 0 {
+		ZendErrorNoreturn(error_level, "Cannot redeclare %s() (previously declared in %s:%d)", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }), old_function.GetOpArray().GetFilename().GetVal(), old_function.GetOpArray().GetOpcodes()[0].GetLineno())
+	} else {
+		ZendErrorNoreturn(error_level, "Cannot redeclare %s()", b.CondF(op_array != nil, func() []byte { return op_array.GetFunctionName().GetVal() }, func() []byte { return old_function.GetFunctionName().GetVal() }))
+	}
+}
+func DoBindFunction(lcname *Zval) int {
+	var function *ZendFunction
+	var rtd_key *Zval
+	var zv *Zval
+	rtd_key = lcname + 1
+	zv = EG__().GetFunctionTable().KeyFind(rtd_key.GetStr().GetStr())
+	if zv == nil {
+		DoBindFunctionError(lcname.GetStr(), nil, 0)
+		return FAILURE
+	}
+	function = (*ZendFunction)(zv.GetPtr())
+	if function.IsPreloaded() && (CG__().GetCompilerOptions()&ZEND_COMPILE_PRELOAD) == 0 {
+		zv = EG__().GetFunctionTable().KeyAdd(lcname.GetStr().GetStr(), zv)
+	} else {
+		zv = ZendHashSetBucketKey(EG__().GetFunctionTable(), (*Bucket)(zv), lcname.GetStr())
+	}
+	if zv == nil {
+		DoBindFunctionError(lcname.GetStr(), function.GetOpArray(), 0)
+		return FAILURE
+	}
+	return SUCCESS
+}
+func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
+	var ce *ZendClassEntry
+	var rtd_key *Zval
+	var zv *Zval
+	rtd_key = lcname + 1
+	zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
+	if zv == nil {
+		ce = ZendHashFindPtr(EG__().GetClassTable(), lcname.GetStr())
+		if ce != nil {
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+			return FAILURE
+		} else {
+			for {
+				ZEND_ASSERT(EG__().GetCurrentExecuteData().GetFunc().GetOpArray().IsPreloaded())
+				if ZendPreloadAutoload != nil && ZendPreloadAutoload(EG__().GetCurrentExecuteData().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
+					zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
+					if zv != nil {
+						break
+					}
+				}
+				ZendErrorNoreturn(E_ERROR, "Class %s wasn't preloaded", Z_STRVAL_P(lcname))
+				return FAILURE
+				break
+			}
+		}
+	}
+
+	/* Register the derived class */
+
+	ce = (*ZendClassEntry)(zv.GetPtr())
+	zv = ZendHashSetBucketKey(EG__().GetClassTable(), (*Bucket)(zv), lcname.GetStr())
+	if zv == nil {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot declare %s %s, because the name is already in use", ZendGetObjectType(ce), ce.GetName().GetVal())
+		return FAILURE
+	}
+	if ZendDoLinkClass(ce, lc_parent_name) == FAILURE {
+
+		/* Reload bucket pointer, the hash table may have been reallocated */
+
+		zv = EG__().GetClassTable().KeyFind(lcname.GetStr().GetStr())
+		ZendHashSetBucketKey(EG__().GetClassTable(), (*Bucket)(zv), rtd_key.GetStr())
+		return FAILURE
+	}
+	return SUCCESS
+}
+func ZendMarkFunctionAsGenerator() {
+	if CG__().GetActiveOpArray().GetFunctionName() == nil {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "The \"yield\" expression can only be used inside a function")
+	}
+	if CG__().GetActiveOpArray().IsHasReturnType() {
+		var return_info ZendArgInfo = CG__().GetActiveOpArray().GetArgInfo()[-1]
+		if return_info.GetType().Code() != IS_ITERABLE {
+			var msg *byte = "Generators may only declare a return type of Generator, Iterator, Traversable, or iterable, %s is not permitted"
+			if !(return_info.GetType().IsClass()) {
+				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZendGetTypeByConst(return_info.GetType().Code()))
+			}
+			if !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Traversable")) && !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Iterator")) && !(ZendStringEqualsLiteralCi(return_info.GetType().Name(), "Generator")) {
+				ZendErrorNoreturn(E_COMPILE_ERROR, msg, ZEND_TYPE_NAME(return_info.GetType()).GetVal())
+			}
+		}
+	}
+	CG__().GetActiveOpArray().SetIsGenerator(true)
+}
+func ZendBuildDelayedEarlyBindingList(op_array *ZendOpArray) uint32 {
+	if op_array.IsEarlyBinding() {
+		var first_early_binding_opline uint32 = uint32 - 1
+		var prev_opline_num *uint32 = &first_early_binding_opline
+		var opline *ZendOp = op_array.GetOpcodes()
+		var end *ZendOp = opline + op_array.GetLast()
+		for opline < end {
+			if opline.GetOpcode() == ZEND_DECLARE_CLASS_DELAYED {
+				*prev_opline_num = opline - op_array.GetOpcodes()
+				prev_opline_num = opline.GetResult().GetOplineNum()
+			}
+			opline++
+		}
+		*prev_opline_num = -1
+		return first_early_binding_opline
+	}
+	return uint32 - 1
+}
+func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline uint32) {
+	if first_early_binding_opline != uint32-1 {
+		var orig_in_compilation ZendBool = CG__().GetInCompilation()
+		var opline_num uint32 = first_early_binding_opline
+		var run_time_cache *any
+		if op_array.GetRunTimeCachePtr() == nil {
+			var ptr any
+			ZEND_ASSERT(op_array.IsHeapRtCache())
+			ptr = Emalloc(op_array.GetCacheSize() + b.SizeOf("void *"))
+			ZEND_MAP_PTR_INIT(op_array.run_time_cache, ptr)
+			ptr = (*byte)(ptr + b.SizeOf("void *"))
+			ZEND_MAP_PTR_SET(op_array.run_time_cache, ptr)
+			memset(ptr, 0, op_array.GetCacheSize())
+		}
+		run_time_cache = RUN_TIME_CACHE(op_array)
+		CG__().SetInCompilation(1)
+		for opline_num != uint32-1 {
+			var opline *ZendOp = op_array.GetOpcodes()[opline_num]
+			var lcname *Zval = RT_CONSTANT(opline, opline.GetOp1())
+			var zv *Zval = EG__().GetClassTable().KeyFind((lcname + 1).GetStr().GetStr())
+			if zv != nil {
+				var ce *ZendClassEntry = zv.GetCe()
+				var lc_parent_name *ZendString = RT_CONSTANT(opline, opline.GetOp2()).GetStr()
+				var parent_ce *ZendClassEntry = ZendHashFindExPtr(EG__().GetClassTable(), lc_parent_name, 1)
+				if parent_ce != nil {
+					if ZendTryEarlyBind(ce, parent_ce, lcname.GetStr(), zv) != 0 {
+
+						/* Store in run-time cache */
+
+						(*any)((*byte)(run_time_cache + opline.GetExtendedValue()))[0] = ce
+
+						/* Store in run-time cache */
+
+					}
+				}
+			}
+			opline_num = op_array.GetOpcodes()[opline_num].GetResult().GetOplineNum()
+		}
+		CG__().SetInCompilation(orig_in_compilation)
+	}
+}
+func ZendManglePropertyName(src1 *byte, src1_length int, src2 string, src2_length int, internal int) *ZendString {
+	var prop_name_length int = 1 + src1_length + 1 + src2_length
+	var prop_name *ZendString = ZendStringAlloc(prop_name_length, internal)
+	prop_name.GetVal()[0] = '0'
+	memcpy(prop_name.GetVal()+1, src1, src1_length+1)
+	memcpy(prop_name.GetVal()+1+src1_length+1, src2, src2_length+1)
+	return prop_name
+}
+func ZendStrnlen(s *byte, maxlen int) int {
+	var len_ int = 0
+	for b.PostInc(&(*s)) && b.PostDec(&maxlen) {
+		len_++
+	}
+	return len_
+}
+func ZendUnmanglePropertyNameEx(name *ZendString, class_name **byte, prop_name **byte, prop_len *int) int {
+	var class_name_len int
+	var anonclass_src_len int
+	*class_name = nil
+	if name.GetLen() == 0 || name.GetVal()[0] != '0' {
+		*prop_name = name.GetVal()
+		if prop_len != nil {
+			*prop_len = name.GetLen()
+		}
+		return SUCCESS
+	}
+	if name.GetLen() < 3 || name.GetVal()[1] == '0' {
+		ZendError(E_NOTICE, "Illegal member variable name")
+		*prop_name = name.GetVal()
+		if prop_len != nil {
+			*prop_len = name.GetLen()
+		}
+		return FAILURE
+	}
+	class_name_len = ZendStrnlen(name.GetVal()+1, name.GetLen()-2)
+	if class_name_len >= name.GetLen()-2 || name.GetVal()[class_name_len+1] != '0' {
+		ZendError(E_NOTICE, "Corrupt member variable name")
+		*prop_name = name.GetVal()
+		if prop_len != nil {
+			*prop_len = name.GetLen()
+		}
+		return FAILURE
+	}
+	*class_name = name.GetVal() + 1
+	anonclass_src_len = ZendStrnlen((*class_name)+class_name_len+1, name.GetLen()-class_name_len-2)
+	if class_name_len+anonclass_src_len+2 != name.GetLen() {
+		class_name_len += anonclass_src_len + 1
+	}
+	*prop_name = name.GetVal() + class_name_len + 2
+	if prop_len != nil {
+		*prop_len = name.GetLen() - class_name_len - 2
+	}
+	return SUCCESS
+}
+func ZendLookupReservedConst(name *byte, len_ int) *ZendConstant {
+	var c *ZendConstant = ZendHashFindPtrLc(EG__().GetZendConstants(), name, len_)
+	if c != nil && (ZEND_CONSTANT_FLAGS(c)&CONST_CS) == 0 && (ZEND_CONSTANT_FLAGS(c)&CONST_CT_SUBST) != 0 {
+		return c
+	}
+	return nil
+}
+func ZendTryCtEvalConst(zv *Zval, name *ZendString, is_fully_qualified ZendBool) ZendBool {
+	var c *ZendConstant
+
+	/* Substitute case-sensitive (or lowercase) constants */
+
+	c = ZendHashFindPtr(EG__().GetZendConstants(), name)
+	if c != nil && ((ZEND_CONSTANT_FLAGS(c)&CONST_PERSISTENT) != 0 && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) == 0 && ((ZEND_CONSTANT_FLAGS(c)&CONST_NO_FILE_CACHE) == 0 || (CG__().GetCompilerOptions()&ZEND_COMPILE_WITH_FILE_CACHE) == 0) || c.GetValue().GetType() < IS_OBJECT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0) {
+		ZVAL_COPY_OR_DUP(zv, c.GetValue())
+		return 1
+	}
+
+	/* Substitute true, false and null (including unqualified usage in namespaces) */
+
+	var lookup_name *byte = name.GetVal()
+	var lookup_len int = name.GetLen()
+	if is_fully_qualified == 0 {
+		ZendGetUnqualifiedName(name, &lookup_name, &lookup_len)
+	}
+	c = ZendLookupReservedConst(lookup_name, lookup_len)
+	if c != nil {
+		ZVAL_COPY_OR_DUP(zv, c.GetValue())
+		return 1
+	}
+	return 0
+}
+func ZendIsScopeKnown() ZendBool {
+	if CG__().GetActiveOpArray().IsClosure() {
+
+		/* Closures can be rebound to a different scope */
+
+		return 0
+
+		/* Closures can be rebound to a different scope */
+
+	}
+	if CG__().GetActiveClassEntry() == nil {
+
+		/* The scope is known if we're in a free function (no scope), but not if we're in
+		 * a file/eval (which inherits including/eval'ing scope). */
+
+		return CG__().GetActiveOpArray().GetFunctionName() != nil
+
+		/* The scope is known if we're in a free function (no scope), but not if we're in
+		 * a file/eval (which inherits including/eval'ing scope). */
+
+	}
+
+	/* For traits self etc refers to the using class, not the trait itself */
+
+	return !CG__().GetActiveClassEntry().IsTrait()
+
+	/* For traits self etc refers to the using class, not the trait itself */
+}
+func ClassNameRefersToActiveCe(class_name *ZendString, fetch_type uint32) ZendBool {
+	if CG__().GetActiveClassEntry() == nil {
+		return 0
+	}
+	if fetch_type == ZEND_FETCH_CLASS_SELF && ZendIsScopeKnown() != 0 {
+		return 1
+	}
+	return fetch_type == ZEND_FETCH_CLASS_DEFAULT && ZendStringEqualsCi(class_name, CG__().GetActiveClassEntry().GetName())
+}
+func ZendGetClassFetchType(name *ZendString) uint32 {
+	if ZendStringEqualsLiteralCi(name, "self") {
+		return ZEND_FETCH_CLASS_SELF
+	} else if ZendStringEqualsLiteralCi(name, "parent") {
+		return ZEND_FETCH_CLASS_PARENT
+	} else if ZendStringEqualsLiteralCi(name, "static") {
+		return ZEND_FETCH_CLASS_STATIC
+	} else {
+		return ZEND_FETCH_CLASS_DEFAULT
+	}
+}
+func ZendGetClassFetchTypeAst(name_ast *ZendAst) uint32 {
+	/* Fully qualified names are always default refs */
+
+	if name_ast.GetAttr() == ZEND_NAME_FQ {
+		return ZEND_FETCH_CLASS_DEFAULT
+	}
+	return ZendGetClassFetchType(ZendAstGetStr(name_ast))
+}
+func ZendEnsureValidClassFetchType(fetch_type uint32) {
+	if fetch_type != ZEND_FETCH_CLASS_DEFAULT && ZendIsScopeKnown() != 0 {
+		var ce *ZendClassEntry = CG__().GetActiveClassEntry()
+		if ce == nil {
+			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use \"%s\" when no class scope is active", b.Cond(b.Cond(fetch_type == ZEND_FETCH_CLASS_SELF, "self", fetch_type == ZEND_FETCH_CLASS_PARENT), "parent", "static"))
+		} else if fetch_type == ZEND_FETCH_CLASS_PARENT && !(ce.GetParentName()) {
+			ZendError(E_DEPRECATED, "Cannot use \"parent\" when current class scope has no parent")
+		}
+	}
+}
+func ZendTryCompileConstExprResolveClassName(zv *Zval, class_ast *ZendAst) ZendBool {
+	var fetch_type uint32
+	var class_name *Zval
+	if class_ast.GetKind() != ZEND_AST_ZVAL {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use ::class with dynamic class name")
+	}
+	class_name = ZendAstGetZval(class_ast)
+	if class_name.GetType() != IS_STRING {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal class name")
+	}
+	fetch_type = ZendGetClassFetchType(class_name.GetStr())
+	ZendEnsureValidClassFetchType(fetch_type)
+	switch fetch_type {
+	case ZEND_FETCH_CLASS_SELF:
+		if CG__().GetActiveClassEntry() != nil && ZendIsScopeKnown() != 0 {
+			zv.SetStringCopy(CG__().GetActiveClassEntry().GetName())
+			return 1
+		}
+		return 0
+	case ZEND_FETCH_CLASS_PARENT:
+		if CG__().GetActiveClassEntry() != nil && CG__().GetActiveClassEntry().GetParentName() && ZendIsScopeKnown() != 0 {
+			zv.SetStringCopy(CG__().GetActiveClassEntry().GetParentName())
+			return 1
+		}
+		return 0
+	case ZEND_FETCH_CLASS_STATIC:
+		return 0
+	case ZEND_FETCH_CLASS_DEFAULT:
+		zv.SetString(ZendResolveClassNameAst(class_ast))
+		return 1
+	default:
+
+	}
+}
+func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *ZendClassEntry) ZendBool {
+	if (c.GetValue().GetAccessFlags() & ZEND_ACC_PUBLIC) != 0 {
+		return 1
+	} else if (c.GetValue().GetAccessFlags() & ZEND_ACC_PRIVATE) != 0 {
+		return c.GetCe() == scope
+	} else {
+		var ce *ZendClassEntry = c.GetCe()
+		for true {
+			if ce == scope {
+				return 1
+			}
+			if !(ce.GetParent()) {
+				break
+			}
+			if ce.IsResolvedParent() {
+				ce = ce.GetParent()
+			} else {
+				ce = ZendHashFindPtrLc(CG__().GetClassTable(), ce.GetParentName().GetVal(), ce.GetParentName().GetLen())
+				if ce == nil {
+					break
+				}
+			}
+		}
+
+		/* Reverse case cannot be true during compilation */
+
+		return 0
+
+		/* Reverse case cannot be true during compilation */
+
+	}
+}
+func ZendTryCtEvalClassConst(zv *Zval, class_name *ZendString, name *ZendString) ZendBool {
+	var fetch_type uint32 = ZendGetClassFetchType(class_name)
+	var cc *ZendClassConstant
+	var c *Zval
+	if ClassNameRefersToActiveCe(class_name, fetch_type) != 0 {
+		cc = ZendHashFindPtr(CG__().GetActiveClassEntry().GetConstantsTable(), name)
+	} else if fetch_type == ZEND_FETCH_CLASS_DEFAULT && (CG__().GetCompilerOptions()&ZEND_COMPILE_NO_CONSTANT_SUBSTITUTION) == 0 {
+		var ce *ZendClassEntry = ZendHashFindPtrLc(CG__().GetClassTable(), class_name.GetVal(), class_name.GetLen())
+		if ce != nil {
+			cc = ZendHashFindPtr(ce.GetConstantsTable(), name)
+		} else {
+			return 0
+		}
+	} else {
+		return 0
+	}
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_NO_PERSISTENT_CONSTANT_SUBSTITUTION) != 0 {
+		return 0
+	}
+	if cc == nil || ZendVerifyCtConstAccess(cc, CG__().GetActiveClassEntry()) == 0 {
+		return 0
+	}
+	c = cc.GetValue()
+
+	/* Substitute case-sensitive (or lowercase) persistent class constants */
+
+	if c.GetType() < IS_OBJECT {
+		ZVAL_COPY_OR_DUP(zv, c)
+		return 1
+	}
+	return 0
+}
+func ZendAddToList(result any, item any) {
+	var list *any = *((*any)(result))
+	var n int = 0
+	if list != nil {
+		for list[n] {
+			n++
+		}
+	}
+	list = Erealloc(list, b.SizeOf("void *")*(n+2))
+	list[n] = item
+	list[n+1] = nil
+	*((*any)(result)) = list
+}
+func ZendDoExtendedStmt() {
+	var opline *ZendOp
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_STMT) == 0 {
+		return
+	}
+	opline = GetNextOp()
+	opline.SetOpcode(ZEND_EXT_STMT)
+}
+func ZendDoExtendedFcallBegin() {
+	var opline *ZendOp
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_FCALL) == 0 {
+		return
+	}
+	opline = GetNextOp()
+	opline.SetOpcode(ZEND_EXT_FCALL_BEGIN)
+}
+func ZendDoExtendedFcallEnd() {
+	var opline *ZendOp
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_EXTENDED_FCALL) == 0 {
+		return
+	}
+	opline = GetNextOp()
+	opline.SetOpcode(ZEND_EXT_FCALL_END)
+}
+func ZendIsAutoGlobalStr(name string, len_ int) ZendBool {
+	var auto_global *ZendAutoGlobal
+	if b.Assign(&auto_global, ZendHashStrFindPtr(CG__().GetAutoGlobals(), name, len_)) != nil {
+		if auto_global.GetArmed() != 0 {
+			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
+		}
+		return 1
+	}
+	return 0
+}
+func ZendIsAutoGlobal(name *ZendString) ZendBool {
+	var auto_global *ZendAutoGlobal
+	if b.Assign(&auto_global, ZendHashFindPtr(CG__().GetAutoGlobals(), name)) != nil {
+		if auto_global.GetArmed() != 0 {
+			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
+		}
+		return 1
+	}
+	return 0
+}
+func ZendRegisterAutoGlobal(name *ZendString, jit ZendBool, auto_global_callback ZendAutoGlobalCallback) int {
+	var auto_global ZendAutoGlobal
+	var retval int
+	auto_global.SetName(name)
+	auto_global.SetAutoGlobalCallback(auto_global_callback)
+	auto_global.SetJit(jit)
+	if ZendHashAddMem(CG__().GetAutoGlobals(), auto_global.GetName(), &auto_global, b.SizeOf("zend_auto_global")) != nil {
+		retval = SUCCESS
+	} else {
+		retval = FAILURE
+	}
+	return retval
+}
+func ZendActivateAutoGlobals() {
+	var auto_global *ZendAutoGlobal
+	var __ht *HashTable = CG__().GetAutoGlobals()
+	for _, _p := range __ht.foreachData() {
+		var _z *Zval = _p.GetVal()
+
+		auto_global = _z.GetPtr()
+		if auto_global.GetJit() != 0 {
+			auto_global.SetArmed(1)
+		} else if auto_global.GetAutoGlobalCallback() != nil {
+			auto_global.SetArmed(auto_global.GetAutoGlobalCallback()(auto_global.GetName()))
+		} else {
+			auto_global.SetArmed(0)
+		}
+	}
+}
+func Zendlex(elem *ZendParserStackElem) int {
+	var zv Zval
+	var ret int
+	if CG__().GetIncrementLineno() != 0 {
+		CG__().GetZendLineno()++
+		CG__().SetIncrementLineno(0)
+	}
+	ret = LexScan(&zv, elem)
+	ZEND_ASSERT(EG__().GetException() == nil || ret == T_ERROR)
+	return ret
+}
+func ZendInitializeClassData(ce *ZendClassEntry, nullify_handlers ZendBool) {
+	var persistent_hashes ZendBool = ce.GetType() == ZEND_INTERNAL_CLASS
+	ce.SetRefcount(1)
+	ce.SetCeFlags(ZEND_ACC_CONSTANTS_UPDATED)
+	if (CG__().GetCompilerOptions() & ZEND_COMPILE_GUARDS) != 0 {
+		ce.SetIsUseGuards(true)
+	}
+	ce.SetDefaultPropertiesTable(nil)
+	ce.SetDefaultStaticMembersTable(nil)
+	ZendHashInitEx(ce.GetPropertiesInfo(), 8, nil, b.Cond(persistent_hashes != 0, ZendDestroyPropertyInfoInternal, nil), persistent_hashes, 0)
+	ZendHashInitEx(ce.GetConstantsTable(), 8, nil, nil, persistent_hashes, 0)
+	ZendHashInitEx(ce.GetFunctionTable(), 8, nil, ZEND_FUNCTION_DTOR, persistent_hashes, 0)
+	if ce.GetType() == ZEND_INTERNAL_CLASS {
+		ZEND_MAP_PTR_INIT(ce.static_members_table, nil)
+	} else {
+		ZEND_MAP_PTR_INIT(ce.static_members_table, ce.GetDefaultStaticMembersTable())
+		ce.SetDocComment(nil)
+	}
+	ce.SetDefaultPropertiesCount(0)
+	ce.SetDefaultStaticMembersCount(0)
+	ce.SetPropertiesInfoTable(nil)
+	if nullify_handlers != 0 {
+		ce.SetConstructor(nil)
+		ce.SetDestructor(nil)
+		ce.SetClone(nil)
+		ce.SetGet(nil)
+		ce.SetSet(nil)
+		ce.SetUnset(nil)
+		ce.SetIsset(nil)
+		ce.SetCall(nil)
+		ce.SetCallstatic(nil)
+		ce.SetTostring(nil)
+		ce.SetCreateObject(nil)
+		ce.SetGetIterator(nil)
+		ce.SetIteratorFuncsPtr(nil)
+		ce.SetGetStaticMethod(nil)
+		ce.SetParent(nil)
+		ce.SetParentName(nil)
+		ce.SetNumInterfaces(0)
+		ce.SetInterfaces(nil)
+		ce.SetNumTraits(0)
+		ce.SetTraitNames(nil)
+		ce.SetTraitAliases(nil)
+		ce.SetTraitPrecedences(nil)
+		ce.SetSerialize(nil)
+		ce.SetUnserialize(nil)
+		ce.SetSerializeFunc(nil)
+		ce.SetUnserializeFunc(nil)
+		ce.SetDebugInfo(nil)
+		if ce.GetType() == ZEND_INTERNAL_CLASS {
+			ce.SetModule(nil)
+			ce.SetBuiltinFunctions(nil)
+		}
+	}
+}
+func ZendGetCompiledVariableName(op_array *ZendOpArray, var_ uint32) *ZendString {
+	return op_array.GetVars()[EX_VAR_TO_NUM(var_)]
+}
+func ZendAstAppendStr(left_ast *ZendAst, right_ast *ZendAst) *ZendAst {
+	var left_zv *Zval = ZendAstGetZval(left_ast)
+	var left *ZendString = left_zv.GetStr()
+	var right *ZendString = ZendAstGetStr(right_ast)
+	var result *ZendString
+	var left_len int = left.GetLen()
+	var len_ int = left_len + right.GetLen() + 1
+	result = ZendStringExtend(left, len_, 0)
+	result.GetVal()[left_len] = '\\'
+	memcpy(&result.GetVal()[left_len+1], right.GetVal(), right.GetLen())
+	result.GetVal()[len_] = '0'
+	ZendStringReleaseEx(right, 0)
+	left_zv.SetString(result)
+	return left_ast
+}
+func ZendNegateNumString(ast *ZendAst) *ZendAst {
+	var zv *Zval = ZendAstGetZval(ast)
+	if zv.IsLong() {
+		if zv.GetLval() == 0 {
+			zv.SetString(ZendStringInit("-0", b.SizeOf("\"-0\"")-1, 0))
+		} else {
+			ZEND_ASSERT(zv.GetLval() > 0)
+			zv.SetLval(zv.GetLval() * -1)
+		}
+	} else if zv.IsString() {
+		var orig_len int = Z_STRLEN_P(zv)
+		zv.SetStr(ZendStringExtend(zv.GetStr(), orig_len+1, 0))
+		memmove(Z_STRVAL_P(zv)+1, Z_STRVAL_P(zv), orig_len+1)
+		Z_STRVAL_P(zv)[0] = '-'
+	} else {
+		ZEND_ASSERT(false)
+	}
+	return ast
+}
+func ZendVerifyNamespace() {
+	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() == 0 {
+		ZendErrorNoreturn(E_COMPILE_ERROR, "No code may exist outside of namespace {}")
+	}
+}
+func ZendDirname(path *byte, len_ int) int {
+	var end *byte = path + len_ - 1
+	var len_adjust uint = 0
+	if len_ == 0 {
+
+		/* Illegal use of this function */
+
+		return 0
+
+		/* Illegal use of this function */
+
+	}
+
+	/* Strip trailing slashes */
+
+	for end >= path && IS_SLASH_P(end) {
+		end--
+	}
+	if end < path {
+
+		/* The path only contained slashes */
+
+		path[0] = DEFAULT_SLASH
+		path[1] = '0'
+		return 1 + len_adjust
+	}
+
+	/* Strip filename */
+
+	for end >= path && !(IS_SLASH_P(end)) {
+		end--
+	}
+	if end < path {
+
+		/* No slash found, therefore return '.' */
+
+		path[0] = '.'
+		path[1] = '0'
+		return 1 + len_adjust
+	}
+
+	/* Strip slashes which came before the file name */
+
+	for end >= path && IS_SLASH_P(end) {
+		end--
+	}
+	if end < path {
+		path[0] = DEFAULT_SLASH
+		path[1] = '0'
+		return 1 + len_adjust
+	}
+	*(end + 1) = '0'
+	return size_t(end+1-path) + len_adjust
+}
+func ZendAdjustForFetchType(opline *ZendOp, result *Znode, type_ uint32) {
+	var factor ZendUchar = b.Cond(opline.GetOpcode() == ZEND_FETCH_STATIC_PROP_R, 1, 3)
+	switch type_ {
+	case BP_VAR_R:
+		opline.SetResultType(IS_TMP_VAR)
+		result.SetOpType(IS_TMP_VAR)
+		return
+	case BP_VAR_W:
+		opline.SetOpcode(opline.GetOpcode() + 1*factor)
+		return
+	case BP_VAR_RW:
+		opline.SetOpcode(opline.GetOpcode() + 2*factor)
+		return
+	case BP_VAR_IS:
+		opline.SetResultType(IS_TMP_VAR)
+		result.SetOpType(IS_TMP_VAR)
+		opline.SetOpcode(opline.GetOpcode() + 3*factor)
+		return
+	case BP_VAR_FUNC_ARG:
+		opline.SetOpcode(opline.GetOpcode() + 4*factor)
+		return
+	case BP_VAR_UNSET:
+		opline.SetOpcode(opline.GetOpcode() + 5*factor)
+		return
+	default:
+
+	}
+}
