@@ -322,8 +322,8 @@ func ZendFileContextEnd(prev_context *ZendFileContext) {
 	CG__().SetFileContext(*prev_context)
 }
 func ZendInitCompilerDataStructures() {
-	ZendStackInit(CG__().GetLoopVarStack(), b.SizeOf("zend_loop_var"))
-	ZendStackInit(CG__().GetDelayedOplinesStack(), b.SizeOf("zend_op"))
+	CG__().GetLoopVarStack().Init()
+	CG__().GetDelayedOplinesStack().Init()
 	CG__().SetActiveClassEntry(nil)
 	CG__().SetInCompilation(0)
 	CG__().SetSkipShebang(0)
@@ -345,7 +345,7 @@ func ZendHaveSeenSymbol(name *ZendString, kind uint32) ZendBool {
 	var zv *Zval = FC__().GetSeenSymbols().KeyFind(name.GetStr())
 	return zv != nil && (zv.GetLval()&kind) != 0
 }
-func FileHandleDtor(fh *ZendFileHandle) { ZendFileHandleDtor(fh) }
+func FileHandleDtor(fh *ZendFileHandle) { fh.Destroy() }
 func InitCompiler() {
 	CG__().SetArena(ZendArenaCreate(64 * 1024))
 	CG__().SetActiveOpArray(nil)
@@ -353,14 +353,14 @@ func InitCompiler() {
 	ZendInitCompilerDataStructures()
 	ZendInitRsrcList()
 	ZendHashInit(CG__().GetFilenamesTable(), 8, nil, ZVAL_PTR_DTOR, 0)
-	ZendLlistInit(CG__().GetOpenFiles(), b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
+	CG__().GetOpenFiles().Init(b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
 	CG__().SetUncleanShutdown(0)
 	CG__().SetDelayedVarianceObligations(nil)
 	CG__().SetDelayedAutoloads(nil)
 }
 func ShutdownCompiler() {
-	ZendStackDestroy(CG__().GetLoopVarStack())
-	ZendStackDestroy(CG__().GetDelayedOplinesStack())
+	CG__().GetLoopVarStack().Destroy()
+	CG__().GetDelayedOplinesStack().Destroy()
 	CG__().GetFilenamesTable().Destroy()
 	ZendArenaDestroy(CG__().GetArena())
 	if CG__().GetDelayedVarianceObligations() != nil {
@@ -574,7 +574,7 @@ func ZendBeginLoop(free_opcode ZendUchar, loop_var *Znode, is_switch ZendBool) {
 		 * We won't try to free something of we don't have loop variable.  */
 
 	}
-	ZendStackPush(CG__().GetLoopVarStack(), &info)
+	CG__().GetLoopVarStack().Push(&info)
 }
 func ZendEndLoop(cont_addr int, var_node *Znode) {
 	var end uint32 = GetNextOpNumber()
@@ -582,7 +582,7 @@ func ZendEndLoop(cont_addr int, var_node *Znode) {
 	brk_cont_element.SetCont(cont_addr)
 	brk_cont_element.SetBrk(end)
 	CG__().GetContext().SetCurrentBrkCont(brk_cont_element.GetParent())
-	ZendStackDelTop(CG__().GetLoopVarStack())
+	CG__().GetLoopVarStack().DelTop()
 }
 func ZendDoFree(op1 *Znode) {
 	if op1.GetOpType() == IS_TMP_VAR {
@@ -1206,7 +1206,7 @@ func ZendTryCompileConstExprResolveClassName(zv *Zval, class_ast *ZendAst) ZendB
 		zv.SetString(ZendResolveClassNameAst(class_ast))
 		return 1
 	default:
-		break
+
 	}
 }
 func ZendVerifyCtConstAccess(c *ZendClassConstant, scope *ZendClassEntry) ZendBool {
@@ -1546,7 +1546,7 @@ func ZendAdjustForFetchType(opline *ZendOp, result *Znode, type_ uint32) {
 		opline.SetOpcode(opline.GetOpcode() + 5*factor)
 		return
 	default:
-		break
+
 	}
 }
 func ZendMakeVarResult(result *Znode, opline *ZendOp) {
@@ -1641,37 +1641,37 @@ func ZendEmitJump(opnum_target uint32) uint32 {
 func ZendIsSmartBranch(opline *ZendOp) int {
 	switch opline.GetOpcode() {
 	case ZEND_IS_IDENTICAL:
-
+		fallthrough
 	case ZEND_IS_NOT_IDENTICAL:
-
+		fallthrough
 	case ZEND_IS_EQUAL:
-
+		fallthrough
 	case ZEND_IS_NOT_EQUAL:
-
+		fallthrough
 	case ZEND_IS_SMALLER:
-
+		fallthrough
 	case ZEND_IS_SMALLER_OR_EQUAL:
-
+		fallthrough
 	case ZEND_CASE:
-
+		fallthrough
 	case ZEND_ISSET_ISEMPTY_CV:
-
+		fallthrough
 	case ZEND_ISSET_ISEMPTY_VAR:
-
+		fallthrough
 	case ZEND_ISSET_ISEMPTY_DIM_OBJ:
-
+		fallthrough
 	case ZEND_ISSET_ISEMPTY_PROP_OBJ:
-
+		fallthrough
 	case ZEND_ISSET_ISEMPTY_STATIC_PROP:
-
+		fallthrough
 	case ZEND_INSTANCEOF:
-
+		fallthrough
 	case ZEND_TYPE_CHECK:
-
+		fallthrough
 	case ZEND_DEFINED:
-
+		fallthrough
 	case ZEND_IN_ARRAY:
-
+		fallthrough
 	case ZEND_ARRAY_KEY_EXISTS:
 		return 1
 	default:
@@ -1697,22 +1697,20 @@ func ZendUpdateJumpTarget(opnum_jump uint32, opnum_target uint32) {
 	switch opline.GetOpcode() {
 	case ZEND_JMP:
 		opline.GetOp1().SetOplineNum(opnum_target)
-		break
 	case ZEND_JMPZ:
-
+		fallthrough
 	case ZEND_JMPNZ:
-
+		fallthrough
 	case ZEND_JMPZ_EX:
-
+		fallthrough
 	case ZEND_JMPNZ_EX:
-
+		fallthrough
 	case ZEND_JMP_SET:
-
+		fallthrough
 	case ZEND_COALESCE:
 		opline.GetOp2().SetOplineNum(opnum_target)
-		break
 	default:
-		break
+
 	}
 }
 func ZendUpdateJumpTargetToNext(opnum_jump uint32) {
@@ -1741,8 +1739,8 @@ func ZendDelayedEmitOp(result *Znode, opcode ZendUchar, op1 *Znode, op2 *Znode) 
 	if result != nil {
 		ZendMakeVarResult(result, &tmp_opline)
 	}
-	ZendStackPush(CG__().GetDelayedOplinesStack(), &tmp_opline)
-	return ZendStackTop(CG__().GetDelayedOplinesStack())
+	CG__().GetDelayedOplinesStack().Push(&tmp_opline)
+	return CG__().GetDelayedOplinesStack().Top()
 }
 func ZendDelayedCompileBegin() uint32 {
 	return CG__().GetDelayedOplinesStack().GetTop()
@@ -2373,7 +2371,7 @@ func ZendCompileAssign(result *Znode, ast *ZendAst) {
 		ZendCompileListAssign(result, var_ast, &expr_node, var_ast.GetAttr())
 		return
 	default:
-		break
+
 	}
 }
 func ZendCompileAssignRef(result *Znode, ast *ZendAst) {
@@ -2493,7 +2491,7 @@ func ZendCompileCompoundAssign(result *Znode, ast *ZendAst) {
 		opline.SetExtendedValue(cache_slot)
 		return
 	default:
-		break
+
 	}
 }
 func ZendCompileArgs(ast *ZendAst, fbc *ZendFunction) uint32 {
@@ -3465,12 +3463,12 @@ func ZendCompileUnset(ast *ZendAst) {
 		opline.SetOpcode(ZEND_UNSET_STATIC_PROP)
 		return
 	default:
-		break
+
 	}
 }
 func ZendHandleLoopsAndFinallyEx(depth ZendLong, return_value *Znode) int {
 	var base *ZendLoopVar
-	var loop_var *ZendLoopVar = ZendStackTop(CG__().GetLoopVarStack())
+	var loop_var *ZendLoopVar = CG__().GetLoopVarStack().Top()
 	if loop_var == nil {
 		return 1
 	}
@@ -3531,7 +3529,7 @@ func ZendHandleLoopsAndFinally(return_value *Znode) int {
 }
 func ZendHasFinallyEx(depth ZendLong) int {
 	var base *ZendLoopVar
-	var loop_var *ZendLoopVar = ZendStackTop(CG__().GetLoopVarStack())
+	var loop_var *ZendLoopVar = CG__().GetLoopVarStack().Top()
 	if loop_var == nil {
 		return 0
 	}
@@ -4167,7 +4165,7 @@ func ZendCompileTry(ast *ZendAst) {
 		fast_call.SetVarType(IS_TMP_VAR)
 		fast_call.SetVarNum(CG__().GetContext().GetFastCallVar())
 		fast_call.SetTryCatchOffset(try_catch_offset)
-		ZendStackPush(CG__().GetLoopVarStack(), &fast_call)
+		CG__().GetLoopVarStack().Push(&fast_call)
 	}
 	CG__().GetContext().SetTryCatchOffset(try_catch_offset)
 	ZendCompileStmt(try_ast)
@@ -4236,14 +4234,14 @@ func ZendCompileTry(ast *ZendAst) {
 
 		/* Pop FAST_CALL from unwind stack */
 
-		ZendStackDelTop(CG__().GetLoopVarStack())
+		CG__().GetLoopVarStack().DelTop()
 
 		/* Push DISCARD_EXCEPTION on unwind stack */
 
 		discard_exception.SetOpcode(ZEND_DISCARD_EXCEPTION)
 		discard_exception.SetVarType(IS_TMP_VAR)
 		discard_exception.SetVarNum(CG__().GetContext().GetFastCallVar())
-		ZendStackPush(CG__().GetLoopVarStack(), &discard_exception)
+		CG__().GetLoopVarStack().Push(&discard_exception)
 		CG__().SetZendLineno(finally_ast.GetLineno())
 		opline = ZendEmitOp(nil, ZEND_FAST_CALL, nil, nil)
 		opline.GetOp1().SetNum(try_catch_offset)
@@ -4262,7 +4260,7 @@ func ZendCompileTry(ast *ZendAst) {
 
 		/* Pop DISCARD_EXCEPTION from unwind stack */
 
-		ZendStackDelTop(CG__().GetLoopVarStack())
+		CG__().GetLoopVarStack().DelTop()
 
 		/* Pop DISCARD_EXCEPTION from unwind stack */
 
@@ -4561,20 +4559,16 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a float type can only be float, integer, or NULL")
 							}
 							ConvertToDouble(default_node.GetConstant())
-							break
 						case IS_ITERABLE:
 							if default_node.GetConstant().GetType() != IS_ARRAY {
 								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with iterable type can only be an array or NULL")
 							}
-							break
 						case IS_OBJECT:
 							ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with an object type can only be NULL")
-							break
 						default:
 							if !(ZEND_SAME_FAKE_TYPE(arg_info.GetType().Code(), default_node.GetConstant().GetType())) {
 								ZendErrorNoreturn(E_COMPILE_ERROR, "Default value for parameters "+"with a %s type can only be %s or NULL", ZendGetTypeByConst(arg_info.GetType().Code()), ZendGetTypeByConst(arg_info.GetType().Code()))
 							}
-							break
 						}
 					}
 				}
@@ -5074,7 +5068,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel ZendBool) {
 
 	var dummy_var ZendLoopVar
 	dummy_var.SetOpcode(ZEND_RETURN)
-	ZendStackPush(CG__().GetLoopVarStack(), any(&dummy_var))
+	CG__().GetLoopVarStack().Push(any(&dummy_var))
 	ZendCompileParams(params_ast, return_type_ast)
 	if CG__().GetActiveOpArray().IsGenerator() {
 		ZendMarkFunctionAsGenerator()
@@ -5101,7 +5095,7 @@ func ZendCompileFuncDecl(result *Znode, ast *ZendAst, toplevel ZendBool) {
 
 	/* Pop the loop variable stack separator */
 
-	ZendStackDelTop(CG__().GetLoopVarStack())
+	CG__().GetLoopVarStack().DelTop()
 	CG__().SetActiveOpArray(orig_op_array)
 	CG__().SetActiveClassEntry(orig_class_entry)
 }
@@ -5269,12 +5263,11 @@ func ZendCompileUseTrait(ast *ZendAst) {
 		}
 		switch ZendGetClassFetchType(name) {
 		case ZEND_FETCH_CLASS_SELF:
-
+			fallthrough
 		case ZEND_FETCH_CLASS_PARENT:
-
+			fallthrough
 		case ZEND_FETCH_CLASS_STATIC:
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Cannot use '%s' as trait name "+"as it is reserved", name.GetVal())
-			break
 		}
 		ce.GetTraitNames()[ce.GetNumTraits()].SetName(ZendResolveClassNameAst(trait_ast))
 		ce.GetTraitNames()[ce.GetNumTraits()].SetLcName(ZendStringTolower(ce.GetTraitNames()[ce.GetNumTraits()].GetName()))
@@ -5288,12 +5281,10 @@ func ZendCompileUseTrait(ast *ZendAst) {
 		switch adaptation_ast.GetKind() {
 		case ZEND_AST_TRAIT_PRECEDENCE:
 			ZendCompileTraitPrecedence(adaptation_ast)
-			break
 		case ZEND_AST_TRAIT_ALIAS:
 			ZendCompileTraitAlias(adaptation_ast)
-			break
 		default:
-			break
+
 		}
 	}
 }
@@ -5545,7 +5536,7 @@ func ZendGetImportHt(type_ uint32) *HashTable {
 		}
 		return FC__().GetImportsConst()
 	default:
-		break
+
 	}
 	return nil
 }
@@ -5558,7 +5549,7 @@ func ZendGetUseTypeStr(type_ uint32) *byte {
 	case ZEND_SYMBOL_CONST:
 		return " const"
 	default:
-		break
+
 	}
 	return " unknown"
 }
@@ -5775,10 +5766,8 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 	switch ast.GetAttr() {
 	case T_LINE:
 		zv.SetLong(ast.GetLineno())
-		break
 	case T_FILE:
 		zv.SetStringCopy(CG__().GetCompiledFilename())
-		break
 	case T_DIR:
 		var filename *ZendString = CG__().GetCompiledFilename()
 		var dirname *ZendString = ZendStringInit(filename.GetVal(), filename.GetLen(), 0)
@@ -5789,14 +5778,12 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 			dirname.SetLen(strlen(dirname.GetVal()))
 		}
 		zv.SetString(dirname)
-		break
 	case T_FUNC_C:
 		if op_array != nil && op_array.GetFunctionName() != nil {
 			zv.SetStringCopy(op_array.GetFunctionName())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
-		break
 	case T_METHOD_C:
 
 		/* Detect whether we are directly inside a class (e.g. a class constant) and treat
@@ -5814,7 +5801,6 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
-		break
 	case T_CLASS_C:
 		if ce != nil {
 			if ce.IsTrait() {
@@ -5825,23 +5811,20 @@ func ZendTryCtEvalMagicConst(zv *Zval, ast *ZendAst) ZendBool {
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
-		break
 	case T_TRAIT_C:
 		if ce != nil && ce.IsTrait() {
 			zv.SetStringCopy(ce.GetName())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
-		break
 	case T_NS_C:
 		if FC__().GetCurrentNamespace() != nil {
 			zv.SetStringCopy(FC__().GetCurrentNamespace())
 		} else {
 			ZVAL_EMPTY_STRING(zv)
 		}
-		break
 	default:
-		break
+
 	}
 	return 1
 }
@@ -5989,25 +5972,18 @@ func ZendTryCtEvalArray(result *Zval, ast *ZendAst) ZendBool {
 			switch key.GetType() {
 			case IS_LONG:
 				result.GetArr().IndexUpdateH(key.GetLval(), value)
-				break
 			case IS_STRING:
 				result.GetArr().SymtableUpdate(key.GetStr().GetStr(), value)
-				break
 			case IS_DOUBLE:
 				result.GetArr().IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
-				break
 			case IS_FALSE:
 				result.GetArr().IndexUpdateH(0, value)
-				break
 			case IS_TRUE:
 				result.GetArr().IndexUpdateH(1, value)
-				break
 			case IS_NULL:
 				result.GetArr().KeyUpdate(ZSTR_EMPTY_ALLOC().GetStr(), value)
-				break
 			default:
 				ZendErrorNoreturn(E_COMPILE_ERROR, "Illegal offset type")
-				break
 			}
 		} else {
 			if result.GetArr().NextIndexInsert(value) == nil {
@@ -6404,24 +6380,20 @@ func ZendCompileAssignCoalesce(result *Znode, ast *ZendAst) {
 	switch var_ast.GetKind() {
 	case ZEND_AST_VAR:
 		ZendEmitOp(&assign_node, ZEND_ASSIGN, &var_node_w, &default_node)
-		break
 	case ZEND_AST_STATIC_PROP:
 		opline.SetOpcode(ZEND_ASSIGN_STATIC_PROP)
 		ZendEmitOpData(&default_node)
 		assign_node = var_node_w
-		break
 	case ZEND_AST_DIM:
 		opline.SetOpcode(ZEND_ASSIGN_DIM)
 		ZendEmitOpData(&default_node)
 		assign_node = var_node_w
-		break
 	case ZEND_AST_PROP:
 		opline.SetOpcode(ZEND_ASSIGN_OBJ)
 		ZendEmitOpData(&default_node)
 		assign_node = var_node_w
-		break
 	default:
-		break
+
 	}
 	opline = ZendEmitOpTmp(nil, ZEND_QM_ASSIGN, &assign_node, nil)
 	opline.SetResultType(result.GetOpType())
@@ -6589,21 +6561,17 @@ func ZendCompileIssetOrEmpty(result *Znode, ast *ZendAst) {
 			opline = ZendCompileSimpleVarNoCv(result, var_ast, BP_VAR_IS, 0)
 			opline.SetOpcode(ZEND_ISSET_ISEMPTY_VAR)
 		}
-		break
 	case ZEND_AST_DIM:
 		opline = ZendCompileDim(result, var_ast, BP_VAR_IS)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_DIM_OBJ)
-		break
 	case ZEND_AST_PROP:
 		opline = ZendCompileProp(result, var_ast, BP_VAR_IS, 0)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_PROP_OBJ)
-		break
 	case ZEND_AST_STATIC_PROP:
 		opline = ZendCompileStaticProp(result, var_ast, BP_VAR_IS, 0, 0)
 		opline.SetOpcode(ZEND_ISSET_ISEMPTY_STATIC_PROP)
-		break
 	default:
-		break
+
 	}
 	opline.SetResultType(IS_TMP_VAR)
 	result.SetOpType(opline.GetResultType())
@@ -7048,7 +7016,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 	var fetch_type uint32 = ZendGetClassFetchType(class_name)
 	switch fetch_type {
 	case ZEND_FETCH_CLASS_SELF:
-
+		fallthrough
 	case ZEND_FETCH_CLASS_PARENT:
 
 		/* For the const-eval representation store the fetch type instead of the name. */
@@ -7061,7 +7029,7 @@ func ZendCompileConstExprClassName(ast_ptr **ZendAst) {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "static::class cannot be used for compile-time class name resolution")
 		return
 	default:
-		break
+
 	}
 }
 func ZendCompileConstExprConst(ast_ptr **ZendAst) {
@@ -7101,19 +7069,14 @@ func ZendCompileConstExpr(ast_ptr **ZendAst) {
 	switch ast.GetKind() {
 	case ZEND_AST_CLASS_CONST:
 		ZendCompileConstExprClassConst(ast_ptr)
-		break
 	case ZEND_AST_CLASS_NAME:
 		ZendCompileConstExprClassName(ast_ptr)
-		break
 	case ZEND_AST_CONST:
 		ZendCompileConstExprConst(ast_ptr)
-		break
 	case ZEND_AST_MAGIC_CONST:
 		ZendCompileConstExprMagicConst(ast_ptr)
-		break
 	default:
 		ZendAstApply(ast, ZendCompileConstExpr)
-		break
 	}
 }
 func ZendConstExprToZval(result *Zval, ast *ZendAst) {
@@ -7181,92 +7144,64 @@ func ZendCompileStmt(ast *ZendAst) {
 	switch ast.GetKind() {
 	case ZEND_AST_STMT_LIST:
 		ZendCompileStmtList(ast)
-		break
 	case ZEND_AST_GLOBAL:
 		ZendCompileGlobalVar(ast)
-		break
 	case ZEND_AST_STATIC:
 		ZendCompileStaticVar(ast)
-		break
 	case ZEND_AST_UNSET:
 		ZendCompileUnset(ast)
-		break
 	case ZEND_AST_RETURN:
 		ZendCompileReturn(ast)
-		break
 	case ZEND_AST_ECHO:
 		ZendCompileEcho(ast)
-		break
 	case ZEND_AST_THROW:
 		ZendCompileThrow(ast)
-		break
 	case ZEND_AST_BREAK:
-
+		fallthrough
 	case ZEND_AST_CONTINUE:
 		ZendCompileBreakContinue(ast)
-		break
 	case ZEND_AST_GOTO:
 		ZendCompileGoto(ast)
-		break
 	case ZEND_AST_LABEL:
 		ZendCompileLabel(ast)
-		break
 	case ZEND_AST_WHILE:
 		ZendCompileWhile(ast)
-		break
 	case ZEND_AST_DO_WHILE:
 		ZendCompileDoWhile(ast)
-		break
 	case ZEND_AST_FOR:
 		ZendCompileFor(ast)
-		break
 	case ZEND_AST_FOREACH:
 		ZendCompileForeach(ast)
-		break
 	case ZEND_AST_IF:
 		ZendCompileIf(ast)
-		break
 	case ZEND_AST_SWITCH:
 		ZendCompileSwitch(ast)
-		break
 	case ZEND_AST_TRY:
 		ZendCompileTry(ast)
-		break
 	case ZEND_AST_DECLARE:
 		ZendCompileDeclare(ast)
-		break
 	case ZEND_AST_FUNC_DECL:
-
+		fallthrough
 	case ZEND_AST_METHOD:
 		ZendCompileFuncDecl(nil, ast, 0)
-		break
 	case ZEND_AST_PROP_GROUP:
 		ZendCompilePropGroup(ast)
-		break
 	case ZEND_AST_CLASS_CONST_DECL:
 		ZendCompileClassConstDecl(ast)
-		break
 	case ZEND_AST_USE_TRAIT:
 		ZendCompileUseTrait(ast)
-		break
 	case ZEND_AST_CLASS:
 		ZendCompileClassDecl(ast, 0)
-		break
 	case ZEND_AST_GROUP_USE:
 		ZendCompileGroupUse(ast)
-		break
 	case ZEND_AST_USE:
 		ZendCompileUse(ast)
-		break
 	case ZEND_AST_CONST_DECL:
 		ZendCompileConstDecl(ast)
-		break
 	case ZEND_AST_NAMESPACE:
 		ZendCompileNamespace(ast)
-		break
 	case ZEND_AST_HALT_COMPILER:
 		ZendCompileHaltCompiler(ast)
-		break
 	default:
 		var result Znode
 		ZendCompileExpr(&result, ast)
@@ -7293,17 +7228,17 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		*result = (*ZendAstGetZnode)(ast)
 		return
 	case ZEND_AST_VAR:
-
+		fallthrough
 	case ZEND_AST_DIM:
-
+		fallthrough
 	case ZEND_AST_PROP:
-
+		fallthrough
 	case ZEND_AST_STATIC_PROP:
-
+		fallthrough
 	case ZEND_AST_CALL:
-
+		fallthrough
 	case ZEND_AST_METHOD_CALL:
-
+		fallthrough
 	case ZEND_AST_STATIC_CALL:
 		ZendCompileVar(result, ast, BP_VAR_R, 0)
 		return
@@ -7326,7 +7261,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileBinaryOp(result, ast)
 		return
 	case ZEND_AST_GREATER:
-
+		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
 		ZendCompileGreater(result, ast)
 		return
@@ -7334,22 +7269,22 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileUnaryOp(result, ast)
 		return
 	case ZEND_AST_UNARY_PLUS:
-
+		fallthrough
 	case ZEND_AST_UNARY_MINUS:
 		ZendCompileUnaryPm(result, ast)
 		return
 	case ZEND_AST_AND:
-
+		fallthrough
 	case ZEND_AST_OR:
 		ZendCompileShortCircuiting(result, ast)
 		return
 	case ZEND_AST_POST_INC:
-
+		fallthrough
 	case ZEND_AST_POST_DEC:
 		ZendCompilePostIncdec(result, ast)
 		return
 	case ZEND_AST_PRE_INC:
-
+		fallthrough
 	case ZEND_AST_PRE_DEC:
 		ZendCompilePreIncdec(result, ast)
 		return
@@ -7384,7 +7319,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileIncludeOrEval(result, ast)
 		return
 	case ZEND_AST_ISSET:
-
+		fallthrough
 	case ZEND_AST_EMPTY:
 		ZendCompileIssetOrEmpty(result, ast)
 		return
@@ -7413,7 +7348,7 @@ func ZendCompileExpr(result *Znode, ast *ZendAst) {
 		ZendCompileMagicConst(result, ast)
 		return
 	case ZEND_AST_CLOSURE:
-
+		fallthrough
 	case ZEND_AST_ARROW_FUNC:
 		ZendCompileFuncDecl(result, ast, 0)
 		return
@@ -7486,9 +7421,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ZendTryCtEvalBinaryOp(&result, ast.GetAttr(), ZendAstGetZval(ast.GetChild()[0]), ZendAstGetZval(ast.GetChild()[1])) == 0 {
 			return
 		}
-		break
 	case ZEND_AST_GREATER:
-
+		fallthrough
 	case ZEND_AST_GREATER_EQUAL:
 		ZendEvalConstExpr(ast.GetChild()[0])
 		ZendEvalConstExpr(ast.GetChild()[1])
@@ -7496,9 +7430,8 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			return
 		}
 		ZendCtEvalGreater(&result, ast.GetKind(), ZendAstGetZval(ast.GetChild()[0]), ZendAstGetZval(ast.GetChild()[1]))
-		break
 	case ZEND_AST_AND:
-
+		fallthrough
 	case ZEND_AST_OR:
 		var child0_is_true ZendBool
 		var child1_is_true ZendBool
@@ -7521,16 +7454,14 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		} else {
 			ZVAL_BOOL(&result, child0_is_true != 0 && child1_is_true != 0)
 		}
-		break
 	case ZEND_AST_UNARY_OP:
 		ZendEvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
 			return
 		}
 		ZendCtEvalUnaryOp(&result, ast.GetAttr(), ZendAstGetZval(ast.GetChild()[0]))
-		break
 	case ZEND_AST_UNARY_PLUS:
-
+		fallthrough
 	case ZEND_AST_UNARY_MINUS:
 		ZendEvalConstExpr(ast.GetChild()[0])
 		if ast.GetChild()[0].GetKind() != ZEND_AST_ZVAL {
@@ -7539,7 +7470,6 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		if ZendTryCtEvalUnaryPm(&result, ast.GetKind(), ZendAstGetZval(ast.GetChild()[0])) == 0 {
 			return
 		}
-		break
 	case ZEND_AST_COALESCE:
 
 		/* Set isset fetch indicator here, opcache disallows runtime altering of the AST */
@@ -7653,17 +7583,14 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 		} else {
 			return
 		}
-		break
 	case ZEND_AST_ARRAY:
 		if ZendTryCtEvalArray(&result, ast) == 0 {
 			return
 		}
-		break
 	case ZEND_AST_MAGIC_CONST:
 		if ZendTryCtEvalMagicConst(&result, ast) == 0 {
 			return
 		}
-		break
 	case ZEND_AST_CONST:
 		var name_ast *ZendAst = ast.GetChild()[0]
 		var is_fully_qualified ZendBool
@@ -7673,7 +7600,6 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			return
 		}
 		ZendStringReleaseEx(resolved_name, 0)
-		break
 	case ZEND_AST_CLASS_CONST:
 		var class_ast *ZendAst
 		var name_ast *ZendAst
@@ -7691,13 +7617,11 @@ func ZendEvalConstExpr(ast_ptr **ZendAst) {
 			return
 		}
 		ZendStringReleaseEx(resolved_name, 0)
-		break
 	case ZEND_AST_CLASS_NAME:
 		var class_ast *ZendAst = ast.GetChild()[0]
 		if ZendTryCompileConstExprResolveClassName(&result, class_ast) == 0 {
 			return
 		}
-		break
 	default:
 		return
 	}
