@@ -38,8 +38,8 @@ func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	}
 	return argInfo
 }
-func MakeArgInfoSpecial(name int, opts ...ArgInfoOpt) ArgInfo {
-	argInfo := ArgInfo{name: name}
+func MakeReturnArgInfo(requiredArgs int, opts ...ArgInfoOpt) ArgInfo {
+	argInfo := ArgInfo{requiredArgs: -1, name: ""}
 	for _, opt := range opts {
 		opt(&argInfo)
 	}

@@ -51,7 +51,7 @@ func ReplaceMakeArgInfo(code string) string {
 		if isNameStr {
 			return fmt.Sprintf(`%sMakeArgInfo(%s),`, pkgPrefix, strings.Join(makeArgs, ","))
 		} else {
-			return fmt.Sprintf(`%sMakeArgInfoSpecial(%s),`, pkgPrefix, strings.Join(makeArgs, ","))
+			return fmt.Sprintf(`%sMakeReturnArgInfo(%s),`, pkgPrefix, strings.Join(makeArgs, ","))
 		}
 	})
 
