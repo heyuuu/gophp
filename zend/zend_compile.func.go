@@ -4462,10 +4462,10 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 		/* Use op_array->arg_info[-1] for return type */
 
 		arg_infos = SafeEmalloc(b.SizeOf("zend_arg_info"), list.GetChildren()+1, 0)
-		arg_infos.SetName(nil)
-		arg_infos.SetPassByReference(op_array.IsReturnReference())
-		arg_infos.SetIsVariadic(0)
-		arg_infos.SetType(ZendCompileTypename(return_type_ast, 0))
+		*arg_infos = MakeZendReturnArgInfo(
+			ZendCompileTypename(return_type_ast, 0),
+			op_array.IsReturnReference(),
+		)
 		if arg_infos.GetType().Code() == IS_VOID && arg_infos.GetType().AllowNull() {
 			ZendErrorNoreturn(E_COMPILE_ERROR, "Void type cannot be nullable")
 		}
@@ -4526,13 +4526,13 @@ func ZendCompileParams(ast *ZendAst, return_type_ast *ZendAst) {
 			op_array.SetRequiredNumArgs(i + 1)
 		}
 		arg_info = &arg_infos[i]
-		arg_info.SetName(name.Copy())
-		arg_info.SetPassByReference(is_ref)
-		arg_info.SetIsVariadic(is_variadic)
-
-		/* TODO: Keep compatibility, but may be better reset "allow_null" ??? */
-
-		arg_info.SetType(ZEND_TYPE_ENCODE(0, 1))
+		*arg_info = MakeZendArgInfo(
+			name.Copy(),
+			/* TODO: Keep compatibility, but may be better reset "allow_null" ??? */
+			ZEND_TYPE_ENCODE(0, 1),
+			is_ref,
+			is_variadic,
+		)
 		if type_ast != nil {
 			var has_null_default ZendBool = default_ast != nil && (default_node.GetConstant().IsNull() || default_node.GetConstant().IsConstant() && Z_ASTVAL(default_node.GetConstant()).GetKind() == ZEND_AST_CONSTANT && strcasecmp(ZendAstGetConstantName(Z_ASTVAL(default_node.GetConstant())).GetVal(), "NULL") == 0)
 			op_array.SetIsHasTypeHints(true)

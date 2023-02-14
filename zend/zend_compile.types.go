@@ -504,14 +504,35 @@ type ZendArgInfo struct {
 	is_variadic       ZendBool
 }
 
-func (this *ZendArgInfo) GetName() *ZendString               { return this.name }
-func (this *ZendArgInfo) SetName(value *ZendString)          { this.name = value }
-func (this *ZendArgInfo) GetType() ZendType                  { return this.type_ }
-func (this *ZendArgInfo) SetType(value ZendType)             { this.type_ = value }
-func (this *ZendArgInfo) GetPassByReference() ZendUchar      { return this.pass_by_reference }
-func (this *ZendArgInfo) SetPassByReference(value ZendUchar) { this.pass_by_reference = value }
-func (this *ZendArgInfo) GetIsVariadic() ZendBool            { return this.is_variadic }
-func (this *ZendArgInfo) SetIsVariadic(value ZendBool)       { this.is_variadic = value }
+func MakeZendReturnArgInfo(type_ ZendType, pass_by_reference bool) ZendArgInfo {
+	return ZendArgInfo{
+		name:              nil,
+		type_:             type_,
+		pass_by_reference: intBool(pass_by_reference),
+		is_variadic:       0,
+	}
+}
+
+func MakeZendArgInfo(
+	name *ZendString,
+	type_ ZendType,
+	pass_by_reference ZendUchar,
+	is_variadic ZendBool,
+) ZendArgInfo {
+	return ZendArgInfo{
+		name:              name,
+		type_:             type_,
+		pass_by_reference: pass_by_reference,
+		is_variadic:       is_variadic,
+	}
+}
+
+func (this *ZendArgInfo) SetType(value ZendType) { this.type_ = value }
+
+func (this *ZendArgInfo) GetName() *ZendString          { return this.name }
+func (this *ZendArgInfo) GetType() ZendType             { return this.type_ }
+func (this *ZendArgInfo) GetPassByReference() ZendUchar { return this.pass_by_reference }
+func (this *ZendArgInfo) GetIsVariadic() ZendBool       { return this.is_variadic }
 
 /**
  * ZendInternalFunctionInfo
