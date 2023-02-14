@@ -2546,7 +2546,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 
 			/* Currently you cannot denote that the function can accept less arguments than num_args */
 
-			if info.GetRequiredNumArgs() == zend_uintptr_t-1 {
+			if info.GetRequiredNumArgs() == -1 {
 				internal_function.SetRequiredNumArgs(ptr.GetNumArgs())
 			} else {
 				internal_function.SetRequiredNumArgs(info.GetRequiredNumArgs())

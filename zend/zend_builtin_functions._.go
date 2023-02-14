@@ -48,8 +48,6 @@ import (
    +----------------------------------------------------------------------+
 */
 
-/* {{{ arginfo */
-
 var ArginfoZendVoid []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 }

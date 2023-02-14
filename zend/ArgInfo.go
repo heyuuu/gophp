@@ -19,25 +19,29 @@ func ArgInfoVariadic() ArgInfoOpt {
  * 用于代替 ArgInfo / ZendArgInfo
  */
 type ArgInfo struct {
+	// 为 returnArg 临时使用，后续需替换
+	requiredArgs int // -1 表示需要所有参数
+	//
 	name              *byte
 	type_             ZendType
 	pass_by_reference ZendUchar
 	is_variadic       ZendBool
 }
 
-func (this *ArgInfo) Name() string { return b.CastStrAuto(this.name) }
+func (this *ArgInfo) RequiredArgs() int { return this.requiredArgs }
+func (this *ArgInfo) Name() string      { return b.CastStrAuto(this.name) }
 
-func MakeArgInfo(name string, opts ...ArgInfoOpt) *ArgInfo {
-	argInfo := &ArgInfo{name: name}
+func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
+	argInfo := ArgInfo{name: name}
 	for _, opt := range opts {
-		opt(argInfo)
+		opt(&argInfo)
 	}
 	return argInfo
 }
-func MakeArgInfoSpecial(name int, opts ...ArgInfoOpt) *ArgInfo {
-	argInfo := &ArgInfo{name: name}
+func MakeArgInfoSpecial(name int, opts ...ArgInfoOpt) ArgInfo {
+	argInfo := ArgInfo{name: name}
 	for _, opt := range opts {
-		opt(argInfo)
+		opt(&argInfo)
 	}
 	return argInfo
 }
