@@ -357,7 +357,7 @@ var ArginfoFileObjectFputcsv []zend.ArgInfo = []zend.ArgInfo{
 var ArginfoFileObjectFlock []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("operation"),
-	zend.MakeArgInfo("wouldblock",ArgInfoByRef(1)),
+	zend.MakeArgInfo("wouldblock", ArgInfoByRef(1)),
 }
 var ArginfoFileObjectFseek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
@@ -371,7 +371,7 @@ var ArginfoFileObjectFgetss []zend.ArgInfo = []zend.ArgInfo{
 var ArginfoFileObjectFscanf []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
 	zend.MakeArgInfo("format"),
-	zend.MakeArgInfo("vars",ArgInfoByRef(1),ArgInfoVariadic()),
+	zend.MakeArgInfo("vars", ArgInfoByRef(1), ArgInfoVariadic()),
 }
 var ArginfoFileObjectFwrite []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),

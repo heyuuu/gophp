@@ -59,7 +59,7 @@ var zim_spl_SplSubject_detach func(execute_data *zend.ZendExecuteData, return_va
 var zim_spl_SplSubject_notify func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("subject",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
+	zend.MakeArgInfo("subject", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 }
 var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("update", nil, arginfo_SplObserver_update, uint32(b.SizeOf("arginfo_SplObserver_update")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
@@ -67,7 +67,7 @@ var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 }
 var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("observer",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
+	zend.MakeArgInfo("observer", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 }
 var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
@@ -216,16 +216,16 @@ const SPL_MULTIPLE_ITERATOR_GET_ALL_KEY = 2
 
 var arginfo_MultipleIterator_attachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 	zend.MakeArgInfo("infos"),
 }
 var arginfo_MultipleIterator_detachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var arginfo_MultipleIterator_containsIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0))),
 }
 var arginfo_MultipleIterator_setflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),

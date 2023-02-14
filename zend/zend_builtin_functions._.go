@@ -72,7 +72,7 @@ var ArginfoStrncmp []ArgInfo = []ArgInfo{
 }
 var ArginfoEach []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),
-	MakeArgInfo("arr",ArgInfoByRef(1)),
+	MakeArgInfo("arr", ArgInfoByRef(1)),
 }
 var ArginfoErrorReporting []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(0),

@@ -10,11 +10,11 @@ var ZendCeWeakref *ZendClassEntry
 
 var ZendWeakrefHandlers ZendObjectHandlers
 var ZendWeakrefCreateArginfo = []ArgInfo{
-	MakeReturnArgInfo(1,ArgInfoType(ZEND_TYPE_ENCODE_CLASS_CONST("WeakReference", 0))),
-	MakeArgInfo("referent",ArgInfoType(ZEND_TYPE_ENCODE(IS_OBJECT, 0))),
+	MakeReturnArgInfo(1, ArgInfoType(ZEND_TYPE_ENCODE_CLASS_CONST("WeakReference", 0))),
+	MakeArgInfo("referent", ArgInfoType(ZEND_TYPE_ENCODE(IS_OBJECT, 0))),
 }
 var ZendWeakrefGetArginfo = []ArgInfo{
-	MakeReturnArgInfo(0,ArgInfoType(ZEND_TYPE_ENCODE(IS_OBJECT, 1))),
+	MakeReturnArgInfo(0, ArgInfoType(ZEND_TYPE_ENCODE(IS_OBJECT, 1))),
 }
 var ZendWeakrefMethods = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__construct", zim_WeakReference___construct, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),

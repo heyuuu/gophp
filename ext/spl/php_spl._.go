@@ -95,18 +95,18 @@ Return hash id for given object */
 
 var ArginfoIteratorToArray []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 	zend.MakeArgInfo("use_keys"),
 }
 var ArginfoIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 }
 var ArginfoIteratorApply []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(2),
-	zend.MakeArgInfo("iterator",ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
+	zend.MakeArgInfo("iterator", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0))),
 	zend.MakeArgInfo("function"),
-	zend.MakeArgInfo("args",ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1))),
+	zend.MakeArgInfo("args", ArgInfoType(zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1))),
 }
 var ArginfoClassParents []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(1),

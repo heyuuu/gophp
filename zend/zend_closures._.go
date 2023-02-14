@@ -72,7 +72,7 @@ var ArginfoClosureBind []ArgInfo = []ArgInfo{
 var ArginfoClosureCall []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),
 	MakeArgInfo("newthis"),
-	MakeArgInfo("parameters",ArgInfoVariadic()),
+	MakeArgInfo("parameters", ArgInfoVariadic()),
 }
 var ArginfoClosureFromcallable []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(1),

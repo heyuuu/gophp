@@ -46,7 +46,7 @@ var ArginfoPhpUserFilterFilter []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("in"),
 	zend.MakeArgInfo("out"),
-	zend.MakeArgInfo("consumed",ArgInfoByRef(1)),
+	zend.MakeArgInfo("consumed", ArgInfoByRef(1)),
 	zend.MakeArgInfo("closing"),
 }
 var arginfo_php_user_filter_onCreate []zend.ArgInfo = []zend.ArgInfo{
