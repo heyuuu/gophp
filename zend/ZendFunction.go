@@ -2,6 +2,10 @@
 
 package zend
 
+type IFunction interface {
+	GetType() uint8
+}
+
 type functionHeader struct {
 	// type(8) + argFlags(24) 的组合数据
 	typ             uint8
@@ -25,21 +29,19 @@ func (this *functionHeader) GetRequiredNumArgs() uint32 { return this.requiredNu
  */
 type ZendFunction struct /* union */ {
 	functionHeader
-	type_           ZendUchar
-	quick_arg_flags uint32
-	common          struct {
-		//type_ ZendUchar
-		//arg_flags         [3]ZendUchar
-		//fn_flags          uint32
+	common struct {
 		function_name *ZendString
 		scope         *ZendClassEntry
 		prototype     *ZendFunction
-		//num_args          uint32
-		//required_num_args uint32
-		arg_info *ZendArgInfo
+		arg_info      *ZendArgInfo
 	}
 	op_array          ZendOpArray
 	internal_function ZendInternalFunction
+}
+
+func MakeZendFunctionInternal(intern *ZendInternalFunction) ZendFunction {
+	// todo
+	return ZendFunction{}
 }
 
 func (this *ZendFunction) ZEND_CHECK_ARG_FLAG(argNum1 uint32, mask uint8) bool {

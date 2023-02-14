@@ -247,9 +247,6 @@ func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, 
 }
 func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, function_table *HashTable, type_ int) int {
 	var ptr *ZendFunctionEntry = functions
-	var function ZendFunction
-	var reg_function *ZendFunction
-	var internal_function *ZendInternalFunction = (*ZendInternalFunction)(&function)
 	var count int = 0
 	var unload int = 0
 	var target_function_table *HashTable = function_table
@@ -279,9 +276,13 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	if target_function_table == nil {
 		target_function_table = CG__().GetFunctionTable()
 	}
-	internal_function.SetType(ZEND_INTERNAL_FUNCTION)
+	var reg_function *ZendFunction
+
+	//var internal_function *ZendInternalFunction = (*ZendInternalFunction)(&function)
+	var internal_function = NewInternalFunction()
+	var function ZendFunction = MakeZendFunc
+
 	internal_function.SetModule(EG__().GetCurrentModule())
-	memset(internal_function.GetReserved(), 0, ZEND_MAX_RESERVED_RESOURCES*b.SizeOf("void *"))
 	if scope != nil {
 		class_name_len = scope.GetName().GetLen()
 		if b.Assign(&lc_class_name, ZendMemrchr(scope.GetName().GetVal(), '\\', class_name_len)) {

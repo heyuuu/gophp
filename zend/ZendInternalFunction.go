@@ -5,6 +5,10 @@ package zend
 /**
  * ZendInternalFunction
  */
+const ZEND_MAX_RESERVED_RESOURCES = 6
+
+var _ IFunction = (*ZendInternalFunction)(nil)
+
 type ZendInternalFunction struct {
 	type_             ZendUchar
 	arg_flags         []ZendUchar
@@ -17,40 +21,19 @@ type ZendInternalFunction struct {
 	arg_info          *ArgInfo
 	handler           ZifHandler
 	module            *ZendModuleEntry
-	reserved          []any
+	reserved          [ZEND_MAX_RESERVED_RESOURCES]any
 }
 
-func MakeZendInternalFunction(
-	type_ ZendUchar,
-	arg_flags []ZendUchar,
-	fn_flags uint32,
-	function_name *ZendString,
-	scope *ZendClassEntry,
-	prototype *ZendFunction,
-	num_args uint32,
-	required_num_args uint32,
-	arg_info *ArgInfo,
-	handler ZifHandler,
-	module *ZendModuleEntry,
-	reserved []any,
-) ZendInternalFunction {
-	return ZendInternalFunction{
-		type_:             type_,
-		arg_flags:         arg_flags,
-		fn_flags:          fn_flags,
-		function_name:     function_name,
-		scope:             scope,
-		prototype:         prototype,
-		num_args:          num_args,
-		required_num_args: required_num_args,
-		arg_info:          arg_info,
-		handler:           handler,
-		module:            module,
-		reserved:          reserved,
-	}
+func NewInternalFunction() *ZendInternalFunction {
+	return &ZendInternalFunction{}
 }
 
-// func (this *ZendInternalFunction)  GetType() ZendUchar      { return this.type_ }
+func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
+	return ZendInternalFunction{handler: handler}
+}
+
+func (this *ZendInternalFunction) GetType() uint8 { return ZEND_INTERNAL_FUNCTION }
+
 func (this *ZendInternalFunction) SetType(value ZendUchar) { this.type_ = value }
 
 // func (this *ZendInternalFunction)  GetArgFlags() []ZendUchar      { return this.arg_flags }

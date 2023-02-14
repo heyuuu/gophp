@@ -66,7 +66,6 @@ const MAX_LENGTH_OF_DOUBLE = 32
 
 const ZEND_INFINITY float64 = _zendGetInf()
 const ZEND_NAN float64 = _zendGetNan()
-const ZEND_MAX_RESERVED_RESOURCES = 6
 
 /* excpt.h on Digital Unix 4.0 defines function_table */
 

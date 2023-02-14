@@ -97,7 +97,7 @@ const _CV_CODE = 4
 
 type IncdecT func(*Zval) int
 
-var ZendPassFunction ZendInternalFunction = MakeZendInternalFunction(ZEND_INTERNAL_FUNCTION, []ZendUchar{0, 0, 0}, 0, nil, nil, nil, 0, 0, nil, ZifPass, nil, []any{nil, nil, nil, nil})
+var ZendPassFunction = MakeInternalFunctionSimplify(ZifPass)
 
 const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
 const ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
