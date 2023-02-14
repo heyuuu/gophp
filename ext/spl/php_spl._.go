@@ -93,70 +93,70 @@ Return hash id for given object */
 /* {{{ PHP_MINFO(spl)
  */
 
-var ArginfoIteratorToArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoIteratorToArray []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
 	zend.MakeZendInternalArgInfo("use_keys", 0, 0, 0),
 }
-var ArginfoIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
 }
-var ArginfoIteratorApply []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoIteratorApply []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Traversable", 0), 0, 0),
 	zend.MakeZendInternalArgInfo("function", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("args", zend.ZEND_TYPE_ENCODE(zend.IS_ARRAY, 1), 0, 0),
 }
-var ArginfoClassParents []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoClassParents []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("instance", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoClassImplements []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoClassImplements []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoClassUses []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoClassUses []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("what", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoSplClasses []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplClasses []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
-var ArginfoSplAutoloadFunctions []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoloadFunctions []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
-var ArginfoSplAutoload []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoload []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("file_extensions", 0, 0, 0),
 }
-var ArginfoSplAutoloadExtensions []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoloadExtensions []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("file_extensions", 0, 0, 0),
 }
-var ArginfoSplAutoloadCall []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoloadCall []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
 }
-var ArginfoSplAutoloadRegister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoloadRegister []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("autoload_function", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("throw", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("prepend", 0, 0, 0),
 }
-var ArginfoSplAutoloadUnregister []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplAutoloadUnregister []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("autoload_function", 0, 0, 0),
 }
-var ArginfoSplObjectHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplObjectHash []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("obj", 0, 0, 0),
 }
-var ArginfoSplObjectId []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplObjectId []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("obj", 0, 0, 0),
 }

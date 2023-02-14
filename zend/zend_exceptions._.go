@@ -30,7 +30,7 @@ var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("getTraceAsString", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
 	MakeZendFunctionEntry("__toString", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
 }
-var ArginfoExceptionConstruct []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("message", 0, 0, 0),
 	MakeZendInternalArgInfo("code", 0, 0, 0),
@@ -49,7 +49,7 @@ var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("getTraceAsString", zim_exception_getTraceAsString, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
 	MakeZendFunctionEntry("__toString", zim_exception___toString, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
 }
-var ArginfoErrorExceptionConstruct []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoErrorExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("message", 0, 0, 0),
 	MakeZendInternalArgInfo("code", 0, 0, 0),

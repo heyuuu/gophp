@@ -74,25 +74,25 @@ type SplPtrHeapCmpFunc func(any, any, *zend.Zval) int
 
 var SplHeapItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplHeapItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
 var SplPqueueItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplHeapItDtor, SplHeapItValid, SplPqueueItGetCurrentData, SplHeapItGetCurrentKey, SplHeapItMoveForward, SplHeapItRewind, nil)
-var ArginfoHeapInsert []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoHeapInsert []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
 }
-var ArginfoHeapCompare []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoHeapCompare []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value1", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("value2", 0, 0, 0),
 }
-var ArginfoPqueueInsert []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoPqueueInsert []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("priority", 0, 0, 0),
 }
-var ArginfoPqueueSetflags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoPqueueSetflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
-var ArginfoSplheapVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplheapVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var spl_funcs_SplMinHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{

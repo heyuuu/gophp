@@ -550,7 +550,7 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 			str.AppendByte('$')
 			if arg_info.GetName() != nil {
 				if fptr.GetType() == ZEND_INTERNAL_FUNCTION {
-					str.AppendString(b.CastStrAuto((*ZendInternalArgInfo)(arg_info).GetName()))
+					str.AppendString((*ArgInfo)(arg_info).Name())
 				} else {
 					str.AppendString(b.CastStr(arg_info.GetName().GetVal(), arg_info.GetName().GetLen()))
 				}

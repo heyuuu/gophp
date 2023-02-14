@@ -50,152 +50,152 @@ import (
 
 /* {{{ arginfo */
 
-var ArginfoZendVoid []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoZendVoid []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 }
-var ArginfoFuncGetArg []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoFuncGetArg []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("arg_num", 0, 0, 0),
 }
-var ArginfoStrlen []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoStrlen []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("str", 0, 0, 0),
 }
-var ArginfoStrcmp []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoStrcmp []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("str1", 0, 0, 0),
 	MakeZendInternalArgInfo("str2", 0, 0, 0),
 }
-var ArginfoStrncmp []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoStrncmp []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(3)), 0, 0, 0),
 	MakeZendInternalArgInfo("str1", 0, 0, 0),
 	MakeZendInternalArgInfo("str2", 0, 0, 0),
 	MakeZendInternalArgInfo("len", 0, 0, 0),
 }
-var ArginfoEach []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoEach []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("arr", 0, 1, 0),
 }
-var ArginfoErrorReporting []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoErrorReporting []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("new_error_level", 0, 0, 0),
 }
-var ArginfoDefine []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoDefine []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("constant_name", 0, 0, 0),
 	MakeZendInternalArgInfo("value", 0, 0, 0),
 	MakeZendInternalArgInfo("case_insensitive", 0, 0, 0),
 }
-var ArginfoDefined []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoDefined []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("constant_name", 0, 0, 0),
 }
-var ArginfoGetClass []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetClass []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("object", 0, 0, 0),
 }
-var ArginfoIsSubclassOf []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoIsSubclassOf []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("object", 0, 0, 0),
 	MakeZendInternalArgInfo("class_name", 0, 0, 0),
 	MakeZendInternalArgInfo("allow_string", 0, 0, 0),
 }
-var ArginfoGetClassVars []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetClassVars []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("class_name", 0, 0, 0),
 }
-var ArginfoGetObjectVars []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetObjectVars []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("obj", 0, 0, 0),
 }
-var ArginfoGetMangledObjectVars []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetMangledObjectVars []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("obj", 0, 0, 0),
 }
-var ArginfoGetClassMethods []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetClassMethods []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("class", 0, 0, 0),
 }
-var ArginfoMethodExists []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoMethodExists []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("object", 0, 0, 0),
 	MakeZendInternalArgInfo("method", 0, 0, 0),
 }
-var ArginfoPropertyExists []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoPropertyExists []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("object_or_class", 0, 0, 0),
 	MakeZendInternalArgInfo("property_name", 0, 0, 0),
 }
-var ArginfoClassExists []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClassExists []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("classname", 0, 0, 0),
 	MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoTraitExists []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoTraitExists []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("traitname", 0, 0, 0),
 	MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoFunctionExists []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoFunctionExists []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("function_name", 0, 0, 0),
 }
-var ArginfoClassAlias []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClassAlias []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("user_class_name", 0, 0, 0),
 	MakeZendInternalArgInfo("alias_name", 0, 0, 0),
 	MakeZendInternalArgInfo("autoload", 0, 0, 0),
 }
-var ArginfoTriggerError []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoTriggerError []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("message", 0, 0, 0),
 	MakeZendInternalArgInfo("error_type", 0, 0, 0),
 }
-var ArginfoSetErrorHandler []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoSetErrorHandler []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("error_handler", 0, 0, 0),
 	MakeZendInternalArgInfo("error_types", 0, 0, 0),
 }
-var ArginfoSetExceptionHandler []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoSetExceptionHandler []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("exception_handler", 0, 0, 0),
 }
-var ArginfoGetDefinedFunctions []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetDefinedFunctions []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("exclude_disabled", 0, 0, 0),
 }
-var ArginfoCreateFunction []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoCreateFunction []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("args", 0, 0, 0),
 	MakeZendInternalArgInfo("code", 0, 0, 0),
 }
-var ArginfoGetResourceType []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetResourceType []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("res", 0, 0, 0),
 }
-var ArginfoGetResources []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetResources []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("type", 0, 0, 0),
 }
-var ArginfoGetLoadedExtensions []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetLoadedExtensions []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("zend_extensions", 0, 0, 0),
 }
-var ArginfoGetDefinedConstants []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGetDefinedConstants []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("categorize", 0, 0, 0),
 }
-var ArginfoDebugBacktrace []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoDebugBacktrace []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("options", 0, 0, 0),
 	MakeZendInternalArgInfo("limit", 0, 0, 0),
 }
-var ArginfoDebugPrintBacktrace []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoDebugPrintBacktrace []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	MakeZendInternalArgInfo("options", 0, 0, 0),
 	MakeZendInternalArgInfo("limit", 0, 0, 0),
 }
-var ArginfoExtensionLoaded []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoExtensionLoaded []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("extension_name", 0, 0, 0),
 }

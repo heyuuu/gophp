@@ -79,15 +79,15 @@ var ZendFuncsIterator []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
 var ZendFuncsTraversable *ZendFunctionEntry = nil
-var ArginfoArrayaccessOffset []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoArrayaccessOffset []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("offset", 0, 0, 0),
 }
-var ArginfoArrayaccessOffsetGet []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoArrayaccessOffsetGet []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("offset", 0, 0, 0),
 }
-var ArginfoArrayaccessOffsetValue []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoArrayaccessOffsetValue []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("offset", 0, 0, 0),
 	MakeZendInternalArgInfo("value", 0, 0, 0),
@@ -99,7 +99,7 @@ var ZendFuncsArrayaccess []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("offsetUnset", nil, ArginfoArrayaccessOffset, uint32(b.SizeOf("arginfo_arrayaccess_offset")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoSerializableSerialize []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoSerializableSerialize []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 	MakeZendInternalArgInfo("serialized", 0, 0, 0),
 }
@@ -108,7 +108,7 @@ var ZendFuncsSerializable []ZendFunctionEntry = []ZendFunctionEntry{
 	MakeZendFunctionEntry("unserialize", nil, ArginfoSerializableSerialize, uint32(b.SizeOf("arginfo_serializable_serialize")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
 	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoCountableCount []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoCountableCount []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 }
 var ZendFuncsCountable []ZendFunctionEntry = []ZendFunctionEntry{

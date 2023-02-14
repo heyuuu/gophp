@@ -10,12 +10,12 @@ import b "sik/builtin"
 type ZendFunctionEntry struct {
 	fname    *byte
 	handler  ZifHandler
-	arg_info *ZendInternalArgInfo
+	arg_info *ArgInfo
 	num_args uint32
 	flags    uint32
 }
 
-func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ZendInternalArgInfo) ZendFunctionEntry {
+func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ArgInfo) ZendFunctionEntry {
 	return ZendFunctionEntry{
 		fname:    b.CastStrPtr(fname),
 		handler:  handler,
@@ -25,7 +25,7 @@ func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg
 	}
 }
 
-func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ZendInternalArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
+func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
 	return ZendFunctionEntry{
 		fname:    b.CastStrPtr(fname),
 		handler:  handler,
@@ -34,11 +34,11 @@ func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ZendInter
 		flags:    flags,
 	}
 }
-func (this *ZendFunctionEntry) GetFname() *byte                  { return this.fname }
-func (this *ZendFunctionEntry) GetHandler() ZifHandler           { return this.handler }
-func (this *ZendFunctionEntry) GetArgInfo() *ZendInternalArgInfo { return this.arg_info }
-func (this *ZendFunctionEntry) GetNumArgs() uint32               { return this.num_args }
-func (this *ZendFunctionEntry) GetFlags() uint32                 { return this.flags }
+func (this *ZendFunctionEntry) GetFname() *byte        { return this.fname }
+func (this *ZendFunctionEntry) GetHandler() ZifHandler { return this.handler }
+func (this *ZendFunctionEntry) GetArgInfo() *ArgInfo   { return this.arg_info }
+func (this *ZendFunctionEntry) GetNumArgs() uint32     { return this.num_args }
+func (this *ZendFunctionEntry) GetFlags() uint32       { return this.flags }
 
 /* ZendFunctionEntry.flags */
 func (this *ZendFunctionEntry) AddFlags(value uint32)      { this.flags |= value }

@@ -2541,7 +2541,7 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 		}
 		if ptr.GetArgInfo() != nil {
 			var info *ZendInternalFunctionInfo = (*ZendInternalFunctionInfo)(ptr.GetArgInfo())
-			internal_function.SetArgInfo((*ZendInternalArgInfo)(ptr.GetArgInfo() + 1))
+			internal_function.SetArgInfo((*ArgInfo)(ptr.GetArgInfo() + 1))
 			internal_function.SetNumArgs(ptr.GetNumArgs())
 
 			/* Currently you cannot denote that the function can accept less arguments than num_args */

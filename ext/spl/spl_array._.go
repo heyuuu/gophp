@@ -137,7 +137,7 @@ Sort the entries by key using case insensitive "natural order" algorithm. */
 
 /* {{{ arginfo and function table */
 
-var ArginfoArrayConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArrayConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
@@ -146,49 +146,49 @@ var ArginfoArrayConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInf
 
 /* ArrayIterator::__construct and ArrayObject::__construct have different signatures */
 
-var ArginfoArrayIteratorConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArrayIteratorConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("array", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
-var arginfo_array_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_offsetGet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 }
-var arginfo_array_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_offsetSet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
 }
-var ArginfoArrayAppend []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArrayAppend []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
 }
-var ArginfoArraySeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArraySeek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("position", 0, 0, 0),
 }
-var arginfo_array_exchangeArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_exchangeArray []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("input", 0, 0, 0),
 }
-var arginfo_array_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_setFlags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
-var arginfo_array_setIteratorClass []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_setIteratorClass []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("iteratorClass", 0, 0, 0),
 }
-var arginfo_array_uXsort []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_array_uXsort []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("cmp_function", 0, 0, 0),
 }
-var ArginfoArrayUnserialize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArrayUnserialize []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("serialized", 0, 0, 0),
 }
-var ArginfoArrayVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoArrayVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var spl_funcs_ArrayObject []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{

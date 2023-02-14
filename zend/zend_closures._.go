@@ -58,23 +58,23 @@ const ZEND_CLOSURE_PRINT_NAME = "Closure object"
 /* non-static since it needs to be referenced */
 
 var ClosureHandlers ZendObjectHandlers
-var ArginfoClosureBindto []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClosureBindto []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("newthis", 0, 0, 0),
 	MakeZendInternalArgInfo("newscope", 0, 0, 0),
 }
-var ArginfoClosureBind []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClosureBind []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	MakeZendInternalArgInfo("closure", 0, 0, 0),
 	MakeZendInternalArgInfo("newthis", 0, 0, 0),
 	MakeZendInternalArgInfo("newscope", 0, 0, 0),
 }
-var ArginfoClosureCall []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClosureCall []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("newthis", 0, 0, 0),
 	MakeZendInternalArgInfo("parameters", 0, 0, 1),
 }
-var ArginfoClosureFromcallable []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoClosureFromcallable []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("callable", 0, 0, 0),
 }

@@ -132,25 +132,25 @@ Cronstructs a new dir iterator from a glob expression (no glob:// needed). */
 
 var SplFilesystemDirItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemDirItDtor, SplFilesystemDirItValid, SplFilesystemDirItCurrentData, SplFilesystemDirItCurrentKey, SplFilesystemDirItMoveForward, SplFilesystemDirItRewind, nil)
 var SplFilesystemTreeItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFilesystemTreeItDtor, SplFilesystemDirItValid, SplFilesystemTreeItCurrentData, SplFilesystemTreeItCurrentKey, SplFilesystemTreeItMoveForward, SplFilesystemTreeItRewind, nil)
-var ArginfoInfoConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoInfoConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
 }
-var arginfo_info_openFile []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_info_openFile []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("open_mode", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
 }
-var arginfo_info_optinalFileClass []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_info_optinalFileClass []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("class_name", 0, 0, 0),
 }
-var arginfo_optinalSuffix []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_optinalSuffix []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("suffix", 0, 0, 0),
 }
-var ArginfoSplfileinfoVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplfileinfoVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 
@@ -190,11 +190,11 @@ var spl_SplFileInfo_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEntr
 	zend.MakeZendFunctionEntry("__toString", zim_spl_SplFileInfo_getPathname, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoDirConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDirConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
 }
-var ArginfoDirItSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDirItSeek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("position", 0, 0, 0),
 }
@@ -216,16 +216,16 @@ var spl_DirectoryIterator_functions []zend.ZendFunctionEntry = []zend.ZendFuncti
 	zend.MakeZendFunctionEntry("__toString", zim_spl_DirectoryIterator_getFilename, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoRDirConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoRDirConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("path", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
-var arginfo_r_dir_hasChildren []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_r_dir_hasChildren []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("allow_links", 0, 0, 0),
 }
-var arginfo_r_dir_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_r_dir_setFlags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
@@ -326,67 +326,67 @@ var spl_GlobIterator_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEnt
 
 /* {{{ Function/Class/Method definitions */
 
-var ArginfoFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("file_name", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("open_mode", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("use_include_path", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("context", 0, 0, 0),
 }
-var arginfo_file_object_setFlags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_file_object_setFlags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }
-var arginfo_file_object_setMaxLineLen []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_file_object_setMaxLineLen []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("max_len", 0, 0, 0),
 }
-var ArginfoFileObjectFgetcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFgetcsv []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
 }
-var ArginfoFileObjectFputcsv []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFputcsv []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("fields", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("delimiter", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("enclosure", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("escape", 0, 0, 0),
 }
-var ArginfoFileObjectFlock []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFlock []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("operation", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("wouldblock", 0, 1, 0),
 }
-var ArginfoFileObjectFseek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFseek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("pos", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("whence", 0, 0, 0),
 }
-var ArginfoFileObjectFgetss []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFgetss []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("allowable_tags", 0, 0, 0),
 }
-var ArginfoFileObjectFscanf []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFscanf []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("format", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("vars", 0, 1, 1),
 }
-var ArginfoFileObjectFwrite []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFwrite []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("str", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
 }
-var ArginfoFileObjectFread []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFread []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("length", 0, 0, 0),
 }
-var ArginfoFileObjectFtruncate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectFtruncate []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
 }
-var ArginfoFileObjectSeek []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoFileObjectSeek []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("line_pos", 0, 0, 0),
 }
@@ -426,7 +426,7 @@ var spl_SplFileObject_functions []zend.ZendFunctionEntry = []zend.ZendFunctionEn
 	zend.MakeZendFunctionEntry("__toString", zim_spl_SplFileObject_fgets, ArginfoSplfileinfoVoid, uint32(b.SizeOf("arginfo_splfileinfo_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var ArginfoTempFileObjectConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoTempFileObjectConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("max_memory", 0, 0, 0),
 }

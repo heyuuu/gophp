@@ -73,29 +73,29 @@ Sets the value at the specified $index to $newval. */
 Unsets the value at the specified $index. */
 
 var SplFixedarrayItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplFixedarrayItDtor, SplFixedarrayItValid, SplFixedarrayItGetCurrentData, SplFixedarrayItGetCurrentKey, SplFixedarrayItMoveForward, SplFixedarrayItRewind, nil)
-var ArginfoSplfixedarrayConstruct []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplfixedarrayConstruct []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(0)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("size", 0, 0, 0),
 }
-var arginfo_fixedarray_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_fixedarray_offsetGet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 }
-var arginfo_fixedarray_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_fixedarray_offsetSet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
 }
-var arginfo_fixedarray_setSize []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_fixedarray_setSize []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
 }
-var arginfo_fixedarray_fromArray []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_fixedarray_fromArray []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("array", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("save_indexes", 0, 0, 0),
 }
-var ArginfoSplfixedarrayVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplfixedarrayVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{

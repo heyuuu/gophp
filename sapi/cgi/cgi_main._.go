@@ -87,7 +87,7 @@ const STDOUT_FILENO = 1
 const SAPI_CGI_MAX_HEADER_LENGTH = 1024
 const STDIN_FILENO = 0
 
-var ArginfoNoArgs = []zend.ZendInternalArgInfo{
+var ArginfoNoArgs = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var CgiFunctions = []zend.ZendFunctionEntry{

@@ -61,7 +61,7 @@ func ZendFreeInternalArgInfo(function *ZendInternalFunction) {
 	if function.HasFnFlags(ZEND_ACC_HAS_RETURN_TYPE|ZEND_ACC_HAS_TYPE_HINTS) && function.GetArgInfo() != nil {
 		var i uint32
 		var num_args uint32 = function.GetNumArgs() + 1
-		var arg_info *ZendInternalArgInfo = function.GetArgInfo() - 1
+		var arg_info *ArgInfo = function.GetArgInfo() - 1
 		if function.IsVariadic() {
 			num_args++
 		}

@@ -70,14 +70,14 @@ var ZendGeneratorHandlers ZendObjectHandlers
  * once per leaf */
 
 var ZendGeneratorIteratorFunctions ZendObjectIteratorFuncs = MakeZendObjectIteratorFuncs(ZendGeneratorIteratorDtor, ZendGeneratorIteratorValid, ZendGeneratorIteratorGetData, ZendGeneratorIteratorGetKey, ZendGeneratorIteratorMoveForward, ZendGeneratorIteratorRewind, nil)
-var ArginfoGeneratorVoid []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGeneratorVoid []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, ZEND_RETURN_VALUE, 0),
 }
-var ArginfoGeneratorSend []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGeneratorSend []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("value", 0, 0, 0),
 }
-var ArginfoGeneratorThrow []ZendInternalArgInfo = []ZendInternalArgInfo{
+var ArginfoGeneratorThrow []ArgInfo = []ArgInfo{
 	MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	MakeZendInternalArgInfo("exception", 0, 0, 0),
 }

@@ -57,7 +57,7 @@ var zim_spl_SplObserver_update func(execute_data *zend.ZendExecuteData, return_v
 var zim_spl_SplSubject_attach func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 var zim_spl_SplSubject_detach func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 var zim_spl_SplSubject_notify func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var arginfo_SplObserver_update []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("subject", zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0), 0, 0),
 }
@@ -65,11 +65,11 @@ var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntry("update", nil, arginfo_SplObserver_update, uint32(b.SizeOf("arginfo_SplObserver_update")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
 	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
 }
-var arginfo_SplSubject_attach []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("observer", zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0), 0, 0),
 }
-var arginfo_SplSubject_void []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 
@@ -144,32 +144,32 @@ Unserializes storage */
 
 /* {{{ proto array SplObjectStorage::__debugInfo() */
 
-var arginfo_Object []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_Object []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("object", 0, 0, 0),
 }
-var ArginfoAttach []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoAttach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("object", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("data", 0, 0, 0),
 }
-var arginfo_Serialized []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_Serialized []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("serialized", 0, 0, 0),
 }
-var arginfo_setInfo []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_setInfo []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("info", 0, 0, 0),
 }
-var arginfo_getHash []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_getHash []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("object", 0, 0, 0),
 }
-var arginfo_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_offsetGet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("object", 0, 0, 0),
 }
-var ArginfoSplobjectVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoSplobjectVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var spl_funcs_SplObjectStorage []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
@@ -214,20 +214,20 @@ const SPL_MULTIPLE_ITERATOR_GET_ALL_KEY = 2
 /* {{{ proto MultipleIterator::__construct([int flags = MIT_NEED_ALL|MIT_KEYS_NUMERIC])
    Iterator that iterates over several iterators one after the other */
 
-var arginfo_MultipleIterator_attachIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_MultipleIterator_attachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
 	zend.MakeZendInternalArgInfo("infos", 0, 0, 0),
 }
-var arginfo_MultipleIterator_detachIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_MultipleIterator_detachIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
 }
-var arginfo_MultipleIterator_containsIterator []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_MultipleIterator_containsIterator []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("iterator", zend.ZEND_TYPE_ENCODE_CLASS_CONST("Iterator", 0), 0, 0),
 }
-var arginfo_MultipleIterator_setflags []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_MultipleIterator_setflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("flags", 0, 0, 0),
 }

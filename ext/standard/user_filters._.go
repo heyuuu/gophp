@@ -42,17 +42,17 @@ var LeBucket int
 
 /* define the __special__  base filter class */
 
-var ArginfoPhpUserFilterFilter []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoPhpUserFilterFilter []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("in", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("out", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("consumed", 0, 1, 0),
 	zend.MakeZendInternalArgInfo("closing", 0, 0, 0),
 }
-var arginfo_php_user_filter_onCreate []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_php_user_filter_onCreate []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
-var arginfo_php_user_filter_onClose []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_php_user_filter_onClose []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
 var UserFilterClassFuncs []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{

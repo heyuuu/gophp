@@ -91,27 +91,27 @@ Inserts a new entry before the specified $index consisting of $newval. */
 /* {{{ iterator handler table */
 
 var SplDllistItFuncs zend.ZendObjectIteratorFuncs = zend.MakeZendObjectIteratorFuncs(SplDllistItDtor, SplDllistItValid, SplDllistItGetCurrentData, SplDllistItGetCurrentKey, SplDllistItMoveForward, SplDllistItRewind, nil)
-var ArginfoDllistSetiteratormode []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDllistSetiteratormode []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("mode", 0, 0, 0),
 }
-var ArginfoDllistPush []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDllistPush []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("value", 0, 0, 0),
 }
-var arginfo_dllist_offsetGet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_dllist_offsetGet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(1)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 }
-var arginfo_dllist_offsetSet []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var arginfo_dllist_offsetSet []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(2)), 0, 0, 0),
 	zend.MakeZendInternalArgInfo("index", 0, 0, 0),
 	zend.MakeZendInternalArgInfo("newval", 0, 0, 0),
 }
-var ArginfoDllistVoid []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDllistVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 }
-var ArginfoDllistSerialized []zend.ZendInternalArgInfo = []zend.ZendInternalArgInfo{
+var ArginfoDllistSerialized []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeZendInternalArgInfo((*byte)(zend_uintptr_t(-1)), 0, zend.ZEND_RETURN_VALUE, 0),
 	zend.MakeZendInternalArgInfo("serialized", 0, 0, 0),
 }

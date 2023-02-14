@@ -495,28 +495,6 @@ func (this *ZendClassConstant) GetCe() *ZendClassEntry          { return this.ce
 func (this *ZendClassConstant) SetCe(value *ZendClassEntry)     { this.ce = value }
 
 /**
- * ZendInternalArgInfo
- */
-type ZendInternalArgInfo struct {
-	name              *byte
-	type_             ZendType
-	pass_by_reference ZendUchar
-	is_variadic       ZendBool
-}
-
-func MakeZendInternalArgInfo(name *byte, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendInternalArgInfo {
-	return ZendInternalArgInfo{
-		name:              name,
-		type_:             type_,
-		pass_by_reference: pass_by_reference,
-		is_variadic:       is_variadic,
-	}
-}
-func (this *ZendInternalArgInfo) GetName() *byte          { return this.name }
-func (this *ZendInternalArgInfo) GetType() ZendType       { return this.type_ }
-func (this *ZendInternalArgInfo) GetIsVariadic() ZendBool { return this.is_variadic }
-
-/**
  * ZendArgInfo
  */
 type ZendArgInfo struct {
@@ -526,14 +504,6 @@ type ZendArgInfo struct {
 	is_variadic       ZendBool
 }
 
-// func MakeZendArgInfo(name *ZendString, type_ ZendType, pass_by_reference ZendUchar, is_variadic ZendBool) ZendArgInfo {
-//     return ZendArgInfo{
-//         name:name,
-//         type_:type_,
-//         pass_by_reference:pass_by_reference,
-//         is_variadic:is_variadic,
-//     }
-// }
 func (this *ZendArgInfo) GetName() *ZendString               { return this.name }
 func (this *ZendArgInfo) SetName(value *ZendString)          { this.name = value }
 func (this *ZendArgInfo) GetType() ZendType                  { return this.type_ }
