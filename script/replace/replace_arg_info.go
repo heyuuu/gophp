@@ -49,9 +49,9 @@ func ReplaceMakeArgInfo(code string) string {
 
 		// 组成 Make 方法调用
 		if isNameStr {
-			return fmt.Sprintf(`%sMakeArgInfo(%s)`, pkgPrefix, strings.Join(makeArgs, ","))
+			return fmt.Sprintf(`%sMakeArgInfo(%s),`, pkgPrefix, strings.Join(makeArgs, ","))
 		} else {
-			return fmt.Sprintf(`%sMakeArgInfoSpecial(%s)`, pkgPrefix, strings.Join(makeArgs, ","))
+			return fmt.Sprintf(`%sMakeArgInfoSpecial(%s),`, pkgPrefix, strings.Join(makeArgs, ","))
 		}
 	})
 

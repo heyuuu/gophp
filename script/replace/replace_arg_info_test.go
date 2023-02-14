@@ -14,7 +14,7 @@ func TestReplaceMakeArgInfo(t *testing.T) {
 		code := util.MustReadFileString(file.Path)
 		result := ReplaceMakeArgInfo(code)
 		if result != code {
-			println(result)
+			util.MustWriteFileString(file.Path, result)
 		}
 	})
 }
