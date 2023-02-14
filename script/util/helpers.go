@@ -58,3 +58,12 @@ func RegexReplaceAll(rule *regexp.Regexp, src string, repl func(matches []string
 
 	return buf.String()
 }
+
+func EqualsAny[T comparable](value T, expected ...T) bool {
+	for _, v := range expected {
+		if value == v {
+			return true
+		}
+	}
+	return false
+}
