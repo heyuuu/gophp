@@ -25,6 +25,11 @@ func (this ZendType) Ce() *ZendClassEntry {
 func (this ZendType) Code() int       { return this >> int64(2) }
 func (this ZendType) AllowNull() bool { return b.FlagMatch(this, 0x1) }
 
+// todo 不明确作用
+func (this ZendType) TypeName() string {
+	return (*byte)(this)
+}
+
 /**
  * HashTableIterator
  */

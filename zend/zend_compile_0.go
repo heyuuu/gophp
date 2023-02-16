@@ -115,21 +115,8 @@ func RT_CONSTANT(opline *ZendOp, node ZnodeOp) *Zval {
 func ZEND_PASS_TWO_UPDATE_CONSTANT(op_array *ZendOpArray, opline *ZendOp, node ZnodeOp) {
 	node.SetConstant((*byte)(CT_CONSTANT_EX(op_array, node.GetConstant())) - (*byte)(opline))
 }
-func ZEND_PASS_TWO_UNDO_CONSTANT(op_array __auto__, opline *ZendOp, node ZnodeOp) {
-	node.SetConstant(RT_CONSTANT(opline, node) - op_array.literals)
-}
 func RUN_TIME_CACHE(op_array __auto__) any {
 	return ZEND_MAP_PTR_GET(op_array.run_time_cache)
-}
-func ZEND_OP_ARRAY_EXTENSION(op_array __auto__, handle __auto__) any {
-	return (*any)(RUN_TIME_CACHE(op_array))[handle]
-}
-func ZendTryExceptionHandler() {
-	if EG__().GetException() != nil {
-		if EG__().GetUserExceptionHandler().GetType() != IS_UNDEF {
-			ZendUserExceptionHandler()
-		}
-	}
 }
 func ZendUnmanglePropertyName(mangled_property *ZendString, class_name **byte, prop_name **byte) int {
 	return ZendUnmanglePropertyNameEx(mangled_property, class_name, prop_name, nil)

@@ -56,7 +56,7 @@ func (this *ZendFunction) CheckArgSendType(argNum1 uint32, mask uint8) bool {
 		}
 		argNum = len(this.argInfos) - 1
 	}
-	return this.argInfos[argNum].PassByReference()&mask != 0
+	return this.argInfos[argNum].ByReference()&mask != 0
 }
 
 func (this *ZendFunction) GetCommonType() ZendUchar                  { return this.GetType() }

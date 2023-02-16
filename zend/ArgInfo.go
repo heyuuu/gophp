@@ -6,7 +6,7 @@ func ArgInfoType(typ ZendType) ArgInfoOpt {
 	return func(info *ArgInfo) { info.typ = typ }
 }
 func ArgInfoByRef(byRef ZendUchar) ArgInfoOpt {
-	return func(info *ArgInfo) { info.passByReference = byRef }
+	return func(info *ArgInfo) { info.byReference = byRef }
 }
 func ArgInfoVariadic() ArgInfoOpt {
 	return func(info *ArgInfo) { info.isVariadic = true }
@@ -17,19 +17,19 @@ func ArgInfoVariadic() ArgInfoOpt {
  * 用于代替 ArgInfo / ZendArgInfo
  */
 type ArgInfo struct {
-	name            string
-	typ             ZendType
-	passByReference uint8
-	isVariadic      bool
+	name        string
+	typ         ZendType
+	byReference uint8
+	isVariadic  bool
 	// 为 returnArg 临时使用，后续需替换
 	requiredNumArgs int // -1 表示需要所有参数
 }
 
-func (this *ArgInfo) Name() string           { return this.name }
-func (this *ArgInfo) Type() ZendType         { return this.typ }
-func (this *ArgInfo) PassByReference() uint8 { return this.passByReference }
-func (this *ArgInfo) IsVariadic() bool       { return this.isVariadic }
-func (this *ArgInfo) RequiredNumArgs() int   { return this.requiredNumArgs }
+func (this *ArgInfo) Name() string         { return this.name }
+func (this *ArgInfo) Type() ZendType       { return this.typ }
+func (this *ArgInfo) ByReference() uint8   { return this.byReference }
+func (this *ArgInfo) IsVariadic() bool     { return this.isVariadic }
+func (this *ArgInfo) RequiredNumArgs() int { return this.requiredNumArgs }
 
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	argInfo := ArgInfo{name: name}
