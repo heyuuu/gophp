@@ -221,7 +221,6 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 	var fcc ZendFcallInfoCache
 	var mptr *ZendFunction
 	var instance Zval
-	var call ZendInternalFunction
 	if ZendIsCallableEx(callable, nil, 0, nil, &fcc, error) == 0 {
 		return FAILURE
 	}
@@ -248,14 +247,11 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 				return FAILURE
 			}
 		}
-		memset(&call, 0, b.SizeOf("zend_internal_function"))
-		call.SetType(ZEND_INTERNAL_FUNCTION)
+		call := NewInternalFunctionEx(mptr.GetFunctionName().GetStr(), ZendClosureCallMagic)
 		call.SetFnFlags(mptr.GetFnFlags() & ZEND_ACC_STATIC)
-		call.SetHandler(ZendClosureCallMagic)
-		call.SetFunctionName(mptr.GetFunctionName())
 		call.SetScope(mptr.GetScope())
 		ZendFreeTrampoline(mptr)
-		mptr = (*ZendFunction)(&call)
+		mptr = NewZendFunctionInternal(call)
 	}
 	if fcc.GetObject() != nil {
 		instance.SetObject(fcc.GetObject())

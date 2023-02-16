@@ -39,6 +39,11 @@ type ZendFunction struct /* union */ {
 	internal_function ZendInternalFunction
 }
 
+func NewZendFunctionInternal(intern *ZendInternalFunction) *ZendFunction {
+	// todo
+	return &ZendFunction{}
+}
+
 func MakeZendFunctionInternal(intern *ZendInternalFunction) ZendFunction {
 	// todo
 	return ZendFunction{}

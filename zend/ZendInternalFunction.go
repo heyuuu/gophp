@@ -28,6 +28,13 @@ func NewInternalFunction() *ZendInternalFunction {
 	return &ZendInternalFunction{}
 }
 
+func NewInternalFunctionEx(funcName string, handler ZifHandler) *ZendInternalFunction {
+	return &ZendInternalFunction{
+		function_name: NewZendString(funcName),
+		handler:       handler,
+	}
+}
+
 func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
 	return ZendInternalFunction{handler: handler}
 }
