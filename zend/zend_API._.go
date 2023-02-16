@@ -197,6 +197,4 @@ var ModuleRequestStartupHandlers **ZendModuleEntry
 var ModuleRequestShutdownHandlers **ZendModuleEntry
 var ModulePostDeactivateHandlers **ZendModuleEntry
 var ClassCleanupHandlers **ZendClassEntry
-var DisabledClassNew []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
-}
+var DisabledClassNew []ZendFunctionEntry = []ZendFunctionEntry{}

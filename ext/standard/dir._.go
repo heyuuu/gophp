@@ -3,7 +3,6 @@
 package standard
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -33,10 +32,9 @@ var DirClassEntryPtr *zend.ZendClassEntry
 /* {{{ arginfo */
 
 var PhpDirClassFunctions []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("close", ZifClosedir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("rewind", ZifRewinddir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("read", PhpIfReaddir, ArginfoDir, uint32(b.SizeOf("arginfo_dir")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("close", 0, ZifClosedir, ArginfoDir),
+	zend.MakeZendFunctionEntryEx("rewind", 0, ZifRewinddir, ArginfoDir),
+	zend.MakeZendFunctionEntryEx("read", 0, PhpIfReaddir, ArginfoDir),
 }
 
 /* {{{ proto bool chroot(string directory)

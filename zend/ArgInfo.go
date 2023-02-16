@@ -22,14 +22,14 @@ type ArgInfo struct {
 	passByReference uint8
 	isVariadic      bool
 	// 为 returnArg 临时使用，后续需替换
-	requiredArgs int // -1 表示需要所有参数
+	requiredNumArgs int // -1 表示需要所有参数
 }
 
 func (this *ArgInfo) Name() string           { return this.name }
 func (this *ArgInfo) Type() ZendType         { return this.typ }
 func (this *ArgInfo) PassByReference() uint8 { return this.passByReference }
 func (this *ArgInfo) IsVariadic() bool       { return this.isVariadic }
-func (this *ArgInfo) RequiredArgs() int      { return this.requiredArgs }
+func (this *ArgInfo) RequiredNumArgs() int   { return this.requiredNumArgs }
 
 func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	argInfo := ArgInfo{name: name}
@@ -38,8 +38,8 @@ func MakeArgInfo(name string, opts ...ArgInfoOpt) ArgInfo {
 	}
 	return argInfo
 }
-func MakeReturnArgInfo(requiredArgs int, opts ...ArgInfoOpt) ArgInfo {
-	argInfo := ArgInfo{requiredArgs: requiredArgs}
+func MakeReturnArgInfo(requiredNumArgs int, opts ...ArgInfoOpt) ArgInfo {
+	argInfo := ArgInfo{requiredNumArgs: requiredNumArgs}
 	for _, opt := range opts {
 		opt(&argInfo)
 	}

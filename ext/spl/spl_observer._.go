@@ -3,7 +3,6 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -62,8 +61,7 @@ var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("subject", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 }
 var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("update", nil, arginfo_SplObserver_update, uint32(b.SizeOf("arginfo_SplObserver_update")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplObserver_update),
 }
 var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
@@ -78,10 +76,9 @@ var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
 ZEND_END_ARG_INFO();*/
 
 var spl_funcs_SplSubject []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("attach", nil, arginfo_SplSubject_attach, uint32(b.SizeOf("arginfo_SplSubject_attach")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
-	zend.MakeZendFunctionEntry("detach", nil, arginfo_SplSubject_attach, uint32(b.SizeOf("arginfo_SplSubject_attach")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
-	zend.MakeZendFunctionEntry("notify", nil, arginfo_SplSubject_void, uint32(b.SizeOf("arginfo_SplSubject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("attach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
+	zend.MakeZendFunctionEntryEx("detach", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_attach),
+	zend.MakeZendFunctionEntryEx("notify", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplSubject_void),
 }
 var spl_handler_SplObjectStorage zend.ZendObjectHandlers
 
@@ -173,31 +170,30 @@ var ArginfoSplobjectVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_SplObjectStorage []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("attach", zim_spl_SplObjectStorage_attach, ArginfoAttach, uint32(b.SizeOf("arginfo_attach")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("detach", zim_spl_SplObjectStorage_detach, arginfo_Object, uint32(b.SizeOf("arginfo_Object")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("contains", zim_spl_SplObjectStorage_contains, arginfo_Object, uint32(b.SizeOf("arginfo_Object")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("addAll", zim_spl_SplObjectStorage_addAll, arginfo_Object, uint32(b.SizeOf("arginfo_Object")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("removeAll", zim_spl_SplObjectStorage_removeAll, arginfo_Object, uint32(b.SizeOf("arginfo_Object")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("removeAllExcept", zim_spl_SplObjectStorage_removeAllExcept, arginfo_Object, uint32(b.SizeOf("arginfo_Object")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("getInfo", zim_spl_SplObjectStorage_getInfo, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("setInfo", zim_spl_SplObjectStorage_setInfo, arginfo_setInfo, uint32(b.SizeOf("arginfo_setInfo")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("getHash", zim_spl_SplObjectStorage_getHash, arginfo_getHash, uint32(b.SizeOf("arginfo_getHash")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("count", zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_SplObjectStorage_rewind, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("valid", zim_spl_SplObjectStorage_valid, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("key", zim_spl_SplObjectStorage_key, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("current", zim_spl_SplObjectStorage_current, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("next", zim_spl_SplObjectStorage_next, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("unserialize", zim_spl_SplObjectStorage_unserialize, arginfo_Serialized, uint32(b.SizeOf("arginfo_Serialized")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("serialize", zim_spl_SplObjectStorage_serialize, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("__unserialize", zim_spl_SplObjectStorage___unserialize, arginfo_Serialized, uint32(b.SizeOf("arginfo_Serialized")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("__serialize", zim_spl_SplObjectStorage___serialize, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("offsetExists", zim_spl_SplObjectStorage_contains, arginfo_offsetGet, uint32(b.SizeOf("arginfo_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("offsetSet", zim_spl_SplObjectStorage_attach, ArginfoAttach, uint32(b.SizeOf("arginfo_attach")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("offsetUnset", zim_spl_SplObjectStorage_detach, arginfo_offsetGet, uint32(b.SizeOf("arginfo_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("offsetGet", zim_spl_SplObjectStorage_offsetGet, arginfo_offsetGet, uint32(b.SizeOf("arginfo_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("attach", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
+	zend.MakeZendFunctionEntryEx("detach", 0, zim_spl_SplObjectStorage_detach, arginfo_Object),
+	zend.MakeZendFunctionEntryEx("contains", 0, zim_spl_SplObjectStorage_contains, arginfo_Object),
+	zend.MakeZendFunctionEntryEx("addAll", 0, zim_spl_SplObjectStorage_addAll, arginfo_Object),
+	zend.MakeZendFunctionEntryEx("removeAll", 0, zim_spl_SplObjectStorage_removeAll, arginfo_Object),
+	zend.MakeZendFunctionEntryEx("removeAllExcept", 0, zim_spl_SplObjectStorage_removeAllExcept, arginfo_Object),
+	zend.MakeZendFunctionEntryEx("getInfo", 0, zim_spl_SplObjectStorage_getInfo, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("setInfo", 0, zim_spl_SplObjectStorage_setInfo, arginfo_setInfo),
+	zend.MakeZendFunctionEntryEx("getHash", 0, zim_spl_SplObjectStorage_getHash, arginfo_getHash),
+	zend.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("count", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("rewind", 0, zim_spl_SplObjectStorage_rewind, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("valid", 0, zim_spl_SplObjectStorage_valid, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("key", 0, zim_spl_SplObjectStorage_key, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("current", 0, zim_spl_SplObjectStorage_current, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("next", 0, zim_spl_SplObjectStorage_next, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("unserialize", 0, zim_spl_SplObjectStorage_unserialize, arginfo_Serialized),
+	zend.MakeZendFunctionEntryEx("serialize", 0, zim_spl_SplObjectStorage_serialize, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("__unserialize", 0, zim_spl_SplObjectStorage___unserialize, arginfo_Serialized),
+	zend.MakeZendFunctionEntryEx("__serialize", 0, zim_spl_SplObjectStorage___serialize, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("offsetExists", 0, zim_spl_SplObjectStorage_contains, arginfo_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetSet", 0, zim_spl_SplObjectStorage_attach, ArginfoAttach),
+	zend.MakeZendFunctionEntryEx("offsetUnset", 0, zim_spl_SplObjectStorage_detach, arginfo_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetGet", 0, zim_spl_SplObjectStorage_offsetGet, arginfo_offsetGet),
 }
 
 type MultipleIteratorFlags = int
@@ -232,20 +228,19 @@ var arginfo_MultipleIterator_setflags []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("flags"),
 }
 var spl_funcs_MultipleIterator []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("__construct", zim_spl_MultipleIterator___construct, arginfo_MultipleIterator_setflags, uint32(b.SizeOf("arginfo_MultipleIterator_setflags")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("getFlags", zim_spl_MultipleIterator_getFlags, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("setFlags", zim_spl_MultipleIterator_setFlags, arginfo_MultipleIterator_setflags, uint32(b.SizeOf("arginfo_MultipleIterator_setflags")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("attachIterator", zim_spl_MultipleIterator_attachIterator, arginfo_MultipleIterator_attachIterator, uint32(b.SizeOf("arginfo_MultipleIterator_attachIterator")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("detachIterator", zim_spl_SplObjectStorage_detach, arginfo_MultipleIterator_detachIterator, uint32(b.SizeOf("arginfo_MultipleIterator_detachIterator")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("containsIterator", zim_spl_SplObjectStorage_contains, arginfo_MultipleIterator_containsIterator, uint32(b.SizeOf("arginfo_MultipleIterator_containsIterator")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("countIterators", zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_MultipleIterator_rewind, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("valid", zim_spl_MultipleIterator_valid, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("key", zim_spl_MultipleIterator_key, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("current", zim_spl_MultipleIterator_current, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry("next", zim_spl_MultipleIterator_next, ArginfoSplobjectVoid, uint32(b.SizeOf("arginfo_splobject_void")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("__construct", 0, zim_spl_MultipleIterator___construct, arginfo_MultipleIterator_setflags),
+	zend.MakeZendFunctionEntryEx("getFlags", 0, zim_spl_MultipleIterator_getFlags, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("setFlags", 0, zim_spl_MultipleIterator_setFlags, arginfo_MultipleIterator_setflags),
+	zend.MakeZendFunctionEntryEx("attachIterator", 0, zim_spl_MultipleIterator_attachIterator, arginfo_MultipleIterator_attachIterator),
+	zend.MakeZendFunctionEntryEx("detachIterator", 0, zim_spl_SplObjectStorage_detach, arginfo_MultipleIterator_detachIterator),
+	zend.MakeZendFunctionEntryEx("containsIterator", 0, zim_spl_SplObjectStorage_contains, arginfo_MultipleIterator_containsIterator),
+	zend.MakeZendFunctionEntryEx("countIterators", 0, zim_spl_SplObjectStorage_count, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("__debugInfo", 0, zim_spl_SplObjectStorage___debugInfo, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("rewind", 0, zim_spl_MultipleIterator_rewind, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("valid", 0, zim_spl_MultipleIterator_valid, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("key", 0, zim_spl_MultipleIterator_key, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("current", 0, zim_spl_MultipleIterator_current, ArginfoSplobjectVoid),
+	zend.MakeZendFunctionEntryEx("next", 0, zim_spl_MultipleIterator_next, ArginfoSplobjectVoid),
 }
 
 /* {{{ PHP_MINIT_FUNCTION(spl_observer) */

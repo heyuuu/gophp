@@ -21,14 +21,14 @@ var ZendThrowExceptionHook func(ex *Zval)
 var DefaultExceptionHandlers ZendObjectHandlers
 
 var ZendFuncsThrowable []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntry("getMessage", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getCode", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getFile", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getLine", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getTrace", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getPrevious", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("getTraceAsString", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
-	MakeZendFunctionEntry("__toString", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT),
+	MakeZendFunctionEntryEx("getMessage", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getCode", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getFile", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getLine", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getTrace", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getPrevious", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("getTraceAsString", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
+	MakeZendFunctionEntryEx("__toString", ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT, nil, nil),
 }
 var ArginfoExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(0),
@@ -37,17 +37,17 @@ var ArginfoExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeArgInfo("previous"),
 }
 var DefaultExceptionFunctions = []ZendFunctionEntry{
-	MakeZendFunctionEntry("__clone", ZimExceptionClone, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PRIVATE|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("__construct", ZimExceptionConstruct, ArginfoExceptionConstruct, uint32(b.SizeOf("arginfo_exception___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("__wakeup", ZimExceptionWakeup, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("getMessage", zim_exception_getMessage, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getCode", zim_exception_getCode, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getFile", zim_exception_getFile, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getLine", zim_exception_getLine, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getTrace", zim_exception_getTrace, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getPrevious", zim_exception_getPrevious, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("getTraceAsString", zim_exception_getTraceAsString, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry("__toString", zim_exception___toString, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), 0),
+	MakeZendFunctionEntryEx("__clone", ZEND_ACC_PRIVATE|ZEND_ACC_FINAL, ZimExceptionClone, nil),
+	MakeZendFunctionEntryEx("__construct", ZEND_ACC_PUBLIC, ZimExceptionConstruct, ArginfoExceptionConstruct),
+	MakeZendFunctionEntryEx("__wakeup", ZEND_ACC_PUBLIC, ZimExceptionWakeup, nil),
+	MakeZendFunctionEntryEx("getMessage", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getMessage, nil),
+	MakeZendFunctionEntryEx("getCode", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getCode, nil),
+	MakeZendFunctionEntryEx("getFile", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getFile, nil),
+	MakeZendFunctionEntryEx("getLine", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getLine, nil),
+	MakeZendFunctionEntryEx("getTrace", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getTrace, nil),
+	MakeZendFunctionEntryEx("getPrevious", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getPrevious, nil),
+	MakeZendFunctionEntryEx("getTraceAsString", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_exception_getTraceAsString, nil),
+	MakeZendFunctionEntryEx("__toString", 0, zim_exception___toString, nil),
 }
 var ArginfoErrorExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeReturnArgInfo(0),
@@ -59,7 +59,6 @@ var ArginfoErrorExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeArgInfo("previous"),
 }
 var ErrorExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntry("__construct", ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct, uint32(b.SizeOf("arginfo_error_exception___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("getSeverity", zim_error_exception_getSeverity, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_FINAL),
-	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	MakeZendFunctionEntryEx("__construct", ZEND_ACC_PUBLIC, ZimErrorExceptionConstruct, ArginfoErrorExceptionConstruct),
+	MakeZendFunctionEntryEx("getSeverity", ZEND_ACC_PUBLIC|ZEND_ACC_FINAL, zim_error_exception_getSeverity, nil),
 }

@@ -2,10 +2,6 @@
 
 package zend
 
-import (
-	b "sik/builtin"
-)
-
 // Source: <Zend/zend_generators.h>
 
 /*
@@ -82,13 +78,12 @@ var ArginfoGeneratorThrow []ArgInfo = []ArgInfo{
 	MakeArgInfo("exception"),
 }
 var GeneratorFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntry("rewind", zim_Generator_rewind, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("valid", zim_Generator_valid, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("current", zim_Generator_current, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("key", zim_Generator_key, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("next", zim_Generator_next, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("send", zim_Generator_send, ArginfoGeneratorSend, uint32(b.SizeOf("arginfo_generator_send")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("throw", zim_Generator_throw, ArginfoGeneratorThrow, uint32(b.SizeOf("arginfo_generator_throw")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("getReturn", zim_Generator_getReturn, ArginfoGeneratorVoid, uint32(b.SizeOf("arginfo_generator_void")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	MakeZendFunctionEntryEx("rewind", ZEND_ACC_PUBLIC, zim_Generator_rewind, ArginfoGeneratorVoid),
+	MakeZendFunctionEntryEx("valid", ZEND_ACC_PUBLIC, zim_Generator_valid, ArginfoGeneratorVoid),
+	MakeZendFunctionEntryEx("current", ZEND_ACC_PUBLIC, zim_Generator_current, ArginfoGeneratorVoid),
+	MakeZendFunctionEntryEx("key", ZEND_ACC_PUBLIC, zim_Generator_key, ArginfoGeneratorVoid),
+	MakeZendFunctionEntryEx("next", ZEND_ACC_PUBLIC, zim_Generator_next, ArginfoGeneratorVoid),
+	MakeZendFunctionEntryEx("send", ZEND_ACC_PUBLIC, zim_Generator_send, ArginfoGeneratorSend),
+	MakeZendFunctionEntryEx("throw", ZEND_ACC_PUBLIC, zim_Generator_throw, ArginfoGeneratorThrow),
+	MakeZendFunctionEntryEx("getReturn", ZEND_ACC_PUBLIC, zim_Generator_getReturn, ArginfoGeneratorVoid),
 }

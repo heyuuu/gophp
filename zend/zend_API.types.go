@@ -8,62 +8,57 @@ import b "sik/builtin"
  * ZendFunctionEntry
  */
 type ZendFunctionEntry struct {
-	fname    *byte
-	handler  ZifHandler
-	arg_info *ArgInfo
-	num_args uint32
-	flags    uint32
+	funcName        string
+	handler         ZifHandler
+	requiredNumArgs uint32
+	argInfos        []ArgInfo
+	returnArgInfo   *ArgInfo
+	flags           uint32
 }
 
-func (this *ZendFunctionEntry) FuncName() string       { return b.CastStrAuto(this.fname) }
-func (this *ZendFunctionEntry) Handler() ZifHandler    { return this.handler }
-func (this *ZendFunctionEntry) ArgInfos() []ArgInfo    { return b.CastSlice(this.arg_info) }
-func (this *ZendFunctionEntry) ReturnArgInfo() ArgInfo { return this.arg_info[-1] }
-func (this *ZendFunctionEntry) RequiredArgNum() int    { return this.arg_info[-1].requiredArgs }
-func (this *ZendFunctionEntry) Flags() uint32          { return this.flags }
+func MakeZendFunctionEntryEx(funcName string, flags uint32, handler ZifHandler, inputArgInfos []ArgInfo) ZendFunctionEntry {
+	var requiredNumArgs int
+	var argInfos []ArgInfo
+	var returnArgInfo *ArgInfo
 
-func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ArgInfo) ZendFunctionEntry {
+	if len(inputArgInfos) > 0 {
+		requiredNumArgs = inputArgInfos[0].requiredNumArgs
+		if requiredNumArgs < 0 { // 为 -1 时表示所有参数都必填
+			requiredNumArgs = len(inputArgInfos) - 1
+		}
+	}
+	if len(inputArgInfos) > 1 {
+		argInfos = inputArgInfos[1:]
+	}
+
 	return ZendFunctionEntry{
-		fname:    b.CastStrPtr(fname),
-		handler:  handler,
-		arg_info: arg_info,
-		num_args: uint32(len(arg_info)),
-		flags:    flags,
+		funcName:        funcName,
+		handler:         handler,
+		requiredNumArgs: uint32(requiredNumArgs),
+		argInfos:        argInfos,
+		returnArgInfo:   returnArgInfo,
+		flags:           flags,
 	}
 }
 
-func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info []ArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
-	return ZendFunctionEntry{
-		fname:    b.CastStrPtr(fname),
-		handler:  handler,
-		arg_info: arg_info,
-		num_args: num_args,
-		flags:    flags,
-	}
-}
-func (this *ZendFunctionEntry) GetFname() *byte        { return this.fname }
-func (this *ZendFunctionEntry) GetHandler() ZifHandler { return this.handler }
-func (this *ZendFunctionEntry) GetArgInfo() *ArgInfo   { return this.arg_info }
-func (this *ZendFunctionEntry) GetNumArgs() uint32     { return this.num_args }
-func (this *ZendFunctionEntry) GetFlags() uint32       { return this.flags }
+func (this *ZendFunctionEntry) FuncName() string        { return this.funcName }
+func (this *ZendFunctionEntry) Handler() ZifHandler     { return this.handler }
+func (this *ZendFunctionEntry) ArgInfos() []ArgInfo     { return this.argInfos }
+func (this *ZendFunctionEntry) ReturnArgInfo() *ArgInfo { return this.returnArgInfo }
+func (this *ZendFunctionEntry) RequiredNumArgs() uint32 { return this.requiredNumArgs }
+func (this *ZendFunctionEntry) NumArgs() uint32         { return uint32(len(this.argInfos)) }
+func (this *ZendFunctionEntry) Flags() uint32           { return this.flags }
+
+func (this *ZendFunctionEntry) GetFname() *byte      { return b.CastStrPtr(this.funcName) }
+func (this *ZendFunctionEntry) GetArgInfo() *ArgInfo { return b.CastPtr[ArgInfo](this.ArgInfos()) }
+func (this *ZendFunctionEntry) GetNumArgs() uint32   { return this.NumArgs() }
+func (this *ZendFunctionEntry) GetFlags() uint32     { return this.flags }
 
 /* ZendFunctionEntry.flags */
-func (this *ZendFunctionEntry) AddFlags(value uint32)      { this.flags |= value }
-func (this *ZendFunctionEntry) SubFlags(value uint32)      { this.flags &^= value }
 func (this *ZendFunctionEntry) HasFlags(value uint32) bool { return this.flags&value != 0 }
-func (this *ZendFunctionEntry) SwitchFlags(value uint32, cond bool) {
-	if cond {
-		this.AddFlags(value)
-	} else {
-		this.SubFlags(value)
-	}
-}
-func (this ZendFunctionEntry) IsPppMask() bool          { return this.HasFlags(ZEND_ACC_PPP_MASK) }
-func (this ZendFunctionEntry) IsAbstract() bool         { return this.HasFlags(ZEND_ACC_ABSTRACT) }
-func (this ZendFunctionEntry) IsStatic() bool           { return this.HasFlags(ZEND_ACC_STATIC) }
-func (this *ZendFunctionEntry) SetIsPppMask(cond bool)  { this.SwitchFlags(ZEND_ACC_PPP_MASK, cond) }
-func (this *ZendFunctionEntry) SetIsAbstract(cond bool) { this.SwitchFlags(ZEND_ACC_ABSTRACT, cond) }
-func (this *ZendFunctionEntry) SetIsStatic(cond bool)   { this.SwitchFlags(ZEND_ACC_STATIC, cond) }
+func (this ZendFunctionEntry) IsPppMask() bool             { return this.HasFlags(ZEND_ACC_PPP_MASK) }
+func (this ZendFunctionEntry) IsAbstract() bool            { return this.HasFlags(ZEND_ACC_ABSTRACT) }
+func (this ZendFunctionEntry) IsStatic() bool              { return this.HasFlags(ZEND_ACC_STATIC) }
 
 /**
  * ZendFcallInfo

@@ -3,7 +3,6 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -99,21 +98,20 @@ var ArginfoSplfixedarrayVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_SplFixedArray []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("__construct", zim_spl_SplFixedArray___construct, ArginfoSplfixedarrayConstruct, uint32(b.SizeOf("arginfo_splfixedarray_construct")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__wakeup", zim_spl_SplFixedArray___wakeup, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("count", zim_spl_SplFixedArray_count, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("toArray", zim_spl_SplFixedArray_toArray, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("fromArray", zim_spl_SplFixedArray_fromArray, arginfo_fixedarray_fromArray, uint32(b.SizeOf("arginfo_fixedarray_fromArray")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_STATIC),
-	zend.MakeZendFunctionEntry("getSize", zim_spl_SplFixedArray_getSize, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("setSize", zim_spl_SplFixedArray_setSize, arginfo_fixedarray_setSize, uint32(b.SizeOf("arginfo_fixedarray_setSize")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetExists", zim_spl_SplFixedArray_offsetExists, arginfo_fixedarray_offsetGet, uint32(b.SizeOf("arginfo_fixedarray_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetGet", zim_spl_SplFixedArray_offsetGet, arginfo_fixedarray_offsetGet, uint32(b.SizeOf("arginfo_fixedarray_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetSet", zim_spl_SplFixedArray_offsetSet, arginfo_fixedarray_offsetSet, uint32(b.SizeOf("arginfo_fixedarray_offsetSet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetUnset", zim_spl_SplFixedArray_offsetUnset, arginfo_fixedarray_offsetGet, uint32(b.SizeOf("arginfo_fixedarray_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_SplFixedArray_rewind, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("current", zim_spl_SplFixedArray_current, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("key", zim_spl_SplFixedArray_key, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("next", zim_spl_SplFixedArray_next, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("valid", zim_spl_SplFixedArray_valid, ArginfoSplfixedarrayVoid, uint32(b.SizeOf("arginfo_splfixedarray_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("__construct", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray___construct, ArginfoSplfixedarrayConstruct),
+	zend.MakeZendFunctionEntryEx("__wakeup", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray___wakeup, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_count, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("toArray", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_toArray, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("fromArray", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_STATIC, zim_spl_SplFixedArray_fromArray, arginfo_fixedarray_fromArray),
+	zend.MakeZendFunctionEntryEx("getSize", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_getSize, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("setSize", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_setSize, arginfo_fixedarray_setSize),
+	zend.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_offsetExists, arginfo_fixedarray_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_offsetGet, arginfo_fixedarray_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_offsetSet, arginfo_fixedarray_offsetSet),
+	zend.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_offsetUnset, arginfo_fixedarray_offsetGet),
+	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_rewind, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_current, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_key, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_next, ArginfoSplfixedarrayVoid),
+	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_SplFixedArray_valid, ArginfoSplfixedarrayVoid),
 }

@@ -3,7 +3,6 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -116,36 +115,34 @@ var ArginfoDllistSerialized []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeArgInfo("serialized"),
 }
 var spl_funcs_SplQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("enqueue", zim_spl_SplDoublyLinkedList_push, ArginfoDllistPush, uint32(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("dequeue", zim_spl_SplDoublyLinkedList_shift, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("enqueue", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_push, ArginfoDllistPush),
+	zend.MakeZendFunctionEntryEx("dequeue", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_shift, ArginfoDllistVoid),
 }
 var spl_funcs_SplDoublyLinkedList []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("pop", zim_spl_SplDoublyLinkedList_pop, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("shift", zim_spl_SplDoublyLinkedList_shift, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("push", zim_spl_SplDoublyLinkedList_push, ArginfoDllistPush, uint32(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("unshift", zim_spl_SplDoublyLinkedList_unshift, ArginfoDllistPush, uint32(b.SizeOf("arginfo_dllist_push")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("top", zim_spl_SplDoublyLinkedList_top, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("bottom", zim_spl_SplDoublyLinkedList_bottom, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("isEmpty", zim_spl_SplDoublyLinkedList_isEmpty, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("setIteratorMode", zim_spl_SplDoublyLinkedList_setIteratorMode, ArginfoDllistSetiteratormode, uint32(b.SizeOf("arginfo_dllist_setiteratormode")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("getIteratorMode", zim_spl_SplDoublyLinkedList_getIteratorMode, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplDoublyLinkedList___debugInfo, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("count", zim_spl_SplDoublyLinkedList_count, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetExists", zim_spl_SplDoublyLinkedList_offsetExists, arginfo_dllist_offsetGet, uint32(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetGet", zim_spl_SplDoublyLinkedList_offsetGet, arginfo_dllist_offsetGet, uint32(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetSet", zim_spl_SplDoublyLinkedList_offsetSet, arginfo_dllist_offsetSet, uint32(b.SizeOf("arginfo_dllist_offsetSet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("offsetUnset", zim_spl_SplDoublyLinkedList_offsetUnset, arginfo_dllist_offsetGet, uint32(b.SizeOf("arginfo_dllist_offsetGet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("add", zim_spl_SplDoublyLinkedList_add, arginfo_dllist_offsetSet, uint32(b.SizeOf("arginfo_dllist_offsetSet")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_SplDoublyLinkedList_rewind, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("current", zim_spl_SplDoublyLinkedList_current, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("key", zim_spl_SplDoublyLinkedList_key, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("next", zim_spl_SplDoublyLinkedList_next, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("prev", zim_spl_SplDoublyLinkedList_prev, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("valid", zim_spl_SplDoublyLinkedList_valid, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("unserialize", zim_spl_SplDoublyLinkedList_unserialize, ArginfoDllistSerialized, uint32(b.SizeOf("arginfo_dllist_serialized")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("serialize", zim_spl_SplDoublyLinkedList_serialize, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__unserialize", zim_spl_SplDoublyLinkedList___unserialize, ArginfoDllistSerialized, uint32(b.SizeOf("arginfo_dllist_serialized")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__serialize", zim_spl_SplDoublyLinkedList___serialize, ArginfoDllistVoid, uint32(b.SizeOf("arginfo_dllist_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("pop", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_pop, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("shift", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_shift, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("push", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_push, ArginfoDllistPush),
+	zend.MakeZendFunctionEntryEx("unshift", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_unshift, ArginfoDllistPush),
+	zend.MakeZendFunctionEntryEx("top", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_top, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("bottom", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_bottom, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("isEmpty", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_isEmpty, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("setIteratorMode", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_setIteratorMode, ArginfoDllistSetiteratormode),
+	zend.MakeZendFunctionEntryEx("getIteratorMode", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_getIteratorMode, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList___debugInfo, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_count, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("offsetExists", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_offsetExists, arginfo_dllist_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetGet", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_offsetGet, arginfo_dllist_offsetGet),
+	zend.MakeZendFunctionEntryEx("offsetSet", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_offsetSet, arginfo_dllist_offsetSet),
+	zend.MakeZendFunctionEntryEx("offsetUnset", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_offsetUnset, arginfo_dllist_offsetGet),
+	zend.MakeZendFunctionEntryEx("add", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_add, arginfo_dllist_offsetSet),
+	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_rewind, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_current, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_key, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_next, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("prev", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_prev, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_valid, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_unserialize, ArginfoDllistSerialized),
+	zend.MakeZendFunctionEntryEx("serialize", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList_serialize, ArginfoDllistVoid),
+	zend.MakeZendFunctionEntryEx("__unserialize", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList___unserialize, ArginfoDllistSerialized),
+	zend.MakeZendFunctionEntryEx("__serialize", zend.ZEND_ACC_PUBLIC, zim_spl_SplDoublyLinkedList___serialize, ArginfoDllistVoid),
 }

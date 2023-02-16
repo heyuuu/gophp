@@ -79,10 +79,9 @@ var ArginfoClosureFromcallable []ArgInfo = []ArgInfo{
 	MakeArgInfo("callable"),
 }
 var ClosureFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntry("__construct", zim_Closure___construct, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PRIVATE),
-	MakeZendFunctionEntry("bind", zim_Closure_bind, ArginfoClosureBind, uint32(b.SizeOf("arginfo_closure_bind")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_STATIC),
-	MakeZendFunctionEntry("bindTo", zim_Closure_bind, ArginfoClosureBindto, uint32(b.SizeOf("arginfo_closure_bindto")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("call", zim_Closure_call, ArginfoClosureCall, uint32(b.SizeOf("arginfo_closure_call")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
-	MakeZendFunctionEntry("fromCallable", zim_Closure_fromCallable, ArginfoClosureFromcallable, uint32(b.SizeOf("arginfo_closure_fromcallable")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC|ZEND_ACC_STATIC),
-	MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	MakeZendFunctionEntryEx("__construct", ZEND_ACC_PRIVATE, zim_Closure___construct, nil),
+	MakeZendFunctionEntryEx("bind", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_bind, ArginfoClosureBind),
+	MakeZendFunctionEntryEx("bindTo", ZEND_ACC_PUBLIC, zim_Closure_bind, ArginfoClosureBindto),
+	MakeZendFunctionEntryEx("call", ZEND_ACC_PUBLIC, zim_Closure_call, ArginfoClosureCall),
+	MakeZendFunctionEntryEx("fromCallable", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC, zim_Closure_fromCallable, ArginfoClosureFromcallable),
 }

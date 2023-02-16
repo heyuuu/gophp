@@ -3,7 +3,6 @@
 package spl
 
 import (
-	b "sik/builtin"
 	"sik/zend"
 )
 
@@ -96,46 +95,42 @@ var ArginfoSplheapVoid []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 }
 var spl_funcs_SplMinHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("compare", zim_spl_SplMinHeap_compare, ArginfoHeapCompare, uint32(b.SizeOf("arginfo_heap_compare")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PROTECTED),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("compare", zend.ZEND_ACC_PROTECTED, zim_spl_SplMinHeap_compare, ArginfoHeapCompare),
 }
 var spl_funcs_SplMaxHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("compare", zim_spl_SplMaxHeap_compare, ArginfoHeapCompare, uint32(b.SizeOf("arginfo_heap_compare")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PROTECTED),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("compare", zend.ZEND_ACC_PROTECTED, zim_spl_SplMaxHeap_compare, ArginfoHeapCompare),
 }
 var spl_funcs_SplPriorityQueue []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("compare", zim_spl_SplPriorityQueue_compare, ArginfoHeapCompare, uint32(b.SizeOf("arginfo_heap_compare")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("insert", zim_spl_SplPriorityQueue_insert, ArginfoPqueueInsert, uint32(b.SizeOf("arginfo_pqueue_insert")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("setExtractFlags", zim_spl_SplPriorityQueue_setExtractFlags, ArginfoPqueueSetflags, uint32(b.SizeOf("arginfo_pqueue_setflags")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("getExtractFlags", zim_spl_SplPriorityQueue_getExtractFlags, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("top", zim_spl_SplPriorityQueue_top, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("extract", zim_spl_SplPriorityQueue_extract, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("count", zim_spl_SplHeap_count, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("isEmpty", zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_SplHeap_rewind, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("current", zim_spl_SplPriorityQueue_current, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("key", zim_spl_SplHeap_key, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("next", zim_spl_SplHeap_next, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("valid", zim_spl_SplHeap_valid, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("recoverFromCorruption", zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("isCorrupted", zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplPriorityQueue___debugInfo, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("compare", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_compare, ArginfoHeapCompare),
+	zend.MakeZendFunctionEntryEx("insert", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_insert, ArginfoPqueueInsert),
+	zend.MakeZendFunctionEntryEx("setExtractFlags", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_setExtractFlags, ArginfoPqueueSetflags),
+	zend.MakeZendFunctionEntryEx("getExtractFlags", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_getExtractFlags, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("top", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_top, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("extract", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_extract, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_count, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("isEmpty", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_rewind, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue_current, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_key, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_next, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_valid, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("recoverFromCorruption", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("isCorrupted", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_SplPriorityQueue___debugInfo, ArginfoSplheapVoid),
 }
 var spl_funcs_SplHeap []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
-	zend.MakeZendFunctionEntry("extract", zim_spl_SplHeap_extract, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("insert", zim_spl_SplHeap_insert, ArginfoHeapInsert, uint32(b.SizeOf("arginfo_heap_insert")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("top", zim_spl_SplHeap_top, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("count", zim_spl_SplHeap_count, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("isEmpty", zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("rewind", zim_spl_SplHeap_rewind, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("current", zim_spl_SplHeap_current, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("key", zim_spl_SplHeap_key, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("next", zim_spl_SplHeap_next, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("valid", zim_spl_SplHeap_valid, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("recoverFromCorruption", zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("isCorrupted", zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("__debugInfo", zim_spl_SplHeap___debugInfo, ArginfoSplheapVoid, uint32(b.SizeOf("arginfo_splheap_void")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PUBLIC),
-	zend.MakeZendFunctionEntry("compare", nil, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), zend.ZEND_ACC_PROTECTED|zend.ZEND_ACC_ABSTRACT),
-	zend.MakeZendFunctionEntry(nil, nil, nil, 0, 0),
+	zend.MakeZendFunctionEntryEx("extract", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_extract, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("insert", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_insert, ArginfoHeapInsert),
+	zend.MakeZendFunctionEntryEx("top", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_top, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("count", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_count, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("isEmpty", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_isEmpty, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("rewind", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_rewind, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("current", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_current, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("key", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_key, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("next", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_next, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("valid", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_valid, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("recoverFromCorruption", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_recoverFromCorruption, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("isCorrupted", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap_isCorrupted, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("__debugInfo", zend.ZEND_ACC_PUBLIC, zim_spl_SplHeap___debugInfo, ArginfoSplheapVoid),
+	zend.MakeZendFunctionEntryEx("compare", zend.ZEND_ACC_PROTECTED|zend.ZEND_ACC_ABSTRACT, nil, nil),
 }

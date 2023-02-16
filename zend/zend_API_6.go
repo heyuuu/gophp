@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_table *HashTable) {
