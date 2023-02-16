@@ -32,6 +32,17 @@ func MakeInternalFunctionSimplify(handler ZifHandler) ZendInternalFunction {
 	return ZendInternalFunction{handler: handler}
 }
 
+func (this *ZendInternalFunction) InitByEntry(entry *ZendFunctionEntry) {
+	this.handler = entry.Handler()
+	this.function_name = NewZendString(entry.FuncName())
+	this.prototype = nil
+
+	argInfos := entry.ArgInfos()
+
+	if len(argInfos) != 0 {
+	}
+}
+
 func (this *ZendInternalFunction) GetType() uint8 { return ZEND_INTERNAL_FUNCTION }
 
 func (this *ZendInternalFunction) SetType(value ZendUchar) { this.type_ = value }

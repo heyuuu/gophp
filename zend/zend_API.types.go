@@ -19,6 +19,7 @@ func (this *ZendFunctionEntry) FuncName() string       { return b.CastStrAuto(th
 func (this *ZendFunctionEntry) Handler() ZifHandler    { return this.handler }
 func (this *ZendFunctionEntry) ArgInfos() []ArgInfo    { return b.CastSlice(this.arg_info) }
 func (this *ZendFunctionEntry) ReturnArgInfo() ArgInfo { return this.arg_info[-1] }
+func (this *ZendFunctionEntry) RequiredArgNum() int    { return this.arg_info[-1].requiredArgs }
 func (this *ZendFunctionEntry) Flags() uint32          { return this.flags }
 
 func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ArgInfo) ZendFunctionEntry {
@@ -31,7 +32,7 @@ func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg
 	}
 }
 
-func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info *ArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
+func MakeZendFunctionEntry(fname string, handler ZifHandler, arg_info []ArgInfo, num_args uint32, flags uint32) ZendFunctionEntry {
 	return ZendFunctionEntry{
 		fname:    b.CastStrPtr(fname),
 		handler:  handler,

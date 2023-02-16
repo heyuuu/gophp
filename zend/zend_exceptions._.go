@@ -36,7 +36,7 @@ var ArginfoExceptionConstruct []ArgInfo = []ArgInfo{
 	MakeArgInfo("code"),
 	MakeArgInfo("previous"),
 }
-var DefaultExceptionFunctions []ZendFunctionEntry = []ZendFunctionEntry{
+var DefaultExceptionFunctions = []ZendFunctionEntry{
 	MakeZendFunctionEntry("__clone", ZimExceptionClone, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PRIVATE|ZEND_ACC_FINAL),
 	MakeZendFunctionEntry("__construct", ZimExceptionConstruct, ArginfoExceptionConstruct, uint32(b.SizeOf("arginfo_exception___construct")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),
 	MakeZendFunctionEntry("__wakeup", ZimExceptionWakeup, nil, uint32(b.SizeOf("NULL")/b.SizeOf("struct _zend_internal_arg_info")-1), ZEND_ACC_PUBLIC),

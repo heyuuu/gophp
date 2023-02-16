@@ -294,10 +294,9 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	}
 	for ptr.GetFname() != nil {
 		fname_len = strlen(ptr.GetFname())
-		internal_function.SetHandler(ptr.GetHandler())
-		internal_function.SetFunctionName(ZendStringInitInterned(ptr.GetFname(), fname_len, 1))
+
+		internal_function.InitByEntry(ptr)
 		internal_function.SetScope(scope)
-		internal_function.SetPrototype(nil)
 		if ptr.GetFlags() != 0 {
 			if !ptr.IsPppMask() {
 				if ptr.GetFlags() != ZEND_ACC_DEPRECATED && scope != nil {
@@ -602,4 +601,3 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	}
 	return SUCCESS
 }
-
