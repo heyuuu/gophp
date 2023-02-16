@@ -278,9 +278,8 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	}
 	var reg_function *ZendFunction
 
-	//var internal_function *ZendInternalFunction = (*ZendInternalFunction)(&function)
 	var internal_function = NewInternalFunction()
-	var function ZendFunction = MakeZendFunc
+	var function ZendFunction = MakeZendFunctionInternal(internal_function)
 
 	internal_function.SetModule(EG__().GetCurrentModule())
 	if scope != nil {
@@ -603,3 +602,4 @@ func ZendRegisterFunctions(scope *ZendClassEntry, functions *ZendFunctionEntry, 
 	}
 	return SUCCESS
 }
+

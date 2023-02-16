@@ -15,6 +15,12 @@ type ZendFunctionEntry struct {
 	flags    uint32
 }
 
+func (this *ZendFunctionEntry) FuncName() string       { return b.CastStrAuto(this.fname) }
+func (this *ZendFunctionEntry) Handler() ZifHandler    { return this.handler }
+func (this *ZendFunctionEntry) ArgInfos() []ArgInfo    { return b.CastSlice(this.arg_info) }
+func (this *ZendFunctionEntry) ReturnArgInfo() ArgInfo { return this.arg_info[-1] }
+func (this *ZendFunctionEntry) Flags() uint32          { return this.flags }
+
 func MakeZendFunctionEntryEx(fname string, flags uint32, handler ZifHandler, arg_info []ArgInfo) ZendFunctionEntry {
 	return ZendFunctionEntry{
 		fname:    b.CastStrPtr(fname),

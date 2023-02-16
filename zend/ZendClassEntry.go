@@ -99,6 +99,8 @@ func (this *ZendClassEntry) InitMethods(functions []ZendFunctionEntry) {
 	this.SetBuiltinFunctions(functions)
 }
 
+func (this *ZendClassEntry) Name() string { return this.name.GetStr() }
+
 /**
  * Getter / Setter
  */
