@@ -4,45 +4,25 @@ package zend
 
 import (
 	b "sik/builtin"
+	"strings"
 )
 
-func ZendUnregisterFunctions(functions *ZendFunctionEntry, count int, function_table *HashTable) {
-	var ptr *ZendFunctionEntry = functions
-	var i int = 0
-	var target_function_table *HashTable = function_table
-	var lowercase_name *ZendString
-	var fname_len int
-	if target_function_table == nil {
-		target_function_table = CG__().GetFunctionTable()
+func ZendUnregisterFunctions(functions []ZendFunctionEntry, count int, functionTable *HashTable) {
+	targetFunctionTable := functionTable
+	if targetFunctionTable == nil {
+		targetFunctionTable = CG__().GetFunctionTable()
 	}
-	for ptr.GetFname() != nil {
-		if count != -1 && i >= count {
+
+	for i, ptr := range functions {
+		// count 为 -1 不限制；否则限制方法个数
+		if count == -1 || i >= count {
 			break
 		}
-		fname_len = strlen(ptr.GetFname())
-		lowercase_name = ZendStringAlloc(fname_len, 0)
-		ZendStrTolowerCopy(lowercase_name.GetVal(), ptr.GetFname(), fname_len)
-		ZendHashDel(target_function_table, lowercase_name)
-		ZendStringEfree(lowercase_name)
-		ptr++
-		i++
+		lcName := strings.ToLower(ptr.FuncName())
+		functionTable.KeyDelete(lcName)
 	}
 }
-func ZendStartupModule(module *ZendModuleEntry) int {
-	if b.Assign(&module, ZendRegisterInternalModule(module)) != nil && ZendStartupModuleEx(module) == SUCCESS {
-		return SUCCESS
-	}
-	return FAILURE
-}
-func ZendGetModuleStarted(module_name *byte) int {
-	var module *ZendModuleEntry
-	module = ZendHashStrFindPtr(&ModuleRegistry, module_name, strlen(module_name))
-	if module != nil && module.GetModuleStarted() != 0 {
-		return SUCCESS
-	} else {
-		return FAILURE
-	}
-}
+
 func CleanModuleClass(el *Zval, arg any) int {
 	var ce *ZendClassEntry = (*ZendClassEntry)(el.GetPtr())
 	var module_number int = *((*int)(arg))
