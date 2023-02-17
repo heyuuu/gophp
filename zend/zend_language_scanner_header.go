@@ -10,7 +10,6 @@ import (
 
 const YYCURSOR *uint8 = LANG_SCNG__().yy_cursor
 const YYLIMIT *uint8 = LANG_SCNG__().yy_limit
-const YYMARKER = LANG_SCNG__().yy_marker
 
 func YYSETCONDITION(s int) __auto__ {
 	LANG_SCNG__().yy_state = s
@@ -53,7 +52,7 @@ func StartupScanner() {
 func ShutdownScanner() {
 	var sc *LangScanner
 	CG__().parse_error = 0
-	RESET_DOC_COMMENT()
+	sc.docComment = nil
 	sc.stateStack.Clean()
 	sc.heredocLabelStack.Clean()
 	sc.heredocScanAhead = false
@@ -83,7 +82,6 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	}
 	size := len(buf)
 
-	var compiled_filename *ZendString
 	ZEND_ASSERT(!(EG__().exception) && "stream_fixup() should have failed")
 
 	ZendLlistAddElement(CG__().open_files, fileHandle)
@@ -97,35 +95,29 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	}
 
 	/* Reset the scanner for scanning the new file */
-
-	LANG_SCNG__().yy_in = fileHandle
-	LANG_SCNG__().yy_start = nil
-	if size != -1 {
-		LANG_SCNG__().yy_start = (*uint8)(buf)
-		YyScanBuffer(buf, size)
-	} else {
-		ZendErrorNoreturn(E_COMPILE_ERROR, "zend_stream_mmap() failed")
-	}
+	sc := NewLangScanner(buf)
 	if CG__().skip_shebang {
-		CG__().skip_shebang = 0
-		BEGIN(SHEBANG)
+		CG__().skip_shebang = false
+		sc.begin(yycSHEBANG)
 	} else {
-		BEGIN(INITIAL)
+		sc.begin(yycINITIAL)
 	}
-	if fileHandle.openedPath {
-		compiled_filename = zend_string_copy(fileHandle.openedPath)
+
+	var compiled_filename string
+	if len(fileHandle.openedPath) != 0 {
+		compiled_filename = fileHandle.openedPath
 	} else {
-		compiled_filename = zend_string_init(fileHandle.filename, strlen(fileHandle.filename), 0)
+		compiled_filename = fileHandle.filename
 	}
 	zend_set_compiled_filename(compiled_filename)
-	zend_string_release_ex(compiled_filename, 0)
+	ZendSetCompiledFilename(compiled_filename)
 	RESET_DOC_COMMENT()
 	CG__().zend_lineno = 1
 	CG__().increment_lineno = 0
 	return SUCCESS
 }
-func ZendCompile(type_ int) *zend_op_array {
-	var op_array *zend_op_array = nil
+func ZendCompile(type_ int) *ZendOpArray {
+	var op_array *ZendOpArray = nil
 	var original_in_compilation zend_bool = CG__().in_compilation
 	CG__().in_compilation = 1
 	CG__().ast = nil
@@ -160,25 +152,6 @@ func ZendCompile(type_ int) *zend_op_array {
 	zend_ast_destroy(CG__().ast)
 	zend_arena_destroy(CG__().ast_arena)
 	CG__().in_compilation = original_in_compilation
-	return op_array
-}
-func CompileFile(file_handle *zend_file_handle, type_ int) *zend_op_array {
-	var original_lex_state ZendLexState
-	var op_array *zend_op_array = nil
-	ZendSaveLexicalState(&original_lex_state)
-	if OpenFileForScanning(file_handle) == FAILURE {
-		if !(EG__().exception) {
-			if type_ == ZEND_REQUIRE {
-				zend_message_dispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.filename)
-				zend_bailout()
-			} else {
-				zend_message_dispatcher(ZMSG_FAILED_INCLUDE_FOPEN, file_handle.filename)
-			}
-		}
-	} else {
-		op_array = ZendCompile(ZEND_USER_FUNCTION)
-	}
-	ZendRestoreLexicalState(&original_lex_state)
 	return op_array
 }
 func CompileFilename(type_ int, filename *zval) *zend_op_array {
@@ -220,7 +193,7 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 	Z_STR_P(str) = zend_string_extend(Z_STR_P(str), old_len+ZEND_MMAP_AHEAD, 0)
 	Z_TYPE_INFO_P(str) = IS_STRING_EX
 	memset(Z_STRVAL_P(str)+old_len, 0, ZEND_MMAP_AHEAD+1)
-	LANG_SCNG__().yy_in = nil
+	//LANG_SCNG__().yy_in = nil
 	LANG_SCNG__().yy_start = nil
 	buf = Z_STRVAL_P(str)
 	size = old_len

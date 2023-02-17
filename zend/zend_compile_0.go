@@ -329,7 +329,7 @@ func InitCompiler() {
 	memset(CG__().GetContext(), 0, b.SizeOf("CG ( context )"))
 	ZendInitCompilerDataStructures()
 	ZendInitRsrcList()
-	ZendHashInit(CG__().GetFilenamesTable(), 8, nil, ZVAL_PTR_DTOR, 0)
+	CG__().filenamesTable = make(map[string]string)
 	CG__().GetOpenFiles().Init(b.SizeOf("zend_file_handle"), (func(any))(FileHandleDtor), 0)
 	CG__().SetUncleanShutdown(0)
 	CG__().SetDelayedVarianceObligations(nil)
@@ -338,7 +338,7 @@ func InitCompiler() {
 func ShutdownCompiler() {
 	CG__().GetLoopVarStack().Destroy()
 	CG__().GetDelayedOplinesStack().Destroy()
-	CG__().GetFilenamesTable().Destroy()
+	CG__().filenamesTable = nil
 	ZendArenaDestroy(CG__().GetArena())
 	if CG__().GetDelayedVarianceObligations() != nil {
 		CG__().GetDelayedVarianceObligations().Destroy()
@@ -351,19 +351,10 @@ func ShutdownCompiler() {
 		CG__().SetDelayedAutoloads(nil)
 	}
 }
-func ZendSetCompiledFilename(new_compiled_filename *ZendString) *ZendString {
-	var p *Zval
-	var rv Zval
-	if b.Assign(&p, CG__().GetFilenamesTable().KeyFind(new_compiled_filename.GetStr())) {
-		ZEND_ASSERT(p.IsString())
-		CG__().SetCompiledFilename(p.GetStr())
-		return p.GetStr()
+func ZendSetCompiledFilename(new_compiled_filename string) {
+	if _, ok := CG__().filenamesTable[new_compiled_filename]; !ok {
+		CG__().filenamesTable[new_compiled_filename] = new_compiled_filename
 	}
-	new_compiled_filename = ZendNewInternedString(new_compiled_filename.Copy())
-	rv.SetString(new_compiled_filename)
-	CG__().GetFilenamesTable().KeyAddNew(new_compiled_filename.GetStr(), &rv)
-	CG__().SetCompiledFilename(new_compiled_filename)
-	return new_compiled_filename
 }
 func ZendRestoreCompiledFilename(original_compiled_filename *ZendString) {
 	CG__().SetCompiledFilename(original_compiled_filename)
@@ -372,7 +363,7 @@ func ZendGetCompiledFilename() *ZendString { return CG__().GetCompiledFilename()
 func ZendGetCompiledLineno() int           { return CG__().GetZendLineno() }
 func ZendIsCompiling() ZendBool            { return CG__().GetInCompilation() }
 func GetTemporaryVariable() uint32 {
-	return uint32(b.PostInc(&(CG__().GetActiveOpArray().GetT())))
+	return b.PostInc(&(CG__().GetActiveOpArray().GetT()))
 }
 func LookupCv(name *ZendString) int {
 	var op_array *ZendOpArray = CG__().GetActiveOpArray()

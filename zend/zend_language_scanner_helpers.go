@@ -43,6 +43,10 @@ type LangScanner struct {
 	docComment *string // CG__().doc_comment *ZendString
 }
 
+func NewLangScanner() *LangScanner {
+	return &LangScanner{}
+}
+
 func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
 	var zv Zval
 	zv.SetUndef()
@@ -302,7 +306,7 @@ func (sc *LangScanner) saveLexState() *ZendLexState {
 	lexState.input_filter = sc.inputFilter
 	lexState.output_filter = sc.outputFilter
 
-	lexState.in = LANG_SCNG__().yy_in
+	//lexState.in = LANG_SCNG__().yy_in
 	lexState.filename = ZendGetCompiledFilename()
 	lexState.script_org = LANG_SCNG__().script_org
 	lexState.script_org_size = LANG_SCNG__().script_org_size
@@ -336,7 +340,7 @@ func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
 	sc.inputFilter = lexState.input_filter
 	sc.outputFilter = lexState.output_filter
 
-	LANG_SCNG__().yy_in = lexState.in
+	//LANG_SCNG__().yy_in = lexState.in
 	sc.lineno = lexState.lineno
 	ZendRestoreCompiledFilename(lexState.filename)
 	if LANG_SCNG__().script_filtered {

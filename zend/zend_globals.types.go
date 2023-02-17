@@ -8,14 +8,15 @@ import b "sik/builtin"
  * ZendCompilerGlobals
  */
 type ZendCompilerGlobals struct {
-	loop_var_stack               ZendStack
-	active_class_entry           *ZendClassEntry
-	compiled_filename            *ZendString
-	zend_lineno                  int
-	active_op_array              *ZendOpArray
-	function_table               *HashTable
-	class_table                  *HashTable
-	filenames_table              HashTable
+	loop_var_stack     ZendStack
+	active_class_entry *ZendClassEntry
+	compiled_filename  *ZendString
+	zend_lineno        int
+	active_op_array    *ZendOpArray
+	function_table     *HashTable
+	class_table        *HashTable
+	filenamesTable     map[string]string //filenames_table              HashTable
+
 	auto_globals                 *HashTable
 	parse_error                  ZendBool
 	in_compilation               ZendBool
@@ -24,7 +25,7 @@ type ZendCompilerGlobals struct {
 	ini_parser_unbuffered_errors ZendBool
 	open_files                   ZendLlist
 	ini_parser_param             *ZendIniParserParam
-	skip_shebang                 ZendBool
+	skip_shebang                 bool
 	increment_lineno             ZendBool
 	doc_comment                  *ZendString
 	extra_fn_flags               uint32
@@ -68,8 +69,6 @@ func (this *ZendCompilerGlobals) GetFunctionTable() *HashTable        { return t
 func (this *ZendCompilerGlobals) SetFunctionTable(value *HashTable)   { this.function_table = value }
 func (this *ZendCompilerGlobals) GetClassTable() *HashTable           { return this.class_table }
 func (this *ZendCompilerGlobals) SetClassTable(value *HashTable)      { this.class_table = value }
-func (this *ZendCompilerGlobals) GetFilenamesTable() HashTable        { return this.filenames_table }
-func (this *ZendCompilerGlobals) SetFilenamesTable(value HashTable)   { this.filenames_table = value }
 func (this *ZendCompilerGlobals) GetAutoGlobals() *HashTable          { return this.auto_globals }
 func (this *ZendCompilerGlobals) SetAutoGlobals(value *HashTable)     { this.auto_globals = value }
 func (this *ZendCompilerGlobals) GetParseError() ZendBool             { return this.parse_error }

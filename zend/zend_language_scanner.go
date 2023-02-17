@@ -2,6 +2,26 @@ package zend
 
 import b "sik/builtin"
 
+func CompileFile(file_handle *ZendFileHandle, type_ int) *ZendOpArray {
+	var original_lex_state ZendLexState
+	var op_array *ZendOpArray = nil
+	ZendSaveLexicalState(&original_lex_state)
+	if OpenFileForScanning(file_handle) == FAILURE {
+		if !(EG__().exception) {
+			if type_ == ZEND_REQUIRE {
+				ZendMessageDispatcher(ZMSG_FAILED_REQUIRE_FOPEN, file_handle.filename)
+				ZendBailout()
+			} else {
+				ZendMessageDispatcher(ZMSG_FAILED_INCLUDE_FOPEN, file_handle.filename)
+			}
+		}
+	} else {
+		op_array = ZendCompile(ZEND_USER_FUNCTION)
+	}
+	ZendRestoreLexicalState(&original_lex_state)
+	return op_array
+}
+
 /**
  * ZendLexState
  */
