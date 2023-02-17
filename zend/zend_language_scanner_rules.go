@@ -182,7 +182,7 @@ func (sc *LangScanner) lexerRule17() (int, bool) {
 	isDocComment := false
 	if sc.len_ > 2 {
 		isDocComment = true
-		RESET_DOC_COMMENT()
+		sc.resetDocComment()
 	}
 
 	for sc.canRead() {
@@ -200,7 +200,7 @@ func (sc *LangScanner) lexerRule17() (int, bool) {
 	sc.resetLen()
 	sc.handleNewlinesEx(sc.seg())
 	if isDocComment {
-		CG__().doc_comment = NewZendString(sc.seg())
+		sc.setDocComment(sc.seg())
 		return sc.returnOrSkipToken(T_DOC_COMMENT)
 	}
 	return sc.returnOrSkipToken(T_COMMENT)
@@ -490,7 +490,7 @@ func (sc *LangScanner) lexerRule24() (int, bool) {
 }
 func (sc *LangScanner) lexerRule25() (int, bool) {
 	var heredocLabel *ZendHeredocLabel = sc.heredocLabelStack.Top()
-	var newline int = 0
+	var newline uint = 0
 	var indentation int = 0
 	var spacing int = 0
 	if sc.isEnd() {
@@ -578,10 +578,10 @@ func (sc *LangScanner) lexerRule25() (int, bool) {
 	}
 heredoc_scan_done:
 	sc.resetLen()
-	ZVAL_STRINGL(zendlval, sc.yyText, sc.len_-newline)
+	sc.setStr(sc.segLen(sc.len_ - newline))
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
-		var newline_at_start zend_bool = (*(sc.yyText - 1)) == '\n' || (*(sc.yyText - 1)) == '\r'
-		var copy *ZendString = Z_STR_P(zendlval)
+		newlineAtStart := b.EqualsAny(sc.yyTextN(-1), '\r', '\n')
+		var copy *ZendString = Z_STR_P(sc.zendlval)
 		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newline_at_start, newline != 0)) {
 			return sc.token(T_ERROR)
 		}

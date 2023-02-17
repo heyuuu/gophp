@@ -162,6 +162,10 @@ func (sc *LangScanner) seg() string {
 	return sc.code[sc.text : sc.text+sc.len_]
 }
 
+func (sc *LangScanner) segLen(len_ uint) string {
+	return sc.code[sc.text : sc.text+len_]
+}
+
 func (sc *LangScanner) setStr(str string) {
 	sc.zendlval.SetRawString(str)
 }
@@ -234,7 +238,8 @@ func (sc *LangScanner) isStateStackEmpty() bool {
 	return sc.stateStack.IsEmpty()
 }
 
-func (sc *LangScanner) yyText0() byte { return sc.code[sc.text] }
+func (sc *LangScanner) yyText0() byte           { return sc.code[sc.text] }
+func (sc *LangScanner) yyTextN(offset int) byte { return sc.code[int(sc.text)+offset] }
 
 func (sc *LangScanner) handleNewlinesEx(str string) {
 	l := len(str)
@@ -340,6 +345,10 @@ func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
 	CG__().ast = lexState.ast
 	CG__().ast_arena = lexState.ast_arena
 	sc.resetDocComment()
+}
+
+func (sc *LangScanner) setDocComment(docComment string) {
+	sc.docComment = &docComment
 }
 
 func (sc *LangScanner) resetDocComment() {
