@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-type ctype = byte
 type LangScanner struct {
 	code string // 代码原文
 
@@ -18,18 +17,17 @@ type LangScanner struct {
 
 	scannedStringLen uint // LANG_SCNG__().scanned_string_len
 
-	len_   uint // LANG_SCNG__().yy_leng
-	start  uint // LANG_SCNG__().yy_start *byte
-	text   uint // LANG_SCNG__().yy_text *byte
-	cursor uint // LANG_SCNG__().yy_cursor *byte
-	marker uint // LANG_SCNG__().yy_marker *byte
-	limit  uint // LANG_SCNG__().yy_limit *byte
-	state  int  // LANG_SCNG__().yy_state
+	len_       uint         // LANG_SCNG__().yy_leng
+	start      uint         // LANG_SCNG__().yy_start *byte
+	text       uint         // LANG_SCNG__().yy_text *byte
+	cursor     uint         // LANG_SCNG__().yy_cursor *byte
+	marker     uint         // LANG_SCNG__().yy_marker *byte
+	limit      uint         // LANG_SCNG__().yy_limit *byte
+	state      int          // LANG_SCNG__().yy_state
+	stateStack b.Stack[int] // LANG_SCNG__().stateStack
 
-	yyStart  *byte // LANG_SCNG__().yy_start
 	yyText   *byte // LANG_SCNG__().yy_text
 	yyCursor *byte // LANG_SCNG__().yy_cursor
-	yyMarker *byte // LANG_SCNG__().yy_marker
 	yyLimit  *byte // LANG_SCNG__().yy_limit
 	yyState  int   // LANG_SCNG__().yy_state
 
@@ -44,9 +42,7 @@ type LangScanner struct {
 	inputFilter  func(string) string // LANG_SCNG__().input_filter  函数参数类型有差异
 	outputFilter func(string) string // LANG_SCNG__().output_filter 函数参数类型有差异
 
-	stateStack b.Stack[int] // LANG_SCNG__().stateStack
-
-	docComment string // CG__().doc_comment *ZendString
+	docComment *string // CG__().doc_comment *ZendString
 }
 
 func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
@@ -276,6 +272,9 @@ func (sc *LangScanner) getDoubleQuotesScannedLength() uint {
 
 func (sc *LangScanner) saveLexState() *ZendLexState {
 	lexState := ZendLexState{}
+
+	lexState.lineno = sc.lineno
+
 	lexState.len_ = sc.len_
 	lexState.start = sc.start
 	lexState.text = sc.text
@@ -284,20 +283,21 @@ func (sc *LangScanner) saveLexState() *ZendLexState {
 	lexState.limit = sc.limit
 	lexState.state = sc.state
 	lexState.stateStack = sc.stateStack.Copy()
+
 	lexState.heredocLabelStack = sc.heredocLabelStack.Copy()
+
+	lexState.on_event = sc.onEvent
+	lexState.on_event_context = sc.onEventCxt
+
+	lexState.input_filter = sc.inputFilter
+	lexState.output_filter = sc.outputFilter
 
 	lexState.in = LANG_SCNG__().yy_in
 	lexState.filename = ZendGetCompiledFilename()
-	lexState.lineno = sc.lineno
 	lexState.script_org = LANG_SCNG__().script_org
 	lexState.script_org_size = LANG_SCNG__().script_org_size
 	lexState.script_filtered = LANG_SCNG__().script_filtered
 	lexState.script_filtered_size = LANG_SCNG__().script_filtered_size
-	lexState.input_filter = LANG_SCNG__().input_filter
-	lexState.output_filter = LANG_SCNG__().output_filter
-	lexState.script_encoding = LANG_SCNG__().script_encoding
-	lexState.on_event = LANG_SCNG__().on_event
-	lexState.on_event_context = LANG_SCNG__().on_event_context
 	lexState.ast = CG__().ast
 	lexState.ast_arena = CG__().ast_arena
 
@@ -308,6 +308,8 @@ func (sc *LangScanner) saveLexState() *ZendLexState {
 }
 
 func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
+	sc.lineno = lexState.lineno
+
 	sc.len_ = lexState.len_
 	sc.start = lexState.start
 	sc.text = lexState.text
@@ -317,6 +319,12 @@ func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
 	sc.state = lexState.state
 	sc.stateStack = lexState.stateStack
 	sc.heredocLabelStack = lexState.heredocLabelStack
+
+	sc.onEvent = lexState.on_event
+	sc.onEventCxt = lexState.on_event_context
+
+	sc.inputFilter = lexState.input_filter
+	sc.outputFilter = lexState.output_filter
 
 	LANG_SCNG__().yy_in = lexState.in
 	sc.lineno = lexState.lineno
@@ -329,12 +337,11 @@ func (sc *LangScanner) restoreLexState(lexState *ZendLexState) {
 	LANG_SCNG__().script_org_size = lexState.script_org_size
 	LANG_SCNG__().script_filtered = lexState.script_filtered
 	LANG_SCNG__().script_filtered_size = lexState.script_filtered_size
-	LANG_SCNG__().input_filter = lexState.input_filter
-	LANG_SCNG__().output_filter = lexState.output_filter
-	LANG_SCNG__().script_encoding = lexState.script_encoding
-	LANG_SCNG__().on_event = lexState.on_event
-	LANG_SCNG__().on_event_context = lexState.on_event_context
 	CG__().ast = lexState.ast
 	CG__().ast_arena = lexState.ast_arena
-	RESET_DOC_COMMENT()
+	sc.resetDocComment()
+}
+
+func (sc *LangScanner) resetDocComment() {
+	sc.docComment = nil
 }

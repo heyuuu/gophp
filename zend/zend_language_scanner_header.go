@@ -16,10 +16,6 @@ func YYSETCONDITION(s int) __auto__ {
 	return LANG_SCNG__().yy_state
 }
 
-// #define STATE(name) yyc ## name
-
-/* emulate flex constructs */
-
 func BEGIN(state __auto__) __auto__ { return YYSETCONDITION(yycstate) }
 
 var LanguageScannerGlobals ZendPhpScannerGlobals
@@ -107,7 +103,7 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 		LANG_SCNG__().yy_start = (*uint8)(buf)
 		YyScanBuffer(buf, size)
 	} else {
-		zend_error_noreturn(E_COMPILE_ERROR, "zend_stream_mmap() failed")
+		ZendErrorNoreturn(E_COMPILE_ERROR, "zend_stream_mmap() failed")
 	}
 	if CG__().skip_shebang {
 		CG__().skip_shebang = 0
@@ -305,22 +301,6 @@ func HighlightString(str *zval, syntax_highlighter_ini *zend_syntax_highlighter_
 	return SUCCESS
 }
 
-// TODO: avoid reallocation ???
-
-func ZendCopyValue(zendlval __auto__, yytext __auto__, yyleng __auto__) {
-	if LANG_SCNG__().output_filter {
-		var sz int = 0
-		var s *byte = nil
-		LANG_SCNG__().output_filter((**uint8)(&s), &sz, (*uint8)(yytext), int(yyleng))
-		ZVAL_STRINGL(zendlval, s, sz)
-		efree(s)
-	} else if yyleng == 1 {
-		ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(zend_uchar*yytext))
-	} else {
-		ZVAL_STRINGL(zendlval, yytext, yyleng)
-	}
-}
-
 func escapeString(str string, quoteType byte) (string, bool) {
 	len_ := len(str)
 	if len_ <= 1 || strings.IndexByte(str, '\\') >= 0 {
@@ -373,7 +353,7 @@ func (sc *LangScanner) ScanEscapeString(str string, quoteType byte) bool {
 	return true
 }
 
-func ZendScanEscapeString(zendlval *zval, str *byte, len_ int, quote_type byte) int {
+func ZendScanEscapeString(zendlval *zval, str *byte, len_ int, quote_type byte, sc *LangScanner) int {
 
 	var s *byte
 	var t *byte
@@ -577,14 +557,14 @@ func ZendScanEscapeString(zendlval *zval, str *byte, len_ int, quote_type byte) 
 	*t = 0
 	Z_STRLEN_P(zendlval) = t - Z_STRVAL_P(zendlval)
 skip_escape_conversion:
-	if LANG_SCNG__().output_filter {
+	if sc.outputFilter {
 		var sz int = 0
 		var str *uint8
 
 		// TODO: avoid realocation ???
 
 		s = Z_STRVAL_P(zendlval)
-		LANG_SCNG__().output_filter(&str, &sz, (*uint8)(s), int(Z_STRLEN_P(zendlval)))
+		sc.outputFilter(&str, &sz, (*uint8)(s), int(Z_STRLEN_P(zendlval)))
 		zval_ptr_dtor(zendlval)
 		ZVAL_STRINGL(zendlval, (*byte)(str), sz)
 		efree(str)
