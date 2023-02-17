@@ -109,11 +109,7 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	} else {
 		compiled_filename = fileHandle.filename
 	}
-	zend_set_compiled_filename(compiled_filename)
 	ZendSetCompiledFilename(compiled_filename)
-	RESET_DOC_COMMENT()
-	CG__().zend_lineno = 1
-	CG__().increment_lineno = 0
 	return SUCCESS
 }
 func ZendCompile(type_ int) *ZendOpArray {

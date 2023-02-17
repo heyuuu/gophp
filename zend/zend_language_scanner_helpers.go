@@ -12,6 +12,8 @@ type LangScanner struct {
 	startLine uint32
 	shortTags bool // CG__().short_tags
 
+	incrementLineno uint32 // CG__().increment_lineno
+
 	zendlval *Zval                // argument zendlval
 	elem     *ZendParserStackElem // argument: elem
 
@@ -43,8 +45,11 @@ type LangScanner struct {
 	docComment *string // CG__().doc_comment *ZendString
 }
 
-func NewLangScanner() *LangScanner {
-	return &LangScanner{}
+func NewLangScanner(code string, skipShebang bool) *LangScanner {
+	return &LangScanner{
+		code:   code,
+		lineno: 1,
+	}
 }
 
 func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
