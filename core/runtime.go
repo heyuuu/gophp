@@ -20,13 +20,13 @@ func NewApp() *Application {
 	return &Application{}
 }
 
-func (app *Application) Startup(module ISapiModule) {
+func (app *Application) SapiStartup(module ISapiModule) {
 	module.SetIniEntries(nil)
 	app.sapiModule = module
 	app.sapiGlobals.Init()
 }
 
-func (app *Application) Shutdown() {
+func (app *Application) SapiShutdown() {
 	app.sapiGlobals.Destroy()
 }
 

@@ -51,7 +51,7 @@ func main(argc int, argv []*byte) int {
 
 	zend.ZendSignalStartup()
 	PhpCgiGlobalsCtor(&php_cgi_globals)
-	app.Startup(CgiModule)
+	app.SapiStartup(CgiModule)
 	fastcgi = core.FcgiIsFastcgi()
 	CgiModule.SetPhpIniPathOverride(nil)
 	if fastcgi == 0 {
@@ -593,7 +593,7 @@ func main(argc int, argv []*byte) int {
 					core.PhpRequestShutdown(any(0))
 					core.SG__().server_context = nil
 					core.PhpModuleShutdown()
-					app.Shutdown()
+					app.SapiShutdown()
 					zend.Free(bindpath)
 					return zend.FAILURE
 				}
@@ -720,6 +720,6 @@ out:
 parent_out:
 	core.SG__().server_context = nil
 	core.PhpModuleShutdown()
-	app.Shutdown()
+	app.SapiShutdown()
 	return exit_status
 }

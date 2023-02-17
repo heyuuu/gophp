@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sik/core"
 	"sik/zend"
@@ -16,7 +17,7 @@ func main() int {
 	args := os.Args
 
 	var use_extended_info int = 0
-	var ini_path_override *byte = nil
+	var ini_path_override string = ""
 	var ini_entries string = ""
 	var ini_ignore int = 0
 	var sapiModule ICliSapiModule = CliModule
@@ -25,7 +26,7 @@ func main() int {
 
 	optArgs, err := core.GetOpts(args[1:], OPTIONS)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err.Error()+"\n")
+		log.Printf(err.Error() + "\n")
 		PhpCliUsage(args[0])
 		return 0
 	}
@@ -71,8 +72,8 @@ loop:
 	sapiModule.SetPhpinfoAsText(1)
 	sapiModule.SetPhpIniIgnoreCwd(1)
 
-	app.Startup(sapiModule)
-	defer app.Shutdown()
+	app.SapiStartup(sapiModule)
+	defer app.SapiShutdown()
 
 	sapiModule.SetPhpIniIgnore(ini_ignore)
 	sapiModule.SetExecutableLocation(args[0])

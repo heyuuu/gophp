@@ -3,6 +3,7 @@
 package core
 
 import (
+	"log"
 	b "sik/builtin"
 	"sik/core/streams"
 	"sik/ext/standard"
@@ -494,7 +495,6 @@ func OnChangeMailForceExtra(
 }
 func PhpDuringModuleStartup() int  { return ModuleStartup }
 func PhpDuringModuleShutdown() int { return ModuleShutdown }
-func PhpGetModuleInitialized() int { return ModuleInitialized }
 func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 	var fd int = -1
 	var error_time int64
@@ -541,7 +541,6 @@ func PhpLogErrWithSeverity(log_message *byte, syslog_type_int int) {
 	}
 	PG(in_error_log) = 0
 }
-func PhpWrite(buf any, size int) int { return PHPWRITE(buf, size) }
 func PhpPrintf(format string, _ ...any) int {
 	var args va_list
 	var ret int
@@ -1043,24 +1042,6 @@ func PhpGetCurrentUser() *byte {
 		return SG__().request_info.current_user
 	}
 }
-func ZifSetTimeLimit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	var new_timeout zend.ZendLong
-	var new_timeout_str *byte
-	var new_timeout_strlen int
-	var key *zend.ZendString
-	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &new_timeout) == zend.FAILURE {
-		return
-	}
-	new_timeout_strlen = int(zend.ZendSpprintf(&new_timeout_str, 0, zend.ZEND_LONG_FMT, new_timeout))
-	key = zend.ZendStringInit("max_execution_time", b.SizeOf("\"max_execution_time\"")-1, 0)
-	if zend.ZendAlterIniEntryCharsEx(key, new_timeout_str, new_timeout_strlen, PHP_INI_USER, PHP_INI_STAGE_RUNTIME, 0) == zend.SUCCESS {
-		return_value.SetTrue()
-	} else {
-		return_value.SetFalse()
-	}
-	zend.ZendStringReleaseEx(key, 0)
-	zend.Efree(new_timeout_str)
-}
 func PhpFopenWrapperForZend(filename *byte, opened_path **zend.ZendString) *r.FILE {
 	return streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path)
 }
@@ -1385,7 +1366,6 @@ func PhpRequestShutdown(dummy any) {
 
 	/* 16. Deactivate Zend signals */
 }
-func PhpComInitialize() {}
 func CoreGlobalsDtor(core_globals *PhpCoreGlobals) {
 	if core_globals.GetLastErrorMessage() != nil {
 		zend.Free(core_globals.GetLastErrorMessage())
@@ -1664,10 +1644,6 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* we're done */
 }
-func PhpModuleShutdownWrapper(sapi_globals ISapiModule) int {
-	PhpModuleShutdown()
-	return zend.SUCCESS
-}
 func PhpModuleShutdown() {
 	var module_number int = 0
 	ModuleShutdown = 1
@@ -1785,30 +1761,6 @@ func PhpExecuteScript(primary_file *zend.ZendFileHandle) int {
 	}
 	zend.FreeAlloca(old_cwd, use_heap)
 	return retval
-}
-func PhpExecuteSimpleScript(primary_file *zend.ZendFileHandle, ret *zend.Zval) int {
-	var old_cwd *byte
-	zend.EG__().SetExitStatus(0)
-	const OLD_CWD_SIZE = 4096
-	old_cwd = zend.DoAlloca(OLD_CWD_SIZE, use_heap)
-	old_cwd[0] = '0'
-	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
-	var __bailout JMP_BUF
-	zend.EG__().SetBailout(&__bailout)
-	if zend.SETJMP(__bailout) == 0 {
-		PG(during_request_startup) = 0
-		if primary_file.GetFilename() != nil && (SG__().options&SAPI_OPTION_NO_CHDIR) == 0 {
-			PhpIgnoreValue(zend.VCWD_GETCWD(old_cwd, OLD_CWD_SIZE-1))
-			zend.VCWD_CHDIR_FILE(primary_file.GetFilename())
-		}
-		zend.ZendExecuteScripts(zend.ZEND_REQUIRE, ret, 1, primary_file)
-	}
-	zend.EG__().SetBailout(__orig_bailout)
-	if old_cwd[0] != '0' {
-		PhpIgnoreValue(zend.VCWD_CHDIR(old_cwd))
-	}
-	zend.FreeAlloca(old_cwd, use_heap)
-	return zend.EG__().GetExitStatus()
 }
 func PhpHandleAbortedConnection() {
 	PG(connection_status) = PHP_CONNECTION_ABORTED
