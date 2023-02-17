@@ -284,14 +284,7 @@ func PhpPrintInfo(flag int) {
 		PhpInfoPrintTableRow(2, "Thread Safety", "disabled")
 		PhpInfoPrintTableRow(2, "Zend Signal Handling", "enabled")
 		PhpInfoPrintTableRow(2, "Zend Memory Manager", b.Cond(zend.IsZendMm() != 0, "enabled", "disabled"))
-		var functions *zend.ZendMultibyteFunctions = zend.ZendMultibyteGetFunctions()
-		var descr *byte
-		if functions != nil {
-			core.Spprintf(&descr, 0, "provided by %s", functions.GetProviderName())
-		} else {
-			descr = zend.Estrdup("disabled")
-		}
-		PhpInfoPrintTableRow(2, "Zend Multibyte Support", descr)
+		PhpInfoPrintTableRow(2, "Zend Multibyte Support", "disabled")
 		zend.Efree(descr)
 		PhpInfoPrintTableRow(2, "IPv6 Support", "enabled")
 		PhpInfoPrintTableRow(2, "DTrace Support", "disabled")

@@ -278,10 +278,6 @@ func MultipartBufferHeaders(self *MultipartBuffer, header *zend.ZendLlist) int {
 		/* add header to table */
 
 		var value *byte = nil
-		if PhpRfc1867EncodingTranslation() != 0 {
-			self.SetInputEncoding(zend.ZendMultibyteEncodingDetector((*uint8)(line), strlen(line), self.GetDetectOrder(), self.GetDetectOrderSize()))
-		}
-
 		/* space in the beginning means same header */
 
 		if !(isspace(line[0])) {
@@ -541,7 +537,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 	var event_extra_data any = nil
 	var llen uint = 0
 	var upload_cnt int = zend.INI_INT("max_file_uploads")
-	var internal_encoding *zend.ZendEncoding = zend.ZendMultibyteGetInternalEncoding()
+	var internal_encoding *zend.ZendEncoding = nil
 	var getword PhpRfc1867GetwordT
 	var getword_conf PhpRfc1867GetwordConfT
 	var _basename PhpRfc1867BasenameT
@@ -662,27 +658,11 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 							zend.Efree(param)
 						}
 						param = getword_conf(mbuff.GetInputEncoding(), pair)
-						if mbuff.GetInputEncoding() != nil && internal_encoding != nil {
-							var new_param *uint8
-							var new_param_len int
-							if size_t-1 != zend.ZendMultibyteEncodingConverter(&new_param, &new_param_len, (*uint8)(param), strlen(param), internal_encoding, mbuff.GetInputEncoding()) {
-								zend.Efree(param)
-								param = (*byte)(new_param)
-							}
-						}
 					} else if !(strcasecmp(key, "filename")) {
 						if filename != nil {
 							zend.Efree(filename)
 						}
 						filename = getword_conf(mbuff.GetInputEncoding(), pair)
-						if mbuff.GetInputEncoding() != nil && internal_encoding != nil {
-							var new_filename *uint8
-							var new_filename_len int
-							if size_t-1 != zend.ZendMultibyteEncodingConverter(&new_filename, &new_filename_len, (*uint8)(filename), strlen(filename), internal_encoding, mbuff.GetInputEncoding()) {
-								zend.Efree(filename)
-								filename = (*byte)(new_filename)
-							}
-						}
 					}
 				}
 				if key != nil {
@@ -700,15 +680,6 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				if value == nil {
 					value = zend.Estrdup("")
 					value_len = 0
-				}
-				if mbuff.GetInputEncoding() != nil && internal_encoding != nil {
-					var new_value *uint8
-					var new_value_len int
-					if size_t-1 != zend.ZendMultibyteEncodingConverter(&new_value, &new_value_len, (*uint8)(value), value_len, internal_encoding, mbuff.GetInputEncoding()) {
-						zend.Efree(value)
-						value = (*byte)(new_value)
-						value_len = new_value_len
-					}
 				}
 				if b.PreInc(&count) <= PG(max_input_vars) && SM__().GetInputFilter()(PARSE_POST, param, &value, value_len, &new_val_len) != 0 {
 					if PhpRfc1867Callback != nil {

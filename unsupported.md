@@ -1,6 +1,9 @@
 # 不支持的 Ini 配置
 
 - `zend.enable_gc`
+- `zend.multibyte=Off`
+- `zend.script_encoding`
+- `zend.detect_unicode`
 
 # 不支持的方法
 

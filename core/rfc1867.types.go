@@ -180,31 +180,6 @@ type MultipartBuffer struct {
 	detect_order_size int
 }
 
-//             func MakeMultipartBuffer(
-// buffer *byte,
-// buf_begin *byte,
-// bufsize int,
-// bytes_in_buffer int,
-// boundary *byte,
-// boundary_next *byte,
-// boundary_next_len int,
-// input_encoding *zend.ZendEncoding,
-// detect_order **zend.ZendEncoding,
-// detect_order_size int,
-// ) MultipartBuffer {
-//                 return MultipartBuffer{
-//                     buffer:buffer,
-//                     buf_begin:buf_begin,
-//                     bufsize:bufsize,
-//                     bytes_in_buffer:bytes_in_buffer,
-//                     boundary:boundary,
-//                     boundary_next:boundary_next,
-//                     boundary_next_len:boundary_next_len,
-//                     input_encoding:input_encoding,
-//                     detect_order:detect_order,
-//                     detect_order_size:detect_order_size,
-//                 }
-//             }
 func (this *MultipartBuffer) GetBuffer() *byte           { return this.buffer }
 func (this *MultipartBuffer) SetBuffer(value *byte)      { this.buffer = value }
 func (this *MultipartBuffer) GetBufBegin() *byte         { return this.buf_begin }

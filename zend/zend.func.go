@@ -25,22 +25,6 @@ func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) 
 	return true
 }
 
-func OnUpdateScriptEncoding(
-	entry *ZendIniEntry,
-	new_value *ZendString,
-	mh_arg1 any,
-	mh_arg2 any,
-	mh_arg3 any,
-	stage int,
-) int {
-	if CG__().GetMultibyte() == 0 {
-		return FAILURE
-	}
-	if ZendMultibyteGetFunctions() == nil {
-		return SUCCESS
-	}
-	return ZendMultibyteSetScriptEncodingByString(b.CondF1(new_value != nil, func() []byte { return new_value.GetVal() }, nil), b.CondF1(new_value != nil, func() int { return new_value.GetLen() }, 0))
-}
 func OnUpdateAssertions(
 	entry *ZendIniEntry,
 	new_value *ZendString,
@@ -518,11 +502,6 @@ func ZendShutdown() {
 		Free(CG__().GetMapPtrBase())
 		CG__().SetMapPtrBase(nil)
 		CG__().SetMapPtrSize(0)
-	}
-	if CG__().GetScriptEncodingList() != nil {
-		Free(CG__().GetScriptEncodingList())
-		CG__().SetScriptEncodingList(nil)
-		CG__().SetScriptEncodingListSize(0)
 	}
 	ZendDestroyRsrcListDtors()
 }

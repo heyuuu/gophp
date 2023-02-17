@@ -80,20 +80,6 @@ var IniEntries = []ZendIniEntryDef{
 		OnModifyArgs(
 			OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
 		),
-	*NewZendIniEntryDef("zend.multibyte", ZEND_INI_PERDIR).Value("0").
-		Displayer(ZendIniBooleanDisplayerCb).
-		OnModifyArgs(
-			OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetMultibyte()))-(*byte)(nil))), any(&CompilerGlobals), nil,
-		),
-	*NewZendIniEntryDef("zend.script_encoding", ZEND_INI_ALL).
-		OnModifyArgs(
-			OnUpdateScriptEncoding, nil, nil, nil,
-		),
-	*NewZendIniEntryDef("zend.detect_unicode", ZEND_INI_ALL).Value("1").
-		Displayer(ZendIniBooleanDisplayerCb).
-		OnModifyArgs(
-			OnUpdateBool, any(zend_long((*byte)(&((*ZendCompilerGlobals)(nil).GetDetectUnicode()))-(*byte)(nil))), any(&CompilerGlobals), nil,
-		),
 	*NewZendIniEntryDef("zend.signal_check", ZEND_INI_SYSTEM).Value(SIGNAL_CHECK_DEFAULT).
 		Displayer(ZendIniBooleanDisplayerCb).
 		OnModifyArgs(

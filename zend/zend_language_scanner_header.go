@@ -36,22 +36,6 @@ func zendIsOct(c byte) bool { return c >= '0' && c <= '7' }
 func zendIsHex(c byte) bool {
 	return c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F'
 }
-func EncodingFilterScriptToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
-	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	ZEND_ASSERT(internal_encoding != nil)
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, LANG_SCNG__().script_encoding)
-}
-func EncodingFilterScriptToIntermediate(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, ZendMultibyteEncodingUtf8, LANG_SCNG__().script_encoding)
-}
-func EncodingFilterIntermediateToScript(to **uint8, to_length *int, from *uint8, from_length int) int {
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, LANG_SCNG__().script_encoding, ZendMultibyteEncodingUtf8)
-}
-func EncodingFilterIntermediateToInternal(to **uint8, to_length *int, from *uint8, from_length int) int {
-	var internal_encoding *ZendEncoding = ZendMultibyteGetInternalEncoding()
-	ZEND_ASSERT(internal_encoding != nil)
-	return ZendMultibyteEncodingConverter(to, to_length, from, from_length, internal_encoding, ZendMultibyteEncodingUtf8)
-}
 
 func YyScanBuffer(str *byte, len_ int) {
 	YYCURSOR = (*uint8)(str)
@@ -93,226 +77,6 @@ func ZendDestroyFileHandle(file_handle *ZendFileHandle) {
 	file_handle.filename = ""
 }
 
-const BOM_UTF32_BE = "x00x00xfexff"
-const BOM_UTF32_LE = "xffxfex00x00"
-const BOM_UTF16_BE = "xfexff"
-const BOM_UTF16_LE = "xffxfe"
-const BOM_UTF8 = "xefxbbxbf"
-
-func ZendMultibyteDetectUtfEncoding(script *uint8, script_size int) *ZendEncoding {
-	var p *uint8
-	var wchar_size int = 2
-	var le int = 0
-
-	/* utf-16 or utf-32? */
-
-	p = script
-	ZEND_ASSERT(p >= script)
-	for size_t(p-script) < script_size {
-		p = memchr(p, 0, script_size-(p-script)-2)
-		if p == nil {
-			break
-		}
-		if (*(p + 1)) == '0' && (*(p + 2)) == '0' {
-			wchar_size = 4
-			break
-		}
-
-		/* searching for UTF-32 specific byte orders, so this will do */
-
-		p += 4
-
-		/* searching for UTF-32 specific byte orders, so this will do */
-
-	}
-
-	/* BE or LE? */
-
-	p = script
-	assert(p >= script)
-	for size_t(p-script) < script_size {
-		if (*p) == '0' && (*(p + wchar_size - 1)) != '0' {
-
-			/* BE */
-
-			le = 0
-			break
-		} else if (*p) != '0' && (*(p + wchar_size - 1)) == '0' {
-
-			/* LE* */
-
-			le = 1
-			break
-		}
-		p += wchar_size
-	}
-	if wchar_size == 2 {
-		if le != 0 {
-			return zend_multibyte_encoding_utf16le
-		} else {
-			return zend_multibyte_encoding_utf16be
-		}
-	} else {
-		if le != 0 {
-			return zend_multibyte_encoding_utf32le
-		} else {
-			return zend_multibyte_encoding_utf32be
-		}
-	}
-	return nil
-}
-func ZendMultibyteDetectUnicode() *ZendEncoding {
-	var script_encoding *ZendEncoding = nil
-	var bom_size int
-	var pos1 *uint8
-	var pos2 *uint8
-	if LANG_SCNG__().script_org_size < b.SizeOf("BOM_UTF32_LE")-1 {
-		return nil
-	}
-
-	/* check out BOM */
-
-	if !(memcmp(LANG_SCNG__().script_org, BOM_UTF32_BE, b.SizeOf("BOM_UTF32_BE")-1)) {
-		script_encoding = ZendMultibyteEncodingUtf32be
-		bom_size = b.SizeOf("BOM_UTF32_BE") - 1
-	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF32_LE, b.SizeOf("BOM_UTF32_LE")-1)) {
-		script_encoding = ZendMultibyteEncodingUtf32le
-		bom_size = b.SizeOf("BOM_UTF32_LE") - 1
-	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF16_BE, b.SizeOf("BOM_UTF16_BE")-1)) {
-		script_encoding = ZendMultibyteEncodingUtf16be
-		bom_size = b.SizeOf("BOM_UTF16_BE") - 1
-	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF16_LE, b.SizeOf("BOM_UTF16_LE")-1)) {
-		script_encoding = ZendMultibyteEncodingUtf16le
-		bom_size = b.SizeOf("BOM_UTF16_LE") - 1
-	} else if !(memcmp(LANG_SCNG__().script_org, BOM_UTF8, b.SizeOf("BOM_UTF8")-1)) {
-		script_encoding = ZendMultibyteEncodingUtf8
-		bom_size = b.SizeOf("BOM_UTF8") - 1
-	}
-	if script_encoding != nil {
-
-		/* remove BOM */
-
-		LANG_SCNG__().script_org += bom_size
-		LANG_SCNG__().script_org_size -= bom_size
-		return script_encoding
-	}
-
-	/* script contains NULL bytes -> auto-detection */
-
-	if b.Assign(&pos1, memchr(LANG_SCNG__().script_org, 0, LANG_SCNG__().script_org_size)) {
-
-		/* check if the NULL byte is after the __HALT_COMPILER(); */
-
-		pos2 = LANG_SCNG__().script_org
-		for size_t(pos1-pos2) >= b.SizeOf("\"__HALT_COMPILER();\"")-1 {
-			pos2 = memchr(pos2, '_', pos1-pos2)
-			if pos2 == nil {
-				break
-			}
-			pos2++
-			if strncasecmp((*byte)(pos2), "_HALT_COMPILER", b.SizeOf("\"_HALT_COMPILER\"")-1) == 0 {
-				pos2 += b.SizeOf("\"_HALT_COMPILER\"") - 1
-				for (*pos2) == ' ' || (*pos2) == '\t' || (*pos2) == '\r' || (*pos2) == '\n' {
-					pos2++
-				}
-				if (*pos2) == '(' {
-					pos2++
-					for (*pos2) == ' ' || (*pos2) == '\t' || (*pos2) == '\r' || (*pos2) == '\n' {
-						pos2++
-					}
-					if (*pos2) == ')' {
-						pos2++
-						for (*pos2) == ' ' || (*pos2) == '\t' || (*pos2) == '\r' || (*pos2) == '\n' {
-							pos2++
-						}
-						if (*pos2) == ';' {
-							return nil
-						}
-					}
-				}
-			}
-		}
-
-		/* make best effort if BOM is missing */
-
-		return ZendMultibyteDetectUtfEncoding(LANG_SCNG__().script_org, LANG_SCNG__().script_org_size)
-
-		/* make best effort if BOM is missing */
-
-	}
-	return nil
-}
-func ZendMultibyteFindScriptEncoding() *zend_encoding {
-	var script_encoding *zend_encoding
-	if CG__().detect_unicode {
-
-		/* check out bom(byte order mark) and see if containing wchars */
-
-		script_encoding = ZendMultibyteDetectUnicode()
-		if script_encoding != nil {
-
-			/* bom or wchar detection is prior to 'script_encoding' option */
-
-			return script_encoding
-
-			/* bom or wchar detection is prior to 'script_encoding' option */
-
-		}
-	}
-
-	/* if no script_encoding specified, just leave alone */
-
-	if !(CG__().script_encoding_list) || !(CG__().script_encoding_list_size) {
-		return nil
-	}
-
-	/* if multiple encodings specified, detect automagically */
-
-	if CG__().script_encoding_list_size > 1 {
-		return zend_multibyte_encoding_detector(LANG_SCNG__().script_org, LANG_SCNG__().script_org_size, CG__().script_encoding_list, CG__().script_encoding_list_size)
-	}
-	return CG__().script_encoding_list[0]
-}
-func ZendMultibyteSetFilter(onetime_encoding *zend_encoding) int {
-	var internal_encoding *zend_encoding = zend_multibyte_get_internal_encoding()
-	var script_encoding *zend_encoding = b.CondF2(onetime_encoding != nil, onetime_encoding, func() *zend_encoding { return ZendMultibyteFindScriptEncoding() })
-	if script_encoding == nil {
-		return FAILURE
-	}
-
-	/* judge input/output filter */
-
-	LANG_SCNG__().script_encoding = script_encoding
-	LANG_SCNG__().input_filter = nil
-	LANG_SCNG__().output_filter = nil
-	if internal_encoding == nil || LANG_SCNG__().script_encoding == internal_encoding {
-		if !(zend_multibyte_check_lexer_compatibility(LANG_SCNG__().script_encoding)) {
-
-			/* and if not, work around w/ script_encoding -> utf-8 -> script_encoding conversion */
-
-			LANG_SCNG__().input_filter = EncodingFilterScriptToIntermediate
-			LANG_SCNG__().output_filter = EncodingFilterIntermediateToScript
-		} else {
-			LANG_SCNG__().input_filter = nil
-			LANG_SCNG__().output_filter = nil
-		}
-		return SUCCESS
-	}
-	if zend_multibyte_check_lexer_compatibility(internal_encoding) {
-		LANG_SCNG__().input_filter = EncodingFilterScriptToInternal
-		LANG_SCNG__().output_filter = nil
-	} else if zend_multibyte_check_lexer_compatibility(LANG_SCNG__().script_encoding) {
-		LANG_SCNG__().input_filter = nil
-		LANG_SCNG__().output_filter = EncodingFilterScriptToInternal
-	} else {
-
-		/* both script and internal encodings are incompatible w/ flex */
-
-		LANG_SCNG__().input_filter = EncodingFilterScriptToIntermediate
-		LANG_SCNG__().output_filter = EncodingFilterIntermediateToInternal
-	}
-	return 0
-}
 func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	buf, ok := fileHandle.Fixup()
 	if !ok {
@@ -340,19 +104,6 @@ func OpenFileForScanning(fileHandle *ZendFileHandle) int {
 	LANG_SCNG__().yy_in = fileHandle
 	LANG_SCNG__().yy_start = nil
 	if size != -1 {
-		if CG__().multibyte {
-			LANG_SCNG__().script_org = (*uint8)(buf)
-			LANG_SCNG__().script_org_size = size
-			LANG_SCNG__().script_filtered = nil
-			ZendMultibyteSetFilter(nil)
-			if LANG_SCNG__().input_filter {
-				if size_t-1 == LANG_SCNG__().input_filter(&(LANG_SCNG__().script_filtered), &(LANG_SCNG__().script_filtered_size), LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-					zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
-				}
-				buf = (*byte)(LANG_SCNG__().script_filtered)
-				size = LANG_SCNG__().script_filtered_size
-			}
-		}
 		LANG_SCNG__().yy_start = (*uint8)(buf)
 		YyScanBuffer(buf, size)
 	} else {
@@ -476,19 +227,6 @@ func ZendPrepareStringForScanning(str *zval, filename *byte) int {
 	LANG_SCNG__().yy_start = nil
 	buf = Z_STRVAL_P(str)
 	size = old_len
-	if CG__().multibyte {
-		LANG_SCNG__().script_org = (*uint8)(buf)
-		LANG_SCNG__().script_org_size = size
-		LANG_SCNG__().script_filtered = nil
-		ZendMultibyteSetFilter(zend_multibyte_get_internal_encoding())
-		if LANG_SCNG__().input_filter {
-			if size_t-1 == LANG_SCNG__().input_filter(&(LANG_SCNG__().script_filtered), &(LANG_SCNG__().script_filtered_size), LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-				zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
-			}
-			buf = (*byte)(LANG_SCNG__().script_filtered)
-			size = LANG_SCNG__().script_filtered_size
-		}
-	}
 	YyScanBuffer(buf, size)
 	new_compiled_filename = zend_string_init(filename, strlen(filename), 0)
 	zend_set_compiled_filename(new_compiled_filename)
@@ -565,36 +303,6 @@ func HighlightString(str *zval, syntax_highlighter_ini *zend_syntax_highlighter_
 		zval_ptr_dtor(&tmp)
 	}
 	return SUCCESS
-}
-func ZendMultibyteYyinputAgain(old_input_filter zend_encoding_filter, old_encoding *zend_encoding) {
-	var length int
-	var new_yy_start *uint8
-
-	/* convert and set */
-
-	if !(LANG_SCNG__().input_filter) {
-		if LANG_SCNG__().script_filtered {
-			efree(LANG_SCNG__().script_filtered)
-			LANG_SCNG__().script_filtered = nil
-		}
-		LANG_SCNG__().script_filtered_size = 0
-		length = LANG_SCNG__().script_org_size
-		new_yy_start = LANG_SCNG__().script_org
-	} else {
-		if size_t-1 == LANG_SCNG__().input_filter(&new_yy_start, &length, LANG_SCNG__().script_org, LANG_SCNG__().script_org_size) {
-			zend_error_noreturn(E_COMPILE_ERROR, "Could not convert the script from the detected "+"encoding \"%s\" to a compatible encoding", zend_multibyte_get_encoding_name(LANG_SCNG__().script_encoding))
-		}
-		if LANG_SCNG__().script_filtered {
-			efree(LANG_SCNG__().script_filtered)
-		}
-		LANG_SCNG__().script_filtered = new_yy_start
-		LANG_SCNG__().script_filtered_size = length
-	}
-	LANG_SCNG__().yy_cursor = new_yy_start + (LANG_SCNG__().yy_cursor - LANG_SCNG__().yy_start)
-	LANG_SCNG__().yy_marker = new_yy_start + (LANG_SCNG__().yy_marker - LANG_SCNG__().yy_start)
-	LANG_SCNG__().yy_text = new_yy_start + (LANG_SCNG__().yy_text - LANG_SCNG__().yy_start)
-	LANG_SCNG__().yy_limit = new_yy_start + length
-	LANG_SCNG__().yy_start = new_yy_start
 }
 
 // TODO: avoid reallocation ???

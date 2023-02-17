@@ -373,50 +373,6 @@ func ZendCompileTry(ast *ZendAst) {
 	CG__().GetContext().SetTryCatchOffset(orig_try_catch_offset)
 	Efree(jmp_opnums)
 }
-func ZendHandleEncodingDeclaration(ast *ZendAst) ZendBool {
-	var declares *ZendAstList = ZendAstGetList(ast)
-	var i uint32
-	for i = 0; i < declares.GetChildren(); i++ {
-		var declare_ast *ZendAst = declares.GetChild()[i]
-		var name_ast *ZendAst = declare_ast.GetChild()[0]
-		var value_ast *ZendAst = declare_ast.GetChild()[1]
-		var name *ZendString = ZendAstGetStr(name_ast)
-		if ZendStringEqualsLiteralCi(name, "encoding") {
-			if value_ast.GetKind() != ZEND_AST_ZVAL {
-				ZendThrowException(ZendCeCompileError, "Encoding must be a literal", 0)
-				return 0
-			}
-			if CG__().GetMultibyte() != 0 {
-				var encoding_name *ZendString = ZvalGetString(ZendAstGetZval(value_ast))
-				var new_encoding *ZendEncoding
-				var old_encoding *ZendEncoding
-				var old_input_filter ZendEncodingFilter
-				CG__().SetEncodingDeclared(1)
-				new_encoding = ZendMultibyteFetchEncoding(encoding_name.GetVal())
-				if new_encoding == nil {
-					ZendError(E_COMPILE_WARNING, "Unsupported encoding [%s]", encoding_name.GetVal())
-				} else {
-					old_input_filter = INI_SCNG__().input_filter
-					old_encoding = INI_SCNG__().script_encoding
-					ZendMultibyteSetFilter(new_encoding)
-
-					/* need to re-scan if input filter changed */
-
-					if old_input_filter != INI_SCNG__().input_filter || old_input_filter != nil && new_encoding != old_encoding {
-						ZendMultibyteYyinputAgain(old_input_filter, old_encoding)
-					}
-
-					/* need to re-scan if input filter changed */
-
-				}
-				ZendStringReleaseEx(encoding_name, 0)
-			} else {
-				ZendError(E_COMPILE_WARNING, "declare(encoding=...) ignored because "+"Zend multibyte feature is turned off by settings")
-			}
-		}
-	}
-	return 1
-}
 func ZendDeclareIsFirstStatement(ast *ZendAst) int {
 	var i uint32 = 0
 	var file_ast *ZendAstList = ZendAstGetList(CG__().GetAst())

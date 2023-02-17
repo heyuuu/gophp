@@ -351,7 +351,6 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 	var i int
 	var charset EntityCharset = CsUtf8
 	var len_ int = 0
-	var zenc *zend.ZendEncoding
 
 	/* Default is now UTF-8 */
 
@@ -360,18 +359,6 @@ func DetermineCharset(charset_hint *byte) EntityCharset {
 	}
 	if b.Assign(&len_, strlen(charset_hint)) != 0 {
 		goto det_charset
-	}
-	zenc = zend.ZendMultibyteGetInternalEncoding()
-	if zenc != nil {
-		charset_hint = (*byte)(zend.ZendMultibyteGetEncodingName(zenc))
-		if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {
-			if len_ == 4 && (!(memcmp("pass", charset_hint, 4)) || !(memcmp("auto", charset_hint, 4))) {
-				charset_hint = nil
-				len_ = 0
-			} else {
-				goto det_charset
-			}
-		}
 	}
 	charset_hint = core.SG__().default_charset
 	if charset_hint != nil && b.Assign(&len_, strlen(charset_hint)) != 0 {

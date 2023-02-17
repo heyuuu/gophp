@@ -35,11 +35,6 @@ type ZendCompilerGlobals struct {
 
 	InternedStrings *InternedStrings /* request 专用内部字符串 */
 
-	script_encoding_list         **ZendEncoding
-	script_encoding_list_size    int
-	multibyte                    ZendBool
-	detect_unicode               ZendBool
-	encoding_declared            ZendBool
 	ast                          *ZendAst
 	ast_arena                    *ZendArena
 	delayed_oplines_stack        ZendStack
@@ -115,28 +110,10 @@ func (this *ZendCompilerGlobals) GetFileContext() ZendFileContext      { return 
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
 func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return this.arena }
 func (this *ZendCompilerGlobals) SetArena(value *ZendArena)            { this.arena = value }
-func (this *ZendCompilerGlobals) GetScriptEncodingList() **ZendEncoding {
-	return this.script_encoding_list
-}
-func (this *ZendCompilerGlobals) SetScriptEncodingList(value **ZendEncoding) {
-	this.script_encoding_list = value
-}
-func (this *ZendCompilerGlobals) GetScriptEncodingListSize() int {
-	return this.script_encoding_list_size
-}
-func (this *ZendCompilerGlobals) SetScriptEncodingListSize(value int) {
-	this.script_encoding_list_size = value
-}
-func (this *ZendCompilerGlobals) GetMultibyte() ZendBool             { return this.multibyte }
-func (this *ZendCompilerGlobals) SetMultibyte(value ZendBool)        { this.multibyte = value }
-func (this *ZendCompilerGlobals) GetDetectUnicode() ZendBool         { return this.detect_unicode }
-func (this *ZendCompilerGlobals) SetDetectUnicode(value ZendBool)    { this.detect_unicode = value }
-func (this *ZendCompilerGlobals) GetEncodingDeclared() ZendBool      { return this.encoding_declared }
-func (this *ZendCompilerGlobals) SetEncodingDeclared(value ZendBool) { this.encoding_declared = value }
-func (this *ZendCompilerGlobals) GetAst() *ZendAst                   { return this.ast }
-func (this *ZendCompilerGlobals) SetAst(value *ZendAst)              { this.ast = value }
-func (this *ZendCompilerGlobals) GetAstArena() *ZendArena            { return this.ast_arena }
-func (this *ZendCompilerGlobals) SetAstArena(value *ZendArena)       { this.ast_arena = value }
+func (this *ZendCompilerGlobals) GetAst() *ZendAst                     { return this.ast }
+func (this *ZendCompilerGlobals) SetAst(value *ZendAst)                { this.ast = value }
+func (this *ZendCompilerGlobals) GetAstArena() *ZendArena              { return this.ast_arena }
+func (this *ZendCompilerGlobals) SetAstArena(value *ZendArena)         { this.ast_arena = value }
 func (this *ZendCompilerGlobals) GetDelayedOplinesStack() ZendStack {
 	return this.delayed_oplines_stack
 }

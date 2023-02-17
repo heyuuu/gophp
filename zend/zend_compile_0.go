@@ -305,7 +305,6 @@ func ZendInitCompilerDataStructures() {
 	CG__().SetActiveClassEntry(nil)
 	CG__().SetInCompilation(0)
 	CG__().SetSkipShebang(0)
-	CG__().SetEncodingDeclared(0)
 	CG__().SetMemoizedExprs(nil)
 	CG__().SetMemoizeMode(0)
 }
