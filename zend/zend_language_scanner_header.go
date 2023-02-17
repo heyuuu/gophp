@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"strconv"
 	"strings"
 )
 
@@ -301,13 +302,15 @@ func HighlightString(str *zval, syntax_highlighter_ini *zend_syntax_highlighter_
 	return SUCCESS
 }
 
-func escapeString(str string, quoteType byte) (string, bool) {
+func (sc *LangScanner) setEscapeString(str string, quoteType byte) bool {
 	len_ := len(str)
 	if len_ <= 1 || strings.IndexByte(str, '\\') >= 0 {
-		// 无转义直接返回
-		return str, true
+		// 无转义处理直接返回
+		sc.setStrFiltered(str)
+		return true
 	}
 
+	/* convert escape sequences */
 	buf := strings.Builder{}
 	for i := 0; i < len_; i++ {
 		// 非转义字符直接计入结果
@@ -333,243 +336,104 @@ func escapeString(str string, quoteType byte) (string, bool) {
 		case quoteType, '\\', '$':
 			buf.WriteByte(str[i])
 		case 'x', 'X':
-			// todo
-		case 'u':
-			// todo
-		default:
-			// todo
-		}
-	}
-
-	return buf.String(), true
-}
-
-func (sc *LangScanner) ScanEscapeString(str string, quoteType byte) bool {
-	str, ok := escapeString(str, quoteType)
-	if !ok {
-		return false
-	}
-	sc.setStrFiltered(str)
-	return true
-}
-
-func ZendScanEscapeString(zendlval *zval, str *byte, len_ int, quote_type byte, sc *LangScanner) int {
-
-	var s *byte
-	var t *byte
-	var end *byte
-	if len_ <= 1 {
-		if len_ < 1 {
-			ZVAL_EMPTY_STRING(zendlval)
-		} else {
-			var c zend_uchar = zend_uchar * str
-			if c == '\n' || c == '\r' {
-				CG__().zend_lineno++
+			if i+1 < len_ && zendIsHex(str[i+1]) {
+				// 十六形式的字符 (e.g. 0x12)
+				i++
+				val := str[i]
+				if i+1 < len_ && zendIsHex(str[i+1]) {
+					i++
+					val = val*16 + str[i+1]
+				}
+				buf.WriteByte(val)
+			} else {
+				buf.WriteByte('\\')
+				buf.WriteByte(str[i])
 			}
-			ZVAL_INTERNED_STR(zendlval, ZSTR_CHAR(c))
-		}
-		goto skip_escape_conversion
-	}
-	ZVAL_STRINGL(zendlval, str, len_)
-
-	/* convert escape sequences */
-
-	s = Z_STRVAL_P(zendlval)
-	end = s + Z_STRLEN_P(zendlval)
-	for true {
-		if (*s) == '\\' {
-			break
-		}
-		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG__().zend_lineno++
-		}
-		s++
-		if s == end {
-			goto skip_escape_conversion
-		}
-	}
-	t = s
-	for s < end {
-		if (*s) == '\\' {
-			s++
-			if s >= end {
-				b.PostInc(&(*t)) = '\\'
+		case 'u':
+			// 跳过非 \u{xxxx} 形式的值
+			if i >= len_ || str[i+1] != '{' {
+				/* we silently let this pass to avoid breaking code
+				 * with JSON in string literals (e.g. "\"\u202e\""
+				 */
+				buf.WriteByte('\\')
+				buf.WriteByte('u')
 				break
 			}
-			switch *s {
-			case 'n':
-				b.PostInc(&(*t)) = '\n'
-			case 'r':
-				b.PostInc(&(*t)) = '\r'
-			case 't':
-				b.PostInc(&(*t)) = '\t'
-			case 'f':
-				b.PostInc(&(*t)) = 'f'
-			case 'v':
-				b.PostInc(&(*t)) = 'v'
-			case 'e':
-				b.PostInc(&(*t)) = 'e'
-			case '"':
-				fallthrough
-			case '`':
-				if (*s) != quote_type {
-					b.PostInc(&(*t)) = '\\'
-					b.PostInc(&(*t)) = *s
+
+			/* \u{xxxx} 形式的值 */
+			i += 2
+			start := i
+			valid := true
+			for i < len_ && str[i] != '}' {
+				if !zendIsHex(str[i]) {
+					valid = false
 					break
 				}
-				fallthrough
-			case '\\':
-				fallthrough
-			case '$':
-				b.PostInc(&(*t)) = *s
-			case 'x':
-				fallthrough
-			case 'X':
-				if zendIsHex(*(s + 1)) {
-					var hex_buf []byte = []byte{0, 0, 0}
-					hex_buf[0] = *(b.PreInc(&s))
-					if zendIsHex(*(s + 1)) {
-						hex_buf[1] = *(b.PreInc(&s))
-					}
-					b.PostInc(&(*t)) = byte(ZEND_STRTOL(hex_buf, nil, 16))
-				} else {
-					b.PostInc(&(*t)) = '\\'
-					b.PostInc(&(*t)) = *s
-				}
-			case 'u':
-
-				/* cache where we started so we can parse after validating */
-
-				var start *byte = s + 1
-				var len_ int = 0
-				var valid zend_bool = 1
-				var codepoint uint64
-				if (*start) != '{' {
-
-					/* we silently let this pass to avoid breaking code
-					 * with JSON in string literals (e.g. "\"\u202e\""
-					 */
-
-					b.PostInc(&(*t)) = '\\'
-					b.PostInc(&(*t)) = 'u'
-					break
-				} else {
-
-					/* on the other hand, invalid \u{blah} errors */
-
-					s++
-					len_++
-					s++
-					for (*s) != '}' {
-						if !(zendIsHex(*s)) {
-							valid = 0
-							break
-						} else {
-							len_++
-						}
-						s++
-					}
-					if (*s) == '}' {
-						valid = 1
-						len_++
-					}
-				}
-
-				/* \u{} is invalid */
-
-				if len_ <= 2 {
-					valid = 0
-				}
-				if !valid {
-					zend_throw_exception(zend_ce_parse_error, "Invalid UTF-8 codepoint escape sequence", 0)
-					zval_ptr_dtor(zendlval)
-					ZVAL_UNDEF(zendlval)
-					return FAILURE
-				}
-				errno = 0
-				codepoint = strtoul(start+1, nil, 16)
-
-				/* per RFC 3629, UTF-8 can only represent 21 bits */
-
-				if codepoint > 0x10ffff || errno {
-					zend_throw_exception(zend_ce_parse_error, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
-					zval_ptr_dtor(zendlval)
-					ZVAL_UNDEF(zendlval)
-					return FAILURE
-				}
-
-				/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
-
-				if codepoint < 0x80 {
-					b.PostInc(&(*t)) = codepoint
-				} else if codepoint <= 0x7ff {
-					b.PostInc(&(*t)) = (codepoint >> 6) + 0xc0
-					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
-				} else if codepoint <= 0xffff {
-					b.PostInc(&(*t)) = (codepoint >> 12) + 0xe0
-					b.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
-					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
-				} else if codepoint <= 0x10ffff {
-					b.PostInc(&(*t)) = (codepoint >> 18) + 0xf0
-					b.PostInc(&(*t)) = (codepoint >> 12 & 0x3f) + 0x80
-					b.PostInc(&(*t)) = (codepoint >> 6 & 0x3f) + 0x80
-					b.PostInc(&(*t)) = (codepoint & 0x3f) + 0x80
-				}
-
-				/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
-
-			default:
-
-				/* check for an octal */
-
-				if zendIsOct(*s) {
-					var octal_buf []byte = []byte{0, 0, 0, 0}
-					octal_buf[0] = *s
-					if zendIsOct(*(s + 1)) {
-						octal_buf[1] = *(b.PreInc(&s))
-						if zendIsOct(*(s + 1)) {
-							octal_buf[2] = *(b.PreInc(&s))
-						}
-					}
-					if octal_buf[2] && octal_buf[0] > '3' && !(LANG_SCNG__().heredoc_scan_ahead) {
-
-						/* 3 octit values must not overflow 0xFF (\377) */
-
-						zend_error(E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", octal_buf)
-
-						/* 3 octit values must not overflow 0xFF (\377) */
-
-					}
-					b.PostInc(&(*t)) = byte(ZEND_STRTOL(octal_buf, nil, 8))
-				} else {
-					b.PostInc(&(*t)) = '\\'
-					b.PostInc(&(*t)) = *s
-				}
+				i++
 			}
-		} else {
-			b.PostInc(&(*t)) = *s
-		}
-		if (*s) == '\n' || (*s) == '\r' && (*(s + 1)) != '\n' {
-			CG__().zend_lineno++
-		}
-		s++
-	}
-	*t = 0
-	Z_STRLEN_P(zendlval) = t - Z_STRVAL_P(zendlval)
-skip_escape_conversion:
-	if sc.outputFilter {
-		var sz int = 0
-		var str *uint8
+			if i == len_ {
+				valid = false
+			}
 
-		// TODO: avoid realocation ???
+			/* \u{} is invalid */
+			if i == start+1 {
+				valid = false
+			}
+			if !valid { // 没找到或为 ${} 形式
+				ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence", 0)
+				sc.zendlval.SetUndef()
+				return false
+			}
 
-		s = Z_STRVAL_P(zendlval)
-		sc.outputFilter(&str, &sz, (*uint8)(s), int(Z_STRLEN_P(zendlval)))
-		zval_ptr_dtor(zendlval)
-		ZVAL_STRINGL(zendlval, (*byte)(str), sz)
-		efree(str)
+			codepoint, _ := strconv.ParseUint(str[start:i], 16, 64)
+			/* based on https://en.wikipedia.org/wiki/UTF-8#Sample_code */
+			if codepoint < 0x80 {
+				buf.WriteByte(uint8(codepoint))
+			} else if codepoint <= 0x7ff {
+				buf.WriteByte(uint8(codepoint>>6 + 0xc0))
+				buf.WriteByte(uint8(codepoint&0x3f + 0x80))
+			} else if codepoint <= 0xffff {
+				buf.WriteByte(uint8(codepoint>>12 + 0xe0))
+				buf.WriteByte(uint8(codepoint>>6&0x3f + 0x80))
+				buf.WriteByte(uint8(codepoint&0x3f + 0x80))
+			} else if codepoint <= 0x10ffff {
+				buf.WriteByte(uint8(codepoint>>18 + 0xf0))
+				buf.WriteByte(uint8(codepoint>>12&0x3f + 0x80))
+				buf.WriteByte(uint8(codepoint>>6&0x3f + 0x80))
+				buf.WriteByte(uint8(codepoint&0x3f + 0x80))
+			} else {
+				/* per RFC 3629, UTF-8 can only represent 21 bits */
+				ZendThrowException(ZendCeParseError, "Invalid UTF-8 codepoint escape sequence: Codepoint too large", 0)
+				sc.zendlval.SetUndef()
+				return false
+			}
+		default:
+			/* check for an octal */
+			if zendIsOct(str[i]) {
+				start := i
+				var octal uint = uint(str[i])
+				if i+1 < len_ && zendIsOct(str[i+1]) {
+					i++
+					octal = octal*8 + octal
+					if i+1 < len_ && zendIsOct(str[i+1]) {
+						i++
+						octal = octal*8 + octal
+					}
+				}
+				if octal > 0377 && !sc.heredocScanAhead {
+					/* 3 octit values must not overflow 0xFF (\377) */
+					ZendError(E_COMPILE_WARNING, "Octal escape sequence overflow \\%s is greater than \\377", str[start:i+1])
+				}
+				buf.WriteByte(byte(octal))
+			} else {
+				buf.WriteByte('\\')
+				buf.WriteByte(str[i])
+			}
+		}
 	}
-	return SUCCESS
+
+	sc.setStrFiltered(buf.String())
+	return true
 }
 
 const HEREDOC_USING_SPACES = 1

@@ -259,7 +259,7 @@ func (sc *LangScanner) lexerRule20() (int, bool) {
 			str := sc.seg()
 			str = str[bprefix+1 : len(str)-bprefix-2]
 
-			if sc.ScanEscapeString(str, '"') || !sc.isParserMode() {
+			if sc.setEscapeString(str, '"') || !sc.isParserMode() {
 				return sc.tokenWithVal(T_CONSTANT_ENCAPSED_STRING)
 			} else {
 				return sc.token(T_ERROR)
@@ -407,14 +407,14 @@ func (sc *LangScanner) lexerRule22() (int, bool) {
 }
 func (sc *LangScanner) lexerRule23() (int, bool) {
 	if sc.getDoubleQuotesScannedLength() != 0 {
-		sc.yyCursor += sc.getDoubleQuotesScannedLength() - 1
+		sc.cursor += sc.getDoubleQuotesScannedLength() - 1
 		sc.setDoubleQuotesScannedLength(0)
 		goto double_quotes_scan_done
 	}
 	if sc.isEnd() {
 		return sc.token(END)
 	}
-	if sc.yyText[0] == '\\' && sc.canRead() {
+	if sc.yyText0() == '\\' && sc.canRead() {
 		sc.skip()
 	}
 	for sc.canRead() {
@@ -444,7 +444,7 @@ func (sc *LangScanner) lexerRule23() (int, bool) {
 	}
 double_quotes_scan_done:
 	sc.resetLen()
-	if ZendScanEscapeString(zendlval, sc.yyText, sc.len_, '"') == SUCCESS || !(sc.isParserMode()) {
+	if sc.setEscapeString(sc.seg(), '"') || !(sc.isParserMode()) {
 		return sc.tokenWithVal(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		return sc.token(T_ERROR)
@@ -482,7 +482,7 @@ func (sc *LangScanner) lexerRule24() (int, bool) {
 		break
 	}
 	sc.resetLen()
-	if ZendScanEscapeString(zendlval, sc.yyText, sc.len_, '`') == SUCCESS || !(sc.isParserMode()) {
+	if sc.setEscapeString(sc.seg(), '`') || !(sc.isParserMode()) {
 		return sc.tokenWithVal(T_ENCAPSED_AND_WHITESPACE)
 	} else {
 		return sc.token(T_ERROR)
@@ -581,15 +581,13 @@ heredoc_scan_done:
 	ZVAL_STRINGL(zendlval, sc.yyText, sc.len_-newline)
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
 		var newline_at_start zend_bool = (*(sc.yyText - 1)) == '\n' || (*(sc.yyText - 1)) == '\r'
-		var copy *zend_string = Z_STR_P(zendlval)
+		var copy *ZendString = Z_STR_P(zendlval)
 		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newline_at_start, newline != 0)) {
 			return sc.token(T_ERROR)
 		}
-		if ZendScanEscapeString(zendlval, ZSTR_VAL(copy), ZSTR_LEN(copy), 0) != SUCCESS {
-			zend_string_efree(copy)
+		if sc.setEscapeString(copy.GetStr(), 0) {
 			return sc.token(T_ERROR)
 		}
-		zend_string_efree(copy)
 	} else {
 		sc.handleNewlines(sc.yyText, sc.len_-newline)
 	}
