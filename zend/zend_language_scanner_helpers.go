@@ -9,7 +9,7 @@ type LangScanner struct {
 	code string // 代码原文
 
 	lineno    uint32 // CG__().zend_lineno
-	startLine int
+	startLine uint32
 	shortTags bool // CG__().short_tags
 
 	zendlval *Zval                // argument zendlval
@@ -28,8 +28,6 @@ type LangScanner struct {
 
 	yyText   *byte // LANG_SCNG__().yy_text
 	yyCursor *byte // LANG_SCNG__().yy_cursor
-	yyLimit  *byte // LANG_SCNG__().yy_limit
-	yyState  int   // LANG_SCNG__().yy_state
 
 	heredocLabelStack            b.Stack[*ZendHeredocLabel] // LANG_SCNG__().heredocLabelStack
 	heredocScanAhead             bool                       // LANG_SCNG__().heredoc_scan_ahead
@@ -48,6 +46,7 @@ type LangScanner struct {
 func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
 	var zv Zval
 	zv.SetUndef()
+	sc.zendlval = &zv
 	token := sc.LexScanEx(&zv, elem)
 	return token, &zv
 }
@@ -55,8 +54,13 @@ func (sc *LangScanner) LexScan(elem *ZendParserStackElem) (int, *Zval) {
 func (sc *LangScanner) LexScanEx(zendlval *Zval, elem *ZendParserStackElem) int {
 	sc.limit = uint(len(sc.code)) - 1
 
+	// 初始化
+	sc.zendlval = zendlval
+	sc.elem = elem
+	sc.startLine = sc.lineno
+	sc.zendlval.SetUndef()
+
 	// 第一次执行
-	sc.beforeScan(zendlval, elem)
 	sc.text = sc.cursor
 	token, restart := _lexScan(zendlval, elem, sc)
 
@@ -68,6 +72,14 @@ func (sc *LangScanner) LexScanEx(zendlval *Zval, elem *ZendParserStackElem) int 
 
 	return token
 }
+
+func (sc *LangScanner) charAt(pos int) byte {
+	if pos >= 0 && pos < len(sc.code) {
+		return sc.code[pos]
+	}
+	return 0
+}
+func (sc *LangScanner) textChar(offset int) byte { return sc.charAt(int(sc.text) + offset) }
 
 func (sc *LangScanner) isEnd() bool   { return sc.cursor > sc.limit }
 func (sc *LangScanner) canRead() bool { return sc.cursor < sc.limit }
@@ -136,13 +148,6 @@ func (sc *LangScanner) tail() string {
 		return ""
 	}
 	return sc.code[sc.cursor:]
-}
-
-func (sc *LangScanner) beforeScan(zendlval *Zval, elem *ZendParserStackElem) {
-	sc.zendlval = zendlval
-	sc.elem = elem
-	sc.startLine = sc.lineno
-	sc.zendlval.SetUndef()
 }
 
 func (sc *LangScanner) resetLen() {

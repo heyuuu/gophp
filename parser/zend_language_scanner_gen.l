@@ -58,7 +58,7 @@ NEWLINE ("\r"|"\n"|"\r\n")
 
 <ST_IN_SCRIPTING>"yield"{WHITESPACE}"from"[^a-zA-Z0-9_\x80-\xff] {
 	sc.setLen(sc.len_ - 1);
-	sc.handleNewlines(sc.yyText, sc.len_);
+	sc.handleNewlinesEx(sc.seg());
 	return sc.token(T_YIELD_FROM);
 }
 
@@ -516,7 +516,7 @@ NEWLINE ("\r"|"\n"|"\r\n")
 
 
 <ST_IN_SCRIPTING>"}" {
-	RESET_DOC_COMMENT()
+	sc.resetDocComment()
 	sc.tryPopState()
 	return sc.token('}')
 }

@@ -91,7 +91,7 @@ func (sc *LangScanner) lexerDNum() (int, bool) {
 
 func (sc *LangScanner) lexerRule12() (int, bool) {
 	/* Allow <?php followed by end of file. */
-	if sc.yyCursor == sc.yyLimit {
+	if sc.cursor == sc.limit {
 		sc.begin(yycST_IN_SCRIPTING)
 		return sc.returnOrSkipToken(T_OPEN_TAG)
 	}
@@ -590,7 +590,7 @@ heredoc_scan_done:
 			return sc.token(T_ERROR)
 		}
 	} else {
-		sc.handleNewlines(sc.yyText, sc.len_-newline)
+		sc.handleNewlinesEx(sc.segLen(sc.len_ - newline))
 	}
 	return sc.tokenWithVal(T_ENCAPSED_AND_WHITESPACE)
 }
@@ -623,7 +623,7 @@ func (sc *LangScanner) lexerRule26() (int, bool) {
 				sc.skip()
 				indentation++
 			}
-			if sc.yyCursor == sc.yyLimit {
+			if sc.cursor == sc.limit {
 				sc.resetLen()
 				sc.handleNewlinesEx(sc.seg())
 				sc.zendlval.SetNull()
@@ -665,12 +665,12 @@ nowdoc_scan_done:
 	sc.resetLen()
 	sc.setStr(sc.segLen(sc.len_ - newline))
 	if !(EG__().exception) && spacing != -1 && sc.isParserMode() {
-		var newline_at_start zend_bool = (*(sc.yyText - 1)) == '\n' || (*(sc.yyText - 1)) == '\r'
-		if !(StripMultilineStringIndentation(zendlval, indentation, spacing == HEREDOC_USING_SPACES, newline_at_start, newline != 0)) {
+		newlineAtStart := b.EqualsAny(sc.yyTextN(-1), '\r', '\n')
+		if !(StripMultilineStringIndentation(zendlval, indentation, spacing == HEREDOC_USING_SPACES, newlineAtStart, newline != 0)) {
 			return sc.token(T_ERROR)
 		}
 	}
-	sc.handleNewlines(sc.yyText, sc.len_-newline)
+	sc.handleNewlinesEx(sc.segLen(sc.len_ - newline))
 	return sc.tokenWithVal(T_ENCAPSED_AND_WHITESPACE)
 }
 func (sc *LangScanner) lexerRule27() (int, bool) {
@@ -678,7 +678,7 @@ func (sc *LangScanner) lexerRule27() (int, bool) {
 		return sc.token(END)
 	}
 	if !sc.heredocScanAhead {
-		ZendError(E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.yyState)
+		ZendError(E_COMPILE_WARNING, "Unexpected character in input:  '%c' (ASCII=%d) state=%d", sc.yyText0(), sc.yyText0(), sc.state)
 	}
 	if sc.isParserMode() {
 		return 0, true

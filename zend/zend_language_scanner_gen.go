@@ -1157,7 +1157,7 @@ func _lexScan(zendlval *Zval, elem *ZendParserStackElem, sc *LangScanner) (int, 
 			sc.skip()
 			sc.resetLen()
 			{
-				RESET_DOC_COMMENT()
+				sc.resetDocComment()
 				sc.tryPopState()
 				return sc.token('}')
 			}
@@ -6455,7 +6455,7 @@ func _lexScan(zendlval *Zval, elem *ZendParserStackElem, sc *LangScanner) (int, 
 			sc.resetLen()
 			{
 				sc.setLen(sc.len_ - 1)
-				sc.handleNewlines(sc.yyText, sc.len_)
+				sc.handleNewlinesEx(sc.seg())
 				return sc.token(T_YIELD_FROM)
 			}
 		yy542:
@@ -7903,7 +7903,7 @@ func _lexScan(zendlval *Zval, elem *ZendParserStackElem, sc *LangScanner) (int, 
 	yy646:
 		sc.resetLen()
 		{
-			sc.handleNewline(sc.yyText[sc.len_-1])
+			sc.handleNewline(sc.yyTextN(sc.len_-1))
 			sc.begin(yycST_IN_SCRIPTING)
 			return sc.returnOrSkipToken(0)
 		}
