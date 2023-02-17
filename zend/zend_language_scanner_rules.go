@@ -489,13 +489,15 @@ func (sc *LangScanner) lexerRule24() (int, bool) {
 	}
 }
 func (sc *LangScanner) lexerRule25() (int, bool) {
+	if sc.isEnd() {
+		return sc.token(END)
+	}
+
 	var heredocLabel *ZendHeredocLabel = sc.heredocLabelStack.Top()
 	var newline uint = 0
 	var indentation int = 0
 	var spacing int = 0
-	if sc.isEnd() {
-		return sc.token(END)
-	}
+
 	sc.fallback()
 	for sc.canRead() {
 		switch sc.read() {
@@ -506,8 +508,8 @@ func (sc *LangScanner) lexerRule25() (int, bool) {
 			fallthrough
 		case '\n':
 			spacing = 0
-			indentation = spacing
-			for sc.canRead() && (sc.peek() == ' ' || sc.peek() == '\t') {
+			indentation = 0
+			for sc.canRead() && sc.peekIs(' ', '\t') {
 				if sc.peek() == '\t' {
 					spacing |= HEREDOC_USING_TABS
 				} else {
@@ -516,15 +518,14 @@ func (sc *LangScanner) lexerRule25() (int, bool) {
 				sc.skip()
 				indentation++
 			}
-			if sc.yyCursor == sc.yyLimit {
+			if sc.cursor == sc.limit {
 				sc.resetLen()
-				sc.handleNewlines(sc.yyText, sc.len_)
+				sc.handleNewlinesEx(sc.seg())
 				sc.zendlval.SetNull()
 				return sc.tokenWithVal(T_ENCAPSED_AND_WHITESPACE)
 			}
 
 			/* Check for ending label on the next line */
-
 			if isLabelStart(sc.peek()) && sc.peekStrIs(heredocLabel.Label()) {
 				if isLabelSuccessor(sc.yyCursor[heredocLabel.Length()]) {
 					continue
@@ -582,7 +583,7 @@ heredoc_scan_done:
 	if !(sc.heredocScanAhead) && !(EG__().exception) && sc.isParserMode() {
 		newlineAtStart := b.EqualsAny(sc.yyTextN(-1), '\r', '\n')
 		var copy *ZendString = Z_STR_P(sc.zendlval)
-		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newline_at_start, newline != 0)) {
+		if !(StripMultilineStringIndentation(zendlval, heredocLabel.indentation, heredocLabel.indentationUsesSpaces, newlineAtStart, newline != 0)) {
 			return sc.token(T_ERROR)
 		}
 		if sc.setEscapeString(copy.GetStr(), 0) {
@@ -599,7 +600,7 @@ func (sc *LangScanner) lexerRule26() (int, bool) {
 	}
 
 	var heredocLabel = sc.heredocLabelStack.Top()
-	var newline int = 0
+	var newline uint = 0
 	var indentation int = 0
 	var spacing int = -1
 	sc.fallback()
@@ -662,7 +663,7 @@ func (sc *LangScanner) lexerRule26() (int, bool) {
 	}
 nowdoc_scan_done:
 	sc.resetLen()
-	ZVAL_STRINGL(zendlval, sc.yyText, sc.len_-newline)
+	sc.setStr(sc.segLen(sc.len_ - newline))
 	if !(EG__().exception) && spacing != -1 && sc.isParserMode() {
 		var newline_at_start zend_bool = (*(sc.yyText - 1)) == '\n' || (*(sc.yyText - 1)) == '\r'
 		if !(StripMultilineStringIndentation(zendlval, indentation, spacing == HEREDOC_USING_SPACES, newline_at_start, newline != 0)) {

@@ -456,6 +456,7 @@ func NextNewline(str *byte, end *byte, newline_len *int) *byte {
 	*newline_len = 0
 	return nil
 }
+
 func StripMultilineStringIndentation(zendlval *zval, indentation int, using_spaces zend_bool, newline_at_start zend_bool, newline_at_end zend_bool) zend_bool {
 	var str *byte = Z_STRVAL_P(zendlval)
 	var end *byte = str + Z_STRLEN_P(zendlval)
@@ -485,16 +486,10 @@ func StripMultilineStringIndentation(zendlval *zval, indentation int, using_spac
 		}
 
 		/* Try to skip indentation */
-
 		for skip = 0; skip < indentation; {
 			if str == nl {
-
 				/* Don't require full indentation on whitespace-only lines */
-
 				break
-
-				/* Don't require full indentation on whitespace-only lines */
-
 			}
 			if str == end || (*str) != ' ' && (*str) != '\t' {
 				CG__().zend_lineno += newline_count
@@ -526,6 +521,7 @@ error:
 	ZVAL_UNDEF(zendlval)
 	return 0
 }
+
 func CopyHeredocLabelStack(heredocLabel *ZendHeredocLabel) {
 	newHeredocLabel := heredocLabel.Copy()
 	LANG_SCNG__().heredoc_label_stack.Push(newHeredocLabel)
