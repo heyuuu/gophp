@@ -5,8 +5,6 @@ import "flag"
 func main() {
 	var opts = getOpts()
 
-
-
 }
 
 type cliOpts struct {

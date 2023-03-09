@@ -160,7 +160,7 @@ func NewZendReference(val *Zval) *ZendReference {
 
 func (this *ZendReference) GetVal() *Zval                               { return &this.val }
 func (this *ZendReference) SetVal(value Zval)                           { this.val = value }
-func (this *ZendReference) GetSources() ZendPropertyInfoSourceList      { return this.sources }
+func (this *ZendReference) GetSources() *ZendPropertyInfoSourceList     { return &this.sources }
 func (this *ZendReference) SetSources(value ZendPropertyInfoSourceList) { this.sources = value }
 
 /**

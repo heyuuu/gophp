@@ -7903,7 +7903,7 @@ func _lexScan(zendlval *Zval, elem *ZendParserStackElem, sc *LangScanner) (int, 
 	yy646:
 		sc.resetLen()
 		{
-			sc.handleNewline(sc.yyTextN(sc.len_-1))
+			sc.handleNewline(sc.yyTextN(sc.len_ - 1))
 			sc.begin(yycST_IN_SCRIPTING)
 			return sc.returnOrSkipToken(0)
 		}

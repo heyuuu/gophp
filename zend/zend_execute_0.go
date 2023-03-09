@@ -6,7 +6,7 @@ import (
 	b "sik/builtin"
 )
 
-func ZEND_REF_TYPE_SOURCES(ref *ZendReference) ZendPropertyInfoSourceList { return ref.GetSources() }
+func ZEND_REF_TYPE_SOURCES(ref *ZendReference) *ZendPropertyInfoSourceList { return ref.GetSources() }
 func ZEND_REF_HAS_TYPE_SOURCES(ref *ZendReference) bool {
 	return ZEND_REF_TYPE_SOURCES(ref).GetPtr() != nil
 }
