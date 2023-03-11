@@ -24,8 +24,8 @@ const (
 	LM_PHP_INT_T
 )
 
-type WideInt = long__long
-type UWideInt = unsigned__long__long
+type WideInt = int64
+type UWideInt = uint64
 
 const FORMAT_CONV_MAX_PRECISION = 500
 

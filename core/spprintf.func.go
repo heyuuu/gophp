@@ -7,25 +7,15 @@ import (
 	"sik/zend"
 )
 
-func INS_STRING(xbuf any, str *byte, len_ int, is_char zend.ZendBool) {
-	if is_char != 0 {
-		(*zend.SmartString)(xbuf).AppendString(b.CastStr(str, len_))
-	} else {
-		(*zend.SmartStr)(xbuf).AppendString(b.CastStr(str, len_))
+func INS_STRING(xbuf *zend.SmartStr, str *byte, len_ int) {
+	xbuf.AppendString(b.CastStr(str, len_))
+}
+func PAD_CHAR(xbuf *zend.SmartStr, ch byte, count int) {
+	for i := 0; i < count; i++ {
+		xbuf.AppendByte(ch)
 	}
 }
-func PAD_CHAR(xbuf any, ch byte, count int, is_char zend.ZendBool) {
-	if is_char != 0 {
-		(*zend.SmartString)(xbuf).Alloc(count)
-		memset((*zend.SmartString)(xbuf).GetC()+(*zend.SmartString)(xbuf).GetLen(), ch, count)
-		(*zend.SmartString)(xbuf).SetLen((*zend.SmartString)(xbuf).GetLen() + count)
-	} else {
-		(*zend.SmartStr)(xbuf).Alloc(count)
-		memset((*zend.SmartStr)(xbuf).GetS().GetVal()+(*zend.SmartStr)(xbuf).GetS().GetLen(), ch, count)
-		(*zend.SmartStr)(xbuf).GetS().GetLen() += count
-	}
-}
-func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) {
+func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 	var s *byte = nil
 	var s_len int
 	var free_zcopy int
@@ -37,8 +27,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 	var pad_char byte
 	var prefix_char byte
 	var fp_num float64
-	var i_num WideInt = WideInt(0)
-	var ui_num UWideInt = UWideInt(0)
+	var i_num int64 = 0
+	var ui_num uint64 = 0
 	var num_buf []byte
 	var char_buf []byte
 	var lconv *__struct__lconv = nil
@@ -54,13 +44,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 	var adjust_precision BooleanE
 	var adjust_width BooleanE
 	var is_negative BoolInt
-	for *fmt {
+	for *fmt != 0 {
 		if (*fmt) != '%' {
-			if is_char != 0 {
-				(*zend.SmartString)(xbuf).AppendByte(*fmt)
-			} else {
-				(*zend.SmartStr)(xbuf).AppendByte(*fmt)
-			}
+			buf.AppendByte(*fmt)
 		} else {
 
 			/*
@@ -81,11 +67,9 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 			 */
 
 			if isascii(int(*fmt)) && !(islower(int(*fmt))) {
-
 				/*
 				 * Recognize flags: -, #, BLANK, +
 				 */
-
 				for ; ; fmt++ {
 					if (*fmt) == '-' {
 						adjust = LEFT
@@ -460,11 +444,7 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 				s_len = 1
 				pad_char = ' '
 			case 'n':
-				if is_char != 0 {
-					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartString)(xbuf).GetLen())
-				} else {
-					*(__va_arg(ap, (*int)(_))) = int((*zend.SmartStr)(xbuf).GetS().GetLen())
-				}
+				*(__va_arg(ap, (*int)(_))) = int(buf.GetLen())
 				goto skip_output
 			case 'p':
 				if b.SizeOf("char *") <= b.SizeOf("u_wide_int") {
@@ -503,25 +483,21 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 			}
 			if adjust_width != 0 && adjust == RIGHT && int(min_width > s_len) != 0 {
 				if pad_char == '0' && prefix_char != NUL {
-					if is_char != 0 {
-						(*zend.SmartString)(xbuf).AppendByte(*s)
-					} else {
-						(*zend.SmartStr)(xbuf).AppendByte(*s)
-					}
+					buf.AppendByte(*s)
 					s++
 					s_len--
 					min_width--
 				}
-				PAD_CHAR(xbuf, pad_char, min_width-s_len, is_char)
+				PAD_CHAR(buf, pad_char, min_width-s_len)
 			}
 
 			/*
 			 * Print the string s.
 			 */
 
-			INS_STRING(xbuf, s, s_len, is_char)
+			INS_STRING(buf, s, s_len)
 			if adjust_width != 0 && adjust == LEFT && int(min_width > s_len) != 0 {
-				PAD_CHAR(xbuf, pad_char, min_width-s_len, is_char)
+				PAD_CHAR(buf, pad_char, min_width-s_len)
 			}
 			if free_zcopy != 0 {
 				zend.ZvalPtrDtorStr(&zcopy)
@@ -533,8 +509,8 @@ func XbufFormatConverter(xbuf any, is_char zend.ZendBool, fmt *byte, ap ...any) 
 	return
 }
 func PhpPrintfToSmartString(buf *zend.SmartString, format *byte, ap ...any) {
-	XbufFormatConverter(buf, 1, format, ap)
+	XbufFormatConverter(buf, format, ap)
 }
 func PhpPrintfToSmartStr(buf *zend.SmartStr, format *byte, ap ...any) {
-	XbufFormatConverter(buf, 0, format, ap)
+	XbufFormatConverter(buf, format, ap)
 }
