@@ -168,7 +168,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifVarDump(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVarDump(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var i int
@@ -204,7 +204,7 @@ func ZifVarDump(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -405,7 +405,7 @@ again:
 		core.PhpPrintf("%sUNKNOWN:0\n", COMMON)
 	}
 }
-func ZifDebugZvalDump(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDebugZvalDump(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var i int
@@ -441,7 +441,7 @@ func ZifDebugZvalDump(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -684,7 +684,7 @@ func PhpVarExport(struc *zend.Zval, level int) {
 	core.PHPWRITE(buf.GetS().GetVal(), buf.GetS().GetLen())
 	buf.Free()
 }
-func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVarExport(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	var return_output zend.ZendBool = 0
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -720,7 +720,7 @@ func ZifVarExport(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			_optional = 1
@@ -1249,7 +1249,7 @@ func PhpVarSerializeDestroy(d PhpSerializeDataT) {
 		BG(serialize).data = nil
 	}
 }
-func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSerialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var struc *zend.Zval
 	var var_hash PhpSerializeDataT
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
@@ -1285,7 +1285,7 @@ func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &struc, 0)
 			break
@@ -1332,7 +1332,7 @@ func ZifSerialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUnserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var buf *byte = nil
 	var buf_len int
 	var p *uint8
@@ -1375,7 +1375,7 @@ func ZifUnserialize(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &buf, &buf_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1532,7 +1532,7 @@ cleanup:
 	 * the very end, because __wakeup() calls performed during UNSERIALIZE_DESTROY might affect
 	 * the value we unwrap here. This is compatible with behavior in PHP <=7.0. */
 }
-func ZifMemoryGetUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMemoryGetUsage(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var real_usage zend.ZendBool = 0
 	for {
 		var _flags int = 0
@@ -1566,7 +1566,7 @@ func ZifMemoryGetUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {
@@ -1606,7 +1606,7 @@ func ZifMemoryGetUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	return_value.SetLong(zend.ZendMemoryUsage(real_usage))
 	return
 }
-func ZifMemoryGetPeakUsage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var real_usage zend.ZendBool = 0
 	for {
 		var _flags int = 0
@@ -1640,7 +1640,7 @@ func ZifMemoryGetPeakUsage(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &real_usage, &_dummy, 0) == 0 {

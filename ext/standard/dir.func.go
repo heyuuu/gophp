@@ -59,7 +59,7 @@ func ZmStartupDir(type_ int, module_number int) int {
 	zend.REGISTER_LONG_CONSTANT("GLOB_AVAILABLE_FLAGS", GLOB_AVAILABLE_FLAGS, zend.CONST_CS|zend.CONST_PERSISTENT)
 	return zend.SUCCESS
 }
-func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, createobject int) {
+func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, createobject int) {
 	var dirname *byte
 	var dir_len int
 	var zcontext *zend.Zval = nil
@@ -97,7 +97,7 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dirname, &dir_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -156,13 +156,13 @@ func _phpDoOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval, 
 		core.PhpStreamToZval(dirp, return_value)
 	}
 }
-func ZifOpendir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	_phpDoOpendir(execute_data, return_value, 0)
+func ZifOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	_phpDoOpendir(executeData, return_value, 0)
 }
-func ZifGetdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	_phpDoOpendir(execute_data, return_value, 1)
+func ZifGetdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	_phpDoOpendir(executeData, return_value, 1)
 }
-func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifClosedir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var id *zend.Zval = nil
 	var tmp *zend.Zval
 	var myself *zend.Zval
@@ -200,7 +200,7 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
@@ -271,7 +271,7 @@ func ZifClosedir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		PhpSetDefaultDir(nil)
 	}
 }
-func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChroot(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -307,7 +307,7 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -359,7 +359,7 @@ func ZifChroot(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChdir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var ret int
 	var str_len int
@@ -395,7 +395,7 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -452,7 +452,7 @@ func ZifChdir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifGetcwd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetcwd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var path []byte
 	var ret *byte = nil
 	if zend.ZendParseParametersNone() == zend.FAILURE {
@@ -467,7 +467,7 @@ func ZifGetcwd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRewinddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var id *zend.Zval = nil
 	var tmp *zend.Zval
 	var myself *zend.Zval
@@ -504,7 +504,7 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
@@ -571,7 +571,7 @@ func ZifRewinddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	core.PhpStreamRewinddir(dirp)
 }
-func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfReaddir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var id *zend.Zval = nil
 	var tmp *zend.Zval
 	var myself *zend.Zval
@@ -609,7 +609,7 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &id, 0) == 0 {
@@ -681,7 +681,7 @@ func PhpIfReaddir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGlob(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var cwd_skip int = 0
 	var pattern *byte = nil
 	var pattern_len int
@@ -722,7 +722,7 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &pattern, &pattern_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -836,7 +836,7 @@ func ZifGlob(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifScandir(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var dirn *byte
 	var dirn_len int
 	var flags zend.ZendLong = 0
@@ -877,7 +877,7 @@ func ZifScandir(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &dirn, &dirn_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

@@ -441,7 +441,7 @@ func PhpGetDataCompareFunc(sort_type zend.ZendLong, reverse int) zend.CompareFun
 	}
 	return nil
 }
-func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifKrsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -477,7 +477,7 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -528,7 +528,7 @@ func ZifKrsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifKsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -564,7 +564,7 @@ func ZifKsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -641,7 +641,7 @@ func PhpCountRecursive(ht *zend.HashTable) zend.ZendLong {
 	}
 	return cnt
 }
-func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var mode zend.ZendLong = COUNT_NORMAL
 	var cnt zend.ZendLong
@@ -677,7 +677,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &array, 0)
 			_optional = 1
@@ -765,7 +765,7 @@ func ZifCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fold_case int) {
+func PhpNatsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, fold_case int) {
 	var array *zend.Zval
 	for {
 		var _flags int = 0
@@ -799,7 +799,7 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -846,13 +846,13 @@ func PhpNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fol
 	return_value.SetTrue()
 	return
 }
-func ZifNatsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpNatsort(execute_data, return_value, 0)
+func ZifNatsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpNatsort(executeData, return_value, 0)
 }
-func ZifNatcasesort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpNatsort(execute_data, return_value, 1)
+func ZifNatcasesort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpNatsort(executeData, return_value, 1)
 }
-func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifAsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -888,7 +888,7 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -939,7 +939,7 @@ func ZifAsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -975,7 +975,7 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1026,7 +1026,7 @@ func ZifArsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -1062,7 +1062,7 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1113,7 +1113,7 @@ func ZifSort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var sort_type zend.ZendLong = PHP_SORT_REGULAR
 	var cmp zend.CompareFuncT
@@ -1149,7 +1149,7 @@ func ZifRsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1244,7 +1244,7 @@ func PHP_ARRAY_CMP_FUNC_RESTORE() {
 	BG(user_compare_fci) = old_user_compare_fci
 	BG(user_compare_fci_cache) = old_user_compare_fci_cache
 }
-func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compare_func zend.CompareFuncT, renumber zend.ZendBool) {
+func PhpUsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, compare_func zend.CompareFuncT, renumber zend.ZendBool) {
 	var array *zend.Zval
 	var arr *zend.ZendArray
 	var retval zend.ZendBool
@@ -1283,7 +1283,7 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 0)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1351,11 +1351,11 @@ func PhpUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval, compa
 	zend.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
-func ZifUsort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpUsort(execute_data, return_value, PhpArrayUserCompare, 1)
+func ZifUsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpUsort(executeData, return_value, PhpArrayUserCompare, 1)
 }
-func ZifUasort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpUsort(execute_data, return_value, PhpArrayUserCompare, 0)
+func ZifUasort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpUsort(executeData, return_value, PhpArrayUserCompare, 0)
 }
 func PhpArrayUserKeyCompare(a any, b any) int {
 	var f *zend.Bucket
@@ -1389,10 +1389,10 @@ func PhpArrayUserKeyCompare(a any, b any) int {
 	zend.ZvalPtrDtor(&args[1])
 	return zend.ZEND_NORMALIZE_BOOL(result)
 }
-func ZifUksort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpUsort(execute_data, return_value, PhpArrayUserKeyCompare, 0)
+func ZifUksort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpUsort(executeData, return_value, PhpArrayUserKeyCompare, 0)
 }
-func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifEnd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	var entry *zend.Zval
 	for {
@@ -1427,7 +1427,7 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1474,7 +1474,7 @@ func ZifEnd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPrev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	var entry *zend.Zval
 	for {
@@ -1509,7 +1509,7 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1556,7 +1556,7 @@ func ZifPrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifNext(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	var entry *zend.Zval
 	for {
@@ -1591,7 +1591,7 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1638,7 +1638,7 @@ func ZifNext(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifReset(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	var entry *zend.Zval
 	for {
@@ -1673,7 +1673,7 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1720,7 +1720,7 @@ func ZifReset(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZVAL_COPY_DEREF(return_value, entry)
 	}
 }
-func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCurrent(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	var entry *zend.Zval
 	for {
@@ -1755,7 +1755,7 @@ func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1799,7 +1799,7 @@ func ZifCurrent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZVAL_COPY_DEREF(return_value, entry)
 }
-func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifKey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.HashTable
 	for {
 		var _flags int = 0
@@ -1833,7 +1833,7 @@ func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArrayHt(_arg, &array, 0, 1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1870,7 +1870,7 @@ func ZifKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZendHashGetCurrentKeyZval(array, return_value)
 }
-func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMin(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var argc int
 	var args *zend.Zval = nil
 	for {
@@ -1905,7 +1905,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -1979,7 +1979,7 @@ func ZifMin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* mixed min ( array $values ) */
 }
-func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMax(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval = nil
 	var argc int
 	for {
@@ -2014,7 +2014,7 @@ func ZifMax(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -2248,7 +2248,7 @@ func PhpArrayWalk(array *zend.Zval, userdata *zend.Zval, recursive int) int {
 	zend.ZendHashIteratorDel(ht_iter)
 	return result
 }
-func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var userdata *zend.Zval = nil
 	var orig_array_walk_fci zend.ZendFcallInfo
@@ -2287,7 +2287,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -2347,7 +2347,7 @@ func ZifArrayWalk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var userdata *zend.Zval = nil
 	var orig_array_walk_fci zend.ZendFcallInfo
@@ -2386,7 +2386,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 1) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -2446,7 +2446,7 @@ func ZifArrayWalkRecursive(execute_data *zend.ZendExecuteData, return_value *zen
 	return_value.SetTrue()
 	return
 }
-func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval, behavior int) {
+func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *zend.Zval, behavior int) {
 	var value *zend.Zval
 	var array *zend.Zval
 	var entry *zend.Zval
@@ -2485,7 +2485,7 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &value, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -2674,11 +2674,11 @@ func PhpSearchArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval,
 	return_value.SetFalse()
 	return
 }
-func ZifInArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpSearchArray(execute_data, return_value, 0)
+func ZifInArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpSearchArray(executeData, return_value, 0)
 }
-func ZifArraySearch(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpSearchArray(execute_data, return_value, 1)
+func ZifArraySearch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpSearchArray(executeData, return_value, 1)
 }
 func PhpValidVarName(var_name *byte, var_name_len int) int {
 	/* first 256 bits for first character, and second 256 bits for the next */
@@ -3523,7 +3523,7 @@ func PhpExtractSkip(arr *zend.ZendArray, symbol_table *zend.ZendArray) zend.Zend
 	}
 	return count
 }
-func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_array_param *zend.Zval
 	var prefix *zend.Zval = nil
 	var extract_refs zend.ZendLong
@@ -3562,7 +3562,7 @@ func ZifExtract(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 0)
 			if zend.ZendParseArgArray(_arg, &var_array_param, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -3720,7 +3720,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 		}
 	}
 }
-func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCompact(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval = nil
 	var num_args uint32
 	var i uint32
@@ -3757,7 +3757,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -3817,7 +3817,7 @@ func ZifCompact(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		PhpCompactVar(symbol_table, return_value, &args[i])
 	}
 }
-func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var val *zend.Zval
 	var start_key zend.ZendLong
 	var num zend.ZendLong
@@ -3853,7 +3853,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &start_key, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
@@ -3956,7 +3956,7 @@ func ZifArrayFill(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var keys *zend.Zval
 	var val *zend.Zval
 	var entry *zend.Zval
@@ -3992,7 +3992,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &keys, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -4050,7 +4050,7 @@ func ZifArrayFillKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 	}
 }
-func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zlow *zend.Zval
 	var zhigh *zend.Zval
 	var zstep *zend.Zval = nil
@@ -4090,7 +4090,7 @@ func ZifRange(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zlow, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -4497,7 +4497,7 @@ func PhpArrayDataShuffle(array *zend.Zval) {
 		zend.ZendHashToPacked(hash)
 	}
 }
-func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifShuffle(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	for {
 		var _flags int = 0
@@ -4531,7 +4531,7 @@ func ZifShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -4731,7 +4731,7 @@ func PhpSplice(in_hash *zend.HashTable, offset zend.ZendLong, length zend.ZendLo
 	in_hash.SetPDestructor(out_hash.GetPDestructor())
 	zend.ZendHashInternalPointerReset(in_hash)
 }
-func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayPush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var stack *zend.Zval
 	var new_var zend.Zval
@@ -4769,7 +4769,7 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -4833,7 +4833,7 @@ func ZifArrayPush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Clean up and return the number of values in the stack */
 }
-func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayPop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stack *zend.Zval
 	var val *zend.Zval
 	var idx uint32
@@ -4870,7 +4870,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -4940,7 +4940,7 @@ func ZifArrayPop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.ZendHashInternalPointerReset(stack.GetArr())
 }
-func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayShift(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stack *zend.Zval
 	var val *zend.Zval
 	var idx uint32
@@ -4977,7 +4977,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -5110,7 +5110,7 @@ func ZifArrayShift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	}
 	zend.ZendHashInternalPointerReset(stack.GetArr())
 }
-func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var stack *zend.Zval
 	var new_hash zend.HashTable
@@ -5150,7 +5150,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -5238,7 +5238,7 @@ func ZifArrayUnshift(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 	/* Clean up and return the number of elements in the stack */
 }
-func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var repl_array *zend.Zval = nil
 	var rem_hash *zend.HashTable = nil
@@ -5277,7 +5277,7 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 1)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -5375,7 +5375,7 @@ func ZifArraySplice(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 	/* Perform splice */
 }
-func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var z_length *zend.Zval = nil
 	var entry *zend.Zval
@@ -5418,7 +5418,7 @@ func ZifArraySlice(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -5711,7 +5711,7 @@ func PhpArrayReplaceRecursive(dest *zend.HashTable, src *zend.HashTable) int {
 	}
 	return 1
 }
-func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *zend.Zval, recursive int) {
+func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *zend.Zval, recursive int) {
 	var args *zend.Zval = nil
 	var arg *zend.Zval
 	var argc int
@@ -5749,7 +5749,7 @@ func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *ze
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -5814,7 +5814,7 @@ func PhpArrayReplaceWrapper(execute_data *zend.ZendExecuteData, return_value *ze
 		}
 	}
 }
-func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend.Zval, recursive int) {
+func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *zend.Zval, recursive int) {
 	var args *zend.Zval = nil
 	var arg *zend.Zval
 	var argc int
@@ -5855,7 +5855,7 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -6004,19 +6004,19 @@ func PhpArrayMergeWrapper(execute_data *zend.ZendExecuteData, return_value *zend
 		}
 	}
 }
-func ZifArrayMerge(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayMergeWrapper(execute_data, return_value, 0)
+func ZifArrayMerge(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayMergeWrapper(executeData, return_value, 0)
 }
-func ZifArrayMergeRecursive(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayMergeWrapper(execute_data, return_value, 1)
+func ZifArrayMergeRecursive(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayMergeWrapper(executeData, return_value, 1)
 }
-func ZifArrayReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayReplaceWrapper(execute_data, return_value, 0)
+func ZifArrayReplace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayReplaceWrapper(executeData, return_value, 0)
 }
-func ZifArrayReplaceRecursive(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayReplaceWrapper(execute_data, return_value, 1)
+func ZifArrayReplaceRecursive(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayReplaceWrapper(executeData, return_value, 1)
 }
-func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var search_value *zend.Zval = nil
 	var entry *zend.Zval
@@ -6058,7 +6058,7 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6205,7 +6205,7 @@ func ZifArrayKeys(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	/* Initialize return array */
 }
-func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stack *zend.Zval
 	for {
 		var _flags int = 0
@@ -6239,7 +6239,7 @@ func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6278,7 +6278,7 @@ func ZifArrayKeyFirst(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	var pos zend.HashPosition = 0
 	zend.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
 }
-func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stack *zend.Zval
 	var pos zend.HashPosition
 	for {
@@ -6313,7 +6313,7 @@ func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &stack, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6352,7 +6352,7 @@ func ZifArrayKeyLast(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	zend.ZendHashInternalPointerEndEx(target_hash, &pos)
 	zend.ZendHashGetCurrentKeyZvalEx(target_hash, return_value, &pos)
 }
-func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var entry *zend.Zval
 	var arrval *zend.ZendArray
@@ -6389,7 +6389,7 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6469,7 +6469,7 @@ func ZifArrayValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 
 	/* Go through input array and add values to the return array */
 }
-func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var entry *zend.Zval
 	var tmp *zend.Zval
@@ -6506,7 +6506,7 @@ func ZifArrayCountValues(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6632,7 +6632,7 @@ func ArrayColumnFetchProp(data *zend.Zval, name *zend.Zval, rv *zend.Zval) *zend
 	}
 	return prop
 }
-func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.HashTable
 	var colval *zend.Zval
 	var data *zend.Zval
@@ -6671,7 +6671,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArrayHt(_arg, &input, 0, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6804,7 +6804,7 @@ func ZifArrayColumn(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 	}
 }
-func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var entry *zend.Zval
 	var string_key *zend.ZendString
@@ -6842,7 +6842,7 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -6934,7 +6934,7 @@ func ZifArrayReverse(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 	}
 }
-func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var pad_value *zend.Zval
 	var pad_size zend.ZendLong
@@ -6976,7 +6976,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -7128,7 +7128,7 @@ func ZifArrayPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var entry *zend.Zval
 	var data zend.Zval
@@ -7166,7 +7166,7 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -7229,7 +7229,7 @@ func ZifArrayFlip(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var entry *zend.Zval
 	var string_key *zend.ZendString
@@ -7268,7 +7268,7 @@ func ZifArrayChangeKeyCase(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -7340,7 +7340,7 @@ func ArrayBucketindexSwap(p any, q any) {
 	*f = *g
 	*g = t
 }
-func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var idx uint32
 	var p *zend.Bucket
@@ -7382,7 +7382,7 @@ func ZifArrayUnique(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -7543,7 +7543,7 @@ func ZvalUserCompare(a *zend.Zval, b *zend.Zval) int {
 		return 0
 	}
 }
-func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval, data_compare_type int) {
+func PhpArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *zend.Zval, data_compare_type int) {
 	var idx uint32
 	var p *zend.Bucket
 	var argc int
@@ -7634,7 +7634,7 @@ func PhpArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend
 		}
 	}
 }
-func PhpArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zval, behavior int, data_compare_type int, key_compare_type int) {
+func PhpArrayIntersect(executeData *zend.ZendExecuteData, return_value *zend.Zval, behavior int, data_compare_type int, key_compare_type int) {
 	var args *zend.Zval = nil
 	var hash *zend.HashTable
 	var arr_argc int
@@ -7920,31 +7920,31 @@ out:
 	zend.Efree(ptrs)
 	zend.Efree(lists)
 }
-func ZifArrayIntersectKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersectKey(execute_data, return_value, INTERSECT_COMP_DATA_NONE)
+func ZifArrayIntersectKey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_NONE)
 }
-func ZifArrayIntersectUkey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersect(execute_data, return_value, INTERSECT_KEY, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
+func ZifArrayIntersectUkey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersect(executeData, return_value, INTERSECT_KEY, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
 }
-func ZifArrayIntersect(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersect(execute_data, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_INTERNAL)
+func ZifArrayIntersect(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_INTERNAL)
 }
-func ZifArrayUintersect(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersect(execute_data, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_INTERNAL)
+func ZifArrayUintersect(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersect(executeData, return_value, INTERSECT_NORMAL, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_INTERNAL)
 }
-func ZifArrayIntersectAssoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersectKey(execute_data, return_value, INTERSECT_COMP_DATA_INTERNAL)
+func ZifArrayIntersectAssoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_INTERNAL)
 }
-func ZifArrayIntersectUassoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersect(execute_data, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
+func ZifArrayIntersectUassoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_INTERNAL, INTERSECT_COMP_KEY_USER)
 }
-func ZifArrayUintersectAssoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersectKey(execute_data, return_value, INTERSECT_COMP_DATA_USER)
+func ZifArrayUintersectAssoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersectKey(executeData, return_value, INTERSECT_COMP_DATA_USER)
 }
-func ZifArrayUintersectUassoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayIntersect(execute_data, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_USER)
+func ZifArrayUintersectUassoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayIntersect(executeData, return_value, INTERSECT_ASSOC, INTERSECT_COMP_DATA_USER, INTERSECT_COMP_KEY_USER)
 }
-func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval, data_compare_type int) {
+func PhpArrayDiffKey(executeData *zend.ZendExecuteData, return_value *zend.Zval, data_compare_type int) {
 	var idx uint32
 	var p *zend.Bucket
 	var argc int
@@ -8029,7 +8029,7 @@ func PhpArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 	}
 }
-func PhpArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval, behavior int, data_compare_type int, key_compare_type int) {
+func PhpArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval, behavior int, data_compare_type int, key_compare_type int) {
 	var args *zend.Zval = nil
 	var hash *zend.HashTable
 	var arr_argc int
@@ -8323,13 +8323,13 @@ out:
 	zend.Efree(ptrs)
 	zend.Efree(lists)
 }
-func ZifArrayDiffKey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiffKey(execute_data, return_value, DIFF_COMP_DATA_NONE)
+func ZifArrayDiffKey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_NONE)
 }
-func ZifArrayDiffUkey(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiff(execute_data, return_value, DIFF_KEY, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
+func ZifArrayDiffUkey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiff(executeData, return_value, DIFF_KEY, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
 }
-func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var argc int
 	var i int
@@ -8377,7 +8377,7 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -8562,20 +8562,20 @@ func ZifArrayDiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	exclude.Destroy()
 }
-func ZifArrayUdiff(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiff(execute_data, return_value, DIFF_NORMAL, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_INTERNAL)
+func ZifArrayUdiff(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiff(executeData, return_value, DIFF_NORMAL, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_INTERNAL)
 }
-func ZifArrayDiffAssoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiffKey(execute_data, return_value, DIFF_COMP_DATA_INTERNAL)
+func ZifArrayDiffAssoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_INTERNAL)
 }
-func ZifArrayDiffUassoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiff(execute_data, return_value, DIFF_ASSOC, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
+func ZifArrayDiffUassoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_INTERNAL, DIFF_COMP_KEY_USER)
 }
-func ZifArrayUdiffAssoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiffKey(execute_data, return_value, DIFF_COMP_DATA_USER)
+func ZifArrayUdiffAssoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiffKey(executeData, return_value, DIFF_COMP_DATA_USER)
 }
-func ZifArrayUdiffUassoc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpArrayDiff(execute_data, return_value, DIFF_ASSOC, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_USER)
+func ZifArrayUdiffUassoc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpArrayDiff(executeData, return_value, DIFF_ASSOC, DIFF_COMP_DATA_USER, DIFF_COMP_KEY_USER)
 }
 func PhpMultisortCompare(a any, b any) int {
 	var ab *zend.Bucket = *((**zend.Bucket)(a))
@@ -8607,7 +8607,7 @@ func ArrayBucketPSawp(p any, q any) {
 	*f = *g
 	*g = t
 }
-func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval
 	var arrays **zend.Zval
 	var indirect **zend.Bucket
@@ -8656,7 +8656,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			var _num_varargs int = _num_args - _i - 0
 			if _num_varargs > 0 {
 				args = _real_arg + 1
@@ -8893,7 +8893,7 @@ func ZifArrayMultisort(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	return_value.SetTrue()
 	return
 }
-func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var num_req zend.ZendLong = 1
 	var string_key *zend.ZendString
@@ -8935,7 +8935,7 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -9100,7 +9100,7 @@ func ZifArrayRand(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	__fill_ht.SetNInternalPointer(0)
 	zend.FreeAlloca(bitset, use_heap)
 }
-func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArraySum(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var entry *zend.Zval
 	var entry_n zend.Zval
@@ -9136,7 +9136,7 @@ func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -9185,7 +9185,7 @@ func ZifArraySum(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.FastAddFunction(return_value, return_value, &entry_n)
 	}
 }
-func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayProduct(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var entry *zend.Zval
 	var entry_n zend.Zval
@@ -9222,7 +9222,7 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -9283,7 +9283,7 @@ func ZifArrayProduct(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		return_value.SetDval(return_value.GetDval() * entry_n.GetDval())
 	}
 }
-func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayReduce(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.Zval
 	var args []zend.Zval
 	var operand *zend.Zval
@@ -9325,7 +9325,7 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -9416,7 +9416,7 @@ func ZifArrayReduce(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	zend.ZendReleaseFcallInfoCache(&fci_cache)
 	zend.ZVAL_ZVAL(return_value, &result, 1, 1)
 }
-func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var array *zend.Zval
 	var operand *zend.Zval
 	var key *zend.Zval
@@ -9460,7 +9460,7 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &array, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -9592,7 +9592,7 @@ func ZifArrayFilter(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	zend.ZendReleaseFcallInfoCache(&fci_cache)
 }
-func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arrays *zend.Zval = nil
 	var n_arrays int = 0
 	var result zend.Zval
@@ -9633,7 +9633,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgFunc(_arg, &fci, &fci_cache, 1, &_error) == 0 {
 				if _error == nil {
@@ -9836,7 +9836,7 @@ func ZifArrayMap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.Efree(array_pos)
 	}
 }
-func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var key *zend.Zval
 	var array *zend.Zval
 	var ht *zend.HashTable
@@ -9872,7 +9872,7 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &key, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -9930,7 +9930,7 @@ func ZifArrayKeyExists(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 		zend.ZendReleaseProperties(ht)
 	}
 }
-func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num_in int
 	var size zend.ZendLong
 	var current zend.ZendLong = 0
@@ -9972,7 +9972,7 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &input, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -10085,7 +10085,7 @@ func ZifArrayChunk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 
 	/* Add the final chunk if there is one. */
 }
-func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var values *zend.HashTable
 	var keys *zend.HashTable
 	var pos_values uint32 = 0
@@ -10125,7 +10125,7 @@ func ZifArrayCombine(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArrayHt(_arg, &keys, 0, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY

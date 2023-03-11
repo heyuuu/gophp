@@ -82,7 +82,7 @@ func PhpPackParseDouble(is_little_endian int, src any) float64 {
 	}
 	return m.d
 }
-func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var argv *zend.Zval = nil
 	var num_args int = 0
 	var i int
@@ -127,7 +127,7 @@ func ZifPack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &format, &formatlen, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -660,7 +660,7 @@ func PhpUnpack(data *byte, size int, issigned int, map_ *int) zend.ZendLong {
 	}
 	return result
 }
-func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var format *byte
 	var input *byte
 	var formatarg *zend.ZendString
@@ -702,7 +702,7 @@ func ZifUnpack(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &formatarg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

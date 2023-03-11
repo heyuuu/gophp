@@ -144,7 +144,7 @@ func PhpQuotPrintEncode(str *uint8, length int) *zend.ZendString {
 	ret = zend.ZendStringTruncate(ret, d-(*uint8)(ret.GetVal()), 0)
 	return ret
 }
-func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifQuotedPrintableDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg1 *zend.ZendString
 	var str_in *byte
 	var str_out *zend.ZendString
@@ -183,7 +183,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -280,7 +280,7 @@ func ZifQuotedPrintableDecode(execute_data *zend.ZendExecuteData, return_value *
 	str_out.SetLen(j)
 	return_value.SetString(str_out)
 }
-func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifQuotedPrintableEncode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var new_str *zend.ZendString
 	for {
@@ -315,7 +315,7 @@ func ZifQuotedPrintableEncode(execute_data *zend.ZendExecuteData, return_value *
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

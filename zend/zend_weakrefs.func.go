@@ -83,10 +83,10 @@ func ZendWeakrefNoIsset(object *Zval, member *Zval, hse int, rtc *any) int {
 	return 0
 }
 func ZendWeakrefNoUnset(object *Zval, member *Zval, rtc *any) { ZendWeakrefUnsupported("properties") }
-func zim_WeakReference___construct(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_WeakReference___construct(executeData *ZendExecuteData, return_value *Zval) {
 	ZendThrowError(nil, "Direct instantiation of 'WeakReference' is not allowed, "+"use WeakReference::create instead")
 }
-func zim_WeakReference_create(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_WeakReference_create(executeData *ZendExecuteData, return_value *Zval) {
 	var referent *Zval
 	for {
 		var _flags int = ZEND_PARSE_PARAMS_THROW
@@ -120,7 +120,7 @@ func zim_WeakReference_create(execute_data *ZendExecuteData, return_value *Zval)
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = ZEND_CALL_ARG(executeData, 0)
 			Z_PARAM_PROLOGUE(0, 0)
 			if ZendParseArgObject(_arg, &referent, nil, 0) == 0 {
 				_expected_type = Z_EXPECTED_OBJECT
@@ -160,7 +160,7 @@ func zim_WeakReference_create(execute_data *ZendExecuteData, return_value *Zval)
 	}
 	ZendWeakrefCreate(referent, return_value)
 }
-func zim_WeakReference_get(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_WeakReference_get(executeData *ZendExecuteData, return_value *Zval) {
 	for {
 		var _flags int = ZEND_PARSE_PARAMS_THROW
 		var _min_num_args int = 0
@@ -193,7 +193,7 @@ func zim_WeakReference_get(execute_data *ZendExecuteData, return_value *Zval) {
 				_error_code = ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = ZEND_CALL_ARG(executeData, 0)
 			break
 		}
 		if _error_code != ZPP_ERROR_OK {

@@ -18,7 +18,7 @@ func MakeDigestEx(md5str *byte, digest *uint8, len_ int) {
 	}
 	md5str[len_*2] = '0'
 }
-func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfMd5(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
 	var raw_output zend.ZendBool = 0
 	var context PHP_MD5_CTX
@@ -55,7 +55,7 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -108,7 +108,7 @@ func PhpIfMd5(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 16)
 	}
 }
-func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfMd5File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *byte
 	var arg_len int
 	var raw_output zend.ZendBool = 0
@@ -149,7 +149,7 @@ func PhpIfMd5File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

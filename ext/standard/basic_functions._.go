@@ -33,8 +33,8 @@ const BasicFunctionsModulePtr = &BasicFunctionsModule
 
 /* system functions */
 
-var ZifSetTimeLimit func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifHeaderRegisterCallback func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifSetTimeLimit func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifHeaderRegisterCallback func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 
 /* From the INI parser */
 

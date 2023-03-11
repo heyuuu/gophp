@@ -20,7 +20,7 @@ var ZendWrite ZendWriteFuncT
 var ZendFopen func(filename *byte, opened_path **ZendString) *r.FILE
 var ZendFopenEx func(filename string, opened_path *string) *r.FILE
 var ZendTicksFunction func(ticks int)
-var ZendInterruptFunction func(execute_data *ZendExecuteData)
+var ZendInterruptFunction func(executeData *ZendExecuteData)
 var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 var ZendOnTimeout func(seconds int)
 var ZendStreamOpenFunction func(filename string, handle *ZendFileHandle) int

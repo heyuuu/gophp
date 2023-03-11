@@ -16,7 +16,7 @@ func PhpSelect(m core.PhpSocketT, r *fd_set, w *fd_set, e *fd_set, t *__struct__
 func GET_CTX_OPT(stream *core.PhpStream, wrapper string, name string, val *zend.Zval) bool {
 	return core.PHP_STREAM_CONTEXT(stream) != nil && nil != b.Assign(&val, streams.PhpStreamContextGetOption(core.PHP_STREAM_CONTEXT(stream), wrapper, name))
 }
-func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketPair(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var domain zend.ZendLong
 	var type_ zend.ZendLong
 	var protocol zend.ZendLong
@@ -55,7 +55,7 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &domain, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
@@ -121,7 +121,7 @@ func ZifStreamSocketPair(execute_data *zend.ZendExecuteData, return_value *zend.
 	zend.AddNextIndexResource(return_value, s1.GetRes())
 	zend.AddNextIndexResource(return_value, s2.GetRes())
 }
-func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketClient(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var host *zend.ZendString
 	var zerrno *zend.Zval = nil
 	var zerrstr *zend.Zval = nil
@@ -168,7 +168,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &host, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -272,7 +272,7 @@ func ZifStreamSocketClient(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketServer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var host *byte
 	var host_len int
 	var zerrno *zend.Zval = nil
@@ -316,7 +316,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -400,7 +400,7 @@ func ZifStreamSocketServer(execute_data *zend.ZendExecuteData, return_value *zen
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketAccept(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var timeout float64 = float64(FG(default_socket_timeout))
 	var zpeername *zend.Zval = nil
 	var peername *zend.ZendString = nil
@@ -442,7 +442,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -510,7 +510,7 @@ func ZifStreamSocketAccept(execute_data *zend.ZendExecuteData, return_value *zen
 		zend.ZendStringReleaseEx(errstr, 0)
 	}
 }
-func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketGetName(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var zstream *zend.Zval
 	var want_peer zend.ZendBool
@@ -547,7 +547,7 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -601,7 +601,7 @@ func ZifStreamSocketGetName(execute_data *zend.ZendExecuteData, return_value *ze
 	}
 	return_value.SetString(name)
 }
-func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketSendto(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var zstream *zend.Zval
 	var flags zend.ZendLong = 0
@@ -643,7 +643,7 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -715,7 +715,7 @@ func ZifStreamSocketSendto(execute_data *zend.ZendExecuteData, return_value *zen
 	return_value.SetLong(streams.PhpStreamXportSendto(stream, data, datalen, int(flags), b.Cond(target_addr_len != 0, &sa, nil), sl))
 	return
 }
-func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketRecvfrom(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var zstream *zend.Zval
 	var zremote *zend.Zval = nil
@@ -756,7 +756,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -831,7 +831,7 @@ func ZifStreamSocketRecvfrom(execute_data *zend.ZendExecuteData, return_value *z
 	return_value.SetFalse()
 	return
 }
-func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var zsrc *zend.Zval
 	var maxlen zend.ZendLong = ssize_t(core.PHP_STREAM_COPY_ALL)
@@ -869,7 +869,7 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zsrc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -959,7 +959,7 @@ func ZifStreamGetContents(execute_data *zend.ZendExecuteData, return_value *zend
 		return
 	}
 }
-func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamCopyToStream(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var src *core.PhpStream
 	var dest *core.PhpStream
 	var zsrc *zend.Zval
@@ -1000,7 +1000,7 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zsrc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1070,7 +1070,7 @@ func ZifStreamCopyToStream(execute_data *zend.ZendExecuteData, return_value *zen
 	return_value.SetLong(len_)
 	return
 }
-func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetMetaData(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zstream *zend.Zval
 	var stream *core.PhpStream
 	for {
@@ -1105,7 +1105,7 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1162,7 +1162,7 @@ func ZifStreamGetMetaData(execute_data *zend.ZendExecuteData, return_value *zend
 		zend.AddAssocString(return_value, "uri", stream.GetOrigPath())
 	}
 }
-func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetTransports(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream_xport_hash *zend.HashTable
 	var stream_xport *zend.ZendString
 	if zend.ZendParseParametersNone() == zend.FAILURE {
@@ -1182,7 +1182,7 @@ func ZifStreamGetTransports(execute_data *zend.ZendExecuteData, return_value *ze
 		return
 	}
 }
-func ZifStreamGetWrappers(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetWrappers(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var url_stream_wrappers_hash *zend.HashTable
 	var stream_protocol *zend.ZendString
 	if zend.ZendParseParametersNone() == zend.FAILURE {
@@ -1368,7 +1368,7 @@ func StreamArrayEmulateReadFdSet(stream_array *zend.Zval) int {
 	}
 	return ret
 }
-func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSelect(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var r_array *zend.Zval
 	var w_array *zend.Zval
 	var e_array *zend.Zval
@@ -1417,7 +1417,7 @@ func ZifStreamSelect(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(1, 0)
 			if zend.ZendParseArgArray(_arg, &r_array, 1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -1677,7 +1677,7 @@ func DecodeContextParam(contextresource *zend.Zval) *core.PhpStreamContext {
 	}
 	return context
 }
-func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextGetOptions(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval
 	var context *core.PhpStreamContext
 	for {
@@ -1712,7 +1712,7 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1756,7 +1756,7 @@ func ZifStreamContextGetOptions(execute_data *zend.ZendExecuteData, return_value
 	}
 	zend.ZVAL_COPY(return_value, context.GetOptions())
 }
-func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextSetOption(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval = nil
 	var context *core.PhpStreamContext
 	if zend.ZEND_NUM_ARGS() == 2 {
@@ -1793,7 +1793,7 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					_error_code = zend.ZPP_ERROR_FAILURE
 					break
 				}
-				_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+				_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 				zend.Z_PARAM_PROLOGUE(0, 0)
 				if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 					_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1883,7 +1883,7 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 					_error_code = zend.ZPP_ERROR_FAILURE
 					break
 				}
-				_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+				_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 				zend.Z_PARAM_PROLOGUE(0, 0)
 				if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 					_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -1945,7 +1945,7 @@ func ZifStreamContextSetOption(execute_data *zend.ZendExecuteData, return_value 
 		return
 	}
 }
-func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextSetParams(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var params *zend.Zval
 	var zcontext *zend.Zval
 	var context *core.PhpStreamContext
@@ -1981,7 +1981,7 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2031,7 +2031,7 @@ func ZifStreamContextSetParams(execute_data *zend.ZendExecuteData, return_value 
 	}
 	zend.ZVAL_BOOL(return_value, ParseContextParams(context, params) == zend.SUCCESS)
 }
-func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextGetParams(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zcontext *zend.Zval
 	var context *core.PhpStreamContext
 	for {
@@ -2066,7 +2066,7 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zcontext, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2116,7 +2116,7 @@ func ZifStreamContextGetParams(execute_data *zend.ZendExecuteData, return_value 
 	context.GetOptions().TryAddRefcount()
 	zend.AddAssocZvalEx(return_value, "options", b.SizeOf("\"options\"")-1, context.GetOptions())
 }
-func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextGetDefault(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var params *zend.Zval = nil
 	var context *core.PhpStreamContext
 	for {
@@ -2151,7 +2151,7 @@ func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &params, 0, 0) == 0 {
@@ -2197,7 +2197,7 @@ func ZifStreamContextGetDefault(execute_data *zend.ZendExecuteData, return_value
 	}
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextSetDefault(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextSetDefault(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var options *zend.Zval = nil
 	var context *core.PhpStreamContext
 	for {
@@ -2232,7 +2232,7 @@ func ZifStreamContextSetDefault(execute_data *zend.ZendExecuteData, return_value
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &options, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_ARRAY
@@ -2274,7 +2274,7 @@ func ZifStreamContextSetDefault(execute_data *zend.ZendExecuteData, return_value
 	ParseContextOptions(context, options)
 	streams.PhpStreamContextToZval(context, return_value)
 }
-func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamContextCreate(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var options *zend.Zval = nil
 	var params *zend.Zval = nil
 	var context *core.PhpStreamContext
@@ -2310,7 +2310,7 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgArray(_arg, &options, 1, 0) == 0 {
@@ -2363,7 +2363,7 @@ func ZifStreamContextCreate(execute_data *zend.ZendExecuteData, return_value *ze
 	return_value.SetResource(context.GetRes())
 	return
 }
-func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ApplyFilterToStream(append int, executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zstream *zend.Zval
 	var stream *core.PhpStream
 	var filtername *byte
@@ -2404,7 +2404,7 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2515,13 +2515,13 @@ func ApplyFilterToStream(append int, execute_data *zend.ZendExecuteData, return_
 		return
 	}
 }
-func ZifStreamFilterPrepend(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	ApplyFilterToStream(0, execute_data, return_value)
+func ZifStreamFilterPrepend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	ApplyFilterToStream(0, executeData, return_value)
 }
-func ZifStreamFilterAppend(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	ApplyFilterToStream(1, execute_data, return_value)
+func ZifStreamFilterAppend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	ApplyFilterToStream(1, executeData, return_value)
 }
-func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamFilterRemove(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zfilter *zend.Zval
 	var filter *core.PhpStreamFilter
 	for {
@@ -2556,7 +2556,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zfilter, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2613,7 +2613,7 @@ func ZifStreamFilterRemove(execute_data *zend.ZendExecuteData, return_value *zen
 		return
 	}
 }
-func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetLine(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte = nil
 	var str_len int = 0
 	var max_length zend.ZendLong
@@ -2652,7 +2652,7 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2718,7 +2718,7 @@ func ZifStreamGetLine(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 }
-func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetBlocking(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zstream *zend.Zval
 	var block zend.ZendBool
 	var stream *core.PhpStream
@@ -2754,7 +2754,7 @@ func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2803,7 +2803,7 @@ func ZifStreamSetBlocking(execute_data *zend.ZendExecuteData, return_value *zend
 	return_value.SetTrue()
 	return
 }
-func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetTimeout(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var socket *zend.Zval
 	var seconds zend.ZendLong
 	var microseconds zend.ZendLong = 0
@@ -2842,7 +2842,7 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &socket, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2905,7 +2905,7 @@ func ZifStreamSetTimeout(execute_data *zend.ZendExecuteData, return_value *zend.
 	return_value.SetFalse()
 	return
 }
-func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetWriteBuffer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg1 *zend.Zval
 	var ret int
 	var arg2 zend.ZendLong
@@ -2943,7 +2943,7 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -2998,7 +2998,7 @@ func ZifStreamSetWriteBuffer(execute_data *zend.ZendExecuteData, return_value *z
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetChunkSize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var ret int
 	var csize zend.ZendLong
 	var zstream *zend.Zval
@@ -3035,7 +3035,7 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3098,7 +3098,7 @@ func ZifStreamSetChunkSize(execute_data *zend.ZendExecuteData, return_value *zen
 	return_value.SetLong(b.CondF(ret > 0, func() zend.ZendLong { return zend.ZendLong(ret) }, func() zend.ZendLong { return zend.ZendLong(r.EOF) }))
 	return
 }
-func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSetReadBuffer(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg1 *zend.Zval
 	var ret int
 	var arg2 zend.ZendLong
@@ -3136,7 +3136,7 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3191,7 +3191,7 @@ func ZifStreamSetReadBuffer(execute_data *zend.ZendExecuteData, return_value *ze
 	return_value.SetLong(b.Cond(ret == 0, 0, r.EOF))
 	return
 }
-func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var cryptokind zend.ZendLong = 0
 	var zstream *zend.Zval
 	var zsessstream *zend.Zval = nil
@@ -3232,7 +3232,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3319,7 +3319,7 @@ func ZifStreamSocketEnableCrypto(execute_data *zend.ZendExecuteData, return_valu
 		return
 	}
 }
-func ZifStreamResolveIncludePath(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var filename *byte
 	var filename_len int
 	var resolved_path *zend.ZendString
@@ -3355,7 +3355,7 @@ func ZifStreamResolveIncludePath(execute_data *zend.ZendExecuteData, return_valu
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &filename, &filename_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -3398,7 +3398,7 @@ func ZifStreamResolveIncludePath(execute_data *zend.ZendExecuteData, return_valu
 	return_value.SetFalse()
 	return
 }
-func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamIsLocal(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zstream *zend.Zval
 	var stream *core.PhpStream = nil
 	var wrapper *core.PhpStreamWrapper = nil
@@ -3434,7 +3434,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zstream, 0)
 			break
@@ -3486,7 +3486,7 @@ func ZifStreamIsLocal(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	zend.ZVAL_BOOL(return_value, wrapper.GetIsUrl() == 0)
 	return
 }
-func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSupportsLock(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var zsrc *zend.Zval
 	for {
@@ -3521,7 +3521,7 @@ func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zen
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zsrc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3565,7 +3565,7 @@ func ZifStreamSupportsLock(execute_data *zend.ZendExecuteData, return_value *zen
 	return_value.SetTrue()
 	return
 }
-func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamIsatty(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zsrc *zend.Zval
 	var stream *core.PhpStream
 	var fileno core.PhpSocketT
@@ -3601,7 +3601,7 @@ func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zsrc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -3653,7 +3653,7 @@ func ZifStreamIsatty(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 
 	/* Check if the file descriptor identifier is a terminal */
 }
-func ZifStreamSocketShutdown(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamSocketShutdown(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var how zend.ZendLong
 	var zstream *zend.Zval
 	var stream *core.PhpStream
@@ -3689,7 +3689,7 @@ func ZifStreamSocketShutdown(execute_data *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zstream, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE

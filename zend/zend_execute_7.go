@@ -125,7 +125,7 @@ func ZendRefDelTypeSource(source_list *ZendPropertyInfoSourceList, prop *ZendPro
 		source_list.SetList(ZEND_PROPERTY_INFO_SOURCE_FROM_LIST(Erealloc(list, b.SizeOf("zend_property_info_list")+(list.GetNumAllocated()-1)*b.SizeOf("zend_property_info *"))))
 	}
 }
-func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendFetchThisVar(type_ int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
 	switch type_ {
 	case BP_VAR_R:
@@ -158,8 +158,8 @@ func ZendFetchThisVar(type_ int, opline *ZendOp, _ EXECUTE_DATA_D) {
 func ZendWrongCloneCall(clone *ZendFunction, scope *ZendClassEntry) {
 	ZendThrowError(nil, "Call to %s %s::__clone() from context '%s'", ZendVisibilityString(clone.GetFnFlags()), clone.GetScope().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
 }
-func ExecuteInternal(execute_data *ZendExecuteData, return_value *Zval) {
-	execute_data.GetFunc().GetInternalFunction().GetHandler()(execute_data, return_value)
+func ExecuteInternal(executeData *ZendExecuteData, return_value *Zval) {
+	executeData.GetFunc().GetInternalFunction().GetHandler()(executeData, return_value)
 }
 func ZendCleanAndCacheSymbolTable(symbol_table *ZendArray) {
 	/* Clean before putting into the cache, since clean could call dtors,
@@ -173,7 +173,7 @@ func ZendCleanAndCacheSymbolTable(symbol_table *ZendArray) {
 		*(b.PostInc(&(EG__().GetSymtableCachePtr()))) = symbol_table
 	}
 }
-func IFreeCompiledVariables(execute_data *ZendExecuteData) {
+func IFreeCompiledVariables(executeData *ZendExecuteData) {
 	var cv *Zval = EX_VAR_NUM(0)
 	var count int = EX(func_).op_array.last_var
 	for count != 0 {
@@ -190,7 +190,7 @@ func IFreeCompiledVariables(execute_data *ZendExecuteData) {
 		count--
 	}
 }
-func ZendFreeCompiledVariables(execute_data *ZendExecuteData) { IFreeCompiledVariables(execute_data) }
+func ZendFreeCompiledVariables(executeData *ZendExecuteData) { IFreeCompiledVariables(executeData) }
 func ZEND_VM_INTERRUPT_CHECK() {
 	if EG__().GetVmInterrupt() != 0 {
 		ZEND_VM_INTERRUPT()
@@ -201,7 +201,7 @@ func ZEND_VM_LOOP_INTERRUPT_CHECK() {
 		ZEND_VM_LOOP_INTERRUPT()
 	}
 }
-func ZendCopyExtraArgs(EXECUTE_DATA_D) {
+func ZendCopyExtraArgs(executeData *ZendExecuteData) {
 	var op_array *ZendOpArray = EX(func_).op_array
 	var first_extra_arg uint32 = op_array.GetNumArgs()
 	var num_args uint32 = EX_NUM_ARGS()
@@ -236,12 +236,12 @@ func ZendCopyExtraArgs(EXECUTE_DATA_D) {
 			}
 		}
 		if Z_TYPE_INFO_REFCOUNTED(type_flags) {
-			ZEND_ADD_CALL_FLAG(execute_data, ZEND_CALL_FREE_EXTRA_ARGS)
+			ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 		}
 	} else {
 		for {
 			if src.IsRefcounted() {
-				ZEND_ADD_CALL_FLAG(execute_data, ZEND_CALL_FREE_EXTRA_ARGS)
+				ZEND_ADD_CALL_FLAG(executeData, ZEND_CALL_FREE_EXTRA_ARGS)
 				break
 			}
 			src--
@@ -251,7 +251,7 @@ func ZendCopyExtraArgs(EXECUTE_DATA_D) {
 		}
 	}
 }
-func ZendInitCvs(first uint32, last uint32, _ EXECUTE_DATA_D) {
+func ZendInitCvs(first uint32, last uint32, executeData *ZendExecuteData) {
 	if first < last {
 		var count uint32 = last - first
 		var var_ *Zval = EX_VAR_NUM(first)
@@ -264,7 +264,7 @@ func ZendInitCvs(first uint32, last uint32, _ EXECUTE_DATA_D) {
 		}
 	}
 }
-func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_trampoline ZendBool, _ EXECUTE_DATA_D) {
+func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_trampoline ZendBool, executeData *ZendExecuteData) {
 	var first_extra_arg uint32
 	var num_args uint32
 	ZEND_ASSERT(EX(func_) == (*ZendFunction)(op_array))
@@ -278,7 +278,7 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 	num_args = EX_NUM_ARGS()
 	if num_args > first_extra_arg {
 		if may_be_trampoline == 0 || !op_array.IsCallViaTrampoline() {
-			ZendCopyExtraArgs(EXECUTE_DATA_C)
+			ZendCopyExtraArgs(executeData)
 		}
 	} else if !op_array.IsHasTypeHints() {
 
@@ -292,9 +292,9 @@ func IInitFuncExecuteData(op_array *ZendOpArray, return_value *Zval, may_be_tram
 
 	/* Initialize CV variables (skip arguments) */
 
-	ZendInitCvs(num_args, op_array.GetLastVar(), EXECUTE_DATA_C)
+	ZendInitCvs(num_args, op_array.GetLastVar(), executeData)
 	EX(run_time_cache) = RUN_TIME_CACHE(op_array)
-	EG__().SetCurrentExecuteData(execute_data)
+	EG__().SetCurrentExecuteData(executeData)
 }
 func InitFuncRunTimeCacheI(op_array *ZendOpArray) {
 	var run_time_cache *any
@@ -331,12 +331,12 @@ func ZendInitFuncRunTimeCache(op_array *ZendOpArray) {
 		InitFuncRunTimeCacheI(op_array)
 	}
 }
-func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
+func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
 	ZEND_ASSERT(EX(func_) == (*ZendFunction)(op_array))
 	EX(opline) = op_array.GetOpcodes()
 	EX(call) = nil
 	EX(return_value) = return_value
-	ZendAttachSymbolTable(execute_data)
+	ZendAttachSymbolTable(executeData)
 	if op_array.GetRunTimeCachePtr() == nil {
 		var ptr any
 		ZEND_ASSERT(op_array.IsHeapRtCache())
@@ -347,25 +347,25 @@ func IInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, 
 		memset(ptr, 0, op_array.GetCacheSize())
 	}
 	EX(run_time_cache) = RUN_TIME_CACHE(op_array)
-	EG__().SetCurrentExecuteData(execute_data)
+	EG__().SetCurrentExecuteData(executeData)
 }
 func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
-	var execute_data *ZendExecuteData = ex
+	var executeData *ZendExecuteData = ex
 	EX(prev_execute_data) = EG__().GetCurrentExecuteData()
 	if !(RUN_TIME_CACHE(op_array)) {
 		InitFuncRunTimeCache(op_array)
 	}
-	IInitFuncExecuteData(op_array, return_value, 1, EXECUTE_DATA_C)
+	IInitFuncExecuteData(op_array, return_value, 1, executeData)
 }
-func ZendInitCodeExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
+func ZendInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
 	EX(prev_execute_data) = EG__().GetCurrentExecuteData()
-	IInitCodeExecuteData(execute_data, op_array, return_value)
+	IInitCodeExecuteData(executeData, op_array, return_value)
 }
-func ZendInitExecuteData(execute_data *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
+func ZendInitExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
 	if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
-		ZendInitCodeExecuteData(execute_data, op_array, return_value)
+		ZendInitCodeExecuteData(executeData, op_array, return_value)
 	} else {
-		ZendInitFuncExecuteData(execute_data, op_array, return_value)
+		ZendInitFuncExecuteData(executeData, op_array, return_value)
 	}
 }
 func ZendVmStackCopyCallFrame(call *ZendExecuteData, passed_args uint32, additional_args uint32) *ZendExecuteData {

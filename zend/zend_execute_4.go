@@ -6,7 +6,7 @@ import (
 	b "sik/builtin"
 )
 
-func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *any, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendPreIncdecOverloadedProperty(object *Zval, property *Zval, cache_slot *any, opline *ZendOp, executeData *ZendExecuteData) {
 	var rv Zval
 	var z *Zval
 	var obj Zval
@@ -49,7 +49,7 @@ func ZendAssignOpOverloadedProperty(
 	cache_slot *any,
 	value *Zval,
 	opline *ZendOp,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) {
 	var z *Zval
 	var rv Zval
@@ -73,7 +73,7 @@ func ZendAssignOpOverloadedProperty(
 		}
 		ZVAL_COPY_VALUE(z, value)
 	}
-	if ZendBinaryOp(&res, z, value, OPLINE_C) == SUCCESS {
+	if ZendBinaryOp(&res, z, value, opline) == SUCCESS {
 		Z_OBJ_HT(obj).GetWriteProperty()(&obj, property, &res, cache_slot)
 	}
 	if RETURN_VALUE_USED(opline) {
@@ -98,7 +98,7 @@ func ZendExtensionFcallEndHandler(extension *ZendExtension, frame *ZendExecuteDa
 		extension.GetFcallEndHandler()(frame)
 	}
 }
-func ZendGetTargetSymbolTable(fetch_type int, _ EXECUTE_DATA_D) *HashTable {
+func ZendGetTargetSymbolTable(fetch_type int, executeData *ZendExecuteData) *HashTable {
 	var ht *HashTable
 	if (fetch_type & (ZEND_FETCH_GLOBAL_LOCK | ZEND_FETCH_GLOBAL)) != 0 {
 		ht = EG__().GetSymbolTable()
@@ -179,19 +179,19 @@ func ZendUseResourceAsOffset(dim *Zval) {
 func ZendUseNewElementForString() {
 	ZendThrowError(nil, "[] operator not supported for strings")
 }
-func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendBinaryAssignOpDimSlow(container *Zval, dim *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	if container.IsString() {
 		if opline.GetOp2Type() == IS_UNUSED {
 			ZendUseNewElementForString()
 		} else {
-			ZendCheckStringOffset(dim, BP_VAR_RW, EXECUTE_DATA_C)
-			ZendWrongStringOffset(EXECUTE_DATA_C)
+			ZendCheckStringOffset(dim, BP_VAR_RW, executeData)
+			ZendWrongStringOffset(executeData)
 		}
 	} else if !(container.IsError()) {
 		ZendUseScalarAsArray()
 	}
 }
-func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA_D) ZendUchar {
+func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, executeData *ZendExecuteData) ZendUchar {
 	switch dim.GetType() {
 	case IS_UNDEF:
 
@@ -231,7 +231,7 @@ func SlowIndexConvert(ht *HashTable, dim *Zval, value *ZendValue, _ EXECUTE_DATA
 		return IS_NULL
 	}
 }
-func ZendFetchDimensionAddressInner(ht *HashTable, dim *Zval, dim_type int, type_ int, _ EXECUTE_DATA_D) *Zval {
+func ZendFetchDimensionAddressInner(ht *HashTable, dim *Zval, dim_type int, type_ int, executeData *ZendExecuteData) *Zval {
 	var retval *Zval = nil
 	var offset_key *ZendString
 	var hval ZendUlong
@@ -324,7 +324,7 @@ try_again:
 		goto try_again
 	} else {
 		var val ZendValue
-		var t ZendUchar = SlowIndexConvert(ht, dim, &val, EXECUTE_DATA_C)
+		var t ZendUchar = SlowIndexConvert(ht, dim, &val, executeData)
 		if t == IS_STRING {
 			offset_key = val.GetStr()
 			goto str_index
@@ -341,17 +341,17 @@ try_again:
 	}
 	return retval
 }
-func zend_fetch_dimension_address_inner_W(ht *HashTable, dim *Zval, _ EXECUTE_DATA_D) *Zval {
-	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_W, EXECUTE_DATA_C)
+func zend_fetch_dimension_address_inner_W(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_W_CONST(ht *HashTable, dim *Zval, _ EXECUTE_DATA_D) *Zval {
-	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_W, EXECUTE_DATA_C)
+func zend_fetch_dimension_address_inner_W_CONST(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_inner_RW(ht *HashTable, dim *Zval, _ EXECUTE_DATA_D) *Zval {
-	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_RW, EXECUTE_DATA_C)
+func zend_fetch_dimension_address_inner_RW(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+	return ZendFetchDimensionAddressInner(ht, dim, IS_TMP_VAR, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_inner_RW_CONST(ht *HashTable, dim *Zval, _ EXECUTE_DATA_D) *Zval {
-	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_RW, EXECUTE_DATA_C)
+func zend_fetch_dimension_address_inner_RW_CONST(ht *HashTable, dim *Zval, executeData *ZendExecuteData) *Zval {
+	return ZendFetchDimensionAddressInner(ht, dim, IS_CONST, BP_VAR_RW, executeData)
 }
 func ZendFetchDimensionAddress(
 	result *Zval,
@@ -359,7 +359,7 @@ func ZendFetchDimensionAddress(
 	dim *Zval,
 	dim_type int,
 	type_ int,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) {
 	var retval *Zval
 	if container.IsArray() {
@@ -374,7 +374,7 @@ func ZendFetchDimensionAddress(
 				return
 			}
 		} else {
-			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
+			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, executeData)
 			if retval == nil {
 				result.IsError()
 				return
@@ -406,8 +406,8 @@ func ZendFetchDimensionAddress(
 		if dim == nil {
 			ZendUseNewElementForString()
 		} else {
-			ZendCheckStringOffset(dim, type_, EXECUTE_DATA_C)
-			ZendWrongStringOffset(EXECUTE_DATA_C)
+			ZendCheckStringOffset(dim, type_, executeData)
+			ZendWrongStringOffset(executeData)
 		}
 		result.IsError()
 	} else if container.IsObject() {

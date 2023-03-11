@@ -42,7 +42,7 @@ func Crc32Aarch64(crc uint32, p *byte, nr int) uint32 {
 	}
 	return crc
 }
-func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpIfCrc32(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var p *byte
 	var nr int
 	var crcinit uint32 = 0
@@ -79,7 +79,7 @@ func PhpIfCrc32(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &p, &nr, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

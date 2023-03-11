@@ -186,7 +186,7 @@ func PhpVersionCompare(orig_ver1 *byte, orig_ver2 *byte) int {
 	zend.Efree(ver2)
 	return compare
 }
-func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVersionCompare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var v1 *byte
 	var v2 *byte
 	var op *byte = nil
@@ -226,7 +226,7 @@ func ZifVersionCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &v1, &v1_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

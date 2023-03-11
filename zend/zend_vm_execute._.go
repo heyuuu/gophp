@@ -44,7 +44,7 @@ var ZendHandlersCount int
 
 const ZendVmGetOpcodeHandlerFunc = ZendVmGetOpcodeHandler
 
-type OpcodeHandlerT func(execute_data *ZendExecuteData) int
+type OpcodeHandlerT func(executeData *ZendExecuteData) int
 
 const OPLINE = EX(opline)
 

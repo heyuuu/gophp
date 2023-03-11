@@ -150,7 +150,7 @@ func IZendVerifyPropertyType(info *ZendPropertyInfo, property *Zval, strict Zend
 func ZendVerifyPropertyType(info *ZendPropertyInfo, property *Zval, strict ZendBool) ZendBool {
 	return IZendVerifyPropertyType(info, property, strict)
 }
-func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zval, _ EXECUTE_DATA_D) *Zval {
+func ZendAssignToTypedProp(info *ZendPropertyInfo, property_val *Zval, value *Zval, executeData *ZendExecuteData) *Zval {
 	var tmp Zval
 	ZVAL_DEREF(value)
 	ZVAL_COPY(&tmp, value)
@@ -272,7 +272,7 @@ func ZendVerifyInternalArgTypes(fbc *ZendFunction, call *ZendExecuteData) int {
 	}
 	return 1
 }
-func ZendMissingArgError(execute_data *ZendExecuteData) {
+func ZendMissingArgError(executeData *ZendExecuteData) {
 	var ptr *ZendExecuteData = EX(prev_execute_data)
 	if ptr != nil && ptr.GetFunc() != nil && ZEND_USER_CODE(ptr.GetFunc().GetCommonType()) {
 		ZendThrowError(ZendCeArgumentCountError, "Too few arguments to function %s%s%s(), %d passed in %s on line %d and %s %d expected", b.CondF1(EX(func_).common.scope, func() []byte { return EX(func_).common.scope.name.GetVal() }, ""), b.Cond(EX(func_).common.scope, "::", ""), EX(func_).common.function_name.GetVal(), EX_NUM_ARGS(), ptr.GetFunc().GetOpArray().GetFilename().GetVal(), ptr.GetOpline().GetLineno(), b.Cond(EX(func_).common.required_num_args == EX(func_).common.num_args, "exactly", "at least"), EX(func_).common.required_num_args)
@@ -325,7 +325,7 @@ func ZendUseObjectAsArray() {
 func ZendIllegalOffset() {
 	ZendError(E_WARNING, "Illegal offset type")
 }
-func ZendAssignToObjectDim(object *Zval, dim *Zval, value *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendAssignToObjectDim(object *Zval, dim *Zval, value *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	Z_OBJ_HT_P(object).GetWriteDimension()(object, dim, value)
 	if RETURN_VALUE_USED(opline) {
 		ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), value)
@@ -339,7 +339,7 @@ func ZendBinaryOp(ret *Zval, op1 *Zval, op2 *Zval, opline *ZendOp) int {
 	var opcode int = int(opline.GetExtendedValue())
 	return zend_binary_ops[opcode-ZEND_ADD](ret, op1, op2)
 }
-func ZendBinaryAssignOpObjDim(object *Zval, property *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendBinaryAssignOpObjDim(object *Zval, property *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var free_op_data1 ZendFreeOp
 	var value *Zval
 	var z *Zval
@@ -355,7 +355,7 @@ func ZendBinaryAssignOpObjDim(object *Zval, property *Zval, opline *ZendOp, _ EX
 			}
 			ZVAL_COPY_VALUE(z, value)
 		}
-		if ZendBinaryOp(&res, z, value, OPLINE_C) == SUCCESS {
+		if ZendBinaryOp(&res, z, value, opline) == SUCCESS {
 			Z_OBJ_HT_P(object).GetWriteDimension()(object, property, &res)
 		}
 		if z == &rv {
@@ -373,7 +373,7 @@ func ZendBinaryAssignOpObjDim(object *Zval, property *Zval, opline *ZendOp, _ EX
 	}
 	FREE_OP(free_op_data1)
 }
-func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var z_copy Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
@@ -383,7 +383,7 @@ func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp,
 		ZEND_ASSERT(ref.GetVal().IsString() && "Concat should return string")
 		return
 	}
-	ZendBinaryOp(&z_copy, ref.GetVal(), value, OPLINE_C)
+	ZendBinaryOp(&z_copy, ref.GetVal(), value, opline)
 	if ZendVerifyRefAssignableZval(ref, &z_copy, EX_USES_STRICT_TYPES()) != 0 {
 		ZvalPtrDtor(ref.GetVal())
 		ZVAL_COPY_VALUE(ref.GetVal(), &z_copy)
@@ -391,7 +391,7 @@ func ZendBinaryAssignOpTypedRef(ref *ZendReference, value *Zval, opline *ZendOp,
 		ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var z_copy Zval
 
 	/* Make sure that in-place concatenation is used if the LHS is a string. */
@@ -401,7 +401,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value 
 		ZEND_ASSERT(zptr.IsString() && "Concat should return string")
 		return
 	}
-	ZendBinaryOp(&z_copy, zptr, value, OPLINE_C)
+	ZendBinaryOp(&z_copy, zptr, value, opline)
 	if ZendVerifyPropertyType(prop_info, &z_copy, EX_USES_STRICT_TYPES()) != 0 {
 		ZvalPtrDtor(zptr)
 		ZVAL_COPY_VALUE(zptr, &z_copy)
@@ -409,7 +409,7 @@ func ZendBinaryAssignOpTypedProp(prop_info *ZendPropertyInfo, zptr *Zval, value 
 		ZvalPtrDtor(&z_copy)
 	}
 }
-func ZendCheckStringOffset(dim *Zval, type_ int, _ EXECUTE_DATA_D) ZendLong {
+func ZendCheckStringOffset(dim *Zval, type_ int, executeData *ZendExecuteData) ZendLong {
 	var offset ZendLong
 try_again:
 	if dim.GetType() != IS_LONG {

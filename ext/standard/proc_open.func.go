@@ -132,7 +132,7 @@ func ZmStartupProcOpen(type_ int, module_number int) int {
 	LeProcOpen = zend.ZendRegisterListDestructorsEx(ProcOpenRsrcDtor, nil, "process", module_number)
 	return zend.SUCCESS
 }
-func ZifProcTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifProcTerminate(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zproc *zend.Zval
 	var proc *PhpProcessHandle
 	var sig_no zend.ZendLong = SIGTERM
@@ -168,7 +168,7 @@ func ZifProcTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -223,7 +223,7 @@ func ZifProcTerminate(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 }
-func ZifProcClose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifProcClose(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zproc *zend.Zval
 	var proc *PhpProcessHandle
 	for {
@@ -258,7 +258,7 @@ func ZifProcClose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -304,7 +304,7 @@ func ZifProcClose(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(FG(pclose_ret))
 	return
 }
-func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifProcGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zproc *zend.Zval
 	var proc *PhpProcessHandle
 	var wstatus int
@@ -347,7 +347,7 @@ func ZifProcGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zproc, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -429,7 +429,7 @@ func GetValidArgString(zv *zend.Zval, elem_num int) *zend.ZendString {
 	}
 	return str
 }
-func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifProcOpen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var command_zv *zend.Zval
 	var command *byte = nil
 	var cwd *byte = nil
@@ -482,7 +482,7 @@ func ZifProcOpen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &command_zv, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)

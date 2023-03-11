@@ -9,7 +9,7 @@ import (
 	"sik/zend"
 )
 
-func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Zval, persistent int) {
+func PhpFsockopenStream(executeData *zend.ZendExecuteData, return_value *zend.Zval, persistent int) {
 	var host *byte
 	var host_len int
 	var port zend.ZendLong = -1
@@ -57,7 +57,7 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &host, &host_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -160,9 +160,9 @@ func PhpFsockopenStream(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	}
 	core.PhpStreamToZval(stream, return_value)
 }
-func ZifFsockopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpFsockopenStream(execute_data, return_value, 0)
+func ZifFsockopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpFsockopenStream(executeData, return_value, 0)
 }
-func ZifPfsockopen(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpFsockopenStream(execute_data, return_value, 1)
+func ZifPfsockopen(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpFsockopenStream(executeData, return_value, 1)
 }

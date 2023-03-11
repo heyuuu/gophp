@@ -48,7 +48,7 @@ func ZmStartupLcg(type_ int, module_number int) int {
 	LcgInitGlobals(&LcgGlobals)
 	return zend.SUCCESS
 }
-func ZifLcgValue(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLcgValue(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

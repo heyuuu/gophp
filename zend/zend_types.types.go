@@ -169,6 +169,15 @@ func (this *ZendReference) SetSources(value ZendPropertyInfoSourceList) { this.s
  */
 type ZendAstRef struct {
 	ZendRefcounted
+	//
+	ast *ZendAst
 }
 
 var _ IRefcounted = &ZendAstRef{}
+
+func (this ZendAstRef) GcAst() *ZendAst {
+	//func GC_AST(p *ZendAstRef) *ZendAst {
+	//	return (*ZendAst)((*byte)(p) + b.SizeOf("zend_ast_ref"))
+	//}
+	return this.ast
+}

@@ -89,7 +89,7 @@ func ZendFetchPropertyAddress(
 	flags uint32,
 	init_undef ZendBool,
 	opline *ZendOp,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) {
 	var ptr *Zval
 	if container_op_type != IS_UNUSED && container.GetType() != IS_OBJECT {
@@ -108,7 +108,7 @@ func ZendFetchPropertyAddress(
 				result.SetNull()
 				return
 			}
-			container = MakeRealObject(container, prop_ptr, OPLINE_C, EXECUTE_DATA_C)
+			container = MakeRealObject(container, prop_ptr, opline, executeData)
 			if container == nil {
 				result.IsError()
 				return
@@ -189,12 +189,12 @@ func ZendAssignToPropertyReference(
 	prop_op_type uint32,
 	value_ptr *Zval,
 	opline *ZendOp,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) {
 	var variable Zval
 	var variable_ptr *Zval = &variable
 	var cache_addr *any = b.CondF1(prop_op_type == IS_CONST, func() *any { return CACHE_ADDR(opline.GetExtendedValue() & ^ZEND_RETURNS_FUNCTION) }, nil)
-	ZendFetchPropertyAddress(variable_ptr, container, container_op_type, prop_ptr, prop_op_type, cache_addr, BP_VAR_W, 0, 0, OPLINE_C, EXECUTE_DATA_C)
+	ZendFetchPropertyAddress(variable_ptr, container, container_op_type, prop_ptr, prop_op_type, cache_addr, BP_VAR_W, 0, 0, opline, executeData)
 	if variable_ptr.IsIndirect() {
 		variable_ptr = variable_ptr.GetZv()
 	}
@@ -207,7 +207,7 @@ func ZendAssignToPropertyReference(
 	} else if value_ptr.IsError() {
 		variable_ptr = EG__().GetUninitializedZval()
 	} else if (opline.GetExtendedValue()&ZEND_RETURNS_FUNCTION) != 0 && !(value_ptr.IsReference()) {
-		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, OPLINE_C, EXECUTE_DATA_C)
+		variable_ptr = ZendWrongAssignToVariableReference(variable_ptr, value_ptr, opline, executeData)
 	} else {
 		var prop_info *ZendPropertyInfo = nil
 		if prop_op_type == IS_CONST {
@@ -217,7 +217,7 @@ func ZendAssignToPropertyReference(
 			prop_info = ZendObjectFetchPropertyTypeInfo(container.GetObj(), variable_ptr)
 		}
 		if prop_info != nil {
-			variable_ptr = ZendAssignToTypedPropertyReference(prop_info, variable_ptr, value_ptr, EXECUTE_DATA_C)
+			variable_ptr = ZendAssignToTypedPropertyReference(prop_info, variable_ptr, value_ptr, executeData)
 		} else {
 			ZendAssignToVariableReference(variable_ptr, value_ptr)
 		}
@@ -226,17 +226,17 @@ func ZendAssignToPropertyReference(
 		ZVAL_COPY(EX_VAR(opline.GetResult().GetVar()), variable_ptr)
 	}
 }
-func ZendAssignToPropertyReferenceThisConst(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
-	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_CONST, value_ptr, OPLINE_C, EXECUTE_DATA_C)
+func ZendAssignToPropertyReferenceThisConst(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_CONST, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceVarConst(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
-	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_CONST, value_ptr, OPLINE_C, EXECUTE_DATA_C)
+func ZendAssignToPropertyReferenceVarConst(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_CONST, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceThisVar(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
-	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_VAR, value_ptr, OPLINE_C, EXECUTE_DATA_C)
+func ZendAssignToPropertyReferenceThisVar(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	ZendAssignToPropertyReference(container, IS_UNUSED, prop_ptr, IS_VAR, value_ptr, opline, executeData)
 }
-func ZendAssignToPropertyReferenceVarVar(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
-	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_VAR, value_ptr, OPLINE_C, EXECUTE_DATA_C)
+func ZendAssignToPropertyReferenceVarVar(container *Zval, prop_ptr *Zval, value_ptr *Zval, opline *ZendOp, executeData *ZendExecuteData) {
+	ZendAssignToPropertyReference(container, IS_VAR, prop_ptr, IS_VAR, value_ptr, opline, executeData)
 }
 func ZendFetchStaticPropertyAddressEx(
 	retval **Zval,
@@ -244,7 +244,7 @@ func ZendFetchStaticPropertyAddressEx(
 	cache_slot uint32,
 	fetch_type int,
 	opline *ZendOp,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) int {
 	var free_op1 ZendFreeOp
 	var name *ZendString
@@ -291,7 +291,7 @@ func ZendFetchStaticPropertyAddressEx(
 			tmp_name = nil
 		} else {
 			if op1_type == IS_CV && varname.IsUndef() {
-				ZvalUndefinedCv(opline.GetOp1().GetVar(), EXECUTE_DATA_C)
+				ZvalUndefinedCv(opline.GetOp1().GetVar(), executeData)
 			}
 			name = ZvalGetTmpString(varname, &tmp_name)
 		}
@@ -320,7 +320,7 @@ func ZendFetchStaticPropertyAddress(
 	fetch_type int,
 	flags int,
 	opline *ZendOp,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) int {
 	var success int
 	var property_info *ZendPropertyInfo
@@ -332,7 +332,7 @@ func ZendFetchStaticPropertyAddress(
 			return FAILURE
 		}
 	} else {
-		success = ZendFetchStaticPropertyAddressEx(retval, &property_info, cache_slot, fetch_type, OPLINE_C, EXECUTE_DATA_C)
+		success = ZendFetchStaticPropertyAddressEx(retval, &property_info, cache_slot, fetch_type, opline, executeData)
 		if success != SUCCESS {
 			return FAILURE
 		}

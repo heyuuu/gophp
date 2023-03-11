@@ -30,7 +30,7 @@ func PhpGetgid() zend.ZendLong {
 	PhpStatpage()
 	return BG(page_gid)
 }
-func ZifGetmyuid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmyuid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var uid zend.ZendLong
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -44,7 +44,7 @@ func ZifGetmyuid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmygid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmygid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var gid zend.ZendLong
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -58,7 +58,7 @@ func ZifGetmygid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmypid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmypid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var pid zend.ZendLong
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -72,7 +72,7 @@ func ZifGetmypid(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifGetmyinode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetmyinode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -89,7 +89,7 @@ func PhpGetlastmod() int64 {
 	PhpStatpage()
 	return BG(page_mtime)
 }
-func ZifGetlastmod(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetlastmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var lm zend.ZendLong
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return

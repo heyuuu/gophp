@@ -514,7 +514,7 @@ func BrowscapZvalCopyCtor(p *zend.Zval) {
 		}
 	}
 }
-func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetBrowser(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var agent_name *zend.ZendString = nil
 	var lookup_browser_name *zend.ZendString
 	var return_array zend.ZendBool = 0
@@ -569,7 +569,7 @@ func ZifGetBrowser(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &agent_name, 1) == 0 {

@@ -85,7 +85,7 @@ func GetMimeType(server *PhpCliServer, ext *byte, ext_len int) *byte {
 	}
 	return nil
 }
-func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var client *PhpCliServerClient
 	var headers *zend.HashTable
 	var key *zend.ZendString
@@ -134,7 +134,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

@@ -61,7 +61,7 @@ func PhpOpenlog(ident *byte, option int, facility int) {
 	openlog(ident, option, facility)
 	core.PG(have_called_openlog) = 1
 }
-func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOpenlog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var ident *byte
 	var option zend.ZendLong
 	var facility zend.ZendLong
@@ -98,7 +98,7 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &ident, &ident_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -157,7 +157,7 @@ func ZifOpenlog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifCloselog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCloselog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -169,7 +169,7 @@ func ZifCloselog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSyslog(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var priority zend.ZendLong
 	var message *byte
 	var message_len int
@@ -205,7 +205,7 @@ func ZifSyslog(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &priority, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG

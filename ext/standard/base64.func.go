@@ -137,7 +137,7 @@ func PhpBase64DecodeEx(str *uint8, length int, strict zend.ZendBool) *zend.ZendS
 	result.SetLen(outl)
 	return result
 }
-func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifBase64Encode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var str_len int
 	var result *zend.ZendString
@@ -173,7 +173,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -212,7 +212,7 @@ func ZifBase64Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetString(result)
 	return
 }
-func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifBase64Decode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var strict zend.ZendBool = 0
 	var str_len int
@@ -249,7 +249,7 @@ func ZifBase64Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

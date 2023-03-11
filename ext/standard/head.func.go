@@ -8,7 +8,7 @@ import (
 	"sik/zend"
 )
 
-func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHeader(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var rep zend.ZendBool = 1
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int
@@ -44,7 +44,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -95,7 +95,7 @@ func ZifHeader(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	ctr.SetLineLen(uint32(len_))
 	core.SapiHeaderOp(b.Cond(rep != 0, core.SAPI_HEADER_REPLACE, core.SAPI_HEADER_ADD), &ctr)
 }
-func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHeaderRemove(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var ctr core.SapiHeaderLine = core.MakeSapiHeaderLine(0)
 	var len_ int = 0
 	for {
@@ -130,7 +130,7 @@ func ZifHeaderRemove(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, ctr.GetLine(), &len_, 0) == 0 {
@@ -338,7 +338,7 @@ func PhpHeadParseCookieOptionsArray(
 
 	/* Array is not empty but no valid keys were found */
 }
-func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSetcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var expires_or_options *zend.Zval = nil
 	var name *zend.ZendString
 	var value *zend.ZendString = nil
@@ -380,7 +380,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -479,7 +479,7 @@ func ZifSetcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSetrawcookie(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var expires_or_options *zend.Zval = nil
 	var name *zend.ZendString
 	var value *zend.ZendString = nil
@@ -521,7 +521,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &name, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -620,7 +620,7 @@ func ZifSetrawcookie(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 	}
 }
-func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHeadersSent(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg1 *zend.Zval = nil
 	var arg2 *zend.Zval = nil
 	var file *byte = ""
@@ -657,7 +657,7 @@ func ZifHeadersSent(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg1, 0)
@@ -720,14 +720,14 @@ func PhpHeadApplyHeaderListToHash(data any, arg any) {
 		zend.AddNextIndexString((*zend.Zval)(arg), (*byte)(sapi_header.GetHeader()))
 	}
 }
-func ZifHeadersList(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHeadersList(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	zend.ArrayInit(return_value)
 	core.SG__().sapi_headers.headers.ApplyWithArgument(PhpHeadApplyHeaderListToHash, return_value)
 }
-func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHttpResponseCode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var response_code zend.ZendLong = 0
 	for {
 		var _flags int = 0
@@ -761,7 +761,7 @@ func ZifHttpResponseCode(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &response_code, &_dummy, 0, 0) == 0 {

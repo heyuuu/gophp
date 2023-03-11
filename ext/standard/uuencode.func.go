@@ -154,7 +154,7 @@ err:
 	zend.ZendStringEfree(dest)
 	return nil
 }
-func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifConvertUuencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var src *zend.ZendString
 	for {
 		var _flags int = 0
@@ -188,7 +188,7 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &src, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -231,7 +231,7 @@ func ZifConvertUuencode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	return_value.SetString(PhpUuencode(src.GetVal(), src.GetLen()))
 	return
 }
-func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifConvertUudecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var src *zend.ZendString
 	var dest *zend.ZendString
 	for {
@@ -266,7 +266,7 @@ func ZifConvertUudecode(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &src, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

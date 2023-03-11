@@ -60,13 +60,13 @@ func ZEND_CALL_VAR_NUM(call *ZendExecuteData, n int) *Zval {
 func ZEND_CALL_ARG(call *ZendExecuteData, n int) *Zval {
 	return ZEND_CALL_VAR_NUM(call, int(n)-1)
 }
-func EX(element __auto__) __auto__                           { return execute_data.element }
-func EX_CALL_INFO() uint32                                   { return ZEND_CALL_INFO(execute_data) }
-func EX_CALL_KIND() int                                      { return ZEND_CALL_KIND(execute_data) }
-func EX_NUM_ARGS() uint32                                    { return ZEND_CALL_NUM_ARGS(execute_data) }
+func EX(element __auto__) __auto__                           { return executeData.element }
+func EX_CALL_INFO() uint32                                   { return ZEND_CALL_INFO(executeData) }
+func EX_CALL_KIND() int                                      { return ZEND_CALL_KIND(executeData) }
+func EX_NUM_ARGS() uint32                                    { return ZEND_CALL_NUM_ARGS(executeData) }
 func ZEND_CALL_USES_STRICT_TYPES(call *ZendExecuteData) bool { return call.GetFunc().IsStrictTypes() }
 func EX_USES_STRICT_TYPES() bool {
-	return ZEND_CALL_USES_STRICT_TYPES(execute_data)
+	return ZEND_CALL_USES_STRICT_TYPES(executeData)
 }
 func ZEND_ARG_USES_STRICT_TYPES() bool {
 	return EG__().GetCurrentExecuteData().GetPrevExecuteData() != nil && EG__().GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData().GetPrevExecuteData())
@@ -74,9 +74,9 @@ func ZEND_ARG_USES_STRICT_TYPES() bool {
 func ZEND_RET_USES_STRICT_TYPES() bool {
 	return ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData())
 }
-func EX_VAR(n uint32) *Zval { return ZEND_CALL_VAR(execute_data, n) }
+func EX_VAR(n uint32) *Zval { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_NUM(n int) *Zval {
-	return ZEND_CALL_VAR_NUM(execute_data, n)
+	return ZEND_CALL_VAR_NUM(executeData, n)
 }
 func EX_VAR_TO_NUM(n uint32) __auto__ {
 	return uint32(ZEND_CALL_VAR(nil, n) - ZEND_CALL_VAR_NUM(nil, 0))

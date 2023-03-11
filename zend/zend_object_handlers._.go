@@ -103,7 +103,7 @@ type ZendObjectGetPropertiesForT func(object *Zval, purpose ZendPropPurpose) *Ze
 
 /* Used to call methods */
 
-type ZendObjectCallMethodT func(method *ZendString, object *ZendObject, execute_data *ZendExecuteData, return_value *Zval) int
+type ZendObjectCallMethodT func(method *ZendString, object *ZendObject, executeData *ZendExecuteData, return_value *Zval) int
 type ZendObjectGetMethodT func(object **ZendObject, method *ZendString, key *Zval) *ZendFunction
 type ZendObjectGetConstructorT func(object *ZendObject) *ZendFunction
 

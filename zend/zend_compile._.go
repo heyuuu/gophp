@@ -38,7 +38,7 @@ const ZEND_USE_ABS_CONST_ADDR = 0
 
 /* Compilation context that is different for each file, but shared between op arrays. */
 
-type UserOpcodeHandlerT func(execute_data *ZendExecuteData) int
+type UserOpcodeHandlerT func(executeData *ZendExecuteData) int
 
 const ZEND_LIVE_TMPVAR = 0
 const ZEND_LIVE_LOOP = 1
@@ -255,7 +255,7 @@ const ZEND_RETURN_REFERENCE = 1
 
 /* zend_internal_function_handler */
 
-type ZifHandler func(execute_data *ZendExecuteData, return_value *Zval)
+type ZifHandler func(executeData *ZendExecuteData, return_value *Zval)
 
 const ZEND_CALL_HAS_THIS = IS_OBJECT_EX
 

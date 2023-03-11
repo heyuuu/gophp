@@ -12,9 +12,9 @@ func ZEND_CLOSURE_OBJECT(op_array *ZendFunction) *ZendObject {
 func ZEND_CLOSURE_PROPERTY_ERROR() {
 	ZendThrowError(nil, "Closure object cannot have properties")
 }
-func zim_Closure___invoke(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_Closure___invoke(executeData *ZendExecuteData, return_value *Zval) {
 	var func_ *ZendFunction = EX(func_)
-	var arguments *Zval = ZEND_CALL_ARG(execute_data, 1)
+	var arguments *Zval = ZEND_CALL_ARG(executeData, 1)
 	if CallUserFunction(CG__().GetFunctionTable(), nil, ZEND_THIS, return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
 		return_value.SetFalse()
 	}
@@ -72,7 +72,7 @@ func ZendValidClosureBinding(closure *ZendClosure, newthis *Zval, scope *ZendCla
 	}
 	return 1
 }
-func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_Closure_call(executeData *ZendExecuteData, return_value *Zval) {
 	var newthis *Zval
 	var closure_result Zval
 	var closure *ZendClosure
@@ -147,7 +147,7 @@ func zim_Closure_call(execute_data *ZendExecuteData, return_value *Zval) {
 		Efree(my_function.GetOpArray().GetRunTimeCachePtr())
 	}
 }
-func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_Closure_bind(executeData *ZendExecuteData, return_value *Zval) {
 	var newthis *Zval
 	var zclosure *Zval
 	var scope_arg *Zval = nil
@@ -189,7 +189,7 @@ func zim_Closure_bind(execute_data *ZendExecuteData, return_value *Zval) {
 	}
 	ZendCreateClosure(return_value, closure.GetFunc(), ce, called_scope, newthis)
 }
-func ZendClosureCallMagic(execute_data *ZendExecuteData, return_value *Zval) {
+func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *Zval) {
 	var fci ZendFcallInfo
 	var fcc ZendFcallInfoCache
 	var params []Zval
@@ -261,7 +261,7 @@ func ZendCreateClosureFromCallable(return_value *Zval, callable *Zval, error **b
 	}
 	return SUCCESS
 }
-func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_Closure_fromCallable(executeData *ZendExecuteData, return_value *Zval) {
 	var callable *Zval
 	var success int
 	var error *byte = nil
@@ -280,7 +280,7 @@ func zim_Closure_fromCallable(execute_data *ZendExecuteData, return_value *Zval)
 
 	EG__().SetCurrentExecuteData(EX(prev_execute_data))
 	success = ZendCreateClosureFromCallable(return_value, callable, &error)
-	EG__().SetCurrentExecuteData(execute_data)
+	EG__().SetCurrentExecuteData(executeData)
 	if success == FAILURE || error != nil {
 		if error != nil {
 			ZendTypeError("Failed to create closure from callable: %s", error)
@@ -466,7 +466,7 @@ func ZendClosureGetGc(obj *Zval, table **Zval, n *int) *HashTable {
 		return nil
 	}
 }
-func zim_Closure___construct(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_Closure___construct(executeData *ZendExecuteData, return_value *Zval) {
 	ZendThrowError(nil, "Instantiation of 'Closure' is not allowed")
 }
 func ZendRegisterClosureCe() {
@@ -494,9 +494,9 @@ func ZendRegisterClosureCe() {
 	ClosureHandlers.SetGetClosure(ZendClosureGetClosure)
 	ClosureHandlers.SetGetGc(ZendClosureGetGc)
 }
-func ZendClosureInternalHandler(execute_data *ZendExecuteData, return_value *Zval) {
+func ZendClosureInternalHandler(executeData *ZendExecuteData, return_value *Zval) {
 	var closure *ZendClosure = (*ZendClosure)(ZEND_CLOSURE_OBJECT(EX(func_)))
-	closure.GetOrigInternalHandler()(execute_data, return_value)
+	closure.GetOrigInternalHandler()(executeData, return_value)
 	OBJ_RELEASE((*ZendObject)(closure))
 	EX(func_) = nil
 }

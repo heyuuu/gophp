@@ -294,7 +294,7 @@ just_path:
 	}
 	return ret
 }
-func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifParseUrl(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var str_len int
 	var resource *PhpUrl
@@ -333,7 +333,7 @@ func ZifParseUrl(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -512,7 +512,7 @@ func PhpUrlEncode(s *byte, len_ int) *zend.ZendString {
 	start = zend.ZendStringTruncate(start, to-(*uint8)(start.GetVal()), 0)
 	return start
 }
-func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUrlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var in_str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -546,7 +546,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -584,7 +584,7 @@ func ZifUrlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(PhpUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUrldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var in_str *zend.ZendString
 	var out_str *zend.ZendString
 	for {
@@ -619,7 +619,7 @@ func ZifUrldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -702,7 +702,7 @@ func PhpRawUrlEncode(s *byte, len_ int) *zend.ZendString {
 	str = zend.ZendStringTruncate(str, y, 0)
 	return str
 }
-func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRawurlencode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var in_str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -736,7 +736,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -774,7 +774,7 @@ func ZifRawurlencode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetString(PhpRawUrlEncode(in_str.GetVal(), in_str.GetLen()))
 	return
 }
-func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRawurldecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var in_str *zend.ZendString
 	var out_str *zend.ZendString
 	for {
@@ -809,7 +809,7 @@ func ZifRawurldecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &in_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -866,7 +866,7 @@ func PhpRawUrlDecode(str *byte, len_ int) int {
 	*dest = '0'
 	return dest - str
 }
-func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var url *byte
 	var url_len int
 	var stream *core.PhpStream
@@ -907,7 +907,7 @@ func ZifGetHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &url, &url_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

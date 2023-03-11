@@ -9,7 +9,7 @@ import (
 	"sik/zend"
 )
 
-func ZifReadlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var link *byte
 	var link_len int
 	var buff []byte
@@ -46,7 +46,7 @@ func ZifReadlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -98,7 +98,7 @@ func ZifReadlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZVAL_STRINGL(return_value, buff, ret)
 	return
 }
-func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var link *byte
 	var dirname *byte
 	var link_len int
@@ -136,7 +136,7 @@ func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &link, &link_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -189,7 +189,7 @@ func ZifLinkinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(zend.ZendLong(sb.st_dev))
 	return
 }
-func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSymlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int
@@ -231,7 +231,7 @@ func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH
@@ -311,7 +311,7 @@ func ZifSymlink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifLink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var topath *byte
 	var frompath *byte
 	var topath_len int
@@ -351,7 +351,7 @@ func ZifLink(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &topath, &topath_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

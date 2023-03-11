@@ -46,7 +46,7 @@ func (this *ZendGeneratorNode) SetRoot(value *ZendGenerator)    { this.ptr.root 
 type ZendGenerator struct {
 	std                      ZendObject
 	iterator                 *ZendObjectIterator
-	execute_data             *ZendExecuteData
+	executeData              *ZendExecuteData
 	frozen_call_stack        *ZendExecuteData
 	value                    Zval
 	key                      Zval
@@ -64,7 +64,7 @@ type ZendGenerator struct {
 //             func MakeZendGenerator(
 // std ZendObject,
 // iterator *ZendObjectIterator,
-// execute_data *ZendExecuteData,
+// executeData *ZendExecuteData,
 // frozen_call_stack *ZendExecuteData,
 // value Zval,
 // key Zval,
@@ -81,7 +81,7 @@ type ZendGenerator struct {
 //                 return ZendGenerator{
 //                     std:std,
 //                     iterator:iterator,
-//                     execute_data:execute_data,
+//                     executeData:execute_data,
 //                     frozen_call_stack:frozen_call_stack,
 //                     value:value,
 //                     key:key,
@@ -101,8 +101,8 @@ func (this *ZendGenerator) GetStd() ZendObject { return this.std }
 // func (this *ZendGenerator) SetStd(value ZendObject) { this.std = value }
 func (this *ZendGenerator) GetIterator() *ZendObjectIterator          { return this.iterator }
 func (this *ZendGenerator) SetIterator(value *ZendObjectIterator)     { this.iterator = value }
-func (this *ZendGenerator) GetExecuteData() *ZendExecuteData          { return this.execute_data }
-func (this *ZendGenerator) SetExecuteData(value *ZendExecuteData)     { this.execute_data = value }
+func (this *ZendGenerator) GetExecuteData() *ZendExecuteData          { return this.executeData }
+func (this *ZendGenerator) SetExecuteData(value *ZendExecuteData)     { this.executeData = value }
 func (this *ZendGenerator) GetFrozenCallStack() *ZendExecuteData      { return this.frozen_call_stack }
 func (this *ZendGenerator) SetFrozenCallStack(value *ZendExecuteData) { this.frozen_call_stack = value }
 func (this *ZendGenerator) GetValue() Zval                            { return this.value }

@@ -261,7 +261,7 @@ func ZendSetHashSymbol(
 	va_end(symbol_table_list)
 	return SUCCESS
 }
-func ZifDisplayDisabledFunction(execute_data *ZendExecuteData, return_value *Zval) {
+func ZifDisplayDisabledFunction(executeData *ZendExecuteData, return_value *Zval) {
 	ZendError(E_WARNING, "%s() has been disabled for security reasons", GetActiveFunctionName())
 }
 func ZendDisableFunction(function_name *byte, function_name_length int) int {

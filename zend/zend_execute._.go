@@ -28,8 +28,8 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var ZendExecuteEx func(execute_data *ZendExecuteData)
-var ZendExecuteInternal func(execute_data *ZendExecuteData, return_value *Zval)
+var ZendExecuteEx func(executeData *ZendExecuteData)
+var ZendExecuteInternal func(executeData *ZendExecuteData, return_value *Zval)
 
 /* export zend_pass_function to allow comparisons against it */
 
@@ -62,33 +62,7 @@ const CACHE_SPECIAL = 1 << 0
 
 // Source: <Zend/zend_execute.c>
 
-/*
-   +----------------------------------------------------------------------+
-   | Zend Engine                                                          |
-   +----------------------------------------------------------------------+
-   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
-   +----------------------------------------------------------------------+
-   | This source file is subject to version 2.00 of the Zend license,     |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
-   | http://www.zend.com/license/2_00.txt.                                |
-   | If you did not receive a copy of the Zend license and are unable to  |
-   | obtain it through the world-wide-web, please send a note to          |
-   | license@zend.com so we can mail you a copy immediately.              |
-   +----------------------------------------------------------------------+
-   | Authors: Andi Gutmans <andi@php.net>                                 |
-   |          Zeev Suraski <zeev@php.net>                                 |
-   |          Dmitry Stogov <dmitry@php.net>                              |
-   +----------------------------------------------------------------------+
-*/
-
-const ZEND_INTENSIVE_DEBUGGING = 0
-
 /* Virtual current working directory support */
-
-const EXECUTE_DATA_D = zend_execute_data * execute_data
-const EXECUTE_DATA_C EXECUTE_DATA_D = execute_data
-const OPLINE_C *ZendOp = opline
 const _CONST_CODE = 0
 const _TMP_CODE = 1
 const _VAR_CODE = 2

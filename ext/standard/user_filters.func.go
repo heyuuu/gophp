@@ -9,7 +9,7 @@ import (
 	"sik/zend"
 )
 
-func ZifUserFilterNop(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {}
+func ZifUserFilterNop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {}
 func PhpBucketDtor(res *zend.ZendResource) {
 	var bucket *streams.PhpStreamBucket = (*streams.PhpStreamBucket)(res.GetPtr())
 	if bucket != nil {
@@ -322,7 +322,7 @@ func FilterItemDtor(zv *zend.Zval) {
 	zend.ZendStringReleaseEx(fdat.GetClassname(), 0)
 	zend.Efree(fdat)
 }
-func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zbrigade *zend.Zval
 	var zbucket zend.Zval
 	var brigade *streams.PhpStreamBucketBrigade
@@ -359,7 +359,7 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zbrigade, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -412,7 +412,7 @@ func ZifStreamBucketMakeWriteable(execute_data *zend.ZendExecuteData, return_val
 		zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 	}
 }
-func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func PhpStreamBucketAttach(append int, executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zbrigade *zend.Zval
 	var zobject *zend.Zval
 	var pzbucket *zend.Zval
@@ -451,7 +451,7 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &zbrigade, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -534,13 +534,13 @@ func PhpStreamBucketAttach(append int, execute_data *zend.ZendExecuteData, retur
 	 * multiple times. See bug35916.phpt for reference.
 	 */
 }
-func ZifStreamBucketPrepend(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStreamBucketAttach(0, execute_data, return_value)
+func ZifStreamBucketPrepend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStreamBucketAttach(0, executeData, return_value)
 }
-func ZifStreamBucketAppend(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStreamBucketAttach(1, execute_data, return_value)
+func ZifStreamBucketAppend(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStreamBucketAttach(1, executeData, return_value)
 }
-func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zstream *zend.Zval
 	var zbucket zend.Zval
 	var stream *core.PhpStream
@@ -580,7 +580,7 @@ func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &zstream, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -636,7 +636,7 @@ func ZifStreamBucketNew(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	zend.AddPropertyStringl(return_value, "data", bucket.GetBuf(), bucket.GetBuflen())
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }
-func ZifStreamGetFilters(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var filter_name *zend.ZendString
 	var filters_hash *zend.HashTable
 	if zend.ZendParseParametersNone() == zend.FAILURE {
@@ -656,7 +656,7 @@ func ZifStreamGetFilters(execute_data *zend.ZendExecuteData, return_value *zend.
 		}
 	}
 }
-func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamFilterRegister(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var filtername *zend.ZendString
 	var classname *zend.ZendString
 	var fdat *PhpUserFilterData
@@ -692,7 +692,7 @@ func ZifStreamFilterRegister(execute_data *zend.ZendExecuteData, return_value *z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &filtername, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

@@ -88,7 +88,7 @@ func LocaleconvR(out *__struct__lconv) *__struct__lconv {
 	*out = (*localeconv)()
 	return out
 }
-func ZifBin2hex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifBin2hex(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var data *zend.ZendString
 	for {
@@ -123,7 +123,7 @@ func ZifBin2hex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &data, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -166,7 +166,7 @@ func ZifBin2hex(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(result)
 	return
 }
-func ZifHex2bin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHex2bin(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var data *zend.ZendString
 	for {
@@ -201,7 +201,7 @@ func ZifHex2bin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &data, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -249,7 +249,7 @@ func ZifHex2bin(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetString(result)
 }
-func PhpSpnCommonHandler(execute_data *zend.ZendExecuteData, return_value *zend.Zval, behavior int) {
+func PhpSpnCommonHandler(executeData *zend.ZendExecuteData, return_value *zend.Zval, behavior int) {
 	var s11 *zend.ZendString
 	var s22 *zend.ZendString
 	var start zend.ZendLong = 0
@@ -286,7 +286,7 @@ func PhpSpnCommonHandler(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &s11, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -376,13 +376,13 @@ func PhpSpnCommonHandler(execute_data *zend.ZendExecuteData, return_value *zend.
 		return
 	}
 }
-func ZifStrspn(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpSpnCommonHandler(execute_data, return_value, STR_STRSPN)
+func ZifStrspn(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpSpnCommonHandler(executeData, return_value, STR_STRSPN)
 }
-func ZifStrcspn(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpSpnCommonHandler(execute_data, return_value, STR_STRCSPN)
+func ZifStrcspn(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpSpnCommonHandler(executeData, return_value, STR_STRCSPN)
 }
-func ZifStrcoll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrcoll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var s1 *zend.ZendString
 	var s2 *zend.ZendString
 	for {
@@ -417,7 +417,7 @@ func ZifStrcoll(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &s1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -582,7 +582,7 @@ func PhpTrimInt(str *zend.ZendString, what *byte, what_len int, mode int) *zend.
 func PhpTrim(str *zend.ZendString, what *byte, what_len int, mode int) *zend.ZendString {
 	return PhpTrimInt(str, what, what_len, mode)
 }
-func PhpDoTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
+func PhpDoTrim(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
 	var str *zend.ZendString
 	var what *zend.ZendString = nil
 	for {
@@ -617,7 +617,7 @@ func PhpDoTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -661,16 +661,16 @@ func PhpDoTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode
 	}
 	return_value.SetString(PhpTrimInt(str, b.CondF1(what != nil, func() []byte { return what.GetVal() }, nil), b.CondF1(what != nil, func() int { return what.GetLen() }, 0), mode))
 }
-func ZifTrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpDoTrim(execute_data, return_value, 3)
+func ZifTrim(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpDoTrim(executeData, return_value, 3)
 }
-func ZifRtrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpDoTrim(execute_data, return_value, 2)
+func ZifRtrim(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpDoTrim(executeData, return_value, 2)
 }
-func ZifLtrim(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpDoTrim(execute_data, return_value, 1)
+func ZifLtrim(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpDoTrim(executeData, return_value, 1)
 }
-func ZifWordwrap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifWordwrap(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var text *zend.ZendString
 	var breakchar *byte = "\n"
 	var newtextlen int
@@ -715,7 +715,7 @@ func ZifWordwrap(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &text, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -965,7 +965,7 @@ func PhpExplodeNegativeLimit(delim *zend.ZendString, str *zend.ZendString, retur
 		zend.Efree(any(positions))
 	}
 }
-func ZifExplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifExplode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var delim *zend.ZendString
 	var limit zend.ZendLong = zend.ZEND_LONG_MAX
@@ -1002,7 +1002,7 @@ func ZifExplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &delim, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1177,7 +1177,7 @@ func PhpImplode(glue *zend.ZendString, pieces *zend.Zval, return_value *zend.Zva
 	return_value.SetString(str)
 	return
 }
-func ZifImplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifImplode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg1 *zend.Zval
 	var arg2 *zend.Zval = nil
 	var pieces *zend.Zval
@@ -1215,7 +1215,7 @@ func ZifImplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg1, 0)
 			_optional = 1
@@ -1274,7 +1274,7 @@ func ZifImplode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZendTmpStringRelease(tmp_glue)
 }
 func STRTOK_TABLE(p *byte) __auto__ { return BG(strtok_table)[uint8(*p)] }
-func ZifStrtok(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrtok(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var tok *zend.ZendString = nil
 	var token *byte
@@ -1314,7 +1314,7 @@ func ZifStrtok(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1451,7 +1451,7 @@ func PhpStringToupper(s *zend.ZendString) *zend.ZendString {
 	}
 	return s.Copy()
 }
-func ZifStrtoupper(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrtoupper(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
 	for {
 		var _flags int = 0
@@ -1485,7 +1485,7 @@ func ZifStrtoupper(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1559,7 +1559,7 @@ func PhpStringTolower(s *zend.ZendString) *zend.ZendString {
 	}
 	return s.Copy()
 }
-func ZifStrtolower(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrtolower(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -1593,7 +1593,7 @@ func ZifStrtolower(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1690,7 +1690,7 @@ quit_loop:
 	ret = zend.ZendStringInit(comp, len_, 0)
 	return ret
 }
-func ZifBasename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifBasename(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var string *byte
 	var suffix *byte = nil
 	var string_len int
@@ -1727,7 +1727,7 @@ func ZifBasename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &string, &string_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1773,7 +1773,7 @@ func ZifBasename(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return
 }
 func PhpDirname(path *byte, len_ int) int { return zend.ZendDirname(path, len_) }
-func ZifDirname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDirname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *byte
 	var str_len int
 	var ret *zend.ZendString
@@ -1810,7 +1810,7 @@ func ZifDirname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1882,7 +1882,7 @@ func ZifDirname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(ret)
 	return
 }
-func ZifPathinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPathinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var tmp zend.Zval
 	var path *byte
 	var dirname *byte
@@ -1922,7 +1922,7 @@ func ZifPathinfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &path, &path_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2080,7 +2080,7 @@ func PhpNeedleChar(needle *zend.Zval, target *byte) int {
 		return zend.FAILURE
 	}
 }
-func ZifStristr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStristr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var needle *zend.Zval
 	var haystack *zend.ZendString
 	var found *byte = nil
@@ -2120,7 +2120,7 @@ func ZifStristr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2198,7 +2198,7 @@ func ZifStristr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	zend.Efree(haystack_dup)
 }
-func ZifStrstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrstr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var needle *zend.Zval
 	var haystack *zend.ZendString
 	var found *byte = nil
@@ -2237,7 +2237,7 @@ func ZifStrstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2310,7 +2310,7 @@ func ZifStrstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifStrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrpos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var needle *zend.Zval
 	var haystack *zend.ZendString
 	var found *byte = nil
@@ -2348,7 +2348,7 @@ func ZifStrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2424,7 +2424,7 @@ func ZifStrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifStripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStripos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var found *byte = nil
 	var haystack *zend.ZendString
 	var offset zend.ZendLong = 0
@@ -2464,7 +2464,7 @@ func ZifStripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2549,7 +2549,7 @@ func ZifStripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.ZendStringReleaseEx(needle_dup, 0)
 	}
 }
-func ZifStrrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrrpos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zneedle *zend.Zval
 	var haystack *zend.ZendString
 	var needle_len int
@@ -2591,7 +2591,7 @@ func ZifStrrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2681,7 +2681,7 @@ func ZifStrrpos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrripos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zneedle *zend.Zval
 	var needle *zend.ZendString
 	var haystack *zend.ZendString
@@ -2724,7 +2724,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -2867,7 +2867,7 @@ func ZifStrripos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifStrrchr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrrchr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var needle *zend.Zval
 	var haystack *zend.ZendString
 	var found *byte = nil
@@ -2904,7 +2904,7 @@ func ZifStrrchr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3002,7 +3002,7 @@ func PhpChunkSplit(src *byte, srclen int, end *byte, endlen int, chunklen int) *
 	dest.SetLen(q - dest.GetVal())
 	return dest
 }
-func ZifChunkSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChunkSplit(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var end *byte = "\r\n"
 	var endlen int = 2
@@ -3040,7 +3040,7 @@ func ZifChunkSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3117,7 +3117,7 @@ func ZifChunkSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		return
 	}
 }
-func ZifSubstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSubstr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var l zend.ZendLong = 0
 	var f zend.ZendLong
@@ -3154,7 +3154,7 @@ func ZifSubstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3282,7 +3282,7 @@ func ZifSubstr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZVAL_STRINGL(return_value, str.GetVal()+f, l)
 	return
 }
-func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSubstrReplace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.Zval
 	var from *zend.Zval
 	var len_ *zend.Zval = nil
@@ -3330,7 +3330,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &str, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -3603,7 +3603,7 @@ func ZifSubstrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		}
 	}
 }
-func ZifQuotemeta(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifQuotemeta(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var old *zend.ZendString
 	var old_end *byte
 	var p *byte
@@ -3642,7 +3642,7 @@ func ZifQuotemeta(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &old, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3719,7 +3719,7 @@ func ZifQuotemeta(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(zend.ZendStringTruncate(str, q-str.GetVal(), 0))
 	return
 }
-func ZifOrd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOrd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -3753,7 +3753,7 @@ func ZifOrd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3791,7 +3791,7 @@ func ZifOrd(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(uint8(str.GetVal()[0]))
 	return
 }
-func ZifChr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifChr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var c zend.ZendLong
 	for {
 		var _flags int = 0
@@ -3825,7 +3825,7 @@ func ZifChr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &c, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
@@ -3874,7 +3874,7 @@ func PhpUcfirst(str *zend.ZendString) *zend.ZendString {
 		return s
 	}
 }
-func ZifUcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUcfirst(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -3908,7 +3908,7 @@ func ZifUcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -3960,7 +3960,7 @@ func PhpLcfirst(str *zend.ZendString) *zend.ZendString {
 		return s
 	}
 }
-func ZifLcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLcfirst(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -3994,7 +3994,7 @@ func ZifLcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -4036,7 +4036,7 @@ func ZifLcfirst(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(PhpLcfirst(str))
 	return
 }
-func ZifUcwords(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUcwords(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var delims *byte = " \t\r\nfv"
 	var r *byte
@@ -4075,7 +4075,7 @@ func ZifUcwords(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -4699,7 +4699,7 @@ func PhpStrToStr(
 		return new_str
 	}
 }
-func ZifStrtr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrtr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var from *zend.Zval
 	var str *zend.ZendString
 	var to *byte = nil
@@ -4737,7 +4737,7 @@ func ZifStrtr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -4846,7 +4846,7 @@ func ZifStrtr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifStrrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrrev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var s *byte
 	var e *byte
@@ -4884,7 +4884,7 @@ func ZifStrrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -4979,7 +4979,7 @@ func PhpSimilarChar(txt1 *byte, len1 int, txt2 *byte, len2 int) int {
 	}
 	return sum
 }
-func ZifSimilarText(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSimilarText(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var t1 *zend.ZendString
 	var t2 *zend.ZendString
 	var percent *zend.Zval = nil
@@ -5017,7 +5017,7 @@ func ZifSimilarText(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &t1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -5075,7 +5075,7 @@ func ZifSimilarText(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	return_value.SetLong(sim)
 	return
 }
-func ZifAddcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifAddcslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var what *zend.ZendString
 	for {
@@ -5110,7 +5110,7 @@ func ZifAddcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -5162,7 +5162,7 @@ func ZifAddcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	return_value.SetString(PhpAddcslashesStr(str.GetVal(), str.GetLen(), what.GetVal(), what.GetLen()))
 	return
 }
-func ZifAddslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifAddslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -5196,7 +5196,7 @@ func ZifAddslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -5238,7 +5238,7 @@ func ZifAddslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.SetString(PhpAddslashes(str))
 	return
 }
-func ZifStripcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStripcslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -5272,7 +5272,7 @@ func ZifStripcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -5310,7 +5310,7 @@ func ZifStripcslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	zend.ZVAL_STRINGL(return_value, str.GetVal(), str.GetLen())
 	PhpStripcslashes(return_value.GetStr())
 }
-func ZifStripslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStripslashes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	for {
 		var _flags int = 0
@@ -5344,7 +5344,7 @@ func ZifStripslashes(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -5777,7 +5777,7 @@ func PhpStrReplaceInSubject(search *zend.Zval, replace *zend.Zval, subject *zend
 	zend.ZendTmpStringRelease(tmp_subject_str)
 	return replace_count
 }
-func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.Zval, case_sensitivity int) {
+func PhpStrReplaceCommon(executeData *zend.ZendExecuteData, return_value *zend.Zval, case_sensitivity int) {
 	var subject *zend.Zval
 	var search *zend.Zval
 	var replace *zend.Zval
@@ -5820,7 +5820,7 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &search, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -5922,13 +5922,13 @@ func PhpStrReplaceCommon(execute_data *zend.ZendExecuteData, return_value *zend.
 		zend.ZEND_TRY_ASSIGN_REF_LONG(zcount, count)
 	}
 }
-func ZifStrReplace(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStrReplaceCommon(execute_data, return_value, 1)
+func ZifStrReplace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStrReplaceCommon(executeData, return_value, 1)
 }
-func ZifStrIreplace(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStrReplaceCommon(execute_data, return_value, 0)
+func ZifStrIreplace(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStrReplaceCommon(executeData, return_value, 0)
 }
-func PhpHebrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval, convert_newlines int) {
+func PhpHebrev(executeData *zend.ZendExecuteData, return_value *zend.Zval, convert_newlines int) {
 	var str *byte
 	var heb_str *byte
 	var target *byte
@@ -5977,7 +5977,7 @@ func PhpHebrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval, conv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -6156,13 +6156,13 @@ func PhpHebrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval, conv
 		return
 	}
 }
-func ZifHebrev(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpHebrev(execute_data, return_value, 0)
+func ZifHebrev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpHebrev(executeData, return_value, 0)
 }
-func ZifHebrevc(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpHebrev(execute_data, return_value, 1)
+func ZifHebrevc(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpHebrev(executeData, return_value, 1)
 }
-func ZifNl2br(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifNl2br(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* in brief this inserts <br /> or <br> before matched regexp \n\r?|\r\n? */
 
 	var tmp *byte
@@ -6204,7 +6204,7 @@ func ZifNl2br(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -6301,7 +6301,7 @@ func ZifNl2br(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(result)
 	return
 }
-func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStripTags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var buf *zend.ZendString
 	var str *zend.ZendString
 	var allow *zend.Zval = nil
@@ -6340,7 +6340,7 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -6413,7 +6413,7 @@ func ZifStripTags(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(buf)
 	return
 }
-func ZifSetlocale(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSetlocale(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval = nil
 	var plocale *zend.Zval
 	var loc *zend.ZendString
@@ -6454,7 +6454,7 @@ func ZifSetlocale(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &cat, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
@@ -6574,7 +6574,7 @@ func ZifSetlocale(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifParseStr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifParseStr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *byte
 	var arrayArg *zend.Zval = nil
 	var res *byte = nil
@@ -6611,7 +6611,7 @@ func ZifParseStr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &arg, &arglen, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7068,7 +7068,7 @@ finish:
 	}
 	return size_t(rp - rbuf)
 }
-func ZifStrGetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrGetcsv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var delim byte = ','
 	var enc byte = '"'
@@ -7111,7 +7111,7 @@ func ZifStrGetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7184,7 +7184,7 @@ func ZifStrGetcsv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	PhpFgetcsv(nil, delim, enc, esc, str.GetLen(), str.GetVal(), return_value)
 }
-func ZifStrRepeat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrRepeat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input_str *zend.ZendString
 	var mult zend.ZendLong
 	var result *zend.ZendString
@@ -7221,7 +7221,7 @@ func ZifStrRepeat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &input_str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7306,7 +7306,7 @@ func ZifStrRepeat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(result)
 	return
 }
-func ZifCountChars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifCountChars(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var input *zend.ZendString
 	var chars []int
 	var mymode zend.ZendLong = 0
@@ -7347,7 +7347,7 @@ func ZifCountChars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &input, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7431,7 +7431,7 @@ func ZifCountChars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		return
 	}
 }
-func PhpStrnatcmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, fold_case int) {
+func PhpStrnatcmp(executeData *zend.ZendExecuteData, return_value *zend.Zval, fold_case int) {
 	var s1 *zend.ZendString
 	var s2 *zend.ZendString
 	for {
@@ -7466,7 +7466,7 @@ func PhpStrnatcmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval, f
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &s1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7526,10 +7526,10 @@ func StringNaturalCaseCompareFunction(result *zend.Zval, op1 *zend.Zval, op2 *ze
 func StringNaturalCompareFunction(result *zend.Zval, op1 *zend.Zval, op2 *zend.Zval) int {
 	return StringNaturalCompareFunctionEx(result, op1, op2, 0)
 }
-func ZifStrnatcmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStrnatcmp(execute_data, return_value, 0)
+func ZifStrnatcmp(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStrnatcmp(executeData, return_value, 0)
 }
-func ZifLocaleconv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLocaleconv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var grouping zend.Zval
 	var mon_grouping zend.Zval
 	var len_ int
@@ -7578,10 +7578,10 @@ func ZifLocaleconv(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.GetArr().KeyUpdate("grouping", &grouping)
 	return_value.GetArr().KeyUpdate("mon_grouping", &mon_grouping)
 }
-func ZifStrnatcasecmp(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpStrnatcmp(execute_data, return_value, 1)
+func ZifStrnatcasecmp(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpStrnatcmp(executeData, return_value, 1)
 }
-func ZifSubstrCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSubstrCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var haystack *byte
 	var needle *byte
 	var offset zend.ZendLong = 0
@@ -7625,7 +7625,7 @@ func ZifSubstrCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &haystack, &haystack_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7721,7 +7721,7 @@ func ZifSubstrCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	return_value.SetLong(count)
 	return
 }
-func ZifStrPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrPad(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* Input arguments */
 
 	var input *zend.ZendString
@@ -7769,7 +7769,7 @@ func ZifStrPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &input, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -7881,7 +7881,7 @@ func ZifStrPad(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(result)
 	return
 }
-func ZifSscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSscanf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var args *zend.Zval = nil
 	var str *byte
 	var format *byte
@@ -7921,7 +7921,7 @@ func ZifSscanf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8002,7 +8002,7 @@ func PhpStrRot13(str *zend.ZendString) *zend.ZendString {
 	*target = '0'
 	return ret
 }
-func ZifStrRot13(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrRot13(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
 	for {
 		var _flags int = 0
@@ -8036,7 +8036,7 @@ func ZifStrRot13(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8096,7 +8096,7 @@ func PhpStringShuffle(str *byte, len_ zend.ZendLong) {
 		}
 	}
 }
-func ZifStrShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrShuffle(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
 	for {
 		var _flags int = 0
@@ -8130,7 +8130,7 @@ func ZifStrShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8170,7 +8170,7 @@ func ZifStrShuffle(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		PhpStringShuffle(zend.Z_STRVAL_P(return_value), zend.ZendLong(zend.Z_STRLEN_P(return_value)))
 	}
 }
-func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrWordCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var char_list *byte = nil
 	var ch []*byte
@@ -8212,7 +8212,7 @@ func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8320,7 +8320,7 @@ func ZifStrWordCount(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	}
 }
-func ZifMoneyFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMoneyFormat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var format_len int = 0
 	var format *byte
 	var p *byte
@@ -8361,7 +8361,7 @@ func ZifMoneyFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &format, &format_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8427,7 +8427,7 @@ func ZifMoneyFormat(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	return_value.SetString(zend.ZendStringTruncate(str, str.GetLen(), 0))
 	return
 }
-func ZifStrSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrSplit(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var split_length zend.ZendLong = 1
 	var p *byte
@@ -8464,7 +8464,7 @@ func ZifStrSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8527,7 +8527,7 @@ func ZifStrSplit(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		zend.AddNextIndexStringl(return_value, p, str.GetVal()+str.GetLen()-p)
 	}
 }
-func ZifStrpbrk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrpbrk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var haystack *zend.ZendString
 	var char_list *zend.ZendString
 	var haystack_ptr *byte
@@ -8564,7 +8564,7 @@ func ZifStrpbrk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &haystack, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8622,7 +8622,7 @@ func ZifStrpbrk(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetFalse()
 	return
 }
-func ZifSubstrCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var s1 *zend.ZendString
 	var s2 *zend.ZendString
 	var offset zend.ZendLong
@@ -8662,7 +8662,7 @@ func ZifSubstrCompare(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &s1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8809,7 +8809,7 @@ func PhpUtf8Decode(s *byte, len_ int) *zend.ZendString {
 	}
 	return str
 }
-func ZifUtf8Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUtf8Encode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *byte
 	var arg_len int
 	for {
@@ -8844,7 +8844,7 @@ func ZifUtf8Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &arg, &arg_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -8882,7 +8882,7 @@ func ZifUtf8Encode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.SetString(PhpUtf8Encode(arg, arg_len))
 	return
 }
-func ZifUtf8Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUtf8Decode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *byte
 	var arg_len int
 	for {
@@ -8917,7 +8917,7 @@ func ZifUtf8Decode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &arg, &arg_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

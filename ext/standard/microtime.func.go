@@ -7,7 +7,7 @@ import (
 	"sik/zend"
 )
 
-func _phpGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
+func _phpGettimeofday(executeData *zend.ZendExecuteData, return_value *zend.Zval, mode int) {
 	var get_as_float zend.ZendBool = 0
 	var tp __struct__timeval = __struct__timeval{0}
 	for {
@@ -42,7 +42,7 @@ func _phpGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgBool(_arg, &get_as_float, &_dummy, 0) == 0 {
@@ -99,13 +99,13 @@ func _phpGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 }
-func ZifMicrotime(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	_phpGettimeofday(execute_data, return_value, 0)
+func ZifMicrotime(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	_phpGettimeofday(executeData, return_value, 0)
 }
-func ZifGettimeofday(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	_phpGettimeofday(execute_data, return_value, 1)
+func ZifGettimeofday(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	_phpGettimeofday(executeData, return_value, 1)
 }
-func ZifGetrusage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetrusage(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var usg __struct__rusage
 	var pwho zend.ZendLong = 0
 	var who int = RUSAGE_SELF
@@ -141,7 +141,7 @@ func ZifGetrusage(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &pwho, &_dummy, 0, 0) == 0 {

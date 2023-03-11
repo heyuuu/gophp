@@ -28,8 +28,8 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var ZifFdSet func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var ZifFdIsset func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifFdSet func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifFdIsset func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 var ZmStartupUserStreams func(type_ int, module_number int) int
 var PhpSetSockBlocking func(socketd core.PhpSocketT, block int) int
 

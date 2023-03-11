@@ -52,10 +52,10 @@ var spl_ce_MultipleIterator *zend.ZendClassEntry
    +----------------------------------------------------------------------+
 */
 
-var zim_spl_SplObserver_update func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_attach func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_detach func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
-var zim_spl_SplSubject_notify func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
+var zim_spl_SplObserver_update func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var zim_spl_SplSubject_attach func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var zim_spl_SplSubject_detach func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
+var zim_spl_SplSubject_notify func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
 	zend.MakeArgInfo("subject", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),

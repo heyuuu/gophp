@@ -572,12 +572,12 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	}
 	ZEND_ASSERT(fci.GetSize() == b.SizeOf("zend_fcall_info"))
 
-	/* Initialize execute_data */
+	/* Initialize executeData */
 
 	if EG__().GetCurrentExecuteData() == nil {
 
 		/* This only happens when we're called outside any execute()'s
-		 * It shouldn't be strictly necessary to NULL execute_data out,
+		 * It shouldn't be strictly necessary to NULL executeData out,
 		 * but it may make bugs easier to spot
 		 */
 
@@ -1225,9 +1225,9 @@ func ZendRebuildSymbolTable() *ZendArray {
 	}
 	return symbol_table
 }
-func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
-	var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
-	var ht *HashTable = execute_data.GetSymbolTable()
+func ZendAttachSymbolTable(executeData *ZendExecuteData) {
+	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+	var ht *HashTable = executeData.GetSymbolTable()
 
 	/* copy real values from symbol table into CV slots and create
 	   INDIRECT references to CV in symbol table  */
@@ -1261,9 +1261,9 @@ func ZendAttachSymbolTable(execute_data *ZendExecuteData) {
 	/* copy real values from symbol table into CV slots and create
 	   INDIRECT references to CV in symbol table  */
 }
-func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
-	var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
-	var ht *HashTable = execute_data.GetSymbolTable()
+func ZendDetachSymbolTable(executeData *ZendExecuteData) {
+	var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
+	var ht *HashTable = executeData.GetSymbolTable()
 
 	/* copy real values from CV slots into symbol table */
 
@@ -1289,14 +1289,14 @@ func ZendDetachSymbolTable(execute_data *ZendExecuteData) {
 	/* copy real values from CV slots into symbol table */
 }
 func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
-	var execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
-	for execute_data != nil && (execute_data.GetFunc() == nil || !(ZEND_USER_CODE(execute_data.GetFunc().GetCommonType()))) {
-		execute_data = execute_data.GetPrevExecuteData()
+	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
+	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
+		executeData = executeData.GetPrevExecuteData()
 	}
-	if execute_data != nil {
+	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			var h ZendUlong = name.GetHash()
-			var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
+			var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **ZendString = op_array.GetVars()
 				var end **ZendString = str + op_array.GetLastVar()
@@ -1320,21 +1320,21 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 				}
 			}
 		} else {
-			execute_data.GetSymbolTable().KeyUpdateIndirect(name.GetStr(), value)
+			executeData.GetSymbolTable().KeyUpdateIndirect(name.GetStr(), value)
 			return SUCCESS
 		}
 	}
 	return FAILURE
 }
 func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
-	var execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
-	for execute_data != nil && (execute_data.GetFunc() == nil || !(ZEND_USER_CODE(execute_data.GetFunc().GetCommonType()))) {
-		execute_data = execute_data.GetPrevExecuteData()
+	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
+	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
+		executeData = executeData.GetPrevExecuteData()
 	}
-	if execute_data != nil {
+	if executeData != nil {
 		if (EX_CALL_INFO() & ZEND_CALL_HAS_SYMBOL_TABLE) == 0 {
 			var h ZendUlong = ZendHashFunc(name, len_)
-			var op_array *ZendOpArray = execute_data.GetFunc().GetOpArray()
+			var op_array *ZendOpArray = executeData.GetFunc().GetOpArray()
 			if op_array.GetLastVar() != 0 {
 				var str **ZendString = op_array.GetVars()
 				var end **ZendString = str + op_array.GetLastVar()
@@ -1359,7 +1359,7 @@ func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
 				}
 			}
 		} else {
-			execute_data.GetSymbolTable().KeyUpdateIndirect(b.CastStr(name, len_), value)
+			executeData.GetSymbolTable().KeyUpdateIndirect(b.CastStr(name, len_), value)
 			return SUCCESS
 		}
 	}

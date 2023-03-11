@@ -910,7 +910,7 @@ func ZmShutdownCgi(type_ int, module_number int) int {
 	return zend.SUCCESS
 }
 func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }
-func ZifApacheRequestHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() != 0 {
 		return
 	}
@@ -1040,7 +1040,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 		}
 	}
 }
-func ZifApacheResponseHeaders(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

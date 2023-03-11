@@ -106,7 +106,7 @@ func ZendDoFcallOverloaded(call *ZendExecuteData, ret *Zval) int {
 	Efree(fbc)
 	return 1
 }
-func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_DATA_D) ZendBool {
+func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, executeData *ZendExecuteData) ZendBool {
 	var ce *ZendClassEntry = Z_OBJCE_P(array_ptr)
 	var iter *ZendObjectIterator = ce.GetGetIterator()(ce, array_ptr, by_ref)
 	var is_empty ZendBool
@@ -140,7 +140,7 @@ func ZendFeResetIterator(array_ptr *Zval, by_ref int, opline *ZendOp, _ EXECUTE_
 	EX_VAR(opline.GetResult().GetVar()).SetFeIterIdx(uint32 - 1)
 	return is_empty
 }
-func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opline *ZendOp, _ EXECUTE_DATA_D) int {
+func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opline *ZendOp, executeData *ZendExecuteData) int {
 	var zv *Zval
 	var orig_key *Zval = key
 	var c *ZendConstant = nil
@@ -235,11 +235,11 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 	CACHE_PTR(opline.GetExtendedValue(), c)
 	return SUCCESS
 }
-func ZendQuickGetConstant(key *Zval, flags uint32, opline *ZendOp, _ EXECUTE_DATA_D) {
-	_zendQuickGetConstant(key, flags, 0, OPLINE_C, EXECUTE_DATA_C)
+func ZendQuickGetConstant(key *Zval, flags uint32, opline *ZendOp, executeData *ZendExecuteData) {
+	_zendQuickGetConstant(key, flags, 0, opline, executeData)
 }
-func ZendQuickCheckConstant(key *Zval, opline *ZendOp, _ EXECUTE_DATA_D) int {
-	return _zendQuickGetConstant(key, 0, 1, OPLINE_C, EXECUTE_DATA_C)
+func ZendQuickCheckConstant(key *Zval, opline *ZendOp, executeData *ZendExecuteData) int {
+	return _zendQuickGetConstant(key, 0, 1, opline, executeData)
 }
 func ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION() {
 	OPLINE = EX(opline) + 1
@@ -391,7 +391,7 @@ func ZendGetZvalPtr(
 	opline *ZendOp,
 	op_type int,
 	node *ZnodeOp,
-	execute_data *ZendExecuteData,
+	executeData *ZendExecuteData,
 	should_free *ZendFreeOp,
 	type_ int,
 ) *Zval {

@@ -697,8 +697,8 @@ exit:
 	return retval
 }
 func PropertyUsesStrictTypes() ZendBool {
-	var execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
-	return execute_data != nil && execute_data.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData())
+	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
+	return executeData != nil && executeData.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData())
 }
 func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *any) *Zval {
 	var zobj *ZendObject

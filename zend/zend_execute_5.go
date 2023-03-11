@@ -6,17 +6,17 @@ import (
 	b "sik/builtin"
 )
 
-func zend_fetch_dimension_address_W(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_W(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_W, EXECUTE_DATA_C)
+	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_W, executeData)
 }
-func zend_fetch_dimension_address_RW(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_RW(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_RW, EXECUTE_DATA_C)
+	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_RW, executeData)
 }
-func zend_fetch_dimension_address_UNSET(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_UNSET(container_ptr *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, EXECUTE_DATA_C)
+	ZendFetchDimensionAddress(result, container_ptr, dim, dim_type, BP_VAR_UNSET, executeData)
 }
 func ZendFetchDimensionAddressRead(
 	result *Zval,
@@ -26,13 +26,13 @@ func ZendFetchDimensionAddressRead(
 	type_ int,
 	is_list int,
 	slow int,
-	_ EXECUTE_DATA_D,
+	executeData *ZendExecuteData,
 ) {
 	var retval *Zval
 	if slow == 0 {
 		if container.IsArray() {
 		try_array:
-			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, EXECUTE_DATA_C)
+			retval = ZendFetchDimensionAddressInner(container.GetArr(), dim, dim_type, type_, executeData)
 			ZVAL_COPY_DEREF(result, retval)
 			return
 		} else if container.IsReference() {
@@ -128,26 +128,26 @@ func ZendFetchDimensionAddressRead(
 		result.SetNull()
 	}
 }
-func zend_fetch_dimension_address_read_R(container *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_read_R(container *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 0, 0, EXECUTE_DATA_C)
+	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_read_R_slow(container *Zval, dim *Zval, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_read_R_slow(container *Zval, dim *Zval, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddressRead(result, container, dim, IS_CV, BP_VAR_R, 0, 1, EXECUTE_DATA_C)
+	ZendFetchDimensionAddressRead(result, container, dim, IS_CV, BP_VAR_R, 0, 1, executeData)
 }
-func zend_fetch_dimension_address_read_IS(container *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_read_IS(container *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_IS, 0, 0, EXECUTE_DATA_C)
+	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_IS, 0, 0, executeData)
 }
-func zend_fetch_dimension_address_LIST_r(container *Zval, dim *Zval, dim_type int, opline *ZendOp, _ EXECUTE_DATA_D) {
+func zend_fetch_dimension_address_LIST_r(container *Zval, dim *Zval, dim_type int, opline *ZendOp, executeData *ZendExecuteData) {
 	var result *Zval = EX_VAR(opline.GetResult().GetVar())
-	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 1, 0, EXECUTE_DATA_C)
+	ZendFetchDimensionAddressRead(result, container, dim, dim_type, BP_VAR_R, 1, 0, executeData)
 }
 func ZendFetchDimensionConst(result *Zval, container *Zval, dim *Zval, type_ int) {
 	ZendFetchDimensionAddressRead(result, container, dim, IS_TMP_VAR, type_, 0, 0, nil)
 }
-func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
+func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, executeData *ZendExecuteData) *Zval {
 	var hval ZendUlong
 	if offset.IsDouble() {
 		hval = ZendDvalToLval(offset.GetDval())
@@ -173,7 +173,7 @@ func ZendFindArrayDimSlow(ht *HashTable, offset *Zval, _ EXECUTE_DATA_D) *Zval {
 		return nil
 	}
 }
-func ZendIssetDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
+func ZendIssetDimSlow(container *Zval, offset *Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		offset = ZVAL_UNDEFINED_OP2()
 	}
@@ -210,7 +210,7 @@ func ZendIssetDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
 		return 0
 	}
 }
-func ZendIsemptyDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
+func ZendIsemptyDimSlow(container *Zval, offset *Zval, executeData *ZendExecuteData) int {
 	if offset.IsUndef() {
 		offset = ZVAL_UNDEFINED_OP2()
 	}
@@ -247,7 +247,7 @@ func ZendIsemptyDimSlow(container *Zval, offset *Zval, _ EXECUTE_DATA_D) int {
 		return 1
 	}
 }
-func ZendArrayKeyExistsFast(ht *HashTable, key *Zval, opline *ZendOp, _ EXECUTE_DATA_D) uint32 {
+func ZendArrayKeyExistsFast(ht *HashTable, key *Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	var str *ZendString
 	var hval ZendUlong
 try_again:
@@ -284,11 +284,11 @@ try_again:
 		return IS_FALSE
 	}
 }
-func ZendArrayKeyExistsSlow(subject *Zval, key *Zval, opline *ZendOp, _ EXECUTE_DATA_D) uint32 {
+func ZendArrayKeyExistsSlow(subject *Zval, key *Zval, opline *ZendOp, executeData *ZendExecuteData) uint32 {
 	if subject.IsObject() {
 		ZendError(E_DEPRECATED, "array_key_exists(): "+"Using array_key_exists() on objects is deprecated. "+"Use isset() or property_exists() instead")
 		var ht *HashTable = ZendGetPropertiesFor(subject, ZEND_PROP_PURPOSE_ARRAY_CAST)
-		var result uint32 = ZendArrayKeyExistsFast(ht, key, OPLINE_C, EXECUTE_DATA_C)
+		var result uint32 = ZendArrayKeyExistsFast(ht, key, opline, executeData)
 		ZendReleaseProperties(ht)
 		return result
 	} else {

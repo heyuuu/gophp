@@ -8,7 +8,7 @@ import (
 	"sik/zend"
 )
 
-func ZifGethostname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var buf []byte
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -21,7 +21,7 @@ func ZifGethostname(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	zend.ZVAL_STRING(return_value, buf)
 	return
 }
-func ZifGethostbyaddr(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var addr *byte
 	var addr_len int
 	var hostname *zend.ZendString
@@ -57,7 +57,7 @@ func ZifGethostbyaddr(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &addr, &addr_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -116,7 +116,7 @@ func PhpGethostbyaddr(ip *byte) *zend.ZendString {
 	}
 	return zend.ZendStringInit(hp.h_name, strlen(hp.h_name), 0)
 }
-func ZifGethostbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var hostname *byte
 	var hostname_len int
 	for {
@@ -151,7 +151,7 @@ func ZifGethostbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -197,7 +197,7 @@ func ZifGethostbyname(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 	return_value.SetString(PhpGethostbyname(hostname))
 	return
 }
-func ZifGethostbynamel(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGethostbynamel(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var hp *__struct__hostent
@@ -235,7 +235,7 @@ func ZifGethostbynamel(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -317,7 +317,7 @@ func PhpGethostbyname(name *byte) *zend.ZendString {
 	address = inet_ntoa(in)
 	return zend.ZendStringInit(address, strlen(address), 0)
 }
-func ZifDnsCheckRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsCheckRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var hp *HEADER
 	var answer Querybuf
 	var hostname *byte
@@ -361,7 +361,7 @@ func ZifDnsCheckRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -863,7 +863,7 @@ func PhpParserr(
 	}
 	return cp
 }
-func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsGetRecord(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var type_param zend.ZendLong = PHP_DNS_ANY
@@ -919,7 +919,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1208,7 +1208,7 @@ func ZifDnsGetRecord(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 		}
 	}
 }
-func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifDnsGetMx(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var hostname *byte
 	var hostname_len int
 	var mx_list *zend.Zval
@@ -1258,7 +1258,7 @@ func ZifDnsGetMx(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &hostname, &hostname_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

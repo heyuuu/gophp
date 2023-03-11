@@ -107,17 +107,15 @@ func Z_RES_TYPE(zval Zval) int            { return Z_RES(zval).GetType() }
 func Z_RES_TYPE_P(zval_p *Zval) int       { return Z_RES_TYPE(*zval_p) }
 func Z_REF(zval Zval) *ZendReference      { return zval.GetRef() }
 func Z_REF_P(zval_p *Zval) *ZendReference { return zval_p.GetRef() }
-func Z_REFVAL(zval Zval) Zval             { return zval.GetRef().GetVal() }
-func Z_REFVAL_P(zval_p *Zval) Zval        { return zval_p.GetRef().GetVal() }
-func GC_AST(p *ZendAstRef) *ZendAst {
-	return (*ZendAst)((*byte)(p) + b.SizeOf("zend_ast_ref"))
-}
-func Z_ASTVAL(zval Zval) *ZendAst      { return GC_AST(zval.GetAst()) }
-func Z_ASTVAL_P(zval_p *Zval) *ZendAst { return Z_ASTVAL(*zval_p) }
-func Z_INDIRECT(zval Zval) *Zval       { return zval.GetZv() }
-func Z_INDIRECT_P(zval_p *Zval) *Zval  { return zval_p.GetZv() }
-func Z_CE(zval Zval) *ZendClassEntry   { return zval.GetCe() }
-func Z_PTR(zval Zval) any              { return zval.GetPtr() }
+func Z_REFVAL(zval Zval) *Zval            { return zval.GetRef().GetVal() }
+func Z_REFVAL_P(zval_p *Zval) *Zval       { return zval_p.GetRef().GetVal() }
+func GC_AST(p *ZendAstRef) *ZendAst       { return p.GcAst() }
+func Z_ASTVAL(zval Zval) *ZendAst         { return GC_AST(zval.GetAst()) }
+func Z_ASTVAL_P(zval_p *Zval) *ZendAst    { return Z_ASTVAL(*zval_p) }
+func Z_INDIRECT(zval Zval) *Zval          { return zval.GetZv() }
+func Z_INDIRECT_P(zval_p *Zval) *Zval     { return zval_p.GetZv() }
+func Z_CE(zval Zval) *ZendClassEntry      { return zval.GetCe() }
+func Z_PTR(zval Zval) any                 { return zval.GetPtr() }
 
 func ZVAL_BOOL(z *Zval, b int)                 { z.SetBool(b != 0) }
 func ZVAL_LONG(z *Zval, l ZendLong)            { z.SetLong(l) }

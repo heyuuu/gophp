@@ -63,7 +63,7 @@ func PhpRandomBytes(bytes any, size int, should_throw zend.ZendBool) int {
 	}
 	return zend.SUCCESS
 }
-func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRandomBytes(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var size zend.ZendLong
 	var bytes *zend.ZendString
 	for {
@@ -98,7 +98,7 @@ func ZifRandomBytes(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &size, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG
@@ -191,7 +191,7 @@ func PhpRandomInt(min zend.ZendLong, max zend.ZendLong, result *zend.ZendLong, s
 	*result = zend_long(trial%umax + min)
 	return zend.SUCCESS
 }
-func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifRandomInt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var min zend.ZendLong
 	var max zend.ZendLong
 	var result zend.ZendLong
@@ -227,7 +227,7 @@ func ZifRandomInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &min, &_dummy, 0, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_LONG

@@ -579,7 +579,7 @@ func RegisterPhpinfoConstants(type_ int, module_number int) {
 	zend.REGISTER_LONG_CONSTANT("CREDITS_QA", PHP_CREDITS_QA, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_LONG_CONSTANT("CREDITS_ALL", PHP_CREDITS_ALL, zend.CONST_PERSISTENT|zend.CONST_CS)
 }
-func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpversion(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var ext_name *byte = nil
 	var ext_name_len int = 0
 	for {
@@ -614,7 +614,7 @@ func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &ext_name, &ext_name_len, 0) == 0 {
@@ -664,7 +664,7 @@ func ZifPhpversion(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		return
 	}
 }
-func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpcredits(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var flag zend.ZendLong = PHP_CREDITS_ALL
 	for {
 		var _flags int = 0
@@ -698,7 +698,7 @@ func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &flag, &_dummy, 0, 0) == 0 {
@@ -738,14 +738,14 @@ func ZifPhpcredits(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.SetTrue()
 	return
 }
-func ZifPhpSapiName(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpSapiName(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	return_value.SetRawString(core.SM__().Name())
 	return
 }
-func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpUname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var mode *byte = "a"
 	var modelen int = b.SizeOf("\"a\"") - 1
 	for {
@@ -780,7 +780,7 @@ func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &mode, &modelen, 0) == 0 {
@@ -819,7 +819,7 @@ func ZifPhpUname(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetString(PhpGetUname(*mode))
 	return
 }
-func ZifPhpIniScannedFiles(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpIniScannedFiles(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -831,7 +831,7 @@ func ZifPhpIniScannedFiles(execute_data *zend.ZendExecuteData, return_value *zen
 		return
 	}
 }
-func ZifPhpIniLoadedFile(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPhpIniLoadedFile(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

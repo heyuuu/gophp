@@ -548,7 +548,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 			var pce *zend.ZendClassEntry = nil
 			var arg zend.Zval
 			var ref zend.Zval
-			var execute_data zend.ZendExecuteData
+			var executeData zend.ZendExecuteData
 			switch behavior {
 			default:
 				break
@@ -571,8 +571,8 @@ func DoCli(argc int, argv **byte, args []string) int {
 			}
 			zend.ZVAL_STRING(&arg, reflection_what)
 			zend.ObjectInitEx(&ref, pce)
-			memset(&execute_data, 0, b.SizeOf("zend_execute_data"))
-			zend.EG__().SetCurrentExecuteData(&execute_data)
+			memset(&executeData, 0, b.SizeOf("zend_execute_data"))
+			zend.EG__().SetCurrentExecuteData(&executeData)
 			zend.ZendCallMethodWith1Params(&ref, pce, pce.GetConstructor(), "__construct", nil, &arg)
 			if zend.EG__().GetException() != nil {
 				var tmp zend.Zval

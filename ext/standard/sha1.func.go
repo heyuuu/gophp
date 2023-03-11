@@ -9,7 +9,7 @@ import (
 )
 
 func MakeSha1Digest(sha1str *byte, digest *uint8) { MakeDigestEx(sha1str, digest, 20) }
-func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.ZendString
 	var raw_output zend.ZendBool = 0
 	var context PHP_SHA1_CTX
@@ -46,7 +46,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &arg, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -99,7 +99,7 @@ func ZifSha1(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		MakeDigestEx(zend.Z_STRVAL_P(return_value), digest, 20)
 	}
 }
-func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *byte
 	var arg_len int
 	var raw_output zend.ZendBool = 0
@@ -140,7 +140,7 @@ func ZifSha1File(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgPath(_arg, &arg, &arg_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_PATH

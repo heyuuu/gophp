@@ -7,7 +7,7 @@ import (
 	"sik/zend"
 )
 
-func ZifGettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.Zval
 	var type_ *zend.ZendString
 	for {
@@ -42,7 +42,7 @@ func ZifGettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
 			break
@@ -82,7 +82,7 @@ func ZifGettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifSettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	var type_ *zend.ZendString
 	var tmp zend.Zval
@@ -119,7 +119,7 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -200,7 +200,7 @@ func ZifSettype(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetTrue()
 }
-func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIntval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
 	var base zend.ZendLong = 10
 	for {
@@ -235,7 +235,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &num, 0)
 			_optional = 1
@@ -318,7 +318,7 @@ func ZifIntval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetLong(zend.ZEND_STRTOL(zend.Z_STRVAL_P(num), nil, base))
 }
-func ZifFloatval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFloatval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
 	for {
 		var _flags int = 0
@@ -352,7 +352,7 @@ func ZifFloatval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &num, 0)
 			break
@@ -386,7 +386,7 @@ func ZifFloatval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetDouble(zend.ZvalGetDouble(num))
 	return
 }
-func ZifBoolval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifBoolval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var val *zend.Zval
 	for {
 		var _flags int = 0
@@ -420,7 +420,7 @@ func ZifBoolval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &val, 0)
 			break
@@ -454,7 +454,7 @@ func ZifBoolval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZVAL_BOOL(return_value, zend.ZendIsTrue(val) != 0)
 	return
 }
-func ZifStrval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStrval(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var num *zend.Zval
 	for {
 		var _flags int = 0
@@ -488,7 +488,7 @@ func ZifStrval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &num, 0)
 			break
@@ -521,7 +521,7 @@ func ZifStrval(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetString(zend.ZvalGetString(num))
 }
-func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type_ int) {
+func PhpIsType(executeData *zend.ZendExecuteData, return_value *zend.Zval, type_ int) {
 	var arg *zend.Zval
 	for {
 		var _flags int = 0
@@ -555,7 +555,7 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
 			break
@@ -602,13 +602,13 @@ func PhpIsType(execute_data *zend.ZendExecuteData, return_value *zend.Zval, type
 		return
 	}
 }
-func ZifIsNull(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_NULL)
+func ZifIsNull(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_NULL)
 }
-func ZifIsResource(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_RESOURCE)
+func ZifIsResource(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_RESOURCE)
 }
-func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsBool(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.Zval
 	for {
 		var _flags int = 0
@@ -642,7 +642,7 @@ func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
 			break
@@ -677,22 +677,22 @@ func ZifIsBool(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	zend.ZVAL_BOOL(return_value, arg.IsType(zend.IS_FALSE) || arg.IsType(zend.IS_TRUE))
 	return
 }
-func ZifIsInt(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_LONG)
+func ZifIsInt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_LONG)
 }
-func ZifIsFloat(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_DOUBLE)
+func ZifIsFloat(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_DOUBLE)
 }
-func ZifIsString(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_STRING)
+func ZifIsString(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_STRING)
 }
-func ZifIsArray(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_ARRAY)
+func ZifIsArray(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_ARRAY)
 }
-func ZifIsObject(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpIsType(execute_data, return_value, zend.IS_OBJECT)
+func ZifIsObject(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpIsType(executeData, return_value, zend.IS_OBJECT)
 }
-func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsNumeric(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.Zval
 	for {
 		var _flags int = 0
@@ -726,7 +726,7 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
 			break
@@ -776,7 +776,7 @@ func ZifIsNumeric(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsScalar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var arg *zend.Zval
 	for {
 		var _flags int = 0
@@ -810,7 +810,7 @@ func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &arg, 0)
 			break
@@ -858,7 +858,7 @@ func ZifIsScalar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIsCallable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsCallable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	var callable_name *zend.Zval = nil
 	var name *zend.ZendString
@@ -898,7 +898,7 @@ func ZifIsCallable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			_optional = 1
@@ -959,7 +959,7 @@ func ZifIsCallable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.ZVAL_BOOL(return_value, retval != 0)
 	return
 }
-func ZifIsIterable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsIterable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	for {
 		var _flags int = 0
@@ -993,7 +993,7 @@ func ZifIsIterable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			break
@@ -1027,7 +1027,7 @@ func ZifIsIterable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.ZVAL_BOOL(return_value, zend.ZendIsIterable(var_) != 0)
 	return
 }
-func ZifIsCountable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIsCountable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var var_ *zend.Zval
 	for {
 		var _flags int = 0
@@ -1061,7 +1061,7 @@ func ZifIsCountable(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &var_, 0)
 			break

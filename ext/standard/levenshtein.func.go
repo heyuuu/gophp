@@ -71,7 +71,7 @@ func CustomLevdist(str1 *byte, str2 *byte, callback_name *byte) int {
 
 	/* not there yet */
 }
-func ZifLevenshtein(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var argc int = zend.ZEND_NUM_ARGS()
 	var str1 *byte
 	var str2 *byte

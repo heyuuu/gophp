@@ -254,7 +254,7 @@ func UserWrapperOpendir(
 	standard.FG(user_stream_current_filename) = nil
 	return stream
 }
-func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamWrapperRegister(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var protocol *zend.ZendString
 	var classname *zend.ZendString
 	var uwrap *PhpUserStreamWrapper
@@ -301,7 +301,7 @@ func ZifStreamWrapperRegister(execute_data *zend.ZendExecuteData, return_value *
 	return_value.SetFalse()
 	return
 }
-func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamWrapperUnregister(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var protocol *zend.ZendString
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "S", &protocol) == zend.FAILURE {
 		return_value.SetFalse()
@@ -318,7 +318,7 @@ func ZifStreamWrapperUnregister(execute_data *zend.ZendExecuteData, return_value
 	return_value.SetTrue()
 	return
 }
-func ZifStreamWrapperRestore(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifStreamWrapperRestore(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var protocol *zend.ZendString
 	var wrapper *core.PhpStreamWrapper
 	var global_wrapper_hash *zend.HashTable

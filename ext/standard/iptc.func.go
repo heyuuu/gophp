@@ -89,7 +89,7 @@ func PhpIptcNextMarker(fp *r.FILE, spool int, spoolbuf **uint8) int {
 	}
 	return uint(c)
 }
-func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIptcembed(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var iptcdata *byte
 	var jpeg_file *byte
 	var iptcdata_len int
@@ -135,7 +135,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &iptcdata, &iptcdata_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -285,7 +285,7 @@ func ZifIptcembed(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 		return
 	}
 }
-func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifIptcparse(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var inx int = 0
 	var len_ int
 	var tagsfound uint = 0
@@ -329,7 +329,7 @@ func ZifIptcparse(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgString(_arg, &str, &str_len, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

@@ -6,7 +6,7 @@ import (
 	b "sik/builtin"
 )
 
-func ZendRethrowException(execute_data *ZendExecuteData) {
+func ZendRethrowException(executeData *ZendExecuteData) {
 	if EX(opline).opcode != ZEND_HANDLE_EXCEPTION {
 		EG__().SetOplineBeforeException(EX(opline))
 		EX(opline) = EG__().GetExceptionOp()
@@ -181,14 +181,14 @@ func ZendDefaultExceptionNew(class_type *ZendClassEntry) *ZendObject {
 func ZendErrorExceptionNew(class_type *ZendClassEntry) *ZendObject {
 	return ZendDefaultExceptionNewEx(class_type, 2)
 }
-func ZimExceptionClone(execute_data *ZendExecuteData, return_value *Zval) {
+func ZimExceptionClone(executeData *ZendExecuteData, return_value *Zval) {
 	/* Should never be executable */
 
 	ZendThrowException(nil, "Cannot clone object using __clone()", 0)
 
 	/* Should never be executable */
 }
-func ZimExceptionConstruct(execute_data *ZendExecuteData, return_value *Zval) {
+func ZimExceptionConstruct(executeData *ZendExecuteData, return_value *Zval) {
 	var message *ZendString = nil
 	var code ZendLong = 0
 	var tmp Zval
@@ -228,7 +228,7 @@ func CHECK_EXC_TYPE(id ZendKnownStringId, type_ uint32) {
 		ZendUnsetProperty(IGetExceptionBase(object), object, ZSTR_KNOWN(id).GetVal(), ZSTR_KNOWN(id).GetLen())
 	}
 }
-func ZimExceptionWakeup(execute_data *ZendExecuteData, return_value *Zval) {
+func ZimExceptionWakeup(executeData *ZendExecuteData, return_value *Zval) {
 	var value Zval
 	var pvalue *Zval
 	var object *Zval = ZEND_THIS
@@ -243,7 +243,7 @@ func ZimExceptionWakeup(execute_data *ZendExecuteData, return_value *Zval) {
 		ZendUnsetProperty(IGetExceptionBase(object), object, "previous", b.SizeOf("\"previous\"")-1)
 	}
 }
-func ZimErrorExceptionConstruct(execute_data *ZendExecuteData, return_value *Zval) {
+func ZimErrorExceptionConstruct(executeData *ZendExecuteData, return_value *Zval) {
 	var message *ZendString = nil
 	var filename *ZendString = nil
 	var code ZendLong = 0
@@ -297,7 +297,7 @@ func GET_PROPERTY(object *Zval, id ZendKnownStringId) *Zval {
 func GET_PROPERTY_SILENT(object *Zval, id ZendKnownStringId) *Zval {
 	return ZendReadPropertyEx(IGetExceptionBase(object), object, ZSTR_KNOWN(id), 1, &rv)
 }
-func zim_exception_getFile(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getFile(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -307,7 +307,7 @@ func zim_exception_getFile(execute_data *ZendExecuteData, return_value *Zval) {
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
-func zim_exception_getLine(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getLine(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -317,7 +317,7 @@ func zim_exception_getLine(execute_data *ZendExecuteData, return_value *Zval) {
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
-func zim_exception_getMessage(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getMessage(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -327,7 +327,7 @@ func zim_exception_getMessage(execute_data *ZendExecuteData, return_value *Zval)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
-func zim_exception_getCode(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getCode(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -337,7 +337,7 @@ func zim_exception_getCode(execute_data *ZendExecuteData, return_value *Zval) {
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
-func zim_exception_getTrace(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getTrace(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -347,7 +347,7 @@ func zim_exception_getTrace(execute_data *ZendExecuteData, return_value *Zval) {
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
-func zim_error_exception_getSeverity(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_error_exception_getSeverity(executeData *ZendExecuteData, return_value *Zval) {
 	var prop *Zval
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
@@ -468,7 +468,7 @@ func _buildTraceString(str *SmartStr, ht *HashTable, num uint32) {
 	}
 	str.AppendString(")\n")
 }
-func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getTraceAsString(executeData *ZendExecuteData, return_value *Zval) {
 	var trace *Zval
 	var frame *Zval
 	var rv Zval
@@ -506,14 +506,14 @@ func zim_exception_getTraceAsString(execute_data *ZendExecuteData, return_value 
 	return_value.SetString(str.GetS())
 	return
 }
-func zim_exception_getPrevious(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception_getPrevious(executeData *ZendExecuteData, return_value *Zval) {
 	var rv Zval
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
 	ZVAL_COPY(return_value, GET_PROPERTY_SILENT(ZEND_THIS, ZEND_STR_PREVIOUS))
 }
-func zim_exception___toString(execute_data *ZendExecuteData, return_value *Zval) {
+func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) {
 	var trace Zval
 	var exception *Zval
 	var base_ce *ZendClassEntry

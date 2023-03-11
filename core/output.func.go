@@ -897,7 +897,7 @@ func PhpOutputHandlerDefaultFunc(handler_context *any, output_context *PhpOutput
 func PhpOutputHandlerDevnullFunc(handler_context *any, output_context *PhpOutputContext) int {
 	return zend.SUCCESS
 }
-func ZifObStart(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObStart(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var output_handler *zend.Zval = nil
 	var chunk_size zend.ZendLong = 0
 	var flags zend.ZendLong = PHP_OUTPUT_HANDLER_STDFLAGS
@@ -915,7 +915,7 @@ func ZifObStart(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -932,7 +932,7 @@ func ZifObFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -949,7 +949,7 @@ func ZifObClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetTrue()
 	return
 }
-func ZifObEndFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObEndFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -961,7 +961,7 @@ func ZifObEndFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.ZVAL_BOOL(return_value, zend.SUCCESS == PhpOutputEnd())
 	return
 }
-func ZifObEndClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObEndClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -973,7 +973,7 @@ func ZifObEndClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	zend.ZVAL_BOOL(return_value, zend.SUCCESS == PhpOutputDiscard())
 	return
 }
-func ZifObGetFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -986,7 +986,7 @@ func ZifObGetFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetClean(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -1003,7 +1003,7 @@ func ZifObGetClean(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 		PhpErrorDocref("ref.outcontrol", zend.E_NOTICE, "failed to delete buffer of %s (%d)", OG(active).name.GetVal(), OG(active).level)
 	}
 }
-func ZifObGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetContents(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -1012,14 +1012,14 @@ func ZifObGetContents(execute_data *zend.ZendExecuteData, return_value *zend.Zva
 		return
 	}
 }
-func ZifObGetLevel(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetLevel(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	return_value.SetLong(PhpOutputGetLevel())
 	return
 }
-func ZifObGetLength(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetLength(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -1028,7 +1028,7 @@ func ZifObGetLength(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		return
 	}
 }
-func ZifObListHandlers(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObListHandlers(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -1038,7 +1038,7 @@ func ZifObListHandlers(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	}
 	zend.ZendStackApplyWithArgument(&(OG(handlers)), zend.ZEND_STACK_APPLY_BOTTOMUP, PhpOutputStackApplyList, return_value)
 }
-func ZifObGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObGetStatus(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var full_status zend.ZendBool = 0
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|b", &full_status) == zend.FAILURE {
 		return
@@ -1054,14 +1054,14 @@ func ZifObGetStatus(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 		PhpOutputHandlerStatus(OG(active), return_value)
 	}
 }
-func ZifObImplicitFlush(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifObImplicitFlush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var flag zend.ZendLong = 1
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|l", &flag) == zend.FAILURE {
 		return
 	}
 	PhpOutputSetImplicitFlush(flag)
 }
-func ZifOutputResetRewriteVars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOutputResetRewriteVars(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -1073,7 +1073,7 @@ func ZifOutputResetRewriteVars(execute_data *zend.ZendExecuteData, return_value 
 		return
 	}
 }
-func ZifOutputAddRewriteVar(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifOutputAddRewriteVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var name *byte
 	var value *byte
 	var name_len int

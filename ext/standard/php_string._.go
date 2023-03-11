@@ -27,4 +27,4 @@ import (
    +----------------------------------------------------------------------+
 */
 
-var ZifNlLanginfo func(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
+var ZifNlLanginfo func(executeData *zend.ZendExecuteData, return_value *zend.Zval)

@@ -501,7 +501,7 @@ func PhpFormattedPrintGetArray(array *zend.Zval, argc *int) *zend.Zval {
 	*argc = n
 	return args
 }
-func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUserSprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var format *zend.Zval
 	var args *zend.Zval
@@ -538,7 +538,7 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			var _num_varargs int = _num_args - _i - 0
@@ -587,7 +587,7 @@ func ZifUserSprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	return_value.SetString(result)
 }
-func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVsprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var format *zend.Zval
 	var array *zend.Zval
@@ -625,7 +625,7 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -668,7 +668,7 @@ func ZifVsprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	return_value.SetString(result)
 }
-func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifUserPrintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var rlen int
 	var format *zend.Zval
@@ -706,7 +706,7 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			var _num_varargs int = _num_args - _i - 0
@@ -758,7 +758,7 @@ func ZifUserPrintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) 
 	return_value.SetLong(rlen)
 	return
 }
-func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var result *zend.ZendString
 	var rlen int
 	var format *zend.Zval
@@ -797,7 +797,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			zend.ZendParseArgZvalDeref(_arg, &format, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
@@ -843,7 +843,7 @@ func ZifVprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(rlen)
 	return
 }
-func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifFprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var arg1 *zend.Zval
 	var format *zend.Zval
@@ -885,7 +885,7 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE
@@ -943,7 +943,7 @@ func ZifFprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 	return_value.SetLong(result.GetLen())
 	zend.ZendStringEfree(result)
 }
-func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var stream *core.PhpStream
 	var arg1 *zend.Zval
 	var format *zend.Zval
@@ -986,7 +986,7 @@ func ZifVfprintf(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgResource(_arg, &arg1, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_RESOURCE

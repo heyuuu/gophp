@@ -13,7 +13,7 @@ func ZendVmStackExtendCallFrame(call **ZendExecuteData, passed_args uint32, addi
 		*call = ZendVmStackCopyCallFrame(*call, passed_args, additional_args)
 	}
 }
-func ZendGetRunningGenerator(EXECUTE_DATA_D) *ZendGenerator {
+func ZendGetRunningGenerator(executeData *ZendExecuteData) *ZendGenerator {
 	/* The generator object is stored in EX(return_value) */
 
 	var generator *ZendGenerator = (*ZendGenerator)(EX(return_value))
@@ -26,7 +26,7 @@ func ZendGetRunningGenerator(EXECUTE_DATA_D) *ZendGenerator {
 	/* However control may currently be delegated to another generator.
 	 * That's the one we're interested in. */
 }
-func CleanupUnfinishedCalls(execute_data *ZendExecuteData, op_num uint32) {
+func CleanupUnfinishedCalls(executeData *ZendExecuteData, op_num uint32) {
 	if EX(call) {
 		var call *ZendExecuteData = EX(call)
 		var opline *ZendOp = EX(func_).op_array.opcodes + op_num
@@ -179,7 +179,7 @@ func FindLiveRange(op_array *ZendOpArray, op_num uint32, var_num uint32) *ZendLi
 	}
 	return nil
 }
-func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num uint32) {
+func CleanupLiveVars(executeData *ZendExecuteData, op_num uint32, catch_op_num uint32) {
 	var i int
 	for i = 0; i < EX(func_).op_array.last_live_range; i++ {
 		var range_ *ZendLiveRange = EX(func_).op_array.live_range[i]
@@ -242,9 +242,9 @@ func CleanupLiveVars(execute_data *ZendExecuteData, op_num uint32, catch_op_num 
 		}
 	}
 }
-func ZendCleanupUnfinishedExecution(execute_data *ZendExecuteData, op_num uint32, catch_op_num uint32) {
-	CleanupUnfinishedCalls(execute_data, op_num)
-	CleanupLiveVars(execute_data, op_num, catch_op_num)
+func ZendCleanupUnfinishedExecution(executeData *ZendExecuteData, op_num uint32, catch_op_num uint32) {
+	CleanupUnfinishedCalls(executeData, op_num)
+	CleanupLiveVars(executeData, op_num, catch_op_num)
 }
 func ZendSwapOperands(op *ZendOp) {
 	var tmp ZnodeOp

@@ -7,7 +7,7 @@ import (
 	"sik/zend"
 )
 
-func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifMetaphone(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var result *zend.ZendString = nil
 	var phones zend.ZendLong = 0
@@ -43,7 +43,7 @@ func ZifMetaphone(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING

@@ -1330,7 +1330,7 @@ func PhpEscapeHtmlEntitiesEx(
 	replaced.SetLen(len_)
 	return replaced
 }
-func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval, all int) {
+func PhpHtmlEntities(executeData *zend.ZendExecuteData, return_value *zend.Zval, all int) {
 	var str *zend.ZendString
 	var hint_charset *zend.ZendString = nil
 	var default_charset *byte
@@ -1369,7 +1369,7 @@ func PhpHtmlEntities(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1443,10 +1443,10 @@ func RegisterHtmlConstants(type_ int, module_number int) {
 	zend.REGISTER_LONG_CONSTANT("ENT_XHTML", ENT_XHTML, zend.CONST_PERSISTENT|zend.CONST_CS)
 	zend.REGISTER_LONG_CONSTANT("ENT_HTML5", ENT_HTML5, zend.CONST_PERSISTENT|zend.CONST_CS)
 }
-func ZifHtmlspecialchars(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpHtmlEntities(execute_data, return_value, 0)
+func ZifHtmlspecialchars(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpHtmlEntities(executeData, return_value, 0)
 }
-func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHtmlspecialcharsDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var quote_style zend.ZendLong = ENT_COMPAT
 	var replaced *zend.ZendString
@@ -1482,7 +1482,7 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1532,7 +1532,7 @@ func ZifHtmlspecialcharsDecode(execute_data *zend.ZendExecuteData, return_value 
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifHtmlEntityDecode(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var str *zend.ZendString
 	var hint_charset *zend.ZendString = nil
 	var default_charset *byte
@@ -1570,7 +1570,7 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &str, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -1629,8 +1629,8 @@ func ZifHtmlEntityDecode(execute_data *zend.ZendExecuteData, return_value *zend.
 	return_value.SetFalse()
 	return
 }
-func ZifHtmlentities(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
-	PhpHtmlEntities(execute_data, return_value, 1)
+func ZifHtmlentities(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
+	PhpHtmlEntities(executeData, return_value, 1)
 }
 func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset, arr *zend.Zval) {
 	var key []byte = ""
@@ -1674,7 +1674,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		}
 	}
 }
-func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifGetHtmlTranslationTable(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var all zend.ZendLong = HTML_SPECIALCHARS
 	var flags zend.ZendLong = ENT_COMPAT
 	var doctype int
@@ -1720,7 +1720,7 @@ func ZifGetHtmlTranslationTable(execute_data *zend.ZendExecuteData, return_value
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			_optional = 1
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgLong(_arg, &all, &_dummy, 0, 0) == 0 {

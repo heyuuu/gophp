@@ -339,7 +339,7 @@ func PhpPasswordAlgoIdentifyEx(hash *zend.ZendString, default_algo *PhpPasswordA
 		return algo
 	}
 }
-func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var algo *PhpPasswordAlgo
 	var hash *zend.ZendString
 	var ident *zend.ZendString
@@ -376,7 +376,7 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -435,7 +435,7 @@ func ZifPasswordGetInfo(execute_data *zend.ZendExecuteData, return_value *zend.Z
 	}
 	zend.AddAssocZval(return_value, "options", &options)
 }
-func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPasswordNeedsRehash(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var old_algo *PhpPasswordAlgo
 	var new_algo *PhpPasswordAlgo
 	var hash *zend.ZendString
@@ -473,7 +473,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &hash, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -536,7 +536,7 @@ func ZifPasswordNeedsRehash(execute_data *zend.ZendExecuteData, return_value *ze
 	zend.ZVAL_BOOL(return_value, old_algo.GetNeedsRehash()(hash, options) != 0)
 	return
 }
-func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPasswordVerify(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var password *zend.ZendString
 	var hash *zend.ZendString
 	var algo *PhpPasswordAlgo
@@ -572,7 +572,7 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -618,7 +618,7 @@ func ZifPasswordVerify(execute_data *zend.ZendExecuteData, return_value *zend.Zv
 	zend.ZVAL_BOOL(return_value, algo != nil && (algo.GetVerify() == nil || algo.GetVerify()(password, hash) != 0))
 	return
 }
-func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPasswordHash(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var password *zend.ZendString
 	var digest *zend.ZendString = nil
 	var zalgo *zend.Zval
@@ -656,7 +656,7 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 				_error_code = zend.ZPP_ERROR_FAILURE
 				break
 			}
-			_real_arg = zend.ZEND_CALL_ARG(execute_data, 0)
+			_real_arg = zend.ZEND_CALL_ARG(executeData, 0)
 			zend.Z_PARAM_PROLOGUE(0, 0)
 			if zend.ZendParseArgStr(_arg, &password, 0) == 0 {
 				_expected_type = zend.Z_EXPECTED_STRING
@@ -719,7 +719,7 @@ func ZifPasswordHash(execute_data *zend.ZendExecuteData, return_value *zend.Zval
 	return_value.SetString(digest)
 	return
 }
-func ZifPasswordAlgos(execute_data *zend.ZendExecuteData, return_value *zend.Zval) {
+func ZifPasswordAlgos(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var algo *zend.ZendString
 	if zend.ZEND_NUM_ARGS() != 0 {
 		zend.ZendWrongParametersNoneError()
