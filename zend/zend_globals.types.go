@@ -49,6 +49,18 @@ type ZendCompilerGlobals struct {
 	rtd_key_counter              uint32
 }
 
+func (this *ZendCompilerGlobals) InitTables() {
+	this.function_table = NewZendArrayEx(1024, ZEND_FUNCTION_DTOR, true)
+	this.class_table = NewZendArrayEx(64, ZEND_CLASS_DTOR, true)
+	this.auto_globals = NewZendArrayEx(8, AutoGlobalDtor, true)
+}
+
+func (this *ZendCompilerGlobals) DestroyTables() {
+	this.function_table.Destroy()
+	this.class_table.Destroy()
+	this.auto_globals.Destroy()
+}
+
 func (this *ZendCompilerGlobals) GetLoopVarStack() ZendStack      { return this.loop_var_stack }
 func (this *ZendCompilerGlobals) SetLoopVarStack(value ZendStack) { this.loop_var_stack = value }
 func (this *ZendCompilerGlobals) GetActiveClassEntry() *ZendClassEntry {
@@ -226,6 +238,13 @@ type ZendExecutorGlobals struct {
 	weakrefs                            HashTable
 	exception_ignore_args               ZendBool
 	reserved                            []any
+}
+
+func (this *ZendExecutorGlobals) InitTables() {
+	this.zend_constants = NewZendArrayEx(128, ZEND_CONSTANT_DTOR, true)
+}
+func (this *ZendExecutorGlobals) DestroyTables() {
+	this.zend_constants.Destroy()
 }
 
 /**

@@ -409,15 +409,11 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	/* set up version */
 
 	ZendVersionInfo = ZEND_CORE_VERSION_INFO
-	GLOBAL_FUNCTION_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
-	GLOBAL_CLASS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
-	GLOBAL_AUTO_GLOBALS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
-	GLOBAL_CONSTANTS_TABLE = (*HashTable)(Malloc(b.SizeOf("HashTable")))
-	ZendHashInitEx(GLOBAL_FUNCTION_TABLE, 1024, nil, ZEND_FUNCTION_DTOR, 1, 0)
-	ZendHashInitEx(GLOBAL_CLASS_TABLE, 64, nil, ZEND_CLASS_DTOR, 1, 0)
-	ZendHashInitEx(GLOBAL_AUTO_GLOBALS_TABLE, 8, nil, AutoGlobalDtor, 1, 0)
-	ZendHashInitEx(GLOBAL_CONSTANTS_TABLE, 128, nil, ZEND_CONSTANT_DTOR, 1, 0)
-	ZendHashInitEx(&ModuleRegistry, 32, nil, ModuleDestructorZval, 1, 0)
+
+	CG__().InitTables()
+	EG__().InitTables()
+	ModuleRegistry = *NewZendArrayEx(32, ModuleDestructorZval, true)
+
 	ZendInitRsrcListDtors()
 	IniScannerGlobalsCtor(&ini_scanner_globals)
 	PhpScannerGlobalsCtor(&language_scanner_globals)
@@ -492,17 +488,12 @@ func ZendShutdown() {
 	ZendDestroyModules()
 	VirtualCwdDeactivate()
 	VirtualCwdShutdown()
-	GLOBAL_FUNCTION_TABLE.Destroy()
-	GLOBAL_CLASS_TABLE.Destroy()
-	GLOBAL_AUTO_GLOBALS_TABLE.Destroy()
-	Free(GLOBAL_AUTO_GLOBALS_TABLE)
+
+	CG__().DestroyTables()
+	EG__().DestroyTables()
+
 	ZendShutdownExtensions()
-	//Free(ZendVersionInfo)
-	Free(GLOBAL_FUNCTION_TABLE)
-	Free(GLOBAL_CLASS_TABLE)
-	GLOBAL_CONSTANTS_TABLE.Destroy()
-	Free(GLOBAL_CONSTANTS_TABLE)
-	//ZendShutdownStrtod()
+
 	if CG__().GetMapPtrBase() {
 		Free(CG__().GetMapPtrBase())
 		CG__().SetMapPtrBase(nil)
