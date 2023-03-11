@@ -95,9 +95,6 @@ func (this *ZendTraitAlias) SetAlias(value *ZendString) { this.alias = value }
 func (this *ZendTraitAlias) GetModifiers() uint32       { return this.modifiers }
 func (this *ZendTraitAlias) SetModifiers(value uint32)  { this.modifiers = value }
 
-/**
- * ZendUtilityFunctions
- */
 type ZendUtilityFunctions struct {
 	error_function                  func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
 	printf_function                 func(format *byte, _ ...any) int
@@ -114,37 +111,6 @@ type ZendUtilityFunctions struct {
 	resolve_path_function           func(filename *byte, filename_len int) *ZendString
 }
 
-//             func MakeZendUtilityFunctions(
-// error_function func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any),
-// printf_function func(format *byte, _ ...any) int,
-// write_function func(str *byte, str_length int) int,
-// fopen_function func(filename *byte, openedPath **ZendString) *r.FILE,
-// message_handler func(message ZendLong, data any),
-// get_configuration_directive func(name *ZendString) *Zval,
-// ticks_function func(ticks int),
-// on_timeout func(seconds int),
-// stream_open_function func(filename *byte, handle *ZendFileHandle) int,
-// printf_to_smart_string_function func(buf *SmartString, format *byte, ap ...any),
-// printf_to_smart_str_function func(buf *SmartStr, format *byte, ap ...any),
-// getenv_function func(name *byte, name_len int) *byte,
-// resolve_path_function func(filename *byte, filename_len int) *ZendString,
-// ) ZendUtilityFunctions {
-//                 return ZendUtilityFunctions{
-//                     error_function:error_function,
-//                     printf_function:printf_function,
-//                     write_function:write_function,
-//                     fopen_function:fopen_function,
-//                     message_handler:message_handler,
-//                     get_configuration_directive:get_configuration_directive,
-//                     ticks_function:ticks_function,
-//                     on_timeout:on_timeout,
-//                     stream_open_function:stream_open_function,
-//                     printf_to_smart_string_function:printf_to_smart_string_function,
-//                     printf_to_smart_str_function:printf_to_smart_str_function,
-//                     getenv_function:getenv_function,
-//                     resolve_path_function:resolve_path_function,
-//                 }
-//             }
 func (this *ZendUtilityFunctions) GetErrorFunction() func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
 	return this.error_function
 }

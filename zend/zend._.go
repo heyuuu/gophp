@@ -14,7 +14,6 @@ type ZendUnserializeData = __struct___zend_unserialize_data
 type ZendWriteFuncT func(str *byte, str_length int) int
 
 /* output support */
-
 var ZendPrintf func(format *byte, _ ...any) int
 var ZendWrite ZendWriteFuncT
 var ZendFopen func(filename *byte, opened_path **ZendString) *r.FILE

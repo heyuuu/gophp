@@ -380,7 +380,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	ZendErrorCb = utility_functions.GetErrorFunction()
 	ZendPrintf = utility_functions.GetPrintfFunction()
-	ZendWrite = ZendWriteFuncT(utility_functions.GetWriteFunction())
+	ZendWrite = utility_functions.GetWriteFunction()
 	ZendFopen = utility_functions.GetFopenFunction()
 	if ZendFopen == nil {
 		ZendFopen = ZendFopenWrapper
