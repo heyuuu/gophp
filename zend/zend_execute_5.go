@@ -98,7 +98,7 @@ func ZendFetchDimensionAddressRead(
 			result.SetInternedString(ZSTR_CHAR(c))
 		}
 	} else if container.IsObject() {
-		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.IsUndef() {
+		if dim.IsUndef() {
 			dim = ZVAL_UNDEFINED_OP2()
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -119,7 +119,7 @@ func ZendFetchDimensionAddressRead(
 		if type_ != BP_VAR_IS && container.IsUndef() {
 			container = ZVAL_UNDEFINED_OP1()
 		}
-		if ZEND_CONST_COND(dim_type == IS_CV, 1) && dim.IsUndef() {
+		if dim.IsUndef() {
 			ZVAL_UNDEFINED_OP2()
 		}
 		if is_list == 0 && type_ != BP_VAR_IS {

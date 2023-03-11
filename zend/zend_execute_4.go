@@ -260,7 +260,7 @@ try_again:
 		}
 	} else if dim.IsString() {
 		offset_key = dim.GetStr()
-		if ZEND_CONST_COND(dim_type != IS_CONST, 1) {
+		{
 			if ZEND_HANDLE_NUMERIC(offset_key, &hval) {
 				goto num_index
 			}
@@ -411,7 +411,7 @@ func ZendFetchDimensionAddress(
 		}
 		result.IsError()
 	} else if container.IsObject() {
-		if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.IsUndef() {
+		if dim != nil && dim.IsUndef() {
 			dim = ZVAL_UNDEFINED_OP2()
 		}
 		if dim_type == IS_CONST && dim.GetU2Extra() == ZEND_EXTRA_VALUE {
@@ -454,7 +454,7 @@ func ZendFetchDimensionAddress(
 
 				/* for read-mode only */
 
-				if ZEND_CONST_COND(dim_type == IS_CV, dim != nil) && dim.IsUndef() {
+				if dim != nil && dim.IsUndef() {
 					ZVAL_UNDEFINED_OP2()
 				}
 				result.SetNull()

@@ -343,17 +343,15 @@ func DisplayErrorsMode(ini_entry *zend.ZendIniEntry, type_ int) {
 	cgi_or_cli = SM__().Name() == "cli" || SM__().Name() == "cgi" || SM__().Name() == "phpdbg"
 	switch mode {
 	case PHP_DISPLAY_ERRORS_STDERR:
-		if true {
+		{
 			PUTS("STDERR")
-		} else {
-			PUTS("On")
 		}
+
 	case PHP_DISPLAY_ERRORS_STDOUT:
-		if true {
+		{
 			PUTS("STDOUT")
-		} else {
-			PUTS("On")
 		}
+
 	default:
 		PUTS("Off")
 	}

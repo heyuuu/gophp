@@ -19,15 +19,12 @@ func ZEND_REF_FIRST_SOURCE(ref *ZendReference) *ZendPropertyInfo {
 }
 func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, ref *ZendRefcounted) {
 	ZVAL_COPY_VALUE(variable_ptr, value)
-	if ZEND_CONST_COND(value_type == IS_CONST, 0) {
+
+	if (value_type & (IS_CONST | IS_CV)) != 0 {
 		if variable_ptr.IsRefcounted() {
 			variable_ptr.AddRefcount()
 		}
-	} else if (value_type & (IS_CONST | IS_CV)) != 0 {
-		if variable_ptr.IsRefcounted() {
-			variable_ptr.AddRefcount()
-		}
-	} else if ZEND_CONST_COND(value_type == IS_VAR, 1) && ref != nil {
+	} else if ref != nil {
 		if ref.DelRefcount() == 0 {
 			EfreeSize(ref, b.SizeOf("zend_reference"))
 		} else if variable_ptr.IsRefcounted() {
@@ -37,7 +34,7 @@ func ZendCopyToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, r
 }
 func ZendAssignToVariable(variable_ptr *Zval, value *Zval, value_type ZendUchar, strict ZendBool) *Zval {
 	var ref *ZendRefcounted = nil
-	if ZEND_CONST_COND(value_type&(IS_VAR|IS_CV), 1) && value.IsReference() {
+	if value.IsReference() {
 		ref = value.GetCounted()
 		value = Z_REFVAL_P(value)
 	}
