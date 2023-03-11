@@ -586,7 +586,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				exit_status = 1
 			} else {
 				zend.ZendPrintZval(&ref, 0)
-				zend.ZendWrite("\n", 1)
+				zend.ZendWrite("\n")
 			}
 			zend.ZvalPtrDtor(&ref)
 			zend.ZvalPtrDtor(&arg)

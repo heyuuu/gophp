@@ -11,21 +11,17 @@ const ZEND_VERSION = "3.4.0"
 type ZendSerializeData = __struct___zend_serialize_data
 type ZendUnserializeData = __struct___zend_unserialize_data
 
-type ZendWriteFuncT func(str *byte, str_length int) int
-
 /* output support */
-var ZendPrintf func(format *byte, _ ...any) int
-var ZendWrite ZendWriteFuncT
-var ZendFopen func(filename *byte, opened_path **ZendString) *r.FILE
-var ZendFopenEx func(filename string, opened_path *string) *r.FILE
+var ZendPrintf func(format string, args ...any) int
+var ZendWrite func(str string) int
+var ZendFopen func(filename string, opened_path *string) *r.FILE
 var ZendTicksFunction func(ticks int)
 var ZendInterruptFunction func(executeData *ZendExecuteData)
-var ZendErrorCb func(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any)
+var ZendErrorCb func(type_ int, error_filename string, error_lineno uint32, format string, args ...any)
 var ZendOnTimeout func(seconds int)
 var ZendStreamOpenFunction func(filename string, handle *ZendFileHandle) int
 var ZendStreamOpenFunctionEx func(filename string, handle *ZendFileHandle) bool
-var ZendPrintfToSmartString func(buf *SmartString, format *byte, ap ...any)
-var ZendPrintfToSmartStr func(buf *SmartStr, format *byte, ap ...any)
+var ZendPrintfToSmartStr func(buf *SmartStr, format string, ap ...any)
 var ZendGetenv func(name *byte, name_len int) *byte
 var ZendResolvePath func(filename *byte, filename_len int) *ZendString
 
@@ -64,7 +60,7 @@ var ZendPostStartupCb func() int = nil
 var ZendPostShutdownCb func() = nil
 var ZendPreloadAutoload func(filename *ZendString) int = nil
 var ZendMessageDispatcherP func(message ZendLong, data any)
-var ZendGetConfigurationDirectiveP func(name *ZendString) *Zval
+var ZendGetConfigurationDirectiveP func(name string) *Zval
 
 const SIGNAL_CHECK_DEFAULT = "0"
 

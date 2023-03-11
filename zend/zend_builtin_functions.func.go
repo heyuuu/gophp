@@ -2724,7 +2724,7 @@ func ZifDebugPrintBacktrace(executeData *ZendExecuteData, return_value *Zval) {
 		}
 		ZendPrintf("#%-2d ", indent)
 		if class_name != nil {
-			ZEND_PUTS(class_name.GetVal())
+			ZEND_PUTS(class_name.GetStr())
 			ZEND_PUTS(call_type)
 			if object != nil && func_.GetScope() == nil && object.GetHandlers().GetGetClassName() != ZendStdGetClassName {
 				ZendStringReleaseEx(class_name, 0)

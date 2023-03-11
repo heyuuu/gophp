@@ -2362,12 +2362,12 @@ func ZEND_ECHO_SPEC_CONST_HANDLER(executeData *ZendExecuteData) int {
 	if z.IsString() {
 		var str *ZendString = z.GetStr()
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		}
 	} else {
 		var str *ZendString = ZvalGetStringFunc(z)
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		} else if IS_CONST == IS_CV && z.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
@@ -11173,12 +11173,12 @@ func ZEND_ECHO_SPEC_TMPVAR_HANDLER(executeData *ZendExecuteData) int {
 	if z.IsString() {
 		var str *ZendString = z.GetStr()
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		}
 	} else {
 		var str *ZendString = ZvalGetStringFunc(z)
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		} else if (IS_TMP_VAR|IS_VAR) == IS_CV && z.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}
@@ -32194,12 +32194,12 @@ func ZEND_ECHO_SPEC_CV_HANDLER(executeData *ZendExecuteData) int {
 	if z.IsString() {
 		var str *ZendString = z.GetStr()
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		}
 	} else {
 		var str *ZendString = ZvalGetStringFunc(z)
 		if str.GetLen() != 0 {
-			ZendWrite(str.GetVal(), str.GetLen())
+			ZendWrite(str.GetStr())
 		} else if IS_CV == IS_CV && z.IsUndef() {
 			ZVAL_UNDEFINED_OP1()
 		}

@@ -97,7 +97,7 @@ func (this *ZendFileHandle) Open(filename string) bool {
 	}
 
 	var openedPath string
-	fp := ZendFopenEx(filename, &openedPath)
+	fp := ZendFopen(filename, &openedPath)
 	this.InitFp(fp, filename)
 	this.openedPath = openedPath
 

@@ -23,7 +23,7 @@ func PhpSyslog(priority int, format string, _ ...any) {
 		PhpOpenlog(PG(syslog_ident), 0, PG(syslog_facility))
 	}
 	va_start(args, format)
-	zend.ZendPrintfToSmartString(&fbuf, format, args)
+	zend.ZendPrintfToSmartStr(&fbuf, format, args)
 	fbuf.ZeroTail()
 	va_end(args)
 	if PG(syslog_filter) == PHP_SYSLOG_FILTER_RAW {

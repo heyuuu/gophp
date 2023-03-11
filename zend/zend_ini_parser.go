@@ -3,6 +3,7 @@
 package zend
 
 import (
+	"log"
 	b "sik/builtin"
 )
 
@@ -102,9 +103,9 @@ const DEBUG_CFG_PARSER = 0
 
 // #define YYSTYPE       zval
 
-const ZEND_INI_PARSER_CB = CG__().GetIniParserParam().GetIniParserCb()
-const ZEND_INI_PARSER_ARG = CG__().GetIniParserParam().GetArg()
-const ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
+var ZEND_INI_PARSER_CB = CG__().GetIniParserParam().GetIniParserCb()
+var ZEND_INI_PARSER_ARG = CG__().GetIniParserParam().GetArg()
+var ZEND_SYSTEM_INI = CG__().GetIniParserUnbufferedErrors()
 
 func GetIntVal(op *Zval) int {
 	switch op.GetType() {
@@ -222,27 +223,6 @@ func ZendIniGetConstant(result *Zval, name *Zval) {
 
 	/* If name contains ':' it is not a constant. Bug #26893. */
 }
-
-/* }}} */
-
-func ZendIniGetVar(result *Zval, name *Zval) {
-	var curval *Zval
-	var envvar *byte
-
-	/* Fetch configuration option value */
-
-	if b.Assign(&curval, ZendGetConfigurationDirective(name.GetStr())) != nil {
-		result.SetString(ZendStringInit(Z_STRVAL_P(curval), Z_STRLEN_P(curval), ZEND_SYSTEM_INI))
-	} else if b.Assign(&envvar, ZendGetenv(Z_STRVAL_P(name), Z_STRLEN_P(name))) != nil || b.Assign(&envvar, getenv(Z_STRVAL_P(name))) != nil {
-		result.SetString(ZendStringInit(envvar, strlen(envvar), ZEND_SYSTEM_INI))
-	} else {
-		ZendIniInitString(result)
-	}
-
-	/* Fetch configuration option value */
-}
-
-/* }}} */
 
 func IniError(msg *byte) {
 	var error_buf *byte

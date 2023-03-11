@@ -672,11 +672,9 @@ func PhpIniActivatePerHostConfig(host *byte, host_len int) {
 
 	}
 }
-func CfgGetEntryEx(name *zend.ZendString) *zend.Zval {
-	return Config().KeyFind(name.GetStr())
-}
-func CfgGetEntry(name *byte, name_length int) *zend.Zval {
-	return Config().KeyFind(b.CastStr(name, name_length))
+
+func CfgGetEntry(name string) *zend.Zval {
+	return Config().KeyFind(name)
 }
 func CfgGetLong(varname *byte, result *zend.ZendLong) int {
 	var tmp *zend.Zval

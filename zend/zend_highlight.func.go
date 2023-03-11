@@ -157,7 +157,7 @@ func ZendStrip() {
 		switch token_type {
 		case T_WHITESPACE:
 			if prev_space == 0 {
-				ZendWrite(" ", b.SizeOf("\" \"")-1)
+				ZendWrite(" ")
 				prev_space = 1
 			}
 			fallthrough
@@ -167,19 +167,19 @@ func ZendStrip() {
 			token.SetUndef()
 			continue
 		case T_END_HEREDOC:
-			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
+			ZendWrite(b.CastStr(INI_SCNG__().GetYyText(), INI_SCNG__().GetYyLeng()))
 
 			/* read the following character, either newline or ; */
 
 			if LexScan(&token, nil) != T_WHITESPACE {
-				ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
+				ZendWrite(b.CastStr(INI_SCNG__().GetYyText(), INI_SCNG__().GetYyLeng()))
 			}
-			ZendWrite("\n", b.SizeOf("\"\\n\"")-1)
+			ZendWrite("\n")
 			prev_space = 1
 			token.SetUndef()
 			continue
 		default:
-			ZendWrite((*byte)(INI_SCNG__().GetYyText()), INI_SCNG__().GetYyLeng())
+			ZendWrite(b.CastStr(INI_SCNG__().GetYyText(), INI_SCNG__().GetYyLeng()))
 		}
 		if token.IsString() {
 			switch token_type {

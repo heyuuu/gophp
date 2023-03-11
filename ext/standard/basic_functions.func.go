@@ -813,7 +813,7 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* SAPI method returns an emalloc()'d string */
 
-		ptr = core.SapiGetenv(str, str_len)
+		ptr = core.SapiGetenv(b.CastStr(str, str_len))
 		if ptr != nil {
 
 			// TODO: avoid realocation ???
@@ -1762,7 +1762,7 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	retval = core.CfgGetEntry(varname, uint32(varname_len))
+	retval = core.CfgGetEntry(b.CastStr(varname, varname_len))
 	if retval != nil {
 		if retval.IsType(zend.IS_ARRAY) {
 			zend.ArrayInit(return_value)

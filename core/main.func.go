@@ -773,7 +773,7 @@ func PhpErrorDocref2(
 	}
 }
 func PhpHtmlPuts(str *byte, size int) { zend.ZendHtmlPuts(str, size) }
-func PhpErrorCb(type_ int, error_filename *byte, error_lineno uint32, format *byte, args ...any) {
+func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format string, args ...any) {
 	var buffer *byte
 	var buffer_len int
 	var display int
@@ -1040,8 +1040,11 @@ func PhpGetCurrentUser() *byte {
 		return SG__().request_info.current_user
 	}
 }
-func PhpFopenWrapperForZend(filename *byte, opened_path **zend.ZendString) *r.FILE {
-	return streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path)
+func PhpFopenWrapperForZend(filename string, opened_path *string) *r.FILE {
+	var opened_path_zstr **zend.ZendString
+	f := streams.PhpStreamOpenWrapperAsFile((*byte)(filename), "rb", USE_PATH|IGNORE_URL_WIN|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE, opened_path_zstr)
+	*opened_path = (*opened_path_zstr).GetStr()
+	return f
 }
 func PhpZendStreamCloser(handle any) { PhpStreamClose((*PhpStream)(handle)) }
 func PhpZendStreamFsizer(handle any) int {
@@ -1059,7 +1062,7 @@ func PhpZendStreamFsizer(handle any) int {
 	}
 	return 0
 }
-func PhpStreamOpenForZend(filename *byte, handle *zend.ZendFileHandle) int {
+func PhpStreamOpenForZend(filename string, handle *zend.ZendFileHandle) int {
 	return PhpStreamOpenForZendEx(filename, handle, USE_PATH|REPORT_ERRORS|STREAM_OPEN_FOR_INCLUDE)
 }
 func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode int) int {
@@ -1089,11 +1092,8 @@ func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode in
 	}
 	return zend.FAILURE
 }
-func PhpResolvePathForZend(filename *byte, filename_len int) *zend.ZendString {
-	return PhpResolvePath(filename, filename_len, PG(include_path))
-}
-func PhpGetConfigurationDirectiveForZend(name *zend.ZendString) *zend.Zval {
-	return CfgGetEntryEx(name)
+func PhpResolvePathForZend(filename string) *zend.ZendString {
+	return PhpResolvePath(b.CastStrPtr(filename), len(filename), PG(include_path))
 }
 func PhpFreeRequestGlobals() {
 	if PG(last_error_message) {
@@ -1410,7 +1410,6 @@ func PhpModuleStartupEx(sf ISapiModule, additional_modules []zend.ZendModuleEntr
 	return retval != zend.FAILURE
 }
 func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, num_additional_modules uint32) int {
-	var zuf zend.ZendUtilityFunctions
 	var zuv zend.ZendUtilityValues
 	var retval int = zend.SUCCESS
 	var module_number int = 0
@@ -1428,20 +1427,8 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	memset(&CoreGlobals, 0, b.SizeOf("core_globals"))
 	PhpStartupTicks()
 	//zend.GcGlobalsCtor()
-	zuf.SetErrorFunction(PhpErrorCb)
-	zuf.SetPrintfFunction(PhpPrintf)
-	zuf.SetWriteFunction(PhpOutputWrite)
-	zuf.SetFopenFunction(PhpFopenWrapperForZend)
-	zuf.SetMessageHandler(PhpMessageHandlerForZend)
-	zuf.SetGetConfigurationDirective(PhpGetConfigurationDirectiveForZend)
-	zuf.SetTicksFunction(PhpRunTicks)
-	zuf.SetOnTimeout(PhpOnTimeout)
-	zuf.SetStreamOpenFunction(PhpStreamOpenForZend)
-	zuf.SetPrintfToSmartStringFunction(PhpPrintfToSmartString)
-	zuf.SetPrintfToSmartStrFunction(PhpPrintfToSmartStr)
-	zuf.SetGetenvFunction(SapiGetenv)
-	zuf.SetResolvePathFunction(PhpResolvePathForZend)
-	zend.ZendStartup(&zuf)
+
+	zend.ZendStartup(&zendUtilityFunctions)
 	setlocale(LC_CTYPE, "")
 	tzset()
 	zend.LeIndexPtr = zend.ZendRegisterListDestructorsEx(nil, nil, "index pointer", 0)

@@ -508,9 +508,6 @@ func XbufFormatConverter(buf *zend.SmartStr, fmt *byte, ap ...any) {
 	}
 	return
 }
-func PhpPrintfToSmartString(buf *zend.SmartString, format *byte, ap ...any) {
-	XbufFormatConverter(buf, format, ap)
-}
-func PhpPrintfToSmartStr(buf *zend.SmartStr, format *byte, ap ...any) {
+func PhpPrintfToSmartStr(buf *zend.SmartStr, format string, ap ...any) {
 	XbufFormatConverter(buf, format, ap)
 }

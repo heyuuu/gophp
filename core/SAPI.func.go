@@ -733,9 +733,7 @@ func SapiGetStat() *zend.ZendStatT {
 		return &(SG__().global_stat)
 	}
 }
-func SapiGetenv(name_ptr *byte, name_len int) *string {
-	var name = b.CastStr(name_ptr, name_len)
-
+func SapiGetenv(name string) *string {
 	if strings.EqualFold(name, "HTTP_PROXY") {
 		/* Ugly fix for HTTP_PROXY issue, see bug #72573 */
 		return nil

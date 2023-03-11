@@ -109,9 +109,12 @@ func PhpOutputWriteUnbuffered(str *byte, len_ int) int {
 	}
 	return PhpOutputDirect(str, len_)
 }
-func PhpOutputWrite(str *byte, len_ int) int {
+func PhpOutputWrite(str string) int {
+	ptr := b.CastStrPtr(str)
+	len_ := len(str)
+
 	if (OG(flags) & PHP_OUTPUT_ACTIVATED) != 0 {
-		PhpOutputOp(PHP_OUTPUT_HANDLER_WRITE, str, len_)
+		PhpOutputOp(PHP_OUTPUT_HANDLER_WRITE, ptr, len_)
 		return len_
 	}
 	if (OG(flags) & PHP_OUTPUT_DISABLED) != 0 {

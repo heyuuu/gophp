@@ -11,10 +11,9 @@ import (
 func USED_RET() bool {
 	return !(EX(prev_execute_data)) || !(ZEND_USER_CODE(EX(prev_execute_data).func_.common.type_)) || EX(prev_execute_data).opline.result_type != IS_UNUSED
 }
-func ZendBailout()                          { _zendBailout(__FILE__, __LINE__) }
-func ZEND_WRITE(str *byte, str_len int) int { return ZendWrite(str, str_len) }
-func ZEND_PUTS(str string) int              { return ZendWrite(str, strlen(str)) }
-func ZEND_PUTC(c byte) int                  { return ZendWrite(&c, 1) }
+func ZendBailout()             { _zendBailout(__FILE__, __LINE__) }
+func ZEND_PUTS(str string) int { return ZendWrite(str) }
+func ZEND_PUTC(c byte) int     { return ZendWrite(string([]byte{c})) }
 
 func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) bool {
 	if newValue == nil {
@@ -58,7 +57,7 @@ func ZendVspprintf(pbuf *string, max_len int, format string, ap ...any) int {
 
 func __sprintfEx(maxLen int, format string, args ...any) string {
 	buf := SmartStr{}
-	ZendPrintfToSmartString(&buf, b.CastStrPtr(format), args...)
+	ZendPrintfToSmartStr(&buf, b.CastStrPtr(format), args...)
 	result := buf.GetStr()
 	if maxLen != 0 && len(result) > maxLen {
 		return result[:maxLen]
@@ -68,7 +67,7 @@ func __sprintfEx(maxLen int, format string, args ...any) string {
 
 func __sprintf(format string, args ...any) string {
 	var buf = SmartStr{}
-	ZendPrintfToSmartString(&buf, b.CastStrPtr(format), args...)
+	ZendPrintfToSmartStr(&buf, b.CastStrPtr(format), args...)
 	return buf.GetStr()
 }
 
@@ -188,7 +187,7 @@ func PrintFlatHash(ht *HashTable) {
 		}
 		ZEND_PUTS("[")
 		if string_key != nil {
-			ZEND_WRITE(string_key.GetVal(), string_key.GetLen())
+			ZendWrite(string_key.GetStr())
 		} else {
 			ZendPrintf(ZEND_ULONG_FMT, num_key)
 		}
@@ -209,7 +208,7 @@ func ZendPrintZval(expr *Zval, indent int) int {
 	var str *ZendString = ZvalGetTmpString(expr, &tmp_str)
 	var len_ int = str.GetLen()
 	if len_ != 0 {
-		ZendWrite(str.GetVal(), len_)
+		ZendWrite(str.GetStr())
 	}
 	ZendTmpStringRelease(tmp_str)
 	return len_
@@ -314,12 +313,12 @@ func ZendPrintZvalRToStr(expr *Zval, indent int) *ZendString {
 }
 func ZendPrintZvalR(expr *Zval, indent int) {
 	var str *ZendString = ZendPrintZvalRToStr(expr, indent)
-	ZendWrite(str.GetVal(), str.GetLen())
+	ZendWrite(str.GetStr())
 	ZendStringReleaseEx(str, 0)
 }
-func ZendFopenWrapper(filename *byte, opened_path **ZendString) *r.FILE {
+func ZendFopenWrapper(filename string, opened_path *string) *r.FILE {
 	if opened_path != nil {
-		*opened_path = ZendStringInit(filename, strlen(filename), 0)
+		*opened_path = filename
 	}
 	return r.Fopen(filename, "rb")
 }
@@ -378,22 +377,21 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 
 	/* Set up utility functions and values */
 
-	ZendErrorCb = utility_functions.GetErrorFunction()
-	ZendPrintf = utility_functions.GetPrintfFunction()
-	ZendWrite = utility_functions.GetWriteFunction()
-	ZendFopen = utility_functions.GetFopenFunction()
+	ZendErrorCb = utility_functions.ErrorFunction
+	ZendPrintf = utility_functions.PrintfFunction
+	ZendWrite = utility_functions.WriteFunction
+	ZendFopen = utility_functions.FopenFunction
 	if ZendFopen == nil {
 		ZendFopen = ZendFopenWrapper
 	}
-	ZendStreamOpenFunction = utility_functions.GetStreamOpenFunction()
-	ZendMessageDispatcherP = utility_functions.GetMessageHandler()
-	ZendGetConfigurationDirectiveP = utility_functions.GetGetConfigurationDirective()
-	ZendTicksFunction = utility_functions.GetTicksFunction()
-	ZendOnTimeout = utility_functions.GetOnTimeout()
-	ZendPrintfToSmartString = utility_functions.GetPrintfToSmartStringFunction()
-	ZendPrintfToSmartStr = utility_functions.GetPrintfToSmartStrFunction()
-	ZendGetenv = utility_functions.GetGetenvFunction()
-	ZendResolvePath = utility_functions.GetResolvePathFunction()
+	ZendStreamOpenFunction = utility_functions.StreamOpenFunction
+	ZendMessageDispatcherP = utility_functions.MessageHandler
+	ZendGetConfigurationDirectiveP = utility_functions.GetConfigurationDirective
+	ZendTicksFunction = utility_functions.TicksFunction
+	ZendOnTimeout = utility_functions.OnTimeout
+	ZendPrintfToSmartStr = utility_functions.PrintfToSmartStrFunction
+	ZendGetenv = utility_functions.GetenvFunction
+	ZendResolvePath = utility_functions.ResolvePathFunction
 	ZendInterruptFunction = nil
 	ZendCompileFile = CompileFile
 	ZendExecuteEx = ExecuteEx
@@ -587,7 +585,7 @@ func ZendMessageDispatcher(message ZendLong, data any) {
 }
 func ZendGetConfigurationDirective(name *ZendString) *Zval {
 	if ZendGetConfigurationDirectiveP != nil {
-		return ZendGetConfigurationDirectiveP(name)
+		return ZendGetConfigurationDirectiveP(name.GetStr())
 	} else {
 		return nil
 	}
