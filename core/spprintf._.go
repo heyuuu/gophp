@@ -4,6 +4,6 @@ import (
 	"sik/zend"
 )
 
-const Spprintf = zend.ZendSpprintf
-const Strpprintf = zend.ZendStrpprintf
-const Vspprintf = zend.ZendVspprintf
+var Spprintf = zend.ZendSpprintf
+var Strpprintf = zend.ZendStrpprintf
+var Vspprintf = zend.ZendVspprintf

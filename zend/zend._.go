@@ -51,10 +51,10 @@ const (
 const DEBUG_BACKTRACE_PROVIDE_OBJECT ZendLong = 1 << 0
 const DEBUG_BACKTRACE_IGNORE_ARGS ZendLong = 1 << 1
 
-const GLOBAL_FUNCTION_TABLE *HashTable = CG__().GetFunctionTable()
-const GLOBAL_CLASS_TABLE *HashTable = CG__().GetClassTable()
-const GLOBAL_AUTO_GLOBALS_TABLE *HashTable = CG__().GetAutoGlobals()
-const GLOBAL_CONSTANTS_TABLE *HashTable = EG__().GetZendConstants()
+var GLOBAL_FUNCTION_TABLE *HashTable = CG__().GetFunctionTable()
+var GLOBAL_CLASS_TABLE *HashTable = CG__().GetClassTable()
+var GLOBAL_AUTO_GLOBALS_TABLE *HashTable = CG__().GetAutoGlobals()
+var GLOBAL_CONSTANTS_TABLE *HashTable = EG__().GetZendConstants()
 
 /* version information */
 

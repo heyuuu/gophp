@@ -53,7 +53,9 @@ const ZEND_EXTENSIONS_SUPPORT = 1
 
 /* AIX requires this to be the first thing in the file.  */
 
-const JMP_BUF = sigjmp_buf
+//const JMP_BUF = sigjmp_buf
+type JMP_BUF struct{}
+
 const ZTS_V = 0
 const LONG_MAX = 2147483647
 const LONG_MIN = -LONG_MAX - 1

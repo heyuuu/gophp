@@ -15,21 +15,16 @@ func ZEND_MM_ALIGNED_SIZE_EX(size int, alignment int) int {
 }
 func EfreeSize(ptr any, size int)                     { b.Free(ptr) }
 func Emalloc(size int) any                            { return b.Malloc(size) }
-func EmallocLarge(size int) any                       { return b.Malloc(size) }
 func SafeEmalloc(nmemb int, size int, offset int) any { return b.Malloc(nmemb, size, offset) }
 func Efree(ptr any)                                   { b.Free(ptr) }
 func Ecalloc(nmemb int, size int) any                 { return b.Calloc(nmemb, size) }
 func Erealloc(ptr any, size int) any                  { return b.Realloc(ptr, size) }
-func Erealloc2(ptr any, size int, copy_size int) any  { return b.Realloc(ptr, size, copy_size) }
 func SafeErealloc(ptr any, nmemb int, size int, offset int) any {
 	return b.Realloc(ptr, nmemb, size, offset)
 }
-func Estrdup(s string) *byte                { return b.Strdup(s) }
-func Estrndup(s *byte, length int) *byte    { return b.Strndup(s, length) }
-func Pemalloc(size int, persistent int) any { return b.Malloc(size) }
-func SafePemalloc(nmemb int, size int, offset int, persistent int) any {
-	return b.Malloc(nmemb, size, offset)
-}
+func Estrdup(s string) *byte                             { return b.Strdup(s) }
+func Estrndup(s *byte, length int) *byte                 { return b.Strndup(s, length) }
+func Pemalloc(size int, persistent int) any              { return b.Malloc(size) }
 func Pefree(ptr any, persistent int)                     { b.Free(ptr) }
 func Pecalloc(nmemb int, size int, persistent uint8) any { return b.Calloc(nmemb, size) }
 func Perealloc(ptr any, size int, persistent uint8) any {

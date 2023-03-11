@@ -662,8 +662,6 @@ func ZendRegisterDefaultException() {
 	ZendCeDivisionByZeroError = ZendRegisterInternalClassEx(&ce, ZendCeArithmeticError)
 	ZendCeDivisionByZeroError.SetCreateObject(ZendDefaultExceptionNew)
 }
-func ZendExceptionGetDefault() *ZendClassEntry { return ZendCeException }
-func ZendGetErrorException() *ZendClassEntry   { return ZendCeErrorException }
 func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendLong) *ZendObject {
 	var ex Zval
 	var tmp Zval
@@ -688,21 +686,15 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 	ZendThrowExceptionInternal(&ex)
 	return ex.GetObj()
 }
-func ZendThrowExceptionEx(exception_ce *ZendClassEntry, code ZendLong, format string, _ ...any) *ZendObject {
-	var arg va_list
-	var message *byte
-	var obj *ZendObject
-	va_start(arg, format)
-	ZendVspprintf(&message, 0, format, arg)
-	va_end(arg)
-	obj = ZendThrowException(exception_ce, message, code)
-	Efree(message)
+func ZendThrowExceptionEx(exception_ce *ZendClassEntry, code ZendLong, format string, args ...any) *ZendObject {
+	message := __sprintf(format, args)
+	obj := ZendThrowException(exception_ce, message, code)
 	return obj
 }
-func ZendThrowErrorException(exception_ce *ZendClassEntry, message *byte, code ZendLong, severity int) *ZendObject {
+func ZendThrowErrorException(exception_ce *ZendClassEntry, message string, code ZendLong, severity int) *ZendObject {
 	var ex Zval
 	var tmp Zval
-	var obj *ZendObject = ZendThrowException(exception_ce, message, code)
+	var obj = ZendThrowException(exception_ce, message, code)
 	ex.SetObject(obj)
 	tmp.SetLong(severity)
 	ZendUpdatePropertyEx(ZendCeErrorException, &ex, ZSTR_KNOWN(ZEND_STR_SEVERITY), &tmp)

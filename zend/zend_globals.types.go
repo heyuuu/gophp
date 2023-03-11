@@ -105,7 +105,7 @@ func (this *ZendCompilerGlobals) GetCompilerOptions() uint32           { return 
 func (this *ZendCompilerGlobals) SetCompilerOptions(value uint32)      { this.compiler_options = value }
 func (this *ZendCompilerGlobals) GetContext() ZendOparrayContext       { return this.context }
 func (this *ZendCompilerGlobals) SetContext(value ZendOparrayContext)  { this.context = value }
-func (this *ZendCompilerGlobals) GetFileContext() ZendFileContext      { return this.file_context }
+func (this *ZendCompilerGlobals) GetFileContext() *ZendFileContext     { return &this.file_context }
 func (this *ZendCompilerGlobals) SetFileContext(value ZendFileContext) { this.file_context = value }
 func (this *ZendCompilerGlobals) GetArena() *ZendArena                 { return this.arena }
 func (this *ZendCompilerGlobals) SetArena(value *ZendArena)            { this.arena = value }
@@ -384,7 +384,7 @@ func (this *ZendExecutorGlobals) GetErrorReportingIniEntry() *ZendIniEntry {
 func (this *ZendExecutorGlobals) SetErrorReportingIniEntry(value *ZendIniEntry) {
 	this.error_reporting_ini_entry = value
 }
-func (this *ZendExecutorGlobals) GetObjectsStore() ZendObjectsStore      { return this.objects_store }
+func (this *ZendExecutorGlobals) GetObjectsStore() *ZendObjectsStore     { return &this.objects_store }
 func (this *ZendExecutorGlobals) SetObjectsStore(value ZendObjectsStore) { this.objects_store = value }
 func (this *ZendExecutorGlobals) GetException() *ZendObject              { return this.exception }
 func (this *ZendExecutorGlobals) SetException(value *ZendObject)         { this.exception = value }

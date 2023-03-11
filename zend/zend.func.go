@@ -45,29 +45,34 @@ func OnUpdateAssertions(
 	*p = val
 	return SUCCESS
 }
-func ZendVspprintf(pbuf **byte, max_len int, format *byte, ap ...any) int {
-	var buf SmartString = MakeSmartString(0)
-
+func ZendVspprintf(pbuf *string, max_len int, format string, ap ...any) int {
 	/* since there are places where (v)spprintf called without checking for null,
 	   a bit of defensive coding here */
-
 	if pbuf == nil {
 		return 0
 	}
-	ZendPrintfToSmartString(&buf, format, ap)
-	if max_len != 0 && buf.GetLen() > max_len {
-		buf.SetLen(max_len)
-	}
-	buf.ZeroTail()
-	if buf.GetC() != nil {
-		*pbuf = buf.GetC()
-		return buf.GetLen()
-	} else {
-		*pbuf = Estrndup("", 0)
-		return 0
-	}
+	result := __sprintfEx(max_len, format, ap...)
+	*pbuf = result
+	return len(result)
 }
-func ZendSpprintf(message **byte, max_len int, format string, _ ...any) int {
+
+func __sprintfEx(maxLen int, format string, args ...any) string {
+	buf := SmartStr{}
+	ZendPrintfToSmartString(&buf, b.CastStrPtr(format), args...)
+	result := buf.GetStr()
+	if maxLen != 0 && len(result) > maxLen {
+		return result[:maxLen]
+	}
+	return result
+}
+
+func __sprintf(format string, args ...any) string {
+	var buf = SmartStr{}
+	ZendPrintfToSmartString(&buf, b.CastStrPtr(format), args...)
+	return buf.GetStr()
+}
+
+func ZendSpprintf(message *string, max_len int, format string, args ...any) int {
 	var arg va_list
 	var len_ int
 	va_start(arg, format)
@@ -76,7 +81,7 @@ func ZendSpprintf(message **byte, max_len int, format string, _ ...any) int {
 	return len_
 }
 func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
-	var buf SmartStr = MakeSmartStr(0)
+	var buf SmartStr
 	ZendPrintfToSmartStr(&buf, format, ap)
 	if buf.GetS() == nil {
 		return ZSTR_EMPTY_ALLOC()
@@ -876,9 +881,7 @@ func ZendErrorNoreturn(type_ int, format string, _ ...any) {
 
 	/* Should never reach this. */
 }
-func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
-	var va va_list
-	var message *byte = nil
+func ZendThrowError(exception_ce *ZendClassEntry, format string, args ...any) {
 	if exception_ce != nil {
 		if InstanceofFunction(exception_ce, ZendCeError) == 0 {
 			ZendError(E_NOTICE, "Error exceptions must be derived from Error")
@@ -893,8 +896,8 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
 	if EG__().GetException() == any(uintPtr-1) {
 		return
 	}
-	va_start(va, format)
-	ZendVspprintf(&message, 0, format, va)
+
+	message := __sprintf(format, args...)
 
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
@@ -903,43 +906,27 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, _ ...any) {
 	} else {
 		ZendError(E_ERROR, "%s", message)
 	}
-	Efree(message)
-	va_end(va)
 }
-func ZendTypeError(format string, _ ...any) {
-	var va va_list
-	var message *byte = nil
-	va_start(va, format)
-	ZendVspprintf(&message, 0, format, va)
+func ZendTypeError(format string, args ...any) {
+	message := __sprintf(format, args...)
 	ZendThrowException(ZendCeTypeError, message, 0)
 	Efree(message)
-	va_end(va)
 }
-func ZendInternalTypeError(throw_exception ZendBool, format string, _ ...any) {
-	var va va_list
-	var message *byte = nil
-	va_start(va, format)
-	ZendVspprintf(&message, 0, format, va)
+func ZendInternalTypeError(throw_exception ZendBool, format string, args ...any) {
+	message := __sprintf(format, args...)
 	if throw_exception != 0 {
 		ZendThrowException(ZendCeTypeError, message, 0)
 	} else {
 		ZendError(E_WARNING, "%s", message)
 	}
-	Efree(message)
-	va_end(va)
 }
-func ZendInternalArgumentCountError(throw_exception ZendBool, format string, _ ...any) {
-	var va va_list
-	var message *byte = nil
-	va_start(va, format)
-	ZendVspprintf(&message, 0, format, va)
+func ZendInternalArgumentCountError(throw_exception ZendBool, format string, args ...any) {
+	message := __sprintf(format, args...)
 	if throw_exception != 0 {
 		ZendThrowException(ZendCeArgumentCountError, message, 0)
 	} else {
 		ZendError(E_WARNING, "%s", message)
 	}
-	Efree(message)
-	va_end(va)
 }
 func ZendOutputDebugString(trigger_break ZendBool, format string, _ ...any) {}
 func ZendUserExceptionHandler() {

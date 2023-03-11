@@ -103,18 +103,13 @@ func ZendUncleanZvalPtrDtor(zv *Zval) {
 	}
 	IZvalPtrDtor(zv)
 }
-func ZendThrowOrError(fetch_type int, exception_ce *ZendClassEntry, format string, _ ...any) {
-	var va va_list
-	var message *byte = nil
-	va_start(va, format)
-	ZendVspprintf(&message, 0, format, va)
+func ZendThrowOrError(fetch_type int, exception_ce *ZendClassEntry, format string, args ...any) {
+	message := __sprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
 		ZendThrowError(exception_ce, "%s", message)
 	} else {
 		ZendError(E_ERROR, "%s", message)
 	}
-	Efree(message)
-	va_end(va)
 }
 func ShutdownDestructors() {
 	if CG__().GetUncleanShutdown() != 0 {

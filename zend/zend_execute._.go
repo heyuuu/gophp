@@ -74,7 +74,8 @@ type IncdecT func(*Zval) int
 var ZendPassFunction = MakeInternalFunctionSimplify(ZifPass)
 
 const ZEND_VM_STACK_PAGE_SLOTS = 16 * 1024
-const ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
+
+var ZEND_VM_STACK_PAGE_SIZE = ZEND_VM_STACK_PAGE_SLOTS * b.SizeOf("zval")
 
 /* this should modify object only if it's empty */
 
