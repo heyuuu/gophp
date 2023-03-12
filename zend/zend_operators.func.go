@@ -477,6 +477,25 @@ func ZendAtoi(str *byte, str_len int) int {
 	}
 	return retval
 }
+
+func ZendAtolEx(str string) ZendLong {
+	if len(str) == 0 {
+		return 0
+	}
+	retval := ZEND_STRTOL_EX(str, 0)
+	switch str[len(str)-1] {
+	case 'g', 'G':
+		retval *= 1024
+		fallthrough
+	case 'm', 'M':
+		retval *= 1024
+		fallthrough
+	case 'k', 'K':
+		retval *= 1024
+	}
+
+	return int(retval)
+}
 func ZendAtol(str *byte, str_len int) ZendLong {
 	var retval ZendLong
 	if str_len == 0 {
@@ -485,19 +504,13 @@ func ZendAtol(str *byte, str_len int) ZendLong {
 	retval = ZEND_STRTOL(str, nil, 0)
 	if str_len > 0 {
 		switch str[str_len-1] {
-		case 'g':
-			fallthrough
-		case 'G':
+		case 'g', 'G':
 			retval *= 1024
 			fallthrough
-		case 'm':
-			fallthrough
-		case 'M':
+		case 'm', 'M':
 			retval *= 1024
 			fallthrough
-		case 'k':
-			fallthrough
-		case 'K':
+		case 'k', 'K':
 			retval *= 1024
 		}
 	}

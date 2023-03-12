@@ -66,20 +66,19 @@ const SIGNAL_CHECK_DEFAULT = "0"
 
 var IniEntries = []ZendIniEntryDef{
 	*NewZendIniEntryDef("error_reporting", ZEND_INI_ALL).OnModify(OnUpdateErrorReportingEx),
-	*NewZendIniEntryDef("zend.assertions", ZEND_INI_ALL).Value("1").
-		OnModifyArgs(
-			OnUpdateAssertions, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetAssertions()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
-		),
+	*NewZendIniEntryDef("zend.assertions", ZEND_INI_ALL).Value("1").OnModify(OnUpdateAssertionsEx),
 	*NewZendIniEntryDef("zend.signal_check", ZEND_INI_SYSTEM).Value(SIGNAL_CHECK_DEFAULT).
 		Displayer(ZendIniBooleanDisplayerCb).
-		OnModifyArgs(
-			OnUpdateBool, any(zend_long((*byte)(&((*ZendSignalGlobalsT)(nil).GetCheck()))-(*byte)(nil))), any(&ZendSignalGlobals), nil,
-		),
+		OnModify(func(entry *ZendIniEntry, new_value *string, stage int) bool {
+			ZendSignalGlobals.check = ZendIniStringParseBool(*new_value)
+			return true
+		}),
 	*NewZendIniEntryDef("zend.exception_ignore_args", ZEND_INI_ALL).Value("0").
 		Displayer(ZendIniBooleanDisplayerCb).
-		OnModifyArgs(
-			OnUpdateBool, any(zend_long((*byte)(&((*ZendExecutorGlobals)(nil).GetExceptionIgnoreArgs()))-(*byte)(nil))), any(&ExecutorGlobals), nil,
-		),
+		OnModify(func(entry *ZendIniEntry, new_value *string, stage int) bool {
+			EG__().exception_ignore_args = intBool(ZendIniStringParseBool(*new_value))
+			return true
+		}),
 }
 
 const ShortTagsDefault = 1

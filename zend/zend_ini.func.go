@@ -409,23 +409,6 @@ func ZendIniColorDisplayerCb(ini_entry *ZendIniEntry, type_ int) {
 		}
 	}
 }
-func DisplayLinkNumbers(ini_entry *ZendIniEntry, type_ int) {
-	var value *byte
-	if type_ == ZEND_INI_DISPLAY_ORIG && ini_entry.GetModified() != 0 {
-		value = ini_entry.GetOrigValue().GetVal()
-	} else if ini_entry.GetValue() != nil {
-		value = ini_entry.GetValue().GetVal()
-	} else {
-		value = nil
-	}
-	if value != nil {
-		if atoi(value) == -1 {
-			ZEND_PUTS("Unlimited")
-		} else {
-			ZendPrintf("%s", value)
-		}
-	}
-}
 func OnUpdateBool(
 	entry *ZendIniEntry,
 	new_value *ZendString,

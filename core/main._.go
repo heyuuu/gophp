@@ -348,7 +348,7 @@ var IniEntries []zend.ZendIniEntryDef = []zend.ZendIniEntryDef{
 		),
 	*zend.NewZendIniEntryDef("hard_timeout", PHP_INI_SYSTEM).Value("2").
 		OnModifyArgs(
-			zend.OnUpdateLong, any(zend_long((*byte)(&((*zend.ZendExecutorGlobals)(nil).GetHardTimeout()))-(*byte)(nil))), any(&zend.ExecutorGlobals), nil,
+			zend.OnUpdateLong, any(zend_long((*byte)(&((*zend.ZendExecutorGlobals)(nil).GetHardTimeout()))-(*byte)(nil))), zend.EG__(), nil,
 		),
 	*zend.NewZendIniEntryDef("syslog.facility", PHP_INI_SYSTEM).Value("LOG_USER").
 		OnModifyArgs(

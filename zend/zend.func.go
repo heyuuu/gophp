@@ -23,27 +23,22 @@ func OnUpdateErrorReportingEx(entry *ZendIniEntry, newValue *string, stage int) 
 	}
 	return true
 }
-
-func OnUpdateAssertions(
-	entry *ZendIniEntry,
-	new_value *ZendString,
-	mh_arg1 any,
-	mh_arg2 any,
-	mh_arg3 any,
-	stage int,
-) int {
-	var p *ZendLong
-	var val ZendLong
-	var base *byte = (*byte)(mh_arg2)
-	p = (*ZendLong)(base + int(mh_arg1))
-	val = ZendAtol(new_value.GetVal(), new_value.GetLen())
-	if stage != ZEND_INI_STAGE_STARTUP && stage != ZEND_INI_STAGE_SHUTDOWN && (*p) != val && ((*p) < 0 || val < 0) {
-		ZendError(E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
-		return FAILURE
+func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) bool {
+	if new_value == nil {
+		// todo
+		return true
 	}
-	*p = val
-	return SUCCESS
+
+	assertions := EG__().assertions
+	val := ZendAtolEx(*new_value)
+	if stage != ZEND_INI_STAGE_STARTUP && stage != ZEND_INI_STAGE_SHUTDOWN && assertions != val && (assertions < 0 || val < 0) {
+		ZendError(E_WARNING, "zend.assertions may be completely enabled or disabled only in php.ini")
+		return false
+	}
+	EG__().assertions = val
+	return true
 }
+
 func ZendVspprintf(pbuf *string, max_len int, format string, ap ...any) int {
 	/* since there are places where (v)spprintf called without checking for null,
 	   a bit of defensive coding here */
