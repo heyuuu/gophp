@@ -52,7 +52,7 @@ func ZendVspprintf(pbuf *string, max_len int, format string, ap ...any) int {
 
 func __sprintfEx(maxLen int, format string, args ...any) string {
 	buf := SmartStr{}
-	ZendPrintfToSmartStr(&buf, b.CastStrPtr(format), args...)
+	ZendPrintfToSmartStr(&buf, format, args...)
 	result := buf.GetStr()
 	if maxLen != 0 && len(result) > maxLen {
 		return result[:maxLen]
@@ -62,16 +62,12 @@ func __sprintfEx(maxLen int, format string, args ...any) string {
 
 func __sprintf(format string, args ...any) string {
 	var buf = SmartStr{}
-	ZendPrintfToSmartStr(&buf, b.CastStrPtr(format), args...)
+	ZendPrintfToSmartStr(&buf, format, args...)
 	return buf.GetStr()
 }
 
 func ZendSpprintf(message *string, max_len int, format string, args ...any) int {
-	var arg va_list
-	var len_ int
-	va_start(arg, format)
-	len_ = ZendVspprintf(message, max_len, format, arg)
-	va_end(arg)
+	len_ := ZendVspprintf(message, max_len, format, args...)
 	return len_
 }
 func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
