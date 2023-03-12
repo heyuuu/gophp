@@ -104,7 +104,7 @@ func ZendUncleanZvalPtrDtor(zv *Zval) {
 	IZvalPtrDtor(zv)
 }
 func ZendThrowOrError(fetch_type int, exception_ce *ZendClassEntry, format string, args ...any) {
-	message := __sprintf(format, args)
+	message := ZendSprintf(format, args)
 	if (fetch_type & ZEND_FETCH_CLASS_EXCEPTION) != 0 {
 		ZendThrowError(exception_ce, "%s", message)
 	} else {

@@ -788,7 +788,7 @@ func _convertToCstring(op *Zval) {
 	if op.IsDouble() {
 		var str *ZendString
 		var dval float64 = op.GetDval()
-		str = ZendStrpprintfUnchecked(0, "%.*H", int(EG__().GetPrecision()), dval)
+		str = NewZendString(ZendSprintf("%.*H", int(EG__().GetPrecision()), dval))
 		op.SetString(str)
 	} else {
 		_convertToString(op)

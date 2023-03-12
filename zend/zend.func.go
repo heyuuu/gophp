@@ -39,64 +39,42 @@ func OnUpdateAssertionsEx(entry *ZendIniEntry, new_value *string, stage int) boo
 	return true
 }
 
-func ZendVspprintf(pbuf *string, max_len int, format string, ap ...any) int {
-	/* since there are places where (v)spprintf called without checking for null,
-	   a bit of defensive coding here */
-	if pbuf == nil {
-		return 0
-	}
-	result := __sprintfEx(max_len, format, ap...)
-	*pbuf = result
-	return len(result)
-}
-
-func __sprintfEx(maxLen int, format string, args ...any) string {
-	buf := SmartStr{}
-	ZendPrintfToSmartStr(&buf, format, args...)
-	result := buf.GetStr()
+// 替代各种 sprintf 方法(限制长度)
+func ZendSprintfEx(maxLen int, format string, args ...any) string {
+	result := ZendSprintf(format, args...)
 	if maxLen != 0 && len(result) > maxLen {
 		return result[:maxLen]
 	}
 	return result
 }
 
-func __sprintf(format string, args ...any) string {
+// 替代各种 sprintf 方法
+func ZendSprintf(format string, args ...any) string {
 	var buf = SmartStr{}
 	ZendPrintfToSmartStr(&buf, format, args...)
 	return buf.GetStr()
 }
 
+func ZendVspprintf(pbuf *string, max_len int, format string, args ...any) int {
+	/* since there are places where (v)spprintf called without checking for null,
+	   a bit of defensive coding here */
+	if pbuf == nil {
+		return 0
+	}
+	result := ZendSprintfEx(max_len, format, args...)
+	*pbuf = result
+	return len(result)
+}
+
 func ZendSpprintf(message *string, max_len int, format string, args ...any) int {
-	len_ := ZendVspprintf(message, max_len, format, args...)
-	return len_
+	result := ZendSprintfEx(max_len, format, args...)
+	*message = result
+	return len(result)
 }
-func ZendVstrpprintf(max_len int, format *byte, ap ...any) *ZendString {
-	var buf SmartStr
-	ZendPrintfToSmartStr(&buf, format, ap)
-	if buf.GetS() == nil {
-		return ZSTR_EMPTY_ALLOC()
-	}
-	if max_len != 0 && buf.GetS().GetLen() > max_len {
-		buf.GetS().GetLen() = max_len
-	}
-	buf.ZeroTail()
-	return buf.GetS()
-}
-func ZendStrpprintf(max_len int, format string, _ ...any) *ZendString {
-	var arg va_list
-	var str *ZendString
-	va_start(arg, format)
-	str = ZendVstrpprintf(max_len, format, arg)
-	va_end(arg)
-	return str
-}
-func ZendStrpprintfUnchecked(max_len int, format string, _ ...any) *ZendString {
-	var arg va_list
-	var str *ZendString
-	va_start(arg, format)
-	str = ZendVstrpprintf(max_len, format, arg)
-	va_end(arg)
-	return str
+
+func ZendStrpprintf(max_len int, format string, args ...any) *ZendString {
+	result := ZendSprintfEx(max_len, format, args...)
+	return NewZendString(result)
 }
 func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	var tmp *Zval
@@ -672,7 +650,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			/* Handle the error in user space */
 
 			VaCopy(usr_copy, args)
-			params[1].SetString(ZendVstrpprintf(0, format, usr_copy))
+			params[1].SetString(ZendStrpprintf(0, format, usr_copy))
 			va_end(usr_copy)
 			params[0].SetLong(type_)
 			if error_filename != nil {
@@ -877,7 +855,7 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, args ...any) {
 		return
 	}
 
-	message := __sprintf(format, args...)
+	message := ZendSprintf(format, args...)
 
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
@@ -888,12 +866,12 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, args ...any) {
 	}
 }
 func ZendTypeError(format string, args ...any) {
-	message := __sprintf(format, args...)
+	message := ZendSprintf(format, args...)
 	ZendThrowException(ZendCeTypeError, message, 0)
 	Efree(message)
 }
 func ZendInternalTypeError(throw_exception ZendBool, format string, args ...any) {
-	message := __sprintf(format, args...)
+	message := ZendSprintf(format, args...)
 	if throw_exception != 0 {
 		ZendThrowException(ZendCeTypeError, message, 0)
 	} else {
@@ -901,7 +879,7 @@ func ZendInternalTypeError(throw_exception ZendBool, format string, args ...any)
 	}
 }
 func ZendInternalArgumentCountError(throw_exception ZendBool, format string, args ...any) {
-	message := __sprintf(format, args...)
+	message := ZendSprintf(format, args...)
 	if throw_exception != 0 {
 		ZendThrowException(ZendCeArgumentCountError, message, 0)
 	} else {

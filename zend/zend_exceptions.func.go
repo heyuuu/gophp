@@ -687,7 +687,7 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 	return ex.GetObj()
 }
 func ZendThrowExceptionEx(exception_ce *ZendClassEntry, code ZendLong, format string, args ...any) *ZendObject {
-	message := __sprintf(format, args)
+	message := ZendSprintf(format, args)
 	obj := ZendThrowException(exception_ce, message, code)
 	return obj
 }
