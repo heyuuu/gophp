@@ -1092,8 +1092,14 @@ func PhpStreamOpenForZendEx(filename *byte, handle *zend.ZendFileHandle, mode in
 	}
 	return zend.FAILURE
 }
-func PhpResolvePathForZend(filename string) *zend.ZendString {
-	return PhpResolvePath(b.CastStrPtr(filename), len(filename), PG(include_path))
+func PhpResolvePathForZend(filename string) *string {
+	var result string
+	zstr := PhpResolvePath(b.CastStrPtr(filename), len(filename), PG(include_path))
+	if zstr == nil {
+		return nil
+	}
+	result = zstr.GetStr()
+	return &result
 }
 func PhpFreeRequestGlobals() {
 	if PG(last_error_message) {

@@ -22,8 +22,8 @@ var ZendOnTimeout func(seconds int)
 var ZendStreamOpenFunction func(filename string, handle *ZendFileHandle) int
 var ZendStreamOpenFunctionEx func(filename string, handle *ZendFileHandle) bool
 var ZendPrintfToSmartStr func(buf *SmartStr, format string, ap ...any)
-var ZendGetenv func(name *byte, name_len int) *byte
-var ZendResolvePath func(filename *byte, filename_len int) *ZendString
+var ZendGetenv func(name string) *string
+var ZendResolvePath func(filename string) *string
 
 var ZendUv ZendUtilityValues
 

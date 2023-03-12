@@ -1804,7 +1804,7 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 	var wrapper *core.PhpStreamWrapper = nil
 	var path_to_open *byte
 	var persistent int = options & core.STREAM_OPEN_PERSISTENT
-	var resolved_path *zend.ZendString = nil
+	var resolved_path *string = nil
 	var copy_of_path *byte = nil
 	if opened_path != nil {
 		*opened_path = nil
@@ -1814,9 +1814,9 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 		return nil
 	}
 	if (options & core.USE_PATH) != 0 {
-		resolved_path = zend.ZendResolvePath(path, strlen(path))
+		resolved_path = zend.ZendResolvePath(path)
 		if resolved_path != nil {
-			path = resolved_path.GetVal()
+			path = resolved_path
 
 			/* we've found this file, don't re-check include_path or run realpath */
 
@@ -1831,9 +1831,6 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 	wrapper = PhpStreamLocateUrlWrapper(path, &path_to_open, options)
 	if (options&core.STREAM_USE_URL) != 0 && (wrapper == nil || wrapper.GetIsUrl() == 0) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "This function may only be used against URLs")
-		if resolved_path != nil {
-			zend.ZendStringReleaseEx(resolved_path, 0)
-		}
 		return nil
 	}
 	if wrapper != nil {
@@ -1870,18 +1867,12 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 		var newstream *core.PhpStream
 		switch core.PhpStreamMakeSeekableRel(stream, &newstream, b.Cond((options&core.STREAM_WILL_CAST) != 0, core.PHP_STREAM_PREFER_STDIO, core.PHP_STREAM_NO_PREFERENCE)) {
 		case core.PHP_STREAM_UNCHANGED:
-			if resolved_path != nil {
-				zend.ZendStringReleaseEx(resolved_path, 0)
-			}
 			return stream
 		case core.PHP_STREAM_RELEASED:
 			if newstream.GetOrigPath() != nil {
 				zend.Pefree(newstream.GetOrigPath(), persistent)
 			}
 			newstream.SetOrigPath(zend.Pestrdup(path, persistent))
-			if resolved_path != nil {
-				zend.ZendStringReleaseEx(resolved_path, 0)
-			}
 			return newstream
 		default:
 			core.PhpStreamClose(stream)
@@ -1915,9 +1906,6 @@ func _phpStreamOpenWrapperEx(path *byte, mode *byte, options int, opened_path **
 		}
 	}
 	PhpStreamTidyWrapperErrorLog(wrapper)
-	if resolved_path != nil {
-		zend.ZendStringReleaseEx(resolved_path, 0)
-	}
 	return stream
 }
 func PhpStreamContextSet(stream *core.PhpStream, context *core.PhpStreamContext) *core.PhpStreamContext {

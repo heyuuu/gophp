@@ -75,7 +75,7 @@ type ZendUtilityFunctions struct {
 	StreamOpenFunction        func(filename string, handle *ZendFileHandle) int
 	PrintfToSmartStrFunction  func(buf *SmartStr, format string, ap ...any)
 	GetenvFunction            func(name string) *string
-	ResolvePathFunction       func(filename string) *ZendString
+	ResolvePathFunction       func(filename string) *string
 }
 
 /**

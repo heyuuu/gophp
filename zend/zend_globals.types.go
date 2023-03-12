@@ -277,7 +277,7 @@ func (this *ZendExecutorGlobals) SetSymtableCachePtr(value **ZendArray) {
 }
 func (this *ZendExecutorGlobals) GetSymbolTable() *ZendArray        { return &this.symbol_table }
 func (this *ZendExecutorGlobals) SetSymbolTable(value ZendArray)    { this.symbol_table = value }
-func (this *ZendExecutorGlobals) GetIncludedFiles() HashTable       { return this.included_files }
+func (this *ZendExecutorGlobals) GetIncludedFiles() *HashTable      { return &this.included_files }
 func (this *ZendExecutorGlobals) SetIncludedFiles(value HashTable)  { this.included_files = value }
 func (this *ZendExecutorGlobals) GetBailout() *JMP_BUF              { return this.bailout }
 func (this *ZendExecutorGlobals) SetBailout(value *JMP_BUF)         { this.bailout = value }

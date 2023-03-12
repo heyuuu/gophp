@@ -295,7 +295,7 @@ func PhpFopenAndSetOpenedPath(path *byte, mode string, opened_path **zend.ZendSt
 func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 	var path_info *byte
 	var filename *byte = nil
-	var resolved_path *zend.ZendString = nil
+	var resolved_path *string = nil
 	var length int
 	var orig_display_errors zend.ZendBool
 	path_info = SG__().request_info.request_uri
@@ -332,7 +332,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		filename = SG__().request_info.path_translated
 	}
 	if filename != nil {
-		resolved_path = zend.ZendResolvePath(filename, strlen(filename))
+		resolved_path = zend.ZendResolvePath(filename)
 	}
 	if resolved_path == nil {
 		if SG__().request_info.path_translated != filename {
@@ -352,7 +352,6 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 		}
 		return zend.FAILURE
 	}
-	zend.ZendStringReleaseEx(resolved_path, 0)
 	orig_display_errors = PG(display_errors)
 	PG(display_errors) = 0
 	if zend.ZendStreamOpen(filename, file_handle) == zend.FAILURE {

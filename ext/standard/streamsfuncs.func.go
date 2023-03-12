@@ -3322,7 +3322,7 @@ func ZifStreamSocketEnableCrypto(executeData *zend.ZendExecuteData, return_value
 func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var filename *byte
 	var filename_len int
-	var resolved_path *zend.ZendString
+	var resolved_path *string
 	for {
 		var _flags int = 0
 		var _min_num_args int = 1
@@ -3390,9 +3390,9 @@ func ZifStreamResolveIncludePath(executeData *zend.ZendExecuteData, return_value
 		}
 		break
 	}
-	resolved_path = zend.ZendResolvePath(filename, filename_len)
+	resolved_path = zend.ZendResolvePath(b.CastStr(filename, filename_len))
 	if resolved_path != nil {
-		return_value.SetString(resolved_path)
+		return_value.SetStringVal(*resolved_path)
 		return
 	}
 	return_value.SetFalse()

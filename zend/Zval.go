@@ -233,6 +233,11 @@ func (this *Zval) SetString(s *ZendString) {
 	this.SetStr(s)
 	this.SetTypeInfo(IS_STRING_EX)
 }
+func (this *Zval) SetStringVal(str string) {
+	s := NewZendString(str)
+	this.SetStr(s)
+	this.SetTypeInfo(IS_STRING_EX)
+}
 func (this *Zval) SetInternedString(s *ZendString) {
 	this.SetStr(s)
 	this.SetTypeInfo(IS_INTERNED_STRING_EX)

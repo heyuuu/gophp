@@ -23,10 +23,10 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		fallthrough
 	case ZEND_REQUIRE_ONCE:
 		var file_handle ZendFileHandle
-		var resolved_path *ZendString
-		resolved_path = ZendResolvePath(Z_STRVAL_P(inc_filename), Z_STRLEN_P(inc_filename))
+		var resolved_path *string
+		resolved_path = ZendResolvePath(inc_filename.GetStr().GetStr())
 		if resolved_path != nil {
-			if ZendHashExists(EG__().GetIncludedFiles(), resolved_path) != 0 {
+			if EG__().GetIncludedFiles().KeyExists(*resolved_path) {
 				goto already_compiled
 			}
 		} else if EG__().GetException() != nil {
@@ -35,16 +35,15 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
 			break
 		} else {
-			resolved_path = inc_filename.GetStr().Copy()
+			*resolved_path = inc_filename.GetStr().GetStr()
 		}
-		if SUCCESS == ZendStreamOpen(resolved_path.GetVal(), &file_handle) {
+		if SUCCESS == ZendStreamOpen(*resolved_path, &file_handle) {
 			if file_handle.GetOpenedPath() == nil {
 				file_handle.SetOpenedPath(resolved_path.Copy())
 			}
 			if ZendHashAddEmptyElement(EG__().GetIncludedFiles(), file_handle.GetOpenedPath()) != nil {
 				var op_array *ZendOpArray = ZendCompileFile(&file_handle, b.Cond(type_ == ZEND_INCLUDE_ONCE, ZEND_INCLUDE, ZEND_REQUIRE))
 				ZendDestroyFileHandle(&file_handle)
-				ZendStringReleaseEx(resolved_path, 0)
 				if tmp_inc_filename.GetType() != IS_UNDEF {
 					ZvalPtrDtorStr(&tmp_inc_filename)
 				}
@@ -57,7 +56,6 @@ func ZendIncludeOrEval(inc_filename *Zval, type_ int) *ZendOpArray {
 		} else {
 			ZendMessageDispatcher(b.Cond(type_ == ZEND_INCLUDE_ONCE, ZMSG_FAILED_INCLUDE_FOPEN, ZMSG_FAILED_REQUIRE_FOPEN), Z_STRVAL_P(inc_filename))
 		}
-		ZendStringReleaseEx(resolved_path, 0)
 	case ZEND_INCLUDE:
 		fallthrough
 	case ZEND_REQUIRE:
