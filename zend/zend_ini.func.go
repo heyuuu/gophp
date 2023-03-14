@@ -9,28 +9,14 @@ import (
 func INI_INT(name string) ZendLong {
 	return ZendIniLong(name, b.SizeOf("name")-1, 0)
 }
-func INI_FLT(name *byte) float64 {
-	return ZendIniDouble(name, b.SizeOf("name")-1, 0)
-}
 func INI_STR(name string) *byte {
 	return ZendIniStringEx(name, b.SizeOf("name")-1, 0, nil)
 }
-func INI_BOOL(name *byte) ZendBool { return ZendBool(INI_INT(name)) }
-func INI_ORIG_INT(name *byte) ZendLong {
-	return ZendIniLong(name, b.SizeOf("name")-1, 1)
-}
-func INI_ORIG_FLT(name *byte) float64 {
-	return ZendIniDouble(name, b.SizeOf("name")-1, 1)
-}
-func INI_ORIG_STR(name *byte) *byte {
-	return ZendIniString(name, b.SizeOf("name")-1, 1)
-}
-func INI_ORIG_BOOL(name *byte) ZendBool { return ZendBool(INI_ORIG_INT(name)) }
-func REGISTER_INI_ENTRIES() int {
+func REGISTER_INI_ENTRIES(module_number int) int {
 	return ZendRegisterIniEntries(IniEntries, module_number)
 }
-func UNREGISTER_INI_ENTRIES() { ZendUnregisterIniEntries(module_number) }
-func DISPLAY_INI_ENTRIES()    { DisplayIniEntries(zend_module) }
+func UNREGISTER_INI_ENTRIES(module_number int)         { ZendUnregisterIniEntries(module_number) }
+func DISPLAY_INI_ENTRIES(zend_module *ZendModuleEntry) { DisplayIniEntries(zend_module) }
 func REGISTER_INI_DISPLAYER(name *byte, displayer func(ini_entry *ZendIniEntry, type_ int)) int {
 	return ZendIniRegisterDisplayer(name, b.SizeOf("name")-1, displayer)
 }

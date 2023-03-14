@@ -33,7 +33,7 @@ func FileGlobalsDtor(file_globals_p *PhpFileGlobals) {}
 func ZmStartupFile(type_ int, module_number int) int {
 	LeStreamContext = zend.ZendRegisterListDestructorsEx(FileContextDtor, nil, "stream-context", module_number)
 	FileGlobalsCtor(&FileGlobals)
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 	zend.REGISTER_LONG_CONSTANT("SEEK_SET", r.SEEK_SET, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("SEEK_CUR", r.SEEK_CUR, zend.CONST_CS|zend.CONST_PERSISTENT)
 	zend.REGISTER_LONG_CONSTANT("SEEK_END", r.SEEK_END, zend.CONST_CS|zend.CONST_PERSISTENT)

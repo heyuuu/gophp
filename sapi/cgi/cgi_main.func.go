@@ -901,12 +901,12 @@ func PhpCgiGlobalsCtor(php_cgi_globals *php_cgi_globals_struct) {
 	zend.ZendHashInit(php_cgi_globals.GetUserConfigCache(), 8, nil, UserConfigCacheEntryDtor, 1)
 }
 func ZmStartupCgi(type_ int, module_number int) int {
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmShutdownCgi(type_ int, module_number int) int {
 	CGIG(user_config_cache).Destroy()
-	zend.UNREGISTER_INI_ENTRIES()
+	zend.UNREGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmInfoCgi(zend_module *zend.ZendModuleEntry) { zend.DISPLAY_INI_ENTRIES() }

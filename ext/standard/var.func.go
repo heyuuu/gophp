@@ -1681,6 +1681,6 @@ func ZifMemoryGetPeakUsage(executeData *zend.ZendExecuteData, return_value *zend
 	return
 }
 func ZmStartupVar(type_ int, module_number int) int {
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }

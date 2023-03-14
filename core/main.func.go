@@ -1495,7 +1495,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 
 	/* Register PHP core ini entries */
 
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 
 	/* Register Zend ini entries */
 
@@ -1648,7 +1648,7 @@ func PhpModuleShutdown() {
 	/* Destroys filter & transport registries too */
 
 	PhpShutdownStreamWrappers(module_number)
-	zend.UNREGISTER_INI_ENTRIES()
+	zend.UNREGISTER_INI_ENTRIES(module_number)
 
 	/* close down the ini config */
 

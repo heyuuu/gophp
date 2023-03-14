@@ -142,11 +142,11 @@ func ZifApacheResponseHeaders(executeData *zend.ZendExecuteData, return_value *z
 	zend.ZendLlistApplyWithArgument(core.SG__().sapi_headers.headers, zend.LlistApplyWithArgFuncT(AddResponseHeader), return_value)
 }
 func ZmStartupCliServer(type_ int, module_number int) int {
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmShutdownCliServer(type_ int, module_number int) int {
-	zend.UNREGISTER_INI_ENTRIES()
+	zend.UNREGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmInfoCliServer(ZEND_MODULE_INFO_FUNC_ARGS) { zend.DISPLAY_INI_ENTRIES() }

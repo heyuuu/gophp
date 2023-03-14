@@ -1161,11 +1161,11 @@ func PhpUrlScannerResetVar(name *zend.ZendString, encode int) int {
 	return PhpUrlScannerResetVarImpl(name, encode, 0)
 }
 func ZmStartupUrlScanner(type_ int, module_number int) int {
-	zend.REGISTER_INI_ENTRIES()
+	zend.REGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmShutdownUrlScanner(type_ int, module_number int) int {
-	zend.UNREGISTER_INI_ENTRIES()
+	zend.UNREGISTER_INI_ENTRIES(module_number)
 	return zend.SUCCESS
 }
 func ZmActivateUrlScanner(type_ int, module_number int) int {

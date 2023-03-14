@@ -386,8 +386,7 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	return SUCCESS
 }
 func ZendRegisterStandardIniEntries() {
-	var module_number int = 0
-	REGISTER_INI_ENTRIES()
+	REGISTER_INI_ENTRIES(0)
 }
 func ZendResolvePropertyTypes() {
 	var ce *ZendClassEntry
