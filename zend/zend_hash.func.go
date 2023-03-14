@@ -266,22 +266,10 @@ func ZendHashNextIndexInsertMem(ht *HashTable, pData any, size int) any {
 	return nil
 }
 func ZendHashFindPtr(ht *HashTable, key *ZendString) any {
-	var zv *Zval
-	zv = ht.KeyFind(key.GetStr())
-	if zv != nil {
-		return zv.GetPtr()
-	} else {
-		return nil
-	}
+	return ht.KeyFindPtr(key.GetStr())
 }
 func ZendHashFindExPtr(ht *HashTable, key *ZendString, known_hash ZendBool) any {
-	var zv *Zval
-	zv = ht.KeyFind(key.GetStr())
-	if zv != nil {
-		return zv.GetPtr()
-	} else {
-		return nil
-	}
+	return ht.KeyFindPtr(key.GetStr())
 }
 func ZendHashStrFindPtr(ht *HashTable, str *byte, len_ int) any {
 	var zv *Zval

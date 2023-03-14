@@ -76,29 +76,21 @@ func ZendStrpprintf(max_len int, format string, args ...any) *ZendString {
 	result := ZendSprintfEx(max_len, format, args...)
 	return NewZendString(result)
 }
+
 func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 	var tmp *Zval
 	var string_key *ZendString
 	var num_key ZendUlong
-	var i int
-	for i = 0; i < indent; i++ {
+	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
 	}
 	buf.AppendString("(\n")
 	indent += PRINT_ZVAL_INDENT
-	var __ht *HashTable = ht
-	for _, _p := range __ht.foreachData() {
-		var _z *Zval = _p.GetVal()
-		if _z.IsIndirect() {
-			_z = _z.GetZv()
-			if _z.IsUndef() {
-				continue
-			}
-		}
-		num_key = _p.GetH()
-		string_key = _p.GetKey()
-		tmp = _z
-		for i = 0; i < indent; i++ {
+	ht.eachValidBucketIndirect(func(_ uint32, p *Bucket, z *Zval) {
+		num_key = p.GetH()
+		string_key = p.GetKey()
+		tmp = z
+		for i := 0; i < indent; i++ {
 			buf.AppendByte(' ')
 		}
 		buf.AppendByte('[')
@@ -127,9 +119,9 @@ func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
 		buf.AppendString("] => ")
 		ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
 		buf.AppendString("\n")
-	}
+	})
 	indent -= PRINT_ZVAL_INDENT
-	for i = 0; i < indent; i++ {
+	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
 	}
 	buf.AppendString(")\n")

@@ -391,13 +391,13 @@ func ProcessNestedData(
 					existing_propinfo = zend.ZendHashFindPtr(obj.GetCe().GetPropertiesInfo(), unmangled)
 					if (unmangled_class == nil || !(strcmp(unmangled_class, "*")) || !(strcasecmp(unmangled_class, obj.GetCe().GetName().GetVal()))) && existing_propinfo != nil && existing_propinfo.HasFlags(zend.ZEND_ACC_PPP_MASK) {
 						if existing_propinfo.HasFlags(zend.ZEND_ACC_PROTECTED) {
-							new_key = zend.ZendManglePropertyName("*", 1, unmangled.GetVal(), unmangled.GetLen(), 0)
+							new_key = zend.ZendManglePropertyName_ZStr("*", unmangled.GetStr(), false)
 							zend.ZendStringReleaseEx(unmangled, 0)
 						} else if existing_propinfo.HasFlags(zend.ZEND_ACC_PRIVATE) {
 							if unmangled_class != nil && strcmp(unmangled_class, "*") != 0 {
-								new_key = zend.ZendManglePropertyName(unmangled_class, strlen(unmangled_class), unmangled.GetVal(), unmangled.GetLen(), 0)
+								new_key = zend.ZendManglePropertyName_ZStr(unmangled_class, unmangled.GetStr(), false)
 							} else {
-								new_key = zend.ZendManglePropertyName(existing_propinfo.GetCe().GetName().GetVal(), existing_propinfo.GetCe().GetName().GetLen(), unmangled.GetVal(), unmangled.GetLen(), 0)
+								new_key = zend.ZendManglePropertyName_ZStr(existing_propinfo.GetCe().GetName().GetStr(), unmangled.GetStr(), false)
 							}
 							zend.ZendStringReleaseEx(unmangled, 0)
 						} else {

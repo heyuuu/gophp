@@ -146,21 +146,16 @@ func ZendRegisterStringConstant(name *byte, name_len int, strval *byte, flags in
 }
 func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 	var c *ZendConstant
-	var haltoff []byte = "__COMPILER_HALT_OFFSET__"
+	var haltoff = "__COMPILER_HALT_OFFSET__"
 	if EG__().GetCurrentExecuteData() == nil {
 		return nil
 	} else if name_len == b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1 && !(memcmp(name, "__COMPILER_HALT_OFFSET__", b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1)) {
-		var cfilename *byte
-		var haltname *ZendString
-		var clen int
-		cfilename = ZendGetExecutedFilename()
-		clen = strlen(cfilename)
+		cfilename := ZendGetExecutedFilename()
 
 		/* check for __COMPILER_HALT_OFFSET__ */
 
-		haltname = ZendManglePropertyName(haltoff, b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1, cfilename, clen, 0)
+		haltname := ZendManglePropertyName_Ex(haltoff, cfilename)
 		c = ZendHashFindPtr(EG__().GetZendConstants(), haltname)
-		ZendStringEfree(haltname)
 		return c
 	} else {
 		return nil

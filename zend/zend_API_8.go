@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ZendIsCallableImpl(callable *Zval, object *ZendObject, check_flags uint32, fcc *ZendFcallInfoCache, error **byte) ZendBool {
@@ -428,10 +427,10 @@ func ZendDeclareTypedProperty(
 	if (access_type & ZEND_ACC_PUBLIC) != 0 {
 		property_info.SetName(name.Copy())
 	} else if (access_type & ZEND_ACC_PRIVATE) != 0 {
-		property_info.SetName(ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
+		property_info.SetName(ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr(), IsPersistentClass(ce) != 0))
 	} else {
 		ZEND_ASSERT((access_type & ZEND_ACC_PROTECTED) != 0)
-		property_info.SetName(ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), IsPersistentClass(ce)))
+		property_info.SetName(ZendManglePropertyName_ZStr("*", name.GetStr(), IsPersistentClass(ce) != 0))
 	}
 	property_info.SetName(ZendNewInternedString(property_info.GetName()))
 	property_info.SetFlags(access_type)

@@ -323,7 +323,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 	}
 	debug_info = zend.ZendNewArray(1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
-	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags", b.SizeOf("\"flags\"")-1)
+	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyAdd(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
@@ -337,7 +337,7 @@ func SplDllistObjectGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		i++
 		current = next
 	}
-	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist", b.SizeOf("\"dllist\"")-1)
+	pnstr = SplGenPrivatePropName(spl_ce_SplDoublyLinkedList, "dllist")
 	debug_info.KeyAdd(pnstr.GetStr(), &dllist_array)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	return debug_info

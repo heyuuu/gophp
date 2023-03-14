@@ -267,6 +267,17 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 		CG__().SetInCompilation(orig_in_compilation)
 	}
 }
+
+func ZendManglePropertyName_Ex(src1 string, src2 string) string {
+	propName := "\000" + src1 + src2
+	return propName
+}
+
+func ZendManglePropertyName_ZStr(src1 string, src2 string, internal bool) *ZendString {
+	str := ZendManglePropertyName_Ex(src1, src2)
+	return NewZendStringPersistent(str, internal)
+}
+
 func ZendManglePropertyName(src1 *byte, src1_length int, src2 string, src2_length int, internal int) *ZendString {
 	var prop_name_length int = 1 + src1_length + 1 + src2_length
 	var prop_name *ZendString = ZendStringAlloc(prop_name_length, internal)
@@ -277,11 +288,13 @@ func ZendManglePropertyName(src1 *byte, src1_length int, src2 string, src2_lengt
 }
 func ZendStrnlen(s *byte, maxlen int) int {
 	var len_ int = 0
+
 	for b.PostInc(&(*s)) && b.PostDec(&maxlen) {
 		len_++
 	}
 	return len_
 }
+
 func ZendUnmanglePropertyNameEx(name *ZendString, class_name **byte, prop_name **byte, prop_len *int) int {
 	var class_name_len int
 	var anonclass_src_len int

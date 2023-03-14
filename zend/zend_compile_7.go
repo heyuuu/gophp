@@ -242,12 +242,12 @@ func ZendCompileHaltCompiler(ast *ZendAst) {
 	var offset ZendLong = ZendAstGetZval(offset_ast).GetLval()
 	var filename *ZendString
 	var name *ZendString
-	var const_name []byte = "__COMPILER_HALT_OFFSET__"
+	var const_name = "__COMPILER_HALT_OFFSET__"
 	if FC__().GetHasBracketedNamespaces() != 0 && FC__().GetInNamespace() != 0 {
 		ZendErrorNoreturn(E_COMPILE_ERROR, "__HALT_COMPILER() can only be used from the outermost scope")
 	}
 	filename = ZendGetCompiledFilename()
-	name = ZendManglePropertyName(const_name, b.SizeOf("const_name")-1, filename.GetVal(), filename.GetLen(), 0)
+	name = ZendManglePropertyName_ZStr(const_name, filename.GetStr(), false)
 	ZendRegisterLongConstant(name.GetVal(), name.GetLen(), offset, CONST_CS, 0)
 	ZendStringReleaseEx(name, 0)
 }

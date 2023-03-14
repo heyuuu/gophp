@@ -185,7 +185,7 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 		storage.GetArr().KeyUpdate(md5str.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(md5str, 0)
 	}
-	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage", b.SizeOf("\"storage\"")-1)
+	zname = SplGenPrivatePropName(spl_ce_SplObjectStorage, "storage")
 	debug_info.SymtableUpdate(zname.GetStr(), &storage)
 	zend.ZendStringReleaseEx(zname, 0)
 	return debug_info

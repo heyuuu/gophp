@@ -358,11 +358,11 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 	}
 	debug_info = zend.ZendNewArray(intern.GetStd().GetProperties().GetNNumOfElements() + 1)
 	zend.ZendHashCopy(debug_info, intern.GetStd().GetProperties(), zend.CopyCtorFuncT(zend.ZvalAddRef))
-	pnstr = SplGenPrivatePropName(ce, "flags", b.SizeOf("\"flags\"")-1)
+	pnstr = SplGenPrivatePropName(ce, "flags")
 	tmp.SetLong(intern.GetFlags())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
-	pnstr = SplGenPrivatePropName(ce, "isCorrupted", b.SizeOf("\"isCorrupted\"")-1)
+	pnstr = SplGenPrivatePropName(ce, "isCorrupted")
 	zend.ZVAL_BOOL(&tmp, intern.GetHeap().IsHeapCorrupted())
 	debug_info.KeyUpdate(pnstr.GetStr(), &tmp)
 	zend.ZendStringReleaseEx(pnstr, 0)
@@ -379,7 +379,7 @@ func SplHeapObjectGetDebugInfo(ce *zend.ZendClassEntry, obj *zend.Zval) *zend.Ha
 			elem.TryAddRefcount()
 		}
 	}
-	pnstr = SplGenPrivatePropName(ce, "heap", b.SizeOf("\"heap\"")-1)
+	pnstr = SplGenPrivatePropName(ce, "heap")
 	debug_info.KeyUpdate(pnstr.GetStr(), &heap_array)
 	zend.ZendStringReleaseEx(pnstr, 0)
 	return debug_info

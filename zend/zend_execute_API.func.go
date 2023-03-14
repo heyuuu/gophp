@@ -424,13 +424,13 @@ func GetActiveFunctionName() *byte {
 		return nil
 	}
 }
-func ZendGetExecutedFilename() *byte {
+func ZendGetExecutedFilename() string {
 	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
 	if ex != nil {
-		return ex.GetFunc().GetOpArray().GetFilename().GetVal()
+		return ex.GetFunc().GetOpArray().GetFilename().GetStr()
 	} else {
 		return "[no active file]"
 	}

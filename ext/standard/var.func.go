@@ -933,7 +933,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			retval = zend.FAILURE
 			break
 		}
-		priv_name = zend.ZendManglePropertyName(ce.GetName().GetVal(), ce.GetName().GetLen(), name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
+		priv_name = zend.ZendManglePropertyName_ZStr(ce.GetName().GetStr(), name.GetStr(), ce.GetType()&zend.ZEND_INTERNAL_CLASS != 0)
 		if PhpVarSerializeTryAddSleepProp(ht, props, priv_name, name, struc) == zend.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
 			zend.ZendStringRelease(priv_name)
@@ -945,7 +945,7 @@ func PhpVarSerializeGetSleepProps(ht *zend.HashTable, struc *zend.Zval, sleep_re
 			retval = zend.FAILURE
 			break
 		}
-		prot_name = zend.ZendManglePropertyName("*", 1, name.GetVal(), name.GetLen(), ce.GetType()&zend.ZEND_INTERNAL_CLASS)
+		prot_name = zend.ZendManglePropertyName_ZStr("*", name.GetStr(), ce.GetType()&zend.ZEND_INTERNAL_CLASS != 0)
 		if PhpVarSerializeTryAddSleepProp(ht, props, prot_name, name, struc) == zend.SUCCESS {
 			zend.ZendTmpStringRelease(tmp_name)
 			zend.ZendStringRelease(prot_name)

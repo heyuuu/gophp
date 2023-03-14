@@ -661,7 +661,7 @@ func SplArrayGetDebugInfo(obj *zend.Zval) *zend.HashTable {
 		} else {
 			base = spl_ce_ArrayObject
 		}
-		zname = SplGenPrivatePropName(base, "storage", b.SizeOf("\"storage\"")-1)
+		zname = SplGenPrivatePropName(base, "storage")
 		debug_info.SymtableUpdate(zname.GetStr(), storage)
 		zend.ZendStringReleaseEx(zname, 0)
 		return debug_info

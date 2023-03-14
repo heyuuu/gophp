@@ -361,6 +361,14 @@ func (this *ZendArray) KeyFind(key string) *Zval {
 	return nil
 }
 
+func (this *ZendArray) KeyFindPtr(key string) any {
+	var zv = this.KeyFind(key)
+	if zv != nil {
+		return zv.GetPtr()
+	}
+	return nil
+}
+
 func (this *ZendArray) IndexExists(index int) bool {
 	if _, ok := this.indexMap[index]; ok {
 		return true
