@@ -4,6 +4,7 @@ package zend
 
 import (
 	b "sik/builtin"
+	"strings"
 )
 
 func ZendResolveFunctionName(name *ZendString, type_ uint32, is_fully_qualified *ZendBool) *ZendString {
@@ -269,7 +270,7 @@ func ZendDoDelayedEarlyBinding(op_array *ZendOpArray, first_early_binding_opline
 }
 
 func ZendManglePropertyName_Ex(src1 string, src2 string) string {
-	propName := "\000" + src1 + src2
+	propName := "\000" + src1 + "\000" + src2
 	return propName
 }
 
@@ -278,61 +279,44 @@ func ZendManglePropertyName_ZStr(src1 string, src2 string, internal bool) *ZendS
 	return NewZendStringPersistent(str, internal)
 }
 
-func ZendManglePropertyName(src1 *byte, src1_length int, src2 string, src2_length int, internal int) *ZendString {
-	var prop_name_length int = 1 + src1_length + 1 + src2_length
-	var prop_name *ZendString = ZendStringAlloc(prop_name_length, internal)
-	prop_name.GetVal()[0] = '0'
-	memcpy(prop_name.GetVal()+1, src1, src1_length+1)
-	memcpy(prop_name.GetVal()+1+src1_length+1, src2, src2_length+1)
-	return prop_name
-}
-func ZendStrnlen(s *byte, maxlen int) int {
-	var len_ int = 0
-
-	for b.PostInc(&(*s)) && b.PostDec(&maxlen) {
-		len_++
+func ZendUnmanglePropertyName_Ex(name string) (className string, propName string, ok bool) {
+	if len(name) == 0 || name[0] != '\000' {
+		return "", name, true
 	}
-	return len_
+	if len(name) < 3 || name[1] == '\000' {
+		ZendError(E_NOTICE, "Illegal member variable name")
+		return "", name, false
+	}
+	/*
+	 * 可能的Name结构
+	 * -	\0 + {className} + \0 + {$propName}
+	 * -	\0 + {className} + \0 + {annoClassSrc} + \0 + {$propName}
+	 */
+	parts := strings.SplitN(name[1:], "\000", 3)
+	switch len(parts) {
+	case 2:
+		return parts[0], parts[1], true
+	case 3:
+		return parts[0], parts[2], true
+	default:
+		ZendError(E_NOTICE, "Corrupt member variable name")
+		return "", name, false
+	}
 }
 
 func ZendUnmanglePropertyNameEx(name *ZendString, class_name **byte, prop_name **byte, prop_len *int) int {
-	var class_name_len int
-	var anonclass_src_len int
-	*class_name = nil
-	if name.GetLen() == 0 || name.GetVal()[0] != '0' {
-		*prop_name = name.GetVal()
-		if prop_len != nil {
-			*prop_len = name.GetLen()
-		}
-		return SUCCESS
-	}
-	if name.GetLen() < 3 || name.GetVal()[1] == '0' {
-		ZendError(E_NOTICE, "Illegal member variable name")
-		*prop_name = name.GetVal()
-		if prop_len != nil {
-			*prop_len = name.GetLen()
-		}
-		return FAILURE
-	}
-	class_name_len = ZendStrnlen(name.GetVal()+1, name.GetLen()-2)
-	if class_name_len >= name.GetLen()-2 || name.GetVal()[class_name_len+1] != '0' {
-		ZendError(E_NOTICE, "Corrupt member variable name")
-		*prop_name = name.GetVal()
-		if prop_len != nil {
-			*prop_len = name.GetLen()
-		}
-		return FAILURE
-	}
-	*class_name = name.GetVal() + 1
-	anonclass_src_len = ZendStrnlen((*class_name)+class_name_len+1, name.GetLen()-class_name_len-2)
-	if class_name_len+anonclass_src_len+2 != name.GetLen() {
-		class_name_len += anonclass_src_len + 1
-	}
-	*prop_name = name.GetVal() + class_name_len + 2
+	className, propName, ok := ZendUnmanglePropertyName_Ex(name.GetStr())
+
+	*class_name = className
+	*prop_name = propName
 	if prop_len != nil {
-		*prop_len = name.GetLen() - class_name_len - 2
+		*prop_len = len(propName)
 	}
-	return SUCCESS
+	if ok {
+		return SUCCESS
+	} else {
+		return FAILURE
+	}
 }
 func ZendLookupReservedConst(name *byte, len_ int) *ZendConstant {
 	var c *ZendConstant = ZendHashFindPtrLc(EG__().GetZendConstants(), name, len_)

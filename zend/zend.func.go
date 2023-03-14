@@ -78,46 +78,37 @@ func ZendStrpprintf(max_len int, format string, args ...any) *ZendString {
 }
 
 func PrintHash(buf *SmartStr, ht *HashTable, indent int, is_object ZendBool) {
-	var tmp *Zval
-	var string_key *ZendString
-	var num_key ZendUlong
 	for i := 0; i < indent; i++ {
 		buf.AppendByte(' ')
 	}
 	buf.AppendString("(\n")
 	indent += PRINT_ZVAL_INDENT
 	ht.eachValidBucketIndirect(func(_ uint32, p *Bucket, z *Zval) {
-		num_key = p.GetH()
-		string_key = p.GetKey()
-		tmp = z
 		for i := 0; i < indent; i++ {
 			buf.AppendByte(' ')
 		}
 		buf.AppendByte('[')
-		if string_key != nil {
+		if p.IsStrKey() {
 			if is_object != 0 {
-				var prop_name *byte
-				var class_name *byte
-				var prop_len int
-				var mangled int = ZendUnmanglePropertyNameEx(string_key, &class_name, &prop_name, &prop_len)
-				buf.AppendString(b.CastStr(prop_name, prop_len))
-				if class_name != nil && mangled == SUCCESS {
-					if class_name[0] == '*' {
+				className, propName, mangled := ZendUnmanglePropertyName_Ex(p.StrKey())
+				buf.AppendString(propName)
+				if className != "" && mangled {
+					if className[0] == '*' {
 						buf.AppendString(":protected")
 					} else {
 						buf.AppendString(":")
-						buf.AppendString(b.CastStrAuto(class_name))
+						buf.AppendString(className)
 						buf.AppendString(":private")
 					}
 				}
 			} else {
-				buf.AppendString(string_key.GetStr())
+				buf.AppendString(p.StrKey())
 			}
 		} else {
-			buf.AppendLong(num_key)
+			buf.AppendLong(p.IndexKey())
 		}
 		buf.AppendString("] => ")
-		ZendPrintZvalRToBuf(buf, tmp, indent+PRINT_ZVAL_INDENT)
+		ZendPrintZvalRToBuf(buf, z, indent+PRINT_ZVAL_INDENT)
 		buf.AppendString("\n")
 	})
 	indent -= PRINT_ZVAL_INDENT
@@ -235,7 +226,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	case IS_OBJECT:
 		var properties *HashTable
 		var class_name *ZendString = Z_OBJ_HT(*expr).GetGetClassName()(expr.GetObj())
-		buf.AppendString(b.CastStrAuto(class_name.GetVal()))
+		buf.AppendString(class_name.GetStr())
 		ZendStringReleaseEx(class_name, 0)
 		buf.AppendString(" Object\n")
 		if expr.GetObj().IsRecursive() {
@@ -267,7 +258,7 @@ func ZendPrintZvalRToBuf(buf *SmartStr, expr *Zval, indent int) {
 	}
 }
 func ZendPrintZvalRToStr(expr *Zval, indent int) *ZendString {
-	var buf SmartStr = MakeSmartStr(0)
+	var buf SmartStr = SmartStr{}
 	ZendPrintZvalRToBuf(&buf, expr, indent)
 	buf.ZeroTail()
 	return buf.GetS()
