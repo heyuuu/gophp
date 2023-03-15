@@ -1232,9 +1232,7 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			/* keep the arg as binary, since the encoding is not known */
 
-			val.SetRawString(b.CastStrAuto
-
-			/* keep the arg as binary, since the encoding is not known */(php_optarg))
+			val.SetRawString(b.CastStrAuto(php_optarg))
 
 		} else {
 			val.SetFalse()

@@ -58,14 +58,14 @@ var zim_spl_SplSubject_detach func(executeData *zend.ZendExecuteData, return_val
 var zim_spl_SplSubject_notify func(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 var arginfo_SplObserver_update []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("subject", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
+	zend.MakeArgInfo("subject", zend.ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplSubject", 0))),
 }
 var spl_funcs_SplObserver []zend.ZendFunctionEntry = []zend.ZendFunctionEntry{
 	zend.MakeZendFunctionEntryEx("update", zend.ZEND_ACC_PUBLIC|zend.ZEND_ACC_ABSTRACT, nil, arginfo_SplObserver_update),
 }
 var arginfo_SplSubject_attach []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),
-	zend.MakeArgInfo("observer", ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
+	zend.MakeArgInfo("observer", zend.ArgInfoType(zend.ZEND_TYPE_ENCODE_CLASS_CONST("SplObserver", 0))),
 }
 var arginfo_SplSubject_void []zend.ArgInfo = []zend.ArgInfo{
 	zend.MakeReturnArgInfo(-1),

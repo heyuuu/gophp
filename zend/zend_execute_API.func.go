@@ -933,9 +933,8 @@ func ZendEvalStringl(str *byte, str_len int, retval_ptr *Zval, string_name *byte
 		Z_STRVAL(pv)[Z_STRLEN(pv)-1] = ';'
 		Z_STRVAL(pv)[Z_STRLEN(pv)] = '0'
 	} else {
-		pv.SetRawString(b.CastStr
-
-		/*printf("Evaluating '%s'\n", pv.value.str.val);*/(str, str_len))
+		/*printf("Evaluating '%s'\n", pv.value.str.val);*/
+		pv.SetRawString(b.CastStr(str, str_len))
 	}
 
 	original_compiler_options = CG__().GetCompilerOptions()
