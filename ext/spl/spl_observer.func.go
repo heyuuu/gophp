@@ -247,19 +247,19 @@ func SplObjectStorageContains(intern *spl_SplObjectStorage, this *zend.Zval, obj
 func zim_spl_SplObjectStorage_attach(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
 	var inf *zend.Zval = nil
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o|z!", &obj, &inf) == zend.FAILURE {
 		return
 	}
-	SplObjectStorageAttach(intern, zend.ZEND_THIS, obj, inf)
+	SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), obj, inf)
 }
 func zim_spl_SplObjectStorage_detach(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o", &obj) == zend.FAILURE {
 		return
 	}
-	SplObjectStorageDetach(intern, zend.ZEND_THIS, obj)
+	SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), obj)
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
 	intern.SetIndex(0)
 }
@@ -274,12 +274,12 @@ func zim_spl_SplObjectStorage_getHash(executeData *zend.ZendExecuteData, return_
 func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
 	var element *spl_SplObjectStorageElement
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var key zend.ZendHashKey
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o", &obj) == zend.FAILURE {
 		return
 	}
-	if SplObjectStorageGetHash(&key, intern, zend.ZEND_THIS, obj) == zend.FAILURE {
+	if SplObjectStorageGetHash(&key, intern, zend.ZEND_THIS(executeData), obj) == zend.FAILURE {
 		return
 	}
 	element = SplObjectStorageGet(intern, &key)
@@ -293,19 +293,19 @@ func zim_spl_SplObjectStorage_offsetGet(executeData *zend.ZendExecuteData, retur
 }
 func zim_spl_SplObjectStorage_addAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var other *spl_SplObjectStorage
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O", &obj, spl_ce_SplObjectStorage) == zend.FAILURE {
 		return
 	}
 	other = Z_SPLOBJSTORAGE_P(obj)
-	SplObjectStorageAddall(intern, zend.ZEND_THIS, other)
+	SplObjectStorageAddall(intern, zend.ZEND_THIS(executeData), other)
 	return_value.SetLong(intern.GetStorage().GetNNumOfElements())
 	return
 }
 func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var other *spl_SplObjectStorage
 	var element *spl_SplObjectStorageElement
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O", &obj, spl_ce_SplObjectStorage) == zend.FAILURE {
@@ -314,7 +314,7 @@ func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, retur
 	other = Z_SPLOBJSTORAGE_P(obj)
 	zend.ZendHashInternalPointerReset(other.GetStorage())
 	for b.Assign(&element, zend.ZendHashGetCurrentDataPtr(other.GetStorage())) != nil {
-		if SplObjectStorageDetach(intern, zend.ZEND_THIS, element.GetObj()) == zend.FAILURE {
+		if SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), element.GetObj()) == zend.FAILURE {
 			zend.ZendHashMoveForward(other.GetStorage())
 		}
 	}
@@ -325,7 +325,7 @@ func zim_spl_SplObjectStorage_removeAll(executeData *zend.ZendExecuteData, retur
 }
 func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var other *spl_SplObjectStorage
 	var element *spl_SplObjectStorageElement
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O", &obj, spl_ce_SplObjectStorage) == zend.FAILURE {
@@ -337,8 +337,8 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 		var _z *zend.Zval = _p.GetVal()
 
 		element = _z.GetPtr()
-		if SplObjectStorageContains(other, zend.ZEND_THIS, element.GetObj()) == 0 {
-			SplObjectStorageDetach(intern, zend.ZEND_THIS, element.GetObj())
+		if SplObjectStorageContains(other, zend.ZEND_THIS(executeData), element.GetObj()) == 0 {
+			SplObjectStorageDetach(intern, zend.ZEND_THIS(executeData), element.GetObj())
 		}
 	}
 	zend.ZendHashInternalPointerResetEx(intern.GetStorage(), intern.GetPos())
@@ -348,15 +348,15 @@ func zim_spl_SplObjectStorage_removeAllExcept(executeData *zend.ZendExecuteData,
 }
 func zim_spl_SplObjectStorage_contains(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var obj *zend.Zval
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "o", &obj) == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_BOOL(return_value, SplObjectStorageContains(intern, zend.ZEND_THIS, obj) != 0)
+	zend.ZVAL_BOOL(return_value, SplObjectStorageContains(intern, zend.ZEND_THIS(executeData), obj) != 0)
 	return
 }
 func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var mode zend.ZendLong = standard.COUNT_NORMAL
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "|l", &mode) == zend.FAILURE {
 		return
@@ -376,7 +376,7 @@ func zim_spl_SplObjectStorage_count(executeData *zend.ZendExecuteData, return_va
 	return
 }
 func zim_spl_SplObjectStorage_rewind(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -384,7 +384,7 @@ func zim_spl_SplObjectStorage_rewind(executeData *zend.ZendExecuteData, return_v
 	intern.SetIndex(0)
 }
 func zim_spl_SplObjectStorage_valid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -392,7 +392,7 @@ func zim_spl_SplObjectStorage_valid(executeData *zend.ZendExecuteData, return_va
 	return
 }
 func zim_spl_SplObjectStorage_key(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -401,7 +401,7 @@ func zim_spl_SplObjectStorage_key(executeData *zend.ZendExecuteData, return_valu
 }
 func zim_spl_SplObjectStorage_current(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var element *spl_SplObjectStorageElement
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -412,7 +412,7 @@ func zim_spl_SplObjectStorage_current(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_SplObjectStorage_getInfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var element *spl_SplObjectStorageElement
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -423,7 +423,7 @@ func zim_spl_SplObjectStorage_getInfo(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_SplObjectStorage_setInfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var element *spl_SplObjectStorageElement
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var inf *zend.Zval
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &inf) == zend.FAILURE {
 		return
@@ -435,7 +435,7 @@ func zim_spl_SplObjectStorage_setInfo(executeData *zend.ZendExecuteData, return_
 	zend.ZVAL_COPY(element.GetInf(), inf)
 }
 func zim_spl_SplObjectStorage_next(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -443,7 +443,7 @@ func zim_spl_SplObjectStorage_next(executeData *zend.ZendExecuteData, return_val
 	intern.GetIndex()++
 }
 func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var element *spl_SplObjectStorageElement
 	var members zend.Zval
 	var flags zend.Zval
@@ -478,7 +478,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	/* members */
 
 	buf.AppendString("m:")
-	members.SetArray(zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS)))
+	members.SetArray(zend.ZendArrayDup(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))))
 	standard.PhpVarSerialize(&buf, &members, &var_hash)
 	zend.ZvalPtrDtor(&members)
 
@@ -494,7 +494,7 @@ func zim_spl_SplObjectStorage_serialize(executeData *zend.ZendExecuteData, retur
 	}
 }
 func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var buf *byte
 	var buf_len int
 	var p *uint8
@@ -563,7 +563,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 			zend.ZvalPtrDtor(&inf)
 			goto outexcept
 		}
-		if SplObjectStorageGetHash(&key, intern, zend.ZEND_THIS, &entry) == zend.FAILURE {
+		if SplObjectStorageGetHash(&key, intern, zend.ZEND_THIS(executeData), &entry) == zend.FAILURE {
 			zend.ZvalPtrDtor(&entry)
 			zend.ZvalPtrDtor(&inf)
 			goto outexcept
@@ -578,7 +578,7 @@ func zim_spl_SplObjectStorage_unserialize(executeData *zend.ZendExecuteData, ret
 				standard.VarPushDtor(&var_hash, pelement.GetObj())
 			}
 		}
-		element = SplObjectStorageAttach(intern, zend.ZEND_THIS, &entry, b.Cond(inf.IsUndef(), nil, &inf))
+		element = SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), &entry, b.Cond(inf.IsUndef(), nil, &inf))
 		standard.VarReplace(&var_hash, &entry, element.GetObj())
 		standard.VarReplace(&var_hash, &inf, element.GetInf())
 		zend.ZvalPtrDtor(&entry)
@@ -613,7 +613,7 @@ outexcept:
 	return
 }
 func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var elem *spl_SplObjectStorageElement
 	var tmp zend.Zval
 	if zend.ZendParseParametersNoneThrow() == zend.FAILURE {
@@ -638,12 +638,12 @@ func zim_spl_SplObjectStorage___serialize(executeData *zend.ZendExecuteData, ret
 
 	/* members */
 
-	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS))
+	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	var data *zend.HashTable
 	var storage_zv *zend.Zval
 	var members_zv *zend.Zval
@@ -673,7 +673,7 @@ func zim_spl_SplObjectStorage___unserialize(executeData *zend.ZendExecuteData, r
 				zend.ZendThrowException(spl_ce_UnexpectedValueException, "Non-object key", 0)
 				return
 			}
-			SplObjectStorageAttach(intern, zend.ZEND_THIS, key, val)
+			SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), key, val)
 			key = nil
 		} else {
 			key = val
@@ -694,11 +694,11 @@ func zim_spl_MultipleIterator___construct(executeData *zend.ZendExecuteData, ret
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "|l", &flags) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	intern.SetFlags(flags)
 }
 func zim_spl_MultipleIterator_getFlags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	var intern *spl_SplObjectStorage = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -707,7 +707,7 @@ func zim_spl_MultipleIterator_getFlags(executeData *zend.ZendExecuteData, return
 }
 func zim_spl_MultipleIterator_setFlags(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", intern.GetFlags()) == zend.FAILURE {
 		return
 	}
@@ -719,7 +719,7 @@ func zim_spl_MultipleIterator_attachIterator(executeData *zend.ZendExecuteData, 
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "O|z!", &iterator, zend.ZendCeIterator, &info) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if info != nil {
 		var element *spl_SplObjectStorageElement
 		if info.GetType() != zend.IS_LONG && info.GetType() != zend.IS_STRING {
@@ -735,13 +735,13 @@ func zim_spl_MultipleIterator_attachIterator(executeData *zend.ZendExecuteData, 
 			zend.ZendHashMoveForwardEx(intern.GetStorage(), intern.GetPos())
 		}
 	}
-	SplObjectStorageAttach(intern, zend.ZEND_THIS, iterator, info)
+	SplObjectStorageAttach(intern, zend.ZEND_THIS(executeData), iterator, info)
 }
 func zim_spl_MultipleIterator_rewind(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage
 	var element *spl_SplObjectStorageElement
 	var it *zend.Zval
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -756,7 +756,7 @@ func zim_spl_MultipleIterator_next(executeData *zend.ZendExecuteData, return_val
 	var intern *spl_SplObjectStorage
 	var element *spl_SplObjectStorageElement
 	var it *zend.Zval
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -774,7 +774,7 @@ func zim_spl_MultipleIterator_valid(executeData *zend.ZendExecuteData, return_va
 	var retval zend.Zval
 	var expect zend.ZendLong
 	var valid zend.ZendLong
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -867,7 +867,7 @@ func SplMultipleIteratorGetAll(intern *spl_SplObjectStorage, get_type int, retur
 }
 func zim_spl_MultipleIterator_current(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -875,7 +875,7 @@ func zim_spl_MultipleIterator_current(executeData *zend.ZendExecuteData, return_
 }
 func zim_spl_MultipleIterator_key(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var intern *spl_SplObjectStorage
-	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS)
+	intern = Z_SPLOBJSTORAGE_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

@@ -889,7 +889,7 @@ func zim_Generator_rewind(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorRewind(generator)
 }
 func zim_Generator_valid(executeData *ZendExecuteData, return_value *Zval) {
@@ -897,7 +897,7 @@ func zim_Generator_valid(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	ZendGeneratorGetCurrent(generator)
 	ZVAL_BOOL(return_value, generator.GetExecuteData() != nil)
@@ -909,7 +909,7 @@ func zim_Generator_current(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
 	if generator.GetExecuteData() != nil && root.GetValue().GetType() != IS_UNDEF {
@@ -923,7 +923,7 @@ func zim_Generator_key(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	root = ZendGeneratorGetCurrent(generator)
 	if generator.GetExecuteData() != nil && root.GetKey().GetType() != IS_UNDEF {
@@ -936,7 +936,7 @@ func zim_Generator_next(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	ZendGeneratorResume(generator)
 }
@@ -1007,7 +1007,7 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *Zval) {
 		}
 		break
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 
 	/* The generator is already closed, thus can't send anything */
@@ -1096,7 +1096,7 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *Zval) {
 		break
 	}
 	exception.TryAddRefcount()
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	if generator.GetExecuteData() != nil {
 		var root *ZendGenerator = ZendGeneratorGetCurrent(generator)
@@ -1124,7 +1124,7 @@ func zim_Generator_getReturn(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	generator = (*ZendGenerator)(ZEND_THIS.GetObj())
+	generator = (*ZendGenerator)(ZEND_THIS(executeData).GetObj())
 	ZendGeneratorEnsureInitialized(generator)
 	if EG__().GetException() != nil {
 		return

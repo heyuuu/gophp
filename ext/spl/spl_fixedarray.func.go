@@ -378,7 +378,7 @@ func SplFixedarrayObjectCountElements(object *zend.Zval, count *zend.ZendLong) i
 	return zend.SUCCESS
 }
 func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var object *zend.Zval = zend.ZEND_THIS
+	var object *zend.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplFixedarrayObject
 	var size zend.ZendLong = 0
 	if zend.ZendParseParametersThrow(zend.ZEND_NUM_ARGS(), "|l", &size) == zend.FAILURE {
@@ -401,8 +401,8 @@ func zim_spl_SplFixedArray___construct(executeData *zend.ZendExecuteData, return
 	SplFixedarrayInit(intern.GetArray(), size)
 }
 func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
-	var intern_ht *zend.HashTable = zend.ZendStdGetProperties(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
+	var intern_ht *zend.HashTable = zend.ZendStdGetProperties(zend.ZEND_THIS(executeData))
 	var data *zend.Zval
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -431,7 +431,7 @@ func zim_spl_SplFixedArray___wakeup(executeData *zend.ZendExecuteData, return_va
 	}
 }
 func zim_spl_SplFixedArray_count(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var object *zend.Zval = zend.ZEND_THIS
+	var object *zend.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplFixedarrayObject
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -445,7 +445,7 @@ func zim_spl_SplFixedArray_toArray(executeData *zend.ZendExecuteData, return_val
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if intern.GetArray().GetSize() > 0 {
 		var i int = 0
 		zend.ArrayInit(return_value)
@@ -527,7 +527,7 @@ func zim_spl_SplFixedArray_fromArray(executeData *zend.ZendExecuteData, return_v
 	intern.SetArray(array)
 }
 func zim_spl_SplFixedArray_getSize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var object *zend.Zval = zend.ZEND_THIS
+	var object *zend.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplFixedarrayObject
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -537,7 +537,7 @@ func zim_spl_SplFixedArray_getSize(executeData *zend.ZendExecuteData, return_val
 	return
 }
 func zim_spl_SplFixedArray_setSize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var object *zend.Zval = zend.ZEND_THIS
+	var object *zend.Zval = zend.ZEND_THIS(executeData)
 	var intern *SplFixedarrayObject
 	var size zend.ZendLong
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &size) == zend.FAILURE {
@@ -558,7 +558,7 @@ func zim_spl_SplFixedArray_offsetExists(executeData *zend.ZendExecuteData, retur
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	zend.ZVAL_BOOL(return_value, SplFixedarrayObjectHasDimensionHelper(intern, zindex, 0) != 0)
 	return
 }
@@ -569,7 +569,7 @@ func zim_spl_SplFixedArray_offsetGet(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	value = SplFixedarrayObjectReadDimensionHelper(intern, zindex)
 	if value != nil {
 		zend.ZVAL_COPY_DEREF(return_value, value)
@@ -585,7 +585,7 @@ func zim_spl_SplFixedArray_offsetSet(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	SplFixedarrayObjectWriteDimensionHelper(intern, zindex, value)
 }
 func zim_spl_SplFixedArray_offsetUnset(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -594,7 +594,7 @@ func zim_spl_SplFixedArray_offsetUnset(executeData *zend.ZendExecuteData, return
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	intern = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	SplFixedarrayObjectUnsetDimensionHelper(intern, zindex)
 }
 func SplFixedarrayItDtor(iter *zend.ZendObjectIterator) {
@@ -653,7 +653,7 @@ func SplFixedarrayItMoveForward(iter *zend.ZendObjectIterator) {
 	}
 }
 func zim_spl_SplFixedArray_key(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -661,14 +661,14 @@ func zim_spl_SplFixedArray_key(executeData *zend.ZendExecuteData, return_value *
 	return
 }
 func zim_spl_SplFixedArray_next(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	intern.GetCurrent()++
 }
 func zim_spl_SplFixedArray_valid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -676,7 +676,7 @@ func zim_spl_SplFixedArray_valid(executeData *zend.ZendExecuteData, return_value
 	return
 }
 func zim_spl_SplFixedArray_rewind(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -685,7 +685,7 @@ func zim_spl_SplFixedArray_rewind(executeData *zend.ZendExecuteData, return_valu
 func zim_spl_SplFixedArray_current(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var zindex zend.Zval
 	var value *zend.Zval
-	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS)
+	var intern *SplFixedarrayObject = Z_SPLFIXEDARRAY_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}

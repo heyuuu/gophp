@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ZEND_NS_NAME(ns string, name string) string { return ns + "\\" + name }
@@ -41,8 +40,8 @@ func ZendRegisterNsClassAlias(ns string, name string, ce *ZendClassEntry) int {
 	return ZendRegisterClassAliasEx(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, ce, 1)
 }
 func getThis() *Zval {
-	if ZEND_THIS.IsObject() {
-		return ZEND_THIS
+	if ZEND_THIS(executeData).IsObject() {
+		return ZEND_THIS(executeData)
 	} else {
 		return nil
 	}

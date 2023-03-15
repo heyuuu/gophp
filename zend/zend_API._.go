@@ -43,7 +43,13 @@ const IS_CALLABLE_CHECK_NO_ACCESS = 1 << 1
 const IS_CALLABLE_CHECK_IS_STATIC = 1 << 2
 const IS_CALLABLE_CHECK_SILENT uint32 = 1 << 3
 const IS_CALLABLE_STRICT uint32 = IS_CALLABLE_CHECK_IS_STATIC
-const ZEND_THIS *Zval = &(EX(This))
+
+//const ZEND_THIS *Zval = &(EX(This))
+
+func ZEND_THIS(executeData *ZendExecuteData) *Zval {
+	return &executeData.This
+}
+
 const WRONG_PARAM_COUNT = ZEND_WRONG_PARAM_COUNT()
 
 /** Build zend_call_info/cache from a zval*

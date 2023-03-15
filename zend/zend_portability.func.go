@@ -20,8 +20,6 @@ func LONGJMP(a __auto__, b ZEND_RESULT_CODE) __auto__ { return siglongjmp(a, b) 
 func ZEND_BIT_TEST(bits []uint32, bit uint32) int {
 	return bits[bit/(b.SizeOf("( bits ) [ 0 ]")*8)] >> (bit&b.SizeOf("( bits ) [ 0 ]")*8 - 1) & 1
 }
-func _zendGetInf() float64        { return HUGE_VAL }
-func _zendGetNan() float64        { return 0.0 / 0.0 }
 func ZEND_STRL(str string) string { return str }
 func ZEND_NORMALIZE_BOOL(n ZendLong) int {
 	if n != 0 {

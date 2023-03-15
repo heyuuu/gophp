@@ -15,7 +15,7 @@ func ZEND_CLOSURE_PROPERTY_ERROR() {
 func zim_Closure___invoke(executeData *ZendExecuteData, return_value *Zval) {
 	var func_ *ZendFunction = EX(func_)
 	var arguments *Zval = ZEND_CALL_ARG(executeData, 1)
-	if CallUserFunction(CG__().GetFunctionTable(), nil, ZEND_THIS, return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
+	if CallUserFunction(CG__().GetFunctionTable(), nil, ZEND_THIS(executeData), return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
 		return_value.SetFalse()
 	}
 
@@ -85,7 +85,7 @@ func zim_Closure_call(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParameters(ZEND_NUM_ARGS(), "o*", &newthis, fci.GetParams(), fci.GetParamCount()) == FAILURE {
 		return
 	}
-	closure = (*ZendClosure)(ZEND_THIS.GetObj())
+	closure = (*ZendClosure)(ZEND_THIS(executeData).GetObj())
 	newobj = newthis.GetObj()
 	if ZendValidClosureBinding(closure, newthis, Z_OBJCE_P(newthis)) == 0 {
 		return
@@ -211,7 +211,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *Zval) {
 	} else {
 		ZVAL_EMPTY_ARRAY(fci.GetParams()[1])
 	}
-	fci.SetObject(ZEND_THIS.GetObj())
+	fci.SetObject(ZEND_THIS(executeData).GetObj())
 	fcc.SetObject(fci.GetObject())
 	fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
 	ZendCallFunction(&fci, &fcc)

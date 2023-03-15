@@ -364,7 +364,7 @@ func zim_spl_SplDoublyLinkedList_push(executeData *zend.ZendExecuteData, return_
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistPush(intern.GetLlist(), value)
 	return_value.SetTrue()
 	return
@@ -375,7 +375,7 @@ func zim_spl_SplDoublyLinkedList_unshift(executeData *zend.ZendExecuteData, retu
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistUnshift(intern.GetLlist(), value)
 	return_value.SetTrue()
 	return
@@ -385,7 +385,7 @@ func zim_spl_SplDoublyLinkedList_pop(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistPop(intern.GetLlist(), return_value)
 	if return_value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't pop from an empty datastructure", 0)
@@ -398,7 +398,7 @@ func zim_spl_SplDoublyLinkedList_shift(executeData *zend.ZendExecuteData, return
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	SplPtrLlistShift(intern.GetLlist(), return_value)
 	if return_value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't shift from an empty datastructure", 0)
@@ -412,7 +412,7 @@ func zim_spl_SplDoublyLinkedList_top(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	value = SplPtrLlistLast(intern.GetLlist())
 	if value == nil || value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
@@ -426,7 +426,7 @@ func zim_spl_SplDoublyLinkedList_bottom(executeData *zend.ZendExecuteData, retur
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	value = SplPtrLlistFirst(intern.GetLlist())
 	if value == nil || value.IsUndef() {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Can't peek at an empty datastructure", 0)
@@ -436,7 +436,7 @@ func zim_spl_SplDoublyLinkedList_bottom(executeData *zend.ZendExecuteData, retur
 }
 func zim_spl_SplDoublyLinkedList_count(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var count zend.ZendLong
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -449,7 +449,7 @@ func zim_spl_SplDoublyLinkedList_isEmpty(executeData *zend.ZendExecuteData, retu
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	SplDllistObjectCountElements(zend.ZEND_THIS, &count)
+	SplDllistObjectCountElements(zend.ZEND_THIS(executeData), &count)
 	zend.ZVAL_BOOL(return_value, count == 0)
 	return
 }
@@ -459,7 +459,7 @@ func zim_spl_SplDoublyLinkedList_setIteratorMode(executeData *zend.ZendExecuteDa
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "l", &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if intern.IsItFix() && (intern.GetFlags()&SPL_DLLIST_IT_LIFO) != (value&SPL_DLLIST_IT_LIFO) {
 		zend.ZendThrowException(spl_ce_RuntimeException, "Iterators' LIFO/FIFO modes for SplStack/SplQueue objects are frozen", 0)
 		return
@@ -473,7 +473,7 @@ func zim_spl_SplDoublyLinkedList_getIteratorMode(executeData *zend.ZendExecuteDa
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	return_value.SetLong(intern.GetFlags())
 	return
 }
@@ -484,7 +484,7 @@ func zim_spl_SplDoublyLinkedList_offsetExists(executeData *zend.ZendExecuteData,
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	zend.ZVAL_BOOL(return_value, index >= 0 && index < intern.GetLlist().GetCount())
 	return
@@ -497,7 +497,7 @@ func zim_spl_SplDoublyLinkedList_offsetGet(executeData *zend.ZendExecuteData, re
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index >= intern.GetLlist().GetCount() {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)
@@ -518,7 +518,7 @@ func zim_spl_SplDoublyLinkedList_offsetSet(executeData *zend.ZendExecuteData, re
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zindex.IsType(zend.IS_NULL) {
 
 		/* $obj[] = ... */
@@ -577,7 +577,7 @@ func zim_spl_SplDoublyLinkedList_offsetUnset(executeData *zend.ZendExecuteData, 
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "z", &zindex) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	llist = intern.GetLlist()
 	if index < 0 || index >= intern.GetLlist().GetCount() {
@@ -699,7 +699,7 @@ func SplDllistItMoveForward(iter *zend.ZendObjectIterator) {
 	SplDllistItHelperMoveForward(iterator.GetTraversePointer(), iterator.GetTraversePosition(), object.GetLlist(), object.GetFlags())
 }
 func zim_spl_SplDoublyLinkedList_key(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -707,21 +707,21 @@ func zim_spl_SplDoublyLinkedList_key(executeData *zend.ZendExecuteData, return_v
 	return
 }
 func zim_spl_SplDoublyLinkedList_prev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	SplDllistItHelperMoveForward(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags()^SPL_DLLIST_IT_LIFO)
 }
 func zim_spl_SplDoublyLinkedList_next(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	SplDllistItHelperMoveForward(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags())
 }
 func zim_spl_SplDoublyLinkedList_valid(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
@@ -729,14 +729,14 @@ func zim_spl_SplDoublyLinkedList_valid(executeData *zend.ZendExecuteData, return
 	return
 }
 func zim_spl_SplDoublyLinkedList_rewind(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
 	SplDllistItHelperRewind(intern.GetTraversePointer(), intern.GetTraversePosition(), intern.GetLlist(), intern.GetFlags())
 }
 func zim_spl_SplDoublyLinkedList_current(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var element *SplPtrLlistElement = intern.GetTraversePointer()
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
@@ -750,7 +750,7 @@ func zim_spl_SplDoublyLinkedList_current(executeData *zend.ZendExecuteData, retu
 	}
 }
 func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var buf zend.SmartStr = zend.MakeSmartStr(0)
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var next *SplPtrLlistElement
@@ -788,7 +788,7 @@ func zim_spl_SplDoublyLinkedList_serialize(executeData *zend.ZendExecuteData, re
 	}
 }
 func zim_spl_SplDoublyLinkedList_unserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var flags *zend.Zval
 	var elem *zend.Zval
 	var buf *byte
@@ -841,7 +841,7 @@ error:
 	return
 }
 func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var current *SplPtrLlistElement = intern.GetLlist().GetHead()
 	var tmp zend.Zval
 	if zend.ZendParseParametersNoneThrow() == zend.FAILURE {
@@ -866,12 +866,12 @@ func zim_spl_SplDoublyLinkedList___serialize(executeData *zend.ZendExecuteData, 
 
 	/* members */
 
-	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS))
+	tmp.SetArray(zend.ZendStdGetProperties(zend.ZEND_THIS(executeData)))
 	tmp.TryAddRefcount()
 	return_value.GetArr().NextIndexInsert(&tmp)
 }
 func zim_spl_SplDoublyLinkedList___unserialize(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
-	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	var intern *SplDllistObject = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	var data *zend.HashTable
 	var flags_zv *zend.Zval
 	var storage_zv *zend.Zval
@@ -906,7 +906,7 @@ func zim_spl_SplDoublyLinkedList_add(executeData *zend.ZendExecuteData, return_v
 	if zend.ZendParseParameters(zend.ZEND_NUM_ARGS(), "zz", &zindex, &value) == zend.FAILURE {
 		return
 	}
-	intern = Z_SPLDLLIST_P(zend.ZEND_THIS)
+	intern = Z_SPLDLLIST_P(zend.ZEND_THIS(executeData))
 	index = SplOffsetConvertToLong(zindex)
 	if index < 0 || index > intern.GetLlist().GetCount() {
 		zend.ZendThrowException(spl_ce_OutOfRangeException, "Offset invalid or out of range", 0)

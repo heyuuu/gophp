@@ -196,7 +196,7 @@ func ZimExceptionConstruct(executeData *ZendExecuteData, return_value *Zval) {
 	var previous *Zval = nil
 	var base_ce *ZendClassEntry
 	var argc int = ZEND_NUM_ARGS()
-	object = ZEND_THIS
+	object = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(object)
 	if ZendParseParametersEx(ZEND_PARSE_PARAMS_QUIET, argc, "|SlO!", &message, &code, &previous, ZendCeThrowable) == FAILURE {
 		var ce *ZendClassEntry
@@ -231,7 +231,7 @@ func CHECK_EXC_TYPE(id ZendKnownStringId, type_ uint32) {
 func ZimExceptionWakeup(executeData *ZendExecuteData, return_value *Zval) {
 	var value Zval
 	var pvalue *Zval
-	var object *Zval = ZEND_THIS
+	var object *Zval = ZEND_THIS(executeData)
 	CHECK_EXC_TYPE(ZEND_STR_MESSAGE, IS_STRING)
 	CHECK_EXC_TYPE(ZEND_STR_STRING, IS_STRING)
 	CHECK_EXC_TYPE(ZEND_STR_CODE, IS_LONG)
@@ -265,7 +265,7 @@ func ZimErrorExceptionConstruct(executeData *ZendExecuteData, return_value *Zval
 		ZendThrowError(nil, "Wrong parameters for %s([string $message [, long $code, [ long $severity, [ string $filename, [ long $lineno  [, Throwable $previous = NULL]]]]]])", ce.GetName().GetVal())
 		return
 	}
-	object = ZEND_THIS
+	object = ZEND_THIS(executeData)
 	if message != nil {
 		tmp.SetStringCopy(message)
 		ZendUpdatePropertyEx(ZendCeException, object, ZSTR_KNOWN(ZEND_STR_MESSAGE), &tmp)
@@ -303,7 +303,7 @@ func zim_exception_getFile(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_FILE)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_FILE)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -313,7 +313,7 @@ func zim_exception_getLine(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_LINE)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_LINE)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -323,7 +323,7 @@ func zim_exception_getMessage(executeData *ZendExecuteData, return_value *Zval) 
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_MESSAGE)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_MESSAGE)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -333,7 +333,7 @@ func zim_exception_getCode(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_CODE)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_CODE)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -343,7 +343,7 @@ func zim_exception_getTrace(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_TRACE)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_TRACE)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -353,7 +353,7 @@ func zim_error_exception_getSeverity(executeData *ZendExecuteData, return_value 
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	prop = GET_PROPERTY(ZEND_THIS, ZEND_STR_SEVERITY)
+	prop = GET_PROPERTY(ZEND_THIS(executeData), ZEND_STR_SEVERITY)
 	ZVAL_DEREF(prop)
 	ZVAL_COPY(return_value, prop)
 }
@@ -480,7 +480,7 @@ func zim_exception_getTraceAsString(executeData *ZendExecuteData, return_value *
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	object = ZEND_THIS
+	object = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(object)
 	trace = ZendReadPropertyEx(base_ce, object, ZSTR_KNOWN(ZEND_STR_TRACE), 1, &rv)
 	if trace.GetType() != IS_ARRAY {
@@ -511,7 +511,7 @@ func zim_exception_getPrevious(executeData *ZendExecuteData, return_value *Zval)
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	ZVAL_COPY(return_value, GET_PROPERTY_SILENT(ZEND_THIS, ZEND_STR_PREVIOUS))
+	ZVAL_COPY(return_value, GET_PROPERTY_SILENT(ZEND_THIS(executeData), ZEND_STR_PREVIOUS))
 }
 func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) {
 	var trace Zval
@@ -526,7 +526,7 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) 
 		return
 	}
 	str = ZSTR_EMPTY_ALLOC()
-	exception = ZEND_THIS
+	exception = ZEND_THIS(executeData)
 	fname = ZendStringInit("gettraceasstring", b.SizeOf("\"gettraceasstring\"")-1, 0)
 	for exception != nil && exception.IsObject() && InstanceofFunction(Z_OBJCE_P(exception), ZendCeThrowable) != 0 {
 		var prev_str *ZendString = str
@@ -566,7 +566,7 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) 
 		}
 	}
 	ZendStringReleaseEx(fname, 0)
-	exception = ZEND_THIS
+	exception = ZEND_THIS(executeData)
 
 	/* Reset apply counts */
 
@@ -578,7 +578,7 @@ func zim_exception___toString(executeData *ZendExecuteData, return_value *Zval) 
 		}
 		exception = GET_PROPERTY(exception, ZEND_STR_PREVIOUS)
 	}
-	exception = ZEND_THIS
+	exception = ZEND_THIS(executeData)
 	base_ce = IGetExceptionBase(exception)
 
 	/* We store the result in the private property string so we can access
