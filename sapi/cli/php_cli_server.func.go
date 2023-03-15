@@ -128,7 +128,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 						break
 					}
 				}
-				zend.AddAssocStringlEx(return_value, s, uint32(len_), p, h.GetHeaderLen()-(p-h.GetHeader()))
+				zend.AddAssocStringlEx(return_value, b.CastStr(s, uint32(len_)), p, h.GetHeaderLen()-(p-h.GetHeader()))
 				zend.FreeAlloca(s, use_heap)
 			}
 		}

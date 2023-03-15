@@ -42,25 +42,25 @@ func AddAssocLong(__arg *Zval, __key string, __n ZendLong) int {
 	return AddAssocLongEx(__arg, __key, __n)
 }
 func AddAssocNull(__arg *Zval, __key string) int {
-	return AddAssocNullEx(__arg, __key, strlen(__key))
+	return AddAssocNullEx(__arg, __key)
 }
 func AddAssocBool(__arg *Zval, __key string, __b int) int {
 	return AddAssocBoolEx(__arg, __key, __b)
 }
 func AddAssocDouble(__arg *Zval, __key *byte, __d float64) int {
-	return AddAssocDoubleEx(__arg, __key, strlen(__key), __d)
+	return AddAssocDoubleEx(__arg, __key, __d)
 }
 func AddAssocStr(__arg *Zval, __key string, __str *ZendString) int {
-	return AddAssocStrEx(__arg, __key, strlen(__key), __str)
+	return AddAssocStrEx(__arg, __key, __str)
 }
 func AddAssocString(__arg *Zval, __key *byte, __str *byte) int {
-	return AddAssocStringEx(__arg, __key, strlen(__key), __str)
+	return AddAssocStringEx(__arg, __key, __str)
 }
 func AddAssocStringl(__arg *Zval, __key string, __str *byte, __length int) int {
-	return AddAssocStringlEx(__arg, __key, strlen(__key), __str, __length)
+	return AddAssocStringlEx(__arg, __key, __str, __length)
 }
 func AddAssocZval(__arg *Zval, __key string, __value *Zval) int {
-	return AddAssocZvalEx(__arg, __key, strlen(__key), __value)
+	return AddAssocZvalEx(__arg, __key, __value)
 }
 func AddIndexZval(arg *Zval, index ZendUlong, value *Zval) int {
 	if arg.GetArr().IndexUpdateH(index, value) != nil {

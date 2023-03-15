@@ -149,10 +149,10 @@ func AddAssocLongEx(arg *Zval, key string, n ZendLong) int {
 	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
+func AddAssocNullEx(arg *Zval, key string) int {
 	var tmp Zval
 	tmp.SetNull()
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
 func AddAssocBoolEx(arg *Zval, key string, b int) int {
@@ -161,32 +161,32 @@ func AddAssocBoolEx(arg *Zval, key string, b int) int {
 	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
+func AddAssocDoubleEx(arg *Zval, key string, d float64) int {
 	var tmp Zval
 	tmp.SetDouble(d)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
+func AddAssocStrEx(arg *Zval, key string, str *ZendString) int {
 	var tmp Zval
 	tmp.SetString(str)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocStringEx(arg *Zval, key string, key_len int, str *byte) int {
+func AddAssocStringEx(arg *Zval, key string, str *byte) int {
 	var tmp Zval
 	ZVAL_STRING(&tmp, str)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
+func AddAssocStringlEx(arg *Zval, key string, str *byte, length int) int {
 	var tmp Zval
 	ZVAL_STRINGL(&tmp, str, length)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocZvalEx(arg *Zval, key string, key_len int, value *Zval) int {
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), value)
+func AddAssocZvalEx(arg *Zval, key string, value *Zval) int {
+	arg.GetArr().SymtableUpdate(key, value)
 	return SUCCESS
 }
 func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {

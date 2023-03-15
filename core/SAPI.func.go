@@ -791,7 +791,7 @@ func SapiAddRequestHeader(var_ *byte, var_len uint, val *byte, val_len uint, arg
 	} else {
 		return
 	}
-	zend.AddAssocStringlEx(return_value, var_, var_len, val, val_len)
+	zend.AddAssocStringlEx(return_value, b.CastStr(var_, var_len), val, val_len)
 	if str != nil {
 		zend.FreeAlloca(var_, use_heap)
 	}

@@ -46,9 +46,9 @@ func SplPqueueExtractHelper(result *zend.Zval, elem *SplPqueueElem, flags int) {
 	if (flags & SPL_PQUEUE_EXTR_BOTH) == SPL_PQUEUE_EXTR_BOTH {
 		zend.ArrayInit(result)
 		elem.GetData().TryAddRefcount()
-		zend.AddAssocZvalEx(result, "data", b.SizeOf("\"data\"")-1, elem.GetData())
+		zend.AddAssocZvalEx(result, "data", elem.GetData())
 		elem.GetPriority().TryAddRefcount()
-		zend.AddAssocZvalEx(result, "priority", b.SizeOf("\"priority\"")-1, elem.GetPriority())
+		zend.AddAssocZvalEx(result, "priority", elem.GetPriority())
 		return
 	}
 	if (flags & SPL_PQUEUE_EXTR_DATA) != 0 {

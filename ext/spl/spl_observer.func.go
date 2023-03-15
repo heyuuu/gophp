@@ -180,8 +180,8 @@ func SplObjectStorageDebugInfo(obj *zend.Zval) *zend.HashTable {
 		 * Prefer to null the destructor */
 
 		zend.Z_ARRVAL_P(&tmp).SetPDestructor(nil)
-		zend.AddAssocZvalEx(&tmp, "obj", b.SizeOf("\"obj\"")-1, element.GetObj())
-		zend.AddAssocZvalEx(&tmp, "inf", b.SizeOf("\"inf\"")-1, element.GetInf())
+		zend.AddAssocZvalEx(&tmp, "obj", element.GetObj())
+		zend.AddAssocZvalEx(&tmp, "inf", element.GetInf())
 		storage.GetArr().KeyUpdate(md5str.GetStr(), &tmp)
 		zend.ZendStringReleaseEx(md5str, 0)
 	}

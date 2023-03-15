@@ -1641,7 +1641,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 		var l int = r.GetEntityLen()
 		memcpy(&entity[1], r.GetEntity(), l)
 		entity[l+1] = ';'
-		zend.AddAssocStringlEx(arr, key, written_k1, entity, l+2)
+		zend.AddAssocStringlEx(arr, b.CastStr(key, written_k1), entity, l+2)
 	} else {
 		var i unsigned
 		var num_entries unsigned
@@ -1650,7 +1650,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 			var l int = mcpr[0].GetDefaultEntityLen()
 			memcpy(&entity[1], mcpr[0].GetDefaultEntity(), l)
 			entity[l+1] = ';'
-			zend.AddAssocStringlEx(arr, key, written_k1, entity, l+2)
+			zend.AddAssocStringlEx(arr, b.CastStr(key, written_k1), entity, l+2)
 		}
 		num_entries = mcpr[0].GetSize()
 		for i = 1; i <= num_entries; i++ {
@@ -1670,7 +1670,7 @@ func WriteS3rowData(r *EntityStage3Row, orig_cp unsigned, charset EntityCharset,
 			written_k2 = WriteOctetSequence((*uint8)(&key[written_k1]), charset, spe_cp)
 			memcpy(&entity[1], mcpr[i].GetEntity(), l)
 			entity[l+1] = ';'
-			zend.AddAssocStringlEx(arr, key, written_k1+written_k2, entity, l+2)
+			zend.AddAssocStringlEx(arr, b.CastStr(key, written_k1+written_k2), entity, l+2)
 		}
 	}
 }

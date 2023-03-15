@@ -1666,7 +1666,7 @@ func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, re
 			str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		}
 		if key != nil {
-			zend.AddAssocStrEx(retval, key.GetVal(), key.GetLen(), str)
+			zend.AddAssocStrEx(retval, key.GetStr(), str)
 		} else {
 			zend.AddIndexStr(retval, h, str)
 		}
@@ -1939,8 +1939,8 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	if core.PG(last_error_message) {
 		zend.ArrayInit(return_value)
 		zend.AddAssocLongEx(return_value, "type", core.PG(last_error_type))
-		zend.AddAssocStringEx(return_value, "message", b.SizeOf("\"message\"")-1, core.PG(last_error_message))
-		zend.AddAssocStringEx(return_value, "file", b.SizeOf("\"file\"")-1, b.CondF1(core.PG(last_error_file), func() __auto__ { return core.PG(last_error_file) }, "-"))
+		zend.AddAssocStringEx(return_value, "message", core.PG(last_error_message))
+		zend.AddAssocStringEx(return_value, "file", b.CondF1(core.PG(last_error_file), func() __auto__ { return core.PG(last_error_file) }, "-"))
 		zend.AddAssocLongEx(return_value, "line", core.PG(last_error_lineno))
 	}
 }

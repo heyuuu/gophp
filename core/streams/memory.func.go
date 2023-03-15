@@ -518,7 +518,7 @@ func PhpStreamUrlWrapRfc2397(
 			plen = sep - path
 			vlen = b.CondF1(semi != nil, func() __auto__ { return size_t(semi - sep) }, mlen-plen) - 1
 			if plen != b.SizeOf("\"mediatype\"")-1 || memcmp(path, "mediatype", b.SizeOf("\"mediatype\"")-1) {
-				zend.AddAssocStringlEx(&meta, path, plen, sep+1, vlen)
+				zend.AddAssocStringlEx(&meta, b.CastStr(path, plen), sep+1, vlen)
 			}
 			plen += vlen + 1
 			mlen -= plen
