@@ -149,7 +149,7 @@ func _phpDoOpendir(executeData *zend.ZendExecuteData, return_value *zend.Zval, c
 	PhpSetDefaultDir(dirp.GetRes())
 	if createobject != 0 {
 		zend.ObjectInitEx(return_value, DirClassEntryPtr)
-		zend.AddPropertyStringl(return_value, "path", dirname, dir_len)
+		zend.AddPropertyStringl(return_value, "path", b.CastStrPtr(dirname, dir_len))
 		zend.AddPropertyResource(return_value, "handle", dirp.GetRes())
 		core.PhpStreamAutoCleanup(dirp)
 	} else {

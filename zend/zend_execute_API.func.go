@@ -525,9 +525,6 @@ func ZvalUpdateConstantEx(p *Zval, scope *ZendClassEntry) int {
 	}
 	return SUCCESS
 }
-func ZvalUpdateConstant(pp *Zval) int {
-	return ZvalUpdateConstantEx(pp, b.CondF(EG__().GetCurrentExecuteData() != nil, func() *ZendClassEntry { return ZendGetExecutedScope() }, func() *ZendClassEntry { return CG__().GetActiveClassEntry() }))
-}
 func _callUserFunctionEx(
 	object *Zval,
 	function_name *Zval,

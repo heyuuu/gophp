@@ -1589,7 +1589,7 @@ func UserSpaceStreamNotifier(
 	zvs[3].SetLong(xcode)
 	zvs[4].SetLong(bytes_sofar)
 	zvs[5].SetLong(bytes_max)
-	if zend.FAILURE == zend.CallUserFunctionEx(nil, nil, callback, &retval, 6, zvs, 0, nil) {
+	if zend.FAILURE == zend.CallUserFunctionEx(nil, callback, &retval, 6, zvs, 0) {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "failed to call user notifier")
 	}
 	for i = 0; i < 6; i++ {

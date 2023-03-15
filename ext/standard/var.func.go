@@ -859,7 +859,7 @@ func PhpVarSerializeCallMagicSerialize(retval *zend.Zval, obj *zend.Zval) int {
 	var res int
 	zend.ZVAL_STRINGL(&fname, "__serialize", b.SizeOf("\"__serialize\"")-1)
 	BG(serialize_lock)++
-	res = zend.CallUserFunction(zend.CG__().GetFunctionTable(), obj, &fname, retval, 0, 0)
+	res = zend.CallUserFunction(obj, &fname, retval, 0, 0)
 	BG(serialize_lock)--
 	zend.ZvalPtrDtorStr(&fname)
 	if res == zend.FAILURE || retval.IsUndef() {

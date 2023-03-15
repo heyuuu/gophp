@@ -322,58 +322,27 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 		return FAILURE
 	}
 }
-func AddPropertyLongEx(arg *Zval, key *byte, key_len int, n ZendLong) int {
-	var tmp Zval
-	tmp.SetLong(n)
-	return AddPropertyZvalEx(arg, key, key_len, &tmp)
+func AddPropertyLongEx(arg *Zval, key string, n ZendLong) int {
+	return AddPropertyZvalEx(arg, key, NewZvalLong(n))
 }
-func AddPropertyBoolEx(arg *Zval, key *byte, key_len int, b ZendLong) int {
-	zv := NewZvalBool(b != 0)
-	return AddPropertyZvalEx(arg, key, key_len, zv)
+func AddPropertyBoolEx(arg *Zval, key string, b ZendLong) int {
+	return AddPropertyZvalEx(arg, key, NewZvalBool(b != 0))
 }
-func AddPropertyNullEx(arg *Zval, key *byte, key_len int) int {
-	var tmp Zval
-	tmp.SetNull()
-	return AddPropertyZvalEx(arg, key, key_len, &tmp)
+func AddPropertyNullEx(arg *Zval, key string) int {
+	return AddPropertyZvalEx(arg, key, NewZvalNull())
 }
-func AddPropertyResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
-	var tmp Zval
-	tmp.SetResource(r)
-	AddPropertyZvalEx(arg, key, key_len, &tmp)
-	ZvalPtrDtor(&tmp)
-	return SUCCESS
+func AddPropertyResourceEx(arg *Zval, key string, r *ZendResource) int {
+	return AddPropertyZvalEx(arg, key, NewZvalResource(r))
 }
-func AddPropertyDoubleEx(arg *Zval, key *byte, key_len int, d float64) int {
-	var tmp Zval
-	tmp.SetDouble(d)
-	return AddPropertyZvalEx(arg, key, key_len, &tmp)
+func AddPropertyDoubleEx(arg *Zval, key string, d float64) int {
+	return AddPropertyZvalEx(arg, key, NewZvalDouble(d))
 }
-func AddPropertyStrEx(arg *Zval, key *byte, key_len int, str *ZendString) int {
-	var tmp Zval
-	tmp.SetString(str)
-	AddPropertyZvalEx(arg, key, key_len, &tmp)
-	ZvalPtrDtor(&tmp)
-	return SUCCESS
+func AddPropertyStrEx(arg *Zval, key string, str string) int {
+	return AddPropertyZvalEx(arg, key, NewZvalString(str))
 }
-func AddPropertyStringEx(arg *Zval, key *byte, key_len int, str *byte) int {
-	var tmp Zval
-	ZVAL_STRING(&tmp, str)
-	AddPropertyZvalEx(arg, key, key_len, &tmp)
-	ZvalPtrDtor(&tmp)
-	return SUCCESS
-}
-func AddPropertyStringlEx(arg *Zval, key *byte, key_len int, str *byte, length int) int {
-	var tmp Zval
-	ZVAL_STRINGL(&tmp, str, length)
-	AddPropertyZvalEx(arg, key, key_len, &tmp)
-	ZvalPtrDtor(&tmp)
-	return SUCCESS
-}
-func AddPropertyZvalEx(arg *Zval, key *byte, key_len int, value *Zval) int {
-	var z_key Zval
-	ZVAL_STRINGL(&z_key, key, key_len)
-	Z_OBJ_HT(*arg).GetWriteProperty()(arg, &z_key, value, nil)
-	ZvalPtrDtor(&z_key)
+func AddPropertyZvalEx(arg *Zval, key string, value *Zval) int {
+	zKey := NewZvalString(key)
+	Z_OBJ_HT(*arg).GetWriteProperty()(arg, zKey, value, nil)
 	return SUCCESS
 }
 func ZendStartupModuleEx(module *ZendModuleEntry) int {

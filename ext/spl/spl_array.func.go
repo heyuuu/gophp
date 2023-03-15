@@ -1153,7 +1153,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 	aht.AddRefcount()
 	if use_arg == 0 {
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.EG__().GetFunctionTable(), nil, &function_name, return_value, 1, params)
+		zend.CallUserFunction(nil, &function_name, return_value, 1, params)
 		intern.GetNApplyCount()--
 	} else if use_arg == SPL_ARRAY_METHOD_MAY_USER_ARG {
 		if zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "|z", &arg) == zend.FAILURE {
@@ -1164,7 +1164,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 			zend.ZVAL_COPY_VALUE(&params[1], arg)
 		}
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.EG__().GetFunctionTable(), nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
+		zend.CallUserFunction(nil, &function_name, return_value, b.Cond(arg != nil, 2, 1), params)
 		intern.GetNApplyCount()--
 	} else {
 		if zend.ZEND_NUM_ARGS() != 1 || zend.ZendParseParametersEx(zend.ZEND_PARSE_PARAMS_QUIET, zend.ZEND_NUM_ARGS(), "z", &arg) == zend.FAILURE {
@@ -1173,7 +1173,7 @@ func SplArrayMethod(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 		}
 		zend.ZVAL_COPY_VALUE(&params[1], arg)
 		intern.GetNApplyCount()++
-		zend.CallUserFunction(zend.EG__().GetFunctionTable(), nil, &function_name, return_value, 2, params)
+		zend.CallUserFunction(nil, &function_name, return_value, 2, params)
 		intern.GetNApplyCount()--
 	}
 exit:

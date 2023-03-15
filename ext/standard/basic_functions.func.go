@@ -2384,7 +2384,7 @@ func UserShutdownFunctionCall(zv *zend.Zval) int {
 		zend.ZendStringReleaseEx(function_name, 0)
 		return 0
 	}
-	if zend.CallUserFunction(nil, nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == zend.SUCCESS {
+	if zend.CallUserFunction(nil, shutdown_function_entry.GetArguments()[0], &retval, shutdown_function_entry.GetArgCount()-1, shutdown_function_entry.GetArguments()+1) == zend.SUCCESS {
 		zend.ZvalPtrDtor(&retval)
 	}
 	return 0
@@ -2397,7 +2397,7 @@ func UserTickFunctionCall(tick_fe *UserTickFunctionEntry) {
 
 	if tick_fe.GetCalling() == 0 {
 		tick_fe.SetCalling(1)
-		if zend.CallUserFunction(nil, nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == zend.SUCCESS {
+		if zend.CallUserFunction(nil, function, &retval, tick_fe.GetArgCount()-1, tick_fe.GetArguments()+1) == zend.SUCCESS {
 			zend.ZvalPtrDtor(&retval)
 		} else {
 			var obj *zend.Zval

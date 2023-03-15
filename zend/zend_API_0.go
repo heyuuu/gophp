@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import b "sik/builtin"
@@ -82,49 +80,33 @@ func AddPropertyLong(__arg *Zval, __key string, __n ZendLong) int {
 	return AddPropertyLongEx(__arg, __key, __n)
 }
 func AddPropertyNull(__arg *Zval, __key string) int {
-	return AddPropertyNullEx(__arg, __key, strlen(__key))
+	return AddPropertyNullEx(__arg, __key)
 }
-func AddPropertyBool(__arg *Zval, __key *byte, __b ZendLong) int {
+func AddPropertyBool(__arg *Zval, __key string, __b ZendLong) int {
 	return AddPropertyBoolEx(__arg, __key, __b)
 }
 func AddPropertyResource(__arg *Zval, __key string, __r *ZendResource) int {
 	return AddPropertyResourceEx(__arg, __key, __r)
 }
-func AddPropertyDouble(__arg *Zval, __key *byte, __d float64) int {
+func AddPropertyDouble(__arg *Zval, __key string, __d float64) int {
 	return AddPropertyDoubleEx(__arg, __key, __d)
 }
-func AddPropertyStr(__arg *Zval, __key *byte, __str *ZendString) int {
+func AddPropertyStr(__arg *Zval, __key string, __str *ZendString) int {
+	return AddPropertyStrEx(__arg, __key, __str.GetStr())
+}
+func AddPropertyString(__arg *Zval, __key string, __str string) int {
 	return AddPropertyStrEx(__arg, __key, __str)
 }
-func AddPropertyString(__arg *Zval, __key string, __str *byte) int {
-	return AddPropertyStringEx(__arg, __key, strlen(__key), __str)
-}
-func AddPropertyStringl(__arg *Zval, __key string, __str *byte, __length int) int {
-	return AddPropertyStringlEx(__arg, __key, strlen(__key), __str, __length)
+func AddPropertyStringl(__arg *Zval, __key string, __str string) int {
+	return AddPropertyStrEx(__arg, __key, __str)
 }
 func AddPropertyZval(__arg *Zval, __key string, __value *Zval) int {
-	return AddPropertyZvalEx(__arg, __key, strlen(__key), __value)
+	return AddPropertyZvalEx(__arg, __key, __value)
 }
-func CallUserFunction(
-	function_table *HashTable,
-	object *Zval,
-	function_name *Zval,
-	retval_ptr *Zval,
-	param_count uint32,
-	params []Zval,
-) int {
+func CallUserFunction(object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval) int {
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, 1)
 }
-func CallUserFunctionEx(
-	function_table __auto__,
-	object *Zval,
-	function_name *Zval,
-	retval_ptr *Zval,
-	param_count uint32,
-	params []Zval,
-	no_separation int,
-	symbol_table __auto__,
-) int {
+func CallUserFunctionEx(object *Zval, function_name *Zval, retval_ptr *Zval, param_count uint32, params []Zval, no_separation int) int {
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
 }
 func ZendForbidDynamicCall(func_name string) int {
@@ -136,9 +118,6 @@ func ZendForbidDynamicCall(func_name string) int {
 	}
 	return SUCCESS
 }
-func CHECK_ZVAL_NULL_PATH(p *Zval) bool {
-	return Z_STRLEN_P(p) != strlen(Z_STRVAL_P(p))
-}
 func CHECK_NULL_PATH(p []byte, l int) bool { return strlen(p) != size_t(l) }
 func ZVAL_STRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 0)) }
 func ZVAL_STRING(z *Zval, s *byte) {
@@ -147,11 +126,7 @@ func ZVAL_STRING(z *Zval, s *byte) {
 }
 func ZVAL_EMPTY_STRING(z *Zval)             { z.SetInternedString(ZSTR_EMPTY_ALLOC()) }
 func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 1)) }
-func ZVAL_PSTRING(z *Zval, s *byte) {
-	var _s *byte = s
-	ZVAL_PSTRINGL(z, _s, strlen(_s))
-}
-func ZVAL_EMPTY_PSTRING(z *Zval) { ZVAL_PSTRINGL(z, "", 0) }
+func ZVAL_EMPTY_PSTRING(z *Zval)            { ZVAL_PSTRINGL(z, "", 0) }
 func ZVAL_ZVAL(z *Zval, zv *Zval, copy int, dtor int) {
 	var __z *Zval = z
 	var __zv *Zval = zv
@@ -168,7 +143,7 @@ func ZVAL_ZVAL(z *Zval, zv *Zval, copy int, dtor int) {
 		}
 	}
 }
-func HASH_OF(p *Zval) __auto__ {
+func HASH_OF(p *Zval) *ZendArray {
 	if p.IsArray() {
 		return p.GetArr()
 	} else {
@@ -178,13 +153,6 @@ func HASH_OF(p *Zval) __auto__ {
 			return nil
 		}
 	}
-}
-func ZVAL_IS_NULL(z __auto__) bool { return z.GetType() == IS_NULL }
-func ZEND_GINIT(module __auto__) func(any) {
-	return (func(any))(zm_globals_ctor_module)
-}
-func ZEND_GSHUTDOWN(module __auto__) func(any) {
-	return (func(any))(zm_globals_dtor_module)
 }
 func _ZEND_TRY_ASSIGN_NULL(zv *Zval, is_ref int) {
 	for {
@@ -202,7 +170,6 @@ func _ZEND_TRY_ASSIGN_NULL(zv *Zval, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_NULL(zv *Zval) { _ZEND_TRY_ASSIGN_NULL(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_NULL(zv *Zval) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_NULL(zv, 1)
@@ -244,32 +211,6 @@ func _ZEND_TRY_ASSIGN_TRUE(zv *Zval, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_TRUE(zv *Zval) { _ZEND_TRY_ASSIGN_TRUE(zv, 0) }
-func ZEND_TRY_ASSIGN_REF_TRUE(zv *Zval) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_TRUE(zv, 1)
-}
-func _ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefBool(ref, 1)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		ZVAL_BOOL(_zv, bval)
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_BOOL(zv *Zval, bval __auto__) { _ZEND_TRY_ASSIGN_BOOL(zv, bval, 0) }
-func ZEND_TRY_ASSIGN_REF_BOOL(zv *Zval, bval __auto__) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_BOOL(zv, bval, 1)
-}
 func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
 	for {
 		var _zv *Zval = zv
@@ -286,7 +227,6 @@ func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong) { _ZEND_TRY_ASSIGN_LONG(zv, lval, 0) }
 func ZEND_TRY_ASSIGN_REF_LONG(zv *Zval, lval ZendLong) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_LONG(zv, lval, 1)

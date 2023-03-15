@@ -158,7 +158,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zend.ZVAL_STRINGL(&wakeup_name, "__wakeup", b.SizeOf("\"__wakeup\"")-1)
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(nil, zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || retval.IsUndef() {
+					if zend.CallUserFunction(zv, &wakeup_name, &retval, 0, 0) == zend.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
@@ -182,7 +182,7 @@ func VarDestroy(var_hashx *PhpUnserializeDataT) {
 						zend.ZVAL_STRINGL(&unserialize_name, "__unserialize", b.SizeOf("\"__unserialize\"")-1)
 					}
 					BG(serialize_lock)++
-					if zend.CallUserFunction(zend.CG__().GetFunctionTable(), zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || retval.IsUndef() {
+					if zend.CallUserFunction(zv, &unserialize_name, &retval, 1, &param) == zend.FAILURE || retval.IsUndef() {
 						delayed_call_failed = 1
 						zv.GetObj().AddGcFlags(zend.IS_OBJ_DESTRUCTOR_CALLED)
 					}
@@ -858,7 +858,7 @@ yy18:
 		zend.ZVAL_STRING(&user_func, core.PG(unserialize_callback_func))
 		args[0].SetStringCopy(class_name)
 		BG(serialize_lock)++
-		if zend.CallUserFunctionEx(nil, nil, &user_func, &retval, 1, args, 0, nil) != zend.SUCCESS {
+		if zend.CallUserFunctionEx(nil, &user_func, &retval, 1, args, 0) != zend.SUCCESS {
 			BG(serialize_lock)--
 			if zend.EG__().GetException() != nil {
 				zend.ZendStringReleaseEx(class_name, 0)

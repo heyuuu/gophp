@@ -15,7 +15,7 @@ func ZEND_CLOSURE_PROPERTY_ERROR() {
 func zim_Closure___invoke(executeData *ZendExecuteData, return_value *Zval) {
 	var func_ *ZendFunction = EX(func_)
 	var arguments *Zval = ZEND_CALL_ARG(executeData, 1)
-	if CallUserFunction(CG__().GetFunctionTable(), nil, ZEND_THIS(executeData), return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
+	if CallUserFunction(nil, ZEND_THIS(executeData), return_value, ZEND_NUM_ARGS(), arguments) == FAILURE {
 		return_value.SetFalse()
 	}
 

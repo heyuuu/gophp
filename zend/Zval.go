@@ -204,13 +204,15 @@ func (this *Zval) SwitchConstantFlags(value uint32, cond bool) {
 /**
  * New
  */
-func NewZvalUndef() *Zval            { var tmp Zval; tmp.SetUndef(); return &tmp }
-func NewZvalNull() *Zval             { var tmp Zval; tmp.SetNull(); return &tmp }
-func NewZvalFalse() *Zval            { var tmp Zval; tmp.SetFalse(); return &tmp }
-func NewZvalTrue() *Zval             { var tmp Zval; tmp.SetTrue(); return &tmp }
-func NewZvalBool(b bool) *Zval       { var tmp Zval; tmp.SetBool(b); return &tmp }
-func NewZvalString(str string) *Zval { var tmp Zval; tmp.SetRawString(str); return &tmp }
-func NewZvalLong(l ZendLong) *Zval   { var tmp Zval; tmp.SetLong(l); return &tmp }
+func NewZvalUndef() *Zval                     { var tmp Zval; tmp.SetUndef(); return &tmp }
+func NewZvalNull() *Zval                      { var tmp Zval; tmp.SetNull(); return &tmp }
+func NewZvalFalse() *Zval                     { var tmp Zval; tmp.SetFalse(); return &tmp }
+func NewZvalTrue() *Zval                      { var tmp Zval; tmp.SetTrue(); return &tmp }
+func NewZvalBool(b bool) *Zval                { var tmp Zval; tmp.SetBool(b); return &tmp }
+func NewZvalString(str string) *Zval          { var tmp Zval; tmp.SetRawString(str); return &tmp }
+func NewZvalLong(l ZendLong) *Zval            { var tmp Zval; tmp.SetLong(l); return &tmp }
+func NewZvalDouble(d float64) *Zval           { var tmp Zval; tmp.SetDouble(d); return &tmp }
+func NewZvalResource(res *ZendResource) *Zval { var tmp Zval; tmp.SetResource(res); return &tmp }
 
 /**
  * init

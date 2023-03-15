@@ -878,7 +878,7 @@ func ZendUserExceptionHandler() {
 	EG__().SetException(nil)
 	params[0].SetObject(old_exception)
 	ZVAL_COPY_VALUE(&orig_user_exception_handler, EG__().GetUserExceptionHandler())
-	if CallUserFunction(CG__().GetFunctionTable(), nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
+	if CallUserFunction(nil, &orig_user_exception_handler, &retval2, 1, params) == SUCCESS {
 		ZvalPtrDtor(&retval2)
 		if EG__().GetException() != nil {
 			OBJ_RELEASE(EG__().GetException())

@@ -79,7 +79,7 @@ func UserfilterDtor(thisfilter *core.PhpStreamFilter) {
 
 	}
 	zend.ZVAL_STRINGL(&func_name, "onclose", b.SizeOf("\"onclose\"")-1)
-	zend.CallUserFunction(nil, obj, &func_name, &retval, 0, nil)
+	zend.CallUserFunction(obj, &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)
 	zend.ZvalPtrDtor(&func_name)
 
@@ -143,7 +143,7 @@ func UserfilterFilter(
 		args[2].SetNull()
 	}
 	zend.ZVAL_BOOL(&args[3], (flags&streams.PSFS_FLAG_FLUSH_CLOSE) != 0)
-	call_result = zend.CallUserFunctionEx(nil, obj, &func_name, &retval, 4, args, 0, nil)
+	call_result = zend.CallUserFunctionEx(obj, &func_name, &retval, 4, args, 0)
 	zend.ZvalPtrDtor(&func_name)
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF {
 		zend.ConvertToLong(&retval)
@@ -265,7 +265,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 
 	/* filtername */
 
-	zend.AddPropertyString(&obj, "filtername", (*byte)(filtername))
+	zend.AddPropertyString(&obj, "filtername", b.CastStrAuto(filtername))
 
 	/* and the parameters, if any */
 
@@ -278,7 +278,7 @@ func UserFilterFactoryCreate(filtername *byte, filterparams *zend.Zval, persiste
 	/* invoke the constructor */
 
 	zend.ZVAL_STRINGL(&func_name, "oncreate", b.SizeOf("\"oncreate\"")-1)
-	zend.CallUserFunction(nil, &obj, &func_name, &retval, 0, nil)
+	zend.CallUserFunction(&obj, &func_name, &retval, 0, nil)
 	if retval.GetType() != zend.IS_UNDEF {
 		if retval.IsType(zend.IS_FALSE) {
 
@@ -408,7 +408,7 @@ func ZifStreamBucketMakeWriteable(executeData *zend.ZendExecuteData, return_valu
 		/* add_property_zval increments the refcount which is unwanted here */
 
 		zend.ZvalPtrDtor(&zbucket)
-		zend.AddPropertyStringl(return_value, "data", bucket.GetBuf(), bucket.GetBuflen())
+		zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 		zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 	}
 }
@@ -633,7 +633,7 @@ func ZifStreamBucketNew(executeData *zend.ZendExecuteData, return_value *zend.Zv
 	/* add_property_zval increments the refcount which is unwanted here */
 
 	zend.ZvalPtrDtor(&zbucket)
-	zend.AddPropertyStringl(return_value, "data", bucket.GetBuf(), bucket.GetBuflen())
+	zend.AddPropertyStringl(return_value, "data", b.CastStr(bucket.GetBuf(), bucket.GetBuflen()))
 	zend.AddPropertyLong(return_value, "datalen", bucket.GetBuflen())
 }
 func ZifStreamGetFilters(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

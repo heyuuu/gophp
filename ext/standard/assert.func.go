@@ -215,12 +215,12 @@ func ZifAssert(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		/* XXX do we want to check for error here? */
 
 		if description == nil {
-			zend.CallUserFunction(nil, nil, &(ASSERTG(callback)), &retval, 3, args)
+			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 3, args)
 			zend.ZvalPtrDtor(&args[2])
 			zend.ZvalPtrDtor(&args[0])
 		} else {
 			args[3].SetString(zend.ZvalGetString(description))
-			zend.CallUserFunction(nil, nil, &(ASSERTG(callback)), &retval, 4, args)
+			zend.CallUserFunction(nil, &(ASSERTG(callback)), &retval, 4, args)
 			zend.ZvalPtrDtor(&args[3])
 			zend.ZvalPtrDtor(&args[2])
 			zend.ZvalPtrDtor(&args[0])
