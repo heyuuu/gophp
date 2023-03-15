@@ -763,7 +763,8 @@ func ZifTouch(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 		/* Never reached */
 
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	wrapper = streams.PhpStreamLocateUrlWrapper(filename, nil, 0)
 	if wrapper != &PhpPlainFilesWrapper || strncasecmp("file://", filename, 7) == 0 {
@@ -2480,13 +2481,13 @@ func ZifRealpathCacheGet(executeData *zend.ZendExecuteData, return_value *zend.Z
 			/* bucket->key is unsigned long */
 
 			if zend.ZEND_LONG_MAX >= bucket.GetKey() {
-				zend.AddAssocLongEx(&entry, "key", b.SizeOf("\"key\"")-1, bucket.GetKey())
+				zend.AddAssocLongEx(&entry, "key", bucket.GetKey())
 			} else {
 				zend.AddAssocDoubleEx(&entry, "key", b.SizeOf("\"key\"")-1, float64(bucket.GetKey()))
 			}
-			zend.AddAssocBoolEx(&entry, "is_dir", b.SizeOf("\"is_dir\"")-1, bucket.GetIsDir())
+			zend.AddAssocBoolEx(&entry, "is_dir", bucket.GetIsDir())
 			zend.AddAssocStringlEx(&entry, "realpath", b.SizeOf("\"realpath\"")-1, bucket.GetRealpath(), bucket.GetRealpathLen())
-			zend.AddAssocLongEx(&entry, "expires", b.SizeOf("\"expires\"")-1, bucket.GetExpires())
+			zend.AddAssocLongEx(&entry, "expires", bucket.GetExpires())
 			return_value.GetArr().KeyUpdate(b.CastStr(bucket.GetPath(), bucket.GetPathLen()), &entry)
 			bucket = bucket.GetNext()
 		}

@@ -3406,7 +3406,8 @@ func ZifNumberFormat(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 		}
 		return_value.SetString(_phpMathNumberFormatEx(num, int(dec), dec_point, dec_point_len, thousand_sep, thousand_sep_len))
 	default:
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 }
 func ZifFmod(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

@@ -7974,7 +7974,8 @@ func ZifSscanf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	result = PhpSscanfInternal(str, format, num_args, args, 0, return_value)
 	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 }
 func PhpStrRot13(str *zend.ZendString) *zend.ZendString {

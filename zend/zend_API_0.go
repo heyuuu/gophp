@@ -2,11 +2,6 @@
 
 package zend
 
-import (
-	b "sik/builtin"
-)
-
-func ZEND_NS_NAME(ns string, name string) string { return ns + "\\" + name }
 func CE_STATIC_MEMBERS(ce *ZendClassEntry) *Zval {
 	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table__ptr))
 }
@@ -33,38 +28,24 @@ func ZendParseParametersNoneThrow() ZEND_RESULT_CODE {
 		return FAILURE
 	}
 }
-func ZendRegisterClassAlias(name *byte, ce *ZendClassEntry) int {
-	return ZendRegisterClassAliasEx(name, b.SizeOf("name")-1, ce, 1)
-}
-func ZendRegisterNsClassAlias(ns string, name string, ce *ZendClassEntry) int {
-	return ZendRegisterClassAliasEx(ZEND_NS_NAME(ns, name), b.SizeOf("ZEND_NS_NAME ( ns , name )")-1, ce, 1)
-}
-func getThis() *Zval {
+func getThis(executeData *ZendExecuteData) *Zval {
 	if ZEND_THIS(executeData).IsObject() {
 		return ZEND_THIS(executeData)
 	} else {
 		return nil
 	}
 }
-func ZEND_IS_METHOD_CALL() bool { return EX(func_).common.scope != nil }
-func WRONG_PARAM_COUNT_WITH_RETVAL(ret ZEND_RESULT_CODE) __auto__ {
-	return ZEND_WRONG_PARAM_COUNT_WITH_RETVAL(ret)
-}
-func ARG_COUNT(dummy __auto__) uint32      { return EX_NUM_ARGS() }
 func ZEND_NUM_ARGS() uint32                { return EX_NUM_ARGS() }
 func ArrayInit(arg *Zval)                  { arg.SetArray(ZendNewArray(0)) }
 func ArrayInitSize(arg *Zval, size uint32) { arg.SetArray(ZendNewArray(size)) }
 func AddAssocLong(__arg *Zval, __key string, __n ZendLong) int {
-	return AddAssocLongEx(__arg, __key, strlen(__key), __n)
+	return AddAssocLongEx(__arg, __key, __n)
 }
 func AddAssocNull(__arg *Zval, __key string) int {
 	return AddAssocNullEx(__arg, __key, strlen(__key))
 }
 func AddAssocBool(__arg *Zval, __key string, __b int) int {
-	return AddAssocBoolEx(__arg, __key, strlen(__key), __b)
-}
-func AddAssocResource(__arg *Zval, __key *byte, __r *ZendResource) int {
-	return AddAssocResourceEx(__arg, __key, strlen(__key), __r)
+	return AddAssocBoolEx(__arg, __key, __b)
 }
 func AddAssocDouble(__arg *Zval, __key *byte, __d float64) int {
 	return AddAssocDoubleEx(__arg, __key, strlen(__key), __d)

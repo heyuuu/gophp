@@ -154,7 +154,7 @@ func zim_Closure_bind(executeData *ZendExecuteData, return_value *Zval) {
 	var closure *ZendClosure
 	var ce *ZendClassEntry
 	var called_scope *ZendClassEntry
-	if ZendParseMethodParameters(ZEND_NUM_ARGS(), getThis(), "Oo!|z", &zclosure, ZendCeClosure, &newthis, &scope_arg) == FAILURE {
+	if ZendParseMethodParameters(ZEND_NUM_ARGS(), getThis(executeData), "Oo!|z", &zclosure, ZendCeClosure, &newthis, &scope_arg) == FAILURE {
 		return
 	}
 	closure = (*ZendClosure)(zclosure.GetObj())

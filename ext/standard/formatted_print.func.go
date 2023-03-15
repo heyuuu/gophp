@@ -851,7 +851,8 @@ func ZifFprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var argc int
 	var result *zend.ZendString
 	if zend.ZEND_NUM_ARGS() < 2 {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	for {
 		var _flags int = 0
@@ -952,7 +953,8 @@ func ZifVfprintf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var argc int
 	var result *zend.ZendString
 	if zend.ZEND_NUM_ARGS() != 3 {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	for {
 		var _flags int = 0

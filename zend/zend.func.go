@@ -860,9 +860,9 @@ func ZendInternalTypeError(throw_exception ZendBool, format string, args ...any)
 		ZendError(E_WARNING, "%s", message)
 	}
 }
-func ZendInternalArgumentCountError(throw_exception ZendBool, format string, args ...any) {
+func ZendInternalArgumentCountError(throw_exception bool, format string, args ...any) {
 	message := ZendSprintf(format, args...)
-	if throw_exception != 0 {
+	if throw_exception {
 		ZendThrowException(ZendCeArgumentCountError, message, 0)
 	} else {
 		ZendError(E_WARNING, "%s", message)

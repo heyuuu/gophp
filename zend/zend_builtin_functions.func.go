@@ -76,10 +76,10 @@ func ZifGcStatus(executeData *ZendExecuteData, return_value *Zval) {
 		return
 	}
 	ArrayInitSize(return_value, 3)
-	AddAssocLongEx(return_value, "runs", b.SizeOf("\"runs\"")-1, 0)
-	AddAssocLongEx(return_value, "collected", b.SizeOf("\"collected\"")-1, 0)
-	AddAssocLongEx(return_value, "threshold", b.SizeOf("\"threshold\"")-1, 0)
-	AddAssocLongEx(return_value, "roots", b.SizeOf("\"roots\"")-1, 0)
+	AddAssocLongEx(return_value, "runs", 0)
+	AddAssocLongEx(return_value, "collected", 0)
+	AddAssocLongEx(return_value, "threshold", 0)
+	AddAssocLongEx(return_value, "roots", 0)
 }
 func ZifFuncNumArgs(executeData *ZendExecuteData, return_value *Zval) {
 	var ex *ZendExecuteData = EX(prev_execute_data)

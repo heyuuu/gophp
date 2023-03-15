@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func ObjectPropertiesInit(object *ZendObject, class_type *ZendClassEntry) {
@@ -144,10 +143,10 @@ func ObjectInit(arg *Zval) int {
 	arg.SetObject(ZendObjectsNew(ZendStandardClassDef))
 	return SUCCESS
 }
-func AddAssocLongEx(arg *Zval, key string, key_len int, n ZendLong) int {
+func AddAssocLongEx(arg *Zval, key string, n ZendLong) int {
 	var tmp Zval
 	tmp.SetLong(n)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
 func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
@@ -156,16 +155,10 @@ func AddAssocNullEx(arg *Zval, key *byte, key_len int) int {
 	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
 	return SUCCESS
 }
-func AddAssocBoolEx(arg *Zval, key string, key_len int, b int) int {
+func AddAssocBoolEx(arg *Zval, key string, b int) int {
 	var tmp Zval
-	ZVAL_BOOL(&tmp, b != 0)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
-	return SUCCESS
-}
-func AddAssocResourceEx(arg *Zval, key *byte, key_len int, r *ZendResource) int {
-	var tmp Zval
-	tmp.SetResource(r)
-	arg.GetArr().SymtableUpdate(b.CastStr(key, key_len), &tmp)
+	tmp.SetBool(b != 0)
+	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
 func AddAssocDoubleEx(arg *Zval, key string, key_len int, d float64) int {
@@ -202,15 +195,9 @@ func AddIndexLong(arg *Zval, index ZendUlong, n ZendLong) int {
 	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
-func AddIndexNull(arg *Zval, index ZendUlong) int {
-	var tmp Zval
-	tmp.SetNull()
-	arg.GetArr().IndexUpdateH(index, &tmp)
-	return SUCCESS
-}
 func AddIndexBool(arg *Zval, index ZendUlong, b int) int {
 	var tmp Zval
-	ZVAL_BOOL(&tmp, b != 0)
+	tmp.SetBool(b != 0)
 	arg.GetArr().IndexUpdateH(index, &tmp)
 	return SUCCESS
 }
@@ -227,36 +214,29 @@ func AddIndexDouble(arg *Zval, index ZendUlong, d float64) int {
 	return SUCCESS
 }
 func AddIndexStr(arg *Zval, index ZendUlong, str *ZendString) int {
-	var tmp Zval
-	tmp.SetString(str)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	zv := NewZvalString(str.GetStr())
+	arg.GetArr().IndexUpdateH(index, zv)
 	return SUCCESS
 }
 func AddIndexString(arg *Zval, index ZendUlong, str *byte) int {
-	var tmp Zval
-	ZVAL_STRING(&tmp, str)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	zv := NewZvalString(b.CastStrAuto(str))
+	arg.GetArr().IndexUpdateH(index, zv)
 	return SUCCESS
 }
 func AddIndexStringl(arg *Zval, index ZendUlong, str *byte, length int) int {
-	var tmp Zval
-	ZVAL_STRINGL(&tmp, str, length)
-	arg.GetArr().IndexUpdateH(index, &tmp)
+	zv := NewZvalString(b.CastStr(str, length))
+	arg.GetArr().IndexUpdateH(index, zv)
 	return SUCCESS
 }
 func AddNextIndexLong(arg *Zval, n ZendLong) int {
-	var tmp Zval
-	tmp.SetLong(n)
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.GetArr().NextIndexInsert(NewZvalLong(n)) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
 	}
 }
 func AddNextIndexNull(arg *Zval) int {
-	var tmp Zval
-	tmp.SetNull()
-	if arg.GetArr().NextIndexInsert(&tmp) != nil {
+	if arg.GetArr().NextIndexInsert(NewZvalNull()) != nil {
 		return SUCCESS
 	} else {
 		return FAILURE
@@ -264,7 +244,7 @@ func AddNextIndexNull(arg *Zval) int {
 }
 func AddNextIndexBool(arg *Zval, b int) int {
 	var tmp Zval
-	ZVAL_BOOL(&tmp, b != 0)
+	tmp.SetBool(b != 0)
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
@@ -327,7 +307,7 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 		break
 	case IS_RESOURCE:
 		ZendError(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(key), Z_RES_HANDLE_P(key))
-		result = ht.IndexUpdateH(Z_RES_HANDLE_P(key), value)
+		result = ht.IndexUpdate(Z_RES_HANDLE_P(key), value)
 		break
 	case IS_FALSE:
 		result = ht.IndexUpdateH(0, value)
@@ -336,10 +316,10 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 		result = ht.IndexUpdateH(1, value)
 		break
 	case IS_LONG:
-		result = ht.IndexUpdateH(key.GetLval(), value)
+		result = ht.IndexUpdate(key.GetLval(), value)
 		break
 	case IS_DOUBLE:
-		result = ht.IndexUpdateH(ZendDvalToLval(key.GetDval()), value)
+		result = ht.IndexUpdate(ZendDvalToLval(key.GetDval()), value)
 		break
 	default:
 		ZendError(E_WARNING, "Illegal offset type")
@@ -358,9 +338,8 @@ func AddPropertyLongEx(arg *Zval, key *byte, key_len int, n ZendLong) int {
 	return AddPropertyZvalEx(arg, key, key_len, &tmp)
 }
 func AddPropertyBoolEx(arg *Zval, key *byte, key_len int, b ZendLong) int {
-	var tmp Zval
-	ZVAL_BOOL(&tmp, b != 0)
-	return AddPropertyZvalEx(arg, key, key_len, &tmp)
+	zv := NewZvalBool(b != 0)
+	return AddPropertyZvalEx(arg, key, key_len, zv)
 }
 func AddPropertyNullEx(arg *Zval, key *byte, key_len int) int {
 	var tmp Zval

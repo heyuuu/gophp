@@ -1536,7 +1536,8 @@ func SplFilesystemFileCall(intern *SplFilesystemObject, func_ptr *zend.ZendFunct
 	}
 	if zend.ZendGetParametersArrayEx(pass_num_args, params+b.Cond(arg2 != nil, 2, 1)) != zend.SUCCESS {
 		zend.Efree(params)
-		zend.WRONG_PARAM_COUNT_WITH_RETVAL(zend.FAILURE)
+		zend.ZendWrongParamCount()
+		return zend.FAILURE
 	}
 	retval.SetUndef()
 	fci.SetSize(b.SizeOf("fci"))

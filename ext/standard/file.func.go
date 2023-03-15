@@ -1953,7 +1953,8 @@ func ZifFscanf(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	result = PhpSscanfInternal(buf, format, argc, args, 0, return_value)
 	zend.Efree(buf)
 	if SCAN_ERROR_WRONG_PARAM_COUNT == result {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 }
 func ZifFwrite(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

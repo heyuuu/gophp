@@ -100,7 +100,8 @@ func ZifLevenshtein(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		}
 		distance = CustomLevdist(str1, str2, callback_name)
 	default:
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	if distance < 0 && zend.ZEND_NUM_ARGS() != 3 {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Argument string(s) too long")

@@ -1539,8 +1539,8 @@ func ZifTimeNanosleep(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return
 	} else if errno == EINTR {
 		zend.ArrayInit(return_value)
-		zend.AddAssocLongEx(return_value, "seconds", b.SizeOf("\"seconds\"")-1, php_rem.tv_sec)
-		zend.AddAssocLongEx(return_value, "nanoseconds", b.SizeOf("\"nanoseconds\"")-1, php_rem.tv_nsec)
+		zend.AddAssocLongEx(return_value, "seconds", php_rem.tv_sec)
+		zend.AddAssocLongEx(return_value, "nanoseconds", php_rem.tv_nsec)
 		return
 	} else if errno == EINVAL {
 		core.PhpErrorDocref(nil, zend.E_WARNING, "nanoseconds was not in the range 0 to 999 999 999 or seconds was negative")
@@ -1938,10 +1938,10 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	}
 	if core.PG(last_error_message) {
 		zend.ArrayInit(return_value)
-		zend.AddAssocLongEx(return_value, "type", b.SizeOf("\"type\"")-1, core.PG(last_error_type))
+		zend.AddAssocLongEx(return_value, "type", core.PG(last_error_type))
 		zend.AddAssocStringEx(return_value, "message", b.SizeOf("\"message\"")-1, core.PG(last_error_message))
 		zend.AddAssocStringEx(return_value, "file", b.SizeOf("\"file\"")-1, b.CondF1(core.PG(last_error_file), func() __auto__ { return core.PG(last_error_file) }, "-"))
-		zend.AddAssocLongEx(return_value, "line", b.SizeOf("\"line\"")-1, core.PG(last_error_lineno))
+		zend.AddAssocLongEx(return_value, "line", core.PG(last_error_lineno))
 	}
 }
 func ZifErrorClearLast(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -2469,7 +2469,8 @@ func ZifRegisterShutdownFunction(executeData *zend.ZendExecuteData, return_value
 	var i int
 	shutdown_function_entry.SetArgCount(zend.ZEND_NUM_ARGS())
 	if shutdown_function_entry.GetArgCount() < 1 {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	shutdown_function_entry.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), shutdown_function_entry.GetArgCount(), 0)))
 	if zend.ZendGetParametersArray(zend.ZEND_NUM_ARGS(), shutdown_function_entry.GetArgCount(), shutdown_function_entry.GetArguments()) == zend.FAILURE {
@@ -3855,7 +3856,8 @@ func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *ze
 	tick_fe.SetCalling(0)
 	tick_fe.SetArgCount(zend.ZEND_NUM_ARGS())
 	if tick_fe.GetArgCount() < 1 {
-		zend.WRONG_PARAM_COUNT
+		zend.ZendWrongParamCount()
+		return
 	}
 	tick_fe.SetArguments((*zend.Zval)(zend.SafeEmalloc(b.SizeOf("zval"), tick_fe.GetArgCount(), 0)))
 	if zend.ZendGetParametersArray(zend.ZEND_NUM_ARGS(), tick_fe.GetArgCount(), tick_fe.GetArguments()) == zend.FAILURE {

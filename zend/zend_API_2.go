@@ -18,7 +18,7 @@ func ZendWrongParametersNoneException() int {
 	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
 	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
+	ZendInternalArgumentCountError(true, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
 	return FAILURE
 }
 func ZendWrongParametersCountError(min_num_args int, max_num_args int) {
@@ -31,7 +31,7 @@ func ZendWrongParametersCountException(min_num_args int, max_num_args int) {
 	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
 	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(1, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+	ZendInternalArgumentCountError(true, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 }
 func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Zval) {
 	var space *byte
