@@ -260,6 +260,7 @@ func ZendParseArgDoubleSlow(arg *Zval, dest *float64) int {
 	}
 	return ZendParseArgDoubleWeak(arg, dest)
 }
+
 func ZendParseArgStrWeak(arg *Zval, dest **ZendString) int {
 	if arg.GetType() < IS_STRING {
 		ConvertToString(arg)

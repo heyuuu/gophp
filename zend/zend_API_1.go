@@ -4,85 +4,8 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
-func ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray) { _ZEND_TRY_ASSIGN_ARR(zv, arr, 0) }
-func ZEND_TRY_ASSIGN_REF_ARR(zv *Zval, arr *ZendArray) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_ARR(zv, arr, 1)
-}
-func _ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefRes(ref, res)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		_zv.SetResource(res)
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_RES(zv *Zval, res *ZendResource) { _ZEND_TRY_ASSIGN_RES(zv, res, 0) }
-func ZEND_TRY_ASSIGN_REF_RES(zv *Zval, res *ZendResource) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_RES(zv, res, 1)
-}
-func _ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRef(ref, other_zv)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		ZVAL_COPY_VALUE(_zv, other_zv)
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_TMP(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_TMP(zv, other_zv, 0) }
-func ZEND_TRY_ASSIGN_REF_TMP(zv *Zval, other_zv *Zval) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_TMP(zv, other_zv, 1)
-}
-func _ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefZval(ref, other_zv)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		ZVAL_COPY_VALUE(_zv, other_zv)
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_VALUE(zv *Zval, other_zv *Zval) { _ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 0) }
-func ZEND_TRY_ASSIGN_REF_VALUE(zv *Zval, other_zv *Zval) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_VALUE(zv, other_zv, 1)
-}
-func ZEND_TRY_ASSIGN_COPY(zv *Zval, other_zv *Zval) {
-	other_zv.TryAddRefcount()
-	ZEND_TRY_ASSIGN_VALUE(zv, other_zv)
-}
-func ZEND_TRY_ASSIGN_REF_COPY(zv *Zval, other_zv *Zval) {
-	other_zv.TryAddRefcount()
-	ZEND_TRY_ASSIGN_REF_VALUE(zv, other_zv)
-}
 func _ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool, is_ref int) {
 	for {
 		var _zv *Zval = zv
@@ -102,17 +25,9 @@ func _ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool, is_ref
 func ZEND_TRY_ASSIGN_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
 	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 0)
 }
-func ZEND_TRY_ASSIGN_REF_VALUE_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict, 1)
-}
 func ZEND_TRY_ASSIGN_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
 	other_zv.TryAddRefcount()
 	ZEND_TRY_ASSIGN_VALUE_EX(zv, other_zv, strict)
-}
-func ZEND_TRY_ASSIGN_REF_COPY_EX(zv *Zval, other_zv *Zval, strict ZendBool) {
-	other_zv.TryAddRefcount()
-	ZEND_TRY_ASSIGN_REF_VALUE_EX(zv, other_zv, strict)
 }
 func ZendTryArrayInitSize(zv *Zval, size uint32) *Zval {
 	var arr *ZendArray = ZendNewArray(size)
@@ -151,45 +66,6 @@ func Z_PARAM_PROLOGUE(deref int, separate int) {
 		SEPARATE_ZVAL_NOREF(_arg)
 	}
 }
-func Z_PARAM_STRICT_LONG_EX2(dest ZendLong, is_null ZendBool, check_null int, deref int, separate int) {
-	Z_PARAM_PROLOGUE(deref, separate)
-	if ZendParseArgLong(_arg, &dest, &is_null, check_null, 1) == 0 {
-		_expected_type = Z_EXPECTED_LONG
-		_error_code = ZPP_ERROR_WRONG_ARG
-		break
-	}
-}
-func Z_PARAM_STRICT_LONG_EX(dest ZendLong, is_null ZendBool, check_null int, separate int) {
-	Z_PARAM_STRICT_LONG_EX2(dest, is_null, check_null, separate, separate)
-}
-func Z_PARAM_STRICT_LONG(dest ZendLong) {
-	Z_PARAM_STRICT_LONG_EX(dest, _dummy, 0, 0)
-}
-func Z_PARAM_OBJECT_OF_CLASS_EX2(dest *Zval, _ce *ZendClassEntry, check_null int, deref int, separate int) {
-	Z_PARAM_PROLOGUE(deref, separate)
-	if ZendParseArgObject(_arg, &dest, _ce, check_null) == 0 {
-		if _ce != nil {
-			_error = _ce.GetName().GetVal()
-			_error_code = ZPP_ERROR_WRONG_CLASS
-			break
-		} else {
-			_expected_type = Z_EXPECTED_OBJECT
-			_error_code = ZPP_ERROR_WRONG_ARG
-			break
-		}
-	}
-}
-func Z_PARAM_OBJECT_OF_CLASS_EX(dest *Zval, _ce *ZendClassEntry, check_null int, separate int) {
-	Z_PARAM_OBJECT_OF_CLASS_EX2(dest, _ce, check_null, separate, separate)
-}
-func Z_PARAM_OBJECT_OF_CLASS(dest *Zval, _ce *ZendClassEntry) {
-	Z_PARAM_OBJECT_OF_CLASS_EX(dest, _ce, 0, 0)
-}
-func Z_PARAM_ZVAL_DEREF_EX(dest *Zval, check_null int, separate int) {
-	Z_PARAM_PROLOGUE(1, separate)
-	ZendParseArgZvalDeref(_arg, &dest, check_null)
-}
-func Z_PARAM_ZVAL_DEREF(dest *Zval) { Z_PARAM_ZVAL_DEREF_EX(dest, 0, 0) }
 func ZendParseArgBool(arg *Zval, dest *ZendBool, is_null *ZendBool, check_null int) int {
 	if check_null != 0 {
 		*is_null = 0
@@ -337,13 +213,6 @@ func ZendParseArgFunc(arg *Zval, dest_fci *ZendFcallInfo, dest_fcc *ZendFcallInf
 		return 0
 	}
 	return 1
-}
-func ZendParseArgZval(arg *Zval, dest **Zval, check_null int) {
-	if check_null != 0 && (arg.IsNull() || arg.IsReference() && Z_REFVAL_P(arg).IsNull()) {
-		*dest = nil
-	} else {
-		*dest = arg
-	}
 }
 func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
 	if check_null != 0 && arg.IsNull() {

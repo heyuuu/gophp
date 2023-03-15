@@ -158,11 +158,7 @@ func ZendIniDoOp(type_ byte, result *Zval, op1 *Zval, op2 *Zval) {
 /* }}} */
 
 func ZendIniInitString(result *Zval) {
-	if ZEND_SYSTEM_INI != 0 {
-		ZVAL_EMPTY_PSTRING(result)
-	} else {
-		ZVAL_EMPTY_STRING(result)
-	}
+	result.SetStringVal("")
 }
 
 /* }}} */
@@ -177,7 +173,7 @@ func ZendIniAddString(result *Zval, op1 *Zval, op2 *Zval) {
 		if ZEND_SYSTEM_INI != 0 {
 			var tmp_str *ZendString
 			var str *ZendString = ZvalGetTmpString(op1, &tmp_str)
-			ZVAL_PSTRINGL(op1, str.GetVal(), str.GetLen())
+			op1.SetRawString(str.GetStr())
 			ZendTmpStringRelease(tmp_str)
 		} else {
 			op1.SetString(ZvalGetStringFunc(op1))

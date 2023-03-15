@@ -50,7 +50,7 @@ func (this *ZendFunctionEntry) NumArgs() uint32         { return uint32(len(this
 func (this *ZendFunctionEntry) Flags() uint32           { return this.flags }
 
 func (this *ZendFunctionEntry) GetFname() *byte      { return b.CastStrPtr(this.funcName) }
-func (this *ZendFunctionEntry) GetArgInfo() *ArgInfo { return b.CastPtr[ArgInfo](this.ArgInfos()) }
+func (this *ZendFunctionEntry) GetArgInfo() *ArgInfo { return b.Cast[ArgInfo](&this.argInfos) }
 func (this *ZendFunctionEntry) GetNumArgs() uint32   { return this.NumArgs() }
 func (this *ZendFunctionEntry) GetFlags() uint32     { return this.flags }
 

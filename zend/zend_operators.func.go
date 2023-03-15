@@ -167,17 +167,6 @@ func TryConvertToString(op *Zval) ZendBool {
 	}
 	return _tryConvertToString(op)
 }
-func _zvalGetLong(op *Zval) ZendLong          { return ZvalGetLong(op) }
-func _zvalGetDouble(op *Zval) float64         { return ZvalGetDouble(op) }
-func _zvalGetString(op *Zval) *ZendString     { return ZvalGetString(op) }
-func _zvalGetLongFunc(op *Zval) ZendLong      { return ZvalGetLongFunc(op) }
-func _zvalGetDoubleFunc(op *Zval) float64     { return ZvalGetDoubleFunc(op) }
-func _zvalGetStringFunc(op *Zval) *ZendString { return ZvalGetStringFunc(op) }
-func ConvertToCstring(op *Zval) {
-	if op.GetType() != IS_STRING {
-		_convertToCstring(op)
-	}
-}
 func ConvertToString(op *Zval) {
 	if op.GetType() != IS_STRING {
 		_convertToString(op)
@@ -782,16 +771,6 @@ try_again:
 		goto try_again
 	default:
 
-	}
-}
-func _convertToCstring(op *Zval) {
-	if op.IsDouble() {
-		var str *ZendString
-		var dval float64 = op.GetDval()
-		str = NewZendString(ZendSprintf("%.*H", int(EG__().GetPrecision()), dval))
-		op.SetString(str)
-	} else {
-		_convertToString(op)
 	}
 }
 func _convertToString(op *Zval) {

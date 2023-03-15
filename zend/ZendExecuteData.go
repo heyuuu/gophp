@@ -46,7 +46,7 @@ func (this *ZendExecuteData) SetCall(value *ZendExecuteData) { this.call = value
 func (this *ZendExecuteData) SetReturnValue(value *Zval)  { this.return_value = value }
 func (this *ZendExecuteData) GetFunc() *ZendFunction      { return this.func_ }
 func (this *ZendExecuteData) SetFunc(value *ZendFunction) { this.func_ = value }
-func (this *ZendExecuteData) GetThis() Zval               { return this.This }
+func (this *ZendExecuteData) GetThis() *Zval              { return &this.This }
 
 // func (this *ZendExecuteData) SetThis(value Zval) { this.This = value }
 func (this *ZendExecuteData) GetPrevExecuteData() *ZendExecuteData { return this.prev_execute_data }

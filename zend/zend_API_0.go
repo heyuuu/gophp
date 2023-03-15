@@ -3,7 +3,8 @@ package zend
 import b "sik/builtin"
 
 func CE_STATIC_MEMBERS(ce *ZendClassEntry) *Zval {
-	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table__ptr))
+	// todo
+	return (ZEND_MAP_PTR_GET(ce.static_members_table__ptr)).(*Zval)
 }
 func ZEND_FCI_INITIALIZED(fci ZendFcallInfo) bool { return fci.GetSize() != 0 }
 func ZendGetParametersArray(ht uint32, param_count int, argument_array *Zval) int {
@@ -109,10 +110,8 @@ func ZendForbidDynamicCall(func_name string) int {
 	}
 	return SUCCESS
 }
-func CHECK_NULL_PATH(p []byte, l int) bool  { return len(p) != l }
-func ZVAL_EMPTY_STRING(z *Zval)             { z.SetInternedString(ZSTR_EMPTY_ALLOC()) }
-func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 1)) }
-func ZVAL_EMPTY_PSTRING(z *Zval)            { ZVAL_PSTRINGL(z, "", 0) }
+func CHECK_NULL_PATH(p []byte, l int) bool { return len(p) != l }
+func ZVAL_EMPTY_STRING(z *Zval)            { z.SetInternedString(ZSTR_EMPTY_ALLOC()) }
 func ZVAL_ZVAL(z *Zval, zv *Zval, copy int, dtor int) {
 	var __z *Zval = z
 	var __zv *Zval = zv
