@@ -256,13 +256,9 @@ func ZendWrongParamCount() {
 	var class_name *byte = GetActiveClassName(&space)
 	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "Wrong parameter count for %s%s%s()", class_name, space, GetActiveFunctionName())
 }
-func ZendGetTypeByConst(type_ int) *byte {
+func ZendGetTypeByConst(type_ ZendUchar) string {
 	switch type_ {
-	case IS_FALSE:
-
-	case IS_TRUE:
-
-	case _IS_BOOL:
+	case IS_FALSE, IS_TRUE, _IS_BOOL:
 		return "bool"
 	case IS_LONG:
 		return "int"
@@ -290,7 +286,7 @@ func ZendGetTypeByConst(type_ int) *byte {
 		return "unknown"
 	}
 }
-func ZendZvalTypeName(arg *Zval) *byte {
+func ZendZvalTypeName(arg *Zval) string {
 	ZVAL_DEREF(arg)
 	return ZendGetTypeByConst(arg.GetType())
 }

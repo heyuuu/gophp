@@ -13,15 +13,6 @@ type ZnodeOp struct /* union */ {
 	jmp_offset uint32
 }
 
-// func MakeZnodeOp(constant uint32, var_ uint32, num uint32, opline_num uint32, jmp_offset uint32) ZnodeOp {
-//     return ZnodeOp{
-//         constant:constant,
-//         var_:var_,
-//         num:num,
-//         opline_num:opline_num,
-//         jmp_offset:jmp_offset,
-//     }
-// }
 func (this *ZnodeOp) GetConstant() uint32       { return this.constant }
 func (this *ZnodeOp) SetConstant(value uint32)  { this.constant = value }
 func (this *ZnodeOp) GetVar() uint32            { return this.var_ }
@@ -47,14 +38,9 @@ type Znode struct {
 
 func (this *Znode) GetOpType() ZendUchar      { return this.op_type }
 func (this *Znode) SetOpType(value ZendUchar) { this.op_type = value }
-
-// func (this *Znode)  GetFlag() ZendUchar      { return this.flag }
-// func (this *Znode) SetFlag(value ZendUchar) { this.flag = value }
-func (this *Znode) GetOp() ZnodeOp      { return this.u.op }
-func (this *Znode) SetOp(value ZnodeOp) { this.u.op = value }
-func (this *Znode) GetConstant() Zval   { return this.u.constant }
-
-// func (this *Znode) SetConstant(value Zval) { this.u.constant = value }
+func (this *Znode) GetOp() ZnodeOp            { return this.u.op }
+func (this *Znode) SetOp(value ZnodeOp)       { this.u.op = value }
+func (this *Znode) GetConstant() Zval         { return this.u.constant }
 
 /**
  * ZendAstZnode
@@ -66,24 +52,11 @@ type ZendAstZnode struct {
 	node   Znode
 }
 
-// func MakeZendAstZnode(kind ZendAstKind, attr ZendAstAttr, lineno uint32, node Znode) ZendAstZnode {
-//     return ZendAstZnode{
-//         kind:kind,
-//         attr:attr,
-//         lineno:lineno,
-//         node:node,
-//     }
-// }
-// func (this *ZendAstZnode)  GetKind() ZendAstKind      { return this.kind }
 func (this *ZendAstZnode) SetKind(value ZendAstKind) { this.kind = value }
-
-// func (this *ZendAstZnode)  GetAttr() ZendAstAttr      { return this.attr }
 func (this *ZendAstZnode) SetAttr(value ZendAstAttr) { this.attr = value }
-
-// func (this *ZendAstZnode)  GetLineno() uint32      { return this.lineno }
-func (this *ZendAstZnode) SetLineno(value uint32) { this.lineno = value }
-func (this *ZendAstZnode) GetNode() Znode         { return this.node }
-func (this *ZendAstZnode) SetNode(value Znode)    { this.node = value }
+func (this *ZendAstZnode) SetLineno(value uint32)    { this.lineno = value }
+func (this *ZendAstZnode) GetNode() Znode            { return this.node }
+func (this *ZendAstZnode) SetNode(value Znode)       { this.node = value }
 
 /**
  * ZendDeclarables
@@ -92,11 +65,6 @@ type ZendDeclarables struct {
 	ticks ZendLong
 }
 
-// func MakeZendDeclarables(ticks ZendLong) ZendDeclarables {
-//     return ZendDeclarables{
-//         ticks:ticks,
-//     }
-// }
 func (this *ZendDeclarables) GetTicks() ZendLong      { return this.ticks }
 func (this *ZendDeclarables) SetTicks(value ZendLong) { this.ticks = value }
 
@@ -114,27 +82,6 @@ type ZendFileContext struct {
 	seen_symbols             HashTable
 }
 
-//             func MakeZendFileContext(
-// declarables ZendDeclarables,
-// current_namespace *ZendString,
-// in_namespace ZendBool,
-// has_bracketed_namespaces ZendBool,
-// imports *HashTable,
-// imports_function *HashTable,
-// imports_const *HashTable,
-// seen_symbols HashTable,
-// ) ZendFileContext {
-//                 return ZendFileContext{
-//                     declarables:declarables,
-//                     current_namespace:current_namespace,
-//                     in_namespace:in_namespace,
-//                     has_bracketed_namespaces:has_bracketed_namespaces,
-//                     imports:imports,
-//                     imports_function:imports_function,
-//                     imports_const:imports_const,
-//                     seen_symbols:seen_symbols,
-//                 }
-//             }
 func (this *ZendFileContext) GetDeclarables() ZendDeclarables       { return this.declarables }
 func (this *ZendFileContext) SetDeclarables(value ZendDeclarables)  { this.declarables = value }
 func (this *ZendFileContext) GetCurrentNamespace() *ZendString      { return this.current_namespace }
@@ -167,23 +114,9 @@ type ZendParserStackElem struct /* union */ {
 	ptr *uint8
 }
 
-// func MakeZendParserStackElem(ast *ZendAst, str *ZendString, num ZendUlong, ptr *uint8) ZendParserStackElem {
-//     return ZendParserStackElem{
-//         ast:ast,
-//         str:str,
-//         num:num,
-//         ptr:ptr,
-//     }
-// }
 func (this *ZendParserStackElem) GetAst() *ZendAst      { return this.ast }
 func (this *ZendParserStackElem) SetAst(value *ZendAst) { this.ast = value }
 func (this *ZendParserStackElem) GetStr() *ZendString   { return this.str }
-
-// func (this *ZendParserStackElem) SetStr(value *ZendString) { this.str = value }
-// func (this *ZendParserStackElem)  GetNum() ZendUlong      { return this.num }
-// func (this *ZendParserStackElem) SetNum(value ZendUlong) { this.num = value }
-// func (this *ZendParserStackElem)  GetPtr() *uint8      { return this.ptr }
-// func (this *ZendParserStackElem) SetPtr(value *uint8) { this.ptr = value }
 
 /**
  * ZendOp
@@ -201,31 +134,6 @@ type ZendOp struct {
 	result_type    ZendUchar
 }
 
-//             func MakeZendOp(
-// handler any,
-// op1 ZnodeOp,
-// op2 ZnodeOp,
-// result ZnodeOp,
-// extended_value uint32,
-// lineno uint32,
-// opcode ZendUchar,
-// op1_type ZendUchar,
-// op2_type ZendUchar,
-// result_type ZendUchar,
-// ) ZendOp {
-//                 return ZendOp{
-//                     handler:handler,
-//                     op1:op1,
-//                     op2:op2,
-//                     result:result,
-//                     extended_value:extended_value,
-//                     lineno:lineno,
-//                     opcode:opcode,
-//                     op1_type:op1_type,
-//                     op2_type:op2_type,
-//                     result_type:result_type,
-//                 }
-//             }
 func (this *ZendOp) GetHandler() any               { return this.handler }
 func (this *ZendOp) SetHandler(value any)          { this.handler = value }
 func (this *ZendOp) GetOp1() ZnodeOp               { return this.op1 }
@@ -307,14 +215,6 @@ type ZendTryCatchElement struct {
 	finally_end uint32
 }
 
-// func MakeZendTryCatchElement(try_op uint32, catch_op uint32, finally_op uint32, finally_end uint32) ZendTryCatchElement {
-//     return ZendTryCatchElement{
-//         try_op:try_op,
-//         catch_op:catch_op,
-//         finally_op:finally_op,
-//         finally_end:finally_end,
-//     }
-// }
 func (this *ZendTryCatchElement) GetTryOp() uint32           { return this.try_op }
 func (this *ZendTryCatchElement) SetTryOp(value uint32)      { this.try_op = value }
 func (this *ZendTryCatchElement) GetCatchOp() uint32         { return this.catch_op }
@@ -333,13 +233,6 @@ type ZendLiveRange struct {
 	end   uint32
 }
 
-// func MakeZendLiveRange(var_ uint32, start uint32, end uint32) ZendLiveRange {
-//     return ZendLiveRange{
-//         var_:var_,
-//         start:start,
-//         end:end,
-//     }
-// }
 func (this *ZendLiveRange) GetVar() uint32        { return this.var_ }
 func (this *ZendLiveRange) SetVar(value uint32)   { this.var_ = value }
 func (this *ZendLiveRange) GetStart() uint32      { return this.start }
@@ -418,23 +311,6 @@ type ZendPropertyInfo struct {
 	type_       ZendType
 }
 
-//             func MakeZendPropertyInfo(
-// offset uint32,
-// flags uint32,
-// name *ZendString,
-// doc_comment *ZendString,
-// ce *ZendClassEntry,
-// type_ ZendType,
-// ) ZendPropertyInfo {
-//                 return ZendPropertyInfo{
-//                     offset:offset,
-//                     flags:flags,
-//                     name:name,
-//                     doc_comment:doc_comment,
-//                     ce:ce,
-//                     type_:type_,
-//                 }
-//             }
 func (this *ZendPropertyInfo) GetOffset() uint32               { return this.offset }
 func (this *ZendPropertyInfo) SetOffset(value uint32)          { this.offset = value }
 func (this *ZendPropertyInfo) GetFlags() uint32                { return this.flags }

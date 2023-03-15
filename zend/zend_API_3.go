@@ -32,14 +32,6 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 	}
 	return SUCCESS
 }
-func ZendParseParameter(flags int, arg_num int, arg *Zval, spec *byte, _ ...any) int {
-	var va va_list
-	var ret int
-	va_start(va, spec)
-	ret = ZendParseArg(arg_num, arg, &va, &spec, flags)
-	va_end(va)
-	return ret
-}
 func ZendParseParametersDebugError(msg string) {
 	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")

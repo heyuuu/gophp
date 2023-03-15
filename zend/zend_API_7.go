@@ -4,7 +4,6 @@ package zend
 
 import (
 	b "sik/builtin"
-	"sik/core"
 )
 
 func DisplayDisabledClass(class_type *ZendClassEntry) *ZendObject {
