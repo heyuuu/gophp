@@ -39,12 +39,12 @@ func ZendTryAssignTypedRefStr(ref *ZendReference, str *ZendString) int {
 }
 func ZendTryAssignTypedRefString(ref *ZendReference, string *byte) int {
 	var tmp Zval
-	ZVAL_STRING(&tmp, string)
+	tmp.SetRawString(b.CastStrAuto(string))
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefStringl(ref *ZendReference, string *byte, len_ int) int {
 	var tmp Zval
-	ZVAL_STRINGL(&tmp, string, len_)
+	tmp.SetRawString(b.CastStr(string, len_))
 	return ZendTryAssignTypedRef(ref, &tmp)
 }
 func ZendTryAssignTypedRefArr(ref *ZendReference, arr *ZendArray) int {
@@ -195,7 +195,7 @@ func ZendUpdateProperty(scope *ZendClassEntry, object *Zval, name *byte, name_le
 	var property Zval
 	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	ZVAL_STRINGL(&property, name, name_length)
+	property.SetRawString(b.CastStr(name, name_length))
 	Z_OBJ_HT_P(object).GetWriteProperty()(object, &property, value, nil)
 	ZvalPtrDtor(&property)
 	EG__().SetFakeScope(old_scope)
@@ -209,7 +209,7 @@ func ZendUnsetProperty(scope *ZendClassEntry, object *Zval, name string, name_le
 	var property Zval
 	var old_scope *ZendClassEntry = EG__().GetFakeScope()
 	EG__().SetFakeScope(scope)
-	ZVAL_STRINGL(&property, name, name_length)
+	property.SetRawString(b.CastStr(name, name_length))
 	Z_OBJ_HT_P(object).GetUnsetProperty()(object, &property, 0)
 	ZvalPtrDtor(&property)
 	EG__().SetFakeScope(old_scope)
@@ -236,7 +236,7 @@ func ZendUpdatePropertyStr(scope *ZendClassEntry, object *Zval, name *byte, name
 }
 func ZendUpdatePropertyString(scope *ZendClassEntry, object *Zval, name *byte, name_length int, value *byte) {
 	var tmp Zval
-	ZVAL_STRING(&tmp, value)
+	tmp.SetRawString(b.CastStrAuto(value))
 	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
@@ -249,7 +249,7 @@ func ZendUpdatePropertyStringl(
 	value_len int,
 ) {
 	var tmp Zval
-	ZVAL_STRINGL(&tmp, value, value_len)
+	tmp.SetRawString(b.CastStr(value, value_len))
 	tmp.SetRefcount(0)
 	ZendUpdateProperty(scope, object, name, name_length, &tmp)
 }
@@ -310,13 +310,13 @@ func ZendUpdateStaticPropertyDouble(scope *ZendClassEntry, name *byte, name_leng
 }
 func ZendUpdateStaticPropertyString(scope *ZendClassEntry, name *byte, name_length int, value *byte) int {
 	var tmp Zval
-	ZVAL_STRING(&tmp, value)
+	tmp.SetRawString(b.CastStrAuto(value))
 	tmp.SetRefcount(0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }
 func ZendUpdateStaticPropertyStringl(scope *ZendClassEntry, name *byte, name_length int, value *byte, value_len int) int {
 	var tmp Zval
-	ZVAL_STRINGL(&tmp, value, value_len)
+	tmp.SetRawString(b.CastStr(value, value_len))
 	tmp.SetRefcount(0)
 	return ZendUpdateStaticProperty(scope, name, name_length, &tmp)
 }

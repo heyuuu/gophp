@@ -513,7 +513,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				for len_ > 0 && b.PostDec(&len_) && (input[len_] == '\n' || input[len_] == '\r') {
 					input[len_] = '0'
 				}
-				zend.ZVAL_STRINGL(&argn, input, len_+1)
+				argn.SetRawString(b.CastStr(input, len_+1))
 				zend.EG__().GetSymbolTable().KeyUpdate("argn", &argn)
 				argi.SetLong(b.PreInc(&index))
 				zend.EG__().GetSymbolTable().KeyUpdate("argi", &argi)
@@ -569,7 +569,7 @@ func DoCli(argc int, argv **byte, args []string) int {
 				pce = reflection_zend_extension_ptr
 				break
 			}
-			zend.ZVAL_STRING(&arg, reflection_what)
+			arg.SetRawString(b.CastStrAuto(reflection_what))
 			zend.ObjectInitEx(&ref, pce)
 			memset(&executeData, 0, b.SizeOf("zend_execute_data"))
 			zend.EG__().SetCurrentExecuteData(&executeData)

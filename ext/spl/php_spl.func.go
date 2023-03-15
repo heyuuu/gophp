@@ -263,7 +263,7 @@ func ZifSplAutoloadExtensions(executeData *zend.ZendExecuteData, return_value *z
 		SPL_G(autoload_extensions) = file_exts.Copy()
 	}
 	if SPL_G(autoload_extensions) == nil {
-		zend.ZVAL_STRINGL(return_value, SPL_DEFAULT_FILE_EXTENSIONS, b.SizeOf("SPL_DEFAULT_FILE_EXTENSIONS")-1)
+		return_value.SetRawString(SPL_DEFAULT_FILE_EXTENSIONS)
 		return
 	} else {
 		SPL_G(autoload_extensions).AddRefcount()

@@ -1056,7 +1056,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 			}
 			if is_anonymous == 0 {
 				if size_overflow != 0 {
-					zend.ZVAL_STRING(&file_size, file_size_buf)
+					file_size.SetRawString(b.CastStrAuto(file_size_buf))
 				}
 				SafePhpRegisterVariableEx(lbuf, &file_size, nil, size_overflow)
 			}
@@ -1069,7 +1069,7 @@ func Rfc1867PostHandler(content_type_dup *byte, arg any) {
 				Snprintf(lbuf, llen, "%s[size]", param)
 			}
 			if size_overflow != 0 {
-				zend.ZVAL_STRING(&file_size, file_size_buf)
+				file_size.SetRawString(b.CastStrAuto(file_size_buf))
 			}
 			RegisterHttpPostFilesVariableEx(lbuf, &file_size, &PG(http_globals)[TRACK_VARS_FILES], size_overflow)
 			zend.Efree(param)

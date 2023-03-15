@@ -938,7 +938,7 @@ func ZifImageTypeToMimeType(executeData *zend.ZendExecuteData, return_value *zen
 		}
 		break
 	}
-	zend.ZVAL_STRING(return_value, (*byte)(PhpImageTypeToMimeType(p_image_type)))
+	return_value.SetRawString(b.CastStrAuto((*byte)(PhpImageTypeToMimeType(p_image_type))))
 }
 func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	var image_type zend.ZendLong
@@ -1058,7 +1058,7 @@ func ZifImageTypeToExtension(executeData *zend.ZendExecuteData, return_value *ze
 		imgext = ".webp"
 	}
 	if imgext != nil {
-		zend.ZVAL_STRING(return_value, &imgext[!inc_dot])
+		return_value.SetRawString(b.CastStrAuto(&imgext[!inc_dot]))
 		return
 	}
 	return_value.SetFalse()

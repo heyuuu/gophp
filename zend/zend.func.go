@@ -636,7 +636,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 			va_end(usr_copy)
 			params[0].SetLong(type_)
 			if error_filename != nil {
-				ZVAL_STRING(&params[2], error_filename)
+				params[2].SetRawString(b.CastStrAuto(error_filename))
 			} else {
 				params[2].SetNull()
 			}

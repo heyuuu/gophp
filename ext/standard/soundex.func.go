@@ -126,6 +126,6 @@ func ZifSoundex(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		soundex[b.PostInc(&_small)] = '0'
 	}
 	soundex[_small] = '0'
-	zend.ZVAL_STRINGL(return_value, soundex, _small)
+	return_value.SetRawString(b.CastStr(soundex, _small))
 	return
 }

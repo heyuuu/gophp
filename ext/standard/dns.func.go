@@ -18,7 +18,7 @@ func ZifGethostname(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRING(return_value, buf)
+	return_value.SetRawString(b.CastStrAuto(buf))
 	return
 }
 func ZifGethostbyaddr(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -191,7 +191,7 @@ func ZifGethostbyname(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		/* name too long, protect from CVE-2015-0235 */
 
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Host name is too long, the limit is %d characters", core.MAXFQDNLEN)
-		zend.ZVAL_STRINGL(return_value, hostname, hostname_len)
+		return_value.SetRawString(b.CastStr(hostname, hostname_len))
 		return
 	}
 	return_value.SetString(PhpGethostbyname(hostname))

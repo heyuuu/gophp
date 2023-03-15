@@ -240,10 +240,10 @@ func ZifCrypt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	salt[salt_in_len] = '0'
 	if b.Assign(&result, PhpCrypt(str, int(str_len), salt, int(salt_in_len), 0)) == nil {
 		if salt[0] == '*' && salt[1] == '0' {
-			zend.ZVAL_STRING(return_value, "*1")
+			return_value.SetRawString("*1")
 			return
 		} else {
-			zend.ZVAL_STRING(return_value, "*0")
+			return_value.SetRawString("*0")
 			return
 		}
 	}

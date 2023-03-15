@@ -270,7 +270,7 @@ func AddNextIndexStr(arg *Zval, str *ZendString) int {
 }
 func AddNextIndexString(arg *Zval, str *byte) int {
 	var tmp Zval
-	ZVAL_STRING(&tmp, str)
+	tmp.SetRawString(b.CastStrAuto(str))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
@@ -279,7 +279,7 @@ func AddNextIndexString(arg *Zval, str *byte) int {
 }
 func AddNextIndexStringl(arg *Zval, str *byte, length int) int {
 	var tmp Zval
-	ZVAL_STRINGL(&tmp, str, length)
+	tmp.SetRawString(b.CastStr(str, length))
 	if arg.GetArr().NextIndexInsert(&tmp) != nil {
 		return SUCCESS
 	} else {
@@ -325,17 +325,11 @@ func ArraySetZvalKey(ht *HashTable, key *Zval, value *Zval) int {
 func AddPropertyLongEx(arg *Zval, key string, n ZendLong) int {
 	return AddPropertyZvalEx(arg, key, NewZvalLong(n))
 }
-func AddPropertyBoolEx(arg *Zval, key string, b ZendLong) int {
-	return AddPropertyZvalEx(arg, key, NewZvalBool(b != 0))
-}
 func AddPropertyNullEx(arg *Zval, key string) int {
 	return AddPropertyZvalEx(arg, key, NewZvalNull())
 }
 func AddPropertyResourceEx(arg *Zval, key string, r *ZendResource) int {
 	return AddPropertyZvalEx(arg, key, NewZvalResource(r))
-}
-func AddPropertyDoubleEx(arg *Zval, key string, d float64) int {
-	return AddPropertyZvalEx(arg, key, NewZvalDouble(d))
 }
 func AddPropertyStrEx(arg *Zval, key string, str string) int {
 	return AddPropertyZvalEx(arg, key, NewZvalString(str))

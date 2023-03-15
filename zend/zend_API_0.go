@@ -82,17 +82,8 @@ func AddPropertyLong(__arg *Zval, __key string, __n ZendLong) int {
 func AddPropertyNull(__arg *Zval, __key string) int {
 	return AddPropertyNullEx(__arg, __key)
 }
-func AddPropertyBool(__arg *Zval, __key string, __b ZendLong) int {
-	return AddPropertyBoolEx(__arg, __key, __b)
-}
 func AddPropertyResource(__arg *Zval, __key string, __r *ZendResource) int {
 	return AddPropertyResourceEx(__arg, __key, __r)
-}
-func AddPropertyDouble(__arg *Zval, __key string, __d float64) int {
-	return AddPropertyDoubleEx(__arg, __key, __d)
-}
-func AddPropertyStr(__arg *Zval, __key string, __str *ZendString) int {
-	return AddPropertyStrEx(__arg, __key, __str.GetStr())
 }
 func AddPropertyString(__arg *Zval, __key string, __str string) int {
 	return AddPropertyStrEx(__arg, __key, __str)
@@ -118,12 +109,7 @@ func ZendForbidDynamicCall(func_name string) int {
 	}
 	return SUCCESS
 }
-func CHECK_NULL_PATH(p []byte, l int) bool { return strlen(p) != size_t(l) }
-func ZVAL_STRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 0)) }
-func ZVAL_STRING(z *Zval, s *byte) {
-	var _s *byte = s
-	ZVAL_STRINGL(z, _s, strlen(_s))
-}
+func CHECK_NULL_PATH(p []byte, l int) bool  { return len(p) != l }
 func ZVAL_EMPTY_STRING(z *Zval)             { z.SetInternedString(ZSTR_EMPTY_ALLOC()) }
 func ZVAL_PSTRINGL(z *Zval, s *byte, l int) { z.SetString(ZendStringInit(s, l, 1)) }
 func ZVAL_EMPTY_PSTRING(z *Zval)            { ZVAL_PSTRINGL(z, "", 0) }
@@ -327,7 +313,7 @@ func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_STRING(_zv, string)
+		_zv.SetRawString(b.CastStrAuto(string))
 		break
 	}
 }
@@ -348,7 +334,7 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int, is_ref int) {
 			_zv = ref.GetVal()
 		}
 		ZvalPtrDtor(_zv)
-		ZVAL_STRINGL(_zv, string, len_)
+		_zv.SetRawString(b.CastStr(string, len_))
 		break
 	}
 }

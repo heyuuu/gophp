@@ -376,7 +376,7 @@ func PhpFopenPrimaryScript(file_handle *zend.ZendFileHandle) int {
 	}
 	return zend.SUCCESS
 }
-func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendString {
+func PhpResolvePath(fileName string, filenamePtr *byte, filename_length int, path *byte) *zend.ZendString {
 	var resolved_path []byte
 	var trypath []byte
 	var ptr *byte
@@ -385,17 +385,14 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 	var actual_path *byte
 	var wrapper *PhpStreamWrapper
 	var exec_filename *zend.ZendString
-	if filename == nil || zend.CHECK_NULL_PATH(filename, filename_length) {
-		return nil
-	}
 
 	/* Don't resolve paths which contain protocol (except of file://) */
 
-	for p = filename; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
+	for p = filenamePtr; isalnum(int(*p)) || (*p) == '+' || (*p) == '-' || (*p) == '.'; p++ {
 
 	}
-	if (*p) == ':' && p-filename > 1 && p[1] == '/' && p[2] == '/' {
-		wrapper = PhpStreamLocateUrlWrapper(filename, &actual_path, STREAM_OPEN_FOR_INCLUDE)
+	if (*p) == ':' && p-filenamePtr > 1 && p[1] == '/' && p[2] == '/' {
+		wrapper = PhpStreamLocateUrlWrapper(filenamePtr, &actual_path, STREAM_OPEN_FOR_INCLUDE)
 		if wrapper == &streams.PhpPlainFilesWrapper {
 			if zend.TsrmRealpath(actual_path, resolved_path) != nil {
 				return zend.ZendStringInit(resolved_path, strlen(resolved_path), 0)
@@ -403,8 +400,8 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 		}
 		return nil
 	}
-	if (*filename) == '.' && (zend.IS_SLASH(filename[1]) || filename[1] == '.' && zend.IS_SLASH(filename[2])) || zend.IS_ABSOLUTE_PATH(filename, filename_length) || path == nil || !(*path) {
-		if zend.TsrmRealpath(filename, resolved_path) != nil {
+	if (*filenamePtr) == '.' && (zend.IS_SLASH(filenamePtr[1]) || filenamePtr[1] == '.' && zend.IS_SLASH(filenamePtr[2])) || zend.IS_ABSOLUTE_PATH(filenamePtr, filename_length) || path == nil || !(*path) {
+		if zend.TsrmRealpath(filenamePtr, resolved_path) != nil {
 			return zend.ZendStringInit(resolved_path, strlen(resolved_path), 0)
 		} else {
 			return nil
@@ -439,7 +436,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 			}
 			memcpy(trypath, ptr, end-ptr)
 			trypath[end-ptr] = '/'
-			memcpy(trypath+(end-ptr)+1, filename, filename_length+1)
+			memcpy(trypath+(end-ptr)+1, filenamePtr, filename_length+1)
 			ptr = end + 1
 		} else {
 			var len_ int = strlen(ptr)
@@ -448,7 +445,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 			}
 			memcpy(trypath, ptr, len_)
 			trypath[len_] = '/'
-			memcpy(trypath+len_+1, filename, filename_length+1)
+			memcpy(trypath+len_+1, filenamePtr, filename_length+1)
 			ptr = nil
 		}
 		actual_path = trypath
@@ -485,7 +482,7 @@ func PhpResolvePath(filename *byte, filename_length int, path *byte) *zend.ZendS
 		}
 		if exec_fname_length > 0 && filename_length < MAXPATHLEN-2 && exec_fname_length+1+filename_length+1 < MAXPATHLEN {
 			memcpy(trypath, exec_fname, exec_fname_length+1)
-			memcpy(trypath+exec_fname_length+1, filename, filename_length+1)
+			memcpy(trypath+exec_fname_length+1, filenamePtr, filename_length+1)
 			actual_path = trypath
 
 			/* Check for stream wrapper */

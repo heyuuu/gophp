@@ -1582,7 +1582,7 @@ func UserSpaceStreamNotifier(
 	zvs[0].SetLong(notifycode)
 	zvs[1].SetLong(severity)
 	if xmsg != nil {
-		zend.ZVAL_STRING(&zvs[2], xmsg)
+		zvs[2].SetRawString(b.CastStrAuto(xmsg))
 	} else {
 		zvs[2].SetNull()
 	}

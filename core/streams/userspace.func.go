@@ -131,11 +131,11 @@ func UserWrapperOpener(
 
 	/* call it's stream_open method - set up params first */
 
-	zend.ZVAL_STRING(&args[0], filename)
-	zend.ZVAL_STRING(&args[1], mode)
+	args[0].SetRawString(b.CastStrAuto(filename))
+	args[1].SetRawString(b.CastStrAuto(mode))
 	args[2].SetLong(options)
 	args[3].SetNewRef(zend.EG__().GetUninitializedZval())
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_OPEN)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_OPEN))
 	var __orig_bailout *JMP_BUF = zend.EG__().GetBailout()
 	var __bailout JMP_BUF
 	zend.EG__().SetBailout(&__bailout)
@@ -220,9 +220,9 @@ func UserWrapperOpendir(
 
 	/* call it's dir_open method - set up params first */
 
-	zend.ZVAL_STRING(&args[0], filename)
+	args[0].SetRawString(b.CastStrAuto(filename))
 	args[1].SetLong(options)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_DIR_OPEN)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_DIR_OPEN))
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &zfuncname, &zretval, 2, args, 0)
 	if call_result == zend.SUCCESS && zretval.GetType() != zend.IS_UNDEF && zend.ZvalIsTrue(&zretval) != 0 {
 
@@ -359,8 +359,8 @@ func PhpUserstreamopWrite(stream *core.PhpStream, buf *byte, count int) ssize_t 
 	var args []zend.Zval
 	var didwrite ssize_t
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_WRITE, b.SizeOf("USERSTREAM_WRITE")-1)
-	zend.ZVAL_STRINGL(&args[0], (*byte)(buf), count)
+	func_name.SetRawString(USERSTREAM_WRITE)
+	args[0].SetRawString(b.CastStr((*byte)(buf), count))
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 	zend.ZvalPtrDtor(&args[0])
 	zend.ZvalPtrDtor(&func_name)
@@ -396,7 +396,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 	var didread int = 0
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_READ, b.SizeOf("USERSTREAM_READ")-1)
+	func_name.SetRawString(USERSTREAM_READ)
 	args[0].SetLong(count)
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 	zend.ZvalPtrDtor(&args[0])
@@ -427,7 +427,7 @@ func PhpUserstreamopRead(stream *core.PhpStream, buf *byte, count int) ssize_t {
 
 	/* since the user stream has no way of setting the eof flag directly, we need to ask it if we hit eof */
 
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_EOF, b.SizeOf("USERSTREAM_EOF")-1)
+	func_name.SetRawString(USERSTREAM_EOF)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&func_name)
 	if zend.EG__().GetException() != nil {
@@ -448,7 +448,7 @@ func PhpUserstreamopClose(stream *core.PhpStream, close_handle int) int {
 	var retval zend.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_CLOSE, b.SizeOf("USERSTREAM_CLOSE")-1)
+	func_name.SetRawString(USERSTREAM_CLOSE)
 	zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)
 	zend.ZvalPtrDtor(&func_name)
@@ -463,7 +463,7 @@ func PhpUserstreamopFlush(stream *core.PhpStream) int {
 	var call_result int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_FLUSH, b.SizeOf("USERSTREAM_FLUSH")-1)
+	func_name.SetRawString(USERSTREAM_FLUSH)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_UNDEF && zend.ZvalIsTrue(&retval) != 0 {
 		call_result = 0
@@ -482,7 +482,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	var args []zend.Zval
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_SEEK, b.SizeOf("USERSTREAM_SEEK")-1)
+	func_name.SetRawString(USERSTREAM_SEEK)
 	args[0].SetLong(offset)
 	args[1].SetLong(whence)
 	call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 2, args, 0)
@@ -512,7 +512,7 @@ func PhpUserstreamopSeek(stream *core.PhpStream, offset zend.ZendOffT, whence in
 
 	/* now determine where we are */
 
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_TELL, b.SizeOf("USERSTREAM_TELL")-1)
+	func_name.SetRawString(USERSTREAM_TELL)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.IsType(zend.IS_LONG) {
 		*newoffs = retval.GetLval()
@@ -582,7 +582,7 @@ func PhpUserstreamopStat(stream *core.PhpStream, ssb *core.PhpStreamStatbuf) int
 	var call_result int
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	var ret int = -1
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_STAT, b.SizeOf("USERSTREAM_STAT")-1)
+	func_name.SetRawString(USERSTREAM_STAT)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.IsType(zend.IS_ARRAY) {
 		if zend.SUCCESS == StatbufFromArray(&retval, ssb) {
@@ -606,7 +606,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	var args []zend.Zval
 	switch option {
 	case core.PHP_STREAM_OPTION_CHECK_LIVENESS:
-		zend.ZVAL_STRINGL(&func_name, USERSTREAM_EOF, b.SizeOf("USERSTREAM_EOF")-1)
+		func_name.SetRawString(USERSTREAM_EOF)
 		call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 		if call_result == zend.SUCCESS && (retval.IsType(zend.IS_FALSE) || retval.IsType(zend.IS_TRUE)) {
 			if zend.ZvalIsTrue(&retval) != 0 {
@@ -636,7 +636,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 
 		/* TODO wouldblock */
 
-		zend.ZVAL_STRINGL(&func_name, USERSTREAM_LOCK, b.SizeOf("USERSTREAM_LOCK")-1)
+		func_name.SetRawString(USERSTREAM_LOCK)
 		call_result = zend.CallUserFunctionEx(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 1, args, 0)
 		if call_result == zend.SUCCESS && (retval.IsType(zend.IS_FALSE) || retval.IsType(zend.IS_TRUE)) {
 			ret = retval.IsType(zend.IS_FALSE)
@@ -658,7 +658,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 		zend.ZvalPtrDtor(&func_name)
 		zend.ZvalPtrDtor(&args[0])
 	case core.PHP_STREAM_OPTION_TRUNCATE_API:
-		zend.ZVAL_STRINGL(&func_name, USERSTREAM_TRUNCATE, b.SizeOf("USERSTREAM_TRUNCATE")-1)
+		func_name.SetRawString(USERSTREAM_TRUNCATE)
 		switch value {
 		case core.PHP_STREAM_TRUNCATE_SUPPORTED:
 			if zend.ZendIsCallableEx(&func_name, b.CondF2(us.GetObject().IsUndef(), nil, func() *zend.ZendObject { return us.GetObject().GetObj() }), zend.IS_CALLABLE_CHECK_SILENT, nil, nil, nil) != 0 {
@@ -698,7 +698,7 @@ func PhpUserstreamopSetOption(stream *core.PhpStream, option int, value int, ptr
 	case core.PHP_STREAM_OPTION_READ_TIMEOUT:
 		fallthrough
 	case core.PHP_STREAM_OPTION_BLOCKING:
-		zend.ZVAL_STRINGL(&func_name, USERSTREAM_SET_OPTION, b.SizeOf("USERSTREAM_SET_OPTION")-1)
+		func_name.SetRawString(USERSTREAM_SET_OPTION)
 		args[0].SetLong(option)
 		args[1].SetNull()
 		args[2].SetNull()
@@ -756,8 +756,8 @@ func UserWrapperUnlink(wrapper *core.PhpStreamWrapper, url *byte, options int, c
 
 	/* call the unlink method */
 
-	zend.ZVAL_STRING(&args[0], url)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_UNLINK)
+	args[0].SetRawString(b.CastStrAuto(url))
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_UNLINK))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 1, args, 0)
 	if call_result == zend.SUCCESS && (zretval.IsType(zend.IS_FALSE) || zretval.IsType(zend.IS_TRUE)) {
 		ret = zretval.IsType(zend.IS_TRUE)
@@ -791,9 +791,9 @@ func UserWrapperRename(wrapper *core.PhpStreamWrapper, url_from *byte, url_to *b
 
 	/* call the rename method */
 
-	zend.ZVAL_STRING(&args[0], url_from)
-	zend.ZVAL_STRING(&args[1], url_to)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_RENAME)
+	args[0].SetRawString(b.CastStrAuto(url_from))
+	args[1].SetRawString(b.CastStrAuto(url_to))
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_RENAME))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 2, args, 0)
 	if call_result == zend.SUCCESS && (zretval.IsType(zend.IS_FALSE) || zretval.IsType(zend.IS_TRUE)) {
 		ret = zretval.IsType(zend.IS_TRUE)
@@ -828,10 +828,10 @@ func UserWrapperMkdir(wrapper *core.PhpStreamWrapper, url *byte, mode int, optio
 
 	/* call the mkdir method */
 
-	zend.ZVAL_STRING(&args[0], url)
+	args[0].SetRawString(b.CastStrAuto(url))
 	args[1].SetLong(mode)
 	args[2].SetLong(options)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_MKDIR)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_MKDIR))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 3, args, 0)
 	if call_result == zend.SUCCESS && (zretval.IsType(zend.IS_FALSE) || zretval.IsType(zend.IS_TRUE)) {
 		ret = zretval.IsType(zend.IS_TRUE)
@@ -867,9 +867,9 @@ func UserWrapperRmdir(wrapper *core.PhpStreamWrapper, url *byte, options int, co
 
 	/* call the rmdir method */
 
-	zend.ZVAL_STRING(&args[0], url)
+	args[0].SetRawString(b.CastStrAuto(url))
 	args[1].SetLong(options)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_RMDIR)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_RMDIR))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 2, args, 0)
 	if call_result == zend.SUCCESS && (zretval.IsType(zend.IS_FALSE) || zretval.IsType(zend.IS_TRUE)) {
 		ret = zretval.IsType(zend.IS_TRUE)
@@ -911,7 +911,7 @@ func UserWrapperMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int, 
 	case core.PHP_STREAM_META_GROUP_NAME:
 		fallthrough
 	case core.PHP_STREAM_META_OWNER_NAME:
-		zend.ZVAL_STRING(&args[2], value)
+		args[2].SetRawString(b.CastStrAuto(value))
 	default:
 		core.PhpErrorDocref(nil, zend.E_WARNING, "Unknown option %d for "+USERSTREAM_METADATA, option)
 		zend.ZvalPtrDtor(&args[2])
@@ -928,9 +928,9 @@ func UserWrapperMetadata(wrapper *core.PhpStreamWrapper, url *byte, option int, 
 
 	/* call the mkdir method */
 
-	zend.ZVAL_STRING(&args[0], url)
+	args[0].SetRawString(b.CastStrAuto(url))
 	args[1].SetLong(option)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_METADATA)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_METADATA))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 3, args, 0)
 	if call_result == zend.SUCCESS && (zretval.IsType(zend.IS_FALSE) || zretval.IsType(zend.IS_TRUE)) {
 		ret = zretval.IsType(zend.IS_TRUE)
@@ -966,9 +966,9 @@ func UserWrapperStatUrl(wrapper *core.PhpStreamWrapper, url *byte, flags int, ss
 
 	/* call it's stat_url method - set up params first */
 
-	zend.ZVAL_STRING(&args[0], url)
+	args[0].SetRawString(b.CastStrAuto(url))
 	args[1].SetLong(flags)
-	zend.ZVAL_STRING(&zfuncname, USERSTREAM_STATURL)
+	zfuncname.SetRawString(b.CastStrAuto(USERSTREAM_STATURL))
 	call_result = zend.CallUserFunctionEx(&object, &zfuncname, &zretval, 2, args, 0)
 	if call_result == zend.SUCCESS && zretval.IsType(zend.IS_ARRAY) {
 
@@ -1008,7 +1008,7 @@ func PhpUserstreamopReaddir(stream *core.PhpStream, buf *byte, count int) ssize_
 	if count != b.SizeOf("php_stream_dirent") {
 		return -1
 	}
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_DIR_READ, b.SizeOf("USERSTREAM_DIR_READ")-1)
+	func_name.SetRawString(USERSTREAM_DIR_READ)
 	call_result = zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	if call_result == zend.SUCCESS && retval.GetType() != zend.IS_FALSE && retval.GetType() != zend.IS_TRUE {
 		zend.ConvertToString(&retval)
@@ -1026,7 +1026,7 @@ func PhpUserstreamopClosedir(stream *core.PhpStream, close_handle int) int {
 	var retval zend.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
 	r.Assert(us != nil)
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_DIR_CLOSE, b.SizeOf("USERSTREAM_DIR_CLOSE")-1)
+	func_name.SetRawString(USERSTREAM_DIR_CLOSE)
 	zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)
 	zend.ZvalPtrDtor(&func_name)
@@ -1039,7 +1039,7 @@ func PhpUserstreamopRewinddir(stream *core.PhpStream, offset zend.ZendOffT, when
 	var func_name zend.Zval
 	var retval zend.Zval
 	var us *PhpUserstreamDataT = (*PhpUserstreamDataT)(stream.GetAbstract())
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_DIR_REWIND, b.SizeOf("USERSTREAM_DIR_REWIND")-1)
+	func_name.SetRawString(USERSTREAM_DIR_REWIND)
 	zend.CallUserFunction(b.CondF2(us.GetObject().IsUndef(), nil, func() zend.Zval { return us.GetObject() }), &func_name, &retval, 0, nil)
 	zend.ZvalPtrDtor(&retval)
 	zend.ZvalPtrDtor(&func_name)
@@ -1053,7 +1053,7 @@ func PhpUserstreamopCast(stream *core.PhpStream, castas int, retptr *any) int {
 	var intstream *core.PhpStream = nil
 	var call_result int
 	var ret int = zend.FAILURE
-	zend.ZVAL_STRINGL(&func_name, USERSTREAM_CAST, b.SizeOf("USERSTREAM_CAST")-1)
+	func_name.SetRawString(USERSTREAM_CAST)
 	switch castas {
 	case core.PHP_STREAM_AS_FD_FOR_SELECT:
 		args[0].SetLong(core.PHP_STREAM_AS_FD_FOR_SELECT)

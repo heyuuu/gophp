@@ -190,7 +190,7 @@ func PhpOutputGetLevel() int {
 }
 func PhpOutputGetContents(p *zend.Zval) int {
 	if OG(active) {
-		zend.ZVAL_STRINGL(p, OG(active).buffer.data, OG(active).buffer.used)
+		p.SetRawString(b.CastStr(OG(active).buffer.data, OG(active).buffer.used))
 		return zend.SUCCESS
 	} else {
 		p.SetNull()
@@ -600,7 +600,7 @@ func PhpOutputHandlerOp(handler *PhpOutputHandler, context *PhpOutputContext) Ph
 			var retval zend.Zval
 			var ob_data zend.Zval
 			var ob_mode zend.Zval
-			zend.ZVAL_STRINGL(&ob_data, handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed())
+			ob_data.SetRawString(b.CastStr(handler.GetBuffer().GetData(), handler.GetBuffer().GetUsed()))
 			ob_mode.SetLong(zend.ZendLong(context.GetOp()))
 			zend.ZendFcallInfoArgn(handler.GetUser().GetFci(), 2, &ob_data, &ob_mode)
 			zend.ZvalPtrDtor(&ob_data)

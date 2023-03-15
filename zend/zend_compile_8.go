@@ -494,7 +494,7 @@ func ZendCompileShellExec(result *Znode, ast *ZendAst) {
 	var name_ast *ZendAst
 	var args_ast *ZendAst
 	var call_ast *ZendAst
-	ZVAL_STRING(&fn_name, "shell_exec")
+	fn_name.SetRawString("shell_exec")
 	name_ast = ZendAstCreateZval(&fn_name)
 	args_ast = ZendAstCreateList(1, ZEND_AST_ARG_LIST, expr_ast)
 	call_ast = ZendAstCreate(ZEND_AST_CALL, name_ast, args_ast)

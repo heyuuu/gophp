@@ -29,7 +29,7 @@ func ZifZendVersion(executeData *ZendExecuteData, return_value *Zval) {
 	if ZendParseParametersNone() == FAILURE {
 		return
 	}
-	ZVAL_STRINGL(return_value, ZEND_VERSION, b.SizeOf("ZEND_VERSION")-1)
+	return_value.SetRawString(ZEND_VERSION)
 	return
 }
 func ZifGcMemCaches(executeData *ZendExecuteData, return_value *Zval) {
@@ -2307,10 +2307,10 @@ func ZifGetResourceType(executeData *ZendExecuteData, return_value *Zval) {
 	}
 	resource_type = ZendRsrcListGetRsrcType(z_resource_type.GetRes())
 	if resource_type != nil {
-		ZVAL_STRING(return_value, resource_type)
+		return_value.SetRawString(b.CastStrAuto(resource_type))
 		return
 	} else {
-		ZVAL_STRING(return_value, "Unknown")
+		return_value.SetRawString("Unknown")
 		return
 	}
 }

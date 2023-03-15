@@ -78,7 +78,7 @@ func ZifGettype(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetInternedString(type_)
 		return
 	} else {
-		zend.ZVAL_STRING(return_value, "unknown type")
+		return_value.SetRawString("unknown type")
 		return
 	}
 }

@@ -95,7 +95,7 @@ func ZifReadlink(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	/* Append NULL to the end of the string */
 
 	buff[ret] = '0'
-	zend.ZVAL_STRINGL(return_value, buff, ret)
+	return_value.SetRawString(b.CastStr(buff, ret))
 	return
 }
 func ZifLinkinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

@@ -103,7 +103,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ze
 
 		key = _p.GetKey()
 		value = _z.GetPtr()
-		zend.ZVAL_STRING(&tmp, value)
+		tmp.SetRawString(b.CastStrAuto(value))
 		return_value.GetArr().SymtableUpdate(key.GetStr(), &tmp)
 	}
 }

@@ -8015,7 +8015,7 @@ func ZEND_GET_TYPE_SPEC_CONST_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
-		ZVAL_STRING(EX_VAR(opline.GetResult().GetVar()), "unknown type")
+		EX_VAR(opline.GetResult().GetVar()).SetRawString("unknown type")
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }
@@ -17129,7 +17129,7 @@ func ZEND_GET_TYPE_SPEC_TMP_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
-		ZVAL_STRING(EX_VAR(opline.GetResult().GetVar()), "unknown type")
+		EX_VAR(opline.GetResult().GetVar()).SetRawString("unknown type")
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -18515,7 +18515,7 @@ func ZEND_FE_FETCH_R_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					ZVAL_STRINGL(EX_VAR(opline.GetResult().GetVar()), prop_name, prop_name_len)
+					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[Z_FE_ITER_P(array)].SetPos(pos + 1)
@@ -18683,7 +18683,7 @@ func ZEND_FE_FETCH_RW_SPEC_VAR_HANDLER(executeData *ZendExecuteData) int {
 					var prop_name *byte
 					var prop_name_len int
 					ZendUnmanglePropertyNameEx(p.GetKey(), &class_name, &prop_name, &prop_name_len)
-					ZVAL_STRINGL(EX_VAR(opline.GetResult().GetVar()), prop_name, prop_name_len)
+					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(prop_name, prop_name_len))
 				}
 			}
 			EG__().GetHtIterators()[Z_FE_ITER_P(EX_VAR(opline.GetOp1().GetVar()))].SetPos(pos + 1)
@@ -24484,7 +24484,7 @@ func ZEND_GET_TYPE_SPEC_VAR_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
-		ZVAL_STRING(EX_VAR(opline.GetResult().GetVar()), "unknown type")
+		EX_VAR(opline.GetResult().GetVar()).SetRawString("unknown type")
 	}
 	ZvalPtrDtorNogc(free_op1)
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
@@ -40886,7 +40886,7 @@ func ZEND_GET_TYPE_SPEC_CV_UNUSED_HANDLER(executeData *ZendExecuteData) int {
 	if type_ != nil {
 		EX_VAR(opline.GetResult().GetVar()).SetInternedString(type_)
 	} else {
-		ZVAL_STRING(EX_VAR(opline.GetResult().GetVar()), "unknown type")
+		EX_VAR(opline.GetResult().GetVar()).SetRawString("unknown type")
 	}
 	ZEND_VM_NEXT_OPCODE_CHECK_EXCEPTION()
 }

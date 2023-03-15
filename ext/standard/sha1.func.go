@@ -92,7 +92,7 @@ func ZifSha1(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	PHP_SHA1Update(&context, (*uint8)(arg.GetVal()), arg.GetLen())
 	PHP_SHA1Final(digest, &context)
 	if raw_output != 0 {
-		zend.ZVAL_STRINGL(return_value, (*byte)(digest), 20)
+		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(40, 0))
@@ -194,7 +194,7 @@ func ZifSha1File(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	PHP_SHA1Final(digest, &context)
 	core.PhpStreamClose(stream)
 	if raw_output != 0 {
-		zend.ZVAL_STRINGL(return_value, (*byte)(digest), 20)
+		return_value.SetRawString(b.CastStr((*byte)(digest), 20))
 		return
 	} else {
 		return_value.SetString(zend.ZendStringAlloc(40, 0))

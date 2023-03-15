@@ -161,7 +161,7 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	trace.SetRefcount(0)
 	base_ce = IGetExceptionBase(&obj)
 	if class_type != ZendCeParseError && class_type != ZendCeCompileError || !(b.Assign(&filename, ZendGetCompiledFilename())) {
-		ZVAL_STRING(&tmp, ZendGetExecutedFilename())
+		tmp.SetRawString(b.CastStrAuto(ZendGetExecutedFilename()))
 		ZendUpdatePropertyEx(base_ce, &obj, ZSTR_KNOWN(ZEND_STR_FILE), &tmp)
 		ZvalPtrDtor(&tmp)
 		tmp.SetLong(ZendGetExecutedLineno())
@@ -675,7 +675,7 @@ func ZendThrowException(exception_ce *ZendClassEntry, message string, code ZendL
 	}
 	ObjectInitEx(&ex, exception_ce)
 	if message {
-		ZVAL_STRING(&tmp, message)
+		tmp.SetRawString(b.CastStrAuto(message))
 		ZendUpdatePropertyEx(exception_ce, &ex, ZSTR_KNOWN(ZEND_STR_MESSAGE), &tmp)
 		ZvalPtrDtor(&tmp)
 	}

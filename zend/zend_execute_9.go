@@ -174,7 +174,7 @@ func _zendQuickGetConstant(key *Zval, flags uint32, check_defined_only int, opli
 					EX_VAR(opline.GetResult().GetVar()).SetStringCopy(RT_CONSTANT(opline, opline.GetOp2()).GetStr())
 				} else {
 					actual++
-					ZVAL_STRINGL(EX_VAR(opline.GetResult().GetVar()), actual, Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))-(actual-Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2()))))
+					EX_VAR(opline.GetResult().GetVar()).SetRawString(b.CastStr(actual, Z_STRLEN_P(RT_CONSTANT(opline, opline.GetOp2()))-(actual-Z_STRVAL_P(RT_CONSTANT(opline, opline.GetOp2())))))
 				}
 
 				/* non-qualified constant - allow text substitution */

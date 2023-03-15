@@ -469,7 +469,7 @@ func ZifInetNtop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRING(return_value, buffer)
+	return_value.SetRawString(b.CastStrAuto(buffer))
 	return
 }
 func PhpInetPton(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -558,7 +558,7 @@ func PhpInetPton(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRINGL(return_value, buffer, b.Cond(af == AF_INET, 4, 16))
+	return_value.SetRawString(b.CastStr(buffer, b.Cond(af == AF_INET, 4, 16)))
 	return
 }
 func ZifIp2long(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -717,7 +717,7 @@ func ZifLong2ip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	ip = zend.ZendUlong(sip)
 	myaddr.s_addr = htonl(ip)
 	if inet_ntop(AF_INET, &myaddr, str, b.SizeOf("str")) {
-		zend.ZVAL_STRING(return_value, str)
+		return_value.SetRawString(b.CastStrAuto(str))
 		return
 	} else {
 		return_value.SetFalse()
@@ -818,7 +818,7 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			// TODO: avoid realocation ???
 
-			zend.ZVAL_STRING(return_value, ptr)
+			return_value.SetRawString(b.CastStrAuto(ptr))
 			zend.Efree(ptr)
 			return
 		}
@@ -829,7 +829,7 @@ func ZifGetenv(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 	ptr = getenv(str)
 	if ptr != nil {
-		zend.ZVAL_STRING(return_value, ptr)
+		return_value.SetRawString(b.CastStrAuto(ptr))
 	}
 	tsrm_env_unlock()
 	if ptr != nil {
@@ -1232,9 +1232,9 @@ func ZifGetopt(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 
 			/* keep the arg as binary, since the encoding is not known */
 
-			zend.ZVAL_STRING(&val, php_optarg)
+			val.SetRawString(b.CastStrAuto
 
-			/* keep the arg as binary, since the encoding is not known */
+			/* keep the arg as binary, since the encoding is not known */(php_optarg))
 
 		} else {
 			val.SetFalse()
@@ -1654,7 +1654,7 @@ func ZifGetCurrentUser(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	if zend.ZendParseParametersNone() == zend.FAILURE {
 		return
 	}
-	zend.ZVAL_STRING(return_value, core.PhpGetCurrentUser())
+	return_value.SetRawString(b.CastStrAuto(core.PhpGetCurrentUser()))
 	return
 }
 func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, retval *zend.Zval) {
@@ -1769,7 +1769,7 @@ func ZifGetCfgVar(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			AddConfigEntries(retval.GetArr(), return_value)
 			return
 		} else {
-			zend.ZVAL_STRING(return_value, zend.Z_STRVAL_P(retval))
+			return_value.SetRawString(b.CastStrAuto(zend.Z_STRVAL_P(retval)))
 			return
 		}
 	} else {
@@ -3313,7 +3313,7 @@ func ZifSetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zva
 	/* copy to return here, because alter might free it! */
 
 	if old_value != nil {
-		zend.ZVAL_STRING(return_value, old_value)
+		return_value.SetRawString(b.CastStrAuto(old_value))
 	} else {
 		return_value.SetFalse()
 	}
@@ -3336,7 +3336,7 @@ func ZifGetIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zva
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRING(return_value, str)
+	return_value.SetRawString(b.CastStrAuto(str))
 	return
 }
 func ZifRestoreIncludePath(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3693,7 +3693,7 @@ func ZifGetservbyport(executeData *zend.ZendExecuteData, return_value *zend.Zval
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRING(return_value, serv.s_name)
+	return_value.SetRawString(b.CastStrAuto(serv.s_name))
 	return
 }
 func ZifGetprotobyname(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
@@ -3850,7 +3850,7 @@ func ZifGetprotobynumber(executeData *zend.ZendExecuteData, return_value *zend.Z
 		return_value.SetFalse()
 		return
 	}
-	zend.ZVAL_STRING(return_value, ent.p_name)
+	return_value.SetRawString(b.CastStrAuto(ent.p_name))
 	return
 }
 func ZifRegisterTickFunction(executeData *zend.ZendExecuteData, return_value *zend.Zval) {

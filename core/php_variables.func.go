@@ -539,7 +539,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 	if SG__().request_info.argc {
 		var i int
 		for i = 0; i < SG__().request_info.argc; i++ {
-			zend.ZVAL_STRING(&tmp, SG__().request_info.argv[i])
+			tmp.SetRawString(b.CastStrAuto(SG__().request_info.argv[i]))
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				zend.ZendStringEfree(tmp.GetStr())
 			}
@@ -554,7 +554,7 @@ func PhpBuildArgv(s *byte, track_vars_array *zend.Zval) {
 
 			/* auto-type */
 
-			zend.ZVAL_STRING(&tmp, ss)
+			tmp.SetRawString(b.CastStrAuto(ss))
 			count++
 			if arr.GetArr().NextIndexInsert(&tmp) == nil {
 				zend.ZendStringEfree(tmp.GetStr())
@@ -604,15 +604,15 @@ func PhpRegisterServerVariables() {
 	/* PHP Authentication support */
 
 	if SG__().request_info.auth_user {
-		zend.ZVAL_STRING(&tmp, SG__().request_info.auth_user)
+		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_user))
 		PhpRegisterVariableQuick("PHP_AUTH_USER", b.SizeOf("\"PHP_AUTH_USER\"")-1, &tmp, ht)
 	}
 	if SG__().request_info.auth_password {
-		zend.ZVAL_STRING(&tmp, SG__().request_info.auth_password)
+		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_password))
 		PhpRegisterVariableQuick("PHP_AUTH_PW", b.SizeOf("\"PHP_AUTH_PW\"")-1, &tmp, ht)
 	}
 	if SG__().request_info.auth_digest {
-		zend.ZVAL_STRING(&tmp, SG__().request_info.auth_digest)
+		tmp.SetRawString(b.CastStrAuto(SG__().request_info.auth_digest))
 		PhpRegisterVariableQuick("PHP_AUTH_DIGEST", b.SizeOf("\"PHP_AUTH_DIGEST\"")-1, &tmp, ht)
 	}
 
@@ -709,7 +709,7 @@ func CheckHttpProxy(var_table *zend.HashTable) {
 			zend.ZendHashStrDel(var_table, "HTTP_PROXY", b.SizeOf("\"HTTP_PROXY\"")-1)
 		} else {
 			var local_zval zend.Zval
-			zend.ZVAL_STRING(&local_zval, local_proxy)
+			local_zval.SetRawString(b.CastStrAuto(local_proxy))
 			var_table.KeyUpdate("HTTP_PROXY", &local_zval)
 		}
 	}
