@@ -342,7 +342,6 @@ func ZendStartup(utility_functions *ZendUtilityFunctions) int {
 	ZendTicksFunction = utility_functions.TicksFunction
 	ZendOnTimeout = utility_functions.OnTimeout
 	ZendPrintfToSmartStr = utility_functions.PrintfToSmartStrFunction
-	ZendGetenv = utility_functions.GetenvFunction
 	ZendResolvePath = utility_functions.ResolvePathFunction
 	ZendInterruptFunction = nil
 	ZendCompileFile = CompileFile
