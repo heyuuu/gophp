@@ -810,7 +810,7 @@ func PhpOutputStackApplyStatus(h any, z any) int {
 func PhpOutputHandlerStatus(handler *PhpOutputHandler, entry *zend.Zval) *zend.Zval {
 	zend.ZEND_ASSERT(entry != nil)
 	zend.ArrayInit(entry)
-	zend.AddAssocStr(entry, "name", handler.GetName().Copy())
+	zend.AddAssocStr(entry, "name", handler.GetName().GetStr())
 	zend.AddAssocLong(entry, "type", zend_long(handler.GetFlags()&0xf))
 	zend.AddAssocLong(entry, "flags", zend.ZendLong(handler.GetFlags()))
 	zend.AddAssocLong(entry, "level", zend.ZendLong(handler.GetLevel()))

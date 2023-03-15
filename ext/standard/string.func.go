@@ -1976,7 +1976,7 @@ func ZifPathinfo(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	}
 	if have_basename != 0 {
 		ret = PhpBasename(path, path_len, nil, 0)
-		zend.AddAssocStr(&tmp, "basename", ret.Copy())
+		zend.AddAssocStr(&tmp, "basename", ret.GetStr())
 	}
 	if (opt & PHP_PATHINFO_EXTENSION) == PHP_PATHINFO_EXTENSION {
 		var p *byte

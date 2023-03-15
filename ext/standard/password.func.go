@@ -424,7 +424,7 @@ func ZifPasswordGetInfo(executeData *zend.ZendExecuteData, return_value *zend.Zv
 		zend.AddAssocZval(return_value, "options", &options)
 		return
 	}
-	zend.AddAssocStr(return_value, "algo", PhpPasswordAlgoExtractIdent(hash))
+	zend.AddAssocStr(return_value, "algo", PhpPasswordAlgoExtractIdent(hash).GetStr())
 	zend.ZendStringRelease(ident)
 	zend.AddAssocString(return_value, "algoName", algo.GetName())
 	if algo.GetGetInfo() != nil && zend.FAILURE == algo.GetGetInfo()(&options, hash) {

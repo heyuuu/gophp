@@ -1666,7 +1666,7 @@ func AddConfigEntry(h zend.ZendUlong, key *zend.ZendString, entry *zend.Zval, re
 			str = zend.ZendStringInit(str.GetVal(), str.GetLen(), 0)
 		}
 		if key != nil {
-			zend.AddAssocStrEx(retval, key.GetStr(), str)
+			zend.AddAssocStrEx(retval, key.GetStr(), str.GetStr())
 		} else {
 			zend.AddIndexStr(retval, h, str)
 		}
@@ -1939,8 +1939,12 @@ func ZifErrorGetLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 	if core.PG(last_error_message) {
 		zend.ArrayInit(return_value)
 		zend.AddAssocLongEx(return_value, "type", core.PG(last_error_type))
-		zend.AddAssocStringEx(return_value, "message", core.PG(last_error_message))
-		zend.AddAssocStringEx(return_value, "file", b.CondF1(core.PG(last_error_file), func() __auto__ { return core.PG(last_error_file) }, "-"))
+		zend.AddAssocStr(return_value, "message", b.CastStrAuto(core.PG(last_error_message)))
+		if core.PG(last_error_file) {
+			zend.AddAssocStr(return_value, "file", b.CastStrAuto(core.PG(last_error_file)))
+		} else {
+			zend.AddAssocStr(return_value, "file", "-")
+		}
 		zend.AddAssocLongEx(return_value, "line", core.PG(last_error_lineno))
 	}
 }
@@ -3017,14 +3021,14 @@ func ZifIniGetAll(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if details != 0 {
 				zend.ArrayInit(&option)
 				if ini_entry.GetOrigValue() != nil {
-					zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().Copy())
+					zend.AddAssocStr(&option, "global_value", ini_entry.GetOrigValue().GetStr())
 				} else if ini_entry.GetValue() != nil {
-					zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().Copy())
+					zend.AddAssocStr(&option, "global_value", ini_entry.GetValue().GetStr())
 				} else {
 					zend.AddAssocNull(&option, "global_value")
 				}
 				if ini_entry.GetValue() != nil {
-					zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().Copy())
+					zend.AddAssocStr(&option, "local_value", ini_entry.GetValue().GetStr())
 				} else {
 					zend.AddAssocNull(&option, "local_value")
 				}

@@ -648,7 +648,7 @@ func PhpParserr(
 		tp.GetVal()[l2] = '0'
 		tp.SetLen(l2)
 		cp += dlen
-		zend.AddAssocStr(subarray, "txt", tp)
+		zend.AddAssocStr(subarray, "txt", tp.GetStr())
 		zend.AddAssocZval(subarray, "entries", &entries)
 	case DNS_T_SOA:
 		zend.AddAssocString(subarray, "type", "SOA")

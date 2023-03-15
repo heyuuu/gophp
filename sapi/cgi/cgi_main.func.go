@@ -3,6 +3,7 @@
 package cgi
 
 import (
+	"log"
 	b "sik/builtin"
 	"sik/core"
 	r "sik/runtime"
@@ -1005,7 +1006,7 @@ func ZifApacheRequestHeaders(executeData *zend.ZendExecuteData, return_value *ze
 				continue
 			}
 			val++
-			zend.AddAssocStringEx(return_value, b.CastStr(var_, var_len), val)
+			zend.AddAssocStr(return_value, b.CastStr(var_, var_len), b.CastStrAuto(val))
 		}
 		if t != buf && t != nil {
 			zend.Efree(t)
@@ -1034,7 +1035,7 @@ func AddResponseHeader(h *core.SapiHeader, return_value *zend.Zval) {
 						break
 					}
 				}
-				zend.AddAssocStringlEx(return_value, b.CastStr(s, len_), p, h.GetHeaderLen()-(p-h.GetHeader()))
+				zend.AddAssocStringlEx(return_value, b.CastStr(s, len_), b.CastStr(p, h.GetHeaderLen()-(p-h.GetHeader())))
 				zend.FreeAlloca(s, use_heap)
 			}
 		}

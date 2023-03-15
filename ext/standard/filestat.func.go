@@ -2486,7 +2486,7 @@ func ZifRealpathCacheGet(executeData *zend.ZendExecuteData, return_value *zend.Z
 				zend.AddAssocDoubleEx(&entry, "key", float64(bucket.GetKey()))
 			}
 			zend.AddAssocBoolEx(&entry, "is_dir", bucket.GetIsDir())
-			zend.AddAssocStringlEx(&entry, "realpath", bucket.GetRealpath(), bucket.GetRealpathLen())
+			zend.AddAssocStringlEx(&entry, "realpath", b.CastStr(bucket.GetRealpath(), bucket.GetRealpathLen()))
 			zend.AddAssocLongEx(&entry, "expires", bucket.GetExpires())
 			return_value.GetArr().KeyUpdate(b.CastStr(bucket.GetPath(), bucket.GetPathLen()), &entry)
 			bucket = bucket.GetNext()

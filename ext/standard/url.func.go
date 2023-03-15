@@ -989,7 +989,7 @@ func ZifGetHeaders(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 					s++
 				}
 				if b.Assign(&prev_val, return_value.GetArr().KeyFind(b.CastStr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr)))) == nil {
-					zend.AddAssocStringlEx(return_value, b.CastStr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr)), s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))
+					zend.AddAssocStringlEx(return_value, b.CastStr(zend.Z_STRVAL_P(hdr), p-zend.Z_STRVAL_P(hdr)), b.CastStr(s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr))))
 				} else {
 					zend.ConvertToArray(prev_val)
 					zend.AddNextIndexStringl(prev_val, s, zend.Z_STRLEN_P(hdr)-(s-zend.Z_STRVAL_P(hdr)))

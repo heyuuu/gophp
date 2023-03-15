@@ -61,17 +61,17 @@ func IfaceAppendUnicast(
 	if addr != nil {
 		zend.AddAssocLong(&u, "family", addr.sa_family)
 		if b.Assign(&host, PhpInetNtop(addr)) {
-			zend.AddAssocStr(&u, "address", host)
+			zend.AddAssocStr(&u, "address", host.GetStr())
 		}
 	}
 	if b.Assign(&host, PhpInetNtop(netmask)) {
-		zend.AddAssocStr(&u, "netmask", host)
+		zend.AddAssocStr(&u, "netmask", host.GetStr())
 	}
 	if b.Assign(&host, PhpInetNtop(broadcast)) {
-		zend.AddAssocStr(&u, "broadcast", host)
+		zend.AddAssocStr(&u, "broadcast", host.GetStr())
 	}
 	if b.Assign(&host, PhpInetNtop(ptp)) {
-		zend.AddAssocStr(&u, "ptp", host)
+		zend.AddAssocStr(&u, "ptp", host.GetStr())
 	}
 	zend.AddNextIndexZval(unicast, &u)
 }

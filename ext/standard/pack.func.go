@@ -1016,7 +1016,7 @@ func ZifUnpack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 						}
 					}
 					buf.GetVal()[len_] = '0'
-					zend.AddAssocStr(return_value, n, buf)
+					zend.AddAssocStr(return_value, n, buf.GetStr())
 				case 'c':
 					fallthrough
 				case 'C':

@@ -167,22 +167,12 @@ func AddAssocDoubleEx(arg *Zval, key string, d float64) int {
 	arg.GetArr().SymtableUpdate(key, &tmp)
 	return SUCCESS
 }
-func AddAssocStrEx(arg *Zval, key string, str *ZendString) int {
-	var tmp Zval
-	tmp.SetString(str)
-	arg.GetArr().SymtableUpdate(key, &tmp)
+func AddAssocStrEx(arg *Zval, key string, str string) int {
+	arg.GetArr().SymtableUpdate(key, NewZvalString(str))
 	return SUCCESS
 }
-func AddAssocStringEx(arg *Zval, key string, str *byte) int {
-	var tmp Zval
-	ZVAL_STRING(&tmp, str)
-	arg.GetArr().SymtableUpdate(key, &tmp)
-	return SUCCESS
-}
-func AddAssocStringlEx(arg *Zval, key string, str *byte, length int) int {
-	var tmp Zval
-	ZVAL_STRINGL(&tmp, str, length)
-	arg.GetArr().SymtableUpdate(key, &tmp)
+func AddAssocStringlEx(arg *Zval, key string, str string) int {
+	arg.GetArr().SymtableUpdate(key, NewZvalString(str))
 	return SUCCESS
 }
 func AddAssocZvalEx(arg *Zval, key string, value *Zval) int {

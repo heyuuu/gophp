@@ -2,6 +2,8 @@
 
 package zend
 
+import b "sik/builtin"
+
 func CE_STATIC_MEMBERS(ce *ZendClassEntry) *Zval {
 	return (*Zval)(ZEND_MAP_PTR_GET(ce.static_members_table__ptr))
 }
@@ -47,17 +49,17 @@ func AddAssocNull(__arg *Zval, __key string) int {
 func AddAssocBool(__arg *Zval, __key string, __b int) int {
 	return AddAssocBoolEx(__arg, __key, __b)
 }
-func AddAssocDouble(__arg *Zval, __key *byte, __d float64) int {
+func AddAssocDouble(__arg *Zval, __key string, __d float64) int {
 	return AddAssocDoubleEx(__arg, __key, __d)
 }
-func AddAssocStr(__arg *Zval, __key string, __str *ZendString) int {
+func AddAssocStr(__arg *Zval, __key string, __str string) int {
 	return AddAssocStrEx(__arg, __key, __str)
 }
-func AddAssocString(__arg *Zval, __key *byte, __str *byte) int {
-	return AddAssocStringEx(__arg, __key, __str)
+func AddAssocString(__arg *Zval, __key string, __str *byte) int {
+	return AddAssocStrEx(__arg, __key, b.CastStrAuto(__str))
 }
 func AddAssocStringl(__arg *Zval, __key string, __str *byte, __length int) int {
-	return AddAssocStringlEx(__arg, __key, __str, __length)
+	return AddAssocStringlEx(__arg, __key, b.CastStr(__str, __length))
 }
 func AddAssocZval(__arg *Zval, __key string, __value *Zval) int {
 	return AddAssocZvalEx(__arg, __key, __value)
@@ -77,22 +79,22 @@ func AddNextIndexZval(arg *Zval, value *Zval) int {
 	}
 }
 func AddPropertyLong(__arg *Zval, __key string, __n ZendLong) int {
-	return AddPropertyLongEx(__arg, __key, strlen(__key), __n)
+	return AddPropertyLongEx(__arg, __key, __n)
 }
 func AddPropertyNull(__arg *Zval, __key string) int {
 	return AddPropertyNullEx(__arg, __key, strlen(__key))
 }
 func AddPropertyBool(__arg *Zval, __key *byte, __b ZendLong) int {
-	return AddPropertyBoolEx(__arg, __key, strlen(__key), __b)
+	return AddPropertyBoolEx(__arg, __key, __b)
 }
 func AddPropertyResource(__arg *Zval, __key string, __r *ZendResource) int {
-	return AddPropertyResourceEx(__arg, __key, strlen(__key), __r)
+	return AddPropertyResourceEx(__arg, __key, __r)
 }
 func AddPropertyDouble(__arg *Zval, __key *byte, __d float64) int {
-	return AddPropertyDoubleEx(__arg, __key, strlen(__key), __d)
+	return AddPropertyDoubleEx(__arg, __key, __d)
 }
 func AddPropertyStr(__arg *Zval, __key *byte, __str *ZendString) int {
-	return AddPropertyStrEx(__arg, __key, strlen(__key), __str)
+	return AddPropertyStrEx(__arg, __key, __str)
 }
 func AddPropertyString(__arg *Zval, __key string, __str *byte) int {
 	return AddPropertyStringEx(__arg, __key, strlen(__key), __str)
