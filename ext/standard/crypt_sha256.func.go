@@ -285,7 +285,7 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 		var srounds zend.ZendUlong = zend.ZEND_STRTOUL(num, &endp, 10)
 		if (*endp) == '$' {
 			salt = endp + 1
-			rounds = zend.MAX(ROUNDS_MIN, cli.MIN(srounds, ROUNDS_MAX))
+			rounds = b.Max(ROUNDS_MIN, cli.MIN(srounds, ROUNDS_MAX))
 			rounds_custom = 1
 		}
 	}
@@ -455,15 +455,15 @@ func PhpSha256CryptR(key *byte, salt *byte, buffer *byte, buflen int) *byte {
 	/* Now we can construct the result string.  It consists of three
 	   parts.  */
 
-	cp = __phpStpncpy(buffer, Sha256SaltPrefix, zend.MAX(0, buflen))
+	cp = __phpStpncpy(buffer, Sha256SaltPrefix, b.Max(0, buflen))
 	buflen -= b.SizeOf("sha256_salt_prefix") - 1
 	if rounds_custom != 0 {
-		var n int = core.Snprintf(cp, zend.MAX(0, buflen), "%s%zu$", Sha256RoundsPrefix, rounds)
+		var n int = core.Snprintf(cp, b.Max(0, buflen), "%s%zu$", Sha256RoundsPrefix, rounds)
 		cp += n
 		buflen -= n
 	}
-	cp = __phpStpncpy(cp, salt, cli.MIN(int(zend.MAX(0, buflen)), salt_len))
-	buflen -= cli.MIN(zend.MAX(0, buflen), int(salt_len))
+	cp = __phpStpncpy(cp, salt, cli.MIN(int(b.Max(0, buflen)), salt_len))
+	buflen -= cli.MIN(b.Max(0, buflen), int(salt_len))
 	if buflen > 0 {
 		b.PostInc(&(*cp)) = '$'
 		buflen--

@@ -63,11 +63,7 @@ const INT_MAX = 2147483647
 const INT_MIN = -INT_MAX - 1
 
 /* double limits */
-
-const PHP_DOUBLE_MAX_LENGTH = 1080
-const PHP_GCC_VERSION = zend.ZEND_GCC_VERSION
 const EXEC_INPUT_BUF = 4096
-const PHP_MIME_TYPE = "application/x-httpd-php"
 
 /* macros */
 
@@ -78,45 +74,16 @@ const MAXPATHLEN = 256
 const PhpSleep = sleep
 
 var Environ **byte
-var Phperror func(error *byte)
-var Debug func(format *byte, _ ...any) int
-var Cfgparse func() int
 
 const PhpError = zend.ZendError
-const ErrorHandlingT = zend_error_handling_t
 
 /* PHPAPI void php_error(int type, const char *format, ...); */
 
-const Zenderror = Phperror
-const Zendlex = phplex
-const Phpparse = zend.Zendparse
-const Phprestart = zendrestart
-const Phpin = zendin
 const PhpMemnstr = zend.ZendMemnstr
-
-/* functions */
-
-var PhpRegisterPreRequestShutdown func(func_ func(any), userdata any)
 
 /* PHP-named Zend macro wrappers */
 
-const PHP_MN = ZEND_MN
-const PHP_ABSTRACT_ME = ZEND_ABSTRACT_ME
-const PHP_ME_MAPPING = ZEND_ME_MAPPING
-const PHP_MODULE_STARTUP_N = ZEND_MODULE_STARTUP_N
-const PHP_MODULE_SHUTDOWN_N = ZEND_MODULE_SHUTDOWN_N
-const PHP_MODULE_ACTIVATE_N = ZEND_MODULE_ACTIVATE_N
-const PHP_MODULE_DEACTIVATE_N = ZEND_MODULE_DEACTIVATE_N
-const PHP_MODULE_INFO_N = ZEND_MODULE_INFO_N
-const PHP_MODULE_STARTUP_D = ZEND_MODULE_STARTUP_D
-const PHP_MODULE_SHUTDOWN_D = ZEND_MODULE_SHUTDOWN_D
-const PHP_MODULE_ACTIVATE_D = ZEND_MODULE_ACTIVATE_D
-const PHP_MODULE_DEACTIVATE_D = ZEND_MODULE_DEACTIVATE_D
-const PHP_MODULE_INFO_D = ZEND_MODULE_INFO_D
-
-/* Compatibility macros */
-
-const PHP_MODULE_GLOBALS = ZEND_MODULE_GLOBALS
+var PHP_MODULE_GLOBALS = ZEND_MODULE_GLOBALS
 
 /* Output support */
 

@@ -56,7 +56,7 @@ func PhpSprintfAppendstring(
 	} else {
 		npad = min_width - copy_len
 	}
-	m_width = zend.MAX(min_width, copy_len)
+	m_width = b.Max(min_width, copy_len)
 	if m_width > core.INT_MAX-(*pos)-1 {
 		zend.ZendErrorNoreturn(zend.E_ERROR, "Field width %zd is too long", m_width)
 	}

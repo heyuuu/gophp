@@ -582,7 +582,7 @@ func ZendGetFunctionDeclaration(fptr *ZendFunction) *ZendString {
 							str.AppendString("NULL")
 						} else if zv.IsString() {
 							str.AppendByte('\'')
-							str.AppendString(b.CastStr(Z_STRVAL_P(zv), MIN(Z_STRLEN_P(zv), 10)))
+							str.AppendString(b.CastStr(Z_STRVAL_P(zv), b.Min(Z_STRLEN_P(zv), 10)))
 							if Z_STRLEN_P(zv) > 10 {
 								str.AppendString("...")
 							}

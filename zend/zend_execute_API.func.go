@@ -1029,7 +1029,7 @@ func ZendTimeoutHandler(dummy int) {
 		}
 		output_len = core.Snprintf(log_buffer, b.SizeOf("log_buffer"), "\nFatal error: Maximum execution time of "+ZEND_LONG_FMT+"+"+ZEND_LONG_FMT+" seconds exceeded (terminated) in %s on line %d\n", EG__().GetTimeoutSeconds(), EG__().GetHardTimeout(), error_filename, error_lineno)
 		if output_len > 0 {
-			ZendQuietWrite(2, log_buffer, MIN(output_len, b.SizeOf("log_buffer")))
+			ZendQuietWrite(2, log_buffer, b.Min(output_len, b.SizeOf("log_buffer")))
 		}
 		_exit(124)
 	}

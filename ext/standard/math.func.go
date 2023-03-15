@@ -3176,7 +3176,7 @@ func _phpMathNumberFormatEx(
 		is_negative = 1
 		d = -d
 	}
-	dec = zend.MAX(0, dec)
+	dec = b.Max(0, dec)
 	d = _phpMathRound(d, dec, PHP_ROUND_HALF_UP)
 	tmpbuf = core.Strpprintf(0, "%.*F", dec, d)
 	if tmpbuf == nil {

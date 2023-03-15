@@ -1133,7 +1133,7 @@ func ZendGetCallTrampolineFunc(ce *ZendClassEntry, method_name *ZendString, is_s
 	/* reserve space for arguments, local and temporary variables */
 
 	if fbc.GetType() == ZEND_USER_FUNCTION {
-		func_.SetT(MAX(fbc.GetOpArray().GetLastVar()+fbc.GetOpArray().GetT(), 2))
+		func_.SetT(b.Max(fbc.GetOpArray().GetLastVar()+fbc.GetOpArray().GetT(), 2))
 	} else {
 		func_.SetT(2)
 	}

@@ -63,7 +63,7 @@ func ZendStringSafeRealloc(s *ZendString, n int, m int, l int, persistent int) *
 	//	return ret
 	//}
 	ret = ZendStringSafeAlloc(n, m, l, persistent)
-	memcpy(ret.GetVal(), s.GetVal(), MIN(n*m+l, s.GetLen())+1)
+	memcpy(ret.GetVal(), s.GetVal(), b.Min(n*m+l, s.GetLen())+1)
 	s.DelRefcount()
 	return ret
 }
@@ -106,26 +106,29 @@ func ZendInlineHashFunc(str *byte, len_ int) ZendUlong {
 	return b.HashStr(str_)
 }
 func ZendHashFunc(str *byte, len_ int) ZendUlong { return ZendInlineHashFunc(str, len_) }
+
+/**
+ * Interned String 相关
+ */
+var IsInRequestForInternedString bool = false
+
 func ZendInternedStringsInit() {
-	InternedStringRequestHandler = ZendNewInternedStringRequest
-	InternedStringInitRequestHandler = ZendStringInitInternedRequest
 	ZendEmptyString = nil
 	InternedStringsPermanent.Clean()
-	ZendNewInternedString = ZendNewInternedStringPermanent
-	ZendStringInitInterned = ZendStringInitInternedPermanent
+	IsInRequestForInternedString = false
 
 	/* interned empty string */
-	ZendEmptyString = initInternedZendString("", false)
+	ZendEmptyString = InitInternedZendString("")
 	for i := 0; i < 256; i++ {
-		ZendOneCharString[i] = initInternedZendString(string([]byte{byte(i)}), false)
+		ZendOneCharString[i] = InitInternedZendString(string([]byte{byte(i)}))
 	}
 }
 func ZendInternedStringsDtor() {
 	InternedStringsPermanent.Clean()
 }
 
-func initInternedString(str string, request bool) string {
-	if request {
+func InitInternedString(str string) string {
+	if IsInRequestForInternedString {
 		/* Check for permanent strings, the table is readonly at this point. */
 		if ret, ok := InternedStringsPermanent.Get(str); ok {
 			return ret
@@ -139,39 +142,25 @@ func initInternedString(str string, request bool) string {
 	}
 }
 
-func initInternedZendString(str string, request bool) *ZendString {
-	var interned = initInternedString(str, request)
+func InitInternedZendString(str string) *ZendString {
+	var interned = InitInternedString(str)
 	return NewZendString(interned)
 }
 
-func ZendNewInternedStringPermanent(str *ZendString) *ZendString {
-	var s = str.GetStr()
-	return initInternedZendString(s, false)
+func ZendNewInternedString(str *ZendString) *ZendString {
+	return InitInternedZendString(str.GetStr())
 }
-func ZendNewInternedStringRequest(str *ZendString) *ZendString {
-	var s = str.GetStr()
-	return initInternedZendString(s, true)
+
+func ZendStringInitInterned(str *byte, size int, permanent int) *ZendString {
+	return InitInternedZendString(b.CastStr(str, size))
 }
-func ZendStringInitInternedPermanent(str *byte, size int, permanent int) *ZendString {
-	var s = b.CastStr(str, size)
-	return initInternedZendString(s, false)
-}
-func ZendStringInitInternedRequest(str *byte, size int, permanent int) *ZendString {
-	var s = b.CastStr(str, size)
-	return initInternedZendString(s, true)
-}
+
 func ZendInternedStringsActivate() {
 	CG__().InternedStrings = NewInternedStrings()
 }
 func ZendInternedStringsDeactivate() {
 	CG__().InternedStrings.Destroy()
 }
-func ZendInternedStringsSwitchStorage(request ZendBool) {
-	if request != 0 {
-		ZendNewInternedString = InternedStringRequestHandler
-		ZendStringInitInterned = InternedStringInitRequestHandler
-	} else {
-		ZendNewInternedString = ZendNewInternedStringPermanent
-		ZendStringInitInterned = ZendStringInitInternedPermanent
-	}
+func ZendInternedStringsSwitchStorage(inRequest bool) {
+	IsInRequestForInternedString = inRequest
 }

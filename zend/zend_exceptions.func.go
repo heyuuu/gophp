@@ -381,7 +381,7 @@ func _buildTraceArgs(arg *Zval, str *SmartStr) {
 		str.AppendString("NULL, ")
 	case IS_STRING:
 		str.AppendByte('\'')
-		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), MIN(Z_STRLEN_P(arg), 15))
+		SmartStrAppendEscaped(str, Z_STRVAL_P(arg), b.Min(Z_STRLEN_P(arg), 15))
 		if Z_STRLEN_P(arg) > 15 {
 			str.AppendString("...', ")
 		} else {

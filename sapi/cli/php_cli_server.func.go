@@ -193,7 +193,7 @@ func SapiCliServerReadPost(buf *byte, count_bytes int) int {
 	var client *PhpCliServerClient = core.SG__().server_context
 	if client.GetRequest().GetContent() != nil {
 		var content_len int = client.GetRequest().GetContentLen()
-		var nbytes_copied int = MIN(client.GetPostReadOffset()+count_bytes, content_len) - client.GetPostReadOffset()
+		var nbytes_copied int = b.Min(client.GetPostReadOffset()+count_bytes, content_len) - client.GetPostReadOffset()
 		memmove(buf, client.GetRequest().GetContent()+client.GetPostReadOffset(), nbytes_copied)
 		client.SetPostReadOffset(client.GetPostReadOffset() + nbytes_copied)
 		return nbytes_copied

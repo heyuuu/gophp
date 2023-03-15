@@ -100,7 +100,7 @@ func ZendVmStackPushCallFrameEx(used_stack uint32, call_info uint32, func_ *Zend
 func ZendVmCalcUsedStack(num_args uint32, func_ *ZendFunction) uint32 {
 	var used_stack uint32 = ZEND_CALL_FRAME_SLOT + num_args
 	if ZEND_USER_CODE(func_.GetType()) {
-		used_stack += func_.GetOpArray().GetLastVar() + func_.GetOpArray().GetT() - MIN(func_.GetOpArray().GetNumArgs(), num_args)
+		used_stack += func_.GetOpArray().GetLastVar() + func_.GetOpArray().GetT() - b.Min(func_.GetOpArray().GetNumArgs(), num_args)
 	}
 	return used_stack * b.SizeOf("zval")
 }

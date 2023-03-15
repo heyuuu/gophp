@@ -197,7 +197,7 @@ func ZendCheckMagicMethodImplementation(ce *ZendClassEntry, fptr *ZendFunction, 
 	 * the beginning of the name speeds up the check process */
 
 	name_len = fptr.GetFunctionName().GetLen()
-	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), MIN(name_len, b.SizeOf("lcname")-1))
+	ZendStrTolowerCopy(lcname, fptr.GetFunctionName().GetVal(), b.Min(name_len, b.SizeOf("lcname")-1))
 	lcname[b.SizeOf("lcname")-1] = '0'
 	if name_len == b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1 && !(memcmp(lcname, ZEND_DESTRUCTOR_FUNC_NAME, b.SizeOf("ZEND_DESTRUCTOR_FUNC_NAME")-1)) && fptr.GetNumArgs() != 0 {
 		ZendError(error_type, "Destructor %s::%s() cannot take arguments", ce.GetName().GetVal(), ZEND_DESTRUCTOR_FUNC_NAME)

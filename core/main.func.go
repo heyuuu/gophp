@@ -1627,7 +1627,7 @@ func PhpModuleStartup(sf ISapiModule, additional_modules *zend.ZendModuleEntry, 
 	ModuleStartup = 0
 	zend.ShutdownMemoryManager(1, 0)
 	zend.VirtualCwdActivate()
-	zend.ZendInternedStringsSwitchStorage(1)
+	zend.ZendInternedStringsSwitchStorage(true)
 
 	/* we're done */
 
@@ -1641,7 +1641,7 @@ func PhpModuleShutdown() {
 	if ModuleInitialized == 0 {
 		return
 	}
-	zend.ZendInternedStringsSwitchStorage(0)
+	zend.ZendInternedStringsSwitchStorage(false)
 	SapiFlush()
 	zend.ZendShutdown()
 

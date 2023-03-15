@@ -2,14 +2,13 @@
 
 package zend
 
-import "math"
+import (
+	"math"
+)
 
-type ZendNewInternedStringFuncT func(str *ZendString) *ZendString
-type ZendStringInitInternedFuncT func(str *byte, size int, permanent int) *ZendString
-
-var ZendNewInternedString ZendNewInternedStringFuncT
-var ZendStringInitInterned ZendStringInitInternedFuncT
 var ZendOneCharString []*ZendString
+
+var InternedStringsPermanent = NewInternedStrings()
 
 const ZSTR_MAX_LEN = math.MaxInt
 
@@ -66,7 +65,3 @@ const (
 	ZEND_STR_ARGC                                 = "argc"
 	ZEND_STR_ARRAY_CAPITALIZED                    = "Array"
 )
-
-var InternedStringsPermanent = NewInternedStrings()
-var InternedStringRequestHandler ZendNewInternedStringFuncT = ZendNewInternedStringRequest
-var InternedStringInitRequestHandler ZendStringInitInternedFuncT = ZendStringInitInternedRequest

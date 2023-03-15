@@ -2492,7 +2492,7 @@ func DebugBacktraceGetArgs(call *ZendExecuteData, arg_array *Zval) {
 		var __fill_idx uint32 = __fill_ht.GetNNumUsed()
 		ZEND_ASSERT(__fill_ht.HasUFlags(HASH_FLAG_PACKED))
 		if call.GetFunc().GetType() == ZEND_USER_FUNCTION {
-			var first_extra_arg uint32 = MIN(num_args, call.GetFunc().GetOpArray().GetNumArgs())
+			var first_extra_arg uint32 = b.Min(num_args, call.GetFunc().GetOpArray().GetNumArgs())
 			if (ZEND_CALL_INFO(call) & ZEND_CALL_HAS_SYMBOL_TABLE) != 0 {
 
 				/* In case of attached symbol_table, values on stack may be invalid

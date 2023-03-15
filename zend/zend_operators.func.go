@@ -3061,7 +3061,7 @@ func ZendBinaryStrcmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	if s1 == s2 {
 		return 0
 	}
-	retval = memcmp(s1, s2, MIN(len1, len2))
+	retval = memcmp(s1, s2, b.Min(len1, len2))
 	if retval == 0 {
 		return int(len1 - len2)
 	} else {
@@ -3073,9 +3073,9 @@ func ZendBinaryStrncmp(s1 *byte, len1 int, s2 *byte, len2 int, length int) int {
 	if s1 == s2 {
 		return 0
 	}
-	retval = memcmp(s1, s2, MIN(length, MIN(len1, len2)))
+	retval = memcmp(s1, s2, b.Min(length, b.Min(len1, len2)))
 	if retval == 0 {
-		return int(MIN(length, len1) - MIN(length, len2))
+		return int(b.Min(length, len1) - b.Min(length, len2))
 	} else {
 		return retval
 	}
@@ -3087,7 +3087,7 @@ func ZendBinaryStrcasecmp(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	if s1 == s2 {
 		return 0
 	}
-	len_ = MIN(len1, len2)
+	len_ = b.Min(len1, len2)
 	for b.PostDec(&len_) {
 		c1 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s1))))
 		c2 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s2))))
@@ -3104,7 +3104,7 @@ func ZendBinaryStrncasecmp(s1 *byte, len1 int, s2 string, len2 int, length int) 
 	if s1 == s2 {
 		return 0
 	}
-	len_ = MIN(length, MIN(len1, len2))
+	len_ = b.Min(length, b.Min(len1, len2))
 	for b.PostDec(&len_) {
 		c1 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s1))))
 		c2 = ZendTolowerAscii(*((*uint8)(b.PostInc(&s2))))
@@ -3112,7 +3112,7 @@ func ZendBinaryStrncasecmp(s1 *byte, len1 int, s2 string, len2 int, length int) 
 			return c1 - c2
 		}
 	}
-	return int(MIN(length, len1) - MIN(length, len2))
+	return int(b.Min(length, len1) - b.Min(length, len2))
 }
 func ZendBinaryStrcasecmpL(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	var len_ int
@@ -3121,7 +3121,7 @@ func ZendBinaryStrcasecmpL(s1 *byte, len1 int, s2 *byte, len2 int) int {
 	if s1 == s2 {
 		return 0
 	}
-	len_ = MIN(len1, len2)
+	len_ = b.Min(len1, len2)
 	for b.PostDec(&len_) {
 		c1 = ZendTolower(int(*((*uint8)(b.PostInc(&s1)))))
 		c2 = ZendTolower(int(*((*uint8)(b.PostInc(&s2)))))
@@ -3138,7 +3138,7 @@ func ZendBinaryStrncasecmpL(s1 *byte, len1 int, s2 *byte, len2 int, length int) 
 	if s1 == s2 {
 		return 0
 	}
-	len_ = MIN(length, MIN(len1, len2))
+	len_ = b.Min(length, b.Min(len1, len2))
 	for b.PostDec(&len_) {
 		c1 = ZendTolower(int(*((*uint8)(b.PostInc(&s1)))))
 		c2 = ZendTolower(int(*((*uint8)(b.PostInc(&s2)))))
@@ -3146,7 +3146,7 @@ func ZendBinaryStrncasecmpL(s1 *byte, len1 int, s2 *byte, len2 int, length int) 
 			return c1 - c2
 		}
 	}
-	return int(MIN(length, len1) - MIN(length, len2))
+	return int(b.Min(length, len1) - b.Min(length, len2))
 }
 func ZendBinaryZvalStrcmp(s1 *Zval, s2 *Zval) int {
 	return ZendBinaryStrcmp(Z_STRVAL_P(s1), Z_STRLEN_P(s1), Z_STRVAL_P(s2), Z_STRLEN_P(s2))

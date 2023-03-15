@@ -8749,7 +8749,7 @@ func ZifSubstrCompare(executeData *zend.ZendExecuteData, return_value *zend.Zval
 	if len_ != 0 {
 		cmp_len = int(len_)
 	} else {
-		cmp_len = zend.MAX(s2.GetLen(), s1.GetLen()-offset)
+		cmp_len = b.Max(s2.GetLen(), s1.GetLen()-offset)
 	}
 	if cs == 0 {
 		return_value.SetLong(zend.ZendBinaryStrncmp(s1.GetVal()+offset, s1.GetLen()-offset, s2.GetVal(), s2.GetLen(), cmp_len))

@@ -1337,7 +1337,7 @@ func _phpStreamCopyToMem(src *core.PhpStream, maxlen int, persistent int) *zend.
 	 * 8K).  */
 
 	if core.PhpStreamStat(src, &ssbuf) == 0 && ssbuf.GetSb().st_size > 0 {
-		max_len = zend.MAX(ssbuf.GetSb().st_size-src.GetPosition(), 0) + step
+		max_len = b.Max(ssbuf.GetSb().st_size-src.GetPosition(), 0) + step
 	} else {
 		max_len = step
 	}

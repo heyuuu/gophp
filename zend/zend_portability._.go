@@ -2,6 +2,8 @@
 
 package zend
 
+import "math"
+
 // Source: <Zend/zend_portability.h>
 
 /*
@@ -30,17 +32,6 @@ package zend
 
 const ZEND_PATHS_SEPARATOR = ':'
 
-// failed # include "../TSRM/TSRM.h"
-
-/* GCC x.y.z supplies __GNUC__ = x and __GNUC_MINOR__ = y */
-
-const ZEND_GCC_VERSION = 0
-
-/* Compatibility with non-clang compilers */
-
-/* Only use this macro if you know for sure that all of the switches values
-   are covered by its case statements */
-
 /* all HAVE_XXX test have to be after the include of zend_config above */
 
 const RTLD_LAZY = 1
@@ -49,7 +40,6 @@ const PHP_RTLD_MODE = RTLD_LAZY
 const DL_UNLOAD = dlclose
 const DL_FETCH_SYMBOL = dlsym
 const DL_ERROR = dlerror
-const ZEND_EXTENSIONS_SUPPORT = 1
 
 /* AIX requires this to be the first thing in the file.  */
 
@@ -66,26 +56,6 @@ const MAX_LENGTH_OF_DOUBLE = 32
  * won't fail to compile on some machines and not others.
  */
 
-const ZEND_INFINITY float64 = _zendGetInf()
-const ZEND_NAN float64 = _zendGetNan()
+var ZEND_INFINITY = math.Inf(1)
 
-/* excpt.h on Digital Unix 4.0 defines function_table */
-
-/* This check should only be used on network socket, not file descriptors */
-
-/* va_copy() is __va_copy() in old gcc versions.
- * According to the autoconf manual, using
- * memcpy(&dst, &src, sizeof(va_list))
- * gives maximum portability. */
-
-/* Intrinsics macros start. */
-
-/* Do not use for conditional declaration of API functions! */
-
-/* Do not use for conditional declaration of API functions! */
-
-/* Do not use for conditional declaration of API functions! */
-
-/* Intrinsics macros end. */
-
-/* On CPU with few registers, it's cheaper to reload value then use spill slot */
+var ZEND_NAN = math.NaN()

@@ -468,7 +468,7 @@ func ZifPack(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		case 'A':
 			fallthrough
 		case 'Z':
-			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return zend.MAX(0, arg-1) })
+			var arg_cp int = b.CondF2(code != 'Z', arg, func() int { return b.Max(0, arg-1) })
 			var tmp_str *zend.ZendString
 			var str *zend.ZendString = zend.ZvalGetTmpString(&argv[b.PostInc(&currentarg)], &tmp_str)
 			memset(&output.GetVal()[outputpos], b.Cond(code == 'a' || code == 'Z', '0', ' '), arg)

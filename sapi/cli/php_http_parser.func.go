@@ -1327,7 +1327,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 			break
 		case SBodyIdentity:
 			r.Assert(pe >= p)
-			to_read = MIN(size_t(pe-p), int(parser.GetContentLength()))
+			to_read = b.Min(size_t(pe-p), int(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
 					settings.GetOnBody()(parser, p, to_read)
@@ -1401,7 +1401,7 @@ func PhpHttpParserExecute(parser *PhpHttpParser, settings *PhpHttpParserSettings
 		case SChunkData:
 			r.Assert(parser.IsChunked())
 			r.Assert(pe >= p)
-			to_read = MIN(size_t(pe-p), size_t(parser.GetContentLength()))
+			to_read = b.Min(size_t(pe-p), size_t(parser.GetContentLength()))
 			if to_read > 0 {
 				if settings.GetOnBody() != nil {
 					settings.GetOnBody()(parser, p, to_read)

@@ -542,7 +542,7 @@ func PhpOutputHandlerAppend(handler *PhpOutputHandler, buf *PhpOutputBuffer) int
 		if handler.GetBuffer().GetSize()-handler.GetBuffer().GetUsed() <= buf.GetUsed() {
 			var grow_int int = PHP_OUTPUT_HANDLER_INITBUF_SIZE(handler.GetSize())
 			var grow_buf int = PHP_OUTPUT_HANDLER_INITBUF_SIZE(buf.GetUsed() - (handler.GetBuffer().GetSize() - handler.GetBuffer().GetUsed()))
-			var grow_max int = zend.MAX(grow_int, grow_buf)
+			var grow_max int = b.Max(grow_int, grow_buf)
 			handler.GetBuffer().SetData(zend.SafeErealloc(handler.GetBuffer().GetData(), 1, handler.GetBuffer().GetSize(), grow_max))
 			handler.GetBuffer().SetSize(handler.GetBuffer().GetSize() + grow_max)
 		}
