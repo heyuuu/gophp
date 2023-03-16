@@ -6,11 +6,23 @@ import (
 	"strconv"
 )
 
+var (
+	nilIdent   = Ident("nil")
+	falseIdent = Ident("false")
+	trueIdent  = Ident("true")
+)
+
 func Ident(name string) *ast.Ident { return &ast.Ident{Name: name} }
 
-func NilLit() *ast.Ident { return Ident("nil") }
+func NilLit() *ast.Ident { return nilIdent }
 func IntLit(val int) *ast.BasicLit {
 	return &ast.BasicLit{Kind: token.INT, Value: strconv.Itoa(val)}
+}
+func BoolLit(val bool) ast.Expr {
+	if val {
+		return trueIdent
+	}
+	return falseIdent
 }
 func StrLit(val string) *ast.BasicLit {
 	return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(val)}
@@ -32,6 +44,8 @@ func Fields(fields ...*ast.Field) *ast.FieldList {
 
 func Type(name string) ast.Expr     { return Ident(name) }
 func RefType(typ ast.Expr) ast.Expr { return &ast.StarExpr{X: typ} }
+
+func Not(expr ast.Expr) ast.Expr { return &ast.UnaryExpr{Op: token.NOT, X: expr} }
 
 func CallExpr(name string, args []ast.Expr) ast.Expr {
 	return &ast.CallExpr{
@@ -59,4 +73,7 @@ func AssignStmt(variable ast.Expr, value ast.Expr) ast.Stmt {
 		Tok: token.DEFINE,
 		Rhs: []ast.Expr{value},
 	}
+}
+func BlockStmt(list ...ast.Stmt) *ast.BlockStmt {
+	return &ast.BlockStmt{List: list}
 }

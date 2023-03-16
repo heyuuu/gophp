@@ -25,34 +25,20 @@ func ZendStartupBuiltinFunctions() int {
 		return SUCCESS
 	}
 }
-func ZifZendVersion(executeData *ZendExecuteData, return_value *Zval) {
-	if ZendParseParametersNone() == FAILURE {
-		return
-	}
-	return_value.SetRawString(ZEND_VERSION)
-	return
-}
-func ZifGcMemCaches(executeData *ZendExecuteData, return_value *Zval) {
-	if ZendParseParametersNone() == FAILURE {
-		return
-	}
-	return_value.SetLong(ZendMmGc(ZendMmGetHeap()))
-	return
-}
-func ZifGcCollectCycles(executeData *ZendExecuteData, return_value *Zval) {
-	if ZendParseParametersNone() == FAILURE {
-		return
-	}
-	return_value.SetLong(0)
-	return
-}
-func ZifGcEnabled(executeData *ZendExecuteData, return_value *Zval) {
-	if ZendParseParametersNone() == FAILURE {
-		return
-	}
-	return_value.SetTrue()
-	return
-}
+
+//@zif -c 0
+func ZifZendVersion() string { return ZEND_VERSION }
+
+//@zif -c 0
+func ZifGcMemCaches() int { return ZendMmGc(ZendMmGetHeap()) }
+
+//@zif -c 0
+func ZifGcCollectCycles() int { return 0 }
+
+//@zif -c 0
+func ZifGcEnabled() bool { return true }
+
+//@zif -c 0
 func ZifGcEnable(executeData *ZendExecuteData, return_value *Zval) {
 	var key *ZendString
 	if ZendParseParametersNone() == FAILURE {

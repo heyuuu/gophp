@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sik/internal/cmd/sikgen/zif"
 )
 
 func main() {
@@ -21,9 +22,9 @@ func run(args []string) {
 	fmt.Printf("%+v\n", opts)
 	switch opts.cmd {
 	case "gen-func":
-		runGenFunc(opts.dir)
+		zif.RunGenFunc(opts.dir)
 	case "clear-func":
-		runClearFunc(opts.dir)
+		zif.RunClearFunc(opts.dir)
 	case "":
 		log.Fatalln("命令不可为空")
 	default:

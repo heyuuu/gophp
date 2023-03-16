@@ -2,7 +2,10 @@
 
 package zend
 
-import b "sik/builtin"
+import (
+	"math"
+	b "sik/builtin"
+)
 
 /**
  * ZendExecuteData
@@ -32,6 +35,9 @@ func (this *ZendExecuteData) CheckNumArgsError(minNumArgs int, maxNumArgs int) b
 }
 func (this *ZendExecuteData) CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
 	return this.CheckNumArgs(minNumArgs, maxNumArgs, true)
+}
+func (this *ZendExecuteData) CheckMinNumArgs(minNumArgs int, forceStrict bool) bool {
+	return this.CheckNumArgs(minNumArgs, math.MaxInt, forceStrict)
 }
 func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceStrict bool) bool {
 	// 检查参数个数，若检查通过直接返回
