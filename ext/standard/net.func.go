@@ -79,7 +79,7 @@ func ZifNetGetInterfaces(executeData *zend.ZendExecuteData, return_value *zend.Z
 	var addrs *__struct__ifaddrs = nil
 	var p *__struct__ifaddrs
 	if zend.ZEND_NUM_ARGS() != 0 {
-		zend.ZendWrongParametersNoneError()
+		zend.CheckNumArgsNoneError()
 		return
 	}
 	if getifaddrs(&addrs) {

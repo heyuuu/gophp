@@ -7,36 +7,46 @@ import (
 	"sik/core"
 )
 
-func ZendWrongParametersNoneError() int {
-	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
-	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
-	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
-	return FAILURE
+func CheckNumArgs(minNumArgs int, maxNumArgs int, throwException bool) bool {
+	// 检查参数个数，若检查通过直接返回
+	numArgs := int(EG__().GetCurrentExecuteData().NumArgs())
+	if numArgs >= minNumArgs && numArgs <= maxNumArgs {
+		return true
+	}
+
+	// 构建错误信息
+	activeFunc := EG__().GetCurrentExecuteData().GetFunc()
+	var callee string
+	if activeFunc.GetScope() != nil {
+		className := activeFunc.GetScope().Name()
+		callee = className + "::" + activeFunc.GetFunctionName().GetStr()
+	} else {
+		callee = activeFunc.GetFunctionName().GetStr()
+	}
+
+	if minNumArgs == maxNumArgs {
+		ZendInternalArgumentCountError(throwException, "%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
+	} else if numArgs < minNumArgs {
+		ZendInternalArgumentCountError(throwException, "%s() expects at least %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
+	} else { // numArgs > maxNumArgs
+		ZendInternalArgumentCountError(throwException, "%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, b.Cond(maxNumArgs == 1, "", "s"), numArgs)
+	}
+	return false
 }
-func ZendWrongParametersNoneException() int {
-	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
-	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
-	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(true, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), "exactly", 0, "s", num_args)
-	return FAILURE
+
+func CheckNumArgsNoneError() bool     { return CheckNumArgs(0, 0, ZEND_ARG_USES_STRICT_TYPES()) }
+func CheckNumArgsNoneException() bool { return CheckNumArgs(0, 0, true) }
+func CheckNumArgsError(minNumArgs int, maxNumArgs int) bool {
+	return CheckNumArgs(minNumArgs, maxNumArgs, ZEND_ARG_USES_STRICT_TYPES())
 }
-func ZendWrongParametersCountError(min_num_args int, max_num_args int) {
-	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
-	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
-	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
+	return CheckNumArgs(minNumArgs, maxNumArgs, true)
 }
-func ZendWrongParametersCountException(min_num_args int, max_num_args int) {
-	var num_args int = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
-	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
-	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
-	ZendInternalArgumentCountError(true, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
-}
+
 func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
+	var expected_error = []string{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
 	if EG__().GetException() != nil {
 		return
 	}

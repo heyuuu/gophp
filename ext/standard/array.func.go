@@ -469,9 +469,9 @@ func ZifKrsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -556,9 +556,9 @@ func ZifKsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -669,9 +669,9 @@ func ZifCount(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -791,9 +791,9 @@ func PhpNatsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, fold
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -880,9 +880,9 @@ func ZifAsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -967,9 +967,9 @@ func ZifArsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1054,9 +1054,9 @@ func ZifSort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1141,9 +1141,9 @@ func ZifRsort(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1275,9 +1275,9 @@ func PhpUsort(executeData *zend.ZendExecuteData, return_value *zend.Zval, compar
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1419,9 +1419,9 @@ func ZifEnd(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1501,9 +1501,9 @@ func ZifPrev(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1583,9 +1583,9 @@ func ZifNext(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1665,9 +1665,9 @@ func ZifReset(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1747,9 +1747,9 @@ func ZifCurrent(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1825,9 +1825,9 @@ func ZifKey(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -1897,9 +1897,9 @@ func ZifMin(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -2006,9 +2006,9 @@ func ZifMax(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -2279,9 +2279,9 @@ func ZifArrayWalk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -2378,9 +2378,9 @@ func ZifArrayWalkRecursive(executeData *zend.ZendExecuteData, return_value *zend
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -2477,9 +2477,9 @@ func PhpSearchArray(executeData *zend.ZendExecuteData, return_value *zend.Zval, 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -3554,9 +3554,9 @@ func ZifExtract(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -3749,9 +3749,9 @@ func ZifCompact(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -3845,9 +3845,9 @@ func ZifArrayFill(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -3984,9 +3984,9 @@ func ZifArrayFillKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -4082,9 +4082,9 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -4523,9 +4523,9 @@ func ZifShuffle(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -4761,9 +4761,9 @@ func ZifArrayPush(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -4862,9 +4862,9 @@ func ZifArrayPop(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -4969,9 +4969,9 @@ func ZifArrayShift(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -5142,9 +5142,9 @@ func ZifArrayUnshift(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -5269,9 +5269,9 @@ func ZifArraySplice(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -5410,9 +5410,9 @@ func ZifArraySlice(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -5741,9 +5741,9 @@ func PhpArrayReplaceWrapper(executeData *zend.ZendExecuteData, return_value *zen
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -5847,9 +5847,9 @@ func PhpArrayMergeWrapper(executeData *zend.ZendExecuteData, return_value *zend.
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6050,9 +6050,9 @@ func ZifArrayKeys(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6231,9 +6231,9 @@ func ZifArrayKeyFirst(executeData *zend.ZendExecuteData, return_value *zend.Zval
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6305,9 +6305,9 @@ func ZifArrayKeyLast(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6381,9 +6381,9 @@ func ZifArrayValues(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6498,9 +6498,9 @@ func ZifArrayCountValues(executeData *zend.ZendExecuteData, return_value *zend.Z
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6663,9 +6663,9 @@ func ZifArrayColumn(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6834,9 +6834,9 @@ func ZifArrayReverse(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -6968,9 +6968,9 @@ func ZifArrayPad(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -7158,9 +7158,9 @@ func ZifArrayFlip(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -7260,9 +7260,9 @@ func ZifArrayChangeKeyCase(executeData *zend.ZendExecuteData, return_value *zend
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -7374,9 +7374,9 @@ func ZifArrayUnique(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -8369,9 +8369,9 @@ func ZifArrayDiff(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -8648,9 +8648,9 @@ func ZifArrayMultisort(executeData *zend.ZendExecuteData, return_value *zend.Zva
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -8927,9 +8927,9 @@ func ZifArrayRand(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9128,9 +9128,9 @@ func ZifArraySum(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9214,9 +9214,9 @@ func ZifArrayProduct(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9317,9 +9317,9 @@ func ZifArrayReduce(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9452,9 +9452,9 @@ func ZifArrayFilter(executeData *zend.ZendExecuteData, return_value *zend.Zval) 
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9625,9 +9625,9 @@ func ZifArrayMap(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9864,9 +9864,9 @@ func ZifArrayKeyExists(executeData *zend.ZendExecuteData, return_value *zend.Zva
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -9964,9 +9964,9 @@ func ZifArrayChunk(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE
@@ -10117,9 +10117,9 @@ func ZifArrayCombine(executeData *zend.ZendExecuteData, return_value *zend.Zval)
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & zend.ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & zend.ZEND_PARSE_PARAMS_THROW) != 0 {
-						zend.ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						zend.CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						zend.ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						zend.CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = zend.ZPP_ERROR_FAILURE

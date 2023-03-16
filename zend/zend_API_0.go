@@ -17,7 +17,7 @@ func ZendParseParametersNone() ZEND_RESULT_CODE {
 	if ZEND_NUM_ARGS() == 0 {
 		return SUCCESS
 	} else {
-		ZendWrongParametersNoneError()
+		CheckNumArgsNoneError()
 		return FAILURE
 	}
 }
@@ -25,7 +25,7 @@ func ZendParseParametersNoneThrow() ZEND_RESULT_CODE {
 	if ZEND_NUM_ARGS() == 0 {
 		return SUCCESS
 	} else {
-		ZendWrongParametersNoneException()
+		CheckNumArgsNoneException()
 		return FAILURE
 	}
 }

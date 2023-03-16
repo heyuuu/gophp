@@ -968,9 +968,9 @@ func zim_Generator_send(executeData *ZendExecuteData, return_value *Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = ZPP_ERROR_FAILURE
@@ -1056,9 +1056,9 @@ func zim_Generator_throw(executeData *ZendExecuteData, return_value *Zval) {
 			if _num_args < _min_num_args || _num_args > _max_num_args && _max_num_args >= 0 {
 				if (_flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
 					if (_flags & ZEND_PARSE_PARAMS_THROW) != 0 {
-						ZendWrongParametersCountException(_min_num_args, _max_num_args)
+						CheckNumArgsException(_min_num_args, _max_num_args)
 					} else {
-						ZendWrongParametersCountError(_min_num_args, _max_num_args)
+						CheckNumArgsError(_min_num_args, _max_num_args)
 					}
 				}
 				_error_code = ZPP_ERROR_FAILURE
