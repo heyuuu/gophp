@@ -252,7 +252,7 @@ func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	return SUCCESS
 }
 func ZendWrongParamCount() {
-	class_name, space := GetActiveClassNameEx()
+	class_name, space := GetActiveClassName()
 	ZendInternalArgumentCountError(ZEND_ARG_USES_STRICT_TYPES(), "Wrong parameter count for %s%s%s()", class_name, space, GetActiveFunctionName())
 }
 func ZendGetTypeByConst(type_ ZendUchar) string {

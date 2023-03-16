@@ -622,7 +622,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 			function = "Unknown"
 		} else {
 			is_function = 1
-			class_name, space = zend.GetActiveClassNameEx()
+			class_name, space = zend.GetActiveClassName()
 		}
 	}
 

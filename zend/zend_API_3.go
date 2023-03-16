@@ -17,7 +17,7 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 		}
 		if (flags&ZEND_PARSE_PARAMS_QUIET) == 0 && ((*expected_type) || error != nil) {
 			var space *byte
-			class_name, space := GetActiveClassNameEx()
+			class_name, space := GetActiveClassName()
 			var throw_exception ZendBool = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			if error != nil {
 				ZendInternalTypeError(throw_exception, "%s%s%s() expects parameter %d %s", class_name, space, GetActiveFunctionName(), arg_num, error)

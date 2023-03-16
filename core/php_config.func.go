@@ -2,6 +2,8 @@
 
 package core
 
-func ZendIsnan(a float64) __auto__  { return isnan(a) }
-func ZendIsinf(a float64) __auto__  { return isinf(a) }
-func ZendFinite(a float64) __auto__ { return isfinite(a) }
+import "math"
+
+func ZendIsnan(f float64) bool  { return math.IsNaN(f) }
+func ZendIsInf(f float64) bool  { return math.IsInf(f, 1) || math.IsInf(f, -1) }
+func ZendFinite(f float64) bool { return !ZendIsInf(f) }

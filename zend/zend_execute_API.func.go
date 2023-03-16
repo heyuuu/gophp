@@ -371,7 +371,36 @@ func ShutdownExecutor() {
 	ZendShutdownFpu()
 }
 
-func GetActiveClassNameEx() (className string, space string) {
+func GetActiveCalleeName() string {
+	if !ZendIsExecuting() {
+		return ""
+	}
+
+	activeFunc := CurrEX().GetFunc()
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		// func name
+		funcNameZStr := activeFunc.GetFunctionName()
+		funcName := ""
+		if funcNameZStr != nil {
+			funcName = funcNameZStr.GetStr()
+		} else {
+			funcName = "main"
+		}
+
+		// scope name
+		ce := activeFunc.GetScope()
+		if ce != nil {
+			return ce.Name() + "::" + funcName
+		} else {
+			return funcName
+		}
+	}
+
+	return ""
+}
+
+func GetActiveClassName() (className string, space string) {
 	if !ZendIsExecuting() {
 		return
 	}

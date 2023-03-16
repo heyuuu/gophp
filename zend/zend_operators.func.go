@@ -5,7 +5,6 @@ package zend
 import (
 	b "sik/builtin"
 	"sik/core"
-	r "sik/runtime"
 	"strings"
 )
 
@@ -33,9 +32,6 @@ func ZendDvalToLvalCap(d float64) ZendLong {
 	return ZendLong(d)
 }
 func ZEND_IS_DIGIT(c byte) bool { return c >= '0' && c <= '9' }
-func ZEND_IS_XDIGIT(c __auto__) bool {
-	return c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f'
-}
 func IsNumericStringEx(
 	str *byte,
 	length int,
@@ -214,41 +210,6 @@ again:
 	return result
 }
 func ZendStringTolower(str *ZendString) *ZendString { return ZendStringTolowerEx(str, 0) }
-func ConvertToExplicitType(pzv *Zval, type_ __auto__) {
-	for {
-		switch type_ {
-		case IS_NULL:
-			ConvertToNull(pzv)
-		case IS_LONG:
-			ConvertToLong(pzv)
-		case IS_DOUBLE:
-			ConvertToDouble(pzv)
-		case _IS_BOOL:
-			ConvertToBoolean(pzv)
-		case IS_ARRAY:
-			ConvertToArray(pzv)
-		case IS_OBJECT:
-			ConvertToObject(pzv)
-		case IS_STRING:
-			ConvertToString(pzv)
-		default:
-			r.Assert(false)
-		}
-		break
-	}
-}
-func ConvertToExplicitTypeEx(pzv *Zval, str_type __auto__) {
-	if pzv.GetType() != str_type {
-		ConvertToExplicitType(pzv, str_type)
-	}
-}
-func ConvertToBooleanEx(pzv *Zval) {
-	if pzv.GetTypeInfo() > IS_TRUE {
-		ConvertToBoolean(pzv)
-	} else if pzv.GetTypeInfo() < IS_FALSE {
-		pzv.SetFalse()
-	}
-}
 func ConvertToStringEx(pzv *Zval) {
 	if pzv.GetType() != IS_STRING {
 		ConvertToString(pzv)
@@ -257,16 +218,6 @@ func ConvertToStringEx(pzv *Zval) {
 func ConvertToArrayEx(pzv *Zval) {
 	if pzv.GetType() != IS_ARRAY {
 		ConvertToArray(pzv)
-	}
-}
-func ConvertToObjectEx(pzv *Zval) {
-	if pzv.GetType() != IS_OBJECT {
-		ConvertToObject(pzv)
-	}
-}
-func ConvertToNullEx(pzv *Zval) {
-	if pzv.GetType() != IS_NULL {
-		ConvertToNull(pzv)
 	}
 }
 func ConvertScalarToNumberEx(pzv *Zval) {
@@ -440,33 +391,6 @@ func ZendUnwrapReference(op *Zval) {
 func ZendTolower(c int) __auto__         { return tolower(c) }
 func TYPE_PAIR(t1 uint32, t2 uint32) int { return t1<<4 | t2 }
 func ZendTolowerAscii(c uint8) uint8     { return TolowerMap[uint8(c)] }
-func ZendAtoi(str *byte, str_len int) int {
-	var retval int
-	if str_len == 0 {
-		str_len = strlen(str)
-	}
-	retval = ZEND_STRTOL(str, nil, 0)
-	if str_len > 0 {
-		switch str[str_len-1] {
-		case 'g':
-			fallthrough
-		case 'G':
-			retval *= 1024
-			fallthrough
-		case 'm':
-			fallthrough
-		case 'M':
-			retval *= 1024
-			fallthrough
-		case 'k':
-			fallthrough
-		case 'K':
-			retval *= 1024
-		}
-	}
-	return retval
-}
-
 func ZendAtolEx(str string) ZendLong {
 	if len(str) == 0 {
 		return 0
@@ -924,40 +848,6 @@ try_again:
 		ObjectInit(op)
 		Z_OBJPROP_P(op).KeyAddNew(ZSTR_KNOWN(ZEND_STR_SCALAR).GetStr(), &tmp)
 	}
-}
-func MultiConvertToLongEx(argc int, _ ...any) {
-	var arg *Zval
-	var ap va_list
-	va_start(ap, argc)
-	for b.PostDec(&argc) {
-		arg = __va_arg(ap, (*Zval)(_))
-		if arg.GetType() != IS_LONG {
-			ConvertToLong(arg)
-		}
-	}
-	va_end(ap)
-}
-func MultiConvertToDoubleEx(argc int, _ ...any) {
-	var arg *Zval
-	var ap va_list
-	va_start(ap, argc)
-	for b.PostDec(&argc) {
-		arg = __va_arg(ap, (*Zval)(_))
-		if arg.GetType() != IS_DOUBLE {
-			ConvertToDouble(arg)
-		}
-	}
-	va_end(ap)
-}
-func MultiConvertToStringEx(argc int, _ ...any) {
-	var arg *Zval
-	var ap va_list
-	va_start(ap, argc)
-	for b.PostDec(&argc) {
-		arg = __va_arg(ap, (*Zval)(_))
-		ConvertToStringEx(arg)
-	}
-	va_end(ap)
 }
 func _zvalGetLongFuncEx(op *Zval, silent ZendBool) ZendLong {
 try_again:
@@ -2368,21 +2258,6 @@ func ConcatFunction(result *Zval, op1 *Zval, op2 *Zval) int {
 	ZvalPtrDtorStr(&op2_copy)
 	return SUCCESS
 }
-func StringCompareFunctionEx(op1 *Zval, op2 *Zval, case_insensitive ZendBool) int {
-	var tmp_str1 *ZendString
-	var tmp_str2 *ZendString
-	var str1 *ZendString = ZvalGetTmpString(op1, &tmp_str1)
-	var str2 *ZendString = ZvalGetTmpString(op2, &tmp_str2)
-	var ret int
-	if case_insensitive != 0 {
-		ret = ZendBinaryStrcasecmpL(str1.GetVal(), str1.GetLen(), str2.GetVal(), str1.GetLen())
-	} else {
-		ret = ZendBinaryStrcmp(str1.GetVal(), str1.GetLen(), str2.GetVal(), str2.GetLen())
-	}
-	ZendTmpStringRelease(tmp_str1)
-	ZendTmpStringRelease(tmp_str2)
-	return ret
-}
 func StringCompareFunction(op1 *Zval, op2 *Zval) int {
 	if op1.IsString() && op2.IsString() {
 		if op1.GetStr() == op2.GetStr() {
@@ -3130,15 +3005,6 @@ func ZendBinaryStrncasecmpL(s1 *byte, len1 int, s2 *byte, len2 int, length int) 
 func ZendBinaryZvalStrcmp(s1 *Zval, s2 *Zval) int {
 	return ZendBinaryStrcmp(Z_STRVAL_P(s1), Z_STRLEN_P(s1), Z_STRVAL_P(s2), Z_STRLEN_P(s2))
 }
-func ZendBinaryZvalStrncmp(s1 *Zval, s2 *Zval, s3 *Zval) int {
-	return ZendBinaryStrncmp(Z_STRVAL_P(s1), Z_STRLEN_P(s1), Z_STRVAL_P(s2), Z_STRLEN_P(s2), s3.GetLval())
-}
-func ZendBinaryZvalStrcasecmp(s1 *Zval, s2 *Zval) int {
-	return ZendBinaryStrcasecmpL(Z_STRVAL_P(s1), Z_STRLEN_P(s1), Z_STRVAL_P(s2), Z_STRLEN_P(s2))
-}
-func ZendBinaryZvalStrncasecmp(s1 *Zval, s2 *Zval, s3 *Zval) int {
-	return ZendBinaryStrncasecmpL(Z_STRVAL_P(s1), Z_STRLEN_P(s1), Z_STRVAL_P(s2), Z_STRLEN_P(s2), s3.GetLval())
-}
 func ZendiSmartStreq(s1 *ZendString, s2 *ZendString) int {
 	var ret1 int
 	var ret2 int
@@ -3292,11 +3158,6 @@ func ZendCompareObjects(o1 *Zval, o2 *Zval) int {
 	} else {
 		return Z_OBJ_HT_P(o1).GetCompareObjects()(o1, o2)
 	}
-}
-func ZendLocaleSprintfDouble(op *Zval) {
-	var str *ZendString
-	str = ZendStrpprintf(0, "%.*G", int(EG__().GetPrecision()), float64(op.GetDval()))
-	op.SetString(str)
 }
 func ZendLongToStr(num ZendLong) *ZendString {
 	if ZendUlong(num <= 9) != 0 {
@@ -3471,32 +3332,6 @@ func ZendMemnstrExPre(td []uint, needle *byte, needle_len int, reverse int) {
 			td[uint8(needle[i])] = int(needle_len - i)
 		}
 	}
-}
-func ZendMemnstrEx(haystack *byte, needle string, needle_len int, end *byte) *byte {
-	var td []uint
-	var i int
-	var p *byte
-	if needle_len == 0 || end-haystack < needle_len {
-		return nil
-	}
-	ZendMemnstrExPre(td, needle, needle_len, 0)
-	p = haystack
-	end -= needle_len
-	for p <= end {
-		for i = 0; i < needle_len; i++ {
-			if needle[i] != p[i] {
-				break
-			}
-		}
-		if i == needle_len {
-			return p
-		}
-		if p == end {
-			return nil
-		}
-		p += td[uint8(p[needle_len])]
-	}
-	return nil
 }
 func ZendMemnrstrEx(haystack *byte, needle *byte, needle_len int, end *byte) *byte {
 	var td []uint

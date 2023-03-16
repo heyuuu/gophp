@@ -194,7 +194,7 @@ func PhpSprintfAppenddouble(
 		PhpSprintfAppendstring(buffer, pos, "NaN", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return
 	}
-	if core.ZendIsinf(number) {
+	if core.ZendIsInf(number) {
 		is_negative = number < 0
 		PhpSprintfAppendstring(buffer, pos, "INF", 3, 0, padding, alignment, 3, is_negative, 0, always_sign)
 		return

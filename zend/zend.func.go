@@ -783,6 +783,9 @@ func ZendErrorAt(type_ int, filename *byte, lineno uint32, format string, _ ...a
 	ZendErrorVaList(type_, filename, lineno, format, args)
 	va_end(args)
 }
+func ZendErrorEx(typ int, message string) {
+	// todo
+}
 func ZendError(type_ int, format string, args ...any) {
 	var filename *byte
 	var lineno uint32
@@ -851,10 +854,25 @@ func ZendTypeError(format string, args ...any) {
 	ZendThrowException(ZendCeTypeError, message, 0)
 	Efree(message)
 }
+
+func ZendInternalTypeErrorEx(throwException bool, message string) {
+	if throwException {
+		ZendThrowException(ZendCeTypeError, message, 0)
+	} else {
+		ZendError(E_WARNING, "%s", message)
+	}
+}
 func ZendInternalTypeError(throw_exception bool, format string, args ...any) {
 	message := ZendSprintf(format, args...)
 	if throw_exception {
 		ZendThrowException(ZendCeTypeError, message, 0)
+	} else {
+		ZendError(E_WARNING, "%s", message)
+	}
+}
+func ZendInternalArgumentCountErrorEx(throwException bool, message string) {
+	if throwException {
+		ZendThrowException(ZendCeArgumentCountError, message, 0)
 	} else {
 		ZendError(E_WARNING, "%s", message)
 	}

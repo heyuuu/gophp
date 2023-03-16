@@ -1,6 +1,7 @@
 package zend
 
 import (
+	"fmt"
 	b "sik/builtin"
 	"sik/core"
 )
@@ -14,76 +15,56 @@ func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
 	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
 }
 
-func WrongArgTypeError(num int, expected_type ZendExpectedType, arg *Zval, forceStrict bool) {
+func WrongParamTypeError(num int, expectedType ZendExpectedType, arg *Zval, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
 	}
-
+	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, expectedType, ZendZvalTypeName(arg))
+	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	ZendInternalTypeErrorEx(throwException, message)
 }
 
 func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Zval) {
-	var space *byte
-	var class_name *byte
-	var expected_error = []string{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
-	if EG__().GetException() != nil {
-		return
-	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
+	WrongParamTypeError(num, expected_type, arg, false)
 }
 func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, arg *Zval) {
-	var space *byte
-	var class_name *byte
-	var expected_error = []string{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
+	WrongParamTypeError(num, expected_type, arg, true)
+}
+
+func WrongParamClassError(num int, name string, arg *Zval, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
+	message := fmt.Sprintf("%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), num, name, ZendZvalTypeName(arg))
+	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	ZendInternalTypeErrorEx(throwException, message)
 }
-func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
-	var space *byte
-	var class_name *byte
+
+func ZendWrongParameterClassError(num int, name string, arg *Zval) {
+	WrongParamClassError(num, name, arg, false)
+}
+func ZendWrongParameterClassException(num int, name string, arg *Zval) {
+	WrongParamClassError(num, name, arg, true)
+}
+
+func WrongCallbackError(num int, error string, forceStrict bool) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
+	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
+	throwException := forceStrict || ZEND_ARG_USES_STRICT_TYPES()
+	ZendInternalTypeErrorEx(throwException, message)
 }
-func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
-	var space *byte
-	var class_name *byte
-	if EG__().GetException() != nil {
-		return
-	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
+
+func ZendWrongCallbackError(num int, error string) {
+	WrongCallbackError(num, error, false)
 }
-func ZendWrongCallbackError(num int, error *byte) {
-	var space *byte
-	var class_name *byte
-	if EG__().GetException() != nil {
-		return
-	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	Efree(error)
+func ZendWrongCallbackException(num int, error string) {
+	WrongCallbackError(num, error, true)
 }
-func ZendWrongCallbackException(num int, error *byte) {
-	var space *byte
-	var class_name *byte
-	if EG__().GetException() != nil {
-		return
-	}
-	class_name, space = GetActiveClassNameEx()
-	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	Efree(error)
-}
-func ZendWrongCallbackDeprecated(num int, error *byte) {
-	var space *byte
-	class_name, space := GetActiveClassNameEx()
-	ZendError(E_DEPRECATED, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
-	Efree(error)
+func ZendWrongCallbackDeprecated(num int, error string) {
+	message := fmt.Sprintf("%s() expects parameter %d to be a valid callback, %s", GetActiveCalleeName(), num, error)
+	ZendErrorEx(E_DEPRECATED, message)
 }
 func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int) int {
 	var ce_base *ZendClassEntry = *pce
@@ -98,17 +79,13 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	*pce = ZendLookupClass(arg.GetStr())
 	if ce_base != nil {
 		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
-			var space *byte
-			class_name, space := GetActiveClassNameEx()
-			ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a class name derived from %s, '%s' given", class_name, space, GetActiveFunctionName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
+			ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s() expects parameter %d to be a class name derived from %s, '%s' given", GetActiveCalleeName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
 			*pce = nil
 			return 0
 		}
 	}
 	if (*pce) == nil {
-		var space *byte
-		class_name, space := GetActiveClassNameEx()
-		ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid class name, '%s' given", class_name, space, GetActiveFunctionName(), num, Z_STRVAL_P(arg))
+		ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s() expects parameter %d to be a valid class name, '%s' given", GetActiveCalleeName(), num, Z_STRVAL_P(arg))
 		return 0
 	}
 	return 1
@@ -139,8 +116,8 @@ func ZendParseArgLongWeak(arg *Zval, dest *ZendLong) int {
 		}
 	} else if arg.IsString() {
 		var d float64
-		var type_ int
-		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), dest, &d)) != IS_LONG {
+		type_ := IsNumericStrFunction(arg.GetStr(), dest, &d)
+		if type_ != IS_LONG {
 			if type_ != 0 {
 				if core.ZendIsnan(d) {
 					return 0
@@ -180,8 +157,8 @@ func ZendParseArgLongCapWeak(arg *Zval, dest *ZendLong) int {
 		*dest = ZendDvalToLvalCap(arg.GetDval())
 	} else if arg.IsString() {
 		var d float64
-		var type_ int
-		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), dest, &d)) != IS_LONG {
+		var type_ = IsNumericStrFunction(arg.GetStr(), dest, &d)
+		if type_ != IS_LONG {
 			if type_ != 0 {
 				if core.ZendIsnan(d) {
 					return 0
@@ -214,8 +191,8 @@ func ZendParseArgDoubleWeak(arg *Zval, dest *float64) int {
 		*dest = float64(arg.GetLval())
 	} else if arg.IsString() {
 		var l ZendLong
-		var type_ int
-		if b.Assign(&type_, IsNumericStrFunction(arg.GetStr(), &l, dest)) != IS_DOUBLE {
+		var type_ = IsNumericStrFunction(arg.GetStr(), &l, dest)
+		if type_ != IS_DOUBLE {
 			if type_ != 0 {
 				*dest = float64(l)
 			} else {

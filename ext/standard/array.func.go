@@ -4246,7 +4246,7 @@ func ZifRange(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 	double_str:
 		low = zend.ZvalGetDouble(zlow)
 		high = zend.ZvalGetDouble(zhigh)
-		if core.ZendIsinf(high) || core.ZendIsinf(low) {
+		if core.ZendIsInf(high) || core.ZendIsInf(low) {
 			core.PhpErrorDocref(nil, zend.E_WARNING, "Invalid range supplied: start=%0.0f end=%0.0f", low, high)
 			return_value.SetFalse()
 			return

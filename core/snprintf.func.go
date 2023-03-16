@@ -768,7 +768,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 				if ZendIsnan(fp_num) {
 					s = "NAN"
 					s_len = 3
-				} else if ZendIsinf(fp_num) {
+				} else if ZendIsInf(fp_num) {
 					s = "INF"
 					s_len = 3
 				} else {
@@ -803,7 +803,7 @@ func FormatConverter(odp *Buffy, fmt *byte, ap ...any) int {
 					s = "NAN"
 					s_len = 3
 					break
-				} else if ZendIsinf(fp_num) {
+				} else if ZendIsInf(fp_num) {
 					if fp_num > 0 {
 						s = "INF"
 						s_len = 3

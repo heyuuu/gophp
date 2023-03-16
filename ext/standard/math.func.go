@@ -1624,7 +1624,7 @@ func ZifIsInfinite(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
 		}
 		break
 	}
-	zend.ZVAL_BOOL(return_value, core.ZendIsinf(dval))
+	zend.ZVAL_BOOL(return_value, core.ZendIsInf(dval))
 	return
 }
 func ZifIsNan(executeData *zend.ZendExecuteData, return_value *zend.Zval) {
