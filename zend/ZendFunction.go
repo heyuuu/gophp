@@ -73,7 +73,7 @@ func (this *ZendFunction) GetPrototype() *ZendFunction               { return th
 func (this *ZendFunction) SetPrototype(value *ZendFunction)          { this.common.prototype = value }
 func (this *ZendFunction) GetArgInfo() *ZendArgInfo                  { return this.common.arg_info }
 func (this *ZendFunction) SetArgInfo(value *ZendArgInfo)             { this.common.arg_info = value }
-func (this *ZendFunction) GetOpArray() ZendOpArray                   { return this.op_array }
+func (this *ZendFunction) GetOpArray() *ZendOpArray                  { return &this.op_array }
 func (this *ZendFunction) GetInternalFunction() ZendInternalFunction { return this.internal_function }
 
 /* ZendFunction.common.fn_flags */

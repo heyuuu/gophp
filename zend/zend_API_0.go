@@ -159,43 +159,6 @@ func ZEND_TRY_ASSIGN_REF_NULL(zv *Zval) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_NULL(zv, 1)
 }
-func _ZEND_TRY_ASSIGN_FALSE(zv *Zval, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefBool(ref, 0)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		_zv.SetFalse()
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_FALSE(zv *Zval) { _ZEND_TRY_ASSIGN_FALSE(zv, 0) }
-func ZEND_TRY_ASSIGN_REF_FALSE(zv *Zval) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_FALSE(zv, 1)
-}
-func _ZEND_TRY_ASSIGN_TRUE(zv *Zval, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefBool(ref, 1)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		_zv.SetTrue()
-		break
-	}
-}
 func _ZEND_TRY_ASSIGN_LONG(zv *Zval, lval ZendLong, is_ref int) {
 	for {
 		var _zv *Zval = zv
@@ -232,7 +195,6 @@ func _ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_DOUBLE(zv *Zval, dval float64) { _ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 0) }
 func ZEND_TRY_ASSIGN_REF_DOUBLE(zv *Zval, dval float64) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_DOUBLE(zv, dval, 1)
@@ -253,7 +215,6 @@ func _ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_EMPTY_STRING(zv *Zval) { _ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 0) }
 func ZEND_TRY_ASSIGN_REF_EMPTY_STRING(zv *Zval) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_EMPTY_STRING(zv, 1)
@@ -274,31 +235,9 @@ func _ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_STR(zv, str, 0) }
 func ZEND_TRY_ASSIGN_REF_STR(zv *Zval, str *ZendString) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STR(zv, str, 1)
-}
-func _ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString, is_str int) {
-	for {
-		var _zv *Zval = zv
-		if is_str != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefStr(ref, str)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		_zv.SetString(str)
-		break
-	}
-}
-func ZEND_TRY_ASSIGN_NEW_STR(zv *Zval, str *ZendString) { _ZEND_TRY_ASSIGN_NEW_STR(zv, str, 0) }
-func ZEND_TRY_ASSIGN_REF_NEW_STR(zv *Zval, str *ZendString) {
-	ZEND_ASSERT(zv.IsReference())
-	_ZEND_TRY_ASSIGN_NEW_STR(zv, str, 1)
 }
 func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
 	for {
@@ -316,7 +255,6 @@ func _ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_STRING(zv *Zval, string *byte) { _ZEND_TRY_ASSIGN_STRING(zv, string, 0) }
 func ZEND_TRY_ASSIGN_REF_STRING(zv *Zval, string *byte) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRING(zv, string, 1)
@@ -337,26 +275,7 @@ func _ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int, is_ref int) {
 		break
 	}
 }
-func ZEND_TRY_ASSIGN_STRINGL(zv *Zval, string *byte, len_ int) {
-	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 0)
-}
 func ZEND_TRY_ASSIGN_REF_STRINGL(zv *Zval, string *byte, len_ int) {
 	ZEND_ASSERT(zv.IsReference())
 	_ZEND_TRY_ASSIGN_STRINGL(zv, string, len_, 1)
-}
-func _ZEND_TRY_ASSIGN_ARR(zv *Zval, arr *ZendArray, is_ref int) {
-	for {
-		var _zv *Zval = zv
-		if is_ref != 0 || _zv.IsReference() {
-			var ref *ZendReference = _zv.GetRef()
-			if ZEND_REF_HAS_TYPE_SOURCES(ref) {
-				ZendTryAssignTypedRefArr(ref, arr)
-				break
-			}
-			_zv = ref.GetVal()
-		}
-		ZvalPtrDtor(_zv)
-		_zv.SetArray(arr)
-		break
-	}
 }

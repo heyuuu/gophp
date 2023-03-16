@@ -71,7 +71,7 @@ func ZendFetchResource2(res *ZendResource, resource_type_name string, resource_t
 	}
 	if resource_type_name {
 		var space *byte
-		var class_name *byte = GetActiveClassName(&space)
+		class_name, space := GetActiveClassNameEx()
 		ZendError(E_WARNING, "%s%s%s(): supplied resource is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
 	}
 	return nil
@@ -82,7 +82,7 @@ func ZendFetchResource(res *ZendResource, resource_type_name *byte, resource_typ
 	}
 	if resource_type_name != nil {
 		var space *byte
-		var class_name *byte = GetActiveClassName(&space)
+		class_name, space := GetActiveClassNameEx()
 		ZendError(E_WARNING, "%s%s%s(): supplied resource is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
 	}
 	return nil
@@ -92,14 +92,14 @@ func ZendFetchResourceEx(res *Zval, resource_type_name string, resource_type int
 	var class_name *byte
 	if res == nil {
 		if resource_type_name {
-			class_name = GetActiveClassName(&space)
+			class_name, space = GetActiveClassNameEx()
 			ZendError(E_WARNING, "%s%s%s(): no %s resource supplied", class_name, space, GetActiveFunctionName(), resource_type_name)
 		}
 		return nil
 	}
 	if res.GetType() != IS_RESOURCE {
 		if resource_type_name {
-			class_name = GetActiveClassName(&space)
+			class_name, space = GetActiveClassNameEx()
 			ZendError(E_WARNING, "%s%s%s(): supplied argument is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
 		}
 		return nil
@@ -111,14 +111,14 @@ func ZendFetchResource2Ex(res *Zval, resource_type_name string, resource_type1 i
 	var class_name *byte
 	if res == nil {
 		if resource_type_name {
-			class_name = GetActiveClassName(&space)
+			class_name, space = GetActiveClassNameEx()
 			ZendError(E_WARNING, "%s%s%s(): no %s resource supplied", class_name, space, GetActiveFunctionName(), resource_type_name)
 		}
 		return nil
 	}
 	if res.GetType() != IS_RESOURCE {
 		if resource_type_name {
-			class_name = GetActiveClassName(&space)
+			class_name, space = GetActiveClassNameEx()
 			ZendError(E_WARNING, "%s%s%s(): supplied argument is not a valid %s resource", class_name, space, GetActiveFunctionName(), resource_type_name)
 		}
 		return nil

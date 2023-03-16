@@ -370,58 +370,42 @@ func ShutdownExecutor() {
 	EG__().SetHtIteratorsUsed(0)
 	ZendShutdownFpu()
 }
-func GetActiveClassName(space **byte) *byte {
-	var func_ *ZendFunction
-	if ZendIsExecuting() == 0 {
-		if space != nil {
-			*space = ""
-		}
-		return ""
+
+func GetActiveClassNameEx() (className string, space string) {
+	if !ZendIsExecuting() {
+		return
 	}
-	func_ = CurrEX().GetFunc()
-	switch func_.GetType() {
-	case ZEND_USER_FUNCTION:
-		fallthrough
-	case ZEND_INTERNAL_FUNCTION:
-		var ce *ZendClassEntry = func_.GetScope()
-		if space != nil {
-			if ce != nil {
-				*space = "::"
-			} else {
-				*space = ""
-			}
-		}
+
+	activeFunc := CurrEX().GetFunc()
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		ce := activeFunc.GetScope()
 		if ce != nil {
-			return ce.GetName().GetVal()
+			return "::", ce.Name()
 		} else {
-			return ""
+			return
 		}
-		fallthrough
 	default:
-		if space != nil {
-			*space = ""
-		}
-		return ""
+		return
 	}
 }
-func GetActiveFunctionName() *byte {
-	var func_ *ZendFunction
-	if ZendIsExecuting() == 0 {
-		return nil
+
+func GetActiveFunctionName() string {
+	if !ZendIsExecuting() {
+		return ""
 	}
-	func_ = CurrEX().GetFunc()
-	switch func_.GetType() {
-	case ZEND_USER_FUNCTION:
-		var function_name *ZendString = func_.GetFunctionName()
+
+	activeFunc := CurrEX().GetFunc()
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		var function_name = activeFunc.GetFunctionName()
 		if function_name != nil {
-			return function_name.GetVal()
+			return function_name.GetStr()
 		} else {
 			return "main"
 		}
-	case ZEND_INTERNAL_FUNCTION:
-		return func_.GetFunctionName().GetVal()
 	default:
-		return nil
+		return ""
 	}
 }
 func ZendGetExecutedFilename() string {
@@ -471,8 +455,8 @@ func ZendGetExecutedScope() *ZendClassEntry {
 		ex = ex.GetPrevExecuteData()
 	}
 }
-func ZendIsExecuting() ZendBool {
-	return CurrEX() != 0
+func ZendIsExecuting() bool {
+	return CurrEX() != nil
 }
 func ZendUseUndefinedConstant(name *ZendString, attr ZendAstAttr, result *Zval) int {
 	var colon *byte

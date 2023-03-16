@@ -851,9 +851,9 @@ func ZendTypeError(format string, args ...any) {
 	ZendThrowException(ZendCeTypeError, message, 0)
 	Efree(message)
 }
-func ZendInternalTypeError(throw_exception ZendBool, format string, args ...any) {
+func ZendInternalTypeError(throw_exception bool, format string, args ...any) {
 	message := ZendSprintf(format, args...)
-	if throw_exception != 0 {
+	if throw_exception {
 		ZendThrowException(ZendCeTypeError, message, 0)
 	} else {
 		ZendError(E_WARNING, "%s", message)

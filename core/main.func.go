@@ -561,9 +561,9 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	var docref_root *byte = ""
 	var p *byte
 	var buffer_len int = 0
-	var space *byte = ""
-	var class_name *byte = ""
-	var function *byte
+	var space string
+	var class_name string
+	var function string
 	var origin_len int
 	var origin *byte
 	var message *byte
@@ -618,11 +618,11 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		}
 	} else {
 		function = zend.GetActiveFunctionName()
-		if function == nil || !(strlen(function)) {
+		if function == "" {
 			function = "Unknown"
 		} else {
 			is_function = 1
-			class_name = zend.GetActiveClassName(&space)
+			class_name, space = zend.GetActiveClassNameEx()
 		}
 	}
 

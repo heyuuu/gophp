@@ -1,5 +1,3 @@
-// <<generate>>
-
 package zend
 
 import (
@@ -16,6 +14,13 @@ func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
 	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
 }
 
+func WrongArgTypeError(num int, expected_type ZendExpectedType, arg *Zval, forceStrict bool) {
+	if EG__().GetException() != nil {
+		return
+	}
+
+}
+
 func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Zval) {
 	var space *byte
 	var class_name *byte
@@ -23,17 +28,17 @@ func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Z
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
 }
 func ZendWrongParameterTypeException(num int, expected_type ZendExpectedType, arg *Zval) {
 	var space *byte
 	var class_name *byte
-	var expected_error []*byte = []*byte{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
+	var expected_error = []string{"int", "bool", "string", "array", "valid callback", "resource", "a valid path", "object", "float", nil}
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, expected_error[expected_type], ZendZvalTypeName(arg))
 }
 func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
@@ -42,7 +47,7 @@ func ZendWrongParameterClassError(num int, name *byte, arg *Zval) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
 }
 func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
@@ -51,7 +56,7 @@ func ZendWrongParameterClassException(num int, name *byte, arg *Zval) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), num, name, ZendZvalTypeName(arg))
 }
 func ZendWrongCallbackError(num int, error *byte) {
@@ -60,7 +65,7 @@ func ZendWrongCallbackError(num int, error *byte) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
 	Efree(error)
 }
@@ -70,13 +75,13 @@ func ZendWrongCallbackException(num int, error *byte) {
 	if EG__().GetException() != nil {
 		return
 	}
-	class_name = GetActiveClassName(&space)
+	class_name, space = GetActiveClassNameEx()
 	ZendInternalTypeError(1, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
 	Efree(error)
 }
 func ZendWrongCallbackDeprecated(num int, error *byte) {
 	var space *byte
-	var class_name *byte = GetActiveClassName(&space)
+	class_name, space := GetActiveClassNameEx()
 	ZendError(E_DEPRECATED, "%s%s%s() expects parameter %d to be a valid callback, %s", class_name, space, GetActiveFunctionName(), num, error)
 	Efree(error)
 }
@@ -94,7 +99,7 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	if ce_base != nil {
 		if (*pce) == nil || InstanceofFunction(*pce, ce_base) == 0 {
 			var space *byte
-			var class_name *byte = GetActiveClassName(&space)
+			class_name, space := GetActiveClassNameEx()
 			ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a class name derived from %s, '%s' given", class_name, space, GetActiveFunctionName(), num, ce_base.GetName().GetVal(), Z_STRVAL_P(arg))
 			*pce = nil
 			return 0
@@ -102,7 +107,7 @@ func ZendParseArgClass(arg *Zval, pce **ZendClassEntry, num int, check_null int)
 	}
 	if (*pce) == nil {
 		var space *byte
-		var class_name *byte = GetActiveClassName(&space)
+		class_name, space := GetActiveClassNameEx()
 		ZendInternalTypeError(ZEND_ARG_USES_STRICT_TYPES(), "%s%s%s() expects parameter %d to be a valid class name, '%s' given", class_name, space, GetActiveFunctionName(), num, Z_STRVAL_P(arg))
 		return 0
 	}
