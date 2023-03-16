@@ -198,7 +198,7 @@ var ArginfoExtensionLoaded []ArgInfo = []ArgInfo{
 	MakeArgInfo("extension_name"),
 }
 var BuiltinFunctions []ZendFunctionEntry = []ZendFunctionEntry{
-	MakeZendFunctionEntryEx("zend_version", 0, ZifZendVersion, ArginfoZendVoid),
+	ZifZendVersionDef,
 	MakeZendFunctionEntryEx("func_num_args", 0, ZifFuncNumArgs, ArginfoZendVoid),
 	MakeZendFunctionEntryEx("func_get_arg", 0, ZifFuncGetArg, ArginfoFuncGetArg),
 	MakeZendFunctionEntryEx("func_get_args", 0, ZifFuncGetArgs, ArginfoZendVoid),

@@ -2,17 +2,23 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 )
 
 func main() {
-	if len(os.Args) < 2 {
+	run(os.Args)
+}
+
+func run(args []string) {
+	if len(args) < 2 {
 		log.Fatalln("Args 不可为空")
 	}
 
-	opts := parseOpts()
+	opts := parseOpts(args)
+	fmt.Printf("%+v\n", opts)
 	switch opts.cmd {
 	case "gen-func":
 		runGenFunc(opts.dir)
@@ -30,18 +36,15 @@ type opts struct {
 	dir string
 }
 
-func parseOpts() opts {
+func parseOpts(args []string) opts {
 	var cmd string
 	var dir string
 
-	// arguments
-	if len(os.Args) >= 2 {
-		cmd = os.Args[1]
-	}
-
 	// options
-	flag.StringVar(&dir, "d", "", "mode")
-	flag.Parse()
+	flagSet := flag.NewFlagSet(args[0], flag.ExitOnError)
+	flagSet.StringVar(&cmd, "cmd", "", "command")
+	flagSet.StringVar(&dir, "d", "", "dir")
+	_ = flagSet.Parse(args[1:])
 
 	// workdir
 	wd, err := os.Getwd()
