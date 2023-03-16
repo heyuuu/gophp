@@ -3686,7 +3686,7 @@ func PhpCompactVar(eg_active_symbol_table *zend.HashTable, return_value *zend.Zv
 			value_ptr.TryAddRefcount()
 			return_value.GetArr().KeyUpdate(entry.GetStr().GetStr(), value_ptr)
 		} else if zend.ZendStringEqualsLiteral(entry.GetStr(), "this") {
-			var object *zend.ZendObject = zend.ZendGetThisObject(zend.EG__().GetCurrentExecuteData())
+			var object *zend.ZendObject = zend.ZendGetThisObject(zend.CurrEX())
 			if object != nil {
 				object.AddRefcount()
 				data.SetObject(object)

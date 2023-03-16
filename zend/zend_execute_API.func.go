@@ -378,7 +378,7 @@ func GetActiveClassName(space **byte) *byte {
 		}
 		return ""
 	}
-	func_ = EG__().GetCurrentExecuteData().GetFunc()
+	func_ = CurrEX().GetFunc()
 	switch func_.GetType() {
 	case ZEND_USER_FUNCTION:
 		fallthrough
@@ -409,7 +409,7 @@ func GetActiveFunctionName() *byte {
 	if ZendIsExecuting() == 0 {
 		return nil
 	}
-	func_ = EG__().GetCurrentExecuteData().GetFunc()
+	func_ = CurrEX().GetFunc()
 	switch func_.GetType() {
 	case ZEND_USER_FUNCTION:
 		var function_name *ZendString = func_.GetFunctionName()
@@ -425,7 +425,7 @@ func GetActiveFunctionName() *byte {
 	}
 }
 func ZendGetExecutedFilename() string {
-	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
@@ -436,7 +436,7 @@ func ZendGetExecutedFilename() string {
 	}
 }
 func ZendGetExecutedFilenameEx() *ZendString {
-	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
@@ -447,7 +447,7 @@ func ZendGetExecutedFilenameEx() *ZendString {
 	}
 }
 func ZendGetExecutedLineno() uint32 {
-	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
@@ -461,7 +461,7 @@ func ZendGetExecutedLineno() uint32 {
 	}
 }
 func ZendGetExecutedScope() *ZendClassEntry {
-	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var ex *ZendExecuteData = CurrEX()
 	for true {
 		if ex == nil {
 			return nil
@@ -472,7 +472,7 @@ func ZendGetExecutedScope() *ZendClassEntry {
 	}
 }
 func ZendIsExecuting() ZendBool {
-	return EG__().GetCurrentExecuteData() != 0
+	return CurrEX() != 0
 }
 func ZendUseUndefinedConstant(name *ZendString, attr ZendAstAttr, result *Zval) int {
 	var colon *byte
@@ -566,7 +566,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 	/* Initialize executeData */
 
-	if EG__().GetCurrentExecuteData() == nil {
+	if CurrEX() == nil {
 
 		/* This only happens when we're called outside any execute()'s
 		 * It shouldn't be strictly necessary to NULL executeData out,
@@ -575,12 +575,12 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 
 		memset(&dummy_execute_data, 0, b.SizeOf("zend_execute_data"))
 		EG__().SetCurrentExecuteData(&dummy_execute_data)
-	} else if EG__().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetCommonType()) && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() != ZEND_DO_ICALL && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() != ZEND_DO_UCALL && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME {
+	} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_ICALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_UCALL && CurrEX().GetOpline().GetOpcode() != ZEND_DO_FCALL_BY_NAME {
 
 		/* Insert fake frame in case of include or magic calls */
 
 		dummy_execute_data = (*EG__)().current_execute_data
-		dummy_execute_data.SetPrevExecuteData(EG__().GetCurrentExecuteData())
+		dummy_execute_data.SetPrevExecuteData(CurrEX())
 		dummy_execute_data.SetCall(nil)
 		dummy_execute_data.SetOpline(nil)
 		dummy_execute_data.SetFunc(nil)
@@ -598,7 +598,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 				Efree(error)
 				ZendStringReleaseEx(callable_name, 0)
 			}
-			if EG__().GetCurrentExecuteData() == &dummy_execute_data {
+			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 			}
 			return FAILURE
@@ -612,7 +612,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 			ZendError(E_DEPRECATED, "%s", error)
 			Efree(error)
 			if EG__().GetException() != nil {
-				if EG__().GetCurrentExecuteData() == &dummy_execute_data {
+				if CurrEX() == &dummy_execute_data {
 					EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 				}
 				return FAILURE
@@ -634,9 +634,9 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		ZendError(E_DEPRECATED, "Function %s%s%s() is deprecated", b.CondF1(func_.GetScope() != nil, func() []byte { return func_.GetScope().GetName().GetVal() }, ""), b.Cond(func_.GetScope() != nil, "::", ""), func_.GetFunctionName().GetVal())
 		if EG__().GetException() != nil {
 			ZendVmStackFreeCallFrame(call)
-			if EG__().GetCurrentExecuteData() == &dummy_execute_data {
+			if CurrEX() == &dummy_execute_data {
 				EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
-				ZendRethrowException(EG__().GetCurrentExecuteData())
+				ZendRethrowException(CurrEX())
 			}
 			return FAILURE
 		}
@@ -666,7 +666,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 						ZEND_CALL_NUM_ARGS(call) = i
 						ZendVmStackFreeArgs(call)
 						ZendVmStackFreeCallFrame(call)
-						if EG__().GetCurrentExecuteData() == &dummy_execute_data {
+						if CurrEX() == &dummy_execute_data {
 							EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 						}
 						return FAILURE
@@ -719,7 +719,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 	} else if func_.GetType() == ZEND_INTERNAL_FUNCTION {
 		var call_via_handler int = func_.IsCallViaTrampoline()
 		fci.GetRetval().SetNull()
-		call.SetPrevExecuteData(EG__().GetCurrentExecuteData())
+		call.SetPrevExecuteData(CurrEX())
 		EG__().SetCurrentExecuteData(call)
 		if ZendExecuteInternal == nil {
 
@@ -753,7 +753,7 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		/* Not sure what should be done here if it's a static method */
 
 		if fci.GetObject() != nil {
-			call.SetPrevExecuteData(EG__().GetCurrentExecuteData())
+			call.SetPrevExecuteData(CurrEX())
 			EG__().SetCurrentExecuteData(call)
 			fci.GetObject().GetHandlers().GetCallMethod()(func_.GetFunctionName(), fci.GetObject(), call, fci.GetRetval())
 			EG__().SetCurrentExecuteData(call.GetPrevExecuteData())
@@ -771,14 +771,14 @@ func ZendCallFunction(fci *ZendFcallInfo, fci_cache *ZendFcallInfoCache) int {
 		}
 	}
 	ZendVmStackFreeCallFrame(call)
-	if EG__().GetCurrentExecuteData() == &dummy_execute_data {
+	if CurrEX() == &dummy_execute_data {
 		EG__().SetCurrentExecuteData(dummy_execute_data.GetPrevExecuteData())
 	}
 	if EG__().GetException() != nil {
-		if EG__().GetCurrentExecuteData() == nil {
+		if CurrEX() == nil {
 			ZendThrowExceptionInternal(nil)
-		} else if EG__().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetCommonType()) {
-			ZendRethrowException(EG__().GetCurrentExecuteData())
+		} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
+			ZendRethrowException(CurrEX())
 		}
 	}
 	return SUCCESS
@@ -1107,7 +1107,7 @@ check_fetch_type:
 		}
 		return scope.GetParent()
 	case ZEND_FETCH_CLASS_STATIC:
-		ce = ZendGetCalledScope(EG__().GetCurrentExecuteData())
+		ce = ZendGetCalledScope(CurrEX())
 		if ce == nil {
 			ZendThrowOrError(fetch_type, nil, "Cannot access static:: when no class scope is active")
 			return nil
@@ -1175,7 +1175,7 @@ func ZendRebuildSymbolTable() *ZendArray {
 
 	/* Search for last called user function */
 
-	ex = EG__().GetCurrentExecuteData()
+	ex = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetCommonType()))) {
 		ex = ex.GetPrevExecuteData()
 	}
@@ -1280,7 +1280,7 @@ func ZendDetachSymbolTable(executeData *ZendExecuteData) {
 	/* copy real values from CV slots into symbol table */
 }
 func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
-	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var executeData *ZendExecuteData = CurrEX()
 	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
 		executeData = executeData.GetPrevExecuteData()
 	}
@@ -1318,7 +1318,7 @@ func ZendSetLocalVar(name *ZendString, value *Zval, force int) int {
 	return FAILURE
 }
 func ZendSetLocalVarStr(name string, len_ int, value *Zval, force int) int {
-	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var executeData *ZendExecuteData = CurrEX()
 	for executeData != nil && (executeData.GetFunc() == nil || !(ZEND_USER_CODE(executeData.GetFunc().GetCommonType()))) {
 		executeData = executeData.GetPrevExecuteData()
 	}

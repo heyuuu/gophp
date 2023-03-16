@@ -1221,7 +1221,7 @@ func ZendDoInheritanceEx(ce *ZendClassEntry, parent_ce *ZendClassEntry, checked 
 		ce.SetDefaultStaticMembersCount(ce.GetDefaultStaticMembersCount() + parent_ce.GetDefaultStaticMembersCount())
 		if ce.GetStaticMembersTablePtr() == nil {
 			ZEND_ASSERT(ce.GetType() == ZEND_INTERNAL_CLASS)
-			if EG__().GetCurrentExecuteData() == nil {
+			if CurrEX() == nil {
 				ZEND_MAP_PTR_NEW(ce.static_members_table)
 			} else {
 

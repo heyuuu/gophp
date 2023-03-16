@@ -147,7 +147,7 @@ func ZendRegisterStringConstant(name *byte, name_len int, strval *byte, flags in
 func ZendGetSpecialConstant(name *byte, name_len int) *ZendConstant {
 	var c *ZendConstant
 	var haltoff = "__COMPILER_HALT_OFFSET__"
-	if EG__().GetCurrentExecuteData() == nil {
+	if CurrEX() == nil {
 		return nil
 	} else if name_len == b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1 && !(memcmp(name, "__COMPILER_HALT_OFFSET__", b.SizeOf("\"__COMPILER_HALT_OFFSET__\"")-1)) {
 		cfilename := ZendGetExecutedFilename()
@@ -274,7 +274,7 @@ func ZendGetConstantEx(cname *ZendString, scope *ZendClassEntry, flags uint32) *
 				ce = scope.GetParent()
 			}
 		} else if ZendStringEqualsLiteralCi(class_name, "static") {
-			ce = ZendGetCalledScope(EG__().GetCurrentExecuteData())
+			ce = ZendGetCalledScope(CurrEX())
 			if ce == nil {
 				ZendThrowError(nil, "Cannot access static:: when no class scope is active")
 				goto failure

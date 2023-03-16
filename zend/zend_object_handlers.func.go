@@ -697,8 +697,8 @@ exit:
 	return retval
 }
 func PropertyUsesStrictTypes() ZendBool {
-	var executeData *ZendExecuteData = EG__().GetCurrentExecuteData()
-	return executeData != nil && executeData.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData())
+	var executeData *ZendExecuteData = CurrEX()
+	return executeData != nil && executeData.GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(CurrEX())
 }
 func ZendStdWriteProperty(object *Zval, member *Zval, value *Zval, cache_slot *any) *Zval {
 	var zobj *ZendObject
@@ -1248,7 +1248,7 @@ func ZendStdGetStaticMethod(ce *ZendClassEntry, function_name *ZendString, key *
 		if key == nil {
 			ZendStringReleaseEx(lc_function_name, 0)
 		}
-		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(EG__().GetCurrentExecuteData())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
+		if ce.GetCall() != nil && b.Assign(&object, ZendGetThisObject(CurrEX())) != nil && InstanceofFunction(object.GetCe(), ce) != 0 {
 
 			/* Call the top-level defined __call().
 			 * see: tests/classes/__call_004.phpt  */

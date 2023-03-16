@@ -213,7 +213,7 @@ func ZendClosureCallMagic(executeData *ZendExecuteData, return_value *Zval) {
 	}
 	fci.SetObject(ZEND_THIS(executeData).GetObj())
 	fcc.SetObject(fci.GetObject())
-	fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
+	fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
 	ZendCallFunction(&fci, &fcc)
 	ZvalPtrDtor(fci.GetParams()[1])
 }

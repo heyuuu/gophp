@@ -24,7 +24,7 @@ func OnChangeCallback(
 	mh_arg3 any,
 	stage int,
 ) int {
-	if zend.EG__().GetCurrentExecuteData() != nil {
+	if zend.CurrEX() != nil {
 		if ASSERTG(callback).u1.v.type_ != zend.IS_UNDEF {
 			zend.ZvalPtrDtor(&(ASSERTG(callback)))
 			ASSERTG(callback).SetUndef()

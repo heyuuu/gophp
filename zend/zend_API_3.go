@@ -33,7 +33,7 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 	return SUCCESS
 }
 func ZendParseParametersDebugError(msg string) {
-	var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
+	var active_function *ZendFunction = CurrEX().GetFunc()
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendErrorNoreturn(E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
 }
@@ -137,14 +137,14 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 	}
 	if num_args < min_num_args || num_args > max_num_args && max_num_args >= 0 {
 		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
-			var active_function *ZendFunction = EG__().GetCurrentExecuteData().GetFunc()
+			var active_function *ZendFunction = CurrEX().GetFunc()
 			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 			var throw_exception = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			ZendInternalArgumentCountError(throw_exception, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
 		}
 		return FAILURE
 	}
-	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
 	if num_args > arg_count {
 		ZendParseParametersDebugError("could not obtain parameters for parsing")
 		return FAILURE
@@ -164,7 +164,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 			type_spec++
 			if num_varargs > 0 {
 				*n_varargs = num_varargs
-				*varargs = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), i+1)
+				*varargs = ZEND_CALL_ARG(CurrEX(), i+1)
 
 				/* adjust how many args we have left and restart loop */
 
@@ -176,7 +176,7 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 				*n_varargs = 0
 			}
 		}
-		arg = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), i+1)
+		arg = ZEND_CALL_ARG(CurrEX(), i+1)
 		if ZendParseArg(i+1, arg, va, &type_spec, flags) == FAILURE {
 
 			/* clean up varargs array if it was used */
@@ -229,7 +229,7 @@ func ZendParseMethodParameters(num_args int, this_ptr *Zval, type_spec string, _
 	 * In that case EG(This) would still be the $this from the calling code and we'd take the
 	 * wrong branch here. */
 
-	var is_method ZendBool = EG__().GetCurrentExecuteData().GetFunc().GetScope() != nil
+	var is_method ZendBool = CurrEX().GetFunc().GetScope() != nil
 	if is_method == 0 || this_ptr == nil || this_ptr.GetType() != IS_OBJECT {
 		va_start(va, type_spec)
 		retval = ZendParseVaArgs(num_args, type_spec, &va, flags)

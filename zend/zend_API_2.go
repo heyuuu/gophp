@@ -7,40 +7,13 @@ import (
 	"sik/core"
 )
 
-func CheckNumArgs(minNumArgs int, maxNumArgs int, throwException bool) bool {
-	// 检查参数个数，若检查通过直接返回
-	numArgs := int(EG__().GetCurrentExecuteData().NumArgs())
-	if numArgs >= minNumArgs && numArgs <= maxNumArgs {
-		return true
-	}
-
-	// 构建错误信息
-	activeFunc := EG__().GetCurrentExecuteData().GetFunc()
-	var callee string
-	if activeFunc.GetScope() != nil {
-		className := activeFunc.GetScope().Name()
-		callee = className + "::" + activeFunc.GetFunctionName().GetStr()
-	} else {
-		callee = activeFunc.GetFunctionName().GetStr()
-	}
-
-	if minNumArgs == maxNumArgs {
-		ZendInternalArgumentCountError(throwException, "%s() expects exactly %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
-	} else if numArgs < minNumArgs {
-		ZendInternalArgumentCountError(throwException, "%s() expects at least %d parameter%s, %d given", callee, minNumArgs, b.Cond(minNumArgs == 1, "", "s"), numArgs)
-	} else { // numArgs > maxNumArgs
-		ZendInternalArgumentCountError(throwException, "%s() expects at most %d parameter%s, %d given", callee, maxNumArgs, b.Cond(maxNumArgs == 1, "", "s"), numArgs)
-	}
-	return false
-}
-
-func CheckNumArgsNoneError() bool     { return CheckNumArgs(0, 0, ZEND_ARG_USES_STRICT_TYPES()) }
-func CheckNumArgsNoneException() bool { return CheckNumArgs(0, 0, true) }
+func CheckNumArgsNoneError() bool     { return CurrEX().CheckNumArgsError(0, 0) }
+func CheckNumArgsNoneException() bool { return CurrEX().CheckNumArgsException(0, 0) }
 func CheckNumArgsError(minNumArgs int, maxNumArgs int) bool {
-	return CheckNumArgs(minNumArgs, maxNumArgs, ZEND_ARG_USES_STRICT_TYPES())
+	return CurrEX().CheckNumArgsError(minNumArgs, maxNumArgs)
 }
 func CheckNumArgsException(minNumArgs int, maxNumArgs int) bool {
-	return CheckNumArgs(minNumArgs, maxNumArgs, true)
+	return CurrEX().CheckNumArgsException(minNumArgs, maxNumArgs)
 }
 
 func ZendWrongParameterTypeError(num int, expected_type ZendExpectedType, arg *Zval) {

@@ -376,7 +376,7 @@ func ZendVerifyTypeErrorCommon(
 	}
 }
 func ZendVerifyArgError(zf *ZendFunction, arg_info *ZendArgInfo, arg_num int, ce *ZendClassEntry, value *Zval) {
-	var ptr *ZendExecuteData = EG__().GetCurrentExecuteData().GetPrevExecuteData()
+	var ptr *ZendExecuteData = CurrEX().GetPrevExecuteData()
 	var fname *byte
 	var fsep *byte
 	var fclass *byte

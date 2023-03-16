@@ -479,7 +479,7 @@ func ZendGeneratorCheckPlaceholderFrame(ptr *ZendExecuteData) *ZendExecuteData {
 	return ptr
 }
 func ZendGeneratorThrowException(generator *ZendGenerator, exception *Zval) {
-	var original_execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var original_execute_data *ZendExecuteData = CurrEX()
 
 	/* if we don't stop an array/iterator yield from, the exception will only reach the generator after the values were all iterated over */
 
@@ -496,7 +496,7 @@ func ZendGeneratorThrowException(generator *ZendGenerator, exception *Zval) {
 	if exception != nil {
 		ZendThrowExceptionObject(exception)
 	} else {
-		ZendRethrowException(EG__().GetCurrentExecuteData())
+		ZendRethrowException(CurrEX())
 	}
 	generator.GetExecuteData().GetOpline()++
 	EG__().SetCurrentExecuteData(original_execute_data)
@@ -631,7 +631,7 @@ func ZendGeneratorUpdateCurrent(generator *ZendGenerator, leaf *ZendGenerator) *
 
 						/* Throw the exception in the context of the generator */
 
-						var original_execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
+						var original_execute_data *ZendExecuteData = CurrEX()
 						EG__().SetCurrentExecuteData(root.GetExecuteData())
 						if root == generator {
 							root.GetExecuteData().SetPrevExecuteData(original_execute_data)
@@ -790,7 +790,7 @@ try_again:
 
 	/* Backup executor globals */
 
-	var original_execute_data *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var original_execute_data *ZendExecuteData = CurrEX()
 
 	/* Set executor globals */
 
@@ -848,10 +848,10 @@ try_again:
 	if EG__().GetException() != nil {
 		if generator == orig_generator {
 			ZendGeneratorClose(generator, 0)
-			if EG__().GetCurrentExecuteData() == nil {
+			if CurrEX() == nil {
 				ZendThrowExceptionInternal(nil)
-			} else if EG__().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetCommonType()) {
-				ZendRethrowException(EG__().GetCurrentExecuteData())
+			} else if CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType()) {
+				ZendRethrowException(CurrEX())
 			}
 		} else {
 			generator = ZendGeneratorGetCurrent(orig_generator)

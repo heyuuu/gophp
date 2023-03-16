@@ -2776,7 +2776,7 @@ func ZendFetchDebugBacktrace(return_value *Zval, skip_last int, options int, lim
 	var stack_frame Zval
 	var tmp Zval
 	ArrayInit(return_value)
-	if !(b.Assign(&ptr, EG__().GetCurrentExecuteData())) {
+	if !(b.Assign(&ptr, CurrEX())) {
 		return
 	}
 	if ptr.GetFunc() == nil || !(ZEND_USER_CODE(ptr.GetFunc().GetCommonType())) {

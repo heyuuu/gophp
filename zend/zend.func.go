@@ -585,7 +585,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 		case E_COMPILE_ERROR:
 
 		case E_USER_ERROR:
-			ex = EG__().GetCurrentExecuteData()
+			ex = CurrEX()
 			opline = nil
 			for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 				ex = ex.GetPrevExecuteData()
@@ -705,7 +705,7 @@ func ZendErrorVaList(type_ int, error_filename *byte, error_lineno uint32, forma
 
 		/* eval() errors do not affect exit_status */
 
-		if !(EG__().GetCurrentExecuteData() != nil && EG__().GetCurrentExecuteData().GetFunc() != nil && ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetType()) && EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_INCLUDE_OR_EVAL && EG__().GetCurrentExecuteData().GetOpline().GetExtendedValue() == ZEND_EVAL) {
+		if !(CurrEX() != nil && CurrEX().GetFunc() != nil && ZEND_USER_CODE(CurrEX().GetFunc().GetType()) && CurrEX().GetOpline().GetOpcode() == ZEND_INCLUDE_OR_EVAL && CurrEX().GetOpline().GetExtendedValue() == ZEND_EVAL) {
 			EG__().SetExitStatus(255)
 		}
 
@@ -840,7 +840,7 @@ func ZendThrowError(exception_ce *ZendClassEntry, format string, args ...any) {
 
 	//TODO: we can't convert compile-time errors to exceptions yet???
 
-	if EG__().GetCurrentExecuteData() != nil && CG__().GetInCompilation() == 0 {
+	if CurrEX() != nil && CG__().GetInCompilation() == 0 {
 		ZendThrowException(exception_ce, message, 0)
 	} else {
 		ZendError(E_ERROR, "%s", message)

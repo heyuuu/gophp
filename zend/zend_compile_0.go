@@ -64,17 +64,13 @@ func EX(element __auto__) __auto__                           { return executeDat
 func EX_CALL_INFO() uint32                                   { return ZEND_CALL_INFO(executeData) }
 func EX_CALL_KIND() int                                      { return ZEND_CALL_KIND(executeData) }
 func EX_NUM_ARGS() uint32                                    { return ZEND_CALL_NUM_ARGS(executeData) }
-func ZEND_CALL_USES_STRICT_TYPES(call *ZendExecuteData) bool { return call.GetFunc().IsStrictTypes() }
+func ZEND_CALL_USES_STRICT_TYPES(call *ZendExecuteData) bool { return call.IsStrictTypesCall() }
 func EX_USES_STRICT_TYPES() bool {
 	return ZEND_CALL_USES_STRICT_TYPES(executeData)
 }
-func ZEND_ARG_USES_STRICT_TYPES() bool {
-	return EG__().GetCurrentExecuteData().GetPrevExecuteData() != nil && EG__().GetCurrentExecuteData().GetPrevExecuteData().GetFunc() != nil && ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData().GetPrevExecuteData())
-}
-func ZEND_RET_USES_STRICT_TYPES() bool {
-	return ZEND_CALL_USES_STRICT_TYPES(EG__().GetCurrentExecuteData())
-}
-func EX_VAR(n uint32) *Zval { return ZEND_CALL_VAR(executeData, n) }
+func ZEND_ARG_USES_STRICT_TYPES() bool { return CurrEX().IsStrictTypesArg() }
+func ZEND_RET_USES_STRICT_TYPES() bool { return CurrEX().IsStrictTypesCall() }
+func EX_VAR(n uint32) *Zval            { return ZEND_CALL_VAR(executeData, n) }
 func EX_VAR_NUM(n int) *Zval {
 	return ZEND_CALL_VAR_NUM(executeData, n)
 }

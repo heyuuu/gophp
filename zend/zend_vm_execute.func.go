@@ -609,7 +609,7 @@ func zend_leave_helper_SPEC(executeData *ZendExecuteData) int {
 		EfreeSize(EX(func_), b.SizeOf("zend_op_array"))
 		old_execute_data = executeData
 		EG__().SetCurrentExecuteData(EX(prev_execute_data))
-		executeData = EG__().GetCurrentExecuteData()
+		executeData = CurrEX()
 		ZendVmStackFreeCallFrameEx(call_info, old_execute_data)
 		ZendAttachSymbolTable(executeData)
 		if EG__().GetException() != nil {
@@ -1895,7 +1895,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 	}
 	call = executeData
 	EG__().SetCurrentExecuteData(EX(prev_execute_data))
-	executeData = EG__().GetCurrentExecuteData()
+	executeData = CurrEX()
 	if fbc.GetOpArray().IsStatic() {
 		call.SetFunc(fbc.GetOpArray().GetScope().GetCallstatic())
 	} else {
@@ -1957,7 +1957,7 @@ func ZEND_CALL_TRAMPOLINE_SPEC_HANDLER(executeData *ZendExecuteData) int {
 			ZvalPtrDtor(ret)
 		}
 	}
-	executeData = EG__().GetCurrentExecuteData()
+	executeData = CurrEX()
 	if !(EX(func_)) || !(ZEND_USER_CODE(EX(func_).type_)) || (call_info&ZEND_CALL_TOP) != 0 {
 		return -1
 	}
@@ -43730,7 +43730,7 @@ func ExecuteEx(ex *ZendExecuteData) {
 		var ret int
 		if b.Assign(&ret, OpcodeHandlerT(OPLINE.handler)(executeData)) != 0 {
 			if ret > 0 {
-				executeData = EG__().GetCurrentExecuteData()
+				executeData = CurrEX()
 				ZEND_VM_LOOP_INTERRUPT_CHECK()
 			} else {
 				return
@@ -43746,20 +43746,20 @@ func ZendExecute(op_array *ZendOpArray, return_value *Zval) {
 	if EG__().GetException() != nil {
 		return
 	}
-	object_or_called_scope = ZendGetThisObject(EG__().GetCurrentExecuteData())
+	object_or_called_scope = ZendGetThisObject(CurrEX())
 	if !object_or_called_scope {
-		object_or_called_scope = ZendGetCalledScope(EG__().GetCurrentExecuteData())
+		object_or_called_scope = ZendGetCalledScope(CurrEX())
 		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE
 	} else {
 		call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE | ZEND_CALL_HAS_THIS
 	}
 	executeData = ZendVmStackPushCallFrame(call_info, (*ZendFunction)(op_array), 0, object_or_called_scope)
-	if EG__().GetCurrentExecuteData() != nil {
+	if CurrEX() != nil {
 		executeData.SetSymbolTable(ZendRebuildSymbolTable())
 	} else {
 		executeData.SetSymbolTable(EG__().GetSymbolTable())
 	}
-	EX(prev_execute_data) = EG__().GetCurrentExecuteData()
+	EX(prev_execute_data) = CurrEX()
 	IInitCodeExecuteData(executeData, op_array, return_value)
 	ZendExecuteEx(executeData)
 	ZendVmStackFreeCallFrame(executeData)

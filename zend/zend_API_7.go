@@ -65,13 +65,13 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 				*error = Estrdup("cannot access self:: when no class scope is active")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope) == 0 {
 				fcc.SetCalledScope(scope)
 			}
 			fcc.SetCallingScope(scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(CurrEX()))
 			}
 			ret = 1
 		}
@@ -85,19 +85,19 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 				*error = Estrdup("cannot access parent:: when current class scope has no parent")
 			}
 		} else {
-			fcc.SetCalledScope(ZendGetCalledScope(EG__().GetCurrentExecuteData()))
+			fcc.SetCalledScope(ZendGetCalledScope(CurrEX()))
 			if fcc.GetCalledScope() == nil || InstanceofFunction(fcc.GetCalledScope(), scope.GetParent()) == 0 {
 				fcc.SetCalledScope(scope.GetParent())
 			}
 			fcc.SetCallingScope(scope.GetParent())
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(CurrEX()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
 	} else if ZendStringEqualsLiteral(lcname, "static") {
-		var called_scope *ZendClassEntry = ZendGetCalledScope(EG__().GetCurrentExecuteData())
+		var called_scope *ZendClassEntry = ZendGetCalledScope(CurrEX())
 		if called_scope == nil {
 			if error != nil {
 				*error = Estrdup("cannot access static:: when no class scope is active")
@@ -106,14 +106,14 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 			fcc.SetCalledScope(called_scope)
 			fcc.SetCallingScope(called_scope)
 			if fcc.GetObject() == nil {
-				fcc.SetObject(ZendGetThisObject(EG__().GetCurrentExecuteData()))
+				fcc.SetObject(ZendGetThisObject(CurrEX()))
 			}
 			*strict_class = 1
 			ret = 1
 		}
 	} else if b.Assign(&ce, ZendLookupClass(name)) != nil {
 		var scope *ZendClassEntry
-		var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+		var ex *ZendExecuteData = CurrEX()
 		for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {
 			ex = ex.GetPrevExecuteData()
 		}
@@ -124,7 +124,7 @@ func ZendIsCallableCheckClass(name *ZendString, scope *ZendClassEntry, fcc *Zend
 		}
 		fcc.SetCallingScope(ce)
 		if scope != nil && fcc.GetObject() == nil {
-			var object *ZendObject = ZendGetThisObject(EG__().GetCurrentExecuteData())
+			var object *ZendObject = ZendGetThisObject(CurrEX())
 			if object != nil && InstanceofFunction(object.GetCe(), scope) != 0 && InstanceofFunction(scope, ce) != 0 {
 				fcc.SetObject(object)
 				fcc.SetCalledScope(object.GetCe())
@@ -313,7 +313,7 @@ func ZendIsCallableCheckFunc(check_flags int, callable *Zval, fcc *ZendFcallInfo
 				retval = 1
 				call_via_handler = fcc.GetFunctionHandler().IsCallViaTrampoline()
 				if call_via_handler != 0 && fcc.GetObject() == nil {
-					var object *ZendObject = ZendGetThisObject(EG__().GetCurrentExecuteData())
+					var object *ZendObject = ZendGetThisObject(CurrEX())
 					if object != nil && InstanceofFunction(object.GetCe(), fcc.GetCallingScope()) != 0 {
 						fcc.SetObject(object)
 					}

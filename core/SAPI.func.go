@@ -685,7 +685,7 @@ func SapiRegisterPostEntries(post_entries *SapiPostEntry) int {
 func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	var ret int
 	var key *zend.ZendString
-	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
+	if SG__().sapi_started && zend.CurrEX() != nil {
 		return zend.FAILURE
 	}
 	key = zend.ZendStringInit(post_entry.GetContentType(), post_entry.GetContentTypeLen(), 1)
@@ -699,21 +699,21 @@ func SapiRegisterPostEntry(post_entry *SapiPostEntry) int {
 	return ret
 }
 func SapiRegisterDefaultPostReader(default_post_reader func()) int {
-	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
+	if SG__().sapi_started && zend.CurrEX() != nil {
 		return zend.FAILURE
 	}
 	SM__().SetDefaultPostReader(default_post_reader)
 	return zend.SUCCESS
 }
 func SapiRegisterTreatData(treat_data func(arg int, str *byte, destArray *zend.Zval)) int {
-	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
+	if SG__().sapi_started && zend.CurrEX() != nil {
 		return zend.FAILURE
 	}
 	SM__().SetTreatData(treat_data)
 	return zend.SUCCESS
 }
 func SapiRegisterInputFilter(input_filter func(arg int, var_ *byte, val **byte, val_len int, new_val_len *int) uint, input_filter_init func() uint) int {
-	if SG__().sapi_started && zend.EG__().GetCurrentExecuteData() != nil {
+	if SG__().sapi_started && zend.CurrEX() != nil {
 		return zend.FAILURE
 	}
 	SM__().SetInputFilter(input_filter)

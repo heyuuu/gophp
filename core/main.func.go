@@ -596,8 +596,8 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 		function = "PHP Startup"
 	} else if PhpDuringModuleShutdown() != 0 {
 		function = "PHP Shutdown"
-	} else if zend.EG__().GetCurrentExecuteData() != nil && zend.EG__().GetCurrentExecuteData().GetFunc() != nil && zend.ZEND_USER_CODE(zend.EG__().GetCurrentExecuteData().GetFunc().GetCommonType()) && zend.EG__().GetCurrentExecuteData().GetOpline() != nil && zend.EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
-		switch zend.EG__().GetCurrentExecuteData().GetOpline().GetExtendedValue() {
+	} else if zend.CurrEX() != nil && zend.CurrEX().GetFunc() != nil && zend.ZEND_USER_CODE(zend.CurrEX().GetFunc().GetCommonType()) && zend.CurrEX().GetOpline() != nil && zend.CurrEX().GetOpline().GetOpcode() == zend.ZEND_INCLUDE_OR_EVAL {
+		switch zend.CurrEX().GetOpline().GetExtendedValue() {
 		case zend.ZEND_EVAL:
 			function = "eval"
 			is_function = 1
@@ -726,7 +726,7 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 && (zend.EG__().GetUserErrorHandler().IsType(zend.IS_UNDEF) || (zend.EG__().GetUserErrorHandlerErrorReporting()&type_) == 0) {
 		var tmp zend.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
-		if zend.EG__().GetCurrentExecuteData() != nil {
+		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == zend.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}
@@ -1007,7 +1007,7 @@ func PhpErrorCb(type_ int, error_filename string, error_lineno uint32, format st
 	if PG(track_errors) && ModuleInitialized != 0 && zend.EG__().GetActive() != 0 {
 		var tmp zend.Zval
 		tmp.SetRawString(b.CastStr(buffer, buffer_len))
-		if zend.EG__().GetCurrentExecuteData() != nil {
+		if zend.CurrEX() != nil {
 			if zend.ZendSetLocalVarStr("php_errormsg", b.SizeOf("\"php_errormsg\"")-1, &tmp, 0) == zend.FAILURE {
 				zend.ZvalPtrDtor(&tmp)
 			}

@@ -99,7 +99,7 @@ func ZendThrowExceptionInternal(exception *Zval) {
 			return
 		}
 	}
-	if EG__().GetCurrentExecuteData() == nil {
+	if CurrEX() == nil {
 		if exception != nil && (Z_OBJCE_P(exception) == ZendCeParseError || Z_OBJCE_P(exception) == ZendCeCompileError) {
 			return
 		}
@@ -111,7 +111,7 @@ func ZendThrowExceptionInternal(exception *Zval) {
 	if ZendThrowExceptionHook != nil {
 		ZendThrowExceptionHook(exception)
 	}
-	if EG__().GetCurrentExecuteData().GetFunc() == nil || !(ZEND_USER_CODE(EG__().GetCurrentExecuteData().GetFunc().GetCommonType())) || EG__().GetCurrentExecuteData().GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
+	if CurrEX().GetFunc() == nil || !(ZEND_USER_CODE(CurrEX().GetFunc().GetCommonType())) || CurrEX().GetOpline().GetOpcode() == ZEND_HANDLE_EXCEPTION {
 
 		/* no need to rethrow the exception */
 
@@ -120,8 +120,8 @@ func ZendThrowExceptionInternal(exception *Zval) {
 		/* no need to rethrow the exception */
 
 	}
-	EG__().SetOplineBeforeException(EG__().GetCurrentExecuteData().GetOpline())
-	EG__().GetCurrentExecuteData().SetOpline(EG__().GetExceptionOp())
+	EG__().SetOplineBeforeException(CurrEX().GetOpline())
+	CurrEX().SetOpline(EG__().GetExceptionOp())
 }
 func ZendClearException() {
 	var exception *ZendObject
@@ -138,8 +138,8 @@ func ZendClearException() {
 	exception = EG__().GetException()
 	EG__().SetException(nil)
 	OBJ_RELEASE(exception)
-	if EG__().GetCurrentExecuteData() != nil {
-		EG__().GetCurrentExecuteData().SetOpline(EG__().GetOplineBeforeException())
+	if CurrEX() != nil {
+		CurrEX().SetOpline(EG__().GetOplineBeforeException())
 	}
 }
 func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) *ZendObject {
@@ -153,7 +153,7 @@ func ZendDefaultExceptionNewEx(class_type *ZendClassEntry, skip_top_traces int) 
 	obj.SetObj(object)
 	Z_OBJ_HT(obj) = &DefaultExceptionHandlers
 	ObjectPropertiesInit(object, class_type)
-	if EG__().GetCurrentExecuteData() != nil {
+	if CurrEX() != nil {
 		ZendFetchDebugBacktrace(&trace, skip_top_traces, b.Cond(EG__().GetExceptionIgnoreArgs() != 0, DEBUG_BACKTRACE_IGNORE_ARGS, 0), 0)
 	} else {
 		ArrayInit(&trace)

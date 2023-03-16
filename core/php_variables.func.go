@@ -106,8 +106,8 @@ func PhpRegisterVariableEx(var_name *byte, val *zend.Zval, track_vars_array *zen
 		zend.FreeAlloca(var_orig, use_heap)
 		return
 	}
-	if var_len == b.SizeOf("\"this\"")-1 && zend.EG__().GetCurrentExecuteData() != nil {
-		var ex *zend.ZendExecuteData = zend.EG__().GetCurrentExecuteData()
+	if var_len == b.SizeOf("\"this\"")-1 && zend.CurrEX() != nil {
+		var ex *zend.ZendExecuteData = zend.CurrEX()
 		for ex != nil {
 			if ex.GetFunc() != nil && zend.ZEND_USER_CODE(ex.GetFunc().GetCommonType()) {
 				if (zend.ZEND_CALL_INFO(ex)&zend.ZEND_CALL_HAS_SYMBOL_TABLE) != 0 && ex.GetSymbolTable() == symtable1 {

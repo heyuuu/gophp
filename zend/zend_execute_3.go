@@ -37,7 +37,7 @@ func ZendWrongStringOffset(executeData *ZendExecuteData) {
 
 		var_ = opline.GetResult().GetVar()
 		opline++
-		end = EG__().GetCurrentExecuteData().GetFunc().GetOpArray().GetOpcodes() + EG__().GetCurrentExecuteData().GetFunc().GetOpArray().GetLast()
+		end = CurrEX().GetFunc().GetOpArray().GetOpcodes() + CurrEX().GetFunc().GetOpArray().GetLast()
 		for opline < end {
 			if opline.GetOp1Type() == IS_VAR && opline.GetOp1().GetVar() == var_ {
 				switch opline.GetOpcode() {

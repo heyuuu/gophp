@@ -351,14 +351,14 @@ func IInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, r
 }
 func ZendInitFuncExecuteData(ex *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
 	var executeData *ZendExecuteData = ex
-	EX(prev_execute_data) = EG__().GetCurrentExecuteData()
+	EX(prev_execute_data) = CurrEX()
 	if !(RUN_TIME_CACHE(op_array)) {
 		InitFuncRunTimeCache(op_array)
 	}
 	IInitFuncExecuteData(op_array, return_value, 1, executeData)
 }
 func ZendInitCodeExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {
-	EX(prev_execute_data) = EG__().GetCurrentExecuteData()
+	EX(prev_execute_data) = CurrEX()
 	IInitCodeExecuteData(executeData, op_array, return_value)
 }
 func ZendInitExecuteData(executeData *ZendExecuteData, op_array *ZendOpArray, return_value *Zval) {

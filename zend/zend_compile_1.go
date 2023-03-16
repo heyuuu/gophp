@@ -159,8 +159,8 @@ func DoBindClass(lcname *Zval, lc_parent_name *ZendString) int {
 			return FAILURE
 		} else {
 			for {
-				ZEND_ASSERT(EG__().GetCurrentExecuteData().GetFunc().GetOpArray().IsPreloaded())
-				if ZendPreloadAutoload != nil && ZendPreloadAutoload(EG__().GetCurrentExecuteData().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
+				ZEND_ASSERT(CurrEX().GetFunc().GetOpArray().IsPreloaded())
+				if ZendPreloadAutoload != nil && ZendPreloadAutoload(CurrEX().GetFunc().GetOpArray().GetFilename()) == SUCCESS {
 					zv = EG__().GetClassTable().KeyFind(rtd_key.GetStr().GetStr())
 					if zv != nil {
 						break

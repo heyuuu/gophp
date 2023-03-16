@@ -75,7 +75,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a private function, we're allowed to do so.
 				 */
 
-				if EG__().GetCurrentExecuteData() != nil {
+				if CurrEX() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if object.GetCe() != scope {
 						ZendThrowError(nil, "Call to private %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))
@@ -94,7 +94,7 @@ func ZendObjectsDestroyObject(object *ZendObject) {
 				/* Ensure that if we're calling a protected function, we're allowed to do so.
 				 */
 
-				if EG__().GetCurrentExecuteData() != nil {
+				if CurrEX() != nil {
 					var scope *ZendClassEntry = ZendGetExecutedScope()
 					if ZendCheckProtected(ZendGetFunctionRootClass(destructor), scope) == 0 {
 						ZendThrowError(nil, "Call to protected %s::__destruct() from context '%s'", object.GetCe().GetName().GetVal(), b.CondF1(scope != nil, func() []byte { return scope.GetName().GetVal() }, ""))

@@ -1598,7 +1598,7 @@ func SplFilesystemFileReadLineEx(this_ptr *zend.Zval, intern *SplFilesystemObjec
 		if SPL_HAS_FLAG(intern.GetFlags(), SPL_FILE_OBJECT_READ_CSV) != 0 {
 			return SplFilesystemFileReadCsv(intern, intern.GetDelimiter(), intern.GetEnclosure(), intern.GetEscape(), nil)
 		} else {
-			var executeData *zend.ZendExecuteData = zend.EG__().GetCurrentExecuteData()
+			var executeData *zend.ZendExecuteData = zend.CurrEX()
 			zend.ZendCallMethodWith0Params(this_ptr, zend.Z_OBJCE_P(zend.ZEND_THIS(executeData)), intern.GetFuncGetCurr(), "getCurrentLine", &retval)
 		}
 		if !(retval.IsUndef()) {

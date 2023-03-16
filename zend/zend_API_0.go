@@ -102,7 +102,7 @@ func CallUserFunctionEx(object *Zval, function_name *Zval, retval_ptr *Zval, par
 	return _callUserFunctionEx(object, function_name, retval_ptr, param_count, params, no_separation)
 }
 func ZendForbidDynamicCall(func_name string) int {
-	var ex *ZendExecuteData = EG__().GetCurrentExecuteData()
+	var ex *ZendExecuteData = CurrEX()
 	ZEND_ASSERT(ex != nil && ex.GetFunc() != nil)
 	if (ZEND_CALL_INFO(ex) & ZEND_CALL_DYNAMIC) != 0 {
 		ZendError(E_WARNING, "Cannot call %s dynamically", func_name)

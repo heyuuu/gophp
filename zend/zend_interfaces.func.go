@@ -116,7 +116,7 @@ func ZendCallMethod(
 		if object != nil {
 			fcic.SetCalledScope(Z_OBJCE_P(object))
 		} else {
-			var called_scope *ZendClassEntry = ZendGetCalledScope(EG__().GetCurrentExecuteData())
+			var called_scope *ZendClassEntry = ZendGetCalledScope(CurrEX())
 			if obj_ce != nil && (called_scope == nil || InstanceofFunction(called_scope, obj_ce) == 0) {
 				fcic.SetCalledScope(obj_ce)
 			} else {

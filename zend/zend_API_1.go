@@ -224,8 +224,8 @@ func ZendParseArgZvalDeref(arg *Zval, dest **Zval, check_null int) {
 func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), 1)
-	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	param_ptr = ZEND_CALL_ARG(CurrEX(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
 	if param_count > arg_count {
 		return FAILURE
 	}
@@ -239,8 +239,8 @@ func _zendGetParametersArrayEx(param_count int, argument_array *Zval) int {
 func ZendCopyParametersArray(param_count int, argument_array *Zval) int {
 	var param_ptr *Zval
 	var arg_count int
-	param_ptr = ZEND_CALL_ARG(EG__().GetCurrentExecuteData(), 1)
-	arg_count = ZEND_CALL_NUM_ARGS(EG__().GetCurrentExecuteData())
+	param_ptr = ZEND_CALL_ARG(CurrEX(), 1)
+	arg_count = ZEND_CALL_NUM_ARGS(CurrEX())
 	if param_count > arg_count {
 		return FAILURE
 	}
