@@ -21,6 +21,78 @@ type ZendExecuteData struct {
 	run_time_cache  *any
 }
 
+func (this *ZendExecuteData) FunctionName() string {
+	if this == nil {
+		return ""
+	}
+
+	activeFunc := this.GetFunc()
+	if activeFunc == nil {
+		return ""
+	}
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		funcName := activeFunc.GetFunctionName()
+		if funcName != nil {
+			return funcName.GetStr()
+		} else {
+			return "main"
+		}
+	default:
+		return ""
+	}
+}
+func (this *ZendExecuteData) ClassName() string {
+	if this == nil {
+		return ""
+	}
+
+	activeFunc := this.GetFunc()
+	if activeFunc == nil {
+		return ""
+	}
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		ce := activeFunc.GetScope()
+		if ce != nil {
+			return ce.Name()
+		} else {
+			return ""
+		}
+	default:
+		return ""
+	}
+}
+func (this *ZendExecuteData) CalleeName() string {
+	if this == nil {
+		return ""
+	}
+
+	activeFunc := this.GetFunc()
+	if activeFunc == nil {
+		return ""
+	}
+
+	switch activeFunc.GetType() {
+	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
+		// scopePrefix(className + "::")
+		scopePrefix := ""
+		if activeFunc.GetScope() != nil {
+			scopePrefix = activeFunc.GetScope().Name() + "::"
+		}
+
+		// func name
+		funcName := activeFunc.GetFunctionName()
+		if funcName != nil {
+			return scopePrefix + funcName.GetStr()
+		} else {
+			return "main"
+		}
+	default:
+		return ""
+	}
+}
+
 func (this *ZendExecuteData) isStrictTypes() bool {
 	return this != nil && this.func_ != nil && this.func_.IsStrictTypes()
 }
@@ -42,6 +114,11 @@ func (this *ZendExecuteData) CheckMinNumArgs(minNumArgs int, forceStrict bool) b
 func (this *ZendExecuteData) CheckNumArgs(minNumArgs int, maxNumArgs int, forceStrict bool) bool {
 	// 检查参数个数，若检查通过直接返回
 	numArgs := int(this.NumArgs())
+	return this.CheckNumArgsEx(numArgs, minNumArgs, maxNumArgs, forceStrict)
+}
+
+func (this *ZendExecuteData) CheckNumArgsEx(numArgs int, minNumArgs int, maxNumArgs int, forceStrict bool) bool {
+	// 检查参数个数，若检查通过直接返回
 	if numArgs >= minNumArgs && numArgs <= maxNumArgs {
 		return true
 	}

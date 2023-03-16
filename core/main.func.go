@@ -617,12 +617,15 @@ func PhpVerror(docref *byte, params *byte, type_ int, format *byte, args ...any)
 			function = "Unknown"
 		}
 	} else {
-		function = zend.GetActiveFunctionName()
+		function = zend.CurrEX().FunctionName()
 		if function == "" {
 			function = "Unknown"
 		} else {
 			is_function = 1
-			class_name, space = zend.GetActiveClassName()
+			class_name = zend.CurrEX().ClassName()
+			if class_name != "" {
+				space = "::"
+			}
 		}
 	}
 

@@ -371,72 +371,8 @@ func ShutdownExecutor() {
 	ZendShutdownFpu()
 }
 
-func GetActiveCalleeName() string {
-	if !ZendIsExecuting() {
-		return ""
-	}
-
-	activeFunc := CurrEX().GetFunc()
-	switch activeFunc.GetType() {
-	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
-		// func name
-		funcNameZStr := activeFunc.GetFunctionName()
-		funcName := ""
-		if funcNameZStr != nil {
-			funcName = funcNameZStr.GetStr()
-		} else {
-			funcName = "main"
-		}
-
-		// scope name
-		ce := activeFunc.GetScope()
-		if ce != nil {
-			return ce.Name() + "::" + funcName
-		} else {
-			return funcName
-		}
-	}
-
-	return ""
-}
-
-func GetActiveClassName() (className string, space string) {
-	if !ZendIsExecuting() {
-		return
-	}
-
-	activeFunc := CurrEX().GetFunc()
-	switch activeFunc.GetType() {
-	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
-		ce := activeFunc.GetScope()
-		if ce != nil {
-			return "::", ce.Name()
-		} else {
-			return
-		}
-	default:
-		return
-	}
-}
-
-func GetActiveFunctionName() string {
-	if !ZendIsExecuting() {
-		return ""
-	}
-
-	activeFunc := CurrEX().GetFunc()
-	switch activeFunc.GetType() {
-	case ZEND_USER_FUNCTION, ZEND_INTERNAL_FUNCTION:
-		var function_name = activeFunc.GetFunctionName()
-		if function_name != nil {
-			return function_name.GetStr()
-		} else {
-			return "main"
-		}
-	default:
-		return ""
-	}
-}
+func GetActiveCalleeName() string   { return CurrEX().CalleeName() }
+func GetActiveFunctionName() string { return CurrEX().FunctionName() }
 func ZendGetExecutedFilename() string {
 	var ex *ZendExecuteData = CurrEX()
 	for ex != nil && (ex.GetFunc() == nil || !(ZEND_USER_CODE(ex.GetFunc().GetType()))) {

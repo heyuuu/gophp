@@ -16,14 +16,12 @@ func ZendParseArg(arg_num int, arg *Zval, va *va_list, spec **byte, flags int) i
 			return FAILURE
 		}
 		if (flags&ZEND_PARSE_PARAMS_QUIET) == 0 && ((*expected_type) || error != nil) {
-			var space *byte
-			class_name, space := GetActiveClassName()
-			var throw_exception ZendBool = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
+			var throwException = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
 			if error != nil {
-				ZendInternalTypeError(throw_exception, "%s%s%s() expects parameter %d %s", class_name, space, GetActiveFunctionName(), arg_num, error)
+				ZendInternalTypeError(throwException, "%s() expects parameter %d %s", GetActiveCalleeName(), arg_num, error)
 				Efree(error)
 			} else {
-				ZendInternalTypeError(throw_exception, "%s%s%s() expects parameter %d to be %s, %s given", class_name, space, GetActiveFunctionName(), arg_num, expected_type, ZendZvalTypeName(arg))
+				ZendInternalTypeError(throwException, "%s() expects parameter %d to be %s, %s given", GetActiveCalleeName(), arg_num, expected_type, ZendZvalTypeName(arg))
 			}
 		}
 		if severity != E_DEPRECATED {
@@ -37,6 +35,78 @@ func ZendParseParametersDebugError(msg string) {
 	var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
 	ZendErrorNoreturn(E_CORE_ERROR, "%s%s%s(): %s", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), msg)
 }
+
+func ZendParseVaArgs_Ex(numArgs int, typeSpec string, args []any, flags int) bool {
+	maxNumArgs := 0
+	minNumArgs := -1
+	haveVarargs := false
+	postVarargs := 0
+	for _, c := range []byte(typeSpec) {
+		switch c {
+		case 'l', 'L',
+			'd',
+			's',
+			'b',
+			'r',
+			'a',
+			'o',
+			'O',
+			'z',
+			'Z',
+			'C',
+			'h',
+			'f',
+			'A',
+			'H',
+			'p',
+			'S',
+			'P':
+			maxNumArgs++
+		case '|':
+			minNumArgs = maxNumArgs
+		case '/', '!':
+		/* Pass */
+		case '*', '+':
+			if haveVarargs {
+				ZendParseParametersDebugError("only one varargs specifier (* or +) is permitted")
+				return false
+			}
+			haveVarargs = true
+
+			/* we expect at least one parameter in varargs */
+			if c == '+' {
+				maxNumArgs++
+			}
+
+			/* mark the beginning of varargs */
+			postVarargs = maxNumArgs
+		default:
+			ZendParseParametersDebugError("bad type specifier while parsing parameters")
+			return false
+		}
+	}
+	if minNumArgs < 0 {
+		minNumArgs = maxNumArgs
+	}
+	if haveVarargs {
+		/* calculate how many required args are at the end of the specifier list */
+		postVarargs = maxNumArgs - postVarargs
+		maxNumArgs = -1
+	}
+	if numArgs < minNumArgs || (numArgs > maxNumArgs && maxNumArgs >= 0) {
+		if (flags & ZEND_PARSE_PARAMS_QUIET) == 0 {
+
+			CurrEX().CheckNumArgs()
+
+			var active_function *ZendFunction = CurrEX().GetFunc()
+			var class_name *byte = b.CondF1(active_function.GetScope() != nil, func() []byte { return active_function.GetScope().GetName().GetVal() }, "")
+			var throwException = ZEND_ARG_USES_STRICT_TYPES() || (flags&ZEND_PARSE_PARAMS_THROW) != 0
+			ZendInternalArgumentCountError(throwException, "%s%s%s() expects %s %d parameter%s, %d given", class_name, b.Cond(class_name[0], "::", ""), active_function.GetFunctionName().GetVal(), b.Cond(b.Cond(min_num_args == max_num_args, "exactly", num_args < min_num_args), "at least", "at most"), b.Cond(num_args < min_num_args, min_num_args, max_num_args), b.Cond(b.Cond(num_args < min_num_args, min_num_args, max_num_args) == 1, "", "s"), num_args)
+		}
+
+	}
+}
+
 func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int {
 	var spec_walk *byte
 	var c int
@@ -53,41 +123,23 @@ func ZendParseVaArgs(num_args int, type_spec *byte, va *va_list, flags int) int 
 		c = *spec_walk
 		switch c {
 		case 'l':
-
 		case 'd':
-
 		case 's':
-
 		case 'b':
-
 		case 'r':
-
 		case 'a':
-
 		case 'o':
-
 		case 'O':
-
 		case 'z':
-
 		case 'Z':
-
 		case 'C':
-
 		case 'h':
-
 		case 'f':
-
 		case 'A':
-
 		case 'H':
-
 		case 'p':
-
 		case 'S':
-
 		case 'P':
-
 		case 'L':
 			max_num_args++
 			break
