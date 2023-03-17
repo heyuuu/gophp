@@ -1939,8 +1939,8 @@ func ZendDoTraitsPropertyBinding(ce *ZendClassEntry, traits **ZendClassEntry) {
 						if (flags & ZEND_ACC_STATIC) != 0 {
 							op1 = ce.GetDefaultStaticMembersTable()[coliding_prop.GetOffset()]
 							op2 = traits[i].GetDefaultStaticMembersTable()[property_info.GetOffset()]
-							ZVAL_DEINDIRECT(op1)
-							ZVAL_DEINDIRECT(op2)
+							op1 = ZVAL_DEINDIRECT(op1)
+							op2 = ZVAL_DEINDIRECT(op2)
 						} else {
 							op1 = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(coliding_prop.GetOffset())]
 							op2 = traits[i].GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(property_info.GetOffset())]

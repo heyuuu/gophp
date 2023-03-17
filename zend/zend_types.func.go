@@ -186,16 +186,11 @@ func ZVAL_DEREF(z *Zval) *Zval { // todo replace
 	}
 	return z
 }
-func ZVAL_DEINDIRECT_EX(z *Zval) *Zval { // todo replace
+func ZVAL_DEINDIRECT(z *Zval) *Zval { // todo replace
 	if z.IsIndirect() {
 		return z.GetZv()
 	}
 	return z
-}
-func ZVAL_DEINDIRECT(z *Zval) { // todo replace
-	if z.IsIndirect() {
-		z = z.GetZv()
-	}
 }
 func ZVAL_MAKE_REF(zv *Zval) {
 	var __zv *Zval = zv

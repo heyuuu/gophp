@@ -1294,7 +1294,7 @@ func ZendClassInitStatics(class_type *ZendClassEntry) {
 			p = class_type.GetDefaultStaticMembersTable()[i]
 			if p.IsIndirect() {
 				var q *Zval = &CE_STATIC_MEMBERS(class_type.GetParent())[i]
-				ZVAL_DEINDIRECT(q)
+				q = ZVAL_DEINDIRECT(q)
 				CE_STATIC_MEMBERS(class_type)[i].SetIndirect(q)
 			} else {
 				ZVAL_COPY_OR_DUP(&CE_STATIC_MEMBERS(class_type)[i], p)
@@ -1348,7 +1348,7 @@ func ZendStdGetStaticPropertyWithInfo(ce *ZendClassEntry, property_name *ZendStr
 		}
 	}
 	ret = CE_STATIC_MEMBERS(ce) + property_info.GetOffset()
-	ZVAL_DEINDIRECT(ret)
+	ret = ZVAL_DEINDIRECT(ret)
 	if (type_ == BP_VAR_R || type_ == BP_VAR_RW) && ret.IsUndef() && property_info.GetType() != 0 {
 		ZendThrowError(nil, "Typed static property %s::$%s must not be accessed before initialization", property_info.GetCe().GetName().GetVal(), ZendGetUnmangledPropertyName(property_name))
 		return nil

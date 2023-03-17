@@ -1292,7 +1292,7 @@ func AddClassVars(scope *ZendClassEntry, ce *ZendClassEntry, statics int, return
 		prop = nil
 		if statics != 0 && prop_info.IsStatic() {
 			prop = ce.GetDefaultStaticMembersTable()[prop_info.GetOffset()]
-			ZVAL_DEINDIRECT(prop)
+			prop = ZVAL_DEINDIRECT(prop)
 		} else if statics == 0 && !prop_info.IsStatic() {
 			prop = ce.GetDefaultPropertiesTable()[OBJ_PROP_TO_NUM(prop_info.GetOffset())]
 		}
